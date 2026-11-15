@@ -12,6 +12,9 @@
 //     the slot list shows it; opening the slot after the world changed restores the saved world exactly (state and
 //     digest); a refused slot is reported, changes nothing and leaves its file as it was; without a still renderer the
 //     world is saved without a picture and the slot says so.
+// Feature 093 (A12-P05) T-A12-506 (FR-A12-504; SC-A12-504): each of the three packs saved at each detail tier reopens
+// at another tier with the same state and digest, its thumbnail a 160 × 120 PNG of at most 64 KB (the tier is
+// presentation only and never enters a saved world).
 import Foundation
 import UIKit
 import XCTest
@@ -249,6 +252,47 @@ final class WorldStoreTests: XCTestCase {
         XCTAssertEqual(presenter.lastPropsDrawn, 2)
         XCTAssertEqual(presenter.mirror.props, saved.props)
         session.close()
+    }
+
+    func testSavedWorldsRoundTripAcrossTiersAndPacks() async throws {
+        let session = ExperienceSession()
+        let shell = try await WorldsTest.open(session, store: WorldStore(storage: storage))
+        let presenter = shell.presenter
+        for pack in 0..<3 {
+            for saveTier in 0..<3 {
+                let label = "pack \(pack), saved at tier \(saveTier)"
+                XCTAssertTrue(shell.handle(control: "world.pack", values: [Double(pack)]).isAccepted, label)
+                try shell.setQualityTier(saveTier)
+                try WorldsTest.frames(session, 1)
+                XCTAssertEqual(presenter.lastTier, saveTier, label)
+                let saved = try WorldsTest.core(shell)
+                let digest = try shell.engine.digest()
+                let message = presenter.saveWorld(slot: pack, still: WorldsTest.stillRenderer(session))
+                XCTAssertTrue(message.hasPrefix("Saved") && !message.contains("no picture"), "\(label): \(message)")
+                let png = try storage.read(WorldStore.pictureName(slot: pack))
+                XCTAssertLessThanOrEqual(png.count, WorldStore.maxThumbnailBytes, label)
+                let image = try XCTUnwrap(UIImage(data: png)?.cgImage, label)
+                XCTAssertEqual(image.width, 160, label)
+                XCTAssertEqual(image.height, 120, label)
+
+                // Another tier and another world, then open the slot.
+                let openTier = (saveTier + 1) % 3
+                try shell.setQualityTier(openTier)
+                XCTAssertTrue(shell.handle(control: "world.preset", values: [Double((pack + 1) % 3)]).isAccepted, label)
+                try WorldsTest.frames(session, 1)
+                XCTAssertEqual(presenter.lastTier, openTier, label)
+                XCTAssertNotEqual(try shell.engine.digest(), digest, "\(label): the world changed")
+                let opened = presenter.openWorld(slot: pack)
+                XCTAssertTrue(opened.hasPrefix("Opened"), "\(label): \(opened)")
+                XCTAssertEqual(try WorldsTest.core(shell).state, saved.state, "\(label): the same document")
+                XCTAssertEqual(try shell.engine.digest(), digest, "\(label): the same digest")
+                try WorldsTest.frames(session, 1)
+                XCTAssertEqual(presenter.lastTier, openTier, "\(label): opened at the other tier")
+                XCTAssertEqual(try shell.engine.digest(), digest, "\(label): drawing changes nothing")
+            }
+        }
+        session.close()
+        XCTAssertEqual(session.diagnostics.lastCloseCounts?.objects, 0)
     }
 
     func testARefusedSlotChangesNothingAndReportsItsReason() async throws {
