@@ -7,7 +7,7 @@ after every task (no trailers); read every check's exit before ticking. No Swift
 
 ## Phase 1: Setup
 
-- [ ] T-A12-001 Create `docs/apps/tiny-worlds/README.md` (what the experience is per the manual §1–§2: a curated gallery of miniature procedural worlds with orbit navigation and gentle customization; that it is an experience of the one app; its documents) and `docs/apps/tiny-worlds/regression-baseline.md` with the phase start `9315c27e` (the specify commit; constitution `dbc35ba4`) and the reference pin `d93edd1`
+- [X] T-A12-001 Create `docs/apps/tiny-worlds/README.md` (what the experience is per the manual §1–§2: a curated gallery of miniature procedural worlds with orbit navigation and gentle customization; that it is an experience of the one app; its documents) and `docs/apps/tiny-worlds/regression-baseline.md` with the phase start `9315c27e` (the specify commit; constitution `dbc35ba4`) and the reference pin `d93edd1` — Verified 2026-11-15: 2026-11-15: docs/apps/tiny-worlds/README.md and regression-baseline.md (phase start 9315c27e, constitution dbc35ba4, pin d93edd1; reference 7/7 recorded); committed with the contract they link to
 
 ## Phase 3: User Story 1 — Evidence-backed integration matrix (P1) 🎯
 
