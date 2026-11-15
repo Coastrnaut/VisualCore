@@ -30,8 +30,8 @@
 //     clip range at the drawn distance. The flight is presentation state and never reaches the core.
 //   - Camera-relative drawing (FR-A14-322): every model matrix is built from the position minus the drawn target,
 //     subtracted in Double and rounded to Float (``CameraRelative/relative(_:to:)``), and the scene is drawn through an
-//     orbit camera with the same yaw, pitch and distance whose target is the origin, so precision does not depend on
-//     the distance from the Sun.
+//     orbit camera with the same yaw, pitch and distance whose target is the origin, so the Float rounding does
+//     not depend on the distance from the Sun.
 //   - Detail levels (feature 107, A14-P05, T-A14-504; FR-A14-510, SC-A14-504; clarification Q5): the host's quality
 //     tier, clamped to 0 … 1 (``SceneMeshes/DetailLevel/index(tier:)``), picks the meshes drawn: level 0 the spheres
 //     of 48 × 24, 400 stars and orbits of 128 samples described above; level 1 spheres of 24 × 12 with the same recipe

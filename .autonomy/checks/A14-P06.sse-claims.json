@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "sh",
+    "specs/108-sse-p06-release/scan-claims-release.sh"
+  ],
+  "command": "sh specs/108-sse-p06-release/scan-claims-release.sh",
+  "elapsed_seconds": 0.668,
+  "exit_code": 0,
+  "finished": "2026-11-15T23:13:27+00:00",
+  "log": ".autonomy/logs/A14-P06.sse-claims.log",
+  "log_sha256": "47cf8c693dfd2182a9dd26d5c189652b3cccfb27e514e1a19b23fb976ba43eb5",
+  "name": "sse-claims",
+  "stage": "A14-P06",
+  "started": "2026-11-15T23:13:26+00:00",
+  "timed_out": false
+}
