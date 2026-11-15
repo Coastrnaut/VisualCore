@@ -22,6 +22,48 @@ Canonical overrides:
 - **Owner rulings:** short tests; iOS 27 at phase gates; reference regression and iOS 26 at X-A10 (this phase changes
   VisualCore: its documentation and published interface record are updated here); every Spec Kit step runs.
 
+## Clarifications
+
+### Session 2026-11-14
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+`VisualCoreAudio` (rendering package) holds only input sources and depends on the pure `VisualCoreAudioDSP` (core
+package, host-testable); the microphone capture sets the session category itself, nothing plays sound; `ParticleSystem`
+(seeded, `burst`, `step`, `instances`) and `ParticleRenderer` exist; `HapticKind` (selection, success, warning, error,
+impactLight/Medium/Heavy) and `ExperienceFeedback.haptic(_:)` (respecting `hapticsEnabled`) exist;
+`transitionDuration(_:reduceMotion:)` returns 0 under Reduce Motion; Neon Arcade has one quality tier.
+
+- Q: Where do the sound effects live and what do they offer? → A: The pure part in `VisualCoreAudioDSP`:
+  `SoundEffect` (waveform sine/triangle/square, start and end frequency 40…4,000 Hz, duration 0.02…1 s, attack and
+  release ≥ 2 ms, noise 0…1 from a fixed internal generator seeded by the effect, gain 0…0.9) and
+  `SoundEffectSynth.render(_:sampleRate:) -> [Float]` (deterministic, finite, |sample| ≤ gain ≤ 0.9, linear fades at
+  both ends; invalid effects render silence of zero length). The playing part in `VisualCoreAudio`:
+  `SoundEffectPlayer` over the system audio engine with at most 4 voices (a fifth request is dropped), the ambient
+  session category (mixes with other audio, silenced by the silent switch, no input, so no permission), `stopAll()`
+  on interruption and background, and an `isEnabled` switch.
+- Q: How is the flow recorded and driven? → A: `ArcadeState` snapshot schema 3 adds `screen` (title, playing, paused,
+  over), `sound` and `haptics` (on by default); migration 2 → 3 derives the screen from the run (over → over, paused →
+  paused, otherwise playing) with sound and haptics on. A new experience opens on title. Actions: `run.start` (title →
+  playing; over → a new run, playing), `run.pause [0…1]` (playing ↔ paused only), `run.restart` (paused or over → a
+  new run, playing), `settings.sound [0…1]`, `settings.haptics [0…1]`; any other combination is refused with
+  `a10.wrong-screen`. Only `playing` advances the run.
+- Q: Which effects appear, and how are they bounded? → A: Derived by the presenter from the run's new events and wave
+  changes since the last drawn state: pickup — a burst of 16 cyan particles at the orb's position (life 0.4 s); hit —
+  a red ring expanding from the player for 0.3 s plus 24 particles, and a full-field red tint of alpha 0.25 for 6 steps
+  unless reduced flashing, which keeps only the ring; wave start — a horizontal cyan sweep line for 0.5 s. At most 3
+  bursts and 2 sounds start per step, one particle pool of 256, advanced by game steps (so pausing freezes them), drawn
+  below the collision shapes.
+- Q: What do the sounds and haptics sound and feel like? → A: Pickup: sine 880 → 1,320 Hz, 0.12 s, gain 0.5, haptic
+  impactLight. Hit: triangle 160 → 60 Hz, 0.25 s, noise 0.3, gain 0.7, haptic impactHeavy. Wave: sine 300 → 600 Hz,
+  0.4 s, gain 0.3, haptic selection. Game over: triangle 440 → 220 Hz, 0.5 s, gain 0.5, haptic error. Each effect is
+  played only when its setting is on (sound by the player, haptics through the host's feedback route).
+- Q: How do screens change, and how is the high-speed fixture expressed? → A: Screens cross-fade over
+  `transitionDuration(0.25, reduceMotion:)` (0 under Reduce Motion), presentation only. The high-speed fixture is a
+  core test that places a circle hazard above the player with a fall speed of 20, 50 and 100 units/s so that it
+  crosses the player within one step (and a copy offset 1.5 units sideways) and checks one hit at that step (and none);
+  the manifest's fixture 12 plays a run past its first hit and names the core test as the proof of the speed cases,
+  as the manifests already do for properties actions cannot set up.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - A game with a beginning, a pause and an end (Priority: P1) 🎯
@@ -90,7 +132,8 @@ between two steps.
   dropped, never delayed.
 - **Pausing during a burst:** effects freeze with the game; they never advance while paused.
 - **Restoring a saved game in the title or game-over screen:** the same screen returns.
-- **Effects at the lowest quality level:** fewer particles; sounds and haptics unchanged.
+- **Quality levels:** Neon Arcade keeps one quality level in this phase; particle budgets by level come with the glow
+  caps of A10-P05.
 
 ## Requirements *(mandatory)*
 
