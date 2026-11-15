@@ -36,7 +36,7 @@ stay open, as for A11-P06.
 
 ## Phase 6: Polish, owner and device items
 
-- [ ] T-A12-614 Script tests (`--name script-tests -- python3 scripts/test_scripts.py`)
+- [X] T-A12-614 Script tests (`--name script-tests -- python3 scripts/test_scripts.py`) — Verified 2026-11-15: 2026-11-15: .autonomy/checks/A12-P06.script-tests.json exit 0 (540 tests OK)
 - [ ] T-A12-615 BLOCKED_OWNER_ACTION: signing, archive upload and App Store Connect entry of Tiny Worlds' store text, per `docs/release/build-and-archive.md` owner steps (FR-A12-640)
 - [ ] T-A12-616 {device} In the device campaign (after ImplementationLock-100): the measurements and audits of `docs/apps/tiny-worlds/device-campaign.md` on D1–D3 (FR-A12-641)
 - [ ] T-A12-617 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A12-P06 (owner and device items stay open, as for A11-P06); update README.md (status, gate count) in the record commit (rule 16)
