@@ -181,7 +181,7 @@ final class SolarBodiesRenderTests: XCTestCase {
 
         XCTAssertTrue(shell.port.send("scale.mode", [1]).isAccepted)
         let description = shell.accessibilitySummary
-        XCTAssertTrue(description.hasSuffix("Distances and sizes to one scale; small bodies marked."), description)
+        XCTAssertTrue(description.contains("Distances and sizes to one scale; small bodies marked."), description)
         XCTAssertEqual(sink.announced, [description], "the change is announced with the new description")
         XCTAssertEqual(presenter.lastAnnouncement, description)
         XCTAssertEqual(presenter.mirror.scaleMode, .trueRelative)
@@ -205,7 +205,7 @@ final class SolarBodiesRenderTests: XCTestCase {
 
         // Back to the enhanced mode: announced again, and once the flight ends the first frame again.
         XCTAssertTrue(shell.port.send("scale.mode", [0]).isAccepted)
-        XCTAssertTrue(shell.accessibilitySummary.hasSuffix("Distances and sizes not to scale."))
+        XCTAssertTrue(shell.accessibilitySummary.contains("Distances and sizes not to scale."))
         XCTAssertEqual(sink.announced.count, 2)
         XCTAssertEqual(presenter.announcementCount, 2)
         try settle(session)

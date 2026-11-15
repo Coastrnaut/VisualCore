@@ -89,7 +89,8 @@ final class SolarOrbitRenderTests: XCTestCase {
         let names = shell.frameProbes.map(\.name)
         XCTAssertEqual(names, ["background", "body-0"], "the background and the Sun's centre")
         assertProbesHold(shell, frame, "overview")
-        XCTAssertEqual(shell.accessibilitySummary, SolarCore.canvasDescription(selection: 0, dayOffset: 0))
+        XCTAssertEqual(shell.accessibilitySummary, SolarCore.canvasDescription(selection: 0, dayOffset: 0)
+                       + " Date 2000-01-01 12:00 UTC, time paused.")
         session.close()
         XCTAssertEqual(session.hostsAlive, 0)
     }

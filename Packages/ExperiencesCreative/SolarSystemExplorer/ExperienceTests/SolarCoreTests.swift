@@ -32,13 +32,16 @@ final class SolarCoreTests: XCTestCase {
         XCTAssertEqual(SolarCore.experienceID, "a14.solar-system-explorer")
         let ids: [String] = SolarCore.controls.map(\.id)
         XCTAssertEqual(ids, ["body.select", "body.next", "body.previous", "date.step", "camera.orbit", "camera.tilt",
-                             "camera.zoom", "view.reset", "scale.mode"])
+                             "camera.zoom", "view.reset", "scale.mode", "time.play", "time.rate", "date.set",
+                             "tour.start", "tour.next", "tour.pause", "tour.stop", "view.apply"])
         XCTAssertEqual(ids, SolarCore.actionIDs)
         XCTAssertEqual(SolarCore.bodyCount, 9)
-        let ranges: [[ClosedRange<Double>]] = [[0...8], [], [], [-365...365], [-1...1], [-1...1], [-1...1], [],
-                                               [0...1]]
+        var ranges: [[ClosedRange<Double>]] = [[0...8], [], [], [-365...365], [-1...1], [-1...1], [-1...1], [],
+                                               [0...1], [0...1], [0...3], [-18_262.5...18_627.5], [0...1], [], [0...1],
+                                               []]
+        ranges.append([0...8, -18_262.5...18_627.5, 0...3, -1_000_000...1_000_000, 5...85, -1...12, 0...1])
         XCTAssertEqual(SolarCore.controls.map(\.ranges), ranges)
-        XCTAssertEqual(SolarCore.migrations.currentVersion, 3)
+        XCTAssertEqual(SolarCore.migrations.currentVersion, 4)
         XCTAssertEqual(SolarRule.invalidStep, "a14.invalid-step")
         XCTAssertEqual(SolarRule.outOfRange, "a14.out-of-range")
         XCTAssertEqual(SolarCore.qualityTiers, 1)
@@ -54,6 +57,10 @@ final class SolarCoreTests: XCTestCase {
             ScriptedAction("date.step", [30]), ScriptedAction("camera.orbit", [1]), ScriptedAction("camera.tilt", [-1]),
             ScriptedAction("camera.zoom", [1]), ScriptedAction("view.reset"), ScriptedAction("date.step", [-30]),
             ScriptedAction("scale.mode", [1]), ScriptedAction("scale.mode", [0]),
+            ScriptedAction("time.rate", [2]), ScriptedAction("time.play", [1]), ScriptedAction("time.play", [0]),
+            ScriptedAction("date.set", [100]), ScriptedAction("tour.start", [1]), ScriptedAction("tour.pause", [1]),
+            ScriptedAction("tour.next"), ScriptedAction("tour.stop"),
+            ScriptedAction("view.apply", [3, 10, 1, 2, 45, 3, 0]),
         ]
         let rejected: [ScriptedAction] = [
             ScriptedAction("body.select", [0.5]), ScriptedAction("body.select", [9]),
@@ -62,6 +69,9 @@ final class SolarCoreTests: XCTestCase {
             ScriptedAction("body.select", [.infinity]), ScriptedAction("bogus"),
             ScriptedAction("date.step", [7]), ScriptedAction("date.step", [400]), ScriptedAction("camera.zoom", [0]),
             ScriptedAction("view.reset", [1]), ScriptedAction("scale.mode", [0.5]), ScriptedAction("scale.mode", [2]),
+            ScriptedAction("time.play", [0.5]), ScriptedAction("time.rate", [4]), ScriptedAction("date.set", [20_000]),
+            ScriptedAction("tour.next"), ScriptedAction("tour.stop"), ScriptedAction("tour.pause", [1]),
+            ScriptedAction("view.apply", [3, 10, 1, 2, 40, 3, 0]), ScriptedAction("view.apply", [3]),
         ]
         let plan = ConformancePlan(seeds: [1, 2, 0xFFFF_FFFF_FFFF_FFFF], stepsPerSegment: 5, actions: actions,
                                    rejected: rejected)
@@ -178,7 +188,7 @@ final class SolarCoreTests: XCTestCase {
             }
         }
         let snapshot = try engine.snapshot()
-        XCTAssertEqual(snapshot.schemaVersion, 3)
+        XCTAssertEqual(snapshot.schemaVersion, 4)
         XCTAssertEqual(Data(snapshot.payload.utf8), try XCTUnwrap(engine.core).state.encoded())
         let saved = try XCTUnwrap(engine.core)
         var other = try await makeEngine(seed: 3)
@@ -212,14 +222,17 @@ final class SolarCoreTests: XCTestCase {
             ("no date", { $0["dayOffset"] = nil }),
             ("scale 2", { $0["scaleMode"] = 2 }),
             ("no scale", { $0["scaleMode"] = nil }),
+            ("rate 4", { $0["rateIndex"] = 4 }),
+            ("tour 2", { $0["tourIndex"] = 2 }),
+            ("no playing", { $0["playing"] = nil }),
         ]
         for (name, change) in damaged {
             XCTAssertThrowsError(try engine.restore(solarEnvelope(solarPayload(saved.payload, change), like: saved)),
                                  name)
         }
-        // Newer: an envelope of schema 4, and a payload of schema 4 inside a schema-3 envelope.
-        XCTAssertThrowsError(try engine.restore(solarEnvelope(Data(saved.payload.utf8), like: saved, schema: 4)))
-        let newerPayload = try solarPayload(saved.payload) { $0["schema"] = 4 }
+        // Newer: an envelope of schema 5, and a payload of schema 5 inside a schema-4 envelope.
+        XCTAssertThrowsError(try engine.restore(solarEnvelope(Data(saved.payload.utf8), like: saved, schema: 5)))
+        let newerPayload = try solarPayload(saved.payload) { $0["schema"] = 5 }
         XCTAssertThrowsError(try engine.restore(solarEnvelope(newerPayload, like: saved)))
         XCTAssertEqual(try engine.digest(), before, "every refusal leaves the state as it was")
 
@@ -258,10 +271,11 @@ final class SolarCoreTests: XCTestCase {
 
     func testTheCanvasDescriptionFollowsClarificationsQ4AndQ5() throws {
         XCTAssertEqual(SolarCore(seed: 1).canvasDescription,
-                       "Solar System Explorer: Sun in focus on 2000-01-01; 9 bodies. Distances and sizes not to scale.")
+                       "Solar System Explorer: Sun in focus on 2000-01-01; 9 bodies. Distances and sizes not to scale. "
+                       + "Date 2000-01-01 12:00 UTC, time paused.")
         let earth = try solarCore(SolarState(selection: 3)).canvasDescription
         XCTAssertTrue(earth.hasPrefix("Solar System Explorer: Earth in focus on 2000-01-01, 0.983 AU ("), earth)
-        XCTAssertTrue(earth.hasSuffix(" km) from the Sun; 9 bodies. Distances and sizes not to scale."), earth)
+        XCTAssertTrue(earth.contains(" km) from the Sun; 9 bodies. Distances and sizes not to scale."), earth)
         XCTAssertEqual(SolarCore.distanceWords(index: 3, dayOffset: 0), "0.983 AU (147,101,000 km)",
                        "the example of the header (T-A14-216)")
         let neptune = SolarCore.canvasDescription(selection: 8, dayOffset: 9_132)
@@ -321,13 +335,72 @@ final class SolarCoreTests: XCTestCase {
         XCTAssertEqual(engine.handle(control: "scale.mode", values: [1]), .accepted)
         XCTAssertEqual(try XCTUnwrap(engine.core).state.scaleMode, .trueRelative)
         XCTAssertTrue(try XCTUnwrap(engine.core).canvasDescription
-            .hasSuffix("Distances and sizes to one scale; small bodies marked."))
+            .contains("Distances and sizes to one scale; small bodies marked."))
         XCTAssertEqual(engine.handle(control: "scale.mode", values: [0.5]), invalid)
         XCTAssertEqual(engine.handle(control: "scale.mode", values: [2]), .rejected(.outOfRange(index: 0)))
         XCTAssertEqual(engine.handle(control: "view.reset"), .accepted)
         XCTAssertEqual(try XCTUnwrap(engine.core).state.scaleMode, .trueRelative, "reset keeps the scale")
         XCTAssertEqual(engine.handle(control: "scale.mode", values: [0]), .accepted)
-        XCTAssertTrue(try XCTUnwrap(engine.core).canvasDescription.hasSuffix("Distances and sizes not to scale."))
+        XCTAssertTrue(try XCTUnwrap(engine.core).canvasDescription.contains("Distances and sizes not to scale."))
+    }
+
+    /// Time, tour and saved-view actions (A14-P04 T-A14-406): accepted within their ranges, refused with their codes.
+    func testTimeTourAndViewActions() async throws {
+        var engine = try await makeEngine()
+        let noTour = ActionResult.rejected(.rule(code: SolarRule.noTour))
+        let invalid = ActionResult.rejected(.rule(code: SolarRule.invalidChoice))
+        XCTAssertEqual(SolarRule.noTour, "a14.no-tour")
+        XCTAssertEqual(engine.handle(control: "tour.next"), noTour)
+        XCTAssertEqual(engine.handle(control: "tour.pause", values: [1]), noTour)
+        XCTAssertEqual(engine.handle(control: "tour.stop"), noTour)
+        XCTAssertEqual(engine.handle(control: "time.rate", values: [3]), .accepted)
+        XCTAssertEqual(engine.handle(control: "time.play", values: [0.5]), invalid)
+        XCTAssertEqual(engine.handle(control: "time.play", values: [1]), .accepted)
+        try engine.run(steps: 120)
+        XCTAssertEqual(try XCTUnwrap(engine.core).state.dayOffset, 365, accuracy: 1e-9, "a year per second")
+        XCTAssertEqual(engine.handle(control: "date.set", values: [20_000]), .rejected(.outOfRange(index: 0)))
+        XCTAssertEqual(engine.handle(control: "date.set", values: [9_132]), .accepted)
+        XCTAssertEqual(engine.handle(control: "tour.start", values: [0]), .accepted)
+        XCTAssertEqual(try XCTUnwrap(engine.core).state.selection, 0)
+        try engine.run(steps: 600)
+        XCTAssertEqual(try XCTUnwrap(engine.core).state.selection, 1, "the tour moved on to Mercury")
+        XCTAssertTrue(try XCTUnwrap(engine.core).canvasDescription.contains("Tour Inner planets, stop 2 of 5: Mercury"))
+        XCTAssertEqual(engine.handle(control: "body.select", values: [5]), .accepted)
+        XCTAssertEqual(try XCTUnwrap(engine.core).state.tourIndex, -1, "a body choice ends the tour")
+        XCTAssertEqual(engine.handle(control: "view.apply", values: [6, 400, 2, 3, 40, 4, 1]),
+                       .rejected(.rule(code: SolarRule.outOfRange)), "pitch off its grid")
+        XCTAssertEqual(engine.handle(control: "view.apply", values: [6, 400, 2, 3, 55, 4, 1]), .accepted)
+        let state = try XCTUnwrap(engine.core).state
+        XCTAssertEqual(state.selection, 6)
+        XCTAssertFalse(state.playing, "applying a view pauses time")
+        XCTAssertEqual(state.scaleMode, .trueRelative)
+    }
+
+    /// The same command stream played twice gives the same digest (SC-A14-401).
+    func testTheSameCommandsGiveTheSameDigest() async throws {
+        var digests: [String] = []
+        for _ in 0..<2 {
+            var engine = try await makeEngine()
+            XCTAssertEqual(engine.handle(control: "time.rate", values: [1]), .accepted)
+            XCTAssertEqual(engine.handle(control: "time.play", values: [1]), .accepted)
+            XCTAssertEqual(engine.handle(control: "tour.start", values: [1]), .accepted)
+            try engine.run(steps: 777)
+            XCTAssertEqual(engine.handle(control: "date.step", values: [30]), .accepted)
+            try engine.run(steps: 33)
+            digests.append(try engine.digest().hex)
+        }
+        XCTAssertEqual(digests[0], digests[1])
+    }
+
+    /// A schema-3 envelope (A14-P03) opens paused with no tour (T-A14-406).
+    func testASchema3EnvelopeMigrates() async throws {
+        var engine = try await makeEngine()
+        let saved = try engine.snapshot()
+        let old = Data(#"{"dayOffset":30,"pitchDegrees":45,"scaleMode":1,"schema":3,"selection":4,"yawSteps":1,"zoomSteps":2}"#.utf8)
+        try engine.restore(solarEnvelope(old, like: saved, schema: 3))
+        XCTAssertEqual(try XCTUnwrap(engine.core).state,
+                       SolarState(selection: 4, dayOffset: 30, yawSteps: 1, pitchDegrees: 45, zoomSteps: 2,
+                                  scaleMode: .trueRelative))
     }
 
     /// A schema-2 envelope (A14-P02) opens with the enhanced scale mode (T-A14-306).

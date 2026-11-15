@@ -1,12 +1,13 @@
 // SolarCore — feature 103 (A14-P01) T-A14-103 (FR-A14-120…122; clarifications Q4, Q5; contracts/catalog.md), with the
 // orbit view's date and camera by feature 104 (A14-P02) T-A14-208 (FR-A14-211, FR-A14-221, FR-A14-222; clarifications
 // Q3–Q5; contracts/orbit-view.md), with the scale mode by feature 105 (A14-P03) T-A14-306 (FR-A14-310, FR-A14-312;
-// clarification Q3; contracts/bodies.md). The state of Solar System Explorer as an experience: a `SolarState` (schema 2: the
+// clarification Q3; contracts/bodies.md), with the clock, tours and saved views by feature 106 (A14-P04) T-A14-406
+// (FR-A14-401–403, FR-A14-411, FR-A14-421; clarifications Q1, Q2, Q5; contracts/time-tours.md). The state of Solar System Explorer as an experience: a `SolarState` (schema 2: the
 // selected and focused body, 0 = Sun … 8 = Neptune, into `BodyCatalog.bundled`; the simulated date in days since
 // J2000.0; the camera's yaw, pitch and zoom steps) and the preparation seed. Nothing animates: a host step (the
 // default 1/120 s) changes nothing, so a suspension never changes the view either.
 //
-// Preparation: every preparation seed opens with the Sun selected at J2000.0 with the overview camera
+// Preparation (A14-P04: a host step now advances the clock and the tour, see the actions below): every preparation seed opens with the Sun selected at J2000.0 with the overview camera
 // (`SolarState.initial`); the seed is kept only as the envelope's preparation seed (`reset()` returns to the same first
 // state). The catalog and the orbital elements are fixed data, so nothing depends on the seed.
 //
@@ -27,16 +28,30 @@
 //   view.reset              the overview camera (yaw 0, pitch 35°, zoom 0); the selection, date and scale stay.
 //   scale.mode [0…1]        0 enhanced, 1 true-relative (`ScaleMode`); a value that is not a whole 0 or 1 is refused
 //                           with `a14.invalid-choice`.
+//   time.play [0…1]         pauses (0) or plays (1) simulated time; a non-whole value `a14.invalid-choice`.
+//   time.rate [0…3]         the rate (`SimClock.rates`, 1 day to 1 year per second); non-whole `a14.invalid-choice`.
+//   date.set [days]         the date ("Now", computed by the controls from an injected clock); a non-finite value or one
+//                           outside the range `a14.out-of-range`.
+//   tour.start [0…1]        starts (or restarts) tour 0 or 1 at its first stop; non-whole `a14.invalid-choice`.
+//   tour.next, tour.stop    the next stop (after the last the tour ends), or the end of the tour; `a14.no-tour` without
+//   tour.pause [0…1]        a tour; pause holds or resumes the tour.
+//   view.apply [7 values]   a saved view (selection, day, rate, yaw, pitch, zoom, scale; `SavedView`); a value off its
+//                           range `a14.out-of-range`; it ends a tour and pauses time.
+// Body choices (`body.select`, `body.next`, `body.previous`) during a tour end the tour. A host step advances the state
+// (`SolarState.advance()`: the clock while playing, then the tour), so motion and tours are replayable and a suspension
+// (no steps) never fast-forwards them.
 // Called directly (not through the engine), the core refuses an unknown control with `unknownControl` and a wrong
 // value count with `wrongValueCount`, as the engine does. A refusal changes nothing.
 //
-// Snapshot schema 3: `SolarState.encoded()` (JSON with sorted keys: dayOffset, pitchDegrees, scaleMode, schema,
-// selection, yawSteps, zoomSteps); the preparation seed and the schema version come from the snapshot envelope
-// (`MigrationChain(currentVersion: 3)` with the step 1 → 2 adding J2000.0 and the overview camera and the step 2 → 3
-// adding the enhanced scale mode, so older envelopes open and a newer envelope is refused by the engine). A payload
+// Snapshot schema 4: `SolarState.encoded()` (JSON with sorted keys, the fields of `SolarState`); the preparation seed
+// and the schema version come from the snapshot envelope (`MigrationChain(currentVersion: 4)` with the steps 1 → 2
+// adding J2000.0 and the overview camera, 2 → 3 adding the enhanced scale mode and 3 → 4 adding a paused clock at
+// rate 0 and no tour, so older envelopes open and a newer envelope is refused by the engine). The engine refuses a
+// value outside a declared range (for `date.set` the model's range, for `view.apply` each field's range) with
+// `action.out-of-range` before the core sees it. A payload
 // `SolarState.decode(_:)` refuses (damaged, newer inside the payload or out of range) is refused (the restore throws
 // `SolarRestoreError`). One
-// quality tier (`level-0`). The digest is the canonical text of the state ("a14.solar.v3|" and the state's JSON)
+// quality tier (`level-0`). The digest is the canonical text of the state ("a14.solar.v4|" and the state's JSON)
 // followed by the selection and the selected body's id.
 //
 // The outcome is `viewing-<body id>` ("viewing-sun", "viewing-earth") for the selected body: the scenario manifest's
@@ -62,6 +77,8 @@ public enum SolarRule {
     public static let invalidStep = DateStepRefusal.invalidStep.rawValue
     /// A date step leaving the model's range, or a tilt or zoom step beyond its range.
     public static let outOfRange = DateStepRefusal.outOfRange.rawValue
+    /// A tour action without a running tour (A14-P04).
+    public static let noTour = "a14.no-tour"
 }
 
 /// Why a stored Solar System Explorer state is refused.
@@ -77,12 +94,15 @@ public struct SolarCore: ExperienceCore, Equatable {
 
     /// The action ids in declaration order.
     public static let actionIDs = ["body.select", "body.next", "body.previous", "date.step", "camera.orbit",
-                                   "camera.tilt", "camera.zoom", "view.reset", "scale.mode"]
+                                   "camera.tilt", "camera.zoom", "view.reset", "scale.mode", "time.play", "time.rate",
+                                   "date.set", "tour.start", "tour.next", "tour.pause", "tour.stop", "view.apply"]
 
     /// The value count of each action.
     static let valueCounts: [String: Int] = ["body.select": 1, "body.next": 0, "body.previous": 0, "date.step": 1,
                                              "camera.orbit": 1, "camera.tilt": 1, "camera.zoom": 1,
-                                             "view.reset": 0, "scale.mode": 1]
+                                             "view.reset": 0, "scale.mode": 1, "time.play": 1, "time.rate": 1,
+                                             "date.set": 1, "tour.start": 1, "tour.next": 0, "tour.pause": 1,
+                                             "tour.stop": 0, "view.apply": SavedView.valueCount]
 
     /// The approximate orbit model of the bundled catalog and elements.
     public static let model = OrbitModel.bundled
@@ -127,7 +147,8 @@ public struct SolarCore: ExperienceCore, Equatable {
     /// One quality tier (`level-0`): the orbit view has nothing to scale down in this phase.
     public static var qualityTiers: Int { 1 }
 
-    /// Schema 3 with the steps 1 → 2 (J2000.0 and the overview camera) and 2 → 3 (the enhanced scale mode).
+    /// Schema 4 with the steps 1 → 2 (J2000.0 and the overview camera), 2 → 3 (the enhanced scale mode) and 3 → 4 (a
+    /// paused clock at rate 0, no tour).
     public static var migrations: MigrationChain {
         MigrationChain(currentVersion: SolarState.schemaVersion, steps: [1: { payload in
             var next = payload
@@ -142,10 +163,21 @@ public struct SolarCore: ExperienceCore, Equatable {
             next["schema"] = 3
             next["scaleMode"] = ScaleMode.enhanced.rawValue
             return next
+        }, 3: { payload in
+            var next = payload
+            next["schema"] = 4
+            next["playing"] = false
+            next["rateIndex"] = 0
+            next["stopReason"] = ""
+            next["tourIndex"] = -1
+            next["tourStop"] = 0
+            next["tourStep"] = 0
+            next["tourPaused"] = false
+            return next
         }])
     }
 
-    /// The nine controls with their declared ranges.
+    /// The seventeen controls with their declared ranges.
     public static var controls: [ExperienceControl] {
         [ExperienceControl(id: "body.select", ranges: [0...Double(bodyCount - 1)]),
          ExperienceControl(id: "body.next"),
@@ -155,7 +187,22 @@ public struct SolarCore: ExperienceCore, Equatable {
          ExperienceControl(id: "camera.tilt", ranges: [-1...1]),
          ExperienceControl(id: "camera.zoom", ranges: [-1...1]),
          ExperienceControl(id: "view.reset"),
-         ExperienceControl(id: "scale.mode", ranges: [0...1])]
+         ExperienceControl(id: "scale.mode", ranges: [0...1]),
+         ExperienceControl(id: "time.play", ranges: [0...1]),
+         ExperienceControl(id: "time.rate", ranges: [0...Double(SimClock.rates.count - 1)]),
+         ExperienceControl(id: "date.set", ranges: [SimulatedDate.range]),
+         ExperienceControl(id: "tour.start", ranges: [0...Double(Tour.bundled.count - 1)]),
+         ExperienceControl(id: "tour.next"),
+         ExperienceControl(id: "tour.pause", ranges: [0...1]),
+         ExperienceControl(id: "tour.stop"),
+         ExperienceControl(id: "view.apply", ranges: viewApplyRanges)]
+    }
+
+    /// The declared ranges of `view.apply`'s seven values (selection, day, rate, yaw steps, pitch, zoom, scale).
+    static var viewApplyRanges: [ClosedRange<Double>] {
+        [0...Double(bodyCount - 1), SimulatedDate.range, 0...Double(SimClock.rates.count - 1), -1_000_000...1_000_000,
+         Double(SolarState.pitchRange.lowerBound)...Double(SolarState.pitchRange.upperBound),
+         Double(SolarState.zoomRange.lowerBound)...Double(SolarState.zoomRange.upperBound), 0...1]
     }
 
     /// The first state with `seed` as the preparation seed.
@@ -164,8 +211,10 @@ public struct SolarCore: ExperienceCore, Equatable {
         return SolarCore(seed: seed)
     }
 
-    /// A host step changes nothing: nothing animates in this phase.
-    public mutating func update(step: Int) {}
+    /// A host step advances the clock while playing and a running tour (`SolarState.advance()`).
+    public mutating func update(step: Int) {
+        state.advance()
+    }
 
     /// Carries out a well-formed action (see the file header); a refused action changes nothing.
     public mutating func apply(_ action: ExperienceAction) -> ActionResult {
@@ -181,10 +230,33 @@ public struct SolarCore: ExperienceCore, Equatable {
             guard let index = Self.choice(v[0], count: Self.bodyCount), next.select(index) else {
                 return rule(SolarRule.invalidChoice)
             }
+            next.stopTour()
         case "body.next":
             guard next.next() else { return rule(SolarRule.invalidChoice) }
+            next.stopTour()
         case "body.previous":
             guard next.previous() else { return rule(SolarRule.invalidChoice) }
+            next.stopTour()
+        case "time.play":
+            guard let on = Self.whole(v[0]), on == 0 || on == 1 else { return rule(SolarRule.invalidChoice) }
+            next.setPlaying(on == 1)
+        case "time.rate":
+            guard let index = Self.whole(v[0]), next.setRate(index) else { return rule(SolarRule.invalidChoice) }
+        case "date.set":
+            guard next.setDate(v[0]) else { return rule(SolarRule.outOfRange) }
+        case "tour.start":
+            guard let index = Self.whole(v[0]), next.startTour(index) else { return rule(SolarRule.invalidChoice) }
+        case "tour.next":
+            guard next.nextTourStop() else { return rule(SolarRule.noTour) }
+        case "tour.pause":
+            guard let on = Self.whole(v[0]), on == 0 || on == 1 else { return rule(SolarRule.invalidChoice) }
+            guard next.pauseTour(on == 1) else { return rule(SolarRule.noTour) }
+        case "tour.stop":
+            guard next.tour != nil else { return rule(SolarRule.noTour) }
+            next.stopTour()
+        case "view.apply":
+            guard let view = SavedView(values: v) else { return rule(SolarRule.outOfRange) }
+            next.apply(view)
         case "date.step":
             guard let days = Self.whole(v[0]) else { return rule(SolarRule.invalidStep) }
             if let refusal = next.stepDate(by: days) { return rule(refusal.rawValue) }
@@ -287,8 +359,30 @@ public struct SolarCore: ExperienceCore, Equatable {
             + "\(scaleMode.label)."
     }
 
-    /// The canvas description of this core.
+    /// The time words (A14-P04): "Date 2000-01-01 12:00 UTC, time paused." or "Date …, time playing at 1 year/s.",
+    /// followed by "The model's range ends here." after motion stopped at a range end.
+    public static func timeWords(state: SolarState) -> String {
+        let date = state.date.labelWithTime
+        let rate = SimClock.rateLabels.indices.contains(state.rateIndex) ? SimClock.rateLabels[state.rateIndex] : ""
+        let motion = state.playing ? "time playing at \(rate)" : "time paused"
+        let stop = state.stopReason == SimClock.endOfRange ? " \(SimClock.stopSentence)." : ""
+        return "Date \(date), \(motion).\(stop)"
+    }
+
+    /// The tour words (A14-P04): "Tour Inner planets, stop 2 of 5: <caption>" (with "paused" when held), or nil
+    /// without a tour.
+    public static func tourWords(state: SolarState) -> String? {
+        guard let tour = state.tour, let caption = state.tourCaption else { return nil }
+        let held = state.tourPaused ? ", paused" : ""
+        return "Tour \(tour.title), stop \(state.tourStop + 1) of \(tour.stops.count)\(held): \(caption)"
+    }
+
+    /// The canvas description of this core: the body, date, distance and scale sentence, then the time words and,
+    /// during a tour, the tour words.
     public var canvasDescription: String {
-        Self.canvasDescription(selection: state.selection, dayOffset: state.dayOffset, scaleMode: state.scaleMode)
+        let base = Self.canvasDescription(selection: state.selection, dayOffset: state.dayOffset,
+                                          scaleMode: state.scaleMode)
+        let tour = Self.tourWords(state: state).map { " \($0)" } ?? ""
+        return base + " " + Self.timeWords(state: state) + tour
     }
 }

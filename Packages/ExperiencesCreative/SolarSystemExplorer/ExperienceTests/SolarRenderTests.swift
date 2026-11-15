@@ -276,7 +276,7 @@ final class SolarRenderTests: XCTestCase {
         XCTAssertTrue(shell.port.send("body.next").isAccepted)
         let summary = shell.accessibilitySummary
         XCTAssertTrue(summary.hasPrefix("Solar System Explorer: Mercury in focus on 2000-01-01, "), summary)
-        XCTAssertTrue(summary.hasSuffix("Distances and sizes not to scale."), summary)
+        XCTAssertTrue(summary.contains("Distances and sizes not to scale."), summary)
         XCTAssertTrue(shell.port.send("date.step", [30]).isAccepted)
         XCTAssertEqual(shell.port.send("date.step", [2]).code, "action.rule.a14.invalid-step")
         XCTAssertTrue(shell.port.send("camera.zoom", [-1]).isAccepted)
