@@ -1,0 +1,567 @@
+{
+  "controls" : [
+    "world.preset",
+    "world.seed",
+    "view.orbit",
+    "view.zoom",
+    "view.reset"
+  ],
+  "experience" : "a12.tiny-worlds",
+  "kind" : "creative",
+  "scenarios" : [
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+        "initialDigest" : "b2a20cc67ad727bb4ca0e91cae3d3fa98adc4fcfd09009bb680ccc2105277224"
+      },
+      "name" : "launch-first-frame",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "world.preset",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "world.seed",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "view.orbit",
+            "values" : [
+              -30,
+              15
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "view.zoom",
+            "values" : [
+              1.25
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "548fb9cee985cd0a046ee38fb2a27786b75904f287a16214df864a5c5c270f13",
+        "initialDigest" : "b2a20cc67ad727bb4ca0e91cae3d3fa98adc4fcfd09009bb680ccc2105277224"
+      },
+      "name" : "input-response",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "world.preset",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "outcome" : "world-miniature-city"
+      },
+      "name" : "completion",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "world.preset",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "world.preset",
+            "values" : [
+              -1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "world.preset",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "action.rule.a12.invalid-choice",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "view.zoom",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "view.zoom",
+            "values" : [
+              0.25
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "view.orbit",
+            "values" : [
+              200,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "world.seed",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "view.reset",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "view.orbit",
+            "values" : [
+              10
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+
+      },
+      "name" : "rejection",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "world.preset",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "world.seed",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "view.orbit",
+            "values" : [
+              -30,
+              15
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "view.zoom",
+            "values" : [
+              1.25
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "548fb9cee985cd0a046ee38fb2a27786b75904f287a16214df864a5c5c270f13",
+        "initialDigest" : "b2a20cc67ad727bb4ca0e91cae3d3fa98adc4fcfd09009bb680ccc2105277224"
+      },
+      "name" : "save-restore",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "world.preset",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "world.seed",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "view.orbit",
+            "values" : [
+              -30,
+              15
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "view.zoom",
+            "values" : [
+              1.25
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "initialDigest" : "b2a20cc67ad727bb4ca0e91cae3d3fa98adc4fcfd09009bb680ccc2105277224",
+        "resetDigest" : true
+      },
+      "name" : "reset",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "suspend-resume",
+      "seed" : "1"
+    },
+    {
+      "cycles" : 5,
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "teardown-reentry",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "cancel-prepare",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "world.preset",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b2a20cc67ad727bb4ca0e91cae3d3fa98adc4fcfd09009bb680ccc2105277224",
+        "initialDigest" : "b2a20cc67ad727bb4ca0e91cae3d3fa98adc4fcfd09009bb680ccc2105277224"
+      },
+      "name" : "fixture-island-1",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "world.preset",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "2e7be2b7348f28de92ef0d823190174a9a403dec86fb5c6f07561bcfd69af62d",
+        "initialDigest" : "2e7be2b7348f28de92ef0d823190174a9a403dec86fb5c6f07561bcfd69af62d"
+      },
+      "name" : "fixture-island-2",
+      "seed" : "2"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "world.preset",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "021580e2723a77b687689b4664d114efa2a57231597ca2627bdda4e9136dd776",
+        "initialDigest" : "021580e2723a77b687689b4664d114efa2a57231597ca2627bdda4e9136dd776"
+      },
+      "name" : "fixture-island-3",
+      "seed" : "3"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "world.preset",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "c5655456d515785826ca1d23fcbab20e6cd3f29fee117534cf2350f1b0fcfde6",
+        "initialDigest" : "b2a20cc67ad727bb4ca0e91cae3d3fa98adc4fcfd09009bb680ccc2105277224"
+      },
+      "name" : "fixture-asteroid-garden-1",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "world.preset",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "07406c49c03cfb956d9363d633a3ba7322f8916e26b7c02051b269bd2c913b02",
+        "initialDigest" : "2e7be2b7348f28de92ef0d823190174a9a403dec86fb5c6f07561bcfd69af62d"
+      },
+      "name" : "fixture-asteroid-garden-2",
+      "seed" : "2"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "world.preset",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "437d7a8fcc3b44ad5e3182d3520910b0a1ef06093cfa11dad6cf5f241fbe7e19",
+        "initialDigest" : "021580e2723a77b687689b4664d114efa2a57231597ca2627bdda4e9136dd776"
+      },
+      "name" : "fixture-asteroid-garden-3",
+      "seed" : "3"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "world.preset",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "0d775211a1aa32492dac4b0efafa696e19156eca337987cf08d1b9aad4865c8c",
+        "initialDigest" : "b2a20cc67ad727bb4ca0e91cae3d3fa98adc4fcfd09009bb680ccc2105277224"
+      },
+      "name" : "fixture-miniature-city-1",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "world.preset",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b1e888014244fe2aea834158513b5dbb0a0f3be070f119c1139e7c0c9044c680",
+        "initialDigest" : "2e7be2b7348f28de92ef0d823190174a9a403dec86fb5c6f07561bcfd69af62d"
+      },
+      "name" : "fixture-miniature-city-2",
+      "seed" : "2"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "world.preset",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "352e02f6647863c246778d39112efed8be6b5a78d25047ef8a5c8bab64209fca",
+        "initialDigest" : "021580e2723a77b687689b4664d114efa2a57231597ca2627bdda4e9136dd776"
+      },
+      "name" : "fixture-miniature-city-3",
+      "seed" : "3"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "world.preset",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b2a20cc67ad727bb4ca0e91cae3d3fa98adc4fcfd09009bb680ccc2105277224",
+        "initialDigest" : "b2a20cc67ad727bb4ca0e91cae3d3fa98adc4fcfd09009bb680ccc2105277224"
+      },
+      "name" : "refusal-preset-out-of-range",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "world.preset",
+            "values" : [
+              1.5
+            ]
+          },
+          "result" : "action.rule.a12.invalid-choice",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b2a20cc67ad727bb4ca0e91cae3d3fa98adc4fcfd09009bb680ccc2105277224",
+        "initialDigest" : "b2a20cc67ad727bb4ca0e91cae3d3fa98adc4fcfd09009bb680ccc2105277224"
+      },
+      "name" : "refusal-preset-fractional",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "view.zoom",
+            "values" : [
+              0.25
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b2a20cc67ad727bb4ca0e91cae3d3fa98adc4fcfd09009bb680ccc2105277224",
+        "initialDigest" : "b2a20cc67ad727bb4ca0e91cae3d3fa98adc4fcfd09009bb680ccc2105277224"
+      },
+      "name" : "refusal-zoom-out-of-range",
+      "seed" : "1"
+    }
+  ],
+  "schema" : 1
+}
