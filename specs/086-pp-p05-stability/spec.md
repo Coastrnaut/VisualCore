@@ -136,6 +136,8 @@ accuracy, safety or learning claims; whoever runs the device campaign finds the 
 - **A sleeping body under a pinned or static body:** stays asleep; static and pinned bodies never wake others.
 - **A sleeping body on a spring that is stretched by an edit:** wakes.
 - **Level changes (gravity, drag, stiffness):** wake every body.
+- **How sleep looks:** sleeping bodies are drawn exactly like awake ones (sleep is an optimisation, not a feature the
+  person sees); the state panel and the spoken description are unchanged.
 - **Quality level changed mid-run:** drawing detail changes; the digest does not.
 - **Low Power Mode:** the lowest quality level is drawn; the physics is unchanged.
 - **Thermal or performance claims:** none without device measurements; the device plan holds them.
