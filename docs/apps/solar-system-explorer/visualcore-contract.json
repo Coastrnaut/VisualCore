@@ -443,7 +443,7 @@
         "file": "Packages/ExperiencesCreative/ParticleUniverse/Core/SceneSimulation.swift",
         "symbol": "SceneSimulation"
       },
-      "notes": "Fixed steps, replayable command streams, delta clamping and background pause exist and are tested (FixedStepClockTests, FixedStepRunnerTests, SceneClockTests, TimeStepPolicyTests, PlaybackStateTests). Missing: an orbit model that turns a simulated date into positions (G-ORBIT) and a simulated calendar date advancing at a chosen rate within a bounded range (G-TIME); SceneClock's speed range 0...4 and its scene duration are not a calendar."
+      "notes": "Fixed steps, replayable command streams, delta clamping and background pause exist and are tested (FixedStepClockTests, FixedStepRunnerTests, SceneClockTests, TimeStepPolicyTests, PlaybackStateTests). Missing: an orbit model that turns a simulated date into positions (G-ORBIT) and a simulated calendar date advancing at a chosen rate within a bounded range (G-TIME); SceneClock's speed range 0...4 and its scene duration are not a calendar. A14-P02 (G-ORBIT): the orbit model turns a simulated date (SimulatedDate, days since J2000.0, 1950–2050, steps ±1, ±30, ±365 days) into positions (OrbitModel; OrbitFixtureTests, SimulatedDateTests); play, pause and rate stay with G-TIME (A14-P04)."
     },
     {
       "id": "M06",
@@ -547,7 +547,7 @@
         "file": "Packages/ExperiencesCreative/TinyWorlds/Core/CameraPolicy.swift",
         "symbol": "CameraPolicy"
       },
-      "notes": "The orbit camera, a clearance sphere around the target (OrbitViewBounds.minimumDistance), ray-sphere picking and closed tubes exist and are tested (OrbitCameraTests, OrbitViewBoundsTests, RayIntersectionTests, MeshShapeTests). Missing: orbit paths sampled from the orbit model (G-ORBIT), and the focus controller that sets target, distance and near/far per body so a focus flight never crosses the near plane, orbit lines and selection (G-BODIES)."
+      "notes": "The orbit camera, a clearance sphere around the target (OrbitViewBounds.minimumDistance), ray-sphere picking and closed tubes exist and are tested (OrbitCameraTests, OrbitViewBoundsTests, RayIntersectionTests, MeshShapeTests). Missing: orbit paths sampled from the orbit model (G-ORBIT), and the focus controller that sets target, distance and near/far per body so a focus flight never crosses the near plane, orbit lines and selection (G-BODIES). A14-P02 (G-ORBIT): orbit lines sampled from the orbit model (128 samples per orbit as closed tubes), focus on the selected body and stepped orbit, tilt and zoom with a minimum distance that keeps every body in front of the near plane (OrbitLayout, SolarPresenter; OrbitLayoutTests, SolarOrbitRenderTests); the eased focus flight and picking stay with G-BODIES (A14-P03)."
     },
     {
       "id": "M08",
@@ -695,8 +695,14 @@
       "id": "M12",
       "capability": "Approximate orbit computation: labelled approximate Kepler propagation (mean anomaly from epoch and period, eccentric anomaly by bounded iteration, position in the orbital plane rotated to ecliptic coordinates) in Double for a simulated date, with fixtures",
       "source": "manual algorithm decision 1; phase 02 approximate orbit computation with fixtures; spec FR-A14-003",
-      "status": "upstream gap",
+      "status": "available",
       "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/KeplerOrbit.swift",
+          "symbol": "KeplerOrbit",
+          "product": "VisualCoreMath",
+          "public": true
+        },
         {
           "file": "Packages/VisualCore/Sources/VisualCoreMath/Vectors.swift",
           "symbol": "Vec3",
@@ -714,7 +720,7 @@
         "file": "Packages/ExperiencesCreative/ParticleUniverse/Core/SceneSimulation.swift",
         "symbol": "SceneSimulation"
       },
-      "notes": "Grep for kepler, eccentric, ephemeris, julian and semiMajor in Packages/VisualCore and Packages/VisualCoreRendering finds nothing (2026-11-15). Double vectors and angle normalisation exist (LinearAlgebraTests, NumericHygieneTests). Solving Kepler's equation and placing a body from classical elements is generic mathematics: G-ORBIT (VisualCoreMath, upstream). The example is the closest consumer of a deterministic time-driven simulation."
+      "notes": "Grep for kepler, eccentric, ephemeris, julian and semiMajor in Packages/VisualCore and Packages/VisualCoreRendering finds nothing (2026-11-15). Double vectors and angle normalisation exist (LinearAlgebraTests, NumericHygieneTests). Solving Kepler's equation and placing a body from classical elements is generic mathematics: G-ORBIT (VisualCoreMath, upstream). The example is the closest consumer of a deterministic time-driven simulation. A14-P02 (G-ORBIT, closed): VisualCoreMath.KeplerOrbit (classical elements, Newton solution of Kepler's equation in at most 32 steps below 1e-12 rad, position rotated by ω, i and Ω, always finite; KeplerOrbitTests, README, API baseline) and its consumer SolarSystemExplorerCore OrbitModel with the Standish J2000.0 mean elements (OrbitFixtureTests: Earth longitude at J2000.0, Earth and Mars distance ranges, period return); reference regression at X-A14."
     },
     {
       "id": "M13",
@@ -1238,7 +1244,7 @@
       "justification": "Found in A14-P00: no orbit propagation exists in any framework product (grep for kepler, eccentric, ephemeris, julian, semiMajor finds nothing). Approximate Kepler propagation (solving Kepler's equation for elliptical orbits by bounded Newton iteration, position from classical elements in Double, orbit path samples) is generic mathematics and belongs to VisualCoreMath (constitution A14 reuse first, clarification 5, A14-P02); if the phase finds no reuse beyond this experience it stays app-local and this entry records why. Body data, epoch handling and validity ranges stay in the experience.",
       "phase": 2,
       "test": "Host tests (swift test, no GPU): circular orbits give uniform motion; for eccentricities 0...0.9 the solved eccentric anomaly satisfies Kepler's equation within 1e-12 in at most a fixed iteration count; positions at perihelion and aphelion match a(1-e) and a(1+e); one period returns to the start within tolerance; fixture positions of the eight planets for chosen dates match an approximate published reference within the stated tolerance; NaN/Inf and e >= 1 are refused; API baseline additive, documented with ///, and the reference regression passes at the X gate",
-      "closed": null
+      "closed": "A14-P02"
     },
     {
       "id": "G-BODIES",
