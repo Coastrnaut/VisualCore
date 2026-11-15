@@ -419,6 +419,7 @@
       ],
       "tile_seed": 585748781,
       "capabilities": [
+        "three ready-made world packs",
         "island, asteroid garden, miniature city",
         "seeded terrain, seam-free normals",
         "terrain coloured by height",

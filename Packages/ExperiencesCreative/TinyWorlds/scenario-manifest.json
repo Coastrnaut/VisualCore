@@ -12,7 +12,8 @@
     "prop.delete",
     "light.azimuth",
     "light.elevation",
-    "light.ambient"
+    "light.ambient",
+    "world.pack"
   ],
   "experience" : "a12.tiny-worlds",
   "kind" : "creative",
@@ -221,6 +222,26 @@
             ]
           },
           "result" : "action.rule.a12.no-selection",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "world.pack",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "world.pack",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "action.rule.a12.invalid-choice",
           "steps" : 0
         }
       ],
@@ -826,6 +847,198 @@
         "initialDigest" : "f64e358a43a19ebe3a09118d77a4cf0d2d05d000fa228792afca40c73c92fef5"
       },
       "name" : "refusal-prop-no-selection",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "world.pack",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "fdf0c371127f007885ef18e236c750cddd848c8e9c9b68db5252b7fb9e82b4c8",
+        "initialDigest" : "f64e358a43a19ebe3a09118d77a4cf0d2d05d000fa228792afca40c73c92fef5"
+      },
+      "name" : "fixture-pack-island",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "world.pack",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1b1bd2f25f587d1ce5b742b4e0a57f8ca51922ae2f49d2463f7cade1ff047859",
+        "initialDigest" : "f64e358a43a19ebe3a09118d77a4cf0d2d05d000fa228792afca40c73c92fef5"
+      },
+      "name" : "fixture-pack-asteroid-garden",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "world.pack",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "27d265bd6f68dafb6727354f7ead67db247c51b35485ef526f9a8a7072f269da",
+        "initialDigest" : "f64e358a43a19ebe3a09118d77a4cf0d2d05d000fa228792afca40c73c92fef5"
+      },
+      "name" : "fixture-pack-miniature-city",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "world.pack",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "prop.select",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "prop.move",
+            "values" : [
+              0,
+              -0.5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "prop.rotate",
+            "values" : [
+              90
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "light.azimuth",
+            "values" : [
+              200
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "light.elevation",
+            "values" : [
+              20
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "light.ambient",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "prop.select",
+            "values" : [
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "prop.delete",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "view.orbit",
+            "values" : [
+              30,
+              10
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "world.seed",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "world.pack",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "fdf0c371127f007885ef18e236c750cddd848c8e9c9b68db5252b7fb9e82b4c8",
+        "initialDigest" : "f64e358a43a19ebe3a09118d77a4cf0d2d05d000fa228792afca40c73c92fef5"
+      },
+      "name" : "fixture-pack-reset",
       "seed" : "1"
     }
   ],

@@ -20,7 +20,7 @@ Precedent: `specs/091-tw-p03-customize/tasks.md`.
 
 ## Phase 4: Records
 
-- [ ] T-A12-404 Registration and regeneration: `Catalog/registrations.json` (capabilities: three environment packs); `python3 scripts/build_catalog.py`; regenerate `Packages/ExperiencesCreative/TinyWorlds/scenario-manifest.json` and `docs/apps/tiny-worlds/content-licenses.md` (`UPDATE_SCENARIO_MANIFEST=1 TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`)
+- [X] T-A12-404 Registration and regeneration: `Catalog/registrations.json` (capabilities: three environment packs); `python3 scripts/build_catalog.py`; regenerate `Packages/ExperiencesCreative/TinyWorlds/scenario-manifest.json` and `docs/apps/tiny-worlds/content-licenses.md` (`UPDATE_SCENARIO_MANIFEST=1 TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`) — Verified 2026-11-15: 2026-11-15: registrations.json a12 capability 'three ready-made world packs'; build_catalog (11 available); scenario-manifest.json (4 pack fixtures, 2 refusals) and content-licenses.md (3 packs) regenerated — both match in .autonomy/checks/A12-P04.worlds-ios27.json
 - [ ] T-A12-405 Contract `docs/apps/tiny-worlds/visualcore-contract.json`: G-PACKS closed by "A12-P04"; row M06 available with the pack evidence
 
 ## Phase 5: Polish & evidence
