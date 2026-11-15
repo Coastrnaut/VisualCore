@@ -29,3 +29,20 @@
 - **D5 Drawing:** a `SceneNode` tree per state: background rect, a faint grid, tiles (walls filled squares, mirrors
   and prisms thick diagonal lines, targets squares with a lit ring, emitter triangle), the beam as lines of width 0.08
   cell from the tracer's segments; a `Camera2D` fitting the board into the canvas.
+
+## 2. As built (2026-11-15)
+
+- **Grid-snapped reflection (D3):** after `Vec2.reflected(about:)` the tracer snaps the direction to the nearest grid
+  direction (`Direction.nearest`); unsnapped, a 45° mirror gives (2e-16, 0.9999999999999998) and the path would drift
+  off the cell centres. With snapping every hit lies exactly on cell centres, target squares and board edges; the
+  fixtures pin exact values.
+- **Loops:** with mirrors alone a loop always returns to the emitter (the rules are reversible and the emitter blocks),
+  so "loop" appears only where prism branches meet states already traced; the cycle key is (cell left, direction); a
+  prism's straight-on branch keeps its parent's bounce count; splits refused at the 16-branch cap are counted
+  (`droppedBranches`).
+- **Levels (D4):** the 20 layouts were designed for this repository: lm-01 by hand, lm-02…lm-20 laid out with a small
+  search over the same rules for a single solution, then named, reviewed and fixed as Swift data — original content,
+  author "VisualCore project", MIT. The tests prove each is valid, unsolved at start and solved by its recorded solution;
+  uniqueness of the solution is not claimed (the solvability checker is A13-P05).
+- **Codec:** refusal reasons missing-license, unsupported-license, invalid-number, out-of-range, invalid-board,
+  duplicate-id; an unreadable document is refused as a whole as `catalog`.
