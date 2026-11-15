@@ -1298,7 +1298,7 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     "OscilloscopeStudioExperience",
                                     # Feature 068 (A09-P01): Digital Aquarium, integrated at X-A09.
                                     "DigitalAquariumExperience",
-                                    # Feature 075 (A10-P01): Neon Arcade, a candidate until X-A10.
+                                    # Feature 075 (A10-P01): Neon Arcade, integrated at X-A10.
                                     "NeonArcadeExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):

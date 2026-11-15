@@ -1,6 +1,6 @@
 // NASupport — feature 078 (A10-P04) T-A10-404 (FR-A10-422; SC-A10-405): helpers of the interface tests of Neon Arcade
-// (A10) inside the one app, modelled on `DASupport`. A10 is a candidate; every launch carries `-vcCandidates`, and the
-// tests open it directly with `-openExperience`. The controls are found by the identifiers of `ArcadeControls`
+// (A10) inside the one app, modelled on `DASupport`. A10 was a candidate until X-A10 (integrated 2026-11-15);
+// every launch still carries `-vcCandidates`, and the tests open it directly with `-openExperience`. The controls are found by the identifiers of `ArcadeControls`
 // (`port.identifier(name)`, that is `experience.a10.neon-arcade.<name>`): Start / Play again (`run.start`), the hold
 // buttons Steer left and Steer right (`run.left`, `run.right`), Straight (`run.straight`), the Pause toggle
 // (`run.pause`, values "Playing"/"Paused"), Restart (`run.restart`), the Sound and Haptics toggles

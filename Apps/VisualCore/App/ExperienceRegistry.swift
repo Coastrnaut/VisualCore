@@ -61,17 +61,17 @@ struct ExperienceRegistration: Sendable {
 /// The explicit list of registered experiences.
 enum ExperienceRegistry {
     /// Every registered experience, in catalog order: those whose X gate is pass (X-A01, X-A02 and X-A03, recorded
-    /// 2026-11-13 after UA-F07; X-A04 recorded 2026-11-13 after A04-P06; X-A05 recorded 2026-11-14 after A05-P06; X-A06 recorded 2026-11-14 after A06-P06; X-A07 recorded 2026-11-14 after A07-P06; X-A08 recorded 2026-11-14 after A08-P06; X-A09 recorded 2026-11-14 after A09-P06).
+    /// 2026-11-13 after UA-F07; X-A04 recorded 2026-11-13 after A04-P06; X-A05 recorded 2026-11-14 after A05-P06; X-A06 recorded 2026-11-14 after A06-P06; X-A07 recorded 2026-11-14 after A07-P06; X-A08 recorded 2026-11-14 after A08-P06; X-A09 recorded 2026-11-14 after A09-P06; X-A10 recorded 2026-11-15 after A10-P06).
     static let all: [ExperienceRegistration] = [generativeArtStudio, fluidArtPlayground, fractalExplorer,
                                                 particleUniverse, infiniteGeometry,
                                                 visualCoreMusicLab, audioOdyssey,
-                                                oscilloscopeStudio, digitalAquarium].compactMap { $0 }
+                                                oscilloscopeStudio, digitalAquarium, neonArcade].compactMap { $0 }
 
     /// The adopted experiences before their X gate (feature 193, FR-U07-021; clarification 4), in catalog order:
     /// each carries its scenario manifest, so that the verification runner can open it, but it stays unavailable
     /// in the catalog and outside `all`. Debug builds show them with `-vcCandidates`. Recording an experience's X
     /// gate moves its registration from here to `all`.
-    static let candidates: [ExperienceRegistration] = [neonArcade].compactMap { $0 }
+    static let candidates: [ExperienceRegistration] = []
 
     /// A01 Generative Art Studio (feature 193, US1).
     private static var generativeArtStudio: ExperienceRegistration? {
@@ -225,7 +225,7 @@ extension ExperienceRegistry {
         return registration
     }
 
-    /// A10 Neon Arcade (feature 075, A10-P01): a candidate until X-A10.
+    /// A10 Neon Arcade (features 074–080, A10-P00…P06): integrated at X-A10 (2026-11-15).
     fileprivate static var neonArcade: ExperienceRegistration? {
         guard let id = NeonArcadeExperience.id else { return nil }
         // Schema 2 (feature 076, A10-P02) adds the waves, schema 3 (feature 077, A10-P03) the screen and the sound and
