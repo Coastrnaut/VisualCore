@@ -33,7 +33,7 @@ Evidence: `python3 Tools/python/desktop_runbook.py run-check --stage A10-P06 --t
 
 ## Phase 6: Polish, owner and device items
 
-- [ ] T-A10-613 Script tests (`--name script-tests -- python3 scripts/test_scripts.py`)
+- [X] T-A10-613 Script tests (`--name script-tests -- python3 scripts/test_scripts.py`) — Verified 2026-11-15: 2026-11-15: .autonomy/checks/A10-P06.script-tests.json exit 0
 - [ ] T-A10-614 BLOCKED_OWNER_ACTION: signing, archive upload and App Store Connect entry of Neon Arcade's store text, per `docs/release/build-and-archive.md` owner steps (FR-A10-640)
 - [ ] T-A10-615 {device} In the device campaign (after ImplementationLock-100): the measurements and audits of `docs/apps/neon-arcade/device-campaign.md` on D1–D3 (FR-A10-641)
 - [ ] T-A10-616 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A10-P06 (owner and device items stay open, as for A09-P06); update README.md (status, gate count) in the record commit (rule 16)
