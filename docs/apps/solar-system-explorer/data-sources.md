@@ -39,4 +39,19 @@ Every number Solar System Explorer shows comes from this table. It is generated 
 | Neptune | sidereal-period | 60,189 | days | Planetary Fact Sheet — Metric, NASA Space Science Data Coordinated Archive (D. R. Williams, NASA Goddard Space Flight Center) (nssdc.gsfc.nasa.gov/planetary/factsheet) | J2000.0 | public-domain |
 | Neptune | axial-tilt | 28.32 | degrees | Planetary Fact Sheet — Metric, NASA Space Science Data Coordinated Archive (D. R. Williams, NASA Goddard Space Flight Center) (nssdc.gsfc.nasa.gov/planetary/factsheet) | J2000.0 | public-domain |
 
+## Orbital elements
+
+Mean elements at epoch J2000.0, held fixed (no secular rates): positions are approximate and valid only as a labelled model. The argument of perihelion is ϖ − Ω and the mean anomaly at epoch L − ϖ; the mean motion is 2π divided by the catalog's sidereal period.
+
+| Body | a (AU) | e | i (deg) | L (deg) | ϖ (deg) | Ω (deg) | Source | Epoch | License |
+|---|---|---|---|---|---|---|---|---|---|
+| Mercury | 0.38709927 | 0.20563593 | 7.00497902 | 252.2503235 | 77.45779628 | 48.33076593 | Keplerian Elements for Approximate Positions of the Major Planets, Table 1, E. M. Standish, NASA Jet Propulsion Laboratory Solar System Dynamics (numerical facts, public domain) (ssd.jpl.nasa.gov/planets/approx_pos.html) | J2000.0 | public-domain |
+| Venus | 0.72333566 | 0.00677672 | 3.39467605 | 181.9790995 | 131.60246718 | 76.67984255 | Keplerian Elements for Approximate Positions of the Major Planets, Table 1, E. M. Standish, NASA Jet Propulsion Laboratory Solar System Dynamics (numerical facts, public domain) (ssd.jpl.nasa.gov/planets/approx_pos.html) | J2000.0 | public-domain |
+| Earth | 1.00000261 | 0.01671123 | -1.531e-05 | 100.46457166 | 102.93768193 | 0.0 | Keplerian Elements for Approximate Positions of the Major Planets, Table 1, E. M. Standish, NASA Jet Propulsion Laboratory Solar System Dynamics (numerical facts, public domain) (ssd.jpl.nasa.gov/planets/approx_pos.html) | J2000.0 | public-domain |
+| Mars | 1.52371034 | 0.0933941 | 1.84969142 | -4.55343205 | -23.94362959 | 49.55953891 | Keplerian Elements for Approximate Positions of the Major Planets, Table 1, E. M. Standish, NASA Jet Propulsion Laboratory Solar System Dynamics (numerical facts, public domain) (ssd.jpl.nasa.gov/planets/approx_pos.html) | J2000.0 | public-domain |
+| Jupiter | 5.202887 | 0.04838624 | 1.30439695 | 34.39644051 | 14.72847983 | 100.47390909 | Keplerian Elements for Approximate Positions of the Major Planets, Table 1, E. M. Standish, NASA Jet Propulsion Laboratory Solar System Dynamics (numerical facts, public domain) (ssd.jpl.nasa.gov/planets/approx_pos.html) | J2000.0 | public-domain |
+| Saturn | 9.53667594 | 0.05386179 | 2.48599187 | 49.95424423 | 92.59887831 | 113.66242448 | Keplerian Elements for Approximate Positions of the Major Planets, Table 1, E. M. Standish, NASA Jet Propulsion Laboratory Solar System Dynamics (numerical facts, public domain) (ssd.jpl.nasa.gov/planets/approx_pos.html) | J2000.0 | public-domain |
+| Uranus | 19.18916464 | 0.04725744 | 0.77263783 | 313.23810451 | 170.9542763 | 74.01692503 | Keplerian Elements for Approximate Positions of the Major Planets, Table 1, E. M. Standish, NASA Jet Propulsion Laboratory Solar System Dynamics (numerical facts, public domain) (ssd.jpl.nasa.gov/planets/approx_pos.html) | J2000.0 | public-domain |
+| Neptune | 30.06992276 | 0.00859048 | 1.77004347 | -55.12002969 | 44.96476227 | 131.78422574 | Keplerian Elements for Approximate Positions of the Major Planets, Table 1, E. M. Standish, NASA Jet Propulsion Laboratory Solar System Dynamics (numerical facts, public domain) (ssd.jpl.nasa.gov/planets/approx_pos.html) | J2000.0 | public-domain |
+
 34 values; 0 problems.

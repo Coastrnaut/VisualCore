@@ -106,7 +106,7 @@ import Testing
                               + "Center) (nssdc.gsfc.nasa.gov/planetary/factsheet) | J2000.0 | public-domain |"))
         #expect(text.contains("| Mercury | axial-tilt | 0.034 | degrees |"))
         let rows: [Substring] = text.split(separator: "\n").filter { $0.hasPrefix("| ") && !$0.hasPrefix("| Body") }
-        #expect(rows.count == 34)
+        #expect(rows.count == 34 + 8, "34 values and 8 orbital-element sets (A14-P02)")
         #expect(text.hasSuffix("\n34 values; 0 problems.\n"))
         #expect(!text.contains("\r") && !text.hasSuffix("\n\n"))
         #expect(CitationAudit.markdown(catalog) == text)
@@ -118,6 +118,33 @@ import Testing
         let single = BodyCatalog(bodies: [catalog.bodies[0]], sources: [])
         #expect(CitationAudit.markdown(BodyCatalog(bodies: [], sources: [])).hasSuffix("\n0 values; 0 problems.\n"))
         #expect(CitationAudit.problems(single).count == 2)
+    }
+
+    /// The orbital elements' audit (feature 104, A14-P02, T-A14-205; FR-A14-210): the bundled sets are complete; a
+    /// missing, duplicate, damaged or orphan record is named; the document lists every set.
+    @Test func theOrbitalElementsAreAudited() {
+        let elements = OrbitElements.bundled
+        let records = SourceRecord.orbitalElements
+        #expect(records.count == 8 && CitationAudit.elementProblems(elements).isEmpty)
+        for record in records {
+            #expect(record.epoch == "J2000.0" && record.units == "AU, degrees" && record.license == "public-domain")
+        }
+        var damaged: [SourceRecord] = Array(records.dropFirst())
+        damaged.append(records[1])
+        damaged[2] = changed(damaged[2], title: "")
+        let wrong = SourceRecord(bodyID: "pluto", quantity: "orbital-elements", title: "t", publisher: "p",
+                                 link: "l", epoch: "J2000.0", units: "AU, degrees", license: "CC-BY-4.0")
+        damaged.append(wrong)
+        let problems = CitationAudit.elementProblems(elements, sources: damaged)
+        #expect(problems.contains("mercury orbital-elements: no source record"))
+        #expect(problems.contains("venus orbital-elements: duplicate source record"))
+        #expect(problems.contains("mars orbital-elements: missing source"))
+        #expect(problems.contains("pluto orbital-elements: source record without an element set"))
+        let text = CitationAudit.markdown(catalog)
+        #expect(text.contains("## Orbital elements\n"))
+        #expect(text.contains("| Earth | 1.00000261 | 0.01671123 | -1.531e-05 | 100.46457166 | 102.93768193 | 0.0 | "))
+        #expect(text.contains("| Mars | 1.52371034 | 0.0933941 | 1.84969142 | -4.55343205 | -23.94362959 | 49.55953891 | "))
+        #expect(CitationAudit.markdown(catalog, elements: [], elementSources: []).hasSuffix("\n34 values; 0 problems.\n"))
     }
 
     /// The committed `docs/apps/solar-system-explorer/data-sources.md` equals the generated document (T-A14-106); run

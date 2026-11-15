@@ -12,6 +12,12 @@
 // - the Sun's axial tilt (7.25°, to the ecliptic): the NSSDCA "Sun Fact Sheet",
 //   nssdc.gsfc.nasa.gov/planetary/factsheet/sunfact.html, epoch J2000.0, public domain.
 // Units are "km" for radii and semi-major axes, "days" for sidereal periods and "degrees" for axial tilts.
+//
+// Feature 104 (A14-P02) T-A14-205 (FR-A14-210; clarification Q2; research D2) adds `SourceRecord.orbitalElements`: one
+// record per planet for quantity `orbital-elements` (its `OrbitElements.bundled` set): E. M. Standish, "Keplerian
+// Elements for Approximate Positions of the Major Planets", Table 1, NASA Jet Propulsion Laboratory Solar System
+// Dynamics, ssd.jpl.nasa.gov/planets/approx_pos.html, epoch J2000.0, units "AU, degrees", `public-domain` (numerical
+// facts published by a NASA laboratory). They are kept apart from `bundled`, which holds the catalog's values.
 import Foundation
 
 /// A stored quantity of a body, with its key in source records and the units it is stored in.
@@ -93,6 +99,30 @@ public struct SourceRecord: Codable, Equatable, Sendable {
     public static let j2000 = "J2000.0"
     /// The license of every bundled record.
     public static let publicDomain = "public-domain"
+
+    /// The quantity key of an orbital-element set.
+    public static let orbitalElementsQuantity = "orbital-elements"
+    /// The units of an orbital-element set.
+    public static let orbitalElementsUnits = "AU, degrees"
+    /// The title of the orbital elements' source.
+    public static let standishTitle = "Keplerian Elements for Approximate Positions of the Major Planets, Table 1"
+    /// The publisher line of the orbital elements' source.
+    public static let standishPublisher =
+        "E. M. Standish, NASA Jet Propulsion Laboratory Solar System Dynamics (numerical facts, public domain)"
+    /// The orbital elements' link text.
+    public static let standishLink = "ssd.jpl.nasa.gov/planets/approx_pos.html"
+
+    /// The eight orbital-element records, one per planet in catalog order (see the file header).
+    public static let orbitalElements: [SourceRecord] = {
+        let planets: [String] = ["mercury", "venus", "earth", "mars", "jupiter", "saturn", "uranus", "neptune"]
+        var records: [SourceRecord] = []
+        for planet in planets {
+            records.append(SourceRecord(bodyID: planet, quantity: orbitalElementsQuantity, title: standishTitle,
+                                        publisher: standishPublisher, link: standishLink, epoch: j2000,
+                                        units: orbitalElementsUnits, license: publicDomain))
+        }
+        return records
+    }()
 
     /// A Planetary Fact Sheet record for `bodyID`'s `quantity`.
     private static func factSheet(_ bodyID: String, _ quantity: BodyQuantity) -> SourceRecord {
