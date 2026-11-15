@@ -46,7 +46,7 @@ extension PlaygroundCore {
          ScenarioStep(steps: 0, action: ScriptedAction("world.timeScale", [1.5]),
                       result: "action.rule." + PlaygroundRule.invalidChoice),
          ScenarioStep(steps: 0, action: ScriptedAction("world.timeScale", [4]), result: "action.out-of-range"),
-         ScenarioStep(steps: 5, action: ScriptedAction("world.step"),
+         ScenarioStep(steps: 0, action: ScriptedAction("world.step"),
                       result: "action.rule." + PlaygroundRule.notPaused),
          ScenarioStep(steps: 0, action: ScriptedAction("world.reset", [1]), result: "action.wrong-value-count"),
          ScenarioStep(steps: 0, action: ScriptedAction("world.drop", [0.5]),

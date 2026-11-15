@@ -148,7 +148,7 @@
             ]
           },
           "result" : "action.rule.a11.not-paused",
-          "steps" : 5
+          "steps" : 0
         },
         {
           "action" : {
