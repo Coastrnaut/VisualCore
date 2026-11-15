@@ -10,9 +10,9 @@
 //     The Sun maps to the origin in both.
 //   - Drawn radii: delegated to `ScaleMode.drawnRadius(index:)`. Enhanced (``displayRadius(index:)``): A14-P01's
 //     display radius × 0.6 for a planet and × 0.5 for the Sun (0.8); true-relative: radius km ÷ 149,597,870.7 × 2.
-//   - Orbit paths: 128 samples over one period of the body's `KeplerOrbit`, each mapped by the mode; a closed loop
-//     drawn as a tube of ``orbitTubeRadius(mode:)`` (0.04 enhanced; 0.1 true-relative, where the scene is about 2.8
-//     times larger and a pixel at the overview about 0.29 units).
+//   - Orbit paths: 128 samples (64 at detail level 1, feature 107) over one period of the body's `KeplerOrbit`, each
+//     mapped by the mode; a closed loop drawn as a tube of ``orbitTubeRadius(mode:)`` (0.04 enhanced; 0.1
+//     true-relative, where the scene is about 2.8 times larger and a pixel at the overview about 0.29 units).
 //   - Camera of a state (``camera(state:)``): target the focused body's position in the state's mode, yaw and pitch
 //     from the state, distance `ScaleMode.cameraDistance(zoomSteps:)` (60 or 120 · 1.25^−zoomSteps), 60° field of
 //     view, near and far from `ScaleMode.clipRange(distance:)` (0.5 and 200 enhanced; max(1e-4, 0.05 d) and d + 140
@@ -42,8 +42,10 @@ enum OrbitLayout {
     static let planetRadiusFactor = ScaleMode.planetRadiusFactor
     /// The enhanced display-radius factor of the Sun (0.5 × A14-P01's display radius, 0.8).
     static let sunRadiusFactor = ScaleMode.sunRadiusFactor
-    /// The samples of one orbit path (128).
+    /// The samples of one orbit path at detail level 0 (128).
     static let orbitSamples = 128
+    /// The samples of one orbit path at detail level 1 (64, every second point of level 0's path).
+    static let lowOrbitSamples = 64
     /// The vertical field of view (60°).
     static let fieldOfView = Double.pi / 3
     /// The enhanced mode's near plane distance (below the smallest camera distance minus the largest display radius).
@@ -101,15 +103,16 @@ enum OrbitLayout {
 
     // MARK: Orbits
 
-    /// The orbit path of `bodyID` in `mode`: 128 scene points at times k · period / 128 (k = 0 … 127) of its
-    /// `KeplerOrbit`, a closed loop; empty for the Sun or an unknown id.
-    static func orbitPath(bodyID: String, mode: ScaleMode = .enhanced) -> [Vec3] {
-        guard let orbit = SolarCore.model.orbit(bodyID: bodyID) else { return [] }
+    /// The orbit path of `bodyID` in `mode`: `samples` (128 by default; 64 at detail level 1) scene points at times
+    /// k · period / samples (k = 0 … samples − 1) of its `KeplerOrbit`, a closed loop; empty for the Sun, an unknown id
+    /// or fewer than 3 samples. The 64-sample path is every second point of the 128-sample one.
+    static func orbitPath(bodyID: String, mode: ScaleMode = .enhanced, samples: Int = orbitSamples) -> [Vec3] {
+        guard samples >= 3, let orbit = SolarCore.model.orbit(bodyID: bodyID) else { return [] }
         let period = orbit.period
         var path: [Vec3] = []
-        path.reserveCapacity(orbitSamples)
-        for k in 0..<orbitSamples {
-            path.append(mode.scenePosition(orbit.position(at: period * Double(k) / Double(orbitSamples))))
+        path.reserveCapacity(samples)
+        for k in 0..<samples {
+            path.append(mode.scenePosition(orbit.position(at: period * Double(k) / Double(samples))))
         }
         return path
     }

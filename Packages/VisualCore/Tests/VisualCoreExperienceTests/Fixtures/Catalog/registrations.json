@@ -334,7 +334,8 @@
         "sizes and spacing not to scale"
       ],
       "quality_tiers": [
-        "level-0"
+        "level-0",
+        "level-1"
       ],
       "palette": [
         "#05070F",

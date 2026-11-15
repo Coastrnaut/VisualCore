@@ -4,16 +4,16 @@
 // FR-A14-320–322; clarifications Q1–Q5; contracts/bodies.md). Draws Solar System Explorer through the host only (the
 // host's context and registry, VisualCore's `DepthMeshPass` and `MeshRenderer` with an `OrbitCamera`; no context of
 // its own, no second renderer, no imported assets). The presenter reads the core and never writes it:
-//   - Bodies: each body is the unit 48 × 24 sphere of ``SceneMeshes`` with per-vertex colours from its `SurfaceRecipe`
-//     (seam-free procedural surfaces), drawn at its position in the state's scale mode (``OrbitLayout/scenePosition(
-//     index:day:mode:)``), scaled to the mode's drawn radius and tilted by its catalog axial tilt about the scene x
-//     axis. The Sun is emissive (ambient 1); each planet is lit from the Sun (its light direction points from the
+//   - Bodies: each body is the unit 48 × 24 sphere (level 0) of ``SceneMeshes`` with per-vertex colours from its
+//     `SurfaceRecipe` (seam-free procedural surfaces), drawn at its position in the state's scale mode
+//     (``OrbitLayout/scenePosition(index:day:mode:)``), scaled to the mode's drawn radius and tilted by its catalog
+//     axial tilt about the scene x axis. The Sun is emissive (ambient 1); each planet is lit from the Sun (its light direction points from the
 //     planet toward the origin, ``lightDirection(at:)``, ambient 0.25).
 //   - Saturn's ring: the two-sided annulus of ``SceneMeshes/saturnRing(_:)`` (Cassini division darker) around Saturn,
 //     scaled with Saturn's drawn radius and tilted with it, lit from the Sun with ambient 0.7.
-//   - Orbits: eight closed tubes per scale mode along 128 samples of each planet's orbit
+//   - Orbits: eight closed tubes per scale mode along 128 samples (level 0) of each planet's orbit
 //     (``OrbitLayout/orbitPath(bodyID:mode:)``); the active mode's set is drawn fully bright in a dim colour.
-//   - Starfield: 400 seeded stars (``SceneMeshes/starMesh(directions:)``) centred on the eye at 0.9 × the active far
+//   - Starfield: 400 seeded stars (level 0; ``SceneMeshes/starMesh(directions:)``) centred on the eye at 0.9 × the far
 //     plane, white at ambient 1, drawn last; in the enhanced mode every body lies nearer (at most 75 + 22 units from
 //     the eye against 180), so no star is ever drawn in front of a body.
 //   - Markers (true-relative mode): every body drawn under 2 pixels in radius gets a camera-facing marker ring of 6
@@ -32,12 +32,20 @@
 //     subtracted in Double and rounded to Float (``CameraRelative/relative(_:to:)``), and the scene is drawn through an
 //     orbit camera with the same yaw, pitch and distance whose target is the origin, so precision does not depend on
 //     the distance from the Sun.
-//   - GPU objects: one `DepthMeshPass` and 37 mesh renderers (nine bodies, nine selection rings, eight orbits per
-//     scale mode, Saturn's ring, the starfield and one marker ring), all made together with the host's registry in
-//     `setup` (so they are made again after a context recreation; `draw` releases and makes them all if any is
-//     missing) and all released together in `teardown`. Every mesh renderer shares one cached shader program in the
-//     host's registry and releasing any renderer releases that program for all of them (A14-P01 research, As built),
-//     so no renderer is ever released while others are in use. The CPU meshes are made once and kept.
+//   - Detail levels (feature 107, A14-P05, T-A14-504; FR-A14-510, SC-A14-504; clarification Q5): the host's quality
+//     tier, clamped to 0 … 1 (``SceneMeshes/DetailLevel/index(tier:)``), picks the meshes drawn: level 0 the spheres
+//     of 48 × 24, 400 stars and orbits of 128 samples described above; level 1 spheres of 24 × 12 with the same recipe
+//     colours per vertex, the first 200 of the 400 stars and orbits of 64 samples. Saturn's ring, the selection rings
+//     and the marker are shared. A level changes only which meshes are drawn: positions, the flight, the labels, the
+//     probes and the state are computed the same way at both levels (the probes keep level 0's sphere and all 400
+//     star directions).
+//   - GPU objects: one `DepthMeshPass` and 63 mesh renderers (level 0: nine bodies, eight orbits per scale mode and
+//     the starfield; level 1: the same 26 again from its meshes; shared: nine selection rings, Saturn's ring and one
+//     marker ring), all made together with the host's registry in `setup` (so they are made again after a context
+//     recreation; `draw` releases and makes them all if any is missing) and all released together in `teardown`; a
+//     level change makes or releases nothing. Every mesh renderer shares one cached shader program in the host's
+//     registry and releasing any renderer releases that program for all of them (A14-P01 research, As built), so no
+//     renderer is ever released while others are in use. The CPU meshes of both levels are made once and kept.
 //   - Probes (from the camera and eye of the last drawn frame): the background at the first of
 //     ``backgroundProbes`` whose ray misses every body, Saturn's ring, the selection ring, every marker, the orbits
 //     and every star (``OrbitLayout/rayMissesScene(ndc:camera:state:aspect:heightPixels:)``), expected dark; and the focused body's centre with the colour class of the recipe colours
@@ -217,7 +225,7 @@ final class SolarPresenter: ExperiencePresenter {
 
     /// Whether the GPU side is set up (between `setup` and `teardown`).
     private(set) var isLive = false
-    /// How many times the renderers (all 37, always together) were made.
+    /// How many times the renderers (all 63 of both levels, always together) were made.
     private(set) var rendererBuildCount = 0
     /// How many times the nine selection ring renderers were made (with the others; never per selection).
     private(set) var ringBuildCount = 0
@@ -225,6 +233,14 @@ final class SolarPresenter: ExperiencePresenter {
     private(set) var meshBuildCount = 0
     /// The number of bodies drawn by the last frame.
     private(set) var lastBodiesDrawn = 0
+    /// The detail level the last frame drew (the host's tier clamped to 0 … 1); nil before the first frame.
+    private(set) var lastTier: Int?
+    /// The vertices of the nine body spheres drawn by the last frame (9 × 1,225 at level 0, 9 × 325 at level 1); 0
+    /// before the first frame.
+    private(set) var lastBodyVertexCount = 0
+    /// The vertices of the level-dependent meshes drawn by the last frame: the bodies, the active mode's orbits and the
+    /// stars; 0 before the first frame.
+    private(set) var lastDetailVertexCount = 0
     /// The number of orbit lines drawn by the last frame.
     private(set) var lastOrbitsDrawn = 0
     /// Whether the last frame drew the selection ring.
@@ -293,6 +309,14 @@ final class SolarPresenter: ExperiencePresenter {
     private(set) var starMesh: Mesh?
     /// The unit marker ring; nil until first needed.
     private(set) var markerMesh: Mesh?
+    /// Level 1's unit body spheres (24 × 12) with their recipe colours in catalog order; empty until first needed.
+    private(set) var lowBodyMeshes: [(mesh: Mesh, colors: [Vec4])] = []
+    /// Level 1's enhanced orbit meshes (64 samples); empty until first needed.
+    private(set) var lowOrbitMeshes: [Mesh] = []
+    /// Level 1's true-relative orbit meshes (64 samples); empty until first needed.
+    private(set) var lowTrueOrbitMeshes: [Mesh] = []
+    /// Level 1's starfield (the first 200 stars) on the unit sphere; nil until first needed.
+    private(set) var lowStarMesh: Mesh?
     /// The body renderers in catalog order; empty after `teardown`.
     private(set) var bodyRenderers: [MeshRenderer] = []
     /// The selection ring renderers of the nine bodies in catalog order, made once with the others; empty after
@@ -308,6 +332,14 @@ final class SolarPresenter: ExperiencePresenter {
     private(set) var starRenderer: MeshRenderer?
     /// The marker renderer (drawn once per marked body); nil after `teardown`.
     private(set) var markerRenderer: MeshRenderer?
+    /// Level 1's body renderers in catalog order; empty after `teardown`.
+    private(set) var lowBodyRenderers: [MeshRenderer] = []
+    /// Level 1's eight enhanced orbit renderers; empty after `teardown`.
+    private(set) var lowOrbitRenderers: [MeshRenderer] = []
+    /// Level 1's eight true-relative orbit renderers; empty after `teardown`.
+    private(set) var lowTrueOrbitRenderers: [MeshRenderer] = []
+    /// Level 1's starfield renderer; nil after `teardown`.
+    private(set) var lowStarRenderer: MeshRenderer?
     /// The selection ring renderer of the last drawn selection; nil after `teardown` or before the first frame.
     var ringRenderer: MeshRenderer? {
         guard let selection = lastSelection, ringRenderers.indices.contains(selection) else { return nil }
@@ -350,11 +382,15 @@ final class SolarPresenter: ExperiencePresenter {
         bodyRenderers.count == SolarCore.bodyCount && ringRenderers.count == SolarCore.bodyCount
             && !orbitRenderers.isEmpty && orbitRenderers.count == orbitMeshes.count
             && trueOrbitRenderers.count == trueOrbitMeshes.count && saturnRingRenderer != nil && starRenderer != nil
-            && markerRenderer != nil
+            && markerRenderer != nil && lowBodyRenderers.count == SolarCore.bodyCount
+            && lowOrbitRenderers.count == lowOrbitMeshes.count
+            && lowTrueOrbitRenderers.count == lowTrueOrbitMeshes.count
+            && lowStarRenderer != nil
     }
 
     /// Draws the bodies, Saturn's ring, the active mode's orbits, the selection ring, the markers and the starfield
-    /// with depth through the drawn camera of the focus flight, camera-relative.
+    /// with depth through the drawn camera of the focus flight, camera-relative, from the meshes of the detail level of
+    /// `tier` (clamped to 0 … 1).
     func draw(_ core: SolarCore, tier: Int, context: RenderContext, frame: FrameInfo) throws {
         sync(core)
         let width = Double(max(1, context.pixelWidth)), height = Double(max(1, context.pixelHeight))
@@ -365,7 +401,13 @@ final class SolarPresenter: ExperiencePresenter {
             releaseRenderers()
             try makeRenderers(context)
         }
-        guard let depthPass, let saturnRingRenderer, let starRenderer, let markerRenderer else { return }
+        guard let depthPass, let saturnRingRenderer, let markerRenderer, let fullStars = starRenderer,
+              let lowStars = lowStarRenderer else { return }
+        let level = SceneMeshes.DetailLevel.index(tier: tier)
+        let low = level == 1
+        let levelBodies = low ? lowBodyRenderers : bodyRenderers
+        let levelBodyMeshes = low ? lowBodyMeshes : bodyMeshes
+        let drawnStars = low ? lowStars : fullStars
         depthPass.clearColor = Self.backgroundColor
         let state = core.state
         let mode = state.scaleMode
@@ -383,7 +425,8 @@ final class SolarPresenter: ExperiencePresenter {
         }
         var items: [DepthMeshPass.Item] = []
         var centers: [Vec3] = []
-        for (index, renderer) in bodyRenderers.enumerated() {
+        var bodyVertices = 0
+        for (index, renderer) in levelBodies.enumerated() {
             let center = OrbitLayout.scenePosition(index: index, day: day, mode: mode)
             centers.append(center)
             if index > 0 { renderer.lightDirection = Self.lightDirection(at: center) }
@@ -391,6 +434,7 @@ final class SolarPresenter: ExperiencePresenter {
             let model = Mat4.translation(relative(center)) * SceneMeshes.bodyTilt(index: index)
                 * Mat4.scale(Vec3(r, r, r))
             items.append(DepthMeshPass.Item(renderer: renderer, model: model, color: Vec4(1, 1, 1, 1)))
+            if levelBodyMeshes.indices.contains(index) { bodyVertices += levelBodyMeshes[index].mesh.positions.count }
         }
         let bodies = items.count
         // Saturn's ring (unit = Saturn radii), tilted with Saturn.
@@ -403,7 +447,18 @@ final class SolarPresenter: ExperiencePresenter {
                                             * SceneMeshes.bodyTilt(index: saturn)
                                             * Mat4.scale(Vec3(saturnRadius, saturnRadius, saturnRadius)),
                                         color: Vec4(1, 1, 1, 1)))
-        let orbits = mode == .enhanced ? orbitRenderers : trueOrbitRenderers
+        let orbits: [MeshRenderer]
+        let orbitMeshesDrawn: [Mesh]
+        if low {
+            orbits = mode == .enhanced ? lowOrbitRenderers : lowTrueOrbitRenderers
+            orbitMeshesDrawn = mode == .enhanced ? lowOrbitMeshes : lowTrueOrbitMeshes
+        } else {
+            orbits = mode == .enhanced ? orbitRenderers : trueOrbitRenderers
+            orbitMeshesDrawn = mode == .enhanced ? orbitMeshes : trueOrbitMeshes
+        }
+        var orbitVertices = 0
+        for mesh in orbitMeshesDrawn { orbitVertices += mesh.positions.count }
+        let starVertices = (low ? lowStarMesh : starMesh)?.positions.count ?? 0
         let orbitModel = Mat4.translation(relative(.zero))
         for renderer in orbits {
             items.append(DepthMeshPass.Item(renderer: renderer, model: orbitModel, color: Self.orbitColor))
@@ -430,12 +485,15 @@ final class SolarPresenter: ExperiencePresenter {
         }
         // The starfield last, centred on the eye at 0.9 × far.
         let starRadius = SceneMeshes.starRadius(far: camera.far)
-        items.append(DepthMeshPass.Item(renderer: starRenderer,
+        items.append(DepthMeshPass.Item(renderer: drawnStars,
                                         model: Mat4.translation(relative(eye))
                                             * Mat4.scale(Vec3(starRadius, starRadius, starRadius)),
                                         color: SceneMeshes.starColor))
         try depthPass.draw(items, camera: relativeCamera, context: context)
         lastBodiesDrawn = bodies
+        lastTier = level
+        lastBodyVertexCount = bodyVertices
+        lastDetailVertexCount = bodyVertices + orbitVertices + starVertices
         lastOrbitsDrawn = orbits.count
         lastRingDrawn = ringDrawn
         lastSaturnRingDrawn = true
@@ -523,6 +581,8 @@ final class SolarPresenter: ExperiencePresenter {
         lastStarsDrawn = false
         lastMarkersDrawn = 0
         lastMarkedBodies = []
+        lastBodyVertexCount = 0
+        lastDetailVertexCount = 0
     }
 
     /// Releases every renderer and the depth pass.
@@ -532,8 +592,16 @@ final class SolarPresenter: ExperiencePresenter {
         depthPass = nil
     }
 
-    /// Releases every mesh renderer, all together.
+    /// Releases every mesh renderer of both levels, all together.
     private func releaseRenderers() {
+        for renderer in lowBodyRenderers { renderer.release() }
+        for renderer in lowOrbitRenderers { renderer.release() }
+        for renderer in lowTrueOrbitRenderers { renderer.release() }
+        lowStarRenderer?.release()
+        lowBodyRenderers = []
+        lowOrbitRenderers = []
+        lowTrueOrbitRenderers = []
+        lowStarRenderer = nil
         for renderer in bodyRenderers { renderer.release() }
         for renderer in ringRenderers { renderer.release() }
         for renderer in orbitRenderers { renderer.release() }
@@ -554,19 +622,27 @@ final class SolarPresenter: ExperiencePresenter {
     private var meshesComplete: Bool {
         bodyMeshes.count == SolarCore.bodyCount && ringMeshes.count == SolarCore.bodyCount && !orbitMeshes.isEmpty
             && trueOrbitMeshes.count == orbitMeshes.count && saturnRingMesh != nil && starMesh != nil
-            && markerMesh != nil
+            && markerMesh != nil && lowBodyMeshes.count == SolarCore.bodyCount && !lowOrbitMeshes.isEmpty
+            && lowTrueOrbitMeshes.count == lowOrbitMeshes.count && lowStarMesh != nil
     }
 
-    /// Makes the CPU meshes once: bodies, selection rings, both orbit sets, Saturn's ring, the stars and the marker.
+    /// Makes the CPU meshes of both levels once: bodies, both orbit sets and the stars of each level, and the shared
+    /// selection rings, Saturn's ring and marker.
     private func buildMeshes() throws {
         let bodies = SceneMeshes.bodies()
+        let lowBodies = SceneMeshes.bodies(sphere: SceneMeshes.lowUnitSphere)
+        let lowSamples = OrbitLayout.lowOrbitSamples
         var rings: [Mesh] = []
         for index in 0..<SolarCore.bodyCount { rings.append(try Self.ringMesh(selection: index)) }
         var orbits: [Mesh] = []
         var trueOrbits: [Mesh] = []
+        var lowOrbits: [Mesh] = []
+        var lowTrueOrbits: [Mesh] = []
         for id in OrbitLayout.orbitBodyIDs {
             orbits.append(try SceneMeshes.orbitMesh(bodyID: id, mode: .enhanced))
             trueOrbits.append(try SceneMeshes.orbitMesh(bodyID: id, mode: .trueRelative))
+            lowOrbits.append(try SceneMeshes.orbitMesh(bodyID: id, mode: .enhanced, samples: lowSamples))
+            lowTrueOrbits.append(try SceneMeshes.orbitMesh(bodyID: id, mode: .trueRelative, samples: lowSamples))
         }
         let saturnRing = try SceneMeshes.saturnRing()
         let marker = try SceneMeshes.markerMesh()
@@ -577,15 +653,19 @@ final class SolarPresenter: ExperiencePresenter {
         saturnRingMesh = saturnRing
         starMesh = SceneMeshes.starMesh()
         markerMesh = marker
+        lowBodyMeshes = lowBodies
+        lowOrbitMeshes = lowOrbits
+        lowTrueOrbitMeshes = lowTrueOrbits
+        lowStarMesh = SceneMeshes.starMesh(directions: SceneMeshes.lowStarField)
         meshBuildCount += 1
     }
 
-    /// Makes all the renderers together: the nine bodies (the Sun fully bright, the planets lit from the Sun), the
-    /// nine selection rings, both orbit sets, Saturn's ring (ambient 0.7), the stars and the marker (fully bright); a
-    /// failure releases every renderer made so far and rethrows.
+    /// Makes all the renderers of both levels together: per level the nine bodies (the Sun fully bright, the planets
+    /// lit from the Sun), both orbit sets and the stars; shared, the nine selection rings, Saturn's ring (ambient 0.7)
+    /// and the marker (fully bright); a failure releases every renderer made so far and rethrows.
     private func makeRenderers(_ context: RenderContext) throws {
         if !meshesComplete { try buildMeshes() }
-        guard let saturnRingMesh, let starMesh, let markerMesh else { return }
+        guard let saturnRingMesh, let starMesh, let markerMesh, let lowStarMesh else { return }
         var made: [MeshRenderer] = []
         func renderer(_ mesh: Mesh, colors: [Vec4]? = nil, ambient: Double) throws -> MeshRenderer {
             let renderer = try MeshRenderer(mesh: mesh, colors: colors, registry: context.resources)
@@ -608,6 +688,16 @@ final class SolarPresenter: ExperiencePresenter {
                                           ambient: SceneMeshes.ringAmbient)
             let stars = try renderer(starMesh, ambient: 1)
             let marker = try renderer(markerMesh, ambient: 1)
+            var lowBodies: [MeshRenderer] = []
+            for (index, part) in lowBodyMeshes.enumerated() {
+                lowBodies.append(try renderer(part.mesh, colors: part.colors,
+                                              ambient: index == 0 ? 1 : Self.planetAmbient))
+            }
+            var lowOrbits: [MeshRenderer] = []
+            for mesh in lowOrbitMeshes { lowOrbits.append(try renderer(mesh, ambient: 1)) }
+            var lowTrueOrbits: [MeshRenderer] = []
+            for mesh in lowTrueOrbitMeshes { lowTrueOrbits.append(try renderer(mesh, ambient: 1)) }
+            let lowStars = try renderer(lowStarMesh, ambient: 1)
             bodyRenderers = bodies
             ringRenderers = rings
             orbitRenderers = orbits
@@ -615,6 +705,10 @@ final class SolarPresenter: ExperiencePresenter {
             saturnRingRenderer = saturnRing
             starRenderer = stars
             markerRenderer = marker
+            lowBodyRenderers = lowBodies
+            lowOrbitRenderers = lowOrbits
+            lowTrueOrbitRenderers = lowTrueOrbits
+            lowStarRenderer = lowStars
         } catch {
             for renderer in made { renderer.release() }
             throw error

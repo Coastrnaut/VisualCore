@@ -144,8 +144,9 @@ public struct SolarCore: ExperienceCore, Equatable {
 
     // MARK: Contract
 
-    /// One quality tier (`level-0`): the orbit view has nothing to scale down in this phase.
-    public static var qualityTiers: Int { 1 }
+    /// Two quality tiers (A14-P05, T-A14-504): `level-0` (spheres 48 × 24, 400 stars, orbits of 128 samples) and
+    /// `level-1` (24 × 12, 200 stars, 64 samples); a level changes only the drawing, never a position or the state.
+    public static var qualityTiers: Int { 2 }
 
     /// Schema 4 with the steps 1 → 2 (J2000.0 and the overview camera), 2 → 3 (the enhanced scale mode) and 3 → 4 (a
     /// paused clock at rate 0, no tour).

@@ -22,6 +22,11 @@
 //     the mesh on the eye and scales it to ``starRadius(far:)`` = 0.9 × the active far plane.
 //   - Marker ring: a closed `Mesh.tube` circle of radius 1 in the x–y plane (normal +z); the presenter turns it to
 //     face the camera and scales it to the marker's pixel radius.
+//   - Detail levels (feature 107, A14-P05, T-A14-504; FR-A14-510; clarification Q5): ``DetailLevel/levels`` lists two,
+//     `level-0` (spheres 48 × 24, 400 stars, orbits of 128 samples, all of the above) and `level-1` (spheres 24 × 12
+//     with the same recipe colours per vertex, the first 200 of the 400 star directions, orbits of 64 samples, every
+//     second point of level 0's). Saturn's ring, the selection rings and the marker ring are shared by both levels. A
+//     level changes only the meshes, never a position.
 import Foundation
 import SolarSystemExplorerCore
 import VisualCoreMath
@@ -36,8 +41,14 @@ enum SceneMeshes {
     /// Latitude rings of each body sphere (24).
     static let sphereRings = 24
 
-    /// The unit sphere every body is drawn from (48 × 24, radius 1).
+    /// The unit sphere every body is drawn from at detail level 0 (48 × 24, radius 1).
     static let unitSphere: Mesh = Mesh.uvSphere(segments: sphereSegments, rings: sphereRings, radius: 1)
+    /// Longitude segments of each body sphere at detail level 1 (24).
+    static let lowSphereSegments = 24
+    /// Latitude rings of each body sphere at detail level 1 (12).
+    static let lowSphereRings = 12
+    /// The unit sphere every body is drawn from at detail level 1 (24 × 12, radius 1).
+    static let lowUnitSphere: Mesh = Mesh.uvSphere(segments: lowSphereSegments, rings: lowSphereRings, radius: 1)
 
     /// The surface recipe of the catalog body at `index` (nil outside the catalog or without a recipe).
     static func recipe(index: Int) -> SurfaceRecipe? {
@@ -56,11 +67,12 @@ enum SceneMeshes {
         return recipe.colors(for: mesh.positions).map(vector)
     }
 
-    /// The nine unit body spheres in catalog order with their recipe colours.
-    static func bodies() -> [(mesh: Mesh, colors: [Vec4])] {
+    /// The nine unit body spheres (`sphere`, by default level 0's 48 × 24) in catalog order with their recipe
+    /// colours per vertex.
+    static func bodies(sphere: Mesh = unitSphere) -> [(mesh: Mesh, colors: [Vec4])] {
         var parts: [(mesh: Mesh, colors: [Vec4])] = []
         for index in 0..<SolarCore.bodyCount {
-            parts.append((unitSphere, bodyColors(index: index, mesh: unitSphere)))
+            parts.append((sphere, bodyColors(index: index, mesh: sphere)))
         }
         return parts
     }
@@ -148,23 +160,25 @@ enum SceneMeshes {
 
     // MARK: Orbits
 
-    /// The orbit paths of ``OrbitLayout/orbitBodyIDs`` in `mode` (128 scene points each).
-    static func orbitPaths(mode: ScaleMode) -> [[Vec3]] {
-        OrbitLayout.orbitBodyIDs.map { OrbitLayout.orbitPath(bodyID: $0, mode: mode) }
+    /// The orbit paths of ``OrbitLayout/orbitBodyIDs`` in `mode` (`samples` scene points each, 128 by default).
+    static func orbitPaths(mode: ScaleMode, samples: Int = OrbitLayout.orbitSamples) -> [[Vec3]] {
+        OrbitLayout.orbitBodyIDs.map { OrbitLayout.orbitPath(bodyID: $0, mode: mode, samples: samples) }
     }
 
     /// The orbit tube of `bodyID` in `mode`: a closed `Mesh.tube` of ``OrbitLayout/orbitTubeRadius(mode:)`` and
-    /// ``SolarPresenter/orbitSides`` sides along its path.
-    static func orbitMesh(bodyID: String, mode: ScaleMode) throws -> Mesh {
-        try Mesh.tube(path: OrbitLayout.orbitPath(bodyID: bodyID, mode: mode),
+    /// ``SolarPresenter/orbitSides`` sides along its path of `samples` points (128 by default).
+    static func orbitMesh(bodyID: String, mode: ScaleMode, samples: Int = OrbitLayout.orbitSamples) throws -> Mesh {
+        try Mesh.tube(path: OrbitLayout.orbitPath(bodyID: bodyID, mode: mode, samples: samples),
                       radius: OrbitLayout.orbitTubeRadius(mode: mode), sides: SolarPresenter.orbitSides, caps: false,
                       closed: true)
     }
 
     // MARK: Starfield
 
-    /// The number of stars (400).
+    /// The number of stars at detail level 0 (400).
     static let starCount = 400
+    /// The number of stars at detail level 1 (200, the first 200 of level 0's directions).
+    static let lowStarCount = 200
     /// The starfield seed (0xA14_57A5).
     static let starSeed: UInt64 = 0xA14_57A5
     /// The distance of each star's tetrahedron vertices from its point on the unit sphere (0.004).
@@ -211,6 +225,9 @@ enum SceneMeshes {
 
     /// The 400 star directions of ``starSeed``, made once.
     static let starField: [Vec3] = starDirections()
+    /// The star directions of detail level 1: the first ``lowStarCount`` (200) of ``starField``, so its sky is a
+    /// subset of level 0's.
+    static let lowStarField: [Vec3] = Array(starField.prefix(lowStarCount))
 
     /// The starfield on the unit sphere: one regular tetrahedron per direction (4 faces, 3 vertices each with the
     /// face's normal, wound outward).
@@ -240,6 +257,38 @@ enum SceneMeshes {
             }
         }
         return mesh
+    }
+
+    // MARK: Detail levels
+
+    /// One detail level of the 3D view (feature 107, clarification Q5): the body sphere's segments and rings, the
+    /// number of stars and the samples of each orbit path.
+    struct DetailLevel: Equatable, Sendable {
+        /// The level's name in the registration and the quality profile (`level-0`, `level-1`).
+        let name: String
+        /// Longitude segments of each body sphere.
+        let sphereSegments: Int
+        /// Latitude rings of each body sphere.
+        let sphereRings: Int
+        /// The number of stars drawn (a prefix of ``SceneMeshes/starField``).
+        let starCount: Int
+        /// The samples of each orbit path.
+        let orbitSamples: Int
+
+        /// The two levels, the full one first: `level-0` (48 × 24, 400 stars, 128 samples) and `level-1` (24 × 12,
+        /// 200 stars, 64 samples).
+        static let levels: [DetailLevel] = [
+            DetailLevel(name: "level-0", sphereSegments: SceneMeshes.sphereSegments,
+                        sphereRings: SceneMeshes.sphereRings, starCount: SceneMeshes.starCount,
+                        orbitSamples: OrbitLayout.orbitSamples),
+            DetailLevel(name: "level-1", sphereSegments: SceneMeshes.lowSphereSegments,
+                        sphereRings: SceneMeshes.lowSphereRings, starCount: SceneMeshes.lowStarCount,
+                        orbitSamples: OrbitLayout.lowOrbitSamples)
+        ]
+
+        /// The index of the level drawn for the host's `tier`: clamped to 0 … levels − 1 (above 1 draws level 1,
+        /// below 0 draws level 0).
+        static func index(tier: Int) -> Int { min(max(tier, 0), levels.count - 1) }
     }
 
     // MARK: Markers
