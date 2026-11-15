@@ -23,6 +23,43 @@ Canonical overrides:
 - **Owner rulings:** short tests; iOS 27 at phase gates; the reference regression for the VisualCore change runs at
   X-A11; every Spec Kit step runs.
 
+## Clarifications
+
+### Session 2026-11-15
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+`ImpulseSolver2D.solve(_:contacts:settings:)` takes `Contact2D(a:b:manifold:)` without stored impulses (cold start
+each tick); `WorldSettings` holds gravity, linear and angular drag, tick 1/120 s, iterations and stage size;
+`PhysicsWorld.schemaVersion` is 1 and the adapter's `MigrationChain(currentVersion: 1)`; `WorldSimulation` tests all
+pairs behind a bounding-circle pre-filter (A11-P01 research D3); `Primitive.polyline` exists for zigzags.
+
+- Q: How does a spring act, and what bounds keep it stable? → A: In `VisualCoreSimulation`: a spring joins anchor A (a
+  body index with a body-local point, or a fixed world point) and anchor B (a body index with a local point), with rest
+  length, stiffness k (N/m) and damping ratio ζ. Each tick it applies the impulse J = (−k·(L − L₀) − c·vₙ)·dt along the
+  unit direction between the world anchors, at the anchors (linear and angular), where vₙ is the closing speed and
+  c = 2ζ·√(k·m) with m = 1/(Σ inverse masses of the ends). k is clamped to 0.1·m/dt² (so ω·dt ≤ 0.32) and c to m/dt;
+  a length below 1e-9 m applies nothing; static ends never move. Pure, deterministic, documented.
+- Q: How does the broad phase work? → A: Axis-aligned bounds from each shape and pose (`Shape2D` gains its bounds);
+  sweep and prune along x with an insertion-sorted order; overlap is inclusive within 1e-9 m; it returns the pairs
+  (i, j), i < j, sorted ascending, exactly the pairs brute force reports; the world uses it for body pairs and keeps
+  the wall test per body.
+- Q: How does the solver keep a stack standing? → A: Warm starting: `Contact2D` gains stored normal and tangent impulses
+  per point (empty by default, which is the Phase 01 cold start), and a new `solve(_:contacts: inout ...)` applies them
+  first and writes the accumulated impulses back; the existing `solve` keeps its behaviour. The world keeps a contact
+  cache keyed by (body id A, body id B, point index) from the previous tick and seeds a contact when the pair and point
+  count match. Resting stack fixture: five boxes 0.5 m wide (wood) stacked on the floor for 1,200 ticks.
+- Q: Which force and stiffness levels exist, and how are they saved? → A: Gravity off, Moon 1.62, Earth 9.81 m/s²
+  (default Earth); drag none 0, low 0.05, high 1.0 s⁻¹ for linear and angular drag (default low); stiffness levels 20,
+  60, 150, 400 N/m (default 60), each clamped per spring to its stable bound; damping ratio 0.1 for the world's springs.
+  Actions `world.gravity [0…2]`, `world.drag [0…2]`, `world.stiffness [0…3]` (fractional → `a11.invalid-choice`). The
+  world becomes schema 2 (springs, next spring id, the three levels; settings' gravity and drag follow the levels); the
+  migration 1 → 2 adds no springs, Earth, low drag and stiffness level 1. At most 16 springs.
+- Q: What does the starting scene add, and how are springs drawn? → A: A wood box (half-size 0.3 m) hanging on a spring
+  from the world anchor (7.5, 8.0) on the ceiling with rest length 1.5 m, and two rubber circles (radius 0.3 m) joined by
+  a spring of rest length 1.0 m; the Phase 01 bodies keep non-overlapping places. A spring is drawn as an 8-coil zigzag
+  polyline 0.03 m wide between its world anchors with small anchor dots; the spoken description adds the spring count,
+  stiffness level, gravity and drag.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Springs that bounce and settle (Priority: P1) 🎯
