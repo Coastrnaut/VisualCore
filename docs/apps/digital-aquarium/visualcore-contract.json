@@ -198,7 +198,7 @@
       "id": "M03",
       "capability": "Procedural fish shapes and swim animation: per-species outline built from parameters (body length, depth, tail, fins, palette), a travelling body wave and tail beat tied to speed, smooth turning, drawn as polygons per frame",
       "source": "v0.1 feature 02; brainstorm: animation, sprite and object systems; manual P02 fish movement and visual prototype",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreScenes/SceneGraph.swift",
@@ -226,17 +226,29 @@
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/InfiniteGeometry/Experience/GeometryPresenter.swift",
-        "symbol": "GeometryPresenter"
+        "file": "Packages/ExperiencesCreative/DigitalAquarium/Experience/AquariumPresenter.swift",
+        "symbol": "AquariumPresenter.animatedOutline"
       },
-      "notes": "The polygon primitive, transforms and the fixed-step clock exist and are tested; no outline generator or body-wave deformation exists, and both are species-specific. G-FISHSWIM (app-local), A09-P02."
+      "notes": "The polygon primitive, transforms and the fixed-step clock exist and are tested; no outline generator or body-wave deformation exists, and both are species-specific. G-FISHSWIM (app-local), A09-P02. Built in A09-P02 (app-local): AquariumPresenter draws each fish from its species outline with a body wave of 0.06 body lengths, a tail sweep of 0.15 body lengths driven by the speed-scaled animation phase, and a bend toward the smoothed turn capped at ±0.35 rad; Reduce Motion halves all three in drawing only (AquariumRenderTests)."
     },
     {
       "id": "M04",
       "capability": "Bounded school behaviours: steering forces (separation, alignment, cohesion, wander, boundary avoidance) with speed and turn-rate limits over a bounded neighbour search (uniform grid or spatial hash with a per-agent neighbour cap)",
       "source": "v0.1 feature 02; manual risk erratic motion; spec FR-A09-003",
-      "status": "upstream gap",
+      "status": "available",
       "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/Steering.swift",
+          "symbol": "Steering",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/Steering.swift",
+          "symbol": "NeighbourSearch",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
         {
           "file": "Packages/VisualCore/Sources/VisualCoreSimulation/ParticleSystem.swift",
           "symbol": "ParticleForce",
@@ -263,10 +275,10 @@
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/ParticleUniverse/Core/SceneSimulation.swift",
-        "symbol": "SceneSimulation"
+        "file": "Packages/ExperiencesCreative/DigitalAquarium/Core/AquariumSimulation.swift",
+        "symbol": "AquariumSimulation"
       },
-      "notes": "ParticleForce has only point and field forces (gravity, drag, attractor, repulsor, gravityWell, wind, vortex) applied to particles independently; no agent-to-agent force, neighbour query, spatial hash or grid, or steering/flocking exists in any framework product (grep 2026-11-14). Steering with a bounded neighbour search is generic (schools, swarms, crowds), so it belongs to VisualCoreSimulation. G-STEERING, A09-P02."
+      "notes": "ParticleForce has only point and field forces (gravity, drag, attractor, repulsor, gravityWell, wind, vortex) applied to particles independently; no agent-to-agent force, neighbour query, spatial hash or grid, or steering/flocking exists in any framework product (grep 2026-11-14). Steering with a bounded neighbour search is generic (schools, swarms, crowds), so it belongs to VisualCoreSimulation. G-STEERING, A09-P02. Built in A09-P02 (upstream, VisualCoreSimulation): NeighbourSearch (linear scan, at most limit neighbours within a radius, nearest first, ties by index) and Steering (separation over all neighbours, alignment and cohesion within a group, inward boundary push, each term and the sum capped); AquariumSimulation schools the fish with species tuning, a reduced seeded wander and the Phase 01 bounds and speed limits (SteeringForceTests, NeighbourSearchTests, SchoolingTests). A grid was not needed for 24 fish."
     },
     {
       "id": "M05",
@@ -915,7 +927,7 @@
       "justification": "Found in A09-P00: no neighbour search, steering or flocking exists in any framework product; bounded steering over a neighbour grid is generic (schools, swarms, crowds) and belongs to VisualCoreSimulation.",
       "phase": 2,
       "test": "Host tests: the neighbour grid returns exactly the agents within the radius (checked against brute force) with a per-agent cap; separation, alignment, cohesion, wander and boundary forces have the expected sign and bound; speed and turn rate never exceed their limits; NaN/Inf rejected; seeded runs are deterministic; bounded work per step and no allocation in the steady state (API baseline additive)",
-      "closed": null
+      "closed": "A09-P02"
     },
     {
       "id": "G-FISHSWIM",
@@ -927,7 +939,7 @@
       "justification": "Fish outlines and their body-wave animation are species-specific; they are built from VisualCoreScenes polygons on the VisualCoreSimulation clock.",
       "phase": 2,
       "test": "Host tests: each species outline is a simple polygon within the point cap for every phase of the swim cycle; tail-beat frequency follows speed within limits; turning is smooth (bounded heading change per step); outlines are deterministic per seed",
-      "closed": null
+      "closed": "A09-P02"
     },
     {
       "id": "G-FEEDPLACE",
