@@ -27,6 +27,54 @@ Canonical overrides:
 - **Owner rulings:** short tests; audits and device runs in the device campaign; iOS 27 at phase gates; the reference
   regression for the VisualCore change runs at X-A11 (owner ruling 2026-11-14); every Spec Kit step runs.
 
+## Clarifications
+
+### Session 2026-11-15
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code: an
+`ExperienceCore` declares `stepDuration` (default 1/120 s), `update(step:)`, `apply(_:)`, `reset()`, snapshot payload
+and restore with a `MigrationChain`, `qualityTiers` (default 1); an `ExperienceAction` carries `control`, `values` and
+the `step`, so the applied actions are the input record; the engine's `suspend()`/`resume()` stop and restart stepping;
+`SeededRandom` saves and restores its state; `Vec2` (`VisualCoreMath`) offers `dot`, `cross`, `length`, `normalized`
+and `isFinite`; `VisualCoreSimulation` depends only on `VisualCoreMath` and holds `Collision2D` (circles and capsules)
+but no box, contact or solver code (contract G-CONTACTS); `Primitive` draws rectangles, circles, lines and polygons.
+
+- Q: Which units, stage, tick and limits does the world use? → A: Metres, kilograms (2D: density in kg/m²), seconds
+  and radians; y up, origin at the stage's bottom-left; the stage is 10 m wide and 8 m high, enclosed by four static
+  walls 1 m thick just outside it (floor, ceiling, left, right). One tick is 1/120 s (the host step). Defaults: gravity
+  (0, −9.81) m/s², linear and angular drag 0.05 s⁻¹ applied as the factor 1/(1 + k·dt); speeds capped at 40 m/s and
+  40 rad/s (at most 0.33 m per tick, under the wall thickness); at most 48 bodies; radii and box half-sizes 0.15…1.0 m.
+- Q: What exactly do the shared contact and solver code offer? → A: In `VisualCoreSimulation`: a shape (circle with
+  radius, box with half-extents), a pose (position, angle), a contact manifold (normal pointing from the first body to
+  the second, depth ≥ 0, one or two points) from `collide` for circle–circle, circle–box and box–box (separating-axis
+  test with reference-face clipping for boxes; touching within 1e-9 counts; separated, non-finite or non-positive sizes
+  give none); a rigid-body state (position, angle, velocity, angular velocity, inverse mass, inverse inertia,
+  restitution, friction); and a sequential impulse solver that runs a fixed number of velocity iterations (default 10)
+  over the contacts with restitution max(eA, eB) applied when the closing speed exceeds 0.5 m/s, Coulomb friction
+  √(fA·fB), and then a positional correction of 80 % of the depth beyond a 0.005 m slop shared by inverse mass. Inverse
+  mass 0 is static; the solver never divides by zero. All of it is pure, deterministic and documented.
+- Q: Which materials ship, and how is the catalog checked? → A: Four materials as Swift data with a JSON encoding and
+  a validating decoder: rubber (density 1.2, restitution 0.8, friction 0.9), wood (0.6, 0.4, 0.5), steel (7.8, 0.25,
+  0.4) and ice (0.9, 0.1, 0.05), each with fill and edge colours, author "VisualCore project" and license "MIT" (the
+  only allowed license). Ranges: density 0.1…10, restitution and friction 0…1. Refusal reasons `missing-license`,
+  `unsupported-license`, `out-of-range`, `invalid-number`, `duplicate-id`, with the valid rest kept. A license document
+  `docs/apps/physics-playground/content-licenses.md` is generated and checked against the catalog by a test.
+- Q: What is the starting scene, and which actions exist? → A: From the seed: three circles and three boxes in the upper
+  half at non-overlapping positions with sizes 0.25…0.6 m and seeded materials and angles, at rest, plus one static
+  steel ledge (mass 0) at a fixed place on the left. Actions: `world.pause [0…1]`; `world.step` (one tick, only while
+  paused, else refused with `a11.not-paused`); `world.timeScale [0…3]` choosing ¼, ½, 1 or 2 (each host step adds the
+  scale in quarter ticks to a remainder and runs its whole ticks, so the world after N ticks is the same at every
+  scale); `world.reset` (the starting scene of the seed, time scale 1, running); `world.drop [0…1]` (0 circle, 1 box)
+  placing a seeded body at y = 7 m, x 1…9 m, refused with `a11.body-cap` at 48 bodies. A refusal changes nothing;
+  fractional choices are refused with `a11.invalid-choice`. The replay is the seed plus the applied actions with steps.
+- Q: What is saved, drawn and spoken? → A: Snapshot schema 1: the world as JSON with sorted keys (settings, bodies,
+  tick, next id, paused, time-scale index and remainder, generator state); a damaged or newer payload is refused and a
+  new world opens; one quality level (`level-0`). The stage is drawn letterboxed with its walls; every body is drawn at
+  its physics size in its material colours (circles with a radius line showing rotation, boxes as rotated polygons,
+  static bodies with a darker hatch). The spoken description names the body count, running or paused and the time
+  scale; diagnostics (kinetic and potential energy, momentum) are pure functions of the world for tests and later
+  overlays. There is no decorative motion, so Reduce Motion changes nothing.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Drop objects into a stage (Priority: P1) 🎯
