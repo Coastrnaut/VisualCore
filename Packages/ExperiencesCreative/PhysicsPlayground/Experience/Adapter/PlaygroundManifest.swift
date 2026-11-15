@@ -33,6 +33,15 @@
 // controls, 31 the tutorial "Controlling time" completed by its actions, 32 the tutorial "Springs and energy", 33
 // schema-3 migration. Saving and opening slots is outside the replay (the experience's storage) and is proved by
 // `ExperimentStoreTests` and `ExperimentSampleFileTests`; the energy bounds are the core's `SpringEnergyFixtureTests`.
+//
+// Feature 086 (A11-P05) T-A11-505 (FR-A11-501, FR-A11-502, FR-A11-510; SC-A11-501, SC-A11-505; research D4): the state
+// is schema 5 with the world at world schema 4 (every digest now covers each body's `asleep` and `restTicks`), and
+// fixtures 34–38 are added: 34 a stress session (stiffness level 3, the world filled to 48 bodies by drops, nudges of a
+// selected circle and gravity and drag level changes, 600 steps), 35 the stacked objects settling to sleep
+// (360 steps), 36 the settled stack woken by a circle added above it and falling onto it, 37 replay across quality (the
+// recorded inputs with the overlays switched on and off; the tests play it with the quality tier changed during the
+// run and get the same digest), 38 schema-4 migration. The stress bounds over five seeds and 1,200 ticks, the work
+// budget and the energy bound are the core's `StressTests`, `WorkBudgetTests` and `SleepTests`.
 #if DEBUG || VISUALCORE_AUTOMATION
 import PhysicsPlaygroundCore
 import VisualCoreExperience
@@ -82,6 +91,29 @@ extension PlaygroundCore {
 
     /// The host steps fixtures 27 and 29 run their preset (5 s at 1×; feature 085).
     public static let presetSteps = 600
+
+    /// The host steps of the stress fixture 34 (5 s at 1×; feature 086).
+    public static let stressSteps = 600
+
+    /// The host steps the stack of fixtures 35 and 36 settles for (3 s at 1×; the core puts it to sleep within 360
+    /// ticks, `SleepTests`; feature 086).
+    public static let sleepSteps = 360
+
+    /// The host steps fixture 36 runs after the circle is added above the settled stack (2 s at 1×; feature 086).
+    public static let wakeSteps = 240
+
+    /// The point fixture 36 adds a circle at, in metres: above the middle of the stack (its top at 2.5 m), clear of it.
+    public static let wakePoint = Vec2(Presets.stackX, 4)
+
+    /// The tiers fixture 37 is played at in turn (the tests change the engine's tier at each overlay action; feature
+    /// 086).
+    public static let qualityFixtureTiers = [2, 1, 0, 2]
+
+    /// The overlay actions fixture 37 adds to the recorded inputs: (step, control, values).
+    public static let qualityOverlayInputs: [(step: Int, control: String, values: [Double])] = [
+        (100, "overlay.velocity", [1]), (250, "overlay.forces", [1]), (400, "overlay.velocity", [0]),
+        (550, "overlay.forces", [0]),
+    ]
 
     /// The points fixture 19 adds a circle and a box at, in metres (clear of the starting bodies at step 0).
     public static let addPoints = (circle: Vec2(4.5, 1.5), box: Vec2(5.0, 3.0))
@@ -183,7 +215,52 @@ extension PlaygroundCore {
         return builder.finish().hex
     }
 
-    /// The entries of the thirty-three fixtures (research D5 of features 082, 083, 084 and 085):
+    /// The entries of the stress fixture 34 (feature 086): stiffness level 3; the world filled to 48 bodies by
+    /// ``capDrops`` drops 5 steps apart (circles and boxes in turn); circle 8 selected; then four rounds of 60 steps,
+    /// each a nudge of the circle followed by a gravity and a drag level change; then the steps left up to
+    /// ``stressSteps``.
+    public static var stressEntries: [ScenarioStep] {
+        func act(_ control: String, _ values: [Double] = [], steps: Int = 0) -> ScenarioStep {
+            ScenarioStep(steps: steps, action: ScriptedAction(control, values), result: "accepted")
+        }
+        var entries = [act("world.stiffness", [3])]
+        entries += (0..<capDrops).map { act("world.drop", [Double($0 % 2)], steps: $0 == 0 ? 0 : 5) }
+        entries.append(act("edit.select", [Double(firstCircleId)]))
+        let rounds: [(nudge: [Double], gravity: Double, drag: Double)] = [
+            ([1, 1], 1, 0), ([-1, 0.5], 0, 2), ([0.5, -1], 2, 0), ([-0.5, 1], 2, 1),
+        ]
+        for round in rounds {
+            entries += [act("edit.nudge", round.nudge, steps: 60), act("world.gravity", [round.gravity], steps: 30),
+                        act("world.drag", [round.drag])]
+        }
+        let used = entries.reduce(0) { $0 + $1.steps }
+        entries.append(ScenarioStep(steps: stressSteps - used))
+        return entries
+    }
+
+    /// The entries of the replay-across-quality fixture 37 (feature 086): the recorded inputs with
+    /// ``qualityOverlayInputs`` merged in step order (an overlay action after the recorded ones of its step), then the
+    /// steps left up to ``replaySteps``.
+    public static var qualityReplayEntries: [ScenarioStep] {
+        typealias Input = (step: Int, control: String, values: [Double])
+        var inputs: [Input] = recordedInputs
+        for overlay in qualityOverlayInputs {
+            // After every input at or before the overlay's step.
+            let index = inputs.firstIndex { $0.step > overlay.step } ?? inputs.count
+            inputs.insert(overlay, at: index)
+        }
+        var entries: [ScenarioStep] = []
+        var step = 0
+        for input in inputs {
+            entries.append(ScenarioStep(steps: input.step - step, action: ScriptedAction(input.control, input.values),
+                                        result: "accepted"))
+            step = input.step
+        }
+        entries.append(ScenarioStep(steps: replaySteps - step))
+        return entries
+    }
+
+    /// The entries of the thirty-eight fixtures (research D5 of features 082, 083, 084 and 085, D4 of feature 086):
     /// 1. free fall: a circle dropped at step 0, then 120 host steps (1 s at 1×); the 1 % free-fall property without
     ///    drag is proved by `PhysicsFixtureTests` and, through the level actions, by fixture 17;
     /// 2. two-body momentum: two circles dropped, then 240 steps; the head-on elastic exchange (momentum within 1e-9
@@ -257,7 +334,22 @@ extension PlaygroundCore {
     /// 33. schema-3 migration: the A11-P03 actions the stored schema-3 example was saved after (two drops, a pin, a
     ///    selection, a grab, velocity arrows, half speed, pause), 30 paused steps, then running for 60 steps; the
     ///    stored example (`schemaThreeExample()`) restores through the step 3 → 4 to the same world and generator,
-    ///    origin free play, the world without grab and selection as the starting world and no tutorial.
+    ///    origin free play, the world without grab and selection as the starting world and no tutorial;
+    /// and (feature 086, research D4):
+    /// 34. stress: ``stressEntries`` — stiffness level 3, 38 drops fill the world to 48 bodies, circle 8 selected and
+    ///    nudged four times with gravity and drag level changes, 600 steps in all; every value stays finite, every
+    ///    body inside the stage and every cap respected (five seeds over 1,200 ticks: the core's `StressTests`);
+    /// 35. settle to sleep: the stacked objects opened at step 0, then 360 steps; every box is asleep;
+    /// 36. wake by a hit: the stacked objects settled for 360 steps, a circle added above the stack at (5, 4) m, then
+    ///    240 steps; the falling circle wakes the stack;
+    /// 37. replay across quality: ``qualityReplayEntries`` — the recorded inputs with the overlays switched on and off;
+    ///    the tests play it with the engine's quality tier changed at each overlay action and get the digest of the
+    ///    run without tier changes (the tier is presentation only);
+    /// 38. schema-4 migration: the A11-P04 actions the stored schema-4 example was saved after (the tutorial "Springs
+    ///    and energy" started, the spring chain opened, force arrows on, a box dropped, Moon gravity, half speed,
+    ///    pause), 30 paused steps, then running for 60 steps; the stored example (`schemaFourExample()`) restores
+    ///    through the step 4 → 5 to the same worlds (every body awake with 0 rest ticks), generator, origin and
+    ///    tutorial.
     public static var fixtureEntries: [[ScenarioStep]] {
         func act(_ control: String, _ values: [Double] = [], steps: Int = 0,
                  result: String = "accepted") -> ScenarioStep {
@@ -328,6 +420,13 @@ extension PlaygroundCore {
             [act("tutorial.start", [1]), act("experiment.preset", [Double(PresetID.springChain.rawValue)]),
              act("overlay.forces", [1]), ScenarioStep(steps: Tutorials.runTicks)],
             schemaThreeExampleActions.map { act($0.control, $0.values) }
+                + [act("world.pause", [0], steps: 30), ScenarioStep(steps: 60)],
+            stressEntries,
+            [act("experiment.preset", [Double(PresetID.stackedObjects.rawValue)]), ScenarioStep(steps: sleepSteps)],
+            [act("experiment.preset", [Double(PresetID.stackedObjects.rawValue)]),
+             act("edit.add", [wakePoint.x, wakePoint.y, 0], steps: sleepSteps), ScenarioStep(steps: wakeSteps)],
+            qualityReplayEntries,
+            schemaFourExampleActions.map { act($0.control, $0.values) }
                 + [act("world.pause", [0], steps: 30), ScenarioStep(steps: 60)],
         ]
     }

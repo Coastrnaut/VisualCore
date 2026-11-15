@@ -26,6 +26,12 @@
 // energy never rising by more than 0.5 % between seconds and ending below its start, the stack standing, reset
 // returning to the pendulum exactly, both tutorials completed and ended, and the stored schema-3 example restoring to
 // the fixture's world and generator with origin free play.
+//
+// Feature 086 (A11-P05) T-A11-505 (FR-A11-501, FR-A11-502, FR-A11-510; SC-A11-501, SC-A11-505; research D4):
+// thirty-eight fixtures and schema 5; fixtures 34–38 ending in the states they name: the stress session finite, valid
+// and inside the stage after every step with 48 bodies, the stack asleep, the settled stack woken by the falling
+// circle, the replay across quality giving the same digest with the engine's tier changed during the run, and the
+// stored schema-4 example restoring to the fixture's worlds, generator, origin and tutorial.
 import Foundation
 import Testing
 @testable import PhysicsPlaygroundExperience
@@ -71,13 +77,13 @@ private func stepped(_ entries: [ScenarioStep], seed: UInt64 = PlaygroundCore.ma
 }
 
 @Suite struct PlaygroundManifestTests {
-    @Test func theManifestIsValidWithTheNineStandardScenariosAndThirtyThreeFixtures() throws {
+    @Test func theManifestIsValidWithTheNineStandardScenariosAndThirtyEightFixtures() throws {
         let manifest = PlaygroundCore.manifest(for: id)
         let problems = ScenarioManifestValidator.problems(manifest, controls: PlaygroundCore.controls,
-                                                          content: ContentRequirement(fixtures: 33))
+                                                          content: ContentRequirement(fixtures: 38))
         #expect(problems.isEmpty, "\(problems)")
         #expect(Set(manifest.scenarios.map(\.name))
-                == Set(ScenarioManifest.standardNames).union((1...33).map { "fixture-\($0)" }))
+                == Set(ScenarioManifest.standardNames).union((1...38).map { "fixture-\($0)" }))
         let used = Set(manifest.scenarios.flatMap { $0.entries.compactMap { $0.action?.control } })
         #expect(used.isSuperset(of: ["world.gravity", "world.drag", "world.stiffness"]), "the level actions are played")
         #expect(used == Set(PlaygroundCore.actionIDs), "every action is played")
@@ -115,7 +121,7 @@ private func stepped(_ entries: [ScenarioStep], seed: UInt64 = PlaygroundCore.ma
         let seed = PlaygroundCore.manifestSeed
         let fixtures = PlaygroundCore.fixtureEntries
         let catalog = PlaygroundCore.catalog
-        #expect(fixtures.count == 33)
+        #expect(fixtures.count == 38)
         #expect(PlaygroundCore(seed: seed).world.bodies.count == PlaygroundCore.startingBodies)
 
         // 1. Free fall: the dropped circle falls under gravity for 1 s.
@@ -228,7 +234,12 @@ private func stepped(_ entries: [ScenarioStep], seed: UInt64 = PlaygroundCore.ma
         let pile = PlaygroundCore.played(seed: seed, entries: fixtures[10]).world
         #expect(pile.bodies.count == PlaygroundCore.startingBodies + 5)
         #expect(pile.dragLevel == 2)
-        #expect(!pile.contactCache.isEmpty, "the resting bodies hold contact impulses")
+        // Since feature 086 (A11-P05) a settled pile falls asleep and stops holding contacts; it either still holds
+        // contact impulses or every dynamic body sleeps.
+        // (The anchored hanging box of the starting scene never sleeps and touches nothing, so only the five dropped
+        // boxes are looked at.)
+        let restingAwake = pile.bodies.suffix(5).filter { !$0.asleep }
+        #expect(!pile.contactCache.isEmpty || restingAwake.isEmpty, "the dropped boxes hold contact impulses or sleep")
         let fastest = pile.bodies.filter { !$0.isStatic }.map(\.velocity.length).max() ?? 0
         #expect(fastest < 0.05, "every body at rest: \(fastest) m/s")
 
@@ -515,6 +526,107 @@ private func stepped(_ entries: [ScenarioStep], seed: UInt64 = PlaygroundCore.ma
         for step in 0..<60 { migrated.update(step: step) }
         let played33 = PlaygroundCore.played(seed: seed, entries: fixtures[32])
         #expect(migrated.world == played33.world && played33.world.tick == 30)
+    }
+
+    /// T-A11-505 (FR-A11-501, FR-A11-502; SC-A11-501): fixtures 34–36 end in the states they name.
+    @Test func theStabilityFixturesEndInTheStatesTheyName() throws {
+        let seed = PlaygroundCore.manifestSeed
+        let fixtures = PlaygroundCore.fixtureEntries
+        let catalog = PlaygroundCore.catalog
+
+        // 34. Stress: every value finite, the world valid (caps, speeds, stage) after every step; 48 bodies.
+        var invalidSteps = 0
+        let stress = stepped(fixtures[33]) { core in
+            if !core.world.isFinite || !core.world.validate(catalog: catalog).isEmpty { invalidSteps += 1 }
+        }
+        #expect(invalidSteps == 0)
+        #expect(stress.world.bodies.count == PhysicsWorld.maxBodies)
+        #expect(stress.world.stiffnessLevel == 3 && stress.world.tick == PlaygroundCore.stressSteps)
+        #expect(stress.world.selectedId == PlaygroundCore.firstCircleId)
+        let stage = stress.world.settings.stageSize
+        for body in stress.world.bodies {
+            #expect((0...stage.x).contains(body.position.x) && (0...stage.y).contains(body.position.y),
+                    "body \(body.id) inside the stage")
+        }
+
+        // 35. Settle to sleep: every box of the stack is asleep and at rest.
+        let settled = PlaygroundCore.played(seed: seed, entries: fixtures[34])
+        #expect(settled.origin == .preset(PresetID.stackedObjects.rawValue))
+        #expect(settled.world.tick == PlaygroundCore.sleepSteps)
+        #expect(settled.world.bodies.count == Presets.stackCount)
+        for body in settled.world.bodies {
+            #expect(body.asleep && body.velocity == .zero && body.angularVelocity == 0, "box \(body.id) sleeps")
+        }
+
+        // 36. Wake by a hit: the settled stack sleeps when the circle is added; the falling circle wakes it.
+        let added = PlaygroundCore.played(seed: seed, entries: Array(fixtures[35].prefix(2)))
+        #expect(added.world.bodies.count == Presets.stackCount + 1)
+        #expect(added.world.bodies.prefix(Presets.stackCount).allSatisfy { $0.asleep }, "the stack sleeps")
+        let circle = try #require(added.world.bodies.last)
+        #expect(!circle.asleep && circle.position == PlaygroundCore.wakePoint)
+        let top = try #require(added.world.bodies.prefix(Presets.stackCount).last).id
+        var woken = false
+        let hit = stepped(fixtures[35]) { core in
+            if core.world.tick > PlaygroundCore.sleepSteps,
+               let box = core.world.bodies.first(where: { $0.id == top }), !box.asleep { woken = true }
+        }
+        #expect(woken, "the top box woke when the circle reached it")
+        #expect(hit.world.validate(catalog: catalog).isEmpty)
+        #expect(hit.world.tick == PlaygroundCore.sleepSteps + PlaygroundCore.wakeSteps)
+    }
+
+    /// T-A11-505 (FR-A11-510; SC-A11-505): fixture 37 gives the same digest when the engine's quality tier changes
+    /// during the run, and the overlays change nothing but their flags; fixture 38 restores the stored schema-4
+    /// example to the fixture's worlds, generator, origin and tutorial.
+    @Test func theQualityAndMigrationFixturesEndInTheStatesTheyName() async throws {
+        let seed = PlaygroundCore.manifestSeed
+        let fixtures = PlaygroundCore.fixtureEntries
+        let spec = try #require(PlaygroundCore.manifest(for: id).scenarios.first { $0.name == "fixture-37" })
+
+        // 37. Replay across quality: the tier changes at every overlay action; the digest is the manifest's.
+        var engine = ExperienceEngine<PlaygroundCore>(id: id)
+        try await engine.prepare(seed: seed)
+        try engine.activate()
+        var tiers = PlaygroundCore.qualityFixtureTiers.makeIterator()
+        for entry in fixtures[36] {
+            try engine.run(steps: entry.steps)
+            guard let action = entry.action else { continue }
+            if action.control.hasPrefix("overlay."), let tier = tiers.next() {
+                try engine.setQualityTier(tier)
+                #expect(engine.qualityTier == tier)
+            }
+            #expect(engine.handle(control: action.control, values: action.values).isAccepted, "\(action.control)")
+        }
+        #expect(tiers.next() == nil, "every tier was set")
+        #expect(try engine.digest().hex == spec.expect.finalDigest)
+        let tiered = try #require(engine.core)
+        #expect(tiered == PlaygroundCore.played(seed: seed, entries: fixtures[36]))
+        var replay = PlaygroundCore.played(seed: seed, entries: PlaygroundCore.replayEntries()).world
+        #expect(!tiered.world.showVelocity && !tiered.world.showForces, "both overlays end off")
+        replay.showVelocity = tiered.world.showVelocity
+        replay.showForces = tiered.world.showForces
+        #expect(tiered.world == replay, "the overlays change nothing but their flags")
+
+        // 38. Schema-4 migration: the stored example restores to the fixture's worlds, generator, origin and tutorial.
+        let count = PlaygroundCore.schemaFourExampleActions.count
+        let paused38 = PlaygroundCore.played(seed: seed, entries: Array(fixtures[37].prefix(count)))
+        #expect(paused38.world.paused && paused38.world.tick == 0 && paused38.tutorial != nil)
+        #expect(paused38.origin == .preset(PresetID.springChain.rawValue))
+        let example = try #require(PlaygroundCore.schemaFourExample(seed: seed))
+        let snapshot = try ExperienceSnapshot(data: example.snapshot)
+        #expect(snapshot.schemaVersion == 4 && snapshot.seed == seed)
+        let object = try #require(try JSONSerialization.jsonObject(with: Data(snapshot.payload.utf8)) as? [String: Any])
+        let upgraded = try PlaygroundCore.migrations.migrate(object, from: 4)
+        var migrated = try PlaygroundCore.restore(
+            payload: JSONSerialization.data(withJSONObject: upgraded, options: [.sortedKeys]), seed: seed)
+        #expect(migrated == paused38, "the same worlds, generator, origin and tutorial")
+        #expect(migrated.world.schema == PhysicsWorld.schemaVersion)
+        #expect(migrated.startingWorld.schema == PhysicsWorld.schemaVersion)
+        _ = migrated.apply(ExperienceAction(control: "world.pause", values: [0], step: 0))
+        for step in 0..<60 { migrated.update(step: step) }
+        let played38 = PlaygroundCore.played(seed: seed, entries: fixtures[37])
+        #expect(migrated.world == played38.world && played38.world.tick == 30)
+        #expect(migrated.tutorial == played38.tutorial)
     }
 
     /// The JSON form with the control ids, named by `Catalog/registrations.json`. `UPDATE_SCENARIO_MANIFEST=1`
