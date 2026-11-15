@@ -582,6 +582,47 @@ animal-care simulator.
 - **One phase at a time:** implement only one Spec Kit phase at a time (one ledger gate, ADR-0004), in order
   A09-P00 → A09-P06.
 
+### A10 Neon Arcade (`a10.neon-arcade`)
+
+Ratified from the app manual's constitution prompt (2026-11-14). Like A05–A09, it never had a standalone target: it
+is built directly as an experience of the one app. Its product goal is a compact arcade game with glow, particles and
+disciplined game logic — in version 0.1 one complete game, Neon Dodge (a player lane, falling hazards and collectible
+orbs) — not a whole arcade collection, online leaderboard or user-generated levels.
+
+- **Consumer, not fork:** an experience of the VisualCore app and a VisualCore consumer, never a fork of
+  projectm-ios. It uses only audited VisualCore public APIs over the OpenGL ES → ANGLE → Metal integration. It MUST
+  NOT create its own EGL/ANGLE initialization path, a second renderer, or link ProjectM engine code.
+- **Reuse first (Principle II):** scenes, primitives, particles, glow and bloom passes, gestures, the seeded
+  fixed-step clock, collision helpers, persistence and quality tiers already in VisualCore are reused, not copied.
+  New generic machinery (for example broad-phase collision or a game-loop scheduler) goes into VisualCore with tests,
+  docs, the API baseline and the reference regression when it is reusable; game rules, content, copy and UI stay in
+  the experience.
+- **Visuals and sound are code:** player, hazards, orbs, glow, particles and backgrounds are procedural; sounds, if
+  any, are synthesized in code; no purchased, generated or hand-made artwork, sprites, textures or recordings.
+- **Authoritative, GPU-free rules:** the game loop runs at a fixed step from a seed; collision, scoring, lives,
+  waves and difficulty are decided by the domain alone and MUST be testable without GPU access through `swift test`;
+  the same seed and inputs give the same outcome, and drawing never changes the game state.
+- **Readability over effects:** glow, particles and screen effects never hide hazards, the player or the score; the
+  collision shapes the rules use are the shapes the person sees.
+- **Offline-first and private:** no networking, accounts, online leaderboards, ads, loot boxes or purchasable
+  currency; local scores only; no permission beyond what a feature actually needs.
+- **Truthful claims:** no claims of skill, reflex, cognitive or health benefits; performance or battery numbers only
+  from device measurements.
+- **Bounded resources:** hazards, orbs, particles, draw batches and per-step work are capped; quality tiers lower the
+  load under heat and Low Power Mode; context loss rebuilds everything from versioned CPU state; backgrounding pauses
+  the game and never fast-forwards it.
+- **Accessibility:** native SwiftUI controls with VoiceOver labels and Dynamic Type; the canvas has a spoken
+  description of the game state; touch steering has a control alternative with configurable sensitivity; sound and
+  haptics have toggles; Reduce Motion and Reduce Flashing calm shake, flashes and glow pulses (no flashing above the
+  platform's safe limits).
+- **Licenses:** every bundled palette, pattern and shader records its author and license; only original or
+  license-cleared content is bundled.
+- **Regression when VisualCore changes:** any VisualCore change made for this experience MUST be followed by the
+  ProjectM reference regression (at the experience's X gate per the owner ruling of 2026-11-14).
+- **Python only:** repository automation uses Python 3; there is no PowerShell dependency.
+- **One phase at a time:** implement only one Spec Kit phase at a time (one ledger gate, ADR-0004), in order
+  A10-P00 → A10-P06.
+
 ## Governance
 
 - Precedence: real Apple platform and toolchain behavior and observed test results → owner
@@ -608,5 +649,7 @@ animal-care simulator.
   its manual's constitution prompt at gate A08-P00 (feature 060); no principle changes.
 - Amendment 2.5.0 (2026-11-14, MINOR): App-Scoped Rules gain the A09 Digital Aquarium subsection, ratified from its
   manual's constitution prompt at gate A09-P00 (feature 067); no principle changes.
+- Amendment 2.6.0 (2026-11-14, MINOR): App-Scoped Rules gain the A10 Neon Arcade subsection, ratified from its
+  manual's constitution prompt at gate A10-P00 (feature 074); no principle changes.
 
-**Version**: 2.5.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-14
+**Version**: 2.6.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-14
