@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "SteeringForceTests|NeighbourSearchTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter 'SteeringForceTests|NeighbourSearchTests'",
+  "elapsed_seconds": 3.86,
+  "exit_code": 0,
+  "finished": "2026-11-15T02:06:39+00:00",
+  "gate": "X-A09",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-A09.visualcore-steering.log",
+  "log_sha256": "17629950934ecbf3f866046649c0206cc4202dd3b1e0103346872a8d9d355bc5",
+  "name": "visualcore-steering",
+  "started": "2026-11-15T02:06:35+00:00",
+  "timed_out": false
+}

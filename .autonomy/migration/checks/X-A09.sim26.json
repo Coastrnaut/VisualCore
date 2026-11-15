@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a09.digital-aquarium",
+    "--runtime",
+    "26"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a09.digital-aquarium --runtime 26",
+  "elapsed_seconds": 31.126,
+  "exit_code": 0,
+  "finished": "2026-11-15T02:07:29+00:00",
+  "gate": "X-A09",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-A09.sim26.log",
+  "log_sha256": "6a9418dfca85a8192a1c15b79d81dc50c339eb2ce8b7270b8db2beb253bfdf5d",
+  "name": "sim26",
+  "started": "2026-11-15T02:06:58+00:00",
+  "timed_out": false
+}
