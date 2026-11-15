@@ -306,12 +306,24 @@
       "id": "M05",
       "capability": "Collision visualization: the collision shapes the rules use (player and orb circles, hazard capsules) drawn as the shapes the person sees, with overlap decided by a shared shape-against-shape test",
       "source": "brainstorm: collision visualization; constitution A10 readability over effects",
-      "status": "upstream gap",
+      "status": "available",
       "evidence": [
         {
-          "file": "Packages/VisualCore/Sources/VisualCoreScenes/SceneGraph.swift",
-          "symbol": "Primitive.contains",
-          "product": "VisualCoreScenes",
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/Collision2D.swift",
+          "symbol": "Collision2D",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/Collision2D.swift",
+          "symbol": "CollisionCircle",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/Collision2D.swift",
+          "symbol": "CollisionCapsule",
+          "product": "VisualCoreSimulation",
           "public": true
         },
         {
@@ -321,12 +333,6 @@
           "public": true
         },
         {
-          "file": "Packages/VisualCore/Sources/VisualCoreScenes/SceneGraph.swift",
-          "symbol": "Primitive.line",
-          "product": "VisualCoreScenes",
-          "public": false
-        },
-        {
           "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/PrimitiveRenderer.swift",
           "symbol": "PrimitiveRenderer",
           "product": "VisualCoreRendering",
@@ -334,10 +340,10 @@
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/DigitalAquarium/Core/Feeding.swift",
-        "symbol": "Feeding"
+        "file": "Packages/ExperiencesCreative/NeonArcade/Core/GameSimulation.swift",
+        "symbol": "GameSimulation"
       },
-      "notes": "Circles and thick lines (capsule outlines) can be drawn, and Primitive.contains / SceneNode.hitTest answer point-in-shape only (tested in SceneGraphTests). No shape-against-shape overlap (circle-circle, circle-capsule) and no swept test exists in any framework product; the 'intersect' matches are mesh and camera-bound helpers (grep 2026-11-14). Closest consumer: Digital Aquarium's Feeding does its own point-distance check. G-COLLISION2D (VisualCoreSimulation), A10-P01."
+      "notes": "Since A10-P01 (G-COLLISION2D closed): Collision2D answers circle-circle and circle-capsule overlap and the swept circle-circle test (Collision2DTests); circles and capsules are drawn through PrimitiveRenderer at the sizes the rules use. Neon Arcade's GameSimulation is the first consumer."
     },
     {
       "id": "M06",
@@ -435,12 +441,12 @@
       "id": "M08",
       "capability": "Authoritative collision between player, hazards and orbs: circle and capsule overlap decided by the domain each step, swept tests so fast hazards never pass through the player between steps",
       "source": "v0.1 feature 02: authoritative collision; manual risk collision tunnelling",
-      "status": "upstream gap",
+      "status": "requires adaptation",
       "evidence": [
         {
-          "file": "Packages/VisualCore/Sources/VisualCoreScenes/SceneGraph.swift",
-          "symbol": "Primitive.contains",
-          "product": "VisualCoreScenes",
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/Collision2D.swift",
+          "symbol": "Collision2D",
+          "product": "VisualCoreSimulation",
           "public": true
         },
         {
@@ -451,10 +457,10 @@
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/DigitalAquarium/Core/Feeding.swift",
-        "symbol": "Feeding"
+        "file": "Packages/ExperiencesCreative/NeonArcade/Core/GameSimulation.swift",
+        "symbol": "GameSimulation"
       },
-      "notes": "Only point-in-shape containment and the fixed-step runner exist; no overlap, swept or continuous collision test exists in any framework product (grep 2026-11-14). G-COLLISION2D (VisualCoreSimulation, upstream) in A10-P01, the swept case proved by A10-P03's fast-hazard fixture; the hit, pickup and lives rules are G-GAMERULES (app-local)."
+      "notes": "The generic tests exist since A10-P01 (Collision2D, G-COLLISION2D closed). The game's authoritative rules (hit, pickup, invulnerability, lives; swept test for circle objects, end-of-step overlap for speed-bounded capsules) are G-GAMERULES (app-local): the Phase 01 part is GameSimulation (GameSimulationTests, ReplayTests); lanes and waves follow in A10-P02; A10-P03's fixture proves fast hazards."
     },
     {
       "id": "M09",
@@ -849,8 +855,8 @@
       "owner": "VisualCore:VisualCoreSimulation",
       "justification": "Found in A10-P00: no shape-against-shape overlap and no swept test exists in any framework product; circle and capsule overlap and swept tests are generic 2D game machinery and belong to VisualCoreSimulation (clarification 5). The swept case is proved by A10-P03's fast-hazard fixture.",
       "phase": 1,
-      "test": "Host tests: circle-circle, circle-capsule and capsule-capsule overlap agree with analytic answers including touching and degenerate (zero-length capsule) cases; swept circle against circle and capsule returns the first contact time in [0, 1] and catches a hazard that would tunnel through the player in one step; NaN/Inf rejected; no allocation per query (API baseline additive); A10-P03 fixture: a fast hazard never passes through the player between steps",
-      "closed": null
+      "test": "Host tests (Collision2DTests, 13 tests): circle-circle and circle-capsule overlap agree with analytic answers including touching, inside, both rounded ends and a degenerate segment; the swept circle-circle test returns 0 when already touching, the analytic earliest fraction in [0, 1] for crossings and nil for misses, and catches tunnelling at 4, 10 and 50 times the summed radii per step; NaN/Inf and negative radii give no hit; deterministic (API baseline additive). Capsules are not swept: their fall speed is bounded below the summed radii per step (GameSimulationTests). A10-P03 fixture: a fast hazard never passes through the player between steps.",
+      "closed": "A10-P01"
     },
     {
       "id": "G-GAMERULES",
@@ -861,7 +867,7 @@
       ],
       "kind": "adaptation",
       "owner": "app-local",
-      "justification": "Neon Dodge's rules (lanes, player, hazards, orbs, waves, difficulty, lives, scoring), the input replay format and the content license fields are the game's domain over VisualCore's fixed-step runner, ControlStream, SeededRandom and the 2D collision of G-COLLISION2D (clarification 5).",
+      "justification": "Neon Dodge's rules (lanes, player, hazards, orbs, waves, difficulty, lives, scoring), the input replay format and the content license fields are the game's domain over VisualCore's fixed-step runner, ControlStream, SeededRandom and the 2D collision of G-COLLISION2D (clarification 5). Phase 01 part built in A10-P01: GameRun, GameSimulation (fixed step, spawning, swept collision, scoring, lives, replayable inputs), ArcadeCatalog and LicenseAudit (content licenses); lanes, waves and difficulty remain for A10-P02.",
       "phase": 1,
       "test": "Host tests (swift test, no GPU): the same seed and input replay give the same state digest; hits cost a life, orbs score once, waves and difficulty follow their tables within caps on hazards and orbs; drawing never changes the state; every palette, pattern and shader records an author and a license and the audit fails on a missing one. Lanes and full mechanics complete in A10-P02",
       "closed": null
