@@ -35,7 +35,7 @@ X-A14. Precedent: `specs/101-lm-p06-release/tasks.md`.
 
 ## Phase 6: Records
 
-- [ ] T-A14-613 Script tests (`--name script-tests -- python3 scripts/test_scripts.py`)
+- [X] T-A14-613 Script tests (`--name script-tests -- python3 scripts/test_scripts.py`) — Verified 2026-11-15: .autonomy/checks/A14-P06.script-tests.json exit 0 (scripts/test_scripts.py, including the release_check chunk v2)
 - [ ] T-A14-614 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A14-P06 (owner and device items stay open as BLOCKED_OWNER_ACTION and pending-campaign-ii); update README.md (rule 16) and `docs/automatedtesting.md` if a tool, rule or lesson changed (rule 17)
 
 ## Dependencies
