@@ -43,3 +43,9 @@ Agent A: T-A14-502. Lead: 503–509.
 
 MVP: the review (502), then the model statement (503), then levels and the device plan (504–505). Review checkpoints
 after 502 (core tests) and at 507.
+
+## Phase 6: Convergence
+
+- [ ] T-A14-511 Bring the `a14.solar-system-explorer` registration's summary and capabilities in `Catalog/registrations.json` and `Packages/VisualCore/Tests/VisualCoreExperienceTests/Fixtures/Catalog/registrations.json` up to the built experience (still the A14-P01 line-up wording, "sizes and spacing not to scale"): orbits from an approximate model, time controls and guided tours, fact cards with units and sources, drawn in code, the enhanced view labelled not to scale; prove with `RealCatalogTests` and the app unit tests per FR-A14-504 / truthful wording (contradicts)
+- [ ] T-A14-512 Record in `specs/107-sse-p05-review/research.md` (§As built): the 216 sampled states (first written as 72), the event offsets measured (oppositions within 0.5 day, perihelia within 1.4 days), 63 renderers made and released together, probes at level 1 reusing level 0's colour expectations, the tier forced in tests with `shell.setQualityTier`, and the adapter-level label test in `SolarCoreTests` per plan: research D1–D4 (partial)
+- [ ] T-A14-513 Update `docs/apps/solar-system-explorer/README.md` (state through A14-P05; links to `scientific-review.md` and `device-campaign.md`) and `docs/automatedtesting.md` (generated review documents checked by tests; the 216-state arithmetic slip; quality levels compared by digest) per plan and CLAUDE.md rule 17 (partial)
