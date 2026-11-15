@@ -492,7 +492,7 @@
         "file": "Packages/ExperiencesCreative/TinyWorlds/Core/PropCatalog.swift",
         "symbol": "PropCatalog"
       },
-      "notes": "Spheres, revolved shapes, seeded 2D noise and per-vertex colour drawing exist and are tested (MeshDigestTests, MeshShapeTests, GradientNoise2DTests, MeshRendererColorTests). Missing: the body catalog with radii, elements, periods, tilts and facts with sources and units (G-CATALOG, app-local) and the procedural surfaces, bands, rings and Sun built from it (G-BODIES, app-local). The noise is 2D: sampling it by longitude and latitude seams at the date line and pinches at the poles, so G-BODIES must sample a periodic domain or blend; a 3D noise would be generic and is assessed there for VisualCoreScenes."
+      "notes": "Spheres, revolved shapes, seeded 2D noise and per-vertex colour drawing exist and are tested (MeshDigestTests, MeshShapeTests, GradientNoise2DTests, MeshRendererColorTests). Missing: the body catalog with radii, elements, periods, tilts and facts with sources and units (G-CATALOG, app-local) and the procedural surfaces, bands, rings and Sun built from it (G-BODIES, app-local). The noise is 2D: sampling it by longitude and latitude seams at the date line and pinches at the poles, so G-BODIES must sample a periodic domain or blend; a 3D noise would be generic and is assessed there for VisualCoreScenes. A14-P01 (G-CATALOG): the catalog of the Sun and eight planets with sourced values and fact cards (SolarSystemExplorerCore BodyCatalog, FactCard; BodyCatalogTests) and a static line-up of nine lit procedural spheres (SolarPresenter; SolarRenderTests); the full scene, orbits and focus stay with G-BODIES and G-ORBIT."
     },
     {
       "id": "M07",
@@ -621,7 +621,7 @@
         "file": "Packages/ExperiencesCreative/TinyWorlds/Core/CameraPolicy.swift",
         "symbol": "CameraPolicy"
       },
-      "notes": "Double vectors and matrices for scaling exist and are tested (LinearAlgebraTests, OriginRebaseTests). No unit type or conversion between kilometres and astronomical units and no scale mode exist in any framework product. Unit conversion with the catalog's units is G-CATALOG; the two scale modes (one mapping, both driven by the same Double positions, the enhanced one always labelled not to scale) are G-BODIES; both app-local."
+      "notes": "Double vectors and matrices for scaling exist and are tested (LinearAlgebraTests, OriginRebaseTests). No unit type or conversion between kilometres and astronomical units and no scale mode exist in any framework product. Unit conversion with the catalog's units is G-CATALOG; the two scale modes (one mapping, both driven by the same Double positions, the enhanced one always labelled not to scale) are G-BODIES; both app-local. A14-P01 (G-CATALOG): explicit units — km stored, AU derived through the exact 149,597,870.7 km, days and Julian years (Units; UnitsTests); the two scale modes stay with G-BODIES."
     },
     {
       "id": "M10",
@@ -689,7 +689,7 @@
         "file": "Packages/ExperiencesCreative/TinyWorlds/Core/LicenseAudit.swift",
         "symbol": "LicenseAudit"
       },
-      "notes": "A license inventory and acknowledgements screen exist and are tested (AcknowledgementsViewTests). No fact, unit or citation model exists in a framework product: the citation records and units are G-CATALOG and the fact cards that show them are G-TOURS, both app-local."
+      "notes": "A license inventory and acknowledgements screen exist and are tested (AcknowledgementsViewTests). No fact, unit or citation model exists in a framework product: the citation records and units are G-CATALOG and the fact cards that show them are G-TOURS, both app-local. A14-P01 (G-CATALOG): every fact on a card shows its unit and its source title (FactCard; SolarCoreTests, SolarSessionTests); the reviewed citation display in tours stays with G-TOURS."
     },
     {
       "id": "M12",
@@ -843,7 +843,7 @@
         "file": "Packages/ExperiencesCreative/AudioOdyssey/Core/OdysseyQuality.swift",
         "symbol": "OdysseyQuality"
       },
-      "notes": "Mesh and resource budgets, a bounded speed and numeric hygiene exist and are tested (MeshBuilderTests, ResourceLedgerTests, NumericHygieneTests, SceneClockTests). Missing: the catalog's body cap and validation (G-CATALOG) and the simulated date range and rate cap that keep long timescales from overflowing or leaving the model's validity range (G-TIME)."
+      "notes": "Mesh and resource budgets, a bounded speed and numeric hygiene exist and are tested (MeshBuilderTests, ResourceLedgerTests, NumericHygieneTests, SceneClockTests). Missing: the catalog's body cap and validation (G-CATALOG) and the simulated date range and rate cap that keep long timescales from overflowing or leaving the model's validity range (G-TIME). A14-P01 (G-CATALOG): the catalog document is versioned and bounded (1…16 bodies, radius, axis, period and tilt ranges; BodyCatalogTests); the simulated date range stays with G-TIME."
     },
     {
       "id": "M16",
@@ -1064,7 +1064,7 @@
         "file": "Packages/ExperiencesCreative/TinyWorlds/Core/LicenseAudit.swift",
         "symbol": "LicenseAudit"
       },
-      "notes": "The license inventory exists and is tested (AcknowledgementsViewTests); it records code and asset licenses, not per-value source, epoch and units. The data record and its test are G-CATALOG (A14-P01); the tolerance and provenance review is G-REVIEW (A14-P05); both app-local."
+      "notes": "The license inventory exists and is tested (AcknowledgementsViewTests); it records code and asset licenses, not per-value source, epoch and units. The data record and its test are G-CATALOG (A14-P01); the tolerance and provenance review is G-REVIEW (A14-P05); both app-local. A14-P01 (G-CATALOG): one source record per stored value with source, epoch, units and license (public-domain, CC0-1.0 only), audited by CitationAudit and listed in docs/apps/solar-system-explorer/data-sources.md (CitationAuditTests); the release review stays with G-REVIEW."
     },
     {
       "id": "M21",
@@ -1224,7 +1224,7 @@
       "justification": "No body catalog, unit type or citation record exists in any framework product. The Sun and eight planets with mean radius (km), semi-major axis (AU), orbital period (days), eccentricity, inclination, longitudes, mean anomaly at an epoch, axial tilt and curated facts, each value with source, epoch, units and license, the kilometre/astronomical-unit conversion and the catalog's caps and validation are Solar System Explorer's educational content and stay in its GPU-free Core (clarification 5, manual phase 01 scientific catalog/units and citation audit, A14-P01).",
       "phase": 1,
       "test": "Core host tests (swift test, no GPU): the bundled catalog decodes, has exactly the Sun and eight planets, and every value has source, epoch, units and license; known approximate periods and radii match the catalog within stated tolerances; AU to km and back round-trips within 1e-12 relative; non-finite, negative, missing-source and duplicate entries are refused; a generated provenance document matches the catalog",
-      "closed": null
+      "closed": "A14-P01"
     },
     {
       "id": "G-ORBIT",
