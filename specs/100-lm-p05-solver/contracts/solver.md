@@ -1,7 +1,8 @@
 # Contract: Light Maze solver and content QA (feature 100)
 
 ```swift
-public enum SolverRefusal: Equatable, Sendable { case invalidBoard(BoardRefusal); case tooManyTiles(Int) }
+public enum SolverRefusal: Equatable, Sendable { case invalidBoard(BoardRefusal); case tooManyTiles(Int)
+    public var code: String }                                       // "invalid-board" / "too-many-tiles"
 public enum SolverResult: Equatable, Sendable {
     case solved(orientations: [Orientation], turns: Int, examined: Int)
     case unsolvable(examined: Int)
