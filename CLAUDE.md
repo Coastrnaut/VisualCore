@@ -115,6 +115,9 @@ evidence commands are found as described in Auto-Creator.md §19. Simulators are
     change to a steering document.
 16. **README current** (owner, 2026-11-14): GitHub-style, all details, only true facts; update it and its date
     with every gate record or structural change.
+17. **Testing doc current** (owner, 2026-11-15): [`docs/automatedtesting.md`](docs/automatedtesting.md) holds the
+    automated testing process and its lessons learned; update it and its date whenever a gate adds or changes a test
+    tool or rule, or teaches a lesson worth keeping.
 
 ## 4. Where things are
 
@@ -131,6 +134,7 @@ evidence commands are found as described in Auto-Creator.md §19. Simulators are
 | Original planning documents, byte-identical | [`docs/archive/planning/`](docs/archive/planning/README.md) (former README, former CLAUDE.md, rounds 2–12, playbook) |
 | Which source text became which rule | `docs/migration/source-to-canonical-matrix.csv` |
 | Setup, disk space | [`setup.md`](setup.md), `python3 scripts/verify_environment.py` |
+| Automated testing: tools, rules, per-gate sequence, lessons | [`docs/automatedtesting.md`](docs/automatedtesting.md) (kept current, rule 17) |
 
 Former CLAUDE.md (2026-11-11): `docs/archive/planning/root/CLAUDE-2026-11-11-agent-contract.md`; lessons in
 Auto-Creator.md §19, §24.
