@@ -115,6 +115,17 @@ Coulomb friction √(μA·μB), then a positional correction of 80 % of the dept
 static and never changes; nothing non-finite is written. Pure and deterministic; host tests `Contacts2DTests` and
 `ImpulseSolver2DTests`.
 
+**Springs, broad phase and warm starting** (`VisualCoreSimulation`, feature 083): a `Spring2D` joins two
+`SpringAnchor2D`s (a body index with a body-local point, or a fixed world point) with a rest length, stiffness and
+damping ratio; `Springs2D.apply(_:springs:dt:)` applies its force as impulses at the anchors, with stiffness clamped to
+`stableStiffness` (0.1·m/dt²) and damping to `stableDamping` (m/dt) for the ends' effective mass, so a spring can never
+make the step unstable; a zero-length or static–static spring does nothing. `Shape2D.bounds(at:)` gives an `AABB2D`, and
+`BroadPhase2D.pairs(_:)` sweeps and prunes along x to return exactly the overlapping pairs (inclusive within 1e-9) as
+sorted `BroadPhasePair2D`s, the same as testing every pair. `Contact2D` can carry the previous tick's normal and tangent
+impulses; `ImpulseSolver2D.solve(_:contacts: inout ...)` starts from them (warm starting) and writes the new ones back,
+which keeps resting stacks standing; with nothing stored it gives exactly the earlier results. Host tests
+`Springs2DTests`, `BroadPhase2DTests` and `ImpulseSolver2DTests`.
+
 **CPU field references** (`VisualCoreSimulation`, feature 019): a `FieldGrid` is a W×H grid with 1…4 channels,
 row-major from the bottom row up, as in GL. `StoragePrecision` (`float32`, `float16`, `float16TowardZero`, `unorm8`) rounds values the
 way GPU storage does after every step. GLES leaves the rounding of half-float color writes implementation-defined,
