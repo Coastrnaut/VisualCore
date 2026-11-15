@@ -27,6 +27,43 @@ Canonical overrides:
 - **Owner rulings:** short tests; measure briefly and bound longer runs by arithmetic; no wall-clock assertions on CI;
   iOS 27 at phase gates; reference regression and iOS 26 at X-A11; every Spec Kit step runs.
 
+## Clarifications
+
+### Session 2026-11-15
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+the world (schema 3) already caps speeds (40 m/s, 40 rad/s), clamps spring stiffness and damping to their stable
+bounds, limits the positional correction to 0.1 m per tick and holds at most 48 bodies and 16 springs; the broad phase
+returns only overlapping pairs; `PlaygroundCore.qualityTiers` is 1 (registration `["level-0"]`); Neon Arcade declares
+three tiers through `ArcadeBudget.levels`, forwards the host's `qualityProfile` through its experience wrapper and maps
+host tier 0 (the best) to its fullest drawing budget, with Low Power Mode injected (`lowPowerMode`) and selecting the
+lowest.
+
+- Q: When does a body sleep and wake? → A: A dynamic, unpinned, ungrabbed body whose speed is below 0.05 m/s and
+  angular speed below 0.05 rad/s for 60 consecutive ticks (0.5 s) falls asleep: its velocities become 0 and it is
+  skipped by gravity, drag and integration; a pair of two sleeping bodies, or a sleeping body and a wall or a static or
+  pinned body, is not tested. It wakes (counter reset) in the tick in which an awake dynamic body's bounds overlap it, a
+  spring joins it to an awake body, an edit names it (grab, nudge, pin, delete of a body touching it), or any level
+  changes (all wake); presets, reset and opened slots start awake. Per-body `asleep` and `restTicks` are saved (world
+  schema 4, migration 3 → 4 sets awake with 0) and covered by the digest.
+- Q: What is the stated work budget? → A: Counted per tick (derived, never saved): narrow-phase tests ≤ 48·47/2 + 48·4
+  = 1,320, contact points ≤ 2 per contact, solver point updates ≤ iterations × points. The audit records the counts at
+  48 awake bodies and 16 springs and the host's median tick time over 600 ticks in research.md (measured, not asserted);
+  longer runs are bounded by arithmetic.
+- Q: What are the stress scenes? → A: Five seeds: free play filled to 48 bodies by drops, 16 springs between seeded
+  pairs of bodies, stiffness level 3; every 30 ticks a seeded nudge (±1) on a seeded body; every 240 ticks seeded
+  gravity, drag and stiffness levels; 1,200 ticks each, every value checked each tick. The energy check uses the same
+  scene without nudges or level changes after tick 0 (drag low): total energy sampled each second never rises > 1 %.
+- Q: What do the quality levels change? → A: Three levels; host tier 0 is the best: tier 0 → spring zigzags of 8 coils,
+  circles of 33 segments, hatch lines every 0.12 m, arrowheads drawn; tier 1 → 6 coils, 24 segments, hatch every
+  0.2 m; tier 2 → 4 coils, 16 segments, no hatch (static bodies keep their darker fill). Low Power Mode (injected in
+  tests) selects tier 2. `qualityTiers` 3; registration `["level-0", "level-1", "level-2"]`; the core stores no tier.
+- Q: What is the storefront text and which words are refused? → A: Summary "A sandbox of circles, boxes and springs
+  under gravity and drag, with presets, saved experiments and tutorials." Capabilities each map to a named test in a
+  table in `docs/apps/physics-playground/README.md`, checked by `specs/086-pp-p05-stability/scan-claims.sh`, which also
+  refuses (case-insensitive, whole words) accurate, accuracy, precise, precision, engineering-grade, safety, predict,
+  prediction, teaches, learning outcome and improves understanding in the catalog entry and the README.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Nothing explodes (Priority: P1) 🎯
