@@ -2,8 +2,9 @@
 // "PhysicsWorld"). The world record and the starting scene, host-free and short: defaults and units; mass = density ×
 // area and inertia from `Shape2D`, static ⇔ mass 0; the JSON round trip with sorted keys is exact; `validate` names
 // each problem (schema, settings, count, ids, non-finite values, sizes, unknown material, speeds, a moving static body,
-// a centre outside the stage, tick, time-scale index and remainder); the seeded starting scene has the ledge and three
-// circles and three boxes at rest in the upper half without overlap, and is the same for the same seed.
+// a centre outside the stage, tick, time-scale index and remainder); the seeded starting scene has the ledge, three
+// circles and three boxes at rest in the upper left, the hanging box and the joined circles (feature 083) without
+// overlap, and is the same for the same seed. Updated for schema 2 by feature 083 (A11-P02) T-A11-203.
 import Foundation
 import Testing
 import VisualCoreMath
@@ -25,7 +26,9 @@ import PhysicsPlaygroundCore
         #expect(settings.tick == 1.0 / 120.0 && settings.iterations == 10)
         #expect(settings.stageSize == Vec2(10, 8))
         let world = PhysicsWorld()
-        #expect(world.schema == 1 && world.tick == 0 && world.nextId == 0 && !world.paused)
+        #expect(world.schema == 2 && world.tick == 0 && world.nextId == 0 && !world.paused)
+        #expect(world.springs.isEmpty && world.nextSpringId == 0 && world.contactCache.isEmpty)
+        #expect(world.gravityLevel == 2 && world.dragLevel == 1 && world.stiffnessLevel == 1)
         #expect(world.timeScaleIndex == 2 && world.remainder == 0)
         #expect(PhysicsWorld.timeScales == [0.25, 0.5, 1, 2] && PhysicsWorld.maxBodies == 48)
         #expect(world.validate().isEmpty)
@@ -60,7 +63,7 @@ import PhysicsPlaygroundCore
         #expect(back.encoded() == data)
         let text = try #require(String(data: data, encoding: .utf8))
         #expect(text.hasPrefix("{\"bodies\":[{\"angle\":"))
-        #expect(text.contains("\"schema\":1"))
+        #expect(text.contains("\"schema\":2"))
     }
 
     @Test func validateNamesEachProblem() {
@@ -71,11 +74,14 @@ import PhysicsPlaygroundCore
             change(&world)
             return world.validate()
         }
-        #expect(problems { $0.schema = 2 } == ["schema 2 is not 1"])
+        #expect(problems { $0.schema = 1 } == ["schema 1 is not 2"])
         #expect(problems { $0.settings.gravity = Vec2(0, .nan) } == ["settings.gravity is not finite"])
-        #expect(problems { $0.settings.gravity = Vec2(0, -25) } == ["settings.gravity exceeds 20.0 m/s²"])
-        #expect(problems { $0.settings.linearDrag = 6 } == ["settings.linearDrag 6.0 is outside 0…5"])
-        #expect(problems { $0.settings.angularDrag = -1 } == ["settings.angularDrag -1.0 is outside 0…5"])
+        #expect(problems { $0.settings.gravity = Vec2(0, -25) } == ["settings.gravity exceeds 20.0 m/s²",
+                                                                 "settings.gravity does not match gravityLevel 2"])
+        #expect(problems { $0.settings.linearDrag = 6 } == ["settings.linearDrag 6.0 is outside 0…5",
+                                                          "settings.linearDrag does not match dragLevel 1"])
+        #expect(problems { $0.settings.angularDrag = -1 } == ["settings.angularDrag -1.0 is outside 0…5",
+                                                            "settings.angularDrag does not match dragLevel 1"])
         #expect(problems { $0.settings.tick = 1.0 / 60.0 }.first?.hasPrefix("settings.tick") == true)
         #expect(problems { $0.settings.iterations = 0 } == ["settings.iterations 0 is outside 1…20"])
         #expect(problems { $0.settings.iterations = 21 } == ["settings.iterations 21 is outside 1…20"])
@@ -93,13 +99,13 @@ import PhysicsPlaygroundCore
         #expect(problems { $0.bodies[2].id = 1 } == ["body 1: id is not above the previous id 1"])
         #expect(problems { $0.bodies.swapAt(1, 2) } == ["body 1: id is not above the previous id 2"])
         #expect(problems { $0.bodies[0].id = -1 } == ["body -1: id is negative"])
-        #expect(problems { $0.nextId = 6 } == ["body 6: id is not below nextId 6"])
+        #expect(problems { $0.nextId = 9 } == ["body 9: id is not below nextId 9"])
         #expect(problems { $0.tick = -1 } == ["tick -1 is negative"])
         #expect(problems { $0.timeScaleIndex = 4 } == ["timeScaleIndex 4 is outside 0…3"])
         #expect(problems { $0.remainder = 8 } == ["remainder 8 is outside 0…7"])
         #expect(problems { $0.remainder = 7 }.isEmpty)
         let crowded = problems { world in
-            for id in 7..<50 {
+            for id in 10..<50 {
                 world.bodies.append(PhysicsBody(id: id, shape: .circle(radius: 0.2), materialId: "wood",
                                                 position: Vec2(5, 4)))
             }
@@ -110,19 +116,19 @@ import PhysicsPlaygroundCore
         #expect(several.count == 3)
     }
 
-    @Test func theStartingSceneHasTheLedgeAndSixBodiesAtRestWithoutOverlap() throws {
+    @Test func theStartingSceneHasTheLedgeSixBodiesAndTheSpringBodiesAtRestWithoutOverlap() throws {
         for seed: UInt64 in [1, 2, 3, 42, 2026, 31_337, 99_999] {
             let world = scene(seed)
             #expect(world.validate().isEmpty)
-            #expect(world.bodies.count == 7 && world.nextId == 7)
-            #expect(world.bodies.map(\.id) == Array(0...6))
+            #expect(world.bodies.count == 10 && world.nextId == 10)
+            #expect(world.bodies.map(\.id) == Array(0...9))
             let ledge = world.bodies[0]
             #expect(ledge.isStatic && ledge.materialId == "steel" && ledge.position == Vec2(2.0, 2.5))
             #expect(ledge.shape == .box(halfExtents: Vec2(1.0, 0.15)))
             let dynamic = Array(world.bodies.dropFirst())
             #expect(dynamic.allSatisfy { !$0.isStatic && $0.velocity == .zero && $0.angularVelocity == 0 })
             var circles = 0, boxes = 0
-            for body in dynamic {
+            for body in world.bodies[1...6] {
                 switch body.shape {
                 case .circle: circles += 1
                 case .box: boxes += 1
@@ -130,11 +136,14 @@ import PhysicsPlaygroundCore
                 #expect(body.sizes.allSatisfy { (0.25...0.6).contains($0) })
                 #expect(body.position.y - body.boundingRadius >= 4)
                 #expect(body.position.y + body.boundingRadius <= 8)
-                #expect(body.position.x - body.boundingRadius >= 0 && body.position.x + body.boundingRadius <= 10)
+                #expect(body.position.x - body.boundingRadius >= 0 && body.position.x + body.boundingRadius <= 6.6)
                 #expect(abs(body.angle) <= Double.pi)
                 #expect(catalog.material(id: body.materialId) != nil)
             }
             #expect(circles == 3 && boxes == 3)
+            #expect(world.bodies[7].position == Vec2(7.5, 6.2) && world.bodies[7].materialId == "wood")
+            #expect(world.bodies[8].position == Vec2(7.0, 1.5) && world.bodies[9].position == Vec2(8.0, 1.5))
+            #expect(world.springs.map(\.id) == [0, 1] && world.nextSpringId == 2)
             for i in world.bodies.indices {
                 for j in world.bodies.indices where j > i {
                     let a = world.bodies[i], b = world.bodies[j]

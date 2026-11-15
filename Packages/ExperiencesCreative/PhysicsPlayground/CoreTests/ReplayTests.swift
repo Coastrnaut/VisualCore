@@ -55,7 +55,7 @@ import PhysicsPlaygroundCore
             let (b, randomB) = play(0..<420, world: world, random: random)
             #expect(a.encoded() == b.encoded() && !a.encoded().isEmpty)
             #expect(randomA == randomB)
-            #expect(a.bodies.count == 7 + 6 && a.validate().isEmpty)
+            #expect(a.bodies.count == 10 + 6 && a.validate().isEmpty)
             #expect(a.tick > 300)
         }
         let (other, _) = play(0..<420, world: start(8).0, random: start(8).1)

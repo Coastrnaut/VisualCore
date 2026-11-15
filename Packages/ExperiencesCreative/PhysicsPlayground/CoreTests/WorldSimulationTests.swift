@@ -137,18 +137,18 @@ import PhysicsPlaygroundCore
                                    catalog: catalog) {
             drops += 1
         }
-        #expect(drops == 41 && world.bodies.count == 48 && world.nextId == 48)
+        #expect(drops == 38 && world.bodies.count == 48 && world.nextId == 48)
         let generator = random, full = world
         #expect(!WorldSimulation.drop(&world, kind: .circle, random: &random, catalog: catalog))
         #expect(world == full && random == generator)
-        for body in world.bodies.dropFirst(7) {
+        for body in world.bodies.dropFirst(10) {
             #expect(body.position.y == 7 && (1...9).contains(body.position.x))
             #expect(body.sizes.allSatisfy { (0.25...0.6).contains($0) })
             #expect(!body.isStatic && body.velocity == .zero && body.angularVelocity == 0)
         }
-        let dropped = world.bodies[7]
+        let dropped = world.bodies[10]
         guard case .circle = dropped.shape else { Issue.record("first drop is not a circle"); return }
-        guard case .box = world.bodies[8].shape else { Issue.record("second drop is not a box"); return }
+        guard case .box = world.bodies[11].shape else { Issue.record("second drop is not a box"); return }
         #expect(world.validate().isEmpty)
         var empty = scene(8)
         var other = SeededRandom(seed: 1)
