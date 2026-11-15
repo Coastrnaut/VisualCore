@@ -25,7 +25,7 @@ Precedent: `specs/091-tw-p03-customize/tasks.md`.
 
 ## Phase 5: Polish & evidence
 
-- [ ] T-A12-406 Tiny Worlds tests on sim-27.2 (`--name worlds-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing TinyWorldsCoreTests TinyWorldsExperienceTests`; each test < 10 s) (SC-A12-401–405)
+- [X] T-A12-406 Tiny Worlds tests on sim-27.2 (`--name worlds-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing TinyWorldsCoreTests TinyWorldsExperienceTests`; each test < 10 s) (SC-A12-401–405) — Verified 2026-11-15: 2026-11-15: .autonomy/checks/A12-P04.worlds-ios27.json exit 0 (88 core, 61 experience XCTest, 6 manifest tests on sim-27.2)
 - [ ] T-A12-407 App build and unit (`--name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`) and runner iOS 27 (`--name verify-27 -- python3 scripts/verify_experiences.py --only a12.tiny-worlds --runtime 27`)
 - [ ] T-A12-408 Experience package check, contract, catalog host tests and script tests (`--name experience-packages`, `--name contract`, `--name catalog-host`, `--name script-tests` as in A12-P03)
 - [ ] T-A12-409 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A12-P04; update README.md (status, gate count) in the record commit (rule 16)
