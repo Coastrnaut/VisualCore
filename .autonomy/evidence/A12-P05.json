@@ -1,0 +1,74 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/A12-P05.app-unit.json",
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A12-P05.app-unit.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A12-P05.catalog-host.json",
+      "command": "swift test --package-path Packages/VisualCore --filter 'RealCatalogTests|RegistryReportTests|ShellModelTests'",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A12-P05.catalog-host.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A12-P05.catalog.json",
+      "command": "python3 scripts/build_catalog.py --check",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A12-P05.catalog.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A12-P05.claims.json",
+      "command": "bash specs/093-tw-p05-qa/scan-claims.sh",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A12-P05.claims.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A12-P05.contract.json",
+      "command": "python3 scripts/check_app_contract.py --app tiny-worlds --render",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A12-P05.contract.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A12-P05.distinctiveness.json",
+      "command": "python3 scripts/check_distinctiveness.py --check",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A12-P05.distinctiveness.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A12-P05.experience-packages.json",
+      "command": "python3 scripts/check_experience_packages.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A12-P05.experience-packages.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A12-P05.script-tests.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A12-P05.script-tests.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A12-P05.verify-27.json",
+      "command": "python3 scripts/verify_experiences.py --only a12.tiny-worlds --runtime 27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A12-P05.verify-27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A12-P05.worlds-ios27-2.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing TinyWorldsCoreTests TinyWorldsExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A12-P05.worlds-ios27-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A12-P05.worlds-ios27-3.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing TinyWorldsCoreTests TinyWorldsExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A12-P05.worlds-ios27-3.log"
+    }
+  ],
+  "generated": "2026-11-15T16:33:33+00:00",
+  "method": "deterministic-run-check",
+  "stage": "A12-P05",
+  "status": "pass"
+}
