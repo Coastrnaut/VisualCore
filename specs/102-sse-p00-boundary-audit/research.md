@@ -25,7 +25,7 @@
   time-based simulation) and the six version 0.1 features, plus the cross-cutting rows (double precision and
   camera-relative positions, determinism and replay, bounded content and date range, persistence, quality tiers and low
   power, accessibility with Reduce Motion, lifecycle and context loss, data provenance and licenses, truthful scale
-  labelling); availability rule of clarification 2.
+  labelling, labelled simulated date and time zone); availability rule of clarification 2.
 - **D3 Regression:** two chunks as for every VisualCore-adjacent gate.
 - **D4 Gap owners (clarification 5):** catalog, units and citations → app-local (A14-P01); approximate Kepler
   propagation → `VisualCoreMath` if reusable (A14-P02); rendering, focus and scale modes → app-local (A14-P03); clock,
