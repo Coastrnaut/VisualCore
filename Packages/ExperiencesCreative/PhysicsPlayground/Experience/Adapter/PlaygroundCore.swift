@@ -38,6 +38,35 @@
 // throws). `schemaOneExample()` is the stored Phase 01 payload the registry's migration check restores. One quality
 // tier (`level-0`). The digest is the canonical text of the whole state: the world (settings, bodies, tick, next id,
 // paused, time-scale index, remainder, springs, next spring id, levels and contact cache) and the generator state.
+//
+// Feature 084 (A11-P03) T-A11-303 (FR-A11-301, FR-A11-303, FR-A11-320; clarifications 1, 4, 5; research D1, D3;
+// data-model "Snapshot"; contract contracts/actions.md) adds the ten edit and overlay actions, each applied through
+// the core's `WorldEditing` on a copy (a refusal changes nothing) with the refusal codes of `EditRefusal.code`:
+//   edit.add [x 0…10, y 0…8, kind 0…1]   a seeded body of the kind centred at the point (`WorldEditing.add`, drawing
+//                                        from the generator); `a11.body-cap`, `a11.no-room`;
+//   edit.select [id −1…10000]            −1 clears; `a11.unknown-body`;
+//   edit.grab [id 0…10000, x 0…10, y 0…8] the grab of a dynamic, unpinned body at the point; `a11.unknown-body`,
+//                                        `a11.not-grabbable`;
+//   edit.move [x −1…11, y −1…9]           the grab's target (any point of the drawn view, clamped into the stage by the
+//                                        core); `a11.no-grab`;
+//   edit.release                         ends the grab; `a11.no-grab`;
+//   edit.pin [id 0…10000]                pins or unpins; `a11.unknown-body`, `a11.static-body`;
+//   edit.delete [id 0…10000]             the body with its springs, cache entries, grab and selection;
+//                                        `a11.unknown-body`;
+//   edit.nudge [dx −1…1, dy −1…1]        1 m/s × value added to the selected body; `a11.no-selection`,
+//                                        `a11.not-grabbable`;
+//   overlay.velocity [0…1], overlay.forces [0…1]  the world's overlay flags (drawing only).
+// A fractional kind, id or overlay value is refused with `a11.invalid-choice`.
+//
+// Snapshot schema 3: the schema-3 world (pins, selection, grab, overlay flags). `MigrationChain(currentVersion: 3)`
+// has the steps 1 → 2 (a Phase 01 payload to a faithful Phase 02 payload: the world as `PhysicsWorld.SchemaTwo`,
+// written without the `pinned` key) and 2 → 3 (`PhysicsWorld.migrated(fromSchemaTwo:)`: no pins, no selection, no
+// grab, overlays off; the generator kept). `schemaTwoExample()` is the stored Phase 02 payload the registry's
+// migration check restores. A host step runs the measured advance
+// (`WorldSimulation.advanceHostStep(_:catalog:forces:)`) and keeps the measured spring forces of the last tick in
+// `PlaygroundCore.forces`: derived data for the force arrows, never encoded, never digested and not part of the core's
+// equality (a restored or reset core has none until its next tick). Reset gives the starting scene with no pins, no
+// selection, no grab and both overlays off.
 import Foundation
 import PhysicsPlaygroundCore
 import VisualCoreExperience
@@ -51,8 +80,20 @@ public enum PlaygroundRule {
     public static let invalidChoice = "a11.invalid-choice"
     /// A single step asked for while the world is running.
     public static let notPaused = "a11.not-paused"
-    /// A drop asked for while the world already holds the most bodies (48).
+    /// A drop or an add asked for while the world already holds the most bodies (48).
     public static let bodyCap = "a11.body-cap"
+    /// An added body would leave the stage or overlap another body too much (feature 084).
+    public static let noRoom = EditRefusal.noRoom.code
+    /// No body has the id (feature 084).
+    public static let unknownBody = EditRefusal.unknownBody.code
+    /// The body is static or pinned and cannot be grabbed or nudged (feature 084).
+    public static let notGrabbable = EditRefusal.notGrabbable.code
+    /// There is no grab to move or release (feature 084).
+    public static let noGrab = EditRefusal.noGrab.code
+    /// A static body cannot be pinned or unpinned (feature 084).
+    public static let staticBody = EditRefusal.staticBody.code
+    /// There is no selected body to nudge (feature 084).
+    public static let noSelection = EditRefusal.noSelection.code
 }
 
 /// The saved state of Physics Playground at snapshot schema 1 (feature 082): the schema-1 world and the generator
@@ -70,6 +111,21 @@ public struct PlaygroundStateSchemaOne: Codable, Equatable, Sendable {
     }
 }
 
+/// The saved state of Physics Playground at snapshot schema 2 (feature 083): the schema-2 world and the generator
+/// state, exactly the keys A11-P02 wrote.
+public struct PlaygroundStateSchemaTwo: Codable, Equatable, Sendable {
+    /// The schema-2 world.
+    public var world: PhysicsWorld.SchemaTwo
+    /// The state of the generator that draws dropped bodies.
+    public var random: SeededRandom.State
+
+    /// A schema-2 state of `world` with the generator state `random`.
+    public init(world: PhysicsWorld.SchemaTwo, random: SeededRandom.State) {
+        self.world = world
+        self.random = random
+    }
+}
+
 /// Why a stored playground state is refused.
 public enum PlaygroundRestoreError: Error, Equatable {
     /// The world does not validate (its problems, from `PhysicsWorld.validate(catalog:)`).
@@ -78,9 +134,11 @@ public enum PlaygroundRestoreError: Error, Equatable {
     case invalidGenerator
     /// A payload handed to the step 1 → 2 whose world is not at schema 1 (the schema it names).
     case notSchemaOne(Int)
+    /// A payload handed to the step 2 → 3 whose world is not at schema 2 (the schema it names; feature 084).
+    case notSchemaTwo(Int)
 }
 
-/// The saved state of Physics Playground (snapshot schema 2): the world and the generator state.
+/// The saved state of Physics Playground (snapshot schema 3): the world and the generator state.
 public struct PlaygroundState: Codable, Equatable, Sendable {
     /// The physics world.
     public var world: PhysicsWorld
@@ -94,7 +152,7 @@ public struct PlaygroundState: Codable, Equatable, Sendable {
     }
 }
 
-/// The state of Physics Playground. Schema version 2.
+/// The state of Physics Playground. Schema version 3.
 public struct PlaygroundCore: ExperienceCore, Equatable {
     /// The experience's id in the catalog.
     public static let experienceID = "a11.physics-playground"
@@ -106,10 +164,19 @@ public struct PlaygroundCore: ExperienceCore, Equatable {
 
     /// The action ids in declaration order.
     public static let actionIDs = ["world.pause", "world.step", "world.timeScale", "world.reset", "world.drop",
-                                   "world.gravity", "world.drag", "world.stiffness"]
+                                   "world.gravity", "world.drag", "world.stiffness",
+                                   "edit.add", "edit.select", "edit.grab", "edit.move", "edit.release", "edit.pin",
+                                   "edit.delete", "edit.nudge", "overlay.velocity", "overlay.forces"]
+
+    /// The edit actions a canvas gesture sends (feature 084; each also reachable through a native control).
+    public static let gestureActionIDs: Set<String> = ["edit.add", "edit.select", "edit.grab", "edit.move",
+                                                       "edit.release", "edit.pin", "edit.delete"]
 
     /// The snapshot schema this build writes.
-    public static let snapshotSchema = 2
+    public static let snapshotSchema = 3
+
+    /// The largest body id an edit action names.
+    public static let maxBodyId = 10_000
 
     /// The materials the world uses: the bundled catalog (it validates: `MaterialCatalog.decode` of its encoding
     /// refuses nothing, which the tests check).
@@ -121,10 +188,15 @@ public struct PlaygroundCore: ExperienceCore, Equatable {
     public private(set) var world: PhysicsWorld
     /// The generator of the starting scene and of dropped bodies.
     public private(set) var generator: SeededRandom
+    /// The spring forces measured by the last tick a host step or a single step ran (feature 084): derived data for
+    /// the force arrows, never encoded, never digested and not compared by `==`; empty after preparation, restore and
+    /// reset until the next tick.
+    public private(set) var forces = ForceMeasurement()
 
     /// The first state prepared with `seed`: a generator seeded by `seed` and the starting scene drawn from it (the
     /// static ledge, three circles and three boxes at rest, the hanging box and the joined circles with their two
-    /// springs, the default levels, an empty contact cache, tick 0, running at 1×).
+    /// springs, the default levels, an empty contact cache, no pins, no selection, no grab, both overlays off, tick 0,
+    /// running at 1×).
     public init(seed: UInt64) {
         preparationSeed = seed
         var random = SeededRandom(seed: seed)
@@ -143,6 +215,12 @@ public struct PlaygroundCore: ExperienceCore, Equatable {
         }
     }
 
+    /// Two cores are equal when their preparation seeds, worlds and generators are; the measured ``forces`` are
+    /// derived data and are not compared.
+    public static func == (lhs: PlaygroundCore, rhs: PlaygroundCore) -> Bool {
+        lhs.preparationSeed == rhs.preparationSeed && lhs.world == rhs.world && lhs.generator == rhs.generator
+    }
+
     /// The whole state: the world and the generator state.
     public var state: PlaygroundState { PlaygroundState(world: world, random: generator.state) }
 
@@ -154,24 +232,66 @@ public struct PlaygroundCore: ExperienceCore, Equatable {
     /// One quality tier (`level-0`): the drawing has nothing to scale down.
     public static var qualityTiers: Int { 1 }
 
-    /// Schema 2 (feature 083). The step 1 → 2 (``migratedToSchemaTwo(_:)``) decodes a Phase 01 payload, migrates its
-    /// world with `PhysicsWorld.migrated(fromSchemaOne:)`, keeps the generator state and re-encodes it. A payload that
-    /// does not decode is refused by the step (the engine reports the migration as failed).
+    /// Schema 3 (feature 084). The step 1 → 2 (``migratedToSchemaTwo(_:)``) turns a Phase 01 payload into a Phase 02
+    /// payload; the step 2 → 3 (``migratedToSchemaThree(_:)``) turns a Phase 02 payload into a schema-3 payload. A
+    /// payload that does not decode is refused by its step (the engine reports the migration as failed).
     public static var migrations: MigrationChain {
         MigrationChain(currentVersion: snapshotSchema, steps: [
             1: { payload in try migratedToSchemaTwo(payload) },
+            2: { payload in try migratedToSchemaThree(payload) },
         ])
+    }
+
+    /// The schema-2 record of a world: every schema-2 field of `world` (its pins, selection, grab and overlay flags
+    /// dropped).
+    static func schemaTwo(of world: PhysicsWorld) -> PhysicsWorld.SchemaTwo {
+        var bodies = world.bodies
+        for index in bodies.indices { bodies[index].pinned = false }
+        return PhysicsWorld.SchemaTwo(settings: world.settings, bodies: bodies, tick: world.tick, nextId: world.nextId,
+                                      paused: world.paused, timeScaleIndex: world.timeScaleIndex,
+                                      remainder: world.remainder, springs: world.springs,
+                                      nextSpringId: world.nextSpringId, gravityLevel: world.gravityLevel,
+                                      dragLevel: world.dragLevel, stiffnessLevel: world.stiffnessLevel,
+                                      contactCache: world.contactCache)
+    }
+
+    /// `value` encoded with sorted keys as a JSON object, every body of its world written without the `pinned` key
+    /// (as schemas 1 and 2 wrote bodies).
+    static func objectWithoutPins<Value: Encodable>(_ value: Value) throws -> [String: Any] {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
+        guard var object = try JSONSerialization.jsonObject(with: encoder.encode(value)) as? [String: Any],
+              var world = object["world"] as? [String: Any],
+              var bodies = world["bodies"] as? [[String: Any]] else {
+            throw PlaygroundRestoreError.invalidWorld(["the state is not a JSON object with a world and bodies"])
+        }
+        for index in bodies.indices { bodies[index]["pinned"] = nil }
+        world["bodies"] = bodies
+        object["world"] = world
+        return object
     }
 
     /// The step 1 → 2: `payload` decoded as a ``PlaygroundStateSchemaOne`` (its world must name schema 1), the world
     /// migrated (no springs, Earth, low drag, stiffness level 1, an empty cache; bodies, tick, ids, pause and time
-    /// scale kept), the generator state kept, and the state encoded again as a JSON object. Not validated here; the
-    /// restore validates.
+    /// scale kept) and written as a Phase 02 payload (``PlaygroundStateSchemaTwo``, bodies without `pinned`), the
+    /// generator state kept. Not validated here; the restore validates.
     static func migratedToSchemaTwo(_ payload: [String: Any]) throws -> [String: Any] {
         let data = try JSONSerialization.data(withJSONObject: payload, options: [.sortedKeys])
         let old = try JSONDecoder().decode(PlaygroundStateSchemaOne.self, from: data)
         guard old.world.schema == 1 else { throw PlaygroundRestoreError.notSchemaOne(old.world.schema) }
-        let state = PlaygroundState(world: PhysicsWorld.migrated(fromSchemaOne: old.world), random: old.random)
+        let world = schemaTwo(of: PhysicsWorld.migrated(fromSchemaOne: old.world))
+        return try objectWithoutPins(PlaygroundStateSchemaTwo(world: world, random: old.random))
+    }
+
+    /// The step 2 → 3: `payload` decoded as a ``PlaygroundStateSchemaTwo`` (its world must name schema 2), the world
+    /// migrated with `PhysicsWorld.migrated(fromSchemaTwo:)` (no pins, no selection, no grab, overlays off; everything
+    /// else kept), the generator state kept, and the state encoded again as a JSON object. Not validated here; the
+    /// restore validates.
+    static func migratedToSchemaThree(_ payload: [String: Any]) throws -> [String: Any] {
+        let data = try JSONSerialization.data(withJSONObject: payload, options: [.sortedKeys])
+        let old = try JSONDecoder().decode(PlaygroundStateSchemaTwo.self, from: data)
+        guard old.world.schema == 2 else { throw PlaygroundRestoreError.notSchemaTwo(old.world.schema) }
+        let state = PlaygroundState(world: PhysicsWorld.migrated(fromSchemaTwo: old.world), random: old.random)
         guard let object = try JSONSerialization.jsonObject(with: encode(state)) as? [String: Any] else {
             throw PlaygroundRestoreError.invalidWorld(["the migrated state is not a JSON object"])
         }
@@ -218,7 +338,7 @@ public struct PlaygroundCore: ExperienceCore, Equatable {
     public static func schemaOneExampleState(seed: UInt64 = 7) -> PlaygroundStateSchemaOne {
         var random = SeededRandom(seed: seed)
         var old = phaseOneScene(random: &random)
-        // Dropped through the schema-2 helper on a world without springs: the same five draws as A11-P01's drop.
+        // Dropped through the current helper on a world without springs: the same five draws as A11-P01's drop.
         var world = PhysicsWorld(bodies: old.bodies, nextId: old.nextId)
         for kind in [BodyKind.circle, .box] {
             _ = WorldSimulation.drop(&world, kind: kind, random: &random, catalog: catalog)
@@ -230,39 +350,84 @@ public struct PlaygroundCore: ExperienceCore, Equatable {
         return PlaygroundStateSchemaOne(world: old, random: random.state)
     }
 
-    /// The stored example of schema 1 for the registry's migration check (feature 083, T-A11-204): the A11-P01 payload
-    /// ``schemaOneExampleState(seed:)`` — written as A11-P01 wrote it (the world at schema 1 without springs, levels
-    /// or contact cache) at step 0 — with the digest its restore through the migration chain must give: the same
-    /// bodies, tick, ids, pause, time scale and generator, with no springs, Earth gravity, low drag, stiffness level 1
-    /// and an empty cache. Nil only if the encoding failed.
-    public static func schemaOneExample(seed: UInt64 = 7) -> MigrationExample? {
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
+    /// The stored example of `version` for the registry's migration check: `payload` in an envelope of that schema
+    /// version at step 0, with the digest its restore through the migration chain gives. Nil only if a step failed.
+    static func migrationExample(version: Int, payload: [String: Any], seed: UInt64) -> MigrationExample? {
         guard let id = ExperienceID(rawValue: experienceID),
-              let payload = try? encoder.encode(schemaOneExampleState(seed: seed)),
-              let object = (try? JSONSerialization.jsonObject(with: payload)) as? [String: Any],
-              let upgraded = try? migrations.migrate(object, from: 1),
+              let data = try? JSONSerialization.data(withJSONObject: payload, options: [.sortedKeys]),
+              let upgraded = try? migrations.migrate(payload, from: version),
               let migrated = try? JSONSerialization.data(withJSONObject: upgraded, options: [.sortedKeys]),
               let restored = try? restore(payload: migrated, seed: seed) else { return nil }
         var builder = DigestBuilder(domain: id.rawValue)
         guard (try? restored.writeDigest(into: &builder)) != nil else { return nil }
         let digest = builder.finish()
-        guard let snapshot = try? ExperienceSnapshot(experience: id, schemaVersion: 1, seed: seed, stepIndex: 0,
-                                                     digest: digest, payload: payload),
+        guard let snapshot = try? ExperienceSnapshot(experience: id, schemaVersion: version, seed: seed, stepIndex: 0,
+                                                     digest: digest, payload: data),
               let encoded = try? snapshot.encoded() else { return nil }
-        return MigrationExample(version: 1, snapshot: encoded, expectedDigest: digest.hex)
+        return MigrationExample(version: version, snapshot: encoded, expectedDigest: digest.hex)
     }
 
-    /// The eight controls with their declared ranges.
+    /// The stored example of schema 1 for the registry's migration check (feature 083, T-A11-204): the A11-P01 payload
+    /// ``schemaOneExampleState(seed:)`` — written as A11-P01 wrote it (the world at schema 1 without springs, levels
+    /// or contact cache, bodies without `pinned`) at step 0 — with the digest its restore through the migration chain
+    /// (1 → 2 → 3) must give: the same bodies, tick, ids, pause, time scale and generator, with no springs, Earth
+    /// gravity, low drag, stiffness level 1, an empty cache, no pins, no selection, no grab and overlays off. Nil only
+    /// if the encoding failed.
+    public static func schemaOneExample(seed: UInt64 = 7) -> MigrationExample? {
+        guard let payload = try? objectWithoutPins(schemaOneExampleState(seed: seed)) else { return nil }
+        return migrationExample(version: 1, payload: payload, seed: seed)
+    }
+
+    /// The actions the stored Phase 02 example was saved after, all at step 0 (A11-P02 actions only): drop a circle,
+    /// drop a box, stiff springs, Moon gravity, high drag, half speed, pause.
+    public static let schemaTwoExampleActions: [(control: String, values: [Double])] = [
+        ("world.drop", [0]), ("world.drop", [1]), ("world.stiffness", [2]), ("world.gravity", [1]),
+        ("world.drag", [2]), ("world.timeScale", [1]), ("world.pause", [1]),
+    ]
+
+    /// The A11-P02 state of seed `seed` after ``schemaTwoExampleActions`` at step 0: the starting scene of ten bodies
+    /// and two springs, a dropped circle and a dropped box (ids 10 and 11), stiffness level 2, Moon gravity, high drag,
+    /// half speed, paused, tick 0, an empty contact cache, and the generator after those draws. No tick has run and
+    /// the actions are A11-P02's, so this is exactly what A11-P02 saved for that seed and those actions.
+    public static func schemaTwoExampleState(seed: UInt64 = 7) -> PlaygroundStateSchemaTwo {
+        var core = PlaygroundCore(seed: seed)
+        for action in schemaTwoExampleActions {
+            _ = core.apply(ExperienceAction(control: action.control, values: action.values, step: 0))
+        }
+        return PlaygroundStateSchemaTwo(world: schemaTwo(of: core.world), random: core.generator.state)
+    }
+
+    /// The stored example of schema 2 for the registry's migration check (feature 084, T-A11-303): the A11-P02 payload
+    /// ``schemaTwoExampleState(seed:)`` — the world at schema 2 (springs, levels and contact cache; bodies without
+    /// `pinned`; no selection, grab or overlay keys) at step 0 — with the digest its restore through the step 2 → 3
+    /// must give: everything kept, no pins, no selection, no grab and overlays off. Nil only if the encoding failed.
+    public static func schemaTwoExample(seed: UInt64 = 7) -> MigrationExample? {
+        guard let payload = try? objectWithoutPins(schemaTwoExampleState(seed: seed)) else { return nil }
+        return migrationExample(version: 2, payload: payload, seed: seed)
+    }
+
+    /// The eighteen controls with their declared ranges.
     public static var controls: [ExperienceControl] {
-        [ExperienceControl(id: "world.pause", ranges: [0...1]),
-         ExperienceControl(id: "world.step"),
-         ExperienceControl(id: "world.timeScale", ranges: [0...3]),
-         ExperienceControl(id: "world.reset"),
-         ExperienceControl(id: "world.drop", ranges: [0...1]),
-         ExperienceControl(id: "world.gravity", ranges: [0...2]),
-         ExperienceControl(id: "world.drag", ranges: [0...2]),
-         ExperienceControl(id: "world.stiffness", ranges: [0...3])]
+        let id = -1...Double(maxBodyId), body = 0...Double(maxBodyId)
+        let stage = WorldSettings.defaultStage, wall = WorldSimulation.wallThickness
+        return [ExperienceControl(id: "world.pause", ranges: [0...1]),
+                ExperienceControl(id: "world.step"),
+                ExperienceControl(id: "world.timeScale", ranges: [0...3]),
+                ExperienceControl(id: "world.reset"),
+                ExperienceControl(id: "world.drop", ranges: [0...1]),
+                ExperienceControl(id: "world.gravity", ranges: [0...2]),
+                ExperienceControl(id: "world.drag", ranges: [0...2]),
+                ExperienceControl(id: "world.stiffness", ranges: [0...3]),
+                ExperienceControl(id: "edit.add", ranges: [0...stage.x, 0...stage.y, 0...1]),
+                ExperienceControl(id: "edit.select", ranges: [id]),
+                ExperienceControl(id: "edit.grab", ranges: [body, 0...stage.x, 0...stage.y]),
+                ExperienceControl(id: "edit.move", ranges: [-wall...(stage.x + wall), -wall...(stage.y + wall)]),
+                ExperienceControl(id: "edit.release"),
+                ExperienceControl(id: "edit.pin", ranges: [body]),
+                ExperienceControl(id: "edit.delete", ranges: [body]),
+                ExperienceControl(id: "edit.nudge", ranges: [-1...1, -1...1]),
+                ExperienceControl(id: "overlay.velocity", ranges: [0...1]),
+                ExperienceControl(id: "overlay.forces", ranges: [0...1])]
     }
 
     /// The first state with `seed` as the preparation seed.
@@ -271,19 +436,29 @@ public struct PlaygroundCore: ExperienceCore, Equatable {
         return PlaygroundCore(seed: seed)
     }
 
-    /// One host step: `WorldSimulation.advanceHostStep` (nothing while paused; otherwise the time scale's whole ticks).
+    /// One host step: the measured `WorldSimulation.advanceHostStep` (nothing while paused; otherwise the time
+    /// scale's whole ticks), keeping the spring forces of the last tick it ran in ``forces``.
     public mutating func update(step: Int) {
-        WorldSimulation.advanceHostStep(&world, catalog: Self.catalog)
+        WorldSimulation.advanceHostStep(&world, catalog: Self.catalog, forces: &forces)
     }
+
+    /// The number of values each action carries.
+    static let valueCounts: [String: Int] = [
+        "world.pause": 1, "world.step": 0, "world.timeScale": 1, "world.reset": 0, "world.drop": 1,
+        "world.gravity": 1, "world.drag": 1, "world.stiffness": 1, "edit.add": 3, "edit.select": 1, "edit.grab": 3,
+        "edit.move": 2, "edit.release": 0, "edit.pin": 1, "edit.delete": 1, "edit.nudge": 2, "overlay.velocity": 1,
+        "overlay.forces": 1,
+    ]
 
     /// Carries out a well-formed action (the engine checked the control, the value count, finiteness and ranges);
     /// a refused action changes nothing.
     public mutating func apply(_ action: ExperienceAction) -> ActionResult {
         let v = action.values
-        let expected = ["world.pause": 1, "world.step": 0, "world.timeScale": 1, "world.reset": 0,
-                        "world.drop": 1, "world.gravity": 1, "world.drag": 1, "world.stiffness": 1][action.control]
-        guard let expected else { return .rejected(.unknownControl(action.control)) }
+        guard let expected = Self.valueCounts[action.control] else {
+            return .rejected(.unknownControl(action.control))
+        }
         guard v.count == expected else { return .rejected(.wrongValueCount(expected: expected, found: v.count)) }
+        if action.control.hasPrefix("edit.") || action.control.hasPrefix("overlay.") { return applyEdit(action) }
         switch action.control {
         case "world.pause":
             guard let i = Self.choice(v[0], count: 2) else {
@@ -292,12 +467,13 @@ public struct PlaygroundCore: ExperienceCore, Equatable {
             world.paused = i == 1
         case "world.step":
             guard world.paused else { return .rejected(.rule(code: PlaygroundRule.notPaused)) }
-            var next = world
+            var next = world, measured = forces
             // A validated world can always be ticked; a world that could not is refused like a running one.
-            guard WorldSimulation.step(&next, catalog: Self.catalog) else {
+            guard WorldSimulation.step(&next, catalog: Self.catalog, forces: &measured) else {
                 return .rejected(.rule(code: PlaygroundRule.notPaused))
             }
             world = next
+            forces = measured
         case "world.timeScale":
             guard let i = Self.choice(v[0], count: PhysicsWorld.timeScales.count) else {
                 return .rejected(.rule(code: PlaygroundRule.invalidChoice))
@@ -344,9 +520,58 @@ public struct PlaygroundCore: ExperienceCore, Equatable {
         return .accepted
     }
 
+    /// The edit and overlay actions (feature 084): each edit runs on a copy of the world (and of the generator for
+    /// `edit.add`) and is kept only when `WorldEditing` accepts it; a refusal is reported with its `EditRefusal.code`.
+    mutating func applyEdit(_ action: ExperienceAction) -> ActionResult {
+        let v = action.values
+        let invalid = ActionResult.rejected(.rule(code: PlaygroundRule.invalidChoice))
+        var next = world
+        var random = generator
+        let refusal: EditRefusal?
+        switch action.control {
+        case "edit.add":
+            guard let i = Self.choice(v[2], count: 2), let kind = BodyKind(rawValue: i) else { return invalid }
+            refusal = WorldEditing.add(&next, kind: kind, at: Vec2(v[0], v[1]), random: &random, catalog: Self.catalog)
+        case "edit.select":
+            guard let id = Self.wholeNumber(v[0]) else { return invalid }
+            refusal = WorldEditing.select(&next, id: id)
+        case "edit.grab":
+            guard let id = Self.wholeNumber(v[0]) else { return invalid }
+            refusal = WorldEditing.grab(&next, id: id, at: Vec2(v[1], v[2]))
+        case "edit.move":
+            refusal = WorldEditing.move(&next, to: Vec2(v[0], v[1]))
+        case "edit.release":
+            refusal = WorldEditing.release(&next)
+        case "edit.pin":
+            guard let id = Self.wholeNumber(v[0]) else { return invalid }
+            refusal = WorldEditing.togglePin(&next, id: id)
+        case "edit.delete":
+            guard let id = Self.wholeNumber(v[0]) else { return invalid }
+            refusal = WorldEditing.delete(&next, id: id)
+        case "edit.nudge":
+            refusal = WorldEditing.nudge(&next, dx: v[0], dy: v[1])
+        case "overlay.velocity", "overlay.forces":
+            guard let i = Self.choice(v[0], count: 2) else { return invalid }
+            if action.control == "overlay.velocity" { next.showVelocity = i == 1 } else { next.showForces = i == 1 }
+            refusal = nil
+        default:
+            return .rejected(.unknownControl(action.control))
+        }
+        if let refusal { return .rejected(.rule(code: refusal.code)) }
+        world = next
+        generator = random
+        return .accepted
+    }
+
     /// The table index named by `value`: a finite whole number in `0..<count`; nil otherwise.
     static func choice(_ value: Double, count: Int) -> Int? {
         guard value.isFinite, value == value.rounded(), value >= 0, value < Double(count) else { return nil }
+        return Int(value)
+    }
+
+    /// `value` as a whole number in −1…``maxBodyId`` (a body id, or −1 to clear a selection); nil otherwise.
+    static func wholeNumber(_ value: Double) -> Int? {
+        guard value.isFinite, value == value.rounded(), value >= -1, value <= Double(maxBodyId) else { return nil }
         return Int(value)
     }
 
@@ -360,7 +585,8 @@ public struct PlaygroundCore: ExperienceCore, Equatable {
         self = PlaygroundCore(seed: preparationSeed)
     }
 
-    /// The canonical text of the whole state (`a11.playground.v1|` and the state as JSON with sorted keys); a value
+    /// The canonical text of the whole state (`a11.playground.v1|` and the state as JSON with sorted keys: the world
+    /// with its pins, selection, grab and overlay flags, and the generator state; never the measured forces); a value
     /// that cannot be written (a non-finite number) is refused as non-finite.
     public func writeDigest(into builder: inout DigestBuilder) throws(DigestError) {
         guard let text = try? String(data: Self.encode(state), encoding: .utf8) else {
@@ -369,14 +595,15 @@ public struct PlaygroundCore: ExperienceCore, Equatable {
         builder.add("a11.playground.v1|" + text)
     }
 
-    /// The playground state (schema 2) as JSON with sorted keys.
+    /// The playground state (schema 3) as JSON with sorted keys.
     public func snapshotPayload() throws -> Data {
         try Self.encode(state)
     }
 
-    /// The core of a schema-2 payload (an older one has been through ``migrations``) with the envelope's `seed` as
-    /// preparation seed. A payload that does not decode as schema 2 (a schema-1 payload included), a world that does
-    /// not validate or a malformed generator state is refused (throws).
+    /// The core of a schema-3 payload (an older one has been through ``migrations``) with the envelope's `seed` as
+    /// preparation seed. A payload that does not decode as schema 3 (a schema-1 or schema-2 payload included), a world
+    /// that does not validate or a malformed generator state is refused (throws). The restored core has no measured
+    /// forces until its next tick.
     public static func restore(payload: Data, seed: UInt64) throws -> PlaygroundCore {
         let state = try JSONDecoder().decode(PlaygroundState.self, from: payload)
         let problems = state.world.validate(catalog: catalog)

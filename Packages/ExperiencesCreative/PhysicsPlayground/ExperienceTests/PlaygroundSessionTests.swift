@@ -10,6 +10,11 @@
 // Feature 083 (A11-P02) T-A11-204 (FR-A11-212, FR-A11-220; SC-A11-206): the starting scene holds ten bodies and two
 // springs, both drawn; the description adds the springs and the levels; a level picked in a session survives the
 // saved state; a schema-3 state is the newer one refused; the stored schema-1 example opens through the migration.
+//
+// Feature 084 (A11-P03) T-A11-303 (FR-A11-303, FR-A11-320; SC-A11-301, SC-A11-305): the description adds the pins,
+// the selection and the overlays; the seven edit actions are the gesture actions, each with a native alternative;
+// pins, selection, grab and overlays survive the saved state (schema 3); a schema-4 state is the newer one refused;
+// the stored schema-2 example opens through the migration 2 → 3.
 import Foundation
 import XCTest
 import VisualCoreDiagnostics
@@ -37,11 +42,11 @@ final class PlaygroundSessionTests: XCTestCase {
         XCTAssertEqual(presenter.lastSpringsDrawn, 2, "the hanging box's and the joined circles' springs")
         let summary = shell.accessibilitySummary
         XCTAssertEqual(summary, "Physics Playground: 10 bodies, running, normal speed (time scale 1×); "
-                       + "2 springs, stiffness medium, gravity Earth, drag low.")
+                       + "2 springs, stiffness medium, gravity Earth, drag low; none pinned, no selection, arrows off.")
         XCTAssertTrue(presenter.mirror.ready)
         XCTAssertEqual(presenter.mirror.bodyCount, 10)
         XCTAssertEqual(presenter.nativeActions, Set(PlaygroundCore.actionIDs))
-        XCTAssertEqual(presenter.gestureActions, [])
+        XCTAssertEqual(presenter.gestureActions, PlaygroundCore.gestureActionIDs)
         XCTAssertEqual(GestureAlternatives.missing(gesture: presenter.gestureActions, native: presenter.nativeActions),
                        [])
 
@@ -53,7 +58,17 @@ final class PlaygroundSessionTests: XCTestCase {
         XCTAssertTrue(shell.handle(control: "world.stiffness", values: [2]).isAccepted)
         XCTAssertEqual(shell.accessibilitySummary,
                        "Physics Playground: 11 bodies, paused, double speed (time scale 2×); "
-                       + "2 springs, stiffness stiff, gravity Earth, drag low.")
+                       + "2 springs, stiffness stiff, gravity Earth, drag low; none pinned, no selection, arrows off.")
+        XCTAssertTrue(shell.handle(control: "edit.pin", values: [8]).isAccepted)
+        XCTAssertTrue(shell.handle(control: "edit.select", values: [7]).isAccepted)
+        XCTAssertTrue(shell.handle(control: "edit.grab", values: [7, 7.5, 6.2]).isAccepted)
+        XCTAssertTrue(shell.handle(control: "overlay.velocity", values: [1]).isAccepted)
+        XCTAssertTrue(shell.accessibilitySummary.hasSuffix(
+            "; 1 pinned, body 7 selected (a box), body 7 held, velocity arrows on."), shell.accessibilitySummary)
+        XCTAssertEqual(presenter.mirror.pinnedCount, 1)
+        XCTAssertEqual(presenter.mirror.selectedId, 7)
+        XCTAssertEqual(presenter.mirror.grabbedId, 7)
+        XCTAssertTrue(presenter.mirror.showVelocity)
         XCTAssertEqual(presenter.mirror.timeScaleIndex, 3)
         XCTAssertEqual(presenter.mirror.bodyCount, 11)
         XCTAssertEqual(presenter.mirror.stiffnessLevel, 2)
@@ -171,8 +186,14 @@ final class PlaygroundSessionTests: XCTestCase {
         XCTAssertTrue(shell.handle(control: "world.drag", values: [2]).isAccepted)
         XCTAssertTrue(shell.handle(control: "world.stiffness", values: [3]).isAccepted)
         try PlaygroundTest.frames(first, 3)
+        XCTAssertTrue(shell.handle(control: "edit.pin", values: [9]).isAccepted)
+        XCTAssertTrue(shell.handle(control: "edit.select", values: [8]).isAccepted)
+        XCTAssertTrue(shell.handle(control: "edit.grab", values: [7, 7.5, 6.2]).isAccepted)
+        XCTAssertTrue(shell.handle(control: "edit.move", values: [6, 5]).isAccepted)
+        XCTAssertTrue(shell.handle(control: "overlay.forces", values: [1]).isAccepted)
+        try PlaygroundTest.frames(first, 2)
         let snapshot = try shell.snapshot()
-        XCTAssertEqual(snapshot.schemaVersion, 2)
+        XCTAssertEqual(snapshot.schemaVersion, 3)
         let saved = try PlaygroundTest.core(shell)
         XCTAssertGreaterThan(saved.world.tick, 0, "a world in motion")
         first.close()
@@ -186,6 +207,10 @@ final class PlaygroundSessionTests: XCTestCase {
         XCTAssertEqual(core.world.gravityLevel, 1)
         XCTAssertEqual(core.world.dragLevel, 2)
         XCTAssertEqual(core.world.stiffnessLevel, 3)
+        XCTAssertTrue(try XCTUnwrap(core.world.bodies.first { $0.id == 9 }).pinned)
+        XCTAssertEqual(core.world.selectedId, 8)
+        XCTAssertEqual(core.world.grab?.target, Vec2(6, 5))
+        XCTAssertTrue(core.world.showForces)
         try PlaygroundTest.frames(second, 1)
         XCTAssertEqual(restored.presenter.mirror.stiffnessLevel, 3, "the controls show the restored levels")
         XCTAssertEqual(restored.presenter.mirror.gravityLevel, 1)
@@ -209,6 +234,30 @@ final class PlaygroundSessionTests: XCTestCase {
         XCTAssertTrue(opened.accessibilitySummary.contains("9 bodies, paused, half speed"),
                       opened.accessibilitySummary)
         XCTAssertTrue(opened.accessibilitySummary.contains("no springs, stiffness medium, gravity Earth, drag low"))
+        XCTAssertTrue(opened.accessibilitySummary.hasSuffix("none pinned, no selection, arrows off."))
+        session.close()
+    }
+
+    /// T-A11-303 (FR-A11-320; SC-A11-305): the stored Phase 02 payload opens in a session through the migration 2 → 3
+    /// with its springs and levels, nothing pinned, nothing selected, nothing held and the overlays off.
+    func testTheStoredSchemaTwoExampleOpensThroughTheMigration() async throws {
+        let example = try XCTUnwrap(PlaygroundCore.schemaTwoExample())
+        let snapshot = try ExperienceSnapshot(data: example.snapshot)
+        XCTAssertEqual(snapshot.schemaVersion, 2)
+        let session = ExperienceSession()
+        let opened = try await PlaygroundTest.open(session, seed: 3, snapshot: snapshot)
+        XCTAssertNil(session.lastRestoreRefusal, "the Phase 02 state is migrated, not refused")
+        let core = try PlaygroundTest.core(opened)
+        XCTAssertEqual(core.world.bodies.count, 12)
+        XCTAssertEqual(core.world.springs.count, 2)
+        XCTAssertEqual(core.world.validate(), [])
+        XCTAssertTrue(core.world.paused)
+        XCTAssertEqual(opened.presenter.lastSpringsDrawn, 2)
+        XCTAssertEqual(opened.accessibilitySummary,
+                       "Physics Playground: 12 bodies, paused, half speed (time scale ½×); "
+                       + "2 springs, stiffness stiff, gravity Moon, drag high; none pinned, no selection, arrows off.")
+        XCTAssertEqual(opened.presenter.mirror.pinnedCount, 0)
+        XCTAssertNil(opened.presenter.mirror.selectedId)
         session.close()
     }
 
@@ -219,7 +268,7 @@ final class PlaygroundSessionTests: XCTestCase {
         try PlaygroundTest.frames(first, 60)
         let saved = try shell.snapshot()
         first.close()
-        let newer = try ExperienceSnapshot(experience: PlaygroundTest.id, schemaVersion: 3, seed: saved.seed,
+        let newer = try ExperienceSnapshot(experience: PlaygroundTest.id, schemaVersion: 4, seed: saved.seed,
                                            stepIndex: saved.stepIndex, digest: saved.digest,
                                            payload: Data(saved.payload.utf8))
 

@@ -21,6 +21,26 @@
 // coils 0.12 m to each side of the axis, plus a small dot (radius 0.06 m) at each anchor, in a pale spring colour. The
 // description adds the springs, the stiffness level, gravity and drag ("2 springs, stiffness medium, gravity Earth,
 // drag low"), and the frame probe also steps aside when a spring passes near it.
+//
+// Feature 084 (A11-P03) T-A11-303 (FR-A11-303, FR-A11-310, FR-A11-311; SC-A11-301, SC-A11-304; clarifications 2, 4;
+// research D4): canvas pointer events go through `PlaygroundGestures` (tap, double tap, long press and drag over
+// VisualCore's arbiter; `gestureActions` are its seven edit actions, each also sent by a native control), with the
+// shape picker's kind kept here as presentation state; a held tap or a long press held still is resolved on the frame
+// tick (`advance(by:)` with the frame's delta); the gesture state is reset on suspension and teardown. Overlays, drawn
+// from the world and the core's measured forces (`PlaygroundCore.forces`) and never writing either, above the bodies:
+//   - velocity arrows (when `showVelocity`): from each non-static body's centre along v, 0.25 s × |v| m long, capped at
+//     2 m, in a pale cyan;
+//   - force arrows (when `showForces`): each non-static body's weight m·g (`ForceMeasurement.weight`) in orange and
+//     its measured net spring force (`ForceMeasurement.springForce`, only while the measurement belongs to the drawn
+//     tick) in green, each 0.05 m per newton, capped at 2 m;
+//   - every arrow is a shaft 0.04 m wide (at least a pixel) and a triangular head 0.12 m long and 0.12 m wide whose
+//     tip is the arrow's end (a shorter arrow is all head); a zero vector draws nothing;
+//   - the grab line, 0.02 m wide (at least a pixel), from the grabbed body's anchor to the grab's target;
+//   - a ring around the selected body (its bounding radius + 0.1 m) and a small dot (radius 0.08 m) at the centre of
+//     every pinned body.
+// The description adds the pinned bodies, the selection, a grab and the overlays ("none pinned, no selection, arrows
+// off"), the mirror carries the state panel (`PlaygroundPanel`: kinetic, potential, spring and total energy, momentum
+// and the selected body's speed from `WorldDiagnostics`), and the probe steps aside for every overlay near it.
 import Foundation
 import SwiftUI
 import PhysicsPlaygroundCore
@@ -53,6 +73,127 @@ final class PlaygroundMirror {
     var status = ""
     /// The forces line: springs, stiffness, gravity and drag.
     var forces = ""
+    /// The body ids in drawing order (the previous and next selection controls walk them; feature 084).
+    var bodyIds: [Int] = []
+    /// The selected body's id, nil without a selection.
+    var selectedId: Int?
+    /// The selected body's centre in stage metres (the native hold grabs there).
+    var selectedCenter: Vec2?
+    /// Whether the selected body is static.
+    var selectedStatic = false
+    /// Whether the selected body is pinned.
+    var selectedPinned = false
+    /// The grabbed body's id, nil without a grab.
+    var grabbedId: Int?
+    /// The grab's target in stage metres, nil without a grab.
+    var grabTarget: Vec2?
+    /// The number of pinned bodies.
+    var pinnedCount = 0
+    /// Whether velocity arrows are drawn.
+    var showVelocity = false
+    /// Whether force arrows are drawn.
+    var showForces = false
+    /// The shape picker's kind, 0 circle or 1 box (presentation state, never in the world): what a tap on the empty
+    /// stage and "Add at centre" add.
+    var shapeKind = BodyKind.circle.rawValue
+    /// The state panel's measured values.
+    var panel = PlaygroundPanel()
+    /// The editing line: pinned bodies, the selection, a grab and the overlays.
+    var editing = ""
+}
+
+/// The measured values of the state panel (feature 084, FR-A11-311): read from `WorldDiagnostics` without changing the
+/// world, shown with two decimals.
+struct PlaygroundPanel: Equatable, Sendable {
+    /// Kinetic energy in joules.
+    var kinetic = 0.0
+    /// Gravitational potential energy above the floor in joules.
+    var potential = 0.0
+    /// Spring potential energy in joules.
+    var spring = 0.0
+    /// Total energy in joules.
+    var total = 0.0
+    /// The magnitude of the total momentum in kg·m/s.
+    var momentum = 0.0
+    /// The selected body's speed in m/s; nil without a selection.
+    var speed: Double?
+
+    /// The panel of `world`: `WorldDiagnostics`' energies, the magnitude of its momentum and the selected body's speed.
+    static func measure(_ world: PhysicsWorld, catalog: MaterialCatalog = PlaygroundCore.catalog) -> PlaygroundPanel {
+        var panel = PlaygroundPanel()
+        panel.kinetic = WorldDiagnostics.kineticEnergy(world, catalog: catalog)
+        panel.potential = WorldDiagnostics.potentialEnergy(world, catalog: catalog)
+        panel.spring = WorldDiagnostics.springPotentialEnergy(world, catalog: catalog)
+        panel.total = WorldDiagnostics.totalEnergy(world, catalog: catalog)
+        panel.momentum = WorldDiagnostics.momentum(world, catalog: catalog).length
+        if let id = world.selectedId, let index = world.index(ofBody: id) {
+            panel.speed = world.bodies[index].velocity.length
+        }
+        return panel
+    }
+
+    /// `value` with two decimals ("1.25"; never "-0.00"; "—" for a non-finite value).
+    static func text(_ value: Double) -> String {
+        guard value.isFinite else { return "—" }
+        let rounded = (value * 100).rounded() / 100
+        return String(format: "%.2f", rounded == 0 ? 0 : rounded)
+    }
+
+    /// The note above the values.
+    static let note = "Educational approximation"
+    /// What the force arrows leave out.
+    static let arrowNote =
+        "Arrows show velocity, weight and the net spring force; contact and drag forces are not drawn."
+
+    /// The panel's rows: (identifier name, label, value with its unit).
+    var rows: [(name: String, label: String, value: String)] {
+        [("panel-kinetic", "Kinetic energy", Self.text(kinetic) + " J"),
+         ("panel-potential", "Potential energy", Self.text(potential) + " J"),
+         ("panel-spring", "Spring energy", Self.text(spring) + " J"),
+         ("panel-total", "Total energy", Self.text(total) + " J"),
+         ("panel-momentum", "Momentum", Self.text(momentum) + " kg·m/s"),
+         ("panel-speed", "Selected speed", speed.map { Self.text($0) + " m/s" } ?? "no selection")]
+    }
+}
+
+/// One overlay arrow in stage metres: from its start to its tip.
+struct PlaygroundArrow: Equatable, Sendable {
+    /// What the arrow shows.
+    enum Kind: Int, CaseIterable, Sendable {
+        /// The body's velocity.
+        case velocity
+        /// The body's weight.
+        case weight
+        /// The net spring force on the body.
+        case spring
+    }
+
+    /// The arrow's start (the body's centre) in metres.
+    var from: Vec2
+    /// The arrow's tip in metres.
+    var to: Vec2
+
+    /// The arrow's length in metres.
+    var length: Double { (to - from).length }
+    /// The arrow's unit direction.
+    var direction: Vec2 { (to - from) / length }
+
+    /// The arrow from `from` along `vector`, `scale` metres per unit of the vector and capped at `maxLength` metres;
+    /// nil for a zero or non-finite vector.
+    static func make(from: Vec2, vector: Vec2, scale: Double, maxLength: Double) -> PlaygroundArrow? {
+        let magnitude = vector.length, length = magnitude * scale
+        guard from.isFinite, vector.isFinite, length.isFinite, length > 0, magnitude > 0 else { return nil }
+        return PlaygroundArrow(from: from, to: from + vector * (min(length, maxLength) / magnitude))
+    }
+
+    /// The end of the shaft: the base of a head `headLength` long (the start when the arrow is no longer than that).
+    func shaftEnd(headLength: Double) -> Vec2 { from + direction * max(length - headLength, 0) }
+
+    /// The head triangle: the tip, then the two base corners `width` apart at the shaft's end.
+    func head(length headLength: Double, width: Double) -> [Vec2] {
+        let base = shaftEnd(headLength: headLength), side = Vec2(-direction.y, direction.x) * (width / 2)
+        return [to, base + side, base - side]
+    }
 }
 
 /// A failure the presenter injects for tests (`failNextDraw`).
@@ -109,6 +250,30 @@ final class PlaygroundPresenter: ExperiencePresenter {
     nonisolated static let probePoint = Vec2(5, 0.75)
     /// The clearance around the probe point (metres) a body's bounding circle must keep for the probe to be taken.
     nonisolated static let probeMargin = 0.3
+    /// The z of the overlays (arrows, grab line, selection ring and pin dots): above the bodies, under the masks.
+    nonisolated static let overlayZ = 6
+    /// The seconds of motion a velocity arrow shows: its length is 0.25 s × |v| metres.
+    nonisolated static let velocityArrowSeconds = 0.25
+    /// The metres per newton of a force arrow.
+    nonisolated static let forceArrowScale = 0.05
+    /// The longest arrow in metres.
+    nonisolated static let maxArrowLength = 2.0
+    /// The length and the width of an arrowhead in metres.
+    nonisolated static let arrowHeadLength = 0.12, arrowHeadWidth = 0.12
+    /// The width of an arrow's shaft in metres.
+    nonisolated static let arrowShaftWidth = 0.04
+    /// The width of the grab line in metres.
+    nonisolated static let grabLineWidth = 0.02
+    /// The gap between the selected body's bounding circle and its ring, and the radius of a pinned body's dot, in
+    /// metres.
+    nonisolated static let selectionGap = 0.1, pinDotRadius = 0.08
+    /// The colours of the velocity, weight and spring-force arrows.
+    nonisolated static let arrowColors: [PlaygroundArrow.Kind: Vec4] = [
+        .velocity: Vec4(0.45, 0.85, 0.95, 1), .weight: Vec4(0.95, 0.6, 0.25, 1), .spring: Vec4(0.55, 0.9, 0.45, 1),
+    ]
+    /// The colour of the grab line, the selection ring and the pin dots.
+    nonisolated static let grabColor = Vec4(0.95, 0.95, 0.95, 1), selectionColor = Vec4(0.98, 0.85, 0.2, 1),
+                           pinColor = Vec4(0.9, 0.25, 0.3, 1)
 
     let experienceID: ExperienceID
     let mirror = PlaygroundMirror()
@@ -138,7 +303,20 @@ final class PlaygroundPresenter: ExperiencePresenter {
                      hatchNodes: [SceneNode] = []
     /// The zigzag and the two anchor dots (end A, end B) of each spring slot.
     private(set) var springNodes: [SceneNode] = [], anchorNodes: [(a: SceneNode, b: SceneNode)] = []
+    /// The shaft and the head of each arrow kind (velocity, weight, spring) of each body slot (feature 084).
+    private(set) var shaftNodes: [[SceneNode]] = [], headNodes: [[SceneNode]] = []
+    /// The pin dot of each body slot, the selection ring and the grab line.
+    private(set) var pinNodes: [SceneNode] = []
+    let selectionNode = SceneNode(id: "selection", z: PlaygroundPresenter.overlayZ)
+    let grabNode = SceneNode(id: "grab", z: PlaygroundPresenter.overlayZ)
+    /// The number of arrows of each kind drawn in the last frame.
+    private(set) var lastArrowsDrawn: [PlaygroundArrow.Kind: Int] = [:]
     private var maskNodes: [SceneNode] = []
+    /// The canvas gestures (feature 084).
+    private(set) var gestures = PlaygroundGestures()
+    /// The port of the last canvas pointer event: a held tap or a long press held still is resolved through it on a
+    /// frame tick.
+    private var gesturePort: ExperienceActionPort?
 
     /// A presenter for the experience `experienceID`.
     init(experienceID: ExperienceID) {
@@ -167,6 +345,24 @@ final class PlaygroundPresenter: ExperiencePresenter {
             markNodes.append(mark)
             hatchNodes.append(hatch)
         }
+        for slot in 0..<PhysicsWorld.maxBodies {
+            var shafts: [SceneNode] = [], heads: [SceneNode] = []
+            for kind in PlaygroundArrow.Kind.allCases {
+                let shaft = SceneNode(id: "b\(slot).arrow\(kind.rawValue)", z: Self.overlayZ)
+                let head = SceneNode(id: "b\(slot).arrow\(kind.rawValue).head", z: Self.overlayZ)
+                root.add(shaft)
+                root.add(head)
+                shafts.append(shaft)
+                heads.append(head)
+            }
+            shaftNodes.append(shafts)
+            headNodes.append(heads)
+            let pin = SceneNode(id: "b\(slot).pin", z: Self.overlayZ)
+            root.add(pin)
+            pinNodes.append(pin)
+        }
+        root.add(selectionNode)
+        root.add(grabNode)
         for side in 0..<4 {
             let node = SceneNode(id: "mask\(side)", z: Self.maskZ)
             root.add(node)
@@ -195,10 +391,16 @@ final class PlaygroundPresenter: ExperiencePresenter {
         layOut(core, width: width, height: height)
         if primitives == nil { primitives = try PrimitiveRenderer(registry: context.resources) }
         try primitives?.draw(root, camera: Camera2D(), metrics: ViewMetrics(size: Vec2(width, height), scale: 1))
+        // A held tap whose double-tap window closed, or a long press held still, is sent on the frame tick (an action
+        // at the next step, recorded like any other; the drawing itself changes nothing).
+        if let port = gesturePort {
+            advanceGestures(by: frame.delta) { port.send($0, $1) }
+        }
     }
 
     func teardown(_ context: RenderContext) {
         isLive = false
+        suspended()
         primitives?.release()
         primitives = nil
     }
@@ -392,6 +594,7 @@ final class PlaygroundPresenter: ExperiencePresenter {
         }
         lastBodiesDrawn = drawn
         lastStaticDrawn = hatched
+        layOutOverlays(core, scale: s)
 
         // Letterbox masks: everything outside the view is covered in the clear colour.
         let halfW = Self.viewWidth / 2 * s, halfH = Self.viewHeight / 2 * s
@@ -422,6 +625,24 @@ final class PlaygroundPresenter: ExperiencePresenter {
         if mirror.status != status { mirror.status = status }
         let forces = Self.forces(world)
         if mirror.forces != forces { mirror.forces = forces }
+        let ids = world.bodies.map(\.id)
+        if mirror.bodyIds != ids { mirror.bodyIds = ids }
+        let selected = world.selectedId.flatMap { world.index(ofBody: $0) }.map { world.bodies[$0] }
+        if mirror.selectedId != selected?.id { mirror.selectedId = selected?.id }
+        if mirror.selectedCenter != selected?.position { mirror.selectedCenter = selected?.position }
+        let selectedStatic = selected?.isStatic ?? false, selectedPinned = selected?.pinned ?? false
+        if mirror.selectedStatic != selectedStatic { mirror.selectedStatic = selectedStatic }
+        if mirror.selectedPinned != selectedPinned { mirror.selectedPinned = selectedPinned }
+        if mirror.grabbedId != world.grab?.bodyId { mirror.grabbedId = world.grab?.bodyId }
+        if mirror.grabTarget != world.grab?.target { mirror.grabTarget = world.grab?.target }
+        let pinned = world.bodies.filter(\.pinned).count
+        if mirror.pinnedCount != pinned { mirror.pinnedCount = pinned }
+        if mirror.showVelocity != world.showVelocity { mirror.showVelocity = world.showVelocity }
+        if mirror.showForces != world.showForces { mirror.showForces = world.showForces }
+        let panel = PlaygroundPanel.measure(world)
+        if mirror.panel != panel { mirror.panel = panel }
+        let editing = Self.editing(world)
+        if mirror.editing != editing { mirror.editing = editing }
     }
 
     /// The word of `index` in `words`, or "unknown" outside it.
@@ -510,9 +731,49 @@ final class PlaygroundPresenter: ExperiencePresenter {
     }
 
     /// The canvas description, for example "Physics Playground: 10 bodies, running, normal speed (time scale 1×);
-    /// 2 springs, stiffness medium, gravity Earth, drag low."
+    /// 2 springs, stiffness medium, gravity Earth, drag low; none pinned, no selection, arrows off."
     nonisolated static func description(_ world: PhysicsWorld) -> String {
-        "Physics Playground: \(status(world)) (time scale \(timeScaleText(world.timeScaleIndex))); \(forces(world))."
+        "Physics Playground: \(status(world)) (time scale \(timeScaleText(world.timeScaleIndex))); \(forces(world)); "
+            + "\(editing(world))."
+    }
+
+    /// "none pinned", "1 pinned" or "3 pinned".
+    nonisolated static func pinnedWords(_ count: Int) -> String {
+        count <= 0 ? "none pinned" : "\(count) pinned"
+    }
+
+    /// "a circle" or "a box".
+    nonisolated static func shapeWords(_ shape: Shape2D) -> String {
+        switch shape {
+        case .circle: return "a circle"
+        case .box: return "a box"
+        }
+    }
+
+    /// The selection in words: "no selection", or "body 7 selected (a box, pinned)".
+    nonisolated static func selectionWords(_ world: PhysicsWorld) -> String {
+        guard let id = world.selectedId, let index = world.index(ofBody: id) else { return "no selection" }
+        let body = world.bodies[index]
+        let state = body.isStatic ? ", static" : body.pinned ? ", pinned" : ""
+        return "body \(id) selected (\(shapeWords(body.shape))\(state))"
+    }
+
+    /// The overlays in words: "arrows off", "velocity arrows on", "force arrows on" or "velocity and force arrows on".
+    nonisolated static func overlayWords(_ world: PhysicsWorld) -> String {
+        switch (world.showVelocity, world.showForces) {
+        case (false, false): return "arrows off"
+        case (true, false): return "velocity arrows on"
+        case (false, true): return "force arrows on"
+        case (true, true): return "velocity and force arrows on"
+        }
+    }
+
+    /// The editing line: "none pinned, no selection, arrows off", with ", body 8 held" before the overlays while a
+    /// body is grabbed.
+    nonisolated static func editing(_ world: PhysicsWorld) -> String {
+        let held = world.grab.map { ", body \($0.bodyId) held" } ?? ""
+        return "\(pinnedWords(world.bodies.filter(\.pinned).count)), \(selectionWords(world))\(held), "
+            + overlayWords(world)
     }
 
     /// The description of `core`'s world.
@@ -568,6 +829,24 @@ final class PlaygroundPresenter: ExperiencePresenter {
                 return []
             }
         }
+        // Feature 084: every overlay — arrows (widened by half the head's width), the grab line, the selection ring
+        // and pin dots (inside their bodies) — keeps the margin too.
+        let arrowReach = max(Self.arrowHeadWidth / 2, Self.arrowShaftWidth)
+        for item in Self.arrows(core.world, forces: core.forces) {
+            let arrow = item.arrow
+            if Self.distance(from: Self.probePoint, toSegment: arrow.from, arrow.to) < arrowReach + Self.probeMargin {
+                return []
+            }
+        }
+        if let line = Self.grabLine(core.world),
+           Self.distance(from: Self.probePoint, toSegment: line.from, line.to) < Self.grabLineWidth + Self.probeMargin {
+            return []
+        }
+        if let id = core.world.selectedId, let index = core.world.index(ofBody: id) {
+            let body = core.world.bodies[index]
+            let reach = body.boundingRadius + Self.selectionGap + Self.edgeWidth + Self.probeMargin
+            if (body.position - Self.probePoint).length < reach { return [] }
+        }
         let fraction = canvasFraction(of: Self.probePoint)
         return [FrameProbe(name: "stage", x: fraction.x, y: fraction.y, expected: expected)].compactMap { $0 }
     }
@@ -576,6 +855,130 @@ final class PlaygroundPresenter: ExperiencePresenter {
         AnyView(PlaygroundControls(port: port, mirror: mirror))
     }
 
-    /// Every action has a native control (the three level pickers included); there is no canvas gesture.
+    /// Every action has a native control (the three level pickers, the selection, pin, delete, add, hold and
+    /// direction buttons and the two overlay toggles included).
     var nativeActions: Set<String> { Set(PlaygroundCore.actionIDs) }
+
+    // MARK: Gestures (feature 084)
+
+    /// The seven edit actions the canvas gestures send.
+    var gestureActions: Set<String> { PlaygroundGestures.gestureActions }
+
+    /// Turns a canvas pointer event into edit actions against the last drawn world and sends each through `port`;
+    /// nothing happens before a state was seen.
+    func pointer(_ event: PointerEvent, viewSize: Vec2, port: ExperienceActionPort) {
+        gesturePort = port
+        pointer(event, viewSize: viewSize) { port.send($0, $1) }
+    }
+
+    /// The pointer event `event` turned into edit actions sent through `send` (tests record them); the shape picker's
+    /// kind is the one an add uses.
+    func pointer(_ event: PointerEvent, viewSize: Vec2, send: PlaygroundGestures.Send) {
+        guard let core = lastCore else { return }
+        let kind = BodyKind(rawValue: mirror.shapeKind) ?? .circle
+        gestures.handle(event, viewSize: viewSize, world: core.world, kind: kind, send: send)
+    }
+
+    /// Advances the gestures by `seconds` of frame time against the last drawn world, sending what comes due through
+    /// `send`.
+    func advanceGestures(by seconds: Double, send: PlaygroundGestures.Send) {
+        guard let core = lastCore else { return }
+        gestures.advance(by: seconds, world: core.world, send: send)
+    }
+
+    /// The experience was suspended or is leaving: every touch, held tap and grab finger is forgotten (nothing is sent;
+    /// the suspension's `edit.release` is sent by `PlaygroundExperience` before it suspends).
+    func suspended() {
+        gestures.reset()
+        gesturePort = nil
+    }
+
+    // MARK: Overlays (feature 084)
+
+    /// The overlay arrows of `world` with the measured `forces`, by body slot and kind: velocity arrows when
+    /// `showVelocity` is on, weight and spring-force arrows when `showForces` is on, for every non-static, finite body
+    /// (the spring force only while `forces` belongs to the world's tick); a zero vector gives no arrow.
+    nonisolated static func arrows(_ world: PhysicsWorld, forces: ForceMeasurement,
+                                   catalog: MaterialCatalog = PlaygroundCore.catalog)
+        -> [(slot: Int, kind: PlaygroundArrow.Kind, arrow: PlaygroundArrow)] {
+        guard world.showVelocity || world.showForces else { return [] }
+        let current = forces.isCurrent(for: world)
+        var arrows: [(slot: Int, kind: PlaygroundArrow.Kind, arrow: PlaygroundArrow)] = []
+        for (slot, body) in world.bodies.enumerated() where !body.isStatic && body.isFinite {
+            if world.showVelocity,
+               let arrow = PlaygroundArrow.make(from: body.position, vector: body.velocity,
+                                                scale: velocityArrowSeconds, maxLength: maxArrowLength) {
+                arrows.append((slot, .velocity, arrow))
+            }
+            guard world.showForces else { continue }
+            let weight = ForceMeasurement.weight(of: body, in: world, catalog: catalog)
+            if let arrow = PlaygroundArrow.make(from: body.position, vector: weight, scale: forceArrowScale,
+                                                maxLength: maxArrowLength) {
+                arrows.append((slot, .weight, arrow))
+            }
+            if current,
+               let arrow = PlaygroundArrow.make(from: body.position, vector: forces.springForce(on: body.id),
+                                                scale: forceArrowScale, maxLength: maxArrowLength) {
+                arrows.append((slot, .spring, arrow))
+            }
+        }
+        return arrows
+    }
+
+    /// The grab line of `world` in metres: from the grabbed body's anchor (through its pose) to the target; nil without
+    /// a grab or when the body is missing.
+    nonisolated static func grabLine(_ world: PhysicsWorld) -> (from: Vec2, to: Vec2)? {
+        guard let grab = world.grab, let index = world.index(ofBody: grab.bodyId) else { return nil }
+        let anchor = world.bodies[index].pose.toWorld(grab.localAnchor)
+        guard anchor.isFinite, grab.target.isFinite else { return nil }
+        return (anchor, grab.target)
+    }
+
+    /// Places the overlay nodes of `core` at `scale` pixels per metre (reads `core` only).
+    func layOutOverlays(_ core: PlaygroundCore, scale s: Double) {
+        let world = core.world
+        func map(_ p: Vec2) -> Vec2 { Self.world(p, scale: s) }
+        func px(_ metres: Double) -> Double { max(metres * s, 1) }
+        for slot in 0..<PhysicsWorld.maxBodies {
+            for node in shaftNodes[slot] + headNodes[slot] + [pinNodes[slot]] {
+                node.primitive = nil
+                node.position = .zero
+            }
+        }
+        var counts: [PlaygroundArrow.Kind: Int] = [:]
+        for item in Self.arrows(world, forces: core.forces) where item.slot < PhysicsWorld.maxBodies {
+            let shaft = shaftNodes[item.slot][item.kind.rawValue], head = headNodes[item.slot][item.kind.rawValue]
+            let color = Self.arrowColors[item.kind] ?? Self.grabColor
+            let base = item.arrow.shaftEnd(headLength: Self.arrowHeadLength)
+            if (base - item.arrow.from).length > 0 {
+                shaft.primitive = .line(map(item.arrow.from), map(base), width: px(Self.arrowShaftWidth))
+            }
+            head.primitive = .polygon(item.arrow.head(length: Self.arrowHeadLength, width: Self.arrowHeadWidth)
+                .map(map))
+            shaft.color = color
+            head.color = color
+            counts[item.kind, default: 0] += 1
+        }
+        lastArrowsDrawn = counts
+        for (slot, body) in world.bodies.enumerated() where slot < PhysicsWorld.maxBodies && body.pinned {
+            pinNodes[slot].primitive = .circle(px(Self.pinDotRadius))
+            pinNodes[slot].position = map(body.position)
+            pinNodes[slot].color = Self.pinColor
+        }
+        selectionNode.primitive = nil
+        selectionNode.position = .zero
+        if let id = world.selectedId, let index = world.index(ofBody: id), world.bodies[index].isFinite {
+            let body = world.bodies[index]
+            selectionNode.primitive = .polyline(
+                Self.ring(center: body.position, radius: body.boundingRadius + Self.selectionGap).map(map),
+                width: px(Self.edgeWidth))
+            selectionNode.color = Self.selectionColor
+        }
+        grabNode.primitive = nil
+        grabNode.position = .zero
+        if let line = Self.grabLine(world) {
+            grabNode.primitive = .line(map(line.from), map(line.to), width: px(Self.grabLineWidth))
+            grabNode.color = Self.grabColor
+        }
+    }
 }

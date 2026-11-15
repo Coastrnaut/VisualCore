@@ -13,6 +13,14 @@
 // 0.03 m wide from anchor to anchor at the physics anchors (a body anchor through the body's pose, a world anchor
 // fixed), with anchor dots; the description adds the springs, stiffness, gravity and drag; the probe also steps aside
 // for a spring passing near it.
+//
+// Feature 084 (A11-P03) T-A11-303 (FR-A11-310, FR-A11-311; SC-A11-304; clarification 4): velocity arrows (0.25 s ×
+// |v|, capped at 2 m) and force arrows (weight and the measured net spring force, 0.05 m per newton, capped at 2 m)
+// with 0.12 m triangular heads, drawn at the stated lengths within one pixel when the overlays are on and none when
+// they are off, the spring force only while the measurement belongs to the drawn tick; the grab line, the selection
+// ring and the pin dots; drawing never changes the world or the digest; the state panel's values equal
+// `WorldDiagnostics` to display precision; the description names pins, selection, grab and overlays; the controls'
+// selection walk and hold moves; the probe steps aside for the overlays.
 import Foundation
 import XCTest
 @testable import PhysicsPlaygroundExperience
@@ -213,9 +221,10 @@ final class PlaygroundRenderTests: XCTestCase {
 
     func testTheDescriptionNamesBodiesStateAndTimeScale() async throws {
         var world = playgroundSampleWorld()
+        let none = "; none pinned, no selection, arrows off."
         XCTAssertEqual(PlaygroundPresenter.description(world),
                        "Physics Playground: 3 bodies, running, normal speed (time scale 1×); "
-                       + "no springs, stiffness medium, gravity Earth, drag low.")
+                       + "no springs, stiffness medium, gravity Earth, drag low" + none)
         world.paused = true
         world.timeScaleIndex = 0
         XCTAssertTrue(WorldSimulation.setGravityLevel(&world, 1))
@@ -224,7 +233,7 @@ final class PlaygroundRenderTests: XCTestCase {
         world.springs = [WorldSpring(id: 0, a: .world(Vec2(5, 7.5)), b: .body(1), restLength: 1)]
         XCTAssertEqual(PlaygroundPresenter.description(world),
                        "Physics Playground: 3 bodies, paused, quarter speed (time scale ¼×); "
-                       + "1 spring, stiffness very stiff, gravity Moon, drag high.")
+                       + "1 spring, stiffness very stiff, gravity Moon, drag high" + none)
         world.springs = []
         world.bodies = [world.bodies[0]]
         world.timeScaleIndex = 1
@@ -233,10 +242,10 @@ final class PlaygroundRenderTests: XCTestCase {
         XCTAssertTrue(WorldSimulation.setStiffnessLevel(&world, 0))
         XCTAssertEqual(PlaygroundPresenter.description(world),
                        "Physics Playground: 1 body, paused, half speed (time scale ½×); "
-                       + "no springs, stiffness soft, gravity off, drag none.")
+                       + "no springs, stiffness soft, gravity off, drag none" + none)
         XCTAssertEqual(PlaygroundPresenter.description(PlaygroundCore(seed: 7).world),
                        "Physics Playground: 10 bodies, running, normal speed (time scale 1×); "
-                       + "2 springs, stiffness medium, gravity Earth, drag low.")
+                       + "2 springs, stiffness medium, gravity Earth, drag low" + none)
         XCTAssertEqual(PlaygroundPresenter.bodyWords(0), "no bodies")
         XCTAssertEqual(PlaygroundPresenter.springWords(0), "no springs")
         XCTAssertEqual(PlaygroundPresenter.springWords(2), "2 springs")
@@ -357,6 +366,242 @@ final class PlaygroundRenderTests: XCTestCase {
         XCTAssertEqual(PlaygroundPresenter.zigzag(from: Vec2(1, 1), to: Vec2(1, 1)), [Vec2(1, 1), Vec2(1, 1)])
     }
 
+    // MARK: Feature 084 overlays, panel and controls
+
+    /// The sample world with velocities on its two dynamic bodies (the box's capped) and the overlays `velocity` and
+    /// `forces`.
+    private func movingWorld(velocity: Bool, forces: Bool) -> PhysicsWorld {
+        var world = playgroundSampleWorld()
+        world.bodies[1].velocity = Vec2(1.2, -1.6)   // |v| = 2 m/s → 0.5 m
+        world.bodies[2].velocity = Vec2(-30, 0)      // 7.5 m → capped at 2 m
+        world.showVelocity = velocity
+        world.showForces = forces
+        return world
+    }
+
+    /// Checks that the shaft and head of `kind` at `slot` draw `arrow` (metres) at `s` pixels per metre: the shaft from
+    /// the start to the head's base, the head's tip at the arrow's end, the tip `length` metres from the start within
+    /// one pixel.
+    private func assertArrow(_ presenter: PlaygroundPresenter, slot: Int, kind: PlaygroundArrow.Kind,
+                             from start: Vec2, vector: Vec2, length: Double, s: Double, line: UInt = #line) {
+        let map = { (p: Vec2) in PlaygroundPresenter.world(p, scale: s) }
+        guard case .polygon(let head)? = presenter.headNodes[slot][kind.rawValue].primitive else {
+            return XCTFail("no head for slot \(slot) \(kind)", line: line)
+        }
+        XCTAssertEqual(head.count, 3, line: line)
+        let tip = head[0], origin = map(start)
+        XCTAssertEqual((tip - origin).length, length * s, accuracy: 1, "the stated length within a pixel", line: line)
+        let want = origin + vector * (length * s / vector.length)
+        XCTAssertEqual((tip - want).length, 0, accuracy: 1, "along the vector", line: line)
+        let base = (head[1] + head[2]) / 2
+        XCTAssertEqual((tip - base).length, PlaygroundPresenter.arrowHeadLength * s, accuracy: 1e-6, line: line)
+        XCTAssertEqual((head[1] - head[2]).length, PlaygroundPresenter.arrowHeadWidth * s, accuracy: 1e-6, line: line)
+        guard case .line(let from, let to, let width)? = presenter.shaftNodes[slot][kind.rawValue].primitive else {
+            return XCTFail("no shaft for slot \(slot) \(kind)", line: line)
+        }
+        XCTAssertEqual((from - origin).length, 0, accuracy: 1e-6, line: line)
+        XCTAssertEqual((to - base).length, 0, accuracy: 1e-6, "the shaft ends at the head's base", line: line)
+        XCTAssertEqual(width, max(PlaygroundPresenter.arrowShaftWidth * s, 1), accuracy: 1e-9, line: line)
+        XCTAssertEqual(presenter.shaftNodes[slot][kind.rawValue].color, PlaygroundPresenter.arrowColors[kind],
+                       line: line)
+    }
+
+    /// T-A11-303 (FR-A11-310; SC-A11-304): velocity arrows from each dynamic body's centre along v, 0.25 s × |v| m long
+    /// and capped at 2 m; none on the static ledge; none at all when the overlay is off.
+    func testVelocityArrowsHaveTheStatedLengthsAndOnlyWhenOn() throws {
+        let presenter = PlaygroundPresenter(experienceID: PlaygroundTest.id)
+        let world = movingWorld(velocity: true, forces: false)
+        let core = try playgroundCore(world)
+        let copy = core
+        presenter.layOut(core, width: 1200, height: 1000)
+        XCTAssertEqual(core, copy, "drawing reads the core only")
+        let s = presenter.lastScale
+        XCTAssertEqual(s, 100, accuracy: 1e-12)
+        XCTAssertEqual(presenter.lastArrowsDrawn, [.velocity: 2])
+        assertArrow(presenter, slot: 1, kind: .velocity, from: Vec2(3, 5), vector: Vec2(1.2, -1.6), length: 0.5, s: s)
+        assertArrow(presenter, slot: 2, kind: .velocity, from: Vec2(7, 3), vector: Vec2(-1, 0), length: 2, s: s)
+        XCTAssertNil(presenter.headNodes[0][0].primitive, "no arrow on the static ledge")
+        XCTAssertNil(presenter.headNodes[1][PlaygroundArrow.Kind.weight.rawValue].primitive, "force arrows are off")
+        XCTAssertGreaterThan(PlaygroundPresenter.overlayZ, PlaygroundPresenter.hatchZ, "above the bodies")
+        XCTAssertLessThan(PlaygroundPresenter.overlayZ, PlaygroundPresenter.maskZ)
+
+        // At a small canvas the stated length still holds within a pixel.
+        presenter.layOut(core, width: 120, height: 100)
+        assertArrow(presenter, slot: 1, kind: .velocity, from: Vec2(3, 5), vector: Vec2(1.2, -1.6), length: 0.5,
+                    s: presenter.lastScale)
+
+        // Off: nothing drawn, the world unchanged.
+        let off = try playgroundCore(movingWorld(velocity: false, forces: false))
+        presenter.layOut(off, width: 1200, height: 1000)
+        XCTAssertEqual(presenter.lastArrowsDrawn, [:])
+        for slot in 0..<PhysicsWorld.maxBodies {
+            for node in presenter.shaftNodes[slot] + presenter.headNodes[slot] { XCTAssertNil(node.primitive) }
+        }
+        XCTAssertEqual(PlaygroundPresenter.arrows(off.world, forces: off.forces).count, 0)
+    }
+
+    /// T-A11-303 (FR-A11-310; SC-A11-304): force arrows show each dynamic body's weight m·g and its measured net spring
+    /// force at 0.05 m per newton, capped at 2 m; the spring force only while the measurement belongs to the drawn
+    /// tick.
+    func testForceArrowsShowWeightAndTheMeasuredSpringForce() throws {
+        let presenter = PlaygroundPresenter(experienceID: PlaygroundTest.id)
+        var world = movingWorld(velocity: false, forces: true)
+        world.springs = [WorldSpring(id: 0, a: .world(Vec2(3, 7.5)), b: .body(1), restLength: 1)]
+        world.nextSpringId = 1
+        XCTAssertEqual(world.validate(), [])
+        var core = try playgroundCore(world)
+        presenter.layOut(core, width: 1200, height: 1000)
+        let s = presenter.lastScale
+        XCTAssertEqual(presenter.lastArrowsDrawn, [.weight: 2], "a restored world shows no spring force before a tick")
+        let catalog = PlaygroundCore.catalog
+        for slot in [1, 2] {
+            let body = world.bodies[slot]
+            let weight = ForceMeasurement.weight(of: body, in: world, catalog: catalog)
+            XCTAssertEqual(weight.y, -(body.mass(in: catalog) ?? 0) * 9.81, accuracy: 1e-9)
+            assertArrow(presenter, slot: slot, kind: .weight, from: body.position, vector: weight,
+                        length: min(weight.length * 0.05, 2), s: s)
+        }
+
+        core.update(step: 0)
+        XCTAssertTrue(core.forces.isCurrent(for: core.world))
+        let pull = core.forces.springForce(on: 1)
+        XCTAssertGreaterThan(pull.length, 0, "the stretched spring pulls the circle")
+        presenter.layOut(core, width: 1200, height: 1000)
+        XCTAssertEqual(presenter.lastArrowsDrawn, [.weight: 2, .spring: 1])
+        assertArrow(presenter, slot: 1, kind: .spring, from: core.world.bodies[1].position, vector: pull,
+                    length: min(pull.length * 0.05, 2), s: s)
+        XCTAssertNil(presenter.headNodes[2][PlaygroundArrow.Kind.spring.rawValue].primitive, "no spring on the box")
+
+        // The arrow's own geometry: capped, a zero vector gives none, a short arrow is all head.
+        let capped = try XCTUnwrap(PlaygroundArrow.make(from: .zero, vector: Vec2(0, -500), scale: 0.05, maxLength: 2))
+        XCTAssertEqual(capped.to, Vec2(0, -2))
+        XCTAssertNil(PlaygroundArrow.make(from: .zero, vector: .zero, scale: 0.05, maxLength: 2))
+        XCTAssertNil(PlaygroundArrow.make(from: .zero, vector: Vec2(.nan, 0), scale: 0.05, maxLength: 2))
+        let short = PlaygroundArrow(from: .zero, to: Vec2(0.05, 0))
+        XCTAssertEqual(short.shaftEnd(headLength: 0.12), .zero)
+    }
+
+    /// T-A11-303: the grab line from the grabbed body's anchor to the target, the selection ring and the pin dots; all
+    /// gone when there is nothing to show.
+    func testTheGrabLineSelectionRingAndPinDots() throws {
+        let presenter = PlaygroundPresenter(experienceID: PlaygroundTest.id)
+        var world = playgroundSampleWorld()
+        world.grab = Grab(bodyId: 1, localAnchor: Vec2(0.2, 0), target: Vec2(6, 6))
+        world.selectedId = 1
+        world.bodies[2].pinned = true
+        XCTAssertEqual(world.validate(), [])
+        presenter.layOut(try playgroundCore(world), width: 1200, height: 1000)
+        let map = { (p: Vec2) in PlaygroundPresenter.world(p, scale: 100) }
+        guard case .line(let from, let to, let width)? = presenter.grabNode.primitive else {
+            return XCTFail("no grab line")
+        }
+        let anchor = Vec2(3 + 0.2 * cos(0.6), 5 + 0.2 * sin(0.6))
+        XCTAssertEqual((from - map(anchor)).length, 0, accuracy: 1e-6, "from the anchor through the body's pose")
+        XCTAssertEqual((to - map(Vec2(6, 6))).length, 0, accuracy: 1e-6, "to the target")
+        XCTAssertEqual(width, 2, accuracy: 1e-9, "0.02 m")
+        guard case .polyline(let ring, _)? = presenter.selectionNode.primitive else { return XCTFail("no ring") }
+        for point in ring { XCTAssertEqual((point - map(Vec2(3, 5))).length, 60, accuracy: 1e-6) }
+        XCTAssertEqual(presenter.pinNodes[2].primitive, .circle(8))
+        XCTAssertEqual(presenter.pinNodes[2].position, map(Vec2(7, 3)))
+        XCTAssertNil(presenter.pinNodes[1].primitive)
+
+        presenter.layOut(try playgroundCore(playgroundSampleWorld()), width: 1200, height: 1000)
+        XCTAssertNil(presenter.grabNode.primitive)
+        XCTAssertNil(presenter.selectionNode.primitive)
+        XCTAssertNil(presenter.pinNodes[2].primitive)
+    }
+
+    /// T-A11-303 (FR-A11-311; SC-A11-304): the panel's values are `WorldDiagnostics`' to display precision, the
+    /// selected speed is the selected body's, drawing frames with every overlay on changes neither the world nor the
+    /// digest, and the description names pins, selection, grab and overlays.
+    func testThePanelEqualsTheDiagnosticsAndOverlaysNeverWriteTheWorld() async throws {
+        let catalog = PlaygroundCore.catalog
+        var world = movingWorld(velocity: true, forces: true)
+        world.selectedId = 1
+        let panel = PlaygroundPanel.measure(world)
+        XCTAssertEqual(panel.kinetic, WorldDiagnostics.kineticEnergy(world, catalog: catalog))
+        XCTAssertEqual(panel.potential, WorldDiagnostics.potentialEnergy(world, catalog: catalog))
+        XCTAssertEqual(panel.spring, WorldDiagnostics.springPotentialEnergy(world, catalog: catalog))
+        XCTAssertEqual(panel.total, WorldDiagnostics.totalEnergy(world, catalog: catalog))
+        XCTAssertEqual(panel.momentum, WorldDiagnostics.momentum(world, catalog: catalog).length)
+        XCTAssertEqual(panel.speed, 2)
+        XCTAssertEqual(panel.rows.map { $0.label }, ["Kinetic energy", "Potential energy", "Spring energy",
+                                                 "Total energy", "Momentum", "Selected speed"])
+        XCTAssertEqual(panel.rows[0].value, String(format: "%.2f J", panel.kinetic))
+        XCTAssertEqual(panel.rows[4].value, String(format: "%.2f kg·m/s", panel.momentum))
+        XCTAssertEqual(panel.rows[5].value, "2.00 m/s")
+        XCTAssertEqual(PlaygroundPanel.text(-0.001), "0.00", "never -0.00")
+        XCTAssertEqual(PlaygroundPanel.text(1.236), "1.24")
+        XCTAssertEqual(PlaygroundPanel.text(.infinity), "—")
+        XCTAssertEqual(PlaygroundPanel.note, "Educational approximation")
+        XCTAssertTrue(PlaygroundPanel.arrowNote.contains("contact and drag forces are not drawn"))
+        world.selectedId = nil
+        XCTAssertEqual(PlaygroundPanel.measure(world).rows[5].value, "no selection")
+
+        world.selectedId = 1
+        world.bodies[2].pinned = true
+        world.bodies[2].velocity = .zero
+        world.grab = Grab(bodyId: 1, localAnchor: .zero, target: Vec2(4, 4))
+        XCTAssertEqual(world.validate(), [])
+        XCTAssertTrue(PlaygroundPresenter.description(world).hasSuffix(
+            "; 1 pinned, body 1 selected (a circle), body 1 held, velocity and force arrows on."))
+        world.showVelocity = false
+        world.selectedId = 2
+        world.grab = nil
+        XCTAssertTrue(PlaygroundPresenter.description(world).hasSuffix("; 1 pinned, body 2 selected (a box, pinned), "
+                                                                       + "force arrows on."))
+        world.selectedId = 0
+        XCTAssertTrue(PlaygroundPresenter.selectionWords(world) == "body 0 selected (a box, static)")
+
+        // In a session: every overlay on, frames drawn; the world equals the bare replay and the mirror's panel the
+        // diagnostics of the drawn world.
+        let session = ExperienceSession()
+        let shell = try await PlaygroundTest.open(session, size: size)
+        let step = shell.engine.stepIndex
+        for (control, values) in [("overlay.velocity", [1.0]), ("overlay.forces", [1.0]), ("edit.select", [9.0]),
+                                  ("edit.pin", [8.0]), ("edit.grab", [7.0, 7.5, 6.2])] {
+            XCTAssertTrue(shell.handle(control: control, values: values).isAccepted, control)
+        }
+        try PlaygroundTest.frames(session, 30)
+        XCTAssertGreaterThan(shell.presenter.lastArrowsDrawn[.velocity] ?? 0, 0)
+        XCTAssertGreaterThan(shell.presenter.lastArrowsDrawn[.spring] ?? 0, 0)
+        XCTAssertNotNil(shell.presenter.grabNode.primitive)
+        let drawn = try PlaygroundTest.core(shell)
+        let edits: [(String, [Double])] = [("overlay.velocity", [1]), ("overlay.forces", [1]), ("edit.select", [9]),
+                                           ("edit.pin", [8]), ("edit.grab", [7, 7.5, 6.2])]
+        let entries = edits.enumerated().map { index, edit in
+            ScenarioStep(steps: index == 0 ? step : 0, action: ScriptedAction(edit.0, edit.1))
+        } + [ScenarioStep(steps: shell.engine.stepIndex - step)]
+        XCTAssertEqual(drawn, PlaygroundCore.played(seed: 7, entries: entries),
+                       "the drawn session with every overlay equals the undrawn replay")
+        XCTAssertEqual(shell.presenter.mirror.panel, PlaygroundPanel.measure(drawn.world),
+                       "the panel shows the drawn world's diagnostics")
+        XCTAssertEqual(shell.presenter.mirror.panel.speed,
+                       drawn.world.bodies.first { $0.id == 9 }?.velocity.length)
+        session.close()
+    }
+
+    func testTheControlsWalkTheSelectionAndMoveAHeldBody() {
+        let ids = [0, 1, 2, 7]
+        XCTAssertEqual(PlaygroundControls.neighbour(of: nil, in: ids, forward: true), 0)
+        XCTAssertEqual(PlaygroundControls.neighbour(of: nil, in: ids, forward: false), 7)
+        XCTAssertEqual(PlaygroundControls.neighbour(of: 1, in: ids, forward: true), 2)
+        XCTAssertEqual(PlaygroundControls.neighbour(of: 7, in: ids, forward: true), 0, "wraps")
+        XCTAssertEqual(PlaygroundControls.neighbour(of: 0, in: ids, forward: false), 7, "wraps")
+        XCTAssertEqual(PlaygroundControls.neighbour(of: 5, in: ids, forward: true), 0, "a missing selection")
+        XCTAssertNil(PlaygroundControls.neighbour(of: nil, in: [], forward: true))
+        XCTAssertEqual(PlaygroundControls.movedTarget(Vec2(5, 4), dx: 1, dy: 0), Vec2(5.5, 4))
+        XCTAssertEqual(PlaygroundControls.movedTarget(Vec2(9.8, 0.2), dx: 1, dy: -1), Vec2(10, 0), "clamped")
+        XCTAssertEqual(PlaygroundControls.addPoint, Vec2(5, 4))
+        XCTAssertEqual(PlaygroundControls.shapeTitles, ["Circle", "Box"])
+        XCTAssertEqual(PlaygroundControls.directions.map { $0.name },
+                       ["nudge-up", "nudge-down", "nudge-left", "nudge-right"])
+        XCTAssertEqual(PlaygroundControls.selectionValue(nil), "No body selected")
+        XCTAssertEqual(PlaygroundControls.selectionValue(7), "Body 7 selected")
+        let presenter = PlaygroundPresenter(experienceID: PlaygroundTest.id)
+        XCTAssertTrue(Set(PlaygroundCore.actionIDs).isSubset(of: presenter.nativeActions))
+    }
+
     func testTheProbeStepsAsideForBodiesNearIt() throws {
         let presenter = PlaygroundPresenter(experienceID: PlaygroundTest.id)
         var world = playgroundSampleWorld()
@@ -376,6 +621,16 @@ final class PlaygroundRenderTests: XCTestCase {
         XCTAssertEqual(world.validate(), [])
         XCTAssertEqual(presenter.probes(try playgroundCore(world)), [], "a spring over the probe point")
         XCTAssertEqual(presenter.probes(PlaygroundCore(seed: 7)).count, 1, "the starting scene leaves the probe clear")
+        // Feature 084: an arrow or a grab line over the probe point moves the probe aside too.
+        world.springs = []
+        world.bodies[2].velocity = Vec2(-8, -8)   // the box at (7, 3): a 2 m arrow toward (5.6, 1.6)
+        world.bodies[2].position = Vec2(6.2, 2.2)
+        XCTAssertEqual(presenter.probes(try playgroundCore(world)).count, 1, "overlays off: the probe holds")
+        world.showVelocity = true
+        XCTAssertEqual(presenter.probes(try playgroundCore(world)), [], "a velocity arrow over the probe point")
+        world.showVelocity = false
+        world.grab = Grab(bodyId: 1, localAnchor: .zero, target: Vec2(5, 0.5))
+        XCTAssertEqual(presenter.probes(try playgroundCore(world)), [], "the grab line over the probe point")
         XCTAssertEqual(PlaygroundPresenter.colorClassOfStage, FrameColorClass.dark.rawValue)
         XCTAssertEqual(PlaygroundPresenter.colorClass(red: PlaygroundPresenter.letterboxColor.x,
                                                       green: PlaygroundPresenter.letterboxColor.y,
