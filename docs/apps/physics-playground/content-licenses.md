@@ -12,4 +12,16 @@ constants are educational approximations, not engineering data.
 | steel | Steel | 7.8 | 0.25 | 0.4 | VisualCore project | MIT |
 | ice | Ice | 0.9 | 0.1 | 0.05 | VisualCore project | MIT |
 
-4 materials; 0 problems.
+The presets and the tutorial texts are original content of this repository; each tutorial row covers all of
+its step texts.
+
+| Id | Role | Name | Author | License |
+|---|---|---|---|---|
+| free-play | preset | Free play | VisualCore project | MIT |
+| pendulum | preset | Pendulum | VisualCore project | MIT |
+| spring-chain | preset | Spring chain | VisualCore project | MIT |
+| stacked-objects | preset | Stacked objects | VisualCore project | MIT |
+| controlling-time | tutorial | Controlling time | VisualCore project | MIT |
+| springs-and-energy | tutorial | Springs and energy | VisualCore project | MIT |
+
+4 materials, 4 presets, 2 tutorials; 0 problems.

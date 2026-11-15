@@ -24,6 +24,15 @@
 // release, 21 pin with impacts (the mass-zero fixture), 22 unpin and fall, 23 delete with springs, 24 selection and
 // nudge, 25 overlays on and off, 26 schema-2 migration. The exact bounds (a pinned body bit-identical over 1,000 ticks,
 // the fall at g within 1 %, the grab within 5 cm in 1 s) are the core's `PinFixtureTests` and `WorldEditingTests`.
+//
+// Feature 085 (A11-P04) T-A11-404 (FR-A11-430; SC-A11-401, SC-A11-403, SC-A11-404, SC-A11-405; research D5): the state
+// is schema 4 (every digest now covers the origin, the starting world and the tutorial progress), the rejection
+// scenario adds `tutorial.stop` without a tutorial (`a11.no-tutorial`) and fractional preset and tutorial values
+// (`a11.invalid-choice`), and fixtures 27–33 are added, scripted over the experiment and tutorial actions: 27 pendulum,
+// 28 spring-chain energy over 1,200 steps, 29 stacked objects, 30 reset to the experiment after edits and time
+// controls, 31 the tutorial "Controlling time" completed by its actions, 32 the tutorial "Springs and energy", 33
+// schema-3 migration. Saving and opening slots is outside the replay (the experience's storage) and is proved by
+// `ExperimentStoreTests` and `ExperimentSampleFileTests`; the energy bounds are the core's `SpringEnergyFixtureTests`.
 #if DEBUG || VISUALCORE_AUTOMATION
 import PhysicsPlaygroundCore
 import VisualCoreExperience
@@ -71,6 +80,9 @@ extension PlaygroundCore {
     /// The host steps fixture 21 runs with the pinned circle under impacts.
     public static let pinSteps = 1_000
 
+    /// The host steps fixtures 27 and 29 run their preset (5 s at 1×; feature 085).
+    public static let presetSteps = 600
+
     /// The points fixture 19 adds a circle and a box at, in metres (clear of the starting bodies at step 0).
     public static let addPoints = (circle: Vec2(4.5, 1.5), box: Vec2(5.0, 3.0))
 
@@ -93,7 +105,8 @@ extension PlaygroundCore {
     /// out-of-range drag and a fractional stiffness; then (feature 084) an add leaving the stage, an add of a
     /// fractional kind, an add outside the range, a select of a missing body and of a fractional id, a grab of the
     /// static ledge, a move and a release without a grab, a pin of the static ledge, a delete of a missing body, a
-    /// nudge without a selection and a fractional overlay value.
+    /// nudge without a selection and a fractional overlay value; then (feature 085) a stop without a tutorial, a
+    /// fractional preset and a fractional tutorial.
     public static var rejectionEntries: [ScenarioStep] {
         func refused(_ control: String, _ values: [Double], _ rule: String) -> ScenarioStep {
             ScenarioStep(steps: 0, action: ScriptedAction(control, values), result: "action.rule." + rule)
@@ -126,7 +139,10 @@ extension PlaygroundCore {
          refused("edit.pin", [0], PlaygroundRule.staticBody),
          refused("edit.delete", [99], PlaygroundRule.unknownBody),
          refused("edit.nudge", [1, 0], PlaygroundRule.noSelection),
-         refused("overlay.velocity", [0.5], PlaygroundRule.invalidChoice)]
+         refused("overlay.velocity", [0.5], PlaygroundRule.invalidChoice),
+         refused("tutorial.stop", [], PlaygroundRule.noTutorial),
+         refused("experiment.preset", [1.5], PlaygroundRule.invalidChoice),
+         refused("tutorial.start", [0.5], PlaygroundRule.invalidChoice)]
     }
 
     /// The recorded inputs up to (and including) `limit` as scenario entries, then the steps left up to `limit`.
@@ -167,7 +183,7 @@ extension PlaygroundCore {
         return builder.finish().hex
     }
 
-    /// The entries of the twenty-six fixtures (research D5 of features 082, 083 and 084):
+    /// The entries of the thirty-three fixtures (research D5 of features 082, 083, 084 and 085):
     /// 1. free fall: a circle dropped at step 0, then 120 host steps (1 s at 1×); the 1 % free-fall property without
     ///    drag is proved by `PhysicsFixtureTests` and, through the level actions, by fixture 17;
     /// 2. two-body momentum: two circles dropped, then 240 steps; the head-on elastic exchange (momentum within 1e-9
@@ -224,7 +240,24 @@ extension PlaygroundCore {
     /// 26. schema-2 migration: the A11-P02 actions the stored schema-2 example was saved after (a circle and a box
     ///    dropped, stiff springs, Moon gravity, high drag, half speed, pause), 30 paused steps, then running for 60
     ///    steps; the stored example (`schemaTwoExample()`) restores through the step 2 → 3 to the same world with no
-    ///    pins, selection, grab or overlays.
+    ///    pins, selection, grab or overlays;
+    /// and (feature 085, research D5):
+    /// 27. pendulum: the pendulum preset opened at step 0, then 600 steps (5 s); without drag its total energy stays
+    ///    within 5 % of the start (`SpringEnergyFixtureTests`);
+    /// 28. spring-chain energy: the spring chain opened at step 0, then 1,200 steps (10 s); with gravity and low drag
+    ///    the total energy sampled each second never rises by more than 0.5 % and ends below its start;
+    /// 29. stacked objects: the five-box stack opened at step 0, then 600 steps; the stack stands on the floor;
+    /// 30. reset to the experiment: the pendulum opened, 60 steps, the bob selected and nudged, quarter speed, a drop,
+    ///    40 steps, a pause and two single steps, stiff springs and Moon gravity, then `world.reset`: the world equals
+    ///    the pendulum as it opened (running, normal speed, no grab, no selection);
+    /// 31. tutorial "Controlling time": the tutorial started, 10 steps, a pause, one single step, half speed and a
+    ///    reset complete its four steps in order and end it; then 30 steps;
+    /// 32. tutorial "Springs and energy": the tutorial started, the spring chain opened and force arrows shown complete
+    ///    its first two steps; 360 steps (3 s) running complete the last one and end it;
+    /// 33. schema-3 migration: the A11-P03 actions the stored schema-3 example was saved after (two drops, a pin, a
+    ///    selection, a grab, velocity arrows, half speed, pause), 30 paused steps, then running for 60 steps; the
+    ///    stored example (`schemaThreeExample()`) restores through the step 3 → 4 to the same world and generator,
+    ///    origin free play, the world without grab and selection as the starting world and no tutorial.
     public static var fixtureEntries: [[ScenarioStep]] {
         func act(_ control: String, _ values: [Double] = [], steps: Int = 0,
                  result: String = "accepted") -> ScenarioStep {
@@ -282,6 +315,19 @@ extension PlaygroundCore {
             [act("overlay.velocity", [1]), act("overlay.forces", [1]), act("overlay.velocity", [0], steps: 60),
              ScenarioStep(steps: 60)],
             schemaTwoExampleActions.map { act($0.control, $0.values) }
+                + [act("world.pause", [0], steps: 30), ScenarioStep(steps: 60)],
+            [act("experiment.preset", [Double(PresetID.pendulum.rawValue)]), ScenarioStep(steps: presetSteps)],
+            [act("experiment.preset", [Double(PresetID.springChain.rawValue)]), ScenarioStep(steps: settleSteps)],
+            [act("experiment.preset", [Double(PresetID.stackedObjects.rawValue)]), ScenarioStep(steps: presetSteps)],
+            [act("experiment.preset", [Double(PresetID.pendulum.rawValue)]), act("edit.select", [1], steps: 60),
+             act("edit.nudge", [1, 0]), act("world.timeScale", [0]), act("world.drop", [0]),
+             act("world.pause", [1], steps: 40), act("world.step"), act("world.step"), act("world.stiffness", [3]),
+             act("world.gravity", [1]), act("world.reset")],
+            [act("tutorial.start", [0]), act("world.pause", [1], steps: 10), act("world.step"),
+             act("world.timeScale", [1]), act("world.reset"), ScenarioStep(steps: 30)],
+            [act("tutorial.start", [1]), act("experiment.preset", [Double(PresetID.springChain.rawValue)]),
+             act("overlay.forces", [1]), ScenarioStep(steps: Tutorials.runTicks)],
+            schemaThreeExampleActions.map { act($0.control, $0.values) }
                 + [act("world.pause", [0], steps: 30), ScenarioStep(steps: 60)],
         ]
     }

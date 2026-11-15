@@ -19,6 +19,13 @@
 // velocity, the pinned circle bit-identical under impacts for 1,000 steps with every number finite, the unpinned
 // circle falling, the deleted bodies gone with their springs and the selection, the nudged selection, the overlays
 // changing nothing but their flags, and the stored schema-2 example restoring to the fixture's world.
+//
+// Feature 085 (A11-P04) T-A11-404 (FR-A11-430; SC-A11-401, SC-A11-403, SC-A11-404, SC-A11-405; research D5):
+// thirty-three fixtures and schema 4; the rejection scenario's `a11.no-tutorial` and fractional preset and tutorial refusals;
+// fixtures 27–33 ending in the states they name: the pendulum swinging with its energy within 5 %, the spring chain's
+// energy never rising by more than 0.5 % between seconds and ending below its start, the stack standing, reset
+// returning to the pendulum exactly, both tutorials completed and ended, and the stored schema-3 example restoring to
+// the fixture's world and generator with origin free play.
 import Foundation
 import Testing
 @testable import PhysicsPlaygroundExperience
@@ -64,20 +71,21 @@ private func stepped(_ entries: [ScenarioStep], seed: UInt64 = PlaygroundCore.ma
 }
 
 @Suite struct PlaygroundManifestTests {
-    @Test func theManifestIsValidWithTheNineStandardScenariosAndTwentySixFixtures() throws {
+    @Test func theManifestIsValidWithTheNineStandardScenariosAndThirtyThreeFixtures() throws {
         let manifest = PlaygroundCore.manifest(for: id)
         let problems = ScenarioManifestValidator.problems(manifest, controls: PlaygroundCore.controls,
-                                                          content: ContentRequirement(fixtures: 26))
+                                                          content: ContentRequirement(fixtures: 33))
         #expect(problems.isEmpty, "\(problems)")
         #expect(Set(manifest.scenarios.map(\.name))
-                == Set(ScenarioManifest.standardNames).union((1...26).map { "fixture-\($0)" }))
+                == Set(ScenarioManifest.standardNames).union((1...33).map { "fixture-\($0)" }))
         let used = Set(manifest.scenarios.flatMap { $0.entries.compactMap { $0.action?.control } })
         #expect(used.isSuperset(of: ["world.gravity", "world.drag", "world.stiffness"]), "the level actions are played")
         #expect(used == Set(PlaygroundCore.actionIDs), "every action is played")
         let rejection = try #require(manifest.scenarios.first { $0.name == "rejection" })
         let codes = Set(rejection.entries.compactMap(\.result))
         for rule in [PlaygroundRule.noRoom, PlaygroundRule.unknownBody, PlaygroundRule.notGrabbable,
-                     PlaygroundRule.noGrab, PlaygroundRule.staticBody, PlaygroundRule.noSelection] {
+                     PlaygroundRule.noGrab, PlaygroundRule.staticBody, PlaygroundRule.noSelection,
+                     PlaygroundRule.noTutorial] {
             #expect(codes.contains("action.rule." + rule), "the rejection scenario refuses with \(rule)")
         }
         #expect(manifest.kind == .creative)
@@ -107,7 +115,7 @@ private func stepped(_ entries: [ScenarioStep], seed: UInt64 = PlaygroundCore.ma
         let seed = PlaygroundCore.manifestSeed
         let fixtures = PlaygroundCore.fixtureEntries
         let catalog = PlaygroundCore.catalog
-        #expect(fixtures.count == 26)
+        #expect(fixtures.count == 33)
         #expect(PlaygroundCore(seed: seed).world.bodies.count == PlaygroundCore.startingBodies)
 
         // 1. Free fall: the dropped circle falls under gravity for 1 s.
@@ -418,11 +426,95 @@ private func stepped(_ entries: [ScenarioStep], seed: UInt64 = PlaygroundCore.ma
         let upgraded = try PlaygroundCore.migrations.migrate(object, from: 2)
         var migrated = try PlaygroundCore.restore(
             payload: JSONSerialization.data(withJSONObject: upgraded, options: [.sortedKeys]), seed: seed)
-        #expect(migrated == paused26, "the same world and generator")
+        #expect(migrated.world == paused26.world && migrated.generator == paused26.generator,
+                "the same world and generator")
         _ = migrated.apply(ExperienceAction(control: "world.pause", values: [0], step: 0))
         for step in 0..<60 { migrated.update(step: step) }
         let played26 = PlaygroundCore.played(seed: seed, entries: fixtures[25])
         #expect(migrated.world == played26.world && played26.world.tick == 30)
+    }
+
+    /// T-A11-404 (FR-A11-430; SC-A11-401, SC-A11-403, SC-A11-404): fixtures 27–33 end in the states they name.
+    @Test func theExperimentFixturesEndInTheStatesTheyName() throws {
+        let seed = PlaygroundCore.manifestSeed
+        let fixtures = PlaygroundCore.fixtureEntries
+        let catalog = PlaygroundCore.catalog
+        func energy(_ core: PlaygroundCore) -> Double { WorldDiagnostics.totalEnergy(core.world, catalog: catalog) }
+
+        // 27. Pendulum: the bob swings; without drag the total energy stays within 5 % of the start.
+        let pendulumStart = PlaygroundCore.played(seed: seed, entries: Array(fixtures[26].prefix(1)))
+        #expect(pendulumStart.origin == .preset(PresetID.pendulum.rawValue))
+        #expect(pendulumStart.world == pendulumStart.startingWorld)
+        let start27 = energy(pendulumStart)
+        let pendulum = stepped(fixtures[26]) { core in
+            #expect(abs(energy(core) - start27) <= 0.05 * abs(start27))
+        }
+        #expect(pendulum.world.tick == PlaygroundCore.presetSteps)
+        let bob = try #require(pendulum.world.bodies.first { $0.id == 1 })
+        #expect(bob.position != pendulumStart.world.bodies[1].position, "the bob swings")
+
+        // 28. Spring chain: energy sampled each second never rises by more than 0.5 % and ends below its start.
+        let chainStart = PlaygroundCore.played(seed: seed, entries: Array(fixtures[27].prefix(1)))
+        var samples = [energy(chainStart)]
+        let chain = stepped(fixtures[27]) { core in
+            if core.world.tick > 0, core.world.tick.isMultiple(of: 120) { samples.append(energy(core)) }
+        }
+        #expect(samples.count == 11)
+        for (before, after) in zip(samples, samples.dropFirst()) {
+            #expect(after - before <= 0.005 * abs(before), "\(before) → \(after)")
+        }
+        #expect(try #require(samples.last) < samples[0])
+        #expect(chain.world.springs.count == Presets.chainCount && chain.world.isFinite)
+
+        // 29. Stacked objects: the stack stands on the floor.
+        let stack = PlaygroundCore.played(seed: seed, entries: fixtures[28])
+        #expect(stack.origin == .preset(PresetID.stackedObjects.rawValue))
+        for (index, body) in stack.world.bodies.enumerated() {
+            #expect(abs(body.position.x - Presets.stackX) < 0.05, "box \(index) stays in the stack")
+            #expect(abs(body.position.y - Presets.stackHalfSize * Double(2 * index + 1)) < 0.05)
+        }
+
+        // 30. Reset to the experiment after edits and time controls.
+        let beforeReset = PlaygroundCore.played(seed: seed, entries: Array(fixtures[29].dropLast()))
+        #expect(beforeReset.world.paused && beforeReset.world.bodies.count == 3 && beforeReset.world.gravityLevel == 1)
+        let reset = PlaygroundCore.played(seed: seed, entries: fixtures[29])
+        #expect(reset.world == reset.startingWorld)
+        #expect(reset.world == PlaygroundCore.played(seed: seed, entries: Array(fixtures[29].prefix(1))).world)
+        #expect(!reset.world.paused && reset.world.timeScaleIndex == PhysicsWorld.normalTimeScaleIndex)
+        #expect(reset.world.grab == nil && reset.world.selectedId == nil)
+
+        // 31. "Controlling time" completes through its actions, step by step.
+        for (count, step) in [(1, 0), (2, 1), (3, 2), (4, 3)] {
+            let partial = PlaygroundCore.played(seed: seed, entries: Array(fixtures[30].prefix(count)))
+            #expect(partial.tutorial?.tutorial == 0 && partial.tutorial?.step == step, "after \(count) entries")
+        }
+        let time = PlaygroundCore.played(seed: seed, entries: fixtures[30])
+        #expect(time.tutorial == nil && time.world.tick == 30)
+
+        // 32. "Springs and energy" completes when the chain opens, the arrows show and 3 s pass.
+        let opened = PlaygroundCore.played(seed: seed, entries: Array(fixtures[31].prefix(3)))
+        #expect(opened.tutorial == TutorialProgress(tutorial: 1, step: 2, startTick: 0))
+        let springs = PlaygroundCore.played(seed: seed, entries: fixtures[31])
+        #expect(springs.tutorial == nil && springs.world.showForces && springs.world.tick == Tutorials.runTicks)
+
+        // 33. Schema-3 migration: the stored example restores to the fixture's world and generator, free play.
+        let count = PlaygroundCore.schemaThreeExampleActions.count
+        let paused33 = PlaygroundCore.played(seed: seed, entries: Array(fixtures[32].prefix(count)))
+        #expect(paused33.world.paused && paused33.world.tick == 0 && paused33.world.grab != nil)
+        let example = try #require(PlaygroundCore.schemaThreeExample(seed: seed))
+        let snapshot = try ExperienceSnapshot(data: example.snapshot)
+        #expect(snapshot.schemaVersion == 3 && snapshot.seed == seed)
+        let object = try #require(try JSONSerialization.jsonObject(with: Data(snapshot.payload.utf8)) as? [String: Any])
+        let upgraded = try PlaygroundCore.migrations.migrate(object, from: 3)
+        var migrated = try PlaygroundCore.restore(
+            payload: JSONSerialization.data(withJSONObject: upgraded, options: [.sortedKeys]), seed: seed)
+        #expect(migrated.world == paused33.world && migrated.generator == paused33.generator)
+        #expect(migrated.origin == .freePlay && migrated.tutorial == nil)
+        #expect(migrated.startingWorld == ExperimentDocument.withoutEditing(paused33.world))
+        _ = migrated.apply(ExperienceAction(control: "world.pause", values: [0], step: 0))
+        for step in 0..<60 { migrated.update(step: step) }
+        let played33 = PlaygroundCore.played(seed: seed, entries: fixtures[32])
+        #expect(migrated.world == played33.world && played33.world.tick == 30)
     }
 
     /// The JSON form with the control ids, named by `Catalog/registrations.json`. `UPDATE_SCENARIO_MANIFEST=1`
