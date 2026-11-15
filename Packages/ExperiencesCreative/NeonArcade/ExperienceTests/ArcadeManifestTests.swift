@@ -4,6 +4,10 @@
 // what the engine gives when the runner plays them, the fixtures ending in the states they name, and the committed
 // `scenario-manifest.json` equal to the Swift manifest (`UPDATE_SCENARIO_MANIFEST=1`, on the simulator
 // `TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`, rewrites it).
+// Feature 076 (A10-P02) T-A10-204 (FR-A10-221; SC-A10-206; research D5): fixtures 8–11 — wave progression through
+// waves 1–4, the wall gap (rows of four with exactly one free lane, never the previous one), background/resume in wave
+// 3 (the paused steps change nothing and the resume equals the unpaused run) and the Phase 01 migration (the stored
+// schema-1 example restored, then 60 steps).
 import Foundation
 import Testing
 @testable import NeonArcadeExperience
@@ -30,13 +34,13 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
 }
 
 @Suite struct ArcadeManifestTests {
-    @Test func theManifestIsValidWithTheNineStandardScenariosAndSevenFixtures() {
+    @Test func theManifestIsValidWithTheNineStandardScenariosAndElevenFixtures() {
         let manifest = ArcadeCore.manifest(for: id)
         let problems = ScenarioManifestValidator.problems(manifest, controls: ArcadeCore.controls,
-                                                          content: ContentRequirement(fixtures: 7))
+                                                          content: ContentRequirement(fixtures: 11))
         #expect(problems.isEmpty, "\(problems)")
         #expect(Set(manifest.scenarios.map(\.name))
-                == Set(ScenarioManifest.standardNames).union((1...7).map { "fixture-\($0)" }))
+                == Set(ScenarioManifest.standardNames).union((1...11).map { "fixture-\($0)" }))
         #expect(manifest.kind == .creative)
         #expect(manifest.experience == id)
     }
@@ -63,7 +67,7 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
     @Test func theFixturesEndInTheStatesTheyName() throws {
         let seed = ArcadeCore.manifestSeed
         let fixtures = ArcadeCore.fixtureEntries
-        #expect(fixtures.count == 7)
+        #expect(fixtures.count == 11)
 
         // 1. Replay: twelve recorded inputs over 1,200 steps; two plays give the same score, lives and events.
         #expect(fixtures[0].compactMap(\.action).count == 12)
@@ -79,7 +83,8 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
         #expect(fixtures[1] == fixtures[0])
         #expect(ArcadeCore.played(seed: seed, entries: fixtures[1]) == replayA)
 
-        // 3. Swept hit: a falling hazard hits the player; one life is lost and invulnerability started.
+        // 3. Swept hit (steering half left): a falling hazard hits the player; one life is lost and invulnerability
+        // started.
         let hit = ArcadeCore.played(seed: seed, entries: fixtures[2]).run
         let hits = hit.events.filter { $0.kind == .hit }
         #expect(!hits.isEmpty, "a hazard hits the player")
@@ -132,6 +137,113 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
         }
         #expect(core.run.validate().isEmpty)
         #expect(core == ArcadeCore.played(seed: seed, entries: fixtures[6]))
+    }
+
+    /// The core prepared with `seed` after `entries`, recording the pattern of every wave it reaches (wave 1 first).
+    private func patterns(seed: UInt64, entries: [ScenarioStep]) -> (core: ArcadeCore, patterns: [String]) {
+        var core = ArcadeCore(seed: seed)
+        var patterns = [core.run.patternId]
+        var step = 0
+        for entry in entries {
+            for _ in 0..<max(0, entry.steps) {
+                core.update(step: step)
+                step += 1
+                if core.run.wave > patterns.count { patterns.append(core.run.patternId) }
+            }
+            if let action = entry.action {
+                _ = core.apply(ExperienceAction(control: action.control, values: action.values, step: step))
+                if action.control == "run.restart" { patterns = [core.run.patternId] }
+            }
+        }
+        return (core, patterns)
+    }
+
+    @Test func theWaveFixturesEndInTheStatesTheyName() throws {
+        let seed = ArcadeCore.manifestSeed
+        let fixtures = ArcadeCore.fixtureEntries
+
+        // 8. Wave progression: 1,900 steps alive through waves 1–4, each pattern other than the one before.
+        #expect(fixtures[7].reduce(0) { $0 + $1.steps } == ArcadeCore.waveSteps)
+        #expect(fixtures[7].compactMap(\.action).count == ArcadeCore.waveInputs.count)
+        let progression = patterns(seed: seed, entries: fixtures[7])
+        let wave4 = progression.core.run
+        #expect(!wave4.over && wave4.lives > 0, "the run lives through four waves")
+        #expect(wave4.step == 1_900 && wave4.wave == 4 && wave4.waveStep == 100)
+        #expect(progression.patterns == ["rain", "orb-trail", "wall", "rain"], "\(progression.patterns)")
+        for (a, b) in zip(progression.patterns, progression.patterns.dropFirst()) { #expect(a != b) }
+        #expect(wave4.validate().isEmpty)
+        #expect(progression.core == ArcadeCore.played(seed: seed, entries: fixtures[7]))
+        #expect(wave4.score >= wave4.step / GameSimulation.survivalInterval, "survival points at least")
+
+        // 9. Wall gap: after the restart at step 31 the new run's wave 2 is `wall`; at its end two rows of four
+        // spike-balls of radius 0.5, one shared speed each, at the lane centres, each with one free lane, the second's
+        // not the first's and equal to the run's.
+        #expect(fixtures[8].first?.action?.control == "run.restart")
+        #expect(fixtures[8].first?.steps == ArcadeCore.wallRestartSteps)
+        let wall = patterns(seed: seed, entries: fixtures[8])
+        let wallRun = wall.core.run
+        #expect(wall.patterns == ["rain", "wall"], "\(wall.patterns)")
+        #expect(patterns(seed: seed, entries: [ScenarioStep(steps: 800)]).patterns[1] != "wall",
+                "without the restart wave 2 of seed 7 is not a wall")
+        #expect(wallRun.step == ArcadeCore.wallSteps && wallRun.wave == 2 && wallRun.patternId == "wall")
+        #expect(!wallRun.over)
+        let spikes = wallRun.objects.filter { $0.contentId == "spike-ball" && $0.radius == WaveDirector.wallRadius }
+        var rows: [Double: [FallingObject]] = [:]
+        for object in spikes { rows[object.position.y, default: []].append(object) }
+        let ordered = rows.values.filter { $0.count == Lanes.count - 1 }
+            .sorted { $0[0].position.y < $1[0].position.y }   // oldest row (lowest) first
+        try #require(ordered.count == 2, "two wall rows in wave 2 by step 800")
+        var freeLanes: [Int] = []
+        for row in ordered {
+            #expect(Set(row.map(\.velocity.y)).count == 1, "one shared speed per row")
+            let lanes = row.compactMap { object in Lanes.centres.firstIndex { abs($0 - object.position.x) < 1e-12 } }
+            #expect(lanes.count == row.count, "every spike-ball at a lane centre")
+            let free = Set(0..<Lanes.count).subtracting(lanes)
+            #expect(free.count == 1, "exactly one free lane")
+            freeLanes.append(contentsOf: free)
+        }
+        #expect(freeLanes.count == 2 && freeLanes[0] != freeLanes[1], "never the same free lane twice in a row")
+        #expect(freeLanes.last == wallRun.freeLane)
+
+        // 10. Background/resume in wave 3: the paused steps change nothing; the resume equals the unpaused run.
+        let pausedAt = fixtures[9].firstIndex { $0.action?.control == "run.pause" && $0.action?.values == [1] }
+        let pauseIndex = try #require(pausedAt)
+        let atPause = ArcadeCore.played(seed: seed, entries: Array(fixtures[9].prefix(pauseIndex + 1)))
+        #expect(atPause.run.wave == 3 && atPause.run.patternId == "wall" && atPause.run.paused)
+        #expect(atPause.run.step == ArcadeCore.waveThreeSteps && !atPause.run.over)
+        var beforeResume = fixtures[9].prefix(pauseIndex + 2)
+        beforeResume[pauseIndex + 1] = ScenarioStep(steps: beforeResume[pauseIndex + 1].steps)
+        #expect(ArcadeCore.played(seed: seed, entries: Array(beforeResume)) == atPause,
+                "300 paused steps change nothing")
+        let resumed = ArcadeCore.played(seed: seed, entries: fixtures[9])
+        let unpaused = ArcadeCore.played(seed: seed, entries: ArcadeCore.steeringEntries(
+            ArcadeCore.waveInputs, steps: ArcadeCore.waveThreeSteps + 60))
+        #expect(resumed == unpaused, "no catch-up: the resume continues from the paused step")
+        #expect(resumed.run.wave == 3 && resumed.run.step == ArcadeCore.waveThreeSteps + 60)
+
+        // 11. Phase 01 migration: the fixture plays the run the schema-1 example was saved from; the stored example
+        // restores to that run's step, score, lives, player and objects at wave 1, wave step 0, and plays 60 steps on.
+        #expect(fixtures[10].reduce(0) { $0 + $1.steps }
+                == ArcadeCore.schemaOneExampleSteps + ArcadeCore.migrationSteps)
+        let source = ArcadeCore.played(seed: seed, entries: ArcadeCore.steeringEntries(
+            ArcadeCore.schemaOneExampleInputs, steps: ArcadeCore.schemaOneExampleSteps))
+        let example = try #require(ArcadeCore.schemaOneExample(seed: seed))
+        let snapshot = try ExperienceSnapshot(data: example.snapshot)
+        let object = try #require(try JSONSerialization.jsonObject(with: Data(snapshot.payload.utf8)) as? [String: Any])
+        let upgraded = try ArcadeCore.migrations.migrate(object, from: 1)
+        var migrated = try ArcadeCore.restore(
+            payload: JSONSerialization.data(withJSONObject: upgraded, options: [.sortedKeys]), seed: seed)
+        #expect(migrated.run.schema == GameRun.currentSchema)
+        #expect(migrated.run.step == source.run.step && migrated.run.score == source.run.score)
+        #expect(migrated.run.lives == source.run.lives && migrated.run.player == source.run.player)
+        #expect(migrated.run.objects == source.run.objects && migrated.generator == source.generator)
+        #expect(migrated.run.wave == 1 && migrated.run.waveStep == 0 && migrated.run.patternId == "rain")
+        for step in 0..<ArcadeCore.migrationSteps { migrated.update(step: ArcadeCore.schemaOneExampleSteps + step) }
+        #expect(migrated.run.validate().isEmpty)
+        #expect(migrated.run.step == ArcadeCore.schemaOneExampleSteps + ArcadeCore.migrationSteps)
+        #expect(migrated.run.waveStep == ArcadeCore.migrationSteps)
+        let played = ArcadeCore.played(seed: seed, entries: fixtures[10]).run
+        #expect(played.step == migrated.run.step && played.validate().isEmpty)
     }
 
     /// The JSON form with the control ids, named by `Catalog/registrations.json`. `UPDATE_SCENARIO_MANIFEST=1`

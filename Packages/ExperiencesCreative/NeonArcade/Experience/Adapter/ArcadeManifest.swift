@@ -4,6 +4,12 @@
 // the run, so the expected digests are derived by playing the entries on a core exactly as the engine plays them (the
 // steps of an entry, then its action) and digesting it with the experience id as domain, as Digital Aquarium's
 // manifest does. The properties themselves are proved by the tests named with each fixture.
+// Fixtures 8–11 — feature 076 (A10-P02) T-A10-204 (FR-A10-221; SC-A10-206; research D5): wave progression, the wall
+// gap, background/resume in wave 3 and the Phase 01 migration. The waves' pattern order depends only on the seed and
+// the restarts (every spawn makes the same draws whatever the player does), so steering never changes which pattern a
+// wave plays; the steering inputs of fixtures 8 and 10 were chosen so the run survives to the waves they name. Fixtures
+// 1–7 keep their entries except fixture 3 (steering half left; half right no longer meets a hazard); their digests
+// changed with the waves.
 #if DEBUG || VISUALCORE_AUTOMATION
 import NeonArcadeCore
 import VisualCoreExperience
@@ -21,6 +27,35 @@ extension ArcadeCore {
 
     /// The number of steps the replay fixture plays.
     public static let replaySteps = 1_200
+
+    /// The steering inputs of the wave progression fixture (8): (step, value); with them the run of seed 7 lives
+    /// through waves 1–4 (rain, orb-trail, wall, rain).
+    public static let waveInputs: [(step: Int, value: Double)] = [(300, 0.5), (660, -1.0), (1680, 0.5), (1740, -1.0)]
+    /// The steps of the wave progression fixture (wave 4 begins at step 1,800).
+    public static let waveSteps = 1_900
+    /// The steps before the restart of the wall gap fixture (9): the first spawn's draws (step 30) shift the
+    /// generator so that the next run's wave 2 plays `wall` with seed 7.
+    public static let wallRestartSteps = 31
+    /// The steps the wall gap fixture plays after its restart (wave 2 from step 600, rows at 630 and 750).
+    public static let wallSteps = 800
+    /// The steps of the background/resume fixture (10) before its pause: inside wave 3 (steps 1,200…1,799).
+    public static let waveThreeSteps = 1_300
+    /// The steps the migration fixture (11) plays after the 120 steps the schema-1 example was saved after.
+    public static let migrationSteps = 60
+
+    /// `inputs` as scenario entries: the steps up to each input, the `run.steer` action, and the steps left up to
+    /// `steps`.
+    public static func steeringEntries(_ inputs: [(step: Int, value: Double)], steps: Int) -> [ScenarioStep] {
+        var entries: [ScenarioStep] = []
+        var step = 0
+        for input in inputs where input.step <= steps {
+            entries.append(ScenarioStep(steps: input.step - step, action: ScriptedAction("run.steer", [input.value]),
+                                        result: "accepted"))
+            step = input.step
+        }
+        entries.append(ScenarioStep(steps: steps - step))
+        return entries
+    }
 
     /// The actions of input-response, save-restore and reset: steer right, steer half left, pause.
     public static var inputEntries: [ScenarioStep] {
@@ -42,15 +77,7 @@ extension ArcadeCore {
     /// The recorded inputs as scenario entries: the steps up to each input, the `run.steer` action, and the steps
     /// left up to ``replaySteps``.
     public static var replayEntries: [ScenarioStep] {
-        var entries: [ScenarioStep] = []
-        var step = 0
-        for input in recordedInputs {
-            entries.append(ScenarioStep(steps: input.step - step, action: ScriptedAction("run.steer", [input.value]),
-                                        result: "accepted"))
-            step = input.step
-        }
-        entries.append(ScenarioStep(steps: replaySteps - step))
-        return entries
+        steeringEntries(recordedInputs, steps: replaySteps)
     }
 
     /// The core prepared with `seed` after playing `entries` as the engine plays them: each entry's steps, then its
@@ -78,12 +105,13 @@ extension ArcadeCore {
         return builder.finish().hex
     }
 
-    /// The entries of the seven fixtures (research D5):
+    /// The entries of the eleven fixtures (research D5 of features 075 and 076):
     /// 1. replay: the twelve recorded steering inputs over 1,200 steps (`ArcadeManifestTests` plays them twice and
     ///    compares score, lives and the events; `ReplayTests` proves it for three seeds on the bare run);
     /// 2. frame pacing: the same entries — the same digest whatever the frame pacing, because the runner steps the
     ///    engine; the frame-time property (frames of 1/30, 1/60 and 1/120 s) is proved by `ArcadeSessionTests`;
-    /// 3. swept hit: steering half right from the start, then 500 steps, in which a falling hazard hits the player
+    /// 3. swept hit: steering half left from the start (half right until A10-P02, whose lanes let that run pass
+    ///    untouched), then 500 steps, in which a falling hazard hits the player
     ///    (`ArcadeManifestTests` checks the `hit` event; the swept test catching tunnelling at 4–50× the summed radii
     ///    is proved by `Collision2DTests` and `GameSimulationTests`, since an action cannot place a hazard);
     /// 4. save/restore mid-run: the recorded inputs up to step 600 (the test round-trips the state through its snapshot
@@ -94,7 +122,23 @@ extension ArcadeCore {
     ///    names a catalog item; the refusals of malformed catalogs are proved by `ArcadeCatalogTests`);
     /// 7. bounded objects: steering alternating hard left and right every 200 steps over 2,400 steps (at most 24
     ///    objects, the player inside the field and a valid run throughout; 10,000-step runs over 20 seeds are proved
-    ///    by `GameSimulationTests`).
+    ///    by `GameSimulationTests`);
+    /// 8. wave progression (A10-P02): the ``waveInputs`` over 1,900 steps — waves 1–4 (rain, orb-trail, wall, rain)
+    ///    with the run alive (`ArcadeManifestTests` checks the wave, the wave step and the patterns; the difficulty per
+    ///    wave is proved by `DifficultyTests`);
+    /// 9. wall gap: 31 steps, a restart (the generator continues), then 800 steps — the new run's wave 2 is `wall`
+    ///    (with seed 7 its wave 2 is `orb-trail` without the restart); the test checks two rows of four spike-balls of
+    ///    radius 0.5 sharing one speed at the lane centres, each with exactly one free lane, the second's free lane
+    ///    not the first's and equal to the run's (`WaveDirectorTests` proves the rule over many rows);
+    /// 10. background/resume in wave 3: the first two ``waveInputs`` to step 1,300 (wave 3, `wall`), a pause, 300
+    ///     steps that change nothing, the resume and 60 steps — the same state as 1,360 steps played without the pause
+    ///     (`ArcadeSessionTests` suspends a session in wave 3 for several lengths and finds wave, step, objects and
+    ///     score identical);
+    /// 11. Phase 01 migration: the first 120 steps of the recorded replay, as the schema-1 example (`schemaOneExample`)
+    ///     was saved after, then 60 steps. A scenario cannot restore a stored payload, so the fixture plays the run the
+    ///     example was saved from; `ArcadeManifestTests` restores the stored example in an engine, plays the same 60
+    ///     steps and checks the migrated run (wave 1 restarted at wave step 0, score, lives, player and objects kept)
+    ///     advances validly; the registry's migration check (`SnapshotMigrationCheck`) restores the same example.
     public static var fixtureEntries: [[ScenarioStep]] {
         func step(_ control: String, _ values: [Double], steps: Int = 0) -> ScenarioStep {
             ScenarioStep(steps: steps, action: ScriptedAction(control, values), result: "accepted")
@@ -110,12 +154,18 @@ extension ArcadeCore {
         return [
             replay,
             replay,
-            [step("run.steer", [0.5]), ScenarioStep(steps: 500)],
+            [step("run.steer", [-0.5]), ScenarioStep(steps: 500)],
             halfway,
             [step("run.steer", [0.5], steps: 60), step("run.pause", [1]), ScenarioStep(steps: 300)],
             [step("run.steer", [-0.5]), ScenarioStep(steps: 400)],
             (0..<12).map { step("run.steer", [$0 % 2 == 0 ? -1 : 1], steps: $0 == 0 ? 0 : 200) }
                 + [ScenarioStep(steps: 200)],
+            steeringEntries(waveInputs, steps: waveSteps),
+            [ScenarioStep(steps: wallRestartSteps, action: ScriptedAction("run.restart"), result: "accepted"),
+             ScenarioStep(steps: wallSteps)],
+            steeringEntries(waveInputs, steps: waveThreeSteps)
+                + [step("run.pause", [1]), step("run.pause", [0], steps: 300), ScenarioStep(steps: 60)],
+            steeringEntries(schemaOneExampleInputs, steps: schemaOneExampleSteps + migrationSteps),
         ]
     }
 

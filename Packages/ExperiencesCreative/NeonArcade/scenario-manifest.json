@@ -12,7 +12,7 @@
 
       ],
       "expect" : {
-        "initialDigest" : "ae49ad15e841b94888c65d3e3bb2482f0f91b2e58f599a7d14c0e82a8d83360a"
+        "initialDigest" : "85b2279832b0e7821f26d0e123657effd46a64b52d4940c9dc4d6b7298b4cc81"
       },
       "name" : "launch-first-frame",
       "seed" : "7"
@@ -51,8 +51,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "b80f31ed356030b427775a4170ca9008e8efcd943ae585706fd9fc28b01c9f74",
-        "initialDigest" : "ae49ad15e841b94888c65d3e3bb2482f0f91b2e58f599a7d14c0e82a8d83360a"
+        "finalDigest" : "850b726c7f0f400e7a2688da4313849ffe69b6a756c0e11a47f30c50477cef58",
+        "initialDigest" : "85b2279832b0e7821f26d0e123657effd46a64b52d4940c9dc4d6b7298b4cc81"
       },
       "name" : "input-response",
       "seed" : "7"
@@ -159,8 +159,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "b80f31ed356030b427775a4170ca9008e8efcd943ae585706fd9fc28b01c9f74",
-        "initialDigest" : "ae49ad15e841b94888c65d3e3bb2482f0f91b2e58f599a7d14c0e82a8d83360a"
+        "finalDigest" : "850b726c7f0f400e7a2688da4313849ffe69b6a756c0e11a47f30c50477cef58",
+        "initialDigest" : "85b2279832b0e7821f26d0e123657effd46a64b52d4940c9dc4d6b7298b4cc81"
       },
       "name" : "save-restore",
       "seed" : "7"
@@ -199,7 +199,7 @@
         }
       ],
       "expect" : {
-        "initialDigest" : "ae49ad15e841b94888c65d3e3bb2482f0f91b2e58f599a7d14c0e82a8d83360a",
+        "initialDigest" : "85b2279832b0e7821f26d0e123657effd46a64b52d4940c9dc4d6b7298b4cc81",
         "resetDigest" : true
       },
       "name" : "reset",
@@ -363,8 +363,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "55e706e69546e0803875bb25719d08da9a649bf4b71087d3f83b4122a10f5d4b",
-        "initialDigest" : "ae49ad15e841b94888c65d3e3bb2482f0f91b2e58f599a7d14c0e82a8d83360a"
+        "finalDigest" : "459aeb23216dc273cd1abe57e47234ae2ec18df0efdead0f6306e1684ebe93c7",
+        "initialDigest" : "85b2279832b0e7821f26d0e123657effd46a64b52d4940c9dc4d6b7298b4cc81"
       },
       "name" : "fixture-1",
       "seed" : "7"
@@ -496,8 +496,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "55e706e69546e0803875bb25719d08da9a649bf4b71087d3f83b4122a10f5d4b",
-        "initialDigest" : "ae49ad15e841b94888c65d3e3bb2482f0f91b2e58f599a7d14c0e82a8d83360a"
+        "finalDigest" : "459aeb23216dc273cd1abe57e47234ae2ec18df0efdead0f6306e1684ebe93c7",
+        "initialDigest" : "85b2279832b0e7821f26d0e123657effd46a64b52d4940c9dc4d6b7298b4cc81"
       },
       "name" : "fixture-2",
       "seed" : "7"
@@ -508,7 +508,7 @@
           "action" : {
             "control" : "run.steer",
             "values" : [
-              0.5
+              -0.5
             ]
           },
           "result" : "accepted",
@@ -519,8 +519,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "625e31e06977c8f7e9e86774fd0ba1177617e48416e00e14d77754b04a35d7a7",
-        "initialDigest" : "ae49ad15e841b94888c65d3e3bb2482f0f91b2e58f599a7d14c0e82a8d83360a"
+        "finalDigest" : "c12e4af7dfff504de875a60f16baff858740551a5c4029e98818f7515e48a9a0",
+        "initialDigest" : "85b2279832b0e7821f26d0e123657effd46a64b52d4940c9dc4d6b7298b4cc81"
       },
       "name" : "fixture-3",
       "seed" : "7"
@@ -612,8 +612,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "608017790732a27db889b5d9d254c53396f6d37366eb63f5c1b360eee0266007",
-        "initialDigest" : "ae49ad15e841b94888c65d3e3bb2482f0f91b2e58f599a7d14c0e82a8d83360a"
+        "finalDigest" : "bd1ad565d7e7a9e3e45c13210e2d6a8d3e210c27f37b8e20b3d737ed40d005ba",
+        "initialDigest" : "85b2279832b0e7821f26d0e123657effd46a64b52d4940c9dc4d6b7298b4cc81"
       },
       "name" : "fixture-4",
       "seed" : "7"
@@ -645,8 +645,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "5370125dc1a93d70610871a32f1591a62c55c837cd26914973d35b3b60f9514e",
-        "initialDigest" : "ae49ad15e841b94888c65d3e3bb2482f0f91b2e58f599a7d14c0e82a8d83360a"
+        "finalDigest" : "5f6d349c070d2403ed2e10847f50a0ab5c60ee3610d86298f24ecf2c12825e3a",
+        "initialDigest" : "85b2279832b0e7821f26d0e123657effd46a64b52d4940c9dc4d6b7298b4cc81"
       },
       "name" : "fixture-5",
       "seed" : "7"
@@ -668,8 +668,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "4f2b60e1cd3fcbfee4a6684fe043de644e65cde74c9b7d82ac6d21140db0871a",
-        "initialDigest" : "ae49ad15e841b94888c65d3e3bb2482f0f91b2e58f599a7d14c0e82a8d83360a"
+        "finalDigest" : "52bf3bc410cfb42f3f69d05caef739f658ad12892614c0736f4ce9da85113b83",
+        "initialDigest" : "85b2279832b0e7821f26d0e123657effd46a64b52d4940c9dc4d6b7298b4cc81"
       },
       "name" : "fixture-6",
       "seed" : "7"
@@ -801,10 +801,175 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "7e31f631c5965f43ab815c0354c0810bf99ffe6cb84d72f1acf04d1d54be846d",
-        "initialDigest" : "ae49ad15e841b94888c65d3e3bb2482f0f91b2e58f599a7d14c0e82a8d83360a"
+        "finalDigest" : "51729d5a7bd492a3709885f1212e4cf7f5f02f023d8c66cf7a4162ecda22f8c8",
+        "initialDigest" : "85b2279832b0e7821f26d0e123657effd46a64b52d4940c9dc4d6b7298b4cc81"
       },
       "name" : "fixture-7",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 300
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 360
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1020
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 60
+        },
+        {
+          "steps" : 160
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "237ebff9cf2a3bf523c31718f4b06ef225db1f490348a437b847cec6f5e322b2",
+        "initialDigest" : "85b2279832b0e7821f26d0e123657effd46a64b52d4940c9dc4d6b7298b4cc81"
+      },
+      "name" : "fixture-8",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "run.restart",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 31
+        },
+        {
+          "steps" : 800
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9e74e3276deb07ec11b345d0a8cccc5285f89907417c39d0d4a5013b103c8548",
+        "initialDigest" : "85b2279832b0e7821f26d0e123657effd46a64b52d4940c9dc4d6b7298b4cc81"
+      },
+      "name" : "fixture-9",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 300
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 360
+        },
+        {
+          "steps" : 640
+        },
+        {
+          "action" : {
+            "control" : "run.pause",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "run.pause",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 300
+        },
+        {
+          "steps" : 60
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "752c66c4dcf8c72c4d51fb5785189d6ade885228799a86f10a97877a82aa7474",
+        "initialDigest" : "85b2279832b0e7821f26d0e123657effd46a64b52d4940c9dc4d6b7298b4cc81"
+      },
+      "name" : "fixture-10",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              0.59999999999999998
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              -0.29999999999999999
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 45
+        },
+        {
+          "steps" : 135
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "eee2b513d9a31c4e6b0e558b44035b8b0bf069610e286176996ef7eadaaafe01",
+        "initialDigest" : "85b2279832b0e7821f26d0e123657effd46a64b52d4940c9dc4d6b7298b4cc81"
+      },
+      "name" : "fixture-11",
       "seed" : "7"
     }
   ],
