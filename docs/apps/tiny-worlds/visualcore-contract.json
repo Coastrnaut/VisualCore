@@ -356,6 +356,12 @@
       "status": "requires adaptation",
       "evidence": [
         {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshRenderer.swift",
+          "symbol": "MeshRenderer",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
           "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/DepthMeshPass.swift",
           "symbol": "DepthMeshPass.Item",
           "product": "VisualCoreRendering",
@@ -384,7 +390,7 @@
         "file": "Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/MusicLabScenes.swift",
         "symbol": "GeometryMeshes"
       },
-      "notes": "A draw has exactly one premultiplied colour (DepthMeshPass.Item.color; DepthMeshPassTests, MeshRendererTests) and palettes exist (ParametersTests); Mesh carries uvs but MeshRenderer samples no texture, and there is no per-vertex colour or material model in any framework product (grep 2026-11-15). A height-coloured terrain therefore needs either one draw per colour band or a per-vertex colour stream; the generic stream is G-MATERIALS (VisualCoreRendering, A12-P02). The prop catalog (procedural shapes with named palette colours) is G-PROPS (app-local), A12-P03."
+      "notes": "A draw has exactly one premultiplied colour (DepthMeshPass.Item.color; DepthMeshPassTests, MeshRendererTests) and palettes exist (ParametersTests); Mesh carries uvs but MeshRenderer samples no texture, and there is no per-vertex colour or material model in any framework product (grep 2026-11-15). A height-coloured terrain therefore needs either one draw per colour band or a per-vertex colour stream; the generic stream is G-MATERIALS (VisualCoreRendering, A12-P02). The prop catalog (procedural shapes with named palette colours) is G-PROPS (app-local), A12-P03. Since A12-P02 (G-MATERIALS closed): MeshRenderer(mesh:colors:registry:) draws one RGBA per vertex multiplied into the lit colour, pixel-identical without a stream (MeshRendererColorTests, MeshRendererTests, DepthMeshPassTests); Tiny Worlds colours its terrain by height (TerrainColoring). Props remain (G-PROPS)."
     },
     {
       "id": "M06",
@@ -433,8 +439,14 @@
       "id": "M07",
       "capability": "Orbit camera with constrained zoom and comfortable control: per-world pitch, distance and pan limits, the eye kept above the terrain and outside props, eased orbit and zoom that Reduce Motion calms, a reset view and a control alternative for every camera gesture",
       "source": "v0.1 feature 2: orbit camera with constrained zoom; manual algorithm decision 4; spec edge case camera penetration",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitCamera.swift",
+          "symbol": "OrbitCamera",
+          "product": "VisualCoreMath",
+          "public": true
+        },
         {
           "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitViewBounds.swift",
           "symbol": "OrbitViewBounds",
@@ -473,10 +485,10 @@
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/InfiniteGeometry/Experience/Adapter/GeometryCore.swift",
-        "symbol": "GeometryCore"
+        "file": "Packages/ExperiencesCreative/TinyWorlds/Core/CameraPolicy.swift",
+        "symbol": "CameraPolicy"
       },
-      "notes": "Constrained orbit and zoom already exist and are tested (OrbitViewBoundsTests, CameraBoundsTests, EasingTests, GestureAlternativesTests): pitch limit, distance range, pan radius, field-of-view range and a clearance sphere about the origin, used by Infinite Geometry. Missing: a clearance that follows a height field (the eye above terrain plus a margin rather than outside one sphere), per-world limits, and eased camera motion with a Reduce Motion variant. These are the world's camera policy over OrbitViewBounds and the height field's sampler (G-TERRAIN): G-CAMERA (app-local), A12-P02."
+      "notes": "Since A12-P02 (G-CAMERA closed): CameraPolicy keeps pitch 10°…75°, distance 10…30 m and the eye 0.5 m above the highest of 9 terrain samples around it, raising pitch in 1° steps (CameraPolicyTests sweep of 768 views per preset); drag and pinch are sent as view.orbit and view.zoom with control alternatives, eased in the presenter and direct under Reduce Motion."
     },
     {
       "id": "M08",
@@ -684,7 +696,7 @@
         "file": "Packages/ExperiencesCreative/AudioOdyssey/Core/OdysseyQuality.swift",
         "symbol": "OdysseyQuality"
       },
-      "notes": "Segment counts per quality level under a vertex budget (TessellationChoiceTests), streaming levels (StreamingBudgetTests), mesh budgets (MeshBuilderTests), the governor and profiles (QualityGovernorTests, QualityProfileTests) and the process footprint (used by VisualCoreExperienceHostTests/EnduranceTests) exist; no level-of-detail mesh selection or prop and draw caps per tier exist in a framework product. The world's tier table (terrain resolution, prop and draw caps, thumbnail size) and its memory-warning response are G-DETAIL (app-local), A12-P05; Core.qualityTiers must match the presenter's levels."
+      "notes": "Segment counts per quality level under a vertex budget (TessellationChoiceTests), streaming levels (StreamingBudgetTests), mesh budgets (MeshBuilderTests), the governor and profiles (QualityGovernorTests, QualityProfileTests) and the process footprint (used by VisualCoreExperienceHostTests/EnduranceTests) exist; no level-of-detail mesh selection or prop and draw caps per tier exist in a framework product. The world's tier table (terrain resolution, prop and draw caps, thumbnail size) and its memory-warning response are G-DETAIL (app-local), A12-P05; Core.qualityTiers must match the presenter's levels. A12-P02 adds three terrain detail levels (TerrainDetail: full, half, quarter resolution; 27 meshes validate with every index in bounds) declared as quality levels level-0…2; the tier policy under memory, heat and Low Power Mode remains (G-DETAIL, A12-P05)."
     },
     {
       "id": "M12",
@@ -733,8 +745,14 @@
       "id": "M13",
       "capability": "Picking geometry separate from the visual meshes: coarse boxes or spheres per prop and the terrain's height field hit by a camera ray, nearest hit first, independent of the detail tier",
       "source": "cross-cutting: picking; manual algorithm decision 3",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/RayIntersection.swift",
+          "symbol": "Ray3",
+          "product": "VisualCoreMath",
+          "public": true
+        },
         {
           "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitCamera.swift",
           "symbol": "OrbitCamera.ray",
@@ -761,10 +779,10 @@
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/InfiniteGeometry/Experience/Adapter/GeometryCore.swift",
-        "symbol": "GeometryCore"
+        "file": "Packages/ExperiencesCreative/TinyWorlds/Core/GroundPick.swift",
+        "symbol": "GroundPick"
       },
-      "notes": "The camera ray and projection (OrbitCameraTests) and axis-aligned bounds with point containment (MeshBoundsTests) exist; no ray-box, ray-sphere or ray-triangle intersection exists in any framework product (grep 2026-11-15). Ray intersection against simple shapes is generic: G-PICKING (VisualCoreMath upstream), A12-P02; the ray against the terrain uses G-TERRAIN's height sampler."
+      "notes": "Since A12-P02 (G-PICKING closed): Ray3 intersects boxes, spheres and triangles (RayIntersectionTests, analytic within 1e-9); Tiny Worlds resolves a tap on the ground by marching and bisecting over the height field (GroundPickTests within 1 mm), separate from the drawn meshes."
     },
     {
       "id": "M14",
@@ -1132,7 +1150,7 @@
       "justification": "Found in A12-P00: a draw has exactly one colour and no per-vertex colour or material model exists in any framework product. An optional per-vertex colour stream drawn by MeshRenderer and DepthMeshPass (Lambert lighting and fog unchanged, existing meshes and digests unchanged when absent) lets a terrain be coloured by height or slope in one draw and is generic, so it belongs to VisualCore where generic (clarification 5, A12-P02); named surface palettes stay in the experience.",
       "phase": 2,
       "test": "Host and simulator tests: a mesh with vertex colours renders each region in its colour under the same light within a pixel tolerance; a mesh without colours renders exactly as before (MeshRendererTests and DepthMeshPassTests unchanged); colour streams of the wrong length are refused; context recreation rebuilds the stream; API baseline additive and the reference regression passes at the X gate",
-      "closed": null
+      "closed": "A12-P02"
     },
     {
       "id": "G-PICKING",
@@ -1145,7 +1163,7 @@
       "justification": "Found in A12-P00: OrbitCamera.ray exists but no ray-box, ray-sphere or ray-triangle intersection exists in any framework product. Ray intersection against simple picking shapes (nearest hit distance and normal) is generic geometry and belongs to VisualCoreMath (clarification 5, A12-P02); which shapes stand for which prop and the ground hit over G-TERRAIN's height sampler stay in the experience.",
       "phase": 2,
       "test": "Host tests: rays hit boxes, spheres and triangles at the analytic distance and normal, including grazing, inside-start and parallel cases; misses return nil; the nearest of several hits wins; a ray through OrbitCamera.ray at the screen centre hits the target's box; NaN/Inf rays rejected; API baseline additive and the reference regression passes at the X gate",
-      "closed": null
+      "closed": "A12-P02"
     },
     {
       "id": "G-CAMERA",
@@ -1157,7 +1175,7 @@
       "justification": "Constrained orbit and zoom already exist in VisualCoreMath (OrbitBounds, OrbitViewBounds with pitch limit, distance range, pan radius, field-of-view range and clearance sphere, tested). What remains is the world's camera policy: per-world limits, keeping the eye above its own terrain and props through G-TERRAIN's height sampler, eased motion with a Reduce Motion variant, a reset view and control alternatives (clarification 5 allows app-local where not generic).",
       "phase": 2,
       "test": "Host tests: every orbit, zoom and pan step returns a camera inside the world's bounds; the eye stays at least the stated margin above the terrain at every yaw and pitch of a sampled sweep; extreme pinches saturate at the limits; the reset view restores the preset camera; eased motion is replaced by direct moves under Reduce Motion; every camera gesture has a control alternative (GestureAlternatives.missing is empty); the spoken camera description is rate-limited",
-      "closed": null
+      "closed": "A12-P02"
     },
     {
       "id": "G-PROPS",

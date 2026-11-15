@@ -1415,6 +1415,9 @@ VisualCoreMath | func | public func fold(_ p: Vec2) -> Vec2
 VisualCoreMath | func | public func framing(at t: Double, curve: EasingCurve = .sine) -> PlaneFraming
 VisualCoreMath | func | public func images(of p: Vec2) -> [Vec2]
 VisualCoreMath | func | public func images(of p: Vec2, rings: Int) -> [Vec2]
+VisualCoreMath | func | public func intersect(boxMin: Vec3, boxMax: Vec3) -> RayHit3?
+VisualCoreMath | func | public func intersect(sphereCenter: Vec3, radius: Double) -> RayHit3?
+VisualCoreMath | func | public func intersect(triangle a: Vec3, _ b: Vec3, _ c: Vec3) -> RayHit3?
 VisualCoreMath | func | public func local(_ p: Vec3) -> SIMD3<Float>
 VisualCoreMath | func | public func minimumDistance(for camera: OrbitCamera) -> Double
 VisualCoreMath | func | public func minimumTurnRadius() -> Double
@@ -1482,6 +1485,7 @@ VisualCoreMath | func | public static func hash21(_ x: Float, _ y: Float) -> Flo
 VisualCoreMath | func | public static func hash22(_ x: Float, _ y: Float) -> (Float, Float)
 VisualCoreMath | func | public static func lookAt(eye: Vec3, target: Vec3, up: Vec3) -> Mat4
 VisualCoreMath | func | public static func minimumPixelStep(mantissaBits: Int, magnitude: Double) -> Double
+VisualCoreMath | func | public static func nearest(_ hits: [RayHit3?]) -> RayHit3?
 VisualCoreMath | func | public static func normalizedAngle(_ radians: Double) -> Double
 VisualCoreMath | func | public static func pcg(_ v: UInt32) -> UInt32
 VisualCoreMath | func | public static func perspective(fovY: Double, aspect: Double, near: Double, far: Double) -> Mat4
@@ -1522,9 +1526,11 @@ VisualCoreMath | init | public init(target: Vec3 = .zero, distance: Double = 5, 
 VisualCoreMath | init | public init(x: Double, y: Double, z: Double, w: Double)
 VisualCoreMath | init | public init(zoomRange: ClosedRange<Double>, extent: Double)
 VisualCoreMath | init | public init?(controlPoints: [Vec3], samplesPerSpan: Int = 64)
+VisualCoreMath | init | public init?(origin: Vec3, direction: Vec3)
 VisualCoreMath | let | public let center: Vec2
 VisualCoreMath | let | public let controlPoints: [Vec3]
 VisualCoreMath | let | public let direction: Vec3
+VisualCoreMath | let | public let distance: Double
 VisualCoreMath | let | public let flightDuration: Double
 VisualCoreMath | let | public let framing: PlaneFraming
 VisualCoreMath | let | public let from: PlaneFraming
@@ -1532,7 +1538,10 @@ VisualCoreMath | let | public let hold: Double
 VisualCoreMath | let | public let level: Level
 VisualCoreMath | let | public let margin: Double
 VisualCoreMath | let | public let minimumPixelStep: Double
+VisualCoreMath | let | public let normal: Vec3
+VisualCoreMath | let | public let origin: Vec3
 VisualCoreMath | let | public let phase: Phase
+VisualCoreMath | let | public let point: Vec3
 VisualCoreMath | let | public let position: Vec3
 VisualCoreMath | let | public let reduceMotion: Bool
 VisualCoreMath | let | public let right: Vec3
@@ -1574,6 +1583,8 @@ VisualCoreMath | struct | public struct PlaneViewport: Sendable, Equatable
 VisualCoreMath | struct | public struct Quat: Sendable, Equatable
 VisualCoreMath | struct | public struct RailFlight: Sendable, Equatable, Codable
 VisualCoreMath | struct | public struct RailPose: Sendable, Equatable
+VisualCoreMath | struct | public struct Ray3: Sendable, Equatable
+VisualCoreMath | struct | public struct RayHit3: Sendable, Equatable
 VisualCoreMath | struct | public struct State: Sendable, Equatable
 VisualCoreMath | struct | public struct Status: Sendable, Equatable
 VisualCoreMath | struct | public struct Stop: Sendable, Equatable
@@ -1877,6 +1888,8 @@ VisualCoreRendering | func | public static func viewPoint(_ worldPoint: Vec2, vi
 VisualCoreRendering | func | public static func worldPoint(_ viewPoint: Vec2, viewSize: Vec2, world: WorldRect) -> Vec2?
 VisualCoreRendering | init | public convenience init(bundle: Bundle, subdirectory: String? = "Shaders")
 VisualCoreRendering | init | public convenience init(fragmentName: String, bundle: ShaderBundle)
+VisualCoreRendering | init | public convenience init(mesh: Mesh, colors: [Vec4]?, registry: ResourceRegistry) throws
+VisualCoreRendering | init | public convenience init(mesh: Mesh, registry: ResourceRegistry) throws
 VisualCoreRendering | init | public init()
 VisualCoreRendering | init | public init(center: Vec2, size: Vec2)
 VisualCoreRendering | init | public init(extensionReported: Bool, probeComplete: Bool)
@@ -1884,7 +1897,6 @@ VisualCoreRendering | init | public init(files: [String: String])
 VisualCoreRendering | init | public init(folder: TemporaryFolder)
 VisualCoreRendering | init | public init(fragment: String, fragmentName: String, bundle: ShaderBundle)
 VisualCoreRendering | init | public init(index: Int, time: Double, targetTime: Double)
-VisualCoreRendering | init | public init(mesh: Mesh, registry: ResourceRegistry) throws
 VisualCoreRendering | init | public init(name: String, minimum: Int, reported: Int)
 VisualCoreRendering | init | public init(program: ShaderProgram, state: RenderState)
 VisualCoreRendering | init | public init(rangeMin: Int, rangeMax: Int, precisionBits: Int)

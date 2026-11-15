@@ -137,6 +137,17 @@ bilinear sampler clamped to the grid, normals, and `mesh(budget:)` (one vertex p
 triangles per cell seen from +y, checked against the `MeshBudget` before building; non-finite input is refused with
 `MeshError.invalidInput`). Used by Tiny Worlds (A12) for its preset terrains.
 
+**Ray intersection** (`VisualCoreMath`, feature 090): `Ray3(origin:direction:)` (nil for non-finite values or a zero
+direction; the direction is normalised) intersects an axis-aligned box (slab method), a sphere and a triangle
+(two-sided Möller–Trumbore) and returns the nearest `RayHit3` at distance ≥ 0 with a unit normal facing against the
+ray; a start inside a box or sphere hits at distance 0 with the normal −direction, a tangent ray hits once, and a ray
+parallel to a triangle, a degenerate triangle or an invalid shape gives nil (tolerance 1e-12); `Ray3.nearest` picks
+the closest of several hits. With `OrbitCamera.ray(ndc:aspect:)` it gives picking. **Per-vertex colours**
+(`VisualCoreRendering`, feature 090): `MeshRenderer(mesh:colors:registry:)` takes one RGBA (0…1) per vertex,
+multiplied into the draw colour before lighting (also through `DepthMeshPass`); without colours the attribute is a
+constant 1, so existing pixels are unchanged; a wrong count or a value that is non-finite or outside 0…1 is refused
+with `MeshError.invalidInput`; the stream is rebuilt after a context recreation. Used by Tiny Worlds (A12).
+
 **CPU field references** (`VisualCoreSimulation`, feature 019): a `FieldGrid` is a W×H grid with 1…4 channels,
 row-major from the bottom row up, as in GL. `StoragePrecision` (`float32`, `float16`, `float16TowardZero`, `unorm8`) rounds values the
 way GPU storage does after every step. GLES leaves the rounding of half-float color writes implementation-defined,

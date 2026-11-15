@@ -23,7 +23,7 @@ X-A12 (owner, 2026-11-14). Precedent: `specs/089-tw-p01-terrain/tasks.md`.
 ## Phase 4: Records
 
 - [ ] T-A12-206 Registration and manifest: `Catalog/registrations.json` a12 `quality_tiers` ["level-0", "level-1", "level-2"] and capabilities (coloured terrain, drag and pinch, ground pick, three detail levels); `python3 scripts/build_catalog.py`; regenerate `Packages/ExperiencesCreative/TinyWorlds/scenario-manifest.json` (`UPDATE_SCENARIO_MANIFEST=1 TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`) if the declared tiers change it
-- [ ] T-A12-207 VisualCore records: `Packages/VisualCore/README.md` (ray intersection and colour stream), API baseline (`python3 scripts/check_public_api.py --update`), contract `docs/apps/tiny-worlds/visualcore-contract.json` (G-MATERIALS, G-PICKING, G-CAMERA closed by "A12-P02"; rows M04/M05, M07, M11, M13 updated) (FR-A12-203)
+- [X] T-A12-207 VisualCore records: `Packages/VisualCore/README.md` (ray intersection and colour stream), API baseline (`python3 scripts/check_public_api.py --update`), contract `docs/apps/tiny-worlds/visualcore-contract.json` (G-MATERIALS, G-PICKING, G-CAMERA closed by "A12-P02"; rows M04/M05, M07, M11, M13 updated) (FR-A12-203) — Verified 2026-11-15: 2026-11-15: Packages/VisualCore/README.md ray intersection and per-vertex colour paragraph; API baseline 2,934 lines (.autonomy/checks/A12-P02.public-api.json exit 0, 0 undocumented); contract G-MATERIALS, G-PICKING and G-CAMERA closed by A12-P02, M07 and M13 available, M05 and M11 notes updated (check_app_contract PASS 21 rows, 137 citations, 10 gaps)
 
 ## Phase 5: Polish & evidence
 
