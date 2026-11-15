@@ -25,6 +25,53 @@ Canonical overrides:
 - **Owner rulings:** short tests; audits and device runs in the device campaign; iOS 27 at phase gates; the reference
   regression for the VisualCore change runs at X-A13 (owner ruling 2026-11-14); every Spec Kit step runs.
 
+## Clarifications
+
+### Session 2026-11-15
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+`VisualCoreMath.Vec2` (Double components, dot, scalar cross, length, normalized; no reflect) and `Ray3`/`RayHit3`
+(`init?(origin:direction:)` refuses non-finite or zero directions and normalises; `intersect(boxMin:boxMax:)`,
+`sphereCenter:radius:`, `triangle:`) set the style for the 2D additions; `VisualCoreScenes.Primitive.line(a,b,width:)`,
+`.rect`, `.circle`, `.polygon` and `SceneNode` are drawn by `VisualCoreRendering.PrimitiveRenderer` through a
+`Camera2D`; the experience pattern (Core, CoreTests, Experience with Adapter/, ExperienceTests, scenario manifest,
+candidate registration in `Apps/VisualCore/App/ExperienceRegistry.swift`, `ExperienceShell` with a presenter) is the one
+A12 used at A12-P01; `ContentCatalog`/`LicenseAudit` in Tiny Worlds are the content-license pattern.
+
+- Q: What do the 2D ray and segment cast offer, and with which rules? → A: `Ray2` (`init?(origin:direction:)` refusing
+  non-finite or zero directions, normalising) and `Segment2(a, b)`; `Ray2.cast(against segments: [Segment2], excluding:
+  Int? = nil, minimumDistance: Double = 1e-9) -> RayHit2?` returns the nearest hit with distance > minimumDistance
+  (`distance`, `point`, `segmentIndex`, `normal` unit and facing the ray); parallel or collinear rays miss; end points
+  count as hits; non-finite segments are skipped. `Vec2.reflected(about normal:)` (`d − 2(d·n)n` for a unit normal; a
+  non-unit or zero normal returns the direction unchanged) keeps length; tolerance for the fixture 1e-12 on angles and
+  lengths. In `VisualCoreMath`, files `Ray2.swift`, tests `Ray2Tests`.
+- Q: Which board geometry and tile rules apply? → A: Cells of 1 unit; board 4…12 × 4…12 cells; at most one tile per
+  cell; the beam starts at the emitter cell's centre heading in its direction (east, north, west or south) and travels
+  along the grid; walls are the cell's square (4 segments) and stop the beam; a mirror is the cell's diagonal segment
+  with orientation `/` or `\` (two states), reflecting from both sides; a target is a square of side 0.6 centred in its
+  cell that stops the beam and is lit when hit from any side; a prism (beam splitter) is the cell's diagonal like a
+  mirror (two orientations) that both reflects the beam and lets it pass straight on (two branches); the board's outer
+  edge ends a branch ("left the board"). Only mirrors and prisms turn (orientation toggles); emitters, walls and targets
+  are fixed.
+- Q: Which caps and cycle rule bound the trace? → A: At most 64 bounces per branch, at most 256 segments in total and at
+  most 16 branches; a branch ends on the first repeated state (cell, direction) with the reason "loop"; the end reasons
+  are left-board, wall, target, emitter, loop, bounce-cap, segment-cap. Monochrome only (algorithm decision 3).
+- Q: What makes the 20 levels, their solutions and the license records? → A: 20 levels in a bundled JSON catalog (schema
+  1) — id `lm-01`…`lm-20`, name, size, tiles with kinds, cells and starting orientations, and a recorded solution (the
+  orientation of every turnable tile); levels 1–5 one or two mirrors, 6–15 more mirrors and walls, 16–20 add prisms with
+  two targets; each level's starting state is unsolved and its solution lights every target; author "VisualCore
+  project", license "MIT"; a `LicenseAudit` refuses missing or unsupported licenses and a generated
+  `docs/apps/light-maze/content-licenses.md` is kept equal to the catalog by a test. Beam fixtures pin the solved paths
+  of levels 1, 10 and 20 (segment end points as exact values).
+- Q: Which actions, controls and saved state does the slice have? → A: Actions `level.select [0…19]`, `level.next`,
+  `level.previous`, `tile.select [index of turnable tile]`, `tile.turn` (toggles the selected tile), `level.reset`;
+  refused actions change nothing and are answered with a reason. Native controls for each, with labels and values; the
+  canvas description "Light Maze: level 1, First light; 1 mirror, 1 target; beam ends at the wall; not solved." State
+  schema 1 = level index, orientations of turnable tiles, selection; damaged or newer refused. Drawing: the board in
+  cells through `PrimitiveRenderer` (walls as filled squares, mirrors and prisms as thick diagonal lines, targets as
+  squares that change colour and gain a ring when lit, the emitter as a triangle) and the beam as lines from the
+  tracer's exact segments; quality tiers not yet declared beyond one level.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Turn a mirror and light the target (Priority: P1) 🎯
