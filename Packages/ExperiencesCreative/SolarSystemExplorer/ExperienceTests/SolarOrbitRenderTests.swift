@@ -3,7 +3,7 @@
 // wall-clock assertion): a frame of the overview is non-blank with nine bodies, eight orbit lines and the ring; a
 // date step of +365 days changes the drawn pixels where Jupiter was; focusing a body moves the camera onto it; the
 // camera actions change the view and Reset view brings the first frame back; every listed probe holds across camera
-// states; and nothing is released or remade mid-session (all 37 renderers of feature 105 are the same objects
+// states; and nothing is released or remade mid-session (every level-0 renderer (37; level 1 adds 26 more, A14-P05) of feature 105 are the same objects
 // throughout). A change of focus starts a 30-frame focus flight (A14-P03 FR-A14-320), so a test that judges the focused
 // view draws the flight's frames first; probes are always judged against the camera actually drawn.
 import Foundation

@@ -44,8 +44,8 @@ final class SolarCoreTests: XCTestCase {
         XCTAssertEqual(SolarCore.migrations.currentVersion, 4)
         XCTAssertEqual(SolarRule.invalidStep, "a14.invalid-step")
         XCTAssertEqual(SolarRule.outOfRange, "a14.out-of-range")
-        XCTAssertEqual(SolarCore.qualityTiers, 1)
-        XCTAssertEqual(SolarCore.qualityProfile.levels.count, 1)
+        XCTAssertEqual(SolarCore.qualityTiers, 2)
+        XCTAssertEqual(SolarCore.qualityProfile.levels.count, 2)
         XCTAssertEqual(SolarCore.stepDuration, 1.0 / 120, accuracy: 1e-15)
         XCTAssertEqual(SolarRule.invalidChoice, "a14.invalid-choice")
     }
@@ -390,6 +390,42 @@ final class SolarCoreTests: XCTestCase {
             digests.append(try engine.digest().hex)
         }
         XCTAssertEqual(digests[0], digests[1])
+    }
+
+    /// Truthful labels through the real adapter text (A14-P05, T-A14-502; FR-A14-504; SC-A14-503): 9 bodies × 2 scale
+    /// modes × 3 tour states × 2 play states × 2 stop reasons; every enhanced description says "not to scale" and no
+    /// true-relative description does.
+    func testTheCanvasDescriptionIsTruthfulInAllSampledStates() throws {
+        var enhanced = 0
+        var trueRelative = 0
+        let tours: [Int] = [-1, 0, 1]
+        let flags: [Bool] = [false, true]
+        let reasons: [String] = ["", "end-of-range"]
+        for body in 0..<9 {
+            for mode in ScaleMode.allCases {
+                for tour in tours {
+                    for playing in flags {
+                        for reason in reasons {
+                            let json = "{\"dayOffset\":365,\"pitchDegrees\":35,\"playing\":\(playing),\"rateIndex\":1,"
+                                + "\"scaleMode\":\(mode.rawValue),\"schema\":4,\"selection\":\(body),"
+                                + "\"stopReason\":\"\(reason)\",\"tourIndex\":\(tour),\"tourPaused\":false,"
+                                + "\"tourStep\":0,\"tourStop\":0,\"yawSteps\":0,\"zoomSteps\":0}"
+                            let core = try SolarCore.restore(payload: Data(json.utf8), seed: 1)
+                            let text = core.canvasDescription
+                            if mode == .enhanced {
+                                enhanced += 1
+                                XCTAssertTrue(text.contains("not to scale"), text)
+                            } else {
+                                trueRelative += 1
+                                XCTAssertFalse(text.contains("not to scale"), text)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        XCTAssertEqual(enhanced, 108)
+        XCTAssertEqual(trueRelative, 108)
     }
 
     /// A schema-3 envelope (A14-P03) opens paused with no tour (T-A14-406).

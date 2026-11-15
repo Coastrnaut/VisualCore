@@ -22,7 +22,11 @@
 //     description when the mode changes;
 //   the legend (`legend`): the active mode's label ("Distances and sizes not to scale" or "Distances and sizes to one
 //     scale; small bodies marked"), the status line (`status`: "Earth selected, body 4 of 9") and the answer to a
-//     refused action (`message`, shown only when there is one).
+//     refused action (`message`, shown only when there is one);
+//   "About this model" of feature 107 (A14-P05) T-A14-503 (FR-A14-503; clarification Q3): right after the legend, a
+//     text (`about-model`) with the accessible label "About this model" and the model statement
+//     (`ScientificReview.modelStatement`: an approximate Kepler model from mean elements at J2000.0, 1950 to 2050, not
+//     an ephemeris; enlarged and not to scale in the enhanced view) as its text and accessible value;
 //   the time and tour controls of feature 106 (A14-P04) T-A14-408 (FR-A14-401–403, FR-A14-411, FR-A14-421;
 //     contracts/time-tours.md): the date and time with the clock (`time`: "2000-01-01 12:00 UTC, paused"); Play/Pause
 //     (`play-pause` → `time.play [1 / 0]`, value "Playing at 1 year/s" or "Paused"); the Rate picker (`rate` →
@@ -132,6 +136,15 @@ struct SolarControls: View {
 
     /// The legend: the active mode's label.
     static func legendText(_ mode: ScaleMode) -> String { mode.label }
+
+    /// The accessible label of the model statement ("About this model").
+    static let aboutLabel = "About this model"
+
+    /// The identifier name of the model statement (`about-model`).
+    static let aboutName = "about-model"
+
+    /// The model statement shown under "About this model" (``ScientificReview/modelStatement``).
+    static var aboutText: String { ScientificReview.modelStatement }
 
     /// The controls, or a progress indicator before the first state.
     var body: some View {
@@ -252,6 +265,16 @@ struct SolarControls: View {
                 .accessibilityLabel(Text(verbatim: "Legend"))
                 .accessibilityValue(Text(verbatim: Self.legendText(mirror.scaleMode)))
                 .accessibilityIdentifier(port.identifier("legend"))
+            VStack(alignment: .leading, spacing: 2) {
+                Text(verbatim: Self.aboutLabel).font(.footnote.bold())
+                Text(verbatim: Self.aboutText)
+                    .font(.footnote)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(Text(verbatim: Self.aboutLabel))
+            .accessibilityValue(Text(verbatim: Self.aboutText))
+            .accessibilityIdentifier(port.identifier(Self.aboutName))
             Text(verbatim: Self.sentence(mirror.status))
                 .font(.footnote)
                 .fixedSize(horizontal: false, vertical: true)

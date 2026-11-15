@@ -16,7 +16,7 @@ X-A14. Precedents: `specs/093-tw-p05-qa/tasks.md`, `specs/106-sse-p04-time-tours
 
 ## Phase 3: Story 2 — the model statement in the app
 
-- [ ] T-A14-503 [US2] Show "About this model" with `ScientificReview.modelStatement` as label and value in `Experience/SolarControls.swift` (identifier `experience.a14.solar-system-explorer.about-model`), with a session test in `ExperienceTests/SolarQualityTests.swift` (FR-A14-503)
+- [X] T-A14-503 [US2] Show "About this model" with `ScientificReview.modelStatement` as label and value in `Experience/SolarControls.swift` (identifier `experience.a14.solar-system-explorer.about-model`), with a session test in `ExperienceTests/SolarQualityTests.swift` (FR-A14-503) — Verified 2026-11-15: 2026-11-15: About this model element (label, ScientificReview.modelStatement as value, identifier about-model) in SolarControls; SolarQualityTests checks it and SolarCoreTests checks the 216 adapter descriptions, passing in .autonomy/checks/A14-P05.sse-ios27.json exit 0 on sim-27.2
 
 ## Phase 4: Story 3 — detail levels
 
