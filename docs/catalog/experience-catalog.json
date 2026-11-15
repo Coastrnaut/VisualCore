@@ -2261,10 +2261,10 @@
      "A11-P01",
      "A11-P02",
      "A11-P03",
-     "A11-P04"
+     "A11-P04",
+     "A11-P05"
     ],
     "legacy_gates_pending": [
-     "A11-P05",
      "A11-P06"
     ],
     "unified_integration": "pending"

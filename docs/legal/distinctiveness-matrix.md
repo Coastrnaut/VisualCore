@@ -8,7 +8,7 @@ Each experience is reduced to (core abstraction, player action, win rule): R03/R
 
 ## Counts
 
-- Catalog SHA-256: `7fffe08c74e142d0dc9d43e2cca796f4f0c11f73424bf3ddcc9885fdb86c8803`
+- Catalog SHA-256: `5ce3f25f2c5377d0cfb6b51a2727374d7f192c492b0b4cccc132990f80759dec`
 - Launch experiences: 100
 - Pairs: 4950
 - Shared mechanics: 0
