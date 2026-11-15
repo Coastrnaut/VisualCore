@@ -7,7 +7,7 @@ after every task (no trailers); read every check's exit before ticking. iOS 27 o
 
 ## Phase 1: Setup
 
-- [ ] T-A11-301 Baseline: cite the A11-P02 evidence on the unchanged tree (`.autonomy/checks/A11-P02.{playground-ios27-1,app-unit,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14)
+- [X] T-A11-301 Baseline: cite the A11-P02 evidence on the unchanged tree (`.autonomy/checks/A11-P02.{playground-ios27-1,app-unit,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14) — Verified 2026-11-15: 2026-11-15: cited .autonomy/checks/A11-P02.{playground-ios27-1,app-unit,verify-27}.json on the unchanged tree (no rerun)
 
 ## Phase 2: Foundational — editing, pinning and measurement in the core
 
