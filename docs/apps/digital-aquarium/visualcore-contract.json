@@ -536,7 +536,7 @@
       "id": "M11",
       "capability": "Bubbles and environmental particles: rising, wobbling bubbles from vents that end at the surface, and slow drifting motes, bounded per quality level",
       "source": "v0.1 feature 04; brainstorm: particles",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreSimulation/ParticleSystem.swift",
@@ -570,16 +570,16 @@
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/ParticleUniverse/Experience/ParticleStage.swift",
-        "symbol": "ParticleStage"
+        "file": "Packages/ExperiencesCreative/DigitalAquarium/Core/WaterEffects.swift",
+        "symbol": "WaterEffects"
       },
-      "notes": "Emitters with line and ring shapes, buoyancy as negative gravity, drift as wind and the particle budget exist and are tested; the bubble wobble, surface end and mote look are composition in the experience. G-WATERFX (app-local), A09-P04."
+      "notes": "Emitters with line and ring shapes, buoyancy as negative gravity, drift as wind and the particle budget exist and are tested; the bubble wobble, surface end and mote look are composition in the experience. G-WATERFX (app-local), A09-P04. Built in A09-P04 (app-local): WaterEffects derives bubbles (two vents per habitat, one bubble per vent every 20 steps, rising 1.2 units/s with a ±0.08 wobble, gone at the surface, at most 48) and 24 drifting motes from the step count, so they hold while paused or suspended and never enter the saved state; Reduce Motion halves the rise, removes the wobble and slows the motes (WaterEffectsTests, AquariumRenderTests). Particle counts per quality level arrive with the levels in A09-P05."
     },
     {
       "id": "M12",
       "capability": "Depth layers: back, middle and front layers with parallax, depth tint and haze, size and speed scaled by depth, drawn in z order",
       "source": "v0.1 feature 04",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreScenes/SceneGraph.swift",
@@ -607,16 +607,16 @@
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/GenerativeArtPresenter.swift",
-        "symbol": "GenerativeArtPresenter"
+        "file": "Packages/ExperiencesCreative/DigitalAquarium/Core/WaterEffects.swift",
+        "symbol": "WaterEffects.layer"
       },
-      "notes": "z order, cameras and the effect passes (blur, colorMatrix, composite) exist and are tested; the layer split, parallax factors and depth tint are the experience's composition. G-WATERFX (app-local), A09-P04."
+      "notes": "z order, cameras and the effect passes (blur, colorMatrix, composite) exist and are tested; the layer split, parallax factors and depth tint are the experience's composition. G-WATERFX (app-local), A09-P04. Built in A09-P04 (app-local): fish and plants take depth layer index mod 3, scaled 0.75/0.875/1.0 and tinted 35/15/0 % toward the water colour, drawn back to front with decor and pellets in the middle layer (WaterEffectsTests, AquariumRenderTests). No parallax: the tank has no camera motion."
     },
     {
       "id": "M13",
       "capability": "Caustics: an animated, seamless light pattern on the sand and fish from procedural noise, with a soft distortion of the water, low-cost on the lowest quality level and still under Reduce Motion",
       "source": "v0.1 feature 04; manual P04 lighting",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
@@ -644,10 +644,10 @@
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidArtPresenter.swift",
-        "symbol": "FluidArtPresenter"
+        "file": "Packages/ExperiencesCreative/DigitalAquarium/Experience/CausticsScene.swift",
+        "symbol": "CausticsScene"
       },
-      "notes": "vc/noise, full-screen shaders and the distort and composite passes exist and are tested; no caustics pattern exists. Built app-local first; it moves to VisualCoreEffects only if a second experience needs it. G-WATERFX (app-local), A09-P04."
+      "notes": "vc/noise, full-screen shaders and the distort and composite passes exist and are tested; no caustics pattern exists. Built app-local first; it moves to VisualCoreEffects only if a second experience needs it. G-WATERFX (app-local), A09-P04. Built in A09-P04 (app-local): CausticsScene draws the water and gravel with a periodic two-octave noise caustic over a FullScreenShaderScene from inline source, seamless every 16 units, strength 0.04/0.07/0.10 by lighting, time from the step count and fixed under Reduce Motion; a failed shader falls back to the plain clear and gravel (AquariumRenderTests). The simplified lowest-quality variant arrives with the levels in A09-P05."
     },
     {
       "id": "M14",
@@ -819,7 +819,7 @@
       "id": "M18",
       "capability": "Spoken habitat description: VoiceOver text for the habitat (species and counts, plants and decor, feeding state, ambient mode), rate-limited announcements of changes",
       "source": "cross-cutting: accessibility; manual P04 accessibility",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AccessibilityPlayers.swift",
@@ -835,10 +835,10 @@
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/OscilloscopeStudio/Core/ScopeAnnouncer.swift",
-        "symbol": "ScopeAnnouncer"
+        "file": "Packages/ExperiencesCreative/DigitalAquarium/Core/AquariumWording.swift",
+        "symbol": "AquariumWording"
       },
-      "notes": "AnnouncementSink and AnnouncementPlanner are public and tested (VisualCoreUITests/AccessibilityPlayersTests, VisualCoreSimulationTests); the habitat wording is experience domain, as Oscilloscope Studio's ScopeAnnouncer is. G-HABITATA11Y (app-local), A09-P04."
+      "notes": "AnnouncementSink and AnnouncementPlanner are public and tested (VisualCoreUITests/AccessibilityPlayersTests, VisualCoreSimulationTests); the habitat wording is experience domain, as Oscilloscope Studio's ScopeAnnouncer is. G-HABITATA11Y (app-local), A09-P04. Built in A09-P04 (app-local): AquariumWording names habitat, species with counts, plants, decorations, food, lighting and motion; AquariumAnnouncer speaks changes (food dropped, habitat, decoration added or removed, paused, swimming) at most once per 3 s through the injected AnnouncementSink, only with VoiceOver on (AquariumWordingTests, AquariumAnnouncerTests, AquariumAnnouncementTests). Ambient mode wording arrives in A09-P05."
     },
     {
       "id": "M19",
@@ -965,7 +965,7 @@
       "justification": "Depth layers, bubbles and caustics are the aquarium's composition over the shared particle system, renderer and effect passes; a caustics pattern moves to VisualCoreEffects only if it proves reusable.",
       "phase": 4,
       "test": "Host tests: bubble and mote counts stay within the particle budget per quality level and bubbles end at the surface; layer order, parallax and depth tint follow depth; simulator tests: the caustics shader compiles and its pattern tiles seamlessly, holds still under Reduce Motion and is skipped or simplified on the lowest quality level",
-      "closed": null
+      "closed": "A09-P04"
     },
     {
       "id": "G-HABITATA11Y",
@@ -977,7 +977,7 @@
       "justification": "The habitat wording is experience domain; AnnouncementSink and AnnouncementPlanner already exist in VisualCore.",
       "phase": 4,
       "test": "Host tests of the habitat description for each state (empty decor, feeding, ambient, Reduce Motion) and rate-limited announcements through a RecordingAnnouncementSink",
-      "closed": null
+      "closed": "A09-P04"
     },
     {
       "id": "G-AMBIENT",
