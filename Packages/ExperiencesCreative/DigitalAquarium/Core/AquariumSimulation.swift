@@ -18,6 +18,11 @@
 // Tuning (research D3): neighbour radius 2.5, limit 6, separation radius 1.6 × body length, weights separation 2.0,
 // alignment 1.0, cohesion 0.8, boundary 3.0 with margin 1.0, maximum force 2.0 — unchanged from D3; measured over seeds
 // 1…20 after 1,800 steps: Reef 20 of 20 seeds closer (SC-A09-201) and 19 aligned (SC-A09-202), Kelp 19 and 18.
+// Feeding since feature 070 (A09-P03) T-A09-303 (FR-A09-302, FR-A09-303; clarification 3; research D2): each fish's
+// steering force also gets ``Feeding/seekForce(for:food:)`` toward its nearest pellet within 4 units (from the state at
+// the start of the step), and the sum is capped again to the species' maximum force; after every fish has moved,
+// ``Feeding/step(_:catalog:dt:)`` sinks, eats and removes pellets. Without food the seek force is zero and nothing is
+// re-capped, so a document without food advances bit for bit as before.
 import Foundation
 import VisualCoreMath
 import VisualCoreSimulation
@@ -56,8 +61,9 @@ public enum AquariumSimulation {
     }
 
     /// The steering force on every fish of `doc`, all from the same (current) state; `.zero` for a fish of an unknown
-    /// species. The force on a fish depends only on the set of fish, not on their order (ties in the neighbour search
-    /// aside).
+    /// species. A non-zero ``Feeding/seekForce(for:food:)`` is added and the sum capped to the species' maximum force.
+    /// The force on a fish depends only on the set of fish and pellets, not on the fish order (ties in the neighbour
+    /// search aside).
     static func forces(_ doc: HabitatDocument, catalog: SpeciesCatalog) -> [Vec2] {
         let agents = agents(doc, catalog: catalog)
         let bounds = SteeringBounds(minX: doc.bounds.minX, maxX: doc.bounds.maxX,
@@ -67,15 +73,19 @@ public enum AquariumSimulation {
             let parameters = parameters(for: species)
             let neighbours = NeighbourSearch.neighbours(of: index, in: agents, radius: parameters.neighbourRadius,
                                                         limit: parameters.neighbourLimit)
-            return Steering.force(for: index, agents: agents, neighbours: neighbours, parameters: parameters,
-                                  bounds: bounds)
+            let force = Steering.force(for: index, agents: agents, neighbours: neighbours, parameters: parameters,
+                                       bounds: bounds)
+            let seek = Feeding.seekForce(for: doc.fish[index], food: doc.food)
+            guard seek != .zero else { return force }
+            return Steering.capped(force + seek, to: parameters.maxForce)
         }
     }
 
     /// Advances every fish of `doc` by one ``step`` using the species of `catalog` and the generator `random` (one
     /// draw per fish whose species is known, in document order). Every steering force is computed from the state at
-    /// the start of the step. A fish whose species is not in the catalog is only clamped into the bounds; plants,
-    /// decor and lighting are not changed.
+    /// the start of the step, the seek toward food included. A fish whose species is not in the catalog is only
+    /// clamped into the bounds. After every fish has moved, ``Feeding/step(_:catalog:dt:)`` sinks, eats and removes
+    /// the pellets; plants, decor and lighting are not changed.
     public static func advance(_ doc: inout HabitatDocument, catalog: SpeciesCatalog, random: inout SeededRandom) {
         let bounds = doc.bounds
         let dt = step
@@ -119,6 +129,7 @@ public enum AquariumSimulation {
             fish.animationPhase = wrappedPhase(fish.animationPhase + 2 * Double.pi * beats * dt)
             doc.fish[index] = fish
         }
+        Feeding.step(&doc, catalog: catalog, dt: dt)
     }
 
     /// `p` clamped into `b` (a non-finite component becomes the bound's centre).
