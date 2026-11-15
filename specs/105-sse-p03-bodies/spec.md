@@ -26,6 +26,55 @@ Canonical overrides:
 - **Owner rulings:** short tests; audits and device runs in the device campaign; iOS 27 at phase gates; reference
   regression and iOS 26 at X-A14; every Spec Kit step runs.
 
+## Clarifications
+
+### Session 2026-11-15
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+VisualCoreScenes has only 2D gradient noise (`GradientNoise2D`, `FractalNoise2D`; sampling it by longitude and latitude
+seams and pinches, contract row M06); `Mesh` exposes public `positions`, `normals`, `uvs`, `indices`;
+`Mesh.revolution(profile:segments:)` and `Mesh.uvSphere(segments:rings:radius:)` exist; `MeshRenderer` always culls
+back faces (`GL_CULL_FACE`, `GL_BACK`, MeshRenderer.swift); `OrbitCamera` has public `near` and `far`; the experience's
+`make(id:storage:reduceMotion:…)` already receives Reduce Motion and ignores it (no motion until now).
+
+- Q: How are seam-free surfaces made, and does VisualCore gain a 3D noise? → A: App-local `SphereNoise` in
+  SolarSystemExplorerCore: seeded 3D value noise (integer lattice hashed with SplitMix64, smoothstep trilinear
+  interpolation, 4 octaves, lacunarity 2, gain 0.5) evaluated at each vertex's unit direction, so the duplicated seam
+  vertices and the pole vertices get identical colours. No VisualCore change: one consumer, recorded in the contract
+  (II-a not triggered). Spheres are `uvSphere(segments: 48, rings: 24)`; per-vertex colours from a `SurfaceRecipe` per
+  body: the Sun (emissive yellow-orange, ambient 1, granulation ±8 %), Mercury and the Moonless rocky look (grey
+  terrain), Venus (pale yellow haze), Earth (ocean blue below noise 0.52, land green-brown above, white caps where
+  |sin latitude| > 0.88), Mars (rust with dark patches), Jupiter and Saturn (latitude bands of sin(latitude · k)
+  perturbed by noise; Jupiter 9 bands, Saturn 7 paler bands), Uranus (cyan, faint bands), Neptune (deep blue, faint
+  bands). Seed of body i is 0xA14_0000 + i. The surface digest is the stable hash of the colour array.
+- Q: Where do Saturn's ring numbers come from and how is the ring drawn when back faces are culled? → A: Main rings
+  from the C ring's inner edge 74,500 km to the A ring's outer edge 136,775 km (NASA NSSDCA "Saturnian Rings Fact
+  Sheet", nssdc.gsfc.nasa.gov/planetary/factsheet/satringfact.html, public domain, epoch J2000.0, km), recorded as
+  source records `ring-inner-radius` and `ring-outer-radius` and audited. The ring mesh is a flat annulus from
+  `Mesh.revolution` (64 segments) plus a copy with reversed winding and flipped normals, so both faces draw; colour
+  pale tan with ambient 0.7 and the Cassini division as a darker band at 117,580–122,170 km (same fact sheet).
+  Tilted about the scene x axis by Saturn's catalog axial tilt (26.73°); the pole's azimuth is not modelled (stated
+  approximation). In the enhanced mode the ring radii scale with Saturn's display radius.
+- Q: What do the two scale modes map, and how are tiny bodies found? → A: Enhanced (mode 0, default): the A14-P02
+  mapping (4·√r) and display radii, label "Distances and sizes not to scale". True-relative (mode 1): one linear scale,
+  2 scene units per AU for both positions and radii (radius km ÷ 149,597,870.7 × 2; Neptune at ≈ 60, the Sun's radius
+  ≈ 0.0093), label "Distances and sizes to one scale"; overview distance 120 × 1.25^−zoom, zoom steps −1…12 as in A14-P02.
+  A body whose drawn radius is under 2 px gets a camera-facing marker ring of 6 px radius in its palette colour;
+  markers never change the drawn body. The mode is state (schema 3, `scaleMode` 0/1, action `scale.mode [0…1]`, a
+  non-whole value refused `a14.invalid-choice`), migration 2 → 3 adds mode 0.
+- Q: How does the focus flight work without breaking determinism? → A: The flight is presentation only: the core's
+  state changes in one step (focus = selection), and the presenter eases its drawn camera from the previous view to
+  the new one over 30 drawn frames (smoothstep on the target position, distance interpolated in log space, yaw and
+  pitch from the state). If an eased eye would come within a body's clearance (3 × drawn radius + 0.5 × near), it is
+  pushed out radially to the clearance. Reduce Motion (passed at make) cuts in one frame. A new focus during a flight
+  starts from the current drawn eye. The pure `FocusFlight` function is tested for all 72 ordered pairs in both modes.
+- Q: What near and far planes and what precision bound apply? → A: Enhanced: near 0.5, far 200 (A14-P02). True-relative:
+  near = max(1e-4, 0.05 × camera distance), far = camera distance + 70. Model matrices are built from positions minus
+  the camera target in double precision before conversion to single precision; the test converts every body's
+  camera-relative position to Float and back for both modes, every focus and zoom steps −1, 0 and 12, and bounds the
+  error by 0.1 pixel at a 2,000-pixel-high canvas with a 60° field of view (pixel size 2 · d · tan 30° / 2,000 at camera
+  distance d).
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - The bodies look like distinct worlds (Priority: P1) 🎯
@@ -138,7 +187,7 @@ jitter, because positions are kept in double precision and drawn relative to the
 
 **Integration**
 
-- **FR-A14-330**: The scenario manifest MUST be updated (state schema 3 with migration from 2) and pass the runner on
+- **FR-A14-330**: The scenario manifest MUST be updated (state schema 3 with `scaleMode` and migration from 2) and pass the runner on
   iOS 27; the contract closes G-BODIES with the label placement moved to G-TOURS.
 
 ### Key Entities
@@ -146,7 +195,7 @@ jitter, because positions are kept in double precision and drawn relative to the
 - **Surface recipe**: body, seed, palette (colours and bands or terrain thresholds), noise frequency.
 - **Ring record**: Saturn, inner and outer radius (km), source, units, license.
 - **Scale mode**: enhanced or true-relative; mapping of positions and radii; near and far planes.
-- **Focus flight**: from-eye, to-view, step index, length; Reduce Motion flag.
+- **Focus flight** (presentation only): from-view, to-view, frame index of 30; Reduce Motion cuts.
 
 ## Success Criteria *(mandatory)*
 
@@ -165,7 +214,7 @@ jitter, because positions are kept in double precision and drawn relative to the
 
 - The catalog, orbit model, date and camera of A14-P01 and A14-P02 exist; VisualCore's sphere, revolution and tube
   meshes, per-vertex colours, depth pass, orbit camera and ray-sphere tests exist (contract rows M01, M06, M07).
-- Saturn's ring radii come from the NASA Saturn fact sheet (public domain).
+- Saturn's ring radii come from the NASA NSSDCA Saturnian Rings Fact Sheet (public domain).
 
 ## Traceability
 
