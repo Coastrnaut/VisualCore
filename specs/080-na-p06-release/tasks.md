@@ -6,7 +6,7 @@ Evidence: `python3 Tools/python/desktop_runbook.py run-check --stage A10-P06 --t
 
 ## Phase 1: Setup
 
-- [ ] T-A10-601 Baseline: cite the A10-P05 evidence on the unchanged tree (`.autonomy/checks/A10-P05.{arcade-ios27,app-ui,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14)
+- [X] T-A10-601 Baseline: cite the A10-P05 evidence on the unchanged tree (`.autonomy/checks/A10-P05.{arcade-ios27,app-ui,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14) — Verified 2026-11-15: 2026-11-15: cited .autonomy/checks/A10-P05.{arcade-ios27,app-ui,verify-27}.json on the unchanged tree (no rerun)
 
 ## Phase 2: User Story 1 — nothing leaves the device (P1) 🎯
 
