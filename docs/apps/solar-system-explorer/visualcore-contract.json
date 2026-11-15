@@ -1,0 +1,1489 @@
+{
+  "schema": 1,
+  "app": "solar-system-explorer",
+  "gate": "A14-P00",
+  "date": "2026-11-15",
+  "inventory": [
+    {
+      "area": "Package products",
+      "description": "Pure, host-testable products of Packages/VisualCore: VisualCoreMath, VisualCoreSimulation, VisualCoreScenes, VisualCoreShaderSource, VisualCoreEffectsGraph, VisualCoreDiagnostics, VisualCoreAudioDSP, VisualCorePersistence, VisualCoreParameters, VisualCoreExperience (+ VisualCoreTestSupport for test targets). iOS products of Packages/VisualCoreRendering: VisualCoreRendering, VisualCoreEffects, VisualCoreUI, VisualCoreAudio, VisualCoreAutomation, VisualCoreExperienceHost. For Solar System Explorer (checked 2026-11-15): VisualCoreMath has Vec3 and Mat4 in Double precision, Quat, OrbitCamera (distance 0.01...1,000,000; view, projection, project, ray), OrbitBounds and OrbitViewBounds (clearance sphere, clamp), CameraRail, FramingFlight and TourTimeline (PlaneFraming stops), OriginRebase, PrecisionAdvisor, NumericHygiene and Ray3/RayHit3 with ray-box, ray-sphere and ray-triangle casts; VisualCoreScenes has Mesh (plane, cube, uvSphere(segments:rings:radius:)), MeshBuilder under a MeshBudget, the shapes surface, revolution, extrusion, tube and bevelledBox, GradientNoise2D and FractalNoise2D (2D only), gestures; VisualCoreSimulation has SceneClock (speed 0...4), Timeline and Tween, FixedStepClock, FixedStepRunner with ControlStream, TimeStepPolicy, PlaybackState (background pause), SeededRandom, accessibility planners; VisualCoreRendering has MeshRenderer (one directional Lambert light, ambient, per-vertex colours, MeshFog), DepthMeshPass, RenderTarget, PrimitiveRenderer, ParticleRenderer, FullScreenShaderScene and ResourceRegistry; VisualCoreExperience has ExperienceStorage, SavedStateStore, StateDigest and ScenarioManifest; VisualCorePersistence has DocumentStore and MigrationChain. Missing in every framework product (grep 2026-11-15): orbit propagation of any kind, a simulated calendar date advancing at a rate, astronomical unit or kilometre conversion, a body catalog, 3D or seamless spherical noise, and a 3D orbit-camera tour track.",
+      "paths": [
+        "Packages/VisualCore/Package.swift",
+        "Packages/VisualCoreRendering/Package.swift",
+        "Packages/ExperiencesCreative/Package.swift",
+        "Packages/VisualCore/Sources/VisualCoreMath/Vectors.swift",
+        "Packages/VisualCore/Sources/VisualCoreMath/Matrix.swift",
+        "Packages/VisualCore/Sources/VisualCoreMath/Quaternion.swift",
+        "Packages/VisualCore/Sources/VisualCoreMath/OrbitCamera.swift",
+        "Packages/VisualCore/Sources/VisualCoreMath/CameraBounds.swift",
+        "Packages/VisualCore/Sources/VisualCoreMath/OrbitViewBounds.swift",
+        "Packages/VisualCore/Sources/VisualCoreMath/CameraRail.swift",
+        "Packages/VisualCore/Sources/VisualCoreMath/FramingFlight.swift",
+        "Packages/VisualCore/Sources/VisualCoreMath/OriginRebase.swift",
+        "Packages/VisualCore/Sources/VisualCoreMath/PrecisionAdvisor.swift",
+        "Packages/VisualCore/Sources/VisualCoreMath/RayIntersection.swift",
+        "Packages/VisualCore/Sources/VisualCoreScenes/MeshGenerators.swift",
+        "Packages/VisualCore/Sources/VisualCoreScenes/MeshShapes.swift",
+        "Packages/VisualCore/Sources/VisualCoreScenes/GradientNoise2D.swift",
+        "Packages/VisualCore/Sources/VisualCoreSimulation/SceneClock.swift",
+        "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepClock.swift",
+        "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepRunner.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshRenderer.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/DepthMeshPass.swift",
+        "scripts/check_dependencies.py",
+        "docs/api/visualcore-public-api.txt"
+      ],
+      "owner": "VisualCore packages (ADR-0003, ADR-0009)"
+    },
+    {
+      "area": "EGL render host and thread",
+      "description": "RenderHost (@MainActor) owns the EGL display, context and surfaces over ANGLE's Metal backend (EGLDisplayProvider chooses an RGBA8 ES3 config with no guaranteed depth buffer, so the window surface is colour-only), the CAMetalLayer RenderView, the FrameScheduler (CADisplayLink) and context generations; pause/resume, replaceScene, recreateContext, renderOffscreen and destroy; scenes implement RenderScene setup/resize/render/teardown. All EGL and GL work runs on the main thread. Solar System Explorer's catalog, orbit computation for a simulated date, clock, scale modes and tours are GPU-free CPU work in Double precision done per frame tick or on input before drawing; drawing reads the computed camera-relative transforms and never changes the simulation state. Depth comes from DepthMeshPass's owned off-screen target copied to the framebuffer, never from a changed window configuration; the experience adds no EGL or GL context of its own.",
+      "paths": [
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderView.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderView+Touches.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FrameScheduler.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/EGLDisplayProvider.swift"
+      ],
+      "owner": "VisualCoreRendering (ADR-0002 seam)"
+    },
+    {
+      "area": "Shaders and resources",
+      "description": "ResourceRegistry creates buffers, textures, programs and render targets under a ResourceBudget and rejects stale handles after a generation change; makeRenderTarget(depth: true) adds a 24-bit depth renderbuffer. ShaderProgram, ShaderBundle and ShaderLibrary (#include expansion with line maps) compile bundled GLSL; the vc/ library holds color, field, hash, noise, palette and sdf helpers. Pipeline = ShaderProgram + RenderState, applied by GLState.apply (RenderState.opaque3D: depth test and write, back-face culling). MeshRenderer draws one Mesh with Lambert lighting from one light direction plus an ambient fraction, in one colour or per-vertex colours, with optional linear eye-depth MeshFog; DepthMeshPass draws a list of items (renderer, model transform, colour) with depth testing into an owned depth target and blits the colour to the framebuffer, on screen and off screen alike. PrimitiveRenderer (2D shapes through Camera2D), ParticleRenderer (instanced quads through Camera2D), FullScreenShaderScene and the effects graph (EffectScene, EffectRenderer) are available for overlays, a starfield backdrop and grading.",
+      "paths": [
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderProgram.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderBundle.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/Pipeline.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLState.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshRenderer.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshFog.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/DepthMeshPass.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/PrimitiveRenderer.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ParticleRenderer.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+        "Packages/VisualCore/Sources/VisualCoreShaderSource/ShaderLibrary.swift",
+        "Packages/VisualCore/Sources/VisualCoreShaderSource/RenderState.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/noise.glsl",
+        "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectScene.swift"
+      ],
+      "owner": "VisualCoreRendering + VisualCoreShaderSource + VisualCoreEffects"
+    },
+    {
+      "area": "Geometry, cameras and precision",
+      "description": "Mesh (positions, normals, uvs, UInt32 indices; plane, cube, uvSphere) and MeshBuilder under a MeshBudget with welding; shapes surface (parametric grid with closed directions), revolution (a ring is a revolved profile), extrusion, tube (an orbit line can be a closed thin tube along sampled points) and bevelledBox; normals, MeshBounds, validation, digest and MeshCache. OrbitCamera with OrbitBounds/OrbitViewBounds gives orbit, zoom and a clearance sphere around a target; OrbitCamera.ray with Ray3.intersect(sphereCenter:radius:) and Ray3.nearest picks a body; OrbitCamera.project places native labels. Vec3/Mat4 are Double, OriginRebase draws Double positions relative to a floating origin as Float, and PrecisionAdvisor rates a magnitude against a pixel step: the pieces for keeping orbital state in Double and drawing camera-relative positions exist, but the per-body camera-relative transform and near/far choice across astronomical ranges is app work (G-BODIES).",
+      "paths": [
+        "Packages/VisualCore/Sources/VisualCoreScenes/MeshGenerators.swift",
+        "Packages/VisualCore/Sources/VisualCoreScenes/MeshBuilder.swift",
+        "Packages/VisualCore/Sources/VisualCoreScenes/MeshShapes.swift",
+        "Packages/VisualCore/Sources/VisualCoreScenes/MeshNormals.swift",
+        "Packages/VisualCore/Sources/VisualCoreScenes/MeshBounds.swift",
+        "Packages/VisualCore/Sources/VisualCoreScenes/MeshValidation.swift",
+        "Packages/VisualCore/Sources/VisualCoreMath/OrbitCamera.swift",
+        "Packages/VisualCore/Sources/VisualCoreMath/CameraBounds.swift",
+        "Packages/VisualCore/Sources/VisualCoreMath/OrbitViewBounds.swift",
+        "Packages/VisualCore/Sources/VisualCoreMath/RayIntersection.swift",
+        "Packages/VisualCore/Sources/VisualCoreMath/OriginRebase.swift",
+        "Packages/VisualCore/Sources/VisualCoreMath/PrecisionAdvisor.swift"
+      ],
+      "owner": "VisualCoreMath + VisualCoreScenes"
+    },
+    {
+      "area": "Time, animation and tours",
+      "description": "SceneClock (bounded delta, speed 0...4, play/pause/toggle, scrub, reduced-motion factor), Timeline/Tween and EasingCurve drive deterministic animation; FixedStepClock and FixedStepRunner with ControlStream step a simulation deterministically; TimeStepPolicy clamps frame deltas; PlaybackState pauses in the background and never fast-forwards; CameraRail, FramingFlight and TourTimeline give eased camera paths with holds and a Reduce Motion form. None of these is a calendar: no simulated UTC date, no rate in days per second beyond speed 4 and no date range exist (G-TIME); TourTimeline moves 2D PlaneFraming stops, so 3D orbit-camera tours with captions are app work over it (G-TOURS).",
+      "paths": [
+        "Packages/VisualCore/Sources/VisualCoreSimulation/SceneClock.swift",
+        "Packages/VisualCore/Sources/VisualCoreSimulation/Timeline.swift",
+        "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepClock.swift",
+        "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepRunner.swift",
+        "Packages/VisualCore/Sources/VisualCoreSimulation/TimeStepPolicy.swift",
+        "Packages/VisualCore/Sources/VisualCoreSimulation/PlaybackState.swift",
+        "Packages/VisualCore/Sources/VisualCoreMath/Easing.swift",
+        "Packages/VisualCore/Sources/VisualCoreMath/CameraRail.swift",
+        "Packages/VisualCore/Sources/VisualCoreMath/FramingFlight.swift"
+      ],
+      "owner": "VisualCoreSimulation + VisualCoreMath"
+    },
+    {
+      "area": "Experience host",
+      "description": "ExperienceSession opens, checkpoints, closes and recovers an Experience on one RenderHost, applies the quality level (QualityGovernor over the experience's QualityProfile, fed by DeviceConditions thermal state and Low Power Mode) and memory/scene-phase events, and renders stills (renderStill); ExperienceShell adapts an ExperiencePresenter (scene, controls) to Experience; ExperienceCore is the GPU-free state with its qualityTiers; ExperienceStorage is the per-experience sandbox; ExperienceFeedback routes haptics and announcements; ScenarioRunner replays a ScenarioManifest; the one app registers experiences in ExperienceRegistry and Catalog/registrations.json (thirteen registered, A01-A13, checked 2026-11-15; Solar System Explorer joins in A14-P01 and stays unregistered and unavailable in A14-P00; scripts/check_experience_packages.py forbids unregistered targets). Version 0.1 needs no location, camera, motion, microphone or network; reset to present reads the device clock only and view state lives in the experience's own storage, so no usage description or privacy answer changes.",
+      "paths": [
+        "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceShell.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceFeedback.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ScenarioRunner.swift",
+        "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceCore.swift",
+        "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+        "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceLifecycle.swift",
+        "Packages/VisualCore/Sources/VisualCoreExperience/ScenarioManifest.swift",
+        "Apps/VisualCore/App/ExperienceRegistry.swift",
+        "Catalog/registrations.json",
+        "scripts/check_experience_packages.py",
+        "project.yml"
+      ],
+      "owner": "VisualCoreExperience + VisualCoreExperienceHost + the one app"
+    },
+    {
+      "area": "Build and release steps",
+      "description": "XcodeGen spec project.yml for the one app (target VisualCore), package schemes via scripts/xcodebuild_package.py, app tests via scripts/xcodebuild_app.py, and scripts/release_check.py: 123 named steps listed by --list on 2026-11-15 (shared checks including app-contracts, which checks every docs/apps/*/visualcore-contract.json, package and app builds/tests, experience-release and copy-claims steps, verify steps of A01-A13 on iOS 27 and 26, release audits of the one app, the seven reference regression steps and the ProjectM independence check).",
+      "paths": [
+        "project.yml",
+        "scripts/release_check.py",
+        "scripts/xcodebuild_package.py",
+        "scripts/xcodebuild_app.py",
+        "scripts/check_app_contract.py",
+        "scripts/check_licenses.py",
+        ".github/workflows/ci.yml"
+      ],
+      "owner": "repository tooling"
+    },
+    {
+      "area": "Source ownership",
+      "description": "Solar System Explorer owns its domain (the body catalog of the Sun and eight planets with radii, orbital elements, periods, axial tilts and facts, each with source, epoch, units and license; unit conversion between kilometres and astronomical units; the approximate orbit model's use for a simulated date and its stated validity range; the simulated UTC clock with play, pause, rate and a bounded date range; the true-relative and visibility-enhanced scale modes and their labels; procedural planet surfaces, rings, the Sun, starfield, orbit lines and labels; planet focus without near-clip surprises; fact cards with units and citations; captioned tours; saved view state; the spoken body, date, rate and mode; copy, data provenance and licenses) and UI under Packages/ExperiencesCreative/SolarSystemExplorer/ (Core GPU-free, CoreTests, Experience with Adapter/, ExperienceTests, Shaders, scenario-manifest.json; created in A14-P01, not present today). VisualCore owns reusable machinery: vectors, matrices, quaternions, the orbit camera and its bounds, rails, flights and tour timelines, origin rebasing, precision advice, ray casts and the approximate Kepler propagation to come (VisualCoreMath), meshes, shapes, noise and gestures (VisualCoreScenes), clocks, fixed steps and accessibility planners (VisualCoreSimulation), mesh drawing and depth (VisualCoreRendering), quality, persistence and storage (constitution Principle II, A14 section). Tiny Worlds' camera policy, Audio Odyssey's star pieces and Fractal Explorer's tour player stay experience code and are not copied. ProjectM stays in the harness.",
+      "paths": [
+        ".specify/memory/constitution.md",
+        "Auto-Creator.md",
+        "docs/decisions/ADR-0009-unified-app.md",
+        "Packages/ExperiencesCreative/Package.swift",
+        "specs/102-sse-p00-boundary-audit/spec.md"
+      ],
+      "owner": "constitution + ADR-0009"
+    },
+    {
+      "area": "ProjectM reference regression",
+      "description": "Reference pinned at d93edd1, read-only; scripts/run_reference_baseline.py lists the ordered reference steps; scripts/check_reference_clean.py checks the submodule; the 7 release-check steps run in two chunks via release_check.py --only (reference-engine-xcframework, reference-build-projectm-ios-sim, reference-clean; reference-test-anglerendering-ios27, reference-test-anglerendering-ios26, projectm-reference-ios27, projectm-reference-ios26), recorded in the A14 regression baseline document (docs/apps/solar-system-explorer/regression-baseline.md) with the phase-start commit 9335c07c.",
+      "paths": [
+        "scripts/run_reference_baseline.py",
+        "scripts/check_reference_clean.py",
+        "Harnesses/ProjectMReference/ProjectMReference.yml",
+        "docs/apps/solar-system-explorer/regression-baseline.md",
+        "specs/102-sse-p00-boundary-audit/research.md"
+      ],
+      "owner": "reference adapter (harness only)"
+    },
+    {
+      "area": "Determinism and budgets",
+      "description": "StateDigest and StableHash fingerprint experience state so the same simulated date, scale mode and view give the same digest; ScenarioManifest and ScenarioRunner replay recorded steps; FixedStepRunner with ControlStream replays commands step by step; MeshBudget, MeshCache, ResourceBudget, QualityProfile and QualityGovernor bound vertex counts, GPU memory and quality levels; NumericHygiene refuses or wraps non-finite values. Body count, mesh detail, orbit sample count, time rate and the date range are Solar System Explorer's own caps (G-CATALOG, G-BODIES, G-TIME).",
+      "paths": [
+        "Packages/VisualCore/Sources/VisualCoreExperience/StateDigest.swift",
+        "Packages/VisualCore/Sources/VisualCoreExperience/ScenarioManifest.swift",
+        "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepRunner.swift",
+        "Packages/VisualCore/Sources/VisualCoreMath/StableHash.swift",
+        "Packages/VisualCore/Sources/VisualCoreMath/NumericHygiene.swift",
+        "Packages/VisualCore/Sources/VisualCoreScenes/MeshBuilder.swift",
+        "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityProfile.swift",
+        "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityGovernor.swift",
+        "Packages/VisualCore/Sources/VisualCoreDiagnostics/ResourceLedger.swift"
+      ],
+      "owner": "VisualCoreExperience + VisualCoreSimulation + VisualCoreScenes + VisualCoreDiagnostics"
+    }
+  ],
+  "matrix": [
+    {
+      "id": "M01",
+      "capability": "3D scenes: several lit procedural meshes (spheres for the Sun and planets, rings, orbit lines) drawn per frame with correct occlusion through RenderHost on the main thread, on screen and off screen alike",
+      "source": "brainstorm: 3D scenes; constitution A14 consumer, not fork",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/DepthMeshPass.swift",
+          "symbol": "DepthMeshPass",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/DepthMeshPass.swift",
+          "symbol": "DepthMeshPass.Item",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshRenderer.swift",
+          "symbol": "MeshRenderer",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshFog.swift",
+          "symbol": "MeshFog",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+          "symbol": "RenderHost",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshGenerators.swift",
+          "symbol": "Mesh.uvSphere",
+          "product": "VisualCoreScenes",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/AudioOdyssey/Experience/OdysseyPresenter.swift",
+        "symbol": "OdysseyPresenter"
+      },
+      "notes": "Tested in VisualCoreRenderingTests (DepthMeshPassTests: the nearer of two meshes wins in both draw orders on screen and off screen, recreated contexts match; MeshRendererTests; MeshFogTests; RenderHostTests) and VisualCoreScenesTests (MeshBoundsTests, MeshCompatibilityTests and MeshDigestTests build uvSphere). Each item is one draw call; one sphere renderer can be drawn for several bodies with different model transforms. Assembling the solar system's draw list is the experience's scene code (G-BODIES)."
+    },
+    {
+      "id": "M02",
+      "capability": "Camera controls: perspective orbit camera (target, distance, yaw, pitch, field of view, clip planes), orbit, pinch zoom and pan inside bounds (pitch limit, distance range, target radius, clearance sphere), with touch recognizers, deterministic arbitration and a control alternative for every gesture",
+      "source": "brainstorm: camera controls",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitCamera.swift",
+          "symbol": "OrbitCamera",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitCamera.swift",
+          "symbol": "OrbitCamera.viewProjection",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/CameraBounds.swift",
+          "symbol": "OrbitBounds",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/CameraBounds.swift",
+          "symbol": "OrbitCamera.orbited",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/CameraBounds.swift",
+          "symbol": "OrbitCamera.zoomed",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitViewBounds.swift",
+          "symbol": "OrbitViewBounds",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/GestureRecognizers.swift",
+          "symbol": "DragRecognizer",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/GestureRecognizers.swift",
+          "symbol": "PinchRecognizer",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/GestureArbiter.swift",
+          "symbol": "GestureArbiter",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/GestureAlternatives.swift",
+          "symbol": "GestureAlternatives",
+          "product": "VisualCoreExperience",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/TinyWorlds/Core/CameraPolicy.swift",
+        "symbol": "CameraPolicy"
+      },
+      "notes": "Tested in VisualCoreMathTests (OrbitCameraTests, CameraBoundsTests, OrbitViewBoundsTests), VisualCoreScenesTests (GestureTests, GestureArbiterTests) and VisualCoreExperienceTests (GestureAlternativesTests). Planet focus and transitions without near-clip surprises are row M07."
+    },
+    {
+      "id": "M03",
+      "capability": "Materials and lighting: distinguishable procedural body colours without image files, lit from the Sun's direction with an ambient floor, the Sun itself drawn fully lit, legible without colour alone",
+      "source": "brainstorm: materials and lighting; constitution A14 visuals are code",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshRenderer.swift",
+          "symbol": "MeshRenderer.lightDirection",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshRenderer.swift",
+          "symbol": "MeshRenderer.ambient",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshRenderer.swift",
+          "symbol": "MeshRenderer.draw",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreParameters/Palette.swift",
+          "symbol": "Palette",
+          "product": "VisualCoreParameters",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreShaderSource/RenderState.swift",
+          "symbol": "RenderState.opaque3D",
+          "product": "VisualCoreShaderSource",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/Pipeline.swift",
+          "symbol": "Pipeline",
+          "product": "VisualCoreRendering",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/TinyWorlds/Core/WorldLight.swift",
+        "symbol": "WorldLight"
+      },
+      "notes": "Tested in VisualCoreRenderingTests (MeshRendererTests, MeshRendererColorTests for the per-vertex colour stream, PipelineTests) and VisualCoreParametersTests/ParametersTests (Palette). MeshRenderer lights from one direction: the Sun's light on a planet is reproduced by setting each body's renderer lightDirection to the direction from the body to the Sun before its draw, and the Sun is drawn with ambient 1. The per-body colouring from noise is the procedural surface work of row M06 (G-BODIES)."
+    },
+    {
+      "id": "M04",
+      "capability": "Animation: deterministic eased motion of the camera, labels and tour transitions from a scene clock with pause, rate and easing, calmed by Reduce Motion",
+      "source": "brainstorm: animation",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/SceneClock.swift",
+          "symbol": "SceneClock",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/Timeline.swift",
+          "symbol": "Timeline",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/Timeline.swift",
+          "symbol": "Tween",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/Easing.swift",
+          "symbol": "EasingCurve",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
+          "symbol": "transitionDuration",
+          "product": "VisualCoreSimulation",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/ClockedArtScene.swift",
+        "symbol": "ClockedArtScene"
+      },
+      "notes": "Tested in VisualCoreSimulationTests (SceneClockTests, TimelineTests, AccessibilityPlansTests) and VisualCoreMathTests/EasingTests. Animation moves drawn transforms only and never changes the simulated date or body positions."
+    },
+    {
+      "id": "M05",
+      "capability": "Time-based simulation: body positions advanced from a simulated time by a deterministic model, stepped with a bounded clock, replayable, independent of frame rate",
+      "source": "brainstorm: time-based simulation",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepClock.swift",
+          "symbol": "FixedStepClock",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepRunner.swift",
+          "symbol": "FixedStepRunner",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepRunner.swift",
+          "symbol": "ControlStream",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/SceneClock.swift",
+          "symbol": "SceneClock.speed",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/TimeStepPolicy.swift",
+          "symbol": "TimeStepPolicy",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/PlaybackState.swift",
+          "symbol": "PlaybackState",
+          "product": "VisualCoreSimulation",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/ParticleUniverse/Core/SceneSimulation.swift",
+        "symbol": "SceneSimulation"
+      },
+      "notes": "Fixed steps, replayable command streams, delta clamping and background pause exist and are tested (FixedStepClockTests, FixedStepRunnerTests, SceneClockTests, TimeStepPolicyTests, PlaybackStateTests). Missing: an orbit model that turns a simulated date into positions (G-ORBIT) and a simulated calendar date advancing at a chosen rate within a bounded range (G-TIME); SceneClock's speed range 0...4 and its scene duration are not a calendar."
+    },
+    {
+      "id": "M06",
+      "capability": "The Sun and eight major planets with curated fact cards and procedural surfaces (no licensed or other textures): sphere meshes with noise-coloured surfaces, Saturn's rings as a revolved ring, the Sun emissive, each body from a sourced catalog",
+      "source": "v0.1 feature 1: Sun and eight major planets with curated fact cards (licensed textures replaced by procedural surfaces, canonical override)",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshGenerators.swift",
+          "symbol": "Mesh.uvSphere",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshShapes.swift",
+          "symbol": "Mesh.revolution",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/GradientNoise2D.swift",
+          "symbol": "GradientNoise2D",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/GradientNoise2D.swift",
+          "symbol": "FractalNoise2D",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshRenderer.swift",
+          "symbol": "MeshRenderer",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreParameters/Palette.swift",
+          "symbol": "Palette",
+          "product": "VisualCoreParameters",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/TinyWorlds/Core/PropCatalog.swift",
+        "symbol": "PropCatalog"
+      },
+      "notes": "Spheres, revolved shapes, seeded 2D noise and per-vertex colour drawing exist and are tested (MeshDigestTests, MeshShapeTests, GradientNoise2DTests, MeshRendererColorTests). Missing: the body catalog with radii, elements, periods, tilts and facts with sources and units (G-CATALOG, app-local) and the procedural surfaces, bands, rings and Sun built from it (G-BODIES, app-local). The noise is 2D: sampling it by longitude and latitude seams at the date line and pinches at the poles, so G-BODIES must sample a periodic domain or blend; a 3D noise would be generic and is assessed there for VisualCoreScenes."
+    },
+    {
+      "id": "M07",
+      "capability": "Orbit view, planet focus and camera navigation: orbit lines for every planet, tap or list selection of a body, an eased focus flight that keeps the eye outside the body and inside the clip range (no near-clip surprises), reset to the overview",
+      "source": "v0.1 feature 2: orbit view, planet focus and camera navigation; manual regression fixture body focus and near clip",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitCamera.swift",
+          "symbol": "OrbitCamera",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitViewBounds.swift",
+          "symbol": "OrbitViewBounds.minimumDistance",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitViewBounds.swift",
+          "symbol": "OrbitViewBounds.clamp",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitCamera.swift",
+          "symbol": "OrbitCamera.ray",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/RayIntersection.swift",
+          "symbol": "Ray3.intersect",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshShapes.swift",
+          "symbol": "Mesh.tube",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/Easing.swift",
+          "symbol": "EasingCurve",
+          "product": "VisualCoreMath",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/TinyWorlds/Core/CameraPolicy.swift",
+        "symbol": "CameraPolicy"
+      },
+      "notes": "The orbit camera, a clearance sphere around the target (OrbitViewBounds.minimumDistance), ray-sphere picking and closed tubes exist and are tested (OrbitCameraTests, OrbitViewBoundsTests, RayIntersectionTests, MeshShapeTests). Missing: orbit paths sampled from the orbit model (G-ORBIT), and the focus controller that sets target, distance and near/far per body so a focus flight never crosses the near plane, orbit lines and selection (G-BODIES)."
+    },
+    {
+      "id": "M08",
+      "capability": "Play, pause and speed up simulated motion with an explicit date and time display (UTC by default), reset to present from the device clock",
+      "source": "v0.1 feature 3: play/pause/speed up simulated motion with explicit date/time display",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/SceneClock.swift",
+          "symbol": "SceneClock",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/SceneClock.swift",
+          "symbol": "SceneClock.play",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/SceneClock.swift",
+          "symbol": "SceneClock.pause",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/PlaybackState.swift",
+          "symbol": "PlaybackState",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepClock.swift",
+          "symbol": "FixedStepClock.advance",
+          "product": "VisualCoreSimulation",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalScene.swift",
+        "symbol": "FractalScene"
+      },
+      "notes": "Play, pause, toggle, a bounded speed and background pause exist and are tested (SceneClockTests, PlaybackStateTests, FixedStepClockTests). Missing: a simulated UTC instant advanced by a rate in simulated days per second, with discrete rate steps, a bounded date range and reset to present (G-TIME); a reusable scaled-date clock is assessed for VisualCoreSimulation there."
+    },
+    {
+      "id": "M09",
+      "capability": "Separate true-relative and visibility-enhanced size and distance modes with explicit kilometre and astronomical unit conversion, physical radii kept apart from display scale",
+      "source": "v0.1 feature 4: separate true-relative and visibility-enhanced size/distance modes; manual algorithm decision 3",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/Matrix.swift",
+          "symbol": "Mat4",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/Vectors.swift",
+          "symbol": "Vec3",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/OriginRebase.swift",
+          "symbol": "OriginRebase",
+          "product": "VisualCoreMath",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/TinyWorlds/Core/CameraPolicy.swift",
+        "symbol": "CameraPolicy"
+      },
+      "notes": "Double vectors and matrices for scaling exist and are tested (LinearAlgebraTests, OriginRebaseTests). No unit type or conversion between kilometres and astronomical units and no scale mode exist in any framework product. Unit conversion with the catalog's units is G-CATALOG; the two scale modes (one mapping, both driven by the same Double positions, the enhanced one always labelled not to scale) are G-BODIES; both app-local."
+    },
+    {
+      "id": "M10",
+      "capability": "Guided tours with narration-free captions: a bounded sequence of camera stops over bodies with eased flights, holds and a caption per stop, pausable and skippable, Reduce Motion cutting instead of flying",
+      "source": "v0.1 feature 5: guided tours with narration-free captions",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/FramingFlight.swift",
+          "symbol": "TourTimeline",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/FramingFlight.swift",
+          "symbol": "FramingFlight",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/CameraRail.swift",
+          "symbol": "CameraRail",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/CameraRail.swift",
+          "symbol": "CameraRail.orbitCamera",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
+          "symbol": "AnnouncementPlanner",
+          "product": "VisualCoreSimulation",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/FractalExplorer/Experience/TourPlayer.swift",
+        "symbol": "TourPlayer"
+      },
+      "notes": "Tour timing with holds and a Reduce Motion form (FramingFlightTests), 3D camera rails (CameraRailTests) and announcements (AccessibilityPlansTests) exist. TourTimeline moves 2D PlaneFraming stops, not orbit cameras, so 3D tours with captions are G-TOURS (app-local over TourTimeline's timing and OrbitCamera); a generic 3D orbit-camera tour track is assessed for VisualCoreMath there."
+    },
+    {
+      "id": "M11",
+      "capability": "References and units on educational claims: every fact card value shows its units and a citation of a bundled reviewed source",
+      "source": "v0.1 feature 6: references and units displayed on educational claims; manual regression fixture all displayed facts reference a bundled source",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AcknowledgementsView.swift",
+          "symbol": "LicenseInventory",
+          "product": "VisualCoreUI",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AcknowledgementsView.swift",
+          "symbol": "AcknowledgementsView",
+          "product": "VisualCoreUI",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/TinyWorlds/Core/LicenseAudit.swift",
+        "symbol": "LicenseAudit"
+      },
+      "notes": "A license inventory and acknowledgements screen exist and are tested (AcknowledgementsViewTests). No fact, unit or citation model exists in a framework product: the citation records and units are G-CATALOG and the fact cards that show them are G-TOURS, both app-local."
+    },
+    {
+      "id": "M12",
+      "capability": "Approximate orbit computation: labelled approximate Kepler propagation (mean anomaly from epoch and period, eccentric anomaly by bounded iteration, position in the orbital plane rotated to ecliptic coordinates) in Double for a simulated date, with fixtures",
+      "source": "manual algorithm decision 1; phase 02 approximate orbit computation with fixtures; spec FR-A14-003",
+      "status": "upstream gap",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/Vectors.swift",
+          "symbol": "Vec3",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/NumericHygiene.swift",
+          "symbol": "NumericHygiene.normalizedAngle",
+          "product": "VisualCoreMath",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/ParticleUniverse/Core/SceneSimulation.swift",
+        "symbol": "SceneSimulation"
+      },
+      "notes": "Grep for kepler, eccentric, ephemeris, julian and semiMajor in Packages/VisualCore and Packages/VisualCoreRendering finds nothing (2026-11-15). Double vectors and angle normalisation exist (LinearAlgebraTests, NumericHygieneTests). Solving Kepler's equation and placing a body from classical elements is generic mathematics: G-ORBIT (VisualCoreMath, upstream). The example is the closest consumer of a deterministic time-driven simulation."
+    },
+    {
+      "id": "M13",
+      "capability": "Double precision and camera-relative positions: orbital state kept in Double on the CPU, positions drawn relative to the camera or focus body as Float, precision assessed for the largest distances",
+      "source": "cross-cutting: double precision and camera-relative positions; manual algorithm decision 2",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/Vectors.swift",
+          "symbol": "Vec3",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/OriginRebase.swift",
+          "symbol": "OriginRebase",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/OriginRebase.swift",
+          "symbol": "OriginRebase.local",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/PrecisionAdvisor.swift",
+          "symbol": "PrecisionAdvisor",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/PrecisionAdvisor.swift",
+          "symbol": "PrecisionAdvisor.assess",
+          "product": "VisualCoreMath",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/AudioOdyssey/Experience/OdysseyPresenter.swift",
+        "symbol": "OdysseyPresenter"
+      },
+      "notes": "Double vectors, a floating origin that subtracts in Double before converting to Float and a precision assessment exist and are tested (LinearAlgebraTests, OriginRebaseTests, PrecisionAdvisorTests). OriginRebase uses a fixed 1,024-unit grid; Solar System Explorer needs positions relative to the camera or focus body every frame and near/far planes chosen per scale mode across a range of about 10^5 to 10^6 (G-BODIES, app-local)."
+    },
+    {
+      "id": "M14",
+      "capability": "Determinism and replay: the same simulated date, scale mode and view give the same body positions and digest on every run; recorded steps replay",
+      "source": "cross-cutting: determinism and replay; constitution A14 deterministic, GPU-free rules",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/StateDigest.swift",
+          "symbol": "StateDigest",
+          "product": "VisualCoreExperience",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/ScenarioManifest.swift",
+          "symbol": "ScenarioManifest",
+          "product": "VisualCoreExperience",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepRunner.swift",
+          "symbol": "FixedStepRunner",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepRunner.swift",
+          "symbol": "ControlStream",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/StableHash.swift",
+          "symbol": "StableHash",
+          "product": "VisualCoreMath",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/InfiniteGeometry/Experience/GeometryPresenter.swift",
+        "symbol": "GeometryPresenter"
+      },
+      "notes": "Tested in VisualCoreExperienceTests (StateDigestTests, ScenarioManifestTests), VisualCoreSimulationTests/FixedStepRunnerTests and VisualCoreMathTests/StableHashTests."
+    },
+    {
+      "id": "M15",
+      "capability": "Bounded content and date range: fixed caps for body count, mesh detail, orbit samples, time rate and the simulated date range; non-finite values and documents beyond the caps refused",
+      "source": "cross-cutting: bounded content and date range; constitution A14 bounded; spec edge case long timescales",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshBuilder.swift",
+          "symbol": "MeshBudget",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshBuilder.swift",
+          "symbol": "MeshError",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/ResourceLedger.swift",
+          "symbol": "ResourceBudget",
+          "product": "VisualCoreDiagnostics",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/NumericHygiene.swift",
+          "symbol": "NumericHygiene",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/SceneClock.swift",
+          "symbol": "SceneClock.speedRange",
+          "product": "VisualCoreSimulation",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/AudioOdyssey/Core/OdysseyQuality.swift",
+        "symbol": "OdysseyQuality"
+      },
+      "notes": "Mesh and resource budgets, a bounded speed and numeric hygiene exist and are tested (MeshBuilderTests, ResourceLedgerTests, NumericHygieneTests, SceneClockTests). Missing: the catalog's body cap and validation (G-CATALOG) and the simulated date range and rate cap that keep long timescales from overflowing or leaving the model's validity range (G-TIME)."
+    },
+    {
+      "id": "M16",
+      "capability": "Persistence of view state: camera, simulated date, rate, scale mode and selected body saved as a versioned document in per-experience storage with atomic writes, migration and safe recovery from damaged or newer files",
+      "source": "cross-cutting: persistence of view state; constitution A14 offline-first and private",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
+          "symbol": "DocumentStore",
+          "product": "VisualCorePersistence",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCorePersistence/Migration.swift",
+          "symbol": "MigrationChain",
+          "product": "VisualCorePersistence",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCorePersistence/Envelope.swift",
+          "symbol": "DocumentEnvelope",
+          "product": "VisualCorePersistence",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+          "symbol": "ExperienceStorage",
+          "product": "VisualCoreExperience",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/SavedStateStore.swift",
+          "symbol": "SavedStateStore",
+          "product": "VisualCoreExperience",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/TinyWorlds/Core/WorldDocument.swift",
+        "symbol": "WorldDocument"
+      },
+      "notes": "Tested in VisualCorePersistenceTests (DocumentStoreTests, NamedLibraryTests) and VisualCoreExperienceTests (ExperienceStorageTests, SavedStateStoreTests). The saved view document's schema is G-TOURS."
+    },
+    {
+      "id": "M17",
+      "capability": "Quality tiers and low power: quality governor fed by thermal state and Low Power Mode, declared quality tiers that lower sphere segments, orbit samples and starfield density (never the simulated state), refreshed by the session",
+      "source": "cross-cutting: quality tiers and low power; constitution A14 bounded",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityGovernor.swift",
+          "symbol": "QualityGovernor",
+          "product": "VisualCoreDiagnostics",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityProfile.swift",
+          "symbol": "QualityProfile",
+          "product": "VisualCoreDiagnostics",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/DeviceConditions.swift",
+          "symbol": "DeviceConditions",
+          "product": "VisualCoreDiagnostics",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/TessellationChoice.swift",
+          "symbol": "TessellationChoice",
+          "product": "VisualCoreDiagnostics",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceCore.swift",
+          "symbol": "ExperienceCore.qualityTiers",
+          "product": "VisualCoreExperience",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+          "symbol": "ExperienceSession.refreshQuality",
+          "product": "VisualCoreExperienceHost",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/TinyWorlds/Core/TierPolicy.swift",
+        "symbol": "TierPolicy"
+      },
+      "notes": "Tested in VisualCoreDiagnosticsTests (QualityGovernorTests, QualityProfileTests, TessellationChoiceTests), VisualCoreExperienceTests (QualityDeclarationTests) and VisualCoreExperienceHostTests (SessionQualityTests). Core.qualityTiers must match the presenter's levels."
+    },
+    {
+      "id": "M18",
+      "capability": "Accessibility with Reduce Motion and spoken state: system preferences observed, camera flights and tours calmed or cut, the selected body, simulated date, time rate and scale mode spoken through rate-limited announcements, a control alternative for every gesture, information not by colour alone",
+      "source": "cross-cutting: accessibility with Reduce Motion and spoken state; constitution A14 accessibility",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPreferences.swift",
+          "symbol": "SystemAccessibility",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/SystemAccessibilityObserver.swift",
+          "symbol": "SystemAccessibilityObserver",
+          "product": "VisualCoreUI",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
+          "symbol": "AnnouncementPlanner",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
+          "symbol": "StateSign",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AccessibilityPlayers.swift",
+          "symbol": "AnnouncementSink",
+          "product": "VisualCoreUI",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
+          "symbol": "transitionDuration",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/GestureAlternatives.swift",
+          "symbol": "GestureAlternatives",
+          "product": "VisualCoreExperience",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/TinyWorlds/Experience/WorldsPresenter.swift",
+        "symbol": "WorldsPresenter"
+      },
+      "notes": "Tested in VisualCoreSimulationTests (AccessibilityPreferencesTests, AccessibilityPlansTests), VisualCoreUITests (SystemAccessibilityObserverTests, AccessibilityPlayersTests) and VisualCoreExperienceTests (GestureAlternativesTests). The spoken wording for body, date, rate and mode is experience copy over AnnouncementPlanner (G-TIME and G-TOURS carry its tests)."
+    },
+    {
+      "id": "M19",
+      "capability": "Lifecycle and context loss: context loss, resize, background and memory warning rebuild every mesh and target from versioned CPU state; backgrounding pauses simulated time and never fast-forwards it",
+      "source": "cross-cutting: lifecycle and context loss; constitution A14 resilient GPU state",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+          "symbol": "RenderHost.recreateContext",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+          "symbol": "RenderHost.pause",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+          "symbol": "ResourceRegistry",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+          "symbol": "ExperienceSession.handleMemoryWarning",
+          "product": "VisualCoreExperienceHost",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+          "symbol": "ExperienceSession.checkpoint",
+          "product": "VisualCoreExperienceHost",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/PlaybackState.swift",
+          "symbol": "PlaybackState.enterBackground",
+          "product": "VisualCoreSimulation",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/TinyWorlds/Experience/WorldsPresenter.swift",
+        "symbol": "WorldsPresenter"
+      },
+      "notes": "Tested in VisualCoreRenderingTests (RenderHostTests, ResourceRegistryTests, DepthMeshPassTests recreated context, MeshRendererTests recreation), VisualCoreExperienceHostTests (SessionPhaseMemoryTests, ShellLifecycleTests) and VisualCoreSimulationTests/PlaybackStateTests."
+    },
+    {
+      "id": "M20",
+      "capability": "Data provenance and licenses: every bundled number (orbital elements, radii, periods, distances) and fact records its source, epoch, units and license; only openly licensed or public-domain data; the record checked by a test",
+      "source": "cross-cutting: data provenance and licenses; constitution A14 data with provenance and licenses; spec FR-A14-006",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AcknowledgementsView.swift",
+          "symbol": "LicenseInventory",
+          "product": "VisualCoreUI",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AcknowledgementsView.swift",
+          "symbol": "AcknowledgementsView",
+          "product": "VisualCoreUI",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/TinyWorlds/Core/LicenseAudit.swift",
+        "symbol": "LicenseAudit"
+      },
+      "notes": "The license inventory exists and is tested (AcknowledgementsViewTests); it records code and asset licenses, not per-value source, epoch and units. The data record and its test are G-CATALOG (A14-P01); the tolerance and provenance review is G-REVIEW (A14-P05); both app-local."
+    },
+    {
+      "id": "M21",
+      "capability": "Truthful scale labelling: the active scale mode always shown and spoken, the visibility-enhanced mode labelled not to scale, distances and sizes shown with units, never by colour alone",
+      "source": "cross-cutting: truthful scale labelling; constitution A14 truthful claims; manual regression fixture scale-mode label",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
+          "symbol": "StateSign",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
+          "symbol": "AnnouncementPlanner",
+          "product": "VisualCoreSimulation",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/FractalExplorer/Core/PrecisionLadder.swift",
+        "symbol": "PrecisionLadder"
+      },
+      "notes": "Non-colour state signs and announcements exist and are tested (AccessibilityPlansTests). The scale legend and its label rule depend on the scale modes (G-BODIES); the wording review against the model is G-REVIEW; both app-local."
+    },
+    {
+      "id": "M22",
+      "capability": "Labelled simulated date, time zone and model scope: the simulated date shown with its time zone (UTC by default), the model named as an approximation with its epoch and validity range, and the clock rate never implying precision beyond that range",
+      "source": "cross-cutting: labelled simulated date, time zone and model scope; manual algorithm decision 4; spec edge case timestamps",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/SceneClock.swift",
+          "symbol": "SceneClock",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepClock.swift",
+          "symbol": "FixedStepClock.advance",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
+          "symbol": "AnnouncementPlanner",
+          "product": "VisualCoreSimulation",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalScene.swift",
+        "symbol": "FractalScene"
+      },
+      "notes": "Clocks with elapsed simulated time and announcements exist and are tested (SceneClockTests, FixedStepClockTests, AccessibilityPlansTests); no framework product holds a calendar date or time zone. The labelled UTC date and the range rule are G-TIME; the model-scope wording review is G-REVIEW; both app-local."
+    },
+    {
+      "id": "M23",
+      "capability": "Orbit lines, labels and starfield: orbit paths drawn as thin closed meshes, native labels placed at projected body positions without overlapping the controls, and a procedural seeded starfield backdrop",
+      "source": "cross-cutting: orbit lines and labels; manual render sequence stage 3; spec FR-A14-003",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshShapes.swift",
+          "symbol": "Mesh.tube",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitCamera.swift",
+          "symbol": "OrbitCamera.project",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ParticleRenderer.swift",
+          "symbol": "ParticleRenderer",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+          "symbol": "FullScreenShaderScene",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/SeededRandom.swift",
+          "symbol": "SeededRandom",
+          "product": "VisualCoreSimulation",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/AudioOdyssey/Core/WorldPieces.swift",
+        "symbol": "WorldPieces"
+      },
+      "notes": "Tubes along a path (MeshShapeTests), projection to the screen (OrbitCameraTests), instanced quads through Camera2D (ParticleRendererTests), full-screen shader scenes and seeded random numbers (SeededRandomTests) exist. Missing: orbit samples from the model (G-ORBIT), and the orbit line, label placement and starfield of the solar system scene (G-BODIES, app-local); ParticleRenderer draws through Camera2D, so a 3D starfield is either sphere-mapped in a shader or projected stars."
+    },
+    {
+      "id": "M24",
+      "capability": "Body picking: a tap turns into a camera ray tested against each body's sphere (display radius in the active scale mode), nearest hit first, independent of the quality tier",
+      "source": "cross-cutting: picking; user journey 2 select planet",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/RayIntersection.swift",
+          "symbol": "Ray3",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/RayIntersection.swift",
+          "symbol": "Ray3.intersect",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/RayIntersection.swift",
+          "symbol": "Ray3.nearest",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitCamera.swift",
+          "symbol": "OrbitCamera.ray",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/GestureRecognizers.swift",
+          "symbol": "TapRecognizer",
+          "product": "VisualCoreScenes",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/TinyWorlds/Core/GroundPick.swift",
+        "symbol": "GroundPick"
+      },
+      "notes": "Tested in VisualCoreMathTests (RayIntersectionTests: ray-sphere hits against analytic results, nearest; OrbitCameraTests ray) and VisualCoreScenesTests/GestureTests. The body radius used for picking follows the scale mode (G-BODIES)."
+    }
+  ],
+  "gaps": [
+    {
+      "id": "G-CATALOG",
+      "matrix": [
+        "M06",
+        "M09",
+        "M11",
+        "M15",
+        "M20"
+      ],
+      "kind": "adaptation",
+      "owner": "app-local",
+      "justification": "No body catalog, unit type or citation record exists in any framework product. The Sun and eight planets with mean radius (km), semi-major axis (AU), orbital period (days), eccentricity, inclination, longitudes, mean anomaly at an epoch, axial tilt and curated facts, each value with source, epoch, units and license, the kilometre/astronomical-unit conversion and the catalog's caps and validation are Solar System Explorer's educational content and stay in its GPU-free Core (clarification 5, manual phase 01 scientific catalog/units and citation audit, A14-P01).",
+      "phase": 1,
+      "test": "Core host tests (swift test, no GPU): the bundled catalog decodes, has exactly the Sun and eight planets, and every value has source, epoch, units and license; known approximate periods and radii match the catalog within stated tolerances; AU to km and back round-trips within 1e-12 relative; non-finite, negative, missing-source and duplicate entries are refused; a generated provenance document matches the catalog",
+      "closed": null
+    },
+    {
+      "id": "G-ORBIT",
+      "matrix": [
+        "M05",
+        "M07",
+        "M12"
+      ],
+      "kind": "upstream",
+      "owner": "VisualCore:VisualCoreMath",
+      "justification": "Found in A14-P00: no orbit propagation exists in any framework product (grep for kepler, eccentric, ephemeris, julian, semiMajor finds nothing). Approximate Kepler propagation (solving Kepler's equation for elliptical orbits by bounded Newton iteration, position from classical elements in Double, orbit path samples) is generic mathematics and belongs to VisualCoreMath (constitution A14 reuse first, clarification 5, A14-P02); if the phase finds no reuse beyond this experience it stays app-local and this entry records why. Body data, epoch handling and validity ranges stay in the experience.",
+      "phase": 2,
+      "test": "Host tests (swift test, no GPU): circular orbits give uniform motion; for eccentricities 0...0.9 the solved eccentric anomaly satisfies Kepler's equation within 1e-12 in at most a fixed iteration count; positions at perihelion and aphelion match a(1-e) and a(1+e); one period returns to the start within tolerance; fixture positions of the eight planets for chosen dates match an approximate published reference within the stated tolerance; NaN/Inf and e >= 1 are refused; API baseline additive, documented with ///, and the reference regression passes at the X gate",
+      "closed": null
+    },
+    {
+      "id": "G-BODIES",
+      "matrix": [
+        "M06",
+        "M07",
+        "M09",
+        "M13",
+        "M21",
+        "M23"
+      ],
+      "kind": "adaptation",
+      "owner": "app-local",
+      "justification": "Spheres, revolved rings, 2D noise, tubes, the lit mesh renderer, the orbit camera with a clearance sphere, OriginRebase and ray-sphere picking exist, but the solar system scene does not: procedural planet surfaces (sampled without date-line seams or pole pinches), Saturn's rings, the emissive Sun, the starfield, orbit lines and labels, camera-relative per-body transforms with near/far chosen per scale mode, the focus controller that never crosses the near plane, and the true-relative and visibility-enhanced scale modes with their label. These are app-local over MeshRenderer, the noise and OrbitCamera (clarification 5, manual phase 03 camera and 3D body rendering, A14-P03); a 3D or seamless spherical noise is assessed for VisualCoreScenes there.",
+      "phase": 3,
+      "test": "Core and experience tests: body surface meshes are deterministic by digest and seam-free at the date line; camera-relative positions keep Float error below a stated fraction of a pixel for every body in both scale modes; focus flights to every body keep the eye outside the body and the body inside near/far at every sampled step; the true-relative mode keeps catalog ratios and the enhanced mode is always labelled not to scale; drawn orbit lines follow the model's samples; context recreation redraws the same image within a pixel tolerance",
+      "closed": null
+    },
+    {
+      "id": "G-TIME",
+      "matrix": [
+        "M05",
+        "M08",
+        "M15",
+        "M22"
+      ],
+      "kind": "adaptation",
+      "owner": "app-local",
+      "justification": "SceneClock, FixedStepClock and PlaybackState give play, pause, a bounded speed and background pause, but no simulated calendar instant, rate in simulated days per second, bounded date range, UTC label or reset to present exist. The simulated clock and its labelled UTC date, discrete rates, the date range inside the model's validity range and the spoken date and rate are app-local over SceneClock and PlaybackState (clarification 5, manual phase 04 time controls, A14-P04); a reusable scaled-date clock is assessed for VisualCoreSimulation there.",
+      "phase": 4,
+      "test": "Core host tests: play, pause and each rate advance the simulated UTC instant by rate times elapsed time; the date clamps at both ends of the range with a typed reason; backgrounding never fast-forwards; reset to present uses an injected clock; the displayed date carries its time zone (UTC by default); the same command stream gives the same instants and digest; spoken date and rate announcements are rate limited",
+      "closed": null
+    },
+    {
+      "id": "G-TOURS",
+      "matrix": [
+        "M10",
+        "M11"
+      ],
+      "kind": "adaptation",
+      "owner": "app-local",
+      "justification": "TourTimeline (2D PlaneFraming stops), CameraRail, the announcement planner and ExperienceStorage exist, but captioned 3D tours over bodies, fact cards showing units and citations, and the saved view document (camera, simulated date, rate, scale mode, selected body) do not. They are Solar System Explorer's content and UI, app-local over TourTimeline's timing, OrbitCamera and ExperienceStorage (clarification 5, manual phase 04 guided tours, A14-P04); a generic 3D orbit-camera tour track is assessed for VisualCoreMath there.",
+      "phase": 4,
+      "test": "Core and experience tests: each bundled tour is bounded in stops and duration, every stop has a caption and a valid body, pause and skip work, and Reduce Motion cuts between stops; every fact card value shows units and a citation present in the catalog; the saved view document round-trips, and damaged, newer and oversized files are reported",
+      "closed": null
+    },
+    {
+      "id": "G-REVIEW",
+      "matrix": [
+        "M20",
+        "M21",
+        "M22"
+      ],
+      "kind": "adaptation",
+      "owner": "app-local",
+      "justification": "A provenance and tolerance review of bundled data, fact wording, the scale labels and the model-scope statement is educational quality work specific to this experience; no framework product can own it (clarification 5, manual phase 05 scientific review and device QA, A14-P05).",
+      "phase": 5,
+      "test": "Core host tests and a reviewed document: every displayed fact references a bundled reviewed source; model positions stay within the stated tolerance over the whole date range; every screen state with the enhanced mode shows the not-to-scale label; the model-scope text names the approximation, epoch and range; copy claims checked by the release copy-claims step",
+      "closed": null
+    }
+  ],
+  "traceability": [
+    {
+      "item": "brainstorm: 3D scenes",
+      "matrix": [
+        "M01",
+        "M06",
+        "M23"
+      ],
+      "phases": [
+        3
+      ]
+    },
+    {
+      "item": "brainstorm: camera controls",
+      "matrix": [
+        "M02",
+        "M07",
+        "M24"
+      ],
+      "phases": [
+        3
+      ]
+    },
+    {
+      "item": "brainstorm: materials and lighting",
+      "matrix": [
+        "M03",
+        "M06"
+      ],
+      "phases": [
+        3
+      ]
+    },
+    {
+      "item": "brainstorm: animation",
+      "matrix": [
+        "M04",
+        "M10"
+      ],
+      "phases": [
+        3,
+        4
+      ]
+    },
+    {
+      "item": "brainstorm: time-based simulation",
+      "matrix": [
+        "M05",
+        "M08",
+        "M12"
+      ],
+      "phases": [
+        2,
+        4
+      ]
+    },
+    {
+      "item": "v0.1 feature 1: Sun and eight major planets with curated fact cards (procedural surfaces)",
+      "matrix": [
+        "M06",
+        "M11",
+        "M20"
+      ],
+      "phases": [
+        1,
+        3
+      ]
+    },
+    {
+      "item": "v0.1 feature 2: orbit view, planet focus and camera navigation",
+      "matrix": [
+        "M02",
+        "M07",
+        "M12",
+        "M23",
+        "M24"
+      ],
+      "phases": [
+        2,
+        3
+      ]
+    },
+    {
+      "item": "v0.1 feature 3: play/pause/speed up simulated motion with explicit date/time display",
+      "matrix": [
+        "M08",
+        "M22"
+      ],
+      "phases": [
+        4
+      ]
+    },
+    {
+      "item": "v0.1 feature 4: separate true-relative and visibility-enhanced size/distance modes",
+      "matrix": [
+        "M09",
+        "M13",
+        "M21"
+      ],
+      "phases": [
+        1,
+        3
+      ]
+    },
+    {
+      "item": "v0.1 feature 5: guided tours with narration-free captions",
+      "matrix": [
+        "M10"
+      ],
+      "phases": [
+        4
+      ]
+    },
+    {
+      "item": "v0.1 feature 6: references and units displayed on educational claims",
+      "matrix": [
+        "M11",
+        "M20"
+      ],
+      "phases": [
+        1,
+        4,
+        5
+      ]
+    }
+  ],
+  "negative": [
+    {
+      "rule": "No EGL display, context, surface or GL path of its own and no second renderer; all drawing goes through VisualCore's RenderHost on OpenGL ES -> ANGLE -> Metal",
+      "source": "constitution A14 consumer, not fork; CLAUDE.md rule 4; spec FR-A14-006"
+    },
+    {
+      "rule": "No ProjectM types, engine or presets and no ProjectM code reused",
+      "source": "constitution A14 consumer, not fork; CLAUDE.md rule 12; spec FR-A14-006"
+    },
+    {
+      "rule": "No networking, accounts, analytics, tracking or advertising and no live ephemeris download; state is stored only on the device",
+      "source": "constitution A14 offline-first and private; CLAUDE.md rule 3; spec FR-A14-006"
+    },
+    {
+      "rule": "No high-precision ephemeris and no live sky position claims: positions come from a stated approximate model over a stated date range and are never presented as an observing or navigation tool",
+      "source": "manual non-goals; constitution A14 truthful claims; spec FR-A14-006"
+    },
+    {
+      "rule": "No telescope alignment",
+      "source": "manual non-goals; spec FR-A14-006"
+    },
+    {
+      "rule": "No purchased, generated or hand-made images, textures or artwork: planet surfaces, rings, the Sun, orbits, label backdrops and the starfield are procedural geometry, noise and shaders (the manual's licensed textures are replaced by procedural surfaces)",
+      "source": "CLAUDE.md rule 4; constitution A14 visuals are code; spec canonical override and FR-A14-006"
+    },
+    {
+      "rule": "No unlicensed imagery or data and no scraping",
+      "source": "manual non-goals; constitution A14 data with provenance; spec FR-A14-006"
+    },
+    {
+      "rule": "No claim that the visibility-enhanced mode is to scale: it is always labelled not to scale",
+      "source": "constitution A14 truthful claims; spec FR-A14-006"
+    },
+    {
+      "rule": "No shader decides body positions: positions for a simulated date come from the GPU-free CPU model in Double, and drawing never changes the simulation state",
+      "source": "constitution A14 deterministic, GPU-free rules; manual algorithm decision 2; spec FR-A14-006"
+    },
+    {
+      "rule": "Data and license rule: every bundled number and fact records its source, epoch, units and license; only openly licensed or public-domain data is bundled, checked by a test",
+      "source": "constitution A14 data with provenance and licenses; spec FR-A14-006"
+    },
+    {
+      "rule": "No permission prompts: no location, camera, motion, microphone or network in version 0.1; reset to present reads the device clock only; the app's privacy answers do not change",
+      "source": "spec clarification 4; CLAUDE.md rule 6"
+    },
+    {
+      "rule": "No fork or copy of VisualCore, ANGLE or projectm-ios, no standalone app target and no copy of Tiny Worlds' camera policy, Audio Odyssey's star pieces, Fractal Explorer's tour player or other experience code; generic needs become VisualCore gaps",
+      "source": "ADR-0009; constitution A14 reuse first; CLAUDE.md rule 1; spec edge cases"
+    }
+  ],
+  "decision": {
+    "result": "go",
+    "reasons": [
+      "A working host and 3D drawing path exist: RenderHost on OpenGL ES -> ANGLE -> Metal, MeshRenderer with one directional Lambert light, ambient, per-vertex colours and optional fog, and DepthMeshPass drawing several meshes with depth into an owned target copied to the colour-only surface, through OrbitCamera, all public and tested.",
+      "10 of 24 rows are available with tests: 3D scenes, camera controls, materials and lighting, animation, determinism and replay, persistence of view state, quality tiers and low power, accessibility with Reduce Motion, lifecycle and context loss, body picking. The clarification's facts hold; in addition Mesh.revolution (rings) and Mesh.tube (orbit lines) exist, OriginRebase subtracts in Double before converting to Float, and TourTimeline moves 2D PlaneFraming stops, so 3D tours need adaptation.",
+      "All gaps are additive and owned: app-local G-CATALOG (catalog, units, citations) in A14-P01; G-ORBIT (approximate Kepler propagation, VisualCoreMath upstream) in A14-P02; app-local G-BODIES (procedural bodies, starfield, orbit lines, labels, camera-relative positions, focus, scale modes) in A14-P03; app-local G-TIME (simulated UTC clock, rate, date range) and G-TOURS (captioned tours, fact cards, saved view state) in A14-P04; app-local G-REVIEW (provenance and tolerance review) in A14-P05.",
+      "No permission and no privacy answer changes; Solar System Explorer stays unregistered until A14-P01 creates Packages/ExperiencesCreative/SolarSystemExplorer with its targets and first real rules, so the experience package check and the one app are unchanged."
+    ],
+    "blockers": []
+  }
+}
