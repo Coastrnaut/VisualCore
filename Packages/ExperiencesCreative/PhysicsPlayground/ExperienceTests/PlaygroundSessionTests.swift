@@ -20,6 +20,10 @@
 // experiment ("Experiment: Free play.") and, while a tutorial runs, its step; the mirror carries the experiment and the
 // tutorial; the origin, starting world and tutorial survive the saved state (schema 4); a schema-5 state is the newer
 // one refused; the stored schema-3 example opens through the migration 3 → 4; a tutorial runs through the shell.
+//
+// Feature 086 (A11-P05) T-A11-504 (FR-A11-502, FR-A11-520): the saved state is schema 5 (the world at world schema 4,
+// sleep included); a schema-6 state is the newer one refused; the stored schema-3 example opens through 3 → 4 → 5 with
+// its world at world schema 4. The ledge is hatched at the levels that draw a hatch.
 import Foundation
 import XCTest
 import VisualCoreDiagnostics
@@ -43,7 +47,9 @@ final class PlaygroundSessionTests: XCTestCase {
         let core = try PlaygroundTest.core(shell)
         XCTAssertEqual(core.world.bodies.count, 10)
         XCTAssertEqual(presenter.lastBodiesDrawn, 10)
-        XCTAssertEqual(presenter.lastStaticDrawn, 1, "the ledge is hatched")
+        XCTAssertEqual(presenter.lastStaticDrawn, 1, "the ledge is drawn darker")
+        XCTAssertEqual(presenter.lastHatchesDrawn, presenter.budget.hatchSpacing == nil ? 0 : 1,
+                       "the ledge is hatched at the levels with a hatch")
         XCTAssertEqual(presenter.lastSpringsDrawn, 2, "the hanging box's and the joined circles' springs")
         let summary = shell.accessibilitySummary
         XCTAssertEqual(summary, "Physics Playground: 10 bodies, running, normal speed (time scale 1×); "
@@ -201,7 +207,7 @@ final class PlaygroundSessionTests: XCTestCase {
         XCTAssertTrue(shell.handle(control: "overlay.forces", values: [1]).isAccepted)
         try PlaygroundTest.frames(first, 2)
         let snapshot = try shell.snapshot()
-        XCTAssertEqual(snapshot.schemaVersion, 4)
+        XCTAssertEqual(snapshot.schemaVersion, 5)
         let saved = try PlaygroundTest.core(shell)
         XCTAssertGreaterThan(saved.world.tick, 0, "a world in motion")
         first.close()
@@ -278,7 +284,7 @@ final class PlaygroundSessionTests: XCTestCase {
         try PlaygroundTest.frames(first, 60)
         let saved = try shell.snapshot()
         first.close()
-        let newer = try ExperienceSnapshot(experience: PlaygroundTest.id, schemaVersion: 5, seed: saved.seed,
+        let newer = try ExperienceSnapshot(experience: PlaygroundTest.id, schemaVersion: 6, seed: saved.seed,
                                            stepIndex: saved.stepIndex, digest: saved.digest,
                                            payload: Data(saved.payload.utf8))
 
@@ -346,7 +352,9 @@ final class PlaygroundSessionTests: XCTestCase {
         let opened = try await PlaygroundTest.open(session, seed: 3, snapshot: snapshot)
         XCTAssertNil(session.lastRestoreRefusal, "the Phase 03 state is migrated, not refused")
         let core = try PlaygroundTest.core(opened)
-        XCTAssertEqual(core.world, PlaygroundCore.schemaThreeExampleState().world)
+        let stored = PlaygroundCore.schemaThreeExampleState().world
+        XCTAssertEqual(core.world, PhysicsWorld.migrated(fromSchemaThree: stored))
+        XCTAssertEqual(core.world.schema, 4)
         XCTAssertEqual(core.origin, .freePlay)
         XCTAssertEqual(core.startingWorld, ExperimentDocument.withoutEditing(core.world))
         XCTAssertNil(core.tutorial)

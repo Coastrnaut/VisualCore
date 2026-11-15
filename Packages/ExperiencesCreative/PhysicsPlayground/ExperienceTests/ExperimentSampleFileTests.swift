@@ -5,6 +5,10 @@
 // through the presenter, where it becomes the world and the starting world; the newer (file schema 2), damaged (not
 // JSON) and truncated (the valid file cut in half) samples are refused with their reasons, the presenter's state is
 // unchanged, and each file stays byte for byte as committed. Files and one short session only, well under 10 s.
+//
+// Feature 086 (A11-P05) T-A11-504 (FR-A11-502): the committed samples stay as A11-P04 wrote them (the world at world
+// schema 3, bodies without `asleep` and `restTicks`); the valid sample is exactly today's encoding with the world
+// written at world schema 3, and it still opens, its world migrated to world schema 4 with every body awake.
 import Foundation
 import XCTest
 @testable import PhysicsPlaygroundExperience
@@ -57,7 +61,20 @@ final class ExperimentSampleFileTests: XCTestCase {
     func testTheValidSampleOpens() async throws {
         let bytes = try sample("experiment-valid.json")
         let expected = pendulumDocument()
-        XCTAssertEqual(bytes, expected.encoded(), "the sample has the exact shape encoded() writes (sorted keys)")
+        // The sample is today's encoding (sorted keys) with the world written at world schema 3 (A11-P04).
+        var today = try XCTUnwrap(try JSONSerialization.jsonObject(with: expected.encoded()) as? [String: Any])
+        var world = try XCTUnwrap(today["world"] as? [String: Any])
+        world["schema"] = 3
+        world["bodies"] = try XCTUnwrap(world["bodies"] as? [[String: Any]]).map { body in
+            var body = body
+            body["asleep"] = nil
+            body["restTicks"] = nil
+            return body
+        }
+        today["world"] = world
+        let stored = try XCTUnwrap(try JSONSerialization.jsonObject(with: bytes) as? [String: Any])
+        XCTAssertEqual(stored as NSDictionary, today as NSDictionary, "the A11-P04 shape of the same document")
+        XCTAssertEqual(expected.world.schema, PhysicsWorld.schemaVersion)
         try install(bytes)
         let store = ExperimentStore(storage: storage)
         XCTAssertEqual(try store.read(slot: 0).get(), expected)

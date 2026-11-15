@@ -95,6 +95,19 @@
 // registry's migration check restores. A saved slot is opened outside the replay: `opening(document:slot:from:)`
 // builds the state and `openingSnapshot(of:experience:stepIndex:)` the snapshot the presenter hands to
 // `ExperienceShell.restore`. The digest covers the whole state (world, generator, origin, starting world, tutorial).
+//
+// Feature 086 (A11-P05) T-A11-504 (FR-A11-502, FR-A11-520; clarifications 1, 4; research D1, D3; data-model
+// "PlaygroundState (schema 5)"; contract contracts/stability.md). The world is at world schema 4 (every body's `asleep`
+// and `restTicks`, covered by the digest), so the state is snapshot schema 5: the schema-4 state with a schema-4 world
+// and starting world. `MigrationChain(currentVersion: 5)` keeps the steps 1 → 2, 2 → 3 and 3 → 4, each writing the
+// faithful payload of its schema (bodies without the keys their schema lacked: `pinned`, `asleep` and `restTicks` for
+// schemas 1 and 2, `asleep` and `restTicks` for schemas 3 and 4; the world of a schema-3 or schema-4 state at world
+// schema 3), and adds 4 → 5 (``migratedToSchemaFive(_:)``): the world and the starting world of a schema-4 state (both
+// at world schema 3) migrated with `PhysicsWorld.migrated(fromSchemaThree:)` — every body awake with 0 rest ticks,
+// everything else kept. `schemaFourExample()` is the stored A11-P04 payload the registry's migration check restores.
+// Three quality tiers (`level-0`, `level-1`, `level-2`, as the registration): the presenter draws the host's tier with
+// `DrawingBudget` (spring coils, circle points, hatch spacing); the core stores no tier (`setQualityTier` keeps the
+// protocol's default, which does nothing), so the state, the replay and the digest are the same at every tier.
 import Foundation
 import PhysicsPlaygroundCore
 import VisualCoreExperience
@@ -168,6 +181,9 @@ public enum PlaygroundRestoreError: Error, Equatable {
     case notSchemaTwo(Int)
     /// A payload handed to the step 3 → 4 whose world is not at schema 3 (the schema it names; feature 085).
     case notSchemaThree(Int)
+    /// A payload handed to the step 4 → 5 whose world or starting world is not at world schema 3 (the schema it
+    /// names; feature 086).
+    case notSchemaFour(Int)
     /// The starting world does not validate (its problems; feature 085).
     case invalidStartingWorld([String])
     /// The tutorial progress names no tutorial or step, or a negative start tick (feature 085).
@@ -189,8 +205,10 @@ public struct PlaygroundStateSchemaThree: Codable, Equatable, Sendable {
     }
 }
 
-/// The saved state of Physics Playground (snapshot schema 4, feature 085): the world, the generator state, the origin
-/// of the opened experiment, its starting world and the tutorial progress (nil, and not written, when none runs).
+/// The saved state of Physics Playground (snapshot schema 5, feature 086; the shape of schema 4, feature 085, with the
+/// world and the starting world at world schema 4): the world, the generator state, the origin of the opened
+/// experiment, its starting world and the tutorial progress (nil, and not written, when none runs). A schema-4 payload
+/// decodes into the same shape with both worlds at world schema 3 (the step 4 → 5 migrates them).
 public struct PlaygroundState: Codable, Equatable, Sendable {
     /// The physics world.
     public var world: PhysicsWorld
@@ -221,7 +239,7 @@ public struct PlaygroundState: Codable, Equatable, Sendable {
     }
 }
 
-/// The state of Physics Playground. Schema version 4.
+/// The state of Physics Playground. Schema version 5 (feature 086).
 public struct PlaygroundCore: ExperienceCore, Equatable {
     /// The experience's id in the catalog.
     public static let experienceID = "a11.physics-playground"
@@ -242,8 +260,8 @@ public struct PlaygroundCore: ExperienceCore, Equatable {
     public static let gestureActionIDs: Set<String> = ["edit.add", "edit.select", "edit.grab", "edit.move",
                                                        "edit.release", "edit.pin", "edit.delete"]
 
-    /// The snapshot schema this build writes.
-    public static let snapshotSchema = 4
+    /// The snapshot schema this build writes (5 since feature 086: the world at world schema 4).
+    public static let snapshotSchema = 5
 
     /// The largest body id an edit action names.
     public static let maxBodyId = 10_000
@@ -315,20 +333,29 @@ public struct PlaygroundCore: ExperienceCore, Equatable {
     /// One host step is the world's fixed tick, 1/120 s.
     public static var stepDuration: Double { WorldSettings.fixedTick }
 
-    /// One quality tier (`level-0`): the drawing has nothing to scale down.
-    public static var qualityTiers: Int { 1 }
+    /// Three quality tiers (`level-0`, `level-1`, `level-2`, feature 086 A11-P05; the default uniform profile names
+    /// them as the registration does): `DrawingBudget.count`. The tier is presentation only — the presenter draws
+    /// the springs, circles and hatches with the `DrawingBudget` of the host's tier (level 2 under Low Power Mode);
+    /// the core keeps nothing (`setQualityTier` is the protocol's default, which does nothing), so the state and its
+    /// digest are the same at every tier.
+    public static var qualityTiers: Int { DrawingBudget.count }
 
-    /// Schema 4 (feature 085). The step 1 → 2 (``migratedToSchemaTwo(_:)``) turns a Phase 01 payload into a Phase 02
+    /// Schema 5 (feature 086). The step 1 → 2 (``migratedToSchemaTwo(_:)``) turns a Phase 01 payload into a Phase 02
     /// payload; the step 2 → 3 (``migratedToSchemaThree(_:)``) turns a Phase 02 payload into a Phase 03 payload; the
-    /// step 3 → 4 (``migratedToSchemaFour(_:)``) turns a Phase 03 payload into a schema-4 payload. A payload that does
-    /// not decode is refused by its step (the engine reports the migration as failed).
+    /// step 3 → 4 (``migratedToSchemaFour(_:)``) turns a Phase 03 payload into a Phase 04 payload; the step 4 → 5
+    /// (``migratedToSchemaFive(_:)``) turns a Phase 04 payload into a schema-5 payload. A payload that does not decode
+    /// is refused by its step (the engine reports the migration as failed).
     public static var migrations: MigrationChain {
         MigrationChain(currentVersion: snapshotSchema, steps: [
             1: { payload in try migratedToSchemaTwo(payload) },
             2: { payload in try migratedToSchemaThree(payload) },
             3: { payload in try migratedToSchemaFour(payload) },
+            4: { payload in try migratedToSchemaFive(payload) },
         ])
     }
+
+    /// The body keys world schema 4 added (feature 086): absent from the bodies of every older world record.
+    static let sleepKeys = ["asleep", "restTicks"]
 
     /// The schema-2 record of a world: every schema-2 field of `world` (its pins, selection, grab and overlay flags
     /// dropped).
@@ -343,20 +370,35 @@ public struct PlaygroundCore: ExperienceCore, Equatable {
                                       contactCache: world.contactCache)
     }
 
-    /// `value` encoded with sorted keys as a JSON object, every body of its world written without the `pinned` key
-    /// (as schemas 1 and 2 wrote bodies).
+    /// `value` encoded with sorted keys as a JSON object, every body of its world written without the `pinned`,
+    /// `asleep` and `restTicks` keys (as schemas 1 and 2 wrote bodies).
     static func objectWithoutPins<Value: Encodable>(_ value: Value) throws -> [String: Any] {
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
-        guard var object = try JSONSerialization.jsonObject(with: encoder.encode(value)) as? [String: Any],
-              var world = object["world"] as? [String: Any],
-              var bodies = world["bodies"] as? [[String: Any]] else {
-            throw PlaygroundRestoreError.invalidWorld(["the state is not a JSON object with a world and bodies"])
+        try withoutBodyKeys(jsonObject(value), keys: ["pinned"] + sleepKeys, worlds: ["world"])
+    }
+
+    /// `object` with the keys `keys` removed from every body of each of its worlds named by `worlds` (feature 086: the
+    /// faithful payload of an older schema). Throws when a named world is not a JSON object with bodies.
+    static func withoutBodyKeys(_ object: [String: Any], keys: [String], worlds: [String]) throws -> [String: Any] {
+        var object = object
+        for name in worlds {
+            guard var world = object[name] as? [String: Any], var bodies = world["bodies"] as? [[String: Any]] else {
+                throw PlaygroundRestoreError.invalidWorld(["the state has no \(name) with bodies"])
+            }
+            for index in bodies.indices {
+                for key in keys { bodies[index][key] = nil }
+            }
+            world["bodies"] = bodies
+            object[name] = world
         }
-        for index in bodies.indices { bodies[index]["pinned"] = nil }
-        world["bodies"] = bodies
-        object["world"] = world
         return object
+    }
+
+    /// `world` as a world-schema-3 record (feature 086): the schema number set to 3; its bodies are written without
+    /// `asleep` and `restTicks` by the callers (``withoutBodyKeys(_:keys:worlds:)``).
+    static func schemaThreeWorld(_ world: PhysicsWorld) -> PhysicsWorld {
+        var world = world
+        world.schema = 3
+        return world
     }
 
     /// The step 1 → 2: `payload` decoded as a ``PlaygroundStateSchemaOne`` (its world must name schema 1), the world
@@ -374,24 +416,44 @@ public struct PlaygroundCore: ExperienceCore, Equatable {
     /// The step 2 → 3: `payload` decoded as a ``PlaygroundStateSchemaTwo`` (its world must name schema 2), the world
     /// migrated with `PhysicsWorld.migrated(fromSchemaTwo:)` (no pins, no selection, no grab, overlays off; everything
     /// else kept), the generator state kept, and the Phase 03 state (``PlaygroundStateSchemaThree``) encoded again as
-    /// a JSON object. Not validated here; the restore validates.
+    /// a JSON object — its world at schema 3 with bodies without `asleep` and `restTicks` (feature 086), exactly as
+    /// A11-P03 wrote it. Not validated here; the restore validates.
     static func migratedToSchemaThree(_ payload: [String: Any]) throws -> [String: Any] {
         let data = try JSONSerialization.data(withJSONObject: payload, options: [.sortedKeys])
         let old = try JSONDecoder().decode(PlaygroundStateSchemaTwo.self, from: data)
         guard old.world.schema == 2 else { throw PlaygroundRestoreError.notSchemaTwo(old.world.schema) }
-        let state = PlaygroundStateSchemaThree(world: PhysicsWorld.migrated(fromSchemaTwo: old.world),
-                                               random: old.random)
-        return try jsonObject(state)
+        let world = schemaThreeWorld(PhysicsWorld.migrated(fromSchemaTwo: old.world))
+        let state = PlaygroundStateSchemaThree(world: world, random: old.random)
+        return try withoutBodyKeys(jsonObject(state), keys: sleepKeys, worlds: ["world"])
     }
 
     /// The step 3 → 4 (feature 085): `payload` decoded as a ``PlaygroundStateSchemaThree`` (its world must name schema
     /// 3), kept as it is, with origin free play, the world without grab and selection as the starting world and no
-    /// tutorial; the generator state kept; encoded again as a JSON object. Not validated here; the restore validates.
+    /// tutorial; the generator state kept; encoded again as a JSON object with both worlds at schema 3 and their bodies
+    /// without `asleep` and `restTicks` (feature 086), exactly as A11-P04 wrote it. Not validated here; the restore
+    /// validates.
     static func migratedToSchemaFour(_ payload: [String: Any]) throws -> [String: Any] {
         let data = try JSONSerialization.data(withJSONObject: payload, options: [.sortedKeys])
         let old = try JSONDecoder().decode(PlaygroundStateSchemaThree.self, from: data)
         guard old.world.schema == 3 else { throw PlaygroundRestoreError.notSchemaThree(old.world.schema) }
-        return try jsonObject(PlaygroundState(world: old.world, random: old.random))
+        return try withoutBodyKeys(jsonObject(PlaygroundState(world: old.world, random: old.random)), keys: sleepKeys,
+                                   worlds: ["world", "startingWorld"])
+    }
+
+    /// The step 4 → 5 (feature 086): `payload` decoded as a schema-4 state (the shape of ``PlaygroundState``; its
+    /// world and starting world must name world schema 3), both worlds migrated with
+    /// `PhysicsWorld.migrated(fromSchemaThree:)` (world schema 4, every body awake with 0 rest ticks, everything else
+    /// kept), the generator, origin and tutorial progress kept; encoded again as a JSON object. Not validated here; the
+    /// restore validates.
+    static func migratedToSchemaFive(_ payload: [String: Any]) throws -> [String: Any] {
+        let data = try JSONSerialization.data(withJSONObject: payload, options: [.sortedKeys])
+        var state = try JSONDecoder().decode(PlaygroundState.self, from: data)
+        for schema in [state.world.schema, state.startingWorld.schema] where schema != 3 {
+            throw PlaygroundRestoreError.notSchemaFour(schema)
+        }
+        state.world = PhysicsWorld.migrated(fromSchemaThree: state.world)
+        state.startingWorld = PhysicsWorld.migrated(fromSchemaThree: state.startingWorld)
+        return try jsonObject(state)
     }
 
     /// `value` encoded with sorted keys as a JSON object.
@@ -524,22 +586,60 @@ public struct PlaygroundCore: ExperienceCore, Equatable {
     /// dropped circle and a dropped box (ids 10 and 11), circle 8 pinned, circle 9 selected, the hanging box held,
     /// velocity arrows on, half speed, paused, tick 0, and the generator after those draws. No tick has run and the
     /// actions are A11-P03's, so this is exactly what A11-P03 saved for that seed and those actions (feature 085).
+    /// The world is written at world schema 3 (feature 086): every body is awake with 0 rest ticks at step 0, so the
+    /// schema number is the only difference from the current world.
     public static func schemaThreeExampleState(seed: UInt64 = 7) -> PlaygroundStateSchemaThree {
         var core = PlaygroundCore(seed: seed)
         for action in schemaThreeExampleActions {
             _ = core.apply(ExperienceAction(control: action.control, values: action.values, step: 0))
         }
-        return PlaygroundStateSchemaThree(world: core.world, random: core.generator.state)
+        return PlaygroundStateSchemaThree(world: schemaThreeWorld(core.world), random: core.generator.state)
     }
 
     /// The stored example of schema 3 for the registry's migration check (feature 085, T-A11-403): the A11-P03 payload
-    /// ``schemaThreeExampleState(seed:)`` — exactly the keys `random` and `world` (the schema-3 world) at step 0 —
-    /// with the digest its restore through the step 3 → 4 must give: the same world and generator, origin free play,
-    /// the world without its grab and selection as the starting world, and no tutorial. Nil only if the encoding
-    /// failed.
+    /// ``schemaThreeExampleState(seed:)`` — exactly the keys `random` and `world` (the schema-3 world, bodies without
+    /// `asleep` and `restTicks`) at step 0 — with the digest its restore through the steps 3 → 4 → 5 must give: the
+    /// same world (at world schema 4) and generator, origin free play, the world without its grab and selection as the
+    /// starting world, and no tutorial. Nil only if the encoding failed.
     public static func schemaThreeExample(seed: UInt64 = 7) -> MigrationExample? {
-        guard let payload = try? jsonObject(schemaThreeExampleState(seed: seed)) else { return nil }
+        guard let object = try? jsonObject(schemaThreeExampleState(seed: seed)),
+              let payload = try? withoutBodyKeys(object, keys: sleepKeys, worlds: ["world"]) else { return nil }
         return migrationExample(version: 3, payload: payload, seed: seed)
+    }
+
+    /// The actions the stored Phase 04 example was saved after, all at step 0 (A11-P01 … A11-P04 actions only; feature
+    /// 086): start the tutorial "Springs and energy", open the spring chain, force arrows on (the tutorial's first two
+    /// steps), drop a box, Moon gravity, half speed, pause.
+    public static let schemaFourExampleActions: [(control: String, values: [Double])] = [
+        ("tutorial.start", [1]), ("experiment.preset", [Double(PresetID.springChain.rawValue)]),
+        ("overlay.forces", [1]), ("world.drop", [1]), ("world.gravity", [1]), ("world.timeScale", [1]),
+        ("world.pause", [1]),
+    ]
+
+    /// The A11-P04 state of seed `seed` after ``schemaFourExampleActions`` at step 0: the spring chain as the starting
+    /// world, the chain with a dropped box, force arrows on, Moon gravity, half speed and paused as the world, origin
+    /// the spring-chain preset, the tutorial "Springs and energy" on its last step, and the generator after those
+    /// draws; both worlds at world schema 3. No tick has run and the actions are A11-P04's, so this is exactly what
+    /// A11-P04 saved for that seed and those actions (feature 086).
+    public static func schemaFourExampleState(seed: UInt64 = 7) -> PlaygroundState {
+        var core = PlaygroundCore(seed: seed)
+        for action in schemaFourExampleActions {
+            _ = core.apply(ExperienceAction(control: action.control, values: action.values, step: 0))
+        }
+        return PlaygroundState(world: schemaThreeWorld(core.world), random: core.generator.state, origin: core.origin,
+                               startingWorld: schemaThreeWorld(core.startingWorld), tutorial: core.tutorial)
+    }
+
+    /// The stored example of schema 4 for the registry's migration check (feature 086, T-A11-504): the A11-P04 payload
+    /// ``schemaFourExampleState(seed:)`` — the keys `origin`, `random`, `startingWorld`, `tutorial` and `world`, both
+    /// worlds at world schema 3 with bodies without `asleep` and `restTicks` — at step 0, with the digest its restore
+    /// through the step 4 → 5 must give: the same worlds at world schema 4 (every body awake with 0 rest ticks), the
+    /// same generator, origin and tutorial progress. Nil only if the encoding failed.
+    public static func schemaFourExample(seed: UInt64 = 7) -> MigrationExample? {
+        guard let object = try? jsonObject(schemaFourExampleState(seed: seed)),
+              let payload = try? withoutBodyKeys(object, keys: sleepKeys, worlds: ["world", "startingWorld"])
+        else { return nil }
+        return migrationExample(version: 4, payload: payload, seed: seed)
     }
 
     /// The twenty-one controls with their declared ranges.
@@ -789,9 +889,9 @@ public struct PlaygroundCore: ExperienceCore, Equatable {
         return core
     }
 
-    /// The snapshot of `core` for `ExperienceShell.restore` (feature 085): schema 4, the core's preparation seed, the
-    /// step index `stepIndex`, the core's digest with `experience` as domain and its payload. Throws when the payload
-    /// or the digest cannot be written or the envelope is refused.
+    /// The snapshot of `core` for `ExperienceShell.restore` (feature 085): the current schema (5), the core's
+    /// preparation seed, the step index `stepIndex`, the core's digest with `experience` as domain and its payload.
+    /// Throws when the payload or the digest cannot be written or the envelope is refused.
     public static func openingSnapshot(of core: PlaygroundCore, experience: ExperienceID,
                                        stepIndex: Int) throws -> ExperienceSnapshot {
         var builder = DigestBuilder(domain: experience.rawValue)
@@ -834,15 +934,16 @@ public struct PlaygroundCore: ExperienceCore, Equatable {
         builder.add("a11.playground.v1|" + text)
     }
 
-    /// The playground state (schema 4) as JSON with sorted keys.
+    /// The playground state (schema 5) as JSON with sorted keys.
     public func snapshotPayload() throws -> Data {
         try Self.encode(state)
     }
 
-    /// The core of a schema-4 payload (an older one has been through ``migrations``) with the envelope's `seed` as
-    /// preparation seed. A payload that does not decode as schema 4 (a schema-1, 2 or 3 payload included), a world or
-    /// a starting world that does not validate, a tutorial progress that names no tutorial or step, or a malformed
-    /// generator state is refused (throws). The restored core has no measured forces until its next tick.
+    /// The core of a schema-5 payload (an older one has been through ``migrations``) with the envelope's `seed` as
+    /// preparation seed. A payload that does not decode as schema 5 (a schema-1, 2 or 3 payload included), a world or
+    /// a starting world that does not validate (a schema-4 payload's worlds at world schema 3 included), a tutorial
+    /// progress that names no tutorial or step, or a malformed generator state is refused (throws). The restored core
+    /// has no measured forces until its next tick.
     public static func restore(payload: Data, seed: UInt64) throws -> PlaygroundCore {
         let state = try JSONDecoder().decode(PlaygroundState.self, from: payload)
         let problems = state.world.validate(catalog: catalog)

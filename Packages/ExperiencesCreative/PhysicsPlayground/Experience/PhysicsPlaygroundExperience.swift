@@ -15,6 +15,12 @@
 // experiments `experiment-0.json` … `experiment-3.json` of `ExperimentStore`, built from the launch's storage — and the
 // factory hands the presenter its shell, through which an opened slot is restored. Without storage (tests) the saved
 // experiments are kept in memory.
+//
+// Feature 086 (A11-P05) T-A11-504 (FR-A11-520; clarification 4; research D3): three quality levels.
+// `PlaygroundExperience` forwards the shell's `qualityProfile` (the core's `level-0`…`level-2`, as the registration)
+// and `setQualityTier(_:)`, so the session's governor steps through all three; the presenter draws each frame with the
+// `DrawingBudget` of the host's tier, or level 2 under Low Power Mode (`lowPowerMode` injected in tests, the system's
+// state otherwise). The core stores no tier, so the state and the digest are the same at every level.
 import SwiftUI
 import VisualCoreDiagnostics
 import VisualCoreExperience
@@ -38,10 +44,13 @@ public enum PhysicsPlaygroundExperience {
     }
 
     /// The experience's shell with its presenter exposed (tests); `store` keeps the saved experiments (in memory
-    /// when nil). The presenter is handed the shell, through which an opened slot is restored.
+    /// when nil); `lowPowerMode` tells whether Low Power Mode is on (nil: the system's state; feature 086). The
+    /// presenter is handed the shell, through which an opened slot is restored.
     @MainActor
-    static func make(id: ExperienceID, store: ExperimentStore? = nil) -> ExperienceShell<PlaygroundPresenter> {
-        let presenter = PlaygroundPresenter(experienceID: id, store: store ?? ExperimentStore(storage: nil))
+    static func make(id: ExperienceID, store: ExperimentStore? = nil,
+                     lowPowerMode: (@MainActor () -> Bool)? = nil) -> ExperienceShell<PlaygroundPresenter> {
+        let presenter = PlaygroundPresenter(experienceID: id, store: store ?? ExperimentStore(storage: nil),
+                                            lowPowerMode: lowPowerMode)
         let shell = ExperienceShell(id: id, presenter: presenter)
         presenter.shell = shell
         return shell
@@ -49,7 +58,7 @@ public enum PhysicsPlaygroundExperience {
 }
 
 /// Physics Playground's experience: the shell of its presenter with the suspension rule of feature 084 (see the file
-/// header).
+/// header). The quality profile and the tier are the shell's (the core's three levels, feature 086).
 @MainActor
 final class PlaygroundExperience: Experience {
     /// The shell every call goes to.
@@ -106,6 +115,7 @@ final class PlaygroundExperience: Experience {
 
     func reset() throws(ExperienceError) { try shell.reset() }
 
+    /// Sets the host's quality tier on the shell (presentation only: the presenter draws the tier's budget).
     func setQualityTier(_ tier: Int) throws(ExperienceError) { try shell.setQualityTier(tier) }
 
     func shedCaches() throws(ExperienceError) { try shell.shedCaches() }

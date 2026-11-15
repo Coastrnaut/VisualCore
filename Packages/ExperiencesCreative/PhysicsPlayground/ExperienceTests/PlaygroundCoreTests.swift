@@ -34,6 +34,12 @@
 // saved document keeps the generator and becomes the starting world; the digest covering the origin, the starting
 // world and the tutorial; the stored schema-3 example restoring through the step 3 → 4 (and the examples of schemas 1
 // and 2 through the whole chain); a schema-4 state with a bad starting world or tutorial refused.
+//
+// Feature 086 (A11-P05) T-A11-504 (FR-A11-502, FR-A11-520; clarifications 1, 4; research D1, D3): snapshot schema 5
+// with the world at world schema 4 and three quality tiers; the older examples restore through the chain ending in the
+// step 4 → 5 (their worlds at world schema 4, every body awake with 0 rest ticks); a newer payload is schema 6; a
+// current payload sent as an older schema is refused by the step it reaches. The schema-4 example and the tiers are
+// covered by `PlaygroundQualityTests`.
 import Foundation
 import XCTest
 @testable import PhysicsPlaygroundExperience
@@ -77,10 +83,10 @@ final class PlaygroundCoreTests: XCTestCase {
         XCTAssertEqual(PlaygroundCore.gestureActionIDs,
                        ["edit.add", "edit.select", "edit.grab", "edit.move", "edit.release", "edit.pin", "edit.delete"])
         XCTAssertTrue(PlaygroundCore.gestureActionIDs.isSubset(of: Set(PlaygroundCore.actionIDs)))
-        XCTAssertEqual(PlaygroundCore.migrations.currentVersion, 4)
-        XCTAssertEqual(PlaygroundCore.snapshotSchema, 4)
+        XCTAssertEqual(PlaygroundCore.migrations.currentVersion, 5)
+        XCTAssertEqual(PlaygroundCore.snapshotSchema, 5)
         XCTAssertEqual(PlaygroundRule.noTutorial, "a11.no-tutorial")
-        XCTAssertEqual(PlaygroundCore.qualityTiers, 1)
+        XCTAssertEqual(PlaygroundCore.qualityTiers, 3)
         XCTAssertEqual(PlaygroundCore.stepDuration, 1.0 / 120, accuracy: 1e-15)
         XCTAssertEqual(ExperienceEngine<PlaygroundCore>.stepDuration, 1.0 / 120, accuracy: 1e-15)
         XCTAssertEqual(PlaygroundRule.invalidChoice, "a11.invalid-choice")
@@ -148,7 +154,8 @@ final class PlaygroundCoreTests: XCTestCase {
         XCTAssertEqual(core.world.dragLevel, ForceLevels.defaultDragLevel)
         XCTAssertEqual(core.world.stiffnessLevel, ForceLevels.defaultStiffnessLevel)
         XCTAssertEqual(core.world.contactCache, [])
-        XCTAssertEqual(core.world.schema, 3)
+        XCTAssertEqual(core.world.schema, 4)
+        XCTAssertFalse(core.world.bodies.contains(where: \.asleep), "every body starts awake")
         XCTAssertFalse(core.world.bodies.contains(where: \.pinned), "no pins")
         XCTAssertNil(core.world.selectedId)
         XCTAssertNil(core.world.grab)
@@ -422,7 +429,7 @@ final class PlaygroundCoreTests: XCTestCase {
         XCTAssertEqual(engine.handle(control: "overlay.forces", values: [1]), .accepted)
         try engine.run(steps: 3)
         let snapshot = try engine.snapshot()
-        XCTAssertEqual(snapshot.schemaVersion, 4)
+        XCTAssertEqual(snapshot.schemaVersion, 5)
         let saved = try XCTUnwrap(engine.core)
         var other = try await makeEngine(seed: 3)
         try other.restore(ExperienceSnapshot(data: snapshot.encoded()))
@@ -446,7 +453,7 @@ final class PlaygroundCoreTests: XCTestCase {
         let saved = try engine.snapshot()
         let before = try engine.digest()
 
-        func envelope(_ payload: Data, schema: Int = 3) throws -> ExperienceSnapshot {
+        func envelope(_ payload: Data, schema: Int = PlaygroundCore.snapshotSchema) throws -> ExperienceSnapshot {
             try ExperienceSnapshot(experience: playgroundID, schemaVersion: schema, seed: saved.seed,
                                    stepIndex: saved.stepIndex, digest: saved.digest, payload: payload)
         }
@@ -512,12 +519,13 @@ final class PlaygroundCoreTests: XCTestCase {
         object["random"] = random
         XCTAssertThrowsError(try engine.restore(envelope(
             JSONSerialization.data(withJSONObject: object, options: [.sortedKeys]))))
-        // Newer: schema 5 is not known to this build.
-        XCTAssertThrowsError(try engine.restore(envelope(Data(saved.payload.utf8), schema: 5)))
-        // A schema-4 payload sent as schema 1 runs the step 1 → 2, which refuses it (its world is not schema 1), and
-        // sent as schema 2 runs the step 2 → 3, which refuses it (its world is not schema 2).
-        XCTAssertThrowsError(try engine.restore(envelope(Data(saved.payload.utf8), schema: 1)))
-        XCTAssertThrowsError(try engine.restore(envelope(Data(saved.payload.utf8), schema: 2)))
+        // Newer: schema 6 is not known to this build.
+        XCTAssertThrowsError(try engine.restore(envelope(Data(saved.payload.utf8), schema: 6)))
+        // A schema-5 payload sent as schema 1, 2, 3 or 4 runs the step it names, which refuses it (its world is at
+        // world schema 4, not the schema the step reads).
+        for older in 1...4 {
+            XCTAssertThrowsError(try engine.restore(envelope(Data(saved.payload.utf8), schema: older)), "\(older)")
+        }
         XCTAssertEqual(try engine.digest(), before, "every refusal leaves the state as it was")
 
         // The core names the reason.
@@ -637,6 +645,8 @@ final class PlaygroundCoreTests: XCTestCase {
         }
         for body in try XCTUnwrap(storedWorld["bodies"] as? [[String: Any]]) {
             XCTAssertNil(body["pinned"], "a Phase 01 body has no pinned key")
+            XCTAssertNil(body["asleep"], "a Phase 01 body has no asleep key")
+            XCTAssertNil(body["restTicks"], "a Phase 01 body has no restTicks key")
         }
         let phaseOne = try JSONDecoder().decode(PlaygroundStateSchemaOne.self, from: Data(snapshot.payload.utf8))
         XCTAssertEqual(phaseOne, PlaygroundCore.schemaOneExampleState())
@@ -649,8 +659,9 @@ final class PlaygroundCoreTests: XCTestCase {
         XCTAssertEqual(try engine.digest().hex, example.expectedDigest)
         let core = try XCTUnwrap(engine.core)
         let world = core.world
-        XCTAssertEqual(world.schema, 3)
+        XCTAssertEqual(world.schema, 4)
         XCTAssertEqual(world.validate(), [])
+        XCTAssertFalse(world.bodies.contains(where: \.asleep), "every body awake")
         XCTAssertFalse(world.bodies.contains(where: \.pinned))
         XCTAssertNil(world.selectedId)
         XCTAssertNil(world.grab)
@@ -690,8 +701,9 @@ final class PlaygroundCoreTests: XCTestCase {
 
         let two = try XCTUnwrap(PlaygroundCore.schemaTwoExample())
         let three = try XCTUnwrap(PlaygroundCore.schemaThreeExample())
+        let four = try XCTUnwrap(PlaygroundCore.schemaFourExample())
         let problems = await SnapshotMigrationCheck.problems(for: PlaygroundCore.self, id: playgroundID,
-                                                              examples: [example, two, three])
+                                                              examples: [example, two, three, four])
         XCTAssertEqual(problems, [])
     }
 
@@ -706,10 +718,13 @@ final class PlaygroundCoreTests: XCTestCase {
         let current = try XCTUnwrap(try JSONSerialization.jsonObject(with: PlaygroundCore(seed: 7).snapshotPayload())
                                     as? [String: Any])
         XCTAssertThrowsError(try PlaygroundCore.migrations.migrate(current, from: 1)) { error in
-            XCTAssertEqual(error as? PlaygroundRestoreError, .notSchemaOne(3))
+            XCTAssertEqual(error as? PlaygroundRestoreError, .notSchemaOne(4))
         }
         XCTAssertThrowsError(try PlaygroundCore.migrations.migrate(current, from: 2)) { error in
-            XCTAssertEqual(error as? PlaygroundRestoreError, .notSchemaTwo(3))
+            XCTAssertEqual(error as? PlaygroundRestoreError, .notSchemaTwo(4))
+        }
+        XCTAssertThrowsError(try PlaygroundCore.migrations.migrate(current, from: 4)) { error in
+            XCTAssertEqual(error as? PlaygroundRestoreError, .notSchemaFour(4))
         }
         XCTAssertThrowsError(try PlaygroundCore.migrations.migrate(["world": 1], from: 1))
         let object = try XCTUnwrap(try JSONSerialization.jsonObject(with: Data(snapshot.payload.utf8))
@@ -719,14 +734,17 @@ final class PlaygroundCoreTests: XCTestCase {
             payload: JSONSerialization.data(withJSONObject: upgraded, options: [.sortedKeys]), seed: 7)
         XCTAssertEqual(restored.world,
                        PhysicsWorld.migrated(fromSchemaOne: PlaygroundCore.schemaOneExampleState().world))
-        XCTAssertEqual(try PlaygroundCore.migrations.migrate(current, from: 4) as NSDictionary,
-                       current as NSDictionary, "a schema-4 payload needs no step")
+        XCTAssertEqual(try PlaygroundCore.migrations.migrate(current, from: 5) as NSDictionary,
+                       current as NSDictionary, "a schema-5 payload needs no step")
         // The step 1 → 2 alone writes a faithful Phase 02 payload.
         let phaseTwo = try PlaygroundCore.migratedToSchemaTwo(object)
         let phaseTwoWorld = try XCTUnwrap(phaseTwo["world"] as? [String: Any])
         XCTAssertEqual(phaseTwoWorld["schema"] as? Int, 2)
         XCTAssertNil(phaseTwoWorld["showForces"])
-        for body in try XCTUnwrap(phaseTwoWorld["bodies"] as? [[String: Any]]) { XCTAssertNil(body["pinned"]) }
+        for body in try XCTUnwrap(phaseTwoWorld["bodies"] as? [[String: Any]]) {
+            XCTAssertNil(body["pinned"])
+            XCTAssertNil(body["asleep"])
+        }
         XCTAssertThrowsError(try PlaygroundCore.restore(
             payload: JSONSerialization.data(withJSONObject: phaseTwo, options: [.sortedKeys]), seed: 7),
                              "a schema-2 payload needs the step 2 → 3")
@@ -764,7 +782,7 @@ final class PlaygroundCoreTests: XCTestCase {
         XCTAssertEqual(try engine.digest().hex, example.expectedDigest)
         let core = try XCTUnwrap(engine.core)
         XCTAssertEqual(core.world, PhysicsWorld.migrated(fromSchemaTwo: phaseTwo.world))
-        XCTAssertEqual(core.world.schema, 3)
+        XCTAssertEqual(core.world.schema, 4)
         XCTAssertEqual(core.world.validate(), [])
         XCTAssertFalse(core.world.bodies.contains(where: \.pinned))
         XCTAssertNil(core.world.selectedId)
@@ -794,8 +812,9 @@ final class PlaygroundCoreTests: XCTestCase {
 
         let one = try XCTUnwrap(PlaygroundCore.schemaOneExample())
         let three = try XCTUnwrap(PlaygroundCore.schemaThreeExample())
+        let four = try XCTUnwrap(PlaygroundCore.schemaFourExample())
         let problems = await SnapshotMigrationCheck.problems(for: PlaygroundCore.self, id: playgroundID,
-                                                              examples: [one, example, three])
+                                                              examples: [one, example, three, four])
         XCTAssertEqual(problems, [])
     }
 
@@ -1101,7 +1120,7 @@ final class PlaygroundCoreTests: XCTestCase {
         var engine = try await makeEngine()
         try engine.run(steps: 5)
         let snapshot = try PlaygroundCore.openingSnapshot(of: opened, experience: playgroundID, stepIndex: 5)
-        XCTAssertEqual(snapshot.schemaVersion, 4)
+        XCTAssertEqual(snapshot.schemaVersion, 5)
         try engine.restore(snapshot)
         XCTAssertEqual(try XCTUnwrap(engine.core), opened)
         XCTAssertEqual(engine.stepIndex, 5)
@@ -1139,6 +1158,12 @@ final class PlaygroundCoreTests: XCTestCase {
         let payload = try XCTUnwrap(try JSONSerialization.jsonObject(with: Data(snapshot.payload.utf8))
                                     as? [String: Any])
         XCTAssertEqual(Set(payload.keys), ["random", "world"], "exactly the A11-P03 keys")
+        let storedWorld = try XCTUnwrap(payload["world"] as? [String: Any])
+        XCTAssertEqual(storedWorld["schema"] as? Int, 3)
+        for body in try XCTUnwrap(storedWorld["bodies"] as? [[String: Any]]) {
+            XCTAssertNil(body["asleep"], "a Phase 03 body has no asleep key")
+            XCTAssertNotNil(body["pinned"])
+        }
         let phaseThree = try JSONDecoder().decode(PlaygroundStateSchemaThree.self, from: Data(snapshot.payload.utf8))
         XCTAssertEqual(phaseThree, PlaygroundCore.schemaThreeExampleState())
         XCTAssertEqual(phaseThree.world.selectedId, 9)
@@ -1150,10 +1175,12 @@ final class PlaygroundCoreTests: XCTestCase {
         try engine.restore(snapshot)
         XCTAssertEqual(try engine.digest().hex, example.expectedDigest)
         let core = try XCTUnwrap(engine.core)
-        XCTAssertEqual(core.world, phaseThree.world)
+        let migratedWorld = PhysicsWorld.migrated(fromSchemaThree: phaseThree.world)
+        XCTAssertEqual(core.world, migratedWorld)
+        XCTAssertEqual(core.world.schema, 4)
         XCTAssertEqual(core.state.random, phaseThree.random)
         XCTAssertEqual(core.origin, .freePlay)
-        XCTAssertEqual(core.startingWorld, ExperimentDocument.withoutEditing(phaseThree.world))
+        XCTAssertEqual(core.startingWorld, ExperimentDocument.withoutEditing(migratedWorld))
         XCTAssertNil(core.tutorial)
         XCTAssertEqual(engine.handle(control: "world.reset"), .accepted)
         XCTAssertEqual(try XCTUnwrap(engine.core).world.selectedId, nil)
@@ -1164,8 +1191,9 @@ final class PlaygroundCoreTests: XCTestCase {
         let twoPayload = try XCTUnwrap(try JSONSerialization.jsonObject(with: Data(twoSnapshot.payload.utf8))
                                        as? [String: Any])
         XCTAssertThrowsError(try PlaygroundCore.migratedToSchemaFour(twoPayload), "a Phase 02 payload needs 2 → 3")
+        let four = try XCTUnwrap(PlaygroundCore.schemaFourExample())
         let problems = await SnapshotMigrationCheck.problems(for: PlaygroundCore.self, id: playgroundID,
-                                                              examples: [one, two, example])
+                                                              examples: [one, two, example, four])
         XCTAssertEqual(problems, [])
     }
 

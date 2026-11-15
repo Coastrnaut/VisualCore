@@ -1,7 +1,9 @@
 // PlaygroundTestSupport — feature 082 (A11-P01) T-A11-104 (FR-A11-120, FR-A11-121). Shared helpers of the Physics
 // Playground experience tests: opening the experience in the one app's session host, drawing frames, reading the pixels
 // of a frame, counting the pixels two frames differ in, and building a core that holds a given world. Feature 085
-// (A11-P04) T-A11-403 adds a temporary experience storage for the saved-experiment tests.
+// (A11-P04) T-A11-403 adds a temporary experience storage for the saved-experiment tests. Feature 086 (A11-P05)
+// T-A11-504: the opened experience is given Low Power Mode off unless a test injects it, so every drawing level is the
+// host's tier.
 import Foundation
 import XCTest
 @testable import PhysicsPlaygroundExperience
@@ -19,14 +21,16 @@ enum PlaygroundTest {
     static var id: ExperienceID { PhysicsPlaygroundExperience.id ?? ExperienceID(rawValue: "a11.unknown")! }
 
     /// Opens Physics Playground in `session` (seed `seed`, optionally restoring `snapshot`, with the saved
-    /// experiments of `store`, in memory when nil), lays the view out at `size` points and draws one frame.
+    /// experiments of `store`, in memory when nil, and Low Power Mode from `lowPowerMode`, off when nil), lays the
+    /// view out at `size` points and draws one frame.
     static func open(_ session: ExperienceSession, seed: UInt64 = 7, snapshot: ExperienceSnapshot? = nil,
-                     size: CGSize = CGSize(width: 120, height: 100), store: ExperimentStore? = nil) async throws
+                     size: CGSize = CGSize(width: 120, height: 100), store: ExperimentStore? = nil,
+                     lowPowerMode: (@MainActor () -> Bool)? = nil) async throws
         -> ExperienceShell<PlaygroundPresenter> {
         let id = self.id
         var made: ExperienceShell<PlaygroundPresenter>?
         let request = ExperienceOpenRequest(id: id, seed: seed, snapshot: snapshot, refusedSnapshotFails: false) {
-            let shell = PhysicsPlaygroundExperience.make(id: id, store: store)
+            let shell = PhysicsPlaygroundExperience.make(id: id, store: store, lowPowerMode: lowPowerMode ?? { false })
             made = shell
             return shell
         }

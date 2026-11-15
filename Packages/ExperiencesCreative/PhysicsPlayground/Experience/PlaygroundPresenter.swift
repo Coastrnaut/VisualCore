@@ -51,6 +51,17 @@
 // is reported as the slot's status text; a refused file is left as it is. The description adds the experiment
 // ("Experiment: Pendulum.", or the saved slot's name and number) and, while a tutorial runs, its name, step and text;
 // the mirror carries the same for the controls (the step text is announced there).
+//
+// Feature 086 (A11-P05) T-A11-504 (FR-A11-520; SC-A11-502, SC-A11-505; clarification 4; research D3; contract
+// contracts/stability.md; edge cases "Quality level changed mid-run", "Low Power Mode", "How sleep looks"): each frame
+// is drawn with a `DrawingBudget` chosen before anything else (`applyQuality(tier:)`): level
+// `DrawingBudget.level(tier:lowPower:)` — 2 (the lightest) while Low Power Mode is on (injected `lowPowerMode`, default
+// `ProcessInfo.processInfo.isLowPowerModeEnabled`), otherwise the host's tier clamped to 0…2 (host tier 0 is the best
+// and draws level 0, the fullest). The budget sets the zigzag coils of every spring (8, 6, 4), the points of every
+// circle outline and of the selection ring (closed rings of 33, 24, 16 points) and the spacing of a static body's hatch
+// (0.12 m, 0.2 m, none; without a hatch a static body keeps its darker fill and edge). Before the first frame the
+// budget is level 0. The budget is presentation only: drawing reads the core and never writes it, so the world, the
+// replay and the digest are the same at every level, drawn or not. Sleeping bodies are drawn exactly like awake ones.
 import Foundation
 import SwiftUI
 import PhysicsPlaygroundCore
@@ -251,10 +262,12 @@ final class PlaygroundPresenter: ExperiencePresenter {
     nonisolated static let staticFillFactor = 0.55, staticEdgeFactor = 0.7
     /// The width of outlines, radius lines and hatch lines in metres.
     nonisolated static let edgeWidth = 0.04
-    /// The number of points of a circle's ring (closed: the last equals the first).
-    nonisolated static let ringPoints = 33
-    /// The spacing of the hatch of a static body in metres.
-    nonisolated static let hatchSpacing = 0.25
+    /// The number of points of a circle's ring at level 0 (closed: the last equals the first; feature 086: the
+    /// budget's `circleSegments`, 33, 24 or 16 by level).
+    nonisolated static let ringPoints = DrawingBudget.levels[0].circleSegments
+    /// The number of quality levels the presenter draws: `DrawingBudget.count` (equal to `PlaygroundCore.qualityTiers`;
+    /// feature 086).
+    nonisolated static let levelCount = DrawingBudget.count
     /// The z of the stage, the walls, the springs and their anchor dots, the body fills, the outlines and marks, the
     /// hatch and the letterbox masks.
     nonisolated static let stageZ = 0, wallZ = 1, springZ = 2, fillZ = 3, edgeZ = 4, hatchZ = 5, maskZ = 9
@@ -262,16 +275,20 @@ final class PlaygroundPresenter: ExperiencePresenter {
     nonisolated static let springColor = Vec4(0.92, 0.86, 0.55, 1)
     /// The width of a spring's zigzag in metres.
     nonisolated static let springWidth = 0.03
-    /// The number of coils of a spring's zigzag (each coil one peak to each side).
-    nonisolated static let springCoils = 8
+    /// The number of coils of a spring's zigzag at level 0 (each coil one peak to each side; feature 086: the budget's
+    /// `coils`, 8, 6 or 4 by level).
+    nonisolated static let springCoils = DrawingBudget.levels[0].coils
     /// The distance of a coil's peaks from the spring's axis in metres.
     nonisolated static let springAmplitude = 0.12
     /// The share of a spring's length taken by the straight lead at each end.
     nonisolated static let springLead = 0.1
     /// The radius of a spring's anchor dots in metres.
     nonisolated static let anchorDotRadius = 0.06
-    /// The number of points of a spring's zigzag: both anchors, both lead ends and two peaks per coil.
-    nonisolated static var springPoints: Int { 4 + 2 * springCoils }
+    /// The number of points of a spring's zigzag at level 0: both anchors, both lead ends and two peaks per coil.
+    nonisolated static var springPoints: Int { zigzagPoints(coils: springCoils) }
+
+    /// The number of points of a zigzag of `coils` coils: both anchors, both lead ends and two peaks per coil.
+    nonisolated static func zigzagPoints(coils: Int) -> Int { 4 + 2 * max(coils, 1) }
     /// The stage point (metres) near the floor at the stage's middle where the frame probe is taken.
     nonisolated static let probePoint = Vec2(5, 0.75)
     /// The clearance around the probe point (metres) a body's bounding circle must keep for the probe to be taken.
@@ -317,8 +334,16 @@ final class PlaygroundPresenter: ExperiencePresenter {
     private(set) var lastCore: PlaygroundCore?
     /// The scale of the last frame (pixels per metre) and its canvas size in pixels.
     private(set) var lastScale = 0.0, lastCanvas = Vec2(0, 0)
-    /// The number of bodies drawn in the last frame and how many of them were hatched as static.
+    /// The number of bodies drawn in the last frame and how many of them were static (drawn darker).
     private(set) var lastBodiesDrawn = 0, lastStaticDrawn = 0
+    /// The number of static bodies hatched in the last frame (0 at a level without a hatch; feature 086).
+    private(set) var lastHatchesDrawn = 0
+    /// Whether Low Power Mode is on, read once per drawn frame (feature 086).
+    let lowPowerMode: @MainActor () -> Bool
+    /// The drawing level in force, 0 (the fullest) … 2 (the lightest); 0 until a frame is drawn with another.
+    private(set) var budgetLevel = 0
+    /// The host tier the last drawn frame was given (nil before the first draw) and whether Low Power Mode was on.
+    private(set) var lastHostTier: Int?, lastLowPower = false
     /// The number of springs drawn in the last frame.
     private(set) var lastSpringsDrawn = 0
 
@@ -349,10 +374,14 @@ final class PlaygroundPresenter: ExperiencePresenter {
     /// frame tick.
     private var gesturePort: ExperienceActionPort?
 
-    /// A presenter for the experience `experienceID` with the saved experiments of `store` (in memory by default).
-    init(experienceID: ExperienceID, store: ExperimentStore = ExperimentStore(storage: nil)) {
+    /// A presenter for the experience `experienceID` with the saved experiments of `store` (in memory by default);
+    /// `lowPowerMode` tells whether Low Power Mode is on (nil: `ProcessInfo.processInfo.isLowPowerModeEnabled`; while
+    /// it is on every frame is drawn at level 2, feature 086).
+    init(experienceID: ExperienceID, store: ExperimentStore = ExperimentStore(storage: nil),
+         lowPowerMode: (@MainActor () -> Bool)? = nil) {
         self.experienceID = experienceID
         self.store = store
+        self.lowPowerMode = lowPowerMode ?? { ProcessInfo.processInfo.isLowPowerModeEnabled }
         root.add(stage)
         for index in 0..<4 {
             let node = SceneNode(id: "wall\(index)", z: Self.wallZ)
@@ -415,6 +444,7 @@ final class PlaygroundPresenter: ExperiencePresenter {
             failNextDraw = false
             throw PlaygroundDrawError.injected
         }
+        applyQuality(tier: tier)
         sync(core)
         clear.red = Float(Self.letterboxColor.x)
         clear.green = Float(Self.letterboxColor.y)
@@ -436,6 +466,20 @@ final class PlaygroundPresenter: ExperiencePresenter {
         suspended()
         primitives?.release()
         primitives = nil
+    }
+
+    // MARK: Quality (feature 086)
+
+    /// The drawing budget in force: `DrawingBudget.budget(level: budgetLevel)`.
+    var budget: DrawingBudget { DrawingBudget.budget(level: budgetLevel) }
+
+    /// Chooses the level of a frame drawn at the host's `tier` with Low Power Mode read now:
+    /// `DrawingBudget.level(tier:lowPower:)`. Presentation only.
+    func applyQuality(tier: Int) {
+        let lowPower = lowPowerMode()
+        lastHostTier = tier
+        lastLowPower = lowPower
+        budgetLevel = DrawingBudget.level(tier: tier, lowPower: lowPower)
     }
 
     // MARK: Geometry
@@ -462,10 +506,12 @@ final class PlaygroundPresenter: ExperiencePresenter {
             .map { place($0, center: center, angle: angle) }
     }
 
-    /// The closed ring of ``ringPoints`` points of `radius` around `center`.
-    nonisolated static func ring(center: Vec2, radius: Double) -> [Vec2] {
-        (0..<ringPoints).map { i in
-            let angle = 2 * Double.pi * Double(i) / Double(ringPoints - 1)
+    /// The closed ring of `points` points (at least 3; ``ringPoints`` by default) of `radius` around `center`: the
+    /// last point equals the first.
+    nonisolated static func ring(center: Vec2, radius: Double, points: Int = ringPoints) -> [Vec2] {
+        let count = max(points, 3)
+        return (0..<count).map { i in
+            let angle = 2 * Double.pi * Double(i) / Double(count - 1)
             return center + Vec2(cos(angle) * radius, sin(angle) * radius)
         }
     }
@@ -476,14 +522,15 @@ final class PlaygroundPresenter: ExperiencePresenter {
     }
 
     /// The hatch inside `shape` at `center` and `angle`: a path through lines across the shape (bottom to top, then
-    /// top to bottom) at x steps of about ``hatchSpacing`` (inside a circle, the chord ends at each x).
-    nonisolated static func hatch(_ shape: Shape2D, center: Vec2, angle: Double) -> [Vec2] {
+    /// top to bottom) at x steps of about `spacing` metres (the budget's hatch spacing; inside a circle, the chord ends
+    /// at each x).
+    nonisolated static func hatch(_ shape: Shape2D, center: Vec2, angle: Double, spacing: Double) -> [Vec2] {
         let halfWidth: Double
         switch shape {
         case .circle(let radius): halfWidth = radius
         case .box(let half): halfWidth = half.x
         }
-        let count = max(1, Int((2 * halfWidth / hatchSpacing).rounded(.down)))
+        let count = max(1, Int((2 * halfWidth / max(spacing, 1e-3)).rounded(.down)))
         let step = 2 * halfWidth / Double(count + 1)
         var points: [Vec2] = []
         for k in 1...count {
@@ -501,14 +548,15 @@ final class PlaygroundPresenter: ExperiencePresenter {
     }
 
     /// The zigzag of a spring from the world point `a` to the world point `b` (metres): `a`, the end of the lead
-    /// (``springLead`` of the length along the axis), two peaks per coil (``springCoils`` coils) alternately
-    /// ``springAmplitude`` to the left and to the right of the axis, evenly spaced between the leads, the start of the
-    /// other lead, and `b` — ``springPoints`` points. Two coincident anchors give the straight segment [a, b].
-    nonisolated static func zigzag(from a: Vec2, to b: Vec2) -> [Vec2] {
+    /// (``springLead`` of the length along the axis), two peaks per coil (`coils` coils, at least 1; ``springCoils``
+    /// by default) alternately ``springAmplitude`` to the left and to the right of the axis, evenly spaced between the
+    /// leads, the start of the other lead, and `b` — `zigzagPoints(coils:)` points. Two coincident anchors give the
+    /// straight segment [a, b].
+    nonisolated static func zigzag(from a: Vec2, to b: Vec2, coils: Int = springCoils) -> [Vec2] {
         let d = b - a, length = d.length
         guard length > 1e-9 else { return [a, b] }
         let axis = d * (1 / length), side = Vec2(-axis.y, axis.x)
-        let peaks = 2 * springCoils
+        let peaks = 2 * max(coils, 1)
         var points = [a, a + d * springLead]
         for k in 0..<peaks {
             let t = springLead + (1 - 2 * springLead) * (Double(k) + 0.5) / Double(peaks)
@@ -553,10 +601,11 @@ final class PlaygroundPresenter: ExperiencePresenter {
         return (darkened(fill, staticFillFactor), darkened(edge, staticEdgeFactor))
     }
 
-    /// Places every node for a canvas of `width` × `height` pixels (world = pixels from the centre, y up). Reads
-    /// `core` only.
+    /// Places every node for a canvas of `width` × `height` pixels (world = pixels from the centre, y up) with the
+    /// ``budget`` in force (feature 086). Reads `core` only.
     func layOut(_ core: PlaygroundCore, width: Double, height: Double) {
         let world = core.world
+        let budget = self.budget
         let s = Self.scale(width: width, height: height)
         lastScale = s
         lastCanvas = Vec2(width, height)
@@ -583,7 +632,8 @@ final class PlaygroundPresenter: ExperiencePresenter {
                 node.color = Self.springColor
             }
             guard slot < world.springs.count, let ends = Self.anchors(world.springs[slot], in: world) else { continue }
-            line.primitive = .polyline(Self.zigzag(from: ends.a, to: ends.b).map(map), width: px(Self.springWidth))
+            line.primitive = .polyline(Self.zigzag(from: ends.a, to: ends.b, coils: budget.coils).map(map),
+                                       width: px(Self.springWidth))
             dotA.primitive = .circle(px(Self.anchorDotRadius))
             dotA.position = map(ends.a)
             dotB.primitive = .circle(px(Self.anchorDotRadius))
@@ -592,7 +642,7 @@ final class PlaygroundPresenter: ExperiencePresenter {
         }
         lastSpringsDrawn = springsDrawn
 
-        var drawn = 0, hatched = 0
+        var drawn = 0, statics = 0, hatched = 0
         for slot in 0..<PhysicsWorld.maxBodies {
             let fill = fillNodes[slot], edge = edgeNodes[slot], mark = markNodes[slot], hatch = hatchNodes[slot]
             for node in [fill, edge, mark, hatch] { node.primitive = nil; node.position = .zero }
@@ -608,7 +658,8 @@ final class PlaygroundPresenter: ExperiencePresenter {
             case .circle(let radius):
                 fill.primitive = .circle(radius * s)
                 fill.position = map(body.position)
-                edge.primitive = .polyline(Self.ring(center: body.position, radius: radius).map(map),
+                edge.primitive = .polyline(Self.ring(center: body.position, radius: radius,
+                                                     points: budget.circleSegments).map(map),
                                            width: px(Self.edgeWidth))
                 mark.primitive = .line(map(body.position),
                                        map(Self.radiusEnd(center: body.position, radius: radius, angle: body.angle)),
@@ -619,14 +670,19 @@ final class PlaygroundPresenter: ExperiencePresenter {
                 edge.primitive = .polyline((corners + [corners[0]]).map(map), width: px(Self.edgeWidth))
             }
             if body.isStatic {
-                hatch.primitive = .polyline(Self.hatch(body.shape, center: body.position, angle: body.angle).map(map),
-                                            width: px(Self.edgeWidth))
-                hatched += 1
+                statics += 1
+                if let spacing = budget.hatchSpacing {
+                    hatch.primitive = .polyline(Self.hatch(body.shape, center: body.position, angle: body.angle,
+                                                           spacing: spacing).map(map),
+                                                width: px(Self.edgeWidth))
+                    hatched += 1
+                }
             }
             drawn += 1
         }
         lastBodiesDrawn = drawn
-        lastStaticDrawn = hatched
+        lastStaticDrawn = statics
+        lastHatchesDrawn = hatched
         layOutOverlays(core, scale: s)
 
         // Letterbox masks: everything outside the view is covered in the clear colour.
@@ -1118,6 +1174,7 @@ final class PlaygroundPresenter: ExperiencePresenter {
     /// Places the overlay nodes of `core` at `scale` pixels per metre (reads `core` only).
     func layOutOverlays(_ core: PlaygroundCore, scale s: Double) {
         let world = core.world
+        let budget = self.budget
         func map(_ p: Vec2) -> Vec2 { Self.world(p, scale: s) }
         func px(_ metres: Double) -> Double { max(metres * s, 1) }
         for slot in 0..<PhysicsWorld.maxBodies {
@@ -1151,7 +1208,8 @@ final class PlaygroundPresenter: ExperiencePresenter {
         if let id = world.selectedId, let index = world.index(ofBody: id), world.bodies[index].isFinite {
             let body = world.bodies[index]
             selectionNode.primitive = .polyline(
-                Self.ring(center: body.position, radius: body.boundingRadius + Self.selectionGap).map(map),
+                Self.ring(center: body.position, radius: body.boundingRadius + Self.selectionGap,
+                          points: budget.circleSegments).map(map),
                 width: px(Self.edgeWidth))
             selectionNode.color = Self.selectionColor
         }
