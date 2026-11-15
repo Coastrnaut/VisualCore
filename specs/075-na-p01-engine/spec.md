@@ -167,6 +167,8 @@ fixture 2); the base for local scores in A10-P04.
 
 - **Two hits in the same step** (a hazard and an orb, or two hazards): resolved in a fixed order (objects by their
   spawn order); during invulnerability later hazards in that step cost nothing.
+- **A hazard touches the player during invulnerability:** it passes without effect (no life lost, no event, not
+  removed); orbs are still collected. A restart resets steering to 0, the score to 0 and the lives to 3.
 - **An object spawned overlapping the player:** it can be collected or hit only from the next step on; spawning is
   never inside the player's band.
 - **Steering held against a wall:** the player stops at the field edge; no tunnelling through the wall.
