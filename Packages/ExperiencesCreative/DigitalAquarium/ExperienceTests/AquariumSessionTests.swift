@@ -148,6 +148,36 @@ final class AquariumSessionTests: XCTestCase {
         second.close()
     }
 
+    /// Feature 071 (A09-P04) T-A09-406 (FR-A09-430; SC-A09-406): a saved aquarium naming an unknown species and an
+    /// unknown decoration kind is refused, the refusal is recorded and the starter habitat (Reef) opens.
+    func testASavedStateWithUnknownContentIsRefusedAndTheReefOpens() async throws {
+        let first = ExperienceSession()
+        let shell = try await AquariumTest.open(first)
+        XCTAssertTrue(shell.handle(control: "habitat.select", values: [1]).isAccepted)
+        let saved = try shell.snapshot()
+        first.close()
+        var object = try XCTUnwrap(try JSONSerialization.jsonObject(with: Data(saved.payload.utf8)) as? [String: Any])
+        var document = try XCTUnwrap(object["document"] as? [String: Any])
+        var fish = try XCTUnwrap(document["fish"] as? [[String: Any]])
+        fish[0]["speciesId"] = "unknown-fish"
+        document["fish"] = fish
+        var decor = try XCTUnwrap(document["decor"] as? [[String: Any]])
+        decor[0]["kindId"] = "unknown-decor"
+        document["decor"] = decor
+        object["document"] = document
+        let payload = try JSONSerialization.data(withJSONObject: object, options: [.sortedKeys])
+        let damaged = try ExperienceSnapshot(experience: AquariumTest.id, schemaVersion: saved.schemaVersion,
+                                             seed: saved.seed, stepIndex: saved.stepIndex, digest: saved.digest,
+                                             payload: payload)
+
+        let second = ExperienceSession()
+        let opened = try await AquariumTest.open(second, snapshot: damaged)
+        XCTAssertNotNil(second.lastRestoreRefusal, "unknown content is refused")
+        XCTAssertEqual(try AquariumTest.core(opened).document.habitatId, "reef", "the starter habitat opens")
+        XCTAssertThrowsError(try opened.restore(damaged))
+        second.close()
+    }
+
     func testTheSavedStateRestoresIdenticallyInANewSession() async throws {
         let first = ExperienceSession()
         let shell = try await AquariumTest.open(first)
