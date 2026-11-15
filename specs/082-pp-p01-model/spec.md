@@ -234,7 +234,7 @@ approximations.
 ### Measurable Outcomes
 
 - **SC-A11-101**: A new world shows the stage and bodies, and dynamic bodies move within the first second; 0 bodies
-  leave the stage over 10,000 ticks from 20 seeded scenes.
+  leave the stage over 2,400 ticks (20 s) from 5 seeded scenes filled to the body cap by drops.
 - **SC-A11-102**: Free fall after 1 s matches g·t and g·t²/2 within 1 %; a head-on elastic collision of two equal
   circles keeps total momentum within 1e-9 relative error and exchanges velocities within 2 %.
 - **SC-A11-103**: A body of mass 0 moves by exactly 0 over 1,000 ticks of impacts; no non-finite value appears in 100 %
