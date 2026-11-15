@@ -14,9 +14,20 @@
 // stack, the undamped and damped oscillators, the clamp, brute-force equality on 50 scenes) are proved by the core's
 // `StackFixtureTests`, `SpringWorldTests`, `MigrationTests` and VisualCore's `Springs2DTests` and `BroadPhase2DTests`;
 // `PlaygroundManifestTests` checks each fixture's end state.
+//
+// Feature 084 (A11-P03) T-A11-304 (FR-A11-321; SC-A11-305; research D5): the world is schema 3 (every digest now
+// covers the pins, selection, grab and overlay flags), the rejection scenario adds a refusal for each new rule
+// (`a11.no-room`, `a11.unknown-body`, `a11.not-grabbable`, `a11.no-grab`, `a11.static-body`, `a11.no-selection` and
+// fractional ids, kinds and overlay values), the body-cap fixture also refuses an `edit.add` at 48 bodies, and fixtures
+// 19–26 are added, scripted over the edit actions on the seed-independent spring bodies (the hanging box id 7 at
+// (7.5, 6.2) m, the joined circles ids 8 and 9 at (7, 1.5) and (8, 1.5) m): 19 add at a point, 20 grab, move and
+// release, 21 pin with impacts (the mass-zero fixture), 22 unpin and fall, 23 delete with springs, 24 selection and
+// nudge, 25 overlays on and off, 26 schema-2 migration. The exact bounds (a pinned body bit-identical over 1,000 ticks,
+// the fall at g within 1 %, the grab within 5 cm in 1 s) are the core's `PinFixtureTests` and `WorldEditingTests`.
 #if DEBUG || VISUALCORE_AUTOMATION
 import PhysicsPlaygroundCore
 import VisualCoreExperience
+import VisualCoreMath
 
 extension PlaygroundCore {
     /// The seed of every scenario.
@@ -54,6 +65,18 @@ extension PlaygroundCore {
     /// The host steps fixture 16 runs after its drops.
     public static let broadPhaseSteps = 240
 
+    /// The hanging box's id and the joined circles' ids in every starting scene (feature 084 fixtures).
+    public static let hangingBoxId = 7, firstCircleId = 8, secondCircleId = 9
+
+    /// The host steps fixture 21 runs with the pinned circle under impacts.
+    public static let pinSteps = 1_000
+
+    /// The points fixture 19 adds a circle and a box at, in metres (clear of the starting bodies at step 0).
+    public static let addPoints = (circle: Vec2(4.5, 1.5), box: Vec2(5.0, 3.0))
+
+    /// The targets fixture 20 moves the grabbed circle to, in metres.
+    public static let grabTargets = [Vec2(6, 3), Vec2(5, 3.5)]
+
     /// The actions of input-response, save-restore and reset: drop a circle, drop a box, stiffer springs, half speed,
     /// pause, one step.
     public static var inputEntries: [ScenarioStep] {
@@ -67,9 +90,15 @@ extension PlaygroundCore {
 
     /// The entries of rejection: a pause value out of range, a fractional pause, a fractional and an out-of-range time
     /// scale, a single step while running, a reset carrying a value, a fractional drop, a fractional gravity, an
-    /// out-of-range drag and a fractional stiffness.
+    /// out-of-range drag and a fractional stiffness; then (feature 084) an add leaving the stage, an add of a
+    /// fractional kind, an add outside the range, a select of a missing body and of a fractional id, a grab of the
+    /// static ledge, a move and a release without a grab, a pin of the static ledge, a delete of a missing body, a
+    /// nudge without a selection and a fractional overlay value.
     public static var rejectionEntries: [ScenarioStep] {
-        [ScenarioStep(steps: 0, action: ScriptedAction("world.pause", [2]), result: "action.out-of-range"),
+        func refused(_ control: String, _ values: [Double], _ rule: String) -> ScenarioStep {
+            ScenarioStep(steps: 0, action: ScriptedAction(control, values), result: "action.rule." + rule)
+        }
+        return [ScenarioStep(steps: 0, action: ScriptedAction("world.pause", [2]), result: "action.out-of-range"),
          ScenarioStep(steps: 0, action: ScriptedAction("world.pause", [0.5]),
                       result: "action.rule." + PlaygroundRule.invalidChoice),
          ScenarioStep(steps: 0, action: ScriptedAction("world.timeScale", [1.5]),
@@ -84,7 +113,20 @@ extension PlaygroundCore {
                       result: "action.rule." + PlaygroundRule.invalidChoice),
          ScenarioStep(steps: 0, action: ScriptedAction("world.drag", [3]), result: "action.out-of-range"),
          ScenarioStep(steps: 0, action: ScriptedAction("world.stiffness", [2.25]),
-                      result: "action.rule." + PlaygroundRule.invalidChoice)]
+                      result: "action.rule." + PlaygroundRule.invalidChoice),
+         refused("edit.add", [0.2, 0.2, 0], PlaygroundRule.noRoom),
+         refused("edit.add", [4.5, 1.5, 0.5], PlaygroundRule.invalidChoice),
+         ScenarioStep(steps: 0, action: ScriptedAction("edit.add", [11, 4, 0]), result: "action.out-of-range"),
+         refused("edit.select", [99], PlaygroundRule.unknownBody),
+         refused("edit.select", [1.5], PlaygroundRule.invalidChoice),
+         refused("edit.grab", [0, StartingScene.ledgeCenter.x, StartingScene.ledgeCenter.y],
+                 PlaygroundRule.notGrabbable),
+         refused("edit.move", [5, 4], PlaygroundRule.noGrab),
+         refused("edit.release", [], PlaygroundRule.noGrab),
+         refused("edit.pin", [0], PlaygroundRule.staticBody),
+         refused("edit.delete", [99], PlaygroundRule.unknownBody),
+         refused("edit.nudge", [1, 0], PlaygroundRule.noSelection),
+         refused("overlay.velocity", [0.5], PlaygroundRule.invalidChoice)]
     }
 
     /// The recorded inputs up to (and including) `limit` as scenario entries, then the steps left up to `limit`.
@@ -125,7 +167,7 @@ extension PlaygroundCore {
         return builder.finish().hex
     }
 
-    /// The entries of the eighteen fixtures (research D5 of features 082 and 083):
+    /// The entries of the twenty-six fixtures (research D5 of features 082, 083 and 084):
     /// 1. free fall: a circle dropped at step 0, then 120 host steps (1 s at 1×); the 1 % free-fall property without
     ///    drag is proved by `PhysicsFixtureTests` and, through the level actions, by fixture 17;
     /// 2. two-body momentum: two circles dropped, then 240 steps; the head-on elastic exchange (momentum within 1e-9
@@ -164,7 +206,25 @@ extension PlaygroundCore {
     ///    1.62 m/s² and then slows as e^(−t);
     /// 18. schema-1 migration: the A11-P01 actions the stored schema-1 example was saved after (a circle and a box
     ///    dropped, half speed, pause), 30 paused steps, then running for 60 steps; the stored example
-    ///    (`schemaOneExample()`) restores through the step 1 → 2 with the same generator and dropped bodies.
+    ///    (`schemaOneExample()`) restores through the steps 1 → 2 → 3 with the same generator and dropped bodies;
+    /// and (feature 084, research D5):
+    /// 19. add at a point: a circle at (4.5, 1.5) m and a box at (5, 3) m added at step 0 (ids 10 and 11, centred
+    ///    there), then 120 steps;
+    /// 20. grab, move and release: circle 8 grabbed at its centre, its target moved to (6, 3) m after 30 steps and to
+    ///    (5, 3.5) m after 30 more, held for 120 steps (1 s), released, then 60 steps; the body keeps its own velocity;
+    /// 21. pin with impacts (the mass-zero fixture): circle 8 pinned at step 0, a box added above it at (7, 3) m and a
+    ///    circle at (7, 4.5) m that fall onto it, then 1,000 steps; the pinned circle never moves and every number
+    ///    stays finite;
+    /// 22. unpin and fall: circle 8 pinned for 60 steps, then unpinned; 60 steps later it has fallen;
+    /// 23. delete with springs: the hanging box selected, then deleted with its spring, and circle 8 deleted with the
+    ///    spring to circle 9; no springs and no selection remain; then 60 steps;
+    /// 24. selection and nudge: circle 9 selected and nudged by (1, 1) and (−0.5, 1), then 60 steps;
+    /// 25. overlays on and off: velocity and force arrows on, 60 steps, velocity arrows off, 60 steps; the world equals
+    ///    the same steps without the overlay actions except for the flags;
+    /// 26. schema-2 migration: the A11-P02 actions the stored schema-2 example was saved after (a circle and a box
+    ///    dropped, stiff springs, Moon gravity, high drag, half speed, pause), 30 paused steps, then running for 60
+    ///    steps; the stored example (`schemaTwoExample()`) restores through the step 2 → 3 to the same world with no
+    ///    pins, selection, grab or overlays.
     public static var fixtureEntries: [[ScenarioStep]] {
         func act(_ control: String, _ values: [Double] = [], steps: Int = 0,
                  result: String = "accepted") -> ScenarioStep {
@@ -173,7 +233,11 @@ extension PlaygroundCore {
         let replay = replayEntries()
         let cap = (0..<capDrops).map { act("world.drop", [Double($0 % 2)], steps: $0 == 0 ? 0 : 10) }
             + [act("world.drop", [0], steps: 10, result: "action.rule." + PlaygroundRule.bodyCap),
+               act("edit.add", [addPoints.circle.x, addPoints.circle.y, 0],
+                   result: "action.rule." + PlaygroundRule.bodyCap),
                ScenarioStep(steps: 60)]
+        let circle = Double(firstCircleId), other = Double(secondCircleId), box = Double(hangingBoxId)
+        let start = StartingScene.pairCenters.0
         return [
             [act("world.drop", [0]), ScenarioStep(steps: 120)],
             [act("world.drop", [0]), act("world.drop", [0]), ScenarioStep(steps: 240)],
@@ -201,6 +265,23 @@ extension PlaygroundCore {
              act("world.gravity", [2], steps: levelSegmentSteps), act("world.drag", [1]),
              ScenarioStep(steps: levelSegmentSteps)],
             schemaOneExampleActions.map { act($0.control, $0.values) }
+                + [act("world.pause", [0], steps: 30), ScenarioStep(steps: 60)],
+            [act("edit.add", [addPoints.circle.x, addPoints.circle.y, 0]),
+             act("edit.add", [addPoints.box.x, addPoints.box.y, 1]), ScenarioStep(steps: 120)],
+            [act("edit.grab", [circle, start.x, start.y]),
+             act("edit.move", [grabTargets[0].x, grabTargets[0].y], steps: 30),
+             act("edit.move", [grabTargets[1].x, grabTargets[1].y], steps: 30),
+             act("edit.release", steps: 120), ScenarioStep(steps: 60)],
+            [act("edit.pin", [circle]), act("edit.add", [7, 3, 1]), act("edit.add", [7, 4.5, 0]),
+             ScenarioStep(steps: pinSteps)],
+            [act("edit.pin", [circle]), act("edit.pin", [circle], steps: 60), ScenarioStep(steps: 60)],
+            [act("edit.select", [box]), act("edit.delete", [box]), act("edit.delete", [circle]),
+             ScenarioStep(steps: 60)],
+            [act("edit.select", [other]), act("edit.nudge", [1, 1]), act("edit.nudge", [-0.5, 1]),
+             ScenarioStep(steps: 60)],
+            [act("overlay.velocity", [1]), act("overlay.forces", [1]), act("overlay.velocity", [0], steps: 60),
+             ScenarioStep(steps: 60)],
+            schemaTwoExampleActions.map { act($0.control, $0.values) }
                 + [act("world.pause", [0], steps: 30), ScenarioStep(steps: 60)],
         ]
     }

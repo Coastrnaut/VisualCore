@@ -12,6 +12,13 @@
 // the clamped stiffness, the broad-phase world equal to the all-pairs world, the gravity and drag levels in the
 // settings and in a falling circle's speed, and the stored schema-1 example restoring with the fixture's generator
 // and drops.
+//
+// Feature 084 (A11-P03) T-A11-304 (FR-A11-321; SC-A11-305; research D5): twenty-six fixtures and schema 3; the
+// rejection scenario's edit refusals; the body-cap fixture also refusing an add; fixtures 19–26 ending in the states
+// they name: the added bodies centred at their points, the grabbed circle pulled to its target and let go with its own
+// velocity, the pinned circle bit-identical under impacts for 1,000 steps with every number finite, the unpinned
+// circle falling, the deleted bodies gone with their springs and the selection, the nudged selection, the overlays
+// changing nothing but their flags, and the stored schema-2 example restoring to the fixture's world.
 import Foundation
 import Testing
 @testable import PhysicsPlaygroundExperience
@@ -57,15 +64,22 @@ private func stepped(_ entries: [ScenarioStep], seed: UInt64 = PlaygroundCore.ma
 }
 
 @Suite struct PlaygroundManifestTests {
-    @Test func theManifestIsValidWithTheNineStandardScenariosAndEighteenFixtures() {
+    @Test func theManifestIsValidWithTheNineStandardScenariosAndTwentySixFixtures() throws {
         let manifest = PlaygroundCore.manifest(for: id)
         let problems = ScenarioManifestValidator.problems(manifest, controls: PlaygroundCore.controls,
-                                                          content: ContentRequirement(fixtures: 18))
+                                                          content: ContentRequirement(fixtures: 26))
         #expect(problems.isEmpty, "\(problems)")
         #expect(Set(manifest.scenarios.map(\.name))
-                == Set(ScenarioManifest.standardNames).union((1...18).map { "fixture-\($0)" }))
+                == Set(ScenarioManifest.standardNames).union((1...26).map { "fixture-\($0)" }))
         let used = Set(manifest.scenarios.flatMap { $0.entries.compactMap { $0.action?.control } })
         #expect(used.isSuperset(of: ["world.gravity", "world.drag", "world.stiffness"]), "the level actions are played")
+        #expect(used == Set(PlaygroundCore.actionIDs), "every action is played")
+        let rejection = try #require(manifest.scenarios.first { $0.name == "rejection" })
+        let codes = Set(rejection.entries.compactMap(\.result))
+        for rule in [PlaygroundRule.noRoom, PlaygroundRule.unknownBody, PlaygroundRule.notGrabbable,
+                     PlaygroundRule.noGrab, PlaygroundRule.staticBody, PlaygroundRule.noSelection] {
+            #expect(codes.contains("action.rule." + rule), "the rejection scenario refuses with \(rule)")
+        }
         #expect(manifest.kind == .creative)
         #expect(manifest.experience == id)
     }
@@ -93,7 +107,7 @@ private func stepped(_ entries: [ScenarioStep], seed: UInt64 = PlaygroundCore.ma
         let seed = PlaygroundCore.manifestSeed
         let fixtures = PlaygroundCore.fixtureEntries
         let catalog = PlaygroundCore.catalog
-        #expect(fixtures.count == 18)
+        #expect(fixtures.count == 26)
         #expect(PlaygroundCore(seed: seed).world.bodies.count == PlaygroundCore.startingBodies)
 
         // 1. Free fall: the dropped circle falls under gravity for 1 s.
@@ -166,8 +180,10 @@ private func stepped(_ entries: [ScenarioStep], seed: UInt64 = PlaygroundCore.ma
         // 10. Body cap: 38 drops fill the world to 48 bodies, the 39th is refused, and the world stays valid.
         #expect(PlaygroundCore.capDrops == 38)
         let capEntries = fixtures[9]
-        #expect(capEntries.compactMap(\.action).count == PlaygroundCore.capDrops + 1)
-        #expect(capEntries.compactMap(\.result).last == "action.rule." + PlaygroundRule.bodyCap)
+        #expect(capEntries.compactMap(\.action).count == PlaygroundCore.capDrops + 2)
+        #expect(capEntries.compactMap(\.result).suffix(2) == ["action.rule." + PlaygroundRule.bodyCap,
+                                                              "action.rule." + PlaygroundRule.bodyCap])
+        #expect(capEntries.compactMap(\.action).last?.control == "edit.add", "an add is refused at the cap too")
         let full = stepped(capEntries) { core in
             #expect(core.world.bodies.count <= PhysicsWorld.maxBodies)
         }
@@ -301,6 +317,112 @@ private func stepped(_ entries: [ScenarioStep], seed: UInt64 = PlaygroundCore.ma
         #expect(migrated.world.validate(catalog: catalog).isEmpty && migrated.world.tick == 30)
         let played18 = PlaygroundCore.played(seed: seed, entries: fixtures[17]).world
         #expect(played18.tick == 30 && !played18.paused)
+    }
+
+    /// T-A11-304 (FR-A11-321; SC-A11-302, SC-A11-303, SC-A11-305): fixtures 19–26 end in the states they name.
+    @Test func theEditingFixturesEndInTheStatesTheyName() throws {
+        let seed = PlaygroundCore.manifestSeed
+        let fixtures = PlaygroundCore.fixtureEntries
+        let catalog = PlaygroundCore.catalog
+        let circle = PlaygroundCore.firstCircleId, box = PlaygroundCore.hangingBoxId
+        let start = PlaygroundCore(seed: seed).world
+        #expect(start.bodies[box].id == box && start.bodies[circle].id == circle)
+        #expect(start.bodies[circle].position == StartingScene.pairCenters.0)
+
+        // 19. Add at a point: a circle and a box, centred at their points, then they fall.
+        let added = PlaygroundCore.played(seed: seed, entries: Array(fixtures[18].prefix(2))).world
+        #expect(added.bodies.count == PlaygroundCore.startingBodies + 2)
+        let newCircle = try #require(added.bodies.first { $0.id == 10 })
+        let newBox = try #require(added.bodies.first { $0.id == 11 })
+        #expect(newCircle.position == PlaygroundCore.addPoints.circle)
+        #expect(newBox.position == PlaygroundCore.addPoints.box)
+        if case .circle = newCircle.shape {} else { Issue.record("body 10 is a circle") }
+        if case .box = newBox.shape {} else { Issue.record("body 11 is a box") }
+        let fallen = PlaygroundCore.played(seed: seed, entries: fixtures[18]).world
+        #expect(try #require(fallen.bodies.first { $0.id == 11 }).position.y < PlaygroundCore.addPoints.box.y)
+
+        // 20. Grab, move and release: held for 1 s the circle comes near its target; let go, it keeps its velocity.
+        let held = PlaygroundCore.played(seed: seed,
+                                         entries: Array(fixtures[19].prefix(3)) + [ScenarioStep(steps: 120)])
+        let grab = try #require(held.world.grab)
+        #expect(grab.bodyId == circle && grab.target == PlaygroundCore.grabTargets[1])
+        let heldBody = try #require(held.world.bodies.first { $0.id == circle })
+        let anchor = heldBody.pose.toWorld(grab.localAnchor)
+        #expect((anchor - grab.target).length < 0.05, "within 5 cm of the target: \((anchor - grab.target).length)")
+        let released = PlaygroundCore.played(seed: seed, entries: Array(fixtures[19].prefix(4)))
+        #expect(released.world.grab == nil)
+        let atRelease = try #require(released.world.bodies.first { $0.id == circle })
+        #expect(atRelease.velocity == heldBody.velocity, "the release changes no velocity")
+
+        // 21. Pin with impacts: the pinned circle never moves while the added bodies land on it.
+        let pinnedStart = PlaygroundCore.played(seed: seed, entries: Array(fixtures[20].prefix(3)))
+        let pinned = try #require(pinnedStart.world.bodies.first { $0.id == circle })
+        #expect(pinned.pinned && pinned.velocity == .zero)
+        var touched = false
+        let hit = stepped(fixtures[20]) { core in
+            guard let body = core.world.bodies.first(where: { $0.id == circle }) else {
+                Issue.record("the pinned circle is gone")
+                return
+            }
+            #expect(body.position == pinned.position && body.angle == pinned.angle)
+            #expect(body.velocity == .zero && body.angularVelocity == 0)
+            #expect(core.world.isFinite)
+            if core.world.contactCache.contains(where: { ($0.bodyA == circle || $0.bodyB == circle)
+                && ($0.bodyA >= 10 || $0.bodyB >= 10) }) { touched = true }
+        }
+        #expect(hit.world.tick == PlaygroundCore.pinSteps)
+        #expect(touched, "an added body landed on the pinned circle")
+        #expect(hit.world.validate(catalog: catalog).isEmpty)
+
+        // 22. Unpin and fall: pinned for 60 steps it stays; unpinned it falls.
+        let stillPinned = PlaygroundCore.played(seed: seed, entries: Array(fixtures[21].prefix(1))
+                                                + [ScenarioStep(steps: 60)])
+        let stayed = try #require(stillPinned.world.bodies.first { $0.id == circle })
+        #expect(stayed.position == start.bodies[circle].position)
+        let unpinned = PlaygroundCore.played(seed: seed, entries: fixtures[21]).world
+        let free = try #require(unpinned.bodies.first { $0.id == circle })
+        #expect(!free.pinned && free.position.y < start.bodies[circle].position.y - 0.05, "it fell: \(free.position.y)")
+
+        // 23. Delete with springs: both springs and the selection go with their bodies.
+        let selected = PlaygroundCore.played(seed: seed, entries: Array(fixtures[22].prefix(1))).world
+        #expect(selected.selectedId == box)
+        let deleted = PlaygroundCore.played(seed: seed, entries: fixtures[22]).world
+        #expect(deleted.bodies.count == PlaygroundCore.startingBodies - 2)
+        #expect(!deleted.bodies.contains { $0.id == box || $0.id == circle })
+        #expect(deleted.springs.isEmpty && deleted.selectedId == nil)
+        #expect(!deleted.contactCache.contains { [box, circle].contains($0.bodyA) || [box, circle].contains($0.bodyB) })
+
+        // 24. Selection and nudge: the selected circle gains (1, 1) + (−0.5, 1) m/s at once.
+        let before24 = PlaygroundCore.played(seed: seed, entries: Array(fixtures[23].prefix(1))).world
+        let nudged = PlaygroundCore.played(seed: seed, entries: Array(fixtures[23].prefix(3))).world
+        let other = PlaygroundCore.secondCircleId
+        let v0 = try #require(before24.bodies.first { $0.id == other }).velocity
+        let v1 = try #require(nudged.bodies.first { $0.id == other }).velocity
+        #expect(abs(v1.x - v0.x - 0.5) < 1e-12 && abs(v1.y - v0.y - 2) < 1e-12)
+        #expect(PlaygroundCore.played(seed: seed, entries: fixtures[23]).world.selectedId == other)
+
+        // 25. Overlays on and off: the world equals the same steps without them except for the flags.
+        let overlays = PlaygroundCore.played(seed: seed, entries: fixtures[24]).world
+        #expect(!overlays.showVelocity && overlays.showForces)
+        var plain = PlaygroundCore.played(seed: seed, entries: [ScenarioStep(steps: 120)]).world
+        plain.showForces = true
+        #expect(overlays == plain)
+
+        // 26. Schema-2 migration: the stored example restores to the world the fixture's actions give.
+        let paused26 = PlaygroundCore.played(seed: seed, entries: Array(fixtures[25].prefix(7)))
+        #expect(paused26.world.paused && paused26.world.tick == 0)
+        let example = try #require(PlaygroundCore.schemaTwoExample(seed: seed))
+        let snapshot = try ExperienceSnapshot(data: example.snapshot)
+        #expect(snapshot.schemaVersion == 2 && snapshot.seed == seed)
+        let object = try #require(try JSONSerialization.jsonObject(with: Data(snapshot.payload.utf8)) as? [String: Any])
+        let upgraded = try PlaygroundCore.migrations.migrate(object, from: 2)
+        var migrated = try PlaygroundCore.restore(
+            payload: JSONSerialization.data(withJSONObject: upgraded, options: [.sortedKeys]), seed: seed)
+        #expect(migrated == paused26, "the same world and generator")
+        _ = migrated.apply(ExperienceAction(control: "world.pause", values: [0], step: 0))
+        for step in 0..<60 { migrated.update(step: step) }
+        let played26 = PlaygroundCore.played(seed: seed, entries: fixtures[25])
+        #expect(migrated.world == played26.world && played26.world.tick == 30)
     }
 
     /// The JSON form with the control ids, named by `Catalog/registrations.json`. `UPDATE_SCENARIO_MANIFEST=1`
