@@ -12,7 +12,7 @@ after every task (no trailers); read every check's exit before ticking. iOS 27 o
 
 ## Phase 2: Foundational — loop fixtures (story 4)
 
-- [ ] T-A13-202 [P] [US4] Write `Packages/ExperiencesCreative/LightMaze/CoreTests/LoopFixtureTests.swift` per research D3: a mirror-only board whose path returns to the emitter (ends "emitter"), a prism board whose branches meet (ends "loop"), and a mirror spiral reaching the bounce cap (ends "bounce-cap"); each branch ≤ 64 bounces, total ≤ 256 segments; boards committed as literals (FR-A13-220; SC-A13-205)
+- [X] T-A13-202 [P] [US4] Write `Packages/ExperiencesCreative/LightMaze/CoreTests/LoopFixtureTests.swift` per research D3: a mirror-only board whose path returns to the emitter (ends "emitter"), a prism board whose branches meet (ends "loop"), and a mirror spiral reaching the bounce cap (ends "bounce-cap"); each branch ≤ 64 bounces, total ≤ 256 segments; boards committed as literals (FR-A13-220; SC-A13-205) — Verified 2026-11-15: 2026-11-15: LoopFixtureTests (mirror path back to the emitter, prism branches meeting with loop, winding mirror path to the bounce cap at 64; every branch ≤ 64 bounces, ≤ 256 segments, deterministic) pass in .autonomy/checks/A13-P02.maze-ios27.json exit 0 (45 core tests on sim-27.2)
 
 ## Phase 3: Stories 1–2 — touch, drag and twist (P1) 🎯
 

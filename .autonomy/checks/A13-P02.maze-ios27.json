@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesCreative",
+    "--scheme",
+    "ExperiencesCreative-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "LightMazeCoreTests",
+    "LightMazeExperienceTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing LightMazeCoreTests LightMazeExperienceTests",
+  "elapsed_seconds": 8.32,
+  "exit_code": 0,
+  "finished": "2026-11-15T18:27:11+00:00",
+  "log": ".autonomy/logs/A13-P02.maze-ios27.log",
+  "log_sha256": "dbd9d33729da535b2c68df32e011902981771e0543a3e3541722f808531d239f",
+  "name": "maze-ios27",
+  "stage": "A13-P02",
+  "started": "2026-11-15T18:27:03+00:00",
+  "timed_out": false
+}
