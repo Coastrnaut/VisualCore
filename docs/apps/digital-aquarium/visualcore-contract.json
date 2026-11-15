@@ -690,13 +690,13 @@
         "file": "Packages/ExperiencesCreative/ParticleUniverse/Experience/ParticleLibrary.swift",
         "symbol": "ParticleLibrary"
       },
-      "notes": "Tested in VisualCorePersistenceTests and VisualCoreExperienceTests; the habitat schema is G-HABITAT (M09). Storage quota 16 MB, 64 files."
+      "notes": "Tested in VisualCorePersistenceTests and VisualCoreExperienceTests; the habitat schema is G-HABITAT (M09). Storage quota 16 MB, 64 files. Used in A09-P05: AquariumLibrary keeps up to 12 saved habitat configurations as aquarium-<uuid>.json files in the experience storage, counts damaged and newer files without deleting them and rebuilds a configuration through actions (AquariumConfigurationTests, AquariumLibraryTests)."
     },
     {
       "id": "M15",
       "capability": "Low-motion, low-power ambient mode with automatic dimming: reduced frame work and particle counts, slower calmer movement, in-scene brightness dimmed after a period without touch and restored on touch; never the system screen brightness",
       "source": "v0.1 feature 06; manual P05 ambient device testing",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityGovernor.swift",
@@ -724,10 +724,10 @@
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/ParticleUniverse/Core/SceneQuality.swift",
-        "symbol": "SceneQuality"
+        "file": "Packages/ExperiencesCreative/DigitalAquarium/Core/AmbientDimmer.swift",
+        "symbol": "AmbientDimmer"
       },
-      "notes": "Quality levels, Low Power Mode, Reduce Motion and a brightness cap exist and are tested; no idle timer or dimming policy exists, and the ambient mode's rules are the experience's. G-AMBIENT (app-local), A09-P05."
+      "notes": "Quality levels, Low Power Mode, Reduce Motion and a brightness cap exist and are tested; no idle timer or dimming policy exists, and the ambient mode's rules are the experience's. G-AMBIENT (app-local), A09-P05. Built in A09-P05 (app-local): ambient mode (saved, snapshot schema 4) slows the fish to 0.6 of their cruise speed; ambient drawing (ambient mode, Low Power Mode or Reduce Motion) caps bubbles and motes at 12 each and AmbientDimmer fades the in-scene colours to 60 % after 60 s without a touch, restored on the next touch; no system brightness or idle-timer call exists (AmbientDimmerTests, AquariumSimulationTests, AquariumRenderTests source scan)."
     },
     {
       "id": "M16",
@@ -770,7 +770,7 @@
         "file": "Packages/ExperiencesCreative/ParticleUniverse/Core/SceneQuality.swift",
         "symbol": "SceneQuality"
       },
-      "notes": "Tested in VisualCoreDiagnosticsTests (QualityGovernorTests) and VisualCoreExperienceHostTests. Core.qualityTiers must match the presenter's levels (declared at P05)."
+      "notes": "Tested in VisualCoreDiagnosticsTests (QualityGovernorTests) and VisualCoreExperienceHostTests. Core.qualityTiers must match the presenter's levels (declared at P05). Declared in A09-P05: three quality tiers (level-0…2) with AquariumBudget (bubbles per vent 24/12/6, motes 24/12/6, caustics octaves 2/1/0); the digest is identical at every level (AquariumRenderTests)."
     },
     {
       "id": "M17",
@@ -989,7 +989,7 @@
       "justification": "The ambient mode's motion, particle and dimming rules are the experience's policy over QualityGovernor, DeviceConditions, Reduce Motion and the in-scene brightness cap.",
       "phase": 5,
       "test": "Host tests: ambient mode lowers particle counts and movement speed within stated bounds, Low Power Mode and Reduce Motion select it, the in-scene brightness dims after the idle interval and restores on touch, and the system screen brightness is never changed; frame-cost bounds are recorded for the device campaign",
-      "closed": null
+      "closed": "A09-P05"
     }
   ],
   "traceability": [
