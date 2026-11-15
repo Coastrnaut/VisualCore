@@ -56,15 +56,15 @@ evidence**: no physical-device test of the unified app has been run.
 | A06 VisualCore Music Lab | experience in the app; X-A06 pass | `.autonomy/migration/checks/X-A06.*.json` |
 | A07 Audio Odyssey | experience in the app; X-A07 pass | `.autonomy/migration/checks/X-A07.*.json` |
 | A08 Oscilloscope Studio | experience in the app; X-A08 pass | `.autonomy/migration/checks/X-A08.*.json` |
-| A09 Digital Aquarium | in progress: A09-P00 and A09-P01 pass (habitat model, species catalog with license audit, bounded swimming); registered as a candidate | [docs/apps/digital-aquarium](docs/apps/digital-aquarium/README.md) |
+| A09 Digital Aquarium | in progress: A09-P00, A09-P01 and A09-P02 pass (habitat model, species catalog with license audit, schooling fish with swim animation, decor with transforms); registered as a candidate | [docs/apps/digital-aquarium](docs/apps/digital-aquarium/README.md) |
 | A10–A25 | not started | `python3 Tools/python/desktop_runbook.py next` |
 | Shared round features (R02-F02 … F05, F26) | pass | `python3 scripts/migration_ledger.py status` |
 | Games of Rounds 2–12 | planned; none exists in source | [catalog](docs/catalog/experience-catalog.json) |
 | Physical-device testing | none run; waits for `ImplementationLock-100` | [support matrix](docs/release/support-matrix.md) |
 | App Store | no submission and nothing for sale; signing, App Store Connect and agreements are owner actions | [build and archive](docs/release/build-and-archive.md) |
 
-Ledger totals today: the legacy ledger records **68 of 263** gates as passed (F00–F09 and the app phases
-A01-P00 … A09-P01); the unified-app ledger has 1,233 gates, with 8 experience gates (X-A01 … X-A08), 11 unified-app features,
+Ledger totals today: the legacy ledger records **69 of 263** gates as passed (F00–F09 and the app phases
+A01-P00 … A09-P02); the unified-app ledger has 1,233 gates, with 8 experience gates (X-A01 … X-A08), 11 unified-app features,
 5 shared round features and both governance milestones passed.
 
 ```bash
@@ -79,7 +79,8 @@ python3 scripts/migration_ledger.py status        # unified-app gates and the ne
 - **Visuals are code.** GLSL shaders, procedural meshes, signed-distance fields, particles and deterministic
   animation — no purchased, generated or hand-made art.
 - **Deterministic simulation.** A seeded random generator and a fixed-step clock (`VisualCoreSimulation`) make every
-  scene repeatable in automated tests; each experience proves this with a scenario manifest and state digests.
+  scene repeatable in automated tests; each experience proves this with a scenario manifest and state digests. Bounded
+  steering (separation, alignment, cohesion, boundary) over a capped neighbour search moves schools of agents.
 - **Experience contract.** Every experience implements one contract (core state, actions, snapshots with migrations,
   quality tiers, accessibility description) and is opened, suspended, restored and torn down by one host.
 - **Audio without recording.** Live analysis of microphone, file and test-signal input in memory only; nothing is
