@@ -41,3 +41,7 @@ Agent A: T-A12-402. Agent B: T-A12-403 after A. Lead: 404, 405, runs, commits.
 ## Implementation strategy
 
 MVP: the island pack opened and swept without clipping; then the other packs, reset, budgets and records.
+
+## Phase 6: Convergence
+
+- [ ] T-A12-410 Record in `specs/092-tw-p04-packs/research.md` (as built): `WorldPack.apply` resets the seed generator to `WorldState.generatorSeed`, so an opened pack depends only on the pack and "reset to pack" returns the exact digest after any edits, including a new seed; `world.pack` is the last control so earlier control ids keep their order; `view.reset` returns to the global default view (45°, 35°, 18 m) clamped to the preset's limits, while "Reset to pack" restores the pack's default view; the camera policy now also runs after prop and light actions because its clearance includes props, per research D1–D2 (unrequested)
