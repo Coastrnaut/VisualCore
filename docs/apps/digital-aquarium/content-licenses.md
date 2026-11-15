@@ -1,8 +1,8 @@
 # Digital Aquarium — content licenses
 
-Every species, plant and starter habitat of Digital Aquarium is drawn by code in this repository. This
-table is generated from `SpeciesCatalog.bundled` by `LicenseAudit.markdown(_:)`, and a test checks that
-it matches the catalog. Allowed licenses: MIT.
+Every species, plant, decor piece and starter habitat of Digital Aquarium is drawn by code in this
+repository. This table is generated from `SpeciesCatalog.bundled` by `LicenseAudit.markdown(_:)`, and a
+test checks that it matches the catalog. Allowed licenses: MIT.
 
 | Kind | Id | Name | Author | License |
 |---|---|---|---|---|
@@ -14,7 +14,10 @@ it matches the catalog. Allowed licenses: MIT.
 | plant | red-fan-plant | Red fan plant | VisualCore project | MIT |
 | plant | tall-brown-ribbon | Tall brown ribbon | VisualCore project | MIT |
 | plant | purple-fan-plant | Purple fan plant | VisualCore project | MIT |
+| decor | round-rock | Round rock | VisualCore project | MIT |
+| decor | flat-rock | Flat rock | VisualCore project | MIT |
+| decor | spiral-shell | Spiral shell | VisualCore project | MIT |
 | habitat | reef | Reef | VisualCore project | MIT |
 | habitat | kelp | Kelp | VisualCore project | MIT |
 
-10 items (4 species, 4 plants, 2 habitats); 0 problems.
+13 items (4 species, 4 plants, 3 decor kinds, 2 habitats); 0 problems.

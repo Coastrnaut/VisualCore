@@ -4,6 +4,9 @@
 // license on every item), the sorted-key JSON round trip, and one crafted malformed item per refusal reason
 // (missing-license, unsupported-license, unknown-shape, unknown-reference, invalid-number, too-many-fish), each refused
 // with its name while every valid bundled item is kept; unreadable JSON is refused as a whole.
+// Feature 069 (A09-P02) T-A09-203 (FR-A09-212): the bundled decor kinds (round-rock, flat-rock, spiral-shell; both
+// shapes; MIT, project author) and the starter decor (Reef 3 pieces, Kelp 2, on the gravel, transforms in range). The
+// decoder's decor refusals are in `HabitatMigrationTests`.
 import Foundation
 import Testing
 import DigitalAquariumCore
@@ -45,8 +48,35 @@ import DigitalAquariumCore
             #expect(habitat.species.allSatisfy { catalog.species(id: $0.speciesId) != nil })
             #expect(habitat.plants.allSatisfy { catalog.plant(id: $0.plantId) != nil })
         }
-        let ids = catalog.species.map(\.id) + catalog.plants.map(\.id) + catalog.habitats.map(\.id)
+        let ids = catalog.species.map(\.id) + catalog.plants.map(\.id) + catalog.decor.map(\.id)
+            + catalog.habitats.map(\.id)
         #expect(Set(ids).count == ids.count)
+    }
+
+    @Test func theBundledDecorIsThreeKindsWithStarterPiecesOnTheGravel() throws {
+        #expect(catalog.decor.map(\.id) == ["round-rock", "flat-rock", "spiral-shell"])
+        #expect(catalog.decor.map(\.name) == ["Round rock", "Flat rock", "Spiral shell"])
+        #expect(Set(catalog.decor.map(\.shape)) == Set(DecorShape.allCases))
+        #expect(catalog.habitats.map(\.decor.count) == [3, 2])
+        for kind in catalog.decor {
+            #expect(CatalogDecoder.check(kind) == nil, "\(kind.id)")
+            #expect(kind.author == SpeciesCatalog.projectAuthor && kind.license == "MIT")
+            #expect(DecorKind.sizeRange.contains(kind.size))
+            #expect(catalog.decor(id: kind.id) == kind)
+        }
+        #expect(catalog.decor(id: "no-such-rock") == nil)
+        for habitat in catalog.habitats {
+            #expect(habitat.decor.count <= HabitatDocument.maxDecor)
+            for spot in habitat.decor {
+                #expect(catalog.decor(id: spot.decorId) != nil, "\(spot.decorId)")
+                #expect(CatalogDecoder.isValid(spot))
+                #expect((1.0...1.6).contains(spot.position.y))
+                #expect(spot.position.x > 0 && spot.position.x < SwimBounds.tankWidth)
+                #expect(DecorSpot.rotationRange.contains(spot.rotation))
+                #expect(DecorSpot.scaleRange.contains(spot.scale))
+            }
+            #expect(Set(habitat.decor.map(\.rotation)).count == habitat.decor.count)
+        }
     }
 
     @Test func everyBundledItemIsValidWithAuthorAndLicense() {
@@ -61,8 +91,12 @@ import DigitalAquariumCore
             #expect(plant.author == SpeciesCatalog.projectAuthor && plant.license == "MIT")
         }
         let speciesIds = Set(catalog.species.map(\.id)), plantIds = Set(catalog.plants.map(\.id))
+        let decorIds = Set(catalog.decor.map(\.id))
         for habitat in catalog.habitats {
-            #expect(CatalogDecoder.check(habitat, speciesIds: speciesIds, plantIds: plantIds) == nil, "\(habitat.id)")
+            let known = CatalogDecoder.check(habitat, speciesIds: speciesIds, plantIds: plantIds, decorIds: decorIds)
+            #expect(known == nil, "\(habitat.id)")
+            let unknown = CatalogDecoder.check(habitat, speciesIds: speciesIds, plantIds: plantIds, decorIds: [])
+            #expect(unknown == .unknownReference)
             #expect(habitat.author == SpeciesCatalog.projectAuthor && habitat.license == "MIT")
         }
     }
@@ -70,7 +104,7 @@ import DigitalAquariumCore
     @Test func theJSONRoundTripsWithSortedKeysAndNoRefusal() throws {
         let data = catalog.encoded()
         let text = try #require(String(data: data, encoding: .utf8))
-        #expect(text.hasPrefix("{\"habitats\":[{\"author\":\"VisualCore project\""))
+        #expect(text.hasPrefix("{\"decor\":[{\"author\":\"VisualCore project\""))
         let (decoded, refused) = SpeciesCatalog.decode(data)
         #expect(refused.isEmpty)
         #expect(decoded == catalog)

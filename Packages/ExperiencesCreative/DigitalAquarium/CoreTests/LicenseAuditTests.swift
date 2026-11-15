@@ -2,6 +2,7 @@
 // audit, host-free and short: one row per species, plant and habitat with author and license; no problems for the
 // bundled catalog; a missing author, a missing license and an unsupported license are each named; the Markdown document
 // has the title, the table header and every id, and is deterministic.
+// Feature 069 (A09-P02) T-A09-203 (FR-A09-212): decor kinds are audited too, after the plants and before the habitats.
 import Foundation
 import Testing
 import DigitalAquariumCore
@@ -11,8 +12,12 @@ import DigitalAquariumCore
 
     @Test func everyItemHasOneRowWithAuthorAndLicense() {
         let rows = LicenseAudit.rows(catalog)
-        #expect(rows.count == catalog.species.count + catalog.plants.count + catalog.habitats.count)
-        #expect(rows.map(\.id) == catalog.species.map(\.id) + catalog.plants.map(\.id) + catalog.habitats.map(\.id))
+        #expect(rows.count == catalog.species.count + catalog.plants.count + catalog.decor.count
+                + catalog.habitats.count)
+        #expect(rows.map(\.id) == catalog.species.map(\.id) + catalog.plants.map(\.id) + catalog.decor.map(\.id)
+                + catalog.habitats.map(\.id))
+        #expect(catalog.decor.count == 3)
+        #expect(rows.filter { $0.kind == .decor }.map(\.id) == ["round-rock", "flat-rock", "spiral-shell"])
         #expect(rows.allSatisfy { $0.author == "VisualCore project" && $0.license == "MIT" })
         #expect(rows.filter { $0.kind == .species }.count == catalog.species.count)
         #expect(rows.filter { $0.kind == .plant }.count == catalog.plants.count)
@@ -33,6 +38,11 @@ import DigitalAquariumCore
                              "plant \(catalog.plants[1].id): missing-license",
                              "habitat \(catalog.habitats[0].id): unsupported-license"])
         #expect(LicenseAudit.markdown(broken).contains("3 problems."))
+        var shell = catalog
+        shell.decor[2].license = "CC-BY-SA-4.0"
+        shell.decor[0].author = " "
+        #expect(LicenseAudit.problems(shell) == ["decor round-rock: missing-license",
+                                                 "decor spiral-shell: unsupported-license"])
     }
 
     @Test func theMarkdownListsEveryItemDeterministically() {
@@ -43,6 +53,8 @@ import DigitalAquariumCore
             #expect(text.contains("| \(row.kind.rawValue) | \(row.id) | \(row.name) | VisualCore project | MIT |"))
         }
         #expect(text.contains("0 problems."))
+        #expect(text.contains("3 decor kinds"))
+        #expect(text.contains("| decor | spiral-shell | Spiral shell | VisualCore project | MIT |"))
         #expect(text.hasSuffix("\n") && !text.contains("\r"))
         #expect(LicenseAudit.markdown(catalog) == text)
     }

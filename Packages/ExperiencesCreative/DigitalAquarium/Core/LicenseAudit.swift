@@ -3,11 +3,13 @@
 // and license; the problems (a missing author or license, or a license outside the allowed list); and the Markdown text
 // of `docs/apps/digital-aquarium/content-licenses.md`, which a test compares with the bundled catalog. The text is
 // deterministic (no dates), so regenerating it from an unchanged catalog gives the same bytes.
+// Feature 069 (A09-P02) T-A09-203 (FR-A09-212, FR-A09-213): decor kinds are audited like plants; their rows come after
+// the plants and before the habitats.
 import Foundation
 
 /// One audited catalog item.
 public struct LicenseRow: Codable, Equatable, Sendable {
-    /// The item kind (`species`, `plant` or `habitat`).
+    /// The item kind (`species`, `plant`, `decor` or `habitat`).
     public var kind: CatalogItemKind
     /// The item id.
     public var id: String
@@ -29,12 +31,14 @@ public enum LicenseAudit {
     /// The document title.
     public static let title = "Digital Aquarium — content licenses"
 
-    /// One row per item: species, then plants, then habitats, each in catalog order.
+    /// One row per item: species, then plants, then decor kinds, then habitats, each in catalog order.
     public static func rows(_ catalog: SpeciesCatalog) -> [LicenseRow] {
         catalog.species.map { LicenseRow(kind: .species, id: $0.id, name: $0.name, author: $0.author,
                                          license: $0.license) }
             + catalog.plants.map { LicenseRow(kind: .plant, id: $0.id, name: $0.name, author: $0.author,
                                               license: $0.license) }
+            + catalog.decor.map { LicenseRow(kind: .decor, id: $0.id, name: $0.name, author: $0.author,
+                                             license: $0.license) }
             + catalog.habitats.map { LicenseRow(kind: .habitat, id: $0.id, name: $0.name, author: $0.author,
                                                 license: $0.license) }
     }
@@ -55,9 +59,10 @@ public enum LicenseAudit {
         var lines: [String] = [
             "# \(title)",
             "",
-            "Every species, plant and starter habitat of Digital Aquarium is drawn by code in this repository. This",
-            "table is generated from `SpeciesCatalog.bundled` by `LicenseAudit.markdown(_:)`, and a test checks that",
-            "it matches the catalog. Allowed licenses: \(SpeciesCatalog.allowedLicenses.joined(separator: ", ")).",
+            "Every species, plant, decor piece and starter habitat of Digital Aquarium is drawn by code in this",
+            "repository. This table is generated from `SpeciesCatalog.bundled` by `LicenseAudit.markdown(_:)`, and a",
+            "test checks that it matches the catalog. Allowed licenses: "
+                + "\(SpeciesCatalog.allowedLicenses.joined(separator: ", ")).",
             "",
             "| Kind | Id | Name | Author | License |",
             "|---|---|---|---|---|",
@@ -69,7 +74,8 @@ public enum LicenseAudit {
         let problemCount = Self.problems(catalog).count
         lines.append("")
         lines.append("\(items.count) items (\(catalog.species.count) species, \(catalog.plants.count) plants, "
-                     + "\(catalog.habitats.count) habitats); \(problemCount) problems.")
+                     + "\(catalog.decor.count) decor kinds, \(catalog.habitats.count) habitats); "
+                     + "\(problemCount) problems.")
         return lines.joined(separator: "\n") + "\n"
     }
 
