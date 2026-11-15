@@ -23,6 +23,39 @@ Canonical overrides:
 - **Owner rulings:** short tests; iOS 27 at phase gates; reference regression and iOS 26 at X-A10; every Spec Kit step
   runs.
 
+## Clarifications
+
+### Session 2026-11-14
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+`ArcadeCore` snapshot schema 1 is `ArcadeState` with `MigrationChain(currentVersion: 1)`; Digital Aquarium migrates
+older snapshots with `MigrationChain` steps and stores `schemaOneExample()` payloads (`MigrationExample`) that the
+registry's migration check restores; `GameSimulation` spawns one random object at step 30 and every 40 steps with fall
+speed 3…5 units/s; the capsule speed bound (fall ≤ 5 units/s, 0.083 units per step < 0.6) is a Phase 01 test.
+
+- Q: How many lanes are there, where, and how long is a wave? → A: Five lanes with centres x = 0.9, 2.7, 4.5, 6.3, 8.1
+  (1.8 units apart); a wave lasts 600 steps (10 s); wave 1 starts at step 0 and its first spawn comes at wave step 30;
+  the player still moves freely across the field (lanes place objects, not the player).
+- Q: Which patterns exist and how are they chosen? → A: A pattern table in the experience's core (data with id, name,
+  rule, parameters, author "VisualCore project", license "MIT"): `rain` (one object per spawn gap in a seeded lane,
+  hazard 70 % / orb 30 %), `wall` (a row every 120 steps: spike-balls of radius 0.5 in four lanes, the free lane seeded,
+  never the same free lane twice in a row), `zigzag` (a hazard per spawn gap walking lanes 0→4→0), `orb-trail` (orbs
+  per spawn gap in one seeded lane, bars in both neighbouring lanes every second gap). Wave 1 is always `rain`; each
+  later wave draws uniformly from the patterns other than the previous wave's.
+- Q: How does difficulty rise and where is the ceiling? → A: Level L = min(wave − 1, 8). Fall speed range
+  (3 + 0.2 L) … min(5, 3.6 + 0.2 L) units/s (wave 9 on: 4.6…5.0, keeping the capsule bound); spawn gap
+  max(20, 40 − 2.5 L) steps; orb multiplier 1 + L / 2 (integer division: 1…5). Survival: 1 point per 60 steps of play.
+  A wall row falls 15 units at ≤ 5 units/s (≥ 3 s), while the player crosses at most 7.2 units in under 1 s, so every
+  gap is reachable; a test checks it from the values.
+- Q: What does the saved state hold, and how is the Phase 01 state migrated? → A: `GameRun` schema 2 adds `wave`
+  (≥ 1), `waveStep` (0…599), `patternId`, `freeLane` (the last wall's free lane, −1 for none) and `patternCursor` (the
+  zigzag position or the trail lane); `ArcadeState` snapshot schema 2 with `MigrationChain(currentVersion: 2)`, step
+  1 → 2 setting wave 1, wave step 0, pattern `rain`, no free lane, cursor 0 and keeping everything else; a stored
+  schema-1 example is registered for the migration check.
+- Q: What does the person see and hear of the waves? → A: Five dim lane guides drawn as thin lines at the lane centres
+  below the HUD, the wave number as drawn digits beside the score, and the spoken description adds "wave n"; the
+  pattern table appears in `docs/apps/neon-arcade/content-licenses.md` with role `pattern`.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Waves that ask for skill (Priority: P1) 🎯
