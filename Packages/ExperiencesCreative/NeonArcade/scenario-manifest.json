@@ -5,7 +5,8 @@
     "run.pause",
     "run.restart",
     "settings.sound",
-    "settings.haptics"
+    "settings.haptics",
+    "settings.sensitivity"
   ],
   "experience" : "a10.neon-arcade",
   "kind" : "creative",
@@ -15,7 +16,7 @@
 
       ],
       "expect" : {
-        "initialDigest" : "efbb062611269c8abae57f8c6589933e9cffd9921400269d1bab12ec93aac6c5"
+        "initialDigest" : "cdc568c6e69916837ea9f0ac30a800cba789d8df6c080986014918c436681f2c"
       },
       "name" : "launch-first-frame",
       "seed" : "7"
@@ -64,8 +65,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "af8227d00fa90571250f5786338a6ef23350768fa348828f4e59fc405b30acfe",
-        "initialDigest" : "efbb062611269c8abae57f8c6589933e9cffd9921400269d1bab12ec93aac6c5"
+        "finalDigest" : "6f2f528ffe563ffcc711b5294e99f6bef3080e5ab5245dcd1c1635a27b1a4c41",
+        "initialDigest" : "cdc568c6e69916837ea9f0ac30a800cba789d8df6c080986014918c436681f2c"
       },
       "name" : "input-response",
       "seed" : "7"
@@ -160,6 +161,26 @@
           },
           "result" : "action.rule.a10.invalid-choice",
           "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "settings.sensitivity",
+            "values" : [
+              2.5
+            ]
+          },
+          "result" : "action.rule.a10.invalid-choice",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "settings.sensitivity",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
         }
       ],
       "expect" : {
@@ -212,8 +233,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "af8227d00fa90571250f5786338a6ef23350768fa348828f4e59fc405b30acfe",
-        "initialDigest" : "efbb062611269c8abae57f8c6589933e9cffd9921400269d1bab12ec93aac6c5"
+        "finalDigest" : "6f2f528ffe563ffcc711b5294e99f6bef3080e5ab5245dcd1c1635a27b1a4c41",
+        "initialDigest" : "cdc568c6e69916837ea9f0ac30a800cba789d8df6c080986014918c436681f2c"
       },
       "name" : "save-restore",
       "seed" : "7"
@@ -262,7 +283,7 @@
         }
       ],
       "expect" : {
-        "initialDigest" : "efbb062611269c8abae57f8c6589933e9cffd9921400269d1bab12ec93aac6c5",
+        "initialDigest" : "cdc568c6e69916837ea9f0ac30a800cba789d8df6c080986014918c436681f2c",
         "resetDigest" : true
       },
       "name" : "reset",
@@ -436,8 +457,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "6b5e4fe48713f9804561349143f8c9992b2fc28a4517ab9b79044ee8f4ab3c25",
-        "initialDigest" : "efbb062611269c8abae57f8c6589933e9cffd9921400269d1bab12ec93aac6c5"
+        "finalDigest" : "8c54acd3c343be3224f30da92ded9119b703193a15c0546985191bcfd724ea10",
+        "initialDigest" : "cdc568c6e69916837ea9f0ac30a800cba789d8df6c080986014918c436681f2c"
       },
       "name" : "fixture-1",
       "seed" : "7"
@@ -579,8 +600,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "6b5e4fe48713f9804561349143f8c9992b2fc28a4517ab9b79044ee8f4ab3c25",
-        "initialDigest" : "efbb062611269c8abae57f8c6589933e9cffd9921400269d1bab12ec93aac6c5"
+        "finalDigest" : "8c54acd3c343be3224f30da92ded9119b703193a15c0546985191bcfd724ea10",
+        "initialDigest" : "cdc568c6e69916837ea9f0ac30a800cba789d8df6c080986014918c436681f2c"
       },
       "name" : "fixture-2",
       "seed" : "7"
@@ -612,8 +633,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "d155a9b53f6cea0b6dbcb0c329dbccafad093ab40eeabd3ddcbdf82fd21e6430",
-        "initialDigest" : "efbb062611269c8abae57f8c6589933e9cffd9921400269d1bab12ec93aac6c5"
+        "finalDigest" : "de5faa0d575ba90cff4cd34596e922647aa6941be7dd728a6610cfea64caf8c4",
+        "initialDigest" : "cdc568c6e69916837ea9f0ac30a800cba789d8df6c080986014918c436681f2c"
       },
       "name" : "fixture-3",
       "seed" : "7"
@@ -715,8 +736,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "5d6f32ed40f5ab2f05f88d44b6dcb86093ba048643a58ad0aad72e3d59018d1e",
-        "initialDigest" : "efbb062611269c8abae57f8c6589933e9cffd9921400269d1bab12ec93aac6c5"
+        "finalDigest" : "eb488e29d7841fcfb13975c1adcc65e8faa7de5329d0e04e85e2b1c2753d3749",
+        "initialDigest" : "cdc568c6e69916837ea9f0ac30a800cba789d8df6c080986014918c436681f2c"
       },
       "name" : "fixture-4",
       "seed" : "7"
@@ -758,8 +779,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "55bfd3a329bb3c24c5a525b67c145d91c173561bf522009bfc38dd910aeaeafe",
-        "initialDigest" : "efbb062611269c8abae57f8c6589933e9cffd9921400269d1bab12ec93aac6c5"
+        "finalDigest" : "f1633e1bdc79bb1ed1d500e6589eb089d2522f4f7fdbf87f786e32f3d83df836",
+        "initialDigest" : "cdc568c6e69916837ea9f0ac30a800cba789d8df6c080986014918c436681f2c"
       },
       "name" : "fixture-5",
       "seed" : "7"
@@ -791,8 +812,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "f95ed9a8dcb9e6672bd85fcc51d3e098b52ea7952e759f5dc23774e796ae6a30",
-        "initialDigest" : "efbb062611269c8abae57f8c6589933e9cffd9921400269d1bab12ec93aac6c5"
+        "finalDigest" : "fad5efb153c1863b41c141c0d5a4ad1bc0e56ad077175bf644106ac4f90a3f06",
+        "initialDigest" : "cdc568c6e69916837ea9f0ac30a800cba789d8df6c080986014918c436681f2c"
       },
       "name" : "fixture-6",
       "seed" : "7"
@@ -934,8 +955,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "ed2952a48bd6edd37d3d9689d9714e25b0ccf578a5910f0fc29b9c0e710fe079",
-        "initialDigest" : "efbb062611269c8abae57f8c6589933e9cffd9921400269d1bab12ec93aac6c5"
+        "finalDigest" : "41f969e1020ab062c89c5892ac0dcc6b4559efe4257ad9aea032647abfd30386",
+        "initialDigest" : "cdc568c6e69916837ea9f0ac30a800cba789d8df6c080986014918c436681f2c"
       },
       "name" : "fixture-7",
       "seed" : "7"
@@ -997,8 +1018,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "fca8057583c7df4ec9d53541936d6fcb7d37bef9eed2c60221420c0143d659aa",
-        "initialDigest" : "efbb062611269c8abae57f8c6589933e9cffd9921400269d1bab12ec93aac6c5"
+        "finalDigest" : "dc4d22f9218cde381ec357921082df7287cdbaa2cf56d4519c2d19ddd662e28a",
+        "initialDigest" : "cdc568c6e69916837ea9f0ac30a800cba789d8df6c080986014918c436681f2c"
       },
       "name" : "fixture-8",
       "seed" : "7"
@@ -1040,8 +1061,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "b9886127f8693230f87bcd667cef9aa85c8d21049233592ff3a6501367f9271b",
-        "initialDigest" : "efbb062611269c8abae57f8c6589933e9cffd9921400269d1bab12ec93aac6c5"
+        "finalDigest" : "bd62ed5ef9c9dcc1a15acd1b450829f77891d45e3ae40e17bee134c6b8cceae1",
+        "initialDigest" : "cdc568c6e69916837ea9f0ac30a800cba789d8df6c080986014918c436681f2c"
       },
       "name" : "fixture-9",
       "seed" : "7"
@@ -1106,8 +1127,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "353274d82f81cc6f723e9dee3d70f1301c7be063b1059d4c77dc563a976ae5a5",
-        "initialDigest" : "efbb062611269c8abae57f8c6589933e9cffd9921400269d1bab12ec93aac6c5"
+        "finalDigest" : "e653b29d815063d12b1eafe3ecf28ce7c10f82ccc093034d6f009293380a5a53",
+        "initialDigest" : "cdc568c6e69916837ea9f0ac30a800cba789d8df6c080986014918c436681f2c"
       },
       "name" : "fixture-10",
       "seed" : "7"
@@ -1149,8 +1170,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "36fed423d4fcbd16b9da1441a1d52f230c9f1e935ceeaa83e8b17fc1b8abf66d",
-        "initialDigest" : "efbb062611269c8abae57f8c6589933e9cffd9921400269d1bab12ec93aac6c5"
+        "finalDigest" : "0dfe31cd401609aa296356311a12b43ce7ba8d3d72d6376f34b08aea9f1cfc2d",
+        "initialDigest" : "cdc568c6e69916837ea9f0ac30a800cba789d8df6c080986014918c436681f2c"
       },
       "name" : "fixture-11",
       "seed" : "7"
@@ -1172,8 +1193,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "a36e5f431075c3ee2071e09b137f1e3018b61205f56332584d90c16f2809949d",
-        "initialDigest" : "efbb062611269c8abae57f8c6589933e9cffd9921400269d1bab12ec93aac6c5"
+        "finalDigest" : "680ce29853a8c31113d3d89afdd8d449b36a1fc6d0b7b02361e5594fd72beb9c",
+        "initialDigest" : "cdc568c6e69916837ea9f0ac30a800cba789d8df6c080986014918c436681f2c"
       },
       "name" : "fixture-12",
       "seed" : "7"
@@ -1195,8 +1216,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "f3f8a5f849dd527b557bd6fe21cb6e7a57509e291672ea790d13c07eb5afc412",
-        "initialDigest" : "efbb062611269c8abae57f8c6589933e9cffd9921400269d1bab12ec93aac6c5"
+        "finalDigest" : "f78c0c697ec87a534b6f624762f4b5e94398c03569829cb9096c23a6052f4aed",
+        "initialDigest" : "cdc568c6e69916837ea9f0ac30a800cba789d8df6c080986014918c436681f2c"
       },
       "name" : "fixture-13",
       "seed" : "7"
@@ -1238,10 +1259,86 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "4564da75ebddd215d9e5d56fed277c214e166245023c02c574debdc40d35bcda",
-        "initialDigest" : "efbb062611269c8abae57f8c6589933e9cffd9921400269d1bab12ec93aac6c5"
+        "finalDigest" : "d9ba0871f1164d55d9feb11e3d701369dced1afc5afe95224827e11cedc157c9",
+        "initialDigest" : "cdc568c6e69916837ea9f0ac30a800cba789d8df6c080986014918c436681f2c"
       },
       "name" : "fixture-14",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "run.start",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "steps" : 700
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f80b8787b4b0d3f7bcfe5408df152edaf0e3c90d83d1d4b209ede82ac0f258d7",
+        "initialDigest" : "cdc568c6e69916837ea9f0ac30a800cba789d8df6c080986014918c436681f2c"
+      },
+      "name" : "fixture-15",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "run.start",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "settings.sensitivity",
+            "values" : [
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "settings.sensitivity",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 60
+        },
+        {
+          "steps" : 60
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a2bacfa10a90bd1eb45031e45b1c1dc8f03f4d279e63c1f7a67dc1b8e16ee914",
+        "initialDigest" : "cdc568c6e69916837ea9f0ac30a800cba789d8df6c080986014918c436681f2c"
+      },
+      "name" : "fixture-16",
       "seed" : "7"
     }
   ],

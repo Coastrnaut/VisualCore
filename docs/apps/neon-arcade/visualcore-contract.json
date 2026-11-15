@@ -449,7 +449,7 @@
       "id": "M10",
       "capability": "Touch steering with configurable sensitivity and a control alternative: drag maps to lane or horizontal position with a person-chosen sensitivity, native buttons reach the same result",
       "source": "v0.1 feature 04: touch steering with configurable sensitivity; constitution A10 accessibility",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreScenes/GestureRecognizers.swift",
@@ -477,10 +477,10 @@
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/PlaygroundView.swift",
-        "symbol": "PlaygroundModel"
+        "file": "Packages/ExperiencesCreative/NeonArcade/Experience/ArcadeGestures.swift",
+        "symbol": "ArcadeGestures"
       },
-      "notes": "DragRecognizer (translation, velocity), the velocity tracker, arbitration and the gesture-alternative check exist and are tested (GestureTests, PointerVelocityTrackerTests, GestureArbiterTests, GestureAlternativesTests); no sensitivity mapping exists and it is game-specific. G-STEERINPUT (app-local over DragRecognizer), A10-P04."
+      "notes": "Since A10-P04 (G-STEERINPUT closed): five sensitivity steps (reach 2.5…0.6 units) chosen with a labelled Stepper and saved with the game; the drag maps the finger's offset by the chosen reach through DragRecognizer/GestureArbiter; the left, right and straight buttons are the native alternative (GestureAlternatives.missing empty; NAArcadeUITests)."
     },
     {
       "id": "M11",
@@ -594,10 +594,10 @@
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/ParticleUniverse/Experience/ParticleLibrary.swift",
-        "symbol": "ParticleLibrary"
+        "file": "Packages/ExperiencesCreative/NeonArcade/Experience/HighScoreStore.swift",
+        "symbol": "HighScoreStore"
       },
-      "notes": "Tested in VisualCorePersistenceTests and VisualCoreExperienceTests; storage quota 16 MB, 64 files. The score table schema is G-HIGHSCORES (M09)."
+      "notes": "Tested in VisualCorePersistenceTests and VisualCoreExperienceTests; storage quota 16 MB, 64 files. The score table schema is G-HIGHSCORES (M09). Since A10-P04 (G-HIGHSCORES closed): the local high-score table (≤ 10 entries, no personal data) is saved as high-scores.json through ExperienceStorage's atomic write; interrupted saves leave the last complete table and damaged or newer files are reported (HighScoreStoreTests)."
     },
     {
       "id": "M14",
@@ -823,7 +823,7 @@
       "justification": "Mapping drag translation to lane or horizontal position with a person-chosen sensitivity is game-specific; it is built over DragRecognizer and GestureArbiter, with native controls as the alternative.",
       "phase": 4,
       "test": "Host tests: each sensitivity step maps a drag to a bounded movement, the setting persists, the native buttons reach the same positions (GestureAlternatives.missing is empty), and steering is recorded as replayable commands",
-      "closed": null
+      "closed": "A10-P04"
     },
     {
       "id": "G-HIGHSCORES",
@@ -835,7 +835,7 @@
       "justification": "The local high-score table is the game's document stored crash-safe in ExperienceStorage through VisualCorePersistence; no online leaderboard.",
       "phase": 4,
       "test": "Host tests: scores round-trip, a write interrupted mid-way keeps the previous table, damaged or newer files are reported and never crash, the table keeps a bounded number of entries in order",
-      "closed": null
+      "closed": "A10-P04"
     },
     {
       "id": "G-GLOWCAPS",

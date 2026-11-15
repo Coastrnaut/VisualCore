@@ -16,6 +16,10 @@
 // schema 3 a new experience opens on the title screen, so fixtures 1–11 and the standard scenarios with actions begin
 // with `run.start`; fixture 9 pauses before its restart (a restart is allowed only from the paused or game-over
 // screen); every digest changed with the screen and the settings.
+// Fixtures 15–16 — feature 078 (A10-P04) T-A10-405 (FR-A10-401, FR-A10-402, FR-A10-412; research D3): a run played to
+// game over (the run the presenter enters into the high-score table; the crash-safe table write itself happens in the
+// presenter, outside the digest, and is proved by `HighScoreStoreTests`) and a sensitivity change (steps 4 then 0, a
+// recorded setting that never changes the run). Every digest changed with schema 4 (sensitivity and run number).
 #if DEBUG || VISUALCORE_AUTOMATION
 import NeonArcadeCore
 import VisualCoreExperience
@@ -61,6 +65,13 @@ extension ArcadeCore {
     public static let titleSteps = 30
     /// The steps the settings fixture (14) plays with sound and haptics off.
     public static let settingsSteps = 120
+    /// The steering of the game-over fixture (15): hard left from the start; with seed 7 the run ends at step 679 in
+    /// wave 2 with score 11.
+    public static let gameOverSteering = -1.0
+    /// The steps the game-over fixture (15) plays (the run is over before the last; the over screen holds).
+    public static let gameOverSteps = 700
+    /// The steps the sensitivity fixture (16) plays after each of its two sensitivity changes.
+    public static let sensitivitySteps = 60
 
     /// `inputs` as scenario entries: the steps up to each input, the `run.steer` action, and the steps left up to
     /// `steps`.
@@ -85,7 +96,8 @@ extension ArcadeCore {
     }
 
     /// The entries of rejection: a steering value out of range, a pause value out of range, a fractional pause choice,
-    /// a restart carrying a value, a pause on the title screen (`a10.wrong-screen`) and a fractional sound setting.
+    /// a restart carrying a value, a pause on the title screen (`a10.wrong-screen`), a fractional sound setting and
+    /// (feature 078) a fractional and an out-of-range sensitivity step.
     public static var rejectionEntries: [ScenarioStep] {
         [ScenarioStep(steps: 0, action: ScriptedAction("run.steer", [2]), result: "action.out-of-range"),
          ScenarioStep(steps: 0, action: ScriptedAction("run.pause", [-1]), result: "action.out-of-range"),
@@ -95,7 +107,10 @@ extension ArcadeCore {
          ScenarioStep(steps: 0, action: ScriptedAction("run.pause", [1]),
                       result: "action.rule." + ArcadeRule.wrongScreen),
          ScenarioStep(steps: 0, action: ScriptedAction("settings.sound", [0.5]),
-                      result: "action.rule." + ArcadeRule.invalidChoice)]
+                      result: "action.rule." + ArcadeRule.invalidChoice),
+         ScenarioStep(steps: 0, action: ScriptedAction("settings.sensitivity", [2.5]),
+                      result: "action.rule." + ArcadeRule.invalidChoice),
+         ScenarioStep(steps: 0, action: ScriptedAction("settings.sensitivity", [5]), result: "action.out-of-range")]
     }
 
     /// The recorded inputs as scenario entries: the steps up to each input, the `run.steer` action, and the steps
@@ -129,8 +144,8 @@ extension ArcadeCore {
         return builder.finish().hex
     }
 
-    /// The entries of the fourteen fixtures (research D5 of features 075, 076 and 077); each begins with
-    /// ``startEntry`` except 13, which holds the title screen first:
+    /// The entries of the sixteen fixtures (research D5 of features 075, 076 and 077, research D3 of 078); each begins
+    /// with ``startEntry`` except 13, which holds the title screen first:
     /// 1. replay: the twelve recorded steering inputs over 1,200 steps (`ArcadeManifestTests` plays them twice and
     ///    compares score, lives and the events; `ReplayTests` proves it for three seeds on the bare run);
     /// 2. frame pacing: the same entries — the same digest whatever the frame pacing, because the runner steps the
@@ -172,7 +187,13 @@ extension ArcadeCore {
     /// 13. title → start: ``titleSteps`` steps on the title screen (nothing advances), `run.start`, then
     ///     ``titleSteps`` steps — the run at step 30 (`ArcadeManifestTests` checks the held title and the start);
     /// 14. settings off: `settings.sound [0]` and `settings.haptics [0]`, then ``settingsSteps`` steps — the run and
-    ///     the generator identical to the same steps with both settings on (`ArcadeManifestTests`).
+    ///     the generator identical to the same steps with both settings on (`ArcadeManifestTests`);
+    /// 15. game over (A10-P04): steering hard left, then ``gameOverSteps`` steps — the run is over (score above 0, run
+    ///     number 1), the run a finished game enters into the high-score table once (`ArcadeManifestTests` checks the
+    ///     over screen and the entry; the crash-safe write and the interrupted save are `HighScoreStoreTests`');
+    /// 16. sensitivity: `settings.sensitivity [4]`, ``sensitivitySteps`` steps, `settings.sensitivity [0]`,
+    ///     ``sensitivitySteps`` steps — the step saved, and the run and generator identical to the same steps at the
+    ///     default step (`ArcadeManifestTests`).
     public static var fixtureEntries: [[ScenarioStep]] {
         func step(_ control: String, _ values: [Double], steps: Int = 0) -> ScenarioStep {
             ScenarioStep(steps: steps, action: ScriptedAction(control, values), result: "accepted")
@@ -205,6 +226,9 @@ extension ArcadeCore {
             [step("run.start", [], steps: titleSteps), ScenarioStep(steps: titleSteps)],
             [startEntry, step("settings.sound", [0]), step("settings.haptics", [0]),
              ScenarioStep(steps: settingsSteps)],
+            [startEntry, step("run.steer", [gameOverSteering]), ScenarioStep(steps: gameOverSteps)],
+            [startEntry, step("settings.sensitivity", [4]), step("settings.sensitivity", [0], steps: sensitivitySteps),
+             ScenarioStep(steps: sensitivitySteps)],
         ]
     }
 

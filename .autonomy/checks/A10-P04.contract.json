@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_app_contract.py",
+    "--app",
+    "neon-arcade",
+    "--render"
+  ],
+  "command": "python3 scripts/check_app_contract.py --app neon-arcade --render",
+  "elapsed_seconds": 0.1,
+  "exit_code": 0,
+  "finished": "2026-11-15T04:42:49+00:00",
+  "log": ".autonomy/logs/A10-P04.contract.log",
+  "log_sha256": "63b826f416be2cca0ca76590d43dff99e61dee17b434791d808b6ee098aba00b",
+  "name": "contract",
+  "stage": "A10-P04",
+  "started": "2026-11-15T04:42:49+00:00",
+  "timed_out": false
+}

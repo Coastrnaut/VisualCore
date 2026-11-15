@@ -11,6 +11,9 @@
 // Feature 077 (A10-P03) T-A10-305 (FR-A10-330; SC-A10-306; research D5): fourteen fixtures, each of 1–12 and 14
 // beginning with `run.start`; 12 plays a run past its first hit (the high-speed crossings are `HighSpeedFixtureTests`'),
 // 13 holds the title screen until the start, 14 plays with sound and haptics off and equals the run with them on.
+// Feature 078 (A10-P04) T-A10-405 (FR-A10-401, FR-A10-402, FR-A10-412): sixteen fixtures; 15 plays a run to game over
+// (score above 0, run number 1, entered into a high-score table once), 16 changes the sensitivity twice (the step saved,
+// the run identical to the default step's).
 import Foundation
 import Testing
 @testable import NeonArcadeExperience
@@ -37,13 +40,13 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
 }
 
 @Suite struct ArcadeManifestTests {
-    @Test func theManifestIsValidWithTheNineStandardScenariosAndFourteenFixtures() {
+    @Test func theManifestIsValidWithTheNineStandardScenariosAndSixteenFixtures() {
         let manifest = ArcadeCore.manifest(for: id)
         let problems = ScenarioManifestValidator.problems(manifest, controls: ArcadeCore.controls,
-                                                          content: ContentRequirement(fixtures: 14))
+                                                          content: ContentRequirement(fixtures: 16))
         #expect(problems.isEmpty, "\(problems)")
         #expect(Set(manifest.scenarios.map(\.name))
-                == Set(ScenarioManifest.standardNames).union((1...14).map { "fixture-\($0)" }))
+                == Set(ScenarioManifest.standardNames).union((1...16).map { "fixture-\($0)" }))
         // Every scenario with actions starts the game first, except fixture 13 and rejection (which stays on the title
         // screen to show the wrong-screen refusal).
         for spec in manifest.scenarios where spec.entries.contains(where: { $0.action != nil }) {
@@ -76,7 +79,7 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
     @Test func theFixturesEndInTheStatesTheyName() throws {
         let seed = ArcadeCore.manifestSeed
         let fixtures = ArcadeCore.fixtureEntries
-        #expect(fixtures.count == 14)
+        #expect(fixtures.count == 16)
 
         // 1. Replay: the start and twelve recorded inputs over 1,200 steps; two plays give the same score, lives and
         // events.
@@ -291,6 +294,39 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
         #expect(restored == off)
         restored.update(step: ArcadeCore.settingsSteps)
         #expect(!restored.sound && !restored.haptics)
+    }
+
+    /// T-A10-405 (FR-A10-401, FR-A10-402, FR-A10-412): fixtures 15–16 end in the states they name.
+    @Test func thePhaseFourFixturesEndInTheStatesTheyName() throws {
+        let seed = ArcadeCore.manifestSeed
+        let fixtures = ArcadeCore.fixtureEntries
+
+        // 15. A run to game over: the over screen, a score that enters the table, run number 1; entered once.
+        #expect(fixtures[14].first == ArcadeCore.startEntry)
+        let over = ArcadeCore.played(seed: seed, entries: fixtures[14])
+        #expect(over.screen == .over && over.run.over && over.run.lives == 0)
+        #expect(over.run.score > 0 && over.runNumber == 1)
+        #expect(over.run.step < ArcadeCore.gameOverSteps, "the run ends before the fixture's last step")
+        #expect(over.outcome?.code == ArcadeCore.overOutcome)
+        var table = HighScoreTable()
+        let entry = HighScoreEntry(score: over.run.score, wave: over.run.wave, run: over.runNumber)
+        #expect(table.enter(entry) == 0)
+        #expect(table.enter(entry) == nil, "the same run is entered once")
+        #expect(table.entries == [entry])
+        // Play again: a new run with run number 2.
+        var again = over
+        #expect(again.apply(ExperienceAction(control: "run.start", values: [], step: over.run.step)) == .accepted)
+        #expect(again.runNumber == 2 && again.screen == .playing && again.run.score == 0)
+
+        // 16. Sensitivity: the last step saved; the run and generator equal the default step's.
+        let changed = ArcadeCore.played(seed: seed, entries: fixtures[15])
+        #expect(changed.sensitivity == 0 && changed.screen == .playing)
+        let plain = ArcadeCore.played(seed: seed, entries: [ArcadeCore.startEntry,
+                                                            ScenarioStep(steps: 2 * ArcadeCore.sensitivitySteps)])
+        #expect(plain.sensitivity == Sensitivity.defaultStep)
+        #expect(changed.run == plain.run && changed.generator == plain.generator)
+        let restored = try ArcadeCore.restore(payload: changed.snapshotPayload(), seed: seed)
+        #expect(restored == changed && restored.sensitivity == 0)
     }
 
     /// The JSON form with the control ids, named by `Catalog/registrations.json`. `UPDATE_SCENARIO_MANIFEST=1`
