@@ -666,6 +666,49 @@ state panel — not a complete engineering simulation, a 3D soft-body or fluid s
 - **One phase at a time:** implement only one Spec Kit phase at a time (one ledger gate, ADR-0004), in order
   A11-P00 → A11-P06.
 
+### A12 Tiny Worlds (`a12.tiny-worlds`)
+
+Ratified from the app manual's constitution prompt (2026-11-15). Like A05–A11, it never had a standalone target: it
+is built directly as an experience of the one app. Its product goal is a curated gallery of miniature procedural
+worlds explored with an orbit camera and gently customized — in version 0.1 three small world presets (island,
+asteroid garden and miniature city), an orbit camera with constrained zoom, seeded terrain and mesh generation with
+stable boundaries, prop placement and scene light adjustment, saved world compositions with thumbnails and a
+dynamic detail tier within a GPU and memory budget — not infinite terrain or open-world streaming, multiplayer world
+creation, photorealistic global illumination or full physics gameplay.
+
+- **Consumer, not fork:** an experience of the VisualCore app and a VisualCore consumer, never a fork of
+  projectm-ios. It uses only audited VisualCore public APIs over the OpenGL ES → ANGLE → Metal integration. It MUST
+  NOT create its own EGL/ANGLE initialization path, a second renderer, or link ProjectM engine code.
+- **Reuse first (Principle II):** scenes, cameras, procedural meshes, lighting, materials, gestures, the seeded
+  fixed-step clock and runner, persistence, quality tiers and accessibility planning already in VisualCore are
+  reused, not copied. New generic machinery (for example an orbit camera with constrained zoom, seeded terrain
+  generation or mesh level-of-detail budgeting) goes into VisualCore with tests, docs, the API baseline and the
+  reference regression when it is reusable; world presets, props, copy and UI stay in the experience.
+- **Visuals are code:** terrain, props, skies, water and lighting are procedural meshes, SDFs and shaders; no
+  purchased, generated or hand-made models, textures, sprites or recordings.
+- **Deterministic, GPU-free worlds:** a world document (preset, seed, placed props, light settings) generates the
+  same terrain and composition every time; generation, placement rules, camera limits and persisted files MUST be
+  testable without GPU access through `swift test`, and drawing never changes the document.
+- **Bounded:** terrain resolution, prop count, vertex and draw budgets and thumbnail size are capped; the detail
+  tier lowers mesh density under the GPU and memory budget, heat and Low Power Mode; non-finite values and documents
+  beyond the caps are refused, never allowed to grow without limit.
+- **Offline-first and private:** no networking, accounts, analytics or ads; worlds and thumbnails are stored only on
+  the device; no permission beyond what a feature actually needs, each disclosed.
+- **Truthful claims:** no claims of scientific, geographic or platform accuracy; performance, memory or battery
+  numbers only from device measurements.
+- **Resilient GPU state:** context loss rebuilds every mesh and texture from versioned CPU state; backgrounding
+  pauses animation and never fast-forwards it.
+- **Accessibility:** native SwiftUI controls with VoiceOver labels and Dynamic Type; the canvas has a spoken
+  description of the world and the camera; every gesture (orbit, zoom, place, select) has a control alternative;
+  Reduce Motion calms ambient animation and camera easing.
+- **Licenses:** every bundled preset, prop, palette and shader records its author and license; only original or
+  license-cleared content is bundled.
+- **Regression when VisualCore changes:** any VisualCore change made for this experience MUST be followed by the
+  ProjectM reference regression (at the experience's X gate per the owner ruling of 2026-11-14).
+- **Python only:** repository automation uses Python 3; there is no PowerShell dependency.
+- **One phase at a time:** implement only one Spec Kit phase at a time (one ledger gate, ADR-0004), in order
+  A12-P00 → A12-P06.
+
 ## Governance
 
 - Precedence: real Apple platform and toolchain behavior and observed test results → owner
@@ -696,5 +739,7 @@ state panel — not a complete engineering simulation, a 3D soft-body or fluid s
   manual's constitution prompt at gate A10-P00 (feature 074); no principle changes.
 - Amendment 2.7.0 (2026-11-15, MINOR): App-Scoped Rules gain the A11 Physics Playground subsection, ratified
   from its manual's constitution prompt at gate A11-P00 (feature 081); no principle changes.
+- Amendment 2.8.0 (2026-11-15, MINOR): App-Scoped Rules gain the A12 Tiny Worlds subsection, ratified from its
+  manual's constitution prompt at gate A12-P00 (feature 088); no principle changes.
 
-**Version**: 2.7.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-15
+**Version**: 2.8.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-15
