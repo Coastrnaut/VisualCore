@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_app_contract.py",
+    "--app",
+    "light-maze",
+    "--render"
+  ],
+  "command": "python3 scripts/check_app_contract.py --app light-maze --render",
+  "elapsed_seconds": 0.038,
+  "exit_code": 0,
+  "finished": "2026-11-15T18:27:45+00:00",
+  "log": ".autonomy/logs/A13-P02.contract.log",
+  "log_sha256": "5cad83f2f204539b8a1252d859e2e4c8d98b3bc0e099ce9eb4a9bfd73d33ec28",
+  "name": "contract",
+  "stage": "A13-P02",
+  "started": "2026-11-15T18:27:45+00:00",
+  "timed_out": false
+}

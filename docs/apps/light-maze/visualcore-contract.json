@@ -341,7 +341,7 @@
         "file": "Packages/ExperiencesCreative/PhysicsPlayground/Experience/PlaygroundGestures.swift",
         "symbol": "PlaygroundGestures"
       },
-      "notes": "Tested in VisualCoreScenesTests (GestureTests, GestureArbiterTests, SceneGraphTests) and VisualCoreExperienceTests (GestureAlternativesTests). Snapping a drag to grid cells and a rotation to fixed steps is Light Maze's rule (row M07, G-SNAP)."
+      "notes": "Tested in VisualCoreScenesTests (GestureTests, GestureArbiterTests, SceneGraphTests) and VisualCoreExperienceTests (GestureAlternativesTests). Snapping a drag to grid cells and a rotation to fixed steps is Light Maze's rule (row M07, G-SNAP). A13-P02: used by MazeGestures (TapRecognizer, DragRecognizer, RotateRecognizer, GestureArbiter)."
     },
     {
       "id": "M05",
@@ -433,7 +433,7 @@
       "id": "M07",
       "capability": "Drag and rotate pieces snapped to the grid: a movable tile follows the finger, lands in a free cell and turns in fixed steps, with tap-to-rotate as a single-finger alternative",
       "source": "v0.1 feature 2: drag/rotate snapped to the grid",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreScenes/GestureRecognizers.swift",
@@ -461,10 +461,10 @@
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/PhysicsPlayground/Experience/PlaygroundGestures.swift",
-        "symbol": "PlaygroundGestures"
+        "file": "Packages/ExperiencesCreative/LightMaze/Experience/MazeGestures.swift",
+        "symbol": "MazeGestures"
       },
-      "notes": "Recognizers, arbitration and the screen-to-world camera exist and are tested (GestureTests, GestureArbiterTests, Camera2DTests); snapping to cells and angle steps, occupancy and fixed-tile refusal are board rules: G-SNAP (app-local over the recognizers, A13-P02)."
+      "notes": "Recognizers, arbitration and the screen-to-world camera exist and are tested (GestureTests, GestureArbiterTests, Camera2DTests); snapping to cells and angle steps, occupancy and fixed-tile refusal are board rules: G-SNAP (app-local over the recognizers, A13-P02). A13-P02 (G-SNAP closed): MazeGestures over GestureArbiter — tap selects then turns, a drag from a turnable tile snaps at 0.35 cell to the nearest diagonal, a two-finger rotation turns once per 45°; every gesture sends only tile.select and tile.turn, which the native controls send too (MazeGestureTests)."
     },
     {
       "id": "M08",
@@ -611,7 +611,7 @@
         "file": "Packages/ExperiencesCreative/NeonArcade/Experience/ArcadeEffectsLayer.swift",
         "symbol": "ArcadeEffectsLayer"
       },
-      "notes": "Bloom and blur passes, additive blending, colour-plus-sign checking, contrast ratios and the flash limiter exist and are tested (PassPixelTests, RenderStateTests, AccessibilityPlansTests, AccessibilitySettingsSectionTests, FlashLimiterModelTests). Neon Arcade's glow layer is experience code and is not copied. The beam style (core line from exact segments, glow strength cap) is G-BEAMS (app-local, A13-P02); colour plus sign cues and contrast checks for beams, targets and tiles are G-FEEDBACK (app-local, A13-P04)."
+      "notes": "Bloom and blur passes, additive blending, colour-plus-sign checking, contrast ratios and the flash limiter exist and are tested (PassPixelTests, RenderStateTests, AccessibilityPlansTests, AccessibilitySettingsSectionTests, FlashLimiterModelTests). Neon Arcade's glow layer is experience code and is not copied. The beam style (core line from exact segments, glow strength cap) is G-BEAMS (app-local, A13-P02); colour plus sign cues and contrast checks for beams, targets and tiles are G-FEEDBACK (app-local, A13-P04). A13-P02: capped static glow (halo 0.30 cell at 0.25 opacity under a 0.08 core), lit-target rings and a selection outline beside colour; the remaining hints and success feedback stay with G-FEEDBACK."
     },
     {
       "id": "M11",
@@ -642,7 +642,7 @@
       "id": "M12",
       "capability": "Beam geometry from the CPU tracer only: the drawn beam is exactly the tracer's segment list (polyline primitives), never recomputed in a shader or the render callback",
       "source": "cross-cutting: beam geometry single source of truth; manual main risk visual beams diverging from logical paths",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreScenes/SceneGraph.swift",
@@ -664,10 +664,10 @@
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/OscilloscopeStudio/Experience/ScopePresenter.swift",
-        "symbol": "ScopePresenter"
+        "file": "Packages/ExperiencesCreative/LightMaze/Experience/MazePresenter.swift",
+        "symbol": "MazePresenter"
       },
-      "notes": "Polyline and line primitives drawn by PrimitiveRenderer exist and are tested (SceneGraphTests, PrimitiveRendererTests); Oscilloscope Studio draws its traces as polylines from CPU points this way (experience code). The segments come from G-RAYCAST2D and G-BOARD (A13-P01); drawing them with the glow is G-BEAMS (A13-P02), tested by comparing drawn vertices with the tracer's segments. A13-P01: the board, tiles and the 20 levels (LightMazeCore Board, LevelCatalog) and plain beam lines from the tracer's segments (MazePresenter) exist; the remainder stays with G-BEAMS (glow)."
+      "notes": "Polyline and line primitives drawn by PrimitiveRenderer exist and are tested (SceneGraphTests, PrimitiveRendererTests); Oscilloscope Studio draws its traces as polylines from CPU points this way (experience code). The segments come from G-RAYCAST2D and G-BOARD (A13-P01); drawing them with the glow is G-BEAMS (A13-P02), tested by comparing drawn vertices with the tracer's segments. A13-P01: the board, tiles and the 20 levels (LightMazeCore Board, LevelCatalog) and plain beam lines from the tracer's segments (MazePresenter) exist; the remainder stays with G-BEAMS (glow). A13-P02 (G-BEAMS closed): every beam core line and its halo are drawn from the tracer's exact segments (MazeGlowTests: each core equals a segment; halo half-width ≤ 0.15 cell)."
     },
     {
       "id": "M13",
@@ -1024,7 +1024,7 @@
       "justification": "PrimitiveRenderer draws polylines and EffectRenderer runs bloom and blur, but the beam's style (core line from the tracer's exact segments, glow strength and radius capped so the beam and tiles stay legible, tier-dependent glow) is Light Maze's presentation; app-local over PrimitiveRenderer and the effect graph (clarification 5, A13-P02).",
       "phase": 2,
       "test": "Experience tests: drawn beam vertices equal the tracer's segments for fixture boards; with glow off (low tier or Reduce Flashing) the core line still draws; the glow parameters stay within the declared cap; context recreation redraws the same image within a pixel tolerance",
-      "closed": null
+      "closed": "A13-P02"
     },
     {
       "id": "G-SNAP",
@@ -1036,7 +1036,7 @@
       "justification": "The recognizers and arbiter report drags and rotations but know nothing of cells, occupancy or fixed tiles. Snapping a dragged tile to the nearest free cell, turning in fixed angle steps, refusing fixed tiles and offering tap-to-rotate are board rules, app-local over the gesture recognizers (clarification 5, A13-P02).",
       "phase": 2,
       "test": "Core and experience tests: drags end in the nearest free cell or return to the start; rotations land on the allowed steps; fixed tiles refuse moves; tap-to-rotate gives the same board as the rotate gesture; every move changes the board only through the core and retraces the beam",
-      "closed": null
+      "closed": "A13-P02"
     },
     {
       "id": "G-LEVELS",
