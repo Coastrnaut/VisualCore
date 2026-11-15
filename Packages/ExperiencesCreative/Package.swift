@@ -388,7 +388,8 @@ let package = Package(
                                    .product(name: "VisualCoreAudioDSP", package: visualCore),
                                    .product(name: "VisualCoreExperienceHost", package: rendering),
                                    .product(name: "VisualCoreUI", package: rendering)],
-                    path: "NeonArcade/ExperienceTests"),
+                    path: "NeonArcade/ExperienceTests",
+                    resources: [.copy("Fixtures")]),
         .target(name: "ParticleUniverseCore",
                 dependencies: [
                                .product(name: "VisualCoreSimulation", package: visualCore),
