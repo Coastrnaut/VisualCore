@@ -10,7 +10,7 @@
 - **Decision**: generated Markdown checked by a test, like `data-sources.md`.
 
 ## D3 — Truthful labels
-- **Decision**: enumerate 72 states; a substring check on "not to scale".
+- **Decision**: enumerate 216 states; a substring check on "not to scale".
 
 ## D4 — Detail levels
 - **Decision**: two levels; both built once; the level changes drawing only.

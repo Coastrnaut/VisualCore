@@ -6,7 +6,7 @@
 
 Build G-REVIEW with no VisualCore change: in the core `EventChecks` (four Mars oppositions, three Earth perihelia,
 ±3 days, sources), the model statement and `ScientificReview.markdown()` generating
-`docs/apps/solar-system-explorer/scientific-review.md` (compared by a test), and a 72-state labelling test; in the
+`docs/apps/solar-system-explorer/scientific-review.md` (compared by a test), and a 216-state labelling test; in the
 experience two detail levels (`SolarCore.qualityTiers` 2; the presenter draws level 1 with 24 × 12 spheres, 200 stars
 and 64-sample orbits, all built once), the registration's `quality_tiers` and its fixture copy, an "About this model"
 text in the controls, and `docs/apps/solar-system-explorer/device-campaign.md` with {device} tasks. Research:

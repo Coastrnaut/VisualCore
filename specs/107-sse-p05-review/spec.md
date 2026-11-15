@@ -52,7 +52,7 @@ lists `["level-0"]` today; `CitationAudit.markdown` already generates the data-s
   They are not an ephemeris. In the enhanced view, sizes and distances are enlarged and not to scale." — a `static let`
   in the core, shown as a text element "About this model" in the controls (label and value) and in the review.
 - Q: How is truthful labelling tested? → A: A core test enumerates the 9 bodies × 2 scale modes × 3 tour states (none,
-  inner, giant at their first stop) × 2 play states × 2 stop reasons (72 states) and checks that every enhanced-mode
+  inner, giant at their first stop) × 2 play states × 2 stop reasons (216 states) and checks that every enhanced-mode
   description contains "not to scale" and no true-relative description does.
 - Q: Which detail levels? → A: Two: `level-0` (spheres 48 × 24, 400 stars, orbits of 128 samples) and `level-1`
   (spheres 24 × 12, 200 stars, 64 samples), both built once on the CPU and their renderers made and released together;
