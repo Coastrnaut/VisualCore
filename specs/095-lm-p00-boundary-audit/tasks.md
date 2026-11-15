@@ -7,7 +7,7 @@ after every task (no trailers); read every check's exit before ticking. No Swift
 
 ## Phase 1: Setup
 
-- [ ] T-A13-001 Create `docs/apps/light-maze/README.md` (what the experience is per the manual §1–§2: a tactile light-reflection puzzle with clear beams and deterministic rules; that it is an experience of the one app; its documents) and `docs/apps/light-maze/regression-baseline.md` with the phase start `57a587f9` (the specify commit; constitution `d5d232b6`) and the reference pin `d93edd1`
+- [X] T-A13-001 Create `docs/apps/light-maze/README.md` (what the experience is per the manual §1–§2: a tactile light-reflection puzzle with clear beams and deterministic rules; that it is an experience of the one app; its documents) and `docs/apps/light-maze/regression-baseline.md` with the phase start `57a587f9` (the specify commit; constitution `d5d232b6`) and the reference pin `d93edd1` — Verified 2026-11-15: 2026-11-15: docs/apps/light-maze/README.md and regression-baseline.md (phase start 57a587f9, constitution d5d232b6, pin d93edd1)
 
 ## Phase 3: User Story 1 — Evidence-backed integration matrix (P1) 🎯
 

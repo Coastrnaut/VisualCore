@@ -1,0 +1,24 @@
+# Light Maze (`a13.light-maze`)
+
+A precise, tactile light-reflection puzzle with clear beams and deterministic rules (archived manual
+`apps/13-light-maze.md` §1–§2), for puzzle fans, children curious about reflection geometry and players wanting short,
+meaningful sessions. Version 0.1: at least 20 handcrafted levels with emitter, wall, mirror, target and optional prism
+tiles; drag and rotate interactions snapped to the puzzle grid; deterministic beam propagation with reflection and a
+finite bounce cap; level select, unlock progression, undo and restart with success feedback; glow and colour cues that
+never hide the beam's path; and a built-in solvability check for level data.
+Non-goals: photorealistic optics with refraction physics, unvalidated user-generated level sharing and endless procedural level generation.
+
+Light Maze is an experience of the one VisualCore app (ADR-0009), built from Phase 01 on in
+`Packages/ExperiencesCreative/LightMaze`; it never has a standalone target. Beams, glow, tiles and backgrounds are drawn
+in code (procedural geometry and shaders, no sprites or textures as assets). The beam path and the solved state come
+from the CPU tracer only; a shader never decides whether a puzzle is solved, and drawing never changes the game state.
+Its rules are the A13 subsection of the constitution (2.9.0).
+
+| Document | Content |
+|---|---|
+| [visualcore-contract.json](visualcore-contract.json) / [.md](visualcore-contract.md) | Phase 00 inventory, capability matrix, gaps, decision (checked by `scripts/check_app_contract.py`) |
+| [regression-baseline.md](regression-baseline.md) | Phase start, reference pin, the ProjectM reference regression results |
+
+Phases: A13-P00 boundary audit (feature 095), P01 grid/ray reflection solver and fixtures, P02 rendering and tap
+interactions, P03 core levels and progress, P04 hints, accessibility and visual polish, P05 content solvability and
+release QA, P06 final verification, privacy, packaging and release; then the experience's integration gate X-A13.
