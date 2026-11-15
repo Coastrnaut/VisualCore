@@ -49,3 +49,7 @@ Package.swift, 105, 106 regeneration, 107, 108, runs, commits.
 
 MVP: contacts, solver and the world core (US2 and US1's rules), then the drawn stage, registration, fixtures and
 records; evidence last.
+
+## Phase 6: Convergence
+
+- [ ] T-A11-115 Record in `specs/082-pp-p01-model/research.md` D3 the two safeguards `WorldSimulation` adds beyond the plan — the per-tick limit of 0.1 m on the solver's positional correction of a body (so a deep overlap from a drop separates over a few ticks and never pushes a body through a 1 m wall) and the bounding-circle skip before `Contacts2D.collide` (a pre-filter with identical results, not a broad phase; G-BROADPHASE stays open) — with their source lines and the tests that cover them, per plan: research D2/D3 (unrequested)
