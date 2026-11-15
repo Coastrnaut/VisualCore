@@ -11,6 +11,10 @@
 // swimming right; Reduce Motion halves every point's sideways displacement; two moments of a swim draw different
 // outlines; decor polygons follow their rotation and scale and are drawn for the starter decor; the state digest is
 // unchanged by Reduce Motion.
+//
+// Feature 070 (A09-P03) T-A09-307 (FR-A09-311–313): food pellets are drawn and change the frame; every gesture action
+// has a native control (`GestureAlternatives.missing` is empty); the description names the pellet and decor counts and
+// follows a feed and a removal; a quick tap on the canvas, forwarded through the presenter, drops food exactly once.
 import Foundation
 import XCTest
 @testable import DigitalAquariumExperience
@@ -19,6 +23,7 @@ import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreMath
 import VisualCoreRendering
+import VisualCoreScenes
 
 @MainActor
 final class AquariumRenderTests: XCTestCase {
@@ -243,6 +248,79 @@ final class AquariumRenderTests: XCTestCase {
                        "the digest does not depend on Reduce Motion")
         full.close()
         reduced.close()
+    }
+
+    // MARK: Feeding and decor editing (feature 070, T-A09-307)
+
+    func testPelletsAreDrawnAndChangeTheFrame() async throws {
+        let session = ExperienceSession()
+        let shell = try await AquariumTest.open(session, size: CGSize(width: 640, height: 360))
+        XCTAssertTrue(shell.handle(control: "motion.pause", values: [1]).isAccepted)
+        let before = try AquariumTest.picture(session)
+        XCTAssertEqual(shell.presenter.lastFoodDrawn, 0, "a starter habitat has no food")
+        XCTAssertTrue(shell.handle(control: "food.drop", values: [0.5, 0.8]).isAccepted)
+        let after = try AquariumTest.picture(session)
+        let core = try AquariumTest.core(shell)
+        XCTAssertEqual(core.document.food.count, Feeding.pelletsPerFeed)
+        XCTAssertEqual(shell.presenter.lastFoodDrawn, core.document.food.count, "every pellet is drawn")
+        XCTAssertNotEqual(StableHash.sha256Hex(before.rgba), StableHash.sha256Hex(after.rgba), "the pellets show")
+        XCTAssertGreaterThan(AquariumTest.differingPixels(before.rgba, after.rgba), 0)
+        session.close()
+    }
+
+    func testEveryGestureActionHasANativeControl() {
+        let presenter = AquariumPresenter(experienceID: AquariumTest.id)
+        XCTAssertEqual(presenter.gestureActions, ["food.drop", "decor.place", "decor.move"])
+        XCTAssertEqual(presenter.nativeActions, Set(AquariumCore.actionIDs))
+        XCTAssertEqual(GestureAlternatives.missing(gesture: presenter.gestureActions,
+                                                   native: presenter.nativeActions), [])
+    }
+
+    func testTheDescriptionNamesPelletAndDecorCounts() async throws {
+        XCTAssertEqual(AquariumPresenter.foodWords(0), "no food")
+        XCTAssertEqual(AquariumPresenter.foodWords(1), "1 food pellet")
+        XCTAssertEqual(AquariumPresenter.foodWords(3), "3 food pellets")
+        XCTAssertEqual(AquariumPresenter.decorWords(1), "1 decoration")
+        XCTAssertEqual(AquariumPresenter.decorWords(4), "4 decorations")
+        let session = ExperienceSession()
+        let shell = try await AquariumTest.open(session)
+        XCTAssertTrue(shell.handle(control: "motion.pause", values: [1]).isAccepted)
+        let decor = try AquariumTest.core(shell).document.decor.count
+        XCTAssertGreaterThan(decor, 0, "the Reef carries starter decor")
+        let start = shell.accessibilitySummary
+        XCTAssertTrue(start.hasPrefix("Digital Aquarium: Reef, "), start)
+        XCTAssertTrue(start.contains(", \(AquariumPresenter.decorWords(decor)), no food, lighting soft"), start)
+
+        XCTAssertTrue(shell.handle(control: "food.drop", values: [0.5, 0.8]).isAccepted)
+        let fed = shell.accessibilitySummary
+        XCTAssertTrue(fed.contains(", \(Feeding.pelletsPerFeed) food pellets, "), fed)
+        XCTAssertNotEqual(fed, start)
+
+        XCTAssertTrue(shell.handle(control: "decor.remove", values: [0]).isAccepted)
+        let removed = shell.accessibilitySummary
+        XCTAssertTrue(removed.contains(", \(AquariumPresenter.decorWords(decor - 1)), "), removed)
+        XCTAssertNotEqual(removed, fed)
+        XCTAssertTrue(removed.hasSuffix("paused."), removed)
+        session.close()
+    }
+
+    func testAQuickTapOnTheCanvasDropsFoodOnce() async throws {
+        let session = ExperienceSession()
+        let shell = try await AquariumTest.open(session)
+        XCTAssertTrue(shell.handle(control: "motion.pause", values: [1]).isAccepted)
+        let decorBefore = try AquariumTest.core(shell).document.decor.count
+        let view = Vec2(Double(size.width), Double(size.height))
+        let point = Vec2(80, 30)
+        shell.presenter.pointer(PointerEvent(id: 1, phase: .began, location: point, timestamp: 10.0), viewSize: view,
+                                port: shell.port)
+        XCTAssertTrue(try AquariumTest.core(shell).document.food.isEmpty, "nothing before the finger lifts")
+        shell.presenter.pointer(PointerEvent(id: 1, phase: .ended, location: point, timestamp: 10.1), viewSize: view,
+                                port: shell.port)
+        let core = try AquariumTest.core(shell)
+        XCTAssertEqual(core.document.food.count, Feeding.pelletsPerFeed, "exactly one food.drop")
+        XCTAssertEqual(core.document.decor.count, decorBefore, "a tap places nothing")
+        XCTAssertTrue(shell.accessibilitySummary.contains("\(Feeding.pelletsPerFeed) food pellets"))
+        session.close()
     }
 
     /// The experience draws only through the `RenderContext` the host hands it: none of its sources creates a

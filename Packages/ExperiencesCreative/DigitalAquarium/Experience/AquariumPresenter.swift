@@ -17,8 +17,10 @@
 //     front of the water, gravel and plants and behind the fish: a rock is an irregular rounded 9-point outline, a shell
 //     a 12-point snail spiral opening at its lip; the drawn width is the kind's size × the piece's scale, turned by the
 //     piece's rotation about its position. Pieces of kinds missing from the catalog are skipped.
-//   - At most 24 fish, 12 plants and 12 decor pieces: 48 fish shapes, 12 plant nodes of up to 5 lines each, 12 decor
-//     polygons, the water and the gravel.
+//   - Food (feature 070): each pellet in the water is a small filled circle of radius 0.08 habitat units in a warm
+//     food colour under the lighting, in front of the decor and behind the fish.
+//   - At most 24 fish, 12 plants, 12 decor pieces and 12 pellets: 48 fish shapes, 12 plant nodes of up to 5 lines each,
+//     12 decor polygons, 12 pellet circles, the water and the gravel.
 // Reduce Motion is presentation only: the core's state and digest never depend on it. No audio.
 //
 // Feature 069 (A09-P02) T-A09-205 (FR-A09-211; clarification 5; research D5): the swim animation is drawn from the
@@ -33,9 +35,15 @@
 //     left draws its local bend with the opposite sign, so the bend always follows the turn in the tank;
 //   - Reduce Motion multiplies wave, swing and bend by ½.
 //
+// Feature 070 (A09-P03) T-A09-307 (FR-A09-311–313; clarifications 1 and 2; research D1): canvas pointer events go
+// through `AquariumGestures` (tap → `food.drop`, long press → `decor.place`, drag on a piece → `decor.move`) against the
+// last synced habitat document, and every gesture action also has a native control (`nativeActions` holds all eight
+// actions). The gestures are reset on teardown and when the habitat changes.
+//
 // Description: "Digital Aquarium: Reef, 7 fish of 2 species (Orange striped fish and Blue fish with yellow tail), 5
-// plants, lighting soft, swimming." — habitat name, fish count, species count and names (in order of first appearance),
-// plant count, lighting (dim, soft, bright) and swimming or paused.
+// plants, 3 decorations, no food, lighting soft, swimming." — habitat name, fish count, species count and names (in
+// order of first appearance), plant count, decor count ("1 decoration", "n decorations"), pellets in the water ("no
+// food", "1 food pellet", "n food pellets"), lighting (dim, soft, bright) and swimming or paused.
 import Foundation
 import SwiftUI
 import DigitalAquariumCore
@@ -59,6 +67,14 @@ final class AquariumMirror {
     var paused = false
     /// The status line: habitat, fish and plant counts.
     var status = ""
+    /// The decoration kind the next placement uses (an index into the catalog's decor kinds).
+    var decorKind = 0
+    /// The kind name of each decor piece, in document order ("Round rock").
+    var decorNames: [String] = []
+    /// The position of each decor piece as tank fractions (x left→right, y bottom→top), in document order.
+    var decorFractions: [Vec2] = []
+    /// The number of food pellets in the water.
+    var foodCount = 0
 }
 
 /// A failure the presenter injects for tests (`failNextDraw`).
@@ -116,6 +132,12 @@ final class AquariumPresenter: ExperiencePresenter {
     nonisolated static let shellInner = 0.35
     /// The line width of plants in habitat units.
     nonisolated static let plantWidth = 0.14
+    /// The most food pellets the water may hold.
+    nonisolated static let maxFood = HabitatDocument.maxFood
+    /// The radius of a drawn food pellet in habitat units.
+    nonisolated static let pelletRadius = 0.08
+    /// The warm food colour of a pellet at full light.
+    nonisolated static let foodColor = RGBA(0.86, 0.52, 0.22, 1)
 
     let experienceID: ExperienceID
     let mirror = AquariumMirror()
@@ -134,6 +156,12 @@ final class AquariumPresenter: ExperiencePresenter {
     private(set) var lastFishDrawn = 0, lastPlantsDrawn = 0
     /// The number of decor pieces drawn in the last frame.
     private(set) var lastDecorDrawn = 0
+    /// The number of food pellets drawn in the last frame.
+    private(set) var lastFoodDrawn = 0
+    /// The canvas gestures (tap feeds, long press places, drag moves a piece).
+    private var gestures = AquariumGestures()
+    /// The habitat id of the last synced document (a change resets the gestures).
+    private var lastHabitatId: String?
     /// The motion factor (1 or ½) of the plant sway and the swim animation in the last frame.
     private(set) var lastSwayFactor = 1.0
 
@@ -144,6 +172,7 @@ final class AquariumPresenter: ExperiencePresenter {
     private let gravel = SceneNode(id: "gravel", z: 1)
     private var plantNodes: [[SceneNode]] = []
     private var decorNodes: [SceneNode] = []
+    private var foodNodes: [SceneNode] = []
     private var tailNodes: [SceneNode] = []
     private var bodyNodes: [SceneNode] = []
 
@@ -166,9 +195,14 @@ final class AquariumPresenter: ExperiencePresenter {
             root.add(node)
             decorNodes.append(node)
         }
+        for pellet in 0..<Self.maxFood {
+            let node = SceneNode(id: "food\(pellet)", z: 4)
+            root.add(node)
+            foodNodes.append(node)
+        }
         for fish in 0..<Self.maxFish {
-            let tail = SceneNode(id: "t\(fish)", z: 4)
-            let body = SceneNode(id: "f\(fish)", z: 5)
+            let tail = SceneNode(id: "t\(fish)", z: 5)
+            let body = SceneNode(id: "f\(fish)", z: 6)
             root.add(tail)
             root.add(body)
             tailNodes.append(tail)
@@ -205,6 +239,7 @@ final class AquariumPresenter: ExperiencePresenter {
 
     func teardown(_ context: RenderContext) {
         isLive = false
+        gestures.reset()
         primitives?.release()
         primitives = nil
     }
@@ -426,6 +461,18 @@ final class AquariumPresenter: ExperiencePresenter {
         }
         lastDecorDrawn = decorDrawn
 
+        var foodDrawn = 0
+        let foodColor = Self.lit(Self.foodColor, level: level)
+        for (index, node) in foodNodes.enumerated() {
+            node.primitive = nil
+            guard index < document.food.count else { continue }
+            node.primitive = .circle(Self.pelletRadius * s)
+            node.position = world(document.food[index].position)
+            node.color = foodColor
+            foodDrawn += 1
+        }
+        lastFoodDrawn = foodDrawn
+
         var fishDrawn = 0
         for index in 0..<Self.maxFish {
             let body = bodyNodes[index], tail = tailNodes[index]
@@ -451,6 +498,10 @@ final class AquariumPresenter: ExperiencePresenter {
     func sync(_ core: AquariumCore) {
         lastCore = core
         let document = core.document
+        if lastHabitatId != document.habitatId {
+            if lastHabitatId != nil { gestures.reset() }
+            lastHabitatId = document.habitatId
+        }
         if !mirror.ready { mirror.ready = true }
         if mirror.habitatIndex != document.habitatIndex { mirror.habitatIndex = document.habitatIndex }
         if mirror.lightingLevel != document.lighting { mirror.lightingLevel = document.lighting }
@@ -458,6 +509,14 @@ final class AquariumPresenter: ExperiencePresenter {
         let status = "\(Self.habitatName(document)), \(Self.fishWords(document.fish.count)), "
             + "\(Self.plantWords(document.plants.count)), \(core.paused ? "paused" : "swimming")"
         if mirror.status != status { mirror.status = status }
+        if mirror.decorKind != core.decorKind { mirror.decorKind = core.decorKind }
+        let names = document.decor.map { AquariumCore.catalog.decor(id: $0.kindId)?.name ?? $0.kindId }
+        if mirror.decorNames != names { mirror.decorNames = names }
+        let fractions = document.decor.map {
+            Vec2($0.position.x / Self.tankWidth, $0.position.y / Self.tankHeight)
+        }
+        if mirror.decorFractions != fractions { mirror.decorFractions = fractions }
+        if mirror.foodCount != document.food.count { mirror.foodCount = document.food.count }
     }
 
     /// The name of `document`'s starter habitat ("Aquarium" for an unknown index).
@@ -479,6 +538,18 @@ final class AquariumPresenter: ExperiencePresenter {
     /// "1 plant" or "5 plants".
     static func plantWords(_ count: Int) -> String { count == 1 ? "1 plant" : "\(count) plants" }
 
+    /// "1 decoration" or "4 decorations".
+    static func decorWords(_ count: Int) -> String { count == 1 ? "1 decoration" : "\(count) decorations" }
+
+    /// "no food", "1 food pellet" or "3 food pellets".
+    static func foodWords(_ count: Int) -> String {
+        switch count {
+        case 0: return "no food"
+        case 1: return "1 food pellet"
+        default: return "\(count) food pellets"
+        }
+    }
+
     /// The spoken name of the lighting level `level`.
     static func lightingName(_ level: Int) -> String {
         lightingNames.indices.contains(level) ? lightingNames[level] : lightingNames[1]
@@ -492,7 +563,7 @@ final class AquariumPresenter: ExperiencePresenter {
     }
 
     /// "Digital Aquarium: Reef, 7 fish of 2 species (Orange striped fish and Blue fish with yellow tail), 5 plants,
-    /// lighting soft, swimming."
+    /// 3 decorations, no food, lighting soft, swimming."
     func describe(_ core: AquariumCore) -> String {
         sync(core)
         let document = core.document
@@ -500,6 +571,7 @@ final class AquariumPresenter: ExperiencePresenter {
         let species = names.count == 1 ? "1 species" : "\(names.count) species"
         return "Digital Aquarium: \(Self.habitatName(document)), \(Self.fishWords(document.fish.count)) of \(species) "
             + "(\(Self.joined(names))), \(Self.plantWords(document.plants.count)), "
+            + "\(Self.decorWords(document.decor.count)), \(Self.foodWords(document.food.count)), "
             + "lighting \(Self.lightingName(document.lighting)), \(core.paused ? "paused" : "swimming")."
     }
 
@@ -534,4 +606,15 @@ final class AquariumPresenter: ExperiencePresenter {
 
     /// Every action has a native control.
     var nativeActions: Set<String> { Set(AquariumCore.actionIDs) }
+
+    /// The actions the canvas gestures send: `food.drop`, `decor.place` and `decor.move`.
+    var gestureActions: Set<String> { AquariumGestures.gestureActions }
+
+    /// Turns a canvas pointer event into gesture actions against the last synced habitat document and sends each
+    /// through `port`; nothing happens before a state was seen.
+    func pointer(_ event: PointerEvent, viewSize: Vec2, port: ExperienceActionPort) {
+        guard let document = lastCore?.document else { return }
+        let actions = gestures.handle(event, document: document, catalog: AquariumCore.catalog, viewSize: viewSize)
+        for action in actions { port.send(action.control, action.values) }
+    }
 }
