@@ -28,7 +28,7 @@ X-A12 (owner, 2026-11-14). Precedent: `specs/082-pp-p01-model/tasks.md`.
 
 ## Phase 5: Polish & evidence
 
-- [ ] T-A12-109 VisualCore host tests (`--name visualcore-host -- swift test --package-path Packages/VisualCore --filter "GradientNoise2DTests|HeightFieldTests"`) and public API (`--name public-api -- python3 scripts/check_public_api.py`) (SC-A12-102)
+- [X] T-A12-109 VisualCore host tests (`--name visualcore-host -- swift test --package-path Packages/VisualCore --filter "GradientNoise2DTests|HeightFieldTests"`) and public API (`--name public-api -- python3 scripts/check_public_api.py`) (SC-A12-102) — Verified 2026-11-15: 2026-11-15: .autonomy/checks/A12-P01.visualcore-host.json exit 0 (GradientNoise2DTests and HeightFieldTests, 21 tests); .autonomy/checks/A12-P01.public-api.json exit 0 (2,922 declarations, 0 undocumented)
 - [ ] T-A12-110 Tiny Worlds tests on sim-27.2 (`--name worlds-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing TinyWorldsCoreTests TinyWorldsExperienceTests`; each test < 10 s) (SC-A12-101–106)
 - [X] T-A12-111 App build and unit (`--name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`) — Verified 2026-11-15: 2026-11-15: .autonomy/checks/A12-P01.app-unit.json exit 0 (app build-for-testing with TinyWorlds and unit tests, iOS 27.2)
 - [ ] T-A12-112 Runner iOS 27 (`--name verify-27 -- python3 scripts/verify_experiences.py --only a12.tiny-worlds --runtime 27`) (SC-A12-106)
