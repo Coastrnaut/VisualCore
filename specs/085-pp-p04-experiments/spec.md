@@ -22,6 +22,41 @@ Canonical overrides:
   of experiments.
 - **Owner rulings:** short tests; iOS 27 at phase gates; every Spec Kit step runs.
 
+## Clarifications
+
+### Session 2026-11-15
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+`ExperienceStorage` offers `write` (atomic), `read`, `exists`, `list` and `remove` per experience; Neon Arcade's
+`HighScoreStore` keeps a versioned file there, reports damaged or newer files once and leaves them in place;
+`ExperienceShell` offers `snapshot()` and `restore(_:)`; the world is schema 3 with springs (one global stiffness
+level), levels, pins, selection, grab and overlays; experience actions carry numbers only.
+
+- Q: What do the presets contain? → A: Free play (the seeded starting scene); pendulum (a pinned steel pivot circle of
+  radius 0.15 m at (5, 7) and a steel bob of radius 0.3 m on a 2.5 m spring released 30° from vertical, drag none,
+  stiffness level 3); spring chain (five rubber circles of radius 0.2 m joined by 0.8 m springs hanging from a ceiling
+  anchor at (5, 8), drag low, stiffness level 2); stacked objects (five wood boxes 0.5 m wide stacked on the floor at
+  x = 5). Each preset records author "VisualCore project" and license "MIT"; the content license document lists them.
+- Q: How does the world remember its experiment, and how does a saved experiment open? → A: The core state keeps the
+  opened experiment's starting world and its origin (preset 0–3 or slot 0–3); `reset` restores that world (running, normal
+  speed, no grab, no selection). `experiment.preset [0…3]` opens a preset through an action (replayable). A saved slot is
+  read by the experience's store, validated, and opened by restoring a snapshot built from it (outside the replay),
+  becoming the new starting world.
+- Q: How are experiments saved? → A: An `ExperimentStore` writes `experiment-<slot>.json` (document schema 1: name,
+  origin, world of the current schema without grab and selection, sorted keys) through `ExperienceStorage.write`;
+  reading refuses with the reasons `empty-slot`, `damaged` (not JSON or truncated), `newer-version` and `invalid-world`,
+  leaving the file in place; clearing removes the file. Names are 1–24 characters (cut, or "Experiment N" when empty).
+- Q: Which tutorials exist and how do steps complete? → A: "Controlling time": pause (paused), step once (exactly one
+  tick advanced while paused since the step began), half speed (time scale ½), reset (the world equals the starting
+  world and runs). "Springs and energy": open the spring chain (origin preset 2), show force arrows, let it run 3 s (360
+  ticks while running since the step began). Actions `tutorial.start [0…1]` and `tutorial.stop`; progress (tutorial,
+  step, the tick when the step began) is part of the state and checked after every action and step; the current
+  step's text is spoken and shown.
+- Q: How is the energy fixture measured? → A: Spring chain, gravity on, drag low, 1,200 ticks: total energy sampled each
+  second never rises by more than 0.5 % and ends below its start. Pendulum, drag none, 600 ticks: total energy within
+  5 % of the start. The world becomes schema 4 (origin, starting world, tutorial progress); migration 3 → 4 sets origin
+  free play, the current world as the starting world and no tutorial.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Start from a ready-made experiment (Priority: P1) 🎯
