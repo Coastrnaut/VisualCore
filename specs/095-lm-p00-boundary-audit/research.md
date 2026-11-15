@@ -37,3 +37,19 @@
   spoken descriptions, legible cues and success feedback → app-local (A13-P04); solvability checker → app-local
   (A13-P05). Alternative rejected: app-local ray math (constitution A13 reuse first: 2D ray casting with reflection is
   generic).
+
+## 2. As found by the audit (2026-11-15)
+
+- **D4 confirmed:** no 2D ray cast against segments and no reflection about a normal exist in any framework product;
+  gap G-RAYCAST2D → `VisualCoreMath` (A13-P01). `VisualCoreSimulation.Collision2D` and `CollisionCapsule` exist (circle
+  and capsule overlap, `closestPoint(on:to:)` on a segment, swept circles) and are reusable neighbours, but cast no ray.
+- **Colour-independent cues:** `StateSign` and `stateSignProblems` (`AccessibilityPlans.swift`, a colour paired with a
+  non-colour sign) and `AccessibleColors.contrastRatio` (`VisualCoreUI`) serve the legible beam and target cues (M10,
+  M17; G-BEAMS, G-FEEDBACK).
+- **Effects:** experiences drive the effect graph through `EffectScene` (`VisualCoreEffects`, with `reduceFlashing`);
+  none calls `EffectRenderer` directly; the pass limit is `PassSchemas.maxPasses` (32).
+- **Licenses:** no separate gap; row M20 is covered by G-LEVELS (A13-P03, the levels are the bundled content) and
+  rechecked with G-SOLVER at release QA (A13-P05).
+- **Inventory:** `python3 scripts/release_check.py --list` gives 118 steps (A12-P00 recorded 113).
+- The contract (`docs/apps/light-maze/visualcore-contract.json`) holds 20 rows (10 available, 8 requires adaptation,
+  2 upstream gap) and 7 gaps; decision go.
