@@ -1051,7 +1051,7 @@
       "id": "M20",
       "capability": "Data provenance and licenses: every bundled number (orbital elements, radii, periods, distances) and fact records its source, epoch, units and license; only openly licensed or public-domain data; the record checked by a test",
       "source": "cross-cutting: data provenance and licenses; constitution A14 data with provenance and licenses; spec FR-A14-006",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AcknowledgementsView.swift",
@@ -1070,13 +1070,13 @@
         "file": "Packages/ExperiencesCreative/TinyWorlds/Core/LicenseAudit.swift",
         "symbol": "LicenseAudit"
       },
-      "notes": "The license inventory exists and is tested (AcknowledgementsViewTests); it records code and asset licenses, not per-value source, epoch and units. The data record and its test are G-CATALOG (A14-P01); the tolerance and provenance review is G-REVIEW (A14-P05); both app-local. A14-P01 (G-CATALOG): one source record per stored value with source, epoch, units and license (public-domain, CC0-1.0 only), audited by CitationAudit and listed in docs/apps/solar-system-explorer/data-sources.md (CitationAuditTests); the release review stays with G-REVIEW."
+      "notes": "The license inventory exists and is tested (AcknowledgementsViewTests); it records code and asset licenses, not per-value source, epoch and units. The data record and its test are G-CATALOG (A14-P01); the tolerance and provenance review is G-REVIEW (A14-P05); both app-local. A14-P01 (G-CATALOG): one source record per stored value with source, epoch, units and license (public-domain, CC0-1.0 only), audited by CitationAudit and listed in docs/apps/solar-system-explorer/data-sources.md (CitationAuditTests); the release review stays with G-REVIEW. A14-P05 (G-REVIEW, closed): every displayed number traced to a source in the generated scientific review and data-sources documents; the model checked against four Mars oppositions and three Earth perihelia within ±3 days (EventChecksTests)."
     },
     {
       "id": "M21",
       "capability": "Truthful scale labelling: the active scale mode always shown and spoken, the visibility-enhanced mode labelled not to scale, distances and sizes shown with units, never by colour alone",
       "source": "cross-cutting: truthful scale labelling; constitution A14 truthful claims; manual regression fixture scale-mode label",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
@@ -1095,13 +1095,13 @@
         "file": "Packages/ExperiencesCreative/FractalExplorer/Core/PrecisionLadder.swift",
         "symbol": "PrecisionLadder"
       },
-      "notes": "Non-colour state signs and announcements exist and are tested (AccessibilityPlansTests). The scale legend and its label rule depend on the scale modes (G-BODIES); the wording review against the model is G-REVIEW; both app-local. A14-P03 (G-BODIES, closed): the active scale mode shown and spoken (the Scale control's value and the canvas description end with the mode's label; the enhanced mode says not to scale); the wording review stays with G-REVIEW."
+      "notes": "Non-colour state signs and announcements exist and are tested (AccessibilityPlansTests). The scale legend and its label rule depend on the scale modes (G-BODIES); the wording review against the model is G-REVIEW; both app-local. A14-P03 (G-BODIES, closed): the active scale mode shown and spoken (the Scale control's value and the canvas description end with the mode's label; the enhanced mode says not to scale); the wording review stays with G-REVIEW. A14-P05 (G-REVIEW, closed): the enhanced mode is described as not to scale in every one of 216 sampled states and the true-relative mode never (TruthfulLabelTests); the model statement names the approximation, epoch and range."
     },
     {
       "id": "M22",
       "capability": "Labelled simulated date, time zone and model scope: the simulated date shown with its time zone (UTC by default), the model named as an approximation with its epoch and validity range, and the clock rate never implying precision beyond that range",
       "source": "cross-cutting: labelled simulated date, time zone and model scope; manual algorithm decision 4; spec edge case timestamps",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreSimulation/SceneClock.swift",
@@ -1126,7 +1126,7 @@
         "file": "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalScene.swift",
         "symbol": "FractalScene"
       },
-      "notes": "Clocks with elapsed simulated time and announcements exist and are tested (SceneClockTests, FixedStepClockTests, AccessibilityPlansTests); no framework product holds a calendar date or time zone. The labelled UTC date and the range rule are G-TIME; the model-scope wording review is G-REVIEW; both app-local. A14-P04 (G-TIME, closed): the spoken date and rate are rate-limited (AnnouncementLimiter); the wording review stays with G-REVIEW."
+      "notes": "Clocks with elapsed simulated time and announcements exist and are tested (SceneClockTests, FixedStepClockTests, AccessibilityPlansTests); no framework product holds a calendar date or time zone. The labelled UTC date and the range rule are G-TIME; the model-scope wording review is G-REVIEW; both app-local. A14-P04 (G-TIME, closed): the spoken date and rate are rate-limited (AnnouncementLimiter); the wording review stays with G-REVIEW. A14-P05 (G-REVIEW, closed): the model statement is shown and spoken in the controls (About this model) and printed in the scientific review; the date and rate announcements stay rate-limited."
     },
     {
       "id": "M23",
@@ -1307,10 +1307,10 @@
       ],
       "kind": "adaptation",
       "owner": "app-local",
-      "justification": "A provenance and tolerance review of bundled data, fact wording, the scale labels and the model-scope statement is educational quality work specific to this experience; no framework product can own it (clarification 5, manual phase 05 scientific review and device QA, A14-P05).",
+      "justification": "A provenance and tolerance review of bundled data, fact wording, the scale labels and the model-scope statement is educational quality work specific to this experience; no framework product can own it (clarification 5, manual phase 05 scientific review and device QA, A14-P05). A14-P05 (closing): the generated scientific review (ScientificReview, scientific-review.md checked by ScientificReviewTests), seven checks against published events within ±3 days (EventChecks; EventChecksTests), the model statement shown and spoken (About this model), and the 216-state truthful-label check (TruthfulLabelTests); device QA planned in device-campaign.md.",
       "phase": 5,
       "test": "Core host tests and a reviewed document: every displayed fact references a bundled reviewed source; model positions stay within the stated tolerance over the whole date range; every screen state with the enhanced mode shows the not-to-scale label; the model-scope text names the approximation, epoch and range; copy claims checked by the release copy-claims step",
-      "closed": null
+      "closed": "A14-P05"
     }
   ],
   "traceability": [
