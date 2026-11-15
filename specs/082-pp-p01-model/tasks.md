@@ -8,7 +8,7 @@ X-A11 (owner, 2026-11-14). Precedent: `specs/075-na-p01-engine/tasks.md`.
 
 ## Phase 1: Setup
 
-- [ ] T-A11-101 Baseline: cite the last evidence on an unchanged `Packages` tree (`.autonomy/checks/A11-P00.{app-build,no-change}.json`, `.autonomy/migration/checks/X-A10.*.json`) instead of a rerun (owner ruling of 2026-11-14)
+- [X] T-A11-101 Baseline: cite the last evidence on an unchanged `Packages` tree (`.autonomy/checks/A11-P00.{app-build,no-change}.json`, `.autonomy/migration/checks/X-A10.*.json`) instead of a rerun (owner ruling of 2026-11-14) — Verified 2026-11-15: 2026-11-15: cited .autonomy/checks/A11-P00.{app-build,no-change}.json and .autonomy/migration/checks/X-A10.*.json on the unchanged Packages tree (no rerun)
 
 ## Phase 2: Foundational — generic contacts and solver (story 2) and the world core (stories 1–4)
 
