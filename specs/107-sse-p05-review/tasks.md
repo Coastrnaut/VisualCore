@@ -21,7 +21,7 @@ X-A14. Precedents: `specs/093-tw-p05-qa/tasks.md`, `specs/106-sse-p04-time-tours
 ## Phase 4: Story 3 — detail levels
 
 - [ ] T-A14-504 [US3] Declare `SolarCore.qualityTiers` 2 in `Experience/Adapter/SolarCore.swift`; set `quality_tiers` ["level-0", "level-1"] for `a14.solar-system-explorer` in `Catalog/registrations.json` and `Packages/VisualCore/Tests/VisualCoreExperienceTests/Fixtures/Catalog/registrations.json`; draw level 1 (spheres 24 × 12, 200 stars, orbits of 64 samples; renderers of both levels made and released together) in `Experience/{SceneMeshes,SolarPresenter}.swift`; tests in `ExperienceTests/SolarQualityTests.swift` (profile names and count; both levels draw non-blank frames; same recorded centres and state digest; level 1 uses fewer vertices; switching the level during a focus flight and a tour changes neither the state nor the flight's target) (FR-A14-510; SC-A14-504)
-- [ ] T-A14-505 [US3] Write `docs/apps/solar-system-explorer/device-campaign.md` with the {device} tasks and pass criteria of FR-A14-511 (FR-A14-511)
+- [X] T-A14-505 [US3] Write `docs/apps/solar-system-explorer/device-campaign.md` with the {device} tasks and pass criteria of FR-A14-511 (FR-A14-511) — Verified 2026-11-15: 2026-11-15: docs/apps/solar-system-explorer/device-campaign.md lists six {device} rows (frame time at level 0, the drop to level 1, peak memory, accessibility audits, VoiceOver, Dynamic Type and Reduce Motion) with thresholds, all pending until ImplementationLock-100; python3 scripts/validate_docs.py PASS
 
 ## Phase 5: Records and evidence
 
