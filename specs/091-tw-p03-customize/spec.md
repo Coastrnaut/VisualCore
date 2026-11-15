@@ -151,7 +151,8 @@ same terrain, same props at exactly the same places, same light and view.
 
 **World document and saved worlds (story 3, G-WORLDDOC)**
 
-- **FR-A12-320**: The world document MUST hold preset, seed, props (kind, position, rotation, scale), light and view,
+- **FR-A12-320**: The world document MUST hold preset, seed, props (kind, position, rotation, scale), the selection, light and
+  view,
   versioned, with older versions migrated and newer or damaged ones refused.
 - **FR-A12-321**: Four saved-world slots MUST save and reopen documents with atomic writes, never losing the previous
   file on a failed write, and report damaged files.
