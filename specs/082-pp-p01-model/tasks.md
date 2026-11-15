@@ -1,0 +1,51 @@
+# Tasks: Physics Playground — Phase 01 Physics model, units and deterministic tests
+
+**Input**: [spec.md](spec.md), [plan.md](plan.md), [research.md](research.md), [data-model.md](data-model.md),
+[contracts/api.md](contracts/api.md), [quickstart.md](quickstart.md). Gate A11-P01 (legacy). Evidence:
+`python3 Tools/python/desktop_runbook.py run-check --stage A11-P01 --timeout 600 --name <check> -- <command>`. Commit
+after every task (no trailers); read every check's exit before ticking. iOS 27 only; reference regression and iOS 26 at
+X-A11 (owner, 2026-11-14). Precedent: `specs/075-na-p01-engine/tasks.md`.
+
+## Phase 1: Setup
+
+- [ ] T-A11-101 Baseline: cite the last evidence on an unchanged `Packages` tree (`.autonomy/checks/A11-P00.{app-build,no-change}.json`, `.autonomy/migration/checks/X-A10.*.json`) instead of a rerun (owner ruling of 2026-11-14)
+
+## Phase 2: Foundational — generic contacts and solver (story 2) and the world core (stories 1–4)
+
+- [ ] T-A11-102 [P] [US2] Write `Packages/VisualCore/Tests/VisualCoreSimulationTests/{Contacts2DTests,ImpulseSolver2DTests}.swift` first, then `Packages/VisualCore/Sources/VisualCoreSimulation/{Contacts2D,ImpulseSolver2D}.swift` per contracts/api.md and research D1–D2 (`Shape2D` with `area` and `inertia(mass:)`, `Pose2D` with `toWorld`/`toLocal`, `ContactManifold2D`, `Contacts2D.collide` for circle–circle, circle–box and box–box with normal from the first shape to the second, one or two points, `tolerance` 1e-9; `RigidBodyState2D`, `Contact2D`, `ImpulseSolver2D.Settings` (iterations 10, restitutionThreshold 0.5, slop 0.005, correction 0.8) and `solve`; public with `///` docs). Contact tests: separated (nil), touching (depth 0), overlapping depth and normal direction, circle inside a box, rotated boxes (45°) face and corner contacts with two and one points, a box resting flat gives two points, non-finite pose and non-positive size give nil, swapped arguments flip the normal. Solver tests: equal circles head-on with e = 1 exchange velocities and keep momentum (relative error ≤ 1e-9), e = 0 makes them move together, a static body (inverse mass 0) never changes, friction stops sliding within the Coulomb bound, restitution is not applied below 0.5 m/s, positional correction separates an overlap beyond the slop, identical input gives identical output, no non-finite output (FR-A11-101, 102; SC-A11-102, 105)
+- [ ] T-A11-103 [P] [US1] Create the core target `Packages/ExperiencesCreative/PhysicsPlayground/Core/{MaterialCatalog,LicenseAudit,PhysicsWorld,StartingScene,WorldSimulation,WorldDiagnostics}.swift` and `Packages/ExperiencesCreative/PhysicsPlayground/CoreTests/{MaterialCatalogTests,LicenseAuditTests,PhysicsWorldTests,WorldSimulationTests,PhysicsFixtureTests,ReplayTests}.swift` per contracts/api.md, data-model.md and research D3–D4: materials rubber (1.2, 0.8, 0.9), wood (0.6, 0.4, 0.5), steel (7.8, 0.25, 0.4), ice (0.9, 0.1, 0.05) with "density 0.1…10, restitution and friction 0…1", license ∈ {"MIT"}, author "VisualCore project", refusal reasons missing-license, unsupported-license, out-of-range, invalid-number, duplicate-id with the valid rest kept; `PhysicsWorld` schema 1 ("sizes 0.15…1.0 m", "bodies (≤ 48, ids unique and ascending)", "timeScaleIndex 0…3, remainder 0…7 quarter ticks", static ⇔ mass 0); stage 10 × 8 m with four 1 m static walls (restitution 0, friction 0.5); `StartingScene.make` (three circles and three boxes 0.25…0.6 m, non-overlapping, at rest, seeded materials and angles, plus the static steel ledge); `WorldSimulation.tick` (gravity, drag factor 1/(1 + k·dt), caps 40 m/s and 40 rad/s, all pairs in id order and walls through `Contacts2D`/`ImpulseSolver2D`, semi-implicit integration), `advanceHostStep` (quarter-tick remainder), `drop` (y = 7 m, x 1…9 m, refused at 48); `WorldDiagnostics` (kinetic, potential, momentum). Tests: free fall 1 s within 1 %; two-body momentum fixture; ledge moves 0 over 1,000 ticks of impacts; 0 bodies leave the stage over 10,000 ticks from 20 seeds (measured on 3 seeds in the test, 20 bounded by arithmetic if needed to stay < 10 s); time scale ¼, ½, 2 give the same world after N ticks as 1; replay of seed + actions identical; validate names problems; non-finite refused (FR-A11-110–114; SC-A11-101–104, 106)
+
+## Phase 3: User Story 1 — drop objects into a stage (P1) 🎯
+
+- [ ] T-A11-104 [US1] Create the experience targets in `Packages/ExperiencesCreative/Package.swift` (`PhysicsPlaygroundCore`, `PhysicsPlaygroundCoreTests`, `PhysicsPlaygroundExperience`, `PhysicsPlaygroundExperienceTests`, product `PhysicsPlaygroundExperience`) and `Packages/ExperiencesCreative/PhysicsPlayground/Experience/{Adapter/PlaygroundCore.swift,PlaygroundPresenter.swift,PlaygroundControls.swift,PhysicsPlaygroundExperience.swift}`: adapter (ExperienceCore; actions world.pause [0…1], world.step, world.timeScale [0…3], world.reset, world.drop [0…1] with codes a11.invalid-choice, a11.not-paused, a11.body-cap; snapshot schema 1 = `PlaygroundState` (world + generator state); stepDuration 1/120; qualityTiers 1; digest covers the whole world and the generator), presenter drawing the letterboxed stage, walls, circles with a radius line, boxes as rotated polygons and static bodies darker through `PrimitiveRenderer` with the host's context only, native controls with VoiceOver labels and values, spoken description (body count, running or paused, time scale); tests in `Packages/ExperiencesCreative/PhysicsPlayground/ExperienceTests/{PlaygroundCoreTests,PlaygroundSessionTests,PlaygroundRenderTests,PlaygroundTestSupport}.swift` (actions and refusals, save/restore identity, damaged and newer payloads refused, suspension does not advance, drawing does not change the digest, a drawn frame is non-blank and bodies are drawn at physics size) (FR-A11-120, 121; SC-A11-101)
+
+## Phase 4: Stories 2–4 — registration, fixtures and records
+
+- [ ] T-A11-105 [US2] Register: `Catalog/registrations.json` entry for a11 (capabilities, quality_tiers ["level-0"], palette, manifest), candidate in `Apps/VisualCore/App/ExperienceRegistry.swift`, `project.yml` dependency on the product, `scripts/test_scripts.py` products list, `Packages/VisualCore/Tests/VisualCoreExperienceTests/RealCatalogTests.swift` registrations and the synthetic candidate in `Apps/VisualCore/Tests/Unit/AppModelTests.swift` moved past a11; `python3 scripts/build_catalog.py`; `xcodegen generate --spec project.yml` (FR-A11-122)
+- [ ] T-A11-106 [US2] Write `Packages/ExperiencesCreative/PhysicsPlayground/Experience/Adapter/PlaygroundManifest.swift` (nine standard scenarios + ten fixtures per research D5) and generate `Packages/ExperiencesCreative/PhysicsPlayground/scenario-manifest.json` (`UPDATE_SCENARIO_MANIFEST=1 TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`), with `Packages/ExperiencesCreative/PhysicsPlayground/ExperienceTests/PlaygroundManifestTests.swift` (FR-A11-122; SC-A11-107)
+- [ ] T-A11-107 [US2] VisualCore records: `Packages/VisualCore/README.md` (rigid-body contacts and solver section), API baseline (`python3 scripts/check_public_api.py --update`) and the contract `docs/apps/physics-playground/visualcore-contract.json` (G-RIGIDBODY, G-CONTENTLICENSES closed by "A11-P01"; G-CONTACTS split: the contact and solver part closed by "A11-P01", a new open gap G-BROADPHASE (VisualCoreSimulation, A11-P02: broad phase and resting-stack stability) for the rest; rows M06, M07, M09, M18 updated with the new evidence) (FR-A11-103)
+- [ ] T-A11-108 [US4] Generate `docs/apps/physics-playground/content-licenses.md` from `LicenseAudit.markdown(.bundled)` with a test in `Packages/ExperiencesCreative/PhysicsPlayground/CoreTests/LicenseAuditTests.swift` that the document lists every material; link it from `docs/apps/physics-playground/README.md` (FR-A11-114; SC-A11-106)
+
+## Phase 5: Polish & evidence
+
+- [ ] T-A11-109 VisualCore host tests (`--name visualcore-host -- swift test --package-path Packages/VisualCore --filter "Contacts2DTests|ImpulseSolver2DTests"`) and public API (`--name public-api -- python3 scripts/check_public_api.py`) (SC-A11-105, 107)
+- [ ] T-A11-110 Playground tests on sim-27.2 (`--name playground-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing PhysicsPlaygroundCoreTests PhysicsPlaygroundExperienceTests`; each test < 10 s) (SC-A11-101–107)
+- [ ] T-A11-111 App build and unit (`--name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`)
+- [ ] T-A11-112 Runner iOS 27 (`--name verify-27 -- python3 scripts/verify_experiences.py --only a11.physics-playground --runtime 27`)
+- [ ] T-A11-113 Experience package check, contract and script tests (`--name experience-packages -- python3 scripts/check_experience_packages.py`; `--name contract -- python3 scripts/check_app_contract.py --app physics-playground --render`; `--name script-tests -- python3 scripts/test_scripts.py`)
+- [ ] T-A11-114 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A11-P01; update README.md (status, gate count) in the record commit (rule 16)
+
+## Dependencies
+
+T-A11-101 → (102 ∥ 103) → 104 (needs 102, 103) → 105 → 106 → (107 ∥ 108) → Polish. 103 builds against
+contracts/api.md for the contact calls and compiles once 102 lands.
+
+## Parallel examples
+
+Agent A: T-A11-102. Agent B: T-A11-103. Agent C: T-A11-104 experience files and tests after A and B. Lead:
+Package.swift, 105, 106 regeneration, 107, 108, runs, commits.
+
+## Implementation strategy
+
+MVP: contacts, solver and the world core (US2 and US1's rules), then the drawn stage, registration, fixtures and
+records; evidence last.
