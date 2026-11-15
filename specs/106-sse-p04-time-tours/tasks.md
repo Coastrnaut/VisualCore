@@ -50,3 +50,9 @@ Agent A: T-A14-402. Agent B: T-A14-404. Lead: 403, 405–407. Agent C: T-A14-408
 
 MVP: the clock (404–406, story 1), then tours (story 2), then the overlay, labels and saved view (story 3). Review
 checkpoints after 403 (host tests and API), after 405 (core tests) and at 410.
+
+## Phase 7: Convergence
+
+- [ ] T-A14-414 Record in `specs/106-sse-p04-time-tours/research.md` (§As built) what the build settled beyond D1–D5: through the engine a `date.set` outside the range is refused as `action.out-of-range` (declared range) and `a14.out-of-range` only when the core is called directly; captions show stored values (Mars 686.98 days, not the spec example's 687); `labelWithTime` rounds to the second; the announcement limiter counts 10 s from the last announcement of either kind; the label canvas size comes from the overlay's reported size, falling back to pixels ÷ display scale; the suspension test suspends the shell directly so frames keep drawing; the documented-API check (missed at A14-P03) found `RecordingAnnouncementSink` undocumented per plan: research D1–D5 (partial)
+- [ ] T-A14-415 Update `docs/apps/solar-system-explorer/README.md` (state of the build through A14-P04: time controls, tours, saved view, labels on the canvas; the remaining gap G-REVIEW for A14-P05) per plan: Project Structure (partial)
+- [ ] T-A14-416 Update `docs/automatedtesting.md` (rule 17): the canvas overlay host tests, the documented-API check run every phase (it caught `RecordingAnnouncementSink` one phase late), time-dependent tests driven by injected clocks and host steps, and the "Last updated" line per CLAUDE.md rule 17 (missing)
