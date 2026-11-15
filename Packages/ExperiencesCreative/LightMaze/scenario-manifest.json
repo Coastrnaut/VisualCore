@@ -6,7 +6,8 @@
     "tile.select",
     "tile.turn",
     "level.reset",
-    "move.undo"
+    "move.undo",
+    "hint.show"
   ],
   "experience" : "a13.light-maze",
   "kind" : "creative",
@@ -863,6 +864,47 @@
         "initialDigest" : "77b24a14c8640d0c7ada6b88a639572c6ccfb85207db3bf762105ab50312b6b4"
       },
       "name" : "fixture-undo",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.select",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hint.show",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "tile.turn",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f7dce4d2f7ab2e1633c1d342c03031d00ae6ec8ecab9adfdcd94513ddb9f6db0",
+        "initialDigest" : "77b24a14c8640d0c7ada6b88a639572c6ccfb85207db3bf762105ab50312b6b4",
+        "outcome" : "level-solved"
+      },
+      "name" : "fixture-hint",
       "seed" : "1"
     },
     {

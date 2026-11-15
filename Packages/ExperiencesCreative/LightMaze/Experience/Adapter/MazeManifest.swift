@@ -18,6 +18,8 @@
 // regenerated; a sixth fixture `fixture-undo` solves level 1 (select its mirror, turn it) and takes the turn back with
 // `move.undo`, ending unsolved with no moves (digest pinned by ``undoFixtureDigest``); the rejection scenario also
 // refuses `move.undo` with nothing to undo (`a13.no-moves`).
+// Feature 099 (A13-P04) T-A13-408 (FR-A13-402): a seventh fixture `fixture-hint` chooses level 1, asks for a hint
+// (`hint.show` selects its mirror) and turns it, ending solved with one move (digest pinned by ``hintFixtureDigest``).
 #if DEBUG || VISUALCORE_AUTOMATION
 import LightMazeCore
 import VisualCoreExperience
@@ -50,6 +52,22 @@ extension MazeCore {
          ScenarioStep(steps: 1, action: ScriptedAction("tile.select", [0]), result: "accepted"),
          ScenarioStep(steps: 1, action: ScriptedAction("tile.turn"), result: "accepted"),
          ScenarioStep(steps: 1, action: ScriptedAction("move.undo"), result: "accepted")]
+    }
+
+    /// The name of the hint fixture (feature 099).
+    public static let hintFixtureName = "fixture-hint"
+
+    /// The committed digest of the state after ``hintFixtureEntries`` from the first state (level 1 solved through the
+    /// hint, one move). It equals `fixture-lm-01`'s digest: the hint selects the same mirror the recorded solution
+    /// turns, so both end in the same state.
+    public static let hintFixtureDigest = "f7dce4d2f7ab2e1633c1d342c03031d00ae6ec8ecab9adfdcd94513ddb9f6db0"
+
+    /// The entries of `fixture-hint`: level 1 chosen, a hint asked for (its mirror selected), the hinted tile turned
+    /// (solved).
+    public static var hintFixtureEntries: [ScenarioStep] {
+        [ScenarioStep(steps: 1, action: ScriptedAction("level.select", [0]), result: "accepted"),
+         ScenarioStep(steps: 1, action: ScriptedAction("hint.show"), result: "accepted"),
+         ScenarioStep(steps: 1, action: ScriptedAction("tile.turn"), result: "accepted")]
     }
 
     /// The name of the fixture of level index `level`: `fixture-<level id>` (`fixture-lm-01`).
@@ -180,6 +198,9 @@ extension MazeCore {
         }
         specs.append(ScenarioSpec(name: undoFixtureName, seed: seed, entries: undoFixtureEntries,
                                   expect: ScenarioExpectations(initialDigest: initial, finalDigest: undoFixtureDigest)))
+        specs.append(ScenarioSpec(name: hintFixtureName, seed: seed, entries: hintFixtureEntries,
+                                  expect: ScenarioExpectations(initialDigest: initial, finalDigest: hintFixtureDigest,
+                                                               outcome: solvedOutcome)))
         for refusal in refusalScenarios {
             specs.append(ScenarioSpec(name: refusal.name, seed: seed, entries: [refusal.entry],
                                       expect: ScenarioExpectations(initialDigest: initial, finalDigest: initial)))

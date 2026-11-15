@@ -32,8 +32,9 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
 @Suite struct MazeManifestTests {
     /// The names of the five solved fixtures.
     static let fixtureNames = ["fixture-lm-01", "fixture-lm-05", "fixture-lm-10", "fixture-lm-16", "fixture-lm-20"]
-    /// The names of all six fixtures: the five solved ones, then the undo fixture (feature 098).
-    static let allFixtureNames = fixtureNames + ["fixture-undo"]
+    /// The names of all seven fixtures: the five solved ones, the undo fixture (feature 098) and the hint fixture
+    /// (feature 099).
+    static let allFixtureNames = fixtureNames + ["fixture-undo", "fixture-hint"]
     /// The names of the three refusal scenarios.
     static let refusalNames = ["refusal-level-out-of-range", "refusal-level-before-first",
                                "refusal-turn-without-selection"]
@@ -41,12 +42,12 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
     @Test func theManifestIsValidWithTheStandardScenariosSixFixturesAndThreeRefusals() {
         let manifest = MazeCore.manifest(for: id)
         let problems = ScenarioManifestValidator.problems(manifest, controls: MazeCore.controls,
-                                                          content: ContentRequirement(fixtures: 6))
+                                                          content: ContentRequirement(fixtures: 7))
         #expect(problems.isEmpty, "\(problems)")
         #expect(manifest.scenarios.map(\.name)
                 == ScenarioManifest.standardNames + Self.allFixtureNames + Self.refusalNames)
         let fixtures = manifest.scenarios.filter { $0.name.hasPrefix("fixture-") }
-        #expect(fixtures.count == 6)
+        #expect(fixtures.count == 7)
         #expect(fixtures.count >= 5, "the content-count audit needs at least five fixtures")
         #expect(MazeCore.solvedFixtures.map { MazeCore.fixtureName(level: $0.level) } == Self.fixtureNames)
         #expect(manifest.kind == .creative)
@@ -100,6 +101,24 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
             let controls = Set(spec.entries.compactMap { $0.action?.control })
             #expect(controls.isSubset(of: ["level.select", "tile.select", "tile.turn"]), "\(name): solved by actions")
         }
+    }
+
+    /// Feature 099: `fixture-hint` asks for a hint on level 1 and turns the hinted tile, ending solved with one move at
+    /// the committed digest.
+    @Test func theHintFixtureSolvesLevelOneThroughTheHint() async throws {
+        let manifest = MazeCore.manifest(for: id)
+        let spec = try #require(manifest.scenarios.first { $0.name == MazeCore.hintFixtureName })
+        #expect(spec.name == "fixture-hint")
+        #expect(spec.expect.finalDigest == MazeCore.hintFixtureDigest)
+        #expect(spec.expect.outcome == MazeCore.solvedOutcome)
+        let controls: [String] = spec.entries.compactMap { $0.action?.control }
+        #expect(controls == ["level.select", "hint.show", "tile.turn"])
+        let played = try await play(spec)
+        #expect(played.final == MazeCore.hintFixtureDigest, "fixture-hint: \(played.final)")
+        let core = try #require(played.core)
+        #expect(core.state.levelIndex == 0)
+        #expect(core.isSolved)
+        #expect(core.state.moves.count == 1)
     }
 
     /// Feature 098: `fixture-undo` solves level 1 and takes the turn back, ending unsolved with no moves at the
