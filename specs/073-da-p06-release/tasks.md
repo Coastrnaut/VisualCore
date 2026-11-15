@@ -12,7 +12,7 @@ stay open, as for A07-P06 and A08-P06.
 ## Phase 2: User Story 1 — nothing leaves the device (P1) 🎯
 
 - [ ] T-A09-602 [P] [US1] Write `docs/apps/digital-aquarium/privacy-and-credits.md` (stored: `aquarium-<uuid>.json` saved configurations in the experience's folder and the app's session state; nothing sent; no permission; credits from `content-licenses.md`) (FR-A09-601, 604)
-- [ ] T-A09-603 [US1] Source scan (`python3 Tools/python/desktop_runbook.py run-check --stage A09-P06 --timeout 600 --name da-no-network -- /bin/sh -c "! grep -rnE 'URLSession|import Network|CLLocation|AVCapture|AVAudio|CMMotion|CNContact|ASIdentifierManager|AppTrackingTransparency|UIScreen.main.brightness|isIdleTimerDisabled' Packages/ExperiencesCreative/DigitalAquarium"`) (FR-A09-602; SC-A09-601)
+- [X] T-A09-603 [US1] Source scan (`python3 Tools/python/desktop_runbook.py run-check --stage A09-P06 --timeout 600 --name da-no-network -- /bin/sh -c "! grep -rnE 'URLSession|import Network|CLLocation|AVCapture|AVAudio|CMMotion|CNContact|ASIdentifierManager|AppTrackingTransparency|UIScreen.main.brightness|isIdleTimerDisabled' Packages/ExperiencesCreative/DigitalAquarium"`) (FR-A09-602; SC-A09-601) — Verified 2026-11-14: 2026-11-14: .autonomy/checks/A09-P06.da-no-network.json exit 0 (no network, tracking, sensor, brightness or idle-timer use in Packages/ExperiencesCreative/DigitalAquarium)
 
 ## Phase 3: User Story 2 — damaged data never breaks the aquarium (P1)
 

@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "/bin/sh",
+    "-c",
+    "! grep -rnE 'URLSession|import Network|CLLocation|AVCapture|AVAudio|CMMotion|CNContact|ASIdentifierManager|AppTrackingTransparency|UIScreen.main.brightness|isIdleTimerDisabled' Packages/ExperiencesCreative/DigitalAquarium"
+  ],
+  "command": "/bin/sh -c '! grep -rnE '\"'\"'URLSession|import Network|CLLocation|AVCapture|AVAudio|CMMotion|CNContact|ASIdentifierManager|AppTrackingTransparency|UIScreen.main.brightness|isIdleTimerDisabled'\"'\"' Packages/ExperiencesCreative/DigitalAquarium'",
+  "elapsed_seconds": 0.035,
+  "exit_code": 0,
+  "finished": "2026-11-15T01:49:57+00:00",
+  "log": ".autonomy/logs/A09-P06.da-no-network.log",
+  "log_sha256": "7341c41d42648ec74464e136370e1f99b58b4517bbd5fe9ef06a63bd5f763f89",
+  "name": "da-no-network",
+  "stage": "A09-P06",
+  "started": "2026-11-15T01:49:57+00:00",
+  "timed_out": false
+}
