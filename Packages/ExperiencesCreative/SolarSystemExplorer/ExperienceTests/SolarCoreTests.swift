@@ -32,12 +32,13 @@ final class SolarCoreTests: XCTestCase {
         XCTAssertEqual(SolarCore.experienceID, "a14.solar-system-explorer")
         let ids: [String] = SolarCore.controls.map(\.id)
         XCTAssertEqual(ids, ["body.select", "body.next", "body.previous", "date.step", "camera.orbit", "camera.tilt",
-                             "camera.zoom", "view.reset"])
+                             "camera.zoom", "view.reset", "scale.mode"])
         XCTAssertEqual(ids, SolarCore.actionIDs)
         XCTAssertEqual(SolarCore.bodyCount, 9)
-        let ranges: [[ClosedRange<Double>]] = [[0...8], [], [], [-365...365], [-1...1], [-1...1], [-1...1], []]
+        let ranges: [[ClosedRange<Double>]] = [[0...8], [], [], [-365...365], [-1...1], [-1...1], [-1...1], [],
+                                               [0...1]]
         XCTAssertEqual(SolarCore.controls.map(\.ranges), ranges)
-        XCTAssertEqual(SolarCore.migrations.currentVersion, 2)
+        XCTAssertEqual(SolarCore.migrations.currentVersion, 3)
         XCTAssertEqual(SolarRule.invalidStep, "a14.invalid-step")
         XCTAssertEqual(SolarRule.outOfRange, "a14.out-of-range")
         XCTAssertEqual(SolarCore.qualityTiers, 1)
@@ -52,6 +53,7 @@ final class SolarCoreTests: XCTestCase {
             ScriptedAction("body.previous"), ScriptedAction("body.select", [8]), ScriptedAction("body.select", [0]),
             ScriptedAction("date.step", [30]), ScriptedAction("camera.orbit", [1]), ScriptedAction("camera.tilt", [-1]),
             ScriptedAction("camera.zoom", [1]), ScriptedAction("view.reset"), ScriptedAction("date.step", [-30]),
+            ScriptedAction("scale.mode", [1]), ScriptedAction("scale.mode", [0]),
         ]
         let rejected: [ScriptedAction] = [
             ScriptedAction("body.select", [0.5]), ScriptedAction("body.select", [9]),
@@ -59,7 +61,7 @@ final class SolarCoreTests: XCTestCase {
             ScriptedAction("body.next", [1]), ScriptedAction("body.previous", [0]),
             ScriptedAction("body.select", [.infinity]), ScriptedAction("bogus"),
             ScriptedAction("date.step", [7]), ScriptedAction("date.step", [400]), ScriptedAction("camera.zoom", [0]),
-            ScriptedAction("view.reset", [1]),
+            ScriptedAction("view.reset", [1]), ScriptedAction("scale.mode", [0.5]), ScriptedAction("scale.mode", [2]),
         ]
         let plan = ConformancePlan(seeds: [1, 2, 0xFFFF_FFFF_FFFF_FFFF], stepsPerSegment: 5, actions: actions,
                                    rejected: rejected)
@@ -176,7 +178,7 @@ final class SolarCoreTests: XCTestCase {
             }
         }
         let snapshot = try engine.snapshot()
-        XCTAssertEqual(snapshot.schemaVersion, 2)
+        XCTAssertEqual(snapshot.schemaVersion, 3)
         XCTAssertEqual(Data(snapshot.payload.utf8), try XCTUnwrap(engine.core).state.encoded())
         let saved = try XCTUnwrap(engine.core)
         var other = try await makeEngine(seed: 3)
@@ -208,14 +210,16 @@ final class SolarCoreTests: XCTestCase {
             ("zoom 13", { $0["zoomSteps"] = 13 }),
             ("day 20000", { $0["dayOffset"] = 20_000.0 }),
             ("no date", { $0["dayOffset"] = nil }),
+            ("scale 2", { $0["scaleMode"] = 2 }),
+            ("no scale", { $0["scaleMode"] = nil }),
         ]
         for (name, change) in damaged {
             XCTAssertThrowsError(try engine.restore(solarEnvelope(solarPayload(saved.payload, change), like: saved)),
                                  name)
         }
-        // Newer: an envelope of schema 3, and a payload of schema 3 inside a schema-2 envelope.
-        XCTAssertThrowsError(try engine.restore(solarEnvelope(Data(saved.payload.utf8), like: saved, schema: 3)))
-        let newerPayload = try solarPayload(saved.payload) { $0["schema"] = 3 }
+        // Newer: an envelope of schema 4, and a payload of schema 4 inside a schema-3 envelope.
+        XCTAssertThrowsError(try engine.restore(solarEnvelope(Data(saved.payload.utf8), like: saved, schema: 4)))
+        let newerPayload = try solarPayload(saved.payload) { $0["schema"] = 4 }
         XCTAssertThrowsError(try engine.restore(solarEnvelope(newerPayload, like: saved)))
         XCTAssertEqual(try engine.digest(), before, "every refusal leaves the state as it was")
 
@@ -308,6 +312,32 @@ final class SolarCoreTests: XCTestCase {
         var end = try solarCore(try XCTUnwrap(SolarState(selection: 3, dayOffset: 18_627.5, yawSteps: 0,
                                                          pitchDegrees: 35, zoomSteps: 0)))
         XCTAssertEqual(end.apply(action("date.step", [1])), outOfRange)
+    }
+
+    /// The scale-mode action (A14-P03 T-A14-306): accepted for 0 and 1, refused otherwise; the description follows.
+    func testTheScaleModeAction() async throws {
+        var engine = try await makeEngine()
+        let invalid = ActionResult.rejected(.rule(code: SolarRule.invalidChoice))
+        XCTAssertEqual(engine.handle(control: "scale.mode", values: [1]), .accepted)
+        XCTAssertEqual(try XCTUnwrap(engine.core).state.scaleMode, .trueRelative)
+        XCTAssertTrue(try XCTUnwrap(engine.core).canvasDescription
+            .hasSuffix("Distances and sizes to one scale; small bodies marked."))
+        XCTAssertEqual(engine.handle(control: "scale.mode", values: [0.5]), invalid)
+        XCTAssertEqual(engine.handle(control: "scale.mode", values: [2]), .rejected(.outOfRange(index: 0)))
+        XCTAssertEqual(engine.handle(control: "view.reset"), .accepted)
+        XCTAssertEqual(try XCTUnwrap(engine.core).state.scaleMode, .trueRelative, "reset keeps the scale")
+        XCTAssertEqual(engine.handle(control: "scale.mode", values: [0]), .accepted)
+        XCTAssertTrue(try XCTUnwrap(engine.core).canvasDescription.hasSuffix("Distances and sizes not to scale."))
+    }
+
+    /// A schema-2 envelope (A14-P02) opens with the enhanced scale mode (T-A14-306).
+    func testASchema2EnvelopeMigrates() async throws {
+        var engine = try await makeEngine()
+        let saved = try engine.snapshot()
+        let old = Data(#"{"dayOffset":30,"pitchDegrees":45,"schema":2,"selection":4,"yawSteps":1,"zoomSteps":2}"#.utf8)
+        try engine.restore(solarEnvelope(old, like: saved, schema: 2))
+        XCTAssertEqual(try XCTUnwrap(engine.core).state,
+                       SolarState(selection: 4, dayOffset: 30, yawSteps: 1, pitchDegrees: 45, zoomSteps: 2))
     }
 
     /// A schema-1 envelope (A14-P01) opens at its selection with J2000.0 and the overview camera (T-A14-208).

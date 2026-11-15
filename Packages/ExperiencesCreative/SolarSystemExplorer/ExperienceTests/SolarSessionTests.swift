@@ -41,7 +41,7 @@ final class SolarSessionTests: XCTestCase {
         XCTAssertEqual(presenter.mirror.bodyName, "Sun")
         XCTAssertEqual(presenter.mirror.status, "Sun selected, body 1 of 9")
         XCTAssertEqual(presenter.mirror.facts, try XCTUnwrap(BodyCatalog.bundled.factCard(for: 0)).facts.map(\.text))
-        XCTAssertEqual(presenter.nativeActions.count, 8)
+        XCTAssertEqual(presenter.nativeActions.count, 9)
         XCTAssertEqual(presenter.nativeActions, Set(SolarCore.actionIDs), "every action has a native control")
         XCTAssertEqual(presenter.gestureActions, [])
         XCTAssertEqual(GestureAlternatives.missing(gesture: presenter.gestureActions, native: presenter.nativeActions),
@@ -122,8 +122,8 @@ final class SolarSessionTests: XCTestCase {
         XCTAssertTrue(shell.handle(control: "body.select", values: [4]).isAccepted)
         let saved = try shell.snapshot()
         first.close()
-        let newerEnvelope = try solarEnvelope(Data(saved.payload.utf8), like: saved, schema: 3)
-        let newerPayload = try solarEnvelope(solarPayload(saved.payload) { $0["schema"] = 3 }, like: saved)
+        let newerEnvelope = try solarEnvelope(Data(saved.payload.utf8), like: saved, schema: 4)
+        let newerPayload = try solarEnvelope(solarPayload(saved.payload) { $0["schema"] = 4 }, like: saved)
 
         let cases: [(String, ExperienceSnapshot)] = [("envelope", newerEnvelope), ("payload", newerPayload)]
         for (name, newer) in cases {
