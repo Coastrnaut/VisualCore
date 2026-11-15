@@ -73,6 +73,20 @@
 // outside the replay: `openingSnapshot(of:experience:stepIndex:)` builds the snapshot the presenter hands to
 // `ExperienceShell.restore`. The digest text keeps its `a12.worlds.v1|` prefix; the state's JSON (now with `light`,
 // `props` and `selection`) is digested whole, so every prop transform and the light are covered.
+//
+// Feature 092 (A12-P04) T-A12-403 (FR-A12-402, FR-A12-404, FR-A12-407; clarifications Q1, Q3 and Q5; contracts/
+// actions.md). One action is added:
+//   world.pack [index 0…2]                 replaces the world with pack i's composition (`WorldPack.pack(index:)` and
+//                                          `WorldPack.apply(to:field:)`: preset i, the pack's seed, a fresh generator,
+//                                          its props in order, no selection, its light and its default view); also
+//                                          "reset to pack" (the controls send it with the current preset's index), so
+//                                          opening a pack after any edits gives the same state and digest. A value that
+//                                          is not a whole index is `a12.invalid-choice`; a pack whose prop breaks a
+//                                          placement rule is refused with that rule's code (`WorldEditRefusal`) and the
+//                                          world stays.
+// The camera policy now uses the preset's limits (`CameraPolicy.limits(for:)`, the pack's pitch and distance ranges)
+// and sees the props: every clamp (after every accepted action, the prop actions included, and whenever a core is
+// built from a state) is `CameraPolicy.clamp(_:state:field:)` over the level-0 terrain from the memo.
 import Foundation
 import Synchronization
 import TinyWorldsCore
@@ -103,13 +117,13 @@ public struct WorldsCore: ExperienceCore, Equatable {
     /// The action ids in declaration order.
     public static let actionIDs = ["world.preset", "world.seed", "view.orbit", "view.zoom", "view.reset",
                                    "prop.place", "prop.select", "prop.move", "prop.rotate", "prop.delete",
-                                   "light.azimuth", "light.elevation", "light.ambient"]
+                                   "light.azimuth", "light.elevation", "light.ambient", "world.pack"]
 
     /// The number of values each action carries.
     static let valueCounts: [String: Int] = [
         "world.preset": 1, "world.seed": 0, "view.orbit": 2, "view.zoom": 1, "view.reset": 0,
         "prop.place": 3, "prop.select": 1, "prop.move": 2, "prop.rotate": 1, "prop.delete": 0,
-        "light.azimuth": 1, "light.elevation": 1, "light.ambient": 1,
+        "light.azimuth": 1, "light.elevation": 1, "light.ambient": 1, "world.pack": 1,
     ]
 
     /// The declared range of a prop's x and z in `prop.place`: the world box, −6…6 m.
@@ -172,11 +186,11 @@ public struct WorldsCore: ExperienceCore, Equatable {
         return field
     }
 
-    /// `view` passed through the camera policy over `state`'s level-0 terrain (`CameraPolicy.clamp(_:field:)`);
-    /// when the terrain cannot be built, `CameraPolicy.clamp(_:preset:seed:)` checks it against the highest terrain.
+    /// `view` passed through the camera policy for `state` (`CameraPolicy.clamp(_:state:field:)`: the preset's
+    /// limits, the level-0 terrain from the memo and the props); when the terrain cannot be built, the policy checks
+    /// it against the highest terrain.
     static func policyView(_ view: WorldView, of state: WorldState) -> WorldView {
-        if let field = heightField(of: state) { return CameraPolicy.clamp(view, field: field) }
-        return CameraPolicy.clamp(view, preset: state.preset, seed: state.seed)
+        CameraPolicy.clamp(view, state: state, field: heightField(of: state))
     }
 
     /// Applies the camera policy to the current view (see the file header).
@@ -245,7 +259,10 @@ public struct WorldsCore: ExperienceCore, Equatable {
         return upgraded
     }
 
-    /// The thirteen controls with their declared ranges.
+    /// The declared range of `world.pack`: the pack indices 0…2.
+    public static var packRange: ClosedRange<Double> { 0...Double(WorldPack.all.count - 1) }
+
+    /// The fourteen controls with their declared ranges.
     public static var controls: [ExperienceControl] {
         [ExperienceControl(id: "world.preset", ranges: [0...Double(WorldState.presetRange.upperBound)]),
          ExperienceControl(id: "world.seed"),
@@ -260,7 +277,8 @@ public struct WorldsCore: ExperienceCore, Equatable {
          ExperienceControl(id: "prop.delete"),
          ExperienceControl(id: "light.azimuth", ranges: [azimuthRange]),
          ExperienceControl(id: "light.elevation", ranges: [WorldLight.elevationRange]),
-         ExperienceControl(id: "light.ambient", ranges: [WorldLight.ambientRange])]
+         ExperienceControl(id: "light.ambient", ranges: [WorldLight.ambientRange]),
+         ExperienceControl(id: "world.pack", ranges: [packRange])]
     }
 
     /// The first state with `seed` as the preparation seed.
@@ -300,6 +318,8 @@ public struct WorldsCore: ExperienceCore, Equatable {
             state.view = view
         case "view.reset":
             state.view.reset()
+        case "world.pack":
+            return openPack(v[0])
         default:
             return applyEdit(action.control, v)
         }
@@ -307,8 +327,23 @@ public struct WorldsCore: ExperienceCore, Equatable {
         return .accepted
     }
 
+    /// Replaces the world with the pack named by `value` (see the file header); a refusal changes nothing.
+    private mutating func openPack(_ value: Double) -> ActionResult {
+        guard let index = Self.choice(value, count: WorldPack.all.count), let pack = WorldPack.pack(index: index) else {
+            return Self.refused(.invalidChoice)
+        }
+        var next = state
+        let probe = WorldState(presetIndex: pack.presetIndex, seed: pack.seed, view: pack.defaultView,
+                               random: state.random)
+        if let refusal = pack.apply(to: &next, field: Self.heightField(of: probe)) { return Self.refused(refusal) }
+        replace(with: next)
+        applyCameraPolicy()
+        return .accepted
+    }
+
     /// Carries out a prop or light action (see the file header) on a copy of the state; a refusal changes nothing.
-    /// The view is unchanged by these actions, so the camera policy needs no new pass.
+    /// The camera policy then passes over the new props (a prop never rises near the eye at the policy's heights, so
+    /// the view almost never changes).
     private mutating func applyEdit(_ control: String, _ v: [Double]) -> ActionResult {
         var next = state
         let field = Self.heightField(of: state)
@@ -340,6 +375,7 @@ public struct WorldsCore: ExperienceCore, Equatable {
         }
         if let refusal { return Self.refused(refusal) }
         state = next
+        applyCameraPolicy()
         return .accepted
     }
 

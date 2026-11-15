@@ -68,6 +68,12 @@
 //     validates the slot's file and restores a snapshot of `WorldsCore.opening(state:from:)` through the shell
 //     (`ExperienceShell.restore`); a refused file is reported and the world stays as it was. Clearing removes both
 //     files.
+//
+// Feature 092 (A12-P04) T-A12-403 (FR-A12-402, FR-A12-404, FR-A12-407; clarifications Q1 and Q3): opening a pack
+// (`world.pack`, sent by the controls' Open pack and Reset to pack through ``send(_:_:through:)``) is answered in words,
+// "Opened the island pack." (shown and spoken while VoiceOver runs); the camera eases to the pack's view as to any new
+// view, and moves directly under Reduce Motion. While easing, the drawn view passes through the camera policy for the
+// state (`CameraPolicy.clamp(_:state:field:)`: the preset's limits and the props as well as the terrain).
 import Foundation
 import SwiftUI
 import TinyWorldsCore
@@ -101,6 +107,8 @@ final class WorldsMirror {
     var light = WorldLight.default
     /// The prop kind the Place button places (presentation state, never in the world).
     var placeKind = PropKind.tree.rawValue
+    /// The pack the Open pack button opens, 0…2 (presentation state, never in the world; feature 092).
+    var packChoice = 0
     /// The words of the last editing action, tap or slot action.
     var message = ""
     /// The stored name of each slot, empty for an empty or refused slot.
@@ -432,11 +440,11 @@ final class WorldsPresenter: ExperiencePresenter {
     }
 
     /// The view to draw for `core` after `delta` seconds: eased towards the state's view (direct under Reduce
-    /// Motion); while easing it also keeps the camera policy's clearance over the level-0 terrain.
+    /// Motion); while easing it also keeps the camera policy for the state (preset limits, terrain and props).
     private func drawnView(_ core: WorldsCore, delta: Double) -> WorldView {
         let view = easing.advance(to: core.view, by: delta, reduceMotion: reducesMotion)
         guard view != core.view, let field = groundField(core) else { return view }
-        return CameraPolicy.clamp(view, field: field)
+        return CameraPolicy.clamp(view, state: core.state, field: field)
     }
 
     /// Advances the announcement clock by `delta`, offers a change of the state's view and speaks what is due.
@@ -761,6 +769,9 @@ final class WorldsPresenter: ExperiencePresenter {
         return "Not done: that value is out of range."
     }
 
+    /// The words that answer opening `pack`: "Opened the island pack.", "Opened the asteroid garden pack.".
+    nonisolated static func packWords(_ pack: WorldPack) -> String { "Opened the \(pack.name.lowercased()) pack." }
+
     /// The light in words: "Light from 30 degrees, 50 degrees up, ambient 0.35."
     nonisolated static func lightWords(_ light: WorldLight) -> String {
         "Light from \(Int(light.azimuth.rounded())) degrees, \(Int(light.elevation.rounded())) degrees up, ambient "
@@ -778,6 +789,9 @@ final class WorldsPresenter: ExperiencePresenter {
         case "world.preset", "world.seed":
             guard let before, !before.props.isEmpty, after?.props.isEmpty ?? true else { return nil }
             return "The props were cleared for the new terrain."
+        case "world.pack":
+            guard let after, let pack = WorldPack.pack(index: after.presetIndex) else { return nil }
+            return packWords(pack)
         case "prop.place", "prop.move":
             guard let prop = after?.selectedProp else { return nil }
             let verb = control == "prop.place" ? "Placed a" : "Moved the"

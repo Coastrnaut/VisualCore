@@ -11,7 +11,9 @@
 // Q4): thirteen controls with their ranges, snapshot schema 2 with the step 1 → 2, three quality tiers still; the
 // conformance plan adds light and selection actions; newer snapshots are now schema 3, a schema-1 envelope around a
 // schema-2 payload is refused by the step, and a damaged prop or light in a payload is refused; the digest covers
-// props, selection and light.
+// props, selection and light. Feature 092 (A12-P04) T-A12-403 (FR-A12-402, FR-A12-403, FR-A12-405): fourteen
+// controls (`world.pack [0…2]` last); restored and acted views equal the camera policy's clamp for their state (the
+// preset's limits, the level-0 terrain and the props, `CameraPolicy.clamp(_:state:field:)`).
 import Foundation
 import XCTest
 @testable import TinyWorldsExperience
@@ -39,11 +41,11 @@ final class WorldsCoreTests: XCTestCase {
         XCTAssertEqual(WorldsCore.controls.map(\.id),
                        ["world.preset", "world.seed", "view.orbit", "view.zoom", "view.reset", "prop.place",
                         "prop.select", "prop.move", "prop.rotate", "prop.delete", "light.azimuth", "light.elevation",
-                        "light.ambient"])
+                        "light.ambient", "world.pack"])
         XCTAssertEqual(WorldsCore.controls.map(\.id), WorldsCore.actionIDs)
         XCTAssertEqual(WorldsCore.controls.map(\.ranges),
                        [[0...2], [], [-180...180, -180...180], [0.5...2], [], [0...3, -6...6, -6...6], [-1...23],
-                        [-1...1, -1...1], [-180...180], [], [0...360], [10...85], [0.1...0.6]])
+                        [-1...1, -1...1], [-180...180], [], [0...360], [10...85], [0.1...0.6], [0...2]])
         XCTAssertEqual(WorldsCore.migrations.currentVersion, 2, "schema 2 (feature 091)")
         XCTAssertEqual(WorldsCore.qualityTiers, 3, "level-0…level-2 (feature 090)")
         XCTAssertEqual(WorldsCore.stepDuration, 1.0 / 120, accuracy: 1e-15)
@@ -338,6 +340,7 @@ final class WorldsCoreTests: XCTestCase {
     func testRestoredAndActedViewsKeepTheCameraPolicy() async throws {
         for preset in WorldPreset.all {
             let field = try TerrainGenerator.heightField(preset: preset, seed: 1)
+            let limits = CameraPolicy.limits(for: preset)
             for yaw in stride(from: -180.0, to: 180, by: 30) {
                 for (pitch, distance) in [(10.0, 10.0), (10.0, 30.0), (40.0, 10.0), (75.0, 30.0)] {
                     let view = WorldView(yaw: yaw * WorldView.radiansPerDegree,
@@ -345,13 +348,16 @@ final class WorldsCoreTests: XCTestCase {
                     let state = WorldState(presetIndex: preset.id.rawValue, seed: 1, view: view,
                                            random: WorldState.initial.random)
                     let restored = try worldsCore(state).view
-                    XCTAssertTrue(CameraPolicy.keepsClearance(restored, field: field), "\(preset.name) \(view)")
-                    XCTAssertEqual(restored, CameraPolicy.clamp(view, field: field))
-                    if CameraPolicy.keepsClearance(view, field: field) {
+                    XCTAssertTrue(CameraPolicy.keepsClearance(restored, field: field, limits: limits),
+                                  "\(preset.name) \(view)")
+                    XCTAssertEqual(restored, CameraPolicy.clamp(view, state: state, field: field))
+                    if CameraPolicy.keepsClearance(view, field: field, limits: limits) {
                         XCTAssertEqual(restored, view, "a valid view restores unchanged")
                     }
                     XCTAssertEqual(restored.yaw, view.yaw, "the policy never turns the view")
-                    XCTAssertEqual(restored.distance, view.distance, "nor moves it in or out")
+                    let near = limits.distance.lowerBound, far = limits.distance.upperBound
+                    XCTAssertEqual(restored.distance, min(max(view.distance, near), far),
+                                   "the distance only clamped into the preset's limits")
                 }
             }
         }
@@ -361,13 +367,16 @@ final class WorldsCoreTests: XCTestCase {
             ("view.orbit", [0, -180]), ("view.zoom", [2]), ("view.zoom", [2]), ("view.orbit", [180, -180]),
             ("world.preset", [1]), ("view.orbit", [-90, -30]), ("world.preset", [2]), ("world.seed", []),
             ("view.zoom", [0.5]), ("view.orbit", [45, 180]), ("view.reset", []), ("view.orbit", [-170, -90]),
+            ("world.pack", [0]), ("view.orbit", [0, -180]), ("view.zoom", [2]), ("world.pack", [2]),
+            ("view.orbit", [90, 180]), ("view.zoom", [0.5]),
         ]
         for (control, values) in actions {
             XCTAssertEqual(engine.handle(control: control, values: values), .accepted, control)
             let core = try XCTUnwrap(engine.core)
             let field = try TerrainGenerator.heightField(preset: core.preset, seed: core.seed)
-            XCTAssertTrue(CameraPolicy.keepsClearance(core.view, field: field), "\(control) \(values)")
-            XCTAssertEqual(CameraPolicy.clamp(core.view, field: field), core.view, "acted views are already clamped")
+            XCTAssertTrue(CameraPolicy.keepsClearance(core.state, field: field), "\(control) \(values)")
+            XCTAssertEqual(CameraPolicy.clamp(core.view, state: core.state, field: field), core.view,
+                           "acted views are already clamped")
         }
         XCTAssertEqual(WorldsCore(seed: 1).view, .default, "the default view keeps the policy unchanged")
         XCTAssertEqual(WorldsCore.qualityTiers, 3)

@@ -26,6 +26,16 @@
 //     the first, second and fourth end in their initial digest;
 //   - the rejection scenario also refuses a prop kind 4 and an elevation of 90° (out of range) and a move with
 //     nothing selected.
+//
+// Feature 092 (A12-P04) T-A12-403 (FR-A12-402, FR-A12-404, FR-A12-407; SC-A12-401, SC-A12-405; clarification Q5): the
+// pack scenarios, all prepared with seed 1 (the default state):
+//   - `fixture-pack-island`, `fixture-pack-asteroid-garden` and `fixture-pack-miniature-city`: `world.pack i` from the
+//     default state; the final digest is pinned by ``packFixtures`` (committed values, which `WorldsManifestTests` and
+//     `WorldsPackTests` prove equal to the derived digest and to the digest of `WorldPack.state()`);
+//   - `fixture-pack-reset`: the island pack, then edits (select and move the house, turn it, the light's azimuth,
+//     elevation and ambient, select and delete the lantern, a turn of the view and a new seed), then `world.pack 0`
+//     again ("reset to pack"): its final digest is the island pack's committed digest;
+//   - the rejection scenario also refuses `world.pack 3` (out of range) and `world.pack 0.5` (`a12.invalid-choice`).
 #if DEBUG || VISUALCORE_AUTOMATION
 import TinyWorldsCore
 import VisualCoreExperience
@@ -50,6 +60,33 @@ extension WorldsCore {
         (.miniatureCity, 2, "0f7cfa9a93f4d79fb66cbea3cfdd278d2b8c2205c11aa8d8a80eb64edfa7d644"),
         (.miniatureCity, 3, "12581638b5b7a92b00efc0e1f3ba45bdeba5d36767cdafb5ed95bbcfbcbb65d4"),
     ]
+
+    /// The committed digests (engine digest, the experience id as domain) of the state right after `world.pack i` from
+    /// the default state, in pack order (feature 092).
+    public static let packFixtures: [(pack: WorldPresetID, digest: String)] = [
+        (.island, "fdf0c371127f007885ef18e236c750cddd848c8e9c9b68db5252b7fb9e82b4c8"),
+        (.asteroidGarden, "1b1bd2f25f587d1ce5b742b4e0a57f8ca51922ae2f49d2463f7cade1ff047859"),
+        (.miniatureCity, "27d265bd6f68dafb6727354f7ead67db247c51b35485ef526f9a8a7072f269da"),
+    ]
+
+    /// The name of the fixture of the pack of `preset`: `fixture-pack-<preset content id>`.
+    public static func packFixtureName(_ preset: WorldPresetID) -> String { "fixture-pack-\(preset.contentId)" }
+
+    /// The entry of the fixture of the pack of `preset`: open the pack (accepted).
+    public static func packEntries(_ preset: WorldPresetID) -> [ScenarioStep] {
+        [ScenarioStep(steps: 1, action: ScriptedAction("world.pack", [Double(preset.rawValue)]), result: "accepted")]
+    }
+
+    /// The entries of `fixture-pack-reset` (see the file header): the island pack, edits, then the island pack again.
+    public static var packResetEntries: [ScenarioStep] {
+        func step(_ control: String, _ values: [Double] = []) -> ScenarioStep {
+            ScenarioStep(steps: 1, action: ScriptedAction(control, values), result: "accepted")
+        }
+        return [step("world.pack", [0]), step("prop.select", [5]), step("prop.move", [0, -0.5]),
+                step("prop.rotate", [90]), step("light.azimuth", [200]), step("light.elevation", [20]),
+                step("light.ambient", [0.5]), step("prop.select", [6]), step("prop.delete"),
+                step("view.orbit", [30, 10]), step("world.seed"), step("world.pack", [0])]
+    }
 
     /// The name of the fixture of `preset` and `seed`: `fixture-<preset content id>-<seed>`.
     public static func fixtureName(_ preset: WorldPresetID, seed: UInt32) -> String {
@@ -86,7 +123,9 @@ extension WorldsCore {
                 ScenarioStep(steps: 0, action: ScriptedAction("prop.place", [4, 0, 0]), result: "action.out-of-range"),
                 ScenarioStep(steps: 0, action: ScriptedAction("light.elevation", [90]), result: "action.out-of-range"),
                 ScenarioStep(steps: 0, action: ScriptedAction("prop.move", [0.5, 0]),
-                             result: "action.rule." + WorldEditRefusal.noSelection.rawValue)]
+                             result: "action.rule." + WorldEditRefusal.noSelection.rawValue),
+                ScenarioStep(steps: 0, action: ScriptedAction("world.pack", [3]), result: "action.out-of-range"),
+                ScenarioStep(steps: 0, action: ScriptedAction("world.pack", [0.5]), result: invalid)]
     }
 
     /// The entries of `fixture-props-island-1` (see the file header).
@@ -206,6 +245,15 @@ extension WorldsCore {
             specs.append(ScenarioSpec(name: refusal.name, seed: seed, entries: refusal.entries,
                                       expect: ScenarioExpectations(initialDigest: initial, finalDigest: final)))
         }
+        for fixture in packFixtures {
+            let entries = packEntries(fixture.pack)
+            specs.append(ScenarioSpec(name: packFixtureName(fixture.pack), seed: seed, entries: entries,
+                                      expect: ScenarioExpectations(initialDigest: initial,
+                                                                   finalDigest: fixture.digest)))
+        }
+        specs.append(ScenarioSpec(name: "fixture-pack-reset", seed: seed, entries: packResetEntries,
+                                  expect: ScenarioExpectations(initialDigest: initial,
+                                                               finalDigest: packFixtures[0].digest)))
         return ScenarioManifest(experience: id, kind: .creative, scenarios: specs)
     }
 }

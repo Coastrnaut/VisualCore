@@ -5,6 +5,7 @@
 // factors equal to the scale since the previous pinch event, clamped into 0.5…2; every gesture action has a native
 // control (`GestureAlternatives.missing` empty); a tap on the terrain speaks a ground point that lies on the level-0
 // terrain within 1 mm and leaves the digest unchanged; a tap on the sky speaks a miss and changes nothing.
+// Feature 092 (A12-P04) T-A12-403 (FR-A12-403): a wild pinch saturates at the preset's least distance.
 import Foundation
 import XCTest
 @testable import TinyWorldsExperience
@@ -119,9 +120,10 @@ final class WorldsGestureTests: XCTestCase {
         shell.handlePointer(event(3, .ended, 59, 50, 1.21), viewSize: size)
         let core = try WorldsTest.core(shell)
         view = core.view
-        XCTAssertEqual(view.distance, WorldView.distanceRange.lowerBound, accuracy: 1e-12)
+        XCTAssertEqual(view.distance, CameraPolicy.limits(for: core.preset).distance.lowerBound, accuracy: 1e-12,
+                       "the preset's least distance (feature 092)")
         let field = try TerrainGenerator.heightField(preset: core.preset, seed: core.seed)
-        XCTAssertTrue(CameraPolicy.keepsClearance(view, field: field))
+        XCTAssertTrue(CameraPolicy.keepsClearance(core.state, field: field))
         session.close()
     }
 

@@ -27,6 +27,13 @@
 //     by actions; Save hands over the host's still renderer (`experienceStillRenderer`) for the thumbnail.
 // Editing and light actions go through `WorldsEditActions`, which sends them through the port and answers them in
 // words.
+//
+// Feature 092 (A12-P04) T-A12-403 (FR-A12-402, FR-A12-404; clarifications Q1 and Q3) adds the Packs group: the pack
+// picker (`pack` : Island, Asteroid garden, Miniature city; presentation state only), Open pack (`open-pack` →
+// `world.pack [chosen index]`) and Reset to pack (`reset-pack` → `world.pack [current preset index]`, the current
+// preset's pack after any edits), both sent through `WorldsEditActions` and answered in words ("Opened the island
+// pack."). Tilt and zoom are enabled against the current preset's camera limits (`CameraPolicy.limits(for:)`), not the
+// global ones.
 import SwiftUI
 import TinyWorldsCore
 import UIKit
@@ -122,14 +129,22 @@ struct WorldsControls: View {
         return first.uppercased() + String(status.dropFirst())
     }
 
-    /// Whether the view can tilt further up (pitch below 75°).
-    static func canTiltUp(_ view: WorldView) -> Bool { view.pitch < WorldView.pitchRange.upperBound }
-    /// Whether the view can tilt further down (pitch above 10°).
-    static func canTiltDown(_ view: WorldView) -> Bool { view.pitch > WorldView.pitchRange.lowerBound }
-    /// Whether the view can move closer (distance above 10 m).
-    static func canZoomIn(_ view: WorldView) -> Bool { view.distance > WorldView.distanceRange.lowerBound }
-    /// Whether the view can move farther (distance below 30 m).
-    static func canZoomOut(_ view: WorldView) -> Bool { view.distance < WorldView.distanceRange.upperBound }
+    /// Whether the view can tilt further up (pitch below the upper pitch of `preset`'s limits).
+    static func canTiltUp(_ view: WorldView, preset: WorldPreset) -> Bool {
+        view.pitch < CameraPolicy.limits(for: preset).pitch.upperBound
+    }
+    /// Whether the view can tilt further down (pitch above the lower pitch of `preset`'s limits).
+    static func canTiltDown(_ view: WorldView, preset: WorldPreset) -> Bool {
+        view.pitch > CameraPolicy.limits(for: preset).pitch.lowerBound
+    }
+    /// Whether the view can move closer (distance above the least distance of `preset`'s limits).
+    static func canZoomIn(_ view: WorldView, preset: WorldPreset) -> Bool {
+        view.distance > CameraPolicy.limits(for: preset).distance.lowerBound
+    }
+    /// Whether the view can move farther (distance below the greatest distance of `preset`'s limits).
+    static func canZoomOut(_ view: WorldView, preset: WorldPreset) -> Bool {
+        view.distance < CameraPolicy.limits(for: preset).distance.upperBound
+    }
 
     /// The controls, or a progress indicator before the first state.
     var body: some View {
@@ -147,6 +162,9 @@ struct WorldsControls: View {
         let direction = WorldsPresenter.directionWords(view)
         let pitch = WorldsPresenter.pitchWords(view)
         let distance = WorldsPresenter.distanceWords(view)
+        let preset = WorldPreset.preset(index: mirror.presetIndex) ?? .island
+        let tiltUp = Self.canTiltUp(view, preset: preset), tiltDown = Self.canTiltDown(view, preset: preset)
+        let zoomIn = Self.canZoomIn(view, preset: preset), zoomOut = Self.canZoomOut(view, preset: preset)
         VStack(alignment: .leading, spacing: 8) {
             Text(verbatim: "Tiny Worlds").font(.headline).accessibilityAddTraits(.isHeader)
             Picker(selection: Binding(get: { mirror.presetIndex },
@@ -176,19 +194,19 @@ struct WorldsControls: View {
             }
             HStack(spacing: 8) {
                 button("Tilt up", name: "tilt-up", value: pitch,
-                       hint: Self.canTiltUp(view) ? "Looks down from 10 degrees higher" : "The view is at its highest",
-                       enabled: Self.canTiltUp(view)) { _ = port.send("view.orbit", [0, Self.tiltStep]) }
+                       hint: tiltUp ? "Looks down from 10 degrees higher" : "The view is at its highest",
+                       enabled: tiltUp) { _ = port.send("view.orbit", [0, Self.tiltStep]) }
                 button("Tilt down", name: "tilt-down", value: pitch,
-                       hint: Self.canTiltDown(view) ? "Looks from 10 degrees lower" : "The view is at its lowest",
-                       enabled: Self.canTiltDown(view)) { _ = port.send("view.orbit", [0, -Self.tiltStep]) }
+                       hint: tiltDown ? "Looks from 10 degrees lower" : "The view is at its lowest",
+                       enabled: tiltDown) { _ = port.send("view.orbit", [0, -Self.tiltStep]) }
             }
             HStack(spacing: 8) {
                 button("Zoom in", name: "zoom-in", value: distance,
-                       hint: Self.canZoomIn(view) ? "Moves closer to the world" : "The view is at its closest",
-                       enabled: Self.canZoomIn(view)) { _ = port.send("view.zoom", [Self.zoomInFactor]) }
+                       hint: zoomIn ? "Moves closer to the world" : "The view is at its closest",
+                       enabled: zoomIn) { _ = port.send("view.zoom", [Self.zoomInFactor]) }
                 button("Zoom out", name: "zoom-out", value: distance,
-                       hint: Self.canZoomOut(view) ? "Moves away from the world" : "The view is at its farthest",
-                       enabled: Self.canZoomOut(view)) { _ = port.send("view.zoom", [Self.zoomOutFactor]) }
+                       hint: zoomOut ? "Moves away from the world" : "The view is at its farthest",
+                       enabled: zoomOut) { _ = port.send("view.zoom", [Self.zoomOutFactor]) }
             }
             button("Reset view", name: "reset-view", value: WorldsPresenter.viewWords(view),
                    hint: "Returns to the view from the north-east", enabled: true) { _ = port.send("view.reset") }
@@ -197,12 +215,42 @@ struct WorldsControls: View {
                 .fixedSize(horizontal: false, vertical: true)
                 .accessibilityIdentifier(port.identifier("status"))
             Group {
+                packsGroup
                 propsGroup
                 lightGroup
                 slotsGroup
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    /// The packs group (feature 092): the pack picker, Open pack and Reset to pack.
+    @ViewBuilder private var packsGroup: some View {
+        let chosen = WorldPack.pack(index: mirror.packChoice) ?? .island
+        let current = WorldPack.pack(index: mirror.presetIndex) ?? .island
+        Text(verbatim: "Packs").font(.headline).accessibilityAddTraits(.isHeader)
+        Picker(selection: Binding(get: { mirror.packChoice }, set: { mirror.packChoice = $0 })) {
+            ForEach(WorldPack.all.indices, id: \.self) { index in
+                Text(verbatim: WorldPack.all[index].name).tag(index)
+            }
+        } label: {
+            Text(verbatim: "Pack")
+        }
+        .pickerStyle(.segmented)
+        .frame(minHeight: 44)
+        .accessibilityLabel(Text(verbatim: "Pack to open"))
+        .accessibilityValue(Text(verbatim: chosen.name))
+        .accessibilityIdentifier(port.identifier("pack"))
+        HStack(spacing: 8) {
+            button("Open pack", name: "open-pack", value: chosen.name,
+                   hint: "Replaces the world with the chosen pack", enabled: true) {
+                edit.send("world.pack", [Double(mirror.packChoice)])
+            }
+            button("Reset to pack", name: "reset-pack", value: current.name,
+                   hint: "Replaces the world with the pack of the current kind of world", enabled: true) {
+                edit.send("world.pack", [Double(mirror.presetIndex)])
+            }
+        }
     }
 
     /// The props group (feature 091).

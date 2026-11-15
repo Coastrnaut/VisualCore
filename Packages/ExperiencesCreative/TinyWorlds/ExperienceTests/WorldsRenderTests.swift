@@ -18,6 +18,7 @@
 // props are drawn with their model matrices (the pixels where a prop projects change when it is placed; one renderer
 // per kind, made lazily and released in teardown; the selected prop drawn brighter); the world light reaches every
 // renderer each frame, and a face lit head-on is brighter than after the light moves away and low.
+// Feature 092 (A12-P04) T-A12-403 (FR-A12-403): tilt and zoom are enabled against the preset's camera limits.
 import Foundation
 import XCTest
 @testable import TinyWorldsExperience
@@ -153,14 +154,14 @@ final class WorldsRenderTests: XCTestCase {
         XCTAssertEqual(WorldsPresenter.compass(yawDegrees: 20), "north")
         XCTAssertEqual(WorldsControls.sentence("island, seed 1"), "Island, seed 1")
         XCTAssertEqual(WorldsControls.sentence(""), "Loading")
-        XCTAssertTrue(WorldsControls.canTiltUp(.default))
-        XCTAssertTrue(WorldsControls.canZoomOut(.default))
+        XCTAssertTrue(WorldsControls.canTiltUp(.default, preset: .island))
+        XCTAssertTrue(WorldsControls.canZoomOut(.default, preset: .island))
         var top = WorldView.default
         top.orbit(yawDegrees: 0, pitchDegrees: 180)
         top.zoom(2)
-        XCTAssertFalse(WorldsControls.canTiltUp(top))
-        XCTAssertFalse(WorldsControls.canZoomIn(top))
-        XCTAssertTrue(WorldsControls.canTiltDown(top))
+        XCTAssertFalse(WorldsControls.canTiltUp(top, preset: .island))
+        XCTAssertFalse(WorldsControls.canZoomIn(top, preset: .island))
+        XCTAssertTrue(WorldsControls.canTiltDown(top, preset: .island))
 
         let session = ExperienceSession()
         let shell = try await WorldsTest.open(session, size: size)

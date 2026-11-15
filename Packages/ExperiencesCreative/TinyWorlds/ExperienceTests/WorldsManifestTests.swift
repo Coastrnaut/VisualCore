@@ -6,7 +6,9 @@
 // (`UPDATE_SCENARIO_MANIFEST=1`, on the simulator `TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`, rewrites it). Feature 091
 // (A12-P03) T-A12-303 (FR-A12-302, FR-A12-323; SC-A12-301, SC-A12-302): the prop fixture `fixture-props-island-1` and
 // four prop refusal scenarios follow; the fixture's props rest on the terrain and its final digest pins their exact
-// transforms and the light.
+// transforms and the light. Feature 092 (A12-P04) T-A12-403 (FR-A12-404, FR-A12-407; SC-A12-401, SC-A12-405): the
+// pack fixtures `fixture-pack-<pack>` (final digest the committed `WorldsCore.packFixtures` value) and
+// `fixture-pack-reset` (edits, then the island pack again: the island pack's committed digest) follow.
 import Foundation
 import Testing
 @testable import TinyWorldsExperience
@@ -40,6 +42,9 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
     /// The prop fixture and the four prop refusal scenarios (feature 091).
     static let propNames = ["fixture-props-island-1", "refusal-prop-outside", "refusal-prop-under-water",
                             "refusal-prop-too-close", "refusal-prop-no-selection"]
+    /// The three pack fixtures and the reset fixture (feature 092).
+    static let packNames = ["fixture-pack-island", "fixture-pack-asteroid-garden", "fixture-pack-miniature-city",
+                            "fixture-pack-reset"]
 
     @Test func theManifestIsValidWithTheStandardScenariosNineFixturesAndThreeRefusals() {
         let manifest = WorldsCore.manifest(for: id)
@@ -47,7 +52,8 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
                                                           content: ContentRequirement(fixtures: 9))
         #expect(problems.isEmpty, "\(problems)")
         #expect(manifest.scenarios.map(\.name)
-                == ScenarioManifest.standardNames + Self.fixtureNames + Self.refusalNames + Self.propNames)
+                == ScenarioManifest.standardNames + Self.fixtureNames + Self.refusalNames + Self.propNames
+                + Self.packNames)
         #expect(Self.fixtureNames == [
             "fixture-island-1", "fixture-island-2", "fixture-island-3",
             "fixture-asteroid-garden-1", "fixture-asteroid-garden-2", "fixture-asteroid-garden-3",
@@ -123,6 +129,32 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
                     == fixture.digest, "\(name)")
             #expect(spec.expect.finalDigest == played.final, "\(name): the final digest pins the terrain")
         }
+    }
+
+    @Test func thePackFixturesPinTheCommittedDigests() async throws {
+        let manifest = WorldsCore.manifest(for: id)
+        for fixture in WorldsCore.packFixtures {
+            let name = WorldsCore.packFixtureName(fixture.pack)
+            let spec = try #require(manifest.scenarios.first { $0.name == name })
+            #expect(spec.seed == WorldsCore.manifestSeed)
+            #expect(spec.expect.finalDigest == fixture.digest, "\(name)")
+            let played = try await play(spec)
+            #expect(played.final == fixture.digest, "\(name): \(played.final)")
+            let core = try #require(played.core)
+            let pack = WorldPack.pack(for: fixture.pack)
+            #expect(core.props.count == pack.props.count, "\(name)")
+            #expect(core.selection == WorldState.noSelection)
+            #expect(core.preset.id == fixture.pack)
+        }
+        let reset = try #require(manifest.scenarios.first { $0.name == "fixture-pack-reset" })
+        #expect(reset.entries.first?.action?.control == "world.pack")
+        #expect(reset.entries.last?.action?.control == "world.pack")
+        let controls = Set(reset.entries.compactMap { $0.action?.control })
+        #expect(controls.isSuperset(of: ["prop.move", "light.azimuth", "light.elevation", "light.ambient",
+                                         "world.seed"]))
+        let played = try await play(reset)
+        #expect(played.final == WorldsCore.packFixtures[0].digest, "reset to pack: \(played.final)")
+        #expect(reset.expect.finalDigest == WorldsCore.packFixtures[0].digest)
     }
 
     /// The JSON form with the control ids, named by `Catalog/registrations.json`. `UPDATE_SCENARIO_MANIFEST=1`
