@@ -390,6 +390,17 @@ let package = Package(
                                    .product(name: "VisualCoreUI", package: rendering)],
                     path: "NeonArcade/ExperienceTests",
                     resources: [.copy("Fixtures")]),
+        // Feature 082 (A11-P01) T-A11-103/104: Physics Playground (materials with licenses, the world model in metres,
+        // kilograms and seconds, fixed-tick simulation over VisualCore's contacts and impulse solver).
+        .target(name: "PhysicsPlaygroundCore",
+                dependencies: [.product(name: "VisualCoreSimulation", package: visualCore),
+                               .product(name: "VisualCoreMath", package: visualCore)],
+                path: "PhysicsPlayground/Core"),
+        .testTarget(name: "PhysicsPlaygroundCoreTests",
+                    dependencies: ["PhysicsPlaygroundCore",
+                                   .product(name: "VisualCoreSimulation", package: visualCore),
+                                   .product(name: "VisualCoreMath", package: visualCore)],
+                    path: "PhysicsPlayground/CoreTests"),
         .target(name: "ParticleUniverseCore",
                 dependencies: [
                                .product(name: "VisualCoreSimulation", package: visualCore),
