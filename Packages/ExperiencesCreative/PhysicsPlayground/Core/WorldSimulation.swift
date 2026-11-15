@@ -1,16 +1,25 @@
 // WorldSimulation — feature 082 (A11-P01) T-A11-103 (FR-A11-111, FR-A11-112; clarifications 1 and 4; research D3,
 // D4; SC-A11-101–104), extended by feature 083 (A11-P02) T-A11-203 (FR-A11-211; clarifications 1–4; research D1–D4).
+// Extended by feature 084 (A11-P03) T-A11-302 (FR-A11-301, FR-A11-302; clarification 3; research D1–D3): pinned
+// bodies and the grab pull.
 // The fixed-tick rules of the playground world. One tick (1/120 s) does, in this order:
-// 1. Solver states: the bodies in id order (static bodies with inverse mass and inverse inertia 0), then the four
-//    walls (floor, ceiling, left, right; static, restitution 0, friction 0.5).
+// 1. Solver states: the bodies in id order (static and pinned bodies with inverse mass and inverse inertia 0, and a
+//    pinned body with velocity and angular velocity 0), then the four walls (floor, ceiling, left, right; static,
+//    restitution 0, friction 0.5).
+// 1a. The grab pull (when the world has a grab of an existing dynamic, unpinned body): a temporary `Spring2D` from the
+//    grab's body-local anchor to its target world point, rest length 0, stiffness
+//    `Springs2D.stableStiffness(effectiveMass: body mass, dt:)` and damping ratio 1.0, applied through `Springs2D.apply`
+//    before the world's springs. It is never stored as a world spring and is not part of the measured spring force.
 // 2. Springs through VisualCore's `Springs2D.apply`, in spring order, with the stiffness of the world's level (each
 //    spring clamps it to its stable bound) and the damping ratio 0.1. Springs act before gravity so a spring's damper
 //    never sees the gravity speed of the same tick (that would shorten a hanging body's rest stretch by 2ζ·ω·dt,
-//    about 1.8 % at ζ = 0.1).
-// 3. Every dynamic body: v += g·dt; v ·= 1/(1 + kₗ·dt); ω ·= 1/(1 + kₐ·dt); then the caps (40 m/s, 40 rad/s). Gravity
+//    about 1.8 % at ζ = 0.1). With a `ForceMeasurement`, each spring is applied on its own in the same order (the
+//    same result) and its impulse J·n is summed per body ÷ dt (see ForceMeasurement.swift).
+// 3. Every dynamic (not static, not pinned) body: v += g·dt; v ·= 1/(1 + kₗ·dt); ω ·= 1/(1 + kₐ·dt); then the caps (40 m/s, 40 rad/s). Gravity
 //    and drag come from the settings, which carry the world's gravity and drag levels.
 // 4. Contacts through VisualCore's `Contacts2D.collide`: the body pairs i < j that `BroadPhase2D.pairs` reports over
-//    each body's `Shape2D.bounds(at:)` (static–static skipped), in ascending (i, j) order, then every dynamic body
+//    each body's `Shape2D.bounds(at:)` (pairs of two fixed bodies — static or pinned — skipped), in ascending (i, j)
+//    order, then every dynamic, unpinned body
 //    against each wall it can reach (a body whose bounding circle stays more than 1e-6 m inside a wall's stage edge is
 //    not tested; this only saves work). ``ContactPairing/allPairs`` passes every pair instead (the reference the broad
 //    phase is tested against; the result is identical).
@@ -21,8 +30,10 @@
 //    (body id A, body id B, point index).
 // 6. Dynamic bodies take the solved velocities and the corrected positions back; the correction of one body in one tick
 //    is limited to 0.1 m so a deep overlap (a drop onto another body) separates over a few ticks and never pushes a
-//    body through a 1 m wall. The caps apply again; static bodies are never written.
-// 7. Semi-implicit Euler: x += v·dt, θ += ω·dt (θ kept in −π…π); the tick count increases.
+//    body through a 1 m wall. The caps apply again; static bodies are never written, and a pinned body only has its
+//    velocity and angular velocity set to 0 (its position and angle are never written).
+// 7. Semi-implicit Euler for dynamic, unpinned bodies: x += v·dt, θ += ω·dt (θ kept in −π…π); the tick count
+//    increases.
 //
 // A world with a non-finite number, an unknown material, unsound settings, levels that do not match the settings or an
 // unsound spring is refused (`tick` returns false and changes nothing). `advanceHostStep` turns host steps into ticks
@@ -65,6 +76,8 @@ public enum WorldSimulation {
     public static let dropXRange: ClosedRange<Double> = 1...9
     /// The size range of a dropped body (radius or half-extent), in metres.
     public static let dropSizeRange: ClosedRange<Double> = 0.25...0.6
+    /// The damping ratio of the grab pull (critically damped).
+    public static let grabDampingRatio = 1.0
 
     /// The four walls just outside a stage of `settings.stageSize`, each 1 m thick and overlapping at the corners, in
     /// the order floor, ceiling, left, right.
@@ -106,6 +119,27 @@ public enum WorldSimulation {
     /// the world cannot be simulated.
     @discardableResult
     public static func tick(_ world: inout PhysicsWorld, catalog: MaterialCatalog, pairing: ContactPairing) -> Bool {
+        var none: ForceMeasurement?
+        return run(&world, catalog: catalog, pairing: pairing, forces: &none)
+    }
+
+    /// Runs one tick with the broad phase and records the measured spring forces of that tick in `forces` (replaced
+    /// as a whole; see ``ForceMeasurement``). Returns false and changes neither the world nor `forces` when the world
+    /// cannot be simulated. The world after the tick is identical to ``tick(_:catalog:)``.
+    @discardableResult
+    public static func tick(_ world: inout PhysicsWorld, catalog: MaterialCatalog,
+                            forces: inout ForceMeasurement) -> Bool {
+        var measured: ForceMeasurement? = ForceMeasurement()
+        guard run(&world, catalog: catalog, pairing: .broadPhase, forces: &measured), let measured else {
+            return false
+        }
+        forces = measured
+        return true
+    }
+
+    /// The tick itself; measures spring forces into `forces` when it is not nil.
+    private static func run(_ world: inout PhysicsWorld, catalog: MaterialCatalog, pairing: ContactPairing,
+                            forces: inout ForceMeasurement?) -> Bool {
         guard canSimulate(world, catalog: catalog) else { return false }
         let settings = world.settings, dt = settings.tick
         let linear = 1 / (1 + settings.linearDrag * dt), angular = 1 / (1 + settings.angularDrag * dt)
@@ -114,10 +148,12 @@ public enum WorldSimulation {
         var states: [RigidBodyState2D] = bodies.map { body in
             let material = catalog.material(id: body.materialId)!
             let mass = body.mass(in: catalog) ?? 0, inertia = body.inertia(in: catalog) ?? 0
-            return RigidBodyState2D(position: body.position, angle: body.angle, velocity: body.velocity,
-                                    angularVelocity: body.angularVelocity,
-                                    inverseMass: body.isStatic || mass <= 0 ? 0 : 1 / mass,
-                                    inverseInertia: body.isStatic || inertia <= 0 ? 0 : 1 / inertia,
+            let fixed = body.isFixed
+            return RigidBodyState2D(position: body.position, angle: body.angle,
+                                    velocity: body.pinned ? .zero : body.velocity,
+                                    angularVelocity: body.pinned ? 0 : body.angularVelocity,
+                                    inverseMass: fixed || mass <= 0 ? 0 : 1 / mass,
+                                    inverseInertia: fixed || inertia <= 0 ? 0 : 1 / inertia,
                                     restitution: material.restitution, friction: material.friction)
         }
         let walls = walls(for: settings)
@@ -127,7 +163,21 @@ public enum WorldSimulation {
                                            friction: wallFriction))
         }
 
+        // The grab pull, before the world's springs.
+        if let grab = world.grab, let index = world.index(ofBody: grab.bodyId), !bodies[index].isFixed,
+           let mass = bodies[index].mass(in: catalog), mass > 0 {
+            let pull = Spring2D(a: .body(index: index, local: grab.localAnchor), b: .world(grab.target),
+                                restLength: 0, stiffness: Springs2D.stableStiffness(effectiveMass: mass, dt: dt),
+                                dampingRatio: grabDampingRatio)
+            Springs2D.apply(&states, springs: [pull], dt: dt)
+        }
+
         // Springs.
+        if forces != nil {
+            forces = ForceMeasurement(tick: world.tick + 1,
+                                      springForces: Dictionary(uniqueKeysWithValues: bodies.filter { !$0.isStatic }
+                                          .map { ($0.id, Vec2.zero) }))
+        }
         if !world.springs.isEmpty {
             var indexOfId: [Int: Int] = [:]
             for (index, body) in bodies.enumerated() { indexOfId[body.id] = index }
@@ -140,11 +190,23 @@ public enum WorldSimulation {
                 Spring2D(a: anchor($0.a), b: anchor($0.b), restLength: $0.restLength, stiffness: stiffness,
                          dampingRatio: ForceLevels.springDampingRatio)
             }
-            Springs2D.apply(&states, springs: springs, dt: dt)
+            if var measured = forces {
+                for spring in springs {
+                    let applied = ForceMeasurement.appliedImpulse(spring, states, dt: dt)
+                    let before = states
+                    Springs2D.apply(&states, springs: [spring], dt: dt)
+                    guard let applied, states != before else { continue }
+                    if let a = applied.indexA { measured.add(applied.impulse / dt, to: bodies[a]) }
+                    if let b = applied.indexB { measured.add(applied.impulse * (-1 / dt), to: bodies[b]) }
+                }
+                forces = measured
+            } else {
+                Springs2D.apply(&states, springs: springs, dt: dt)
+            }
         }
 
         // Gravity and drag (after the springs, so a spring's damper never sees this tick's gravity speed), then caps.
-        for index in bodies.indices where !bodies[index].isStatic {
+        for index in bodies.indices where !bodies[index].isFixed {
             states[index].velocity = (states[index].velocity + settings.gravity * dt) * linear
             states[index].angularVelocity *= angular
             cap(&states[index])
@@ -153,7 +215,7 @@ public enum WorldSimulation {
         // Contacts.
         var contacts: [Contact2D] = []
         let count = bodies.count
-        let fixed = bodies.map(\.isStatic)
+        let fixed = bodies.map(\.isFixed)
         var pairs: [(Int, Int)] = []
         switch pairing {
         case .broadPhase:
@@ -167,7 +229,7 @@ public enum WorldSimulation {
                 contacts.append(Contact2D(a: i, b: j, manifold: manifold))
             }
         }
-        for i in 0..<count where !bodies[i].isStatic {
+        for i in 0..<count where !fixed[i] {
             let body = bodies[i]
             let bound = body.boundingRadius + 1e-6, stage = settings.stageSize
             let reaches = [body.position.y - bound <= 0, body.position.y + bound >= stage.y,
@@ -222,6 +284,12 @@ public enum WorldSimulation {
 
         for index in bodies.indices where !bodies[index].isStatic {
             var body = bodies[index]
+            if body.pinned {
+                body.velocity = .zero
+                body.angularVelocity = 0
+                bodies[index] = body
+                continue
+            }
             let state = states[index]
             body.velocity = state.velocity
             body.angularVelocity = state.angularVelocity
@@ -247,15 +315,34 @@ public enum WorldSimulation {
     /// cannot be simulated, or has a time-scale index outside 0…3 or a remainder outside 0…7, is left unchanged (0).
     @discardableResult
     public static func advanceHostStep(_ world: inout PhysicsWorld, catalog: MaterialCatalog) -> Int {
+        var none: ForceMeasurement?
+        return advance(&world, catalog: catalog, forces: &none)
+    }
+
+    /// One host step like ``advanceHostStep(_:catalog:)`` that also records the spring forces of the last tick it ran
+    /// in `forces` (unchanged when no tick ran).
+    @discardableResult
+    public static func advanceHostStep(_ world: inout PhysicsWorld, catalog: MaterialCatalog,
+                                       forces: inout ForceMeasurement) -> Int {
+        var measured: ForceMeasurement? = forces
+        let ticks = advance(&world, catalog: catalog, forces: &measured)
+        if ticks > 0, let measured { forces = measured }
+        return ticks
+    }
+
+    /// The host step itself; measures into `forces` when it is not nil.
+    private static func advance(_ world: inout PhysicsWorld, catalog: MaterialCatalog,
+                                forces: inout ForceMeasurement?) -> Int {
         guard !world.paused, (0...3).contains(world.timeScaleIndex), (0...7).contains(world.remainder),
               canSimulate(world, catalog: catalog) else { return 0 }
-        var next = world
+        var next = world, measured = forces
         let quarters = next.remainder + PhysicsWorld.quarterTicks[next.timeScaleIndex]
         next.remainder = quarters % 4
         for _ in 0..<(quarters / 4) {
-            guard tick(&next, catalog: catalog) else { return 0 }
+            guard run(&next, catalog: catalog, pairing: .broadPhase, forces: &measured) else { return 0 }
         }
         world = next
+        forces = measured
         return quarters / 4
     }
 
@@ -265,6 +352,14 @@ public enum WorldSimulation {
     public static func step(_ world: inout PhysicsWorld, catalog: MaterialCatalog) -> Bool {
         guard world.paused else { return false }
         return tick(&world, catalog: catalog)
+    }
+
+    /// The single step like ``step(_:catalog:)`` that also records the tick's spring forces in `forces`.
+    @discardableResult
+    public static func step(_ world: inout PhysicsWorld, catalog: MaterialCatalog,
+                            forces: inout ForceMeasurement) -> Bool {
+        guard world.paused else { return false }
+        return tick(&world, catalog: catalog, forces: &forces)
     }
 
     /// Drops a body of `kind` at rest at y = 7 m. Five draws from `random`, always in this order: x (1…9 m), the first

@@ -1,7 +1,9 @@
 // PhysicsWorld — feature 082 (A11-P01) T-A11-103 (FR-A11-110, FR-A11-111; clarifications 1 and 4; data-model
 // "WorldSettings", "PhysicsBody", "PhysicsWorld"), extended by feature 083 (A11-P02) T-A11-203 (FR-A11-210;
 // clarifications 3 and 4; research D3, D4; data-model "Spring", "Force levels", "ContactCacheEntry", "PhysicsWorld
-// schema 2"). The versioned world record (schema 2). Units are metres, kilograms (2D: density in kg/m²), seconds and
+// schema 2"), and by feature 084 (A11-P03) T-A11-302 (FR-A11-301, FR-A11-302, FR-A11-320; clarifications 1, 5; research
+// D1; data-model "PhysicsBody (schema 3)", "Grab", "Overlay settings", "PhysicsWorld (schema 3)"). The versioned world
+// record (schema 3). Units are metres, kilograms (2D: density in kg/m²), seconds and
 // radians; y is up and the origin is the stage's bottom-left corner. The stage is 10 m × 8 m, enclosed by four static
 // walls 1 m thick just outside it (see `WorldSimulation.walls(for:)`).
 //
@@ -18,9 +20,17 @@
 // tangent impulse of every contact point of the last tick, keyed by (body id A, body id B or a wall marker, point
 // index), sorted by that key, used to warm-start the next tick and saved so a restore continues exactly.
 //
-// A schema-1 record is read with `PhysicsWorld.decode(_:)` (which reads the schema number first) or migrated explicitly
-// with `PhysicsWorld.migrated(fromSchemaOne:)`: its bodies, tick, ids, pause and time scale are kept; it gets no springs,
-// Earth gravity, low drag, stiffness level 1 and an empty cache.
+// Schema 3 adds: a `pinned` flag per body (false by default; a pinned body keeps its material and mass but the tick
+// treats it as static — inverse mass and inverse inertia 0, velocity 0; a pinned body must be at rest and a static body
+// is never pinned), the selected body id (nil or a body of the world), the grab (nil, or a dynamic unpinned body, a
+// finite body-local anchor and a target inside the stage) and the two overlay choices `showVelocity` and `showForces`
+// (false by default). Overlays and the selection never change the simulation.
+//
+// Older records are read with `PhysicsWorld.decode(_:)` (which reads the schema number first) and migrated 1 → 2 → 3:
+// `PhysicsWorld.migrated(fromSchemaOne:)` keeps the bodies, tick, ids, pause and time scale and gives no springs, Earth
+// gravity, low drag, stiffness level 1 and an empty cache; `PhysicsWorld.migrated(fromSchemaTwo:)` keeps everything and
+// gives no pins, no selection, no grab and both overlays off. A body record without a `pinned` key (schemas 1 and 2)
+// reads as unpinned; schema 3 always writes the key.
 //
 // The record is plain Codable data, so `JSONEncoder` with `.sortedKeys` gives deterministic bytes. `validate(catalog:)`
 // names every problem, one line each, and is empty for a sound world.
@@ -115,13 +125,52 @@ public struct PhysicsBody: Codable, Equatable, Sendable, Identifiable {
     public var velocity: Vec2
     /// The angular velocity in rad/s.
     public var angularVelocity: Double
+    /// True while the body is pinned (schema 3): the tick treats it as static (inverse mass and inertia 0) and keeps
+    /// its velocity 0; its mass and inertia still come from its material. A static body is never pinned.
+    public var pinned: Bool
 
     /// Creates a body (no validation; ``PhysicsWorld/validate(catalog:)`` validates).
     public init(id: Int, shape: Shape2D, materialId: String, isStatic: Bool = false, position: Vec2,
-                angle: Double = 0, velocity: Vec2 = .zero, angularVelocity: Double = 0) {
+                angle: Double = 0, velocity: Vec2 = .zero, angularVelocity: Double = 0, pinned: Bool = false) {
         self.id = id; self.shape = shape; self.materialId = materialId; self.isStatic = isStatic
         self.position = position; self.angle = angle; self.velocity = velocity; self.angularVelocity = angularVelocity
+        self.pinned = pinned
     }
+
+    private enum CodingKeys: String, CodingKey {
+        case id, shape, materialId, isStatic, position, angle, velocity, angularVelocity, pinned
+    }
+
+    /// Decodes a body; a record without `pinned` (schemas 1 and 2) reads as unpinned.
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(Int.self, forKey: .id)
+        shape = try c.decode(Shape2D.self, forKey: .shape)
+        materialId = try c.decode(String.self, forKey: .materialId)
+        isStatic = try c.decode(Bool.self, forKey: .isStatic)
+        position = try c.decode(Vec2.self, forKey: .position)
+        angle = try c.decode(Double.self, forKey: .angle)
+        velocity = try c.decode(Vec2.self, forKey: .velocity)
+        angularVelocity = try c.decode(Double.self, forKey: .angularVelocity)
+        pinned = try c.decodeIfPresent(Bool.self, forKey: .pinned) ?? false
+    }
+
+    /// Encodes every field, `pinned` included.
+    public func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(id, forKey: .id)
+        try c.encode(shape, forKey: .shape)
+        try c.encode(materialId, forKey: .materialId)
+        try c.encode(isStatic, forKey: .isStatic)
+        try c.encode(position, forKey: .position)
+        try c.encode(angle, forKey: .angle)
+        try c.encode(velocity, forKey: .velocity)
+        try c.encode(angularVelocity, forKey: .angularVelocity)
+        try c.encode(pinned, forKey: .pinned)
+    }
+
+    /// True when the tick treats the body as immovable: static or pinned.
+    public var isFixed: Bool { isStatic || pinned }
 
     /// The pose (position and angle) used for contact generation.
     public var pose: Pose2D { Pose2D(position: position, angle: angle) }
@@ -229,10 +278,29 @@ public struct ContactCacheEntry: Codable, Equatable, Sendable {
     public var isFinite: Bool { normalImpulse.isFinite && tangentImpulse.isFinite }
 }
 
-/// The world record, schema 2.
+/// A grab (schema 3): a dynamic, unpinned body pulled toward a target point by a critically damped spring from a
+/// point fixed in the body's frame.
+public struct Grab: Codable, Equatable, Sendable {
+    /// The grabbed body's id.
+    public var bodyId: Int
+    /// The grabbed point in the body's local frame, in metres.
+    public var localAnchor: Vec2
+    /// The pull target in world metres, inside the stage.
+    public var target: Vec2
+
+    /// Creates a grab (no validation; ``PhysicsWorld/validate(catalog:)`` validates).
+    public init(bodyId: Int, localAnchor: Vec2, target: Vec2) {
+        self.bodyId = bodyId; self.localAnchor = localAnchor; self.target = target
+    }
+
+    /// True when the anchor and the target are finite.
+    public var isFinite: Bool { localAnchor.isFinite && target.isFinite }
+}
+
+/// The world record, schema 3.
 public struct PhysicsWorld: Codable, Equatable, Sendable {
     /// The schema this code writes and reads.
-    public static let schemaVersion = 2
+    public static let schemaVersion = 3
     /// The most bodies a world holds (including static ones).
     public static let maxBodies = 48
     /// The allowed radius and half-extent sizes in metres.
@@ -252,7 +320,7 @@ public struct PhysicsWorld: Codable, Equatable, Sendable {
     /// The most contact cache entries: two points for every body pair and every body–wall pair of a full world.
     public static let maxContactCache = 2 * (maxBodies * (maxBodies - 1) / 2 + 4 * maxBodies)
 
-    /// The schema version (2).
+    /// The schema version (3).
     public var schema: Int
     /// The fixed settings (their gravity and drags equal the levels' values).
     public var settings: WorldSettings
@@ -280,15 +348,25 @@ public struct PhysicsWorld: Codable, Equatable, Sendable {
     public var stiffnessLevel: Int
     /// The accumulated contact impulses of the last tick, sorted by (bodyA, bodyB, pointIndex).
     public var contactCache: [ContactCacheEntry]
+    /// The selected body's id, or nil (schema 3).
+    public var selectedId: Int?
+    /// The active grab, or nil (schema 3).
+    public var grab: Grab?
+    /// True when velocity arrows are drawn (schema 3; drawing only).
+    public var showVelocity: Bool
+    /// True when force arrows are drawn (schema 3; drawing only).
+    public var showForces: Bool
 
-    /// Creates a world (defaults: schema 2, default settings, no bodies, tick 0, running at normal speed, no springs,
-    /// stiffness level 1, an empty cache). A nil gravity or drag level is the level whose value the settings carry, or
-    /// the default level when none matches (``validate(catalog:)`` then reports the mismatch).
+    /// Creates a world (defaults: schema 3, default settings, no bodies, tick 0, running at normal speed, no springs,
+    /// stiffness level 1, an empty cache, no selection, no grab, overlays off). A nil gravity or drag level is the level
+    /// whose value the settings carry, or the default level when none matches (``validate(catalog:)`` then reports the
+    /// mismatch).
     public init(settings: WorldSettings = WorldSettings(), bodies: [PhysicsBody] = [], tick: Int = 0,
                 nextId: Int? = nil, paused: Bool = false, timeScaleIndex: Int = PhysicsWorld.normalTimeScaleIndex,
                 remainder: Int = 0, springs: [WorldSpring] = [], nextSpringId: Int? = nil, gravityLevel: Int? = nil,
                 dragLevel: Int? = nil, stiffnessLevel: Int = ForceLevels.defaultStiffnessLevel,
-                contactCache: [ContactCacheEntry] = []) {
+                contactCache: [ContactCacheEntry] = [], selectedId: Int? = nil, grab: Grab? = nil,
+                showVelocity: Bool = false, showForces: Bool = false) {
         self.schema = Self.schemaVersion; self.settings = settings; self.bodies = bodies; self.tick = tick
         self.nextId = nextId ?? ((bodies.map(\.id).max() ?? -1) + 1)
         self.paused = paused; self.timeScaleIndex = timeScaleIndex; self.remainder = remainder
@@ -300,7 +378,12 @@ public struct PhysicsWorld: Codable, Equatable, Sendable {
             ?? ForceLevels.defaultDragLevel
         self.stiffnessLevel = stiffnessLevel
         self.contactCache = contactCache
+        self.selectedId = selectedId; self.grab = grab
+        self.showVelocity = showVelocity; self.showForces = showForces
     }
+
+    /// The index of the body with id `id` in ``bodies``, nil when there is none.
+    public func index(ofBody id: Int) -> Int? { bodies.firstIndex { $0.id == id } }
 
     /// The world as JSON with sorted keys (deterministic bytes for equal worlds); a non-finite number gives empty
     /// data rather than a crash.
@@ -310,10 +393,10 @@ public struct PhysicsWorld: Codable, Equatable, Sendable {
         return (try? encoder.encode(self)) ?? Data()
     }
 
-    /// True when every number of the settings, the bodies, the springs and the contact cache is finite.
+    /// True when every number of the settings, the bodies, the springs, the contact cache and the grab is finite.
     public var isFinite: Bool {
         settings.isFinite && bodies.allSatisfy(\.isFinite) && springs.allSatisfy(\.isFinite)
-            && contactCache.allSatisfy(\.isFinite)
+            && contactCache.allSatisfy(\.isFinite) && (grab?.isFinite ?? true)
     }
 
     /// The world position of spring end `end`: the world point, or the body's local point through its pose; nil when
@@ -326,8 +409,8 @@ public struct PhysicsWorld: Codable, Equatable, Sendable {
     /// Every problem of the world, one line each, empty when it is sound: the schema, the settings, the body count,
     /// ids (≥ 0, unique and ascending, below ``nextId``), each body's numbers (finite), sizes (0.15…1.0 m), material
     /// (known in `catalog`), speeds (within the caps), a moving static body, a centre outside the stage, a negative
-    /// tick, the time-scale index (0…3) and the remainder (0…7); then ``levelProblems()``, ``springProblems()`` and
-    /// ``contactCacheProblems()``.
+    /// tick, the time-scale index (0…3) and the remainder (0…7); then ``levelProblems()``, ``springProblems()``,
+    /// ``contactCacheProblems()`` and ``editProblems()``.
     public func validate(catalog: MaterialCatalog = .bundled) -> [String] {
         var out: [String] = []
         if schema != Self.schemaVersion { out.append("schema \(schema) is not \(Self.schemaVersion)") }
@@ -353,6 +436,10 @@ public struct PhysicsWorld: Codable, Equatable, Sendable {
             if body.isStatic && (body.velocity != .zero || body.angularVelocity != 0) {
                 out.append("\(label): static body is moving")
             }
+            if body.isStatic && body.pinned { out.append("\(label): static body is pinned") }
+            if body.pinned && (body.velocity != .zero || body.angularVelocity != 0) {
+                out.append("\(label): pinned body is moving")
+            }
             if !isInsideStage(body.position) { out.append("\(label): centre outside the stage") }
         }
         if tick < 0 { out.append("tick \(tick) is negative") }
@@ -361,6 +448,29 @@ public struct PhysicsWorld: Codable, Equatable, Sendable {
         out += levelProblems()
         out += springProblems()
         out += contactCacheProblems()
+        out += editProblems()
+        return out
+    }
+
+    /// The problems of the schema-3 editing state, one line each: a selected id that names no body; a grab of a body
+    /// that does not exist, is static or is pinned, with a non-finite anchor or target, or with a target outside the
+    /// stage.
+    public func editProblems() -> [String] {
+        var out: [String] = []
+        if let selectedId, index(ofBody: selectedId) == nil {
+            out.append("selectedId \(selectedId) names no body")
+        }
+        if let grab {
+            let label = "grab of body \(grab.bodyId)"
+            if let index = index(ofBody: grab.bodyId) {
+                if bodies[index].isStatic { out.append("\(label): body is static") }
+                if bodies[index].pinned { out.append("\(label): body is pinned") }
+            } else {
+                out.append("\(label): body does not exist")
+            }
+            if !grab.isFinite { out.append("\(label): non-finite value") }
+            else if !isInsideStage(grab.target) { out.append("\(label): target outside the stage") }
+        }
         return out
     }
 
@@ -450,15 +560,15 @@ public struct PhysicsWorld: Codable, Equatable, Sendable {
         return out
     }
 
-    /// True when `point` lies inside the stage (inclusive); false for an unusable stage size.
-    private func isInsideStage(_ point: Vec2) -> Bool {
+    /// True when `point` lies inside the stage (inclusive); true for an unusable stage size (reported elsewhere).
+    public func isInsideStage(_ point: Vec2) -> Bool {
         let stage = settings.stageSize
         guard stage.isFinite, stage.x >= 0, stage.y >= 0 else { return true }
         return (0...stage.x).contains(point.x) && (0...stage.y).contains(point.y)
     }
 }
 
-// MARK: - Schema 1 and the migration 1 → 2
+// MARK: - Schemas 1 and 2 and the migrations 1 → 2 → 3
 
 extension PhysicsWorld {
     /// A world record of schema 1 (feature 082), exactly the fields it was saved with.
@@ -490,36 +600,96 @@ extension PhysicsWorld {
         }
     }
 
+    /// A world record of schema 2 (feature 083), exactly the fields it was saved with.
+    public struct SchemaTwo: Codable, Equatable, Sendable {
+        /// The schema version (2).
+        public var schema: Int
+        /// The settings.
+        public var settings: WorldSettings
+        /// The bodies (read without `pinned`).
+        public var bodies: [PhysicsBody]
+        /// Ticks run so far.
+        public var tick: Int
+        /// The next body id.
+        public var nextId: Int
+        /// The pause flag.
+        public var paused: Bool
+        /// The time-scale index.
+        public var timeScaleIndex: Int
+        /// The time-scale remainder.
+        public var remainder: Int
+        /// The springs.
+        public var springs: [WorldSpring]
+        /// The next spring id.
+        public var nextSpringId: Int
+        /// The gravity level.
+        public var gravityLevel: Int
+        /// The drag level.
+        public var dragLevel: Int
+        /// The stiffness level.
+        public var stiffnessLevel: Int
+        /// The contact cache.
+        public var contactCache: [ContactCacheEntry]
+
+        /// Creates a schema-2 record (no validation).
+        public init(schema: Int = 2, settings: WorldSettings, bodies: [PhysicsBody], tick: Int, nextId: Int,
+                    paused: Bool, timeScaleIndex: Int, remainder: Int, springs: [WorldSpring], nextSpringId: Int,
+                    gravityLevel: Int, dragLevel: Int, stiffnessLevel: Int, contactCache: [ContactCacheEntry]) {
+            self.schema = schema; self.settings = settings; self.bodies = bodies; self.tick = tick
+            self.nextId = nextId; self.paused = paused; self.timeScaleIndex = timeScaleIndex
+            self.remainder = remainder; self.springs = springs; self.nextSpringId = nextSpringId
+            self.gravityLevel = gravityLevel; self.dragLevel = dragLevel; self.stiffnessLevel = stiffnessLevel
+            self.contactCache = contactCache
+        }
+    }
+
     /// Errors of ``decode(_:)``.
     public enum DecodeError: Error, Equatable {
-        /// The record's schema is neither 1 nor 2.
+        /// The record's schema is not 1, 2 or 3.
         case unsupportedSchema(Int)
     }
 
-    /// The schema-2 world of a schema-1 record: its bodies, tick, ids, pause flag, time-scale index and remainder,
-    /// its stage, tick and iterations; no springs (next spring id 0), Earth gravity (level 2), low drag (level 1)
-    /// written into the settings, stiffness level 1 and an empty contact cache. Not validated (the caller validates).
+    /// The schema-3 world of a schema-1 record (the steps 1 → 2 → 3): its bodies, tick, ids, pause flag, time-scale
+    /// index and remainder, its stage, tick and iterations; no springs (next spring id 0), Earth gravity (level 2), low
+    /// drag (level 1) written into the settings, stiffness level 1 and an empty contact cache (step 1 → 2); then no pins,
+    /// no selection, no grab and both overlays off (step 2 → 3). Not validated (the caller validates).
     public static func migrated(fromSchemaOne old: SchemaOne) -> PhysicsWorld {
         var settings = old.settings
         settings.gravity = ForceLevels.gravityVector(level: ForceLevels.defaultGravityLevel)!
         settings.linearDrag = ForceLevels.drag[ForceLevels.defaultDragLevel]
         settings.angularDrag = ForceLevels.drag[ForceLevels.defaultDragLevel]
-        return PhysicsWorld(settings: settings, bodies: old.bodies, tick: old.tick, nextId: old.nextId,
+        let two = SchemaTwo(settings: settings, bodies: old.bodies, tick: old.tick, nextId: old.nextId,
                             paused: old.paused, timeScaleIndex: old.timeScaleIndex, remainder: old.remainder,
                             springs: [], nextSpringId: 0, gravityLevel: ForceLevels.defaultGravityLevel,
                             dragLevel: ForceLevels.defaultDragLevel,
                             stiffnessLevel: ForceLevels.defaultStiffnessLevel, contactCache: [])
+        return migrated(fromSchemaTwo: two)
     }
 
-    /// Decodes a world record of schema 1 or 2 from JSON: it reads the `schema` number first, decodes a schema-2
-    /// record as it is and migrates a schema-1 record with ``migrated(fromSchemaOne:)``. Throws the decoder's error for
-    /// malformed data and ``DecodeError/unsupportedSchema(_:)`` for another schema. Not validated.
+    /// The schema-3 world of a schema-2 record (the step 2 → 3): every field kept, every body unpinned, no selection,
+    /// no grab, both overlays off. Not validated (the caller validates).
+    public static func migrated(fromSchemaTwo old: SchemaTwo) -> PhysicsWorld {
+        var bodies = old.bodies
+        for index in bodies.indices { bodies[index].pinned = false }
+        return PhysicsWorld(settings: old.settings, bodies: bodies, tick: old.tick, nextId: old.nextId,
+                            paused: old.paused, timeScaleIndex: old.timeScaleIndex, remainder: old.remainder,
+                            springs: old.springs, nextSpringId: old.nextSpringId, gravityLevel: old.gravityLevel,
+                            dragLevel: old.dragLevel, stiffnessLevel: old.stiffnessLevel,
+                            contactCache: old.contactCache, selectedId: nil, grab: nil, showVelocity: false,
+                            showForces: false)
+    }
+
+    /// Decodes a world record of schema 1, 2 or 3 from JSON: it reads the `schema` number first, decodes a schema-3
+    /// record as it is and migrates a schema-1 record with ``migrated(fromSchemaOne:)`` and a schema-2 record with
+    /// ``migrated(fromSchemaTwo:)``. Throws the decoder's error for malformed data and
+    /// ``DecodeError/unsupportedSchema(_:)`` for another schema. Not validated.
     public static func decode(_ data: Data) throws -> PhysicsWorld {
         struct Header: Decodable { var schema: Int }
         let decoder = JSONDecoder()
         let header = try decoder.decode(Header.self, from: data)
         switch header.schema {
         case 1: return migrated(fromSchemaOne: try decoder.decode(SchemaOne.self, from: data))
+        case 2: return migrated(fromSchemaTwo: try decoder.decode(SchemaTwo.self, from: data))
         case schemaVersion: return try decoder.decode(PhysicsWorld.self, from: data)
         default: throw DecodeError.unsupportedSchema(header.schema)
         }

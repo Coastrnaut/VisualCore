@@ -4,7 +4,8 @@
 // each problem (schema, settings, count, ids, non-finite values, sizes, unknown material, speeds, a moving static body,
 // a centre outside the stage, tick, time-scale index and remainder); the seeded starting scene has the ledge, three
 // circles and three boxes at rest in the upper left, the hanging box and the joined circles (feature 083) without
-// overlap, and is the same for the same seed. Updated for schema 2 by feature 083 (A11-P02) T-A11-203.
+// overlap, and is the same for the same seed. Updated for schema 2 by feature 083 (A11-P02) T-A11-203
+// and for schema 3 by feature 084 (A11-P03) T-A11-302.
 import Foundation
 import Testing
 import VisualCoreMath
@@ -26,7 +27,7 @@ import PhysicsPlaygroundCore
         #expect(settings.tick == 1.0 / 120.0 && settings.iterations == 10)
         #expect(settings.stageSize == Vec2(10, 8))
         let world = PhysicsWorld()
-        #expect(world.schema == 2 && world.tick == 0 && world.nextId == 0 && !world.paused)
+        #expect(world.schema == 3 && world.tick == 0 && world.nextId == 0 && !world.paused)
         #expect(world.springs.isEmpty && world.nextSpringId == 0 && world.contactCache.isEmpty)
         #expect(world.gravityLevel == 2 && world.dragLevel == 1 && world.stiffnessLevel == 1)
         #expect(world.timeScaleIndex == 2 && world.remainder == 0)
@@ -63,7 +64,7 @@ import PhysicsPlaygroundCore
         #expect(back.encoded() == data)
         let text = try #require(String(data: data, encoding: .utf8))
         #expect(text.hasPrefix("{\"bodies\":[{\"angle\":"))
-        #expect(text.contains("\"schema\":2"))
+        #expect(text.contains("\"schema\":3") && text.contains("\"pinned\":false"))
     }
 
     @Test func validateNamesEachProblem() {
@@ -74,7 +75,7 @@ import PhysicsPlaygroundCore
             change(&world)
             return world.validate()
         }
-        #expect(problems { $0.schema = 1 } == ["schema 1 is not 2"])
+        #expect(problems { $0.schema = 1 } == ["schema 1 is not 3"])
         #expect(problems { $0.settings.gravity = Vec2(0, .nan) } == ["settings.gravity is not finite"])
         #expect(problems { $0.settings.gravity = Vec2(0, -25) } == ["settings.gravity exceeds 20.0 m/s²",
                                                                  "settings.gravity does not match gravityLevel 2"])

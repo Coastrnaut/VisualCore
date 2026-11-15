@@ -16,6 +16,8 @@
 // the ledge (y ≤ 2.65 m) lies below every slot, and the spring bodies lie right of x = 6.6 m (the box spans x 7.2…7.8,
 // the circles x 6.7…8.3 below y 1.8 m). The world has the default levels (Earth gravity, low drag, stiffness level 1)
 // and an empty contact cache. An empty catalog gives the same scene with the material id "steel" for every body.
+// Feature 084 (A11-P03) T-A11-302: the scene is schema 3 with the new fields at their defaults — no body pinned, no
+// selection, no grab, both overlays off.
 import Foundation
 import VisualCoreMath
 import VisualCoreSimulation

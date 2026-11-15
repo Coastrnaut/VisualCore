@@ -7,6 +7,10 @@
 // - `PhysicsWorld.migrated(fromSchemaOne:)` writes the default levels' gravity and drags into the settings and keeps
 //   the stage, tick and iterations; every A11-P01 starting scene (re-expressed as schema 1) migrates to a sound world.
 // - Another schema number is refused; a schema-2 world with springs, levels and a contact cache round-trips exactly.
+// Updated by feature 084 (A11-P03) T-A11-302 (FR-A11-320; clarification 5; SC-A11-305) for schema 3: schema-1 records
+// migrate 1 → 2 → 3 (nothing pinned, no selection, no grab, overlays off); a schema-2 record (as feature 083 wrote it,
+// without `pinned`) migrates 2 → 3 keeping every field; the strict schema-3 decoder refuses both; schema 4 is refused;
+// a schema-3 world with pins, a selection, a grab and overlays round-trips exactly.
 import Foundation
 import Testing
 import VisualCoreMath
@@ -30,7 +34,9 @@ import PhysicsPlaygroundCore
     @Test func aSchemaOneWorldJSONMigratesWithDefaults() throws {
         let data = Data(Self.schemaOneJSON.utf8)
         let world = try PhysicsWorld.decode(data)
-        #expect(world.schema == 2 && world.validate(catalog: catalog).isEmpty)
+        #expect(world.schema == 3 && world.validate(catalog: catalog).isEmpty)
+        #expect(world.bodies.allSatisfy { !$0.pinned } && world.selectedId == nil && world.grab == nil)
+        #expect(!world.showVelocity && !world.showForces)
         #expect(world.bodies.map(\.id) == [0, 3] && world.nextId == 4)
         #expect(world.bodies[1].shape == .circle(radius: 0.3) && world.bodies[1].materialId == "rubber")
         #expect(world.bodies[1].velocity == Vec2(1.5, -2) && world.bodies[1].angularVelocity == -1.25)
@@ -39,7 +45,7 @@ import PhysicsPlaygroundCore
         #expect(world.springs.isEmpty && world.nextSpringId == 0 && world.contactCache.isEmpty)
         #expect(world.gravityLevel == 2 && world.dragLevel == 1 && world.stiffnessLevel == 1)
         #expect(world.settings == WorldSettings())
-        // The strict schema-2 decoder does not guess the missing fields.
+        // The strict schema-3 decoder does not guess the missing fields.
         #expect(throws: DecodingError.self) { try JSONDecoder().decode(PhysicsWorld.self, from: data) }
         // The migrated world simulates.
         var running = world
@@ -76,14 +82,28 @@ import PhysicsPlaygroundCore
     }
 
     @Test func anotherSchemaIsRefused() {
-        let three = Self.schemaOneJSON.replacingOccurrences(of: "\"schema\":1", with: "\"schema\":3")
-        #expect(throws: PhysicsWorld.DecodeError.unsupportedSchema(3)) {
-            try PhysicsWorld.decode(Data(three.utf8))
+        let four = Self.schemaOneJSON.replacingOccurrences(of: "\"schema\":1", with: "\"schema\":4")
+        #expect(throws: PhysicsWorld.DecodeError.unsupportedSchema(4)) {
+            try PhysicsWorld.decode(Data(four.utf8))
         }
         #expect(throws: DecodingError.self) { try PhysicsWorld.decode(Data("{}".utf8)) }
     }
 
-    @Test func aSchemaTwoWorldRoundTripsExactly() throws {
+    /// A schema-2 record of `world` exactly as feature 083 wrote it: no `pinned` keys, none of the schema-3 fields.
+    private func schemaTwoData(_ world: PhysicsWorld) throws -> Data {
+        var object = try #require(try JSONSerialization.jsonObject(with: world.encoded()) as? [String: Any])
+        object["schema"] = 2
+        for key in ["selectedId", "grab", "showVelocity", "showForces"] { object.removeValue(forKey: key) }
+        let bodies = try #require(object["bodies"] as? [[String: Any]])
+        object["bodies"] = bodies.map { body -> [String: Any] in
+            var body = body
+            body.removeValue(forKey: "pinned")
+            return body
+        }
+        return try JSONSerialization.data(withJSONObject: object, options: [.sortedKeys])
+    }
+
+    @Test func aSchemaTwoWorldMigratesToSchemaThreeKeepingEveryField() throws {
         var random = SeededRandom(seed: 11)
         var world = StartingScene.make(random: &random, catalog: catalog)
         WorldSimulation.setGravityLevel(&world, 1)
@@ -91,10 +111,39 @@ import PhysicsPlaygroundCore
         WorldSimulation.setStiffnessLevel(&world, 3)
         for _ in 0..<600 { WorldSimulation.tick(&world, catalog: catalog) }
         #expect(!world.contactCache.isEmpty)
+        let data = try schemaTwoData(world)
+        let text = try #require(String(data: data, encoding: .utf8))
+        #expect(text.contains("\"schema\":2") && !text.contains("pinned") && !text.contains("showForces"))
+        // The strict schema-3 decoder refuses it; the migrating decoder keeps every schema-2 field.
+        #expect(throws: DecodingError.self) { try JSONDecoder().decode(PhysicsWorld.self, from: data) }
+        let migrated = try PhysicsWorld.decode(data)
+        #expect(migrated == world)
+        #expect(migrated.schema == 3 && migrated.validate(catalog: catalog).isEmpty)
+        #expect(migrated.bodies.allSatisfy { !$0.pinned } && migrated.selectedId == nil && migrated.grab == nil)
+        #expect(!migrated.showVelocity && !migrated.showForces)
+        let old = try JSONDecoder().decode(PhysicsWorld.SchemaTwo.self, from: data)
+        #expect(PhysicsWorld.migrated(fromSchemaTwo: old) == world)
+        // The migrated world continues exactly like the original.
+        var a = world, b = migrated
+        for _ in 0..<60 { WorldSimulation.tick(&a, catalog: catalog); WorldSimulation.tick(&b, catalog: catalog) }
+        #expect(a.encoded() == b.encoded())
+    }
+
+    @Test func aSchemaThreeWorldRoundTripsExactly() throws {
+        var random = SeededRandom(seed: 11)
+        var world = StartingScene.make(random: &random, catalog: catalog)
+        WorldSimulation.setStiffnessLevel(&world, 3)
+        for _ in 0..<240 { WorldSimulation.tick(&world, catalog: catalog) }
+        #expect(WorldEditing.togglePin(&world, id: 1) == nil)
+        #expect(WorldEditing.select(&world, id: 2) == nil)
+        #expect(WorldEditing.grab(&world, id: 3, at: world.bodies[3].position + Vec2(0.05, 0)) == nil)
+        world.showVelocity = true
+        world.showForces = true
         #expect(world.validate(catalog: catalog) == [])
         let data = world.encoded()
         let text = try #require(String(data: data, encoding: .utf8))
-        #expect(text.contains("\"schema\":2") && text.contains("\"springs\":[") && text.contains("\"contactCache\":["))
+        #expect(text.contains("\"schema\":3") && text.contains("\"pinned\":true") && text.contains("\"grab\":{"))
+        #expect(text.contains("\"selectedId\":2") && text.contains("\"showForces\":true"))
         let back = try PhysicsWorld.decode(data)
         #expect(back == world && back.encoded() == data)
         #expect(try JSONDecoder().decode(PhysicsWorld.self, from: data) == world)

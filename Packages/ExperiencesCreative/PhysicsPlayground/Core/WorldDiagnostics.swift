@@ -5,7 +5,8 @@
 // Feature 083 (A11-P02) T-A11-203 adds the spring potential energy Σ ½·k'·(L − L₀)² over the springs, where k' is the
 // world's stiffness clamped to each spring's stable bound `Springs2D.stableStiffness(effectiveMass:dt:)` (effective mass
 // 1/(Σ inverse masses of the ends); a spring between two static ends or a missing body counts 0), and the total energy
-// kinetic + gravitational + spring potential.
+// kinetic + gravitational + spring potential. Feature 084 (A11-P03) T-A11-302: a pinned body is a fixed spring end
+// (inverse mass 0), as in the tick, so k' matches the stiffness the tick applies.
 import Foundation
 import VisualCoreMath
 import VisualCoreSimulation
@@ -50,7 +51,7 @@ public enum WorldDiagnostics {
             guard let body = world.bodies.first(where: { $0.id == id }), let mass = body.mass(in: catalog) else {
                 return nil
             }
-            return mass > 0 ? 1 / mass : 0
+            return mass > 0 && !body.pinned ? 1 / mass : 0
         }
         return world.springs.reduce(0) { total, spring in
             guard let pa = world.anchorPosition(spring.a), let pb = world.anchorPosition(spring.b),
