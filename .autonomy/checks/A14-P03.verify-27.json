@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a14.solar-system-explorer",
+    "--runtime",
+    "27"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a14.solar-system-explorer --runtime 27",
+  "elapsed_seconds": 51.993,
+  "exit_code": 0,
+  "finished": "2026-11-15T22:03:17+00:00",
+  "log": ".autonomy/logs/A14-P03.verify-27.log",
+  "log_sha256": "aa4cbfbd48d3a334d880b259cc4785fc32c1c1e90795823443b7b1af0416a230",
+  "name": "verify-27",
+  "stage": "A14-P03",
+  "started": "2026-11-15T22:02:25+00:00",
+  "timed_out": false
+}
