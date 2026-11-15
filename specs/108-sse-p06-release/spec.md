@@ -23,6 +23,45 @@ Canonical overrides:
 - **Owner rulings:** short tests; audits in the device campaign; iOS 27 at phase gates; reference regression and iOS 26
   at X-A14; interface tests under 60 s each.
 
+## Clarifications
+
+### Session 2026-11-15
+
+Answered autonomously under the owner's standing delegation, recommended option each time, as for A13-P06. Facts checked
+in code: `check_experience_release.py` reads `docs/apps/<slug>/release.json` (schema 1: `experience`, `requiredDocs`,
+`checklist`, `copyCheck` with `text`, `swift`, `allow`) and accepts the statuses `verified`, `pending-campaign-ii` and
+`owner-action`; `release_check.py` derives `experience-release-<code>` and `copy-claims-<code>` from that file and runs
+interface chunks by name (`u2` is Light Maze's, serial; `v2` is free); `ViewStore` answers `missing`, `refused(…)`
+(damaged, newer-version, out-of-range, oversized) and `unreadable` and never writes on load; the presenter has no
+failure seam yet (Light Maze's `failNextDraw` is the model); the registry passes stored schema examples to
+`ExperienceRegistration(examples:)` for migration checks (`MazeCore.schemaOneExample()`), and `SolarCore` has none yet;
+the experience's sources import only Foundation, SwiftUI, UIKit and VisualCore modules; the a14 registration declares no
+permission; control identifiers are `experience.a14.solar-system-explorer.<name>` (`body`, `previous-body`, `next-body`,
+`date`, `play-pause`, `rate`, `now`, `tour`, `tour-next`, `tour-pause`, `tour-stop`, `scale`, `save-view`,
+`restore-view`, `view-message`, `about-model`, `status`, `message`, …).
+
+- Q: Which statuses does the release checklist use? → A: The checker's: `verified` (with evidence),
+  `pending-campaign-ii` (device rows, naming the device-campaign row) and `owner-action` (with the owner's steps).
+- Q: Which words are refused in the store text and interface copy? → A: An experience scan over the store text and the
+  interface Swift (controls and presenter) refuses ephemeris (except in "not an ephemeris"), real-time, live sky,
+  telescope, precise, precision, accurate, accuracy, exact positions, fps, frames per second, battery and a millisecond
+  figure (whole words, case-insensitive), alongside the shared copy check; every test named in the store claim table
+  must exist.
+- Q: What does the source scan refuse? → A: In `Packages/ExperiencesCreative/SolarSystemExplorer`: `URLSession`,
+  `import Network`, `CLLocation`, `AVCapture`, `AVAudioRecorder`, `inputNode`, `installTap`, `CMMotion`, `CNContact`,
+  `ASIdentifierManager`, `AppTrackingTransparency`, `UIScreen.main.brightness` and `isIdleTimerDisabled`.
+- Q: Which interface journeys run, and how? → A: A new serial chunk `v2` with `SSEViewUITests` (choose Earth from the
+  Body menu — the status names Earth; Later 1 year then Play and Pause — the date changes; switch Scale to True relative —
+  the legend says "to one scale") and `SSETourUITests` (start the Inner planets tour — the status names the Sun and the
+  overlay is present; Next stop — Mercury; Stop tour; Save view, choose Mars, Restore view — Earth again), launched
+  through `SSESupport` like `LMSupport`; each test under 60 s.
+- Q: How are crash recovery, sample files and old sessions proved? → A: A test-only `failNextDraw` seam in the presenter;
+  a test saves a view in a temporary storage, starts a tour, sets the seam, draws so the session fails, checks
+  `view.json` byte-identical, opens a new session and draws. Four committed samples (`view-valid`, `-newer`, `-damaged`,
+  `-oversized`) under the experience's test fixtures answered by `ViewStore` and byte-identical afterwards. Stored
+  examples `SolarCore.schemaOneExample()`, `schemaTwoExample()` and `schemaThreeExample()` (envelopes of schemas 1–3 with
+  the digest their migration must give), passed to the registry's candidate registration and tested.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Nothing leaves the device (Priority: P1) 🎯
