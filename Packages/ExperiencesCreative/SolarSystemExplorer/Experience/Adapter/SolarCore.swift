@@ -328,6 +328,51 @@ public struct SolarCore: ExperienceCore, Equatable {
         }
     }
 
+    // MARK: Stored migration examples (A14-P06)
+
+    /// The stored payload of schema `version` (1, 2 or 3) for the registry's migration check (feature 108, T-A14-606):
+    /// schema 1 selects Earth; schema 2 also steps the date by 30 days and moves the camera; schema 3 also chooses the
+    /// true-relative scale. Nil for another version.
+    public static func schemaExamplePayload(version: Int) -> [String: Any]? {
+        var payload: [String: Any] = ["schema": version, "selection": 3]
+        guard (1...3).contains(version) else { return nil }
+        if version >= 2 {
+            payload["dayOffset"] = 30.0
+            payload["yawSteps"] = 1
+            payload["pitchDegrees"] = 45
+            payload["zoomSteps"] = 2
+        }
+        if version >= 3 { payload["scaleMode"] = ScaleMode.trueRelative.rawValue }
+        return payload
+    }
+
+    /// The stored example of schema `version` for the registry's migration check: ``schemaExamplePayload(version:)``
+    /// in an envelope of that schema at step 0 with seed `seed`, with the digest its restore through the migration
+    /// chain to schema 4 must give. Nil for another version or if the encoding failed.
+    public static func schemaExample(version: Int, seed: UInt64 = 7) -> MigrationExample? {
+        guard let id = ExperienceID(rawValue: experienceID), let payload = schemaExamplePayload(version: version),
+              let data = try? JSONSerialization.data(withJSONObject: payload, options: [.sortedKeys]),
+              let upgraded = try? migrations.migrate(payload, from: version),
+              let migrated = try? JSONSerialization.data(withJSONObject: upgraded, options: [.sortedKeys]),
+              let restored = try? restore(payload: migrated, seed: seed) else { return nil }
+        var builder = DigestBuilder(domain: id.rawValue)
+        guard (try? restored.writeDigest(into: &builder)) != nil else { return nil }
+        let digest = builder.finish()
+        guard let snapshot = try? ExperienceSnapshot(experience: id, schemaVersion: version, seed: seed, stepIndex: 0,
+                                                     digest: digest, payload: data),
+              let encoded = try? snapshot.encoded() else { return nil }
+        return MigrationExample(version: version, snapshot: encoded, expectedDigest: digest.hex)
+    }
+
+    /// The stored schema-1 example (A14-P01 state: the selection only).
+    public static func schemaOneExample(seed: UInt64 = 7) -> MigrationExample? { schemaExample(version: 1, seed: seed) }
+    /// The stored schema-2 example (A14-P02 state: date and camera).
+    public static func schemaTwoExample(seed: UInt64 = 7) -> MigrationExample? { schemaExample(version: 2, seed: seed) }
+    /// The stored schema-3 example (A14-P03 state: the scale mode).
+    public static func schemaThreeExample(seed: UInt64 = 7) -> MigrationExample? {
+        schemaExample(version: 3, seed: seed)
+    }
+
     // MARK: Words
 
     /// The name of the body at `index` ("Earth"), or "Unknown body" outside the catalog.

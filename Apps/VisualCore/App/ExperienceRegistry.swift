@@ -308,7 +308,11 @@ extension ExperienceRegistry {
     /// A14 Solar System Explorer (feature 103, A14-P01): a candidate until X-A14.
     fileprivate static var solarSystemExplorer: ExperienceRegistration? {
         guard let id = SolarSystemExplorerExperience.id else { return nil }
-        var registration = ExperienceRegistration(id: id, core: SolarCore.self) { launch in
+        // Schemas 2–4 (A14-P02 to A14-P04) add the date and camera, the scale mode, and the clock and tour; the stored
+        // schema 1–3 examples prove the migrations (A14-P06, T-A14-606).
+        let examples = [SolarCore.schemaOneExample(), SolarCore.schemaTwoExample(),
+                        SolarCore.schemaThreeExample()].compactMap { $0 }
+        var registration = ExperienceRegistration(id: id, core: SolarCore.self, examples: examples) { launch in
             let system = SystemAccessibilityObserver.systemValues()
             return SolarSystemExplorerExperience.make(
                 id: id, storage: launch.storage,
