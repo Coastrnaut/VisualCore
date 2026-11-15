@@ -7,7 +7,7 @@ stay open, as for A07-P06 and A08-P06.
 
 ## Phase 1: Setup
 
-- [ ] T-A09-601 Baseline: cite the A09-P05 evidence on the unchanged tree (`.autonomy/checks/A09-P05.aquarium-ios27.json`, `.autonomy/checks/A09-P05.app-unit.json`, `.autonomy/checks/A09-P05.verify-27.json`) instead of a rerun (owner ruling of 2026-11-14)
+- [X] T-A09-601 Baseline: cite the A09-P05 evidence on the unchanged tree (`.autonomy/checks/A09-P05.aquarium-ios27.json`, `.autonomy/checks/A09-P05.app-unit.json`, `.autonomy/checks/A09-P05.verify-27.json`) instead of a rerun (owner ruling of 2026-11-14) — Verified 2026-11-14: 2026-11-14: no aquarium or app source change since the A09-P05 evidence (only specs, docs and the record's regenerated catalog fixture); cites .autonomy/checks/A09-P05.{aquarium-ios27,app-unit,verify-27}.json
 
 ## Phase 2: User Story 1 — nothing leaves the device (P1) 🎯
 
