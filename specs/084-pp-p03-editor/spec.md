@@ -152,6 +152,9 @@ selection and overlay choices; a world saved by Phase 02 opens with nothing pinn
 - **A drag outside the stage:** the pull target is clamped inside the stage.
 - **Very fast flicks:** the release velocity is the body's own (capped by the speed limit), never computed from the
   finger alone.
+- **Which forces are drawn:** weight and the net spring force only; contact and drag forces are not drawn, and the
+  panel says so. The spring force is measured during a tick, so a restored world shows no spring-force arrow until its
+  next tick runs (it is derived data, never saved).
 - **Reduce Motion:** arrows are static drawings of the current values; nothing decorative moves.
 
 ## Requirements *(mandatory)*
