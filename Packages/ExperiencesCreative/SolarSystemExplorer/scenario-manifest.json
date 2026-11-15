@@ -1,0 +1,426 @@
+{
+  "controls" : [
+    "body.select",
+    "body.next",
+    "body.previous"
+  ],
+  "experience" : "a14.solar-system-explorer",
+  "kind" : "creative",
+  "scenarios" : [
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+        "initialDigest" : "51a5635b7a12a59c71b25273bfcf07d46af066a15dbcc395f3bd43ab95d08598"
+      },
+      "name" : "launch-first-frame",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "body.select",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "body.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "body.previous",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "body.select",
+            "values" : [
+              8
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6236a93d22864854e6caa6350c7e5dc88b2e1d9021ede9ee86b9769a7b1ac769",
+        "initialDigest" : "51a5635b7a12a59c71b25273bfcf07d46af066a15dbcc395f3bd43ab95d08598"
+      },
+      "name" : "input-response",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "body.select",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "outcome" : "viewing-earth"
+      },
+      "name" : "completion",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "body.select",
+            "values" : [
+              9
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "body.select",
+            "values" : [
+              -1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "body.select",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "action.rule.a14.invalid-choice",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "body.previous",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.a14.invalid-choice",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "body.next",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "body.previous",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "body.select",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "body.select",
+            "values" : [
+              8
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "body.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.a14.invalid-choice",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+
+      },
+      "name" : "rejection",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "body.select",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "body.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "body.previous",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "body.select",
+            "values" : [
+              8
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6236a93d22864854e6caa6350c7e5dc88b2e1d9021ede9ee86b9769a7b1ac769",
+        "initialDigest" : "51a5635b7a12a59c71b25273bfcf07d46af066a15dbcc395f3bd43ab95d08598"
+      },
+      "name" : "save-restore",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "body.select",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "body.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "body.previous",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "body.select",
+            "values" : [
+              8
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "initialDigest" : "51a5635b7a12a59c71b25273bfcf07d46af066a15dbcc395f3bd43ab95d08598",
+        "resetDigest" : true
+      },
+      "name" : "reset",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "suspend-resume",
+      "seed" : "1"
+    },
+    {
+      "cycles" : 5,
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "teardown-reentry",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "cancel-prepare",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "body.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "bef0b95211940fd6ad5fd468964d602073e576d34ca29eccea52e07cf419dc31",
+        "initialDigest" : "51a5635b7a12a59c71b25273bfcf07d46af066a15dbcc395f3bd43ab95d08598",
+        "outcome" : "viewing-mercury"
+      },
+      "name" : "fixture-mercury",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "body.select",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "47b8bbb1edfbcb3dcb84d197e8825d0b672d93eedbd6d08df704813b572a0f80",
+        "initialDigest" : "51a5635b7a12a59c71b25273bfcf07d46af066a15dbcc395f3bd43ab95d08598",
+        "outcome" : "viewing-earth"
+      },
+      "name" : "fixture-earth",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "body.select",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "bddc8b2540ffcac1e7f9a13603ef84376eeae84b12cced5088075fc3da2ed16c",
+        "initialDigest" : "51a5635b7a12a59c71b25273bfcf07d46af066a15dbcc395f3bd43ab95d08598",
+        "outcome" : "viewing-jupiter"
+      },
+      "name" : "fixture-jupiter",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "body.select",
+            "values" : [
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e67e8b8ce4c2f8f66568c8f87bd973e7a4fddfe23987d39de97f100216da017e",
+        "initialDigest" : "51a5635b7a12a59c71b25273bfcf07d46af066a15dbcc395f3bd43ab95d08598",
+        "outcome" : "viewing-saturn"
+      },
+      "name" : "fixture-saturn",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "body.select",
+            "values" : [
+              8
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6236a93d22864854e6caa6350c7e5dc88b2e1d9021ede9ee86b9769a7b1ac769",
+        "initialDigest" : "51a5635b7a12a59c71b25273bfcf07d46af066a15dbcc395f3bd43ab95d08598",
+        "outcome" : "viewing-neptune"
+      },
+      "name" : "fixture-neptune",
+      "seed" : "1"
+    }
+  ],
+  "schema" : 1
+}
