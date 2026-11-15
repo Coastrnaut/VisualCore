@@ -1305,7 +1305,9 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     # Feature 089 (A12-P01): Tiny Worlds, integrated at X-A12.
                                     "TinyWorldsExperience",
                                     # Feature 096 (A13-P01): Light Maze, integrated at X-A13.
-                                    "LightMazeExperience"])
+                                    "LightMazeExperience",
+                                    # Feature 103 (A14-P01): Solar System Explorer, a candidate until X-A14.
+                                    "SolarSystemExplorerExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):
         listing = subprocess.run([sys.executable, str(HERE / "release_check.py"), "--list"],

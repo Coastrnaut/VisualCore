@@ -323,6 +323,29 @@
       "manifest": "Packages/ExperiencesCreative/LightMaze/scenario-manifest.json",
       "permissions": [],
       "summary": "A light-reflection puzzle: turn mirrors and prisms on a grid to guide a beam into every target."
+    },
+    "a14.solar-system-explorer": {
+      "capabilities": [
+        "the Sun and eight planets",
+        "fact cards with units and sources",
+        "distances in km and AU",
+        "values from NASA's fact sheet",
+        "planets drawn in code",
+        "sizes and spacing not to scale"
+      ],
+      "quality_tiers": [
+        "level-0"
+      ],
+      "palette": [
+        "#05070F",
+        "#FFB547",
+        "#4C8BF5",
+        "#E8EAF0"
+      ],
+      "content": null,
+      "manifest": "Packages/ExperiencesCreative/SolarSystemExplorer/scenario-manifest.json",
+      "permissions": [],
+      "summary": "A solar system primer: the Sun and the eight planets with fact cards whose numbers carry units and sources."
     }
   }
 }
