@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesCreative",
+    "--scheme",
+    "ExperiencesCreative-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "SolarSystemExplorerCoreTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing SolarSystemExplorerCoreTests",
+  "elapsed_seconds": 6.171,
+  "exit_code": 0,
+  "finished": "2026-11-15T21:29:33+00:00",
+  "log": ".autonomy/logs/A14-P03.sse-core-ios27.log",
+  "log_sha256": "dfde7106b366c4fd2fc61b9021d39a3daa1304508b3f49dba2dfe60a1aeae63d",
+  "name": "sse-core-ios27",
+  "stage": "A14-P03",
+  "started": "2026-11-15T21:29:27+00:00",
+  "timed_out": false
+}
