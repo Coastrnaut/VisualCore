@@ -23,6 +23,39 @@ Canonical overrides:
 - **Owner rulings:** short tests; iOS 27 at phase gates; reference regression and iOS 26 at X-A10; every Spec Kit step
   runs.
 
+## Clarifications
+
+### Session 2026-11-14
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+`ExperienceStorage.write(_:to:)` replaces a file atomically (readers see the complete old or new content; temporary
+files are hidden and a refused write leaves the stored file intact); `AnnouncementPlanner(minimumInterval:)` collapses
+announcements within an interval; `ExperienceFeedback.announce(_:kind:)` routes to VoiceOver; `GestureAlternatives`
+checks that every canvas gesture has a native control; Neon Arcade's drag uses a fixed reach of 1.5 units (A10-P01) and
+its snapshot is schema 3; Digital Aquarium's UI tests (`Apps/VisualCore/Tests/UI/DigitalAquarium`) open a candidate
+with `-vcCandidates` and find controls by `experience.<id>.<name>` identifiers.
+
+- Q: What are the five sensitivity steps and where are they kept? → A: Reaches 2.5, 2.0, 1.5 (default), 1.0 and 0.6
+  units of finger offset for full steering, steps 0 (gentle) … 4 (sharp); action `settings.sensitivity [0…4]` (whole
+  numbers, otherwise `a10.invalid-choice`); snapshot schema 4 adds `sensitivity` (migration 3 → 4 sets 2) and
+  `runNumber` (counts the runs started, migration sets 1 for a run in progress).
+- Q: What does the high-score table hold and how is it saved? → A: `HighScoreTable` (board version 1, at most 10
+  `HighScoreEntry(score, wave, run)` with score 1…9,999,999 and wave ≥ 1, highest score first, equal scores by earlier
+  run) stored as JSON in the experience's storage file `high-scores.json` with the atomic write; no date, name or
+  device data. The table also remembers the last run number entered, so a run's end is entered once. A file that does
+  not decode, has another board version or breaks the rules is reported ("high scores could not be read") and left in
+  place until the next completed run writes a valid table.
+- Q: How is "killed while saving" proved? → A: Host and simulator tests write a table, then simulate an interrupted
+  save by leaving a partial temporary file beside it (and by truncating a copy of the JSON), and read back the last
+  complete table; a truncated file on its own is reported as damaged. The scenario manifest adds a fixture that ends a
+  run (the table write itself happens in the presenter, outside the digest).
+- Q: What is announced, how often and in which words? → A: Through `AnnouncementPlanner(minimumInterval: 1.0)` and
+  the host's feedback route: "Hit, n lives left", "Wave n", "Game over, score s", "New high score s" (the last replaces
+  "Game over" when both apply); pickups are never announced; repeated events within a second collapse into the latest.
+- Q: What do the UI tests cover? → A: A new `Apps/VisualCore/Tests/UI/NeonArcade/` suite (support file plus one test
+  class) on the iOS 27 phone: open Neon Arcade as a candidate, Start, steer left and right with the buttons, pause and
+  resume, change the sensitivity, find the best-score label on the title screen; run in its own UI chunk.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Steering that suits my hands (Priority: P1) 🎯
