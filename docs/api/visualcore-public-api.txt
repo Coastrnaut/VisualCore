@@ -3,6 +3,7 @@ VisualCoreAudio | class | public final class AudioSessionEventMonitor
 VisualCoreAudio | class | public final class DemoAudioSource: AudioSource
 VisualCoreAudio | class | public final class FileAudioSource: AudioSource
 VisualCoreAudio | class | public final class MicrophoneAudioSource: ResumableAudioSource
+VisualCoreAudio | class | public final class SoundEffectPlayer
 VisualCoreAudio | class | public final class StereoFileAudioSource: StereoAudioSource
 VisualCoreAudio | class | public final class StereoMicrophoneAudioSource: StereoAudioSource
 VisualCoreAudio | class | public final class SystemMicrophonePermission: MicrophonePermission
@@ -14,13 +15,16 @@ VisualCoreAudio | enum | public enum AudioSourceState: Equatable, Sendable
 VisualCoreAudio | enum | public enum MicrophonePermissionState: Equatable, Sendable
 VisualCoreAudio | func | public func handle(_ event: AudioSessionEvent)
 VisualCoreAudio | func | public func handleNewRoute()
+VisualCoreAudio | func | public func play(_ effect: SoundEffect, id: String) -> Bool
 VisualCoreAudio | func | public func request() async -> MicrophonePermissionState
 VisualCoreAudio | func | public func resume()
 VisualCoreAudio | func | public func start(into buffer: SampleRingBuffer) throws
 VisualCoreAudio | func | public func start(into buffer: StereoSampleBuffer) throws
 VisualCoreAudio | func | public func stop()
+VisualCoreAudio | func | public func stopAll()
 VisualCoreAudio | func | public nonisolated static func map(_ permission: AVAudioApplication.recordPermission) -> MicrophonePermissionState
 VisualCoreAudio | init | public convenience init(permission: any MicrophonePermission)
+VisualCoreAudio | init | public convenience init(voices: Int = 4, sampleRate: Double = 48_000)
 VisualCoreAudio | init | public init()
 VisualCoreAudio | init | public init(center: NotificationCenter = .default, handler: @escaping @MainActor (AudioSessionEvent) -> Void)
 VisualCoreAudio | init | public init(signal: DemoSignal)
@@ -31,6 +35,7 @@ VisualCoreAudio | let | public let channelCount: Int
 VisualCoreAudio | let | public let frameCount: Int64
 VisualCoreAudio | let | public let sampleRate: Double
 VisualCoreAudio | let | public let url: URL
+VisualCoreAudio | let | public let voiceCount: Int
 VisualCoreAudio | let | public static let blockFrames
 VisualCoreAudio | let | public static let blockFrames: AVAudioFrameCount
 VisualCoreAudio | let | public static let chunkFrames: AVAudioFrameCount
@@ -47,6 +52,8 @@ VisualCoreAudio | var | public private(set) var awaitsResume
 VisualCoreAudio | var | public private(set) var channelCount: Int
 VisualCoreAudio | var | public private(set) var sampleRate: Double
 VisualCoreAudio | var | public private(set) var state: AudioSourceState
+VisualCoreAudio | var | public var activeVoices: Int
+VisualCoreAudio | var | public var isEnabled
 VisualCoreAudio | var | public var state: MicrophonePermissionState
 VisualCoreAudioDSP | class | public final class FeatureExtractor
 VisualCoreAudioDSP | class | public final class SampleRingBuffer: @unchecked Sendable
@@ -59,6 +66,8 @@ VisualCoreAudioDSP | enum | public enum LevelMeter
 VisualCoreAudioDSP | enum | public enum MinMaxDecimator
 VisualCoreAudioDSP | enum | public enum Mode: Int, Sendable, CaseIterable
 VisualCoreAudioDSP | enum | public enum ScopeTrigger
+VisualCoreAudioDSP | enum | public enum SoundEffectSynth
+VisualCoreAudioDSP | enum | public enum SoundWaveform: String, Sendable, Codable, CaseIterable
 VisualCoreAudioDSP | enum | public enum TriggerMode: Int, Sendable, CaseIterable
 VisualCoreAudioDSP | enum | public enum TriggerSlope: Int, Sendable, CaseIterable
 VisualCoreAudioDSP | enum | public enum Waveform: Int, Sendable, CaseIterable
@@ -92,10 +101,12 @@ VisualCoreAudioDSP | func | public static func expectedBin(frequency: Double, sa
 VisualCoreAudioDSP | func | public static func find(in samples: [Float], settings: TriggerSettings, searchRange: Range<Int>) -> Int?
 VisualCoreAudioDSP | func | public static func from(index: Int) -> AudioFeatureKind?
 VisualCoreAudioDSP | func | public static func makeExtractor(level: Int, sampleRate: Double) -> FeatureExtractor?
+VisualCoreAudioDSP | func | public static func noiseSeed(_ effect: SoundEffect) -> UInt64
 VisualCoreAudioDSP | func | public static func peak(_ samples: UnsafeBufferPointer<Float>) -> Float
 VisualCoreAudioDSP | func | public static func peakBin(_ magnitudesDB: [Float]) -> Int?
 VisualCoreAudioDSP | func | public static func periods(frequency: Double, sampleCount: Int, sampleRate: Double) -> Double
 VisualCoreAudioDSP | func | public static func reduce(_ samples: [Float], columns: Int) -> [ColumnRange]
+VisualCoreAudioDSP | func | public static func render(_ effect: SoundEffect, sampleRate: Double = defaultSampleRate) -> [Float]
 VisualCoreAudioDSP | func | public static func rms(_ samples: UnsafeBufferPointer<Float>) -> Float
 VisualCoreAudioDSP | func | public static func silent(bandCount: Int) -> AudioFeatures
 VisualCoreAudioDSP | init | public init(attack: Double, release: Double)
@@ -108,6 +119,7 @@ VisualCoreAudioDSP | init | public init(min: Float, max: Float)
 VisualCoreAudioDSP | init | public init(secondsPerDivision: Double)
 VisualCoreAudioDSP | init | public init(seed: UInt64, mode: Mode, sampleRate: Double = 48_000)
 VisualCoreAudioDSP | init | public init(timestamp: Double, rms: Float, peak: Float, bandEnergies: [Float], flux: Float, onset: Bool,
+VisualCoreAudioDSP | init | public init(waveform: SoundWaveform, startFrequency: Double, endFrequency: Double, duration: Double,
 VisualCoreAudioDSP | init | public init(waveform: Waveform, frequency: Double = TestSignal.defaultFrequency,
 VisualCoreAudioDSP | init | public init?(bandCount: Int = 16, lowestFrequency: Double = 40, highestFrequency: Double = 16_000,
 VisualCoreAudioDSP | init | public init?(channel: Int = 0, level: Double = 0, slope: TriggerSlope = .rising,
@@ -157,8 +169,10 @@ VisualCoreAudioDSP | let | public static let defaultHysteresis
 VisualCoreAudioDSP | let | public static let defaultSampleRate
 VisualCoreAudioDSP | let | public static let defaultSweepDuration
 VisualCoreAudioDSP | let | public static let defaultSweepEnd
+VisualCoreAudioDSP | let | public static let durationRange: ClosedRange<Double>
 VisualCoreAudioDSP | let | public static let floorDB: Float
 VisualCoreAudioDSP | let | public static let frequencyRange
+VisualCoreAudioDSP | let | public static let frequencyRange: ClosedRange<Double>
 VisualCoreAudioDSP | let | public static let gainRange: ClosedRange<Double>
 VisualCoreAudioDSP | let | public static let hysteresisRange
 VisualCoreAudioDSP | let | public static let levelWindowDB: ClosedRange<Float>
@@ -171,9 +185,11 @@ VisualCoreAudioDSP | let | public static let maximumCapacityFrames
 VisualCoreAudioDSP | let | public static let maximumSize
 VisualCoreAudioDSP | let | public static let minimumCapacity
 VisualCoreAudioDSP | let | public static let minimumCapacityFrames
+VisualCoreAudioDSP | let | public static let minimumFade
 VisualCoreAudioDSP | let | public static let minimumSize
 VisualCoreAudioDSP | let | public static let minimumTimeConstant: Double
 VisualCoreAudioDSP | let | public static let noiseAmplitude: Float
+VisualCoreAudioDSP | let | public static let noiseRange: ClosedRange<Double>
 VisualCoreAudioDSP | let | public static let noteDuration
 VisualCoreAudioDSP | let | public static let pentatonic: [Double]
 VisualCoreAudioDSP | let | public static let regionWindowDB: ClosedRange<Float>
@@ -194,6 +210,7 @@ VisualCoreAudioDSP | struct | public struct ColumnRange: Sendable, Equatable
 VisualCoreAudioDSP | struct | public struct DemoSignal: Sendable
 VisualCoreAudioDSP | struct | public struct FeatureSmoother: Sendable, Equatable
 VisualCoreAudioDSP | struct | public struct OnsetDetector: Sendable
+VisualCoreAudioDSP | struct | public struct SoundEffect: Sendable, Equatable, Codable
 VisualCoreAudioDSP | struct | public struct SpectrumAnalyzer: Sendable
 VisualCoreAudioDSP | struct | public struct TestSignal: Sendable, Equatable
 VisualCoreAudioDSP | struct | public struct TimebaseWindow: Sendable, Equatable
@@ -206,11 +223,15 @@ VisualCoreAudioDSP | var | public var bandEnergies: [Float]
 VisualCoreAudioDSP | var | public var beatEnergy: Float
 VisualCoreAudioDSP | var | public var clampHigh: Double
 VisualCoreAudioDSP | var | public var clampLow: Double
+VisualCoreAudioDSP | var | public var duration: Double
+VisualCoreAudioDSP | var | public var endFrequency: Double
 VisualCoreAudioDSP | var | public var feature: AudioFeatureKind
 VisualCoreAudioDSP | var | public var features: AudioFeatures
 VisualCoreAudioDSP | var | public var flux: Float
 VisualCoreAudioDSP | var | public var gain: Double
 VisualCoreAudioDSP | var | public var index: Int
+VisualCoreAudioDSP | var | public var isValid: Bool
+VisualCoreAudioDSP | var | public var noise: Double
 VisualCoreAudioDSP | var | public var onset: Bool
 VisualCoreAudioDSP | var | public var peak: Float
 VisualCoreAudioDSP | var | public var peakDB: Float
@@ -220,9 +241,11 @@ VisualCoreAudioDSP | var | public var rmsDB: Float
 VisualCoreAudioDSP | var | public var sampleRate: Double
 VisualCoreAudioDSP | var | public var size: Int
 VisualCoreAudioDSP | var | public var smoothed: Double
+VisualCoreAudioDSP | var | public var startFrequency: Double
 VisualCoreAudioDSP | var | public var timestamp: Double
 VisualCoreAudioDSP | var | public var totalFrames: Int
 VisualCoreAudioDSP | var | public var totalWritten: Int
+VisualCoreAudioDSP | var | public var waveform: SoundWaveform
 VisualCoreAutomation | class | public final class AutomationRunner
 VisualCoreAutomation | class | public final class Coordinator
 VisualCoreAutomation | enum | public enum AutomationInfo
