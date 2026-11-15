@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-15 (A14-P04 convergence: canvas overlay tests, documented-API check, injected clocks).
+Last updated: 2026-11-15 (A14-P05: generated review documents, quality levels compared by digest, state-count slip).
 
 ## 1. What is tested, and where
 
@@ -97,6 +97,11 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
 
 ### Determinism and digests
 
+- **Generated documents are tests too.** `data-sources.md` and `scientific-review.md` are produced by core functions
+  and compared with the committed files (`UPDATE_DATA_SOURCES=1`, `UPDATE_SCIENTIFIC_REVIEW=1` and their
+  `TEST_RUNNER_` forms rewrite them), so a data change cannot leave the documents stale.
+- **Quality levels change drawing only.** Two-level tests compare the state digest, the recorded body centres and the
+  camera at each level, and switch levels mid-flight and mid-tour (A14-P05).
 - **Pinned digests change with every state schema.** A scenario fixture's digest covers the state's JSON; adding a
   field re-pins every fixture. Pin from the first run's "derived" values, then rerun the manifest tests to prove them.
 - **The scenario-manifest validator wants an outcome for the completion scenario,** so every experience defines one
@@ -111,6 +116,8 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   18,627.5 days after J2000.0 is 2051-01-01 00:00 UTC, not 2050-12-31, and 60 × 1.25^−12 is 4.12, not 4.03.
 - **Make seams exact.** A noise sampled at a unit direction still differs at the date line (sin 2π ≈ −2.4e-16); rounding
   directions to a 2^−30 grid made seam and pole vertices identical.
+- **Count combinations before writing them down.** A spec said 72 sampled states for 9 × 2 × 3 × 2 × 2 (216); the
+  test that counted them caught it (A14-P05). Let tests count enumerations instead of hard-coding a number first.
 - **Quantise before hashing floats** for digests that must match across platforms (surface colours are hashed as
   16-bit values).
 

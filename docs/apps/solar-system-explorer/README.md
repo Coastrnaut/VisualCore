@@ -24,8 +24,11 @@ navigation, with distances and sizes labelled not to scale. A14-P03 the 3D bodie
 eased focus flight that never enters a body (cut by Reduce Motion) and two scale modes — visibility-enhanced, labelled
 not to scale, and true-relative, with markers for bodies too small to see. A14-P04 time and tours: play, pause and
 four rates (a day to a year per second) with the UTC date and time, "Now", two captioned guided tours (inner and giant
-planets) with pause, skip and stop, a saved view, and body labels on the canvas. A14-P05 reviews the data, wording and
-scale labels (G-REVIEW).
+planets) with pause, skip and stop, a saved view, and body labels on the canvas. A14-P05 reviewed it: a generated
+[scientific review](scientific-review.md) checks the model against four Mars oppositions and three Earth perihelia
+(all within ±3 days), the app states the model's limits ("About this model"), the not-to-scale label is proven in every
+sampled state, and two detail levels are declared; the [device campaign](device-campaign.md) lists what waits for real
+devices.
 
 | Document | Content |
 |---|---|
