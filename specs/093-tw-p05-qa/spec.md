@@ -44,7 +44,7 @@ builds props from four meshes drawn once per placed prop (A12-P03).
   Playground) and memory warnings (the presenter's `shedCaches()`); the experience adds no thermal reading of its own.
 - Q: What does each tier change? → A: Only the terrain's detail level (tier i draws terrain level i: 64/32/16 cells,
   city 48/24/12) and therefore its vertex count; every placed prop and the sea are always drawn (they are part of the
-  world), so the draw count is 2 + props at every tier and the thumbnail is always 160 × 120 drawn at the current tier.
+  world), so the draw count is the world parts (terrain, plus the sea for the island and the city) + props at every tier and the thumbnail is always 160 × 120 drawn at the current tier.
   Lower tiers never raise a count.
 - Q: Which rules choose the tier? → A: tier = max(host level, Low Power floor, memory floor): Low Power Mode on → the
   lowest tier (2) while on; a memory warning → the lowest tier at once, released 30 s after the last warning (repeated
@@ -78,7 +78,8 @@ chosen tier, the counts and the world digest.
 1. **Given** a world at full detail, **When** a memory warning arrives, **Then** the lowest tier is used within one
    frame and its counts stay within budget, and the world's digest is unchanged.
 2. **Given** a serious or critical thermal state or Low Power Mode, **When** the policy runs, **Then** the tier steps
-   down as stated, and steps back up only after the pressure has eased for the stated time.
+   down as stated, and steps back up when the pressure passes: heat after the host governor's hold, Low Power Mode when
+   it ends, a memory warning 30 s of frame time after the last.
 
 ---
 
@@ -155,7 +156,7 @@ claims accuracy or measured performance.
 
 ### Key Entities
 
-- **Tier**: index 0…2, terrain cells (columns × rows per preset), draw count (2 + props), thumbnail size (160 × 120).
+- **Tier**: index 0…2, terrain cells (columns × rows per preset), draw count (world parts — terrain, plus the sea for the island and the city — + props), thumbnail size (160 × 120).
 - **Pressure**: the host's quality level (thermal state through the host's governor), Low Power Mode, memory warnings
   (held 30 s of frame time after the last).
 

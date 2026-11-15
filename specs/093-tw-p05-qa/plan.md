@@ -5,7 +5,7 @@
 ## Summary
 
 Close G-DETAIL in the experience, with no VisualCore change: a pure `DetailTier` table (terrain cells per preset and
-tier, draws = 2 + props, thumbnail 160 × 120) and a pure `TierPolicy` (tier = max(host level, Low Power floor, memory
+tier, draws = world parts + props, thumbnail 160 × 120) and a pure `TierPolicy` (tier = max(host level, Low Power floor, memory
 floor), the memory floor held 30 s on the presenter's frame clock after the last warning) live in the core; the
 presenter applies the policy before drawing, rebuilds only the terrain renderer at most once per tier change, and
 records memory warnings in `shedCaches()`; the factory injects Low Power Mode (`lowPowerMode`) as Physics Playground

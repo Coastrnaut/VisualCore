@@ -7,7 +7,7 @@ Facts verified on 2026-11-15 (clarification session and the plan's read-only aud
 ## D1 — Tier table
 
 - **Decision**: `DetailTier` (core): tier i draws terrain level i (`TerrainDetail.columns/rows(preset:level:)`:
-  64/32/16 cells, city 48/24/12); draws per frame = 2 + props (terrain, sea, each prop once); thumbnail 160 × 120 at
+  64/32/16 cells, city 48/24/12); draws per frame = world parts + props (terrain, the sea for the island and the city, each prop once); thumbnail 160 × 120 at
   every tier. Terrain vertices = (cols + 1) × (rows + 1) at each tier, strictly decreasing.
 - **Rationale**: the props and the sea are part of the world; removing them would change what the person sees and
   saves. The terrain carries almost all vertices.
