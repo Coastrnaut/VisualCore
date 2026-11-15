@@ -164,6 +164,9 @@ approximations.
 
 - **Too many bodies:** the world has a body cap; dropping beyond it is refused, not queued.
 - **A body dropped overlapping another:** the contact pushes them apart over the next ticks without non-finite values.
+- **Walls and the ledge:** the four walls are static with restitution 0 and friction 0.5 (so a body's own restitution
+  decides its bounce through max(eA, eB)); the ledge is a static body of the steel material. The two-body momentum
+  fixture uses a test material of restitution 1 inside the catalog's 0…1 range.
 - **Very fast bodies:** speeds are capped; the floor and walls are thick enough that a capped body cannot cross them
   in one tick.
 - **Resting stacks:** may jitter slightly in this phase; bounded resting stacks are A11-P02's fixture.
