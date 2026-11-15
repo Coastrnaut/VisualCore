@@ -35,3 +35,15 @@
   document and thumbnails → app-local (A12-P03); the three environment packs → app-local (A12-P04); the detail tier
   over `StreamingBudget` and `MeshBudget` with memory and thermal limits → app-local (A12-P05). Alternative rejected:
   app-local noise (constitution A12 reuse first: seeded noise and height fields are generic).
+
+## 2. As found by the audit (2026-11-15)
+
+- **D4 corrected:** constrained orbit and zoom already exist in `VisualCoreMath` — `OrbitBounds`
+  (`CameraBounds.swift`) and `OrbitViewBounds` (pitch limit, distance range, pan radius, field-of-view range, clearance
+  sphere; added at A05-P03, tested). What remains for Tiny Worlds is the world-specific clearance above its own
+  terrain, per-world limits and Reduce Motion easing: app-local, gap G-CAMERA (A12-P02).
+- Two owners the clarification did not name: a per-vertex colour stream for distinguishable surfaces, gap G-MATERIALS
+  → `VisualCoreRendering` (A12-P02); ray intersection against boxes, spheres and triangles for picking, gap
+  G-PICKING → `VisualCoreMath` (A12-P02), using the height sampler of G-TERRAIN for the terrain itself.
+- The contract (`docs/apps/tiny-worlds/visualcore-contract.json`) holds 21 rows (11 available, 8 requires adaptation,
+  2 upstream gap) and 10 gaps; decision go.

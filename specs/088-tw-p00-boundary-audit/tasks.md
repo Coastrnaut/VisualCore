@@ -49,4 +49,4 @@ MVP is US1 (the matrix) with US2 (reference); US3 and US4 complete the gate.
 
 ## Phase 8: Convergence
 
-- [ ] T-A12-012 Record in `specs/088-tw-p00-boundary-audit/research.md` the audit's correction of D4 (constrained orbit and zoom already exist as `OrbitBounds` and `OrbitViewBounds` in `VisualCoreMath` since A05-P03; the remaining world-specific clearance is app-local, G-CAMERA; per-vertex colour G-MATERIALS is assigned to `VisualCoreRendering`, G-PICKING to `VisualCoreMath`) per plan: research D4 (partial)
+- [X] T-A12-012 Record in `specs/088-tw-p00-boundary-audit/research.md` the audit's correction of D4 (constrained orbit and zoom already exist as `OrbitBounds` and `OrbitViewBounds` in `VisualCoreMath` since A05-P03; the remaining world-specific clearance is app-local, G-CAMERA; per-vertex colour G-MATERIALS is assigned to `VisualCoreRendering`, G-PICKING to `VisualCoreMath`) per plan: research D4 (partial) — Verified 2026-11-15: 2026-11-15: research.md §2 'As found by the audit' records the D4 correction (OrbitBounds, OrbitViewBounds exist; G-CAMERA app-local) and the G-MATERIALS and G-PICKING owners; validate_docs passes in the tick
