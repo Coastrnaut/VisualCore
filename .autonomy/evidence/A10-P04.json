@@ -1,0 +1,50 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/A10-P04.app-ui.json",
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27 app-ui-ios27-r2",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A10-P04.app-ui.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A10-P04.arcade-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing NeonArcadeCoreTests NeonArcadeExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A10-P04.arcade-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A10-P04.contract.json",
+      "command": "python3 scripts/check_app_contract.py --app neon-arcade --render",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A10-P04.contract.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A10-P04.experience-packages.json",
+      "command": "python3 scripts/check_experience_packages.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A10-P04.experience-packages.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A10-P04.script-tests-2.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A10-P04.script-tests-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A10-P04.script-tests-3.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A10-P04.script-tests-3.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A10-P04.verify-27.json",
+      "command": "python3 scripts/verify_experiences.py --only a10.neon-arcade --runtime 27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A10-P04.verify-27.log"
+    }
+  ],
+  "generated": "2026-11-15T04:48:06+00:00",
+  "method": "deterministic-run-check",
+  "stage": "A10-P04",
+  "status": "pass"
+}
