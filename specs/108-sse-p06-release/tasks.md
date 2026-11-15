@@ -12,7 +12,7 @@ X-A14. Precedent: `specs/101-lm-p06-release/tasks.md`.
 
 ## Phase 2: Story 1 — privacy
 
-- [ ] T-A14-602 [P] [US1] Write `docs/apps/solar-system-explorer/privacy-and-credits.md` per research D1 (stored: `view.json` in the experience's folder and the app's session state; nothing sent; deletion; credits for NASA NSSDCA fact sheets, the IAU 2015 B3 constant, E. M. Standish / JPL elements, the USNO and NASA event dates, each with its licence) (FR-A14-604)
+- [X] T-A14-602 [P] [US1] Write `docs/apps/solar-system-explorer/privacy-and-credits.md` per research D1 (stored: `view.json` in the experience's folder and the app's session state; nothing sent; deletion; credits for NASA NSSDCA fact sheets, the IAU 2015 B3 constant, E. M. Standish / JPL elements, the USNO and NASA event dates, each with its licence) (FR-A14-604) — Verified 2026-11-15: docs/apps/solar-system-explorer/privacy-and-credits.md: stored view.json and session state, nothing sent, deletion paths, no permission, required-reason APIs and credits with licences; every cited test exists (12 of 12 found by grep) and the manifest reasons CA92.1, 35F9.1, C617.1 match PrivacyInfo.xcprivacy
 - [X] T-A14-603 [US1] Write `specs/108-sse-p06-release/scan-sources-release.sh` refusing the uses of Clarifications Q3 in `Packages/ExperiencesCreative/SolarSystemExplorer` and run it (`--name sse-no-network -- sh specs/108-sse-p06-release/scan-sources-release.sh`) (FR-A14-601, 602; SC-A14-601) — Verified 2026-11-15: 2026-11-15: specs/108-sse-p06-release/scan-sources-release.sh refuses the uses of clarification Q3; .autonomy/checks/A14-P06.sse-no-network.json exit 0 (no scanned use in 68 Swift files); the a14 registration declares no permission
 
 ## Phase 3: Story 2 — data and recovery
