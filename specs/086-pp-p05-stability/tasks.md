@@ -8,7 +8,7 @@ open until ImplementationLock-100. Precedents: `specs/079-na-p05-balance/tasks.m
 
 ## Phase 1: Setup
 
-- [ ] T-A11-501 Baseline: cite the A11-P04 evidence on the unchanged tree (`.autonomy/checks/A11-P04.{playground-ios27,app-unit,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14)
+- [X] T-A11-501 Baseline: cite the A11-P04 evidence on the unchanged tree (`.autonomy/checks/A11-P04.{playground-ios27,app-unit,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14) — Verified 2026-11-15: 2026-11-15: cited .autonomy/checks/A11-P04.{playground-ios27,app-unit,verify-27}.json on the unchanged tree (no rerun)
 
 ## Phase 2: Foundational — sleep, work count, drawing budgets in the core
 
