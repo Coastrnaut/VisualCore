@@ -8,7 +8,7 @@ device campaign (owner, 2026-11-13/14). Precedent: `specs/077-na-p03-effects/tas
 
 ## Phase 1: Setup
 
-- [ ] T-A10-401 Baseline: cite the A10-P03 evidence on the unchanged tree (`.autonomy/checks/A10-P03.{arcade-ios27,app-unit,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14)
+- [X] T-A10-401 Baseline: cite the A10-P03 evidence on the unchanged tree (`.autonomy/checks/A10-P03.{arcade-ios27,app-unit,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14) — Verified 2026-11-14: 2026-11-14: cited .autonomy/checks/A10-P03.{arcade-ios27,app-unit,verify-27}.json on the unchanged tree (no rerun)
 
 ## Phase 2: Foundational — core sensitivity, table and announcements
 
