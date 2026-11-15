@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesCreative",
+    "--scheme",
+    "ExperiencesCreative-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "NeonArcadeCoreTests",
+    "NeonArcadeExperienceTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing NeonArcadeCoreTests NeonArcadeExperienceTests",
+  "elapsed_seconds": 8.562,
+  "exit_code": 0,
+  "finished": "2026-11-15T03:34:45+00:00",
+  "log": ".autonomy/logs/A10-P02.arcade-ios27.log",
+  "log_sha256": "ab5d37e94c462f965a4ed3ee7cb9aa08a9489234be07631ca40ed5c28462bd1d",
+  "name": "arcade-ios27",
+  "stage": "A10-P02",
+  "started": "2026-11-15T03:34:36+00:00",
+  "timed_out": false
+}

@@ -7,6 +7,9 @@
 // as the bare replay; the state saved by the shell restores identically in a new session; newer and damaged saved
 // states are refused and a new run opens; Reduce Motion halves the glow pulse and the background drift but never
 // changes the state; reopening keeps the drawing resources steady.
+// Feature 076 (A10-P02) T-A10-203 (FR-A10-211; SC-A10-204): a session restored in wave 3 and suspended for several
+// lengths (with frames requested meanwhile) keeps wave, wave step, step, objects and score identical, and the resume
+// continues from the same step; the description names the wave; schema 3 is the newer saved state.
 import Foundation
 import XCTest
 import VisualCoreDiagnostics
@@ -33,7 +36,7 @@ final class ArcadeSessionTests: XCTestCase {
         XCTAssertEqual(presenter.lastScoreText, "0")
         XCTAssertEqual(presenter.lastLivesLit, 3)
         let summary = shell.accessibilitySummary
-        XCTAssertTrue(summary.hasPrefix("Neon Arcade: Neon Dodge, score 0, 3 lives, "), summary)
+        XCTAssertTrue(summary.hasPrefix("Neon Arcade: Neon Dodge, wave 1, score 0, 3 lives, "), summary)
         XCTAssertTrue(summary.hasSuffix("playing."), summary)
         XCTAssertTrue(presenter.mirror.ready)
         XCTAssertEqual(presenter.nativeActions, Set(ArcadeCore.actionIDs))
@@ -94,6 +97,59 @@ final class ArcadeSessionTests: XCTestCase {
         try ArcadeTest.frames(session, 1)
         let resumed = try ArcadeTest.core(shell)
         XCTAssertLessThanOrEqual(resumed.run.step - before.run.step, 2, "one frame's steps, never the suspended time")
+        session.close()
+    }
+
+    /// The saved state of seed 7 after the wave fixture's inputs to step 1,300: wave 3 (`wall`), alive.
+    private func waveThreeSnapshot() async throws -> ExperienceSnapshot {
+        var engine = ExperienceEngine<ArcadeCore>(id: ArcadeTest.id)
+        try await engine.prepare(seed: 7)
+        try engine.activate()
+        for input in ArcadeCore.waveInputs where input.step < ArcadeCore.waveThreeSteps {
+            try engine.run(steps: input.step - engine.stepIndex)
+            XCTAssertEqual(engine.handle(control: "run.steer", values: [input.value]), .accepted)
+        }
+        try engine.run(steps: ArcadeCore.waveThreeSteps - engine.stepIndex)
+        let run = try XCTUnwrap(engine.core).run
+        XCTAssertEqual(run.wave, 3)
+        XCTAssertFalse(run.over)
+        return try engine.snapshot()
+    }
+
+    /// T-A10-203 (SC-A10-204): suspensions of 0, 50 and 250 ms in wave 3, with 1, 10 and 60 frames requested while
+    /// suspended, leave wave, wave step, step, objects and score identical; each resume continues from the same step.
+    func testASuspensionOfAnyLengthInWaveThreeChangesNothing() async throws {
+        let snapshot = try await waveThreeSnapshot()
+        let session = ExperienceSession()
+        let shell = try await ArcadeTest.open(session, snapshot: snapshot)
+        XCTAssertNil(session.lastRestoreRefusal)
+        XCTAssertEqual(try ArcadeTest.core(shell).run.wave, 3)
+        XCTAssertTrue(shell.accessibilitySummary.contains("wave 3"), shell.accessibilitySummary)
+        for (milliseconds, frames) in [(0, 1), (50, 10), (250, 60)] {
+            let before = try ArcadeTest.core(shell)
+            let stepIndex = shell.engine.stepIndex
+            session.setScenePhase(.background)
+            XCTAssertEqual(shell.state, .suspended)
+            for _ in 0..<frames { _ = session.renderHost?.renderOneFrame(present: false) }
+            if milliseconds > 0 { try await Task.sleep(for: .milliseconds(milliseconds)) }
+            let held = try ArcadeTest.core(shell)
+            XCTAssertEqual(held.run.wave, before.run.wave, "\(milliseconds) ms")
+            XCTAssertEqual(held.run.waveStep, before.run.waveStep, "\(milliseconds) ms")
+            XCTAssertEqual(held.run.step, before.run.step, "\(milliseconds) ms")
+            XCTAssertEqual(held.run.objects, before.run.objects, "\(milliseconds) ms")
+            XCTAssertEqual(held.run.score, before.run.score, "\(milliseconds) ms")
+            XCTAssertEqual(held, before, "\(milliseconds) ms: nothing moves while suspended")
+            XCTAssertEqual(shell.engine.stepIndex, stepIndex)
+
+            session.setScenePhase(.active)
+            XCTAssertEqual(shell.state, .active)
+            XCTAssertEqual(try ArcadeTest.core(shell), before, "the resume continues from the same step")
+            try ArcadeTest.frames(session, 1)
+            let resumed = try ArcadeTest.core(shell)
+            XCTAssertLessThanOrEqual(resumed.run.step - before.run.step, 2,
+                                     "one frame's steps, never the suspended time")
+            XCTAssertEqual(resumed.run.wave, 3)
+        }
         session.close()
     }
 
@@ -171,7 +227,7 @@ final class ArcadeSessionTests: XCTestCase {
         try ArcadeTest.frames(first, 60)
         let saved = try shell.snapshot()
         first.close()
-        let newer = try ExperienceSnapshot(experience: ArcadeTest.id, schemaVersion: 2, seed: saved.seed,
+        let newer = try ExperienceSnapshot(experience: ArcadeTest.id, schemaVersion: 3, seed: saved.seed,
                                            stepIndex: saved.stepIndex, digest: saved.digest,
                                            payload: Data(saved.payload.utf8))
 

@@ -16,6 +16,11 @@
 //   - Score and lives: the score in seven-segment digits (lines) at the top left of the field, the lives as three
 //     small circles at the top right (lost lives faint). Paused: two bars in the middle; over: a dark shade over the
 //     field and a cross in the hazard colour.
+//   - Waves (feature 076, A10-P02, T-A10-203; FR-A10-220; clarification 5): five dim lane guides — thin vertical lines
+//     (0.03 units, faint cyan at alpha 0.07) at the lane centres `Lanes.centres` from y 2 (above the player's band, keeping the
+//     bottom-centre frame probe on plain field) to the top of the field, drawn under the glows, objects, player and HUD so they never hide or resize a collision shape — and the
+//     wave number in the same seven-segment digits beside the score (from x 4.6, at most three digits, in cyan). The
+//     spoken description names the wave ("wave 3"). Rule sizes are unchanged.
 // Reduce Motion halves the glow pulse amplitude (0.15 → 0.075) and the background drift speed (0.6 → 0.3 units/s);
 // the game itself — and so the core's state and digest — never depends on it. Nothing flashes. No audio.
 // The canvas drag goes through `ArcadeGestures` (`run.steer`); every action also has a native control.
@@ -110,6 +115,16 @@ final class ArcadePresenter: ExperiencePresenter {
     ]
     /// The centre of the first life marker, the spacing to the next (leftwards) and the marker radius, game units.
     nonisolated static let livesOrigin = Vec2(8.6, 15.35), livesSpacing = 0.45, lifeRadius = 0.17
+    /// The colour of the lane guides: faint cyan.
+    nonisolated static let laneColor = Vec4(0.13, 0.9, 1.0, 0.07)
+    /// The width of a lane guide in game units.
+    nonisolated static let laneWidth = 0.03
+    /// The most digits of the wave number (999).
+    nonisolated static let maxWaveDigits = 3
+    /// The top-left corner of the wave number's first digit in game units (beside the score's seven digits).
+    nonisolated static let waveOrigin = Vec2(4.6, 15.65)
+    /// The colour of the wave digits.
+    nonisolated static let waveColor = Vec4(0.13, 0.9, 1.0, 0.9)
     /// The colour of the score digits.
     nonisolated static let hudColor = Vec4(0.85, 0.98, 1.0, 1)
     /// The alpha of a lost life's marker.
@@ -120,9 +135,9 @@ final class ArcadePresenter: ExperiencePresenter {
     nonisolated static let overShade = Vec4(0, 0, 0, 0.45)
     /// The fallback colours of an object whose item is not in the catalog.
     nonisolated static let fallbackHazard = Vec4(1.0, 0.2, 0.45, 1), fallbackOrb = Vec4(0.75, 1.0, 0.3, 1)
-    /// The z of the field, the drift lines, the glows, the objects, the player, the HUD, the pause and over marks and
-    /// the letterbox masks.
-    nonisolated static let fieldZ = 0, driftZ = 1, glowZ = 2, objectZ = 3, playerZ = 4, hudZ = 6, stateZ = 7,
+    /// The z of the field, the drift lines, the lane guides, the glows, the objects, the player, the HUD, the pause
+    /// and over marks and the letterbox masks.
+    nonisolated static let fieldZ = 0, driftZ = 1, laneZ = 1, glowZ = 2, objectZ = 3, playerZ = 4, hudZ = 6, stateZ = 7,
                            maskZ = 9
     /// The field point (game units) near the bottom centre where the frame probe is taken when it lies in the field.
     nonisolated static let probeMargin = 0.35
@@ -144,6 +159,8 @@ final class ArcadePresenter: ExperiencePresenter {
     private(set) var lastObjectsDrawn = 0
     /// The score text and the number of lit lives of the last frame.
     private(set) var lastScoreText = "", lastLivesLit = 0
+    /// The wave text of the last frame.
+    private(set) var lastWaveText = ""
     /// The state mark of the last frame: "none", "paused" (two bars) or "over" (shade and cross).
     private(set) var lastStateMark = "none"
     /// The glow pulse amplitude and the drift speed the last frame was drawn with.
@@ -161,6 +178,8 @@ final class ArcadePresenter: ExperiencePresenter {
     let field = SceneNode(id: "field", z: ArcadePresenter.fieldZ)
     /// The drifting background lines.
     private(set) var driftNodes: [SceneNode] = []
+    /// The five lane guides.
+    private(set) var laneNodes: [SceneNode] = []
     /// The glow, body and two capsule end nodes of each object slot.
     private(set) var glowNodes: [SceneNode] = [], bodyNodes: [SceneNode] = []
     private var capNodes: [(SceneNode, SceneNode)] = []
@@ -170,6 +189,8 @@ final class ArcadePresenter: ExperiencePresenter {
     let playerChevron = SceneNode(id: "player.chevron", z: ArcadePresenter.playerZ)
     /// The seven segment nodes of each score digit.
     private var digitNodes: [[SceneNode]] = []
+    /// The seven segment nodes of each wave digit.
+    private(set) var waveDigitNodes: [[SceneNode]] = []
     /// The life markers.
     private(set) var lifeNodes: [SceneNode] = []
     private var pauseNodes: [SceneNode] = []
@@ -189,6 +210,11 @@ final class ArcadePresenter: ExperiencePresenter {
             let node = SceneNode(id: "drift\(index)", z: Self.driftZ)
             root.add(node)
             driftNodes.append(node)
+        }
+        for lane in 0..<Lanes.count {
+            let node = SceneNode(id: "lane\(lane)", z: Self.laneZ)
+            root.add(node)
+            laneNodes.append(node)
         }
         for slot in 0..<GameRun.maxObjects {
             let glow = SceneNode(id: "o\(slot).glow", z: Self.glowZ)
@@ -211,6 +237,15 @@ final class ArcadePresenter: ExperiencePresenter {
                 segments.append(node)
             }
             digitNodes.append(segments)
+        }
+        for digit in 0..<Self.maxWaveDigits {
+            var segments: [SceneNode] = []
+            for segment in 0..<7 {
+                let node = SceneNode(id: "wave\(digit).\(segment)", z: Self.hudZ)
+                root.add(node)
+                segments.append(node)
+            }
+            waveDigitNodes.append(segments)
         }
         for life in 0..<GameRun.startLives {
             let node = SceneNode(id: "life\(life)", z: Self.hudZ)
@@ -342,6 +377,35 @@ final class ArcadePresenter: ExperiencePresenter {
         String(String(min(max(score, 0), GameRun.maxScore)).suffix(maxDigits))
     }
 
+    /// The wave number as drawn: its decimal digits, at most ``maxWaveDigits`` (999 and above draw 999).
+    nonisolated static func waveText(_ wave: Int) -> String {
+        String(min(max(wave, 1), 999))
+    }
+
+    /// The two ends of lane guide `lane` (game units): the lane centre from `driftBottom` to the top of the field, so
+    /// the band with the player and the frame probe at the bottom centre stay plain field.
+    nonisolated static func laneGuideEnds(_ lane: Int) -> (Vec2, Vec2) {
+        let x = Lanes.centre(lane)
+        return (Vec2(x, driftBottom), Vec2(x, fieldHeight))
+    }
+
+    /// Lights the segments of `text`'s digits in `nodes` from `origin` (game units) in `color`; unused nodes are
+    /// cleared.
+    private static func drawDigits(_ text: String, nodes: [[SceneNode]], origin: Vec2, color: Vec4,
+                                   world: (Vec2) -> Vec2, width: Double) {
+        let digits = text.compactMap { $0.wholeNumberValue }
+        for (index, segments) in nodes.enumerated() {
+            for node in segments { node.primitive = nil }
+            guard index < digits.count else { continue }
+            let digitOrigin = origin + Vec2(Double(index) * digitAdvance, 0)
+            for segment in segmentTable[digits[index]] {
+                let (a, b) = segmentEnds(segment, origin: digitOrigin)
+                segments[segment].primitive = .line(world(a), world(b), width: width)
+                segments[segment].color = color
+            }
+        }
+    }
+
     /// A catalog colour as a vector.
     nonisolated static func vector(_ color: RGBA) -> Vec4 { Vec4(color.r, color.g, color.b, color.a) }
 
@@ -382,6 +446,12 @@ final class ArcadePresenter: ExperiencePresenter {
             let y = Self.driftLineY(index: index, offset: offset)
             node.primitive = .line(world(Vec2(0, y)), world(Vec2(Self.fieldWidth, y)), width: px(0.03))
             node.color = Self.driftColor
+        }
+
+        for (lane, node) in laneNodes.enumerated() {
+            let (bottom, top) = Self.laneGuideEnds(lane)
+            node.primitive = .line(world(bottom), world(top), width: px(Self.laneWidth))
+            node.color = Self.laneColor
         }
 
         let glowAlpha = Self.glowAlpha(step: run.step, amount: pulse)
@@ -433,17 +503,12 @@ final class ArcadePresenter: ExperiencePresenter {
 
         let text = Self.scoreText(run.score)
         lastScoreText = text
-        let digits = text.compactMap { $0.wholeNumberValue }
-        for (index, segments) in digitNodes.enumerated() {
-            for node in segments { node.primitive = nil }
-            guard index < digits.count else { continue }
-            let origin = Self.digitOrigin + Vec2(Double(index) * Self.digitAdvance, 0)
-            for segment in Self.segmentTable[digits[index]] {
-                let (a, b) = Self.segmentEnds(segment, origin: origin)
-                segments[segment].primitive = .line(world(a), world(b), width: px(Self.segmentWidth))
-                segments[segment].color = Self.hudColor
-            }
-        }
+        Self.drawDigits(text, nodes: digitNodes, origin: Self.digitOrigin, color: Self.hudColor, world: world,
+                        width: px(Self.segmentWidth))
+        let waveText = Self.waveText(run.wave)
+        lastWaveText = waveText
+        Self.drawDigits(waveText, nodes: waveDigitNodes, origin: Self.waveOrigin, color: Self.waveColor, world: world,
+                        width: px(Self.segmentWidth))
         var lit = 0
         for (index, node) in lifeNodes.enumerated() {
             let alive = index < run.lives
@@ -531,10 +596,11 @@ final class ArcadePresenter: ExperiencePresenter {
         "score \(run.score), \(livesWords(run.lives)), \(stateWord(run))"
     }
 
-    /// The canvas description, for example "Neon Arcade: Neon Dodge, score 120, 2 lives, 3 objects falling, playing."
+    /// The canvas description, for example "Neon Arcade: Neon Dodge, wave 3, score 120, 2 lives, 3 objects falling,
+    /// playing."
     nonisolated static func description(_ run: GameRun) -> String {
-        "Neon Arcade: Neon Dodge, score \(run.score), \(livesWords(run.lives)), \(objectWords(run.objects.count)), "
-            + "\(stateWord(run))."
+        "Neon Arcade: Neon Dodge, wave \(run.wave), score \(run.score), \(livesWords(run.lives)), "
+            + "\(objectWords(run.objects.count)), \(stateWord(run))."
     }
 
     /// The description of `core`'s run.

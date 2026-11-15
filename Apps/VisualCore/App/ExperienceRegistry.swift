@@ -228,7 +228,9 @@ extension ExperienceRegistry {
     /// A10 Neon Arcade (feature 075, A10-P01): a candidate until X-A10.
     fileprivate static var neonArcade: ExperienceRegistration? {
         guard let id = NeonArcadeExperience.id else { return nil }
-        var registration = ExperienceRegistration(id: id, core: ArcadeCore.self, examples: []) { launch in
+        // Schema 2 (feature 076, A10-P02) adds the waves; the stored schema-1 example proves the migration.
+        let examples = [ArcadeCore.schemaOneExample()].compactMap { $0 }
+        var registration = ExperienceRegistration(id: id, core: ArcadeCore.self, examples: examples) { launch in
             let system = SystemAccessibilityObserver.systemValues()
             return NeonArcadeExperience.make(id: id, storage: launch.storage,
                                              reduceMotion: launch.reduceMotion.resolved(system: system.reduceMotion),

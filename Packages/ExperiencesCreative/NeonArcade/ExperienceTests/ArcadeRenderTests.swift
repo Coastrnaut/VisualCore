@@ -8,6 +8,10 @@
 // lives and playing, paused or over; the drag steers by the finger's offset ÷ 1.5 and its release sends 0; the probe
 // steps aside for objects near it; a failed draw reaches the session; and the experience's sources never create a
 // graphics context of their own.
+// Feature 076 (A10-P02) T-A10-203 (FR-A10-220; SC-A10-204; clarification 5): the five lane guides are thin dim lines at
+// the lane centres under the objects, player and HUD; the wave number is drawn in seven-segment digits beside the
+// score; the description names the wave; drawing a wave-3 run never changes its state or digest and keeps every
+// object at its rule size.
 import Foundation
 import XCTest
 @testable import NeonArcadeExperience
@@ -170,6 +174,95 @@ final class ArcadeRenderTests: XCTestCase {
         XCTAssertEqual(ArcadePresenter.segmentTable[1], [1, 2])
     }
 
+    /// A run in wave 3 (`wall`, wave step 100, free lane 2) with the three objects of ``runWithObjects()``.
+    private func waveThreeRun() -> GameRun {
+        var run = runWithObjects()
+        run.step = 1_300
+        run.score = 57
+        run.wave = 3
+        run.waveStep = 100
+        run.patternId = "wall"
+        run.freeLane = 2
+        return run
+    }
+
+    /// T-A10-203: five lane guides at the lane centres (0.9 … 8.1), bottom to top, thin and dim, below the glows,
+    /// objects, player and HUD.
+    func testTheLaneGuidesAreDrawnAtTheLaneCentres() throws {
+        let presenter = ArcadePresenter(experienceID: ArcadeTest.id)
+        presenter.layOut(try core(waveThreeRun()), width: 90, height: 160)
+        let s = presenter.lastScale
+        XCTAssertEqual(presenter.laneNodes.count, Lanes.count)
+        for (centre, expected) in zip(Lanes.centres, [0.9, 2.7, 4.5, 6.3, 8.1]) {
+            XCTAssertEqual(centre, expected, accuracy: 1e-12)
+        }
+        for (lane, node) in presenter.laneNodes.enumerated() {
+            let x = Lanes.centre(lane)
+            XCTAssertEqual(node.primitive, .line(ArcadePresenter.world(Vec2(x, ArcadePresenter.driftBottom), scale: s),
+                                                 ArcadePresenter.world(Vec2(x, GameRun.fieldHeight), scale: s),
+                                                 width: max(ArcadePresenter.laneWidth * s, 1)), "lane \(lane)")
+            XCTAssertEqual(node.color, ArcadePresenter.laneColor)
+            XCTAssertLessThan(node.z, ArcadePresenter.glowZ, "under the glows and objects")
+            XCTAssertLessThan(node.z, ArcadePresenter.hudZ, "under the HUD")
+        }
+        XCTAssertLessThanOrEqual(ArcadePresenter.laneColor.w, 0.1, "dim")
+        XCTAssertLessThan(ArcadePresenter.laneWidth, 0.05, "thin")
+        // The guides start above the player's band, so the bottom-centre frame probe (on lane 2's x) sees plain field.
+        XCTAssertLessThan(presenter.probeFieldPoint().y, ArcadePresenter.driftBottom)
+        XCTAssertEqual(presenter.probes(try core(GameRun.new())).map(\.expected), [FrameColorClass.dark.rawValue])
+    }
+
+    /// T-A10-203: the wave number is drawn in seven-segment digits beside the score, clear of the score and the
+    /// lives, and follows the run.
+    func testTheWaveNumberIsDrawnBesideTheScore() throws {
+        let presenter = ArcadePresenter(experienceID: ArcadeTest.id)
+        var run = waveThreeRun()
+        presenter.layOut(try core(run), width: 90, height: 160)
+        XCTAssertEqual(presenter.lastWaveText, "3")
+        XCTAssertEqual(presenter.lastScoreText, "57")
+        let lit = presenter.waveDigitNodes.map { $0.filter { $0.primitive != nil }.count }
+        XCTAssertEqual(lit, [ArcadePresenter.segmentTable[3].count, 0, 0], "a 3 in the first wave digit")
+        XCTAssertTrue(presenter.waveDigitNodes.joined().allSatisfy { $0.z == ArcadePresenter.hudZ })
+        let scoreRight = ArcadePresenter.digitOrigin.x + Double(ArcadePresenter.maxDigits - 1)
+            * ArcadePresenter.digitAdvance + ArcadePresenter.digitWidth
+        let waveRight = ArcadePresenter.waveOrigin.x + Double(ArcadePresenter.maxWaveDigits - 1)
+            * ArcadePresenter.digitAdvance + ArcadePresenter.digitWidth
+        let livesLeft = ArcadePresenter.livesOrigin.x - Double(GameRun.startLives - 1) * ArcadePresenter.livesSpacing
+            - ArcadePresenter.lifeRadius
+        XCTAssertLessThan(scoreRight, ArcadePresenter.waveOrigin.x, "beside the score, never over it")
+        XCTAssertLessThan(waveRight, livesLeft, "clear of the lives")
+        XCTAssertEqual(ArcadePresenter.waveOrigin.y, ArcadePresenter.digitOrigin.y, "on the score's line")
+        run.wave = 27
+        presenter.layOut(try core(run), width: 90, height: 160)
+        XCTAssertEqual(presenter.lastWaveText, "27")
+        XCTAssertEqual(ArcadePresenter.waveText(1_234), "999")
+        XCTAssertEqual(ArcadePresenter.waveText(0), "1")
+    }
+
+    /// T-A10-203 (FR-A10-220): drawing a wave-3 run reads the core only — state and digest unchanged — and keeps the
+    /// objects and the player at their rule sizes; the description names the wave.
+    func testDrawingAWaveThreeRunNeverChangesTheDigest() throws {
+        let presenter = ArcadePresenter(experienceID: ArcadeTest.id)
+        let core = try core(waveThreeRun())
+        let copy = core
+        var before = DigestBuilder(domain: ArcadeTest.id.rawValue)
+        try core.writeDigest(into: &before)
+        for size in [(90.0, 160.0), (160.0, 90.0), (375.0, 812.0)] {
+            presenter.layOut(core, width: size.0, height: size.1)
+            let s = presenter.lastScale
+            XCTAssertEqual(presenter.bodyNodes[0].primitive, .circle(0.5 * s), "rule size at \(size)")
+            XCTAssertEqual(presenter.bodyNodes[2].primitive, .circle(0.25 * s), "rule size at \(size)")
+        }
+        _ = presenter.describe(core)
+        _ = presenter.probes(core)
+        var after = DigestBuilder(domain: ArcadeTest.id.rawValue)
+        try core.writeDigest(into: &after)
+        XCTAssertEqual(core, copy)
+        XCTAssertEqual(after.finish(), before.finish())
+        XCTAssertEqual(presenter.describe(core),
+                       "Neon Arcade: Neon Dodge, wave 3, score 57, 3 lives, 3 objects falling, playing.")
+    }
+
     func testReduceMotionHalvesPulseAndDriftAndLeavesTheCoreAlone() throws {
         let full = ArcadePresenter(experienceID: ArcadeTest.id)
         let reduced = ArcadePresenter(experienceID: ArcadeTest.id, reduceMotion: true)
@@ -203,17 +296,19 @@ final class ArcadeRenderTests: XCTestCase {
     func testTheDescriptionNamesScoreLivesAndState() async throws {
         var run = GameRun.new()
         XCTAssertEqual(ArcadePresenter.description(run),
-                       "Neon Arcade: Neon Dodge, score 0, 3 lives, no objects falling, playing.")
+                       "Neon Arcade: Neon Dodge, wave 1, score 0, 3 lives, no objects falling, playing.")
         run = runWithObjects()
         run.score = 40
         run.lives = 1
         run.paused = true
         XCTAssertEqual(ArcadePresenter.description(run),
-                       "Neon Arcade: Neon Dodge, score 40, 1 life, 3 objects falling, paused.")
+                       "Neon Arcade: Neon Dodge, wave 1, score 40, 1 life, 3 objects falling, paused.")
         run.lives = 0
         run.over = true
         XCTAssertEqual(ArcadePresenter.description(run),
-                       "Neon Arcade: Neon Dodge, score 40, no lives, 3 objects falling, over.")
+                       "Neon Arcade: Neon Dodge, wave 1, score 40, no lives, 3 objects falling, over.")
+        run.wave = 12
+        XCTAssertTrue(ArcadePresenter.description(run).hasPrefix("Neon Arcade: Neon Dodge, wave 12, score 40, "))
         XCTAssertEqual(ArcadeControls.steeringWords(0), "Straight")
         XCTAssertEqual(ArcadeControls.steeringWords(-1), "Left")
         XCTAssertEqual(ArcadeControls.steeringWords(0.5), "Right 50 percent")
@@ -221,6 +316,7 @@ final class ArcadeRenderTests: XCTestCase {
         let session = ExperienceSession()
         let shell = try await ArcadeTest.open(session, size: size)
         XCTAssertTrue(shell.accessibilitySummary.contains("score 0"))
+        XCTAssertTrue(shell.accessibilitySummary.contains("wave 1, "))
         XCTAssertTrue(shell.accessibilitySummary.contains("3 lives"))
         XCTAssertTrue(shell.handle(control: "run.pause", values: [1]).isAccepted)
         XCTAssertTrue(shell.accessibilitySummary.hasSuffix("paused."))

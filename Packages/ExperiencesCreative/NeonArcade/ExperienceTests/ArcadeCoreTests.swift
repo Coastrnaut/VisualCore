@@ -1,12 +1,16 @@
 // ArcadeCoreTests — feature 075 (A10-P01) T-A10-104 (FR-A10-112, FR-A10-121; SC-A10-101, SC-A10-102, SC-A10-105;
 // contract "Experience actions"). The adapter core of Neon Arcade against the experience contract, short runs only
-// (simulated steps, no wall clock): the id, the three controls, schema 1, one quality tier and the 1/60 s step;
-// conformance over four seeds; the first state (a new run); every action accepted in range; values outside the range
-// refused by the engine, a fractional pause refused by the core with `a10.invalid-choice` and a non-finite or
+// (simulated steps, no wall clock): the id, the three controls, the schema (2 since A10-P02), one quality tier and the
+// 1/60 s step; conformance over four seeds; the first state (a new run); every action accepted in range; values outside
+// the range refused by the engine, a fractional pause refused by the core with `a10.invalid-choice` and a non-finite or
 // too-large steering value with `a10.invalid-steering` (called directly), a refusal leaving the digest as it was; host
 // steps advancing the run unless paused or over; the same seed and recorded inputs giving the same run and digest; the
 // digest covering the events and the event count; the snapshot round trip into another engine; damaged, invalid and
 // newer snapshots refused; reset, restart and the outcome.
+// Feature 076 (A10-P02) T-A10-203 (FR-A10-210, FR-A10-211; SC-A10-204; clarification 4; research D4): schema 2; the
+// stored schema-1 example restores through the engine's migration in a new engine with step, score, lives, player,
+// objects, events and generator kept and the run at the start of wave 1; a schema-1 payload that skips the migration is
+// refused by the restore; a schema-2 save in wave 3 round-trips identically; schema 3 is refused as newer.
 import Foundation
 import XCTest
 @testable import NeonArcadeExperience
@@ -52,7 +56,8 @@ final class ArcadeCoreTests: XCTestCase {
         XCTAssertEqual(ArcadeCore.controls.map(\.id), ["run.steer", "run.pause", "run.restart"])
         XCTAssertEqual(ArcadeCore.controls.map(\.id), ArcadeCore.actionIDs)
         XCTAssertEqual(ArcadeCore.controls.map(\.ranges), [[-1...1], [0...1], []])
-        XCTAssertEqual(ArcadeCore.migrations.currentVersion, 1)
+        XCTAssertEqual(ArcadeCore.migrations.currentVersion, 2)
+        XCTAssertEqual(ExperienceEngine<ArcadeCore>.schemaVersion, GameRun.currentSchema)
         XCTAssertEqual(ArcadeCore.qualityTiers, 1)
         XCTAssertEqual(ArcadeCore.stepDuration, 1.0 / 60, accuracy: 1e-12)
         XCTAssertEqual(ExperienceEngine<ArcadeCore>.stepDuration, 1.0 / 60, accuracy: 1e-12)
@@ -216,7 +221,7 @@ final class ArcadeCoreTests: XCTestCase {
     func testTheSnapshotRestoresIdenticallyInAnotherEngine() async throws {
         var engine = try await replayed(steps: 400)
         let snapshot = try engine.snapshot()
-        XCTAssertEqual(snapshot.schemaVersion, 1)
+        XCTAssertEqual(snapshot.schemaVersion, 2)
         let saved = try XCTUnwrap(engine.core)
         var other = try await makeEngine(seed: 3)
         try other.restore(ExperienceSnapshot(data: snapshot.encoded()))
@@ -234,7 +239,7 @@ final class ArcadeCoreTests: XCTestCase {
         let saved = try engine.snapshot()
         let before = try engine.digest()
 
-        func envelope(_ payload: Data, schema: Int = 1) throws -> ExperienceSnapshot {
+        func envelope(_ payload: Data, schema: Int = 2) throws -> ExperienceSnapshot {
             try ExperienceSnapshot(experience: arcadeID, schemaVersion: schema, seed: saved.seed,
                                    stepIndex: saved.stepIndex, digest: saved.digest, payload: payload)
         }
@@ -266,8 +271,18 @@ final class ArcadeCoreTests: XCTestCase {
         object["random"] = random
         XCTAssertThrowsError(try engine.restore(envelope(
             JSONSerialization.data(withJSONObject: object, options: [.sortedKeys]))))
-        // Newer: schema 2 is not known to this build.
-        XCTAssertThrowsError(try engine.restore(envelope(Data(saved.payload.utf8), schema: 2)))
+        // Invalid wave state: a wave below 1, an unknown pattern.
+        for (key, value) in [("wave", 0), ("patternId", "spiral")] as [(String, Any)] {
+            var bad = originalRun
+            bad[key] = value
+            object["run"] = bad
+            object["random"] = try XCTUnwrap(
+                try JSONSerialization.jsonObject(with: Data(saved.payload.utf8)) as? [String: Any])["random"]
+            XCTAssertThrowsError(try engine.restore(envelope(
+                JSONSerialization.data(withJSONObject: object, options: [.sortedKeys]))), key)
+        }
+        // Newer: schema 3 is not known to this build.
+        XCTAssertThrowsError(try engine.restore(envelope(Data(saved.payload.utf8), schema: 3)))
         XCTAssertEqual(try engine.digest(), before, "every refusal leaves the state as it was")
 
         // The core names the reason.
@@ -279,6 +294,113 @@ final class ArcadeCoreTests: XCTestCase {
             }
             XCTAssertFalse(problems.isEmpty)
         }
+    }
+
+    /// T-A10-203 (SC-A10-204): the stored Phase 01 payload restores in a new engine through the migration 1 → 2: step,
+    /// score, lives, player, objects, events and generator kept, the run at schema 2 at the start of wave 1, the digest
+    /// the example names; the run then plays on validly and identically in two engines.
+    func testASchemaOneSnapshotRestoresInANewEngineWithTheRunKept() async throws {
+        let example = try XCTUnwrap(ArcadeCore.schemaOneExample())
+        XCTAssertEqual(example.version, 1)
+        let snapshot = try ExperienceSnapshot(data: example.snapshot)
+        XCTAssertEqual(snapshot.schemaVersion, 1)
+        XCTAssertEqual(snapshot.stepIndex, ArcadeCore.schemaOneExampleSteps)
+        let payload = try XCTUnwrap(try JSONSerialization.jsonObject(with: Data(snapshot.payload.utf8)) as? [String: Any])
+        let storedRun = try XCTUnwrap(payload["run"] as? [String: Any])
+        XCTAssertEqual(storedRun["schema"] as? Int, 1)
+        for key in ["wave", "waveStep", "patternId", "freeLane", "patternCursor"] {
+            XCTAssertNil(storedRun[key], "a Phase 01 run has no \(key)")
+        }
+        let phaseOne = try JSONDecoder().decode(ArcadeState.self, from: Data(snapshot.payload.utf8))
+        XCTAssertEqual(phaseOne.run.schema, 1)
+        XCTAssertFalse(phaseOne.run.objects.isEmpty, "a mid-run state with falling objects")
+
+        var engine = try await makeEngine(seed: 3)
+        try engine.restore(snapshot)
+        XCTAssertEqual(try engine.digest().hex, example.expectedDigest)
+        XCTAssertEqual(engine.stepIndex, ArcadeCore.schemaOneExampleSteps)
+        let core = try XCTUnwrap(engine.core)
+        let run = core.run
+        XCTAssertEqual(run.schema, 2)
+        XCTAssertEqual(run.validate(), [])
+        XCTAssertEqual(run.step, phaseOne.run.step)
+        XCTAssertEqual(run.score, phaseOne.run.score)
+        XCTAssertEqual(run.lives, phaseOne.run.lives)
+        XCTAssertEqual(run.player, phaseOne.run.player)
+        XCTAssertEqual(run.objects, phaseOne.run.objects)
+        XCTAssertEqual(run.events, phaseOne.run.events)
+        XCTAssertEqual(run.eventCount, phaseOne.run.eventCount)
+        XCTAssertEqual(run.steering, phaseOne.run.steering)
+        XCTAssertEqual(run.nextObjectId, phaseOne.run.nextObjectId)
+        XCTAssertEqual(run.wave, 1)
+        XCTAssertEqual(run.waveStep, 0)
+        XCTAssertEqual(run.patternId, PatternTable.firstPatternId)
+        XCTAssertEqual(run.freeLane, -1)
+        XCTAssertEqual(run.patternCursor, 0)
+        XCTAssertEqual(core.state.random, phaseOne.random, "the generator state is kept")
+        XCTAssertEqual(core.preparationSeed, snapshot.seed)
+
+        var other = try await makeEngine(seed: 11)
+        try other.restore(ExperienceSnapshot(data: example.snapshot))
+        try engine.run(steps: ArcadeCore.migrationSteps)
+        try other.run(steps: ArcadeCore.migrationSteps)
+        let continued = try XCTUnwrap(engine.core)
+        XCTAssertEqual(continued.run.validate(), [])
+        XCTAssertEqual(continued.run.waveStep, ArcadeCore.migrationSteps)
+        XCTAssertEqual(continued, try XCTUnwrap(other.core), "the migrated run plays on identically")
+
+        // The registry's check accepts the example.
+        let problems = await SnapshotMigrationCheck.problems(for: ArcadeCore.self, id: arcadeID, examples: [example])
+        XCTAssertEqual(problems, [])
+    }
+
+    /// T-A10-203: a schema-1 payload handed to the restore without the migration is refused (the run must be schema 2),
+    /// and the migration step itself keeps a schema-2 run unchanged.
+    func testTheRestoreValidatesTheMigratedRun() throws {
+        let example = try XCTUnwrap(ArcadeCore.schemaOneExample())
+        let snapshot = try ExperienceSnapshot(data: example.snapshot)
+        XCTAssertThrowsError(try ArcadeCore.restore(payload: Data(snapshot.payload.utf8), seed: 7)) { error in
+            guard case ArcadeRestoreError.invalidRun(let problems)? = error as? ArcadeRestoreError else {
+                return XCTFail("\(error)")
+            }
+            XCTAssertTrue(problems.contains("schema 1 is not 2"), "\(problems)")
+        }
+        let object = try XCTUnwrap(try JSONSerialization.jsonObject(with: Data(snapshot.payload.utf8)) as? [String: Any])
+        let upgraded = try ArcadeCore.migrations.migrate(object, from: 1)
+        let migrated = try ArcadeCore.restore(
+            payload: JSONSerialization.data(withJSONObject: upgraded, options: [.sortedKeys]), seed: 7)
+        XCTAssertEqual(migrated.run.schema, 2)
+        XCTAssertThrowsError(try ArcadeCore.migrations.migrate(["run": 1], from: 1), "a payload that does not decode")
+
+        let current = try XCTUnwrap(try JSONSerialization.jsonObject(with: ArcadeCore.encode(migrated.state))
+                                    as? [String: Any])
+        let again = try ArcadeCore.migratedToSchemaTwo(current)
+        XCTAssertEqual(try JSONDecoder().decode(ArcadeState.self,
+                                                from: JSONSerialization.data(withJSONObject: again)), migrated.state)
+    }
+
+    /// T-A10-203: a schema-2 save in wave 3 (wave, wave step, pattern, free lane and cursor) round-trips identically
+    /// in another engine and both continue alike.
+    func testASchemaTwoSaveInWaveThreeRoundTrips() async throws {
+        var engine = try await makeEngine()
+        for input in ArcadeCore.waveInputs where input.step < 1_300 {
+            try engine.run(steps: input.step - engine.stepIndex)
+            XCTAssertEqual(engine.handle(control: "run.steer", values: [input.value]), .accepted)
+        }
+        try engine.run(steps: 1_300 - engine.stepIndex)
+        let saved = try XCTUnwrap(engine.core)
+        XCTAssertEqual(saved.run.wave, 3)
+        XCTAssertEqual(saved.run.patternId, "wall")
+        XCTAssertGreaterThanOrEqual(saved.run.freeLane, 0)
+        let snapshot = try engine.snapshot()
+        XCTAssertEqual(snapshot.schemaVersion, 2)
+        var other = try await makeEngine(seed: 5)
+        try other.restore(ExperienceSnapshot(data: snapshot.encoded()))
+        XCTAssertEqual(try XCTUnwrap(other.core).state, saved.state)
+        XCTAssertEqual(try other.digest(), try engine.digest())
+        try engine.run(steps: 120)
+        try other.run(steps: 120)
+        XCTAssertEqual(try XCTUnwrap(other.core).state, try XCTUnwrap(engine.core).state)
     }
 
     func testResetReturnsToThePreparedRun() async throws {
