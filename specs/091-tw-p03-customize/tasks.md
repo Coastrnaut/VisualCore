@@ -42,3 +42,7 @@ Agent A: T-A12-302. Agent B: T-A12-303 after A. Lead: 304, 305, runs, commits.
 
 MVP: props and the document with the exact-transform fixture (US1, US3), then light, slots and thumbnails; evidence
 last.
+
+## Phase 6: Convergence
+
+- [ ] T-A12-310 Record in `specs/091-tw-p03-customize/research.md` (as built): props rest on the drawn terrain triangles (each cell split along its (i, j)–(i + 1, j + 1) diagonal) so they sit on the visible surface, while `GroundPick` keeps the bilinear sampler (a tap point may differ from the drawn surface by the cell's bilinear error; placement snaps it); re-choosing the same preset keeps the props, `world.seed` and a real preset change clear them; placing selects the new prop; the engine accepts `light.azimuth` only within 0…360 and the stepper wraps before sending; a document of file schema 1 is refused as damaged while a schema-1 state inside a schema-2 document migrates; the interrupted-write test makes the folder read-only (the storage's internal failure hook is not public), per research D2–D4 (partial)
