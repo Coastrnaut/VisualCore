@@ -8,7 +8,7 @@ after every task (no trailers). iOS 27 only; reference regression and iOS 26 at 
 
 ## Phase 1: Setup
 
-- [ ] T-A10-201 Baseline: cite the A10-P01 evidence on the unchanged tree (`.autonomy/checks/A10-P01.arcade-ios27-2.json`, `.autonomy/checks/A10-P01.app-unit.json`, `.autonomy/checks/A10-P01.verify-27.json`) instead of a rerun (owner ruling of 2026-11-14)
+- [X] T-A10-201 Baseline: cite the A10-P01 evidence on the unchanged tree (`.autonomy/checks/A10-P01.arcade-ios27-2.json`, `.autonomy/checks/A10-P01.app-unit.json`, `.autonomy/checks/A10-P01.verify-27.json`) instead of a rerun (owner ruling of 2026-11-14) — Verified 2026-11-14: 2026-11-14: cited .autonomy/checks/A10-P01.{arcade-ios27-2,app-unit,verify-27}.json on the unchanged tree (no rerun)
 
 ## Phase 2: Foundational — lanes, patterns, difficulty, waves (stories 1–3)
 
