@@ -29,6 +29,42 @@ Canonical overrides:
 - **Owner rulings:** short tests; iOS 27 at phase gates; reference regression and iOS 26 at X-A10; every Spec Kit step
   runs.
 
+## Clarifications
+
+### Session 2026-11-14
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+Neon Arcade declares one quality tier (`qualityTiers` 1, registration `["level-0"]`); its presenter draws each object's
+glow at 1.6 × the radius with an alpha pulse (amplitude 0.15, halved under Reduce Motion) and keeps one particle pool of
+256; Digital Aquarium declares three levels in `AquariumBudget.levels` (level 0 first, the lowest) and injects Low
+Power Mode into its presenter (`lowPowerMode`, default `ProcessInfo.isLowPowerModeEnabled`); the host passes the
+governor's tier to `draw(_:tier:context:frame:)`.
+
+- Q: Which quality levels exist and what are their caps? → A: Three levels, `level-0` (lowest) … `level-2` (full),
+  declared by the core (`qualityTiers` 3), the presenter and the registration: level 2 — glow 1.6 × radius, glow
+  opacity ≤ 0.35 including the pulse, ≤ 256 live particles; level 1 — 1.4 ×, ≤ 0.30, ≤ 128; level 0 — 1.2 ×, ≤ 0.25
+  and no pulse, ≤ 48. Bursts scale their particle counts by the level's cap ÷ 256 (at least 1). Low Power Mode selects
+  level 0; reduced flashing removes the pulse at every level.
+- Q: How is "readable" measured? → A: By colour contrast ratios (the relative-luminance ratio used by WCAG): a
+  hazard's core against the field ≥ 4.5 : 1, and against its own glow composited over the field at the level's
+  maximum opacity ≥ 3 : 1; the player and orbs likewise ≥ 3 : 1 against the field; collision shapes are drawn above
+  every glow and particle at their rule sizes. Colours are tuned in the catalog if a ratio is missed (recorded).
+- Q: Who are the simulated players and what are the targets? → A: Deterministic test players that send only
+  `run.steer` actions: *idle* (always 0); *dodger* (steers away from the nearest hazard less than 4 units above the
+  player within 1 unit sideways, else back toward the centre lane); *collector* (as the dodger, but with no hazard
+  threat it steers toward the nearest orb). Targets over 20 seeds, at most 6,000 steps each: idle median wave ≤ 2;
+  dodger median wave ≥ 3; collector median score > dodger median score > idle median score. These measure the game's
+  curve, not anyone's ability. Missed targets are tuned in the difficulty or spawn values and recorded.
+- Q: What does the device-campaign document hold? → A: `docs/apps/neon-arcade/device-campaign.md` modelled on Digital
+  Aquarium's: rows for frame pacing per level on the reference phone and tablet, thermal state over a 10-minute session
+  (at the campaign), glow readability on a real screen in bright light, audio route changes (headphones, silent
+  switch), VoiceOver pass, each with device, procedure, threshold and status "pending device campaign" until
+  ImplementationLock-100; the matching tasks are tagged {device}.
+- Q: What does the catalog entry say? → A: Name "Neon Arcade", a one-line description "Neon Dodge: steer through
+  falling hazards and collect orbs in waves." and capabilities that are each proved by a named test (fixed-step game,
+  swept collision, wave patterns, local high scores, synthesized sounds and haptics, five steering sensitivities,
+  quality levels); `scripts/check_distinctiveness.py` and a realism-word scan reject benefit claims.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Glow that never hides the danger (Priority: P1) 🎯
