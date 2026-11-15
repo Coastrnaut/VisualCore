@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a13.light-maze",
+    "--runtime",
+    "27"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a13.light-maze --runtime 27",
+  "elapsed_seconds": 51.54,
+  "exit_code": 0,
+  "finished": "2026-11-15T19:09:36+00:00",
+  "log": ".autonomy/logs/A13-P04.verify-27.log",
+  "log_sha256": "9dc606022be4fdd539658e8ba94f294b5e57e573fff263f7c15f071b327e5b90",
+  "name": "verify-27",
+  "stage": "A13-P04",
+  "started": "2026-11-15T19:08:44+00:00",
+  "timed_out": false
+}
