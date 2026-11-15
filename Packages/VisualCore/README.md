@@ -142,7 +142,15 @@ direction; the direction is normalised) intersects an axis-aligned box (slab met
 (two-sided Möller–Trumbore) and returns the nearest `RayHit3` at distance ≥ 0 with a unit normal facing against the
 ray; a start inside a box or sphere hits at distance 0 with the normal −direction, a tangent ray hits once, and a ray
 parallel to a triangle, a degenerate triangle or an invalid shape gives nil (tolerance 1e-12); `Ray3.nearest` picks
-the closest of several hits. With `OrbitCamera.ray(ndc:aspect:)` it gives picking. **Per-vertex colours**
+the closest of several hits. With `OrbitCamera.ray(ndc:aspect:)` it gives picking. **2D ray casting and reflection**
+(`VisualCoreMath`, feature 096): `Ray2(origin:direction:)` (nil for non-finite values or a zero direction; the direction
+is normalised) casts against an array of `Segment2` with `cast(against:excluding:minimumDistance:)` and returns the
+nearest `RayHit2` (distance above the minimum, default 1e-9; point; segment index; unit normal facing against the ray);
+parallel and collinear segments miss (tolerance 1e-12), end points count, segments with non-finite or coincident end
+points are skipped, equal distances go to the lower index, and `excluding` ignores the segment just left so a reflected
+ray never hits its own surface at distance 0. `Vec2.reflected(about:)` mirrors a direction about a normal
+(`d − 2(d·n)n`, the normal normalised first; a zero or non-finite normal leaves it unchanged), keeping its length and
+making the angle of incidence equal the angle of reflection. Used by Light Maze (A13). **Per-vertex colours**
 (`VisualCoreRendering`, feature 090): `MeshRenderer(mesh:colors:registry:)` takes one RGBA (0…1) per vertex,
 multiplied into the draw colour before lighting (also through `DepthMeshPass`); without colours the attribute is a
 constant 1, so existing pixels are unchanged; a wrong count or a value that is non-finite or outside 0…1 is refused

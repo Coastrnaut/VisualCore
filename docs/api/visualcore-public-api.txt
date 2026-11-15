@@ -1400,6 +1400,7 @@ VisualCoreMath | func | public func apply(_ p: Vec2) -> Vec2
 VisualCoreMath | func | public func applyPoint(_ p: Vec3) -> Vec3
 VisualCoreMath | func | public func applyVector(_ v: Vec2) -> Vec2
 VisualCoreMath | func | public func applyVector(_ v: Vec3) -> Vec3
+VisualCoreMath | func | public func cast(against segments: [Segment2], excluding: Int? = nil,
 VisualCoreMath | func | public func cellCenters(rings: Int) -> [Vec2]
 VisualCoreMath | func | public func clamp(_ camera: Camera2D) -> Camera2D
 VisualCoreMath | func | public func clamp(_ camera: OrbitCamera) -> OrbitCamera
@@ -1430,10 +1431,12 @@ VisualCoreMath | func | public func panned(by delta: Vec2, within bounds: OrbitV
 VisualCoreMath | func | public func panned(by delta: Vec2, within bounds: ViewBounds2D) -> Camera2D
 VisualCoreMath | func | public func pinched(by scale: Double, anchor: Vec2) -> PlaneViewport
 VisualCoreMath | func | public func plane(fromScreen p: Vec2) -> Vec2
+VisualCoreMath | func | public func point(at t: Double) -> Vec2
 VisualCoreMath | func | public func pose(at distance: Double) -> RailPose
 VisualCoreMath | func | public func project(_ p: Vec3, aspect: Double) -> Vec3
 VisualCoreMath | func | public func projection(aspect: Double) -> Mat4
 VisualCoreMath | func | public func ray(ndc: Vec2, aspect: Double) -> (origin: Vec3, direction: Vec3)
+VisualCoreMath | func | public func reflected(about normal: Vec2) -> Vec2
 VisualCoreMath | func | public func resized(to newSize: Vec2) -> PlaneViewport
 VisualCoreMath | func | public func rotate(_ v: Vec3) -> Vec3
 VisualCoreMath | func | public func row(_ i: Int) -> Vec3
@@ -1501,6 +1504,7 @@ VisualCoreMath | func | public static func translation(_ t: Vec2) -> Mat3
 VisualCoreMath | func | public static func translation(_ t: Vec3) -> Mat4
 VisualCoreMath | func | public static func trs(_ t: Vec2, _ r: Double, _ s: Vec2) -> Mat3
 VisualCoreMath | func | public static func wrapped(_ x: Double, modulus: Double) throws(NumericError) -> Double
+VisualCoreMath | init | public init(_ a: Vec2, _ b: Vec2)
 VisualCoreMath | init | public init(_ c0: Vec3, _ c1: Vec3, _ c2: Vec3)
 VisualCoreMath | init | public init(_ c0: Vec4, _ c1: Vec4, _ c2: Vec4, _ c3: Vec4)
 VisualCoreMath | init | public init(_ v: Vec3, _ w: Double)
@@ -1526,9 +1530,11 @@ VisualCoreMath | init | public init(target: Vec3 = .zero, distance: Double = 5, 
 VisualCoreMath | init | public init(x: Double, y: Double, z: Double, w: Double)
 VisualCoreMath | init | public init(zoomRange: ClosedRange<Double>, extent: Double)
 VisualCoreMath | init | public init?(controlPoints: [Vec3], samplesPerSpan: Int = 64)
+VisualCoreMath | init | public init?(origin: Vec2, direction: Vec2)
 VisualCoreMath | init | public init?(origin: Vec3, direction: Vec3)
 VisualCoreMath | let | public let center: Vec2
 VisualCoreMath | let | public let controlPoints: [Vec3]
+VisualCoreMath | let | public let direction: Vec2
 VisualCoreMath | let | public let direction: Vec3
 VisualCoreMath | let | public let distance: Double
 VisualCoreMath | let | public let flightDuration: Double
@@ -1538,14 +1544,18 @@ VisualCoreMath | let | public let hold: Double
 VisualCoreMath | let | public let level: Level
 VisualCoreMath | let | public let margin: Double
 VisualCoreMath | let | public let minimumPixelStep: Double
+VisualCoreMath | let | public let normal: Vec2
 VisualCoreMath | let | public let normal: Vec3
+VisualCoreMath | let | public let origin: Vec2
 VisualCoreMath | let | public let origin: Vec3
 VisualCoreMath | let | public let phase: Phase
+VisualCoreMath | let | public let point: Vec2
 VisualCoreMath | let | public let point: Vec3
 VisualCoreMath | let | public let position: Vec3
 VisualCoreMath | let | public let reduceMotion: Bool
 VisualCoreMath | let | public let right: Vec3
 VisualCoreMath | let | public let samplesPerSpan: Int
+VisualCoreMath | let | public let segmentIndex: Int
 VisualCoreMath | let | public let span: Double
 VisualCoreMath | let | public let start: PlaneFraming
 VisualCoreMath | let | public let stopIndex: Int
@@ -1583,8 +1593,11 @@ VisualCoreMath | struct | public struct PlaneViewport: Sendable, Equatable
 VisualCoreMath | struct | public struct Quat: Sendable, Equatable
 VisualCoreMath | struct | public struct RailFlight: Sendable, Equatable, Codable
 VisualCoreMath | struct | public struct RailPose: Sendable, Equatable
+VisualCoreMath | struct | public struct Ray2: Sendable, Equatable
 VisualCoreMath | struct | public struct Ray3: Sendable, Equatable
+VisualCoreMath | struct | public struct RayHit2: Sendable, Equatable
 VisualCoreMath | struct | public struct RayHit3: Sendable, Equatable
+VisualCoreMath | struct | public struct Segment2: Sendable, Equatable, Hashable, Codable
 VisualCoreMath | struct | public struct State: Sendable, Equatable
 VisualCoreMath | struct | public struct Status: Sendable, Equatable
 VisualCoreMath | struct | public struct Stop: Sendable, Equatable
@@ -1597,6 +1610,8 @@ VisualCoreMath | var | public private(set) var center: Vec2
 VisualCoreMath | var | public private(set) var size: Vec2
 VisualCoreMath | var | public private(set) var unitsPerPoint: Double
 VisualCoreMath | var | public private(set) var wasClamped: Bool
+VisualCoreMath | var | public var a: Vec2
+VisualCoreMath | var | public var b: Vec2
 VisualCoreMath | var | public var basis: (Vec2, Vec2)
 VisualCoreMath | var | public var c0: Vec3, c1: Vec3, c2: Vec3
 VisualCoreMath | var | public var c0: Vec4, c1: Vec4, c2: Vec4, c3: Vec4

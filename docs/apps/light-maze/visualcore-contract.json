@@ -243,8 +243,14 @@
       "id": "M03",
       "capability": "Geometry and transformations: 2D vectors, rotation/translation/scale transforms, a 2D camera, bounded primitives with hit testing, and the reflection and segment math a light path needs",
       "source": "brainstorm: geometry and transformations",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/Ray2.swift",
+          "symbol": "Ray2",
+          "product": "VisualCoreMath",
+          "public": true
+        },
         {
           "file": "Packages/VisualCore/Sources/VisualCoreMath/Vectors.swift",
           "symbol": "Vec2",
@@ -283,10 +289,10 @@
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/PhysicsPlayground/Core/WorldEditing.swift",
-        "symbol": "WorldEditing"
+        "file": "Packages/ExperiencesCreative/LightMaze/Core/BeamTracer.swift",
+        "symbol": "BeamTracer"
       },
-      "notes": "Vectors, transforms, the camera, primitives with hit testing and the closest point on a segment exist and are tested (LinearAlgebraTests, Camera2DTests, SceneGraphTests, Collision2DTests). Missing: reflection of a direction about a normal, a perpendicular, and a ray-segment intersection (Vec2 has dot, scalar cross, length, normalized and distance only). These are generic: G-RAYCAST2D (VisualCoreMath, A13-P01)."
+      "notes": "Vectors, transforms, the camera, primitives with hit testing and the closest point on a segment exist and are tested (LinearAlgebraTests, Camera2DTests, SceneGraphTests, Collision2DTests). Missing: reflection of a direction about a normal, a perpendicular, and a ray-segment intersection (Vec2 has dot, scalar cross, length, normalized and distance only). These are generic: G-RAYCAST2D (VisualCoreMath, A13-P01). A13-P01 (G-RAYCAST2D closed): Ray2 casts against Segment2 lists and Vec2.reflected mirrors a direction about a normal (Ray2Tests: 360 angles × 3 normals, incidence = reflection within 1e-12)."
     },
     {
       "id": "M04",
@@ -421,7 +427,7 @@
         "file": "Packages/ExperiencesCreative/PhysicsPlayground/Core/ExperimentDocument.swift",
         "symbol": "ExperimentDocument"
       },
-      "notes": "Drawing tiles (primitives in a scene graph) and storing documents exist and are tested (SceneGraphTests, DocumentStoreTests). No tile board, tile model or optical rules exist in any framework product (grep 2026-11-15): G-BOARD (app-local, A13-P01) builds the board and tiles; G-LEVELS (app-local, A13-P03) the 20 levels."
+      "notes": "Drawing tiles (primitives in a scene graph) and storing documents exist and are tested (SceneGraphTests, DocumentStoreTests). No tile board, tile model or optical rules exist in any framework product (grep 2026-11-15): G-BOARD (app-local, A13-P01) builds the board and tiles; G-LEVELS (app-local, A13-P03) the 20 levels. A13-P01: the board, tiles and the 20 levels (LightMazeCore Board, LevelCatalog) and plain beam lines from the tracer's segments (MazePresenter) exist; the remainder stays with G-LEVELS (progression, undo, saved progress)."
     },
     {
       "id": "M07",
@@ -464,8 +470,26 @@
       "id": "M08",
       "capability": "Deterministic ray propagation: a 2D ray from each emitter against tile segments, reflection about the hit normal, prism splitting, an epsilon and last-hit rule against self-intersection, a finite bounce cap and cycle detection",
       "source": "v0.1 feature 3: deterministic ray propagation with reflection and a finite bounce cap; spec edge cases mirror loops and self-intersection",
-      "status": "upstream gap",
+      "status": "available",
       "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/Ray2.swift",
+          "symbol": "Ray2",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/Ray2.swift",
+          "symbol": "Segment2",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/Ray2.swift",
+          "symbol": "RayHit2",
+          "product": "VisualCoreMath",
+          "public": true
+        },
         {
           "file": "Packages/VisualCore/Sources/VisualCoreMath/Vectors.swift",
           "symbol": "Vec2",
@@ -492,10 +516,10 @@
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/NeonArcade/Core/GameSimulation.swift",
-        "symbol": "GameSimulation"
+        "file": "Packages/ExperiencesCreative/LightMaze/Core/BeamTracer.swift",
+        "symbol": "BeamTracer"
       },
-      "notes": "Only 3D rays against boxes, spheres and triangles (RayIntersectionTests) and 2D circle/capsule contacts (Collision2DTests) exist; no 2D ray against segments and no reflection exist in any framework product (grep 2026-11-15). The generic ray cast with reflection is G-RAYCAST2D (VisualCoreMath, A13-P01); the tile rules, prism split, bounce cap and cycle detection are G-BOARD (app-local, A13-P01)."
+      "notes": "Only 3D rays against boxes, spheres and triangles (RayIntersectionTests) and 2D circle/capsule contacts (Collision2DTests) exist; no 2D ray against segments and no reflection exist in any framework product (grep 2026-11-15). The generic ray cast with reflection is G-RAYCAST2D (VisualCoreMath, A13-P01); the tile rules, prism split, bounce cap and cycle detection are G-BOARD (app-local, A13-P01). A13-P01 (G-RAYCAST2D and G-BOARD closed): BeamTracer traces the beam over Ray2 with grid-snapped reflection, ≤ 64 bounces per branch, ≤ 256 segments, ≤ 16 branches and loop detection; 20 levels proven by their recorded solutions; fixtures for lm-01, lm-10, lm-20 (BeamTracerTests, BeamFixtureTests, LevelCatalogTests)."
     },
     {
       "id": "M09",
@@ -643,7 +667,7 @@
         "file": "Packages/ExperiencesCreative/OscilloscopeStudio/Experience/ScopePresenter.swift",
         "symbol": "ScopePresenter"
       },
-      "notes": "Polyline and line primitives drawn by PrimitiveRenderer exist and are tested (SceneGraphTests, PrimitiveRendererTests); Oscilloscope Studio draws its traces as polylines from CPU points this way (experience code). The segments come from G-RAYCAST2D and G-BOARD (A13-P01); drawing them with the glow is G-BEAMS (A13-P02), tested by comparing drawn vertices with the tracer's segments."
+      "notes": "Polyline and line primitives drawn by PrimitiveRenderer exist and are tested (SceneGraphTests, PrimitiveRendererTests); Oscilloscope Studio draws its traces as polylines from CPU points this way (experience code). The segments come from G-RAYCAST2D and G-BOARD (A13-P01); drawing them with the glow is G-BEAMS (A13-P02), tested by comparing drawn vertices with the tracer's segments. A13-P01: the board, tiles and the 20 levels (LightMazeCore Board, LevelCatalog) and plain beam lines from the tracer's segments (MazePresenter) exist; the remainder stays with G-BEAMS (glow)."
     },
     {
       "id": "M13",
@@ -973,7 +997,7 @@
       "justification": "Found in A13-P00: Vec2 has no reflect or perpendicular, Ray3/RayHit3 are 3D only and no 2D ray against segments exists in any framework product; Collision2D gives only the closest point on a capsule's segment. A 2D ray cast against line segments (nearest hit distance, point, segment index and normal, with a minimum distance so a ray leaving a surface does not hit it again) and reflection of a direction about a normal are generic geometry and belong to VisualCoreMath (constitution A13 reuse first, clarification 5, A13-P01); tile semantics stay in the experience.",
       "phase": 1,
       "test": "Host tests (swift test, no GPU): rays hit segments at the analytic distance, point and normal, including endpoints, grazing and parallel cases; misses return nil; the nearest of several segments wins and ties break by a stable order; the minimum distance skips the segment just left; reflection about axis-aligned and 45-degree normals matches the analytic result and preserves length; NaN/Inf inputs rejected; API baseline additive, documented with ///, and the reference regression passes at the X gate",
-      "closed": null
+      "closed": "A13-P01"
     },
     {
       "id": "G-BOARD",
@@ -987,7 +1011,7 @@
       "justification": "No tile board, tile model or optical rules exist in any framework product. The grid, the emitter, wall, mirror, target and prism tiles with orientations, the optical rules (mirror reflection via G-RAYCAST2D, prism split, wall absorption, target lighting), the epsilon and last-hit policy, the bounce cap, cycle detection and the board caps are Light Maze's puzzle rules and stay in its GPU-free Core (clarification 5, A13-P01).",
       "phase": 1,
       "test": "Core host tests: fixture boards give the expected segment lists and lit targets; mirror loops stop by cycle detection and long paths stop at the bounce cap with a typed reason; a ray leaving a mirror never re-hits it; the same board gives bitwise identical segments and digest on repeated runs; boards above the grid or tile caps are refused",
-      "closed": null
+      "closed": "A13-P01"
     },
     {
       "id": "G-BEAMS",
