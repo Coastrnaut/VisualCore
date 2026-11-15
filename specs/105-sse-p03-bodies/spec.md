@@ -42,7 +42,7 @@ back faces (`GL_CULL_FACE`, `GL_BACK`, MeshRenderer.swift); `OrbitCamera` has pu
   interpolation, 4 octaves, lacunarity 2, gain 0.5) evaluated at each vertex's unit direction, so the duplicated seam
   vertices and the pole vertices get identical colours. No VisualCore change: one consumer, recorded in the contract
   (II-a not triggered). Spheres are `uvSphere(segments: 48, rings: 24)`; per-vertex colours from a `SurfaceRecipe` per
-  body: the Sun (emissive yellow-orange, ambient 1, granulation ±8 %), Mercury and the Moonless rocky look (grey
+  body: the Sun (emissive yellow-orange, ambient 1, granulation ±8 %), Mercury (grey
   terrain), Venus (pale yellow haze), Earth (ocean blue below noise 0.52, land green-brown above, white caps where
   |sin latitude| > 0.88), Mars (rust with dark patches), Jupiter and Saturn (latitude bands of sin(latitude · k)
   perturbed by noise; Jupiter 9 bands, Saturn 7 paler bands), Uranus (cyan, faint bands), Neptune (deep blue, faint
