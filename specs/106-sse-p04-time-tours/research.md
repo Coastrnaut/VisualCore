@@ -21,3 +21,19 @@
 
 ## D5 — Saved view
 - **Decision**: `view.json` schema 1 in `ExperienceStorage`, ≤ 4,096 bytes, applied through `view.apply` (7 values).
+
+## As built (2026-11-15)
+
+- **`date.set` refusals:** the action declares the model's range, so through the engine a day outside it is refused as
+  `action.out-of-range` before the core sees it; `a14.out-of-range` comes only when the core is called directly (and
+  for `view.apply` values that pass the declared ranges but not the saved view's rules, such as a pitch off its grid).
+- **Captions** show the catalog's stored values (Mars: one orbit takes 686.98 days), not the rounded example of the
+  clarification.
+- **`labelWithTime`** rounds the instant to the second, so sums of 1/120-day steps never read a minute short.
+- **Announcements:** the limiter counts its 10 s from the last announcement of either kind (event or periodic date).
+- **Label canvas size:** taken from the size the overlay reports; until it reports, the drawable's pixels ÷ the display
+  scale.
+- **Suspension test:** suspends the shell directly, so frames keep drawing while no step runs (the session's
+  background route also pauses the render host, which would hide the property under test).
+- **Documented API:** the phase's check found `RecordingAnnouncementSink` (used by the presenter tests since A14-P03)
+  undocumented; it is now named in `Packages/VisualCoreRendering/README.md`.
