@@ -752,6 +752,53 @@ optics with refraction physics, unvalidated user-generated level sharing or endl
 - **One phase at a time:** implement only one Spec Kit phase at a time (one ledger gate, ADR-0004), in order
   A13-P00 → A13-P06.
 
+### A14 Solar System Explorer (`a14.solar-system-explorer`)
+
+Ratified from the app manual's constitution prompt (2026-11-15). Like A05–A13, it never had a standalone target: it
+is built directly as an experience of the one app. Its product goal is an educational solar system viewer that keeps
+astronomical scale, simulated time and visibility-enhanced displays clearly apart — in version 0.1 the Sun and the
+eight major planets with curated fact cards; orbit view, planet focus and camera navigation; play, pause and speed-up
+of simulated motion with an explicit date and time; separate true-relative and visibility-enhanced size and distance
+modes; guided tours with captions; and references and units on every educational claim — not a high-precision
+ephemeris or live sky position, telescope alignment, or imagery and data taken without a license.
+
+- **Consumer, not fork:** an experience of the VisualCore app and a VisualCore consumer, never a fork of
+  projectm-ios. It uses only audited VisualCore public APIs over the OpenGL ES → ANGLE → Metal integration. It MUST
+  NOT create its own EGL/ANGLE initialization path, a second renderer, or link ProjectM engine code.
+- **Reuse first (Principle II):** 3D scenes, cameras, meshes, materials and lighting, the seeded fixed-step clock and
+  runner, gestures, persistence, quality tiers and accessibility planning already in VisualCore are reused, not
+  copied. New generic machinery (for example Kepler orbit propagation or a scaled-time clock) goes into VisualCore
+  with tests, docs, the API baseline and the reference regression when it is reusable; bodies, facts, tours, copy and
+  UI stay in the experience.
+- **Visuals are code:** planet surfaces, rings, the Sun, orbits, labels' backdrops and the starfield are procedural
+  geometry, noise and shaders made in code; the manual's licensed textures are replaced by procedural surfaces; no
+  purchased, generated or hand-made images, textures or recordings.
+- **Data with provenance:** every bundled number (orbital elements, radii, periods, distances, facts) records its
+  source, epoch, units and license; only openly licensed or public-domain data is bundled, and the record is checked
+  by a test.
+- **Deterministic, GPU-free rules:** body positions for a given simulated date, the time controls, the scale modes,
+  tours and persisted files MUST be testable without GPU access through `swift test`, and drawing never changes the
+  simulation state.
+- **Bounded:** body count, mesh detail, orbit sample count, time rate and the simulated date range are fixed limits;
+  render targets and draw budgets are capped per quality level; non-finite values and documents beyond the caps are
+  refused.
+- **Offline-first and private:** no networking, accounts, analytics or ads; no live ephemeris download; state is
+  stored only on the device; no permission beyond what a feature actually needs, each disclosed.
+- **Truthful claims:** positions come from a stated simplified model over a stated date range, never presented as an
+  observing or navigation tool; the visibility-enhanced mode is always labelled as not to scale; every educational
+  claim shows its units and source; performance, memory or battery numbers only from device measurements.
+- **Resilient GPU state:** context loss rebuilds every render target, mesh and texture from versioned CPU state;
+  backgrounding pauses simulated time and never fast-forwards it.
+- **Accessibility:** native SwiftUI controls with VoiceOver labels and Dynamic Type; the selected body, the simulated
+  date, the time rate and the scale mode are spoken; every gesture (orbit, zoom, select) has a control alternative;
+  information never depends on colour alone; Reduce Motion calms camera moves and tours.
+- **Licenses:** every bundled data set, fact text, palette and shader records its author or source and license.
+- **Regression when VisualCore changes:** any VisualCore change made for this experience MUST be followed by the
+  ProjectM reference regression (at the experience's X gate per the owner ruling of 2026-11-14).
+- **Python only:** repository automation uses Python 3; there is no PowerShell dependency.
+- **One phase at a time:** implement only one Spec Kit phase at a time (one ledger gate, ADR-0004), in order
+  A14-P00 → A14-P06.
+
 ## Governance
 
 - Precedence: real Apple platform and toolchain behavior and observed test results → owner
@@ -786,5 +833,7 @@ optics with refraction physics, unvalidated user-generated level sharing or endl
   manual's constitution prompt at gate A12-P00 (feature 088); no principle changes.
 - Amendment 2.9.0 (2026-11-15, MINOR): App-Scoped Rules gain the A13 Light Maze subsection, ratified from its
   manual's constitution prompt at gate A13-P00 (feature 095); no principle changes.
+- Amendment 2.10.0 (2026-11-15, MINOR): App-Scoped Rules gain the A14 Solar System Explorer subsection, ratified
+  from its manual's constitution prompt at gate A14-P00 (feature 102); no principle changes.
 
-**Version**: 2.9.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-15
+**Version**: 2.10.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-15
