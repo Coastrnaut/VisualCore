@@ -24,7 +24,8 @@ Canonical overrides:
   manifest; the slice draws a real, playable game (player, hazards, orbs, score and lives, all in code) — no
   placeholder.
 - **Owner rulings:** short tests; audits and device runs in the device campaign; iOS 27 at phase gates; the reference
-  regression runs here because VisualCore changes (two chunks); every Spec Kit step runs.
+  regression for this VisualCore change runs at X-A10 (owner ruling 2026-11-14, "faster gates"); every Spec Kit
+  step runs.
 
 ## Clarifications
 
@@ -187,7 +188,8 @@ fixture 2); the base for local scores in A10-P04.
   first touch; touching counts as overlap; non-finite inputs give "no hit".
 - **FR-A10-102**: The tests MUST be pure and deterministic, documented, part of the published interface record, and
   proved by tests including a tunnelling case (travel per step at least four times the summed radii).
-- **FR-A10-103**: Because the shared module changes, the reference regression MUST pass in two chunks.
+- **FR-A10-103**: Because the shared module changes, its documentation and published interface record MUST be updated
+  in this phase and the seven-step reference regression MUST be scheduled for X-A10 (two chunks).
 
 **Game run (G-GAMERULES, Phase 01 part, app-local)**
 
@@ -243,8 +245,8 @@ fixture 2); the base for local scores in A10-P04.
 - **SC-A10-104**: 100 % of bundled content items carry author and license; 100 % of malformed catalog fixtures are
   refused with a named reason.
 - **SC-A10-105**: Save/restore round trips are identical; a resume after any suspension continues from the same step.
-- **SC-A10-106**: The nine standard scenarios and the fixtures pass on iOS 27; the reference regression passes 7 of 7
-  steps; each package test finishes in under 10 seconds.
+- **SC-A10-106**: The nine standard scenarios and the fixtures pass on iOS 27; the VisualCore host tests and the
+  public-interface check pass; each package test finishes in under 10 seconds.
 
 ## Assumptions
 
