@@ -31,7 +31,7 @@
 
 - [X] T-A10-009 No-change proof (`python3 Tools/python/desktop_runbook.py run-check --stage A10-P00 --timeout 600 --name no-change -- git diff --exit-code --stat 8e4fcdbe..HEAD -- Packages External`) (FR-A10-008, SC-A10-005) — Verified 2026-11-14: 2026-11-14: .autonomy/checks/A10-P00.no-change.json exit 0 (empty diff 8e4fcdbe..HEAD of Packages External)
 - [X] T-A10-010 Script tests (`python3 Tools/python/desktop_runbook.py run-check --stage A10-P00 --timeout 600 --name script-tests -- python3 scripts/test_scripts.py`) and the release-check document steps (`python3 Tools/python/desktop_runbook.py run-check --stage A10-P00 --timeout 600 --name fast-checks -- python3 scripts/release_check.py --only docs app-contracts compliance dependencies`); every run-check of this gate stays within its 600 s limit and the contract check under 10 s (SC-A10-006) — Verified 2026-11-14: 2026-11-14: .autonomy/checks/A10-P00.{script-tests,fast-checks}.json exit 0; every run under 600 s, contract check under 10 s
-- [ ] T-A10-011 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A10-P00
+- [X] T-A10-011 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A10-P00 — Verified 2026-11-14: 2026-11-14: /speckit-converge appended nothing (8 FR, 6 SC, 4 stories, 10 tasks with evidence; contract 17 rows, 7 gaps, decision go)
 
 ## Dependencies
 
