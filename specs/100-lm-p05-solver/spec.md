@@ -22,6 +22,40 @@ Canonical overrides:
 - **Owner rulings:** short tests; audits and device runs in the device campaign ({device}); iOS 27 at phase gates;
   reference regression and iOS 26 at X-A13; every Spec Kit step runs.
 
+## Clarifications
+
+### Session 2026-11-15
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+`BeamTracer.trace(_:)` gives `Beam.isSolved` for a board; `Board.applying(_:)` sets the turnable tiles' orientations
+(nil for a wrong count); `Board.turnableIndices` lists them; `Board.problem` names an invalid board; tiles never move
+(`Tile` has a cell but no move rule; the only state is `MazeState.orientations`); the catalog's largest level has 8
+turnable tiles (`MazeCore.maxTurnable`), every level was designed for a single solution (LevelCatalog header);
+`LicenseAudit.problems(_:)` lists missing author or license fields; the experience test `MazeGlowTests` already compares
+drawn beam lines with tracer segments on five levels; no search or solver exists in any framework product (contract row
+M11).
+
+- Q: What does the search examine, in what order, and what is one "turn"? → A: Orientation sets of the turnable tiles
+  only. A turn toggles one tile, so the turns of a set are the tiles whose orientation differs from the start. Order:
+  by number of turns k = 0, 1, … n, and within k the tile combinations in lexicographic order of tile index; the first
+  set whose traced board is solved is reported with its turns and the number of sets examined. Deterministic; at most
+  2ⁿ sets.
+- Q: What is the limit and what is refused? → A: At most 16 turnable tiles (65,536 sets); a board with more is refused
+  `too-many-tiles`, an invalid board `invalid-board` (the board's own problem code is kept), both before any set is
+  traced. A test builds a 16-tile board that is searched and a 17-tile board that is refused.
+- Q: Where does the search live and is it shown to people? → A: In LightMazeCore as `Solver` and `ContentQA`
+  (pure Swift, VisualCoreMath only), used by tests and the release QA; nothing in the experience calls them at run
+  time, and no control or word changes (hints stay as A13-P04 built them).
+- Q: What exactly does content QA check and report? → A: Per level: `unsolvable` (search finds no set), `wrong-solution`
+  (the recorded solution does not light every target), `longer-solution` (recorded turns > fewest turns; no level has
+  an allowance), `solved-start` (the start lights every target), `no-license` (LicenseAudit problem for the level);
+  the result holds the level id, fewest turns, recorded turns and the failed check names in that order. Damaged-level
+  fixtures are built in tests from catalog levels (a wall added on the path, a solution entry flipped, the start set to
+  the solution, the license emptied).
+- Q: How is "the drawn beam matches the tracer" checked? → A: An experience test builds the scene of each of the 20 levels
+  at its start, with its recorded solution and with the search's answer, and requires the core beam lines' end points
+  (in cells) to equal the tracer's segments one to one, within 1e-9; the drawing itself does not change.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Every level is proven solvable by the rules (Priority: P1) 🎯
@@ -48,8 +82,7 @@ unsolvable.
 
 ### User Story 2 - The content passes release QA (Priority: P1)
 
-Before release, one check confirms for every level: it is solvable, its recorded solution is correct and no longer than
-needed by more than the level allows, its start is not already solved, and its author and license are recorded.
+Before release, one check confirms for every level: it is solvable, its recorded solution is correct and uses the fewest turns, its start is not already solved, and its author and license are recorded.
 
 **Why this priority**: the phase's name (release QA) and row M20's recheck.
 
@@ -94,15 +127,16 @@ The beam a person sees starts and ends exactly where the rules say, on every lev
 - **FR-A13-501**: The search MUST examine orientation sets of the turnable tiles in a fixed order of increasing number
   of turns from the start, report the first set that lights every target (fewest turns), or report unsolvable after
   all sets, counting the sets it examined.
-- **FR-A13-502**: The search MUST refuse, without searching, a board that is invalid or has more turnable tiles than its
-  limit (16, at most 65,536 sets).
+- **FR-A13-502**: The search MUST refuse, without searching, a board that is invalid (`invalid-board`) or has more
+  turnable tiles than its limit (`too-many-tiles`: more than 16; at most 65,536 sets).
 
 **Release QA (story 2)**
 
 - **FR-A13-510**: The content QA MUST check every level for: solvable by the search; recorded solution lights every target;
-  recorded solution's turns not more than the fewest plus the level's allowance (0 unless stated); start not solved;
+  recorded solution's turns not more than the fewest (no level has an allowance); start not solved;
   author and license present; and report one result per level with the fewest turns.
-- **FR-A13-511**: Each failing check MUST be named in the result.
+- **FR-A13-511**: Each failing check MUST be named in the result (`unsolvable`, `wrong-solution`, `longer-solution`,
+  `solved-start`, `no-license`).
 
 **Drawing matches rules (story 3)**
 
@@ -128,8 +162,8 @@ The beam a person sees starts and ends exactly where the rules say, on every lev
 
 - The board, tracer, levels with recorded solutions, actions and presenter of A13-P01–P04 exist. Tiles turn but never
   move, so the search space is the orientations of the turnable tiles.
-- A recorded solution is expected to use the fewest turns; a level may state an allowance if a longer recorded solution
-  is intended (none does today).
+- A recorded solution is expected to use the fewest turns (each level was designed for a single solution); a longer one
+  fails QA.
 
 ## Traceability
 
