@@ -8,7 +8,7 @@ stay open, as for A10-P06.
 
 ## Phase 1: Setup
 
-- [ ] T-A11-601 Baseline: cite the A11-P05 evidence on the unchanged tree (`.autonomy/checks/A11-P05.{playground-ios27,app-unit,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14)
+- [X] T-A11-601 Baseline: cite the A11-P05 evidence on the unchanged tree (`.autonomy/checks/A11-P05.{playground-ios27,app-unit,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14) — Verified 2026-11-15: 2026-11-15: cited .autonomy/checks/A11-P05.{playground-ios27,app-unit,verify-27}.json (exit 0) on the unchanged source tree (no rerun)
 
 ## Phase 2: User Story 1 — nothing leaves the device (P1) 🎯
 
