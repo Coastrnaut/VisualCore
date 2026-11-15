@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a09.digital-aquarium",
+    "--runtime",
+    "27"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a09.digital-aquarium --runtime 27",
+  "elapsed_seconds": 23.885,
+  "exit_code": 0,
+  "finished": "2026-11-15T01:44:47+00:00",
+  "log": ".autonomy/logs/A09-P05.verify-27.log",
+  "log_sha256": "15cde5272c091d5222fbdf7cae15da3572b9ae014a6c5176d0779647d3283ec7",
+  "name": "verify-27",
+  "stage": "A09-P05",
+  "started": "2026-11-15T01:44:23+00:00",
+  "timed_out": false
+}
