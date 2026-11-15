@@ -25,6 +25,45 @@ Canonical overrides:
 - **Owner rulings:** short tests; audits and device runs in the device campaign; iOS 27 at phase gates; every Spec Kit
   step runs.
 
+## Clarifications
+
+### Session 2026-11-14
+
+Facts checked in code: `ExperienceStorage` (VisualCoreExperience) gives each experience its own files (`write` replaces a
+file atomically under the quota of 16 MB and 64 files, `read`, `list`, `remove`, names ≤ 128 characters);
+Oscilloscope Studio's `ScopePresetStore` keeps one `scope-<uuid>.json` per preset, counts unreadable and newer files
+without deleting them, and applies a preset by sending actions through the `ExperienceActionPort` — a presenter cannot
+replace the whole state (the shell's `restore` takes a snapshot, used by the session). The host calls
+`draw(_:tier:context:frame:)` with the governor's tier and `setQualityTier`; the session records `lowPower` from the
+device conditions; `ResourceRegistry.stats` counts live drawing resources.
+
+- Q: What exactly does a saved aquarium hold, given that a saved configuration is applied through actions? → A: A
+  habitat configuration, not a frozen moment: the habitat, the decorations with their positions, rotations and
+  scales, the lighting, the chosen decoration kind and the ambient choice (format 1, file `aquarium-<uuid>.json`, with
+  id, name and save time). Opening it sends the actions that rebuild it: `habitat.select` (fresh fish of the habitat's
+  species and counts, no food), then the decorations by `decor.remove`, `decor.kind`, `decor.place` and a new
+  `decor.turn [index, rotation, scale]`, then `lighting.level` and `ambient.mode`. Fish positions and food are not
+  saved. At most 12 saved aquariums; names trimmed to 1…40 characters (empty → "My aquarium"); duplicates allowed.
+  Unreadable or newer files are counted and never deleted. The full-state restore of Phases 01–04 (the session's saved
+  state) stays as it is.
+- Q: How does ambient mode change the simulation, and what stays presentation-only? → A: `ambient.mode [0…1]` is part
+  of the saved state (snapshot schema 4, `ambient`, missing → off). In ambient the fish cruise at 0.6 of their species'
+  cruise speed (the speed floor scales with it); every other bound holds. Bubbles and motes are halved (12 per vent,
+  12 motes) and dimming applies whenever ambient drawing is in effect — the saved choice, Low Power Mode or Reduce
+  Motion; Low Power Mode and Reduce Motion never change the state.
+- Q: What are the idle interval and the dimmed brightness? → A: After 60 seconds of frame time without a canvas touch
+  the scene's colours fade over 2 seconds to 60 % brightness (in-scene colour scale, applied to the shader colours and
+  every node); a touch restores 100 % at once; pausing does not stop the idle clock. The experience never sets the
+  system screen brightness or the idle timer (no such call in its sources; a test scans them).
+- Q: What are the quality levels? → A: Three levels (`qualityTiers` 3; registration `quality_tiers` level-0, level-1,
+  level-2): level 0 everything; level 1 bubbles 12 per vent, 12 motes, caustics one octave; level 2 bubbles 6 per vent,
+  6 motes, caustics off (the plain fallback). Ambient and level combine by taking the smaller budget.
+- Q: How are the long-run bounds and graphics memory proved within the short-test rule? → A: A core test runs 10,000
+  steps with a feed every 100 steps for 3 seeds (fish count constant, food ≤ 12, bubbles ≤ 48, motes 24 at sampled
+  steps); a session test opens and closes the experience five times and compares `ResourceRegistry.stats` after each
+  open with the first; longer device runs (ten minutes) belong to the device campaign. Manifest fixtures: 12 ambient
+  (ambient on, 600 steps), 13 a long run with feeds (2,000 steps, a feed every 100).
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Saved aquariums (Priority: P1) 🎯
@@ -41,8 +80,9 @@ reported; the number and size of saved aquariums are bounded.
 
 1. **Given** an arranged aquarium, **When** the person saves it under a name, **Then** it appears in the list with that
    name.
-2. **Given** a saved aquarium, **When** the person opens it, **Then** the habitat, fish, plants, decorations, food and
-   lighting are exactly as saved.
+2. **Given** a saved aquarium, **When** the person opens it, **Then** the habitat, its fish species and counts, plants,
+   decorations (with their transforms), lighting, decoration kind and ambient choice are as saved; the fish swim from
+   fresh positions and there is no food.
 3. **Given** a saved aquarium, **When** the person deletes it, **Then** it disappears from the list and the current
    aquarium is unchanged.
 4. **Given** a damaged or unreadable saved file, **When** the list is shown, **Then** that entry is skipped, the others
@@ -124,29 +164,34 @@ pattern — without changing the aquarium itself.
 
 ### Functional Requirements
 
-- **FR-A09-501**: A person MUST be able to save the current aquarium under a name, list saved aquariums, open one and
-  delete one; the number of saved aquariums is bounded and a save beyond it is refused with a reason.
-- **FR-A09-502**: Opening a saved aquarium MUST restore it exactly; damaged, foreign or unreadable saved files MUST be
-  skipped and reported without affecting the others or the current aquarium.
-- **FR-A09-510**: Ambient mode MUST be a saved choice of the aquarium; it MUST lower bubbles and motes to at most half and
-  the fish cruise speed to a stated fraction, keeping every earlier bound.
-- **FR-A09-511**: In ambient mode (or with Low Power Mode or Reduce Motion) the scene MUST dim to a stated brightness
-  after a stated idle interval without touches and MUST restore on the next touch; the system screen brightness MUST
-  never be changed.
+- **FR-A09-501**: A person MUST be able to save the current aquarium's configuration (habitat, decorations with
+  transforms, lighting, decoration kind, ambient choice) under a name, list saved aquariums, open one and delete one; at
+  most 12 are kept and a save beyond them is refused with a reason.
+- **FR-A09-502**: Opening a saved aquarium MUST rebuild its configuration exactly through actions (including the new
+  `decor.turn [index, rotation −π…π, scale 0.5…2.0]`); damaged, foreign, newer or unreadable saved files MUST be
+  counted, skipped and reported without being deleted and without affecting the others or the current aquarium.
+- **FR-A09-510**: Ambient mode MUST be a saved choice of the aquarium (`ambient.mode`, snapshot schema 4); it MUST lower
+  bubbles and motes to at most half and the fish cruise speed to 0.6 of normal, keeping every earlier bound.
+- **FR-A09-511**: In ambient mode (or with Low Power Mode or Reduce Motion) the scene MUST fade over 2 s to 60 % brightness
+  after 60 s without a canvas touch and MUST restore on the next touch; the system screen brightness and idle timer
+  MUST never be changed.
 - **FR-A09-512**: Low Power Mode and Reduce Motion MUST select ambient drawing (fewer particles, dimming) without
   changing the saved state.
-- **FR-A09-520**: The experience MUST declare its quality levels; each level MUST lower or keep particle counts and the
-  light pattern's cost relative to the level above; the state MUST never depend on the level.
+- **FR-A09-520**: The experience MUST declare three quality levels (level 0 all; level 1 bubbles 12 per vent, 12 motes,
+  one-octave caustics; level 2 bubbles 6 per vent, 6 motes, no caustics), matching its registration; the state MUST
+  never depend on the level.
 - **FR-A09-530**: A long run MUST keep the fish count constant and pellets, bubbles and motes within their limits;
   drawing resources MUST return to the same count after closing and reopening.
-- **FR-A09-531**: The scenario manifest MUST add fixtures for ambient mode and a long run with feeds.
+- **FR-A09-531**: The scenario manifest MUST add fixtures for ambient mode (600 steps) and a long run with feeds (2,000
+  steps, a feed every 100).
 - **FR-A09-540**: A device-campaign document MUST plan the device measurements (frame time per level, thermal state over
   ten minutes, memory, ambient dimming, saved aquariums, VoiceOver, Dynamic Type, Reduce Motion), all pending until
   ImplementationLock-100.
 
 ### Key Entities
 
-- **Saved aquarium**: a name, an identity, the saved aquarium state; stored in the experience's own storage.
+- **Saved aquarium**: format, id, name (1…40), save time, habitat index, lighting, decoration kind, ambient, decorations
+  (kind, position, rotation, scale); one file per aquarium in the experience's own storage; at most 12.
 - **Ambient mode**: a saved on/off choice; an effective ambient drawing state also selected by Low Power Mode and
   Reduce Motion.
 - **Quality level**: a declared drawing budget (particles, light pattern).
