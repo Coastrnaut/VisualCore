@@ -10,7 +10,7 @@
 
 ## Phase 2: Foundational (core schema 3)
 
-- [ ] T-A09-302 Habitat document schema 3 in `Packages/ExperiencesCreative/DigitalAquarium/Core/HabitatDocument.swift`: `FoodPellet` ("position: Vec2", finite, inside the swim bounds), `food: [FoodPellet]` ("≤ 12; missing → []"), `currentSchema = 3`, `migrated(catalog:)` brings schemas 1 and 2 to 3, validation of the food count and positions; habitat starter documents have no food; tests in `CoreTests/{HabitatDocumentTests,HabitatMigrationTests}.swift` (FR-A09-320)
+- [X] T-A09-302 Habitat document schema 3 in `Packages/ExperiencesCreative/DigitalAquarium/Core/HabitatDocument.swift`: `FoodPellet` ("position: Vec2", finite, inside the swim bounds), `food: [FoodPellet]` ("≤ 12; missing → []"), `currentSchema = 3`, `migrated(catalog:)` brings schemas 1 and 2 to 3, validation of the food count and positions; habitat starter documents have no food; tests in `CoreTests/{HabitatDocumentTests,HabitatMigrationTests}.swift` (FR-A09-320) — Verified 2026-11-14: 2026-11-14: HabitatDocument schema 3 (FoodPellet, food ≤ 12, migrated 1/2 → 3, validation); HabitatDocumentTests and HabitatMigrationTests pass in DigitalAquariumCoreTests (72 tests) on sim-27.2
 
 ## Phase 3: User Story 1 — feeding the fish (P1) 🎯
 

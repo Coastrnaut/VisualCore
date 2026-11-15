@@ -6,6 +6,8 @@
 // Feature 069 (A09-P02) T-A09-203 (FR-A09-212): schema 2 — starters carry the habitat's starter decor and fish with
 // turn 0, the decor draws no random numbers (the fish are those of a decor-free catalog), and validation names a decor
 // kind missing from the catalog. Migration from schema 1 is in `HabitatMigrationTests`.
+// Feature 070 (A09-P03) T-A09-302 (FR-A09-320): schema 3 — starters have no food, the JSON round trip keeps the food,
+// and validation names too many pellets and a pellet outside the swim bounds or non-finite.
 import Foundation
 import Testing
 import VisualCoreMath
@@ -25,7 +27,7 @@ import DigitalAquariumCore
         let habitat = catalog.habitats[index]
         #expect(doc.validate(catalog: catalog).isEmpty)
         #expect(doc.validate().isEmpty)
-        #expect(doc.schema == 2 && doc.habitatIndex == index && doc.habitatId == habitat.id)
+        #expect(doc.schema == 3 && doc.habitatIndex == index && doc.habitatId == habitat.id)
         #expect(doc.waterColor == habitat.waterColor)
         #expect(doc.bounds == SwimBounds(minX: 0.5, maxX: 15.5, minY: 1.5, maxY: 8.5))
         #expect(Set(doc.fish.map(\.speciesId)).count == 2)
@@ -36,6 +38,7 @@ import DigitalAquariumCore
         #expect(doc.decor.count == [3, 2][index])
         #expect(doc.fish.allSatisfy { $0.turn == 0 })
         #expect(doc.lighting == 1)
+        #expect(doc.food.isEmpty)
         for fish in doc.fish {
             let species = try #require(catalog.species(id: fish.speciesId))
             #expect(doc.bounds.contains(fish.position))
@@ -88,12 +91,33 @@ import DigitalAquariumCore
         doc.lighting = 2
         doc.decor = [DecorPlacement(kindId: "round-rock", position: Vec2(3, 0.8), rotation: -2.5, scale: 1.75)]
         doc.fish[0].turn = -0.42
+        doc.food = [FoodPellet(position: Vec2(4.25, 7.5)), FoodPellet(position: Vec2(15.5, 1.5))]
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.sortedKeys]
         let data = try encoder.encode(doc)
         let decoded = try JSONDecoder().decode(HabitatDocument.self, from: data)
         #expect(decoded == doc)
+        #expect(decoded.food.count == 2)
         #expect(decoded.validate(catalog: catalog).isEmpty)
+    }
+
+    @Test func validationNamesBadFood() {
+        let valid = starter(0)
+        var doc = valid
+        doc.food = Array(repeating: FoodPellet(position: Vec2(8, 5)), count: HabitatDocument.maxFood)
+        #expect(doc.validate(catalog: catalog).isEmpty)
+        doc.food.append(FoodPellet(position: Vec2(8, 5)))
+        #expect(doc.validate() == ["13 food pellets exceed 12"])
+        doc = valid
+        doc.food = [FoodPellet(position: Vec2(8, 5)), FoodPellet(position: Vec2(8, 1.4))]
+        #expect(doc.validate() == ["food 1 is outside the swim bounds"])
+        doc.food = [FoodPellet(position: Vec2(15.6, 5))]
+        #expect(doc.validate() == ["food 0 is outside the swim bounds"])
+        doc.food = [FoodPellet(position: Vec2(.nan, 5))]
+        #expect(doc.validate() == ["food 0 is outside the swim bounds"])
+        doc.food = [FoodPellet(position: Vec2(8, .infinity))]
+        #expect(doc.validate() == ["food 0 is outside the swim bounds"])
+        #expect(HabitatDocument.maxFood == 12 && Feeding.maxPellets == HabitatDocument.maxFood)
     }
 
     @Test func validationNamesEveryProblem() {

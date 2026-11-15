@@ -6,6 +6,9 @@
 // scales 0.4 and 2.1, rotation 4, an unknown decor kind, decor outside the tank and a non-finite turn; a schema-2
 // document round-trips identically; and the catalog decoder refuses bad decor kinds and spots while a catalog without
 // decor keys still decodes.
+// Feature 070 (A09-P03) T-A09-302 (FR-A09-320; research D3): schema 3 — schemas 1 and 2 (no `food` key) decode with
+// no food and migrate to 3 (schema 2 keeps its decor, even none); a schema-2 document is refused until migrated; a
+// schema-3 document with food round-trips identically; schema 4 is left alone.
 import Foundation
 import Testing
 import VisualCoreMath
@@ -34,6 +37,15 @@ import DigitalAquariumCore
         object["schema"] = 1
         object["fish"] = fish.map { var f = $0; f["turn"] = nil; return f }
         object["decor"] = decor
+        object["food"] = nil
+        return try JSONSerialization.data(withJSONObject: object, options: [.sortedKeys])
+    }
+
+    /// `doc` written as schema 2 wrote it: schema 2 and no `food` key.
+    private func schemaTwoJSON(_ doc: HabitatDocument) throws -> Data {
+        var object = try #require(try JSONSerialization.jsonObject(with: encoded(doc)) as? [String: Any])
+        object["schema"] = 2
+        object["food"] = nil
         return try JSONSerialization.data(withJSONObject: object, options: [.sortedKeys])
     }
 
@@ -43,12 +55,14 @@ import DigitalAquariumCore
         let data = try schemaOneJSON(original)
         let text = try #require(String(data: data, encoding: .utf8))
         #expect(!text.contains("\"turn\"") && !text.contains("\"rotation\"") && !text.contains("\"scale\""))
+        #expect(!text.contains("\"food\""))
         let old = try JSONDecoder().decode(HabitatDocument.self, from: data)
-        #expect(old.schema == 1 && old.decor.isEmpty)
+        #expect(old.schema == 1 && old.decor.isEmpty && old.food.isEmpty)
         #expect(old.fish.allSatisfy { $0.turn == 0 })
         #expect(old.validate(catalog: catalog).contains { $0.contains("schema 1") })
         let migrated = old.migrated(catalog: catalog)
-        #expect(migrated.schema == HabitatDocument.currentSchema && migrated.schema == 2)
+        #expect(migrated.schema == HabitatDocument.currentSchema && migrated.schema == 3)
+        #expect(migrated.food.isEmpty)
         #expect(migrated.decor == catalog.habitats[index].decor.map { DecorPlacement($0) })
         #expect(migrated.fish == original.fish)
         #expect(migrated.plants == original.plants)
@@ -71,8 +85,8 @@ import DigitalAquariumCore
         #expect(old.decor == [DecorPlacement(kindId: "flat-rock", position: Vec2(4, 1.2), rotation: 0, scale: 1)])
         #expect(old.fish.map(\.turn) == [0])
         let migrated = old.migrated(catalog: catalog)
-        #expect(migrated.schema == 2)
-        #expect(migrated.decor == old.decor)
+        #expect(migrated.schema == 3)
+        #expect(migrated.decor == old.decor && migrated.food.isEmpty)
         #expect(migrated.fish == old.fish && migrated.plants == old.plants && migrated.lighting == 0)
         #expect(migrated.validate(catalog: catalog).isEmpty)
     }
@@ -81,15 +95,40 @@ import DigitalAquariumCore
         let current = starter(0)
         #expect(current.migrated(catalog: catalog) == current)
         var future = current
-        future.schema = 3
+        future.schema = 4
         #expect(future.migrated(catalog: catalog) == future)
-        #expect(future.validate(catalog: catalog).contains { $0.contains("schema 3") })
+        #expect(future.validate(catalog: catalog).contains { $0.contains("schema 4") })
         var lost = current
         lost.schema = 1
         lost.decor = []
         lost.habitatIndex = 9
         let migrated = lost.migrated(catalog: catalog)
-        #expect(migrated.schema == 2 && migrated.decor.isEmpty)
+        #expect(migrated.schema == 3 && migrated.decor.isEmpty)
+    }
+
+    @Test(arguments: [0, 1]) func aSchemaTwoDocumentMigratesToThreeKeepingItsDecor(index: Int) throws {
+        var original = starter(index, seed: 21)
+        original.lighting = 0
+        original.fish[0].turn = 0.5
+        original.decor[0].rotation = 1.25
+        original.decor.removeLast()
+        let data = try schemaTwoJSON(original)
+        let text = try #require(String(data: data, encoding: .utf8))
+        #expect(!text.contains("\"food\""))
+        let old = try JSONDecoder().decode(HabitatDocument.self, from: data)
+        #expect(old.schema == 2 && old.food.isEmpty)
+        #expect(old.validate(catalog: catalog) == ["schema 2 is not 3"])
+        let migrated = old.migrated(catalog: catalog)
+        #expect(migrated.schema == 3)
+        #expect(migrated.decor == original.decor)
+        #expect(migrated.food.isEmpty)
+        #expect(migrated == original)
+        #expect(migrated.validate(catalog: catalog).isEmpty)
+        var bare = original
+        bare.schema = 2
+        bare.decor = []
+        let kept = bare.migrated(catalog: catalog)
+        #expect(kept.schema == 3 && kept.decor.isEmpty)
     }
 
     @Test func validationRefusesBadDecorAndTurn() {
@@ -124,19 +163,21 @@ import DigitalAquariumCore
         #expect(doc.validate().contains { $0.contains("fish 0 has a non-finite number") })
         doc = valid
         doc.schema = 1
-        #expect(doc.validate() == ["schema 1 is not 2"])
+        #expect(doc.validate() == ["schema 1 is not 3"])
     }
 
-    @Test func aSchemaTwoDocumentRoundTripsIdentically() throws {
+    @Test func aSchemaThreeDocumentRoundTripsIdentically() throws {
         var doc = starter(1, seed: 77)
         doc.lighting = 0
         doc.fish[0].turn = 0.37
         doc.fish[1].turn = -1.25
         doc.decor[0].rotation = 2.75
         doc.decor[1].scale = 0.6
+        doc.food = [FoodPellet(position: Vec2(6.75, 8.5)), FoodPellet(position: Vec2(7, 3.125))]
         let data = try encoded(doc)
         let text = try #require(String(data: data, encoding: .utf8))
         #expect(text.contains("\"turn\"") && text.contains("\"rotation\"") && text.contains("\"scale\""))
+        #expect(text.contains("\"food\""))
         let decoded = try JSONDecoder().decode(HabitatDocument.self, from: data)
         #expect(decoded == doc)
         #expect(try encoded(decoded) == data)

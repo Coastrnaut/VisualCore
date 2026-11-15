@@ -9,7 +9,12 @@
 // "DecorPlacement", "HabitatDocument"): each fish keeps its smoothed `turn` (radians per second, for drawing the bend);
 // each decor piece has a rotation (−π…π) and a scale (0.5…2.0); starter documents carry the habitat's starter decor.
 // A schema-1 document decodes with turn 0, rotation 0 and scale 1 and is brought to schema 2 by `migrated(catalog:)`
-// (the habitat's starter decor is added when it has none); validation accepts schema 2 only.
+// (the habitat's starter decor is added when it has none).
+// Schema 3 — feature 070 (A09-P03) T-A09-302 (FR-A09-320; clarification 4; research D3; data-model "FoodPellet",
+// "HabitatDocument"): the document holds the food pellets in the water (`food`, at most 12, each finite and inside the
+// swim bounds; a missing key decodes as none). `migrated(catalog:)` brings schemas 1 and 2 to 3 (schema 1 also gets
+// the starter decor when it has none; schema 2 keeps its decor); starter documents have no food; validation accepts
+// schema 3 only.
 import Foundation
 import VisualCoreMath
 import VisualCoreSimulation
@@ -132,16 +137,28 @@ public struct DecorPlacement: Codable, Equatable, Sendable {
     }
 }
 
-/// The versioned description of one aquarium (schema 2).
+/// One food pellet in the water (schema 3).
+public struct FoodPellet: Codable, Equatable, Sendable {
+    /// The pellet's centre in habitat units; finite and inside the habitat's swim bounds.
+    public var position: Vec2
+
+    /// Creates a pellet at `position`; validity is checked by ``HabitatDocument/validate(catalog:)``.
+    public init(position: Vec2) { self.position = position }
+}
+
+/// The versioned description of one aquarium (schema 3).
 public struct HabitatDocument: Codable, Equatable, Sendable {
-    /// The document schema written by this version (2: fish `turn`, decor rotation and scale, starter decor).
-    public static let currentSchema = 2
+    /// The document schema written by this version (3: food pellets; 2: fish `turn`, decor rotation and scale,
+    /// starter decor).
+    public static let currentSchema = 3
     /// The most fish a habitat may hold.
     public static let maxFish = 24
     /// The most plants a habitat may hold.
     public static let maxPlants = 12
     /// The most decor items a habitat may hold.
     public static let maxDecor = 12
+    /// The most food pellets a habitat may hold in the water (``Feeding/maxPellets`` is this value).
+    public static let maxFood = 12
     /// The lighting levels: 0 dim, 1 soft, 2 bright.
     public static let lightingRange: ClosedRange<Int> = 0...2
     /// The lighting level of a new starter document (soft).
@@ -149,7 +166,7 @@ public struct HabitatDocument: Codable, Equatable, Sendable {
     /// The y coordinate plants stand on, in habitat units.
     public static let plantBaseY = 1.0
 
-    /// The document schema (2; a decoded schema-1 document is brought to 2 by ``migrated(catalog:)``).
+    /// The document schema (3; a decoded schema-1 or schema-2 document is brought to 3 by ``migrated(catalog:)``).
     public var schema: Int
     /// The index of the starter habitat in the catalog's `habitats`.
     public var habitatIndex: Int
@@ -167,14 +184,37 @@ public struct HabitatDocument: Codable, Equatable, Sendable {
     public var decor: [DecorPlacement]
     /// The lighting level, in ``lightingRange``.
     public var lighting: Int
+    /// The food pellets in the water; at most ``maxFood``, each inside ``bounds``.
+    public var food: [FoodPellet]
 
-    /// Creates a document from all of its fields; validity is checked by ``validate(catalog:)``.
+    /// Creates a document from all of its fields (`food` defaults to none); validity is checked by
+    /// ``validate(catalog:)``.
     public init(schema: Int = HabitatDocument.currentSchema, habitatIndex: Int, habitatId: String, waterColor: RGBA,
                 bounds: SwimBounds = .standard, plants: [PlantPlacement], fish: [FishAgent],
-                decor: [DecorPlacement] = [], lighting: Int = HabitatDocument.defaultLighting) {
+                decor: [DecorPlacement] = [], lighting: Int = HabitatDocument.defaultLighting,
+                food: [FoodPellet] = []) {
         self.schema = schema; self.habitatIndex = habitatIndex; self.habitatId = habitatId
         self.waterColor = waterColor; self.bounds = bounds; self.plants = plants; self.fish = fish
-        self.decor = decor; self.lighting = lighting
+        self.decor = decor; self.lighting = lighting; self.food = food
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case schema, habitatIndex, habitatId, waterColor, bounds, plants, fish, decor, lighting, food
+    }
+
+    /// Decodes a document; a missing `food` (schemas 1 and 2) decodes as none.
+    public init(from decoder: any Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        schema = try c.decode(Int.self, forKey: .schema)
+        habitatIndex = try c.decode(Int.self, forKey: .habitatIndex)
+        habitatId = try c.decode(String.self, forKey: .habitatId)
+        waterColor = try c.decode(RGBA.self, forKey: .waterColor)
+        bounds = try c.decode(SwimBounds.self, forKey: .bounds)
+        plants = try c.decode([PlantPlacement].self, forKey: .plants)
+        fish = try c.decode([FishAgent].self, forKey: .fish)
+        decor = try c.decode([DecorPlacement].self, forKey: .decor)
+        lighting = try c.decode(Int.self, forKey: .lighting)
+        food = try c.decodeIfPresent([FoodPellet].self, forKey: .food) ?? []
     }
 
     /// A new document of the catalog's starter habitat `index` (clamped to the catalog's habitats; an empty catalog
@@ -182,7 +222,7 @@ public struct HabitatDocument: Codable, Equatable, Sendable {
     /// the standard bounds with a random heading (mostly level, ±0.4 rad around left or right), moving at its
     /// species' cruise speed, with a random animation phase and `turn` 0. Fish of species missing from the catalog
     /// are skipped. The habitat's starter decor (at most ``maxDecor``) is copied as it is, drawing no random numbers,
-    /// so the generator sequence is the same as in schema 1.
+    /// so the generator sequence is the same as in schema 1. A starter document has no food.
     public static func starter(_ index: Int, catalog: SpeciesCatalog, random: inout SeededRandom) -> HabitatDocument {
         guard !catalog.habitats.isEmpty else {
             return HabitatDocument(habitatIndex: 0, habitatId: "none", waterColor: RGBA(0.05, 0.3, 0.5),
@@ -210,22 +250,24 @@ public struct HabitatDocument: Codable, Equatable, Sendable {
                                bounds: bounds, plants: plants, fish: fish, decor: decor)
     }
 
-    /// This document brought to schema 2. A schema-1 document (decoded with turn 0, rotation 0 and scale 1) gets
-    /// schema 2, and when it has no decor, the starter decor (at most ``maxDecor``) of the catalog habitat at
-    /// `habitatIndex`, if that habitat exists; its fish, plants, lighting and other fields are kept. A document of any
-    /// other schema (2, or one this version does not know) is returned unchanged, so validation still judges it.
+    /// This document brought to schema 3. A schema-1 document (decoded with turn 0, rotation 0 and scale 1) gets
+    /// schema 3, and when it has no decor, the starter decor (at most ``maxDecor``) of the catalog habitat at
+    /// `habitatIndex`, if that habitat exists. A schema-2 document gets schema 3 and keeps its decor. Both keep their
+    /// fish, plants, lighting, food (decoded as none when the key is missing) and other fields. A document of any
+    /// other schema (3, or one this version does not know) is returned unchanged, so validation still judges it.
     public func migrated(catalog: SpeciesCatalog) -> HabitatDocument {
-        guard schema == 1 else { return self }
+        guard schema == 1 || schema == 2 else { return self }
         var copy = self
-        copy.schema = 2
-        if copy.decor.isEmpty, catalog.habitats.indices.contains(habitatIndex) {
+        copy.schema = Self.currentSchema
+        if schema == 1, copy.decor.isEmpty, catalog.habitats.indices.contains(habitatIndex) {
             copy.decor = catalog.habitats[habitatIndex].decor.prefix(Self.maxDecor).map { DecorPlacement($0) }
         }
         return copy
     }
 
-    /// The document's problems, empty when it is valid: the schema (exactly 2; a schema-1 document must be
-    /// ``migrated(catalog:)`` first), the bounds, the water colour, the counts (≤ 24 fish, ≤ 12 plants, ≤ 12 decor),
+    /// The document's problems, empty when it is valid: the schema (exactly 3; a schema-1 or schema-2 document must
+    /// be ``migrated(catalog:)`` first), the bounds, the water colour, the counts (≤ 24 fish, ≤ 12 plants, ≤ 12 decor,
+    /// ≤ 12 food pellets), every food pellet (finite, inside the swim bounds),
     /// every fish (non-empty species, finite numbers including `turn`, position inside the bounds, phase in 0…2π),
     /// every plant (non-empty kind, x finite inside the tank), every decor piece (non-empty kind, position inside the
     /// tank, finite rotation in −π…π, finite scale in 0.5…2.0) and the lighting level (0…2). With a `catalog` it also
@@ -240,6 +282,10 @@ public struct HabitatDocument: Codable, Equatable, Sendable {
         if fish.count > Self.maxFish { problems.append("\(fish.count) fish exceed \(Self.maxFish)") }
         if plants.count > Self.maxPlants { problems.append("\(plants.count) plants exceed \(Self.maxPlants)") }
         if decor.count > Self.maxDecor { problems.append("\(decor.count) decor items exceed \(Self.maxDecor)") }
+        if food.count > Self.maxFood { problems.append("\(food.count) food pellets exceed \(Self.maxFood)") }
+        for (i, pellet) in food.enumerated() where !bounds.contains(pellet.position) {
+            problems.append("food \(i) is outside the swim bounds")
+        }
         if !Self.lightingRange.contains(lighting) { problems.append("lighting \(lighting) is outside 0…2") }
         for (i, agent) in fish.enumerated() {
             if agent.speciesId.isEmpty { problems.append("fish \(i) has no species") }
