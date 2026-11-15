@@ -12,6 +12,12 @@
 // the lane centres under the objects, player and HUD; the wave number is drawn in seven-segment digits beside the
 // score; the description names the wave; drawing a wave-3 run never changes its state or digest and keeps every
 // object at its rule size.
+// Feature 077 (A10-P03) T-A10-304 (FR-A10-310, FR-A10-311, FR-A10-320, FR-A10-321; SC-A10-301; story 1 scenarios 1, 3
+// and 4; story 2 scenarios 1 and 2): the title screen is drawn (non-blank, its probe holding) with its emblem; the
+// game-over screen shows the shade, the cross and the final score and wave digits; screens cross-fade over 0.25 s and
+// change at once under Reduce Motion; the effects are drawn in the back layer, before the particles and both before
+// every collision shape; a hit draws its ring and, unless reduced flashing, the full-field tint; the wave sweep runs
+// down the field; particles reach the renderer in a session; the probe steps aside for effects.
 import Foundation
 import XCTest
 @testable import NeonArcadeExperience
@@ -85,6 +91,8 @@ final class ArcadeRenderTests: XCTestCase {
         XCTAssertNotEqual(StableHash.sha256Hex(later.rgba), StableHash.sha256Hex(further.rgba), "and keep falling")
 
         XCTAssertTrue(shell.handle(control: "run.pause", values: [1]).isAccepted)
+        try ArcadeTest.frames(session, 20)   // past the 0.25 s cross-fade to the paused screen
+        XCTAssertEqual(shell.presenter.lastTransitionProgress, 1)
         let held = try ArcadeTest.picture(session)
         try ArcadeTest.frames(session, 10)
         let stillHeld = try ArcadeTest.picture(session)
@@ -95,7 +103,7 @@ final class ArcadeRenderTests: XCTestCase {
     func testDrawingNeverChangesTheDigest() async throws {
         let session = ExperienceSession()
         let shell = try await ArcadeTest.open(session, size: size)
-        var entries: [ScenarioStep] = []
+        var entries: [ScenarioStep] = [ArcadeCore.startEntry]
         var last = 0
         func steer(_ value: Double) {
             let step = shell.engine.stepIndex
@@ -421,5 +429,191 @@ final class ArcadeRenderTests: XCTestCase {
                 XCTAssertFalse(text.contains(word), "\(file.lastPathComponent) mentions \(word)")
             }
         }
+    }
+
+    // MARK: Feature 077 (A10-P03)
+
+    /// A core holding `run` on `screen` (prepared with seed 7).
+    private func core(_ run: GameRun, screen: ArcadeScreen) throws -> ArcadeCore {
+        try ArcadeCore.restore(payload: ArcadeCore.encode(ArcadeState(run: run, random: SeededRandom(seed: 7).state,
+                                                                      screen: screen)), seed: 7)
+    }
+
+    /// T-A10-304 (story 1 scenario 1): the title screen is drawn — not blank, not black, its probe holding — with the
+    /// shade, the emblem and the play triangle; nothing falls.
+    func testTheTitleScreenIsDrawn() async throws {
+        let session = ExperienceSession()
+        let shell = try await ArcadeTest.open(session, start: false, size: size)
+        let frame = try ArcadeTest.picture(session)
+        assertDrawn(shell, frame, "title")
+        XCTAssertFalse(shell.frameProbes.isEmpty)
+        let presenter = shell.presenter
+        XCTAssertEqual(presenter.lastStateMark, "title")
+        for node in [presenter.titleShadeNode, presenter.titleRing, presenter.titleChevron, presenter.titlePlay] {
+            XCTAssertNotNil(node.primitive, node.id)
+            XCTAssertEqual(node.z, ArcadePresenter.stateZ)
+        }
+        XCTAssertEqual(presenter.lastObjectsDrawn, 0, "nothing falls on the title screen")
+        try ArcadeTest.frames(session, 30)
+        XCTAssertEqual(StableHash.sha256Hex(try ArcadeTest.picture(session).rgba), StableHash.sha256Hex(frame.rgba),
+                       "the title holds still")
+        session.close()
+    }
+
+    /// T-A10-304 (story 1 scenario 3): the game-over screen shows the shade, the cross and the run's final score and
+    /// wave in seven-segment digits centred under the cross; the title nodes are hidden.
+    func testTheGameOverScreenShowsTheScoreAndTheWave() throws {
+        let presenter = ArcadePresenter(experienceID: ArcadeTest.id)
+        var run = waveThreeRun()
+        run.lives = 0
+        run.over = true
+        run.score = 1_250
+        presenter.layOut(try core(run, screen: .over), width: 90, height: 160)
+        XCTAssertEqual(presenter.lastStateMark, "over")
+        XCTAssertEqual(presenter.lastOverScoreText, "1250")
+        XCTAssertEqual(presenter.lastOverWaveText, "3")
+        let litScore = presenter.overScoreNodes.map { $0.filter { $0.primitive != nil }.count }
+        XCTAssertEqual(Array(litScore.prefix(4)), [1, 2, 5, 0].map { ArcadePresenter.segmentTable[$0].count })
+        XCTAssertEqual(Array(litScore.dropFirst(4)), [0, 0, 0])
+        let litWave = presenter.overWaveNodes.map { $0.filter { $0.primitive != nil }.count }
+        XCTAssertEqual(litWave, [ArcadePresenter.segmentTable[3].count, 0, 0])
+        XCTAssertEqual(ArcadePresenter.centredDigitsX(1), 4.5 - ArcadePresenter.digitWidth / 2, accuracy: 1e-12)
+        XCTAssertNil(presenter.titleShadeNode.primitive)
+        XCTAssertEqual(presenter.describe(try core(run, screen: .over)),
+                       "Neon Arcade: Neon Dodge, wave 3, score 1250, no lives, 3 objects falling, over.")
+    }
+
+    /// T-A10-304 (FR-A10-311; story 1 scenario 4; analyze addition): a screen change cross-fades over 0.25 s of frame
+    /// time — the old overlay fading out while the new one fades in — and under Reduce Motion the cross-fade lasts
+    /// 0 s: the change is immediate. Presentation only: the core is unchanged.
+    func testScreensCrossFadeAndChangeAtOnceUnderReduceMotion() throws {
+        let full = ArcadePresenter(experienceID: ArcadeTest.id)
+        let reduced = ArcadePresenter(experienceID: ArcadeTest.id, reduceMotion: true)
+        XCTAssertEqual(full.screenTransitionDuration, 0.25, accuracy: 1e-12)
+        XCTAssertEqual(reduced.screenTransitionDuration, 0, "Reduce Motion: no animated transition")
+        var run = GameRun.new()
+        run.step = 200
+        let playing = try core(run, screen: .playing)
+        run.paused = true
+        let paused = try core(run, screen: .paused)
+        let copy = paused
+        for presenter in [full, reduced] {
+            presenter.advancePresentation(playing, seconds: 1.0 / 60)
+            presenter.layOut(playing, width: 90, height: 160)
+            XCTAssertEqual(presenter.lastTransitionProgress, 1, "the first screen appears at once")
+            presenter.advancePresentation(paused, seconds: 1.0 / 60)
+            presenter.layOut(paused, width: 90, height: 160)
+        }
+        XCTAssertEqual(reduced.lastTransitionProgress, 1, "immediate under Reduce Motion")
+        XCTAssertEqual(reduced.overlayAlpha(.paused), 1)
+        XCTAssertEqual(full.lastTransitionProgress, 0, "the cross-fade begins")
+        XCTAssertEqual(full.overlayAlpha(.playing), 1, "the old screen fades out from full")
+        full.advancePresentation(paused, seconds: 0.1)
+        XCTAssertEqual(full.transitionProgress, 0.4, accuracy: 1e-9)
+        XCTAssertEqual(full.overlayAlpha(.paused), 0.4, accuracy: 1e-9)
+        XCTAssertEqual(full.overlayAlpha(.playing), 0.6, accuracy: 1e-9)
+        full.layOut(paused, width: 90, height: 160)
+        XCTAssertEqual(full.lastTransitionProgress, 0.4, accuracy: 1e-9)
+        full.advancePresentation(paused, seconds: 0.2)
+        XCTAssertEqual(full.transitionProgress, 1)
+        XCTAssertNil(full.fadingScreen, "the cross-fade is over")
+        XCTAssertEqual(paused, copy, "presentation only")
+    }
+
+    /// T-A10-304 (FR-A10-320): every effect node lies in the back layer, which is drawn before the particles and the
+    /// front layer with the glows, objects and player: the collision shapes are always above the effects.
+    func testTheEffectsAreDrawnBelowTheCollisionShapes() throws {
+        let presenter = ArcadePresenter(experienceID: ArcadeTest.id)
+        let back = Set(presenter.backRoot.drawList().map { ObjectIdentifier($0.node) })
+        let front = Set(presenter.root.drawList().map { ObjectIdentifier($0.node) })
+        for node in presenter.effects.nodes {
+            XCTAssertTrue(back.contains(ObjectIdentifier(node)), "\(node.id) in the back layer")
+            XCTAssertFalse(front.contains(ObjectIdentifier(node)), "\(node.id) not in the front layer")
+        }
+        for node in presenter.bodyNodes + presenter.glowNodes + [presenter.playerRing, presenter.playerChevron] {
+            XCTAssertTrue(front.contains(ObjectIdentifier(node)), "\(node.id) in the front layer")
+            XCTAssertFalse(back.contains(ObjectIdentifier(node)), "\(node.id) not in the back layer")
+        }
+        XCTAssertTrue(back.contains(ObjectIdentifier(presenter.field)), "the field is under the effects")
+    }
+
+    /// T-A10-304 (story 2 scenarios 1 and 2; FR-A10-321): a pickup bursts cyan particles at the orb; a hit bursts red
+    /// particles, draws its ring expanding over 0.3 s and the full-field tint for 6 steps — under reduced flashing
+    /// only the ring; a new wave runs the sweep down the field over 0.5 s.
+    func testHitsPickupsAndWavesStartTheirEffects() throws {
+        var previous = GameRun.new()
+        previous.step = 599
+        previous.objects = [FallingObject(id: 4, contentId: "glow-orb", kind: .orb, position: Vec2(3, 2),
+                                          velocity: Vec2(0, -5), radius: 0.25, value: 10)]
+        previous.nextObjectId = 5
+        var current = previous
+        current.step = 600
+        current.objects = []
+        // Events carry the step they happened in, the step before the run's new step count (GameRun.validate).
+        current.events = [CollisionEvent(step: 599, objectId: 4, kind: .pickup),
+                          CollisionEvent(step: 599, objectId: 2, kind: .hit)]
+        current.eventCount = 2
+        current.lives = 2
+        current.wave = 2
+        current.waveStep = 0
+        for reduceFlashing in [false, true] {
+            let sound = RecordingSoundSink()
+            let haptics = RecordingHapticSink()
+            let presenter = ArcadePresenter(experienceID: ArcadeTest.id, reduceFlashing: reduceFlashing,
+                                            soundSink: sound, feedback: ArcadeTest.feedback(haptics))
+            presenter.advancePresentation(try core(previous), seconds: 1.0 / 60)
+            presenter.advancePresentation(try core(current), seconds: 1.0 / 60)
+            XCTAssertEqual(presenter.effects.lastCues.map(\.kind), [.pickup, .hit, .wave])
+            XCTAssertEqual(presenter.effects.burstCount, 2)
+            XCTAssertEqual(presenter.effects.particles.aliveCount,
+                           ArcadeEffectsLayer.pickupParticles + ArcadeEffectsLayer.hitParticles)
+            XCTAssertEqual(sound.played, ["pickup", "hit"], "two sounds per step at most")
+            XCTAssertEqual(haptics.played, [.impactLight, .impactHeavy])
+            XCTAssertEqual(presenter.effects.rings.count, 1)
+            XCTAssertEqual(presenter.effects.tintAlphaNow, reduceFlashing ? 0 : 0.25, "reduced flashing: ring only")
+            XCTAssertEqual(presenter.effects.sweepY ?? -1, GameRun.fieldHeight, accuracy: 1e-12)
+            presenter.layOut(try core(current), width: 90, height: 160)
+            XCTAssertNotNil(presenter.effects.ringNodes[0].primitive, "the ring is drawn")
+            XCTAssertEqual(presenter.effects.tint.primitive == nil, reduceFlashing)
+            XCTAssertNotNil(presenter.effects.sweep.primitive)
+            // Nine steps later: the ring has grown, the tint is gone, the sweep has moved down.
+            var later = current
+            later.step = 609
+            presenter.advancePresentation(try core(later), seconds: 0.15)
+            let start = presenter.effects.rings[0].start
+            XCTAssertEqual(presenter.effects.ringRadius(start: start), 1.0, accuracy: 1e-9, "halfway from 0.4 to 1.6")
+            XCTAssertEqual(presenter.effects.tintAlphaNow, 0)
+            XCTAssertEqual(presenter.effects.sweepY ?? -1, 16 * (1 - 9.0 / 30), accuracy: 1e-9)
+            later.step = 640
+            presenter.advancePresentation(try core(later), seconds: 0.5)
+            XCTAssertTrue(presenter.effects.rings.isEmpty, "the ring lasts 0.3 s")
+            XCTAssertNil(presenter.effects.sweepY, "the sweep lasts 0.5 s")
+            XCTAssertEqual(presenter.effects.particles.aliveCount, 0, "particles live 0.4 s")
+        }
+        XCTAssertEqual(ArcadeEffectsLayer.particleCapacity, 256)
+    }
+
+    /// T-A10-304: in a session the particles of a hit reach the particle renderer through the host's registry, the
+    /// probe steps aside for them, and a restart clears every effect.
+    func testParticlesAreDrawnInASessionAndARestartClearsThem() async throws {
+        let session = ExperienceSession()
+        let shell = try await ArcadeTest.open(session, size: size)
+        XCTAssertTrue(shell.handle(control: "run.steer", values: [-1]).isAccepted)
+        var frames = 0
+        while shell.presenter.effects.rings.isEmpty, frames < 600 {
+            try ArcadeTest.frames(session, 1)
+            frames += 1
+        }
+        try ArcadeTest.frames(session, 1)
+        XCTAssertGreaterThan(shell.presenter.lastParticlesDrawn, 0, "the burst is drawn")
+        let frame = try ArcadeTest.picture(session)
+        assertDrawn(shell, frame, "with effects")
+        XCTAssertTrue(shell.handle(control: "run.pause", values: [1]).isAccepted)
+        XCTAssertTrue(shell.handle(control: "run.restart").isAccepted)
+        try ArcadeTest.frames(session, 1)
+        XCTAssertTrue(shell.presenter.effects.rings.isEmpty, "a new run starts without effects")
+        XCTAssertEqual(shell.presenter.effects.particles.aliveCount, 0)
+        session.close()
+        XCTAssertEqual(shell.state, .inactive, "closed without a GPU leak")
     }
 }

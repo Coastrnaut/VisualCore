@@ -351,6 +351,7 @@ let package = Package(
                     resources: [.copy("Fixtures")]),
         // Feature 075 (A10-P01) T-A10-103/104: Neon Arcade (Neon Dodge game run, catalog, licenses, fixed-step
         // simulation with VisualCore's swept collision; the experience draws the game through PrimitiveRenderer).
+        // Feature 077 (A10-P03): the experience gains VisualCoreAudio and VisualCoreAudioDSP for its synthesized sounds.
         .target(name: "NeonArcadeCore",
                 dependencies: [.product(name: "VisualCoreSimulation", package: visualCore),
                                .product(name: "VisualCoreMath", package: visualCore)],
@@ -368,6 +369,8 @@ let package = Package(
                                .product(name: "VisualCorePersistence", package: visualCore),
                                .product(name: "VisualCoreExperience", package: visualCore),
                                .product(name: "VisualCoreRendering", package: rendering),
+                               .product(name: "VisualCoreAudio", package: rendering),
+                               .product(name: "VisualCoreAudioDSP", package: visualCore),
                                .product(name: "VisualCoreExperienceHost", package: rendering),
                                .product(name: "VisualCoreUI", package: rendering)],
                 path: "NeonArcade/Experience"),
@@ -380,6 +383,8 @@ let package = Package(
                                    .product(name: "VisualCorePersistence", package: visualCore),
                                    .product(name: "VisualCoreExperience", package: visualCore),
                                    .product(name: "VisualCoreRendering", package: rendering),
+                                   .product(name: "VisualCoreAudio", package: rendering),
+                                   .product(name: "VisualCoreAudioDSP", package: visualCore),
                                    .product(name: "VisualCoreExperienceHost", package: rendering),
                                    .product(name: "VisualCoreUI", package: rendering)],
                     path: "NeonArcade/ExperienceTests"),

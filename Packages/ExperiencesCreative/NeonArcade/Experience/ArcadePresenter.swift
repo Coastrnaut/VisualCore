@@ -24,6 +24,19 @@
 // Reduce Motion halves the glow pulse amplitude (0.15 → 0.075) and the background drift speed (0.6 → 0.3 units/s);
 // the game itself — and so the core's state and digest — never depends on it. Nothing flashes. No audio.
 // The canvas drag goes through `ArcadeGestures` (`run.steer`); every action also has a native control.
+// Screens and effects — feature 077 (A10-P03) T-A10-304 (FR-A10-310, FR-A10-311, FR-A10-320, FR-A10-321; SC-A10-301,
+// SC-A10-304; clarifications 2–5): the overlay follows the core's screen. Title: a dark shade, the player's ring and
+// chevron enlarged as an emblem and a cyan play triangle; paused: the two bars; game over: the shade, the cross and the
+// run's final score and wave in the same seven-segment digits, centred under the cross. A change of screen cross-fades
+// the old overlay out and the new one in over `transitionDuration(0.25, reduceMotion:)` seconds of frame time (0
+// under Reduce Motion: the change is immediate); presentation only, the first screen drawn appears at once. The
+// effects of `ArcadeEffectsLayer` (bursts, ring, tint or outline only under reduced flashing, sweep, sounds and
+// haptics as the settings allow) are advanced from the last drawn run to the current one in each draw. The scene is
+// drawn in three passes through the host's registry: the back layer (field, drift lines, lane guides, tint, sweep and
+// rings), the particles (`ParticleRenderer`), then the glows, objects, player, HUD, overlays and letterbox masks, so
+// the collision shapes are always above every effect. Sounds stop on teardown and when the experience is suspended
+// (`suspended()`); the presenter never changes the core and sends nothing on its own (the suspension's `run.pause` is
+// sent by `ArcadeExperience` through the port).
 import Foundation
 import SwiftUI
 import NeonArcadeCore
@@ -32,6 +45,7 @@ import VisualCoreExperienceHost
 import VisualCoreMath
 import VisualCoreRendering
 import VisualCoreScenes
+import VisualCoreSimulation
 
 /// What the controls show, updated only when a field changes.
 @MainActor
@@ -49,7 +63,13 @@ final class ArcadeMirror {
     var over = false
     /// The held steering value, −1…1.
     var steering = 0.0
-    /// The status line: score, lives and playing, paused or over.
+    /// The screen shown (feature 077).
+    var screen = ArcadeScreen.title
+    /// Whether sound effects are on (feature 077).
+    var sound = true
+    /// Whether haptics are on (feature 077).
+    var haptics = true
+    /// The status line: score, lives and the screen.
     var status = ""
 }
 
@@ -135,10 +155,22 @@ final class ArcadePresenter: ExperiencePresenter {
     nonisolated static let overShade = Vec4(0, 0, 0, 0.45)
     /// The fallback colours of an object whose item is not in the catalog.
     nonisolated static let fallbackHazard = Vec4(1.0, 0.2, 0.45, 1), fallbackOrb = Vec4(0.75, 1.0, 0.3, 1)
-    /// The z of the field, the drift lines, the lane guides, the glows, the objects, the player, the HUD, the pause
-    /// and over marks and the letterbox masks.
-    nonisolated static let fieldZ = 0, driftZ = 1, laneZ = 1, glowZ = 2, objectZ = 3, playerZ = 4, hudZ = 6, stateZ = 7,
-                           maskZ = 9
+    /// The z of the field, the drift lines, the lane guides, the effects (in the back layer), the glows, the objects,
+    /// the player, the HUD, the screen overlays and the letterbox masks.
+    nonisolated static let fieldZ = 0, driftZ = 1, laneZ = 1, effectZ = 1, glowZ = 2, objectZ = 3, playerZ = 4,
+                           hudZ = 6, stateZ = 7, maskZ = 9
+    /// The shade over the field on the title screen.
+    nonisolated static let titleShade = Vec4(0, 0, 0, 0.5)
+    /// The centre of the title emblem (game units), its ring radius and the chevron's scale.
+    nonisolated static let emblemCenter = Vec2(4.5, 9.5), emblemRadius = 1.5, emblemScale = 4.0
+    /// The title's play triangle: its centre (game units) and half size.
+    nonisolated static let playCenter = Vec2(4.5, 6.4), playSize = 0.6
+    /// The colour of the play triangle: cyan.
+    nonisolated static let playColor = Vec4(0.13, 0.9, 1.0, 1)
+    /// The top of the game-over score digits and of the wave digits under them (game units).
+    nonisolated static let overScoreTop = 6.4, overWaveTop = 5.4
+    /// The length of a screen cross-fade at full motion in seconds.
+    nonisolated static let screenFade = 0.25
     /// The field point (game units) near the bottom centre where the frame probe is taken when it lies in the field.
     nonisolated static let probeMargin = 0.35
 
@@ -161,8 +193,28 @@ final class ArcadePresenter: ExperiencePresenter {
     private(set) var lastScoreText = "", lastLivesLit = 0
     /// The wave text of the last frame.
     private(set) var lastWaveText = ""
-    /// The state mark of the last frame: "none", "paused" (two bars) or "over" (shade and cross).
+    /// The state mark of the last frame: "none" (playing), "title", "paused" (two bars) or "over" (shade and cross).
     private(set) var lastStateMark = "none"
+    /// The final score and wave texts the game-over screen showed in the last frame (empty when not shown).
+    private(set) var lastOverScoreText = "", lastOverWaveText = ""
+    /// The alpha of the current screen's overlay in the last frame (1 once the cross-fade is complete).
+    private(set) var lastTransitionProgress = 1.0
+    /// The particles drawn in the last frame.
+    private(set) var lastParticlesDrawn = 0
+    /// The sounds and haptics started since the presenter was made (tests).
+    private(set) var soundsStarted = 0, hapticsStarted = 0
+    /// With reduced flashing a hit keeps only its ring (no full-field tint).
+    let reduceFlashing: Bool
+    /// The effects (particles, rings, tint, sweep).
+    let effects: ArcadeEffectsLayer
+    /// Where the sounds go.
+    let soundSink: any ArcadeSoundSink
+    /// The host's haptic route.
+    let feedback: ExperienceFeedback
+    /// The screen whose overlay is shown (nil before the first frame) and the screen fading out, with the seconds of
+    /// frame time since the change.
+    private(set) var shownScreen: ArcadeScreen?, fadingScreen: ArcadeScreen?
+    private var transitionElapsed = 0.0
     /// The glow pulse amplitude and the drift speed the last frame was drawn with.
     private(set) var lastPulseAmount = 0.0, lastDriftAmount = 0.0
     /// The canvas gesture (a drag steers).
@@ -172,8 +224,14 @@ final class ArcadePresenter: ExperiencePresenter {
     private var followPort: ExperienceActionPort?
 
     private let clear = ClearColorScene(red: 0, green: 0, blue: 0)
+    /// The renderers of the back layer, the particles and the front layer (created in `setup`, released in
+    /// `teardown`).
+    private var backPrimitives: PrimitiveRenderer?
+    private var particleRenderer: ParticleRenderer?
     private var primitives: PrimitiveRenderer?
-    private let root = SceneNode(id: "arcade")
+    /// The back layer (field, drift lines, lane guides, effects) and the front layer (everything else).
+    let backRoot = SceneNode(id: "arcade.back")
+    let root = SceneNode(id: "arcade")
     /// The field rectangle.
     let field = SceneNode(id: "field", z: ArcadePresenter.fieldZ)
     /// The drifting background lines.
@@ -197,25 +255,42 @@ final class ArcadePresenter: ExperiencePresenter {
     private let shade = SceneNode(id: "over.shade", z: ArcadePresenter.stateZ)
     private var crossNodes: [SceneNode] = []
     private var maskNodes: [SceneNode] = []
+    /// The title screen's shade, emblem ring, emblem chevron and play triangle.
+    let titleShadeNode = SceneNode(id: "title.shade", z: ArcadePresenter.stateZ)
+    let titleRing = SceneNode(id: "title.ring", z: ArcadePresenter.stateZ)
+    let titleChevron = SceneNode(id: "title.chevron", z: ArcadePresenter.stateZ)
+    let titlePlay = SceneNode(id: "title.play", z: ArcadePresenter.stateZ)
+    /// The seven segment nodes of each final score digit and final wave digit on the game-over screen.
+    private(set) var overScoreNodes: [[SceneNode]] = [], overWaveNodes: [[SceneNode]] = []
 
     /// A presenter.
     /// - Parameters:
     ///   - experienceID: The experience's id.
-    ///   - reduceMotion: Halves the glow pulse and the background drift (presentation only).
-    init(experienceID: ExperienceID, reduceMotion: Bool = false) {
+    ///   - reduceMotion: Halves the glow pulse and the background drift and makes screen changes immediate
+    ///     (presentation only).
+    ///   - reduceFlashing: A hit keeps only its ring (no full-field tint).
+    ///   - soundSink: Where the sounds go (by default VisualCore's `SoundEffectPlayer`).
+    ///   - feedback: The haptic route (by default the host's shared `ExperienceFeedback`).
+    init(experienceID: ExperienceID, reduceMotion: Bool = false, reduceFlashing: Bool = false,
+         soundSink: (any ArcadeSoundSink)? = nil, feedback: ExperienceFeedback? = nil) {
         self.experienceID = experienceID
         self.reduceMotion = reduceMotion
-        root.add(field)
+        self.reduceFlashing = reduceFlashing
+        self.soundSink = soundSink ?? ArcadeSoundPlayer()
+        self.feedback = feedback ?? .shared
+        effects = ArcadeEffectsLayer(reduceFlashing: reduceFlashing, z: Self.effectZ)
+        backRoot.add(field)
         for index in 0..<Self.driftLines {
             let node = SceneNode(id: "drift\(index)", z: Self.driftZ)
-            root.add(node)
+            backRoot.add(node)
             driftNodes.append(node)
         }
         for lane in 0..<Lanes.count {
             let node = SceneNode(id: "lane\(lane)", z: Self.laneZ)
-            root.add(node)
+            backRoot.add(node)
             laneNodes.append(node)
         }
+        for node in effects.nodes { backRoot.add(node) }
         for slot in 0..<GameRun.maxObjects {
             let glow = SceneNode(id: "o\(slot).glow", z: Self.glowZ)
             let body = SceneNode(id: "o\(slot)", z: Self.objectZ)
@@ -263,6 +338,20 @@ final class ArcadePresenter: ExperiencePresenter {
             root.add(node)
             crossNodes.append(node)
         }
+        for (count, prefix) in [(Self.maxDigits, "overScore"), (Self.maxWaveDigits, "overWave")] {
+            var digits: [[SceneNode]] = []
+            for digit in 0..<count {
+                var segments: [SceneNode] = []
+                for segment in 0..<7 {
+                    let node = SceneNode(id: "\(prefix)\(digit).\(segment)", z: Self.stateZ)
+                    root.add(node)
+                    segments.append(node)
+                }
+                digits.append(segments)
+            }
+            if prefix == "overScore" { overScoreNodes = digits } else { overWaveNodes = digits }
+        }
+        for node in [titleShadeNode, titleRing, titleChevron, titlePlay] { root.add(node) }
         for side in 0..<4 {
             let node = SceneNode(id: "mask\(side)", z: Self.maskZ)
             root.add(node)
@@ -276,10 +365,74 @@ final class ArcadePresenter: ExperiencePresenter {
     var pulseAmount: Double { Self.glowPulse * motionFactor }
     /// The background drift speed in game units per second this presenter draws with (0.6, or 0.3 with Reduce Motion).
     var driftAmount: Double { Self.driftSpeed * motionFactor }
+    /// The length of a screen cross-fade this presenter draws with: `transitionDuration(0.25, reduceMotion:)`, so 0
+    /// under Reduce Motion.
+    var screenTransitionDuration: Double {
+        VisualCoreSimulation.transitionDuration(Self.screenFade, reduceMotion: reduceMotion)
+    }
+
+    // MARK: Screens and effects
+
+    /// Notes the screen of the core being drawn: a change starts a cross-fade from the shown screen (the first
+    /// screen appears at once; with a cross-fade of 0 s the change is immediate).
+    func noteScreen(_ screen: ArcadeScreen) {
+        guard let shown = shownScreen else {
+            shownScreen = screen
+            return
+        }
+        guard shown != screen else { return }
+        fadingScreen = screenTransitionDuration > 0 ? shown : nil
+        shownScreen = screen
+        transitionElapsed = 0
+    }
+
+    /// The progress 0…1 of the current cross-fade (1 when none runs).
+    var transitionProgress: Double {
+        guard fadingScreen != nil else { return 1 }
+        let duration = screenTransitionDuration
+        return duration > 0 ? min(max(transitionElapsed / duration, 0), 1) : 1
+    }
+
+    /// The alpha of the overlay of `screen` now: the shown screen fades in, the screen before it fades out.
+    func overlayAlpha(_ screen: ArcadeScreen) -> Double {
+        if screen == shownScreen { return transitionProgress }
+        if screen == fadingScreen { return 1 - transitionProgress }
+        return 0
+    }
+
+    /// The presentation step of one drawn frame of `seconds`: the screen and its cross-fade, then the effects of the
+    /// run change since the last drawn run, with their sounds (sound setting on) and haptics (haptics setting on).
+    /// Reads `core` only.
+    func advancePresentation(_ core: ArcadeCore, seconds: Double) {
+        let before = shownScreen
+        noteScreen(core.screen)
+        if before == shownScreen, fadingScreen != nil, seconds.isFinite, seconds > 0 {
+            transitionElapsed += seconds
+            if transitionProgress >= 1 { fadingScreen = nil }
+        }
+        for cue in effects.advance(to: core.run) {
+            guard let sound = cue.sound else { continue }
+            if core.sound {
+                soundSink.play(sound)
+                soundsStarted += 1
+            }
+            if core.haptics {
+                feedback.haptic(sound.haptic)
+                hapticsStarted += 1
+            }
+        }
+    }
+
+    /// The experience was suspended: every sound stops (nothing is queued for later).
+    func suspended() {
+        soundSink.stopAll()
+    }
 
     // MARK: Render scene
 
     func setup(_ context: RenderContext) throws {
+        backPrimitives = try PrimitiveRenderer(registry: context.resources)
+        particleRenderer = try ParticleRenderer(registry: context.resources)
         primitives = try PrimitiveRenderer(registry: context.resources)
         isLive = true
     }
@@ -292,14 +445,25 @@ final class ArcadePresenter: ExperiencePresenter {
             throw ArcadeDrawError.injected
         }
         sync(core)
+        advancePresentation(core, seconds: frame.delta)
         clear.red = Float(Self.letterboxColor.x)
         clear.green = Float(Self.letterboxColor.y)
         clear.blue = Float(Self.letterboxColor.z)
         try clear.render(context, frame: frame)
         let width = Double(max(1, context.pixelWidth)), height = Double(max(1, context.pixelHeight))
         layOut(core, width: width, height: height)
+        if backPrimitives == nil { backPrimitives = try PrimitiveRenderer(registry: context.resources) }
+        if particleRenderer == nil { particleRenderer = try ParticleRenderer(registry: context.resources) }
         if primitives == nil { primitives = try PrimitiveRenderer(registry: context.resources) }
-        try primitives?.draw(root, camera: Camera2D(), metrics: ViewMetrics(size: Vec2(width, height), scale: 1))
+        let metrics = ViewMetrics(size: Vec2(width, height), scale: 1)
+        try backPrimitives?.draw(backRoot, camera: Camera2D(), metrics: metrics)
+        let s = lastScale
+        let particles = effects.instances.map {
+            ParticleInstance(position: Self.world($0.position, scale: s), size: $0.size * s, color: $0.color)
+        }
+        try particleRenderer?.draw(particles, camera: Camera2D(), metrics: metrics)
+        lastParticlesDrawn = particleRenderer?.lastInstanceCount ?? 0
+        try primitives?.draw(root, camera: Camera2D(), metrics: metrics)
         // T-A10-115: a finger held still keeps steering by its offset from the drawn player (an action at the next
         // step, recorded like any other; the drawing itself changes nothing).
         if let port = followPort {
@@ -311,6 +475,11 @@ final class ArcadePresenter: ExperiencePresenter {
         isLive = false
         gestures.reset()
         followPort = nil
+        soundSink.stopAll()
+        backPrimitives?.release()
+        backPrimitives = nil
+        particleRenderer?.release()
+        particleRenderer = nil
         primitives?.release()
         primitives = nil
     }
@@ -389,6 +558,12 @@ final class ArcadePresenter: ExperiencePresenter {
         return (Vec2(x, driftBottom), Vec2(x, fieldHeight))
     }
 
+    /// The left x (game units) of `count` digits centred on the field.
+    nonisolated static func centredDigitsX(_ count: Int) -> Double {
+        let width = Double(max(count, 1) - 1) * digitAdvance + digitWidth
+        return fieldWidth / 2 - width / 2
+    }
+
     /// Lights the segments of `text`'s digits in `nodes` from `origin` (game units) in `color`; unused nodes are
     /// cleared.
     private static func drawDigits(_ text: String, nodes: [[SceneNode]], origin: Vec2, color: Vec4,
@@ -427,6 +602,7 @@ final class ArcadePresenter: ExperiencePresenter {
     /// `core` only.
     func layOut(_ core: ArcadeCore, width: Double, height: Double) {
         let run = core.run
+        noteScreen(core.screen)
         let s = Self.scale(width: width, height: height)
         lastScale = s
         lastCanvas = Vec2(width, height)
@@ -453,6 +629,8 @@ final class ArcadePresenter: ExperiencePresenter {
             node.primitive = .line(world(bottom), world(top), width: px(Self.laneWidth))
             node.color = Self.laneColor
         }
+        effects.layOut(world: world, scale: s, fieldCenter: field.position,
+                       fieldSize: Vec2(Self.fieldWidth * s, Self.fieldHeight * s))
 
         let glowAlpha = Self.glowAlpha(step: run.step, amount: pulse)
         var drawn = 0
@@ -519,25 +697,62 @@ final class ArcadePresenter: ExperiencePresenter {
         }
         lastLivesLit = lit
 
+        lastTransitionProgress = transitionProgress
+        let pausedAlpha = overlayAlpha(.paused)
         for (index, node) in pauseNodes.enumerated() {
-            guard run.paused, !run.over else { node.primitive = nil; continue }
+            guard pausedAlpha > 0 else { node.primitive = nil; continue }
             node.primitive = .rect(Vec2(px(0.3), px(1.2)))
             node.position = world(Vec2(Self.fieldWidth / 2 + (index == 0 ? -0.3 : 0.3), Self.fieldHeight / 2))
-            node.color = Self.pauseColor
+            node.color = Self.faded(Self.pauseColor, pausedAlpha)
         }
-        lastStateMark = run.over ? "over" : run.paused ? "paused" : "none"
+        switch shownScreen ?? core.screen {
+        case .title: lastStateMark = "title"
+        case .playing: lastStateMark = "none"
+        case .paused: lastStateMark = "paused"
+        case .over: lastStateMark = "over"
+        }
         let hazard = ArcadeCore.catalog.hazards.first.map { Self.vector($0.color) } ?? Self.fallbackHazard
-        if run.over {
+        let overAlpha = overlayAlpha(.over)
+        if overAlpha > 0 {
             shade.primitive = .rect(Vec2(Self.fieldWidth * s, Self.fieldHeight * s))
             shade.position = field.position
-            shade.color = Self.overShade
+            shade.color = Self.faded(Self.overShade, overAlpha)
             let c = Vec2(Self.fieldWidth / 2, Self.fieldHeight / 2)
             crossNodes[0].primitive = .line(world(c + Vec2(-1.2, -1.2)), world(c + Vec2(1.2, 1.2)), width: px(0.18))
             crossNodes[1].primitive = .line(world(c + Vec2(-1.2, 1.2)), world(c + Vec2(1.2, -1.2)), width: px(0.18))
-            for node in crossNodes { node.color = hazard }
+            for node in crossNodes { node.color = Self.faded(hazard, overAlpha) }
+            let scoreText = Self.scoreText(run.score), waveText = Self.waveText(run.wave)
+            lastOverScoreText = scoreText
+            lastOverWaveText = waveText
+            Self.drawDigits(scoreText, nodes: overScoreNodes,
+                            origin: Vec2(Self.centredDigitsX(scoreText.count), Self.overScoreTop),
+                            color: Self.faded(Self.hudColor, overAlpha), world: world, width: px(Self.segmentWidth))
+            Self.drawDigits(waveText, nodes: overWaveNodes,
+                            origin: Vec2(Self.centredDigitsX(waveText.count), Self.overWaveTop),
+                            color: Self.faded(Self.waveColor, overAlpha), world: world, width: px(Self.segmentWidth))
         } else {
             shade.primitive = nil
             for node in crossNodes { node.primitive = nil }
+            for node in (overScoreNodes + overWaveNodes).joined() { node.primitive = nil }
+            lastOverScoreText = ""
+            lastOverWaveText = ""
+        }
+        let titleAlpha = overlayAlpha(.title)
+        if titleAlpha > 0 {
+            titleShadeNode.primitive = .rect(Vec2(Self.fieldWidth * s, Self.fieldHeight * s))
+            titleShadeNode.position = field.position
+            titleShadeNode.color = Self.faded(Self.titleShade, titleAlpha)
+            let emblem = Self.ring(center: Self.emblemCenter, radius: Self.emblemRadius).map(world)
+            titleRing.primitive = .polyline(emblem, width: px(Self.ringWidth * 2))
+            titleRing.color = Self.faded(playerFill, titleAlpha)
+            titleChevron.primitive = .polygon(Self.chevron.map { world(Self.emblemCenter + $0 * Self.emblemScale) })
+            titleChevron.color = Self.faded(playerFill, titleAlpha)
+            let p = Self.playCenter, h = Self.playSize
+            titlePlay.primitive = .polygon([world(p + Vec2(-h * 0.8, h)), world(p + Vec2(h, 0)),
+                                            world(p + Vec2(-h * 0.8, -h))])
+            titlePlay.color = Self.faded(Self.playColor, titleAlpha)
+        } else {
+            for node in [titleShadeNode, titleRing, titleChevron, titlePlay] { node.primitive = nil }
         }
 
         // Letterbox masks: everything outside the field is covered in the clear colour.
@@ -564,13 +779,26 @@ final class ArcadePresenter: ExperiencePresenter {
         if mirror.paused != run.paused { mirror.paused = run.paused }
         if mirror.over != run.over { mirror.over = run.over }
         if mirror.steering != run.steering { mirror.steering = run.steering }
-        let status = Self.status(run)
+        if mirror.screen != core.screen { mirror.screen = core.screen }
+        if mirror.sound != core.sound { mirror.sound = core.sound }
+        if mirror.haptics != core.haptics { mirror.haptics = core.haptics }
+        let status = Self.status(run, screen: core.screen)
         if mirror.status != status { mirror.status = status }
     }
 
     /// "playing", "paused" or "over".
     nonisolated static func stateWord(_ run: GameRun) -> String {
-        run.over ? "over" : run.paused ? "paused" : "playing"
+        screenWord(ArcadeScreen.derived(from: run))
+    }
+
+    /// The screen in words: "title screen", "playing", "paused" or "over".
+    nonisolated static func screenWord(_ screen: ArcadeScreen) -> String {
+        switch screen {
+        case .title: return "title screen"
+        case .playing: return "playing"
+        case .paused: return "paused"
+        case .over: return "over"
+        }
     }
 
     /// "no lives", "1 life" or "3 lives".
@@ -593,20 +821,31 @@ final class ArcadePresenter: ExperiencePresenter {
 
     /// The status line: "score 120, 2 lives, playing".
     nonisolated static func status(_ run: GameRun) -> String {
-        "score \(run.score), \(livesWords(run.lives)), \(stateWord(run))"
+        status(run, screen: ArcadeScreen.derived(from: run))
+    }
+
+    /// The status line on `screen`: "score 0, 3 lives, title screen".
+    nonisolated static func status(_ run: GameRun, screen: ArcadeScreen) -> String {
+        "score \(run.score), \(livesWords(run.lives)), \(screenWord(screen))"
     }
 
     /// The canvas description, for example "Neon Arcade: Neon Dodge, wave 3, score 120, 2 lives, 3 objects falling,
     /// playing."
     nonisolated static func description(_ run: GameRun) -> String {
-        "Neon Arcade: Neon Dodge, wave \(run.wave), score \(run.score), \(livesWords(run.lives)), "
-            + "\(objectWords(run.objects.count)), \(stateWord(run))."
+        description(run, screen: ArcadeScreen.derived(from: run))
     }
 
-    /// The description of `core`'s run.
+    /// The canvas description on `screen`, for example "Neon Arcade: Neon Dodge, wave 1, score 0, 3 lives, no objects
+    /// falling, title screen." (feature 077: every screen is spoken).
+    nonisolated static func description(_ run: GameRun, screen: ArcadeScreen) -> String {
+        "Neon Arcade: Neon Dodge, wave \(run.wave), score \(run.score), \(livesWords(run.lives)), "
+            + "\(objectWords(run.objects.count)), \(screenWord(screen))."
+    }
+
+    /// The description of `core`'s run on its screen.
     func describe(_ core: ArcadeCore) -> String {
         sync(core)
-        return Self.description(core.run)
+        return Self.description(core.run, screen: core.screen)
     }
 
     /// The field point (game units) under the canvas point at fraction (0.5, 0.99) of the last canvas (y from the
@@ -640,7 +879,8 @@ final class ArcadePresenter: ExperiencePresenter {
     }
 
     /// One probe at the bottom centre of the canvas expecting the dark field (or the dark letterbox below it); none
-    /// while a falling object or its glow lies within reach of that point.
+    /// while a falling object or its glow, or an effect (a particle, a hit ring or the wave sweep), lies within reach
+    /// of that point.
     func probes(_ core: ArcadeCore) -> [FrameProbe] {
         guard let expected = Self.colorClassOfField,
               Self.colorClass(red: Self.letterboxColor.x, green: Self.letterboxColor.y,
@@ -652,6 +892,7 @@ final class ArcadePresenter: ExperiencePresenter {
                 let dy = object.position.y - point.y
                 if (dx * dx + dy * dy).squareRoot() < object.radius * Self.glowScale + Self.probeMargin { return [] }
             }
+            if effects.touches(point, margin: Self.probeMargin) { return [] }
         }
         return [FrameProbe(name: "field", x: 0.5, y: 0.99, expected: expected)].compactMap { $0 }
     }

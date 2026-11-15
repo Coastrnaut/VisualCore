@@ -9,7 +9,15 @@
 // changes the state; reopening keeps the drawing resources steady.
 // Feature 076 (A10-P02) T-A10-203 (FR-A10-211; SC-A10-204): a session restored in wave 3 and suspended for several
 // lengths (with frames requested meanwhile) keeps wave, wave step, step, objects and score identical, and the resume
-// continues from the same step; the description names the wave; schema 3 is the newer saved state.
+// continues from the same step; the description names the wave.
+// Feature 077 (A10-P03) T-A10-304 (FR-A10-310, FR-A10-320, FR-A10-321; SC-A10-301, SC-A10-304; edge cases "leaving
+// the app while playing", "pausing during a burst", "restoring a saved game in the title or game-over screen"): a new
+// experience shows the title screen, says so and advances nothing until Start; a suspension while playing records
+// `run.pause [1]` (the paused screen returns, nothing advanced) and stops the sounds, while a suspension on the title
+// screen sends nothing; the digests are identical with reduced flashing, with the effects drawn or not, and the run
+// identical with sound and haptics on or off; the injected sound and haptic sinks receive the cues only while their
+// setting is on; the effects freeze while paused; a saved title or game-over screen restores to the same screen;
+// schema 4 is the newer saved state.
 import Foundation
 import XCTest
 import VisualCoreDiagnostics
@@ -18,6 +26,7 @@ import NeonArcadeCore
 import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreMath
+import VisualCoreSimulation
 
 @MainActor
 final class ArcadeSessionTests: XCTestCase {
@@ -78,25 +87,58 @@ final class ArcadeSessionTests: XCTestCase {
         session.close()
     }
 
-    func testASuspensionDoesNotAdvanceTheGame() async throws {
+    /// T-A10-304 (edge case "leaving the app while playing"): a suspension while playing records `run.pause [1]`
+    /// through the port and stops the sounds; nothing advances while away; the paused screen returns and resuming
+    /// continues from the same step.
+    func testASuspensionWhilePlayingRecordsAPauseAndAdvancesNothing() async throws {
         let session = ExperienceSession()
-        let shell = try await ArcadeTest.open(session)
+        let sound = RecordingSoundSink()
+        let experience = try await ArcadeTest.openExperience(session, soundSink: sound)
+        let shell = experience.shell
         try ArcadeTest.frames(session, 45)
         let before = try ArcadeTest.core(shell)
+        XCTAssertEqual(before.screen, .playing)
         let stepIndex = shell.engine.stepIndex
+        let accepted = shell.engine.acceptedActions
+        let stops = sound.stops
         session.setScenePhase(.background)
         XCTAssertEqual(shell.state, .suspended)
+        XCTAssertEqual(shell.engine.acceptedActions, accepted + 1, "one recorded action")
+        XCTAssertGreaterThan(sound.stops, stops, "the sounds stop on suspension")
+        let paused = try ArcadeTest.core(shell)
+        XCTAssertEqual(paused.screen, .paused, "the game moved to the paused screen")
+        XCTAssertTrue(paused.run.paused)
+        XCTAssertEqual(paused.run.step, before.run.step)
+        XCTAssertEqual(paused.run.objects, before.run.objects)
         for _ in 0..<10 { _ = session.renderHost?.renderOneFrame(present: false) }
         try await Task.sleep(for: .milliseconds(150))
-        XCTAssertEqual(try ArcadeTest.core(shell), before, "nothing moves while suspended")
+        XCTAssertEqual(try ArcadeTest.core(shell), paused, "nothing moves while suspended")
         XCTAssertEqual(shell.engine.stepIndex, stepIndex)
 
         session.setScenePhase(.active)
         XCTAssertEqual(shell.state, .active)
-        XCTAssertEqual(try ArcadeTest.core(shell), before, "the resume continues from the same step")
+        try ArcadeTest.frames(session, 5)
+        XCTAssertEqual(try ArcadeTest.core(shell), paused, "the paused screen returns; nothing fast-forwards")
+        XCTAssertTrue(shell.accessibilitySummary.hasSuffix("paused."), shell.accessibilitySummary)
+        XCTAssertTrue(shell.handle(control: "run.pause", values: [0]).isAccepted)
         try ArcadeTest.frames(session, 1)
         let resumed = try ArcadeTest.core(shell)
         XCTAssertLessThanOrEqual(resumed.run.step - before.run.step, 2, "one frame's steps, never the suspended time")
+        XCTAssertGreaterThan(resumed.run.step, before.run.step)
+        session.close()
+    }
+
+    /// T-A10-304: a suspension on the title screen sends nothing (the digest stays) and the title returns.
+    func testASuspensionOnTheTitleScreenSendsNothing() async throws {
+        let session = ExperienceSession()
+        let shell = try await ArcadeTest.open(session, start: false)
+        let digest = try shell.engine.digest()
+        session.setScenePhase(.background)
+        XCTAssertEqual(try shell.engine.digest(), digest)
+        session.setScenePhase(.active)
+        try ArcadeTest.frames(session, 10)
+        XCTAssertEqual(try shell.engine.digest(), digest)
+        XCTAssertEqual(try ArcadeTest.core(shell).screen, .title)
         session.close()
     }
 
@@ -105,6 +147,7 @@ final class ArcadeSessionTests: XCTestCase {
         var engine = ExperienceEngine<ArcadeCore>(id: ArcadeTest.id)
         try await engine.prepare(seed: 7)
         try engine.activate()
+        XCTAssertEqual(engine.handle(control: "run.start"), .accepted)
         for input in ArcadeCore.waveInputs where input.step < ArcadeCore.waveThreeSteps {
             try engine.run(steps: input.step - engine.stepIndex)
             XCTAssertEqual(engine.handle(control: "run.steer", values: [input.value]), .accepted)
@@ -118,6 +161,8 @@ final class ArcadeSessionTests: XCTestCase {
 
     /// T-A10-203 (SC-A10-204): suspensions of 0, 50 and 250 ms in wave 3, with 1, 10 and 60 frames requested while
     /// suspended, leave wave, wave step, step, objects and score identical; each resume continues from the same step.
+    /// Since feature 077 the first suspension pauses the game (the later ones find it paused), so the resume shows the
+    /// paused screen and the game continues after `run.pause [0]`.
     func testASuspensionOfAnyLengthInWaveThreeChangesNothing() async throws {
         let snapshot = try await waveThreeSnapshot()
         let session = ExperienceSession()
@@ -138,18 +183,24 @@ final class ArcadeSessionTests: XCTestCase {
             XCTAssertEqual(held.run.step, before.run.step, "\(milliseconds) ms")
             XCTAssertEqual(held.run.objects, before.run.objects, "\(milliseconds) ms")
             XCTAssertEqual(held.run.score, before.run.score, "\(milliseconds) ms")
-            XCTAssertEqual(held, before, "\(milliseconds) ms: nothing moves while suspended")
+            XCTAssertEqual(held.screen, .paused, "\(milliseconds) ms: the suspension paused the game")
             XCTAssertEqual(shell.engine.stepIndex, stepIndex)
 
             session.setScenePhase(.active)
             XCTAssertEqual(shell.state, .active)
-            XCTAssertEqual(try ArcadeTest.core(shell), before, "the resume continues from the same step")
+            XCTAssertEqual(try ArcadeTest.core(shell), held, "the resume continues from the same step")
             try ArcadeTest.frames(session, 1)
             let resumed = try ArcadeTest.core(shell)
             XCTAssertLessThanOrEqual(resumed.run.step - before.run.step, 2,
                                      "one frame's steps, never the suspended time")
             XCTAssertEqual(resumed.run.wave, 3)
         }
+        XCTAssertTrue(shell.handle(control: "run.pause", values: [0]).isAccepted)
+        let paused = try ArcadeTest.core(shell)
+        try ArcadeTest.frames(session, 1)
+        let playing = try ArcadeTest.core(shell)
+        XCTAssertGreaterThan(playing.run.step, paused.run.step)
+        XCTAssertLessThanOrEqual(playing.run.step - paused.run.step, 2)
         session.close()
     }
 
@@ -161,8 +212,9 @@ final class ArcadeSessionTests: XCTestCase {
 
     func testFramePacingGivesTheSameRunAfterTheSameSteps() async throws {
         let id = ArcadeTest.id
-        // The bare replay: the inputs applied at their steps, the steps run one by one.
+        // The bare replay: the start, the inputs applied at their steps, the steps run one by one.
         var reference = ArcadeCore(seed: 7)
+        XCTAssertEqual(reference.apply(ExperienceAction(control: "run.start", values: [], step: 0)), .accepted)
         for step in 0..<Self.pacedSteps {
             for input in Self.pacedInputs where input.step == step {
                 XCTAssertEqual(reference.apply(ExperienceAction(control: "run.steer", values: [input.value],
@@ -177,6 +229,7 @@ final class ArcadeSessionTests: XCTestCase {
             var engine = ExperienceEngine<ArcadeCore>(id: id)
             try await engine.prepare(seed: 7)
             try engine.activate()
+            XCTAssertEqual(engine.handle(control: "run.start"), .accepted)
             var pending = Self.pacedInputs
             var frames = 0
             while engine.stepIndex < Self.pacedSteps, frames < 4 * Self.pacedSteps {
@@ -227,7 +280,7 @@ final class ArcadeSessionTests: XCTestCase {
         try ArcadeTest.frames(first, 60)
         let saved = try shell.snapshot()
         first.close()
-        let newer = try ExperienceSnapshot(experience: ArcadeTest.id, schemaVersion: 3, seed: saved.seed,
+        let newer = try ExperienceSnapshot(experience: ArcadeTest.id, schemaVersion: 4, seed: saved.seed,
                                            stepIndex: saved.stepIndex, digest: saved.digest,
                                            payload: Data(saved.payload.utf8))
 
@@ -302,5 +355,219 @@ final class ArcadeSessionTests: XCTestCase {
             }
             session.close()
         }
+    }
+
+    // MARK: Feature 077 (A10-P03)
+
+    /// An active engine of seed `seed`, started unless `start` is false, with `settings` applied.
+    private func engine(seed: UInt64 = 7, start: Bool = true,
+                        settings: [(String, Double)] = []) async throws -> ExperienceEngine<ArcadeCore> {
+        var engine = ExperienceEngine<ArcadeCore>(id: ArcadeTest.id)
+        try await engine.prepare(seed: seed)
+        try engine.activate()
+        if start { XCTAssertEqual(engine.handle(control: "run.start"), .accepted) }
+        for (control, value) in settings { XCTAssertEqual(engine.handle(control: control, values: [value]), .accepted) }
+        return engine
+    }
+
+    /// Plays `steps` steps of `engine` one by one, handing every state to `presenter` as a drawn frame of 1/60 s.
+    private func play(_ engine: inout ExperienceEngine<ArcadeCore>, steps: Int, presenter: ArcadePresenter) throws {
+        for _ in 0..<steps {
+            try engine.run(steps: 1)
+            presenter.advancePresentation(try XCTUnwrap(engine.core), seconds: 1.0 / 60)
+        }
+    }
+
+    /// T-A10-304 (story 1 scenario 1; FR-A10-310): a new experience shows the title screen, says so and advances
+    /// nothing until Start; Start plays.
+    func testANewExperienceOpensOnTheTitleScreen() async throws {
+        let session = ExperienceSession()
+        let shell = try await ArcadeTest.open(session, start: false)
+        let presenter = shell.presenter
+        let first = try ArcadeTest.core(shell)
+        XCTAssertEqual(first.screen, .title)
+        try ArcadeTest.frames(session, 60)
+        XCTAssertEqual(try ArcadeTest.core(shell), first, "nothing falls until the person starts")
+        XCTAssertEqual(shell.accessibilitySummary,
+                       "Neon Arcade: Neon Dodge, wave 1, score 0, 3 lives, no objects falling, title screen.")
+        XCTAssertEqual(presenter.mirror.screen, .title)
+        XCTAssertTrue(presenter.mirror.status.hasSuffix("title screen"), presenter.mirror.status)
+        XCTAssertEqual(presenter.lastStateMark, "title")
+        XCTAssertEqual(ArcadeControls.startTitle(presenter.mirror.screen), "Start")
+        XCTAssertFalse(ArcadeControls.canPause(.title))
+        XCTAssertFalse(ArcadeControls.canRestart(.title))
+        XCTAssertEqual(shell.port.send("run.pause", [1]), .rejected(.rule(code: ArcadeRule.wrongScreen)))
+        XCTAssertTrue(shell.port.send("run.start").isAccepted)
+        try ArcadeTest.frames(session, 30)
+        let playing = try ArcadeTest.core(shell)
+        XCTAssertEqual(playing.screen, .playing)
+        XCTAssertGreaterThan(playing.run.step, 0)
+        XCTAssertEqual(presenter.mirror.screen, .playing)
+        XCTAssertNil(ArcadeControls.startTitle(.playing))
+        XCTAssertTrue(shell.accessibilitySummary.hasSuffix("playing."), shell.accessibilitySummary)
+        XCTAssertEqual(presenter.nativeActions, Set(ArcadeCore.actionIDs))
+        session.close()
+    }
+
+    /// T-A10-304 (edge case "restoring a saved game in the title or game-over screen"; story 1 scenario 3): a saved
+    /// title screen and a saved game-over screen restore to the same screen in a new session, which speaks it and
+    /// draws the game over with the run's score and wave; Play again starts a new run in wave 1.
+    func testASavedTitleOrGameOverScreenRestoresToTheSameScreen() async throws {
+        let first = ExperienceSession()
+        let title = try await ArcadeTest.open(first, start: false)
+        let titleSnapshot = try title.snapshot()
+        first.close()
+        let second = ExperienceSession()
+        let restoredTitle = try await ArcadeTest.open(second, snapshot: titleSnapshot, start: false)
+        XCTAssertNil(second.lastRestoreRefusal)
+        XCTAssertEqual(try ArcadeTest.core(restoredTitle).screen, .title)
+        XCTAssertTrue(restoredTitle.accessibilitySummary.hasSuffix("title screen."))
+        second.close()
+
+        var over = GameRun.new()
+        over.lives = 0
+        over.over = true
+        over.step = 1_400
+        over.score = 88
+        over.wave = 3
+        over.waveStep = 200
+        over.patternId = "wall"
+        over.freeLane = 1
+        let core = try ArcadeCore.restore(payload: ArcadeCore.encode(ArcadeState(
+            run: over, random: SeededRandom(seed: 7).state, screen: .over)), seed: 7)
+        var builder = DigestBuilder(domain: ArcadeTest.id.rawValue)
+        try core.writeDigest(into: &builder)
+        let overSnapshot = try ExperienceSnapshot(experience: ArcadeTest.id, schemaVersion: 3, seed: 7,
+                                                  stepIndex: 1_400, digest: builder.finish(),
+                                                  payload: core.snapshotPayload())
+        let third = ExperienceSession()
+        let restoredOver = try await ArcadeTest.open(third, snapshot: overSnapshot)
+        XCTAssertNil(third.lastRestoreRefusal)
+        XCTAssertEqual(try ArcadeTest.core(restoredOver).screen, .over)
+        try ArcadeTest.frames(third, 30)
+        XCTAssertEqual(try ArcadeTest.core(restoredOver).state, core.state, "nothing advances on the game over")
+        XCTAssertEqual(restoredOver.accessibilitySummary,
+                       "Neon Arcade: Neon Dodge, wave 3, score 88, no lives, no objects falling, over.")
+        XCTAssertEqual(restoredOver.presenter.lastStateMark, "over")
+        XCTAssertEqual(restoredOver.presenter.lastOverScoreText, "88")
+        XCTAssertEqual(restoredOver.presenter.lastOverWaveText, "3")
+        XCTAssertEqual(ArcadeControls.startTitle(.over), "Play again")
+        XCTAssertTrue(restoredOver.port.send("run.start").isAccepted)
+        let again = try ArcadeTest.core(restoredOver)
+        XCTAssertEqual(again.screen, .playing)
+        XCTAssertEqual(again.run, GameRun.new(), "a new run in wave 1")
+        third.close()
+    }
+
+    /// T-A10-304 (SC-A10-304; story 2 scenario 3): the effects never change the game. Sessions with and without
+    /// reduced flashing (effects drawn either way) give identical digests; with sound and haptics off the run and the
+    /// generator are identical too (the settings themselves are saved in the state).
+    func testDigestsAreIdenticalWithEffectsSoundAndHapticsOnOrOff() async throws {
+        var digests: [String] = []
+        var states: [ArcadeState] = []
+        var bursts: [Int] = []
+        for (reduceFlashing, settingsOff) in [(false, false), (true, false), (false, true)] {
+            let session = ExperienceSession()
+            let shell = try await ArcadeTest.openExperience(session, reduceFlashing: reduceFlashing).shell
+            XCTAssertEqual(shell.presenter.reduceFlashing, reduceFlashing)
+            if settingsOff {
+                XCTAssertTrue(shell.handle(control: "settings.sound", values: [0]).isAccepted)
+                XCTAssertTrue(shell.handle(control: "settings.haptics", values: [0]).isAccepted)
+            }
+            XCTAssertTrue(shell.handle(control: "run.steer", values: [-1]).isAccepted)
+            try ArcadeTest.frames(session, 400)
+            let core = try ArcadeTest.core(shell)
+            XCTAssertTrue(core.run.events.contains { $0.kind == .hit }, "a hit happened")
+            bursts.append(shell.presenter.effects.burstCount)
+            states.append(core.state)
+            digests.append(try shell.engine.digest().hex)
+            session.close()
+        }
+        XCTAssertTrue(bursts.allSatisfy { $0 > 0 }, "effects were started: \(bursts)")
+        XCTAssertEqual(digests[0], digests[1], "reduced flashing changes the drawing only")
+        XCTAssertEqual(states[0], states[1])
+        XCTAssertEqual(states[0].run, states[2].run, "the run is the same with sound and haptics off")
+        XCTAssertEqual(states[0].random, states[2].random)
+        XCTAssertFalse(states[2].sound || states[2].haptics)
+        var settingsOn = states[2]
+        settingsOn.sound = true
+        settingsOn.haptics = true
+        XCTAssertEqual(settingsOn, states[0])
+        XCTAssertNotEqual(digests[0], digests[2], "the settings are saved in the digest")
+    }
+
+    /// T-A10-304 (FR-A10-321; story 2 scenarios 1, 2 and 4): the injected sound and haptic sinks receive the cues of
+    /// pickups, hits and waves only while their setting is on.
+    func testTheSoundAndHapticSinksReceiveCuesOnlyWhenEnabled() async throws {
+        var results: [(sounds: [String], haptics: [HapticKind], bursts: Int)] = []
+        let variants: [[(String, Double)]] = [[], [("settings.sound", 0)], [("settings.haptics", 0)]]
+        for settings in variants {
+            let sound = RecordingSoundSink()
+            let haptics = RecordingHapticSink()
+            let presenter = ArcadePresenter(experienceID: ArcadeTest.id, soundSink: sound,
+                                            feedback: ArcadeTest.feedback(haptics))
+            var engine = try await engine(settings: settings)
+            presenter.advancePresentation(try XCTUnwrap(engine.core), seconds: 0)
+            try play(&engine, steps: ArcadeCore.firstHitSteps, presenter: presenter)
+            results.append((sound.played, haptics.played, presenter.effects.burstCount))
+        }
+        let all = results[0]
+        XCTAssertTrue(all.sounds.contains("hit"), "\(all.sounds)")
+        XCTAssertTrue(all.sounds.contains("wave"), "wave 2 starts at step 600: \(all.sounds)")
+        XCTAssertTrue(all.haptics.contains(.impactHeavy))
+        XCTAssertTrue(all.haptics.contains(.selection))
+        XCTAssertEqual(all.sounds.count, all.haptics.count, "each sound with its haptic")
+        XCTAssertEqual(results[1].sounds, [], "sound off: nothing plays")
+        XCTAssertEqual(results[1].haptics, all.haptics, "haptics still play")
+        XCTAssertEqual(results[2].haptics, [], "haptics off: nothing is felt")
+        XCTAssertEqual(results[2].sounds, all.sounds, "sounds still play")
+        XCTAssertEqual(Set(results.map(\.bursts)).count, 1, "the visual effects do not depend on the settings")
+        XCTAssertEqual(ArcadeSoundPlayer.effect(.hit)?.waveform, .triangle)
+        for sound in ArcadeSound.all { XCTAssertEqual(ArcadeSoundPlayer.effect(sound)?.isValid, true, sound.id) }
+    }
+
+    /// T-A10-304 (edge case "pausing during a burst"): the effects advance by game steps only, so they freeze while
+    /// the game is paused and move again after the resume.
+    func testTheEffectsFreezeWhilePaused() async throws {
+        let presenter = ArcadePresenter(experienceID: ArcadeTest.id, soundSink: RecordingSoundSink(),
+                                        feedback: ArcadeTest.feedback(RecordingHapticSink()))
+        var engine = try await engine()
+        XCTAssertEqual(engine.handle(control: "run.steer", values: [-1]), .accepted)
+        presenter.advancePresentation(try XCTUnwrap(engine.core), seconds: 0)
+        var steps = 0
+        while presenter.effects.rings.isEmpty, steps < 600 {
+            try play(&engine, steps: 1, presenter: presenter)
+            steps += 1
+        }
+        XCTAssertFalse(presenter.effects.rings.isEmpty, "a hit started its ring")
+        try play(&engine, steps: 2, presenter: presenter)
+        XCTAssertGreaterThan(presenter.effects.particles.aliveCount, 0, "a burst is alive")
+        XCTAssertEqual(engine.handle(control: "run.pause", values: [1]), .accepted)
+        let checksum = presenter.effects.particles.checksum()
+        let radius = presenter.effects.ringRadius(start: presenter.effects.rings[0].start)
+        try play(&engine, steps: 60, presenter: presenter)
+        XCTAssertEqual(presenter.effects.particles.checksum(), checksum, "particles hold while paused")
+        XCTAssertEqual(presenter.effects.ringRadius(start: presenter.effects.rings[0].start), radius)
+        XCTAssertEqual(engine.handle(control: "run.pause", values: [0]), .accepted)
+        try play(&engine, steps: 1, presenter: presenter)
+        XCTAssertNotEqual(presenter.effects.particles.checksum(), checksum, "and move again after the resume")
+    }
+
+    /// T-A10-304 (FR-A10-310): every screen is spoken, and the controls follow it.
+    func testEveryScreenIsSpoken() {
+        var run = GameRun.new()
+        XCTAssertTrue(ArcadePresenter.description(run, screen: .title).hasSuffix("no objects falling, title screen."))
+        XCTAssertTrue(ArcadePresenter.description(run, screen: .playing).hasSuffix("playing."))
+        run.paused = true
+        XCTAssertTrue(ArcadePresenter.description(run, screen: .paused).hasSuffix("paused."))
+        run.over = true
+        run.lives = 0
+        XCTAssertTrue(ArcadePresenter.description(run, screen: .over).hasSuffix("no lives, no objects falling, over."))
+        XCTAssertEqual(ArcadePresenter.status(GameRun.new(), screen: .title), "score 0, 3 lives, title screen")
+        XCTAssertEqual(ArcadeControls.startTitle(.paused), nil)
+        XCTAssertTrue(ArcadeControls.canPause(.paused) && ArcadeControls.canPause(.playing))
+        XCTAssertTrue(ArcadeControls.canRestart(.paused) && ArcadeControls.canRestart(.over))
+        XCTAssertEqual(ArcadeControls.onOff(true), "On")
+        XCTAssertEqual(ArcadeControls.onOff(false), "Off")
     }
 }
