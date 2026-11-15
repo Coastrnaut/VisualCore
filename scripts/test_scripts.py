@@ -1302,7 +1302,7 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     "NeonArcadeExperience",
                                     # Feature 082 (A11-P01): Physics Playground, integrated at X-A11.
                                     "PhysicsPlaygroundExperience",
-                                    # Feature 089 (A12-P01): Tiny Worlds, a candidate until X-A12.
+                                    # Feature 089 (A12-P01): Tiny Worlds, integrated at X-A12.
                                     "TinyWorldsExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):

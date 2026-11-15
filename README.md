@@ -170,7 +170,7 @@ python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phon
 
 `project.yml` is the XcodeGen specification of the VisualCore app, its unit and interface tests, and the Showcase.
 Xcode projects and build output are generated locally and are not committed. Debug builds show experiences that are
-still candidates (A12 Tiny Worlds today) with the launch argument `-vcCandidates`.
+still candidates (none today) with the launch argument `-vcCandidates`.
 
 ## Testing and continuous integration
 

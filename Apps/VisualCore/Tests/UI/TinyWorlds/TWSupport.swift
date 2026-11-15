@@ -1,5 +1,5 @@
 // TWSupport — feature 094 (A12-P06) T-A12-609 (FR-A12-630): helpers of the interface tests of Tiny Worlds (A12) inside
-// the one app, modelled on `PPSupport`. A12 is a candidate until X-A12, so every launch carries `-vcCandidates`
+// the one app, modelled on `PPSupport`. A12 was a candidate until X-A12 (integrated 2026-11-15); every launch still carries `-vcCandidates`
 // (DebugLaunch: the candidates' catalog entries become available and are registered), and the tests open it directly
 // with `-openExperience a12.tiny-worlds`. The controls are found by the identifiers of `WorldsControls`
 // (`port.identifier(name)`, that is `experience.a12.tiny-worlds.<name>`): New seed (`new-seed`), Turn left and right

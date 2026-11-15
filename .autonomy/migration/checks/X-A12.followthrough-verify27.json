@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a12.tiny-worlds",
+    "--runtime",
+    "27"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a12.tiny-worlds --runtime 27",
+  "elapsed_seconds": 49.445,
+  "exit_code": 0,
+  "finished": "2026-11-15T17:11:11+00:00",
+  "gate": "X-A12",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-A12.followthrough-verify27.log",
+  "log_sha256": "86ccf213dd7c6e68fdca0f3a7cb1c840a123933f56b0ff3d1cb56973c28781f1",
+  "name": "followthrough-verify27",
+  "started": "2026-11-15T17:10:22+00:00",
+  "timed_out": false
+}
