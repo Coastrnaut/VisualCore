@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "experience": "a14.solar-system-explorer",
+  "requiredDocs": [
+    "docs/apps/solar-system-explorer/privacy-and-credits.md",
+    "docs/apps/solar-system-explorer/store-listing.md",
+    "docs/apps/solar-system-explorer/release-checklist.md",
+    "docs/apps/solar-system-explorer/device-campaign.md",
+    "docs/apps/solar-system-explorer/scientific-review.md",
+    "docs/release/build-and-archive.md"
+  ],
+  "checklist": "docs/apps/solar-system-explorer/release-checklist.md",
+  "copyCheck": {
+    "text": [
+      "docs/apps/solar-system-explorer/store-listing.md"
+    ],
+    "swift": [
+      "Packages/ExperiencesCreative/SolarSystemExplorer/Experience/SolarControls.swift",
+      "Packages/ExperiencesCreative/SolarSystemExplorer/Experience/SolarPresenter.swift"
+    ],
+    "allow": [
+      "camera"
+    ]
+  }
+}

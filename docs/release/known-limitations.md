@@ -243,6 +243,30 @@ and `VisualCoreRendering` (iOS, GL). ADR-0003 and the package map record this. R
   progress file is refused with its reason, play starts from fresh progress, and the file is left in place until the
   next solve replaces it (`ProgressStoreTests.testRefusedFilesAreReportedAndLeftUntouched`).
 
+### Solar System Explorer (A14; features 102–108)
+
+- The frame time at both drawing levels, the drop to level 1 under Low Power Mode or a serious thermal state and the
+  peak memory over tours, scale switches and reopenings are unmeasured on devices; they wait for the device campaign
+  ([device-campaign.md](../apps/solar-system-explorer/device-campaign.md), rows SSE-D1 to SSE-D3). No frame-time,
+  thermal, power or memory figure is stated.
+- The system accessibility audits (row SSE-D4), the VoiceOver pass on hardware (row SSE-D5) and Dynamic Type at the
+  largest sizes and Reduce Motion on hardware (row SSE-D6) wait for the device campaign; the labels and values, the
+  native control for every action, the canvas description with date, distance and scale, the model statement, the
+  Reduce Motion cut and the rate-limited announcements are proved by the experience's tests only.
+- Positions come from an approximate model, not an ephemeris: Kepler orbits from the planets' mean elements at epoch
+  J2000.0 (E. M. Standish, JPL), held fixed with no secular rates and no perturbations between planets; the model's
+  Earth is the Earth–Moon barycentre. It is checked only against seven published events (four Mars oppositions, three
+  Earth perihelia), each within ±3 days ([scientific-review.md](../apps/solar-system-explorer/scientific-review.md)).
+- Dates run only from 1950-01-01 to 2051-01-01; a step or a playing clock stops at a range end with the reason. Times
+  are UTC; there is no time zone, no sky as seen from a place on Earth and no rise or set times.
+- The Sun and the eight planets only: no moons, dwarf planets, asteroids, comets or spacecraft, and the stars are a
+  seeded decorative backdrop, not a star catalog. Surfaces are procedural colourings, not maps of the planets.
+- In the enhanced view sizes and distances are enlarged and not to scale, which the legend and the canvas description
+  say; the true-relative view is to one scale and marks bodies too small to see.
+- Two tours and one saved view in version 0.1, kept on the device only (no sync, no export). A damaged, newer,
+  oversized or out-of-range `view.json` is refused with its reason and left in place until the next Save view replaces
+  it (`ViewStoreTests.testDamagedNewerAndOversizedFilesAreRefusedAndLeftUntouched`).
+
 ## Distribution
 
 - No App Store submission, signing or purchase setup is part of this release; those are owner actions.
