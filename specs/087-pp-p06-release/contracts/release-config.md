@@ -9,8 +9,8 @@
                    "docs/release/build-and-archive.md"],
   "checklist": "docs/apps/physics-playground/release-checklist.md",
   "copyCheck": {"text": ["docs/apps/physics-playground/store-listing.md"],
-                "swift": ["Packages/ExperiencesCreative/NeonArcade/Experience/ArcadeControls.swift",
-                          "Packages/ExperiencesCreative/NeonArcade/Experience/ArcadePresenter.swift"],
+                "swift": ["Packages/ExperiencesCreative/PhysicsPlayground/Experience/PlaygroundControls.swift",
+                          "Packages/ExperiencesCreative/PhysicsPlayground/Experience/PlaygroundPresenter.swift"],
                 "allow": []}
 }
 ```
