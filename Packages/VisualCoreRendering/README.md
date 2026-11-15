@@ -346,6 +346,8 @@ fills from the frame it reads (`ScenarioRunResult.renderer`).
 feedback generators (`SystemHapticSink`) and accessibility announcements (`SystemAnnouncementSink`, only while
 VoiceOver runs), through the planners' rate limits and the haptics switch. It never touches an experience's state.
 `ExperiencePresenter.gestureActions` and `nativeActions` declare which actions gestures and native controls send.
+Tests substitute `RecordingAnnouncementSink` (and `RecordingHapticSink`), which record what would have been
+announced or played instead of reaching the system.
 
 ## Resource ownership and pipelines (feature 204, R02-F04)
 
