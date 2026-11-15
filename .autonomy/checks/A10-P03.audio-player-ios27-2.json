@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "VisualCoreAudioTests/SoundEffectPlayerTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --only-testing VisualCoreAudioTests/SoundEffectPlayerTests",
+  "elapsed_seconds": 5.683,
+  "exit_code": 0,
+  "finished": "2026-11-15T03:49:43+00:00",
+  "log": ".autonomy/logs/A10-P03.audio-player-ios27-2.log",
+  "log_sha256": "7590031d8030be49819b6f98f124276a1f10b067a949f91e4a014f8598a15dd4",
+  "name": "audio-player-ios27-2",
+  "stage": "A10-P03",
+  "started": "2026-11-15T03:49:38+00:00",
+  "timed_out": false
+}
