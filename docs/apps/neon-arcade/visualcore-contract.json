@@ -392,29 +392,11 @@
       "id": "M07",
       "capability": "Deterministic fixed-step game loop: seeded clock and runner with timed commands, identical outcome for the same seed and inputs, input replay, state digest; lanes, hazards, orbs, waves and difficulty stepped GPU-free",
       "source": "v0.1 feature 01: deterministic fixed-step game loop; constitution A10 authoritative, GPU-free rules",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepRunner.swift",
           "symbol": "FixedStepRunner",
-          "product": "VisualCoreSimulation",
-          "public": true
-        },
-        {
-          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepRunner.swift",
-          "symbol": "FixedStepSimulation",
-          "product": "VisualCoreSimulation",
-          "public": true
-        },
-        {
-          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepRunner.swift",
-          "symbol": "ControlStream",
-          "product": "VisualCoreSimulation",
-          "public": true
-        },
-        {
-          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepClock.swift",
-          "symbol": "FixedStepClock",
           "product": "VisualCoreSimulation",
           "public": true
         },
@@ -423,25 +405,19 @@
           "symbol": "SeededRandom",
           "product": "VisualCoreSimulation",
           "public": true
-        },
-        {
-          "file": "Packages/VisualCore/Sources/VisualCoreExperience/StateDigest.swift",
-          "symbol": "StateDigest",
-          "product": "VisualCoreExperience",
-          "public": true
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/ParticleUniverse/Core/SceneSimulation.swift",
-        "symbol": "SceneState"
+        "file": "Packages/ExperiencesCreative/NeonArcade/Core/WaveDirector.swift",
+        "symbol": "WaveDirector"
       },
-      "notes": "The loop machinery exists and is tested (FixedStepRunnerTests incl. ControlStream, FixedStepClockTests, SeededRandomTests); no separate game-loop scheduler is needed. The game rules, lanes and input replay format are Neon Dodge's domain. G-GAMERULES (app-local), A10-P01 (rules and replay) and A10-P02 (lanes and mechanics)."
+      "notes": "Since A10-P02 (G-GAMERULES closed): the run advances at a fixed 1/60 s step from a seed; WaveDirector runs 600-step waves of four licensed patterns over five lanes with a capped difficulty ramp; recorded inputs replay to identical waves, score and events at any frame pacing (WaveDirectorTests, DifficultyTests, ReplayTests, ArcadeSessionTests)."
     },
     {
       "id": "M08",
       "capability": "Authoritative collision between player, hazards and orbs: circle and capsule overlap decided by the domain each step, swept tests so fast hazards never pass through the player between steps",
       "source": "v0.1 feature 02: authoritative collision; manual risk collision tunnelling",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreSimulation/Collision2D.swift",
@@ -450,8 +426,8 @@
           "public": true
         },
         {
-          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepRunner.swift",
-          "symbol": "FixedStepRunner",
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/Collision2D.swift",
+          "symbol": "CollisionCapsule",
           "product": "VisualCoreSimulation",
           "public": true
         }
@@ -460,7 +436,7 @@
         "file": "Packages/ExperiencesCreative/NeonArcade/Core/GameSimulation.swift",
         "symbol": "GameSimulation"
       },
-      "notes": "The generic tests exist since A10-P01 (Collision2D, G-COLLISION2D closed). The game's authoritative rules (hit, pickup, invulnerability, lives; swept test for circle objects, end-of-step overlap for speed-bounded capsules) are G-GAMERULES (app-local): the Phase 01 part is GameSimulation (GameSimulationTests, ReplayTests); lanes and waves follow in A10-P02; A10-P03's fixture proves fast hazards."
+      "notes": "Since A10-P02 (G-GAMERULES closed): hits, pickups, invulnerability, lives and scoring are decided by GameSimulation each step with Collision2D's swept test for circles and end-of-step overlap for speed-bounded capsules (fall ≤ 5 units/s at the difficulty ceiling); A10-P03's fixture proves fast hazards (GameSimulationTests)."
     },
     {
       "id": "M09",
@@ -822,26 +798,20 @@
       "id": "M17",
       "capability": "Licenses and provenance: every palette, pattern and shader bundled later records its author and license; only original content",
       "source": "cross-cutting: licenses; constitution A10 licenses; spec FR-A10-006",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AcknowledgementsView.swift",
           "symbol": "LicenseInventory",
           "product": "VisualCoreUI",
           "public": true
-        },
-        {
-          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AcknowledgementsView.swift",
-          "symbol": "AcknowledgementsView",
-          "product": "VisualCoreUI",
-          "public": true
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/DigitalAquarium/Core/LicenseAudit.swift",
+        "file": "Packages/ExperiencesCreative/NeonArcade/Core/LicenseAudit.swift",
         "symbol": "LicenseAudit"
       },
-      "notes": "LicenseInventory and AcknowledgementsView cover third-party notices (scripts/check_licenses.py audits the built app); per-content author and license fields for palettes, patterns and shaders do not exist in a framework product and belong to the game's content definitions, as Digital Aquarium's LicenseAudit does. G-GAMERULES (app-local), A10-P01."
+      "notes": "Since A10-P01/P02: every catalog item and spawn pattern records author and license (MIT, VisualCore project); docs/apps/neon-arcade/content-licenses.md is generated from LicenseAudit and checked against the catalog and pattern table by a test."
     }
   ],
   "gaps": [
@@ -870,7 +840,7 @@
       "justification": "Neon Dodge's rules (lanes, player, hazards, orbs, waves, difficulty, lives, scoring), the input replay format and the content license fields are the game's domain over VisualCore's fixed-step runner, ControlStream, SeededRandom and the 2D collision of G-COLLISION2D (clarification 5). Phase 01 part built in A10-P01: GameRun, GameSimulation (fixed step, spawning, swept collision, scoring, lives, replayable inputs), ArcadeCatalog and LicenseAudit (content licenses); lanes, waves and difficulty remain for A10-P02.",
       "phase": 1,
       "test": "Host tests (swift test, no GPU): the same seed and input replay give the same state digest; hits cost a life, orbs score once, waves and difficulty follow their tables within caps on hazards and orbs; drawing never changes the state; every palette, pattern and shader records an author and a license and the audit fails on a missing one. Lanes and full mechanics complete in A10-P02",
-      "closed": null
+      "closed": "A10-P02"
     },
     {
       "id": "G-SOUNDFX",
