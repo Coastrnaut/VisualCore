@@ -6,7 +6,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T-A10-001 Create `docs/apps/neon-arcade/README.md` (what the experience is per the manual §1–§2: Neon Dodge, one complete game, that it is an experience of the one app, its documents) and `docs/apps/neon-arcade/regression-baseline.md` with the phase start `8e4fcdbe` (the specify commit; constitution `1d922dd7`) and the reference pin `d93edd1`
+- [X] T-A10-001 Create `docs/apps/neon-arcade/README.md` (what the experience is per the manual §1–§2: Neon Dodge, one complete game, that it is an experience of the one app, its documents) and `docs/apps/neon-arcade/regression-baseline.md` with the phase start `8e4fcdbe` (the specify commit; constitution `1d922dd7`) and the reference pin `d93edd1` — Verified 2026-11-14: 2026-11-14: docs/apps/neon-arcade/README.md and regression-baseline.md (phase start 8e4fcdbe, constitution 1d922dd7, pin d93edd1; reference 7/7 recorded)
 
 ## Phase 3: User Story 1 — Evidence-backed integration matrix (P1) 🎯
 
