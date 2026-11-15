@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesCreative",
+    "--scheme",
+    "ExperiencesCreative-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "TinyWorldsCoreTests",
+    "TinyWorldsExperienceTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing TinyWorldsCoreTests TinyWorldsExperienceTests",
+  "elapsed_seconds": 19.326,
+  "exit_code": 0,
+  "finished": "2026-11-15T11:54:52+00:00",
+  "log": ".autonomy/logs/A12-P01.worlds-ios27.log",
+  "log_sha256": "90248b3eae388af0092b7d9ee8f93e031a744e5f1b51425f6e4329b623f44897",
+  "name": "worlds-ios27",
+  "stage": "A12-P01",
+  "started": "2026-11-15T11:54:32+00:00",
+  "timed_out": false
+}
