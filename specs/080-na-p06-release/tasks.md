@@ -25,7 +25,7 @@ Evidence: `python3 Tools/python/desktop_runbook.py run-check --stage A10-P06 --t
 
 ## Phase 5: User Story 4 — the game works in the real app (P2)
 
-- [ ] T-A10-608 [P] [US4] Write `Apps/VisualCore/Tests/UI/NeonArcade/NASettingsUITests.swift` (sound and haptics toggles change their values; the sensitivity stepper's value changes; using `NASupport`) and add it to chunk `"r2"` in `scripts/release_check.py` (FR-A10-630)
+- [X] T-A10-608 [P] [US4] Write `Apps/VisualCore/Tests/UI/NeonArcade/NASettingsUITests.swift` (sound and haptics toggles change their values; the sensitivity stepper's value changes; using `NASupport`) and add it to chunk `"r2"` in `scripts/release_check.py` (FR-A10-630) — Verified 2026-11-15: 2026-11-15: NASettingsUITests (sound toggle, haptics toggle, sensitivity stepper) added to chunk r2 (serial); pass in .autonomy/checks/A10-P06.app-ui.json
 - [ ] T-A10-609 [US4] Neon Arcade suites on sim-27.2 (`--name arcade-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing NeonArcadeCoreTests NeonArcadeExperienceTests`) (FR-A10-632; SC-A10-605)
 - [ ] T-A10-610 [US4] App build, unit and interface chunk (`xcodegen generate --spec project.yml` first, then `--name app-ui -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27 app-ui-ios27-r2`; each interface test < 60 s) (FR-A10-630; SC-A10-604)
 - [ ] T-A10-611 [US4] Runner iOS 27 (`--name verify-27 -- python3 scripts/verify_experiences.py --only a10.neon-arcade --runtime 27`)

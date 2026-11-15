@@ -254,7 +254,7 @@ UI_CHUNKS = {
     "o2": ["AOJourneyUITests", "AOPresetsUITests"],   # feature 059 A07-P06 (T-A07-609)
     "p2": ["OSScopeUITests", "OSPresetsUITests"],   # feature 066 A08-P06 (T-A08-609)
     "q2": ["DAAquariumUITests", "DALibraryUITests"],   # feature 073 A09-P06 (T-A09-608)
-    "r2": ["NAArcadeUITests"],   # feature 078 A10-P04 (T-A10-404)
+    "r2": ["NAArcadeUITests", "NASettingsUITests"],   # feature 078 A10-P04 (T-A10-404); feature 080 A10-P06 (T-A10-608)
 }
 # Chunks that run on one simulator (feature 066 A08-P06): the oscilloscope draws every frame on the main thread, and
 # two parallel clones competing for the host's CPU kept XCTest's idle wait from settling (single tests took 60–89 s in
