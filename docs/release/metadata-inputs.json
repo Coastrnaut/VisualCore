@@ -87,9 +87,17 @@
       "name": "Neon Arcade",
       "permissions": [],
       "tier": "free"
+    },
+    {
+      "category": "play",
+      "code": "A11",
+      "id": "a11.physics-playground",
+      "name": "Physics Playground",
+      "permissions": [],
+      "tier": "free"
     }
   ],
-  "ledger_sha256": "400b3ca1eec8626d1b62435fce9365b741ff0f43db293fe4fa31d002b340f7b7",
+  "ledger_sha256": "37c7ea7a4c351cef3f72d63ba4c67ea186fb99ccddb9a24fbe224a7b7c934fbc",
   "privacy_answers": "unproven",
   "schema": 1
 }

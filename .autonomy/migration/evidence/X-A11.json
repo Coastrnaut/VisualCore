@@ -1,0 +1,97 @@
+{
+  "branch": "main",
+  "dirty": true,
+  "dirty_paths": [
+    "docs/verification/a11.physics-playground/summary-27.2.json",
+    "docs/verification/a11.physics-playground/summary-26.5.json"
+  ],
+  "failed_attempts": [
+    {
+      "command": "python3 scripts/verify_experiences.py --only a11.physics-playground --runtime 26",
+      "exit_code": 1,
+      "log": ".autonomy/logs/migration/X-A11.sim26.log",
+      "log_sha256": "70a81a6904a4af8b9a486e8dd0eec5bdbad916cb3084ea58a2584bdad0df66b8",
+      "name": "sim26",
+      "timed_out": false
+    }
+  ],
+  "gate": "X-A11",
+  "ledger": "migration",
+  "passing_checks": [
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --result-name xa11-host",
+      "exit_code": 0,
+      "finished": "2026-11-15T10:49:16+00:00",
+      "log": ".autonomy/logs/migration/X-A11.host.log",
+      "log_sha256": "78ffbc8a77d1240af65f4828a76c7e4ce4d4957ad048378f7cd0809d9cb4f087",
+      "name": "host"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean",
+      "exit_code": 0,
+      "finished": "2026-11-15T10:58:47+00:00",
+      "log": ".autonomy/logs/migration/X-A11.reference-1.log",
+      "log_sha256": "3ed19322f794868073e2c117faf98a23c37c45291799b6ae53e0250a808eda4a",
+      "name": "reference-1"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26",
+      "exit_code": 0,
+      "finished": "2026-11-15T10:59:50+00:00",
+      "log": ".autonomy/logs/migration/X-A11.reference-2.log",
+      "log_sha256": "90e6bca8c554487e95c70e0d84f50759250b9ea062f7d826441f847f03af9e86",
+      "name": "reference-2"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a11.physics-playground --runtime 26",
+      "exit_code": 0,
+      "finished": "2026-11-15T10:51:45+00:00",
+      "log": ".autonomy/logs/migration/X-A11.sim26-2.log",
+      "log_sha256": "e87b80cecc3346287f0a3e0d4d0b7ceccd949b8e8a0809db030f71b7da855122",
+      "name": "sim26-2"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a11.physics-playground --runtime 27",
+      "exit_code": 0,
+      "finished": "2026-11-15T10:50:23+00:00",
+      "log": ".autonomy/logs/migration/X-A11.sim27.log",
+      "log_sha256": "8bafda4d8a02daff5f1adfb1418a9a7ad2659c7e653345c780c23d9412752b09",
+      "name": "sim27"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-ui-ios27-s2",
+      "exit_code": 0,
+      "finished": "2026-11-15T10:57:09+00:00",
+      "log": ".autonomy/logs/migration/X-A11.ui-s2.log",
+      "log_sha256": "c85ad67b2dac6d28179e3d7fce31a52d8882c0f0965f63dbadccaa9d2e60fdd1",
+      "name": "ui-s2"
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "finished": "2026-11-15T10:45:51+00:00",
+      "log": ".autonomy/logs/migration/X-A11.visualcore-host.log",
+      "log_sha256": "4495040b185f71d13d4afee5947085023f212b2761d614fb58ec75bb6caffac5",
+      "name": "visualcore-host"
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore --filter 'Contacts2DTests|ImpulseSolver2DTests|Springs2DTests|BroadPhase2DTests'",
+      "exit_code": 0,
+      "finished": "2026-11-15T10:50:28+00:00",
+      "log": ".autonomy/logs/migration/X-A11.visualcore-new.log",
+      "log_sha256": "d820105e71038741ebac88d3b3348b784c24c0cdea83761fb9672d6d9ff84f45",
+      "name": "visualcore-new"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name xa11-rendering",
+      "exit_code": 0,
+      "finished": "2026-11-15T10:58:01+00:00",
+      "log": ".autonomy/logs/migration/X-A11.visualcore-rendering.log",
+      "log_sha256": "15d1f2e8e964094276a1f9430c04819262f475a4b24aa0fe4020a0381cfabf34",
+      "name": "visualcore-rendering"
+    }
+  ],
+  "revision": "2f8226c1681254642b4a3d4ba68ce48829034ba0",
+  "revision_number": 1,
+  "sealed": "2026-11-15T11:00:04+00:00"
+}

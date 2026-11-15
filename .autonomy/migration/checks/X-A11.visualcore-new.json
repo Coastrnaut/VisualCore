@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "Contacts2DTests|ImpulseSolver2DTests|Springs2DTests|BroadPhase2DTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter 'Contacts2DTests|ImpulseSolver2DTests|Springs2DTests|BroadPhase2DTests'",
+  "elapsed_seconds": 4.859,
+  "exit_code": 0,
+  "finished": "2026-11-15T10:50:28+00:00",
+  "gate": "X-A11",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-A11.visualcore-new.log",
+  "log_sha256": "d820105e71038741ebac88d3b3348b784c24c0cdea83761fb9672d6d9ff84f45",
+  "name": "visualcore-new",
+  "started": "2026-11-15T10:50:23+00:00",
+  "timed_out": false
+}

@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a11.physics-playground",
+    "--runtime",
+    "26"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a11.physics-playground --runtime 26",
+  "elapsed_seconds": 63.023,
+  "exit_code": 0,
+  "finished": "2026-11-15T10:51:45+00:00",
+  "gate": "X-A11",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-A11.sim26-2.log",
+  "log_sha256": "e87b80cecc3346287f0a3e0d4d0b7ceccd949b8e8a0809db030f71b7da855122",
+  "name": "sim26-2",
+  "started": "2026-11-15T10:50:42+00:00",
+  "timed_out": false
+}

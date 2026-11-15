@@ -58,7 +58,7 @@ evidence**: no physical-device test of the unified app has been run.
 | A08 Oscilloscope Studio | experience in the app; X-A08 pass | `.autonomy/migration/checks/X-A08.*.json` |
 | A09 Digital Aquarium | experience in the app; X-A09 pass | `.autonomy/migration/checks/X-A09.*.json` |
 | A10 Neon Arcade | experience in the app; X-A10 pass — Neon Dodge: five lanes and four wave patterns, swept collision, title, pause and game-over screens, a local high-score table, synthesized sounds and haptics, five steering sensitivities, three quality levels ([contract](docs/apps/neon-arcade/visualcore-contract.md)) | `.autonomy/migration/checks/X-A10.*.json` |
-| A11 Physics Playground | a candidate in the app (A11-P06 pass: release documents, interface tests) — circles and boxes that collide, stack and settle on a 10 × 8 m stage; springs with bounded stiffness; gravity off, Moon or Earth and three drag levels; touch editing (tap to add or select, drag to grab, hold to pin, double-tap to delete, each with a native control); velocity and force arrows and a measured energy panel; presets (pendulum, spring chain, stacked objects), four saved experiment slots and two guided tutorials; pause, single step, time scale and reset to the opened experiment; resting bodies sleep; three drawing quality levels; VisualCore gains 2D contacts, an impulse solver with warm starting, springs and a broad phase ([contract](docs/apps/physics-playground/visualcore-contract.md)) | `.autonomy/checks/A11-P06.*.json` |
+| A11 Physics Playground | experience in the app; X-A11 pass — circles and boxes that collide, stack and settle on a 10 × 8 m stage; springs with bounded stiffness; gravity off, Moon or Earth and three drag levels; touch editing (tap to add or select, drag to grab, hold to pin, double-tap to delete, each with a native control); velocity and force arrows and a measured energy panel; presets (pendulum, spring chain, stacked objects), four saved experiment slots and two guided tutorials; pause, single step, time scale and reset to the opened experiment; resting bodies sleep; three drawing quality levels; VisualCore gains 2D contacts, an impulse solver with warm starting, springs and a broad phase ([contract](docs/apps/physics-playground/visualcore-contract.md)) | `.autonomy/migration/checks/X-A11.*.json` |
 | A12–A25 | not started | `python3 Tools/python/desktop_runbook.py next` |
 | Shared round features (R02-F02 … F05, F26) | pass | `python3 scripts/migration_ledger.py status` |
 | Games of Rounds 2–12 | planned; none exists in source | [catalog](docs/catalog/experience-catalog.json) |
@@ -66,7 +66,7 @@ evidence**: no physical-device test of the unified app has been run.
 | App Store | no submission and nothing for sale; a one-time name and bundle reservation is prepared and waits for the owner (signing, App Store Connect and agreements are owner actions) | [build and archive](docs/release/build-and-archive.md), [name reservation](docs/release/name-reservation.md) |
 
 Ledger totals today: the legacy ledger records **87 of 263** gates as passed (F00–F09 and the app phases
-A01-P00 … A11-P06); the unified-app ledger has 1,233 gates, with 10 experience gates (X-A01 … X-A10), 11 unified-app features,
+A01-P00 … A11-P06); the unified-app ledger has 1,233 gates, with 11 experience gates (X-A01 … X-A11), 11 unified-app features,
 5 shared round features and both governance milestones passed.
 
 ```bash
