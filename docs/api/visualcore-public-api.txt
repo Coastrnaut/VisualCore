@@ -2382,11 +2382,13 @@ VisualCoreSimulation | enum | public enum AccessibilityChoice: String, Sendable,
 VisualCoreSimulation | enum | public enum AnnouncementKind: String, Sendable, Equatable, CaseIterable
 VisualCoreSimulation | enum | public enum EmitterShape: Sendable, Equatable, Codable
 VisualCoreSimulation | enum | public enum HapticKind: String, Sendable, Equatable, CaseIterable
+VisualCoreSimulation | enum | public enum NeighbourSearch
 VisualCoreSimulation | enum | public enum ParticleForce: Sendable, Equatable
 VisualCoreSimulation | enum | public enum RandomChoiceError: Error, Equatable, Sendable
 VisualCoreSimulation | enum | public enum RandomStateError: Error, Equatable, Sendable
 VisualCoreSimulation | enum | public enum SeedDerivation
 VisualCoreSimulation | enum | public enum SimulationInfo
+VisualCoreSimulation | enum | public enum Steering
 VisualCoreSimulation | enum | public enum StoragePrecision: String, Sendable, Codable, CaseIterable
 VisualCoreSimulation | enum | public enum TimelineEvent: Sendable, Equatable
 VisualCoreSimulation | enum | public enum TrailDecay
@@ -2448,14 +2450,17 @@ VisualCoreSimulation | func | public mutating func submit(_ announcement: Announ
 VisualCoreSimulation | func | public mutating func submit(_ event: HapticEvent) -> HapticEvent?
 VisualCoreSimulation | func | public mutating func toggle()
 VisualCoreSimulation | func | public mutating func weightedIndex(_ weights: [Double]) throws(RandomChoiceError) -> Int
+VisualCoreSimulation | func | public static func capped(_ v: Vec2, to limit: Double) -> Vec2
 VisualCoreSimulation | func | public static func clampedStrength(_ strength: Double) -> Double
 VisualCoreSimulation | func | public static func derive(_ seed: UInt64, index: UInt64) -> UInt64
 VisualCoreSimulation | func | public static func derive(_ seed: UInt64, label: String) -> UInt64
 VisualCoreSimulation | func | public static func factor(strength: Double, delta: Double) -> Double
 VisualCoreSimulation | func | public static func fnv1a64(_ label: String) -> UInt64
+VisualCoreSimulation | func | public static func force(for index: Int, agents: [SteeringAgent], neighbours: [Int],
 VisualCoreSimulation | func | public static func keys(prefix: String) -> (reduceMotion: String, reduceFlashing: String)
 VisualCoreSimulation | func | public static func load(from defaults: UserDefaults, keyPrefix prefix: String) -> AccessibilityPreferences
 VisualCoreSimulation | func | public static func mix(_ z: UInt64) -> UInt64
+VisualCoreSimulation | func | public static func neighbours(of index: Int, in agents: [SteeringAgent], radius: Double, limit: Int) -> [Int]
 VisualCoreSimulation | func | public static func step8(_ value: UInt8, factor: Double, subtract: Double = 1) -> UInt8
 VisualCoreSimulation | func | public static func subtraction(delta: Double) -> Double
 VisualCoreSimulation | func | public static func unorm8(range: Float) -> SignedRangeEncoding?
@@ -2469,10 +2474,13 @@ VisualCoreSimulation | init | public init(from: Double, to: Double, duration: Do
 VisualCoreSimulation | init | public init(id: String, colorHex: String, sign: String)
 VisualCoreSimulation | init | public init(kind: HapticKind, time: Double)
 VisualCoreSimulation | init | public init(minStep: Double = 1.0 / 240, maxStep: Double = 1.0 / 30)
+VisualCoreSimulation | init | public init(minX: Double, maxX: Double, minY: Double, maxY: Double)
 VisualCoreSimulation | init | public init(minimumInterval: Double = 0.05)
 VisualCoreSimulation | init | public init(minimumInterval: Double = 0.5)
+VisualCoreSimulation | init | public init(neighbourRadius: Double = 2.5, neighbourLimit: Int = 6, separationRadius: Double = 1,
 VisualCoreSimulation | init | public init(position: Vec2 = .zero, rate: Double = 100, lifetime: ClosedRange<Double> = 1...1,
 VisualCoreSimulation | init | public init(position: Vec2, size: Double, color: Vec4)
+VisualCoreSimulation | init | public init(position: Vec2, velocity: Vec2, group: Int)
 VisualCoreSimulation | init | public init(reduceMotion: AccessibilityChoice = .system, reduceFlashing: AccessibilityChoice = .system)
 VisualCoreSimulation | init | public init(reduceMotion: Bool = false, dimFlashingLights: Bool = false)
 VisualCoreSimulation | init | public init(reduceMotion: Bool, autoplay: Bool = true)
@@ -2559,6 +2567,9 @@ VisualCoreSimulation | struct | public struct SignedRangeEncoding: Sendable, Equ
 VisualCoreSimulation | struct | public struct SplitMix64: RandomNumberGenerator, Sendable
 VisualCoreSimulation | struct | public struct State: Codable, Sendable, Equatable
 VisualCoreSimulation | struct | public struct StateSign: Sendable, Equatable
+VisualCoreSimulation | struct | public struct SteeringAgent: Sendable, Equatable
+VisualCoreSimulation | struct | public struct SteeringBounds: Sendable, Equatable
+VisualCoreSimulation | struct | public struct SteeringParameters: Sendable, Equatable
 VisualCoreSimulation | struct | public struct SystemAccessibility: Sendable, Equatable
 VisualCoreSimulation | struct | public struct TimeStepPolicy: Sendable, Equatable
 VisualCoreSimulation | struct | public struct Timeline: Sendable
@@ -2586,9 +2597,13 @@ VisualCoreSimulation | var | public private(set) var time
 VisualCoreSimulation | var | public private(set) var time: Double
 VisualCoreSimulation | var | public private(set) var totalSteps
 VisualCoreSimulation | var | public private(set) var wantsToPlay: Bool
+VisualCoreSimulation | var | public var alignmentWeight: Double
 VisualCoreSimulation | var | public var alpha: Double
 VisualCoreSimulation | var | public var autoreverses: Bool
+VisualCoreSimulation | var | public var boundaryMargin: Double
+VisualCoreSimulation | var | public var boundaryWeight: Double
 VisualCoreSimulation | var | public var burst: EmitterBurst?
+VisualCoreSimulation | var | public var cohesionWeight: Double
 VisualCoreSimulation | var | public var color: Vec4
 VisualCoreSimulation | var | public var colorHex: String
 VisualCoreSimulation | var | public var count: Int
@@ -2601,6 +2616,7 @@ VisualCoreSimulation | var | public var enabled: Bool
 VisualCoreSimulation | var | public var finalValue: Double
 VisualCoreSimulation | var | public var forces: [ParticleForce]
 VisualCoreSimulation | var | public var from: Double
+VisualCoreSimulation | var | public var group: Int
 VisualCoreSimulation | var | public var id: String
 VisualCoreSimulation | var | public var interval: Double
 VisualCoreSimulation | var | public var isEmitting
@@ -2608,13 +2624,18 @@ VisualCoreSimulation | var | public var isFinished: Bool
 VisualCoreSimulation | var | public var isFinite: Bool
 VisualCoreSimulation | var | public var isPaused
 VisualCoreSimulation | var | public var isRunning: Bool
+VisualCoreSimulation | var | public var isValid: Bool
 VisualCoreSimulation | var | public var kind: AnnouncementKind
 VisualCoreSimulation | var | public var kind: HapticKind
 VisualCoreSimulation | var | public var lifetime: ClosedRange<Double>
 VisualCoreSimulation | var | public var liveLimit: Int
+VisualCoreSimulation | var | public var maxForce: Double
 VisualCoreSimulation | var | public var minValue: Float
+VisualCoreSimulation | var | public var minX: Double, maxX: Double, minY: Double, maxY: Double
 VisualCoreSimulation | var | public var mode: EasingMode
 VisualCoreSimulation | var | public var name: String
+VisualCoreSimulation | var | public var neighbourLimit: Int
+VisualCoreSimulation | var | public var neighbourRadius: Double
 VisualCoreSimulation | var | public var offset: Double
 VisualCoreSimulation | var | public var playbackRate: Double
 VisualCoreSimulation | var | public var position: Vec2
@@ -2627,6 +2648,8 @@ VisualCoreSimulation | var | public var reduceMotion: AccessibilityChoice
 VisualCoreSimulation | var | public var reduceMotion: Bool
 VisualCoreSimulation | var | public var reducedMotion
 VisualCoreSimulation | var | public var repeatCount: Int?
+VisualCoreSimulation | var | public var separationRadius: Double
+VisualCoreSimulation | var | public var separationWeight: Double
 VisualCoreSimulation | var | public var shape: EmitterShape
 VisualCoreSimulation | var | public var sign: String
 VisualCoreSimulation | var | public var simulatedTime: Double
@@ -2645,6 +2668,7 @@ VisualCoreSimulation | var | public var tolerance: Float
 VisualCoreSimulation | var | public var totalDuration: Double?
 VisualCoreSimulation | var | public var tween: Tween
 VisualCoreSimulation | var | public var values: [Float]
+VisualCoreSimulation | var | public var velocity: Vec2
 VisualCoreTestSupport | enum | public enum ClockInUpdate: SampleFault
 VisualCoreTestSupport | enum | public enum FailingPreparation: SampleFault
 VisualCoreTestSupport | enum | public enum ImageComparison

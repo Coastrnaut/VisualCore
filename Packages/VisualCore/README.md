@@ -7,7 +7,7 @@ iOS 26+ inside apps. The package map and dependency rules R1–R5 are in
 | Product | Purpose |
 |---|---|
 | VisualCoreMath | vectors, matrices, quaternions, cameras, double-precision plane viewports (PlaneViewport) and size-independent framings (PlaneFraming), log-scale framing flights and tour timelines (FramingFlight, TourTimeline), precision advice (PrecisionAdvisor), easing, camera rails with comfort limits (CameraRail, RailPose, ComfortLimits, RailFlight) and origin rebasing for long journeys (OriginRebase) |
-| VisualCoreSimulation | fixed-step clock, seeded RNG, timelines, particle pool, NaN guard, CPU field grids, storage precision, time-step policy |
+| VisualCoreSimulation | fixed-step clock, seeded RNG, timelines, particle pool, NaN guard, CPU field grids, storage precision, time-step policy, bounded steering and neighbour search |
 | VisualCoreScenes | input mapping, pointer tracking and velocity, seeded synthetic gesture scripts, mesh generators, export geometry, streaming piece windows (SegmentWindow), fixed-size slot pools (SlotPool) and per-quality-level streaming budgets (StreamingBudget, StreamingLevel); feature 062 (A08-P02): `Primitive.polyline` (a bounded multi-point line of up to 8,192 finite points with a width) |
 | VisualCoreShaderSource | shader library, includes, line maps, diagnostics parsing |
 | VisualCoreEffectsGraph | effect DAG model, validation, quotas, flash-limiter model |
@@ -86,6 +86,14 @@ cap, `limit(requested:tier:) = min(requested, max(minimum, ⌊requested × share
 `QualityPolicy.decide`. `ParticleSystem.liveLimit` applies the cap: emission stops at it, nobody is removed.
 
 Time is passed in, so decisions are deterministic and host-testable. `reset()` returns to the best tier.
+
+**Bounded steering** (`VisualCoreSimulation`, feature 069): `NeighbourSearch.neighbours(of:in:radius:limit:)` returns at
+most `limit` indices of `SteeringAgent`s within `radius`, nearest first with ties broken by index, never the agent itself
+(a linear scan, meant for a few dozen agents). `Steering.force(for:agents:neighbours:parameters:bounds:)` adds weighted
+separation (all neighbours inside `separationRadius`; coincident agents part along ±x by index), alignment and cohesion
+(only neighbours of the same `group`) and an inward boundary push inside `boundaryMargin` of valid `SteeringBounds`;
+each term and the sum are capped to `maxForce`, and non-finite input gives zero force. Deterministic, no randomness;
+host tests `SteeringForceTests` and `NeighbourSearchTests`.
 
 **CPU field references** (`VisualCoreSimulation`, feature 019): a `FieldGrid` is a W×H grid with 1…4 channels,
 row-major from the bottom row up, as in GL. `StoragePrecision` (`float32`, `float16`, `float16TowardZero`, `unorm8`) rounds values the
