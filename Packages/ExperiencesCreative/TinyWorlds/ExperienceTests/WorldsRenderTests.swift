@@ -5,6 +5,14 @@
 // the terrain (no rebuild, the same terrain digest); the camera, light and background follow the file header of
 // `WorldsPresenter`; the description names the world, the seed and the view in words; teardown releases every GPU
 // object; and the experience's sources never create a graphics context of their own.
+//
+// Feature 090 (A12-P02) T-A12-205 (FR-A12-212, FR-A12-213, FR-A12-220, FR-A12-222; SC-A12-204; clarifications 3–5;
+// acceptance scenarios US1-2, US1-3, US2-1 and US4-2): the island's terrain shows its coloured low land (green) and
+// high land (sand) in one frame, told apart by channel ratios that the white light cannot change; a change of quality
+// tier rebuilds the terrain renderer alone at the new detail level and keeps the state and its digest; the drawn view
+// eases to the state's view in 0.35 s of frame time (21 frames of 1/60 s) with the canvas label current at once, and
+// moves directly under Reduce Motion, also when it is switched on mid-ease; view announcements are spoken at most once
+// per second of the injected frame clock.
 import Foundation
 import XCTest
 @testable import TinyWorldsExperience
@@ -15,6 +23,8 @@ import VisualCoreMath
 import VisualCoreRendering
 import VisualCoreScenes
 import VisualCoreSimulation
+import VisualCoreUI
+import VisualCoreDiagnostics
 
 @MainActor
 final class WorldsRenderTests: XCTestCase {
@@ -78,6 +88,7 @@ final class WorldsRenderTests: XCTestCase {
         let terrain = try WorldsTest.core(shell).terrainDigest
         let builds = shell.presenter.rebuildCount
         XCTAssertTrue(shell.handle(control: "view.orbit", values: [90, 20]).isAccepted)
+        try WorldsTest.settle(session, shell)   // the drawn view eases over 0.35 s (feature 090)
         let after = try WorldsTest.picture(session)
         assertDrawn(shell, after, "turned")
         XCTAssertNotEqual(StableHash.sha256Hex(before.rgba), StableHash.sha256Hex(after.rgba), "the frame changes")
@@ -190,5 +201,156 @@ final class WorldsRenderTests: XCTestCase {
                 XCTAssertFalse(text.contains(word), "\(file.lastPathComponent) mentions \(word)")
             }
         }
+    }
+
+    // MARK: Feature 090
+
+    /// The pixels of `frame` whose red/green and blue/green ratios fall in the given ranges (green above 20).
+    private func count(_ frame: (rgba: [UInt8], width: Int, height: Int), redOverGreen: ClosedRange<Double>,
+                       blueOverGreen: ClosedRange<Double>) -> Int {
+        var found = 0
+        var i = 0
+        while i + 3 < frame.rgba.count {
+            let r = Double(frame.rgba[i]), g = Double(frame.rgba[i + 1]), b = Double(frame.rgba[i + 2])
+            if g > 20, redOverGreen.contains(r / g), blueOverGreen.contains(b / g) { found += 1 }
+            i += 4
+        }
+        return found
+    }
+
+    func testColouredLowAndHighLandDifferInTheFrame() async throws {
+        let session = ExperienceSession()
+        let shell = try await WorldsTest.open(session, size: size)
+        XCTAssertTrue(shell.presenter.terrainColored, "the terrain carries its colour stream")
+        XCTAssertEqual(shell.presenter.terrainLevel, 0)
+        let frame = try WorldsTest.picture(session)
+        assertDrawn(shell, frame, "coloured island")
+        // Island palette: low land (0.36, 0.62, 0.30): r/g 0.58, b/g 0.48; high land (0.72, 0.66, 0.50): r/g 1.09,
+        // b/g 0.76; sea (0.16, 0.42, 0.62): b/g 1.48. A white light scales the channels together.
+        let low = count(frame, redOverGreen: 0.5...0.68, blueOverGreen: 0.38...0.58)
+        let high = count(frame, redOverGreen: 0.98...1.2, blueOverGreen: 0.66...0.86)
+        XCTAssertGreaterThan(low, 4, "low land is drawn green")
+        XCTAssertGreaterThan(high, 4, "high land is drawn sand-coloured")
+        XCTAssertEqual(TerrainColoring.color(height: 0.05, palette: try XCTUnwrap(ContentCatalog.bundled
+            .palette(id: "island")), preset: .island), Vec4(0.36, 0.62, 0.30, 1))
+        session.close()
+    }
+
+    func testALevelChangeRebuildsOnlyTheTerrainRendererAndKeepsTheDigest() async throws {
+        let session = ExperienceSession()
+        let shell = try await WorldsTest.open(session, size: size)
+        let presenter = shell.presenter
+        XCTAssertEqual(shell.qualityProfile.levels.count, 3)
+        let digest = try shell.engine.digest()
+        let core = try WorldsTest.core(shell)
+        let builds = presenter.rebuildCount, terrainBuilds = presenter.terrainBuildCount
+        let sea = ObjectIdentifier(presenter.renderers[1])
+        let terrain = ObjectIdentifier(presenter.renderers[0])
+        for (tier, level) in [(1, 1), (2, 2), (0, 0)] {
+            try shell.setQualityTier(tier)
+            let frame = try WorldsTest.picture(session)
+            assertDrawn(shell, frame, "tier \(tier)")
+            XCTAssertEqual(presenter.terrainLevel, level)
+            XCTAssertEqual(presenter.rebuildCount, builds, "the other renderers stay")
+            XCTAssertEqual(ObjectIdentifier(presenter.renderers[1]), sea, "the sea renderer is kept")
+            XCTAssertEqual(presenter.lastPartsDrawn, 2)
+            XCTAssertEqual(try shell.engine.digest(), digest, "the world is unchanged")
+            XCTAssertEqual(try WorldsTest.core(shell), core)
+        }
+        XCTAssertEqual(presenter.terrainBuildCount, terrainBuilds + 3, "one terrain rebuild per level change")
+        XCTAssertNotEqual(ObjectIdentifier(presenter.renderers[0]), terrain)
+        try WorldsTest.frames(session, 2)
+        XCTAssertEqual(presenter.terrainBuildCount, terrainBuilds + 3, "an unchanged tier rebuilds nothing")
+        XCTAssertThrowsError(try shell.setQualityTier(3))
+        XCTAssertEqual(WorldsPresenter.level(forTier: 7), 2)
+        XCTAssertEqual(WorldsPresenter.level(forTier: -1), 0)
+        session.close()
+        XCTAssertEqual(session.diagnostics.lastCloseCounts?.objects, 0)
+    }
+
+    func testTheViewEasesToTheTargetIn035Seconds() async throws {
+        let session = ExperienceSession()
+        let shell = try await WorldsTest.open(session, size: size)
+        let start = try WorldsTest.core(shell).view
+        XCTAssertTrue(shell.handle(control: "view.orbit", values: [90, 20]).isAccepted)
+        let target = try WorldsTest.core(shell).view
+        XCTAssertTrue(shell.accessibilitySummary.contains(WorldsPresenter.viewWords(target)), "the label is current")
+        try WorldsTest.frames(session, 10)
+        let middle = try XCTUnwrap(shell.presenter.lastDrawnView)
+        XCTAssertNotEqual(middle, target, "still easing after 10 frames")
+        XCTAssertGreaterThan(middle.yawDegrees, start.yawDegrees)
+        XCTAssertLessThan(middle.yawDegrees, target.yawDegrees)
+        XCTAssertGreaterThan(middle.pitchDegrees, start.pitchDegrees)
+        XCTAssertLessThan(middle.pitchDegrees, target.pitchDegrees)
+        try WorldsTest.frames(session, 10)
+        XCTAssertNotEqual(shell.presenter.lastDrawnView, target, "20 frames are 0.333 s")
+        try WorldsTest.frames(session, 1)
+        XCTAssertEqual(shell.presenter.lastDrawnView, target, "21 frames are 0.35 s")
+        XCTAssertFalse(shell.presenter.easing.isEasing)
+
+        // The pure easing: smoothstep, the shorter way round, direct without a previous view.
+        XCTAssertEqual(ViewEasing.smoothstep(0.5), 0.5)
+        XCTAssertEqual(ViewEasing.smoothstep(2), 1)
+        let west = WorldView(yaw: 170 * WorldView.radiansPerDegree, pitch: 0.5, distance: 20)
+        let east = WorldView(yaw: -170 * WorldView.radiansPerDegree, pitch: 0.5, distance: 20)
+        XCTAssertEqual(abs(ViewEasing.blend(west, east, 0.5).yawDegrees), 180, accuracy: 1e-9)
+        var easing = ViewEasing()
+        XCTAssertEqual(easing.advance(to: west, by: 1.0 / 60, reduceMotion: false), west, "the first view is direct")
+        XCTAssertNotEqual(easing.advance(to: east, by: 1.0 / 60, reduceMotion: false), east)
+        XCTAssertEqual(easing.advance(to: east, by: 0.34, reduceMotion: false), east)
+        session.close()
+    }
+
+    func testReduceMotionMovesTheViewDirectlyEvenMidEase() async throws {
+        let session = ExperienceSession()
+        let shell = try await WorldsTest.open(session, size: size, reduceMotion: true)
+        XCTAssertTrue(shell.presenter.reducesMotion)
+        XCTAssertTrue(shell.handle(control: "view.orbit", values: [-60, 15]).isAccepted)
+        try WorldsTest.frames(session, 1)
+        XCTAssertEqual(shell.presenter.lastDrawnView, try WorldsTest.core(shell).view, "direct under Reduce Motion")
+        session.close()
+
+        let second = ExperienceSession()
+        let eased = try await WorldsTest.open(second, size: size)
+        XCTAssertTrue(eased.handle(control: "view.zoom", values: [2]).isAccepted)
+        try WorldsTest.frames(second, 5)
+        XCTAssertNotEqual(eased.presenter.lastDrawnView, try WorldsTest.core(eased).view, "easing")
+        eased.presenter.reduceMotion = true
+        try WorldsTest.frames(second, 1)
+        XCTAssertEqual(eased.presenter.lastDrawnView, try WorldsTest.core(eased).view, "switched on mid-ease: direct")
+        second.close()
+    }
+
+    func testViewAnnouncementsAreSpokenAtMostOncePerSecond() async throws {
+        // The pure rate limit with an injected clock.
+        var announcer = ViewAnnouncer()
+        XCTAssertEqual(announcer.offer("a", at: 0), "a")
+        XCTAssertNil(announcer.offer("b", at: 0.4))
+        XCTAssertNil(announcer.offer("c", at: 0.9))
+        XCTAssertNil(announcer.tick(at: 0.99))
+        XCTAssertEqual(announcer.tick(at: 1.0), "c", "the latest held text, once a second has passed")
+        XCTAssertNil(announcer.tick(at: 5))
+        XCTAssertEqual(announcer.offer("d", at: 5), "d")
+
+        // In the presenter, on the frame clock (1/60 s per frame).
+        let sink = RecordingAnnouncementSink()
+        let session = ExperienceSession()
+        let shell = try await WorldsTest.open(session, size: size, announcements: sink)
+        XCTAssertEqual(sink.announced, [], "the first frame speaks nothing")
+        for _ in 0..<5 {
+            XCTAssertTrue(shell.handle(control: "view.orbit", values: [10, 0]).isAccepted)
+            try WorldsTest.frames(session, 1)
+        }
+        let first = sink.announced
+        XCTAssertEqual(first.count, 1, "five changes in 5 frames speak once")
+        XCTAssertTrue(first[0].hasPrefix("View from the "), first[0])
+        try WorldsTest.frames(session, 60)
+        let final = try WorldsTest.core(shell).view
+        XCTAssertEqual(sink.announced.count, 2, "the held change is spoken once a second has passed")
+        XCTAssertEqual(sink.announced.last, WorldsPresenter.spokenView(final))
+        try WorldsTest.frames(session, 60)
+        XCTAssertEqual(sink.announced.count, 2, "nothing more without a change")
+        XCTAssertEqual(WorldsPresenter.spokenView(.default), "View from the north-east, 35 degrees up, 18 metres away.")
+        session.close()
     }
 }

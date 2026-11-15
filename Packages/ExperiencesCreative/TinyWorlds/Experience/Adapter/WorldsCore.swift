@@ -31,14 +31,26 @@
 // Snapshot schema 1: `WorldState.encoded()` (JSON with sorted keys); the preparation seed and the schema version come
 // from the snapshot envelope (`MigrationChain(currentVersion: 1)`, so a newer envelope is refused by the engine). A
 // payload `WorldState.decode(_:)` refuses (damaged, or a newer schema inside the payload) is refused (the restore
-// throws `WorldsRestoreError`). One quality tier (`level-0`). The digest is the canonical text of the whole state and
-// the terrain digest it generates, so a scenario's final digest pins the terrain too. The outcome names the world
-// shown (`world-island`, `world-asteroid-garden`, `world-miniature-city`).
+// throws `WorldsRestoreError`). The quality tiers are described below. The digest is the canonical text of the whole
+// state and the terrain digest it generates, so a scenario's final digest pins the terrain too. The outcome names the
+// world shown (`world-island`, `world-asteroid-garden`, `world-miniature-city`).
+//
+// Feature 090 (A12-P02) T-A12-205 (FR-A12-210, FR-A12-222; clarifications 3 and 5; research D3; plan "Lifecycle"):
+// the camera policy. After every accepted action (the view actions `view.orbit`, `view.zoom` and `view.reset`, and
+// also `world.preset` and `world.seed`, whose new terrain may rise under the eye) and whenever a core is built from a
+// state (preparation, restore, reset), the view is passed through `CameraPolicy.clamp(_:field:)` over the level-0
+// terrain of the current preset and seed: the pitch is raised in 1° steps (to at most 75°) until the eye is 0.5 m above
+// the terrain around the point below it. The clamp is idempotent, so a view that already keeps the clearance (every
+// bundled preset's default view, and every view of the P01 scenario fixtures) is unchanged and so are their digests; a
+// saved view that does not keep it is raised on restore. The level-0 height fields are remembered per preset and seed
+// in a small process-wide memo (at most 16 entries), as the terrain digests are. Three quality tiers (`level-0`…
+// `level-2`) are declared; the presenter maps them to the terrain detail levels and the state never depends on them.
 import Foundation
 import Synchronization
 import TinyWorldsCore
 import VisualCoreExperience
 import VisualCorePersistence
+import VisualCoreScenes
 import VisualCoreSimulation
 
 /// The rule codes of Tiny Worlds' refusals.
@@ -89,8 +101,42 @@ public struct WorldsCore: ExperienceCore, Equatable {
     /// A core holding `state`, prepared with `seed`.
     init(seed: UInt64, state: WorldState) {
         preparationSeed = seed
-        self.state = state
-        terrainDigest = Self.terrainDigest(of: state)
+        var clamped = state
+        clamped.view = Self.policyView(state.view, of: state)
+        self.state = clamped
+        terrainDigest = Self.terrainDigest(of: clamped)
+    }
+
+    /// The most level-0 height fields ``fieldMemo`` keeps before it starts over.
+    static let fieldMemoLimit = 16
+
+    /// Level-0 height fields by preset index and seed (`presetIndex << 32 | seed`); generation is pure.
+    private static let fieldMemo = Mutex<[UInt64: HeightField]>([:])
+
+    /// The level-0 height field of `state`'s preset and seed, or nil when it cannot be built (never for the bundled
+    /// presets).
+    static func heightField(of state: WorldState) -> HeightField? {
+        let key = UInt64(state.presetIndex) << 32 | UInt64(state.seed)
+        if let known = fieldMemo.withLock({ $0[key] }) { return known }
+        guard let field = try? TerrainGenerator.heightField(preset: state.preset, seed: state.seed) else { return nil }
+        fieldMemo.withLock { memo in
+            if memo.count >= fieldMemoLimit { memo.removeAll() }
+            memo[key] = field
+        }
+        return field
+    }
+
+    /// `view` passed through the camera policy over `state`'s level-0 terrain (`CameraPolicy.clamp(_:field:)`);
+    /// when the terrain cannot be built, `CameraPolicy.clamp(_:preset:seed:)` checks it against the highest terrain.
+    static func policyView(_ view: WorldView, of state: WorldState) -> WorldView {
+        if let field = heightField(of: state) { return CameraPolicy.clamp(view, field: field) }
+        return CameraPolicy.clamp(view, preset: state.preset, seed: state.seed)
+    }
+
+    /// Applies the camera policy to the current view (see the file header).
+    private mutating func applyCameraPolicy() {
+        let clamped = Self.policyView(state.view, of: state)
+        if clamped != state.view { state.view = clamped }
     }
 
     /// The most terrain digests ``terrainMemo`` keeps before it starts over.
@@ -121,8 +167,9 @@ public struct WorldsCore: ExperienceCore, Equatable {
 
     // MARK: Contract
 
-    /// One quality tier (`level-0`): the drawing has nothing to scale down in this phase.
-    public static var qualityTiers: Int { 1 }
+    /// Three quality tiers (`level-0`…`level-2`), drawn at the terrain detail levels 0…2 (`TerrainDetail`); the
+    /// state and its digest never depend on the tier.
+    public static var qualityTiers: Int { 3 }
 
     /// Schema 1, the first; nothing to migrate.
     public static var migrations: MigrationChain { MigrationChain(currentVersion: WorldState.schemaVersion) }
@@ -145,7 +192,8 @@ public struct WorldsCore: ExperienceCore, Equatable {
     /// A host step changes nothing: nothing animates in this phase.
     public mutating func update(step: Int) {}
 
-    /// Carries out a well-formed action (see the file header); a refused action changes nothing.
+    /// Carries out a well-formed action (see the file header), then applies the camera policy; a refused action
+    /// changes nothing.
     public mutating func apply(_ action: ExperienceAction) -> ActionResult {
         let v = action.values
         let expected = ["world.preset": 1, "world.seed": 0, "view.orbit": 2, "view.zoom": 1,
@@ -174,6 +222,7 @@ public struct WorldsCore: ExperienceCore, Equatable {
         default:   // view.reset
             state.view.reset()
         }
+        applyCameraPolicy()
         return .accepted
     }
 

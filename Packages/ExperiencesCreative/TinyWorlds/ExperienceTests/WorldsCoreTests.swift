@@ -1,10 +1,13 @@
 // WorldsCoreTests — feature 089 (A12-P01) T-A12-104 (FR-A12-111, FR-A12-121, FR-A12-122; clarifications 4 and 5;
 // research D4; SC-A12-103). The adapter core of Tiny Worlds against the experience contract, short runs only (no wall
-// clock): the id, the five controls, schema 1, one quality tier and the default step; conformance over four seeds;
+// clock): the id, the five controls, schema 1, three quality tiers and the default step; conformance over four seeds;
 // the first state (the preparation seed naming the world's seed, the default world otherwise); every action accepted
 // in range; refusals by the engine and by the core (`a12.invalid-choice`) each leaving the state as it was; new seeds
 // from the generator; host steps changing nothing; the digest covering the state and its terrain; the snapshot round
-// trip into another engine; damaged and newer snapshots refused; reset; the outcome.
+// trip into another engine; damaged and newer snapshots refused; reset; the outcome. Feature 090 (A12-P02) T-A12-205
+// (FR-A12-210; SC-A12-201; edge case "Damaged or newer saved state"): every restored and every acted view keeps the
+// camera policy (limits and the 0.5 m clearance over the level-0 terrain), a restored view equals its policy clamp,
+// and a view that keeps the clearance restores unchanged.
 import Foundation
 import XCTest
 @testable import TinyWorldsExperience
@@ -34,7 +37,7 @@ final class WorldsCoreTests: XCTestCase {
         XCTAssertEqual(WorldsCore.controls.map(\.id), WorldsCore.actionIDs)
         XCTAssertEqual(WorldsCore.controls.map(\.ranges), [[0...2], [], [-180...180, -180...180], [0.5...2], []])
         XCTAssertEqual(WorldsCore.migrations.currentVersion, 1)
-        XCTAssertEqual(WorldsCore.qualityTiers, 1)
+        XCTAssertEqual(WorldsCore.qualityTiers, 3, "level-0…level-2 (feature 090)")
         XCTAssertEqual(WorldsCore.stepDuration, 1.0 / 120, accuracy: 1e-15)
         XCTAssertEqual(WorldsRule.invalidChoice, "a12.invalid-choice")
     }
@@ -294,5 +297,45 @@ final class WorldsCoreTests: XCTestCase {
         XCTAssertEqual(core.outcome?.code, "world-miniature-city", "the view does not change the outcome")
         core.reset()
         XCTAssertEqual(core.outcome?.code, "world-island")
+    }
+
+    // MARK: Feature 090
+
+    func testRestoredAndActedViewsKeepTheCameraPolicy() async throws {
+        for preset in WorldPreset.all {
+            let field = try TerrainGenerator.heightField(preset: preset, seed: 1)
+            for yaw in stride(from: -180.0, to: 180, by: 30) {
+                for (pitch, distance) in [(10.0, 10.0), (10.0, 30.0), (40.0, 10.0), (75.0, 30.0)] {
+                    let view = WorldView(yaw: yaw * WorldView.radiansPerDegree,
+                                         pitch: pitch * WorldView.radiansPerDegree, distance: distance)
+                    let state = WorldState(presetIndex: preset.id.rawValue, seed: 1, view: view,
+                                           random: WorldState.initial.random)
+                    let restored = try worldsCore(state).view
+                    XCTAssertTrue(CameraPolicy.keepsClearance(restored, field: field), "\(preset.name) \(view)")
+                    XCTAssertEqual(restored, CameraPolicy.clamp(view, field: field))
+                    if CameraPolicy.keepsClearance(view, field: field) {
+                        XCTAssertEqual(restored, view, "a valid view restores unchanged")
+                    }
+                    XCTAssertEqual(restored.yaw, view.yaw, "the policy never turns the view")
+                    XCTAssertEqual(restored.distance, view.distance, "nor moves it in or out")
+                }
+            }
+        }
+
+        var engine = try await makeEngine()
+        let actions: [(String, [Double])] = [
+            ("view.orbit", [0, -180]), ("view.zoom", [2]), ("view.zoom", [2]), ("view.orbit", [180, -180]),
+            ("world.preset", [1]), ("view.orbit", [-90, -30]), ("world.preset", [2]), ("world.seed", []),
+            ("view.zoom", [0.5]), ("view.orbit", [45, 180]), ("view.reset", []), ("view.orbit", [-170, -90]),
+        ]
+        for (control, values) in actions {
+            XCTAssertEqual(engine.handle(control: control, values: values), .accepted, control)
+            let core = try XCTUnwrap(engine.core)
+            let field = try TerrainGenerator.heightField(preset: core.preset, seed: core.seed)
+            XCTAssertTrue(CameraPolicy.keepsClearance(core.view, field: field), "\(control) \(values)")
+            XCTAssertEqual(CameraPolicy.clamp(core.view, field: field), core.view, "acted views are already clamped")
+        }
+        XCTAssertEqual(WorldsCore(seed: 1).view, .default, "the default view keeps the policy unchanged")
+        XCTAssertEqual(WorldsCore.qualityTiers, 3)
     }
 }

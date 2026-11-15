@@ -35,7 +35,7 @@ final class WorldsSessionTests: XCTestCase {
         XCTAssertTrue(presenter.mirror.ready)
         XCTAssertEqual(presenter.mirror.presetIndex, 0)
         XCTAssertEqual(presenter.nativeActions, Set(WorldsCore.actionIDs))
-        XCTAssertEqual(presenter.gestureActions, [])
+        XCTAssertEqual(presenter.gestureActions, ["view.orbit", "view.zoom"], "drag and pinch (feature 090)")
         XCTAssertEqual(GestureAlternatives.missing(gesture: presenter.gestureActions, native: presenter.nativeActions),
                        [])
 
