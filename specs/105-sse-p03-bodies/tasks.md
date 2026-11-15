@@ -8,7 +8,7 @@ X-A14. Precedent: `specs/104-sse-p02-orbits/tasks.md`.
 
 ## Phase 1: Setup
 
-- [ ] T-A14-301 Baseline: cite the last evidence on the unchanged tree (`.autonomy/checks/A14-P02.{sse-ios27,app-unit,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14)
+- [X] T-A14-301 Baseline: cite the last evidence on the unchanged tree (`.autonomy/checks/A14-P02.{sse-ios27,app-unit,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14) — Verified 2026-11-15: 2026-11-15: cited .autonomy/checks/A14-P02.sse-ios27.json, A14-P02.app-unit.json and A14-P02.verify-27.json (exit 0) on the tree recorded at A14-P02, unchanged since apart from spec documents (no rerun)
 
 ## Phase 2: Foundational — core surfaces, ring and scale (stories 1, 2)
 
