@@ -20,6 +20,12 @@
 // game over (the run the presenter enters into the high-score table; the crash-safe table write itself happens in the
 // presenter, outside the digest, and is proved by `HighScoreStoreTests`) and a sensitivity change (steps 4 then 0, a
 // recorded setting that never changes the run). Every digest changed with schema 4 (sensitivity and run number).
+// Fixtures 17–19 — feature 079 (A10-P05) T-A10-505 (FR-A10-522; research D5): one per quality level (0, 1, 2). A
+// scenario has no field for the quality tier and the tier is presentation only (the core stores none, so
+// `setQualityTier` leaves the digest unchanged), so the three fixtures play the same 600-step run (start, steer
+// ``qualitySteering``) and record one digest. The per-level caps (glow radius, glow opacity, live particles), the level
+// change mid-run keeping the shapes and the digest, Low Power Mode drawing level 0 and the steady glow under reduced
+// flashing are proved by `ArcadeRenderTests` and `ArcadeSessionTests`.
 #if DEBUG || VISUALCORE_AUTOMATION
 import NeonArcadeCore
 import VisualCoreExperience
@@ -72,6 +78,12 @@ extension ArcadeCore {
     public static let gameOverSteps = 700
     /// The steps the sensitivity fixture (16) plays after each of its two sensitivity changes.
     public static let sensitivitySteps = 60
+    /// The steering of the quality-level fixtures (17–19, feature 079).
+    public static let qualitySteering = 0.5
+    /// The steps the quality-level fixtures (17–19) play after their steering.
+    public static let qualitySteps = 600
+    /// The quality levels of fixtures 17, 18 and 19, in order.
+    public static let qualityFixtureLevels = [0, 1, 2]
 
     /// `inputs` as scenario entries: the steps up to each input, the `run.steer` action, and the steps left up to
     /// `steps`.
@@ -144,8 +156,8 @@ extension ArcadeCore {
         return builder.finish().hex
     }
 
-    /// The entries of the sixteen fixtures (research D5 of features 075, 076 and 077, research D3 of 078); each begins
-    /// with ``startEntry`` except 13, which holds the title screen first:
+    /// The entries of the nineteen fixtures (research D5 of features 075, 076, 077 and 079, research D3 of 078); each
+    /// begins with ``startEntry`` except 13, which holds the title screen first:
     /// 1. replay: the twelve recorded steering inputs over 1,200 steps (`ArcadeManifestTests` plays them twice and
     ///    compares score, lives and the events; `ReplayTests` proves it for three seeds on the bare run);
     /// 2. frame pacing: the same entries — the same digest whatever the frame pacing, because the runner steps the
@@ -193,7 +205,13 @@ extension ArcadeCore {
     ///     over screen and the entry; the crash-safe write and the interrupted save are `HighScoreStoreTests`');
     /// 16. sensitivity: `settings.sensitivity [4]`, ``sensitivitySteps`` steps, `settings.sensitivity [0]`,
     ///     ``sensitivitySteps`` steps — the step saved, and the run and generator identical to the same steps at the
-    ///     default step (`ArcadeManifestTests`).
+    ///     default step (`ArcadeManifestTests`);
+    /// 17–19. quality levels 0, 1 and 2 (A10-P05): steering ``qualitySteering``, then ``qualitySteps`` steps — the
+    ///     same entries and the same digest for every level, because the level is presentation only (a scenario cannot
+    ///     name a tier; `ArcadeManifestTests` checks the digest unchanged by `setQualityTier` at every level). The
+    ///     per-level caps are proved by the render tests (`ArcadeRenderTests`: the drawn glow radius and opacity and
+    ///     the live particles of each level; a level change mid-run; reduced flashing) and the session tests
+    ///     (`ArcadeSessionTests`: Low Power Mode draws level 0; the host's tier changes no state).
     public static var fixtureEntries: [[ScenarioStep]] {
         func step(_ control: String, _ values: [Double], steps: Int = 0) -> ScenarioStep {
             ScenarioStep(steps: steps, action: ScriptedAction(control, values), result: "accepted")
@@ -229,7 +247,9 @@ extension ArcadeCore {
             [startEntry, step("run.steer", [gameOverSteering]), ScenarioStep(steps: gameOverSteps)],
             [startEntry, step("settings.sensitivity", [4]), step("settings.sensitivity", [0], steps: sensitivitySteps),
              ScenarioStep(steps: sensitivitySteps)],
-        ]
+        ] + qualityFixtureLevels.map { _ in
+            [startEntry, step("run.steer", [qualitySteering]), ScenarioStep(steps: qualitySteps)]
+        }
     }
 
     /// The manifest of the experience `id`.

@@ -14,6 +14,9 @@
 // Feature 078 (A10-P04) T-A10-405 (FR-A10-401, FR-A10-402, FR-A10-412): sixteen fixtures; 15 plays a run to game over
 // (score above 0, run number 1, entered into a high-score table once), 16 changes the sensitivity twice (the step saved,
 // the run identical to the default step's).
+// Feature 079 (A10-P05) T-A10-505 (FR-A10-522; research D5): nineteen fixtures; 17–19 play the same 600-step run (start,
+// steer) for quality levels 0, 1 and 2 and record one digest, which `setQualityTier` leaves unchanged at every level
+// (the per-level caps are proved by the render and session tests).
 import Foundation
 import Testing
 @testable import NeonArcadeExperience
@@ -40,13 +43,13 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
 }
 
 @Suite struct ArcadeManifestTests {
-    @Test func theManifestIsValidWithTheNineStandardScenariosAndSixteenFixtures() {
+    @Test func theManifestIsValidWithTheNineStandardScenariosAndNineteenFixtures() {
         let manifest = ArcadeCore.manifest(for: id)
         let problems = ScenarioManifestValidator.problems(manifest, controls: ArcadeCore.controls,
-                                                          content: ContentRequirement(fixtures: 16))
+                                                          content: ContentRequirement(fixtures: 19))
         #expect(problems.isEmpty, "\(problems)")
         #expect(Set(manifest.scenarios.map(\.name))
-                == Set(ScenarioManifest.standardNames).union((1...16).map { "fixture-\($0)" }))
+                == Set(ScenarioManifest.standardNames).union((1...19).map { "fixture-\($0)" }))
         // Every scenario with actions starts the game first, except fixture 13 and rejection (which stays on the title
         // screen to show the wrong-screen refusal).
         for spec in manifest.scenarios where spec.entries.contains(where: { $0.action != nil }) {
@@ -79,7 +82,7 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
     @Test func theFixturesEndInTheStatesTheyName() throws {
         let seed = ArcadeCore.manifestSeed
         let fixtures = ArcadeCore.fixtureEntries
-        #expect(fixtures.count == 16)
+        #expect(fixtures.count == 19)
 
         // 1. Replay: the start and twelve recorded inputs over 1,200 steps; two plays give the same score, lives and
         // events.
@@ -327,6 +330,33 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
         #expect(changed.run == plain.run && changed.generator == plain.generator)
         let restored = try ArcadeCore.restore(payload: changed.snapshotPayload(), seed: seed)
         #expect(restored == changed && restored.sensitivity == 0)
+    }
+
+    /// T-A10-505 (FR-A10-522; research D5): fixtures 17–19, one per quality level, play the same run and record one
+    /// digest; the tier is presentation only, so `setQualityTier` at every level leaves the core and its digest as
+    /// they are.
+    @Test func theQualityFixturesShareOneRunAndOneDigest() throws {
+        let seed = ArcadeCore.manifestSeed
+        let fixtures = ArcadeCore.fixtureEntries
+        #expect(ArcadeCore.qualityFixtureLevels == Array(0..<ArcadeCore.qualityTiers))
+        let quality = Array(fixtures[16...18])
+        #expect(quality.allSatisfy { $0 == quality[0] })
+        #expect(quality[0].first == ArcadeCore.startEntry)
+        #expect(quality[0].compactMap(\.action).map(\.control) == ["run.start", "run.steer"])
+        #expect(quality[0].reduce(0) { $0 + $1.steps } == ArcadeCore.qualitySteps)
+        let manifest = ArcadeCore.manifest(for: id)
+        let digests = (17...19).map { n in manifest.scenarios.first { $0.name == "fixture-\(n)" }?.expect.finalDigest }
+        #expect(digests.allSatisfy { $0 != nil && $0 == digests[0] }, "\(digests)")
+        let played = ArcadeCore.played(seed: seed, entries: quality[0])
+        #expect(played.screen == .playing && played.run.step == ArcadeCore.qualitySteps)
+        for level in ArcadeCore.qualityFixtureLevels {
+            var tiered = played
+            tiered.setQualityTier(level)
+            #expect(tiered == played, "level \(level)")
+            var builder = DigestBuilder(domain: id.rawValue)
+            try tiered.writeDigest(into: &builder)
+            #expect(builder.finish().hex == digests[0], "level \(level)")
+        }
     }
 
     /// The JSON form with the control ids, named by `Catalog/registrations.json`. `UPDATE_SCENARIO_MANIFEST=1`

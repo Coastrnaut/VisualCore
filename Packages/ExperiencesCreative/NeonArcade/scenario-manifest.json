@@ -1340,6 +1340,105 @@
       },
       "name" : "fixture-16",
       "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "run.start",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "steps" : 600
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8833fe00f2ca023929cc312798c393425e62b65c58df34c0b6fdcc06117b1b76",
+        "initialDigest" : "cdc568c6e69916837ea9f0ac30a800cba789d8df6c080986014918c436681f2c"
+      },
+      "name" : "fixture-17",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "run.start",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "steps" : 600
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8833fe00f2ca023929cc312798c393425e62b65c58df34c0b6fdcc06117b1b76",
+        "initialDigest" : "cdc568c6e69916837ea9f0ac30a800cba789d8df6c080986014918c436681f2c"
+      },
+      "name" : "fixture-18",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "run.start",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "steps" : 600
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8833fe00f2ca023929cc312798c393425e62b65c58df34c0b6fdcc06117b1b76",
+        "initialDigest" : "cdc568c6e69916837ea9f0ac30a800cba789d8df6c080986014918c436681f2c"
+      },
+      "name" : "fixture-19",
+      "seed" : "7"
     }
   ],
   "schema" : 1

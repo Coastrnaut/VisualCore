@@ -486,7 +486,7 @@
       "id": "M11",
       "capability": "Glow and particle feedback constrained by readability: bloom and particles never hide hazards, the player or the score; caps on bloom intensity, particle counts and brightness per quality tier",
       "source": "v0.1 feature 05: glow and particle feedback constrained by readability; manual risk visual clutter",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreEffectsGraph/PassSchemas.swift",
@@ -520,10 +520,10 @@
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/PlaygroundView.swift",
-        "symbol": "PlaygroundModel"
+        "file": "Packages/ExperiencesCreative/NeonArcade/Core/ArcadeBudget.swift",
+        "symbol": "ArcadeBudget"
       },
-      "notes": "The bloom pass (threshold, soft knee, radius, intensity; ValidationTests, PassPixelTests), the particle budget, a brightness cap and the flash limiter exist and are tested; no per-object glow limit or readability rule exists, and the caps over bloom quality are the game's. G-GLOWCAPS (app-local), A10-P05."
+      "notes": "Since A10-P05 (G-GLOWCAPS closed): three quality levels with glow factor 1.2/1.4/1.6, glow opacity caps 0.25/0.30/0.35 and particle caps 48/128/256 (ArcadeBudgetTests, ArcadeRenderTests); collision shapes drawn above glow at rule size with contrast ≥ 4.5 : 1 (hazard vs field) and ≥ 3 : 1 (hazard vs its glow) (ContrastTests); Low Power Mode draws level 0 and reduced flashing holds the glow steady; the game never sees the level."
     },
     {
       "id": "M12",
@@ -847,7 +847,7 @@
       "justification": "Readability caps (bloom intensity and radius, particle counts, brightness and glow pulses per quality tier) are the game's policy over the shared bloom pass, particle budget and flash limiter.",
       "phase": 5,
       "test": "Host tests: per tier the bloom parameters, particle counts and brightness stay within the stated caps, Reduce Flashing removes glow pulses; simulator tests: hazards, player and score keep a minimum contrast against the glow",
-      "closed": null
+      "closed": "A10-P05"
     }
   ],
   "traceability": [
