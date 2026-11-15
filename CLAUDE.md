@@ -130,7 +130,7 @@ evidence commands are found as described in Auto-Creator.md §19. Simulators are
 | State before the consolidation | [`docs/migration/pre-fable-baseline.md`](docs/migration/pre-fable-baseline.md), `python3 scripts/migration_baseline.py verify` |
 | Original planning documents, byte-identical | [`docs/archive/planning/`](docs/archive/planning/README.md) (former README, former CLAUDE.md, rounds 2–12, playbook) |
 | Which source text became which rule | `docs/migration/source-to-canonical-matrix.csv` |
-| Machine setup | [`setup.md`](setup.md), `python3 scripts/verify_environment.py` |
+| Setup, disk space | [`setup.md`](setup.md), `python3 scripts/verify_environment.py` |
 
 Former CLAUDE.md (2026-11-11): `docs/archive/planning/root/CLAUDE-2026-11-11-agent-contract.md`; lessons in
 Auto-Creator.md §19, §24.

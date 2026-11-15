@@ -22,6 +22,7 @@ the repository root. Pins last verified on 2026-11-11: `python3 scripts/verify_e
 8. [Verify the machine](#8-verify-the-machine)
 9. [Where the state lives and how to resume](#9-where-the-state-lives-and-how-to-resume)
 10. [The owner-only boundary](#10-the-owner-only-boundary)
+11. [Disk space](#11-disk-space)
 
 ## 1. Reference toolchain
 
@@ -303,3 +304,27 @@ after that; then the order is D1, D2, D3 (ADR-0009 D-08).
 
 Device identifiers (UDID, ECID, serial number), team identifiers, account names and secrets are never written into a
 tracked file. Raw device inventories stay in the gitignored `.autonomy/private/`.
+
+## 11. Disk space
+
+Measured on 2026-11-15, when the Mac showed about 400 GB used. Nearly all of it is build and simulator data that
+rebuilds itself, not Git history (`.git` is 169 MB):
+
+| Place | Size | What it is |
+|---|---|---|
+| `~/Library/Developer/CoreSimulator/Devices` | 89 GB | Simulator contents; the iOS 27.2 devices hold 10–15 GB each |
+| `~/Library/Developer/Xcode/DerivedData` | 57 GB | Xcode build cache |
+| `build/DerivedData` | 46 GB | Build cache of `scripts/xcodebuild_app.py` |
+| `../projectm-ios` (separate checkout) | 47 GB | `Vendor` alone is 23 GB |
+| `External` | 13 GB | The pinned projectM submodule |
+
+1. `xcrun simctl delete unavailable` frees nothing while every simulator is still available. To reclaim simulator
+   space, run `xcrun simctl shutdown all && xcrun simctl erase all`: it wipes contents but keeps every device, so
+   selection by runtime (`sim-27.2`, `sim-26.5`) keeps working. Never run it during a test run
+   (`pgrep -fl xcodebuild` first).
+2. Parallel simulator clones (`--parallel N`) and one-off named devices each keep their own data; erase or delete
+   them after the run that needed them.
+3. Remove a cache folder itself, `rm -rf ~/Library/Developer/Xcode/DerivedData`, not its contents through a glob.
+   With `DerivedData/*`, zsh asks to confirm more than 100 files, and when no answer comes, nothing is deleted.
+4. Clearing either DerivedData folder costs only a slower first build. Nothing inside `Vendor/angle` or
+   `External/projectm-ios` is removed to save space (CLAUDE.md rule 12).
