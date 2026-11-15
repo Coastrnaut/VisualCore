@@ -117,7 +117,7 @@ toy behaves predictably and never explodes.
 1. **Given** an undamped body on a spring without gravity, **When** it oscillates for 10 s, **Then** its total energy
    stays within 2 % of the starting energy.
 2. **Given** a damped spring, **When** it oscillates, **Then** its energy never rises by more than 0.1 % from one second
-   to the next and falls below 10 % of the start within 10 s at the high damping level.
+   to the next and falls below 10 % of the start within 10 s at damping ratio 0.5 (the world's springs use 0.1).
 3. **Given** a stiffness above the stable bound for the tick, **When** it is used, **Then** it is clamped to the bound
    and the motion stays finite.
 
@@ -198,7 +198,7 @@ springs and the default forces.
   bounded by the measured per-second drift rate (no long run executed).
 - **SC-A11-203**: The broad phase equals brute force on 100 % of 50 random scenes.
 - **SC-A11-204**: Undamped spring energy stays within 2 % over 10 s; damped energy never rises more than 0.1 % per second
-  and falls below 10 % within 10 s at high damping.
+  and falls below 10 % within 10 s at damping ratio 0.5.
 - **SC-A11-205**: Gravity levels give 0, 1.62 and 9.81 m/s² within 1 %; drag levels give the stated decay within 1 %.
 - **SC-A11-206**: Schema-1 worlds migrate in 100 % of fixtures; save/restore round trips are identical.
 - **SC-A11-207**: The standard scenarios and fixtures pass on iOS 27; the VisualCore host tests and the public-interface
