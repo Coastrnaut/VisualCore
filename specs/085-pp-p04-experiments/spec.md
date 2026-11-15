@@ -54,8 +54,8 @@ level), levels, pins, selection, grab and overlays; experience actions carry num
   step's text is spoken and shown.
 - Q: How is the energy fixture measured? → A: Spring chain, gravity on, drag low, 1,200 ticks: total energy sampled each
   second never rises by more than 0.5 % and ends below its start. Pendulum, drag none, 600 ticks: total energy within
-  5 % of the start. The world becomes schema 4 (origin, starting world, tutorial progress); migration 3 → 4 sets origin
-  free play, the current world as the starting world and no tutorial.
+  5 % of the start. The experience state becomes schema 4 (origin, starting world, tutorial progress) while the world
+  itself stays schema 3; migration 3 → 4 sets origin free play, the current world as the starting world and no tutorial.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -169,7 +169,7 @@ energy stays within a stated band over its first swings.
 
 **State and records**
 
-- **FR-A11-430**: The world MUST become schema 4 (the opened experiment and tutorial progress) with a migration from
+- **FR-A11-430**: The experience state MUST become schema 4 (the opened experiment and tutorial progress) with a migration from
   schema 3; the scenario manifest MUST add fixtures for each preset, reset to the experiment, save and reopen,
   refusals of damaged files, both tutorials and the energy bounds.
 - **FR-A11-431**: Every preset and tutorial text MUST record its author and license in the content license document.
@@ -179,7 +179,7 @@ energy stays within a stated band over its first swings.
 - **Experiment document**: schema version, name, world (bodies, springs, levels, settings), origin (preset or slot).
 - **Slot**: index 0–3, name, saved document file.
 - **Tutorial**: id, name, steps (text, condition).
-- **World (schema 4)**: schema-3 world plus the opened experiment and tutorial progress.
+- **Experience state (schema 4)**: the schema-3 world plus the opened experiment and tutorial progress.
 
 ## Success Criteria *(mandatory)*
 
