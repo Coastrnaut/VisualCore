@@ -27,6 +27,40 @@ Canonical overrides:
 - **Owner rulings:** short tests; measure briefly and bound longer runs by arithmetic; no wall-clock assertions on CI;
   iOS 27 at phase gates; reference regression and iOS 26 at X-A12; every Spec Kit step runs.
 
+## Clarifications
+
+### Session 2026-11-15
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+`QualityGovernor(levelCount:)` (VisualCoreDiagnostics) decides a level from `DeviceConditions` (thermal state, Low
+Power) at most once per second, and the session exposes the decided level as its `qualityProfile`; Physics Playground
+and Neon Arcade forward that profile through their experience wrappers and inject Low Power Mode (`lowPowerMode`) for
+tests; presenters have a `shedCaches()` hook the host calls on a memory warning; `ResourceRegistry` keeps live counts,
+peaks and leaks; Tiny Worlds already declares three quality levels mapped to its terrain detail levels (A12-P02) and
+builds props from four meshes drawn once per placed prop (A12-P03).
+
+- Q: Where do the pressure signals come from? → A: The host's quality level (the session's governor, which already
+  steps down on serious or critical heat), Low Power Mode (the system's state, injectable in tests, as in Physics
+  Playground) and memory warnings (the presenter's `shedCaches()`); the experience adds no thermal reading of its own.
+- Q: What does each tier change? → A: Only the terrain's detail level (tier i draws terrain level i: 64/32/16 cells,
+  city 48/24/12) and therefore its vertex count; every placed prop and the sea are always drawn (they are part of the
+  world), so the draw count is 2 + props at every tier and the thumbnail is always 160 × 120 drawn at the current tier.
+  Lower tiers never raise a count.
+- Q: Which rules choose the tier? → A: tier = max(host level, Low Power floor, memory floor): Low Power Mode on → the
+  lowest tier (2) while on; a memory warning → the lowest tier at once, released 30 s after the last warning (repeated
+  warnings restart the hold and never go below the lowest tier); otherwise the host's level. A tier change rebuilds
+  only the terrain renderer, at most once per change; the world document and digest never change.
+- Q: What exactly does the stale-object fixture count? → A: The resource registry's live counts after each of 20
+  cycles of: open a pack, save and reopen a slot, change the tier, recreate the context, close and reopen the session;
+  every cycle ends with the same live counts as the first, closing leaves 0 live objects and the registry reports 0
+  leaks.
+- Q: How is the catalog entry kept truthful? → A: The README gains "Capabilities and their proof", one row per
+  registered capability naming at least one existing test; `specs/093-tw-p05-qa/scan-claims.sh` refuses accurate,
+  accuracy, precise, precision, scientific, realistic, real-world, geographic, fps, frames per second, battery and
+  millisecond figures (whole words, case-insensitive) in the catalog entry and the README (its non-goals line exempt)
+  and checks every named test exists; `docs/apps/tiny-worlds/device-campaign.md` lists TW-D1 frame pacing, TW-D2
+  thermals, TW-D3 memory high-water mark, TW-D4 touch latency and TW-D5 accessibility audits as {device} tasks.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - The world stays light when the device is under pressure (Priority: P1) 🎯
@@ -105,7 +139,7 @@ claims accuracy or measured performance.
 
 ### Functional Requirements
 
-- **FR-A12-501**: A tier table MUST state per tier the terrain resolution, the prop cap drawn, the draw cap and the
+- **FR-A12-501**: A tier table MUST state per tier the terrain resolution, the props drawn, the draw count and the
   thumbnail size; lower tiers MUST never raise a count.
 - **FR-A12-502**: A tier policy MUST choose the tier from the host's quality level, memory warnings, the thermal state
   and Low Power Mode, with stated step-down and step-up rules and a hold time; changing the tier MUST NOT change the
