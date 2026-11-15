@@ -46,3 +46,7 @@ Agent: T-A14-002 (contract draft, read-heavy). Lead: T-A14-001, the runs, T-A14-
 ## Implementation strategy
 
 MVP is US1 (the matrix) with US2 (reference); US3 and US4 complete the gate.
+
+## Phase 8: Convergence
+
+- [ ] T-A14-012 Record in `specs/102-sse-p00-boundary-audit/research.md` the audit's findings beyond D4 (`TourTimeline` moves 2D `PlaneFraming` stops only, so 3D tours need adaptation; `GradientNoise2D`/`FractalNoise2D` are 2D and seam at the date line on a sphere; `MeshRenderer` has one directional light, so the Sun's light is set per body and the Sun drawn with ambient 1; `OriginRebase` rebases on a fixed 1,024-unit grid; `Mesh.revolution` and `Mesh.tube` exist for rings and orbit lines; `FixedStepClock.simulatedTime` is untested, so `FixedStepClock.advance` is cited; 123 release-check steps; contract 24 rows: 10 available, 13 requires adaptation, 1 upstream gap; 6 gaps) per plan: research D4 (partial)
