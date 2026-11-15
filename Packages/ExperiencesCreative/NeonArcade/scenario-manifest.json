@@ -1,0 +1,812 @@
+{
+  "controls" : [
+    "run.steer",
+    "run.pause",
+    "run.restart"
+  ],
+  "experience" : "a10.neon-arcade",
+  "kind" : "creative",
+  "scenarios" : [
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+        "initialDigest" : "ae49ad15e841b94888c65d3e3bb2482f0f91b2e58f599a7d14c0e82a8d83360a"
+      },
+      "name" : "launch-first-frame",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              -0.5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 30
+        },
+        {
+          "action" : {
+            "control" : "run.pause",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b80f31ed356030b427775a4170ca9008e8efcd943ae585706fd9fc28b01c9f74",
+        "initialDigest" : "ae49ad15e841b94888c65d3e3bb2482f0f91b2e58f599a7d14c0e82a8d83360a"
+      },
+      "name" : "input-response",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "outcome" : "run-playing"
+      },
+      "name" : "completion",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "run.pause",
+            "values" : [
+              -1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "run.pause",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "action.rule.a10.invalid-choice",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "run.restart",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+
+      },
+      "name" : "rejection",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              -0.5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 30
+        },
+        {
+          "action" : {
+            "control" : "run.pause",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b80f31ed356030b427775a4170ca9008e8efcd943ae585706fd9fc28b01c9f74",
+        "initialDigest" : "ae49ad15e841b94888c65d3e3bb2482f0f91b2e58f599a7d14c0e82a8d83360a"
+      },
+      "name" : "save-restore",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              -0.5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 30
+        },
+        {
+          "action" : {
+            "control" : "run.pause",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "initialDigest" : "ae49ad15e841b94888c65d3e3bb2482f0f91b2e58f599a7d14c0e82a8d83360a",
+        "resetDigest" : true
+      },
+      "name" : "reset",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "suspend-resume",
+      "seed" : "7"
+    },
+    {
+      "cycles" : 5,
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "teardown-reentry",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "cancel-prepare",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              0.59999999999999998
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              -0.29999999999999999
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 45
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 75
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              0.25
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 90
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 90
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 90
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              -0.75
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 90
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 120
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              -0.20000000000000001
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 120
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              0.90000000000000002
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 130
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 140
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              0.34999999999999998
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 110
+        },
+        {
+          "steps" : 100
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "55e706e69546e0803875bb25719d08da9a649bf4b71087d3f83b4122a10f5d4b",
+        "initialDigest" : "ae49ad15e841b94888c65d3e3bb2482f0f91b2e58f599a7d14c0e82a8d83360a"
+      },
+      "name" : "fixture-1",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              0.59999999999999998
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              -0.29999999999999999
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 45
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 75
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              0.25
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 90
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 90
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 90
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              -0.75
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 90
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 120
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              -0.20000000000000001
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 120
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              0.90000000000000002
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 130
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 140
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              0.34999999999999998
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 110
+        },
+        {
+          "steps" : 100
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "55e706e69546e0803875bb25719d08da9a649bf4b71087d3f83b4122a10f5d4b",
+        "initialDigest" : "ae49ad15e841b94888c65d3e3bb2482f0f91b2e58f599a7d14c0e82a8d83360a"
+      },
+      "name" : "fixture-2",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "steps" : 500
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "625e31e06977c8f7e9e86774fd0ba1177617e48416e00e14d77754b04a35d7a7",
+        "initialDigest" : "ae49ad15e841b94888c65d3e3bb2482f0f91b2e58f599a7d14c0e82a8d83360a"
+      },
+      "name" : "fixture-3",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              0.59999999999999998
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              -0.29999999999999999
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 45
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 75
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              0.25
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 90
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 90
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 90
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              -0.75
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 90
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 120
+        },
+        {
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "608017790732a27db889b5d9d254c53396f6d37366eb63f5c1b360eee0266007",
+        "initialDigest" : "ae49ad15e841b94888c65d3e3bb2482f0f91b2e58f599a7d14c0e82a8d83360a"
+      },
+      "name" : "fixture-4",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 60
+        },
+        {
+          "action" : {
+            "control" : "run.pause",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "steps" : 300
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5370125dc1a93d70610871a32f1591a62c55c837cd26914973d35b3b60f9514e",
+        "initialDigest" : "ae49ad15e841b94888c65d3e3bb2482f0f91b2e58f599a7d14c0e82a8d83360a"
+      },
+      "name" : "fixture-5",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              -0.5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "steps" : 400
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "4f2b60e1cd3fcbfee4a6684fe043de644e65cde74c9b7d82ac6d21140db0871a",
+        "initialDigest" : "ae49ad15e841b94888c65d3e3bb2482f0f91b2e58f599a7d14c0e82a8d83360a"
+      },
+      "name" : "fixture-6",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 200
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 200
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 200
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 200
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 200
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 200
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 200
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 200
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 200
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 200
+        },
+        {
+          "action" : {
+            "control" : "run.steer",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 200
+        },
+        {
+          "steps" : 200
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7e31f631c5965f43ab815c0354c0810bf99ffe6cb84d72f1acf04d1d54be846d",
+        "initialDigest" : "ae49ad15e841b94888c65d3e3bb2482f0f91b2e58f599a7d14c0e82a8d83360a"
+      },
+      "name" : "fixture-7",
+      "seed" : "7"
+    }
+  ],
+  "schema" : 1
+}
