@@ -22,6 +22,43 @@ Canonical overrides:
 - **Owner rulings:** short tests; audits and device runs in the device campaign; iOS 27 at phase gates; reference
   regression and iOS 26 at X-A13; every Spec Kit step runs.
 
+## Clarifications
+
+### Session 2026-11-15
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+Physics Playground's `ExperimentStore` keeps files in the experience's `ExperienceStorage` (`write(_:to:)` replaces a file
+atomically; reading never writes; refusals `damaged`, `newer-version` and storage error codes; an in-memory variant
+without storage), and Tiny Worlds' `WorldStore` follows it; `LightMazeExperience.make(id:storage:…)` receives the
+launch's storage but does not use it yet; `MazeState` is schema 1 (level index, orientations, selection) inside
+`MazeCore` with a `MigrationChain(currentVersion: 1)`; the scenario manifest's fixtures replay `level.select`,
+`tile.select` and `tile.turn` from a fresh state.
+
+- Q: Where does progress live, and does it change what the engine accepts? → A: Progress is the device's file
+  `progress.json` in the experience's storage, read and written by a `ProgressStore` (as `ExperimentStore`) owned by the
+  presenter, outside the engine state, so replays and the runner's fixtures are unchanged by it. Locking is enforced
+  where a person chooses a level: the Level menu lists locked levels as disabled with "locked", Next level is disabled
+  when the next level is locked, and a refused choice is answered "Level 7 is locked; solve level 6 first."; the engine's
+  `level.select` stays as it is.
+- Q: What is the progress document? → A: Schema 1, sorted-key JSON of at most 16 KB: `{"levels":[{"best":n|null,
+  "id":"lm-01","open":true,"solved":false},…],"schema":1}` with exactly the 20 catalog ids in order; level 1 always
+  open; a solved level is open and has best 1…999, an unsolved one has best null; anything else, unknown ids or a
+  different count is `damaged`; a higher schema is `newer-version`; a refused file is reported and left untouched and
+  play continues from fresh progress in memory (not written until the next real change, which then replaces it).
+- Q: How are moves, undo and restart kept? → A: State schema 2 = schema 1 plus `moves` (each: tile index, orientation
+  before, orientation after), at most 64 (the oldest dropped beyond that); `tile.turn` appends; a new action
+  `move.undo` restores the last move's "before" orientation exactly and removes it (refused with `a13.no-moves` when
+  empty); `level.reset` is the restart (starting orientations, moves emptied); `level.select` empties the moves; the
+  migration 1 → 2 adds no moves. Native controls: Undo (`undo`, value "N moves") and Restart (`reset-level`).
+- Q: When is a level recorded as solved? → A: When a drawn frame shows the current level solved after it was not (the
+  presenter compares with the last frame), progress marks it solved, sets best = min(best, moves count, at least 1),
+  opens the next level and saves once; reaching a solved state by undo counts with the remaining moves. Without storage
+  (tests) progress is kept in memory.
+- Q: How are the shipping levels proven? → A: A core test replays each level's recorded solution as `level.select`,
+  `tile.select` and `tile.turn` from a fresh state and reads it solved (all 20); an experience test solves levels 1–3 in
+  order through the presenter and reads levels 1–3 solved, level 4 open and level 5 locked; the content license record
+  of A13-P01 stays the license proof of G-LEVELS.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Unlock levels by solving them (Priority: P1) 🎯
