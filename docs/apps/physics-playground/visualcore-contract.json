@@ -343,38 +343,44 @@
       "id": "M06",
       "capability": "Circles and boxes with rigid-body collision: dynamic and static (zero-mass, infinite-inertia) bodies with mass and moment of inertia in stated units; circle-circle, circle-box and box-box contact generation; an impulse solver with restitution, friction and positional correction; a broad phase",
       "source": "v0.1 feature 1: circles and boxes with rigid-body collision; constitution A11 reuse first",
-      "status": "upstream gap",
+      "status": "requires adaptation",
       "evidence": [
         {
-          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/Collision2D.swift",
-          "symbol": "Collision2D",
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/Contacts2D.swift",
+          "symbol": "Contacts2D",
           "product": "VisualCoreSimulation",
           "public": true
         },
         {
-          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/Collision2D.swift",
-          "symbol": "CollisionCircle",
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/Contacts2D.swift",
+          "symbol": "Shape2D",
           "product": "VisualCoreSimulation",
           "public": true
         },
         {
-          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/Collision2D.swift",
-          "symbol": "CollisionCapsule",
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/Contacts2D.swift",
+          "symbol": "ContactManifold2D",
           "product": "VisualCoreSimulation",
           "public": true
         },
         {
-          "file": "Packages/VisualCore/Sources/VisualCoreScenes/SceneGraph.swift",
-          "symbol": "Primitive.rect",
-          "product": "VisualCoreScenes",
-          "public": false
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/ImpulseSolver2D.swift",
+          "symbol": "ImpulseSolver2D",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/ImpulseSolver2D.swift",
+          "symbol": "RigidBodyState2D",
+          "product": "VisualCoreSimulation",
+          "public": true
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/NeonArcade/Core/GameSimulation.swift",
-        "symbol": "GameSimulation"
+        "file": "Packages/ExperiencesCreative/PhysicsPlayground/Core/WorldSimulation.swift",
+        "symbol": "WorldSimulation"
       },
-      "notes": "Collision2D answers circle-circle and circle-capsule overlap, closest point and swept circle tests (Collision2DTests) and boxes can be drawn; no contact manifold (normal, depth, points), no box contacts, no impulse or constraint solver and no broad phase exist in any framework product; NeighbourSearch is a linear scan over steering agents (grep 2026-11-15). Neon Arcade's GameSimulation decides overlaps for a game and resolves no contacts. G-CONTACTS (VisualCoreSimulation, upstream), A11-P02; the body and world model with static bodies is G-RIGIDBODY (app-local), A11-P01."
+      "notes": "Since A11-P01 (contact part of G-CONTACTS closed): Contacts2D generates circle-circle, circle-box and box-box manifolds and ImpulseSolver2D resolves them with restitution, friction and positional correction (Contacts2DTests, ImpulseSolver2DTests); WorldSimulation runs all pairs of at most 48 bodies. Open: the broad phase and resting-stack stability (G-BROADPHASE, A11-P02)."
     },
     {
       "id": "M07",
@@ -408,10 +414,10 @@
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/ParticleUniverse/Core/SceneSimulation.swift",
-        "symbol": "SceneSimulation"
+        "file": "Packages/ExperiencesCreative/PhysicsPlayground/Core/WorldSimulation.swift",
+        "symbol": "WorldSimulation"
       },
-      "notes": "ParticleForce gravity and drag act on ParticleSystem particles only (ParticleSystemTests, ParticleForceFieldTests); they apply to no body with mass, rotation or contacts. No spring constraint exists in any framework product (grep 2026-11-15). Gravity and drag on bodies are G-RIGIDBODY (app-local), A11-P01; spring constraints with bounded stiffness are G-SPRINGS (VisualCoreSimulation, upstream), A11-P02."
+      "notes": "ParticleForce gravity and drag act on ParticleSystem particles only (ParticleSystemTests, ParticleForceFieldTests); they apply to no body with mass, rotation or contacts. No spring constraint exists in any framework product (grep 2026-11-15). Gravity and drag on bodies are G-RIGIDBODY (app-local), A11-P01; spring constraints with bounded stiffness are G-SPRINGS (VisualCoreSimulation, upstream), A11-P02. Since A11-P01: constant gravity and linear and angular drag act on rigid bodies in WorldSimulation (free fall within 1 %); springs remain G-SPRINGS (A11-P02)."
     },
     {
       "id": "M08",
@@ -484,7 +490,7 @@
       "id": "M09",
       "capability": "Pause, single step, time scale and reset: pause stops the world, single step advances exactly one fixed step while paused, time scale changes how many fixed steps a frame runs (never the step size), reset restores the experiment's initial document",
       "source": "v0.1 feature 4: pause/single step/time scale/reset",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepRunner.swift",
@@ -512,10 +518,10 @@
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/FluidArtPlayground/Core/SimulationControl.swift",
-        "symbol": "SimulationControl"
+        "file": "Packages/ExperiencesCreative/PhysicsPlayground/Core/WorldSimulation.swift",
+        "symbol": "WorldSimulation"
       },
-      "notes": "FixedStepRunner pause, resume, stepOnce and run(steps:) and PlaybackState (background suspension) exist and are tested (FixedStepRunnerTests, PlaybackStateTests); no time-scale control exists and reset needs the playground's world document. Fluid Art Playground's SimulationControl is experience code. G-RIGIDBODY (app-local over FixedStepRunner), A11-P01."
+      "notes": "Since A11-P01 (G-RIGIDBODY closed): pause, single step (one tick while paused), time scales ¼, ½, 1 and 2 as whole ticks per host step (the tick never changes) and reset are built over the shared fixed step in WorldSimulation and the adapter; the same ticks give the same world at every scale (WorldSimulationTests)."
     },
     {
       "id": "M10",
@@ -859,7 +865,7 @@
       "id": "M18",
       "capability": "Licenses and provenance: every preset, palette and shader bundled later records its author and license; only original content",
       "source": "cross-cutting: licenses; constitution A11 licenses; spec FR-A11-006",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AcknowledgementsView.swift",
@@ -875,10 +881,10 @@
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/NeonArcade/Core/LicenseAudit.swift",
+        "file": "Packages/ExperiencesCreative/PhysicsPlayground/Core/LicenseAudit.swift",
         "symbol": "LicenseAudit"
       },
-      "notes": "LicenseInventory and AcknowledgementsView cover third-party notices (AcknowledgementsViewTests; scripts/check_licenses.py audits the built app); per-content author and license fields for presets, palettes and shaders do not exist in a framework product and belong to the experience's content definitions, as Neon Arcade's LicenseAudit does. G-CONTENTLICENSES (app-local), A11-P01."
+      "notes": "Since A11-P01 (G-CONTENTLICENSES closed): every bundled material records author and license (MaterialCatalog, MIT only); LicenseAudit generates docs/apps/physics-playground/content-licenses.md and a test compares it with the catalog. LicenseInventory and AcknowledgementsView cover third-party notices."
     }
   ],
   "gaps": [
@@ -891,23 +897,22 @@
       ],
       "kind": "adaptation",
       "owner": "app-local",
-      "justification": "The playground's body and world model with stated units (metres, kilograms, seconds), static zero-mass bodies, constant gravity, linear drag, semi-implicit integration, pause, single step, time scale and reset are the experience's domain over VisualCore's FixedStepRunner, FixedStepClock and TimeStepPolicy (clarification 5); contacts and springs come from G-CONTACTS and G-SPRINGS.",
+      "justification": "The playground's body and world model with stated units (metres, kilograms, seconds), static zero-mass bodies, constant gravity, linear drag, semi-implicit integration, pause, single step, time scale and reset are the experience's domain over VisualCore's FixedStepRunner, FixedStepClock and TimeStepPolicy (clarification 5); contacts and springs come from G-CONTACTS and G-SPRINGS. Built in A11-P01: PhysicsWorld (schema 1, units, static zero-mass bodies), WorldSimulation (gravity, drag, semi-implicit integration over the shared contacts and solver, pause, single step, time scale, drop, reset through the adapter) and WorldDiagnostics.",
       "phase": 1,
       "test": "Host tests (swift test, no GPU): a body in free fall matches the analytic position within a stated tolerance for the step; static bodies never move and have zero inverse mass; drag decays speed monotonically; the same document and inputs give the same state digest; pause stops stepping, single step advances exactly one fixed step, time scale changes steps per frame but never the step size, reset restores the initial document; non-finite inputs rejected",
-      "closed": null
+      "closed": "A11-P01"
     },
     {
       "id": "G-CONTACTS",
       "matrix": [
-        "M06",
-        "M10"
+        "M06"
       ],
       "kind": "upstream",
       "owner": "VisualCore:VisualCoreSimulation",
-      "justification": "Found in A11-P00: Collision2D answers circle and capsule overlap only; no contact manifold, no circle-box or box-box contacts, no impulse solver and no broad phase exist in any framework product. Contacts, an impulse solver with restitution, friction and positional correction, and a broad phase are generic 2D machinery and belong to VisualCoreSimulation (constitution A11 reuse first, clarification 5).",
-      "phase": 2,
-      "test": "Host tests: circle-circle, circle-box and box-box manifolds (normal, depth, points) agree with analytic answers including touching, nested and rotated cases; the solver conserves momentum in a two-body impact, restitution 0 and 1 give inelastic and elastic outcomes, friction holds a box on a slope below its angle of repose, positional correction removes penetration within bounded iterations; the broad phase returns the same pairs as brute force; a stack of boxes stays standing; NaN/Inf rejected; API baseline additive and the reference regression passes",
-      "closed": null
+      "justification": "Found in A11-P00: Collision2D answers circle and capsule overlap only; no contact manifold, no circle-box or box-box contacts, no impulse solver and no broad phase exist in any framework product. Contacts, an impulse solver with restitution, friction and positional correction, and a broad phase are generic 2D machinery and belong to VisualCoreSimulation (constitution A11 reuse first, clarification 5). Moved to A11-P01 because the Phase 01 gate requires circles and boxes that collide and the two-body momentum fixture: Contacts2D (circle-circle, circle-box, box-box manifolds) and ImpulseSolver2D (sequential impulses with restitution, friction and positional correction). The broad phase and resting-stack stability are G-BROADPHASE (A11-P02).",
+      "phase": 1,
+      "test": "Host tests (Contacts2DTests, ImpulseSolver2DTests; 25 tests): separated, touching, overlapping, nested and rotated manifolds; equal circles head-on with e = 1 exchange velocities and keep momentum within 1e-9; e = 0, static bodies unchanged, threshold, friction bound, positional correction, determinism, no non-finite output; API baseline additive; reference regression at X-A11",
+      "closed": "A11-P01"
     },
     {
       "id": "G-SPRINGS",
@@ -978,9 +983,22 @@
       ],
       "kind": "adaptation",
       "owner": "app-local",
-      "justification": "Per-content author and license fields for presets, palettes and shaders belong to the experience's content definitions (as Neon Arcade's LicenseAudit); the audit starts with the first bundled content in A11-P01 and covers the presets added in A11-P04.",
+      "justification": "Per-content author and license fields for presets, palettes and shaders belong to the experience's content definitions (as Neon Arcade's LicenseAudit); the audit starts with the first bundled content in A11-P01 and covers the presets added in A11-P04. Built in A11-P01: MaterialCatalog (four MIT materials with a validating decoder) and LicenseAudit, which generates docs/apps/physics-playground/content-licenses.md.",
       "phase": 1,
       "test": "Host tests: every bundled preset, palette and shader records an author and a license and the audit fails on a missing one",
+      "closed": "A11-P01"
+    },
+    {
+      "id": "G-BROADPHASE",
+      "matrix": [
+        "M06",
+        "M10"
+      ],
+      "kind": "upstream",
+      "owner": "VisualCore:VisualCoreSimulation",
+      "justification": "Split from G-CONTACTS at A11-P01: a broad phase (pairs equal to brute force, fewer narrow-phase tests) and resting-stack stability (warm starting or equivalent positional handling so a stack of boxes stays bounded) are generic and belong to VisualCoreSimulation; A11-P01 tests all pairs of at most 48 bodies.",
+      "phase": 2,
+      "test": "Host tests: the broad phase returns exactly the brute-force pairs for random scenes; a resting stack of boxes stays bounded (manual fixture 2); determinism; API baseline additive; reference regression at X-A11",
       "closed": null
     }
   ],
