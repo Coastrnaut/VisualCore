@@ -204,8 +204,9 @@ pattern — without changing the aquarium itself.
 
 - **SC-A09-501**: 100 % of save/open round trips are identical; 100 % of damaged files are skipped and reported; saves
   beyond the limit are refused in 100 % of attempts.
-- **SC-A09-502**: In ambient mode bubbles and motes are at most half their normal counts at every tested step and the
-  fish cruise at the stated fraction of their normal speed.
+- **SC-A09-502**: In ambient mode bubbles and motes are at most half their normal counts at every tested step; the
+  simulation uses 0.6 of each species' cruise speed (and the scaled speed floor), so the mean swimming speed is lower
+  than without ambient for every tested seed and within 0.6 ± 0.15 of the species' cruise.
 - **SC-A09-503**: Dimming starts after exactly the idle interval without touches and ends on the first touch, in every
   test; the system brightness is never set (no such call exists in the experience).
 - **SC-A09-504**: Over 10,000 steps with a feed every 100 steps, the fish count is constant and every limit holds; the

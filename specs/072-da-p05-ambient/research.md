@@ -21,6 +21,10 @@ action pattern, the host's tier in `draw`, `setQualityTier`, the session's `lowP
 - **Decision**: `AquariumSimulation.advance(_:catalog:random:ambient:)` with cruise × 0.6 (floor 0.5 × the scaled
   cruise); ambient drawing = saved `ambient` OR Low Power Mode OR Reduce Motion (presenter, injected closures).
 - **Alternatives**: Low Power changing the simulation (would make the digest depend on the device).
+- **Finding (implementation, 2026-11-14)**: the steering keeps no pull toward the cruise speed, so speeds drift between
+  the floor and the maximum; with the cruise and the floor scaled by 0.6 the measured mean is 0.49–0.57 × the
+  species' cruise (plain runs 0.60–0.79), about 0.72–0.88 of the plain mean. SC-A09-502 states this measurable form;
+  no new dynamics were added.
 
 ## D3 — Dimmer
 
