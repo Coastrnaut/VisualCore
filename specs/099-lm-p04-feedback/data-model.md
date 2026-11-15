@@ -8,7 +8,7 @@ No persisted format changes: the session state stays schema 2 and `progress.json
   solved. Following hints (select + turn) changes one differing tile per step.
 
 ## BoardDescription (core, value)
-- `summary: String` — "N of M targets lit" (plus "; solved" when solved).
+- `summary: String` — "Light Maze: level N, K of T targets lit." plus " Solved." when solved (contract §Words).
 - `full: String` — level and size; per tile kind the places (row, column from 1, row 1 at the top) with direction
   (emitter) or orientation (mirror, prism: "slash"/"backslash"); per beam branch its start, turn cells and end; per
   target lit or unlit. Length ≤ 4,000 characters for any board within the caps.

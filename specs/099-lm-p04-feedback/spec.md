@@ -106,8 +106,8 @@ path the beam takes, and which targets are lit and which are not; and is told wh
 **Acceptance Scenarios**:
 
 1. **Given** a fixture board, **When** its description is read, **Then** it names the level, the board size, every
-   emitter, wall, mirror, prism and target with its row and column (and direction or orientation), the beam's path as
-   the cells where it turns or ends, and each target as lit or unlit.
+   emitter, wall, mirror, prism and target with its row and column (and direction or orientation), each beam branch's
+   path as the cells where it starts, turns and ends, and each target as lit or unlit.
 2. **Given** any change to the board, **When** the description is read again, **Then** it matches the new board.
 3. **Given** the board element, **Then** its accessible value is a short summary ("2 of 3 targets lit") and the full
    description is available through a native control.
