@@ -44,3 +44,10 @@ Facts verified on 2026-11-15 (clarification session).
   energy (non-increasing within 0.1 %/s, < 10 % at ζ = 0.5 by 10 s), 15 stiffness clamp, 16 broad phase equals brute
   force, 17 gravity and drag levels, 18 schema-1 migration. Drift over longer runs: the measured per-second drift times
   the run length (stated in the test, not run).
+- **As built** (recorded at convergence, T-A11-212): the manifest replays only the experience's
+  actions, so fixture 11 is a dropped pile that settles until its fastest body moves below 0.05 m/s, and fixture 13 is
+  spring energy with gravity and drag off at the world's damping ratio 0.1 (energy never rises after the switch). The
+  five-box stack bound (drift < 2 cm, sink < 1 cm over 1,200 ticks; measured 0.8 mm and 1.4 mm in the world, 2.1 mm and
+  1.3 mm in VisualCore) is proven by `StackFixtureTests` and `ImpulseSolver2DTests`, and the undamped ± 2 % band by
+  `Springs2DTests`.
+
