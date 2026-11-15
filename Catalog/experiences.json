@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "catalog_sha256": "d83acf92ba1bb4d020fcf1beede247576770a0245ce5a7030bf05d3720f9e64e",
+  "catalog_sha256": "397974ed3c4d8c6ee33aa995712d3409eb0f9206f7e3008c45063806cae782dd",
   "experiences": [
     {
       "id": "a01.generative-art-studio",
@@ -369,10 +369,23 @@
         "games-and-interactive-experiences"
       ],
       "order": 11,
-      "palette": [],
+      "palette": [
+        "#10141C",
+        "#E8EEF4",
+        "#E0603A",
+        "#3AA0E0"
+      ],
       "tile_seed": 350328926,
-      "capabilities": [],
-      "quality_tiers": [],
+      "capabilities": [
+        "rigid-body circles and boxes",
+        "gravity and drag in SI units",
+        "pause, single step and time scale",
+        "drop circles and boxes",
+        "deterministic replay"
+      ],
+      "quality_tiers": [
+        "level-0"
+      ],
       "content": null,
       "available": false
     },

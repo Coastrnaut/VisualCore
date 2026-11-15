@@ -90,7 +90,9 @@ enum CatalogFixture {
                                // Feature 068 (A09-P01); integrated at X-A09.
                                "a09.digital-aquarium",
                                // Feature 075 (A10-P01); integrated at X-A10.
-                               "a10.neon-arcade"],
+                               "a10.neon-arcade",
+                               // Feature 082 (A11-P01): registered as a candidate, not yet available.
+                               "a11.physics-playground"],
                 "the registrations of Catalog/registrations.json")
     }
 

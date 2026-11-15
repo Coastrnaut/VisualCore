@@ -239,6 +239,27 @@
       "manifest": "Packages/ExperiencesCreative/NeonArcade/scenario-manifest.json",
       "permissions": [],
       "summary": "Neon Dodge: steer through falling hazards and collect orbs in waves."
+    },
+    "a11.physics-playground": {
+      "capabilities": [
+        "rigid-body circles and boxes",
+        "gravity and drag in SI units",
+        "pause, single step and time scale",
+        "drop circles and boxes",
+        "deterministic replay"
+      ],
+      "quality_tiers": [
+        "level-0"
+      ],
+      "palette": [
+        "#10141C",
+        "#E8EEF4",
+        "#E0603A",
+        "#3AA0E0"
+      ],
+      "content": null,
+      "manifest": "Packages/ExperiencesCreative/PhysicsPlayground/scenario-manifest.json",
+      "permissions": []
     }
   }
 }
