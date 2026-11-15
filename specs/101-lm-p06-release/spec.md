@@ -26,7 +26,8 @@ Canonical overrides:
 
 ### Session 2026-11-15
 
-Answered autonomously under the owner's standing delegation, recommended option each time, as for A12-P06. Facts
+Answered autonomously under the owner's standing delegation, recommended option each time, as for A12-P06. The session was
+written before the `/speckit-clarify` invocation and re-checked against the code inside it; all five answers stand. Facts
 checked in code: `scripts/check_experience_release.py` reads `docs/apps/<slug>/release.json` (schema 1: `experience`,
 `requiredDocs`, `checklist`, `copyCheck` with `text`, `swift`, `allow`) and accepts the statuses `verified`,
 `pending-campaign-ii` and `owner-action`; `scripts/release_check.py` derives `experience-release-<code>` and
