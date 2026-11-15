@@ -46,3 +46,8 @@
   uniqueness of the solution is not claimed (the solvability checker is A13-P05).
 - **Codec:** refusal reasons missing-license, unsupported-license, invalid-number, out-of-range, invalid-board,
   duplicate-id; an unreadable document is refused as a whole as `catalog`.
+- **Manifest fixtures:** the scenario manifest holds five solved-level fixtures (`fixture-lm-01`, `-05`, `-10`, `-16`,
+  `-20`) rather than three: the repository's content-count audit (`test_scripts.py`, `content-counts`) asks for at least
+  the planning catalog's five; the first script-test run (`.autonomy/checks/A13-P01.script-tests.json`, exit 1) named
+  it. The beam fixtures of the core stay at lm-01, lm-10 and lm-20.
+- **Level menu:** every action has a native control; `level.select` is reached through the Level menu (T-A13-115).
