@@ -1,0 +1,139 @@
+# Feature Specification: Solar System Explorer — Phase 05 Scientific review and device QA
+
+**Feature Branch**: `107-sse-p05-review` (spec directory only; work stays on `main`)
+
+**Created**: 2026-11-15
+
+**Status**: Draft
+
+**Ledger gate**: A14-P05 (legacy ledger) · ID namespace FR-A14-5##, SC-A14-5##, T-A14-5##
+
+**Input**: User description: archived manual `apps/14-solar-system-explorer.md` §9 Phase 05 `/speckit-specify` prompt
+(verbatim in the invocation).
+
+Canonical overrides:
+- **Phase gates (manual §9 Phase 05):** MVP — a reviewed experience: every number shown is sourced, the model's
+  positions are checked against well-known published events within stated tolerances, the model's limits are stated
+  in the app, and the scale labels are truthful in every state; regression fixture — the review document is generated
+  from the bundled data and checked by a test; graphics context ownership stays solely in the VisualCore host.
+- **Gap built here** (contract `docs/apps/solar-system-explorer/visualcore-contract.json`): G-REVIEW (rows M20, M21,
+  M22) — app-local: the provenance and tolerance review, the wording and the model-scope statement.
+- **Quality levels:** the experience declares the detail levels its drawing uses, and the declaration, the drawing and
+  the catalog registration agree.
+- **Device QA:** frame pacing, thermals, memory and accessibility audits on real devices are planned in a
+  device-campaign document as {device} tasks, run only after ImplementationLock-100.
+- **Owner rulings:** short tests; iOS 27 at phase gates; reference regression and iOS 26 at X-A14; every Spec Kit step
+  runs.
+
+## User Scenarios & Testing *(mandatory)*
+
+### User Story 1 - Trust what is shown (Priority: P1) 🎯
+
+The owner can see, in one generated review document, every number the experience shows with its source, and the
+results of checking the model against well-known published events (planetary alignments and Earth's closest approach
+to the Sun) within stated tolerances.
+
+**Why this priority**: the manual's scientific review and false-precision risk.
+
+**Independent Test**: regenerate the review; compare it with the committed one; run the event checks.
+
+**Acceptance Scenarios**:
+
+1. **Given** the bundled data, **When** the review is generated, **Then** it equals the committed document and lists
+   every displayed number with its source.
+2. **Given** the event fixtures, **When** the model computes them, **Then** each falls within its stated tolerance.
+
+---
+
+### User Story 2 - Know the model's limits (Priority: P1)
+
+A person can read, in the app, what the model is (approximate orbits from mean elements at a stated epoch), its
+validity range and that sizes and distances may be enlarged; the "not to scale" label appears whenever the enhanced
+mode is on.
+
+**Why this priority**: the manual's truthful-labelling rule.
+
+**Independent Test**: read the model statement; sample every combination of scale mode, body, tour and play state.
+
+**Acceptance Scenarios**:
+
+1. **Given** the controls, **Then** a model statement names the approximation, the epoch and the date range.
+2. **Given** any state in the enhanced mode, **Then** its description says "not to scale"; in the true-relative mode
+   it never does.
+
+---
+
+### User Story 3 - Detail levels and a device plan (Priority: P2)
+
+The experience lowers its drawing detail when the host asks (memory, heat, low power) without changing any position
+or state, and a device-campaign document lists what must be measured on real devices.
+
+**Why this priority**: the manual's device QA, deferred to devices by the owner's ruling.
+
+**Independent Test**: draw at each level; compare state and positions; read the campaign document.
+
+**Acceptance Scenarios**:
+
+1. **Given** each detail level, **When** drawn, **Then** the bodies are at the same positions and the state digest is
+   unchanged; the declared levels match the drawing and the registration.
+2. **Given** the campaign document, **Then** each device measurement is a {device} task with a pass criterion.
+
+### Edge Cases
+
+- **Dates near the range ends:** event checks stay inside the range.
+- **A body in front of another during an alignment:** the check is on heliocentric longitude, not on the drawing.
+- **A detail level change during a flight or tour:** positions and state do not change.
+
+## Requirements *(mandatory)*
+
+### Functional Requirements
+
+- **FR-A14-501**: A review document MUST be generated from the bundled data (every displayed number with source,
+  epoch, units and license; the model statement; the event check results) and a test MUST compare it with the
+  committed file.
+- **FR-A14-502**: The model MUST be checked against a stated set of well-known published events within stated
+  tolerances, with each event's source recorded.
+- **FR-A14-503**: A model statement (approximation, epoch, date range, enlarged display) MUST be shown and spoken in
+  the experience.
+- **FR-A14-504**: Every state in the enhanced mode MUST be described as not to scale and no state in the true-relative
+  mode as such; a test MUST sample the state space.
+- **FR-A14-510**: The experience MUST declare its detail levels; the drawing's levels and the registration MUST agree;
+  a lower level MUST change no position and no state.
+- **FR-A14-511**: A device-campaign document MUST list the device-only measurements and audits as {device} tasks.
+- **FR-A14-520**: The contract MUST close G-REVIEW; the runner MUST pass on iOS 27.
+
+### Key Entities
+
+- **Event fixture**: name, date (UTC), kind (opposition, perihelion), bodies, tolerance in days, source.
+- **Review document**: generated Markdown with the data table, the model statement and the event results.
+- **Detail level**: index, sphere segments, stars, orbit samples.
+
+## Success Criteria *(mandatory)*
+
+### Measurable Outcomes
+
+- **SC-A14-501**: The committed review document equals the generated one; 100 % of displayed numbers appear in it
+  with a source.
+- **SC-A14-502**: 100 % of event fixtures fall within their tolerances.
+- **SC-A14-503**: 100 % of sampled enhanced-mode states say "not to scale"; 0 % of true-relative states do.
+- **SC-A14-504**: At every detail level the drawn body positions and the state digest equal the full level's.
+- **SC-A14-505**: The runner's standard scenarios pass on iOS 27; every test runs in under 10 s.
+
+## Assumptions
+
+- The catalog, orbit model, scale modes, time and tours of A14-P01 to A14-P04 exist; the host passes a quality level
+  to the presenter.
+- Published event dates are taken from public-domain sources (US Naval Observatory, NASA).
+
+## Traceability
+
+| Source | Requirement |
+|---|---|
+| Phase 05 MVP: scientific review | FR-A14-501–504 |
+| Phase 05: device QA (deferred to devices) | FR-A14-510, 511 |
+| Contract gap G-REVIEW (M20, M21, M22) | FR-A14-501–504, 520 |
+
+## Negative Requirements
+
+- No claim of precision beyond the stated tolerances; no device runs before ImplementationLock-100; no network; no new
+  bundled data without a source and license.
