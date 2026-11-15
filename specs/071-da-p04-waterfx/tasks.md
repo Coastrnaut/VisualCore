@@ -18,7 +18,7 @@
 
 ## Phase 4: User Story 3 — the aquarium in words (P2)
 
-- [ ] T-A09-404 [P] [US3] `Core/AquariumWording.swift` and `Core/AquariumAnnouncer.swift` per contracts/api.md and research D4 with `CoreTests/{AquariumWordingTests,AquariumAnnouncerTests}.swift` (description for each state: empty decor, food, paused, both habitats, species counts; change sentences and priority; announcer interval 3 s, VoiceOver gate, latest pending wins, reset) (FR-A09-420, 421; SC-A09-405)
+- [X] T-A09-404 [P] [US3] `Core/AquariumWording.swift` and `Core/AquariumAnnouncer.swift` per contracts/api.md and research D4 with `CoreTests/{AquariumWordingTests,AquariumAnnouncerTests}.swift` (description for each state: empty decor, food, paused, both habitats, species counts; change sentences and priority; announcer interval 3 s, VoiceOver gate, latest pending wins, reset) (FR-A09-420, 421; SC-A09-405) — Verified 2026-11-14: 2026-11-14: AquariumWording (description with species counts, change sentences) and AquariumAnnouncer (3 s, VoiceOver gate, latest wins); 17 tests pass on sim-27.2
 
 ## Phase 5: User Story 2 — depth and light (P1)
 
