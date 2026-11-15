@@ -154,7 +154,7 @@ that a test keeps equal to the catalog.
   end points count as hits on the segment), never a crash or a non-finite result.
 - **Non-finite input** (origin, direction, segment points): refused, never a hit.
 - **A beam leaving the board:** ends at the board's edge with the reason "left the board".
-- **A beam hitting a wall or the back of a target:** ends there with its reason.
+- **A beam hitting a wall, the emitter or a target:** ends there with its reason; a target is lit from any side.
 - **Prism splitting into paths that cross or loop:** every branch is bounded by the same cap; the total segment count is
   capped.
 - **A level file that is damaged, newer or breaks the rules** (two emitters, tiles outside, out-of-range rotation):
