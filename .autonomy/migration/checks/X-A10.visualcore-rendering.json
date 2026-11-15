@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--result-name",
+    "xa10-rendering"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name xa10-rendering",
+  "elapsed_seconds": 46.117,
+  "exit_code": 0,
+  "finished": "2026-11-15T05:39:53+00:00",
+  "gate": "X-A10",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-A10.visualcore-rendering.log",
+  "log_sha256": "3b1b38785b5533bb75397f9545a53bb599962668bc333f4e8ea7b2731e8d3baf",
+  "name": "visualcore-rendering",
+  "started": "2026-11-15T05:39:07+00:00",
+  "timed_out": false
+}

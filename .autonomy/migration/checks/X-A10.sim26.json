@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a10.neon-arcade",
+    "--runtime",
+    "26"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a10.neon-arcade --runtime 26",
+  "elapsed_seconds": 25.604,
+  "exit_code": 0,
+  "finished": "2026-11-15T05:35:12+00:00",
+  "gate": "X-A10",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-A10.sim26.log",
+  "log_sha256": "06a8ef25ca396f4ef562164ac72b19bfa8314349c1b298ac383ce1ed429177bf",
+  "name": "sim26",
+  "started": "2026-11-15T05:34:46+00:00",
+  "timed_out": false
+}

@@ -1,0 +1,88 @@
+{
+  "branch": "main",
+  "dirty": true,
+  "dirty_paths": [
+    "docs/verification/a10.neon-arcade/summary-27.2.json",
+    "docs/verification/a10.neon-arcade/summary-26.5.json"
+  ],
+  "failed_attempts": [],
+  "gate": "X-A10",
+  "ledger": "migration",
+  "passing_checks": [
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --result-name xa10-host",
+      "exit_code": 0,
+      "finished": "2026-11-15T05:34:24+00:00",
+      "log": ".autonomy/logs/migration/X-A10.host.log",
+      "log_sha256": "254d8da973e47b821011e2595d5dfe6525588c21a895b61ba39464a9dd6a97bf",
+      "name": "host"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean",
+      "exit_code": 0,
+      "finished": "2026-11-15T05:40:30+00:00",
+      "log": ".autonomy/logs/migration/X-A10.reference-1.log",
+      "log_sha256": "685a6c59c90eead3d31b4bbdd0b76ce1b8bdb40992fbdf32f9ee9ee8740c698f",
+      "name": "reference-1"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26",
+      "exit_code": 0,
+      "finished": "2026-11-15T05:41:20+00:00",
+      "log": ".autonomy/logs/migration/X-A10.reference-2.log",
+      "log_sha256": "10223ddf1cc5089097f3e0a0e102dd4728c91d8ea5a63fc8a37513341c091e77",
+      "name": "reference-2"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a10.neon-arcade --runtime 26",
+      "exit_code": 0,
+      "finished": "2026-11-15T05:35:12+00:00",
+      "log": ".autonomy/logs/migration/X-A10.sim26.log",
+      "log_sha256": "06a8ef25ca396f4ef562164ac72b19bfa8314349c1b298ac383ce1ed429177bf",
+      "name": "sim26"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a10.neon-arcade --runtime 27",
+      "exit_code": 0,
+      "finished": "2026-11-15T05:34:46+00:00",
+      "log": ".autonomy/logs/migration/X-A10.sim27.log",
+      "log_sha256": "fa5b5ac75da8be9ac16005c296d3ae82ace39fb84d9876a2175bb8683d149ca5",
+      "name": "sim27"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-ui-ios27-r2",
+      "exit_code": 0,
+      "finished": "2026-11-15T05:38:13+00:00",
+      "log": ".autonomy/logs/migration/X-A10.ui-r2.log",
+      "log_sha256": "47613869a15f5a3322066606df3ff063a9b3516f1786f6936768255d4bb52c6c",
+      "name": "ui-r2"
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "finished": "2026-11-15T05:39:04+00:00",
+      "log": ".autonomy/logs/migration/X-A10.visualcore-host.log",
+      "log_sha256": "d575f7b60cfe2e74f55a1771952415fd82338995f4470da3dcc34aa6e1e52b48",
+      "name": "visualcore-host"
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore --filter 'Collision2DTests|SoundEffectSynthTests'",
+      "exit_code": 0,
+      "finished": "2026-11-15T05:38:25+00:00",
+      "log": ".autonomy/logs/migration/X-A10.visualcore-new.log",
+      "log_sha256": "02e54e572828b973ff700d1251ff40939a7a97136c34bae7f0a9e548f23d3d6c",
+      "name": "visualcore-new"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name xa10-rendering",
+      "exit_code": 0,
+      "finished": "2026-11-15T05:39:53+00:00",
+      "log": ".autonomy/logs/migration/X-A10.visualcore-rendering.log",
+      "log_sha256": "3b1b38785b5533bb75397f9545a53bb599962668bc333f4e8ea7b2731e8d3baf",
+      "name": "visualcore-rendering"
+    }
+  ],
+  "revision": "e4dfcd1df43a2e6be12730f448bc0e7e58239d15",
+  "revision_number": 1,
+  "sealed": "2026-11-15T05:41:24+00:00"
+}

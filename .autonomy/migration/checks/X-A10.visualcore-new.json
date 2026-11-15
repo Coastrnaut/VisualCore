@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "Collision2DTests|SoundEffectSynthTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter 'Collision2DTests|SoundEffectSynthTests'",
+  "elapsed_seconds": 11.793,
+  "exit_code": 0,
+  "finished": "2026-11-15T05:38:25+00:00",
+  "gate": "X-A10",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-A10.visualcore-new.log",
+  "log_sha256": "02e54e572828b973ff700d1251ff40939a7a97136c34bae7f0a9e548f23d3d6c",
+  "name": "visualcore-new",
+  "started": "2026-11-15T05:38:13+00:00",
+  "timed_out": false
+}
