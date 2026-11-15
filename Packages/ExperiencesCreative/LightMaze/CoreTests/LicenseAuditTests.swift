@@ -54,4 +54,20 @@ import Testing
         #expect(pipedText.contains("| lm-02 | — |"))
         #expect(LicenseAudit.markdown(LevelCatalog(levels: [catalog.levels[0]])).hasSuffix("1 level; 0 problems.\n"))
     }
+
+    /// The committed `docs/apps/light-maze/content-licenses.md` equals the generated document (T-A13-108); run the
+    /// package tests with `UPDATE_SCENARIO_MANIFEST=1` to rewrite it. Reads the repository through `#filePath`, so it
+    /// runs from the repository's own package, not from a symlinked scratch copy.
+    @Test func theCommittedLicenseDocumentMatchesTheCatalog() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+            .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+        let file = root.appendingPathComponent("docs/apps/light-maze/content-licenses.md")
+        let text = LicenseAudit.markdown(catalog)
+        if ProcessInfo.processInfo.environment["UPDATE_SCENARIO_MANIFEST"] == "1" {
+            try Data(text.utf8).write(to: file)
+        }
+        let committed = try String(contentsOf: file, encoding: .utf8)
+        #expect(committed == text, "run with UPDATE_SCENARIO_MANIFEST=1 and commit the document")
+        for row in LicenseAudit.rows(catalog) { #expect(committed.contains(row.id), "\(row.id) is listed") }
+    }
 }
