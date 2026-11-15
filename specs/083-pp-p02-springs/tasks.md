@@ -8,7 +8,7 @@ X-A11. Precedent: `specs/082-pp-p01-model/tasks.md`.
 
 ## Phase 1: Setup
 
-- [ ] T-A11-201 Baseline: cite the A11-P01 evidence on the unchanged tree (`.autonomy/checks/A11-P01.{playground-ios27-2,app-unit-2,verify-27-2}.json`) instead of a rerun (owner ruling of 2026-11-14)
+- [X] T-A11-201 Baseline: cite the A11-P01 evidence on the unchanged tree (`.autonomy/checks/A11-P01.{playground-ios27-2,app-unit-2,verify-27-2}.json`) instead of a rerun (owner ruling of 2026-11-14) — Verified 2026-11-15: 2026-11-15: cited .autonomy/checks/A11-P01.{playground-ios27-2,app-unit-2,verify-27-2}.json on the unchanged tree (no rerun)
 
 ## Phase 2: Foundational — generic springs, broad phase and warm starting
 
