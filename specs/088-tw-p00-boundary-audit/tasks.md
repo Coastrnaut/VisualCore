@@ -30,7 +30,7 @@ after every task (no trailers); read every check's exit before ticking. No Swift
 
 ## Phase 7: Polish and evidence
 
-- [ ] T-A12-009 No-change proof (`--name no-change -- git diff --exit-code --stat 9315c27e..HEAD -- Packages External`) (FR-A12-008, SC-A12-005)
+- [X] T-A12-009 No-change proof (`--name no-change -- git diff --exit-code --stat 9315c27e..HEAD -- Packages External`) (FR-A12-008, SC-A12-005) — Verified 2026-11-15: 2026-11-15: .autonomy/checks/A12-P00.no-change.json exit 0 (empty diff 9315c27e..HEAD of Packages External)
 - [ ] T-A12-010 Script tests (`--name script-tests -- python3 scripts/test_scripts.py`) and the release-check document steps (`--name fast-checks -- python3 scripts/release_check.py --only docs app-contracts compliance dependencies`); every run-check of this gate stays within its 600 s limit and the contract check under 10 s (SC-A12-006)
 - [ ] T-A12-011 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A12-P00; update README.md (status, gate count) in the record commit (rule 16)
 
