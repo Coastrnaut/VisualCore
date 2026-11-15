@@ -43,3 +43,7 @@ commits.
 
 MVP: stability under stress and deterministic replay (US1, US2) with sleep and budgets (US3); then levels, storefront
 and device plan (US4); evidence last.
+
+## Phase 5: Convergence
+
+- [ ] T-A11-512 Bring `specs/086-pp-p05-stability/contracts/stability.md` in line with the built sleep rules recorded in research D1 "As built": bodies that touch or share a spring between two dynamic bodies sleep together only when every member has 60 rest ticks and none is grabbed, and a body joined by a spring to a world point or to a static or pinned body never sleeps, per plan: contracts/stability.md (partial)
