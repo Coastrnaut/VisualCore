@@ -32,7 +32,7 @@ after every task (no trailers); read every check's exit before ticking. No Swift
 
 - [X] T-A11-009 No-change proof (`--name no-change -- git diff --exit-code --stat d3797d7c..HEAD -- Packages External`) (FR-A11-008, SC-A11-005) — Verified 2026-11-15: 2026-11-15: .autonomy/checks/A11-P00.no-change.json exit 0 (empty diff d3797d7c..HEAD of Packages External)
 - [X] T-A11-010 Script tests (`--name script-tests -- python3 scripts/test_scripts.py`) and the release-check document steps (`--name fast-checks -- python3 scripts/release_check.py --only docs app-contracts compliance dependencies`); every run-check of this gate stays within its 600 s limit and the contract check under 10 s (SC-A11-006) — Verified 2026-11-15: 2026-11-15: .autonomy/checks/A11-P00.{script-tests,fast-checks}.json exit 0; every run under 600 s, contract check under 10 s
-- [ ] T-A11-011 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A11-P00; update README.md (status, gate count) in the record commit (rule 16)
+- [X] T-A11-011 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A11-P00; update README.md (status, gate count) in the record commit (rule 16) — Verified 2026-11-15: 2026-11-15: /speckit-converge appended nothing (8 FR, 6 SC, 4 stories, 10 tasks with evidence; contract 18 rows, 8 gaps, decision go)
 
 ## Dependencies
 
