@@ -3,7 +3,8 @@
 // `fixture-jupiter`, `fixture-saturn` and `fixture-neptune`; its derived digests and expected results equal to what
 // the engine gives when the runner plays them; every fixture selecting its body by `body.select` with the committed
 // final digest; and the committed `scenario-manifest.json` equal to the Swift manifest (`UPDATE_SCENARIO_MANIFEST=1`,
-// on the simulator `TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`, rewrites it).
+// on the simulator `TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`, rewrites it). Feature 104 (A14-P02) T-A14-209 adds the
+// dated fixture `fixture-earth-2025` (Earth, then date steps to day 9,132) with its committed digest.
 import Foundation
 import Testing
 @testable import SolarSystemExplorerExperience
@@ -37,9 +38,10 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
     @Test func theManifestIsValidWithTheStandardScenariosAndFiveFixtures() {
         let manifest = SolarCore.manifest(for: id)
         let problems = ScenarioManifestValidator.problems(manifest, controls: SolarCore.controls,
-                                                          content: ContentRequirement(fixtures: 5))
+                                                          content: ContentRequirement(fixtures: 6))
         #expect(problems.isEmpty, "\(problems)")
-        #expect(manifest.scenarios.map(\.name) == ScenarioManifest.standardNames + Self.fixtureNames)
+        #expect(manifest.scenarios.map(\.name)
+                == ScenarioManifest.standardNames + Self.fixtureNames + [SolarCore.datedFixtureName])
         #expect(SolarCore.selectedFixtures.map { SolarCore.fixtureName(body: $0.body) } == Self.fixtureNames)
         #expect(manifest.kind == .creative)
         #expect(manifest.experience == id)
@@ -90,6 +92,21 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
             let controls = Set(spec.entries.compactMap { $0.action?.control })
             #expect(controls == ["body.select"], "\(name): selected by the action")
         }
+    }
+
+    @Test func theDatedFixtureStepsTheDateWithTheCommittedDigest() async throws {
+        let manifest = SolarCore.manifest(for: id)
+        let spec = try #require(manifest.scenarios.first { $0.name == SolarCore.datedFixtureName })
+        #expect(spec.expect.finalDigest == SolarCore.datedFixtureDigest)
+        let derived = SolarCore.expectedDigest(for: id, seed: SolarCore.manifestSeed,
+                                               entries: SolarCore.datedFixtureEntries)
+        #expect(derived == SolarCore.datedFixtureDigest, "derived \(derived ?? "nil")")
+        let played = try await play(spec)
+        #expect(played.final == SolarCore.datedFixtureDigest, "played \(played.final)")
+        let core = try #require(played.core)
+        #expect(core.selection == 3 && core.state.dayOffset == 9_132)
+        #expect(core.state.date.label == "2025-01-01")
+        #expect(!SolarCore.selectedFixtures.map(\.digest).contains(SolarCore.datedFixtureDigest))
     }
 
     /// The JSON form with the control ids, named by `Catalog/registrations.json`. `UPDATE_SCENARIO_MANIFEST=1`

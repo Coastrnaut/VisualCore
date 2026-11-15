@@ -2,7 +2,12 @@
   "controls" : [
     "body.select",
     "body.next",
-    "body.previous"
+    "body.previous",
+    "date.step",
+    "camera.orbit",
+    "camera.tilt",
+    "camera.zoom",
+    "view.reset"
   ],
   "experience" : "a14.solar-system-explorer",
   "kind" : "creative",
@@ -12,7 +17,7 @@
 
       ],
       "expect" : {
-        "initialDigest" : "51a5635b7a12a59c71b25273bfcf07d46af066a15dbcc395f3bd43ab95d08598"
+        "initialDigest" : "7a93a837b2018246146099dbcbca46fff4beec71e7aaca2e83052f56445e4185"
       },
       "name" : "launch-first-frame",
       "seed" : "1"
@@ -51,6 +56,56 @@
         },
         {
           "action" : {
+            "control" : "date.step",
+            "values" : [
+              365
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "date.step",
+            "values" : [
+              30
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "camera.orbit",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "camera.tilt",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "camera.zoom",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
             "control" : "body.select",
             "values" : [
               8
@@ -61,8 +116,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "6236a93d22864854e6caa6350c7e5dc88b2e1d9021ede9ee86b9769a7b1ac769",
-        "initialDigest" : "51a5635b7a12a59c71b25273bfcf07d46af066a15dbcc395f3bd43ab95d08598"
+        "finalDigest" : "00b09bb9c6594cd97694ff4a8b88a07dd4c89ed4dae29a9ca9ba90e8a04f1985",
+        "initialDigest" : "7a93a837b2018246146099dbcbca46fff4beec71e7aaca2e83052f56445e4185"
       },
       "name" : "input-response",
       "seed" : "1"
@@ -177,6 +232,106 @@
           },
           "result" : "action.rule.a14.invalid-choice",
           "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "date.step",
+            "values" : [
+              7
+            ]
+          },
+          "result" : "action.rule.a14.invalid-step",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "date.step",
+            "values" : [
+              400
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "camera.tilt",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "camera.tilt",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "camera.tilt",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "camera.tilt",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "camera.tilt",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "camera.tilt",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.rule.a14.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "camera.zoom",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.a14.invalid-step",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "view.reset",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
         }
       ],
       "expect" : {
@@ -219,6 +374,56 @@
         },
         {
           "action" : {
+            "control" : "date.step",
+            "values" : [
+              365
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "date.step",
+            "values" : [
+              30
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "camera.orbit",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "camera.tilt",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "camera.zoom",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
             "control" : "body.select",
             "values" : [
               8
@@ -229,8 +434,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "6236a93d22864854e6caa6350c7e5dc88b2e1d9021ede9ee86b9769a7b1ac769",
-        "initialDigest" : "51a5635b7a12a59c71b25273bfcf07d46af066a15dbcc395f3bd43ab95d08598"
+        "finalDigest" : "00b09bb9c6594cd97694ff4a8b88a07dd4c89ed4dae29a9ca9ba90e8a04f1985",
+        "initialDigest" : "7a93a837b2018246146099dbcbca46fff4beec71e7aaca2e83052f56445e4185"
       },
       "name" : "save-restore",
       "seed" : "1"
@@ -269,6 +474,56 @@
         },
         {
           "action" : {
+            "control" : "date.step",
+            "values" : [
+              365
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "date.step",
+            "values" : [
+              30
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "camera.orbit",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "camera.tilt",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "camera.zoom",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
             "control" : "body.select",
             "values" : [
               8
@@ -279,7 +534,7 @@
         }
       ],
       "expect" : {
-        "initialDigest" : "51a5635b7a12a59c71b25273bfcf07d46af066a15dbcc395f3bd43ab95d08598",
+        "initialDigest" : "7a93a837b2018246146099dbcbca46fff4beec71e7aaca2e83052f56445e4185",
         "resetDigest" : true
       },
       "name" : "reset",
@@ -330,8 +585,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "bef0b95211940fd6ad5fd468964d602073e576d34ca29eccea52e07cf419dc31",
-        "initialDigest" : "51a5635b7a12a59c71b25273bfcf07d46af066a15dbcc395f3bd43ab95d08598",
+        "finalDigest" : "baeed8b1a8d680336d9e2f878d66ab31ed2318ac9f7998f45e9ce8015880c031",
+        "initialDigest" : "7a93a837b2018246146099dbcbca46fff4beec71e7aaca2e83052f56445e4185",
         "outcome" : "viewing-mercury"
       },
       "name" : "fixture-mercury",
@@ -351,8 +606,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "47b8bbb1edfbcb3dcb84d197e8825d0b672d93eedbd6d08df704813b572a0f80",
-        "initialDigest" : "51a5635b7a12a59c71b25273bfcf07d46af066a15dbcc395f3bd43ab95d08598",
+        "finalDigest" : "890b547505b1c63dc84da161a57030f62349994aaff375f8d12c5b3eda10c6f1",
+        "initialDigest" : "7a93a837b2018246146099dbcbca46fff4beec71e7aaca2e83052f56445e4185",
         "outcome" : "viewing-earth"
       },
       "name" : "fixture-earth",
@@ -372,8 +627,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "bddc8b2540ffcac1e7f9a13603ef84376eeae84b12cced5088075fc3da2ed16c",
-        "initialDigest" : "51a5635b7a12a59c71b25273bfcf07d46af066a15dbcc395f3bd43ab95d08598",
+        "finalDigest" : "5f9ad101f524613138d1f5ab4864e240a5616a6e7db13a5dae50dc1e008e0ef7",
+        "initialDigest" : "7a93a837b2018246146099dbcbca46fff4beec71e7aaca2e83052f56445e4185",
         "outcome" : "viewing-jupiter"
       },
       "name" : "fixture-jupiter",
@@ -393,8 +648,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "e67e8b8ce4c2f8f66568c8f87bd973e7a4fddfe23987d39de97f100216da017e",
-        "initialDigest" : "51a5635b7a12a59c71b25273bfcf07d46af066a15dbcc395f3bd43ab95d08598",
+        "finalDigest" : "fb6578cd4b2c8f2df91f769bc36b0a5e3d4630c850f158e8dffdf20653645baa",
+        "initialDigest" : "7a93a837b2018246146099dbcbca46fff4beec71e7aaca2e83052f56445e4185",
         "outcome" : "viewing-saturn"
       },
       "name" : "fixture-saturn",
@@ -414,11 +669,352 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "6236a93d22864854e6caa6350c7e5dc88b2e1d9021ede9ee86b9769a7b1ac769",
-        "initialDigest" : "51a5635b7a12a59c71b25273bfcf07d46af066a15dbcc395f3bd43ab95d08598",
+        "finalDigest" : "458b44ac50bd868a3e1572056fd13ec1486a82e2c9e7e09c3a88c31a28ca97eb",
+        "initialDigest" : "7a93a837b2018246146099dbcbca46fff4beec71e7aaca2e83052f56445e4185",
         "outcome" : "viewing-neptune"
       },
       "name" : "fixture-neptune",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "body.select",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "date.step",
+            "values" : [
+              365
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "date.step",
+            "values" : [
+              365
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "date.step",
+            "values" : [
+              365
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "date.step",
+            "values" : [
+              365
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "date.step",
+            "values" : [
+              365
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "date.step",
+            "values" : [
+              365
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "date.step",
+            "values" : [
+              365
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "date.step",
+            "values" : [
+              365
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "date.step",
+            "values" : [
+              365
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "date.step",
+            "values" : [
+              365
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "date.step",
+            "values" : [
+              365
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "date.step",
+            "values" : [
+              365
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "date.step",
+            "values" : [
+              365
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "date.step",
+            "values" : [
+              365
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "date.step",
+            "values" : [
+              365
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "date.step",
+            "values" : [
+              365
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "date.step",
+            "values" : [
+              365
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "date.step",
+            "values" : [
+              365
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "date.step",
+            "values" : [
+              365
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "date.step",
+            "values" : [
+              365
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "date.step",
+            "values" : [
+              365
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "date.step",
+            "values" : [
+              365
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "date.step",
+            "values" : [
+              365
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "date.step",
+            "values" : [
+              365
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "date.step",
+            "values" : [
+              365
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "date.step",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "date.step",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "date.step",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "date.step",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "date.step",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "date.step",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "date.step",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "cf1d04fd1ae3373948db427a7cec5bd5ae1b04343e375cbc0d24cb6362d2d398",
+        "initialDigest" : "7a93a837b2018246146099dbcbca46fff4beec71e7aaca2e83052f56445e4185",
+        "outcome" : "viewing-earth"
+      },
+      "name" : "fixture-earth-2025",
       "seed" : "1"
     }
   ],
