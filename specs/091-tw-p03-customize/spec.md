@@ -22,6 +22,47 @@ Canonical overrides:
 - **Owner rulings:** short tests; audits and device runs in the device campaign; iOS 27 at phase gates; every Spec
   Kit step runs.
 
+## Clarifications
+
+### Session 2026-11-15
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+Physics Playground's `ExperimentStore` saves, reads, clears and summarises `experiment-<slot>.json` through
+`ExperienceStorage`, whose `write(_:to:)` replaces a file atomically (readers see the old or the new file, never a
+part); slot actions reach the presenter as closures, not engine actions; `ExperienceSession.renderStill(width:height:)`
+draws a still off screen through the host and `StillImageEncoder` encodes it as PNG; `MeshShapes` offers revolution,
+extrusion and bevelled boxes; `MeshRenderer(mesh:colors:registry:)` and `Ray3` exist (A12-P02); `WorldState` is
+schema 1 with a `MigrationChain` in `WorldsCore`.
+
+- Q: Which props exist and how are they built? → A: Four props, each one mesh with per-vertex colours from its own
+  three-colour palette, at most 2,000 vertices, height ≤ 1.2 m, author "VisualCore project", license "MIT": tree
+  (revolved trunk and cone crown), rock (bevelled box), house (box with an extruded gabled roof), lantern (revolved
+  post with a sphere lamp). Each has a picking box (its bounds). A prop's transform is position (x, y, z), rotation
+  about y (−π…π) and scale (fixed 1 in this phase, stored for the packs).
+- Q: Which editing actions and rules apply? → A: `prop.place [kind 0…3, x, z]` (the presenter offers the last picked
+  ground point, else the world centre), `prop.select [index, −1 for none]`, `prop.move [dx, dz]` (each −1…1 m),
+  `prop.rotate [degrees −180…180]`, `prop.delete` (the selected prop). A placed or moved prop snaps to the terrain
+  height at its centre and must be within |x|, |z| ≤ 5.5 m, on ground at least 0.05 m above sea level (island, city)
+  or on the disc (asteroid garden: ground ≥ −0.4 m), at least 0.6 m from every other prop's centre, with at most 24
+  props. Refusals change nothing: `a12.prop-cap`, `a12.outside`, `a12.under-water`, `a12.too-close`,
+  `a12.no-selection`, plus `a12.invalid-choice`. A tap selects the nearest prop whose picking box the ray hits before
+  the ground, else picks the ground. Changing the preset or seed clears the props and the selection (spoken).
+- Q: How is the light set? → A: Azimuth 0°…360° (wrapped), elevation 10°…85°, ambient 0.1…0.6, default 30°, 50°,
+  0.35; direction (cos e · sin a, sin e, cos e · cos a); actions `light.azimuth [degrees]`, `light.elevation
+  [degrees]`, `light.ambient [value]`, out-of-range refused; every renderer (terrain, sea, props) uses it.
+- Q: What is the world document, and how are worlds saved? → A: `WorldState` schema 2 = schema 1 plus props (in
+  placement order) and light; `MigrationChain` 1 → 2 adds no props and the default light; snapshot schema 2. The saved
+  file `world-<slot>.json` (slots 0…3) holds the schema-2 document as sorted-key JSON (at most 64 KB) plus the slot
+  name ("Island, seed 1"); Swift's shortest round-trip number encoding keeps every transform bit-identical. Save,
+  open and clear are slot actions of the presenter through a `WorldStore` over `ExperienceStorage` (as Physics
+  Playground); opening restores the document into the engine as one replayable `world.open` state replacement;
+  damaged, truncated, oversized or newer files are reported (`damaged`, `newer-version`, `too-large`) and the
+  current world stays; a failed write leaves the previous file byte-identical.
+- Q: How are thumbnails made? → A: On save, the session draws a still of the world off screen at 160 × 120 pixels,
+  encodes it as PNG (at most 64 KB) and writes `world-<slot>.png` after the document; the slot list shows it. If no
+  context is available, the world is saved without a picture and the slot says "no picture"; a thumbnail never
+  affects the document or its digest.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Place props on a tiny world (Priority: P1) 🎯
