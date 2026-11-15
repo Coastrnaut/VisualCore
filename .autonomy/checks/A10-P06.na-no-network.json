@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "/bin/sh",
+    "-c",
+    "! grep -rnE 'URLSession|import Network|CLLocation|AVCapture|AVAudioRecorder|inputNode|installTap|MicrophoneAudioSource|CMMotion|CNContact|ASIdentifierManager|AppTrackingTransparency|UIScreen.main.brightness|isIdleTimerDisabled' Packages/ExperiencesCreative/NeonArcade"
+  ],
+  "command": "/bin/sh -c '! grep -rnE '\"'\"'URLSession|import Network|CLLocation|AVCapture|AVAudioRecorder|inputNode|installTap|MicrophoneAudioSource|CMMotion|CNContact|ASIdentifierManager|AppTrackingTransparency|UIScreen.main.brightness|isIdleTimerDisabled'\"'\"' Packages/ExperiencesCreative/NeonArcade'",
+  "elapsed_seconds": 0.06,
+  "exit_code": 0,
+  "finished": "2026-11-15T05:16:33+00:00",
+  "log": ".autonomy/logs/A10-P06.na-no-network.log",
+  "log_sha256": "76a38959d21e21a43dd6bbc24d22bb6c17b3098febe759012172959b1b6a08e4",
+  "name": "na-no-network",
+  "stage": "A10-P06",
+  "started": "2026-11-15T05:16:32+00:00",
+  "timed_out": false
+}

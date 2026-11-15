@@ -11,7 +11,7 @@ Evidence: `python3 Tools/python/desktop_runbook.py run-check --stage A10-P06 --t
 ## Phase 2: User Story 1 — nothing leaves the device (P1) 🎯
 
 - [ ] T-A10-602 [P] [US1] Write `docs/apps/neon-arcade/privacy-and-credits.md` (stored: `high-scores.json` — at most ten scores with wave and run number, no personal data — in the experience's folder, and the app's session state; nothing sent; no permission; sound is ambient and follows the silent switch; how to delete: the app's Settings reset of the experience's data or removing the app; credits from `content-licenses.md`) (FR-A10-601, 604)
-- [ ] T-A10-603 [US1] Source scan (`--name na-no-network -- /bin/sh -c "! grep -rnE 'URLSession|import Network|CLLocation|AVCapture|AVAudioRecorder|inputNode|installTap|MicrophoneAudioSource|CMMotion|CNContact|ASIdentifierManager|AppTrackingTransparency|UIScreen.main.brightness|isIdleTimerDisabled' Packages/ExperiencesCreative/NeonArcade"`) (FR-A10-602; SC-A10-601)
+- [X] T-A10-603 [US1] Source scan (`--name na-no-network -- /bin/sh -c "! grep -rnE 'URLSession|import Network|CLLocation|AVCapture|AVAudioRecorder|inputNode|installTap|MicrophoneAudioSource|CMMotion|CNContact|ASIdentifierManager|AppTrackingTransparency|UIScreen.main.brightness|isIdleTimerDisabled' Packages/ExperiencesCreative/NeonArcade"`) (FR-A10-602; SC-A10-601) — Verified 2026-11-15: 2026-11-15: .autonomy/checks/A10-P06.na-no-network.json exit 0 (no network, tracking, sensor, recording, brightness or idle-timer use in Packages/ExperiencesCreative/NeonArcade)
 
 ## Phase 3: User Story 2 — damaged data never breaks the game (P1)
 
