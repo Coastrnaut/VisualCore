@@ -36,6 +36,16 @@ framework product.
   first, contacts on the new velocities, then positions; positional correction from the solver applied after). Mass =
   density × area (circle πr², box 4·hx·hy), inertia m·r²/2 and m·(w² + h²)/12.
 - **Rationale**: semi-implicit Euler is symplectic enough for a toy and matches the solver's velocity-level design.
+- **Safeguards added in implementation** (recorded at convergence, T-A11-115): (1) the solver's positional correction of
+  a body is limited to 0.1 m per tick (`WorldSimulation.maxCorrectionPerTick`, applied where the corrected positions are
+  copied back): a drop onto another body can start with a deep overlap, and an unlimited 80 % correction could push a
+  body through a 1 m wall in one tick; with the limit the overlap separates over a few ticks. (2) Before
+  `Contacts2D.collide`, a pair whose bounding circles are farther apart than their radii plus 1e-6 m is skipped, and a
+  body is tested only against the walls its bounding circle reaches. Because touching counts within 1e-9 m and shapes
+  lie inside their bounding circles, the skipped pairs are exactly those `collide` answers with nil, so results are
+  identical; it is a pre-filter over all pairs, not a broad phase (G-BROADPHASE stays open for A11-P02). Covered by
+  `PhysicsFixtureTests` (containment: five seeds filled to 48 bodies by drops for 2,400 ticks, every centre inside the
+  stage and every value finite; the ledge fixture) and `WorldSimulationTests`.
 
 ## D4 — Time scale, actions and replay
 
