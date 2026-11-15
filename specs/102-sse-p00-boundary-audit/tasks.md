@@ -7,7 +7,7 @@ after every task (no trailers); read every check's exit before ticking. No Swift
 
 ## Phase 1: Setup
 
-- [ ] T-A14-001 Create `docs/apps/solar-system-explorer/README.md` (what the experience is per the manual §1–§2: an educational solar system viewer that keeps astronomical scale, simulated time and visibility-enhanced displays apart; that it is an experience of the one app; its documents) and `docs/apps/solar-system-explorer/regression-baseline.md` with the phase start `9335c07c` (the specify commit; constitution `462c0a1f`) and the reference pin `d93edd1`
+- [X] T-A14-001 Create `docs/apps/solar-system-explorer/README.md` (what the experience is per the manual §1–§2: an educational solar system viewer that keeps astronomical scale, simulated time and visibility-enhanced displays apart; that it is an experience of the one app; its documents) and `docs/apps/solar-system-explorer/regression-baseline.md` with the phase start `9335c07c` (the specify commit; constitution `462c0a1f`) and the reference pin `d93edd1` — Verified 2026-11-15: 2026-11-15: docs/apps/solar-system-explorer/README.md (what the experience is, one-app rule, procedural visuals, sourced data, documents)
 
 ## Phase 3: User Story 1 — Evidence-backed integration matrix (P1) 🎯
 

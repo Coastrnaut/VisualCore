@@ -1,0 +1,22 @@
+# Solar System Explorer (`a14.solar-system-explorer`)
+
+An educational solar system viewer that keeps astronomical scale, simulated time and visibility-enhanced displays
+clearly apart (archived manual `apps/14-solar-system-explorer.md` §1–§2), for students learning planetary order and
+relative motion, families exploring space together and astronomy hobbyists who want a visual primer. Version 0.1: the
+Sun and the eight major planets with curated fact cards; orbit view, planet focus and camera navigation; play, pause and
+speed-up of simulated motion with an explicit date and time; separate true-relative and visibility-enhanced size and
+distance modes; guided tours with captions; and references and units on every educational claim.
+Non-goals: a high-precision ephemeris or live sky position, telescope alignment, and imagery or data used without a
+license.
+
+Solar System Explorer is an experience of the one VisualCore app (ADR-0009), built from Phase 01 on in
+`Packages/ExperiencesCreative/SolarSystemExplorer`; it never has a standalone target. Planet surfaces, rings, the Sun,
+orbits and the starfield are drawn in code (procedural geometry, noise and shaders; the manual's licensed textures are
+replaced by procedural surfaces). Positions come from a stated simplified model computed on the CPU in double
+precision; a shader never decides where a body is, and drawing never changes the simulation state. Every bundled number
+and fact records its source, epoch, units and license. Its rules are the A14 subsection of the constitution (2.10.0).
+
+| Document | Content |
+|---|---|
+| [visualcore-contract.json](visualcore-contract.json) / [.md](visualcore-contract.md) | Phase 00 inventory, capability matrix, gaps, decision (checked by `scripts/check_app_contract.py`) |
+| [regression-baseline.md](regression-baseline.md) | Phase start, reference pin, the ProjectM reference regression results |
