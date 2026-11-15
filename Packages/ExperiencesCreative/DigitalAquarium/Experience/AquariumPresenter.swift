@@ -40,18 +40,36 @@
 // last synced habitat document, and every gesture action also has a native control (`nativeActions` holds all eight
 // actions). The gestures are reset on teardown and when the habitat changes.
 //
-// Description: "Digital Aquarium: Reef, 7 fish of 2 species (Orange striped fish and Blue fish with yellow tail), 5
-// plants, 3 decorations, no food, lighting soft, swimming." — habitat name, fish count, species count and names (in
-// order of first appearance), plant count, decor count ("1 decoration", "n decorations"), pellets in the water ("no
-// food", "1 food pellet", "n food pellets"), lighting (dim, soft, bright) and swimming or paused.
+// Feature 071 (A09-P04) T-A09-405 (FR-A09-404, 410, 411, 420, 421, 430; clarifications Q1–Q4; research D1–D4):
+//   - Caustics: `CausticsScene` (created in `setup`, released in `teardown`, so a context loss or a resize prepares it
+//     again) draws the water, the letterbox, the gravel band and the caustic light pattern in one full-screen shader;
+//     the water and gravel nodes are hidden then. When the shader cannot be prepared (`isAvailable` false) the frame
+//     falls back to the Phase 03 clear colour with the water and gravel rectangles and everything else draws as before.
+//   - Depth layers: fish `i` and plant `i` are in layer `WaterEffects.layer(index: i)`; their size is scaled by
+//     `WaterEffects.scale(layer:)` (fish length; plant height and line width) and their colours are tinted toward the
+//     habitat's water colour by `WaterEffects.tint(layer:)` before the lighting. Draw order (z): water and caustics 0,
+//     gravel 1, back plants 2, back fish 3, middle plants 4, decor 5, pellets 6, middle fish 7, front plants 8, front
+//     fish 9, bubbles and motes 10; a fish's tail has its body's z and is inserted before it, so it lies just below.
+//   - Bubbles (≤ 48 circles of radius 0.07 units, translucent white-blue) and motes (24 circles of radius 0.03 units,
+//     faint) come from `WaterEffects` with the core's step and the habitat's vents (none for an unknown habitat
+//     index), at least 1 pixel in radius, under the lighting.
+//   - Description: `AquariumWording.description(document:catalog:paused:)` (species with their counts).
+//   - Announcements: each drawn frame compares `AquariumWording.state` with the previous frame's through
+//     `AquariumWording.change(from:to:)` and offers the sentence to an `AquariumAnnouncer` (3 s, latest wins) on a
+//     clock that sums the frame deltas; `tick` releases held text. Released text goes to the injected
+//     `AnnouncementSink` only while `voiceOverRunning()` is true. The first frame after `setup` sets the reference and
+//     announces nothing; `teardown` and `setup` reset it.
+//   - Unknown plant, decor and species kinds stay skipped when drawn.
 import Foundation
 import SwiftUI
+import UIKit
 import DigitalAquariumCore
 import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreMath
 import VisualCoreRendering
 import VisualCoreScenes
+import VisualCoreUI
 
 /// What the controls show, updated only when a field changes.
 @MainActor
@@ -138,6 +156,22 @@ final class AquariumPresenter: ExperiencePresenter {
     nonisolated static let pelletRadius = 0.08
     /// The warm food colour of a pellet at full light.
     nonisolated static let foodColor = RGBA(0.86, 0.52, 0.22, 1)
+    /// The z of the plants of the back, middle and front layers (research D2).
+    nonisolated static let plantZ = [2, 4, 8]
+    /// The z of the fish (body and tail) of the back, middle and front layers (research D2).
+    nonisolated static let fishZ = [3, 7, 9]
+    /// The z of the water (and the caustics), the gravel, the decor, the pellets and the bubbles and motes.
+    nonisolated static let waterZ = 0, gravelZ = 1, decorZ = 5, foodZ = 6, effectsZ = 10
+    /// The radius of a bubble in habitat units.
+    nonisolated static let bubbleRadius = 0.07
+    /// The radius of a mote in habitat units.
+    nonisolated static let moteRadius = 0.03
+    /// The smallest drawn radius of a bubble or mote in pixels.
+    nonisolated static let minParticlePixels = 1.0
+    /// A bubble's colour at full light: light, translucent white-blue.
+    nonisolated static let bubbleColor = RGBA(0.82, 0.92, 1.0, 0.55)
+    /// A mote's colour at full light: faint.
+    nonisolated static let moteColor = RGBA(0.9, 0.95, 0.85, 0.3)
 
     let experienceID: ExperienceID
     let mirror = AquariumMirror()
@@ -164,49 +198,90 @@ final class AquariumPresenter: ExperiencePresenter {
     private var lastHabitatId: String?
     /// The motion factor (1 or ½) of the plant sway and the swim animation in the last frame.
     private(set) var lastSwayFactor = 1.0
+    /// The number of bubbles and motes drawn in the last frame.
+    private(set) var lastBubblesDrawn = 0, lastMotesDrawn = 0
+    /// Whether the last frame was drawn by the caustics shader (false: the Phase 03 fallback).
+    private(set) var lastCausticsDrawn = false
+
+    /// Where announcements go (the system's VoiceOver announcements by default).
+    let announcementSink: any AnnouncementSink
+    /// Whether VoiceOver is running (the system's answer by default).
+    let voiceOverRunning: @MainActor () -> Bool
+    /// The rate limit of the announcements, reset in `setup` and `teardown`.
+    private(set) var announcer = AquariumAnnouncer(voiceOverRunning: true)
+    /// The frame clock of the announcements: the sum of the frame deltas since `setup`, in seconds.
+    private(set) var announcementClock = 0.0
+    /// The announced state of the last drawn frame; nil until the first frame after `setup`.
+    private(set) var announcedState: AquariumWordingState?
+    /// The caustics fragment used instead of the real one (tests inject a broken source); nil in the app.
+    let causticsFragmentOverride: String?
+    /// The caustics scene while set up (nil before `setup` and after `teardown`).
+    private(set) var caustics: CausticsScene?
 
     private let clear = ClearColorScene(red: 0, green: 0, blue: 0)
     private var primitives: PrimitiveRenderer?
     private let root = SceneNode(id: "aquarium")
-    private let water = SceneNode(id: "water", z: 0)
-    private let gravel = SceneNode(id: "gravel", z: 1)
-    private var plantNodes: [[SceneNode]] = []
+    /// The water rectangle (hidden while the caustics draw the water).
+    let water = SceneNode(id: "water", z: AquariumPresenter.waterZ)
+    /// The gravel rectangle (hidden while the caustics draw the gravel).
+    let gravel = SceneNode(id: "gravel", z: AquariumPresenter.gravelZ)
+    /// The line nodes of each plant slot.
+    private(set) var plantNodes: [[SceneNode]] = []
     private var decorNodes: [SceneNode] = []
     private var foodNodes: [SceneNode] = []
-    private var tailNodes: [SceneNode] = []
-    private var bodyNodes: [SceneNode] = []
+    /// The tail and body node of each fish slot.
+    private(set) var tailNodes: [SceneNode] = [], bodyNodes: [SceneNode] = []
+    /// The bubble and mote nodes.
+    private(set) var bubbleNodes: [SceneNode] = [], moteNodes: [SceneNode] = []
 
-    init(experienceID: ExperienceID, reduceMotion: Bool = false) {
+    init(experienceID: ExperienceID, reduceMotion: Bool = false, announcementSink: (any AnnouncementSink)? = nil,
+         voiceOverRunning: (@MainActor () -> Bool)? = nil, causticsFragmentOverride: String? = nil) {
         self.experienceID = experienceID
         self.reduceMotion = reduceMotion
+        self.announcementSink = announcementSink ?? SystemAnnouncementSink()
+        self.voiceOverRunning = voiceOverRunning ?? { UIAccessibility.isVoiceOverRunning }
+        self.causticsFragmentOverride = causticsFragmentOverride
         root.add(water)
         root.add(gravel)
         for plant in 0..<Self.maxPlants {
             var lines: [SceneNode] = []
+            let z = Self.plantZ[WaterEffects.layer(index: plant)]
             for line in 0..<Self.fanLines {
-                let node = SceneNode(id: "p\(plant).\(line)", z: 2)
+                let node = SceneNode(id: "p\(plant).\(line)", z: z)
                 root.add(node)
                 lines.append(node)
             }
             plantNodes.append(lines)
         }
         for piece in 0..<Self.maxDecor {
-            let node = SceneNode(id: "d\(piece)", z: 3)
+            let node = SceneNode(id: "d\(piece)", z: Self.decorZ)
             root.add(node)
             decorNodes.append(node)
         }
         for pellet in 0..<Self.maxFood {
-            let node = SceneNode(id: "food\(pellet)", z: 4)
+            let node = SceneNode(id: "food\(pellet)", z: Self.foodZ)
             root.add(node)
             foodNodes.append(node)
         }
         for fish in 0..<Self.maxFish {
-            let tail = SceneNode(id: "t\(fish)", z: 5)
-            let body = SceneNode(id: "f\(fish)", z: 6)
+            // Same z as the body and inserted before it: the tail lies just below its body.
+            let z = Self.fishZ[WaterEffects.layer(index: fish)]
+            let tail = SceneNode(id: "t\(fish)", z: z)
+            let body = SceneNode(id: "f\(fish)", z: z)
             root.add(tail)
             root.add(body)
             tailNodes.append(tail)
             bodyNodes.append(body)
+        }
+        for bubble in 0..<WaterEffects.maxBubbles {
+            let node = SceneNode(id: "b\(bubble)", z: Self.effectsZ)
+            root.add(node)
+            bubbleNodes.append(node)
+        }
+        for mote in 0..<WaterEffects.moteCount {
+            let node = SceneNode(id: "m\(mote)", z: Self.effectsZ)
+            root.add(node)
+            moteNodes.append(node)
         }
     }
 
@@ -217,8 +292,14 @@ final class AquariumPresenter: ExperiencePresenter {
 
     func setup(_ context: RenderContext) throws {
         primitives = try PrimitiveRenderer(registry: context.resources)
+        let scene = CausticsScene(fragmentOverride: causticsFragmentOverride)
+        do { try scene.setup(context) } catch { scene.teardown(context) }
+        caustics = scene
+        resetAnnouncements()
         isLive = true
     }
+
+    func resize(_ context: RenderContext) { caustics?.resize(context) }
 
     func draw(_ core: AquariumCore, tier: Int, context: RenderContext, frame: FrameInfo) throws {
         if failNextDraw {
@@ -226,22 +307,68 @@ final class AquariumPresenter: ExperiencePresenter {
             throw AquariumDrawError.injected
         }
         sync(core)
-        let waterColor = Self.waterColor(core.document)
-        clear.red = Float(waterColor.x)
-        clear.green = Float(waterColor.y)
-        clear.blue = Float(waterColor.z)
-        try clear.render(context, frame: frame)
+        let document = core.document
+        let waterColor = Self.waterColor(document)
         let width = Double(max(1, context.pixelWidth)), height = Double(max(1, context.pixelHeight))
-        layOut(core, width: width, height: height)
+        let causticsOn = caustics?.isAvailable ?? false
+        if let caustics, causticsOn {
+            let s = Self.scale(width: width, height: height)
+            let origin = Vec2(width / 2 - Self.tankWidth / 2 * s, height / 2 - Self.tankHeight / 2 * s)
+            caustics.configure(step: core.step, reduceMotion: reduceMotion, lighting: document.lighting,
+                               water: waterColor, gravel: Self.litGravel(document.lighting), scale: s, origin: origin,
+                               tankSize: Vec2(Self.tankWidth, Self.tankHeight), gravelTop: Self.gravelTop)
+            try caustics.render(context, frame: frame)
+        } else {
+            clear.red = Float(waterColor.x)
+            clear.green = Float(waterColor.y)
+            clear.blue = Float(waterColor.z)
+            try clear.render(context, frame: frame)
+        }
+        lastCausticsDrawn = causticsOn
+        layOut(core, width: width, height: height, caustics: causticsOn)
         if primitives == nil { primitives = try PrimitiveRenderer(registry: context.resources) }
         try primitives?.draw(root, camera: Camera2D(), metrics: ViewMetrics(size: Vec2(width, height), scale: 1))
+        updateAnnouncements(core, frame: frame)
     }
 
     func teardown(_ context: RenderContext) {
         isLive = false
         gestures.reset()
+        caustics?.teardown(context)
+        caustics = nil
+        resetAnnouncements()
         primitives?.release()
         primitives = nil
+    }
+
+    // MARK: Announcements
+
+    /// Forgets the reference state, the clock and the announcer's history.
+    private func resetAnnouncements() {
+        announcer.reset()
+        announcementClock = 0
+        announcedState = nil
+    }
+
+    /// Advances the frame clock, offers the change since the last frame to the announcer, releases held text when
+    /// due, and sends what it releases to the sink while VoiceOver runs (see the file header).
+    private func updateAnnouncements(_ core: AquariumCore, frame: FrameInfo) {
+        if frame.delta.isFinite, frame.delta > 0 { announcementClock += frame.delta }
+        announcer.voiceOverRunning = voiceOverRunning()
+        let current = AquariumWording.state(document: core.document, catalog: AquariumCore.catalog,
+                                            paused: core.paused)
+        let change = AquariumWording.change(from: announcedState, to: current)
+        announcedState = current
+        if let change, announcer.announce(change, at: announcementClock), let text = announcer.lastAnnounced {
+            send(text)
+        }
+        if let text = announcer.tick(at: announcementClock) { send(text) }
+    }
+
+    /// Sends `text` to the announcement sink while VoiceOver runs.
+    private func send(_ text: String) {
+        guard voiceOverRunning() else { return }
+        announcementSink.announce(text)
     }
 
     // MARK: Drawing
@@ -260,6 +387,23 @@ final class AquariumPresenter: ExperiencePresenter {
     /// The water colour of `document` under its lighting.
     nonisolated static func waterColor(_ document: HabitatDocument) -> Vec4 {
         lit(document.waterColor, level: document.lighting)
+    }
+
+    /// The gravel colour under lighting `level`.
+    nonisolated static func litGravel(_ level: Int) -> Vec4 {
+        let f = lightingFactor(level)
+        return Vec4(gravelColor.x * f, gravelColor.y * f, gravelColor.z * f, 1)
+    }
+
+    /// `color` tinted toward `document`'s water colour by the tint of depth `layer`, then lit by its lighting.
+    nonisolated static func layered(_ color: RGBA, layer: Int, document: HabitatDocument) -> Vec4 {
+        lit(WaterEffects.tinted(color, toward: document.waterColor, amount: WaterEffects.tint(layer: layer)),
+            level: document.lighting)
+    }
+
+    /// The bubble vents of `document`'s starter habitat (none for an index outside the catalog's habitats).
+    nonisolated static func vents(_ document: HabitatDocument, catalog: SpeciesCatalog) -> [Double] {
+        catalog.habitats.indices.contains(document.habitatIndex) ? catalog.habitats[document.habitatIndex].vents : []
     }
 
     /// The uniform scale (pixels per habitat unit) that fits the tank into `width` × `height` pixels.
@@ -394,8 +538,9 @@ final class AquariumPresenter: ExperiencePresenter {
         swayAmplitude * factor * t * t * sin(Double(step) * swayRate + x + 1.5 * t)
     }
 
-    /// Places every node for a canvas of `width` × `height` pixels (world = pixels from the centre, y up).
-    private func layOut(_ core: AquariumCore, width: Double, height: Double) {
+    /// Places every node for a canvas of `width` × `height` pixels (world = pixels from the centre, y up); with
+    /// `caustics` the water and gravel rectangles are hidden (the caustics shader draws them).
+    func layOut(_ core: AquariumCore, width: Double, height: Double, caustics: Bool = false) {
         let document = core.document
         let catalog = AquariumCore.catalog
         let level = document.lighting
@@ -410,8 +555,9 @@ final class AquariumPresenter: ExperiencePresenter {
         water.color = Self.waterColor(document)
         gravel.primitive = .rect(Vec2(Self.tankWidth * s, Self.gravelTop * s))
         gravel.position = world(Vec2(Self.tankWidth / 2, Self.gravelTop / 2))
-        let f = Self.lightingFactor(level)
-        gravel.color = Vec4(Self.gravelColor.x * f, Self.gravelColor.y * f, Self.gravelColor.z * f, 1)
+        gravel.color = Self.litGravel(level)
+        water.isVisible = !caustics
+        gravel.isVisible = !caustics
 
         var plantsDrawn = 0
         for (index, lines) in plantNodes.enumerated() {
@@ -420,14 +566,17 @@ final class AquariumPresenter: ExperiencePresenter {
                 continue
             }
             let x = document.plants[index].x
-            let color = Self.lit(kind.color, level: level)
-            let width = Self.plantWidth * s
+            let layer = WaterEffects.layer(index: index)
+            let depth = WaterEffects.scale(layer: layer)
+            let color = Self.layered(kind.color, layer: layer, document: document)
+            let width = Self.plantWidth * depth * s
+            let plantHeight = kind.height * depth
             switch kind.shape {
             case .ribbon:
                 let points = (0..<Self.ribbonPoints).map { i -> Vec2 in
                     let t = Double(i) / Double(Self.ribbonPoints - 1)
                     let p = Vec2(x + Self.sway(t: t, x: x, step: core.step, factor: factor),
-                                 Self.gravelTop + t * kind.height)
+                                 Self.gravelTop + t * plantHeight)
                     return world(p)
                 }
                 lines[0].primitive = .polyline(points, width: width)
@@ -436,9 +585,9 @@ final class AquariumPresenter: ExperiencePresenter {
                 let base = Vec2(x, Self.gravelTop)
                 for (line, node) in lines.enumerated() {
                     let spread = (Double(line) / Double(Self.fanLines - 1) - 0.5) * 1.1
-                    let tip = Vec2(x + sin(spread) * kind.height * 0.8
+                    let tip = Vec2(x + sin(spread) * plantHeight * 0.8
                                        + Self.sway(t: 1, x: x + Double(line) * 0.3, step: core.step, factor: factor),
-                                   Self.gravelTop + cos(spread) * kind.height)
+                                   Self.gravelTop + cos(spread) * plantHeight)
                     node.primitive = .line(world(base), world(tip), width: width)
                     node.color = color
                 }
@@ -482,14 +631,39 @@ final class AquariumPresenter: ExperiencePresenter {
                 continue
             }
             let fish = document.fish[index]
-            let shapes = Self.fishPolygons(fish, shape: species.shape, length: species.length, factor: factor)
+            let layer = WaterEffects.layer(index: index)
+            let length = species.length * WaterEffects.scale(layer: layer)
+            let shapes = Self.fishPolygons(fish, shape: species.shape, length: length, factor: factor)
             body.primitive = .polygon(shapes.body.map(world))
-            body.color = Self.lit(species.bodyColor, level: level)
+            body.color = Self.layered(species.bodyColor, layer: layer, document: document)
             tail.primitive = .polygon(shapes.tail.map(world))
-            tail.color = Self.lit(species.finColor, level: level)
+            tail.color = Self.layered(species.finColor, layer: layer, document: document)
             fishDrawn += 1
         }
         lastFishDrawn = fishDrawn
+
+        let bubbles = WaterEffects.bubbles(step: core.step, vents: Self.vents(document, catalog: catalog),
+                                           reduceMotion: reduceMotion)
+        let bubbleColor = Self.lit(Self.bubbleColor, level: level)
+        let bubbleRadius = max(Self.bubbleRadius * s, Self.minParticlePixels)
+        for (index, node) in bubbleNodes.enumerated() {
+            guard index < bubbles.count else { node.primitive = nil; continue }
+            node.primitive = .circle(bubbleRadius)
+            node.position = world(bubbles[index])
+            node.color = bubbleColor
+        }
+        lastBubblesDrawn = min(bubbles.count, bubbleNodes.count)
+
+        let motes = WaterEffects.motes(step: core.step, reduceMotion: reduceMotion)
+        let moteColor = Self.lit(Self.moteColor, level: level)
+        let moteRadius = max(Self.moteRadius * s, Self.minParticlePixels)
+        for (index, node) in moteNodes.enumerated() {
+            guard index < motes.count else { node.primitive = nil; continue }
+            node.primitive = .circle(moteRadius)
+            node.position = world(motes[index])
+            node.color = moteColor
+        }
+        lastMotesDrawn = min(motes.count, moteNodes.count)
     }
 
     // MARK: Words and controls
@@ -562,17 +736,12 @@ final class AquariumPresenter: ExperiencePresenter {
         return names.dropLast().joined(separator: ", ") + " and " + last
     }
 
-    /// "Digital Aquarium: Reef, 7 fish of 2 species (Orange striped fish and Blue fish with yellow tail), 5 plants,
+    /// The canvas description by `AquariumWording.description(document:catalog:paused:)`, for example "Digital
+    /// Aquarium: Reef, 7 fish of 2 species (4 Orange striped fish and 3 Blue fish with yellow tail), 5 plants,
     /// 3 decorations, no food, lighting soft, swimming."
     func describe(_ core: AquariumCore) -> String {
         sync(core)
-        let document = core.document
-        let names = Self.speciesNames(document)
-        let species = names.count == 1 ? "1 species" : "\(names.count) species"
-        return "Digital Aquarium: \(Self.habitatName(document)), \(Self.fishWords(document.fish.count)) of \(species) "
-            + "(\(Self.joined(names))), \(Self.plantWords(document.plants.count)), "
-            + "\(Self.decorWords(document.decor.count)), \(Self.foodWords(document.food.count)), "
-            + "lighting \(Self.lightingName(document.lighting)), \(core.paused ? "paused" : "swimming")."
+        return AquariumWording.description(document: core.document, catalog: AquariumCore.catalog, paused: core.paused)
     }
 
     /// One water probe at the top centre of the canvas (above the swim bounds, where no plant reaches), expecting the

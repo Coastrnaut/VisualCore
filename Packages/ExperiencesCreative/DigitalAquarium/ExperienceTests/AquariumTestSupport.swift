@@ -1,6 +1,6 @@
 // AquariumTestSupport — feature 068 (A09-P01) T-A09-103 (FR-A09-120, FR-A09-121). Shared helpers of the Digital
 // Aquarium experience tests: opening the experience in the one app's session host, drawing frames, reading the pixels
-// of a frame and counting the pixels two frames differ in.
+// of a frame and counting the pixels two frames differ in; recording and silent announcement sinks (feature 071).
 import Foundation
 import XCTest
 @testable import DigitalAquariumExperience
@@ -8,6 +8,7 @@ import DigitalAquariumCore
 import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreRendering
+import VisualCoreUI
 
 @MainActor
 enum AquariumTest {
@@ -15,14 +16,21 @@ enum AquariumTest {
     static var id: ExperienceID { DigitalAquariumExperience.id ?? ExperienceID(rawValue: "a09.unknown")! }
 
     /// Opens Digital Aquarium in `session` (seed `seed`, optionally restoring `snapshot`), lays the view out at `size`
-    /// points and draws one frame.
+    /// points and draws one frame. Announcements go to `announcementSink` (default: dropped) with VoiceOver reported
+    /// by `voiceOverRunning` (default: off); `causticsFragment` replaces the caustics shader.
     static func open(_ session: ExperienceSession, seed: UInt64 = 7, snapshot: ExperienceSnapshot? = nil,
                      reduceMotion: Bool = false,
-                     size: CGSize = CGSize(width: 160, height: 90)) async throws -> ExperienceShell<AquariumPresenter> {
+                     size: CGSize = CGSize(width: 160, height: 90),
+                     announcementSink: (any AnnouncementSink)? = nil,
+                     voiceOverRunning: (@MainActor () -> Bool)? = nil,
+                     causticsFragment: String? = nil) async throws -> ExperienceShell<AquariumPresenter> {
         let id = self.id
         var made: ExperienceShell<AquariumPresenter>?
+        let sink = announcementSink ?? AquariumSilentSink()
+        let voiceOver = voiceOverRunning ?? { false }
         let request = ExperienceOpenRequest(id: id, seed: seed, snapshot: snapshot, refusedSnapshotFails: false) {
-            let shell = DigitalAquariumExperience.make(id: id, reduceMotion: reduceMotion)
+            let shell = DigitalAquariumExperience.make(id: id, reduceMotion: reduceMotion, announcementSink: sink,
+                                                       voiceOverRunning: voiceOver, causticsFragment: causticsFragment)
             made = shell
             return shell
         }
@@ -68,4 +76,18 @@ enum AquariumTest {
         }
         return count
     }
+}
+
+/// An announcement sink that records what it is given (VoiceOver is never driven by tests).
+@MainActor
+final class AquariumRecordingSink: AnnouncementSink {
+    /// Every announced text, oldest first.
+    private(set) var texts: [String] = []
+    func announce(_ text: String) { texts.append(text) }
+}
+
+/// An announcement sink that drops everything (the default of `AquariumTest.open`).
+@MainActor
+final class AquariumSilentSink: AnnouncementSink {
+    func announce(_ text: String) {}
 }

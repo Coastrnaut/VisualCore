@@ -15,6 +15,13 @@
 // Feature 070 (A09-P03) T-A09-307 (FR-A09-311–313): food pellets are drawn and change the frame; every gesture action
 // has a native control (`GestureAlternatives.missing` is empty); the description names the pellet and decor counts and
 // follows a feed and a removal; a quick tap on the canvas, forwarded through the presenter, drops food exactly once.
+//
+// Feature 071 (A09-P04) T-A09-405 (FR-A09-404, 410, 411, 430; SC-A09-402–404): back-layer fish and plants are drawn
+// before (lower z), at 0.75 of the front scale and tinted toward the water; the caustics are drawn, change between two
+// frames 60 steps apart and hold under Reduce Motion (time 0); dim caustics are fainter than bright ones; a broken
+// caustics shader falls back to the Phase 03 water and gravel and the frame still draws; bubbles and motes are drawn
+// (at least one pixel in radius); the state digest does not depend on Reduce Motion and the effects; unknown plant and
+// decor kinds are skipped when drawn.
 import Foundation
 import XCTest
 @testable import DigitalAquariumExperience
@@ -341,5 +348,207 @@ final class AquariumRenderTests: XCTestCase {
                 XCTAssertFalse(text.contains(word), "\(file.lastPathComponent) mentions \(word)")
             }
         }
+    }
+    // MARK: Water effects and depth (feature 071, T-A09-405)
+
+    /// The largest distance of `points` (world pixels) from `centre` (habitat units) in habitat units at `scale`.
+    private func reach(_ primitive: Primitive?, centre: Vec2, scale: Double) -> Double {
+        guard case .polygon(let points)? = primitive else { return 0 }
+        let c = AquariumPresenter.world(centre, scale: scale)
+        return points.map { ($0 - c).length }.max().map { $0 / scale } ?? 0
+    }
+
+    /// The RGB distance of two colours.
+    private func distance(_ a: Vec4, _ b: Vec4) -> Double {
+        ((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y) + (a.z - b.z) * (a.z - b.z)).squareRoot()
+    }
+
+    /// The red + green + blue sums of the pixels of the gravel strip x 0.5…15.5, y 0.1…0.5 (habitat units) of a
+    /// frame read bottom row first.
+    private func gravelStrip(_ frame: (rgba: [UInt8], width: Int, height: Int)) -> [Int] {
+        let w = Double(frame.width), h = Double(frame.height)
+        let s = AquariumPresenter.scale(width: w, height: h)
+        let originX = w / 2 - 8 * s, originY = h / 2 - 4.5 * s
+        var sums: [Int] = []
+        for row in Int(originY + 0.1 * s)..<Int(originY + 0.5 * s) {
+            for column in Int(originX + 0.5 * s)..<Int(originX + 15.5 * s) {
+                let i = (row * frame.width + column) * 4
+                sums.append(Int(frame.rgba[i]) + Int(frame.rgba[i + 1]) + Int(frame.rgba[i + 2]))
+            }
+        }
+        return sums
+    }
+
+    func testBackLayersAreDrawnFirstSmallerAndTintedTowardTheWater() throws {
+        let presenter = AquariumPresenter(experienceID: AquariumTest.id)
+        let core = AquariumCore(seed: 7)
+        let document = core.document
+        XCTAssertGreaterThanOrEqual(document.fish.count, 3)
+        let width = 1600.0, height = 900.0, scale = AquariumPresenter.scale(width: width, height: height)
+        presenter.layOut(core, width: width, height: height)
+        // Research D2: back plants 2, back fish 3, middle plants 4, decor 5, pellets 6, middle fish 7, front plants 8,
+        // front fish 9, bubbles and motes 10; a tail shares its body's z.
+        XCTAssertEqual(presenter.plantNodes.prefix(3).map { $0[0].z }, [2, 4, 8])
+        XCTAssertEqual(presenter.bodyNodes.prefix(3).map(\.z), [3, 7, 9])
+        XCTAssertEqual(presenter.tailNodes.map(\.z), presenter.bodyNodes.map(\.z))
+        XCTAssertEqual(Set(presenter.bubbleNodes.map(\.z) + presenter.moteNodes.map(\.z)), [10])
+        XCTAssertEqual(presenter.water.z, 0)
+        XCTAssertEqual(presenter.gravel.z, 1)
+        for index in document.fish.indices {
+            let fish = document.fish[index]
+            let species = try XCTUnwrap(AquariumCore.catalog.species(id: fish.speciesId))
+            let layer = WaterEffects.layer(index: index)
+            // The drawn body reaches as far from the fish's position as an unscaled one times the layer's scale.
+            let full = AquariumPresenter.fishPolygons(fish, shape: species.shape, length: species.length, factor: 1)
+            let fullReach = reach(.polygon(full.body.map { AquariumPresenter.world($0, scale: scale) }),
+                                  centre: fish.position, scale: scale)
+            let drawn = reach(presenter.bodyNodes[index].primitive, centre: fish.position, scale: scale)
+            XCTAssertEqual(drawn / fullReach, WaterEffects.scale(layer: layer), accuracy: 1e-9, "fish \(index)")
+            let water = AquariumPresenter.waterColor(document)
+            let plain = AquariumPresenter.lit(species.bodyColor, level: document.lighting)
+            if layer == 2 {
+                XCTAssertEqual(presenter.bodyNodes[index].color, plain, "a front fish keeps its colour")
+            } else {
+                XCTAssertLessThan(distance(presenter.bodyNodes[index].color, water), distance(plain, water),
+                                  "fish \(index) in layer \(layer) is tinted toward the water")
+            }
+        }
+        XCTAssertEqual(WaterEffects.scale(layer: 0) / WaterEffects.scale(layer: 2), 0.75, accuracy: 1e-12)
+        // A back plant is paler toward the water than the same kind in front.
+        let plants = document.plants
+        let kind = try XCTUnwrap(AquariumCore.catalog.plant(id: plants[0].kindId))
+        XCTAssertLessThan(distance(presenter.plantNodes[0][0].color, AquariumPresenter.waterColor(document)),
+                          distance(AquariumPresenter.lit(kind.color, level: document.lighting),
+                                   AquariumPresenter.waterColor(document)))
+    }
+
+    func testTheCausticsChangeOverTimeAndHoldUnderReduceMotion() async throws {
+        let big = CGSize(width: 320, height: 180)
+        let full = ExperienceSession()
+        let fullShell = try await AquariumTest.open(full, size: big)
+        let a = try AquariumTest.picture(full)
+        XCTAssertTrue(fullShell.presenter.lastCausticsDrawn, "the caustics shader draws the water and gravel")
+        XCTAssertFalse(fullShell.presenter.gravel.isVisible, "the gravel rectangle is hidden under the caustics")
+        assertDrawn(fullShell, a, "caustics")
+        let timeA = try XCTUnwrap(fullShell.presenter.caustics).time
+        try AquariumTest.frames(full, 59)
+        let b = try AquariumTest.picture(full)
+        let timeB = try XCTUnwrap(fullShell.presenter.caustics).time
+        XCTAssertEqual(timeB - timeA, 0.4, accuracy: 1e-9, "60 steps are 0.4 of pattern time")
+        let stripA = gravelStrip(a), stripB = gravelStrip(b)
+        XCTAssertFalse(stripA.isEmpty)
+        let changed = zip(stripA, stripB).filter { abs($0 - $1) > 3 }.count
+        XCTAssertGreaterThan(changed, stripA.count / 20, "the light pattern on the gravel moves")
+        full.close()
+
+        let reduced = ExperienceSession()
+        let reducedShell = try await AquariumTest.open(reduced, reduceMotion: true, size: big)
+        let c = try AquariumTest.picture(reduced)
+        try AquariumTest.frames(reduced, 59)
+        let d = try AquariumTest.picture(reduced)
+        XCTAssertEqual(try XCTUnwrap(reducedShell.presenter.caustics).time, 0, "Reduce Motion holds the pattern")
+        XCTAssertGreaterThan(try AquariumTest.core(reducedShell).step, 59)
+        XCTAssertEqual(gravelStrip(c), gravelStrip(d), "the gravel's light pattern holds under Reduce Motion")
+        reduced.close()
+    }
+
+    func testDimCausticsAreFainterThanBright() async throws {
+        XCTAssertEqual([0, 1, 2, 7].map { CausticsScene.strength(lighting: $0) }, [0.04, 0.07, 0.10, 0.07])
+        let session = ExperienceSession()
+        let shell = try await AquariumTest.open(session, size: CGSize(width: 320, height: 180))
+        try AquariumTest.frames(session, 30)
+        XCTAssertTrue(shell.handle(control: "motion.pause", values: [1]).isAccepted)
+        func pattern() throws -> Double {
+            let strip = gravelStrip(try AquariumTest.picture(session))
+            let floor = strip.min() ?? 0
+            return Double(strip.reduce(0) { $0 + $1 - floor }) / Double(max(strip.count, 1))
+        }
+        XCTAssertTrue(shell.handle(control: "lighting.level", values: [0]).isAccepted)
+        let dim = try pattern()
+        XCTAssertEqual(try XCTUnwrap(shell.presenter.caustics).strength, 0.04, accuracy: 1e-12)
+        XCTAssertTrue(shell.handle(control: "lighting.level", values: [2]).isAccepted)
+        let bright = try pattern()
+        XCTAssertEqual(try XCTUnwrap(shell.presenter.caustics).strength, 0.10, accuracy: 1e-12)
+        XCTAssertGreaterThan(dim, 0, "the pattern shows at dim lighting")
+        XCTAssertLessThan(dim, bright, "dim caustics are fainter than bright ones")
+        session.close()
+    }
+
+    func testABrokenCausticsShaderFallsBackAndTheFrameStillDraws() async throws {
+        let session = ExperienceSession()
+        let shell = try await AquariumTest.open(session, causticsFragment: "precision highp float; not glsl at all")
+        try AquariumTest.frames(session, 5)
+        let frame = try AquariumTest.picture(session)
+        let caustics = try XCTUnwrap(shell.presenter.caustics)
+        XCTAssertNotNil(caustics.errorMessage, "the broken shader reports a diagnostic")
+        XCTAssertFalse(caustics.isAvailable)
+        XCTAssertFalse(shell.presenter.lastCausticsDrawn, "the Phase 03 water and gravel are drawn instead")
+        XCTAssertTrue(shell.presenter.water.isVisible)
+        XCTAssertTrue(shell.presenter.gravel.isVisible)
+        XCTAssertEqual(session.state, .running, "everything else works")
+        assertDrawn(shell, frame, "fallback")
+        XCTAssertGreaterThan(shell.presenter.lastFishDrawn, 0)
+        XCTAssertGreaterThan(shell.presenter.lastBubblesDrawn, 0)
+        session.close()
+        XCTAssertEqual(session.hostsAlive, 0)
+    }
+
+    func testBubblesAndMotesAreDrawnAtLeastOnePixelWide() async throws {
+        let session = ExperienceSession()
+        let shell = try await AquariumTest.open(session)
+        try AquariumTest.frames(session, 100)
+        let presenter = shell.presenter
+        let visible = presenter.bubbleNodes.filter { $0.primitive != nil }.count
+        XCTAssertGreaterThan(visible, 0, "bubbles rise from the Reef's vents")
+        XCTAssertLessThanOrEqual(visible, WaterEffects.maxBubbles)
+        XCTAssertEqual(presenter.lastBubblesDrawn, visible)
+        XCTAssertEqual(presenter.lastMotesDrawn, WaterEffects.moteCount)
+        session.close()
+
+        // A tiny canvas (1 pixel per unit): every particle keeps a radius of at least one pixel.
+        let tiny = AquariumPresenter(experienceID: AquariumTest.id)
+        var core = AquariumCore(seed: 7)
+        for step in 0..<100 { core.update(step: step) }
+        tiny.layOut(core, width: 16, height: 9)
+        for node in tiny.bubbleNodes + tiny.moteNodes {
+            guard case .circle(let radius)? = node.primitive else { continue }
+            XCTAssertGreaterThanOrEqual(radius, 1)
+        }
+        XCTAssertGreaterThan(tiny.lastBubblesDrawn, 0)
+    }
+
+    func testTheDigestDoesNotDependOnReduceMotionOrTheEffects() async throws {
+        let full = ExperienceSession()
+        let fullShell = try await AquariumTest.open(full)
+        try AquariumTest.frames(full, 100)
+        let reduced = ExperienceSession()
+        let reducedShell = try await AquariumTest.open(reduced, reduceMotion: true)
+        try AquariumTest.frames(reduced, 100)
+        XCTAssertGreaterThan(fullShell.presenter.lastBubblesDrawn, 0)
+        XCTAssertEqual(try AquariumTest.core(fullShell).step, try AquariumTest.core(reducedShell).step)
+        XCTAssertEqual(try AquariumTest.core(fullShell).document, try AquariumTest.core(reducedShell).document)
+        XCTAssertEqual(try fullShell.engine.digest(), try reducedShell.engine.digest(),
+                       "bubbles, motes, caustics and Reduce Motion never touch the state")
+        full.close()
+        reduced.close()
+    }
+
+    func testUnknownPlantAndDecorKindsAreSkippedWhenDrawn() throws {
+        let start = AquariumCore(seed: 7).state
+        var document = start.document
+        let knownPlants = document.plants.count, knownDecor = document.decor.count
+        document.plants.append(PlantPlacement(kindId: "no-such-plant", x: 6))
+        document.decor.append(DecorPlacement(kindId: "no-such-decor", position: Vec2(7, 1.2)))
+        document.habitatIndex = 99  // an unknown habitat: no vents, so no bubbles
+        let state = AquariumState(document: document, step: 120, paused: false, random: start.random)
+        let core = try AquariumCore(seed: 7, state: state)
+        let presenter = AquariumPresenter(experienceID: AquariumTest.id)
+        presenter.layOut(core, width: 640, height: 360)
+        XCTAssertEqual(presenter.lastPlantsDrawn, knownPlants, "the unknown plant is skipped")
+        XCTAssertEqual(presenter.lastDecorDrawn, knownDecor, "the unknown decoration is skipped")
+        XCTAssertEqual(presenter.lastFishDrawn, document.fish.count)
+        XCTAssertEqual(presenter.lastBubblesDrawn, 0, "an unknown habitat has no vents")
+        XCTAssertEqual(presenter.lastMotesDrawn, WaterEffects.moteCount)
+        XCTAssertTrue(presenter.describe(core).hasPrefix("Digital Aquarium: Aquarium, "))
     }
 }
