@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a12.tiny-worlds",
+    "--runtime",
+    "27"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a12.tiny-worlds --runtime 27",
+  "elapsed_seconds": 50.995,
+  "exit_code": 0,
+  "finished": "2026-11-15T16:51:41+00:00",
+  "log": ".autonomy/logs/A12-P06.verify-27.log",
+  "log_sha256": "2751e6ef0c2f02345580d3d51dcd8a3b0ed0f35f7e17560828f0f7fcce8e3a98",
+  "name": "verify-27",
+  "stage": "A12-P06",
+  "started": "2026-11-15T16:50:50+00:00",
+  "timed_out": false
+}
