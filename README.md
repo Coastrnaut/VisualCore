@@ -47,7 +47,7 @@ evidence**: no physical-device test of the unified app has been run.
 |---|---|---|
 | Framework packages (version 1.0.0-rc.1) | simulator-verified: host tests and iOS Simulator tests | `.autonomy/evidence/F00.json` … `F09.json`; [release notes](docs/release/release-notes-1.0.0-rc.1.md) |
 | Unified VisualCore app (`Apps/VisualCore`) | exists: launcher, routes, settings, about, onboarding, session host, persistence, quality profiles, verification runner (UA-F00 … UA-F07, UA-F09 … UA-F11 pass) | `python3 scripts/migration_ledger.py status` |
-| Audio modules `VisualCoreAudioDSP` and `VisualCoreAudio` | implemented: FFT, bands, RMS, onsets, test signals, min/max decimation; demo, file, microphone, test-signal and two-channel sources with interruption and route handling | A06–A08 phases; [known limitations](docs/release/known-limitations.md) |
+| Audio modules `VisualCoreAudioDSP` and `VisualCoreAudio` | implemented: FFT, bands, RMS, onsets, test signals, min/max decimation, synthesized sound effects; demo, file, microphone, test-signal and two-channel sources with interruption and route handling; a sound-effect player (ambient, no permission) | A06–A08 and A10-P03 phases; [known limitations](docs/release/known-limitations.md) |
 | A01 Generative Art Studio | experience in the app; X-A01 pass | `.autonomy/migration/checks/X-A01.*.json` |
 | A02 Fluid Art Playground | experience in the app; X-A02 pass | `.autonomy/migration/checks/X-A02.*.json` |
 | A03 Fractal Explorer | experience in the app; X-A03 pass | `.autonomy/migration/checks/X-A03.*.json` |
@@ -57,15 +57,15 @@ evidence**: no physical-device test of the unified app has been run.
 | A07 Audio Odyssey | experience in the app; X-A07 pass | `.autonomy/migration/checks/X-A07.*.json` |
 | A08 Oscilloscope Studio | experience in the app; X-A08 pass | `.autonomy/migration/checks/X-A08.*.json` |
 | A09 Digital Aquarium | experience in the app; X-A09 pass | `.autonomy/migration/checks/X-A09.*.json` |
-| A10 Neon Arcade | in progress, a candidate (not yet available): A10-P00 … A10-P02 pass — Neon Dodge playable with five lanes, four licensed wave patterns and a capped difficulty ramp, swept collision (`Collision2D` in VisualCoreSimulation), recorded-input replay and saved-state migration ([contract](docs/apps/neon-arcade/visualcore-contract.md)); A10-P03 next | `.autonomy/evidence/A10-P0{0,1,2}.json` |
+| A10 Neon Arcade | in progress, a candidate (not yet available): A10-P00 … A10-P03 pass — Neon Dodge with title, pause and game-over screens, five lanes, four licensed wave patterns, a capped difficulty ramp, swept collision (`Collision2D`), particle and ring effects, synthesized sounds (`SoundEffectSynth`, `SoundEffectPlayer`) and haptics with on/off settings, recorded-input replay and saved-state migration ([contract](docs/apps/neon-arcade/visualcore-contract.md)); A10-P04 next | `.autonomy/evidence/A10-P0{0,1,2,3}.json` |
 | A11–A25 | not started | `python3 Tools/python/desktop_runbook.py next` |
 | Shared round features (R02-F02 … F05, F26) | pass | `python3 scripts/migration_ledger.py status` |
 | Games of Rounds 2–12 | planned; none exists in source | [catalog](docs/catalog/experience-catalog.json) |
 | Physical-device testing | none run; waits for `ImplementationLock-100` | [support matrix](docs/release/support-matrix.md) |
 | App Store | no submission and nothing for sale; a one-time name and bundle reservation is prepared and waits for the owner (signing, App Store Connect and agreements are owner actions) | [build and archive](docs/release/build-and-archive.md), [name reservation](docs/release/name-reservation.md) |
 
-Ledger totals today: the legacy ledger records **76 of 263** gates as passed (F00–F09 and the app phases
-A01-P00 … A09-P06, A10-P00 … A10-P02); the unified-app ledger has 1,233 gates, with 9 experience gates (X-A01 … X-A09), 11 unified-app features,
+Ledger totals today: the legacy ledger records **77 of 263** gates as passed (F00–F09 and the app phases
+A01-P00 … A09-P06, A10-P00 … A10-P03); the unified-app ledger has 1,233 gates, with 9 experience gates (X-A01 … X-A09), 11 unified-app features,
 5 shared round features and both governance milestones passed.
 
 ```bash
