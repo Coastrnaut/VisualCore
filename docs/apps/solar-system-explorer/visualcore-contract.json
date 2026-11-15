@@ -449,7 +449,7 @@
       "id": "M06",
       "capability": "The Sun and eight major planets with curated fact cards and procedural surfaces (no licensed or other textures): sphere meshes with noise-coloured surfaces, Saturn's rings as a revolved ring, the Sun emissive, each body from a sourced catalog",
       "source": "v0.1 feature 1: Sun and eight major planets with curated fact cards (licensed textures replaced by procedural surfaces, canonical override)",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshGenerators.swift",
@@ -492,13 +492,13 @@
         "file": "Packages/ExperiencesCreative/TinyWorlds/Core/PropCatalog.swift",
         "symbol": "PropCatalog"
       },
-      "notes": "Spheres, revolved shapes, seeded 2D noise and per-vertex colour drawing exist and are tested (MeshDigestTests, MeshShapeTests, GradientNoise2DTests, MeshRendererColorTests). Missing: the body catalog with radii, elements, periods, tilts and facts with sources and units (G-CATALOG, app-local) and the procedural surfaces, bands, rings and Sun built from it (G-BODIES, app-local). The noise is 2D: sampling it by longitude and latitude seams at the date line and pinches at the poles, so G-BODIES must sample a periodic domain or blend; a 3D noise would be generic and is assessed there for VisualCoreScenes. A14-P01 (G-CATALOG): the catalog of the Sun and eight planets with sourced values and fact cards (SolarSystemExplorerCore BodyCatalog, FactCard; BodyCatalogTests) and a static line-up of nine lit procedural spheres (SolarPresenter; SolarRenderTests); the full scene, orbits and focus stay with G-BODIES and G-ORBIT."
+      "notes": "Spheres, revolved shapes, seeded 2D noise and per-vertex colour drawing exist and are tested (MeshDigestTests, MeshShapeTests, GradientNoise2DTests, MeshRendererColorTests). Missing: the body catalog with radii, elements, periods, tilts and facts with sources and units (G-CATALOG, app-local) and the procedural surfaces, bands, rings and Sun built from it (G-BODIES, app-local). The noise is 2D: sampling it by longitude and latitude seams at the date line and pinches at the poles, so G-BODIES must sample a periodic domain or blend; a 3D noise would be generic and is assessed there for VisualCoreScenes. A14-P01 (G-CATALOG): the catalog of the Sun and eight planets with sourced values and fact cards (SolarSystemExplorerCore BodyCatalog, FactCard; BodyCatalogTests) and a static line-up of nine lit procedural spheres (SolarPresenter; SolarRenderTests); the full scene, orbits and focus stay with G-BODIES and G-ORBIT. A14-P03 (G-BODIES, closed): procedural seam-free surfaces from a seeded 3D value noise of the unit direction (SphereNoise, SurfaceRecipe: banded giants, terrain, Earth's oceans and caps, the emissive Sun; SurfaceRecipeTests digests and seam checks), Saturn's two-sided rings from the NSSDCA Saturnian Rings Fact Sheet (RingRecord, RingRecordTests) drawn by SceneMeshes and SolarPresenter (SolarBodiesRenderTests)."
     },
     {
       "id": "M07",
       "capability": "Orbit view, planet focus and camera navigation: orbit lines for every planet, tap or list selection of a body, an eased focus flight that keeps the eye outside the body and inside the clip range (no near-clip surprises), reset to the overview",
       "source": "v0.1 feature 2: orbit view, planet focus and camera navigation; manual regression fixture body focus and near clip",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitCamera.swift",
@@ -547,7 +547,7 @@
         "file": "Packages/ExperiencesCreative/TinyWorlds/Core/CameraPolicy.swift",
         "symbol": "CameraPolicy"
       },
-      "notes": "The orbit camera, a clearance sphere around the target (OrbitViewBounds.minimumDistance), ray-sphere picking and closed tubes exist and are tested (OrbitCameraTests, OrbitViewBoundsTests, RayIntersectionTests, MeshShapeTests). Missing: orbit paths sampled from the orbit model (G-ORBIT), and the focus controller that sets target, distance and near/far per body so a focus flight never crosses the near plane, orbit lines and selection (G-BODIES). A14-P02 (G-ORBIT): orbit lines sampled from the orbit model (128 samples per orbit as closed tubes), focus on the selected body and stepped orbit, tilt and zoom with a minimum distance that keeps every body in front of the near plane (OrbitLayout, SolarPresenter; OrbitLayoutTests, SolarOrbitRenderTests); the eased focus flight and picking stay with G-BODIES (A14-P03)."
+      "notes": "The orbit camera, a clearance sphere around the target (OrbitViewBounds.minimumDistance), ray-sphere picking and closed tubes exist and are tested (OrbitCameraTests, OrbitViewBoundsTests, RayIntersectionTests, MeshShapeTests). Missing: orbit paths sampled from the orbit model (G-ORBIT), and the focus controller that sets target, distance and near/far per body so a focus flight never crosses the near plane, orbit lines and selection (G-BODIES). A14-P02 (G-ORBIT): orbit lines sampled from the orbit model (128 samples per orbit as closed tubes), focus on the selected body and stepped orbit, tilt and zoom with a minimum distance that keeps every body in front of the near plane (OrbitLayout, SolarPresenter; OrbitLayoutTests, SolarOrbitRenderTests); the eased focus flight and picking stay with G-BODIES (A14-P03). A14-P03 (G-BODIES, closed): an eased 30-frame focus flight with clearance push-out and a Reduce Motion cut (FocusFlight; FocusFlightTests over all 72 ordered body pairs in both scale modes); near and far per scale mode (ScaleMode.clipRange)."
     },
     {
       "id": "M08",
@@ -596,7 +596,7 @@
       "id": "M09",
       "capability": "Separate true-relative and visibility-enhanced size and distance modes with explicit kilometre and astronomical unit conversion, physical radii kept apart from display scale",
       "source": "v0.1 feature 4: separate true-relative and visibility-enhanced size/distance modes; manual algorithm decision 3",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreMath/Matrix.swift",
@@ -621,7 +621,7 @@
         "file": "Packages/ExperiencesCreative/TinyWorlds/Core/CameraPolicy.swift",
         "symbol": "CameraPolicy"
       },
-      "notes": "Double vectors and matrices for scaling exist and are tested (LinearAlgebraTests, OriginRebaseTests). No unit type or conversion between kilometres and astronomical units and no scale mode exist in any framework product. Unit conversion with the catalog's units is G-CATALOG; the two scale modes (one mapping, both driven by the same Double positions, the enhanced one always labelled not to scale) are G-BODIES; both app-local. A14-P01 (G-CATALOG): explicit units — km stored, AU derived through the exact 149,597,870.7 km, days and Julian years (Units; UnitsTests); the two scale modes stay with G-BODIES."
+      "notes": "Double vectors and matrices for scaling exist and are tested (LinearAlgebraTests, OriginRebaseTests). No unit type or conversion between kilometres and astronomical units and no scale mode exist in any framework product. Unit conversion with the catalog's units is G-CATALOG; the two scale modes (one mapping, both driven by the same Double positions, the enhanced one always labelled not to scale) are G-BODIES; both app-local. A14-P01 (G-CATALOG): explicit units — km stored, AU derived through the exact 149,597,870.7 km, days and Julian years (Units; UnitsTests); the two scale modes stay with G-BODIES. A14-P03 (G-BODIES, closed): the visibility-enhanced and true-relative scale modes from one Double source (ScaleMode; ScaleModeTests keep the catalog's radius-to-distance ratios within 0.1 % in the true-relative mode), switched by scale.mode and saved in state schema 3."
     },
     {
       "id": "M10",
@@ -726,7 +726,7 @@
       "id": "M13",
       "capability": "Double precision and camera-relative positions: orbital state kept in Double on the CPU, positions drawn relative to the camera or focus body as Float, precision assessed for the largest distances",
       "source": "cross-cutting: double precision and camera-relative positions; manual algorithm decision 2",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreMath/Vectors.swift",
@@ -763,7 +763,7 @@
         "file": "Packages/ExperiencesCreative/AudioOdyssey/Experience/OdysseyPresenter.swift",
         "symbol": "OdysseyPresenter"
       },
-      "notes": "Double vectors, a floating origin that subtracts in Double before converting to Float and a precision assessment exist and are tested (LinearAlgebraTests, OriginRebaseTests, PrecisionAdvisorTests). OriginRebase uses a fixed 1,024-unit grid; Solar System Explorer needs positions relative to the camera or focus body every frame and near/far planes chosen per scale mode across a range of about 10^5 to 10^6 (G-BODIES, app-local)."
+      "notes": "Double vectors, a floating origin that subtracts in Double before converting to Float and a precision assessment exist and are tested (LinearAlgebraTests, OriginRebaseTests, PrecisionAdvisorTests). OriginRebase uses a fixed 1,024-unit grid; Solar System Explorer needs positions relative to the camera or focus body every frame and near/far planes chosen per scale mode across a range of about 10^5 to 10^6 (G-BODIES, app-local). A14-P03 (G-BODIES, closed): positions minus the camera target in Double before conversion to Float (CameraRelative; PrecisionTests bound the error below 0.1 pixel for every body in both modes)."
     },
     {
       "id": "M14",
@@ -1095,7 +1095,7 @@
         "file": "Packages/ExperiencesCreative/FractalExplorer/Core/PrecisionLadder.swift",
         "symbol": "PrecisionLadder"
       },
-      "notes": "Non-colour state signs and announcements exist and are tested (AccessibilityPlansTests). The scale legend and its label rule depend on the scale modes (G-BODIES); the wording review against the model is G-REVIEW; both app-local."
+      "notes": "Non-colour state signs and announcements exist and are tested (AccessibilityPlansTests). The scale legend and its label rule depend on the scale modes (G-BODIES); the wording review against the model is G-REVIEW; both app-local. A14-P03 (G-BODIES, closed): the active scale mode shown and spoken (the Scale control's value and the canvas description end with the mode's label; the enhanced mode says not to scale); the wording review stays with G-REVIEW."
     },
     {
       "id": "M22",
@@ -1169,7 +1169,7 @@
         "file": "Packages/ExperiencesCreative/AudioOdyssey/Core/WorldPieces.swift",
         "symbol": "WorldPieces"
       },
-      "notes": "Tubes along a path (MeshShapeTests), projection to the screen (OrbitCameraTests), instanced quads through Camera2D (ParticleRendererTests), full-screen shader scenes and seeded random numbers (SeededRandomTests) exist. Missing: orbit samples from the model (G-ORBIT), and the orbit line, label placement and starfield of the solar system scene (G-BODIES, app-local); ParticleRenderer draws through Camera2D, so a 3D starfield is either sphere-mapped in a shader or projected stars."
+      "notes": "Tubes along a path (MeshShapeTests), projection to the screen (OrbitCameraTests), instanced quads through Camera2D (ParticleRendererTests), full-screen shader scenes and seeded random numbers (SeededRandomTests) exist. Missing: orbit samples from the model (G-ORBIT), and the orbit line, label placement and starfield of the solar system scene (G-BODIES, app-local); ParticleRenderer draws through Camera2D, so a 3D starfield is either sphere-mapped in a shader or projected stars. A14-P03 (G-BODIES, closed): orbit lines for both scale modes and a seeded 400-star backdrop centred on the eye inside the far plane (SceneMeshes; SceneMeshesTests); the native labels at projected positions moved to G-TOURS (A14-P04)."
     },
     {
       "id": "M24",
@@ -1258,10 +1258,10 @@
       ],
       "kind": "adaptation",
       "owner": "app-local",
-      "justification": "Spheres, revolved rings, 2D noise, tubes, the lit mesh renderer, the orbit camera with a clearance sphere, OriginRebase and ray-sphere picking exist, but the solar system scene does not: procedural planet surfaces (sampled without date-line seams or pole pinches), Saturn's rings, the emissive Sun, the starfield, orbit lines and labels, camera-relative per-body transforms with near/far chosen per scale mode, the focus controller that never crosses the near plane, and the true-relative and visibility-enhanced scale modes with their label. These are app-local over MeshRenderer, the noise and OrbitCamera (clarification 5, manual phase 03 camera and 3D body rendering, A14-P03); a 3D or seamless spherical noise is assessed for VisualCoreScenes there.",
+      "justification": "Spheres, revolved rings, 2D noise, tubes, the lit mesh renderer, the orbit camera with a clearance sphere, OriginRebase and ray-sphere picking exist, but the solar system scene does not: procedural planet surfaces (sampled without date-line seams or pole pinches), Saturn's rings, the emissive Sun, the starfield, orbit lines and labels, camera-relative per-body transforms with near/far chosen per scale mode, the focus controller that never crosses the near plane, and the true-relative and visibility-enhanced scale modes with their label. These are app-local over MeshRenderer, the noise and OrbitCamera (clarification 5, manual phase 03 camera and 3D body rendering, A14-P03); a 3D or seamless spherical noise is assessed for VisualCoreScenes there. A14-P03 (closing): the native labels placed at projected body positions share the canvas overlay of the tours' captions and moved to G-TOURS (row M23 is listed there too); the seamless 3D noise stayed app-local (SolarSystemExplorerCore SphereNoise, one consumer), to be reassessed for VisualCoreScenes if a second experience needs it.",
       "phase": 3,
       "test": "Core and experience tests: body surface meshes are deterministic by digest and seam-free at the date line; camera-relative positions keep Float error below a stated fraction of a pixel for every body in both scale modes; focus flights to every body keep the eye outside the body and the body inside near/far at every sampled step; the true-relative mode keeps catalog ratios and the enhanced mode is always labelled not to scale; drawn orbit lines follow the model's samples; context recreation redraws the same image within a pixel tolerance",
-      "closed": null
+      "closed": "A14-P03"
     },
     {
       "id": "G-TIME",
@@ -1282,13 +1282,14 @@
       "id": "G-TOURS",
       "matrix": [
         "M10",
-        "M11"
+        "M11",
+        "M23"
       ],
       "kind": "adaptation",
       "owner": "app-local",
-      "justification": "TourTimeline (2D PlaneFraming stops), CameraRail, the announcement planner and ExperienceStorage exist, but captioned 3D tours over bodies, fact cards showing units and citations, and the saved view document (camera, simulated date, rate, scale mode, selected body) do not. They are Solar System Explorer's content and UI, app-local over TourTimeline's timing, OrbitCamera and ExperienceStorage (clarification 5, manual phase 04 guided tours, A14-P04); a generic 3D orbit-camera tour track is assessed for VisualCoreMath there.",
+      "justification": "TourTimeline (2D PlaneFraming stops), CameraRail, the announcement planner and ExperienceStorage exist, but captioned 3D tours over bodies, fact cards showing units and citations, and the saved view document (camera, simulated date, rate, scale mode, selected body) do not. They are Solar System Explorer's content and UI, app-local over TourTimeline's timing, OrbitCamera and ExperienceStorage (clarification 5, manual phase 04 guided tours, A14-P04); a generic 3D orbit-camera tour track is assessed for VisualCoreMath there. From A14-P03: the native labels at projected body positions (row M23), which share the captions' canvas overlay.",
       "phase": 4,
-      "test": "Core and experience tests: each bundled tour is bounded in stops and duration, every stop has a caption and a valid body, pause and skip work, and Reduce Motion cuts between stops; every fact card value shows units and a citation present in the catalog; the saved view document round-trips, and damaged, newer and oversized files are reported",
+      "test": "Core and experience tests: each bundled tour is bounded in stops and duration, every stop has a caption and a valid body, pause and skip work, and Reduce Motion cuts between stops; every fact card value shows units and a citation present in the catalog; the saved view document round-trips, and damaged, newer and oversized files are reported; each label sits at its body's projected position, never overlaps the controls and is hidden for a body behind the camera",
       "closed": null
     },
     {

@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_app_contract.py",
+    "--app",
+    "solar-system-explorer",
+    "--render"
+  ],
+  "command": "python3 scripts/check_app_contract.py --app solar-system-explorer --render",
+  "elapsed_seconds": 0.045,
+  "exit_code": 0,
+  "finished": "2026-11-15T22:01:45+00:00",
+  "log": ".autonomy/logs/A14-P03.contract.log",
+  "log_sha256": "5035794eb9e635ee3fe424444694e5a11228f5de07c397781475486737965ed0",
+  "name": "contract",
+  "stage": "A14-P03",
+  "started": "2026-11-15T22:01:45+00:00",
+  "timed_out": false
+}
