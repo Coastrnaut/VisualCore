@@ -22,7 +22,7 @@ device campaign (owner, 2026-11-13/14). Precedent: `specs/077-na-p03-effects/tas
 
 ## Phase 4: Polish & evidence
 
-- [ ] T-A10-406 Arcade tests on sim-27.2 (`--name arcade-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing NeonArcadeCoreTests NeonArcadeExperienceTests`; each test < 10 s) (SC-A10-401–404, 406)
+- [X] T-A10-406 Arcade tests on sim-27.2 (`--name arcade-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing NeonArcadeCoreTests NeonArcadeExperienceTests`; each test < 10 s) (SC-A10-401–404, 406) — Verified 2026-11-14: 2026-11-14: .autonomy/checks/A10-P04.arcade-ios27.json exit 0 (182 tests on sim-27.2)
 - [ ] T-A10-407 App build, unit and the UI chunk (`--name app-ui -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27 app-ui-ios27-r2`) and runner iOS 27 (`--name verify-27 -- python3 scripts/verify_experiences.py --only a10.neon-arcade --runtime 27`) (SC-A10-405, 406)
 - [ ] T-A10-408 Experience package check and script tests (`--name experience-packages -- python3 scripts/check_experience_packages.py`; `--name script-tests -- python3 scripts/test_scripts.py`)
 - [ ] T-A10-409 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A10-P04
