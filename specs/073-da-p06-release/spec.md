@@ -165,7 +165,12 @@ ambient mode and saved aquariums; the release build and its checks pass.
 - **FR-A09-621**: The shared copy-claim check MUST pass on the store text and the interface copy, and the Digital Aquarium
   scan MUST find none of the realism and animal-care words (Clarifications Q2).
 - **FR-A09-622**: Known limitations MUST list Digital Aquarium's device-only items; the device-campaign plan names each
-  measurement with its device and pass criterion, results pending; the release checklist marks them `device`.
+  measurement with its device and pass criterion, results pending; the release checklist marks them
+  `pending-campaign-ii`.
+- **FR-A09-623**: Accessibility MUST be covered in the release checklist: the automated proofs (canvas description and
+  announcements, Reduce Motion halving, labelled controls for every gesture action) as `verified` with their tests, and
+  the device audits (VoiceOver, Dynamic Type, Reduce Motion, contrast, system accessibility audits) as
+  `pending-campaign-ii` rows naming the device-campaign rows.
 
 **Interface and builds (story 4)**
 - **FR-A09-630**: An interface test chunk for Digital Aquarium MUST pass on the iOS 27 phone simulator, each test < 60 s.
