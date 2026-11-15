@@ -684,14 +684,27 @@ extension PhysicsWorld {
     /// ``migrated(fromSchemaTwo:)``. Throws the decoder's error for malformed data and
     /// ``DecodeError/unsupportedSchema(_:)`` for another schema. Not validated.
     public static func decode(_ data: Data) throws -> PhysicsWorld {
+        try JSONDecoder().decode(AnySchema.self, from: data).world
+    }
+
+    /// Decodes a world record of schema 1, 2 or 3 from `decoder` exactly as ``decode(_:)`` does from data (feature
+    /// 085, A11-P04 T-A11-402: a record nested in another document, such as an experiment file, is read through the
+    /// same path). Throws the decoder's error for a malformed record and ``DecodeError/unsupportedSchema(_:)`` for
+    /// another schema. Not validated.
+    public static func decode(from decoder: Decoder) throws -> PhysicsWorld {
         struct Header: Decodable { var schema: Int }
-        let decoder = JSONDecoder()
-        let header = try decoder.decode(Header.self, from: data)
+        let header = try Header(from: decoder)
         switch header.schema {
-        case 1: return migrated(fromSchemaOne: try decoder.decode(SchemaOne.self, from: data))
-        case 2: return migrated(fromSchemaTwo: try decoder.decode(SchemaTwo.self, from: data))
-        case schemaVersion: return try decoder.decode(PhysicsWorld.self, from: data)
+        case 1: return migrated(fromSchemaOne: try SchemaOne(from: decoder))
+        case 2: return migrated(fromSchemaTwo: try SchemaTwo(from: decoder))
+        case schemaVersion: return try PhysicsWorld(from: decoder)
         default: throw DecodeError.unsupportedSchema(header.schema)
         }
+    }
+
+    /// A world record of any supported schema, decoded through ``decode(from:)``.
+    private struct AnySchema: Decodable {
+        var world: PhysicsWorld
+        init(from decoder: Decoder) throws { world = try PhysicsWorld.decode(from: decoder) }
     }
 }
