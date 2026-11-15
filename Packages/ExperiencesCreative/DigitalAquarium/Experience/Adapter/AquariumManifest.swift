@@ -1,4 +1,5 @@
-// AquariumManifest — feature 068 (A09-P01) T-A09-105 (FR-A09-122; SC-A09-105). The scenarios the verification runner
+// AquariumManifest — feature 068 (A09-P01) T-A09-105 (FR-A09-122; SC-A09-105); fixtures 6 and 7 feature 069 (A09-P02)
+// T-A09-207 (FR-A09-213). The scenarios the verification runner
 // plays for Digital Aquarium: the nine standard ones and one `fixture-<n>` per catalog regression fixture this phase
 // can express through actions (research D6), all short (owner rule of 2026-11-13). Host steps advance the fish, so the
 // expected digests are derived by playing the entries on a core exactly as the engine plays them (the steps of an
@@ -60,7 +61,11 @@ extension AquariumCore {
     /// 3. no fast-forward: paused, then 300 steps change nothing (a suspension stops host steps the same way);
     /// 4. validated catalog: both starter habitats are applied in turn (the bundled catalog validates; refusals of
     ///    malformed catalogs are proved by `SpeciesCatalogTests`);
-    /// 5. bounded counts: five habitat switches never grow the fish or plant counts beyond the habitat's definition.
+    /// 5. bounded counts: five habitat switches never grow the fish or plant counts beyond the habitat's definition;
+    /// 6. schooling (feature 069, T-A09-207): the Reef habitat swims for 1,800 steps (30 s); `AquariumManifestTests`
+    ///    checks that same-species fish end closer together and heading alike (`SchoolMetrics`);
+    /// 7. save/load: the Kelp habitat at bright lighting after 240 steps, with its starter decor; the test round-trips it
+    ///    through a snapshot and compares species, decor transforms and lighting.
     public static var fixtureEntries: [[ScenarioStep]] {
         func step(_ control: String, _ values: [Double], steps: Int = 5) -> ScenarioStep {
             ScenarioStep(steps: steps, action: ScriptedAction(control, values), result: "accepted")
@@ -72,6 +77,8 @@ extension AquariumCore {
             [step("habitat.select", [1], steps: 30), step("habitat.select", [0], steps: 30), ScenarioStep(steps: 30)],
             [step("habitat.select", [1]), step("habitat.select", [0]), step("habitat.select", [1]),
              step("habitat.select", [0]), step("habitat.select", [1]), ScenarioStep(steps: 60)],
+            [step("habitat.select", [0]), ScenarioStep(steps: 1_800)],
+            [step("habitat.select", [1]), step("lighting.level", [2]), ScenarioStep(steps: 240)],
         ]
     }
 

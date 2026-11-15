@@ -12,7 +12,7 @@
 
       ],
       "expect" : {
-        "initialDigest" : "ec1934651cc969ec011c2889f26b30a2daa3288abcb622881cc2e6e149f687c9"
+        "initialDigest" : "8f49285453d508389732cd3392ec72fd85d418669f3db6994cbd96fc1a3b95a2"
       },
       "name" : "launch-first-frame",
       "seed" : "7"
@@ -51,8 +51,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "2173d14fab648ec582d878bfb3d394cbbe7a431cc93a8fa2c90fbc09fbe37294",
-        "initialDigest" : "ec1934651cc969ec011c2889f26b30a2daa3288abcb622881cc2e6e149f687c9"
+        "finalDigest" : "35ccddad55916eedddd7a25ec1071438533375a63eae9bebb6a4de3a4d1f836c",
+        "initialDigest" : "8f49285453d508389732cd3392ec72fd85d418669f3db6994cbd96fc1a3b95a2"
       },
       "name" : "input-response",
       "seed" : "7"
@@ -149,8 +149,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "2173d14fab648ec582d878bfb3d394cbbe7a431cc93a8fa2c90fbc09fbe37294",
-        "initialDigest" : "ec1934651cc969ec011c2889f26b30a2daa3288abcb622881cc2e6e149f687c9"
+        "finalDigest" : "35ccddad55916eedddd7a25ec1071438533375a63eae9bebb6a4de3a4d1f836c",
+        "initialDigest" : "8f49285453d508389732cd3392ec72fd85d418669f3db6994cbd96fc1a3b95a2"
       },
       "name" : "save-restore",
       "seed" : "7"
@@ -189,7 +189,7 @@
         }
       ],
       "expect" : {
-        "initialDigest" : "ec1934651cc969ec011c2889f26b30a2daa3288abcb622881cc2e6e149f687c9",
+        "initialDigest" : "8f49285453d508389732cd3392ec72fd85d418669f3db6994cbd96fc1a3b95a2",
         "resetDigest" : true
       },
       "name" : "reset",
@@ -243,8 +243,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "8e7b12e3993fd92b7ced02fcf8f75185aac695814ab395dd4f988129a8d80e62",
-        "initialDigest" : "ec1934651cc969ec011c2889f26b30a2daa3288abcb622881cc2e6e149f687c9"
+        "finalDigest" : "6f84e29dfc4fb37dd8741180076e69f971e9df7621d2a67597985b083545a2ec",
+        "initialDigest" : "8f49285453d508389732cd3392ec72fd85d418669f3db6994cbd96fc1a3b95a2"
       },
       "name" : "fixture-1",
       "seed" : "7"
@@ -276,8 +276,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "53aacf0621b07740c6c0d1f91b39fca465a14c79157f80a1299cd06c910d1243",
-        "initialDigest" : "ec1934651cc969ec011c2889f26b30a2daa3288abcb622881cc2e6e149f687c9"
+        "finalDigest" : "f8fab0aa9c70d10f44a411f88f073da3f6a6fa25be17d0af21ebc7cbecdba817",
+        "initialDigest" : "8f49285453d508389732cd3392ec72fd85d418669f3db6994cbd96fc1a3b95a2"
       },
       "name" : "fixture-2",
       "seed" : "7"
@@ -299,8 +299,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "c68ddb99aaeea5a9f530493ab48216f742a1489605e52f473f914e8911e1ee78",
-        "initialDigest" : "ec1934651cc969ec011c2889f26b30a2daa3288abcb622881cc2e6e149f687c9"
+        "finalDigest" : "2d220e0e5f95e42d6e2f8bbebc514d470876adde7a8ef1b24cd02eb2b5f563de",
+        "initialDigest" : "8f49285453d508389732cd3392ec72fd85d418669f3db6994cbd96fc1a3b95a2"
       },
       "name" : "fixture-3",
       "seed" : "7"
@@ -332,8 +332,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "6840409c05fe253913d3aff99c37c7c06aa1e4162ccc393a1591bedab3112768",
-        "initialDigest" : "ec1934651cc969ec011c2889f26b30a2daa3288abcb622881cc2e6e149f687c9"
+        "finalDigest" : "d6a9cd20791abd81d7e27e27995c67d3622c8ceb5632d48bc7e7883cc3de9548",
+        "initialDigest" : "8f49285453d508389732cd3392ec72fd85d418669f3db6994cbd96fc1a3b95a2"
       },
       "name" : "fixture-4",
       "seed" : "7"
@@ -395,10 +395,66 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "485b9d3f551a2c295ed118f61263bacddef873ab8b7e664c021701ecd11722c1",
-        "initialDigest" : "ec1934651cc969ec011c2889f26b30a2daa3288abcb622881cc2e6e149f687c9"
+        "finalDigest" : "841b789ce5ac53219f74c742e1b525e8d93fee52a578582e25b31dfeb99b5a2c",
+        "initialDigest" : "8f49285453d508389732cd3392ec72fd85d418669f3db6994cbd96fc1a3b95a2"
       },
       "name" : "fixture-5",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "habitat.select",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "steps" : 1800
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ed8b20d1104d85ed6422fa3a76fc8b0d91cefdb2d7189fc799548f91c34d8195",
+        "initialDigest" : "8f49285453d508389732cd3392ec72fd85d418669f3db6994cbd96fc1a3b95a2"
+      },
+      "name" : "fixture-6",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "habitat.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "action" : {
+            "control" : "lighting.level",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "steps" : 240
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "0e461cf90091fb87024053d00bcdfcd58486b74a568256d2ef5ad662b67170f8",
+        "initialDigest" : "8f49285453d508389732cd3392ec72fd85d418669f3db6994cbd96fc1a3b95a2"
+      },
+      "name" : "fixture-7",
       "seed" : "7"
     }
   ],

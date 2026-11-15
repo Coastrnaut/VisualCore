@@ -1,5 +1,6 @@
-// AquariumManifestTests — feature 068 (A09-P01) T-A09-105 (FR-A09-122; SC-A09-105). The scenario manifest of Digital
-// Aquarium: valid with the nine standard scenarios and the five fixtures of this phase (swim bounds, save/restore, no
+// AquariumManifestTests — feature 068 (A09-P01) T-A09-105 (FR-A09-122; SC-A09-105); fixtures 6 and 7 feature 069
+// (A09-P02) T-A09-207 (FR-A09-213). The scenario manifest of Digital Aquarium: valid with the nine standard scenarios
+// and seven fixtures (A09-P01's five plus schooling and save/load) (swim bounds, save/restore, no
 // fast-forward while paused, both validated habitats, bounded counts), its derived digests and expected results equal
 // to what the engine gives when the runner plays them, the fixtures ending in the states they name, and the committed
 // `scenario-manifest.json` equal to the Swift manifest (`UPDATE_SCENARIO_MANIFEST=1`, on the simulator
@@ -29,13 +30,13 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
 }
 
 @Suite struct AquariumManifestTests {
-    @Test func theManifestIsValidWithTheNineStandardScenariosAndFiveFixtures() {
+    @Test func theManifestIsValidWithTheNineStandardScenariosAndSevenFixtures() {
         let manifest = AquariumCore.manifest(for: id)
         let problems = ScenarioManifestValidator.problems(manifest, controls: AquariumCore.controls,
-                                                          content: ContentRequirement(fixtures: 5))
+                                                          content: ContentRequirement(fixtures: 7))
         #expect(problems.isEmpty, "\(problems)")
         #expect(Set(manifest.scenarios.map(\.name))
-                == Set(ScenarioManifest.standardNames).union((1...5).map { "fixture-\($0)" }))
+                == Set(ScenarioManifest.standardNames).union((1...7).map { "fixture-\($0)" }))
     }
 
     @Test func derivedDigestsAndResultsAreWhatTheEngineGives() async throws {
@@ -87,6 +88,23 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
         #expect(switched.fish.count == kelpHabitat.species.reduce(0) { $0 + $1.count })
         #expect(switched.plants.count == kelpHabitat.plants.count)
         #expect(switched.fish.count <= 24 && switched.plants.count <= 12)
+
+        // 6. Schooling: after 30 s same-species fish are closer than at the start and than other species, heading
+        //    alike (SC-A09-201, 202 for this seed; the 20-seed counts are proved by `SchoolingTests`).
+        let start = AquariumCore.played(seed: seed, entries: Array(fixtures[5].prefix(1))).state.document
+        let schooled = AquariumCore.played(seed: seed, entries: fixtures[5]).state.document
+        let same0 = try? #require(SchoolMetrics.meanSameSpeciesDistance(start))
+        let same = SchoolMetrics.meanSameSpeciesDistance(schooled) ?? .infinity
+        let cross = SchoolMetrics.meanCrossSpeciesDistance(schooled) ?? 0
+        #expect(same <= 0.6 * (same0 ?? 0) && same < cross, "same \(same) from \(same0 ?? 0), cross \(cross)")
+        #expect((SchoolMetrics.headingAgreement(schooled) ?? 0) >= 0.7)
+
+        // 7. Save/load: the Kelp habitat at bright lighting with its starter decor survives a snapshot round trip.
+        let saved = AquariumCore.played(seed: seed, entries: fixtures[6])
+        #expect(saved.document.habitatIndex == 1 && saved.document.lighting == 2)
+        #expect(saved.document.decor == catalog.habitats[1].decor.map(DecorPlacement.init))
+        let restored = try? AquariumCore.restore(payload: saved.snapshotPayload(), seed: seed)
+        #expect(restored?.state == saved.state)
     }
 
     /// The JSON form with the control ids, named by `Catalog/registrations.json`. `UPDATE_SCENARIO_MANIFEST=1`
