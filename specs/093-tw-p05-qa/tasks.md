@@ -1,0 +1,49 @@
+# Tasks: Tiny Worlds — Phase 05 Memory, thermal and content QA
+
+**Input**: [spec.md](spec.md), [plan.md](plan.md), [research.md](research.md), [data-model.md](data-model.md),
+[contracts/detail-tiers.md](contracts/detail-tiers.md), [quickstart.md](quickstart.md). Gate A12-P05 (legacy).
+Evidence: `python3 Tools/python/desktop_runbook.py run-check --stage A12-P05 --timeout 600 --name <check> -- <command>`.
+Commit after every task (no trailers); read every check's exit before ticking. iOS 27 only; device tasks tagged {device}
+stay open until ImplementationLock-100. Precedents: `specs/086-pp-p05-stability/tasks.md`,
+`specs/092-tw-p04-packs/tasks.md`.
+
+## Phase 1: Setup
+
+- [ ] T-A12-501 Baseline: cite the A12-P04 evidence on the unchanged tree (`.autonomy/checks/A12-P04.{worlds-ios27,app-unit,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14)
+
+## Phase 2: Foundational — tier table and tier policy in the core
+
+- [ ] T-A12-502 [US1] Core: new `Packages/ExperiencesCreative/TinyWorlds/Core/DetailTier.swift` and `Packages/ExperiencesCreative/TinyWorlds/Core/TierPolicy.swift` per research D1–D2 and data-model.md: `DetailTier` tiers 0…2 (tier i = terrain level i via `TerrainDetail.columns/rows(preset:level:)`; terrain vertices (cols + 1) × (rows + 1); draws(props) = 2 + props; thumbnail 160 × 120; "lower tiers never raise a count; derived, never saved"); `TierPolicy` value type ("tier = max(host, lowPower ? 2 : 0, held ? 2 : 0); presentation only, never saved"; host clamped 0…2; `recordMemoryWarning(at:)`; held while now − lastWarning < 30 s; non-finite clock values ignored); tests in `Packages/ExperiencesCreative/TinyWorlds/CoreTests/{DetailTierTests,TierPolicyTests}.swift`: table counts per preset (64/32/16, city 48/24/12) strictly decreasing, draws equal at every tier, thumbnail fixed; scripted pressure sequences (host 0→1→2→0, Low Power on/off, a warning then 29.9 s and 30 s, repeated warnings restarting the hold, Low Power at time 0) give the stated tiers (FR-A12-501, 502; SC-A12-501, 502)
+- [ ] T-A12-503 [P] [US4] Documents: `docs/apps/tiny-worlds/README.md` "Capabilities and their proof" table (each capability of the a12 registration with at least one existing "File.swift testName"), new `docs/apps/tiny-worlds/device-campaign.md` (TW-D1 frame pacing per tier on the reference phone and tablet, TW-D2 thermal state over a 10-minute run, TW-D3 memory high-water mark across pack switches, TW-D4 touch latency of orbit and place, TW-D5 accessibility audits; device, procedure, threshold, status "pending device campaign", {device}) linked from the README, and new `specs/093-tw-p05-qa/scan-claims.sh` modelled on `specs/086-pp-p05-stability/scan-claims.sh` (refuses accurate, accuracy, precise, precision, scientific, realistic, real-world, geographic, fps, frames per second, battery and `<number> ms` in the a12 catalog entry and the README, non-goals line exempt; every capability has a row; every named test exists) (FR-A12-506, 507; SC-A12-505)
+
+## Phase 3: Stories 1–3 — the policy in the experience and the fixtures
+
+- [ ] T-A12-504 [US1] Experience: `Packages/ExperiencesCreative/TinyWorlds/Experience/WorldsPresenter.swift` evaluates `TierPolicy` once per frame before drawing (host tier from the shell, Low Power Mode injected `lowPowerMode`, default `ProcessInfo.processInfo.isLowPowerModeEnabled`, presenter frame clock that does not reset on `setup`), draws the policy's tier, exposes `lastTier`, and records a warning in `shedCaches()`; `Packages/ExperiencesCreative/TinyWorlds/Experience/TinyWorldsExperience.swift` factory passes `lowPowerMode`; tests in `Packages/ExperiencesCreative/TinyWorlds/ExperienceTests/WorldsQualityTests.swift`: declared tiers = presenter levels = 3 (level-0…2); a memory warning → tier 2 on the next frame, back to the host tier after 30 s of frames; Low Power → tier 2 from the first frame; repeated warnings rebuild the terrain at most once; terrain vertices and draws per tier match `DetailTier`; digest equal across tiers (FR-A12-502, 505; SC-A12-501, 502)
+- [ ] T-A12-505 [US2] Stale objects: `Packages/ExperiencesCreative/TinyWorlds/ExperienceTests/WorldsStaleObjectTests.swift` per research D4 — 20 cycles of open pack (cycling three), save slot 0 and open it, set host tier (cycling 0…2), recreate the context, close and reopen the session; `liveCount` and `liveBytes` equal cycle 1's, `leaked` 0, `lastCloseCounts.objects` 0 every close (FR-A12-503; SC-A12-503)
+- [ ] T-A12-506 [US3] Saved worlds across tiers and packs: `Packages/ExperiencesCreative/TinyWorlds/ExperienceTests/WorldStoreTests.swift` saves each pack at each tier and reopens at another tier: documents and digests identical, thumbnail 160 × 120 PNG ≤ 64 KB (FR-A12-504; SC-A12-504)
+- [ ] T-A12-507 [US1] Manifest fixtures `fixture-tier-digest` (pack, props, light; digest equal at every tier) in `Packages/ExperiencesCreative/TinyWorlds/Experience/Adapter/WorldsManifest.swift`; regenerate `Packages/ExperiencesCreative/TinyWorlds/scenario-manifest.json` (`UPDATE_SCENARIO_MANIFEST=1 TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`); `WorldsManifestTests` updated (FR-A12-502)
+- [ ] T-A12-508 [US4] Registration and records: `Catalog/registrations.json` a12 summary and capabilities true and proven ("three detail tiers that lighten under memory warnings, heat and Low Power Mode"), `quality_tiers` ["level-0", "level-1", "level-2"]; `python3 scripts/build_catalog.py`; contract `docs/apps/tiny-worlds/visualcore-contract.json` and `.md` (G-DETAIL closed by "A12-P05"; M11 available) (FR-A12-505, 506)
+- [ ] T-A12-509 [US1] {device} Device campaign measurements per `docs/apps/tiny-worlds/device-campaign.md` (TW-D1…D5) — runs only after ImplementationLock-100
+
+## Phase 4: Polish & evidence
+
+- [ ] T-A12-510 Worlds tests on sim-27.2 (`--name worlds-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing TinyWorldsCoreTests TinyWorldsExperienceTests`; each test < 10 s) (SC-A12-506)
+- [ ] T-A12-511 App build and unit (`--name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`) and runner iOS 27 (`--name verify-27 -- python3 scripts/verify_experiences.py --only a12.tiny-worlds --runtime 27`) (SC-A12-506)
+- [ ] T-A12-512 Claims scan, catalog, packages, contract, distinctiveness and script tests (`--name claims -- bash specs/093-tw-p05-qa/scan-claims.sh`; `--name catalog -- python3 scripts/build_catalog.py --check`; `--name experience-packages -- python3 scripts/check_experience_packages.py`; `--name contract -- python3 scripts/check_app_contract.py --app tiny-worlds --render`; `--name distinctiveness -- python3 scripts/check_distinctiveness.py --check`; `--name script-tests -- python3 scripts/test_scripts.py`) (SC-A12-505)
+- [ ] T-A12-513 Run `/speckit-converge` and `/speckit-implement` until nothing is appended (T-A12-509 {device} stays open by design); then seal and record A12-P05; update README.md (status, gate count) in the record commit (rule 16)
+- [ ] T-A12-514 As-built notes in `specs/093-tw-p05-qa/research.md` (measured host timing of the 20-cycle fixture, recorded, not asserted)
+
+## Dependencies
+
+T-A12-501 → 502 → 504 → 505, 506, 507 → 508 → Polish; 503 in parallel with 502 (different files). T-A12-509 waits for
+ImplementationLock-100.
+
+## Parallel examples
+
+Agent A: T-A12-502. Agent C: T-A12-503 (documents). Agent B: T-A12-504–506 after A. Lead: 507 regeneration, 508, runs,
+commits.
+
+## Implementation strategy
+
+MVP: the tier policy under pressure with an unchanged world (US1); then the stale-object fixture (US2), saved worlds
+across tiers (US3), the truthful catalog entry and device plan (US4); evidence last.
