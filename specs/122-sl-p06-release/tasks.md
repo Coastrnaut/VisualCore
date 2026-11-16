@@ -12,7 +12,7 @@ Precedent: `specs/115-me-p06-release/tasks.md`.
 
 ## Phase 2: Story 1 — nothing leaves the device
 
-- [ ] T-A16-602 [P] [US1] Write `docs/apps/simulation-lab/privacy-and-credits.md` per research D1:
+- [X] T-A16-602 [P] [US1] Write `docs/apps/simulation-lab/privacy-and-credits.md` per research D1: — Verified 2026-11-16: 2026-11-16: docs/apps/simulation-lab/privacy-and-credits.md written (stored files and places, deletion, nothing sent, the share sheet; license inventory of six presets, three palettes and seven shader programs); validate_docs.py PASS
   - what is stored: `preset-<uuid>.json` in the experience's storage, the session state, and the latest capture in
     `tmp/a16-captures`, emptied on open;
   - that nothing is sent and no permission is asked, and how data is deleted;
