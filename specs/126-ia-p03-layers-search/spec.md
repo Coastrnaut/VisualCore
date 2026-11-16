@@ -29,6 +29,68 @@ Canonical overrides:
   the public API baseline. The reference regression runs at X-A17.
 - Follow `specs/112-me-p03-selection` and `specs/125-ia-p02-scene-selection`.
 
+## Clarifications
+
+### Session 2026-11-16
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- `CatalogSearch.fold` (`VisualCoreExperience`) and `DocumentEnvelope` and `MigrationChain` (`VisualCorePersistence`)
+  are pure Foundation, so the core may use them.
+- `ExperienceStorage` writes, reads and lists named files but exposes no directory, so `DocumentStore`, which needs one,
+  does not fit. Simulation Lab's preset store writes enveloped JSON through `ExperienceStorage` instead.
+- `MeshRenderer`'s fragment shader writes premultiplied colour (`rgb × a`, `a`).
+- `DepthMeshPass.draw` disables blending, enables depth testing with `LESS` and depth writing, draws the items in
+  order and blits.
+
+- Q: How does search match and rank? → A:
+  - **Index:** each part's English name, standard name and synonyms, each folded with `CatalogSearch.fold`.
+  - **Query:** folded and trimmed. It matches a field when it equals the field or is a prefix of one of the field's
+    words.
+  - **Ranks:** an exact name (English or standard) 0; a name word prefix 1; an exact synonym 2; a synonym word prefix
+    3; a description word prefix 4, only for queries of 3 or more characters.
+  - **Order:** by rank, then inventory order, at most 14 results, each part once at its best rank. An empty query lists
+    the 14 parts in inventory order.
+  - **Content version 2** adds the synonyms "Thigh bone" (femur), "Shin bone" (tibia), "Calf bone" (fibula) and
+    "Kneecap" (patella), still validated against collisions.
+- Q: What exactly is the additive translucent stage in VisualCore? → A: All of it is in `VisualCoreRendering`:
+  - **API:** `DepthMeshPass.Item` gets `center: Vec3`, a model-space sort point that defaults to the origin. A new
+    `draw(_ opaque:translucent:view:projection:fog:context:)` takes both lists.
+  - **Existing calls:** the existing `draw` overloads forward with no translucent items, and that path runs exactly
+    the code it runs today, so its output is bit-identical.
+  - **Translucent items:** drawn after the opaque ones, sorted back to front by the view-space depth of
+    `model × center`, with equal depths kept in submission order. Blending is ONE, ONE_MINUS_SRC_ALPHA, because the
+    shader output is premultiplied. Depth testing stays on with `LESS`, depth writing is off, and the state is restored
+    afterwards.
+  - **Ghost style:** a ghost is its layer's material at alpha 0.25.
+  - **Failure:** if the translucent draw throws, the presenter falls back to the hide mode. The panel then says "Ghosts
+    are off." and the fallback is counted.
+- Q: What are the isolate actions and rules? → A:
+  - **Actions:** `isolate.part [0…13]`, `isolate.layer [0…2]`, `isolate.mode [0 hide / 1 ghost]` (ghost by default),
+    and `isolate.clear` ("Show all").
+  - **Solid set:** the isolated set plus the selection. Isolate shows its set even when the set's layer is toggled off.
+  - **Ghost set:** in the ghost mode, every other part whose layer is shown; in the hide mode, nothing.
+  - **Picking and selecting:** only solid parts are picked, and the list selects solid parts only (refused with
+    `a17.hidden-structure` otherwise).
+  - **Without isolate:** the A17-P02 rules hold.
+- Q: How is the view saved? → A: As one file `view.json` in the experience's storage, written atomically through
+  `ExperienceStorage`. It holds a `DocumentEnvelope` of kind `a17.view` with the view state's schema 2 payload:
+  - **Payload:** the schema 1 fields plus `isolate` (optional: kind `part` or `layer`, its id, the mode).
+  - **Migration:** a `MigrationChain` step 1 → 2 adds no isolate. The same chain serves the session snapshot.
+  - **Unknown ids:** a selection, framing or isolate id that does not resolve is dropped, and the drop is reported in
+    a list of reasons.
+  - **When:** the presenter writes the file after each accepted action that changes the view. The experience opens
+    from the file when the host gives no snapshot.
+  - **Refused data:** damaged or newer files are refused, with the reason recorded, and the opening view is used.
+- Q: What do the panel and the sources document show? → A:
+  - **Panel:** a native section below the list. It shows the English name as its heading, the standard name, the layer
+    in words, the description, and each citation as "Title, edition, section (license)". Then comes "Not reviewed by a
+    clinician." With nothing selected it says "Select a structure to read about it."
+  - **Panel text:** built in the core by `AnatomyPanel` from the content, so it is tested without a GPU.
+  - **Sources document:** `docs/apps/interactive-anatomy/content-sources.md` gets a generated table between
+    `<!-- BEGIN GENERATED -->` and `<!-- END GENERATED -->`: part, standard name, citations and licenses. It is
+    written by a core test under `UPDATE_DATA_SOURCES=1`, and the test fails when the committed table differs.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Find a structure by name (Priority: P1) 🎯
