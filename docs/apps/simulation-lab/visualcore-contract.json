@@ -1,0 +1,1843 @@
+{
+  "schema": 1,
+  "app": "simulation-lab",
+  "gate": "A16-P00",
+  "date": "2026-11-16",
+  "inventory": [
+    {
+      "area": "Package products",
+      "description": "Pure, host-testable products of Packages/VisualCore: VisualCoreMath, VisualCoreSimulation, VisualCoreScenes, VisualCoreShaderSource, VisualCoreEffectsGraph, VisualCoreDiagnostics, VisualCoreAudioDSP, VisualCorePersistence, VisualCoreParameters, VisualCoreExperience (+ VisualCoreTestSupport for test targets). iOS products of Packages/VisualCoreRendering (one module per product): VisualCoreRendering, VisualCoreEffects, VisualCoreUI, VisualCoreAudio, VisualCoreAutomation, VisualCoreExperienceHost. For Simulation Lab (checked 2026-11-16): VisualCoreRendering has RenderTarget, TextureFormat (rgba8, rgba16f, r8), PingPongTarget (read, write, swap(), isValid), FloatRenderSupport (detect(in:) probes GL_EXT_color_buffer_half_float or GL_EXT_color_buffer_float and a 4x4 RGBA16F target; storageFormat gives RGBA16F or the RGBA8 fallback), FieldPass with FieldUniform, FieldPassError (including inputIsOutput) and runObserver, FullScreenShaderScene, ResourceRegistry, RenderTarget.upload(rgbaFloats:) and readFloatPixels(), StillCapture; VisualCoreSimulation has FieldGrid and StoragePrecision (float32, float16, float16TowardZero, unorm8 with round and tolerance), SeededRandom, SeedDerivation, FixedStepClock, FixedStepRunner (stepOnce), TimeStepPolicy and PlaybackState; VisualCoreParameters has ParameterSchema, ParameterDefinition, ParameterEditor, Palette and Preset; VisualCoreUI has ParameterPanel. Missing in every framework product (grep 2026-11-16 for automaton, gray-scott, laplacian, wave, courant, histogram, legend, colormap): cellular-automaton, Gray-Scott and wave rules, wrap or fixed boundary sampling (FieldGrid.sampleBilinear and vc_fieldTexel clamp to the edge; registry targets use LINEAR filtering and CLAMP_TO_EDGE), a field histogram or reduction pass (FrameChecks.histogram is a DEBUG/automation luma check) and a legend view.",
+      "paths": [
+        "Packages/VisualCore/Package.swift",
+        "Packages/VisualCoreRendering/Package.swift",
+        "Packages/ExperiencesCreative/Package.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/PingPongTarget.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FloatRenderSupport.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillCapture.swift",
+        "Packages/VisualCore/Sources/VisualCoreSimulation/FieldGrid.swift",
+        "Packages/VisualCore/Sources/VisualCoreSimulation/SeededRandom.swift",
+        "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepRunner.swift",
+        "Packages/VisualCore/Sources/VisualCoreParameters/ParameterSchema.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreUI/ParameterPanel.swift",
+        "Packages/VisualCore/Sources/VisualCoreExperience/FrameChecks.swift",
+        "scripts/check_dependencies.py",
+        "docs/api/visualcore-public-api.txt"
+      ],
+      "owner": "VisualCore packages (ADR-0003, ADR-0009)"
+    },
+    {
+      "area": "EGL render host and thread",
+      "description": "RenderHost (@MainActor) owns the EGL display, context and surfaces over ANGLE's Metal backend, the CAMetalLayer RenderView, the FrameScheduler (CADisplayLink) and context generations; pause/resume, replaceScene, recreateContext, readPixels, renderOffscreen and destroy; scenes implement RenderScene setup/resize/render/teardown. All EGL and GL work runs on the main thread. Simulation Lab's rules, seeds, parameter validation and CPU references are GPU-free CPU work; the GPU step passes run inside the scene's render call on the main thread through FieldPass, capped steps per frame; the field targets live in the host's ResourceRegistry and are rebuilt from versioned CPU state after a context recreation or resize. The experience adds no EGL or GL context of its own.",
+      "paths": [
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderView.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderView+Touches.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FrameScheduler.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/EGLDisplayProvider.swift"
+      ],
+      "owner": "VisualCoreRendering (ADR-0002 seam)"
+    },
+    {
+      "area": "Shaders and resources (offscreen targets, framebuffer feedback, fullscreen passes, textures)",
+      "description": "ResourceRegistry creates textures, buffers, programs and render targets under a ResourceBudget and rejects stale handles after a generation change; every texture and target is created with LINEAR filtering and CLAMP_TO_EDGE wrapping. RenderTarget uploads RGBA floats (rgba16f as floats, rgba8 clamped to n/255) and reads them back (readFloatPixels). PingPongTarget pairs two equal targets and swaps their roles; FieldPass runs a fragment shader over every pixel of its output with the full-screen vertex shader of FullScreenShaderScene, validates inputs and uniforms before any draw, refuses a pass whose input is its output (FieldPassError.inputIsOutput) and, with run(pair:input:), samples read, draws into write and swaps only when the pass ran; FieldPass.runObserver lets a test audit every run of a frame. FloatRenderSupport probes half-float colour buffers per context generation. The vc/ GLSL library holds field.glsl (texelFetch-exact cell sampling and bilinear sampling matching FieldGrid.sampleBilinear), palette.glsl (up to 8 linear-light stops), color, hash, noise and sdf helpers. ShaderProgram and ShaderBundle compile bundled GLSL with typed errors. Fluid Art Playground (A02) uses PingPongTarget and FieldPass app-locally.",
+      "paths": [
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/PingPongTarget.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FloatRenderSupport.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderProgram.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderBundle.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderCapabilities.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/field.glsl",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/palette.glsl",
+        "Packages/VisualCore/Sources/VisualCoreShaderSource/ShaderLibrary.swift",
+        "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidFieldsScene.swift"
+      ],
+      "owner": "VisualCoreRendering + VisualCoreShaderSource"
+    },
+    {
+      "area": "Simulation fields, time and CPU references",
+      "description": "FieldGrid is a width x height grid of 1-4 Float channels in GL row order with rounded(to:), maxAbsDifference, isFinite, minValue, padded(toChannels:) and sampleBilinear (edge-clamped); StoragePrecision rounds to float32, float16 (nearest even), float16TowardZero or unorm8 and gives a one-step tolerance. Both were built for CPU references of GPU field passes (feature 019) and are used by Fluid Art Playground's FluidSolver. SeededRandom (xoshiro256** after SplitMix64) and SeedDerivation give platform-identical seeds; FixedStepClock bounds steps per frame (maxSteps), FixedStepRunner offers stepOnce, TimeStepPolicy clamps a variable step and PlaybackState holds play, pause and background. NumericHygiene refuses or wraps non-finite values. The automaton, Gray-Scott and wave rules, their boundary modes and stability limits are Simulation Lab's own (G-RULES, G-SPEC).",
+      "paths": [
+        "Packages/VisualCore/Sources/VisualCoreSimulation/FieldGrid.swift",
+        "Packages/VisualCore/Sources/VisualCoreSimulation/SeededRandom.swift",
+        "Packages/VisualCore/Sources/VisualCoreSimulation/SeedDerivation.swift",
+        "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepClock.swift",
+        "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepRunner.swift",
+        "Packages/VisualCore/Sources/VisualCoreSimulation/TimeStepPolicy.swift",
+        "Packages/VisualCore/Sources/VisualCoreSimulation/PlaybackState.swift",
+        "Packages/VisualCore/Sources/VisualCoreMath/NumericHygiene.swift",
+        "Packages/ExperiencesCreative/FluidArtPlayground/Core/FluidSolver.swift"
+      ],
+      "owner": "VisualCoreSimulation + VisualCoreMath"
+    },
+    {
+      "area": "Parameters, gestures and input",
+      "description": "ParameterSchema of ParameterDefinition (name, title, unit, range, default, transform) with clamped values and ParameterEditor (set by value or slider position, reset, modified flags, unit formatting); ParameterPanel renders any schema as a SwiftUI section with VoiceOver adjust actions; Palette holds linear-light colour stops; Preset holds a seed, palette and values. Touches arrive as PointerEvent through RenderView.pointerHandler; Tap, DoubleTap, LongPress, Drag, Pinch and Rotate recognizers with GestureArbiter give deterministic gestures; GestureAlternatives names a control for each gesture. Seeding and painting cells map normalized touch points to grid cells in the experience (G-UI).",
+      "paths": [
+        "Packages/VisualCore/Sources/VisualCoreParameters/ParameterSchema.swift",
+        "Packages/VisualCore/Sources/VisualCoreParameters/ParameterEditor.swift",
+        "Packages/VisualCore/Sources/VisualCoreParameters/Palette.swift",
+        "Packages/VisualCore/Sources/VisualCoreParameters/Preset.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreUI/ParameterPanel.swift",
+        "Packages/VisualCore/Sources/VisualCoreScenes/PointerTracker.swift",
+        "Packages/VisualCore/Sources/VisualCoreScenes/GestureRecognizers.swift",
+        "Packages/VisualCore/Sources/VisualCoreScenes/GestureArbiter.swift",
+        "Packages/VisualCore/Sources/VisualCoreExperience/GestureAlternatives.swift"
+      ],
+      "owner": "VisualCoreParameters + VisualCoreUI + VisualCoreScenes + VisualCoreExperience"
+    },
+    {
+      "area": "Persistence, storage and capture",
+      "description": "DocumentStore writes versioned documents (DocumentEnvelope kind and schemaVersion) atomically under a byte cap and migrates them forward through a MigrationChain, reporting damaged or newer files as problems; NamedLibrary keeps named documents; ExperienceStorage is the per-experience sandbox with StorageQuota; SavedStateStore keeps small values. StillCapture renders the host's scene offscreen through renderOffscreen (no second context) at an ExportSize, encodes a PNG into a TemporaryFolder and reports a person-facing message on failure; the file is handed to SwiftUI ShareLink (Generative Art Studio, Fluid Art Playground and Fractal Explorer do so), so no usage string is needed. Saved presets use these stores (G-PRESETS); still capture is wired in G-CAPTURE.",
+      "paths": [
+        "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
+        "Packages/VisualCore/Sources/VisualCorePersistence/Envelope.swift",
+        "Packages/VisualCore/Sources/VisualCorePersistence/Migration.swift",
+        "Packages/VisualCore/Sources/VisualCorePersistence/NamedLibrary.swift",
+        "Packages/VisualCore/Sources/VisualCorePersistence/TemporaryFolder.swift",
+        "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+        "Packages/VisualCore/Sources/VisualCoreExperience/SavedStateStore.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillCapture.swift",
+        "Packages/VisualCore/Sources/VisualCoreScenes/ExportGeometry.swift",
+        "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/GenerativeArtControls.swift"
+      ],
+      "owner": "VisualCorePersistence + VisualCoreExperience + VisualCoreRendering"
+    },
+    {
+      "area": "Experience host",
+      "description": "ExperienceSession opens, checkpoints, closes and recovers an Experience on one RenderHost, applies the quality level (QualityGovernor over the experience's QualityProfile, fed by DeviceConditions thermal state and Low Power Mode) and memory and scene-phase events, and renders stills; ExperienceShell adapts an ExperiencePresenter (scene, controls, canvas overlay through makeCanvasOverlay) to Experience; ExperienceCore is the GPU-free state with its qualityTiers; ExperienceFeedback routes haptics and announcements; ScenarioRunner replays a ScenarioManifest; the one app registers experiences in ExperienceRegistry and Catalog/registrations.json (fifteen registered, A01-A15, checked 2026-11-16; Simulation Lab joins in A16-P01 and stays unregistered and unavailable in A16-P00; scripts/check_experience_packages.py forbids unregistered targets). Version 0.1 needs no permission: presets stay in the experience's storage and stills go to the system share sheet, so no privacy answer changes.",
+      "paths": [
+        "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceShell.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceFeedback.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ScenarioRunner.swift",
+        "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceCore.swift",
+        "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+        "Packages/VisualCore/Sources/VisualCoreExperience/ScenarioManifest.swift",
+        "Apps/VisualCore/App/ExperienceRegistry.swift",
+        "Catalog/registrations.json",
+        "scripts/check_experience_packages.py",
+        "project.yml"
+      ],
+      "owner": "VisualCoreExperience + VisualCoreExperienceHost + the one app"
+    },
+    {
+      "area": "Build and release steps",
+      "description": "XcodeGen spec project.yml for the one app (target VisualCore), package schemes via scripts/xcodebuild_package.py, app tests via scripts/xcodebuild_app.py, and scripts/release_check.py: 133 named steps listed by --list on 2026-11-16 (shared checks including app-contracts, which checks every docs/apps/*/visualcore-contract.json, package and app builds and tests, experience-release and copy-claims steps of A04-A15, verify steps of A01-A15 on iOS 27 and 26, release audits of the one app, the seven reference regression steps and the ProjectM independence check).",
+      "paths": [
+        "project.yml",
+        "scripts/release_check.py",
+        "scripts/xcodebuild_package.py",
+        "scripts/xcodebuild_app.py",
+        "scripts/check_app_contract.py",
+        "scripts/check_licenses.py",
+        ".github/workflows/ci.yml"
+      ],
+      "owner": "repository tooling"
+    },
+    {
+      "area": "Source ownership",
+      "description": "Simulation Lab owns its domain (the cellular-automaton, Gray-Scott reaction-diffusion and 2D wave rules with their CPU references on tiny grids; boundary modes wrap, clamp and fixed; the versioned SimulationSpec with grid size, time step, boundary mode, seed, parameter map and algorithm version; parameter definitions with units and ranges per experiment; seeded starting conditions; stability limits such as the wave Courant condition and the Gray-Scott step bound; the scheduler with capped steps per frame, pause, reset, single step and speed; the step and display shaders; the histogram or legend; presets with licenses; capture metadata; educational copy and labels) and UI under Packages/ExperiencesCreative/SimulationLab/ (Core GPU-free, CoreTests, Experience with Adapter/, ExperienceTests, Shaders, scenario-manifest.json; created in A16-P01, not present today). VisualCore owns reusable machinery: render targets, ping-pong pairs, the float probe, field passes, full-screen passes and still capture (VisualCoreRendering), fields, storage precision, seeds and fixed steps (VisualCoreSimulation), parameter schemas and panels (VisualCoreParameters, VisualCoreUI), gestures (VisualCoreScenes), persistence (VisualCorePersistence), storage, digests, quality and accessibility planning (constitution Principle II, A16 section). Fluid Art Playground's solver, boundary modes and scenes stay experience code and are not copied. ProjectM stays in the harness.",
+      "paths": [
+        ".specify/memory/constitution.md",
+        "Auto-Creator.md",
+        "docs/decisions/ADR-0009-unified-app.md",
+        "Packages/ExperiencesCreative/Package.swift",
+        "specs/116-sl-p00-boundary-audit/spec.md"
+      ],
+      "owner": "constitution + ADR-0009"
+    },
+    {
+      "area": "ProjectM reference regression",
+      "description": "Reference pinned at d93edd1, read-only; scripts/run_reference_baseline.py lists the ordered reference steps; scripts/check_reference_clean.py checks the submodule; the 7 release-check steps run in two chunks via release_check.py --only (reference-engine-xcframework, reference-build-projectm-ios-sim, reference-clean; reference-test-anglerendering-ios27, reference-test-anglerendering-ios26, projectm-reference-ios27, projectm-reference-ios26), recorded in docs/apps/simulation-lab/regression-baseline.md (T-A16-001/005) with the phase-start commit 1006181f (constitution f2d45f77).",
+      "paths": [
+        "scripts/run_reference_baseline.py",
+        "scripts/check_reference_clean.py",
+        "Harnesses/ProjectMReference/ProjectMReference.yml",
+        "docs/apps/simulation-lab/regression-baseline.md",
+        "specs/116-sl-p00-boundary-audit/research.md"
+      ],
+      "owner": "reference adapter (harness only)"
+    },
+    {
+      "area": "Determinism and budgets",
+      "description": "StateDigest and StableHash fingerprint experience state so the same spec, seed and step count give the same digest; ScenarioManifest and ScenarioRunner replay recorded steps; ResourceBudget, StorageQuota, DocumentStore.maxBytes, FixedStepClock.maxSteps, QualityProfile and QualityGovernor bound GPU memory, storage, steps per frame and quality levels; NumericHygiene refuses or wraps non-finite values. Grid sizes per quality level, steps per frame, the number of targets, the preset count and the capture size are Simulation Lab's own limits (G-SPEC, G-CA-GPU, G-RDWAVE-GPU, G-PRESETS).",
+      "paths": [
+        "Packages/VisualCore/Sources/VisualCoreExperience/StateDigest.swift",
+        "Packages/VisualCore/Sources/VisualCoreExperience/ScenarioManifest.swift",
+        "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepClock.swift",
+        "Packages/VisualCore/Sources/VisualCoreMath/StableHash.swift",
+        "Packages/VisualCore/Sources/VisualCoreMath/NumericHygiene.swift",
+        "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityProfile.swift",
+        "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityGovernor.swift",
+        "Packages/VisualCore/Sources/VisualCoreDiagnostics/ResourceLedger.swift"
+      ],
+      "owner": "VisualCoreExperience + VisualCoreSimulation + VisualCoreDiagnostics"
+    }
+  ],
+  "matrix": [
+    {
+      "id": "M01",
+      "capability": "GPU simulation with framebuffer feedback: each step samples the previous field and writes the next one into a separate offscreen target of the same size and format, swapped only after a complete pass, a capped number of steps per display frame, on the host's context and main thread",
+      "source": "brainstorm: GPU simulation techniques using shaders and framebuffer feedback; manual §6 render sequence stages 1-3",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/PingPongTarget.swift",
+          "symbol": "PingPongTarget",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/PingPongTarget.swift",
+          "symbol": "PingPongTarget.swap",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+          "symbol": "FieldPass",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+          "symbol": "FieldPass.run",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+          "symbol": "RenderTarget",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+          "symbol": "ResourceRegistry.makeRenderTarget",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+          "symbol": "FullScreenShaderScene",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+          "symbol": "RenderHost",
+          "product": "VisualCoreRendering",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidFieldsScene.swift",
+        "symbol": "FluidFieldsScene"
+      },
+      "notes": "Tested in VisualCoreRenderingTests (PingPongTargetTests, FieldPassTests, FullScreenShaderSceneTests, ResourceRegistryTests, RenderHostTests). The feedback machinery is public and tested and Fluid Art Playground runs its advection on it; what is missing is Simulation Lab's step shaders: the automaton step on RGBA8 (G-CA-GPU, A16-P02) and the Gray-Scott and wave steps on RGBA16F (G-RDWAVE-GPU, A16-P03). Steps per frame are capped by the scheduler (G-SCHEDULER)."
+    },
+    {
+      "id": "M02",
+      "capability": "Numerical visualization: the scalar field drawn to the screen through a stated colour ramp (palette made in code) with fixed value bounds per experiment, nearest-cell sampling so cells stay exact, and an optional isoline",
+      "source": "brainstorm: numerical visualization; manual §6 render sequence stage 4",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+          "symbol": "FieldPass",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+          "symbol": "FieldPass.Output",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+          "symbol": "FullScreenShaderScene",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+          "symbol": "FullScreenShaderScene.vertexSource",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreParameters/Palette.swift",
+          "symbol": "Palette",
+          "product": "VisualCoreParameters",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/FluidArtPlayground/Core/FluidPalette.swift",
+        "symbol": "FluidPalette"
+      },
+      "notes": "Tested in VisualCoreRenderingTests (FieldPassTests framebuffer output, FullScreenShaderSceneTests) and VisualCoreParametersTests (ParametersTests). A FieldPass can draw into the framebuffer, vc/field.glsl gives texelFetch-exact cell reads and vc/palette.glsl maps 0...1 through up to 8 linear-light stops. The per-family value mapping (automaton states, the two Gray-Scott concentrations, signed wave height), the ramps and the isoline are display shaders of G-CA-GPU (A16-P02) and G-RDWAVE-GPU (A16-P03); the legend that names the values is G-LEGEND (A16-P04)."
+    },
+    {
+      "id": "M03",
+      "capability": "Parameter controls: every experiment parameter with a name, unit, valid range, default and transform, edited by native sliders with VoiceOver adjust actions, reset to the default and a modified flag",
+      "source": "brainstorm: parameter controls; manual §3 inspector (effective values, reset, valid ranges)",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreParameters/ParameterSchema.swift",
+          "symbol": "ParameterSchema",
+          "product": "VisualCoreParameters",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreParameters/ParameterSchema.swift",
+          "symbol": "ParameterDefinition",
+          "product": "VisualCoreParameters",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreParameters/ParameterSchema.swift",
+          "symbol": "ParameterDefinition.clamped",
+          "product": "VisualCoreParameters",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreParameters/ParameterEditor.swift",
+          "symbol": "ParameterEditor",
+          "product": "VisualCoreParameters",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreParameters/ParameterEditor.swift",
+          "symbol": "ParameterEditor.resetAll",
+          "product": "VisualCoreParameters",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/ParameterPanel.swift",
+          "symbol": "ParameterPanel",
+          "product": "VisualCoreUI",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/ParameterPanel.swift",
+          "symbol": "ParameterPanelModel",
+          "product": "VisualCoreUI",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/ControlsSheet.swift",
+        "symbol": "ControlsSheet"
+      },
+      "notes": "Tested in VisualCoreParametersTests (ParametersTests, ParameterEditorTests) and VisualCoreUITests (ParameterPanelTests). Generative Art Studio edits its schema through ParameterPanel. The schemas themselves (feed and kill rates, diffusion constants, wave speed and damping, automaton rule) are experiment data (G-SPEC, A16-P01)."
+    },
+    {
+      "id": "M04",
+      "capability": "Data visualization: a histogram of the current field's values over fixed bins, or a legend that shows and speaks the colour ramp's value range, updated at a bounded rate without stalling the frame",
+      "source": "brainstorm: data visualization; v0.1 feature 3 (histogram/legend overlay)",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+          "symbol": "RenderTarget.readFloatPixels",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FieldGrid.swift",
+          "symbol": "FieldGrid",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FieldGrid.swift",
+          "symbol": "FieldGrid.minValue",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FieldGrid.swift",
+          "symbol": "FieldGrid.isFinite",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+          "symbol": "ExperiencePresenter.makeCanvasOverlay",
+          "product": "VisualCoreExperienceHost",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/MolecularExplorer/Experience/MoleculeControls.swift",
+        "symbol": "MoleculeControls"
+      },
+      "notes": "Tested in VisualCoreRenderingTests (FloatTransferTests read back RGBA16F and RGBA8 targets as floats), VisualCoreSimulationTests (FieldGridTests) and VisualCoreExperienceHostTests (CanvasOverlayTests). No field histogram, GPU reduction pass or legend view exists in a framework product: FrameChecks.histogram (VisualCoreExperience) is a luma check compiled only under DEBUG or VISUALCORE_AUTOMATION, ImageComparison's histogram is test support and PacingMeter's bins are frame intervals. A read-back of the capped field into a FieldGrid with CPU binning at a bounded rate, or the CPU mirror, is enough for version 0.1: G-LEGEND (app-local, A16-P04), which assesses a FieldGrid histogram for VisualCoreSimulation and a reduction pass for VisualCoreRendering."
+    },
+    {
+      "id": "M05",
+      "capability": "Animation and capture: fixed simulation steps decoupled from the display rate and from wall time, play and pause with background suspension and the Reduce Motion start rule, and a still of the current field rendered offscreen into a PNG handed to the system share sheet",
+      "source": "brainstorm: animation and capture; manual §6 rendering lifecycle (fixed-step simulation apart from visual time)",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepClock.swift",
+          "symbol": "FixedStepClock",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepRunner.swift",
+          "symbol": "FixedStepRunner",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/TimeStepPolicy.swift",
+          "symbol": "TimeStepPolicy",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/PlaybackState.swift",
+          "symbol": "PlaybackState",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillCapture.swift",
+          "symbol": "StillCapture",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillCapture.swift",
+          "symbol": "StillCapture.capture",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+          "symbol": "RenderHost.renderOffscreen",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/ExportGeometry.swift",
+          "symbol": "ExportSize",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCorePersistence/TemporaryFolder.swift",
+          "symbol": "TemporaryFolder",
+          "product": "VisualCorePersistence",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/FractalExplorer/Experience/ExplorerView.swift",
+        "symbol": "ExplorerModel"
+      },
+      "notes": "Tested in VisualCoreSimulationTests (FixedStepClockTests, FixedStepRunnerTests, TimeStepPolicyTests, PlaybackStateTests), VisualCoreRenderingTests (StillCaptureTests, OffscreenExportTests) and VisualCorePersistenceTests (TemporaryFolderTests). Fractal Explorer captures through StillCapture and shares with ShareLink. The capture flow and its metadata (experiment, step index, parameters and the approximation label) are G-CAPTURE (A16-P04)."
+    },
+    {
+      "id": "M06",
+      "capability": "Three simulation families: a cellular automaton (stated neighbourhood and rule, for example Conway's Life), Gray-Scott reaction-diffusion (two concentrations, discrete Laplacian stencil, diffusion constants, feed and kill) and a 2D wave field (height and velocity or two time levels, wave speed, damping), each with a CPU rule and a GPU step",
+      "source": "v0.1 feature 1: three simulation families; manual §6 algorithm decisions 1-3",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FieldGrid.swift",
+          "symbol": "FieldGrid",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FieldGrid.swift",
+          "symbol": "StoragePrecision",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/PingPongTarget.swift",
+          "symbol": "PingPongTarget",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+          "symbol": "FieldPass",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FloatRenderSupport.swift",
+          "symbol": "FloatRenderSupport",
+          "product": "VisualCoreRendering",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/FluidArtPlayground/Core/FluidSolver.swift",
+        "symbol": "FluidSolver"
+      },
+      "notes": "Grep 2026-11-16 for automaton, life, gray-scott, laplacian, wave and courant in Packages/VisualCore/Sources and Packages/VisualCoreRendering/Sources finds no rule. The base pieces are tested (FieldGridTests, PingPongTargetTests, FieldPassTests, FloatRenderSupportTests). The rules are the experience's content: CPU references G-RULES (A16-P01), automaton GPU G-CA-GPU (A16-P02), reaction-diffusion and wave GPU G-RDWAVE-GPU (A16-P03)."
+    },
+    {
+      "id": "M07",
+      "capability": "Clear parameter schema per experiment and seeded starting conditions: a versioned SimulationSpec (kind, grid size, time step, boundary mode, seed, parameter map, algorithm version) validated on ingress, parameter definitions with units and ranges, and starting fields generated from the seed (random cells, Gray-Scott square of V, a wave pulse) identically on every run",
+      "source": "v0.1 feature 2: clear parameter schema per experiment and seeded starting conditions; manual §6 versioned domain schemas",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreParameters/ParameterSchema.swift",
+          "symbol": "ParameterSchema",
+          "product": "VisualCoreParameters",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreParameters/ParameterSchema.swift",
+          "symbol": "ParameterDefinition",
+          "product": "VisualCoreParameters",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/SeededRandom.swift",
+          "symbol": "SeededRandom",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/SeedDerivation.swift",
+          "symbol": "SeedDerivation",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreParameters/Preset.swift",
+          "symbol": "Preset",
+          "product": "VisualCoreParameters",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+          "symbol": "RenderTarget.upload",
+          "product": "VisualCoreRendering",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/FluidArtPlayground/Core/DyeSeed.swift",
+        "symbol": "DyeSeed"
+      },
+      "notes": "Tested in VisualCoreParametersTests (ParametersTests), VisualCoreSimulationTests (SeededRandomTests, SeedDerivationTests) and VisualCoreRenderingTests (FloatTransferTests upload). The spec type, the parameter definitions of each experiment and the seed generators are G-SPEC (app-local, A16-P01)."
+    },
+    {
+      "id": "M08",
+      "capability": "Pause, reset, step, speed and histogram/legend overlay: pause stops stepping, a single step advances exactly one discrete iteration, reset restores the seeded start, speed sets steps per frame within a cap, all as GPU-free control rules with spoken state and native controls over the canvas",
+      "source": "v0.1 feature 3: pause, reset, step, speed and histogram/legend overlay; manual §11 fixture 4",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/PlaybackState.swift",
+          "symbol": "PlaybackState",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepRunner.swift",
+          "symbol": "FixedStepRunner.stepOnce",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepClock.swift",
+          "symbol": "FixedStepClock",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+          "symbol": "ExperiencePresenter.makeCanvasOverlay",
+          "product": "VisualCoreExperienceHost",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
+          "symbol": "AnnouncementPlanner",
+          "product": "VisualCoreSimulation",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/FluidArtPlayground/Core/SimulationControl.swift",
+        "symbol": "SimulationControl"
+      },
+      "notes": "Tested in VisualCoreSimulationTests (PlaybackStateTests, FixedStepRunnerTests, FixedStepClockTests, AccessibilityPlansTests) and VisualCoreExperienceHostTests (CanvasOverlayTests). Fluid Art Playground's SimulationControl is experience code and is not reused. The scheduler (exactly one iteration per step, capped steps per frame, reset to the seed) is G-SCHEDULER (A16-P01); the controls are G-UI and the overlay G-LEGEND (A16-P04)."
+    },
+    {
+      "id": "M09",
+      "capability": "Deterministic tiny CPU reference for each algorithm: a pure, seeded CPU step on a tiny grid with the stated boundary rule, testable through swift test without a GPU, whose storage is rounded to the GPU target's precision so a GPU run can be compared within a declared tolerance",
+      "source": "v0.1 feature 4: deterministic tiny CPU reference; manual §6 algorithm decision 4; manual §11 fixtures 1 and 2",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FieldGrid.swift",
+          "symbol": "FieldGrid",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FieldGrid.swift",
+          "symbol": "FieldGrid.rounded",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FieldGrid.swift",
+          "symbol": "FieldGrid.maxAbsDifference",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FieldGrid.swift",
+          "symbol": "StoragePrecision.tolerance",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/SeededRandom.swift",
+          "symbol": "SeededRandom",
+          "product": "VisualCoreSimulation",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/FluidArtPlayground/Core/FluidSolver.swift",
+        "symbol": "FluidSolver"
+      },
+      "notes": "Tested in VisualCoreSimulationTests (FieldGridTests, SeededRandomTests). The comparison machinery exists; the three CPU references (Life blinker period 2, Gray-Scott and wave steps) are G-RULES (A16-P01); the tolerances are fixed there and validated in G-VALIDATION (A16-P05)."
+    },
+    {
+      "id": "M10",
+      "capability": "GPU ping-pong texture path with explicit boundary rules: every family steps on a ping-pong pair through validated field passes, with the boundary applied in the shader by cell-index arithmetic (wrap for automata and reaction-diffusion, fixed zero for the wave field), independent of the sampler's wrap mode",
+      "source": "v0.1 feature 5: GPU ping-pong texture path with explicit boundary rules",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/PingPongTarget.swift",
+          "symbol": "PingPongTarget",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/PingPongTarget.swift",
+          "symbol": "PingPongTarget.isValid",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+          "symbol": "FieldPass.run",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+          "symbol": "FieldPassError",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+          "symbol": "FieldUniform",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FloatRenderSupport.swift",
+          "symbol": "FloatRenderSupport.storageFormat",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+          "symbol": "TextureFormat",
+          "product": "VisualCoreRendering",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidFieldsScene.swift",
+        "symbol": "FluidFieldsScene"
+      },
+      "notes": "Tested in VisualCoreRenderingTests (PingPongTargetTests, FieldPassTests, FieldBilinearTests, FloatRenderSupportTests). Registry targets are created with LINEAR filtering and CLAMP_TO_EDGE and vc_fieldTexel clamps the index, so wrap and fixed boundaries must be done with texelFetch and index arithmetic in the step shaders: G-CA-GPU (A16-P02) and G-RDWAVE-GPU (A16-P03)."
+    },
+    {
+      "id": "M11",
+      "capability": "Save presets and capture stills: named experiment presets (spec, palette, annotation) saved in the experience's storage with a versioned schema and migration, bundled presets with author and license, and stills captured from the current field and shared through the system sheet",
+      "source": "v0.1 feature 6: save presets and capture stills; manual §6 ExperimentPreset",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
+          "symbol": "DocumentStore",
+          "product": "VisualCorePersistence",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCorePersistence/Migration.swift",
+          "symbol": "MigrationChain",
+          "product": "VisualCorePersistence",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCorePersistence/NamedLibrary.swift",
+          "symbol": "NamedLibrary",
+          "product": "VisualCorePersistence",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreParameters/Preset.swift",
+          "symbol": "Preset",
+          "product": "VisualCoreParameters",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+          "symbol": "ExperienceStorage",
+          "product": "VisualCoreExperience",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillCapture.swift",
+          "symbol": "StillCapture",
+          "product": "VisualCoreRendering",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/GenerativeArtControls.swift",
+        "symbol": "ExportedImage"
+      },
+      "notes": "Tested in VisualCorePersistenceTests (DocumentStoreTests, NamedLibraryTests), VisualCoreParametersTests, VisualCoreExperienceTests (ExperienceStorageTests) and VisualCoreRenderingTests (StillCaptureTests). The preset schema and library are G-PRESETS and the capture flow G-CAPTURE (app-local, A16-P04)."
+    },
+    {
+      "id": "M12",
+      "capability": "CPU references with storage precision: the CPU grid rounded after every step to the storage of the GPU target (unorm8 for automata with exact states, float16 in both rounding modes for reaction-diffusion and waves) with one-step tolerances, and GPU sampling that matches the CPU formula exactly",
+      "source": "cross-cutting: CPU references with storage precision; spec clarification 5; manual §13 risk 1",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FieldGrid.swift",
+          "symbol": "StoragePrecision",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FieldGrid.swift",
+          "symbol": "StoragePrecision.round",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FieldGrid.swift",
+          "symbol": "StoragePrecision.tolerance",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FieldGrid.swift",
+          "symbol": "FieldGrid",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FieldGrid.swift",
+          "symbol": "FieldGrid.sampleBilinear",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+          "symbol": "RenderTarget.readFloatPixels",
+          "product": "VisualCoreRendering",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/FluidArtPlayground/Core/FluidSolver.swift",
+        "symbol": "FluidSolver"
+      },
+      "notes": "Tested in VisualCoreSimulationTests (FieldGridTests) and VisualCoreRenderingTests (FieldBilinearTests, FloatTransferTests). StoragePrecision.float16TowardZero exists because some GPUs truncate half-float colour writes (observed on the iOS 27.2 simulator, feature 019); a comparison uses both half modes when the mode is unknown."
+    },
+    {
+      "id": "M13",
+      "capability": "Boundary rules (wrap, clamp, fixed): every algorithm states its boundary; wrap for automata and reaction-diffusion and fixed zero for the wave field, identical on the CPU reference and the GPU step",
+      "source": "cross-cutting: boundary rules; spec clarification 5; constitution A16 deterministic CPU truth",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FieldGrid.swift",
+          "symbol": "FieldGrid.sampleBilinear",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FieldGrid.swift",
+          "symbol": "FieldGrid",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+          "symbol": "ResourceRegistry.makeRenderTarget",
+          "product": "VisualCoreRendering",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/FluidArtPlayground/Core/FluidConfiguration.swift",
+        "symbol": "BoundaryMode"
+      },
+      "notes": "Tested in VisualCoreSimulationTests (FieldGridTests) and VisualCoreRenderingTests (FieldBilinearTests). The framework clamps only: FieldGrid.sampleBilinear and vc_fieldTexel clamp to the edge and render targets use CLAMP_TO_EDGE. Fluid Art Playground's BoundaryMode (walls, open) is experience code for a different problem. Wrap and fixed boundaries are G-RULES (CPU, A16-P01), G-CA-GPU (A16-P02) and G-RDWAVE-GPU (A16-P03); a shared boundary-mode helper is assessed for VisualCoreSimulation in A16-P01 only if a second consumer exists."
+    },
+    {
+      "id": "M14",
+      "capability": "Resource separation: no pass reads the texture it writes; ping-pong pairs are explicit, a pass whose input is its output is refused before any draw, and a test audits every pass run of whole frames",
+      "source": "cross-cutting: resource separation; constitution A16 resource separation; manual §13 risk 2",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+          "symbol": "FieldPassError",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+          "symbol": "FieldPassError.inputIsOutput",
+          "product": "VisualCoreRendering",
+          "public": false
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+          "symbol": "FieldPass.runObserver",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+          "symbol": "FieldPass.Run",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/PingPongTarget.swift",
+          "symbol": "PingPongTarget",
+          "product": "VisualCoreRendering",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidFieldsScene.swift",
+        "symbol": "FluidFieldsScene"
+      },
+      "notes": "Tested in VisualCoreRenderingTests (FieldPassTests asserts .inputIsOutput; PingPongTargetTests asserts read and write differ). Fluid Art Playground's PassIsolationTests audits all its passes through FieldPass.runObserver; Simulation Lab adds the same audit for its own passes in G-CA-GPU (A16-P02) and G-RDWAVE-GPU (A16-P03)."
+    },
+    {
+      "id": "M15",
+      "capability": "Float targets with probe and fallback: RGBA16F targets for reaction-diffusion and the wave field when the context reports half-float colour buffers and a probe target works, probed per context generation; when unsupported those two families are disabled with a message, never run silently on RGBA8",
+      "source": "cross-cutting: float targets with probe and fallback; spec clarification 5; manual §13 risk 1",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FloatRenderSupport.swift",
+          "symbol": "FloatRenderSupport",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FloatRenderSupport.swift",
+          "symbol": "FloatRenderSupport.detect",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FloatRenderSupport.swift",
+          "symbol": "FloatRenderSupport.storageFormat",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FloatRenderSupport.swift",
+          "symbol": "FloatRenderSupport.supported",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+          "symbol": "TextureFormat",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+          "symbol": "RenderTarget.upload",
+          "product": "VisualCoreRendering",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidFieldsScene.swift",
+        "symbol": "FluidFieldsScene"
+      },
+      "notes": "Tested in VisualCoreRenderingTests (FloatRenderSupportTests, FloatTransferTests). storageFormat's documented fallback is RGBA8; Simulation Lab does not use the fallback for reaction-diffusion or waves (clarification 5) and disables them with a message instead: the rule and its test are G-RDWAVE-GPU (A16-P03)."
+    },
+    {
+      "id": "M16",
+      "capability": "Validity safeguards and stability limits: parameters within stated ranges; a time step beyond the stability limit (wave Courant condition, Gray-Scott explicit step bound) or a non-finite value is refused or clamped with a visible explanation and never corrupts the field",
+      "source": "cross-cutting: validity safeguards and stability limits; catalog validity risk (convergence, step control, invalid-state safeguards); manual §11 fixture 3",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/NumericHygiene.swift",
+          "symbol": "NumericHygiene",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/TimeStepPolicy.swift",
+          "symbol": "TimeStepPolicy",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreParameters/ParameterSchema.swift",
+          "symbol": "ParameterDefinition.clamped",
+          "product": "VisualCoreParameters",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FieldGrid.swift",
+          "symbol": "FieldGrid.isFinite",
+          "product": "VisualCoreSimulation",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/FluidArtPlayground/Core/FluidConfiguration.swift",
+        "symbol": "FluidConfiguration"
+      },
+      "notes": "Tested in VisualCoreMathTests (NumericHygieneTests), VisualCoreSimulationTests (TimeStepPolicyTests, FieldGridTests) and VisualCoreParametersTests. The stability limits and their explanations are experiment rules: G-SPEC (A16-P01); they are validated on tiny grids and at the limits in G-VALIDATION (A16-P05). The exact tolerances and limits are decided in A16-P01 (clarification 5)."
+    },
+    {
+      "id": "M17",
+      "capability": "Determinism: the same spec, seed and step count give the same field and digest on every run; rules and references run without a GPU; drawing never changes the state",
+      "source": "cross-cutting: determinism; constitution A16 deterministic CPU truth",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/SeededRandom.swift",
+          "symbol": "SeededRandom",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/SeedDerivation.swift",
+          "symbol": "SeedDerivation",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/StateDigest.swift",
+          "symbol": "StateDigest",
+          "product": "VisualCoreExperience",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/StableHash.swift",
+          "symbol": "StableHash",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/ScenarioManifest.swift",
+          "symbol": "ScenarioManifest",
+          "product": "VisualCoreExperience",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepRunner.swift",
+          "symbol": "FixedStepRunner",
+          "product": "VisualCoreSimulation",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/FluidArtPlayground/Core/FluidSolver.swift",
+        "symbol": "FluidSolver"
+      },
+      "notes": "Tested in VisualCoreSimulationTests (SeededRandomTests, SeededRandomStateTests, SeedDerivationTests, FixedStepRunnerTests), VisualCoreExperienceTests (StateDigestTests, ScenarioManifestTests) and VisualCoreMathTests (StableHashTests)."
+    },
+    {
+      "id": "M18",
+      "capability": "Persistence with migration: presets and settings versioned, written atomically, migrated forward and refused when damaged or newer, without a crash",
+      "source": "cross-cutting: persistence with migration; manual §6 versioned schemas",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
+          "symbol": "DocumentStore",
+          "product": "VisualCorePersistence",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCorePersistence/Envelope.swift",
+          "symbol": "DocumentEnvelope",
+          "product": "VisualCorePersistence",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCorePersistence/Migration.swift",
+          "symbol": "MigrationChain",
+          "product": "VisualCorePersistence",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+          "symbol": "ExperienceStorage",
+          "product": "VisualCoreExperience",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/SavedStateStore.swift",
+          "symbol": "SavedStateStore",
+          "product": "VisualCoreExperience",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/TinyWorlds/Core/WorldDocument.swift",
+        "symbol": "WorldDocument"
+      },
+      "notes": "Tested in VisualCorePersistenceTests (DocumentStoreTests, NamedLibraryTests) and VisualCoreExperienceTests (ExperienceStorageTests, SavedStateStoreTests). The preset schema is G-PRESETS."
+    },
+    {
+      "id": "M19",
+      "capability": "Quality tiers and low power: the governor fed by thermal state and Low Power Mode lowers grid resolution and steps per frame per declared tier while parameter meaning and legends stay the same",
+      "source": "cross-cutting: quality tiers and low power; manual §12 (lower resolution preserving parameter meaning and legends)",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityGovernor.swift",
+          "symbol": "QualityGovernor",
+          "product": "VisualCoreDiagnostics",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityProfile.swift",
+          "symbol": "QualityProfile",
+          "product": "VisualCoreDiagnostics",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/DeviceConditions.swift",
+          "symbol": "DeviceConditions",
+          "product": "VisualCoreDiagnostics",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceCore.swift",
+          "symbol": "ExperienceCore.qualityTiers",
+          "product": "VisualCoreExperience",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+          "symbol": "ExperienceSession.refreshQuality",
+          "product": "VisualCoreExperienceHost",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/FluidArtPlayground/Core/FluidQuality.swift",
+        "symbol": "FluidQuality"
+      },
+      "notes": "Tested in VisualCoreDiagnosticsTests (QualityGovernorTests, QualityProfileTests), VisualCoreExperienceTests (QualityDeclarationTests) and VisualCoreExperienceHostTests (SessionQualityTests). Grid sizes and steps per frame per tier are G-SPEC; Core.qualityTiers must match the presenter's levels (declared at the X follow-through)."
+    },
+    {
+      "id": "M20",
+      "capability": "Accessibility with Reduce Motion, Reduce Flashing and colour-independent legends: system preferences observed, rapidly changing fields slowed or paused, flashing limited, the experiment, its state (running, paused, step count) and parameter values spoken, legend values shown and spoken so nothing depends on colour, contrast checked, a control for every gesture",
+      "source": "cross-cutting: accessibility; constitution A16 accessibility",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPreferences.swift",
+          "symbol": "SystemAccessibility",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPreferences.swift",
+          "symbol": "AccessibilityPreferences",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPreferences.swift",
+          "symbol": "EffectiveAccessibility",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/SystemAccessibilityObserver.swift",
+          "symbol": "SystemAccessibilityObserver",
+          "product": "VisualCoreUI",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
+          "symbol": "AnnouncementPlanner",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
+          "symbol": "transitionDuration",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreEffectsGraph/FlashLimiterModel.swift",
+          "symbol": "FlashLimiterModel",
+          "product": "VisualCoreEffectsGraph",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/GestureAlternatives.swift",
+          "symbol": "GestureAlternatives",
+          "product": "VisualCoreExperience",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AccessibilitySettingsSection.swift",
+          "symbol": "AccessibleColors.contrastRatio",
+          "product": "VisualCoreUI",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/TinyWorlds/Experience/WorldsPresenter.swift",
+        "symbol": "WorldsPresenter"
+      },
+      "notes": "Tested in VisualCoreSimulationTests (AccessibilityPreferencesTests, AccessibilityPlansTests), VisualCoreUITests (SystemAccessibilityObserverTests, AccessibilitySettingsSectionTests), VisualCoreEffectsGraphTests (FlashLimiterModelTests) and VisualCoreExperienceTests (GestureAlternativesTests). The spoken wording, the legend values and the Reduce Motion and Reduce Flashing step-rate rule are experience copy and rules (G-UI, G-LEGEND)."
+    },
+    {
+      "id": "M21",
+      "capability": "Lifecycle with resize and context loss: context loss, resize, background and memory warning release the field targets and rebuild them from versioned CPU state (spec, seed, step count or a CPU snapshot) without carrying corrupted values; the experiment and its parameters survive",
+      "source": "cross-cutting: lifecycle, resize and context loss; manual §3 renderer-lost transition; manual §11 fixture 5",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+          "symbol": "RenderHost.recreateContext",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+          "symbol": "RenderHost.pause",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+          "symbol": "ResourceRegistry",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/PingPongTarget.swift",
+          "symbol": "PingPongTarget.isValid",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/PingPongTarget.swift",
+          "symbol": "PingPongTarget.release",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+          "symbol": "RenderScene",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+          "symbol": "ExperienceSession.handleMemoryWarning",
+          "product": "VisualCoreExperienceHost",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+          "symbol": "ExperienceSession.checkpoint",
+          "product": "VisualCoreExperienceHost",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/PlaybackState.swift",
+          "symbol": "PlaybackState.enterBackground",
+          "product": "VisualCoreSimulation",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidFieldsScene.swift",
+        "symbol": "FluidFieldsScene"
+      },
+      "notes": "Tested in VisualCoreRenderingTests (RenderHostTests, ResourceRegistryTests, PingPongTargetTests stale after recreation), VisualCoreExperienceHostTests (SessionPhaseMemoryTests, ShellLifecycleTests) and VisualCoreSimulationTests (PlaybackStateTests). Rebuilding Simulation Lab's fields from CPU state after a context loss or resize is G-CA-GPU (A16-P02) and G-RDWAVE-GPU (A16-P03)."
+    },
+    {
+      "id": "M22",
+      "capability": "Licenses: every bundled preset, palette, fact text and shader records its author or source and license, checked by a test and listed in the acknowledgements",
+      "source": "cross-cutting: licenses; constitution A16 licenses; manual §13 cross-cutting obligations",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AcknowledgementsView.swift",
+          "symbol": "LicenseInventory",
+          "product": "VisualCoreUI",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AcknowledgementsView.swift",
+          "symbol": "AcknowledgementsView",
+          "product": "VisualCoreUI",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Core/SourceRecords.swift",
+        "symbol": "SourceRecord"
+      },
+      "notes": "The license inventory and acknowledgements screen exist and are tested (AcknowledgementsViewTests); they record code and asset licenses, not per-preset authors. The preset author and license fields are G-PRESETS (A16-P04); the release license review is G-RELEASE (A16-P06); all app-local."
+    },
+    {
+      "id": "M23",
+      "capability": "Truthful educational labels: every experiment is labelled as an educational approximation with its method (stencil, scheme, rule), boundary, precision and limits, visible and spoken; no claim of scientific accuracy, prediction or certification; performance numbers only from device measurements",
+      "source": "cross-cutting: truthful educational labels; constitution A16 truthful claims; manual §13 risk 3",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
+          "symbol": "AnnouncementPlanner",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
+          "symbol": "StateSign",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AcknowledgementsView.swift",
+          "symbol": "LicenseInventory",
+          "product": "VisualCoreUI",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Core/ScientificReview.swift",
+        "symbol": "ScientificReview"
+      },
+      "notes": "Announcements, state signs and the license inventory exist and are tested (AccessibilityPlansTests, AcknowledgementsViewTests). The labels are experience copy shown in G-UI (A16-P04); the copy review and the copy-claims release step are G-RELEASE (A16-P06)."
+    },
+    {
+      "id": "M24",
+      "capability": "Render host, thread rule and experience host: one RenderHost on OpenGL ES -> ANGLE -> Metal with all GL work on the main thread, an ExperienceShell over a presenter with native controls and a canvas overlay, and an ExperienceSession that opens, checkpoints, recovers and closes the experience",
+      "source": "manual §4 architecture (VisualCore consumer, not renderer fork) and contracts and threading; spec FR-A16-001",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+          "symbol": "RenderHost",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+          "symbol": "RenderScene",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+          "symbol": "ExperienceSession",
+          "product": "VisualCoreExperienceHost",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceShell.swift",
+          "symbol": "ExperienceShell",
+          "product": "VisualCoreExperienceHost",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+          "symbol": "ExperiencePresenter",
+          "product": "VisualCoreExperienceHost",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+          "symbol": "ExperiencePresenter.makeCanvasOverlay",
+          "product": "VisualCoreExperienceHost",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidArtPresenter.swift",
+        "symbol": "FluidArtPresenter"
+      },
+      "notes": "Tested in VisualCoreRenderingTests (RenderHostTests) and VisualCoreExperienceHostTests (SessionOpenCloseTests, ShellLifecycleTests, CanvasOverlayTests). Fifteen experiences run on it today."
+    },
+    {
+      "id": "M25",
+      "capability": "Seeding and painting by touch with a control alternative: a tap seeds a pattern and a drag paints cells or concentration at grid coordinates mapped from the canvas, with a button or menu alternative for every gesture",
+      "source": "manual §2 journey 1 (tap to seed); spec FR-A16-003 (seeding and painting by touch with a control alternative)",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/PointerTracker.swift",
+          "symbol": "PointerEvent",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderView+Touches.swift",
+          "symbol": "RenderView.pointerHandler",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/GestureRecognizers.swift",
+          "symbol": "TapRecognizer",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/GestureRecognizers.swift",
+          "symbol": "DragRecognizer",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/GestureArbiter.swift",
+          "symbol": "GestureArbiter",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/GestureAlternatives.swift",
+          "symbol": "GestureAlternatives",
+          "product": "VisualCoreExperience",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/FluidArtPlayground/Core/Splat.swift",
+        "symbol": "Splat"
+      },
+      "notes": "Tested in VisualCoreScenesTests (GestureTests, GestureArbiterTests, PointerTrackerTests), VisualCoreRenderingTests (TouchAdapterTests) and VisualCoreExperienceTests (GestureAlternativesTests). Mapping touches to cells, the seed and paint commands applied to the CPU state and the GPU field, and their control alternatives are G-UI (A16-P04); the commands' domain rules come with G-SPEC (A16-P01)."
+    },
+    {
+      "id": "M26",
+      "capability": "Bounded resources: fixed limits per quality level for grid size, steps per frame, render targets, presets and capture size; requests beyond a limit refused or clamped with a message, never allocated",
+      "source": "cross-cutting: bounded; constitution A16 bounded; manual §12 (cap steps per frame, monitor GPU memory)",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/ResourceLedger.swift",
+          "symbol": "ResourceBudget",
+          "product": "VisualCoreDiagnostics",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepClock.swift",
+          "symbol": "FixedStepClock.maxSteps",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+          "symbol": "StorageQuota",
+          "product": "VisualCoreExperience",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
+          "symbol": "DocumentStore.maxBytes",
+          "product": "VisualCorePersistence",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/PingPongTarget.swift",
+          "symbol": "PingPongTarget.bytes",
+          "product": "VisualCoreRendering",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/FluidArtPlayground/Core/FluidConfiguration.swift",
+        "symbol": "FluidConfiguration"
+      },
+      "notes": "Resource budgets, step caps, storage quotas and document byte caps exist and are tested (ResourceLedgerTests, FixedStepClockTests, ExperienceStorageTests, DocumentStoreTests, PingPongTargetTests). Simulation Lab's limits are G-SPEC (A16-P01), measured against them in G-VALIDATION (A16-P05)."
+    }
+  ],
+  "gaps": [
+    {
+      "id": "G-RULES",
+      "matrix": [
+        "M06",
+        "M09",
+        "M13"
+      ],
+      "kind": "adaptation",
+      "owner": "app-local",
+      "justification": "No cellular-automaton, Gray-Scott or wave rule exists in any framework product. The three CPU references on tiny grids (a stated automaton neighbourhood and rule; Gray-Scott with its Laplacian stencil, diffusion constants, feed and kill; a bounded explicit wave scheme), each with its boundary rule (wrap for automata and reaction-diffusion, fixed zero for waves) and storage rounded through StoragePrecision, are the experience's science content and stay in its GPU-free Core (spec clarification 5, manual phase 01, A16-P01). A boundary-mode helper is assessed for VisualCoreSimulation there if a second consumer exists.",
+      "phase": 1,
+      "test": "Core host tests (swift test, no GPU): Life blinker returns after exactly two steps and a block is still; wrap carries a glider across an edge; Gray-Scott on a tiny grid matches a hand-computed step and keeps values finite and in 0...1; the wave pulse keeps its symmetry, is zero on the fixed boundary and its energy does not grow below the Courant limit; the same seed gives the same grid and digest; rounding to unorm8 keeps automaton states exact",
+      "closed": null
+    },
+    {
+      "id": "G-SPEC",
+      "matrix": [
+        "M07",
+        "M16",
+        "M26"
+      ],
+      "kind": "adaptation",
+      "owner": "app-local",
+      "justification": "ParameterSchema, SeededRandom, NumericHygiene and TimeStepPolicy exist; the versioned SimulationSpec (kind, grid size, time step, boundary mode, seed, parameter map, algorithm version), the parameter definitions with units and ranges for each experiment, the seeded starting conditions, the stability limits (wave Courant number, Gray-Scott step bound) with their visible explanations and the per-tier grid and step limits are experiment rules (manual §6 domain schemas and algorithm decisions, A16-P01).",
+      "phase": 1,
+      "test": "Core host tests: the spec round-trips through its versioned schema and refuses an unknown version, kind or boundary; every parameter is clamped to its range with an explanation; a time step beyond the stability limit is refused or clamped with the stated message; non-finite values are refused; the same seed gives the same starting field; grid sizes and steps per frame beyond a tier's limit are refused",
+      "closed": null
+    },
+    {
+      "id": "G-SCHEDULER",
+      "matrix": [
+        "M08"
+      ],
+      "kind": "adaptation",
+      "owner": "app-local",
+      "justification": "PlaybackState, FixedStepClock and FixedStepRunner.stepOnce exist; the simulation scheduler (run, pause, single step of exactly one iteration, reset to the seeded start, speed as steps per frame within a cap, separate from display and wall time) is the experience's control rule (manual SimulationScheduler component, §11 fixture 4, A16-P01); Fluid Art Playground's SimulationControl is not copied.",
+      "phase": 1,
+      "test": "Core host tests: pause stops stepping; one step while paused advances the step count by exactly one and equals one CPU step; reset restores the seeded field and step 0; speed never exceeds the cap per frame; a long frame gap never runs a catch-up burst beyond the cap",
+      "closed": null
+    },
+    {
+      "id": "G-CA-GPU",
+      "matrix": [
+        "M01",
+        "M02",
+        "M06",
+        "M10",
+        "M13"
+      ],
+      "kind": "adaptation",
+      "owner": "app-local",
+      "justification": "PingPongTarget, FieldPass and texelFetch-exact sampling exist; the automaton step and display shaders on RGBA8 (unorm8, exact states) with wrap by index arithmetic, the GPU-versus-CPU parity, the pass-isolation audit and the rebuild of the field from CPU state after context loss or resize are specific to this experience (manual phase 02, A16-P02).",
+      "phase": 2,
+      "test": "Rendering tests on the iOS 27.2 simulator: on a tiny grid N GPU steps read back with readFloatPixels equal the CPU reference exactly; the blinker period is 2 on the GPU; a glider wraps; FieldPass.runObserver shows no pass sampling its output over whole frames; after recreateContext and a resize the field is rebuilt from CPU state and matches the reference",
+      "closed": null
+    },
+    {
+      "id": "G-RDWAVE-GPU",
+      "matrix": [
+        "M01",
+        "M02",
+        "M06",
+        "M10",
+        "M13"
+      ],
+      "kind": "adaptation",
+      "owner": "app-local",
+      "justification": "FloatRenderSupport, PingPongTarget and FieldPass exist; the Gray-Scott and wave step and display shaders on RGBA16F, the use of FloatRenderSupport.detect per context generation with the rule that both families are disabled with a message when it reports no support (no silent RGBA8 run), the fixed-zero wave boundary and wrap for reaction-diffusion are specific to this experience (spec clarification 5, manual phase 03, A16-P03).",
+      "phase": 3,
+      "test": "Rendering tests on the iOS 27.2 simulator: on a tiny grid GPU steps match the CPU reference within the declared tolerance under both float16 rounding modes; a forced-unsupported FloatRenderSupport disables reaction-diffusion and waves with the message and allocates no RGBA8 field; the wave field stays zero on the boundary; the pass-isolation audit passes; rebuild after recreateContext and resize matches the reference",
+      "closed": null
+    },
+    {
+      "id": "G-UI",
+      "matrix": [
+        "M08",
+        "M25"
+      ],
+      "kind": "adaptation",
+      "owner": "app-local",
+      "justification": "ParameterPanel, the gesture recognizers, GestureAlternatives, the canvas overlay and the accessibility planners exist; the gallery of experiments, the inspector with effective values and ranges, the pause, reset, step and speed controls, touch seeding and painting mapped to cells with control alternatives, the visible approximation labels, the spoken state and the Reduce Motion and Reduce Flashing step-rate rule are experience UI (manual §3, phase 04, A16-P04).",
+      "phase": 4,
+      "test": "Experience tests and one UI pass on the iOS 27.x phone: every control acts and is spoken (running, paused, step count, parameter values); a tap seeds and a drag paints the expected cells, and the control alternative gives the same command; Reduce Motion and Reduce Flashing lower or pause the step rate; the approximation label is visible in every experiment",
+      "closed": null
+    },
+    {
+      "id": "G-LEGEND",
+      "matrix": [
+        "M04",
+        "M08"
+      ],
+      "kind": "adaptation",
+      "owner": "app-local",
+      "justification": "No field histogram, reduction pass or legend view exists in a framework product (FrameChecks.histogram is a DEBUG/automation luma check). Version 0.1 needs a histogram of a capped field over fixed bins at a bounded update rate and a legend that shows and speaks the ramp's value range; the CPU mirror or a readFloatPixels read-back into a FieldGrid is enough (manual phase 04, A16-P04). A16-P04 assesses a FieldGrid histogram for VisualCoreSimulation and a GPU reduction pass for VisualCoreRendering (both generic) and records the outcome here; either would be an additive VisualCore change with tests, docs, the API baseline and the reference regression.",
+      "phase": 4,
+      "test": "Core host tests: the histogram of a known grid has the expected counts, sums to the cell count and ignores no value silently (non-finite cells are counted apart); the legend's values match the ramp bounds of each experiment and are spoken; Experience tests: the overlay updates at most at its stated rate and never on every step",
+      "closed": null
+    },
+    {
+      "id": "G-PRESETS",
+      "matrix": [
+        "M11",
+        "M22"
+      ],
+      "kind": "adaptation",
+      "owner": "app-local",
+      "justification": "DocumentStore, MigrationChain, NamedLibrary, Preset and ExperienceStorage exist; the ExperimentPreset schema (spec, palette id, annotation), the bundled presets with author or source and license, and the saved-preset library with its cap are experience data (manual §6 ExperimentPreset, phase 04, A16-P04).",
+      "phase": 4,
+      "test": "Core host tests: presets round-trip, migrate from the previous schema and refuse damaged or newer files without a crash; every bundled preset decodes into a valid spec and carries author or source and license from the allowed set; the library keeps at most its cap",
+      "closed": null
+    },
+    {
+      "id": "G-CAPTURE",
+      "matrix": [
+        "M11"
+      ],
+      "kind": "adaptation",
+      "owner": "app-local",
+      "justification": "StillCapture, renderOffscreen and ExportSize exist and ShareLink is a system API; the capture of the current field at an allowed size with its metadata (experiment, step index, parameters, approximation label) and the hand-off to the share sheet without a usage string are experience flow (spec clarification 4, manual phase 04, A16-P04).",
+      "phase": 4,
+      "test": "Experience tests on the iOS 27.2 simulator: a capture of a paused field writes one PNG of the chosen size into the temporary folder and replaces the previous one; a failed capture reports the message and leaves no file; capturing never changes the field or the step count; no usage string is added",
+      "closed": null
+    },
+    {
+      "id": "G-VALIDATION",
+      "matrix": [
+        "M09",
+        "M16",
+        "M26"
+      ],
+      "kind": "adaptation",
+      "owner": "app-local",
+      "justification": "Numerical validation of the experience's own rules: the declared tolerances on tiny grids, behaviour at and beyond the stability limits, the float probe and parity on the iOS 27.x and 26.x simulators, and bounded short measurements of steps per second apart from display rate, are quality work specific to this experience (manual phase 05, A16-P05); device observations wait for the device campaign.",
+      "phase": 5,
+      "test": "A generated validation report from short runs: every family's GPU-versus-CPU difference is within its declared tolerance on both simulator runtimes; at the stability limit the wave and Gray-Scott runs stay finite and beyond it the step is refused with the message; steps per frame never exceed the cap; resource bytes stay within the tier budget",
+      "closed": null
+    },
+    {
+      "id": "G-RELEASE",
+      "matrix": [
+        "M22",
+        "M23"
+      ],
+      "kind": "adaptation",
+      "owner": "app-local",
+      "justification": "The release review of this experience: licenses of presets, palettes, copy and shaders, the educational approximation labels and the absence of accuracy, prediction or certification claims, an unchanged privacy answer, registration and the experience-release and copy-claims steps (manual phase 06, A16-P06).",
+      "phase": 6,
+      "test": "Release-check steps for A16 (experience-release, copy-claims) pass; the license inventory lists every bundled preset, palette and shader with its license; copy contains no forbidden claim words; every experiment shows and speaks its method and limits; the app's privacy answers and usage descriptions are unchanged",
+      "closed": null
+    }
+  ],
+  "traceability": [
+    {
+      "item": "brainstorm: GPU simulation techniques using shaders and framebuffer feedback",
+      "matrix": [
+        "M01",
+        "M10",
+        "M14",
+        "M15"
+      ],
+      "phases": [
+        2,
+        3
+      ]
+    },
+    {
+      "item": "brainstorm: numerical visualization",
+      "matrix": [
+        "M02",
+        "M12"
+      ],
+      "phases": [
+        2,
+        3
+      ]
+    },
+    {
+      "item": "brainstorm: parameter controls",
+      "matrix": [
+        "M03",
+        "M07"
+      ],
+      "phases": [
+        1,
+        4
+      ]
+    },
+    {
+      "item": "brainstorm: data visualization",
+      "matrix": [
+        "M04",
+        "M02"
+      ],
+      "phases": [
+        4
+      ]
+    },
+    {
+      "item": "brainstorm: animation and capture",
+      "matrix": [
+        "M05",
+        "M08",
+        "M11"
+      ],
+      "phases": [
+        1,
+        4
+      ]
+    },
+    {
+      "item": "v0.1 feature 1: three simulation families (cellular automata, reaction-diffusion, 2D wave field)",
+      "matrix": [
+        "M06",
+        "M09"
+      ],
+      "phases": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "item": "v0.1 feature 2: clear parameter schema per experiment and seeded starting conditions",
+      "matrix": [
+        "M07",
+        "M03",
+        "M16"
+      ],
+      "phases": [
+        1
+      ]
+    },
+    {
+      "item": "v0.1 feature 3: pause, reset, step, speed and histogram/legend overlay",
+      "matrix": [
+        "M08",
+        "M04"
+      ],
+      "phases": [
+        1,
+        4
+      ]
+    },
+    {
+      "item": "v0.1 feature 4: deterministic tiny CPU reference for each algorithm",
+      "matrix": [
+        "M09",
+        "M12",
+        "M17"
+      ],
+      "phases": [
+        1,
+        5
+      ]
+    },
+    {
+      "item": "v0.1 feature 5: GPU ping-pong texture path with explicit boundary rules",
+      "matrix": [
+        "M10",
+        "M13",
+        "M14",
+        "M15"
+      ],
+      "phases": [
+        2,
+        3
+      ]
+    },
+    {
+      "item": "v0.1 feature 6: save presets and capture stills",
+      "matrix": [
+        "M11",
+        "M18",
+        "M05"
+      ],
+      "phases": [
+        4
+      ]
+    },
+    {
+      "item": "non-goal: numerically certified scientific solver",
+      "matrix": [
+        "M23",
+        "M09"
+      ],
+      "phases": [
+        1,
+        6
+      ]
+    },
+    {
+      "item": "non-goal: large high-precision computation clusters",
+      "matrix": [
+        "M26",
+        "M12"
+      ],
+      "phases": [
+        1,
+        5
+      ]
+    },
+    {
+      "item": "non-goal: simultaneous multiuser experiments",
+      "matrix": [
+        "M18",
+        "M24"
+      ],
+      "phases": [
+        4
+      ]
+    },
+    {
+      "item": "manual §13 risk 1: numeric outcomes depend on precision and filtering",
+      "matrix": [
+        "M12",
+        "M15",
+        "M10"
+      ],
+      "phases": [
+        3,
+        5
+      ]
+    },
+    {
+      "item": "manual §13 risk 2: incorrect shader read/write feedback",
+      "matrix": [
+        "M14",
+        "M01"
+      ],
+      "phases": [
+        2,
+        3
+      ]
+    },
+    {
+      "item": "manual §13 risk 3: scientific visuals may look authoritative",
+      "matrix": [
+        "M23",
+        "M04"
+      ],
+      "phases": [
+        4,
+        6
+      ]
+    }
+  ],
+  "negative": [
+    {
+      "rule": "No EGL display, context, surface or GL path of its own; all drawing goes through VisualCore's RenderHost on OpenGL ES -> ANGLE -> Metal",
+      "source": "constitution A16 consumer, not fork; CLAUDE.md rule 4; spec FR-A16-006"
+    },
+    {
+      "rule": "No second renderer: every simulation step and display pass runs through FieldPass, PingPongTarget and FullScreenShaderScene or an additive VisualCore extension of that pipeline",
+      "source": "constitution A16 consumer, not fork; CLAUDE.md rule 4; spec FR-A16-006"
+    },
+    {
+      "rule": "No ProjectM types, engine or presets and no ProjectM code reused",
+      "source": "constitution A16 consumer, not fork; CLAUDE.md rule 12; spec FR-A16-006"
+    },
+    {
+      "rule": "No networking, accounts, analytics, tracking or advertising; presets stay on the device and stills leave it only through the system share sheet chosen by the person",
+      "source": "constitution A16 offline-first and private; CLAUDE.md rule 3; spec FR-A16-006"
+    },
+    {
+      "rule": "No claim of scientific accuracy, prediction or certification: every experiment is an educational approximation labelled with its method and limits; no numerically certified solver",
+      "source": "manual non-goals; constitution A16 truthful claims; spec FR-A16-006"
+    },
+    {
+      "rule": "No high-precision cluster computation: grids, steps per frame and precision are bounded per quality level on the device; nothing is offloaded",
+      "source": "manual non-goals; constitution A16 bounded; spec FR-A16-006"
+    },
+    {
+      "rule": "No multi-user experiments: one person, one device, no shared or synchronised sessions",
+      "source": "manual non-goals; spec FR-A16-006"
+    },
+    {
+      "rule": "No pass reads the texture it writes: every step uses a ping-pong pair through FieldPass, which refuses an input that is its output, and a test audits every run of whole frames",
+      "source": "constitution A16 resource separation; manual §13 risk 2; spec FR-A16-006"
+    },
+    {
+      "rule": "No silent precision loss: reaction-diffusion and the wave field never run on RGBA8; without float render support they are disabled with a message",
+      "source": "spec clarification 5; constitution A16 bounded"
+    },
+    {
+      "rule": "No purchased, generated or hand-made images, textures or artwork: fields, colour ramps, overlays, legends and backgrounds are shaders and procedural drawing made in code",
+      "source": "CLAUDE.md rule 4; constitution A16 visuals are code; spec FR-A16-006"
+    },
+    {
+      "rule": "No unlicensed presets or copy: every bundled preset, palette, fact text and shader records its author or source and license",
+      "source": "constitution A16 licenses; spec FR-A16-006"
+    },
+    {
+      "rule": "No shader decides the state: rules, seeds, validation and references are GPU-free CPU code testable with swift test, and drawing never changes the state",
+      "source": "constitution A16 deterministic CPU truth"
+    },
+    {
+      "rule": "No permission prompts: presets are kept in the experience's storage and stills go to the system share sheet, so no usage string is added; no camera, location, microphone, photos or network; the app's privacy answers do not change",
+      "source": "spec clarification 4; CLAUDE.md rule 6"
+    },
+    {
+      "rule": "No fork or copy of VisualCore, ANGLE or projectm-ios, no standalone app target and no copy of another experience's code (Fluid Art Playground's solver, scenes, BoundaryMode and SimulationControl); generic needs become VisualCore gaps",
+      "source": "ADR-0009; constitution A16 reuse first; CLAUDE.md rule 1"
+    },
+    {
+      "rule": "Risk 1, numeric outcomes depend on precision and filtering. Owner: Simulation Lab (app-local G-RDWAVE-GPU in A16-P03, G-VALIDATION in A16-P05) over VisualCoreRendering's FloatRenderSupport and VisualCoreSimulation's StoragePrecision. Verification: each family documents its storage format and pass semantics; step shaders read cells with texelFetch (no hardware filtering); FloatRenderSupport.detect runs per context generation; tiny-grid GPU-versus-CPU tests pass within the declared tolerance under both float16 rounding modes and exactly for automata on unorm8. Release blocker: any family running on a format other than its documented one, a silent RGBA8 run of reaction-diffusion or waves, or a parity test outside its tolerance on the iOS 27.x or 26.x simulator.",
+      "source": "manual §13 risk 1"
+    },
+    {
+      "rule": "Risk 2, incorrect shader read/write feedback can produce undefined behaviour. Owner: Simulation Lab (app-local G-CA-GPU in A16-P02 and G-RDWAVE-GPU in A16-P03) over VisualCoreRendering's PingPongTarget and FieldPass. Verification: every simulation and display pass runs through FieldPass (run(pair:input:) for steps), which throws inputIsOutput before any draw; an experience test installs FieldPass.runObserver over whole frames of every family and asserts no run samples its output, as Fluid Art Playground's PassIsolationTests does. Release blocker: any run whose input texture equals its output, or any simulation draw outside FieldPass.",
+      "source": "manual §13 risk 2"
+    },
+    {
+      "rule": "Risk 3, scientific visuals may look authoritative. Owner: Simulation Lab copy and UI (app-local G-UI in A16-P04, G-RELEASE in A16-P06). Verification: every experiment shows and speaks an educational-approximation label with its method, boundary, precision and limits in the inspector and the about text, checked by experience tests; the copy-claims release step for A16 refuses accuracy, prediction and certification wording. Release blocker: an experiment without its label, or copy or store text claiming scientific accuracy, prediction or certification.",
+      "source": "manual §13 risk 3"
+    }
+  ],
+  "decision": {
+    "result": "go",
+    "reasons": [
+      "A working host exists: RenderHost on OpenGL ES -> ANGLE -> Metal with all GL work on the main thread, ExperienceShell, ExperienceSession and the canvas overlay, public and tested; fifteen experiences (A01-A15) run on it.",
+      "A buildable offscreen feedback path exists: RenderTarget, PingPongTarget with swap(), FieldPass with run(pair:input:) that refuses an input that is its output, FloatRenderSupport with a per-generation probe and storageFormat, read-back with readFloatPixels and FieldGrid with StoragePrecision for CPU references, all public and tested; Fluid Art Playground already runs a GPU field simulation on it.",
+      "11 of 26 rows are available with tests (M03, M05, M12, M14, M15, M17, M18, M19, M20, M21, M24): parameter controls, animation and capture, CPU references with storage precision, resource separation, float targets with probe, determinism, persistence with migration, quality tiers, accessibility, lifecycle and context loss, and the host. The clarification's facts hold; in addition the registry creates every target with LINEAR filtering and CLAMP_TO_EDGE, so wrap and fixed boundaries are done by index arithmetic in the step shaders.",
+      "All 15 non-available rows have owned, additive gaps: app-local G-RULES, G-SPEC and G-SCHEDULER in A16-P01; G-CA-GPU in A16-P02; G-RDWAVE-GPU in A16-P03; G-UI, G-LEGEND (a FieldGrid histogram for VisualCoreSimulation and a reduction pass for VisualCoreRendering assessed there), G-PRESETS and G-CAPTURE in A16-P04; G-VALIDATION in A16-P05; G-RELEASE in A16-P06. No upstream VisualCore change is required to start.",
+      "No permission and no privacy answer changes; Simulation Lab stays unregistered (fifteen registered, A01-A15) until A16-P01 creates Packages/ExperiencesCreative/SimulationLab with its targets and first real rules."
+    ],
+    "blockers": []
+  }
+}
