@@ -33,4 +33,8 @@
 
 - Release, privacy and storage words describe what the owner and person see, not
   implementation choices, as in feature 108.
-- All items pass on the first validation (2026-11-16).
+- The spec was drafted before the skill was invoked (a process slip, corrected the same day); this invocation
+  validated it against every item above and against the phase prompt: privacy and permission strings (FR-A15-601–604),
+  accessibility (FR-A15-623), credit review (FR-A15-604, 620), local data migration and crash recovery
+  (FR-A15-610–612), CPU/GPU and device tests (FR-A15-630–632 and the device plan), build and archive (FR-A15-620),
+  no fabricated claims (FR-A15-621). All items pass (2026-11-16).
