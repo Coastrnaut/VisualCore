@@ -48,3 +48,7 @@ Agent C, after B: T-A15-509–510 (leak and words tests). Lead: manifest, review
 
 MVP: state schema 4, the import rules and the importer (502, 503, 505, 506) with the controls (507); then fuzz (508),
 leak (509) and review (504, 510). Review checkpoints after 503 (core tests), 507 (import session tests) and at 512.
+
+## Phase 5: Convergence
+
+- [ ] T-A15-516 Extend `ExperienceTests/MoleculeWordsTests.swift` to read the experience's Swift sources (`Experience/*.swift`, `Experience/Adapter/*.swift`, found from `#filePath`) and check every string literal — the inline accessibility labels, values and hints of `MoleculeControls` included — for `MoleculeReview.claimWords`, so no shown word escapes the domain check per FR-A15-521 (partial)
