@@ -29,6 +29,54 @@ Canonical overrides:
 - **Owner-only:** signing, archive and upload stay `BLOCKED_OWNER_ACTION` with the steps of
   `docs/release/build-and-archive.md`. Follow `specs/115-me-p06-release`.
 
+## Clarifications
+
+### Session 2026-11-16
+
+Answered by the lead under the owner's standing delegation (the recommended option each time), with the facts checked
+in code:
+- The release checker reads `docs/apps/<slug>/release.json` (schema 1: `requiredDocs`, `checklist`, and `copyCheck`
+  with text, swift and allow). `scripts/release_check.py` builds `experience-release-<id>` and `copy-claims-<id>` from
+  it, and the last interface chunk is `w2`.
+- The shared denylist refuses `share` as a feature the experience lacks; A16-P04 added sharing.
+
+- Q: Which statuses does the release checklist use? → A: The checker's:
+  - `verified`, with evidence;
+  - `pending-campaign-ii`, for device rows naming the device-campaign rows SL-D1 … SL-D6 of
+    `docs/apps/simulation-lab/device-campaign.md`;
+  - `owner-action`, with the owner's steps from `docs/release/build-and-archive.md`.
+- Q: Which words does the experience's own scan refuse? → A: Over the store text and the interface Swift (controls,
+  presenter, legend and the adapter's words), as whole words, case-insensitive:
+  - accurate, accuracy, precise, precision, predict, prediction, forecast, certified, certification;
+  - real-time, realistic, scientific-grade;
+  - fps, frames per second, battery.
+
+  "exact" stays allowed, because the automaton's states are exact and its label says so. The shared copy check runs
+  with `share` allowed (the capture's share sheet). Every test named in the claims table must exist.
+- Q: What does the source scan refuse? → A: In `Packages/ExperiencesCreative/SimulationLab`, the A15 list:
+  `URLSession`, `import Network`, `CLLocation`, `AVCapture`, `AVAudioRecorder`, `inputNode`, `installTap`, `CMMotion`,
+  `CNContact`, `PHPhotoLibrary`, `UIImagePickerController`, `ASIdentifierManager`, `AppTrackingTransparency`,
+  `UIScreen.main.brightness` and `isIdleTimerDisabled`.
+- Q: Which interface journeys run, and how? → A: A new serial chunk `x2`, launched through `SLSupport` as `MESupport`
+  does; each test under 60 s; no share sheet is presented (the capture is proved by the package tests).
+  - `SLExploreUITests`: Pause, and the status starts "Paused"; Step, and the step count in the status rises by one;
+    the bundled preset Spots, and the status names time step 1 while the approximation label names the Euler step;
+    Seed, and the step count is unchanged.
+  - `SLLibraryUITests`: type "My spots" in the experiment name and Save, and a "My spots" button appears; reopen the
+    experience, and it is still listed.
+- Q: How are crash recovery, sample files and old sessions proved? → A: Three proofs:
+  - **Crash recovery.** A test-only `failNextDraw` seam in the presenter. A test saves an experiment into a temporary
+    storage, sets the seam, and draws so the session fails. The preset file must be byte-identical, and a new session
+    over the same storage lists and opens it.
+  - **Sample files.** Committed `preset-{valid,newer,damaged,invalid}.json` and `state-{valid,newer,damaged}.json`
+    under the experience's test fixtures, answered by `SimulationPresetStore` or `SimulationCore.restore` as specified
+    and byte-identical afterwards.
+  - **Old sessions.** The state and preset schemas are both at version 1, so no older stored form exists and no
+    schema examples are registered; this is recorded in the release checklist.
+
+  A license inventory in `privacy-and-credits.md` lists the six presets, the three palettes and the shader programs:
+  the parameters' scientific sources are public domain, and the palettes and shaders are original code.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Nothing leaves the device (Priority: P1) 🎯
