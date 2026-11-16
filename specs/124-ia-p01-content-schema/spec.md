@@ -153,6 +153,9 @@ The content and any later saved view are versioned; damaged, newer or malformed 
   - the schema is unsupported.
 
   Each refusal MUST name the problem.
+- **FR-A17-107**: Each description MUST be 1 to 3 sentences of at most 400 characters, describing form, position and
+  connections only. It MUST carry no diagnostic, symptom or treatment statement (the words diagnose, diagnosis,
+  symptom, treatment, treat, cure, injury advice and medical advice are refused by validation, reason `clinical-text`).
 - **FR-A17-104**: Without a recorded clinical review, the manifest MUST state "not reviewed by a clinician".
 - **FR-A17-105**: The content, the model and its validation MUST be testable without a GPU.
 - **FR-A17-106**: The experience is not registered in this phase; no interface appears.
