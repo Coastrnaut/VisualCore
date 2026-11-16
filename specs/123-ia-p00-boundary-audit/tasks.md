@@ -23,7 +23,7 @@ Precedent: `specs/116-sl-p00-boundary-audit/tasks.md`.
 ## Phase 5: User Story 3 — The shell builds with the experience absent (P2)
 
 - [ ] T-A17-006 [US3] Build the one app for testing (`--name app-build -- python3 scripts/release_check.py --only app-build-for-testing-ios27`)
-- [ ] T-A17-007 [US3] Experience package check (`--name experience-packages -- python3 scripts/check_experience_packages.py`: 16 experiences, none A17); `grep -c a16 Catalog/registrations.json Apps/VisualCore/App/ExperienceRegistry.swift` gives 0 (FR-A17-005, SC-A17-004)
+- [ ] T-A17-007 [US3] Experience package check (`--name experience-packages -- python3 scripts/check_experience_packages.py`: 16 experiences, none A17); `grep -c a17 Catalog/registrations.json Apps/VisualCore/App/ExperienceRegistry.swift` gives 0 (FR-A17-005, SC-A17-004)
 
 ## Phase 6: User Story 4 — Stop/go decision (P2)
 
