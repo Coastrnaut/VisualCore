@@ -260,7 +260,8 @@ import Testing
                          "a07.audio-odyssey", "a08.oscilloscope-studio", "a09.digital-aquarium",
                          "a10.neon-arcade", "a11.physics-playground", "a12.tiny-worlds",
                          "a13.light-maze",
-                         "a14.solar-system-explorer"])
+                         "a14.solar-system-explorer",
+                         "a15.molecular-explorer"])
         for search in ["", "aurora"] {
             #expect(LauncherModel.state(manifest: .success(manifest), categories: categories, registered: [],
                                         searchText: search) == .empty, "nothing registered shows nothing")

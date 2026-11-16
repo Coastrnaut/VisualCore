@@ -1,5 +1,5 @@
 // MESupport — feature 115 (A15-P06) T-A15-609 (clarification Q4): helpers of the interface tests of Molecular Explorer
-// (A15) inside the one app, modelled on `SSESupport`. A15 is a candidate until X-A15; every launch carries
+// (A15) inside the one app, modelled on `SSESupport`. A15 was a candidate until X-A15 (integrated 2026-11-16); every launch carries
 // `-vcCandidates` (DebugLaunch: the candidates' catalog entries become available and are registered). A first start
 // erases the data (`-vcResetData`, which also removes the experience's storage, so there is no `recent.json` and no
 // `settings.json`: the Recent menu holds only the molecule opened at start and the labels are shown for all atoms),

@@ -119,9 +119,17 @@
       "name": "Solar System Explorer",
       "permissions": [],
       "tier": "free"
+    },
+    {
+      "category": "learn",
+      "code": "A15",
+      "id": "a15.molecular-explorer",
+      "name": "Molecular Explorer",
+      "permissions": [],
+      "tier": "free"
     }
   ],
-  "ledger_sha256": "e630249a220841f694e55141eee7daa9502656364b1b1e64509fb125ac9544c4",
+  "ledger_sha256": "8a3d7b7ede1da4b8ea71e458b61e5332fda234d91a8727bb841eacdb8a3c06f1",
   "privacy_answers": "unproven",
   "schema": 1
 }
