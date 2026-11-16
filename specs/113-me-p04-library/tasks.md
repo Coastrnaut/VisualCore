@@ -8,7 +8,7 @@ after every task (no trailers); read every check's exit before ticking. iOS 27 o
 
 ## Phase 1: Setup
 
-- [ ] T-A15-401 Baseline: cite the A15-P03 evidence on the unchanged tree (`.autonomy/checks/A15-P03.{me-ios27-2,app-unit-2,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14)
+- [X] T-A15-401 Baseline: cite the A15-P03 evidence on the unchanged tree (`.autonomy/checks/A15-P03.{me-ios27-2,app-unit-2,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14) — Verified 2026-11-16: 2026-11-16: A15-P03 evidence cited on unchanged sources (no Packages change since): .autonomy/checks/A15-P03.me-ios27-2.json, A15-P03.app-unit-2.json, A15-P03.verify-27.json, all exit 0
 
 ## Phase 2: Foundational — the core (stories 2–4)
 
