@@ -54,5 +54,5 @@ checkpoints after 105 (the bundled region validates) and at 111.
 
 ## Phase 7: Convergence
 
-- [ ] T-A17-114 Record in `specs/124-ia-p01-content-schema/plan.md` (Project Structure) the pending-core allowance in `scripts/check_experience_packages.py` and its three fixture tests in `scripts/tests/test_experience_packages.py` (research D7) per plan: project structure (unrequested)
+- [X] T-A17-114 Record in `specs/124-ia-p01-content-schema/plan.md` (Project Structure) the pending-core allowance in `scripts/check_experience_packages.py` and its three fixture tests in `scripts/tests/test_experience_packages.py` (research D7) per plan: project structure (unrequested) — Verified 2026-11-16: 2026-11-16: plan.md Project Structure lists scripts/check_experience_packages.py and scripts/tests/test_experience_packages.py (pending core, research D7); .autonomy/checks/A17-P01.experience-packages-2.json and A17-P01.script-tests-2.json exit 0
 - [ ] T-A17-115 Record in `specs/124-ia-p01-content-schema/data-model.md` the symmetric-neighbour rule (`missing-reference`) and the root rule (a root with a layer or meshes is `damaged`), and add a test of the root rule to `Packages/ExperiencesCreative/InteractiveAnatomy/CoreTests/ContentValidationTests.swift` per SC-A17-102 (unrequested)

@@ -52,6 +52,7 @@ Packages/ExperiencesCreative/InteractiveAnatomy/CoreTests/{BundledRegionTests,Co
   ContentCodecTests}.swift                                                                          new
 docs/apps/interactive-anatomy/visualcore-contract.json (G-CONTENT closed)                           modify
 docs/apps/interactive-anatomy/content-sources.md                                                    new (citations, licenses, review status)
+scripts/check_experience_packages.py, scripts/tests/test_experience_packages.py                       modify (pending core, research D7)
 ```
 
 **Dependency direction:** the core → VisualCoreMath. **Lifecycle:** decode once and validate; the result is immutable.
