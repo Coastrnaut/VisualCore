@@ -8,7 +8,7 @@ prompt. Precedent: `specs/125-ia-p02-scene-selection/tasks.md`.
 
 ## Phase 1: Setup
 
-- [ ] T-A17-301 Baseline: cite the A17-P02 evidence (`.autonomy/checks/A17-P02.{ia-ios27-6,app-unit,verify-27-2}.json`) on the tree recorded at A17-P02, whose Packages are unchanged since (owner ruling of 2026-11-14)
+- [X] T-A17-301 Baseline: cite the A17-P02 evidence (`.autonomy/checks/A17-P02.{ia-ios27-6,app-unit,verify-27-2}.json`) on the tree recorded at A17-P02, whose Packages are unchanged since (owner ruling of 2026-11-14) — Verified 2026-11-16: 2026-11-16: A17-P02 evidence cited: .autonomy/checks/A17-P02.ia-ios27-6.json, A17-P02.app-unit.json and A17-P02.verify-27-2.json, all exit 0; Packages unchanged since the A17-P02 record commit 1d8587f9
 
 ## Phase 2: Foundational — the VisualCore stage (story 3)
 
