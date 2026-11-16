@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "sh",
+    "specs/115-me-p06-release/scan-claims-release.sh"
+  ],
+  "command": "sh specs/115-me-p06-release/scan-claims-release.sh",
+  "elapsed_seconds": 0.741,
+  "exit_code": 0,
+  "finished": "2026-11-16T18:01:56+00:00",
+  "log": ".autonomy/logs/A15-P06.me-claims.log",
+  "log_sha256": "afbe03e819df08ed95bffe396ffe7c96a8ea22986742a3bea81126b9c163cd0c",
+  "name": "me-claims",
+  "stage": "A15-P06",
+  "started": "2026-11-16T18:01:55+00:00",
+  "timed_out": false
+}
