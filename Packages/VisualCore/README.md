@@ -6,7 +6,7 @@ iOS 26+ inside apps. The package map and dependency rules R1–R5 are in
 
 | Product | Purpose |
 |---|---|
-| VisualCoreMath | vectors, matrices, quaternions, cameras, double-precision plane viewports (PlaneViewport) and size-independent framings (PlaneFraming), log-scale framing flights and tour timelines (FramingFlight, TourTimeline), precision advice (PrecisionAdvisor), easing, camera rails with comfort limits (CameraRail, RailPose, ComfortLimits, RailFlight) and origin rebasing for long journeys (OriginRebase) |
+| VisualCoreMath | vectors, matrices, quaternions, cameras, double-precision plane viewports (PlaneViewport) and size-independent framings (PlaneFraming), log-scale framing flights and tour timelines (FramingFlight, TourTimeline), precision advice (PrecisionAdvisor), easing, camera rails with comfort limits (CameraRail, RailPose, ComfortLimits, RailFlight) origin rebasing for long journeys (OriginRebase) and anchored-label layout (AnchoredLabelLayout) |
 | VisualCoreSimulation | fixed-step clock, seeded RNG, timelines, particle pool, NaN guard, CPU field grids, storage precision, time-step policy, bounded steering and neighbour search, 2D overlap and swept collision tests |
 | VisualCoreScenes | input mapping, pointer tracking and velocity, seeded synthetic gesture scripts, mesh generators, export geometry, streaming piece windows (SegmentWindow), fixed-size slot pools (SlotPool) and per-quality-level streaming budgets (StreamingBudget, StreamingLevel); feature 062 (A08-P02): `Primitive.polyline` (a bounded multi-point line of up to 8,192 finite points with a width) |
 | VisualCoreShaderSource | shader library, includes, line maps, diagnostics parsing |
@@ -136,6 +136,16 @@ function get bit-identical edge heights and normals (for cell sizes exact in bin
 bilinear sampler clamped to the grid, normals, and `mesh(budget:)` (one vertex per grid point, two counter-clockwise
 triangles per cell seen from +y, checked against the `MeshBudget` before building; non-finite input is refused with
 `MeshError.invalidInput`). Used by Tiny Worlds (A12) for its preset terrains.
+
+**Anchored-label layout** (`VisualCoreMath`, feature 127, A17-P04): `AnchoredLabelLayout.place(_:camera:aspect:canvas:budget:)`
+places text-label boxes (`Candidate`: id, model-space anchor, size in points, priority) on a canvas overlay (points,
+origin top-left, y down) and returns `Placement`s (id, projected anchor, box). Candidates are taken by priority, then
+id; an anchor behind the camera or outside clip depth is culled (`canvasPoint(of:camera:aspect:canvas:)` gives nil);
+the box sits `offset` = 6 points right of and above the projected anchor (minX = x + 6, maxY = y − 6); a box not wholly
+inside the canvas, or overlapping an already placed box by a positive area (`overlaps`; touching edges do not
+overlap), is skipped; at most `budget` boxes are placed, and non-finite anchors or sizes are skipped. Deterministic and
+independent of input order. The generic form of the Solar System Explorer (A14) and Molecular Explorer (A15) label
+layouts; used by Interactive Anatomy (A17).
 
 **Ray intersection** (`VisualCoreMath`, feature 090): `Ray3(origin:direction:)` (nil for non-finite values or a zero
 direction; the direction is normalised) intersects an axis-aligned box (slab method), a sphere and a triangle

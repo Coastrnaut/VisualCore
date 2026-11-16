@@ -1387,6 +1387,7 @@ VisualCoreExperienceHost | var | public var snapshot: ExperienceSnapshot?
 VisualCoreExperienceHost | var | public var state: ExperienceLifecycleState
 VisualCoreExperienceHost | var | public var surfaceSize
 VisualCoreExperienceHost | var | public var timeLimit: Duration
+VisualCoreMath | enum | public enum AnchoredLabelLayout
 VisualCoreMath | enum | public enum EasingCurve: String, CaseIterable, Sendable, Codable
 VisualCoreMath | enum | public enum EasingMode: String, CaseIterable, Sendable, Codable
 VisualCoreMath | enum | public enum Level: String, Sendable, Equatable
@@ -1486,6 +1487,7 @@ VisualCoreMath | func | public static func -= (a: inout Vec2, b: Vec2)
 VisualCoreMath | func | public static func / (a: Vec2, s: Double) -> Vec2
 VisualCoreMath | func | public static func / (a: Vec3, s: Double) -> Vec3
 VisualCoreMath | func | public static func assess(mantissaBits: Int, magnitude: Double, pixelStep: Double) -> Status
+VisualCoreMath | func | public static func canvasPoint(of position: Vec3, camera: OrbitCamera, aspect: Double, canvas: Vec2) -> Vec2?
 VisualCoreMath | func | public static func eccentricAnomaly(meanAnomaly: Double, eccentricity e: Double) -> Double
 VisualCoreMath | func | public static func finite(_ x: Double, or fallback: Double) -> Double
 VisualCoreMath | func | public static func framing(width: Double, center: Vec2, size: Vec2) -> PlaneViewport
@@ -1496,8 +1498,10 @@ VisualCoreMath | func | public static func lookAt(eye: Vec3, target: Vec3, up: V
 VisualCoreMath | func | public static func minimumPixelStep(mantissaBits: Int, magnitude: Double) -> Double
 VisualCoreMath | func | public static func nearest(_ hits: [RayHit3?]) -> RayHit3?
 VisualCoreMath | func | public static func normalizedAngle(_ radians: Double) -> Double
+VisualCoreMath | func | public static func overlaps(_ a: Placement, _ b: Placement) -> Bool
 VisualCoreMath | func | public static func pcg(_ v: UInt32) -> UInt32
 VisualCoreMath | func | public static func perspective(fovY: Double, aspect: Double, near: Double, far: Double) -> Mat4
+VisualCoreMath | func | public static func place(_ candidates: [Candidate], camera: OrbitCamera, aspect: Double, canvas: Vec2,
 VisualCoreMath | func | public static func quantized(_ x: Double, step: Double) throws(NumericError) -> Int64
 VisualCoreMath | func | public static func rotation(_ a: Double) -> Mat3
 VisualCoreMath | func | public static func rotation(_ q: Quat) -> Mat4
@@ -1526,6 +1530,8 @@ VisualCoreMath | init | public init(distance: Double = 0, speed: Double = 0, tar
 VisualCoreMath | init | public init(framing: PlaneFraming, hold: Double)
 VisualCoreMath | init | public init(from decoder: any Decoder) throws
 VisualCoreMath | init | public init(from: PlaneFraming, to: PlaneFraming)
+VisualCoreMath | init | public init(id: Int, anchor: Vec3, size: Vec2, priority: Int)
+VisualCoreMath | init | public init(id: Int, point: Vec2, minX: Double, minY: Double, maxX: Double, maxY: Double)
 VisualCoreMath | init | public init(maxSpeed: Double, maxAcceleration: Double, maxTurnRate: Double, swayAmplitude: Double,
 VisualCoreMath | init | public init(orbit: OrbitBounds, targetRadius: Double, fovRange: ClosedRange<Double>, clearance: Double = 0)
 VisualCoreMath | init | public init(origin: Vec3 = .zero)
@@ -1539,6 +1545,7 @@ VisualCoreMath | init | public init?(controlPoints: [Vec3], samplesPerSpan: Int 
 VisualCoreMath | init | public init?(origin: Vec2, direction: Vec2)
 VisualCoreMath | init | public init?(origin: Vec3, direction: Vec3)
 VisualCoreMath | init | public init?(semiMajorAxis: Double, eccentricity: Double, inclination: Double, ascendingNode: Double,
+VisualCoreMath | let | public let anchor: Vec3
 VisualCoreMath | let | public let argumentOfPeriapsis: Double
 VisualCoreMath | let | public let ascendingNode: Double
 VisualCoreMath | let | public let center: Vec2
@@ -1551,11 +1558,16 @@ VisualCoreMath | let | public let flightDuration: Double
 VisualCoreMath | let | public let framing: PlaneFraming
 VisualCoreMath | let | public let from: PlaneFraming
 VisualCoreMath | let | public let hold: Double
+VisualCoreMath | let | public let id: Int
 VisualCoreMath | let | public let inclination: Double
 VisualCoreMath | let | public let level: Level
 VisualCoreMath | let | public let margin: Double
+VisualCoreMath | let | public let maxX: Double
+VisualCoreMath | let | public let maxY: Double
 VisualCoreMath | let | public let meanAnomalyAtEpoch: Double
 VisualCoreMath | let | public let meanMotion: Double
+VisualCoreMath | let | public let minX: Double
+VisualCoreMath | let | public let minY: Double
 VisualCoreMath | let | public let minimumPixelStep: Double
 VisualCoreMath | let | public let normal: Vec2
 VisualCoreMath | let | public let normal: Vec3
@@ -1565,11 +1577,13 @@ VisualCoreMath | let | public let phase: Phase
 VisualCoreMath | let | public let point: Vec2
 VisualCoreMath | let | public let point: Vec3
 VisualCoreMath | let | public let position: Vec3
+VisualCoreMath | let | public let priority: Int
 VisualCoreMath | let | public let reduceMotion: Bool
 VisualCoreMath | let | public let right: Vec3
 VisualCoreMath | let | public let samplesPerSpan: Int
 VisualCoreMath | let | public let segmentIndex: Int
 VisualCoreMath | let | public let semiMajorAxis: Double
+VisualCoreMath | let | public let size: Vec2
 VisualCoreMath | let | public let span: Double
 VisualCoreMath | let | public let start: PlaneFraming
 VisualCoreMath | let | public let stopIndex: Int
@@ -1584,6 +1598,7 @@ VisualCoreMath | let | public static let maxUnitsPerPoint
 VisualCoreMath | let | public static let minUnitsPerPoint
 VisualCoreMath | let | public static let minimumAngleFromVertical
 VisualCoreMath | let | public static let nearLimitMargin
+VisualCoreMath | let | public static let offset
 VisualCoreMath | let | public static let orderRange: ClosedRange<Int>
 VisualCoreMath | let | public static let pitchLimit
 VisualCoreMath | let | public static let reducedMotion
@@ -1596,6 +1611,7 @@ VisualCoreMath | let | public static let zero
 VisualCoreMath | let | public static let zoomRange: ClosedRange<Double>
 VisualCoreMath | struct | public struct Camera2D: Sendable, Equatable
 VisualCoreMath | struct | public struct CameraRail: Sendable, Equatable
+VisualCoreMath | struct | public struct Candidate: Equatable, Sendable
 VisualCoreMath | struct | public struct ComfortLimits: Sendable, Equatable, Codable
 VisualCoreMath | struct | public struct FramingFlight: Sendable, Equatable
 VisualCoreMath | struct | public struct KeplerOrbit: Sendable, Equatable
@@ -1605,6 +1621,7 @@ VisualCoreMath | struct | public struct OrbitBounds: Sendable, Equatable, Codabl
 VisualCoreMath | struct | public struct OrbitCamera: Sendable, Equatable
 VisualCoreMath | struct | public struct OrbitViewBounds: Sendable, Equatable, Codable
 VisualCoreMath | struct | public struct OriginRebase: Sendable, Equatable, Codable
+VisualCoreMath | struct | public struct Placement: Equatable, Sendable
 VisualCoreMath | struct | public struct PlaneFraming: Sendable, Equatable, Hashable, Codable
 VisualCoreMath | struct | public struct PlaneViewport: Sendable, Equatable
 VisualCoreMath | struct | public struct Quat: Sendable, Equatable

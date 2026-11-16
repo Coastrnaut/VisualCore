@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_documented_api.py",
+    "--sources",
+    "Packages/VisualCore/Sources/VisualCoreMath"
+  ],
+  "command": "python3 scripts/check_documented_api.py --sources Packages/VisualCore/Sources/VisualCoreMath",
+  "elapsed_seconds": 0.302,
+  "exit_code": 0,
+  "finished": "2026-11-16T23:43:08+00:00",
+  "log": ".autonomy/logs/A17-P04.documented-api-math.log",
+  "log_sha256": "f2922b9368a3d649e755839231227838b8da848110c2ffcd07deda14bc12c30a",
+  "name": "documented-api-math",
+  "stage": "A17-P04",
+  "started": "2026-11-16T23:43:08+00:00",
+  "timed_out": false
+}

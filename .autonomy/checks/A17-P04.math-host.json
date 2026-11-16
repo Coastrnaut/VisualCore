@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "VisualCoreMathTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter VisualCoreMathTests",
+  "elapsed_seconds": 8.589,
+  "exit_code": 0,
+  "finished": "2026-11-16T23:43:08+00:00",
+  "log": ".autonomy/logs/A17-P04.math-host.log",
+  "log_sha256": "7091d66fafd653106266434282b16b678908b7daf1ef042a9c9c31338bb167f7",
+  "name": "math-host",
+  "stage": "A17-P04",
+  "started": "2026-11-16T23:42:59+00:00",
+  "timed_out": false
+}
