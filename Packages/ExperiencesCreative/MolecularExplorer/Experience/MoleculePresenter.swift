@@ -66,6 +66,19 @@
 //     first panel line (or "No atom selected") through the injected ``AnnouncementSink`` (the system's VoiceOver
 //     announcements by default); `sync` sees each state once per change, so one action gives at most one announcement.
 //     The first state seen and a molecule change announce nothing.
+//
+// Feature 113 (A15-P04) T-A15-404 and T-A15-405 (FR-A15-401, FR-A15-410, FR-A15-411, FR-A15-420, FR-A15-440;
+// clarifications Q1–Q4; contracts/library.md):
+//   - Recent molecules: ``RecentStore`` (`recent.json` in the experience's storage, loaded once when the presenter is
+//     made). `sync` records the selected molecule's id on every molecule change it sees, the first state included (the
+//     molecule opened at start counts as opened). When the file was refused or unreadable the first state is recorded
+//     in memory only, so the refused file stays byte for byte until the next molecule change replaces it.
+//   - Settings: ``SettingsStore`` (`settings.json`, loaded once). Its label mode filters the overlay's labels: all the
+//     labels `LabelLayout` placed, only the selected atom's label (none when nothing is selected), or none; the ring is
+//     drawn whenever an atom is selected. ``setLabelMode(_:)`` (the Labels picker) is not an engine action: it writes
+//     the settings and filters the labels of the last frame at once.
+//   - Both stores live outside the engine state, so digests and replays are unchanged; the mirror holds the recent ids
+//     and titles (newest first), the label mode and the stores' messages for the controls.
 import Foundation
 import MolecularExplorerCore
 import SwiftUI
@@ -134,6 +147,16 @@ final class MoleculeMirror {
     var canvasSize = Vec2(0, 0)
     /// The overlay's size in points as it reported it; nil before it is shown (feature 112).
     var overlaySize: Vec2?
+    /// The recent molecule ids, newest first (feature 113).
+    var recentIDs: [String] = []
+    /// The recent molecules' titles, newest first (feature 113).
+    var recentTitles: [String] = []
+    /// The label mode of the settings (feature 113).
+    var labelMode = LabelMode.all
+    /// Why the recent list could not be read or saved; empty otherwise (feature 113).
+    var recentMessage = ""
+    /// Why the settings could not be read or saved; empty otherwise (feature 113).
+    var settingsMessage = ""
 }
 
 /// The ring drawn around the selected atom on the canvas overlay (feature 112, T-A15-306).
@@ -172,6 +195,16 @@ final class MoleculePresenter: ExperiencePresenter {
     let displayScale: Double
     /// Draws the styled sticks (true) or one 0.12 Å stick per half (false: the comparison drawing of the tests).
     var drawsBondStyles = true
+    /// The recent-molecules list in the experience's storage (feature 113).
+    let recentStore: RecentStore
+    /// The settings in the experience's storage (feature 113).
+    let settingsStore: SettingsStore
+    /// The molecule last recorded into the recent list; nil before the first state (feature 113).
+    private(set) var recordedSelection: Int?
+    /// Every label `LabelLayout` placed for the last frame, before the label mode filtered them (feature 113).
+    private(set) var lastPlacedLabels: [LabelLayout.Label] = []
+    /// The selected atom of the last frame (feature 113: the label mode `selected` keeps its label only).
+    private(set) var lastSelectedAtom: Int?
 
     /// Whether the GPU side is set up (between `setup` and `teardown`).
     private(set) var isLive = false
@@ -199,7 +232,7 @@ final class MoleculePresenter: ExperiencePresenter {
     private(set) var lastCanvas: Vec2?
     /// The scene of the last frame; nil before the first frame (feature 112: taps pick against it).
     private(set) var lastScene: MoleculeScene?
-    /// The labels of the last frame (feature 112).
+    /// The labels shown for the last frame, after the label mode (feature 112; filtered since feature 113).
     private(set) var lastLabels: [LabelLayout.Label] = []
     /// The canvas size in points the last labels were laid out in (feature 112).
     private(set) var lastCanvasPoints: Vec2?
@@ -224,12 +257,18 @@ final class MoleculePresenter: ExperiencePresenter {
 
     /// A presenter for the experience `experienceID`; `announcementSink` replaces the system's VoiceOver
     /// announcements (nil: the system's); `displayScale` is the points-per-pixel factor used before the overlay reports
-    /// its size (nil: the current trait collection's, else 2).
-    init(experienceID: ExperienceID, announcementSink: (any AnnouncementSink)? = nil, displayScale: Double? = nil) {
+    /// its size (nil: the current trait collection's, else 2); `recentStore` and `settingsStore` keep the recent list
+    /// and the settings (nil: in memory; feature 113). Both stores have loaded their files already; nothing is written
+    /// here.
+    init(experienceID: ExperienceID, announcementSink: (any AnnouncementSink)? = nil, displayScale: Double? = nil,
+         recentStore: RecentStore? = nil, settingsStore: SettingsStore? = nil) {
         self.experienceID = experienceID
         self.announcementSink = announcementSink ?? SystemAnnouncementSink()
         let traitScale = Double(UITraitCollection.current.displayScale)
         self.displayScale = displayScale ?? (traitScale > 0 ? traitScale : 2)
+        self.recentStore = recentStore ?? RecentStore(storage: nil)
+        self.settingsStore = settingsStore ?? SettingsStore(storage: nil)
+        syncStores()
     }
 
     // MARK: Render scene
@@ -293,13 +332,34 @@ final class MoleculePresenter: ExperiencePresenter {
         } else {
             canvas = Vec2(pixels.x / displayScale, pixels.y / displayScale)
         }
-        let labels = LabelLayout.labels(scene: scene, camera: camera, canvas: canvas, selected: selected)
+        let placed = LabelLayout.labels(scene: scene, camera: camera, canvas: canvas, selected: selected)
         let ring = selected.flatMap { Self.selectionRing(scene: scene, index: $0, camera: camera, canvas: canvas) }
-        lastLabels = labels
+        lastPlacedLabels = placed
+        lastSelectedAtom = selected
         lastCanvasPoints = canvas
-        if mirror.labels != labels { mirror.labels = labels }
+        showLabels()
         if mirror.ring != ring { mirror.ring = ring }
         if mirror.canvasSize != canvas { mirror.canvasSize = canvas }
+    }
+
+    /// The labels of `placed` the label mode `mode` shows with atom `selected` (or none): all of them, only the
+    /// selected atom's (none when nothing is selected) or none (feature 113).
+    nonisolated static func shownLabels(_ placed: [LabelLayout.Label], mode: LabelMode, selected: Int?)
+        -> [LabelLayout.Label] {
+        switch mode {
+        case .all: return placed
+        case .none: return []
+        case .selected:
+            guard let selected else { return [] }
+            return placed.filter { $0.index == selected }
+        }
+    }
+
+    /// Shows the last frame's placed labels through the settings' label mode in the mirror (feature 113).
+    private func showLabels() {
+        let labels = Self.shownLabels(lastPlacedLabels, mode: settingsStore.labels, selected: lastSelectedAtom)
+        lastLabels = labels
+        if mirror.labels != labels { mirror.labels = labels }
     }
 
     /// Releases every GPU object; the CPU meshes stay for the next context.
@@ -704,6 +764,64 @@ final class MoleculePresenter: ExperiencePresenter {
         if mirror.atomWords != atomWords { mirror.atomWords = atomWords }
         seenSelectedAtom = atom
         announceSelection(molecule: selection, atom: atom, words: atomWords)
+        recordMolecule(selection)
+    }
+
+    // MARK: Recent molecules and settings (feature 113)
+
+    /// Records the molecule at `selection` into the recent list when it differs from the one last recorded (the
+    /// first state included). The first state is written only when the file was read or missing, so a refused or
+    /// unreadable file stays as it was until the next molecule change.
+    private func recordMolecule(_ selection: Int) {
+        guard selection != recordedSelection, let molecule = MoleculeCore.molecule(index: selection) else { return }
+        let first = recordedSelection == nil
+        recordedSelection = selection
+        let persist: Bool
+        switch recentStore.loadResult {
+        case .refused, .unreadable: persist = !first
+        case .loaded, .missing: persist = true
+        }
+        recentStore.record(molecule.id, persist: persist)
+        syncStores()
+    }
+
+    /// The titles of the molecules `ids`, in order; ids outside the library are left out.
+    nonisolated static func recentTitles(_ ids: [String]) -> [String] {
+        ids.compactMap { id in MoleculeCore.library.first { $0.id == id }?.title }
+    }
+
+    /// The library index of the molecule `id`, or nil outside the library.
+    nonisolated static func libraryIndex(id: String) -> Int? {
+        MoleculeCore.library.firstIndex { $0.id == id }
+    }
+
+    /// The name of `mode` on the Labels picker: "All", "Selected" or "None".
+    nonisolated static func labelTitle(_ mode: LabelMode) -> String {
+        switch mode {
+        case .all: return "All"
+        case .selected: return "Selected"
+        case .none: return "None"
+        }
+    }
+
+    /// Sets the label mode (the Labels picker; not an engine action): the settings are written and the last frame's
+    /// labels are filtered at once.
+    func setLabelMode(_ mode: LabelMode) {
+        settingsStore.setLabels(mode)
+        syncStores()
+        showLabels()
+    }
+
+    /// Brings the mirror's recent list, label mode and store messages in line with the stores.
+    private func syncStores() {
+        let ids = recentStore.recent.ids
+        if mirror.recentIDs != ids { mirror.recentIDs = ids }
+        let titles = Self.recentTitles(ids)
+        if mirror.recentTitles != titles { mirror.recentTitles = titles }
+        let mode = settingsStore.labels
+        if mirror.labelMode != mode { mirror.labelMode = mode }
+        if mirror.recentMessage != recentStore.message { mirror.recentMessage = recentStore.message }
+        if mirror.settingsMessage != settingsStore.message { mirror.settingsMessage = settingsStore.message }
     }
 
     /// The words of no selected atom.
