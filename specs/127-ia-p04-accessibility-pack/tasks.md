@@ -44,3 +44,7 @@ Package.swift, API baseline, README, contract, runs, commits.
 
 MVP: the gestures (405) with the pack's provenance fixture (404). Labels (402, 403) and accessibility (403, 405) close
 the phase. Review checkpoints after 404 (core) and at 408.
+
+## Phase 6: Convergence
+
+- [ ] T-A17-411 Record in `specs/127-ia-p04-accessibility-pack/research.md` three as-built decisions: `AnatomyContentPack.bundledSavedAt` (a fixed savedAt so encoding is deterministic); the label canvas (the overlay's reported size, else pixels divided by the display scale); and the gesture difference from Molecular Explorer (a blocked orbit start during a pinch does not skip that event's zoom step). Per plan: lifecycle (unrequested)
