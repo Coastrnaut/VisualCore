@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-16 (A16-P06: interface chunk x2, a scan that allows a named format; A16-P05: a generated validation report; mirrors reload after an edit; A16-P04: no mutating call inside #expect; A16-P03: round to half in the shader, test the mirror while it runs; A16-P02: GPU parity against both half roundings; A16-P01: fixture count from the catalog).
+Last updated: 2026-11-16 (A17-P00: an audit corrects the clarification; A16-P06: interface chunk x2, a scan that allows a named format; A16-P05: a generated validation report; mirrors reload after an edit; A16-P04: no mutating call inside #expect; A16-P03: round to half in the shader, test the mirror while it runs; A16-P02: GPU parity against both half roundings; A16-P01: fixture count from the catalog).
 
 ## 1. What is tested, and where
 
@@ -99,6 +99,10 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   (A16-P04) followed by a step in the same frame was then stepped from the unpainted field; only a test that paints
   and steps without a frame between found it (A16-P05, `BoundaryRuleTests`). Any action that changes state outside the
   step counts as an edit (`SimulationCore.paintCount`), and a test runs edit-then-step with no frame between.
+- **Let the contract audit correct the clarification.** A17-P00's clarification assumed no lathe or sweep generator
+  and one `LabelLayout` consumer. The code audit found `Mesh.revolution` and `tube` (tested), two consumers already,
+  and a blend-free depth pass; converge then corrected the spec and research (T-A17-012). Grep the framework products
+  before writing a gap, and treat the audit's file and symbol checks as the truth (A17-P00).
 - **A claims scan may allow one named phrase, never a word.** Simulation Lab's label says "half-precision values";
   the scan removes that exact phrase before refusing "precision", so the word stays refused everywhere else (A16-P06,
   `specs/122-sl-p06-release/scan-claims-release.sh`). Interface journeys for A16 run in the serial chunk `x2`.
