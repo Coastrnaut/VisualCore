@@ -8,7 +8,7 @@ Precedent: `specs/117-sl-p01-algorithms/tasks.md`.
 
 ## Phase 1: Setup
 
-- [ ] T-A17-101 Baseline: cite the A17-P00 evidence on an unchanged `Packages` tree (`.autonomy/checks/A17-P00.{app-build,no-change}.json`) instead of a rerun (owner ruling of 2026-11-14)
+- [X] T-A17-101 Baseline: cite the A17-P00 evidence on an unchanged `Packages` tree (`.autonomy/checks/A17-P00.{app-build,no-change}.json`) instead of a rerun (owner ruling of 2026-11-14) — Verified 2026-11-16: 2026-11-16: A17-P00 evidence cited: .autonomy/checks/A17-P00.app-build.json and A17-P00.no-change.json, both exit 0; the Packages tree is unchanged since the A17-P00 record commit 4c74bdf1 (git diff --stat empty)
 
 ## Phase 2: Foundational — the core targets
 
