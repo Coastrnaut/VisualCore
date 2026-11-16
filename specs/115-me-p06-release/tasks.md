@@ -35,7 +35,7 @@ picker or any system prompt. Precedent: `specs/108-sse-p06-release/tasks.md`.
 
 ## Phase 6: Records
 
-- [ ] T-A15-613 Script tests (`--name script-tests -- python3 scripts/test_scripts.py`)
+- [X] T-A15-613 Script tests (`--name script-tests -- python3 scripts/test_scripts.py`) — Verified 2026-11-16: 2026-11-16: .autonomy/checks/A15-P06.script-tests.json exit 0
 - [ ] T-A15-614 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A15-P06 (owner and device items stay open as BLOCKED_OWNER_ACTION and pending-campaign-ii); update README.md (rule 16) and `docs/automatedtesting.md` (rule 17)
 
 ## Dependencies
