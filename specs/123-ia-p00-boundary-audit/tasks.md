@@ -31,7 +31,7 @@ Precedent: `specs/116-sl-p00-boundary-audit/tasks.md`.
 
 ## Phase 7: Polish and evidence
 
-- [ ] T-A17-009 No-change proof (`--name no-change -- git diff --exit-code --stat f437fd0b..HEAD -- Packages External`) (FR-A17-008, SC-A17-005)
+- [X] T-A17-009 No-change proof (`--name no-change -- git diff --exit-code --stat f437fd0b..HEAD -- Packages External`) (FR-A17-008, SC-A17-005) — Verified 2026-11-16: 2026-11-16: .autonomy/checks/A17-P00.no-change.json exit 0 (empty diff of Packages and External since f437fd0b)
 - [ ] T-A17-010 Script tests (`--name script-tests -- python3 scripts/test_scripts.py`) and the release-check document steps (`--name fast-checks -- python3 scripts/release_check.py --only docs app-contracts compliance dependencies`); every run-check of this gate stays within its 600 s limit and the contract check under 10 s (SC-A17-006)
 - [ ] T-A17-011 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A17-P00; update README.md (status, gate count) in the record commit (rule 16) and `docs/automatedtesting.md` if a test tool, rule or lesson changed (rule 17)
 
