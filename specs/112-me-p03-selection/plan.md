@@ -4,7 +4,8 @@
 
 ## Summary
 
-Build G-PICK and G-PANEL and the gestures and panning moved from A15-P02, with no VisualCore change: in the core a pure
+Build G-PICK and G-PANEL and the gestures and panning moved from A15-P02, with one additive VisualCore change found in
+convergence (the host hook `ExperiencePresenter.cancelPointers()`, T-A15-313): in the core a pure
 atom picker (line of sight against drawn spheres, nearest wins), a label layout without overlaps, bond styles from
 order and provenance, the camera's pan steps and state schema 3 (pan, selected atom) with a migration from schema 2; in
 the experience the canvas gestures over VisualCore's arbiter, the new actions and controls (pan, atom previous / next /
@@ -26,7 +27,8 @@ only; no NEEDS CLARIFICATION remains.
 
 ## Constitution Check
 
-I PASS (one renderer) · II PASS (gestures, rays, camera, overlay slot reused; no upstream change) · II-a N/A · III PASS
+I PASS (one renderer) · II PASS (gestures, rays, camera, overlay slot reused; one additive host hook) · II-a PASS (the hook is documented,
+in the API baseline and tested; the reference regression runs at X-A15 by the owner ruling of 2026-11-14) · III PASS
 · IV PASS (picker, labels, bond styles, pan and state tested without GPU; gestures as pure values with synthetic events)
 · V PASS (schema 3 with a migration from 2) · VI PASS · VII PASS (every gesture has a control; bond order and
 provenance not by colour alone; panel and description speak the selection; one announcement per action) · VIII PASS ·

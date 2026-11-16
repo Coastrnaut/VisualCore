@@ -21,3 +21,15 @@
 ## D5 — State, panel and speech
 - **Decision**: schema 3 (pan, selected atom), migration from 2; panel lines, description suffix and one announcement
   per action (clarification Q5).
+
+## As built (2026-11-15)
+
+- **Host hook (convergence round 1, T-A15-313):** pointer events of a suspended experience are dropped, so the
+  system's touch cancellation never reached the gestures; a finger held through a suspension stayed tracked and the
+  next one-finger drag would have been read as two fingers. `ExperiencePresenter.cancelPointers()` (additive, default
+  no-op) is now called by `ExperienceShell.suspend()`; Molecular Explorer resets its gestures there. Documented in the
+  VisualCoreRendering README, API baseline +1, tested by `PointerCancelTests` and
+  `MoleculeGestureTests.testASuspensionForgetsAFingerThatWasDown`; the reference regression runs at X-A15.
+- **Signs:** dragging right sends `camera.orbit [−1]` and dragging down `camera.tilt [+1]`, so the molecule follows the
+  finger; two fingers moving right send `camera.pan [−1, 0]`. The Pan buttons move the view, like the Turn buttons.
+- **Description order:** "…; ball-and-stick; selected nitrogen, atom 3."

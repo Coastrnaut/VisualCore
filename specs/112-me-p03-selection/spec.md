@@ -201,7 +201,8 @@ and metadata panel".
 ## Assumptions
 
 - The gesture recognizers and arbiter, ray casts against spheres, the orbit camera's rays and the host's canvas
-  overlay slot of the A15-P00 contract and A14 are enough; no VisualCore change.
+  overlay slot of the A15-P00 contract and A14 are enough, plus one additive host hook found missing during
+  convergence (`ExperiencePresenter.cancelPointers()`, called on suspension; T-A15-313).
 - Bond picking is not part of version 0.1.
 
 ## Traceability
@@ -219,4 +220,5 @@ and metadata panel".
 ## Negative Requirements
 
 - No bond picking, measurement tools, persisted library or settings, import or network in this phase; no information
-  carried by colour alone; no VisualCore change.
+  carried by colour alone; no VisualCore change beyond the additive `cancelPointers()` hook (reference regression
+  at X-A15).
