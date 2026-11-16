@@ -28,7 +28,7 @@ Precedent: `specs/117-sl-p01-algorithms/tasks.md`.
 
 ## Phase 5: Story 3 — content that is safe to store and evolve (P2)
 
-- [ ] T-A17-109 [P] [US3] Write `Packages/ExperiencesCreative/InteractiveAnatomy/CoreTests/ContentCodecTests.swift`: `encoded` then `decode` gives an equal region and equal bytes; damaged JSON, schema 2 and 262,145 bytes are refused with `damaged`, `newer-version` and `too-large` (SC-A17-103)
+- [X] T-A17-109 [P] [US3] Write `Packages/ExperiencesCreative/InteractiveAnatomy/CoreTests/ContentCodecTests.swift`: `encoded` then `decode` gives an equal region and equal bytes; damaged JSON, schema 2 and 262,145 bytes are refused with `damaged`, `newer-version` and `too-large` (SC-A17-103) — Verified 2026-11-16: 2026-11-16: ContentCodecTests (exact round trip, damaged, newer-version, too-large) pass in .autonomy/checks/A17-P01.ia-core-ios27.json exit 0 (24 tests in 3 suites, iOS 27)
 
 ## Phase 6: Records and evidence
 
