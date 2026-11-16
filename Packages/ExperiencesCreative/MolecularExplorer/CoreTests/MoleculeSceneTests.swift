@@ -3,7 +3,9 @@
 // atom count: 3 atoms and 2 bonds → 4 halves, 9 atoms and 8 bonds → 16 halves); every half of all five library
 // molecules starts at its atom's centre and ends at the bond midpoint within 1e-9 Å; space-filling draws atoms at their
 // van der Waals radius and no halves, ball-and-stick at 0.30 × with sticks of 0.12 Å; a one-atom molecule has no halves
-// and a bounding radius equal to its display radius; the scene is deterministic and within the draw budget.
+// and a bounding radius equal to its display radius; the scene is deterministic and within the draw budget. Updated by
+// feature 112 (A15-P03) T-A15-303 (FR-A15-321): each half's radius is its bond style's stick radius (0.12 Å for a
+// recorded single bond) and the item count is the atoms plus the styled sticks.
 import Foundation
 import Testing
 import VisualCoreMath
@@ -28,6 +30,7 @@ import VisualCoreMath
         #expect(waterScene.atoms.count == 3 && water.bonds.count == 2 && waterScene.bondHalves.count == 4)
         #expect(ethanolScene.atoms.count == 9 && ethanol.bonds.count == 8 && ethanolScene.bondHalves.count == 16)
         #expect(waterScene.itemCount == 7 && ethanolScene.itemCount == 25)
+        #expect(waterScene.sticks.count == 4 && ethanolScene.sticks.count == 16)
     }
 
     @Test func everyHalfRunsFromItsAtomCentreToTheMidpoint() {
@@ -43,7 +46,9 @@ import VisualCoreMath
                 #expect((first.from - pa).length <= 1e-9 && (first.to - middle).length <= 1e-9, "\(molecule.id)")
                 #expect((second.from - pb).length <= 1e-9 && (second.to - middle).length <= 1e-9, "\(molecule.id)")
                 #expect(first.symbol == a.symbol && second.symbol == b.symbol)
-                #expect(first.radius == DisplayMode.stickRadius && second.radius == DisplayMode.stickRadius)
+                let radius = BondStyle.style(order: bond.order, origin: bond.origin).radius
+                #expect(first.radius == radius && second.radius == radius)
+                #expect(bond.order != 1 || radius == DisplayMode.stickRadius)
             }
         }
     }
