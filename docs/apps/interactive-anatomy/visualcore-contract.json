@@ -1,0 +1,1973 @@
+{
+ "schema": 1,
+ "app": "interactive-anatomy",
+ "gate": "A17-P00",
+ "date": "2026-11-16",
+ "inventory": [
+  {
+   "area": "Package products",
+   "description": "Pure, host-testable products of Packages/VisualCore: VisualCoreMath, VisualCoreSimulation, VisualCoreScenes, VisualCoreShaderSource, VisualCoreEffectsGraph, VisualCoreDiagnostics, VisualCoreAudioDSP, VisualCorePersistence, VisualCoreParameters, VisualCoreExperience (+ VisualCoreTestSupport for test targets). iOS products of Packages/VisualCoreRendering: VisualCoreRendering, VisualCoreEffects, VisualCoreUI, VisualCoreAudio, VisualCoreAutomation, VisualCoreExperienceHost. For Interactive Anatomy (checked 2026-11-16): VisualCoreMath has Vec3, Mat4 and Quat, OrbitCamera (view, projection, viewProjection, project, ray(ndc:aspect:)), OrbitBounds and OrbitViewBounds (orbit, pan, zoom, clamp), Ray3/RayHit3 with ray-box, ray-sphere and ray-triangle casts and nearest, StableHash and NumericHygiene; VisualCoreScenes has Mesh with plane, cube and uvSphere, MeshShapes surface, revolution (lathe), extrusion, tube (sweep with rotation-minimizing frames) and bevelledBox, MeshBuilder under a MeshBudget, MeshBounds, MeshCache and the gesture recognizers with GestureArbiter; VisualCorePersistence has DocumentStore, DocumentEnvelope, MigrationChain and NamedLibrary; VisualCoreExperience has ExperienceStorage with StorageQuota, SavedStateStore, StateDigest, ScenarioManifest, GestureAlternatives and CatalogSearch.fold; VisualCoreRendering has MeshRenderer, DepthMeshPass, MeshFog and ResourceRegistry. Missing in every framework product (grep 2026-11-16): an anatomy or structure-graph type, a ray-versus-mesh cast, translucent depth-sorted mesh drawing, an anchored-label layout with overlap handling and a citation or review record.",
+   "paths": [
+    "Packages/VisualCore/Package.swift",
+    "Packages/VisualCoreRendering/Package.swift",
+    "Packages/ExperiencesCreative/Package.swift",
+    "Packages/VisualCore/Sources/VisualCoreMath/OrbitCamera.swift",
+    "Packages/VisualCore/Sources/VisualCoreMath/CameraBounds.swift",
+    "Packages/VisualCore/Sources/VisualCoreMath/OrbitViewBounds.swift",
+    "Packages/VisualCore/Sources/VisualCoreMath/RayIntersection.swift",
+    "Packages/VisualCore/Sources/VisualCoreScenes/MeshGenerators.swift",
+    "Packages/VisualCore/Sources/VisualCoreScenes/MeshShapes.swift",
+    "Packages/VisualCore/Sources/VisualCoreScenes/MeshBuilder.swift",
+    "Packages/VisualCore/Sources/VisualCoreScenes/GestureRecognizers.swift",
+    "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
+    "Packages/VisualCore/Sources/VisualCorePersistence/Migration.swift",
+    "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+    "Packages/VisualCore/Sources/VisualCoreExperience/CatalogSearch.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshRenderer.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/DepthMeshPass.swift",
+    "scripts/check_dependencies.py",
+    "docs/api/visualcore-public-api.txt"
+   ],
+   "owner": "VisualCore packages (ADR-0003, ADR-0009)"
+  },
+  {
+   "area": "EGL render host and thread",
+   "description": "RenderHost (@MainActor) owns the EGL display, context and surfaces over ANGLE's Metal backend (EGLDisplayProvider chooses an RGBA8 ES3 config with no guaranteed depth buffer, so the window surface is colour-only), the CAMetalLayer RenderView, the FrameScheduler (CADisplayLink) and context generations; pause/resume, replaceScene, recreateContext, renderOffscreen and destroy; scenes implement RenderScene setup/resize/render/teardown. All EGL and GL work runs on the main thread. Interactive Anatomy's structure graph, layer rules, picking, search and validation are GPU-free CPU work done on input or load before drawing; drawing reads the state and camera and never changes them. Depth comes from DepthMeshPass's owned off-screen target copied to the framebuffer; the experience adds no EGL or GL context of its own.",
+   "paths": [
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderView.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderView+Touches.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FrameScheduler.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/EGLDisplayProvider.swift"
+   ],
+   "owner": "VisualCoreRendering (ADR-0002 seam)"
+  },
+  {
+   "area": "Shaders and resources (meshes, mesh rendering, lighting, depth, blending, textures)",
+   "description": "ResourceRegistry creates buffers, textures (makeTexture), programs and render targets under a ResourceBudget and rejects stale handles after a generation change; makeRenderTarget(depth: true) adds a 24-bit depth renderbuffer. ShaderProgram, ShaderBundle and ShaderLibrary compile bundled GLSL; the vc/ library holds color, field, hash, noise, palette and sdf helpers. Pipeline = ShaderProgram + RenderState, applied by GLState (RenderState.opaque3D: depth test and write, back-face culling; RenderState.alphaBlended: alpha blend only). MeshRenderer draws one Mesh with Lambert lighting from one light direction plus an ambient fraction, in one premultiplied-alpha colour or per-vertex colours, with optional MeshFog, culling back faces and leaving depth to the caller; it samples no texture and sets no blend state. DepthMeshPass draws a list of items with depth test LESS and depth write into an owned target with blending disabled and blits the colour to the framebuffer, so translucent ghosts need G-GHOST. PrimitiveRenderer and FullScreenShaderScene serve backgrounds.",
+   "paths": [
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderProgram.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderBundle.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/Pipeline.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLState.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshRenderer.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshFog.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/DepthMeshPass.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/PrimitiveRenderer.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+    "Packages/VisualCore/Sources/VisualCoreShaderSource/ShaderLibrary.swift",
+    "Packages/VisualCore/Sources/VisualCoreShaderSource/RenderState.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/palette.glsl"
+   ],
+   "owner": "VisualCoreRendering + VisualCoreShaderSource"
+  },
+  {
+   "area": "Geometry, cameras and picking",
+   "description": "Mesh (positions, normals, uvs, UInt32 indices; plane, cube, uvSphere) and MeshBuilder under a MeshBudget with welding; MeshShapes surface, revolution, extrusion, tube and bevelledBox (feature 205, tested in MeshShapeTests): bone shafts and condyles as revolved profiles, ligaments and the tendon as tubes along paths, capsules as revolved profiles, curved cartilage and menisci as surfaces; normals, MeshBounds (centre and radius for framing and pick prefilter), validation, digest and MeshCache. OrbitCamera with OrbitViewBounds gives orbit, pan and zoom in bounds; OrbitCamera.ray with Ray3.intersect(triangle:) and Ray3.nearest picks against triangles; OrbitCamera.project places labels. There is no ray-versus-mesh helper (G-PICK).",
+   "paths": [
+    "Packages/VisualCore/Sources/VisualCoreScenes/MeshGenerators.swift",
+    "Packages/VisualCore/Sources/VisualCoreScenes/MeshBuilder.swift",
+    "Packages/VisualCore/Sources/VisualCoreScenes/MeshShapes.swift",
+    "Packages/VisualCore/Sources/VisualCoreScenes/MeshNormals.swift",
+    "Packages/VisualCore/Sources/VisualCoreScenes/MeshBounds.swift",
+    "Packages/VisualCore/Sources/VisualCoreScenes/MeshValidation.swift",
+    "Packages/VisualCore/Sources/VisualCoreScenes/MeshCache.swift",
+    "Packages/VisualCore/Sources/VisualCoreMath/Quaternion.swift",
+    "Packages/VisualCore/Sources/VisualCoreMath/Matrix.swift",
+    "Packages/VisualCore/Sources/VisualCoreMath/OrbitCamera.swift",
+    "Packages/VisualCore/Sources/VisualCoreMath/CameraBounds.swift",
+    "Packages/VisualCore/Sources/VisualCoreMath/OrbitViewBounds.swift",
+    "Packages/VisualCore/Sources/VisualCoreMath/RayIntersection.swift",
+    "Packages/VisualCore/Sources/VisualCoreScenes/GestureRecognizers.swift",
+    "Packages/VisualCore/Sources/VisualCoreScenes/GestureArbiter.swift"
+   ],
+   "owner": "VisualCoreMath + VisualCoreScenes"
+  },
+  {
+   "area": "Labels, overlays, search and accessibility",
+   "description": "ExperiencePresenter.makeCanvasOverlay puts a SwiftUI overlay over the canvas (CanvasOverlayTests); OrbitCamera.project gives anchor points. Anchored-label layouts with overlap handling exist only in Solar System Explorer (Experience/LabelLayout.swift, internal) and Molecular Explorer (Core/LabelLayout.swift, public in its experience product), assessed for VisualCoreMath in G-LABELS. CatalogSearch.fold folds text language-independently. SystemAccessibility, AnnouncementPlanner, StateSign with stateSignProblems, transitionDuration (Reduce Motion), GestureAlternatives, SystemAccessibilityObserver, the announcement sinks and AccessibleColors.contrastRatio cover accessibility planning; LicenseInventory and AcknowledgementsView list licenses.",
+   "paths": [
+    "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+    "Packages/ExperiencesCreative/SolarSystemExplorer/Experience/LabelLayout.swift",
+    "Packages/ExperiencesCreative/MolecularExplorer/Core/LabelLayout.swift",
+    "Packages/VisualCore/Sources/VisualCoreExperience/CatalogSearch.swift",
+    "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
+    "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPreferences.swift",
+    "Packages/VisualCore/Sources/VisualCoreExperience/GestureAlternatives.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreUI/SystemAccessibilityObserver.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreUI/AccessibilityPlayers.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreUI/AccessibilitySettingsSection.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreUI/AcknowledgementsView.swift"
+   ],
+   "owner": "VisualCoreExperienceHost + VisualCoreExperience + VisualCoreSimulation + VisualCoreUI"
+  },
+  {
+   "area": "Persistence and storage",
+   "description": "DocumentStore writes versioned documents (DocumentEnvelope kind and schemaVersion) atomically under a byte cap (maxBytes) and migrates them forward through a MigrationChain, reporting damaged or newer files as problems instead of crashing; NamedLibrary keeps named documents; ExperienceStorage is the per-experience sandbox with StorageQuota and typed StorageError; SavedStateStore keeps small values. The saved view uses these (G-VIEW); the bundled content pack reuses the envelope and migration (G-PACK).",
+   "paths": [
+    "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
+    "Packages/VisualCore/Sources/VisualCorePersistence/Envelope.swift",
+    "Packages/VisualCore/Sources/VisualCorePersistence/Migration.swift",
+    "Packages/VisualCore/Sources/VisualCorePersistence/NamedLibrary.swift",
+    "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+    "Packages/VisualCore/Sources/VisualCoreExperience/SavedStateStore.swift"
+   ],
+   "owner": "VisualCorePersistence + VisualCoreExperience"
+  },
+  {
+   "area": "Experience host",
+   "description": "ExperienceSession opens, checkpoints, closes and recovers an Experience on one RenderHost, applies the quality level (QualityGovernor over the experience's QualityProfile, fed by DeviceConditions thermal state and Low Power Mode) and memory and scene-phase events, and renders stills; ExperienceShell adapts an ExperiencePresenter (scene, controls, canvas overlay through makeCanvasOverlay) to Experience; ExperienceCore is the GPU-free state with its qualityTiers; ExperienceFeedback routes haptics and announcements; ScenarioRunner replays a ScenarioManifest; the one app registers experiences in ExperienceRegistry and Catalog/registrations.json (sixteen registered, A01-A16, checked 2026-11-16; Interactive Anatomy joins in A17-P01 and stays unregistered and unavailable in A17-P00; scripts/check_experience_packages.py forbids unregistered targets). Version 0.1 needs no permission: the content is bundled and saved views stay in the experience's storage, so no privacy answer changes.",
+   "paths": [
+    "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceShell.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceFeedback.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ScenarioRunner.swift",
+    "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceCore.swift",
+    "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+    "Packages/VisualCore/Sources/VisualCoreExperience/ScenarioManifest.swift",
+    "Apps/VisualCore/App/ExperienceRegistry.swift",
+    "Catalog/registrations.json",
+    "scripts/check_experience_packages.py",
+    "project.yml"
+   ],
+   "owner": "VisualCoreExperience + VisualCoreExperienceHost + the one app"
+  },
+  {
+   "area": "Build and release steps",
+   "description": "XcodeGen spec project.yml for the one app (target VisualCore), package schemes via scripts/xcodebuild_package.py, app tests via scripts/xcodebuild_app.py, and scripts/release_check.py: 138 named steps listed by --list on 2026-11-16 (shared checks including app-contracts, which checks every docs/apps/*/visualcore-contract.json, package and app builds and tests, experience-release and copy-claims steps, verify steps of A01-A16 on iOS 27 and 26, release audits of the one app, the seven reference regression steps and the ProjectM independence check).",
+   "paths": [
+    "project.yml",
+    "scripts/release_check.py",
+    "scripts/xcodebuild_package.py",
+    "scripts/xcodebuild_app.py",
+    "scripts/check_app_contract.py",
+    "scripts/check_licenses.py",
+    "scripts/check_copy_claims.py",
+    ".github/workflows/ci.yml"
+   ],
+   "owner": "repository tooling"
+  },
+  {
+   "area": "Source ownership",
+   "description": "Interactive Anatomy owns its domain (the right knee's structure inventory and graph with ids, Terminologia Anatomica names, English equivalents, synonyms, systems, layers, parents and neighbours; the schematic shape parameters of each structure; the per-system material table; layer, isolate and ghost rules; the structure picker; the search index; descriptions from Gray's Anatomy 1918 with citations, sources and licenses; the review record and the not-reviewed label; the bundled offline content pack; the saved view; budgets per tier; copy) and UI under Packages/ExperiencesCreative/InteractiveAnatomy/ (Core GPU-free, CoreTests, Experience with Adapter/, ExperienceTests, Shaders, scenario-manifest.json; created in A17-P01, not present today). VisualCore owns reusable machinery: vectors, matrices, the orbit camera and its bounds, ray casts and hashing (VisualCoreMath), meshes, shapes and gestures (VisualCoreScenes), mesh drawing and depth (VisualCoreRendering), persistence (VisualCorePersistence), storage, digests, quality and accessibility planning (constitution Principle II, A17 section). Solar System Explorer's and Molecular Explorer's label layouts, pickers and overlays stay experience code and are not copied. ProjectM stays in the harness.",
+   "paths": [
+    ".specify/memory/constitution.md",
+    "Auto-Creator.md",
+    "docs/decisions/ADR-0009-unified-app.md",
+    "Packages/ExperiencesCreative/Package.swift",
+    "specs/123-ia-p00-boundary-audit/spec.md"
+   ],
+   "owner": "constitution + ADR-0009"
+  },
+  {
+   "area": "ProjectM reference regression",
+   "description": "Reference pinned at d93edd1, read-only; scripts/run_reference_baseline.py lists the ordered reference steps; scripts/check_reference_clean.py checks the submodule; the 7 release-check steps run in two chunks via release_check.py --only (reference-engine-xcframework, reference-build-projectm-ios-sim, reference-clean; reference-test-anglerendering-ios27, reference-test-anglerendering-ios26, projectm-reference-ios27, projectm-reference-ios26), recorded in docs/apps/interactive-anatomy/regression-baseline.md (T-A17-001/005) with the phase-start commit f437fd0b (constitution a834dda9).",
+   "paths": [
+    "scripts/run_reference_baseline.py",
+    "scripts/check_reference_clean.py",
+    "Harnesses/ProjectMReference/ProjectMReference.yml",
+    "docs/apps/interactive-anatomy/regression-baseline.md",
+    "specs/123-ia-p00-boundary-audit/research.md"
+   ],
+   "owner": "reference adapter (harness only)"
+  },
+  {
+   "area": "Determinism and budgets",
+   "description": "StateDigest and StableHash fingerprint experience state so the same content pack, view state and camera give the same digest; ScenarioManifest and ScenarioRunner replay recorded steps; MeshBudget, ResourceBudget, StorageQuota, DocumentStore.maxBytes, QualityProfile, QualityGovernor and TessellationChoice bound vertex counts, GPU memory, storage and quality levels; NumericHygiene refuses or wraps non-finite values. Structure count, triangle, draw-call and label budgets per tier and the pack size are Interactive Anatomy's own limits (G-BUDGETS, G-PACK).",
+   "paths": [
+    "Packages/VisualCore/Sources/VisualCoreExperience/StateDigest.swift",
+    "Packages/VisualCore/Sources/VisualCoreExperience/ScenarioManifest.swift",
+    "Packages/VisualCore/Sources/VisualCoreMath/StableHash.swift",
+    "Packages/VisualCore/Sources/VisualCoreMath/NumericHygiene.swift",
+    "Packages/VisualCore/Sources/VisualCoreScenes/MeshBuilder.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityProfile.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityGovernor.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/TessellationChoice.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/ResourceLedger.swift"
+   ],
+   "owner": "VisualCoreExperience + VisualCoreScenes + VisualCoreDiagnostics"
+  }
+ ],
+ "matrix": [
+  {
+   "id": "M01",
+   "capability": "3D model rendering: the right knee's procedural structure meshes (bones, cartilage, menisci, ligaments, tendon) drawn lit, back-face culled and depth tested through RenderHost on the main thread, one MeshRenderer per structure mesh drawn by model transform, with correct occlusion between structures",
+   "source": "brainstorm: 3D model rendering; constitution A17 consumer, not fork",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshRenderer.swift",
+     "symbol": "MeshRenderer",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshRenderer.swift",
+     "symbol": "MeshRenderer.draw",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/DepthMeshPass.swift",
+     "symbol": "DepthMeshPass",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/DepthMeshPass.swift",
+     "symbol": "DepthMeshPass.Item",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+     "symbol": "RenderHost",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreShaderSource/RenderState.swift",
+     "symbol": "RenderState.opaque3D",
+     "product": "VisualCoreShaderSource",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshGenerators.swift",
+     "symbol": "Mesh",
+     "product": "VisualCoreScenes",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Experience/SolarPresenter.swift",
+    "symbol": "SolarPresenter"
+   },
+   "notes": "Tested: MeshRendererTests, DepthMeshPassTests (the nearer of two meshes wins in both draw orders, on and off screen, recreated contexts match), DepthTargetTests, RenderHostTests, RenderStateTests (opaque3D tests and writes depth and culls back faces). MeshRenderer leaves depth testing to the caller; DepthMeshPass owns a 24-bit depth target (the window surface has no depth buffer) and blits the colour, so it is the depth-tested path. Solar System Explorer and Molecular Explorer draw lit, depth-tested meshes this way. Every item is one draw call; there is no instanced lit-mesh drawing, which a region of about fifteen structures does not need."
+  },
+  {
+   "id": "M02",
+   "capability": "Textures and materials: a distinguishable colour per system (bone, cartilage, ligament, tendon) and per structure on lit procedural meshes without image files, a selection highlight colour, procedural surface variation baked into per-vertex colours, premultiplied-alpha colour for ghosted structures",
+   "source": "brainstorm: textures and materials; constitution A17 visuals are code",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshRenderer.swift",
+     "symbol": "MeshRenderer",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshRenderer.swift",
+     "symbol": "MeshRenderer.draw",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreParameters/Palette.swift",
+     "symbol": "Palette",
+     "product": "VisualCoreParameters",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/Pipeline.swift",
+     "symbol": "Pipeline",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreShaderSource/RenderState.swift",
+     "symbol": "RenderState.opaque3D",
+     "product": "VisualCoreShaderSource",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/TinyWorlds/Core/WorldLight.swift",
+    "symbol": "WorldLight"
+   },
+   "notes": "Tested in VisualCoreRenderingTests (MeshRendererTests, MeshRendererColorTests for the per-vertex colour stream init(mesh:colors:registry:), PipelineTests) and VisualCoreParametersTests (Palette). A uniform colour per draw or a per-vertex colour stream covers system colours, a highlight and procedural variation. MeshRenderer samples no texture (its uvs are not read): image textures are forbidden anyway (visuals are code), and ResourceRegistry.makeTexture is not wired to mesh drawing. The per-system material table is app data (G-SCENE). Translucent ghost drawing is not covered here (M09, M15, G-GHOST)."
+  },
+  {
+   "id": "M03",
+   "capability": "Camera controls: a perspective orbit camera around the knee, one-finger orbit, pinch zoom and two-finger pan inside bounds (pitch limit, distance range, target radius), touch recognizers with deterministic arbitration and a control alternative for every gesture",
+   "source": "brainstorm: camera controls",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitCamera.swift",
+     "symbol": "OrbitCamera",
+     "product": "VisualCoreMath",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitCamera.swift",
+     "symbol": "OrbitCamera.viewProjection",
+     "product": "VisualCoreMath",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitViewBounds.swift",
+     "symbol": "OrbitViewBounds",
+     "product": "VisualCoreMath",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitViewBounds.swift",
+     "symbol": "OrbitCamera.orbited",
+     "product": "VisualCoreMath",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitViewBounds.swift",
+     "symbol": "OrbitCamera.zoomed",
+     "product": "VisualCoreMath",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitViewBounds.swift",
+     "symbol": "OrbitCamera.panned",
+     "product": "VisualCoreMath",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitViewBounds.swift",
+     "symbol": "OrbitViewBounds.clamp",
+     "product": "VisualCoreMath",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreMath/CameraBounds.swift",
+     "symbol": "OrbitBounds",
+     "product": "VisualCoreMath",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreScenes/GestureRecognizers.swift",
+     "symbol": "DragRecognizer",
+     "product": "VisualCoreScenes",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreScenes/GestureRecognizers.swift",
+     "symbol": "PinchRecognizer",
+     "product": "VisualCoreScenes",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreScenes/GestureRecognizers.swift",
+     "symbol": "RotateRecognizer",
+     "product": "VisualCoreScenes",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreScenes/GestureArbiter.swift",
+     "symbol": "GestureArbiter",
+     "product": "VisualCoreScenes",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/GestureAlternatives.swift",
+     "symbol": "GestureAlternatives",
+     "product": "VisualCoreExperience",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Experience/FocusFlight.swift",
+    "symbol": "FocusFlight"
+   },
+   "notes": "Tested in VisualCoreMathTests (OrbitCameraTests, OrbitViewBoundsTests, CameraBoundsTests), VisualCoreScenesTests (GestureTests, GestureArbiterTests) and VisualCoreExperienceTests (GestureAlternativesTests). Framing the camera on a selected structure and the reset view are app work over OrbitCamera and MeshBounds (G-CAMERA)."
+  },
+  {
+   "id": "M04",
+   "capability": "Lighting: one directional light with an ambient floor so the curved bone, cartilage and ligament surfaces read as 3D, optional depth fog for distance cues, the same light for every system",
+   "source": "brainstorm: lighting",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshRenderer.swift",
+     "symbol": "MeshRenderer.lightDirection",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshRenderer.swift",
+     "symbol": "MeshRenderer.ambient",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshRenderer.swift",
+     "symbol": "MeshRenderer.draw",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshFog.swift",
+     "symbol": "MeshFog",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreShaderSource/RenderState.swift",
+     "symbol": "RenderState.opaque3D",
+     "product": "VisualCoreShaderSource",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/TinyWorlds/Core/WorldLight.swift",
+    "symbol": "WorldLight"
+   },
+   "notes": "Tested in MeshRendererTests (Lambert term and ambient) and MeshFogTests. One directional Lambert light plus ambient; no specular term and no shadows, which a schematic educational model does not need. Per-system lighting choices are colour and ambient values chosen by the experience (G-SCENE)."
+  },
+  {
+   "id": "M05",
+   "capability": "Labels and overlays: structure names anchored to projected points of their structures on a SwiftUI canvas overlay, following the drawn camera, with an overlap rule so no two labels cover each other, and the selected structure always labelled",
+   "source": "brainstorm: labels and overlays; manual §13 risk 3",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitCamera.swift",
+     "symbol": "OrbitCamera.project",
+     "product": "VisualCoreMath",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+     "symbol": "makeCanvasOverlay",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+     "symbol": "ExperiencePresenter",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Experience/LabelLayout.swift",
+    "symbol": "LabelLayout"
+   },
+   "notes": "Framework part tested: OrbitCameraTests (project), CanvasOverlayTests (the presenter default is no overlay; a presenter's overlay reaches the shell; the host view builds with and without one). An anchored-label layout with overlap handling exists only inside experiences: Solar System Explorer's internal LabelLayout (A14-P04) and Molecular Explorer's public LabelLayout in its Core (A15-P03, modelled on A14's). Interactive Anatomy would be the third consumer, so the promotion of a generic layout to VisualCoreMath is assessed in G-LABELS (A17-P04); copying either experience's layout is not allowed."
+  },
+  {
+   "id": "M06",
+   "capability": "One reviewed region: the right knee joint (distal femur, proximal tibia, head of the fibula, patella; articular cartilage and the medial and lateral menisci; anterior and posterior cruciate, medial and lateral collateral and patellar ligaments; the quadriceps tendon) as a schematic procedural model with a structure inventory and a review record",
+   "source": "manual v0.1: one reviewed region; spec clarification 5",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshShapes.swift",
+     "symbol": "Mesh.revolution",
+     "product": "VisualCoreScenes",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshShapes.swift",
+     "symbol": "Mesh.tube",
+     "product": "VisualCoreScenes",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshShapes.swift",
+     "symbol": "Mesh.surface",
+     "product": "VisualCoreScenes",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshBuilder.swift",
+     "symbol": "MeshBuilder",
+     "product": "VisualCoreScenes",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshBuilder.swift",
+     "symbol": "MeshBudget",
+     "product": "VisualCoreScenes",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreMath/StableHash.swift",
+     "symbol": "StableHash",
+     "product": "VisualCoreMath",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Core/BodyCatalog.swift",
+    "symbol": "CelestialBody"
+   },
+   "notes": "VisualCore gives the generators and budgets (M12) and hashing; no anatomy type exists in any framework product (grep 2026-11-16 for anatomy, femur, ligament: none outside docs). The structure inventory and graph are G-CONTENT (A17-P01), the procedural shapes G-SCENE (A17-P02), the review record G-REVIEW (A17-P05)."
+  },
+  {
+   "id": "M07",
+   "capability": "Toggleable layered mesh groups and an accessible structure list: the four layers (bones, cartilage, ligaments, tendons) shown or hidden as groups, every structure also reachable from a list that VoiceOver reads, with layer membership not shown by colour alone",
+   "source": "manual v0.1: toggleable layered mesh groups and accessible structure list",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/DepthMeshPass.swift",
+     "symbol": "DepthMeshPass",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/DepthMeshPass.swift",
+     "symbol": "DepthMeshPass.Item",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
+     "symbol": "StateSign",
+     "product": "VisualCoreSimulation",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
+     "symbol": "AnnouncementPlanner",
+     "product": "VisualCoreSimulation",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPreferences.swift",
+     "symbol": "SystemAccessibility",
+     "product": "VisualCoreSimulation",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/MolecularExplorer/Core/DisplayMode.swift",
+    "symbol": "DisplayMode"
+   },
+   "notes": "Visibility is the choice of which items go into DepthMeshPass.draw (DepthMeshPassTests); colour-independent signs and announcements are tested in AccessibilityPlansTests. Layer state, its rules and the structure list are the experience's (G-LAYERS in A17-P03, G-A11Y in A17-P04)."
+  },
+  {
+   "id": "M08",
+   "capability": "Selection highlighting, labels and searchable metadata: a tap selects the nearest visible structure, which is highlighted and labelled; its name, synonyms, system, layer and description are shown; structures are found by searching names and synonyms",
+   "source": "manual v0.1: selection highlighting, labels and searchable metadata",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitCamera.swift",
+     "symbol": "OrbitCamera.ray",
+     "product": "VisualCoreMath",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreMath/RayIntersection.swift",
+     "symbol": "Ray3",
+     "product": "VisualCoreMath",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreMath/RayIntersection.swift",
+     "symbol": "Ray3.intersect",
+     "product": "VisualCoreMath",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreMath/RayIntersection.swift",
+     "symbol": "Ray3.nearest",
+     "product": "VisualCoreMath",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreScenes/GestureRecognizers.swift",
+     "symbol": "TapRecognizer",
+     "product": "VisualCoreScenes",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/CatalogSearch.swift",
+     "symbol": "CatalogSearch.fold",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+     "symbol": "makeCanvasOverlay",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/MolecularExplorer/Core/AtomPicker.swift",
+    "symbol": "AtomPicker"
+   },
+   "notes": "Framework parts tested: OrbitCameraTests (ray), RayIntersectionTests (triangle, sphere and box casts, nearest), GestureTests (tap), CatalogSearchTests (language-independent folding), CanvasOverlayTests. Picking against structure meshes (G-PICK, A17-P02), search over the structure index (G-SEARCH, A17-P03) and anchored labels (G-LABELS, A17-P04) are not in a framework product; Molecular Explorer's AtomPicker is experience code."
+  },
+  {
+   "id": "M09",
+   "capability": "Camera orbit and zoom with isolation and ghost: orbit and zoom around the region, framing on a selected structure, isolating one structure or layer, and drawing the others as translucent ghosts in a stable back-to-front order with the opaque structures still occluding correctly",
+   "source": "manual v0.1: camera orbit/zoom with isolation/ghost",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitCamera.swift",
+     "symbol": "OrbitCamera",
+     "product": "VisualCoreMath",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitViewBounds.swift",
+     "symbol": "OrbitViewBounds",
+     "product": "VisualCoreMath",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshBounds.swift",
+     "symbol": "MeshBounds",
+     "product": "VisualCoreScenes",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/DepthMeshPass.swift",
+     "symbol": "DepthMeshPass",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreShaderSource/RenderState.swift",
+     "symbol": "RenderState.alphaBlended",
+     "product": "VisualCoreShaderSource",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshRenderer.swift",
+     "symbol": "MeshRenderer.draw",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Experience/FocusFlight.swift",
+    "symbol": "FocusFlight"
+   },
+   "notes": "Orbit and zoom are available (M03). Framing on a selection over MeshBounds centre and radius is app work (G-CAMERA, A17-P02). DepthMeshPass disables blending (vcglDisable GL_BLEND) and writes depth for every item, and MeshRenderer offers no blend state, so ghosted structures cannot be drawn translucently today; RenderState.alphaBlended exists (RenderStateTests) but is not applied to mesh drawing. A translucent pass after the opaque items (blend on, depth test on, depth write off, items sorted back to front) is G-GHOST, assessed as an additive change in VisualCoreRendering in A17-P03."
+  },
+  {
+   "id": "M10",
+   "capability": "Reviewed factual text with citations and provenance: each structure's plain-words description written from Gray's Anatomy, 20th edition (1918, public domain) and cited by section, names in Terminologia Anatomica (1998) with English equivalents, every text recording its source and license, and a not-reviewed-by-a-clinician label until the owner's clinical review",
+   "source": "manual v0.1: reviewed factual text with citations and provenance; spec clarification 5",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AcknowledgementsView.swift",
+     "symbol": "LicenseInventory",
+     "product": "VisualCoreUI",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AcknowledgementsView.swift",
+     "symbol": "AcknowledgementsView",
+     "product": "VisualCoreUI",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreMath/StableHash.swift",
+     "symbol": "StableHash",
+     "product": "VisualCoreMath",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Core/SourceRecords.swift",
+    "symbol": "SourceRecord"
+   },
+   "notes": "Tested: AcknowledgementsViewTests (LicenseInventory). No citation or review record type exists in any framework product; Solar System Explorer's SourceRecord and CitationAudit are experience code. The texts and citations are G-TEXT (A17-P03); the review record, the not-reviewed label and its validation are G-REVIEW (A17-P05)."
+  },
+  {
+   "id": "M11",
+   "capability": "Download-free offline content pack: the structure graph, names, synonyms, descriptions, citations and shape parameters bundled with the app in a versioned schema, decoded and validated on load, with no network",
+   "source": "manual v0.1: download-free offline content pack",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/Envelope.swift",
+     "symbol": "DocumentEnvelope",
+     "product": "VisualCorePersistence",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/Migration.swift",
+     "symbol": "MigrationChain",
+     "product": "VisualCorePersistence",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreMath/StableHash.swift",
+     "symbol": "StableHash",
+     "product": "VisualCoreMath",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreMath/NumericHygiene.swift",
+     "symbol": "NumericHygiene",
+     "product": "VisualCoreMath",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/MolecularExplorer/Core/MoleculeLibraryData.swift",
+    "symbol": "MoleculeLibraryData"
+   },
+   "notes": "DocumentEnvelope (kind, schemaVersion) and MigrationChain are tested in DocumentStoreTests; StableHash in StableHashTests. The pack's schema, its loader with typed refusals and its digest are the experience's (G-PACK, A17-P04); the schema is designed in A17-P01 (G-CONTENT)."
+  },
+  {
+   "id": "M12",
+   "capability": "Procedural geometry beyond plane, cube and sphere: solids of revolution (lathe) for bone shafts and condyles, tubes swept along paths for ligaments and the tendon, capsules as revolved profiles, parametric surfaces for curved cartilage and menisci, extrusions, all within a mesh budget with validation",
+   "source": "spec FR-A17-003 procedural geometry; constitution A17 visuals are code",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshGenerators.swift",
+     "symbol": "Mesh.plane",
+     "product": "VisualCoreScenes",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshGenerators.swift",
+     "symbol": "Mesh.cube",
+     "product": "VisualCoreScenes",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshGenerators.swift",
+     "symbol": "Mesh.uvSphere",
+     "product": "VisualCoreScenes",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshShapes.swift",
+     "symbol": "Mesh.revolution",
+     "product": "VisualCoreScenes",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshShapes.swift",
+     "symbol": "Mesh.tube",
+     "product": "VisualCoreScenes",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshShapes.swift",
+     "symbol": "Mesh.surface",
+     "product": "VisualCoreScenes",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshShapes.swift",
+     "symbol": "Mesh.extrusion",
+     "product": "VisualCoreScenes",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshBuilder.swift",
+     "symbol": "MeshBuilder",
+     "product": "VisualCoreScenes",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshBuilder.swift",
+     "symbol": "MeshBudget",
+     "product": "VisualCoreScenes",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshBuilder.swift",
+     "symbol": "MeshError",
+     "product": "VisualCoreScenes",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Experience/SceneMeshes.swift",
+    "symbol": "SceneMeshes"
+   },
+   "notes": "Verified 2026-11-16: VisualCoreScenes' MeshShapes (feature 205) already provides public Mesh.revolution (a lathe over a radius-height profile), Mesh.tube along a path with rotation-minimizing frames and optional caps (a sweep), Mesh.surface and Mesh.extrusion, tested in MeshShapeTests (revolution of a semicircle at three resolutions and its edge cases, capped and open tubes, surfaces closed in u and v). This corrects the research note that no lathe, sweep, tube or capsule generator exists: a capsule is a revolved profile of two quarter circles and a line, so no new generator is required. The knee's shape parameters are content (G-SCENE)."
+  },
+  {
+   "id": "M13",
+   "capability": "Structure graph as a GPU-free model: structure ids, names, systems, layers, parents and neighbours, with a versioned schema, validation (unique ids, known layers, acyclic parents, symmetric neighbours) and host tests without the GPU",
+   "source": "spec FR-A17-003 structure graph; constitution A17 testable without the GPU",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreMath/StableHash.swift",
+     "symbol": "StableHash",
+     "product": "VisualCoreMath",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/StateDigest.swift",
+     "symbol": "StateDigest",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreMath/NumericHygiene.swift",
+     "symbol": "NumericHygiene",
+     "product": "VisualCoreMath",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/MolecularExplorer/Core/Molecule.swift",
+    "symbol": "Molecule"
+   },
+   "notes": "No structure-graph type exists in any framework product; it is anatomy content and stays in the experience's GPU-free Core (G-CONTENT, A17-P01)."
+  },
+  {
+   "id": "M14",
+   "capability": "Picking a structure by touch: a tap is turned into a camera ray and tested against the visible structures' triangles (with a bounding-sphere prefilter), the nearest hit wins, hidden structures are not hit, ghosted ones are hit only under a stated rule",
+   "source": "spec FR-A17-003 picking",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitCamera.swift",
+     "symbol": "OrbitCamera.ray",
+     "product": "VisualCoreMath",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreMath/RayIntersection.swift",
+     "symbol": "Ray3",
+     "product": "VisualCoreMath",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreMath/RayIntersection.swift",
+     "symbol": "Ray3.intersect",
+     "product": "VisualCoreMath",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreMath/RayIntersection.swift",
+     "symbol": "Ray3.nearest",
+     "product": "VisualCoreMath",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreMath/RayIntersection.swift",
+     "symbol": "RayHit3",
+     "product": "VisualCoreMath",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshBounds.swift",
+     "symbol": "MeshBounds",
+     "product": "VisualCoreScenes",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreScenes/GestureRecognizers.swift",
+     "symbol": "TapRecognizer",
+     "product": "VisualCoreScenes",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/MolecularExplorer/Core/AtomPicker.swift",
+    "symbol": "AtomPicker"
+   },
+   "notes": "Tested: RayIntersectionTests (ray-triangle front and back, ray-sphere, ray-box, nearest), MeshBoundsTests, OrbitCameraTests, GestureTests. No ray-versus-mesh helper exists in a framework product; the structure picker is G-PICK (A17-P02), with a generic Ray3-against-Mesh cast assessed for VisualCoreMath or VisualCoreScenes if a second consumer exists."
+  },
+  {
+   "id": "M15",
+   "capability": "Layered visibility with isolate and ghost translucency: layer toggles, isolate one structure or layer, ghost the rest translucently and depth-sorted, never hiding the selection",
+   "source": "spec FR-A17-003 layered visibility",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/DepthMeshPass.swift",
+     "symbol": "DepthMeshPass",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/DepthMeshPass.swift",
+     "symbol": "DepthMeshPass.Item",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreShaderSource/RenderState.swift",
+     "symbol": "RenderState.alphaBlended",
+     "product": "VisualCoreShaderSource",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshRenderer.swift",
+     "symbol": "MeshRenderer.draw",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreMath/Matrix.swift",
+     "symbol": "Mat4",
+     "product": "VisualCoreMath",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/MolecularExplorer/Core/MoleculeScene.swift",
+    "symbol": "MoleculeScene"
+   },
+   "notes": "Opaque visibility is available through the item list of DepthMeshPass; translucent depth-sorted drawing is not (blending disabled in DepthMeshPass, see M09). The layer and isolate rules are G-LAYERS (A17-P03, app-local); the translucent pass is G-GHOST (A17-P03, VisualCoreRendering)."
+  },
+  {
+   "id": "M16",
+   "capability": "Anchored labels with overlap handling and the list alternative: projected labels placed in a deterministic order with overlapping boxes skipped, the selected structure first, and the accessible structure list as the equivalent for people who cannot read the canvas",
+   "source": "spec FR-A17-003 labels; manual §13 risk 3",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitCamera.swift",
+     "symbol": "OrbitCamera.project",
+     "product": "VisualCoreMath",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+     "symbol": "makeCanvasOverlay",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
+     "symbol": "AnnouncementPlanner",
+     "product": "VisualCoreSimulation",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPreferences.swift",
+     "symbol": "SystemAccessibility",
+     "product": "VisualCoreSimulation",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/MolecularExplorer/Core/LabelLayout.swift",
+    "symbol": "LabelLayout"
+   },
+   "notes": "See M05: the overlap layout exists in A14 and A15 only. G-LABELS (A17-P04, VisualCoreMath assessed) and G-A11Y (A17-P04, the list)."
+  },
+  {
+   "id": "M17",
+   "capability": "Search over names and synonyms: accent- and case-independent matching of Terminologia Anatomica names, English equivalents and synonyms, ranked results, an empty query listing every structure",
+   "source": "spec FR-A17-003 search",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/CatalogSearch.swift",
+     "symbol": "CatalogSearch",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/CatalogSearch.swift",
+     "symbol": "CatalogSearch.fold",
+     "product": "VisualCoreExperience",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/VisualCore/Sources/VisualCoreExperience/ShellModel.swift",
+    "symbol": "LauncherModel"
+   },
+   "notes": "CatalogSearch.fold (compatibility decomposition, combining marks removed, language-independent lower case) is public and tested in CatalogSearchTests; the ranked search itself is CatalogManifest.search over experience descriptors, not over arbitrary records. The structure index and ranking are G-SEARCH (A17-P03), reusing CatalogSearch.fold."
+  },
+  {
+   "id": "M18",
+   "capability": "Content provenance and the review record: every name, synonym, description and shape parameter records its source, section, license and author; a review record names who reviewed what and when; the clinical review is an owner action",
+   "source": "spec FR-A17-003, FR-A17-006; constitution A17 content provenance",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AcknowledgementsView.swift",
+     "symbol": "LicenseInventory",
+     "product": "VisualCoreUI",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AcknowledgementsView.swift",
+     "symbol": "AcknowledgementsView",
+     "product": "VisualCoreUI",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreMath/StableHash.swift",
+     "symbol": "StableHash",
+     "product": "VisualCoreMath",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Core/CitationAudit.swift",
+    "symbol": "CitationAudit"
+   },
+   "notes": "Tested: AcknowledgementsViewTests. No provenance or review type exists in a framework product (Solar System Explorer's CitationAudit and ScientificReview and Molecular Explorer's MoleculeReview are experience code). G-TEXT (A17-P03) and G-REVIEW (A17-P05)."
+  },
+  {
+   "id": "M19",
+   "capability": "The offline content pack with schema and migration: the bundled pack decodes through a versioned envelope, an older pack schema migrates forward, a damaged or newer pack is refused with a typed reason instead of crashing",
+   "source": "spec FR-A17-003 offline content pack",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/Envelope.swift",
+     "symbol": "DocumentEnvelope",
+     "product": "VisualCorePersistence",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/Migration.swift",
+     "symbol": "MigrationChain",
+     "product": "VisualCorePersistence",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
+     "symbol": "DocumentStore",
+     "product": "VisualCorePersistence",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreMath/NumericHygiene.swift",
+     "symbol": "NumericHygiene",
+     "product": "VisualCoreMath",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/MolecularExplorer/Core/MoleculeLibrary.swift",
+    "symbol": "MoleculeLibrary"
+   },
+   "notes": "Envelope and migration tested in DocumentStoreTests; the pack format and its loader are G-PACK (A17-P04)."
+  },
+  {
+   "id": "M20",
+   "capability": "Saved view: the camera, visible layers, isolate and ghost state and the selection kept in the experience's storage and restored, with a versioned schema and refusal of damaged data",
+   "source": "spec FR-A17-003 saved view",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
+     "symbol": "DocumentStore",
+     "product": "VisualCorePersistence",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/Envelope.swift",
+     "symbol": "DocumentEnvelope",
+     "product": "VisualCorePersistence",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/Migration.swift",
+     "symbol": "MigrationChain",
+     "product": "VisualCorePersistence",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+     "symbol": "ExperienceStorage",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/SavedStateStore.swift",
+     "symbol": "SavedStateStore",
+     "product": "VisualCoreExperience",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Core/SavedView.swift",
+    "symbol": "SavedView"
+   },
+   "notes": "Storage and documents are available (M21); the view document is the experience's and depends on the A17-P03 layer and ghost state (G-VIEW)."
+  },
+  {
+   "id": "M21",
+   "capability": "Persistence with migration: every stored document (saved view, settings) is versioned, written atomically under a byte cap and migrated forward; damaged or newer files are reported, never crash",
+   "source": "constitution A17 bounded, offline and private; spec FR-A17-003",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
+     "symbol": "DocumentStore",
+     "product": "VisualCorePersistence",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
+     "symbol": "DocumentStore.maxBytes",
+     "product": "VisualCorePersistence",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/Envelope.swift",
+     "symbol": "DocumentEnvelope",
+     "product": "VisualCorePersistence",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/Migration.swift",
+     "symbol": "MigrationChain",
+     "product": "VisualCorePersistence",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+     "symbol": "ExperienceStorage",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+     "symbol": "StorageQuota",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/SavedStateStore.swift",
+     "symbol": "SavedStateStore",
+     "product": "VisualCoreExperience",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/TinyWorlds/Core/WorldDocument.swift",
+    "symbol": "WorldDocument"
+   },
+   "notes": "Tested in DocumentStoreTests, NamedLibraryTests, ExperienceStorageTests and SavedStateStoreTests."
+  },
+  {
+   "id": "M22",
+   "capability": "Quality tiers and low power: the governor fed by thermal state and Low Power Mode, declared tiers matching the presenter's levels, tessellation chosen per tier",
+   "source": "constitution A17 bounded; spec FR-A17-003",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityGovernor.swift",
+     "symbol": "QualityGovernor",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityProfile.swift",
+     "symbol": "QualityProfile",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/DeviceConditions.swift",
+     "symbol": "DeviceConditions",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/TessellationChoice.swift",
+     "symbol": "TessellationChoice",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceCore.swift",
+     "symbol": "ExperienceCore.qualityTiers",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+     "symbol": "ExperienceSession.refreshQuality",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/TinyWorlds/Core/TierPolicy.swift",
+    "symbol": "TierPolicy"
+   },
+   "notes": "Tested in QualityGovernorTests, QualityProfileTests, TessellationChoiceTests, QualityDeclarationTests and SessionQualityTests. The experience must declare Core.qualityTiers to match its presenter's levels (lesson of earlier gates)."
+  },
+  {
+   "id": "M23",
+   "capability": "Bounded resources: triangle, draw-call and label budgets per quality level, mesh budgets on every generator, the content pack size and the structure count capped",
+   "source": "spec FR-A17-003 budgets",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshBuilder.swift",
+     "symbol": "MeshBudget",
+     "product": "VisualCoreScenes",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshBuilder.swift",
+     "symbol": "MeshError",
+     "product": "VisualCoreScenes",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/ResourceLedger.swift",
+     "symbol": "ResourceBudget",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+     "symbol": "StorageQuota",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
+     "symbol": "DocumentStore.maxBytes",
+     "product": "VisualCorePersistence",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshCache.swift",
+     "symbol": "MeshCache",
+     "product": "VisualCoreScenes",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/AudioOdyssey/Core/OdysseyQuality.swift",
+    "symbol": "OdysseyQuality"
+   },
+   "notes": "The bounding machinery is tested (MeshBuilderTests, ResourceLedgerTests, ExperienceStorageTests, MeshCacheTests); the experience's own numbers per tier are G-BUDGETS (A17-P02)."
+  },
+  {
+   "id": "M24",
+   "capability": "Accessibility with Reduce Motion and colour-independent layers: system preferences observed, camera flights shortened or skipped under Reduce Motion, layers and selection told apart by sign and text as well as colour, announcements rate-limited, every gesture with a control alternative, contrast checked",
+   "source": "constitution A17 accessibility; spec FR-A17-003",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPreferences.swift",
+     "symbol": "SystemAccessibility",
+     "product": "VisualCoreSimulation",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/SystemAccessibilityObserver.swift",
+     "symbol": "SystemAccessibilityObserver",
+     "product": "VisualCoreUI",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
+     "symbol": "AnnouncementPlanner",
+     "product": "VisualCoreSimulation",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
+     "symbol": "StateSign",
+     "product": "VisualCoreSimulation",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
+     "symbol": "stateSignProblems",
+     "product": "VisualCoreSimulation",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AccessibilityPlayers.swift",
+     "symbol": "AnnouncementSink",
+     "product": "VisualCoreUI",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
+     "symbol": "transitionDuration",
+     "product": "VisualCoreSimulation",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/GestureAlternatives.swift",
+     "symbol": "GestureAlternatives",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AccessibilitySettingsSection.swift",
+     "symbol": "AccessibleColors.contrastRatio",
+     "product": "VisualCoreUI",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/TinyWorlds/Experience/WorldsPresenter.swift",
+    "symbol": "WorldsPresenter"
+   },
+   "notes": "Tested in AccessibilityPreferencesTests, AccessibilityPlansTests, SystemAccessibilityObserverTests, AccessibilityPlayersTests, GestureAlternativesTests and AccessibilitySettingsSectionTests. The structure list is M07/M16 (G-A11Y). System accessibility audits wait for device testing."
+  },
+  {
+   "id": "M25",
+   "capability": "Lifecycle with resize and context loss: context loss, resize, background and memory warning rebuild every GPU object from CPU state, the depth target follows the pixel size",
+   "source": "constitution A17 consumer; spec FR-A17-003",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+     "symbol": "RenderHost.recreateContext",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+     "symbol": "RenderHost.pause",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+     "symbol": "ResourceRegistry",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/DepthMeshPass.swift",
+     "symbol": "DepthMeshPass",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+     "symbol": "ExperienceSession.handleMemoryWarning",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+     "symbol": "ExperienceSession.checkpoint",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreSimulation/PlaybackState.swift",
+     "symbol": "PlaybackState.enterBackground",
+     "product": "VisualCoreSimulation",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/TinyWorlds/Experience/WorldsPresenter.swift",
+    "symbol": "WorldsPresenter"
+   },
+   "notes": "Tested in RenderHostTests, ResourceRegistryTests, DepthMeshPassTests (recreated contexts match; target rebuilt on resize and generation), SessionPhaseMemoryTests, SessionRestoreTests and PlaybackStateTests."
+  },
+  {
+   "id": "M26",
+   "capability": "Licenses: every bundled text source (Gray's Anatomy 1918, public domain; Terminologia Anatomica names) and every shader recorded with author or source and license in the license inventory",
+   "source": "constitution A17 licenses; spec FR-A17-006",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AcknowledgementsView.swift",
+     "symbol": "LicenseInventory",
+     "product": "VisualCoreUI",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AcknowledgementsView.swift",
+     "symbol": "AcknowledgementsView",
+     "product": "VisualCoreUI",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/MolecularExplorer/Core/MoleculeReview.swift",
+    "symbol": "MoleculeReview"
+   },
+   "notes": "Tested in AcknowledgementsViewTests; scripts/check_licenses.py runs in the release check. The A17 entries are added with the content (G-TEXT)."
+  },
+  {
+   "id": "M27",
+   "capability": "Educational, not medical labels: the model is labelled schematic and educational, texts carry the not-reviewed-by-a-clinician label until the owner's review, and no diagnostic, treatment, accuracy or certification wording appears in the experience or store text",
+   "source": "constitution A17 educational, not medical; truthful claims; spec FR-A17-006",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
+     "symbol": "StateSign",
+     "product": "VisualCoreSimulation",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
+     "symbol": "AnnouncementPlanner",
+     "product": "VisualCoreSimulation",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AcknowledgementsView.swift",
+     "symbol": "LicenseInventory",
+     "product": "VisualCoreUI",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Core/ScientificReview.swift",
+    "symbol": "ScientificReview"
+   },
+   "notes": "No claim checker exists in a framework product other than the repository's scripts/check_copy_claims.py release step. The labels are G-REVIEW (A17-P05) and the A17 copy-claims step is G-RELEASE (A17-P06)."
+  },
+  {
+   "id": "M28",
+   "capability": "Determinism: the same content pack, view state and camera give the same structure graph, picking result and digest; scenarios replay",
+   "source": "constitution A17 testable without the GPU",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/StateDigest.swift",
+     "symbol": "StateDigest",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ScenarioManifest.swift",
+     "symbol": "ScenarioManifest",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreMath/StableHash.swift",
+     "symbol": "StableHash",
+     "product": "VisualCoreMath",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreMath/NumericHygiene.swift",
+     "symbol": "NumericHygiene",
+     "product": "VisualCoreMath",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/InfiniteGeometry/Experience/GeometryPresenter.swift",
+    "symbol": "GeometryPresenter"
+   },
+   "notes": "Tested in StateDigestTests, ScenarioManifestTests, StableHashTests and NumericHygieneTests."
+  },
+  {
+   "id": "M29",
+   "capability": "Experience host: session, shell, presenter with the canvas overlay, feedback and scenario runner in the one app, no new target",
+   "source": "ADR-0009; spec FR-A17-005",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+     "symbol": "ExperienceSession",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceShell.swift",
+     "symbol": "ExperienceShell",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+     "symbol": "ExperiencePresenter",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+     "symbol": "makeCanvasOverlay",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/MolecularExplorer/Experience/MoleculePresenter.swift",
+    "symbol": "MoleculePresenter"
+   },
+   "notes": "Tested in SessionOpenCloseTests, ShellLifecycleTests, ShellRenderingTests, CanvasOverlayTests and ScenarioRunnerTests."
+  }
+ ],
+ "gaps": [
+  {
+   "id": "G-CONTENT",
+   "matrix": [
+    "M06",
+    "M11",
+    "M13"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "No anatomy type exists in any framework product. The knee's structure inventory (ids, Terminologia Anatomica names with English equivalents, synonyms, systems, layers, parents, neighbours), its versioned schema and validation are anatomy content in the experience's GPU-free Core (research D4, manual phase 01).",
+   "phase": 1,
+   "test": "Core host tests (swift test, no GPU): the inventory decodes; ids unique; every layer known; parents acyclic; neighbours symmetric; every structure has a name, a system and a layer; refusals typed; the same input gives the same digest",
+   "closed": null
+  },
+  {
+   "id": "G-SCENE",
+   "matrix": [
+    "M06"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "The schematic shapes of the knee's structures (profiles for revolution, paths for tubes, surface functions) and the per-system material table are content; they are built from the existing public generators (M12), so no generator is added. A capsule profile helper or other generic shape is assessed for VisualCoreScenes in A17-P02 only if a second consumer exists.",
+   "phase": 2,
+   "test": "Core host tests: every structure mesh builds within its MeshBudget at every quality tier, passes mesh validation, is closed where stated and gives the same mesh digest twice; experience tests draw the region through DepthMeshPass on the simulator",
+   "closed": null
+  },
+  {
+   "id": "G-PICK",
+   "matrix": [
+    "M08",
+    "M14"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "Structure picking (camera ray, bounding-sphere prefilter, triangle casts, nearest visible hit, the ghost rule) and selection are the experience's; Molecular Explorer's AtomPicker is not copied. A generic Ray3-against-Mesh cast is assessed for VisualCoreMath in A17-P02.",
+   "phase": 2,
+   "test": "Core host tests: rays through known structure centres pick them; occluded structures are not picked; hidden structures are never hit; a miss gives nil; ties resolve by a stated order; picking is deterministic",
+   "closed": null
+  },
+  {
+   "id": "G-CAMERA",
+   "matrix": [
+    "M09"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "Framing the orbit camera on a selected structure (MeshBounds centre and radius into OrbitViewBounds) and the reset view are app work over the public camera.",
+   "phase": 2,
+   "test": "Core host tests: framing keeps the structure's bounding sphere inside the view for every tier's field of view and stays within OrbitViewBounds; reset returns to the initial camera; Reduce Motion makes the move immediate",
+   "closed": null
+  },
+  {
+   "id": "G-BUDGETS",
+   "matrix": [
+    "M23"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "Triangle, draw-call and label budgets per quality tier, the structure count and pack size caps are the experience's numbers over MeshBudget, ResourceBudget and StorageQuota.",
+   "phase": 2,
+   "test": "Core host tests: the region's triangle and draw counts stay under each tier's budget; label count capped; over-budget content refused with a typed reason; Core.qualityTiers matches the presenter's levels",
+   "closed": null
+  },
+  {
+   "id": "G-LAYERS",
+   "matrix": [
+    "M07",
+    "M15"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "Layer visibility, isolate one structure or layer, and the rule that the selection is never hidden are the experience's view state.",
+   "phase": 3,
+   "test": "Core host tests: toggling each layer changes exactly its structures; isolate shows the chosen set and ghosts or hides the rest; the selection stays visible; state round-trips; the draw list follows the state",
+   "closed": null
+  },
+  {
+   "id": "G-GHOST",
+   "matrix": [
+    "M09",
+    "M15"
+   ],
+   "kind": "adaptation",
+   "owner": "VisualCore:VisualCoreRendering",
+   "justification": "DepthMeshPass disables blending and writes depth for every item, and MeshRenderer has no blend state, so translucent ghosts cannot be drawn without a change in VisualCore. Assessed in A17-P03 as an additive translucent stage of DepthMeshPass (opaque items first, then translucent items back to front with blend on, depth test on and depth write off); existing pixels unchanged. Never a second renderer and no GL path in the experience.",
+   "phase": 3,
+   "test": "VisualCoreRenderingTests: with no translucent items the output is bit-identical to today; a translucent item in front of an opaque one blends, behind it is occluded; two translucent items give the same pixels in either submission order after sorting; context recreation and resize match; experience test of ghosted layers",
+   "closed": null
+  },
+  {
+   "id": "G-SEARCH",
+   "matrix": [
+    "M08",
+    "M17"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "The structure index (names, English equivalents, synonyms) and its ranking are the experience's; it reuses CatalogSearch.fold for folding instead of copying it.",
+   "phase": 3,
+   "test": "Core host tests: case- and accent-independent matches; synonyms find their structure; ranking name before synonym before description; empty query lists all in inventory order; deterministic order",
+   "closed": null
+  },
+  {
+   "id": "G-TEXT",
+   "matrix": [
+    "M10",
+    "M18",
+    "M26"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "Plain-words descriptions written from Gray's Anatomy, 20th edition (1918, public domain) cited by section, Terminologia Anatomica names, and per-text source and license records are content; the license inventory gets the A17 entries.",
+   "phase": 3,
+   "test": "Core host tests: every structure has a description with at least one citation (edition, section); every text records source and license from the allowed set; missing citations refused; a generated sources document matches the pack",
+   "closed": null
+  },
+  {
+   "id": "G-VIEW",
+   "matrix": [
+    "M20"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "The saved view (camera, layers, isolate and ghost state, selection) is the experience's document in its storage, over DocumentStore and MigrationChain.",
+   "phase": 3,
+   "test": "Core host tests: the view round-trips; an older schema migrates; damaged or newer data is refused without a crash; unknown structure ids are dropped with a reason",
+   "closed": null
+  },
+  {
+   "id": "G-LABELS",
+   "matrix": [
+    "M05",
+    "M08",
+    "M16"
+   ],
+   "kind": "adaptation",
+   "owner": "VisualCore:VisualCoreMath",
+   "justification": "An overlap-free anchored-label layout exists in Solar System Explorer (internal, A14-P04) and Molecular Explorer (public in its Core, A15-P03); Interactive Anatomy is the third consumer, so promoting a generic layout (project, cull behind camera and outside the canvas, priority order, skip positive-area overlaps) to VisualCoreMath is assessed in A17-P04, with A14 and A15 left unchanged unless their own gates adopt it.",
+   "phase": 4,
+   "test": "Host tests: no two placed labels overlap by a positive area; the selected structure keeps its label when on the canvas; points behind the camera or outside the canvas get none; order deterministic; if promoted, VisualCoreMathTests plus an API baseline update",
+   "closed": null
+  },
+  {
+   "id": "G-A11Y",
+   "matrix": [
+    "M07",
+    "M16"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "The accessible structure list (grouped by layer, selection and visibility from the list, VoiceOver labels with layer signs), colour-independent layer signs and Reduce Motion behaviour are the experience's UI over the public accessibility planners.",
+   "phase": 4,
+   "test": "Core and experience tests: every structure is in the list with its layer sign; selecting from the list equals a tap selection; stateSignProblems is empty for the layer signs; announcements rate-limited; Reduce Motion removes the camera flight",
+   "closed": null
+  },
+  {
+   "id": "G-PACK",
+   "matrix": [
+    "M11",
+    "M19"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "The bundled offline content pack (format, versioned envelope, loader with typed refusals, size cap, digest) is the experience's; it is shipped in the app bundle and never downloaded.",
+   "phase": 4,
+   "test": "Core host tests: the bundled pack decodes and validates; an older schema migrates; damaged, oversized or newer packs are refused with a typed reason; the digest is stable; no network API is referenced",
+   "closed": null
+  },
+  {
+   "id": "G-REVIEW",
+   "matrix": [
+    "M06",
+    "M10",
+    "M18",
+    "M27"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "The content review record (who reviewed which text when, the clinical review as an owner action) and the not-reviewed-by-a-clinician label until it exists are the experience's; the clinical review itself is BLOCKED_OWNER_ACTION, never done by the engineer.",
+   "phase": 5,
+   "test": "Core host tests: without a clinical review record every text carries the not-reviewed label; the record validates (reviewer, date, scope); the schematic-model label is always present; validation of the whole pack passes",
+   "closed": null
+  },
+  {
+   "id": "G-RELEASE",
+   "matrix": [
+    "M27"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "Registration, the A17 copy-claims release step (refusing diagnostic, treatment, accuracy and certification wording), verify steps on iOS 27 and 26 and the release notes belong to the experience's release phase.",
+   "phase": 6,
+   "test": "Release-check steps: copy-claims-a17 passes on the experience and store text; verify-a17 steps pass on the iOS 27.x and 26.x simulators; the experience package check lists A17 as registered",
+   "closed": null
+  }
+ ],
+ "traceability": [
+  {
+   "item": "brainstorm: 3D model rendering",
+   "matrix": [
+    "M01",
+    "M12"
+   ],
+   "phases": [
+    2
+   ]
+  },
+  {
+   "item": "brainstorm: textures and materials",
+   "matrix": [
+    "M02"
+   ],
+   "phases": [
+    2
+   ]
+  },
+  {
+   "item": "brainstorm: camera controls",
+   "matrix": [
+    "M03",
+    "M09"
+   ],
+   "phases": [
+    2
+   ]
+  },
+  {
+   "item": "brainstorm: lighting",
+   "matrix": [
+    "M04"
+   ],
+   "phases": [
+    2
+   ]
+  },
+  {
+   "item": "brainstorm: labels and overlays",
+   "matrix": [
+    "M05",
+    "M16"
+   ],
+   "phases": [
+    4
+   ]
+  },
+  {
+   "item": "v0.1: one reviewed region",
+   "matrix": [
+    "M06",
+    "M12",
+    "M13"
+   ],
+   "phases": [
+    1,
+    2,
+    5
+   ]
+  },
+  {
+   "item": "v0.1: toggleable layered mesh groups and accessible structure list",
+   "matrix": [
+    "M07",
+    "M15",
+    "M16",
+    "M24"
+   ],
+   "phases": [
+    3,
+    4
+   ]
+  },
+  {
+   "item": "v0.1: selection highlighting, labels and searchable metadata",
+   "matrix": [
+    "M08",
+    "M14",
+    "M17"
+   ],
+   "phases": [
+    2,
+    3,
+    4
+   ]
+  },
+  {
+   "item": "v0.1: camera orbit/zoom with isolation/ghost",
+   "matrix": [
+    "M09",
+    "M03",
+    "M15"
+   ],
+   "phases": [
+    2,
+    3
+   ]
+  },
+  {
+   "item": "v0.1: reviewed factual text with citations and provenance",
+   "matrix": [
+    "M10",
+    "M18",
+    "M26"
+   ],
+   "phases": [
+    3,
+    5
+   ]
+  },
+  {
+   "item": "v0.1: download-free offline content pack",
+   "matrix": [
+    "M11",
+    "M19"
+   ],
+   "phases": [
+    1,
+    4
+   ]
+  },
+  {
+   "item": "FR-A17-003: saved view; persistence with migration",
+   "matrix": [
+    "M20",
+    "M21"
+   ],
+   "phases": [
+    3
+   ]
+  },
+  {
+   "item": "FR-A17-003: triangle, draw-call and label budgets per quality level",
+   "matrix": [
+    "M22",
+    "M23"
+   ],
+   "phases": [
+    2
+   ]
+  },
+  {
+   "item": "FR-A17-003: resize and context-loss rebuild",
+   "matrix": [
+    "M25"
+   ],
+   "phases": [
+    2
+   ]
+  },
+  {
+   "item": "constitution A17: educational, not medical; truthful claims",
+   "matrix": [
+    "M27"
+   ],
+   "phases": [
+    5,
+    6
+   ]
+  },
+  {
+   "item": "constitution A17: testable without the GPU; determinism",
+   "matrix": [
+    "M13",
+    "M28"
+   ],
+   "phases": [
+    1
+   ]
+  },
+  {
+   "item": "ADR-0009: one app, experience host",
+   "matrix": [
+    "M29"
+   ],
+   "phases": [
+    1,
+    6
+   ]
+  },
+  {
+   "item": "manual §13 risks 1-3",
+   "matrix": [
+    "M10",
+    "M18",
+    "M27",
+    "M12",
+    "M02",
+    "M05",
+    "M16"
+   ],
+   "phases": [
+    2,
+    4,
+    5
+   ]
+  }
+ ],
+ "negative": [
+  {
+   "rule": "No EGL display, context, surface or GL path of its own; all drawing goes through VisualCore's RenderHost on OpenGL ES -> ANGLE -> Metal",
+   "source": "constitution A17 consumer, not fork; CLAUDE.md rule 4; spec FR-A17-006"
+  },
+  {
+   "rule": "No second renderer: every structure is drawn through MeshRenderer and DepthMeshPass or an additive VisualCore extension of that pipeline (G-GHOST)",
+   "source": "constitution A17 consumer, not fork; CLAUDE.md rule 4; spec FR-A17-006"
+  },
+  {
+   "rule": "No ProjectM types, engine or presets and no ProjectM code reused",
+   "source": "CLAUDE.md rule 12; spec FR-A17-006"
+  },
+  {
+   "rule": "No networking, accounts, analytics, tracking or advertising; the content pack is bundled and saved views stay in the experience's storage",
+   "source": "constitution A17 bounded, offline and private; CLAUDE.md rule 3; spec FR-A17-006"
+  },
+  {
+   "rule": "No diagnostic, treatment, accuracy or certification claim: the model is a schematic educational model, never medical advice, in the experience, its copy and the store text",
+   "source": "manual non-goals; constitution A17 educational, not medical; spec FR-A17-006"
+  },
+  {
+   "rule": "No patient or personal health data: nothing is read from HealthKit or any health source, no images of people, no usage string is added",
+   "source": "spec clarification 4; spec FR-A17-006"
+  },
+  {
+   "rule": "No purchased, generated, scanned or hand-modelled meshes, textures or images: every structure is procedural geometry from the public generators, coloured in code",
+   "source": "CLAUDE.md rule 4; constitution A17 visuals are code; spec FR-A17-006"
+  },
+  {
+   "rule": "No unsourced or unlicensed content text: every name, synonym and description records its source (Terminologia Anatomica 1998; Gray's Anatomy 20th edition 1918, public domain, by section) and license, checked by a test",
+   "source": "constitution A17 content provenance; spec FR-A17-006"
+  },
+  {
+   "rule": "The clinical review of the content text is a person's action, owner owner-action, recorded as BLOCKED_OWNER_ACTION and never done by the engineer; until it is recorded every text is labelled as not reviewed by a clinician",
+   "source": "spec clarification 5; spec FR-A17-006"
+  },
+  {
+   "rule": "No whole-body model: version 0.1 is the right knee joint only",
+   "source": "manual non-goals; spec clarification 5"
+  },
+  {
+   "rule": "No shader decides content: the structure graph, picking, layers, search and validation are GPU-free CPU rules testable with swift test, and drawing never changes the state",
+   "source": "constitution A17 testable without the GPU"
+  },
+  {
+   "rule": "No fork or copy of VisualCore, ANGLE or projectm-ios, no standalone app target and no copy of another experience's code (Solar System Explorer's or Molecular Explorer's LabelLayout, AtomPicker, overlays); generic needs become VisualCore gaps",
+   "source": "ADR-0009; constitution A17 reuse first; CLAUDE.md rule 1"
+  },
+  {
+   "rule": "Risk 1, medical mistakes misinform. Owner: Interactive Anatomy content (app-local G-TEXT in A17-P03, G-REVIEW in A17-P05) with the clinical review by the owner (owner-action). Verification: every text cites its source edition and section and records its license (host tests); the review record is validated; without a clinical review record every text shows and speaks the not-reviewed-by-a-clinician label and the model is labelled schematic. Release blocker: any text without a citation or license, any text without the not-reviewed label while no clinical review is recorded, or any diagnostic or treatment wording.",
+   "source": "manual §13 risk 1"
+  },
+  {
+   "rule": "Risk 2, purchased or high-poly assets carry redistribution rights. Owner: Interactive Anatomy scene (app-local G-SCENE in A17-P02) under the visuals-are-code rule. Verification: every structure mesh is built in code from Mesh.revolution, Mesh.tube, Mesh.surface or another public generator within its MeshBudget (host tests); scripts/check_licenses.py and the compliance step find no bundled mesh, texture or image files in the experience. Release blocker: any bundled model, texture or image file, or a mesh over its tier budget.",
+   "source": "manual §13 risk 2"
+  },
+  {
+   "rule": "Risk 3, 3D labels overlap. Owner: the label layout (G-LABELS in A17-P04, VisualCoreMath assessed) and the structure list (app-local G-A11Y in A17-P04). Verification: host tests show no two placed labels overlap by a positive area, the selected structure keeps its label, points behind the camera get none; every structure is reachable from the accessible list. Release blocker: any overlapping placed labels in the layout tests, or a structure missing from the list.",
+   "source": "manual §13 risk 3"
+  }
+ ],
+ "decision": {
+  "result": "go",
+  "reasons": [
+   "A working host and a lit, depth-tested mesh path exist: RenderHost on OpenGL ES -> ANGLE -> Metal, MeshRenderer (one directional Lambert light, ambient, per-vertex colours, optional fog, back faces culled) and DepthMeshPass (owned 24-bit depth target blitted to the framebuffer), through OrbitCamera, all public and tested; Molecular Explorer and Solar System Explorer already draw lit, depth-tested meshes with picking on it.",
+   "12 of 29 rows are available with tests: 3D model rendering, materials, camera controls, lighting, procedural geometry, persistence with migration, quality tiers, accessibility, lifecycle, licenses, determinism and the experience host. Correction to the research facts: VisualCoreScenes already has public, tested Mesh.revolution (lathe), Mesh.tube (sweep), Mesh.surface and Mesh.extrusion, so no new generator is required.",
+   "All 17 non-available rows have owned gaps: app-local G-CONTENT in A17-P01; G-SCENE, G-PICK, G-CAMERA and G-BUDGETS in A17-P02; G-LAYERS, G-SEARCH, G-TEXT, G-VIEW and the additive VisualCoreRendering translucent stage G-GHOST in A17-P03; G-LABELS (VisualCoreMath, third consumer of the label layout), G-A11Y and G-PACK in A17-P04; G-REVIEW in A17-P05; G-RELEASE in A17-P06. The only upstream change (G-GHOST) is additive and not needed to start.",
+   "No permission and no privacy answer changes; Interactive Anatomy stays unregistered (16 registered, A01-A16) until A17-P01 creates Packages/ExperiencesCreative/InteractiveAnatomy with its targets and first real rules. The clinical review is an owner action recorded as BLOCKED_OWNER_ACTION and does not block engineering."
+  ],
+  "blockers": []
+ }
+}
