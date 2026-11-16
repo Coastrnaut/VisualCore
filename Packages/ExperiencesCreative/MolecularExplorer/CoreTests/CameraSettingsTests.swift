@@ -2,6 +2,10 @@
 // host-free and short: the default is turn 2, tilt 2, zoom 0 (30°, 20°); turning wraps 23 → 0 and 0 → 23; tilt and zoom
 // refuse a step beyond their limits and change nothing; the camera looks at the scene's centre at every step; at zoom +4
 // the camera stays outside the bounding sphere for every library molecule, both modes and aspects 0.5 and 2.0.
+// Feature 112 (A15-P03) T-A15-304 (FR-A15-302; clarification Q2): the pan refuses values other than −1, 0, 1, (0, 0) and
+// steps beyond −10…10; reset zeroes it; each step moves the target by 0.1 × the bounding radius along the view's right
+// or up direction (the molecule appears to move the other way) and leaves the distance and view direction unchanged;
+// camera JSON without the pan decodes with pan 0 and a pan outside −10…10 does not decode.
 import Foundation
 import Testing
 import VisualCoreMath
@@ -92,6 +96,76 @@ import VisualCoreMath
         #expect(valid == CameraSettings(turnSteps: 23, tiltSteps: -8, zoomSteps: 4))
         let payloads: [String] = [#"{"tilt":9,"turn":0,"zoom":0}"#, #"{"tilt":0,"turn":24,"zoom":0}"#,
                                   #"{"tilt":0,"turn":0,"zoom":-5}"#]
+        for payload in payloads {
+            #expect((try? JSONDecoder().decode(CameraSettings.self, from: Data(payload.utf8))) == nil, "\(payload)")
+        }
+    }
+
+    @Test func panRefusesBadValuesAndLimits() {
+        var camera = CameraSettings.default
+        #expect(camera.panX == 0 && camera.panY == 0 && CameraSettings.panRange == -10...10)
+        let refused: [(Int, Int)] = [(0, 0), (2, 0), (0, -2), (Int.min, 1), (1, Int.max)]
+        for (dx, dy) in refused {
+            let accepted = camera.pan(dx: dx, dy: dy)
+            #expect(!accepted && camera == .default, "pan \(dx), \(dy)")
+        }
+        for _ in 0..<10 {
+            let accepted = camera.pan(dx: -1, dy: 1)
+            #expect(accepted)
+        }
+        let edge = camera
+        var accepted = camera.pan(dx: -1, dy: 0)
+        #expect(!accepted && camera == edge && camera.panX == -10 && camera.panY == 10)
+        accepted = camera.pan(dx: 1, dy: 1)
+        #expect(!accepted && camera == edge, "refused when either axis leaves the range")
+        accepted = camera.pan(dx: 1, dy: 0)
+        #expect(accepted && camera.panX == -9 && camera.isValid)
+        camera.turn(3)
+        camera.reset()
+        #expect(camera == .default)
+        #expect(CameraSettings(turnSteps: 0, tiltSteps: 0, zoomSteps: 0, panX: 40, panY: -40).panX == 10)
+    }
+
+    @Test func eachPanStepMovesTheTargetAlongTheViewAxes() {
+        let centre = Vec3(1, 2, -3)
+        let radius = 2.5
+        let aspect = 1.5
+        for turn in stride(from: 0, to: 24, by: 5) {
+            for tilt in [-8, -3, 0, 4, 8] {
+                let still = CameraSettings(turnSteps: turn, tiltSteps: tilt, zoomSteps: 1)
+                let base = still.camera(centre: centre, boundingRadius: radius, aspect: aspect)
+                let axes = still.viewAxes
+                let forward = (base.target - base.eye).normalized
+                #expect(abs(axes.right.length - 1) <= 1e-12 && abs(axes.up.length - 1) <= 1e-12)
+                #expect(abs(axes.right.dot(forward)) <= 1e-12 && abs(axes.up.dot(forward)) <= 1e-12)
+                #expect(abs(axes.right.dot(axes.up)) <= 1e-12 && axes.right.cross(axes.up).dot(forward) < 0)
+                for (px, py) in [(1, 0), (0, 1), (-3, 2), (10, -10)] {
+                    let panned = CameraSettings(turnSteps: turn, tiltSteps: tilt, zoomSteps: 1, panX: px, panY: py)
+                    let camera = panned.camera(centre: centre, boundingRadius: radius, aspect: aspect)
+                    let expected = centre + (axes.right * Double(px) + axes.up * Double(py)) * (0.1 * radius)
+                    #expect((camera.target - expected).length <= 1e-12, "turn \(turn) tilt \(tilt)")
+                    #expect(camera.distance == base.distance && camera.near == base.near && camera.far == base.far)
+                    #expect(((camera.target - camera.eye).normalized - forward).length <= 1e-12)
+                    let seen = camera.project(centre, aspect: aspect)
+                    #expect(px == 0 || (seen.x < 0) == (px > 0), "the molecule appears to move the other way")
+                    #expect(py == 0 || (seen.y < 0) == (py > 0))
+                }
+            }
+        }
+    }
+
+    @Test func panCodingDefaultsAndLimits() throws {
+        let old = try JSONDecoder().decode(CameraSettings.self, from: Data(#"{"tilt":1,"turn":3,"zoom":-2}"#.utf8))
+        #expect(old == CameraSettings(turnSteps: 3, tiltSteps: 1, zoomSteps: -2) && old.panX == 0 && old.panY == 0)
+        let panned = CameraSettings(turnSteps: 3, tiltSteps: 1, zoomSteps: -2, panX: -10, panY: 7)
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys]
+        let data = try encoder.encode(panned)
+        #expect(String(decoding: data, as: UTF8.self) == #"{"panX":-10,"panY":7,"tilt":1,"turn":3,"zoom":-2}"#)
+        #expect((try? JSONDecoder().decode(CameraSettings.self, from: data)) == panned)
+        let payloads: [String] = [#"{"panX":11,"tilt":0,"turn":0,"zoom":0}"#,
+                                  #"{"panY":-11,"tilt":0,"turn":0,"zoom":0}"#,
+                                  #"{"panX":"1","tilt":0,"turn":0,"zoom":0}"#]
         for payload in payloads {
             #expect((try? JSONDecoder().decode(CameraSettings.self, from: Data(payload.utf8))) == nil, "\(payload)")
         }

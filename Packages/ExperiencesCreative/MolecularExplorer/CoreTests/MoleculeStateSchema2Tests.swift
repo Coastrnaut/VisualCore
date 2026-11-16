@@ -2,7 +2,8 @@
 // schema 2, host-free and short: a state with a mode and a changed camera round-trips exactly; a schema-1 payload opens
 // as ball-and-stick with the default camera; a newer schema is refused; damaged and out-of-range schema-2 payloads are
 // refused with their reason; choosing a molecule resets the camera and keeps the mode; mode and camera changes keep the
-// selection.
+// selection. Updated by feature 112 (A15-P03) T-A15-304 (FR-A15-330): states are written at schema 3 (camera with the
+// pan), a schema-2 payload is still read, and the newer schema is 4.
 import Foundation
 import Testing
 @testable import MolecularExplorerCore
@@ -15,8 +16,10 @@ import Testing
         _ = state.tilt(1)
         _ = state.zoom(2)
         let data = state.encoded()
-        let expected = #"{"camera":{"tilt":3,"turn":5,"zoom":2},"mode":1,"schema":2,"selection":3}"#
+        let expected = #"{"camera":{"panX":0,"panY":0,"tilt":3,"turn":5,"zoom":2},"mode":1,"schema":3,"selection":3}"#
         #expect(String(decoding: data, as: UTF8.self) == expected)
+        let v2 = Data(#"{"camera":{"tilt":3,"turn":5,"zoom":2},"mode":1,"schema":2,"selection":3}"#.utf8)
+        #expect(MoleculeState.decode(v2) == .success(state))
         #expect(MoleculeState.decode(data) == .success(state))
         #expect((try? JSONDecoder().decode(MoleculeState.self, from: data)) == state)
     }
@@ -33,7 +36,7 @@ import Testing
     }
 
     @Test func newerDamagedAndOutOfRangePayloadsAreRefused() {
-        let newer: [String] = [#"{"schema":3,"selection":0,"mode":0,"camera":{"tilt":0,"turn":0,"zoom":0}}"#,
+        let newer: [String] = [#"{"schema":4,"selection":0,"mode":0,"camera":{"tilt":0,"turn":0,"zoom":0}}"#,
                                #"{"schema":42}"#]
         for payload in newer {
             #expect(MoleculeState.decode(Data(payload.utf8)) == .failure(.newerVersion), "\(payload)")
