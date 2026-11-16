@@ -1,0 +1,426 @@
+{
+  "controls" : [
+    "molecule.select",
+    "molecule.next",
+    "molecule.previous"
+  ],
+  "experience" : "a15.molecular-explorer",
+  "kind" : "creative",
+  "scenarios" : [
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+        "initialDigest" : "898c8e0b69c5e417fe2dc097bbf564626db33d079da5052e064c2285b62079e2"
+      },
+      "name" : "launch-first-frame",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "molecule.select",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "molecule.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "molecule.previous",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "molecule.select",
+            "values" : [
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "bea0e7a245b79525fd587db753352efa59a4edf4fb5b361d3395a37b13073afa",
+        "initialDigest" : "898c8e0b69c5e417fe2dc097bbf564626db33d079da5052e064c2285b62079e2"
+      },
+      "name" : "input-response",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "molecule.select",
+            "values" : [
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "outcome" : "viewing-caffeine"
+      },
+      "name" : "completion",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "molecule.select",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "molecule.select",
+            "values" : [
+              -1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "molecule.select",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "action.rule.a15.invalid-choice",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "molecule.previous",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.a15.invalid-choice",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "molecule.next",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "molecule.previous",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "molecule.select",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "molecule.select",
+            "values" : [
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "molecule.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.a15.invalid-choice",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+
+      },
+      "name" : "rejection",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "molecule.select",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "molecule.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "molecule.previous",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "molecule.select",
+            "values" : [
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "bea0e7a245b79525fd587db753352efa59a4edf4fb5b361d3395a37b13073afa",
+        "initialDigest" : "898c8e0b69c5e417fe2dc097bbf564626db33d079da5052e064c2285b62079e2"
+      },
+      "name" : "save-restore",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "molecule.select",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "molecule.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "molecule.previous",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "molecule.select",
+            "values" : [
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "initialDigest" : "898c8e0b69c5e417fe2dc097bbf564626db33d079da5052e064c2285b62079e2",
+        "resetDigest" : true
+      },
+      "name" : "reset",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "suspend-resume",
+      "seed" : "1"
+    },
+    {
+      "cycles" : 5,
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "teardown-reentry",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "cancel-prepare",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "molecule.select",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "898c8e0b69c5e417fe2dc097bbf564626db33d079da5052e064c2285b62079e2",
+        "initialDigest" : "898c8e0b69c5e417fe2dc097bbf564626db33d079da5052e064c2285b62079e2",
+        "outcome" : "viewing-water"
+      },
+      "name" : "fixture-water",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "molecule.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ba65d980c1636cb0721a19d795f57fb18251944c4cd7bb7167c05eb49bfc1807",
+        "initialDigest" : "898c8e0b69c5e417fe2dc097bbf564626db33d079da5052e064c2285b62079e2",
+        "outcome" : "viewing-methane"
+      },
+      "name" : "fixture-methane",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "molecule.select",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "806d57b4423e5b3e9d79a8dac436e5d259bc020fd6f957b6c776b4c613bb71f4",
+        "initialDigest" : "898c8e0b69c5e417fe2dc097bbf564626db33d079da5052e064c2285b62079e2",
+        "outcome" : "viewing-ethanol"
+      },
+      "name" : "fixture-ethanol",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "molecule.select",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1464cbc58b73e81483fc88745cc7e5dcaa9429a0d1df376eae60c45b82cc5db9",
+        "initialDigest" : "898c8e0b69c5e417fe2dc097bbf564626db33d079da5052e064c2285b62079e2",
+        "outcome" : "viewing-benzene"
+      },
+      "name" : "fixture-benzene",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "molecule.select",
+            "values" : [
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "bea0e7a245b79525fd587db753352efa59a4edf4fb5b361d3395a37b13073afa",
+        "initialDigest" : "898c8e0b69c5e417fe2dc097bbf564626db33d079da5052e064c2285b62079e2",
+        "outcome" : "viewing-caffeine"
+      },
+      "name" : "fixture-caffeine",
+      "seed" : "1"
+    }
+  ],
+  "schema" : 1
+}
