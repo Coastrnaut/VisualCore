@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesCreative",
+    "--scheme",
+    "ExperiencesCreative-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "MolecularExplorerExperienceTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing MolecularExplorerExperienceTests",
+  "elapsed_seconds": 12.071,
+  "exit_code": 0,
+  "finished": "2026-11-16T00:55:19+00:00",
+  "log": ".autonomy/logs/A15-P01.me-exp.log",
+  "log_sha256": "c65f018de14693882415d419a56b8895b41e0d2fcac21953bb7cb8f8e2573d60",
+  "name": "me-exp",
+  "stage": "A15-P01",
+  "started": "2026-11-16T00:55:07+00:00",
+  "timed_out": false
+}
