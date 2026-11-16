@@ -8,7 +8,7 @@ Precedent: `specs/118-sl-p02-automata-gpu/tasks.md`.
 
 ## Phase 1: Setup
 
-- [ ] T-A16-301 Baseline: cite the A16-P02 evidence on the unchanged sources (`.autonomy/checks/A16-P02.{sl-ios27,app-unit,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14)
+- [X] T-A16-301 Baseline: cite the A16-P02 evidence on the unchanged sources (`.autonomy/checks/A16-P02.{sl-ios27,app-unit,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14) — Verified 2026-11-16: 2026-11-16: A16-P02 evidence cited on unchanged sources (no Packages, Apps or project.yml change since the A16-P02 record 90974faa): .autonomy/checks/A16-P02.sl-ios27.json, A16-P02.app-unit.json, A16-P02.verify-27.json, all exit 0
 
 ## Phase 2: Foundational — the time-step action and rule code
 
