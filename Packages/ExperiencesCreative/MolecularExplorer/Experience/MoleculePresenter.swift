@@ -93,6 +93,10 @@
 //     molecule, the engine's import, or, with no import in the engine, replays the stored copy; when the copy is
 //     missing or refused the entry is dropped from the list.
 //   - Panel: the line `inferred-note` (``inferredNote``, `MoleculeReview.inferredStatement`) under the bonds.
+//
+// Feature 115 (A15-P06) T-A15-604 (FR-A15-611; clarification Q5): the test-only seam `failNextDraw` makes the next
+// `draw` throw `MoleculeDrawError.injected` once (and clears itself) before anything is synced or written, so a test can
+// drive the host into its failure state; nothing in the experience sets it.
 import Foundation
 import MolecularExplorerCore
 import SwiftUI
@@ -265,6 +269,9 @@ final class MoleculePresenter: ExperiencePresenter {
     private(set) var gestures = MoleculeGestures()
     /// The imports of a person's XYZ files and the stored copy (feature 114).
     let importer: MoleculeImporter
+    /// Set by a test to make the next `draw` throw ``MoleculeDrawError/injected`` once; the seam clears itself and
+    /// nothing in the experience sets it (feature 115, T-A15-604).
+    var failNextDraw = false
     /// The port imports and replays are sent through; set by ``attach(port:isActive:)`` (feature 114).
     private(set) weak var port: ExperienceActionPort?
     /// Whether the experience is active now (imports are refused otherwise); set by ``attach(port:isActive:)``.
@@ -327,8 +334,13 @@ final class MoleculePresenter: ExperiencePresenter {
         isLive = true
     }
 
-    /// Draws the state's scene lit, with depth, through the state's camera framed on the scene.
+    /// Draws the state's scene lit, with depth, through the state's camera framed on the scene; throws
+    /// ``MoleculeDrawError/injected`` (once, drawing and syncing nothing) while ``failNextDraw`` is set.
     func draw(_ core: MoleculeCore, tier: Int, context: RenderContext, frame: FrameInfo) throws {
+        if failNextDraw {
+            failNextDraw = false
+            throw MoleculeDrawError.injected
+        }
         sync(core)
         let width = Double(max(1, context.pixelWidth)), height = Double(max(1, context.pixelHeight))
         lastCanvas = Vec2(width, height)
@@ -1102,4 +1114,10 @@ final class MoleculePresenter: ExperiencePresenter {
         if seenSelectedAtom != nil, send("atom.clear", []).isAccepted { seenSelectedAtom = nil }
         return nil
     }
+}
+
+/// Why a draw of Molecular Explorer failed on purpose (feature 115, test-only seam ``MoleculePresenter/failNextDraw``).
+enum MoleculeDrawError: Error, Equatable {
+    /// The test-only seam asked for one failed draw.
+    case injected
 }
