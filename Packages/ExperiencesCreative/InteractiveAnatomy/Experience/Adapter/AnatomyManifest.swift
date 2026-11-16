@@ -5,7 +5,11 @@
 //     `fixture-ligaments-hidden` (`layer.show [2, 0]`), `fixture-turned` (three `camera.turn [1]`, one
 //     `camera.tilt [1]`), `fixture-bones-only` (`layer.show [1, 0]`, `layer.show [2, 0]`) and `fixture-acl-zoomed`
 //     (`structure.select [8]`, two `camera.zoom [1]`), expecting the outcomes `selected-knee-femur`, `viewing-knee`,
-//     `viewing-knee`, `viewing-knee` and `selected-knee-acl`.
+//     `viewing-knee`, `viewing-knee` and `selected-knee-acl`;
+//   - feature 126 (A17-P03) T-A17-308 (FR-A17-304): two isolate fixtures, `fixture-isolate-bones-ghost`
+//     (`isolate.layer [0]`, ghost mode) and `fixture-isolate-acl-hidden` (`structure.select [8]`, `isolate.mode [0]`,
+//     `isolate.part [8]`), expecting `viewing-knee` and `selected-knee-acl`; the rejection scenario also refuses
+//     `isolate.part [20]` (out of range).
 // The completion scenario selects the femur and expects the outcome `selected-knee-femur`. The expected digests are
 // derived by playing the entries on a core exactly as the engine plays them (the steps of an entry, then its action)
 // and digesting it with the experience id as domain, as Molecular Explorer's manifest does.
@@ -40,6 +44,14 @@ extension AnatomyCore {
           ScenarioStep(steps: 1, action: ScriptedAction("camera.zoom", [1]), result: "accepted"),
           ScenarioStep(steps: 1, action: ScriptedAction("camera.zoom", [1]), result: "accepted")],
          "selected-knee-acl"),
+        ("fixture-isolate-bones-ghost",
+         [ScenarioStep(steps: 1, action: ScriptedAction("isolate.layer", [0]), result: "accepted")],
+         "viewing-knee"),
+        ("fixture-isolate-acl-hidden",
+         [ScenarioStep(steps: 1, action: ScriptedAction("structure.select", [8]), result: "accepted"),
+          ScenarioStep(steps: 1, action: ScriptedAction("isolate.mode", [0]), result: "accepted"),
+          ScenarioStep(steps: 1, action: ScriptedAction("isolate.part", [8]), result: "accepted")],
+         "selected-knee-acl"),
     ]
 
     /// The actions of input-response, save-restore and reset: select the tibia, hide the ligaments, zoom in, select
@@ -57,7 +69,8 @@ extension AnatomyCore {
     }
 
     /// The entries of rejection, from the opening state: indices out of range and fractional, a bad layer switch,
-    /// camera steps other than ±1, wrong value counts, a hidden part, and tilt steps beyond the limit.
+    /// camera steps other than ±1, wrong value counts, an isolate index out of range, a hidden part, and tilt steps
+    /// beyond the limit.
     public static var rejectionEntries: [ScenarioStep] {
         let invalid = "action.rule." + AnatomyRule.invalidChoice
         let hidden = "action.rule." + AnatomyRule.hiddenStructure
@@ -70,6 +83,7 @@ extension AnatomyCore {
             ScenarioStep(steps: 0, action: ScriptedAction("camera.turn", [0]), result: invalid),
             ScenarioStep(steps: 0, action: ScriptedAction("structure.select"), result: "action.wrong-value-count"),
             ScenarioStep(steps: 0, action: ScriptedAction("view.reset", [1]), result: "action.wrong-value-count"),
+            ScenarioStep(steps: 0, action: ScriptedAction("isolate.part", [20]), result: "action.out-of-range"),
             ScenarioStep(steps: 0, action: ScriptedAction("layer.show", [2, 0]), result: "accepted"),
             ScenarioStep(steps: 0, action: ScriptedAction("structure.select", [9]), result: hidden),
         ]

@@ -4,7 +4,9 @@
 // `fixture-acl-zoomed`; its derived digests, results and outcomes equal to what the engine gives when the runner plays
 // them; every fixture ending in the view state its actions describe; and the committed `scenario-manifest.json` equal
 // to the Swift manifest (`UPDATE_SCENARIO_MANIFEST=1`, on the simulator `TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`,
-// rewrites it).
+// rewrites it). Feature 126 (A17-P03) T-A17-307 (FR-A17-304): seven fixtures, adding `fixture-isolate-bones-ghost`
+// (`isolate.layer [0]`) and `fixture-isolate-acl-hidden` (`structure.select [8]`, `isolate.mode [0]`,
+// `isolate.part [8]`), each ending in the isolate its actions describe; the seven end in seven different states.
 import Foundation
 import Testing
 @testable import InteractiveAnatomyExperience
@@ -31,14 +33,15 @@ private func playManifest(_ spec: ScenarioSpec) async throws -> (initial: String
 }
 
 @Suite struct AnatomyManifestTests {
-    /// The names of the five fixtures.
+    /// The names of the seven fixtures.
     static let fixtureNames = ["fixture-femur-selected", "fixture-ligaments-hidden", "fixture-turned",
-                               "fixture-bones-only", "fixture-acl-zoomed"]
+                               "fixture-bones-only", "fixture-acl-zoomed", "fixture-isolate-bones-ghost",
+                               "fixture-isolate-acl-hidden"]
 
-    @Test func theManifestIsValidWithTheStandardScenariosAndFiveFixtures() {
+    @Test func theManifestIsValidWithTheStandardScenariosAndSevenFixtures() {
         let manifest = AnatomyCore.manifest(for: manifestID)
         let problems = ScenarioManifestValidator.problems(manifest, controls: AnatomyCore.controls,
-                                                          content: ContentRequirement(fixtures: 5))
+                                                          content: ContentRequirement(fixtures: 7))
         #expect(problems.isEmpty, "\(problems)")
         #expect(manifest.scenarios.map(\.name) == ScenarioManifest.standardNames + Self.fixtureNames)
         #expect(AnatomyCore.fixtures.map(\.name) == Self.fixtureNames)
@@ -77,17 +80,26 @@ private func playManifest(_ spec: ScenarioSpec) async throws -> (initial: String
             switch fixture.name {
             case "fixture-femur-selected":
                 #expect(view.selection == "knee.femur" && view.framed == "knee.femur")
+                #expect(view.isolate == nil)
+            case "fixture-isolate-bones-ghost":
+                #expect(view.isolate == AnatomyIsolate(target: .layer(.bones), mode: .ghost))
+                #expect(view.selection == nil && view.visibleLayers == [true, true, true])
+            case "fixture-isolate-acl-hidden":
+                #expect(view.isolate == AnatomyIsolate(target: .part(8), mode: .hide))
+                #expect(view.selection == "knee.acl" && view.framed == "knee.acl")
             case "fixture-ligaments-hidden":
                 #expect(view.visibleLayers == [true, true, false] && view.selection == nil)
             case "fixture-turned":
                 #expect(view.camera.turn == 5 && view.camera.tilt == 2 && view.camera.zoom == 0)
             case "fixture-bones-only":
                 #expect(view.visibleLayers == [true, false, false])
-            default:
+            case "fixture-acl-zoomed":
                 #expect(view.selection == "knee.acl" && view.framed == "knee.acl" && view.camera.zoom == 2)
+            default:
+                Issue.record("unexpected fixture \(fixture.name)")
             }
         }
-        #expect(digests.count == 5, "the fixtures end in five different states")
+        #expect(digests.count == 7, "the fixtures end in seven different states")
     }
 
     /// The JSON form with the control ids, named by `Catalog/registrations.json`. `UPDATE_SCENARIO_MANIFEST=1`

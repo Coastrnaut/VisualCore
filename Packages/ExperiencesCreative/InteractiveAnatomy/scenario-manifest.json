@@ -6,7 +6,12 @@
     "camera.turn",
     "camera.tilt",
     "camera.zoom",
-    "view.reset"
+    "view.reset",
+    "isolate.part",
+    "isolate.layer",
+    "isolate.mode",
+    "isolate.clear",
+    "view.apply"
   ],
   "experience" : "a17.interactive-anatomy",
   "kind" : "creative",
@@ -16,7 +21,7 @@
 
       ],
       "expect" : {
-        "initialDigest" : "2ae14159afeb18a206284f6b9eb552447493b1b85f968853b7e9d1942e241c04"
+        "initialDigest" : "66888f83accdf5665ad15a017c9756ba97f1c7b62105ce7f410381ba12739f55"
       },
       "name" : "launch-first-frame",
       "seed" : "1"
@@ -66,8 +71,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "559d7d4a4f13db4701a6b0a4e0fb0c9b0149aae3ebfa570e396ae01a4da23e21",
-        "initialDigest" : "2ae14159afeb18a206284f6b9eb552447493b1b85f968853b7e9d1942e241c04"
+        "finalDigest" : "588aa3f06ad95beffdd041bdcfa05a30346a842e832af33115cdee4881a1d990",
+        "initialDigest" : "66888f83accdf5665ad15a017c9756ba97f1c7b62105ce7f410381ba12739f55"
       },
       "name" : "input-response",
       "seed" : "1"
@@ -163,6 +168,16 @@
             ]
           },
           "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "isolate.part",
+            "values" : [
+              20
+            ]
+          },
+          "result" : "action.out-of-range",
           "steps" : 0
         },
         {
@@ -298,8 +313,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "559d7d4a4f13db4701a6b0a4e0fb0c9b0149aae3ebfa570e396ae01a4da23e21",
-        "initialDigest" : "2ae14159afeb18a206284f6b9eb552447493b1b85f968853b7e9d1942e241c04"
+        "finalDigest" : "588aa3f06ad95beffdd041bdcfa05a30346a842e832af33115cdee4881a1d990",
+        "initialDigest" : "66888f83accdf5665ad15a017c9756ba97f1c7b62105ce7f410381ba12739f55"
       },
       "name" : "save-restore",
       "seed" : "1"
@@ -349,7 +364,7 @@
         }
       ],
       "expect" : {
-        "initialDigest" : "2ae14159afeb18a206284f6b9eb552447493b1b85f968853b7e9d1942e241c04",
+        "initialDigest" : "66888f83accdf5665ad15a017c9756ba97f1c7b62105ce7f410381ba12739f55",
         "resetDigest" : true
       },
       "name" : "reset",
@@ -400,8 +415,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "886c5b6977f2aca7253dca13a5e2b209355aa261fc7d0da9305243b979ec0f13",
-        "initialDigest" : "2ae14159afeb18a206284f6b9eb552447493b1b85f968853b7e9d1942e241c04",
+        "finalDigest" : "5000ad14c62bef159e1f783c459e26521c2ec2901c9f10365878dc1b260be15e",
+        "initialDigest" : "66888f83accdf5665ad15a017c9756ba97f1c7b62105ce7f410381ba12739f55",
         "outcome" : "selected-knee-femur"
       },
       "name" : "fixture-femur-selected",
@@ -422,8 +437,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "d398ac9bcdf5c6add4311e16f07a17e7b4964b8d267efec59214f928bdde9a73",
-        "initialDigest" : "2ae14159afeb18a206284f6b9eb552447493b1b85f968853b7e9d1942e241c04",
+        "finalDigest" : "d1d7cb13a61b6723070cf723f94c89eb536dddd68aa906493abcbe43379e614a",
+        "initialDigest" : "66888f83accdf5665ad15a017c9756ba97f1c7b62105ce7f410381ba12739f55",
         "outcome" : "viewing-knee"
       },
       "name" : "fixture-ligaments-hidden",
@@ -473,8 +488,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "da2f7b740d7cf792672064c24685fc3bc99d16af2c257d011c0231a4eeec30ca",
-        "initialDigest" : "2ae14159afeb18a206284f6b9eb552447493b1b85f968853b7e9d1942e241c04",
+        "finalDigest" : "b987a24201ed097f09436493f0820a03ce5e211d98e63142da52e2bc43426657",
+        "initialDigest" : "66888f83accdf5665ad15a017c9756ba97f1c7b62105ce7f410381ba12739f55",
         "outcome" : "viewing-knee"
       },
       "name" : "fixture-turned",
@@ -506,8 +521,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "4665ff638d2e99ceea73d4520d7b148628ff6cf07569cc349990e1f46d55f5b9",
-        "initialDigest" : "2ae14159afeb18a206284f6b9eb552447493b1b85f968853b7e9d1942e241c04",
+        "finalDigest" : "c4e528d9951d0e219d178f569869a3f95f7affcada0c31995639dd2499c6b276",
+        "initialDigest" : "66888f83accdf5665ad15a017c9756ba97f1c7b62105ce7f410381ba12739f55",
         "outcome" : "viewing-knee"
       },
       "name" : "fixture-bones-only",
@@ -547,11 +562,73 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "f5c533a7f941a476d8c3015b287d24beb52f970e8e8f16bf442f469933c677cb",
-        "initialDigest" : "2ae14159afeb18a206284f6b9eb552447493b1b85f968853b7e9d1942e241c04",
+        "finalDigest" : "5d248d370200885a0fd8217afa31245fc1b625ee4d40c59e93ce298cd68e0de4",
+        "initialDigest" : "66888f83accdf5665ad15a017c9756ba97f1c7b62105ce7f410381ba12739f55",
         "outcome" : "selected-knee-acl"
       },
       "name" : "fixture-acl-zoomed",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "isolate.layer",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1a13455784ff3106d8d7291e643211983c1c9af486e52e621a9bb0808dad1553",
+        "initialDigest" : "66888f83accdf5665ad15a017c9756ba97f1c7b62105ce7f410381ba12739f55",
+        "outcome" : "viewing-knee"
+      },
+      "name" : "fixture-isolate-bones-ghost",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "structure.select",
+            "values" : [
+              8
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "isolate.mode",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "isolate.part",
+            "values" : [
+              8
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8c09fceb4f053c93b4667983be4cb81e4b0388ff291ca6f5c6e222101443e7e4",
+        "initialDigest" : "66888f83accdf5665ad15a017c9756ba97f1c7b62105ce7f410381ba12739f55",
+        "outcome" : "selected-knee-acl"
+      },
+      "name" : "fixture-isolate-acl-hidden",
       "seed" : "1"
     }
   ],
