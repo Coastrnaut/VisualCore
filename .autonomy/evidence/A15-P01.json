@@ -1,0 +1,68 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/A15-P01.app-unit.json",
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A15-P01.app-unit.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A15-P01.catalog-host.json",
+      "command": "swift test --package-path Packages/VisualCore --filter 'RealCatalogTests|RegistryReportTests|ShellModelTests|CatalogSearchTests'",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A15-P01.catalog-host.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A15-P01.contract-2.json",
+      "command": "python3 scripts/check_app_contract.py --app molecular-explorer --render",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A15-P01.contract-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A15-P01.documented-api.json",
+      "command": "python3 scripts/check_documented_api.py --sources Packages/ExperiencesCreative/MolecularExplorer",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A15-P01.documented-api.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A15-P01.experience-packages.json",
+      "command": "python3 scripts/check_experience_packages.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A15-P01.experience-packages.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A15-P01.me-core.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing MolecularExplorerCoreTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A15-P01.me-core.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A15-P01.me-exp.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing MolecularExplorerExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A15-P01.me-exp.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A15-P01.me-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing MolecularExplorerCoreTests MolecularExplorerExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A15-P01.me-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A15-P01.script-tests.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A15-P01.script-tests.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A15-P01.verify-27.json",
+      "command": "python3 scripts/verify_experiences.py --only a15.molecular-explorer --runtime 27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A15-P01.verify-27.log"
+    }
+  ],
+  "generated": "2026-11-16T00:59:54+00:00",
+  "method": "deterministic-run-check",
+  "stage": "A15-P01",
+  "status": "pass"
+}
