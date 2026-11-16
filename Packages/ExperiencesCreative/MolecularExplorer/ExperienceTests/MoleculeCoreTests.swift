@@ -6,7 +6,9 @@
 // and by the core (`a15.invalid-choice`) each leaving the state as it was; host steps changing nothing; the digest
 // covering the selection, the mode and the camera, stable; the snapshot round trip into another engine; damaged and
 // newer snapshots refused; the migration step 1 → 2; reset; the outcome; the information lines and the canvas
-// description of clarification Q5 ending with the mode.
+// description of clarification Q5 ending with the mode. Updated by feature 112 (A15-P03) T-A15-305 (FR-A15-302,
+// FR-A15-310, FR-A15-311, FR-A15-330): thirteen controls, schema 3 with the steps 1 → 2 and 2 → 3 ("newer" is 4), the
+// pan and atom actions with their refusals, and the description naming the selected atom after the mode.
 import Foundation
 import XCTest
 @testable import MolecularExplorerExperience
@@ -38,12 +40,14 @@ final class MoleculeCoreTests: XCTestCase {
         XCTAssertEqual(MoleculeCore.experienceID, "a15.molecular-explorer")
         let ids: [String] = MoleculeCore.controls.map(\.id)
         XCTAssertEqual(ids, ["molecule.select", "molecule.next", "molecule.previous", "display.mode", "camera.orbit",
-                             "camera.tilt", "camera.zoom", "view.reset"])
+                             "camera.tilt", "camera.zoom", "view.reset", "camera.pan", "atom.select", "atom.next",
+                             "atom.previous", "atom.clear"])
         XCTAssertEqual(ids, MoleculeCore.actionIDs)
         XCTAssertEqual(MoleculeCore.moleculeCount, 5)
-        let ranges: [[ClosedRange<Double>]] = [[0...4], [], [], [0...1], [-1...1], [-1...1], [-1...1], []]
+        let ranges: [[ClosedRange<Double>]] = [[0...4], [], [], [0...1], [-1...1], [-1...1], [-1...1], [],
+                                               [-1...1, -1...1], [0...499], [], [], []]
         XCTAssertEqual(MoleculeCore.controls.map(\.ranges), ranges)
-        XCTAssertEqual(MoleculeCore.migrations.currentVersion, 2)
+        XCTAssertEqual(MoleculeCore.migrations.currentVersion, 3)
         XCTAssertEqual(MoleculeCore.qualityTiers, 1)
         XCTAssertEqual(MoleculeCore.qualityProfile.levels.count, 1)
         XCTAssertEqual(MoleculeCore.stepDuration, 1.0 / 120, accuracy: 1e-15)
@@ -57,6 +61,9 @@ final class MoleculeCoreTests: XCTestCase {
             ScriptedAction("molecule.previous"), ScriptedAction("display.mode", [1]),
             ScriptedAction("camera.orbit", [1]), ScriptedAction("camera.tilt", [-1]),
             ScriptedAction("camera.zoom", [1]), ScriptedAction("view.reset"),
+            ScriptedAction("camera.pan", [1, 0]), ScriptedAction("camera.pan", [-1, 1]),
+            ScriptedAction("atom.select", [2]), ScriptedAction("atom.next"), ScriptedAction("atom.previous"),
+            ScriptedAction("atom.clear"), ScriptedAction("atom.next"),
             ScriptedAction("molecule.select", [0]),
         ]
         let rejected: [ScriptedAction] = [
@@ -67,6 +74,9 @@ final class MoleculeCoreTests: XCTestCase {
             ScriptedAction("display.mode", [0.5]), ScriptedAction("display.mode", [2]),
             ScriptedAction("camera.orbit", [0]), ScriptedAction("camera.tilt", [0.5]),
             ScriptedAction("camera.zoom", [-2]), ScriptedAction("view.reset", [0]),
+            ScriptedAction("camera.pan", [0, 0]), ScriptedAction("camera.pan", [0.5, 0]),
+            ScriptedAction("camera.pan", [1]), ScriptedAction("atom.select", [500]),
+            ScriptedAction("atom.select", [1.5]), ScriptedAction("atom.clear", [1]),
         ]
         let plan = ConformancePlan(seeds: [1, 2, 0xFFFF_FFFF_FFFF_FFFF], stepsPerSegment: 5, actions: actions,
                                    rejected: rejected)
@@ -176,11 +186,28 @@ final class MoleculeCoreTests: XCTestCase {
         XCTAssertEqual(core.mode, .spaceFilling, "a molecule change keeps the mode")
     }
 
-    func testTheMigrationStepTurnsSchemaOneIntoSchemaTwo() throws {
+    func testTheMigrationStepsTurnSchemaOneAndTwoIntoSchemaThree() throws {
         let upgraded = try MoleculeCore.migrations.migrate(["schema": 1, "selection": 3], from: 1)
         let data = try JSONSerialization.data(withJSONObject: upgraded, options: [.sortedKeys])
         XCTAssertEqual(String(decoding: data, as: UTF8.self),
+                       #"{"camera":{"panX":0,"panY":0,"tilt":2,"turn":2,"zoom":0},"mode":0,"schema":3,"selection":3}"#)
+        let one = try MoleculeCore.migrateSchemaOne(["schema": 1, "selection": 3])
+        let oneData = try JSONSerialization.data(withJSONObject: one, options: [.sortedKeys])
+        XCTAssertEqual(String(decoding: oneData, as: UTF8.self),
                        #"{"camera":{"tilt":2,"turn":2,"zoom":0},"mode":0,"schema":2,"selection":3}"#)
+        let two: [String: Any] = ["schema": 2, "selection": 4, "mode": 1,
+                                  "camera": ["turn": 5, "tilt": -1, "zoom": 2]]
+        let fromTwo = try MoleculeCore.migrations.migrate(two, from: 2)
+        let twoData = try JSONSerialization.data(withJSONObject: fromTwo, options: [.sortedKeys])
+        let migrated = try MoleculeCore.restore(payload: twoData, seed: 1)
+        XCTAssertEqual(migrated.state, MoleculeState(selection: 4, mode: .spaceFilling,
+                                                     camera: CameraSettings(turnSteps: 5, tiltSteps: -1, zoomSteps: 2)))
+        XCTAssertNil(migrated.selectedAtom, "no atom after the migration")
+        XCTAssertEqual(migrated.camera.panX, 0)
+        XCTAssertEqual(migrated.camera.panY, 0)
+        XCTAssertThrowsError(try MoleculeCore.migrations.migrate(["schema": 2, "selection": 1], from: 2)) { error in
+            XCTAssertEqual(error as? MoleculeRestoreError, .refused(.damaged))
+        }
         let core = try MoleculeCore.restore(payload: data, seed: 1)
         XCTAssertEqual(core.state, MoleculeState(selection: 3, mode: .ballAndStick, camera: .default))
         let refused: [[String: Any]] = [["schema": 1, "selection": 5], ["schema": 1], ["schema": 2, "selection": 1],
@@ -235,7 +262,7 @@ final class MoleculeCoreTests: XCTestCase {
         try engine.run(steps: 3)
         XCTAssertEqual(engine.handle(control: "molecule.select", values: [3]), .accepted)
         let snapshot = try engine.snapshot()
-        XCTAssertEqual(snapshot.schemaVersion, 2)
+        XCTAssertEqual(snapshot.schemaVersion, 3)
         XCTAssertEqual(Data(snapshot.payload.utf8), try XCTUnwrap(engine.core).state.encoded())
         let saved = try XCTUnwrap(engine.core)
         var other = try await makeEngine(seed: 3)
@@ -264,9 +291,9 @@ final class MoleculeCoreTests: XCTestCase {
             XCTAssertThrowsError(try engine.restore(moleculeEnvelope(payload, like: saved)),
                                  "\(key) \(String(describing: value))")
         }
-        // Newer: an envelope of schema 3, and a payload of schema 3 inside a schema-2 envelope.
-        XCTAssertThrowsError(try engine.restore(moleculeEnvelope(Data(saved.payload.utf8), like: saved, schema: 3)))
-        let newerPayload = try moleculePayload(saved.payload, key: "schema", value: 3)
+        // Newer: an envelope of schema 4, and a payload of schema 4 inside a schema-3 envelope.
+        XCTAssertThrowsError(try engine.restore(moleculeEnvelope(Data(saved.payload.utf8), like: saved, schema: 4)))
+        let newerPayload = try moleculePayload(saved.payload, key: "schema", value: 4)
         XCTAssertThrowsError(try engine.restore(moleculeEnvelope(newerPayload, like: saved)))
         XCTAssertEqual(try engine.digest(), before, "every refusal leaves the state as it was")
 
@@ -344,5 +371,60 @@ final class MoleculeCoreTests: XCTestCase {
                 XCTAssertTrue(text.contains(name), "\(text) names \(name)")
             }
         }
+    }
+
+    func testThePanAndAtomActionsAndTheirRefusals() throws {
+        var core = try moleculeCore(MoleculeState(selection: 4))
+        let invalid = ActionResult.rejected(.rule(code: MoleculeRule.invalidChoice))
+        let limit = ActionResult.rejected(.rule(code: MoleculeRule.cameraLimit))
+        let kept = core
+        let refusedValues: [[Double]] = [[0, 0], [2, 0], [0.5, 0], [0, -0.5], [.nan, 1]]
+        for values in refusedValues {
+            XCTAssertEqual(core.apply(action("camera.pan", values)), invalid, "\(values)")
+        }
+        XCTAssertEqual(core.apply(action("atom.clear")), invalid, "nothing to clear")
+        XCTAssertEqual(core.apply(action("atom.select", [24])), invalid, "caffeine has 24 atoms")
+        XCTAssertEqual(core.apply(action("atom.select", [2.5])), invalid)
+        XCTAssertEqual(core.apply(action("camera.pan", [1])), .rejected(.wrongValueCount(expected: 2, found: 1)))
+        XCTAssertEqual(core, kept, "a refusal changes nothing")
+        for _ in 0..<10 { XCTAssertEqual(core.apply(action("camera.pan", [1, -1])), .accepted) }
+        XCTAssertEqual(core.apply(action("camera.pan", [1, 0])), limit, "beyond 10 steps right")
+        XCTAssertEqual(core.apply(action("camera.pan", [0, -1])), limit, "beyond 10 steps down")
+        XCTAssertEqual(core.camera.panX, 10)
+        XCTAssertEqual(core.camera.panY, -10)
+        XCTAssertEqual(core.apply(action("atom.select", [2])), .accepted)
+        XCTAssertEqual(core.selectedAtom, 2)
+        XCTAssertEqual(core.apply(action("view.reset")), .accepted)
+        XCTAssertEqual(core.camera, .default, "reset zeroes the pan")
+        XCTAssertEqual(core.selectedAtom, 2, "reset keeps the atom")
+        XCTAssertEqual(core.apply(action("display.mode", [1])), .accepted)
+        XCTAssertEqual(core.selectedAtom, 2, "the mode keeps the atom")
+        XCTAssertEqual(core.apply(action("atom.previous")), .accepted)
+        XCTAssertEqual(core.apply(action("atom.previous")), .accepted)
+        XCTAssertEqual(core.apply(action("atom.previous")), invalid, "atom 1 is the first")
+        XCTAssertEqual(core.apply(action("atom.clear")), .accepted)
+        XCTAssertEqual(core.apply(action("atom.previous")), .accepted)
+        XCTAssertEqual(core.selectedAtom, 23, "previous with none selects the last")
+        XCTAssertEqual(core.apply(action("atom.next")), invalid, "the last atom")
+        XCTAssertEqual(core.apply(action("molecule.previous")), .accepted)
+        XCTAssertNil(core.selectedAtom, "a molecule change clears the atom")
+        XCTAssertEqual(core.apply(action("atom.next")), .accepted)
+        XCTAssertEqual(core.selectedAtom, 0, "next with none selects the first")
+    }
+
+    func testTheDigestAndTheDescriptionCoverThePanAndTheAtom() throws {
+        let plain = try moleculeDigest(moleculeCore(MoleculeState(selection: 4)))
+        let picked = try moleculeDigest(moleculeCore(MoleculeState(selection: 4, selectedAtom: 2)))
+        let panned = try moleculeDigest(moleculeCore(MoleculeState(
+            selection: 4, camera: CameraSettings(turnSteps: 2, tiltSteps: 2, zoomSteps: 0, panX: 1, panY: 0))))
+        XCTAssertEqual(Set([plain, picked, panned]).count, 3, "the pan and the atom are state")
+        XCTAssertEqual(try moleculeCore(MoleculeState(selection: 4, selectedAtom: 2)).canvasDescription,
+                       "Molecular Explorer: Caffeine, C8H10N4O2; 24 atoms, 25 bonds; elements carbon, hydrogen, "
+                       + "nitrogen, oxygen; ball-and-stick; selected nitrogen, atom 3.")
+        XCTAssertEqual(MoleculeCore.canvasDescription(selection: 0, mode: .spaceFilling, atom: 0),
+                       "Molecular Explorer: Water, H2O; 3 atoms, 2 bonds; elements hydrogen, oxygen; space-filling; "
+                       + "selected oxygen, atom 1.")
+        XCTAssertEqual(MoleculeCore.canvasDescription(selection: 0, atom: 9),
+                       MoleculeCore.canvasDescription(selection: 0), "an index outside the molecule adds nothing")
     }
 }

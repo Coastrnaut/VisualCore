@@ -6,7 +6,8 @@
 // same frame; drawing never changes the state or its digest; the unit sphere and stick meshes, their model matrices
 // and the colours; the default camera centred on the scene with every atom in view at every aspect in both modes; the
 // words of the controls; teardown releases both renderers together; and the experience's sources never create a
-// graphics context of their own.
+// graphics context of their own. Feature 112 (A15-P03) T-A15-306 (FR-A15-321): the bond items are the scene's styled
+// sticks, each the unit stick scaled across by its radius ÷ 0.12.
 import Foundation
 import XCTest
 @testable import MolecularExplorerExperience
@@ -49,7 +50,7 @@ final class MoleculeRenderTests: XCTestCase {
             let state = MoleculeState(selection: index)
             let scene = try XCTUnwrap(state.scene)
             XCTAssertEqual(shell.presenter.lastAtomsDrawn, molecule.atoms.count, molecule.id)
-            XCTAssertEqual(shell.presenter.lastHalvesDrawn, scene.bondHalves.count, molecule.id)
+            XCTAssertEqual(shell.presenter.lastSticksDrawn, scene.sticks.count, molecule.id)
             XCTAssertEqual(shell.presenter.lastSelection, index, molecule.id)
             let center = try XCTUnwrap(shell.presenter.lastCenter)
             XCTAssertLessThan((center - scene.centre).length, 1e-12, molecule.id)
@@ -129,7 +130,7 @@ final class MoleculeRenderTests: XCTestCase {
             XCTAssertLessThan((turned - direction).length, 1e-12, "\(direction)")
         }
         // Every atom model puts the unit sphere's surface at the display radius; every half model puts the stick's
-        // ends on the half's ends.
+        // ends on the stick's ends with the stick's radius.
         for molecule in MoleculeCore.library {
             for mode in DisplayMode.allCases {
                 let scene = MoleculeScene(molecule: molecule, mode: mode)
@@ -139,19 +140,21 @@ final class MoleculeRenderTests: XCTestCase {
                     XCTAssertEqual((model.applyPoint(Vec3(0, 0, 1)) - atom.position).length, atom.radius,
                                    accuracy: 1e-12, "\(molecule.id) \(atom.symbol)")
                 }
-                for half in scene.bondHalves {
-                    let model = try XCTUnwrap(MoleculePresenter.halfModel(half))
-                    XCTAssertLessThan((model.applyPoint(Vec3(0, 0, 0)) - half.from).length, 1e-12, molecule.id)
-                    XCTAssertLessThan((model.applyPoint(Vec3(0, 1, 0)) - half.to).length, 1e-12, molecule.id)
-                    // The stick's radius is not stretched: a side point stays 0.12 from the axis.
+                for stick in scene.sticks {
+                    let model = try XCTUnwrap(MoleculePresenter.stickModel(stick))
+                    XCTAssertLessThan((model.applyPoint(Vec3(0, 0, 0)) - stick.from).length, 1e-12, molecule.id)
+                    XCTAssertLessThan((model.applyPoint(Vec3(0, 1, 0)) - stick.to).length, 1e-12, molecule.id)
+                    // A side point of the unit stick (0.12 from its axis) lands at the stick's own radius.
                     let side = model.applyPoint(Vec3(DisplayMode.stickRadius, 0.5, 0))
-                    let axis = (half.from + half.to) * 0.5
-                    XCTAssertEqual((side - axis).length, DisplayMode.stickRadius, accuracy: 1e-12, molecule.id)
+                    let axis = (stick.from + stick.to) * 0.5
+                    XCTAssertEqual((side - axis).length, stick.radius, accuracy: 1e-12, molecule.id)
                 }
             }
         }
-        XCTAssertNil(MoleculePresenter.halfModel(MoleculeScene.BondHalf(from: Vec3(1, 1, 1), to: Vec3(1, 1, 1),
-                                                                          symbol: "C", radius: 0.12)))
+        XCTAssertNil(MoleculePresenter.stickModel(MoleculeScene.Stick(from: Vec3(1, 1, 1), to: Vec3(1, 1, 1),
+                                                                        symbol: "C", radius: 0.12)))
+        XCTAssertNil(MoleculePresenter.stickModel(MoleculeScene.Stick(from: Vec3(0, 0, 0), to: Vec3(0, 1, 0),
+                                                                        symbol: "C", radius: 0)))
         XCTAssertEqual(MoleculePresenter.color(symbol: "O"), MoleculePresenter.color(hex: "FF0D0D"))
         XCTAssertEqual(MoleculePresenter.color(symbol: "Xx"), Vec4(0.5, 0.5, 0.5, 1))
         for element in Elements.all {
@@ -238,7 +241,8 @@ final class MoleculeRenderTests: XCTestCase {
         let shell = try await MoleculeTest.open(session, size: size)
         let names: [String] = ["previous-molecule", "next-molecule", "molecule", "name", "counts", "source", "status",
                                "message", "display-mode", "turn-left", "turn-right", "tilt-up", "tilt-down", "zoom-in",
-                               "zoom-out", "reset-view", "legend"]
+                               "zoom-out", "reset-view", "legend", "pan-left", "pan-right", "pan-up", "pan-down",
+                               "previous-atom", "next-atom", "clear-atom", "atom-panel", "atom-bond-1"]
         for name in names {
             XCTAssertEqual(shell.port.identifier(name), "experience.a15.molecular-explorer.\(name)")
         }
@@ -261,7 +265,7 @@ final class MoleculeRenderTests: XCTestCase {
         XCTAssertTrue(shell.presenter.renderers.isEmpty)
         XCTAssertNil(shell.presenter.depthPass)
         XCTAssertEqual(shell.presenter.lastAtomsDrawn, 0)
-        XCTAssertEqual(shell.presenter.lastHalvesDrawn, 0)
+        XCTAssertEqual(shell.presenter.lastSticksDrawn, 0)
         XCTAssertNotNil(shell.presenter.sphereMesh, "the CPU meshes stay")
         XCTAssertNotNil(shell.presenter.stickMesh, "the CPU meshes stay")
         XCTAssertEqual(session.diagnostics.lastCloseCounts?.objects, 0)

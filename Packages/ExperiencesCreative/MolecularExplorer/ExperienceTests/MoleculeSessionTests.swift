@@ -1,5 +1,6 @@
 // MoleculeSessionTests — feature 110 (A15-P01) T-A15-106 (FR-A15-131; clarification Q5; SC-A15-104), updated by feature
-// 111 (A15-P02) T-A15-205 (two renderers, schema 2, the mode in the description; FR-A15-202, FR-A15-221). The A15
+// 111 (A15-P02) T-A15-205 (two renderers, schema 2, the mode in the description; FR-A15-202, FR-A15-221) and feature
+// 112 (A15-P03) T-A15-305 (thirteen actions, the gesture actions, schema 3 so "newer" is 4; FR-A15-301). The A15
 // adapter inside the one app's session host on the simulator, short runs only (each test well under 10 s, no wall-clock
 // assertion): the session opens with five molecules in library order and water selected, draws it through the host and
 // describes it in words; next and previous step through the library and a step past an end is refused with the answer
@@ -49,9 +50,11 @@ final class MoleculeSessionTests: XCTestCase {
         XCTAssertEqual(presenter.mirror.status, "Water selected, molecule 1 of 5")
         XCTAssertEqual(presenter.nativeActions, ["molecule.select", "molecule.next", "molecule.previous",
                                                  "display.mode", "camera.orbit", "camera.tilt", "camera.zoom",
-                                                 "view.reset"])
+                                                 "view.reset", "camera.pan", "atom.select", "atom.next",
+                                                 "atom.previous", "atom.clear"])
         XCTAssertEqual(presenter.nativeActions, Set(MoleculeCore.actionIDs), "every action has a native control")
-        XCTAssertEqual(presenter.gestureActions, [])
+        XCTAssertEqual(presenter.gestureActions, ["camera.orbit", "camera.tilt", "camera.zoom", "camera.pan",
+                                                  "atom.select", "atom.clear"])
         XCTAssertEqual(GestureAlternatives.missing(gesture: presenter.gestureActions, native: presenter.nativeActions),
                        [])
 
@@ -153,8 +156,8 @@ final class MoleculeSessionTests: XCTestCase {
         XCTAssertTrue(shell.handle(control: "molecule.select", values: [2]).isAccepted)
         let saved = try shell.snapshot()
         first.close()
-        let newerEnvelope = try moleculeEnvelope(Data(saved.payload.utf8), like: saved, schema: 3)
-        let newerPayload = try moleculeEnvelope(moleculePayload(saved.payload, key: "schema", value: 3), like: saved)
+        let newerEnvelope = try moleculeEnvelope(Data(saved.payload.utf8), like: saved, schema: 4)
+        let newerPayload = try moleculeEnvelope(moleculePayload(saved.payload, key: "schema", value: 4), like: saved)
 
         let cases: [(String, ExperienceSnapshot)] = [("envelope", newerEnvelope), ("payload", newerPayload)]
         for (name, newer) in cases {

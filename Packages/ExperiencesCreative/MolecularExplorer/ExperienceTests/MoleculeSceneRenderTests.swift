@@ -4,6 +4,7 @@
 // and space-filling each draw a non-blank, non-black frame with their probes holding, and the two frames differ; the
 // items drawn are exactly the scene's (water in ball-and-stick: 3 atoms and 4 bond halves; space-filling draws no
 // half), within the draw budget; the mode changes the description and the legend and keeps the molecule and camera.
+// Feature 112 (A15-P03) T-A15-306 (FR-A15-321): the drawn bond items are the scene's styled sticks.
 import Foundation
 import XCTest
 @testable import MolecularExplorerExperience
@@ -33,7 +34,7 @@ final class MoleculeSceneRenderTests: XCTestCase {
     /// Checks that the last frame of `shell` drew exactly the items of `scene`.
     private func assertCounts(_ shell: ExperienceShell<MoleculePresenter>, _ scene: MoleculeScene, _ name: String) {
         XCTAssertEqual(shell.presenter.lastAtomsDrawn, scene.atoms.count, "\(name) atoms")
-        XCTAssertEqual(shell.presenter.lastHalvesDrawn, scene.bondHalves.count, "\(name) halves")
+        XCTAssertEqual(shell.presenter.lastSticksDrawn, scene.sticks.count, "\(name) sticks")
         XCTAssertEqual(shell.presenter.lastItemCount, scene.itemCount, "\(name) items")
         XCTAssertLessThanOrEqual(shell.presenter.lastItemCount, MoleculeScene.drawBudget, "\(name) budget")
     }
@@ -48,14 +49,14 @@ final class MoleculeSceneRenderTests: XCTestCase {
             assertDrawn(shell, ball, "\(molecule.id) ball-and-stick")
             assertCounts(shell, MoleculeScene(molecule: molecule, mode: .ballAndStick), "\(molecule.id) ball")
             XCTAssertEqual(shell.presenter.lastMode, .ballAndStick)
-            XCTAssertEqual(shell.presenter.lastHalvesDrawn, molecule.bonds.count * 2, molecule.id)
+            XCTAssertGreaterThanOrEqual(shell.presenter.lastSticksDrawn, molecule.bonds.count * 2, molecule.id)
 
             XCTAssertTrue(shell.handle(control: "display.mode", values: [1]).isAccepted)
             let space = try MoleculeTest.picture(session)
             assertDrawn(shell, space, "\(molecule.id) space-filling")
             assertCounts(shell, MoleculeScene(molecule: molecule, mode: .spaceFilling), "\(molecule.id) space")
             XCTAssertEqual(shell.presenter.lastMode, .spaceFilling)
-            XCTAssertEqual(shell.presenter.lastHalvesDrawn, 0, "\(molecule.id): space-filling draws no half")
+            XCTAssertEqual(shell.presenter.lastSticksDrawn, 0, "\(molecule.id): space-filling draws no stick")
             XCTAssertNotEqual(StableHash.sha256Hex(ball.rgba), StableHash.sha256Hex(space.rgba), molecule.id)
             XCTAssertGreaterThan(MoleculeTest.differingPixels(ball.rgba, space.rgba), 100,
                                  "\(molecule.id): the modes differ in many pixels")
@@ -69,12 +70,12 @@ final class MoleculeSceneRenderTests: XCTestCase {
         let shell = try await MoleculeTest.open(session, size: size)
         try MoleculeTest.frames(session, 1)
         XCTAssertEqual(shell.presenter.lastAtomsDrawn, 3)
-        XCTAssertEqual(shell.presenter.lastHalvesDrawn, 4)
+        XCTAssertEqual(shell.presenter.lastSticksDrawn, 4)
         XCTAssertEqual(shell.presenter.lastItemCount, 7)
         XCTAssertTrue(shell.handle(control: "display.mode", values: [1]).isAccepted)
         try MoleculeTest.frames(session, 1)
         XCTAssertEqual(shell.presenter.lastAtomsDrawn, 3)
-        XCTAssertEqual(shell.presenter.lastHalvesDrawn, 0)
+        XCTAssertEqual(shell.presenter.lastSticksDrawn, 0)
         XCTAssertEqual(shell.presenter.lastItemCount, 3)
         XCTAssertEqual(shell.presenter.rendererBuildCount, 1, "a mode change never remakes the renderers")
         session.close()

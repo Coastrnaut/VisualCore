@@ -1,5 +1,6 @@
 // MoleculeTestSupport — feature 110 (A15-P01) T-A15-106 (FR-A15-131; clarification Q5; SC-A15-104) and feature 111
-// (A15-P02) T-A15-205 (snapshot envelopes at schema 2; FR-A15-221). Shared helpers of
+// (A15-P02) T-A15-205 (snapshot envelopes at schema 2; FR-A15-221), updated by feature 112 (A15-P03) T-A15-305 and
+// T-A15-306 (schema 3; a presenter of the test's own, with a recording announcement sink). Shared helpers of
 // the Molecular Explorer experience tests: opening the experience in the one app's session host with a real view size
 // (a view without a frame size does not draw), drawing frames, reading the pixels of a frame (rows bottom-up, as the
 // host reads them back), counting the pixels two frames differ in, and building snapshot envelopes and payloads.
@@ -25,15 +26,16 @@ enum MoleculeTest {
         MolecularExplorerExperience.id ?? ExperienceID(rawValue: "a15.unknown")!
     }
 
-    /// Opens Molecular Explorer in `session` (seed `seed`, optionally restoring `snapshot`), lays the view out at
-    /// `size` points and draws one frame.
+    /// Opens Molecular Explorer in `session` (seed `seed`, optionally restoring `snapshot`, with `presenter` or the
+    /// factory's own), lays the view out at `size` points and draws one frame.
     static func open(_ session: ExperienceSession, seed: UInt64 = 1, snapshot: ExperienceSnapshot? = nil,
-                     size: CGSize = CGSize(width: 240, height: 160)) async throws
+                     size: CGSize = CGSize(width: 240, height: 160), presenter: MoleculePresenter? = nil) async throws
         -> ExperienceShell<MoleculePresenter> {
         let id = self.id
         var made: ExperienceShell<MoleculePresenter>?
         let request = ExperienceOpenRequest(id: id, seed: seed, snapshot: snapshot, refusedSnapshotFails: false) {
-            let shell = MolecularExplorerExperience.make(id: id)
+            let shell = presenter.map { ExperienceShell(id: id, presenter: $0) }
+                ?? MolecularExplorerExperience.make(id: id)
             made = shell
             return shell
         }
@@ -107,7 +109,7 @@ func moleculeCore(_ state: MoleculeState, seed: UInt64 = 1) throws -> MoleculeCo
 }
 
 /// A snapshot envelope of Molecular Explorer around `payload` with the fields of `saved` and schema `schema` (the
-/// current schema 2 by default).
+/// current schema 3 by default).
 func moleculeEnvelope(_ payload: Data, like saved: ExperienceSnapshot, schema: Int = MoleculeState.schemaVersion) throws
     -> ExperienceSnapshot {
     let id = try XCTUnwrap(ExperienceID(rawValue: MoleculeCore.experienceID))

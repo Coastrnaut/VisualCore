@@ -15,6 +15,16 @@
 //     saying so), each with the value "Turned 30°, tilted 20°"; Zoom in and Zoom out (`zoom-in`, `zoom-out` →
 //     `camera.zoom [+1 / −1]`, disabled at steps 4 and −4) with the value "Zoom step 0 of −4 to 4"; Reset view
 //     (`reset-view` → `view.reset`) with both values.
+// Feature 112 (A15-P03) T-A15-305 and T-A15-306 (FR-A15-301, FR-A15-302, FR-A15-311, FR-A15-322; clarifications Q2,
+// Q3, Q5): Pan left, Pan right, Pan up and Pan down (`pan-left`, `pan-right`, `pan-up`, `pan-down` →
+// `camera.pan [−1, 0]`, `[1, 0]`, `[0, 1]`, `[0, −1]`: one step of the view, so the molecule moves the other way;
+// disabled at −10 and 10 steps with a hint saying so) with the value "View centred" / "View panned 2 right and 1 up";
+// Previous atom and Next atom (`previous-atom`, `next-atom` → `atom.previous` / `atom.next`; with no selection they
+// select the last and the first atom; disabled at the first and the last atom and for a molecule without atoms) and
+// Clear selection (`clear-atom` → `atom.clear`, disabled when no atom is selected), each with the value "Nitrogen (N),
+// atom 3 of 24" or "No atom selected"; the selected atom's panel (`atom-panel`: its name and place, position and radii
+// lines, or "No atom selected") and one line per bond (`atom-bond-<n>`, n = 1, 2, …: "Single bond to carbon, atom 8,
+// recorded"). The canvas gestures send the same actions as these buttons (`GestureAlternatives.missing` is empty).
 // Every control and line has an accessible label and value (controls a hint too) and the identifier
 // `experience.a15.molecular-explorer.<name>` from the port; hit areas are at least 44 points high and text wraps.
 //
@@ -101,6 +111,9 @@ struct MoleculeControls: View {
             modePicker
             line(mirror.legend, label: "Legend", name: "legend", font: .footnote)
             cameraButtons
+            panButtons
+            atomButtons
+            atomPanel
             if !mirror.message.isEmpty {
                 line(mirror.message, label: "Message", name: "message", font: .footnote)
             }
@@ -164,6 +177,61 @@ struct MoleculeControls: View {
         button("Reset view", name: "reset-view", value: view + ", " + zoom,
                hint: "Returns to the framed default view; the molecule and the display stay",
                enabled: true) { send("view.reset") }
+    }
+
+    /// Pan left, right, up and down (feature 112): one step of the view each, disabled at ±10 steps.
+    @ViewBuilder private var panButtons: some View {
+        let words = mirror.panWords
+        let limit = CameraSettings.panRange
+        let atLeft = mirror.panX <= limit.lowerBound, atRight = mirror.panX >= limit.upperBound
+        let atBottom = mirror.panY <= limit.lowerBound, atTop = mirror.panY >= limit.upperBound
+        HStack(spacing: 8) {
+            button("Pan left", name: "pan-left", value: words,
+                   hint: atLeft ? "The view is panned as far left as it goes" : "Moves the view left; the molecule "
+                       + "moves right", enabled: !atLeft) { send("camera.pan", [-1, 0]) }
+            button("Pan right", name: "pan-right", value: words,
+                   hint: atRight ? "The view is panned as far right as it goes" : "Moves the view right; the molecule "
+                       + "moves left", enabled: !atRight) { send("camera.pan", [1, 0]) }
+        }
+        HStack(spacing: 8) {
+            button("Pan up", name: "pan-up", value: words,
+                   hint: atTop ? "The view is panned as far up as it goes" : "Moves the view up; the molecule moves "
+                       + "down", enabled: !atTop) { send("camera.pan", [0, 1]) }
+            button("Pan down", name: "pan-down", value: words,
+                   hint: atBottom ? "The view is panned as far down as it goes" : "Moves the view down; the molecule "
+                       + "moves up", enabled: !atBottom) { send("camera.pan", [0, -1]) }
+        }
+    }
+
+    /// Previous atom, Next atom and Clear selection (feature 112).
+    @ViewBuilder private var atomButtons: some View {
+        let words = mirror.atomWords
+        let count = mirror.atomCount
+        let selected = mirror.selectedAtom
+        let atFirst = count == 0 || selected == 0
+        let atLast = count == 0 || selected == count - 1
+        HStack(spacing: 8) {
+            button("Previous atom", name: "previous-atom", value: words,
+                   hint: atFirst ? "This is the first atom" : "Selects the previous atom, or the last one when none "
+                       + "is selected", enabled: !atFirst) { send("atom.previous") }
+            button("Next atom", name: "next-atom", value: words,
+                   hint: atLast ? "This is the last atom" : "Selects the next atom, or the first one when none is "
+                       + "selected", enabled: !atLast) { send("atom.next") }
+        }
+        button("Clear selection", name: "clear-atom", value: words,
+               hint: selected == nil ? "No atom is selected" : "Clears the selected atom",
+               enabled: selected != nil) { send("atom.clear") }
+    }
+
+    /// The selected atom's panel and one line per bond (feature 112).
+    @ViewBuilder private var atomPanel: some View {
+        let panel = mirror.atomPanel.isEmpty ? MoleculePresenter.noAtomWords
+            : mirror.atomPanel.joined(separator: "\n")
+        line(panel, label: "Selected atom", name: "atom-panel", font: .footnote)
+        ForEach(mirror.bondLines.indices, id: \.self) { index in
+            line(mirror.bondLines[index], label: "Bond \(index + 1)", name: "atom-bond-\(index + 1)",
+                 font: .footnote)
+        }
     }
 
     /// Sends `control` with `values` through the presenter, which shows the answer when it is refused.

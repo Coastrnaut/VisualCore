@@ -4,7 +4,8 @@
 // changes the drawn frame, keeps the molecule's centre projected at the canvas centre within 1 pixel and keeps every
 // declared probe holding; a tilt or zoom beyond its limit is refused with `a15.camera-limit` and changes nothing; Reset
 // view frames the molecule again; a molecule change resets the camera and keeps the mode; a schema-1 saved state
-// restores in schema 2 (ethanol, ball-and-stick, the default camera); a context recreation draws the same frame.
+// restores in schema 3 since feature 112 (ethanol, ball-and-stick, the default camera, no pan, no atom; T-A15-305); a
+// context recreation draws the same frame (caffeine: 24 atoms and 58 styled sticks, T-A15-306).
 import Foundation
 import XCTest
 @testable import MolecularExplorerExperience
@@ -150,7 +151,7 @@ final class MoleculeCameraTests: XCTestCase {
         session.close()
     }
 
-    func testASchemaOneSavedStateRestoresInSchemaTwo() async throws {
+    func testASchemaOneSavedStateRestoresInSchemaThree() async throws {
         let first = ExperienceSession()
         let shell = try await MoleculeTest.open(first)
         let saved = try shell.snapshot()
@@ -166,9 +167,9 @@ final class MoleculeCameraTests: XCTestCase {
         XCTAssertEqual(core.molecule?.id, "ethanol")
         try MoleculeTest.frames(second, 1)
         XCTAssertEqual(opened.presenter.lastAtomsDrawn, 9)
-        XCTAssertEqual(opened.presenter.lastHalvesDrawn, 16)
+        XCTAssertEqual(opened.presenter.lastSticksDrawn, 16, "eight single bonds, two sticks each")
         let resaved = try opened.snapshot()
-        XCTAssertEqual(resaved.schemaVersion, 2, "saved again in schema 2")
+        XCTAssertEqual(resaved.schemaVersion, 3, "saved again in schema 3")
         XCTAssertEqual(Data(resaved.payload.utf8), MoleculeState(selection: 2).encoded())
         second.close()
     }
@@ -192,7 +193,7 @@ final class MoleculeCameraTests: XCTestCase {
         XCTAssertEqual(shell.presenter.renderers.count, 2)
         XCTAssertEqual(shell.presenter.meshBuildCount, meshes, "the unit meshes are CPU data and survive")
         XCTAssertEqual(StableHash.sha256Hex(before.rgba), StableHash.sha256Hex(after.rgba), "the drawing is the same")
-        XCTAssertEqual(shell.presenter.lastItemCount, 74, "caffeine: 24 atoms and 50 halves")
+        XCTAssertEqual(shell.presenter.lastItemCount, 82, "caffeine: 24 atoms and 58 sticks")
         XCTAssertEqual(try shell.engine.digest(), digest)
         session.close()
         XCTAssertEqual(session.diagnostics.lastCloseCounts?.objects, 0)
