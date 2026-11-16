@@ -13,6 +13,7 @@ public enum Elements {
 public enum ElementAudit {
     public static let allowedLicenses: [String]          // ["public-domain", "CC0-1.0", "factual-data"]
     public static func problems(elements: [Element], sources: [SourceRecord]) -> [String]
+    public static func problems(molecules: [Molecule]) -> [String]   // molecule source records
     public static func markdown() -> String              // docs/apps/molecular-explorer/data-sources.md
 }
 public struct Atom: Codable, Equatable, Sendable { public let symbol: String; public let x, y, z: Double }
