@@ -23,6 +23,44 @@ Canonical overrides:
   reference regression run at X-A16 (owner ruling of 2026-11-14), so the report states which runtime produced it.
 - **Release** (licenses, copy, privacy) is A16-P06 (G-RELEASE). Follow `specs/120-sl-p04-ui-presets-capture`.
 
+## Clarifications
+
+### Session 2026-11-16
+
+Answered by the lead under the owner's standing delegation (the recommended option each time), with the facts checked
+in code:
+- `ResourceRegistry.stats` (`ResourceLedger.Snapshot`: `totalBytes`, `peakBytes`) and `budget` (`ResourceBudget`,
+  default 256 MiB) exist, and `PingPongTarget.bytes` gives a pair's size.
+- The presenter's per-frame cap is `maxStepsPerFrame` (128), and the scheduler runs at most 16 iterations per host step.
+- The field targets are grid-sized (64 × 64), independent of the canvas size.
+
+- Q: Which runs produce the differences in the report, and what are the tolerances? → A:
+  - Per family, a running 64 × 64 session at ×4 for 120 frames through the presenter, comparing the GPU field with
+    the CPU field after every frame.
+  - Tolerances: 0 for the automaton (exact) and 0.01 for reaction-diffusion and the wave.
+  - The 16 × 16 ten-step fixtures of A16-P03 are reported too, against both half roundings.
+- Q: How are the stability limits exercised? → A:
+  - On the CPU model and on the GPU pair: 600 iterations of reaction-diffusion at Δt 1.5625, and 600 of the wave at
+    c 1 and Δt 1/√2 (the Courant limit). Every cell must stay finite; the count of non-finite cells is reported.
+  - `sim.timestep` 1 % above each limit is refused with its sentence, quoted in the report.
+- Q: What are the per-frame and memory bounds? → A:
+  - The largest GPU steps in one frame over the 120 frames is reported and must be ≤ 128.
+  - The presenter's own targets (the display target and the automaton, Gray-Scott and wave pairs) must total
+    ≤ 256 KiB. Expected: 16,384 + 32,768 + 65,536 + 65,536 = 180,224 bytes.
+  - The registry's `totalBytes` must stay within its `ResourceBudget.total`.
+- Q: How is steps per second measured without a wall-clock assertion? → A: In a short run, 600 CPU iterations of
+  each family, timed with `ContinuousClock` and reported as iterations per second. They are labelled "simulator figure,
+  not a device claim" and never asserted. Device rates wait for the device campaign.
+- Q: How is the report produced, kept current, and how is the size change checked? → A: The report and the check:
+  - `SimulationValidationTests` writes `docs/apps/simulation-lab/validation-report.md` when
+    `UPDATE_VALIDATION_REPORT=1` (on the simulator `TEST_RUNNER_UPDATE_VALIDATION_REPORT=1`), as the scenario
+    manifest is written. It always asserts the bounds.
+  - It compares the committed report's deterministic lines with the generated ones. The steps-per-second lines are
+    excluded, as timing varies. The report names its runtime ("iOS 27.2 simulator"); X-A16 adds the iOS 26 section.
+  - The size-change fixture: a canvas size change keeps the grid-sized targets and reloads them from the CPU state.
+    A context recreation makes every target new (a new registry generation and `resourceBuildCount` + 1) and loads
+    them. In both cases the next frame's GPU field equals the CPU field within the family's tolerance.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - A validation report anyone can regenerate (Priority: P1) 🎯
@@ -76,10 +114,12 @@ the graphics-processor field with the reference.
 - **FR-A16-501**: A validation report MUST be generated from short runs and committed, naming the runtime, and stating
   per family the largest difference from the reference with the declared tolerance.
 - **FR-A16-502**: At each stability limit a run MUST stay finite; one step beyond MUST be refused with its sentence.
-- **FR-A16-503**: The iterations per frame MUST never exceed the cap, and the fields' memory MUST stay within the
-  stated budget; steps per second MUST be measured in a short run and reported, not asserted.
-- **FR-A16-504**: A canvas size change and a context recreation MUST leave the next frame's field equal to the
-  reference, with every target of a recreation made new.
+- **FR-A16-503**: The GPU steps per frame MUST never exceed 128; the presenter's targets MUST total at most 256 KiB
+  and the registry MUST stay within its budget; steps per second MUST be measured in a short run and reported as a
+  simulator figure, not asserted.
+- **FR-A16-504**: A canvas size change (grid-sized targets kept and reloaded) and a context recreation (every target
+  made new) MUST leave the next frame's GPU field equal to the CPU field within the family's tolerance (0 for the
+  automaton, 0.01 otherwise).
 - **FR-A16-505**: The boundary rule of every family MUST be asserted on the graphics-processor path (wrap or fixed
   zero).
 - **FR-A16-506**: The runner's standard scenarios MUST pass on iOS 27.
@@ -95,8 +135,8 @@ the graphics-processor field with the reference.
 
 - **SC-A16-501**: 3 of 3 families are within their declared tolerance in the report.
 - **SC-A16-502**: 0 non-finite cells at the limits; 2 of 2 beyond-limit steps refused.
-- **SC-A16-503**: 0 frames above the per-frame cap; memory within the stated budget.
-- **SC-A16-504**: After a size change and a recreation, 100 % of cells equal the reference in every family.
+- **SC-A16-503**: 0 frames above 128 GPU steps; the presenter's targets total at most 256 KiB (expected 180,224 bytes).
+- **SC-A16-504**: After a size change and a recreation, 100 % of cells are within the family's tolerance in every family.
 - **SC-A16-505**: Every test runs in under 10 s; the runner's standard scenarios pass on iOS 27.
 
 ## Assumptions
