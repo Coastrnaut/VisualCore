@@ -1,0 +1,1586 @@
+{
+  "schema": 1,
+  "app": "molecular-explorer",
+  "gate": "A15-P00",
+  "date": "2026-11-15",
+  "inventory": [
+    {
+      "area": "Package products",
+      "description": "Pure, host-testable products of Packages/VisualCore: VisualCoreMath, VisualCoreSimulation, VisualCoreScenes, VisualCoreShaderSource, VisualCoreEffectsGraph, VisualCoreDiagnostics, VisualCoreAudioDSP, VisualCorePersistence, VisualCoreParameters, VisualCoreExperience (+ VisualCoreTestSupport for test targets). iOS products of Packages/VisualCoreRendering: VisualCoreRendering, VisualCoreEffects, VisualCoreUI, VisualCoreAudio, VisualCoreAutomation, VisualCoreExperienceHost. For Molecular Explorer (checked 2026-11-15): VisualCoreMath has Vec3, Mat4 and Quat (axis-angle, rotate, slerp) in Double, OrbitCamera (view, projection, project, ray), OrbitBounds and OrbitViewBounds (orbit, pan, zoom, clamp), NumericHygiene with NumericError, StableHash and Ray3/RayHit3 with ray-box, ray-sphere and ray-triangle casts and nearest (no ray-cylinder or ray-capsule); VisualCoreScenes has Mesh with MeshGenerators plane, cube and uvSphere(segments:rings:radius:) only, MeshBuilder under a MeshBudget, the shapes surface, revolution, extrusion, tube (a two-point capped tube is a cylinder) and bevelledBox, and the gesture recognizers (Drag, Pinch, Rotate, Tap) with GestureArbiter; VisualCorePersistence has DocumentStore, DocumentEnvelope, MigrationChain and NamedLibrary; VisualCoreExperience has ExperienceStorage with StorageQuota, SavedStateStore, StateDigest and ScenarioManifest; VisualCoreRendering has MeshRenderer (one directional Lambert light, ambient, per-vertex colours, MeshFog, one draw per item), DepthMeshPass, PrimitiveRenderer, ParticleRenderer (the only instanced draw: 2D quads through Camera2D) and ResourceRegistry. Missing in every framework product (grep 2026-11-15 for cylinder, capsule, xyz, atom, bond, covalent, angstrom): an element catalog, a molecule domain, a text-record parser, bond inference, instanced lit-mesh drawing, a ray-cylinder cast and a document-picker helper.",
+      "paths": [
+        "Packages/VisualCore/Package.swift",
+        "Packages/VisualCoreRendering/Package.swift",
+        "Packages/ExperiencesCreative/Package.swift",
+        "Packages/VisualCore/Sources/VisualCoreMath/Vectors.swift",
+        "Packages/VisualCore/Sources/VisualCoreMath/Matrix.swift",
+        "Packages/VisualCore/Sources/VisualCoreMath/Quaternion.swift",
+        "Packages/VisualCore/Sources/VisualCoreMath/OrbitCamera.swift",
+        "Packages/VisualCore/Sources/VisualCoreMath/OrbitViewBounds.swift",
+        "Packages/VisualCore/Sources/VisualCoreMath/RayIntersection.swift",
+        "Packages/VisualCore/Sources/VisualCoreMath/NumericHygiene.swift",
+        "Packages/VisualCore/Sources/VisualCoreScenes/MeshGenerators.swift",
+        "Packages/VisualCore/Sources/VisualCoreScenes/MeshShapes.swift",
+        "Packages/VisualCore/Sources/VisualCoreScenes/MeshBuilder.swift",
+        "Packages/VisualCore/Sources/VisualCoreScenes/GestureRecognizers.swift",
+        "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
+        "Packages/VisualCore/Sources/VisualCorePersistence/Migration.swift",
+        "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshRenderer.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/DepthMeshPass.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ParticleRenderer.swift",
+        "scripts/check_dependencies.py",
+        "docs/api/visualcore-public-api.txt"
+      ],
+      "owner": "VisualCore packages (ADR-0003, ADR-0009)"
+    },
+    {
+      "area": "EGL render host and thread",
+      "description": "RenderHost (@MainActor) owns the EGL display, context and surfaces over ANGLE's Metal backend (EGLDisplayProvider chooses an RGBA8 ES3 config with no guaranteed depth buffer, so the window surface is colour-only), the CAMetalLayer RenderView, the FrameScheduler (CADisplayLink) and context generations; pause/resume, replaceScene, recreateContext, renderOffscreen and destroy; scenes implement RenderScene setup/resize/render/teardown. All EGL and GL work runs on the main thread. Molecular Explorer's parsing, bond inference, display-mode rules and picking are GPU-free CPU work done on input or load before drawing; drawing reads the molecule and camera and never changes them. Depth comes from DepthMeshPass's owned off-screen target copied to the framebuffer, never from a changed window configuration; the experience adds no EGL or GL context of its own.",
+      "paths": [
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderView.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderView+Touches.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FrameScheduler.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/EGLDisplayProvider.swift"
+      ],
+      "owner": "VisualCoreRendering (ADR-0002 seam)"
+    },
+    {
+      "area": "Shaders and resources",
+      "description": "ResourceRegistry creates buffers, textures, programs and render targets under a ResourceBudget and rejects stale handles after a generation change; makeRenderTarget(depth: true) adds a 24-bit depth renderbuffer. ShaderProgram, ShaderBundle and ShaderLibrary (#include expansion with line maps) compile bundled GLSL; the vc/ library holds color, field, hash, noise, palette and sdf helpers. Pipeline = ShaderProgram + RenderState, applied by GLState.apply (RenderState.opaque3D: depth test and write, back-face culling). MeshRenderer draws one Mesh with Lambert lighting from one light direction plus an ambient fraction, in one colour or per-vertex colours, with optional MeshFog; DepthMeshPass draws a list of items (renderer, model transform, colour) with depth into an owned target and blits the colour to the framebuffer. ParticleRenderer's instancing (vcglDrawArraysInstanced, vcglVertexAttribDivisor in the internal DynamicVertexBuffer) draws unlit 2D quads only; instanced lit meshes are assessed under G-RENDER. PrimitiveRenderer, FullScreenShaderScene and the effects graph are available for backgrounds and overlays.",
+      "paths": [
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderProgram.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderBundle.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/Pipeline.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLState.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshRenderer.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshFog.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/DepthMeshPass.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/PrimitiveRenderer.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ParticleRenderer.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+        "Packages/VisualCore/Sources/VisualCoreShaderSource/ShaderLibrary.swift",
+        "Packages/VisualCore/Sources/VisualCoreShaderSource/RenderState.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/noise.glsl",
+        "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectScene.swift"
+      ],
+      "owner": "VisualCoreRendering + VisualCoreShaderSource + VisualCoreEffects"
+    },
+    {
+      "area": "Geometry, cameras and picking",
+      "description": "Mesh (positions, normals, uvs, UInt32 indices; plane, cube, uvSphere) and MeshBuilder under a MeshBudget with welding; shapes surface, revolution, extrusion, tube and bevelledBox; normals, MeshBounds, validation, digest. A bond cylinder is Mesh.tube(path: [a, b], radius:, sides:, caps: true, closed: false), tested as a closed capped straight tube (MeshShapeTests); one unit cylinder can be oriented per bond with Mat4.rotation(Quat), translation and scale. OrbitCamera with OrbitViewBounds gives orbit, pan and zoom in bounds; OrbitCamera.ray with Ray3.intersect(sphereCenter:radius:) and Ray3.nearest picks an atom; OrbitCamera.project places native labels. There is no ray-cylinder cast (bond picking is not in version 0.1) and no neighbour search for bond inference (G-DOMAIN).",
+      "paths": [
+        "Packages/VisualCore/Sources/VisualCoreScenes/MeshGenerators.swift",
+        "Packages/VisualCore/Sources/VisualCoreScenes/MeshBuilder.swift",
+        "Packages/VisualCore/Sources/VisualCoreScenes/MeshShapes.swift",
+        "Packages/VisualCore/Sources/VisualCoreScenes/MeshNormals.swift",
+        "Packages/VisualCore/Sources/VisualCoreScenes/MeshBounds.swift",
+        "Packages/VisualCore/Sources/VisualCoreScenes/MeshValidation.swift",
+        "Packages/VisualCore/Sources/VisualCoreMath/Quaternion.swift",
+        "Packages/VisualCore/Sources/VisualCoreMath/Matrix.swift",
+        "Packages/VisualCore/Sources/VisualCoreMath/OrbitCamera.swift",
+        "Packages/VisualCore/Sources/VisualCoreMath/CameraBounds.swift",
+        "Packages/VisualCore/Sources/VisualCoreMath/OrbitViewBounds.swift",
+        "Packages/VisualCore/Sources/VisualCoreMath/RayIntersection.swift",
+        "Packages/VisualCore/Sources/VisualCoreScenes/GestureRecognizers.swift",
+        "Packages/VisualCore/Sources/VisualCoreScenes/GestureArbiter.swift"
+      ],
+      "owner": "VisualCoreMath + VisualCoreScenes"
+    },
+    {
+      "area": "Persistence and storage",
+      "description": "DocumentStore writes versioned documents (DocumentEnvelope kind and schemaVersion) atomically under a byte cap (maxBytes, default 256 KiB) and migrates them forward through a MigrationChain, reporting damaged or newer files as problems instead of crashing; NamedLibrary keeps named documents; ExperienceStorage is the per-experience sandbox with StorageQuota (16 MiB, 64 files) and typed StorageError; SavedStateStore keeps small values. Recent molecules, visual settings, the camera and imported molecule copies use these (G-LIBRARY, G-IMPORT). No document-picker helper exists in a framework product: SwiftUI fileImporter is used only in the audio controls of A06-A08.",
+      "paths": [
+        "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
+        "Packages/VisualCore/Sources/VisualCorePersistence/Envelope.swift",
+        "Packages/VisualCore/Sources/VisualCorePersistence/Migration.swift",
+        "Packages/VisualCore/Sources/VisualCorePersistence/NamedLibrary.swift",
+        "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+        "Packages/VisualCore/Sources/VisualCoreExperience/SavedStateStore.swift",
+        "Packages/ExperiencesCreative/OscilloscopeStudio/Experience/ScopeControls.swift"
+      ],
+      "owner": "VisualCorePersistence + VisualCoreExperience"
+    },
+    {
+      "area": "Experience host",
+      "description": "ExperienceSession opens, checkpoints, closes and recovers an Experience on one RenderHost, applies the quality level (QualityGovernor over the experience's QualityProfile, fed by DeviceConditions thermal state and Low Power Mode) and memory/scene-phase events, and renders stills; ExperienceShell adapts an ExperiencePresenter (scene, controls, canvas overlay) to Experience; ExperienceCore is the GPU-free state with its qualityTiers; ExperienceStorage is the per-experience sandbox; ExperienceFeedback routes haptics and announcements; ScenarioRunner replays a ScenarioManifest; the one app registers experiences in ExperienceRegistry and Catalog/registrations.json (fourteen registered, A01-A14, checked 2026-11-15; Molecular Explorer joins in A15-P01 and stays unregistered and unavailable in A15-P00; scripts/check_experience_packages.py forbids unregistered targets). Version 0.1 needs no permission: the XYZ import uses the system document picker (no usage string), so no privacy answer changes.",
+      "paths": [
+        "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceShell.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceFeedback.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ScenarioRunner.swift",
+        "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceCore.swift",
+        "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+        "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceLifecycle.swift",
+        "Packages/VisualCore/Sources/VisualCoreExperience/ScenarioManifest.swift",
+        "Apps/VisualCore/App/ExperienceRegistry.swift",
+        "Catalog/registrations.json",
+        "scripts/check_experience_packages.py",
+        "project.yml"
+      ],
+      "owner": "VisualCoreExperience + VisualCoreExperienceHost + the one app"
+    },
+    {
+      "area": "Build and release steps",
+      "description": "XcodeGen spec project.yml for the one app (target VisualCore), package schemes via scripts/xcodebuild_package.py, app tests via scripts/xcodebuild_app.py, and scripts/release_check.py: 128 named steps listed by --list on 2026-11-15 (shared checks including app-contracts, which checks every docs/apps/*/visualcore-contract.json, package and app builds/tests, experience-release and copy-claims steps, verify steps of A01-A14 on iOS 27 and 26, release audits of the one app, the seven reference regression steps and the ProjectM independence check).",
+      "paths": [
+        "project.yml",
+        "scripts/release_check.py",
+        "scripts/xcodebuild_package.py",
+        "scripts/xcodebuild_app.py",
+        "scripts/check_app_contract.py",
+        "scripts/check_licenses.py",
+        ".github/workflows/ci.yml"
+      ],
+      "owner": "repository tooling"
+    },
+    {
+      "area": "Source ownership",
+      "description": "Molecular Explorer owns its domain (the element catalog with symbol, name, atomic number, covalent and van der Waals radii in ångström and display colours, each with source and license; atoms, bonds and molecules with versioned schemas; the strict bounded XYZ parser and its typed refusals; distance-based bond inference marked as inferred; ball-and-stick and space-filling rules; atom picking and selection; labels, bond-order styling and the metadata panel; the curated small-molecule library with attributions; recent molecules, visual settings and the camera; the document-picker import; copy, data provenance and licenses) and UI under Packages/ExperiencesCreative/MolecularExplorer/ (Core GPU-free, CoreTests, Experience with Adapter/, ExperienceTests, Shaders, scenario-manifest.json; created in A15-P01, not present today). VisualCore owns reusable machinery: vectors, matrices, quaternions, the orbit camera and its bounds, ray casts and numeric hygiene (VisualCoreMath), meshes, shapes and gestures (VisualCoreScenes), mesh drawing and depth (VisualCoreRendering), persistence (VisualCorePersistence), storage, digests, quality and accessibility planning (constitution Principle II, A15 section). Solar System Explorer's presenter and picking code and the audio experiences' importers stay experience code and are not copied. ProjectM stays in the harness.",
+      "paths": [
+        ".specify/memory/constitution.md",
+        "Auto-Creator.md",
+        "docs/decisions/ADR-0009-unified-app.md",
+        "Packages/ExperiencesCreative/Package.swift",
+        "specs/109-me-p00-boundary-audit/spec.md"
+      ],
+      "owner": "constitution + ADR-0009"
+    },
+    {
+      "area": "ProjectM reference regression",
+      "description": "Reference pinned at d93edd1, read-only; scripts/run_reference_baseline.py lists the ordered reference steps; scripts/check_reference_clean.py checks the submodule; the 7 release-check steps run in two chunks via release_check.py --only (reference-engine-xcframework, reference-build-projectm-ios-sim, reference-clean; reference-test-anglerendering-ios27, reference-test-anglerendering-ios26, projectm-reference-ios27, projectm-reference-ios26), recorded in the A15 regression baseline document (docs/apps/molecular-explorer/regression-baseline.md, written by T-A15-001/005) with the phase-start commit fc60a33d (constitution aaeeb3a7).",
+      "paths": [
+        "scripts/run_reference_baseline.py",
+        "scripts/check_reference_clean.py",
+        "Harnesses/ProjectMReference/ProjectMReference.yml",
+        "specs/109-me-p00-boundary-audit/research.md"
+      ],
+      "owner": "reference adapter (harness only)"
+    },
+    {
+      "area": "Determinism and budgets",
+      "description": "StateDigest and StableHash fingerprint experience state so the same molecule, display mode, selection and camera give the same digest; ScenarioManifest and ScenarioRunner replay recorded steps; MeshBudget, ResourceBudget, StorageQuota, DocumentStore.maxBytes, QualityProfile and QualityGovernor bound vertex counts, GPU memory, storage and quality levels; NumericHygiene refuses or wraps non-finite values. Atom and bond caps, import size, line length and coordinate magnitude, the draw budget and the recent-list cap are Molecular Explorer's own limits (G-DOMAIN, G-PARSER, G-RENDER, G-LIBRARY).",
+      "paths": [
+        "Packages/VisualCore/Sources/VisualCoreExperience/StateDigest.swift",
+        "Packages/VisualCore/Sources/VisualCoreExperience/ScenarioManifest.swift",
+        "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepRunner.swift",
+        "Packages/VisualCore/Sources/VisualCoreMath/StableHash.swift",
+        "Packages/VisualCore/Sources/VisualCoreMath/NumericHygiene.swift",
+        "Packages/VisualCore/Sources/VisualCoreScenes/MeshBuilder.swift",
+        "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityProfile.swift",
+        "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityGovernor.swift",
+        "Packages/VisualCore/Sources/VisualCoreDiagnostics/ResourceLedger.swift"
+      ],
+      "owner": "VisualCoreExperience + VisualCoreSimulation + VisualCoreScenes + VisualCoreDiagnostics"
+    }
+  ],
+  "matrix": [
+    {
+      "id": "M01",
+      "capability": "Instanced geometry: many atom spheres and bond cylinders (up to the experience's atom and bond caps) drawn per frame with correct occlusion through RenderHost on the main thread, one shared mesh per shape and quality level reused for every atom or bond by model transform, within a bounded draw budget",
+      "source": "brainstorm: instanced geometry; constitution A15 reuse first (instanced or batched drawing)",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshRenderer.swift",
+          "symbol": "MeshRenderer",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshRenderer.swift",
+          "symbol": "MeshRenderer.draw",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/DepthMeshPass.swift",
+          "symbol": "DepthMeshPass",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/DepthMeshPass.swift",
+          "symbol": "DepthMeshPass.Item",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+          "symbol": "RenderHost",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ParticleRenderer.swift",
+          "symbol": "ParticleRenderer",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshGenerators.swift",
+          "symbol": "Mesh.uvSphere",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshShapes.swift",
+          "symbol": "Mesh.tube",
+          "product": "VisualCoreScenes",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Experience/SolarPresenter.swift",
+        "symbol": "SolarPresenter"
+      },
+      "notes": "Tested: DepthMeshPassTests (the nearer of two meshes wins in both draw orders, on and off screen, recreated contexts match), MeshRendererTests, RenderHostTests, ParticleRendererTests. One MeshRenderer can be drawn many times with different model transforms (SolarPresenter draws its bodies that way), but every item is one draw call with its own uniforms: there is no instanced lit-mesh drawing in any framework product. Instancing exists only inside ParticleRenderer (vcglDrawArraysInstanced of 2D quads with vcglVertexAttribDivisor in the internal DynamicVertexBuffer, through Camera2D, unlit), which cannot draw lit 3D meshes. A molecule of a few hundred atoms and bonds is a few hundred draw items: batching over MeshRenderer and DepthMeshPass (shared meshes, merged static geometry per display mode, or per-element merged meshes) is G-RENDER (A15-P02); an instanced lit-mesh path is assessed there for VisualCoreRendering as an additive change to the same pipeline, never a second renderer."
+    },
+    {
+      "id": "M02",
+      "capability": "Materials: distinguishable per-element display colours (a conventional CPK-style palette with a recorded source) on lit procedural meshes without image files, a highlight for the selected atom, bonds coloured by their atoms' halves or a neutral colour",
+      "source": "brainstorm: materials; constitution A15 visuals are code",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshRenderer.swift",
+          "symbol": "MeshRenderer",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshRenderer.swift",
+          "symbol": "MeshRenderer.draw",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreParameters/Palette.swift",
+          "symbol": "Palette",
+          "product": "VisualCoreParameters",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/Pipeline.swift",
+          "symbol": "Pipeline",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreShaderSource/RenderState.swift",
+          "symbol": "RenderState.opaque3D",
+          "product": "VisualCoreShaderSource",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/TinyWorlds/Core/WorldLight.swift",
+        "symbol": "WorldLight"
+      },
+      "notes": "Tested in VisualCoreRenderingTests (MeshRendererTests, MeshRendererColorTests for per-vertex colours, PipelineTests) and VisualCoreParametersTests (Palette). A uniform colour per draw or a per-vertex colour stream covers element colours, a highlight colour and two-colour bonds (a bond drawn as two half-cylinders). The element palette itself, with its source and license, is element-catalog data (G-ELEMENTS)."
+    },
+    {
+      "id": "M03",
+      "capability": "Camera controls: perspective orbit camera around the molecule's centre, orbit, pinch zoom and pan inside bounds (pitch limit, distance range, target radius), touch recognizers with deterministic arbitration and a control alternative for every gesture",
+      "source": "brainstorm: camera controls",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitCamera.swift",
+          "symbol": "OrbitCamera",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitCamera.swift",
+          "symbol": "OrbitCamera.viewProjection",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitViewBounds.swift",
+          "symbol": "OrbitViewBounds",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitViewBounds.swift",
+          "symbol": "OrbitCamera.orbited",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitViewBounds.swift",
+          "symbol": "OrbitCamera.zoomed",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitViewBounds.swift",
+          "symbol": "OrbitCamera.panned",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitViewBounds.swift",
+          "symbol": "OrbitViewBounds.clamp",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/GestureRecognizers.swift",
+          "symbol": "DragRecognizer",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/GestureRecognizers.swift",
+          "symbol": "PinchRecognizer",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/GestureRecognizers.swift",
+          "symbol": "RotateRecognizer",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/GestureArbiter.swift",
+          "symbol": "GestureArbiter",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/GestureAlternatives.swift",
+          "symbol": "GestureAlternatives",
+          "product": "VisualCoreExperience",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Experience/FocusFlight.swift",
+        "symbol": "FocusFlight"
+      },
+      "notes": "Tested in VisualCoreMathTests (OrbitCameraTests, OrbitViewBoundsTests, CameraBoundsTests), VisualCoreScenesTests (GestureTests, GestureArbiterTests) and VisualCoreExperienceTests (GestureAlternativesTests). Framing a molecule by its bounding sphere, the reset view and persisting the camera apart from the molecule data are app work over OrbitCamera (G-CAMERA)."
+    },
+    {
+      "id": "M04",
+      "capability": "Lighting: a directional light with an ambient floor so sphere and cylinder shading reads as 3D, the same in both display modes, with optional depth cueing by linear eye-depth fog",
+      "source": "brainstorm: lighting",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshRenderer.swift",
+          "symbol": "MeshRenderer.lightDirection",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshRenderer.swift",
+          "symbol": "MeshRenderer.ambient",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshRenderer.swift",
+          "symbol": "MeshRenderer.draw",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshFog.swift",
+          "symbol": "MeshFog",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreShaderSource/RenderState.swift",
+          "symbol": "RenderState.opaque3D",
+          "product": "VisualCoreShaderSource",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/TinyWorlds/Core/WorldLight.swift",
+        "symbol": "WorldLight"
+      },
+      "notes": "Tested in VisualCoreRenderingTests (MeshRendererTests, MeshFogTests, MeshRendererColorTests). MeshRenderer has one Lambert light and ambient; no specular term exists, which is enough for legible ball-and-stick shading (the manual asks for clear styling, not photorealism). A specular highlight would be an additive VisualCore change assessed in A15-P02 under G-RENDER only if the review shows it is needed."
+    },
+    {
+      "id": "M05",
+      "capability": "Structured scientific data visualization: an element catalog (symbol, name, atomic number, covalent and van der Waals radius in ångström, display colour, each with source and license) and an atom, bond and molecule domain with versioned schemas turned into a drawn, labelled 3D structure",
+      "source": "brainstorm: structured scientific data visualization; constitution A15 data with provenance",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/Vectors.swift",
+          "symbol": "Vec3",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/Matrix.swift",
+          "symbol": "Mat4",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/NumericHygiene.swift",
+          "symbol": "NumericHygiene",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/StableHash.swift",
+          "symbol": "StableHash",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AcknowledgementsView.swift",
+          "symbol": "LicenseInventory",
+          "product": "VisualCoreUI",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Core/BodyCatalog.swift",
+        "symbol": "CelestialBody"
+      },
+      "notes": "Grep 2026-11-15 for xyz, atom, bond, covalent and angstrom in Packages/VisualCore/Sources and Packages/VisualCoreRendering/Sources finds no domain type (only doc-comment words in Vectors.swift and Matrix.swift). Double vectors, numeric hygiene, stable hashing and the license inventory exist and are tested (LinearAlgebraTests, NumericHygieneTests, StableHashTests, AcknowledgementsViewTests). The element catalog and the molecule domain are chemistry content: G-ELEMENTS and G-DOMAIN, app-local (A15-P01), as Solar System Explorer's body catalog was."
+    },
+    {
+      "id": "M06",
+      "capability": "Curated small-molecule library with source attributions: a bounded set of bundled small molecules (coordinates in ångström) each with its name, formula, source, license and attribution shown in the app",
+      "source": "v0.1 feature 1: curated small-molecule library with source attributions",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AcknowledgementsView.swift",
+          "symbol": "LicenseInventory",
+          "product": "VisualCoreUI",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AcknowledgementsView.swift",
+          "symbol": "AcknowledgementsView",
+          "product": "VisualCoreUI",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCorePersistence/NamedLibrary.swift",
+          "symbol": "NamedLibrary",
+          "product": "VisualCorePersistence",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/StableHash.swift",
+          "symbol": "StableHash",
+          "product": "VisualCoreMath",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Core/SourceRecords.swift",
+        "symbol": "SourceRecord"
+      },
+      "notes": "The license inventory and acknowledgements screen exist and are tested (AcknowledgementsViewTests), as does a named library of documents (NamedLibraryTests); none holds per-record scientific provenance. The curated molecules, their source records and the library UI are G-LIBRARY (app-local, A15-P04); the per-value source record type is shared with the element catalog (G-ELEMENTS, A15-P01)."
+    },
+    {
+      "id": "M07",
+      "capability": "Ball-and-stick and space-filling display modes: atoms as spheres scaled by a fraction of the covalent radius joined by bond cylinders, or as spheres at the van der Waals radius without bonds; switching modes changes drawing only, never the molecule",
+      "source": "v0.1 feature 2: ball-and-stick and space-filling modes",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshGenerators.swift",
+          "symbol": "Mesh.uvSphere",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshShapes.swift",
+          "symbol": "Mesh.tube",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshBuilder.swift",
+          "symbol": "MeshBuilder",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshBuilder.swift",
+          "symbol": "MeshBudget",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/TessellationChoice.swift",
+          "symbol": "TessellationChoice",
+          "product": "VisualCoreDiagnostics",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshRenderer.swift",
+          "symbol": "MeshRenderer",
+          "product": "VisualCoreRendering",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Experience/SceneMeshes.swift",
+        "symbol": "SceneMeshes"
+      },
+      "notes": "Spheres, capped straight tubes (a cylinder is Mesh.tube along two points with caps; MeshShapeTests straightCappedTubeAtThreeResolutions checks a closed capped straight tube's area and volume), the mesh builder under a budget and tessellation choice per quality level exist and are tested (MeshDigestTests, MeshShapeTests, MeshBuilderTests, TessellationChoiceTests). The mode rule (radius per mode, bonds hidden in space-filling) is G-DISPLAY (app-local, A15-P03) over the geometry of G-RENDER."
+    },
+    {
+      "id": "M08",
+      "capability": "Touch orbit, pan, zoom and atom picking: one-finger orbit, two-finger pan, pinch zoom, a tap turned into a camera ray tested against each atom's display sphere (nearest hit first, radius per display mode) and a control alternative that steps through atoms",
+      "source": "v0.1 feature 3: touch orbit, pan, zoom and atom picking",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitCamera.swift",
+          "symbol": "OrbitCamera.ray",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/RayIntersection.swift",
+          "symbol": "Ray3",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/RayIntersection.swift",
+          "symbol": "Ray3.intersect",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/RayIntersection.swift",
+          "symbol": "Ray3.nearest",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/GestureRecognizers.swift",
+          "symbol": "TapRecognizer",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/GestureRecognizers.swift",
+          "symbol": "DragRecognizer",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/GestureRecognizers.swift",
+          "symbol": "PinchRecognizer",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/GestureArbiter.swift",
+          "symbol": "GestureArbiter",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitViewBounds.swift",
+          "symbol": "OrbitCamera.panned",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/GestureAlternatives.swift",
+          "symbol": "GestureAlternatives",
+          "product": "VisualCoreExperience",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Experience/OrbitLayout.swift",
+        "symbol": "OrbitLayout"
+      },
+      "notes": "Tested in VisualCoreMathTests (RayIntersectionTests: ray-sphere, ray-box and ray-triangle hits against analytic results, nearest; OrbitCameraTests ray; OrbitViewBoundsTests pan) and VisualCoreScenesTests/GestureTests. No ray-cylinder or ray-capsule test exists, so bonds are not pickable by an existing cast; v0.1 needs atom picking only. Atom picking over Ray3 with the display-mode radius, the stepping control and the selection state are G-PICK (app-local, A15-P03); a generic ray-capsule cast is assessed there for VisualCoreMath if bond picking is added. Framing and the persisted camera are G-CAMERA (A15-P02)."
+    },
+    {
+      "id": "M09",
+      "capability": "Element labels, bond types and a metadata panel: element symbols drawn or listed next to atoms without overlap, bond order (single, double, triple, aromatic or inferred) shown by style and text, a native panel with the molecule's name, formula, atom and bond counts, source and the selected atom's element and position",
+      "source": "v0.1 feature 4: element labels, bond types and metadata panel",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitCamera.swift",
+          "symbol": "OrbitCamera.project",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+          "symbol": "makeCanvasOverlay",
+          "product": "VisualCoreExperienceHost",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
+          "symbol": "StateSign",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
+          "symbol": "AnnouncementPlanner",
+          "product": "VisualCoreSimulation",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Experience/LabelLayout.swift",
+        "symbol": "LabelLayout"
+      },
+      "notes": "Projection to the screen (OrbitCameraTests), the canvas overlay slot (CanvasOverlayTests), non-colour state signs and announcements (AccessibilityPlansTests) exist and are tested. Label placement, bond-order styling and the metadata panel are G-PANEL (app-local, A15-P03); the bond order values come from G-DOMAIN."
+    },
+    {
+      "id": "M10",
+      "capability": "Small XYZ file import with strict bounds and parser errors: a chosen .xyz text file parsed by a pure bounded parser, refused with a typed reason (too large, too many atoms, line too long, unknown element, malformed or non-finite value, count mismatch) and changing nothing on refusal, a valid file copied into the experience's own storage",
+      "source": "v0.1 feature 5: small XYZ file import with strict bounds and parser errors",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/NumericHygiene.swift",
+          "symbol": "NumericHygiene.finite",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/NumericHygiene.swift",
+          "symbol": "NumericError",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+          "symbol": "ExperienceStorage",
+          "product": "VisualCoreExperience",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+          "symbol": "StorageQuota",
+          "product": "VisualCoreExperience",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+          "symbol": "StorageError",
+          "product": "VisualCoreExperience",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/OscilloscopeStudio/Experience/ScopeControls.swift",
+        "symbol": "ScopeControls"
+      },
+      "notes": "Numeric hygiene with typed errors and per-experience storage with quotas exist and are tested (NumericHygieneTests, ExperienceStorageTests). No text-record parser exists in any framework product (only the private splitLines of ShaderLibrary). The XYZ parser is G-PARSER (app-local, A15-P01; a generic bounded line-record reader is assessed for VisualCore there); the picker, security-scoped read and copy are G-IMPORT (A15-P05). The example is the closest consumer: ScopeControls uses SwiftUI fileImporter for audio."
+    },
+    {
+      "id": "M11",
+      "capability": "Local recent molecules and visual settings: a bounded most-recent list (library and imported molecules), display mode, label and colour settings and the camera, each a versioned document in the experience's own storage with migration, damaged or newer files refused without a crash",
+      "source": "v0.1 feature 6: local recent molecules and visual settings",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
+          "symbol": "DocumentStore",
+          "product": "VisualCorePersistence",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCorePersistence/Envelope.swift",
+          "symbol": "DocumentEnvelope",
+          "product": "VisualCorePersistence",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCorePersistence/Migration.swift",
+          "symbol": "MigrationChain",
+          "product": "VisualCorePersistence",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+          "symbol": "ExperienceStorage",
+          "product": "VisualCoreExperience",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/SavedStateStore.swift",
+          "symbol": "SavedStateStore",
+          "product": "VisualCoreExperience",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCorePersistence/NamedLibrary.swift",
+          "symbol": "NamedLibrary",
+          "product": "VisualCorePersistence",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Experience/ViewStore.swift",
+        "symbol": "ViewStore"
+      },
+      "notes": "Versioned documents with migration, envelopes, named libraries, saved state and per-experience storage exist and are tested (DocumentStoreTests, NamedLibraryTests, ExperienceStorageTests, SavedStateStoreTests). The recent list, the settings and camera schemas and their caps are G-LIBRARY (app-local, A15-P04)."
+    },
+    {
+      "id": "M12",
+      "capability": "Strict bounded XYZ parsing with typed errors: fixed limits for file size, atom count, line length and coordinate magnitude; the comment line kept as untrusted text; unknown element symbols, non-finite numbers and count mismatches refused with a typed reason; pure, GPU-free and fuzzed",
+      "source": "cross-cutting: strict bounded parsing; constitution A15 strict, bounded import; manual algorithm decisions",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/NumericHygiene.swift",
+          "symbol": "NumericHygiene",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/NumericHygiene.swift",
+          "symbol": "NumericError",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
+          "symbol": "DocumentStore.maxBytes",
+          "product": "VisualCorePersistence",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+          "symbol": "StorageQuota",
+          "product": "VisualCoreExperience",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Core/SavedView.swift",
+        "symbol": "SavedView"
+      },
+      "notes": "Finite-value checks and byte caps on stored documents exist and are tested (NumericHygieneTests, DocumentStoreTests, ExperienceStorageTests); nothing parses text records. The parser, its caps and refusal reasons are G-PARSER (app-local, A15-P01); the fuzz and malformed-input corpus is G-IMPORT (A15-P05). The example is the closest consumer of bounded decoding with typed refusals (SavedView.decode)."
+    },
+    {
+      "id": "M13",
+      "capability": "Inferred bonds labelled as estimates: bonds inferred from interatomic distance and covalent radii with a stated tolerance, bounded by atom count (spatial bucketing), always marked inferred in the drawing, panel and spoken text and never presented as measured",
+      "source": "cross-cutting: inferred-bond labelling; constitution A15 strict import (inferred bonds); manual domain rule",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/Vectors.swift",
+          "symbol": "Vec3",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/NumericHygiene.swift",
+          "symbol": "NumericHygiene",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
+          "symbol": "StateSign",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
+          "symbol": "AnnouncementPlanner",
+          "product": "VisualCoreSimulation",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Core/CitationAudit.swift",
+        "symbol": "CitationAudit"
+      },
+      "notes": "Vectors, numeric hygiene, state signs and announcements exist and are tested (LinearAlgebraTests, NumericHygieneTests, AccessibilityPlansTests). No neighbour search or spatial grid exists in a framework product. Distance-based bond inference with its provenance flag is G-DOMAIN (app-local, A15-P01); its labelling in the panel and speech is G-PANEL (A15-P03)."
+    },
+    {
+      "id": "M14",
+      "capability": "Determinism: the same molecule, display mode and camera give the same parse result, bonds, picking result and digest on every run; parsing, inference, picking geometry and display rules run without a GPU; drawing never changes the state",
+      "source": "cross-cutting: determinism; constitution A15 deterministic, GPU-free rules",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/StateDigest.swift",
+          "symbol": "StateDigest",
+          "product": "VisualCoreExperience",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/ScenarioManifest.swift",
+          "symbol": "ScenarioManifest",
+          "product": "VisualCoreExperience",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/StableHash.swift",
+          "symbol": "StableHash",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/NumericHygiene.swift",
+          "symbol": "NumericHygiene",
+          "product": "VisualCoreMath",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/InfiniteGeometry/Experience/GeometryPresenter.swift",
+        "symbol": "GeometryPresenter"
+      },
+      "notes": "Tested in VisualCoreExperienceTests (StateDigestTests, ScenarioManifestTests) and VisualCoreMathTests (StableHashTests, NumericHygieneTests)."
+    },
+    {
+      "id": "M15",
+      "capability": "Persistence with migration: every stored document (recent list, settings, camera, imported molecule copies) versioned, written atomically, migrated forward and refused when damaged or newer",
+      "source": "cross-cutting: persistence with migration; constitution A15 offline-first and private",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
+          "symbol": "DocumentStore",
+          "product": "VisualCorePersistence",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCorePersistence/Envelope.swift",
+          "symbol": "DocumentEnvelope",
+          "product": "VisualCorePersistence",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCorePersistence/Migration.swift",
+          "symbol": "MigrationChain",
+          "product": "VisualCorePersistence",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+          "symbol": "ExperienceStorage",
+          "product": "VisualCoreExperience",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/SavedStateStore.swift",
+          "symbol": "SavedStateStore",
+          "product": "VisualCoreExperience",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/TinyWorlds/Core/WorldDocument.swift",
+        "symbol": "WorldDocument"
+      },
+      "notes": "Tested in VisualCorePersistenceTests (DocumentStoreTests, NamedLibraryTests) and VisualCoreExperienceTests (ExperienceStorageTests, SavedStateStoreTests). The schemas are G-LIBRARY."
+    },
+    {
+      "id": "M16",
+      "capability": "Quality tiers and low power: the governor fed by thermal state and Low Power Mode, declared tiers that lower sphere and cylinder segments and the draw budget",
+      "source": "cross-cutting: quality tiers and low power; constitution A15 bounded",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityGovernor.swift",
+          "symbol": "QualityGovernor",
+          "product": "VisualCoreDiagnostics",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityProfile.swift",
+          "symbol": "QualityProfile",
+          "product": "VisualCoreDiagnostics",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/DeviceConditions.swift",
+          "symbol": "DeviceConditions",
+          "product": "VisualCoreDiagnostics",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/TessellationChoice.swift",
+          "symbol": "TessellationChoice",
+          "product": "VisualCoreDiagnostics",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceCore.swift",
+          "symbol": "ExperienceCore.qualityTiers",
+          "product": "VisualCoreExperience",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+          "symbol": "ExperienceSession.refreshQuality",
+          "product": "VisualCoreExperienceHost",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/TinyWorlds/Core/TierPolicy.swift",
+        "symbol": "TierPolicy"
+      },
+      "notes": "Tested in VisualCoreDiagnosticsTests (QualityGovernorTests, QualityProfileTests, TessellationChoiceTests), VisualCoreExperienceTests (QualityDeclarationTests) and VisualCoreExperienceHostTests (SessionQualityTests). Core.qualityTiers must match the presenter's levels (declared at the X follow-through)."
+    },
+    {
+      "id": "M17",
+      "capability": "Accessibility with Reduce Motion and colour-independent element identity: system preferences observed, camera moves calmed or cut, the molecule, selected atom with its element and the display mode spoken, element symbols shown and spoken so identity never depends on colour, contrast checked, a control for every gesture",
+      "source": "cross-cutting: accessibility; constitution A15 accessibility",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPreferences.swift",
+          "symbol": "SystemAccessibility",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/SystemAccessibilityObserver.swift",
+          "symbol": "SystemAccessibilityObserver",
+          "product": "VisualCoreUI",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
+          "symbol": "AnnouncementPlanner",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
+          "symbol": "StateSign",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AccessibilityPlayers.swift",
+          "symbol": "AnnouncementSink",
+          "product": "VisualCoreUI",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
+          "symbol": "transitionDuration",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/GestureAlternatives.swift",
+          "symbol": "GestureAlternatives",
+          "product": "VisualCoreExperience",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AccessibilitySettingsSection.swift",
+          "symbol": "AccessibleColors.contrastRatio",
+          "product": "VisualCoreUI",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/TinyWorlds/Experience/WorldsPresenter.swift",
+        "symbol": "WorldsPresenter"
+      },
+      "notes": "Tested in VisualCoreSimulationTests (AccessibilityPreferencesTests, AccessibilityPlansTests), VisualCoreUITests (SystemAccessibilityObserverTests, AccessibilityPlayersTests, AccessibilitySettingsSectionTests for the WCAG contrast ratio) and VisualCoreExperienceTests (GestureAlternativesTests). The spoken wording and element-symbol labels are experience copy (G-PANEL)."
+    },
+    {
+      "id": "M18",
+      "capability": "Lifecycle and context loss: context loss, resize, background and memory warning rebuild every mesh and buffer from versioned CPU state; the molecule and selection survive",
+      "source": "cross-cutting: lifecycle and context loss; constitution A15 resilient GPU state",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+          "symbol": "RenderHost.recreateContext",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+          "symbol": "RenderHost.pause",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+          "symbol": "ResourceRegistry",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+          "symbol": "ExperienceSession.handleMemoryWarning",
+          "product": "VisualCoreExperienceHost",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+          "symbol": "ExperienceSession.checkpoint",
+          "product": "VisualCoreExperienceHost",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/PlaybackState.swift",
+          "symbol": "PlaybackState.enterBackground",
+          "product": "VisualCoreSimulation",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/TinyWorlds/Experience/WorldsPresenter.swift",
+        "symbol": "WorldsPresenter"
+      },
+      "notes": "Tested in VisualCoreRenderingTests (RenderHostTests, ResourceRegistryTests, DepthMeshPassTests recreated context, MeshRendererTests recreation), VisualCoreExperienceHostTests (SessionPhaseMemoryTests, ShellLifecycleTests) and VisualCoreSimulationTests/PlaybackStateTests."
+    },
+    {
+      "id": "M19",
+      "capability": "Data provenance and licenses: every bundled element property and molecule records source, units (ångström) and license; only openly licensed or public-domain data is bundled; checked by a test and listed in the acknowledgements",
+      "source": "cross-cutting: data provenance and licenses; constitution A15 data with provenance, licenses",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AcknowledgementsView.swift",
+          "symbol": "LicenseInventory",
+          "product": "VisualCoreUI",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AcknowledgementsView.swift",
+          "symbol": "AcknowledgementsView",
+          "product": "VisualCoreUI",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Core/SourceRecords.swift",
+        "symbol": "SourceRecord"
+      },
+      "notes": "The license inventory exists and is tested (AcknowledgementsViewTests); it records code and asset licenses, not per-value source and units. The source record and its test are G-ELEMENTS (A15-P01) and G-LIBRARY (A15-P04); the data review is G-REVIEW (A15-P05); all app-local."
+    },
+    {
+      "id": "M20",
+      "capability": "File import through the system document picker without permissions: only the file the person chooses is read, with security-scoped access, size checked before reading, copied into the experience's own storage; no usage description, no privacy answer change",
+      "source": "cross-cutting: file import without permissions; spec clarification 4",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+          "symbol": "ExperienceStorage",
+          "product": "VisualCoreExperience",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+          "symbol": "StorageQuota",
+          "product": "VisualCoreExperience",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+          "symbol": "StorageError",
+          "product": "VisualCoreExperience",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/OscilloscopeStudio/Experience/ScopeControls.swift",
+        "symbol": "ScopeControls"
+      },
+      "notes": "Per-experience storage with quotas exists and is tested (ExperienceStorageTests). No document-picker helper exists in a framework product: SwiftUI fileImporter appears only in experience controls (ScopeControls, OdysseyControls, MusicLabControls, all for audio), and security-scoped reads only in VisualCoreAudio's file sources. The picker, scoped read and copy are G-IMPORT (app-local, A15-P05)."
+    },
+    {
+      "id": "M21",
+      "capability": "Truthful claims: structures are illustrative models from stated sources, radii and colours are display conventions with their source, inferred bonds say so; no chemical safety, toxicity, medical or therapeutic claim; performance numbers only from device measurements",
+      "source": "cross-cutting: truthful claims; constitution A15 truthful claims",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
+          "symbol": "StateSign",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
+          "symbol": "AnnouncementPlanner",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AcknowledgementsView.swift",
+          "symbol": "LicenseInventory",
+          "product": "VisualCoreUI",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Core/ScientificReview.swift",
+        "symbol": "ScientificReview"
+      },
+      "notes": "State signs, announcements and the license inventory exist and are tested (AccessibilityPlansTests, AcknowledgementsViewTests). The copy review and the generated data review are G-REVIEW (app-local, A15-P05); the release copy-claims step checks store copy."
+    },
+    {
+      "id": "M22",
+      "capability": "Sphere and cylinder geometry for atoms and bonds: a UV sphere per quality level and a capped cylinder along a unit axis, oriented and scaled per bond by a model matrix from a quaternion, under a mesh budget",
+      "source": "cross-cutting: geometry; spec FR-A15-003 sphere and cylinder geometry",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshGenerators.swift",
+          "symbol": "Mesh.uvSphere",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshShapes.swift",
+          "symbol": "Mesh.tube",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/Quaternion.swift",
+          "symbol": "Quat",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/Matrix.swift",
+          "symbol": "Mat4",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshBuilder.swift",
+          "symbol": "MeshBudget",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshBuilder.swift",
+          "symbol": "MeshError",
+          "product": "VisualCoreScenes",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Experience/SceneMeshes.swift",
+        "symbol": "SceneMeshes"
+      },
+      "notes": "Tested in VisualCoreScenesTests (MeshDigestTests and MeshBoundsTests build uvSphere; MeshShapeTests straightCappedTubeAtThreeResolutions builds Mesh.tube along a straight path with caps, a closed capped cylinder, and checks its area and volume; MeshBuilderTests budgets) and VisualCoreMathTests/LinearAlgebraTests (Quat(axis:angle:), Mat4.rotation, translation, scale). Mesh.tube(path: [a, b], radius:, sides:, caps: true, closed: false) is a capped cylinder, so no new generator is required; a named Mesh.cylinder convenience is optional and assessed in A15-P02 (G-RENDER) only if a second consumer appears."
+    },
+    {
+      "id": "M23",
+      "capability": "Bounded content: fixed caps for atom and bond counts, mesh detail, draw items, the recent list and import size; documents beyond a cap refused, never truncated silently",
+      "source": "cross-cutting: bounded; constitution A15 bounded",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshBuilder.swift",
+          "symbol": "MeshBudget",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshBuilder.swift",
+          "symbol": "MeshError",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/ResourceLedger.swift",
+          "symbol": "ResourceBudget",
+          "product": "VisualCoreDiagnostics",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+          "symbol": "StorageQuota",
+          "product": "VisualCoreExperience",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
+          "symbol": "DocumentStore.maxBytes",
+          "product": "VisualCorePersistence",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/AudioOdyssey/Core/OdysseyQuality.swift",
+        "symbol": "OdysseyQuality"
+      },
+      "notes": "Mesh and resource budgets, storage quotas and document byte caps exist and are tested (MeshBuilderTests, ResourceLedgerTests, ExperienceStorageTests, DocumentStoreTests). The molecule caps are G-DOMAIN and G-PARSER (A15-P01), the draw budget per quality level G-RENDER (A15-P02), the recent-list cap G-LIBRARY (A15-P04)."
+    }
+  ],
+  "gaps": [
+    {
+      "id": "G-ELEMENTS",
+      "matrix": [
+        "M02",
+        "M05",
+        "M06",
+        "M19"
+      ],
+      "kind": "adaptation",
+      "owner": "app-local",
+      "justification": "No element catalog or per-value source record exists in any framework product. The elements Molecular Explorer supports (symbol, name, atomic number, covalent radius, van der Waals radius in ångström, display colour), each value with source, units and license, and the source record type shared with the curated library are chemistry content and stay in the experience's GPU-free Core (clarification 5, manual phase 01, A15-P01).",
+      "phase": 1,
+      "test": "Core host tests (swift test, no GPU): the bundled catalog decodes; symbols and atomic numbers are unique and consecutive for the supported range; every value has source, units (ångström for radii) and license from the allowed set; radii are finite and positive; missing-source, duplicate and non-finite entries are refused with a typed reason; a generated data-sources document matches the catalog",
+      "closed": null
+    },
+    {
+      "id": "G-DOMAIN",
+      "matrix": [
+        "M05",
+        "M09",
+        "M13",
+        "M23"
+      ],
+      "kind": "adaptation",
+      "owner": "app-local",
+      "justification": "No atom, bond or molecule type exists in any framework product. The molecule domain (atoms with element and position in ångström, bonds with order and a provenance flag measured/curated or inferred, molecule metadata), its versioned schema, its caps, and distance-based bond inference from covalent radii with a stated tolerance and spatial bucketing are the experience's rules (clarification 5, manual phase 01 atom/bond domain, A15-P01); a generic spatial grid is assessed for VisualCoreMath there if a second consumer exists.",
+      "phase": 1,
+      "test": "Core host tests: domain round-trip through the versioned schema; caps on atoms and bonds refused with a typed reason; inference on fixture molecules (water, methane, ethanol, benzene) gives the expected bonds within the tolerance and marks every inferred bond as inferred; inference time grows linearly on a bounded synthetic grid; the same input gives the same bonds and digest",
+      "closed": null
+    },
+    {
+      "id": "G-PARSER",
+      "matrix": [
+        "M10",
+        "M12",
+        "M23"
+      ],
+      "kind": "adaptation",
+      "owner": "app-local",
+      "justification": "Nothing in a framework product parses text records (ShaderLibrary's splitLines is private and unbounded). The strict XYZ parser (atom-count line, comment line kept as untrusted text, one atom per line, fixed limits on bytes, atoms, line length and coordinate magnitude, typed refusals that change nothing) is pure and app-local (clarification 5, manual phase 01 strict parser, A15-P01). The constitution asks for a reusable bounded text-record reader in VisualCore if it proves generic; A15-P01 assesses that and records the outcome here.",
+      "phase": 1,
+      "test": "Core host tests: valid fixtures parse to the expected atoms; every refusal reason is produced by a minimal input (too many bytes, too many atoms, line too long, count mismatch, unknown element, malformed or non-finite number, magnitude beyond the cap, empty file); refusals leave state unchanged; CRLF and trailing whitespace accepted; a bounded seeded fuzz run never crashes and stays within the caps",
+      "closed": null
+    },
+    {
+      "id": "G-RENDER",
+      "matrix": [
+        "M01",
+        "M07",
+        "M23"
+      ],
+      "kind": "adaptation",
+      "owner": "app-local",
+      "justification": "MeshRenderer and DepthMeshPass draw one item per call; the molecule scene does not exist: shared sphere and cylinder meshes per quality level, per-bond transforms (two half-bonds per bond for two-colour bonds), batching (merged static geometry per display mode and element, or shared meshes drawn per item) under a draw budget, and camera framing of the molecule's bounding sphere. App-local over MeshRenderer, DepthMeshPass, Mesh.uvSphere and Mesh.tube (clarification 5, manual phase 02 camera/atom/bond renderer, A15-P02). Instanced lit-mesh drawing is assessed there for VisualCoreRendering as an additive change on the same pipeline (never a second renderer); a named cylinder generator for VisualCoreScenes only if reusable. If either is added the owner becomes VisualCore and the reference regression runs at the X gate.",
+      "phase": 2,
+      "test": "Experience tests: the scene for each fixture molecule draws within the draw budget per quality level; atom and bond counts drawn equal the domain's; a bond cylinder's ends meet its atoms' centres within tolerance; an off-screen render shows the nearer atom in front (depth) and differs between display modes; context recreation rebuilds an identical image; any VisualCore addition is documented with ///, in the API baseline and tested",
+      "closed": null
+    },
+    {
+      "id": "G-CAMERA",
+      "matrix": [
+        "M03",
+        "M08"
+      ],
+      "kind": "adaptation",
+      "owner": "app-local",
+      "justification": "OrbitCamera, OrbitViewBounds (orbit, pan, zoom, clamp) and the gesture recognizers exist; framing a molecule by its bounding sphere, the bounds derived from it, the reset view, and the camera persisted apart from the molecule data are app-local (clarification 5, A15-P02).",
+      "phase": 2,
+      "test": "Core and experience tests: framing places every atom inside the view for each fixture; gestures and their control alternatives keep the camera inside the bounds; Reduce Motion cuts the reset flight; the camera document round-trips and a damaged one falls back to framing",
+      "closed": null
+    },
+    {
+      "id": "G-PICK",
+      "matrix": [
+        "M08"
+      ],
+      "kind": "adaptation",
+      "owner": "app-local",
+      "justification": "Ray3 ray-sphere casts, Ray3.nearest and OrbitCamera.ray exist; atom picking with the display-mode radius, the selection state, stepping through atoms as the control alternative and the spoken selection are app-local (clarification 5, manual phase 03, A15-P03). No ray-cylinder or ray-capsule cast exists; bond picking is not in version 0.1, and a ray-capsule cast is assessed for VisualCoreMath only if it is added.",
+      "phase": 3,
+      "test": "Core host tests: a ray through an atom's centre picks it in both modes; overlapping atoms give the nearest; a miss clears or keeps the selection as specified; stepping visits every atom in a stable order; the selection survives a mode change",
+      "closed": null
+    },
+    {
+      "id": "G-DISPLAY",
+      "matrix": [
+        "M07"
+      ],
+      "kind": "adaptation",
+      "owner": "app-local",
+      "justification": "The display-mode rule (ball-and-stick radius as a fraction of the covalent radius with bonds shown; space-filling at the van der Waals radius with bonds hidden) and its effect on drawing and picking are app rules over the geometry of G-RENDER (clarification 5, manual phase 03, A15-P03).",
+      "phase": 3,
+      "test": "Core host tests: each mode gives the documented radius per element and bond visibility; switching modes never changes the molecule digest; experience test: the off-screen image differs between modes",
+      "closed": null
+    },
+    {
+      "id": "G-PANEL",
+      "matrix": [
+        "M09",
+        "M13",
+        "M17"
+      ],
+      "kind": "adaptation",
+      "owner": "app-local",
+      "justification": "Projection, the canvas overlay slot, state signs and announcements exist; element labels placed without overlap, bond-order styling and text (inferred bonds marked), the native metadata panel and the spoken molecule, atom, element and mode wording are app-local (clarification 5, manual phase 03, A15-P03).",
+      "phase": 3,
+      "test": "Core and experience tests: labels never overlap beyond the stated rule and hide when off screen; every bond order has a non-colour style and text; inferred bonds read as inferred in panel and speech; the panel shows name, formula, counts, source and the selected atom; announcements are rate limited",
+      "closed": null
+    },
+    {
+      "id": "G-LIBRARY",
+      "matrix": [
+        "M06",
+        "M11",
+        "M15",
+        "M19",
+        "M23"
+      ],
+      "kind": "adaptation",
+      "owner": "app-local",
+      "justification": "DocumentStore, MigrationChain, NamedLibrary, SavedStateStore and ExperienceStorage exist; the curated small-molecule library (bundled records with name, formula, coordinates in ångström, source, license and attribution), the bounded recent-molecules list and the visual settings document with their versioned schemas are app-local (clarification 5, manual phase 04, A15-P04).",
+      "phase": 4,
+      "test": "Core host tests: every curated molecule parses, is within the caps and carries source, units and license from the allowed set; attributions appear in the library UI and acknowledgements; the recent list keeps at most its cap in most-recent order and drops missing imports; settings round-trip, migrate from the previous schema and refuse damaged or newer files without a crash",
+      "closed": null
+    },
+    {
+      "id": "G-IMPORT",
+      "matrix": [
+        "M10",
+        "M12",
+        "M20"
+      ],
+      "kind": "adaptation",
+      "owner": "app-local",
+      "justification": "No document-picker helper exists in a framework product (fileImporter appears only in A06-A08 controls, for audio). The XYZ import through the system document picker (no permission, no usage string), the size check before reading, the security-scoped read, the copy into the experience's storage, user-visible refusal messages and the fuzz and error corpus are app-local (clarification 4 and 5, manual phase 05, A15-P05).",
+      "phase": 5,
+      "test": "Experience and Core tests: a valid file imports and appears in recent molecules; each refusal reason shows its message and leaves storage unchanged; oversize files are refused before being read; a seeded fuzz corpus of malformed files never crashes; Info.plist gains no usage description and the privacy answers are unchanged",
+      "closed": null
+    },
+    {
+      "id": "G-REVIEW",
+      "matrix": [
+        "M19",
+        "M21"
+      ],
+      "kind": "adaptation",
+      "owner": "app-local",
+      "justification": "A provenance and wording review of the bundled element data and molecules, the display-convention statements and the absence of safety, toxicity, medical or therapeutic claims is quality work specific to this experience (clarification 5, manual phase 05 data review, A15-P05).",
+      "phase": 5,
+      "test": "Core host tests and a generated review document: every displayed value references a bundled source with units and license; copy contains no forbidden claim words (checked by the release copy-claims step); inferred-bond and display-convention statements are present in the panel and the about text",
+      "closed": null
+    }
+  ],
+  "traceability": [
+    {
+      "item": "brainstorm: instanced geometry",
+      "matrix": [
+        "M01",
+        "M22",
+        "M23"
+      ],
+      "phases": [
+        2
+      ]
+    },
+    {
+      "item": "brainstorm: materials",
+      "matrix": [
+        "M02",
+        "M05"
+      ],
+      "phases": [
+        1,
+        2
+      ]
+    },
+    {
+      "item": "brainstorm: camera controls",
+      "matrix": [
+        "M03",
+        "M08"
+      ],
+      "phases": [
+        2,
+        3
+      ]
+    },
+    {
+      "item": "brainstorm: lighting",
+      "matrix": [
+        "M04"
+      ],
+      "phases": [
+        2
+      ]
+    },
+    {
+      "item": "brainstorm: structured scientific data visualization",
+      "matrix": [
+        "M05",
+        "M09",
+        "M13",
+        "M19"
+      ],
+      "phases": [
+        1,
+        3
+      ]
+    },
+    {
+      "item": "v0.1 feature 1: curated small-molecule library with source attributions",
+      "matrix": [
+        "M06",
+        "M19"
+      ],
+      "phases": [
+        1,
+        4
+      ]
+    },
+    {
+      "item": "v0.1 feature 2: ball-and-stick and space-filling modes",
+      "matrix": [
+        "M07",
+        "M22",
+        "M01"
+      ],
+      "phases": [
+        2,
+        3
+      ]
+    },
+    {
+      "item": "v0.1 feature 3: touch orbit, pan, zoom and atom picking",
+      "matrix": [
+        "M03",
+        "M08"
+      ],
+      "phases": [
+        2,
+        3
+      ]
+    },
+    {
+      "item": "v0.1 feature 4: element labels, bond types and metadata panel",
+      "matrix": [
+        "M09",
+        "M13",
+        "M17"
+      ],
+      "phases": [
+        1,
+        3
+      ]
+    },
+    {
+      "item": "v0.1 feature 5: small XYZ file import with strict bounds and parser errors",
+      "matrix": [
+        "M10",
+        "M12",
+        "M20",
+        "M23"
+      ],
+      "phases": [
+        1,
+        5
+      ]
+    },
+    {
+      "item": "v0.1 feature 6: local recent molecules and visual settings",
+      "matrix": [
+        "M11",
+        "M15"
+      ],
+      "phases": [
+        4
+      ]
+    }
+  ],
+  "negative": [
+    {
+      "rule": "No EGL display, context, surface or GL path of its own; all drawing goes through VisualCore's RenderHost on OpenGL ES -> ANGLE -> Metal",
+      "source": "constitution A15 consumer, not fork; CLAUDE.md rule 4; spec FR-A15-006"
+    },
+    {
+      "rule": "No second renderer: atoms and bonds are drawn by MeshRenderer/DepthMeshPass or an additive VisualCore extension of that pipeline",
+      "source": "constitution A15 consumer, not fork; CLAUDE.md rule 4; spec FR-A15-006"
+    },
+    {
+      "rule": "No ProjectM types, engine or presets and no ProjectM code reused",
+      "source": "constitution A15 consumer, not fork; CLAUDE.md rule 12; spec FR-A15-006"
+    },
+    {
+      "rule": "No networking, accounts, analytics, tracking or advertising and no download of molecule databases; state and imported molecules are stored only on the device",
+      "source": "constitution A15 offline-first and private; CLAUDE.md rule 3; spec FR-A15-006"
+    },
+    {
+      "rule": "No medicinal chemistry and no chemical safety, toxicity, medical or therapeutic claims",
+      "source": "manual non-goals; constitution A15 truthful claims; spec FR-A15-006"
+    },
+    {
+      "rule": "No predictive molecular dynamics, energy minimisation or property prediction; structures are illustrative models from stated sources",
+      "source": "manual non-goals; constitution A15 product goal; spec FR-A15-006"
+    },
+    {
+      "rule": "No trusting of arbitrary PDB or complex input: only small XYZ text within fixed caps is accepted; other formats are refused; imported files are never executed or trusted beyond their text",
+      "source": "manual non-goals; constitution A15 strict, bounded import; spec FR-A15-006"
+    },
+    {
+      "rule": "No presenting inferred bonds as measured: every distance-inferred bond is marked inferred in drawing, panel and speech",
+      "source": "manual domain rule; constitution A15 strict, bounded import; spec FR-A15-006"
+    },
+    {
+      "rule": "No purchased, generated or hand-made images, textures, models or artwork: atoms, bonds, label backdrops, highlights and backgrounds are procedural geometry and shaders made in code",
+      "source": "CLAUDE.md rule 4; constitution A15 visuals are code; spec FR-A15-006"
+    },
+    {
+      "rule": "No unlicensed data and no scraping: only openly licensed or public-domain element data and molecule coordinates are bundled",
+      "source": "constitution A15 data with provenance; spec FR-A15-006"
+    },
+    {
+      "rule": "Data and license rule: every bundled element property (symbol, name, atomic number, covalent and van der Waals radius, display colour) and every curated molecule records its source, units (ångström) and license, checked by a test",
+      "source": "constitution A15 data with provenance, licenses; spec FR-A15-006"
+    },
+    {
+      "rule": "No shader decides chemistry: parsing, bond inference, display modes and picking geometry are GPU-free CPU rules testable with swift test, and drawing never changes the state",
+      "source": "constitution A15 deterministic, GPU-free rules"
+    },
+    {
+      "rule": "No permission prompts: the XYZ import uses the system document picker, which needs no permission or usage string; no camera, location, microphone, photos or network; the app's privacy answers do not change",
+      "source": "spec clarification 4; CLAUDE.md rule 6"
+    },
+    {
+      "rule": "No fork or copy of VisualCore, ANGLE or projectm-ios, no standalone app target and no copy of another experience's code (Solar System Explorer's presenter, Tiny Worlds' camera policy, audio importers); generic needs become VisualCore gaps",
+      "source": "ADR-0009; constitution A15 reuse first; CLAUDE.md rule 1"
+    }
+  ],
+  "decision": {
+    "result": "go",
+    "reasons": [
+      "A working host and 3D drawing path exist: RenderHost on OpenGL ES -> ANGLE -> Metal, MeshRenderer with one directional Lambert light, ambient, per-vertex colours and optional fog, and DepthMeshPass drawing several meshes with depth into an owned target, through OrbitCamera, all public and tested; Solar System Explorer already draws lit spheres with picking on it.",
+      "9 of 23 rows are available with tests: materials, camera controls, lighting, determinism, persistence with migration, quality tiers and low power, accessibility with colour-independent identity, lifecycle and context loss, and sphere and cylinder geometry. The clarification's facts hold; in addition Mesh.tube along two points with caps is a tested capped cylinder, so no new generator is required.",
+      "All 14 non-available rows have owned, additive gaps: app-local G-ELEMENTS, G-DOMAIN and G-PARSER in A15-P01; G-RENDER (batching; instanced lit meshes assessed for VisualCoreRendering) and G-CAMERA in A15-P02; G-PICK, G-DISPLAY and G-PANEL in A15-P03; G-LIBRARY in A15-P04; G-IMPORT and G-REVIEW in A15-P05. No upstream VisualCore change is required to start.",
+      "No permission and no privacy answer changes; Molecular Explorer stays unregistered (14 registered, A01-A14) until A15-P01 creates Packages/ExperiencesCreative/MolecularExplorer with its targets and first real rules."
+    ],
+    "blockers": []
+  }
+}
