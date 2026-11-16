@@ -17,7 +17,7 @@ Precedent: `specs/109-me-p00-boundary-audit/tasks.md`.
 
 ## Phase 4: User Story 2 — The reference stays proven (P1)
 
-- [ ] T-A16-004 [US2] Reference chunk 1 (`--name reference-1 -- python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean`)
+- [X] T-A16-004 [US2] Reference chunk 1 (`--name reference-1 -- python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean`) — Verified 2026-11-16: 2026-11-16: .autonomy/checks/A16-P00.reference-1.json exit 0 (3/3 steps)
 - [ ] T-A16-005 [US2] Reference chunk 2 (`--name reference-2 -- python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26`); record the 7 steps, commands and results in `docs/apps/simulation-lab/regression-baseline.md` (FR-A16-004, SC-A16-003)
 
 ## Phase 5: User Story 3 — The shell builds with the experience absent (P2)
