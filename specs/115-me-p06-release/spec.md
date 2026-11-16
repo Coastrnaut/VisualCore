@@ -26,7 +26,10 @@ Canonical overrides:
 
 ### Session 2026-11-16
 
-Answered autonomously under the owner's standing delegation, recommended option each time, as for A14-P06. Facts checked
+Answered autonomously under the owner's standing delegation, recommended option each time, as for A14-P06. Drafted before the
+skill was invoked and re-checked inside `/speckit-clarify` the same day: the checker's statuses, the free chunk `w2`, the
+registry entry without examples and the absence of every refused word in the controls and presenter were confirmed;
+no further question was needed. Facts checked
 in code: `check_experience_release.py` reads `docs/apps/<slug>/release.json` (schema 1: `experience`, `requiredDocs`,
 `checklist`, `copyCheck` with `text`, `swift`, `allow`) and accepts the statuses `verified`, `pending-campaign-ii` and
 `owner-action`; `release_check.py` derives `experience-release-<code>` and `copy-claims-<code>` from that file and runs
