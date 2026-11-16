@@ -1,0 +1,67 @@
+# Tasks: Simulation Lab — Phase 05 Numerical validation
+
+**Input**: [spec.md](spec.md), [plan.md](plan.md), [research.md](research.md), [data-model.md](data-model.md),
+[contracts/report.md](contracts/report.md), [quickstart.md](quickstart.md). Gate A16-P05 (legacy). Evidence:
+`python3 Tools/python/desktop_runbook.py run-check --stage A16-P05 --timeout 600 --name <check> -- <command>`. Commit
+after every task (no trailers); read every check's exit before ticking. iOS 27 only. No test may raise a system prompt.
+Precedent: `specs/120-sl-p04-ui-presets-capture/tasks.md`.
+
+## Phase 1: Setup
+
+- [ ] T-A16-501 Baseline: cite the A16-P04 evidence on the unchanged sources (`.autonomy/checks/A16-P04.{sl-ios27-2,app-unit,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14)
+
+## Phase 2: Foundational — presenter accessors
+
+- [ ] T-A16-502 Add documented `ownedTargetBytes` (display target + automaton, Gray-Scott and wave pairs; `PingPongTarget.bytes` and the target's handle bytes) and `maxGPUStepsInFrame` (the largest per-frame GPU step delta since setup, automaton and float mirrors) to `Packages/ExperiencesCreative/SimulationLab/Experience/SimulationPresenter.swift` (data-model.md) (FR-A16-503)
+
+## Phase 3: Story 1 — the validation report
+
+- [ ] T-A16-503 [US1] Create `Packages/ExperiencesCreative/SimulationLab/ExperienceTests/SimulationValidationTests.swift` per contracts/report.md and clarifications Q1–Q5.
+  - **Running mirrors:** per family, 120 frames at ×4 through the presenter, with max |GPU − CPU| after every frame;
+    tolerances 0 and 0.01.
+  - **Fixtures:** the 16 × 16 ten-step runs, against both roundings.
+  - **Limits:** 600 iterations at Δt 1.5625 and at c 1, Δt 1/√2, on the CPU and on the GPU pair, all finite; 1 % above
+    each limit refused, with the sentences quoted.
+  - **Bounds:** `maxGPUStepsInFrame` ≤ 128; `ownedTargetBytes` ≤ 262,144; the registry's `totalBytes` ≤
+    `budget.total`.
+  - **Steps per second:** 600 CPU iterations per family timed with `ContinuousClock` and labelled "simulator figure,
+    not a device claim".
+  - **Report:** render `docs/apps/simulation-lab/validation-report.md`, written when `UPDATE_VALIDATION_REPORT=1`.
+    Otherwise compare the deterministic lines (all lines outside the steps-per-second section) with the committed
+    file; a difference fails with "Regenerate the report with UPDATE_VALIDATION_REPORT=1."
+  - Generate and commit the report.
+
+  (FR-A16-501–503; SC-A16-501–503)
+
+## Phase 4: Story 2 — size change and boundaries
+
+- [ ] T-A16-504 [P] [US2] Create `Packages/ExperiencesCreative/SimulationLab/ExperienceTests/SizeChangeTests.swift`:
+  - per family, mid-run (paused after frames), a canvas resize to a new size keeps `resourceBuildCount` and the GPU
+    field after the next frame is within the family's tolerance of the CPU field, and the drawn square fits the new
+    canvas (`lastSquare`);
+  - a `recreateContext` raises `resourceBuildCount` by one, loads every mirror and leaves the field within tolerance.
+
+  (FR-A16-504; SC-A16-504)
+- [ ] T-A16-505 [P] [US2] Create `Packages/ExperiencesCreative/SimulationLab/ExperienceTests/BoundaryRuleTests.swift`:
+  - the automaton on the GPU: a glider placed by `sim.paint` at the right edge wraps to the left after 4 × 64
+    generations, equal to the CPU;
+  - reaction-diffusion: a disc painted at cell (0, 0) shows values on the opposite edges after one GPU step, equal to
+    the CPU within 0.01;
+  - the wave: edges stay 0 (cites `WaveBorderTests`).
+
+  (FR-A16-505)
+
+## Phase 5: Records and evidence
+
+- [ ] T-A16-506 Contract `docs/apps/simulation-lab/visualcore-contract.json`: G-VALIDATION closed by "A16-P05" (the report on iOS 27.2; the iOS 26 section at X-A16; device figures in the device campaign); rows whose gaps are all closed become available (`--name contract -- python3 scripts/check_app_contract.py --app simulation-lab --render`)
+- [ ] T-A16-507 Simulation Lab tests on sim-27.2 (`--name sl-ios27`; the slowest test under 10 s), documented API (`--name documented-api`), packages (`--name packages`), scripts (`--name scripts`) (SC-A16-505)
+- [ ] T-A16-508 App build and unit (`--name app-unit`) and runner (`--name verify-27`) (FR-A16-506)
+
+## Dependencies
+
+- T-A16-501 runs first, then T-A16-502.
+- T-A16-503 needs T-A16-502.
+- T-A16-504 and T-A16-505 are independent test files (agents).
+- T-A16-506 through T-A16-508 run last.
+
+**Review checkpoint:** after T-A16-503 (the report). **MVP:** Story 1.
