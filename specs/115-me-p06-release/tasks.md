@@ -18,7 +18,7 @@ picker or any system prompt. Precedent: `specs/108-sse-p06-release/tasks.md`.
 ## Phase 3: Story 2 — saved data and failures
 
 - [ ] T-A15-604 [US2] Add the test-only seam `var failNextDraw = false` to `Packages/ExperiencesCreative/MolecularExplorer/Experience/MoleculePresenter.swift` (the next `draw` throws once and clears the flag) with `ExperienceTests/MoleculeRecoveryDrawTests.swift` (import a fixture into a temporary storage, set the seam, draw so the session fails, `import.xyz`, `recent.json` and `settings.json` byte-identical, a new session over the same storage draws the import) (FR-A15-611)
-- [ ] T-A15-605 [P] [US2] Commit `ExperienceTests/Fixtures/{recent,settings}-{valid,newer,damaged,oversized}.json` and `import-{valid,oversized}.xyz` ("valid loads; others refused with their reason and stay byte-identical"), the `Fixtures` resource of `MolecularExplorerExperienceTests` in `Packages/ExperiencesCreative/Package.swift`, and `ExperienceTests/StoredFileSampleTests.swift` (each sample answered by `RecentStore`, `SettingsStore` or `MoleculeImporter` as specified and byte-identical afterwards) (FR-A15-610; SC-A15-602)
+- [ ] T-A15-605 [P] [US2] Commit `ExperienceTests/Fixtures/{recent,settings}-{valid,newer,damaged,oversized}.json` and `import-{valid,damaged,oversized}.xyz` ("valid loads; others refused with their reason and stay byte-identical"; for the import: valid opens, damaged is a parser refusal with its sentence, oversized is refused before reading; recent ids outside the library are already proved dropped by `RecentStoreTests` of A15-P04), the `Fixtures` resource of `MolecularExplorerExperienceTests` in `Packages/ExperiencesCreative/Package.swift`, and `ExperienceTests/StoredFileSampleTests.swift` (each sample answered by `RecentStore`, `SettingsStore` or `MoleculeImporter` as specified and byte-identical afterwards) (FR-A15-610; SC-A15-602)
 - [ ] T-A15-606 [US2] Add `MoleculeCore.schemaOneExample()`, `schemaTwoExample()`, `schemaThreeExample()` (stored payloads of schemas 1–3 in envelopes with the digest their migration to 4 gives) in `Packages/ExperiencesCreative/MolecularExplorer/Experience/Adapter/MoleculeCore.swift`, pass them to the a15 registration in `Apps/VisualCore/App/ExperienceRegistry.swift` (`examples:`), with `ExperienceTests/MoleculeSchemaExampleTests.swift` (each restores in schema 4 with its digest) (FR-A15-612)
 
 ## Phase 4: Story 3 — truthful release documents
@@ -40,7 +40,7 @@ picker or any system prompt. Precedent: `specs/108-sse-p06-release/tasks.md`.
 
 ## Dependencies
 
-T-A15-601 → {602, 603, 604, 605, 606, 609}; 606 → 605 (both touch test fixtures and Package.swift only through 605);
+T-A15-601 → {602, 603, 604, 605, 606, 609} (independent files; only 605 touches Package.swift);
 {602, 604, 605, 606} → 607 → 608; {604, 605, 606, 609} → 610 → 611 → 612 → 613 → 614.
 
 ## Parallel examples

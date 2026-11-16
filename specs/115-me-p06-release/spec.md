@@ -62,7 +62,7 @@ model); the sources mention "brightness" only in comments about colour; control 
   presenter; a test imports a fixture into a temporary storage, sets the seam, draws so the session fails, checks
   `import.xyz`, `recent.json` and `settings.json` byte-identical, opens a new session over the same storage and draws
   the import. Committed samples `recent-{valid,newer,damaged,oversized}.json`, `settings-{…}.json` and
-  `import-{valid.xyz,oversized.xyz}` under the experience's test fixtures, answered as specified and byte-identical
+  `import-{valid,damaged,oversized}.xyz` (an XYZ file has no schema version, so no newer form) under the experience's test fixtures, answered as specified and byte-identical
   afterwards. Stored examples `MoleculeCore.schemaOneExample()`, `schemaTwoExample()` and `schemaThreeExample()`
   (envelopes of schemas 1–3 with the digest their migration to 4 gives), passed to the registry's candidate
   registration and tested. A device-campaign plan `docs/apps/molecular-explorer/device-campaign.md` lists ME-D1 … ME-D6.
