@@ -112,6 +112,10 @@ public struct SimulationCore: ExperienceCore, Equatable {
     public private(set) var preparationSeed: UInt64
     /// The simulation: spec, scheduler and field.
     public private(set) var model: SimulationModel
+    /// Accepted paints since preparation (feature 121): a paint changes the field without stepping, so the presenter's
+    /// GPU mirror reloads when this count changes even if iterations ran in the same frame. Neither saved nor
+    /// digested; a restored core starts at 0.
+    public private(set) var paintCount = 0
 
     /// The first state with `seed`: the cellular automaton with the Life rule, running at ×1, at step 0.
     public init(seed: UInt64) {
@@ -224,6 +228,7 @@ public struct SimulationCore: ExperienceCore, Equatable {
             guard let x = Self.choice(v[0], count: Self.gridSize), let y = Self.choice(v[1], count: Self.gridSize),
                   let m = Self.choice(v[2], count: 2), let mode = PaintMode(rawValue: m),
                   next.paint(x: x, y: y, mode: mode) else { return refused }
+            paintCount += 1
         case "sim.spec":
             guard let index = Self.choice(v[0], count: Self.families.count) else { return refused }
             switch Self.remade(next, spec: Self.spec(family: Self.families[index], a: v[1], b: v[2], timeStep: v[3],

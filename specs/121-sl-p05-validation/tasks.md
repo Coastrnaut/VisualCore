@@ -12,7 +12,7 @@ Precedent: `specs/120-sl-p04-ui-presets-capture/tasks.md`.
 
 ## Phase 2: Foundational — presenter accessors
 
-- [ ] T-A16-502 Add documented `ownedTargetBytes` (display target + automaton, Gray-Scott and wave pairs; `PingPongTarget.bytes` and the target's handle bytes) and `maxGPUStepsInFrame` (the largest per-frame GPU step delta since setup, automaton and float mirrors) to `Packages/ExperiencesCreative/SimulationLab/Experience/SimulationPresenter.swift` (data-model.md) (FR-A16-503)
+- [X] T-A16-502 Add documented `ownedTargetBytes` (display target + automaton, Gray-Scott and wave pairs; `PingPongTarget.bytes` and the target's handle bytes) and `maxGPUStepsInFrame` (the largest per-frame GPU step delta since setup, automaton and float mirrors) to `Packages/ExperiencesCreative/SimulationLab/Experience/SimulationPresenter.swift` (data-model.md) (FR-A16-503) — Verified 2026-11-16: 2026-11-16: .autonomy/checks/A16-P05.sl-ios27.json exit 0 (62 core, 23 Swift Testing and 62 XCTest experience tests, 0 failures, slowest 6.6 s, iOS 27); ownedTargetBytes (180,224 bytes in the report) and maxGPUStepsInFrame (16 in the report) in SimulationPresenter; also the paint-count reload found by BoundaryRuleTests (SimulationCore.paintCount, not saved or digested; a paint then a step in one frame was stepped from the unpainted field)
 
 ## Phase 3: Story 1 — the validation report
 

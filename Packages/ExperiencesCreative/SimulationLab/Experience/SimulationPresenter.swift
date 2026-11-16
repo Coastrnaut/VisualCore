@@ -37,6 +37,9 @@
 // the automaton's field is a function of its spec (rule and seed) and step count alone, since every action that changes
 // the field other than by stepping returns to the seeded start at step 0, so stepping from an earlier count of the
 // same spec (also after a reset followed by iterations in the same frame) arrives at the same field.
+// From feature 120 a paint (`sim.paint`) changes the field without stepping; the core's `paintCount` rises with every
+// accepted paint and a changed count forces a load (feature 121, found by `BoundaryRuleTests`: a paint followed by a
+// step within one frame was otherwise stepped from the unpainted field).
 //
 // Lifecycle: `setup` makes the target, both display passes and the automaton pair with its step pass together
 // (releasing whatever an earlier context left) and, after a context recreation, uploads the last colour-mapped CPU
@@ -180,6 +183,15 @@ final class SimulationPresenter: ExperiencePresenter {
     private(set) var floatLoadCount = 0
     /// Float GPU steps run.
     private(set) var floatStepCount = 0
+    /// The largest number of GPU steps run in one frame since setup (feature 121, FR-A16-503); a larger jump than
+    /// ``maxStepsPerFrame`` loads the mirror instead of stepping it.
+    private(set) var maxGPUStepsInFrame = 0
+    /// The bytes of the presenter's own targets: the display target and the automaton, Gray-Scott and wave pairs
+    /// (feature 121, FR-A16-503).
+    var ownedTargetBytes: Int {
+        (target?.handle.bytes ?? 0) + (automaton?.pair.bytes ?? 0) + (grayScott?.pair.bytes ?? 0)
+            + (wave?.pair.bytes ?? 0)
+    }
     /// GPU steps run on the current mirror since it was last loaded.
     private(set) var stepsSinceLoad = 0
     /// The last core drawn or described (for the words of a refused time step).
@@ -209,6 +221,8 @@ final class SimulationPresenter: ExperiencePresenter {
     private(set) var mirroredStep = 0
     /// The CPU automaton field the GPU field mirrors (to see a change at an unchanged step count).
     private var mirroredField: SimulationField?
+    /// The core's paint count the mirror holds (feature 121): a paint between two frames forces a load.
+    private var mirroredPaintCount = -1
     /// The drawable size in pixels of the last frame; nil before the first.
     private(set) var lastCanvas: Vec2?
     /// The square the grid was drawn into, in pixels (origin x, origin y, side); nil before the first frame.
@@ -322,6 +336,7 @@ final class SimulationPresenter: ExperiencePresenter {
         } else if delta > 0 {
             try automaton.step(rule: spec.automatonRule, count: delta)
             gpuStepCount += delta
+            maxGPUStepsInFrame = max(maxGPUStepsInFrame, delta)
         }
         remember(core)
     }
@@ -349,6 +364,7 @@ final class SimulationPresenter: ExperiencePresenter {
             }
             floatStepCount += delta
             stepsSinceLoad += delta
+            maxGPUStepsInFrame = max(maxGPUStepsInFrame, delta)
         }
         remember(core)
     }
@@ -356,7 +372,7 @@ final class SimulationPresenter: ExperiencePresenter {
     /// Whether the mirror must be loaded from `core` rather than stepped by `delta` (see the file header).
     private func mustLoad(_ core: SimulationCore, delta: Int, reloads: Bool) -> Bool {
         mirroredSpec != core.model.spec || delta < 0 || delta > Self.maxStepsPerFrame
-            || (delta == 0 && mirroredField != core.model.field)
+            || (delta == 0 && mirroredField != core.model.field) || mirroredPaintCount != core.paintCount
             || (reloads && stepsSinceLoad + delta > Self.reloadInterval)
     }
 
@@ -365,6 +381,7 @@ final class SimulationPresenter: ExperiencePresenter {
         mirroredSpec = core.model.spec
         mirroredStep = core.stepCount
         mirroredField = core.model.field
+        mirroredPaintCount = core.paintCount
     }
 
     /// Forgets what the GPU automaton field mirrors, so the next automaton frame loads it from the CPU state.
@@ -372,6 +389,7 @@ final class SimulationPresenter: ExperiencePresenter {
         mirroredSpec = nil
         mirroredStep = 0
         mirroredField = nil
+        mirroredPaintCount = -1
         stepsSinceLoad = 0
     }
 
