@@ -138,6 +138,8 @@ and metadata panel".
 - **Panning at a limit:** a further step is refused with a reason.
 - **An inferred bond:** shown thinner and named "inferred" in the panel; never given an order other than single.
 - **A state saved under schema 2:** opens with no selection and no pan.
+- **A suspension or teardown during a gesture:** every touch is forgotten and nothing more is sent; the next touch
+  starts a new gesture.
 
 ## Requirements *(mandatory)*
 
