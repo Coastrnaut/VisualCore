@@ -49,3 +49,16 @@ completion review (008), the proofs and commits.
 
 MVP: the contract (002, 003, 008) with the baseline (001, 004, 005); the build proof (006, 007) and evidence close the
 phase. Review checkpoint after 003 (checker passes) and at 008 (decision).
+
+## Phase 8: Convergence
+
+- [ ] T-A17-012 Correct the spec's Clarifications (session 2026-11-16) and research D4 with what the contract audit verified:
+  - `VisualCoreScenes/MeshShapes.swift` (feature 205) already has the public, tested `Mesh.revolution`, `tube`,
+    `surface` and `extrusion` (`MeshShapeTests`), so the procedural geometry row is available and G-SCENE is app-local
+    shape content;
+  - `LabelLayout` already has two consumers (Solar System Explorer, internal; Molecular Explorer, public in
+    `MolecularExplorer/Core`), so A17 would be the third (G-LABELS, VisualCoreMath, A17-P04);
+  - `DepthMeshPass.draw` disables `GL_BLEND` and writes depth, and `MeshRenderer` sets no blend state, so ghosting
+    needs an additive VisualCoreRendering stage (G-GHOST, A17-P03).
+
+  Per FR-A17-001 (contradicts)
