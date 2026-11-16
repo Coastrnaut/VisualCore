@@ -13,6 +13,12 @@
 //     reads "Recent molecules could not be saved (<storage code>)."; a write that succeeds clears the message.
 // Without storage (tests and previews) the bytes are kept in memory with the same rules. The store sits outside the
 // engine state: recording never changes a digest or a replay.
+//
+// Feature 114 (A15-P05) T-A15-506 (FR-A15-506; clarification Q3): the ids the file may hold are the library's and
+// `imported` (`ImportedMolecule.id`), so the entry of an imported molecule survives a reload. Whether it is offered is
+// decided when the list is shown: ``availableIDs(importAvailable:)`` keeps `imported` only while the engine holds an
+// import or a readable stored `import.xyz` exists (the presenter knows both). ``drop(_:)`` removes an entry (the
+// presenter drops `imported` when it is chosen with neither), written as a record is.
 import Foundation
 import MolecularExplorerCore
 import VisualCoreExperience
@@ -58,9 +64,12 @@ final class RecentStore {
     /// The library's molecule ids (`water`, `methane`, `ethanol`, `benzene`, `caffeine`).
     static var libraryIDs: Set<String> { Set(MoleculeCore.library.map(\.id)) }
 
+    /// The ids the file may hold: the library's and `imported` (feature 114).
+    static var knownIDs: Set<String> { libraryIDs.union([ImportedMolecule.id]) }
+
     /// A store over `storage` (in memory without storage) that loads the list once, with `known` as the ids it may
-    /// hold (the library's by default). Nothing is written here.
-    init(storage: ExperienceStorage?, known: Set<String> = RecentStore.libraryIDs) {
+    /// hold (the library's and `imported` by default). Nothing is written here.
+    init(storage: ExperienceStorage?, known: Set<String> = RecentStore.knownIDs) {
         self.storage = storage
         self.known = known
         let result = RecentStore.load(storage: storage, memory: nil, known: known)
@@ -110,17 +119,26 @@ final class RecentStore {
         Self.load(storage: storage, memory: memory, known: known)
     }
 
-    /// Records `id` as the newest molecule (moved to the front, unique, at most 8). When the list changed and
-    /// `persist` is true the list is written, replacing the file atomically; returns true when it was written. A
-    /// refused write keeps the previous file and sets the message; the in-memory list changes either way.
+    /// The ids to offer, newest first: the list without `imported` unless `importAvailable` (the engine holds an
+    /// import or a readable stored copy exists; feature 114).
+    func availableIDs(importAvailable: Bool) -> [String] {
+        importAvailable ? recent.ids : recent.ids.filter { $0 != ImportedMolecule.id }
+    }
+
+    /// Removes `id` from the list and writes the list as ``record(_:persist:)`` does (always persisted); returns true
+    /// when it was written. An id not in the list changes nothing (feature 114).
     @discardableResult
-    func record(_ id: String, persist: Bool = true) -> Bool {
-        var next = recent
-        next.record(id)
-        guard next != recent else { return false }
+    func drop(_ id: String) -> Bool {
+        guard recent.ids.contains(id) else { return false }
+        let next = RecentMolecules(ids: recent.ids.filter { $0 != id })
         recent = next
-        guard persist else { return false }
-        let data = next.encoded()
+        return persist(next)
+    }
+
+    /// Writes `list` to the file (or to memory without storage); a refused write keeps the previous file and sets the
+    /// message, a write that succeeds clears it. Returns true when it was written.
+    private func persist(_ list: RecentMolecules) -> Bool {
+        let data = list.encoded()
         if let storage {
             do {
                 try storage.write(data, to: RecentMolecules.fileName)
@@ -134,5 +152,18 @@ final class RecentStore {
         writes += 1
         message = ""
         return true
+    }
+
+    /// Records `id` as the newest molecule (moved to the front, unique, at most 8). When the list changed and
+    /// `persist` is true the list is written, replacing the file atomically; returns true when it was written. A
+    /// refused write keeps the previous file and sets the message; the in-memory list changes either way.
+    @discardableResult
+    func record(_ id: String, persist: Bool = true) -> Bool {
+        var next = recent
+        next.record(id)
+        guard next != recent else { return false }
+        recent = next
+        guard persist else { return false }
+        return self.persist(next)
     }
 }

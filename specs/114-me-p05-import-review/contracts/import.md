@@ -27,5 +27,6 @@ x, y, z ∈ −1000…1000]`, `import.end []`; refusal `a15.invalid-import`. `mo
 without an import). The title travels outside the actions: `import.end` names the molecule "Imported molecule" and the
 presenter shows the file title stored beside `import.xyz` (`import-title.txt`, ≤ 40 characters).
 
-Experience: `MoleculeImporter.importFile(at: URL) -> String?` (nil on success, else the sentence); the Import button
+Experience: `MoleculeImporter.importFile(at: URL, isActive: Bool, send:) -> Outcome` (`.imported(title:atoms:storageCode:)`,
+`.refused(sentence)` or `.inactive`, so an inactive call is told apart from a success); `MoleculePresenter.importFile(at:)`; the Import button
 `import` (label "Import XYZ file", hint "Opens a small XYZ file from Files"); panel line `inferred-note`.

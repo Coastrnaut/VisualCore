@@ -79,6 +79,20 @@
 //     the settings and filters the labels of the last frame at once.
 //   - Both stores live outside the engine state, so digests and replays are unchanged; the mirror holds the recent ids
 //     and titles (newest first), the label mode and the stores' messages for the controls.
+//
+// Feature 114 (A15-P05) T-A15-506 (FR-A15-501–506, FR-A15-540; clarifications Q1–Q3; contracts/import.md):
+//   - Import: ``importFile(at:)`` (the Import button's picker result) runs ``MoleculeImporter`` with the port and the
+//     activity attached by ``attach(port:isActive:)`` (the factory attaches the shell's; nothing is read without
+//     them). On success the file's title (`import-title.txt`, "Imported molecule" when missing) names molecule 6 in the
+//     name line, the status and the description, "<title> imported, N atoms" is announced and the mirror's
+//     `importMessage` is empty, or reads "The molecule was opened but could not be kept for the recent list (<storage
+//     code>)." when the copy could not be written; a refusal announces its sentence and shows it, changing nothing. An
+//     inactive import (suspended or closing) does nothing at all.
+//   - Recent list: the id `imported` (`ImportedMolecule.id`) is recorded when molecule 6 is shown, and offered while
+//     the engine holds an import or a readable stored copy exists. ``chooseRecent(_:through:)`` selects a library
+//     molecule, the engine's import, or, with no import in the engine, replays the stored copy; when the copy is
+//     missing or refused the entry is dropped from the list.
+//   - Panel: the line `inferred-note` (``inferredNote``, `MoleculeReview.inferredStatement`) under the bonds.
 import Foundation
 import MolecularExplorerCore
 import SwiftUI
@@ -157,6 +171,17 @@ final class MoleculeMirror {
     var recentMessage = ""
     /// Why the settings could not be read or saved; empty otherwise (feature 113).
     var settingsMessage = ""
+    /// The selected molecule's title as shown ("Caffeine"; the imported file's title for molecule 6; feature 114).
+    var title = ""
+    /// Whether the engine holds an imported molecule (molecule 6 can be selected; feature 114).
+    var hasImport = false
+    /// The imported molecule's title (the file's, else "Imported molecule"; feature 114).
+    var importTitle = MoleculeImport.fallbackTitle
+    /// The answer to the last import: the refusal sentence, the copy's storage message, or empty (feature 114).
+    var importMessage = ""
+    /// Whether the Import button's file picker is shown (kept here so the controls hold references only; feature
+    /// 114).
+    var importing = false
 }
 
 /// The ring drawn around the selected atom on the canvas overlay (feature 112, T-A15-306).
@@ -238,6 +263,16 @@ final class MoleculePresenter: ExperiencePresenter {
     private(set) var lastCanvasPoints: Vec2?
     /// The canvas gestures (feature 112).
     private(set) var gestures = MoleculeGestures()
+    /// The imports of a person's XYZ files and the stored copy (feature 114).
+    let importer: MoleculeImporter
+    /// The port imports and replays are sent through; set by ``attach(port:isActive:)`` (feature 114).
+    private(set) weak var port: ExperienceActionPort?
+    /// Whether the experience is active now (imports are refused otherwise); set by ``attach(port:isActive:)``.
+    private var isActive: @MainActor () -> Bool = { false }
+    /// The title of the imported molecule: the stored `import-title.txt`, else "Imported molecule" (feature 114).
+    private(set) var importTitle: String
+    /// The core last seen by `sync`; nil before the first state (feature 114).
+    private(set) var lastCore: MoleculeCore?
     /// The selected atom last seen by `sync` or set by an accepted pick (decides whether a miss clears).
     private(set) var seenSelectedAtom: Int?
     /// The molecule and atom last seen by the announcements; nil until the first state.
@@ -259,16 +294,27 @@ final class MoleculePresenter: ExperiencePresenter {
     /// announcements (nil: the system's); `displayScale` is the points-per-pixel factor used before the overlay reports
     /// its size (nil: the current trait collection's, else 2); `recentStore` and `settingsStore` keep the recent list
     /// and the settings (nil: in memory; feature 113). Both stores have loaded their files already; nothing is written
-    /// here.
+    /// here. `importer` opens XYZ files (nil: one keeping its copy in the recent store's storage; feature 114).
     init(experienceID: ExperienceID, announcementSink: (any AnnouncementSink)? = nil, displayScale: Double? = nil,
-         recentStore: RecentStore? = nil, settingsStore: SettingsStore? = nil) {
+         recentStore: RecentStore? = nil, settingsStore: SettingsStore? = nil, importer: MoleculeImporter? = nil) {
         self.experienceID = experienceID
         self.announcementSink = announcementSink ?? SystemAnnouncementSink()
         let traitScale = Double(UITraitCollection.current.displayScale)
         self.displayScale = displayScale ?? (traitScale > 0 ? traitScale : 2)
-        self.recentStore = recentStore ?? RecentStore(storage: nil)
+        let recent = recentStore ?? RecentStore(storage: nil)
+        self.recentStore = recent
         self.settingsStore = settingsStore ?? SettingsStore(storage: nil)
+        let imports = importer ?? MoleculeImporter(storage: recent.storage)
+        self.importer = imports
+        importTitle = imports.storedTitle() ?? MoleculeImport.fallbackTitle
         syncStores()
+    }
+
+    /// Attaches the port imports are sent through and the question whether the experience is active (the factory
+    /// passes the shell's port and `shell.state == .active`; tests attach their own shell; feature 114).
+    func attach(port: ExperienceActionPort, isActive: @escaping @MainActor () -> Bool) {
+        self.port = port
+        self.isActive = isActive
     }
 
     // MARK: Render scene
@@ -721,16 +767,23 @@ final class MoleculePresenter: ExperiencePresenter {
 
     /// Brings the controls' mirror in line with `core`.
     func sync(_ core: MoleculeCore) {
+        lastCore = core
         if !mirror.ready { mirror.ready = true }
         let selection = core.selection
         if mirror.selection != selection { mirror.selection = selection }
-        let name = MoleculeCore.nameLine(index: selection)
+        let shownTitle = title(of: core)
+        if mirror.title != shownTitle { mirror.title = shownTitle }
+        let hasImport = core.imported != nil
+        if mirror.hasImport != hasImport { mirror.hasImport = hasImport }
+        if mirror.importTitle != importTitle { mirror.importTitle = importTitle }
+        let named = selection == MoleculeCore.importedSelection ? importTitle : nil
+        let name = core.nameLine(title: named)
         if mirror.nameLine != name { mirror.nameLine = name }
-        let counts = MoleculeCore.countsLine(index: selection)
+        let counts = core.countsLine
         if mirror.countsLine != counts { mirror.countsLine = counts }
-        let source = MoleculeCore.sourceLine(index: selection)
+        let source = core.sourceLine
         if mirror.sourceLine != source { mirror.sourceLine = source }
-        let status = MoleculeCore.status(selection: selection)
+        let status = core.status(title: named)
         if mirror.status != status { mirror.status = status }
         let mode = core.mode
         if mirror.mode != mode { mirror.mode = mode }
@@ -764,16 +817,23 @@ final class MoleculePresenter: ExperiencePresenter {
         if mirror.atomWords != atomWords { mirror.atomWords = atomWords }
         seenSelectedAtom = atom
         announceSelection(molecule: selection, atom: atom, words: atomWords)
-        recordMolecule(selection)
+        recordMolecule(selection, id: core.molecule?.id)
+    }
+
+    /// The title `core`'s selected molecule is shown with: the imported file's title for molecule 6, else the
+    /// molecule's own title (feature 114).
+    func title(of core: MoleculeCore) -> String {
+        core.selection == MoleculeCore.importedSelection && core.imported != nil ? importTitle : core.title
     }
 
     // MARK: Recent molecules and settings (feature 113)
 
-    /// Records the molecule at `selection` into the recent list when it differs from the one last recorded (the
-    /// first state included). The first state is written only when the file was read or missing, so a refused or
-    /// unreadable file stays as it was until the next molecule change.
-    private func recordMolecule(_ selection: Int) {
-        guard selection != recordedSelection, let molecule = MoleculeCore.molecule(index: selection) else { return }
+    /// Records the molecule `id` shown at `selection` (a library id, or `imported` for molecule 6 since feature 114)
+    /// into the recent list when the selection differs from the one last recorded (the first state included). The
+    /// first state is written only when the file was read or missing, so a refused or unreadable file stays as it was
+    /// until the next molecule change.
+    private func recordMolecule(_ selection: Int, id: String?) {
+        guard selection != recordedSelection, let id else { return }
         let first = recordedSelection == nil
         recordedSelection = selection
         let persist: Bool
@@ -781,13 +841,17 @@ final class MoleculePresenter: ExperiencePresenter {
         case .refused, .unreadable: persist = !first
         case .loaded, .missing: persist = true
         }
-        recentStore.record(molecule.id, persist: persist)
+        recentStore.record(id, persist: persist)
         syncStores()
     }
 
-    /// The titles of the molecules `ids`, in order; ids outside the library are left out.
-    nonisolated static func recentTitles(_ ids: [String]) -> [String] {
-        ids.compactMap { id in MoleculeCore.library.first { $0.id == id }?.title }
+    /// The titles of the molecules `ids`, in order: library titles, `importedTitle` for `imported` (feature 114);
+    /// other ids are left out.
+    nonisolated static func recentTitles(_ ids: [String], importedTitle: String = MoleculeImport.fallbackTitle)
+        -> [String] {
+        ids.compactMap { id in
+            id == ImportedMolecule.id ? importedTitle : MoleculeCore.library.first { $0.id == id }?.title
+        }
     }
 
     /// The library index of the molecule `id`, or nil outside the library.
@@ -812,16 +876,114 @@ final class MoleculePresenter: ExperiencePresenter {
         showLabels()
     }
 
-    /// Brings the mirror's recent list, label mode and store messages in line with the stores.
+    /// Whether the imported molecule can be shown: the engine holds an import or a readable stored copy exists
+    /// (feature 114).
+    var importAvailable: Bool {
+        lastCore?.imported != nil || importer.hasReadableCopy
+    }
+
+    /// Brings the mirror's recent list, label mode and store messages in line with the stores (`imported` only while
+    /// ``importAvailable``; feature 114).
     private func syncStores() {
-        let ids = recentStore.recent.ids
+        let ids = recentStore.availableIDs(importAvailable: importAvailable)
         if mirror.recentIDs != ids { mirror.recentIDs = ids }
-        let titles = Self.recentTitles(ids)
+        let titles = Self.recentTitles(ids, importedTitle: importTitle)
         if mirror.recentTitles != titles { mirror.recentTitles = titles }
         let mode = settingsStore.labels
         if mirror.labelMode != mode { mirror.labelMode = mode }
         if mirror.recentMessage != recentStore.message { mirror.recentMessage = recentStore.message }
         if mirror.settingsMessage != settingsStore.message { mirror.settingsMessage = settingsStore.message }
+    }
+
+    // MARK: Import (feature 114)
+
+    /// The panel line under the bonds (`inferred-note`): "Bonds marked inferred are estimated from atom distances."
+    nonisolated static let inferredNote = MoleculeReview.inferredStatement
+
+    /// The message of an import whose copy could not be written: "The molecule was opened but could not be kept for
+    /// the recent list (<storage code>)."
+    nonisolated static func keepFailedWords(_ code: String) -> String {
+        "The molecule was opened but could not be kept for the recent list (\(code))."
+    }
+
+    /// The announcement of a successful import: "<title> imported, N atoms" ("1 atom" for one).
+    nonisolated static func importedWords(title: String, atoms: Int) -> String {
+        "\(title) imported, \(MoleculeCore.counted(atoms, "atom"))"
+    }
+
+    /// The message of an `imported` entry that could no longer be opened (no import in the engine and no readable
+    /// copy): the entry is dropped from the recent list.
+    nonisolated static let importGoneWords = "The imported molecule is no longer kept, so it was removed from the "
+        + "recent list."
+
+    /// Whether imports can run now: a port is attached and the experience is active.
+    private var canImport: Bool {
+        port != nil && isActive()
+    }
+
+    /// Sends `control` with `values` through the attached port (refused as not active without one).
+    private func sendThroughPort(_ control: String, _ values: [Double]) -> ActionResult {
+        port?.send(control, values) ?? .rejected(.notActive(.inactive))
+    }
+
+    /// Imports the XYZ file at `url` (the Import button's picker result; see the file header): nothing at all while
+    /// the experience is not active; a refusal shows and announces its sentence and changes nothing; a success names
+    /// the molecule with the file's title, announces "<title> imported, N atoms" and shows the copy's storage message
+    /// when it could not be kept.
+    @discardableResult
+    func importFile(at url: URL) -> MoleculeImporter.Outcome {
+        let outcome = importer.importFile(at: url, isActive: canImport) { [weak self] control, values in
+            self?.sendThroughPort(control, values) ?? .rejected(.notActive(.inactive))
+        }
+        switch outcome {
+        case .inactive:
+            return outcome
+        case .refused(let sentence):
+            mirror.importMessage = sentence
+            announce(sentence)
+        case .imported(let title, let atoms, let code):
+            importTitle = title
+            mirror.importMessage = code.map(Self.keepFailedWords) ?? ""
+            announce(Self.importedWords(title: title, atoms: atoms))
+        }
+        if let lastCore { sync(lastCore) }
+        syncStores()
+        return outcome
+    }
+
+    /// Opens the recent entry `id` through `port`: a library molecule by `molecule.select`; `imported` by
+    /// `molecule.select [5]` when the engine holds an import, else by replaying the stored copy (only while the
+    /// experience is active); when the copy is missing or refused the entry is dropped and ``importGoneWords`` shown.
+    /// Returns the answer of the selection, or nil when nothing was sent (an unknown id, or a replay while inactive).
+    @discardableResult
+    func chooseRecent(_ id: String, through port: ExperienceActionPort) -> ActionResult? {
+        if let index = Self.libraryIndex(id: id) {
+            return send("molecule.select", [Double(index)], through: port)
+        }
+        guard id == ImportedMolecule.id else { return nil }
+        if lastCore?.imported != nil {
+            return send("molecule.select", [Double(MoleculeCore.importedSelection)], through: port)
+        }
+        guard canImport else { return nil }
+        importer.forgetCopyCheck()
+        let replayed = importer.replay { control, values in port.send(control, values) }
+        if !replayed {
+            recentStore.drop(ImportedMolecule.id)
+            mirror.importMessage = Self.importGoneWords
+        } else {
+            importTitle = importer.storedTitle() ?? MoleculeImport.fallbackTitle
+            mirror.importMessage = ""
+            if let lastCore { sync(lastCore) }
+        }
+        syncStores()
+        return replayed ? .accepted : .rejected(.rule(code: MoleculeRule.invalidImport))
+    }
+
+    /// Announces `text` through the sink and counts it.
+    private func announce(_ text: String) {
+        announcementSink.announce(text)
+        lastAnnouncement = text
+        announcementCount += 1
     }
 
     /// The words of no selected atom.
@@ -856,6 +1018,7 @@ final class MoleculePresenter: ExperiencePresenter {
         case "atom.next": return "This is the last atom."
         case "atom.previous": return "This is the first atom."
         case "atom.clear": return "No atom is selected."
+        case "import.begin", "import.atom", "import.end": return "The molecule file could not be opened."
         default: return "That is not possible here."
         }
     }
@@ -868,10 +1031,10 @@ final class MoleculePresenter: ExperiencePresenter {
         return result
     }
 
-    /// The description of `core`'s molecule and mode.
+    /// The description of `core`'s molecule and mode (the imported molecule named by its file's title; feature 114).
     func describe(_ core: MoleculeCore) -> String {
         sync(core)
-        return core.canvasDescription
+        return core.titledCanvasDescription(core.selection == MoleculeCore.importedSelection ? importTitle : nil)
     }
 
     /// The native controls, sending through `port`.
@@ -885,7 +1048,8 @@ final class MoleculePresenter: ExperiencePresenter {
     }
 
     /// The actions the native controls send: every action (the molecule buttons and menu, the mode picker, the turn,
-    /// tilt, zoom and pan buttons, Reset view, Previous atom, Next atom and Clear selection).
+    /// tilt, zoom and pan buttons, Reset view, Previous atom, Next atom and Clear selection, and the Import button,
+    /// which sends the three import actions and `molecule.select [5]`; feature 114).
     var nativeActions: Set<String> {
         Set(MoleculeCore.actionIDs)
     }
