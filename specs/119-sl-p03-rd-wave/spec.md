@@ -23,6 +23,49 @@ Canonical overrides:
 - **Owner rulings:** short tests; audits and device runs in the device campaign; iOS 27 at phase gates; reference
   regression and iOS 26 at X-A16; every Spec Kit step runs. Follow `specs/118-sl-p02-automata-gpu`.
 
+## Clarifications
+
+### Session 2026-11-16
+
+Answered by the lead under the owner's standing delegation (the recommended option each time), with the facts checked
+in code: `FloatRenderSupport.detect(in:)` caches per `ResourceRegistry.generation`; `GrayScottGPU` (A16-P02) keeps u in
+red and v in green of an RGBA16F pair; `SimulationSpec.refusal()` already gives `SimulationRefusal.reactionStep`
+("… at or below 1.5625.") and `.courant` ("… at or below 0.707."); `ParameterCatalog` declares reaction Δt 0.1…1.5625
+and wave Δt 0.05…1 with speed c 0.1…2; the controls show `SimulationMirror.message`; the presenter protocol offers
+`makeCanvasOverlay(_:) -> AnyView?`. Today the presenter draws reaction-diffusion and the wave from a CPU upload.
+
+- Q: How is the wave field held on the GPU, and how is its border kept at zero? → A: One RGBA16F ping-pong pair
+  (`WaveGPU`, a new app-local type beside `GrayScottGPU`), the current value uⁿ in red and the previous uⁿ⁻¹ in green;
+  the step writes (uⁿ⁺¹, uⁿ). The step program takes uniforms `uCourant2` (C²) and `uKeep` (1 − γ) and writes 0 for any
+  cell on the edge (index 0 or n − 1, by `gl_FragCoord`), matching `WaveField.step`; neighbours are read by `texelFetch`
+  without wrap. Reaction-diffusion keeps the `GrayScottGPU` wrap.
+- Q: What tolerance and test shape prove GPU agreement for the two families? → A: 10 GPU steps on a 16 × 16 field from
+  the seeded start, read back and compared per cell with the CPU reference computed in both `float16` and
+  `float16TowardZero` (the simulator truncates half writes); the GPU passes when the smaller of the two maxima is
+  ≤ 0.01, for each family. The wave edge test runs 100 GPU steps on 16 × 16 and reads every edge cell as exactly 0.
+- Q: How does the GPU field stay within tolerance on long runs? → A: The presenter steps the GPU field by the engine's
+  iteration delta and reloads it from the CPU field whenever 64 GPU steps have run since the last load (and on setup,
+  recreation, resize, any family, preset, reset, restore or time-step change). The CPU model stays the truth for
+  digests, snapshots, the legend and the description; the automaton keeps its exact A16-P02 path with no reload.
+- Q: What does the time-step control look like and how is a refusal shown? → A: A new action `sim.timestep [Δt]` with
+  the declared range 0.05…2.0, so values beyond each stable limit reach the core. For reaction-diffusion Δt above
+  1.5625 is refused with `a16.unstable` and the sentence of `SimulationRefusal.reactionStep`; for the wave a Δt making
+  C = c · Δt exceed 1/√2 is refused with `a16.unstable` and the sentence of `SimulationRefusal.courant`; a Δt outside
+  the family's own range is refused with `a16.invalid-choice` and its range sentence; the automaton refuses the action
+  with `a16.invalid-choice` ("The cellular automaton advances one generation per step: its time step must be 1."). An
+  accepted Δt replaces the spec's time step, keeps the field, the step count, running and speed (the field is not
+  reseeded), and reloads the GPU mirror. The presenter shows the refusal's sentence in the controls' message line
+  (`SimulationMirror.message`), which VoiceOver announces; the time step is also stated in the status line. A refusal
+  changes nothing.
+- Q: Where is the legend drawn and what happens without floating-point targets? → A: The legend is a SwiftUI view
+  returned by `makeCanvasOverlay(_:)`: a colour bar of the family's palette with the minimum and maximum of the CPU
+  field (u for reaction-diffusion, the signed value for the wave), and for the automaton the alive and dead counts;
+  the canvas description states the same values. The float probe runs in `setup` for each context generation (a test
+  seam forces "unsupported"); without support no GPU field (float or 8-bit) is made for the two families, the family
+  control refuses choosing them with `a16.unsupported` and the sentence "Reaction-diffusion and the wave field need
+  floating-point render targets, which this device does not offer.", shown in the message line, and a restored state
+  in either family is drawn from the CPU upload with that sentence in the status line.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Reaction-diffusion and waves on the graphics processor (Priority: P1) 🎯
@@ -94,9 +137,12 @@ simulation keeps running unchanged.
 
 ### Edge Cases
 
-- **Long runs:** the GPU field is reloaded from the CPU state at a fixed interval so that rounding differences never
+- **Long runs:** the GPU field is reloaded from the CPU state every 64 GPU steps so that rounding differences never
   accumulate beyond the tolerance.
-- **The automaton:** keeps its exact GPU path from A16-P02; its time step is fixed and the control is disabled.
+- **The automaton:** keeps its exact GPU path from A16-P02; its time step is fixed and `sim.timestep` is refused with
+  `a16.invalid-choice` and the one-generation sentence.
+- **A time step below the family's range or above 2.0:** refused (`a16.invalid-choice` with the range sentence, or the
+  engine's `outOfRange` outside 0.05…2.0); nothing changes.
 - **A step program that fails to compile or an incomplete target:** setup throws and the session fails through the
   host's failure state.
 - **Restore of a saved state in a disabled family (no float support):** the state is kept and drawn from the CPU field
@@ -111,13 +157,17 @@ simulation keeps running unchanged.
 - **FR-A16-302**: The wave field MUST step on the GPU on floating-point targets with a fixed zero border and agree with
   the CPU reference within the stated tolerance.
 - **FR-A16-303**: The GPU fields MUST be loaded from the CPU state on setup, recreation, resize, any non-step change and
-  at a fixed reload interval, and stepped by the engine's iterations otherwise; no pass reads what it writes.
-- **FR-A16-310**: The float probe MUST run for each context generation; without support both families MUST be shown as
-  unavailable with a message and no 8-bit field made for them.
-- **FR-A16-320**: A legend MUST show the family's colour scale, value range and current minimum and maximum; the canvas
-  description MUST state them.
-- **FR-A16-330**: A time-step control MUST exist for reaction-diffusion and the wave field; values beyond the stability
-  limit MUST be refused with a visible, spoken sentence naming the limit, leaving the state unchanged.
+  after every 64 GPU steps, and stepped by the engine's iteration delta otherwise; no pass reads what it writes.
+- **FR-A16-310**: The float probe MUST run for each context generation; without support no GPU field (float or 8-bit)
+  MUST be made for the two families, choosing them MUST be refused with `a16.unsupported` and the sentence
+  "Reaction-diffusion and the wave field need floating-point render targets, which this device does not offer.", and a
+  restored state in either family MUST be drawn from the CPU upload with that sentence in the status line.
+- **FR-A16-320**: A legend in the canvas overlay MUST show the family's colour bar and the current minimum and maximum
+  of the CPU field (the automaton: alive and dead counts); the canvas description MUST state the same values.
+- **FR-A16-330**: An action `sim.timestep [Δt]` (declared 0.05…2.0) MUST set the time step of reaction-diffusion and the
+  wave field, keeping the field, step count, running and speed; Δt above 1.5625 (reaction-diffusion) or making
+  C = c · Δt exceed 1/√2 (wave) MUST be refused with `a16.unstable` and the limit's sentence, shown in the message line
+  and announced; the automaton MUST refuse it with `a16.invalid-choice`; a refusal changes nothing.
 - **FR-A16-340**: The runner's standard scenarios MUST pass on iOS 27.
 
 ### Key Entities
