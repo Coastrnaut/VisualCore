@@ -167,13 +167,18 @@ jobs:
       - name: ANGLE stand-ins (link only)
         if: steps.standin-cache.outputs.cache-hit != 'true'
         run: python3 scripts/make_ci_angle_standins.py --out External/projectm-ios/Build/ANGLEFrameworks
+      # The key is computed once before the build: the cache's post step re-evaluates its inputs, and a hashFiles over
+      # Packages/** after the build exceeded its 120-second limit on a slow runner (run 43910302489, 2026-11-16).
+      - name: DerivedData cache key
+        id: ddkey
+        run: echo "key=dd-app-${{ steps.toolchain.outputs.xcode }}-${{ hashFiles('project.yml', 'Packages/**/Package.swift', 'Packages/**/*.swift', 'Packages/**/*.c', 'Packages/**/*.h', 'Apps/VisualCore/**/*.swift') }}" >> "$GITHUB_OUTPUT"
       - name: DerivedData cache
         uses: actions/cache@v4
         with:
           path: |
             Build/DerivedData/ci-debug
             Build/DerivedData/ci-release
-          key: dd-app-${{ steps.toolchain.outputs.xcode }}-${{ hashFiles('project.yml', 'Packages/**/Package.swift', 'Packages/**/*.swift', 'Packages/**/*.c', 'Packages/**/*.h', 'Apps/VisualCore/**/*.swift') }}
+          key: ${{ steps.ddkey.outputs.key }}
           restore-keys: dd-app-${{ steps.toolchain.outputs.xcode }}-
       - name: Generate the project
         run: xcodegen generate --spec project.yml
