@@ -10,7 +10,7 @@ data with a validator.
   `Citation`, `ReviewStatus` and `AnatomyLabel`.
 - **Loading and checking:** `AnatomyContent` decodes and validates; `ContentRefusal` holds the typed reasons with
   their sentences.
-- **Data:** the bundled resource `Core/Content/knee-right.json` holds 14 structures, about 30 meshes and the
+- **Data:** the bundled resource `Core/Content/knee-right.json` holds the root and 14 joint parts, 14–42 meshes and the
   citations.
 - **Tests:** the bundled region validates; every refusal kind is triggered and named; the round trip is exact;
   damaged, newer and oversized data is refused; every label resolves.
