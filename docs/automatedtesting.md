@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-16 (A15-P03: touches cancelled on suspension; A15-P01: contract products, runner count).
+Last updated: 2026-11-16 (human tests for everything that prompts; A15-P03: touches cancelled on suspension).
 
 ## 1. What is tested, and where
 
@@ -58,6 +58,26 @@ are never device evidence; device runs wait for `ImplementationLock-100`.
   injected dependency, so replays never read it.
 - **Test data style.** Explicit types and plain loops instead of large nested closure literals (CI's type checker times
   out on them); synthetic UUIDs of the form `00000000-0000-4000-8000-…`; no scratchpad or session paths in evidence.
+- **Anything that raises a system prompt is human testing, never automated testing** (owner ruling of 2026-11-16, after
+  a device run on D1 stopped at a camera permission prompt). A test that would show a permission dialog (camera,
+  microphone, photo library, location, notifications, tracking or any other system alert that waits for a person) is
+  not part of any automated run, simulator or device: automated tests never choose the microphone, never save to the
+  photo library, never open a camera path and never tap a system alert. Such checks are grouped together in the human
+  test pass of the device campaign (section 3a), run by a person holding the device, one prompt after another.
+
+## 3a. Human tests: everything that prompts
+
+These are done by a person on the devices during the device campaign (after `ImplementationLock-100`), together in one
+sitting, never by an automated run. Each answers the system prompt itself and records what it saw.
+
+| Prompt | Where it appears in VisualCore | Human check |
+|---|---|---|
+| Microphone (`NSMicrophoneUsageDescription`) | choosing the microphone source in A06 VisualCore Music Lab, A07 Audio Odyssey and A08 Oscilloscope Studio | allow → the visuals follow room sound; deny → the experience says so and offers the demo signal; the setting can be changed later in Settings |
+| Photo library add (`NSPhotoLibraryAddUsageDescription`) | "Share or Save Image" of A01 Generative Art Studio's still export, then Save Image in the system share sheet | allow → the image is saved; deny → the experience says so and nothing is saved |
+| Camera | none in VisualCore (the unified app requests no camera); the projectm-ios reference device tests (photo effects) do | run those only as human tests on the device, never in an unattended device run |
+
+The automated suites keep proving the rest without a prompt: `FirstRunUITests` asserts that the first start shows no
+alert; the A06–A08 interface tests assert that the microphone is never chosen; `BundleTests` checks the usage strings.
 
 ## 4. The per-gate test sequence (an experience phase)
 
