@@ -24,6 +24,42 @@ Canonical overrides:
 - **Owner rulings:** short tests; audits and device runs in the device campaign; iOS 27 at phase gates; reference
   regression and iOS 26 at X-A15; every Spec Kit step runs.
 
+## Clarifications
+
+### Session 2026-11-15
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+`MeshRenderer.draw(model:camera:aspect:color:)` and `DepthMeshPass.Item(renderer:model:color:)` take a model matrix
+and a colour per item; the mesh shader transforms normals with `mat3(u_model)` and normalises them, so a uniform scale
+(spheres) and a scale along a stick's own axis (whose side normals have no axial part) keep the lighting right;
+`Mesh.tube(path:radius:sides:caps:closed:)` builds a stick from two points; `OrbitCamera(target:distance:yaw:pitch:…)`.
+
+- Q: What are the display radii of the two modes? → A: Ball-and-stick: atoms at 0.30 × their van der Waals radius
+  (hydrogen 0.36 Å, carbon 0.51 Å), bonds as sticks of radius 0.12 Å (thinner than the smallest atom, so stick ends
+  stay hidden inside the atoms); space-filling: atoms at 1.00 × their van der Waals radius and no bonds. Display
+  conventions only, stated in the legend ("Display radii, not measured sizes").
+- Q: What are the camera's steps and limits? → A: Turn 15° per step and wraps around (24 positions, never refused); tilt
+  10° per step within −80°…+80°; zoom by a factor 0.85 per step within −4…+4 steps of the framed distance (the framed
+  distance is the bounding radius, atom display radii included, × 1.25 / sin of the narrower half field of view of
+  60°; at +4 steps the camera is still about 1.3 bounding radii from the centre, outside the molecule). Default turn
+  30°, tilt 20°, zoom 0, so a planar molecule is never edge-on. A step beyond a limit is refused with
+  `a15.camera-limit`.
+- Q: What does the state hold, and how does schema 1 open? → A: Schema 2: the molecule index, the display mode
+  (0 ball-and-stick, 1 space-filling) and the camera steps (turn 0…23, tilt −8…8, zoom −4…4); a schema-1 state
+  migrates to ball-and-stick with the default camera. Choosing another molecule resets the camera to the default and
+  keeps the mode.
+- Q: Which actions and controls are added? → A: Actions `display.mode [0/1]`, `camera.orbit [−1/+1]`,
+  `camera.tilt [−1/+1]`, `camera.zoom [−1/+1]` and `view.reset`; native controls Ball and stick / Space filling (a
+  segmented picker), Turn left, Turn right, Tilt up, Tilt down, Zoom in, Zoom out and Reset view, each with its value
+  ("Turned 30°, tilted 20°", "Zoom step 0 of −4 to 4"); the canvas description ends with the mode
+  ("; ball-and-stick" or "; space-filling"). New fixtures: caffeine in space-filling, and benzene after three turns,
+  one tilt up and two zoom-ins.
+- Q: How is the scene drawn? → A: One unit sphere mesh (32 × 16) scaled uniformly per atom and one unit stick mesh
+  (16 sides, from 0 to 1 along +y, radius 0.12 Å, no caps) rotated onto each bond half and scaled along its axis to the
+  half's length; each item coloured with its element's colour; two renderers made together, rebuilt after context
+  recreation, released together; the draw budget is 1,500 items (the library needs at most 74). Instanced lit meshes
+  were assessed for VisualCoreRendering and are not needed at these counts; the contract records it.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - See atoms and bonds in two styles (Priority: P1) 🎯
