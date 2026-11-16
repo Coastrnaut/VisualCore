@@ -799,6 +799,55 @@ ephemeris or live sky position, telescope alignment, or imagery and data taken w
 - **One phase at a time:** implement only one Spec Kit phase at a time (one ledger gate, ADR-0004), in order
   A14-P00 → A14-P06.
 
+### A15 Molecular Explorer (`a15.molecular-explorer`)
+
+Ratified from the app manual's constitution prompt (2026-11-15). Like A05–A14, it never had a standalone target: it
+is built directly as an experience of the one app. Its product goal is an approachable 3D molecule viewer with clear
+atom and bond styling and constrained structured-data import — in version 0.1 a curated small-molecule library with
+source attributions; ball-and-stick and space-filling display modes; orbit, pan, zoom and atom picking; element
+labels, bond types and a metadata panel; a small XYZ file import with strict bounds and parser errors; and locally
+kept recent molecules and visual settings — not medicinal chemistry, predictive molecular dynamics, trusted arbitrary
+PDB or complex input, or chemical safety or therapeutic claims.
+
+- **Consumer, not fork:** an experience of the VisualCore app and a VisualCore consumer, never a fork of
+  projectm-ios. It uses only audited VisualCore public APIs over the OpenGL ES → ANGLE → Metal integration. It MUST
+  NOT create its own EGL/ANGLE initialization path, a second renderer, or link ProjectM engine code.
+- **Reuse first (Principle II):** 3D scenes, cameras, meshes (spheres, cylinders), instanced or batched drawing,
+  materials and lighting, ray picking, gestures, persistence, quality tiers and accessibility planning already in
+  VisualCore are reused, not copied. New generic machinery (for example a ray–sphere or ray–capsule picker, or a
+  bounded text-record parser) goes into VisualCore with tests, docs, the API baseline and the reference regression
+  when it is reusable; elements, molecules, bond rules, copy and UI stay in the experience.
+- **Visuals are code:** atoms, bonds, labels' backdrops, highlights and backgrounds are procedural geometry and
+  shaders made in code; no purchased, generated or hand-made images, textures, models or recordings.
+- **Data with provenance:** every bundled element property (symbol, name, atomic number, covalent and van der Waals
+  radius, display colour) and every curated molecule's coordinates record their source, units (ångström) and
+  license; only openly licensed or public-domain data is bundled, and the record is checked by a test.
+- **Strict, bounded import:** XYZ input is parsed by a pure parser with fixed limits (file size, atom count, line
+  length, coordinate magnitude); unknown elements, non-finite or malformed values and documents beyond the caps are
+  refused with a typed reason and change nothing; imported files are never executed or trusted beyond their text.
+  Inferred bonds are marked as inferred, never presented as measured.
+- **Deterministic, GPU-free rules:** parsing, bond inference, picking geometry, display modes, the library and
+  persisted files MUST be testable without GPU access through `swift test`, and drawing never changes the state.
+- **Bounded:** atom and bond counts, mesh detail, the recent list and import size are fixed limits; render targets
+  and draw budgets are capped per quality level.
+- **Offline-first and private:** no networking, accounts, analytics or ads; no download of molecule databases; state
+  and imported molecules are stored only on the device; a file is read only when the person chooses it with the
+  system document picker; no permission beyond what a feature actually needs, each disclosed.
+- **Truthful claims:** structures are illustrative models from stated sources; radii and colours are display
+  conventions with their source; no chemical safety, toxicity, medical or therapeutic claim; performance, memory or
+  battery numbers only from device measurements.
+- **Resilient GPU state:** context loss rebuilds every mesh, buffer and render target from versioned CPU state.
+- **Accessibility:** native SwiftUI controls with VoiceOver labels and Dynamic Type; the molecule, the selected atom
+  with its element and the display mode are spoken; every gesture (orbit, pan, zoom, pick) has a control
+  alternative, including stepping through atoms; information never depends on colour alone (element symbols are
+  shown and spoken); Reduce Motion calms camera moves.
+- **Licenses:** every bundled data set, fact text, palette and shader records its author or source and license.
+- **Regression when VisualCore changes:** any VisualCore change made for this experience MUST be followed by the
+  ProjectM reference regression (at the experience's X gate per the owner ruling of 2026-11-14).
+- **Python only:** repository automation uses Python 3; there is no PowerShell dependency.
+- **One phase at a time:** implement only one Spec Kit phase at a time (one ledger gate, ADR-0004), in order
+  A15-P00 → A15-P06.
+
 ## Governance
 
 - Precedence: real Apple platform and toolchain behavior and observed test results → owner
@@ -835,5 +884,7 @@ ephemeris or live sky position, telescope alignment, or imagery and data taken w
   manual's constitution prompt at gate A13-P00 (feature 095); no principle changes.
 - Amendment 2.10.0 (2026-11-15, MINOR): App-Scoped Rules gain the A14 Solar System Explorer subsection, ratified
   from its manual's constitution prompt at gate A14-P00 (feature 102); no principle changes.
+- Amendment 2.11.0 (2026-11-15, MINOR): App-Scoped Rules gain the A15 Molecular Explorer subsection, ratified
+  from its manual's constitution prompt at gate A15-P00 (feature 109); no principle changes.
 
-**Version**: 2.10.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-15
+**Version**: 2.11.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-15
