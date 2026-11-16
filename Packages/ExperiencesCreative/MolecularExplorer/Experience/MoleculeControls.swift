@@ -33,6 +33,14 @@
 // molecules"; the Labels picker (`labels`: All, Selected, None), which is not an engine action: it sets the label mode
 // through the presenter (the settings store and the overlay); and the stores' messages (`recent-message`,
 // `settings-message`, shown only when there is one).
+// Feature 114 (A15-P05) T-A15-507 (FR-A15-501, FR-A15-540; contracts/import.md): the Import button (`import`, "Import
+// XYZ file", hint "Opens a small XYZ file from Files") shows the system file importer for one `.xyz` or plain-text
+// file (its shown state lives in the mirror, so the view keeps holding references only); the picked file goes to the
+// presenter's `importFile(at:)` and a cancel does nothing. The import's answer (`import-message`, shown only when there
+// is one), the panel line `inferred-note` ("Bonds marked inferred are estimated from atom distances.") under the
+// bonds, the imported molecule in the Molecule menu (molecule 6, by its file's title) and in the Recent menu (through
+// the presenter, which replays the stored copy when the engine holds no import). Previous and Next molecule stay
+// within the library, so both are disabled at the imported molecule.
 // Every control and line has an accessible label and value (controls a hint too) and the identifier
 // `experience.a15.molecular-explorer.<name>` from the port; hit areas are at least 44 points high and text wraps.
 //
@@ -41,6 +49,7 @@
 // (a stored closure never does; feature 108 T-A14-609, docs/automatedtesting.md). Actions go through the presenter.
 import MolecularExplorerCore
 import SwiftUI
+import UniformTypeIdentifiers
 import VisualCoreExperience
 import VisualCoreExperienceHost
 
@@ -81,10 +90,26 @@ struct MoleculeControls: View {
 
     /// The selected molecule in words: "Caffeine, molecule 5 of 5".
     static func moleculeWords(index: Int, count: Int) -> String {
-        "\(MoleculeCore.title(index: index)), molecule \(index + 1) of \(count)"
+        moleculeWords(title: MoleculeCore.title(index: index), index: index, count: count)
     }
 
-    /// The controls, or a progress indicator before the first state.
+    /// The molecule `title` at `index` in words: "Caffeine, molecule 5 of 5"; the imported molecule (index 5) counts
+    /// as molecule 6 of 6 (feature 114).
+    static func moleculeWords(title: String, index: Int, count: Int) -> String {
+        let total = index == MoleculeCore.importedSelection ? MoleculeCore.importedSelection + 1 : count
+        return "\(title), molecule \(index + 1) of \(total)"
+    }
+
+    /// The Import button's label (feature 114).
+    static let importLabel = "Import XYZ file"
+    /// The Import button's hint (feature 114).
+    static let importHint = "Opens a small XYZ file from Files"
+    /// The file types the importer offers: `.xyz` files and plain text (feature 114).
+    static var importTypes: [UTType] {
+        [UTType(filenameExtension: "xyz"), UTType.plainText].compactMap { $0 }
+    }
+
+    /// The controls, or a progress indicator before the first state; the file importer of the Import button.
     var body: some View {
         Group {
             if mirror.ready {
@@ -93,21 +118,28 @@ struct MoleculeControls: View {
                 ProgressView().accessibilityLabel(Text(verbatim: "Loading"))
             }
         }
+        .fileImporter(isPresented: Binding(get: { mirror.importing }, set: { mirror.importing = $0 }),
+                      allowedContentTypes: Self.importTypes, allowsMultipleSelection: false) { result in
+            if case .success(let urls) = result, let url = urls.first { presenter.importFile(at: url) }
+        }
     }
 
     /// The buttons, the menu and the lines.
     @ViewBuilder private var content: some View {
-        let words = Self.moleculeWords(index: mirror.selection, count: mirror.moleculeCount)
-        let atFirst = mirror.selection <= 0
+        let words = Self.moleculeWords(title: mirror.title, index: mirror.selection, count: mirror.moleculeCount)
+        let atImport = mirror.selection >= mirror.moleculeCount
+        let atFirst = mirror.selection <= 0 || atImport
         let atLast = mirror.selection >= mirror.moleculeCount - 1
         VStack(alignment: .leading, spacing: 8) {
             Text(verbatim: "Molecular Explorer").font(.headline).accessibilityAddTraits(.isHeader)
             HStack(spacing: 8) {
                 button("Previous molecule", name: "previous-molecule", value: words,
-                       hint: atFirst ? "Water is the first molecule" : "Selects the previous molecule",
+                       hint: atImport ? "Steps through the library molecules only"
+                           : atFirst ? "Water is the first molecule" : "Selects the previous molecule",
                        enabled: !atFirst) { send("molecule.previous") }
                 button("Next molecule", name: "next-molecule", value: words,
-                       hint: atLast ? "Caffeine is the last molecule" : "Selects the next molecule",
+                       hint: atImport ? "Steps through the library molecules only"
+                           : atLast ? "Caffeine is the last molecule" : "Selects the next molecule",
                        enabled: !atLast) { send("molecule.next") }
             }
             Menu {
@@ -118,6 +150,13 @@ struct MoleculeControls: View {
                         Text(verbatim: Self.moleculeTitles[index])
                     }
                 }
+                if mirror.hasImport {
+                    Button {
+                        send("molecule.select", [Double(MoleculeCore.importedSelection)])
+                    } label: {
+                        Text(verbatim: mirror.importTitle)
+                    }
+                }
             } label: {
                 Text(verbatim: "Molecule")
                     .font(.body)
@@ -126,7 +165,8 @@ struct MoleculeControls: View {
             .buttonStyle(.bordered)
             .accessibilityLabel(Text(verbatim: "Molecule"))
             .accessibilityValue(Text(verbatim: words))
-            .accessibilityHint(Text(verbatim: "Selects any of the five molecules"))
+            .accessibilityHint(Text(verbatim: mirror.hasImport ? "Selects any of the five molecules or the imported one"
+                                        : "Selects any of the five molecules"))
             .accessibilityIdentifier(port.identifier("molecule"))
             line(mirror.nameLine, label: "Name and formula", name: "name", font: .subheadline)
             line(mirror.countsLine, label: "Counts", name: "counts", font: .footnote)
@@ -138,8 +178,13 @@ struct MoleculeControls: View {
             panButtons
             atomButtons
             atomPanel
+            line(MoleculePresenter.inferredNote, label: "Inferred bonds", name: "inferred-note", font: .footnote)
             labelsPicker
             recentMenu
+            importButton
+            if !mirror.importMessage.isEmpty {
+                line(mirror.importMessage, label: "Import message", name: "import-message", font: .footnote)
+            }
             librarySection
             if !mirror.message.isEmpty {
                 line(mirror.message, label: "Message", name: "message", font: .footnote)
@@ -208,13 +253,12 @@ struct MoleculeControls: View {
             if ids.isEmpty {
                 Text(verbatim: Self.noRecentWords)
             } else {
-                ForEach(ids, id: \.self) { id in
-                    if let index = MoleculePresenter.libraryIndex(id: id) {
-                        Button {
-                            send("molecule.select", [Double(index)])
-                        } label: {
-                            Text(verbatim: MoleculeCore.title(index: index))
-                        }
+                ForEach(ids.indices, id: \.self) { position in
+                    Button {
+                        _ = presenter.chooseRecent(ids[position], through: port)
+                    } label: {
+                        Text(verbatim: mirror.recentTitles.indices.contains(position) ? mirror.recentTitles[position]
+                                 : ids[position])
                     }
                 }
             }
@@ -229,6 +273,13 @@ struct MoleculeControls: View {
         .accessibilityHint(Text(verbatim: ids.isEmpty ? "No molecule was opened yet"
                                     : "Opens a recently viewed molecule, newest first"))
         .accessibilityIdentifier(port.identifier("recent"))
+    }
+
+    /// The Import button: shows the system file importer for one XYZ or plain-text file (feature 114).
+    private var importButton: some View {
+        button(Self.importLabel, name: "import", value: mirror.importMessage, hint: Self.importHint, enabled: true) {
+            mirror.importing = true
+        }
     }
 
     /// The Library section: one button per library molecule with its name, formula, counts and source (feature 113;
