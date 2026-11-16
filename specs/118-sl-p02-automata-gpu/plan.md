@@ -9,7 +9,8 @@ Build G-CA-GPU and the phase's Gray-Scott fixture with no VisualCore change:
   9-bit masks and wrap by index modulo), and `GrayScottGPU` (an RGBA16F pair and a step pass, used by the fixture
   only in this phase).
 - **Presenter**: `SimulationPresenter` steps the automaton on the GPU in lockstep with the engine. It loads from the CPU
-  field per clarification 2, displays the GPU field for the automaton through the existing display pass, and keeps the
+  field per clarification 2, displays the GPU field for the automaton through its own display program `SimulationShaders.automatonDisplay` (the
+  GPU field holds red 0 or 255, which the palette display of the other families would mis-colour), and keeps the
   CPU upload for the other two families until A16-P03.
 - **Tests**: parity of N GPU steps against the CPU reference, blinker and glider, pass isolation through
   `FieldPass.runObserver`, rebuild after context recreation and resize, and the Gray-Scott tolerance fixture.

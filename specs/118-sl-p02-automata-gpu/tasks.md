@@ -46,4 +46,4 @@ MVP: the automaton on the GPU with parity (202, 203); isolation (204) and the fi
 
 ## Phase 6: Convergence
 
-- [ ] T-A16-211 Record in `specs/118-sl-p02-automata-gpu/plan.md` (Summary and Project Structure) that the automaton is drawn by its own display program `SimulationShaders.automatonDisplay` (the GPU field holds red 0 or 255, which the palette display of the other families would mis-colour), per plan: Summary (partial)
+- [X] T-A16-211 Record in `specs/118-sl-p02-automata-gpu/plan.md` (Summary and Project Structure) that the automaton is drawn by its own display program `SimulationShaders.automatonDisplay` (the GPU field holds red 0 or 255, which the palette display of the other families would mis-colour), per plan: Summary (partial) — Verified 2026-11-16: 2026-11-16: plan.md records SimulationShaders.automatonDisplay and why, matching the code (SimulationShaders.swift, SimulationPresenter.swift)
