@@ -1257,6 +1257,7 @@ VisualCoreExperienceHost | func | public func announce(_ text: String, kind: Ann
 VisualCoreExperienceHost | func | public func back()
 VisualCoreExperienceHost | func | public func beginDeactivation() throws(ExperienceError)
 VisualCoreExperienceHost | func | public func callAsFunction(width: Int, height: Int) throws(OffscreenRenderError) -> StillImage
+VisualCoreExperienceHost | func | public func cancelPointers()
 VisualCoreExperienceHost | func | public func cancelPreparation()
 VisualCoreExperienceHost | func | public func checkpoint()
 VisualCoreExperienceHost | func | public func close()

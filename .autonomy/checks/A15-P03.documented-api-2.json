@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_documented_api.py",
+    "--sources",
+    "Packages/ExperiencesCreative/MolecularExplorer"
+  ],
+  "command": "python3 scripts/check_documented_api.py --sources Packages/ExperiencesCreative/MolecularExplorer",
+  "elapsed_seconds": 0.985,
+  "exit_code": 0,
+  "finished": "2026-11-16T16:39:56+00:00",
+  "log": ".autonomy/logs/A15-P03.documented-api-2.log",
+  "log_sha256": "a91bb28e12fd937545cf8d310fc69a22918b8266787fedcdb1afe53babe90c46",
+  "name": "documented-api-2",
+  "stage": "A15-P03",
+  "started": "2026-11-16T16:39:55+00:00",
+  "timed_out": false
+}

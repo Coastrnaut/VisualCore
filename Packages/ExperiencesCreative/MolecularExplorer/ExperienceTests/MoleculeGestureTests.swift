@@ -91,6 +91,29 @@ final class MoleculeGestureTests: XCTestCase {
         session.close()
     }
 
+    /// T-A15-313: a finger down when the experience is suspended is forgotten (the shell calls `cancelPointers()`;
+    /// the touch's own cancellation is dropped while suspended), so after resuming a new one-finger drag turns the
+    /// molecule instead of being read as a second finger.
+    func testASuspensionForgetsAFingerThatWasDown() async throws {
+        let session = ExperienceSession()
+        let shell = try await MoleculeTest.open(session)
+        try MoleculeTest.frames(session, 1)
+        let held = [event(7, .began, 200, 40, 0), event(7, .moved, 185, 40, 0.02), event(7, .moved, 170, 40, 0.04)]
+        for item in held { shell.handlePointer(item, viewSize: viewSize) }
+        let before = try MoleculeTest.core(shell).state
+        XCTAssertEqual(before.camera.turnSteps, 2, "30 points of drag send no step yet")
+        session.setScenePhase(.background)
+        XCTAssertEqual(shell.state, .suspended)
+        session.setScenePhase(.active)
+        XCTAssertEqual(shell.state, .active)
+        for item in drag(40, 80, dx: 150, dy: 0, count: 15, t: 1) { shell.handlePointer(item, viewSize: viewSize) }
+        let after = try MoleculeTest.core(shell).state
+        XCTAssertEqual(after.camera.turnSteps, 23, "three turn steps: the old finger was forgotten")
+        XCTAssertEqual(after.camera.zoomSteps, before.camera.zoomSteps, "no pinch was seen")
+        XCTAssertEqual(after.camera.panX, 0)
+        session.close()
+    }
+
     func testAVerticalDragSendsTiltSteps() {
         var gestures = MoleculeGestures()
         let down = Recorder()

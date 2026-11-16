@@ -3,7 +3,9 @@
 // author writes for an experience (GPU objects, drawing, controls, the state in words) and the face every
 // experience shows to the session host. Feature 106 (A14-P04) T-A14-402 (FR-A14-420) adds the optional canvas overlay:
 // `makeCanvasOverlay(_:)` and `Experience.canvasOverlay`, both nil by default (contract
-// specs/106-sse-p04-time-tours/contracts/canvas-overlay.md).
+// specs/106-sse-p04-time-tours/contracts/canvas-overlay.md). Feature 112 (A15-P03) T-A15-313 adds the optional
+// `cancelPointers()`, which the shell calls on suspension: pointer events are dropped while an experience is suspended,
+// so the system's cancellation of the touches would otherwise never reach a presenter that tracks them.
 import SwiftUI
 import VisualCoreDiagnostics
 import VisualCoreExperience
@@ -47,6 +49,10 @@ public protocol ExperiencePresenter: AnyObject {
     /// domain actions with positions normalized to 0…1 of the view and sends them through `port`; it never
     /// changes the state itself. Default: nothing.
     func pointer(_ event: PointerEvent, viewSize: Vec2, port: ExperienceActionPort)
+    /// Forgets every touch in progress (feature 112, T-A15-313): the shell calls it when the experience is
+    /// suspended, because the events of a suspended experience, the touches' cancellation among them, are dropped.
+    /// A presenter that tracks touches resets its gestures here, so nothing more is sent for them. Default: nothing.
+    func cancelPointers()
     /// The action ids a canvas gesture of this experience can send (feature 226, FR-R02F26-010). Default: none.
     var gestureActions: Set<String> { get }
     /// The action ids its native controls can send; every gesture action must be among them
@@ -63,6 +69,8 @@ extension ExperiencePresenter {
     public func probes(_ core: Core) -> [FrameProbe] { [] }
     /// Ignores the event: an experience without canvas input needs no override.
     public func pointer(_ event: PointerEvent, viewSize: Vec2, port: ExperienceActionPort) {}
+    /// Does nothing: a presenter that tracks no touches needs no override.
+    public func cancelPointers() {}
     /// No gesture actions.
     public var gestureActions: Set<String> { [] }
     /// No declared native actions.

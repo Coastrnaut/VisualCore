@@ -1,0 +1,28 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "VisualCoreExperienceHostTests/PointerCancelTests",
+    "VisualCoreExperienceHostTests/CanvasOverlayTests",
+    "VisualCoreExperienceHostTests/ShellLifecycleTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --only-testing VisualCoreExperienceHostTests/PointerCancelTests VisualCoreExperienceHostTests/CanvasOverlayTests VisualCoreExperienceHostTests/ShellLifecycleTests",
+  "elapsed_seconds": 5.734,
+  "exit_code": 0,
+  "finished": "2026-11-16T16:38:33+00:00",
+  "log": ".autonomy/logs/A15-P03.host-pointer-cancel.log",
+  "log_sha256": "ed246af346e2018bebd313e0b2b3b712b4bee58c33f4ddf0ea08018467cc55db",
+  "name": "host-pointer-cancel",
+  "stage": "A15-P03",
+  "started": "2026-11-16T16:38:27+00:00",
+  "timed_out": false
+}

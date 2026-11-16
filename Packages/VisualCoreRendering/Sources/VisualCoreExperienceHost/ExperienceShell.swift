@@ -121,9 +121,11 @@ public final class ExperienceShell<Presenter: ExperiencePresenter>: Experience {
         try engine.activate()
     }
 
-    /// active → suspended: frames are still drawn, no step runs.
+    /// active → suspended: frames are still drawn, no step runs. The presenter forgets every touch in progress
+    /// (`cancelPointers()`), since the events of a suspended experience are dropped (feature 112, T-A15-313).
     public func suspend() throws(ExperienceError) {
         try engine.suspend()
+        presenter.cancelPointers()
     }
 
     /// suspended → active, without catching up on the time spent suspended.

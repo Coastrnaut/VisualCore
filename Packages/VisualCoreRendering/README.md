@@ -320,6 +320,14 @@ surface, inside the canvas's frame, with hit testing off and its elements hidden
 takes a touch, never covers the controls (they sit below the canvas) and the canvas label keeps speaking the state.
 Tested by `CanvasOverlayTests`. Used by Solar System Explorer (A14) for body labels and tour captions.
 
+## Touches forgotten on suspension (feature 112, A15-P03)
+
+Pointer events of a suspended experience are dropped, so the system's cancellation of a touch that was down never
+reaches the presenter. `ExperienceShell.suspend()` therefore calls `ExperiencePresenter.cancelPointers()` once the
+experience is suspended; the default does nothing, and a presenter that tracks touches resets its gestures there, so a
+finger held through a suspension is not mistaken for a second finger after resuming. Tested by `PointerCancelTests`.
+Used by Molecular Explorer (A15).
+
 ## Scenario runner (feature 195, UA-F09)
 
 `ScenarioRunner(session:)` runs a scenario of an experience's manifest in the app's session: every action goes

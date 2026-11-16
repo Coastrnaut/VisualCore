@@ -45,7 +45,7 @@
 //     (`AtomPicker.pick(ndc:camera:aspect:scene:)` through the view point turned into normalised device coordinates
 //     with the view size), so what is tapped is what was seen; a hit sends `atom.select [index]`, a miss sends
 //     `atom.clear` while an atom is selected. Gesture steps go straight to the port: a refusal is dropped quietly (no
-//     answer in the mirror). `teardown` forgets every touch.
+//     answer in the mirror). `teardown` and suspension (`cancelPointers()`, T-A15-313) forget every touch.
 //   - Sticks: in ball-and-stick the scene's styled sticks are drawn (`MoleculeScene.sticks`: one per single or
 //     inferred half, two per double, three per triple, each moved by its offset): the unit stick (built with radius
 //     0.12 Å) turned from +y onto the stick, scaled by radius ÷ 0.12 across (x and z alike) and by the length along y,
@@ -778,6 +778,12 @@ final class MoleculePresenter: ExperiencePresenter {
     var gestureActions: Set<String> { MoleculeGestures.gestureActions }
 
     /// Turns a canvas pointer event into camera steps or a pick sent through `port`.
+    /// Forgets every touch in progress: the shell calls it on suspension (T-A15-313), since the events of a suspended
+    /// experience, the touches' cancellation among them, never arrive.
+    func cancelPointers() {
+        gestures.reset()
+    }
+
     func pointer(_ event: PointerEvent, viewSize: Vec2, port: ExperienceActionPort) {
         pointer(event, viewSize: viewSize) { port.send($0, $1) }
     }

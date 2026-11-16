@@ -1,0 +1,24 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test",
+  "elapsed_seconds": 40.805,
+  "exit_code": 0,
+  "finished": "2026-11-16T16:39:24+00:00",
+  "log": ".autonomy/logs/A15-P03.visualcore-rendering.log",
+  "log_sha256": "f8996fbed1239e9e4f2f78cf80d1038bf5bd2aaef2b9d705ff455f3abbbbd638",
+  "name": "visualcore-rendering",
+  "stage": "A15-P03",
+  "started": "2026-11-16T16:38:43+00:00",
+  "timed_out": false
+}
