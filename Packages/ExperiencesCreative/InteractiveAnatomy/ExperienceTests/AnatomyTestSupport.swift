@@ -32,8 +32,8 @@ enum AnatomyTest {
 
     /// A storage under a fresh temporary directory, so no test reads another's files.
     static func storage() -> ExperienceStorage {
-        let root = FileManager.default.temporaryDirectory
-            .appendingPathComponent("ia-tests-\(UUID().uuidString)", isDirectory: true)
+        AnatomyTemporaryRoot.register()
+        let root = AnatomyTemporaryRoot.url.appendingPathComponent(UUID().uuidString, isDirectory: true)
         return ExperienceStorage(id: id, root: root, defaults: UserDefaults(suiteName: "ia-experience-tests")!)
     }
 
@@ -247,4 +247,27 @@ func anatomyPayload(_ payload: String, key: String, value: Any?) throws -> Data 
     var object = try XCTUnwrap(try JSONSerialization.jsonObject(with: Data(payload.utf8)) as? [String: Any])
     object[key] = value
     return try JSONSerialization.data(withJSONObject: object, options: [.sortedKeys])
+}
+
+/// The one folder that holds every default test storage of `AnatomyTest.storage()` (T-A17-315): removed when the test
+/// bundle finishes, so no run leaves storage folders behind (and any left by an interrupted run are removed first).
+final class AnatomyTemporaryRoot: NSObject, XCTestObservation {
+    /// The folder of the default test storages.
+    static let url = FileManager.default.temporaryDirectory.appendingPathComponent("ia-tests", isDirectory: true)
+    /// The registered observer, once per process.
+    nonisolated(unsafe) private static var observer: AnatomyTemporaryRoot?
+
+    /// Registers the observer on first use and clears a folder left by an earlier, interrupted run.
+    static func register() {
+        guard observer == nil else { return }
+        try? FileManager.default.removeItem(at: url)
+        let made = AnatomyTemporaryRoot()
+        observer = made
+        XCTestObservationCenter.shared.addTestObserver(made)
+    }
+
+    /// Removes the folder when the bundle has run.
+    func testBundleDidFinish(_ testBundle: Bundle) {
+        try? FileManager.default.removeItem(at: Self.url)
+    }
 }
