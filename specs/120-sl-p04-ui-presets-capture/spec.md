@@ -201,7 +201,10 @@ A person captures the paused field as a picture and shares it through the system
 - **FR-A16-402**: Pause and a single step MUST advance exactly one iteration in every family, through the controls.
 - **FR-A16-403**: Each algorithm's deterministic tiny CPU reference MUST stay asserted by a fixture.
 - **FR-A16-410**: An inspector MUST show every parameter of the current family with value, unit and range, and the
-  time step with its limit; an approximation label MUST state grid size, storage precision and boundary.
+  time step with its limit; an approximation label MUST state grid size, storage precision and boundary, reading
+  "Approximation: 64 × 64 cells, exact states (0 or 1), wrap boundary." for the automaton, "Approximation: 64 × 64 cells,
+  half-precision values, wrap boundary, explicit Euler step." for reaction-diffusion and "Approximation: 64 × 64 cells,
+  half-precision values, fixed zero boundary, leapfrog step." for the wave.
 - **FR-A16-411**: The spoken state MUST include running or paused, step count and the parameter values.
 - **FR-A16-412**: The speed MUST be capped at ×1 under Reduce Motion, and the automaton at ×0.25 under Reduce
   Flashing. A faster speed MUST be refused with `a16.reduced-motion` and its sentence.
@@ -209,7 +212,7 @@ A person captures the paused field as a picture and shares it through the system
   (clamped to the end bins), count non-finite cells apart, and update at most once every 15 frames while running.
 - **FR-A16-430**: An experiment preset MUST hold a spec, a palette id and an annotation; bundled presets MUST carry a
   source and a license from an allowed set; saved presets MUST round-trip, migrate from the previous schema and refuse
-  damaged or newer files without a crash; the library MUST keep at most 24; loading a saved preset MUST go through `sim.spec`.
+  damaged or newer files without a crash; a saved preset MUST be deletable; the library MUST keep at most 24; loading a saved preset MUST go through `sim.spec`.
 - **FR-A16-440**: A capture of the paused field MUST write one 1024 × 1024 PNG into `a16-captures`, replacing the previous one, and
   hand it to the share sheet; a failure MUST show a message and leave no file; capturing MUST NOT change the field or
   the step count.
