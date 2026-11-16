@@ -82,8 +82,7 @@ Packages/ExperiencesCreative/SimulationLab/Experience/SimulationShaders.swift   
 Packages/ExperiencesCreative/SimulationLab/Experience/SimulationPresenter.swift                     modify (mirrors, probe, overlay, words)
 Packages/ExperiencesCreative/SimulationLab/Experience/SimulationControls.swift                     modify (time-step row; families disabled)
 Packages/ExperiencesCreative/SimulationLab/Experience/Adapter/SimulationCore.swift                 modify (sim.timestep, a16.unsupported)
-Packages/ExperiencesCreative/SimulationLab/Experience/Adapter/SimulationManifest.swift             modify (time-step entries if needed)
-Packages/ExperiencesCreative/SimulationLab/scenario-manifest.json                                  regenerate (control list)
+Packages/ExperiencesCreative/SimulationLab/scenario-manifest.json                                  regenerate (control list; digests unchanged)
 Packages/ExperiencesCreative/SimulationLab/ExperienceTests/{FloatFieldToleranceTests,WaveBorderTests,
   FloatMirrorTests,FloatUnsupportedTests,TimeStepTests,LegendTests}.swift                          new
 docs/apps/simulation-lab/visualcore-contract.json (G-RDWAVE-GPU closed)                            modify
