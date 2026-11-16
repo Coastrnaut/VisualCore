@@ -23,6 +23,36 @@ Canonical overrides:
 - **Owner rulings:** short tests; audits and device runs in the device campaign; iOS 27 at phase gates; reference
   regression and iOS 26 at X-A16; every Spec Kit step runs. Follow `specs/117-sl-p01-algorithms`.
 
+## Clarifications
+
+### Session 2026-11-16
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+`PingPongTarget` (read and write `RenderTarget`, `swap()`), `FieldPass.run(pair:input:extraInputs:)`,
+`FieldPassError.inputIsOutput` and `FieldPass.runObserver` (each `Run` lists its output and input texture names),
+`Texture.readPixels()` and `readFloatPixels()` (`GPUObjects.swift`), `FloatRenderSupport.detect(in:)` and
+`StoragePrecision.tolerance` (1e-3 for half floats, 1.5/255 for unorm8) exist; GLES leaves float-to-half rounding of
+colour writes implementation-defined (`StoragePrecision.float16TowardZero` documents truncation on the iOS 27.2
+simulator).
+
+- Q: Which side is the engine's truth? → A: The CPU model of A16-P01 stays the truth (snapshots, digests, replays); the
+  GPU field is a mirror stepped in lockstep and drawn; parity is proved by tests, not trusted at run time.
+- Q: When is the GPU field loaded and how far does it step? → A: Loaded from the CPU field at setup, after a context
+  recreation or resize, and whenever the core's field changed other than by stepping (family, preset, reset, restore,
+  a step count that went down or jumped by more than the per-frame cap); otherwise it runs exactly the iterations the
+  engine ran since the last frame (at most 16 per host step × 8 host steps).
+- Q: How is the automaton stored and stepped on the GPU? → A: RGBA8, alive = red 255, dead = 0, read with `texelFetch`
+  and thresholded at 0.5; neighbours wrap by index modulo the grid size (the registry's CLAMP_TO_EDGE is not used for
+  lookup); birth and survival sets passed as two 9-bit masks.
+- Q: What are the Gray-Scott fixture and its tolerance? → A: A 16 × 16 seeded grid in an RGBA16F ping-pong pair (u in
+  red, v in green), 10 steps with `highp` arithmetic, compared with the CPU reference rounded with `float16` and with
+  `float16TowardZero`; it passes when the largest cell difference against either is at most 10 × 1e-3 = 0.01 (one
+  half-float storage step per step). The iOS 27.2 simulator reports float targets; when `FloatRenderSupport` reports
+  none, the fixture fails with the message "Floating-point render targets are not available" rather than skipping
+  silently.
+- Q: How is pass isolation observed? → A: `FieldPass.runObserver` records every run for 10 frames; for every run the
+  output texture name is not among its input names, and step runs alternate between the two targets of the pair.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - The automaton runs on the graphics processor (Priority: P1) 🎯
@@ -72,8 +102,8 @@ tolerance.
 
 1. **Given** the same tiny seeded grid, **When** the same number of steps run on the GPU and the CPU, **Then** the
    largest difference in any cell stays within the documented tolerance.
-2. **Given** floating-point targets are not available, **Then** the comparison is not attempted and the reason is
-   recorded.
+2. **Given** floating-point targets are not available, **Then** the fixture fails with its stated message instead of
+   passing silently.
 
 ### Edge Cases
 
@@ -81,8 +111,8 @@ tolerance.
 - **A refused action:** the GPU field does not change.
 - **Reset or family change:** the GPU field is replaced by the CPU start.
 - **Restore of a saved state:** the GPU field is loaded from the saved field.
-- **Floating-point targets unavailable (fixture only):** the reaction-diffusion comparison reports it; the automaton
-  needs only 8-bit targets.
+- **Floating-point targets unavailable (fixture only):** the reaction-diffusion fixture fails with its message; the
+  automaton needs only 8-bit targets.
 
 ## Requirements *(mandatory)*
 
