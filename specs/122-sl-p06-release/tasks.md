@@ -53,7 +53,7 @@ Precedent: `specs/115-me-p06-release/tasks.md`.
 
   Add a Simulation Lab section to `docs/release/known-limitations.md`: the 64 × 64 grid, half-precision values, the
   stability limits, float targets required for two families, and the device-only items. (FR-A16-620, 622)
-- [ ] T-A16-607 [US3] Write `specs/122-sl-p06-release/scan-claims-release.sh`, scanning the words of Clarifications Q2 over the store text and the controls, presenter, legend and adapter Swift, and checking that every test named in the claims table exists. Run it (`--name sl-claims -- sh specs/122-sl-p06-release/scan-claims-release.sh`). (FR-A16-621; SC-A16-603)
+- [X] T-A16-607 [US3] Write `specs/122-sl-p06-release/scan-claims-release.sh`, scanning the words of Clarifications Q2 over the store text and the controls, presenter, legend and adapter Swift, and checking that every test named in the claims table exists. Run it (`--name sl-claims -- sh specs/122-sl-p06-release/scan-claims-release.sh`). (FR-A16-621; SC-A16-603) — Verified 2026-11-16: 2026-11-16: .autonomy/checks/A16-P06.sl-claims.json exit 0 (no refused word in the store text and the four interface Swift files; 68 proving tests found); the phrase half-precision is removed before matching (clarification Q2, corrected at implement)
 
 ## Phase 5: Story 4 — the interface end to end
 

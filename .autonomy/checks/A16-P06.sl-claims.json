@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "sh",
+    "specs/122-sl-p06-release/scan-claims-release.sh"
+  ],
+  "command": "sh specs/122-sl-p06-release/scan-claims-release.sh",
+  "elapsed_seconds": 0.516,
+  "exit_code": 0,
+  "finished": "2026-11-16T21:32:43+00:00",
+  "log": ".autonomy/logs/A16-P06.sl-claims.log",
+  "log_sha256": "6d568bb5bdbcfacb28c2e427740010e92746a9ed803ce0cb6c66e2f15be2f686",
+  "name": "sl-claims",
+  "stage": "A16-P06",
+  "started": "2026-11-16T21:32:43+00:00",
+  "timed_out": false
+}

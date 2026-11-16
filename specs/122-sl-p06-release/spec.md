@@ -51,7 +51,9 @@ in code:
   - real-time, realistic, scientific-grade;
   - fps, frames per second, battery.
 
-  "exact" stays allowed, because the automaton's states are exact and its label says so. The shared copy check runs
+  "exact" stays allowed, because the automaton's states are exact and its label says so. "half-precision" stays
+  allowed too: it is the storage format the approximation label names, so the scan removes that phrase before
+  matching "precision" (corrected at implement). The shared copy check runs
   with `share` allowed (the capture's share sheet). Every test named in the claims table must exist.
 - Q: What does the source scan refuse? → A: In `Packages/ExperiencesCreative/SimulationLab`, the A15 list:
   `URLSession`, `import Network`, `CLLocation`, `AVCapture`, `AVAudioRecorder`, `inputNode`, `installTap`, `CMMotion`,
