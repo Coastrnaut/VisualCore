@@ -51,4 +51,4 @@ leak (509) and review (504, 510). Review checkpoints after 503 (core tests), 507
 
 ## Phase 5: Convergence
 
-- [ ] T-A15-516 Extend `ExperienceTests/MoleculeWordsTests.swift` to read the experience's Swift sources (`Experience/*.swift`, `Experience/Adapter/*.swift`, found from `#filePath`) and check every string literal — the inline accessibility labels, values and hints of `MoleculeControls` included — for `MoleculeReview.claimWords`, so no shown word escapes the domain check per FR-A15-521 (partial)
+- [X] T-A15-516 Extend `ExperienceTests/MoleculeWordsTests.swift` to read the experience's Swift sources (`Experience/*.swift`, `Experience/Adapter/*.swift`, found from `#filePath`) and check every string literal — the inline accessibility labels, values and hints of `MoleculeControls` included — for `MoleculeReview.claimWords`, so no shown word escapes the domain check per FR-A15-521 (partial) — Verified 2026-11-16: 2026-11-16: .autonomy/checks/A15-P05.me-ios27-4.json exit 0 (117 core, 103 experience tests; MoleculeWordsTests.testNoStringLiteralInTheSourcesHoldsAClaimWord passes over every string literal of Experience/ and Experience/Adapter/)

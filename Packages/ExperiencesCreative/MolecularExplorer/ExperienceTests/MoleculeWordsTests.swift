@@ -8,7 +8,8 @@
 // and storage code; the answers to refused actions; the camera, zoom and pan words; the controls' static labels and
 // hints; and the lines of a molecule imported into a core. None holds a claim word of `MoleculeReview.claimWords`, and
 // the panel shows both statements (the legend ends with `MoleculeReview.displayStatement`, the `inferred-note` line
-// is `MoleculeReview.inferredStatement`). Plain loops, no session, no prompt, no network; well under a second.
+// is `MoleculeReview.inferredStatement`). T-A15-516 adds a scan of every string literal in the experience's sources,
+// so the inline control labels and hints are checked too. Plain loops, no session, no prompt, no network; well under a second.
 import Foundation
 import XCTest
 @testable import MolecularExplorerExperience
@@ -226,5 +227,43 @@ final class MoleculeWordsTests: XCTestCase {
             XCTAssertTrue(presenter.mirror.legend.hasSuffix(MoleculeReview.displayStatement), presenter.mirror.legend)
             XCTAssertEqual(MoleculeReview.claimWords(in: presenter.mirror.legend), [])
         }
+    }
+
+    /// Every string literal in the experience's Swift sources (`Experience/*.swift` and `Experience/Adapter/*.swift`,
+    /// found from `#filePath`), the inline accessibility labels, values and hints of `MoleculeControls` included, holds
+    /// no claim word (T-A15-516, FR-A15-521). Comment lines are skipped; publishers' names are removed as above.
+    func testNoStringLiteralInTheSourcesHoldsAClaimWord() throws {
+        let experience = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+            .appendingPathComponent("Experience")
+        var folders: [URL] = [experience, experience.appendingPathComponent("Adapter")]
+        var files: [URL] = []
+        while let folder = folders.popLast() {
+            let names = try FileManager.default.contentsOfDirectory(atPath: folder.path)
+            for name in names where name.hasSuffix(".swift") {
+                files.append(folder.appendingPathComponent(name))
+            }
+        }
+        XCTAssertGreaterThanOrEqual(files.count, 8, "the experience's sources were found")
+        let literal = try NSRegularExpression(pattern: #""((?:[^"\\]|\\.)*)""#)
+        var literals = 0
+        for file in files {
+            let text = try String(contentsOf: file, encoding: .utf8)
+            var number = 0
+            for line in text.components(separatedBy: "\n") {
+                number += 1
+                let trimmed = line.trimmingCharacters(in: .whitespaces)
+                if trimmed.hasPrefix("//") { continue }
+                let range = NSRange(line.startIndex..., in: line)
+                for match in literal.matches(in: line, range: range) {
+                    guard let found = Range(match.range(at: 1), in: line) else { continue }
+                    var words = String(line[found])
+                    for publisher in publishers { words = words.replacingOccurrences(of: publisher, with: "") }
+                    literals += 1
+                    XCTAssertEqual(MoleculeReview.claimWords(in: words), [],
+                                   "\(file.lastPathComponent):\(number): \(words)")
+                }
+            }
+        }
+        XCTAssertGreaterThan(literals, 200, "the string literals were read")
     }
 }
