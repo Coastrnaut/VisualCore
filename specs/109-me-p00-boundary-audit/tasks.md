@@ -7,7 +7,7 @@ after every task (no trailers); read every check's exit before ticking. No Swift
 
 ## Phase 1: Setup
 
-- [ ] T-A15-001 Create `docs/apps/molecular-explorer/README.md` (what the experience is per the manual §1–§2: an approachable 3D molecule viewer with clear atom and bond styling and constrained structured-data import; that it is an experience of the one app; its documents) and `docs/apps/molecular-explorer/regression-baseline.md` with the phase start `fc60a33d` (the specify commit; constitution `aaeeb3a7`) and the reference pin `d93edd1`
+- [X] T-A15-001 Create `docs/apps/molecular-explorer/README.md` (what the experience is per the manual §1–§2: an approachable 3D molecule viewer with clear atom and bond styling and constrained structured-data import; that it is an experience of the one app; its documents) and `docs/apps/molecular-explorer/regression-baseline.md` with the phase start `fc60a33d` (the specify commit; constitution `aaeeb3a7`) and the reference pin `d93edd1` — Verified 2026-11-15: docs/apps/molecular-explorer/README.md (manual §1–§2 goal, audiences, version 0.1 features, non-goals, one-app placement, documents) and regression-baseline.md (phase start fc60a33d after constitution aaeeb3a7, pin d93edd1, the seven steps)
 
 ## Phase 3: User Story 1 — Evidence-backed integration matrix (P1) 🎯
 
