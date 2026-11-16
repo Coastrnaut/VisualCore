@@ -17,7 +17,7 @@ Precedent: `specs/117-sl-p01-algorithms/tasks.md`.
 
 ## Phase 3: Story 2 — pass isolation
 
-- [ ] T-A16-204 [US2] Create `Packages/ExperiencesCreative/SimulationLab/ExperienceTests/PassIsolationTests.swift` (`FieldPass.runObserver` over 10 frames of the running automaton: no run's output name is among its input names; step runs alternate between the two targets) (FR-A16-203; SC-A16-203)
+- [X] T-A16-204 [US2] Create `Packages/ExperiencesCreative/SimulationLab/ExperienceTests/PassIsolationTests.swift` (`FieldPass.runObserver` over 10 frames of the running automaton: no run's output name is among its input names; step runs alternate between the two targets) (FR-A16-203; SC-A16-203) — Verified 2026-11-16: 2026-11-16: .autonomy/checks/A16-P02.sl-ios27.json exit 0 (41 core, 14 Swift Testing and 46 XCTest experience tests, 0 failures, slowest 0.95 s, iOS 27); PassIsolationTests (10 frames: no run reads its output; steps alternate two targets; inputIsOutput refused)
 
 ## Phase 4: Story 3 — the Gray-Scott fixture
 
