@@ -168,7 +168,9 @@ will own each missing piece and in which phase.
 - **FR-A16-006**: The contract MUST record negative rules (no EGL path of its own, no second renderer, no ProjectM, no
   networking, no claim of scientific accuracy, prediction or certification, no high-precision cluster computation, no
   multi-user experiments, no pass that reads the texture it writes, no purchased, generated or hand-made images,
-  textures or artwork, no unlicensed presets or copy) and a stop/go decision with reasons.
+  textures or artwork, no unlicensed presets or copy), the manual's three risks (precision and filtering, read-write
+  feedback, authoritative-looking visuals) each with an owner, a verification method and a release-blocker condition,
+  and a stop/go decision with reasons.
 - **FR-A16-007**: The contract MUST pass the app-neutral contract checker, and its readable view MUST be generated from
   it.
 - **FR-A16-008**: This phase MUST NOT change VisualCore or ProjectM (empty diff since the phase start).
