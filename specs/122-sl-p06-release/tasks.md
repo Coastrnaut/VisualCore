@@ -21,7 +21,7 @@ Precedent: `specs/115-me-p06-release/tasks.md`.
     `SimulationShaders.swift`, `GrayScottGPU.swift` and `WaveGPU.swift` (original code).
 
   (FR-A16-603)
-- [ ] T-A16-603 [US1] Write `specs/122-sl-p06-release/scan-sources-release.sh` refusing the uses of Clarifications Q3 in `Packages/ExperiencesCreative/SimulationLab` and run it (`--name sl-no-network -- sh specs/122-sl-p06-release/scan-sources-release.sh`) (FR-A16-601; SC-A16-601)
+- [X] T-A16-603 [US1] Write `specs/122-sl-p06-release/scan-sources-release.sh` refusing the uses of Clarifications Q3 in `Packages/ExperiencesCreative/SimulationLab` and run it (`--name sl-no-network -- sh specs/122-sl-p06-release/scan-sources-release.sh`) (FR-A16-601; SC-A16-601) — Verified 2026-11-16: 2026-11-16: .autonomy/checks/A16-P06.sl-no-network.json exit 0 (no scanned use in 61 Swift files of Packages/ExperiencesCreative/SimulationLab)
 
 ## Phase 3: Story 2 — saved data and failures
 

@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "sh",
+    "specs/122-sl-p06-release/scan-sources-release.sh"
+  ],
+  "command": "sh specs/122-sl-p06-release/scan-sources-release.sh",
+  "elapsed_seconds": 0.035,
+  "exit_code": 0,
+  "finished": "2026-11-16T21:26:46+00:00",
+  "log": ".autonomy/logs/A16-P06.sl-no-network.log",
+  "log_sha256": "2f8d1faeb3a02505617c981557318542d715bd38630ab65522bc10a215fb90e8",
+  "name": "sl-no-network",
+  "stage": "A16-P06",
+  "started": "2026-11-16T21:26:46+00:00",
+  "timed_out": false
+}
