@@ -8,7 +8,7 @@ Precedent: `specs/110-me-p01-domain-parser/tasks.md`.
 
 ## Phase 1: Setup
 
-- [ ] T-A16-101 Baseline: cite the A16-P00 evidence on an unchanged `Packages` tree (`.autonomy/checks/A16-P00.{app-build,no-change}.json`) instead of a rerun (owner ruling of 2026-11-14)
+- [X] T-A16-101 Baseline: cite the A16-P00 evidence on an unchanged `Packages` tree (`.autonomy/checks/A16-P00.{app-build,no-change}.json`) instead of a rerun (owner ruling of 2026-11-14) — Verified 2026-11-16: 2026-11-16: A16-P00 evidence cited on an unchanged Packages tree: .autonomy/checks/A16-P00.app-build.json and A16-P00.no-change.json, both exit 0
 
 ## Phase 2: Foundational — the core (stories 2–4)
 
