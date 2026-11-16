@@ -185,6 +185,8 @@ will own each missing piece and in which phase.
     or hand-modelled meshes, textures or images, and no unsourced or unlicensed content text;
   - the manual's three risks, each with an owner, a verification method and a release-blocker condition: medical
     mistakes misinform, purchased assets carry redistribution rights, and 3D labels overlap;
+  - the clinical review of the content text as a person's action (owner `owner-action`), with the not-reviewed
+    label until it is done;
   - a stop/go decision with reasons.
 - **FR-A17-007**: The contract MUST pass the app-neutral contract checker, and its readable view MUST be generated from
   it.
