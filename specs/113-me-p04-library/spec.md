@@ -22,6 +22,36 @@ Canonical overrides:
 - **Owner rulings:** short tests; audits and device runs in the device campaign; iOS 27 at phase gates; reference
   regression and iOS 26 at X-A15; every Spec Kit step runs.
 
+## Clarifications
+
+### Session 2026-11-16
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+`ExperienceStorage.write(_:to:)` replaces a file atomically, `read(_:)`, `exists(_:)` and `remove(_:)` work inside the
+experience's own folder; Solar System Explorer's `ViewStore` keeps one small versioned document there with missing,
+refused and unreadable results, never writing on a load, and keeps bytes in memory without storage; the recent list and
+the settings follow that pattern.
+
+- Q: What are the recent list's cap and file? → A: At most 8 molecule ids, newest first, in `recent.json` (document
+  schema 1, sorted keys, at most 2,048 bytes); the molecule opened at start counts as opened; ids not in the library are
+  dropped when the list is read.
+- Q: What does the settings document hold? → A: `settings.json` (schema 1, at most 1,024 bytes) with the label mode:
+  `all` (default), `selected` (only the selected atom's label) or `none`; the selection ring is always drawn when an
+  atom is selected.
+- Q: How are refusals and failed writes reported? → A: A recent or settings file that is damaged, oversized, of a newer
+  schema or out of range is refused with that reason (`damaged`, `oversized`, `newer-version`, `out-of-range`) and left
+  byte for byte; the message reads "Recent molecules could not be read (damaged)." or "Settings could not be read
+  (damaged); labels are shown for all atoms." A failed write keeps the previous file and reads "Recent molecules could
+  not be saved (<storage code>)."
+- Q: What are the controls? → A: A Library section listing each molecule as a button with its name, formula, counts
+  and "Source: PubChem Compound CID 2519, 3D conformer — public domain" (choosing one sends `molecule.select`); a Recent
+  menu (`recent`) listing the recent titles newest first (choosing one sends `molecule.select`; empty → "No recent
+  molecules"); a Labels picker (`labels`: All, Selected, None). None of them is an engine action except
+  `molecule.select`.
+- Q: How is determinism of bond inference proven? → A: For each library molecule, five seeded shuffles of its atoms
+  (fixed seeds 1 to 5): the inferred pairs mapped back through the shuffle equal the unshuffled inferred pairs and the
+  recorded bonds, every bond is inferred and single, and two runs on the same input give identical lists.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Browse the library with its sources (Priority: P1) 🎯
