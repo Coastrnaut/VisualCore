@@ -25,6 +25,14 @@
 // atom 3 of 24" or "No atom selected"; the selected atom's panel (`atom-panel`: its name and place, position and radii
 // lines, or "No atom selected") and one line per bond (`atom-bond-<n>`, n = 1, 2, …: "Single bond to carbon, atom 8,
 // recorded"). The canvas gestures send the same actions as these buttons (`GestureAlternatives.missing` is empty).
+// Feature 113 (A15-P04) T-A15-405 (FR-A15-401, FR-A15-420, FR-A15-440; clarification Q4; contracts/library.md):
+// the Library section, one button per library molecule (`library-<id>` → `molecule.select [index]`, as the Molecule
+// menu sends it) whose words are the name and formula ("Caffeine — C8H10N4O2"), the counts ("24 atoms, 25 bonds") and
+// the source ("Source: PubChem Compound CID 2519, 3D conformer — public domain", from the molecule's source record);
+// the Recent menu (`recent` → `molecule.select [index]`) listing the recent titles newest first, or "No recent
+// molecules"; the Labels picker (`labels`: All, Selected, None), which is not an engine action: it sets the label mode
+// through the presenter (the settings store and the overlay); and the stores' messages (`recent-message`,
+// `settings-message`, shown only when there is one).
 // Every control and line has an accessible label and value (controls a hint too) and the identifier
 // `experience.a15.molecular-explorer.<name>` from the port; hit areas are at least 44 points high and text wraps.
 //
@@ -53,6 +61,22 @@ struct MoleculeControls: View {
     static func sentence(_ status: String) -> String {
         guard let first = status.first else { return "Loading" }
         return first.uppercased() + String(status.dropFirst())
+    }
+
+    /// The words of the library entry at `index`: the name and formula line, the counts line and "Source: " with the
+    /// source line ("Source: PubChem Compound CID 2519, 3D conformer — public domain"); empty outside the library.
+    static func libraryWords(index: Int) -> [String] {
+        guard MoleculeCore.molecule(index: index) != nil else { return [] }
+        return [MoleculeCore.nameLine(index: index), MoleculeCore.countsLine(index: index),
+                "Source: " + MoleculeCore.sourceLine(index: index)]
+    }
+
+    /// The words of an empty Recent menu.
+    static let noRecentWords = "No recent molecules"
+
+    /// The Recent menu's value: the recent titles newest first, joined by commas, or "No recent molecules".
+    static func recentValue(_ titles: [String]) -> String {
+        titles.isEmpty ? noRecentWords : titles.joined(separator: ", ")
     }
 
     /// The selected molecule in words: "Caffeine, molecule 5 of 5".
@@ -114,8 +138,17 @@ struct MoleculeControls: View {
             panButtons
             atomButtons
             atomPanel
+            labelsPicker
+            recentMenu
+            librarySection
             if !mirror.message.isEmpty {
                 line(mirror.message, label: "Message", name: "message", font: .footnote)
+            }
+            if !mirror.recentMessage.isEmpty {
+                line(mirror.recentMessage, label: "Recent molecules message", name: "recent-message", font: .footnote)
+            }
+            if !mirror.settingsMessage.isEmpty {
+                line(mirror.settingsMessage, label: "Settings message", name: "settings-message", font: .footnote)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -142,6 +175,89 @@ struct MoleculeControls: View {
         .accessibilityHint(Text(verbatim: "Ball and stick shows small atoms joined by sticks; space filling shows "
                                     + "atoms at their van der Waals radius"))
         .accessibilityIdentifier(port.identifier("display-mode"))
+    }
+
+    /// The segmented Labels picker: All, Selected and None (feature 113; not an engine action: the presenter writes
+    /// the settings and filters the overlay's labels).
+    private var labelsPicker: some View {
+        Picker(selection: Binding(get: { mirror.labelMode },
+                                  set: { mode in
+                                      guard mode != mirror.labelMode else { return }
+                                      presenter.setLabelMode(mode)
+                                  })) {
+            ForEach(LabelMode.allCases, id: \.rawValue) { mode in
+                Text(verbatim: MoleculePresenter.labelTitle(mode)).tag(mode)
+            }
+        } label: {
+            Text(verbatim: "Labels")
+        }
+        .pickerStyle(.segmented)
+        .frame(minHeight: 44)
+        .accessibilityLabel(Text(verbatim: "Labels"))
+        .accessibilityValue(Text(verbatim: MoleculePresenter.labelTitle(mirror.labelMode)))
+        .accessibilityHint(Text(verbatim: "Shows element labels for all atoms, only the selected atom, or none"))
+        .accessibilityIdentifier(port.identifier("labels"))
+    }
+
+    /// The Recent menu: the recent molecules newest first (each sends `molecule.select [index]`), or "No recent
+    /// molecules" (feature 113).
+    private var recentMenu: some View {
+        let ids = mirror.recentIDs
+        let value = Self.recentValue(mirror.recentTitles)
+        return Menu {
+            if ids.isEmpty {
+                Text(verbatim: Self.noRecentWords)
+            } else {
+                ForEach(ids, id: \.self) { id in
+                    if let index = MoleculePresenter.libraryIndex(id: id) {
+                        Button {
+                            send("molecule.select", [Double(index)])
+                        } label: {
+                            Text(verbatim: MoleculeCore.title(index: index))
+                        }
+                    }
+                }
+            }
+        } label: {
+            Text(verbatim: "Recent")
+                .font(.body)
+                .frame(maxWidth: .infinity, minHeight: 44)
+        }
+        .buttonStyle(.bordered)
+        .accessibilityLabel(Text(verbatim: "Recent"))
+        .accessibilityValue(Text(verbatim: value))
+        .accessibilityHint(Text(verbatim: ids.isEmpty ? "No molecule was opened yet"
+                                    : "Opens a recently viewed molecule, newest first"))
+        .accessibilityIdentifier(port.identifier("recent"))
+    }
+
+    /// The Library section: one button per library molecule with its name, formula, counts and source (feature 113;
+    /// each sends `molecule.select [index]`, as the Molecule menu does).
+    @ViewBuilder private var librarySection: some View {
+        Text(verbatim: "Library").font(.headline).accessibilityAddTraits(.isHeader)
+        ForEach(Self.moleculeTitles.indices, id: \.self) { index in
+            let words = Self.libraryWords(index: index)
+            let id = MoleculeCore.library[index].id
+            Button {
+                send("molecule.select", [Double(index)])
+            } label: {
+                VStack(alignment: .leading, spacing: 2) {
+                    ForEach(words.indices, id: \.self) { line in
+                        Text(verbatim: words[line])
+                            .font(line == 0 ? .body : .footnote)
+                            .multilineTextAlignment(.leading)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+                .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+            }
+            .buttonStyle(.bordered)
+            .accessibilityLabel(Text(verbatim: MoleculeCore.title(index: index)))
+            .accessibilityValue(Text(verbatim: words.joined(separator: "; ")))
+            .accessibilityHint(Text(verbatim: index == mirror.selection ? "This molecule is open"
+                                        : "Opens this molecule"))
+            .accessibilityIdentifier(port.identifier("library-\(id)"))
+        }
     }
 
     /// Turn left and right, Tilt up and down, Zoom in and out, and Reset view.
