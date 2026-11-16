@@ -23,6 +23,42 @@ Canonical overrides:
 - **Owner rulings:** short tests; audits and device runs in the device campaign; iOS 27 at phase gates; reference
   regression and iOS 26 at X-A16; every Spec Kit step runs. Follow `specs/110-me-p01-domain-parser`.
 
+## Clarifications
+
+### Session 2026-11-16
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+`VisualCoreParameters` `ParameterDefinition` (name, title, unit, minimum, maximum, …) and `ParameterError`;
+`VisualCoreSimulation` `SeededRandom(seed:)` over `SplitMix64`, `FieldGrid` with `StoragePrecision` (float32, float16,
+float16TowardZero, unorm8), `TimeStepPolicy`, `PlaybackState`, `FixedStepClock` and `FixedStepRunner`; `VisualCoreMath`
+`NumericHygiene`; the engine steps a core at its declared `stepDuration` (brought into 1/240…1/30 s) with at most 8 host
+steps per frame (`ExperienceEngine`); `Texture.upload(rgba:)` writes RGBA8 pixels (`GPUObjects.swift`).
+
+- Q: What is the cellular-automaton rule? → A: Two states on a square grid, the eight-cell (Moore) neighbourhood and an
+  outer-totalistic birth/survival rule written B…/S…, with a wrap boundary; presets Life B3/S23 (default), HighLife
+  B36/S23 and Seeds B2/S; the start is a seeded fill with density 0.25 through `SeededRandom`; storage `unorm8` (exact
+  0 and 1).
+- Q: What are the Gray-Scott equations and limits? → A: u′ = u + Δt (Dᵤ∇²u − uv² + F(1 − u)), v′ = v + Δt (Dᵥ∇²v + uv²
+  − (F + k)v), ∇² the five-point stencil (four neighbours minus four times the centre, cell spacing 1), wrap boundary,
+  Dᵤ = 0.16, Dᵥ = 0.08, default Δt = 1.0; stability bound Δt · 4 · max(Dᵤ, Dᵥ) ≤ 1 (Δt ≤ 1.5625), larger Δt refused;
+  F and k each in 0…0.1 (presets Spots F 0.035, k 0.065 and Mazes F 0.029, k 0.057); after each step u and v are
+  clamped to 0…1 and rounded to `float16`; the start is u = 1, v = 0 with six seeded 4 × 4 patches of u = 0.5, v = 0.25.
+- Q: What is the wave scheme and its limit? → A: Leapfrog uⁿ⁺¹ = (2uⁿ − uⁿ⁻¹ + C²∇²uⁿ)(1 − γ) with Courant number
+  C = c · Δt / Δx (Δx = 1), the five-point stencil and a fixed zero border; stability C ≤ 1/√2 (≈ 0.7071), larger C
+  refused with the sentence "The wave step is too large: the Courant number must stay at or below 0.707."; defaults
+  c = 1, Δt = 0.5 (C = 0.5), damping γ in 0…0.05 (default 0.002); the start is a Gaussian pulse (σ = 3 cells, amplitude
+  1) at a seeded position; storage `float16`. "Energy does not grow" means the discrete leapfrog energy Σ(uⁿ⁺¹ − uⁿ)² +
+  C² Σ over neighbour pairs (uⁿ⁺¹ᵢ − uⁿ⁺¹ⱼ)(uⁿᵢ − uⁿⱼ) stays within 10⁻³ of its start (relative) with γ = 0 on the
+  CPU in `float32`, and never increases with γ > 0.
+- Q: What are the grid sizes and the speed rule? → A: Grid sizes 16, 32, 64, 128 or 256 cells per side; the experience
+  runs 64 × 64 on the CPU in this phase (larger sizes need the GPU passes of A16-P02 and A16-P03 and are refused here);
+  the core's step is 1/60 s; speed is one of 0.25, 0.5, 1, 2 or 4 times the family's base rate (automata 10, reaction-
+  diffusion 240, wave 120 iterations per second); whole iterations are run per host step, at most 16, and a remainder
+  beyond the cap is dropped, never carried into a burst.
+- Q: What does the saved state hold? → A: The spec, the scheduler (running, speed, step count) and the field itself
+  (the storage bit patterns of each channel, as base64), at most 1,048,576 bytes; a restore checks the spec, the sizes
+  and every value (finite, within range) and refuses otherwise, so replay never has to re-run thousands of steps.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Watch three kinds of simulation (Priority: P1) 🎯
@@ -156,8 +192,8 @@ non-finite value is refused or clamped with a visible explanation, and the field
 
 - **SC-A16-101**: The blinker equals its start after exactly 2 steps and differs after 1; a block is unchanged after 10.
 - **SC-A16-102**: The Gray-Scott step matches the hand-computed values in 100 % of cells within one storage step.
-- **SC-A16-103**: Over 100 wave steps below the limit the pulse stays mirror-symmetric and the energy never exceeds its
-  start; at the limit plus 1 % the step is refused.
+- **SC-A16-103**: Over 100 wave steps at C = 0.5 the pulse stays mirror-symmetric and the discrete energy stays within
+  10⁻³ of its start with no damping; a Courant number 1 % above 0.7071 is refused.
 - **SC-A16-104**: 100 % of invalid settings are refused with an explanation and leave the digest unchanged.
 - **SC-A16-105**: The runner's standard scenarios pass on iOS 27; every test runs in under 10 s.
 
