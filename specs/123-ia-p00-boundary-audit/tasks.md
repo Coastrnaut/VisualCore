@@ -8,7 +8,7 @@ Precedent: `specs/116-sl-p00-boundary-audit/tasks.md`.
 
 ## Phase 1: Setup
 
-- [ ] T-A17-001 Create `docs/apps/interactive-anatomy/README.md` (what the experience is per the manual §1–§2: a labelled, layer-controlled 3D reference of one anatomy region (the right knee joint, procedural schematic geometry) with plain-language cited descriptions, educational and not medical; that it is an experience of the one app; its documents) and `docs/apps/interactive-anatomy/regression-baseline.md` with the phase start `f437fd0b` (the specify commit; constitution `a834dda9`) and the reference pin `d93edd1`
+- [X] T-A17-001 Create `docs/apps/interactive-anatomy/README.md` (what the experience is per the manual §1–§2: a labelled, layer-controlled 3D reference of one anatomy region (the right knee joint, procedural schematic geometry) with plain-language cited descriptions, educational and not medical; that it is an experience of the one app; its documents) and `docs/apps/interactive-anatomy/regression-baseline.md` with the phase start `f437fd0b` (the specify commit; constitution `a834dda9`) and the reference pin `d93edd1` — Verified 2026-11-16: 2026-11-16: docs/apps/interactive-anatomy/README.md and regression-baseline.md written (phase start f437fd0b, constitution a834dda9, reference pin d93edd1); validate_docs.py PASS
 
 ## Phase 3: User Story 1 — Evidence-backed integration matrix (P1) 🎯
 
