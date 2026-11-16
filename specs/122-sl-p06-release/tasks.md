@@ -32,7 +32,7 @@ Precedent: `specs/115-me-p06-release/tasks.md`.
   - a new session over the same storage lists it, and `sim.spec` opens it.
 
   (FR-A16-610)
-- [ ] T-A16-605 [P] [US2] Commit `ExperienceTests/Fixtures/preset-{valid,newer,damaged,invalid}.json` and `state-{valid,newer,damaged}.json`, declare the `Fixtures` resource of `SimulationLabExperienceTests` in `Packages/ExperiencesCreative/Package.swift`, and add `ExperienceTests/StoredFileSampleTests.swift`:
+- [X] T-A16-605 [P] [US2] Commit `ExperienceTests/Fixtures/preset-{valid,newer,damaged,invalid}.json` and `state-{valid,newer,damaged}.json`, declare the `Fixtures` resource of `SimulationLabExperienceTests` in `Packages/ExperiencesCreative/Package.swift`, and add `ExperienceTests/StoredFileSampleTests.swift`: — Verified 2026-11-16: 2026-11-16: .autonomy/checks/A16-P06.sl-ios27.json exit 0 (62 core, 23 Swift Testing and 69 XCTest experience tests, 0 failures, slowest 6.6 s); StoredFileSampleTests (seven samples bundled, regenerated from code with UPDATE_FIXTURES=1: preset valid listed, newer, damaged and invalid reported; state valid restores, newer and damaged refused; every file byte-identical afterwards); Fixtures resource in Package.swift
   - presets, answered by `SimulationPresetStore` over a temporary storage: valid listed; newer, damaged and invalid
     reported;
   - states, answered by `SimulationCore.restore`: valid restores; newer and damaged refused with their reasons;
