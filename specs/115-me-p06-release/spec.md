@@ -162,7 +162,8 @@ an atom, open a recent molecule and change the label setting, each in under 60 s
 - **FR-A15-611**: A forced drawing failure (test-only seam) MUST fail the session with the stored files unchanged, and a
   reopen MUST draw normally.
 - **FR-A15-612**: Saved sessions of schemas 1 to 3 MUST open in schema 4 (stored examples).
-- **FR-A15-620**: A release checklist with an artifact inventory, store text with a claim → test table, the device plan
+- **FR-A15-620**: A release checklist with an artifact inventory (every document of the release configuration, the
+  sealed evidence of A15-P00 to A15-P06, the two scan scripts and the interface suites), store text with a claim → test table, the device plan
   and a release configuration MUST exist and pass the release-document check; its `owner-action` rows are the signing
   set-up, the archive and its upload, recorded as BLOCKED_OWNER_ACTION and never done by the agent; its
   `pending-campaign-ii` rows name the device-campaign rows.
