@@ -64,7 +64,7 @@ Precedent: `specs/115-me-p06-release/tasks.md`.
 
 ## Phase 6: Records
 
-- [ ] T-A16-612 Contract: G-RELEASE closed by "A16-P06"; rows whose gaps are all closed become available (`--name contract -- python3 scripts/check_app_contract.py --app simulation-lab --render`); script tests (`--name script-tests -- python3 scripts/test_scripts.py`)
+- [X] T-A16-612 Contract: G-RELEASE closed by "A16-P06"; rows whose gaps are all closed become available (`--name contract -- python3 scripts/check_app_contract.py --app simulation-lab --render`); script tests (`--name script-tests -- python3 scripts/test_scripts.py`) — Verified 2026-11-16: 2026-11-16: .autonomy/checks/A16-P06.contract.json exit 0 (G-RELEASE closed by A16-P06; all 11 gaps closed and all 26 rows available) and A16-P06.script-tests.json exit 0
 
 ## Dependencies
 

@@ -1224,7 +1224,7 @@
       "id": "M22",
       "capability": "Licenses: every bundled preset, palette, fact text and shader records its author or source and license, checked by a test and listed in the acknowledgements",
       "source": "cross-cutting: licenses; constitution A16 licenses; manual §13 cross-cutting obligations",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AcknowledgementsView.swift",
@@ -1243,13 +1243,13 @@
         "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Core/SourceRecords.swift",
         "symbol": "SourceRecord"
       },
-      "notes": "The license inventory and acknowledgements screen exist and are tested (AcknowledgementsViewTests); they record code and asset licenses, not per-preset authors. The preset author and license fields are G-PRESETS (A16-P04); the release license review is G-RELEASE (A16-P06); all app-local."
+      "notes": "The license inventory and acknowledgements screen exist and are tested (AcknowledgementsViewTests); they record code and asset licenses, not per-preset authors. The preset author and license fields are G-PRESETS (A16-P04); the release license review is G-RELEASE (A16-P06); all app-local. Available from A16-P06: its gaps (G-PRESETS, G-RELEASE) are closed."
     },
     {
       "id": "M23",
       "capability": "Truthful educational labels: every experiment is labelled as an educational approximation with its method (stencil, scheme, rule), boundary, precision and limits, visible and spoken; no claim of scientific accuracy, prediction or certification; performance numbers only from device measurements",
       "source": "cross-cutting: truthful educational labels; constitution A16 truthful claims; manual §13 risk 3",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
@@ -1274,7 +1274,7 @@
         "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Core/ScientificReview.swift",
         "symbol": "ScientificReview"
       },
-      "notes": "Announcements, state signs and the license inventory exist and are tested (AccessibilityPlansTests, AcknowledgementsViewTests). The labels are experience copy shown in G-UI (A16-P04); the copy review and the copy-claims release step are G-RELEASE (A16-P06)."
+      "notes": "Announcements, state signs and the license inventory exist and are tested (AccessibilityPlansTests, AcknowledgementsViewTests). The labels are experience copy shown in G-UI (A16-P04); the copy review and the copy-claims release step are G-RELEASE (A16-P06). Available from A16-P06: its gaps (G-RELEASE) are closed."
     },
     {
       "id": "M24",
@@ -1564,10 +1564,10 @@
       ],
       "kind": "adaptation",
       "owner": "app-local",
-      "justification": "The release review of this experience: licenses of presets, palettes, copy and shaders, the educational approximation labels and the absence of accuracy, prediction or certification claims, an unchanged privacy answer, registration and the experience-release and copy-claims steps (manual phase 06, A16-P06).",
+      "justification": "The release review of this experience: licenses of presets, palettes, copy and shaders, the educational approximation labels and the absence of accuracy, prediction or certification claims, an unchanged privacy answer, registration and the experience-release and copy-claims steps (manual phase 06, A16-P06). Built at A16-P06: privacy-and-credits.md (stored files, deletion, nothing sent; the license inventory of six presets, three palettes and seven shader programs), store-listing.md with a claims table naming existing tests, release-checklist.md (verified, pending-campaign-ii SL-D1 to SL-D6, owner-action for signing, archive and upload), device-campaign.md, release.json, the source and claims scans of specs/122-sl-p06-release, the failed-draw recovery and stored-file sample tests, and the interface chunk x2 (SLExploreUITests, SLLibraryUITests); experience-release-a16, copy-claims-a16 and the app's privacy, tracking, licence and usage-description checks pass.",
       "phase": 6,
       "test": "Release-check steps for A16 (experience-release, copy-claims) pass; the license inventory lists every bundled preset, palette and shader with its license; copy contains no forbidden claim words; every experiment shows and speaks its method and limits; the app's privacy answers and usage descriptions are unchanged",
-      "closed": null
+      "closed": "A16-P06"
     }
   ],
   "traceability": [
