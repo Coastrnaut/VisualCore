@@ -569,7 +569,7 @@
       "id": "M08",
       "capability": "Touch orbit, pan, zoom and atom picking: one-finger orbit, two-finger pan, pinch zoom, a tap turned into a camera ray tested against each atom's display sphere (nearest hit first, radius per display mode) and a control alternative that steps through atoms",
       "source": "v0.1 feature 3: touch orbit, pan, zoom and atom picking",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitCamera.swift",
@@ -630,19 +630,25 @@
           "symbol": "GestureAlternatives",
           "product": "VisualCoreExperience",
           "public": true
+        },
+        {
+          "file": "Packages/ExperiencesCreative/MolecularExplorer/Core/AtomPicker.swift",
+          "symbol": "AtomPicker",
+          "product": "MolecularExplorerExperience",
+          "public": true
         }
       ],
       "example": {
         "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Experience/OrbitLayout.swift",
         "symbol": "OrbitLayout"
       },
-      "notes": "Tested in VisualCoreMathTests (RayIntersectionTests: ray-sphere, ray-box and ray-triangle hits against analytic results, nearest; OrbitCameraTests ray; OrbitViewBoundsTests pan) and VisualCoreScenesTests/GestureTests. No ray-cylinder or ray-capsule test exists, so bonds are not pickable by an existing cast; v0.1 needs atom picking only. Atom picking over Ray3 with the display-mode radius, the stepping control and the selection state are G-PICK (app-local, A15-P03); a generic ray-capsule cast is assessed there for VisualCoreMath if bond picking is added. Framing and the persisted camera are G-CAMERA (A15-P02)."
+      "notes": "Tested in VisualCoreMathTests (RayIntersectionTests: ray-sphere, ray-box and ray-triangle hits against analytic results, nearest; OrbitCameraTests ray; OrbitViewBoundsTests pan) and VisualCoreScenesTests/GestureTests. No ray-cylinder or ray-capsule test exists, so bonds are not pickable by an existing cast; v0.1 needs atom picking only. Atom picking over Ray3 with the display-mode radius, the stepping control and the selection state are G-PICK (app-local, A15-P03); a generic ray-capsule cast is assessed there for VisualCoreMath if bond picking is added. Framing and the persisted camera are G-CAMERA (A15-P02). Built at A15-P03 (G-CAMERA, G-PICK closed): picking, gestures, labels, bond styles and the panel, tested in AtomPickerTests, LabelLayoutTests, BondStyleTests, MoleculeGestureTests, MoleculePickingTests and MoleculePanelTests."
     },
     {
       "id": "M09",
       "capability": "Element labels, bond types and a metadata panel: element symbols drawn or listed next to atoms without overlap, bond order (single, double, triple, aromatic or inferred) shown by style and text, a native panel with the molecule's name, formula, atom and bond counts, source and the selected atom's element and position",
       "source": "v0.1 feature 4: element labels, bond types and metadata panel",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitCamera.swift",
@@ -667,13 +673,19 @@
           "symbol": "AnnouncementPlanner",
           "product": "VisualCoreSimulation",
           "public": true
+        },
+        {
+          "file": "Packages/ExperiencesCreative/MolecularExplorer/Core/AtomPicker.swift",
+          "symbol": "AtomPicker",
+          "product": "MolecularExplorerExperience",
+          "public": true
         }
       ],
       "example": {
         "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Experience/LabelLayout.swift",
         "symbol": "LabelLayout"
       },
-      "notes": "Projection to the screen (OrbitCameraTests), the canvas overlay slot (CanvasOverlayTests), non-colour state signs and announcements (AccessibilityPlansTests) exist and are tested. Label placement, bond-order styling and the metadata panel are G-PANEL (app-local, A15-P03); the bond order values come from G-DOMAIN."
+      "notes": "Projection to the screen (OrbitCameraTests), the canvas overlay slot (CanvasOverlayTests), non-colour state signs and announcements (AccessibilityPlansTests) exist and are tested. Label placement, bond-order styling and the metadata panel are G-PANEL (app-local, A15-P03); the bond order values come from G-DOMAIN. Built at A15-P03 (G-DOMAIN, G-PANEL closed): picking, gestures, labels, bond styles and the panel, tested in AtomPickerTests, LabelLayoutTests, BondStyleTests, MoleculeGestureTests, MoleculePickingTests and MoleculePanelTests."
     },
     {
       "id": "M10",
@@ -808,7 +820,7 @@
       "id": "M13",
       "capability": "Inferred bonds labelled as estimates: bonds inferred from interatomic distance and covalent radii with a stated tolerance, bounded by atom count (spatial bucketing), always marked inferred in the drawing, panel and spoken text and never presented as measured",
       "source": "cross-cutting: inferred-bond labelling; constitution A15 strict import (inferred bonds); manual domain rule",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreMath/Vectors.swift",
@@ -833,13 +845,19 @@
           "symbol": "AnnouncementPlanner",
           "product": "VisualCoreSimulation",
           "public": true
+        },
+        {
+          "file": "Packages/ExperiencesCreative/MolecularExplorer/Core/AtomPicker.swift",
+          "symbol": "AtomPicker",
+          "product": "MolecularExplorerExperience",
+          "public": true
         }
       ],
       "example": {
         "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Core/CitationAudit.swift",
         "symbol": "CitationAudit"
       },
-      "notes": "Vectors, numeric hygiene, state signs and announcements exist and are tested (LinearAlgebraTests, NumericHygieneTests, AccessibilityPlansTests). No neighbour search or spatial grid exists in a framework product. Distance-based bond inference with its provenance flag is G-DOMAIN (app-local, A15-P01); its labelling in the panel and speech is G-PANEL (A15-P03)."
+      "notes": "Vectors, numeric hygiene, state signs and announcements exist and are tested (LinearAlgebraTests, NumericHygieneTests, AccessibilityPlansTests). No neighbour search or spatial grid exists in a framework product. Distance-based bond inference with its provenance flag is G-DOMAIN (app-local, A15-P01); its labelling in the panel and speech is G-PANEL (A15-P03). Built at A15-P03 (G-DOMAIN, G-PANEL closed): picking, gestures, labels, bond styles and the panel, tested in AtomPickerTests, LabelLayoutTests, BondStyleTests, MoleculeGestureTests, MoleculePickingTests and MoleculePanelTests."
     },
     {
       "id": "M14",
@@ -1339,10 +1357,10 @@
       ],
       "kind": "adaptation",
       "owner": "app-local",
-      "justification": "Ray3 ray-sphere casts, Ray3.nearest and OrbitCamera.ray exist; atom picking with the display-mode radius, the selection state, stepping through atoms as the control alternative and the spoken selection are app-local (clarification 5, manual phase 03, A15-P03). No ray-cylinder or ray-capsule cast exists; bond picking is not in version 0.1, and a ray-capsule cast is assessed for VisualCoreMath only if it is added.",
+      "justification": "Ray3 ray-sphere casts, Ray3.nearest and OrbitCamera.ray exist; atom picking with the display-mode radius, the selection state, stepping through atoms as the control alternative and the spoken selection are app-local (clarification 5, manual phase 03, A15-P03). No ray-cylinder or ray-capsule cast exists; bond picking is not in version 0.1, and a ray-capsule cast is assessed for VisualCoreMath only if it is added. Built at A15-P03: Core/AtomPicker.swift (nearest drawn sphere along the line of sight through OrbitCamera.ray) with the regression fixture over five molecules, both modes and eight camera positions; MoleculeGestures (drag, pinch, two-finger pan and tap over GestureArbiter) and the atom controls as the alternative. No ray-capsule cast was needed (no bond picking).",
       "phase": 3,
       "test": "Core host tests: a ray through an atom's centre picks it in both modes; overlapping atoms give the nearest; a miss clears or keeps the selection as specified; stepping visits every atom in a stable order; the selection survives a mode change",
-      "closed": null
+      "closed": "A15-P03"
     },
     {
       "id": "G-DISPLAY",
@@ -1365,10 +1383,10 @@
       ],
       "kind": "adaptation",
       "owner": "app-local",
-      "justification": "Projection, the canvas overlay slot, state signs and announcements exist; element labels placed without overlap, bond-order styling and text (inferred bonds marked), the native metadata panel and the spoken molecule, atom, element and mode wording are app-local (clarification 5, manual phase 03, A15-P03).",
+      "justification": "Projection, the canvas overlay slot, state signs and announcements exist; element labels placed without overlap, bond-order styling and text (inferred bonds marked), the native metadata panel and the spoken molecule, atom, element and mode wording are app-local (clarification 5, manual phase 03, A15-P03). Built at A15-P03: Core/LabelLayout.swift and BondStyle.swift (parallel sticks for double and triple bonds, a thin stick for inferred ones), MoleculeOverlay (labels and the selection ring in the host's canvas overlay) and the atom panel, description and announcements in MoleculePresenter.",
       "phase": 3,
       "test": "Core and experience tests: labels never overlap beyond the stated rule and hide when off screen; every bond order has a non-colour style and text; inferred bonds read as inferred in panel and speech; the panel shows name, formula, counts, source and the selected atom; announcements are rate limited",
-      "closed": null
+      "closed": "A15-P03"
     },
     {
       "id": "G-LIBRARY",
