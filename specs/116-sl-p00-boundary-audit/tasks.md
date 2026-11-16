@@ -27,7 +27,7 @@ Precedent: `specs/109-me-p00-boundary-audit/tasks.md`.
 
 ## Phase 6: User Story 4 — Stop/go decision (P2)
 
-- [ ] T-A16-008 [US4] Complete the contract's `gaps` (every non-available row: owning module, VisualCore or app-local, and phase A16-P01..P06 per research D4), the three manual risks as `negative` entries naming owner, verification method and release-blocker condition (source "manual §13 risk N"; the checker has no risk key), and `decision` (keys `result`, `reasons`, `blockers`) (verdict and reasons; "stop" if no working host or buildable offscreen feedback path); re-run the checker (`--name contract-final -- python3 scripts/check_app_contract.py --app simulation-lab --render`) (FR-A16-003, 006; SC-A16-002)
+- [X] T-A16-008 [US4] Complete the contract's `gaps` (every non-available row: owning module, VisualCore or app-local, and phase A16-P01..P06 per research D4), the three manual risks as `negative` entries naming owner, verification method and release-blocker condition (source "manual §13 risk N"; the checker has no risk key), and `decision` (keys `result`, `reasons`, `blockers`) (verdict and reasons; "stop" if no working host or buildable offscreen feedback path); re-run the checker (`--name contract-final -- python3 scripts/check_app_contract.py --app simulation-lab --render`) (FR-A16-003, 006; SC-A16-002) — Verified 2026-11-16: 2026-11-16: .autonomy/checks/A16-P00.contract-final.json exit 0; 11 gaps (app-local, A16-P01 to A16-P06), the three manual risks as negative entries with owner, verification and release blocker, decision go with no blocker
 
 ## Phase 7: Polish and evidence
 
