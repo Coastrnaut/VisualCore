@@ -77,7 +77,7 @@ Precedent: `specs/118-sl-p02-automata-gpu/tasks.md`.
 
 ## Phase 6: Story 4 — the explained refusal
 
-- [ ] T-A16-307 [US4] `SimulationPresenter.answerWords` gives the refusal's own sentence for `sim.timestep`:
+- [X] T-A16-307 [US4] `SimulationPresenter.answerWords` gives the refusal's own sentence for `sim.timestep`: — Verified 2026-11-16: 2026-11-16: .autonomy/checks/A16-P03.sl-ios27.json exit 0 (41 core, 20 Swift Testing and 33 XCTest experience tests, 0 failures, slowest 1.98 s, iOS 27); TimeStepTests: the Courant sentence 'The wave step is too large: the Courant number must stay at or below 0.707.' and the reaction sentence naming 1.5625 via timeStepRefusal, which the presenter shows in the message line (announced by the controls); the status line states the time step
   - `SimulationRefusal.reactionStep` or `.courant`, the range sentence, or the one-generation sentence;
   - for `sim.family` with `a16.unsupported`, the unsupported sentence.
 
