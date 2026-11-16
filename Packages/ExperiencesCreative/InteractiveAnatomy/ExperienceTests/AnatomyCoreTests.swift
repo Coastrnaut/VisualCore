@@ -381,4 +381,22 @@ final class AnatomyCoreTests: XCTestCase {
         XCTAssertEqual(reset, opening)
         XCTAssertEqual(try XCTUnwrap(engine.core).view, AnatomyViewState.opening)
     }
+
+    /// T-A17-213 (spec edge case "a declared mesh that the scene cannot build"): valid content that declares a mesh
+    /// with no placement is refused on preparation with `a17.scene-refused` and a sentence naming the mesh, so the
+    /// experience does not open.
+    func testContentWhoseSceneCannotBeBuiltIsRefused() throws {
+        var region = try AnatomyContent.bundledRightKnee()
+        region.meshes.append(ProceduralMeshDeclaration(id: "mesh.femur.extra", kind: .sphere))
+        let femur = try XCTUnwrap(region.structures.firstIndex { $0.id == "knee.femur" })
+        region.structures[femur].meshIDs.append("mesh.femur.extra")
+        XCTAssertNil(AnatomyContent.validate(region), "the content itself is valid")
+        do {
+            _ = try AnatomyCore(seed: 1, region: region)
+            XCTFail("content with an unbuildable mesh was prepared")
+        } catch let failure as ExperienceFailure {
+            XCTAssertEqual(failure.code, AnatomyCore.sceneRefusedCode)
+            XCTAssertTrue(failure.message.contains("mesh.femur.extra"), failure.message)
+        }
+    }
 }
