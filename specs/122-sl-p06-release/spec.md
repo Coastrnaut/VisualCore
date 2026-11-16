@@ -165,7 +165,8 @@ answers as expected.
 - **FR-A16-621**: Copy MUST contain no accuracy, prediction, certification or measured-performance claim, and every
   claim MUST name an existing test.
 - **FR-A16-622**: Every experiment MUST show and speak its method and limits (the approximation label).
-- **FR-A16-630**: Interface journeys MUST run on the iOS 27.x phone simulator.
+- **FR-A16-630**: Interface journeys MUST run on the iOS 27.x phone simulator without presenting any system prompt or
+  the share sheet, each under 60 s.
 - **FR-A16-631**: The release build checks MUST pass.
 - **FR-A16-632**: The experience's package suites MUST pass on iOS 27.
 
