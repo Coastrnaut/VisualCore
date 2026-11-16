@@ -99,4 +99,26 @@ final class SizeChangeTests: XCTestCase {
             session.close()
         }
     }
+
+    /// T-A16-509 (FR-A16-504/505): a paint and a step with no frame between reach the GPU in every family — the mirror
+    /// is loaded from the painted, stepped CPU field (the core's paint count changed) instead of being stepped from the
+    /// unpainted one.
+    func testAPaintThenAStepInOneFrameReachesTheGPU() async throws {
+        for family in 0..<3 {
+            let name = "family \(family)"
+            let session = ExperienceSession()
+            let shell = try await SimulationTest.open(session)
+            let presenter = shell.presenter
+            XCTAssertTrue(presenter.send("sim.family", [Double(family)], through: shell.port).isAccepted, name)
+            try SimulationTest.frames(session, 2)
+            try SimulationTest.pause(shell)
+            try SimulationTest.frames(session, 1)
+            let before = try loads(shell)
+            XCTAssertTrue(presenter.send("sim.paint", [20, 20, 0], through: shell.port).isAccepted, name)
+            XCTAssertTrue(presenter.send("sim.step", through: shell.port).isAccepted, name)
+            try assertWithinTolerance(session, shell, name + ": paint then step")
+            XCTAssertEqual(try loads(shell), before + 1, name + ": the mirror was loaded")
+            session.close()
+        }
+    }
 }
