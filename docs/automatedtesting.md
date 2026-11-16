@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-16 (A16-P01: fixture count from the planning catalog; A16-P00: contract view markers).
+Last updated: 2026-11-16 (A16-P02: GPU parity against both half roundings; A16-P01: fixture count from the catalog).
 
 ## 1. What is tested, and where
 
@@ -174,6 +174,12 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
 - **The planning catalog sets the fixture count.** The content-counts audit in `test_scripts.py` compares a new
   experience's manifest fixtures with the catalog's content requirement (five for a creative experience); write that
   many fixtures in Phase 01, or the script tests fail after the package tests pass (A16-P01).
+- **Compare a GPU field with both half-float roundings.** GLES leaves float-to-half rounding implementation-defined;
+  on the iOS 27.2 simulator the Gray-Scott fixture matched the `float16TowardZero` CPU reference exactly (0.0) and the
+  round-to-nearest one within 0.0032, so a tolerance test compares against both and never assumes one (A16-P02).
+- **Keep the CPU as truth and mirror it on the GPU.** Snapshots and digests stay on the CPU model; the GPU field is
+  loaded from it on any non-step change and stepped by the engine's iteration delta, and parity tests read it back
+  (A16-P02).
 
 ### Process
 
