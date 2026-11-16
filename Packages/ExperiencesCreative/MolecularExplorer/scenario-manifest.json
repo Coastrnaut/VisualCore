@@ -2,7 +2,12 @@
   "controls" : [
     "molecule.select",
     "molecule.next",
-    "molecule.previous"
+    "molecule.previous",
+    "display.mode",
+    "camera.orbit",
+    "camera.tilt",
+    "camera.zoom",
+    "view.reset"
   ],
   "experience" : "a15.molecular-explorer",
   "kind" : "creative",
@@ -12,7 +17,7 @@
 
       ],
       "expect" : {
-        "initialDigest" : "898c8e0b69c5e417fe2dc097bbf564626db33d079da5052e064c2285b62079e2"
+        "initialDigest" : "e3b0b2da99d0be7f508431babe3477477f27842f473c1c01f8ed986d8d646458"
       },
       "name" : "launch-first-frame",
       "seed" : "1"
@@ -61,8 +66,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "bea0e7a245b79525fd587db753352efa59a4edf4fb5b361d3395a37b13073afa",
-        "initialDigest" : "898c8e0b69c5e417fe2dc097bbf564626db33d079da5052e064c2285b62079e2"
+        "finalDigest" : "2cdf378cc6b54aa9209ab1ec9a8db724b809a31f64a32605eda8ae5fb7ba4f63",
+        "initialDigest" : "e3b0b2da99d0be7f508431babe3477477f27842f473c1c01f8ed986d8d646458"
       },
       "name" : "input-response",
       "seed" : "1"
@@ -229,8 +234,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "bea0e7a245b79525fd587db753352efa59a4edf4fb5b361d3395a37b13073afa",
-        "initialDigest" : "898c8e0b69c5e417fe2dc097bbf564626db33d079da5052e064c2285b62079e2"
+        "finalDigest" : "2cdf378cc6b54aa9209ab1ec9a8db724b809a31f64a32605eda8ae5fb7ba4f63",
+        "initialDigest" : "e3b0b2da99d0be7f508431babe3477477f27842f473c1c01f8ed986d8d646458"
       },
       "name" : "save-restore",
       "seed" : "1"
@@ -279,7 +284,7 @@
         }
       ],
       "expect" : {
-        "initialDigest" : "898c8e0b69c5e417fe2dc097bbf564626db33d079da5052e064c2285b62079e2",
+        "initialDigest" : "e3b0b2da99d0be7f508431babe3477477f27842f473c1c01f8ed986d8d646458",
         "resetDigest" : true
       },
       "name" : "reset",
@@ -330,8 +335,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "898c8e0b69c5e417fe2dc097bbf564626db33d079da5052e064c2285b62079e2",
-        "initialDigest" : "898c8e0b69c5e417fe2dc097bbf564626db33d079da5052e064c2285b62079e2",
+        "finalDigest" : "e3b0b2da99d0be7f508431babe3477477f27842f473c1c01f8ed986d8d646458",
+        "initialDigest" : "e3b0b2da99d0be7f508431babe3477477f27842f473c1c01f8ed986d8d646458",
         "outcome" : "viewing-water"
       },
       "name" : "fixture-water",
@@ -351,8 +356,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "ba65d980c1636cb0721a19d795f57fb18251944c4cd7bb7167c05eb49bfc1807",
-        "initialDigest" : "898c8e0b69c5e417fe2dc097bbf564626db33d079da5052e064c2285b62079e2",
+        "finalDigest" : "1f794f1c38f70cf339ca55417bf641bc6ed34778ff96227ea9aea02d22e0d214",
+        "initialDigest" : "e3b0b2da99d0be7f508431babe3477477f27842f473c1c01f8ed986d8d646458",
         "outcome" : "viewing-methane"
       },
       "name" : "fixture-methane",
@@ -372,8 +377,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "806d57b4423e5b3e9d79a8dac436e5d259bc020fd6f957b6c776b4c613bb71f4",
-        "initialDigest" : "898c8e0b69c5e417fe2dc097bbf564626db33d079da5052e064c2285b62079e2",
+        "finalDigest" : "d05fe35bcaa8823a46b7993aa9115199f024446059930c3bab9ffb8887ab80cf",
+        "initialDigest" : "e3b0b2da99d0be7f508431babe3477477f27842f473c1c01f8ed986d8d646458",
         "outcome" : "viewing-ethanol"
       },
       "name" : "fixture-ethanol",
@@ -393,8 +398,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "1464cbc58b73e81483fc88745cc7e5dcaa9429a0d1df376eae60c45b82cc5db9",
-        "initialDigest" : "898c8e0b69c5e417fe2dc097bbf564626db33d079da5052e064c2285b62079e2",
+        "finalDigest" : "3cd2126913b698ee11f901de02d02355033b49533f0df5ea2d96a4e1b119ebc6",
+        "initialDigest" : "e3b0b2da99d0be7f508431babe3477477f27842f473c1c01f8ed986d8d646458",
         "outcome" : "viewing-benzene"
       },
       "name" : "fixture-benzene",
@@ -414,11 +419,123 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "bea0e7a245b79525fd587db753352efa59a4edf4fb5b361d3395a37b13073afa",
-        "initialDigest" : "898c8e0b69c5e417fe2dc097bbf564626db33d079da5052e064c2285b62079e2",
+        "finalDigest" : "2cdf378cc6b54aa9209ab1ec9a8db724b809a31f64a32605eda8ae5fb7ba4f63",
+        "initialDigest" : "e3b0b2da99d0be7f508431babe3477477f27842f473c1c01f8ed986d8d646458",
         "outcome" : "viewing-caffeine"
       },
       "name" : "fixture-caffeine",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "molecule.select",
+            "values" : [
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "display.mode",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a09d03cd338962899a34113dc0a16f4ca7b6058aafb6dc0a6f34cc2cd4839df2",
+        "initialDigest" : "e3b0b2da99d0be7f508431babe3477477f27842f473c1c01f8ed986d8d646458",
+        "outcome" : "viewing-caffeine"
+      },
+      "name" : "fixture-caffeine-space-filling",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "molecule.select",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "camera.orbit",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "camera.orbit",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "camera.orbit",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "camera.tilt",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "camera.zoom",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "camera.zoom",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "0ec4b9f83662bf94500ed14adbfbb18c62b8ffb6448f22ec580bc76aaa00560b",
+        "initialDigest" : "e3b0b2da99d0be7f508431babe3477477f27842f473c1c01f8ed986d8d646458",
+        "outcome" : "viewing-benzene"
+      },
+      "name" : "fixture-benzene-turned",
       "seed" : "1"
     }
   ],

@@ -6,6 +6,9 @@
 //     ``MoleculeCore/selectedFixtures`` (committed values; `MoleculeManifestTests` proves each equal to the derived
 //     digest and the played core's selection equal to the fixture's molecule), and each expects the outcome
 //     `viewing-<id>`.
+//   - two fixtures of feature 111 (A15-P02) T-A15-206: `fixture-caffeine-space-filling` (caffeine, then
+//     `display.mode [1]`) and `fixture-benzene-turned` (benzene, three `camera.orbit [1]`, one `camera.tilt [1]`, two
+//     `camera.zoom [1]`), pinned by ``MoleculeCore/viewFixtures``.
 // The completion scenario selects caffeine and expects the outcome `viewing-caffeine`. The expected digests are derived
 // by playing the entries on a core exactly as the engine plays them (the steps of an entry, then its action) and
 // digesting it with the experience id as domain, as Solar System Explorer's manifest does.
@@ -21,12 +24,34 @@ extension MoleculeCore {
     /// molecule by ``fixtureEntries(molecule:)`` from the first state, by molecule index (0…4), pinned from the first
     /// run of `MoleculeManifestTests` on sim-27.2.
     public static let selectedFixtures: [(molecule: Int, digest: String)] = [
-        (0, "898c8e0b69c5e417fe2dc097bbf564626db33d079da5052e064c2285b62079e2"),
-        (1, "ba65d980c1636cb0721a19d795f57fb18251944c4cd7bb7167c05eb49bfc1807"),
-        (2, "806d57b4423e5b3e9d79a8dac436e5d259bc020fd6f957b6c776b4c613bb71f4"),
-        (3, "1464cbc58b73e81483fc88745cc7e5dcaa9429a0d1df376eae60c45b82cc5db9"),
-        (4, "bea0e7a245b79525fd587db753352efa59a4edf4fb5b361d3395a37b13073afa"),
+        (0, "e3b0b2da99d0be7f508431babe3477477f27842f473c1c01f8ed986d8d646458"),
+        (1, "1f794f1c38f70cf339ca55417bf641bc6ed34778ff96227ea9aea02d22e0d214"),
+        (2, "d05fe35bcaa8823a46b7993aa9115199f024446059930c3bab9ffb8887ab80cf"),
+        (3, "3cd2126913b698ee11f901de02d02355033b49533f0df5ea2d96a4e1b119ebc6"),
+        (4, "2cdf378cc6b54aa9209ab1ec9a8db724b809a31f64a32605eda8ae5fb7ba4f63"),
     ]
+
+    /// The view fixtures of feature 111: a name, the molecule index, the entries after selecting it and the committed
+    /// final digest (pinned from the first run of `MoleculeManifestTests` on sim-27.2).
+    public static let viewFixtures: [(name: String, molecule: Int, entries: [ScenarioStep], digest: String)] = [
+        ("fixture-caffeine-space-filling", 4,
+         [ScenarioStep(steps: 1, action: ScriptedAction("display.mode", [1]), result: "accepted")],
+         "a09d03cd338962899a34113dc0a16f4ca7b6058aafb6dc0a6f34cc2cd4839df2"),
+        ("fixture-benzene-turned", 3,
+         [ScenarioStep(steps: 1, action: ScriptedAction("camera.orbit", [1]), result: "accepted"),
+          ScenarioStep(steps: 1, action: ScriptedAction("camera.orbit", [1]), result: "accepted"),
+          ScenarioStep(steps: 1, action: ScriptedAction("camera.orbit", [1]), result: "accepted"),
+          ScenarioStep(steps: 1, action: ScriptedAction("camera.tilt", [1]), result: "accepted"),
+          ScenarioStep(steps: 1, action: ScriptedAction("camera.zoom", [1]), result: "accepted"),
+          ScenarioStep(steps: 1, action: ScriptedAction("camera.zoom", [1]), result: "accepted")],
+         "0ec4b9f83662bf94500ed14adbfbb18c62b8ffb6448f22ec580bc76aaa00560b"),
+    ]
+
+    /// The entries of the view fixture `fixture`: its molecule selected, then its own entries.
+    public static func viewFixtureEntries(_ fixture: (name: String, molecule: Int, entries: [ScenarioStep],
+                                                      digest: String)) -> [ScenarioStep] {
+        fixtureEntries(molecule: fixture.molecule) + fixture.entries
+    }
 
     /// The name of the fixture of molecule index `molecule`: `fixture-<molecule id>` (`fixture-caffeine`).
     public static func fixtureName(molecule: Int) -> String {
@@ -130,6 +155,12 @@ extension MoleculeCore {
         for fixture in selectedFixtures {
             specs.append(ScenarioSpec(name: fixtureName(molecule: fixture.molecule), seed: seed,
                                       entries: fixtureEntries(molecule: fixture.molecule),
+                                      expect: ScenarioExpectations(initialDigest: initial,
+                                                                   finalDigest: fixture.digest,
+                                                                   outcome: outcomeCode(molecule: fixture.molecule))))
+        }
+        for fixture in viewFixtures {
+            specs.append(ScenarioSpec(name: fixture.name, seed: seed, entries: viewFixtureEntries(fixture),
                                       expect: ScenarioExpectations(initialDigest: initial,
                                                                    finalDigest: fixture.digest,
                                                                    outcome: outcomeCode(molecule: fixture.molecule))))

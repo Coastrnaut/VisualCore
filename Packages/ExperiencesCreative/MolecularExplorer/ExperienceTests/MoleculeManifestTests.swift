@@ -37,9 +37,10 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
     @Test func theManifestIsValidWithTheStandardScenariosAndFiveFixtures() {
         let manifest = MoleculeCore.manifest(for: id)
         let problems = ScenarioManifestValidator.problems(manifest, controls: MoleculeCore.controls,
-                                                          content: ContentRequirement(fixtures: 5))
+                                                          content: ContentRequirement(fixtures: 7))
         #expect(problems.isEmpty, "\(problems)")
-        #expect(manifest.scenarios.map(\.name) == ScenarioManifest.standardNames + Self.fixtureNames)
+        #expect(manifest.scenarios.map(\.name) == ScenarioManifest.standardNames + Self.fixtureNames
+                + MoleculeCore.viewFixtures.map(\.name))
         #expect(MoleculeCore.selectedFixtures.map { MoleculeCore.fixtureName(molecule: $0.molecule) } == Self.fixtureNames)
         #expect(manifest.kind == .creative)
         #expect(manifest.experience == id)
@@ -90,6 +91,30 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
             let controls = Set(spec.entries.compactMap { $0.action?.control })
             #expect(controls == ["molecule.select"], "\(name): selected by the action")
         }
+    }
+
+    /// Feature 111 (A15-P02) T-A15-206: the view fixtures end with their committed digest, the molecule selected and
+    /// the mode or camera changed as their entries say.
+    @Test func everyViewFixtureEndsWithItsCommittedDigest() async throws {
+        let manifest = MoleculeCore.manifest(for: id)
+        #expect(MoleculeCore.viewFixtures.map(\.name) == ["fixture-caffeine-space-filling", "fixture-benzene-turned"])
+        for fixture in MoleculeCore.viewFixtures {
+            let spec = try #require(manifest.scenarios.first { $0.name == fixture.name })
+            #expect(spec.expect.finalDigest == fixture.digest, "\(fixture.name)")
+            let derived = MoleculeCore.expectedDigest(for: id, seed: MoleculeCore.manifestSeed,
+                                                      entries: MoleculeCore.viewFixtureEntries(fixture))
+            #expect(derived == fixture.digest, "\(fixture.name): derived \(derived ?? "nil")")
+            let played = try await play(spec)
+            #expect(played.final == fixture.digest, "\(fixture.name): \(played.final)")
+            let core = try #require(played.core)
+            #expect(core.selection == fixture.molecule, "\(fixture.name)")
+        }
+        let spaceFilling = MoleculeCore.played(seed: MoleculeCore.manifestSeed,
+                                               entries: MoleculeCore.viewFixtureEntries(MoleculeCore.viewFixtures[0]))
+        #expect(spaceFilling.state.mode == .spaceFilling)
+        let turned = MoleculeCore.played(seed: MoleculeCore.manifestSeed,
+                                         entries: MoleculeCore.viewFixtureEntries(MoleculeCore.viewFixtures[1]))
+        #expect(turned.state.camera == CameraSettings(turnSteps: 5, tiltSteps: 3, zoomSteps: 2))
     }
 
     /// The JSON form with the control ids, named by `Catalog/registrations.json`. `UPDATE_SCENARIO_MANIFEST=1`
