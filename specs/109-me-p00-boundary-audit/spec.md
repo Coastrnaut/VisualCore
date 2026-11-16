@@ -25,6 +25,51 @@ Canonical overrides:
 - **Constitution:** 2.11.0 adds the A15 experience rules (committed at the start of this gate, `aaeeb3a7`).
 - **Evidence:** host and simulator only; device tasks are tagged {device} and wait for ImplementationLock-100.
 
+## Clarifications
+
+### Session 2026-11-15
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+the A15 constitution commit is `aaeeb3a7` and the A15-P00 specify commit `fc60a33d` (the phase start: the no-change
+diff of `Packages` and `External` is taken from it); the reference submodule is pinned at `d93edd1`; fourteen
+experiences are registered (`Catalog/registrations.json`, A01–A14). VisualCore offers `VisualCoreMath` `Vec3`, `Mat4`,
+`Quat`, `OrbitCamera` (with `OrbitBounds`), `FramingFlight`, `Ray3`/`RayHit3` with ray–sphere, box and triangle casts
+(`RayIntersection.swift`) and `NumericHygiene`; `VisualCoreScenes` `MeshGenerators` with `plane`, `cube` and
+`uvSphere(segments:rings:radius:)` only, `MeshBuilder`, `MeshBudget` and the gesture recognizers (`DragRecognizer`,
+`PinchRecognizer`, `RotateRecognizer`, `TapRecognizer`) with `GestureArbiter`; `VisualCorePersistence` `DocumentStore`,
+`DocumentEnvelope` and `MigrationChain`; `VisualCoreRendering` `MeshRenderer` (Lambert lighting, per-vertex colours,
+`MeshFog`, one draw per mesh item), `DepthMeshPass`, `PrimitiveRenderer`, `RenderTarget` and `ResourceRegistry`, and
+instanced drawing only inside `ParticleRenderer` (`vcglDrawArraysInstanced` of quads with `vcglVertexAttribDivisor`
+in `DynamicVertexBuffer`). No cylinder or capsule mesh generator, no instanced lit-mesh drawing, no ray–cylinder test,
+no element catalog and no text-record parser exist in any framework product (grep for cylinder, capsule, xyz and
+element finds nothing in VisualCore's sources). A file import exists only app-locally, through SwiftUI's
+`fileImporter` in the controls of A06–A08.
+
+- Q: How is the manual's "compile an empty shell" gate met in the one app? → A: As for A14: the one app is the shell;
+  this phase proves it builds for testing with Molecular Explorer absent; the targets come with A15-P01's first rules.
+- Q: What makes a capability "available"? → A: A public declaration in a VisualCore framework product with at least one
+  test that exercises it; an implementation that exists only inside another experience or a harness is "requires
+  adaptation" at best.
+- Q: Which package holds Molecular Explorer? → A: `Packages/ExperiencesCreative/MolecularExplorer` (Auto-Creator.md
+  §16), as A05–A14 did; no new package is created.
+- Q: Does Molecular Explorer need a permission or a new privacy answer? → A: No. The XYZ import goes through the system
+  document picker, which needs no permission and no usage string; only the file the person chooses is read (with
+  security-scoped access) and copied into the experience's own storage; no network, camera, location, microphone or
+  photo access; the app's privacy answers do not change.
+- Q: Which pieces exist, and who owns the missing ones? → A: Vectors, matrices, quaternions, the orbit camera, ray–sphere
+  picking, the UV sphere, the mesh builder, the lit mesh renderer with depth, gestures, persistence with migration and
+  experience storage exist. Gaps and owners, following the manual's phases (P01 atom/bond domain and strict XYZ
+  parser, P02 camera/atom/bond renderer, P03 selection and display styles, P04 curated content and persistence, P05
+  import fuzz/error and scientific review): the element catalog with sourced properties, the atom, bond and molecule
+  domain, the strict XYZ parser and distance-based bond inference marked as estimated → app-local (A15-P01); a
+  cylinder mesh generator → `VisualCoreScenes` if reusable, else app-local, and many atoms and bonds drawn by batching
+  over `MeshRenderer` (instanced lit meshes assessed for VisualCoreRendering, never a second renderer), the camera
+  framing and persisted camera → app-local over `OrbitCamera` (A15-P02); atom picking over `Ray3` ray–sphere casts,
+  ball-and-stick and space-filling modes, labels and the metadata panel → app-local (A15-P03); the curated library
+  with attributions, recent molecules and visual settings → app-local over `ExperienceStorage` and `MigrationChain`
+  (A15-P04); the import through the document picker, fuzz and error cases and the data review → app-local (A15-P05).
+  The audit confirms or corrects each from the code and the manual's phase list.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - An evidence-backed integration matrix (Priority: P1) 🎯
