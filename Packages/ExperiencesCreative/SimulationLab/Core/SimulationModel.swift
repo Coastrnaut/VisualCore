@@ -6,6 +6,8 @@
 // - `advance(hostStep:)` runs the iterations the scheduler grants for one host step (at most 16).
 // - `reset()` returns to the seeded start and step 0, keeping running and speed.
 // - `digest` is the SHA-256 (hex) of the saved state's JSON, so the same spec, seed and steps give the same digest.
+// - Feature 120 (A16-P04) T-A16-402 (FR-A16-401): `paint(x:y:mode:)` applies
+//   `SimulationBrush`; the step count is unchanged.
 import Foundation
 import VisualCoreMath
 import VisualCoreSimulation
@@ -87,6 +89,16 @@ public struct SimulationModel: Equatable, Sendable {
     public mutating func reset() {
         field = Seeding.start(for: spec)
         scheduler.reset()
+    }
+
+    /// Paints cell (x, y) with the family's brush (`SimulationBrush.painted`), values rounded to `precision`; the
+    /// step count is unchanged. False, with nothing changed, outside the grid.
+    @discardableResult
+    public mutating func paint(x: Int, y: Int, mode: PaintMode) -> Bool {
+        guard let painted = SimulationBrush.painted(field, kind: spec.kind, x: x, y: y, mode: mode,
+                                                    precision: precision) else { return false }
+        field = painted
+        return true
     }
 
     /// One rule iteration of the field (no step count).

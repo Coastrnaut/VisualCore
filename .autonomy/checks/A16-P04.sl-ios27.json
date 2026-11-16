@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesCreative",
+    "--scheme",
+    "ExperiencesCreative-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "SimulationLabCoreTests",
+    "SimulationLabExperienceTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing SimulationLabCoreTests SimulationLabExperienceTests",
+  "elapsed_seconds": 28.559,
+  "exit_code": 0,
+  "finished": "2026-11-16T21:06:14+00:00",
+  "log": ".autonomy/logs/A16-P04.sl-ios27.log",
+  "log_sha256": "fb1ff64823536abfbd41f7c7717c2802a05f7ac22aa6d3be04604aaa5c9e6288",
+  "name": "sl-ios27",
+  "stage": "A16-P04",
+  "started": "2026-11-16T21:05:45+00:00",
+  "timed_out": false
+}

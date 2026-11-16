@@ -12,7 +12,7 @@ Precedent: `specs/119-sl-p03-rd-wave/tasks.md`.
 
 ## Phase 2: Foundational — pure core and actions
 
-- [ ] T-A16-402 [P] Add the pure core in `Packages/ExperiencesCreative/SimulationLab/Core/`, per data-model.md and contracts/ui.md:
+- [X] T-A16-402 [P] Add the pure core in `Packages/ExperiencesCreative/SimulationLab/Core/`, per data-model.md and contracts/ui.md: — Verified 2026-11-16: 2026-11-16: .autonomy/checks/A16-P04.sl-ios27.json exit 0 (62 core, 23 Swift Testing and 54 XCTest experience tests, 0 failures, slowest 4.3 s, iOS 27); SimulationBrushTests (8), SimulationHistogramTests (6), ExperimentPresetTests (7) and the A16-P01 reference suites (AutomatonRuleTests, GrayScottTests, WaveFieldTests) pass
   - `SimulationBrush.swift`: `PaintMode` and `SimulationModel.paint(x:y:mode:)`.
     - automaton: "tap toggles, drag sets alive";
     - reaction-diffusion: "u 0.25, v 0.5 in radius 2 (wrap)";
