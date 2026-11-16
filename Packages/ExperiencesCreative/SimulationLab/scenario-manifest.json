@@ -1,0 +1,508 @@
+{
+  "controls" : [
+    "sim.family",
+    "sim.preset",
+    "sim.run",
+    "sim.pause",
+    "sim.step",
+    "sim.reset",
+    "sim.speed"
+  ],
+  "experience" : "a16.simulation-lab",
+  "kind" : "creative",
+  "scenarios" : [
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+        "initialDigest" : "88bae8b287c953a063558aa6a7feebd9860a49c53ac84f037f8be475f26dfa09"
+      },
+      "name" : "launch-first-frame",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sim.family",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "sim.preset",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "sim.speed",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "sim.pause",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "sim.step",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d79bb5b80dd5b3a97e00b5d81479e3979b5ed037dd29c0bc99b1c38928574c5c",
+        "initialDigest" : "88bae8b287c953a063558aa6a7feebd9860a49c53ac84f037f8be475f26dfa09"
+      },
+      "name" : "input-response",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sim.family",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "outcome" : "simulating-wave"
+      },
+      "name" : "completion",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sim.family",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "sim.family",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "action.rule.a16.invalid-choice",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "sim.preset",
+            "values" : [
+              1.5
+            ]
+          },
+          "result" : "action.rule.a16.invalid-choice",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "sim.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.a16.invalid-choice",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "sim.step",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.a16.invalid-choice",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "sim.speed",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "sim.pause",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "sim.family",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "sim.family",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "sim.preset",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.rule.a16.invalid-choice",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "sim.pause",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "sim.pause",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.a16.invalid-choice",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+
+      },
+      "name" : "rejection",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sim.family",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "sim.preset",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "sim.speed",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "sim.pause",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "sim.step",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d79bb5b80dd5b3a97e00b5d81479e3979b5ed037dd29c0bc99b1c38928574c5c",
+        "initialDigest" : "88bae8b287c953a063558aa6a7feebd9860a49c53ac84f037f8be475f26dfa09"
+      },
+      "name" : "save-restore",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sim.family",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "sim.preset",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "sim.speed",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "sim.pause",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "sim.step",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "initialDigest" : "88bae8b287c953a063558aa6a7feebd9860a49c53ac84f037f8be475f26dfa09",
+        "resetDigest" : true
+      },
+      "name" : "reset",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "suspend-resume",
+      "seed" : "1"
+    },
+    {
+      "cycles" : 5,
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "teardown-reentry",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "cancel-prepare",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sim.family",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "sim.pause",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 120
+        },
+        {
+          "action" : {
+            "control" : "sim.step",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "203cfde63b05302ef6faa3440b798025891563505dfc66be1984643eb66da04f",
+        "initialDigest" : "88bae8b287c953a063558aa6a7feebd9860a49c53ac84f037f8be475f26dfa09",
+        "outcome" : "simulating-automaton"
+      },
+      "name" : "fixture-automaton",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sim.family",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "sim.pause",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 30
+        },
+        {
+          "action" : {
+            "control" : "sim.step",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1708928e068d2ff7e5a1ca5f01fc2855c8f020c591b9757f0273a08f572e8313",
+        "initialDigest" : "88bae8b287c953a063558aa6a7feebd9860a49c53ac84f037f8be475f26dfa09",
+        "outcome" : "simulating-reaction-diffusion"
+      },
+      "name" : "fixture-reaction-diffusion",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sim.family",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "sim.pause",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 30
+        },
+        {
+          "action" : {
+            "control" : "sim.step",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "3d1ba160d4195e0e1ba69fcd0e482ec410e309759d1f139f739afc0957dc7c67",
+        "initialDigest" : "88bae8b287c953a063558aa6a7feebd9860a49c53ac84f037f8be475f26dfa09",
+        "outcome" : "simulating-wave"
+      },
+      "name" : "fixture-wave",
+      "seed" : "1"
+    }
+  ],
+  "schema" : 1
+}
