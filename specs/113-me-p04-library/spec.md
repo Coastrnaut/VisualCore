@@ -204,6 +204,5 @@ is marked inferred.
 
 ## Negative Requirements
 
-- No system prompt of any kind (nothing here needs a permission; prompting checks are human tests, owner ruling of
-  2026-11-16); no import, network, account or sync; no storage outside the experience's own folder; no data without a source and
+- No system prompt of any kind (nothing here needs a permission); no import, network, account or sync; no storage outside the experience's own folder; no data without a source and
   license; no change to the engine state, digests or replays from the recent list or settings.

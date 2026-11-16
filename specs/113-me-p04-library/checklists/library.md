@@ -32,7 +32,7 @@ before this record (CHK010, CHK013).
 - [x] CHK010 Is deleting the stored data (the app's per-experience reset) addressed? [Spec §Edge Cases] — failed (no deletion path was stated); an edge case now says the reset removes both files and the next opening starts empty with defaults.
 - [x] CHK011 Are full lists, re-opened molecules, unknown ids, missing storage, failed writes and interrupted writes addressed? [Spec §Edge Cases] — yes.
 - [x] CHK012 Are local-only storage and the absence of network, accounts and sync stated? [Negative Requirements, constitution A15] — yes.
-- [x] CHK013 Is it stated that the phase raises no system prompt, in line with the owner's rule that prompting checks are human tests? [Negative Requirements] — failed (not stated); the negative requirements now say no system prompt of any kind.
+- [x] CHK013 Is it stated that the phase raises no system prompt, since it needs no permission? [Negative Requirements] — failed (not stated); the negative requirements now say no system prompt of any kind.
 
 ## Accessibility
 

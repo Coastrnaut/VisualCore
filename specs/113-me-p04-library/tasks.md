@@ -3,8 +3,7 @@
 **Input**: [spec.md](spec.md), [plan.md](plan.md), [research.md](research.md), [data-model.md](data-model.md),
 [contracts/library.md](contracts/library.md), [quickstart.md](quickstart.md). Gate A15-P04 (legacy). Evidence:
 `python3 Tools/python/desktop_runbook.py run-check --stage A15-P04 --timeout 600 --name <check> -- <command>`. Commit
-after every task (no trailers); read every check's exit before ticking. iOS 27 only. No test may raise a system prompt
-(owner ruling of 2026-11-16). Precedent: `specs/112-me-p03-selection/tasks.md`.
+after every task (no trailers); read every check's exit before ticking. iOS 27 only. No test may raise a system prompt (the feature needs no permission). Precedent: `specs/112-me-p03-selection/tasks.md`.
 
 ## Phase 1: Setup
 
