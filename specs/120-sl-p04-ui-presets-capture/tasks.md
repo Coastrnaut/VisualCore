@@ -24,7 +24,8 @@ Precedent: `specs/119-sl-p03-rd-wave/tasks.md`.
     the spec must be valid and 64 × 64; JSON with sorted keys; decode refuses damaged and newer files. The six bundled
     presets: Life (Conway 1970), HighLife (Thompson 1994), Seeds (Silverman), Spots and Mazes (Pearson 1993), all
     public-domain, and Pulse (original).
-  - `SimulationModel.swift`, if a helper is needed.
+  - `SimulationModel.swift`: `public mutating func paint(x:y:mode:) -> Bool`, which applies
+    `SimulationBrush.painted(_:kind:x:y:mode:)` (pure, in `SimulationBrush.swift`) because `field` is `private(set)`.
 
   Core tests in `CoreTests/{SimulationBrushTests,SimulationHistogramTests,ExperimentPresetTests}.swift`:
   - each brush's exact cells;
@@ -63,7 +64,7 @@ Precedent: `specs/119-sl-p03-rd-wave/tasks.md`.
 
 ## Phase 4: Story 2 — inspector, label, spoken state, motion caps
 
-- [ ] T-A16-405 [US2] Add an Inspector section to `SimulationControls.swift`: every parameter of `ParameterCatalog.definitions(for:)` with value, unit and range, and the time step with its limit. Add the approximation label with the three sentences of FR-A16-410 (the words in `SimulationCore`). The description keeps running or paused, the step and the values. (FR-A16-410, 411)
+- [ ] T-A16-405 [US2] Add an Inspector section to `SimulationControls.swift`: every parameter of `ParameterCatalog.definitions(for:)` with value, unit and range, and the time step with its limit. Add the approximation label with the three sentences of FR-A16-410 (the words in `SimulationCore`). The description keeps running or paused, the step and the values. Tests in `ExperienceTests/InspectorWordsTests.swift`: the three label sentences, the inspector rows per family (name, value, unit, range) and the description's running, step and values words. (FR-A16-410, 411)
 - [ ] T-A16-406 [US2] Add the motion caps to `SimulationPresenter.swift` and `Experience/SimulationLabExperience.swift`:
   - the factory passes `reduceFlashing`;
   - the presenter's `speedCap(kind:)` is ×1 under Reduce Motion, and for the automaton ×0.25 under Reduce Flashing;
@@ -72,7 +73,8 @@ Precedent: `specs/119-sl-p03-rd-wave/tasks.md`.
   - on activation and after a family change, a speed above the cap is lowered through `sim.speed`; the speed picker
     disables the capped entries.
 
-  Tests in `ExperienceTests/MotionCapTests.swift`. Extend `ExperienceTests/` with an inspector and label words test.
+  Tests in `ExperienceTests/MotionCapTests.swift`: the caps per setting and family, the refusal and its sentence, and
+  the lowering on activation and on a family change.
   (FR-A16-412)
 
 ## Phase 5: Story 3 — histogram

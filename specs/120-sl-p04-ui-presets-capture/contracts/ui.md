@@ -3,7 +3,8 @@
 ```swift
 // SimulationLabCore
 public enum PaintMode: Int { case tap = 0, drag = 1 }
-extension SimulationModel { public mutating func paint(x: Int, y: Int, mode: PaintMode) -> Bool }  // false outside 0…63
+public enum SimulationBrush { public static func painted(_ field: SimulationField, kind: SimulationKind, x: Int, y: Int, mode: PaintMode) -> SimulationField? }
+extension SimulationModel { public mutating func paint(x: Int, y: Int, mode: PaintMode) -> Bool }  // in SimulationModel.swift; false outside 0…63
 public struct SimulationHistogram: Equatable, Sendable {
     public static let binCount = 16
     public let bins: [Int]; public let nonFinite: Int; public let low: Float; public let high: Float
