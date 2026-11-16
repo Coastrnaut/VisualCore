@@ -24,6 +24,51 @@ Canonical overrides:
 - **Owner rulings:** short tests; audits and device runs in the device campaign; iOS 27 at phase gates; reference
   regression and iOS 26 at X-A15; every Spec Kit step runs.
 
+## Clarifications
+
+### Session 2026-11-16
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+actions carry only numbers (`ExperienceAction.values`), so Digital Aquarium's `AquariumLibrary.open` rebuilds a saved
+aquarium by sending its actions one by one and stopping at the first refusal; `ExperienceSnapshot.maxBytes` is
+1,048,576 bytes; `XYZParser` refuses above 65,536 bytes, 500 atoms, 256-byte lines, |coordinate| 1,000 Å and atoms
+closer than 0.4 Å, with twelve typed reasons; the ten supported elements have atomic numbers 1, 6, 7, 8, 9, 15, 16, 17,
+35 and 53; `MoleculeSessionTests` already compares `ResourceLedger` live counts across reopenings;
+`scripts/check_copy_claims.py` scans the string literals of Swift sources against the shared denylist.
+
+- Q: How does an imported molecule enter the engine? → A: As ordinary actions after the file is parsed:
+  `import.begin [atom count]`, one `import.atom [atomic number, x, y, z]` per atom in file order, then `import.end []`,
+  which checks the count, the limits and the minimum distance again, infers the bonds and selects the imported molecule
+  as molecule 6 (`molecule.select [5]`). A begin while an import is pending starts again; an atom or end without a
+  begin, a wrong count, an unsupported atomic number or a value beyond the limits is refused (`a15.invalid-import`)
+  and the shown molecule is unchanged. The engine state moves to schema 4, holding the imported atoms (and the pending
+  atoms during an import); schemas 1–3 migrate with no import. `molecule.next` and `molecule.previous` stay within the
+  five library molecules; `molecule.select [5]` is refused when there is no import.
+- Q: What are the size limit and the refusal sentences? → A: The parser's 65,536 bytes, checked from the file's size
+  before reading: "This file is larger than 64 KB, the limit for a molecule file." Parser refusals read "This file could
+  not be opened: <reason>." with " (line N)" before the period where a line is known; one fixed reason phrase per
+  parser reason (for example "an element this explorer does not know", "two atoms closer than 0.4 Å"). An unreadable
+  file reads "The file could not be read." A cancelled picker shows nothing.
+- Q: Where is the import kept and how is it named? → A: The accepted bytes are written to `import.xyz` in the
+  experience's storage (replacing the previous one). The title is the file name without its extension, keeping letters,
+  digits, spaces and `-_.()`, at most 40 characters, "Imported molecule" when nothing is left; the comment line is
+  never shown. The recent list records it as `imported`; choosing it when the engine has no import (for example after
+  the saved state was reset) sends the actions of the stored file again; when that file is missing or refused the entry
+  is dropped.
+- Q: What is the fuzz corpus? → A: 2,000 files made from the five library molecules written as XYZ text and the refusal
+  fixtures, each changed by one to four seeded mutations (byte flip, byte insert, byte delete, line duplicate, line
+  delete, truncate, digit change) with a fixed small generator and seeds 1 to 2,000; every file goes through the whole
+  import path (size check, parser, actions, engine); no crash, every refusal typed, every accepted molecule within the
+  limits; well under 10 s.
+- Q: What does the review check and produce? → A: A test generates `docs/apps/molecular-explorer/data-review.md`
+  (regenerated with `UPDATE_DATA_REVIEW=1`, compared byte for byte otherwise): per element and per molecule every
+  displayed value with its source, units and license, and the two statements the panel shows: the existing legend ending "Display radii, not
+  measured sizes." and a new line under the bonds, "Bonds marked inferred are estimated from atom distances."
+  A domain word test checks every sentence the experience can show (descriptions of every molecule and atom, legend,
+  status, messages, control words) for safety, toxicity, medical or therapeutic words (safe, safety, toxic, toxicity,
+  poison, hazard, hazardous, medical, medicine, medicinal, drug, therapy, therapeutic, cure, treatment, dose, health,
+  stimulant); the shared copy-claims check runs on the experience's sources.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Open my own molecule file (Priority: P1) 🎯
@@ -117,6 +162,8 @@ count as after the first molecule.
 ### Edge Cases
 
 - **A second import:** it replaces the first; there is one imported molecule at a time.
+- **An import interrupted between its actions** (a refused atom): the pending atoms are dropped at the next begin; the
+  shown molecule never changes until `import.end` is accepted.
 - **The stored import file is missing or damaged at reopening:** the saved state's molecule is still shown (it is in the
   saved state); the stored copy is rewritten at the next import; nothing crashes.
 - **An imported molecule in the recent list after a newer import:** the entry stands for the current import.
@@ -155,8 +202,8 @@ count as after the first molecule.
 
 - **FR-A15-520**: A generated review document MUST list every bundled displayed value with its source, units and
   license, and MUST match the committed document.
-- **FR-A15-521**: No sentence the experience shows MUST contain a safety, toxicity, medical or therapeutic claim word;
-  the inferred-bond statement and the display-convention statement MUST be present.
+- **FR-A15-521**: The panel MUST show "Bonds marked inferred are estimated from atom distances." beside the legend's
+  "Display radii, not measured sizes."; no sentence the experience shows may contain a safety, toxicity, medical or therapeutic claim word.
 
 **Resources (story 5)**
 
@@ -172,7 +219,7 @@ count as after the first molecule.
 
 - **Imported molecule**: atoms (element and position in ångström), inferred bonds, title from the file name, source
   "imported file".
-- **Stored import**: the accepted file's bytes in the experience's own storage, at most the size limit.
+- **Stored import**: the accepted file's bytes in `import.xyz` in the experience's own storage, at most 65,536 bytes.
 - **Refusal message**: one sentence with the reason and, where known, the line.
 - **Review document**: per displayed value its source, units and license; the convention statements.
 
@@ -184,7 +231,7 @@ count as after the first molecule.
   reopening.
 - **SC-A15-502**: Each refusal fixture (one per parser reason plus the size limit) shows its sentence and leaves state
   and storage byte-identical.
-- **SC-A15-503**: A seeded corpus of at least 2,000 mutated files gives zero crashes and zero limit violations.
+- **SC-A15-503**: A seeded corpus of 2,000 mutated files (seeds 1 to 2,000) gives zero crashes and zero limit violations.
 - **SC-A15-504**: The generated review matches the committed review; zero forbidden words in shown sentences.
 - **SC-A15-505**: After ten rounds of switching, importing and restoring, resource counts equal the first frame's.
 - **SC-A15-506**: The runner's standard scenarios pass on iOS 27; every test runs in under 10 s.
