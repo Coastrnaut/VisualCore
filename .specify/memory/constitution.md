@@ -848,6 +848,52 @@ PDB or complex input, or chemical safety or therapeutic claims.
 - **One phase at a time:** implement only one Spec Kit phase at a time (one ledger gate, ADR-0004), in order
   A15-P00 → A15-P06.
 
+### A16 Simulation Lab (`a16.simulation-lab`)
+
+Ratified from the app manual's constitution prompt (2026-11-16). Like A05–A15, it never had a standalone target: it
+is built directly as an experience of the one app. Its product goal is a gallery of inspectable simulations with
+parameter panels and explicit numerical and educational limitations — in version 0.1 three simulation families
+(cellular automata, reaction-diffusion and a 2D wave field); a clear parameter schema per experiment with seeded
+starting conditions; pause, reset, single step, speed and a histogram or legend overlay; a deterministic tiny CPU
+reference for each algorithm; a GPU ping-pong path with explicit boundary rules; and saved presets and still capture —
+not a numerically certified scientific solver, large high-precision computation or multi-user experiments.
+
+- **Consumer, not fork:** an experience of the VisualCore app and a VisualCore consumer, never a fork of
+  projectm-ios. It uses only audited VisualCore public APIs over the OpenGL ES → ANGLE → Metal integration. It MUST
+  NOT create its own EGL/ANGLE initialization path, a second renderer, or link ProjectM engine code.
+- **Reuse first (Principle II):** offscreen targets, framebuffer feedback, fullscreen passes, shader compilation,
+  quality tiers, capture, persistence and accessibility planning already in VisualCore are reused, not copied. New
+  generic machinery (for example a ping-pong render-target pair or a float-texture capability probe) goes into
+  VisualCore with tests, docs, the API baseline and the reference regression when it is reusable; the rules of each
+  simulation, presets, copy and UI stay in the experience.
+- **Visuals are code:** fields, colour ramps, overlays and backgrounds are shaders and procedural drawing made in
+  code; no purchased, generated or hand-made images, textures or recordings.
+- **Deterministic CPU truth:** every algorithm has a pure, seeded CPU reference on a tiny grid with stated boundary
+  rules (wrap, clamp or fixed), testable through `swift test` without GPU access; the GPU path is compared with it
+  within a documented tolerance on a tiny grid, and drawing never changes the state.
+- **Validity safeguards:** parameters have stated ranges; time steps beyond the stability limit, non-finite values
+  and invalid states are refused or clamped with a visible explanation and never corrupt the field; a resize or
+  context loss rebuilds the targets from versioned CPU state without carrying corrupted values.
+- **Resource separation:** a pass never reads the texture it writes; ping-pong pairs are explicit and asserted.
+- **Bounded:** grid sizes, steps per frame, render targets, presets and capture sizes are fixed limits per quality
+  level; float-texture support is probed and an available fallback is used or the family is disabled with a message.
+- **Offline-first and private:** no networking, accounts, analytics or ads; presets and captures are stored only on
+  the device or saved by the person through a system sheet; no permission beyond what a feature actually needs, each
+  disclosed.
+- **Truthful claims:** simulations are labelled as educational approximations with their method and limits; no
+  claim of scientific accuracy, prediction or certification; performance, memory or battery numbers only from device
+  measurements.
+- **Accessibility:** native SwiftUI controls with VoiceOver labels and Dynamic Type; the experiment, its state
+  (running, paused, step count) and parameter values are spoken; every gesture (seeding, painting) has a control
+  alternative; information never depends on colour alone (legend values are shown and spoken); Reduce Motion and
+  Reduce Flashing slow or pause rapidly changing fields.
+- **Licenses:** every preset, palette, fact text and shader records its author or source and license.
+- **Regression when VisualCore changes:** any VisualCore change made for this experience MUST be followed by the
+  ProjectM reference regression (at the experience's X gate per the owner ruling of 2026-11-14).
+- **Python only:** repository automation uses Python 3; there is no PowerShell dependency.
+- **One phase at a time:** implement only one Spec Kit phase at a time (one ledger gate, ADR-0004), in order
+  A16-P00 → A16-P06.
+
 ## Governance
 
 - Precedence: real Apple platform and toolchain behavior and observed test results → owner
@@ -886,5 +932,7 @@ PDB or complex input, or chemical safety or therapeutic claims.
   from its manual's constitution prompt at gate A14-P00 (feature 102); no principle changes.
 - Amendment 2.11.0 (2026-11-15, MINOR): App-Scoped Rules gain the A15 Molecular Explorer subsection, ratified
   from its manual's constitution prompt at gate A15-P00 (feature 109); no principle changes.
+- Amendment 2.12.0 (2026-11-16, MINOR): App-Scoped Rules gain the A16 Simulation Lab subsection, ratified from
+  its manual's constitution prompt at gate A16-P00 (feature 116); no principle changes.
 
-**Version**: 2.11.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-15
+**Version**: 2.12.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-16
