@@ -22,6 +22,48 @@ Canonical overrides:
 - **Owner rulings:** short tests; audits in the device campaign; iOS 27 at phase gates; reference regression and iOS 26
   at X-A15; every Spec Kit step runs. Follow `specs/108-sse-p06-release`.
 
+## Clarifications
+
+### Session 2026-11-16
+
+Answered autonomously under the owner's standing delegation, recommended option each time, as for A14-P06. Facts checked
+in code: `check_experience_release.py` reads `docs/apps/<slug>/release.json` (schema 1: `experience`, `requiredDocs`,
+`checklist`, `copyCheck` with `text`, `swift`, `allow`) and accepts the statuses `verified`, `pending-campaign-ii` and
+`owner-action`; `release_check.py` derives `experience-release-<code>` and `copy-claims-<code>` from that file and runs
+interface chunks by name (`v2` is the last, Solar System Explorer's; `w2` is free); the a15 registration in
+`Apps/VisualCore/App/ExperienceRegistry.swift` passes no stored schema examples yet (Infinite Geometry's
+`schemaOneExample()` is the model); the presenter has no failure seam yet (Solar System Explorer's `failNextDraw` is the
+model); the sources mention "brightness" only in comments about colour; control identifiers are
+`experience.a15.molecular-explorer.<name>` (`molecule`, `display-mode`, `labels`, `recent`, `library-<id>`,
+`next-atom`, `previous-atom`, `import`, `status`, …); there is no device-campaign document for A15 yet.
+
+- Q: Which statuses does the release checklist use? → A: The checker's: `verified` (with evidence),
+  `pending-campaign-ii` (device rows, naming the device-campaign row ME-D1 … ME-D6) and `owner-action` (with the
+  owner's steps from `docs/release/build-and-archive.md`).
+- Q: Which words does the experience's own scan refuse? → A: Over the store text and the interface Swift (controls and
+  presenter): accurate, accuracy, precise, precision, exact, simulation, simulates, quantum, real-time, safe, safety,
+  toxic, toxicity, medical, fps, frames per second, battery and a millisecond figure (whole words, case-insensitive),
+  alongside the shared copy check with `camera` allowed (the 3D view's camera); every test named in the store claim
+  table must exist.
+- Q: What does the source scan refuse? → A: In `Packages/ExperiencesCreative/MolecularExplorer`: `URLSession`,
+  `import Network`, `CLLocation`, `AVCapture`, `AVAudioRecorder`, `inputNode`, `installTap`, `CMMotion`, `CNContact`,
+  `PHPhotoLibrary`, `UIImagePickerController`, `ASIdentifierManager`, `AppTrackingTransparency`,
+  `UIScreen.main.brightness` and `isIdleTimerDisabled`.
+- Q: Which interface journeys run, and how? → A: A new serial chunk `w2` with `MEExploreUITests` (choose Benzene from
+  the Library — the status names Benzene; switch the display mode to Space filling — the legend starts "Space filling";
+  Next atom — the panel names atom 1) and `MELibraryUITests` (choose Caffeine then Water from the Library — the Recent
+  menu lists Water then Caffeine; set Labels to None — the picker's value is None; reopen the experience — Labels is
+  still None), launched through `MESupport` like `SSESupport`; each test under 60 s; the document picker is never
+  presented (the import is proved by the package tests).
+- Q: How are crash recovery, sample files and old sessions proved? → A: A test-only `failNextDraw` seam in the
+  presenter; a test imports a fixture into a temporary storage, sets the seam, draws so the session fails, checks
+  `import.xyz`, `recent.json` and `settings.json` byte-identical, opens a new session over the same storage and draws
+  the import. Committed samples `recent-{valid,newer,damaged,oversized}.json`, `settings-{…}.json` and
+  `import-{valid.xyz,oversized.xyz}` under the experience's test fixtures, answered as specified and byte-identical
+  afterwards. Stored examples `MoleculeCore.schemaOneExample()`, `schemaTwoExample()` and `schemaThreeExample()`
+  (envelopes of schemas 1–3 with the digest their migration to 4 gives), passed to the registry's candidate
+  registration and tested. A device-campaign plan `docs/apps/molecular-explorer/device-campaign.md` lists ME-D1 … ME-D6.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Nothing leaves the device (Priority: P1) 🎯
