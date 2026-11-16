@@ -12,7 +12,7 @@ Precedent: `specs/117-sl-p01-algorithms/tasks.md`.
 
 ## Phase 2: Foundational — the core targets
 
-- [ ] T-A17-102 Add the targets `InteractiveAnatomyCore` (path `InteractiveAnatomy/Core`, dependency `VisualCoreMath`, `resources: [.copy("Content")]`) and `InteractiveAnatomyCoreTests` (path `InteractiveAnatomy/CoreTests`) to `Packages/ExperiencesCreative/Package.swift` (the lead writes this file); no experience target, product or registration (FR-A17-106; clarification Q5)
+- [X] T-A17-102 Add the targets `InteractiveAnatomyCore` (path `InteractiveAnatomy/Core`, dependency `VisualCoreMath`, `resources: [.copy("Content")]`) and `InteractiveAnatomyCoreTests` (path `InteractiveAnatomy/CoreTests`) to `Packages/ExperiencesCreative/Package.swift` (the lead writes this file); no experience target, product or registration (FR-A17-106; clarification Q5) — Verified 2026-11-16: 2026-11-16: targets InteractiveAnatomyCore and InteractiveAnatomyCoreTests in Package.swift (38ab1b90); .autonomy/checks/A17-P01.ia-core-ios27.json exit 0 (24 tests in 3 suites, iOS 27)
 
 ## Phase 3: Story 1 — a trustworthy content inventory (P1) 🎯 MVP
 
