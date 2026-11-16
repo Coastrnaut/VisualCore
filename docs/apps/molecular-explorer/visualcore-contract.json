@@ -184,7 +184,7 @@
       "id": "M01",
       "capability": "Instanced geometry: many atom spheres and bond cylinders (up to the experience's atom and bond caps) drawn per frame with correct occlusion through RenderHost on the main thread, one shared mesh per shape and quality level reused for every atom or bond by model transform, within a bounded draw budget",
       "source": "brainstorm: instanced geometry; constitution A15 reuse first (instanced or batched drawing)",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshRenderer.swift",
@@ -233,13 +233,19 @@
           "symbol": "Mesh.tube",
           "product": "VisualCoreScenes",
           "public": true
+        },
+        {
+          "file": "Packages/ExperiencesCreative/MolecularExplorer/Core/MoleculeScene.swift",
+          "symbol": "MoleculeScene",
+          "product": "MolecularExplorerExperience",
+          "public": true
         }
       ],
       "example": {
         "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Experience/SolarPresenter.swift",
         "symbol": "SolarPresenter"
       },
-      "notes": "Tested: DepthMeshPassTests (the nearer of two meshes wins in both draw orders, on and off screen, recreated contexts match), MeshRendererTests, RenderHostTests, ParticleRendererTests. One MeshRenderer can be drawn many times with different model transforms (SolarPresenter draws its bodies that way), but every item is one draw call with its own uniforms: there is no instanced lit-mesh drawing in any framework product. Instancing exists only inside ParticleRenderer (vcglDrawArraysInstanced of 2D quads with vcglVertexAttribDivisor in the internal DynamicVertexBuffer, through Camera2D, unlit), which cannot draw lit 3D meshes. A molecule of a few hundred atoms and bonds is a few hundred draw items: batching over MeshRenderer and DepthMeshPass (shared meshes, merged static geometry per display mode, or per-element merged meshes) is G-RENDER (A15-P02); an instanced lit-mesh path is assessed there for VisualCoreRendering as an additive change to the same pipeline, never a second renderer."
+      "notes": "Tested: DepthMeshPassTests (the nearer of two meshes wins in both draw orders, on and off screen, recreated contexts match), MeshRendererTests, RenderHostTests, ParticleRendererTests. One MeshRenderer can be drawn many times with different model transforms (SolarPresenter draws its bodies that way), but every item is one draw call with its own uniforms: there is no instanced lit-mesh drawing in any framework product. Instancing exists only inside ParticleRenderer (vcglDrawArraysInstanced of 2D quads with vcglVertexAttribDivisor in the internal DynamicVertexBuffer, through Camera2D, unlit), which cannot draw lit 3D meshes. A molecule of a few hundred atoms and bonds is a few hundred draw items: batching over MeshRenderer and DepthMeshPass (shared meshes, merged static geometry per display mode, or per-element merged meshes) is G-RENDER (A15-P02); an instanced lit-mesh path is assessed there for VisualCoreRendering as an additive change to the same pipeline, never a second renderer. Built at A15-P02 (G-RENDER closed): the molecule scene, display modes and camera, tested in MoleculeSceneTests, CameraSettingsTests, MoleculeSceneRenderTests and MoleculeCameraTests."
     },
     {
       "id": "M02",
@@ -508,7 +514,7 @@
       "id": "M07",
       "capability": "Ball-and-stick and space-filling display modes: atoms as spheres scaled by a fraction of the covalent radius joined by bond cylinders, or as spheres at the van der Waals radius without bonds; switching modes changes drawing only, never the molecule",
       "source": "v0.1 feature 2: ball-and-stick and space-filling modes",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshGenerators.swift",
@@ -545,13 +551,19 @@
           "symbol": "MeshRenderer",
           "product": "VisualCoreRendering",
           "public": true
+        },
+        {
+          "file": "Packages/ExperiencesCreative/MolecularExplorer/Core/MoleculeScene.swift",
+          "symbol": "MoleculeScene",
+          "product": "MolecularExplorerExperience",
+          "public": true
         }
       ],
       "example": {
         "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Experience/SceneMeshes.swift",
         "symbol": "SceneMeshes"
       },
-      "notes": "Spheres, capped straight tubes (a cylinder is Mesh.tube along two points with caps; MeshShapeTests straightCappedTubeAtThreeResolutions checks a closed capped straight tube's area and volume), the mesh builder under a budget and tessellation choice per quality level exist and are tested (MeshDigestTests, MeshShapeTests, MeshBuilderTests, TessellationChoiceTests). The mode rule (radius per mode, bonds hidden in space-filling) is G-DISPLAY (app-local, A15-P03) over the geometry of G-RENDER."
+      "notes": "Spheres, capped straight tubes (a cylinder is Mesh.tube along two points with caps; MeshShapeTests straightCappedTubeAtThreeResolutions checks a closed capped straight tube's area and volume), the mesh builder under a budget and tessellation choice per quality level exist and are tested (MeshDigestTests, MeshShapeTests, MeshBuilderTests, TessellationChoiceTests). The mode rule (radius per mode, bonds hidden in space-filling) is G-DISPLAY (app-local, A15-P03) over the geometry of G-RENDER. Built at A15-P02 (G-RENDER, G-DISPLAY closed): the molecule scene, display modes and camera, tested in MoleculeSceneTests, CameraSettingsTests, MoleculeSceneRenderTests and MoleculeCameraTests."
     },
     {
       "id": "M08",
@@ -1302,10 +1314,10 @@
       ],
       "kind": "adaptation",
       "owner": "app-local",
-      "justification": "MeshRenderer and DepthMeshPass draw one item per call; the molecule scene does not exist: shared sphere and cylinder meshes per quality level, per-bond transforms (two half-bonds per bond for two-colour bonds), batching (merged static geometry per display mode and element, or shared meshes drawn per item) under a draw budget, and camera framing of the molecule's bounding sphere. App-local over MeshRenderer, DepthMeshPass, Mesh.uvSphere and Mesh.tube (clarification 5, manual phase 02 camera/atom/bond renderer, A15-P02). Instanced lit-mesh drawing is assessed there for VisualCoreRendering as an additive change on the same pipeline (never a second renderer); a named cylinder generator for VisualCoreScenes only if reusable. If either is added the owner becomes VisualCore and the reference regression runs at the X gate.",
+      "justification": "MeshRenderer and DepthMeshPass draw one item per call; the molecule scene does not exist: shared sphere and cylinder meshes per quality level, per-bond transforms (two half-bonds per bond for two-colour bonds), batching (merged static geometry per display mode and element, or shared meshes drawn per item) under a draw budget, and camera framing of the molecule's bounding sphere. App-local over MeshRenderer, DepthMeshPass, Mesh.uvSphere and Mesh.tube (clarification 5, manual phase 02 camera/atom/bond renderer, A15-P02). Instanced lit-mesh drawing is assessed there for VisualCoreRendering as an additive change on the same pipeline (never a second renderer); a named cylinder generator for VisualCoreScenes only if reusable. If either is added the owner becomes VisualCore and the reference regression runs at the X gate. Built at A15-P02: Core/MoleculeScene.swift and DisplayMode.swift (atom items and two bond halves per bond, budget 1,500) drawn by MoleculePresenter with one unit sphere and one unit stick renderer through DepthMeshPass. Instanced lit meshes were assessed for VisualCoreRendering and are not needed at the library's at most 74 items; no VisualCore change.",
       "phase": 2,
       "test": "Experience tests: the scene for each fixture molecule draws within the draw budget per quality level; atom and bond counts drawn equal the domain's; a bond cylinder's ends meet its atoms' centres within tolerance; an off-screen render shows the nearer atom in front (depth) and differs between display modes; context recreation rebuilds an identical image; any VisualCore addition is documented with ///, in the API baseline and tested",
-      "closed": null
+      "closed": "A15-P02"
     },
     {
       "id": "G-CAMERA",
@@ -1315,10 +1327,10 @@
       ],
       "kind": "adaptation",
       "owner": "app-local",
-      "justification": "OrbitCamera, OrbitViewBounds (orbit, pan, zoom, clamp) and the gesture recognizers exist; framing a molecule by its bounding sphere, the bounds derived from it, the reset view, and the camera persisted apart from the molecule data are app-local (clarification 5, A15-P02).",
+      "justification": "OrbitCamera, OrbitViewBounds (orbit, pan, zoom, clamp) and the gesture recognizers exist; framing a molecule by its bounding sphere, the bounds derived from it, the reset view, and the camera persisted apart from the molecule data are app-local (clarification 5, A15-P02). Built at A15-P02: Core/CameraSettings.swift (turn 15° wrapping, tilt ±80°, zoom ±4 steps of 0.85, framed on the bounding sphere) kept in MoleculeState schema 2 apart from the molecule data; gestures and panning move to A15-P03 with picking.",
       "phase": 2,
       "test": "Core and experience tests: framing places every atom inside the view for each fixture; gestures and their control alternatives keep the camera inside the bounds; Reduce Motion cuts the reset flight; the camera document round-trips and a damaged one falls back to framing",
-      "closed": null
+      "closed": "A15-P02"
     },
     {
       "id": "G-PICK",
@@ -1339,10 +1351,10 @@
       ],
       "kind": "adaptation",
       "owner": "app-local",
-      "justification": "The display-mode rule (ball-and-stick radius as a fraction of the covalent radius with bonds shown; space-filling at the van der Waals radius with bonds hidden) and its effect on drawing and picking are app rules over the geometry of G-RENDER (clarification 5, manual phase 03, A15-P03).",
-      "phase": 3,
+      "justification": "The display-mode rule (ball-and-stick radius as a fraction of the covalent radius with bonds shown; space-filling at the van der Waals radius with bonds hidden) and its effect on drawing and picking are app rules over the geometry of G-RENDER (clarification 5, manual phase 03, A15-P03). Built at A15-P02 (brought forward from phase 3 by the phase-02 gate 'ball-and-stick and space-filling rendering modes'): DisplayMode with 0.30 and 1.00 of the van der Waals radius, sticks in ball-and-stick only.",
+      "phase": 2,
       "test": "Core host tests: each mode gives the documented radius per element and bond visibility; switching modes never changes the molecule digest; experience test: the off-screen image differs between modes",
-      "closed": null
+      "closed": "A15-P02"
     },
     {
       "id": "G-PANEL",
