@@ -330,7 +330,11 @@ extension ExperienceRegistry {
     /// A15 Molecular Explorer (feature 110, A15-P01): a candidate until X-A15.
     fileprivate static var molecularExplorer: ExperienceRegistration? {
         guard let id = MolecularExplorerExperience.id else { return nil }
-        var registration = ExperienceRegistration(id: id, core: MoleculeCore.self) { launch in
+        // Schema 4 (feature 114) holds the imported molecule; the stored schema-1 to schema-3 examples (feature 115,
+        // A15-P06) prove the migrations.
+        let examples = [MoleculeCore.schemaOneExample(), MoleculeCore.schemaTwoExample(),
+                        MoleculeCore.schemaThreeExample()].compactMap { $0 }
+        var registration = ExperienceRegistration(id: id, core: MoleculeCore.self, examples: examples) { launch in
             let system = SystemAccessibilityObserver.systemValues()
             return MolecularExplorerExperience.make(
                 id: id, storage: launch.storage,

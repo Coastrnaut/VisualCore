@@ -100,6 +100,11 @@
 // the name line "Imported molecule — C2H6O", the counts of its atoms and inferred bonds and the source line "imported
 // file — your own data" (the presenter puts the file's title in place of "Imported molecule"); the status reads
 // "Imported molecule selected, molecule 6 of 6".
+//
+// Feature 115 (A15-P06) T-A15-606 (FR-A15-612; clarification Q5): `schemaOneExample()`, `schemaTwoExample()` and
+// `schemaThreeExample()` are stored payloads of schemas 1, 2 and 3 (caffeine; then space-filling with a moved camera;
+// then a pan and atom 3) in envelopes of their schema, each with the digest its migration to schema 4 and restore
+// give, for the registry's `SnapshotMigrationCheck`.
 import Foundation
 import MolecularExplorerCore
 import VisualCoreExperience
@@ -391,6 +396,54 @@ public struct MoleculeCore: ExperienceCore, Equatable {
         case .success(let state): return MoleculeCore(seed: seed, state: state)
         case .failure(let reason): throw MoleculeRestoreError.refused(reason)
         }
+    }
+
+    // MARK: Stored migration examples (A15-P06)
+
+    /// The stored payload of schema `version` (1, 2 or 3) for the registry's migration check (feature 115,
+    /// T-A15-606): schema 1 selects caffeine; schema 2 also chooses space-filling and moves the camera (turn 5, tilt 3,
+    /// zoom 1); schema 3 also pans the camera (2, −1) and selects atom 3. Nil for another version.
+    public static func schemaExamplePayload(version: Int) -> [String: Any]? {
+        guard (1...3).contains(version) else { return nil }
+        var payload: [String: Any] = ["schema": version, "selection": 4]
+        if version == 2 {
+            payload["mode"] = DisplayMode.spaceFilling.rawValue
+            payload["camera"] = ["turn": 5, "tilt": 3, "zoom": 1]
+        }
+        if version == 3 {
+            payload["mode"] = DisplayMode.spaceFilling.rawValue
+            payload["camera"] = ["turn": 5, "tilt": 3, "zoom": 1, "panX": 2, "panY": -1]
+            payload["atom"] = 3
+        }
+        return payload
+    }
+
+    /// The stored example of schema `version` for the registry's migration check: ``schemaExamplePayload(version:)``
+    /// in an envelope of that schema at step 0 with seed `seed`, with the digest its restore through the migration
+    /// chain to schema 4 gives (computed here by running ``migrations`` and ``restore(payload:seed:)``, as Solar System
+    /// Explorer does). Nil for another version or if the encoding, the migration or the restore failed.
+    public static func schemaExample(version: Int, seed: UInt64 = 7) -> MigrationExample? {
+        guard let id = ExperienceID(rawValue: experienceID), let payload = schemaExamplePayload(version: version),
+              let data = try? JSONSerialization.data(withJSONObject: payload, options: [.sortedKeys]),
+              let upgraded = try? migrations.migrate(payload, from: version),
+              let migrated = try? JSONSerialization.data(withJSONObject: upgraded, options: [.sortedKeys]),
+              let restored = try? restore(payload: migrated, seed: seed) else { return nil }
+        var builder = DigestBuilder(domain: id.rawValue)
+        guard (try? restored.writeDigest(into: &builder)) != nil else { return nil }
+        let digest = builder.finish()
+        guard let snapshot = try? ExperienceSnapshot(experience: id, schemaVersion: version, seed: seed, stepIndex: 0,
+                                                     digest: digest, payload: data),
+              let encoded = try? snapshot.encoded() else { return nil }
+        return MigrationExample(version: version, snapshot: encoded, expectedDigest: digest.hex)
+    }
+
+    /// The stored schema-1 example (A15-P01 state: the selection only).
+    public static func schemaOneExample(seed: UInt64 = 7) -> MigrationExample? { schemaExample(version: 1, seed: seed) }
+    /// The stored schema-2 example (A15-P02 state: the display mode and the camera).
+    public static func schemaTwoExample(seed: UInt64 = 7) -> MigrationExample? { schemaExample(version: 2, seed: seed) }
+    /// The stored schema-3 example (A15-P03 state: the pan and the selected atom).
+    public static func schemaThreeExample(seed: UInt64 = 7) -> MigrationExample? {
+        schemaExample(version: 3, seed: seed)
     }
 
     // MARK: Words
