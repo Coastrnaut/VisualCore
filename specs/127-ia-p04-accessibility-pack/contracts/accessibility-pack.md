@@ -15,5 +15,8 @@ public enum AnatomyLabels { static func candidates(scene: AnatomyScene, solid: S
 public enum AnatomyContentPack { static let kind = "a17.content-pack"; static let schemaVersion = 2; static let maxBytes = 262_144
     static func decode(_ data: Data) -> Result<AnatomyRegion, ContentRefusal>; static func encode(_ region: AnatomyRegion) -> Data; static func digest(_ region: AnatomyRegion) -> String }
 public struct AnatomyProvenance: Equatable, Sendable { static func of(_ region: AnatomyRegion) -> AnatomyProvenance; var problems: [String] }
+// Experience uses VisualCoreSimulation: AnnouncementPlanner(minimumInterval: 0.5) with Announcement(text:kind:time:) of
+//   AnnouncementKind (.rejection for the camera limit, .state for selections), StateSign, stateSignProblems,
+//   transitionDuration(_:reduceMotion:).
 // Experience: drag/pinch/tap via AnatomyGestures; overlay labels; announcements "<name> selected." / "Selection cleared."; limit sentence "The camera is at its limit."
 ```
