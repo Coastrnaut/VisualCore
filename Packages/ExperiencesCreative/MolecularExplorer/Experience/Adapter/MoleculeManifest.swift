@@ -8,7 +8,9 @@
 //     `viewing-<id>`.
 //   - two fixtures of feature 111 (A15-P02) T-A15-206: `fixture-caffeine-space-filling` (caffeine, then
 //     `display.mode [1]`) and `fixture-benzene-turned` (benzene, three `camera.orbit [1]`, one `camera.tilt [1]`, two
-//     `camera.zoom [1]`), pinned by ``MoleculeCore/viewFixtures``.
+//     `camera.zoom [1]`), pinned by ``MoleculeCore/viewFixtures``;
+//   - two fixtures of feature 112 (A15-P03) T-A15-307: `fixture-caffeine-picked` (caffeine, then `atom.select [2]`,
+//     its third atom, a nitrogen) and `fixture-water-panned` (water, two `camera.pan [1, 0]`, one `camera.pan [0, 1]`).
 // The completion scenario selects caffeine and expects the outcome `viewing-caffeine`. The expected digests are derived
 // by playing the entries on a core exactly as the engine plays them (the steps of an entry, then its action) and
 // digesting it with the experience id as domain, as Solar System Explorer's manifest does.
@@ -24,11 +26,11 @@ extension MoleculeCore {
     /// molecule by ``fixtureEntries(molecule:)`` from the first state, by molecule index (0…4), pinned from the first
     /// run of `MoleculeManifestTests` on sim-27.2.
     public static let selectedFixtures: [(molecule: Int, digest: String)] = [
-        (0, "e3b0b2da99d0be7f508431babe3477477f27842f473c1c01f8ed986d8d646458"),
-        (1, "1f794f1c38f70cf339ca55417bf641bc6ed34778ff96227ea9aea02d22e0d214"),
-        (2, "d05fe35bcaa8823a46b7993aa9115199f024446059930c3bab9ffb8887ab80cf"),
-        (3, "3cd2126913b698ee11f901de02d02355033b49533f0df5ea2d96a4e1b119ebc6"),
-        (4, "2cdf378cc6b54aa9209ab1ec9a8db724b809a31f64a32605eda8ae5fb7ba4f63"),
+        (0, "0949b967739e77336de9a182af3bd52a964421a42df96c31b4364d230d5ac930"),
+        (1, "51704829e4f7ac63c799e1a6c1c773ce71118ad1a4211a17da1881da40e26e71"),
+        (2, "5bb8cf7d670bde92f244a74c0b0570fa0f58a4ded5ab15fd62dfabd8093ada07"),
+        (3, "34fdfa1c4aac8d738e60eee44a009b56d9f4fc7b5dc5330b2de56c58c6fbb331"),
+        (4, "bcb917544e35b7e7e84fd858171e1c4289dcc8a78ea8eee67633bafe1eb8bb74"),
     ]
 
     /// The view fixtures of feature 111: a name, the molecule index, the entries after selecting it and the committed
@@ -36,7 +38,7 @@ extension MoleculeCore {
     public static let viewFixtures: [(name: String, molecule: Int, entries: [ScenarioStep], digest: String)] = [
         ("fixture-caffeine-space-filling", 4,
          [ScenarioStep(steps: 1, action: ScriptedAction("display.mode", [1]), result: "accepted")],
-         "a09d03cd338962899a34113dc0a16f4ca7b6058aafb6dc0a6f34cc2cd4839df2"),
+         "7b7953643c250e4f51929929f2cf3a0461a724a9e4fc5198fae1ee6057c83eba"),
         ("fixture-benzene-turned", 3,
          [ScenarioStep(steps: 1, action: ScriptedAction("camera.orbit", [1]), result: "accepted"),
           ScenarioStep(steps: 1, action: ScriptedAction("camera.orbit", [1]), result: "accepted"),
@@ -44,7 +46,15 @@ extension MoleculeCore {
           ScenarioStep(steps: 1, action: ScriptedAction("camera.tilt", [1]), result: "accepted"),
           ScenarioStep(steps: 1, action: ScriptedAction("camera.zoom", [1]), result: "accepted"),
           ScenarioStep(steps: 1, action: ScriptedAction("camera.zoom", [1]), result: "accepted")],
-         "0ec4b9f83662bf94500ed14adbfbb18c62b8ffb6448f22ec580bc76aaa00560b"),
+         "28df1b30c0d650d7daafd0602ec7e459f19fefd8d2ec63241deb8ce01d44eb7f"),
+        ("fixture-caffeine-picked", 4,
+         [ScenarioStep(steps: 1, action: ScriptedAction("atom.select", [2]), result: "accepted")],
+         "70e1d3c67ced089938af1c9b68d829b1ec7e634676864c39b0c3db3d25234b2b"),
+        ("fixture-water-panned", 0,
+         [ScenarioStep(steps: 1, action: ScriptedAction("camera.pan", [1, 0]), result: "accepted"),
+          ScenarioStep(steps: 1, action: ScriptedAction("camera.pan", [1, 0]), result: "accepted"),
+          ScenarioStep(steps: 1, action: ScriptedAction("camera.pan", [0, 1]), result: "accepted")],
+         "0f6f525eb6d052ec6909e92510e058737d78d548d499aec547c2f1f368f0f95b"),
     ]
 
     /// The entries of the view fixture `fixture`: its molecule selected, then its own entries.

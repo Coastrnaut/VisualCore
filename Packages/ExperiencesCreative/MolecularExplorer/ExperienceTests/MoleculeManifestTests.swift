@@ -37,7 +37,7 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
     @Test func theManifestIsValidWithTheStandardScenariosAndFiveFixtures() {
         let manifest = MoleculeCore.manifest(for: id)
         let problems = ScenarioManifestValidator.problems(manifest, controls: MoleculeCore.controls,
-                                                          content: ContentRequirement(fixtures: 7))
+                                                          content: ContentRequirement(fixtures: 9))
         #expect(problems.isEmpty, "\(problems)")
         #expect(manifest.scenarios.map(\.name) == ScenarioManifest.standardNames + Self.fixtureNames
                 + MoleculeCore.viewFixtures.map(\.name))
@@ -97,7 +97,8 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
     /// the mode or camera changed as their entries say.
     @Test func everyViewFixtureEndsWithItsCommittedDigest() async throws {
         let manifest = MoleculeCore.manifest(for: id)
-        #expect(MoleculeCore.viewFixtures.map(\.name) == ["fixture-caffeine-space-filling", "fixture-benzene-turned"])
+        #expect(MoleculeCore.viewFixtures.map(\.name) == ["fixture-caffeine-space-filling", "fixture-benzene-turned",
+                                                       "fixture-caffeine-picked", "fixture-water-panned"])
         for fixture in MoleculeCore.viewFixtures {
             let spec = try #require(manifest.scenarios.first { $0.name == fixture.name })
             #expect(spec.expect.finalDigest == fixture.digest, "\(fixture.name)")
@@ -115,6 +116,12 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
         let turned = MoleculeCore.played(seed: MoleculeCore.manifestSeed,
                                          entries: MoleculeCore.viewFixtureEntries(MoleculeCore.viewFixtures[1]))
         #expect(turned.state.camera == CameraSettings(turnSteps: 5, tiltSteps: 3, zoomSteps: 2))
+        let picked = MoleculeCore.played(seed: MoleculeCore.manifestSeed,
+                                         entries: MoleculeCore.viewFixtureEntries(MoleculeCore.viewFixtures[2]))
+        #expect(picked.state.selectedAtom == 2)
+        let panned = MoleculeCore.played(seed: MoleculeCore.manifestSeed,
+                                         entries: MoleculeCore.viewFixtureEntries(MoleculeCore.viewFixtures[3]))
+        #expect(panned.state.camera.panX == 2 && panned.state.camera.panY == 1)
     }
 
     /// The JSON form with the control ids, named by `Catalog/registrations.json`. `UPDATE_SCENARIO_MANIFEST=1`
