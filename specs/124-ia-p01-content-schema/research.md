@@ -10,3 +10,5 @@
   fixture holds before any geometry exists.
 - **D5 No experience yet** (Q5): there is nothing real to draw until the scene exists, so no registration and no
   placeholder.
+- **D6 The root** (analyze 2026-11-16): the region holds 15 structures, the root `knee.joint` and its 14 joint
+  parts. The root has no layer, no meshes and no label; it groups the parts as their parent.

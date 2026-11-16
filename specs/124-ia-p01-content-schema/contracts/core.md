@@ -8,6 +8,8 @@ public struct ProceduralMeshDeclaration: Codable, Equatable, Sendable { let id: 
 public struct ContentManifest: Codable, Equatable, Sendable { …; var reviewSentence: String }
 public struct AnatomyLabel: Equatable, Sendable { let structureID: String; let text: String; let anchorMeshID: String }
 public struct ContentRefusal: Error, Equatable, Sendable { let reason: Reason; let sentence: String }
+// Reason: damaged, newerVersion, tooLarge, missingReference, duplicateID, parentCycle, emptyText, unsourced,
+//         badLicense, nonFinite, collidingSynonym, clinicalText (raw values as in data-model.md)
 public enum AnatomyContent {
     static let maxBytes = 262_144
     static func decode(_ data: Data) -> Result<AnatomyRegion, ContentRefusal>   // decode + validate

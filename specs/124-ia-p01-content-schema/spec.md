@@ -127,7 +127,8 @@ The content and any later saved view are versioned; damaged, newer or malformed 
 
 ### Edge Cases
 
-- **A structure with no geometry yet:** refused; every structure needs at least one mesh id.
+- **A structure with no geometry yet:** refused; every structure except the root `knee.joint` needs 1–3 mesh ids,
+  and the root needs none.
 - **A cycle in the parent graph:** refused.
 - **Duplicate ids, names or synonyms that collide across structures:** ids are refused; colliding synonyms are
   refused.
@@ -170,7 +171,8 @@ The content and any later saved view are versioned; damaged, newer or malformed 
 
 ### Measurable Outcomes
 
-- **SC-A17-101**: 100 % of the bundled structures have a source, a description and at least one mesh id; 100 % of
+- **SC-A17-101**: 100 % of the bundled structures have a source and a description, and all 14 joint parts (every
+  structure but the root) have 1–3 mesh ids; 100 % of
   the sources have an allowed license.
 - **SC-A17-102**: Every kind of broken reference listed in FR-A17-103 is refused in a test that names it.
 - **SC-A17-103**: The region round-trips unchanged; damaged and newer data is refused.
