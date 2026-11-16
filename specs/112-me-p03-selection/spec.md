@@ -63,7 +63,7 @@ sink.
   index); a schema-2 state migrates with no selection and no pan; choosing a molecule clears the selection and resets
   the camera and pan; changing the mode keeps both. Panel lines for the selected atom: "Nitrogen (N), atom 3 of 24",
   "Position x −0.97, y −1.31, z 0.00 Å", "Covalent radius 0.71 Å, van der Waals radius 1.55 Å", and one line per bond
-  ("Double bond to carbon, atom 10, recorded"). The canvas description adds "; selected nitrogen, atom 3". A selection
+  ("Single bond to carbon, atom 8, recorded"; a double bond reads "Double bond to …"). The canvas description adds "; selected nitrogen, atom 3". A selection
   change announces the first panel line; each action announces at most once. New fixtures: caffeine with atom 3
   picked, and water panned two steps right and one up.
 
