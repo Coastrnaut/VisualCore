@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a16.simulation-lab",
+    "--runtime",
+    "26"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a16.simulation-lab --runtime 26",
+  "elapsed_seconds": 56.37,
+  "exit_code": 0,
+  "finished": "2026-11-16T21:47:56+00:00",
+  "gate": "X-A16",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-A16.sim26-2.log",
+  "log_sha256": "0520d424561dc9e816fe97c33482cdf191f6e1b7bccf7da4aab6d05125c457d5",
+  "name": "sim26-2",
+  "started": "2026-11-16T21:47:00+00:00",
+  "timed_out": false
+}
