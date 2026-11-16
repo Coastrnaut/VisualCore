@@ -3284,10 +3284,11 @@
     ]
    },
    "implementation": {
-    "state": "not-started",
-    "legacy_gates_passed": [],
+    "state": "standalone-partial",
+    "legacy_gates_passed": [
+     "A16-P00"
+    ],
     "legacy_gates_pending": [
-     "A16-P00",
      "A16-P01",
      "A16-P02",
      "A16-P03",
