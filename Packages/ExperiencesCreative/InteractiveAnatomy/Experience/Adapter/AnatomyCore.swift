@@ -1,36 +1,54 @@
-// AnatomyCore — feature 125 (A17-P02) T-A17-204 (FR-A17-202–208; clarifications Q1–Q5; contracts/scene.md). The state
-// of Interactive Anatomy as an experience: the bundled right knee (`AnatomyContent.bundledRightKnee()`), its scene at
-// both quality levels (`AnatomyScene.build`, built once per process and cached; a level change selects the other
-// scene and changes nothing else), the canonical `AnatomyViewState` (camera steps, visible layers, selection, framed
-// part) and the preparation seed. Nothing animates: a host step changes nothing.
+// AnatomyCore — feature 125 (A17-P02) T-A17-204 (FR-A17-202–208; clarifications Q1–Q5; contracts/scene.md) and
+// feature 126 (A17-P03) T-A17-306 (FR-A17-302, FR-A17-304, FR-A17-305, FR-A17-307; clarifications Q3, Q4;
+// contracts/layers-search.md). The state of Interactive Anatomy as an experience: the bundled right knee
+// (`AnatomyContent.bundledRightKnee()`), its scene at both quality levels (`AnatomyScene.build`, built once per process
+// and cached; a level change selects the other scene and changes nothing else), the canonical `AnatomyViewState`
+// (camera steps, visible layers, selection, framed part, isolate), the isolate mode the next isolate uses and the
+// preparation seed. Nothing animates: a host step changes nothing.
 //
 // Preparation: every seed opens with the opening view (`AnatomyViewState.opening`: the opening camera, every layer
-// shown, nothing selected or framed). Content the scene cannot build (or content refused) makes `prepare(seed:)`
-// throw an `ExperienceFailure` (`a17.scene-refused` or `a17.content-refused`) whose message is the refusal's sentence,
-// so the experience does not open.
+// shown, nothing selected, framed or isolated). Content the scene cannot build (or content refused) makes
+// `prepare(seed:)` throw an `ExperienceFailure` (`a17.scene-refused` or `a17.content-refused`) whose message is the
+// refusal's sentence, so the experience does not open.
+//
+// Drawing sets: `solidIndices` and `ghostIndices` are `AnatomyViewState.solidParts(parts:)` and `ghostParts(parts:)`
+// (without an isolate: the parts on shown layers, no ghosts; with one: its target set plus the selection, and in the
+// ghost mode every other part on a shown layer as ghosts).
 //
 // Actions (numbers; the engine refuses a value outside the declared range, a non-finite value and a wrong value
 // count before the core sees it; called directly, the core refuses an unknown control and a wrong count itself):
 //   structure.select [0…13]   the part by inventory index: selected and framed; a value that is not a whole index is
-//                             refused with `a17.invalid-choice`, a part on a hidden layer with `a17.hidden-structure`.
+//                             refused with `a17.invalid-choice`, a part that is not solid (on a hidden layer, or
+//                             outside an isolate) with `a17.hidden-structure`.
 //   structure.clear           clears the selection; the framing stays until Reset view.
 //   layer.show [0…2, 0…1]     shows (1) or hides (0) a layer (bones, cartilage, ligaments); a value that is not a
-//                             whole index or exactly 0 or 1 is refused with `a17.invalid-choice`. Hiding the selected
-//                             part's layer clears the selection.
+//                             whole index or exactly 0 or 1 is refused with `a17.invalid-choice`. The selection is
+//                             cleared only when it is no longer solid.
 //   camera.turn [−1…1]        one 15° turn step, wrapping; camera.tilt [−1…1] one 10° step within −6…6; camera.zoom
 //                             [−1…1] one × 0.85 step within −4…6. A value other than ±1 is refused with
 //                             `a17.invalid-choice`, a step beyond a limit with `a17.camera-limit`.
-//   view.reset                the opening camera, framing the region; the selection and the layers stay.
+//   view.reset                the opening camera, framing the region; the selection, the layers and the isolate stay.
+//   isolate.part [0…13]       isolates the part (the selection stays) in the current isolate mode.
+//   isolate.layer [0…2]       isolates the layer (the selection stays) in the current isolate mode.
+//   isolate.mode [0…1]        0 hide, 1 ghost (the default): the mode of the current isolate and of the next one.
+//   isolate.clear             removes the isolate ("Show all"); a selection that is then not solid is cleared.
+//   view.apply [11 values]    replaces the whole view: turn, tilt, zoom, bones 0/1, cartilage 0/1, ligaments 0/1,
+//                             selection index or −1, framed index or −1, isolate kind (−1 none, 0 part, 1 layer),
+//                             isolate index (−1 with no isolate), isolate mode (0 hide, 1 ghost). Every value is
+//                             validated (`a17.invalid-choice` otherwise); the presenter sends it to open the view file
+//                             (`viewApplyValues(_:parts:)`).
 // A refusal changes nothing.
 //
 // Digest: "a17.anatomy.v1|" and the canonical JSON of the view state (`AnatomyViewState.encoded()`), so drawing and
-// the quality tier never change it. Snapshot schema 1 (`MigrationChain(currentVersion: 1)`): the payload is the view
-// state's JSON; `restore` decodes it with `AnatomyViewState.decode(_:parts:)` (damaged, newer or an unknown part id
-// throw ``AnatomyRestoreError``) and clears a selection on a hidden layer.
+// the quality tier never change it. Snapshot schema 2 (`AnatomyViewState.migrations`, migrating schema 1): the payload
+// is the view state's JSON; `restore` decodes it with `AnatomyViewState.decode(_:parts:)` (damaged or newer throw
+// ``AnatomyRestoreError``; an unknown id is dropped and its reason kept in `lastDropped`) and clears a selection that
+// is not solid.
 //
 // Outcome: `selected-<part id with dots as hyphens>` ("selected-knee-femur") while a part is selected, else
 // `viewing-knee`. The canvas description: "Right knee, <shown layers in words, joined by commas, or 'no layer
-// shown'>; selected: <English name or 'nothing selected'>."
+// shown'>; selected: <English name or 'nothing selected'>", then, with an isolate, "; isolated: <English name or
+// layer words> (<'ghosts' or 'others hidden'>)", and a final period.
 import Foundation
 import InteractiveAnatomyCore
 import VisualCoreExperience
@@ -41,9 +59,10 @@ import VisualCorePersistence
 public enum AnatomyRule {
     /// A camera step beyond its limit (tilt −6…6, zoom −4…6).
     public static let cameraLimit = "a17.camera-limit"
-    /// Selecting a part whose layer is hidden.
+    /// Selecting a part that is not solid (on a hidden layer, or outside an isolate).
     public static let hiddenStructure = "a17.hidden-structure"
-    /// A value that is not a whole index, a layer switch other than 0 or 1, or a camera step other than ±1.
+    /// A value that is not a whole index, a layer switch other than 0 or 1, a camera step other than ±1, or a
+    /// `view.apply` value outside its rule.
     public static let invalidChoice = "a17.invalid-choice"
 }
 
@@ -63,10 +82,15 @@ public struct AnatomyCore: ExperienceCore {
     public static let contentRefusedCode = "a17.content-refused"
     /// The action ids in declaration order.
     public static let actionIDs = ["structure.select", "structure.clear", "layer.show", "camera.turn", "camera.tilt",
-                                   "camera.zoom", "view.reset"]
+                                   "camera.zoom", "view.reset", "isolate.part", "isolate.layer", "isolate.mode",
+                                   "isolate.clear", "view.apply"]
     /// The number of values each action carries, by action id.
     static let valueCounts: [String: Int] = ["structure.select": 1, "structure.clear": 0, "layer.show": 2,
-                                             "camera.turn": 1, "camera.tilt": 1, "camera.zoom": 1, "view.reset": 0]
+                                             "camera.turn": 1, "camera.tilt": 1, "camera.zoom": 1, "view.reset": 0,
+                                             "isolate.part": 1, "isolate.layer": 1, "isolate.mode": 1,
+                                             "isolate.clear": 0, "view.apply": viewApplyCount]
+    /// The number of values of `view.apply`.
+    public static let viewApplyCount = 11
     /// The number of parts of the bundled knee (inventory order).
     public static let partCount = 14
 
@@ -112,6 +136,10 @@ public struct AnatomyCore: ExperienceCore {
     let scenes: [AnatomyScene]
     /// The quality tier in use (0 full, 1 reduced).
     public private(set) var tier = 0
+    /// The mode the next isolate uses (ghost by default); `isolate.mode` sets it and the current isolate's mode.
+    public private(set) var isolateMode: AnatomyIsolate.Mode = .ghost
+    /// The reason sentences of the ids the last `restore` dropped; empty otherwise.
+    public private(set) var lastDropped: [String] = []
 
     /// The opening state of the bundled knee with `seed`; throws the `ExperienceFailure` of unbuildable content.
     public init(seed: UInt64) throws {
@@ -143,6 +171,11 @@ public struct AnatomyCore: ExperienceCore {
     /// The framed part's inventory index, or nil when the region is framed.
     public var framedIndex: Int? { view.framed.flatMap { scene.partIndex($0) } }
 
+    /// The parts drawn solid, by inventory index (`AnatomyViewState.solidParts(parts:)`).
+    public var solidIndices: Set<Int> { view.solidParts(parts: scene.parts) }
+    /// The parts drawn as ghosts, by inventory index (`AnatomyViewState.ghostParts(parts:)`).
+    public var ghostIndices: Set<Int> { view.ghostParts(parts: scene.parts) }
+
     /// The layer of the part at `index` (bones for a part without one).
     func layer(ofPart index: Int) -> AnatomyLayer { scene.parts[index].layer ?? .bones }
 
@@ -158,20 +191,33 @@ public struct AnatomyCore: ExperienceCore {
     /// Two quality tiers, one per `AnatomyQuality` level.
     public static var qualityTiers: Int { AnatomyQuality.levels.count }
 
-    /// Schema 1 only (the first schema).
+    /// Schema 2, migrating schema 1 (`AnatomyViewState.migrations`).
     public static var migrations: MigrationChain {
-        MigrationChain(currentVersion: AnatomyViewState.schemaVersion)
+        AnatomyViewState.migrations
     }
 
-    /// The seven controls with their declared ranges.
+    /// The twelve controls with their declared ranges.
     public static var controls: [ExperienceControl] {
-        [ExperienceControl(id: "structure.select", ranges: [0...Double(partCount - 1)]),
-         ExperienceControl(id: "structure.clear"),
-         ExperienceControl(id: "layer.show", ranges: [0...Double(AnatomyLayer.allCases.count - 1), 0...1]),
-         ExperienceControl(id: "camera.turn", ranges: [-1...1]),
-         ExperienceControl(id: "camera.tilt", ranges: [-1...1]),
-         ExperienceControl(id: "camera.zoom", ranges: [-1...1]),
-         ExperienceControl(id: "view.reset")]
+        let part = 0...Double(partCount - 1), layer = 0...Double(AnatomyLayer.allCases.count - 1)
+        let tilt = AnatomyCameraState.tiltRange, zoom = AnatomyCameraState.zoomRange
+        let apply: [ClosedRange<Double>] = [0...Double(AnatomyCameraState.turnPositions - 1),
+                                            Double(tilt.lowerBound)...Double(tilt.upperBound),
+                                            Double(zoom.lowerBound)...Double(zoom.upperBound),
+                                            0...1, 0...1, 0...1,
+                                            -1...Double(partCount - 1), -1...Double(partCount - 1),
+                                            -1...1, -1...Double(partCount - 1), 0...1]
+        return [ExperienceControl(id: "structure.select", ranges: [part]),
+                ExperienceControl(id: "structure.clear"),
+                ExperienceControl(id: "layer.show", ranges: [layer, 0...1]),
+                ExperienceControl(id: "camera.turn", ranges: [-1...1]),
+                ExperienceControl(id: "camera.tilt", ranges: [-1...1]),
+                ExperienceControl(id: "camera.zoom", ranges: [-1...1]),
+                ExperienceControl(id: "view.reset"),
+                ExperienceControl(id: "isolate.part", ranges: [part]),
+                ExperienceControl(id: "isolate.layer", ranges: [layer]),
+                ExperienceControl(id: "isolate.mode", ranges: [0...1]),
+                ExperienceControl(id: "isolate.clear"),
+                ExperienceControl(id: "view.apply", ranges: apply)]
     }
 
     /// The opening state with `seed`; throws the `ExperienceFailure` of unbuildable content.
@@ -193,10 +239,11 @@ public struct AnatomyCore: ExperienceCore {
         let invalid = ActionResult.rejected(.rule(code: AnatomyRule.invalidChoice))
         let limit = ActionResult.rejected(.rule(code: AnatomyRule.cameraLimit))
         var next = view
+        var nextMode = isolateMode
         switch action.control {
         case "structure.select":
             guard let index = Self.choice(v[0], count: scene.parts.count) else { return invalid }
-            guard visibleLayers.contains(layer(ofPart: index)) else {
+            guard solidIndices.contains(index) else {
                 return .rejected(.rule(code: AnatomyRule.hiddenStructure))
             }
             next.selection = scene.parts[index].id
@@ -212,6 +259,22 @@ public struct AnatomyCore: ExperienceCore {
         case "view.reset":
             next.camera = .opening
             next.framed = nil
+        case "isolate.part":
+            guard let index = Self.choice(v[0], count: scene.parts.count) else { return invalid }
+            next.isolate = AnatomyIsolate(target: .part(index), mode: isolateMode)
+        case "isolate.layer":
+            guard let index = Self.choice(v[0], count: AnatomyLayer.allCases.count) else { return invalid }
+            next.isolate = AnatomyIsolate(target: .layer(AnatomyLayer.allCases[index]), mode: isolateMode)
+        case "isolate.mode":
+            guard let mode = Self.mode(v[0]) else { return invalid }
+            nextMode = mode
+            next.isolate?.mode = mode
+        case "isolate.clear":
+            next.isolate = nil
+            next = next.normalized(layers: partLayers)
+        case "view.apply":
+            guard let applied = viewApplied(v) else { return invalid }
+            next = applied
         default:   // camera.turn, camera.tilt, camera.zoom
             guard let step = Self.unitStep(v[0]) else { return invalid }
             switch action.control {
@@ -221,7 +284,64 @@ public struct AnatomyCore: ExperienceCore {
             }
         }
         view = next
+        isolateMode = nextMode
         return .accepted
+    }
+
+    /// The isolate mode named by `value`: 0 hide, 1 ghost; nil otherwise.
+    static func mode(_ value: Double) -> AnatomyIsolate.Mode? {
+        value == 0 ? .hide : value == 1 ? .ghost : nil
+    }
+
+    /// The view named by the eleven `view.apply` values (see the file header), normalized; nil when any value is
+    /// outside its rule.
+    func viewApplied(_ v: [Double]) -> AnatomyViewState? {
+        guard v.count == Self.viewApplyCount, v.allSatisfy({ $0.isFinite && $0 == $0.rounded() && abs($0) <= 1_000 }) else { return nil }
+        let camera = AnatomyCameraState(turn: Int(v[0]), tilt: Int(v[1]), zoom: Int(v[2]))
+        guard camera.isValid, v[3...5].allSatisfy({ $0 == 0 || $0 == 1 }) else { return nil }
+        let count = scene.parts.count
+        func part(_ value: Double) -> String?? {
+            if value == -1 { return .some(nil) }
+            guard let index = Self.choice(value, count: count) else { return nil }
+            return .some(scene.parts[index].id)
+        }
+        guard let selection = part(v[6]), let framed = part(v[7]), let mode = Self.mode(v[10]) else { return nil }
+        let isolate: AnatomyIsolate?
+        switch v[8] {
+        case -1:
+            guard v[9] == -1 else { return nil }
+            isolate = nil
+        case 0:
+            guard let index = Self.choice(v[9], count: count) else { return nil }
+            isolate = AnatomyIsolate(target: .part(index), mode: mode)
+        case 1:
+            guard let index = Self.choice(v[9], count: AnatomyLayer.allCases.count) else { return nil }
+            isolate = AnatomyIsolate(target: .layer(AnatomyLayer.allCases[index]), mode: mode)
+        default:
+            return nil
+        }
+        let state = AnatomyViewState(camera: camera, visibleLayers: v[3...5].map { $0 == 1 }, selection: selection,
+                                     framed: framed, isolate: isolate)
+        return state.normalized(layers: partLayers)
+    }
+
+    /// The eleven `view.apply` values that recreate `view` over the part ids `parts` (inventory order): an id that
+    /// is not among `parts` becomes −1; with no isolate the kind and index are −1 and the mode 1.
+    public static func viewApplyValues(_ view: AnatomyViewState, parts: [String]) -> [Double] {
+        func index(_ id: String?) -> Double { id.flatMap { parts.firstIndex(of: $0) }.map { Double($0) } ?? -1 }
+        let layers = (0..<AnatomyLayer.allCases.count).map { i in
+            view.visibleLayers.indices.contains(i) && view.visibleLayers[i] ? 1.0 : 0.0
+        }
+        var kind = -1.0, target = -1.0, mode = 1.0
+        if let isolate = view.isolate {
+            switch isolate.target {
+            case .part(let i): kind = 0; target = Double(i)
+            case .layer(let layer): kind = 1; target = Double(AnatomyLayer.allCases.firstIndex(of: layer) ?? 0)
+            }
+            mode = isolate.mode == .ghost ? 1 : 0
+        }
+        return [Double(view.camera.turn), Double(view.camera.tilt), Double(view.camera.zoom)] + layers
+            + [index(view.selection), index(view.framed), kind, target, mode]
     }
 
     /// Part id → layer, for `AnatomyViewState.normalized(layers:)`.
@@ -242,9 +362,10 @@ public struct AnatomyCore: ExperienceCore {
         return Int(value)
     }
 
-    /// Back to the opening state (the scenes and the tier stay).
+    /// Back to the opening state, with the ghost mode for the next isolate (the scenes and the tier stay).
     public mutating func reset() {
         view = .opening
+        isolateMode = .ghost
     }
 
     /// Selects the scene of `tier` (clamped to the levels); never changes the digest.
@@ -271,18 +392,23 @@ public struct AnatomyCore: ExperienceCore {
         builder.add("a17.anatomy.v1|" + text)
     }
 
-    /// The view state (schema 1) as JSON with sorted keys.
+    /// The view state (schema 2) as JSON with sorted keys.
     public func snapshotPayload() throws -> Data {
-        view.encoded()
+        view.encoded(partIDs: partIDs)
     }
 
-    /// The core of a schema-1 payload with the envelope's `seed`; a refused payload throws
-    /// ``AnatomyRestoreError/refused(_:)``, unbuildable content the preparation's `ExperienceFailure`.
+    /// The core of a schema-1 or schema-2 payload with the envelope's `seed`; a refused payload throws
+    /// ``AnatomyRestoreError/refused(_:)``, unbuildable content the preparation's `ExperienceFailure`. An unknown id
+    /// is dropped and its reason kept in `lastDropped`.
     public static func restore(payload: Data, seed: UInt64) throws -> AnatomyCore {
         let prepared = try bundled.get()
         var core = AnatomyCore(seed: seed, prepared: prepared)
-        switch AnatomyViewState.decode(payload, parts: core.partIDs) {
-        case .success(let state): core.view = state.normalized(layers: core.partLayers)
+        let decoded: (Result<AnatomyViewState, ContentRefusal>, dropped: [String]) =
+            AnatomyViewState.decode(payload, parts: core.partIDs)
+        switch decoded.0 {
+        case .success(let state):
+            core.view = state.normalized(layers: core.partLayers)
+            core.lastDropped = decoded.dropped
         case .failure(let refusal): throw AnatomyRestoreError.refused(refusal)
         }
         return core
@@ -292,11 +418,7 @@ public struct AnatomyCore: ExperienceCore {
 
     /// The words of `layer`: "bones", "cartilage and menisci", "ligaments and tendons".
     public static func layerWords(_ layer: AnatomyLayer) -> String {
-        switch layer {
-        case .bones: return "bones"
-        case .cartilage: return "cartilage and menisci"
-        case .ligaments: return "ligaments and tendons"
-        }
+        AnatomyPanel.words(layer)
     }
 
     /// The canvas description (see the file header).
@@ -304,6 +426,13 @@ public struct AnatomyCore: ExperienceCore {
         let shown = AnatomyLayer.allCases.filter { visibleLayers.contains($0) }.map(Self.layerWords)
         let layers = shown.isEmpty ? "no layer shown" : shown.joined(separator: ", ")
         let selected = selectedIndex.map { scene.parts[$0].englishName } ?? "nothing selected"
-        return "Right knee, \(layers); selected: \(selected)."
+        guard let isolate = view.isolate else { return "Right knee, \(layers); selected: \(selected)." }
+        let target: String
+        switch isolate.target {
+        case .part(let index): target = scene.parts.indices.contains(index) ? scene.parts[index].englishName : "nothing"
+        case .layer(let layer): target = Self.layerWords(layer)
+        }
+        let mode = isolate.mode == .ghost ? "ghosts" : "others hidden"
+        return "Right knee, \(layers); selected: \(selected); isolated: \(target) (\(mode))."
     }
 }
