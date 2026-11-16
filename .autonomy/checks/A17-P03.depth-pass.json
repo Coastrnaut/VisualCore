@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "VisualCoreRenderingTests/DepthMeshPassTests",
+    "VisualCoreRenderingTests/DepthMeshPassTranslucentTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --only-testing VisualCoreRenderingTests/DepthMeshPassTests VisualCoreRenderingTests/DepthMeshPassTranslucentTests",
+  "elapsed_seconds": 4.937,
+  "exit_code": 0,
+  "finished": "2026-11-16T23:14:33+00:00",
+  "log": ".autonomy/logs/A17-P03.depth-pass.log",
+  "log_sha256": "5843a62ad3270ccdb0d43f093ad2910870cc401700f28b5426f41251d8752fcc",
+  "name": "depth-pass",
+  "stage": "A17-P03",
+  "started": "2026-11-16T23:14:28+00:00",
+  "timed_out": false
+}

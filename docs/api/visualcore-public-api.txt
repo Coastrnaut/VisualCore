@@ -1855,6 +1855,8 @@ VisualCoreRendering | func | public func clearTrails()
 VisualCoreRendering | func | public func destroy()
 VisualCoreRendering | func | public func draw(_ items: [Item], camera: OrbitCamera, context: RenderContext) throws
 VisualCoreRendering | func | public func draw(_ items: [Item], view: Mat4, projection: Mat4, fog: MeshFog?, context: RenderContext) throws
+VisualCoreRendering | func | public func draw(_ opaque: [Item], translucent: [Item], camera: OrbitCamera, context: RenderContext) throws
+VisualCoreRendering | func | public func draw(_ opaque: [Item], translucent: [Item], view: Mat4, projection: Mat4, fog: MeshFog?,
 VisualCoreRendering | func | public func draw(_ particles: [ParticleInstance], camera: Camera2D, metrics: ViewMetrics, blend: ParticleBlend = .normal) throws
 VisualCoreRendering | func | public func draw(_ root: SceneNode, camera: Camera2D, metrics: ViewMetrics) throws
 VisualCoreRendering | func | public func draw(model: Mat4 = .identity, camera: OrbitCamera, aspect: Double, color: Vec4) throws
@@ -1939,7 +1941,7 @@ VisualCoreRendering | init | public init(registry: ResourceRegistry) throws
 VisualCoreRendering | init | public init(registry: ResourceRegistry, fragment: String, inputs: [String], label: String,
 VisualCoreRendering | init | public init(registry: ResourceRegistry, width: Int, height: Int) throws
 VisualCoreRendering | init | public init(registry: ResourceRegistry, width: Int, height: Int, format: TextureFormat, label: String) throws
-VisualCoreRendering | init | public init(renderer: MeshRenderer, model: Mat4 = .identity, color: Vec4)
+VisualCoreRendering | init | public init(renderer: MeshRenderer, model: Mat4 = .identity, color: Vec4, center: Vec3 = .zero)
 VisualCoreRendering | init | public init(scene: RenderScene, maxFramesPerSecond: Int = 60, budget: ResourceBudget = ResourceBudget()) throws
 VisualCoreRendering | init | public init(world: WorldRect, background: Vec4 = Vec4(0, 0, 0, 1), source: @escaping @MainActor (FrameInfo) -> [ParticleInstance])
 VisualCoreRendering | init | public init?(start: Double, end: Double, color: Vec4)
@@ -2048,6 +2050,7 @@ VisualCoreRendering | var | public var bytes: Int
 VisualCoreRendering | var | public var bytesPerPixel: Int
 VisualCoreRendering | var | public var cachedProgramCount: Int
 VisualCoreRendering | var | public var center: Vec2
+VisualCoreRendering | var | public var center: Vec3
 VisualCoreRendering | var | public var clearColor
 VisualCoreRendering | var | public var color: Vec4
 VisualCoreRendering | var | public var eglExtensions: [String]?
