@@ -5,7 +5,7 @@
 - requiredDocs: privacy-and-credits.md, store-listing.md, release-checklist.md, device-campaign.md,
   validation-report.md, visualcore-contract.md and docs/release/build-and-archive.md;
 - checklist: release-checklist.md;
-- copyCheck: text store-listing.md; swift SimulationControls.swift, SimulationPresenter.swift and SimulationLegend.swift;
+- copyCheck: text store-listing.md; swift SimulationControls.swift, SimulationPresenter.swift and SimulationLegend.swift, Adapter/SimulationCore.swift;
   allow `share`.
 
 Interface chunk `x2` = `SLExploreUITests` and `SLLibraryUITests` (serial). `SimulationPresenter.failNextDraw: Bool` is a

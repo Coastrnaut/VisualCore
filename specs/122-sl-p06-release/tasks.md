@@ -57,7 +57,7 @@ Precedent: `specs/115-me-p06-release/tasks.md`.
 
 ## Phase 5: Story 4 — the interface end to end
 
-- [ ] T-A16-608 [P] [US4] Write `Apps/VisualCore/Tests/UI/SimulationLab/{SLSupport,SLExploreUITests,SLLibraryUITests}.swift` per Clarifications Q4 (launched like `MESupport`; identifiers `experience.a16.simulation-lab.<name>`). Add the serial chunk `"x2": ["SLExploreUITests", "SLLibraryUITests"]` to `scripts/release_check.py`, with `x2` in `SERIAL_CHUNKS`. (FR-A16-630)
+- [ ] T-A16-608 [P] [US4] Write `Apps/VisualCore/Tests/UI/SimulationLab/{SLSupport,SLExploreUITests,SLLibraryUITests}.swift` per Clarifications Q4 (launched like `MESupport`; identifiers `experience.a16.simulation-lab.<name>`). `SLExploreUITests` also reads the `approximation` element: after Spots, its value is the Euler-step sentence (FR-A16-622). Add the serial chunk `"x2": ["SLExploreUITests", "SLLibraryUITests"]` to `scripts/release_check.py`, with `x2` in `SERIAL_CHUNKS`. (FR-A16-630)
 - [ ] T-A16-609 [US4] Simulation Lab suites on sim-27.2 (`--name sl-ios27`; the slowest test under 10 s) (FR-A16-632; SC-A16-605)
 - [ ] T-A16-610 [US4] App build, unit and interface chunk (`xcodegen generate --spec project.yml`, then `--name app-ui -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27 app-ui-ios27-x2`) and the runner (`--name verify-27`) (SC-A16-604)
 - [ ] T-A16-611 [US4] Release build checks (`--name release-checks -- python3 scripts/release_check.py --only app-release-build app-release-symbols app-privacy-manifest app-no-tracking app-licenses app-usage-descriptions experience-release-a16 copy-claims-a16`) (FR-A16-602, 631; SC-A16-603, 604)
