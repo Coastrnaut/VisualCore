@@ -169,6 +169,11 @@ count as after the first molecule.
   saved state); the stored copy is rewritten at the next import; nothing crashes.
 - **An imported molecule in the recent list after a newer import:** the entry stands for the current import.
 - **Picking is cancelled:** nothing changes and no message is shown.
+- **The picker returns while the experience is not active** (suspended or closing): the file is not read and nothing
+  changes; the person can import again.
+- **The stored copy cannot be written** (storage full or refused): the molecule is still imported (it is in the saved
+  state) and the message reads "The molecule was opened but could not be kept for the recent list (<storage code>)."
+- **The title file is missing at reopening:** the molecule is shown as "Imported molecule".
 - **The file cannot be read (no access, removed meanwhile):** refused with "The file could not be read." and nothing
   changes.
 - **A file whose comment line holds markup or very long text:** the comment is never shown as a title; the title comes
@@ -213,7 +218,8 @@ count as after the first molecule.
 
 **Experience**
 
-- **FR-A15-540**: The import control MUST have an accessible label, value and hint; the runner's standard scenarios
+- **FR-A15-540**: The import control MUST have an accessible label, value and hint; a successful import MUST be
+  announced ("<title> imported, N atoms") and a refusal announced with its sentence; the runner's standard scenarios
   MUST pass on iOS 27.
 
 ### Key Entities
