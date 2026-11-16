@@ -39,6 +39,8 @@ let package = Package(
         // Feature 110 (A15-P01): Molecular Explorer, a candidate until X-A15.
         .library(name: "MolecularExplorerExperience", targets: ["MolecularExplorerExperience"]),
         .library(name: "SimulationLabExperience", targets: ["SimulationLabExperience"]),
+        // Feature 125 (A17-P02): Interactive Anatomy, a candidate until X-A17.
+        .library(name: "InteractiveAnatomyExperience", targets: ["InteractiveAnatomyExperience"]),
         // The standalone ParticleUniverse app target compiles the moved sources and needs the Core until X-A04.
         .library(name: "ParticleUniverseCore", targets: ["ParticleUniverseCore"]),
     ],
@@ -552,6 +554,28 @@ let package = Package(
                     dependencies: ["InteractiveAnatomyCore", .product(name: "VisualCoreMath", package: visualCore),
                                    .product(name: "VisualCoreScenes", package: visualCore)],
                     path: "InteractiveAnatomy/CoreTests"),
+        .target(name: "InteractiveAnatomyExperience",
+                dependencies: ["InteractiveAnatomyCore",
+                               .product(name: "VisualCoreMath", package: visualCore),
+                               .product(name: "VisualCoreDiagnostics", package: visualCore),
+                               .product(name: "VisualCoreScenes", package: visualCore),
+                               .product(name: "VisualCorePersistence", package: visualCore),
+                               .product(name: "VisualCoreExperience", package: visualCore),
+                               .product(name: "VisualCoreRendering", package: rendering),
+                               .product(name: "VisualCoreExperienceHost", package: rendering),
+                               .product(name: "VisualCoreUI", package: rendering)],
+                path: "InteractiveAnatomy/Experience"),
+        .testTarget(name: "InteractiveAnatomyExperienceTests",
+                    dependencies: ["InteractiveAnatomyExperience", "InteractiveAnatomyCore",
+                               .product(name: "VisualCoreMath", package: visualCore),
+                               .product(name: "VisualCoreDiagnostics", package: visualCore),
+                               .product(name: "VisualCoreScenes", package: visualCore),
+                               .product(name: "VisualCorePersistence", package: visualCore),
+                               .product(name: "VisualCoreExperience", package: visualCore),
+                               .product(name: "VisualCoreRendering", package: rendering),
+                               .product(name: "VisualCoreExperienceHost", package: rendering),
+                               .product(name: "VisualCoreUI", package: rendering)],
+                    path: "InteractiveAnatomy/ExperienceTests"),
         // A15 Molecular Explorer (feature 110, A15-P01): a candidate until X-A15. The core is pure (Foundation and
         // VisualCoreMath for the scene and camera of feature 111).
         // A16 Simulation Lab (feature 117, A16-P01): a candidate until X-A16. The core is pure (Foundation and VisualCore
