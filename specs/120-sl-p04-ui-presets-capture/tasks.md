@@ -83,7 +83,7 @@ Precedent: `specs/119-sl-p03-rd-wave/tasks.md`.
 
 ## Phase 6: Story 4 — presets
 
-- [ ] T-A16-408 [US4] Create `Packages/ExperiencesCreative/SimulationLab/Experience/SimulationPresetStore.swift`:
+- [X] T-A16-408 [US4] Create `Packages/ExperiencesCreative/SimulationLab/Experience/SimulationPresetStore.swift`: — Verified 2026-11-16: 2026-11-16: .autonomy/checks/A16-P04.sl-ios27.json exit 0 (62 core, 23 Swift Testing and 54 XCTest experience tests, 0 failures, slowest 4.3 s, iOS 27); PresetStoreTests (round trip across stores, the 25th save refused with the sentence, damaged and newer files reported and skipped, delete, an invalid name refused, sorted by name)
   - one file per preset, `preset-<uuid>.json`, in `ExperienceStorage`; "≤ 24 files";
   - damaged, newer or refused files are reported and skipped;
   - save refused at 24 with "The library holds 24 experiments; delete one first."; delete.
