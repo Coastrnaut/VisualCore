@@ -23,6 +23,50 @@ Canonical overrides:
 - **Owner rulings:** short tests; audits and device runs in the device campaign; iOS 27 at phase gates; reference
   regression and iOS 26 at X-A15; every Spec Kit step runs.
 
+## Clarifications
+
+### Session 2026-11-15
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+the presenter receives `pointer(_:viewSize:port:)` from the host; Tiny Worlds' `WorldsGestures` drives drag, pinch and
+tap through VisualCore's `GestureArbiter`, `DragRecognizer`, `PinchRecognizer` (which reports `scale` and the fingers'
+`center`) and `TapRecognizer`, priorities pinch 3, drag 2, tap 1; `OrbitCamera.ray(ndc:aspect:)` and
+`Ray3.intersect(sphereCenter:radius:)` with `Ray3.nearest` serve picking; Solar System Explorer draws labels and
+captions through the host's canvas overlay (`makeCanvasOverlay`, hit testing off) and announces through an injectable
+sink.
+
+- Q: How do gestures map to camera steps? → A: Drag (begins after 10 points) at 0.3° per point, accumulated: every 15°
+  (50 points) across sends `camera.orbit` (dragging right turns the molecule right) and every 10° (about 33 points)
+  down or up sends `camera.tilt`; pinch: each time the scale since the last step passes 1 / 0.85 or 0.85, one
+  `camera.zoom` step in or out; two-finger move: every 40 points of the fingers' midpoint sends one `camera.pan` step
+  so the molecule follows the fingers; tap (within 10 points and 0.3 s) picks. Steps refused at a limit are dropped
+  quietly by the gesture (the buttons answer them in words).
+- Q: What are the pan's steps and limits? → A: One step moves the camera's target by 0.1 × the bounding radius along
+  the view's right or up direction; −10…10 steps on each axis; action `camera.pan [dx, dy]` with each value −1, 0 or
+  1 and not both 0; a step beyond a limit is refused with `a15.camera-limit`; Pan left, right, up and down buttons;
+  reset view sets the pan to 0.
+- Q: How does picking work and which actions exist? → A: The line of sight from the camera through the tapped point is
+  tested against every atom's drawn sphere (the mode's radius); the hit with the smallest positive distance wins; a
+  tap on an atom sends `atom.select [index]`, a tap on nothing sends `atom.clear` when an atom is selected. Actions:
+  `atom.select [0…499]` (an index at or above the atom count is refused with `a15.invalid-choice`), `atom.next` and
+  `atom.previous` (with no selection they select the first and the last atom), `atom.clear` (refused with
+  `a15.invalid-choice` when nothing is selected); buttons Previous atom, Next atom and Clear selection.
+- Q: How are labels and bond styles drawn? → A: Labels: the element symbol in a 24 × 18 pt box whose bottom-left corner
+  is 6 pt right of and 6 pt above the atom's projected centre, the selected atom first, then by increasing distance from
+  the eye; a box overlapping a placed one is skipped; atoms projected outside the canvas get none; the selected atom gets
+  a white ring 2 pt wide around its projected outline, all in the canvas overlay (hidden from VoiceOver, the panel and
+  description speak instead). Ball-and-stick sticks: single 1 × 0.12 Å; double 2 × 0.07 Å, 0.09 Å either side of the
+  bond line; triple 3 × 0.06 Å, at 0 and 0.12 Å either side; inferred 1 × 0.06 Å. The side direction is perpendicular to
+  the bond in the plane of another bond of the first atom (so a ring's double bonds lie in the ring's plane), or, with no
+  other bond, perpendicular to the bond and the least-aligned axis.
+- Q: What does the state hold and what is spoken? → A: Schema 3 adds the pan steps and the selected atom (none or an
+  index); a schema-2 state migrates with no selection and no pan; choosing a molecule clears the selection and resets
+  the camera and pan; changing the mode keeps both. Panel lines for the selected atom: "Nitrogen (N), atom 3 of 24",
+  "Position x −0.97, y −1.31, z 0.00 Å", "Covalent radius 0.71 Å, van der Waals radius 1.55 Å", and one line per bond
+  ("Double bond to carbon, atom 10, recorded"). The canvas description adds "; selected nitrogen, atom 3". A selection
+  change announces the first panel line; each action announces at most once. New fixtures: caffeine with atom 3
+  picked, and water panned two steps right and one up.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Touch the molecule (Priority: P1) 🎯
