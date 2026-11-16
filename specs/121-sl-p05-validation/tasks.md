@@ -58,7 +58,7 @@ Precedent: `specs/120-sl-p04-ui-presets-capture/tasks.md`.
 ## Phase 5: Records and evidence
 
 - [X] T-A16-506 Contract `docs/apps/simulation-lab/visualcore-contract.json`: G-VALIDATION closed by "A16-P05" (the report on iOS 27.2; the iOS 26 section at X-A16; device figures in the device campaign); rows whose gaps are all closed become available (`--name contract -- python3 scripts/check_app_contract.py --app simulation-lab --render`) — Verified 2026-11-16: 2026-11-16: .autonomy/checks/A16-P05.contract.json exit 0; G-VALIDATION closed by A16-P05 (report on iOS 27.2; iOS 26 section at X-A16; device figures in the device campaign); M09, M16 and M26 available
-- [ ] T-A16-507 Simulation Lab tests on sim-27.2 (`--name sl-ios27`; the slowest test under 10 s), documented API (`--name documented-api`), packages (`--name packages`), scripts (`--name scripts`) (SC-A16-505)
+- [X] T-A16-507 Simulation Lab tests on sim-27.2 (`--name sl-ios27`; the slowest test under 10 s), documented API (`--name documented-api`), packages (`--name packages`), scripts (`--name scripts`) (SC-A16-505) — Verified 2026-11-16: 2026-11-16: .autonomy/checks/A16-P05.sl-ios27.json exit 0 (slowest test 6.6 s), A16-P05.documented-api.json, A16-P05.packages.json and A16-P05.scripts.json exit 0
 - [ ] T-A16-508 App build and unit (`--name app-unit`) and runner (`--name verify-27`) (FR-A16-506)
 
 ## Dependencies

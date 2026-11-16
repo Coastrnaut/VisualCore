@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_documented_api.py",
+    "--sources",
+    "Packages/ExperiencesCreative/SimulationLab"
+  ],
+  "command": "python3 scripts/check_documented_api.py --sources Packages/ExperiencesCreative/SimulationLab",
+  "elapsed_seconds": 0.946,
+  "exit_code": 0,
+  "finished": "2026-11-16T21:18:39+00:00",
+  "log": ".autonomy/logs/A16-P05.documented-api.log",
+  "log_sha256": "712a6dae8e3fce4f2541393f195de1de2790c04cf25ecf71865563a788fa21d1",
+  "name": "documented-api",
+  "stage": "A16-P05",
+  "started": "2026-11-16T21:18:38+00:00",
+  "timed_out": false
+}
