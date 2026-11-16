@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a16.simulation-lab",
+    "--runtime",
+    "27"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a16.simulation-lab --runtime 27",
+  "elapsed_seconds": 57.28,
+  "exit_code": 0,
+  "finished": "2026-11-16T21:09:39+00:00",
+  "log": ".autonomy/logs/A16-P04.verify-27.log",
+  "log_sha256": "84cf5642cbb0805d8e02bfd4157403fe3cc4d8315f236c758601644a53b0d532",
+  "name": "verify-27",
+  "stage": "A16-P04",
+  "started": "2026-11-16T21:08:42+00:00",
+  "timed_out": false
+}
