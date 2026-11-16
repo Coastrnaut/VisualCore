@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "sh",
+    "specs/115-me-p06-release/scan-sources-release.sh"
+  ],
+  "command": "sh specs/115-me-p06-release/scan-sources-release.sh",
+  "elapsed_seconds": 0.045,
+  "exit_code": 0,
+  "finished": "2026-11-16T18:01:55+00:00",
+  "log": ".autonomy/logs/A15-P06.me-no-network.log",
+  "log_sha256": "9fb7912ff57e0eb897968d3595e1161682157602b470e9ad04406f35524b4d42",
+  "name": "me-no-network",
+  "stage": "A15-P06",
+  "started": "2026-11-16T18:01:55+00:00",
+  "timed_out": false
+}
