@@ -44,3 +44,7 @@ registration (106), manifest generation, contract, runs, commits.
 
 MVP: the rules (103) with the spec (102); the scheduler and state (104) and the experience (105–107) close the phase.
 Review checkpoints after 104 (core tests) and at 109.
+
+## Phase 5: Convergence
+
+- [ ] T-A16-113 Record in `specs/117-sl-p01-algorithms/plan.md` (Project Structure and Summary) the GPU-free aggregate `Core/SimulationModel.swift` that the adapter wraps, and the manifest's five fixtures (one per family plus the HighLife and Mazes presets, required by the planning catalog's content count), per plan: project structure and T-A16-107 (unrequested)
