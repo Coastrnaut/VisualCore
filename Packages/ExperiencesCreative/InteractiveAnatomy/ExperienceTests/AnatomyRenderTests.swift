@@ -4,7 +4,8 @@
 // view restores the opening frame exactly; hiding each layer changes the frame, its meshes are no longer drawn and
 // showing it again restores the frame; with every layer hidden no mesh is drawn, only the backdrop is left and the
 // description says no layer is shown; a selection changes the frame (the amber material and the framing); drawing
-// never changes the digest.
+// never changes the digest. Feature 126 (A17-P03) T-A17-307: without an isolate every drawn mesh is solid and no
+// ghost is drawn.
 import Foundation
 import XCTest
 @testable import InteractiveAnatomyExperience
@@ -65,6 +66,8 @@ final class AnatomyRenderTests: XCTestCase {
             XCTAssertTrue(drawn.isDisjoint(with: meshes), "no mesh of the hidden \(layer) is drawn")
             let core = try AnatomyTest.core(shell)
             XCTAssertEqual(drawn, Set(core.scene.visibleItems(core.visibleLayers).map(\.meshID)))
+            XCTAssertEqual(Set(presenter.lastSolidMeshIDs), drawn, "without an isolate every drawn mesh is solid")
+            XCTAssertTrue(presenter.lastGhostMeshIDs.isEmpty, "without an isolate no ghost is drawn")
             XCTAssertFalse(core.describe().contains(anatomyLayerWords[layer] ?? "?"), core.describe())
             AnatomyTest.accept(shell, "layer.show", [Double(index), 1])
             let shown = try AnatomyTest.picture(session)

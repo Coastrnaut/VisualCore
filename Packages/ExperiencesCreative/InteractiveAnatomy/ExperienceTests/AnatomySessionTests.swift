@@ -5,6 +5,9 @@
 // keeps the camera, layers and selection and draws with the other level's scene; a context recreation rebuilds the
 // renderers together once and redraws the same pixels with the state kept; a resize keeps the state and, back at the
 // first size, draws the same pixels; the saved state restores in a new session; closing releases the renderers.
+// Feature 126 (A17-P03) T-A17-307 (FR-A17-307; SC-A17-305): the saved state (schema 2) carries the isolate and
+// restores it with the same pixels; a schema-1 saved state migrates; a damaged one is refused and the opening view
+// opens; an unknown selection is dropped with a reason and the rest of the view is kept.
 import Foundation
 import XCTest
 @testable import InteractiveAnatomyExperience
@@ -149,7 +152,10 @@ final class AnatomySessionTests: XCTestCase {
         AnatomyTest.accept(shell, "structure.select", [12])
         AnatomyTest.accept(shell, "layer.show", [0, 0])
         AnatomyTest.accept(shell, "camera.zoom", [1])
+        AnatomyTest.accept(shell, "isolate.layer", [2])
         let snapshot = try shell.snapshot()
+        XCTAssertEqual(snapshot.schemaVersion, AnatomyViewState.schemaVersion)
+        XCTAssertEqual(try AnatomyTest.core(shell).view.isolate, AnatomyIsolate(target: .layer(.ligaments)))
         let saved = try AnatomyTest.core(shell)
         let picture = try AnatomyTest.picture(first)
         first.close()
@@ -170,12 +176,56 @@ final class AnatomySessionTests: XCTestCase {
         AnatomyTest.accept(shell, "structure.select", [1])
         let saved = try shell.snapshot()
         first.close()
-        let damaged = try anatomyEnvelope(anatomyPayload(saved.payload, key: "selection", value: "knee.bogus"),
-                                          like: saved)
+        let camera: [String: Any] = ["turn": 2, "tilt": 9, "zoom": 0]
+        let damaged = try anatomyEnvelope(anatomyPayload(saved.payload, key: "camera", value: camera), like: saved)
         let second = ExperienceSession()
         let opened = try await AnatomyTest.open(second, snapshot: damaged)
-        XCTAssertNotNil(second.lastRestoreRefusal, "an unknown part is refused")
+        XCTAssertNotNil(second.lastRestoreRefusal, "a camera out of range is refused")
         XCTAssertEqual(try AnatomyTest.core(opened).view, AnatomyViewState.opening)
+        second.close()
+    }
+
+    /// T-A17-307: a session snapshot whose payload was edited (an unknown selection id) no longer matches its recorded
+    /// digest, so the host refuses it as a whole and the experience opens at the opening view. Dropping unknown ids
+    /// with a reason applies to the view file and to the core's own restore (AnatomyViewFileTests, AnatomyCoreTests).
+    func testAnEditedSnapshotIsRefusedByTheHostAndOpensTheOpeningView() async throws {
+        let first = ExperienceSession()
+        let shell = try await AnatomyTest.open(first)
+        AnatomyTest.accept(shell, "structure.select", [1])
+        AnatomyTest.accept(shell, "camera.turn", [1])
+        let saved = try shell.snapshot()
+        first.close()
+        let edited = try anatomyEnvelope(anatomyPayload(saved.payload, key: "selection", value: "knee.bogus"),
+                                         like: saved)
+        let second = ExperienceSession()
+        let opened = try await AnatomyTest.open(second, snapshot: edited)
+        XCTAssertNotNil(second.lastRestoreRefusal, "the host's digest check refuses the edited snapshot")
+        let core = try AnatomyTest.core(opened)
+        XCTAssertEqual(core.view, AnatomyViewState.opening, "the experience opens at the opening view")
+        second.close()
+    }
+
+    /// T-A17-307: a schema-1 (A17-P02) saved state opens migrated, with no isolate, and draws like the same view
+    /// saved at schema 2.
+    func testASchemaOneSavedStateOpensMigrated() async throws {
+        let first = ExperienceSession()
+        let shell = try await AnatomyTest.open(first)
+        AnatomyTest.accept(shell, "structure.select", [4])
+        AnatomyTest.accept(shell, "layer.show", [2, 0])
+        AnatomyTest.accept(shell, "camera.tilt", [-1])
+        let saved = try shell.snapshot()
+        let view = try AnatomyTest.core(shell).view
+        let picture = try AnatomyTest.picture(first)
+        first.close()
+        let old = try anatomyEnvelope(anatomySchema1Payload(view), like: saved, schema: 1)
+        let second = ExperienceSession()
+        let opened = try await AnatomyTest.open(second, snapshot: old)
+        XCTAssertNil(second.lastRestoreRefusal)
+        let core = try AnatomyTest.core(opened)
+        XCTAssertEqual(core.view, view)
+        XCTAssertNil(core.view.isolate)
+        let again = try AnatomyTest.picture(second)
+        XCTAssertEqual(AnatomyTest.differingPixels(picture.rgba, again.rgba), 0)
         second.close()
     }
 }

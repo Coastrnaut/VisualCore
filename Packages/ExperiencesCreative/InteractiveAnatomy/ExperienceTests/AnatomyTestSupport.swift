@@ -4,7 +4,9 @@
 // the pixels of a frame (rows bottom-up, as the host reads them back); counting the pixels two frames differ in and the
 // pixels that are not the backdrop; projecting a region point through the camera of the last drawn frame; the engine
 // digest of a core; the canvas description expected for a set of shown layers and a selection; snapshot envelopes and
-// edited payloads.
+// edited payloads. Feature 126 (A17-P03) T-A17-307 (SC-A17-303–305): opening over a given storage (the view file),
+// a temporary storage removed in tearDown, the mesh ids of a set of parts, the canvas description with an isolate,
+// schema-1 payloads and view files written by hand.
 import Foundation
 import XCTest
 @testable import InteractiveAnatomyExperience
@@ -38,11 +40,12 @@ enum AnatomyTest {
     /// Opens Interactive Anatomy in `session` (seed `seed`, optionally restoring `snapshot`) through the factory, lays
     /// the view out at `size` points and draws one frame. A session without a quality pin is pinned to level 0, so the
     /// automatic level never changes a frame between two readings.
+    /// `storage` (by default a fresh one) is the experience's storage, where the presenter keeps `view.json`.
     static func open(_ session: ExperienceSession, seed: UInt64 = 1, snapshot: ExperienceSnapshot? = nil,
-                     size: CGSize = CGSize(width: 240, height: 160)) async throws
-        -> ExperienceShell<AnatomyPresenter> {
+                     size: CGSize = CGSize(width: 240, height: 160), storage given: ExperienceStorage? = nil)
+        async throws -> ExperienceShell<AnatomyPresenter> {
         let id = self.id
-        let storage = storage()
+        let storage = given ?? Self.storage()
         var made: ExperienceShell<AnatomyPresenter>?
         if session.qualityPin == nil { session.qualityPin = 0 }
         let request = ExperienceOpenRequest(id: id, seed: seed, snapshot: snapshot, refusedSnapshotFails: false) {
@@ -144,6 +147,42 @@ enum AnatomyTest {
     static func meshIDs(of layer: AnatomyLayer, in scene: AnatomyScene) -> Set<String> {
         Set(scene.items.filter { $0.layer == layer }.map(\.meshID))
     }
+
+    /// The mesh ids of the items of `scene` whose part (inventory index) is in `parts`.
+    static func meshIDs(ofParts parts: Set<Int>, in scene: AnatomyScene) -> Set<String> {
+        Set(scene.items.filter { parts.contains($0.structureIndex) }.map(\.meshID))
+    }
+}
+
+/// An Interactive Anatomy storage under a fresh temporary folder with its own defaults suite; `remove()` deletes both.
+struct TemporaryAnatomyStorage {
+    /// The storage root.
+    let root: URL
+    /// The defaults suite name.
+    let suite: String
+    /// The experience's storage.
+    let storage: ExperienceStorage
+
+    /// A new empty storage.
+    init() {
+        let name = "a17-view-" + UUID().uuidString
+        root = FileManager.default.temporaryDirectory.appendingPathComponent(name, isDirectory: true)
+        suite = name
+        storage = ExperienceStorage(id: ExperienceID(rawValue: AnatomyCore.experienceID)!, root: root,
+                                    defaults: UserDefaults(suiteName: name) ?? .standard)
+    }
+
+    /// The experience's folder `<root>/<id>/`, where `view.json` lies.
+    var folder: URL {
+        root.appendingPathComponent(ExperienceID(rawValue: AnatomyCore.experienceID)!.storageNamespace,
+                                    isDirectory: true)
+    }
+
+    /// Removes the folder and the defaults suite.
+    func remove() {
+        try? FileManager.default.removeItem(at: root)
+        UserDefaults.standard.removePersistentDomain(forName: suite)
+    }
 }
 
 /// The layers in words, in `AnatomyLayer.allCases` order.
@@ -151,11 +190,15 @@ let anatomyLayerWords: [AnatomyLayer: String] = [
     .bones: "bones", .cartilage: "cartilage and menisci", .ligaments: "ligaments and tendons",
 ]
 
-/// The canvas description expected for `shown` layers and the selected part's English name `selected`.
-func anatomyDescription(shown: Set<AnatomyLayer>, selected: String?) -> String {
+/// The canvas description expected for `shown` layers and the selected part's English name `selected`; with
+/// `isolated` (the isolated part's English name or the layer's words, and whether the others are ghosts) the isolate
+/// clause "; isolated: <words> (<ghosts|others hidden>)" comes before the final period.
+func anatomyDescription(shown: Set<AnatomyLayer>, selected: String?,
+                        isolated: (words: String, ghosts: Bool)? = nil) -> String {
     let words = AnatomyLayer.allCases.filter { shown.contains($0) }.compactMap { anatomyLayerWords[$0] }
     let layers = words.isEmpty ? "no layer shown" : words.joined(separator: ", ")
-    return "Right knee, \(layers); selected: \(selected ?? "nothing selected")."
+    let isolate = isolated.map { "; isolated: \($0.words) (\($0.ghosts ? "ghosts" : "others hidden"))" } ?? ""
+    return "Right knee, \(layers); selected: \(selected ?? "nothing selected")\(isolate)."
 }
 
 /// The digest of `core` as the engine computes it (the experience id as domain).
@@ -178,6 +221,24 @@ func anatomyEnvelope(_ payload: Data, like saved: ExperienceSnapshot, schema: In
     let id = try XCTUnwrap(ExperienceID(rawValue: AnatomyCore.experienceID))
     return try ExperienceSnapshot(experience: id, schemaVersion: schema, seed: saved.seed,
                                   stepIndex: saved.stepIndex, digest: saved.digest, payload: payload)
+}
+
+/// The schema-1 (A17-P02) payload of `view`: its JSON with `schema` 1 and no `isolate`.
+func anatomySchema1Payload(_ view: AnatomyViewState) throws -> Data {
+    var object = try XCTUnwrap(try JSONSerialization.jsonObject(with: view.encoded()) as? [String: Any])
+    object["schema"] = 1
+    object["isolate"] = nil
+    return try JSONSerialization.data(withJSONObject: object, options: [.sortedKeys])
+}
+
+/// A view file written by hand: a document envelope of `kind` and `schemaVersion` around `payload` (a JSON object),
+/// as JSON with sorted keys.
+func anatomyViewFile(_ payload: Data, schemaVersion: Int, kind: String = AnatomyViewDocument.kind) throws -> Data {
+    let body = try JSONSerialization.jsonObject(with: payload)
+    let object: [String: Any] = ["kind": kind, "schemaVersion": schemaVersion,
+                                 "savedAt": ISO8601DateFormatter().string(from: Date(timeIntervalSince1970: 0)),
+                                 "payload": body]
+    return try JSONSerialization.data(withJSONObject: object, options: [.sortedKeys])
 }
 
 /// `payload` (a state's JSON) with `key` set to `value` (nil removes it) in its top-level object, as JSON with sorted
