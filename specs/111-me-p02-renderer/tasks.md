@@ -42,3 +42,7 @@ runs, commits.
 
 MVP: the scene with the count fixture (202), the camera (203) and the state (204); then both modes and the camera drawn
 (205–206). Review checkpoints after 204 (core tests) and at 208.
+
+## Phase 5: Convergence
+
+- [ ] T-A15-212 Keep two halves for every bond (recorded or inferred, so molecules imported in A15-P05 show their sticks as estimates; their styling is G-PANEL in A15-P03): align FR-A15-201 and the data model's `BondHalf` row with the code, add a `CoreTests/MoleculeSceneTests.swift` case building a molecule with inferred bonds (`BondInference.bonds`) whose scene has two halves per inferred bond, and record the decision in research.md per FR-A15-201 (contradicts)
