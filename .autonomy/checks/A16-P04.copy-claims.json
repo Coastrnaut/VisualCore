@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_copy_claims.py"
+  ],
+  "command": "python3 scripts/check_copy_claims.py",
+  "elapsed_seconds": 0.021,
+  "exit_code": 2,
+  "finished": "2026-11-16T21:07:53+00:00",
+  "log": ".autonomy/logs/A16-P04.copy-claims.log",
+  "log_sha256": "ce05fe197752f667adf1913e1dd52a1cc770f2a104ef9d1a6715f7f0961e1580",
+  "name": "copy-claims",
+  "stage": "A16-P04",
+  "started": "2026-11-16T21:07:53+00:00",
+  "timed_out": false
+}

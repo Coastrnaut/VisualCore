@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_copy_claims.py",
+    "--allow",
+    "share",
+    "--swift",
+    "Packages/ExperiencesCreative/SimulationLab/Experience/SimulationControls.swift",
+    "Packages/ExperiencesCreative/SimulationLab/Experience/SimulationPresenter.swift",
+    "Packages/ExperiencesCreative/SimulationLab/Experience/SimulationCapture.swift",
+    "Packages/ExperiencesCreative/SimulationLab/Experience/SimulationPresetStore.swift",
+    "Packages/ExperiencesCreative/SimulationLab/Experience/Adapter/SimulationCore.swift",
+    "Packages/ExperiencesCreative/SimulationLab/Core/ExperimentPreset.swift"
+  ],
+  "command": "python3 scripts/check_copy_claims.py --allow share --swift Packages/ExperiencesCreative/SimulationLab/Experience/SimulationControls.swift Packages/ExperiencesCreative/SimulationLab/Experience/SimulationPresenter.swift Packages/ExperiencesCreative/SimulationLab/Experience/SimulationCapture.swift Packages/ExperiencesCreative/SimulationLab/Experience/SimulationPresetStore.swift Packages/ExperiencesCreative/SimulationLab/Experience/Adapter/SimulationCore.swift Packages/ExperiencesCreative/SimulationLab/Core/ExperimentPreset.swift",
+  "elapsed_seconds": 0.029,
+  "exit_code": 0,
+  "finished": "2026-11-16T21:08:12+00:00",
+  "log": ".autonomy/logs/A16-P04.copy-claims-3.log",
+  "log_sha256": "8304e6ea2dbd41426bb8b7ba8d49aed0897468c2d060be2d3e02bc37f4c98931",
+  "name": "copy-claims-3",
+  "stage": "A16-P04",
+  "started": "2026-11-16T21:08:12+00:00",
+  "timed_out": false
+}
