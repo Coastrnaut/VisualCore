@@ -71,7 +71,8 @@ in code:
   - **List rows:** "<sign> <English name>", spoken as "<English name>, <layer words>".
   - **Announcements:** selection changes go to an `AnnouncementPlanner` with a minimum interval of 0.5 s, timed by the
     host's step clock: "<English name> selected." or "Selection cleared." The presenter flushes it on later frames, so
-    the last change is always announced. They go through an injectable sink (Solar System Explorer's precedent).
+    the last change is always announced. They go through an injectable sink (Solar System Explorer's precedent). The production sink posts only while
+    VoiceOver is running, so nothing is spoken otherwise.
   - **Reduce Motion:** framing and every camera change are immediate in every mode; nothing is animated, and
     `transitionDuration(_:reduceMotion:)` gives 0 when Reduce Motion is on.
 - Q: What is the content pack? → A: The bundled resource becomes `Core/Content/knee-right.pack.json`:
@@ -172,6 +173,7 @@ review status.
 - **Labels at the canvas edge:** a label whose box would cross the canvas edge is not placed.
 - **A pack that names a mesh the scene cannot build:** refused when the scene is built (A17-P02).
 - **Any network API in the experience:** a check fails.
+- **The canvas is smaller than one label box:** no label is placed; the list still names every part.
 
 ## Requirements *(mandatory)*
 
