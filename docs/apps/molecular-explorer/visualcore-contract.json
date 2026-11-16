@@ -152,8 +152,9 @@
     },
     {
       "area": "ProjectM reference regression",
-      "description": "Reference pinned at d93edd1, read-only; scripts/run_reference_baseline.py lists the ordered reference steps; scripts/check_reference_clean.py checks the submodule; the 7 release-check steps run in two chunks via release_check.py --only (reference-engine-xcframework, reference-build-projectm-ios-sim, reference-clean; reference-test-anglerendering-ios27, reference-test-anglerendering-ios26, projectm-reference-ios27, projectm-reference-ios26), recorded in the A15 regression baseline document (docs/apps/molecular-explorer/regression-baseline.md, written by T-A15-001/005) with the phase-start commit fc60a33d (constitution aaeeb3a7).",
+      "description": "Reference pinned at d93edd1, read-only; scripts/run_reference_baseline.py lists the ordered reference steps; scripts/check_reference_clean.py checks the submodule; the 7 release-check steps run in two chunks via release_check.py --only (reference-engine-xcframework, reference-build-projectm-ios-sim, reference-clean; reference-test-anglerendering-ios27, reference-test-anglerendering-ios26, projectm-reference-ios27, projectm-reference-ios26), recorded with 7 of 7 passing (2026-11-15; .autonomy/checks/A15-P00.reference-1.json and reference-2.json) in the A15 regression baseline document with the phase-start commit fc60a33d (constitution aaeeb3a7).",
       "paths": [
+        "docs/apps/molecular-explorer/regression-baseline.md",
         "scripts/run_reference_baseline.py",
         "scripts/check_reference_clean.py",
         "Harnesses/ProjectMReference/ProjectMReference.yml",

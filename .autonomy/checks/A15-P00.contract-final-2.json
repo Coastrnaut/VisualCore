@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_app_contract.py",
+    "--app",
+    "molecular-explorer",
+    "--render"
+  ],
+  "command": "python3 scripts/check_app_contract.py --app molecular-explorer --render",
+  "elapsed_seconds": 0.05,
+  "exit_code": 0,
+  "finished": "2026-11-16T00:21:55+00:00",
+  "log": ".autonomy/logs/A15-P00.contract-final-2.log",
+  "log_sha256": "b3a019f10b93c4896bbaeaff47143cdc6e979f42bce1b0bdd1683066f80f97d4",
+  "name": "contract-final-2",
+  "stage": "A15-P00",
+  "started": "2026-11-16T00:21:55+00:00",
+  "timed_out": false
+}
