@@ -759,7 +759,8 @@ final class MoleculePresenter: ExperiencePresenter {
     nonisolated static func legend(_ mode: DisplayMode) -> String {
         switch mode {
         case .ballAndStick:
-            return "Ball and stick: atoms at 30 % of their van der Waals radius, bonds as sticks. " + legendNote
+            // copy-claims: allow (a display fraction of the radius, not a measured claim)
+            return "Ball and stick: atoms at 30 % of their van der Waals radius, bonds as sticks. " + legendNote // copy-claims: allow
         case .spaceFilling:
             return "Space filling: atoms at their van der Waals radius, no bonds. " + legendNote
         }

@@ -1,0 +1,29 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_copy_claims.py",
+    "--allow",
+    "camera",
+    "--swift",
+    "Packages/ExperiencesCreative/MolecularExplorer/Experience/MolecularExplorerExperience.swift",
+    "Packages/ExperiencesCreative/MolecularExplorer/Experience/MoleculeControls.swift",
+    "Packages/ExperiencesCreative/MolecularExplorer/Experience/MoleculeGestures.swift",
+    "Packages/ExperiencesCreative/MolecularExplorer/Experience/MoleculeImporter.swift",
+    "Packages/ExperiencesCreative/MolecularExplorer/Experience/MoleculeOverlay.swift",
+    "Packages/ExperiencesCreative/MolecularExplorer/Experience/MoleculePresenter.swift",
+    "Packages/ExperiencesCreative/MolecularExplorer/Experience/RecentStore.swift",
+    "Packages/ExperiencesCreative/MolecularExplorer/Experience/SettingsStore.swift",
+    "Packages/ExperiencesCreative/MolecularExplorer/Experience/Adapter/MoleculeCore.swift",
+    "Packages/ExperiencesCreative/MolecularExplorer/Experience/Adapter/MoleculeManifest.swift"
+  ],
+  "command": "python3 scripts/check_copy_claims.py --allow camera --swift Packages/ExperiencesCreative/MolecularExplorer/Experience/MolecularExplorerExperience.swift Packages/ExperiencesCreative/MolecularExplorer/Experience/MoleculeControls.swift Packages/ExperiencesCreative/MolecularExplorer/Experience/MoleculeGestures.swift Packages/ExperiencesCreative/MolecularExplorer/Experience/MoleculeImporter.swift Packages/ExperiencesCreative/MolecularExplorer/Experience/MoleculeOverlay.swift Packages/ExperiencesCreative/MolecularExplorer/Experience/MoleculePresenter.swift Packages/ExperiencesCreative/MolecularExplorer/Experience/RecentStore.swift Packages/ExperiencesCreative/MolecularExplorer/Experience/SettingsStore.swift Packages/ExperiencesCreative/MolecularExplorer/Experience/Adapter/MoleculeCore.swift Packages/ExperiencesCreative/MolecularExplorer/Experience/Adapter/MoleculeManifest.swift",
+  "elapsed_seconds": 0.032,
+  "exit_code": 0,
+  "finished": "2026-11-16T17:43:05+00:00",
+  "log": ".autonomy/logs/A15-P05.copy-claims.log",
+  "log_sha256": "8ea446c38701b16c96aa400be61d7c5e364d7ec49820bbb1e8eb970ed9b74c01",
+  "name": "copy-claims",
+  "stage": "A15-P05",
+  "started": "2026-11-16T17:43:05+00:00",
+  "timed_out": false
+}
