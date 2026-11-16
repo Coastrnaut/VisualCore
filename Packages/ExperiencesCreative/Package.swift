@@ -542,6 +542,17 @@ let package = Package(
                     resources: [.copy("Fixtures")]),
         // A15 Molecular Explorer (feature 110, A15-P01): a candidate until X-A15. The core is pure (Foundation and
         // VisualCoreMath for the scene and camera of feature 111).
+        // A16 Simulation Lab (feature 117, A16-P01): a candidate until X-A16. The core is pure (Foundation and VisualCore
+        // simulation, parameter and math modules) and GPU-free.
+        .target(name: "SimulationLabCore",
+                dependencies: [.product(name: "VisualCoreSimulation", package: visualCore),
+                               .product(name: "VisualCoreParameters", package: visualCore),
+                               .product(name: "VisualCoreMath", package: visualCore)],
+                path: "SimulationLab/Core"),
+        .testTarget(name: "SimulationLabCoreTests",
+                    dependencies: ["SimulationLabCore", .product(name: "VisualCoreSimulation", package: visualCore),
+                                   .product(name: "VisualCoreParameters", package: visualCore)],
+                    path: "SimulationLab/CoreTests"),
         .target(name: "MolecularExplorerCore",
                 dependencies: [.product(name: "VisualCoreMath", package: visualCore)],
                 path: "MolecularExplorer/Core"),

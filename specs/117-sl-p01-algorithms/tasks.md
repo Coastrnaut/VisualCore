@@ -8,7 +8,7 @@ Precedent: `specs/110-me-p01-domain-parser/tasks.md`.
 
 ## Phase 1: Setup
 
-- [X] T-A16-101 Baseline: cite the A16-P00 evidence on an unchanged `Packages` tree (`.autonomy/checks/A16-P00.{app-build,no-change}.json`) instead of a rerun (owner ruling of 2026-11-14) — Verified 2026-11-16: 2026-11-16: A16-P00 evidence cited on an unchanged Packages tree: .autonomy/checks/A16-P00.app-build.json and A16-P00.no-change.json, both exit 0
+- [X] T-A16-101 Baseline: cite the A16-P00 evidence on an unchanged `Packages` tree (`.autonomy/checks/A16-P00.{app-build,no-change}.json`) instead of a rerun (owner ruling of 2026-11-14) — Verified 2026-11-16: 2026-11-16: A16-P00 evidence cited: .autonomy/checks/A16-P00.app-build.json and A16-P00.no-change.json, both exit 0; since then only the catalog fixture Packages/VisualCore/Tests/VisualCoreExperienceTests/Fixtures/Catalog/experiences.json changed (rewritten by build_catalog.py in the A16-P00 record commit dd1a8ed0), no source
 
 ## Phase 2: Foundational — the core (stories 2–4)
 
