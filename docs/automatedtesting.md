@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-16 (A15-P03: touches cancelled on suspension; A15-P01: contract products, runner count).
+Last updated: 2026-11-16 (A15-P04: store tests over a temporary folder; A15-P03: touches cancelled on suspension).
 
 ## 1. What is tested, and where
 
@@ -148,6 +148,10 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   system's cancellation of a held touch never arrived and gesture state outlived the suspension (a later one-finger
   drag read as two fingers). `ExperienceShell.suspend()` now calls `ExperiencePresenter.cancelPointers()`; test
   gestures through a real session suspend, not only by calling `reset()` (A15-P03).
+- **Test small documents over a real temporary folder.** Store tests give `ExperienceStorage` a fresh temporary
+  folder, write a refused fixture byte for byte, open a session and compare the bytes afterwards; a failed write is a
+  read-only folder (0o555), and the app's data reset is removing the folder. Two sessions over the same folder prove
+  survival without relaunching anything (A15-P04).
 
 ### Process
 
