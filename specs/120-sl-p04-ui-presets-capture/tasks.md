@@ -79,7 +79,7 @@ Precedent: `specs/119-sl-p03-rd-wave/tasks.md`.
 
 ## Phase 5: Story 3 — histogram
 
-- [ ] T-A16-407 [US3] In `SimulationPresenter.swift`, gate `SimulationHistogram` into the mirror: at most once every 15 frames while running, and at the next frame after a non-step change. `Experience/SimulationLegend.swift` draws the 16 bars. The description adds "most cells in bin k (low…high)". Tests in `ExperienceTests/HistogramGateTests.swift`: over 60 running frames, at most 4 updates; a paint while paused updates at the next frame; the counts sum to 4,096. (FR-A16-420; SC-A16-402)
+- [X] T-A16-407 [US3] In `SimulationPresenter.swift`, gate `SimulationHistogram` into the mirror: at most once every 15 frames while running, and at the next frame after a non-step change. `Experience/SimulationLegend.swift` draws the 16 bars. The description adds "most cells in bin k (low…high)". Tests in `ExperienceTests/HistogramGateTests.swift`: over 60 running frames, at most 4 updates; a paint while paused updates at the next frame; the counts sum to 4,096. (FR-A16-420; SC-A16-402) — Verified 2026-11-16: 2026-11-16: .autonomy/checks/A16-P04.sl-ios27.json exit 0 (62 core, 23 Swift Testing and 54 XCTest experience tests, 0 failures, slowest 4.3 s, iOS 27); HistogramGateTests (at most 4 updates in 60 running frames while many steps ran; a paint while paused updates at the next frame; counts sum to 4,096 in each family); the description ends with the fullest bin
 
 ## Phase 6: Story 4 — presets
 
