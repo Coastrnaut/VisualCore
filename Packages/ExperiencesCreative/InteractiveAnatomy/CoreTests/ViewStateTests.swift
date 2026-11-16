@@ -35,7 +35,7 @@ import Testing
         #expect(try result.get() == state)
         #expect(dropped.isEmpty)
         let opening = AnatomyViewState.opening
-        #expect(try AnatomyViewState.decode(opening.encoded(), parts: parts).get() == opening)
+        #expect(try AnatomyViewState.decode(opening.encoded(), parts: parts).0.get() == opening)
         #expect(opening.schema == 2)
         #expect(AnatomyViewState.schemaVersion == 2)
         #expect(opening.isolate == nil)
@@ -105,12 +105,6 @@ import Testing
         #expect(dropped.contains { $0.contains("knee.elbow") })
         #expect(dropped.contains { $0.contains("knee.joint") })
         #expect(dropped.contains { $0.contains("skin") })
-        let strict: Result<AnatomyViewState, ContentRefusal> = AnatomyViewState.decode(Data(text.utf8), parts: parts)
-        if case let .failure(refusal) = strict {
-            #expect(refusal.reason == .missingReference)
-        } else {
-            Issue.record("the compatibility decode refuses an unknown id")
-        }
         let kept = #"{\#(camera),"schema":2,"selection":"knee.pcl","visibleLayers":[true,true,true]}"#
         #expect(Self.viewStateDecoded(kept, parts).dropped.isEmpty)
         #expect(Self.viewStateReason(kept, parts) == nil)

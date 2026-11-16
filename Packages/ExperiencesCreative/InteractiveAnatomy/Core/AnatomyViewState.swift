@@ -110,7 +110,6 @@ public struct AnatomyViewState: Codable, Equatable, Sendable {
 
     /// Decodes a state of schema 1 or 2 whose ids should be among `parts` (the part ids in inventory order): the
     /// state or the first refusal, and one reason sentence for each dropped id (see the file header).
-    @_disfavoredOverload
     public static func decode(_ data: Data, parts: [String])
         -> (Result<AnatomyViewState, ContentRefusal>, dropped: [String]) {
         guard let object = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] else {
@@ -162,15 +161,6 @@ public struct AnatomyViewState: Codable, Equatable, Sendable {
         }
         state.isolate = isolate
         return (.success(state), dropped)
-    }
-
-    /// Compatibility path for the A17-P02 callers (to be removed once the experience reads the dropped ids): the
-    /// result of the reporting `decode` when nothing was dropped, otherwise a `missing-reference` refusal with the
-    /// first drop's sentence.
-    public static func decode(_ data: Data, parts: [String]) -> Result<AnatomyViewState, ContentRefusal> {
-        let (result, dropped): (Result<AnatomyViewState, ContentRefusal>, dropped: [String]) = decode(data, parts: parts)
-        if case .success = result, let first = dropped.first { return .failure(ContentRefusal(.missingReference, first)) }
-        return result
     }
 
     /// The isolate of a raw JSON value: `damaged` when its shape is wrong, `missing-reference` (a drop) when its id

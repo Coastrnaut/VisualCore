@@ -323,7 +323,7 @@ final class AnatomyCoreTests: XCTestCase {
         let snapshot = try engine.snapshot()
         XCTAssertEqual(snapshot.schemaVersion, AnatomyViewState.schemaVersion)
         let decoded = try AnatomyViewState.decode(Data(snapshot.payload.utf8),
-                                                  parts: saved.scene.parts.map(\.id)).get()
+                                                  parts: saved.scene.parts.map(\.id)).0.get()
         XCTAssertEqual(decoded, saved.view)
         let direct = try AnatomyCore.restore(payload: saved.snapshotPayload(), seed: 1)
         XCTAssertEqual(direct.view, saved.view)
