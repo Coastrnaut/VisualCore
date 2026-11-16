@@ -34,13 +34,17 @@ in code:
   for the no-change diff of `Packages` and `External`; the reference submodule is pinned at `d93edd1`.
 - **Registry:** sixteen experiences are registered in `Catalog/registrations.json` (A01–A16).
 - **VisualCore offers:**
-  - in `VisualCoreScenes`: `Mesh` with the generators `plane`, `cube` and `uvSphere`;
+  - in `VisualCoreScenes`: `Mesh` with the generators `plane`, `cube` and `uvSphere`, and in `MeshShapes.swift`
+    (feature 205) the public, tested `Mesh.revolution` (a lathe), `tube` (a sweep), `surface` and `extrusion`
+    (`MeshShapeTests`; corrected by the contract audit, T-A17-012);
   - in `VisualCoreRendering`: `MeshRenderer`, which is lit, culls back faces, leaves depth testing to the caller and
-    takes premultiplied-alpha colour with optional fog;
+    takes premultiplied-alpha colour with optional fog, but sets no blend state; `DepthMeshPass.draw` disables
+    blending and writes depth, so ghosting needs an additive VisualCoreRendering stage (T-A17-012);
   - in `VisualCoreMath`: `OrbitCamera` (`projection`, `project`, `ray(ndc:aspect:)`), `CameraBounds` and
     `RayIntersection`, covering triangles, spheres and boxes.
-- **Experience-only pieces:** Solar System Explorer keeps a pure label-overlap layout, `LabelLayout` (A14-P04), and
-  Molecular Explorer keeps its atom picking and canvas-overlay labels. Neither is in a framework product.
+- **Experience-only pieces:** a pure label-overlap layout, `LabelLayout`, already has two consumers: Solar System
+  Explorer's internal one (A14-P04) and Molecular Explorer's public one in `MolecularExplorer/Core` (A15-P03).
+  Molecular Explorer also keeps its atom picking. None of these is in a framework product (T-A17-012).
 
 - Q: How is the manual's "compile an empty shell" gate met in the one app? → A: As for A16: the one app is the shell;
   this phase proves it builds for testing with Interactive Anatomy absent; the targets come with A17-P01's first model.
@@ -64,8 +68,9 @@ in code:
   - a clinical review is a person's action, recorded as an owner action, and until it is done the text is labelled
     as not reviewed by a clinician.
 
-  The geometry is procedural: lathes, sweeps, tubes and capsules, labelled as a schematic model. Solar System
-  Explorer's `LabelLayout` gets its second consumer here, so its move into VisualCore is assessed as a gap. The exact
+  The geometry is procedural, built with VisualCore's revolution, tube and extrusion shapes and labelled as a
+  schematic model. `LabelLayout` would get its third consumer here, so its move into VisualCore is assessed as a
+  gap. The exact
   structure list, budgets and phases are decided in A17-P01, not here.
 
 ## User Scenarios & Testing *(mandatory)*

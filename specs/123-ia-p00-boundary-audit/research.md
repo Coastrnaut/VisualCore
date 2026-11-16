@@ -14,7 +14,9 @@ Products used by later phases:
 Elsewhere:
 - Solar System Explorer keeps a pure label-overlap layout, `LabelLayout` (A14-P04). Molecular Explorer keeps atom
   picking and overlay labels. Both are app-local.
-- No lathe, sweep, tube or capsule generator, and no depth-sorted translucency, exists in any framework product.
+- `VisualCoreScenes/MeshShapes.swift` has the tested `Mesh.revolution`, `tube`, `surface` and `extrusion` (a
+  capsule is a revolved profile). No blended, depth-sorted translucency exists: `DepthMeshPass` disables blending
+  (corrected at T-A17-012).
 
 ## Decisions
 
@@ -39,9 +41,10 @@ Elsewhere:
   - the content review record and validation → A17-P05;
   - release → A17-P06.
 
-  Two generic pieces are assessed for VisualCore ownership in their phase. Lathe and sweep generators go to
-  `VisualCoreScenes` in A17-P02 if a second consumer exists. `LabelLayout` goes to `VisualCoreMath` in A17-P04, since
-  A14 and A17 would be two consumers.
+  Two generic pieces are assessed for VisualCore ownership in their phase. Ghost translucency (an additive blended,
+  depth-sorted stage) goes to `VisualCoreRendering` in A17-P03. `LabelLayout` goes to `VisualCoreMath` in A17-P04,
+  since A14, A15 and A17 would be three consumers. The shapes reuse `MeshShapes` and stay app-local content
+  (G-SCENE).
 - **D5 Region and content:** clarification 5.
 - **Alternatives considered:** bundling a licensed mesh set (rejected: visuals are code, and the manual's risk 2);
   modelling the whole body (rejected: the manual's non-goal).

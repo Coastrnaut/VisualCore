@@ -52,7 +52,7 @@ phase. Review checkpoint after 003 (checker passes) and at 008 (decision).
 
 ## Phase 8: Convergence
 
-- [ ] T-A17-012 Correct the spec's Clarifications (session 2026-11-16) and research D4 with what the contract audit verified:
+- [X] T-A17-012 Correct the spec's Clarifications (session 2026-11-16) and research D4 with what the contract audit verified: — Verified 2026-11-16: 2026-11-16: facts confirmed in code (MeshShapes.swift:29, 75, 160, 228 with MeshShapeTests; MolecularExplorer/Core/LabelLayout.swift:18 public; DepthMeshPass.swift:70 disables GL_BLEND) and written into the spec's Clarifications facts and Q5 and research D4
   - `VisualCoreScenes/MeshShapes.swift` (feature 205) already has the public, tested `Mesh.revolution`, `tube`,
     `surface` and `extrusion` (`MeshShapeTests`), so the procedural geometry row is available and G-SCENE is app-local
     shape content;
