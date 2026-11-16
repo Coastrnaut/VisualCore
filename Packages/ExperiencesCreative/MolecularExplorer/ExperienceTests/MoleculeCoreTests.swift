@@ -8,7 +8,11 @@
 // newer snapshots refused; the migration step 1 → 2; reset; the outcome; the information lines and the canvas
 // description of clarification Q5 ending with the mode. Updated by feature 112 (A15-P03) T-A15-305 (FR-A15-302,
 // FR-A15-310, FR-A15-311, FR-A15-330): thirteen controls, schema 3 with the steps 1 → 2 and 2 → 3 ("newer" is 4), the
-// pan and atom actions with their refusals, and the description naming the selected atom after the mode.
+// pan and atom actions with their refusals, and the description naming the selected atom after the mode. Updated by
+// feature 114 (A15-P05) T-A15-505 (FR-A15-504, FR-A15-505; clarification Q1): sixteen controls (`molecule.select`
+// 0…5, `import.begin`, `import.atom`, `import.end`), schema 4 with the step 3 → 4 ("newer" is 5), `molecule.select [5]`
+// refused by the core without an import; every library molecule's XYZ text sent as `MoleculeImport.actions` gives the
+// same atoms and inferred bonds; every import refusal leaves the state unchanged; a begin while pending restarts.
 import Foundation
 import XCTest
 @testable import MolecularExplorerExperience
@@ -41,18 +45,20 @@ final class MoleculeCoreTests: XCTestCase {
         let ids: [String] = MoleculeCore.controls.map(\.id)
         XCTAssertEqual(ids, ["molecule.select", "molecule.next", "molecule.previous", "display.mode", "camera.orbit",
                              "camera.tilt", "camera.zoom", "view.reset", "camera.pan", "atom.select", "atom.next",
-                             "atom.previous", "atom.clear"])
+                             "atom.previous", "atom.clear", "import.begin", "import.atom", "import.end"])
         XCTAssertEqual(ids, MoleculeCore.actionIDs)
         XCTAssertEqual(MoleculeCore.moleculeCount, 5)
-        let ranges: [[ClosedRange<Double>]] = [[0...4], [], [], [0...1], [-1...1], [-1...1], [-1...1], [],
-                                               [-1...1, -1...1], [0...499], [], [], []]
+        let ranges: [[ClosedRange<Double>]] = [[0...5], [], [], [0...1], [-1...1], [-1...1], [-1...1], [],
+                                               [-1...1, -1...1], [0...499], [], [], [], [1...500],
+                                               [1...53, -1000...1000, -1000...1000, -1000...1000], []]
         XCTAssertEqual(MoleculeCore.controls.map(\.ranges), ranges)
-        XCTAssertEqual(MoleculeCore.migrations.currentVersion, 3)
+        XCTAssertEqual(MoleculeCore.migrations.currentVersion, 4)
         XCTAssertEqual(MoleculeCore.qualityTiers, 1)
         XCTAssertEqual(MoleculeCore.qualityProfile.levels.count, 1)
         XCTAssertEqual(MoleculeCore.stepDuration, 1.0 / 120, accuracy: 1e-15)
         XCTAssertEqual(MoleculeRule.invalidChoice, "a15.invalid-choice")
         XCTAssertEqual(MoleculeRule.cameraLimit, "a15.camera-limit")
+        XCTAssertEqual(MoleculeRule.invalidImport, "a15.invalid-import")
     }
 
     func testConformancePassesOverThreeSeeds() async {
@@ -123,7 +129,8 @@ final class MoleculeCoreTests: XCTestCase {
         var engine = try await makeEngine()
         let invalid = ActionResult.rejected(.rule(code: MoleculeRule.invalidChoice))
         let before = try engine.digest()
-        XCTAssertEqual(engine.handle(control: "molecule.select", values: [5]), .rejected(.outOfRange(index: 0)))
+        XCTAssertEqual(engine.handle(control: "molecule.select", values: [6]), .rejected(.outOfRange(index: 0)))
+        XCTAssertEqual(engine.handle(control: "molecule.select", values: [5]), invalid, "no import to select")
         XCTAssertEqual(engine.handle(control: "molecule.select", values: [-1]), .rejected(.outOfRange(index: 0)))
         XCTAssertEqual(engine.handle(control: "molecule.select", values: [.nan]), .rejected(.nonFinite(index: 0)))
         XCTAssertEqual(engine.handle(control: "molecule.select", values: [0.5]), invalid)
@@ -186,11 +193,11 @@ final class MoleculeCoreTests: XCTestCase {
         XCTAssertEqual(core.mode, .spaceFilling, "a molecule change keeps the mode")
     }
 
-    func testTheMigrationStepsTurnSchemaOneAndTwoIntoSchemaThree() throws {
+    func testTheMigrationStepsTurnSchemaOneAndTwoIntoSchemaFour() throws {
         let upgraded = try MoleculeCore.migrations.migrate(["schema": 1, "selection": 3], from: 1)
         let data = try JSONSerialization.data(withJSONObject: upgraded, options: [.sortedKeys])
         XCTAssertEqual(String(decoding: data, as: UTF8.self),
-                       #"{"camera":{"panX":0,"panY":0,"tilt":2,"turn":2,"zoom":0},"mode":0,"schema":3,"selection":3}"#)
+                       #"{"camera":{"panX":0,"panY":0,"tilt":2,"turn":2,"zoom":0},"mode":0,"schema":4,"selection":3}"#)
         let one = try MoleculeCore.migrateSchemaOne(["schema": 1, "selection": 3])
         let oneData = try JSONSerialization.data(withJSONObject: one, options: [.sortedKeys])
         XCTAssertEqual(String(decoding: oneData, as: UTF8.self),
@@ -262,7 +269,7 @@ final class MoleculeCoreTests: XCTestCase {
         try engine.run(steps: 3)
         XCTAssertEqual(engine.handle(control: "molecule.select", values: [3]), .accepted)
         let snapshot = try engine.snapshot()
-        XCTAssertEqual(snapshot.schemaVersion, 3)
+        XCTAssertEqual(snapshot.schemaVersion, 4)
         XCTAssertEqual(Data(snapshot.payload.utf8), try XCTUnwrap(engine.core).state.encoded())
         let saved = try XCTUnwrap(engine.core)
         var other = try await makeEngine(seed: 3)
@@ -291,9 +298,9 @@ final class MoleculeCoreTests: XCTestCase {
             XCTAssertThrowsError(try engine.restore(moleculeEnvelope(payload, like: saved)),
                                  "\(key) \(String(describing: value))")
         }
-        // Newer: an envelope of schema 4, and a payload of schema 4 inside a schema-3 envelope.
-        XCTAssertThrowsError(try engine.restore(moleculeEnvelope(Data(saved.payload.utf8), like: saved, schema: 4)))
-        let newerPayload = try moleculePayload(saved.payload, key: "schema", value: 4)
+        // Newer: an envelope of schema 5, and a payload of schema 5 inside a schema-4 envelope.
+        XCTAssertThrowsError(try engine.restore(moleculeEnvelope(Data(saved.payload.utf8), like: saved, schema: 5)))
+        let newerPayload = try moleculePayload(saved.payload, key: "schema", value: 5)
         XCTAssertThrowsError(try engine.restore(moleculeEnvelope(newerPayload, like: saved)))
         XCTAssertEqual(try engine.digest(), before, "every refusal leaves the state as it was")
 
@@ -426,5 +433,135 @@ final class MoleculeCoreTests: XCTestCase {
                        + "selected oxygen, atom 1.")
         XCTAssertEqual(MoleculeCore.canvasDescription(selection: 0, atom: 9),
                        MoleculeCore.canvasDescription(selection: 0), "an index outside the molecule adds nothing")
+    }
+
+    // MARK: Import (feature 114, T-A15-505)
+
+    /// Applies `control` with `values` to `core` as the engine does: the declared count and ranges first, then the
+    /// core's own rules.
+    private func applied(_ control: String, _ values: [Double] = [], to core: inout MoleculeCore) -> ActionResult {
+        if let rejection = ExperienceInput.validate(control: control, values: values, controls: MoleculeCore.controls) {
+            return .rejected(rejection)
+        }
+        return core.apply(action(control, values))
+    }
+
+    /// Sends the import actions of the XYZ text `xyz` to `core` one by one; nil when all were accepted, else the
+    /// first refusal (the rest are not sent).
+    private func imported(_ xyz: String, into core: inout MoleculeCore) throws -> ActionResult? {
+        let parsed = try XYZParser.parse(xyz).get()
+        for entry in MoleculeImport.actions(parsed) {
+            let result = applied(entry.control, entry.values, to: &core)
+            if !result.isAccepted { return result }
+        }
+        return nil
+    }
+
+    func testEveryLibraryMoleculesXYZTextImportsAsTheSameAtomsAndInferredBonds() throws {
+        XCTAssertEqual(MoleculeCore.importedSelection, 5)
+        for (index, record) in MoleculeLibraryData.records.enumerated() {
+            var core = try moleculeCore(MoleculeState(selection: index))
+            XCTAssertNil(try imported(record.xyz, into: &core), record.id)
+            let library = MoleculeCore.library[index]
+            let molecule = try XCTUnwrap(core.imported?.molecule, record.id)
+            XCTAssertEqual(core.selection, 5, "the file's actions end with molecule.select [5]")
+            XCTAssertEqual(core.molecule, molecule)
+            XCTAssertEqual(molecule.atoms, library.atoms, "\(record.id): the same atoms in file order")
+            XCTAssertEqual(molecule.bonds, BondInference.bonds(for: library.atoms), "\(record.id): inferred bonds")
+            for bond in molecule.bonds {
+                XCTAssertEqual(bond.origin, .inferred, record.id)
+                XCTAssertEqual(bond.order, 1, record.id)
+            }
+            XCTAssertNil(core.state.pending, "nothing pending after the end")
+            XCTAssertEqual(core.outcome?.code, "viewing-imported")
+            XCTAssertEqual(core.nameLine(), "Imported molecule — \(library.formula)")
+            XCTAssertEqual(core.nameLine(title: "my-file"), "my-file — \(library.formula)")
+            XCTAssertEqual(core.countsLine, MoleculeCore.countsLine(molecule))
+            XCTAssertEqual(core.sourceLine, "imported file — your own data")
+            XCTAssertEqual(core.status(), "Imported molecule selected, molecule 6 of 6")
+            let prefix = "Molecular Explorer: Imported molecule, \(library.formula); "
+            XCTAssertTrue(core.canvasDescription.hasPrefix(prefix), core.canvasDescription)
+            // The library molecules keep their own words, and next and previous stay within the library.
+            let kept = core
+            XCTAssertEqual(core.apply(action("molecule.next")), .rejected(.rule(code: MoleculeRule.invalidChoice)))
+            XCTAssertEqual(core.apply(action("molecule.previous")), .rejected(.rule(code: MoleculeRule.invalidChoice)))
+            XCTAssertEqual(core, kept)
+            XCTAssertEqual(core.apply(action("molecule.select", [Double(index)])), .accepted)
+            XCTAssertEqual(core.nameLine(), MoleculeCore.nameLine(index: index))
+            XCTAssertEqual(core.status(), MoleculeCore.status(selection: index))
+            XCTAssertEqual(core.apply(action("molecule.select", [5])), .accepted, "the import stays selectable")
+        }
+        XCTAssertEqual(MoleculeCore.licenseWords("own-data"), "your own data")
+    }
+
+    func testEveryImportRefusalLeavesTheStateUnchanged() throws {
+        let invalid = ActionResult.rejected(.rule(code: MoleculeRule.invalidImport))
+        var core = MoleculeCore(seed: 1)
+        let original = core
+        // An atom or an end without a begin; begin counts outside 1…500; molecule 6 without an import.
+        XCTAssertEqual(applied("import.atom", [8, 0, 0, 0], to: &core), invalid)
+        XCTAssertEqual(applied("import.end", to: &core), invalid)
+        XCTAssertEqual(applied("import.begin", [1.5], to: &core), invalid)
+        XCTAssertEqual(applied("import.begin", [0], to: &core), .rejected(.outOfRange(index: 0)))
+        XCTAssertEqual(applied("import.begin", [501], to: &core), .rejected(.outOfRange(index: 0)))
+        XCTAssertEqual(core.apply(action("import.begin", [0])), invalid, "the core refuses on its own too")
+        XCTAssertEqual(core.apply(action("import.begin", [501])), invalid)
+        XCTAssertEqual(applied("molecule.select", [5], to: &core), .rejected(.rule(code: MoleculeRule.invalidChoice)))
+        XCTAssertEqual(core.apply(action("import.atom", [8, 0, 0])), .rejected(.wrongValueCount(expected: 4, found: 3)))
+        XCTAssertEqual(core, original, "nothing changed")
+
+        // Inside an import: Z = 2, a fractional Z, a coordinate of 1,001 Å, a non-finite coordinate.
+        XCTAssertEqual(applied("import.begin", [2], to: &core), .accepted)
+        let pending = core
+        XCTAssertEqual(applied("import.atom", [2, 0, 0, 0], to: &core), invalid, "helium is not supported")
+        XCTAssertEqual(applied("import.atom", [6.5, 0, 0, 0], to: &core), invalid)
+        XCTAssertEqual(applied("import.atom", [0, 0, 0, 0], to: &core), .rejected(.outOfRange(index: 0)))
+        XCTAssertEqual(applied("import.atom", [8, 1001, 0, 0], to: &core), .rejected(.outOfRange(index: 1)))
+        XCTAssertEqual(core.apply(action("import.atom", [8, 0, 0, 1001])), invalid, "the core refuses on its own too")
+        XCTAssertEqual(core.apply(action("import.atom", [8, 0, .nan, 0])), invalid)
+        XCTAssertEqual(core, pending, "nothing changed")
+
+        // A wrong count at the end; one atom too many; two atoms closer than 0.4 Å.
+        XCTAssertEqual(applied("import.atom", [8, 0, 0, 0], to: &core), .accepted)
+        let one = core
+        XCTAssertEqual(applied("import.end", to: &core), invalid, "one atom of two")
+        XCTAssertEqual(core, one)
+        XCTAssertEqual(applied("import.atom", [1, 0.3, 0, 0], to: &core), .accepted)
+        XCTAssertEqual(applied("import.atom", [1, 0, 0.96, 0], to: &core), invalid, "the count is reached")
+        let close = core
+        XCTAssertEqual(applied("import.end", to: &core), invalid, "two atoms 0.3 Å apart")
+        XCTAssertEqual(core, close)
+        XCTAssertNil(core.imported)
+        XCTAssertEqual(core.selection, 0, "the shown molecule never changed")
+        XCTAssertEqual(applied("molecule.select", [5], to: &core), .rejected(.rule(code: MoleculeRule.invalidChoice)))
+        XCTAssertEqual(core, close)
+    }
+
+    func testABeginWhilePendingRestartsTheImport() throws {
+        var core = MoleculeCore(seed: 1)
+        XCTAssertEqual(applied("import.begin", [3], to: &core), .accepted)
+        XCTAssertEqual(applied("import.atom", [8, 0, 0, 0], to: &core), .accepted)
+        XCTAssertEqual(applied("import.atom", [1, 0.96, 0, 0], to: &core), .accepted)
+        XCTAssertEqual(core.state.pending?.atoms.count, 2)
+        XCTAssertEqual(applied("import.begin", [2], to: &core), .accepted, "a begin while pending restarts")
+        XCTAssertEqual(core.state.pending?.count, 2)
+        XCTAssertEqual(core.state.pending?.atoms.count, 0, "the earlier atoms are dropped")
+        XCTAssertEqual(applied("import.atom", [17, 0, 0, 0], to: &core), .accepted)
+        XCTAssertEqual(applied("import.atom", [1, 1.27, 0, 0], to: &core), .accepted)
+        XCTAssertEqual(applied("import.end", to: &core), .accepted)
+        XCTAssertEqual(core.selection, 0, "the end does not select")
+        XCTAssertEqual(core.imported?.molecule.atoms.map(\.symbol), ["Cl", "H"])
+        XCTAssertEqual(core.imported?.molecule.bonds.count, 1, "H–Cl at 1.27 Å is inferred")
+        XCTAssertEqual(applied("molecule.select", [5], to: &core), .accepted)
+        XCTAssertEqual(core.molecule?.formula, "ClH")
+        // A second import replaces the first; the shown import changes only at the accepted end.
+        XCTAssertNil(try imported(MoleculeLibraryData.records[0].xyz, into: &core))
+        XCTAssertEqual(core.imported?.molecule.atoms.count, 3)
+        XCTAssertEqual(core.selection, 5)
+        // The import is state: digest and snapshot carry it.
+        let restored = try MoleculeCore.restore(payload: try core.snapshotPayload(), seed: 1)
+        XCTAssertEqual(restored.state, core.state)
+        XCTAssertEqual(try moleculeDigest(restored), try moleculeDigest(core))
+        XCTAssertNotEqual(try moleculeDigest(core), try moleculeDigest(MoleculeCore(seed: 1)))
     }
 }

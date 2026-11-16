@@ -165,7 +165,7 @@ final class MoleculePickingTests: XCTestCase {
             XCTAssertEqual(core.camera.panX, 0, "schema \(schema): no pan")
             XCTAssertEqual(core.camera.panY, 0, "schema \(schema): no pan")
             let resaved = try opened.snapshot()
-            XCTAssertEqual(resaved.schemaVersion, 3, "schema \(schema): saved again in schema 3")
+            XCTAssertEqual(resaved.schemaVersion, 4, "schema \(schema): saved again in schema 4")
             session.close()
         }
     }

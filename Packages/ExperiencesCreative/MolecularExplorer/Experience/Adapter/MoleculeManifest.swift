@@ -24,13 +24,13 @@ extension MoleculeCore {
 
     /// The committed digests (engine digest, the experience id as domain) of the state after selecting each library
     /// molecule by ``fixtureEntries(molecule:)`` from the first state, by molecule index (0…4), pinned from the first
-    /// run of `MoleculeManifestTests` on sim-27.2.
+    /// run of `MoleculeManifestTests` on sim-27.2 (re-pinned at schema 4, feature 114).
     public static let selectedFixtures: [(molecule: Int, digest: String)] = [
-        (0, "0949b967739e77336de9a182af3bd52a964421a42df96c31b4364d230d5ac930"),
-        (1, "51704829e4f7ac63c799e1a6c1c773ce71118ad1a4211a17da1881da40e26e71"),
-        (2, "5bb8cf7d670bde92f244a74c0b0570fa0f58a4ded5ab15fd62dfabd8093ada07"),
-        (3, "34fdfa1c4aac8d738e60eee44a009b56d9f4fc7b5dc5330b2de56c58c6fbb331"),
-        (4, "bcb917544e35b7e7e84fd858171e1c4289dcc8a78ea8eee67633bafe1eb8bb74"),
+        (0, "7c726aa5d6789341e8846cb0eedb832c50cef0b9f5cf3aac634261647b890ab5"),
+        (1, "c794b0a757dda5ca746eea99ba9cb24e074261e82958c2f3bc5d16af30bc3b53"),
+        (2, "ce290d0764c887e59a99af8b0208232a930bf445f366b0fa483c53d886547512"),
+        (3, "e053a9ecb76bd6f66ba848a0b2089921a3f27e46f623ada70bde26371c3a72e0"),
+        (4, "3d826bd4d8a82d011679ae972d0ee097983cefb3e1a4ec2f08ad5ee8d1574c35"),
     ]
 
     /// The view fixtures of feature 111: a name, the molecule index, the entries after selecting it and the committed
@@ -38,7 +38,7 @@ extension MoleculeCore {
     public static let viewFixtures: [(name: String, molecule: Int, entries: [ScenarioStep], digest: String)] = [
         ("fixture-caffeine-space-filling", 4,
          [ScenarioStep(steps: 1, action: ScriptedAction("display.mode", [1]), result: "accepted")],
-         "7b7953643c250e4f51929929f2cf3a0461a724a9e4fc5198fae1ee6057c83eba"),
+         "427b7694c7c4f4d174a2b5d32bb1285877f11f3e32d2ee5b04e5b0cd35124b03"),
         ("fixture-benzene-turned", 3,
          [ScenarioStep(steps: 1, action: ScriptedAction("camera.orbit", [1]), result: "accepted"),
           ScenarioStep(steps: 1, action: ScriptedAction("camera.orbit", [1]), result: "accepted"),
@@ -46,15 +46,15 @@ extension MoleculeCore {
           ScenarioStep(steps: 1, action: ScriptedAction("camera.tilt", [1]), result: "accepted"),
           ScenarioStep(steps: 1, action: ScriptedAction("camera.zoom", [1]), result: "accepted"),
           ScenarioStep(steps: 1, action: ScriptedAction("camera.zoom", [1]), result: "accepted")],
-         "28df1b30c0d650d7daafd0602ec7e459f19fefd8d2ec63241deb8ce01d44eb7f"),
+         "19f51f3c33694cbf3d115a5878a86b44ddb5c8124111775ead3e9847dad1d5ea"),
         ("fixture-caffeine-picked", 4,
          [ScenarioStep(steps: 1, action: ScriptedAction("atom.select", [2]), result: "accepted")],
-         "70e1d3c67ced089938af1c9b68d829b1ec7e634676864c39b0c3db3d25234b2b"),
+         "cf7ef454f348f1a634860c6a2b0c101ba5b0950fdbbca6c4c0204f4db0a6ea15"),
         ("fixture-water-panned", 0,
          [ScenarioStep(steps: 1, action: ScriptedAction("camera.pan", [1, 0]), result: "accepted"),
           ScenarioStep(steps: 1, action: ScriptedAction("camera.pan", [1, 0]), result: "accepted"),
           ScenarioStep(steps: 1, action: ScriptedAction("camera.pan", [0, 1]), result: "accepted")],
-         "0f6f525eb6d052ec6909e92510e058737d78d548d499aec547c2f1f368f0f95b"),
+         "7f5e1613e12c0c87030d49966f120dd09eee898293d957b6e6f56f14dc7d885c"),
     ]
 
     /// The entries of the view fixture `fixture`: its molecule selected, then its own entries.
@@ -92,11 +92,13 @@ extension MoleculeCore {
         [ScenarioStep(steps: 10, action: ScriptedAction("molecule.select", [4]), result: "accepted")]
     }
 
-    /// The entries of rejection, from water: indices out of range and fractional, a step before the first molecule,
-    /// actions with the wrong number of values, then caffeine selected and a step past the last molecule.
+    /// The entries of rejection, from water: indices out of range and fractional, the imported molecule without an
+    /// import (`molecule.select [5]`, refused by the core since feature 114 declares 0…5), a step before the first
+    /// molecule, actions with the wrong number of values, then caffeine selected and a step past the last molecule.
     public static var rejectionEntries: [ScenarioStep] {
         let invalid = "action.rule." + MoleculeRule.invalidChoice
-        return [ScenarioStep(steps: 0, action: ScriptedAction("molecule.select", [5]), result: "action.out-of-range"),
+        return [ScenarioStep(steps: 0, action: ScriptedAction("molecule.select", [6]), result: "action.out-of-range"),
+                ScenarioStep(steps: 0, action: ScriptedAction("molecule.select", [5]), result: invalid),
                 ScenarioStep(steps: 0, action: ScriptedAction("molecule.select", [-1]),
                              result: "action.out-of-range"),
                 ScenarioStep(steps: 0, action: ScriptedAction("molecule.select", [0.5]), result: invalid),

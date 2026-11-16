@@ -109,7 +109,7 @@ func moleculeCore(_ state: MoleculeState, seed: UInt64 = 1) throws -> MoleculeCo
 }
 
 /// A snapshot envelope of Molecular Explorer around `payload` with the fields of `saved` and schema `schema` (the
-/// current schema 3 by default).
+/// current schema, 4 since feature 114, by default).
 func moleculeEnvelope(_ payload: Data, like saved: ExperienceSnapshot, schema: Int = MoleculeState.schemaVersion) throws
     -> ExperienceSnapshot {
     let id = try XCTUnwrap(ExperienceID(rawValue: MoleculeCore.experienceID))

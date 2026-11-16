@@ -169,7 +169,7 @@ final class MoleculeCameraTests: XCTestCase {
         XCTAssertEqual(opened.presenter.lastAtomsDrawn, 9)
         XCTAssertEqual(opened.presenter.lastSticksDrawn, 16, "eight single bonds, two sticks each")
         let resaved = try opened.snapshot()
-        XCTAssertEqual(resaved.schemaVersion, 3, "saved again in schema 3")
+        XCTAssertEqual(resaved.schemaVersion, 4, "saved again in schema 4")
         XCTAssertEqual(Data(resaved.payload.utf8), MoleculeState(selection: 2).encoded())
         second.close()
     }

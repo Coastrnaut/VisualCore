@@ -12,7 +12,10 @@
     "atom.select",
     "atom.next",
     "atom.previous",
-    "atom.clear"
+    "atom.clear",
+    "import.begin",
+    "import.atom",
+    "import.end"
   ],
   "experience" : "a15.molecular-explorer",
   "kind" : "creative",
@@ -22,7 +25,7 @@
 
       ],
       "expect" : {
-        "initialDigest" : "0949b967739e77336de9a182af3bd52a964421a42df96c31b4364d230d5ac930"
+        "initialDigest" : "7c726aa5d6789341e8846cb0eedb832c50cef0b9f5cf3aac634261647b890ab5"
       },
       "name" : "launch-first-frame",
       "seed" : "1"
@@ -71,8 +74,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "bcb917544e35b7e7e84fd858171e1c4289dcc8a78ea8eee67633bafe1eb8bb74",
-        "initialDigest" : "0949b967739e77336de9a182af3bd52a964421a42df96c31b4364d230d5ac930"
+        "finalDigest" : "3d826bd4d8a82d011679ae972d0ee097983cefb3e1a4ec2f08ad5ee8d1574c35",
+        "initialDigest" : "7c726aa5d6789341e8846cb0eedb832c50cef0b9f5cf3aac634261647b890ab5"
       },
       "name" : "input-response",
       "seed" : "1"
@@ -102,10 +105,20 @@
           "action" : {
             "control" : "molecule.select",
             "values" : [
-              5
+              6
             ]
           },
           "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "molecule.select",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.rule.a15.invalid-choice",
           "steps" : 0
         },
         {
@@ -239,8 +252,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "bcb917544e35b7e7e84fd858171e1c4289dcc8a78ea8eee67633bafe1eb8bb74",
-        "initialDigest" : "0949b967739e77336de9a182af3bd52a964421a42df96c31b4364d230d5ac930"
+        "finalDigest" : "3d826bd4d8a82d011679ae972d0ee097983cefb3e1a4ec2f08ad5ee8d1574c35",
+        "initialDigest" : "7c726aa5d6789341e8846cb0eedb832c50cef0b9f5cf3aac634261647b890ab5"
       },
       "name" : "save-restore",
       "seed" : "1"
@@ -289,7 +302,7 @@
         }
       ],
       "expect" : {
-        "initialDigest" : "0949b967739e77336de9a182af3bd52a964421a42df96c31b4364d230d5ac930",
+        "initialDigest" : "7c726aa5d6789341e8846cb0eedb832c50cef0b9f5cf3aac634261647b890ab5",
         "resetDigest" : true
       },
       "name" : "reset",
@@ -340,8 +353,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "0949b967739e77336de9a182af3bd52a964421a42df96c31b4364d230d5ac930",
-        "initialDigest" : "0949b967739e77336de9a182af3bd52a964421a42df96c31b4364d230d5ac930",
+        "finalDigest" : "7c726aa5d6789341e8846cb0eedb832c50cef0b9f5cf3aac634261647b890ab5",
+        "initialDigest" : "7c726aa5d6789341e8846cb0eedb832c50cef0b9f5cf3aac634261647b890ab5",
         "outcome" : "viewing-water"
       },
       "name" : "fixture-water",
@@ -361,8 +374,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "51704829e4f7ac63c799e1a6c1c773ce71118ad1a4211a17da1881da40e26e71",
-        "initialDigest" : "0949b967739e77336de9a182af3bd52a964421a42df96c31b4364d230d5ac930",
+        "finalDigest" : "c794b0a757dda5ca746eea99ba9cb24e074261e82958c2f3bc5d16af30bc3b53",
+        "initialDigest" : "7c726aa5d6789341e8846cb0eedb832c50cef0b9f5cf3aac634261647b890ab5",
         "outcome" : "viewing-methane"
       },
       "name" : "fixture-methane",
@@ -382,8 +395,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "5bb8cf7d670bde92f244a74c0b0570fa0f58a4ded5ab15fd62dfabd8093ada07",
-        "initialDigest" : "0949b967739e77336de9a182af3bd52a964421a42df96c31b4364d230d5ac930",
+        "finalDigest" : "ce290d0764c887e59a99af8b0208232a930bf445f366b0fa483c53d886547512",
+        "initialDigest" : "7c726aa5d6789341e8846cb0eedb832c50cef0b9f5cf3aac634261647b890ab5",
         "outcome" : "viewing-ethanol"
       },
       "name" : "fixture-ethanol",
@@ -403,8 +416,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "34fdfa1c4aac8d738e60eee44a009b56d9f4fc7b5dc5330b2de56c58c6fbb331",
-        "initialDigest" : "0949b967739e77336de9a182af3bd52a964421a42df96c31b4364d230d5ac930",
+        "finalDigest" : "e053a9ecb76bd6f66ba848a0b2089921a3f27e46f623ada70bde26371c3a72e0",
+        "initialDigest" : "7c726aa5d6789341e8846cb0eedb832c50cef0b9f5cf3aac634261647b890ab5",
         "outcome" : "viewing-benzene"
       },
       "name" : "fixture-benzene",
@@ -424,8 +437,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "bcb917544e35b7e7e84fd858171e1c4289dcc8a78ea8eee67633bafe1eb8bb74",
-        "initialDigest" : "0949b967739e77336de9a182af3bd52a964421a42df96c31b4364d230d5ac930",
+        "finalDigest" : "3d826bd4d8a82d011679ae972d0ee097983cefb3e1a4ec2f08ad5ee8d1574c35",
+        "initialDigest" : "7c726aa5d6789341e8846cb0eedb832c50cef0b9f5cf3aac634261647b890ab5",
         "outcome" : "viewing-caffeine"
       },
       "name" : "fixture-caffeine",
@@ -455,8 +468,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "7b7953643c250e4f51929929f2cf3a0461a724a9e4fc5198fae1ee6057c83eba",
-        "initialDigest" : "0949b967739e77336de9a182af3bd52a964421a42df96c31b4364d230d5ac930",
+        "finalDigest" : "427b7694c7c4f4d174a2b5d32bb1285877f11f3e32d2ee5b04e5b0cd35124b03",
+        "initialDigest" : "7c726aa5d6789341e8846cb0eedb832c50cef0b9f5cf3aac634261647b890ab5",
         "outcome" : "viewing-caffeine"
       },
       "name" : "fixture-caffeine-space-filling",
@@ -536,8 +549,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "28df1b30c0d650d7daafd0602ec7e459f19fefd8d2ec63241deb8ce01d44eb7f",
-        "initialDigest" : "0949b967739e77336de9a182af3bd52a964421a42df96c31b4364d230d5ac930",
+        "finalDigest" : "19f51f3c33694cbf3d115a5878a86b44ddb5c8124111775ead3e9847dad1d5ea",
+        "initialDigest" : "7c726aa5d6789341e8846cb0eedb832c50cef0b9f5cf3aac634261647b890ab5",
         "outcome" : "viewing-benzene"
       },
       "name" : "fixture-benzene-turned",
@@ -567,8 +580,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "70e1d3c67ced089938af1c9b68d829b1ec7e634676864c39b0c3db3d25234b2b",
-        "initialDigest" : "0949b967739e77336de9a182af3bd52a964421a42df96c31b4364d230d5ac930",
+        "finalDigest" : "cf7ef454f348f1a634860c6a2b0c101ba5b0950fdbbca6c4c0204f4db0a6ea15",
+        "initialDigest" : "7c726aa5d6789341e8846cb0eedb832c50cef0b9f5cf3aac634261647b890ab5",
         "outcome" : "viewing-caffeine"
       },
       "name" : "fixture-caffeine-picked",
@@ -621,8 +634,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "0f6f525eb6d052ec6909e92510e058737d78d548d499aec547c2f1f368f0f95b",
-        "initialDigest" : "0949b967739e77336de9a182af3bd52a964421a42df96c31b4364d230d5ac930",
+        "finalDigest" : "7f5e1613e12c0c87030d49966f120dd09eee898293d957b6e6f56f14dc7d885c",
+        "initialDigest" : "7c726aa5d6789341e8846cb0eedb832c50cef0b9f5cf3aac634261647b890ab5",
         "outcome" : "viewing-water"
       },
       "name" : "fixture-water-panned",

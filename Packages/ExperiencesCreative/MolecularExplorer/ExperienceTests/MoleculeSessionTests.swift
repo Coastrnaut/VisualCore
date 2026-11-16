@@ -51,7 +51,8 @@ final class MoleculeSessionTests: XCTestCase {
         XCTAssertEqual(presenter.nativeActions, ["molecule.select", "molecule.next", "molecule.previous",
                                                  "display.mode", "camera.orbit", "camera.tilt", "camera.zoom",
                                                  "view.reset", "camera.pan", "atom.select", "atom.next",
-                                                 "atom.previous", "atom.clear"])
+                                                 "atom.previous", "atom.clear", "import.begin", "import.atom",
+                                                 "import.end"])
         XCTAssertEqual(presenter.nativeActions, Set(MoleculeCore.actionIDs), "every action has a native control")
         XCTAssertEqual(presenter.gestureActions, ["camera.orbit", "camera.tilt", "camera.zoom", "camera.pan",
                                                   "atom.select", "atom.clear"])
@@ -156,8 +157,8 @@ final class MoleculeSessionTests: XCTestCase {
         XCTAssertTrue(shell.handle(control: "molecule.select", values: [2]).isAccepted)
         let saved = try shell.snapshot()
         first.close()
-        let newerEnvelope = try moleculeEnvelope(Data(saved.payload.utf8), like: saved, schema: 4)
-        let newerPayload = try moleculeEnvelope(moleculePayload(saved.payload, key: "schema", value: 4), like: saved)
+        let newerEnvelope = try moleculeEnvelope(Data(saved.payload.utf8), like: saved, schema: 5)
+        let newerPayload = try moleculeEnvelope(moleculePayload(saved.payload, key: "schema", value: 5), like: saved)
 
         let cases: [(String, ExperienceSnapshot)] = [("envelope", newerEnvelope), ("payload", newerPayload)]
         for (name, newer) in cases {
