@@ -8,7 +8,7 @@ Precedent: `specs/115-me-p06-release/tasks.md`.
 
 ## Phase 1: Setup
 
-- [ ] T-A16-601 Baseline: cite the A16-P05 evidence on the unchanged sources (`.autonomy/checks/A16-P05.{sl-ios27-2,app-unit,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14)
+- [X] T-A16-601 Baseline: cite the A16-P05 evidence on the unchanged sources (`.autonomy/checks/A16-P05.{sl-ios27-2,app-unit,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14) — Verified 2026-11-16: 2026-11-16: A16-P05 evidence cited on unchanged sources (no Packages, Apps or project.yml change since the A16-P05 record 60f21efc): .autonomy/checks/A16-P05.sl-ios27-2.json, A16-P05.app-unit.json, A16-P05.verify-27.json, all exit 0
 
 ## Phase 2: Story 1 — nothing leaves the device
 
