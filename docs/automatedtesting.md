@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-16 (A17-P01: a core before its experience passes the package check; A17-P00: an audit corrects the clarification; A16-P06: interface chunk x2, a scan that allows a named format; A16-P05: a generated validation report; mirrors reload after an edit; A16-P04: no mutating call inside #expect; A16-P03: round to half in the shader, test the mirror while it runs; A16-P02: GPU parity against both half roundings; A16-P01: fixture count from the catalog).
+Last updated: 2026-11-16 (A17-P02: probe rays for picking tests, a snapshot envelope refuses non-JSON; A17-P01: a core before its experience passes the package check; A17-P00: an audit corrects the clarification; A16-P06: interface chunk x2, a scan that allows a named format; A16-P05: a generated validation report; mirrors reload after an edit; A16-P04: no mutating call inside #expect; A16-P03: round to half in the shader, test the mirror while it runs; A16-P02: GPU parity against both half roundings; A16-P01: fixture count from the catalog).
 
 ## 1. What is tested, and where
 
@@ -227,6 +227,14 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   that pair for an unregistered launch-scope catalog experience of the same package, as long as no `<Name>Experience`
   or `<Name>ExperienceTests` target exists. Run the package check before ticking the first core task, not at the end
   of the phase.
+- **Test picking with probe rays, not one ray through the centre.** A thin part (cartilage, a meniscus, a cruciate
+  ligament) can be covered from every single direction by its neighbours, so "a ray through its centre picks it" may
+  be false for correct geometry. A17-P02's picker tests aim 26 rays (axes and diagonals) at each part's centre. At
+  least one must pick it with all layers shown, and none may pick it while its layer is hidden. Experience tap tests
+  compare the selection with what the picker returns for the same ray.
+- **A snapshot envelope refuses a non-JSON payload by itself.** `ExperienceSnapshot(...)` throws for a payload that is
+  not one JSON object, so a restore test for damaged payloads builds the envelope with `try?`. It tests the core's
+  own `restore(payload:seed:)` for every case.
 
 ## 6. Keeping this file current
 

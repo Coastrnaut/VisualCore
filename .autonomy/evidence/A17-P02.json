@@ -1,0 +1,98 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/A17-P02.app-unit.json",
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A17-P02.app-unit.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A17-P02.catalog-host.json",
+      "command": "python3 scripts/build_catalog.py --check",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A17-P02.catalog-host.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A17-P02.contract.json",
+      "command": "python3 scripts/check_app_contract.py --app interactive-anatomy --render",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A17-P02.contract.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A17-P02.documented-api-2.json",
+      "command": "python3 scripts/check_documented_api.py --sources Packages/ExperiencesCreative/InteractiveAnatomy",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A17-P02.documented-api-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A17-P02.documented-api.json",
+      "command": "python3 scripts/check_documented_api.py --sources Packages/ExperiencesCreative/InteractiveAnatomy",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A17-P02.documented-api.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A17-P02.experience-packages.json",
+      "command": "python3 scripts/check_experience_packages.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A17-P02.experience-packages.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A17-P02.ia-core.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing InteractiveAnatomyCoreTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A17-P02.ia-core.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A17-P02.ia-ios27-2.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing InteractiveAnatomyCoreTests InteractiveAnatomyExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A17-P02.ia-ios27-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A17-P02.ia-ios27-3.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing InteractiveAnatomyCoreTests InteractiveAnatomyExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A17-P02.ia-ios27-3.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A17-P02.ia-ios27-4.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing InteractiveAnatomyCoreTests InteractiveAnatomyExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A17-P02.ia-ios27-4.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A17-P02.ia-ios27-6.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing InteractiveAnatomyCoreTests InteractiveAnatomyExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A17-P02.ia-ios27-6.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A17-P02.real-catalog.json",
+      "command": "swift test --package-path Packages/VisualCore --filter RealCatalogTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A17-P02.real-catalog.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A17-P02.script-tests-2.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A17-P02.script-tests-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A17-P02.verify-27-2.json",
+      "command": "python3 scripts/verify_experiences.py --only a17.interactive-anatomy --runtime 27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A17-P02.verify-27-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A17-P02.verify-27.json",
+      "command": "python3 scripts/verify_experiences.py --only a17.interactive-anatomy --runtime 27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A17-P02.verify-27.log"
+    }
+  ],
+  "generated": "2026-11-16T23:05:44+00:00",
+  "method": "deterministic-run-check",
+  "stage": "A17-P02",
+  "status": "pass"
+}
