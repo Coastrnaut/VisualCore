@@ -47,3 +47,9 @@ contract, runs, commits.
 
 MVP: search with the synonyms (303), the regression fixture. Then the panel (304), isolate and the view (305), and the
 experience (306–308). Review checkpoints after 302 (bit-identity) and at 310.
+
+## Phase 6: Convergence
+
+- [ ] T-A17-313 Remove the `@_disfavoredOverload` compatibility `decode(_:parts:) -> Result` from `Packages/ExperiencesCreative/InteractiveAnatomy/Core/AnatomyViewState.swift` and move its callers (`CoreTests/ViewStateTests.swift` and any other) to the tuple decode per contracts/layers-search.md (unrequested)
+- [ ] T-A17-314 Record in `specs/126-ia-p03-layers-search/research.md` the `view.apply` action (11 values) through which the presenter opens the stored view deterministically per plan: lifecycle (unrequested)
+- [ ] T-A17-315 Make the default temporary storage of `AnatomyTest.open` in `Packages/ExperiencesCreative/InteractiveAnatomy/ExperienceTests/AnatomyTestSupport.swift` removed when the test finishes (for example `addTeardownBlock` on the current test, or a shared folder emptied in each suite's tearDown) per Constitution VI test hygiene (partial)
