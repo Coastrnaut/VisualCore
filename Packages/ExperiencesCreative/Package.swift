@@ -545,6 +545,13 @@ let package = Package(
         // VisualCoreMath for the scene and camera of feature 111).
         // A16 Simulation Lab (feature 117, A16-P01): a candidate until X-A16. The core is pure (Foundation and VisualCore
         // simulation, parameter and math modules) and GPU-free.
+        .target(name: "InteractiveAnatomyCore",
+                dependencies: [.product(name: "VisualCoreMath", package: visualCore)],
+                path: "InteractiveAnatomy/Core",
+                resources: [.copy("Content")]),
+        .testTarget(name: "InteractiveAnatomyCoreTests",
+                    dependencies: ["InteractiveAnatomyCore", .product(name: "VisualCoreMath", package: visualCore)],
+                    path: "InteractiveAnatomy/CoreTests"),
         .target(name: "SimulationLabCore",
                 dependencies: [.product(name: "VisualCoreSimulation", package: visualCore),
                                .product(name: "VisualCoreParameters", package: visualCore),
