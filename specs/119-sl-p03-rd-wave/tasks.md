@@ -53,7 +53,7 @@ Precedent: `specs/118-sl-p02-automata-gpu/tasks.md`.
 
 ## Phase 4: Story 2 — no floating-point targets
 
-- [ ] T-A16-305 [US2] In `SimulationPresenter.swift` and `Experience/SimulationControls.swift`:
+- [X] T-A16-305 [US2] In `SimulationPresenter.swift` and `Experience/SimulationControls.swift`: — Verified 2026-11-16: 2026-11-16: .autonomy/checks/A16-P03.sl-ios27.json exit 0 (41 core, 20 Swift Testing and 33 XCTest experience tests, 0 failures, slowest 1.98 s, iOS 27); FloatUnsupportedTests (forced no support: no Gray-Scott or wave pair or display, both families refused with a16.unsupported and the sentence, a restored reaction-diffusion state drawn from the CPU upload with the sentence in the status line)
   - probe `FloatRenderSupport.detect(in:)` in `setup` (seam `forceFloatUnsupported`);
   - without support, make no float or 8-bit pair for the two families;
   - `send` refuses `sim.family` 1 or 2 with `a16.unsupported` and the unsupported sentence, and the controls disable
