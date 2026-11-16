@@ -38,8 +38,13 @@ RGBA16F or the documented RGBA8 fallback), `FieldPass` with `FieldUniform` and `
 `ResourceRegistry` and `StillCapture` (`capture(host:size:prefix:)` into a temporary folder); in `VisualCoreSimulation`
 `FieldGrid` with `StoragePrecision` (float32, float16, float16TowardZero, unorm8) built for CPU references of GPU field
 passes (feature 019). Fluid Art Playground uses `PingPongTarget` and `FieldPass` app-locally. A still is shared through
-SwiftUI `ShareLink` in Generative Art Studio. No cellular-automaton, Gray-Scott or wave rules and no histogram reducer
-exist in any framework product (`ImageComparison`'s histogram is test support only).
+SwiftUI `ShareLink` in Generative Art Studio, Fluid Art Playground, Fractal Explorer (which captures through
+`StillCapture`) and Infinite Geometry. No cellular-automaton, Gray-Scott or wave rules and no shippable field histogram
+exist in any framework product (`ImageComparison`'s histogram is test support; `FrameChecks.histogram` in
+VisualCoreExperience is a luma histogram of RGBA8 frames compiled only under DEBUG or VISUALCORE_AUTOMATION).
+`ResourceRegistry` creates every texture with LINEAR filtering and CLAMP_TO_EDGE, so the wrap and fixed-zero
+boundaries of clarification 5 are done with `texelFetch` and index arithmetic in the step shaders (facts corrected by
+the contract audit, T-A16-012).
 
 - Q: How is the manual's "compile an empty shell" gate met in the one app? → A: As for A15: the one app is the shell;
   this phase proves it builds for testing with Simulation Lab absent; the targets come with A16-P01's first rules.
