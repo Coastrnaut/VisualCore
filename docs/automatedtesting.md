@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-16 (A15-P04: store tests over a temporary folder; A15-P03: touches cancelled on suspension).
+Last updated: 2026-11-16 (A15-P05: imports as actions, fuzz corpus, claim-word scan; A15-P04: store tests over a temporary folder).
 
 ## 1. What is tested, and where
 
@@ -152,6 +152,14 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   folder, write a refused fixture byte for byte, open a session and compare the bytes afterwards; a failed write is a
   read-only folder (0o555), and the app's data reset is removing the folder. Two sessions over the same folder prove
   survival without relaunching anything (A15-P04).
+- **A user file enters the engine as actions.** An imported document is parsed outside the engine and sent as ordinary
+  actions (`import.begin`, `import.atom` × n, `import.end`), so replays, snapshots and digests cover it; tests feed the
+  importer temporary file URLs and never present the document picker. A schema bump changes every digest: regenerate
+  the manifest and re-pin the Swift-pinned fixture digests from the "derived" lines (A15-P05).
+- **Fuzz with a seeded corpus, not time.** 2,000 mutated files (seeds 1…2,000, SplitMix64) run in about 0.1 s through
+  the same rule the engine uses; a 200-file slice goes through the engine itself (A15-P05).
+- **Scan source literals for domain words.** Inline accessibility labels are not reachable as statics; a test reads the
+  experience's Swift sources from `#filePath` and checks every string literal (A15-P05).
 
 ### Process
 
