@@ -45,8 +45,8 @@ in code:
 
 - Q: How does search match and rank? → A:
   - **Index:** each part's English name, standard name and synonyms, each folded with `CatalogSearch.fold`.
-  - **Query:** folded and trimmed. It matches a field when it equals the field or is a prefix of one of the field's
-    words.
+  - **Query:** folded and trimmed. It matches a field when it equals the field or when the field's text, from the start of one of
+    its words, begins with the query (so multi-word queries such as "patellar ten" match).
   - **Ranks:** an exact name (English or standard) 0; a name word prefix 1; an exact synonym 2; a synonym word prefix
     3; a description word prefix 4, only for queries of 3 or more characters.
   - **Order:** by rank, then inventory order, at most 14 results, each part once at its best rank. An empty query lists
