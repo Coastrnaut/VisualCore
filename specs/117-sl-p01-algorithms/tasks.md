@@ -24,7 +24,7 @@ Precedent: `specs/110-me-p01-domain-parser/tasks.md`.
 
 ## Phase 4: Records and evidence
 
-- [ ] T-A16-108 Contract `docs/apps/simulation-lab/visualcore-contract.json`: G-RULES, G-SPEC and G-SCHEDULER closed by "A16-P01"; rows whose gaps are all closed become available (`--name contract -- python3 scripts/check_app_contract.py --app simulation-lab --render`)
+- [X] T-A16-108 Contract `docs/apps/simulation-lab/visualcore-contract.json`: G-RULES, G-SPEC and G-SCHEDULER closed by "A16-P01"; rows whose gaps are all closed become available (`--name contract -- python3 scripts/check_app_contract.py --app simulation-lab --render`) — Verified 2026-11-16: 2026-11-16: .autonomy/checks/A16-P01.contract.json exit 0; G-RULES, G-SPEC and G-SCHEDULER closed by A16-P01; M07 available (the other rows wait on later gaps)
 - [ ] T-A16-109 Simulation Lab tests on sim-27.2 (`--name sl-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing SimulationLabCoreTests SimulationLabExperienceTests`) and the documented-API check (`--name documented-api -- python3 scripts/check_documented_api.py --sources Packages/ExperiencesCreative/SimulationLab`) (SC-A16-101–105)
 - [ ] T-A16-110 App build and unit (`xcodegen generate --spec project.yml`; `--name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`) and runner (`--name verify-27 -- python3 scripts/verify_experiences.py --only a16.simulation-lab --runtime 27`) (SC-A16-105)
 - [ ] T-A16-111 Packages and script tests (`--name experience-packages -- python3 scripts/check_experience_packages.py`; `--name script-tests -- python3 scripts/test_scripts.py`)

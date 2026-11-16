@@ -501,7 +501,7 @@
       "id": "M07",
       "capability": "Clear parameter schema per experiment and seeded starting conditions: a versioned SimulationSpec (kind, grid size, time step, boundary mode, seed, parameter map, algorithm version) validated on ingress, parameter definitions with units and ranges, and starting fields generated from the seed (random cells, Gray-Scott square of V, a wave pulse) identically on every run",
       "source": "v0.1 feature 2: clear parameter schema per experiment and seeded starting conditions; manual §6 versioned domain schemas",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreParameters/ParameterSchema.swift",
@@ -538,13 +538,19 @@
           "symbol": "RenderTarget.upload",
           "product": "VisualCoreRendering",
           "public": true
+        },
+        {
+          "file": "Packages/ExperiencesCreative/SimulationLab/Core/SimulationSpec.swift",
+          "symbol": "SimulationSpec",
+          "product": "SimulationLabExperience",
+          "public": true
         }
       ],
       "example": {
         "file": "Packages/ExperiencesCreative/FluidArtPlayground/Core/DyeSeed.swift",
         "symbol": "DyeSeed"
       },
-      "notes": "Tested in VisualCoreParametersTests (ParametersTests), VisualCoreSimulationTests (SeededRandomTests, SeedDerivationTests) and VisualCoreRenderingTests (FloatTransferTests upload). The spec type, the parameter definitions of each experiment and the seed generators are G-SPEC (app-local, A16-P01)."
+      "notes": "Tested in VisualCoreParametersTests (ParametersTests), VisualCoreSimulationTests (SeededRandomTests, SeedDerivationTests) and VisualCoreRenderingTests (FloatTransferTests upload). The spec type, the parameter definitions of each experiment and the seed generators are G-SPEC (app-local, A16-P01). Built at A16-P01 (G-SPEC closed): the versioned spec, parameter definitions per family and seeded starts, tested in SimulationSpecTests."
     },
     {
       "id": "M08",
@@ -1422,10 +1428,10 @@
       ],
       "kind": "adaptation",
       "owner": "app-local",
-      "justification": "No cellular-automaton, Gray-Scott or wave rule exists in any framework product. The three CPU references on tiny grids (a stated automaton neighbourhood and rule; Gray-Scott with its Laplacian stencil, diffusion constants, feed and kill; a bounded explicit wave scheme), each with its boundary rule (wrap for automata and reaction-diffusion, fixed zero for waves) and storage rounded through StoragePrecision, are the experience's science content and stay in its GPU-free Core (spec clarification 5, manual phase 01, A16-P01). A boundary-mode helper is assessed for VisualCoreSimulation there if a second consumer exists.",
+      "justification": "No cellular-automaton, Gray-Scott or wave rule exists in any framework product. The three CPU references on tiny grids (a stated automaton neighbourhood and rule; Gray-Scott with its Laplacian stencil, diffusion constants, feed and kill; a bounded explicit wave scheme), each with its boundary rule (wrap for automata and reaction-diffusion, fixed zero for waves) and storage rounded through StoragePrecision, are the experience's science content and stay in its GPU-free Core (spec clarification 5, manual phase 01, A16-P01). A boundary-mode helper is assessed for VisualCoreSimulation there if a second consumer exists. Built at A16-P01: Core/AutomatonRule.swift (Moore B/S rules Life, HighLife, Seeds; wrap; unorm8), GrayScott.swift (five-point stencil, Du 0.16, Dv 0.08, explicit Euler, wrap, clamp 0...1, float16) and WaveField.swift (leapfrog, fixed zero border, Courant limit 1/sqrt 2, conserved and damped discrete energies) over FieldGrid and StoragePrecision; no boundary helper was added to VisualCoreSimulation (one consumer).",
       "phase": 1,
-      "test": "Core host tests (swift test, no GPU): Life blinker returns after exactly two steps and a block is still; wrap carries a glider across an edge; Gray-Scott on a tiny grid matches a hand-computed step and keeps values finite and in 0...1; the wave pulse keeps its symmetry, is zero on the fixed boundary and its energy does not grow below the Courant limit; the same seed gives the same grid and digest; rounding to unorm8 keeps automaton states exact",
-      "closed": null
+      "test": "Core tests AutomatonRuleTests, GrayScottTests, WaveFieldTests: blinker period 2, block still, glider wraps after 4N steps, Gray-Scott hand-computed step within one storage step and finite in 0...1, wave mirror-symmetric with a zero border, energy conserved within 1e-3 and the damped energy never rising",
+      "closed": "A16-P01"
     },
     {
       "id": "G-SPEC",
@@ -1436,10 +1442,10 @@
       ],
       "kind": "adaptation",
       "owner": "app-local",
-      "justification": "ParameterSchema, SeededRandom, NumericHygiene and TimeStepPolicy exist; the versioned SimulationSpec (kind, grid size, time step, boundary mode, seed, parameter map, algorithm version), the parameter definitions with units and ranges for each experiment, the seeded starting conditions, the stability limits (wave Courant number, Gray-Scott step bound) with their visible explanations and the per-tier grid and step limits are experiment rules (manual §6 domain schemas and algorithm decisions, A16-P01).",
+      "justification": "ParameterSchema, SeededRandom, NumericHygiene and TimeStepPolicy exist; the versioned SimulationSpec (kind, grid size, time step, boundary mode, seed, parameter map, algorithm version), the parameter definitions with units and ranges for each experiment, the seeded starting conditions, the stability limits (wave Courant number, Gray-Scott step bound) with their visible explanations and the per-tier grid and step limits are experiment rules (manual §6 domain schemas and algorithm decisions, A16-P01). Built at A16-P01: Core/SimulationSpec.swift (schema 1, typed refusals with sentences, the Gray-Scott bound 1.5625 and the Courant refusal), ParameterCatalog.swift over VisualCoreParameters ParameterDefinition, Seeding.swift over SeededRandom, SimulationState.swift (spec, scheduler and field bits, at most 1 MiB).",
       "phase": 1,
-      "test": "Core host tests: the spec round-trips through its versioned schema and refuses an unknown version, kind or boundary; every parameter is clamped to its range with an explanation; a time step beyond the stability limit is refused or clamped with the stated message; non-finite values are refused; the same seed gives the same starting field; grid sizes and steps per frame beyond a tier's limit are refused",
-      "closed": null
+      "test": "Core tests SimulationSpecTests and SimulationStateTests: schema 1 round trips; unknown version, kind, boundary and grid size refused; every range edge; the stability refusals at and 1 % above the limit; the same seed gives the same start; state refusals damaged, newer-version and out-of-range",
+      "closed": "A16-P01"
     },
     {
       "id": "G-SCHEDULER",
@@ -1448,10 +1454,10 @@
       ],
       "kind": "adaptation",
       "owner": "app-local",
-      "justification": "PlaybackState, FixedStepClock and FixedStepRunner.stepOnce exist; the simulation scheduler (run, pause, single step of exactly one iteration, reset to the seeded start, speed as steps per frame within a cap, separate from display and wall time) is the experience's control rule (manual SimulationScheduler component, §11 fixture 4, A16-P01); Fluid Art Playground's SimulationControl is not copied.",
+      "justification": "PlaybackState, FixedStepClock and FixedStepRunner.stepOnce exist; the simulation scheduler (run, pause, single step of exactly one iteration, reset to the seeded start, speed as steps per frame within a cap, separate from display and wall time) is the experience's control rule (manual SimulationScheduler component, §11 fixture 4, A16-P01); Fluid Art Playground's SimulationControl is not copied. Built at A16-P01: Core/SimulationScheduler.swift (speeds 0.25-4 times the family base rate at a 1/60 s host step, at most 16 iterations per host step, no carried burst) and SimulationModel.swift; the adapter's sim.run, sim.pause, sim.step, sim.reset and sim.speed actions.",
       "phase": 1,
-      "test": "Core host tests: pause stops stepping; one step while paused advances the step count by exactly one and equals one CPU step; reset restores the seeded field and step 0; speed never exceeds the cap per frame; a long frame gap never runs a catch-up burst beyond the cap",
-      "closed": null
+      "test": "Core tests SchedulerTests and the experience tests SimulationCoreTests: pause stops; a paused single step adds exactly one and equals one rule step; reset restores the seeded start; at most 16 iterations per host step and no burst after a long gap",
+      "closed": "A16-P01"
     },
     {
       "id": "G-CA-GPU",
