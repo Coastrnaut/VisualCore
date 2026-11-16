@@ -111,6 +111,8 @@ tolerance.
 - **A refused action:** the GPU field does not change.
 - **Reset or family change:** the GPU field is replaced by the CPU start.
 - **Restore of a saved state:** the GPU field is loaded from the saved field.
+- **A step program that fails to compile or an incomplete target:** setup throws, the session fails as for any
+  presenter setup failure (the host's failure state), and nothing is drawn from a half-made pair; the CPU state is kept.
 - **Floating-point targets unavailable (fixture only):** the reaction-diffusion fixture fails with its message; the
   automaton needs only 8-bit targets.
 
