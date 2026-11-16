@@ -69,3 +69,8 @@ Precedent: `specs/120-sl-p04-ui-presets-capture/tasks.md`.
 - T-A16-506 through T-A16-508 run last.
 
 **Review checkpoint:** after T-A16-503 (the report). **MVP:** Story 1.
+
+## Phase 6: Convergence
+
+- [ ] T-A16-509 Add `testAPaintThenAStepInOneFrameReachesTheGPU` to `Packages/ExperiencesCreative/SimulationLab/ExperienceTests/SizeChangeTests.swift`: for each family, paused, `sim.paint [20, 20, 0]` then `sim.step` with no frame between, then one frame; the GPU field equals the CPU field (0 for the automaton, 0.01 otherwise) and the mirror was loaded (load count + 1), per FR-A16-504/505 "without carrying corrupted state" (partial)
+- [ ] T-A16-510 Record decision D7 in `specs/121-sl-p05-validation/research.md`: `SimulationCore.paintCount` (neither saved nor digested), and the presenter's reload when it changes, fix the paint-then-step bug found by `BoundaryRuleTests`, per plan: Project Structure (unrequested)
