@@ -8,7 +8,7 @@ raise a system prompt. Precedent: `specs/126-ia-p03-layers-search/tasks.md`.
 
 ## Phase 1: Setup
 
-- [ ] T-A17-401 Baseline: cite the A17-P03 evidence (`.autonomy/checks/A17-P03.{ia-ios27-3,app-unit,verify-27}.json`) on the tree recorded at A17-P03, whose Packages are unchanged since (owner ruling of 2026-11-14)
+- [X] T-A17-401 Baseline: cite the A17-P03 evidence (`.autonomy/checks/A17-P03.{ia-ios27-3,app-unit,verify-27}.json`) on the tree recorded at A17-P03, whose Packages are unchanged since (owner ruling of 2026-11-14) — Verified 2026-11-16: 2026-11-16: A17-P03 evidence cited: .autonomy/checks/A17-P03.ia-ios27-3.json, A17-P03.app-unit.json and A17-P03.verify-27.json, all exit 0; Packages unchanged since the A17-P03 record commit eb7dbfdf
 
 ## Phase 2: Foundational — the VisualCore layout (story 2)
 
