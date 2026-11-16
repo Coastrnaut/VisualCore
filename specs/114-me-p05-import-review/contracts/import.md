@@ -12,6 +12,8 @@ public enum MoleculeImport {
     public static func actions(_ parsed: ParsedXYZ) -> [(control: String, values: [Double])]  // begin, atom × n, end, select 5
 }
 public struct ImportedMolecule: Codable, Equatable, Sendable { public let molecule: Molecule }   // no title in the engine
+// ImportedMolecule.make(atoms: [Atom]) -> Result<ImportedMolecule, XYZRefusal.Reason>: the single check of the import
+// limits (count, elements, finite, magnitude, minimum distance) with inferred single bonds; used by import.end and the fuzz test.
 public enum MoleculeReview {
     public static let inferredStatement = "Bonds marked inferred are estimated from atom distances."
     public static let claimWords: [String]                                  // clarification Q5
