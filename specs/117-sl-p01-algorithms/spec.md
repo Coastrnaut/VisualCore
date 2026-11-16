@@ -49,7 +49,9 @@ steps per frame (`ExperienceEngine`); `Texture.upload(rgba:)` writes RGBA8 pixel
   c = 1, Δt = 0.5 (C = 0.5), damping γ in 0…0.05 (default 0.002); the start is a Gaussian pulse (σ = 3 cells, amplitude
   1) at a seeded position; storage `float16`. "Energy does not grow" means the discrete leapfrog energy Σ(uⁿ⁺¹ − uⁿ)² +
   C² Σ over neighbour pairs (uⁿ⁺¹ᵢ − uⁿ⁺¹ⱼ)(uⁿᵢ − uⁿⱼ) stays within 10⁻³ of its start (relative) with γ = 0 on the
-  CPU in `float32`, and never increases with γ > 0.
+  CPU in `float32`; with γ > 0 that form is not monotone under this scheme (measured during T-A16-103), so the damped
+  energy E_γ = (1 − γ)·E + γ Σ(uⁿ⁺¹)², which equals E at γ = 0 and falls by exactly (1 − γ) per step, is the one that
+  must never increase.
 - Q: What are the grid sizes and the speed rule? → A: Grid sizes 16, 32, 64, 128 or 256 cells per side; the experience
   runs 64 × 64 on the CPU in this phase (larger sizes need the GPU passes of A16-P02 and A16-P03 and are refused here);
   the core's step is 1/60 s; speed is one of 0.25, 0.5, 1, 2 or 4 times the family's base rate (automata 10, reaction-
