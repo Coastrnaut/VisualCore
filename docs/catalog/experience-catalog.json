@@ -3290,10 +3290,10 @@
      "A16-P01",
      "A16-P02",
      "A16-P03",
-     "A16-P04"
+     "A16-P04",
+     "A16-P05"
     ],
     "legacy_gates_pending": [
-     "A16-P05",
      "A16-P06"
     ],
     "unified_integration": "pending"
