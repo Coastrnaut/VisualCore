@@ -34,7 +34,7 @@ Precedent: `specs/118-sl-p02-automata-gpu/tasks.md`.
 
   Add `reactionDisplay` and `waveDisplay` to `Experience/SimulationShaders.swift`: the `SimulationPalette` stops as
   uniforms, v / 0.5 for reaction-diffusion, the height clamped to −1…1 for the wave.
-- [ ] T-A16-304 [US1] Wire the Gray-Scott and wave mirrors into `Packages/ExperiencesCreative/SimulationLab/Experience/SimulationPresenter.swift` per clarification Q3:
+- [X] T-A16-304 [US1] Wire the Gray-Scott and wave mirrors into `Packages/ExperiencesCreative/SimulationLab/Experience/SimulationPresenter.swift` per clarification Q3: — Verified 2026-11-16: 2026-11-16: .autonomy/checks/A16-P03.sl-ios27.json exit 0 (41 core, 20 Swift Testing and 33 XCTest experience tests, 0 failures, slowest 1.98 s, iOS 27); FloatFieldToleranceTests max |GPU − CPU| after 10 steps on 16 × 16: reaction-diffusion 0.0 (float16) / 0.0032 (toward zero), wave 0.0 / 0.0066, tolerance 0.01; WaveBorderTests 60 of 60 edge cells 0 after 100 steps; FloatMirrorTests (≤ 0.01 over 60 running frames with a reload after 64 steps, loads after recreation, resize, preset, reset and time step, display within ±1 of the palette, no pass reads its output)
   - load at setup, recreation, resize, any non-step change, and "whenever 64 GPU steps have run since the last load";
   - otherwise step by the engine's iteration delta (≤ 128 per frame); draw through the family's display;
   - counters `floatLoadCount` and `floatStepCount`; drawing never changes the digest.
