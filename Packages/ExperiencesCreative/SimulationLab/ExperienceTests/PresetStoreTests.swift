@@ -6,6 +6,7 @@ import XCTest
 @testable import SimulationLabExperience
 import SimulationLabCore
 import VisualCoreExperience
+import VisualCoreExperienceHost
 import VisualCorePersistence
 import VisualCoreRendering
 
@@ -132,5 +133,57 @@ final class PresetStoreTests: XCTestCase {
         XCTAssertNil(store.save(preset("Alpha")))
         XCTAssertEqual(store.entries.map(\.preset.name), ["Alpha", "Same", "Same"])
         XCTAssertEqual(store.entries.dropFirst().map(\.id), [first, second])
+    }
+
+    /// T-A16-413 (US4/AC1, FR-A16-430): a presenter with storage saves the current experiment; a second session over
+    /// the same storage lists it, and opening it through `sim.spec` gives the same spec at step 0.
+    func testASavedExperimentReopensInANewSession() async throws {
+        let id = SimulationTest.id
+        func open(_ session: ExperienceSession) async throws -> ExperienceShell<SimulationPresenter> {
+            var made: ExperienceShell<SimulationPresenter>?
+            let request = ExperienceOpenRequest(id: id, seed: 1, snapshot: nil, refusedSnapshotFails: false) {
+                let shell = SimulationLabExperience.make(id: id, storage: self.temporary.storage)
+                made = shell
+                return shell
+            }
+            _ = await session.open(request)
+            if let view = session.renderHost?.view {
+                view.frame = CGRect(x: 0, y: 0, width: 240, height: 160)
+                view.layoutIfNeeded()
+            }
+            return try XCTUnwrap(made)
+        }
+        let first = ExperienceSession()
+        let saving = try await open(first)
+        XCTAssertTrue(saving.presenter.send("sim.family", [1], through: saving.port).isAccepted)
+        XCTAssertTrue(saving.presenter.send("sim.timestep", [0.75], through: saving.port).isAccepted)
+        let spec = try XCTUnwrap(saving.engine.core).model.spec
+        let store = try XCTUnwrap(saving.presenter.presets)
+        XCTAssertNil(store.save(ExperimentPreset(name: "Slow spots", spec: spec, annotation: "A test experiment.",
+                                                 source: "Saved by you", license: "original")))
+        first.close()
+
+        let second = ExperienceSession()
+        let reopened = try await open(second)
+        let entry = try XCTUnwrap(reopened.presenter.presets?.entries.first { $0.preset.name == "Slow spots" })
+        XCTAssertEqual(entry.preset.spec, spec)
+        XCTAssertTrue(reopened.presenter.send("sim.spec", SimulationCore.specValues(entry.preset.spec),
+                                              through: reopened.port).isAccepted)
+        let core = try XCTUnwrap(reopened.engine.core)
+        XCTAssertEqual(core.model.spec, spec, "the same spec")
+        XCTAssertEqual(core.stepCount, 0)
+        second.close()
+    }
+
+    /// T-A16-414 (spec edge case): a stored preset whose spec is now refused (reaction-diffusion time step 2.0) is
+    /// reported as invalid and not listed.
+    func testAPresetWithARefusedSpecIsReportedAndSkipped() throws {
+        var preset = ExperimentPreset.bundled[3]
+        preset.spec.timeStep = 2.0
+        let name = SimulationPresetStore.fileName(for: UUID(uuidString: "00000000-0000-4000-8000-000000000041")!)
+        try temporary.storage.write(preset.encoded(), to: name)
+        let store = SimulationPresetStore(storage: temporary.storage)
+        XCTAssertTrue(store.entries.isEmpty, "not listed")
+        XCTAssertEqual(store.problems, [name + ": invalid"])
     }
 }
