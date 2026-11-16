@@ -1,0 +1,50 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/A16-P02.app-unit.json",
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A16-P02.app-unit.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A16-P02.contract.json",
+      "command": "python3 scripts/check_app_contract.py --app simulation-lab --render",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A16-P02.contract.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A16-P02.documented-api.json",
+      "command": "python3 scripts/check_documented_api.py --sources Packages/ExperiencesCreative/SimulationLab",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A16-P02.documented-api.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A16-P02.experience-packages.json",
+      "command": "python3 scripts/check_experience_packages.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A16-P02.experience-packages.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A16-P02.script-tests.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A16-P02.script-tests.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A16-P02.sl-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing SimulationLabCoreTests SimulationLabExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A16-P02.sl-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A16-P02.verify-27.json",
+      "command": "python3 scripts/verify_experiences.py --only a16.simulation-lab --runtime 27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A16-P02.verify-27.log"
+    }
+  ],
+  "generated": "2026-11-16T19:39:51+00:00",
+  "method": "deterministic-run-check",
+  "stage": "A16-P02",
+  "status": "pass"
+}
