@@ -45,3 +45,9 @@ registration (206), manifest generation, contract, runs, commits.
 
 MVP: the scene (202) and the experience drawing it (204). Picking, layers and the camera (203–205) close stories 2–3;
 budgets (202) close story 4. Review checkpoints after 203 (core tests) and at 209.
+
+## Phase 5: Convergence
+
+- [ ] T-A17-213 Add to `Packages/ExperiencesCreative/InteractiveAnatomy/ExperienceTests/AnatomyCoreTests.swift` a test that content whose scene cannot be built (a region declaring a mesh id without a placement, through `AnatomyCore.init(seed:region:)`, and the preparation path) is refused with code `a17.scene-refused` and a sentence naming the mesh, so the experience does not open per spec edge case "a declared mesh that the scene cannot build" (partial)
+- [ ] T-A17-214 Add to `Packages/ExperiencesCreative/InteractiveAnatomy/ExperienceTests/AnatomyTapTests.swift` tests through `AnatomyPresenter.pointer(_:viewSize:port:)`: a single tap at a part's projected centre selects what the picker returns; a drag (down, move beyond the tap slop, up) and a two-finger touch send nothing and leave the view state unchanged per spec edge case "a drag or a multi-touch gesture" (partial)
+- [ ] T-A17-215 Record in `specs/125-ia-p02-scene-selection/research.md` the five fixtures (the planning catalog's content count), the outcome codes `selected-<part id>` and `viewing-knee`, the preparation failure codes `a17.scene-refused` and `a17.content-refused`, and the presenter's background probe per T-A17-207 and plan: project structure (unrequested)
