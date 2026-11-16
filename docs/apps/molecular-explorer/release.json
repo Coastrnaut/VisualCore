@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "experience": "a15.molecular-explorer",
+  "requiredDocs": [
+    "docs/apps/molecular-explorer/privacy-and-credits.md",
+    "docs/apps/molecular-explorer/store-listing.md",
+    "docs/apps/molecular-explorer/release-checklist.md",
+    "docs/apps/molecular-explorer/device-campaign.md",
+    "docs/apps/molecular-explorer/data-review.md",
+    "docs/apps/molecular-explorer/data-sources.md",
+    "docs/release/build-and-archive.md"
+  ],
+  "checklist": "docs/apps/molecular-explorer/release-checklist.md",
+  "copyCheck": {
+    "text": [
+      "docs/apps/molecular-explorer/store-listing.md"
+    ],
+    "swift": [
+      "Packages/ExperiencesCreative/MolecularExplorer/Experience/MoleculeControls.swift",
+      "Packages/ExperiencesCreative/MolecularExplorer/Experience/MoleculePresenter.swift"
+    ],
+    "allow": [
+      "camera"
+    ]
+  }
+}

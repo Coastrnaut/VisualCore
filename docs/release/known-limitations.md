@@ -267,6 +267,36 @@ and `VisualCoreRendering` (iOS, GL). ADR-0003 and the package map record this. R
   oversized or out-of-range `view.json` is refused with its reason and left in place until the next Save view replaces
   it (`ViewStoreTests.testDamagedNewerAndOversizedFilesAreRefusedAndLeftUntouched`).
 
+### Molecular Explorer (A15; features 109–115)
+
+- The frame pacing with caffeine in both display modes, touch orbit and picking on hardware, the thermal state and the
+  peak memory over a short session are unmeasured on devices; they wait for the device campaign
+  ([device-campaign.md](../apps/molecular-explorer/device-campaign.md), rows ME-D1, ME-D2 and ME-D6). No frame-time,
+  thermal, power or memory figure is stated.
+- The VoiceOver journey on hardware (row ME-D3), Dynamic Type at the largest sizes and the system accessibility audits
+  (row ME-D4) and the import through the system document picker from Files (row ME-D5) wait for the device campaign;
+  the labels and values, the native control for every gesture, the canvas description with molecule, mode and selected
+  atom, the announcements and the import's refusals are proved by the experience's tests only. No automated test
+  presents the document picker.
+- The library holds five molecules only: water, methane, ethanol, benzene and caffeine, each from its PubChem 3D
+  conformer (CIDs 962, 297, 702, 241 and 2519). The structures are illustrative models; the radii and colours are
+  display conventions ("Display radii, not measured sizes."), and the experience states no chemical safety, toxicity
+  or medical fact.
+- The bonds of an imported file are inferred, not read from the file: two atoms are bonded when their distance is at
+  most the sum of their covalent radii plus 0.4 Å (and not below the 0.4 Å overlap limit); every inferred bond is
+  single and marked inferred, so double, triple and aromatic bonds of an import are not shown as such. Only the
+  library molecules carry recorded bond orders.
+- The import is a small XYZ file only: at most 64 KB (65,536 bytes, checked before the file is read), at most 500 atoms,
+  lines of at most 256 bytes, coordinates within 1,000 Å and only the ten elements the explorer knows (H, C, N, O, F,
+  P, S, Cl, Br and I); no PDB, SDF, CIF or other format. A file outside these limits is refused with its reason and
+  changes nothing.
+- One import at a time: a new import replaces the stored copy (`import.xyz` and its title); there is no list of
+  imports, no export and no sync. The recent list keeps at most eight molecules, kept on the device only. A damaged,
+  newer, oversized or out-of-range `recent.json` or `settings.json` is refused with its reason and left in place until
+  the next change replaces it (`RecentStoreTests.testRefusedFilesStayByteIdenticalWithTheirMessages`,
+  `SettingsStoreTests.testRefusedFilesStayByteIdenticalWithTheirMessages`).
+- One drawing level (`level-0`): there is no lower level under Low Power Mode or a serious thermal state.
+
 ## Distribution
 
 - No App Store submission, signing or purchase setup is part of this release; those are owner actions.
