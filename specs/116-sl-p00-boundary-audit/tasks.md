@@ -32,7 +32,7 @@ Precedent: `specs/109-me-p00-boundary-audit/tasks.md`.
 ## Phase 7: Polish and evidence
 
 - [X] T-A16-009 No-change proof (`--name no-change -- git diff --exit-code --stat 1006181f..HEAD -- Packages External`) (FR-A16-008, SC-A16-005) — Verified 2026-11-16: 2026-11-16: .autonomy/checks/A16-P00.no-change.json exit 0 (no change in Packages or External since 1006181f)
-- [ ] T-A16-010 Script tests (`--name script-tests -- python3 scripts/test_scripts.py`) and the release-check document steps (`--name fast-checks -- python3 scripts/release_check.py --only docs app-contracts compliance dependencies`); every run-check of this gate stays within its 600 s limit and the contract check under 10 s (SC-A16-006)
+- [X] T-A16-010 Script tests (`--name script-tests -- python3 scripts/test_scripts.py`) and the release-check document steps (`--name fast-checks -- python3 scripts/release_check.py --only docs app-contracts compliance dependencies`); every run-check of this gate stays within its 600 s limit and the contract check under 10 s (SC-A16-006) — Verified 2026-11-16: 2026-11-16: .autonomy/checks/A16-P00.script-tests.json and A16-P00.fast-checks.json exit 0; every run-check within 600 s; contract check 0.05 s
 - [ ] T-A16-011 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A16-P00; update README.md (status, gate count) in the record commit (rule 16) and `docs/automatedtesting.md` if a test tool, rule or lesson changed (rule 17)
 
 ## Dependencies
