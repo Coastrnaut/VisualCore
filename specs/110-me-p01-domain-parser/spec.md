@@ -155,7 +155,8 @@ guaranteed structure).
 - **Count line disagrees with the atom lines:** refused (`count-mismatch`), never truncated or padded.
 - **Unknown element symbol, or a symbol in the wrong case:** symbols are matched case-insensitively and normalised
   (for example `cl` → `Cl`); a symbol not in the catalog is refused (`unknown-element`) with its line number.
-- **Windows line endings, trailing spaces, a missing final newline:** accepted.
+- **Windows line endings, trailing spaces, a missing final newline, a leading UTF-8 byte-order mark:** accepted (the
+  mark is ignored).
 - **Extra columns after x y z (for example charges):** ignored; fewer than three coordinates is `malformed-line`.
 - **The comment line:** kept as untrusted plain text, cut to its limit, never interpreted.
 - **Two atoms at (almost) the same position:** refused (`overlapping-atoms`) below a stated minimum distance.
@@ -199,7 +200,8 @@ guaranteed structure).
 - **FR-A15-131**: The experience MUST draw the selected molecule's atoms through the one host's drawing path as lit
   spheres coloured by element at a stated display radius, framed so every atom is in view, with native controls to
   choose the previous, next or any molecule and lines showing the name, formula, atom and bond counts and the source;
-  every control has an accessible label and value.
+  every control has an accessible label and value, and the canvas description names the molecule, its formula, its
+  atom and bond counts and its elements by name (so no information depends on colour alone).
 - **FR-A15-132**: The experience MUST be registered as a candidate with a scenario manifest (standard scenarios and at
   least one fixture per library molecule) and pass the runner on iOS 27.
 
