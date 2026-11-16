@@ -8,7 +8,7 @@ after every task (no trailers); read every check's exit before ticking. iOS 27 o
 
 ## Phase 1: Setup
 
-- [ ] T-A15-101 Baseline: cite the last evidence on an unchanged `Packages` tree (`.autonomy/checks/A15-P00.{app-build,no-change}.json`) instead of a rerun (owner ruling of 2026-11-14)
+- [X] T-A15-101 Baseline: cite the last evidence on an unchanged `Packages` tree (`.autonomy/checks/A15-P00.{app-build,no-change}.json`) instead of a rerun (owner ruling of 2026-11-14) — Verified 2026-11-15: cited .autonomy/checks/A15-P00.app-build.json and A15-P00.no-change.json (exit 0) on the Packages tree unchanged since A15-P00 (no rerun)
 
 ## Phase 2: Foundational — the core (stories 2–4)
 
