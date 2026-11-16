@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a15.molecular-explorer",
+    "--runtime",
+    "27"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a15.molecular-explorer --runtime 27",
+  "elapsed_seconds": 52.23,
+  "exit_code": 0,
+  "finished": "2026-11-16T16:36:01+00:00",
+  "log": ".autonomy/logs/A15-P03.verify-27.log",
+  "log_sha256": "11e7e1774cb75ba47e62258af7dccb76297f773cd3c5abe2663d7cd970f3c96e",
+  "name": "verify-27",
+  "stage": "A15-P03",
+  "started": "2026-11-16T16:35:09+00:00",
+  "timed_out": false
+}
