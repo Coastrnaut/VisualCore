@@ -103,3 +103,9 @@ Precedent: `specs/118-sl-p02-automata-gpu/tasks.md`.
 **Review checkpoints:** after T-A16-304 (the tolerance holds) and after T-A16-307 (the gates are met). **Parallel
 example:** Agent A writes `WaveGPU` and the display programs; Agent B writes `SimulationLegend`; Agent C writes the test
 files. The lead edits the presenter, the core and the controls. **MVP:** Story 1 (T-A16-303, 304).
+
+## Phase 8: Convergence
+
+- [ ] T-A16-311 Add a presenter-path test to `Packages/ExperiencesCreative/SimulationLab/ExperienceTests/TimeStepTests.swift` (or a new XCTest file `ExperienceTests/TimeStepMessageTests.swift`): in a session in the wave, `SimulationPresenter.send("sim.timestep", [1.0], through:)` is refused and `mirror.message` equals "The wave step is too large: the Courant number must stay at or below 0.707."; in reaction-diffusion 1.6 gives the reaction sentence naming 1.5625; an accepted step clears the message, per FR-A16-330, US4/AC1–2 (partial)
+- [ ] T-A16-312 Make `SimulationCore.fieldWords` in `Packages/ExperiencesCreative/SimulationLab/Experience/Adapter/SimulationCore.swift` take its minimum and maximum (and alive count) from `SimulationLegendValues.of(_:kind:)`, so the legend and the description share one source, with the description's words unchanged (digests and the manifest unaffected), per plan: legend values feed the description (partial)
+- [ ] T-A16-313 Record decision D7 in `specs/119-sl-p03-rd-wave/research.md` and the G-RDWAVE-GPU entry: both step shaders round to the nearest half-float in GLSL, so the GPU field equals the float16 CPU reference whatever the driver's colour-write rounding (measured 0.0; without it, the running 64 × 64 mirror drifted 0.03–0.07 in a few frames), per plan: research decisions (partial)
