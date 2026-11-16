@@ -24,6 +24,39 @@ Canonical overrides:
   presets and educational copy need an author or source and license.
 - **Constitution:** 2.12.0 adds the A16 experience rules (committed at the start of this gate, `f2d45f77`).
 
+## Clarifications
+
+### Session 2026-11-16
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+the A16 constitution commit is `f2d45f77` and the A16-P00 specify commit `1006181f` (the phase start: the no-change
+diff of `Packages` and `External` is taken from it); the reference submodule is pinned at `d93edd1`; fifteen
+experiences are registered (`Catalog/registrations.json`, A01–A15). VisualCore offers in `VisualCoreRendering`
+`PingPongTarget` (a read and a write `RenderTarget` with `swap()`), `FloatRenderSupport` (`detect(in:)` probes
+`GL_EXT_color_buffer_half_float` or `GL_EXT_color_buffer_float` and a 4×4 RGBA16F target; `storageFormat` gives
+RGBA16F or the documented RGBA8 fallback), `FieldPass` with `FieldUniform` and `FieldPassError`, `RenderTarget`,
+`ResourceRegistry` and `StillCapture` (`capture(host:size:prefix:)` into a temporary folder); in `VisualCoreSimulation`
+`FieldGrid` with `StoragePrecision` (float32, float16, float16TowardZero, unorm8) built for CPU references of GPU field
+passes (feature 019). Fluid Art Playground uses `PingPongTarget` and `FieldPass` app-locally. A still is shared through
+SwiftUI `ShareLink` in Generative Art Studio. No cellular-automaton, Gray-Scott or wave rules and no histogram reducer
+exist in any framework product (`ImageComparison`'s histogram is test support only).
+
+- Q: How is the manual's "compile an empty shell" gate met in the one app? → A: As for A15: the one app is the shell;
+  this phase proves it builds for testing with Simulation Lab absent; the targets come with A16-P01's first rules.
+- Q: What makes a capability "available"? → A: A public declaration in a VisualCore framework product with at least one
+  test that exercises it; an implementation that exists only inside another experience or a harness is "requires
+  adaptation" at best.
+- Q: Which package holds Simulation Lab? → A: `Packages/ExperiencesCreative/SimulationLab` (Auto-Creator.md §16), as
+  A05–A15 did; no new package is created.
+- Q: Does Simulation Lab need a permission or a new privacy answer? → A: No new one. Presets are kept in the
+  experience's own storage; a still is captured into a temporary folder and handed to the system share sheet, as in
+  Generative Art Studio, so the experience adds no usage string; no network, camera, location or microphone.
+- Q: What precision and boundary rules does the audit assume for later phases? → A: Cellular automata on RGBA8
+  (`unorm8`, exact states); reaction-diffusion and the wave field on RGBA16F when `FloatRenderSupport` reports
+  support, otherwise those two families are disabled with a message (no silent 8-bit run); the CPU reference uses
+  `FieldGrid` with the matching `StoragePrecision`; boundaries are wrap for automata and reaction-diffusion and fixed
+  zero for the wave field. The exact tolerances and stability limits are decided in A16-P01, not here.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - An evidence-backed integration matrix (Priority: P1) 🎯
@@ -108,7 +141,7 @@ will own each missing piece and in which phase.
 - **The build-step count changes during the phase**: the inventory records the count at the time of the check.
 - **The reference regression fails before any change**: recorded as a blocker; no Simulation Lab work starts.
 - **Persisted data, permissions, accessibility interface:** none is added in this phase (no interface); the still
-  capture's permission posture for later phases is decided in clarification.
+  capture's permission posture for later phases is decided in clarification 4 (share sheet, no new usage string).
 
 ## Requirements *(mandatory)*
 
