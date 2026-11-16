@@ -2,7 +2,7 @@
   "schema": 1,
   "app": "molecular-explorer",
   "gate": "A15-P00",
-  "date": "2026-11-15",
+  "date": "2026-11-16",
   "inventory": [
     {
       "area": "Package products",
@@ -477,7 +477,7 @@
       "id": "M06",
       "capability": "Curated small-molecule library with source attributions: a bounded set of bundled small molecules (coordinates in ångström) each with its name, formula, source, license and attribution shown in the app",
       "source": "v0.1 feature 1: curated small-molecule library with source attributions",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AcknowledgementsView.swift",
@@ -502,13 +502,19 @@
           "symbol": "StableHash",
           "product": "VisualCoreMath",
           "public": true
+        },
+        {
+          "file": "Packages/ExperiencesCreative/MolecularExplorer/Core/MoleculeLibrary.swift",
+          "symbol": "MoleculeLibrary",
+          "product": "MolecularExplorerExperience",
+          "public": true
         }
       ],
       "example": {
         "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Core/SourceRecords.swift",
         "symbol": "SourceRecord"
       },
-      "notes": "The license inventory and acknowledgements screen exist and are tested (AcknowledgementsViewTests), as does a named library of documents (NamedLibraryTests); none holds per-record scientific provenance. The curated molecules, their source records and the library UI are G-LIBRARY (app-local, A15-P04); the per-value source record type is shared with the element catalog (G-ELEMENTS, A15-P01)."
+      "notes": "The license inventory and acknowledgements screen exist and are tested (AcknowledgementsViewTests), as does a named library of documents (NamedLibraryTests); none holds per-record scientific provenance. The curated molecules, their source records and the library UI are G-LIBRARY (app-local, A15-P04); the per-value source record type is shared with the element catalog (G-ELEMENTS, A15-P01). Built at A15-P04 (G-ELEMENTS, G-LIBRARY closed): the Library section lists the five PubChem molecules with name, formula, counts and \"Source: PubChem Compound CID …, 3D conformer — public domain\", tested in MoleculeLibraryUITests."
     },
     {
       "id": "M07",
@@ -734,7 +740,7 @@
       "id": "M11",
       "capability": "Local recent molecules and visual settings: a bounded most-recent list (library and imported molecules), display mode, label and colour settings and the camera, each a versioned document in the experience's own storage with migration, damaged or newer files refused without a crash",
       "source": "v0.1 feature 6: local recent molecules and visual settings",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
@@ -771,13 +777,25 @@
           "symbol": "NamedLibrary",
           "product": "VisualCorePersistence",
           "public": true
+        },
+        {
+          "file": "Packages/ExperiencesCreative/MolecularExplorer/Core/RecentMolecules.swift",
+          "symbol": "RecentMolecules",
+          "product": "MolecularExplorerExperience",
+          "public": true
+        },
+        {
+          "file": "Packages/ExperiencesCreative/MolecularExplorer/Core/MoleculeSettings.swift",
+          "symbol": "MoleculeSettings",
+          "product": "MolecularExplorerExperience",
+          "public": true
         }
       ],
       "example": {
         "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Experience/ViewStore.swift",
         "symbol": "ViewStore"
       },
-      "notes": "Versioned documents with migration, envelopes, named libraries, saved state and per-experience storage exist and are tested (DocumentStoreTests, NamedLibraryTests, ExperienceStorageTests, SavedStateStoreTests). The recent list, the settings and camera schemas and their caps are G-LIBRARY (app-local, A15-P04)."
+      "notes": "Versioned documents with migration, envelopes, named libraries, saved state and per-experience storage exist and are tested (DocumentStoreTests, NamedLibraryTests, ExperienceStorageTests, SavedStateStoreTests). The recent list, the settings and camera schemas and their caps are G-LIBRARY (app-local, A15-P04). Built at A15-P04 (G-LIBRARY closed): recent.json (at most 8, newest first) and settings.json (label mode) at schema 1 with typed refusals, tested in RecentMoleculesTests, MoleculeSettingsTests, RecentStoreTests and SettingsStoreTests; display mode and camera stay in the engine state (schema 3, migrated from 1 and 2); element colours are fixed, not a setting; imported molecules join the list at A15-P05."
     },
     {
       "id": "M12",
@@ -1238,7 +1256,7 @@
       "id": "M23",
       "capability": "Bounded content: fixed caps for atom and bond counts, mesh detail, draw items, the recent list and import size; documents beyond a cap refused, never truncated silently",
       "source": "cross-cutting: bounded; constitution A15 bounded",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshBuilder.swift",
@@ -1269,13 +1287,19 @@
           "symbol": "DocumentStore.maxBytes",
           "product": "VisualCorePersistence",
           "public": true
+        },
+        {
+          "file": "Packages/ExperiencesCreative/MolecularExplorer/Core/RecentMolecules.swift",
+          "symbol": "RecentMolecules",
+          "product": "MolecularExplorerExperience",
+          "public": true
         }
       ],
       "example": {
         "file": "Packages/ExperiencesCreative/AudioOdyssey/Core/OdysseyQuality.swift",
         "symbol": "OdysseyQuality"
       },
-      "notes": "Mesh and resource budgets, storage quotas and document byte caps exist and are tested (MeshBuilderTests, ResourceLedgerTests, ExperienceStorageTests, DocumentStoreTests). The molecule caps are G-DOMAIN and G-PARSER (A15-P01), the draw budget per quality level G-RENDER (A15-P02), the recent-list cap G-LIBRARY (A15-P04)."
+      "notes": "Mesh and resource budgets, storage quotas and document byte caps exist and are tested (MeshBuilderTests, ResourceLedgerTests, ExperienceStorageTests, DocumentStoreTests). The molecule caps are G-DOMAIN and G-PARSER (A15-P01), the draw budget per quality level G-RENDER (A15-P02), the recent-list cap G-LIBRARY (A15-P04). Built at A15-P04 (G-LIBRARY closed): the recent list is capped at 8 ids and 2,048 bytes and the settings at 1,024 bytes; a longer list is refused as out-of-range, never truncated (RecentMoleculesTests)."
     }
   ],
   "gaps": [
@@ -1399,10 +1423,10 @@
       ],
       "kind": "adaptation",
       "owner": "app-local",
-      "justification": "DocumentStore, MigrationChain, NamedLibrary, SavedStateStore and ExperienceStorage exist; the curated small-molecule library (bundled records with name, formula, coordinates in ångström, source, license and attribution), the bounded recent-molecules list and the visual settings document with their versioned schemas are app-local (clarification 5, manual phase 04, A15-P04).",
+      "justification": "DocumentStore, MigrationChain, NamedLibrary, SavedStateStore and ExperienceStorage exist; the curated small-molecule library (bundled records with name, formula, coordinates in ångström, source, license and attribution), the bounded recent-molecules list and the visual settings document with their versioned schemas are app-local (clarification 5, manual phase 04, A15-P04). Built at A15-P04: Core/RecentMolecules.swift (recent.json, schema 1, at most 8 ids newest first, at most 2,048 bytes) and MoleculeSettings.swift (settings.json, schema 1, label mode all, selected or none, at most 1,024 bytes), both refusing damaged, oversized, newer-version and out-of-range bytes; RecentStore and SettingsStore over ExperienceStorage following Solar System Explorer's ViewStore (a load never writes, a refused file stays byte for byte, a failed write keeps the previous file); the Library section with each molecule's source and license, the Recent menu and the Labels picker in MoleculeControls. Both documents are new at schema 1, so there is no earlier schema to migrate; imported molecules join the list at A15-P05.",
       "phase": 4,
-      "test": "Core host tests: every curated molecule parses, is within the caps and carries source, units and license from the allowed set; attributions appear in the library UI and acknowledgements; the recent list keeps at most its cap in most-recent order and drops missing imports; settings round-trip, migrate from the previous schema and refuse damaged or newer files without a crash",
-      "closed": null
+      "test": "Core host tests (RecentMoleculesTests, MoleculeSettingsTests, InferenceDeterminismTests): the recent list keeps at most 8, newest first, unique, and drops ids not in the library on read; both documents round-trip byte for byte and refuse damaged, oversized, newer and out-of-range fixtures; bond inference gives the same pairs for five seeded shuffles of every library molecule. Experience tests (RecentStoreTests, SettingsStoreTests, MoleculeLibraryUITests): refused files stay byte-identical with their messages; the list and settings survive a new session over the same storage; removing the folder gives an empty list and the default labels; engine digests are unchanged; the library entries show name, formula, counts, source and license",
+      "closed": "A15-P04"
     },
     {
       "id": "G-IMPORT",
