@@ -46,7 +46,7 @@ Precedent: `specs/120-sl-p04-ui-presets-capture/tasks.md`.
   - a `recreateContext` raises `resourceBuildCount` by one, loads every mirror and leaves the field within tolerance.
 
   (FR-A16-504; SC-A16-504)
-- [ ] T-A16-505 [P] [US2] Create `Packages/ExperiencesCreative/SimulationLab/ExperienceTests/BoundaryRuleTests.swift`:
+- [X] T-A16-505 [P] [US2] Create `Packages/ExperiencesCreative/SimulationLab/ExperienceTests/BoundaryRuleTests.swift`: — Verified 2026-11-16: 2026-11-16: .autonomy/checks/A16-P05.sl-ios27.json exit 0 (62 core, 23 Swift Testing and 62 XCTest experience tests, 0 failures, slowest 6.6 s, iOS 27); BoundaryRuleTests: a glider crosses columns 63 and 0 on the GPU equal to the CPU and is back after 256 generations; a reaction-diffusion disc at (0, 0) wraps to the opposite edges on the GPU within 0.01 (its first run failed and exposed the paint reload bug fixed in T-A16-502); wave edges 0 on GPU and CPU
   - the automaton on the GPU: a glider placed by `sim.paint` at the right edge wraps to the left after 4 × 64
     generations, equal to the CPU;
   - reaction-diffusion: a disc painted at cell (0, 0) shows values on the opposite edges after one GPU step, equal to
