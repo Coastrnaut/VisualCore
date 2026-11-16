@@ -29,6 +29,66 @@ Canonical overrides:
   baseline. The reference regression runs at X-A17.
 - Follow `specs/112-me-p03-selection` and `specs/126-ia-p03-layers-search`.
 
+## Clarifications
+
+### Session 2026-11-16
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- Molecular Explorer's `MoleculeGestures` drives drag, pinch and tap through VisualCore's `GestureArbiter`, with 0.3°
+  per point, a step per turn or tilt angle, pinch steps at the zoom factor and at most 64 steps per event.
+- `LabelLayout` lives in A14 (internal) and A15 (public in its core), with 24 × 18 boxes offset by 6 points, cull and
+  overlap rules.
+- `VisualCoreSimulation` has `AnnouncementPlanner(minimumInterval:)` with `submit` and `flush(now:)`,
+  `StateSign(id:colorHex:sign:)`, `stateSignProblems(_:)` and `transitionDuration(_:reduceMotion:)`.
+- `StableHash.sha256Hex` is in `VisualCoreMath`.
+
+- Q: How do drags and pinches map to camera steps? → A: As in Molecular Explorer:
+  - **Drag:** begins after 10 points and counts 0.3° per point, accumulated. Every 15° (50 points) across sends
+    `camera.turn` (+1 to the right), and every 10° (about 33 points) up or down sends `camera.tilt` (+1 upward).
+  - **Pinch:** each time the scale since the last step passes 1 / 0.85 it sends `camera.zoom +1`; past 0.85 it sends
+    `−1`.
+  - **Arbitration:** at most 64 steps per event, with priorities pinch 3, drag 2, tap 1 through `GestureArbiter`.
+  - **Limits:** a refused step is shown and spoken as "The camera is at its limit."
+- Q: What is the generic label layout? → A: `AnchoredLabelLayout` in `VisualCoreMath`:
+  - **Call:** `place(_ candidates:camera:aspect:canvas:budget:) -> [Placement]`.
+  - **Candidate:** id, model-space anchor, box size in points, priority.
+  - **Projection:** each anchor is projected with the camera. One behind the camera, or outside clip depth, is culled.
+  - **Box:** placed 6 points up and right of the anchor, and dropped if it crosses the canvas edge.
+  - **Order:** candidates are taken by priority, then id. A box that overlaps a placed one by a positive area is
+    skipped. At most `budget` boxes are placed.
+
+  The experience's candidates are the solid parts:
+  - **Anchor:** the sphere centre.
+  - **Box:** 7 points per character plus 8, by 18.
+  - **Priority:** 0 for the selection, then 1 + the inventory index.
+
+  The labels are drawn by the host's canvas overlay, with hit testing off. Solar System Explorer and Molecular
+  Explorer keep their own layouts.
+- Q: What are the layer signs, and how are changes announced? → A:
+  - **Signs:** bones "●", cartilage and menisci "◆", ligaments and tendons "▲", each with its material colour. They
+    must give `stateSignProblems == []`.
+  - **List rows:** "<sign> <English name>", spoken as "<English name>, <layer words>".
+  - **Announcements:** selection changes go to an `AnnouncementPlanner` with a minimum interval of 0.5 s, timed by the
+    host's step clock: "<English name> selected." or "Selection cleared." The presenter flushes it on later frames, so
+    the last change is always announced. They go through an injectable sink (Solar System Explorer's precedent).
+  - **Reduce Motion:** framing and every camera change are immediate in every mode; nothing is animated, and
+    `transitionDuration(_:reduceMotion:)` gives 0 when Reduce Motion is on.
+- Q: What is the content pack? → A: The bundled resource becomes `Core/Content/knee-right.pack.json`:
+  - **Envelope:** a `DocumentEnvelope` of kind `a17.content-pack` at schema 2, whose payload is the region.
+  - **Schema 1:** the bare region file of A17-P01. It migrates by wrapping.
+  - **Cap:** 262,144 bytes.
+  - **Digest:** `StableHash.sha256Hex` of the region encoded with sorted keys.
+  - **Refusals:** damaged, too large and newer, as `ContentRefusal` reasons.
+
+  The bare `knee-right.json` is removed, and `AnatomyContent.bundledRightKnee()` reads the pack.
+- Q: What does provenance contain, and how is "no network" checked? → A:
+  - **Provenance:** `AnatomyProvenance` is built from the manifest. It holds the text and geometry licenses, each
+    citation with its license, and the review status with its sentence. Its check refuses an empty license, a license
+    outside the allowed set or a missing review sentence.
+  - **No network:** a core test scans the Interactive Anatomy Core and Experience sources for `URLSession`,
+    `URLRequest`, `NWConnection`, `Network` imports and `http` literals, and finds none.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Turn and zoom by touch (Priority: P1) 🎯
