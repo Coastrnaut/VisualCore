@@ -9,7 +9,7 @@ Precedents: `specs/111-me-p02-renderer/tasks.md` (scene, camera) and `specs/117-
 
 ## Phase 1: Setup
 
-- [ ] T-A17-201 Baseline: cite the A17-P01 evidence (`.autonomy/checks/A17-P01.{ia-core-ios27-2,app-build,experience-packages-2}.json`) on a tree whose Packages changed since only by the comment move in Package.swift (owner ruling of 2026-11-14)
+- [X] T-A17-201 Baseline: cite the A17-P01 evidence (`.autonomy/checks/A17-P01.{ia-core-ios27-2,app-build,experience-packages-2}.json`) on a tree whose Packages changed since only by the comment move in Package.swift (owner ruling of 2026-11-14) — Verified 2026-11-16: 2026-11-16: A17-P01 evidence cited: .autonomy/checks/A17-P01.ia-core-ios27-2.json, A17-P01.app-build.json and A17-P01.experience-packages-2.json, all exit 0; since the A17-P01 record commit f7a71cd3 Packages changed only by the comment move in Package.swift (7ff78e6f)
 
 ## Phase 2: Foundational — the core (stories 1–4)
 
