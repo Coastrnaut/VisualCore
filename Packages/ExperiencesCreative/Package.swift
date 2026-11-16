@@ -541,10 +541,8 @@ let package = Package(
                                .product(name: "VisualCoreUI", package: rendering)],
                     path: "SolarSystemExplorer/ExperienceTests",
                     resources: [.copy("Fixtures")]),
-        // A15 Molecular Explorer (feature 110, A15-P01): a candidate until X-A15. The core is pure (Foundation and
-        // VisualCoreMath for the scene and camera of feature 111).
-        // A16 Simulation Lab (feature 117, A16-P01): a candidate until X-A16. The core is pure (Foundation and VisualCore
-        // simulation, parameter and math modules) and GPU-free.
+        // A17 Interactive Anatomy (feature 124, A17-P01): a pending core (no experience target until A17-P02). The core
+        // is pure (Foundation and VisualCoreMath) and holds the bundled right knee as a JSON resource.
         .target(name: "InteractiveAnatomyCore",
                 dependencies: [.product(name: "VisualCoreMath", package: visualCore)],
                 path: "InteractiveAnatomy/Core",
@@ -552,6 +550,10 @@ let package = Package(
         .testTarget(name: "InteractiveAnatomyCoreTests",
                     dependencies: ["InteractiveAnatomyCore", .product(name: "VisualCoreMath", package: visualCore)],
                     path: "InteractiveAnatomy/CoreTests"),
+        // A15 Molecular Explorer (feature 110, A15-P01): a candidate until X-A15. The core is pure (Foundation and
+        // VisualCoreMath for the scene and camera of feature 111).
+        // A16 Simulation Lab (feature 117, A16-P01): a candidate until X-A16. The core is pure (Foundation and VisualCore
+        // simulation, parameter and math modules) and GPU-free.
         .target(name: "SimulationLabCore",
                 dependencies: [.product(name: "VisualCoreSimulation", package: visualCore),
                                .product(name: "VisualCoreParameters", package: visualCore),
