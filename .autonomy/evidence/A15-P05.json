@@ -1,0 +1,80 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/A15-P05.app-unit.json",
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A15-P05.app-unit.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A15-P05.contract.json",
+      "command": "python3 scripts/check_app_contract.py --app molecular-explorer --render",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A15-P05.contract.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A15-P05.copy-claims.json",
+      "command": "python3 scripts/check_copy_claims.py --allow camera --swift Packages/ExperiencesCreative/MolecularExplorer/Experience/MolecularExplorerExperience.swift Packages/ExperiencesCreative/MolecularExplorer/Experience/MoleculeControls.swift Packages/ExperiencesCreative/MolecularExplorer/Experience/MoleculeGestures.swift Packages/ExperiencesCreative/MolecularExplorer/Experience/MoleculeImporter.swift Packages/ExperiencesCreative/MolecularExplorer/Experience/MoleculeOverlay.swift Packages/ExperiencesCreative/MolecularExplorer/Experience/MoleculePresenter.swift Packages/ExperiencesCreative/MolecularExplorer/Experience/RecentStore.swift Packages/ExperiencesCreative/MolecularExplorer/Experience/SettingsStore.swift Packages/ExperiencesCreative/MolecularExplorer/Experience/Adapter/MoleculeCore.swift Packages/ExperiencesCreative/MolecularExplorer/Experience/Adapter/MoleculeManifest.swift",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A15-P05.copy-claims.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A15-P05.documented-api.json",
+      "command": "python3 scripts/check_documented_api.py --sources Packages/ExperiencesCreative/MolecularExplorer",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A15-P05.documented-api.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A15-P05.experience-packages.json",
+      "command": "python3 scripts/check_experience_packages.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A15-P05.experience-packages.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A15-P05.me-core-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing MolecularExplorerCoreTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A15-P05.me-core-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A15-P05.me-ios27-2.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing MolecularExplorerCoreTests MolecularExplorerExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A15-P05.me-ios27-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A15-P05.me-ios27-3.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing MolecularExplorerCoreTests MolecularExplorerExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A15-P05.me-ios27-3.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A15-P05.me-ios27-4.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing MolecularExplorerCoreTests MolecularExplorerExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A15-P05.me-ios27-4.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A15-P05.me-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing MolecularExplorerCoreTests MolecularExplorerExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A15-P05.me-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A15-P05.script-tests.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A15-P05.script-tests.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A15-P05.verify-27.json",
+      "command": "python3 scripts/verify_experiences.py --only a15.molecular-explorer --runtime 27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A15-P05.verify-27.log"
+    }
+  ],
+  "generated": "2026-11-16T17:47:34+00:00",
+  "method": "deterministic-run-check",
+  "stage": "A15-P05",
+  "status": "pass"
+}
