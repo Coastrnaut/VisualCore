@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesCreative",
+    "--scheme",
+    "ExperiencesCreative-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "InteractiveAnatomyCoreTests",
+    "InteractiveAnatomyExperienceTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing InteractiveAnatomyCoreTests InteractiveAnatomyExperienceTests",
+  "elapsed_seconds": 32.757,
+  "exit_code": 0,
+  "finished": "2026-11-16T23:44:05+00:00",
+  "log": ".autonomy/logs/A17-P04.ia-core.log",
+  "log_sha256": "64d3d2a5f040868c68078a784560754c6c793ab2ae7a0badec21b23995dbd6fa",
+  "name": "ia-core",
+  "stage": "A17-P04",
+  "started": "2026-11-16T23:43:33+00:00",
+  "timed_out": false
+}
