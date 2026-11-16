@@ -94,4 +94,15 @@ final class CaptureFileTests: XCTestCase {
     func testDefaultFolderName() {
         XCTAssertEqual(SimulationCapture().folder.url.lastPathComponent, "a16-captures")
     }
+
+    /// T-A16-415 (clarification Q5): a picture left in `a16-captures` by an earlier session is removed when a
+    /// presenter is made.
+    func testAPresenterEmptiesTheCaptureFolder() throws {
+        let shared = TemporaryFolder(name: SimulationCapture.folderName)
+        let url = try shared.makeFileURL(prefix: SimulationCapture.prefix, extension: "png")
+        try Data([0x89, 0x50, 0x4E, 0x47]).write(to: url)
+        XCTAssertGreaterThan(shared.fileCount, 0)
+        _ = SimulationPresenter(experienceID: SimulationTest.id)
+        XCTAssertEqual(shared.fileCount, 0, "the earlier picture is gone")
+    }
 }
