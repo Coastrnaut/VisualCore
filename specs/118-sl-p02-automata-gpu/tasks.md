@@ -8,7 +8,7 @@ Precedent: `specs/117-sl-p01-algorithms/tasks.md`.
 
 ## Phase 1: Setup
 
-- [ ] T-A16-201 Baseline: cite the A16-P01 evidence on the unchanged sources (`.autonomy/checks/A16-P01.{sl-ios27-3,app-unit,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14)
+- [X] T-A16-201 Baseline: cite the A16-P01 evidence on the unchanged sources (`.autonomy/checks/A16-P01.{sl-ios27-3,app-unit,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14) — Verified 2026-11-16: 2026-11-16: A16-P01 evidence cited on unchanged sources (no Packages change since the A16-P01 record 5664c0cc): .autonomy/checks/A16-P01.sl-ios27-3.json, A16-P01.app-unit.json, A16-P01.verify-27.json, all exit 0
 
 ## Phase 2: Story 1 — the automaton on the GPU
 
