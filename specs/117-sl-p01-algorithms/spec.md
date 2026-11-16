@@ -175,7 +175,9 @@ non-finite value is refused or clamped with a visible explanation, and the field
 
 - **FR-A16-130**: The experience MUST draw the current CPU field through the one host's drawing path with a family
   palette and a canvas description naming the family, rule or preset, grid size and step count; changing the family
-  MUST change the drawn pixels and the description.
+  MUST change the drawn pixels and the description. The controls MUST have accessible labels and values, the state
+  (running or paused, step count) MUST be part of the description, and with Reduce Motion on the simulation MUST open
+  paused (the person starts it).
 - **FR-A16-131**: The experience MUST be registered as a candidate with a scenario manifest (standard scenarios and one
   fixture per family) and pass the runner's standard scenarios on iOS 27.
 
