@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "reference-test-anglerendering-ios27",
+    "reference-test-anglerendering-ios26",
+    "projectm-reference-ios27",
+    "projectm-reference-ios26"
+  ],
+  "command": "python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26",
+  "elapsed_seconds": 25.556,
+  "exit_code": 0,
+  "finished": "2026-11-16T18:28:48+00:00",
+  "log": ".autonomy/logs/A16-P00.reference-2.log",
+  "log_sha256": "7752522b8ade8586f14a204a0b4bb3afbf286166066e5c33371024ba0172bb3b",
+  "name": "reference-2",
+  "stage": "A16-P00",
+  "started": "2026-11-16T18:28:22+00:00",
+  "timed_out": false
+}
