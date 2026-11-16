@@ -599,7 +599,7 @@
       "id": "M09",
       "capability": "Deterministic tiny CPU reference for each algorithm: a pure, seeded CPU step on a tiny grid with the stated boundary rule, testable through swift test without a GPU, whose storage is rounded to the GPU target's precision so a GPU run can be compared within a declared tolerance",
       "source": "v0.1 feature 4: deterministic tiny CPU reference; manual §6 algorithm decision 4; manual §11 fixtures 1 and 2",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FieldGrid.swift",
@@ -636,7 +636,7 @@
         "file": "Packages/ExperiencesCreative/FluidArtPlayground/Core/FluidSolver.swift",
         "symbol": "FluidSolver"
       },
-      "notes": "Tested in VisualCoreSimulationTests (FieldGridTests, SeededRandomTests). The comparison machinery exists; the three CPU references (Life blinker period 2, Gray-Scott and wave steps) are G-RULES (A16-P01); the tolerances are fixed there and validated in G-VALIDATION (A16-P05)."
+      "notes": "Tested in VisualCoreSimulationTests (FieldGridTests, SeededRandomTests). The comparison machinery exists; the three CPU references (Life blinker period 2, Gray-Scott and wave steps) are G-RULES (A16-P01); the tolerances are fixed there and validated in G-VALIDATION (A16-P05). Available from A16-P05: its gaps (G-RULES, G-VALIDATION) are closed."
     },
     {
       "id": "M10",
@@ -918,7 +918,7 @@
       "id": "M16",
       "capability": "Validity safeguards and stability limits: parameters within stated ranges; a time step beyond the stability limit (wave Courant condition, Gray-Scott explicit step bound) or a non-finite value is refused or clamped with a visible explanation and never corrupts the field",
       "source": "cross-cutting: validity safeguards and stability limits; catalog validity risk (convergence, step control, invalid-state safeguards); manual §11 fixture 3",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreMath/NumericHygiene.swift",
@@ -949,7 +949,7 @@
         "file": "Packages/ExperiencesCreative/FluidArtPlayground/Core/FluidConfiguration.swift",
         "symbol": "FluidConfiguration"
       },
-      "notes": "Tested in VisualCoreMathTests (NumericHygieneTests), VisualCoreSimulationTests (TimeStepPolicyTests, FieldGridTests) and VisualCoreParametersTests. The stability limits and their explanations are experiment rules: G-SPEC (A16-P01); they are validated on tiny grids and at the limits in G-VALIDATION (A16-P05). The exact tolerances and limits are decided in A16-P01 (clarification 5)."
+      "notes": "Tested in VisualCoreMathTests (NumericHygieneTests), VisualCoreSimulationTests (TimeStepPolicyTests, FieldGridTests) and VisualCoreParametersTests. The stability limits and their explanations are experiment rules: G-SPEC (A16-P01); they are validated on tiny grids and at the limits in G-VALIDATION (A16-P05). The exact tolerances and limits are decided in A16-P01 (clarification 5). Available from A16-P05: its gaps (G-SPEC, G-VALIDATION) are closed."
     },
     {
       "id": "M17",
@@ -1378,7 +1378,7 @@
       "id": "M26",
       "capability": "Bounded resources: fixed limits per quality level for grid size, steps per frame, render targets, presets and capture size; requests beyond a limit refused or clamped with a message, never allocated",
       "source": "cross-cutting: bounded; constitution A16 bounded; manual §12 (cap steps per frame, monitor GPU memory)",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/ResourceLedger.swift",
@@ -1415,7 +1415,7 @@
         "file": "Packages/ExperiencesCreative/FluidArtPlayground/Core/FluidConfiguration.swift",
         "symbol": "FluidConfiguration"
       },
-      "notes": "Resource budgets, step caps, storage quotas and document byte caps exist and are tested (ResourceLedgerTests, FixedStepClockTests, ExperienceStorageTests, DocumentStoreTests, PingPongTargetTests). Simulation Lab's limits are G-SPEC (A16-P01), measured against them in G-VALIDATION (A16-P05)."
+      "notes": "Resource budgets, step caps, storage quotas and document byte caps exist and are tested (ResourceLedgerTests, FixedStepClockTests, ExperienceStorageTests, DocumentStoreTests, PingPongTargetTests). Simulation Lab's limits are G-SPEC (A16-P01), measured against them in G-VALIDATION (A16-P05). Available from A16-P05: its gaps (G-SPEC, G-VALIDATION) are closed."
     }
   ],
   "gaps": [
@@ -1551,10 +1551,10 @@
       ],
       "kind": "adaptation",
       "owner": "app-local",
-      "justification": "Numerical validation of the experience's own rules: the declared tolerances on tiny grids, behaviour at and beyond the stability limits, the float probe and parity on the iOS 27.x and 26.x simulators, and bounded short measurements of steps per second apart from display rate, are quality work specific to this experience (manual phase 05, A16-P05); device observations wait for the device campaign.",
+      "justification": "Numerical validation of the experience's own rules: the declared tolerances on tiny grids, behaviour at and beyond the stability limits, the float probe and parity on the iOS 27.x and 26.x simulators, and bounded short measurements of steps per second apart from display rate, are quality work specific to this experience (manual phase 05, A16-P05); device observations wait for the device campaign. Built at A16-P05: SimulationValidationTests generates docs/apps/simulation-lab/validation-report.md from short runs on the iOS 27.2 simulator (running mirrors of all three families within their tolerances, 0 and 0.01; the 16 x 16 fixtures; 600 iterations at each stability limit finite on the CPU and the GPU with 1 % beyond refused; at most 16 GPU steps in a frame against the cap of 128; the presenter's targets 180,224 bytes against 262,144; CPU iterations per second as a simulator figure) and fails when the committed report is stale; SizeChangeTests and BoundaryRuleTests cover the size change and the boundary rules. The iOS 26 section is added at X-A16; device figures wait for the device campaign.",
       "phase": 5,
       "test": "A generated validation report from short runs: every family's GPU-versus-CPU difference is within its declared tolerance on both simulator runtimes; at the stability limit the wave and Gray-Scott runs stay finite and beyond it the step is refused with the message; steps per frame never exceed the cap; resource bytes stay within the tier budget",
-      "closed": null
+      "closed": "A16-P05"
     },
     {
       "id": "G-RELEASE",

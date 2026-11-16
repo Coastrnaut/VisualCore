@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_app_contract.py",
+    "--app",
+    "simulation-lab",
+    "--render"
+  ],
+  "command": "python3 scripts/check_app_contract.py --app simulation-lab --render",
+  "elapsed_seconds": 0.043,
+  "exit_code": 0,
+  "finished": "2026-11-16T21:18:32+00:00",
+  "log": ".autonomy/logs/A16-P05.contract.log",
+  "log_sha256": "9f8a7ebb69a8a1488566b1f67746d76870b7b010c007100cff6eca01edcea103",
+  "name": "contract",
+  "stage": "A16-P05",
+  "started": "2026-11-16T21:18:32+00:00",
+  "timed_out": false
+}
