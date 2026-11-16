@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-16 (A16-P00: contract view markers; A15-P06: CI cache key, settings-free proof, chunk w2).
+Last updated: 2026-11-16 (A16-P01: fixture count from the planning catalog; A16-P00: contract view markers).
 
 ## 1. What is tested, and where
 
@@ -171,6 +171,9 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   `<!-- BEGIN GENERATED -->` and `<!-- END GENERATED -->` of an existing `visualcore-contract.md` and fails without
   them; write the introduction and the two markers first, and link the view from the README only after it exists
   (the docs check refuses broken links) (A16-P00).
+- **The planning catalog sets the fixture count.** The content-counts audit in `test_scripts.py` compares a new
+  experience's manifest fixtures with the catalog's content requirement (five for a creative experience); write that
+  many fixtures in Phase 01, or the script tests fail after the package tests pass (A16-P01).
 
 ### Process
 
