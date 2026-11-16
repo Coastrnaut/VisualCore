@@ -392,28 +392,17 @@ public struct SimulationCore: ExperienceCore, Equatable {
     }
 
     /// The field in numbers: "1024 of 4096 cells alive" (automaton), "v from 0.00 to 0.25" (reaction-diffusion),
-    /// "height from −0.05 to 1.00" (wave).
+    /// "height from −0.05 to 1.00" (wave). The numbers are the legend's (``SimulationLegendValues``, feature 119), so
+    /// the legend and the description share one source.
     public static func fieldWords(_ field: SimulationField, kind: SimulationKind) -> String {
-        let grid = field.current
+        let legend = SimulationLegendValues.of(field, kind: kind)
         switch kind {
         case .automaton:
-            return "\(AutomatonRule.liveCount(grid)) of \(grid.width * grid.height) cells alive"
+            return "\(legend.alive) of \(field.current.width * field.current.height) cells alive"
         case .reactionDiffusion:
-            var low = Float.infinity, high = -Float.infinity
-            var i = 1
-            while i < grid.values.count {
-                low = min(low, grid.values[i])
-                high = max(high, grid.values[i])
-                i += grid.channels
-            }
-            return "v from \(twoDecimals(low)) to \(twoDecimals(high))"
+            return "v from \(twoDecimals(legend.minimum)) to \(twoDecimals(legend.maximum))"
         case .wave:
-            var low = Float.infinity, high = -Float.infinity
-            for value in grid.values {
-                low = min(low, value)
-                high = max(high, value)
-            }
-            return "height from \(twoDecimals(low)) to \(twoDecimals(high))"
+            return "height from \(twoDecimals(legend.minimum)) to \(twoDecimals(legend.maximum))"
         }
     }
 
