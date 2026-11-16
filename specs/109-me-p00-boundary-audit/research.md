@@ -32,3 +32,28 @@
   assessed for `VisualCoreRendering`), camera framing → app-local (A15-P02); picking, display modes, labels and the
   metadata panel → app-local (A15-P03); curated library, recent molecules and settings → app-local (A15-P04); import
   through the document picker, fuzz and data review → app-local (A15-P05).
+
+## 2. As found by the audit (2026-11-15)
+
+- **Cylinder corrected:** clarification 5 expected a cylinder generator to be missing. `Mesh.tube(path:radius:sides:
+  caps:closed:)` (`MeshShapes.swift`) with a two-point path and caps is a tested capped cylinder
+  (`MeshShapeTests.straightCappedTubeAtThreeResolutions`), built directly between two atom centres, so row M22 is
+  available and no new generator is needed; a named cylinder generator for `VisualCoreScenes` only if reuse calls for
+  it (G-RENDER).
+- **Instancing:** only `ParticleRenderer` draws instanced (`vcglDrawArraysInstanced`, divisor in the internal
+  `DynamicVertexBuffer`); `MeshRenderer` and `DepthMeshPass` draw one item per call, so many atoms and bonds are
+  batched app-locally (G-RENDER, A15-P02); instanced lit meshes are assessed there for `VisualCoreRendering`.
+- **Picking:** `Ray3` ray–sphere casts, `Ray3.nearest` and `OrbitCamera.ray(ndc:aspect:)` exist; no ray–cylinder or
+  ray–capsule cast; bond picking is not in version 0.1 (G-PICK).
+- **Parsing:** no text-record parser exists in a framework product (`ShaderLibrary`'s line splitting is private and
+  unbounded); the strict XYZ parser is app-local and a bounded line reader is assessed for VisualCore in A15-P01.
+- **Persistence:** `DocumentStore`, `MigrationChain`, `NamedLibrary` and `ExperienceStorage` serve the library,
+  recent molecules and settings (G-LIBRARY).
+- **Import:** `fileImporter` appears only in the controls of A06–A08, for audio (G-IMPORT, app-local).
+- **Lighting:** one directional Lambert light with ambient and no specular term; judged sufficient for readable atom
+  and bond shading (row M04 available); a specular term would be an additive VisualCoreRendering change if a later
+  phase needs it.
+- **Inventory:** `python3 scripts/release_check.py --list` gives 128 lines.
+- The contract (`docs/apps/molecular-explorer/visualcore-contract.json`) holds 23 rows (9 available, 14 requires
+  adaptation, 0 upstream gap) and 11 app-local gaps (G-ELEMENTS, G-DOMAIN, G-PARSER in A15-P01; G-RENDER, G-CAMERA in
+  A15-P02; G-PICK, G-DISPLAY, G-PANEL in A15-P03; G-LIBRARY in A15-P04; G-IMPORT, G-REVIEW in A15-P05); decision go.
