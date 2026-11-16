@@ -189,7 +189,7 @@
       "id": "M01",
       "capability": "GPU simulation with framebuffer feedback: each step samples the previous field and writes the next one into a separate offscreen target of the same size and format, swapped only after a complete pass, a capped number of steps per display frame, on the host's context and main thread",
       "source": "brainstorm: GPU simulation techniques using shaders and framebuffer feedback; manual §6 render sequence stages 1-3",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/PingPongTarget.swift",
@@ -244,13 +244,13 @@
         "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidFieldsScene.swift",
         "symbol": "FluidFieldsScene"
       },
-      "notes": "Tested in VisualCoreRenderingTests (PingPongTargetTests, FieldPassTests, FullScreenShaderSceneTests, ResourceRegistryTests, RenderHostTests). The feedback machinery is public and tested and Fluid Art Playground runs its advection on it; what is missing is Simulation Lab's step shaders: the automaton step on RGBA8 (G-CA-GPU, A16-P02) and the Gray-Scott and wave steps on RGBA16F (G-RDWAVE-GPU, A16-P03). Steps per frame are capped by the scheduler (G-SCHEDULER)."
+      "notes": "Tested in VisualCoreRenderingTests (PingPongTargetTests, FieldPassTests, FullScreenShaderSceneTests, ResourceRegistryTests, RenderHostTests). The feedback machinery is public and tested and Fluid Art Playground runs its advection on it; what is missing is Simulation Lab's step shaders: the automaton step on RGBA8 (G-CA-GPU, A16-P02) and the Gray-Scott and wave steps on RGBA16F (G-RDWAVE-GPU, A16-P03). Steps per frame are capped by the scheduler (G-SCHEDULER). Available from A16-P03: its gaps G-CA-GPU (A16-P02) and G-RDWAVE-GPU (A16-P03) are closed."
     },
     {
       "id": "M02",
       "capability": "Numerical visualization: the scalar field drawn to the screen through a stated colour ramp (palette made in code) with fixed value bounds per experiment, nearest-cell sampling so cells stay exact, and an optional isoline",
       "source": "brainstorm: numerical visualization; manual §6 render sequence stage 4",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
@@ -287,7 +287,7 @@
         "file": "Packages/ExperiencesCreative/FluidArtPlayground/Core/FluidPalette.swift",
         "symbol": "FluidPalette"
       },
-      "notes": "Tested in VisualCoreRenderingTests (FieldPassTests framebuffer output, FullScreenShaderSceneTests) and VisualCoreParametersTests (ParametersTests). A FieldPass can draw into the framebuffer, vc/field.glsl gives texelFetch-exact cell reads and vc/palette.glsl maps 0...1 through up to 8 linear-light stops. The per-family value mapping (automaton states, the two Gray-Scott concentrations, signed wave height), the ramps and the isoline are display shaders of G-CA-GPU (A16-P02) and G-RDWAVE-GPU (A16-P03); the legend that names the values is G-LEGEND (A16-P04)."
+      "notes": "Tested in VisualCoreRenderingTests (FieldPassTests framebuffer output, FullScreenShaderSceneTests) and VisualCoreParametersTests (ParametersTests). A FieldPass can draw into the framebuffer, vc/field.glsl gives texelFetch-exact cell reads and vc/palette.glsl maps 0...1 through up to 8 linear-light stops. The per-family value mapping (automaton states, the two Gray-Scott concentrations, signed wave height), the ramps and the isoline are display shaders of G-CA-GPU (A16-P02) and G-RDWAVE-GPU (A16-P03); the legend that names the values is G-LEGEND (A16-P04). Available from A16-P03: its gaps G-CA-GPU (A16-P02) and G-RDWAVE-GPU (A16-P03) are closed."
     },
     {
       "id": "M03",
@@ -458,7 +458,7 @@
       "id": "M06",
       "capability": "Three simulation families: a cellular automaton (stated neighbourhood and rule, for example Conway's Life), Gray-Scott reaction-diffusion (two concentrations, discrete Laplacian stencil, diffusion constants, feed and kill) and a 2D wave field (height and velocity or two time levels, wave speed, damping), each with a CPU rule and a GPU step",
       "source": "v0.1 feature 1: three simulation families; manual §6 algorithm decisions 1-3",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FieldGrid.swift",
@@ -495,7 +495,7 @@
         "file": "Packages/ExperiencesCreative/FluidArtPlayground/Core/FluidSolver.swift",
         "symbol": "FluidSolver"
       },
-      "notes": "Grep 2026-11-16 for automaton, life, gray-scott, laplacian, wave and courant in Packages/VisualCore/Sources and Packages/VisualCoreRendering/Sources finds no rule. The base pieces are tested (FieldGridTests, PingPongTargetTests, FieldPassTests, FloatRenderSupportTests). The rules are the experience's content: CPU references G-RULES (A16-P01), automaton GPU G-CA-GPU (A16-P02), reaction-diffusion and wave GPU G-RDWAVE-GPU (A16-P03)."
+      "notes": "Grep 2026-11-16 for automaton, life, gray-scott, laplacian, wave and courant in Packages/VisualCore/Sources and Packages/VisualCoreRendering/Sources finds no rule. The base pieces are tested (FieldGridTests, PingPongTargetTests, FieldPassTests, FloatRenderSupportTests). The rules are the experience's content: CPU references G-RULES (A16-P01), automaton GPU G-CA-GPU (A16-P02), reaction-diffusion and wave GPU G-RDWAVE-GPU (A16-P03). Available from A16-P03: its gaps G-CA-GPU (A16-P02) and G-RDWAVE-GPU (A16-P03) are closed."
     },
     {
       "id": "M07",
@@ -642,7 +642,7 @@
       "id": "M10",
       "capability": "GPU ping-pong texture path with explicit boundary rules: every family steps on a ping-pong pair through validated field passes, with the boundary applied in the shader by cell-index arithmetic (wrap for automata and reaction-diffusion, fixed zero for the wave field), independent of the sampler's wrap mode",
       "source": "v0.1 feature 5: GPU ping-pong texture path with explicit boundary rules",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/PingPongTarget.swift",
@@ -691,7 +691,7 @@
         "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidFieldsScene.swift",
         "symbol": "FluidFieldsScene"
       },
-      "notes": "Tested in VisualCoreRenderingTests (PingPongTargetTests, FieldPassTests, FieldBilinearTests, FloatRenderSupportTests). Registry targets are created with LINEAR filtering and CLAMP_TO_EDGE and vc_fieldTexel clamps the index, so wrap and fixed boundaries must be done with texelFetch and index arithmetic in the step shaders: G-CA-GPU (A16-P02) and G-RDWAVE-GPU (A16-P03)."
+      "notes": "Tested in VisualCoreRenderingTests (PingPongTargetTests, FieldPassTests, FieldBilinearTests, FloatRenderSupportTests). Registry targets are created with LINEAR filtering and CLAMP_TO_EDGE and vc_fieldTexel clamps the index, so wrap and fixed boundaries must be done with texelFetch and index arithmetic in the step shaders: G-CA-GPU (A16-P02) and G-RDWAVE-GPU (A16-P03). Available from A16-P03: its gaps G-CA-GPU (A16-P02) and G-RDWAVE-GPU (A16-P03) are closed."
     },
     {
       "id": "M11",
@@ -795,7 +795,7 @@
       "id": "M13",
       "capability": "Boundary rules (wrap, clamp, fixed): every algorithm states its boundary; wrap for automata and reaction-diffusion and fixed zero for the wave field, identical on the CPU reference and the GPU step",
       "source": "cross-cutting: boundary rules; spec clarification 5; constitution A16 deterministic CPU truth",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FieldGrid.swift",
@@ -820,7 +820,7 @@
         "file": "Packages/ExperiencesCreative/FluidArtPlayground/Core/FluidConfiguration.swift",
         "symbol": "BoundaryMode"
       },
-      "notes": "Tested in VisualCoreSimulationTests (FieldGridTests) and VisualCoreRenderingTests (FieldBilinearTests). The framework clamps only: FieldGrid.sampleBilinear and vc_fieldTexel clamp to the edge and render targets use CLAMP_TO_EDGE. Fluid Art Playground's BoundaryMode (walls, open) is experience code for a different problem. Wrap and fixed boundaries are G-RULES (CPU, A16-P01), G-CA-GPU (A16-P02) and G-RDWAVE-GPU (A16-P03); a shared boundary-mode helper is assessed for VisualCoreSimulation in A16-P01 only if a second consumer exists."
+      "notes": "Tested in VisualCoreSimulationTests (FieldGridTests) and VisualCoreRenderingTests (FieldBilinearTests). The framework clamps only: FieldGrid.sampleBilinear and vc_fieldTexel clamp to the edge and render targets use CLAMP_TO_EDGE. Fluid Art Playground's BoundaryMode (walls, open) is experience code for a different problem. Wrap and fixed boundaries are G-RULES (CPU, A16-P01), G-CA-GPU (A16-P02) and G-RDWAVE-GPU (A16-P03); a shared boundary-mode helper is assessed for VisualCoreSimulation in A16-P01 only if a second consumer exists. Available from A16-P03: its gaps G-CA-GPU (A16-P02) and G-RDWAVE-GPU (A16-P03) are closed."
     },
     {
       "id": "M14",
@@ -1486,10 +1486,10 @@
       ],
       "kind": "adaptation",
       "owner": "app-local",
-      "justification": "FloatRenderSupport, PingPongTarget and FieldPass exist; the Gray-Scott and wave step and display shaders on RGBA16F, the use of FloatRenderSupport.detect per context generation with the rule that both families are disabled with a message when it reports no support (no silent RGBA8 run), the fixed-zero wave boundary and wrap for reaction-diffusion are specific to this experience (spec clarification 5, manual phase 03, A16-P03). A16-P02 added the phase's regression fixture: Experience/GrayScottGPU.swift (RGBA16F pair, highp five-point step, wrap by index) agrees with the CPU reference on a 16 x 16 grid after 10 steps (max difference 0.0032 against float16 and 0.0 against float16TowardZero, tolerance 0.01; GrayScottToleranceTests); the experience's reaction-diffusion and wave still draw the CPU field until A16-P03.",
+      "justification": "FloatRenderSupport, PingPongTarget and FieldPass exist; the Gray-Scott and wave step and display shaders on RGBA16F, the use of FloatRenderSupport.detect per context generation with the rule that both families are disabled with a message when it reports no support (no silent RGBA8 run), the fixed-zero wave boundary and wrap for reaction-diffusion are specific to this experience (spec clarification 5, manual phase 03, A16-P03). A16-P02 added the phase's regression fixture: Experience/GrayScottGPU.swift (RGBA16F pair, highp five-point step, wrap by index) agrees with the CPU reference on a 16 x 16 grid after 10 steps (max difference 0.0032 against float16 and 0.0 against float16TowardZero, tolerance 0.01; GrayScottToleranceTests); the experience's reaction-diffusion and wave still draw the CPU field until A16-P03. Built at A16-P03: Experience/WaveGPU.swift (RGBA16F pair, current height red and previous green, zero edge cells, no wrap) and the reactionDisplay and waveDisplay programs; both step shaders round each value to the nearest half-float in GLSL, so the store is exact whatever the driver's rounding; SimulationPresenter keeps a float mirror per family (loaded on setup, recreation, resize, any non-step change and after 64 GPU steps, stepped by the engine's iteration delta otherwise), probes FloatRenderSupport.detect per context generation and, without support, makes no float or 8-bit field for the two families and refuses them with a16.unsupported and the sentence; a restored state is drawn from the CPU upload with the sentence.",
       "phase": 3,
-      "test": "Rendering tests on the iOS 27.2 simulator: on a tiny grid GPU steps match the CPU reference within the declared tolerance under both float16 rounding modes; a forced-unsupported FloatRenderSupport disables reaction-diffusion and waves with the message and allocates no RGBA8 field; the wave field stays zero on the boundary; the pass-isolation audit passes; rebuild after recreateContext and resize matches the reference",
-      "closed": null
+      "test": "Experience tests on the iOS 27.2 simulator: FloatFieldToleranceTests (10 GPU steps on 16 x 16: reaction-diffusion 0.0 against float16 and 0.0032 toward zero, wave 0.0 and 0.0066, tolerance 0.01), WaveBorderTests (every edge cell 0 after 100 steps), FloatMirrorTests (within 0.01 over 60 running frames with a reload after 64 steps; loads after recreateContext, resize, preset, reset and time step; display within 1 of the palette; pass isolation), FloatUnsupportedTests (forced no support: no pair, a16.unsupported with the sentence, restored state from the CPU upload)",
+      "closed": "A16-P03"
     },
     {
       "id": "G-UI",
