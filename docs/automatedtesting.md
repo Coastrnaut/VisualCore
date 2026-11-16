@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-16 (A17-P03: an edited snapshot fails the host's digest check, test storages removed by an observer; A17-P02: probe rays for picking tests, a snapshot envelope refuses non-JSON; A17-P01: a core before its experience passes the package check; A17-P00: an audit corrects the clarification; A16-P06: interface chunk x2, a scan that allows a named format; A16-P05: a generated validation report; mirrors reload after an edit; A16-P04: no mutating call inside #expect; A16-P03: round to half in the shader, test the mirror while it runs; A16-P02: GPU parity against both half roundings; A16-P01: fixture count from the catalog).
+Last updated: 2026-11-16 (A17-P04: every VisualCore name used must be named in a README or a feature contract, never tick in the command that runs the checks; A17-P03: an edited snapshot fails the host's digest check, test storages removed by an observer; A17-P02: probe rays for picking tests, a snapshot envelope refuses non-JSON; A17-P01: a core before its experience passes the package check; A17-P00: an audit corrects the clarification; A16-P06: interface chunk x2, a scan that allows a named format; A16-P05: a generated validation report; mirrors reload after an edit; A16-P04: no mutating call inside #expect; A16-P03: round to half in the shader, test the mirror while it runs; A16-P02: GPU parity against both half roundings; A16-P01: fixture count from the catalog).
 
 ## 1. What is tested, and where
 
@@ -243,6 +243,12 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   helper. A17-P03's `AnatomyTemporaryRoot` keeps every default storage under one folder, which an
   `XCTestObservation` removes in `testBundleDidFinish`. It clears the folder first, in case an earlier run was
   interrupted.
+- **The documented-API check reads READMEs and feature contracts.** `check_documented_api.py` fails when a consumer
+  uses a public VisualCore name, even an enum such as `AnnouncementKind`, that no package README and no
+  `specs/*/contracts/*.md` names. Name every VisualCore type the experience uses in the feature's contract.
+- **Never tick in the command that runs the checks.** In A17-P04 a loop ran three checks and the tick in the same
+  command cited all three as passing, though one had exited 1. The evidence line had to be corrected in a new commit.
+  Run the checks, read each `exit=`, then tick in a separate step.
 
 ## 6. Keeping this file current
 
