@@ -23,6 +23,77 @@ Canonical overrides:
   code: every mesh is built from VisualCore's procedural generators; no asset of any kind.
 - Follow `specs/111-me-p02-renderer` and `specs/124-ia-p01-content-schema`.
 
+## Clarifications
+
+### Session 2026-11-16
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- `VisualCoreScenes`: `Mesh.revolution`, `tube`, `extrusion` and `surface` throw `MeshError` and check a `MeshBudget`.
+  `Mesh.uvSphere`, `Mesh.validate(requireClosed:budget:)`, `Mesh.bounds` and `Mesh.digest` (SHA-256) also exist.
+- `VisualCoreMath`: `OrbitCamera.ray(ndc:aspect:)` exists, `Ray3` intersects spheres and triangles (two-sided
+  Möller–Trumbore), `RayHit3.nearest` exists, and so do `Mat4` translation, scale and rotation.
+- `VisualCoreRendering`: `DepthMeshPass` draws opaque `MeshRenderer` items with depth, `MeshRenderer` culls back faces,
+  and the renderers share one program (Molecular Explorer's presenter makes and releases them together).
+- The host calls the presenter's `setup` again after a context recreation. No graphics-context code lives in an
+  experience.
+
+- Q: Which quality levels and budgets? → A: Two levels, declared as `Core.qualityTiers == 2`, with the registration's
+  tiers `level-0` and `level-1`:
+  - level-0 (full): revolutions with 48 segments, tubes with 16 sides, spheres 32 × 16; at most 60,000 triangles;
+  - level-1 (reduced): 24 segments, 8 sides, 16 × 8; at most 20,000 triangles.
+
+  At both levels: at most 32 draws (one per mesh; the knee has 20) and at most 16 labels (labels are drawn in
+  A17-P04). Content over a budget is refused with the reason `over-budget`, naming the level and the count. The
+  per-mesh `MeshBudget` is the level's triangle budget.
+- Q: How is the schematic geometry built and placed? → A: Each declared mesh is built from its kind, with fixed
+  schematic parameters per mesh id, in the region's convention (centimetres; +Y superior, +Z anterior, +X lateral):
+  - a revolution profile about the Y axis for shafts and condyles;
+  - a tube along a path for ligaments and tendons;
+  - an extruded outline for cartilage and the menisci;
+  - a sphere for the patella.
+
+  Each mesh is placed by its own model matrix (translation, rotation, scale), and its world bounds come from the mesh
+  bounds through that matrix. A structure's bounding sphere encloses its meshes' world bounds. Every mesh must
+  validate, and the closed kinds (revolution with poles, sphere, capped tube, capped extrusion) must also be closed.
+- Q: What are the camera's steps and limits, and how is a selection framed? → A: The camera follows the Molecular
+  Explorer precedent:
+  - **Opening view:** the target is the region's centre, at turn step 2 (30°), tilt step 1 (10°) and zoom step 0, at
+    the distance that fits the region's bounding sphere × 1.25 in the narrower axis of a 60° field of view.
+  - **Steps:** turn steps of 15° wrap around; tilt steps of 10° within −6…6; zoom steps of × 0.85 within −4…6. A step
+    beyond a limit is refused with rule code `a17.camera-limit` and a sentence.
+  - **Selection:** framing moves the target to the structure's centre and sets the distance that fits its bounding
+    sphere × 1.25, keeping the turn and tilt. The move is immediate.
+  - **Reset view:** restores the opening view exactly and keeps the selection and layers.
+- Q: What are the actions, and how do picking and the list work? → A:
+  - **Actions:**
+    - `structure.select [i]`, where i is 0…13 in inventory order of the parts;
+    - `structure.clear`;
+    - `layer.show [layer 0…2, 0/1]`;
+    - `camera.turn [−1/+1]`, `camera.tilt [−1/+1]` and `camera.zoom [−1/+1]`;
+    - `view.reset`.
+  - **Refusals:** selecting a hidden structure is refused with `a17.hidden-structure`, and an index out of range with
+    `a17.invalid-choice`.
+  - **Picking:** a tap becomes the ray `OrbitCamera.ray(ndc:aspect:)`. Hidden structures are skipped, and structures
+    whose bounding sphere the ray misses are skipped. The remaining world-space triangles are tested, the nearest hit
+    wins, and equal distances resolve by inventory order. A hit sends `structure.select`, and a miss sends
+    `structure.clear`.
+  - **The list:** a native list of the 14 parts grouped by layer, each row naming the structure and its layer in
+    words. A visible row sends the same `structure.select`; a hidden row is marked "Hidden" and is disabled.
+- Q: What is saved, and what does it look like? → A: The experience snapshot is schema 1 JSON with the turn, tilt and
+  zoom steps, the visible layers (three booleans) and the selected structure id (optional). Restoring refuses damaged
+  or newer data, and an unknown structure id. The digest is built from this canonical state, so drawing never changes
+  it. The materials and colours are:
+  - bones ivory (0.90, 0.86, 0.76);
+  - cartilage and menisci blue-grey (0.55, 0.70, 0.85);
+  - ligaments and tendons rose (0.80, 0.45, 0.45);
+  - the selection amber (1.00, 0.80, 0.20);
+  - the backdrop (0.07, 0.08, 0.10).
+
+  The canvas description names the selection and the shown layers in words, so nothing relies on colour alone. The
+  layer toggles are this phase's part of G-LAYERS (the manual's Phase 02 MVP). Isolate, the never-hidden selection
+  rule for isolate and the saved view document remain A17-P03.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - See the knee as a 3D model (Priority: P1) 🎯
