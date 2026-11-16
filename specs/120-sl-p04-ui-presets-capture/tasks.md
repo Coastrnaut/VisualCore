@@ -8,7 +8,7 @@ Precedent: `specs/119-sl-p03-rd-wave/tasks.md`.
 
 ## Phase 1: Setup
 
-- [ ] T-A16-401 Baseline: cite the A16-P03 evidence on the unchanged sources (`.autonomy/checks/A16-P03.{sl-ios27-2,app-unit,verify-27-2}.json`) instead of a rerun (owner ruling of 2026-11-14)
+- [X] T-A16-401 Baseline: cite the A16-P03 evidence on the unchanged sources (`.autonomy/checks/A16-P03.{sl-ios27-2,app-unit,verify-27-2}.json`) instead of a rerun (owner ruling of 2026-11-14) — Verified 2026-11-16: 2026-11-16: A16-P03 evidence cited on unchanged sources (no Packages, Apps or project.yml change since the A16-P03 record 0988add5): .autonomy/checks/A16-P03.sl-ios27-2.json and A16-P03.verify-27-2.json (both on the final A16-P03 sources) and A16-P03.app-unit.json, all exit 0
 
 ## Phase 2: Foundational — pure core and actions
 
