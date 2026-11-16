@@ -16,7 +16,7 @@ Precedent: `specs/120-sl-p04-ui-presets-capture/tasks.md`.
 
 ## Phase 3: Story 1 — the validation report
 
-- [ ] T-A16-503 [US1] Create `Packages/ExperiencesCreative/SimulationLab/ExperienceTests/SimulationValidationTests.swift` per contracts/report.md and clarifications Q1–Q5.
+- [X] T-A16-503 [US1] Create `Packages/ExperiencesCreative/SimulationLab/ExperienceTests/SimulationValidationTests.swift` per contracts/report.md and clarifications Q1–Q5. — Verified 2026-11-16: 2026-11-16: .autonomy/checks/A16-P05.sl-ios27.json exit 0 (62 core, 23 Swift Testing and 62 XCTest experience tests, 0 failures, slowest 6.6 s, iOS 27); SimulationValidationTests (6.6 s) generated docs/apps/simulation-lab/validation-report.md and the full run matched it: mirrors 0.0000 / 0.0015 / 0.0000 against 0 / 0.01 / 0.01; fixtures 0.0000 against float16; 600 iterations at each limit 0 non-finite cells on CPU and GPU; 1 % beyond refused with the sentences; 16 GPU steps per frame at most (cap 128); 180,224 bytes (bound 262,144)
   - **Running mirrors:** per family, 120 frames at ×4 through the presenter, with max |GPU − CPU| after every frame;
     tolerances 0 and 0.01.
   - **Fixtures:** the 16 × 16 ten-step runs, against both roundings.
