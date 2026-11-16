@@ -21,7 +21,7 @@ Precedent: `specs/117-sl-p01-algorithms/tasks.md`.
 
 ## Phase 4: Story 3 — the Gray-Scott fixture
 
-- [ ] T-A16-205 [P] [US3] Create `Packages/ExperiencesCreative/SimulationLab/Experience/GrayScottGPU.swift` (its step shader kept in this file, so `SimulationShaders.swift` has one writer; RGBA16F pair, u red, v green, `highp` step with the five-point stencil, wrap by index, Dᵤ 0.16, Dᵥ 0.08) and `Packages/ExperiencesCreative/SimulationLab/ExperienceTests/GrayScottToleranceTests.swift` ("16 × 16 seeded grid … 10 steps … at most 0.01 against `float16` or `float16TowardZero`"; fails with "Floating-point render targets are not available" without float support) (FR-A16-210; SC-A16-205)
+- [X] T-A16-205 [P] [US3] Create `Packages/ExperiencesCreative/SimulationLab/Experience/GrayScottGPU.swift` (its step shader kept in this file, so `SimulationShaders.swift` has one writer; RGBA16F pair, u red, v green, `highp` step with the five-point stencil, wrap by index, Dᵤ 0.16, Dᵥ 0.08) and `Packages/ExperiencesCreative/SimulationLab/ExperienceTests/GrayScottToleranceTests.swift` ("16 × 16 seeded grid … 10 steps … at most 0.01 against `float16` or `float16TowardZero`"; fails with "Floating-point render targets are not available" without float support) (FR-A16-210; SC-A16-205) — Verified 2026-11-16: 2026-11-16: .autonomy/checks/A16-P02.sl-ios27.json exit 0 (41 core, 14 Swift Testing and 46 XCTest experience tests, 0 failures, slowest 0.95 s, iOS 27); GrayScottToleranceTests: max |GPU − CPU| after 10 steps on 16 × 16 = 0.0032 (float16) and 0.0 (float16TowardZero), tolerance 0.01
 
 ## Phase 5: Records and evidence
 
