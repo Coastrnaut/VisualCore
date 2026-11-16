@@ -1,0 +1,485 @@
+{
+  "controls" : [
+    "structure.select",
+    "structure.clear",
+    "layer.show",
+    "camera.turn",
+    "camera.tilt",
+    "camera.zoom",
+    "view.reset"
+  ],
+  "experience" : "a17.interactive-anatomy",
+  "kind" : "creative",
+  "scenarios" : [
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+        "initialDigest" : "2ae14159afeb18a206284f6b9eb552447493b1b85f968853b7e9d1942e241c04"
+      },
+      "name" : "launch-first-frame",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "structure.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "layer.show",
+            "values" : [
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "camera.zoom",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "structure.select",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "559d7d4a4f13db4701a6b0a4e0fb0c9b0149aae3ebfa570e396ae01a4da23e21",
+        "initialDigest" : "2ae14159afeb18a206284f6b9eb552447493b1b85f968853b7e9d1942e241c04"
+      },
+      "name" : "input-response",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "structure.select",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "outcome" : "selected-knee-femur"
+      },
+      "name" : "completion",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "structure.select",
+            "values" : [
+              14
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "structure.select",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "action.rule.a17.invalid-choice",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "layer.show",
+            "values" : [
+              3,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "layer.show",
+            "values" : [
+              0,
+              0.5
+            ]
+          },
+          "result" : "action.rule.a17.invalid-choice",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "camera.turn",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.a17.invalid-choice",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "structure.select",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "view.reset",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "layer.show",
+            "values" : [
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "structure.select",
+            "values" : [
+              9
+            ]
+          },
+          "result" : "action.rule.a17.hidden-structure",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "camera.tilt",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "camera.tilt",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "camera.tilt",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "camera.tilt",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "camera.tilt",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "camera.tilt",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.rule.a17.camera-limit",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+
+      },
+      "name" : "rejection",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "structure.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "layer.show",
+            "values" : [
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "camera.zoom",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "structure.select",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "559d7d4a4f13db4701a6b0a4e0fb0c9b0149aae3ebfa570e396ae01a4da23e21",
+        "initialDigest" : "2ae14159afeb18a206284f6b9eb552447493b1b85f968853b7e9d1942e241c04"
+      },
+      "name" : "save-restore",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "structure.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "layer.show",
+            "values" : [
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "camera.zoom",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "structure.select",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "initialDigest" : "2ae14159afeb18a206284f6b9eb552447493b1b85f968853b7e9d1942e241c04",
+        "resetDigest" : true
+      },
+      "name" : "reset",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "suspend-resume",
+      "seed" : "1"
+    },
+    {
+      "cycles" : 5,
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "teardown-reentry",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "cancel-prepare",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "structure.select",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "886c5b6977f2aca7253dca13a5e2b209355aa261fc7d0da9305243b979ec0f13",
+        "initialDigest" : "2ae14159afeb18a206284f6b9eb552447493b1b85f968853b7e9d1942e241c04",
+        "outcome" : "selected-knee-femur"
+      },
+      "name" : "fixture-femur-selected",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "layer.show",
+            "values" : [
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d398ac9bcdf5c6add4311e16f07a17e7b4964b8d267efec59214f928bdde9a73",
+        "initialDigest" : "2ae14159afeb18a206284f6b9eb552447493b1b85f968853b7e9d1942e241c04",
+        "outcome" : "viewing-knee"
+      },
+      "name" : "fixture-ligaments-hidden",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "camera.turn",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "camera.turn",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "camera.turn",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "camera.tilt",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "da2f7b740d7cf792672064c24685fc3bc99d16af2c257d011c0231a4eeec30ca",
+        "initialDigest" : "2ae14159afeb18a206284f6b9eb552447493b1b85f968853b7e9d1942e241c04",
+        "outcome" : "viewing-knee"
+      },
+      "name" : "fixture-turned",
+      "seed" : "1"
+    }
+  ],
+  "schema" : 1
+}
