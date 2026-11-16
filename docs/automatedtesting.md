@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-16 (A16-P03: round to half in the shader, test the mirror while it runs; A16-P02: GPU parity against both half roundings; A16-P01: fixture count from the catalog).
+Last updated: 2026-11-16 (A16-P04: no mutating call inside #expect; A16-P03: round to half in the shader, test the mirror while it runs; A16-P02: GPU parity against both half roundings; A16-P01: fixture count from the catalog).
 
 ## 1. What is tested, and where
 
@@ -187,6 +187,9 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
 - **Keep the CPU as truth and mirror it on the GPU.** Snapshots and digests stay on the CPU model; the GPU field is
   loaded from it on any non-step change and stepped by the engine's iteration delta, and parity tests read it back
   (A16-P02).
+- **No mutating call inside `#expect`.** `#expect(model.paint(x: 1, y: 1, mode: .tap))` does not compile: the macro
+  passes the receiver as an immutable `$0`. Assign the result first (`let painted = model.paint(…)`, then
+  `#expect(painted)`), as with `await` in `XCTAssertEqual` (A16-P04, `SimulationBrushTests`).
 
 ### Process
 
