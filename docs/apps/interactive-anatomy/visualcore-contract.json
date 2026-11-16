@@ -607,7 +607,7 @@
    "id": "M09",
    "capability": "Camera orbit and zoom with isolation and ghost: orbit and zoom around the region, framing on a selected structure, isolating one structure or layer, and drawing the others as translucent ghosts in a stable back-to-front order with the opaque structures still occluding correctly",
    "source": "manual v0.1: camera orbit/zoom with isolation/ghost",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitCamera.swift",
@@ -650,7 +650,7 @@
     "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Experience/FocusFlight.swift",
     "symbol": "FocusFlight"
    },
-   "notes": "Orbit and zoom are available (M03). Framing on a selection over MeshBounds centre and radius is app work (G-CAMERA, A17-P02). DepthMeshPass disables blending (vcglDisable GL_BLEND) and writes depth for every item, and MeshRenderer offers no blend state, so ghosted structures cannot be drawn translucently today; RenderState.alphaBlended exists (RenderStateTests) but is not applied to mesh drawing. A translucent pass after the opaque items (blend on, depth test on, depth write off, items sorted back to front) is G-GHOST, assessed as an additive change in VisualCoreRendering in A17-P03."
+   "notes": "Orbit and zoom are available (M03). Framing on a selection over MeshBounds centre and radius is app work (G-CAMERA, A17-P02). DepthMeshPass disables blending (vcglDisable GL_BLEND) and writes depth for every item, and MeshRenderer offers no blend state, so ghosted structures cannot be drawn translucently today; RenderState.alphaBlended exists (RenderStateTests) but is not applied to mesh drawing. A translucent pass after the opaque items (blend on, depth test on, depth write off, items sorted back to front) is G-GHOST, assessed as an additive change in VisualCoreRendering in A17-P03. Available from A17-P03: its gaps (G-CAMERA, G-GHOST) are closed."
   },
   {
    "id": "M10",
@@ -883,7 +883,7 @@
    "id": "M15",
    "capability": "Layered visibility with isolate and ghost translucency: layer toggles, isolate one structure or layer, ghost the rest translucently and depth-sorted, never hiding the selection",
    "source": "spec FR-A17-003 layered visibility",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/DepthMeshPass.swift",
@@ -920,7 +920,7 @@
     "file": "Packages/ExperiencesCreative/MolecularExplorer/Core/MoleculeScene.swift",
     "symbol": "MoleculeScene"
    },
-   "notes": "Opaque visibility is available through the item list of DepthMeshPass; translucent depth-sorted drawing is not (blending disabled in DepthMeshPass, see M09). The layer and isolate rules are G-LAYERS (A17-P03, app-local); the translucent pass is G-GHOST (A17-P03, VisualCoreRendering)."
+   "notes": "Opaque visibility is available through the item list of DepthMeshPass; translucent depth-sorted drawing is not (blending disabled in DepthMeshPass, see M09). The layer and isolate rules are G-LAYERS (A17-P03, app-local); the translucent pass is G-GHOST (A17-P03, VisualCoreRendering). Available from A17-P03: its gaps (G-LAYERS, G-GHOST) are closed."
   },
   {
    "id": "M16",
@@ -963,7 +963,7 @@
    "id": "M17",
    "capability": "Search over names and synonyms: accent- and case-independent matching of Terminologia Anatomica names, English equivalents and synonyms, ranked results, an empty query listing every structure",
    "source": "spec FR-A17-003 search",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreExperience/CatalogSearch.swift",
@@ -982,7 +982,7 @@
     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ShellModel.swift",
     "symbol": "LauncherModel"
    },
-   "notes": "CatalogSearch.fold (compatibility decomposition, combining marks removed, language-independent lower case) is public and tested in CatalogSearchTests; the ranked search itself is CatalogManifest.search over experience descriptors, not over arbitrary records. The structure index and ranking are G-SEARCH (A17-P03), reusing CatalogSearch.fold."
+   "notes": "CatalogSearch.fold (compatibility decomposition, combining marks removed, language-independent lower case) is public and tested in CatalogSearchTests; the ranked search itself is CatalogManifest.search over experience descriptors, not over arbitrary records. The structure index and ranking are G-SEARCH (A17-P03), reusing CatalogSearch.fold. Available from A17-P03: its gaps (G-SEARCH) are closed."
   },
   {
    "id": "M18",
@@ -1056,7 +1056,7 @@
    "id": "M20",
    "capability": "Saved view: the camera, visible layers, isolate and ghost state and the selection kept in the experience's storage and restored, with a versioned schema and refusal of damaged data",
    "source": "spec FR-A17-003 saved view",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
@@ -1093,7 +1093,7 @@
     "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Core/SavedView.swift",
     "symbol": "SavedView"
    },
-   "notes": "Storage and documents are available (M21); the view document is the experience's and depends on the A17-P03 layer and ghost state (G-VIEW)."
+   "notes": "Storage and documents are available (M21); the view document is the experience's and depends on the A17-P03 layer and ghost state (G-VIEW). Available from A17-P03: its gaps (G-VIEW) are closed."
   },
   {
    "id": "M21",
@@ -1575,8 +1575,8 @@
    "owner": "app-local",
    "justification": "Layer visibility, isolate one structure or layer, and the rule that the selection is never hidden are the experience's view state. Showing and hiding each layer as a group came with A17-P02 (the manual's Phase 02 MVP, layer.show); isolate, the never-hidden selection under isolate and the state round trip remain A17-P03.",
    "phase": 3,
-   "test": "Core host tests: toggling each layer changes exactly its structures; isolate shows the chosen set and ghosts or hides the rest; the selection stays visible; state round-trips; the draw list follows the state",
-   "closed": null
+   "test": "Core tests: toggling each layer changes exactly its structures; isolate on a part or a layer shows the target set and ghosts or hides the rest; the selection stays solid; the view state round-trips at schema 2 (IsolateTests, ViewStateTests); experience tests: the solid and ghost draw lists follow the state, and Show all gives back the exact frame (AnatomyIsolateRenderTests).",
+   "closed": "A17-P03"
   },
   {
    "id": "G-GHOST",
@@ -1588,8 +1588,8 @@
    "owner": "VisualCore:VisualCoreRendering",
    "justification": "DepthMeshPass disables blending and writes depth for every item, and MeshRenderer has no blend state, so translucent ghosts cannot be drawn without a change in VisualCore. Assessed in A17-P03 as an additive translucent stage of DepthMeshPass (opaque items first, then translucent items back to front with blend on, depth test on and depth write off); existing pixels unchanged. Never a second renderer and no GL path in the experience.",
    "phase": 3,
-   "test": "VisualCoreRenderingTests: with no translucent items the output is bit-identical to today; a translucent item in front of an opaque one blends, behind it is occluded; two translucent items give the same pixels in either submission order after sorting; context recreation and resize match; experience test of ghosted layers",
-   "closed": null
+   "test": "Added to VisualCoreRendering in A17-P03 as an additive stage of DepthMeshPass: Item.center and draw(_:translucent:…), translucent items back to front with blend ONE, ONE_MINUS_SRC_ALPHA, depth test on and depth write off; the existing path runs today's GL calls. VisualCoreRenderingTests (DepthMeshPassTranslucentTests): bit-identical output with no translucent items, a translucent item in front blends and behind is occluded, either submission order gives the same pixels, resize and context recreation match; 163 rendering tests pass; experience tests of ghosted layers and the fallback to hide (AnatomyIsolateRenderTests). The reference regression runs at X-A17.",
+   "closed": "A17-P03"
   },
   {
    "id": "G-SEARCH",
@@ -1601,8 +1601,8 @@
    "owner": "app-local",
    "justification": "The structure index (names, English equivalents, synonyms) and its ranking are the experience's; it reuses CatalogSearch.fold for folding instead of copying it.",
    "phase": 3,
-   "test": "Core host tests: case- and accent-independent matches; synonyms find their structure; ranking name before synonym before description; empty query lists all in inventory order; deterministic order",
-   "closed": null
+   "test": "Core tests: every name and synonym of every part finds it first, case, accents and spaces ignored through CatalogSearch.fold; ranking exact name, name prefix, exact synonym, synonym prefix, description prefix; an empty query lists all in inventory order; deterministic (SearchTests); experience tests: choosing a result equals a selection (AnatomySearchSessionTests).",
+   "closed": "A17-P03"
   },
   {
    "id": "G-TEXT",
@@ -1615,8 +1615,8 @@
    "owner": "app-local",
    "justification": "Plain-words descriptions written from Gray's Anatomy, 20th edition (1918, public domain) cited by section, Terminologia Anatomica names, and per-text source and license records are content; the license inventory gets the A17 entries.",
    "phase": 3,
-   "test": "Core host tests: every structure has a description with at least one citation (edition, section); every text records source and license from the allowed set; missing citations refused; a generated sources document matches the pack",
-   "closed": null
+   "test": "Core tests: every part has a description with at least one citation (work, edition, section) and the review sentence in the panel (PanelTests); every text records source and license from the allowed set (content validation); the generated sources table in content-sources.md matches the content (SourcesDocumentTests, UPDATE_DATA_SOURCES=1).",
+   "closed": "A17-P03"
   },
   {
    "id": "G-VIEW",
@@ -1627,8 +1627,8 @@
    "owner": "app-local",
    "justification": "The saved view (camera, layers, isolate and ghost state, selection) is the experience's document in its storage, over DocumentStore and MigrationChain.",
    "phase": 3,
-   "test": "Core host tests: the view round-trips; an older schema migrates; damaged or newer data is refused without a crash; unknown structure ids are dropped with a reason",
-   "closed": null
+   "test": "Core tests: the view round-trips; schema 1 migrates; damaged, newer and oversized documents are refused; unknown ids are dropped with a reason (ViewDocumentTests, ViewStateTests). The view is a DocumentEnvelope in view.json through ExperienceStorage, as Simulation Lab's preset store does, because DocumentStore needs a directory the storage handle does not expose; experience tests: the file is written, reopened and migrated, refused files open the opening view, a refused write keeps the session running (AnatomyViewFileTests).",
+   "closed": "A17-P03"
   },
   {
    "id": "G-LABELS",
