@@ -297,6 +297,39 @@ and `VisualCoreRendering` (iOS, GL). ADR-0003 and the package map record this. R
   `SettingsStoreTests.testRefusedFilesStayByteIdenticalWithTheirMessages`).
 - One drawing level (`level-0`): there is no lower level under Low Power Mode or a serious thermal state.
 
+### Simulation Lab (A16; features 116–122)
+
+- The frame pacing at ×4 for each family, the thermal state and the peak memory over a short run are unmeasured on
+  devices; they wait for the device campaign ([device-campaign.md](../apps/simulation-lab/device-campaign.md), rows
+  SL-D1 and SL-D2). No frame-time, thermal, power or memory figure is stated; the steps per second of the validation
+  report are simulator figures, not device claims.
+- VoiceOver on hardware (row SL-D3), Dynamic Type at the largest sizes and the system accessibility audits (row SL-D4)
+  and the share sheet to Files on hardware (row SL-D6) wait for the device campaign; the labels and values, the Seed
+  button for the paint gesture, the canvas description with the legend in words, the approximation label and the
+  Reduce Motion and Reduce Flashing caps are proved by the experience's tests only. No automated test presents the
+  share sheet.
+- Every simulation is an educational approximation, labelled as one: the grid is 64 × 64 cells for every family and
+  every saved experiment; the automaton's states are exact (0 or 1) with a wrap boundary; reaction-diffusion and the
+  wave keep half-float values, reaction-diffusion with a wrap boundary and an explicit Euler step, the wave with a
+  fixed zero boundary and a leapfrog step. The drawn field is compared with a CPU reference on a small grid within a
+  stated tolerance ([validation-report.md](../apps/simulation-lab/validation-report.md)); no physical, chemical or
+  numerical claim beyond that is made.
+- The time step has a stability limit: Δt at most 1.5625 for reaction-diffusion and a Courant number at most 0.707 for
+  the wave; a step beyond it is refused with its sentence and changes nothing. The automaton has no time step.
+- Reaction-diffusion and the wave need floating-point render targets. Where the device does not offer them, the status
+  says so ("Reaction-diffusion and the wave field need floating-point render targets, which this device does not
+  offer.") and the field is drawn from the CPU; this path is tested on the simulator only (`FloatUnsupportedTests`)
+  and waits for the device campaign on the oldest device (row SL-D5).
+- Six bundled presets in version 0.1 (Life, HighLife, Seeds, Spots, Mazes and Pulse), one palette per family and no
+  rule or palette editor. The library holds at most 24 saved experiments, kept on the device only (no sync, no
+  export); a save beyond that is refused with "The library holds 24 experiments; delete one first." A damaged, newer
+  or refused preset file is reported and skipped, never deleted or rewritten
+  (`PresetStoreTests.testDamagedAndNewerFilesAreSkipped`).
+- One picture at a time: a capture is a 1024 × 1024 PNG in the temporary folder `a16-captures`, replaced by the next
+  capture and removed when the experience opens; it leaves the device only through the share sheet the person opens,
+  and nothing is written to Photos.
+- One drawing level (`level-0`): there is no lower level under Low Power Mode or a serious thermal state.
+
 ## Distribution
 
 - No App Store submission, signing or purchase setup is part of this release; those are owner actions.

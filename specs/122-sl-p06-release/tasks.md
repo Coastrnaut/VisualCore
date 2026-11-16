@@ -42,7 +42,7 @@ Precedent: `specs/115-me-p06-release/tasks.md`.
 
 ## Phase 4: Story 3 — truthful release documents
 
-- [ ] T-A16-606 [P] [US3] Write the release documents in `docs/apps/simulation-lab/`:
+- [X] T-A16-606 [P] [US3] Write the release documents in `docs/apps/simulation-lab/`: — Verified 2026-11-16: 2026-11-16: store-listing.md (20 claims with proving tests), release-checklist.md (37 rows; verified, pending-campaign-ii SL-D1–SL-D6, owner-action), device-campaign.md, release.json and the Simulation Lab section of known-limitations.md; check_experience_release.py PASS (7 documents, 37 rows); check_copy_claims.py --allow share PASS
   - `store-listing.md`: the text, plus a Claim | Proving test table, with no forbidden claim;
   - `release-checklist.md`: Item | Area | Status | Evidence. Statuses are `verified`, `pending-campaign-ii` for
     SL-D1–SL-D6, and `owner-action` for signing set-up, archive and upload, with the steps of
