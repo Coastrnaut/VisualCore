@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-16 (A17-P00: an audit corrects the clarification; A16-P06: interface chunk x2, a scan that allows a named format; A16-P05: a generated validation report; mirrors reload after an edit; A16-P04: no mutating call inside #expect; A16-P03: round to half in the shader, test the mirror while it runs; A16-P02: GPU parity against both half roundings; A16-P01: fixture count from the catalog).
+Last updated: 2026-11-16 (A17-P01: a core before its experience passes the package check; A17-P00: an audit corrects the clarification; A16-P06: interface chunk x2, a scan that allows a named format; A16-P05: a generated validation report; mirrors reload after an edit; A16-P04: no mutating call inside #expect; A16-P03: round to half in the shader, test the mirror while it runs; A16-P02: GPU parity against both half roundings; A16-P01: fixture count from the catalog).
 
 ## 1. What is tested, and where
 
@@ -222,6 +222,11 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   rate limits and suspension assert exact values without waiting (A14-P04).
 - **Validate before committing a steering document.** `validate_autocreator.py` also limits CLAUDE.md to 12,000 bytes;
   a CLAUDE.md edit was once committed before its failure was read, and the next commit fixed it.
+- **A core can come before its experience.** `check_experience_packages.py` refused a feature's first phase,
+  whose clarification adds only `<Name>Core` and `<Name>CoreTests`, as `EXTRA_TARGET`. Since A17-P01 it allows exactly
+  that pair for an unregistered launch-scope catalog experience of the same package, as long as no `<Name>Experience`
+  or `<Name>ExperienceTests` target exists. Run the package check before ticking the first core task, not at the end
+  of the phase.
 
 ## 6. Keeping this file current
 
