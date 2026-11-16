@@ -47,4 +47,4 @@ the phase. Review checkpoints after 404 (core) and at 408.
 
 ## Phase 6: Convergence
 
-- [ ] T-A17-411 Record in `specs/127-ia-p04-accessibility-pack/research.md` three as-built decisions: `AnatomyContentPack.bundledSavedAt` (a fixed savedAt so encoding is deterministic); the label canvas (the overlay's reported size, else pixels divided by the display scale); and the gesture difference from Molecular Explorer (a blocked orbit start during a pinch does not skip that event's zoom step). Per plan: lifecycle (unrequested)
+- [X] T-A17-411 Record in `specs/127-ia-p04-accessibility-pack/research.md` three as-built decisions: `AnatomyContentPack.bundledSavedAt` (a fixed savedAt so encoding is deterministic); the label canvas (the overlay's reported size, else pixels divided by the display scale); and the gesture difference from Molecular Explorer (a blocked orbit start during a pinch does not skip that event's zoom step). Per plan: lifecycle (unrequested) — Verified 2026-11-16: 2026-11-16: research.md D6 records bundledSavedAt, the label canvas and the gesture difference from Molecular Explorer; validate_docs.py PASS (read before this tick)

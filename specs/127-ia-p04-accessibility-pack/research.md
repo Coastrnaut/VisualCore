@@ -11,3 +11,11 @@
   migration pattern serves both. Schema 1 is the A17-P01 bare file, which keeps that resource readable.
 - **D5 No network by a source scan** (Q5). The compliance check already scans the app, and a core test scoped to the
   experience gives a fast, local failure.
+- **D6 As built** (converge 2026-11-16). Three things go beyond the earlier decisions:
+  - **A fixed savedAt:** `AnatomyContentPack.bundledSavedAt` (2026-11-16T00:00:00Z) is the pack's savedAt, so
+    encoding the bundled pack is deterministic.
+  - **The label canvas:** labels are laid out on the size the overlay reports. Before the overlay has reported, the
+    drawable's pixels divided by the display scale are used. The overlay scales the boxes from that canvas to its
+    own size.
+  - **A gesture difference from Molecular Explorer:** an orbit start that is blocked while a pinch is under way does
+    not skip that event's zoom step, so a pinch always zooms as far as its scale says.
