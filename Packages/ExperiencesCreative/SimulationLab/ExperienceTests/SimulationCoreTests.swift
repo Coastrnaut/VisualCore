@@ -1,6 +1,6 @@
 // SimulationCoreTests — feature 117 (A16-P01) T-A16-105 (FR-A16-120, FR-A16-130; clarifications Q4, Q5). The Simulation
-// Lab core as an experience core, without a GPU: the first state and the contract (id, one host step of 1/60 s, seven
-// controls, one tier, schema 1); host steps run the scheduler's iterations; every action and every refusal, a refusal
+// Lab core as an experience core, without a GPU: the first state and the contract (id, one host step of 1/60 s, eight
+// controls (the time step from feature 119), one tier, schema 1); host steps run the scheduler's iterations; every action and every refusal, a refusal
 // changing nothing; a paused single step equals one model step; a stability refusal reads `a16.unstable`; the snapshot
 // payload restores to the same digest and damaged or 32 × 32 states are refused; the outcome and the words. Short runs
 // only, plain loops.
@@ -21,7 +21,7 @@ import VisualCoreExperience
         #expect(SimulationCore.migrations.currentVersion == 1)
         #expect(SimulationCore.controls.map(\.id) == SimulationCore.actionIDs)
         #expect(SimulationCore.actionIDs == ["sim.family", "sim.preset", "sim.run", "sim.pause", "sim.step",
-                                             "sim.reset", "sim.speed"])
+                                             "sim.reset", "sim.speed", "sim.timestep"])
         let core = SimulationCore(seed: 1)
         #expect(core.kind == .automaton)
         #expect(core.preset == 0)

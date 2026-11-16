@@ -6,7 +6,8 @@
     "sim.pause",
     "sim.step",
     "sim.reset",
-    "sim.speed"
+    "sim.speed",
+    "sim.timestep"
   ],
   "experience" : "a16.simulation-lab",
   "kind" : "creative",

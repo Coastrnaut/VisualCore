@@ -35,7 +35,8 @@ final class GrayScottGPU {
     /// The sampler name of the state the step reads.
     nonisolated static let stateInput = "uState"
 
-    /// The step program: one explicit Euler step of the five-point stencil with index wrap, clamped to 0…1.
+    /// The step program: one explicit Euler step of the five-point stencil with index wrap, clamped to 0…1 and rounded
+    /// to the nearest half-float in the shader (`toHalf`, feature 119) so the store is exact.
     nonisolated static let stepFragment = """
     precision highp float;
     precision highp int;
@@ -45,6 +46,16 @@ final class GrayScottGPU {
     uniform float uKill;
     uniform float uTimeStep;
     out vec4 color;
+    // Rounds x to the nearest half-float (ties to even), as the CPU reference's float16 does, so the RGBA16F
+    // store holds it exactly whatever rounding the driver applies to colour writes (feature 119).
+    float toHalf(float x) {
+        float a = abs(x);
+        if (a >= 65520.0) { return x; }
+        int e = ((floatBitsToInt(a) >> 23) & 255) - 127;
+        float step = a < 6.103515625e-5 ? 5.9604644775390625e-8 : intBitsToFloat((e - 10 + 127) << 23);
+        float q = roundEven(a / step) * step;
+        return x < 0.0 ? -q : q;
+    }
     vec2 cellAt(ivec2 cell) {
         return texelFetch(uState, (cell + ivec2(uGrid)) % uGrid, 0).rg;
     }
@@ -61,7 +72,7 @@ final class GrayScottGPU {
         float uvv = u * v * v;
         float nu = u + uTimeStep * (\(GrayScott.diffusionU) * lap.x - uvv + uFeed * (1.0 - u));
         float nv = v + uTimeStep * (\(GrayScott.diffusionV) * lap.y + uvv - (uFeed + uKill) * v);
-        color = vec4(clamp(nu, 0.0, 1.0), clamp(nv, 0.0, 1.0), 0.0, 1.0);
+        color = vec4(toHalf(clamp(nu, 0.0, 1.0)), toHalf(clamp(nv, 0.0, 1.0)), 0.0, 1.0);
     }
     """
 

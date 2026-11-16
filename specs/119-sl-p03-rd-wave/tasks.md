@@ -12,7 +12,7 @@ Precedent: `specs/118-sl-p02-automata-gpu/tasks.md`.
 
 ## Phase 2: Foundational — the time-step action and rule code
 
-- [ ] T-A16-302 Add `sim.timestep [0.05…2.0]` and `SimulationRule.unsupported = "a16.unsupported"` to `Packages/ExperiencesCreative/SimulationLab/Experience/Adapter/SimulationCore.swift` per contracts/gpu.md and clarification Q4. Behaviour:
+- [X] T-A16-302 Add `sim.timestep [0.05…2.0]` and `SimulationRule.unsupported = "a16.unsupported"` to `Packages/ExperiencesCreative/SimulationLab/Experience/Adapter/SimulationCore.swift` per contracts/gpu.md and clarification Q4. Behaviour: — Verified 2026-11-16: 2026-11-16: .autonomy/checks/A16-P03.sl-ios27.json exit 0 (41 core, 20 Swift Testing and 33 XCTest experience tests, 0 failures, slowest 1.98 s, iOS 27); TimeStepTests: limits accepted, 1 % above refused with a16.unstable and the sentence, below-range and automaton a16.invalid-choice, field kept; the sources of T-A16-302 to 307 land in this commit (one presenter file is shared by them)
   - "Δt above 1.5625 … `a16.unstable`"; "C = c · Δt exceed 1/√2 … `a16.unstable`";
   - outside the family's own range → `a16.invalid-choice`; the automaton → `a16.invalid-choice`;
   - an accepted Δt keeps the field, the step count, running and speed.

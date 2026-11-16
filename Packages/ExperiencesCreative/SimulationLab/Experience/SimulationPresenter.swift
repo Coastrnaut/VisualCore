@@ -1,9 +1,16 @@
 // SimulationPresenter — feature 117 (A16-P01) T-A16-105 (FR-A16-130; plan "Lifecycle"); feature 118 (A16-P02)
 // T-A16-203 (FR-A16-201, 202, 204; clarification Q2). Draws Simulation Lab through the one host's drawing path. The
 // cellular automaton is drawn from its GPU field (``AutomatonGPU``, an RGBA8 ping-pong pair stepped in lockstep with
-// the engine); reaction-diffusion and the wave are colour-mapped on the CPU (``SimulationPalette``) and uploaded into
-// a 64 × 64 `rgba8` `RenderTarget` until A16-P03. One `FieldPass` display program per path
-// (``SimulationShaders/automatonDisplay``, ``SimulationShaders/display``) draws into the host's framebuffer.
+// the engine). From feature 119 (A16-P03) T-A16-304/305/306/307 (FR-A16-301–330; clarifications Q1–Q5)
+// reaction-diffusion and the wave are stepped and drawn on the GPU too, on floating-point targets (``GrayScottGPU``,
+// ``WaveGPU``), through ``SimulationShaders/reactionDisplay`` and ``SimulationShaders/waveDisplay``. Their mirrors load
+// from the CPU field on the same triggers as the automaton's and also once ``reloadInterval`` (64) GPU steps ran since
+// the last load, so half-float rounding never drifts beyond the stated tolerance. The float probe
+// (`FloatRenderSupport.detect(in:)`, per context generation; the test seam ``forceFloatUnsupported``) runs in `setup`:
+// without support no float or 8-bit pair is made for the two families, choosing them is refused with `a16.unsupported`
+// and ``unsupportedSentence``, and a restored state of either family is colour-mapped on the CPU and uploaded into the
+// 64 × 64 `rgba8` target through ``SimulationShaders/display`` with the sentence in the status line. The canvas overlay
+// is the legend (``SimulationLegend``) of the CPU field. A refused time step shows its own sentence.
 //
 // The display programs fit the grid into a square of side ⌊0.92 · min(width, height) / 64⌋ · 64 pixels (or
 // ⌊0.92 · min(width, height)⌋ on a canvas under 70 pixels) centred on the canvas, and read the cell under each pixel
@@ -63,6 +70,12 @@ final class SimulationMirror {
     var status = ""
     /// The answer to the last refused action; empty after an accepted one.
     var message = ""
+    /// The legend of the current field (feature 119); nil before the first state.
+    var legend: SimulationLegendValues?
+    /// The time step of the current family (1 for the automaton).
+    var timeStep = 1.0
+    /// Whether reaction-diffusion and the wave can be chosen (false once the probe reported no float support).
+    var floatFamiliesAvailable = true
 }
 
 /// Why drawing failed.
@@ -90,6 +103,17 @@ final class SimulationPresenter: ExperiencePresenter {
     /// before opening and restore it to nil afterwards.
     static var stepFragmentOverride: String?
 
+    /// Test seam (feature 119): when true, `setup` treats the float probe as reporting no support. Tests set it
+    /// before opening and restore it to false afterwards.
+    static var forceFloatUnsupported = false
+
+    /// GPU steps after which a float mirror is loaded from the CPU field again (clarification Q3 of feature 119).
+    nonisolated static let reloadInterval = 64
+
+    /// The sentence shown when reaction-diffusion or the wave cannot run here (FR-A16-310).
+    nonisolated static let unsupportedSentence =
+        "Reaction-diffusion and the wave field need floating-point render targets, which this device does not offer."
+
     /// The experience this presenter draws.
     let experienceID: ExperienceID
     /// What the controls show.
@@ -105,6 +129,24 @@ final class SimulationPresenter: ExperiencePresenter {
     private(set) var automatonDisplay: FieldPass?
     /// The automaton's GPU field (an RGBA8 pair and its step pass); nil outside `setup` … `teardown`.
     private(set) var automaton: AutomatonGPU?
+    /// The Gray-Scott float pair; nil without float support or outside `setup` … `teardown`.
+    private(set) var grayScott: GrayScottGPU?
+    /// The wave float pair; nil without float support or outside `setup` … `teardown`.
+    private(set) var wave: WaveGPU?
+    /// The reaction-diffusion display pass; nil without float support.
+    private(set) var reactionDisplay: FieldPass?
+    /// The wave display pass; nil without float support.
+    private(set) var waveDisplay: FieldPass?
+    /// What the last probe reported (false also when forced); nil before the first `setup`.
+    private(set) var floatSupported: Bool?
+    /// Times a float mirror was loaded from the CPU field.
+    private(set) var floatLoadCount = 0
+    /// Float GPU steps run.
+    private(set) var floatStepCount = 0
+    /// GPU steps run on the current mirror since it was last loaded.
+    private(set) var stepsSinceLoad = 0
+    /// The last core drawn or described (for the words of a refused time step).
+    private var lastCore: SimulationCore?
     /// How many times the target, the passes and the automaton pair were made (together each time).
     private(set) var resourceBuildCount = 0
     /// How many times a field was uploaded: a colour-mapped CPU field into the target, or the CPU automaton field
@@ -129,7 +171,7 @@ final class SimulationPresenter: ExperiencePresenter {
     /// The step count of the CPU state the GPU automaton field mirrors.
     private(set) var mirroredStep = 0
     /// The CPU automaton field the GPU field mirrors (to see a change at an unchanged step count).
-    private var mirroredField: FieldGrid?
+    private var mirroredField: SimulationField?
     /// The drawable size in pixels of the last frame; nil before the first.
     private(set) var lastCanvas: Vec2?
     /// The square the grid was drawn into, in pixels (origin x, origin y, side); nil before the first frame.
@@ -166,16 +208,19 @@ final class SimulationPresenter: ExperiencePresenter {
         sync(core)
         let width = max(1, context.pixelWidth), height = max(1, context.pixelHeight)
         lastCanvas = Vec2(Double(width), Double(height))
-        if target == nil || display == nil || automatonDisplay == nil || automaton == nil {
+        let floatMissing = floatSupported == true
+            && (grayScott == nil || wave == nil || reactionDisplay == nil || waveDisplay == nil)
+        if target == nil || display == nil || automatonDisplay == nil || automaton == nil || floatMissing {
             releaseGPU()
             try makeResources(context)
         }
         guard let target, let display, let automatonDisplay, let automaton else { return }
         let field = core.model.field
+        let onGPU = core.kind == .automaton || floatSupported == true
         if lastField != field || lastKind != core.kind {
             lastField = field
             lastKind = core.kind
-            lastPixels = core.kind == .automaton ? [] : SimulationPalette.rgba(field, kind: core.kind)
+            lastPixels = onGPU ? [] : SimulationPalette.rgba(field, kind: core.kind)
             uploaded = false
         }
         let square = Self.square(width: width, height: height, grid: SimulationCore.gridSize)
@@ -190,6 +235,19 @@ final class SimulationPresenter: ExperiencePresenter {
             uniforms["uAlive"] = .vec4(Self.rgba(SimulationPalette.alive))
             uniforms["uDead"] = .vec4(Self.rgba(SimulationPalette.dead))
             try automatonDisplay.run(output: output, inputs: ["uField": automaton.current], uniforms: uniforms)
+        } else if core.kind == .reactionDiffusion, let grayScott, let reactionDisplay {
+            try mirrorFloat(core)
+            uniforms["uScale"] = .float(SimulationPalette.reactionScale)
+            uniforms["uStop0"] = .vec4(Self.rgba(SimulationPalette.reactionStops[0]))
+            uniforms["uStop1"] = .vec4(Self.rgba(SimulationPalette.reactionStops[1]))
+            uniforms["uStop2"] = .vec4(Self.rgba(SimulationPalette.reactionStops[2]))
+            try reactionDisplay.run(output: output, inputs: ["uField": grayScott.pair.read], uniforms: uniforms)
+        } else if core.kind == .wave, let wave, let waveDisplay {
+            try mirrorFloat(core)
+            uniforms["uZero"] = .vec4(Self.rgba(SimulationPalette.waveZero))
+            uniforms["uNegative"] = .vec4(Self.rgba(SimulationPalette.waveNegative))
+            uniforms["uPositive"] = .vec4(Self.rgba(SimulationPalette.wavePositive))
+            try waveDisplay.run(output: output, inputs: ["uField": wave.current], uniforms: uniforms)
         } else {
             invalidateMirror()
             if !uploaded { try upload() }
@@ -210,22 +268,57 @@ final class SimulationPresenter: ExperiencePresenter {
     /// iterations the engine ran since the last frame. Reads the core only.
     private func mirrorAutomaton(_ core: SimulationCore, into automaton: AutomatonGPU) throws {
         let spec = core.model.spec
-        let step = core.stepCount
-        let current = core.model.field.current
-        let delta = step - mirroredStep
-        let mustLoad = mirroredSpec != spec || delta < 0 || delta > Self.maxStepsPerFrame
-            || (delta == 0 && mirroredField != current)
-        if mustLoad {
-            guard automaton.load(current) else { throw SimulationDrawError.uploadFailed }
+        let delta = core.stepCount - mirroredStep
+        if mustLoad(core, delta: delta, reloads: false) {
+            guard automaton.load(core.model.field.current) else { throw SimulationDrawError.uploadFailed }
             gpuLoadCount += 1
             uploadCount += 1
         } else if delta > 0 {
             try automaton.step(rule: spec.automatonRule, count: delta)
             gpuStepCount += delta
         }
-        mirroredSpec = spec
-        mirroredStep = step
-        mirroredField = current
+        remember(core)
+    }
+
+    /// Brings the float mirror of the current family in line with `core` (clarification Q3 of feature 119): loaded
+    /// on the automaton's triggers and also when the delta would take it past ``reloadInterval`` GPU steps since the
+    /// last load; otherwise stepped by the engine's iteration delta with the spec's parameters. Reads the core only.
+    private func mirrorFloat(_ core: SimulationCore) throws {
+        let spec = core.model.spec
+        let delta = core.stepCount - mirroredStep
+        if mustLoad(core, delta: delta, reloads: true) {
+            let loaded = spec.kind == .wave ? wave?.load(core.model.field) : grayScott?.load(core.model.field.current)
+            guard loaded == true else { throw SimulationDrawError.uploadFailed }
+            floatLoadCount += 1
+            uploadCount += 1
+            stepsSinceLoad = 0
+        } else if delta > 0 {
+            if spec.kind == .wave {
+                try wave?.step(courant: Float(spec.courantNumber),
+                               damping: Float(spec.value(ParameterCatalog.damping.name)), count: delta)
+            } else {
+                try grayScott?.step(feed: Float(spec.value(ParameterCatalog.feed.name)),
+                                    kill: Float(spec.value(ParameterCatalog.kill.name)),
+                                    timeStep: Float(spec.timeStep), count: delta)
+            }
+            floatStepCount += delta
+            stepsSinceLoad += delta
+        }
+        remember(core)
+    }
+
+    /// Whether the mirror must be loaded from `core` rather than stepped by `delta` (see the file header).
+    private func mustLoad(_ core: SimulationCore, delta: Int, reloads: Bool) -> Bool {
+        mirroredSpec != core.model.spec || delta < 0 || delta > Self.maxStepsPerFrame
+            || (delta == 0 && mirroredField != core.model.field)
+            || (reloads && stepsSinceLoad + delta > Self.reloadInterval)
+    }
+
+    /// Records what the mirror now holds.
+    private func remember(_ core: SimulationCore) {
+        mirroredSpec = core.model.spec
+        mirroredStep = core.stepCount
+        mirroredField = core.model.field
     }
 
     /// Forgets what the GPU automaton field mirrors, so the next automaton frame loads it from the CPU state.
@@ -233,6 +326,7 @@ final class SimulationPresenter: ExperiencePresenter {
         mirroredSpec = nil
         mirroredStep = 0
         mirroredField = nil
+        stepsSinceLoad = 0
     }
 
     /// `color` as RGBA floats n / 255 with alpha 1.
@@ -279,9 +373,24 @@ final class SimulationPresenter: ExperiencePresenter {
                                          stepFragment: Self.stepFragmentOverride ?? SimulationShaders.automatonStep)
             display = plain
             automatonDisplay = cells
+            let supported = !Self.forceFloatUnsupported && FloatRenderSupport.detect(in: registry).supported
+            floatSupported = supported
+            if supported {
+                reactionDisplay = try FieldPass(registry: registry, fragment: SimulationShaders.reactionDisplay,
+                                                inputs: ["uField"], label: "a16.reaction.display")
+                waveDisplay = try FieldPass(registry: registry, fragment: SimulationShaders.waveDisplay,
+                                            inputs: ["uField"], label: "a16.wave.display")
+                grayScott = try GrayScottGPU(registry: registry, gridSize: n)
+                wave = try WaveGPU(registry: registry, gridSize: n)
+            }
         } catch {
             madeAutomatonDisplay?.release()
             madeDisplay?.release()
+            automaton?.release()
+            automaton = nil
+            releaseFloat()
+            display = nil
+            automatonDisplay = nil
             registry.release(made)
             throw error
         }
@@ -302,8 +411,21 @@ final class SimulationPresenter: ExperiencePresenter {
         automatonDisplay = nil
         automaton?.release()
         automaton = nil
+        releaseFloat()
         uploaded = false
         invalidateMirror()
+    }
+
+    /// Releases the float pairs and their display passes.
+    private func releaseFloat() {
+        grayScott?.release()
+        grayScott = nil
+        wave?.release()
+        wave = nil
+        reactionDisplay?.release()
+        reactionDisplay = nil
+        waveDisplay?.release()
+        waveDisplay = nil
     }
 
     // MARK: Probes, words and controls
@@ -332,13 +454,21 @@ final class SimulationPresenter: ExperiencePresenter {
         if mirror.running != core.isRunning { mirror.running = core.isRunning }
         if mirror.speedIndex != core.speedIndex { mirror.speedIndex = core.speedIndex }
         if mirror.stepCount != core.stepCount { mirror.stepCount = core.stepCount }
-        let status = core.status
+        let unsupported = floatSupported == false
+        let status = unsupported && core.kind != .automaton ? core.status + ". " + Self.unsupportedSentence : core.status
         if mirror.status != status { mirror.status = status }
+        let legend = SimulationLegendValues.of(core.model.field, kind: core.kind)
+        if mirror.legend != legend { mirror.legend = legend }
+        let timeStep = core.model.spec.timeStep
+        if mirror.timeStep != timeStep { mirror.timeStep = timeStep }
+        if mirror.floatFamiliesAvailable == unsupported { mirror.floatFamiliesAvailable = !unsupported }
+        lastCore = core
     }
 
     /// The answer to `result` of `control`: empty when accepted, else why it was refused.
     nonisolated static func answerWords(control: String, result: ActionResult) -> String {
         guard !result.isAccepted else { return "" }
+        if result == .rejected(.rule(code: SimulationRule.unsupported)) { return unsupportedSentence }
         if result == .rejected(.rule(code: SimulationRule.unstable)) {
             return "Those settings are beyond the stability limit and were refused."
         }
@@ -349,16 +479,35 @@ final class SimulationPresenter: ExperiencePresenter {
         case "sim.pause": return "The simulation is already paused."
         case "sim.step": return "Pause the simulation to step it one iteration at a time."
         case "sim.speed": return "There is no such speed."
+        case "sim.timestep": return "The time step must stay within 0.05 to 2."
         default: return "That is not possible here."
         }
     }
 
     /// Sends `control` with `values` through `port` and shows the answer in the mirror (empty when accepted).
     @discardableResult
+    /// Without float support, choosing reaction-diffusion or the wave is refused here with `a16.unsupported` (the
+    /// deterministic core does not know the device). A refused time step shows the core's own sentence for it.
     func send(_ control: String, _ values: [Double] = [], through port: ExperienceActionPort) -> ActionResult {
+        if control == "sim.family", floatSupported == false, let value = values.first, value == 1 || value == 2 {
+            let refused = ActionResult.rejected(.rule(code: SimulationRule.unsupported))
+            mirror.message = Self.answerWords(control: control, result: refused)
+            return refused
+        }
+        let before = lastCore
         let result = port.send(control, values)
-        mirror.message = Self.answerWords(control: control, result: result)
+        if control == "sim.timestep", !result.isAccepted, let value = values.first,
+           let sentence = before?.timeStepRefusal(value)?.sentence {
+            mirror.message = sentence
+        } else {
+            mirror.message = Self.answerWords(control: control, result: result)
+        }
         return result
+    }
+
+    /// The legend over the canvas (FR-A16-320).
+    func makeCanvasOverlay(_ port: ExperienceActionPort) -> AnyView? {
+        AnyView(SimulationLegendOverlay(mirror: mirror))
     }
 
     /// The canvas description of `core` (see `SimulationCore.canvasDescription`).

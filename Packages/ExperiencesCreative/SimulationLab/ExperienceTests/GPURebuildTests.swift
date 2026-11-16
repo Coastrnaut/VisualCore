@@ -145,7 +145,8 @@ final class GPURebuildTests: XCTestCase {
 
         XCTAssertTrue(shell.handle(control: "sim.family", values: [2]).isAccepted)
         try SimulationTest.frames(session, 1)
-        XCTAssertNil(presenter.mirroredSpec, "another family mirrors nothing")
+        // From feature 119 (A16-P03) the wave has its own GPU mirror, so the mirror now holds the wave's spec.
+        XCTAssertEqual(presenter.mirroredSpec?.kind, .wave, "another family mirrors its own field")
         XCTAssertTrue(shell.handle(control: "sim.family", values: [0]).isAccepted)
         try assertMirrors(session, shell, "back to the automaton")
         XCTAssertEqual(presenter.gpuLoadCount, loads + 1, "a family change loads")

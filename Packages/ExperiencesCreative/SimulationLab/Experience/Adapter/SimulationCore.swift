@@ -23,6 +23,12 @@
 //   sim.reset          the seeded start at step 0; running and speed are kept (`SimulationModel.reset()`).
 //   sim.speed [0…4]    the speed index (×0.25, ×0.5, ×1, ×2, ×4); a value that is not a whole index is refused with
 //                      `a16.invalid-choice`.
+//   sim.timestep [0.05…2.0]  (feature 119, A16-P03, clarification Q4) the time step Δt of reaction-diffusion or the
+//                      wave, keeping the field, the step count, running and speed: Δt above 1.5625 (reaction-diffusion)
+//                      or making the Courant number c · Δt exceed 1/√2 (wave) is refused with `a16.unstable`, a Δt
+//                      outside the family's own range with `a16.invalid-choice`, and the cellular automaton (one
+//                      generation per step) refuses the action with `a16.invalid-choice`. ``timeStepRefusal(_:)`` gives
+//                      the refusal with its sentence.
 // A spec the core refuses while changing the family or the preset is refused with `a16.unstable` for a stability
 // refusal and `a16.invalid-choice` for any other (the standard specs are valid, so neither happens with the shipped
 // presets). Called directly (not through the engine), the core refuses an unknown control with `unknownControl` and a
@@ -54,6 +60,9 @@ public enum SimulationRule {
     public static let invalidChoice = "a16.invalid-choice"
     /// A spec beyond its family's stability limit (the Gray-Scott time step or the wave's Courant number).
     public static let unstable = "a16.unstable"
+    /// Reaction-diffusion or the wave chosen where floating-point render targets are missing (feature 119, A16-P03;
+    /// refused by the presenter, which knows the device; the deterministic core never gives it).
+    public static let unsupported = "a16.unsupported"
 }
 
 /// Why a stored Simulation Lab state is refused.
@@ -71,11 +80,12 @@ public struct SimulationCore: ExperienceCore, Equatable {
 
     /// The action ids in declaration order.
     public static let actionIDs = ["sim.family", "sim.preset", "sim.run", "sim.pause", "sim.step", "sim.reset",
-                                   "sim.speed"]
+                                   "sim.speed", "sim.timestep"]
 
     /// The number of values each action carries, by action id.
     static let valueCounts: [String: Int] = ["sim.family": 1, "sim.preset": 1, "sim.run": 0, "sim.pause": 0,
-                                             "sim.step": 0, "sim.reset": 0, "sim.speed": 1]
+                                             "sim.step": 0, "sim.reset": 0, "sim.speed": 1,
+                                             "sim.timestep": 1]
 
     /// The prefix of the outcome code; the family's outcome name follows.
     public static let outcomePrefix = "simulating-"
@@ -132,7 +142,15 @@ public struct SimulationCore: ExperienceCore, Equatable {
         MigrationChain(currentVersion: SimulationState.schemaVersion)
     }
 
-    /// The seven controls with their declared ranges.
+    /// The declared range of `sim.timestep`, wider than every family's stable range so the core's refusals with
+    /// their sentences are reachable (clarification Q4 of feature 119).
+    public static let timeStepRange: ClosedRange<Double> = 0.05...2.0
+
+    /// The automaton's refusal of a time step: it advances one generation per step.
+    public static let automatonTimeStepRefusal = SimulationRefusal(
+        .outOfRange, "The cellular automaton advances one generation per step: its time step must be 1.")
+
+    /// The eight controls with their declared ranges.
     public static var controls: [ExperienceControl] {
         [ExperienceControl(id: "sim.family", ranges: [0...Double(families.count - 1)]),
          ExperienceControl(id: "sim.preset", ranges: [0...Double(maxPresetIndex)]),
@@ -140,7 +158,8 @@ public struct SimulationCore: ExperienceCore, Equatable {
          ExperienceControl(id: "sim.pause"),
          ExperienceControl(id: "sim.step"),
          ExperienceControl(id: "sim.reset"),
-         ExperienceControl(id: "sim.speed", ranges: [0...Double(SimulationScheduler.speeds.count - 1)])]
+         ExperienceControl(id: "sim.speed", ranges: [0...Double(SimulationScheduler.speeds.count - 1)]),
+         ExperienceControl(id: "sim.timestep", ranges: [timeStepRange])]
     }
 
     /// The first state with `seed` as the preparation seed.
@@ -190,6 +209,14 @@ public struct SimulationCore: ExperienceCore, Equatable {
             guard next.singleStep() else { return refused }
         case "sim.reset":
             next.reset()
+        case "sim.timestep":
+            if let refusal = timeStepRefusal(v[0]) { return .rejected(.rule(code: Self.ruleCode(for: refusal))) }
+            var spec = next.spec
+            spec.timeStep = v[0]
+            guard let state = SimulationState(spec: spec, scheduler: next.scheduler, field: next.field) else {
+                return refused
+            }
+            next = SimulationModel(state: state)
         default:   // sim.speed
             guard let index = Self.choice(v[0], count: SimulationScheduler.speeds.count), next.setSpeed(index) else {
                 return refused
@@ -211,6 +238,17 @@ public struct SimulationCore: ExperienceCore, Equatable {
         }
         made.setSpeed(current.scheduler.speedIndex)
         return .success(made)
+    }
+
+    /// Why the current family refuses the time step `value`, with its sentence; nil when it accepts it. The automaton
+    /// refuses every value (``automatonTimeStepRefusal``); the other families refuse what `SimulationSpec.refusal()`
+    /// refuses for the spec with `value` as its time step (``SimulationRefusal/reactionStep``,
+    /// ``SimulationRefusal/courant`` or the range sentence).
+    public func timeStepRefusal(_ value: Double) -> SimulationRefusal? {
+        guard kind != .automaton else { return Self.automatonTimeStepRefusal }
+        var spec = model.spec
+        spec.timeStep = value
+        return spec.refusal()
     }
 
     /// The rule code of a refused spec: `a16.unstable` for a stability refusal, `a16.invalid-choice` otherwise.
@@ -384,10 +422,12 @@ public struct SimulationCore: ExperienceCore, Equatable {
         isRunning ? "running at \(Self.speedTitle(index: speedIndex))" : "paused"
     }
 
-    /// The status line: "Running at ×1, step 120", "Paused, step 0".
+    /// The status line: "Running at ×1, step 120", "Paused, step 0"; reaction-diffusion and the wave add their time
+    /// step (feature 119): "Running at ×1, step 120, time step 1".
     public var status: String {
         let words = playbackWords
-        return (words.first.map { $0.uppercased() + words.dropFirst() } ?? words) + ", step \(stepCount)"
+        let line = (words.first.map { $0.uppercased() + words.dropFirst() } ?? words) + ", step \(stepCount)"
+        return kind == .automaton ? line : line + ", time step \(Self.decimal(model.spec.timeStep))"
     }
 
     /// The canvas description: "Simulation Lab: cellular automaton, rule Life (B3/S23); 64 × 64 grid; running at ×1;

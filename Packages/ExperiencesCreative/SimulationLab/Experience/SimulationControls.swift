@@ -8,10 +8,14 @@
 //   Step (`step` → `sim.step`, disabled while running with a hint saying so);
 //   Reset (`reset` → `sim.reset`: the seeded start at step 0);
 //   the Speed picker (`speed` → `sim.speed [index]`: ×0.25, ×0.5, ×1, ×2, ×4);
+//   the Time step stepper (`time-step` → `sim.timestep [Δt ± 0.05]`, feature 119: reaction-diffusion and the wave
+//     only; a step beyond the stability limit is refused and its sentence appears in the message line);
+//   without floating-point render targets the Family picker disables reaction-diffusion and the wave field;
 //   the status line (`status`: "Running at ×1, step 120") and the answer to a refused action (`message`, shown only
 //     when there is one).
 // Every control and line has an accessible label and value (controls a hint too) and the identifier
-// `experience.a16.simulation-lab.<name>` from the port; hit areas are at least 44 points high and text wraps.
+// `experience.a16.simulation-lab.<name>` from the port; hit areas are at least 44 points high and text wraps. A new
+// message is also announced to VoiceOver.
 //
 // The view holds references only — the port, the mirror and the presenter — and no closure, so the rebuilt view
 // compares equal from one host update to the next (feature 108 T-A14-609). Actions go through the presenter.
@@ -28,6 +32,15 @@ struct SimulationControls: View {
     let mirror: SimulationMirror
     /// The presenter every action goes through (it shows the answer to a refused action in the mirror).
     let presenter: SimulationPresenter
+
+    /// The time-step increment of one stepper tap.
+    static let timeStepIncrement = 0.05
+
+    /// The time step one tap from `value` (`up` adds, otherwise subtracts ``timeStepIncrement``), rounded to two
+    /// decimals so repeated taps stay on the 0.05 grid.
+    static func nextTimeStep(_ value: Double, up: Bool) -> Double {
+        ((value + (up ? timeStepIncrement : -timeStepIncrement)) * 100).rounded() / 100
+    }
 
     /// The Run / Pause button's title: "Pause" while running, "Run" while paused.
     static func runPauseTitle(running: Bool) -> String { running ? "Pause" : "Run" }
@@ -70,12 +83,16 @@ struct SimulationControls: View {
                        hint: "Returns to the seeded start at step 0", enabled: true) { send("sim.reset") }
             }
             speedPicker
+            if mirror.family != 0 { timeStepStepper }
             line(mirror.status, label: "Status", name: "status")
             if !mirror.message.isEmpty {
                 line(mirror.message, label: "Message", name: "message")
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .onChange(of: mirror.message) { _, message in
+            if !message.isEmpty { AccessibilityNotification.Announcement(message).post() }
+        }
     }
 
     /// The Family picker (sends `sim.family [index]` only when the choice changes).
@@ -87,6 +104,7 @@ struct SimulationControls: View {
                                   })) {
             ForEach(SimulationCore.familyTitles.indices, id: \.self) { index in
                 Text(verbatim: SimulationCore.familyTitles[index]).tag(index)
+                    .disabled(index != 0 && !mirror.floatFamiliesAvailable)
             }
         } label: {
             Text(verbatim: "Family")
@@ -141,6 +159,23 @@ struct SimulationControls: View {
         .accessibilityValue(Text(verbatim: SimulationCore.speedTitle(index: mirror.speedIndex)))
         .accessibilityHint(Text(verbatim: "Sets how many iterations run per second, relative to the family's rate"))
         .accessibilityIdentifier(port.identifier("speed"))
+    }
+
+    /// The Time step stepper (sends `sim.timestep [Δt ± 0.05]`; the core refuses a step beyond the limit).
+    private var timeStepStepper: some View {
+        let words = SimulationCore.decimal(mirror.timeStep)
+        return Stepper {
+            Text(verbatim: "Time step \(words)")
+        } onIncrement: {
+            send("sim.timestep", [Self.nextTimeStep(mirror.timeStep, up: true)])
+        } onDecrement: {
+            send("sim.timestep", [Self.nextTimeStep(mirror.timeStep, up: false)])
+        }
+        .frame(minHeight: 44)
+        .accessibilityLabel(Text(verbatim: "Time step"))
+        .accessibilityValue(Text(verbatim: words))
+        .accessibilityHint(Text(verbatim: "Changes the time step by 0.05; a step beyond the stability limit is refused"))
+        .accessibilityIdentifier(port.identifier("time-step"))
     }
 
     /// Sends `control` with `values` through the presenter, which shows the answer when it is refused.
