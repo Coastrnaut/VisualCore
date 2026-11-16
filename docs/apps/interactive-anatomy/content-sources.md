@@ -2,8 +2,8 @@
 
 Feature 124 (A17-P01), task T-A17-106. This page records where the knee content of Interactive Anatomy (A17) comes from,
 under which license each part is used, and its review status. The content itself is the bundled resource
-`Packages/ExperiencesCreative/InteractiveAnatomy/Core/Content/knee-right.json` (schema 1, content version 2). The
-validator `AnatomyContent.validate` refuses any source whose license is outside the allowed set.
+`Packages/ExperiencesCreative/InteractiveAnatomy/Core/Content/knee-right.pack.json`, a versioned content pack (schema 2,
+content version 2). The validator `AnatomyContent.validate` refuses any source whose license is outside the allowed set.
 
 ## Allowed licenses
 

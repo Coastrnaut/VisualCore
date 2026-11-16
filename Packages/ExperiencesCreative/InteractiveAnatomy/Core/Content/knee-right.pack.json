@@ -1,0 +1,535 @@
+{
+  "kind": "a17.content-pack",
+  "payload": {
+    "bounds": {
+      "max": {
+        "x": 7,
+        "y": 15,
+        "z": 7
+      },
+      "min": {
+        "x": -7,
+        "y": -15,
+        "z": -7
+      }
+    },
+    "contentVersion": 2,
+    "convention": {
+      "anterior": "+Z",
+      "lateral": "+X",
+      "superior": "+Y",
+      "unit": "cm"
+    },
+    "id": "region.knee.right",
+    "manifest": {
+      "citations": [
+        {
+          "edition": "20th (1918)",
+          "id": "gray-1918-femur",
+          "license": "public-domain",
+          "section": "Osteology: The Femur",
+          "title": "Anatomy of the Human Body"
+        },
+        {
+          "edition": "20th (1918)",
+          "id": "gray-1918-tibia",
+          "license": "public-domain",
+          "section": "Osteology: The Tibia",
+          "title": "Anatomy of the Human Body"
+        },
+        {
+          "edition": "20th (1918)",
+          "id": "gray-1918-fibula",
+          "license": "public-domain",
+          "section": "Osteology: The Fibula",
+          "title": "Anatomy of the Human Body"
+        },
+        {
+          "edition": "20th (1918)",
+          "id": "gray-1918-patella",
+          "license": "public-domain",
+          "section": "Osteology: The Patella",
+          "title": "Anatomy of the Human Body"
+        },
+        {
+          "edition": "20th (1918)",
+          "id": "gray-1918-knee-joint",
+          "license": "public-domain",
+          "section": "Syndesmology: The Knee-joint",
+          "title": "Anatomy of the Human Body"
+        },
+        {
+          "edition": "20th (1918)",
+          "id": "gray-1918-quadriceps",
+          "license": "public-domain",
+          "section": "Myology: The Quadriceps Femoris",
+          "title": "Anatomy of the Human Body"
+        },
+        {
+          "edition": "1998",
+          "id": "ta-1998",
+          "license": "facts",
+          "section": "Lower limb",
+          "title": "Terminologia Anatomica"
+        },
+        {
+          "edition": "1",
+          "id": "original-descriptions",
+          "license": "original",
+          "section": "All structures",
+          "title": "Interactive Anatomy descriptions"
+        }
+      ],
+      "geometryLicense": "original",
+      "review": {
+        "status": "not-reviewed"
+      },
+      "textLicense": "original"
+    },
+    "meshes": [
+      {
+        "id": "mesh.femur.shaft",
+        "kind": "tube"
+      },
+      {
+        "id": "mesh.femur.condyles",
+        "kind": "revolution"
+      },
+      {
+        "id": "mesh.tibia.plateau",
+        "kind": "extrusion"
+      },
+      {
+        "id": "mesh.tibia.shaft",
+        "kind": "tube"
+      },
+      {
+        "id": "mesh.tibia.tuberosity",
+        "kind": "sphere"
+      },
+      {
+        "id": "mesh.fibula.head",
+        "kind": "sphere"
+      },
+      {
+        "id": "mesh.fibula.shaft",
+        "kind": "tube"
+      },
+      {
+        "id": "mesh.patella.body",
+        "kind": "sphere"
+      },
+      {
+        "id": "mesh.femoral-cartilage.condyles",
+        "kind": "extrusion"
+      },
+      {
+        "id": "mesh.femoral-cartilage.groove",
+        "kind": "extrusion"
+      },
+      {
+        "id": "mesh.tibial-cartilage.medial",
+        "kind": "extrusion"
+      },
+      {
+        "id": "mesh.tibial-cartilage.lateral",
+        "kind": "extrusion"
+      },
+      {
+        "id": "mesh.medial-meniscus.body",
+        "kind": "extrusion"
+      },
+      {
+        "id": "mesh.lateral-meniscus.body",
+        "kind": "extrusion"
+      },
+      {
+        "id": "mesh.acl.band",
+        "kind": "tube"
+      },
+      {
+        "id": "mesh.pcl.band",
+        "kind": "tube"
+      },
+      {
+        "id": "mesh.mcl.band",
+        "kind": "tube"
+      },
+      {
+        "id": "mesh.lcl.band",
+        "kind": "tube"
+      },
+      {
+        "id": "mesh.patellar-ligament.band",
+        "kind": "tube"
+      },
+      {
+        "id": "mesh.quadriceps-tendon.band",
+        "kind": "tube"
+      }
+    ],
+    "schema": 1,
+    "structures": [
+      {
+        "description": "The knee joint links the thigh bone to the shin bone, with the kneecap at its front. Cartilage pads, ligaments and tendons hold its bones together while letting the leg bend and straighten.",
+        "englishName": "Knee joint",
+        "id": "knee.joint",
+        "meshIDs": [],
+        "neighbours": [],
+        "sourceRefs": [
+          "gray-1918-knee-joint",
+          "ta-1998",
+          "original-descriptions"
+        ],
+        "standardName": "Articulatio genus",
+        "synonyms": []
+      },
+      {
+        "description": "The thigh bone runs down from the hip and widens at its lower end into two rounded knobs called condyles. These knobs rest on the top of the shin bone and form the upper half of the knee. A smooth groove at the front between them guides the kneecap.",
+        "englishName": "Femur",
+        "id": "knee.femur",
+        "layer": "bones",
+        "meshIDs": [
+          "mesh.femur.shaft",
+          "mesh.femur.condyles"
+        ],
+        "neighbours": [
+          "knee.acl",
+          "knee.femoral-cartilage",
+          "knee.lcl",
+          "knee.mcl",
+          "knee.patella",
+          "knee.pcl",
+          "knee.quadriceps-tendon"
+        ],
+        "parent": "knee.joint",
+        "sourceRefs": [
+          "gray-1918-femur",
+          "ta-1998",
+          "original-descriptions"
+        ],
+        "standardName": "Femur",
+        "synonyms": [
+          "Thigh bone"
+        ]
+      },
+      {
+        "description": "The shin bone is the larger of the two lower leg bones and carries most of the body's weight. Its broad, flat top supports the thigh bone, and a small bump at the front receives the patellar ligament.",
+        "englishName": "Tibia",
+        "id": "knee.tibia",
+        "layer": "bones",
+        "meshIDs": [
+          "mesh.tibia.plateau",
+          "mesh.tibia.shaft",
+          "mesh.tibia.tuberosity"
+        ],
+        "neighbours": [
+          "knee.acl",
+          "knee.fibula",
+          "knee.mcl",
+          "knee.patellar-ligament",
+          "knee.pcl",
+          "knee.tibial-cartilage"
+        ],
+        "parent": "knee.joint",
+        "sourceRefs": [
+          "gray-1918-tibia",
+          "ta-1998",
+          "original-descriptions"
+        ],
+        "standardName": "Tibia",
+        "synonyms": [
+          "Shin bone"
+        ]
+      },
+      {
+        "description": "The fibula is a slender bone on the outer side of the lower leg. Its rounded head sits just below the knee against the side of the shin bone and anchors the fibular collateral ligament.",
+        "englishName": "Fibula",
+        "id": "knee.fibula",
+        "layer": "bones",
+        "meshIDs": [
+          "mesh.fibula.head",
+          "mesh.fibula.shaft"
+        ],
+        "neighbours": [
+          "knee.lcl",
+          "knee.tibia"
+        ],
+        "parent": "knee.joint",
+        "sourceRefs": [
+          "gray-1918-fibula",
+          "ta-1998",
+          "original-descriptions"
+        ],
+        "standardName": "Fibula",
+        "synonyms": [
+          "Calf bone"
+        ]
+      },
+      {
+        "description": "The kneecap is a flat, roughly triangular bone at the front of the knee. It lies inside the tendon of the large thigh muscle and glides in the groove at the lower end of the thigh bone.",
+        "englishName": "Patella",
+        "id": "knee.patella",
+        "layer": "bones",
+        "meshIDs": [
+          "mesh.patella.body"
+        ],
+        "neighbours": [
+          "knee.femoral-cartilage",
+          "knee.femur",
+          "knee.patellar-ligament",
+          "knee.quadriceps-tendon"
+        ],
+        "parent": "knee.joint",
+        "sourceRefs": [
+          "gray-1918-patella",
+          "ta-1998",
+          "original-descriptions"
+        ],
+        "standardName": "Patella",
+        "synonyms": [
+          "Kneecap"
+        ]
+      },
+      {
+        "description": "A thin, smooth layer of cartilage covers the condyles and front groove of the thigh bone. It lets the thigh bone slide against the kneecap and the shin bone with very little friction.",
+        "englishName": "Femoral articular cartilage",
+        "id": "knee.femoral-cartilage",
+        "layer": "cartilage",
+        "meshIDs": [
+          "mesh.femoral-cartilage.condyles",
+          "mesh.femoral-cartilage.groove"
+        ],
+        "neighbours": [
+          "knee.femur",
+          "knee.lateral-meniscus",
+          "knee.medial-meniscus",
+          "knee.patella",
+          "knee.tibial-cartilage"
+        ],
+        "parent": "knee.joint",
+        "sourceRefs": [
+          "gray-1918-knee-joint",
+          "ta-1998",
+          "original-descriptions"
+        ],
+        "standardName": "Cartilago articularis femoris",
+        "synonyms": []
+      },
+      {
+        "description": "Two smooth patches of cartilage cover the inner and outer halves of the flat top of the shin bone. The menisci rest on their rims and the thigh bone rolls across their centres.",
+        "englishName": "Tibial articular cartilage",
+        "id": "knee.tibial-cartilage",
+        "layer": "cartilage",
+        "meshIDs": [
+          "mesh.tibial-cartilage.medial",
+          "mesh.tibial-cartilage.lateral"
+        ],
+        "neighbours": [
+          "knee.femoral-cartilage",
+          "knee.lateral-meniscus",
+          "knee.medial-meniscus",
+          "knee.tibia"
+        ],
+        "parent": "knee.joint",
+        "sourceRefs": [
+          "gray-1918-knee-joint",
+          "ta-1998",
+          "original-descriptions"
+        ],
+        "standardName": "Cartilago articularis tibiae",
+        "synonyms": []
+      },
+      {
+        "description": "The medial meniscus is a C-shaped pad of tough cartilage on the inner half of the shin bone's top surface. It deepens the seat for the inner knob of the thigh bone and is joined at its edge to the medial collateral ligament.",
+        "englishName": "Medial meniscus",
+        "id": "knee.medial-meniscus",
+        "layer": "cartilage",
+        "meshIDs": [
+          "mesh.medial-meniscus.body"
+        ],
+        "neighbours": [
+          "knee.femoral-cartilage",
+          "knee.mcl",
+          "knee.tibial-cartilage"
+        ],
+        "parent": "knee.joint",
+        "sourceRefs": [
+          "gray-1918-knee-joint",
+          "ta-1998",
+          "original-descriptions"
+        ],
+        "standardName": "Meniscus medialis",
+        "synonyms": []
+      },
+      {
+        "description": "The lateral meniscus is an almost circular pad of tough cartilage on the outer half of the shin bone's top surface. It cushions the outer knob of the thigh bone and moves a little as the knee bends.",
+        "englishName": "Lateral meniscus",
+        "id": "knee.lateral-meniscus",
+        "layer": "cartilage",
+        "meshIDs": [
+          "mesh.lateral-meniscus.body"
+        ],
+        "neighbours": [
+          "knee.femoral-cartilage",
+          "knee.tibial-cartilage"
+        ],
+        "parent": "knee.joint",
+        "sourceRefs": [
+          "gray-1918-knee-joint",
+          "ta-1998",
+          "original-descriptions"
+        ],
+        "standardName": "Meniscus lateralis",
+        "synonyms": []
+      },
+      {
+        "description": "This strong band runs inside the knee from the front of the shin bone's top surface up and back to the inner side of the outer femoral knob. It crosses the posterior cruciate ligament and keeps the shin bone from sliding forward under the thigh bone.",
+        "englishName": "Anterior cruciate ligament",
+        "id": "knee.acl",
+        "layer": "ligaments",
+        "meshIDs": [
+          "mesh.acl.band"
+        ],
+        "neighbours": [
+          "knee.femur",
+          "knee.pcl",
+          "knee.tibia"
+        ],
+        "parent": "knee.joint",
+        "sourceRefs": [
+          "gray-1918-knee-joint",
+          "ta-1998",
+          "original-descriptions"
+        ],
+        "standardName": "Ligamentum cruciatum anterius",
+        "synonyms": [
+          "ACL"
+        ]
+      },
+      {
+        "description": "This thick band runs inside the knee from the back of the shin bone's top surface up and forward to the inner femoral knob. It crosses the anterior cruciate ligament and keeps the shin bone from sliding backward.",
+        "englishName": "Posterior cruciate ligament",
+        "id": "knee.pcl",
+        "layer": "ligaments",
+        "meshIDs": [
+          "mesh.pcl.band"
+        ],
+        "neighbours": [
+          "knee.acl",
+          "knee.femur",
+          "knee.tibia"
+        ],
+        "parent": "knee.joint",
+        "sourceRefs": [
+          "gray-1918-knee-joint",
+          "ta-1998",
+          "original-descriptions"
+        ],
+        "standardName": "Ligamentum cruciatum posterius",
+        "synonyms": [
+          "PCL"
+        ]
+      },
+      {
+        "description": "A broad, flat band runs down the inner side of the knee from the thigh bone to the shin bone. Its deep fibres attach to the edge of the medial meniscus, and it steadies the knee against sideways bending.",
+        "englishName": "Medial collateral ligament",
+        "id": "knee.mcl",
+        "layer": "ligaments",
+        "meshIDs": [
+          "mesh.mcl.band"
+        ],
+        "neighbours": [
+          "knee.femur",
+          "knee.medial-meniscus",
+          "knee.tibia"
+        ],
+        "parent": "knee.joint",
+        "sourceRefs": [
+          "gray-1918-knee-joint",
+          "ta-1998",
+          "original-descriptions"
+        ],
+        "standardName": "Ligamentum collaterale tibiale",
+        "synonyms": [
+          "MCL",
+          "Tibial collateral ligament"
+        ]
+      },
+      {
+        "description": "A round, cord-like band runs down the outer side of the knee from the thigh bone to the head of the fibula. It stands apart from the joint capsule and steadies the knee against bending outward.",
+        "englishName": "Lateral collateral ligament",
+        "id": "knee.lcl",
+        "layer": "ligaments",
+        "meshIDs": [
+          "mesh.lcl.band"
+        ],
+        "neighbours": [
+          "knee.femur",
+          "knee.fibula"
+        ],
+        "parent": "knee.joint",
+        "sourceRefs": [
+          "gray-1918-knee-joint",
+          "ta-1998",
+          "original-descriptions"
+        ],
+        "standardName": "Ligamentum collaterale fibulare",
+        "synonyms": [
+          "LCL",
+          "Fibular collateral ligament"
+        ]
+      },
+      {
+        "description": "This wide, strong band continues from the lower tip of the kneecap down to the bump at the front of the shin bone. It carries the pull of the thigh muscle past the knee to the lower leg.",
+        "englishName": "Patellar ligament",
+        "id": "knee.patellar-ligament",
+        "layer": "ligaments",
+        "meshIDs": [
+          "mesh.patellar-ligament.band"
+        ],
+        "neighbours": [
+          "knee.patella",
+          "knee.tibia"
+        ],
+        "parent": "knee.joint",
+        "sourceRefs": [
+          "gray-1918-knee-joint",
+          "ta-1998",
+          "original-descriptions"
+        ],
+        "standardName": "Ligamentum patellae",
+        "synonyms": [
+          "Patellar tendon"
+        ]
+      },
+      {
+        "description": "The four large muscles at the front of the thigh join into one thick tendon just above the knee. It attaches to the top edge of the kneecap and passes the muscle pull on toward the patellar ligament.",
+        "englishName": "Quadriceps tendon",
+        "id": "knee.quadriceps-tendon",
+        "layer": "ligaments",
+        "meshIDs": [
+          "mesh.quadriceps-tendon.band"
+        ],
+        "neighbours": [
+          "knee.femur",
+          "knee.patella"
+        ],
+        "parent": "knee.joint",
+        "sourceRefs": [
+          "gray-1918-quadriceps",
+          "ta-1998",
+          "original-descriptions"
+        ],
+        "standardName": "Tendo musculi quadricipitis femoris",
+        "synonyms": []
+      }
+    ],
+    "systems": [
+      "skeletal",
+      "articular"
+    ]
+  },
+  "savedAt": "2026-11-16T00:00:00Z",
+  "schemaVersion": 2
+}

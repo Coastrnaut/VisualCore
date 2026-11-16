@@ -201,13 +201,14 @@ public enum AnatomyContent {
         }
     }
 
-    /// The bundled right knee (`Content/knee-right.json`), decoded and validated; throws the `ContentRefusal`.
+    /// The bundled right knee (`Content/knee-right.pack.json`, a content pack of schema 2 since feature 127,
+    /// A17-P04, T-A17-404), decoded by `AnatomyContentPack.decode(_:)` and validated; throws the `ContentRefusal`.
     public static func bundledRightKnee() throws -> AnatomyRegion {
-        guard let url = Bundle.module.url(forResource: "knee-right", withExtension: "json", subdirectory: "Content"),
+        guard let url = Bundle.module.url(forResource: "knee-right.pack", withExtension: "json", subdirectory: "Content"),
               let data = try? Data(contentsOf: url) else {
-            throw ContentRefusal(.damaged, "The bundled file knee-right.json is missing.")
+            throw ContentRefusal(.damaged, "The bundled file knee-right.pack.json is missing.")
         }
-        return try decode(data).get()
+        return try AnatomyContentPack.decode(data).get()
     }
 
     /// The region as JSON with sorted keys, pretty printed, slashes unescaped.
