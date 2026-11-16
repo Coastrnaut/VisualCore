@@ -52,3 +52,7 @@ T-A15-604–606 test files and fixtures. Lead: seam, examples, registry, Package
 
 MVP: privacy (602, 603) and data (604–606); then documents (607, 608) and the interface (609); evidence 610–613.
 Review checkpoints after 606 (package tests) and at 611.
+
+## Phase 7: Convergence
+
+- [ ] T-A15-615 Add `Packages/ExperiencesCreative/MolecularExplorer/ExperienceTests/MoleculeReduceMotionTests.swift` (two sessions made with `reduceMotion`/`reduceFlashing` true and false, the same actions — molecule choice, camera steps, reset, atom selection — give the same engine digests and the same drawn atom and item counts per frame) and cite it in the motion row of `docs/apps/molecular-explorer/release-checklist.md`, so "Reduce Motion changes nothing" is proved per FR-A15-623 (partial)
