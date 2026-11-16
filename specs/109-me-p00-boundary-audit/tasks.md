@@ -46,3 +46,7 @@ Agent: T-A15-002 (contract draft, read-heavy). Lead: T-A15-001, the runs, T-A15-
 ## Implementation strategy
 
 MVP is US1 (the matrix) with US2 (reference); US3 and US4 complete the gate.
+
+## Phase 8: Convergence
+
+- [ ] T-A15-012 Cite `docs/apps/molecular-explorer/regression-baseline.md` in the `paths` of the contract's "ProjectM reference regression" inventory area (it exists now with 7 of 7 results; the description still says "written by T-A15-001/005") and re-run the checker (`--name contract-final-2 -- python3 scripts/check_app_contract.py --app molecular-explorer --render`) per FR-A15-001, FR-A15-004 (partial)
