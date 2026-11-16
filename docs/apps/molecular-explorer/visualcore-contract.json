@@ -697,7 +697,7 @@
       "id": "M10",
       "capability": "Small XYZ file import with strict bounds and parser errors: a chosen .xyz text file parsed by a pure bounded parser, refused with a typed reason (too large, too many atoms, line too long, unknown element, malformed or non-finite value, count mismatch) and changing nothing on refusal, a valid file copied into the experience's own storage",
       "source": "v0.1 feature 5: small XYZ file import with strict bounds and parser errors",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreMath/NumericHygiene.swift",
@@ -728,13 +728,19 @@
           "symbol": "StorageError",
           "product": "VisualCoreExperience",
           "public": true
+        },
+        {
+          "file": "Packages/ExperiencesCreative/MolecularExplorer/Core/MoleculeImport.swift",
+          "symbol": "MoleculeImport",
+          "product": "MolecularExplorerExperience",
+          "public": true
         }
       ],
       "example": {
         "file": "Packages/ExperiencesCreative/OscilloscopeStudio/Experience/ScopeControls.swift",
         "symbol": "ScopeControls"
       },
-      "notes": "Numeric hygiene with typed errors and per-experience storage with quotas exist and are tested (NumericHygieneTests, ExperienceStorageTests). No text-record parser exists in any framework product (only the private splitLines of ShaderLibrary). The XYZ parser is G-PARSER (app-local, A15-P01; a generic bounded line-record reader is assessed for VisualCore there); the picker, security-scoped read and copy are G-IMPORT (A15-P05). The example is the closest consumer: ScopeControls uses SwiftUI fileImporter for audio."
+      "notes": "Numeric hygiene with typed errors and per-experience storage with quotas exist and are tested (NumericHygieneTests, ExperienceStorageTests). No text-record parser exists in any framework product (only the private splitLines of ShaderLibrary). The XYZ parser is G-PARSER (app-local, A15-P01; a generic bounded line-record reader is assessed for VisualCore there); the picker, security-scoped read and copy are G-IMPORT (A15-P05). The example is the closest consumer: ScopeControls uses SwiftUI fileImporter for audio. Built at A15-P05 (G-PARSER, G-IMPORT closed): a chosen file is size-checked, parsed and entered as actions; refusals show one sentence and change nothing; the accepted copy is kept in the experience's storage (MoleculeImportTests, MoleculeImportSessionTests)."
     },
     {
       "id": "M11",
@@ -801,7 +807,7 @@
       "id": "M12",
       "capability": "Strict bounded XYZ parsing with typed errors: fixed limits for file size, atom count, line length and coordinate magnitude; the comment line kept as untrusted text; unknown element symbols, non-finite numbers and count mismatches refused with a typed reason; pure, GPU-free and fuzzed",
       "source": "cross-cutting: strict bounded parsing; constitution A15 strict, bounded import; manual algorithm decisions",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreMath/NumericHygiene.swift",
@@ -826,13 +832,19 @@
           "symbol": "StorageQuota",
           "product": "VisualCoreExperience",
           "public": true
+        },
+        {
+          "file": "Packages/ExperiencesCreative/MolecularExplorer/Core/ImportedMolecule.swift",
+          "symbol": "ImportedMolecule",
+          "product": "MolecularExplorerExperience",
+          "public": true
         }
       ],
       "example": {
         "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Core/SavedView.swift",
         "symbol": "SavedView"
       },
-      "notes": "Finite-value checks and byte caps on stored documents exist and are tested (NumericHygieneTests, DocumentStoreTests, ExperienceStorageTests); nothing parses text records. The parser, its caps and refusal reasons are G-PARSER (app-local, A15-P01); the fuzz and malformed-input corpus is G-IMPORT (A15-P05). The example is the closest consumer of bounded decoding with typed refusals (SavedView.decode)."
+      "notes": "Finite-value checks and byte caps on stored documents exist and are tested (NumericHygieneTests, DocumentStoreTests, ExperienceStorageTests); nothing parses text records. The parser, its caps and refusal reasons are G-PARSER (app-local, A15-P01); the fuzz and malformed-input corpus is G-IMPORT (A15-P05). The example is the closest consumer of bounded decoding with typed refusals (SavedView.decode). Built at A15-P05 (G-IMPORT closed): the import uses the A15-P01 parser unchanged; the comment line is never shown; ImportedMolecule.make re-checks the limits in the engine; a 2,000-file seeded corpus never crashes (ImportFuzzTests)."
     },
     {
       "id": "M13",
@@ -1120,7 +1132,7 @@
       "id": "M19",
       "capability": "Data provenance and licenses: every bundled element property and molecule records source, units (ångström) and license; only openly licensed or public-domain data is bundled; checked by a test and listed in the acknowledgements",
       "source": "cross-cutting: data provenance and licenses; constitution A15 data with provenance, licenses",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AcknowledgementsView.swift",
@@ -1133,19 +1145,25 @@
           "symbol": "AcknowledgementsView",
           "product": "VisualCoreUI",
           "public": true
+        },
+        {
+          "file": "Packages/ExperiencesCreative/MolecularExplorer/Core/MoleculeReview.swift",
+          "symbol": "MoleculeReview",
+          "product": "MolecularExplorerExperience",
+          "public": true
         }
       ],
       "example": {
         "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Core/SourceRecords.swift",
         "symbol": "SourceRecord"
       },
-      "notes": "The license inventory exists and is tested (AcknowledgementsViewTests); it records code and asset licenses, not per-value source and units. The source record and its test are G-ELEMENTS (A15-P01) and G-LIBRARY (A15-P04); the data review is G-REVIEW (A15-P05); all app-local."
+      "notes": "The license inventory exists and is tested (AcknowledgementsViewTests); it records code and asset licenses, not per-value source and units. The source record and its test are G-ELEMENTS (A15-P01) and G-LIBRARY (A15-P04); the data review is G-REVIEW (A15-P05); all app-local. Built at A15-P05 (G-REVIEW closed): the generated data-review.md lists every displayed value with units, source and license and is compared with the data in MoleculeReviewTests; an imported molecule reads as 'imported file — your own data'."
     },
     {
       "id": "M20",
       "capability": "File import through the system document picker without permissions: only the file the person chooses is read, with security-scoped access, size checked before reading, copied into the experience's own storage; no usage description, no privacy answer change",
       "source": "cross-cutting: file import without permissions; spec clarification 4",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
@@ -1164,19 +1182,25 @@
           "symbol": "StorageError",
           "product": "VisualCoreExperience",
           "public": true
+        },
+        {
+          "file": "Packages/ExperiencesCreative/MolecularExplorer/Core/MoleculeImport.swift",
+          "symbol": "MoleculeImport",
+          "product": "MolecularExplorerExperience",
+          "public": true
         }
       ],
       "example": {
         "file": "Packages/ExperiencesCreative/OscilloscopeStudio/Experience/ScopeControls.swift",
         "symbol": "ScopeControls"
       },
-      "notes": "Per-experience storage with quotas exists and is tested (ExperienceStorageTests). No document-picker helper exists in a framework product: SwiftUI fileImporter appears only in experience controls (ScopeControls, OdysseyControls, MusicLabControls, all for audio), and security-scoped reads only in VisualCoreAudio's file sources. The picker, scoped read and copy are G-IMPORT (app-local, A15-P05)."
+      "notes": "Per-experience storage with quotas exists and is tested (ExperienceStorageTests). No document-picker helper exists in a framework product: SwiftUI fileImporter appears only in experience controls (ScopeControls, OdysseyControls, MusicLabControls, all for audio), and security-scoped reads only in VisualCoreAudio's file sources. The picker, scoped read and copy are G-IMPORT (app-local, A15-P05). Built at A15-P05 (G-IMPORT closed): the system document picker (fileImporter, one file, .xyz or plain text), security-scoped access, the size checked from the file before reading, the copy in import.xyz; no usage description added (MoleculeImportSessionTests)."
     },
     {
       "id": "M21",
       "capability": "Truthful claims: structures are illustrative models from stated sources, radii and colours are display conventions with their source, inferred bonds say so; no chemical safety, toxicity, medical or therapeutic claim; performance numbers only from device measurements",
       "source": "cross-cutting: truthful claims; constitution A15 truthful claims",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
@@ -1195,13 +1219,19 @@
           "symbol": "LicenseInventory",
           "product": "VisualCoreUI",
           "public": true
+        },
+        {
+          "file": "Packages/ExperiencesCreative/MolecularExplorer/Core/MoleculeReview.swift",
+          "symbol": "MoleculeReview",
+          "product": "MolecularExplorerExperience",
+          "public": true
         }
       ],
       "example": {
         "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Core/ScientificReview.swift",
         "symbol": "ScientificReview"
       },
-      "notes": "State signs, announcements and the license inventory exist and are tested (AccessibilityPlansTests, AcknowledgementsViewTests). The copy review and the generated data review are G-REVIEW (app-local, A15-P05); the release copy-claims step checks store copy."
+      "notes": "State signs, announcements and the license inventory exist and are tested (AccessibilityPlansTests, AcknowledgementsViewTests). The copy review and the generated data review are G-REVIEW (app-local, A15-P05); the release copy-claims step checks store copy. Built at A15-P05 (G-REVIEW closed): the legend says 'Display radii, not measured sizes.', the panel 'Bonds marked inferred are estimated from atom distances.'; MoleculeWordsTests finds no safety, toxicity, medical or therapeutic word in any shown sentence; no performance number is shown."
     },
     {
       "id": "M22",
@@ -1437,10 +1467,10 @@
       ],
       "kind": "adaptation",
       "owner": "app-local",
-      "justification": "No document-picker helper exists in a framework product (fileImporter appears only in A06-A08 controls, for audio). The XYZ import through the system document picker (no permission, no usage string), the size check before reading, the security-scoped read, the copy into the experience's storage, user-visible refusal messages and the fuzz and error corpus are app-local (clarification 4 and 5, manual phase 05, A15-P05).",
+      "justification": "No document-picker helper exists in a framework product (fileImporter appears only in A06-A08 controls, for audio). The XYZ import through the system document picker (no permission, no usage string), the size check before reading, the security-scoped read, the copy into the experience's storage, user-visible refusal messages and the fuzz and error corpus are app-local (clarification 4 and 5, manual phase 05, A15-P05). Built at A15-P05: Core/MoleculeImport.swift (size refusal from the byte count before reading, one sentence per parser reason, sanitized title, the action list) and ImportedMolecule.swift (the single check of the import limits with inferred bonds); MoleculeState schema 4 holds the import, which enters the engine as import.begin, import.atom × n and import.end, as Digital Aquarium's AquariumLibrary.open rebuilds a document; Experience/MoleculeImporter.swift (security-scoped read, the copy in import.xyz and import-title.txt written only after the engine accepted the actions) and the Import button with the system document picker in MoleculeControls. No usage description and no prompt.",
       "phase": 5,
-      "test": "Experience and Core tests: a valid file imports and appears in recent molecules; each refusal reason shows its message and leaves storage unchanged; oversize files are refused before being read; a seeded fuzz corpus of malformed files never crashes; Info.plist gains no usage description and the privacy answers are unchanged",
-      "closed": null
+      "test": "Core tests (MoleculeImportTests, ImportFuzzTests, MoleculeStateSchema4Tests): every reason's sentence; the 65,536-byte boundary; titles; 2,000 seeded mutated files with no crash, typed refusals and accepted molecules within the limits; schema 4 round trips and migration from 1-3. Experience tests (MoleculeCoreTests, MoleculeImportSessionTests): the actions of every library molecule rebuild its atoms and bonds; each refusal leaves the engine digest, import.xyz and recent.json byte-identical; an oversized file is never read; reopening and the recent entry bring the import back; announcements; a 200-file slice through the engine",
+      "closed": "A15-P05"
     },
     {
       "id": "G-REVIEW",
@@ -1450,10 +1480,10 @@
       ],
       "kind": "adaptation",
       "owner": "app-local",
-      "justification": "A provenance and wording review of the bundled element data and molecules, the display-convention statements and the absence of safety, toxicity, medical or therapeutic claims is quality work specific to this experience (clarification 5, manual phase 05 data review, A15-P05).",
+      "justification": "A provenance and wording review of the bundled element data and molecules, the display-convention statements and the absence of safety, toxicity, medical or therapeutic claims is quality work specific to this experience (clarification 5, manual phase 05 data review, A15-P05). Built at A15-P05: Core/MoleculeReview.swift generates docs/apps/molecular-explorer/data-review.md (every displayed value with units, source and license; the statements 'Display radii, not measured sizes.' and 'Bonds marked inferred are estimated from atom distances.', both shown in the panel) and lists the claim words checked over every shown sentence.",
       "phase": 5,
-      "test": "Core host tests and a generated review document: every displayed value references a bundled source with units and license; copy contains no forbidden claim words (checked by the release copy-claims step); inferred-bond and display-convention statements are present in the panel and the about text",
-      "closed": null
+      "test": "MoleculeReviewTests (the committed review matches the data; the review has no claim word) and MoleculeWordsTests (no safety, toxicity, medical or therapeutic word in any sentence the experience can show; both statements in the panel); the shared copy-claims check passes on the experience's sources",
+      "closed": "A15-P05"
     }
   ],
   "traceability": [
