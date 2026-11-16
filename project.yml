@@ -195,6 +195,8 @@ targets:
         product: MolecularExplorerExperience
       - package: ExperiencesCreative
         product: SimulationLabExperience
+      - package: ExperiencesCreative
+        product: InteractiveAnatomyExperience
     postBuildScripts:
       - name: Bundle licenses (UA-F04)
         basedOnDependencyAnalysis: false

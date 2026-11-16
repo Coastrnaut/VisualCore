@@ -104,7 +104,9 @@ enum CatalogFixture {
                                // Feature 110 (A15-P01); integrated at X-A15.
                                "a15.molecular-explorer",
                                // Feature 117 (A16-P01); integrated at X-A16.
-                               "a16.simulation-lab"],
+                               "a16.simulation-lab",
+                               // Feature 125 (A17-P02); a candidate until X-A17.
+                               "a17.interactive-anatomy"],
                 "the registrations of Catalog/registrations.json")
     }
 

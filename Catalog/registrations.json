@@ -393,6 +393,30 @@
       "manifest": "Packages/ExperiencesCreative/SimulationLab/scenario-manifest.json",
       "permissions": [],
       "summary": "A simulation lab: cellular automata, reaction-diffusion and a wave field from seeded starts, each with a CPU reference, labelled as educational approximations."
+    },
+    "a17.interactive-anatomy": {
+      "capabilities": [
+        "procedural 3D right knee model",
+        "layers shown or hidden as groups",
+        "tap or list selection",
+        "framing camera with steps",
+        "bones, cartilage, ligaments",
+        "cited, not clinically reviewed"
+      ],
+      "quality_tiers": [
+        "level-0",
+        "level-1"
+      ],
+      "palette": [
+        "#121419",
+        "#E6DBC2",
+        "#8CB3D9",
+        "#CC7373"
+      ],
+      "content": null,
+      "manifest": "Packages/ExperiencesCreative/InteractiveAnatomy/scenario-manifest.json",
+      "permissions": [],
+      "summary": "An interactive anatomy reference of the right knee: a procedural, schematic 3D model with bones, cartilage and ligaments in layers, tap or list selection and cited plain-language text, educational and not medical."
     }
   }
 }
