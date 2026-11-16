@@ -27,7 +27,7 @@ Precedent: `specs/118-sl-p02-automata-gpu/tasks.md`.
 
 ## Phase 3: Story 1 — the float fields on the GPU
 
-- [ ] T-A16-303 [P] [US1] Create `Packages/ExperiencesCreative/SimulationLab/Experience/WaveGPU.swift` per contracts/gpu.md and clarification Q1:
+- [X] T-A16-303 [P] [US1] Create `Packages/ExperiencesCreative/SimulationLab/Experience/WaveGPU.swift` per contracts/gpu.md and clarification Q1: — Verified 2026-11-16: 2026-11-16: .autonomy/checks/A16-P03.sl-ios27.json exit 0 (41 core, 20 Swift Testing and 33 XCTest experience tests, 0 failures, slowest 1.98 s, iOS 27); WaveGPU (RGBA16F, uⁿ red, uⁿ⁻¹ green, zero edges) and the reaction and wave display programs, exercised by FloatFieldToleranceTests and FloatMirrorTests; both step shaders round to the nearest half in GLSL, so the GPU equals the float16 CPU reference (max 0.0)
   - "One RGBA16F ping-pong pair … current value uⁿ in red and the previous uⁿ⁻¹ in green"; the step writes (uⁿ⁺¹, uⁿ);
   - `uCourant2` and `uKeep`; "writes 0 for any cell on the edge"; `texelFetch` without wrap;
   - throws `floatTargetsUnavailable` or `compile`; its step shader lives in this file.
