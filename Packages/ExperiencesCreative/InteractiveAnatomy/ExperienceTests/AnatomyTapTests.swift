@@ -5,7 +5,9 @@
 // on a hidden layer, with every layer shown and with each layer hidden in turn; a tap far outside the model clears;
 // choosing a part from the list gives the same state as the tap that picked it; selecting a hidden part from the list
 // is refused with `a17.hidden-structure`; hiding the selected part's layer clears the selection; after selecting each
-// part its sphere centre projects inside the view, at the aspects 1.5, 0.5 and 2.
+// part its sphere centre projects inside the view, at the aspects 1.5, 0.5 and 2. Feature 127 (A17-P04) T-A17-406
+// (FR-A17-401): through the pointer a drag now turns the camera (and never taps) and a two-finger touch at a constant
+// distance sends nothing.
 import Foundation
 import XCTest
 @testable import InteractiveAnatomyExperience
@@ -158,8 +160,9 @@ final class AnatomyTapTests: XCTestCase {
     }
 
     /// T-A17-214 (spec edge case "a drag or a multi-touch gesture"): through the presenter's `pointer`, a single tap at
-    /// the patella's projected centre selects what the picker returns there; a drag from the same point and a
-    /// two-finger touch send nothing and leave the view state as it was.
+    /// the patella's projected centre selects what the picker returns there; a drag from the same point does not tap
+    /// (since feature 127 its 60 points across turn the camera one step, which Turn left undoes) and a two-finger
+    /// touch at a constant distance sends nothing.
     func testOnlyASingleTapPicksThroughThePointer() async throws {
         let session = ExperienceSession()
         defer { session.close() }
@@ -182,7 +185,14 @@ final class AnatomyTapTests: XCTestCase {
         for item in drag { presenter.pointer(item, viewSize: viewSize, port: shell.port) }
         try AnatomyTest.frames(session, 1)
         let afterDrag = try AnatomyTest.core(shell).view
-        XCTAssertEqual(afterDrag, before, "a drag sends nothing")
+        XCTAssertEqual(afterDrag.selection, before.selection, "a drag does not tap")
+        XCTAssertEqual(afterDrag.camera.turn, (before.camera.turn + 1) % AnatomyCameraState.turnPositions,
+                       "60 points to the right turn one step")
+        XCTAssertEqual(afterDrag.camera.tilt, before.camera.tilt, "10 points down do not tilt")
+        AnatomyTest.accept(shell, "camera.turn", [-1])
+        try AnatomyTest.frames(session, 1)
+        let turnedBack = try AnatomyTest.core(shell).view
+        XCTAssertEqual(turnedBack, before, "Turn left undoes the drag")
 
         let pair = [event(2, .began, point, 1), event(3, .began, Vec2(point.x + 4, point.y), 1.01),
                     event(2, .ended, point, 1.05), event(3, .ended, Vec2(point.x + 4, point.y), 1.06)]

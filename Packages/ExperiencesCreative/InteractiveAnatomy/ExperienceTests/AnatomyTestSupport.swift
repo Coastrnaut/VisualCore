@@ -6,7 +6,8 @@
 // digest of a core; the canvas description expected for a set of shown layers and a selection; snapshot envelopes and
 // edited payloads. Feature 126 (A17-P03) T-A17-307 (SC-A17-303–305): opening over a given storage (the view file),
 // a temporary storage removed in tearDown, the mesh ids of a set of parts, the canvas description with an isolate,
-// schema-1 payloads and view files written by hand.
+// schema-1 payloads and view files written by hand. Feature 127 (A17-P04) T-A17-406 (FR-A17-406): opening with Reduce
+// Motion on.
 import Foundation
 import XCTest
 @testable import InteractiveAnatomyExperience
@@ -40,16 +41,18 @@ enum AnatomyTest {
     /// Opens Interactive Anatomy in `session` (seed `seed`, optionally restoring `snapshot`) through the factory, lays
     /// the view out at `size` points and draws one frame. A session without a quality pin is pinned to level 0, so the
     /// automatic level never changes a frame between two readings.
-    /// `storage` (by default a fresh one) is the experience's storage, where the presenter keeps `view.json`.
+    /// `storage` (by default a fresh one) is the experience's storage, where the presenter keeps `view.json`;
+    /// `reduceMotion` is the factory's Reduce Motion setting.
     static func open(_ session: ExperienceSession, seed: UInt64 = 1, snapshot: ExperienceSnapshot? = nil,
-                     size: CGSize = CGSize(width: 240, height: 160), storage given: ExperienceStorage? = nil)
+                     size: CGSize = CGSize(width: 240, height: 160), storage given: ExperienceStorage? = nil,
+                     reduceMotion: Bool = false)
         async throws -> ExperienceShell<AnatomyPresenter> {
         let id = self.id
         let storage = given ?? Self.storage()
         var made: ExperienceShell<AnatomyPresenter>?
         if session.qualityPin == nil { session.qualityPin = 0 }
         let request = ExperienceOpenRequest(id: id, seed: seed, snapshot: snapshot, refusedSnapshotFails: false) {
-            let shell = InteractiveAnatomyExperience.make(id: id, storage: storage, reduceMotion: false)
+            let shell = InteractiveAnatomyExperience.make(id: id, storage: storage, reduceMotion: reduceMotion)
             made = shell
             return shell
         }
