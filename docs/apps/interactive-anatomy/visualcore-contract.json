@@ -429,7 +429,7 @@
    "id": "M05",
    "capability": "Labels and overlays: structure names anchored to projected points of their structures on a SwiftUI canvas overlay, following the drawn camera, with an overlap rule so no two labels cover each other, and the selected structure always labelled",
    "source": "brainstorm: labels and overlays; manual §13 risk 3",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitCamera.swift",
@@ -454,7 +454,7 @@
     "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Experience/LabelLayout.swift",
     "symbol": "LabelLayout"
    },
-   "notes": "Framework part tested: OrbitCameraTests (project), CanvasOverlayTests (the presenter default is no overlay; a presenter's overlay reaches the shell; the host view builds with and without one). An anchored-label layout with overlap handling exists only inside experiences: Solar System Explorer's internal LabelLayout (A14-P04) and Molecular Explorer's public LabelLayout in its Core (A15-P03, modelled on A14's). Interactive Anatomy would be the third consumer, so the promotion of a generic layout to VisualCoreMath is assessed in G-LABELS (A17-P04); copying either experience's layout is not allowed."
+   "notes": "Framework part tested: OrbitCameraTests (project), CanvasOverlayTests (the presenter default is no overlay; a presenter's overlay reaches the shell; the host view builds with and without one). An anchored-label layout with overlap handling exists only inside experiences: Solar System Explorer's internal LabelLayout (A14-P04) and Molecular Explorer's public LabelLayout in its Core (A15-P03, modelled on A14's). Interactive Anatomy would be the third consumer, so the promotion of a generic layout to VisualCoreMath is assessed in G-LABELS (A17-P04); copying either experience's layout is not allowed. Available from A17-P04: its gaps (G-LABELS) are closed."
   },
   {
    "id": "M06",
@@ -509,7 +509,7 @@
    "id": "M07",
    "capability": "Toggleable layered mesh groups and an accessible structure list: the four layers (bones, cartilage, ligaments, tendons) shown or hidden as groups, every structure also reachable from a list that VoiceOver reads, with layer membership not shown by colour alone",
    "source": "manual v0.1: toggleable layered mesh groups and accessible structure list",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/DepthMeshPass.swift",
@@ -546,13 +546,13 @@
     "file": "Packages/ExperiencesCreative/MolecularExplorer/Core/DisplayMode.swift",
     "symbol": "DisplayMode"
    },
-   "notes": "Visibility is the choice of which items go into DepthMeshPass.draw (DepthMeshPassTests); colour-independent signs and announcements are tested in AccessibilityPlansTests. Layer state, its rules and the structure list are the experience's (G-LAYERS in A17-P03, G-A11Y in A17-P04)."
+   "notes": "Visibility is the choice of which items go into DepthMeshPass.draw (DepthMeshPassTests); colour-independent signs and announcements are tested in AccessibilityPlansTests. Layer state, its rules and the structure list are the experience's (G-LAYERS in A17-P03, G-A11Y in A17-P04). Available from A17-P04: its gaps (G-LAYERS, G-A11Y) are closed."
   },
   {
    "id": "M08",
    "capability": "Selection highlighting, labels and searchable metadata: a tap selects the nearest visible structure, which is highlighted and labelled; its name, synonyms, system, layer and description are shown; structures are found by searching names and synonyms",
    "source": "manual v0.1: selection highlighting, labels and searchable metadata",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitCamera.swift",
@@ -601,7 +601,7 @@
     "file": "Packages/ExperiencesCreative/MolecularExplorer/Core/AtomPicker.swift",
     "symbol": "AtomPicker"
    },
-   "notes": "Framework parts tested: OrbitCameraTests (ray), RayIntersectionTests (triangle, sphere and box casts, nearest), GestureTests (tap), CatalogSearchTests (language-independent folding), CanvasOverlayTests. Picking against structure meshes (G-PICK, A17-P02), search over the structure index (G-SEARCH, A17-P03) and anchored labels (G-LABELS, A17-P04) are not in a framework product; Molecular Explorer's AtomPicker is experience code."
+   "notes": "Framework parts tested: OrbitCameraTests (ray), RayIntersectionTests (triangle, sphere and box casts, nearest), GestureTests (tap), CatalogSearchTests (language-independent folding), CanvasOverlayTests. Picking against structure meshes (G-PICK, A17-P02), search over the structure index (G-SEARCH, A17-P03) and anchored labels (G-LABELS, A17-P04) are not in a framework product; Molecular Explorer's AtomPicker is experience code. Available from A17-P04: its gaps (G-PICK, G-SEARCH, G-LABELS) are closed."
   },
   {
    "id": "M09",
@@ -687,7 +687,7 @@
    "id": "M11",
    "capability": "Download-free offline content pack: the structure graph, names, synonyms, descriptions, citations and shape parameters bundled with the app in a versioned schema, decoded and validated on load, with no network",
    "source": "manual v0.1: download-free offline content pack",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCorePersistence/Envelope.swift",
@@ -718,7 +718,7 @@
     "file": "Packages/ExperiencesCreative/MolecularExplorer/Core/MoleculeLibraryData.swift",
     "symbol": "MoleculeLibraryData"
    },
-   "notes": "DocumentEnvelope (kind, schemaVersion) and MigrationChain are tested in DocumentStoreTests; StableHash in StableHashTests. The pack's schema, its loader with typed refusals and its digest are the experience's (G-PACK, A17-P04); the schema is designed in A17-P01 (G-CONTENT)."
+   "notes": "DocumentEnvelope (kind, schemaVersion) and MigrationChain are tested in DocumentStoreTests; StableHash in StableHashTests. The pack's schema, its loader with typed refusals and its digest are the experience's (G-PACK, A17-P04); the schema is designed in A17-P01 (G-CONTENT). Available from A17-P04: its gaps (G-CONTENT, G-PACK) are closed."
   },
   {
    "id": "M12",
@@ -926,7 +926,7 @@
    "id": "M16",
    "capability": "Anchored labels with overlap handling and the list alternative: projected labels placed in a deterministic order with overlapping boxes skipped, the selected structure first, and the accessible structure list as the equivalent for people who cannot read the canvas",
    "source": "spec FR-A17-003 labels; manual §13 risk 3",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitCamera.swift",
@@ -957,7 +957,7 @@
     "file": "Packages/ExperiencesCreative/MolecularExplorer/Core/LabelLayout.swift",
     "symbol": "LabelLayout"
    },
-   "notes": "See M05: the overlap layout exists in A14 and A15 only. G-LABELS (A17-P04, VisualCoreMath assessed) and G-A11Y (A17-P04, the list)."
+   "notes": "See M05: the overlap layout exists in A14 and A15 only. G-LABELS (A17-P04, VisualCoreMath assessed) and G-A11Y (A17-P04, the list). Available from A17-P04: its gaps (G-LABELS, G-A11Y) are closed."
   },
   {
    "id": "M17",
@@ -1019,7 +1019,7 @@
    "id": "M19",
    "capability": "The offline content pack with schema and migration: the bundled pack decodes through a versioned envelope, an older pack schema migrates forward, a damaged or newer pack is refused with a typed reason instead of crashing",
    "source": "spec FR-A17-003 offline content pack",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCorePersistence/Envelope.swift",
@@ -1050,7 +1050,7 @@
     "file": "Packages/ExperiencesCreative/MolecularExplorer/Core/MoleculeLibrary.swift",
     "symbol": "MoleculeLibrary"
    },
-   "notes": "Envelope and migration tested in DocumentStoreTests; the pack format and its loader are G-PACK (A17-P04)."
+   "notes": "Envelope and migration tested in DocumentStoreTests; the pack format and its loader are G-PACK (A17-P04). Available from A17-P04: its gaps (G-PACK) are closed."
   },
   {
    "id": "M20",
@@ -1641,8 +1641,8 @@
    "owner": "VisualCore:VisualCoreMath",
    "justification": "An overlap-free anchored-label layout exists in Solar System Explorer (internal, A14-P04) and Molecular Explorer (public in its Core, A15-P03); Interactive Anatomy is the third consumer, so promoting a generic layout (project, cull behind camera and outside the canvas, priority order, skip positive-area overlaps) to VisualCoreMath is assessed in A17-P04, with A14 and A15 left unchanged unless their own gates adopt it.",
    "phase": 4,
-   "test": "Host tests: no two placed labels overlap by a positive area; the selected structure keeps its label when on the canvas; points behind the camera or outside the canvas get none; order deterministic; if promoted, VisualCoreMathTests plus an API baseline update",
-   "closed": null
+   "test": "Promoted in A17-P04 to VisualCoreMath as AnchoredLabelLayout (third consumer; Solar System Explorer and Molecular Explorer unchanged). VisualCoreMathTests (AnchoredLabelLayoutTests): no positive-area overlaps over 200 seeded candidates and 36 cameras, priority 0 placed whenever its box fits, behind-camera and off-canvas anchors get none, budget, deterministic order; API baseline updated. Experience tests: over 90 cameras on two canvases no overlaps, at most 16 labels, the selection first, no label for ghosted or hidden parts (AnatomyLabelTests).",
+   "closed": "A17-P04"
   },
   {
    "id": "G-A11Y",
@@ -1654,8 +1654,8 @@
    "owner": "app-local",
    "justification": "The accessible structure list (grouped by layer, selection and visibility from the list, VoiceOver labels with layer signs), colour-independent layer signs and Reduce Motion behaviour are the experience's UI over the public accessibility planners.",
    "phase": 4,
-   "test": "Core and experience tests: every structure is in the list with its layer sign; selecting from the list equals a tap selection; stateSignProblems is empty for the layer signs; announcements rate-limited; Reduce Motion removes the camera flight",
-   "closed": null
+   "test": "Core tests: the three layer signs pass stateSignProblems (LayerSignTests); experience tests: every list row carries its sign and is spoken with its layer words; a list selection equals a tap; announcements through AnnouncementPlanner are rate-limited at 0.5 s with the last change always announced, spoken only while VoiceOver runs; nothing animates, so Reduce Motion removes nothing and framing stays immediate (AnatomyAnnouncementTests). The VoiceOver audit runs in the device campaign.",
+   "closed": "A17-P04"
   },
   {
    "id": "G-PACK",
@@ -1667,8 +1667,8 @@
    "owner": "app-local",
    "justification": "The bundled offline content pack (format, versioned envelope, loader with typed refusals, size cap, digest) is the experience's; it is shipped in the app bundle and never downloaded.",
    "phase": 4,
-   "test": "Core host tests: the bundled pack decodes and validates; an older schema migrates; damaged, oversized or newer packs are refused with a typed reason; the digest is stable; no network API is referenced",
-   "closed": null
+   "test": "Core tests: the bundled pack (knee-right.pack.json, kind a17.content-pack, schema 2) decodes and validates; the A17-P01 bare region migrates; damaged, oversized and newer packs are refused with typed reasons; the SHA-256 digest is stable; provenance records the text and geometry licenses, every citation's license and the review status with its sentence (ContentPackTests, ProvenanceTests); no network API is referenced in the experience's sources (NoNetworkTests).",
+   "closed": "A17-P04"
   },
   {
    "id": "G-REVIEW",
