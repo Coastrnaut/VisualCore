@@ -8,7 +8,7 @@ Precedent: `specs/120-sl-p04-ui-presets-capture/tasks.md`.
 
 ## Phase 1: Setup
 
-- [ ] T-A16-501 Baseline: cite the A16-P04 evidence on the unchanged sources (`.autonomy/checks/A16-P04.{sl-ios27-2,app-unit,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14)
+- [X] T-A16-501 Baseline: cite the A16-P04 evidence on the unchanged sources (`.autonomy/checks/A16-P04.{sl-ios27-2,app-unit,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14) — Verified 2026-11-16: 2026-11-16: A16-P04 evidence cited on unchanged sources (no Packages, Apps or project.yml change since the A16-P04 record 6821e3ee): .autonomy/checks/A16-P04.sl-ios27-2.json, A16-P04.app-unit.json, A16-P04.verify-27.json, all exit 0
 
 ## Phase 2: Foundational — presenter accessors
 
