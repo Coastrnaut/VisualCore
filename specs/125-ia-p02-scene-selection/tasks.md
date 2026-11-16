@@ -1,0 +1,47 @@
+# Tasks: Interactive Anatomy — Phase 02 Region scene/selection renderer
+
+**Input**: [spec.md](spec.md), [plan.md](plan.md), [research.md](research.md), [data-model.md](data-model.md),
+[contracts/scene.md](contracts/scene.md), [quickstart.md](quickstart.md). Gate A17-P02 (legacy). Evidence:
+`python3 Tools/python/desktop_runbook.py run-check --stage A17-P02 --timeout 600 --name <check> -- <command>`. Commit
+after every task (no trailers); read every check's exit before ticking. iOS 27 only. No test may raise a system prompt.
+Precedents: `specs/111-me-p02-renderer/tasks.md` (scene, camera) and `specs/117-sl-p01-algorithms/tasks.md`
+(registration).
+
+## Phase 1: Setup
+
+- [ ] T-A17-201 Baseline: cite the A17-P01 evidence (`.autonomy/checks/A17-P01.{ia-core-ios27-2,app-build,experience-packages-2}.json`) on a tree whose Packages changed since only by the comment move in Package.swift (owner ruling of 2026-11-14)
+
+## Phase 2: Foundational — the core (stories 1–4)
+
+- [ ] T-A17-202 Add `VisualCoreScenes` to `InteractiveAnatomyCore` and its tests in `Packages/ExperiencesCreative/Package.swift` (the lead writes this file); create `Packages/ExperiencesCreative/InteractiveAnatomy/Core/{AnatomyQuality,AnatomyGeometry,AnatomyScene}.swift` per contracts/scene.md and data-model.md: two levels ("revolution segments 48 / 24, tube sides 16 / 8, sphere 32 × 16 / 16 × 8; maxTriangles 60,000 / 20,000; maxDraws 32; maxLabels 16"); one `MeshPlacement` per declared mesh id built from its kind with `Mesh.revolution`, `tube`, `extrusion` or `uvSphere` and placed by a model matrix in the region convention (cm, +Y superior, +Z anterior, +X lateral), schematic but anatomically arranged; `AnatomyScene.build` with world triangles, world spheres, the structure and region spheres, counts, a digest, and refusals `over-budget`, `missing-mesh`, `build-failed`; with `CoreTests/{SceneBuildTests,BudgetTests}.swift` (every declared mesh built at both levels; every mesh validates, closed kinds closed; the same digest twice; counts within each level's budget; an over-budget level refused naming the level and count; a declared mesh without a placement refused; 20 draws; the 14 parts in inventory order) (FR-A17-201, 209; SC-A17-201, 204)
+- [ ] T-A17-203 Create `Packages/ExperiencesCreative/InteractiveAnatomy/Core/{AnatomyPicker,AnatomyCamera,AnatomyViewState}.swift`: the picker (sphere prefilter with `Ray3.intersect(sphereCenter:radius:)`, then `Ray3.intersect(triangle:_:_:)` on world triangles; hidden layers skipped; nearest wins; ties by index; nil on a miss; an NDC overload over `OrbitCamera.ray(ndc:aspect:)`); the camera state ("turn wraps 0…23, 15°; tilt −6…6, 10°; zoom −4…6, × 0.85"; opening turn 2, tilt 1, zoom 0; fovY 60°; fit r × 1.25 / sin(30°) on the narrower axis; framing on a structure sphere; refused steps leave the state unchanged); the view state (schema 1; "damaged, newer or unknown id refused; a selection on a hidden layer is cleared"); with `CoreTests/{PickerTests,CameraFramingTests,ViewStateTests}.swift` (a ray from outside through each part's centre picks it with all layers shown; with its layer hidden it never picks it; a miss is nil; a tie resolves to the lower index; deterministic; after framing each part its sphere projects inside NDC ±1 at aspects 0.5 and 2; reset equals the opening view; every limit refused; state round trip; each refusal) (FR-A17-203–205, 208, 210; SC-A17-202, 203)
+
+## Phase 3: Stories 1–3 — the experience
+
+- [ ] T-A17-204 [US1] Add the targets `InteractiveAnatomyExperience` and `InteractiveAnatomyExperienceTests` and the product `InteractiveAnatomyExperience` to `Packages/ExperiencesCreative/Package.swift` (lead); create `Packages/ExperiencesCreative/InteractiveAnatomy/Experience/{Adapter/AnatomyCore.swift,AnatomyPresenter.swift,AnatomyControls.swift,InteractiveAnatomyExperience.swift}`: actions `structure.select [0…13]`, `structure.clear`, `layer.show [0…2, 0/1]`, `camera.turn`, `camera.tilt`, `camera.zoom [−1/+1]`, `view.reset`; rules `a17.camera-limit`, `a17.hidden-structure`, `a17.invalid-choice`; `qualityTiers == 2`; digest from the canonical view state; the presenter draws the visible items with one `DepthMeshPass` and one `MeshRenderer` per mesh (made together in setup, rebuilt after a recreation, released together in teardown), the layer materials and the amber selection; a single tap picks through the presenter's `pointer`; the canvas description of contracts/scene.md; controls (layer toggles, the 14-row list grouped by layer with "Hidden" rows disabled, camera steps, Reset view) with identifiers `experience.a17.interactive-anatomy.<name>` (FR-A17-202–208)
+- [ ] T-A17-205 [US1] Write `Packages/ExperiencesCreative/InteractiveAnatomy/ExperienceTests/{AnatomyTestSupport,AnatomyCoreTests,AnatomySessionTests,AnatomyRenderTests,AnatomyTapTests}.swift`: every action and refusal; non-blank frames; each camera step changes the frame and Reset restores it; hiding a layer changes the frame and its parts are no longer drawn; a tap at the projected centre of each visible part selects it, at a hidden part never selects it, on empty canvas clears; a list selection equals a tap; hiding the selected part's layer clears it; context recreation and a resize draw the same frame with the state kept; `Core.qualityTiers == 2` and the shell's quality profile has two levels; snapshot restore and refusals (SC-A17-202, 205)
+- [ ] T-A17-206 [US1] Register the candidate: `Catalog/registrations.json` entry for a17 (summary, capabilities ≤ 40 characters each, quality_tiers ["level-0", "level-1"], palette, manifest `Packages/ExperiencesCreative/InteractiveAnatomy/scenario-manifest.json`, permissions []), `python3 scripts/build_catalog.py` (catalog and fixture copies), candidate in `Apps/VisualCore/App/ExperienceRegistry.swift`, product in `project.yml`; update `RealCatalogTests`, `scripts/test_scripts.py` and the `AppModelTests` stand-in candidate (`a17.interactive-anatomy` → `a18.ambient-clock`, research D6) (FR-A17-210)
+- [ ] T-A17-207 [US1] Write `Packages/ExperiencesCreative/InteractiveAnatomy/Experience/Adapter/AnatomyManifest.swift` (the nine standard scenarios and fixtures: a part selected, a layer hidden, the camera turned) and generate `Packages/ExperiencesCreative/InteractiveAnatomy/scenario-manifest.json` (`UPDATE_SCENARIO_MANIFEST=1 TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`) with `ExperienceTests/AnatomyManifestTests.swift` (FR-A17-210)
+
+## Phase 4: Records and evidence
+
+- [ ] T-A17-208 Contract `docs/apps/interactive-anatomy/visualcore-contract.json`: G-SCENE, G-PICK, G-CAMERA and G-BUDGETS closed by "A17-P02" (the generic Ray3-against-Mesh cast assessed for VisualCoreMath: not added, one consumer); the layer toggles noted under G-LAYERS; rows whose gaps are all closed become available (`--name contract -- python3 scripts/check_app_contract.py --app interactive-anatomy --render`)
+- [ ] T-A17-209 Interactive Anatomy tests on sim-27.2 (`--name ia-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing InteractiveAnatomyCoreTests InteractiveAnatomyExperienceTests`) and the documented-API check (`--name documented-api -- python3 scripts/check_documented_api.py --sources Packages/ExperiencesCreative/InteractiveAnatomy`) (SC-A17-201–205)
+- [ ] T-A17-210 Catalog and host (`--name catalog-host -- python3 scripts/build_catalog.py --check`); app build and unit (`xcodegen generate --spec project.yml`; `--name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`) and runner (`--name verify-27 -- python3 scripts/verify_experiences.py --only a17.interactive-anatomy --runtime 27`) (SC-A17-205)
+- [ ] T-A17-211 Packages and script tests (`--name experience-packages -- python3 scripts/check_experience_packages.py`; `--name script-tests -- python3 scripts/test_scripts.py`)
+- [ ] T-A17-212 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A17-P02; update README.md in the record commit (rule 16) and `docs/automatedtesting.md` if a test tool, rule or lesson changed (rule 17)
+
+## Dependencies
+
+T-A17-201 → 202 → 203 (203 uses the scene of 202) → 204 → {205, 206} → 207 → 208 → 209 → 210 → 211 → 212.
+
+## Parallel examples
+
+Lead first: Package.swift (202, 204). Agent A: the core files and core tests (202, 203). Agent B, after A: the
+experience sources (204) and the manifest source (207). Agent C, with B: the experience tests (205). Lead:
+registration (206), manifest generation, contract, runs, commits.
+
+## Implementation strategy
+
+MVP: the scene (202) and the experience drawing it (204). Picking, layers and the camera (203–205) close stories 2–3;
+budgets (202) close story 4. Review checkpoints after 203 (core tests) and at 209.
