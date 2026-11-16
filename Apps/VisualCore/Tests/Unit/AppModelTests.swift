@@ -37,7 +37,7 @@ final class AppModelTests: XCTestCase {
         let report = manifest.registryReport(registered: registered)
         XCTAssertTrue(report.isMatch, "missing \(report.missingRegistrations), unexpected "
             + "\(report.unexpectedRegistrations), duplicates \(report.duplicates)")
-        // A01–A13 are integrated (X-A01 to X-A13 pass): registered and available, nothing else.
+        // A01–A14 are integrated (X-A01 to X-A14 pass): registered and available, nothing else.
         XCTAssertEqual(registered.count, manifest.available.count)
         XCTAssertEqual(registered.map(\.rawValue), ["a01.generative-art-studio", "a02.fluid-art-playground",
                                                      "a03.fractal-explorer", "a04.particle-universe",
@@ -45,7 +45,7 @@ final class AppModelTests: XCTestCase {
                                                      "a07.audio-odyssey", "a08.oscilloscope-studio",
                                                      "a09.digital-aquarium", "a10.neon-arcade",
                                                      "a11.physics-playground", "a12.tiny-worlds",
-                                                     "a13.light-maze"])
+                                                     "a13.light-maze", "a14.solar-system-explorer"])
         XCTAssertEqual(manifest.available.map(\.id), registered)
     }
 
@@ -71,7 +71,7 @@ final class AppModelTests: XCTestCase {
         let storage = try TestStorage(self)
         let integrated = ExperienceRegistry.all.map(\.id)
         // Any catalog experience before its X gate works as a candidate; A15 is one (unavailable, not in `all`). The
-        // synthetic debug registration stands in for one (A14 is a real candidate since A14-P01).
+        // synthetic debug registration stands in for one (the registry has no real candidate after X-A14).
         let id = try XCTUnwrap(ExperienceID(rawValue: "a15.molecular-explorer"))
         XCTAssertFalse(integrated.contains(id), "the synthetic candidate is not integrated")
         let candidate = DebugExperience.registration(for: id)
@@ -102,7 +102,7 @@ final class AppModelTests: XCTestCase {
         XCTAssertEqual(Set(ScenarioLaunch.targets().keys), all)
     }
 
-    /// The real catalog with the real registry shows the integrated experiences (A01–A13 since their X gates).
+    /// The real catalog with the real registry shows the integrated experiences (A01–A14 since their X gates).
     func testTheRealCatalogShowsTheIntegratedExperiences() throws {
         let storage = try TestStorage(self)
         let model = AppModel(environment: storage.environment(catalog: try bundled("experiences"),
@@ -469,7 +469,7 @@ final class AppModelTests: XCTestCase {
             XCTAssertEqual(QualityDeclaration.problems(profile: profile, tierCount: profile.count,
                                                        catalogNames: names), [], "\(registration.id)")
         }
-        XCTAssertEqual(ExperienceRegistry.all.count, 13, "A01–A13 are integrated")
+        XCTAssertEqual(ExperienceRegistry.all.count, 14, "A01–A14 are integrated")
     }
 
     /// FR-U06-013: a pinned level is in force when the first frame is drawn, and the record says so.

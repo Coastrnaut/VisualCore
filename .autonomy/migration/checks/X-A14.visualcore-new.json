@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "KeplerOrbit"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter KeplerOrbit",
+  "elapsed_seconds": 2.62,
+  "exit_code": 0,
+  "finished": "2026-11-15T23:53:06+00:00",
+  "gate": "X-A14",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-A14.visualcore-new.log",
+  "log_sha256": "fd7176554d8c2196e181c38cf63ce68e16d232c9ff4ec2141f924dba1a906828",
+  "name": "visualcore-new",
+  "started": "2026-11-15T23:53:04+00:00",
+  "timed_out": false
+}

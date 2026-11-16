@@ -1306,7 +1306,7 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     "TinyWorldsExperience",
                                     # Feature 096 (A13-P01): Light Maze, integrated at X-A13.
                                     "LightMazeExperience",
-                                    # Feature 103 (A14-P01): Solar System Explorer, a candidate until X-A14.
+                                    # Feature 103 (A14-P01): Solar System Explorer, integrated at X-A14.
                                     "SolarSystemExplorerExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):

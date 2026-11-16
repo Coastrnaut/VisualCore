@@ -1,0 +1,88 @@
+{
+  "branch": "main",
+  "dirty": true,
+  "dirty_paths": [
+    "docs/verification/a14.solar-system-explorer/summary-27.2.json",
+    "docs/verification/a14.solar-system-explorer/summary-26.5.json"
+  ],
+  "failed_attempts": [],
+  "gate": "X-A14",
+  "ledger": "migration",
+  "passing_checks": [
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --result-name xa14-host",
+      "exit_code": 0,
+      "finished": "2026-11-15T23:56:51+00:00",
+      "log": ".autonomy/logs/migration/X-A14.host.log",
+      "log_sha256": "ff10b30304e50e4d22cc2cc7a5b39d73be434690b0e55e2c7bc9d3e1c88dccc9",
+      "name": "host"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean",
+      "exit_code": 0,
+      "finished": "2026-11-15T23:54:18+00:00",
+      "log": ".autonomy/logs/migration/X-A14.reference-1.log",
+      "log_sha256": "a2e096e8e4f77d58b63b450a5feb280e8bf3986274c879b31abb758205c9a9a4",
+      "name": "reference-1"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26",
+      "exit_code": 0,
+      "finished": "2026-11-16T00:02:15+00:00",
+      "log": ".autonomy/logs/migration/X-A14.reference-2.log",
+      "log_sha256": "6867e2c9680a07d4f35abf66e4657d7dea2be9ff9669b2c982ef035d2ddf5983",
+      "name": "reference-2"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a14.solar-system-explorer --runtime 26",
+      "exit_code": 0,
+      "finished": "2026-11-15T23:59:25+00:00",
+      "log": ".autonomy/logs/migration/X-A14.sim26.log",
+      "log_sha256": "72cd77798de8cc918290a63ca8fa439460c1258e5369f3eca23cfb0fce0c6774",
+      "name": "sim26"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a14.solar-system-explorer --runtime 27",
+      "exit_code": 0,
+      "finished": "2026-11-15T23:58:36+00:00",
+      "log": ".autonomy/logs/migration/X-A14.sim27.log",
+      "log_sha256": "52319e62093fc05d36449f80605bc920f4086cc14b075d62d441a6e377eb96b8",
+      "name": "sim27"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-ui-ios27-v2",
+      "exit_code": 0,
+      "finished": "2026-11-16T00:01:44+00:00",
+      "log": ".autonomy/logs/migration/X-A14.ui-v2.log",
+      "log_sha256": "1056a6c9e9cc9ed139e5618250f0a04c0e2daa41c566699ce28a7deb72813e79",
+      "name": "ui-v2"
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "finished": "2026-11-15T23:52:59+00:00",
+      "log": ".autonomy/logs/migration/X-A14.visualcore-host.log",
+      "log_sha256": "096bba1ba4ca0528bcc55cfba165293520cc5b9e320ea97f6fa9902cdc45f3dc",
+      "name": "visualcore-host"
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore --filter KeplerOrbit",
+      "exit_code": 0,
+      "finished": "2026-11-15T23:53:06+00:00",
+      "log": ".autonomy/logs/migration/X-A14.visualcore-new.log",
+      "log_sha256": "fd7176554d8c2196e181c38cf63ce68e16d232c9ff4ec2141f924dba1a906828",
+      "name": "visualcore-new"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name xa14-rendering",
+      "exit_code": 0,
+      "finished": "2026-11-15T23:57:40+00:00",
+      "log": ".autonomy/logs/migration/X-A14.visualcore-rendering.log",
+      "log_sha256": "893215d5fc56d39bbfc9d4ab851cfa7f547642b145cb1d3bf15ec02bfae23e44",
+      "name": "visualcore-rendering"
+    }
+  ],
+  "revision": "f6e753cfd89b94daca6f70fc33b87b0a368d601c",
+  "revision_number": 1,
+  "sealed": "2026-11-16T00:02:21+00:00"
+}

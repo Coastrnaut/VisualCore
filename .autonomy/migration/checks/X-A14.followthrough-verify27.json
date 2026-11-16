@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a14.solar-system-explorer",
+    "--runtime",
+    "27"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a14.solar-system-explorer --runtime 27",
+  "elapsed_seconds": 0.155,
+  "exit_code": 0,
+  "finished": "2026-11-16T00:06:05+00:00",
+  "gate": "X-A14",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-A14.followthrough-verify27.log",
+  "log_sha256": "3e04f395f93d148ebe4a0f177ccdbc97fc62c523d709dce1c87ceb12af9af31a",
+  "name": "followthrough-verify27",
+  "started": "2026-11-16T00:06:05+00:00",
+  "timed_out": false
+}

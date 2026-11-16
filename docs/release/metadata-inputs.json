@@ -111,9 +111,17 @@
       "name": "Light Maze",
       "permissions": [],
       "tier": "free"
+    },
+    {
+      "category": "learn",
+      "code": "A14",
+      "id": "a14.solar-system-explorer",
+      "name": "Solar System Explorer",
+      "permissions": [],
+      "tier": "free"
     }
   ],
-  "ledger_sha256": "1fa5559a73ba7ec33bade3ea6f352562a5f1eeb0ba596154c2dfe0dc6eced39a",
+  "ledger_sha256": "e630249a220841f694e55141eee7daa9502656364b1b1e64509fb125ac9544c4",
   "privacy_answers": "unproven",
   "schema": 1
 }

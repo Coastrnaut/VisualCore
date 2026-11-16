@@ -1,6 +1,6 @@
 // SSESupport — feature 108 (A14-P06) T-A14-609 (FR-A14-630; clarification Q4): helpers of the interface tests of Solar
-// System Explorer (A14) inside the one app, modelled on `LMSupport`. A14 is a candidate until X-A14 (its registration
-// sits in `ExperienceRegistry.candidates`); every launch carries `-vcCandidates` (DebugLaunch: the candidates' catalog
+// System Explorer (A14) inside the one app, modelled on `LMSupport`. A14 was a candidate until X-A14 (integrated 2026-11-15);
+// every launch still carries `-vcCandidates` (DebugLaunch: the candidates' catalog
 // entries become available and are registered), starts with erased data (`-vcResetData`, so the state is fresh: the
 // Sun selected at 2000-01-01, the enhanced scale, paused at 1 day/s, no tour and no saved view), skips the welcome and
 // opens the experience directly with `-openExperience a14.solar-system-explorer`. The controls are found by the

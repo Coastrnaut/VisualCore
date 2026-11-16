@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "RealCatalogTests|RegistryReportTests|ShellModelTests|CatalogSearchTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter 'RealCatalogTests|RegistryReportTests|ShellModelTests|CatalogSearchTests'",
+  "elapsed_seconds": 5.257,
+  "exit_code": 0,
+  "finished": "2026-11-16T00:02:54+00:00",
+  "gate": "X-A14",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-A14.followthrough-catalog.log",
+  "log_sha256": "19f5533f9b6c1c2068550fcaad174792bcd72bd321a32b63fc27bb1066f2cad6",
+  "name": "followthrough-catalog",
+  "started": "2026-11-16T00:02:49+00:00",
+  "timed_out": false
+}
