@@ -1,0 +1,45 @@
+# Tasks: Simulation Lab — Phase 01 Algorithm specifications and CPU fixtures
+
+**Input**: [spec.md](spec.md), [plan.md](plan.md), [research.md](research.md), [data-model.md](data-model.md),
+[contracts/core.md](contracts/core.md), [quickstart.md](quickstart.md). Gate A16-P01 (legacy). Evidence:
+`python3 Tools/python/desktop_runbook.py run-check --stage A16-P01 --timeout 600 --name <check> -- <command>`. Commit
+after every task (no trailers); read every check's exit before ticking. iOS 27 only. No test may raise a system prompt.
+Precedent: `specs/110-me-p01-domain-parser/tasks.md`.
+
+## Phase 1: Setup
+
+- [ ] T-A16-101 Baseline: cite the A16-P00 evidence on an unchanged `Packages` tree (`.autonomy/checks/A16-P00.{app-build,no-change}.json`) instead of a rerun (owner ruling of 2026-11-14)
+
+## Phase 2: Foundational — the core (stories 2–4)
+
+- [ ] T-A16-102 [US4] Create `Packages/ExperiencesCreative/SimulationLab/Core/{SimulationSpec,ParameterCatalog,Seeding}.swift` per contracts/core.md and data-model.md (kinds, boundaries; "gridSize ∈ {16, 32, 64, 128, 256}"; parameter definitions over `VisualCoreParameters` `ParameterDefinition` with the ranges of the data model; Gray-Scott "Δt ≤ 1.5625", wave "C = cΔt ≤ 0.7071" with the refusal sentence of clarification 3; non-finite values refused; standard specs and presets; seeded starts over `SeededRandom`) with `CoreTests/SimulationSpecTests.swift` (round trip of schema 1; unknown version, kind, boundary and grid size refused; every range edge; the stability refusals at the limit and 1 % above; the same seed gives the same start; seeds 0 and UInt64.max) (FR-A16-110–112; SC-A16-104)
+- [ ] T-A16-103 [P] [US3] Create `Packages/ExperiencesCreative/SimulationLab/Core/{AutomatonRule,GrayScott,WaveField}.swift` per clarifications 1–3 over `FieldGrid` and `StoragePrecision` with `CoreTests/{AutomatonRuleTests,GrayScottTests,WaveFieldTests}.swift` (B/S notation parse and refusal; blinker period 2 and differs after 1; block still after 10; a glider wraps across an edge back to its shape after 4·gridSize steps; Gray-Scott one step equals hand-computed values on a 4 × 4 grid within one storage step, stays finite and in 0…1; wave pulse mirror-symmetric over 100 steps, zero on the border, discrete energy within 10⁻³ with γ = 0 in float32 and non-increasing with γ > 0) (FR-A16-101–103; SC-A16-101–103)
+- [ ] T-A16-104 [US2] Create `Packages/ExperiencesCreative/SimulationLab/Core/{SimulationScheduler,SimulationState}.swift` (speeds 0.25, 0.5, 1, 2, 4 × base 10 / 240 / 120 per second at a 1/60 s host step; "≤ 16 iterations per host step; remainder beyond the cap dropped"; run, pause, single step, reset; the state with spec, scheduler and field bits as base64, "≤ 1,048,576 bytes", refusals damaged, newer-version, out-of-range) with `CoreTests/{SchedulerTests,SimulationStateTests}.swift` (pause stops; one step while paused adds exactly one and equals one rule step; reset gives the seeded start and step 0; no host step runs more than 16; a long gap does not burst; state round trip byte for byte and each refusal) (FR-A16-120; SC-A16-104)
+
+## Phase 3: Story 1 — the experience
+
+- [ ] T-A16-105 [US1] Create the targets in `Packages/ExperiencesCreative/Package.swift` (`SimulationLabCore`, `SimulationLabCoreTests`, `SimulationLabExperience`, `SimulationLabExperienceTests`, product `SimulationLabExperience`) and `Packages/ExperiencesCreative/SimulationLab/Experience/{Adapter/SimulationCore.swift,SimulationPresenter.swift,SimulationPalette.swift,SimulationControls.swift,SimulationLabExperience.swift}` (actions `sim.family [0…2]`, `sim.preset [0…2]`, `sim.run`, `sim.pause`, `sim.step`, `sim.reset`, `sim.speed [0…4]`; refusals `a16.invalid-choice`, `a16.unstable`; `stepDuration` 1/60; a 64 × 64 CPU field colour-mapped per family and uploaded into a `RenderTarget` drawn by one `FieldPass` with `texelFetch`; resources made together, rebuilt after context recreation from the CPU field, released together; canvas description with family, rule or preset, grid size, running or paused and step count; Reduce Motion opens paused; controls Family, Preset, Run/Pause, Step, Reset, Speed with labels and values, identifiers `experience.a16.simulation-lab.<name>`) and tests `ExperienceTests/{SimulationCoreTests,SimulationSessionTests,SimulationRenderTests,SimulationTestSupport}.swift` (actions and refusals; every family draws a non-blank frame; changing the family changes the pixels and the description; drawing never changes the digest; context recreation draws the same frame) (FR-A16-130; SC-A16-105)
+- [ ] T-A16-106 [US1] Register: `Catalog/registrations.json` entry for a16 (summary, capabilities ≤ 40 characters each, quality_tiers ["level-0"], palette, manifest) and the fixture copy `Packages/VisualCore/Tests/VisualCoreExperienceTests/Fixtures/Catalog/registrations.json`, candidate in `Apps/VisualCore/App/ExperienceRegistry.swift`; update the host and script tests that list registrations (FR-A16-131)
+- [ ] T-A16-107 [US1] Write `Packages/ExperiencesCreative/SimulationLab/Experience/Adapter/SimulationManifest.swift` (nine standard scenarios + three fixtures, one per family, by actions) and generate `Packages/ExperiencesCreative/SimulationLab/scenario-manifest.json` (`UPDATE_SCENARIO_MANIFEST=1 TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`) with `ExperienceTests/SimulationManifestTests.swift` (derived digests equal the committed ones) (FR-A16-131)
+
+## Phase 4: Records and evidence
+
+- [ ] T-A16-108 Contract `docs/apps/simulation-lab/visualcore-contract.json`: G-RULES, G-SPEC and G-SCHEDULER closed by "A16-P01"; rows whose gaps are all closed become available (`--name contract -- python3 scripts/check_app_contract.py --app simulation-lab --render`)
+- [ ] T-A16-109 Simulation Lab tests on sim-27.2 (`--name sl-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing SimulationLabCoreTests SimulationLabExperienceTests`) and the documented-API check (`--name documented-api -- python3 scripts/check_documented_api.py --sources Packages/ExperiencesCreative/SimulationLab`) (SC-A16-101–105)
+- [ ] T-A16-110 App build and unit (`xcodegen generate --spec project.yml`; `--name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`) and runner (`--name verify-27 -- python3 scripts/verify_experiences.py --only a16.simulation-lab --runtime 27`) (SC-A16-105)
+- [ ] T-A16-111 Packages and script tests (`--name experience-packages -- python3 scripts/check_experience_packages.py`; `--name script-tests -- python3 scripts/test_scripts.py`)
+- [ ] T-A16-112 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A16-P01; update README.md in the record commit (rule 16) and `docs/automatedtesting.md` if a test tool, rule or lesson changed (rule 17)
+
+## Dependencies
+
+T-A16-101 → {102, 103}; 102 → 104; {103, 104} → 105 → 106 → 107 → 108 → 109 → 110 → 111 → 112.
+
+## Parallel examples
+
+Agent A: T-A16-102–104 (core and tests). Agent B, after A: T-A16-105 and the manifest source of 107 (experience). Lead:
+Package.swift, registration (106), manifest generation, contract, runs, commits.
+
+## Implementation strategy
+
+MVP: the rules (103) with the spec (102); the scheduler and state (104) and the experience (105–107) close the phase.
+Review checkpoints after 104 (core tests) and at 109.
