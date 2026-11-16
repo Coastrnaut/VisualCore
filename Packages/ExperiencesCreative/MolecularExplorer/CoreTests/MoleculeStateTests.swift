@@ -1,7 +1,9 @@
 // MoleculeStateTests — feature 110 (A15-P01) T-A15-105 (FR-A15-131; clarification Q5; data-model "MoleculeState"). The
 // saved Molecular Explorer state, host-free and short: the initial state selects water; `select(_:)` accepts only
 // 0…4; `next()` and `previous()` step through the five molecules and refuse a step past either end; the sorted-key JSON
-// round trip is exact; damaged, newer and out-of-range payloads are refused with their reason.
+// round trip is exact; damaged, newer and out-of-range payloads are refused with their reason. Updated for schema 2 by
+// feature 111 (A15-P02) T-A15-204 (FR-A15-221): the state now also writes the mode and camera, schema 1 is still read
+// (and migrated), and the newer schema is 3.
 import Foundation
 import Testing
 @testable import MolecularExplorerCore
@@ -10,7 +12,7 @@ import Testing
     @Test func theInitialStateSelectsWater() {
         let state = MoleculeState.initial
         #expect(state.selection == 0 && state.molecule?.id == "water")
-        #expect(MoleculeState.schemaVersion == 1 && MoleculeState.moleculeCount == 5)
+        #expect(MoleculeState.schemaVersion == 2 && MoleculeState.moleculeCount == 5)
         #expect(MoleculeState(selection: 42).selection == 4 && MoleculeState(selection: -3).selection == 0)
     }
 
@@ -51,7 +53,8 @@ import Testing
     @Test func theJSONRoundTripIsExactAndSorted() {
         let state = MoleculeState(selection: 3)
         let data = state.encoded()
-        #expect(String(decoding: data, as: UTF8.self) == #"{"schema":1,"selection":3}"#)
+        let expected = #"{"camera":{"tilt":2,"turn":2,"zoom":0},"mode":0,"schema":2,"selection":3}"#
+        #expect(String(decoding: data, as: UTF8.self) == expected)
         #expect(MoleculeState.decode(data) == .success(state))
         #expect(MoleculeState.decode(MoleculeState.initial.encoded()) == .success(MoleculeState.initial))
         let decoded = try? JSONDecoder().decode(MoleculeState.self, from: data)
@@ -75,7 +78,7 @@ import Testing
         for payload in damaged {
             #expect(MoleculeState.decode(Data(payload.utf8)) == .failure(.damaged), "\(payload)")
         }
-        let newer: [String] = [#"{"schema":2,"selection":3}"#, #"{"schema":9}"#]
+        let newer: [String] = [#"{"schema":3,"selection":3}"#, #"{"schema":9}"#]
         for payload in newer {
             #expect(MoleculeState.decode(Data(payload.utf8)) == .failure(.newerVersion), "\(payload)")
         }
