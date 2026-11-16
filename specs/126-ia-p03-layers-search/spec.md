@@ -76,7 +76,8 @@ in code:
 - Q: How is the view saved? → A: As one file `view.json` in the experience's storage, written atomically through
   `ExperienceStorage`. It holds a `DocumentEnvelope` of kind `a17.view` with the view state's schema 2 payload:
   - **Payload:** the schema 1 fields plus `isolate` (optional: kind `part` or `layer`, its id, the mode).
-  - **Migration:** a `MigrationChain` step 1 → 2 adds no isolate. The same chain serves the session snapshot.
+  - **Migration:** a `MigrationChain` step 1 → 2 adds no isolate. A file larger than 65,536 bytes is refused as
+  too large. The same chain serves the session snapshot.
   - **Unknown ids:** a selection, framing or isolate id that does not resolve is dropped, and the drop is reported in
     a list of reasons.
   - **When:** the presenter writes the file after each accepted action that changes the view. The experience opens
@@ -145,7 +146,7 @@ structure visible.
 2. **Given** isolate with the hide mode, **Then** only the isolated set is drawn.
 3. **Given** a selection outside the isolated set, **Then** the selection stays drawn solid.
 4. **Given** a ghosted structure under a tap, **Then** it is not picked; the solid structure behind it may be.
-5. **Given** "Show all", **Then** the isolate ends and the layers return to their toggles.
+5. **Given** "Show all", **Then** the isolate ends, the layers return to their toggles, and the selection is kept.
 
 ---
 
@@ -173,6 +174,8 @@ older saved view still opens.
 - **Search with diacritics or extra spaces** ("Ménisque", "  acl "): it matches after folding and trimming.
 - **Two structures sharing a word** ("collateral"): both are listed, the name match first and then by inventory order.
 - **A saved view that isolates a structure no longer present:** the isolate is dropped with a reason.
+- **The view file cannot be written** (storage full or refused): the session goes on unchanged, the failure is
+  counted, and the next view change writes again.
 
 ## Requirements *(mandatory)*
 
