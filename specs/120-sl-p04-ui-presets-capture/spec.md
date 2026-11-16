@@ -38,7 +38,7 @@ in code:
   location in points).
 - The host gives the controls `@Environment(\.experienceStillRenderer)` (`ExperienceSession.renderStill(width:height:)`
   on the host's own context), and `StillImageEncoder` and `TemporaryFolder` exist (Fractal Explorer's capture).
-- `NamedLibrary` with `MigrationChain` exists (Fractal Explorer's bookmarks).
+- `ExperienceStorage` (`write(_:to:)`, `list()`, quota 64 files) and `MigrationChain` exist (Fractal Explorer's bookmarks).
 - The scheduler's base rates are 10, 240 and 120 iterations per second, at speeds ×0.25 … ×4.
 - `SimulationLabExperience.make` ignores `reduceFlashing` today and opens paused under Reduce Motion.
 
@@ -77,7 +77,7 @@ in code:
   - The allowed licenses are `original` and `public-domain`. The six family presets are bundled: Life (Conway 1970),
     HighLife (Thompson 1994), Seeds (Silverman), Spots and Mazes (Pearson 1993 classification of Gray-Scott parameters)
     and Pulse (original). The parameter values are `public-domain` scientific facts, and Pulse is `original`.
-  - Saved presets are a `NamedLibrary` of `ExperimentPreset` in the experience storage's `presets` folder, capped at 24.
+  - Saved presets are one file per preset (`preset-<uuid>.json`) in the experience's `ExperienceStorage`, the Fractal Explorer bookmarks pattern, capped at 24. `NamedLibrary` is not used, because it writes to Application Support outside the experience's storage handle; this was corrected at plan.
     Saving at the cap is refused with "The library holds 24 experiments; delete one first."
   - Schema 1 is the first, so "migrate from the previous schema" is met by the `MigrationChain` at version 1: version
     1 passes unchanged, and newer (≥ 2) and damaged files are reported and skipped. A saved preset whose spec is now
@@ -238,8 +238,8 @@ A person captures the paused field as a picture and shares it through the system
 
 ## Assumptions
 
-- VisualCore types are reused with no change: the gesture recognizers and the canvas overlay of the host,
-  `NamedLibrary`, `DocumentStore`, `MigrationChain`, `StillCapture` and `ExportSize`. Fractal Explorer's bookmarks
+- VisualCore types are reused with no change: the pointer events and the canvas overlay of the host,
+  `ExperienceStorage`, `MigrationChain`, `TemporaryFolder`, `StillImageEncoder`, the host's still renderer. Fractal Explorer's bookmarks
   and capture are the precedent. A FieldGrid histogram in VisualCoreSimulation is assessed and recorded in the
   contract; the default is app-local, because there is one consumer.
 
