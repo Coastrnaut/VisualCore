@@ -112,7 +112,8 @@ the graphics-processor field with the reference.
 ### Functional Requirements
 
 - **FR-A16-501**: A validation report MUST be generated from short runs and committed, naming the runtime, and stating
-  per family the largest difference from the reference with the declared tolerance.
+  per family the largest difference from the reference with the declared tolerance. A committed report whose deterministic lines
+  differ from a fresh run MUST fail the test with "Regenerate the report with UPDATE_VALIDATION_REPORT=1."
 - **FR-A16-502**: At each stability limit a run MUST stay finite; one step beyond MUST be refused with its sentence.
 - **FR-A16-503**: The GPU steps per frame MUST never exceed 128; the presenter's targets MUST total at most 256 KiB
   and the registry MUST stay within its budget; steps per second MUST be measured in a short run and reported as a
