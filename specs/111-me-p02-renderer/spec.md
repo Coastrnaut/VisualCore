@@ -123,6 +123,8 @@ centres, and the built-in water and ethanol produce exactly their atom counts.
 - **Zooming far in:** the camera never enters the molecule's bounding sphere (the nearest zoom keeps it outside).
 - **Changing the molecule:** the camera returns to the framed default for the new molecule; the mode is kept.
 - **Context loss:** every mesh and renderer is rebuilt from the state; the drawing is the same.
+- **Reduce Motion:** camera steps, resets and molecule changes cut to the new view in one frame (there is no animated
+  camera move in this phase), so the setting changes nothing here.
 
 ## Requirements *(mandatory)*
 
