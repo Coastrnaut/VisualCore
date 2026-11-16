@@ -99,7 +99,9 @@ enum CatalogFixture {
                                // Feature 096 (A13-P01); integrated at X-A13.
                                "a13.light-maze",
                                // Feature 103 (A14-P01); integrated at X-A14.
-                               "a14.solar-system-explorer"],
+                               "a14.solar-system-explorer",
+                               // Feature 110 (A15-P01): registered as a candidate, not yet available.
+                               "a15.molecular-explorer"],
                 "the registrations of Catalog/registrations.json")
     }
 

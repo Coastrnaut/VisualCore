@@ -347,6 +347,29 @@
       "manifest": "Packages/ExperiencesCreative/SolarSystemExplorer/scenario-manifest.json",
       "permissions": [],
       "summary": "A solar system primer: the Sun and the eight planets on approximate orbits, with time controls, guided tours and fact cards whose numbers carry units and sources."
+    },
+    "a15.molecular-explorer": {
+      "capabilities": [
+        "five curated small molecules",
+        "atoms coloured by element",
+        "strict XYZ parser with limits",
+        "bonds inferred and marked",
+        "element data with sources",
+        "structures from PubChem"
+      ],
+      "quality_tiers": [
+        "level-0"
+      ],
+      "palette": [
+        "#0B0F1A",
+        "#909090",
+        "#FF0D0D",
+        "#3050F8"
+      ],
+      "content": null,
+      "manifest": "Packages/ExperiencesCreative/MolecularExplorer/scenario-manifest.json",
+      "permissions": [],
+      "summary": "A small-molecule viewer: curated molecules from public-domain records drawn atom by atom in element colours, with formulas, counts and sources."
     }
   }
 }

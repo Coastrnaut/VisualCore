@@ -512,7 +512,7 @@
       "id": "a15.molecular-explorer",
       "code": "A15",
       "title": "Molecular Explorer",
-      "summary": "An approachable 3D molecule viewer with clear atom/bond styling and constrained structured-data import.",
+      "summary": "A small-molecule viewer: curated molecules from public-domain records drawn atom by atom in element colours, with formulas, counts and sources.",
       "kind": "creative",
       "tier": "free",
       "category": "learn",
@@ -521,10 +521,24 @@
         "education-and-science"
       ],
       "order": 15,
-      "palette": [],
+      "palette": [
+        "#0B0F1A",
+        "#909090",
+        "#FF0D0D",
+        "#3050F8"
+      ],
       "tile_seed": 4166749141,
-      "capabilities": [],
-      "quality_tiers": [],
+      "capabilities": [
+        "five curated small molecules",
+        "atoms coloured by element",
+        "strict XYZ parser with limits",
+        "bonds inferred and marked",
+        "element data with sources",
+        "structures from PubChem"
+      ],
+      "quality_tiers": [
+        "level-0"
+      ],
       "content": null,
       "available": false
     },
