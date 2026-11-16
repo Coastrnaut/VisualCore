@@ -1310,7 +1310,7 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     "SolarSystemExplorerExperience",
                                     # Feature 110 (A15-P01): Molecular Explorer, integrated at X-A15.
                                     "MolecularExplorerExperience",
-                                    # Feature 117 (A16-P01): Simulation Lab, a candidate until X-A16.
+                                    # Feature 117 (A16-P01): Simulation Lab, integrated at X-A16.
                                     "SimulationLabExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):

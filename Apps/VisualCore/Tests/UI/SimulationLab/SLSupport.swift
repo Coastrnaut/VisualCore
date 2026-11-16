@@ -1,5 +1,5 @@
 // SLSupport — feature 122 (A16-P06) T-A16-608 (clarification Q4; FR-A16-630, FR-A16-622): helpers of the interface
-// tests of Simulation Lab (A16) inside the one app, modelled on `MESupport`. A16 is a candidate until X-A16; every
+// tests of Simulation Lab (A16) inside the one app, modelled on `MESupport`. A16 was a candidate until X-A16 (integrated 2026-11-16); every
 // launch carries `-vcCandidates` (DebugLaunch: the candidates' catalog entries become available and are registered).
 // A first start erases the data (`-vcResetData`, which also removes the experience's storage, so the library holds no
 // `preset-<uuid>.json` and no saved experiment is listed), skips the welcome and opens the experience directly with
