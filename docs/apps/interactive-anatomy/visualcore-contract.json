@@ -797,7 +797,7 @@
    "id": "M13",
    "capability": "Structure graph as a GPU-free model: structure ids, names, systems, layers, parents and neighbours, with a versioned schema, validation (unique ids, known layers, acyclic parents, symmetric neighbours) and host tests without the GPU",
    "source": "spec FR-A17-003 structure graph; constitution A17 testable without the GPU",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreMath/StableHash.swift",
@@ -822,7 +822,7 @@
     "file": "Packages/ExperiencesCreative/MolecularExplorer/Core/Molecule.swift",
     "symbol": "Molecule"
    },
-   "notes": "No structure-graph type exists in any framework product; it is anatomy content and stays in the experience's GPU-free Core (G-CONTENT, A17-P01)."
+   "notes": "No structure-graph type exists in any framework product; it is anatomy content and stays in the experience's GPU-free Core (G-CONTENT, A17-P01). Available from A17-P01: its gaps (G-CONTENT) are closed."
   },
   {
    "id": "M14",
@@ -1513,8 +1513,8 @@
    "owner": "app-local",
    "justification": "No anatomy type exists in any framework product. The knee's structure inventory (ids, Terminologia Anatomica names with English equivalents, synonyms, systems, layers, parents, neighbours), its versioned schema and validation are anatomy content in the experience's GPU-free Core (research D4, manual phase 01).",
    "phase": 1,
-   "test": "Core host tests (swift test, no GPU): the inventory decodes; ids unique; every layer known; parents acyclic; neighbours symmetric; every structure has a name, a system and a layer; refusals typed; the same input gives the same digest",
-   "closed": null
+   "test": "Core tests (InteractiveAnatomyCoreTests, no GPU, iOS 27 simulator): the bundled right knee decodes and validates; ids unique; every part has a known layer; parents acyclic under one root; neighbours resolve and are symmetric; every structure has names, a description and sources with allowed licenses; each of the twelve typed refusals is produced and names its item; the same region encodes to the same bytes (BundledRegionTests, ContentValidationTests, ContentCodecTests)",
+   "closed": "A17-P01"
   },
   {
    "id": "G-SCENE",
