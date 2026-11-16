@@ -1,0 +1,49 @@
+# Tasks: Interactive Anatomy — Phase 03 Layers, search and descriptions
+
+**Input**: [spec.md](spec.md), [plan.md](plan.md), [research.md](research.md), [data-model.md](data-model.md),
+[contracts/layers-search.md](contracts/layers-search.md), [quickstart.md](quickstart.md). Gate A17-P03 (legacy).
+Evidence: `python3 Tools/python/desktop_runbook.py run-check --stage A17-P03 --timeout 600 --name <check> -- <command>`.
+Commit after every task (no trailers); read every check's exit before ticking. iOS 27 only. No test may raise a system
+prompt. Precedent: `specs/125-ia-p02-scene-selection/tasks.md`.
+
+## Phase 1: Setup
+
+- [ ] T-A17-301 Baseline: cite the A17-P02 evidence (`.autonomy/checks/A17-P02.{ia-ios27-6,app-unit,verify-27-2}.json`) on the tree recorded at A17-P02, whose Packages are unchanged since (owner ruling of 2026-11-14)
+
+## Phase 2: Foundational — the VisualCore stage (story 3)
+
+- [ ] T-A17-302 [US3] In `Packages/VisualCoreRendering/Sources/VisualCoreRendering/DepthMeshPass.swift` add `Item.center` ("model space, default origin") and `draw(_ opaque:translucent:view:projection:fog:context:)` plus a camera overload: translucent items after the opaque ones, "sorted by view depth of model × center, farthest first; ties keep submission order", blend ONE, ONE_MINUS_SRC_ALPHA, depth test LESS on, depth write off, state restored; the existing overloads run today's code unchanged; `///` on every new symbol; with `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/DepthMeshPassTranslucentTests.swift` (with no translucent items the pixels equal the existing draw's bit for bit; a translucent item in front of an opaque one blends to the premultiplied mix within 1/255 per channel; behind it the opaque colour is unchanged; two translucent items give the same pixels in either submission order; resize and context recreation give the same pixels); the README row of `DepthMeshPass` in `Packages/VisualCoreRendering/README.md`; `python3 scripts/check_public_api.py --update` then `check_public_api.py` (FR-A17-306; SC-A17-303)
+
+## Phase 3: Core (stories 1–4)
+
+- [ ] T-A17-303 [P] [US1] Content version 2 of `Packages/ExperiencesCreative/InteractiveAnatomy/Core/Content/knee-right.json` (synonyms "Thigh bone" femur, "Shin bone" tibia, "Calf bone" fibula, "Kneecap" patella; `contentVersion` 2) and `Core/AnatomySearch.swift` over `CatalogSearch.fold` ("rank order exact name, name prefix, exact synonym, synonym prefix, description prefix (query ≥ 3 characters); then index; ≤ 14; each part once") with `CoreTests/SearchTests.swift` (every name and synonym of every part finds it first; case, accents and spaces ignored; empty query lists the 14 in order; no match gives none; "collateral" lists both collateral ligaments; deterministic) and the existing content tests updated (FR-A17-301; SC-A17-301)
+- [ ] T-A17-304 [P] [US2] `Core/AnatomyPanel.swift` (heading, standard name, layer words, description, citations "Title, edition, section (license)", review sentence; the empty text "Select a structure to read about it.") with `CoreTests/PanelTests.swift` (every part has at least one citation with edition and section; the review sentence always; nothing selected) and `CoreTests/SourcesDocumentTests.swift` generating the table between `<!-- BEGIN GENERATED -->` and `<!-- END GENERATED -->` in `docs/apps/interactive-anatomy/content-sources.md` (`UPDATE_DATA_SOURCES=1`; fails when the committed table differs) (FR-A17-303, 308; SC-A17-302)
+- [ ] T-A17-305 [US3] `Core/AnatomyIsolate.swift` and `Core/AnatomyViewState.swift` schema 2 ("1 → 2 adds no isolate; unknown ids dropped with reasons"; solid = target set ∪ selection; ghosts = other parts on shown layers in the ghost mode; isolate shows its set even when its layer is off) and `Core/AnatomyViewDocument.swift` (`DocumentEnvelope` kind `a17.view`, file `view.json`, "≤ 65,536 bytes; damaged or newer refused") with `CoreTests/{IsolateTests,ViewDocumentTests}.swift` and `ViewStateTests` updated (every target and mode: solid and ghost sets as the rule gives, the selection always solid; schema 1 migrates; round trip; damaged, newer, too large refused; unknown ids dropped with a reason) (FR-A17-304, 307; SC-A17-304, 305)
+
+## Phase 4: The experience (stories 1–4)
+
+- [ ] T-A17-306 [US3] Update `Packages/ExperiencesCreative/InteractiveAnatomy/Experience/{Adapter/AnatomyCore.swift,AnatomyPresenter.swift,AnatomyControls.swift}`: actions `isolate.part [0…13]`, `isolate.layer [0…2]`, `isolate.mode [0/1]`, `isolate.clear`; picking and selection limited to solid parts; the snapshot through the schema-2 migration chain; the presenter draws solid items and ghost items (layer material at alpha 0.25) through the two-list draw, falls back to hide on a throwing translucent draw and says "Ghosts are off."; writes `view.json` after each accepted view-changing action and opens from it when no snapshot is given (a failed write is counted and the session goes on); controls: search field and results (`search-field`, `search-result-<i>`), panel (`panel`), isolate controls (`isolate-part`, `isolate-layer-<l>`, `isolate-mode`, `show-all`) (FR-A17-302, 304, 305, 307)
+- [ ] T-A17-307 [US3] Write `Packages/ExperiencesCreative/InteractiveAnatomy/ExperienceTests/{AnatomyIsolateRenderTests,AnatomySearchSessionTests,AnatomyViewFileTests}.swift` and update the existing experience tests: ghosts change the frame and solid parts occlude them; hide mode draws only the solid set; a ghost is never picked; a failing translucent draw falls back to hide; choosing a search result equals a selection; the view file is written, reopened, migrated from schema 1, and damaged or newer files open the opening view; a refused write keeps the session running (SC-A17-303–305)
+- [ ] T-A17-308 [US3] Manifest: add fixtures for isolate (ghost and hide) in `Experience/Adapter/AnatomyManifest.swift`, regenerate `scenario-manifest.json` (`UPDATE_SCENARIO_MANIFEST=1 TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`) and update `AnatomyManifestTests` (FR-A17-304)
+
+## Phase 5: Records and evidence
+
+- [ ] T-A17-309 Contract `docs/apps/interactive-anatomy/visualcore-contract.json`: G-LAYERS, G-GHOST (VisualCoreRendering, additive stage), G-SEARCH, G-TEXT and G-VIEW closed by "A17-P03"; rows whose gaps are all closed become available (`--name contract -- python3 scripts/check_app_contract.py --app interactive-anatomy --render`)
+- [ ] T-A17-310 Tests on sim-27.2: VisualCoreRendering (`--name rendering-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --only-testing VisualCoreRenderingTests`), Interactive Anatomy (`--name ia-ios27 -- … --only-testing InteractiveAnatomyCoreTests InteractiveAnatomyExperienceTests`); public API (`--name public-api -- python3 scripts/check_public_api.py`); documented API for both source folders
+- [ ] T-A17-311 App build and unit, runner (`--name verify-27 -- python3 scripts/verify_experiences.py --only a17.interactive-anatomy --runtime 27`), packages, catalog check and script tests
+- [ ] T-A17-312 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A17-P03; update README.md (rule 16) and `docs/automatedtesting.md` (rule 17)
+
+## Dependencies
+
+T-A17-301 → 302 → {303, 304} (different files) → 305 → 306 → 307 → 308 → 309 → 310 → 311 → 312.
+
+## Parallel examples
+
+Agent V: T-A17-302 (VisualCore). Agent C: T-A17-303–305 (core; 303 and 304 in parallel). Agent E, after V and C: T-A17-306
+and the manifest source of 308. Agent T, with E: T-A17-307. Lead: Package.swift, API baseline, generated files,
+contract, runs, commits.
+
+## Implementation strategy
+
+MVP: search with the synonyms (303), the regression fixture. Then the panel (304), isolate and the view (305), and the
+experience (306–308). Review checkpoints after 302 (bit-identity) and at 310.
