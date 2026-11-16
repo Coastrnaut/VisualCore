@@ -1,0 +1,110 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/A17-P03.app-unit.json",
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A17-P03.app-unit.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A17-P03.catalog.json",
+      "command": "python3 scripts/build_catalog.py --check",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A17-P03.catalog.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A17-P03.contract.json",
+      "command": "python3 scripts/check_app_contract.py --app interactive-anatomy --render",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A17-P03.contract.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A17-P03.depth-pass.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --only-testing VisualCoreRenderingTests/DepthMeshPassTests VisualCoreRenderingTests/DepthMeshPassTranslucentTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A17-P03.depth-pass.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A17-P03.documented-api-2.json",
+      "command": "python3 scripts/check_documented_api.py --sources Packages/ExperiencesCreative/InteractiveAnatomy",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A17-P03.documented-api-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A17-P03.documented-api-rendering-2.json",
+      "command": "python3 scripts/check_documented_api.py --sources Packages/VisualCoreRendering/Sources/VisualCoreRendering",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A17-P03.documented-api-rendering-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A17-P03.documented-api-rendering.json",
+      "command": "python3 scripts/check_documented_api.py --sources Packages/VisualCoreRendering/Sources/VisualCoreRendering",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A17-P03.documented-api-rendering.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A17-P03.documented-api.json",
+      "command": "python3 scripts/check_documented_api.py --sources Packages/ExperiencesCreative/InteractiveAnatomy",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A17-P03.documented-api.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A17-P03.experience-packages.json",
+      "command": "python3 scripts/check_experience_packages.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A17-P03.experience-packages.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A17-P03.ia-core.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing InteractiveAnatomyCoreTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A17-P03.ia-core.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A17-P03.ia-ios27-2.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing InteractiveAnatomyCoreTests InteractiveAnatomyExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A17-P03.ia-ios27-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A17-P03.ia-ios27-3.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing InteractiveAnatomyCoreTests InteractiveAnatomyExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A17-P03.ia-ios27-3.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A17-P03.public-api-2.json",
+      "command": "python3 scripts/check_public_api.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A17-P03.public-api-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A17-P03.public-api.json",
+      "command": "python3 scripts/check_public_api.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A17-P03.public-api.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A17-P03.rendering-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --only-testing VisualCoreRenderingTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A17-P03.rendering-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A17-P03.script-tests.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A17-P03.script-tests.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A17-P03.verify-27.json",
+      "command": "python3 scripts/verify_experiences.py --only a17.interactive-anatomy --runtime 27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A17-P03.verify-27.log"
+    }
+  ],
+  "generated": "2026-11-16T23:35:34+00:00",
+  "method": "deterministic-run-check",
+  "stage": "A17-P03",
+  "status": "pass"
+}

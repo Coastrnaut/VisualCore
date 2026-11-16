@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-16 (A17-P02: probe rays for picking tests, a snapshot envelope refuses non-JSON; A17-P01: a core before its experience passes the package check; A17-P00: an audit corrects the clarification; A16-P06: interface chunk x2, a scan that allows a named format; A16-P05: a generated validation report; mirrors reload after an edit; A16-P04: no mutating call inside #expect; A16-P03: round to half in the shader, test the mirror while it runs; A16-P02: GPU parity against both half roundings; A16-P01: fixture count from the catalog).
+Last updated: 2026-11-16 (A17-P03: an edited snapshot fails the host's digest check, test storages removed by an observer; A17-P02: probe rays for picking tests, a snapshot envelope refuses non-JSON; A17-P01: a core before its experience passes the package check; A17-P00: an audit corrects the clarification; A16-P06: interface chunk x2, a scan that allows a named format; A16-P05: a generated validation report; mirrors reload after an edit; A16-P04: no mutating call inside #expect; A16-P03: round to half in the shader, test the mirror while it runs; A16-P02: GPU parity against both half roundings; A16-P01: fixture count from the catalog).
 
 ## 1. What is tested, and where
 
@@ -235,6 +235,14 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
 - **A snapshot envelope refuses a non-JSON payload by itself.** `ExperienceSnapshot(...)` throws for a payload that is
   not one JSON object, so a restore test for damaged payloads builds the envelope with `try?`. It tests the core's
   own `restore(payload:seed:)` for every case.
+- **The host refuses an edited snapshot as a whole.** A session restore checks that the restored state's digest equals
+  the one the snapshot recorded. A test that edits a snapshot payload, for example to an unknown id, therefore sees the
+  snapshot refused and the opening state, not a partial restore. Test the dropping of unknown ids on the core's own
+  `restore(payload:seed:)` and on experience files that carry no digest (A17-P03, the view file).
+- **Remove test storages with an observer.** XCTest has no public "current test" for teardown blocks from a static
+  helper. A17-P03's `AnatomyTemporaryRoot` keeps every default storage under one folder, which an
+  `XCTestObservation` removes in `testBundleDidFinish`. It clears the folder first, in case an earlier run was
+  interrupted.
 
 ## 6. Keeping this file current
 

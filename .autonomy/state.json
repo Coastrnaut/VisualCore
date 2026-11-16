@@ -1419,8 +1419,14 @@
       "status": "pass"
     },
     "A17-P03": {
-      "attempts": [],
-      "status": "pending"
+      "attempts": [
+        {
+          "at": "2026-11-16T23:35:34+00:00",
+          "evidence": ".autonomy/evidence/A17-P03.json",
+          "result": "pass"
+        }
+      ],
+      "status": "pass"
     },
     "A17-P04": {
       "attempts": [],
@@ -2071,5 +2077,5 @@
       "status": "pending"
     }
   },
-  "updated": "2026-11-16T23:05:44+00:00"
+  "updated": "2026-11-16T23:35:34+00:00"
 }
