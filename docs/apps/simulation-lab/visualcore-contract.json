@@ -1470,10 +1470,10 @@
       ],
       "kind": "adaptation",
       "owner": "app-local",
-      "justification": "PingPongTarget, FieldPass and texelFetch-exact sampling exist; the automaton step and display shaders on RGBA8 (unorm8, exact states) with wrap by index arithmetic, the GPU-versus-CPU parity, the pass-isolation audit and the rebuild of the field from CPU state after context loss or resize are specific to this experience (manual phase 02, A16-P02).",
+      "justification": "PingPongTarget, FieldPass and texelFetch-exact sampling exist; the automaton step and display shaders on RGBA8 (unorm8, exact states) with wrap by index arithmetic, the GPU-versus-CPU parity, the pass-isolation audit and the rebuild of the field from CPU state after context loss or resize are specific to this experience (manual phase 02, A16-P02). Built at A16-P02: Experience/AutomatonGPU.swift (RGBA8 PingPongTarget, one FieldPass step with the birth and survival rules as int masks, wrap by texelFetch index modulo) and SimulationShaders.swift; SimulationPresenter steps it in lockstep with the CPU model (loaded from the CPU field on setup, recreation, resize and any non-step change, stepped by the engine's iteration delta otherwise) and draws the automaton from the GPU field.",
       "phase": 2,
-      "test": "Rendering tests on the iOS 27.2 simulator: on a tiny grid N GPU steps read back with readFloatPixels equal the CPU reference exactly; the blinker period is 2 on the GPU; a glider wraps; FieldPass.runObserver shows no pass sampling its output over whole frames; after recreateContext and a resize the field is rebuilt from CPU state and matches the reference",
-      "closed": null
+      "test": "Experience tests on the iOS 27.2 simulator: AutomatonParityTests (0 differing cells after 1, 2, 10 and 100 GPU steps for Life, HighLife and Seeds; blinker period 2; glider back after 4N steps), GPURebuildTests (equal after recreateContext and a resize; refusals leave the field; reset, preset, family and restore reload; an invalid step shader fails the session at setup) and PassIsolationTests (no pass reads its output over 10 frames; steps alternate two targets)",
+      "closed": "A16-P02"
     },
     {
       "id": "G-RDWAVE-GPU",
@@ -1486,7 +1486,7 @@
       ],
       "kind": "adaptation",
       "owner": "app-local",
-      "justification": "FloatRenderSupport, PingPongTarget and FieldPass exist; the Gray-Scott and wave step and display shaders on RGBA16F, the use of FloatRenderSupport.detect per context generation with the rule that both families are disabled with a message when it reports no support (no silent RGBA8 run), the fixed-zero wave boundary and wrap for reaction-diffusion are specific to this experience (spec clarification 5, manual phase 03, A16-P03).",
+      "justification": "FloatRenderSupport, PingPongTarget and FieldPass exist; the Gray-Scott and wave step and display shaders on RGBA16F, the use of FloatRenderSupport.detect per context generation with the rule that both families are disabled with a message when it reports no support (no silent RGBA8 run), the fixed-zero wave boundary and wrap for reaction-diffusion are specific to this experience (spec clarification 5, manual phase 03, A16-P03). A16-P02 added the phase's regression fixture: Experience/GrayScottGPU.swift (RGBA16F pair, highp five-point step, wrap by index) agrees with the CPU reference on a 16 x 16 grid after 10 steps (max difference 0.0032 against float16 and 0.0 against float16TowardZero, tolerance 0.01; GrayScottToleranceTests); the experience's reaction-diffusion and wave still draw the CPU field until A16-P03.",
       "phase": 3,
       "test": "Rendering tests on the iOS 27.2 simulator: on a tiny grid GPU steps match the CPU reference within the declared tolerance under both float16 rounding modes; a forced-unsupported FloatRenderSupport disables reaction-diffusion and waves with the message and allocates no RGBA8 field; the wave field stays zero on the boundary; the pass-isolation audit passes; rebuild after recreateContext and resize matches the reference",
       "closed": null
