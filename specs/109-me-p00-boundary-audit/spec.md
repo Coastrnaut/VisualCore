@@ -155,7 +155,8 @@ will own each missing piece and in which phase.
   the check's owner is named.
 - **The build-step count changes during the phase**: the inventory records the count at the time of the check.
 - **The reference regression fails before any change**: recorded as a blocker; no Molecular Explorer work starts.
-- **Persisted data, permissions, accessibility interface:** not applicable in this phase (no interface is added).
+- **Persisted data, permissions, accessibility interface:** none is added in this phase (no interface); the import's
+  permission posture for later phases is decided in clarification 4 (document picker, no permission).
 
 ## Requirements *(mandatory)*
 

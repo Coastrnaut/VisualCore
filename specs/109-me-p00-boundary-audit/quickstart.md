@@ -8,6 +8,7 @@ python3 scripts/release_check.py --only app-build-for-testing-ios27
 python3 scripts/check_experience_packages.py
 git diff --stat fc60a33d..HEAD -- Packages External
 python3 scripts/test_scripts.py
+python3 scripts/release_check.py --only docs app-contracts compliance dependencies
 ```
 
-Expected: contract PASS; 7 of 7 reference steps; the app builds; 14 experiences, none A15; empty diff; script tests OK.
+Expected: contract PASS; 7 of 7 reference steps; the app builds; 14 experiences, none A15; empty diff; script tests and document steps OK.

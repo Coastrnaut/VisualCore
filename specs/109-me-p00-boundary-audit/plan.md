@@ -12,7 +12,8 @@ prove the one app builds with the experience absent. No source change anywhere. 
 
 **Language**: JSON and Markdown documents; Python 3 checkers (existing). **Dependencies**: none new. **Storage**: none.
 **Testing**: `scripts/check_app_contract.py --app molecular-explorer`; the reference regression in two chunks; the
-app's build-for-testing on the iOS 27.2 phone simulator; `scripts/check_experience_packages.py`; script tests.
+app's build-for-testing on the iOS 27.2 phone simulator; `scripts/check_experience_packages.py`; script tests; the release-check document steps (`docs`, `app-contracts`,
+`compliance`, `dependencies`).
 **Performance**: checker under 10 s; each regression chunk and the build under 10 minutes. **Constraints**: empty diff
 of `Packages` and `External` since `fc60a33d` (the specify commit); no registration; no NEEDS CLARIFICATION remains.
 
