@@ -16,3 +16,12 @@
 - **D6 The candidate stand-in** (registration). `AppModelTests` used `a17.interactive-anatomy` as a synthetic
   candidate through `-vcCandidates`. Once A17 is a real candidate, the stand-in moves to the next unbuilt experience,
   `a18.*`, from the catalog.
+- **D7 As built** (converge 2026-11-16). The implementation adds five things beyond the earlier decisions:
+  - **Five fixtures, not three:** the content-counts audit requires the planning catalog's count, so
+    `fixture-bones-only` and `fixture-acl-zoomed` join the three fixtures the tasks named.
+  - **Outcome codes:** `selected-<part id with dots as hyphens>` while a part is selected, otherwise `viewing-knee`.
+  - **Preparation failures:** `a17.scene-refused` for an unbuildable scene and `a17.content-refused` for refused
+    content, each with the refusal's sentence.
+  - **Background probe:** the presenter declares one at (0.5, 0.04), used only when that ray hits no visible part.
+  - **Finger tracking:** the presenter tracks fingers, so a second finger cancels the tap the arbiter would still
+    report.
