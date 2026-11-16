@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-16 (A15-P06: CI cache key, settings-free proof, interface chunk w2; A15-P05: imports as actions).
+Last updated: 2026-11-16 (A16-P00: contract view markers; A15-P06: CI cache key, settings-free proof, chunk w2).
 
 ## 1. What is tested, and where
 
@@ -167,6 +167,10 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   chunk drives the library, display mode, atom, recent list and labels only (A15-P06).
 - **CI cache keys are computed before the build.** The cache action's post step re-evaluates `hashFiles`; over
   `Packages/**` after a build it exceeded 120 s on a slow runner, so the key now comes from an earlier step (A15-P06).
+- **Create the contract view before rendering it.** `check_app_contract.py --render` fills the block between
+  `<!-- BEGIN GENERATED -->` and `<!-- END GENERATED -->` of an existing `visualcore-contract.md` and fails without
+  them; write the introduction and the two markers first, and link the view from the README only after it exists
+  (the docs check refuses broken links) (A16-P00).
 
 ### Process
 
