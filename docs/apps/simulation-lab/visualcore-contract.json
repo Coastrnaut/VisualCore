@@ -348,7 +348,7 @@
       "id": "M04",
       "capability": "Data visualization: a histogram of the current field's values over fixed bins, or a legend that shows and speaks the colour ramp's value range, updated at a bounded rate without stalling the frame",
       "source": "brainstorm: data visualization; v0.1 feature 3 (histogram/legend overlay)",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
@@ -385,7 +385,7 @@
         "file": "Packages/ExperiencesCreative/MolecularExplorer/Experience/MoleculeControls.swift",
         "symbol": "MoleculeControls"
       },
-      "notes": "Tested in VisualCoreRenderingTests (FloatTransferTests read back RGBA16F and RGBA8 targets as floats), VisualCoreSimulationTests (FieldGridTests) and VisualCoreExperienceHostTests (CanvasOverlayTests). No field histogram, GPU reduction pass or legend view exists in a framework product: FrameChecks.histogram (VisualCoreExperience) is a luma check compiled only under DEBUG or VISUALCORE_AUTOMATION, ImageComparison's histogram is test support and PacingMeter's bins are frame intervals. A read-back of the capped field into a FieldGrid with CPU binning at a bounded rate, or the CPU mirror, is enough for version 0.1: G-LEGEND (app-local, A16-P04), which assesses a FieldGrid histogram for VisualCoreSimulation and a reduction pass for VisualCoreRendering."
+      "notes": "Tested in VisualCoreRenderingTests (FloatTransferTests read back RGBA16F and RGBA8 targets as floats), VisualCoreSimulationTests (FieldGridTests) and VisualCoreExperienceHostTests (CanvasOverlayTests). No field histogram, GPU reduction pass or legend view exists in a framework product: FrameChecks.histogram (VisualCoreExperience) is a luma check compiled only under DEBUG or VISUALCORE_AUTOMATION, ImageComparison's histogram is test support and PacingMeter's bins are frame intervals. A read-back of the capped field into a FieldGrid with CPU binning at a bounded rate, or the CPU mirror, is enough for version 0.1: G-LEGEND (app-local, A16-P04), which assesses a FieldGrid histogram for VisualCoreSimulation and a reduction pass for VisualCoreRendering. Available from A16-P04: its gaps (G-LEGEND) are closed."
     },
     {
       "id": "M05",
@@ -556,7 +556,7 @@
       "id": "M08",
       "capability": "Pause, reset, step, speed and histogram/legend overlay: pause stops stepping, a single step advances exactly one discrete iteration, reset restores the seeded start, speed sets steps per frame within a cap, all as GPU-free control rules with spoken state and native controls over the canvas",
       "source": "v0.1 feature 3: pause, reset, step, speed and histogram/legend overlay; manual §11 fixture 4",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreSimulation/PlaybackState.swift",
@@ -593,7 +593,7 @@
         "file": "Packages/ExperiencesCreative/FluidArtPlayground/Core/SimulationControl.swift",
         "symbol": "SimulationControl"
       },
-      "notes": "Tested in VisualCoreSimulationTests (PlaybackStateTests, FixedStepRunnerTests, FixedStepClockTests, AccessibilityPlansTests) and VisualCoreExperienceHostTests (CanvasOverlayTests). Fluid Art Playground's SimulationControl is experience code and is not reused. The scheduler (exactly one iteration per step, capped steps per frame, reset to the seed) is G-SCHEDULER (A16-P01); the controls are G-UI and the overlay G-LEGEND (A16-P04)."
+      "notes": "Tested in VisualCoreSimulationTests (PlaybackStateTests, FixedStepRunnerTests, FixedStepClockTests, AccessibilityPlansTests) and VisualCoreExperienceHostTests (CanvasOverlayTests). Fluid Art Playground's SimulationControl is experience code and is not reused. The scheduler (exactly one iteration per step, capped steps per frame, reset to the seed) is G-SCHEDULER (A16-P01); the controls are G-UI and the overlay G-LEGEND (A16-P04). Available from A16-P04: its gaps (G-SCHEDULER, G-UI, G-LEGEND) are closed."
     },
     {
       "id": "M09",
@@ -697,7 +697,7 @@
       "id": "M11",
       "capability": "Save presets and capture stills: named experiment presets (spec, palette, annotation) saved in the experience's storage with a versioned schema and migration, bundled presets with author and license, and stills captured from the current field and shared through the system sheet",
       "source": "v0.1 feature 6: save presets and capture stills; manual §6 ExperimentPreset",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
@@ -740,7 +740,7 @@
         "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/GenerativeArtControls.swift",
         "symbol": "ExportedImage"
       },
-      "notes": "Tested in VisualCorePersistenceTests (DocumentStoreTests, NamedLibraryTests), VisualCoreParametersTests, VisualCoreExperienceTests (ExperienceStorageTests) and VisualCoreRenderingTests (StillCaptureTests). The preset schema and library are G-PRESETS and the capture flow G-CAPTURE (app-local, A16-P04)."
+      "notes": "Tested in VisualCorePersistenceTests (DocumentStoreTests, NamedLibraryTests), VisualCoreParametersTests, VisualCoreExperienceTests (ExperienceStorageTests) and VisualCoreRenderingTests (StillCaptureTests). The preset schema and library are G-PRESETS and the capture flow G-CAPTURE (app-local, A16-P04). Available from A16-P04: its gaps (G-PRESETS, G-CAPTURE) are closed."
     },
     {
       "id": "M12",
@@ -1329,7 +1329,7 @@
       "id": "M25",
       "capability": "Seeding and painting by touch with a control alternative: a tap seeds a pattern and a drag paints cells or concentration at grid coordinates mapped from the canvas, with a button or menu alternative for every gesture",
       "source": "manual §2 journey 1 (tap to seed); spec FR-A16-003 (seeding and painting by touch with a control alternative)",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreScenes/PointerTracker.swift",
@@ -1372,7 +1372,7 @@
         "file": "Packages/ExperiencesCreative/FluidArtPlayground/Core/Splat.swift",
         "symbol": "Splat"
       },
-      "notes": "Tested in VisualCoreScenesTests (GestureTests, GestureArbiterTests, PointerTrackerTests), VisualCoreRenderingTests (TouchAdapterTests) and VisualCoreExperienceTests (GestureAlternativesTests). Mapping touches to cells, the seed and paint commands applied to the CPU state and the GPU field, and their control alternatives are G-UI (A16-P04); the commands' domain rules come with G-SPEC (A16-P01)."
+      "notes": "Tested in VisualCoreScenesTests (GestureTests, GestureArbiterTests, PointerTrackerTests), VisualCoreRenderingTests (TouchAdapterTests) and VisualCoreExperienceTests (GestureAlternativesTests). Mapping touches to cells, the seed and paint commands applied to the CPU state and the GPU field, and their control alternatives are G-UI (A16-P04); the commands' domain rules come with G-SPEC (A16-P01). Available from A16-P04: its gaps (G-UI) are closed."
     },
     {
       "id": "M26",
@@ -1499,10 +1499,10 @@
       ],
       "kind": "adaptation",
       "owner": "app-local",
-      "justification": "ParameterPanel, the gesture recognizers, GestureAlternatives, the canvas overlay and the accessibility planners exist; the gallery of experiments, the inspector with effective values and ranges, the pause, reset, step and speed controls, touch seeding and painting mapped to cells with control alternatives, the visible approximation labels, the spoken state and the Reduce Motion and Reduce Flashing step-rate rule are experience UI (manual §3, phase 04, A16-P04).",
+      "justification": "ParameterPanel, the gesture recognizers, GestureAlternatives, the canvas overlay and the accessibility planners exist; the gallery of experiments, the inspector with effective values and ranges, the pause, reset, step and speed controls, touch seeding and painting mapped to cells with control alternatives, the visible approximation labels, the spoken state and the Reduce Motion and Reduce Flashing step-rate rule are experience UI (manual §3, phase 04, A16-P04). Built at A16-P04: sim.paint (a tap toggles or seeds the family's brush, a drag paints each entered cell; the Seed row is the control alternative), the Inspector with every parameter's value, unit and range and the time-step limit, the approximation label per family, the spoken state in the canvas description, and the speed caps (x1 under Reduce Motion, the automaton x0.25 under Reduce Flashing, refused with a16.reduced-motion and its sentence).",
       "phase": 4,
-      "test": "Experience tests and one UI pass on the iOS 27.x phone: every control acts and is spoken (running, paused, step count, parameter values); a tap seeds and a drag paints the expected cells, and the control alternative gives the same command; Reduce Motion and Reduce Flashing lower or pause the step rate; the approximation label is visible in every experiment",
-      "closed": null
+      "test": "Experience tests on the iOS 27.2 simulator: PaintTests (tap, drag and Seed row paint the same cells; outside nothing), StepExactTests (a paused step equals one CPU iteration in every family), InspectorWordsTests (labels, inspector rows, spoken state), MotionCapTests (caps, refusal, lowering on family change and activation); the UI pass on the iOS 27.x phone waits for the device campaign",
+      "closed": "A16-P04"
     },
     {
       "id": "G-LEGEND",
@@ -1512,10 +1512,10 @@
       ],
       "kind": "adaptation",
       "owner": "app-local",
-      "justification": "No field histogram, reduction pass or legend view exists in a framework product (FrameChecks.histogram is a DEBUG/automation luma check). Version 0.1 needs a histogram of a capped field over fixed bins at a bounded update rate and a legend that shows and speaks the ramp's value range; the CPU mirror or a readFloatPixels read-back into a FieldGrid is enough (manual phase 04, A16-P04). A16-P04 assesses a FieldGrid histogram for VisualCoreSimulation and a GPU reduction pass for VisualCoreRendering (both generic) and records the outcome here; either would be an additive VisualCore change with tests, docs, the API baseline and the reference regression.",
+      "justification": "No field histogram, reduction pass or legend view exists in a framework product (FrameChecks.histogram is a DEBUG/automation luma check). Version 0.1 needs a histogram of a capped field over fixed bins at a bounded update rate and a legend that shows and speaks the ramp's value range; the CPU mirror or a readFloatPixels read-back into a FieldGrid is enough (manual phase 04, A16-P04). A16-P04 assesses a FieldGrid histogram for VisualCoreSimulation and a GPU reduction pass for VisualCoreRendering (both generic) and records the outcome here; either would be an additive VisualCore change with tests, docs, the API baseline and the reference regression. Built at A16-P04: SimulationHistogram (Core; 16 bins over the family's display range, finite values clamped into the end bins, non-finite cells counted apart), gated in the presenter to at most once every 15 frames while running and at the next frame after a non-step change, drawn as 16 bars under the legend and spoken as the fullest bin in the description. Assessment (research D2 of specs/120-sl-p04-ui-presets-capture): app-local, because there is one consumer; a VisualCoreSimulation FieldGrid histogram or a GPU reduction pass is not added.",
       "phase": 4,
-      "test": "Core host tests: the histogram of a known grid has the expected counts, sums to the cell count and ignores no value silently (non-finite cells are counted apart); the legend's values match the ramp bounds of each experiment and are spoken; Experience tests: the overlay updates at most at its stated rate and never on every step",
-      "closed": null
+      "test": "Core host tests SimulationHistogramTests (counts, sums, clamping, NaN apart) and the experience test HistogramGateTests (at most 4 updates in 60 running frames, a paused paint at the next frame, sums of 4,096); the legend's values and words in LegendTests (A16-P03)",
+      "closed": "A16-P04"
     },
     {
       "id": "G-PRESETS",
@@ -1525,10 +1525,10 @@
       ],
       "kind": "adaptation",
       "owner": "app-local",
-      "justification": "DocumentStore, MigrationChain, NamedLibrary, Preset and ExperienceStorage exist; the ExperimentPreset schema (spec, palette id, annotation), the bundled presets with author or source and license, and the saved-preset library with its cap are experience data (manual §6 ExperimentPreset, phase 04, A16-P04).",
+      "justification": "DocumentStore, MigrationChain, NamedLibrary, Preset and ExperienceStorage exist; the ExperimentPreset schema (spec, palette id, annotation), the bundled presets with author or source and license, and the saved-preset library with its cap are experience data (manual §6 ExperimentPreset, phase 04, A16-P04). Built at A16-P04: ExperimentPreset schema 1 (name, spec, palette, annotation, source, license from {original, public-domain}), six bundled presets with their sources, and SimulationPresetStore (one file per preset in ExperienceStorage, cap 24; damaged, newer and refused files reported and skipped; NamedLibrary is not used because it writes outside the experience's storage handle); a saved preset opens through sim.spec.",
       "phase": 4,
-      "test": "Core host tests: presets round-trip, migrate from the previous schema and refuse damaged or newer files without a crash; every bundled preset decodes into a valid spec and carries author or source and license from the allowed set; the library keeps at most its cap",
-      "closed": null
+      "test": "Core host tests ExperimentPresetTests (round trip, damaged, newer, invalid, bundled valid with an allowed license) and experience tests PresetStoreTests (reload, cap, damaged and newer skipped, delete) and PaintTests (sim.spec gives each bundled spec)",
+      "closed": "A16-P04"
     },
     {
       "id": "G-CAPTURE",
@@ -1537,10 +1537,10 @@
       ],
       "kind": "adaptation",
       "owner": "app-local",
-      "justification": "StillCapture, renderOffscreen and ExportSize exist and ShareLink is a system API; the capture of the current field at an allowed size with its metadata (experiment, step index, parameters, approximation label) and the hand-off to the share sheet without a usage string are experience flow (spec clarification 4, manual phase 04, A16-P04).",
+      "justification": "StillCapture, renderOffscreen and ExportSize exist and ShareLink is a system API; the capture of the current field at an allowed size with its metadata (experiment, step index, parameters, approximation label) and the hand-off to the share sheet without a usage string are experience flow (spec clarification 4, manual phase 04, A16-P04). Built at A16-P04: SimulationCapture renders through the host's still renderer (ExperienceSession.renderStill, no second context) at 1024 x 1024, encodes a PNG with StillImageEncoder into TemporaryFolder a16-captures (one file, replaced, emptied when the experience opens) and offers it through a ShareLink; a running simulation is paused around the capture and resumed; a failure leaves no file and shows the message; no usage string.",
       "phase": 4,
-      "test": "Experience tests on the iOS 27.2 simulator: a capture of a paused field writes one PNG of the chosen size into the temporary folder and replaces the previous one; a failed capture reports the message and leaves no file; capturing never changes the field or the step count; no usage string is added",
-      "closed": null
+      "test": "Experience tests CaptureFileTests and CaptureTests on the iOS 27.2 simulator (one 1024 x 1024 PNG after two captures, field and step unchanged, a failure leaves none)",
+      "closed": "A16-P04"
     },
     {
       "id": "G-VALIDATION",
