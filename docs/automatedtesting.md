@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-15 (A14-P06: controls rebuilt every frame by closures; the menu never settled).
+Last updated: 2026-11-15 (A15-P01: contract products, runner scenario count; A14-P06: controls rebuilt every frame).
 
 ## 1. What is tested, and where
 
@@ -138,6 +138,12 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   mirror, presenter), as Light Maze's do; `SolarControlsIdentityTests` guards this for A14 (A14-P06). To find such a
   loop, add `let _ = Self._printChanges()` to the view bodies temporarily and read the app's console
   (`xcrun simctl launch --console-pty`).
+- **Contract evidence names library products, not modules.** `check_app_contract.py` accepts only products declared
+  in a `Package.swift` (`MolecularExplorerExperience`), so citing an experience's core file with its module name
+  (`MolecularExplorerCore`) fails with "unknown product" (A15-P01).
+- **The runner plays the nine standard scenarios only.** `verify_experiences.py` reports nine PASS lines per runtime;
+  the fixtures of a scenario manifest are proven by the experience's manifest tests. Evidence counts what the log
+  shows (A15-P01).
 
 ### Process
 
