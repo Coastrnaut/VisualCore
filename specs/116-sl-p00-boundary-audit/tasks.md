@@ -8,7 +8,7 @@ Precedent: `specs/109-me-p00-boundary-audit/tasks.md`.
 
 ## Phase 1: Setup
 
-- [ ] T-A16-001 Create `docs/apps/simulation-lab/README.md` (what the experience is per the manual §1–§2: a gallery of inspectable simulations with parameter panels and explicit numerical and educational limitations; that it is an experience of the one app; its documents) and `docs/apps/simulation-lab/regression-baseline.md` with the phase start `1006181f` (the specify commit; constitution `f2d45f77`) and the reference pin `d93edd1`
+- [X] T-A16-001 Create `docs/apps/simulation-lab/README.md` (what the experience is per the manual §1–§2: a gallery of inspectable simulations with parameter panels and explicit numerical and educational limitations; that it is an experience of the one app; its documents) and `docs/apps/simulation-lab/regression-baseline.md` with the phase start `1006181f` (the specify commit; constitution `f2d45f77`) and the reference pin `d93edd1` — Verified 2026-11-16: 2026-11-16: docs/apps/simulation-lab/README.md and regression-baseline.md (phase start 1006181f, constitution f2d45f77, pin d93edd1) written
 
 ## Phase 3: User Story 1 — Evidence-backed integration matrix (P1) 🎯
 
