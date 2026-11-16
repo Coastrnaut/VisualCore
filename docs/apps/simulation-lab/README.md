@@ -16,5 +16,5 @@ with; simulations are labelled as educational approximations. Its rules are the 
 
 | Document | Content |
 |---|---|
-| `visualcore-contract.json` / `.md` (written in T-A16-002 and T-A16-003) | Phase 00 inventory, capability matrix, gaps, decision (checked by `scripts/check_app_contract.py`) |
+| [visualcore-contract.json](visualcore-contract.json) / [.md](visualcore-contract.md) | Phase 00 inventory, capability matrix, gaps, decision (checked by `scripts/check_app_contract.py`) |
 | [regression-baseline.md](regression-baseline.md) | Phase start, reference pin, the ProjectM reference regression results |
