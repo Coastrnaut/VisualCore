@@ -13,3 +13,9 @@
   does not expose, so the experience follows Simulation Lab's preset store: an envelope in one named file.
 - **D5 Isolate overrides the toggles** (Q3). The learner asked to see that set, so it is shown even when its layer is
   off. "Show all" returns to the toggles.
+- **D6 `view.apply`** (converge 2026-11-16). The presenter opens the stored view through the action `view.apply`, so
+  that state still changes only by actions and replays stay deterministic (constitution IV). The action takes 11
+  values: turn, tilt and zoom; the three layer switches; the selection and framing indices (−1 for none); and the
+  isolate kind, index and mode. It replaces the whole view after every value is validated, and anything out of range
+  is refused with `a17.invalid-choice`. The presenter sends it once, on the first frame, when the core is at the
+  opening view and `view.json` holds another view. A restored snapshot therefore wins over the file.
