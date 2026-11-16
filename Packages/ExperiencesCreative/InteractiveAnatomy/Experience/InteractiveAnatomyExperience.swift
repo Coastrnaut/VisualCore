@@ -3,7 +3,8 @@
 // parameter list as Molecular Explorer's and Simulation Lab's, so the registry entry mirrors them). The view state
 // travels in the host's saved session state and, since feature 126 (A17-P03) T-A17-306 (FR-A17-307), in `view.json`
 // in `storage` (the presenter writes it after each view change and opens from it). Framing and Reset view cut to the
-// new view in one frame, so Reduce Motion changes nothing, and nothing flashes.
+// new view in one frame, so Reduce Motion changes nothing, and nothing flashes. Feature 127 (A17-P04) T-A17-405
+// (FR-A17-406): the presenter keeps `reduceMotion` (every camera change still cuts in one frame in either mode).
 import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreUI
@@ -21,11 +22,12 @@ public enum InteractiveAnatomyExperience {
         make(id: id, storage: storage, reduceMotion: reduceMotion)
     }
 
-    /// The experience's shell with its presenter exposed (tests); the presenter gets `storage` and the shell's port.
+    /// The experience's shell with its presenter exposed (tests); the presenter gets `storage`, `reduceMotion` and the
+    /// shell's port.
     @MainActor
     static func make(id: ExperienceID, storage: ExperienceStorage? = nil,
                      reduceMotion: Bool = false) -> ExperienceShell<AnatomyPresenter> {
-        let presenter = AnatomyPresenter(experienceID: id, storage: storage)
+        let presenter = AnatomyPresenter(experienceID: id, storage: storage, reduceMotion: reduceMotion)
         let shell = ExperienceShell(id: id, presenter: presenter)
         presenter.port = shell.port
         return shell

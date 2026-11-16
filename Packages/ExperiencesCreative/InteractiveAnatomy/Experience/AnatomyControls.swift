@@ -21,6 +21,10 @@
 //     `isolate.mode [1 / 0]`) and Show all (`show-all` → `isolate.clear`).
 // Every control has an accessible label and value (and a hint) and the identifier
 // `experience.a17.interactive-anatomy.<name>` from the port; hit areas are at least 44 points high and text wraps.
+// Feature 127 (A17-P04) T-A17-405 (FR-A17-404; clarification Q3): every structure row and search result reads
+// "<sign> <English name>" with the layer's colour-independent sign (`AnatomyLayerSign`: bones "●", cartilage and
+// menisci "◆", ligaments and tendons "▲") and is spoken "<English name>, <layer words>" (``rowText(name:layer:)``,
+// ``rowLabel(name:layer:)``).
 // The view holds references only (the port, the mirror and the presenter), as Molecular Explorer's controls do, so the
 // rebuilt view compares equal; actions go through the presenter.
 import InteractiveAnatomyCore
@@ -46,6 +50,16 @@ struct AnatomyControls: View {
     /// The identifier name of the toggle of `layer`: `layer-bones`, `layer-cartilage`, `layer-ligaments`.
     static func layerName(_ layer: AnatomyLayer) -> String {
         "layer-" + layer.rawValue
+    }
+
+    /// The text of a list row or search result: "<sign> <English name>" (feature 127).
+    static func rowText(name: String, layer: AnatomyLayer) -> String {
+        "\(AnatomyLayerSign.of(layer).sign) \(name)"
+    }
+
+    /// The spoken label of a list row or search result: "<English name>, <layer words>" (feature 127).
+    static func rowLabel(name: String, layer: AnatomyLayer) -> String {
+        "\(name), \(AnatomyLayerSign.of(layer).words)"
     }
 
     /// The camera in words: "Turned 30°, tilted 10°, zoom step 0".
@@ -133,7 +147,8 @@ struct AnatomyControls: View {
             send("structure.select", [Double(index)])
         } label: {
             HStack {
-                Text(verbatim: part.name).font(.body).fixedSize(horizontal: false, vertical: true)
+                Text(verbatim: Self.rowText(name: part.name, layer: part.layer)).font(.body)
+                    .fixedSize(horizontal: false, vertical: true)
                 Spacer(minLength: 8)
                 if !layerShown || selected {
                     Text(verbatim: value).font(.footnote)
@@ -143,7 +158,7 @@ struct AnatomyControls: View {
         }
         .buttonStyle(.bordered)
         .disabled(!layerShown)
-        .accessibilityLabel(Text(verbatim: part.name))
+        .accessibilityLabel(Text(verbatim: Self.rowLabel(name: part.name, layer: part.layer)))
         .accessibilityValue(Text(verbatim: value))
         .accessibilityHint(Text(verbatim: layerShown ? "Selects this structure, on the \(layerWords) layer"
                                     : "Hidden with the \(layerWords) layer"))
@@ -168,19 +183,22 @@ struct AnatomyControls: View {
 
     /// The result row of `result` (sends `structure.select [index]`).
     private func searchResultRow(_ result: AnatomySearch.Result) -> some View {
-        let name = mirror.parts.indices.contains(result.index) ? mirror.parts[result.index].name : result.matched
+        let known = mirror.parts.indices.contains(result.index)
+        let name = known ? mirror.parts[result.index].name : result.matched
+        let text = known ? Self.rowText(name: name, layer: mirror.parts[result.index].layer) : name
+        let label = known ? Self.rowLabel(name: name, layer: mirror.parts[result.index].layer) : name
         let solid = mirror.solid.contains(result.index)
         return Button {
             send("structure.select", [Double(result.index)])
         } label: {
-            Text(verbatim: name)
+            Text(verbatim: text)
                 .font(.body)
                 .fixedSize(horizontal: false, vertical: true)
                 .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
         }
         .buttonStyle(.bordered)
         .disabled(!solid)
-        .accessibilityLabel(Text(verbatim: name))
+        .accessibilityLabel(Text(verbatim: label))
         .accessibilityValue(Text(verbatim: solid ? (mirror.selected == result.index ? "Selected" : "Not selected")
                                      : "Hidden"))
         .accessibilityHint(Text(verbatim: result.matched))

@@ -562,6 +562,7 @@ let package = Package(
                     path: "InteractiveAnatomy/CoreTests"),
         .target(name: "InteractiveAnatomyExperience",
                 dependencies: ["InteractiveAnatomyCore",
+                               .product(name: "VisualCoreSimulation", package: visualCore),
                                .product(name: "VisualCoreMath", package: visualCore),
                                .product(name: "VisualCoreDiagnostics", package: visualCore),
                                .product(name: "VisualCoreScenes", package: visualCore),

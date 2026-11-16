@@ -15,7 +15,8 @@
 //   - Pointer: one tap declaration (`pick`, `.tap`, one finger) over VisualCore's `GestureArbiter`; a recognized tap
 //     becomes a normalised device point and is picked with the camera and aspect of the LAST DRAWN frame
 //     (the `AnatomyPicker` rule over the solid parts), so what is tapped is what was seen: a hit sends
-//     `structure.select [i]`, a miss `structure.clear`. Drags and any touch with a second finger send nothing.
+//     `structure.select [i]`, a miss `structure.clear`. Drags and any touch with a second finger never tap (since
+//     feature 127 they turn, tilt and zoom; see below).
 //   - Probe: the backdrop at (0.5, 0.04) from the top, expected dark, when the line of sight there meets no drawn
 //     part (solid or ghost).
 //   - Words: the canvas description of `AnatomyCore.describe()`; the mirror holds what the controls show.
@@ -34,14 +35,33 @@
 //     opening view and `view.json` decodes to another view, the presenter sends `view.apply`
 //     (`AnatomyCore.viewApplyValues(_:parts:)`) through the shell's port once; a damaged, newer or unreadable file is
 //     ignored and counted in `viewReadRefusals`. Teardown forgets both, so a re-entry opens from the file again.
+// Feature 127 (A17-P04) T-A17-405 (FR-A17-401, FR-A17-402, FR-A17-404–406; clarifications Q1–Q3;
+// contracts/accessibility-pack.md):
+//   - Gestures: `pointer(_:viewSize:port:)` feeds ``AnatomyGestures`` (drag turns and tilts, pinch zooms, a tap picks)
+//     in place of the A17-P02 tap-only tracking; every step goes through ``send(_:_:through:)``, so a step refused at
+//     a limit (`a17.camera-limit`) shows and speaks "The camera is at its limit.", as a refused button does. A drag and
+//     a two-finger touch never tap.
+//   - Labels: after each drawn frame `lastLabels` is `AnchoredLabelLayout.place` of `AnatomyLabels.candidates` (the
+//     solid parts; ghosted and hidden parts get none) through the frame's camera and aspect, on the canvas in points
+//     (the overlay's reported size, else the pixels over ``displayScale``), at most the level's `maxLabels` (16). The
+//     host draws them through ``makeCanvasOverlay(_:)`` (``AnatomyOverlay``, hit testing off).
+//   - Announcements: a selection change seen by `sync` is submitted to an `AnnouncementPlanner(minimumInterval: 0.5)`
+//     ("<English name> selected." or "Selection cleared."; the first state seen announces nothing), timed by the
+//     host's frame clock (the sum of the drawn frames' `delta`, so a test's frames of 1/60 s are deterministic); every
+//     drawn frame flushes the planner, so the last change is always announced. Posts are kept in `announced` and go to
+//     ``announcementSink`` (by default a VoiceOver announcement, only while VoiceOver is running).
+//   - Reduce Motion: kept from the factory; nothing animates in any mode (framing, Reset view and every camera step cut
+//     in one frame), so ``cameraTransitionSeconds`` is `transitionDuration(0, reduceMotion:)`, always 0.
 import Foundation
 import InteractiveAnatomyCore
 import SwiftUI
+import UIKit
 import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreMath
 import VisualCoreRendering
 import VisualCoreScenes
+import VisualCoreSimulation
 
 /// The error of the test seam `AnatomyPresenter.failNextTranslucentDraw`.
 struct AnatomyGhostFailure: Error {}
@@ -52,6 +72,22 @@ struct AnatomyPartRow: Equatable, Sendable {
     let name: String
     /// The layer.
     let layer: AnatomyLayer
+}
+
+/// One label drawn over the canvas: a part's English name in its placed box (canvas points, origin top-left).
+struct AnatomyCanvasLabel: Equatable, Sendable {
+    /// The part's inventory index.
+    let index: Int
+    /// The English name.
+    let text: String
+    /// The box's left edge.
+    let minX: Double
+    /// The box's top edge.
+    let minY: Double
+    /// The box's width.
+    let width: Double
+    /// The box's height.
+    let height: Double
 }
 
 /// What the controls show, updated only when a field changes.
@@ -82,6 +118,12 @@ final class AnatomyMirror {
     var query = ""
     /// The answer to the last refused control action; empty when it was accepted.
     var message = ""
+    /// The labels of the last drawn frame, in canvas points (feature 127).
+    var labels: [AnatomyCanvasLabel] = []
+    /// The canvas size in points the labels were laid out in (feature 127).
+    var canvasSize = Vec2(0, 0)
+    /// The overlay's own size in points, as it reported it; nil before it reports (feature 127).
+    var overlaySize: Vec2?
 }
 
 /// Draws Interactive Anatomy and owns its presentation state (renderers and the depth pass; see the file header).
@@ -103,8 +145,14 @@ public final class AnatomyPresenter: ExperiencePresenter {
     nonisolated static let ghostsOffSentence = "Ghosts are off."
     /// The ambient light fraction of every renderer.
     nonisolated static let ambient = 0.3
-    /// The one canvas gesture: a single-finger tap that picks.
-    nonisolated static let declarations = [GestureDeclaration(id: "pick", kind: .tap, priority: 1, pointers: 1)]
+    /// The answer and announcement of a camera step refused at a limit (feature 127).
+    nonisolated static let cameraLimitSentence = "The camera is at its limit."
+    /// The announcement of a cleared selection (feature 127).
+    nonisolated static let selectionClearedSentence = "Selection cleared."
+    /// The shortest time between two announcements, seconds (feature 127).
+    nonisolated static let announcementInterval = 0.5
+    /// The length of a camera transition before Reduce Motion: none, every camera change cuts (feature 127).
+    nonisolated static let cameraTransition = 0.0
 
     /// The experience this presenter draws.
     let experienceID: ExperienceID
@@ -156,20 +204,52 @@ public final class AnatomyPresenter: ExperiencePresenter {
     private(set) var lastCanvas: Vec2?
     /// The core of the last frame or description; nil before the first.
     private(set) var lastCore: AnatomyCore?
-    /// The tap arbiter.
-    private var arbiter = GestureArbiter(AnatomyPresenter.declarations)
-    /// The fingers down now.
-    private var fingers: Set<Int> = []
-    /// Whether a second finger landed since the first went down (the touch then sends nothing).
-    private var multiTouch = false
+    /// The canvas gestures: drag, pinch and tap (feature 127).
+    private(set) var gestures = AnatomyGestures()
+    /// Whether Reduce Motion was on when the experience was made; nothing animates either way (feature 127).
+    let reduceMotion: Bool
+    /// The points-per-pixel factor used for the label canvas before the overlay reports its size (feature 127).
+    let displayScale: Double
+    /// The labels placed for the last drawn frame, in placing order (feature 127).
+    private(set) var lastLabels: [AnchoredLabelLayout.Placement] = []
+    /// The canvas size in points the last labels were laid out in; nil before the first frame (feature 127).
+    private(set) var lastLabelCanvas: Vec2?
+    /// The rate limit of the announcements (feature 127).
+    private(set) var planner = AnnouncementPlanner(minimumInterval: AnatomyPresenter.announcementInterval)
+    /// The host's frame clock, seconds: the sum of the drawn frames' `delta` (feature 127).
+    private(set) var clock = 0.0
+    /// The selection last seen by the announcements: nil before the first state, `.some(nil)` with none (feature 127).
+    private var announcedSelection: Int??
+    /// Where posted announcements go: by default a VoiceOver announcement, only while VoiceOver runs (feature 127).
+    var announcementSink: @MainActor (String) -> Void = AnatomyPresenter.voiceOverAnnouncement
+    /// Every announcement posted to the sink, oldest first (feature 127).
+    private(set) var announced: [String] = []
 
     /// The number of renderers made now.
     var rendererCount: Int { renderers.count }
 
-    /// A presenter for the experience `experienceID` storing its view file in `storage` (none when nil).
-    init(experienceID: ExperienceID, storage: ExperienceStorage? = nil) {
+    /// The length of every camera change: `transitionDuration(0, reduceMotion:)`, 0 in every mode (feature 127).
+    var cameraTransitionSeconds: Double {
+        transitionDuration(Self.cameraTransition, reduceMotion: reduceMotion)
+    }
+
+    /// A presenter for the experience `experienceID` storing its view file in `storage` (none when nil);
+    /// `reduceMotion` is the factory's setting (nothing animates either way); `displayScale` turns pixels into points
+    /// for the labels until the overlay reports its size (nil: the current trait collection's, else 2).
+    init(experienceID: ExperienceID, storage: ExperienceStorage? = nil, reduceMotion: Bool = false,
+         displayScale: Double? = nil) {
         self.experienceID = experienceID
         self.storage = storage
+        self.reduceMotion = reduceMotion
+        let traitScale = Double(UITraitCollection.current.displayScale)
+        let scale = displayScale ?? (traitScale > 0 ? traitScale : 2)
+        self.displayScale = scale.isFinite && scale > 0 ? scale : 2
+    }
+
+    /// The production announcement sink: posts `text` as a VoiceOver announcement only while VoiceOver is running.
+    static func voiceOverAnnouncement(_ text: String) {
+        guard UIAccessibility.isVoiceOverRunning else { return }
+        UIAccessibility.post(notification: .announcement, argument: text)
     }
 
     // MARK: Render scene
@@ -188,6 +268,8 @@ public final class AnatomyPresenter: ExperiencePresenter {
 
     /// Draws the visible items with depth through the core's camera at the pixel aspect.
     public func draw(_ core: AnatomyCore, tier: Int, context: RenderContext, frame: FrameInfo) throws {
+        if frame.delta.isFinite, frame.delta > 0 { clock += frame.delta }
+        defer { flushAnnouncements() }
         sync(core)
         var core = core
         if openViewFileIfNeeded(core), let opened = lastCore { core = opened }
@@ -246,6 +328,84 @@ public final class AnatomyPresenter: ExperiencePresenter {
         lastDrawnMeshIDs = solidIDs + ghostIDs
         lastTier = core.tier
         lastCanvas = Vec2(width, height)
+        placeLabels(core, camera: camera, aspect: aspect, pixels: Vec2(width, height))
+    }
+
+    // MARK: Labels
+
+    /// The labels of `core` seen through `camera` with `aspect` on a canvas of `canvas` points: the solid parts'
+    /// candidates (`AnatomyLabels.candidates`, the selection first) placed by `AnchoredLabelLayout`, at most the
+    /// level's label budget.
+    nonisolated static func labelPlacements(_ core: AnatomyCore, camera: OrbitCamera, aspect: Double,
+                                            canvas: Vec2) -> [AnchoredLabelLayout.Placement] {
+        let candidates = AnatomyLabels.candidates(scene: core.scene, solid: core.solidIndices,
+                                                  selected: core.selectedIndex)
+        return AnchoredLabelLayout.place(candidates, camera: camera, aspect: aspect, canvas: canvas,
+                                         budget: core.scene.quality.maxLabels)
+    }
+
+    /// Places the labels of the frame just drawn on the canvas in points (the overlay's reported size, else `pixels`
+    /// over ``displayScale``) and shows them in the mirror.
+    private func placeLabels(_ core: AnatomyCore, camera: OrbitCamera, aspect: Double, pixels: Vec2) {
+        let canvas: Vec2
+        if let reported = mirror.overlaySize, reported.x > 0, reported.y > 0, reported.isFinite {
+            canvas = reported
+        } else {
+            canvas = Vec2(pixels.x / displayScale, pixels.y / displayScale)
+        }
+        let placed = Self.labelPlacements(core, camera: camera, aspect: aspect, canvas: canvas)
+        lastLabels = placed
+        lastLabelCanvas = canvas
+        let parts = core.scene.parts
+        let labels = placed.compactMap { placement -> AnatomyCanvasLabel? in
+            guard parts.indices.contains(placement.id) else { return nil }
+            return AnatomyCanvasLabel(index: placement.id, text: parts[placement.id].englishName,
+                                      minX: placement.minX, minY: placement.minY,
+                                      width: placement.maxX - placement.minX, height: placement.maxY - placement.minY)
+        }
+        if mirror.labels != labels { mirror.labels = labels }
+        if mirror.canvasSize != canvas { mirror.canvasSize = canvas }
+    }
+
+    /// The labels over the canvas (``AnatomyOverlay``); the host draws it with hit testing off.
+    public func makeCanvasOverlay(_ port: ExperienceActionPort) -> AnyView? {
+        AnyView(AnatomyOverlay(mirror: mirror))
+    }
+
+    // MARK: Announcements
+
+    /// The announcement of selecting the part named `name`: "<name> selected.".
+    nonisolated static func selectedSentence(_ name: String) -> String {
+        "\(name) selected."
+    }
+
+    /// Submits `text` to the planner at the frame clock and posts it when the planner lets it through.
+    func announce(_ text: String, kind: AnnouncementKind = .state) {
+        guard !text.isEmpty else { return }
+        if let posted = planner.submit(Announcement(text: text, kind: kind, time: clock)) { post(posted.text) }
+    }
+
+    /// Records `text` and hands it to the sink.
+    private func post(_ text: String) {
+        announced.append(text)
+        announcementSink(text)
+    }
+
+    /// Posts the held announcement once the planner's interval has passed on the frame clock.
+    private func flushAnnouncements() {
+        if let posted = planner.flush(now: clock) { post(posted.text) }
+    }
+
+    /// Announces a change of the selection since the state last seen; the first state announces nothing.
+    private func noteSelection(_ core: AnatomyCore) {
+        let selected = core.selectedIndex
+        defer { announcedSelection = .some(selected) }
+        guard let previous = announcedSelection, previous != selected else { return }
+        if let selected, core.scene.parts.indices.contains(selected) {
+            announce(Self.selectedSentence(core.scene.parts[selected].englishName))
+        } else {
+            announce(Self.selectionClearedSentence)
+        }
     }
 
     /// Releases every GPU object.
@@ -259,6 +419,10 @@ public final class AnatomyPresenter: ExperiencePresenter {
         openedViewFile = false
         lastSeenView = nil
         cancelPointers()
+        // A new session announces from its own first state; nothing held is spoken later (feature 127).
+        planner = AnnouncementPlanner(minimumInterval: Self.announcementInterval)
+        announcedSelection = nil
+        lastLabels = []
     }
 
     /// Releases the renderers and the depth pass, together.
@@ -348,6 +512,7 @@ public final class AnatomyPresenter: ExperiencePresenter {
         if mirror.panel != panel { mirror.panel = panel }
         if mirror.ghostsOff != ghostsOff { mirror.ghostsOff = ghostsOff }
         noteView(core.view)
+        noteSelection(core)
     }
 
     // MARK: View file
@@ -427,12 +592,13 @@ public final class AnatomyPresenter: ExperiencePresenter {
     /// file).
     public var nativeActions: Set<String> { Set(AnatomyCore.actionIDs) }
 
-    /// The actions a canvas tap sends.
-    public var gestureActions: Set<String> { ["structure.select", "structure.clear"] }
+    /// The actions the canvas gestures send (drag, pinch and tap; ``AnatomyGestures``).
+    public var gestureActions: Set<String> { AnatomyGestures.gestureActions }
 
     /// The answer to a refused `control` in words; empty when accepted.
     nonisolated static func answerWords(control: String, result: ActionResult) -> String {
         guard !result.isAccepted else { return "" }
+        if result == .rejected(.rule(code: AnatomyRule.cameraLimit)) { return cameraLimitSentence }
         if result == .rejected(.rule(code: AnatomyRule.hiddenStructure)) {
             return "That structure is on a hidden layer."
         }
@@ -449,39 +615,32 @@ public final class AnatomyPresenter: ExperiencePresenter {
         }
     }
 
-    /// Sends `control` with `values` through `port` and shows the answer in the mirror (empty when accepted).
+    /// Sends `control` with `values` through `port` and shows the answer in the mirror (empty when accepted); a camera
+    /// step refused at a limit is also announced ("The camera is at its limit.", rate-limited; feature 127).
     @discardableResult
     func send(_ control: String, _ values: [Double] = [], through port: ExperienceActionPort) -> ActionResult {
         let result = port.send(control, values)
-        mirror.message = Self.answerWords(control: control, result: result)
+        let words = Self.answerWords(control: control, result: result)
+        if mirror.message != words { mirror.message = words }
+        if result == .rejected(.rule(code: AnatomyRule.cameraLimit)) { announce(words, kind: .rejection) }
         return result
     }
 
     // MARK: Pointer and picking
 
-    /// Forgets every touch in progress (suspension and teardown).
+    /// Forgets every touch in progress (suspension and teardown); sends nothing.
     public func cancelPointers() {
-        _ = arbiter.cancelAll()
-        fingers = []
-        multiTouch = false
+        gestures.reset()
     }
 
-    /// A canvas touch: a single-finger tap picks (``tap(atNDC:through:)``); drags and multi-touch send nothing.
+    /// A canvas touch through ``AnatomyGestures``: a drag turns and tilts, a pinch zooms (each step through
+    /// ``send(_:_:through:)``, which answers a refused step), and a single-finger tap picks
+    /// (``tap(atNDC:through:)``).
     public func pointer(_ event: PointerEvent, viewSize: Vec2, port: ExperienceActionPort) {
-        if event.phase == .began {
-            fingers.insert(event.id)
-            if fingers.count > 1 { multiTouch = true }
-        }
+        var current = gestures
         var taps: [Vec2] = []
-        for outcome in arbiter.handle(event) where outcome.gesture == "pick" && outcome.phase == .recognized {
-            if outcome.values.count >= 2 { taps.append(Vec2(outcome.values[0], outcome.values[1])) }
-        }
-        let single = !multiTouch
-        if event.phase == .ended || event.phase == .cancelled {
-            fingers.remove(event.id)
-            if fingers.isEmpty { multiTouch = false }
-        }
-        guard single else { return }
+        current.handle(event, send: { self.send($0, $1, through: port) }, tap: { taps.append($0) })
+        gestures = current
         for point in taps {
             guard let ndc = Self.ndc(of: point, viewSize: viewSize) else { continue }
             tap(atNDC: ndc, through: port)
