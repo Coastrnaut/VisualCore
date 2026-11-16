@@ -30,14 +30,24 @@ extension SimulationCore {
          "1708928e068d2ff7e5a1ca5f01fc2855c8f020c591b9757f0273a08f572e8313"),
         ("fixture-wave", 2, fixtureEntries(family: 2, steps: 30),
          "3d1ba160d4195e0e1ba69fcd0e482ec410e309759d1f139f739afc0957dc7c67"),
+        // Two preset fixtures (the planning catalog asks for five fixtures; T-A16-111): HighLife and Mazes.
+        ("fixture-automaton-highlife", 0, fixtureEntries(family: 0, preset: 1, steps: 120),
+         "e9aa5e02d7cd1cbf1a32369f516c531d49437a10567227de54f9a4336fb1f62f"),
+        ("fixture-reaction-mazes", 1, fixtureEntries(family: 1, preset: 1, steps: 30),
+         "4ce4811c1e5f1d438c7052b2f9b785b0c02a9a0055af467ce148bac463b68f53"),
     ]
 
-    /// The entries of a family fixture: the family chosen by `sim.family [family]`, `steps` host steps, `sim.pause`,
-    /// then one `sim.step`.
-    public static func fixtureEntries(family: Int, steps: Int) -> [ScenarioStep] {
-        [ScenarioStep(steps: 0, action: ScriptedAction("sim.family", [Double(family)]), result: "accepted"),
-         ScenarioStep(steps: steps, action: ScriptedAction("sim.pause"), result: "accepted"),
-         ScenarioStep(steps: 0, action: ScriptedAction("sim.step"), result: "accepted")]
+    /// The entries of a family fixture: the family chosen by `sim.family [family]`, then `sim.preset [preset]` when a
+    /// preset is given, `steps` host steps, `sim.pause`, then one `sim.step`.
+    public static func fixtureEntries(family: Int, preset: Int? = nil, steps: Int) -> [ScenarioStep] {
+        var entries = [ScenarioStep(steps: 0, action: ScriptedAction("sim.family", [Double(family)]), result: "accepted")]
+        if let preset {
+            entries.append(ScenarioStep(steps: 0, action: ScriptedAction("sim.preset", [Double(preset)]),
+                                        result: "accepted"))
+        }
+        entries.append(ScenarioStep(steps: steps, action: ScriptedAction("sim.pause"), result: "accepted"))
+        entries.append(ScenarioStep(steps: 0, action: ScriptedAction("sim.step"), result: "accepted"))
+        return entries
     }
 
     /// The outcome code of the family at `family` (0…2): `simulating-<family>`.

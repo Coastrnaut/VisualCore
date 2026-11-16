@@ -502,6 +502,108 @@
       },
       "name" : "fixture-wave",
       "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sim.family",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "sim.preset",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "sim.pause",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 120
+        },
+        {
+          "action" : {
+            "control" : "sim.step",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e9aa5e02d7cd1cbf1a32369f516c531d49437a10567227de54f9a4336fb1f62f",
+        "initialDigest" : "88bae8b287c953a063558aa6a7feebd9860a49c53ac84f037f8be475f26dfa09",
+        "outcome" : "simulating-automaton"
+      },
+      "name" : "fixture-automaton-highlife",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sim.family",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "sim.preset",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "sim.pause",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 30
+        },
+        {
+          "action" : {
+            "control" : "sim.step",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "4ce4811c1e5f1d438c7052b2f9b785b0c02a9a0055af467ce148bac463b68f53",
+        "initialDigest" : "88bae8b287c953a063558aa6a7feebd9860a49c53ac84f037f8be475f26dfa09",
+        "outcome" : "simulating-reaction-diffusion"
+      },
+      "name" : "fixture-reaction-mazes",
+      "seed" : "1"
     }
   ],
   "schema" : 1

@@ -32,12 +32,13 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
 
 @Suite struct SimulationManifestTests {
     /// The names of the three fixtures.
-    static let fixtureNames = ["fixture-automaton", "fixture-reaction-diffusion", "fixture-wave"]
+    static let fixtureNames = ["fixture-automaton", "fixture-reaction-diffusion", "fixture-wave",
+                               "fixture-automaton-highlife", "fixture-reaction-mazes"]
 
-    @Test func theManifestIsValidWithTheStandardScenariosAndThreeFixtures() {
+    @Test func theManifestIsValidWithTheStandardScenariosAndFiveFixtures() {
         let manifest = SimulationCore.manifest(for: id)
         let problems = ScenarioManifestValidator.problems(manifest, controls: SimulationCore.controls,
-                                                          content: ContentRequirement(fixtures: 3))
+                                                          content: ContentRequirement(fixtures: 5))
         #expect(problems.isEmpty, "\(problems)")
         #expect(manifest.scenarios.map(\.name) == ScenarioManifest.standardNames + Self.fixtureNames)
         #expect(SimulationCore.familyFixtures.map(\.name) == Self.fixtureNames)
@@ -75,10 +76,10 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
 
     @Test func everyFixtureChoosesItsFamilyWithTheCommittedDigest() async throws {
         let manifest = SimulationCore.manifest(for: id)
-        let kinds: [SimulationKind] = [.automaton, .reactionDiffusion, .wave]
-        let stepCounts = [21, 121, 61]
-        #expect(SimulationCore.familyFixtures.map(\.family) == [0, 1, 2])
-        #expect(Set(SimulationCore.familyFixtures.map(\.digest)).count == 3)
+        let kinds: [SimulationKind] = [.automaton, .reactionDiffusion, .wave, .automaton, .reactionDiffusion]
+        let stepCounts = [21, 121, 61, 21, 121]
+        #expect(SimulationCore.familyFixtures.map(\.family) == [0, 1, 2, 0, 1])
+        #expect(Set(SimulationCore.familyFixtures.map(\.digest)).count == 5)
         for (index, fixture) in SimulationCore.familyFixtures.enumerated() {
             let spec = try #require(manifest.scenarios.first { $0.name == fixture.name })
             #expect(spec.expect.finalDigest == fixture.digest, "\(fixture.name)")
