@@ -8,11 +8,13 @@ Build G-RULES, G-SPEC and G-SCHEDULER and the first candidate experience, with n
 - **Core** (GPU-free): the versioned `SimulationSpec` with validation, the parameter definitions of each family over
   `VisualCoreParameters` `ParameterDefinition`, seeded starts over `SeededRandom`, three CPU steppers (`AutomatonRule`,
   `GrayScott`, `WaveField`) over `VisualCoreSimulation` `FieldGrid` with `StoragePrecision`, the `SimulationScheduler`
-  and the `SimulationState` codec (spec, scheduler, field bits as base64).
+  and the `SimulationState` codec (spec, scheduler, field bits as base64), joined by the GPU-free
+  `SimulationModel` aggregate (spec, scheduler, field; step, advance, reset, digest) that the adapter wraps.
 - **Experience**: `SimulationCore` (the `ExperienceCore` with the family, preset, run, pause, step, reset and speed
   actions, refusals `a16.invalid-choice` and `a16.unstable`), `SimulationPresenter` (colour-maps the CPU field and
   uploads it into a 64 × 64 `RenderTarget`, drawn full-screen by a `FieldPass` with `texelFetch`), controls, a scenario
-  manifest, and a candidate registration.
+  manifest (nine standard scenarios and five fixtures: one per family plus the HighLife and Mazes presets, as the
+  planning catalog's content count asks), and a candidate registration.
 
 Research: [research.md](research.md). Data: [data-model.md](data-model.md). Contract: [contracts/core.md](contracts/core.md).
 
@@ -42,7 +44,7 @@ Post-design: PASS.
 
 ```text
 Packages/ExperiencesCreative/SimulationLab/Core/{SimulationSpec,ParameterCatalog,Seeding,AutomatonRule,GrayScott,
-  WaveField,SimulationScheduler,SimulationState}.swift                                                         new
+  WaveField,SimulationScheduler,SimulationState,SimulationModel}.swift                                         new
 Packages/ExperiencesCreative/SimulationLab/CoreTests/{SimulationSpecTests,AutomatonRuleTests,GrayScottTests,
   WaveFieldTests,SchedulerTests,SimulationStateTests}.swift                                                    new
 Packages/ExperiencesCreative/SimulationLab/Experience/{Adapter/SimulationCore,Adapter/SimulationManifest,

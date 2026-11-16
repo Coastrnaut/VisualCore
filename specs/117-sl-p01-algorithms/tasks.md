@@ -47,4 +47,4 @@ Review checkpoints after 104 (core tests) and at 109.
 
 ## Phase 5: Convergence
 
-- [ ] T-A16-113 Record in `specs/117-sl-p01-algorithms/plan.md` (Project Structure and Summary) the GPU-free aggregate `Core/SimulationModel.swift` that the adapter wraps, and the manifest's five fixtures (one per family plus the HighLife and Mazes presets, required by the planning catalog's content count), per plan: project structure and T-A16-107 (unrequested)
+- [X] T-A16-113 Record in `specs/117-sl-p01-algorithms/plan.md` (Project Structure and Summary) the GPU-free aggregate `Core/SimulationModel.swift` that the adapter wraps, and the manifest's five fixtures (one per family plus the HighLife and Mazes presets, required by the planning catalog's content count), per plan: project structure and T-A16-107 (unrequested) — Verified 2026-11-16: 2026-11-16: plan.md records Core/SimulationModel.swift and the manifest's five fixtures (matching the code and .autonomy/checks/A16-P01.sl-ios27-3.json)
