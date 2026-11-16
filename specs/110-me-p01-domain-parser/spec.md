@@ -26,6 +26,52 @@ Canonical overrides:
 - **Owner rulings:** short tests; audits and device runs in the device campaign; iOS 27 at phase gates; reference
   regression and iOS 26 at X-A15; every Spec Kit step runs.
 
+## Clarifications
+
+### Session 2026-11-15
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code and
+in the fetched records: `VisualCoreScenes.Mesh.uvSphere`, `VisualCoreRendering.MeshRenderer` and `DepthMeshPass` with
+an `OrbitCamera` are the drawing path Solar System Explorer uses; Solar System Explorer's `CitationAudit` is the
+source-record pattern (allowed licenses `public-domain` and `CC0-1.0`); the registry has no candidate after X-A14
+(`ExperienceRegistry.candidates` is empty); PubChem's periodic table (`/rest/pug/periodictable/JSON`) and the 3D
+conformer records of CIDs 962, 297, 702, 241 and 2519 (`/rest/pug/compound/cid/<cid>/record/SDF?record_type=3d`,
+fetched 2026-11-15; the raw records are kept for generating the fixtures) are works of the US National Library of
+Medicine in the public domain.
+
+- Q: Which elements are supported and where do their values come from? → A: Ten elements — H, C, N, O, F, P, S, Cl,
+  Br, I (atomic numbers 1, 6, 7, 8, 9, 15, 16, 17, 35, 53). Name, atomic number, van der Waals radius and display
+  colour from the PubChem periodic table (van der Waals radius in pm, stored in Å: 1.20, 1.70, 1.55, 1.52, 1.35,
+  1.80, 1.80, 1.75, 1.83, 1.98; colours `FFFFFF`, `909090`, `3050F8`, `FF0D0D`, `90E050`, `FF8000`, `FFFF30`,
+  `1FF01F`, `A62929`, `940094`), license `public-domain`. Single-bond covalent radii from B. Cordero et al.,
+  "Covalent radii revisited", Dalton Transactions 2008 (Å: 0.31, 0.76, 0.71, 0.66, 0.57, 1.07, 1.05, 1.02, 1.20,
+  1.39; carbon's sp³ value), recorded with license `factual-data` (numerical facts, cited for provenance). Allowed
+  licenses: `public-domain`, `CC0-1.0`, `factual-data`; anything else is refused.
+- Q: Which molecules ship in this phase's library, and from what? → A: Five, in this order: water (CID 962), methane
+  (CID 297), ethanol (CID 702), benzene (CID 241), caffeine (CID 2519) — the manual's journey names water, caffeine and
+  ethanol. Atoms, coordinates (Å) and recorded bonds with their orders come unchanged from each PubChem 3D conformer
+  record (benzene's alternating orders as recorded); source "PubChem Compound CID <n>, 3D conformer", publisher
+  "National Library of Medicine (NCBI)", license `public-domain`. The bundled form is XYZ text plus a bond list, so the
+  library goes through the same parser as an imported file.
+- Q: What are the parser's limits and refusal reasons? → A: At most 65,536 bytes of UTF-8 text; atom count a whole
+  number 1…500 on the first line; each line at most 256 bytes; the comment cut to 256 characters; every coordinate
+  finite with magnitude at most 1,000 Å; no two atoms closer than 0.4 Å; at most 2,000 bonds. Reasons: `empty`,
+  `too-large`, `not-text` (not valid UTF-8), `bad-count` (missing, negative, zero, fractional or non-numeric),
+  `too-many-atoms`, `count-mismatch`, `line-too-long`, `malformed-line`, `unknown-element`, `non-finite`,
+  `out-of-range`, `overlapping-atoms`; each with the 1-based line where one applies. Limits are inclusive.
+- Q: What is the bond-inference rule? → A: Two atoms are bonded when their distance is at most the sum of their
+  covalent radii plus 0.4 Å (and not below the 0.4 Å overlap limit); the pairs are checked all against all (at most
+  124,750 pairs at 500 atoms, bounded by arithmetic, no spatial grid); every inferred bond is single and marked
+  inferred; the result is sorted by atom indices so it is the same in every run.
+- Q: How does the slice look and what are its state and actions? → A: The selected molecule's atoms are UV spheres at
+  0.35 × their van der Waals radius, coloured with the element's display colour and lit from the camera's side, framed
+  by an orbit camera whose distance fits the molecule's bounding sphere; recorded bonds are counted but drawn from
+  A15-P02. State schema 1 = the molecule index (0 = water … 4 = caffeine). Actions `molecule.select [0…4]`,
+  `molecule.next`, `molecule.previous`; a value that is not a whole index, or a step past an end, is refused with
+  `a15.invalid-choice`. Native controls: Previous molecule, Next molecule, a Molecule menu, and lines for the name and
+  formula ("Caffeine — C8H10N4O2"), the counts ("24 atoms, 25 bonds") and the source ("PubChem Compound CID 2519,
+  3D conformer — public domain"). The manifest has the standard scenarios and five fixtures, one per molecule.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Open a curated molecule with its source (Priority: P1) 🎯
