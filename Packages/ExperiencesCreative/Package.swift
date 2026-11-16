@@ -540,11 +540,13 @@ let package = Package(
                                .product(name: "VisualCoreUI", package: rendering)],
                     path: "SolarSystemExplorer/ExperienceTests",
                     resources: [.copy("Fixtures")]),
-        // A15 Molecular Explorer (feature 110, A15-P01): a candidate until X-A15. The core is Foundation only.
+        // A15 Molecular Explorer (feature 110, A15-P01): a candidate until X-A15. The core is pure (Foundation and
+        // VisualCoreMath for the scene and camera of feature 111).
         .target(name: "MolecularExplorerCore",
+                dependencies: [.product(name: "VisualCoreMath", package: visualCore)],
                 path: "MolecularExplorer/Core"),
         .testTarget(name: "MolecularExplorerCoreTests",
-                    dependencies: ["MolecularExplorerCore"],
+                    dependencies: ["MolecularExplorerCore", .product(name: "VisualCoreMath", package: visualCore)],
                     path: "MolecularExplorer/CoreTests"),
         .target(name: "MolecularExplorerExperience",
                 dependencies: ["MolecularExplorerCore",
