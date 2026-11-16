@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-16 (A15-P05: imports as actions, fuzz corpus, claim-word scan; A15-P04: store tests over a temporary folder).
+Last updated: 2026-11-16 (A15-P06: CI cache key, settings-free proof, interface chunk w2; A15-P05: imports as actions).
 
 ## 1. What is tested, and where
 
@@ -160,6 +160,13 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   the same rule the engine uses; a 200-file slice goes through the engine itself (A15-P05).
 - **Scan source literals for domain words.** Inline accessibility labels are not reachable as statics; a test reads the
   experience's Swift sources from `#filePath` and checks every string literal (A15-P05).
+- **Prove "a setting changes nothing" with two sessions.** A checklist row saying Reduce Motion changes nothing needs a
+  test: two sessions with the setting on and off play the same actions and compare digests, drawn counts and pixels
+  (A15-P06, found by convergence).
+- **Interface tests never open the document picker.** The import is proved by package tests with file URLs; the `w2`
+  chunk drives the library, display mode, atom, recent list and labels only (A15-P06).
+- **CI cache keys are computed before the build.** The cache action's post step re-evaluates `hashFiles`; over
+  `Packages/**` after a build it exceeded 120 s on a slow runner, so the key now comes from an earlier step (A15-P06).
 
 ### Process
 
