@@ -4,6 +4,10 @@
 // `color` for an element; `structure` for a molecule), the source's title, publisher and link text (a host and path,
 // no scheme), the units ("Å" for lengths, "" for a name, a number or a colour) and the license, one of
 // `ElementAudit.allowedLicenses`. Records carry no validation of their own; `ElementAudit` audits them.
+//
+// Feature 114 (A15-P05) T-A15-502 (FR-A15-505): an imported molecule's structure record has the title "imported
+// file", the publisher "your own file", no link, the units "Å" and the license `own-data` ("your own data"). That
+// license is never bundled: `ElementAudit.allowedLicenses` (the licenses of the bundled data) stays unchanged.
 import Foundation
 
 /// The source of one stored value: what it describes, the source, the units and the license.
@@ -46,4 +50,10 @@ public struct SourceRecord: Codable, Equatable, Hashable, Sendable {
     public static let structureQuantity = "structure"
     /// The units of every length (ångström).
     public static let angstrom = "Å"
+    /// The title of an imported molecule's structure record (feature 114).
+    public static let importedTitle = "imported file"
+    /// The publisher of an imported molecule's structure record (feature 114).
+    public static let importedPublisher = "your own file"
+    /// The license of a person's own imported data, shown as "your own data" (feature 114; never a bundled license).
+    public static let ownDataLicense = "own-data"
 }

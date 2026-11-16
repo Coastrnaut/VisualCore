@@ -4,6 +4,8 @@
 // selected atom and no pan, and the migration steps for the adapter write the schema-2 and schema-3 JSON; a newer schema
 // is refused; an atom outside the molecule or a pan outside −10…10 is out of range; next, previous and clear follow
 // their rules; choosing a molecule clears the atom and the pan and keeps the mode; changing the mode keeps both.
+// Updated by feature 114 (A15-P05) T-A15-502: states are written at schema 4 (schema-3 payloads are still read), the
+// step 2 → 3 writes the schema-3 JSON, and the newer schema is 5.
 import Foundation
 import Testing
 @testable import MolecularExplorerCore
@@ -17,15 +19,15 @@ import Testing
         accepted = accepted && state.selectAtom(3)
         #expect(accepted && state.selectedAtom == 3 && state.camera.panX == 2 && state.camera.panY == 1)
         let data = state.encoded()
-        let expected = #"{"atom":3,"camera":{"panX":2,"panY":1,"tilt":2,"turn":2,"zoom":0},"mode":1,"schema":3,"selection":4}"#
+        let expected = #"{"atom":3,"camera":{"panX":2,"panY":1,"tilt":2,"turn":2,"zoom":0},"mode":1,"schema":4,"selection":4}"#
         #expect(String(decoding: data, as: UTF8.self) == expected)
         #expect(MoleculeState.decode(data) == .success(state))
         #expect((try? JSONDecoder().decode(MoleculeState.self, from: data)) == state)
-        let none = #"{"camera":{"panX":0,"panY":0,"tilt":2,"turn":2,"zoom":0},"mode":0,"schema":3,"selection":0}"#
+        let none = #"{"camera":{"panX":0,"panY":0,"tilt":2,"turn":2,"zoom":0},"mode":0,"schema":4,"selection":0}"#
         #expect(String(decoding: MoleculeState.initial.encoded(), as: UTF8.self) == none)
         let null = #"{"atom":null,"camera":{"panX":0,"panY":0,"tilt":2,"turn":2,"zoom":0},"mode":0,"schema":3,"selection":0}"#
         #expect(MoleculeState.decode(Data(null.utf8)) == .success(MoleculeState.initial))
-        #expect(MoleculeState.schemaVersion == 3 && MoleculeState.oldestSchemaVersion == 1)
+        #expect(MoleculeState.schemaVersion == 4 && MoleculeState.oldestSchemaVersion == 1)
     }
 
     @Test func olderPayloadsOpenWithNoAtomAndNoPan() {
@@ -43,16 +45,17 @@ import Testing
         #expect(MoleculeState.migrateV2(selection: 4, mode: 2, camera: (5, 3, 2)) == nil)
         let step1 = MoleculeState.upgradePayload(v1, from: 1).map { String(decoding: $0, as: UTF8.self) }
         #expect(step1 == .success(#"{"camera":{"tilt":2,"turn":2,"zoom":0},"mode":0,"schema":2,"selection":4}"#))
-        #expect(MoleculeState.upgradePayload(v2, from: 2) == .success(fromV2.encoded()))
+        #expect(MoleculeState.upgradePayload(v2, from: 2).map { String(decoding: $0, as: UTF8.self) }
+                == .success(#"{"camera":{"panX":0,"panY":0,"tilt":3,"turn":5,"zoom":2},"mode":1,"schema":3,"selection":4}"#))
         #expect(MoleculeState.upgradePayload(v1, from: 2) == .failure(.damaged))
-        #expect(MoleculeState.upgradePayload(fromV2.encoded(), from: 3) == .failure(.damaged))
+        #expect(MoleculeState.upgradePayload(fromV2.encoded(), from: 3) == .failure(.damaged), "a schema-4 payload")
         #expect(MoleculeState.upgradePayload(Data(#"{"schema":1,"selection":5}"#.utf8), from: 1) == .failure(.outOfRange))
         #expect(MoleculeState.upgradePayload(Data(#"{"schema":2,"selection":1}"#.utf8), from: 2) == .failure(.damaged))
     }
 
     @Test func newerDamagedAndOutOfRangePayloadsAreRefused() {
         let camera = #""camera":{"panX":0,"panY":0,"tilt":2,"turn":2,"zoom":0}"#
-        let newer: [String] = [#"{"atom":0,\#(camera),"mode":0,"schema":4,"selection":0}"#, #"{"schema":4}"#]
+        let newer: [String] = [#"{"atom":0,\#(camera),"mode":0,"schema":5,"selection":0}"#, #"{"schema":5}"#]
         for payload in newer {
             #expect(MoleculeState.decode(Data(payload.utf8)) == .failure(.newerVersion), "\(payload)")
         }
