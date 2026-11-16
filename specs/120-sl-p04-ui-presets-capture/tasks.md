@@ -46,7 +46,7 @@ Precedent: `specs/119-sl-p03-rd-wave/tasks.md`.
 
 ## Phase 3: Story 1 — paint and step exactly
 
-- [ ] T-A16-404 [US1] In `Experience/SimulationPresenter.swift`:
+- [X] T-A16-404 [US1] In `Experience/SimulationPresenter.swift`: — Verified 2026-11-16: 2026-11-16: .autonomy/checks/A16-P04.sl-ios27.json exit 0 (62 core, 23 Swift Testing and 54 XCTest experience tests, 0 failures, slowest 4.3 s, iOS 27); PaintTests (a tap at a cell centre equals the Seed row's sim.paint, a three-cell drag paints three alive, outside the square nothing); StepExactTests (in all three families two paused Steps each equal one CPU SimulationModel.step and add one to the count)
   - `pointer(_:viewSize:port:)` maps a point to its cell through `square(width:height:grid:)`; nothing is sent outside
     the square;
   - a began-and-ended touch without moving to another cell sends `sim.paint [x, y, 0]`; moving sends
