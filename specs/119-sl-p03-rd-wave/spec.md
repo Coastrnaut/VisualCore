@@ -163,7 +163,9 @@ simulation keeps running unchanged.
   "Reaction-diffusion and the wave field need floating-point render targets, which this device does not offer.", and a
   restored state in either family MUST be drawn from the CPU upload with that sentence in the status line.
 - **FR-A16-320**: A legend in the canvas overlay MUST show the family's colour bar and the current minimum and maximum
-  of the CPU field (the automaton: alive and dead counts); the canvas description MUST state the same values.
+  of the CPU field (the automaton: alive and dead counts), on an opaque panel at the bottom-leading corner of the canvas with
+  text in the system caption style (Dynamic Type); the canvas description MUST state the same values, so the legend view
+  itself is hidden from VoiceOver.
 - **FR-A16-330**: An action `sim.timestep [Δt]` (declared 0.05…2.0) MUST set the time step of reaction-diffusion and the
   wave field, keeping the field, step count, running and speed; Δt above 1.5625 (reaction-diffusion) or making
   C = c · Δt exceed 1/√2 (wave) MUST be refused with `a16.unstable` and the limit's sentence, shown in the message line
