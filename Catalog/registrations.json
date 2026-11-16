@@ -370,6 +370,29 @@
       "manifest": "Packages/ExperiencesCreative/MolecularExplorer/scenario-manifest.json",
       "permissions": [],
       "summary": "A small-molecule viewer: curated molecules from public-domain records drawn atom by atom in element colours, with formulas, counts and sources."
+    },
+    "a16.simulation-lab": {
+      "capabilities": [
+        "cellular automata with B/S rules",
+        "Gray-Scott reaction-diffusion",
+        "2D wave field with Courant limit",
+        "seeded deterministic starts",
+        "pause, single step and reset",
+        "CPU reference for every rule"
+      ],
+      "quality_tiers": [
+        "level-0"
+      ],
+      "palette": [
+        "#05070D",
+        "#F2C14E",
+        "#2E86AB",
+        "#E4572E"
+      ],
+      "content": null,
+      "manifest": "Packages/ExperiencesCreative/SimulationLab/scenario-manifest.json",
+      "permissions": [],
+      "summary": "A simulation lab: cellular automata, reaction-diffusion and a wave field from seeded starts, each with a CPU reference, labelled as educational approximations."
     }
   }
 }

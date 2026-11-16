@@ -1309,7 +1309,9 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     # Feature 103 (A14-P01): Solar System Explorer, integrated at X-A14.
                                     "SolarSystemExplorerExperience",
                                     # Feature 110 (A15-P01): Molecular Explorer, integrated at X-A15.
-                                    "MolecularExplorerExperience"])
+                                    "MolecularExplorerExperience",
+                                    # Feature 117 (A16-P01): Simulation Lab, a candidate until X-A16.
+                                    "SimulationLabExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):
         listing = subprocess.run([sys.executable, str(HERE / "release_check.py"), "--list"],

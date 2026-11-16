@@ -546,7 +546,7 @@
       "id": "a16.simulation-lab",
       "code": "A16",
       "title": "Simulation Lab",
-      "summary": "A gallery of inspectable GPU simulations with parameter panels and explicit numerical/educational limitations.",
+      "summary": "A simulation lab: cellular automata, reaction-diffusion and a wave field from seeded starts, each with a CPU reference, labelled as educational approximations.",
       "kind": "creative",
       "tier": "free",
       "category": "learn",
@@ -555,10 +555,24 @@
         "education-and-science"
       ],
       "order": 16,
-      "palette": [],
+      "palette": [
+        "#05070D",
+        "#F2C14E",
+        "#2E86AB",
+        "#E4572E"
+      ],
       "tile_seed": 2061763513,
-      "capabilities": [],
-      "quality_tiers": [],
+      "capabilities": [
+        "cellular automata with B/S rules",
+        "Gray-Scott reaction-diffusion",
+        "2D wave field with Courant limit",
+        "seeded deterministic starts",
+        "pause, single step and reset",
+        "CPU reference for every rule"
+      ],
+      "quality_tiers": [
+        "level-0"
+      ],
       "content": null,
       "available": false
     },
