@@ -227,6 +227,24 @@ private func refusalOf(_ item: ValidationCase, _ base: AnatomyRegion) -> Content
         #expect(refusal?.sentence.contains("knee.patella") == true)
     }
 
+    /// T-A17-115 (SC-A17-102): the root `knee.joint` groups the parts; a root with a layer or with a mesh is damaged
+    /// content, and the sentence names the root.
+    @Test func aRootWithALayerOrAMeshIsDamaged() throws {
+        let base = try AnatomyContent.bundledRightKnee()
+        var layered = base
+        changeStructure(&layered, "knee.joint") { $0.layer = .bones }
+        let layeredRefusal = AnatomyContent.validate(layered)
+        #expect(layeredRefusal?.reason == .damaged)
+        #expect(layeredRefusal?.sentence.contains("knee.joint") == true)
+
+        var meshed = base
+        meshed.meshes.append(ProceduralMeshDeclaration(id: "mesh.joint.capsule", kind: .revolution))
+        changeStructure(&meshed, "knee.joint") { $0.meshIDs = ["mesh.joint.capsule"] }
+        let meshedRefusal = AnatomyContent.validate(meshed)
+        #expect(meshedRefusal?.reason == .damaged)
+        #expect(meshedRefusal?.sentence.contains("knee.joint") == true)
+    }
+
     @Test func everyLabelResolvesToAStructureAndItsFirstMesh() throws {
         let region = try AnatomyContent.bundledRightKnee()
         let labels = AnatomyContent.labels(region)
