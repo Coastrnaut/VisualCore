@@ -121,6 +121,8 @@ is marked inferred.
 
 ### Edge Cases
 
+- **Labels set to "selected only" with nothing selected:** no label is shown.
+- **A malformed recent or settings file** (more than 8 ids, a duplicate, an empty or malformed id, an unknown label mode): refused as out-of-range.
 - **The recent list is full:** opening another molecule drops the oldest.
 - **Opening a molecule already in the list:** it moves to the front; it is never listed twice.
 - **A recent entry for a molecule that no longer exists:** dropped when the list is read.

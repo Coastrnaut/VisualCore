@@ -18,5 +18,10 @@ public struct MoleculeSettings: Equatable, Sendable {
 public enum DocumentRefusal: String, Error, Sendable { case damaged, oversized, newerVersion = "newer-version", outOfRange = "out-of-range" }
 ```
 
+Out-of-range means: more than 8 ids, a duplicate, an id that is empty, longer than 32 characters or not lowercase
+letters, digits and hyphens, an unknown label mode, or a schema version below 1. `LabelMode.selected` with no atom
+selected shows no label.
+
+
 Experience: `RecentStore`, `SettingsStore` over `ExperienceStorage?`; controls identifiers `library-<id>`, `recent`,
 `labels`.
