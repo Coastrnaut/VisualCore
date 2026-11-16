@@ -18,7 +18,10 @@ Rules (one finding line `RULE location: detail` each):
   MISSING_TARGET   <Name>Core, <Name>CoreTests, <Name>Experience or <Name>ExperienceTests is not declared
   MISSING_PRODUCT  the library product <Name>Experience is not declared
   NOT_LINKED       the VisualCore target of project.yml does not list the product as a package dependency
-  EXTRA_TARGET     a target of an Experiences* package belongs to no registered experience of that package
+  EXTRA_TARGET     a target of an Experiences* package belongs to no registered experience of that package; the
+                   one allowance is a pending core (feature 124, A17-P01 clarification Q5): <Name>Core and
+                   <Name>CoreTests of a catalog experience of that package that is not registered yet, with no
+                   <Name>Experience or <Name>ExperienceTests target, are the core-first phase of its feature
   EXTRA_LINK       an <X>Experience product linked by the VisualCore target belongs to no registered experience
   EMPTY_PACKAGE    an Experiences* package exists although no registered experience belongs to it
 
@@ -154,11 +157,24 @@ def app_package_products(root: Path) -> list[tuple[str, str]]:
     return deps
 
 
+def is_pending_core(target: str, base: str | None, targets: set[str], catalog: set[str]) -> bool:
+    """True when `target` is the Core or CoreTests target of a catalog experience `base` of the package that has no
+    Experience or ExperienceTests target yet (the core-first phase of an unregistered experience)."""
+    if base is None or base not in catalog or target not in (base + "Core", base + "CoreTests"):
+        return False
+    return base + "Experience" not in targets and base + "ExperienceTests" not in targets
+
+
 def check(root: Path) -> tuple[list[str], int, int]:
     """The findings, the number of registered experiences and the number of packages they live in."""
     by_id, registered = load_inputs(root)
     findings: list[str] = []
     names_by_package: dict[str, set[str]] = {}
+    catalog_names: dict[str, set[str]] = {}  # package -> names of every catalog experience of the launch scope
+    for entry in by_id.values():
+        catalog_package = package_for(str(entry.get("code", "")))
+        if catalog_package is not None:
+            catalog_names.setdefault(catalog_package, set()).add(type_name(str(entry.get("name", ""))))
     expected: list[tuple[str, str, str]] = []  # (id, package, Name)
     for exp_id in registered:
         entry = by_id.get(exp_id)
@@ -207,6 +223,8 @@ def check(root: Path) -> tuple[list[str], int, int]:
             continue
         for target in sorted(targets):
             base = next((target[: -len(s)] for s in SUFFIXES if target.endswith(s) and len(target) > len(s)), None)
+            if base not in names and is_pending_core(target, base, targets, catalog_names.get(package, set())):
+                continue
             if base not in names:
                 findings.append(f"EXTRA_TARGET {location}: {target} belongs to no registered experience")
 

@@ -103,6 +103,37 @@ class CheckExperiencePackagesTests(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertIn("EXTRA_TARGET Packages/ExperiencesCreative/Package.swift: StrayCore", out)
 
+    def test_pending_core_passes(self) -> None:
+        # Feature 124 (A17-P01 clarification Q5): Core and CoreTests of an unregistered catalog experience of the package.
+        self.fx.write("Packages/ExperiencesCreative/Package.swift",
+                      package_swift(["GenerativeArtStudio"], extra_targets=("SecondArtCore", "SecondArtCoreTests")))
+        catalog = json.loads(json.dumps(CATALOG))
+        catalog["experiences"].append({"code": "A02", "name": "Second Art", "id": "a02.second-art"})
+        self.fx.write("docs/catalog/experience-catalog.json", json.dumps(catalog))
+        code, out = self.run_tool()
+        self.assertEqual(code, 0, out)
+
+    def test_pending_core_with_an_experience_target_is_extra(self) -> None:
+        catalog = json.loads(json.dumps(CATALOG))
+        catalog["experiences"].append({"code": "A02", "name": "Second Art", "id": "a02.second-art"})
+        self.fx.write("docs/catalog/experience-catalog.json", json.dumps(catalog))
+        self.fx.write("Packages/ExperiencesCreative/Package.swift",
+                      package_swift(["GenerativeArtStudio"],
+                                    extra_targets=("SecondArtCore", "SecondArtCoreTests", "SecondArtExperience")))
+        code, out = self.run_tool()
+        self.assertEqual(code, 1)
+        self.assertIn("EXTRA_TARGET Packages/ExperiencesCreative/Package.swift: SecondArtCore belongs", out)
+        self.assertIn("SecondArtExperience belongs", out)
+
+    def test_pending_core_of_another_package_is_extra(self) -> None:
+        # Later Thing (R05) is outside the launch scope, so its core is never pending.
+        self.fx.write("Packages/ExperiencesCreative/Package.swift",
+                      package_swift(["GenerativeArtStudio"], extra_targets=("LaterThingCore", "AuroraLoomCore")))
+        code, out = self.run_tool()
+        self.assertEqual(code, 1)
+        self.assertIn("LaterThingCore belongs", out)
+        self.assertIn("AuroraLoomCore belongs", out)
+
     def test_unknown_registered_id(self) -> None:
         self.fx.registrations(["a01.generative-art-studio", "r02-g01.aurora-loom", "zz.nowhere"])
         code, out = self.run_tool()
