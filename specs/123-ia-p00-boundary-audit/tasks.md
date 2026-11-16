@@ -18,7 +18,7 @@ Precedent: `specs/116-sl-p00-boundary-audit/tasks.md`.
 ## Phase 4: User Story 2 — The reference stays proven (P1)
 
 - [X] T-A17-004 [US2] Reference chunk 1 (`--name reference-1 -- python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean`) — Verified 2026-11-16: 2026-11-16: .autonomy/checks/A17-P00.reference-1.json exit 0 (reference-engine-xcframework, reference-build-projectm-ios-sim, reference-clean pass)
-- [ ] T-A17-005 [US2] Reference chunk 2 (`--name reference-2 -- python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26`); record the 7 steps, commands and results in `docs/apps/interactive-anatomy/regression-baseline.md` (FR-A17-004, SC-A17-003)
+- [X] T-A17-005 [US2] Reference chunk 2 (`--name reference-2 -- python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26`); record the 7 steps, commands and results in `docs/apps/interactive-anatomy/regression-baseline.md` (FR-A17-004, SC-A17-003) — Verified 2026-11-16: 2026-11-16: .autonomy/checks/A17-P00.reference-2.json exit 0 (the four ANGLE and ProjectM reference tests on iOS 27 and 26 pass); 7 of 7 steps recorded in docs/apps/interactive-anatomy/regression-baseline.md
 
 ## Phase 5: User Story 3 — The shell builds with the experience absent (P2)
 
