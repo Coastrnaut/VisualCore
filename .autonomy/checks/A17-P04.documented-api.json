@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_documented_api.py",
+    "--sources",
+    "Packages/ExperiencesCreative/InteractiveAnatomy"
+  ],
+  "command": "python3 scripts/check_documented_api.py --sources Packages/ExperiencesCreative/InteractiveAnatomy",
+  "elapsed_seconds": 0.981,
+  "exit_code": 1,
+  "finished": "2026-11-16T23:55:22+00:00",
+  "log": ".autonomy/logs/A17-P04.documented-api.log",
+  "log_sha256": "bdede936407d3cd7b2cd6d00a64d5ed67400ba6620bfa27040e8fba2195f085a",
+  "name": "documented-api",
+  "stage": "A17-P04",
+  "started": "2026-11-16T23:55:21+00:00",
+  "timed_out": false
+}
