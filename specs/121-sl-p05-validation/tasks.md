@@ -29,6 +29,10 @@ Precedent: `specs/120-sl-p04-ui-presets-capture/tasks.md`.
   - **Report:** render `docs/apps/simulation-lab/validation-report.md`, written when `UPDATE_VALIDATION_REPORT=1`.
     Otherwise compare the deterministic lines (all lines outside the steps-per-second section) with the committed
     file; a difference fails with "Regenerate the report with UPDATE_VALIDATION_REPORT=1."
+  - Without floating-point targets, the test fails with "Floating-point render targets are not available" and
+    writes no report.
+  - The report states that a jump beyond 128 iterations loads the mirror instead of stepping it (the A16-P02 rule;
+    `GPURebuildTests`).
   - Generate and commit the report.
 
   (FR-A16-501–503; SC-A16-501–503)
