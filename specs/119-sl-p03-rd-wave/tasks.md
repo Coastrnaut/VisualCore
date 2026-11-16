@@ -65,7 +65,7 @@ Precedent: `specs/118-sl-p02-automata-gpu/tasks.md`.
 
 ## Phase 5: Story 3 — the legend
 
-- [ ] T-A16-306 [P] [US3] Create `Packages/ExperiencesCreative/SimulationLab/Experience/SimulationLegend.swift`:
+- [X] T-A16-306 [P] [US3] Create `Packages/ExperiencesCreative/SimulationLab/Experience/SimulationLegend.swift`: — Verified 2026-11-16: 2026-11-16: .autonomy/checks/A16-P03.sl-ios27.json exit 0 (41 core, 20 Swift Testing and 33 XCTest experience tests, 0 failures, slowest 1.98 s, iOS 27); LegendTests (minimum and maximum equal the field's v or height, alive and dead counts, the description states the same numbers, the mirror carries the legend); the canvas overlay is SimulationLegendOverlay
   - `SimulationLegendValues.of(_:kind:)` gives the minimum and maximum of v or the height, or the alive and dead
     counts, plus `words`;
   - the `SimulationLegend` view: a colour bar on an opaque panel at the bottom-leading corner, caption style with
