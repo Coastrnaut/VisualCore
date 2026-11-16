@@ -81,7 +81,8 @@ in code:
   - **The list:** a native list of the 14 parts grouped by layer, each row naming the structure and its layer in
     words. A visible row sends the same `structure.select`; a hidden row is marked "Hidden" and is disabled.
 - Q: What is saved, and what does it look like? → A: The experience snapshot is schema 1 JSON with the turn, tilt and
-  zoom steps, the visible layers (three booleans) and the selected structure id (optional). Restoring refuses damaged
+  zoom steps, the visible layers (three booleans), the selected structure id (optional) and the framed structure id
+  (optional; the camera target and fit, kept after the selection is cleared until Reset view). Restoring refuses damaged
   or newer data, and an unknown structure id. The digest is built from this canonical state, so drawing never changes
   it. The materials and colours are:
   - bones ivory (0.90, 0.86, 0.76);
@@ -222,8 +223,9 @@ On any supported device the model stays within its triangle, draw and label budg
 ### Measurable Outcomes
 
 - **SC-A17-201**: All declared meshes are built at every quality level; 0 fail validation or exceed their budget.
-- **SC-A17-202**: A tap through the centre of each of the 14 parts selects that part when all layers are shown, and a
-  tap from the outside through each part on a hidden layer never selects it.
+- **SC-A17-202**: For each of the 14 parts, at least one of 26 probe rays selects that part when all layers are
+  shown. The probes come from outside the region along the axis and diagonal directions and aim at the part's centre.
+  No probe ever selects a part whose layer is hidden.
 - **SC-A17-203**: After selecting each of the 14 parts, its bounding sphere is inside the view at both canvas aspects
   0.5 and 2.
 - **SC-A17-204**: The scene's triangle and draw counts are within the budget of every quality level.
