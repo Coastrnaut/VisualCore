@@ -24,6 +24,50 @@ Canonical overrides:
   presets and educational copy need an author or source and license.
 - **Constitution:** 2.13.0 adds the A17 experience rules (committed at the start of this gate, `a834dda9`).
 
+## Clarifications
+
+### Session 2026-11-16
+
+Answered by the lead under the owner's standing delegation (the recommended option each time), with the facts checked
+in code:
+- **Commits:** the A17 constitution commit is `a834dda9` and the A17-P00 specify commit is `f437fd0b`, the phase start
+  for the no-change diff of `Packages` and `External`; the reference submodule is pinned at `d93edd1`.
+- **Registry:** sixteen experiences are registered in `Catalog/registrations.json` (A01–A16).
+- **VisualCore offers:**
+  - in `VisualCoreScenes`: `Mesh` with the generators `plane`, `cube` and `uvSphere`;
+  - in `VisualCoreRendering`: `MeshRenderer`, which is lit, culls back faces, leaves depth testing to the caller and
+    takes premultiplied-alpha colour with optional fog;
+  - in `VisualCoreMath`: `OrbitCamera` (`projection`, `project`, `ray(ndc:aspect:)`), `CameraBounds` and
+    `RayIntersection`, covering triangles, spheres and boxes.
+- **Experience-only pieces:** Solar System Explorer keeps a pure label-overlap layout, `LabelLayout` (A14-P04), and
+  Molecular Explorer keeps its atom picking and canvas-overlay labels. Neither is in a framework product.
+
+- Q: How is the manual's "compile an empty shell" gate met in the one app? → A: As for A16: the one app is the shell;
+  this phase proves it builds for testing with Interactive Anatomy absent; the targets come with A17-P01's first model.
+- Q: What makes a capability "available"? → A: A public declaration in a VisualCore framework product with at least one
+  test that exercises it. An implementation that exists only inside another experience or a harness is "requires
+  adaptation" at best.
+- Q: Which package holds Interactive Anatomy? → A: `Packages/ExperiencesCreative/InteractiveAnatomy` (Auto-Creator.md
+  §16), as A05–A16 did; no new package is created.
+- Q: Does Interactive Anatomy need a permission or a new privacy answer? → A: No. The content is bundled, saved views
+  stay in the experience's own storage, and nothing is sent. It reads no health data, so no usage string is added.
+- Q: Which region, which content sources and which geometry does the audit assume for later phases? → A: The region
+  is the right knee joint. Its structures:
+  - bones: the distal femur, the proximal tibia, the head of the fibula and the patella;
+  - articular cartilage, and the medial and lateral menisci;
+  - ligaments: the anterior and posterior cruciate, the medial and lateral collateral, and the patellar ligament;
+  - the quadriceps tendon.
+
+  Layers: bones, cartilage, ligaments and tendons. The content:
+  - names follow Terminologia Anatomica (1998), with English equivalents;
+  - descriptions are written in plain words from Gray's Anatomy, 20th edition (1918, public domain), cited by section;
+  - a clinical review is a person's action, recorded as an owner action, and until it is done the text is labelled
+    as not reviewed by a clinician.
+
+  The geometry is procedural: lathes, sweeps, tubes and capsules, labelled as a schematic model. Solar System
+  Explorer's `LabelLayout` gets its second consumer here, so its move into VisualCore is assessed as a gap. The exact
+  structure list, budgets and phases are decided in A17-P01, not here.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - An evidence-backed integration matrix (Priority: P1) 🎯
