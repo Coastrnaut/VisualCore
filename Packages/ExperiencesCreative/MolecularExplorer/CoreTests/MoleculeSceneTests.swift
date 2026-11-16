@@ -79,6 +79,18 @@ import VisualCoreMath
         }
     }
 
+    /// T-A15-212: inferred bonds get two halves each too, so a molecule read from a file shows its estimated sticks.
+    @Test func inferredBondsGetTwoHalvesEach() throws {
+        let water = try #require(molecule("water"))
+        let inferred = BondInference.bonds(for: water.atoms)
+        #expect(inferred.count == 2 && inferred.allSatisfy { $0.origin == .inferred })
+        let estimate = try Molecule.make(id: "water-inferred", title: "Water", atoms: water.atoms, bonds: inferred,
+                                         source: MoleculeLibrary.source(id: "water-inferred", cid: 962)).get()
+        let scene = MoleculeScene(molecule: estimate, mode: .ballAndStick)
+        #expect(scene.bondHalves.count == 2 * inferred.count)
+        #expect(MoleculeScene(molecule: estimate, mode: .spaceFilling).bondHalves.isEmpty)
+    }
+
     @Test func theSceneIsDeterministicBoundedAndWithinBudget() {
         for molecule in MoleculeLibrary.molecules {
             for mode in DisplayMode.allCases {

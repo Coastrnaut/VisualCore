@@ -20,3 +20,11 @@
 ## D5 — Scope cut
 - **Decision**: gestures and panning move to A15-P03 with picking (they share the touch handling); bond-order styling to
   A15-P03 with the panel (contract G-PANEL).
+
+## As built (2026-11-15)
+
+- **Inferred bonds drawn:** the scene makes two halves for every bond, recorded or inferred (convergence round 1,
+  T-A15-212), so a molecule read from a file in A15-P05 shows its estimated sticks; their marking as estimates is
+  G-PANEL (A15-P03). The library holds recorded bonds only, so nothing drawn changes now.
+- **Counts:** water 3 atoms and 4 halves, ethanol 9 and 16, caffeine 24 and 50; the nearest zoom keeps the camera at
+  least 1.305 bounding radii from the centre over all molecules, both modes and aspects 0.5 and 2.

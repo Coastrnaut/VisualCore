@@ -74,7 +74,7 @@ display").
 
 **Acceptance Scenarios**:
 
-1. **Given** a molecule in ball-and-stick, **When** it is drawn, **Then** every atom and every recorded bond is drawn,
+1. **Given** a molecule in ball-and-stick, **When** it is drawn, **Then** every atom and every bond is drawn,
    each bond as two halves coloured by their atoms.
 2. **Given** the same molecule, **When** the mode is switched to space-filling, **Then** atoms are drawn at their van der
    Waals radius, no bond is drawn, and the drawn frame differs.
@@ -133,7 +133,7 @@ centres, and the built-in water and ethanol produce exactly their atom counts.
 **Scene (story 3)**
 
 - **FR-A15-201**: The scene of a molecule MUST hold one item per atom (position, element, display radius) and, in
-  ball-and-stick, two halves per recorded bond (from each atom's centre to the bond's midpoint, coloured by that atom);
+  ball-and-stick, two halves per bond, recorded or inferred (from each atom's centre to the bond's midpoint, coloured by that atom);
   it is computed without drawing and is the same for the same molecule, mode and camera.
 - **FR-A15-202**: Drawing MUST stay within a stated draw budget (at most 1,500 items) and draw exactly the scene's items.
 
