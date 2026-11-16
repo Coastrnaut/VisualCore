@@ -894,6 +894,53 @@ not a numerically certified scientific solver, large high-precision computation 
 - **One phase at a time:** implement only one Spec Kit phase at a time (one ledger gate, ADR-0004), in order
   A16-P00 → A16-P06.
 
+### A17 Interactive Anatomy (`a17.interactive-anatomy`)
+
+Ratified from the app manual's constitution prompt (2026-11-16). Like A05–A16, it never had a standalone target: it
+is built directly as an experience of the one app. Its product goal is a labelled, layer-controlled 3D reference of one
+anatomy region with plain-language descriptions. Version 0.1 covers:
+- one region, not the full body;
+- toggleable layered structure groups and an accessible structure list;
+- selection highlighting, labels and searchable metadata;
+- camera orbit and zoom with isolate and ghost controls;
+- factual text with citations and provenance;
+- download-free offline content.
+
+It is not diagnostic or treatment advice, a full-body atlas, or a viewer for patient files.
+
+- **Consumer, not fork:** an experience of the VisualCore app and a VisualCore consumer, never a fork of
+  projectm-ios. It uses only audited VisualCore public APIs over the OpenGL ES → ANGLE → Metal integration. It MUST
+  NOT create its own EGL/ANGLE initialization path or a second renderer, or link ProjectM engine code.
+- **Reuse first (Principle II):** meshes, materials, lighting, the orbit camera, picking, labels and overlays, quality
+  tiers, persistence and accessibility planning already in VisualCore are reused, not copied. New generic machinery
+  goes into VisualCore with tests, docs, the API baseline and the reference regression when it is reusable. The
+  anatomy content, its structure graph, copy and UI stay in the experience.
+- **Visuals are code:** every structure is procedural geometry built in code (parametric primitives, sweeps, lathes,
+  SDF-derived meshes), labelled as a schematic model. No purchased, generated, scanned or hand-modelled meshes,
+  textures or images. The shapes approximate the region's structures for orientation and are never presented as
+  anatomically exact.
+- **Testable without the GPU:** the structure graph (ids, names, systems, layers, parents, neighbours), search,
+  selection, visibility, isolate and ghost state and the persisted files are pure, versioned models, tested through
+  `swift test`. Drawing never changes the state.
+- **Content provenance:** every name, description and fact carries its source and license, from public-domain or
+  openly licensed references (for example Gray's Anatomy, 20th edition, 1918, public domain, and the Terminologia
+  Anatomica names). A clinical or expert review of the text is a person's action. It stays recorded as an owner
+  action until it is done, and until then the text is labelled as not reviewed by a clinician.
+- **Educational, not medical:** the experience shows and speaks that it is an educational schematic. It makes no
+  diagnostic, treatment, accuracy or certification claim, and never asks for or reads personal health data or
+  patient files.
+- **Bounded:** triangle, structure, label and draw-call counts are fixed limits per quality level. Search results,
+  saved views and stored files have caps.
+- **Offline-first and private:** no networking, accounts, analytics or ads, and all content is bundled. No
+  permission beyond what a feature actually needs, and each one is disclosed.
+- **Truthful claims:** performance, memory or battery numbers come only from device measurements. Copy promises only
+  what the experience does.
+- **Accessibility:** native SwiftUI controls with VoiceOver labels and Dynamic Type. The structure list is the control
+  alternative to tapping the model. The selected structure, its system, its visibility and the camera's view are
+  spoken. Information never depends on colour alone: layers and selection carry names. Reduce Motion replaces
+  animated camera moves with cuts.
+- **Licenses:** every content text, palette and shader records its source and license.
+
 ## Governance
 
 - Precedence: real Apple platform and toolchain behavior and observed test results → owner
@@ -934,5 +981,7 @@ not a numerically certified scientific solver, large high-precision computation 
   from its manual's constitution prompt at gate A15-P00 (feature 109); no principle changes.
 - Amendment 2.12.0 (2026-11-16, MINOR): App-Scoped Rules gain the A16 Simulation Lab subsection, ratified from
   its manual's constitution prompt at gate A16-P00 (feature 116); no principle changes.
+- Amendment 2.13.0 (2026-11-16, MINOR): App-Scoped Rules gain the A17 Interactive Anatomy subsection, ratified
+  from its manual's constitution prompt at gate A17-P00 (feature 123); no principle changes.
 
-**Version**: 2.12.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-16
+**Version**: 2.13.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-16
