@@ -176,6 +176,12 @@ On any supported device the model stays within its triangle, draw and label budg
 - **Context loss or a canvas resize:** the scene is rebuilt from the content and draws the same frame; the selection
   and visibility are kept.
 - **Reduce Motion:** framing a selection moves the camera immediately (no flight in this phase).
+- **A quality level change:** the other level's scene is used for drawing and picking; the camera steps, visible
+  layers and selection are kept.
+- **A restored state whose selection is on a hidden layer:** the selection is cleared on restore, as when the layer
+  is hidden.
+- **A drag or a multi-touch gesture on the canvas:** ignored in this phase; the camera moves only by its controls, and
+  only a single tap picks.
 
 ## Requirements *(mandatory)*
 
