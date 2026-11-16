@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-15 (A15-P01: contract products, runner scenario count; A14-P06: controls rebuilt every frame).
+Last updated: 2026-11-16 (A15-P03: touches cancelled on suspension; A15-P01: contract products, runner count).
 
 ## 1. What is tested, and where
 
@@ -144,6 +144,10 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
 - **The runner plays the nine standard scenarios only.** `verify_experiences.py` reports nine PASS lines per runtime;
   the fixtures of a scenario manifest are proven by the experience's manifest tests. Evidence counts what the log
   shows (A15-P01).
+- **Suspension drops touch cancellation.** The shell drops pointer events while an experience is suspended, so the
+  system's cancellation of a held touch never arrived and gesture state outlived the suspension (a later one-finger
+  drag read as two fingers). `ExperienceShell.suspend()` now calls `ExperiencePresenter.cancelPointers()`; test
+  gestures through a real session suspend, not only by calling `reset()` (A15-P03).
 
 ### Process
 
