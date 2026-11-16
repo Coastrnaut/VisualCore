@@ -21,7 +21,7 @@ import VisualCoreExperience
         #expect(SimulationCore.migrations.currentVersion == 1)
         #expect(SimulationCore.controls.map(\.id) == SimulationCore.actionIDs)
         #expect(SimulationCore.actionIDs == ["sim.family", "sim.preset", "sim.run", "sim.pause", "sim.step",
-                                             "sim.reset", "sim.speed", "sim.timestep"])
+                                             "sim.reset", "sim.speed", "sim.timestep", "sim.paint", "sim.spec"])
         let core = SimulationCore(seed: 1)
         #expect(core.kind == .automaton)
         #expect(core.preset == 0)
@@ -191,14 +191,14 @@ import VisualCoreExperience
     @Test func theWordsNameTheFamilyPresetGridStateAndStep() {
         let core = SimulationCore(seed: 1)
         #expect(core.canvasDescription == "Simulation Lab: cellular automaton, rule Life (B3/S23); 64 × 64 grid; "
-                + "running at ×1; step 0; 1042 of 4096 cells alive.")
+                + "running at ×1; step 0; 1042 of 4096 cells alive; most cells in bin 1 of 16 (0.00 to 0.06).")
         #expect(core.status == "Running at ×1, step 0")
         let reaction = simulationApplied(core, "sim.family", [1]).0
         #expect(reaction.canvasDescription == "Simulation Lab: reaction-diffusion, preset Spots (feed 0.035, kill "
-                + "0.065, time step 1); 64 × 64 grid; running at ×1; step 0; v from 0.00 to 0.25.")
+                + "0.065, time step 1); 64 × 64 grid; running at ×1; step 0; v from 0.00 to 0.25; most cells in bin 1 of 16 (0.00 to 0.06).")
         let wave = simulationApplied(core, "sim.family", [2]).0
         #expect(wave.canvasDescription == "Simulation Lab: wave field, preset Pulse (wave speed 1, damping 0.002, "
-                + "Courant number 0.5); 64 × 64 grid; running at ×1; step 0; height from 0.00 to 1.00.")
+                + "Courant number 0.5); 64 × 64 grid; running at ×1; step 0; height from 0.00 to 1.00; most cells in bin 9 of 16 (0.00 to 0.12).")
         let paused = simulationApplied(core, "sim.pause").0
         let stepped = simulationApplied(paused, "sim.step").0
         #expect(stepped.status == "Paused, step 1")

@@ -12,6 +12,16 @@
 // 64 × 64 `rgba8` target through ``SimulationShaders/display`` with the sentence in the status line. The canvas overlay
 // is the legend (``SimulationLegend``) of the CPU field. A refused time step shows its own sentence.
 //
+// Feature 120 (A16-P04) T-A16-404/406/407 (FR-A16-401, 412, 420; clarifications Q1–Q3):
+// - Touches: a point maps to its cell through the grid square in points; a touch that ends in the cell it began in
+//   sends `sim.paint [x, y, 0]`; one that moves sends `sim.paint [x, y, 1]` for its first cell and for each newly
+//   entered one; nothing outside the square.
+// - Motion caps: ×1 under Reduce Motion, the automaton ×0.25 under Reduce Flashing (``speedCap(kind:)``). A faster
+//   `sim.speed` is refused with `a16.reduced-motion` and ``reducedMotionSentence``; a family change lowers a faster
+//   speed to the cap.
+// - Histogram: the mirror's ``SimulationHistogram`` is recomputed from the CPU field at most once every
+//   ``histogramInterval`` frames while running, and at the next frame after a non-step change.
+//
 // The display programs fit the grid into a square of side ⌊0.92 · min(width, height) / 64⌋ · 64 pixels (or
 // ⌊0.92 · min(width, height)⌋ on a canvas under 70 pixels) centred on the canvas, and read the cell under each pixel
 // with `texelFetch` at the integer cell index (`gl_FragCoord` scaled to the grid), so cells are crisp squares and no
@@ -76,6 +86,14 @@ final class SimulationMirror {
     var timeStep = 1.0
     /// Whether reaction-diffusion and the wave can be chosen (false once the probe reported no float support).
     var floatFamiliesAvailable = true
+    /// The histogram of the field (feature 120); nil before the first frame.
+    var histogram: SimulationHistogram?
+    /// The approximation label of the current family.
+    var approximation = ""
+    /// The fastest speed index allowed by Reduce Motion and Reduce Flashing (4 when neither is on).
+    var speedCap = SimulationScheduler.speeds.count - 1
+    /// The current spec, for the inspector.
+    var spec: SimulationSpec?
 }
 
 /// Why drawing failed.
@@ -109,6 +127,25 @@ final class SimulationPresenter: ExperiencePresenter {
 
     /// GPU steps after which a float mirror is loaded from the CPU field again (clarification Q3 of feature 119).
     nonisolated static let reloadInterval = 64
+
+    /// The sentence shown when reaction-diffusion or the wave cannot run here (FR-A16-310).
+    nonisolated static let reducedMotionSentence = "Faster speeds are off while Reduce Motion or Reduce Flashing is on."
+
+    /// Frames between two histogram updates while running (4 per second at 60 frames per second).
+    nonisolated static let histogramInterval = 15
+
+    /// Whether Reduce Motion is on (set by the experience wrapper).
+    var reduceMotion = false
+    /// Whether Reduce Flashing is on (set by the experience wrapper).
+    var reduceFlashing = false
+    /// Histogram updates so far (tests).
+    private(set) var histogramUpdateCount = 0
+    /// Frames since the last histogram update.
+    private var framesSinceHistogram = 0
+    /// What the last histogram was computed from.
+    private var histogramSource: (spec: SimulationSpec, step: Int, field: SimulationField)?
+    /// The cells of the touches in progress, by pointer id: the first and the last cell, and whether it moved.
+    private var touches: [Int: (first: (Int, Int), last: (Int, Int), moved: Bool)] = [:]
 
     /// The sentence shown when reaction-diffusion or the wave cannot run here (FR-A16-310).
     nonisolated static let unsupportedSentence =
@@ -179,9 +216,17 @@ final class SimulationPresenter: ExperiencePresenter {
     /// The registry the target and the pass were made with (held weakly, as the host owns it).
     private weak var registry: ResourceRegistry?
 
-    /// A presenter for the experience `experienceID`.
-    init(experienceID: ExperienceID) {
+    /// The saved experiments (feature 120); nil without storage (tests).
+    let presets: SimulationPresetStore?
+    /// The latest still capture (feature 120).
+    let capture = SimulationCapture()
+
+    /// A presenter for the experience `experienceID`, keeping saved experiments in `storage` when given. The capture
+    /// folder is emptied, so no picture of an earlier session is left.
+    init(experienceID: ExperienceID, storage: ExperienceStorage? = nil) {
         self.experienceID = experienceID
+        presets = storage.map { SimulationPresetStore(storage: $0) }
+        capture.clearFolder()
     }
 
     // MARK: Render scene
@@ -206,6 +251,7 @@ final class SimulationPresenter: ExperiencePresenter {
     /// with the engine first), the other families from the colour-mapped CPU field (uploaded when it changed).
     func draw(_ core: SimulationCore, tier: Int, context: RenderContext, frame: FrameInfo) throws {
         sync(core)
+        gateHistogram(core)
         let width = max(1, context.pixelWidth), height = max(1, context.pixelHeight)
         lastCanvas = Vec2(Double(width), Double(height))
         let floatMissing = floatSupported == true
@@ -462,6 +508,12 @@ final class SimulationPresenter: ExperiencePresenter {
         let timeStep = core.model.spec.timeStep
         if mirror.timeStep != timeStep { mirror.timeStep = timeStep }
         if mirror.floatFamiliesAvailable == unsupported { mirror.floatFamiliesAvailable = !unsupported }
+        let approximation = SimulationCore.approximationWords(core.kind)
+        if mirror.approximation != approximation { mirror.approximation = approximation }
+        let cap = speedCap(kind: core.kind)
+        if mirror.speedCap != cap { mirror.speedCap = cap }
+        if mirror.spec != core.model.spec { mirror.spec = core.model.spec }
+        if mirror.histogram == nil { updateHistogram(core) }
         lastCore = core
     }
 
@@ -469,6 +521,7 @@ final class SimulationPresenter: ExperiencePresenter {
     nonisolated static func answerWords(control: String, result: ActionResult) -> String {
         guard !result.isAccepted else { return "" }
         if result == .rejected(.rule(code: SimulationRule.unsupported)) { return unsupportedSentence }
+        if result == .rejected(.rule(code: SimulationRule.reducedMotion)) { return reducedMotionSentence }
         if result == .rejected(.rule(code: SimulationRule.unstable)) {
             return "Those settings are beyond the stability limit and were refused."
         }
@@ -494,8 +547,19 @@ final class SimulationPresenter: ExperiencePresenter {
             mirror.message = Self.answerWords(control: control, result: refused)
             return refused
         }
+        if control == "sim.speed", let value = values.first, let kind = lastCore?.kind,
+           value > Double(speedCap(kind: kind)) {
+            let refused = ActionResult.rejected(.rule(code: SimulationRule.reducedMotion))
+            mirror.message = Self.answerWords(control: control, result: refused)
+            return refused
+        }
         let before = lastCore
         let result = port.send(control, values)
+        if control == "sim.family", result.isAccepted, let value = values.first,
+           let index = SimulationCore.choice(value, count: SimulationCore.families.count) {
+            let cap = speedCap(kind: SimulationCore.families[index])
+            if let speed = before?.speedIndex, speed > cap { _ = port.send("sim.speed", [Double(cap)]) }
+        }
         if control == "sim.timestep", !result.isAccepted, let value = values.first,
            let sentence = before?.timeStepRefusal(value)?.sentence {
             mirror.message = sentence
@@ -503,6 +567,88 @@ final class SimulationPresenter: ExperiencePresenter {
             mirror.message = Self.answerWords(control: control, result: result)
         }
         return result
+    }
+
+    /// The fastest speed index for `kind`: ×1 (index 2) under Reduce Motion, the automaton ×0.25 (index 0) under
+    /// Reduce Flashing, otherwise ×4 (index 4).
+    func speedCap(kind: SimulationKind) -> Int {
+        var cap = SimulationScheduler.speeds.count - 1
+        if reduceMotion || reduceFlashing { cap = min(cap, 2) }
+        if reduceFlashing, kind == .automaton { cap = 0 }
+        return cap
+    }
+
+    /// Recomputes the histogram once ``histogramInterval`` frames passed while running, or at once after a non-step
+    /// change (another spec, a step count that went down, or a changed field at an unchanged step count).
+    private func gateHistogram(_ core: SimulationCore) {
+        framesSinceHistogram += 1
+        guard let source = histogramSource else { updateHistogram(core); return }
+        let field = core.model.field
+        guard field != source.field else { return }
+        let nonStep = source.spec != core.model.spec || core.stepCount <= source.step
+        if nonStep || !core.isRunning || framesSinceHistogram >= Self.histogramInterval { updateHistogram(core) }
+    }
+
+    /// Computes the histogram of `core`'s field into the mirror.
+    private func updateHistogram(_ core: SimulationCore) {
+        let histogram = SimulationHistogram.of(core.model.field, kind: core.kind)
+        if mirror.histogram != histogram { mirror.histogram = histogram }
+        histogramSource = (core.model.spec, core.stepCount, core.model.field)
+        framesSinceHistogram = 0
+        histogramUpdateCount += 1
+    }
+
+    /// The cell under `location` (points, top-left origin) on a `viewSize` canvas, or nil outside the grid square.
+    nonisolated static func cell(at location: Vec2, viewSize: Vec2) -> (x: Int, y: Int)? {
+        let n = SimulationCore.gridSize
+        let width = max(1, Int(viewSize.x.rounded(.down))), height = max(1, Int(viewSize.y.rounded(.down)))
+        let square = Self.square(width: width, height: height, grid: n)
+        let top = Double(height) - square.y - square.side
+        let u = (location.x - square.x) / square.side, v = (location.y - top) / square.side
+        guard u >= 0, u < 1, v >= 0, v < 1 else { return nil }
+        let x = min(n - 1, Int((u * Double(n)).rounded(.down)))
+        let rowFromTop = min(n - 1, Int((v * Double(n)).rounded(.down)))
+        return (x, n - 1 - rowFromTop)
+    }
+
+    /// Touches paint cells (see the file header): a tap sends `sim.paint [x, y, 0]`, a drag `sim.paint [x, y, 1]` per
+    /// cell entered.
+    func pointer(_ event: PointerEvent, viewSize: Vec2, port: ExperienceActionPort) {
+        let cell = Self.cell(at: event.location, viewSize: viewSize)
+        switch event.phase {
+        case .began:
+            if let cell { touches[event.id] = ((cell.x, cell.y), (cell.x, cell.y), false) }
+        case .moved:
+            guard var touch = touches[event.id], let cell, cell != touch.last else { return }
+            if !touch.moved {
+                send("sim.paint", [Double(touch.first.0), Double(touch.first.1), 1], through: port)
+                touch.moved = true
+            }
+            send("sim.paint", [Double(cell.x), Double(cell.y), 1], through: port)
+            touch.last = (cell.x, cell.y)
+            touches[event.id] = touch
+        case .ended:
+            if let touch = touches.removeValue(forKey: event.id), !touch.moved {
+                send("sim.paint", [Double(touch.first.0), Double(touch.first.1), 0], through: port)
+            }
+        case .cancelled:
+            touches[event.id] = nil
+        }
+    }
+
+    /// Forgets the touches in progress.
+    func cancelPointers() { touches = [:] }
+
+    /// The action the canvas touches send.
+    var gestureActions: Set<String> { ["sim.paint"] }
+
+    /// Captures the field as a 1024 × 1024 PNG through `render` (the host's still renderer): a running simulation is
+    /// paused by `sim.pause` first and resumed by `sim.run` after, so the field and the step count are unchanged.
+    func captureStill(through port: ExperienceActionPort, render: (Int, Int) throws -> StillImage) {
+        let wasRunning = lastCore?.isRunning == true
+        if wasRunning { _ = port.send("sim.pause", []) }
+        capture.capture(render)
+        if wasRunning { _ = port.send("sim.run", []) }
     }
 
     /// The legend over the canvas (FR-A16-320).
@@ -521,7 +667,7 @@ final class SimulationPresenter: ExperiencePresenter {
         AnyView(SimulationControls(port: port, mirror: mirror, presenter: self))
     }
 
-    /// The actions the native controls send: every action.
+    /// The actions the native controls send: every action (`sim.paint` also from the Seed row).
     var nativeActions: Set<String> {
         Set(SimulationCore.actionIDs)
     }

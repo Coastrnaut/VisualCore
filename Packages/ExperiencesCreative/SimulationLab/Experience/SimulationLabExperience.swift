@@ -1,8 +1,8 @@
 // SimulationLabExperience — feature 117 (A16-P01) T-A16-105 (FR-A16-130, FR-A16-131). The public face of the framework
 // `SimulationLabExperience`: the experience's id and the factory the one app's registry calls (the same parameter list
 // as Molecular Explorer's, so the registry entry mirrors it). The simulation travels in the host's saved session state;
-// the experience keeps no files of its own in this phase, so `storage` is unused. Nothing flashes: the field changes
-// one cell colour at a time at no more than the family's iteration rate, so Reduce Flashing changes nothing.
+// from feature 120 (A16-P04) `storage` holds the saved experiments (``SimulationPresetStore``), and Reduce Motion and
+// Reduce Flashing set the presenter's speed caps (×1, and the automaton ×0.25 under Reduce Flashing).
 //
 // Reduce Motion (FR-A16-130): the simulation opens paused and the person starts it. The core's preparation knows only
 // the seed, so the factory wraps the shell in ``SimulationExperience`` (as Physics Playground's `PlaygroundExperience`
@@ -22,18 +22,19 @@ public enum SimulationLabExperience {
     /// The catalog id `a16.simulation-lab`; nil only if the id text were malformed.
     public static let id = ExperienceID(rawValue: SimulationCore.experienceID)
 
-    /// The experience registered as `id`. `storage` is unused in this phase (the state travels in the host's saved
-    /// session state); with `reduceMotion` the simulation opens paused; `reduceFlashing` changes nothing.
+    /// The experience registered as `id`: `storage` holds the saved experiments; with `reduceMotion` the simulation
+    /// opens paused; both settings cap the speed.
     @MainActor
     public static func make(id: ExperienceID, storage: ExperienceStorage, reduceMotion: Bool,
                             reduceFlashing: Bool) -> any Experience {
-        SimulationExperience(shell: make(id: id), reduceMotion: reduceMotion)
+        SimulationExperience(shell: make(id: id, storage: storage), reduceMotion: reduceMotion,
+                             reduceFlashing: reduceFlashing)
     }
 
-    /// The experience's shell with its presenter exposed (tests).
+    /// The experience's shell with its presenter exposed (tests); without `storage` there is no preset library.
     @MainActor
-    static func make(id: ExperienceID) -> ExperienceShell<SimulationPresenter> {
-        ExperienceShell(id: id, presenter: SimulationPresenter(experienceID: id))
+    static func make(id: ExperienceID, storage: ExperienceStorage? = nil) -> ExperienceShell<SimulationPresenter> {
+        ExperienceShell(id: id, presenter: SimulationPresenter(experienceID: id, storage: storage))
     }
 }
 
@@ -47,10 +48,13 @@ final class SimulationExperience: Experience {
     /// Whether the next activation pauses (set by a preparation or a reset under Reduce Motion).
     private(set) var pauseOnActivation = false
 
-    /// Wraps `shell`; with `reduceMotion` the simulation opens paused.
-    init(shell: ExperienceShell<SimulationPresenter>, reduceMotion: Bool) {
+    /// Wraps `shell`; with `reduceMotion` the simulation opens paused. Both settings set the presenter's speed caps
+    /// (feature 120): a faster speed is lowered to the cap on activation.
+    init(shell: ExperienceShell<SimulationPresenter>, reduceMotion: Bool, reduceFlashing: Bool = false) {
         self.shell = shell
         self.reduceMotion = reduceMotion
+        shell.presenter.reduceMotion = reduceMotion
+        shell.presenter.reduceFlashing = reduceFlashing
     }
 
     /// The presenter of the shell.
@@ -88,6 +92,14 @@ final class SimulationExperience: Experience {
     func activate() throws(ExperienceError) {
         try shell.activate()
         pauseIfDue()
+        lowerSpeedToCap()
+    }
+
+    /// Lowers a speed above the presenter's cap for the current family to the cap through `sim.speed`.
+    private func lowerSpeedToCap() {
+        guard let core = shell.engine.core else { return }
+        let cap = presenter.speedCap(kind: core.kind)
+        if core.speedIndex > cap { _ = shell.handle(control: "sim.speed", values: [Double(cap)]) }
     }
 
     /// active → suspended.

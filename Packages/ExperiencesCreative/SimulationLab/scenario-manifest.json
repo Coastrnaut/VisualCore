@@ -7,7 +7,9 @@
     "sim.step",
     "sim.reset",
     "sim.speed",
-    "sim.timestep"
+    "sim.timestep",
+    "sim.paint",
+    "sim.spec"
   ],
   "experience" : "a16.simulation-lab",
   "kind" : "creative",

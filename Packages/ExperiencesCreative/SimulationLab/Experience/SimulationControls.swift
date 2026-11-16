@@ -11,6 +11,11 @@
 //   the Time step stepper (`time-step` → `sim.timestep [Δt ± 0.05]`, feature 119: reaction-diffusion and the wave
 //     only; a step beyond the stability limit is refused and its sentence appears in the message line);
 //   without floating-point render targets the Family picker disables reaction-diffusion and the wave field;
+//   feature 120 (A16-P04) T-A16-404/405/408/409: the Seed row (`seed-column`, `seed-row`, `seed` → `sim.paint [x, y,
+//     0]`), the Inspector (`inspector`: every parameter with value, unit and range, the time step with its limit), the
+//     approximation label (`approximation`), the Presets section (bundled presets → `sim.family` and `sim.preset`;
+//     saved ones → `sim.spec`; `preset-name` and `preset-save`; delete), and Capture (`capture`, with a ShareLink to
+//     the PNG; a running simulation is paused for it and resumed); the Speed picker disables speeds above the cap;
 //   the status line (`status`: "Running at ×1, step 120") and the answer to a refused action (`message`, shown only
 //     when there is one).
 // Every control and line has an accessible label and value (controls a hint too) and the identifier
@@ -21,6 +26,8 @@
 // compares equal from one host update to the next (feature 108 T-A14-609). Actions go through the presenter.
 import SimulationLabCore
 import SwiftUI
+import VisualCoreParameters
+import VisualCoreRendering
 import VisualCoreExperience
 import VisualCoreExperienceHost
 
@@ -32,6 +39,17 @@ struct SimulationControls: View {
     let mirror: SimulationMirror
     /// The presenter every action goes through (it shows the answer to a refused action in the mirror).
     let presenter: SimulationPresenter
+
+    /// The host's still renderer (nil outside the host).
+    @Environment(\.experienceStillRenderer) private var still
+    /// The Seed row's column.
+    @State private var seedColumn = SimulationCore.gridSize / 2
+    /// The Seed row's row.
+    @State private var seedRow = SimulationCore.gridSize / 2
+    /// The name typed for a saved experiment.
+    @State private var presetName = ""
+    /// The answer to the last save.
+    @State private var presetMessage: String?
 
     /// The time-step increment of one stepper tap.
     static let timeStepIncrement = 0.05
@@ -84,6 +102,11 @@ struct SimulationControls: View {
             }
             speedPicker
             if mirror.family != 0 { timeStepStepper }
+            seedRowView
+            line(mirror.approximation, label: "Approximation", name: "approximation")
+            inspector
+            presetsSection
+            captureRow
             line(mirror.status, label: "Status", name: "status")
             if !mirror.message.isEmpty {
                 line(mirror.message, label: "Message", name: "message")
@@ -149,6 +172,7 @@ struct SimulationControls: View {
                                   })) {
             ForEach(SimulationCore.speedTitles.indices, id: \.self) { index in
                 Text(verbatim: SimulationCore.speedTitles[index]).tag(index)
+                    .disabled(index > mirror.speedCap)
             }
         } label: {
             Text(verbatim: "Speed")
@@ -176,6 +200,132 @@ struct SimulationControls: View {
         .accessibilityValue(Text(verbatim: words))
         .accessibilityHint(Text(verbatim: "Changes the time step by 0.05; a step beyond the stability limit is refused"))
         .accessibilityIdentifier(port.identifier("time-step"))
+    }
+
+    /// The Seed row: column and row steppers and a Seed button sending `sim.paint [x, y, 0]`, the touch alternative.
+    private var seedRowView: some View {
+        let last = SimulationCore.gridSize - 1
+        return VStack(alignment: .leading, spacing: 4) {
+            Stepper(value: $seedColumn, in: 0...last) { Text(verbatim: "Column \(seedColumn)") }
+                .frame(minHeight: 44)
+                .accessibilityLabel(Text(verbatim: "Seed column"))
+                .accessibilityValue(Text(verbatim: "\(seedColumn)"))
+                .accessibilityIdentifier(port.identifier("seed-column"))
+            Stepper(value: $seedRow, in: 0...last) { Text(verbatim: "Row \(seedRow)") }
+                .frame(minHeight: 44)
+                .accessibilityLabel(Text(verbatim: "Seed row"))
+                .accessibilityValue(Text(verbatim: "\(seedRow)"))
+                .accessibilityIdentifier(port.identifier("seed-row"))
+            button("Seed", name: "seed", value: "column \(seedColumn), row \(seedRow)",
+                   hint: "Seeds the cell as a tap on the field does", enabled: true) {
+                send("sim.paint", [Double(seedColumn), Double(seedRow), 0])
+            }
+        }
+    }
+
+    /// The inspector: every parameter of the family with value, unit and range, and the time step with its limit.
+    @ViewBuilder private var inspector: some View {
+        if let spec = mirror.spec {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(verbatim: "Inspector").font(.subheadline).accessibilityAddTraits(.isHeader)
+                ForEach(Self.inspectorRows(spec), id: \.self) { row in
+                    Text(verbatim: row).font(.footnote).fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            .accessibilityElement(children: .combine)
+            .accessibilityIdentifier(port.identifier("inspector"))
+        }
+    }
+
+    /// The inspector's rows for `spec`: "Feed: 0.035 (range 0 to 0.1)", "Wave speed: 1 cells per time unit (range 0.1
+    /// to 2)", and the time step with its limit ("Time step: 1 time units (limit 1.5625)"; the wave's names the Courant
+    /// limit 0.707; the automaton's is one generation).
+    static func inspectorRows(_ spec: SimulationSpec) -> [String] {
+        var rows: [String] = []
+        for definition in ParameterCatalog.definitions(for: spec.kind) {
+            let unit = definition.unit.isEmpty ? "" : " " + definition.unit
+            rows.append("\(definition.title): \(SimulationCore.decimal(spec.value(definition.name)))\(unit) (range "
+                        + "\(SimulationCore.decimal(definition.minimum)) to \(SimulationCore.decimal(definition.maximum)))")
+        }
+        switch spec.kind {
+        case .automaton: rows.append("Time step: one generation per step")
+        case .reactionDiffusion:
+            rows.append("Time step: \(SimulationCore.decimal(spec.timeStep)) time units (limit 1.5625)")
+        case .wave:
+            rows.append("Time step: \(SimulationCore.decimal(spec.timeStep)) time units (Courant number "
+                        + "\(SimulationCore.decimal((spec.courantNumber * 1000).rounded() / 1000)), limit 0.707)")
+        }
+        return rows
+    }
+
+    /// The Presets section: the bundled presets, the saved experiments, saving under a name, deleting.
+    @ViewBuilder private var presetsSection: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(verbatim: "Presets").font(.subheadline).accessibilityAddTraits(.isHeader)
+            ForEach(ExperimentPreset.bundled.indices, id: \.self) { index in
+                let preset = ExperimentPreset.bundled[index]
+                button(preset.name, name: "bundled-\(index)", value: preset.source + ", " + preset.license,
+                       hint: preset.annotation, enabled: true) { open(bundled: preset) }
+            }
+            if let store = presenter.presets {
+                ForEach(store.entries, id: \.id) { entry in
+                    HStack(spacing: 8) {
+                        button(entry.preset.name, name: "saved-\(entry.id.uuidString.lowercased())",
+                               value: SimulationCore.presetWords(entry.preset.spec),
+                               hint: "Opens the saved experiment", enabled: true) {
+                            send("sim.spec", SimulationCore.specValues(entry.preset.spec))
+                        }
+                        button("Delete", name: "delete-\(entry.id.uuidString.lowercased())", value: entry.preset.name,
+                               hint: "Deletes the saved experiment", enabled: true) { store.delete(entry.id) }
+                    }
+                }
+                TextField(text: $presetName) { Text(verbatim: "Name") }
+                    .frame(minHeight: 44)
+                    .accessibilityLabel(Text(verbatim: "Experiment name"))
+                    .accessibilityIdentifier(port.identifier("preset-name"))
+                button("Save experiment", name: "preset-save", value: presetName,
+                       hint: "Saves the current experiment under this name", enabled: true) { save(store) }
+                if let presetMessage { line(presetMessage, label: "Preset message", name: "preset-message") }
+            }
+        }
+    }
+
+    /// The Capture button and, after a capture, the share link to its PNG; a failure shows its message.
+    @ViewBuilder private var captureRow: some View {
+        button("Capture picture", name: "capture", value: "1024 × 1024 PNG",
+               hint: "Captures the field as a picture to share", enabled: still != nil) { captureNow() }
+        if let url = presenter.capture.url {
+            ShareLink(item: SimulationCaptureFile(url: url),
+                      preview: SharePreview(Text(verbatim: "Simulation Lab picture"))) {
+                Text(verbatim: "Share picture").frame(maxWidth: .infinity, minHeight: 44)
+            }
+            .accessibilityIdentifier(port.identifier("share"))
+        }
+        if let message = presenter.capture.message { line(message, label: "Capture message", name: "capture-message") }
+    }
+
+    /// Chooses a bundled preset by its family and preset index.
+    private func open(bundled preset: ExperimentPreset) {
+        let family = Double(SimulationCore.families.firstIndex(of: preset.spec.kind) ?? 0)
+        let index = SimulationCore.preset(of: preset.spec) ?? 0
+        if mirror.family != Int(family) { send("sim.family", [family]) }
+        send("sim.preset", [Double(index)])
+    }
+
+    /// Saves the current experiment under the typed name.
+    private func save(_ store: SimulationPresetStore) {
+        guard let spec = mirror.spec else { return }
+        let preset = ExperimentPreset(name: presetName.trimmingCharacters(in: .whitespacesAndNewlines), spec: spec,
+                                      palette: "standard", annotation: "Saved in Simulation Lab.",
+                                      source: "Saved by you", license: "original")
+        presetMessage = store.save(preset)
+        if presetMessage == nil { presetName = "" }
+    }
+
+    /// Captures the field through the host's still renderer, pausing a running simulation around it.
+    private func captureNow() {
+        guard let still else { return }
+        presenter.captureStill(through: port) { width, height in try still(width: width, height: height) }
     }
 
     /// Sends `control` with `values` through the presenter, which shows the answer when it is refused.

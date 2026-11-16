@@ -34,7 +34,7 @@ Precedent: `specs/119-sl-p03-rd-wave/tasks.md`.
   - the A16-P01 tiny CPU reference fixtures still pass (FR-A16-403).
 
   (FR-A16-401, 403, 420, 430)
-- [ ] T-A16-403 Add `sim.paint [x 0…63, y 0…63, mode 0…1]` and `sim.spec [family 0…2, a, b, Δt 0.05…2]` to `Packages/ExperiencesCreative/SimulationLab/Experience/Adapter/SimulationCore.swift`:
+- [X] T-A16-403 Add `sim.paint [x 0…63, y 0…63, mode 0…1]` and `sim.spec [family 0…2, a, b, Δt 0.05…2]` to `Packages/ExperiencesCreative/SimulationLab/Experience/Adapter/SimulationCore.swift`: — Verified 2026-11-16: 2026-11-16: .autonomy/checks/A16-P04.sl-ios27.json exit 0 (62 core, 23 Swift Testing and 54 XCTest experience tests, 0 failures, slowest 4.3 s, iOS 27); PaintTests (sim.paint changes exactly the brush cells and keeps the step, a non-whole cell refused; sim.spec gives each bundled preset's spec, a refused spec changes nothing); scenario-manifest.json regenerated with the ten controls; the presenter, controls and store sources of T-A16-404 to 409 land in this commit (they share the presenter and the controls)
   - `sim.paint` is refused with `a16.invalid-choice` for a value that is not a whole cell or mode;
   - `sim.spec` builds the family's spec from a and b (rule index and 0, feed and kill, or speed and damping) with Δt,
     validates it with `SimulationSpec.refusal()`, and starts at step 0 with the same seed, running and speed.

@@ -90,6 +90,8 @@ struct SimulationLegendValues: Equatable, Sendable {
 struct SimulationLegend: View {
     /// What the legend shows.
     let values: SimulationLegendValues
+    /// The histogram drawn under the bar (feature 120, FR-A16-420); none when nil.
+    var histogram: SimulationHistogram?
 
     /// A SwiftUI colour from palette bytes.
     static func color(_ rgb: SimulationPalette.RGB) -> Color {
@@ -107,6 +109,19 @@ struct SimulationLegend: View {
         }
     }
 
+    /// The 16 histogram bars, 120 points wide and at most 24 high, each as tall as its share of the fullest bin.
+    private func bars(_ histogram: SimulationHistogram) -> some View {
+        let fullest = max(1, histogram.bins.max() ?? 1)
+        return HStack(alignment: .bottom, spacing: 1) {
+            ForEach(histogram.bins.indices, id: \.self) { index in
+                Rectangle()
+                    .fill(Self.textColor)
+                    .frame(width: 6.5, height: max(1, 24 * CGFloat(histogram.bins[index]) / CGFloat(fullest)))
+            }
+        }
+        .frame(height: 24, alignment: .bottom)
+    }
+
     /// The text colour on the panel.
     private static let textColor = Color.white.opacity(0.92)
 
@@ -116,6 +131,7 @@ struct SimulationLegend: View {
             Text(verbatim: values.title).font(.caption).foregroundStyle(Self.textColor)
             bar
             labels
+            if let histogram { bars(histogram) }
         }
         .padding(8)
         .background(
@@ -172,7 +188,7 @@ struct SimulationLegendOverlay: View {
     /// The legend of the mirror's values; nothing before the first state.
     var body: some View {
         if let values = mirror.legend {
-            SimulationLegend(values: values)
+            SimulationLegend(values: values, histogram: mirror.histogram)
         }
     }
 }

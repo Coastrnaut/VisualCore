@@ -29,6 +29,13 @@
 //                      outside the family's own range with `a16.invalid-choice`, and the cellular automaton (one
 //                      generation per step) refuses the action with `a16.invalid-choice`. ``timeStepRefusal(_:)`` gives
 //                      the refusal with its sentence.
+//   sim.paint [x 0…63, y 0…63, mode 0…1]  (feature 120, A16-P04, clarification Q1) the family's brush at cell (x, y):
+//                      mode 0 a tap, 1 a drag (`SimulationModel.paint(x:y:mode:)`); the step count is unchanged; a value
+//                      that is not a whole cell or mode is refused with `a16.invalid-choice`.
+//   sim.spec [family 0…2, a 0…2, b 0…0.1, Δt 0.05…2]  (feature 120, clarification Q4) a saved experiment: the family's
+//                      two parameters (the rule index and 0, feed and kill, or wave speed and damping) and its time step,
+//                      validated by `SimulationSpec.refusal()` (`a16.unstable` or `a16.invalid-choice`) and started at
+//                      step 0 with the same seed, running and speed.
 // A spec the core refuses while changing the family or the preset is refused with `a16.unstable` for a stability
 // refusal and `a16.invalid-choice` for any other (the standard specs are valid, so neither happens with the shipped
 // presets). Called directly (not through the engine), the core refuses an unknown control with `unknownControl` and a
@@ -63,6 +70,8 @@ public enum SimulationRule {
     /// Reaction-diffusion or the wave chosen where floating-point render targets are missing (feature 119, A16-P03;
     /// refused by the presenter, which knows the device; the deterministic core never gives it).
     public static let unsupported = "a16.unsupported"
+    /// A speed beyond the Reduce Motion or Reduce Flashing cap (feature 120, A16-P04; refused by the presenter).
+    public static let reducedMotion = "a16.reduced-motion"
 }
 
 /// Why a stored Simulation Lab state is refused.
@@ -80,12 +89,12 @@ public struct SimulationCore: ExperienceCore, Equatable {
 
     /// The action ids in declaration order.
     public static let actionIDs = ["sim.family", "sim.preset", "sim.run", "sim.pause", "sim.step", "sim.reset",
-                                   "sim.speed", "sim.timestep"]
+                                   "sim.speed", "sim.timestep", "sim.paint", "sim.spec"]
 
     /// The number of values each action carries, by action id.
     static let valueCounts: [String: Int] = ["sim.family": 1, "sim.preset": 1, "sim.run": 0, "sim.pause": 0,
                                              "sim.step": 0, "sim.reset": 0, "sim.speed": 1,
-                                             "sim.timestep": 1]
+                                             "sim.timestep": 1, "sim.paint": 3, "sim.spec": 4]
 
     /// The prefix of the outcome code; the family's outcome name follows.
     public static let outcomePrefix = "simulating-"
@@ -150,7 +159,7 @@ public struct SimulationCore: ExperienceCore, Equatable {
     public static let automatonTimeStepRefusal = SimulationRefusal(
         .outOfRange, "The cellular automaton advances one generation per step: its time step must be 1.")
 
-    /// The eight controls with their declared ranges.
+    /// The ten controls with their declared ranges.
     public static var controls: [ExperienceControl] {
         [ExperienceControl(id: "sim.family", ranges: [0...Double(families.count - 1)]),
          ExperienceControl(id: "sim.preset", ranges: [0...Double(maxPresetIndex)]),
@@ -159,7 +168,9 @@ public struct SimulationCore: ExperienceCore, Equatable {
          ExperienceControl(id: "sim.step"),
          ExperienceControl(id: "sim.reset"),
          ExperienceControl(id: "sim.speed", ranges: [0...Double(SimulationScheduler.speeds.count - 1)]),
-         ExperienceControl(id: "sim.timestep", ranges: [timeStepRange])]
+         ExperienceControl(id: "sim.timestep", ranges: [timeStepRange]),
+         ExperienceControl(id: "sim.paint", ranges: [0...Double(gridSize - 1), 0...Double(gridSize - 1), 0...1]),
+         ExperienceControl(id: "sim.spec", ranges: [0...Double(families.count - 1), 0...2, 0...0.1, timeStepRange])]
     }
 
     /// The first state with `seed` as the preparation seed.
@@ -209,6 +220,17 @@ public struct SimulationCore: ExperienceCore, Equatable {
             guard next.singleStep() else { return refused }
         case "sim.reset":
             next.reset()
+        case "sim.paint":
+            guard let x = Self.choice(v[0], count: Self.gridSize), let y = Self.choice(v[1], count: Self.gridSize),
+                  let m = Self.choice(v[2], count: 2), let mode = PaintMode(rawValue: m),
+                  next.paint(x: x, y: y, mode: mode) else { return refused }
+        case "sim.spec":
+            guard let index = Self.choice(v[0], count: Self.families.count) else { return refused }
+            switch Self.remade(next, spec: Self.spec(family: Self.families[index], a: v[1], b: v[2], timeStep: v[3],
+                                                     seed: preparationSeed)) {
+            case .success(let made): next = made
+            case .failure(let refusal): return .rejected(.rule(code: Self.ruleCode(for: refusal)))
+            }
         case "sim.timestep":
             if let refusal = timeStepRefusal(v[0]) { return .rejected(.rule(code: Self.ruleCode(for: refusal))) }
             var spec = next.spec
@@ -249,6 +271,41 @@ public struct SimulationCore: ExperienceCore, Equatable {
         var spec = model.spec
         spec.timeStep = value
         return spec.refusal()
+    }
+
+    /// The spec of `family` with the two parameters `a` and `b` (the rule index and 0, feed and kill, or wave speed and
+    /// damping), time step `timeStep` and `seed`, unvalidated (`sim.spec`; `remade` validates it).
+    public static func spec(family: SimulationKind, a: Double, b: Double, timeStep: Double, seed: UInt64) -> SimulationSpec {
+        var spec = SimulationSpec.standard(family, preset: 0, seed: seed)
+        switch family {
+        case .automaton: spec.parameters = [ParameterCatalog.rule.name: a]
+        case .reactionDiffusion: spec.parameters = [ParameterCatalog.feed.name: a, ParameterCatalog.kill.name: b]
+        case .wave: spec.parameters = [ParameterCatalog.speed.name: a, ParameterCatalog.damping.name: b]
+        }
+        spec.timeStep = timeStep
+        return spec
+    }
+
+    /// The `sim.spec` values of `spec`: family index, the two parameters and the time step.
+    public static func specValues(_ spec: SimulationSpec) -> [Double] {
+        let family = Double(families.firstIndex(of: spec.kind) ?? 0)
+        switch spec.kind {
+        case .automaton: return [family, spec.value(ParameterCatalog.rule.name), 0, spec.timeStep]
+        case .reactionDiffusion:
+            return [family, spec.value(ParameterCatalog.feed.name), spec.value(ParameterCatalog.kill.name), spec.timeStep]
+        case .wave:
+            return [family, spec.value(ParameterCatalog.speed.name), spec.value(ParameterCatalog.damping.name),
+                    spec.timeStep]
+        }
+    }
+
+    /// The approximation label of `kind` (FR-A16-410, feature 120).
+    public static func approximationWords(_ kind: SimulationKind) -> String {
+        switch kind {
+        case .automaton: "Approximation: 64 × 64 cells, exact states (0 or 1), wrap boundary."
+        case .reactionDiffusion: "Approximation: 64 × 64 cells, half-precision values, wrap boundary, explicit Euler step."
+        case .wave: "Approximation: 64 × 64 cells, half-precision values, fixed zero boundary, leapfrog step."
+        }
     }
 
     /// The rule code of a refused spec: `a16.unstable` for a stability refusal, `a16.invalid-choice` otherwise.
@@ -406,6 +463,14 @@ public struct SimulationCore: ExperienceCore, Equatable {
         }
     }
 
+    /// The histogram in words (feature 120, FR-A16-420): "most cells in bin 1 of 16 (0.06 to 0.12)".
+    public static func histogramWords(_ histogram: SimulationHistogram) -> String {
+        let k = histogram.fullestBin
+        let width = (histogram.high - histogram.low) / Float(SimulationHistogram.binCount)
+        let low = histogram.low + Float(k) * width, high = low + width
+        return "most cells in bin \(k + 1) of \(SimulationHistogram.binCount) (\(twoDecimals(low)) to \(twoDecimals(high)))"
+    }
+
     /// Running or paused in words: "running at ×1", "paused".
     public var playbackWords: String {
         isRunning ? "running at \(Self.speedTitle(index: speedIndex))" : "paused"
@@ -420,10 +485,11 @@ public struct SimulationCore: ExperienceCore, Equatable {
     }
 
     /// The canvas description: "Simulation Lab: cellular automaton, rule Life (B3/S23); 64 × 64 grid; running at ×1;
-    /// step 0; 1024 of 4096 cells alive."
+    /// step 0; 1024 of 4096 cells alive; most cells in bin 1 of 16 (0.00 to 0.06)." (the histogram from feature 120).
     public var canvasDescription: String {
         let spec = model.spec
         return "Simulation Lab: \(kind.title), \(Self.presetWords(spec)); \(spec.gridSize) × \(spec.gridSize) grid; "
-            + "\(playbackWords); step \(stepCount); \(Self.fieldWords(model.field, kind: kind))."
+            + "\(playbackWords); step \(stepCount); \(Self.fieldWords(model.field, kind: kind)); "
+            + "\(Self.histogramWords(SimulationHistogram.of(model.field, kind: kind)))."
     }
 }
