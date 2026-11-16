@@ -49,8 +49,9 @@ closer than 0.4 Å, with twelve typed reasons; the ten supported elements have a
   not be opened: <reason>." with " (line N)" before the period where a line is known; one fixed reason phrase per
   parser reason (for example "an element this explorer does not know", "two atoms closer than 0.4 Å"). An unreadable
   file reads "The file could not be read." A cancelled picker shows nothing.
-- Q: Where is the import kept and how is it named? → A: The accepted bytes are written to `import.xyz` in the
-  experience's storage (replacing the previous one). The title is the file name without its extension, keeping letters,
+- Q: Where is the import kept and how is it named? → A: The accepted bytes are written to `import.xyz` and the title
+  to `import-title.txt` in the experience's storage (replacing the previous ones; the title stays outside the engine,
+  whose actions carry numbers only). The title is the file name without its extension, keeping letters,
   digits, spaces and `-_.()`, at most 40 characters, "Imported molecule" when nothing is left; the comment line is
   never shown. The recent list records it as `imported`; choosing it when the engine has no import (for example after
   the saved state was reset) sends the actions of the stored file again; when that file is missing or refused the entry
