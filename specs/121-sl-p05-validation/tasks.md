@@ -39,7 +39,7 @@ Precedent: `specs/120-sl-p04-ui-presets-capture/tasks.md`.
 
 ## Phase 4: Story 2 — size change and boundaries
 
-- [ ] T-A16-504 [P] [US2] Create `Packages/ExperiencesCreative/SimulationLab/ExperienceTests/SizeChangeTests.swift`:
+- [X] T-A16-504 [P] [US2] Create `Packages/ExperiencesCreative/SimulationLab/ExperienceTests/SizeChangeTests.swift`: — Verified 2026-11-16: 2026-11-16: .autonomy/checks/A16-P05.sl-ios27.json exit 0 (62 core, 23 Swift Testing and 62 XCTest experience tests, 0 failures, slowest 6.6 s, iOS 27); SizeChangeTests: per family a resize keeps resourceBuildCount, reloads the mirror and the field is within tolerance with the square fitted to the new canvas; a recreation raises resourceBuildCount by one and reloads, within tolerance
   - per family, mid-run (paused after frames), a canvas resize to a new size keeps `resourceBuildCount` and the GPU
     field after the next frame is within the family's tolerance of the CPU field, and the drawn square fits the new
     canvas (`lastSquare`);
