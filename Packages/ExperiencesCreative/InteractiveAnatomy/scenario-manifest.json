@@ -479,6 +479,80 @@
       },
       "name" : "fixture-turned",
       "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "layer.show",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "layer.show",
+            "values" : [
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "4665ff638d2e99ceea73d4520d7b148628ff6cf07569cc349990e1f46d55f5b9",
+        "initialDigest" : "2ae14159afeb18a206284f6b9eb552447493b1b85f968853b7e9d1942e241c04",
+        "outcome" : "viewing-knee"
+      },
+      "name" : "fixture-bones-only",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "structure.select",
+            "values" : [
+              8
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "camera.zoom",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "camera.zoom",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f5c533a7f941a476d8c3015b287d24beb52f970e8e8f16bf442f469933c677cb",
+        "initialDigest" : "2ae14159afeb18a206284f6b9eb552447493b1b85f968853b7e9d1942e241c04",
+        "outcome" : "selected-knee-acl"
+      },
+      "name" : "fixture-acl-zoomed",
+      "seed" : "1"
     }
   ],
   "schema" : 1

@@ -1,9 +1,11 @@
 // AnatomyManifest — feature 125 (A17-P02) T-A17-207 (FR-A17-210). The scenarios the verification runner plays for
 // Interactive Anatomy, all short (owner rule of 2026-11-13):
 //   - the nine standard scenarios, prepared with seed 1 (every seed opens with the opening view);
-//   - three fixtures: `fixture-femur-selected` (`structure.select [0]`), `fixture-ligaments-hidden`
-//     (`layer.show [2, 0]`) and `fixture-turned` (three `camera.turn [1]`, one `camera.tilt [1]`), expecting the
-//     outcomes `selected-knee-femur`, `viewing-knee` and `viewing-knee`.
+//   - five fixtures (the planning catalog's content count): `fixture-femur-selected` (`structure.select [0]`),
+//     `fixture-ligaments-hidden` (`layer.show [2, 0]`), `fixture-turned` (three `camera.turn [1]`, one
+//     `camera.tilt [1]`), `fixture-bones-only` (`layer.show [1, 0]`, `layer.show [2, 0]`) and `fixture-acl-zoomed`
+//     (`structure.select [8]`, two `camera.zoom [1]`), expecting the outcomes `selected-knee-femur`, `viewing-knee`,
+//     `viewing-knee`, `viewing-knee` and `selected-knee-acl`.
 // The completion scenario selects the femur and expects the outcome `selected-knee-femur`. The expected digests are
 // derived by playing the entries on a core exactly as the engine plays them (the steps of an entry, then its action)
 // and digesting it with the experience id as domain, as Molecular Explorer's manifest does.
@@ -29,6 +31,15 @@ extension AnatomyCore {
           ScenarioStep(steps: 1, action: ScriptedAction("camera.turn", [1]), result: "accepted"),
           ScenarioStep(steps: 1, action: ScriptedAction("camera.tilt", [1]), result: "accepted")],
          "viewing-knee"),
+        ("fixture-bones-only",
+         [ScenarioStep(steps: 1, action: ScriptedAction("layer.show", [1, 0]), result: "accepted"),
+          ScenarioStep(steps: 1, action: ScriptedAction("layer.show", [2, 0]), result: "accepted")],
+         "viewing-knee"),
+        ("fixture-acl-zoomed",
+         [ScenarioStep(steps: 1, action: ScriptedAction("structure.select", [8]), result: "accepted"),
+          ScenarioStep(steps: 1, action: ScriptedAction("camera.zoom", [1]), result: "accepted"),
+          ScenarioStep(steps: 1, action: ScriptedAction("camera.zoom", [1]), result: "accepted")],
+         "selected-knee-acl"),
     ]
 
     /// The actions of input-response, save-restore and reset: select the tibia, hide the ligaments, zoom in, select

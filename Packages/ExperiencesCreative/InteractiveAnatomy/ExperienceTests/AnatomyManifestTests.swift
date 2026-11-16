@@ -1,9 +1,10 @@
 // AnatomyManifestTests — feature 125 (A17-P02) T-A17-207 (FR-A17-210). The scenario manifest of Interactive Anatomy:
-// valid with the nine standard scenarios and the three fixtures `fixture-femur-selected`, `fixture-ligaments-hidden`
-// and `fixture-turned`; its derived digests, results and outcomes equal to what the engine gives when the runner
-// plays them; every fixture ending in the view state its actions describe; and the committed
-// `scenario-manifest.json` equal to the Swift manifest (`UPDATE_SCENARIO_MANIFEST=1`, on the simulator
-// `TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`, rewrites it).
+// valid with the nine standard scenarios and the five fixtures (the planning catalog's content count)
+// `fixture-femur-selected`, `fixture-ligaments-hidden`, `fixture-turned`, `fixture-bones-only` and
+// `fixture-acl-zoomed`; its derived digests, results and outcomes equal to what the engine gives when the runner plays
+// them; every fixture ending in the view state its actions describe; and the committed `scenario-manifest.json` equal
+// to the Swift manifest (`UPDATE_SCENARIO_MANIFEST=1`, on the simulator `TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`,
+// rewrites it).
 import Foundation
 import Testing
 @testable import InteractiveAnatomyExperience
@@ -30,13 +31,14 @@ private func playManifest(_ spec: ScenarioSpec) async throws -> (initial: String
 }
 
 @Suite struct AnatomyManifestTests {
-    /// The names of the three fixtures.
-    static let fixtureNames = ["fixture-femur-selected", "fixture-ligaments-hidden", "fixture-turned"]
+    /// The names of the five fixtures.
+    static let fixtureNames = ["fixture-femur-selected", "fixture-ligaments-hidden", "fixture-turned",
+                               "fixture-bones-only", "fixture-acl-zoomed"]
 
-    @Test func theManifestIsValidWithTheStandardScenariosAndThreeFixtures() {
+    @Test func theManifestIsValidWithTheStandardScenariosAndFiveFixtures() {
         let manifest = AnatomyCore.manifest(for: manifestID)
         let problems = ScenarioManifestValidator.problems(manifest, controls: AnatomyCore.controls,
-                                                          content: ContentRequirement(fixtures: 3))
+                                                          content: ContentRequirement(fixtures: 5))
         #expect(problems.isEmpty, "\(problems)")
         #expect(manifest.scenarios.map(\.name) == ScenarioManifest.standardNames + Self.fixtureNames)
         #expect(AnatomyCore.fixtures.map(\.name) == Self.fixtureNames)
@@ -77,11 +79,15 @@ private func playManifest(_ spec: ScenarioSpec) async throws -> (initial: String
                 #expect(view.selection == "knee.femur" && view.framed == "knee.femur")
             case "fixture-ligaments-hidden":
                 #expect(view.visibleLayers == [true, true, false] && view.selection == nil)
-            default:
+            case "fixture-turned":
                 #expect(view.camera.turn == 5 && view.camera.tilt == 2 && view.camera.zoom == 0)
+            case "fixture-bones-only":
+                #expect(view.visibleLayers == [true, false, false])
+            default:
+                #expect(view.selection == "knee.acl" && view.framed == "knee.acl" && view.camera.zoom == 2)
             }
         }
-        #expect(digests.count == 3, "the fixtures end in three different states")
+        #expect(digests.count == 5, "the fixtures end in five different states")
     }
 
     /// The JSON form with the control ids, named by `Catalog/registrations.json`. `UPDATE_SCENARIO_MANIFEST=1`
