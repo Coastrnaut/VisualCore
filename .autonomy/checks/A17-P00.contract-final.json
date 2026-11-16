@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_app_contract.py",
+    "--app",
+    "interactive-anatomy",
+    "--render"
+  ],
+  "command": "python3 scripts/check_app_contract.py --app interactive-anatomy --render",
+  "elapsed_seconds": 0.044,
+  "exit_code": 0,
+  "finished": "2026-11-16T22:11:14+00:00",
+  "log": ".autonomy/logs/A17-P00.contract-final.log",
+  "log_sha256": "d9a145366814aa67915bb4b155f368926527a668f251a18de0c35e6aaf2da91d",
+  "name": "contract-final",
+  "stage": "A17-P00",
+  "started": "2026-11-16T22:11:14+00:00",
+  "timed_out": false
+}

@@ -27,7 +27,7 @@ Precedent: `specs/116-sl-p00-boundary-audit/tasks.md`.
 
 ## Phase 6: User Story 4 — Stop/go decision (P2)
 
-- [ ] T-A17-008 [US4] Complete the contract's `gaps` (every non-available row: owning module, VisualCore or app-local, and phase A17-P01..P06 per research D4), the three manual risks as `negative` entries naming owner, verification method and release-blocker condition (source "manual §13 risk N"; the checker has no risk key), and `decision` (keys `result`, `reasons`, `blockers`) (verdict and reasons; "stop" if no working host or buildable lit, depth-tested mesh path); re-run the checker (`--name contract-final -- python3 scripts/check_app_contract.py --app interactive-anatomy --render`) (FR-A17-003, 006; SC-A17-002)
+- [X] T-A17-008 [US4] Complete the contract's `gaps` (every non-available row: owning module, VisualCore or app-local, and phase A17-P01..P06 per research D4), the three manual risks as `negative` entries naming owner, verification method and release-blocker condition (source "manual §13 risk N"; the checker has no risk key), and `decision` (keys `result`, `reasons`, `blockers`) (verdict and reasons; "stop" if no working host or buildable lit, depth-tested mesh path); re-run the checker (`--name contract-final -- python3 scripts/check_app_contract.py --app interactive-anatomy --render`) (FR-A17-003, 006; SC-A17-002) — Verified 2026-11-16: 2026-11-16: .autonomy/checks/A17-P00.contract-final.json exit 0; 15 gaps each with owner (13 app-local, G-GHOST VisualCore:VisualCoreRendering, G-LABELS VisualCore:VisualCoreMath) and phase A17-P01..P06; the three manual risks as negative entries with owner, verification and release blocker; decision go, no blockers
 
 ## Phase 7: Polish and evidence
 
