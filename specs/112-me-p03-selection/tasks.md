@@ -43,3 +43,7 @@ commits.
 
 MVP: picking with the occlusion fixture (302), then gestures and controls (305); labels, bond styles and the panel
 (303, 306) complete the phase. Review checkpoints after 304 (core tests) and at 309.
+
+## Phase 5: Convergence
+
+- [ ] T-A15-313 Add the additive hook `func cancelPointers()` to `ExperiencePresenter` in `Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift` (default no-op, `///` documented) and call it from `ExperienceShell.suspend()` (pointer events are dropped while suspended, so the system's touch cancellation never reaches a presenter); implement it in `MoleculePresenter` as `gestures.reset()`; test it in VisualCoreRendering (a recording presenter sees the call on suspend) and in `ExperienceTests/MoleculeGestureTests.swift` through a real session suspend (a drag begun before suspension sends nothing after resume, and the next one-finger drag orbits); update the API baseline and the VisualCoreRendering README; the reference regression runs at X-A15 (owner ruling of 2026-11-14) per Spec Edge Cases "suspension during a gesture" and plan Lifecycle (partial)
