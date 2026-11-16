@@ -828,7 +828,7 @@
    "id": "M14",
    "capability": "Picking a structure by touch: a tap is turned into a camera ray and tested against the visible structures' triangles (with a bounding-sphere prefilter), the nearest hit wins, hidden structures are not hit, ghosted ones are hit only under a stated rule",
    "source": "spec FR-A17-003 picking",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitCamera.swift",
@@ -877,7 +877,7 @@
     "file": "Packages/ExperiencesCreative/MolecularExplorer/Core/AtomPicker.swift",
     "symbol": "AtomPicker"
    },
-   "notes": "Tested: RayIntersectionTests (ray-triangle front and back, ray-sphere, ray-box, nearest), MeshBoundsTests, OrbitCameraTests, GestureTests. No ray-versus-mesh helper exists in a framework product; the structure picker is G-PICK (A17-P02), with a generic Ray3-against-Mesh cast assessed for VisualCoreMath or VisualCoreScenes if a second consumer exists."
+   "notes": "Tested: RayIntersectionTests (ray-triangle front and back, ray-sphere, ray-box, nearest), MeshBoundsTests, OrbitCameraTests, GestureTests. No ray-versus-mesh helper exists in a framework product; the structure picker is G-PICK (A17-P02), with a generic Ray3-against-Mesh cast assessed for VisualCoreMath or VisualCoreScenes if a second consumer exists. Available from A17-P02: its gaps (G-PICK) are closed."
   },
   {
    "id": "M15",
@@ -1203,7 +1203,7 @@
    "id": "M23",
    "capability": "Bounded resources: triangle, draw-call and label budgets per quality level, mesh budgets on every generator, the content pack size and the structure count capped",
    "source": "spec FR-A17-003 budgets",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshBuilder.swift",
@@ -1246,7 +1246,7 @@
     "file": "Packages/ExperiencesCreative/AudioOdyssey/Core/OdysseyQuality.swift",
     "symbol": "OdysseyQuality"
    },
-   "notes": "The bounding machinery is tested (MeshBuilderTests, ResourceLedgerTests, ExperienceStorageTests, MeshCacheTests); the experience's own numbers per tier are G-BUDGETS (A17-P02)."
+   "notes": "The bounding machinery is tested (MeshBuilderTests, ResourceLedgerTests, ExperienceStorageTests, MeshCacheTests); the experience's own numbers per tier are G-BUDGETS (A17-P02). Available from A17-P02: its gaps (G-BUDGETS) are closed."
   },
   {
    "id": "M24",
@@ -1525,8 +1525,8 @@
    "owner": "app-local",
    "justification": "The schematic shapes of the knee's structures (profiles for revolution, paths for tubes, surface functions) and the per-system material table are content; they are built from the existing public generators (M12), so no generator is added. A capsule profile helper or other generic shape is assessed for VisualCoreScenes in A17-P02 only if a second consumer exists.",
    "phase": 2,
-   "test": "Core host tests: every structure mesh builds within its MeshBudget at every quality tier, passes mesh validation, is closed where stated and gives the same mesh digest twice; experience tests draw the region through DepthMeshPass on the simulator",
-   "closed": null
+   "test": "Core tests (InteractiveAnatomyCoreTests, iOS 27 simulator): all 20 declared meshes build from MeshShapes and Mesh.uvSphere at both quality levels, validate and are closed, stay within the level's budget and give the same digest twice (SceneBuildTests, BudgetTests); experience tests draw the region through DepthMeshPass with one MeshRenderer per mesh made and released together (AnatomySessionTests, AnatomyRenderTests). No shape helper was added to VisualCoreScenes: no second consumer.",
+   "closed": "A17-P02"
   },
   {
    "id": "G-PICK",
@@ -1538,8 +1538,8 @@
    "owner": "app-local",
    "justification": "Structure picking (camera ray, bounding-sphere prefilter, triangle casts, nearest visible hit, the ghost rule) and selection are the experience's; Molecular Explorer's AtomPicker is not copied. A generic Ray3-against-Mesh cast is assessed for VisualCoreMath in A17-P02.",
    "phase": 2,
-   "test": "Core host tests: rays through known structure centres pick them; occluded structures are not picked; hidden structures are never hit; a miss gives nil; ties resolve by a stated order; picking is deterministic",
-   "closed": null
+   "test": "Core tests: for every part at least one of 26 probe rays picks it with all layers shown and none picks it with its layer hidden; a miss gives nil; ties go to the lower inventory index; deterministic (PickerTests); experience tests: a tap selects exactly what AnatomyPicker returns and never a hidden part; a list selection equals a tap (AnatomyTapTests). The ghost rule comes with G-GHOST (A17-P03). A generic Ray3-against-Mesh cast was assessed for VisualCoreMath and not added: one consumer, and the loop over world triangles with Ray3.intersect(triangle:) is a few lines.",
+   "closed": "A17-P02"
   },
   {
    "id": "G-CAMERA",
@@ -1550,8 +1550,8 @@
    "owner": "app-local",
    "justification": "Framing the orbit camera on a selected structure (MeshBounds centre and radius into OrbitViewBounds) and the reset view are app work over the public camera.",
    "phase": 2,
-   "test": "Core host tests: framing keeps the structure's bounding sphere inside the view for every tier's field of view and stays within OrbitViewBounds; reset returns to the initial camera; Reduce Motion makes the move immediate",
-   "closed": null
+   "test": "Core tests: turn wraps in 15° steps, tilt within ±60° and zoom within −4…6 are refused beyond their limits; framing each part keeps its bounding sphere inside the view at aspects 0.5 and 2; reset returns to the opening view (CameraFramingTests); the framing move is immediate, so Reduce Motion needs nothing more in this phase. The camera follows Molecular Explorer's stepped orbit camera instead of OrbitViewBounds gestures.",
+   "closed": "A17-P02"
   },
   {
    "id": "G-BUDGETS",
@@ -1562,8 +1562,8 @@
    "owner": "app-local",
    "justification": "Triangle, draw-call and label budgets per quality tier, the structure count and pack size caps are the experience's numbers over MeshBudget, ResourceBudget and StorageQuota.",
    "phase": 2,
-   "test": "Core host tests: the region's triangle and draw counts stay under each tier's budget; label count capped; over-budget content refused with a typed reason; Core.qualityTiers matches the presenter's levels",
-   "closed": null
+   "test": "Core tests: the region stays under each level's budget (level-0: 6,444 of 60,000 triangles; level-1: 2,716 of 20,000; 20 of 32 draws; label cap 16 for A17-P04); content over a budget is refused with over-budget naming the level and count (BudgetTests); experience test: Core.qualityTiers == 2 and the shell's quality profile has two levels (AnatomyCoreTests, AnatomySessionTests). The pack size cap belongs to G-PACK (A17-P04).",
+   "closed": "A17-P02"
   },
   {
    "id": "G-LAYERS",
@@ -1573,7 +1573,7 @@
    ],
    "kind": "adaptation",
    "owner": "app-local",
-   "justification": "Layer visibility, isolate one structure or layer, and the rule that the selection is never hidden are the experience's view state.",
+   "justification": "Layer visibility, isolate one structure or layer, and the rule that the selection is never hidden are the experience's view state. Showing and hiding each layer as a group came with A17-P02 (the manual's Phase 02 MVP, layer.show); isolate, the never-hidden selection under isolate and the state round trip remain A17-P03.",
    "phase": 3,
    "test": "Core host tests: toggling each layer changes exactly its structures; isolate shows the chosen set and ghosts or hides the rest; the selection stays visible; state round-trips; the draw list follows the state",
    "closed": null
