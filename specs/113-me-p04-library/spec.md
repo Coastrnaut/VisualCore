@@ -128,6 +128,8 @@ is marked inferred.
 - **A refused write:** the previous file stays; the in-memory list still changes and a message says the change was not
   saved.
 - **Leaving during a write:** the file is replaced atomically, never half written.
+- **The person resets the experience's data in the app's Settings:** both files are removed with the experience's
+  folder; the next opening starts with an empty recent list and the default label mode.
 
 ## Requirements *(mandatory)*
 
@@ -200,5 +202,6 @@ is marked inferred.
 
 ## Negative Requirements
 
-- No import, network, account or sync; no storage outside the experience's own folder; no data without a source and
+- No system prompt of any kind (nothing here needs a permission; prompting checks are human tests, owner ruling of
+  2026-11-16); no import, network, account or sync; no storage outside the experience's own folder; no data without a source and
   license; no change to the engine state, digests or replays from the recent list or settings.
