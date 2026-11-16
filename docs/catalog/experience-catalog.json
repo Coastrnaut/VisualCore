@@ -3284,18 +3284,17 @@
     ]
    },
    "implementation": {
-    "state": "standalone-partial",
+    "state": "standalone-complete",
     "legacy_gates_passed": [
      "A16-P00",
      "A16-P01",
      "A16-P02",
      "A16-P03",
      "A16-P04",
-     "A16-P05"
-    ],
-    "legacy_gates_pending": [
+     "A16-P05",
      "A16-P06"
     ],
+    "legacy_gates_pending": [],
     "unified_integration": "pending"
    },
    "source": {
