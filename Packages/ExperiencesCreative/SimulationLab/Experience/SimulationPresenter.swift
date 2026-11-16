@@ -1,19 +1,32 @@
-// SimulationPresenter — feature 117 (A16-P01) T-A16-105 (FR-A16-130; plan "Lifecycle"). Draws Simulation Lab through
-// the one host's drawing path: the 64 × 64 CPU field is colour-mapped per family (``SimulationPalette``) and uploaded
-// into a 64 × 64 `rgba8` `RenderTarget`, which one `FieldPass` display program draws into the host's framebuffer.
+// SimulationPresenter — feature 117 (A16-P01) T-A16-105 (FR-A16-130; plan "Lifecycle"); feature 118 (A16-P02)
+// T-A16-203 (FR-A16-201, 202, 204; clarification Q2). Draws Simulation Lab through the one host's drawing path. The
+// cellular automaton is drawn from its GPU field (``AutomatonGPU``, an RGBA8 ping-pong pair stepped in lockstep with
+// the engine); reaction-diffusion and the wave are colour-mapped on the CPU (``SimulationPalette``) and uploaded into
+// a 64 × 64 `rgba8` `RenderTarget` until A16-P03. One `FieldPass` display program per path
+// (``SimulationShaders/automatonDisplay``, ``SimulationShaders/display``) draws into the host's framebuffer.
 //
-// The display program fits the grid into a square of side ⌊0.92 · min(width, height) / 64⌋ · 64 pixels (or
-// ⌊0.92 · min(width, height)⌋ on a canvas under 70 pixels) centred on the canvas, and reads the cell under each pixel
+// The display programs fit the grid into a square of side ⌊0.92 · min(width, height) / 64⌋ · 64 pixels (or
+// ⌊0.92 · min(width, height)⌋ on a canvas under 70 pixels) centred on the canvas, and read the cell under each pixel
 // with `texelFetch` at the integer cell index (`gl_FragCoord` scaled to the grid), so cells are crisp squares and no
-// filtering blends them; outside the square it draws the dark background. The margin is at least 4 % of the shorter
-// side, so the probe `background` at (0.01, 0.01) always lands on it.
+// filtering blends them; outside the square they draw the dark background. The margin is at least 4 % of the shorter
+// side, so the probe `background` at (0.01, 0.01) always lands on it. The automaton program maps red ≥ 0.5 to the
+// palette's alive colour and the rest to its dead colour, so the picture is the CPU palette's, byte for byte.
 //
-// Lifecycle: `setup` makes the target and the display pass together (releasing whatever an earlier context left) and,
-// after a context recreation, uploads the last CPU field again at once; `draw` uploads the colour-mapped field only
-// when the field or the family differ from the last upload, then runs the display pass; `teardown` releases both
-// together.
-// Something missing at draw time (a failed setup) releases both and makes both again, never one at a time. Drawing
-// reads the core only: it never changes the state or its digest.
+// The CPU model stays the truth (clarification Q1); the GPU field is a mirror. It is loaded from the CPU field at the
+// first automaton frame after setup, a context recreation or a resize, and whenever the field changed other than by
+// stepping: another spec (family, preset, restore), a step count that went down (reset, restore) or jumped by more
+// than 128 (16 iterations per host step × 8 host steps), or a changed field at an unchanged step count. Otherwise it
+// runs exactly the iterations the engine ran since the last frame. This is exact for every state the actions reach:
+// the automaton's field is a function of its spec (rule and seed) and step count alone, since every action that changes
+// the field other than by stepping returns to the seeded start at step 0, so stepping from an earlier count of the
+// same spec (also after a reset followed by iterations in the same frame) arrives at the same field.
+//
+// Lifecycle: `setup` makes the target, both display passes and the automaton pair with its step pass together
+// (releasing whatever an earlier context left) and, after a context recreation, uploads the last colour-mapped CPU
+// field again at once; a compile failure or an incomplete target throws with nothing left allocated, and the host
+// fails the session (`experience.setup-failed`). `draw` mirrors or uploads, then runs the family's display pass;
+// `teardown` releases everything together. Something missing at draw time releases everything and makes it again,
+// never one part at a time. Drawing reads the core only: it never changes the state or its digest.
 import Foundation
 import SimulationLabCore
 import SwiftUI
@@ -64,26 +77,18 @@ final class SimulationPresenter: ExperiencePresenter {
     /// The fraction of the shorter canvas side the grid may cover.
     nonisolated static let coverage = 0.92
 
-    /// The display program: the grid in a centred square with crisp cells, the background around it.
-    nonisolated static let displayFragment = """
-    precision highp float;
-    uniform highp sampler2D uField;
-    uniform vec2 uOrigin;
-    uniform float uSide;
-    uniform int uGrid;
-    uniform vec4 uBackground;
-    in vec2 v_uv;
-    out vec4 color;
-    void main() {
-        vec2 p = (gl_FragCoord.xy - uOrigin) / uSide;
-        if (p.x < 0.0 || p.y < 0.0 || p.x >= 1.0 || p.y >= 1.0) {
-            color = uBackground;
-            return;
-        }
-        ivec2 cell = clamp(ivec2(floor(p * float(uGrid))), ivec2(0), ivec2(uGrid - 1));
-        color = vec4(texelFetch(uField, cell, 0).rgb, 1.0);
-    }
-    """
+    /// The display program (``SimulationShaders/display``): the grid in a centred square with crisp cells, the
+    /// background around it.
+    nonisolated static var displayFragment: String { SimulationShaders.display }
+
+    /// The most automaton iterations the engine runs between two frames: 16 per host step × 8 host steps
+    /// (clarification Q2). A larger forward jump is not stepping, so the GPU field is loaded instead.
+    nonisolated static let maxStepsPerFrame = SimulationScheduler.maxIterationsPerHostStep * 8
+
+    /// Test seam: when set, the automaton step program is compiled from this source instead of
+    /// ``SimulationShaders/automatonStep`` (an invalid source makes `setup` throw, so the session fails). Tests set it
+    /// before opening and restore it to nil afterwards.
+    static var stepFragmentOverride: String?
 
     /// The experience this presenter draws.
     let experienceID: ExperienceID
@@ -92,22 +97,39 @@ final class SimulationPresenter: ExperiencePresenter {
 
     /// Whether the GPU side is set up (between `setup` and `teardown`).
     private(set) var isLive = false
-    /// The 64 × 64 field target; nil outside `setup` … `teardown`.
+    /// The 64 × 64 field target of the CPU upload (reaction-diffusion and wave); nil outside `setup` … `teardown`.
     private(set) var target: RenderTarget?
-    /// The display pass; nil outside `setup` … `teardown`.
+    /// The display pass of the CPU upload; nil outside `setup` … `teardown`.
     private(set) var display: FieldPass?
-    /// How many times the target and the pass were made (together each time).
+    /// The display pass of the automaton, sampling the GPU field; nil outside `setup` … `teardown`.
+    private(set) var automatonDisplay: FieldPass?
+    /// The automaton's GPU field (an RGBA8 pair and its step pass); nil outside `setup` … `teardown`.
+    private(set) var automaton: AutomatonGPU?
+    /// How many times the target, the passes and the automaton pair were made (together each time).
     private(set) var resourceBuildCount = 0
-    /// How many times a colour-mapped field was uploaded.
+    /// How many times a field was uploaded: a colour-mapped CPU field into the target, or the CPU automaton field
+    /// into the GPU pair.
     private(set) var uploadCount = 0
-    /// The field last colour-mapped (CPU data; survives a context loss); nil before the first state.
+    /// How many times the CPU automaton field was loaded into the GPU pair.
+    private(set) var gpuLoadCount = 0
+    /// How many automaton generations were run on the GPU in total.
+    private(set) var gpuStepCount = 0
+    /// The field last drawn (CPU data; survives a context loss); nil before the first state.
     private(set) var lastField: SimulationField?
     /// The family of ``lastField``.
     private(set) var lastKind: SimulationKind?
-    /// The colour-mapped pixels of ``lastField`` (RGBA8, rows bottom-up).
+    /// The colour-mapped pixels of ``lastField`` (RGBA8, rows bottom-up); empty for the automaton, which is drawn
+    /// from the GPU field.
     private(set) var lastPixels: [UInt8] = []
     /// Whether the target holds ``lastPixels`` (false after a new field or a new target).
     private(set) var uploaded = false
+    /// The spec the GPU automaton field mirrors; nil when it mirrors nothing (before the first load, after a setup,
+    /// a resize or another family).
+    private(set) var mirroredSpec: SimulationSpec?
+    /// The step count of the CPU state the GPU automaton field mirrors.
+    private(set) var mirroredStep = 0
+    /// The CPU automaton field the GPU field mirrors (to see a change at an unchanged step count).
+    private var mirroredField: FieldGrid?
     /// The drawable size in pixels of the last frame; nil before the first.
     private(set) var lastCanvas: Vec2?
     /// The square the grid was drawn into, in pixels (origin x, origin y, side); nil before the first frame.
@@ -122,8 +144,10 @@ final class SimulationPresenter: ExperiencePresenter {
 
     // MARK: Render scene
 
-    /// Makes the target and the display pass together with the host's registry (again after a context recreation)
-    /// and uploads the last CPU field into the new target when there is one.
+    /// Makes the target, the display passes and the automaton pair together with the host's registry (again after a
+    /// context recreation) and uploads the last CPU field into the new target when there is one; the GPU automaton
+    /// field is loaded from the CPU state at the next frame. A compile failure or an incomplete target throws, with
+    /// nothing left allocated, and the host fails the session.
     func setup(_ context: RenderContext) throws {
         releaseGPU()
         try makeResources(context)
@@ -131,38 +155,89 @@ final class SimulationPresenter: ExperiencePresenter {
         if !lastPixels.isEmpty { try upload() }
     }
 
-    /// Uploads the colour-mapped field when it changed, then draws the grid into the host's framebuffer.
+    /// A new drawable size: the GPU automaton field is loaded from the CPU state at the next frame.
+    func resize(_ context: RenderContext) {
+        invalidateMirror()
+    }
+
+    /// Draws the grid into the host's framebuffer: the automaton from its GPU field (loaded or stepped in lockstep
+    /// with the engine first), the other families from the colour-mapped CPU field (uploaded when it changed).
     func draw(_ core: SimulationCore, tier: Int, context: RenderContext, frame: FrameInfo) throws {
         sync(core)
         let width = max(1, context.pixelWidth), height = max(1, context.pixelHeight)
         lastCanvas = Vec2(Double(width), Double(height))
-        if target == nil || display == nil {
+        if target == nil || display == nil || automatonDisplay == nil || automaton == nil {
             releaseGPU()
             try makeResources(context)
         }
-        guard let target, let display else { return }
+        guard let target, let display, let automatonDisplay, let automaton else { return }
         let field = core.model.field
         if lastField != field || lastKind != core.kind {
             lastField = field
             lastKind = core.kind
-            lastPixels = SimulationPalette.rgba(field, kind: core.kind)
+            lastPixels = core.kind == .automaton ? [] : SimulationPalette.rgba(field, kind: core.kind)
             uploaded = false
         }
-        if !uploaded { try upload() }
         let square = Self.square(width: width, height: height, grid: SimulationCore.gridSize)
         lastSquare = square
-        try display.run(output: .framebuffer(name: context.framebuffer, width: width, height: height),
-                        inputs: ["uField": target],
-                        uniforms: ["uOrigin": .vec2(SIMD2(Float(square.x), Float(square.y))),
-                                   "uSide": .float(Float(square.side)),
-                                   "uGrid": .int(Int32(SimulationCore.gridSize)),
-                                   "uBackground": .vec4(SimulationPalette.backgroundRGBA)])
+        let output = FieldPass.Output.framebuffer(name: context.framebuffer, width: width, height: height)
+        var uniforms: [String: FieldUniform] = ["uOrigin": .vec2(SIMD2(Float(square.x), Float(square.y))),
+                                                "uSide": .float(Float(square.side)),
+                                                "uGrid": .int(Int32(SimulationCore.gridSize)),
+                                                "uBackground": .vec4(SimulationPalette.backgroundRGBA)]
+        if core.kind == .automaton {
+            try mirrorAutomaton(core, into: automaton)
+            uniforms["uAlive"] = .vec4(Self.rgba(SimulationPalette.alive))
+            uniforms["uDead"] = .vec4(Self.rgba(SimulationPalette.dead))
+            try automatonDisplay.run(output: output, inputs: ["uField": automaton.current], uniforms: uniforms)
+        } else {
+            invalidateMirror()
+            if !uploaded { try upload() }
+            try display.run(output: output, inputs: ["uField": target], uniforms: uniforms)
+        }
     }
 
-    /// Releases the target and the pass together.
+    /// Releases the target, the passes and the automaton pair together.
     func teardown(_ context: RenderContext) {
         isLive = false
         releaseGPU()
+    }
+
+    /// Brings the GPU automaton field in line with `core` (clarification Q2): it is loaded from the CPU field when
+    /// it mirrors nothing (setup, context recreation, resize, another family before), when the spec changed (family,
+    /// preset or restore), when the step count went down (reset, restore) or jumped forward by more than
+    /// ``maxStepsPerFrame``, or when the field changed at an unchanged step count; otherwise it runs exactly the
+    /// iterations the engine ran since the last frame. Reads the core only.
+    private func mirrorAutomaton(_ core: SimulationCore, into automaton: AutomatonGPU) throws {
+        let spec = core.model.spec
+        let step = core.stepCount
+        let current = core.model.field.current
+        let delta = step - mirroredStep
+        let mustLoad = mirroredSpec != spec || delta < 0 || delta > Self.maxStepsPerFrame
+            || (delta == 0 && mirroredField != current)
+        if mustLoad {
+            guard automaton.load(current) else { throw SimulationDrawError.uploadFailed }
+            gpuLoadCount += 1
+            uploadCount += 1
+        } else if delta > 0 {
+            try automaton.step(rule: spec.automatonRule, count: delta)
+            gpuStepCount += delta
+        }
+        mirroredSpec = spec
+        mirroredStep = step
+        mirroredField = current
+    }
+
+    /// Forgets what the GPU automaton field mirrors, so the next automaton frame loads it from the CPU state.
+    private func invalidateMirror() {
+        mirroredSpec = nil
+        mirroredStep = 0
+        mirroredField = nil
+    }
+
+    /// `color` as RGBA floats n / 255 with alpha 1.
+    private static func rgba(_ color: SimulationPalette.RGB) -> SIMD4<Float> {
+        SIMD4(Float(color.r) / 255, Float(color.g) / 255, Float(color.b) / 255, 1)
     }
 
     /// The square of the grid on a `width` × `height` pixel canvas: side ⌊0.92 · min / grid⌋ · grid (⌊0.92 · min⌋
@@ -185,32 +260,50 @@ final class SimulationPresenter: ExperiencePresenter {
         uploadCount += 1
     }
 
-    /// Makes the 64 × 64 `rgba8` target and the display pass together; a failure releases what was made and
-    /// rethrows.
+    /// Makes the 64 × 64 `rgba8` target, the two display passes and the automaton pair with its step pass together;
+    /// a failure releases what was made and rethrows.
     private func makeResources(_ context: RenderContext) throws {
         let registry = context.resources
         let n = SimulationCore.gridSize
         let made = try registry.makeRenderTarget(width: n, height: n, format: .rgba8, label: "a16.field")
+        var madeDisplay: FieldPass?
+        var madeAutomatonDisplay: FieldPass?
         do {
-            display = try FieldPass(registry: registry, fragment: Self.displayFragment, inputs: ["uField"],
-                                    label: "a16.display")
+            let plain = try FieldPass(registry: registry, fragment: Self.displayFragment, inputs: ["uField"],
+                                      label: "a16.display")
+            madeDisplay = plain
+            let cells = try FieldPass(registry: registry, fragment: SimulationShaders.automatonDisplay,
+                                      inputs: ["uField"], label: "a16.automaton.display")
+            madeAutomatonDisplay = cells
+            automaton = try AutomatonGPU(registry: registry, gridSize: n,
+                                         stepFragment: Self.stepFragmentOverride ?? SimulationShaders.automatonStep)
+            display = plain
+            automatonDisplay = cells
         } catch {
+            madeAutomatonDisplay?.release()
+            madeDisplay?.release()
             registry.release(made)
             throw error
         }
         target = made
         self.registry = registry
         uploaded = false
+        invalidateMirror()
         resourceBuildCount += 1
     }
 
-    /// Releases the target and the display pass, together.
+    /// Releases the target, the display passes and the automaton pair, together.
     private func releaseGPU() {
         if let target { registry?.release(target) }
         target = nil
         display?.release()
         display = nil
+        automatonDisplay?.release()
+        automatonDisplay = nil
+        automaton?.release()
+        automaton = nil
         uploaded = false
+        invalidateMirror()
     }
 
     // MARK: Probes, words and controls
