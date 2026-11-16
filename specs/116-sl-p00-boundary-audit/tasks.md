@@ -49,3 +49,7 @@ completion review (008), the proofs and commits.
 
 MVP: the contract (002, 003, 008) with the baseline (001, 004, 005); the build proof (006, 007) and evidence close the
 phase. Review checkpoint after 003 (checker passes) and at 008 (decision).
+
+## Phase 8: Convergence
+
+- [ ] T-A16-012 Correct the facts paragraph of the spec's Clarifications (session 2026-11-16) with what the contract audit verified: `FrameChecks.histogram` (VisualCoreExperience) is a luma histogram of RGBA8 frames compiled only under DEBUG or VISUALCORE_AUTOMATION, so no shippable field reducer exists; `ShareLink` is used by Generative Art Studio, Fluid Art Playground and Fractal Explorer (the last captures through `StillCapture`); `ResourceRegistry` creates every texture with LINEAR filtering and CLAMP_TO_EDGE, so the wrap and fixed-zero boundaries of clarification 5 are done with `texelFetch` and index arithmetic in the step shaders, per FR-A16-001 (partial)
