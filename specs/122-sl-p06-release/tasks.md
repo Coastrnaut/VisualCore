@@ -25,7 +25,7 @@ Precedent: `specs/115-me-p06-release/tasks.md`.
 
 ## Phase 3: Story 2 — saved data and failures
 
-- [ ] T-A16-604 [US2] Add the test-only seam `var failNextDraw = false` to `Packages/ExperiencesCreative/SimulationLab/Experience/SimulationPresenter.swift`: the next `draw` throws once and clears the flag. Add `ExperienceTests/SimulationRecoveryDrawTests.swift`:
+- [X] T-A16-604 [US2] Add the test-only seam `var failNextDraw = false` to `Packages/ExperiencesCreative/SimulationLab/Experience/SimulationPresenter.swift`: the next `draw` throws once and clears the flag. Add `ExperienceTests/SimulationRecoveryDrawTests.swift`: — Verified 2026-11-16: 2026-11-16: .autonomy/checks/A16-P06.sl-ios27.json exit 0 (62 core, 23 Swift Testing and 69 XCTest experience tests, 0 failures, slowest 6.6 s); SimulationRecoveryDrawTests: failNextDraw fails the session, the saved preset file is byte-identical, a new session lists it and sim.spec opens it at step 0
   - save an experiment into a temporary storage;
   - set the seam and draw, so the session fails;
   - the preset file is byte-identical;

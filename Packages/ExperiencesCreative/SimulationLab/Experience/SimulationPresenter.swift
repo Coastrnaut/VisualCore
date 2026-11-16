@@ -101,6 +101,8 @@ final class SimulationMirror {
 
 /// Why drawing failed.
 enum SimulationDrawError: Error, Equatable {
+    /// The test-only seam ``SimulationPresenter/failNextDraw`` made this draw fail (feature 122, T-A16-604).
+    case injected
     /// The colour-mapped field could not be uploaded into the target.
     case uploadFailed
 }
@@ -134,9 +136,13 @@ final class SimulationPresenter: ExperiencePresenter {
     /// The sentence shown when reaction-diffusion or the wave cannot run here (FR-A16-310).
     nonisolated static let reducedMotionSentence = "Faster speeds are off while Reduce Motion or Reduce Flashing is on."
 
-    /// Frames between two histogram updates while running (4 per second at 60 frames per second).
+    /// Frames between two histogram updates while running (four updates a second when the host draws 60 times a
+    /// second).
     nonisolated static let histogramInterval = 15
 
+    /// Set by a test to make the next `draw` throw ``SimulationDrawError/injected`` once, drawing and syncing nothing;
+    /// the seam clears itself and nothing in the experience sets it (feature 122, T-A16-604).
+    var failNextDraw = false
     /// Whether Reduce Motion is on (set by the experience wrapper).
     var reduceMotion = false
     /// Whether Reduce Flashing is on (set by the experience wrapper).
@@ -264,6 +270,10 @@ final class SimulationPresenter: ExperiencePresenter {
     /// Draws the grid into the host's framebuffer: the automaton from its GPU field (loaded or stepped in lockstep
     /// with the engine first), the other families from the colour-mapped CPU field (uploaded when it changed).
     func draw(_ core: SimulationCore, tier: Int, context: RenderContext, frame: FrameInfo) throws {
+        if failNextDraw {
+            failNextDraw = false
+            throw SimulationDrawError.injected
+        }
         sync(core)
         gateHistogram(core)
         let width = max(1, context.pixelWidth), height = max(1, context.pixelHeight)
