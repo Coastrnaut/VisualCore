@@ -1,0 +1,62 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/A16-P04.app-unit.json",
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A16-P04.app-unit.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A16-P04.contract-3.json",
+      "command": "python3 scripts/check_app_contract.py --app simulation-lab --render",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A16-P04.contract-3.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A16-P04.copy-claims-3.json",
+      "command": "python3 scripts/check_copy_claims.py --allow share --swift Packages/ExperiencesCreative/SimulationLab/Experience/SimulationControls.swift Packages/ExperiencesCreative/SimulationLab/Experience/SimulationPresenter.swift Packages/ExperiencesCreative/SimulationLab/Experience/SimulationCapture.swift Packages/ExperiencesCreative/SimulationLab/Experience/SimulationPresetStore.swift Packages/ExperiencesCreative/SimulationLab/Experience/Adapter/SimulationCore.swift Packages/ExperiencesCreative/SimulationLab/Core/ExperimentPreset.swift",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A16-P04.copy-claims-3.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A16-P04.documented-api.json",
+      "command": "python3 scripts/check_documented_api.py --sources Packages/ExperiencesCreative/SimulationLab",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A16-P04.documented-api.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A16-P04.packages.json",
+      "command": "python3 scripts/check_experience_packages.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A16-P04.packages.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A16-P04.scripts.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A16-P04.scripts.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A16-P04.sl-ios27-2.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing SimulationLabCoreTests SimulationLabExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A16-P04.sl-ios27-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A16-P04.sl-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing SimulationLabCoreTests SimulationLabExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A16-P04.sl-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A16-P04.verify-27.json",
+      "command": "python3 scripts/verify_experiences.py --only a16.simulation-lab --runtime 27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A16-P04.verify-27.log"
+    }
+  ],
+  "generated": "2026-11-16T21:11:15+00:00",
+  "method": "deterministic-run-check",
+  "stage": "A16-P04",
+  "status": "pass"
+}
