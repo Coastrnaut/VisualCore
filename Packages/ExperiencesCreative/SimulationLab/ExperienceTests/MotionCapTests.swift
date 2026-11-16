@@ -58,4 +58,36 @@ final class MotionCapTests: XCTestCase {
         XCTAssertLessThanOrEqual(try XCTUnwrap(experience.shell.engine.core).speedIndex, 2, "lowered to ×1")
         session.close()
     }
+
+    /// T-A16-613 (feature 122; constitution VII): the registry's factory hands both settings to the presenter's caps,
+    /// and with Reduce Motion the experience opens paused.
+    func testTheRegistryFactoryPassesBothSettingsToTheCaps() async throws {
+        let temporary = TemporarySimulationStorage()
+        defer { temporary.remove() }
+        let id = SimulationTest.id
+        let cases: [(motion: Bool, flashing: Bool, caps: [Int])] = [(false, false, [4, 4]), (true, false, [2, 2]),
+                                                                   (false, true, [0, 2])]
+        for setting in cases {
+            let name = "reduceMotion \(setting.motion), reduceFlashing \(setting.flashing)"
+            var made: SimulationExperience?
+            let request = ExperienceOpenRequest(id: id, seed: 1, snapshot: nil, refusedSnapshotFails: false) {
+                let experience = SimulationLabExperience.make(id: id, storage: temporary.storage,
+                                                              reduceMotion: setting.motion,
+                                                              reduceFlashing: setting.flashing)
+                made = experience as? SimulationExperience
+                return experience
+            }
+            let session = ExperienceSession()
+            let opened = await session.open(request)
+            XCTAssertEqual(opened, .running, name)
+            let experience = try XCTUnwrap(made, name + ": the factory gives the wrapper")
+            let presenter = experience.presenter
+            XCTAssertEqual([presenter.speedCap(kind: .automaton), presenter.speedCap(kind: .reactionDiffusion)],
+                           setting.caps, name)
+            XCTAssertNotNil(presenter.presets, name + ": the factory hands the storage to the presenter")
+            let core = try XCTUnwrap(experience.shell.engine.core)
+            XCTAssertEqual(core.isRunning, !setting.motion, name + ": paused under Reduce Motion")
+            session.close()
+        }
+    }
 }
