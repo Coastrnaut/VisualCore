@@ -74,3 +74,7 @@ Precedent: `specs/115-me-p06-release/tasks.md`.
 - T-A16-609 through T-A16-612 run last.
 
 **Review checkpoint:** after T-A16-611. **MVP:** Story 1.
+
+## Phase 7: Convergence
+
+- [ ] T-A16-613 Add `testTheRegistryFactoryPassesBothSettingsToTheCaps` to `Packages/ExperiencesCreative/SimulationLab/ExperienceTests/MotionCapTests.swift`: `SimulationLabExperience.make(id:storage:reduceMotion:reduceFlashing:)` with (false, false), (true, false) and (false, true) gives a `SimulationExperience` whose presenter caps the automaton at 4, 2 and 0 and reaction-diffusion at 4, 2 and 2, and with Reduce Motion it opens paused, per the Phase 06 accessibility deliverable and constitution VII (partial)
