@@ -54,8 +54,9 @@ Medicine in the public domain.
   "National Library of Medicine (NCBI)", license `public-domain`. The bundled form is XYZ text plus a bond list, so the
   library goes through the same parser as an imported file.
 - Q: What are the parser's limits and refusal reasons? → A: At most 65,536 bytes of UTF-8 text; atom count a whole
-  number 1…500 on the first line; each line at most 256 bytes; the comment cut to 256 characters; every coordinate
-  finite with magnitude at most 1,000 Å; no two atoms closer than 0.4 Å; at most 2,000 bonds. Reasons: `empty`,
+  number 1…500 on the first line; the count line and every atom line at most 256 bytes (the line ending not
+  counted); the comment line kept but cut to 256 characters; every coordinate finite with magnitude at most
+  1,000 Å; no two atoms closer than 0.4 Å; at most 2,000 bonds. Reasons: `empty`,
   `too-large`, `not-text` (not valid UTF-8), `bad-count` (missing, negative, zero, fractional or non-numeric),
   `too-many-atoms`, `count-mismatch`, `line-too-long`, `malformed-line`, `unknown-element`, `non-finite`,
   `out-of-range`, `overlapping-atoms`; each with the 1-based line where one applies. Limits are inclusive.

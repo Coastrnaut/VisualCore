@@ -506,7 +506,7 @@ let package = Package(
                                .product(name: "VisualCoreAudioDSP", package: visualCore)],
                     path: "LightMaze/ExperienceTests",
                     resources: [.copy("Fixtures")]),
-        // A14 Solar System Explorer (feature 103, A14-P01): a candidate until X-A14.
+        // A14 Solar System Explorer (feature 103, A14-P01): integrated at X-A14.
         .target(name: "SolarSystemExplorerCore",
                 dependencies: [.product(name: "VisualCoreMath", package: visualCore)],
                 path: "SolarSystemExplorer/Core"),
@@ -538,6 +538,12 @@ let package = Package(
                                .product(name: "VisualCoreUI", package: rendering)],
                     path: "SolarSystemExplorer/ExperienceTests",
                     resources: [.copy("Fixtures")]),
+        // A15 Molecular Explorer (feature 110, A15-P01): a candidate until X-A15. The core is Foundation only.
+        .target(name: "MolecularExplorerCore",
+                path: "MolecularExplorer/Core"),
+        .testTarget(name: "MolecularExplorerCoreTests",
+                    dependencies: ["MolecularExplorerCore"],
+                    path: "MolecularExplorer/CoreTests"),
         .target(name: "ParticleUniverseCore",
                 dependencies: [
                                .product(name: "VisualCoreSimulation", package: visualCore),
