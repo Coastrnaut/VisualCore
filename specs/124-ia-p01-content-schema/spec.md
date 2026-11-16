@@ -23,6 +23,56 @@ Canonical overrides:
   procedural (A17-P02), so the inventory licenses only text and data: public-domain sources and original writing.
 - Follow `specs/117-sl-p01-algorithms`.
 
+## Clarifications
+
+### Session 2026-11-16
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- `Packages/ExperiencesCreative/Package.swift` holds every experience's targets (the Simulation Lab precedent).
+- `VisualCoreScenes/MeshShapes.swift` offers `revolution`, `tube` and `extrusion`, and `Mesh.uvSphere` exists.
+- `VisualCorePersistence` has `MigrationChain`.
+- No A17 source exists yet.
+
+- Q: Which structures, with which ids, names and layers? → A: Fourteen structures in three layers. Ids are
+  `knee.<name>`, English names are given here, and Terminologia Anatomica names are the standard names.
+  - **Bones** (`bones`): femur (Femur), tibia (Tibia), fibula (Fibula), patella (Patella).
+  - **Cartilage and menisci** (`cartilage`): femoral articular cartilage (Cartilago articularis femoris), tibial
+    articular cartilage (Cartilago articularis tibiae), medial meniscus (Meniscus medialis), lateral meniscus
+    (Meniscus lateralis).
+  - **Ligaments and tendons** (`ligaments`): anterior cruciate ligament (Ligamentum cruciatum anterius), posterior
+    cruciate ligament (Ligamentum cruciatum posterius), medial collateral ligament (Ligamentum collaterale tibiale),
+    lateral collateral ligament (Ligamentum collaterale fibulare), patellar ligament (Ligamentum patellae),
+    quadriceps tendon (Tendo musculi quadricipitis femoris).
+
+  Parents form a tree under the region root: the joint parts sit under `knee.joint`, which is the root and has no
+  geometry. Neighbours are the pairs that touch, for example the femur and the patella.
+- Q: Which sources and licenses? → A: Three citation kinds:
+  - Gray's Anatomy, 20th edition (1918), cited by its section titles (Osteology: The Femur, The Tibia, The Fibula,
+    The Patella; Syndesmology: The Knee-joint; Myology: the quadriceps femoris), license `public-domain`;
+  - Terminologia Anatomica (1998) for the standard names only, license `facts`, since names are terms and not
+    copyrightable text;
+  - the descriptions themselves, written in plain words for this experience, license `original`.
+
+  The allowed set is {public-domain, original, facts}. The geometry license is `original` (procedural code). The
+  review status is `not-reviewed`, with no reviewer or date, and the manifest's sentence is "Not reviewed by a
+  clinician."
+- Q: In what form is the content stored and validated? → A: The content is one JSON resource of the core target,
+  `Core/Content/knee-right.json`: schema 1, content version 1, sorted keys, capped at 256 KB. A decoder reads it and
+  then a validator runs. Refusals are typed reasons, each with a sentence naming the item: `damaged`, `newer-version`,
+  `too-large`, `missing-reference`, `duplicate-id`, `parent-cycle`, `empty-text`, `unsourced`, `bad-license`,
+  `non-finite` and `colliding-synonym`. The region's coordinate convention is centimetres, +Y superior, +Z
+  anterior, +X lateral for the right knee, with a bounding box of about 14 × 30 × 14 cm.
+- Q: What are mesh ids and labels at this phase? → A: The region declares a list of procedural meshes, each an id
+  (`mesh.<structure>.<part>`) with a kind (`revolution`, `tube`, `extrusion` or `sphere`). Every structure names
+  1–3 of them, every mesh belongs to exactly one structure, and the root has none. A label is a structure's English
+  name, anchored on its first mesh. The regression fixture: every label resolves to an existing structure, and every
+  structure's mesh ids to declared meshes. A17-P02 builds each declared mesh and adds a check that none is missing.
+- Q: Which targets come in this phase? → A: Only `InteractiveAnatomyCore` (pure Swift, depending on
+  `VisualCoreMath`) with its content resource, plus `InteractiveAnatomyCoreTests`, in
+  `Packages/ExperiencesCreative/Package.swift`. The experience target, registration and catalog entry come with the
+  scene in A17-P02, so nothing appears in the app now.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - A trustworthy content inventory (Priority: P1) 🎯
