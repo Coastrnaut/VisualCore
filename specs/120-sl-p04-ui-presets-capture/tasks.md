@@ -117,3 +117,9 @@ Precedent: `specs/119-sl-p03-rd-wave/tasks.md`.
 - T-A16-410 through T-A16-412 run last.
 
 **Review checkpoints:** after T-A16-404 (the regression fixture) and after T-A16-409 (all four gaps). **MVP:** Story 1.
+
+## Phase 9: Convergence
+
+- [ ] T-A16-413 Add a session round trip to `Packages/ExperiencesCreative/SimulationLab/ExperienceTests/PresetStoreTests.swift`: a presenter made with storage (`SimulationLabExperience.make(id:storage:)` opened through `ExperienceOpenRequest`) saves the current reaction-diffusion experiment after a time-step change; a second presenter over the same storage lists it, and sending its `SimulationCore.specValues` through `presenter.send("sim.spec", …)` gives the same spec at step 0, per US4/AC1, FR-A16-430 (partial)
+- [ ] T-A16-414 Add a refused-spec file test to `PresetStoreTests.swift`: a stored preset JSON whose reaction-diffusion time step is 2.0 is reported as `invalid` in `problems` and not listed, per spec Edge Cases "a saved preset whose spec is now refused" (partial)
+- [ ] T-A16-415 Add a test to `ExperienceTests/CaptureFileTests.swift`: a file left in `a16-captures` from an earlier session is removed when a `SimulationPresenter` is made, per clarification Q5 "the folder is emptied when the experience opens" (partial)
