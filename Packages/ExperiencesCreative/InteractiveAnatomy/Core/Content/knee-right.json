@@ -11,7 +11,7 @@
       "z": -7
     }
   },
-  "contentVersion": 1,
+  "contentVersion": 2,
   "convention": {
     "anterior": "+Z",
     "lateral": "+X",
@@ -207,7 +207,9 @@
         "original-descriptions"
       ],
       "standardName": "Femur",
-      "synonyms": []
+      "synonyms": [
+        "Thigh bone"
+      ]
     },
     {
       "description": "The shin bone is the larger of the two lower leg bones and carries most of the body's weight. Its broad, flat top supports the thigh bone, and a small bump at the front receives the patellar ligament.",
@@ -234,7 +236,9 @@
         "original-descriptions"
       ],
       "standardName": "Tibia",
-      "synonyms": []
+      "synonyms": [
+        "Shin bone"
+      ]
     },
     {
       "description": "The fibula is a slender bone on the outer side of the lower leg. Its rounded head sits just below the knee against the side of the shin bone and anchors the fibular collateral ligament.",
@@ -256,7 +260,9 @@
         "original-descriptions"
       ],
       "standardName": "Fibula",
-      "synonyms": []
+      "synonyms": [
+        "Calf bone"
+      ]
     },
     {
       "description": "The kneecap is a flat, roughly triangular bone at the front of the knee. It lies inside the tendon of the large thigh muscle and glides in the groove at the lower end of the thigh bone.",
@@ -279,7 +285,9 @@
         "original-descriptions"
       ],
       "standardName": "Patella",
-      "synonyms": []
+      "synonyms": [
+        "Kneecap"
+      ]
     },
     {
       "description": "A thin, smooth layer of cartilage covers the condyles and front groove of the thigh bone. It lets the thigh bone slide against the kneecap and the shin bone with very little friction.",
