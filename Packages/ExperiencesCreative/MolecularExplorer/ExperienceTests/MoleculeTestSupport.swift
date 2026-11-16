@@ -1,4 +1,5 @@
-// MoleculeTestSupport — feature 110 (A15-P01) T-A15-106 (FR-A15-131; clarification Q5; SC-A15-104). Shared helpers of
+// MoleculeTestSupport — feature 110 (A15-P01) T-A15-106 (FR-A15-131; clarification Q5; SC-A15-104) and feature 111
+// (A15-P02) T-A15-205 (snapshot envelopes at schema 2; FR-A15-221). Shared helpers of
 // the Molecular Explorer experience tests: opening the experience in the one app's session host with a real view size
 // (a view without a frame size does not draw), drawing frames, reading the pixels of a frame (rows bottom-up, as the
 // host reads them back), counting the pixels two frames differ in, and building snapshot envelopes and payloads.
@@ -105,8 +106,10 @@ func moleculeCore(_ state: MoleculeState, seed: UInt64 = 1) throws -> MoleculeCo
     try MoleculeCore.restore(payload: state.encoded(), seed: seed)
 }
 
-/// A snapshot envelope of Molecular Explorer around `payload` with the fields of `saved` and schema `schema`.
-func moleculeEnvelope(_ payload: Data, like saved: ExperienceSnapshot, schema: Int = 1) throws -> ExperienceSnapshot {
+/// A snapshot envelope of Molecular Explorer around `payload` with the fields of `saved` and schema `schema` (the
+/// current schema 2 by default).
+func moleculeEnvelope(_ payload: Data, like saved: ExperienceSnapshot, schema: Int = MoleculeState.schemaVersion) throws
+    -> ExperienceSnapshot {
     let id = try XCTUnwrap(ExperienceID(rawValue: MoleculeCore.experienceID))
     return try ExperienceSnapshot(experience: id, schemaVersion: schema, seed: saved.seed,
                                   stepIndex: saved.stepIndex, digest: saved.digest, payload: payload)

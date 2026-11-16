@@ -1,11 +1,12 @@
-// MoleculeSessionTests — feature 110 (A15-P01) T-A15-106 (FR-A15-131; clarification Q5; SC-A15-104). The A15 adapter
-// inside the one app's session host on the simulator, short runs only (each test well under 10 s, no wall-clock
-// assertion): the session opens with five molecules in library order and water selected, draws it through the host
-// and describes it in words; next and previous step through the library and a step past an end is refused with the
-// answer in the mirror; a suspension changes nothing; the state saved by the shell restores identically in a new
-// session; newer and damaged saved states are refused and water opens; a context recreation makes all renderers once
-// more and keeps the meshes and the digest; reopening keeps the drawing resources steady and closing leaves no GPU
-// object behind.
+// MoleculeSessionTests — feature 110 (A15-P01) T-A15-106 (FR-A15-131; clarification Q5; SC-A15-104), updated by feature
+// 111 (A15-P02) T-A15-205 (two renderers, schema 2, the mode in the description; FR-A15-202, FR-A15-221). The A15
+// adapter inside the one app's session host on the simulator, short runs only (each test well under 10 s, no wall-clock
+// assertion): the session opens with five molecules in library order and water selected, draws it through the host and
+// describes it in words; next and previous step through the library and a step past an end is refused with the answer
+// in the mirror; a suspension changes nothing; the state saved by the shell restores identically in a new session;
+// newer and damaged saved states are refused and water opens; a context recreation makes all renderers once more and
+// keeps the meshes and the digest; reopening keeps the drawing resources steady and closing leaves no GPU object
+// behind.
 import Foundation
 import XCTest
 import VisualCoreDiagnostics
@@ -32,12 +33,13 @@ final class MoleculeSessionTests: XCTestCase {
         XCTAssertEqual(MoleculeControls.moleculeTitles, ["Water", "Methane", "Ethanol", "Benzene", "Caffeine"])
         XCTAssertEqual(presenter.lastAtomsDrawn, 3)
         XCTAssertEqual(presenter.lastSelection, 0)
-        XCTAssertEqual(presenter.elementRenderers.count, Elements.all.count, "all renderers made together")
-        XCTAssertEqual(presenter.elementMeshes.count, Elements.all.count)
+        XCTAssertEqual(presenter.renderers.count, 2, "the sphere and the stick renderer made together")
+        XCTAssertNotNil(presenter.sphereMesh)
+        XCTAssertNotNil(presenter.stickMesh)
         XCTAssertEqual(presenter.meshBuildCount, 1)
         XCTAssertEqual(presenter.rendererBuildCount, 1)
         XCTAssertEqual(shell.accessibilitySummary,
-                       "Molecular Explorer: Water, H2O; 3 atoms, 2 bonds; elements hydrogen, oxygen.")
+                       "Molecular Explorer: Water, H2O; 3 atoms, 2 bonds; elements hydrogen, oxygen; ball-and-stick.")
         XCTAssertTrue(presenter.mirror.ready)
         XCTAssertEqual(presenter.mirror.selection, 0)
         XCTAssertEqual(presenter.mirror.moleculeCount, 5)
@@ -45,7 +47,9 @@ final class MoleculeSessionTests: XCTestCase {
         XCTAssertEqual(presenter.mirror.countsLine, "3 atoms, 2 bonds")
         XCTAssertEqual(presenter.mirror.sourceLine, "PubChem Compound CID 962, 3D conformer — public domain")
         XCTAssertEqual(presenter.mirror.status, "Water selected, molecule 1 of 5")
-        XCTAssertEqual(presenter.nativeActions, ["molecule.select", "molecule.next", "molecule.previous"])
+        XCTAssertEqual(presenter.nativeActions, ["molecule.select", "molecule.next", "molecule.previous",
+                                                 "display.mode", "camera.orbit", "camera.tilt", "camera.zoom",
+                                                 "view.reset"])
         XCTAssertEqual(presenter.nativeActions, Set(MoleculeCore.actionIDs), "every action has a native control")
         XCTAssertEqual(presenter.gestureActions, [])
         XCTAssertEqual(GestureAlternatives.missing(gesture: presenter.gestureActions, native: presenter.nativeActions),
@@ -54,7 +58,7 @@ final class MoleculeSessionTests: XCTestCase {
         session.close()
         XCTAssertEqual(session.hostsAlive, 0)
         XCTAssertFalse(presenter.isLive)
-        XCTAssertTrue(presenter.elementRenderers.isEmpty, "the renderers are released together in teardown")
+        XCTAssertTrue(presenter.renderers.isEmpty, "the renderers are released together in teardown")
         XCTAssertNil(presenter.depthPass)
         XCTAssertEqual(shell.state, .inactive, "closed without a GPU leak")
     }
@@ -92,7 +96,8 @@ final class MoleculeSessionTests: XCTestCase {
         XCTAssertEqual(presenter.mirror.message, "There is no such molecule.")
         XCTAssertTrue(presenter.send("molecule.select", [2], through: shell.port).isAccepted)
         XCTAssertEqual(shell.accessibilitySummary,
-                       "Molecular Explorer: Ethanol, C2H6O; 9 atoms, 8 bonds; elements carbon, hydrogen, oxygen.")
+                       "Molecular Explorer: Ethanol, C2H6O; 9 atoms, 8 bonds; elements carbon, hydrogen, oxygen; "
+                       + "ball-and-stick.")
         try MoleculeTest.frames(session, 3)
         XCTAssertEqual(presenter.rendererBuildCount, 1, "changing the molecule never remakes the renderers")
         session.close()
@@ -148,8 +153,8 @@ final class MoleculeSessionTests: XCTestCase {
         XCTAssertTrue(shell.handle(control: "molecule.select", values: [2]).isAccepted)
         let saved = try shell.snapshot()
         first.close()
-        let newerEnvelope = try moleculeEnvelope(Data(saved.payload.utf8), like: saved, schema: 2)
-        let newerPayload = try moleculeEnvelope(moleculePayload(saved.payload, key: "schema", value: 2), like: saved)
+        let newerEnvelope = try moleculeEnvelope(Data(saved.payload.utf8), like: saved, schema: 3)
+        let newerPayload = try moleculeEnvelope(moleculePayload(saved.payload, key: "schema", value: 3), like: saved)
 
         let cases: [(String, ExperienceSnapshot)] = [("envelope", newerEnvelope), ("payload", newerPayload)]
         for (name, newer) in cases {
@@ -192,7 +197,7 @@ final class MoleculeSessionTests: XCTestCase {
         XCTAssertEqual(try shell.engine.digest(), digest)
         try MoleculeTest.frames(session, 2)
         XCTAssertEqual(presenter.rendererBuildCount, renderers + 1, "the renderers are made once on the new context")
-        XCTAssertEqual(presenter.elementRenderers.count, Elements.all.count)
+        XCTAssertEqual(presenter.renderers.count, 2)
         XCTAssertEqual(presenter.meshBuildCount, meshes, "the meshes are CPU data and survive")
         XCTAssertEqual(presenter.lastAtomsDrawn, 24)
         XCTAssertEqual(presenter.lastSelection, 4)

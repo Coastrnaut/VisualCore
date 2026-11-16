@@ -1,33 +1,42 @@
-// MoleculePresenter — feature 110 (A15-P01) T-A15-106 (FR-A15-131; clarification Q5; SC-A15-104). Draws Molecular
-// Explorer through the host only (the host's context and registry, VisualCore's `DepthMeshPass` and `MeshRenderer`
-// with an `OrbitCamera`; no context of its own, no second renderer, no imported assets). The presenter reads the core
-// and never writes it:
-//   - Atoms: every atom of the selected molecule is a UV sphere (`Mesh.uvSphere(segments: 32, rings: 16, radius:)`)
-//     at its recorded position (ångström used as scene units) with display radius 0.35 × its element's van der Waals
-//     radius (``MoleculePresenter/displayRadius(symbol:)``), drawn in its element's display colour (the draw colour of
-//     the item; the meshes carry no colour stream). Recorded bonds are counted in the words, drawn from A15-P02.
-//   - Meshes: one sphere per catalog element (ten, in `Elements.all` order), made once per presenter as CPU data and
-//     kept across context recreations; an atom picks its element's mesh.
-//   - Renderers: one `MeshRenderer` per element sphere, all ten made together in `setup` once the context is current
-//     (again after a context recreation; `draw` makes them all again if any is missing) and all released together in
+// MoleculePresenter — feature 110 (A15-P01) T-A15-106 (FR-A15-131; clarification Q5; SC-A15-104) and feature 111
+// (A15-P02) T-A15-205 (FR-A15-202, FR-A15-210, FR-A15-220, FR-A15-230; clarifications Q2–Q5; SC-A15-202, SC-A15-203;
+// contracts/renderer.md). Draws Molecular Explorer through the host only (the host's context and registry,
+// VisualCore's `DepthMeshPass` and `MeshRenderer` with an `OrbitCamera`; no context of its own, no second renderer, no
+// imported assets). The presenter reads the core and never writes it:
+//   - Scene: the core state's `MoleculeScene` (the selected molecule in the display mode): one atom item per atom and,
+//     in ball-and-stick, two bond halves per bond; exactly the scene's items are drawn (at most 74 for the library,
+//     within the draw budget of 1,500).
+//   - Meshes: ONE unit sphere (`Mesh.uvSphere(segments: 32, rings: 16, radius: 1)`) and ONE unit stick
+//     (`Mesh.tube(path: [(0, 0, 0), (0, 1, 0)], radius: DisplayMode.stickRadius, sides: 16, caps: false,
+//     closed: false)`), made together once per presenter as CPU data and kept across context recreations.
+//   - Model matrices: an atom is the unit sphere scaled uniformly by its display radius and moved to its position
+//     (translate(position) × scale(radius)); a bond half is the unit stick turned from +y onto the half's direction
+//     (the shortest-arc quaternion; a half along −y turns half a revolution about x), scaled along y only by the half's
+//     length and moved to its start (translate(from) × rotate × scale(1, length, 1)). The mesh shader turns normals by
+//     the model's 3 × 3 part and normalises them, so the uniform scale and the stretch along the stick's own axis (its
+//     side normals have no axial part) keep the lighting right. Each item is drawn in its element's display colour.
+//   - Renderers: the sphere and the stick `MeshRenderer`, both made together in `setup` once the context is current
+//     (again after a context recreation; `draw` makes both again if either is missing) and both released together in
 //     `teardown`. Every mesh renderer shares one cached shader program in the host's registry and releasing a renderer
-//     releases that program for all of them, so no renderer is ever released while the others are in use.
-//   - Light from the camera's side: every renderer lights toward ``MoleculePresenter/lightDirection`` (the camera's
-//     direction turned a little up and to the right) with ambient 0.3.
-//   - Camera: an `OrbitCamera` (yaw 0.6, pitch 0.35, so a planar molecule is never seen edge-on along an axis, 60°
-//     vertical field of view) whose target is the molecule's centre (the mean of its atom positions) and whose
-//     distance fits the bounding sphere (the largest distance from the centre to an atom plus that atom's display
-//     radius) with a 25 % margin inside the narrower of the vertical and the horizontal field of view
-//     (``MoleculePresenter/camera(for:aspect:)``), so every atom is in view at every aspect. Nothing moves; there is
-//     no gesture in this phase.
+//     releases that program for all of them, so no renderer is ever released while the other is in use.
+//   - Camera: `state.camera.camera(centre:boundingRadius:aspect:)` of the scene's centre and bounding radius at the
+//     canvas aspect (turn 15° and tilt 10° steps, zoom 0.85 per step of the framed distance; clarification Q3), so the
+//     molecule's centre is always drawn at the canvas centre and, at zoom 0 or farther, every atom is in view.
+//   - Light from the camera's side: both renderers light toward ``MoleculePresenter/lightDirection(for:)`` (the
+//     camera's direction turned 0.35 rad to the right and 0.35 rad up) with ambient 0.3.
 //   - Background: a dark canvas (``MoleculePresenter/backgroundColor``).
-//   - Probes: the background at (0.5, 0.04) from the top left (always outside the bounding sphere: its projection
-//     stays within 76 % of the half height) expected dark, and the centre of the frontmost atom (the smallest distance
-//     from the eye minus the display radius, so nothing covers its centre) with the colour class of its element colour
-//     under the light there, when that class is robust at 0.7…1.3 times the brightness (oxygen: red; nitrogen: blue).
-//   - Words: the canvas description of `MoleculeCore`; the mirror holds the name and formula line, the counts line,
-//     the source line, the status and the answer to a refused action for the controls.
-// There is no motion, so Reduce Motion changes nothing; nothing flashes. No audio.
+//   - Probes: the background at (0.5, 0.04) from the top left, expected dark, whenever the ray through it passes every
+//     atom and stick with a margin (always at zoom 0 or farther, where the bounding sphere stays within 76 % of the
+//     half height), and the centre of the frontmost atom (the smallest distance
+//     from the eye minus the display radius, so no other sphere covers its centre) with the colour class of its element
+//     colour under the light there, when that class is robust at 0.7…1.3 times the brightness (oxygen: red; nitrogen:
+//     blue).
+//   - Words: the canvas description of `MoleculeCore` (ending with the mode); the mirror holds the name and formula
+//     line, the counts line, the source line, the status, the mode and its legend ("Display radii, not measured
+//     sizes"), the camera in words ("Turned 30°, tilted 20°", "Zoom step 0 of −4 to 4") and the answer to a refused
+//     action for the controls.
+// Camera steps, resets and molecule changes cut to the new view in one frame (no animated move), so Reduce Motion
+// changes nothing; nothing flashes. No audio.
 import Foundation
 import MolecularExplorerCore
 import SwiftUI
@@ -55,6 +64,20 @@ final class MoleculeMirror {
     var sourceLine = ""
     /// The status line ("Caffeine selected, molecule 5 of 5").
     var status = ""
+    /// The display mode.
+    var mode = DisplayMode.ballAndStick
+    /// The legend of the mode, ending with "Display radii, not measured sizes."
+    var legend = ""
+    /// The camera's turn steps, 0…23.
+    var turnSteps = CameraSettings.default.turnSteps
+    /// The camera's tilt steps, −8…8.
+    var tiltSteps = CameraSettings.default.tiltSteps
+    /// The camera's zoom steps, −4…4.
+    var zoomSteps = CameraSettings.default.zoomSteps
+    /// The turn and tilt in words ("Turned 30°, tilted 20°").
+    var cameraWords = ""
+    /// The zoom in words ("Zoom step 0 of −4 to 4").
+    var zoomWords = ""
     /// The answer to the last refused action; empty after an accepted one.
     var message = ""
 }
@@ -62,29 +85,20 @@ final class MoleculeMirror {
 /// Draws Molecular Explorer and owns its presentation state (meshes, renderers and the depth pass).
 @MainActor
 final class MoleculePresenter: ExperiencePresenter {
-    /// The display radius as a fraction of the van der Waals radius (clarification Q5).
-    nonisolated static let displayScale = 0.35
-    /// Longitude segments of each sphere.
+    /// Longitude segments of the unit sphere.
     nonisolated static let sphereSegments = 32
-    /// Latitude rings of each sphere.
+    /// Latitude rings of the unit sphere.
     nonisolated static let sphereRings = 16
-    /// The vertical field of view of the camera (60°).
-    nonisolated static let fieldOfView = Double.pi / 3
-    /// The framing margin: the bounding sphere fills at most 1 / 1.25 of the narrower field of view's half angle sine.
-    nonisolated static let margin = 1.25
-    /// The camera's yaw, radians.
-    nonisolated static let cameraYaw = 0.6
-    /// The camera's pitch, radians.
-    nonisolated static let cameraPitch = 0.35
-    /// The atoms' ambient light fraction.
+    /// Sides of the unit stick.
+    nonisolated static let stickSides = 16
+    /// The atoms' and sticks' ambient light fraction.
     nonisolated static let ambient = 0.3
-    /// The direction toward the light: the camera's direction turned 0.35 rad to the right and 0.35 rad up.
-    nonisolated static let lightDirection: Vec3 = {
-        let yaw = cameraYaw + 0.35, pitch = cameraPitch + 0.35
-        return Vec3(cos(pitch) * sin(yaw), sin(pitch), cos(pitch) * cos(yaw)).normalized
-    }()
+    /// The light's turn to the right and up from the camera's direction, radians.
+    nonisolated static let lightOffset = 0.35
     /// The canvas around the molecule.
     nonisolated static let backgroundColor = Vec4(0.03, 0.035, 0.06, 1)
+    /// The legend's closing sentence (clarification Q2).
+    nonisolated static let legendNote = "Display radii, not measured sizes."
 
     /// The experience this presenter draws.
     let experienceID: ExperienceID
@@ -93,25 +107,35 @@ final class MoleculePresenter: ExperiencePresenter {
 
     /// Whether the GPU side is set up (between `setup` and `teardown`).
     private(set) var isLive = false
-    /// How many times the element renderers were made (all ten together each time).
+    /// How many times the renderers were made (sphere and stick together each time).
     private(set) var rendererBuildCount = 0
     /// How many times the CPU meshes were made (once per presenter).
     private(set) var meshBuildCount = 0
     /// The number of atoms drawn by the last frame.
     private(set) var lastAtomsDrawn = 0
+    /// The number of bond halves drawn by the last frame.
+    private(set) var lastHalvesDrawn = 0
+    /// The number of items (atoms plus halves) drawn by the last frame.
+    private(set) var lastItemCount = 0
     /// The selection the last frame drew; nil before the first frame.
     private(set) var lastSelection: Int?
-    /// The camera target (the molecule's centre) of the last frame; nil before the first frame.
+    /// The display mode the last frame drew; nil before the first frame.
+    private(set) var lastMode: DisplayMode?
+    /// The camera of the last frame; nil before the first frame.
+    private(set) var lastCamera: OrbitCamera?
+    /// The camera target (the scene's centre) of the last frame; nil before the first frame.
     private(set) var lastCenter: Vec3?
     /// The camera distance of the last frame; nil before the first frame.
     private(set) var lastCameraDistance: Double?
     /// The drawable size in pixels of the last frame; nil before the first.
     private(set) var lastCanvas: Vec2?
-    /// The element sphere meshes in `Elements.all` order; empty until first needed.
-    private(set) var elementMeshes: [Mesh] = []
-    /// The element renderers in `Elements.all` order, made and released all together; empty after `teardown`.
-    private(set) var elementRenderers: [MeshRenderer] = []
-    /// The depth-correct pass the atoms are drawn through; made in `setup`, released in `teardown`.
+    /// The unit sphere mesh; nil until first needed.
+    private(set) var sphereMesh: Mesh?
+    /// The unit stick mesh; nil until first needed.
+    private(set) var stickMesh: Mesh?
+    /// The renderers, sphere first and stick second, made and released together; empty after `teardown`.
+    private(set) var renderers: [MeshRenderer] = []
+    /// The depth-correct pass the items are drawn through; made in `setup`, released in `teardown`.
     private(set) var depthPass: DepthMeshPass?
 
     /// A presenter for the experience `experienceID`.
@@ -121,7 +145,7 @@ final class MoleculePresenter: ExperiencePresenter {
 
     // MARK: Render scene
 
-    /// Makes the depth pass and all element renderers with the host's registry (again after a context recreation).
+    /// Makes the depth pass and both renderers with the host's registry (again after a context recreation).
     func setup(_ context: RenderContext) throws {
         releaseGPU()
         depthPass = DepthMeshPass(registry: context.resources)
@@ -129,33 +153,42 @@ final class MoleculePresenter: ExperiencePresenter {
         isLive = true
     }
 
-    /// Draws the selected molecule's atoms lit, with depth, through the camera fitted to its bounding sphere.
+    /// Draws the state's scene lit, with depth, through the state's camera framed on the scene.
     func draw(_ core: MoleculeCore, tier: Int, context: RenderContext, frame: FrameInfo) throws {
         sync(core)
         let width = Double(max(1, context.pixelWidth)), height = Double(max(1, context.pixelHeight))
         lastCanvas = Vec2(width, height)
         if depthPass == nil { depthPass = DepthMeshPass(registry: context.resources) }
-        if elementRenderers.count != Elements.all.count {
-            // Something is missing: release them all together and make them all again (never one at a time).
+        if renderers.count != 2 {
+            // Something is missing: release both together and make both again (never one at a time).
             releaseRenderers()
             try makeRenderers(context)
         }
-        guard let depthPass, let molecule = core.molecule else { return }
+        guard let depthPass, let scene = core.state.scene else { return }
+        let sphere = renderers[0], stick = renderers[1]
+        let camera = Self.camera(core.state, scene: scene, aspect: width / height)
+        let light = Self.lightDirection(for: camera)
+        sphere.lightDirection = light
+        stick.lightDirection = light
         depthPass.clearColor = Self.backgroundColor
         var items: [DepthMeshPass.Item] = []
-        items.reserveCapacity(molecule.atoms.count)
-        for atom in molecule.atoms {
-            guard let index = Self.elementIndex(symbol: atom.symbol), elementRenderers.indices.contains(index) else {
-                continue
-            }
-            items.append(DepthMeshPass.Item(renderer: elementRenderers[index],
-                                            model: Mat4.translation(Self.position(atom)),
-                                            color: Self.color(hex: Elements.all[index].colorHex)))
+        items.reserveCapacity(scene.itemCount)
+        for atom in scene.atoms {
+            items.append(DepthMeshPass.Item(renderer: sphere, model: Self.atomModel(atom),
+                                            color: Self.color(symbol: atom.symbol)))
         }
-        let camera = Self.camera(for: molecule, aspect: width / height)
+        let atoms = items.count
+        for half in scene.bondHalves {
+            guard let model = Self.halfModel(half) else { continue }
+            items.append(DepthMeshPass.Item(renderer: stick, model: model, color: Self.color(symbol: half.symbol)))
+        }
         try depthPass.draw(items, camera: camera, context: context)
-        lastAtomsDrawn = items.count
+        lastAtomsDrawn = atoms
+        lastHalvesDrawn = items.count - atoms
+        lastItemCount = items.count
         lastSelection = core.selection
+        lastMode = core.mode
+        lastCamera = camera
         lastCenter = camera.target
         lastCameraDistance = camera.distance
     }
@@ -165,6 +198,8 @@ final class MoleculePresenter: ExperiencePresenter {
         isLive = false
         releaseGPU()
         lastAtomsDrawn = 0
+        lastHalvesDrawn = 0
+        lastItemCount = 0
     }
 
     /// Releases the renderers and the depth pass.
@@ -174,24 +209,25 @@ final class MoleculePresenter: ExperiencePresenter {
         depthPass = nil
     }
 
-    /// Releases every element renderer, all together.
+    /// Releases both renderers, together.
     private func releaseRenderers() {
-        for renderer in elementRenderers { renderer.release() }
-        elementRenderers = []
+        for renderer in renderers { renderer.release() }
+        renderers = []
     }
 
-    /// Makes the ten element renderers together (lit from the camera's side); a failure releases the renderers made
-    /// so far and rethrows.
+    /// Makes the sphere and the stick renderer together (ambient 0.3); a failure releases the renderer made so far
+    /// and rethrows.
     private func makeRenderers(_ context: RenderContext) throws {
-        if elementMeshes.count != Elements.all.count {
-            elementMeshes = Self.meshes()
+        if sphereMesh == nil || stickMesh == nil {
+            sphereMesh = Self.unitSphere()
+            stickMesh = try Self.unitStick()
             meshBuildCount += 1
         }
+        guard let sphereMesh, let stickMesh else { return }
         var made: [MeshRenderer] = []
         do {
-            for mesh in elementMeshes {
+            for mesh in [sphereMesh, stickMesh] {
                 let renderer = try MeshRenderer(mesh: mesh, registry: context.resources)
-                renderer.lightDirection = Self.lightDirection
                 renderer.ambient = Self.ambient
                 made.append(renderer)
             }
@@ -199,76 +235,72 @@ final class MoleculePresenter: ExperiencePresenter {
             for renderer in made { renderer.release() }
             throw error
         }
-        elementRenderers = made
+        renderers = made
         rendererBuildCount += 1
     }
 
     // MARK: Geometry
 
-    /// The index of the element `symbol` in `Elements.all`, or nil outside the catalog.
-    nonisolated static func elementIndex(symbol: String) -> Int? {
-        guard let element = Elements.element(symbol: symbol) else { return nil }
-        return Elements.all.firstIndex(of: element)
+    /// The unit sphere: radius 1, 32 × 16.
+    nonisolated static func unitSphere() -> Mesh {
+        Mesh.uvSphere(segments: sphereSegments, rings: sphereRings, radius: 1)
     }
 
-    /// The display radius of an atom of `symbol`: 0.35 × the element's van der Waals radius (ångström as scene
-    /// units); 0.35 × 1.5 for a symbol outside the catalog (never for a validated molecule).
-    nonisolated static func displayRadius(symbol: String) -> Double {
-        displayScale * (Elements.element(symbol: symbol)?.vanDerWaalsRadius ?? 1.5)
+    /// The unit stick: from the origin to (0, 1, 0), radius `DisplayMode.stickRadius`, 16 sides, open, no caps.
+    nonisolated static func unitStick() throws -> Mesh {
+        try Mesh.tube(path: [Vec3(0, 0, 0), Vec3(0, 1, 0)], radius: DisplayMode.stickRadius, sides: stickSides,
+                      caps: false, closed: false)
     }
 
-    /// The ten element sphere meshes in `Elements.all` order.
-    nonisolated static func meshes() -> [Mesh] {
-        var meshes: [Mesh] = []
-        for element in Elements.all {
-            meshes.append(Mesh.uvSphere(segments: sphereSegments, rings: sphereRings,
-                                        radius: displayScale * element.vanDerWaalsRadius))
-        }
-        return meshes
+    /// The model matrix of `atom`: translate(position) × scale(radius).
+    nonisolated static func atomModel(_ atom: MoleculeScene.AtomItem) -> Mat4 {
+        Mat4.translation(atom.position) * Mat4.scale(Vec3(atom.radius, atom.radius, atom.radius))
     }
 
-    /// The position of `atom` in scene units (ångström).
-    nonisolated static func position(_ atom: Atom) -> Vec3 { Vec3(atom.x, atom.y, atom.z) }
-
-    /// The centre of `molecule`: the mean of its atom positions (the origin for no atom).
-    nonisolated static func center(of molecule: Molecule) -> Vec3 {
-        guard !molecule.atoms.isEmpty else { return Vec3(0, 0, 0) }
-        var sum = Vec3(0, 0, 0)
-        for atom in molecule.atoms { sum = sum + position(atom) }
-        return sum * (1 / Double(molecule.atoms.count))
+    /// The model matrix of `half`: translate(from) × rotate(+y onto the half's direction) × scale(1, length, 1); nil
+    /// for a half without length or with a non-finite end.
+    nonisolated static func halfModel(_ half: MoleculeScene.BondHalf) -> Mat4? {
+        let d = half.to - half.from
+        let length = d.length
+        guard length.isFinite, length > 1e-9 else { return nil }
+        let rotation = rotationFromUp(to: d * (1 / length))
+        return Mat4.translation(half.from) * Mat4.rotation(rotation) * Mat4.scale(Vec3(1, length, 1))
     }
 
-    /// The radius of `molecule`'s bounding sphere around its centre: the largest distance from the centre to an atom
-    /// plus that atom's display radius.
-    nonisolated static func boundingRadius(of molecule: Molecule) -> Double {
-        let c = center(of: molecule)
-        var radius = 0.0
-        for atom in molecule.atoms {
-            radius = max(radius, (position(atom) - c).length + displayRadius(symbol: atom.symbol))
-        }
-        return radius
+    /// The shortest-arc rotation turning +y onto the unit vector `direction`: the identity along +y, half a
+    /// revolution about x along −y.
+    nonisolated static func rotationFromUp(to direction: Vec3) -> Quat {
+        let up = Vec3(0, 1, 0)
+        let c = min(max(up.dot(direction), -1), 1)
+        if c > 1 - 1e-12 { return .identity }
+        if c < -1 + 1e-12 { return Quat(axis: Vec3(1, 0, 0), angle: .pi) }
+        return Quat(axis: up.cross(direction), angle: acos(c))
     }
 
-    /// The camera for `molecule` at canvas aspect `aspect` (width / height): looking at its centre from yaw 0.6 and
-    /// pitch 0.35, at the distance where the bounding sphere × 1.25 just fits the narrower half angle of the vertical
-    /// and the horizontal field of view.
-    nonisolated static func camera(for molecule: Molecule, aspect: Double) -> OrbitCamera {
-        let a = aspect.isFinite && aspect > 0 ? aspect : 1
-        let halfVertical = fieldOfView / 2
-        let halfHorizontal = atan(tan(halfVertical) * a)
-        let half = min(halfVertical, halfHorizontal)
-        let radius = max(boundingRadius(of: molecule), 0.1)
-        let distance = radius * margin / sin(half)
-        return OrbitCamera(target: center(of: molecule), distance: distance, yaw: cameraYaw, pitch: cameraPitch,
-                           fovY: fieldOfView, near: 0.05, far: distance + 2 * radius + 10)
+    /// The camera of `state` framed on `scene` at canvas aspect `aspect` (width / height).
+    nonisolated static func camera(_ state: MoleculeState, scene: MoleculeScene, aspect: Double) -> OrbitCamera {
+        state.camera.camera(centre: scene.centre, boundingRadius: scene.boundingRadius, aspect: aspect)
+    }
+
+    /// The direction toward the light for `camera`: its direction from the target turned 0.35 rad to the right and
+    /// 0.35 rad up (the elevation kept within ±85°).
+    nonisolated static func lightDirection(for camera: OrbitCamera) -> Vec3 {
+        let yaw = camera.yaw + lightOffset
+        let pitch = min(max(camera.pitch + lightOffset, -85 * Double.pi / 180), 85 * Double.pi / 180)
+        return Vec3(cos(pitch) * sin(yaw), sin(pitch), cos(pitch) * cos(yaw)).normalized
     }
 
     /// The pixel (x from the left, y from the bottom, as the host reads frames back) where the world point `point` is
-    /// drawn for `molecule` on a canvas of `canvas` pixels.
-    nonisolated static func pixel(of point: Vec3, molecule: Molecule, canvas: Vec2) -> Vec2 {
+    /// drawn through `camera` on a canvas of `canvas` pixels.
+    nonisolated static func pixel(of point: Vec3, camera: OrbitCamera, canvas: Vec2) -> Vec2 {
         let width = max(canvas.x, 1), height = max(canvas.y, 1)
-        let ndc = camera(for: molecule, aspect: width / height).project(point, aspect: width / height)
+        let ndc = camera.project(point, aspect: width / height)
         return Vec2((ndc.x + 1) / 2 * width, (ndc.y + 1) / 2 * height)
+    }
+
+    /// The display colour of the element `symbol`; mid grey outside the catalog.
+    nonisolated static func color(symbol: String) -> Vec4 {
+        color(hex: Elements.element(symbol: symbol)?.colorHex ?? "")
     }
 
     /// The colour (RGB 0…1, alpha 1) of six hex digits ("FF0D0D"); mid grey for text that is not six hex digits.
@@ -311,26 +343,44 @@ final class MoleculePresenter: ExperiencePresenter {
         return classes.count == 1 ? classes.first : nil
     }
 
-    /// The index of the frontmost atom of `molecule` seen through the camera of `aspect`: the smallest distance from
-    /// the eye minus the display radius (no other sphere covers its centre); nil for no atom.
-    nonisolated static func frontmostAtom(_ molecule: Molecule, aspect: Double) -> Int? {
-        let eye = camera(for: molecule, aspect: aspect).eye
+    /// The index of the frontmost atom of `scene` seen through `camera`: the smallest distance from the eye minus the
+    /// display radius (no other sphere covers its centre); nil for no atom.
+    nonisolated static func frontmostAtom(_ scene: MoleculeScene, camera: OrbitCamera) -> Int? {
+        let eye = camera.eye
         var best: (index: Int, depth: Double)?
-        for (index, atom) in molecule.atoms.enumerated() {
-            let depth = (position(atom) - eye).length - displayRadius(symbol: atom.symbol)
+        for (index, atom) in scene.atoms.enumerated() {
+            let depth = (atom.position - eye).length - atom.radius
             if let current = best, depth >= current.depth { continue }
             best = (index, depth)
         }
         return best?.index
     }
 
-    /// The lit colour (RGB 0…1) at the visible centre of atom `index` of `molecule` through the camera of `aspect`:
-    /// the element colour times ambient + (1 − ambient) · Lambert, the normal pointing from the atom to the eye.
-    nonisolated static func centerColor(_ molecule: Molecule, index: Int, aspect: Double) -> Vec3 {
-        let atom = molecule.atoms[index]
-        let base = color(hex: Elements.element(symbol: atom.symbol)?.colorHex ?? "")
-        let normal = (camera(for: molecule, aspect: aspect).eye - position(atom)).normalized
-        let f = ambient + (1 - ambient) * max(0, normal.dot(lightDirection))
+    /// True when the ray from `origin` along the unit `direction` passes every atom of `scene` farther than 1.1 × its
+    /// radius + 0.05 and every bond half (sampled at 17 points) farther than 1.1 × its radius + 0.05.
+    nonisolated static func rayMisses(origin: Vec3, direction: Vec3, scene: MoleculeScene) -> Bool {
+        /// The distance from `point` to the ray.
+        func distance(_ point: Vec3) -> Double {
+            let v = point - origin
+            return (v - direction * max(v.dot(direction), 0)).length
+        }
+        for atom in scene.atoms where distance(atom.position) <= atom.radius * 1.1 + 0.05 { return false }
+        for half in scene.bondHalves {
+            for k in 0...16 {
+                let point = half.from + (half.to - half.from) * (Double(k) / 16)
+                if distance(point) <= half.radius * 1.1 + 0.05 { return false }
+            }
+        }
+        return true
+    }
+
+    /// The lit colour (RGB 0…1) at the visible centre of atom `index` of `scene` through `camera`: the element colour
+    /// times ambient + (1 − ambient) · Lambert, the normal pointing from the atom to the eye.
+    nonisolated static func centerColor(_ scene: MoleculeScene, index: Int, camera: OrbitCamera) -> Vec3 {
+        let atom = scene.atoms[index]
+        let base = color(symbol: atom.symbol)
+        let normal = (camera.eye - atom.position).normalized
+        let f = ambient + (1 - ambient) * max(0, normal.dot(lightDirection(for: camera)))
         return Vec3(base.x * f, base.y * f, base.z * f)
     }
 
@@ -338,15 +388,25 @@ final class MoleculePresenter: ExperiencePresenter {
     func probes(_ core: MoleculeCore) -> [FrameProbe] {
         guard let canvas = lastCanvas else { return [] }
         var probes: [FrameProbe] = []
-        if let background = FrameProbe(name: "background", x: 0.5, y: 0.04, expected: FrameColorClass.dark.rawValue) {
+        guard let scene = core.state.scene else {
+            if let background = FrameProbe(name: "background", x: 0.5, y: 0.04,
+                                           expected: FrameColorClass.dark.rawValue) {
+                probes.append(background)
+            }
+            return probes
+        }
+        let aspect = canvas.x / canvas.y
+        let camera = Self.camera(core.state, scene: scene, aspect: aspect)
+        let ray = camera.ray(ndc: Vec2(0, 1 - 2 * 0.04), aspect: aspect)
+        if Self.rayMisses(origin: ray.origin, direction: ray.direction, scene: scene),
+           let background = FrameProbe(name: "background", x: 0.5, y: 0.04, expected: FrameColorClass.dark.rawValue) {
             probes.append(background)
         }
-        guard let molecule = core.molecule else { return probes }
-        let aspect = canvas.x / canvas.y
-        if let index = Self.frontmostAtom(molecule, aspect: aspect),
-           let expected = Self.robustClass(Self.centerColor(molecule, index: index, aspect: aspect)) {
-            let p = Self.pixel(of: Self.position(molecule.atoms[index]), molecule: molecule, canvas: canvas)
-            if let probe = FrameProbe(name: "atom-\(index)", x: p.x / canvas.x, y: 1 - p.y / canvas.y,
+        if let index = Self.frontmostAtom(scene, camera: camera),
+           let expected = Self.robustClass(Self.centerColor(scene, index: index, camera: camera)) {
+            let p = Self.pixel(of: scene.atoms[index].position, camera: camera, canvas: canvas)
+            if p.x > 0, p.x < canvas.x, p.y > 0, p.y < canvas.y,
+               let probe = FrameProbe(name: "atom-\(index)", x: p.x / canvas.x, y: 1 - p.y / canvas.y,
                                       expected: expected) {
                 probes.append(probe)
             }
@@ -355,6 +415,42 @@ final class MoleculePresenter: ExperiencePresenter {
     }
 
     // MARK: Words and controls
+
+    /// `value` with a true minus sign when negative ("−20").
+    nonisolated static func signed(_ value: Int) -> String {
+        value < 0 ? "\u{2212}\(-value)" : "\(value)"
+    }
+
+    /// The turn and tilt of `camera` in words: "Turned 30°, tilted 20°".
+    nonisolated static func cameraWords(_ camera: CameraSettings) -> String {
+        "Turned \(camera.turnDegrees)°, tilted \(signed(camera.tiltDegrees))°"
+    }
+
+    /// The zoom of `camera` in words: "Zoom step 0 of −4 to 4".
+    nonisolated static func zoomWords(_ camera: CameraSettings) -> String {
+        "Zoom step \(signed(camera.zoomSteps)) of \(signed(CameraSettings.zoomRange.lowerBound)) to "
+            + "\(CameraSettings.zoomRange.upperBound)"
+    }
+
+    /// The name of `mode` on its control: "Ball and stick" or "Space filling".
+    nonisolated static func modeTitle(_ mode: DisplayMode) -> String {
+        switch mode {
+        case .ballAndStick: return "Ball and stick"
+        case .spaceFilling: return "Space filling"
+        }
+    }
+
+    /// The legend of `mode`, ending with "Display radii, not measured sizes.": ball-and-stick "Ball and stick: atoms at
+    /// 30 % of their van der Waals radius, bonds as sticks. …"; space-filling "Space filling: atoms at their van der
+    /// Waals radius, no bonds. …".
+    nonisolated static func legend(_ mode: DisplayMode) -> String {
+        switch mode {
+        case .ballAndStick:
+            return "Ball and stick: atoms at 30 % of their van der Waals radius, bonds as sticks. " + legendNote
+        case .spaceFilling:
+            return "Space filling: atoms at their van der Waals radius, no bonds. " + legendNote
+        }
+    }
 
     /// Brings the controls' mirror in line with `core`.
     func sync(_ core: MoleculeCore) {
@@ -369,6 +465,18 @@ final class MoleculePresenter: ExperiencePresenter {
         if mirror.sourceLine != source { mirror.sourceLine = source }
         let status = MoleculeCore.status(selection: selection)
         if mirror.status != status { mirror.status = status }
+        let mode = core.mode
+        if mirror.mode != mode { mirror.mode = mode }
+        let legend = Self.legend(mode)
+        if mirror.legend != legend { mirror.legend = legend }
+        let camera = core.camera
+        if mirror.turnSteps != camera.turnSteps { mirror.turnSteps = camera.turnSteps }
+        if mirror.tiltSteps != camera.tiltSteps { mirror.tiltSteps = camera.tiltSteps }
+        if mirror.zoomSteps != camera.zoomSteps { mirror.zoomSteps = camera.zoomSteps }
+        let words = Self.cameraWords(camera)
+        if mirror.cameraWords != words { mirror.cameraWords = words }
+        let zoom = Self.zoomWords(camera)
+        if mirror.zoomWords != zoom { mirror.zoomWords = zoom }
     }
 
     /// The answer to `result` of `control`: empty when accepted, else why it was refused.
@@ -378,6 +486,10 @@ final class MoleculePresenter: ExperiencePresenter {
         case "molecule.next": return "Caffeine is the last molecule."
         case "molecule.previous": return "Water is the first molecule."
         case "molecule.select": return "There is no such molecule."
+        case "display.mode": return "There is no such display mode."
+        case "camera.orbit": return "The camera turns one step left or right."
+        case "camera.tilt": return "The camera is tilted as far as it goes."
+        case "camera.zoom": return "The camera is zoomed as far as it goes."
         default: return "That is not possible here."
         }
     }
@@ -390,7 +502,7 @@ final class MoleculePresenter: ExperiencePresenter {
         return result
     }
 
-    /// The description of `core`'s molecule.
+    /// The description of `core`'s molecule and mode.
     func describe(_ core: MoleculeCore) -> String {
         sync(core)
         return core.canvasDescription
@@ -401,9 +513,9 @@ final class MoleculePresenter: ExperiencePresenter {
         AnyView(MoleculeControls(port: port, mirror: mirror, presenter: self))
     }
 
-    /// The actions the native controls send: every action (Previous molecule, Next molecule and the Molecule menu);
-    /// there is no canvas gesture in this phase.
+    /// The actions the native controls send: every action (the molecule buttons and menu, the mode picker, the turn,
+    /// tilt and zoom buttons and Reset view); there is no canvas gesture in this phase.
     var nativeActions: Set<String> {
-        ["molecule.select", "molecule.next", "molecule.previous"]
+        Set(MoleculeCore.actionIDs)
     }
 }
