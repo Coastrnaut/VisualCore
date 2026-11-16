@@ -9,7 +9,7 @@ Precedent: `specs/113-me-p04-library/tasks.md`.
 
 ## Phase 1: Setup
 
-- [ ] T-A15-501 Baseline: cite the A15-P04 evidence on the unchanged sources (`.autonomy/checks/A15-P04.{me-ios27,app-unit,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14)
+- [X] T-A15-501 Baseline: cite the A15-P04 evidence on the unchanged sources (`.autonomy/checks/A15-P04.{me-ios27,app-unit,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14) — Verified 2026-11-16: 2026-11-16: A15-P04 evidence cited on unchanged sources (no Packages change since the A15-P04 record): .autonomy/checks/A15-P04.me-ios27.json, A15-P04.app-unit.json, A15-P04.verify-27.json, all exit 0
 
 ## Phase 2: Foundational — the core (stories 1–4)
 
