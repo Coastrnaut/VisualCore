@@ -12,7 +12,7 @@ picker or any system prompt. Precedent: `specs/108-sse-p06-release/tasks.md`.
 
 ## Phase 2: Story 1 — nothing leaves the device
 
-- [ ] T-A15-602 [P] [US1] Write `docs/apps/molecular-explorer/privacy-and-credits.md` per research D1 (stored: `recent.json`, `settings.json`, `import.xyz`, `import-title.txt` in the experience's folder and the app's session state; the picked file read once and copied; nothing sent; deletion; credits for PubChem and the element data sources of `data-sources.md` with their licenses) (FR-A15-604)
+- [X] T-A15-602 [P] [US1] Write `docs/apps/molecular-explorer/privacy-and-credits.md` per research D1 (stored: `recent.json`, `settings.json`, `import.xyz`, `import-title.txt` in the experience's folder and the app's session state; the picked file read once and copied; nothing sent; deletion; credits for PubChem and the element data sources of `data-sources.md` with their licenses) (FR-A15-604) — Verified 2026-11-16: 2026-11-16: docs/apps/molecular-explorer/privacy-and-credits.md written; required by release.json and passed by .autonomy/checks/A15-P06.release-checks.json (experience-release-a15)
 - [ ] T-A15-603 [US1] Write `specs/115-me-p06-release/scan-sources-release.sh` refusing the uses of Clarifications Q3 in `Packages/ExperiencesCreative/MolecularExplorer` and run it (`--name me-no-network -- sh specs/115-me-p06-release/scan-sources-release.sh`) (FR-A15-601, 602; SC-A15-601)
 
 ## Phase 3: Story 2 — saved data and failures
