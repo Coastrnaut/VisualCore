@@ -59,7 +59,7 @@ and wave Δt 0.05…1 with speed c 0.1…2; the controls show `SimulationMirror.
   changes nothing.
 - Q: Where is the legend drawn and what happens without floating-point targets? → A: The legend is a SwiftUI view
   returned by `makeCanvasOverlay(_:)`: a colour bar of the family's palette with the minimum and maximum of the CPU
-  field (u for reaction-diffusion, the signed value for the wave), and for the automaton the alive and dead counts;
+  field (the inhibitor v for reaction-diffusion, the value `SimulationPalette` colours; the signed height for the wave), and for the automaton the alive and dead counts;
   the canvas description states the same values. The float probe runs in `setup` for each context generation (a test
   seam forces "unsupported"); without support no GPU field (float or 8-bit) is made for the two families, the family
   control refuses choosing them with `a16.unsupported` and the sentence "Reaction-diffusion and the wave field need
