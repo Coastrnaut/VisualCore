@@ -1,0 +1,144 @@
+# Feature Specification: Digital Zen Garden — Phase 04 Persistence, accessibility and still export
+
+**Feature Branch**: `148-zg-p04-library-a11y` (spec directory only; work stays on `main`)
+
+**Created**: 2026-11-17
+
+**Status**: Draft
+
+**Ledger gate**: A20-P04 (legacy ledger) · ID namespace FR-A20-4##, SC-A20-4##, T-A20-4##
+
+**Input**: User description: archived manual `apps/20-digital-zen-garden.md` §9 Phase 04 `/speckit-specify` prompt
+(verbatim in the invocation).
+
+Canonical overrides:
+- **Phase gates (manual §9 Phase 04):**
+  - MVP: undo and redo for strokes and placements (built in A20-P01 and A20-P03; proven here across save and load);
+  - regression fixture: memory remains bounded for long gesture histories;
+  - graphics context ownership stays solely in the audited VisualCore host.
+- **Gaps built here:** G-LIBRARY and G-A11Y of `docs/apps/digital-zen-garden/visualcore-contract.json`, plus a
+  still picture of the garden handed to the system share sheet.
+- **Experience A20 inside the one app; still a candidate.** Follow `specs/141-lw-p04-save-share`.
+
+## User Scenarios & Testing *(mandatory)*
+
+### User Story 1 - Keep named gardens (Priority: P1) 🎯
+
+A person saves the current garden under a name, sees it in a list of saved gardens, opens it later, renames it and
+deletes it. A damaged or newer saved garden is reported, not opened, and the others still work.
+
+**Why this priority**: the manual's version 0.1 feature 05.
+
+**Independent Test**: save, list, open, rename and delete gardens in a temporary storage; open damaged and newer
+samples.
+
+**Acceptance Scenarios**:
+
+1. **Given** a garden, **When** it is saved as "Morning", **Then** "Morning" is listed and opening it restores the
+   garden exactly.
+2. **Given** a damaged saved garden, **When** the list is read, **Then** it is marked as unreadable and the others
+   open.
+
+---
+
+### User Story 2 - Every control can be reached without sight or fine touch (Priority: P1)
+
+Every action has a native control with a spoken label and value; the garden is described in words (strokes, stones,
+the selected stone); undo, redo, save and open are announced; the controls stay usable at the largest text size.
+
+**Why this priority**: G-A11Y and the constitution's accessibility rules.
+
+**Independent Test**: list the controls' labels; read the description; render the controls at the largest text size.
+
+**Acceptance Scenarios**:
+
+1. **Given** the experience, **Then** every control has a spoken label, and every gesture action has a control.
+2. **Given** the largest text size, **Then** the controls stack and stay within the screen width.
+
+---
+
+### User Story 3 - Long sessions stay small (Priority: P1)
+
+However long a person rakes and moves stones, the memory the garden holds stays bounded.
+
+**Why this priority**: the manual's regression fixture.
+
+**Independent Test**: apply thousands of commands; measure the history's size and the document's size.
+
+**Acceptance Scenarios**:
+
+1. **Given** 10,000 commands, **Then** the undo history holds at most its bound, the document stays within its caps,
+   and the encoded history stays under its stated byte bound.
+
+---
+
+### User Story 4 - Share a picture of the garden (Priority: P2)
+
+A person shares a still picture of the garden through the system share sheet, for example to save it.
+
+**Why this priority**: the phase's "export still".
+
+**Independent Test**: export a still; the file has the stated size and is handed to the share sheet.
+
+**Acceptance Scenarios**:
+
+1. **Given** a garden, **When** a still is shared, **Then** a picture of the stated size is written and offered to the
+   share sheet, and nothing else is saved.
+
+### Edge Cases
+
+- **A name that is empty, too long or already used:** refused or made unique, as specified.
+- **The library at its cap:** saving a new garden is refused with a message; replacing an existing one works.
+- **A damaged, newer or oversized saved garden:** reported, never opened, never deleted automatically.
+- **Opening a garden:** the undo history restarts.
+- **A failed still export:** a message; no file is left behind.
+- **The person declines saving to Photos:** the share sheet's other destinations still work.
+
+## Requirements *(mandatory)*
+
+### Functional Requirements
+
+- **FR-A20-401**: Named gardens MUST be saved, listed, opened, renamed and deleted in the experience's own storage,
+  with caps on count, name length and size.
+- **FR-A20-402**: Damaged, newer-version and oversized saved gardens MUST be reported and never opened.
+- **FR-A20-403**: Every control MUST have a spoken label and value; the garden MUST be described in words; undo, redo,
+  save and open MUST be announced; the controls MUST stack at the largest text sizes.
+- **FR-A20-404**: The undo history, the stroke in progress and the document MUST stay within stated bounds for any
+  number of commands.
+- **FR-A20-405**: A still picture of the garden MUST be written at a stated size and handed to the system share sheet,
+  with no file left after a failure.
+- **FR-A20-406**: No network request, no permission beyond the app's existing add-only Photos string used by the share
+  sheet's "Save Image", and no Photos library call by the experience.
+
+### Key Entities
+
+- **Saved garden**: id, name, the document, a modification order.
+- **Library**: the list of saved gardens and its caps.
+- **Still picture**: a file of the garden at a stated size.
+
+## Success Criteria *(mandatory)*
+
+### Measurable Outcomes
+
+- **SC-A20-401**: 100% of save-and-open round trips are exact; one sample of each refusal is reported.
+- **SC-A20-402**: After 10,000 commands the history holds at most 100 commands and stays under its byte bound.
+- **SC-A20-403**: 100% of controls have spoken labels; at the largest text size no control is clipped.
+- **SC-A20-404**: Every test takes under 10 seconds; the runner passes on iOS 27.
+
+## Assumptions
+
+- The caps, the still size and the byte bound are decided in clarification.
+
+## Traceability
+
+| Source | Requirement |
+|---|---|
+| MVP: undo/redo for strokes and placements | FR-A20-401 (across save and open), FR-A20-404 |
+| Regression fixture: memory bounded for long histories | FR-A20-404, SC-A20-402 |
+| Version 0.1 feature 05: save and load named gardens | FR-A20-401, 402 |
+| Phase 04 title: accessibility and export still | FR-A20-403, 405 |
+| Contract G-LIBRARY, G-A11Y | FR-A20-401–403 |
+
+## Negative Requirements
+
+- No network, no account, no Photos library call by the experience, no image asset, no texture snapshot for undo.
