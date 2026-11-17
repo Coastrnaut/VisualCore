@@ -16,6 +16,12 @@
 //     for example "Scene, Ink Flow" or "Colour 2, red 0.40, green 0.20, blue 0.60"; the controls take their labels
 //     from this list, so the tests read exactly what VoiceOver reads.
 //
+// Feature 141 (A19-P04) T-A19-403, T-A19-405, T-A19-407 (FR-A19-401, FR-A19-403, FR-A19-404): the outcome of an
+// `ExportJob` (``outcome(of:refusal:limit:orientation:)``, the same sentences as an attempt's, announced once through
+// ``record(_:port:)``), and the labels of the save controls (``saveLabels(progress:canRetry:shareName:history:)``):
+// the job's progress and its cancel and retry buttons, the share link with the file name, the newest history
+// entries, for example "Ink Flow, iPhone 16 Pro, portrait, PNG 1206 × 2622", and "Clear history".
+//
 // No GL, Photos or system-wallpaper call; nothing here renders.
 import Foundation
 import LivingWallpapersCore
@@ -86,6 +92,8 @@ final class EditorModel {
     static let helpTitle = "How to use it"
     /// The reason shown when no experience is open to render.
     static let noRendererReason = "No picture is open to export."
+    /// The reason shown after a cancelled export.
+    static let cancelledReason = "The export was cancelled."
 
     /// The route announcements go through (the shared one in the app; tests pass one with a recording sink).
     let route: ExperienceFeedback
@@ -132,9 +140,28 @@ final class EditorModel {
             return .notice(notice)
         }
         switch export.state {
-        case .cancelled: return .failed("The export was cancelled.")
+        case .cancelled: return .failed(cancelledReason)
         case .failed(let reason): return .failed(reason.sentence)
         default: return .failed("The export did not finish.")
+        }
+    }
+
+    /// The outcome of an export job in `state` with the planner's `refusal`, with the notice at `limit` in
+    /// `orientation` for a refusal (feature 141); nil while the job is idle or running.
+    static func outcome(of state: ExportJob.State, refusal: ExportRefusal?, limit: Int,
+                        orientation: Orientation) -> Outcome? {
+        switch state {
+        case .idle, .running:
+            return nil
+        case .done(let output):
+            return .done(ExportResultLine.line(plan: output.plan, result: output.result))
+        case .cancelled:
+            return .failed(cancelledReason)
+        case .failed(let reason):
+            if let refusal, let notice = ExportNotice.notice(for: refusal, limit: limit, orientation: orientation) {
+                return .notice(notice)
+            }
+            return .failed(reason.sentence)
         }
     }
 
@@ -253,6 +280,48 @@ final class EditorModel {
         labels.append(EditorLabel(name: "help", title: "Help", value: helpTitle))
         if let resultLine {
             labels.append(EditorLabel(name: "result-help", title: helpTitle, value: "after " + resultLine))
+        }
+        return labels
+    }
+
+    /// The progress in words: "40 percent".
+    static func percent(_ progress: Double) -> String {
+        "\(Int((min(max(progress, 0), 1) * 100).rounded())) percent"
+    }
+
+    /// The line of a history entry: "<scene>, <device>, <orientation>, <format> <w> × <h>", for example
+    /// "Ink Flow, iPhone 16 Pro, portrait, PNG 1206 × 2622" (the ids when the catalog has no such entry).
+    static func historyLine(_ entry: ExportHistory.Entry) -> String {
+        let scene = SceneCatalog.scene(id: entry.scene)?.name ?? entry.scene
+        let device = CanvasTemplates.template(id: entry.template)?.device ?? entry.template
+        let format = formatTitles[ExportFormat.allCases.firstIndex(of: entry.format) ?? 0]
+        return "\(scene), \(device), \(entry.orientation.rawValue), \(format) \(entry.width) × \(entry.height)"
+    }
+
+    /// The labels of the save controls (feature 141), in the controls' order: the job's progress and its cancel
+    /// button while `progress` is given, the retry button when `canRetry`, the share link when `shareName` is
+    /// given, then one label per `history` entry shown (`history-0` …) and "Clear history" when there is any.
+    static func saveLabels(progress: Double?, canRetry: Bool, shareName: String?,
+                           history: [ExportHistory.Entry]) -> [EditorLabel] {
+        var labels: [EditorLabel] = []
+        if let progress {
+            labels.append(EditorLabel(name: "export-progress", title: "Export progress", value: percent(progress)))
+            labels.append(EditorLabel(name: "export-cancel", title: "Cancel export",
+                                      value: "stops at the next step"))
+        }
+        if canRetry {
+            labels.append(EditorLabel(name: "export-retry", title: "Retry export", value: "runs the last export again"))
+        }
+        if let shareName {
+            labels.append(EditorLabel(name: "share", title: "Share", value: shareName))
+        }
+        for (index, entry) in history.enumerated() {
+            labels.append(EditorLabel(name: "history-\(index)", title: "Recent export \(index + 1)",
+                                      value: historyLine(entry)))
+        }
+        if !history.isEmpty {
+            labels.append(EditorLabel(name: "clear-history", title: "Clear history",
+                                      value: history.count == 1 ? "1 entry shown" : "\(history.count) entries shown"))
         }
         return labels
     }

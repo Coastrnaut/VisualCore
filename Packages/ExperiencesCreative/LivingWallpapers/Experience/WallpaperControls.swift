@@ -12,16 +12,16 @@
 //   - `time` slider, the animation moment 0…3600 s (→ `scene.time [seconds]`);
 //   - `format` menu (PNG, JPEG, HEIC → `export.format [0…2]`);
 //   - `motion` toggle (→ `motion.enabled [0 / 1]`);
-//   - `export` button: runs the presenter's `StillExport` with the environment's timed still renderer
-//     (`experienceStillRenderer`) and shows the outcome in `export-message`. Without a renderer (no experience open)
-//     it says so.
+//   - `export` button: exports with the environment's timed still renderer (`experienceStillRenderer`; through the
+//     presenter's `ExportJob` since feature 141) and shows the outcome in `export-message`. Without a renderer (no
+//     experience open) it says so.
 //
 // Feature 140 (A19-P03) T-A19-303, T-A19-307, T-A19-309 (FR-A19-301–305; clarifications Q1–Q5; contracts/editor.md):
 //   - colour editor: one colour well per slot, `colour-0` … `colour-3` (sRGB components, each clamped to 0…1 and
 //     rounded to 1/1000 → `preset.color [slot, r, g, b]`), and `reset-colours` (→ `preset.reset []`);
 //   - beside the template picker, the notice of `ExportNotice` for the planner's result at the presenter's export
 //     limit (`maxEdge`) and the current orientation, with the button "Export at <w> × <h>" (`export-offered`), which
-//     exports the refusal's `offeredPlan(format:)` through `StillExport.run(plan:time:render:)`;
+//     exports the refusal's `offeredPlan(format:)` (through the job's `start(plan:…)` since feature 141);
 //   - after a written export, the result line (`ExportResultLine.line(plan:result:)`) and the "How to use it" button
 //     (`result-help`); the editor's `help` button; both open `HelpView` as a sheet;
 //   - every control's accessibility label carries its current value (`EditorModel.labels`), for example
@@ -30,6 +30,16 @@
 //     the notice);
 //   - at an accessibility Dynamic Type size (accessibility-one to accessibility-five) every row stacks its title above
 //     its control, so the controls form one column no wider than the canvas.
+//
+// Feature 141 (A19-P04) T-A19-403, T-A19-405, T-A19-407 (FR-A19-401, FR-A19-403, FR-A19-404; clarifications Q1–Q3):
+//   - both export buttons start the presenter's `ExportJob` (the one shipping path); while it runs the controls show
+//     its progress (`export-progress`) and a cancel button (`export-cancel`), and both export buttons are disabled;
+//     after a failure or a cancel a retry button (`export-retry`) replays it, with the offered size after a
+//     `does-not-fit`;
+//   - after a written export, a `ShareLink` (`share`) to the `WallpaperExportFile`, shown only while the written
+//     file exists, with the file name as its preview;
+//   - the newest five history entries (`history-0` …), for example "Ink Flow, iPhone 16 Pro, portrait,
+//     PNG 1206 × 2622", and "Clear history" (`clear-history`); each label comes from `EditorModel.saveLabels`.
 // No Photos or system-wallpaper call.
 import CoreGraphics
 import LivingWallpapersCore
@@ -107,7 +117,12 @@ struct WallpaperControls: View {
     /// The controls.
     var body: some View {
         let planned = presenter.plannedExport
-        let labels = Dictionary(model.labels(mirror, planned: planned).map { ($0.name, $0) },
+        let job = presenter.job
+        let share = job.shareItem
+        let save = EditorModel.saveLabels(progress: job.isRunning ? job.progress : nil, canRetry: job.canRetry,
+                                          shareName: share?.url.lastPathComponent,
+                                          history: presenter.history?.shown ?? [])
+        let labels = Dictionary((model.labels(mirror, planned: planned) + save).map { ($0.name, $0) },
                                 uniquingKeysWith: { first, _ in first })
         return VStack(alignment: .leading, spacing: 8) {
             HStack {
@@ -135,6 +150,8 @@ struct WallpaperControls: View {
             }
             motionToggle(labels["motion"])
             exportButton(labels)
+            jobRow(labels, share: share)
+            historyList(labels)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .sheet(isPresented: Binding(get: { model.isHelpOpen },
@@ -264,6 +281,7 @@ struct WallpaperControls: View {
                         Text(verbatim: EditorModel.offeredTitle(offered)).frame(minHeight: 44)
                             .fixedSize(horizontal: false, vertical: true)
                     }
+                    .disabled(presenter.job.isRunning)
                     .accessibilityLabel(spoken(labels["export-offered"], EditorModel.offeredTitle(offered)))
                     .accessibilityHint(Text(verbatim: "Renders the framed picture at the offered size"))
                     .accessibilityIdentifier(port.identifier("export-offered"))
@@ -320,20 +338,89 @@ struct WallpaperControls: View {
         .accessibilityIdentifier(port.identifier("help"))
     }
 
-    /// Runs the export at the template's exact size, or at `offered`, and records its outcome once.
+    /// Starts the job at the template's exact size, or at `offered`; the job announces its outcome once.
     private func runExport(offered: ExportPlan?) {
         guard let stillRenderer else {
             model.finishWithoutRenderer(port: port)
             return
         }
-        let output: StillExport.Output?
-        if let offered {
-            output = presenter.export(plan: offered, using: stillRenderer)
-        } else {
-            output = presenter.export(using: stillRenderer)
+        let job = presenter.job
+        let render = WallpaperPresenter.stillRender(stillRenderer)
+        let project = presenter.project
+        let maxEdge = presenter.maxEdge
+        let port = port
+        Task { @MainActor in
+            if let offered {
+                await job.start(plan: offered, project: project, maxEdge: maxEdge, render: render, port: port)
+            } else {
+                await job.start(project: project, maxEdge: maxEdge, render: render, port: port)
+            }
         }
-        model.finish(output, export: presenter.stillExport, limit: presenter.maxEdge,
-                     orientation: mirror.orientationValue, port: port)
+    }
+
+    /// While the job runs, its progress and the cancel button; after a failure or a cancel, the retry button; after
+    /// a written export, the share link (only while the file exists).
+    @ViewBuilder
+    private func jobRow(_ labels: [String: EditorLabel], share: WallpaperExportFile?) -> some View {
+        let job = presenter.job
+        if job.isRunning {
+            ProgressView(value: job.progress)
+                .frame(minHeight: 44)
+                .accessibilityLabel(spoken(labels["export-progress"], "Export progress"))
+                .accessibilityValue(Text(verbatim: EditorModel.percent(job.progress)))
+                .accessibilityIdentifier(port.identifier("export-progress"))
+            Button {
+                job.cancel()
+            } label: {
+                Text(verbatim: "Cancel export").frame(minHeight: 44)
+            }
+            .accessibilityLabel(spoken(labels["export-cancel"], "Cancel export"))
+            .accessibilityHint(Text(verbatim: "Stops the export at its next step and removes its file"))
+            .accessibilityIdentifier(port.identifier("export-cancel"))
+        }
+        if job.canRetry {
+            Button {
+                Task { @MainActor in await job.retry() }
+            } label: {
+                Text(verbatim: "Retry export").frame(minHeight: 44)
+            }
+            .accessibilityLabel(spoken(labels["export-retry"], "Retry export"))
+            .accessibilityHint(Text(verbatim: "Runs the last export again, at the offered size when it did not fit"))
+            .accessibilityIdentifier(port.identifier("export-retry"))
+        }
+        if let share {
+            let name = share.url.lastPathComponent
+            ShareLink(item: share, preview: SharePreview(Text(verbatim: name))) {
+                Text(verbatim: "Share").frame(minHeight: 44)
+            }
+            .accessibilityLabel(spoken(labels["share"], "Share, " + name))
+            .accessibilityHint(Text(verbatim: "Opens the share sheet with the exported file"))
+            .accessibilityIdentifier(port.identifier("share"))
+        }
+    }
+
+    /// The newest history entries and the Clear history button; nothing while the history is empty.
+    @ViewBuilder
+    private func historyList(_ labels: [String: EditorLabel]) -> some View {
+        if let history = presenter.history, !history.shown.isEmpty {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(verbatim: "Recent exports").font(.subheadline).accessibilityAddTraits(.isHeader)
+                ForEach(Array(history.shown.enumerated()), id: \.offset) { index, entry in
+                    Text(verbatim: EditorModel.historyLine(entry)).font(.footnote)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityLabel(spoken(labels["history-\(index)"], EditorModel.historyLine(entry)))
+                        .accessibilityIdentifier(port.identifier("history-\(index)"))
+                }
+                Button {
+                    history.clear()
+                } label: {
+                    Text(verbatim: "Clear history").frame(minHeight: 44)
+                }
+                .accessibilityLabel(spoken(labels["clear-history"], "Clear history"))
+                .accessibilityHint(Text(verbatim: "Removes the list of recent exports"))
+                .accessibilityIdentifier(port.identifier("clear-history"))
+            }
+        }
     }
 
     /// The Export button, the outcome of the last export and, after a written export, the "How to use it" button.
@@ -344,6 +431,7 @@ struct WallpaperControls: View {
             } label: {
                 Text(verbatim: "Export").frame(minHeight: 44)
             }
+            .disabled(presenter.job.isRunning)
             .accessibilityLabel(spoken(labels["export"], "Export"))
             .accessibilityHint(Text(verbatim: "Renders the framed picture at the device's size into a temporary file"))
             .accessibilityIdentifier(port.identifier("export"))
