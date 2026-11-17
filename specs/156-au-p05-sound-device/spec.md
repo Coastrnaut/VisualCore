@@ -23,6 +23,60 @@ Canonical overrides:
 - **Interface:** the app's interface journeys run in a new serial chunk.
 - **Experience A21 inside the one app; still a candidate.** Follow `specs/149-zg-p05-quiet-device`.
 
+## Clarifications
+
+### Session 2026-11-17
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- `AmbientLoopPlayer` (VisualCoreAudio, A21-P04) uses the ambient session category (mixes with other audio, follows
+  the silent switch, never opens the input). `isEnabled` defaults to `true` and setting it `false` stops the loop;
+  `volume` is clamped to 0…1 and applies at once. Interruptions, media-services resets and moving to the background
+  call `stop()`, and the loop never restarts by itself. The recipe `.gentle` is synthesised by VisualCoreAudioDSP.
+- A presenter has no activate or deactivate hook: `ExperiencePresenter` offers `setup`, `resize`, `draw`, `teardown`,
+  `shedCaches` and `makeControls`, and `ExperienceShell` keeps activation in its engine.
+- Aurora's controls view stays on screen while the controls are hidden; only its content changes
+  (`AuroraControls.swift`, `mirror.controlsHidden`).
+- `FramePacing` caps frames at 30 per second under Low Power Mode (`FrameScheduler.currentPacing` reads
+  `isLowPowerModeEnabled`), and the render host passes each frame's delta clamped to 0…0.1 s. `SkyClock.advance(by:)`
+  adds the delta times the speed, and holds under Reduce Motion or at speed 0.
+- The interface chunks of `scripts/release_check.py` end at `b3`, a serial chunk; the next is `c3`.
+
+- Q: When does the loop play, and what owns it? → A:
+  - **Owner:** the presenter keeps one `AmbientLoopPlayer` with `isEnabled` following the sound choice and `volume`
+    following the volume. It is made lazily, so a first start with the sound off touches no audio session.
+  - **Plays** while Aurora's controls view is on screen, the app's scene is active and the sound is on.
+  - **Stops** when the controls view leaves the screen (leaving Aurora), the scene stops being active, the sound is
+    turned off, or the player stops itself (an interruption, a reset, the background).
+  - **Again:** returning to the active scene, or showing Aurora again, with the sound on plays it again.
+  - **Drawing:** `setup`, `resize`, `draw`, `teardown` and `shedCaches` never touch the player.
+  - **Tests:** the player's output is the internal test double, so no audio plays in tests.
+- Q: How is the low-power cadence without a time jump proved? → A:
+  - **No experience cadence:** the host's cap applies, and there is no VisualCore change.
+  - **Cap:** a test checks `FramePacing(thermal: .nominal, lowPower: true, requestedMaxFPS: 60).maxFPS == 30`.
+  - **Same time:** drawing two seconds at 30 and at 60 frames per second ends at the same sky time (to 1e-6 s), and
+    the off-screen pixels at the shared instants (every 1/30 s) are identical.
+  - **Bounded steps:** each step is the frame's delta times the speed. A 0.5 s stall, given as the host's clamped
+    delta, moves the sky by at most 0.1 s times the speed.
+- Q: Which interface tests run, and in which chunk? → A: A new serial chunk `c3` with `AUSkyUITests` and
+  `AUSoundUITests`, launched with the candidates argument through `AUSupport`, as `ZGSupport` is. Each test runs under
+  60 s.
+  - `AUSkyUITests`: pick "Violet veil"; the canvas label names it. Turn on "Still sky" and "Reduced flashing"; both
+    read on. Hide the controls, tap the sky, and the controls are back.
+  - `AUSoundUITests`: a fresh start reads the sound off. Turn it on and set the volume; the controls read the new
+    choice. Relaunch over the same storage, and the choice is restored.
+- Q: Which campaign rows does the plan hold? → A: Rows AU-D1 to AU-D8 in `docs/apps/aurora/device-campaign.md`:
+  - AU-D1: thermal state and frame rate over a short run per preset, extrapolated;
+  - AU-D2: battery over a short session, extrapolated;
+  - AU-D3: the low-power cadence (30 frames per second) and no visible time jump;
+  - AU-D4: the brightness limit, reduced flashing and comfort on screen;
+  - AU-D5: the still view's idle drawing;
+  - AU-D6: the loop on the speaker with the silent switch, an interruption and the background;
+  - AU-D7: shader compilation on the ANGLE Metal path, the fallback, and high and low refresh rates;
+  - AU-D8: the accessibility audits at the default and the largest text size.
+
+  Each row has its devices (D1, D2, D3), procedure, pass condition and "pending device campaign". No number is claimed.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - A quiet loop, only when asked (Priority: P1) 🎯
@@ -122,8 +176,8 @@ speaker with the silent switch, and the accessibility audits.
 
 ### Functional Requirements
 
-- **FR-A21-501**: The sound MUST be off on a first start; turning it on MUST play the experience's ambient loop and
-  turning it off MUST stop it.
+- **FR-A21-501**: The sound MUST be off on a first start; turning it on MUST play the experience's ambient loop while
+  Aurora is on screen in the active app, and turning it off MUST stop it.
 - **FR-A21-502**: The volume control (0–100 %) MUST set the loop's volume at once, and the sound choice MUST be kept
   and restored with the preferences.
 - **FR-A21-503**: Building, tearing down, rebuilding, pausing or resuming the drawing MUST neither start nor stop the
