@@ -23,6 +23,60 @@ Canonical overrides:
 - **Experience A19 inside the one app:** still a candidate. Visuals are code.
 - Follow `specs/133-ac-p03-themes-favourites`.
 
+## Clarifications
+
+### Session 2026-11-17
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- `WallpaperCore` is snapshot schema 1 with `MigrationChain(currentVersion: 1)`, and `WallpaperProject` is schema 1.
+  Both record the preset by index only.
+- `SnapshotMigrationCheck` takes registered examples of earlier schemas only (A18's `AmbientSchemaExamples`
+  pattern). The X follow-through test fails when a schema above 1 has no stored example (lesson of X-A17).
+- `ExperienceFeedback.announce(_:kind:route:)` (`VisualCoreExperienceHost`) routes announcements through
+  `AnnouncementPlanner`, with a minimum interval of 0.5 s by default.
+- `WallpaperControls` already labels its controls through `port.identifier`, with ids
+  `experience.a19.living-wallpapers.<name>`. `ExportRefusal.doesNotFit(template:offered:)` carries the offered size.
+- The phase starts at `56f9e710` (the specify commit).
+
+- Q: How are edited colours stored? → A: As an optional override of four opaque colours:
+  - **`WallpaperProject` schema 2:** adds `customColors` (nil, or exactly four `RGBColor`). A schema-1 file decodes
+    with nil, and a list of the wrong length or a value outside 0…1 is `invalid-parameter` with the id
+    `customColors`;
+  - **`WallpaperCore` snapshot schema 2:** adds `custom` (0/1) and twelve components. The migration 1 → 2 sets
+    `custom` 0 and copies the preset's colours;
+  - **`AdapterSchemaExamples`:** `schemaOneExample()` and `schemaTwoExample()`, with the schema-1 example
+    registered in `ExperienceRegistry` now (only earlier schemas register);
+  - **controls:** `preset.color [slot 0…3, r, g, b]` (each 0…1) and `preset.reset [ ]`. A scene or preset change
+    clears `custom`. The digest includes the components only when `custom` is 1.
+- Q: What does the fallback notice say? → A: `ExportNotice` in the core is pure and tested. For `doesNotFit` it reads
+  "<Device> is <W> × <H> pixels, larger than this device can render (<limit>). It will be exported at <w> × <h>
+  instead." For `noLimit` it reads "Open a picture to export it." A template that fits gets no notice.
+  - The editor shows the notice beside the template picker, and its export button uses the offered plan
+    (`offeredPlan(format:)`).
+  - The limit named is the export limit the presenter reads.
+- Q: What does the export result show? → A: One line built from the read-back `ExportResult`: "<FORMAT>, <W> × <H>
+  pixels, sRGB". The format comes from the plan and the profile from the file's name `kCGColorSpaceSRGB`, shown as
+  "sRGB"; any other profile is shown by its name. It appears after a written export, together with a "How to use it"
+  button.
+- Q: What does the help say, and how is it checked? → A: `WallpaperHelp` holds three short sections: saving the
+  image (the share sheet comes in A19-P04; in this phase the file is ready to save), setting it in Settings
+  (Wallpaper, Add New Wallpaper, Photos) and choosing the crop.
+  - It states that the person sets the wallpaper and the app does not, and that the system may move the time or
+    widgets over the image.
+  - It is reachable from the editor and from the export result.
+  - The existing platform scan covers it, refusing "video", "live wallpaper" and "set as wallpaper".
+    `scan-help-claims.sh` also refuses "automatically", "sets your wallpaper", "installs" and "animated wallpaper".
+- Q: What makes the editor accessible? → A:
+  - every control has a label with its current value (for example "Scene, Ink Flow", "Colour 2, red 0.40, green
+    0.20, blue 0.60"), and tests list them;
+  - the export outcome (done, failed with its reason, or the notice) is announced once through
+    `ExperienceFeedback.announce` with kind `.outcome` (done or failed) or `.rejection` (the notice), and a test counts the announcements through a recording sink;
+  - at the accessibility-five Dynamic Type size the controls stack in one column. A render test with `ImageRenderer`
+    at that size finds no control wider than the canvas.
+
+  System accessibility audits wait for the device campaign (owner ruling of 2026-11-13).
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Make the colours my own (Priority: P1) 🎯
