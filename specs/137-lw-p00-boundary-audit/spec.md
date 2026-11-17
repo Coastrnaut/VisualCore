@@ -24,6 +24,83 @@ Canonical overrides:
 - **Constitution:** 2.15.0 adds the A19 experience rules (committed at the start of this gate, `2f592d76`).
 - Follow `specs/130-ac-p00-boundary-audit`.
 
+## Clarifications
+
+### Session 2026-11-17
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code by a read-only survey:
+- **Commits:** the A19 constitution commit is `2f592d76` and the A19-P00 specify commit is `530855ef`. The specify
+  commit is the phase start for the no-change diff of `Packages` and `External`. The reference submodule is pinned at
+  `d93edd1`.
+- **Registry:** eighteen experiences are registered in `Catalog/registrations.json` (A01–A18). `a19` appears only in
+  the catalog, the id golden file, their test fixtures and `AppModelTests` (as a synthetic not-yet-integrated id).
+- **VisualCore offers** (public in a framework product and tested):
+  - in `VisualCoreRendering`:
+    - `RenderHost.renderOffscreen(width:height:time:)`: any size, independent of the screen, on the host's own
+      context. It validates the size first, releases its target on every path and restores the live scene
+      (`OffscreenExportTests`).
+    - `RenderHost.maxRenderSize`: the smallest of the maximum texture, renderbuffer and viewport sizes, reported by
+      `RenderCapabilities` with a floor of 2048. Also `RenderHost.maxOffscreenPixels` (64,000,000).
+    - `StillImage` (RGBA8, top-down), `OffscreenRenderError` and `StillImageEncoder.pngData` (an opaque PNG tagged
+      sRGB, the only encoder).
+    - `StillCapture` (one PNG in a temporary folder; it writes nothing to Photos).
+    - `RenderContext.redirected`, `ResourceRegistry.makeRenderTarget`, `RenderTarget.readPixels`, `CachedScene`,
+      `CrossfadeScene`, `FullScreenShaderScene`, `ShaderBundle` and the GLSL library `vc/`;
+  - in `VisualCoreExperienceHost`: `ExperienceSession.renderStill(width:height:)` and the `experienceStillRenderer`
+    environment value (`StillRenderTests`). It always renders at time 0;
+  - in `VisualCoreScenes`: `ExportGeometry` (`hardMaxEdge` 8192, `defaultMaxPixels`), `ExportAspect` (square, 4:5,
+    16:9, 9:16) and `ExportSize` (`ExportGeometryTests`);
+  - in `VisualCoreDiagnostics`: `ResourceBudget` (GPU bytes, refusal when over budget);
+  - in `VisualCorePersistence`: `TemporaryFolder`; and in `VisualCoreExperience`: `ExperienceStorage` with
+    `StorageQuota` (16 MiB, 64 files);
+  - in the host: preparation with cancellation (`ExperienceEngine.prepare`, `ExperienceShell.cancelPreparation`),
+    memory-warning handling and the canvas overlay.
+- **Missing everywhere:**
+  - an encoder other than PNG (no JPEG, HEIC or colour space other than sRGB);
+  - any video encoding (no AVFoundation writer, pixel buffer or VideoToolbox use);
+  - tiled rendering (no sub-rectangle projection);
+  - a catalog of device screen sizes and safe areas;
+  - an export job with progress (the offscreen render is synchronous on the main thread);
+  - an offscreen render of an experience at a chosen animation time (the session's still is at time 0).
+- **Experience-only:** the `ShareLink` image paths of Generative Art Studio, Fluid Art Playground, Fractal Explorer,
+  Infinite Geometry and Simulation Lab (`Transferable` PNG files). No experience calls PhotoKit. Saving to Photos goes
+  through the share sheet's "Save Image" with the app's existing add-only usage string (`project.yml`,
+  `NSPhotoLibraryAddUsageDescription`), declared per experience as the permission word `photo-library-add` (only A01
+  declares it today). The release step `app-usage-descriptions` requires the app's usage keys to equal the union of
+  the declared words.
+
+- Q: How is the manual's "compile an empty shell" gate met in the one app? → A: As for A18: the one app is the shell.
+  This phase proves it builds for testing with Living Wallpapers absent, and the targets come with A19-P01's first
+  model.
+- Q: What makes a capability "available"? → A: A public declaration in a VisualCore framework product with at least
+  one test that exercises it. An implementation that exists only inside another experience or a harness is "requires
+  adaptation" at best.
+- Q: Which package holds Living Wallpapers? → A: `Packages/ExperiencesCreative/LivingWallpapers` (Auto-Creator.md
+  §16), as A05–A18 did; no new package is created.
+- Q: How does an exported image leave the device, and which permission does that need? → A: Through the system share
+  sheet only (SwiftUI `ShareLink` with a file), as the five experiences above do. "Save Image" there writes to Photos
+  with the existing add-only usage string, and "Save to Files" or another app needs no permission. The experience
+  never calls PhotoKit and never asks for read access to the library. Its registration will declare
+  `photo-library-add` (A19-P04), so the usage-description step stays exact, and its copy check will allow the word
+  "share" (as Simulation Lab and Infinite Geometry do). The in-app help explains how to apply the saved image as a
+  wallpaper through the system's own Settings or Photos controls. Recorded as gaps G-SAVE and G-HELP.
+- Q: What do the audit and later phases assume for formats, sizes and video? → A:
+  - **Stills:** PNG through the existing encoder, plus JPEG and HEIC through the same ImageIO path in
+    `VisualCoreRendering`, all tagged sRGB (the renderer draws 8-bit sRGB). The colour profile and dimensions are
+    verified by reading the written file back. Recorded as gap G-ENCODE (VisualCore, A19-P02).
+  - **Sizes:** device templates are app-local data with a provenance record (Apple's published screen sizes). A
+    template whose edge exceeds `maxRenderSize`, or whose pixel count exceeds the cap, is refused before allocation
+    and offered at the largest size that fits. Version 0.1 has no tiling; it is recorded as rejected for 0.1, not as
+    a gap.
+  - **Video:** optional. A19-P01 decides feasibility from public APIs and records it. Until it is shown feasible, no
+    video code, copy or control exists. Recorded as gap G-VIDEO (decision A19-P01; any encoder is assessed for
+    VisualCore ownership then).
+
+  Export at a chosen animation time needs a time on the session's still. That is gap G-STILLTIME
+  (`VisualCoreExperienceHost`, A19-P02). Export progress, cancellation and cleanup run off the interface's critical
+  path with a local history in `ExperienceStorage`: gaps G-EXPORTJOB and G-HISTORY (app-local, A19-P04).
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - An evidence-backed integration matrix (Priority: P1) 🎯
@@ -104,8 +181,8 @@ module will own each missing piece and in which phase.
   memory budget can be queried before allocation, and whether a tiled strategy exists.
 - **Video encoding** (the manual's risk 3): the audit records whether any encoder path exists and assigns the
   feasibility decision to a phase; video stays optional until feasibility is shown.
-- **Saving to Photos:** the audit records which permission and usage string saving would need and whether the app
-  already declares one; export to Files needs none.
+- **Saving to Photos:** saving goes through the share sheet with the app's existing add-only usage string; the
+  experience declares `photo-library-add` and never calls PhotoKit. Export to Files needs no permission.
 
 ## Requirements *(mandatory)*
 
@@ -122,7 +199,8 @@ module will own each missing piece and in which phase.
   - curated procedural backgrounds with colour presets;
   - iPhone and iPad canvas templates with crop and safe-area guides;
   - offscreen rendering at output resolution, independent of the screen, with pixel read-back;
-  - the maximum texture size and memory headroom, queried before allocation, and a tiled strategy;
+  - the maximum texture size and memory headroom, queried before allocation, and the fallback for a size that does
+    not fit (no tiling in version 0.1);
   - still-image encoding in common formats with a verified colour profile;
   - optional short video encoding and its feasibility;
   - export progress, cancellation, cleanup of GPU resources and temporary files, error recovery and a local history;
