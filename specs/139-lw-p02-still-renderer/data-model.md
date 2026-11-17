@@ -16,7 +16,9 @@
     animation time 0…3600, format 0…2 and motion 0/1;
   - controls: the eight of clarification Q5;
   - the digest covers every field;
-  - outcome `scene-<id>`.
+  - outcome `scene-<id>`;
+  - `qualityTiers` is `["level-0", "level-1"]`, matching the presenter's two levels and the registration's
+    `quality_tiers`, declared now so the X-A19 follow-through finds them equal.
 - **`StillExport`:**
   - state idle → planned → rendered → encoded → verified → written, or cancelled or failed with a reason (no-limit,
     does-not-fit, format-unavailable, render, encoding, verification);
