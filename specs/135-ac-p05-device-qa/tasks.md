@@ -28,7 +28,7 @@ action, no audit. Precedent: `specs/134-ac-p04-power-visibility/tasks.md`.
 
 ## Phase 6: Records and evidence
 
-- [ ] T-A18-506 Contract: G-DEVICE closed by "A18-P05" (the campaign plan; its rows wait for devices); rows whose gaps are all closed become available with evidence (`--name contract`)
+- [X] T-A18-506 Contract: G-DEVICE closed by "A18-P05" (the campaign plan; its rows wait for devices); rows whose gaps are all closed become available with evidence (`--name contract`) — Verified 2026-11-16: 2026-11-16: .autonomy/checks/A18-P05.contract.json exit 0 (PASS: 28 rows, 141 citations); G-DEVICE closed by A18-P05 with the campaign plan (its rows wait for devices); M19 and M22 available
 - [ ] T-A18-507 Tests: rendering on sim-27.2 (`--name rendering-ios27 -- … --only-testing VisualCoreRenderingTests`), Ambient Clock (`--name ac-ios27`), public and documented API; app build, unit and interface (`--name app-ui -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27 app-ui-ios27-z2`), runner (`--name verify-27`), packages, catalog and script tests (SC-A18-504)
 - [ ] T-A18-508 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A18-P05; update README.md (rule 16) and `docs/automatedtesting.md` (rule 17)
 
