@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "sh",
+    "specs/138-lw-p01-export-contract/scan-platform-claims.sh"
+  ],
+  "command": "sh specs/138-lw-p01-export-contract/scan-platform-claims.sh",
+  "elapsed_seconds": 0.015,
+  "exit_code": 0,
+  "finished": "2026-11-17T05:30:26+00:00",
+  "log": ".autonomy/logs/A19-P01.platform-claims.log",
+  "log_sha256": "dd26a9e14d7e73d4fa507db8cd14f30aa9a69804424fa29d6ce5a87925956950",
+  "name": "platform-claims",
+  "stage": "A19-P01",
+  "started": "2026-11-17T05:30:26+00:00",
+  "timed_out": false
+}
