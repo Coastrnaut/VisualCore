@@ -68,7 +68,9 @@ docs/apps/aurora/visualcore-contract.json (G-SOUND, G-DEVICE closed)            
 
 - **Dependency direction:** experience → VisualCoreAudio → VisualCoreAudioDSP; the core stays free of audio.
 - **Lifecycle:** see [contracts/sound.md](contracts/sound.md). The drawing calls (`setup`, `resize`, `draw`,
-  `teardown`, `shedCaches`) never touch the sound.
+  `teardown`) never touch the sound (Aurora keeps the protocol's default `shedCaches`, which does nothing).
+- **As built:** `AuroraPresenter.fixedDelta` is a test-only seam (nil in the app, where the host's clamped delta
+  drives the clock); the cadence tests set it to 1/30 s or 1/60 s.
 - **Test seam:** `SkyLoopPlaying` (isEnabled, volume, isPlaying, play, stop), to which `AmbientLoopPlayer` conforms by
   extension; the presenter takes a factory (nil: `AmbientLoopPlayer(recipe: .gentle)`, made lazily on first need).
 - **Migration:** none; `prefs.v1` already keeps the sound choice (A21-P04). **Rollback:** revert the commits.

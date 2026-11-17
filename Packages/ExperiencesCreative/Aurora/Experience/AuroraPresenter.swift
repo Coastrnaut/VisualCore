@@ -58,11 +58,12 @@
 //     only when it first must play) while the sound is on, the controls view is on screen (`controlsAppeared()`,
 //     `controlsDisappeared()`; hiding the controls keeps the view) and the scene is active (`sceneActive(_:)`).
 //     `setSound(on:)` and `setVolume(_:)` drive it at once; the preferences read when the presenter is made seed it.
-//     A loop that cannot start leaves the choice on and the sky as it is. `setup`, `resize`, `draw`, `teardown` and
-//     `shedCaches`, a preset change, the still view and reduced flashing never touch it; the sound stays out of the
-//     core, the snapshot, the digest and the manifest. ``loopFactory`` is the tests' seam (a fake player).
-//   - Cadence: the clock follows the drawn-frame deltas (the host's clamped delta, or ``fixedDelta`` in the tests),
-//     so 30 and 60 frames per second reach the same sky time.
+//     A loop that cannot start leaves the choice on and the sky as it is. `setup`, `resize`, `draw`, `teardown`,
+//     `shedCaches` (the protocol's default, which does nothing here), a preset change, the still view and reduced
+//     flashing never touch it; the sound stays out of the core, the snapshot, the digest and the manifest.
+//     ``loopFactory`` is the tests' seam (a fake player).
+//   - Cadence: the clock follows the drawn-frame deltas (the host's clamped delta), so 30 and 60 frames per second
+//     reach the same sky time. ``fixedDelta`` (nil in the app) is a test-only seam that sets each frame's delta.
 //
 // No GL call: everything is drawn through VisualCoreRendering's scenes.
 import Foundation

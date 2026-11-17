@@ -8,8 +8,8 @@
   - When `play()` returns false (the output failed), the sound choice stays on, the sky is unaffected and there is no
     crash.
 - **Independence:**
-  - `setup`, `resize`, `draw`, `teardown`, `shedCaches`, a preset change, the still view and reduced flashing never
-    call `play` or `stop`.
+  - `setup`, `resize`, `draw`, `teardown`, `shedCaches` (the protocol's default, which does nothing here), a preset
+    change, the still view and reduced flashing never call `play` or `stop`.
   - The digest and the manifest are equal with the sound on and off.
 - **Cadence:**
   - Under Low Power Mode the cap is 30.
@@ -19,4 +19,3 @@
 - **Interface (`c3`):** each test under 60 s.
   - `AUSkyUITests`: the preset, still view, reduced flashing, and hiding and showing the controls.
   - `AUSoundUITests`: the sound off at first; on with a new volume; restored after a relaunch.
-- **Campaign:** 8 rows with devices, procedure, pass condition and "pending device campaign"; no number.

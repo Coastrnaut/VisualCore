@@ -9,6 +9,7 @@
   - When the player stopped itself (an interruption or the background), nothing restarts it until one of the three
     inputs changes to true again.
 - **Cadence:** `FramePacing(thermal: .nominal, lowPower: true, requestedMaxFPS: 60).maxFPS == 30`. The sky time after n
-  frames equals the sum of the clamped deltas times the speed. 60 × 1/30 and 120 × 1/60 both reach 2.0 s (±1e-6).
+  frames equals the sum of the clamped deltas times the speed. 60 × 1/30 and 120 × 1/60 both reach 2.0 s (±1e-6). As built, the tests
+  give each drawn frame its delta through `AuroraPresenter.fixedDelta` (test only, nil in the app).
 - **Campaign row:** an id AU-D1…D8, the measurement, the devices, the procedure, the pass condition, and the status
   "pending device campaign".
