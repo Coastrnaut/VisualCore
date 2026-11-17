@@ -55,7 +55,7 @@ migration, no VisualCore change).
 
 ## Phase 5: Story 4 — interface tests (P2)
 
-- [ ] T-A20-608 [P] [US4] Write `Apps/VisualCore/Tests/UI/DigitalZenGarden/ZGReleaseUITests.swift` per Clarifications
+- [X] T-A20-608 [P] [US4] Write `Apps/VisualCore/Tests/UI/DigitalZenGarden/ZGReleaseUITests.swift` per Clarifications — Verified 2026-11-17: 2026-11-17: ZGReleaseUITests: a fresh start shows calm-sound, calm-drift and calm-haptics off; Make picture; the message reads The picture is ready to share: 1600 by 1200 pixels. and still-share exists (27.1 s); added to serial chunk b3 in scripts/release_check.py; .autonomy/checks/A20-P06.app-ui.json exit 0 (iOS 27.2 phone); written by an agent, retested
   Q5 (with `ZGSupport`; a fresh start shows `calm-sound`, `calm-drift`, `calm-haptics` off; Make picture; the message
   reads "The picture is ready to share: 1600 by 1200 pixels." and `still-share` exists; under 60 s), and add it to the
   serial chunk `b3` in `scripts/release_check.py` (lead) (FR-A20-607)
