@@ -26,6 +26,61 @@ Canonical overrides:
 - **Experience A19 inside the one app:** still a candidate.
 - Follow `specs/134-ac-p04-night-power`.
 
+## Clarifications
+
+### Session 2026-11-17
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- Simulation Lab hands a file to the share sheet with `ShareLink` and a `Transferable` type whose
+  `FileRepresentation(exportedContentType:)` sends the file (`SimulationCapture.swift`). No experience imports
+  PhotoKit.
+- `project.yml` declares `NSPhotoLibraryAddUsageDescription`. The release step `app-usage-descriptions` requires the
+  app's usage keys to equal the union of the registrations' permission words, and A01 already declares
+  `photo-library-add`, so A19's declaration adds no key.
+- `LivingWallpapersExperience.make(id:storage:…)` already receives the launch's `ExperienceStorage`
+  (`write(_:to:)` is atomic, with `read`, `remove` and `StorageQuota`). `ClockSource`, `SystemClock` and
+  `FixedClock` are public in `VisualCoreExperience`.
+- `RenderHost.renderOffscreen` asserts the main thread. `StillImageEncoder.data` and the ImageIO read-back are CPU
+  work with no main-thread rule.
+- The phase starts at `80c98674` (the specify commit).
+
+- Q: How does a file reach the share sheet? → A: `WallpaperExportFile: Transferable`, with a `FileRepresentation` whose
+  content type is that of the plan's format (`.png`, `.jpeg` or `.heic`), sending the written file.
+  - The file name is "<Scene> <Device> <W>x<H>.<ext>", for example "Ink Flow iPhone 16 Pro 1206x2622.png", written
+    into the export folder.
+  - The controls show a `ShareLink` only while that file exists.
+  - The registration adds `photo-library-add`.
+  - A source scan, `scan-photos.sh`, refuses `import Photos`, `PHPhotoLibrary`, `PHAsset` and
+    `UIImageWriteToSavedPhotosAlbum` in the experience.
+  - The release check `app-usage-descriptions` runs in this phase over a Release build.
+- Q: How does the export job run? → A: `ExportJob` (`@MainActor`) runs these steps:
+  1. plan, on the main actor;
+  2. render, on the main actor, because the host requires it;
+  3. encode, off the main actor in a detached task;
+  4. verify, off the main actor;
+  5. write.
+
+  The progress is 0.2, 0.4, 0.7, 0.85 and 1.0 after each step, published for the controls. `cancel()` sets a flag,
+  checked at each step boundary, and a cancelled or failed job removes its file. The render target is released by the
+  host on every path. A failure keeps its named reason, and `retry()` reruns from the plan (using the offered plan
+  after a does-not-fit).
+  - The existing `StillExport` stays as the synchronous core of a step-by-step run. The job wraps it, or splits it
+    into steps, and exactly one of them is the shipping path.
+- Q: What is the history? → A: `ExportHistory` in the core, schema 1, envelope kind `a19.export-history`:
+  - entries (scene id, template id, orientation, format, width, height, `madeAt` as seconds since 1970), newest
+    first, bounded to 20;
+  - `adding(_:)` drops the oldest above the bound, and `cleared()` empties it;
+  - refusals are `damaged`, `newer-version` and `too-large` (above 16,384 bytes).
+
+  The experience stores it as `history.json` through `ExperienceStorage` after each written export, and reads it
+  when it opens; a refused file gives an empty history with one problem reported. The time comes from an injected
+  `ClockSource` (`SystemClock` in the app, `FixedClock` in tests).
+- Q: Does the snapshot change? → A: No. The history and the export file live outside the snapshot, so the snapshot
+  stays schema 2. The project is unchanged.
+- Q: How is the short-loop gate shown? → A: Its decision file stays as it is, and the platform scan
+  (`specs/138-lw-p01-export-contract/scan-platform-claims.sh`) runs as this phase's evidence.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Keep the image where I want it (Priority: P1) 🎯
