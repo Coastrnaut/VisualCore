@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "sh",
+    "-c",
+    "! grep -rnE \"import (UIKit|SwiftUI|OpenGLES|Network|AVFAudio|AVFoundation)|URLSession|Date\\(\\)|ContinuousClock|CFAbsoluteTime\" Packages/ExperiencesCreative/Aurora/Core"
+  ],
+  "command": "sh -c '! grep -rnE \"import (UIKit|SwiftUI|OpenGLES|Network|AVFAudio|AVFoundation)|URLSession|Date\\(\\)|ContinuousClock|CFAbsoluteTime\" Packages/ExperiencesCreative/Aurora/Core'",
+  "elapsed_seconds": 0.008,
+  "exit_code": 0,
+  "finished": "2026-11-17T12:12:51+00:00",
+  "log": ".autonomy/logs/A21-P05.core-purity.log",
+  "log_sha256": "e91fa3399b74f09197d9f82b1f6a098dac59bc0eeb7d06973210599b62d2f4da",
+  "name": "core-purity",
+  "stage": "A21-P05",
+  "started": "2026-11-17T12:12:51+00:00",
+  "timed_out": false
+}

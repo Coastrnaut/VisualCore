@@ -24,7 +24,7 @@
 //     for the restore itself) and of the sound choice. A damaged, newer or out-of-range value opens with the
 //     defaults, keeps its refusal (`preferencesRefusal`) and shows ``readFailedMessage``; the defaults are saved over
 //     it only after the next accepted change. A failed save shows ``saveFailedMessage`` once and the choices stay
-//     in memory. Nothing plays (the sound comes in A21-P05).
+//     in memory. The sound choice drives the loop (``SkySound``, feature 156).
 //   - Chrome: `controlsHidden` (presentation only, not in the snapshot or the digest). `hideControls()` hides the
 //     controls; a tap on the sky (a touch that lifts within ``tapSlop`` points of where it landed) or the
 //     accessibility action "Show controls" (`showControls()`) brings them back. The tap sends no action, so the
@@ -51,6 +51,18 @@
 //     host reports no fragment `highp` (``fragmentHighp``), the picture draws `SkyShader.fallbackSource` (the sky
 //     colour to 0.6 × at the horizon, under the limit) and the controls show ``fallbackMessage``. If the fallback
 //     fails too, the frame is cleared to the sky colour (never grey). ``breakShaders(sky:fallback:)`` is the tests' seam.
+//
+// Feature 156 (A21-P05) T-A21-503 (FR-A21-501–505; contracts/sound.md; data-model.md):
+//
+//   - Sound: one ``SkySound`` plays the shared ambient loop (`AmbientLoopPlayer` of `AmbientLoopRecipe.gentle`, made
+//     only when it first must play) while the sound is on, the controls view is on screen (`controlsAppeared()`,
+//     `controlsDisappeared()`; hiding the controls keeps the view) and the scene is active (`sceneActive(_:)`).
+//     `setSound(on:)` and `setVolume(_:)` drive it at once; the preferences read when the presenter is made seed it.
+//     A loop that cannot start leaves the choice on and the sky as it is. `setup`, `resize`, `draw`, `teardown` and
+//     `shedCaches`, a preset change, the still view and reduced flashing never touch it; the sound stays out of the
+//     core, the snapshot, the digest and the manifest. ``loopFactory`` is the tests' seam (a fake player).
+//   - Cadence: the clock follows the drawn-frame deltas (the host's clamped delta, or ``fixedDelta`` in the tests),
+//     so 30 and 60 frames per second reach the same sky time.
 //
 // No GL call: everything is drawn through VisualCoreRendering's scenes.
 import Foundation
@@ -94,7 +106,7 @@ final class SkyMirror {
     var limit = SkyCore.defaultLimit
     /// Whether the controls are hidden (presentation only).
     var controlsHidden = false
-    /// Whether the sound is on (the preferences only; nothing plays in this phase).
+    /// Whether the sound is on (the preferences; the loop plays while Aurora is open, feature 156).
     var soundOn = SkyPreferences.defaults.soundOn
     /// The sound volume (0…1; the preferences only).
     var volume = SkyPreferences.defaults.volume
@@ -340,12 +352,18 @@ final class AuroraPresenter: ExperiencePresenter {
     private(set) var lastMix: Double?
     /// The touches on the canvas: where each landed, in view points.
     private var touches: [Int: Vec2] = [:]
+    /// When the ambient loop plays (feature 156).
+    let sound: SkySound
+    /// The tests' frame delta in seconds, used instead of the host's when set (feature 156); nil in the app.
+    var fixedDelta: Double?
     /// The frame cap: 30 frames per second (the sky moves slowly).
     var maxFramesPerSecond: Int { 30 }
 
     /// A presenter; with `reduceMotion` on the sky holds still and changes are immediate. The preferences are read
-    /// from `storage`'s value `prefs.v1` now, before the first frame (see the file header).
-    init(reduceMotion: Bool = false, storage: ExperienceStorage? = nil, reduceFlashing: Bool = false) {
+    /// from `storage`'s value `prefs.v1` now, before the first frame (see the file header); `loopFactory` makes the
+    /// sound's player (nil: `AmbientLoopPlayer(recipe: .gentle)`).
+    init(reduceMotion: Bool = false, storage: ExperienceStorage? = nil, reduceFlashing: Bool = false,
+         loopFactory: (() -> any SkyLoopPlaying)? = nil) {
         self.reduceMotion = reduceMotion
         self.systemReduceFlashing = reduceFlashing
         self.storage = storage
@@ -359,6 +377,8 @@ final class AuroraPresenter: ExperiencePresenter {
         seedPending = storage != nil && read.refusal == nil && read.preferences != SkyPreferences.defaults
         mirror.soundOn = preferences.soundOn
         mirror.volume = preferences.volume
+        sound = SkySound(makePlayer: loopFactory)
+        sound.seed(wanted: preferences.soundOn, volume: preferences.volume)
         if read.refusal != nil { mirror.message = Self.readFailedMessage }
     }
 
@@ -456,11 +476,12 @@ final class AuroraPresenter: ExperiencePresenter {
         let holding = reduceMotion || stillView
         clock.reducedMotion = holding
         clock.speed = core.scene.speed
-        clock.advance(by: frame.delta)
+        let delta = fixedDelta ?? frame.delta
+        clock.advance(by: delta)
         if holding {
             blend.finish()
         } else {
-            blend.advance(by: frame.delta)
+            blend.advance(by: delta)
         }
         transition.reducedFlashing = reducedFlashing
         if picture.mode == .sky {
@@ -477,7 +498,7 @@ final class AuroraPresenter: ExperiencePresenter {
                 }
             } else if transition.isChanging {
                 if reduceMotion { transition.finish(context) }
-                transition.advance(by: frame.delta)
+                transition.advance(by: delta)
             }
             if let still = transition.stillLimit, core.limit < still { transition.finish(context) }
             if transition.isChanging, transition.progress >= 1 { transition.finish(context) }
@@ -540,15 +561,17 @@ final class AuroraPresenter: ExperiencePresenter {
         return accepted
     }
 
-    /// Turns the sound on or off: kept in the preferences only (no action is sent, nothing plays).
+    /// Turns the sound on or off: kept in the preferences (no action is sent) and given to the loop at once.
     func setSound(on: Bool) {
         guard preferences.soundOn != on else { return }
         preferences.soundOn = on
         if mirror.soundOn != on { mirror.soundOn = on }
         save()
+        sound.setWanted(on)
     }
 
-    /// Sets the sound volume, clamped to 0…1 (a non-finite value is ignored): kept in the preferences only.
+    /// Sets the sound volume, clamped to 0…1 (a non-finite value is ignored): kept in the preferences and given to
+    /// the loop at once.
     func setVolume(_ volume: Double) {
         guard volume.isFinite else { return }
         let kept = min(max(volume, SkyPreferences.volumeRange.lowerBound), SkyPreferences.volumeRange.upperBound)
@@ -556,7 +579,17 @@ final class AuroraPresenter: ExperiencePresenter {
         preferences.volume = kept
         if mirror.volume != kept { mirror.volume = kept }
         save()
+        sound.setVolume(kept)
     }
+
+    /// The controls view appeared: the loop may play (feature 156).
+    func controlsAppeared() { sound.setOnScreen(true) }
+
+    /// The controls view disappeared (Aurora was left): the loop stops.
+    func controlsDisappeared() { sound.setOnScreen(false) }
+
+    /// The scene became active (`true`) or inactive or backgrounded (`false`): the loop plays or stops.
+    func sceneActive(_ active: Bool) { sound.setActive(active) }
 
     /// Takes the sky of `core` into the preferences (the sound choice stays) and writes them.
     private func adoptSky(_ core: SkyCore) {

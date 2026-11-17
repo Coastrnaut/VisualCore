@@ -25,11 +25,14 @@ public enum AuroraExperience {
     }
 
     /// The experience's shell with its presenter exposed (tests): the presenter gets `reduceMotion`, `storage` (none:
-    /// nothing is read or saved), `reduceFlashing`, the shell's port and the shell's core.
+    /// nothing is read or saved), `reduceFlashing`, `loopFactory` (the sound's player; nil: the ambient loop player),
+    /// the shell's port and the shell's core.
     @MainActor
     static func make(id: ExperienceID, reduceMotion: Bool = false, storage: ExperienceStorage? = nil,
-                     reduceFlashing: Bool = false) -> ExperienceShell<AuroraPresenter> {
-        let presenter = AuroraPresenter(reduceMotion: reduceMotion, storage: storage, reduceFlashing: reduceFlashing)
+                     reduceFlashing: Bool = false,
+                     loopFactory: (() -> any SkyLoopPlaying)? = nil) -> ExperienceShell<AuroraPresenter> {
+        let presenter = AuroraPresenter(reduceMotion: reduceMotion, storage: storage, reduceFlashing: reduceFlashing,
+                                        loopFactory: loopFactory)
         let shell = ExperienceShell(id: id, presenter: presenter)
         presenter.port = shell.port
         presenter.coreSource = { [weak shell] in shell?.engine.core }

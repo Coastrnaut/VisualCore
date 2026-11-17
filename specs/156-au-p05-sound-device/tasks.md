@@ -19,7 +19,7 @@
 
 ## Phase 2: Story 1 — a quiet loop, only when asked (P1) 🎯
 
-- [ ] T-A21-503 [P] [US1] Experience (agent E), per contracts/sound.md and data-model.md:
+- [X] T-A21-503 [P] [US1] Experience (agent E), per contracts/sound.md and data-model.md: — Verified 2026-11-17: 2026-11-17: SkySound.swift (SkyLoopPlaying, AmbientLoopPlayer conformance, SkySound plays while wanted, on screen and active; lazy player), AuroraPresenter (sound seeded from prefs, setSound/setVolume drive it, controlsAppeared/controlsDisappeared/sceneActive; drawing never touches it; fixedDelta test seam), AuroraControls (onAppear/onDisappear, scenePhase, new hints), AuroraExperience loop factory; A21-P05.au-ios27, documented-api (51 of 51), core-purity and isolation exit 0; written by an agent, retested
   - `Experience/SkySound.swift` (new):
     - the protocol `SkyLoopPlaying` (`isEnabled`, `volume: Float`, `isPlaying`, `play() -> Bool`, `stop()`), to
       which `AmbientLoopPlayer` conforms by an extension;

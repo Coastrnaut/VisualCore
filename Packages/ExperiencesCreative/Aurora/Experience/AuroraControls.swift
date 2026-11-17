@@ -9,8 +9,10 @@
 //     limit", 20…72 % → `light.limit [0.2…0.72]`);
 //   - steppers `ribbons` (1…4 → `sky.ribbons`) and `stars` (0…400 in steps of 20 → `sky.stars`);
 //   - the sound choice (feature 154): a `sound` toggle ("Sound", On or Off) and a `volume` slider ("Volume",
-//     0…100 %). They send no action: the presenter keeps them in the preferences only (`setSound(on:)`,
-//     `setVolume(_:)`), so the snapshot, the digest and the scenario manifest do not change, and nothing plays;
+//     0…100 %). They send no action: the presenter keeps them in the preferences (`setSound(on:)`, `setVolume(_:)`),
+//     so the snapshot, the digest and the scenario manifest do not change; feature 156 (A21-P05) T-A21-503: they
+//     drive the ambient loop, which plays while the controls view is on screen (`.onAppear`, `.onDisappear`; the view
+//     stays while the controls are hidden) and the scene is active (`scenePhase`);
 //   - `message`: the line about the saved choices (they could not be read, or could not be saved), when there is one;
 //   - `hide-controls` ("Hide controls"): the presenter hides the controls. While hidden only `show-controls` remains:
 //     a short line "Controls hidden. Tap the sky to show them." with the accessibility action "Show controls", so a
@@ -45,8 +47,10 @@ struct AuroraControls: View {
     let port: ExperienceActionPort
     /// What the controls show.
     let mirror: SkyMirror
-    /// The presenter: hides and shows the controls.
+    /// The presenter: hides and shows the controls and plays the sound.
     let presenter: AuroraPresenter
+    /// The scene's phase: the sound plays only while it is active (feature 156).
+    @Environment(\.scenePhase) private var scenePhase
 
     /// The name of the accessibility action that shows hidden controls.
     static let showControlsAction = "Show controls"
@@ -127,6 +131,9 @@ struct AuroraControls: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .onAppear { presenter.controlsAppeared() }
+        .onDisappear { presenter.controlsDisappeared() }
+        .onChange(of: scenePhase) { _, phase in presenter.sceneActive(phase == .active) }
     }
 
     /// The controls while shown.
@@ -178,7 +185,7 @@ struct AuroraControls: View {
                 Text(verbatim: spoken["sound"]?.title ?? "")
             }
             .spoken(spoken["sound"])
-            .accessibilityHint(Text(verbatim: "Keeps whether the sky's sound is on; nothing plays in this version"))
+            .accessibilityHint(Text(verbatim: "Plays a quiet sound made in code while Aurora is open"))
             .accessibilityIdentifier(port.identifier("sound"))
             VStack(alignment: .leading, spacing: 2) {
                 Text(verbatim: (spoken["volume"]?.title ?? "") + ": " + (spoken["volume"]?.value ?? ""))
@@ -188,7 +195,7 @@ struct AuroraControls: View {
                                       set: { presenter.setVolume(Self.clamped($0, SkyPreferences.volumeRange)) }),
                        in: SkyPreferences.volumeRange)
                     .spoken(spoken["volume"])
-                    .accessibilityHint(Text(verbatim: "How loud the sky's sound is when it is on"))
+                    .accessibilityHint(Text(verbatim: "How loud the sky's sound is"))
                     .accessibilityIdentifier(port.identifier("volume"))
             }
             Toggle(isOn: Binding(get: { mirror.stillView }, set: { presenter.setStillView($0) })) {
