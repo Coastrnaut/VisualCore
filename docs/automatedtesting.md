@@ -254,6 +254,9 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   whose snapshot schema rose (A17's view state reached schema 2 in A17-P03) passes every phase gate. It then fails at
   its X gate's follow-through. When a phase raises the snapshot schema, add `schemaExample(version:)` for each earlier
   version (Molecular Explorer's pattern) and register it with `examples:` in that same phase.
+- **Swift Testing's per-test time includes queueing.** Suites run in parallel, and tests on the main actor wait for
+  each other, so a model test can report 18 s while its own work takes milliseconds (A18-P05: the heaviest frame test,
+  120 frames, takes 4.5 s). Judge the 10-second bound by the frame tests' own times; keep frame loops short.
 
 ## 6. Keeping this file current
 

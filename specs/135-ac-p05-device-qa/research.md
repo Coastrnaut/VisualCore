@@ -9,3 +9,5 @@
 - **D3 The campaign (Q3):** ten rows modelled on Interactive Anatomy's `device-campaign.md`, for the order D1 → D2 →
   D3. D3 is not updated from iPadOS 26.5.
 - **D4 Interface tests (Q4):** a serial chunk `z2`, launched like `IASupport`.
+- **D5 As built:** the key uses a 64-bit FNV-1a mix, so it does not depend on Swift's per-process hash seed. The
+  cache releases its target in pass-through, so a stale picture can never show after motion stops.
