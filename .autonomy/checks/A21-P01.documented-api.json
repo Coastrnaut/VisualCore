@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_documented_api.py",
+    "--sources",
+    "Packages/ExperiencesCreative/Aurora"
+  ],
+  "command": "python3 scripts/check_documented_api.py --sources Packages/ExperiencesCreative/Aurora",
+  "elapsed_seconds": 0.263,
+  "exit_code": 0,
+  "finished": "2026-11-17T10:49:28+00:00",
+  "log": ".autonomy/logs/A21-P01.documented-api.log",
+  "log_sha256": "dc978b310c85015e52c34a799cc740a70461f5703aad83ed2d70d47f41960eae",
+  "name": "documented-api",
+  "stage": "A21-P01",
+  "started": "2026-11-17T10:49:28+00:00",
+  "timed_out": false
+}

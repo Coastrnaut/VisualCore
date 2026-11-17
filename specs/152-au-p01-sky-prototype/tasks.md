@@ -53,7 +53,7 @@ VisualCore change. Precedent: `specs/145-zg-p01-document-strokes/tasks.md`. Roll
 
 - [X] T-A21-109 [P] Write `docs/apps/aurora/licenses.md` (presets, palettes and shader written in this repository; the — Verified 2026-11-17: 2026-11-17: docs/apps/aurora/licenses.md (presets, bounds, aurora-sky.frag, the noise port and reference written here; vc/ is VisualCore's; no third-party asset) listed in docs/apps/aurora/README.md; validate_docs exit 0
   `vc/` library is VisualCore's; no third-party asset) and list it in `docs/apps/aurora/README.md`
-- [ ] T-A21-110 Core tests on sim-27.2 (`--name au-core-ios27 -- python3 scripts/xcodebuild_package.py --package
+- [X] T-A21-110 Core tests on sim-27.2 (`--name au-core-ios27 -- python3 scripts/xcodebuild_package.py --package — Verified 2026-11-17: 2026-11-17: review checkpoint: .autonomy/checks/A21-P01.au-core-ios27.json exit 0 (39 tests on sim-27.2, the whole run about 1.1 s), A21-P01.core-purity.json exit 0 and A21-P01.documented-api.json exit 0
   Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing
   AuroraCoreTests`; each test under 10 s), the purity scan (`--name core-purity`) and the documented API (`--name
   documented-api -- python3 scripts/check_documented_api.py --sources Packages/ExperiencesCreative/Aurora`) (review
