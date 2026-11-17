@@ -49,3 +49,7 @@ registry example, scan (308), manifest regeneration, runs, contract, commits.
 
 MVP: editable colours with schema 2 (302–304). Notice, result and help (305–308) close the regression gate; the
 accessibility work (309) closes G-A11Y. Review checkpoints after 304 and at 311.
+
+## Phase 6: Convergence
+
+- [ ] T-A19-315 Record the as-built design in `specs/140-lw-p03-editor/data-model.md` and the evidence limit in `research.md`: the digest domain is `a19.wallpaper.v2`; choosing the preset or scene already shown keeps an edit (only a real change or `preset.reset` clears it); while `custom` is 0 the stored components are ignored and the preset's own colours are used; sliders carry their value in label and value; the export message after a written export is "Exported <result line>."; the accessibility-five test proves the stacking by the layout's height growing over `.large` and bounds the rendered width at 390 points (a flexible frame can hide a child overflow, so the width check alone is not the evidence) per clarification Q1, Q5 and SC-A19-303 (partial)
