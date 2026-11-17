@@ -67,6 +67,11 @@
 //     placed, through `feedback` (the person's switch and the rate limit decide).
 //   Neither sound nor haptics changes the state.
 //
+// Feature 150 (A20-P06) T-A20-604 (FR-A20-603; SC-A20-602; clarification Q4): the test-only seam `failNextDraw` makes
+// the next `draw` throw `GardenDrawError.injected` once, before anything is followed, set or drawn; the seam clears
+// itself and is unreachable from the interface. The session then fails with the error's message, and the library's
+// files are not touched (only a save, rename or delete writes them).
+//
 // No GL call: everything is drawn through VisualCoreRendering's scenes.
 import Foundation
 import DigitalZenGardenCore
@@ -79,6 +84,20 @@ import VisualCoreMath
 import VisualCoreRendering
 import VisualCoreScenes
 import VisualCoreSimulation
+
+/// Why a draw of Digital Zen Garden failed on purpose (feature 150, A20-P06, T-A20-604).
+enum GardenDrawError: Error, Equatable, CustomStringConvertible {
+    /// The test-only seam ``GardenPresenter/failNextDraw`` made this draw fail.
+    case injected
+
+    /// The message the failed session shows: "The Digital Zen Garden draw failed: the test seam injected a failure."
+    var description: String {
+        switch self {
+        case .injected:
+            return "The Digital Zen Garden draw failed: the test seam injected a failure."
+        }
+    }
+}
 
 /// What the controls show, updated only when a field changes.
 @MainActor
@@ -190,6 +209,10 @@ final class GardenPresenter: ExperiencePresenter {
     static let noSelectionValue = "No stone selected"
     /// The frame cap: 30 frames per second (only the optional sand drift moves on its own).
     var maxFramesPerSecond: Int { 30 }
+    /// Test-only seam: when true, the next `draw` throws ``GardenDrawError/injected`` once, before it follows, sets or
+    /// draws anything; the seam clears itself and nothing in the experience or its interface sets it (feature 150,
+    /// A20-P06, T-A20-604).
+    var failNextDraw = false
     /// The spoken value of undo with nothing to undo (feature 148).
     static let nothingToUndo = "nothing to undo"
     /// The spoken value of redo with nothing to redo (feature 148).
@@ -285,8 +308,12 @@ final class GardenPresenter: ExperiencePresenter {
     }
 
     /// Brings the field up to `core`, sets the tone and grain of `tier` and draws (the cached picture when nothing
-    /// changed).
+    /// changed). Throws ``GardenDrawError/injected`` once while ``failNextDraw`` is set (it is cleared first).
     func draw(_ core: GardenCore, tier: Int, context: RenderContext, frame: FrameInfo) throws {
+        if failNextDraw {
+            failNextDraw = false
+            throw GardenDrawError.injected
+        }
         var core = core
         if core.calm != calm, applyKeptCalm() { core = coreSource?() ?? core }
         follow(core)

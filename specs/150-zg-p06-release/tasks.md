@@ -28,7 +28,7 @@ migration, no VisualCore change).
 
 ## Phase 3: Story 2 — recovery and stored files (P1)
 
-- [ ] T-A20-604 [US2] Add the test-only seam `var failNextDraw = false` to
+- [X] T-A20-604 [US2] Add the test-only seam `var failNextDraw = false` to — Verified 2026-11-17: 2026-11-17: GardenPresenter.failNextDraw (test-only; the next draw throws GardenDrawError.injected once and clears itself) and GardenRecoveryDrawTests (two gardens saved; the session fails with the injected message at the draw stage; library.json, garden-1.json and garden-2.json byte-identical; a new session lists both); .autonomy/checks/A20-P06.zg-ios27.json exit 0 (99 experience, 51 core tests); written by an agent, retested
   `Packages/ExperiencesCreative/DigitalZenGarden/Experience/GardenPresenter.swift` ("the next `draw` throws
   `GardenDrawError.injected` once and clears the flag") and `ExperienceTests/GardenRecoveryDrawTests.swift` (two
   gardens saved in a temporary storage; a failed draw fails the session with the injected message; `library.json` and
