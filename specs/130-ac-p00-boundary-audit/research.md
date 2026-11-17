@@ -37,6 +37,11 @@ pixel drift.
   - an injectable clock source with time-change observation (G-CLOCK, `VisualCoreExperience`, A18-P01), whose second
     consumer is A14's "Now";
   - a crossfade between full-screen scenes (G-TRANSITION, `VisualCoreRendering`, A18-P03).
+
+  The contract audit found a third: an experience cannot lower its frame cap, because `ExperienceSession` builds its
+  `RenderHost` with the default (`ExperienceSession.swift:287`). Night mode needs a lower rate, so G-FRAMERATE
+  (`VisualCoreExperienceHost`, A18-P04) assesses a frame-rate request from an experience; `FramePacing` keeps its
+  30 fps floor.
 - **D5 Permissions:** clarification 4. The keep-awake setting is opt-in and is the first allowed `isIdleTimerDisabled`
   use, in one named file.
 - **Alternatives considered:**

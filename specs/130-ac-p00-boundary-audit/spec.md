@@ -33,7 +33,8 @@ in code by a read-only survey:
   `d93edd1`.
 - **Registry:** seventeen experiences are registered in `Catalog/registrations.json` (A01–A17).
 - **VisualCore offers** (public in a framework product and tested):
-  - in `VisualCoreRendering`: `FullScreenShaderScene` (parameters, palette, `fixedTime`, `timeScale`), `FieldPass`,
+  - in `VisualCoreRendering`: `FullScreenShaderScene` (parameters, palette, `fixedTime`; `timeScale` is public but
+    no test names it), `FieldPass`,
     `ShaderBundle`, the GLSL library `vc/` (palette, noise, SDF, hash, colour), `ParticleRenderer` and
     `ParticleLayerScene` (with `brightnessCap`), and `RenderHost` (frame pacing to `maxFramesPerSecond`, foreground
     notifications);
@@ -50,7 +51,8 @@ in code by a read-only survey:
   - a wall-clock time source and any time-change observer (significant time change, time zone, locale, day);
   - text drawn in the GPU path (text is drawn by the host's canvas overlay);
   - scene transitions or crossfades;
-  - a frame-rate control reachable from an experience;
+  - a frame-rate control reachable from an experience (`ExperienceSession` builds its `RenderHost` with the default
+    cap, `ExperienceSession.swift:287`; recorded as gap G-FRAMERATE, `VisualCoreExperienceHost`, A18-P04);
   - keep-awake, brightness and night-mode helpers;
   - a pixel-drift or screen-care helper.
 - **Experience-only:** Solar System Explorer's injected `now: () -> Date` with its `date.set` action, and the
@@ -160,8 +162,9 @@ own each missing piece and in which phase.
 - **Time correctness** (the manual's risk 2): the audit records how the date enters an experience deterministically
   and where locale, calendar, time-zone and day changes come from; no simulated clock reaches production.
 - **Weather** (the manual's risk 3): kept out of version 0.1; no location or network.
-- **Keeping the screen awake:** the audit records whether VisualCore or the app offers a keep-awake request, and the
-  scan rules that refuse `isIdleTimerDisabled` in other experiences.
+- **Keeping the screen awake:** the audit records whether VisualCore or the app offers a keep-awake request (neither
+  does). No script refuses `isIdleTimerDisabled` or brightness writes yet; the release scan that allows it in one
+  named Ambient Clock file and refuses it everywhere else comes with G-RELEASE (A18-P06).
 
 ## Requirements *(mandatory)*
 
