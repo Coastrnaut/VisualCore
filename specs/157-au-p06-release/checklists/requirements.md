@@ -33,3 +33,5 @@
 
 - File names (`release.json`, the sample files) are the reviewer's artifacts, named as in the precedent
   `specs/150-zg-p06-release`; no implementation choice is made here.
+- The draft was written before `/speckit-specify` was invoked; it was validated against the resolved template and this
+  checklist inside the invocation (all sections present in order, no markers, every item passing) on 2026-11-17.
