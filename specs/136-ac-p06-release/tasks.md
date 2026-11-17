@@ -28,7 +28,7 @@ migration, no VisualCore change).
 
 ## Phase 5: Story 4 — interface tests
 
-- [ ] T-A18-608 [P] [US4] Write `Apps/VisualCore/Tests/UI/AmbientClock/ACThemeUITests.swift` per Clarifications Q5 (launched like `ACSupport`; Wave Field, save "Evening", switch, apply, Wave Field shown; under 60 s), and add it to the serial chunk `z2` in `scripts/release_check.py` (lead) (FR-A18-607)
+- [X] T-A18-608 [P] [US4] Write `Apps/VisualCore/Tests/UI/AmbientClock/ACThemeUITests.swift` per Clarifications Q5 (launched like `ACSupport`; Wave Field, save "Evening", switch, apply, Wave Field shown; under 60 s), and add it to the serial chunk `z2` in `scripts/release_check.py` (lead) (FR-A18-607) — Verified 2026-11-16: 2026-11-16: Apps/VisualCore/Tests/UI/AmbientClock/ACThemeUITests.swift (Wave Field, save Evening, switch to Noise Gradient, apply Evening, Wave Field shown; identifiers of AmbientControls) and ACThemeUITests added to the serial chunk z2 in scripts/release_check.py; .autonomy/checks/A18-P06.app-ui.json exit 0 (z2: 4/4 interface tests, ACThemeUITests 45.2 s); written by an agent, retested
 
 ## Phase 6: Records and evidence
 
