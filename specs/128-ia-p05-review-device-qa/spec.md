@@ -24,6 +24,63 @@ Canonical overrides:
   in a device-campaign document as {device} tasks. They run only after ImplementationLock-100.
 - Follow `specs/107-sse-p05-review`.
 
+## Clarifications
+
+### Session 2026-11-16
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- The manifest's `ReviewStatus {status, reviewer, date}` and `reviewSentence` exist (A17-P01).
+- The pack loader and `DocumentEnvelope` exist (A17-P04).
+- `SourcesDocumentTests` regenerates a marked block under `UPDATE_DATA_SOURCES=1` (A17-P03).
+- The list sends `structure.select` (A17-P02/P03), and announcements go through the presenter's planner (A17-P04).
+
+- Q: Where is the review record kept? → A: In a resource of its own, `Core/Content/knee-right.review.json`, beside the
+  pack, so that a review never edits the content it reviews:
+  - **Envelope:** a `DocumentEnvelope` of kind `a17.review-record` at schema 1.
+  - **Payload:** `contentVersion` (2) and `entries`.
+  - **Validation:** loaded and validated together with the pack, against the pack's content version and part ids.
+- Q: What does an editorial entry hold, and what may a clinical one claim? → A: An editorial entry holds:
+  - **Kind and reviewer:** kind `editorial`, reviewer "Lead engineer (editorial review)".
+  - **Date:** "2026-11-16" (ISO).
+  - **Method:** "Name and description read against the cited Gray's Anatomy (1918) section and Terminologia Anatomica
+    (1998)."
+  - **Sources:** the part's citation ids.
+
+  A `clinical` entry needs a named reviewer and a date, and only the owner adds one (BLOCKED_OWNER_ACTION). The
+  engineer never writes a clinical entry.
+
+  Refusal reasons:
+  - **Unknown part:** `missing-reference`.
+  - **Missing reviewer, date or method:** `empty-text`.
+  - **A date that is not ISO:** `damaged`.
+  - **Another content version:** `newer-version` if higher, `damaged` if lower.
+  - **A clinical entry with an empty reviewer:** `empty-text`.
+  - **A duplicate entry for one part and kind:** `duplicate-id`.
+- Q: What do the panel and the model statement say? → A:
+  - **Panel review lines, after the citations:**
+    - "Text checked against its sources by the lead engineer on 2026-11-16." for the editorial entry;
+    - "Not reviewed by a clinician." while there is no clinical entry, otherwise "Reviewed by <reviewer> on
+      <date>."
+  - **Model statement:** "Schematic model for learning; shapes are simplified." It stays at the top of the panel
+    whether or not a part is selected, and appears as an "About this model" row (identifier `about-model`).
+- Q: What is the review document? → A: `docs/apps/interactive-anatomy/review.md`:
+  - **Fixed prose:** the method, who reviewed what, the BLOCKED_OWNER_ACTION clinical review with its steps, and the
+    model statement.
+  - **Generated table** between `<!-- BEGIN GENERATED -->` and `<!-- END GENERATED -->`: part, sources checked,
+    editorial review (reviewer, date), clinical review ("not reviewed").
+  - **Regeneration:** written by a core test under `UPDATE_DATA_SOURCES=1`, which fails when the committed table
+    differs.
+- Q: How is the VoiceOver regression fixture proven here, and what does the device campaign hold? → A:
+  - **VoiceOver fixture:** an experience test drives all 14 parts with list actions only (no pointer event). For each
+    part it checks the panel lines, the announcement "<name> selected." and that the state equals the tap selection's.
+    The list row model (`rowText`, `rowLabel`, enabled) is checked for every part. The app UI test of the list comes
+    with A17-P06.
+  - **Device campaign:** `docs/apps/interactive-anatomy/device-campaign.md` follows Simulation Lab's format. Its
+    {device} tasks are frame pacing at both quality levels, thermals over a 10-minute session, memory, VoiceOver with
+    the list alone, Dynamic Type, Reduce Motion and the accessibility audit (`VC_RUN_AUDITS=1`). Each task has a pass
+    criterion and the D1/D2/D3 device class.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Know how far to trust the text (Priority: P1) 🎯
