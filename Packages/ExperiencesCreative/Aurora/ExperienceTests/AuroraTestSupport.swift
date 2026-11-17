@@ -2,7 +2,9 @@
 // experience tests: an engine and a shell without a render host (prepared and active, so actions are carried out with
 // no frame drawn), opening the experience in the one app's session host, drawing frames, drawing an off-screen still
 // at the reference size (64 × 48, rows top-down, the same orientation as `SkyReference`), comparing pictures and
-// measuring luminance, and the engine digest of a core. Short runs only (no sleep, no wall-clock assertion).
+// measuring luminance, and the engine digest of a core. Feature 154 (A21-P03): the reference of a mixed frame during a
+// change between presets (both skies' references mixed in display space), opening with a storage and a snapshot, and
+// a temporary storage. Short runs only (no sleep, no wall-clock assertion).
 import CoreGraphics
 import Foundation
 import Testing
@@ -47,15 +49,17 @@ enum AuroraTest {
         try #require(shell.engine.core)
     }
 
-    /// Opens Aurora in `session` through the factory, lays the view out at `size` points and draws one frame. A
-    /// session without a quality pin is pinned to level 0.
+    /// Opens Aurora in `session` through the factory (with `storage` and the session `snapshot` when given), lays
+    /// the view out at `size` points and draws one frame. A session without a quality pin is pinned to level 0.
     static func open(_ session: ExperienceSession, reduceMotion: Bool = false,
-                     size: CGSize = CGSize(width: 32, height: 24)) async throws -> ExperienceShell<AuroraPresenter> {
+                     size: CGSize = CGSize(width: 32, height: 24), storage: ExperienceStorage? = nil,
+                     snapshot: ExperienceSnapshot? = nil) async throws -> ExperienceShell<AuroraPresenter> {
         let id = self.id
         var made: ExperienceShell<AuroraPresenter>?
         if session.qualityPin == nil { session.qualityPin = 0 }
-        let request = ExperienceOpenRequest(id: id, seed: 1, snapshot: nil, refusedSnapshotFails: false) {
-            let shell = AuroraExperience.make(id: id, reduceMotion: reduceMotion)
+        let request = ExperienceOpenRequest(id: id, seed: 1, snapshot: snapshot,
+                                            refusedSnapshotFails: snapshot != nil) {
+            let shell = AuroraExperience.make(id: id, reduceMotion: reduceMotion, storage: storage)
             made = shell
             return shell
         }
@@ -84,11 +88,39 @@ enum AuroraTest {
         return try host.renderOffscreen(width: width, height: height, time: 0).rgba
     }
 
-    /// The reference drawing of the presenter's last uniforms at `width` × `height`.
+    /// The reference drawing of the presenter's last frame at `width` × `height`: the last uniforms' sky, or during a
+    /// change with a moving outgoing sky the two skies' references mixed in display space at the mix drawn (the
+    /// crossfade's `mix(from, to, progress)` of 8-bit pictures).
     static func reference(_ shell: ExperienceShell<AuroraPresenter>, width: Int = width,
                           height: Int = height) throws -> [UInt8] {
-        let uniforms = try #require(shell.presenter.lastUniforms)
-        return SkyReference.render(uniforms, width: width, height: height)
+        let presenter = shell.presenter
+        let uniforms = try #require(presenter.lastUniforms)
+        let incoming = SkyReference.render(uniforms, width: width, height: height)
+        guard let mix = presenter.lastMix, let outgoingUniforms = presenter.lastOutgoingUniforms else { return incoming }
+        let outgoing = SkyReference.render(outgoingUniforms, width: width, height: height)
+        return mixed(outgoing, incoming, mix)
+    }
+
+    /// `a × (1 − t) + b × t` per channel, rounded to 8 bits.
+    static func mixed(_ a: [UInt8], _ b: [UInt8], _ t: Double) -> [UInt8] {
+        guard a.count == b.count else { return b }
+        var out = [UInt8](repeating: 0, count: a.count)
+        for i in 0..<a.count {
+            out[i] = UInt8(min(max((Double(a[i]) * (1 - t) + Double(b[i]) * t).rounded(), 0), 255))
+        }
+        return out
+    }
+
+    /// A fresh storage of Aurora in a temporary folder and its own defaults suite; `cleanUp` removes both.
+    static func storage() throws -> (storage: ExperienceStorage, defaults: UserDefaults, cleanUp: () -> Void) {
+        let name = "aurora-tests-" + UUID().uuidString
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(name, isDirectory: true)
+        let defaults = try #require(UserDefaults(suiteName: name))
+        let storage = ExperienceStorage(id: id, root: root, defaults: defaults)
+        return (storage, defaults, {
+            defaults.removePersistentDomain(forName: name)
+            try? FileManager.default.removeItem(at: root)
+        })
     }
 
     /// Sends `control` with `values` through `shell` and records an issue unless it is accepted (keeps the mutating

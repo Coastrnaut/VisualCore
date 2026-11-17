@@ -20,7 +20,9 @@
 // speed), the hue shift and the limit. Snapshot schema 1: the JSON object `{"hue", "limit", "scene"}` with sorted
 // keys, the scene in its A21-P01 body form. Restoring a damaged payload throws `SkyRestoreRefusal.damaged`, a scene
 // `SkyScene.validate()` refuses `.scene(_:)`, and a hue or limit out of range `.outOfRange(_:)`; the engine refuses a
-// newer schema. Hidden controls are presentation (the presenter's), not state.
+// newer schema. Hidden controls are presentation (the presenter's), not state. A restored core is marked
+// `isRestored` (feature 154, presentation only), so the presenter lets a restored session win over the saved
+// preferences.
 //
 // Outcome `preset-<id>`, for example `preset-polar-night`. Quality: `level-0` (5 fbm octaves) and `level-1` (3), each
 // one full-screen draw at the full resolution.
@@ -75,6 +77,10 @@ public struct SkyCore: ExperienceCore, Equatable {
     /// The quality tier the host set (0 = level-0, 1 = level-1, clamped); presentation only — not in the digest,
     /// the snapshot or `==`.
     public private(set) var qualityTier = 0
+    /// Whether this state came from a restored session snapshot (``restore(payload:seed:)``; feature 154): the
+    /// presenter seeds a fresh state from the saved preferences and leaves a restored one as it is. Presentation only
+    /// — not in the digest, the snapshot or `==`; a reset clears it.
+    public private(set) var isRestored = false
 
     /// The opening state: the default preset's scene, no hue shift and the default limit.
     public init() {
@@ -234,7 +240,7 @@ public struct SkyCore: ExperienceCore, Equatable {
     }
 
     /// The core of `payload`; throws ``SkyRestoreRefusal`` for a damaged payload, a refused scene or a hue shift or
-    /// limit out of range. The seed changes nothing.
+    /// limit out of range. The seed changes nothing. The restored core is marked ``isRestored``.
     public static func restore(payload: Data, seed: UInt64) throws -> SkyCore {
         guard let decoded = try? JSONDecoder().decode(Payload.self, from: payload) else {
             throw SkyRestoreRefusal.damaged
@@ -244,6 +250,8 @@ public struct SkyCore: ExperienceCore, Equatable {
         guard decoded.limit.isFinite, limitRange.contains(decoded.limit) else {
             throw SkyRestoreRefusal.outOfRange("limit")
         }
-        return SkyCore(scene: decoded.scene, hue: decoded.hue, limit: decoded.limit)
+        var core = SkyCore(scene: decoded.scene, hue: decoded.hue, limit: decoded.limit)
+        core.isRestored = true
+        return core
     }
 }

@@ -29,7 +29,7 @@ VisualCore change. Precedent: `specs/147-zg-p03-stones/tasks.md`. Rollback: reve
   "schema 1, kind `a21.preferences`, experience value `prefs.v1`, ≤ 4,096 bytes"; fields and ranges as listed;
   defaults; codes `damaged`, `newer-version`, `out-of-range`; and `CoreTests/PreferencesTests.swift` (round trip, each
   code, defaults) (FR-A21-303, 304)
-- [ ] T-A21-305 [US2] Wire the preferences into the experience (`AuroraPresenter.swift`, `AuroraExperience.swift`):
+- [X] T-A21-305 [US2] Wire the preferences into the experience (`AuroraPresenter.swift`, `AuroraExperience.swift`): — Verified 2026-11-17: 2026-11-17: preferences read before the first draw and seeded through the port, written after every accepted change, the two messages, a restored snapshot (SkyCore.isRestored, outside the digest) winning for the sky and never for the sound; PreferencesStoreTests (4); .autonomy/checks/A21-P03.au-ios27.json exit 0; written by an agent, retested
   read before the first frame, written after every accepted change through `ExperienceStorage.setValue`, the two
   messages of data-model.md, a restored snapshot winning for the sky and never for the sound choice; and
   `ExperienceTests/PreferencesStoreTests.swift` (close and reopen keeps every field; damaged, newer and out-of-range
