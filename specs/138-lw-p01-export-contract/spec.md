@@ -25,6 +25,71 @@ Canonical overrides:
   experience target, the registration and the catalog entry come in A19-P02, so nothing appears in the app now.
 - Follow `specs/131-ac-p01-clock-a11y`.
 
+## Clarifications
+
+### Session 2026-11-17
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- `ExportGeometry` (`VisualCoreScenes`) gives `size(longEdge:aspect:)`: the long edge is clamped to
+  `min(maxEdge, 8192)`, made even, and shrunk two pixels at a time until under `maxPixels` (default 64,000,000). The
+  short edge is rounded to an even number at the aspect. `ExportAspect(id:title:width:height:)` takes any ratio.
+- `StillImage(width:height:topDownRGBA:)` and `StillImageEncoder.pngData` (`VisualCoreRendering`) run on the CPU
+  through ImageIO, with no GL context; the PNG is opaque and tagged sRGB.
+- `DocumentStore` needs a folder, while `ExperienceStorage` is flat files (as A18 found). `DocumentEnvelope` and
+  `MigrationChain` are public in `VisualCorePersistence`.
+- The A18-P01 core pattern is a pure `…Core` target with its `…CoreTests` in `Packages/ExperiencesCreative/Package.swift`,
+  and no experience target until P02.
+- The phase starts at `9d453506` (the specify commit). No A19 source exists yet.
+
+- Q: Which targets come in this phase? → A: Only `LivingWallpapersCore` and `LivingWallpapersCoreTests` in
+  `Packages/ExperiencesCreative/Package.swift`, as A18-P01 did.
+  - `LivingWallpapersCore` depends on `VisualCoreScenes` (export geometry) and `VisualCoreExperience`, plus Foundation
+    and ImageIO for reading a written file back. It has no GL, UIKit or SwiftUI.
+  - `LivingWallpapersCoreTests` also depends on `VisualCoreRendering`, so the regression fixture encodes through the
+    real still encoder.
+  - The experience target, the scenes' shaders, the registration and the catalog entry come in A19-P02.
+- Q: Which curated scenes and presets does version 0.1 hold? → A: Four procedural scenes, drawn in A19-P02 as
+  full-screen shaders over the GLSL library:
+  - `aurora-bands` (soft vertical light bands), `ink-flow` (domain-warped noise), `soft-cells` (Voronoi cells) and
+    `ripple-dunes` (layered sine dunes);
+  - each has three presets of four opaque sRGB colours, and two or three parameters with ranges and defaults;
+  - the license and provenance record says they are written in this repository (no source image).
+- Q: Which templates, and where do their numbers come from? → A: Nine device templates. The pixel sizes are from
+  Apple's published device specifications (provenance: "Apple technical specifications, retrieved 2026-11-17"):
+  - iPhone 16 Pro Max 1320×2868, iPhone 16 Pro 1206×2622, iPhone 16 Plus 1290×2796, iPhone 16 1179×2556 and iPhone SE
+    (3rd generation) 750×1334;
+  - iPad Pro 13-inch (M4) 2064×2752, iPad Pro 11-inch (M4) 1668×2420, iPad Air 11-inch (M2) 1640×2360 and iPad mini
+    (A17 Pro) 1488×2266.
+
+  Each template has portrait and landscape (edges swapped). Its safe-area guides are design guides of the app, stated
+  as fractions of the canvas and labelled approximate, not as system measurements: a top band of 0.22 where the lock
+  screen time may sit, a bottom band of 0.10, and side margins of 0.04. A template that fits is exported at exactly its
+  size (odd edges kept). A template that does not fit gets the `ExportGeometry` fallback at its aspect, with even
+  edges.
+- Q: What is the project file and how is it refused? → A: `WallpaperProject`, schema 1, stored as an envelope of kind
+  `a19.wallpaper-project`:
+  - fields: `scene`, `preset` (index), `seed` (UInt64), `parameters` (id → number), `template`, `orientation`
+    (portrait or landscape), `animationTime` (seconds, finite and in 0…3600) and `format` (png in 0.1; jpeg and heic
+    come with G-ENCODE in A19-P02);
+  - refusals, each with a sentence: `damaged`, `newer-version`, `unknown-scene`, `unknown-preset`,
+    `unknown-template`, `invalid-parameter` and `too-large` (above 16,384 bytes);
+  - the file is pure data, read and written by the core; A19-P04 stores it through `ExperienceStorage`.
+- Q: What is the video decision? → A: No-go for version 0.1, recorded in `docs/apps/living-wallpapers/video-decision.md`.
+  - **Public interface assessed:** AVFoundation's asset writer with a pixel buffer adaptor, fed by the offscreen
+    render.
+  - **Cost bounds:** a 10-second loop at 30 frames is 300 offscreen renders and encodes. Every render runs on the main
+    thread (`renderOffscreen`), so the interface would stall.
+  - **Why no-go now:** disk and heat cost can be measured only on devices, after ImplementationLock-100, so
+    feasibility cannot be shown in this phase.
+  - **Owner and next step:** if a later round reopens it, the owner is VisualCore (`VisualCoreRendering`, an encoder
+    shared with other exporters).
+
+  A source scan, run at every later phase of A19, refuses `AVAssetWriter`, `VideoToolbox`, `CVPixelBuffer`,
+  `UIScreen.main.brightness`, private wallpaper calls and the words "live wallpaper", "video" and "set as wallpaper"
+  in the experience's sources and copy. The help text can still say how to apply an image through the system's
+  controls.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - A curated background to start from (Priority: P1) 🎯
