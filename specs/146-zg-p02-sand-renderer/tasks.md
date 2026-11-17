@@ -51,3 +51,7 @@ registration (207), manifest generation, runs, contract, commits.
 
 MVP: raking with the no-gap fixture (204, 205). The preview (206) completes the manual's MVP; registration and the
 manifest (207, 208) make it runnable in the app. Review checkpoints after 205 and at 209.
+
+## Phase 7: Convergence
+
+- [ ] T-A20-213 Record the as-built design in `specs/146-zg-p02-sand-renderer/data-model.md` and `contracts/experience.md`: `stroke.begin` during a stroke discards the uncommitted one and there is no cancel action (`cancelPointers` and a cancelled phase end without a commit); at the stroke cap `stroke.end` is accepted with the garden unchanged, `lastRefusal` `over-cap`, outcome `refused-over-cap` and the message "The garden holds 400 strokes. Undo one to rake again."; the rule codes `a20.invalid-choice`, `a20.no-stroke`, `a20.nothing-to-undo`, `a20.nothing-to-redo`, `a20.<refusal>`; the rgba8 read-back compared in stored values (h × 0.5 + 0.5) within 1/255; the accessibility identifiers `experience.a20.digital-zen-garden.{rake,tone,undo,redo,pattern-rows,pattern-circle,pattern-wave,pattern-spiral,message}`; the fixtures `fixture-raked-garden`, `fixture-wide-rake`, `fixture-undo`, `fixture-redo`, `fixture-tone` per FR-A20-201, FR-A20-205, FR-A20-206 (partial)
