@@ -37,7 +37,7 @@ for the audio change, feature 077 (A10-P03). Rollback: revert the commits (the A
 - [ ] T-A21-406 [P] [US1] The still view in `Packages/ExperiencesCreative/Aurora/Experience/{AuroraPresenter,AuroraControls}.swift`
   ("Still sky", identifier `still`, presentation only; `CachedScene` keyed by the digest and the size; the clock
   holds) and `ExperienceTests/StillViewTests.swift` (drawn once over 100 frames; once more after a change; a change
-  between skies completes then holds) (FR-A21-401; SC-A21-401)
+  between skies completes then holds; with Reduce Motion on as well, the still view wins and holds) (FR-A21-401; SC-A21-401)
 
 ## Phase 4: Story 2 — nothing flashes (P1)
 
@@ -57,7 +57,7 @@ for the audio change, feature 077 (A10-P03). Rollback: revert the commits (the A
 
 - [ ] T-A21-409 Aurora tests on sim-27.2 (`--name au-ios27`), documented API, isolation, core purity (review checkpoint)
 - [ ] T-A21-410 Contract: G-LOOP and G-LOWPOWER closed by "A21-P04"; rows whose gaps are all closed become available
-  with evidence (`--name contract`); `docs/apps/aurora/licenses.md` lists the loop recipe type as VisualCore's
+  with evidence (`--name contract`)
 - [ ] T-A21-411 Manifest (unchanged unless an engine action changed), catalog, app build and unit (`--name app-unit`),
   runner (`--name verify-27`), packages and script tests
 - [ ] T-A21-412 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
