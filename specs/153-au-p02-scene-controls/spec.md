@@ -21,6 +21,48 @@ Canonical overrides:
   not yet available to a person (that is X-A21).
 - **No VisualCore or ProjectM change.** Follow `specs/146-zg-p02-sand-renderer`.
 
+## Clarifications
+
+### Session 2026-11-17
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- `ExperienceControl` carries at most 24 values per action, and the engine refuses a value outside its declared range
+  before the core sees it; a presenter clamps before sending.
+- Digital Zen Garden (A20-P02) is the pattern for adding an experience: `<Name>Experience` and `<Name>ExperienceTests`
+  targets and product, an adapter core with a digest of the saved state only, a manifest of nine standard scenarios
+  and fixtures with `scenario-manifest.json`, a candidate registration in `Catalog/registrations.json` and
+  `ExperienceRegistry.candidates`, the `project.yml` product, and the synthetic candidate id in `AppModelTests` moved
+  to the next catalog id (`a22.shader-studio`).
+- No VisualCore experience offers a hide-and-restore mode for controls; SwiftUI's `accessibilityAction(named:)` is
+  already used by Fractal Explorer.
+- The A21-P01 shader caps luminance with a soft knee (start 0.6, ceiling 0.72) before the sRGB encode.
+
+- Q: Which controls exist, and how are they sent? → A: Actions, one value each: `preset.select` (0…2, integer),
+  `colour.hue` (−0.5…0.5 turns, shifting every palette colour's hue), `motion.speed` (0…2), `motion.turbulence`
+  (0…1), `sky.ribbons` (1…4, integer), `sky.stars` (0…400, integer), `sky.clouds` (0…1) and `light.limit` (0.2…0.72,
+  default 0.6). A fractional value for an integer control is refused. The digest covers the scene, the hue shift and
+  the limit; the hidden-controls flag is presentation, not state.
+- Q: How is the brightness limit applied? → A: The shader takes `u_limit`; its soft knee starts at 0.83 × limit and
+  ends at the limit, after compositing and before the sRGB encode, so every pixel's luminance is at most the limit
+  (plus 1/255 for 8-bit rounding). `SkyReference` takes the same limit; the A21-P01 default (0.72) is unchanged, so its
+  tests stand. Tests draw every preset at limits 0.2, 0.4 and 0.72.
+- Q: How does a change between presets run? → A: The presenter blends the shader inputs (palette, ribbons, turbulence,
+  clouds, stars) from the current blend to the target over 1.5 s of drawn-frame time, eased; the limit applies to
+  every frame, so the start, middle and end are all capped. A new selection mid-change starts from the current blend.
+  Under Reduce Motion the change is immediate. The multi-layer crossfade comes in A21-P03.
+- Q: How is the sky drawn in the app? → A: `AuroraPresenter` owns one `FullScreenShaderScene` with the core's shader,
+  its `fixedTime` driven by `SkyClock` from frame deltas, `maxFramesPerSecond` 30, quality levels `level-0` (5
+  octaves) and `level-1` (3); it is rebuilt from the state after a context loss or resize. The core adapter
+  (`AuroraCore`'s experience side) keeps snapshot schema 1: the scene, the hue shift and the limit. Native SwiftUI
+  controls (a preset picker, sliders and steppers) carry spoken labels and values; "Hide controls" hides them, and a
+  tap on the sky or the accessibility action "Show controls" brings them back.
+- Q: How is Aurora registered? → A: As Digital Zen Garden was at A20-P02: a candidate entry for a21 in
+  `Catalog/registrations.json` (capabilities of at most 40 characters, quality tiers `level-0` and `level-1`, palette,
+  manifest `Packages/ExperiencesCreative/Aurora/scenario-manifest.json`, permissions `[]`), `ExperienceRegistry`
+  candidate `aurora` (no examples: schema 1), the `project.yml` product `AuroraExperience`, the synthetic candidate in
+  `AppModelTests` moved to `a22.shader-studio`, and the candidate lists in the app and script tests.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Choose a sky and tune it (Priority: P1) 🎯
