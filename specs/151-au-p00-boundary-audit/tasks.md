@@ -47,7 +47,7 @@ only).
 
 ## Phase 6: User Story 4 — Stop/go decision (P2)
 
-- [ ] T-A21-008 [US4] Complete the contract's `gaps` (every non-available row: owning module, VisualCore or
+- [X] T-A21-008 [US4] Complete the contract's `gaps` (every non-available row: owning module, VisualCore or — Verified 2026-11-17: 2026-11-17: 13 gaps, each with owner and phase (G-LOOP owned by VisualCore:VisualCoreAudio in A21-P04; the luminance cap, static fallback and hide-and-restore controls app-local; G-PREFS carries the Phase 03 sound-independence fixture); the three manual risks as negative entries with owner, verification and release blocker (source manual §13 risk N); decision go with no blockers; .autonomy/checks/A21-P00.contract-2.json exit 0
   app-local, and phase A21-P01..P06 per research D4; the ambient loop player owned by VisualCoreAudio in A21-P04 per
   clarification Q4; the luminance cap, static fallback and hide-and-restore controls app-local per clarifications Q3
   and Q5), the three manual risks as `negative` entries naming owner, verification method and release-blocker
