@@ -18,6 +18,10 @@
 //     the environment's timed still renderer and the edge limit recorded at `setup`
 //     (`context.resources.maxTextureSize`; a size the host still refuses fails with the reason `render`).
 //
+// Feature 142 (A19-P05) T-A19-502 (FR-A19-501): in debug and automation builds only, the edge limit recorded at
+// `setup` is capped by the launch argument `-lwExportLimit <n>` (``LaunchOptions``, min(context limit, n)); a
+// shipping build uses the context's limit unchanged.
+//
 // Feature 140 (A19-P03) T-A19-303, T-A19-307, T-A19-309 (FR-A19-301–305): the palette uniforms are the core's
 // `palette`, the edited colours when `custom` is 1 and the preset's otherwise; the mirror carries `custom` and the
 // twelve components for the colour editor; the controls get the presenter's export limit (`maxEdge`) and their
@@ -135,7 +139,12 @@ final class WallpaperPresenter: ExperiencePresenter {
     /// compile or link error throws ``SceneShaderError``.
     func setup(_ context: RenderContext) throws {
         scene = nil
+        #if DEBUG || VISUALCORE_AUTOMATION
+        maxEdge = LaunchOptions.cappedLimit(
+            context: context.resources.maxTextureSize, arguments: ProcessInfo.processInfo.arguments)
+        #else
         maxEdge = context.resources.maxTextureSize
+        #endif
         try build(sceneIndex: lastCore.scene, context: context)
     }
 
