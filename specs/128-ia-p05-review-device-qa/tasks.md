@@ -41,4 +41,4 @@ plan (504) close the phase. Review checkpoint after 502 and at 506.
 
 ## Phase 5: Convergence
 
-- [ ] T-A17-509 Record in `specs/128-ia-p05-review-device-qa/research.md` and `data-model.md` the stricter entry rules as built: a source must be one of the part's own citations; the root `knee.joint` is not a reviewable part; the record's helpers are `isISODate`, `entries(for:)` and `maxBytes` (65,536). Per data-model: review entry rules (unrequested)
+- [X] T-A17-509 Record in `specs/128-ia-p05-review-device-qa/research.md` and `data-model.md` the stricter entry rules as built: a source must be one of the part's own citations; the root `knee.joint` is not a reviewable part; the record's helpers are `isISODate`, `entries(for:)` and `maxBytes` (65,536). Per data-model: review entry rules (unrequested) — Verified 2026-11-16: 2026-11-16: research.md D5 and data-model.md record the stricter entry rules (own citations only, the root not reviewable, at most 65,536 bytes) and the helpers; validate_docs.py PASS, read before this tick

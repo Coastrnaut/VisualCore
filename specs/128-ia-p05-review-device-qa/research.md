@@ -10,3 +10,7 @@
 - **D4 The VoiceOver fixture at the experience level** (Q5). The list's actions and row model are what VoiceOver
   operates, so driving all 14 parts through them without pointer events proves the fixture without a device. The UI
   test of the real list comes in A17-P06.
+- **D5 Stricter entry rules, as built** (converge 2026-11-16). A review entry may name only one of the 14 parts, not
+  the root `knee.joint`, which has no text of its own to review. Its sources must be among that part's own
+  citations, because a review checks the text against what the text cites. The record also offers `isISODate`,
+  `entries(for:)` and `maxBytes`, which is 65,536 bytes (`too-large` above it).
