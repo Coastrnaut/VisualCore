@@ -70,6 +70,7 @@ Packages/ExperiencesCreative/AmbientClock/Core/{ClockPreferences,ClockFormatter,
 Packages/ExperiencesCreative/AmbientClock/CoreTests/{PreferencesTests,FormatterTests,ScheduleTests,
   DaylightSavingTests,StateTests,SpokenTimeTests}.swift                                    new
 docs/apps/ambient-clock/visualcore-contract.json (G-CLOCK, G-FORMAT, G-TIMEA11Y closed)    modify
+scripts/test_scripts.py (the clock files of VisualCoreExperience, research D9)                modify
 ```
 
 - **Dependency direction:** the core → VisualCoreExperience and VisualCoreSimulation; the host addition →
