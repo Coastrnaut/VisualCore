@@ -12,7 +12,7 @@ assert. Precedent: `specs/133-ac-p03-themes-favourites/tasks.md`.
 
 ## Phase 2: Foundational — the VisualCore frame cap (G-FRAMERATE)
 
-- [ ] T-A18-402 Add `var maxFramesPerSecond: Int { get }` with a default of 60 to `ExperiencePresenter` in `Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift` and pass it in `ExperienceSession.swift` to `RenderHost(scene:maxFramesPerSecond:budget:)`, documented; `Packages/VisualCoreRendering/Tests/VisualCoreExperienceHostTests/FrameCapTests.swift` (a presenter declaring 30 gives `host.framePacing.maxFPS == 30`; one without a declaration gives 60; a declared 10 gives 30, the floor); the row in `Packages/VisualCoreRendering/README.md` and the API baseline (FR-A18-404, 409)
+- [ ] T-A18-402 Add `var maxFramesPerSecond: Int { get }` with a default of 60 to `ExperiencePresenter` in `Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift` and pass it in `ExperienceSession.swift` to `RenderHost(scene:maxFramesPerSecond:budget:)`, documented; `Packages/VisualCoreRendering/Tests/VisualCoreExperienceHostTests/FrameCapTests.swift` (a presenter declaring 30 gives `host.framePacing.maxFPS == 30`; one without a declaration gives 60; a declared 10 gives 30, the floor; `FramePacing` with Low Power Mode or serious heat lowers a requested 60 and keeps a declared 30 at the floor); the row in `Packages/VisualCoreRendering/README.md` and the API baseline (FR-A18-404, 409)
 
 ## Phase 3: Story 1 — a clock that is kind at night (P1) 🎯 MVP
 
@@ -25,7 +25,7 @@ assert. Precedent: `specs/133-ac-p03-themes-favourites/tasks.md`.
 
 ## Phase 5: Story 3 — screen care and keeping the screen on (P2)
 
-- [ ] T-A18-406 [US3] Create `Packages/ExperiencesCreative/AmbientClock/Experience/KeepAwake.swift` (`IdleTimerPort`, `ApplicationIdleTimer` — the only file naming `isIdleTimerDisabled`; `KeepAwakeController.update(setting:visible:)`) wired in the presenter (on at setup or `didBecomeActive` when the setting is on; off at `willResignActive`, `didEnterBackground`, teardown and setting off), and `ExperienceTests/{KeepAwakeTests,ResumeTests,SourceScanTests}.swift` (a recording port through every transition; the resume fixture shows the new time before any draw; the source scan finds `isIdleTimerDisabled` only in `KeepAwake.swift` and `brightness =` nowhere in `Packages/ExperiencesCreative/AmbientClock`) (FR-A18-402, 407, 408; SC-A18-402)
+- [ ] T-A18-406 [US3] Create `Packages/ExperiencesCreative/AmbientClock/Experience/KeepAwake.swift` (`IdleTimerPort`, `ApplicationIdleTimer` — the only file naming `isIdleTimerDisabled`; `KeepAwakeController.update(setting:visible:)`) wired in the presenter (on at setup or `didBecomeActive` when the setting is on; off at `willResignActive`, `didEnterBackground`, teardown and setting off), and `ExperienceTests/{KeepAwakeTests,ResumeTests,SourceScanTests}.swift` (a recording port through every transition; the resume fixture shows the new time before any draw; the presenter's dim factor is 0.6 after 600 s of the fixed clock without an action and 1 after a sent action; the source scan finds `isIdleTimerDisabled` only in `KeepAwake.swift` and `brightness =` nowhere in `Packages/ExperiencesCreative/AmbientClock`) (FR-A18-402, 407, 408; SC-A18-402)
 
 ## Phase 6: Registration and verification
 
