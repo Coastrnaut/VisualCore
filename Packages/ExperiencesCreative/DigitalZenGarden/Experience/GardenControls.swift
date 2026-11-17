@@ -35,6 +35,13 @@
 //   - At the accessibility text sizes every row stacks in one column and the text wraps (never clipped); the
 //     segmented pickers become a column of buttons.
 // The library and picture buttons are native controls only: no gesture is added.
+//
+// Feature 149 (A20-P05) T-A20-503 (FR-A20-501; clarifications Q1, Q3; gap G-QUIET). Three native switches, off by
+// default, each sending its calm action through the presenter (which keeps the switches as `calm.v1`):
+//   - `calm-sound` ("Sound" → `calm.sound [0 / 1]`), `calm-drift` ("Sand drift" → `calm.drift [0 / 1]`) and
+//     `calm-haptics` ("Haptics" → `calm.haptics [0 / 1]`), each spoken "<title>, On" or "<title>, Off".
+// Remove, Previous and Next go through the presenter too, for the removal tone and the selection haptic. When the
+// controls appear the presenter sends the kept switches to a core that lost them (`applyKeptCalm()`).
 import DigitalZenGardenCore
 import Foundation
 import SwiftUI
@@ -125,6 +132,22 @@ struct GardenControls: View {
     /// The spoken value of the picture controls (feature 148).
     static let stillValue = "PNG, \(GardenStill.width) by \(GardenStill.height) pixels"
 
+    /// The calm switches: identifier name, action, title and hint (feature 149).
+    static let calmSwitches: [(name: String, control: String, title: String, hint: String)] = [
+        ("calm-sound", "calm.sound", "Sound", "Plays soft tones when you rake, place or remove a stone"),
+        ("calm-drift", "calm.drift", "Sand drift", "Lets the sand grain drift slowly; Reduce Motion keeps it still"),
+        ("calm-haptics", "calm.haptics", "Haptics", "Plays a light tap when you select or place a stone"),
+    ]
+
+    /// Whether the calm switch `control` is on in `calm` (feature 149).
+    static func isOn(_ control: String, in calm: CalmSettings) -> Bool {
+        switch control {
+        case "calm.sound": return calm.sound
+        case "calm.drift": return calm.drift
+        default: return calm.haptics
+        }
+    }
+
     /// The spoken label of the pattern button at `index`: "Rake rows", "Rake a circle", "Rake a wave", "Rake a
     /// spiral".
     static func patternLabel(_ index: Int) -> String {
@@ -190,6 +213,10 @@ struct GardenControls: View {
         }
         labels.append(GardenControlLabel(name: "still-make", title: "Make picture", value: stillValue))
         if stillReady { labels.append(GardenControlLabel(name: "still-share", title: "Share picture", value: stillValue)) }
+        for calm in calmSwitches {
+            labels.append(GardenControlLabel(name: calm.name, title: calm.title,
+                                             value: isOn(calm.control, in: mirror.calm) ? "On" : "Off"))
+        }
         return labels
     }
 
@@ -229,9 +256,13 @@ struct GardenControls: View {
             }
             if let entries { librarySection(entries, spokenLabels) }
             stillSection(spokenLabels)
+            calmSection(spokenLabels)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .onAppear { if name.isEmpty, let opened = presenter.openedName { name = opened } }
+        .onAppear {
+            if name.isEmpty, let opened = presenter.openedName { name = opened }
+            presenter.applyKeptCalm()
+        }
         .confirmationDialog(Text(verbatim: "Replace the garden called \(replacing ?? "")?"),
                             isPresented: Binding(get: { replacing != nil }, set: { if !$0 { replacing = nil } }),
                             titleVisibility: .visible, presenting: replacing) { target in
@@ -429,12 +460,17 @@ struct GardenControls: View {
         .accessibilityIdentifier(port.identifier("stone-kind"))
     }
 
-    /// A stone button sending `control` with `values`, disabled when `values` is nil.
+    /// A stone button sending `control` with `values`, disabled when `values` is nil; a selection and a removal go
+    /// through the presenter (the selection haptic and the removal tone, feature 149).
     private func stoneButton(_ title: String, name: String, hint: String, values: [Double]?,
                              control: String, _ spokenLabels: [String: GardenControlLabel]) -> some View {
         Button {
             guard let values else { return }
-            port.send(control, values)
+            switch control {
+            case "stone.select": presenter.selectStone(values, port: port)
+            case "stone.remove": presenter.removeStone(port: port)
+            default: port.send(control, values)
+            }
         } label: {
             wrapping(title).frame(minWidth: 44, minHeight: 44)
         }
@@ -468,6 +504,28 @@ struct GardenControls: View {
                     .accessibilityHint(Text(verbatim: "Rakes the pattern into the sand with the chosen rake"))
                     .accessibilityIdentifier(port.identifier("pattern-" + pattern))
                 }
+            }
+        }
+    }
+
+    // MARK: Calm switches (feature 149)
+
+    /// The three calm switches (see the file header), native toggles that wrap at the accessibility sizes.
+    private func calmSection(_ spokenLabels: [String: GardenControlLabel]) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            wrapping("Calm").font(.subheadline).accessibilityAddTraits(.isHeader)
+            ForEach(Self.calmSwitches, id: \.name) { item in
+                Toggle(isOn: Binding(get: { Self.isOn(item.control, in: mirror.calm) },
+                                     set: { on in
+                                         guard on != Self.isOn(item.control, in: mirror.calm) else { return }
+                                         presenter.setCalm(item.control, on: on, port: port)
+                                     })) {
+                    wrapping(item.title)
+                }
+                .frame(minHeight: 44)
+                .accessibilityLabel(Text(verbatim: spokenLabels[item.name]?.title ?? item.title))
+                .accessibilityHint(Text(verbatim: item.hint))
+                .accessibilityIdentifier(port.identifier(item.name))
             }
         }
     }

@@ -49,11 +49,30 @@
 //     refusal) of kind `.rejection`.
 //   - Still: `makeStill(renderer:)` exports the 1600 × 1200 PNG through `GardenStill` for the share control.
 //
+// Feature 149 (A20-P05) T-A20-503 (FR-A20-501–503; clarifications Q1–Q3; contracts/quiet.md; gap G-QUIET):
+//   - Calm switches: the presenter keeps the person's `CalmSettings`, read from the experience value `calm.v1` when it
+//     is made (damaged or missing: all off). A calm action the core accepted (its `calmRevision` moved) is adopted and
+//     written back; a core that lost the switches (a restore or a fresh preparation, revision 0) gets the kept switches
+//     again through the port at the next draw (`applyKeptCalm()`, also run by the controls when they appear).
+//   - Drift: with `calm.drift` on and Reduce Motion off, each draw adds the frame's delta to `driftTime` and the grain
+//     moves by `driftSpeed` (0.01) tray widths per second (`SandScene.grainOffset`, wrapped every `driftPeriod` tray
+//     widths); the cache key then includes the offset, so a frame is drawn each draw (at most 30 per second).
+//     Otherwise the offset is 0, `driftTime` restarts and the cached still frame is reused. Reduce Motion (`reduceMotion`,
+//     read at launch, may turn on later) stops the drift at the next draw without changing the switch. The relief,
+//     stones and shadows never move and nothing flashes, so Reduce Flashing changes nothing.
+//   - Sound: `soundSink` (default `GardenSoundPlayer`, VisualCore's `SoundEffectPlayer`) is enabled only while
+//     `calm.sound` is on; the `stroke` tone follows a committed stroke (a drag or a pattern), `place` a placed stone and
+//     `remove` a removed stone. Every tone stops when the experience suspends (`cancelPointers`) or tears down.
+//   - Haptics: with `calm.haptics` on, `HapticKind.selection` when a stone is selected and `.impactLight` when one is
+//     placed, through `feedback` (the person's switch and the rate limit decide).
+//   Neither sound nor haptics changes the state.
+//
 // No GL call: everything is drawn through VisualCoreRendering's scenes.
 import Foundation
 import DigitalZenGardenCore
 import Observation
 import SwiftUI
+import VisualCoreAudioDSP
 import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreMath
@@ -99,6 +118,8 @@ final class GardenMirror {
     var stillURL: URL?
     /// The sentence of the last still export; nil before one (feature 148).
     var stillMessage: String?
+    /// The calm switches the controls show (feature 149).
+    var calm = CalmSettings.off
 }
 
 /// A touch of the stone tool in progress (feature 147).
@@ -124,8 +145,9 @@ final class GardenPresenter: ExperiencePresenter {
     /// The sentence shown when a stroke is refused because the garden is full.
     static let fullMessage = "The garden holds \(GardenDocument.maxStrokes) strokes. Undo one to rake again."
 
-    /// Whether Reduce Motion was on when the experience was made (nothing animates on its own either way).
-    let reduceMotion: Bool
+    /// Whether Reduce Motion is on: read when the experience was made; turning it on stops the sand drift at the next
+    /// draw without changing the switch (feature 149).
+    var reduceMotion: Bool
     /// Whether the sand uses the 8-bit fallback even where half floats render (tests).
     let forceFallback: Bool
     /// What the controls show.
@@ -166,7 +188,7 @@ final class GardenPresenter: ExperiencePresenter {
     static let tapSlop = 10.0
     /// The spoken selection without a selected stone (feature 147).
     static let noSelectionValue = "No stone selected"
-    /// The frame cap: 30 frames per second (nothing moves on its own).
+    /// The frame cap: 30 frames per second (only the optional sand drift moves on its own).
     var maxFramesPerSecond: Int { 30 }
     /// The spoken value of undo with nothing to undo (feature 148).
     static let nothingToUndo = "nothing to undo"
@@ -186,15 +208,53 @@ final class GardenPresenter: ExperiencePresenter {
     var feedback: ExperienceFeedback = .shared
     /// The name of the garden last saved or opened, the name field's suggestion; nil before one (feature 148).
     var openedName: String?
+    /// Where the tones go (feature 149): `GardenSoundPlayer` in the app, a recording sink in tests (set after the
+    /// factory; a new sink is enabled exactly when the sound switch of the last core seen is on).
+    var soundSink: any GardenSoundSink {
+        didSet { soundSink.isEnabled = lastCore.calm.sound }
+    }
+    /// The launch's storage, which keeps the calm switches as `calm.v1`; nil without storage (feature 149).
+    let storage: ExperienceStorage?
+    /// The person's calm switches: read from `calm.v1` when made, updated when a calm action is accepted (feature 149).
+    private(set) var calm: CalmSettings
+    /// Whether the kept switches are being sent to the core (the follow-ups of those sends are not adopted).
+    private var applyingCalm = false
+    /// Seconds of frame time the drift has run since it last started; 0 while it is off (feature 149).
+    var driftTime = 0.0
+    /// The grain offset of the last draw in tray widths; 0 without drift (feature 149).
+    private(set) var grainOffset = 0.0
+    /// The drift speed: 0.01 tray widths per second of frame time (feature 149).
+    nonisolated static let driftSpeed = 0.01
+    /// The grain offset wraps after this many tray widths (about 2.8 hours of drift), keeping the noise coordinates
+    /// small (feature 149).
+    nonisolated static let driftPeriod = 100.0
 
     /// A presenter; `reduceMotion` is recorded (raking is direct and nothing animates); `forceFallback` stores the
     /// field in `rgba8`; `storage` holds the library (none without it); `still` is the still export (feature 148).
+    /// The calm switches are read from `storage`'s value `calm.v1` (all off without one or for damaged data);
+    /// `soundSink` (nil: `GardenSoundPlayer`) and `feedback` (nil: the shared route) are the test seams of the tones
+    /// and the haptics (feature 149). The sink starts disabled.
     init(reduceMotion: Bool = false, forceFallback: Bool = false, storage: ExperienceStorage? = nil,
-         still: GardenStill = GardenStill()) {
+         still: GardenStill = GardenStill(), soundSink: (any GardenSoundSink)? = nil,
+         feedback: ExperienceFeedback? = nil) {
         self.reduceMotion = reduceMotion
         self.forceFallback = forceFallback
         library = storage.map { GardenLibrary(storage: $0) }
         self.still = still
+        self.storage = storage
+        calm = Self.keptCalm(storage)
+        let sink = soundSink ?? GardenSoundPlayer()
+        sink.isEnabled = false
+        self.soundSink = sink
+        self.feedback = feedback ?? .shared
+        mirror.calm = calm
+    }
+
+    /// The calm switches kept in `storage` as `calm.v1`; all off without storage, without the value or for damaged
+    /// data (feature 149).
+    static func keptCalm(_ storage: ExperienceStorage?) -> CalmSettings {
+        guard let data = storage?.value(for: CalmSettings.storageKey) else { return .off }
+        return CalmSettings.decode(data) ?? .off
     }
 
     /// The shell's current core, or the last core followed (feature 148).
@@ -227,6 +287,8 @@ final class GardenPresenter: ExperiencePresenter {
     /// Brings the field up to `core`, sets the tone and grain of `tier` and draws (the cached picture when nothing
     /// changed).
     func draw(_ core: GardenCore, tier: Int, context: RenderContext, frame: FrameInfo) throws {
+        var core = core
+        if core.calm != calm, applyKeptCalm() { core = coreSource?() ?? core }
         follow(core)
         guard let sand, let cache else { return }
         let pending = drawnPending(core)
@@ -242,17 +304,35 @@ final class GardenPresenter: ExperiencePresenter {
         let tone = GardenPalette.tones[core.toneIndex]
         sand.tone = SIMD3(Float(tone.red), Float(tone.green), Float(tone.blue))
         sand.grain = tier == 0
+        let drifting = core.calm.drift && !reduceMotion
+        if drifting {
+            driftTime += frame.delta.isFinite ? max(frame.delta, 0) : 0
+            grainOffset = Self.driftOffset(seconds: driftTime)
+        } else {
+            driftTime = 0
+            grainOffset = 0
+        }
+        sand.grainOffset = Float(grainOffset)
         var hasher = Hasher()
         hasher.combine(sand.revision)
         hasher.combine(sand.stoneRebuildCount)
         hasher.combine(core.toneIndex)
         hasher.combine(tier)
+        if tier == 0, grainOffset != 0 { hasher.combine(grainOffset.bitPattern) }
         cache.key = hasher.finalize()
         try cache.render(context, frame: frame)
     }
 
-    /// Releases the cache and the sand.
+    /// The grain offset in tray widths after `seconds` of drift: `driftSpeed × seconds`, wrapped every
+    /// `driftPeriod` tray widths (feature 149).
+    nonisolated static func driftOffset(seconds: Double) -> Double {
+        guard seconds.isFinite, seconds > 0 else { return 0 }
+        return (driftSpeed * seconds).truncatingRemainder(dividingBy: driftPeriod)
+    }
+
+    /// Releases the cache and the sand; every tone stops (feature 149).
     func teardown(_ context: RenderContext) {
+        soundSink.stopAll()
         cache?.teardown(context)
         cache = nil
         sand = nil
@@ -298,7 +378,8 @@ final class GardenPresenter: ExperiencePresenter {
             guard activePointer == event.id else { return }
             if isStroking {
                 move(event, viewSize: viewSize, port: port)
-                port.send("stroke.end")
+                let result = port.send("stroke.end")
+                if result.isAccepted, currentCore.lastRefusal == nil { play(.stroke) }
                 announceStrokeRefusal()
             }
             finishPointer()
@@ -361,10 +442,12 @@ final class GardenPresenter: ExperiencePresenter {
         finishPointer()
     }
 
-    /// Forgets every touch in progress without committing a stroke or a stone change and hides the preview.
+    /// Forgets every touch in progress without committing a stroke or a stone change and hides the preview; every
+    /// tone stops (the shell calls it when the experience suspends; feature 149).
     func cancelPointers() {
         cancelStroke()
         resetStoneGesture()
+        soundSink.stopAll()
     }
 
     // MARK: Stone tool
@@ -410,7 +493,7 @@ final class GardenPresenter: ExperiencePresenter {
                     port.send("stone.move", [target.x, target.y])
                 } else if !touch.moved, let tray = TrayFit.trayPoint(event.location, viewSize: viewSize) {
                     let id = TrayFit.isInside(tray) ? StoneSelection.topmost(at: tray, in: lastCore.document.stones) : nil
-                    port.send("stone.select", [Double(id ?? 0)])
+                    selectStone([Double(id ?? 0)], port: port)
                 }
                 stoneTouch = nil
             }
@@ -483,8 +566,15 @@ final class GardenPresenter: ExperiencePresenter {
 
     // MARK: Words, probes and views
 
-    /// Brings the mirror up to `core` (each field written only when it changes).
+    /// Brings the mirror up to `core` (each field written only when it changes); adopts a calm switch the core
+    /// accepted and keeps the sound sink enabled only while the sound is on (feature 149).
     func follow(_ core: GardenCore) {
+        if !applyingCalm, core.calm != calm, core.calmRevision > 0,
+           core.calmRevision != lastCore.calmRevision || core.calm != lastCore.calm {
+            adoptCalm(core.calm)
+        }
+        if soundSink.isEnabled != core.calm.sound { soundSink.isEnabled = core.calm.sound }
+        if mirror.calm != core.calm { mirror.calm = core.calm }
         lastCore = core
         if mirror.rakeStyle != core.rakeStyle { mirror.rakeStyle = core.rakeStyle }
         if mirror.tone != core.toneIndex { mirror.tone = core.toneIndex }
@@ -506,6 +596,72 @@ final class GardenPresenter: ExperiencePresenter {
         let redo = core.history.undone.last.map(Self.phrase) ?? Self.nothingToRedo
         if mirror.redoValue != redo { mirror.redoValue = redo }
         updateSelectionOutline()
+    }
+
+    // MARK: Calm switches (feature 149)
+
+    /// Keeps `settings` as the person's switches and writes them as `calm.v1` (a refused write keeps the switches for
+    /// this session only).
+    private func adoptCalm(_ settings: CalmSettings) {
+        calm = settings
+        try? storage?.setValue(settings.encoded(), for: CalmSettings.storageKey)
+    }
+
+    /// Sends the kept switches that the shell's core does not have yet through the port (none without a port, or
+    /// when the core has them); returns whether anything was accepted. A refused send (the experience is not active)
+    /// is tried again at the next draw.
+    @discardableResult
+    func applyKeptCalm() -> Bool {
+        guard let port, !applyingCalm else { return false }
+        let have = currentCore.calm
+        guard have != calm else { return false }
+        applyingCalm = true
+        defer { applyingCalm = false }
+        var accepted = false
+        let pairs = [("calm.sound", calm.sound, have.sound), ("calm.drift", calm.drift, have.drift),
+                     ("calm.haptics", calm.haptics, have.haptics)]
+        for (control, want, current) in pairs where want != current {
+            if port.send(control, [want ? 1 : 0]).isAccepted { accepted = true }
+        }
+        if accepted { follow(currentCore) }
+        return accepted
+    }
+
+    /// Sets the calm switch `control` (`calm.sound`, `calm.drift` or `calm.haptics`) on or off through `port`; the
+    /// accepted switch is kept as `calm.v1`.
+    @discardableResult
+    func setCalm(_ control: String, on: Bool, port: ExperienceActionPort) -> ActionResult {
+        let result = port.send(control, [on ? 1 : 0])
+        if result.isAccepted { follow(currentCore) }
+        return result
+    }
+
+    /// Plays `sound` through the sink when the sound switch is on (feature 149).
+    private func play(_ sound: GardenSound) {
+        guard currentCore.calm.sound else { return }
+        if !soundSink.isEnabled { soundSink.isEnabled = true }
+        soundSink.play(sound.effect, id: sound.id)
+    }
+
+    /// Whether a haptic may be planned: the haptics switch is on (feature 149; the route then applies the person's
+    /// switch and the rate limit).
+    private var hapticsOn: Bool { currentCore.calm.haptics }
+
+    /// Sends `stone.select` with `values` through `port`; selecting a stone (an id other than 0) plans the selection
+    /// haptic (feature 149).
+    @discardableResult
+    func selectStone(_ values: [Double], port: ExperienceActionPort) -> ActionResult {
+        let result = port.send("stone.select", values)
+        if result.isAccepted, values.first.map({ $0 != 0 }) == true, hapticsOn { feedback.haptic(.selection) }
+        return result
+    }
+
+    /// Sends `stone.remove` through `port`; a removal plays the `remove` tone (feature 149).
+    @discardableResult
+    func removeStone(port: ExperienceActionPort) -> ActionResult {
+        let result = port.send("stone.remove")
+        if result.isAccepted { play(.remove) }
+        return result
     }
 
     // MARK: Announced actions (feature 148)
@@ -555,6 +711,10 @@ final class GardenPresenter: ExperiencePresenter {
     @discardableResult
     func placeStone(kind: Int, port: ExperienceActionPort) -> ActionResult {
         let result = port.send("stone.place", StoneControlValues.place(kind: kind))
+        if result.isAccepted {
+            play(.place)
+            if hapticsOn { feedback.haptic(.impactLight) }
+        }
         if result.code == "action.rule." + GardenRule.stoneCap {
             mirror.stoneCapShown = true
             follow(currentCore)
@@ -567,6 +727,7 @@ final class GardenPresenter: ExperiencePresenter {
     @discardableResult
     func rakePattern(_ index: Int, port: ExperienceActionPort) -> [ActionResult] {
         let results = StrokePatterns.send(StrokePatterns.points(index: index), rake: mirror.rakeStyle, port: port)
+        if results.count > 1, results.last?.isAccepted == true, currentCore.lastRefusal == nil { play(.stroke) }
         announceStrokeRefusal()
         return results
     }

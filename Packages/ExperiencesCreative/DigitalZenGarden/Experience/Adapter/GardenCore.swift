@@ -56,6 +56,18 @@
 // `edit.redo` cover it. The selection and the tool are state, not document: they are compared by `==` but are not in
 // the digest or the snapshot (a restore opens with no selection and the rake). The selection clears when its stone
 // leaves the garden (removal, an undo of its placement, a redo of its removal, a restore or a reset).
+//
+// Feature 149 (A20-P05) T-A20-503 (FR-A20-501–503; clarifications Q1–Q3; data-model.md "Calm settings";
+// contracts/quiet.md; gap G-QUIET). The calm switches, each a whole index 0 (off, the default) or 1 (on;
+// `a20.invalid-choice` otherwise):
+//   calm.sound [0…1]                       soft procedural tones on a stroke commit, a placement and a removal;
+//   calm.drift [0…1]                       a slow sideways drift of the sand grain only (forced off by Reduce Motion at
+//                                          draw time, without changing the switch);
+//   calm.haptics [0…1]                     a light selection haptic and a light impact on placement.
+// They are core state, compared by `==`, but not garden: they are not in the digest or the snapshot, they leave
+// `lastRefusal` and the outcome alone, and a reset keeps them (a preference, like the quality tier). Every accepted calm
+// action raises `calmRevision`, so the presenter can tell a switch the person chose (kept as the experience value
+// `calm.v1`, `CalmSettings`) from a restore, which opens with the switches off and the revision 0.
 import Foundation
 import DigitalZenGardenCore
 import VisualCoreDiagnostics
@@ -92,6 +104,50 @@ enum TrayClamp {
     }
 }
 
+/// The three calm switches of Digital Zen Garden (feature 149): sound, sand drift and haptics, each off by default.
+/// Kept as the experience value ``storageKey`` in the JSON `{"drift":0|1,"haptics":0|1,"sound":0|1}`.
+public struct CalmSettings: Equatable, Sendable {
+    /// The experience value key the switches are kept under: `calm.v1`.
+    public static let storageKey = "calm.v1"
+    /// The defaults: everything off.
+    public static let off = CalmSettings()
+
+    /// Soft procedural tones on a stroke commit, a placement and a removal.
+    public var sound = false
+    /// The slow sideways drift of the sand grain (never under Reduce Motion).
+    public var drift = false
+    /// A light selection haptic and a light impact on placement.
+    public var haptics = false
+
+    /// Settings with each switch as given (all off by default).
+    public init(sound: Bool = false, drift: Bool = false, haptics: Bool = false) {
+        self.sound = sound
+        self.drift = drift
+        self.haptics = haptics
+    }
+
+    /// The JSON of the stored value: `{"drift":0|1,"haptics":0|1,"sound":0|1}` (sorted keys).
+    public func encoded() -> Data {
+        func bit(_ on: Bool) -> String { on ? "1" : "0" }
+        return Data("{\"drift\":\(bit(drift)),\"haptics\":\(bit(haptics)),\"sound\":\(bit(sound))}".utf8)
+    }
+
+    /// The settings of a stored value; nil for damaged data (not a JSON object, a missing key, or a value other than
+    /// the whole numbers 0 and 1).
+    public static func decode(_ data: Data) -> CalmSettings? {
+        guard let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return nil }
+        func bit(_ key: String) -> Bool? {
+            guard let number = object[key] as? NSNumber, CFGetTypeID(number) != CFBooleanGetTypeID() else { return nil }
+            let value = number.doubleValue
+            if value == 0 { return false }
+            if value == 1 { return true }
+            return nil
+        }
+        guard let sound = bit("sound"), let drift = bit("drift"), let haptics = bit("haptics") else { return nil }
+        return CalmSettings(sound: sound, drift: drift, haptics: haptics)
+    }
+}
+
 /// The state of Digital Zen Garden (see the file header). Snapshot schema 1.
 public struct GardenCore: ExperienceCore, Equatable {
     /// The experience's id in the catalog.
@@ -99,12 +155,15 @@ public struct GardenCore: ExperienceCore, Equatable {
     /// The action ids in declaration order.
     public static let actionIDs = ["stroke.begin", "stroke.add", "stroke.end", "rake.style", "sand.tone",
                                    "edit.undo", "edit.redo", "stone.place", "stone.select", "stone.move",
-                                   "stone.rotate", "stone.remove", "tool.mode"]
+                                   "stone.rotate", "stone.remove", "tool.mode", "calm.sound", "calm.drift",
+                                   "calm.haptics"]
     /// The actions a canvas drag sends.
     public static let strokeActionIDs: Set<String> = ["stroke.begin", "stroke.add", "stroke.end"]
     /// The actions a canvas gesture of the stone tool sends: a tap selects, a drag moves, two fingers turn (feature
     /// 147).
     public static let stoneGestureActionIDs: Set<String> = ["stone.select", "stone.move", "stone.rotate"]
+    /// The calm switches' actions: sound, drift and haptics (feature 149).
+    public static let calmActionIDs = ["calm.sound", "calm.drift", "calm.haptics"]
     /// The sentence the controls show when a stone is refused because the garden holds its most stones (feature 147).
     public static let stoneCapMessage = "The garden holds \(GardenDocument.maxStones) stones."
     /// The canvas tool of index 0: raking.
@@ -139,6 +198,11 @@ public struct GardenCore: ExperienceCore, Equatable {
     public private(set) var toolMode = 0
     /// The id of the selected stone; nil when none is. State, not in the digest (feature 147).
     public private(set) var selectedStone: UInt32?
+    /// The calm switches: off by default. State, not in the digest or the snapshot; a reset keeps them (feature 149).
+    public private(set) var calm = CalmSettings.off
+    /// The number of accepted calm actions since the core was made or restored (0 after a restore); a reset keeps it
+    /// (feature 149).
+    public private(set) var calmRevision = 0
     /// The quality tier the host set (0 = level-0, 1 = level-1, clamped); presentation only — not in the digest,
     /// the snapshot or `==`.
     public private(set) var qualityTier = 0
@@ -202,7 +266,7 @@ public struct GardenCore: ExperienceCore, Equatable {
     public static func == (lhs: GardenCore, rhs: GardenCore) -> Bool {
         lhs.history == rhs.history && lhs.inProgress == rhs.inProgress && lhs.inProgressRake == rhs.inProgressRake
             && lhs.rakeStyle == rhs.rakeStyle && lhs.lastRefusal == rhs.lastRefusal && lhs.toolMode == rhs.toolMode
-            && lhs.selectedStone == rhs.selectedStone
+            && lhs.selectedStone == rhs.selectedStone && lhs.calm == rhs.calm && lhs.calmRevision == rhs.calmRevision
     }
 
     /// The selected stone of the garden; nil without a selection (feature 147).
@@ -242,9 +306,12 @@ public struct GardenCore: ExperienceCore, Equatable {
         ExperienceControl(id: "stone.rotate", ranges: [-Double.pi...Double.pi]),
         ExperienceControl(id: "stone.remove", ranges: []),
         ExperienceControl(id: "tool.mode", ranges: [0...1]),
+        ExperienceControl(id: "calm.sound", ranges: [0...1]),
+        ExperienceControl(id: "calm.drift", ranges: [0...1]),
+        ExperienceControl(id: "calm.haptics", ranges: [0...1]),
     ]
 
-    /// The thirteen controls with their declared ranges (see the file header).
+    /// The sixteen controls with their declared ranges (see the file header).
     public static var controls: [ExperienceControl] { declaredControls }
 
     /// The opening state; nothing depends on the seed and no clock is read.
@@ -314,6 +381,14 @@ public struct GardenCore: ExperienceCore, Equatable {
             history.redo()
             dropMissingSelection()
             lastRefusal = nil
+        case "calm.sound", "calm.drift", "calm.haptics":
+            guard let on = Self.choice(v[0], count: 2) else { return invalid }
+            switch action.control {
+            case "calm.sound": calm.sound = on == 1
+            case "calm.drift": calm.drift = on == 1
+            default: calm.haptics = on == 1
+            }
+            calmRevision += 1
         default:
             return applyStone(action.control, v)
         }
@@ -390,11 +465,16 @@ public struct GardenCore: ExperienceCore, Equatable {
         return Int(value)
     }
 
-    /// Back to the opening state; the quality tier, which is not state, is kept.
+    /// Back to the opening state; the quality tier, which is not state, and the calm switches with their revision
+    /// (a preference, not garden; feature 149) are kept.
     public mutating func reset() {
         let tier = qualityTier
+        let calm = self.calm
+        let revision = calmRevision
         self = GardenCore()
         qualityTier = tier
+        self.calm = calm
+        calmRevision = revision
     }
 
     /// `refused-<code>` while the last stroke was refused, else `strokes-<n>` with the garden's stroke count.

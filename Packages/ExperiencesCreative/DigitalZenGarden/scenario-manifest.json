@@ -12,7 +12,10 @@
     "stone.move",
     "stone.rotate",
     "stone.remove",
-    "tool.mode"
+    "tool.mode",
+    "calm.sound",
+    "calm.drift",
+    "calm.haptics"
   ],
   "experience" : "a20.digital-zen-garden",
   "kind" : "creative",

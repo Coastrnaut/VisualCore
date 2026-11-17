@@ -28,6 +28,12 @@
 //     five taps toward the light (2, 4, …, 10 cells), each occluded when the stone height there times 12 cells reaches
 //     beyond the tap, so a taller stone casts a longer shadow.
 //
+// Feature 149 (A20-P05) T-A20-503 (FR-A20-502, FR-A20-503; clarification Q2; data-model.md "Drift"; gap G-QUIET).
+// The sand drift moves the grain only: `grainOffset` (tray widths, set by the presenter: 0.01 per second of frame time
+// with `calm.drift` on and Reduce Motion off, otherwise 0) shifts the `vc_fbm` grain sideways by `u_grainOffset` tray
+// widths. The relief, the stones and their shadows never move, nothing flashes, and with the offset at 0 the picture is
+// exactly the A20-P04 one. The step of mean luminance between two drift frames stays below `maxFrameLuminanceStep`.
+//
 // No GL call: the target, the upload and the pass are VisualCoreRendering's, used inside the host's scene callbacks.
 import Foundation
 import DigitalZenGardenCore
@@ -101,7 +107,8 @@ final class SandScene: RenderScene {
 
     /// The relief fragment (see the file header). Uniforms: `u_sand` (the field), `u_tray` (x, y, width, height in
     /// framebuffer pixels, origin bottom-left), `u_tone` (the sand tone, sRGB, alpha 1), `u_decode` (scale and
-    /// offset from the stored value to the height) and `u_grain` (0 or 1).
+    /// offset from the stored value to the height), `u_grain` (0 or 1) and `u_grainOffset` (the drift of the grain in
+    /// tray widths; feature 149).
     static let reliefFragment = """
     precision highp float;
     #include "vc/hash.glsl"
@@ -115,6 +122,7 @@ final class SandScene: RenderScene {
     uniform vec4 u_tone;
     uniform vec2 u_decode;
     uniform float u_grain;
+    uniform float u_grainOffset;
     out vec4 color;
 
     float zg_height(vec2 cell) {
@@ -172,7 +180,7 @@ final class SandScene: RenderScene {
         }
         shade *= 1.0 - \(SandScene.shadowStrength) * occlusion / 5.0;
         vec3 albedo = vc_srgbDecode(u_tone.rgb) * (0.94 + 0.06 * clamp(h, -1.0, 1.0));
-        float grain = vc_fbm(gl_FragCoord.xy * 0.45, 3, 2.0, 0.5);
+        float grain = vc_fbm((gl_FragCoord.xy + vec2(u_grainOffset * u_tray.z, 0.0)) * 0.45, 3, 2.0, 0.5);
         albedo *= 1.0 + u_grain * 0.08 * grain;
         vec3 lit = clamp(albedo * shade * rim, 0.0, 1.0);
         color = vec4(clamp(vc_srgbEncode(lit), 0.0, 1.0), 1.0);
@@ -209,6 +217,12 @@ final class SandScene: RenderScene {
     var tone = SIMD3<Float>(0.93, 0.89, 0.80)
     /// Whether the grain is drawn (level-0, the full level).
     var grain = false
+    /// The sideways drift of the grain in tray widths (0 without drift; feature 149). Only the grain moves.
+    var grainOffset: Float = 0
+    /// The largest step of mean luminance (a share of full scale) allowed between two consecutive frames: 0.02, a
+    /// fiftieth of full scale, far below a flash (WCAG's general flash threshold is a tenth of full luminance), so
+    /// nothing flashes. The drift only moves the fine grain, whose mean over the tray hardly changes (feature 149).
+    static let maxFrameLuminanceStep = 0.02
     /// The fitted tray of the last frame drawn, in framebuffer pixels (origin bottom-left).
     private(set) var trayPixels = SIMD4<Float>(0, 0, 0, 0)
     /// Grows with every change of the shown field.
@@ -438,7 +452,8 @@ final class SandScene: RenderScene {
                                           height: context.pixelHeight),
                      inputs: ["u_sand": target, "u_stones": stoneTarget],
                      uniforms: ["u_tray": .vec4(trayPixels), "u_tone": .vec4(SIMD4(tone, 1)),
-                                "u_decode": .vec2(Self.decode(format)), "u_grain": .float(grain ? 1 : 0)])
+                                "u_decode": .vec2(Self.decode(format)), "u_grain": .float(grain ? 1 : 0),
+                                "u_grainOffset": .float(grainOffset)])
         drawCount += 1
     }
 

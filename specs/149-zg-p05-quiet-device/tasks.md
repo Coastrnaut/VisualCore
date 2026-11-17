@@ -17,7 +17,7 @@ device step. No VisualCore change. Precedent: `specs/142-lw-p05-device-tests/tas
 
 ## Phase 2: Story 1 — quiet by default (P1) 🎯
 
-- [ ] T-A20-503 [P] [US1] Experience (agent E), per contracts/quiet.md and data-model.md:
+- [X] T-A20-503 [P] [US1] Experience (agent E), per contracts/quiet.md and data-model.md: — Verified 2026-11-17: 2026-11-17: calm.sound, calm.drift, calm.haptics (range 0...1, default 0, outside the digest) as native Toggles Sound, Sand drift, Haptics (calm-sound, calm-drift, calm-haptics); kept as calm.v1 JSON, damaged ignored; grain drift 0.01 tray widths per second only with drift on and Reduce Motion off, still frame reused otherwise, SandScene.maxFrameLuminanceStep 0.02; GardenSounds stroke, place, remove (0.14-0.22 s, 190-320 Hz, gain 0.12-0.16) through GardenSoundSink over SoundEffectPlayer, enabled only with sound on, stopped on suspend; haptics .selection and .impactLight via ExperienceFeedback only with haptics on; .autonomy/checks/A20-P05.zg-ios27.json exit 0; written by an agent, retested
   - `Experience/Adapter/GardenCore.swift`: controls `calm.sound`, `calm.drift`, `calm.haptics` "∈ {0, 1}, default 0;
     core state outside the digest"; each a native switch with a spoken label in `Experience/GardenControls.swift`;
   - storage: "stored as the experience value `calm.v1` (JSON `{sound, drift, haptics}`), ignored when damaged",
