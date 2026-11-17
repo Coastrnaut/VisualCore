@@ -9,5 +9,5 @@
 - **`StoneSelection`:** `topmost(at:in:)` (the highest-depth stone whose shape contains the point, or nil);
   `cycle(from:direction:in:)` in depth order, wrapping.
 - **`GardenCore` additions:** `toolMode` (0 rake, 1 stones), `selectedStone` (UInt32?, state only); actions
-  `stone.place` [3], `stone.select` [2], `stone.cycle` [1], `stone.move` [2], `stone.rotate` [1], `stone.remove` [],
-  `tool.mode` [1].
+  `stone.place` [3], `stone.select` [1: id, 0 = none], `stone.move` [2], `stone.rotate` [1], `stone.remove` [],
+  `tool.mode` [1]; selecting an id that no stone has is refused without a change.

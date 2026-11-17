@@ -11,7 +11,7 @@ before this record (CHK010).
 
 ## Completeness
 
-- [x] CHK001 Are every stone action, its values and its ranges specified? [Spec §Q2, data-model] — yes (seven actions).
+- [x] CHK001 Are every stone action, its values and its ranges specified? [Spec §Q2, data-model] — yes (six actions; corrected by analyze: selection by id).
 - [x] CHK002 Are the shapes of all five kinds defined by numbers (exponents, heights, wobble)? [Spec §Q1, data-model] — yes.
 - [x] CHK003 Are the selection rule, its display and its spoken label specified? [Spec §FR-A20-303, Q4] — yes.
 - [x] CHK004 Are native alternatives defined for every stone gesture? [Spec §Q3] — yes.

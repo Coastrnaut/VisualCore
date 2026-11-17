@@ -48,8 +48,10 @@ in code:
     one picture per document, and a CPU reference to test against (recorded in the contract).
 - Q: What are the actions? → A:
   - `stone.place` [kind 0…4, x, y];
-  - `stone.select` [x, y]: the topmost stone containing the point, or none on empty sand;
-  - `stone.cycle` [direction 0 previous, 1 next], in depth order;
+  - `stone.select` [id 0…4,294,967,295]: selects the stone with that id, or none for 0 (ids start at 1). The
+    presenter finds the topmost stone under a tap with the pure `StoneSelection.topmost(at:in:)`, and the native
+    previous and next controls find the neighbour in depth order with `StoneSelection.cycle`. Both send the same
+    action, so the gesture action is also a native action;
   - `stone.move` [x, y]: the selected stone's new centre, clamped inside the tray;
   - `stone.rotate` [angle −π…π]: the selected stone's new rotation;
   - `stone.remove` [];
@@ -63,7 +65,8 @@ in code:
   - **Stone tool:** a tap selects. A one-finger drag that starts on the selected stone moves it: the presenter shows
     the drag and sends one `stone.move` when the finger lifts. A two-finger rotation turns the selected stone, with
     one `stone.rotate` at the end.
-  - **Native controls:** the tool toggle; a kind picker with "Place" (at the tray centre); previous and next stone;
+  - **Native controls:** the tool toggle; a kind picker with "Place" (at the tray centre); previous and next stone
+    (`stone.select` with the neighbour's id);
     turn left and right by 15°; nudges of 0.02 tray widths in four directions; "Remove"; undo and redo.
   - **Gesture alternatives:** the gesture actions are the stroke actions plus `stone.select`, `stone.move` and
     `stone.rotate`, all of which are native actions too.
