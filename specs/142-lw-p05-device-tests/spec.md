@@ -24,6 +24,52 @@ Canonical overrides:
 - **Experience A19 inside the one app:** still a candidate; interface tests launch it with the candidates argument.
 - Follow `specs/135-ac-p05-device-qa`.
 
+## Clarifications
+
+### Session 2026-11-17
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- The controls already carry the identifiers `export`, `export-progress`, `export-cancel`, `export-retry`,
+  `export-message`, `export-notice`, `export-offered`, `share`, `help`, `result-help` and `clear-history`, under the
+  prefix `experience.a19.living-wallpapers.` (`WallpaperControls.swift`).
+- The presenter's export limit comes from the context's maximum texture size, which on the simulator is larger than
+  every template, so no template is refused there.
+- Other experiences read a launch argument for tests (`-uitestTemporaryBookmarks` in Fractal Explorer). The interface
+  chunks are named in `scripts/release_check.py`; `z2` is the last, and serial chunks are listed in `SERIAL_CHUNKS`.
+- Ambient Clock's `device-campaign.md` is the plan's format: rows, device, procedure, threshold and status "pending
+  device campaign".
+- The phase starts at `bdb9fb1a` (the specify commit).
+
+- Q: Which interface tests run, and in which chunk? → A: A new serial chunk `a3`, with `LWExportUITests` and
+  `LWClaimsUITests`, launched like `ACSupport` with the candidates argument:
+  - `LWExportUITests`:
+    - a fresh start exports the iPhone SE template;
+    - progress reaches its end, the result line names "PNG", the size and "sRGB", the share control appears, and
+      the history lists the export;
+    - a second test sets the export limit and shows the notice, then exports at the offered size.
+  - `LWClaimsUITests` collects every static text and button label of the experience and of its help sheet, and finds
+    none of the refused phrases. The help says the person sets the wallpaper.
+- Q: How does the interface test get a size that does not fit? → A: A launch argument `-lwExportLimit <n>`, read
+  only under `DEBUG || VISUALCORE_AUTOMATION`. It caps the presenter's export limit at n. Shipping builds ignore it,
+  and a unit test covers the parsing and the cap.
+- Q: Which campaign rows does the plan hold? → A: Rows LW-D1 to LW-D8 in `docs/apps/living-wallpapers/device-campaign.md`:
+  - LW-D1: the size limit recorded on each device;
+  - LW-D2: the largest template (iPad Pro 13-inch landscape) exports, or falls back as its notice says;
+  - LW-D3: the written file's size and colour profile, read back on the device and after Save Image in Photos;
+  - LW-D4: the thermal state during ten largest exports, every 5 s;
+  - LW-D5: the memory footprint during the largest export;
+  - LW-D6: the add-only Photos prompt on the first Save Image;
+  - LW-D7: the declined path, where Files still works;
+  - LW-D8: the accessibility audits at the default and the largest text size.
+
+  Each row has its device (D1, D2, D3), procedure, threshold and "pending device campaign". No number is claimed.
+- Q: Is a VisualCore change needed? → A: No. The contract's G-DEVICE closes with the plan, and its rows wait for
+  devices.
+- Q: What does the regression fixture refuse? → A: The phrases of the platform and help scans ("live wallpaper",
+  "set as wallpaper", "automatically", "sets your wallpaper", "installs", "animated wallpaper"), case-insensitive,
+  over the collected interface texts. The source scans stay as they are.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - The export journey works in the app (Priority: P1) 🎯
