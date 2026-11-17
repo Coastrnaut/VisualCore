@@ -52,3 +52,7 @@ T-A18-405 and the tests of 406. Lead: registry, manifest, README, API baseline, 
 
 MVP: night mode with its contrast rule (403, 404). Motion and the frame cap (402, 405) and screen care with keep-awake
 (406) close the phase. Review checkpoints after 402 and at 409.
+
+## Phase 8: Convergence
+
+- [ ] T-A18-412 Record the as-built design in `specs/134-ac-p04-power-visibility/data-model.md`, `research.md` and `contracts/power.md`: the shader's night and drift values are six float uniforms joined by `#define u_night` and `#define u_drift` (`FullScreenShaderScene` binds floats only); `IdleTimerPort.keepsScreenAwake` so only `KeepAwake.swift` names `isIdleTimerDisabled`; `Experience.maxFramesPerSecond` (default 60) forwarded by `ExperienceShell`, because the session holds the experience; the shown drift rounded to 0.5 point; `noteAction()` counts control and favourite actions, not `time.set` or `time.changed`; a night frame is checked as not black with a non-zero spread, because the dimmed palette is below the non-blank spread of 8. Per data-model and contracts/power.md (contradicts)
