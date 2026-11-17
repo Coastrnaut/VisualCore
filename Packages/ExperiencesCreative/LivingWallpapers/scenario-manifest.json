@@ -1,0 +1,396 @@
+{
+  "controls" : [
+    "scene.select",
+    "scene.preset",
+    "scene.parameter",
+    "canvas.template",
+    "canvas.orientation",
+    "scene.time",
+    "export.format",
+    "motion.enabled"
+  ],
+  "experience" : "a19.living-wallpapers",
+  "kind" : "creative",
+  "scenarios" : [
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+        "initialDigest" : "dec58bda89ca15695d43b054d800bec6588e96a84ca9e7da539675112a16d6e7"
+      },
+      "name" : "launch-first-frame",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "scene.preset",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "scene.parameter",
+            "values" : [
+              1,
+              0.80000000000000004
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "canvas.template",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ae6c0efca583128b650429ec658d0d4a4fd3f670534515318a667087e8dd63a4",
+        "initialDigest" : "dec58bda89ca15695d43b054d800bec6588e96a84ca9e7da539675112a16d6e7"
+      },
+      "name" : "input-response",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "scene.select",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "outcome" : "scene-ripple-dunes"
+      },
+      "name" : "completion",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "scene.select",
+            "values" : [
+              4
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "scene.preset",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "action.rule.a19.invalid-choice",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "scene.parameter",
+            "values" : [
+              0,
+              9
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "scene.time",
+            "values" : [
+              3601
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "canvas.orientation",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "action.rule.a19.invalid-choice",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "motion.enabled",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "scene.parameter",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+
+      },
+      "name" : "rejection",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "scene.preset",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "scene.parameter",
+            "values" : [
+              1,
+              0.80000000000000004
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "canvas.template",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ae6c0efca583128b650429ec658d0d4a4fd3f670534515318a667087e8dd63a4",
+        "initialDigest" : "dec58bda89ca15695d43b054d800bec6588e96a84ca9e7da539675112a16d6e7"
+      },
+      "name" : "save-restore",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "scene.preset",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "scene.parameter",
+            "values" : [
+              1,
+              0.80000000000000004
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "canvas.template",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "initialDigest" : "dec58bda89ca15695d43b054d800bec6588e96a84ca9e7da539675112a16d6e7",
+        "resetDigest" : true
+      },
+      "name" : "reset",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "suspend-resume",
+      "seed" : "1"
+    },
+    {
+      "cycles" : 5,
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "teardown-reentry",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "cancel-prepare",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "scene.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "3325825fd3c02bc765e76ac12940766658804e5a74344f83a03c389f55adac5d",
+        "initialDigest" : "dec58bda89ca15695d43b054d800bec6588e96a84ca9e7da539675112a16d6e7",
+        "outcome" : "scene-ink-flow"
+      },
+      "name" : "fixture-scene-ink-flow",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "scene.preset",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b7fa86ce5b9bebfd7700f50d582164bd0e0937e754fc875e367e9c01449b0ba1",
+        "initialDigest" : "dec58bda89ca15695d43b054d800bec6588e96a84ca9e7da539675112a16d6e7",
+        "outcome" : "scene-aurora-bands"
+      },
+      "name" : "fixture-preset-third",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canvas.template",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "canvas.orientation",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ac7823cc233c50be575e69a19afdf59d310dc3b3cce0fe20a89692c9cf7ce75e",
+        "initialDigest" : "dec58bda89ca15695d43b054d800bec6588e96a84ca9e7da539675112a16d6e7",
+        "outcome" : "scene-aurora-bands"
+      },
+      "name" : "fixture-template-ipad-landscape",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "scene.time",
+            "values" : [
+              42.5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8e74edc72bf513dcb8bc9f1c91d0cb13791179a13173af2e5c83e45d7f760513",
+        "initialDigest" : "dec58bda89ca15695d43b054d800bec6588e96a84ca9e7da539675112a16d6e7",
+        "outcome" : "scene-aurora-bands"
+      },
+      "name" : "fixture-time-set",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "scene.parameter",
+            "values" : [
+              0,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9c1378cb113f3e63f10e2dd317ef3f965e9b4f066396a140d0957c36e5b8a27d",
+        "initialDigest" : "dec58bda89ca15695d43b054d800bec6588e96a84ca9e7da539675112a16d6e7",
+        "outcome" : "scene-aurora-bands"
+      },
+      "name" : "fixture-parameter-changed",
+      "seed" : "1"
+    }
+  ],
+  "schema" : 1
+}
