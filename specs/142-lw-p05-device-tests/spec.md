@@ -75,7 +75,9 @@ in code:
 ### User Story 1 - The export journey works in the app (Priority: P1) 🎯
 
 In the one app, a person opens Living Wallpapers, picks a device, exports, sees the progress finish, the result line,
-the share control and the new history entry; a cancelled export leaves no share control.
+the share control and the new history entry. Cancellation and error recovery stay proven by A19-P04's
+`ExportJobTests` (a cancelled export leaves no file and no share control); an export of the smallest template
+finishes too fast to cancel reliably in the interface.
 
 **Why this priority**: the MVP proven at the interface.
 
