@@ -32,7 +32,7 @@ raise a system prompt; no wall-clock assert. Precedent: `specs/124-ia-p01-conten
 
 ## Phase 6: Story 3 — heard correctly (P2)
 
-- [ ] T-A18-109 [US3] Write `Packages/ExperiencesCreative/AmbientClock/CoreTests/SpokenTimeTests.swift`: the spoken string names the time (with the period for 12-hour) and the date when shown, for each locale; a run of minute `time.set` actions announces nothing; `time.speak` bursts within 0.5 s post at most one (FR-A18-107)
+- [X] T-A18-109 [US3] Write `Packages/ExperiencesCreative/AmbientClock/CoreTests/SpokenTimeTests.swift`: the spoken string names the time (with the period for 12-hour) and the date when shown, for each locale; a run of minute `time.set` actions announces nothing; `time.speak` bursts within 0.5 s post at most one (FR-A18-107) — Verified 2026-11-16: 2026-11-16: SpokenTimeTests (9: spoken time and date in four locales, no announcement over 60 minute changes, time.speak rate-limited at 0.5 s) pass; 2026-11-16: .autonomy/checks/A18-P01.ac-core-ios27.json exit 0 (59 tests in 6 suites, 0.033 s, iOS 27.2)
 
 ## Phase 7: Records and evidence
 
