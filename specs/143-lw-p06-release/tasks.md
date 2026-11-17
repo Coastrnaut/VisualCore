@@ -32,7 +32,7 @@ migration, no VisualCore change).
 
 ## Phase 6: Records and evidence
 
-- [ ] T-A19-609 Living Wallpapers tests on sim-27.2 (`--name lw-ios27`; each under 10 s) and the documented API (`--name documented-api`) (SC-A19-604)
+- [X] T-A19-609 Living Wallpapers tests on sim-27.2 (`--name lw-ios27`; each under 10 s) and the documented API (`--name documented-api`) (SC-A19-604) — Verified 2026-11-17: 2026-11-17: .autonomy/checks/A19-P06.lw-ios27.json exit 0 (52 core, 76 experience tests on sim-27.2; the slowest suite under 3 s) and A19-P06.documented-api.json exit 0, both read before this tick
 - [ ] T-A19-610 App build, unit and interface chunk (`xcodegen generate --spec project.yml`; `--name app-ui -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27 app-ui-ios27-a3`) and the runner (`--name verify-27`) (SC-A19-604)
 - [ ] T-A19-611 Release build checks (`--name release-checks -- python3 scripts/release_check.py --only app-release-build app-release-symbols app-privacy-manifest app-no-tracking app-licenses app-usage-descriptions experience-release-a19 copy-claims-a19`)
 - [ ] T-A19-612 Contract: G-RELEASE closed by "A19-P06"; rows whose gaps are all closed become available with evidence (`--name contract`); packages, catalog and script tests
