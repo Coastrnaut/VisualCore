@@ -43,7 +43,7 @@
     - `prefs.v1` is byte-identical;
     - a new session over the same storage opens on Violet veil with the sound on
   (FR-A21-603; SC-A21-602)
-- [ ] T-A21-605 [P] [US2] Commit the stored samples and test them:
+- [X] T-A21-605 [P] [US2] Commit the stored samples and test them: — Verified 2026-11-17: 2026-11-17: seven samples in ExperienceTests/Fixtures (snapshot v1, newer, damaged; prefs current, newer, damaged, out-of-range), generated once through the real encoders, no UUID or path; the Fixtures resource in Package.swift; StoredSampleTests (5: v1 restores with its digest, newer refused as snapshot.newer-schema, damaged as snapshot.corrupt; current prefs open on Violet veil, sound on, volume 0.4; newer, damaged and out-of-range open the defaults with their codes; every file byte-identical); .autonomy/checks/A21-P06.au-ios27.json exit 0; written by an agent, retested
   - commit `ExperienceTests/Fixtures/{snapshot-v1,snapshot-newer,snapshot-damaged,prefs-current,prefs-newer,
     prefs-damaged,prefs-out-of-range}.json`, generated once through the real encoders;
   - declare the `Fixtures` resource of `AuroraExperienceTests` in `Packages/ExperiencesCreative/Package.swift` (lead);
