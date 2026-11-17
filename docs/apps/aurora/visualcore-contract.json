@@ -454,7 +454,7 @@
    "id": "M06",
    "capability": "Version 0.1 feature 01: three procedural sky presets with aurora ribbons, stars and cloud layers",
    "source": "manual v0.1 feature 01; manual §13 risk 1; spec clarification Q3",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
@@ -491,7 +491,7 @@
     "file": "Packages/ExperiencesCreative/LivingWallpapers/Experience/SceneShaders.swift",
     "symbol": "SceneShaders"
    },
-   "notes": "The drawing primitives exist; the three presets and palettes are G-SCENE and the ribbon (slowly advected fbm colour bands), star (hashed, bounded twinkle) and cloud (fbm layers) shaders are G-SKY, both app-local in A21-P01. 2D layered shaders, never volumetric (risk 1)."
+   "notes": "The drawing primitives exist; the three presets and palettes are G-SCENE and the ribbon (slowly advected fbm colour bands), star (hashed, bounded twinkle) and cloud (fbm layers) shaders are G-SKY, both app-local in A21-P01. 2D layered shaders, never volumetric (risk 1). G-SCENE closed in A21-P01 (SkyScene, SkyPresets; SceneTests, PresetTests). G-SKY closed in A21-P01 (SkyShader aurora-sky.frag, SkyNoise, SkyReference; NoiseTests, SkyRenderTests drawing off screen through FullScreenShaderScene; the presenter of A21-P02 draws it in the app). Available."
   },
   {
    "id": "M07",
@@ -528,7 +528,7 @@
     "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/Adapter/GenerativeArtCore.swift",
     "symbol": "GenerativeArtCore"
    },
-   "notes": "Bounded parameters are tested (ParametersTests, ParameterEditorTests, ExperienceActionTests). The parameter ranges and their validation are G-SCENE (A21-P01); the controls are G-CONTROLS (A21-P02). Numbers are decided with their tests (research D4a)."
+   "notes": "Bounded parameters are tested (ParametersTests, ParameterEditorTests, ExperienceActionTests). The parameter ranges and their validation are G-SCENE (A21-P01); the controls are G-CONTROLS (A21-P02). Numbers are decided with their tests (research D4a). G-SCENE closed in A21-P01 (SkyScene, SkyPresets; SceneTests, PresetTests)."
   },
   {
    "id": "M08",
@@ -737,13 +737,13 @@
     "file": "Packages/ExperiencesCreative/AmbientClock/Core/ThemePreset.swift",
     "symbol": "ThemePreset"
    },
-   "notes": "Tested in ExperienceSnapshotTests, StateDigestTests, SnapshotMigrationCheckTests and ParametersTests. The scene model is G-SCENE (app-local, A21-P01); a snapshot schema above 1 needs registered schema examples (earlier-gate lesson)."
+   "notes": "Tested in ExperienceSnapshotTests, StateDigestTests, SnapshotMigrationCheckTests and ParametersTests. The scene model is G-SCENE (app-local, A21-P01); a snapshot schema above 1 needs registered schema examples (earlier-gate lesson). G-SCENE closed in A21-P01 (SkyScene, SkyPresets; SceneTests, PresetTests)."
   },
   {
    "id": "M13",
    "capability": "Ribbon, star and cloud layers drawn in bounded full-screen passes over vc/, at two quality levels",
    "source": "spec FR-A21-003; spec clarification Q3; manual §13 risk 1",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
@@ -774,7 +774,7 @@
     "file": "Packages/ExperiencesCreative/DigitalAquarium/Experience/CausticsScene.swift",
     "symbol": "CausticsScene"
    },
-   "notes": "The pass machinery is tested (FullScreenShaderSceneTests, ShaderBundleTests); the shaders, their octave counts and the two levels are G-SKY (app-local, A21-P01)."
+   "notes": "The pass machinery is tested (FullScreenShaderSceneTests, ShaderBundleTests); the shaders, their octave counts and the two levels are G-SKY (app-local, A21-P01). G-SKY closed in A21-P01 (SkyShader aurora-sky.frag, SkyNoise, SkyReference; NoiseTests, SkyRenderTests drawing off screen through FullScreenShaderScene; the presenter of A21-P02 draws it in the app). Available."
   },
   {
    "id": "M14",
@@ -848,7 +848,7 @@
     "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidFieldsScene.swift",
     "symbol": "FluidFieldsScene"
    },
-   "notes": "Tested in RenderHostTests, PingPongTargetTests, SessionPhaseMemoryTests and SessionLifecycleTests. The sky passes rebuild with G-SKY (A21-P01) and the composite and transition targets with G-COMPOSITE (A21-P03)."
+   "notes": "Tested in RenderHostTests, PingPongTargetTests, SessionPhaseMemoryTests and SessionLifecycleTests. The sky passes rebuild with G-SKY (A21-P01) and the composite and transition targets with G-COMPOSITE (A21-P03). G-SKY closed in A21-P01 (SkyShader aurora-sky.frag, SkyNoise, SkyReference; NoiseTests, SkyRenderTests drawing off screen through FullScreenShaderScene; the presenter of A21-P02 draws it in the app)."
   },
   {
    "id": "M16",
@@ -885,7 +885,7 @@
     "file": "Packages/ExperiencesCreative/AmbientClock/Experience/AmbientPresenter.swift",
     "symbol": "AmbientPresenter"
    },
-   "notes": "Scene resize is tested (CrossfadeSceneTests, CachedSceneTests, FullScreenShaderSceneTests). Aurora's passes resize with G-SKY (A21-P01) and its composite targets with G-COMPOSITE (A21-P03)."
+   "notes": "Scene resize is tested (CrossfadeSceneTests, CachedSceneTests, FullScreenShaderSceneTests). Aurora's passes resize with G-SKY (A21-P01) and its composite targets with G-COMPOSITE (A21-P03). G-SKY closed in A21-P01 (SkyShader aurora-sky.frag, SkyNoise, SkyReference; NoiseTests, SkyRenderTests drawing off screen through FullScreenShaderScene; the presenter of A21-P02 draws it in the app)."
   },
   {
    "id": "M17",
@@ -934,7 +934,7 @@
     "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/Adapter/FluidArtCore.swift",
     "symbol": "FluidArtCore"
    },
-   "notes": "Tested in QualityProfileTests, QualityGovernorTests, QualityPolicyTests and SessionQualityTests. Aurora's two levels (octaves, cloud layers) are declared with its first presenter (G-SKY)."
+   "notes": "Tested in QualityProfileTests, QualityGovernorTests, QualityPolicyTests and SessionQualityTests. Aurora's two levels (octaves, cloud layers) are declared with its first presenter (G-SKY). G-SKY closed in A21-P01 (SkyShader aurora-sky.frag, SkyNoise, SkyReference; NoiseTests, SkyRenderTests drawing off screen through FullScreenShaderScene; the presenter of A21-P02 draws it in the app). Available."
   },
   {
    "id": "M18",
@@ -971,7 +971,7 @@
     "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/PlaygroundView.swift",
     "symbol": "PlaygroundView"
    },
-   "notes": "Tested in AccessibilityPreferencesTests, SystemAccessibilityObserverTests and SceneClockTests; the app passes both through ExperienceLaunch.reduceMotion and reduceFlashing. The reduced-motion stable frame is G-CLOCK (A21-P01); labels and Dynamic Type controls are G-CONTROLS and the \"Show controls\" action is G-CHROME (A21-P02)."
+   "notes": "Tested in AccessibilityPreferencesTests, SystemAccessibilityObserverTests and SceneClockTests; the app passes both through ExperienceLaunch.reduceMotion and reduceFlashing. The reduced-motion stable frame is G-CLOCK (A21-P01); labels and Dynamic Type controls are G-CONTROLS and the \"Show controls\" action is G-CHROME (A21-P02). G-CLOCK closed in A21-P01 (SkyClock over SceneClock; ClockTests, ReducedMotionFrameTests)."
   },
   {
    "id": "M19",
@@ -1070,7 +1070,7 @@
     "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/Adapter/GenerativeArtCore.swift",
     "symbol": "GenerativeArtCore"
    },
-   "notes": "Tested in SceneClockTests and FramePacingTests. FullScreenShaderScene uses FrameInfo.time (wall-clock) unless fixedTime is set; wiring the rendered clock is G-CLOCK (A21-P01); the low-power cadence without a time jump is measured in G-DEVICE (A21-P05)."
+   "notes": "Tested in SceneClockTests and FramePacingTests. FullScreenShaderScene uses FrameInfo.time (wall-clock) unless fixedTime is set; wiring the rendered clock is G-CLOCK (A21-P01); the low-power cadence without a time jump is measured in G-DEVICE (A21-P05). G-CLOCK closed in A21-P01 (SkyClock over SceneClock; ClockTests, ReducedMotionFrameTests)."
   },
   {
    "id": "M22",
@@ -1253,7 +1253,7 @@
    "justification": "The sky scene (three presets, palettes, the colour, motion and intensity parameters with their bounds), its schema, validation and migration are the experience's domain, GPU-free in its Core (manual phase 01). No VisualCore change is planned (spec clarification Q3); a second user would justify moving it upstream later (Principle II).",
    "phase": 1,
    "test": "Core host tests: each preset round-trips and migrates; truncated, newer, NaN, infinite and out-of-range values refused or clamped to the declared bounds; every action stays within 24 values; the digest is stable for the same inputs",
-   "closed": null
+   "closed": "A21-P01"
   },
   {
    "id": "G-SKY",
@@ -1269,7 +1269,7 @@
    "justification": "The aurora ribbon (slowly advected fbm colour bands), starfield (hashed, bounded twinkle) and cloud (fbm layers) shaders over vc/, drawn as 2D FullScreenShaderScene passes at two quality levels and rebuilt after resize and context loss (manual phase 01, risk 1). No VisualCore change is planned (spec clarification Q3); a second user would justify moving it upstream later (Principle II).",
    "phase": 1,
    "test": "Experience tests: every shader compiles through ShaderBundle; each preset renders non-empty and within its declared brightness range on the iOS 27.x simulator; level 1 draws fewer octaves than level 0; passes rebuild after recreateContext and resize with the same output; license inventory lists the shaders",
-   "closed": null
+   "closed": "A21-P01"
   },
   {
    "id": "G-CLOCK",
@@ -1282,7 +1282,7 @@
    "justification": "The rendered clock (SceneClock advanced by frame deltas into FullScreenShaderScene.fixedTime, never FrameInfo.time) and the reduced-motion stable frame are the experience's policy (spec clarification Q3). No VisualCore change is planned (spec clarification Q3); a second user would justify moving it upstream later (Principle II).",
    "phase": 1,
    "test": "Core and experience tests: a long background gap advances rendered time by at most SceneClock.maxDelta; Reduce Motion gives the same frame on consecutive draws; the shader time equals the clock time",
-   "closed": null
+   "closed": "A21-P01"
   },
   {
    "id": "G-CONTROLS",

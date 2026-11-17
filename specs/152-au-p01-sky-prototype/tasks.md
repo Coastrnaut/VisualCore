@@ -58,7 +58,7 @@ VisualCore change. Precedent: `specs/145-zg-p01-document-strokes/tasks.md`. Roll
   AuroraCoreTests`; each test under 10 s), the purity scan (`--name core-purity`) and the documented API (`--name
   documented-api -- python3 scripts/check_documented_api.py --sources Packages/ExperiencesCreative/Aurora`) (review
   checkpoint; SC-A21-104, FR-A21-107)
-- [ ] T-A21-111 Contract `docs/apps/aurora/visualcore-contract.json`: G-SCENE, G-SKY and G-CLOCK closed by "A21-P01";
+- [X] T-A21-111 Contract `docs/apps/aurora/visualcore-contract.json`: G-SCENE, G-SKY and G-CLOCK closed by "A21-P01"; — Verified 2026-11-17: 2026-11-17: .autonomy/checks/A21-P01.contract.json exit 0; G-SCENE, G-SKY and G-CLOCK closed by A21-P01; M06, M13 and M17 available; the rest stay open for their later gaps
   rows whose gaps are all closed become available with evidence (`--name contract -- python3
   scripts/check_app_contract.py --app aurora --render`)
 - [ ] T-A21-112 Packages, catalog, script tests and the app build (`--name experience-packages`, `--name catalog --
