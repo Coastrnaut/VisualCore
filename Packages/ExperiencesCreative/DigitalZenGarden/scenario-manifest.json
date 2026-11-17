@@ -1,0 +1,904 @@
+{
+  "controls" : [
+    "stroke.begin",
+    "stroke.add",
+    "stroke.end",
+    "rake.style",
+    "sand.tone",
+    "edit.undo",
+    "edit.redo"
+  ],
+  "experience" : "a20.digital-zen-garden",
+  "kind" : "creative",
+  "scenarios" : [
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+        "initialDigest" : "705a3b42b6f4ec3c7d0b3b80985d212b5feb7072934343bbbd136972c45dc7ca"
+      },
+      "name" : "launch-first-frame",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "stroke.begin",
+            "values" : [
+              0.10000000000000001,
+              0.5,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "stroke.add",
+            "values" : [
+              0.16666666666666669,
+              0.49583333333333335,
+              0.23333333333333334,
+              0.4916666666666667,
+              0.30000000000000004,
+              0.48749999999999999,
+              0.3666666666666667,
+              0.48333333333333334,
+              0.43333333333333335,
+              0.47916666666666669,
+              0.5,
+              0.47499999999999998,
+              0.56666666666666676,
+              0.47083333333333333,
+              0.6333333333333333,
+              0.46666666666666667,
+              0.70000000000000007,
+              0.46250000000000002,
+              0.76666666666666672,
+              0.45833333333333337,
+              0.83333333333333337,
+              0.45416666666666666,
+              0.90000000000000002,
+              0.45000000000000001
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "stroke.end",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "sand.tone",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "rake.style",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e077700cdca49c0b8a563c3686e6c39d929cd8b5ea71872feeeab2b62b3b1fe5",
+        "initialDigest" : "705a3b42b6f4ec3c7d0b3b80985d212b5feb7072934343bbbd136972c45dc7ca"
+      },
+      "name" : "input-response",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "stroke.begin",
+            "values" : [
+              0.29999999999999999,
+              0.20000000000000001,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "stroke.add",
+            "values" : [
+              0.33333333333333331,
+              0.25,
+              0.36666666666666664,
+              0.30000000000000004,
+              0.39999999999999997,
+              0.35000000000000003,
+              0.43333333333333329,
+              0.40000000000000002,
+              0.46666666666666667,
+              0.45000000000000007,
+              0.5,
+              0.5,
+              0.53333333333333333,
+              0.55000000000000004,
+              0.56666666666666665,
+              0.60000000000000009,
+              0.59999999999999998,
+              0.65000000000000013,
+              0.6333333333333333,
+              0.70000000000000018,
+              0.66666666666666663,
+              0.75,
+              0.69999999999999996,
+              0.80000000000000004
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "stroke.end",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "outcome" : "strokes-1"
+      },
+      "name" : "completion",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "stroke.add",
+            "values" : [
+              0.5,
+              0.5,
+              0.5,
+              0.5,
+              0.5,
+              0.5,
+              0.5,
+              0.5,
+              0.5,
+              0.5,
+              0.5,
+              0.5,
+              0.5,
+              0.5,
+              0.5,
+              0.5,
+              0.5,
+              0.5,
+              0.5,
+              0.5,
+              0.5,
+              0.5,
+              0.5,
+              0.5
+            ]
+          },
+          "result" : "action.rule.a20.no-stroke",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "stroke.end",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.a20.no-stroke",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "edit.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.a20.nothing-to-undo",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "edit.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.a20.nothing-to-redo",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "stroke.begin",
+            "values" : [
+              1.5,
+              0.5,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "stroke.begin",
+            "values" : [
+              0.5,
+              0.5,
+              0.5
+            ]
+          },
+          "result" : "action.rule.a20.invalid-choice",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "stroke.begin",
+            "values" : [
+              0.5,
+              0.5
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "stroke.add",
+            "values" : [
+              0.5,
+              0.5
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "rake.style",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "rake.style",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "action.rule.a20.invalid-choice",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "sand.tone",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+
+      },
+      "name" : "rejection",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "stroke.begin",
+            "values" : [
+              0.10000000000000001,
+              0.5,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "stroke.add",
+            "values" : [
+              0.16666666666666669,
+              0.49583333333333335,
+              0.23333333333333334,
+              0.4916666666666667,
+              0.30000000000000004,
+              0.48749999999999999,
+              0.3666666666666667,
+              0.48333333333333334,
+              0.43333333333333335,
+              0.47916666666666669,
+              0.5,
+              0.47499999999999998,
+              0.56666666666666676,
+              0.47083333333333333,
+              0.6333333333333333,
+              0.46666666666666667,
+              0.70000000000000007,
+              0.46250000000000002,
+              0.76666666666666672,
+              0.45833333333333337,
+              0.83333333333333337,
+              0.45416666666666666,
+              0.90000000000000002,
+              0.45000000000000001
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "stroke.end",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "sand.tone",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "rake.style",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e077700cdca49c0b8a563c3686e6c39d929cd8b5ea71872feeeab2b62b3b1fe5",
+        "initialDigest" : "705a3b42b6f4ec3c7d0b3b80985d212b5feb7072934343bbbd136972c45dc7ca"
+      },
+      "name" : "save-restore",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "stroke.begin",
+            "values" : [
+              0.10000000000000001,
+              0.5,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "stroke.add",
+            "values" : [
+              0.16666666666666669,
+              0.49583333333333335,
+              0.23333333333333334,
+              0.4916666666666667,
+              0.30000000000000004,
+              0.48749999999999999,
+              0.3666666666666667,
+              0.48333333333333334,
+              0.43333333333333335,
+              0.47916666666666669,
+              0.5,
+              0.47499999999999998,
+              0.56666666666666676,
+              0.47083333333333333,
+              0.6333333333333333,
+              0.46666666666666667,
+              0.70000000000000007,
+              0.46250000000000002,
+              0.76666666666666672,
+              0.45833333333333337,
+              0.83333333333333337,
+              0.45416666666666666,
+              0.90000000000000002,
+              0.45000000000000001
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "stroke.end",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "sand.tone",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "rake.style",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "initialDigest" : "705a3b42b6f4ec3c7d0b3b80985d212b5feb7072934343bbbd136972c45dc7ca",
+        "resetDigest" : true
+      },
+      "name" : "reset",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "suspend-resume",
+      "seed" : "1"
+    },
+    {
+      "cycles" : 5,
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "teardown-reentry",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "cancel-prepare",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "stroke.begin",
+            "values" : [
+              0.14999999999999999,
+              0.29999999999999999,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "stroke.add",
+            "values" : [
+              0.20833333333333331,
+              0.30416666666666664,
+              0.26666666666666666,
+              0.30833333333333335,
+              0.32499999999999996,
+              0.3125,
+              0.3833333333333333,
+              0.31666666666666665,
+              0.44166666666666665,
+              0.3208333333333333,
+              0.5,
+              0.32499999999999996,
+              0.55833333333333335,
+              0.32916666666666666,
+              0.61666666666666659,
+              0.33333333333333331,
+              0.67499999999999993,
+              0.33749999999999997,
+              0.73333333333333339,
+              0.34166666666666667,
+              0.79166666666666663,
+              0.34583333333333333,
+              0.84999999999999998,
+              0.34999999999999998
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "stroke.end",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "stroke.begin",
+            "values" : [
+              0.20000000000000001,
+              0.69999999999999996,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "stroke.add",
+            "values" : [
+              0.25,
+              0.69166666666666665,
+              0.30000000000000004,
+              0.68333333333333335,
+              0.35000000000000003,
+              0.67499999999999993,
+              0.40000000000000002,
+              0.66666666666666663,
+              0.45000000000000007,
+              0.65833333333333333,
+              0.5,
+              0.64999999999999991,
+              0.55000000000000004,
+              0.64166666666666661,
+              0.60000000000000009,
+              0.6333333333333333,
+              0.65000000000000013,
+              0.625,
+              0.70000000000000018,
+              0.6166666666666667,
+              0.75,
+              0.60833333333333328,
+              0.80000000000000004,
+              0.59999999999999998
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "stroke.end",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7c278b9db842c5d420af125b29d9ab12c53d2fe0205a47ffe6ed9c9c3264cb64",
+        "initialDigest" : "705a3b42b6f4ec3c7d0b3b80985d212b5feb7072934343bbbd136972c45dc7ca",
+        "outcome" : "strokes-2"
+      },
+      "name" : "fixture-raked-garden",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "rake.style",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "stroke.begin",
+            "values" : [
+              0.5,
+              0.14999999999999999,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "stroke.add",
+            "values" : [
+              0.49583333333333335,
+              0.20833333333333331,
+              0.4916666666666667,
+              0.26666666666666666,
+              0.48749999999999999,
+              0.32499999999999996,
+              0.48333333333333334,
+              0.3833333333333333,
+              0.47916666666666669,
+              0.44166666666666665,
+              0.47499999999999998,
+              0.5,
+              0.47083333333333333,
+              0.55833333333333335,
+              0.46666666666666667,
+              0.61666666666666659,
+              0.46250000000000002,
+              0.67499999999999993,
+              0.45833333333333337,
+              0.73333333333333339,
+              0.45416666666666666,
+              0.79166666666666663,
+              0.45000000000000001,
+              0.84999999999999998
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "stroke.end",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e43bd803909c696020ec3f54a2361652837b49a2867743627267a72bdfeca84b",
+        "initialDigest" : "705a3b42b6f4ec3c7d0b3b80985d212b5feb7072934343bbbd136972c45dc7ca",
+        "outcome" : "strokes-1"
+      },
+      "name" : "fixture-wide-rake",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "stroke.begin",
+            "values" : [
+              0.14999999999999999,
+              0.29999999999999999,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "stroke.add",
+            "values" : [
+              0.20833333333333331,
+              0.30416666666666664,
+              0.26666666666666666,
+              0.30833333333333335,
+              0.32499999999999996,
+              0.3125,
+              0.3833333333333333,
+              0.31666666666666665,
+              0.44166666666666665,
+              0.3208333333333333,
+              0.5,
+              0.32499999999999996,
+              0.55833333333333335,
+              0.32916666666666666,
+              0.61666666666666659,
+              0.33333333333333331,
+              0.67499999999999993,
+              0.33749999999999997,
+              0.73333333333333339,
+              0.34166666666666667,
+              0.79166666666666663,
+              0.34583333333333333,
+              0.84999999999999998,
+              0.34999999999999998
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "stroke.end",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "edit.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "705a3b42b6f4ec3c7d0b3b80985d212b5feb7072934343bbbd136972c45dc7ca",
+        "initialDigest" : "705a3b42b6f4ec3c7d0b3b80985d212b5feb7072934343bbbd136972c45dc7ca",
+        "outcome" : "strokes-0"
+      },
+      "name" : "fixture-undo",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "stroke.begin",
+            "values" : [
+              0.14999999999999999,
+              0.29999999999999999,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "stroke.add",
+            "values" : [
+              0.20833333333333331,
+              0.30416666666666664,
+              0.26666666666666666,
+              0.30833333333333335,
+              0.32499999999999996,
+              0.3125,
+              0.3833333333333333,
+              0.31666666666666665,
+              0.44166666666666665,
+              0.3208333333333333,
+              0.5,
+              0.32499999999999996,
+              0.55833333333333335,
+              0.32916666666666666,
+              0.61666666666666659,
+              0.33333333333333331,
+              0.67499999999999993,
+              0.33749999999999997,
+              0.73333333333333339,
+              0.34166666666666667,
+              0.79166666666666663,
+              0.34583333333333333,
+              0.84999999999999998,
+              0.34999999999999998
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "stroke.end",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "edit.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "edit.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "284af41b427ff89582de759d7355834a8853153667a91765169bf317ffedd3f6",
+        "initialDigest" : "705a3b42b6f4ec3c7d0b3b80985d212b5feb7072934343bbbd136972c45dc7ca",
+        "outcome" : "strokes-1"
+      },
+      "name" : "fixture-redo",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sand.tone",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d98950a93258ccf7b829f32c9af436fb7b5de53d8ff21e3fd8baaeeda3541ce7",
+        "initialDigest" : "705a3b42b6f4ec3c7d0b3b80985d212b5feb7072934343bbbd136972c45dc7ca",
+        "outcome" : "strokes-0"
+      },
+      "name" : "fixture-tone",
+      "seed" : "1"
+    }
+  ],
+  "schema" : 1
+}
