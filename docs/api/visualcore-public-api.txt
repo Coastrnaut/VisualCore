@@ -561,6 +561,8 @@ VisualCoreEffectsGraph | var | public var passes: [EffectPassDescription]
 VisualCoreEffectsGraph | var | public var scale: Double
 VisualCoreEffectsGraph | var | public var type: String
 VisualCoreEffectsGraph | var | public var version: Int
+VisualCoreExperience | class | public final class FixedClock: ClockSource
+VisualCoreExperience | class | public final class TimeChangeMonitor: Sendable
 VisualCoreExperience | enum | public enum AccessibilityChoice: String, Sendable, Codable, CaseIterable
 VisualCoreExperience | enum | public enum ActionRejection: Error, Sendable, Equatable, Codable
 VisualCoreExperience | enum | public enum ActionResult: Sendable, Equatable, Codable
@@ -605,6 +607,8 @@ VisualCoreExperience | enum | public enum SnapshotError: Error, Sendable, Equata
 VisualCoreExperience | enum | public enum SnapshotMigrationCheck
 VisualCoreExperience | enum | public enum StorageError: Error, Sendable, Equatable
 VisualCoreExperience | enum | public enum StorageQuota
+VisualCoreExperience | enum | public enum TimeChangeKind: String, CaseIterable, Sendable
+VisualCoreExperience | func | public func advance(by interval: TimeInterval)
 VisualCoreExperience | func | public func diagnostics(gpu: GPUResourceCounts? = nil) -> ExperienceDiagnostics
 VisualCoreExperience | func | public func digest() throws(ExperienceError) -> StateDigest
 VisualCoreExperience | func | public func encode(to encoder: any Encoder) throws
@@ -633,9 +637,12 @@ VisualCoreExperience | func | public func rule(forFile path: String) -> Inventor
 VisualCoreExperience | func | public func rule(forKey key: String) -> InventoryRule?
 VisualCoreExperience | func | public func save(_ snapshot: ExperienceSnapshot) throws(StorageError) -> Bool
 VisualCoreExperience | func | public func search(_ text: String) -> [ExperienceDescriptor]
+VisualCoreExperience | func | public func set(_ instant: Date)
 VisualCoreExperience | func | public func setValue(_ data: Data, for key: String) throws(StorageError)
 VisualCoreExperience | func | public func snapshotPayload() throws -> Data
+VisualCoreExperience | func | public func start()
 VisualCoreExperience | func | public func stateURL(for id: ExperienceID) -> URL
+VisualCoreExperience | func | public func stop()
 VisualCoreExperience | func | public func title(of category: ExperienceCategory) -> String?
 VisualCoreExperience | func | public func unlisted(files: [String], keys: [String]) -> [String]
 VisualCoreExperience | func | public func value(for key: String) -> Data?
@@ -719,8 +726,10 @@ VisualCoreExperience | init | public init()
 VisualCoreExperience | init | public init(_ control: String, _ values: [Double] = [])
 VisualCoreExperience | init | public init(_ descriptor: ExperienceDescriptor)
 VisualCoreExperience | init | public init(_ failure: ExperienceFailure, stage: SessionStage)
+VisualCoreExperience | init | public init(_ instant: Date)
 VisualCoreExperience | init | public init(_ text: String) throws(ExperienceIDError)
 VisualCoreExperience | init | public init(build: String, automation: Bool, qualityTier: Int?, entitlement: String, process: String)
+VisualCoreExperience | init | public init(center: NotificationCenter = .default,
 VisualCoreExperience | init | public init(code: String, message: String)
 VisualCoreExperience | init | public init(code: String, newer: Bool)
 VisualCoreExperience | init | public init(commit: String? = nil, dirty: Bool? = nil, tree: String? = nil, submodules: [String: String]? = nil,
@@ -797,6 +806,7 @@ VisualCoreExperience | let | public let capabilities: [String]
 VisualCoreExperience | let | public let catalogSHA256: String
 VisualCoreExperience | let | public let categories: [Entry]
 VisualCoreExperience | let | public let category: ExperienceCategory
+VisualCoreExperience | let | public let center: NotificationCenter
 VisualCoreExperience | let | public let check: ConformanceCheck
 VisualCoreExperience | let | public let checksum: String
 VisualCoreExperience | let | public let code: ExperienceCode
@@ -864,6 +874,7 @@ VisualCoreExperience | let | public let minY: Int
 VisualCoreExperience | let | public let missingRegistrations: [ExperienceID]
 VisualCoreExperience | let | public let moves: [Move]
 VisualCoreExperience | let | public let name: String
+VisualCoreExperience | let | public let names: [Notification.Name: TimeChangeKind]
 VisualCoreExperience | let | public let newer: Bool
 VisualCoreExperience | let | public let nonBlank: Bool
 VisualCoreExperience | let | public let number: Int
@@ -946,6 +957,7 @@ VisualCoreExperience | let | public static let dominanceMargin
 VisualCoreExperience | let | public static let expectedDigestKey
 VisualCoreExperience | let | public static let experienceKey
 VisualCoreExperience | let | public static let format
+VisualCoreExperience | let | public static let foundationNames: [Notification.Name: TimeChangeKind]
 VisualCoreExperience | let | public static let hostFailedCode
 VisualCoreExperience | let | public static let launchCodes: [String]
 VisualCoreExperience | let | public static let lightChannelSpread
@@ -995,6 +1007,7 @@ VisualCoreExperience | let | public static let unreadableCopyKey
 VisualCoreExperience | let | public static let unreadableFileCode
 VisualCoreExperience | let | public static let unspecifiedCode
 VisualCoreExperience | let | public static let version
+VisualCoreExperience | protocol | public protocol ClockSource: Sendable
 VisualCoreExperience | protocol | public protocol ExperienceCore: Sendable
 VisualCoreExperience | struct | public struct Artifacts: Sendable, Equatable, Codable
 VisualCoreExperience | struct | public struct CatalogManifest: Sendable, Equatable
@@ -1066,6 +1079,7 @@ VisualCoreExperience | struct | public struct SourceMoveMap: Sendable, Equatable
 VisualCoreExperience | struct | public struct StateDigest: Hashable, Sendable, Codable, CustomStringConvertible
 VisualCoreExperience | struct | public struct Step: Sendable, Equatable, Codable
 VisualCoreExperience | struct | public struct StepObservation: Sendable, Equatable, Codable
+VisualCoreExperience | struct | public struct SystemClock: ClockSource
 VisualCoreExperience | struct | public struct Timing: Sendable, Equatable, Codable
 VisualCoreExperience | var | public private(set) var acceptedActions
 VisualCoreExperience | var | public private(set) var clock: FixedStepClock
@@ -1154,6 +1168,7 @@ VisualCoreExperience | var | public var integrationGate: String
 VisualCoreExperience | var | public var isAccepted: Bool
 VisualCoreExperience | var | public var isMatch: Bool
 VisualCoreExperience | var | public var isOriginal: Bool
+VisualCoreExperience | var | public var isRunning: Bool
 VisualCoreExperience | var | public var isWithinLimits: Bool
 VisualCoreExperience | var | public var kind: String
 VisualCoreExperience | var | public var lastCloseCounts: GPUResourceCounts?
@@ -1177,6 +1192,7 @@ VisualCoreExperience | var | public var message: String
 VisualCoreExperience | var | public var missingEntryPoints: Int?
 VisualCoreExperience | var | public var name: String
 VisualCoreExperience | var | public var nonBlank: Bool
+VisualCoreExperience | var | public var now: Date
 VisualCoreExperience | var | public var observed: String
 VisualCoreExperience | var | public var onTime: Int
 VisualCoreExperience | var | public var opens: Int
@@ -1319,6 +1335,7 @@ VisualCoreExperienceHost | let | public let process: String
 VisualCoreExperienceHost | let | public let renderer: RendererRecord?
 VisualCoreExperienceHost | let | public let session: ExperienceSession
 VisualCoreExperienceHost | let | public let snapshot: ExperienceSnapshot?
+VisualCoreExperienceHost | let | public static let applicationNames: [Notification.Name: TimeChangeKind]
 VisualCoreExperienceHost | let | public static let back
 VisualCoreExperienceHost | let | public static let cancel
 VisualCoreExperienceHost | let | public static let canvas

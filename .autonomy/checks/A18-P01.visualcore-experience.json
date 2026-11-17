@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "VisualCoreExperienceTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter VisualCoreExperienceTests",
+  "elapsed_seconds": 2.907,
+  "exit_code": 0,
+  "finished": "2026-11-17T02:25:41+00:00",
+  "log": ".autonomy/logs/A18-P01.visualcore-experience.log",
+  "log_sha256": "59908b7e72118f600322d2875fc3f417fefa67a99a6382a7c926a44f2e5fa3a4",
+  "name": "visualcore-experience",
+  "stage": "A18-P01",
+  "started": "2026-11-17T02:25:39+00:00",
+  "timed_out": false
+}
