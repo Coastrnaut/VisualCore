@@ -82,3 +82,7 @@ commits.
 
 MVP: the adapter, presenter and controls (203, 204). The limit (205) proves the regression fixture; the chrome (206)
 the feature 06 slice. Review checkpoint at 209. One commit per task.
+
+## Phase 6: Convergence
+
+- [ ] T-A21-213 Record the as-built design in `specs/153-au-p02-scene-controls/data-model.md` and `contracts/experience.md`: the knee starts at 5/6 × limit (so the default 0.72 is exactly the A21-P01 knee); only a preset change starts the 1.5 s blend, a control moved during a blend retargets it with its progress kept, re-selecting the current preset snaps, and opening or restoring shows the state at once; the palette expands to five stops (the sky and four ribbon slots) and a ribbon on one side only fades during a blend; `reset()` returns the limit to 0.6; restore refusals `SkyRestoreRefusal` (damaged, scene, out-of-range hue or limit); the rule `a21.not-whole`; the outcome `preset-<id>`; the tap is presentation only (no gesture action) per data-model and contract (unrequested)
