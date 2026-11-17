@@ -1320,7 +1320,7 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     "LivingWallpapersExperience",
                                     # Feature 146 (A20-P02): Digital Zen Garden, integrated at X-A20.
                                     "DigitalZenGardenExperience",
-                                    # Feature 153 (A21-P02): Aurora, a candidate until X-A21.
+                                    # Feature 153 (A21-P02): Aurora, integrated at X-A21.
                                     "AuroraExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):

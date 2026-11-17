@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a21.aurora",
+    "--runtime",
+    "27"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a21.aurora --runtime 27",
+  "elapsed_seconds": 48.884,
+  "exit_code": 0,
+  "finished": "2026-11-17T12:45:54+00:00",
+  "gate": "X-A21",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-A21.sim27.log",
+  "log_sha256": "15dfe18e8cc6a850310e919eddb379a12286477b762fe67c2a1ac16054fadfff",
+  "name": "sim27",
+  "started": "2026-11-17T12:45:05+00:00",
+  "timed_out": false
+}

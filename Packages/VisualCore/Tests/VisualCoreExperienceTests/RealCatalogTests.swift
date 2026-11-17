@@ -29,7 +29,7 @@ enum CatalogFixture {
     }
 
     @Test func onlyExperiencesWithAPassingIntegrationGateAreAvailable() throws {
-        // X-A01 to X-A20 are pass in the migration ledger (2026-11-13 to 2026-11-17); the build tool is the only
+        // X-A01 to X-A21 are pass in the migration ledger (2026-11-13 to 2026-11-17); the build tool is the only
         // writer of this flag.
         #expect(try CatalogFixture.manifest().available.map(\.id.rawValue) == ["a01.generative-art-studio", "a02.fluid-art-playground", "a03.fractal-explorer",
                          "a04.particle-universe", "a05.infinite-geometry", "a06.visualcore-music-lab",
@@ -39,7 +39,8 @@ enum CatalogFixture {
                          "a15.molecular-explorer", "a16.simulation-lab",
                          "a17.interactive-anatomy", "a18.ambient-clock",
                          "a19.living-wallpapers",
-                         "a20.digital-zen-garden"])
+                         "a20.digital-zen-garden",
+                         "a21.aurora"])
     }
 
     @Test func everyIdIsInTheGoldenListAndWellFormed() throws {
@@ -116,7 +117,7 @@ enum CatalogFixture {
                                "a19.living-wallpapers",
                                // Feature 146 (A20-P02); integrated at X-A20.
                                "a20.digital-zen-garden",
-                               // Feature 153 (A21-P02); a candidate until X-A21.
+                               // Feature 153 (A21-P02); integrated at X-A21.
                                "a21.aurora"],
                 "the registrations of Catalog/registrations.json")
     }

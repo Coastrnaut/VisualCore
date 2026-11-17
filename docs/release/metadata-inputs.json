@@ -171,9 +171,17 @@
         "photo-library-add"
       ],
       "tier": "free"
+    },
+    {
+      "category": "ambient",
+      "code": "A21",
+      "id": "a21.aurora",
+      "name": "Aurora",
+      "permissions": [],
+      "tier": "free"
     }
   ],
-  "ledger_sha256": "b0b41c27e13bc0209ba34b13d2570f9177ab12b69cbfa3aab675655cf9a6b665",
+  "ledger_sha256": "abbe20b470de9a517a8f36e3b785afd7a4fe3ca2887ed6c2e12db2ecf00038d8",
   "privacy_answers": "unproven",
   "schema": 1
 }

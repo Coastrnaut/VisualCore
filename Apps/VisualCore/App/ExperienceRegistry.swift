@@ -72,7 +72,7 @@ struct ExperienceRegistration: Sendable {
 /// The explicit list of registered experiences.
 enum ExperienceRegistry {
     /// Every registered experience, in catalog order: those whose X gate is pass (X-A01, X-A02 and X-A03, recorded
-    /// 2026-11-13 after UA-F07; X-A04 recorded 2026-11-13 after A04-P06; X-A05 recorded 2026-11-14 after A05-P06; X-A06 recorded 2026-11-14 after A06-P06; X-A07 recorded 2026-11-14 after A07-P06; X-A08 recorded 2026-11-14 after A08-P06; X-A09 recorded 2026-11-14 after A09-P06; X-A10 recorded 2026-11-15 after A10-P06; X-A11 recorded 2026-11-15 after A11-P06; X-A12 recorded 2026-11-15 after A12-P06; X-A13 recorded 2026-11-15 after A13-P06; X-A14 recorded 2026-11-15 after A14-P06; X-A15 recorded 2026-11-16 after A15-P06; X-A16 recorded 2026-11-16 after A16-P06; X-A17 recorded 2026-11-16 after A17-P06; X-A18 recorded 2026-11-16 after A18-P06; X-A19 recorded 2026-11-17 after A19-P06; X-A20 recorded 2026-11-17 after A20-P06).
+    /// 2026-11-13 after UA-F07; X-A04 recorded 2026-11-13 after A04-P06; X-A05 recorded 2026-11-14 after A05-P06; X-A06 recorded 2026-11-14 after A06-P06; X-A07 recorded 2026-11-14 after A07-P06; X-A08 recorded 2026-11-14 after A08-P06; X-A09 recorded 2026-11-14 after A09-P06; X-A10 recorded 2026-11-15 after A10-P06; X-A11 recorded 2026-11-15 after A11-P06; X-A12 recorded 2026-11-15 after A12-P06; X-A13 recorded 2026-11-15 after A13-P06; X-A14 recorded 2026-11-15 after A14-P06; X-A15 recorded 2026-11-16 after A15-P06; X-A16 recorded 2026-11-16 after A16-P06; X-A17 recorded 2026-11-16 after A17-P06; X-A18 recorded 2026-11-16 after A18-P06; X-A19 recorded 2026-11-17 after A19-P06; X-A20 recorded 2026-11-17 after A20-P06; X-A21 recorded 2026-11-17 after A21-P06).
     static let all: [ExperienceRegistration] = [generativeArtStudio, fluidArtPlayground, fractalExplorer,
                                                 particleUniverse, infiniteGeometry,
                                                 visualCoreMusicLab, audioOdyssey,
@@ -80,13 +80,13 @@ enum ExperienceRegistry {
                                                 physicsPlayground, tinyWorlds, lightMaze,
                                                 solarSystemExplorer, molecularExplorer, simulationLab,
                                                 interactiveAnatomy, ambientClock, livingWallpapers,
-                                                digitalZenGarden].compactMap { $0 }
+                                                digitalZenGarden, aurora].compactMap { $0 }
 
     /// The adopted experiences before their X gate (feature 193, FR-U07-021; clarification 4), in catalog order:
     /// each carries its scenario manifest, so that the verification runner can open it, but it stays unavailable
     /// in the catalog and outside `all`. Debug builds show them with `-vcCandidates`. Recording an experience's X
     /// gate moves its registration from here to `all`.
-    static let candidates: [ExperienceRegistration] = [aurora].compactMap { $0 }
+    static let candidates: [ExperienceRegistration] = []
 
     /// A01 Generative Art Studio (feature 193, US1).
     private static var generativeArtStudio: ExperienceRegistration? {
@@ -442,8 +442,8 @@ extension ExperienceRegistry {
         return registration
     }
 
-    /// A21 Aurora (feature 153, A21-P02): a candidate until X-A21. Snapshot schema 1, so no earlier example is stored
-    /// yet.
+    /// A21 Aurora (features 151–157, A21-P00…P06): integrated at X-A21 (2026-11-17). Snapshot schema 1, so no earlier
+    /// example is stored yet.
     fileprivate static var aurora: ExperienceRegistration? {
         guard let id = AuroraExperience.id else { return nil }
         var registration = ExperienceRegistration(id: id, core: SkyCore.self) { launch in

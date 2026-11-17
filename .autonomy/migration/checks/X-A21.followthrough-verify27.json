@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a21.aurora",
+    "--runtime",
+    "27"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a21.aurora --runtime 27",
+  "elapsed_seconds": 0.139,
+  "exit_code": 0,
+  "finished": "2026-11-17T12:54:57+00:00",
+  "gate": "X-A21",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-A21.followthrough-verify27.log",
+  "log_sha256": "a8d8f6a20c11358521645d24ba997e9b86ed51ee6725f5912bfae28dc6fe7800",
+  "name": "followthrough-verify27",
+  "started": "2026-11-17T12:54:57+00:00",
+  "timed_out": false
+}

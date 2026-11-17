@@ -1,7 +1,8 @@
 // AUSupport — feature 156 (A21-P05) T-A21-506, T-A21-507 (FR-A21-506; SC-A21-503): helpers of the interface tests of
-// Aurora (A21) inside the one app, modelled on `ZGSupport`. Every launch carries `-vcCandidates` (DebugLaunch: the
-// candidates' catalog entries become available and are registered; harmless once A21 is integrated). A fresh start
-// erases the data (`-vcResetData`, so the stored sky preferences are gone), skips the welcome and opens the experience
+// Aurora (A21) inside the one app, modelled on `ZGSupport`. A21 was a candidate until X-A21 (integrated 2026-11-17);
+// every launch carries `-vcCandidates` (DebugLaunch: the candidates' catalog entries become available and are
+// registered; harmless now that A21 is integrated). A fresh start erases the data (`-vcResetData`, so the stored sky
+// preferences are gone), skips the welcome and opens the experience
 // directly with `-openExperience a21.aurora`; a relaunch (`AU.relaunch`) is the same start without the reset, so the
 // stored preferences (the sound choice and the volume among them) survive. A fresh sky is Polar night, sound Off,
 // volume 50 %, Still sky Off and Reduced flashing Off.
