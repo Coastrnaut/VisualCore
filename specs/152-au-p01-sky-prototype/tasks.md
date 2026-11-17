@@ -61,7 +61,7 @@ VisualCore change. Precedent: `specs/145-zg-p01-document-strokes/tasks.md`. Roll
 - [X] T-A21-111 Contract `docs/apps/aurora/visualcore-contract.json`: G-SCENE, G-SKY and G-CLOCK closed by "A21-P01"; — Verified 2026-11-17: 2026-11-17: .autonomy/checks/A21-P01.contract.json exit 0; G-SCENE, G-SKY and G-CLOCK closed by A21-P01; M06, M13 and M17 available; the rest stay open for their later gaps
   rows whose gaps are all closed become available with evidence (`--name contract -- python3
   scripts/check_app_contract.py --app aurora --render`)
-- [ ] T-A21-112 Packages, catalog, script tests and the app build (`--name experience-packages`, `--name catalog --
+- [X] T-A21-112 Packages, catalog, script tests and the app build (`--name experience-packages`, `--name catalog -- — Verified 2026-11-17: 2026-11-17: .autonomy/checks/A21-P01.experience-packages.json (20 experiences, a pending core), A21-P01.catalog.json, A21-P01.script-tests.json and A21-P01.app-build.json, all exit 0
   python3 scripts/build_catalog.py --check`, `--name script-tests -- python3 scripts/test_scripts.py`, `--name app-build
   -- python3 scripts/release_check.py --only app-build-for-testing-ios27`)
 - [ ] T-A21-113 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
