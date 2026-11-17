@@ -9,6 +9,8 @@
   `reducedMotion` or speed 0; `phase = time / 600` in 0…1.
 - **SkyShader:** source `aurora-sky.frag` (`#include "vc/noise.glsl"`), uniforms `u_phase`, `u_ribbons`,
   `u_turbulence`, `u_cloudiness`, `u_stars`, `u_octaves`, the palette; levels: 0 → 5 octaves, 1 → 3.
+- **Star twinkle:** each star's brightness varies by at most ±30 % of its base over the loop; star size is at most
+  1.5 pixels at the reference size.
 - **SkyReference:** per-pixel colour at a resolution, phase and level, from the same formulas.
 - **Tolerances:** mean absolute channel difference ≤ 2/255, largest ≤ 8/255; luminance (Rec. 709, sRGB-decoded)
   ≤ 0.75 per pixel and ≥ 0.02 mean; off-screen size 64 × 48.

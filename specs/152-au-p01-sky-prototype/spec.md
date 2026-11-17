@@ -139,7 +139,8 @@ never jumps. With Reduce Motion on, consecutive frames are identical.
   MUST be clamped to its bound or refused, as documented.
 - **FR-A21-104**: The sky MUST be drawn as layered passes (stars, clouds, ribbons) from shader sources the core
   provides as data; each preset's off-screen picture MUST match its reference computed without the GPU within a
-  documented tolerance, and its brightness MUST stay within the declared range.
+  documented tolerance, and its brightness MUST stay within the declared range; after a context loss and after a resize the drawing MUST
+  match its reference again.
 - **FR-A21-105**: Two quality levels MUST exist; the lower level MUST draw fewer noise octaves.
 - **FR-A21-106**: The sky's time MUST advance only by drawn-frame deltas with each step bounded; with Reduce Motion
   on or speed zero, consecutive frames MUST be identical.
