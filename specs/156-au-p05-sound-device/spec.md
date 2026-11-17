@@ -179,7 +179,8 @@ speaker with the silent switch, and the accessibility audits.
 - **FR-A21-501**: The sound MUST be off on a first start; turning it on MUST play the experience's ambient loop while
   Aurora is on screen in the active app, and turning it off MUST stop it.
 - **FR-A21-502**: The volume control (0–100 %) MUST set the loop's volume at once, and the sound choice MUST be kept
-  and restored with the preferences.
+  and restored with the preferences; the spoken hints of the sound and volume controls MUST describe the loop that plays (no
+  longer "nothing plays").
 - **FR-A21-503**: Building, tearing down, rebuilding, pausing or resuming the drawing MUST neither start nor stop the
   loop nor change the sound choice; the sound choice MUST never change the sky's state, digest or scenario manifest.
 - **FR-A21-504**: Leaving Aurora, an interruption or moving to the background MUST stop the loop; showing Aurora again
