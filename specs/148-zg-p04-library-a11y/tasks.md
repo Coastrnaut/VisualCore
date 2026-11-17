@@ -24,7 +24,7 @@ VisualCore change. Precedent: `specs/141-lw-p04-save-share/tasks.md`. Rollback: 
 
 ## Phase 5: Story 4 — share a still (P2)
 
-- [ ] T-A20-405 [US4] Create `Packages/ExperiencesCreative/DigitalZenGarden/Experience/GardenStill.swift` (1600 × 1200 PNG from `experienceStillRenderer`, one file in `TemporaryFolder("DigitalZenGarden-Still")`, replaced by the next export, removed after a failure) with a `ShareLink` control; write `ExperienceTests/StillTests.swift` (the size and PNG type read back; a second export replaces the first; a failure leaves no file); set the registration's permissions to `["photo-library-add"]` in `Catalog/registrations.json` and rebuild the catalog (lead) (FR-A20-405, 406)
+- [X] T-A20-405 [US4] Create `Packages/ExperiencesCreative/DigitalZenGarden/Experience/GardenStill.swift` (1600 × 1200 PNG from `experienceStillRenderer`, one file in `TemporaryFolder("DigitalZenGarden-Still")`, replaced by the next export, removed after a failure) with a `ShareLink` control; write `ExperienceTests/StillTests.swift` (the size and PNG type read back; a second export replaces the first; a failure leaves no file); set the registration's permissions to `["photo-library-add"]` in `Catalog/registrations.json` and rebuild the catalog (lead) (FR-A20-405, 406) — Verified 2026-11-17: 2026-11-17: Experience/GardenStill.swift (1600 x 1200 PNG from the still renderer, one file in TemporaryFolder DigitalZenGarden-Still, replaced, removed after a failure; Transferable file for ShareLink) and ExperienceTests/StillTests.swift (3 tests) pass in .autonomy/checks/A20-P04.zg-ios27.json exit 0; Catalog/registrations.json permissions photo-library-add and the catalog rebuilt; written by an agent, retested
 
 ## Phase 6: Records and evidence
 

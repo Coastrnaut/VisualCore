@@ -488,7 +488,9 @@
       ],
       "content": null,
       "manifest": "Packages/ExperiencesCreative/DigitalZenGarden/scenario-manifest.json",
-      "permissions": [],
+      "permissions": [
+        "photo-library-add"
+      ],
       "summary": "A calm sand garden: rake a softly lit tray of sand with one finger in two rake styles and three sand tones, with a preview of the rake under the finger, undo and redo of every stroke, and patterns that rake rows, circles, waves and spirals for you."
     }
   }
