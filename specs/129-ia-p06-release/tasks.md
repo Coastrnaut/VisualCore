@@ -31,7 +31,7 @@ after every task (no trailers); run checks, read each exit, then tick in a separ
 
 ## Phase 6: Records and evidence
 
-- [ ] T-A17-609 Interactive Anatomy tests on sim-27.2 (`--name ia-ios27`; the slowest under 10 s) and the documented API
+- [X] T-A17-609 Interactive Anatomy tests on sim-27.2 (`--name ia-ios27`; the slowest under 10 s) and the documented API — Verified 2026-11-16: 2026-11-16: .autonomy/checks/A17-P06.ia-ios27.json exit 0 (101 core, 80 experience, 4 manifest tests on sim-27.2) and A17-P06.documented-api.json exit 0, both read before this tick
 - [ ] T-A17-610 App build, unit and interface chunk (`xcodegen generate --spec project.yml`; `--name app-ui -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27 app-ui-ios27-y2`) and the runner (`--name verify-27`) (SC-A17-604)
 - [ ] T-A17-611 Release build checks (`--name release-checks -- python3 scripts/release_check.py --only app-release-build app-release-symbols app-privacy-manifest app-no-tracking app-licenses app-usage-descriptions experience-release-a17 copy-claims-a17`)
 - [ ] T-A17-612 Contract: G-RELEASE closed by "A17-P06"; rows whose gaps are all closed become available (`--name contract`); packages, catalog and script tests
