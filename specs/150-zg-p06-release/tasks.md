@@ -72,7 +72,7 @@ migration, no VisualCore change).
   experience-release-a20 copy-claims-a20`)
 - [X] T-A20-612 Contract: G-RELEASE closed by "A20-P06" (its iOS 26.x runner half is cited at X-A20); rows whose gaps are all closed become available with evidence — Verified 2026-11-17: 2026-11-17: .autonomy/checks/A20-P06.contract.json exit 0 (G-RELEASE closed by A20-P06; all 14 gaps closed and all 31 rows available, M27 last; the iOS 26.x runner half cited at X-A20); A20-P06.experience-packages.json, A20-P06.catalog.json and A20-P06.script-tests.json exit 0
   (`--name contract`); packages, catalog and script tests
-- [ ] T-A20-613 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+- [X] T-A20-613 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record — Verified 2026-11-17: 2026-11-17: /speckit-converge appended nothing on its first run (7 FR, 4 SC, 4 stories checked; every cited evidence file exists); .autonomy/evidence/A20-P06.json sealed; VERIFIED-GATE A20-P06 (150 of 263); planning index, matrix, distinctiveness, metadata, Auto-Creator, catalog (--check PASS), validate_autocreator and validate_docs PASS; README and docs/automatedtesting.md updated
   A20-P06; update README.md (rule 16) and `docs/automatedtesting.md` (rule 17)
 
 ## Dependencies
