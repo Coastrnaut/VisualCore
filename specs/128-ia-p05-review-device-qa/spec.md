@@ -141,6 +141,8 @@ ImplementationLock-100.
   the rest keep the not-reviewed label.
 - **A review record of another content version:** refused, so a review never covers text it did not see.
 - **The generated review document out of date:** a test fails.
+- **The bundled review record fails validation:** the content stays usable, every part shows only "Not reviewed by a
+  clinician.", and the failure is counted, never shown as a review.
 
 ## Requirements *(mandatory)*
 
