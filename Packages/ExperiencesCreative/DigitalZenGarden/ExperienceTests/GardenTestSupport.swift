@@ -95,6 +95,16 @@ enum GardenTest {
         return (host.readPixels(), size.width, size.height)
     }
 
+    /// Sends `control` with `values` through `shell` and records an issue unless it is accepted (feature 147: keeps
+    /// the mutating call outside `#expect`).
+    @discardableResult
+    static func accept(_ shell: ExperienceShell<GardenPresenter>, _ control: String, _ values: [Double] = [],
+                       sourceLocation: SourceLocation = #_sourceLocation) -> ActionResult {
+        let result = shell.handle(control: control, values: values)
+        #expect(result == .accepted, "\(control) \(values): \(result.code)", sourceLocation: sourceLocation)
+        return result
+    }
+
     /// The values of one `stroke.add` with twelve points evenly from `start` (exclusive) to `end` (inclusive).
     static func addValues(from start: Vec2, to end: Vec2) -> [Double] {
         var values: [Double] = []
