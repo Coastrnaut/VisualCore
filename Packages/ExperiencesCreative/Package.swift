@@ -621,7 +621,9 @@ let package = Package(
                                .product(name: "VisualCoreRendering", package: rendering),
                                .product(name: "VisualCoreExperienceHost", package: rendering),
                                .product(name: "VisualCoreUI", package: rendering)],
-                    path: "LivingWallpapers/ExperienceTests"),
+                    path: "LivingWallpapers/ExperienceTests",
+                    // Feature 143 (A19-P06) T-A19-605: committed snapshot and history samples.
+                    resources: [.copy("Fixtures")]),
         // A18 Ambient Clock (feature 131, A18-P01): a pending core until A18-P02 adds the experience. The core is pure
         // (Foundation, the clock source of VisualCoreExperience and the planner of VisualCoreSimulation) and reads no
         // clock: the time enters as actions.
