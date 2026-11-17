@@ -18,3 +18,13 @@
   - `HistoryRefusal` is damaged, newerVersion(Int) or tooLarge(Int), each with a code and a sentence.
 - **`HistoryStore` (experience):** reads and writes `history.json` through `ExperienceStorage`, with
   `problem: HistoryRefusal?` after a read and an injected `ClockSource`.
+
+## As built (T-A19-412)
+
+- **Shipping path:** the controls start only `ExportJob`. `StillExport` keeps the single implementation of each
+  step (`formatStep`, `encodeStep`, `verifyStep`, `writeStep`); its synchronous `run` and `presenter.export` compose
+  the same steps for the A19-P02 and A19-P03 tests.
+- **Files:** JPEG files use the extension `.jpg`, and `/` and `:` in a file name become `-`. `WallpaperExportFile`
+  declares one `FileRepresentation` per format, each with an exporting condition on the format.
+- **History:** the controls list the 5 newest history entries. A missing `history.json` is an empty history with
+  no problem.
