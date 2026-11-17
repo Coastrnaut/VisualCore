@@ -21,7 +21,7 @@
 
 ## Phase 2: Story 1 — a bounded project (P1) 🎯
 
-- [ ] T-A22-103 [P] [US1] Create `Packages/ExperiencesCreative/ShaderStudio/Core/ShaderProject.swift` per
+- [X] T-A22-103 [P] [US1] Create `Packages/ExperiencesCreative/ShaderStudio/Core/ShaderProject.swift` per — Verified 2026-11-17: 2026-11-17: ShaderProject.swift: ShaderLimits (16,384 bytes, 400 lines, 16 uniforms, 2 inputs; hard ceiling 64 KiB), ShaderProject (kind a22.shader-project, schema 1, at most 65,536 bytes, canonical JSON, name 1-40, float uniforms, 0-2 texture inputs) and ShaderProjectRefusal (damaged, newer-version, too-large, not-finite, out-of-range); .autonomy/checks/A22-P01.ss-core-ios27-2.json exit 0; written by an agent, retested
   data-model.md, with `///` on every public declaration (FR-A22-101, 102):
   - `ShaderLimits`: "`maxSourceBytes` 16,384, `maxLines` 400, `maxUniforms` 16, `maxTextureInputs` 2"; a project's
     limits may be lower, never higher;
