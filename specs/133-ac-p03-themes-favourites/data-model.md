@@ -34,5 +34,7 @@
   `damaged`, `newer-version`, `too-large` and `invalid-entry`.
   - `save(name:preset:)` normalises the name, refuses a 13th entry (`over-cap`) and a duplicate (`duplicate-name`).
   - `apply(id:port:)` sends the four controls.
+  - Also `remove(id:)` (an empty list removes the file), an injectable id generator (`makeID`), the refusal
+    `store-failed` (the storage error's code), and static `decode` and `encode` for tests.
 - **Outcomes:** `showing-time`, `motion-off` and `theme-<id>`. The outcome is the theme when it is not the noise
   gradient.

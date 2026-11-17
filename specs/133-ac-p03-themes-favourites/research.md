@@ -16,7 +16,15 @@
   - The favourites are one `favourites.json` file through `ExperienceStorage`, with a cap of 12.
   - **Alternative:** `NamedLibrary`. Rejected, because it needs a folder, and `ExperienceStorage` exposes only flat
     files. A public folder API would be a VisualCore change with one consumer.
-- **D5 Snapshot schema 2:** `theme` and `palette` are added, and schema 1 migrates to theme 0 and palette 0. The
-  schema-1 and schema-2 examples are registered in `ExperienceRegistry` (the lesson of X-A17).
+- **D5 Snapshot schema 2:** `theme` and `palette` are added, and schema 1 migrates to theme 0 and palette 0. Only
+  the schema-1 example is registered in `ExperienceRegistry` (the lesson of X-A17): `SnapshotMigrationCheck` refuses
+  an example of the current schema ("not an earlier version"). `schemaTwoExample()` exists for the round-trip test.
 - **D6 Crossfade timing (Q5):** 1.2 s, smoothstep, `transitionDuration` under Reduce Motion. A change during a fade
   restarts it from the current mix.
+- **D7 As built (crossfade use):**
+  - `CrossfadeScene` owns its children: it sets them up, resizes and tears them down. The presenter never touches a
+    scene the crossfade holds.
+  - At progress 1 the presenter keeps the crossfade, which draws the incoming scene directly and exactly.
+  - During a fade the outgoing picture is a captured still; only the incoming theme moves.
+  - A theme change compiles the new theme twice: a check (so a failed compile keeps the previous theme), then the
+    crossfade's own setup. The registry cannot share a program, because `release` deletes it.
