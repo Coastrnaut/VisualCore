@@ -1,0 +1,80 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/A18-P06.ac-claims.json",
+      "command": "sh specs/136-ac-p06-release/scan-claims-release.sh",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A18-P06.ac-claims.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A18-P06.ac-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing AmbientClockCoreTests AmbientClockExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A18-P06.ac-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A18-P06.ac-no-network.json",
+      "command": "sh specs/136-ac-p06-release/scan-sources-release.sh",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A18-P06.ac-no-network.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A18-P06.app-ui.json",
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27 app-ui-ios27-z2",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A18-P06.app-ui.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A18-P06.catalog.json",
+      "command": "python3 scripts/build_catalog.py --check",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A18-P06.catalog.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A18-P06.contract.json",
+      "command": "python3 scripts/check_app_contract.py --app ambient-clock --render",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A18-P06.contract.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A18-P06.documented-api.json",
+      "command": "python3 scripts/check_documented_api.py --sources Packages/ExperiencesCreative/AmbientClock",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A18-P06.documented-api.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A18-P06.experience-packages.json",
+      "command": "python3 scripts/check_experience_packages.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A18-P06.experience-packages.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A18-P06.experience-release.json",
+      "command": "python3 scripts/release_check.py --only experience-release-a18 copy-claims-a18",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A18-P06.experience-release.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A18-P06.release-checks.json",
+      "command": "python3 scripts/release_check.py --only app-release-build app-release-symbols app-privacy-manifest app-no-tracking app-licenses app-usage-descriptions experience-release-a18 copy-claims-a18",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A18-P06.release-checks.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A18-P06.script-tests.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A18-P06.script-tests.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A18-P06.verify-27.json",
+      "command": "python3 scripts/verify_experiences.py --only a18.ambient-clock --runtime 27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A18-P06.verify-27.log"
+    }
+  ],
+  "generated": "2026-11-17T04:40:40+00:00",
+  "method": "deterministic-run-check",
+  "stage": "A18-P06",
+  "status": "pass"
+}

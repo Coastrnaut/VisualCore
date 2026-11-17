@@ -3694,18 +3694,17 @@
     ]
    },
    "implementation": {
-    "state": "standalone-partial",
+    "state": "standalone-complete",
     "legacy_gates_passed": [
      "A18-P00",
      "A18-P01",
      "A18-P02",
      "A18-P03",
      "A18-P04",
-     "A18-P05"
-    ],
-    "legacy_gates_pending": [
+     "A18-P05",
      "A18-P06"
     ],
+    "legacy_gates_pending": [],
     "unified_integration": "pending"
    },
    "source": {
