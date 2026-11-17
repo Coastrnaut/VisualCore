@@ -796,7 +796,7 @@
    "id": "M16",
    "capability": "Share-sheet saving with the permission word photo-library-add: the file handed to the system share sheet ('Save Image' to Photos with the existing add-only string, 'Save to Files' or another app with none); no PhotoKit call, no read access",
    "source": "spec clarification 4; research D5; manual §11 share without broad photo permission",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillCapture.swift",
@@ -821,7 +821,7 @@
     "file": "Packages/ExperiencesCreative/SimulationLab/Experience/SimulationCapture.swift",
     "symbol": "SimulationCaptureFile"
    },
-   "notes": "Capture and temporary files are tested (StillCaptureTests, TemporaryFolderTests). The ShareLink with a Transferable file exists only in five experiences. The share path and the registration's photo-library-add declaration (so app-usage-descriptions stays exact) are G-SAVE (app-local, A19-P04); the release scans are G-RELEASE. G-SAVE closed in A19-P04; the row stays open for its remaining gaps."
+   "notes": "Capture and temporary files are tested (StillCaptureTests, TemporaryFolderTests). The ShareLink with a Transferable file exists only in five experiences. The share path and the registration's photo-library-add declaration (so app-usage-descriptions stays exact) are G-SAVE (app-local, A19-P04); the release scans are G-RELEASE. G-SAVE closed in A19-P04; the row stays open for its remaining gaps. G-RELEASE closed in A19-P06: the source scan (specs/143-lw-p06-release/scan-sources-release.sh), the experience-release and copy-claims steps and app-usage-descriptions pass. Available."
   },
   {
    "id": "M17",
@@ -1074,7 +1074,7 @@
    "id": "M24",
    "capability": "Truthful claims: export sizes, formats and colour profile stated as verified; performance and thermal numbers only from device measurements; never a claim that the app sets or installs a wallpaper or that an export is a live wallpaper",
    "source": "constitution A19 truthful claims; manual non-goals; manual §11",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/PerformanceRecord.swift",
@@ -1093,7 +1093,7 @@
     "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Core/ScientificReview.swift",
     "symbol": "ScientificReview"
    },
-   "notes": "PerformanceRecord is tested (SessionPerformanceTests). The repository's scripts/check_copy_claims.py is the claim checker; device measurements are G-DEVICE (A19-P05), the A19 copy-claims step G-RELEASE (A19-P06). G-DEVICE closed in A19-P05 with the device-campaign plan (rows LW-D3 to LW-D5 pending; no number claimed) and the interface claims test LWClaimsUITests; the row stays open for G-RELEASE."
+   "notes": "PerformanceRecord is tested (SessionPerformanceTests). The repository's scripts/check_copy_claims.py is the claim checker; device measurements are G-DEVICE (A19-P05), the A19 copy-claims step G-RELEASE (A19-P06). G-DEVICE closed in A19-P05 with the device-campaign plan (rows LW-D3 to LW-D5 pending; no number claimed) and the interface claims test LWClaimsUITests; the row stays open for G-RELEASE. G-RELEASE closed in A19-P06: the claims scan (specs/143-lw-p06-release/scan-claims-release.sh) and copy-claims-a19 pass; device numbers stay in the campaign rows LW-D1 to LW-D8. Available."
   },
   {
    "id": "M25",
@@ -1360,7 +1360,7 @@
    "justification": "Registration, the A19 copy-claims step (no wallpaper-setting or live-wallpaper claim, no unmeasured performance claim), the usage-description check with photo-library-add, verify steps on iOS 27 and 26 and the release notes belong to the release phase (manual phase 06).",
    "phase": 6,
    "test": "Release-check steps: copy-claims-a19, usage-descriptions and app-usage-descriptions pass; verify-a19 steps pass on the iOS 27.x and 26.x simulators; the experience package check lists A19 as registered",
-   "closed": null
+   "closed": "A19-P06"
   }
  ],
  "traceability": [
