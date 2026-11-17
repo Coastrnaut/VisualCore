@@ -896,7 +896,7 @@
    "id": "M19",
    "capability": "Budgets per quality level: frame cost, shader iterations, particle count and resolution share fixed per tier for each theme, the night tier the cheapest",
    "source": "constitution A18 bounded; spec FR-A18-003 frame and particle budgets",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityProfile.swift",
@@ -995,7 +995,7 @@
    "id": "M22",
    "capability": "Screen care: a slow, bounded pixel drift of the clock text and scene and an idle dimming protect OLED screens over long sessions; Reduce Motion keeps the drift imperceptible",
    "source": "constitution A18 screen care; manual §13 risk 1",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ParticleLayerScene.swift",
@@ -1419,10 +1419,10 @@
    ],
    "kind": "adaptation",
    "owner": "app-local",
-   "justification": "Overnight device tests (plugged in and on battery), thermal and frame-pacing records and the QA rows belong to the device campaign after ImplementationLock-100 (manual phase 05); device actions by the owner are BLOCKED_OWNER_ACTION.",
+   "justification": "Overnight device tests (plugged in and on battery), thermal and frame-pacing records and the QA rows belong to the device campaign after ImplementationLock-100 (manual phase 05); device actions by the owner are BLOCKED_OWNER_ACTION. Planned at A18-P05 in docs/apps/ambient-clock/device-campaign.md (AC-D1 to AC-D10, every row pending until ImplementationLock-100); the simulator-side fixture that a still picture is drawn once is VisualCoreRendering's CachedScene (feature 135).",
    "phase": 5,
    "test": "Device-campaign rows: an overnight run records PerformanceRecord frame cap, thermal state and memory; screen-care drift visible on the device; no claim without a measurement; rows pending until the campaign",
-   "closed": null
+   "closed": "A18-P05"
   },
   {
    "id": "G-RELEASE",

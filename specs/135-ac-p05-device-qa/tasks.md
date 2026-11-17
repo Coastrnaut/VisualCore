@@ -24,7 +24,7 @@ action, no audit. Precedent: `specs/134-ac-p04-power-visibility/tasks.md`.
 
 ## Phase 5: Story 3 — night and motion from the interface (P2)
 
-- [ ] T-A18-505 [US3] Write `Apps/VisualCore/Tests/UI/AmbientClock/{ACSupport,ACPowerUITests}.swift` (launched like `IASupport`, identifiers `experience.a18.ambient-clock.<name>`: the clock opens with its time label; night mode on and reduce motion on change their values; a relaunch without reset keeps them) and add the serial chunk `"z2": ["ACPowerUITests"]` to `scripts/release_check.py` and `SERIAL_CHUNKS` (lead) (FR-A18-505; SC-A18-504)
+- [X] T-A18-505 [US3] Write `Apps/VisualCore/Tests/UI/AmbientClock/{ACSupport,ACPowerUITests}.swift` (launched like `IASupport`, identifiers `experience.a18.ambient-clock.<name>`: the clock opens with its time label; night mode on and reduce motion on change their values; a relaunch without reset keeps them) and add the serial chunk `"z2": ["ACPowerUITests"]` to `scripts/release_check.py` and `SERIAL_CHUNKS` (lead) (FR-A18-505; SC-A18-504) — Verified 2026-11-16: 2026-11-16: Apps/VisualCore/Tests/UI/AmbientClock/{ACSupport,ACPowerUITests}.swift and the serial chunk z2 in scripts/release_check.py; .autonomy/checks/A18-P05.app-ui.json exit 0 (app-build-for-testing-ios27, app-unit-ios27, app-ui-ios27-z2: 3/3 interface tests, 79 s in all); written by an agent, retested
 
 ## Phase 6: Records and evidence
 

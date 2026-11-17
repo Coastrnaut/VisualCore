@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "VisualCoreRenderingTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --only-testing VisualCoreRenderingTests",
+  "elapsed_seconds": 5.054,
+  "exit_code": 0,
+  "finished": "2026-11-17T04:22:15+00:00",
+  "log": ".autonomy/logs/A18-P05.rendering-ios27.log",
+  "log_sha256": "ed3e2af799e52f9ff9488a76ea06345349248808e018828b355a0f07b2f025e2",
+  "name": "rendering-ios27",
+  "stage": "A18-P05",
+  "started": "2026-11-17T04:22:10+00:00",
+  "timed_out": false
+}
