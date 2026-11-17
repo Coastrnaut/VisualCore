@@ -1,0 +1,1540 @@
+{
+ "schema": 1,
+ "app": "living-wallpapers",
+ "gate": "A19-P00",
+ "date": "2026-11-17",
+ "inventory": [
+  {
+   "area": "Package products",
+   "description": "Pure, host-testable products of Packages/VisualCore: VisualCoreMath, VisualCoreSimulation, VisualCoreScenes, VisualCoreShaderSource, VisualCoreEffectsGraph, VisualCoreDiagnostics, VisualCoreAudioDSP, VisualCorePersistence, VisualCoreParameters, VisualCoreExperience (+ VisualCoreTestSupport for test targets). iOS products of Packages/VisualCoreRendering: VisualCoreRendering, VisualCoreEffects, VisualCoreUI, VisualCoreAudio, VisualCoreAutomation, VisualCoreExperienceHost. For Living Wallpapers (checked 2026-11-17): VisualCoreRendering has RenderHost.renderOffscreen(width:height:time:) with maxRenderSize and maxOffscreenPixels (64,000,000), StillImage, OffscreenRenderError, StillImageEncoder.pngData (opaque PNG tagged sRGB, the only encoder) and StillCapture (one PNG in a temporary folder, nothing written to Photos), render targets with readPixels, CachedScene, CrossfadeScene, FullScreenShaderScene, FieldPass and ShaderBundle with the vc/ GLSL library; VisualCoreEffects has EffectScene; VisualCoreExperienceHost has ExperienceSession.renderStill (always at time 0) and the experienceStillRenderer environment value; VisualCoreScenes has ExportGeometry (hardMaxEdge 8192, defaultMaxPixels 64,000,000), ExportAspect (square, 4:5, 16:9, 9:16) and ExportSize; VisualCoreDiagnostics has ResourceBudget; VisualCorePersistence has TemporaryFolder; VisualCoreExperience has ExperienceStorage with StorageQuota (16 MiB, 64 files). Missing in every framework product (grep 2026-11-17): a JPEG or HEIC encoder or any colour space but sRGB, any video encoding (no AVAssetWriter, pixel buffer or VideoToolbox use), tiled rendering, a device screen-size and safe-area catalog, an export job with progress, and an offscreen still of an experience at a chosen time.",
+   "paths": [
+    "Packages/VisualCore/Package.swift",
+    "Packages/VisualCoreRendering/Package.swift",
+    "Packages/ExperiencesCreative/Package.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillImage.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillCapture.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceStill.swift",
+    "Packages/VisualCore/Sources/VisualCoreScenes/ExportGeometry.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/ResourceLedger.swift",
+    "Packages/VisualCore/Sources/VisualCorePersistence/TemporaryFolder.swift",
+    "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+    "docs/api/visualcore-public-api.txt",
+    "scripts/check_dependencies.py"
+   ],
+   "owner": "VisualCore packages (ADR-0003, ADR-0009)"
+  },
+  {
+   "area": "EGL render host and its main-thread rule",
+   "description": "RenderHost (@MainActor) owns the EGL display, context and surfaces over ANGLE's Metal backend (EGLDisplayProvider), the CAMetalLayer RenderView, the FrameScheduler (CADisplayLink with FramePacing) and context generations; every GL call runs on the main thread inside RenderScene setup, resize, render and teardown, and renderOffscreen asserts the main thread. RenderHost pauses on background, resumes on foreground, rebuilds on memory warning and recreateContext, and swaps scenes with replaceScene. RenderCapabilities reports maxTextureSize, maxRenderbufferSize and maxViewport and records findings below the OpenGL ES 3.0 floor of 2048; maxRenderSize is the smallest of those limits (0 before a context reported them). The offscreen render is synchronous on the main thread: it validates the size before any GPU work, renders into a registry render target, reads the pixels back top-down, and on every path releases the target, rebinds framebuffer 0 and resizes the live scene back.",
+   "paths": [
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderView.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FrameScheduler.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/EGLDisplayProvider.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderCapabilities.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/FramePacing.swift"
+   ],
+   "owner": "VisualCoreRendering (ADR-0002 seam)"
+  },
+  {
+   "area": "Shaders and resources (full-screen shaders, fields, palettes, render targets, the offscreen path)",
+   "description": "FullScreenShaderScene draws one bundled fragment shader over the canvas with named float uniforms, a palette of up to 8 colour stops, seed offsets and an explicit fixedTime; FieldPass runs a fragment program into a render target or the framebuffer (PingPongTarget for feedback); ShaderBundle and ShaderLibrary compile bundled GLSL with #include of the vc/ library (palette, noise, sdf, hash, colour, field); ResourceRegistry.makeRenderTarget creates RGBA8 render targets under a ResourceBudget and RenderTarget.readPixels reads them back; RenderContext.redirected points a scene at another framebuffer and size, which is how renderOffscreen draws at an output size independent of the screen.",
+   "paths": [
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/PingPongTarget.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderBundle.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderProgram.swift",
+    "Packages/VisualCore/Sources/VisualCoreShaderSource/ShaderLibrary.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/palette.glsl",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/noise.glsl",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/sdf.glsl",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/hash.glsl",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/color.glsl",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/field.glsl"
+   ],
+   "owner": "VisualCoreRendering + VisualCoreShaderSource"
+  },
+  {
+   "area": "Effects and compositing",
+   "description": "EffectScene wraps a content scene in an EffectGraphDescription run by EffectRenderer (post passes, a flash limiter under Reduce Flashing, a bypass); CrossfadeScene mixes two scenes through render targets; CachedScene keeps a child's picture until its key changes. All three are RenderScenes, so renderOffscreen draws them at output size (CrossfadeSceneTests render offscreen).",
+   "paths": [
+    "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectScene.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectRenderer.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectPasses.swift",
+    "Packages/VisualCore/Sources/VisualCoreEffectsGraph/EffectGraph.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/CrossfadeScene.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/CachedScene.swift"
+   ],
+   "owner": "VisualCoreEffects + VisualCoreEffectsGraph + VisualCoreRendering"
+  },
+  {
+   "area": "Export geometry, capture and encoding",
+   "description": "ExportGeometry clamps a long edge to min(maxEdge, 8192), even, and a pixel cap, and sizes ExportAspect presets into ExportSize; StillCapture renders through renderOffscreen, encodes with StillImageEncoder.pngData and keeps only the latest PNG in a TemporaryFolder; ExperienceSession.renderStill(width:height:) is the experience's still on the session's host at time 0, handed to controls as the experienceStillRenderer environment value. Experience-only consumers: the Transferable PNG files shared with SwiftUI ShareLink by Generative Art Studio (ExportSheet), Fluid Art Playground, Fractal Explorer, Infinite Geometry and Simulation Lab (SimulationCapture); no experience calls PhotoKit.",
+   "paths": [
+    "Packages/VisualCore/Sources/VisualCoreScenes/ExportGeometry.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillCapture.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillImage.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceStill.swift",
+    "Packages/VisualCore/Sources/VisualCorePersistence/TemporaryFolder.swift",
+    "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/ExportSheet.swift",
+    "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/GenerativeArtControls.swift",
+    "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidArtControls.swift",
+    "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalControls.swift",
+    "Packages/ExperiencesCreative/InfiniteGeometry/Experience/GeometryControls.swift",
+    "Packages/ExperiencesCreative/SimulationLab/Experience/SimulationCapture.swift"
+   ],
+   "owner": "VisualCoreScenes + VisualCoreRendering + VisualCoreExperienceHost"
+  },
+  {
+   "area": "Permissions and sharing",
+   "description": "project.yml gives the one app NSPhotoLibraryAddUsageDescription (add-only, 'Save Image' in the share sheet); Configs/permission-vocabulary.json maps the permission word photo-library-add to that key and text; each registration in Catalog/registrations.json declares its words (only a01.generative-art-studio declares photo-library-add today); scripts/check_usage_descriptions.py, run by the release steps usage-descriptions and app-usage-descriptions, requires the app's usage keys to equal the union of the declared words. Saving to Files or another app through the share sheet needs no permission.",
+   "paths": [
+    "project.yml",
+    "Configs/permission-vocabulary.json",
+    "Catalog/registrations.json",
+    "scripts/check_usage_descriptions.py"
+   ],
+   "owner": "the one app + repository tooling"
+  },
+  {
+   "area": "Persistence and storage",
+   "description": "DocumentStore writes versioned documents (DocumentEnvelope kind and schemaVersion) atomically under a byte cap and migrates them through a MigrationChain; NamedLibrary keeps named documents with favourites; ExperienceStorage is the experience's own folder bounded by StorageQuota (16 MiB, 64 files); TemporaryFolder makes and removes temporary files for exports.",
+   "paths": [
+    "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
+    "Packages/VisualCore/Sources/VisualCorePersistence/Envelope.swift",
+    "Packages/VisualCore/Sources/VisualCorePersistence/Migration.swift",
+    "Packages/VisualCore/Sources/VisualCorePersistence/NamedLibrary.swift",
+    "Packages/VisualCore/Sources/VisualCorePersistence/TemporaryFolder.swift",
+    "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift"
+   ],
+   "owner": "VisualCorePersistence + VisualCoreExperience"
+  },
+  {
+   "area": "Experience host",
+   "description": "ExperienceSession opens, checkpoints, closes and recovers an Experience on one RenderHost, applies quality (QualityGovernor over the QualityProfile, fed by DeviceConditions), memory-warning and scene-phase events, keeps a PerformanceRecord and renders the experience's still; ExperienceShell adapts an ExperiencePresenter (scene, controls, canvas overlay through makeCanvasOverlay) and supports cancelPreparation; ExperienceEngine.prepare runs the core's preparation with an optional time limit; the one app registers experiences in ExperienceRegistry and Catalog/registrations.json (eighteen registered, A01-A18, checked 2026-11-17; Living Wallpapers joins in A19-P01 and stays unregistered and unavailable in A19-P00; scripts/check_experience_packages.py forbids unregistered targets).",
+   "paths": [
+    "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceShell.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceStill.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceHostView.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ScenarioRunner.swift",
+    "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceCore.swift",
+    "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceEngine.swift",
+    "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/PerformanceRecord.swift",
+    "Apps/VisualCore/App/ExperienceRegistry.swift",
+    "Catalog/registrations.json",
+    "scripts/check_experience_packages.py",
+    "project.yml"
+   ],
+   "owner": "VisualCoreExperience + VisualCoreExperienceHost + the one app"
+  },
+  {
+   "area": "Build and release steps",
+   "description": "XcodeGen spec project.yml for the one app (target VisualCore), package schemes via scripts/xcodebuild_package.py, app tests via scripts/xcodebuild_app.py, and scripts/release_check.py: 148 named steps listed by --list on 2026-11-17 (shared checks including app-contracts, which checks every docs/apps/*/visualcore-contract.json, licenses and usage-descriptions; package and app builds and tests; experience-release and copy-claims steps of the released experiences; verify steps of A01-A18 on iOS 27 and 26; the app's release audits including app-licenses and app-usage-descriptions; the seven reference regression steps and the ProjectM independence check). No A19 step exists yet; the A19 copy-claims and verify steps come with G-RELEASE.",
+   "paths": [
+    "project.yml",
+    "scripts/release_check.py",
+    "scripts/xcodebuild_package.py",
+    "scripts/xcodebuild_app.py",
+    "scripts/check_app_contract.py",
+    "scripts/check_licenses.py",
+    "scripts/check_copy_claims.py",
+    "scripts/check_usage_descriptions.py",
+    ".github/workflows/ci.yml"
+   ],
+   "owner": "repository tooling"
+  },
+  {
+   "area": "Source ownership",
+   "description": "Living Wallpapers owns its domain (the project model, the curated procedural scenes and colour presets, device canvas templates with provenance, crop and safe-area guides, export requests, results, the export job and its history, the help text and copy) and UI under Packages/ExperiencesCreative/LivingWallpapers/ (Core GPU-free, CoreTests, Experience with Adapter/, ExperienceTests, Shaders, scenario-manifest.json; created in A19-P01, not present today). VisualCore owns reusable machinery: the offscreen render, read-back, render targets, encoders and capture (VisualCoreRendering), effects (VisualCoreEffects), export geometry (VisualCoreScenes), budgets (VisualCoreDiagnostics), temporary folders and documents (VisualCorePersistence), storage and the host (VisualCoreExperience, VisualCoreExperienceHost). The share paths of other experiences stay experience code and are not copied. ProjectM stays in the harness.",
+   "paths": [
+    ".specify/memory/constitution.md",
+    "Auto-Creator.md",
+    "docs/decisions/ADR-0009-unified-app.md",
+    "Packages/ExperiencesCreative/Package.swift",
+    "specs/137-lw-p00-boundary-audit/spec.md"
+   ],
+   "owner": "constitution + ADR-0009"
+  },
+  {
+   "area": "ProjectM reference regression",
+   "description": "Reference pinned at d93edd1, read-only; scripts/run_reference_baseline.py lists the ordered reference steps; scripts/check_reference_clean.py checks the submodule; the 7 release-check steps run in two chunks via release_check.py --only (reference-engine-xcframework, reference-build-projectm-ios-sim, reference-clean; reference-test-anglerendering-ios27, reference-test-anglerendering-ios26, projectm-reference-ios27, projectm-reference-ios26), recorded in docs/apps/living-wallpapers/regression-baseline.md.",
+   "paths": [
+    "scripts/run_reference_baseline.py",
+    "scripts/check_reference_clean.py",
+    "Harnesses/ProjectMReference/ProjectMReference.yml",
+    "specs/137-lw-p00-boundary-audit/research.md"
+   ],
+   "owner": "reference adapter (harness only)"
+  }
+ ],
+ "matrix": [
+  {
+   "id": "M01",
+   "capability": "Offscreen rendering: the current scene drawn at an output size independent of the screen, on the host's own context (no second context), with the pixels read back top-down",
+   "source": "brainstorm: offscreen rendering; manual §6 capability audit; spec FR-A19-003",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+     "symbol": "RenderHost.renderOffscreen",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+     "symbol": "RenderContext.redirected",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+     "symbol": "ResourceRegistry.makeRenderTarget",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+     "symbol": "RenderTarget.readPixels",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillImage.swift",
+     "symbol": "StillImage",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillImage.swift",
+     "symbol": "OffscreenRenderError",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/SimulationLab/Experience/SimulationCapture.swift",
+    "symbol": "SimulationCapture"
+   },
+   "notes": "Tested in OffscreenExportTests (any size, size validated first, target released on every path, live scene restored), CrossfadeSceneTests, ParticleLayerSceneTests, DepthMeshPassTests and ResourceRegistryTests. Generative Art Studio, Fluid Art Playground, Fractal Explorer, Infinite Geometry and Simulation Lab export this way."
+  },
+  {
+   "id": "M02",
+   "capability": "High-resolution rendering: device-sized stills (for example a tablet's 2732-pixel edge) when the GPU allows them, with the limits queried before allocation",
+   "source": "brainstorm: high-resolution rendering; manual non-goal: no unlimited 8K on all devices",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+     "symbol": "RenderHost.maxRenderSize",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+     "symbol": "RenderHost.maxOffscreenPixels",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderCapabilities.swift",
+     "symbol": "RenderCapabilities.maxTextureSize",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreScenes/ExportGeometry.swift",
+     "symbol": "ExportGeometry.hardMaxEdge",
+     "product": "VisualCoreScenes",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreScenes/ExportGeometry.swift",
+     "symbol": "ExportGeometry.clampedLongEdge",
+     "product": "VisualCoreScenes",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/ExportSheet.swift",
+    "symbol": "ExportRunner"
+   },
+   "notes": "maxRenderSize and the pixel cap are tested (OffscreenExportTests, StillCaptureTests), ExportGeometry in ExportGeometryTests. The code guarantees only the OpenGL ES 3.0 floor of 2048 per edge; real device limits are measured in A19-P05 (G-DEVICE), never assumed. Fitting each template to the reported limit with the fallback to the largest size that fits is G-TEMPLATES (A19-P01). Tiling is rejected for 0.1 (research D6)."
+  },
+  {
+   "id": "M03",
+   "capability": "Effects and compositing: post effects, a flash limiter, crossfades and cached layers composed over a procedural scene, drawn the same way on screen and offscreen",
+   "source": "brainstorm: effects and compositing",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectScene.swift",
+     "symbol": "EffectScene",
+     "product": "VisualCoreEffects",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectRenderer.swift",
+     "symbol": "EffectRenderer",
+     "product": "VisualCoreEffects",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/CrossfadeScene.swift",
+     "symbol": "CrossfadeScene",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/CachedScene.swift",
+     "symbol": "CachedScene",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+     "symbol": "FieldPass",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreEffectsGraph/EffectGraph.swift",
+     "symbol": "EffectGraphDescription",
+     "product": "VisualCoreEffectsGraph",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidArtPresenter.swift",
+    "symbol": "FluidArtPresenter"
+   },
+   "notes": "Tested in EffectRendererTests, EffectSceneBypassTests, EffectCleanupSweepTests, CrossfadeSceneTests (including an offscreen render), CachedSceneTests and FieldPassTests. Fluid Art Playground and Generative Art Studio wrap their scenes in EffectScene; Ambient Clock uses CrossfadeScene inside CachedScene."
+  },
+  {
+   "id": "M04",
+   "capability": "Frame capture: the open experience's picture captured as a still at output size, at a chosen animation time, without disturbing the live view",
+   "source": "brainstorm: frame capture",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceStill.swift",
+     "symbol": "ExperienceSession.renderStill",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceStill.swift",
+     "symbol": "ExperienceStillRenderer",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceStill.swift",
+     "symbol": "experienceStillRenderer",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillCapture.swift",
+     "symbol": "StillCapture",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+     "symbol": "RenderHost.renderOffscreen",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/SimulationLab/Experience/SimulationCapture.swift",
+    "symbol": "SimulationCapture"
+   },
+   "notes": "Tested in StillRenderTests (renderStill) and StillCaptureTests. ExperienceSession.renderStill always passes time 0 to renderOffscreen, so an experience cannot choose the animation time of its still: G-STILLTIME (VisualCoreExperienceHost, A19-P02)."
+  },
+  {
+   "id": "M05",
+   "capability": "Export pipelines: request (template, format, time) -> offscreen render -> encode -> temporary file -> share sheet, with progress, cancellation, cleanup and a result record",
+   "source": "brainstorm: export pipelines",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillImage.swift",
+     "symbol": "StillImageEncoder.pngData",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillCapture.swift",
+     "symbol": "StillCapture.capture",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/TemporaryFolder.swift",
+     "symbol": "TemporaryFolder",
+     "product": "VisualCorePersistence",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/TemporaryFolder.swift",
+     "symbol": "TemporaryFolder.removeAll",
+     "product": "VisualCorePersistence",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreScenes/ExportGeometry.swift",
+     "symbol": "ExportGeometry",
+     "product": "VisualCoreScenes",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreScenes/ExportGeometry.swift",
+     "symbol": "ExportSize",
+     "product": "VisualCoreScenes",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/ExportSheet.swift",
+    "symbol": "ExportModel"
+   },
+   "notes": "Tested in OffscreenExportTests (pngData), StillCaptureTests, TemporaryFolderTests and ExportGeometryTests. Missing: JPEG and HEIC (G-ENCODE), an export job with progress and cancellation (G-EXPORTJOB), the request and result model (G-MODEL), the share-sheet path with the permission word (G-SAVE) and video (G-VIDEO)."
+  },
+  {
+   "id": "M06",
+   "capability": "Version 0.1 feature 01: curated procedural backgrounds and colour presets, every background drawn by shaders, fields, particles or SDFs",
+   "source": "manual v0.1 feature 01; constitution A19 visuals are code",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+     "symbol": "FullScreenShaderScene",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+     "symbol": "FullScreenShaderScene.palette",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+     "symbol": "FullScreenShaderScene.parameters",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderBundle.swift",
+     "symbol": "ShaderBundle.visualCoreLibrary",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreParameters/Palette.swift",
+     "symbol": "Palette",
+     "product": "VisualCoreParameters",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreParameters/ParameterSchema.swift",
+     "symbol": "ParameterSchema",
+     "product": "VisualCoreParameters",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/NamedLibrary.swift",
+     "symbol": "NamedLibrary",
+     "product": "VisualCorePersistence",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/GenerativeArtPresenter.swift",
+    "symbol": "ArtCanvasScene"
+   },
+   "notes": "The machinery is tested (FullScreenShaderSceneTests, ShaderBundleTests, ParametersTests, NamedLibraryTests). The curated scenes and their shaders are G-SCENES (A19-P02); the presets and their editing are G-EDITOR (A19-P03) over the project model G-MODEL (A19-P01)."
+  },
+  {
+   "id": "M07",
+   "capability": "Version 0.1 feature 02: iPhone and iPad canvas templates with crop and safe-area guides over the preview",
+   "source": "manual v0.1 feature 02",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreScenes/ExportGeometry.swift",
+     "symbol": "ExportAspect",
+     "product": "VisualCoreScenes",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreScenes/ExportGeometry.swift",
+     "symbol": "ExportSize",
+     "product": "VisualCoreScenes",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreScenes/ExportGeometry.swift",
+     "symbol": "ExportGeometry.size",
+     "product": "VisualCoreScenes",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+     "symbol": "makeCanvasOverlay",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/ExportSheet.swift",
+    "symbol": "ExportRunner"
+   },
+   "notes": "ExportAspect (public init with any ratio) and ExportSize are tested (ExportGeometryTests); the canvas overlay is tested (CanvasOverlayTests). No catalog of device screen sizes or safe areas exists anywhere: the templates with their provenance are G-TEMPLATES (A19-P01), the crop and safe-area guides drawn as native overlay are G-EDITOR (A19-P03)."
+  },
+  {
+   "id": "M08",
+   "capability": "Version 0.1 feature 03: still-image export in common formats (PNG, JPEG, HEIC) with a verified colour profile",
+   "source": "manual v0.1 feature 03; spec clarification 5",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillImage.swift",
+     "symbol": "StillImageEncoder",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillImage.swift",
+     "symbol": "StillImageEncoder.pngData",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillImage.swift",
+     "symbol": "StillImage",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/SimulationLab/Experience/SimulationCapture.swift",
+    "symbol": "SimulationCapture"
+   },
+   "notes": "PNG tagged sRGB exists and is tested (OffscreenExportTests). JPEG and HEIC through the same ImageIO path, tagged sRGB and verified by reading the file back, are G-ENCODE (VisualCoreRendering, A19-P02); the format choice in the request is G-MODEL."
+  },
+  {
+   "id": "M09",
+   "capability": "Version 0.1 feature 04: an optional short video export, only after encoder and resource feasibility is shown",
+   "source": "manual v0.1 feature 04; manual §13 risk 3; spec clarification 5",
+   "status": "upstream gap",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+     "symbol": "RenderHost.renderOffscreen",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/ResourceLedger.swift",
+     "symbol": "ResourceBudget",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillCapture.swift",
+    "symbol": "StillCapture"
+   },
+   "notes": "No framework product or experience writes video (no AVAssetWriter, pixel buffer or VideoToolbox use; grep 2026-11-17). Sequential offscreen frames at chosen times are the only building block. Feasibility from public APIs is decided in A19-P01 (G-VIDEO, app-local; any encoder assessed for VisualCore ownership then); until it is shown feasible no video code, copy or control exists."
+  },
+  {
+   "id": "M10",
+   "capability": "Version 0.1 feature 05: export progress, cancellation, error recovery and a local history of exports",
+   "source": "manual v0.1 feature 05",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillImage.swift",
+     "symbol": "OffscreenRenderError",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillCapture.swift",
+     "symbol": "StillCapture.State",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceShell.swift",
+     "symbol": "ExperienceShell.cancelPreparation",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/TemporaryFolder.swift",
+     "symbol": "TemporaryFolder.removeAll",
+     "product": "VisualCorePersistence",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+     "symbol": "ExperienceStorage",
+     "product": "VisualCoreExperience",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/ExportSheet.swift",
+    "symbol": "ExportModel"
+   },
+   "notes": "Errors, capture state, cancellation of preparation and temporary cleanup are tested (OffscreenExportTests, StillCaptureTests, ShellLifecycleTests, SessionLifecycleTests, TemporaryFolderTests, ExperienceStorageTests). The export job with progress and cancellation is G-EXPORTJOB, the history G-HISTORY (both app-local, A19-P04)."
+  },
+  {
+   "id": "M11",
+   "capability": "Version 0.1 feature 06: clear instructions for applying an exported image by hand through the system's own Settings or Photos controls",
+   "source": "manual v0.1 feature 06; spec clarification 4",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+     "symbol": "ExperiencePresenter",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+     "symbol": "makeCanvasOverlay",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/SimulationLab/Experience/SimulationControls.swift",
+    "symbol": "SimulationControls"
+   },
+   "notes": "Presenter controls and the overlay are tested (CanvasOverlayTests, ShellRenderingTests). No public API sets the system wallpaper; the help text naming the system's own steps, with no claim that the app sets or installs a wallpaper, is G-HELP (app-local, A19-P03)."
+  },
+  {
+   "id": "M12",
+   "capability": "Size limits and the fallback: a template whose edge exceeds maxRenderSize or whose pixel count exceeds the cap is refused before allocation and offered at the largest size that fits",
+   "source": "manual §13 risk 2; spec clarification 5; research D6",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+     "symbol": "RenderHost.maxRenderSize",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+     "symbol": "RenderHost.maxOffscreenPixels",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillImage.swift",
+     "symbol": "OffscreenRenderError",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreScenes/ExportGeometry.swift",
+     "symbol": "ExportGeometry.effectiveMaxEdge",
+     "product": "VisualCoreScenes",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreScenes/ExportGeometry.swift",
+     "symbol": "ExportGeometry.clampedLongEdge",
+     "product": "VisualCoreScenes",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/ExportSheet.swift",
+    "symbol": "ExportRunner"
+   },
+   "notes": "renderOffscreen throws invalidSize before any GPU work (OffscreenExportTests); ExportGeometry clamps (ExportGeometryTests). The template fit and the offered fallback are G-TEMPLATES (A19-P01); device limits are G-DEVICE (A19-P05)."
+  },
+  {
+   "id": "M13",
+   "capability": "GPU budget and memory warnings: render targets allocated under a byte budget that refuses when over, memory warnings rebuilding from CPU state, no export resource left behind",
+   "source": "manual §13 risk 2; manual §11 no orphan GPU resources; constitution A19 bounded",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/ResourceLedger.swift",
+     "symbol": "ResourceBudget",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/ResourceLedger.swift",
+     "symbol": "ResourceBudgetError",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+     "symbol": "ResourceRegistry",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+     "symbol": "ExperienceSession.handleMemoryWarning",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+     "symbol": "RenderHost.renderOffscreen",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/SimulationLab/Experience/SimulationCapture.swift",
+    "symbol": "SimulationCapture"
+   },
+   "notes": "Tested in ResourceLedgerTests, ResourceRegistryTests, OffscreenExportTests (budget refusal, target released), SessionPhaseMemoryTests and CleanupSweepTests."
+  },
+  {
+   "id": "M14",
+   "capability": "Encoding with a verified sRGB profile: PNG, JPEG and HEIC through ImageIO tagged sRGB, the profile and dimensions verified by reading the written file back",
+   "source": "manual v0.1 feature 03; spec clarification 5; research alternatives (no Display P3)",
+   "status": "upstream gap",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillImage.swift",
+     "symbol": "StillImageEncoder.pngData",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/SimulationLab/Experience/SimulationCapture.swift",
+    "symbol": "SimulationCapture"
+   },
+   "notes": "Only pngData exists (OffscreenExportTests read the sRGB tag). JPEG and HEIC encoders in VisualCoreRendering are G-ENCODE (A19-P02); Display P3 is rejected because the renderer draws 8-bit sRGB."
+  },
+  {
+   "id": "M15",
+   "capability": "Still at a chosen time: the experience's still rendered at an animation time the person chose in the preview",
+   "source": "spec clarification 5; research D4",
+   "status": "upstream gap",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceStill.swift",
+     "symbol": "ExperienceSession.renderStill",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+     "symbol": "RenderHost.renderOffscreen",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+     "symbol": "FullScreenShaderScene.fixedTime",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillCapture.swift",
+    "symbol": "StillCapture"
+   },
+   "notes": "renderOffscreen takes a time but the session's renderStill passes 0 (StillRenderTests). A time on the session's still (and on the environment renderer) is G-STILLTIME (VisualCoreExperienceHost, A19-P02)."
+  },
+  {
+   "id": "M16",
+   "capability": "Share-sheet saving with the permission word photo-library-add: the file handed to the system share sheet ('Save Image' to Photos with the existing add-only string, 'Save to Files' or another app with none); no PhotoKit call, no read access",
+   "source": "spec clarification 4; research D5; manual §11 share without broad photo permission",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillCapture.swift",
+     "symbol": "StillCapture",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/TemporaryFolder.swift",
+     "symbol": "TemporaryFolder.makeFileURL",
+     "product": "VisualCorePersistence",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceStill.swift",
+     "symbol": "experienceStillRenderer",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/SimulationLab/Experience/SimulationCapture.swift",
+    "symbol": "SimulationCaptureFile"
+   },
+   "notes": "Capture and temporary files are tested (StillCaptureTests, TemporaryFolderTests). The ShareLink with a Transferable file exists only in five experiences. The share path and the registration's photo-library-add declaration (so app-usage-descriptions stays exact) are G-SAVE (app-local, A19-P04); the release scans are G-RELEASE."
+  },
+  {
+   "id": "M17",
+   "capability": "Export job with progress, cancellation and cleanup: off the interface's critical path, cancellable between steps, temporary files and GPU targets removed on every path",
+   "source": "manual v0.1 feature 05; manual §11; manual §13 risk 3",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/TemporaryFolder.swift",
+     "symbol": "TemporaryFolder.removeAll",
+     "product": "VisualCorePersistence",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+     "symbol": "ResourceRegistry",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillCapture.swift",
+     "symbol": "StillCapture.removeFile",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceShell.swift",
+     "symbol": "ExperienceShell.cancelPreparation",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/ExportSheet.swift",
+    "symbol": "ExportModel"
+   },
+   "notes": "The cleanup pieces are tested (TemporaryFolderTests, ResourceRegistryTests, StillCaptureTests, ShellLifecycleTests). The offscreen render is synchronous on the main thread; the job with progress and cancellation is G-EXPORTJOB (app-local, A19-P04)."
+  },
+  {
+   "id": "M18",
+   "capability": "History in experience storage: a bounded local list of exports (template, format, size, time, result) in the experience's own storage",
+   "source": "manual v0.1 feature 05",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+     "symbol": "ExperienceStorage",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+     "symbol": "StorageQuota",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
+     "symbol": "DocumentStore",
+     "product": "VisualCorePersistence",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/GenerativeArtLibrary.swift",
+    "symbol": "GenerativeArtLibrary"
+   },
+   "notes": "Tested in ExperienceStorageTests and DocumentStoreTests. The history document and its bound are G-HISTORY (app-local, A19-P04)."
+  },
+  {
+   "id": "M19",
+   "capability": "Device templates with provenance: iPhone and iPad screen sizes and safe areas as app data, each with a provenance record (Apple's published screen sizes)",
+   "source": "manual v0.1 feature 02; spec clarification 5",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreScenes/ExportGeometry.swift",
+     "symbol": "ExportAspect",
+     "product": "VisualCoreScenes",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreScenes/ExportGeometry.swift",
+     "symbol": "ExportSize",
+     "product": "VisualCoreScenes",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/ExportSheet.swift",
+    "symbol": "ExportRunner"
+   },
+   "notes": "ExportAspect and ExportSize are tested (ExportGeometryTests); no device catalog exists anywhere (grep 2026-11-17). G-TEMPLATES (app-local, A19-P01)."
+  },
+  {
+   "id": "M20",
+   "capability": "Lifecycle with resize and context loss: context loss, resize, background and memory warning rebuild every GPU object from CPU state; an export never changes the live scene",
+   "source": "constitution A19 consumer; spec FR-A19-003; manual §11 shared render lifecycle",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+     "symbol": "RenderHost.recreateContext",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+     "symbol": "RenderHost.pause",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+     "symbol": "FullScreenShaderScene.resize",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+     "symbol": "ExperienceSession.handleMemoryWarning",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+     "symbol": "ExperienceSession.checkpoint",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/GenerativeArtPresenter.swift",
+    "symbol": "GenerativeArtPresenter"
+   },
+   "notes": "Tested in RenderHostTests, CachedSceneTests, CrossfadeSceneTests, FullScreenShaderSceneTests, ShellRenderingTests, SessionPhaseMemoryTests and OffscreenExportTests (live scene restored)."
+  },
+  {
+   "id": "M21",
+   "capability": "Quality tiers: the governor fed by thermal state and Low Power Mode, declared tiers matching the presenter's levels, preview quality separate from export resolution",
+   "source": "constitution A19 bounded",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityProfile.swift",
+     "symbol": "QualityProfile",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityGovernor.swift",
+     "symbol": "QualityGovernor",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/DeviceConditions.swift",
+     "symbol": "DeviceConditions",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceCore.swift",
+     "symbol": "ExperienceCore.qualityTiers",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+     "symbol": "ExperienceSession.refreshQuality",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/Adapter/FluidArtCore.swift",
+    "symbol": "FluidArtCore"
+   },
+   "notes": "Tested in QualityProfileTests, QualityGovernorTests and SessionQualityTests. Core.qualityTiers must match the presenter's levels (earlier-gate lesson)."
+  },
+  {
+   "id": "M22",
+   "capability": "Accessibility: VoiceOver labels and Dynamic Type for the editor, templates and export controls; progress announced; Reduce Motion and Reduce Flashing respected in the preview",
+   "source": "constitution A19 accessible; manual §11 app UI and accessibility",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPreferences.swift",
+     "symbol": "AccessibilityPreferences",
+     "product": "VisualCoreSimulation",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
+     "symbol": "AnnouncementPlanner",
+     "product": "VisualCoreSimulation",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AccessibilitySettingsSection.swift",
+     "symbol": "AccessibleColors.contrastRatio",
+     "product": "VisualCoreUI",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectScene.swift",
+     "symbol": "EffectScene.reduceFlashing",
+     "product": "VisualCoreEffects",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/SimulationLab/Experience/SimulationControls.swift",
+    "symbol": "SimulationControls"
+   },
+   "notes": "The planners are tested (AccessibilityPreferencesTests, AccessibilityPlansTests, AccessibilitySettingsSectionTests, EffectSceneBypassTests). The labels, announcements and layouts of the experience's UI are G-A11Y (app-local, A19-P03)."
+  },
+  {
+   "id": "M23",
+   "capability": "Licenses: every scene, palette and shader records its source and license in the license inventory; no purchased, generated or photographic image",
+   "source": "constitution A19 licenses; manual §13 cross-cutting obligations",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AcknowledgementsView.swift",
+     "symbol": "LicenseInventory",
+     "product": "VisualCoreUI",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AcknowledgementsView.swift",
+     "symbol": "AcknowledgementsView",
+     "product": "VisualCoreUI",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/DigitalAquarium/Core/LicenseAudit.swift",
+    "symbol": "LicenseAudit"
+   },
+   "notes": "Tested in AcknowledgementsViewTests; scripts/check_licenses.py runs in the release check. The A19 shader entries come with the scenes (G-SCENES)."
+  },
+  {
+   "id": "M24",
+   "capability": "Truthful claims: export sizes, formats and colour profile stated as verified; performance and thermal numbers only from device measurements; never a claim that the app sets or installs a wallpaper or that an export is a live wallpaper",
+   "source": "constitution A19 truthful claims; manual non-goals; manual §11",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/PerformanceRecord.swift",
+     "symbol": "PerformanceRecord",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+     "symbol": "ExperienceSession.performanceRecord",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Core/ScientificReview.swift",
+    "symbol": "ScientificReview"
+   },
+   "notes": "PerformanceRecord is tested (SessionPerformanceTests). The repository's scripts/check_copy_claims.py is the claim checker; device measurements are G-DEVICE (A19-P05), the A19 copy-claims step G-RELEASE (A19-P06)."
+  },
+  {
+   "id": "M25",
+   "capability": "Experience host: session, shell, presenter with the canvas overlay, still renderer and scenario runner in the one app, no new target",
+   "source": "ADR-0009; spec FR-A19-005",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+     "symbol": "ExperienceSession",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceShell.swift",
+     "symbol": "ExperienceShell",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+     "symbol": "ExperiencePresenter",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+     "symbol": "makeCanvasOverlay",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceStill.swift",
+     "symbol": "ExperienceStillRenderer",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/SimulationLab/Experience/SimulationPresenter.swift",
+    "symbol": "SimulationPresenter"
+   },
+   "notes": "Tested in SessionOpenCloseTests, ShellLifecycleTests, ShellRenderingTests, CanvasOverlayTests, StillRenderTests and ScenarioRunnerTests."
+  },
+  {
+   "id": "M26",
+   "capability": "Project documents with schema and migration: saved projects and presets as named, versioned documents migrated forward, damaged files reported instead of crashing",
+   "source": "research D2 persistence with migration; constitution A19 bounded",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
+     "symbol": "DocumentStore",
+     "product": "VisualCorePersistence",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/Envelope.swift",
+     "symbol": "DocumentEnvelope",
+     "product": "VisualCorePersistence",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/Migration.swift",
+     "symbol": "MigrationChain",
+     "product": "VisualCorePersistence",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/NamedLibrary.swift",
+     "symbol": "NamedLibrary",
+     "product": "VisualCorePersistence",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/GenerativeArtLibrary.swift",
+    "symbol": "GenerativeArtLibrary"
+   },
+   "notes": "Tested in DocumentStoreTests and NamedLibraryTests. The project schema itself is G-MODEL (A19-P01)."
+  }
+ ],
+ "gaps": [
+  {
+   "id": "G-MODEL",
+   "matrix": [
+    "M05",
+    "M06",
+    "M08"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "The project model (scene, preset, template, crop, output format, animation time), export requests and results with their validation are the experience's domain, GPU-free in its Core (manual phase 01).",
+   "phase": 1,
+   "test": "Core host tests: a request names scene, template, format and time; invalid requests refused; results record size, format and profile; project documents round-trip and migrate",
+   "closed": null
+  },
+  {
+   "id": "G-TEMPLATES",
+   "matrix": [
+    "M02",
+    "M07",
+    "M12",
+    "M19"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "iPhone and iPad templates (pixel size, safe areas) are app data with a provenance record of Apple's published screen sizes; fitting a template to maxRenderSize and the pixel cap and offering the largest size that fits are app rules over ExportGeometry (manual phase 01). No tiling in 0.1.",
+   "phase": 1,
+   "test": "Core host tests: every template has provenance; a template above the reported limit or the pixel cap is refused before allocation and the fallback is the largest even size that fits with the same aspect; fixtures at 2048, 4096 and 8192 limits",
+   "closed": null
+  },
+  {
+   "id": "G-VIDEO",
+   "matrix": [
+    "M05",
+    "M09"
+   ],
+   "kind": "upstream",
+   "owner": "app-local",
+   "justification": "Video is optional. A19-P01 decides feasibility from public APIs (encoder, disk and thermal cost, cancellation) and records the decision; any encoder is assessed for VisualCore ownership then. Until it is shown feasible no video code, copy or control exists.",
+   "phase": 1,
+   "test": "Decision record in A19-P01 with the public API, the measured or bounded cost and the owner; a source scan finds no AVAssetWriter, VideoToolbox or video copy unless the decision is go",
+   "closed": null
+  },
+  {
+   "id": "G-ENCODE",
+   "matrix": [
+    "M05",
+    "M08",
+    "M14"
+   ],
+   "kind": "upstream",
+   "owner": "VisualCore:VisualCoreRendering",
+   "justification": "StillImageEncoder has only pngData. JPEG and HEIC through the same ImageIO path, tagged sRGB, are generic and belong beside it in VisualCoreRendering (additive API, documentation, API baseline, reference regression).",
+   "phase": 2,
+   "test": "VisualCoreRendering tests: PNG, JPEG and HEIC of a known image read back with ImageIO have the sRGB profile and the exact dimensions; a quality setting stays in range; an unsupported destination throws encoding; API baseline updated; the seven-step reference regression passes",
+   "closed": null
+  },
+  {
+   "id": "G-STILLTIME",
+   "matrix": [
+    "M04",
+    "M15"
+   ],
+   "kind": "upstream",
+   "owner": "VisualCore:VisualCoreExperienceHost",
+   "justification": "ExperienceSession.renderStill always renders at time 0. A time parameter on the session's still and on ExperienceStillRenderer (default 0, so existing callers keep their behaviour) is generic host API.",
+   "phase": 2,
+   "test": "VisualCoreExperienceHost tests: renderStill at two times of a time-dependent sample scene gives different pixels and time 0 equals the current behaviour; the environment renderer forwards the time; API baseline updated; the reference regression passes",
+   "closed": null
+  },
+  {
+   "id": "G-SCENES",
+   "matrix": [
+    "M06"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "The curated procedural scenes and their colour presets (shaders, fields, particles, SDFs; no images) with their license entries are the experience's content (manual phase 02).",
+   "phase": 2,
+   "test": "Experience tests: each scene renders offscreen at a template size within budget; same request and time give the same pixels; license inventory lists every shader",
+   "closed": null
+  },
+  {
+   "id": "G-EDITOR",
+   "matrix": [
+    "M06",
+    "M07"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "Project and preset editing, the template picker and the crop and safe-area guides drawn as native overlay over the preview are the experience's UI (manual phase 03).",
+   "phase": 3,
+   "test": "Core tests: crop rectangle and safe-area insets for every template; preset edits clamp to declared ranges; experience tests: the overlay shows the guides for the chosen template",
+   "closed": null
+  },
+  {
+   "id": "G-HELP",
+   "matrix": [
+    "M11"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "The help text explains how to apply a saved image as a wallpaper through the system's own Settings or Photos controls; no public API sets a wallpaper, so the text never claims the app does (manual phase 03).",
+   "phase": 3,
+   "test": "Experience tests: the help is reachable from the export result; the copy-claims scan finds no 'set wallpaper', 'live wallpaper' or automatic-setting claim",
+   "closed": null
+  },
+  {
+   "id": "G-A11Y",
+   "matrix": [
+    "M22"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "VoiceOver labels, Dynamic Type layouts and progress announcements of the experience's editor and export UI over the public planners (manual phase 03).",
+   "phase": 3,
+   "test": "Experience tests: every control has a label; progress is announced through AnnouncementPlanner at a bounded rate; layouts hold at the largest Dynamic Type size",
+   "closed": null
+  },
+  {
+   "id": "G-SAVE",
+   "matrix": [
+    "M05",
+    "M16"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "The export file is handed to the system share sheet (ShareLink with a Transferable file); 'Save Image' uses the app's existing add-only string; the registration declares photo-library-add so app-usage-descriptions stays exact; no PhotoKit call (manual phase 04).",
+   "phase": 4,
+   "test": "Experience tests: the share item is the written file with the right type; registration declares photo-library-add; usage-descriptions passes; a source scan finds no PhotoKit import",
+   "closed": null
+  },
+  {
+   "id": "G-EXPORTJOB",
+   "matrix": [
+    "M05",
+    "M10",
+    "M17"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "The export job (render, encode, write) runs off the interface's critical path with progress and cancellation between steps, error recovery and cleanup of temporary files and GPU targets on every path (manual phase 04).",
+   "phase": 4,
+   "test": "Experience tests: progress reaches 1 on success; cancel at each step leaves no temporary file and no live export target (ResourceRegistry counts); a failed render keeps the live scene and offers retry",
+   "closed": null
+  },
+  {
+   "id": "G-HISTORY",
+   "matrix": [
+    "M10",
+    "M18"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "A bounded local history of exports in ExperienceStorage under StorageQuota is the experience's data (manual phase 04).",
+   "phase": 4,
+   "test": "Core tests: the history keeps the newest entries up to its bound, round-trips and migrates; damaged history is reported, not fatal",
+   "closed": null
+  },
+  {
+   "id": "G-DEVICE",
+   "matrix": [
+    "M02",
+    "M12",
+    "M24"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "Resolution, colour and heat device tests (real maxRenderSize per device, exported profile on device, thermal cost of the largest template) belong to the device campaign after ImplementationLock-100 (manual phase 05); device actions by the owner are BLOCKED_OWNER_ACTION.",
+   "phase": 5,
+   "test": "Device-campaign rows: maxRenderSize recorded per device; the largest template exports or falls back; the exported file's profile and size verified on device; thermal state recorded; rows pending until the campaign",
+   "closed": null
+  },
+  {
+   "id": "G-RELEASE",
+   "matrix": [
+    "M16",
+    "M24"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "Registration, the A19 copy-claims step (no wallpaper-setting or live-wallpaper claim, no unmeasured performance claim), the usage-description check with photo-library-add, verify steps on iOS 27 and 26 and the release notes belong to the release phase (manual phase 06).",
+   "phase": 6,
+   "test": "Release-check steps: copy-claims-a19, usage-descriptions and app-usage-descriptions pass; verify-a19 steps pass on the iOS 27.x and 26.x simulators; the experience package check lists A19 as registered",
+   "closed": null
+  }
+ ],
+ "traceability": [
+  {
+   "item": "brainstorm: offscreen rendering",
+   "matrix": [
+    "M01",
+    "M13",
+    "M20"
+   ],
+   "phases": [
+    2
+   ]
+  },
+  {
+   "item": "brainstorm: high-resolution rendering",
+   "matrix": [
+    "M02",
+    "M12",
+    "M19"
+   ],
+   "phases": [
+    1,
+    5
+   ]
+  },
+  {
+   "item": "brainstorm: effects and compositing",
+   "matrix": [
+    "M03",
+    "M06"
+   ],
+   "phases": [
+    2
+   ]
+  },
+  {
+   "item": "brainstorm: frame capture",
+   "matrix": [
+    "M04",
+    "M15"
+   ],
+   "phases": [
+    2
+   ]
+  },
+  {
+   "item": "brainstorm: export pipelines",
+   "matrix": [
+    "M05",
+    "M08",
+    "M14",
+    "M16",
+    "M17"
+   ],
+   "phases": [
+    1,
+    2,
+    4
+   ]
+  },
+  {
+   "item": "v0.1 feature 01: curated procedural backgrounds and colour presets",
+   "matrix": [
+    "M06",
+    "M23",
+    "M26"
+   ],
+   "phases": [
+    1,
+    2,
+    3
+   ]
+  },
+  {
+   "item": "v0.1 feature 02: iPhone and iPad canvas templates and crop guides",
+   "matrix": [
+    "M07",
+    "M12",
+    "M19"
+   ],
+   "phases": [
+    1,
+    3
+   ]
+  },
+  {
+   "item": "v0.1 feature 03: still-image export with a verified colour profile",
+   "matrix": [
+    "M08",
+    "M14"
+   ],
+   "phases": [
+    2
+   ]
+  },
+  {
+   "item": "v0.1 feature 04: optional short video export after feasibility",
+   "matrix": [
+    "M09"
+   ],
+   "phases": [
+    1
+   ]
+  },
+  {
+   "item": "v0.1 feature 05: export progress, cancellation, error recovery and local history",
+   "matrix": [
+    "M10",
+    "M17",
+    "M18"
+   ],
+   "phases": [
+    4
+   ]
+  },
+  {
+   "item": "v0.1 feature 06: instructions for applying an exported image by hand",
+   "matrix": [
+    "M11"
+   ],
+   "phases": [
+    3
+   ]
+  },
+  {
+   "item": "cross-cutting: permissions, accessibility, quality, lifecycle, licenses, truthful claims, host",
+   "matrix": [
+    "M16",
+    "M20",
+    "M21",
+    "M22",
+    "M23",
+    "M24",
+    "M25"
+   ],
+   "phases": [
+    3,
+    4,
+    5,
+    6
+   ]
+  }
+ ],
+ "negative": [
+  {
+   "rule": "No EGL display, context, surface or GL path of its own; all drawing, on screen and offscreen, goes through VisualCore's RenderHost on OpenGL ES -> ANGLE -> Metal",
+   "source": "constitution A19 consumer, not fork; CLAUDE.md rule 4; spec FR-A19-006"
+  },
+  {
+   "rule": "No second renderer and no second context for export: stills are drawn by renderOffscreen on the session's host; encoders are ImageIO over the read-back pixels",
+   "source": "constitution A19 consumer, not fork; CLAUDE.md rule 4; spec FR-A19-006"
+  },
+  {
+   "rule": "No ProjectM types, engine or presets and no ProjectM code reused",
+   "source": "CLAUDE.md rule 12; spec FR-A19-006"
+  },
+  {
+   "rule": "No networking, accounts, analytics, tracking or advertising; scenes are bundled and projects and history stay in the experience's storage",
+   "source": "constitution A19 offline-first and private; CLAUDE.md rule 3; spec FR-A19-006"
+  },
+  {
+   "rule": "No private API, and no automatic setting of the system wallpaper: the person applies an exported file through the system's own Settings or Photos controls",
+   "source": "manual non-goals; manual §13 cross-cutting obligations; spec FR-A19-006"
+  },
+  {
+   "rule": "No claim that an export is a live wallpaper or that the app sets or installs a wallpaper, in the experience, its copy or the store text",
+   "source": "manual non-goals; constitution A19 truthful claims; spec FR-A19-006"
+  },
+  {
+   "rule": "No unbounded output size: every export is checked against maxRenderSize and the pixel cap before allocation and falls back to the largest size that fits; no tiling in version 0.1",
+   "source": "manual non-goals (no unlimited 8K); spec clarification 5; spec FR-A19-006"
+  },
+  {
+   "rule": "No PhotoKit call and no photo-library read access: saving goes through the system share sheet with the existing add-only usage string, declared as photo-library-add",
+   "source": "spec clarification 4; research D5"
+  },
+  {
+   "rule": "No purchased, generated, scanned or photographic images: every background is procedural (shaders, fields, particles, SDFs)",
+   "source": "CLAUDE.md rule 4; constitution A19 visuals are code; spec FR-A19-006"
+  },
+  {
+   "rule": "No video code, copy or control until A19-P01 shows video feasible from public APIs (G-VIDEO)",
+   "source": "manual v0.1 feature 04; spec clarification 5"
+  },
+  {
+   "rule": "No fork or copy of VisualCore, ANGLE or projectm-ios, no standalone app target and no copy of another experience's export or share code (Generative Art Studio, Fluid Art Playground, Fractal Explorer, Infinite Geometry, Simulation Lab); generic needs become VisualCore gaps",
+   "source": "ADR-0009; constitution A19 reuse first; CLAUDE.md rule 1"
+  },
+  {
+   "rule": "Risk 1, OS wallpaper behaviour changes and third-party live wallpaper APIs are restricted. Owner: Living Wallpapers help and release (app-local G-HELP in A19-P03, G-RELEASE in A19-P06). Verification: the audit records that no public API sets the system wallpaper or installs a live wallpaper; a source scan finds no private API and no wallpaper-setting call; the A19 copy-claims step refuses 'set wallpaper', 'live wallpaper' and automatic-setting wording; the help names only the system's own controls. Release blocker: any private API, any automatic wallpaper setting, or any claim in the experience, its copy or the store text that the app sets or installs a wallpaper or exports a live wallpaper.",
+   "source": "manual §13 risk 1"
+  },
+  {
+   "rule": "Risk 2, very high resolution exports cause out-of-memory. Owner: templates and the size fit (app-local G-TEMPLATES in A19-P01) over VisualCoreRendering's maxRenderSize, maxOffscreenPixels and ResourceBudget, with device limits in A19-P05 (G-DEVICE). Verification: host tests refuse every size above the reported limit or the 64,000,000-pixel cap before allocation and offer the largest size that fits; OffscreenExportTests prove the budget refusal and the release of the target on every path; the device campaign records maxRenderSize and memory per device. Release blocker: an allocation attempted above the limit, an export without a fallback, a leaked export target, or a size claim not measured on a device.",
+   "source": "manual §13 risk 2"
+  },
+  {
+   "rule": "Risk 3, video encoding consumes disk and thermal budget. Owner: the video feasibility decision (app-local G-VIDEO in A19-P01; any encoder assessed for VisualCore ownership then) and the export job (G-EXPORTJOB in A19-P04). Verification: the A19-P01 decision record bounds duration, size, disk and thermal cost from public APIs; tests prove progress and cancellation remove partial files; until feasibility is shown a source scan finds no video code, copy or control. Release blocker: any video code, copy or control without a recorded go decision, a partial file left after cancellation, or a video export without progress and cancel.",
+   "source": "manual §13 risk 3"
+  }
+ ],
+ "decision": {
+  "result": "go",
+  "reasons": [
+   "A working host and an offscreen render-and-read-back path exist: RenderHost on OpenGL ES -> ANGLE -> Metal draws any RenderScene (FullScreenShaderScene, FieldPass, EffectScene, CrossfadeScene, CachedScene), and RenderHost.renderOffscreen(width:height:time:) renders it at an output size independent of the screen on the host's own context, validates the size first, reads the pixels back top-down and restores the live scene, all public and tested (OffscreenExportTests, StillRenderTests, StillCaptureTests, CrossfadeSceneTests); StillImageEncoder writes an sRGB PNG, and five experiences already share such files through the system share sheet.",
+   "8 of 26 rows are available with tests: offscreen rendering, effects and compositing, GPU budget and memory warnings, lifecycle with resize and context loss, quality tiers, licenses, the experience host and project documents with migration.",
+   "All 18 non-available rows have owned gaps: G-MODEL, G-TEMPLATES and the video feasibility decision G-VIDEO in A19-P01; the additive VisualCoreRendering encoders G-ENCODE (JPEG and HEIC tagged sRGB, verified by read-back), the additive VisualCoreExperienceHost still time G-STILLTIME and G-SCENES in A19-P02; G-EDITOR, G-HELP and G-A11Y in A19-P03; G-SAVE, G-EXPORTJOB and G-HISTORY in A19-P04; G-DEVICE in A19-P05; G-RELEASE in A19-P06. No upstream change is needed to start.",
+   "The only permission is the existing add-only Photos string through the share sheet (photo-library-add, declared in A19-P04); no PhotoKit call, no read access, no network. Living Wallpapers stays unregistered (18 registered, A01-A18) until A19-P01 creates Packages/ExperiencesCreative/LivingWallpapers with its targets and first real rules."
+  ],
+  "blockers": []
+ }
+}
