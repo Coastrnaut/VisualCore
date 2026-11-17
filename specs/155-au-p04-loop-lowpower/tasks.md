@@ -41,7 +41,7 @@ for the audio change, feature 077 (A10-P03). Rollback: revert the commits (the A
 
 ## Phase 4: Story 2 — nothing flashes (P1)
 
-- [ ] T-A21-407 [US2] The reduced-flash mode (control `reduced-flash`, and the system's Reduce Flashing: twinkle 0,
+- [X] T-A21-407 [US2] The reduced-flash mode (control `reduced-flash`, and the system's Reduce Flashing: twinkle 0, — Verified 2026-11-17: 2026-11-17: Reduced flashing (identifier reduced-flash) and the system's Reduce Flashing: twinkle off through u_twinkleOff (default output unchanged, 0/255) and 4.0 s changes; ReducedFlashTests: largest mean-luminance step 0.00079 at 30 frames per second, under 0.02, also during a change; .autonomy/checks/A21-P04.au-ios27.json exit 0; written by an agent, retested
   changes 4.0 s) and `ExperienceTests/ReducedFlashTests.swift` (every consecutive frame's mean-luminance step < 0.02
   at 30 frames per second, also during a change) (FR-A21-402; SC-A21-402)
 

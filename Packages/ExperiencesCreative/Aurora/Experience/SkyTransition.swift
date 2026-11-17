@@ -20,6 +20,12 @@
 // The brightness limit: each sky applies it in its shader, and a mix in display space of two capped pictures stays
 // capped (sRGB decoding is convex). A still captured under a higher limit than the one asked for now ends the change
 // (``stillLimit``). No GL call: everything is drawn through VisualCoreRendering's scenes.
+//
+// Feature 155 (A21-P04) T-A21-407, T-A21-408 (FR-A21-402, FR-A21-403; clarifications Q2, Q4): with
+// ``SkyTransition/reducedFlashing`` on, a change takes ``SkyTransition/reducedFlashDuration`` (4.0 s) instead of 2.0 s
+// (switched during a change, the share done is kept, so the mix does not jump) and every sky draws with the twinkle
+// off (`SkyShader.twinkleOffParameter` 1). ``SkyTransition/fragment`` is the sky's source (a test seam replaces it,
+// before `setup`, with a source that fails to compile).
 import Foundation
 import AuroraCore
 import VisualCoreExperience
@@ -42,15 +48,16 @@ final class SkyLayer: RenderScene {
 
     /// The fragment source of `slot`: the shader itself for slot 0, one `#define AURORA_SKY_SLOT <slot>` line appended
     /// otherwise (the line numbers of diagnostics stay those of `aurora-sky.frag`).
-    static func source(slot: Int) -> String {
-        slot == 0 ? SkyShader.source : SkyShader.source + "\n#define AURORA_SKY_SLOT \(slot)\n"
+    static func source(slot: Int, fragment: String = SkyShader.source) -> String {
+        slot == 0 ? fragment : fragment + "\n#define AURORA_SKY_SLOT \(slot)\n"
     }
 
-    /// A sky in program slot `slot`; nothing is allocated before `setup`.
-    init(slot: Int) {
+    /// A sky in program slot `slot` drawing `fragment` (`aurora-sky.frag` by default); nothing is allocated before
+    /// `setup`.
+    init(slot: Int, fragment: String = SkyShader.source) {
         self.slot = slot
-        shader = FullScreenShaderScene(fragment: Self.source(slot: slot), fragmentName: SkyShader.fragmentName,
-                                       bundle: ShaderBundle(files: [:]))
+        shader = FullScreenShaderScene(fragment: Self.source(slot: slot, fragment: fragment),
+                                       fragmentName: SkyShader.fragmentName, bundle: ShaderBundle(files: [:]))
     }
 
     /// Builds the program; a compile or link error tears it down again and throws ``SkyShaderError``.
@@ -77,12 +84,15 @@ final class SkyLayer: RenderScene {
         if !keepsShaderOnTeardown { shader.teardown(context) }
     }
 
-    /// Sets what the next frame draws: `uniforms` (made from `inputs`) at animation time `time`, for `preset`.
-    func show(_ inputs: SkyInputs, uniforms: SkyUniforms, preset: String, time: Double) {
+    /// Sets what the next frame draws: `uniforms` (made from `inputs`) at animation time `time`, for `preset`; with
+    /// `twinkleOff` the stars do not twinkle (reduced flash).
+    func show(_ inputs: SkyInputs, uniforms: SkyUniforms, preset: String, time: Double, twinkleOff: Bool = false) {
         self.inputs = inputs
         self.preset = preset
         shader.palette = uniforms.palette
-        shader.parameters = uniforms.shaderParameters
+        var parameters = uniforms.shaderParameters
+        if twinkleOff { parameters[SkyShader.twinkleOffParameter] = 1 }
+        shader.parameters = parameters
         shader.fixedTime = time
     }
 }
@@ -92,6 +102,30 @@ final class SkyLayer: RenderScene {
 final class SkyTransition {
     /// The length of a change: 2.0 s of drawn-frame time.
     static let duration = 2.0
+    /// The length of a change with reduced flashing on: 4.0 s of drawn-frame time (feature 155).
+    static let reducedFlashDuration = 4.0
+
+    /// The sky's fragment source for every new layer (`aurora-sky.frag`); set only before `setup` (a test seam), when
+    /// the sky alone is rebuilt with it.
+    var fragment = SkyShader.source {
+        didSet {
+            guard !isSetUp, crossfade == nil else { return }
+            sky = SkyLayer(slot: 0, fragment: fragment)
+        }
+    }
+
+    /// Reduced flashing (feature 155): changes take ``reducedFlashDuration`` and the stars do not twinkle. Switched
+    /// during a change, the share done stays.
+    var reducedFlashing = false {
+        didSet {
+            guard oldValue != reducedFlashing else { return }
+            let share = elapsed / (oldValue ? Self.reducedFlashDuration : Self.duration)
+            elapsed = min(max(share, 0), 1) * length
+        }
+    }
+
+    /// The length of a change now: ``duration``, or ``reducedFlashDuration`` with ``reducedFlashing``.
+    var length: Double { reducedFlashing ? Self.reducedFlashDuration : Self.duration }
 
     /// The sky shown alone, or the incoming sky during a change.
     private(set) var sky = SkyLayer(slot: 0)
@@ -99,7 +133,7 @@ final class SkyTransition {
     private(set) var outgoing: SkyLayer?
     /// The crossfade of a running change; nil without one.
     private(set) var crossfade: CrossfadeScene?
-    /// The frame time since the change began (or restarted), 0…``duration``.
+    /// The frame time since the change began (or restarted), 0…``length``.
     private(set) var elapsed = SkyTransition.duration
     /// Whether the transition is set up (between `setup` and `teardown`).
     private(set) var isSetUp = false
@@ -115,7 +149,7 @@ final class SkyTransition {
     var isChanging: Bool { crossfade != nil }
 
     /// The share of the change done, 0…1 (linear in frame time); 1 without a change.
-    var progress: Double { isChanging ? min(max(elapsed / Self.duration, 0), 1) : 1 }
+    var progress: Double { isChanging ? min(max(elapsed / length, 0), 1) : 1 }
 
     /// The mix drawn: smoothstep of ``progress``.
     var eased: Double {
@@ -170,7 +204,7 @@ final class SkyTransition {
             restarts += 1
         } else {
             let shown = sky
-            let incoming = SkyLayer(slot: 1 - shown.slot)
+            let incoming = SkyLayer(slot: 1 - shown.slot, fragment: fragment)
             incoming.inputs = shown.inputs
             incoming.preset = shown.preset
             let made = CrossfadeScene(from: shown, to: incoming)
@@ -189,7 +223,7 @@ final class SkyTransition {
     /// Ends a running change at the incoming sky, which then draws alone (Reduce Motion, the end of the fade, or a
     /// still captured under a higher limit). Without a change only the progress is completed.
     func finish(_ context: RenderContext) {
-        elapsed = Self.duration
+        elapsed = length
         guard let crossfade else { return }
         sky.keepsShaderOnTeardown = true
         crossfade.teardown(context)
@@ -202,8 +236,8 @@ final class SkyTransition {
     /// Advances a running change by one drawn frame's `delta` seconds; a negative or non-finite delta does nothing.
     func advance(by delta: Double) {
         guard isChanging, delta.isFinite, delta > 0 else { return }
-        elapsed = min(elapsed + delta, Self.duration)
-        if Self.duration - elapsed < 1e-9 { elapsed = Self.duration }
+        elapsed = min(elapsed + delta, length)
+        if length - elapsed < 1e-9 { elapsed = length }
     }
 
     /// Moves a running change to the point where the mix drawn (``eased``) is `mix` (0…1), by inverting smoothstep;
@@ -212,7 +246,7 @@ final class SkyTransition {
         guard isChanging else { return }
         let y = min(max(mix.isFinite ? mix : 0, 0), 1)
         let t = 0.5 - sin(asin(1 - 2 * y) / 3)
-        elapsed = min(max(t, 0), 1) * Self.duration
+        elapsed = min(max(t, 0), 1) * length
     }
 
     // MARK: Drawing
@@ -223,10 +257,11 @@ final class SkyTransition {
     func render(_ context: RenderContext, frame: FrameInfo, incoming: SkyInputs, uniforms: SkyUniforms, preset: String,
                 outgoingUniforms: SkyUniforms?, time: Double) throws {
         sky.resize(context)
-        sky.show(incoming, uniforms: uniforms, preset: preset, time: time)
+        sky.show(incoming, uniforms: uniforms, preset: preset, time: time, twinkleOff: reducedFlashing)
         if let outgoing, let outgoingInputs = outgoing.inputs, let outgoingUniforms {
             outgoing.resize(context)
-            outgoing.show(outgoingInputs, uniforms: outgoingUniforms, preset: outgoing.preset ?? preset, time: time)
+            outgoing.show(outgoingInputs, uniforms: outgoingUniforms, preset: outgoing.preset ?? preset, time: time,
+                          twinkleOff: reducedFlashing)
         }
         if let crossfade {
             crossfade.progress = eased
