@@ -14,7 +14,7 @@ migration, no VisualCore change).
 ## Phase 2: Story 1 — privacy and credits
 
 - [ ] T-A18-602 [P] [US1] Write `docs/apps/ambient-clock/privacy-and-credits.md`: the stored snapshot (format, theme, night and motion settings) and `favourites.json` (at most 12) in the experience's storage, replaced on each change and removed when the app is deleted; nothing sent; no permission or usage string; keep-awake is off by default, turned on only by the person, applies only while the clock is open, and lives in `Experience/KeepAwake.swift`; brightness is never written; the license inventory (the themes, palettes, shaders and type are written in this repository; the system font) (FR-A18-601)
-- [ ] T-A18-603 [US1] Write `specs/136-ac-p06-release/scan-sources-release.sh` refusing the APIs of Clarifications Q3 and any `brightness =` write in `Packages/ExperiencesCreative/AmbientClock`, and requiring `isIdleTimerDisabled` in exactly `Experience/KeepAwake.swift`; run it (`--name ac-no-network -- sh specs/136-ac-p06-release/scan-sources-release.sh`) (FR-A18-602; SC-A18-601)
+- [X] T-A18-603 [US1] Write `specs/136-ac-p06-release/scan-sources-release.sh` refusing the APIs of Clarifications Q3 and any `brightness =` write in `Packages/ExperiencesCreative/AmbientClock`, and requiring `isIdleTimerDisabled` in exactly `Experience/KeepAwake.swift`; run it (`--name ac-no-network -- sh specs/136-ac-p06-release/scan-sources-release.sh`) (FR-A18-602; SC-A18-601) — Verified 2026-11-16: 2026-11-16: specs/136-ac-p06-release/scan-sources-release.sh; .autonomy/checks/A18-P06.ac-no-network.json exit 0 (no scanned use in 52 Swift files of Packages/ExperiencesCreative/AmbientClock; the idle timer only in Experience/KeepAwake.swift)
 
 ## Phase 3: Story 2 — recovery and stored files
 

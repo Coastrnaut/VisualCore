@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "sh",
+    "specs/136-ac-p06-release/scan-sources-release.sh"
+  ],
+  "command": "sh specs/136-ac-p06-release/scan-sources-release.sh",
+  "elapsed_seconds": 0.038,
+  "exit_code": 0,
+  "finished": "2026-11-17T04:33:43+00:00",
+  "log": ".autonomy/logs/A18-P06.ac-no-network.log",
+  "log_sha256": "9750508be94d15ef74156ff85648dad667439010fa02c1877ec55ac2eeb7bea3",
+  "name": "ac-no-network",
+  "stage": "A18-P06",
+  "started": "2026-11-17T04:33:43+00:00",
+  "timed_out": false
+}
