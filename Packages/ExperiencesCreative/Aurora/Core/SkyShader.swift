@@ -6,6 +6,11 @@
 // circle in noise space and the twinkle by whole cycles, so phase 0 and phase 1 give the same picture (a seamless
 // 600 s loop). A final soft knee keeps every pixel's Rec. 709 luminance at most 0.72 (linear light, before the sRGB
 // encode). Level 0 uses 5 octaves and level 1 uses 3. `SkyReference` evaluates the same formulas in `Float`.
+//
+// Feature 153 (A21-P02) T-A21-205 (FR-A21-203; clarification Q2): the brightness limit `u_limit` (0.2…0.72). The soft
+// knee starts at ``SkyShader/kneeRatio`` (5/6, about 0.83) × limit and approaches the limit, after compositing and
+// before the sRGB encode, so every pixel's luminance is at most the limit. The default limit 0.72 gives the A21-P01
+// knee (start 0.6, ceiling 0.72) unchanged.
 import Foundation
 
 /// The values `aurora-sky.frag` is drawn with. The palette is in **linear light** (as `FullScreenShaderScene.palette`
@@ -26,10 +31,14 @@ public struct SkyUniforms: Equatable, Sendable {
     public var phase: Float
     /// The fbm octave count (``SkyShader/octaves(forLevel:)``).
     public var octaves: Int
+    /// The brightness limit: the largest Rec. 709 luminance (linear light) a pixel reaches (feature 153; default
+    /// ``SkyShader/luminanceCeiling``, 0.72, the A21-P01 knee).
+    public var limit: Float
 
-    /// Uniforms with the values as given (nothing is clamped; the shader bounds the loops).
+    /// Uniforms with the values as given (nothing is clamped; the shader bounds the loops); `limit` defaults to
+    /// ``SkyShader/luminanceCeiling``.
     public init(palette: [SIMD3<Float>], ribbons: Int, turbulence: Float, cloudiness: Float, stars: Int,
-                phase: Float, octaves: Int) {
+                phase: Float, octaves: Int, limit: Float = SkyShader.luminanceCeiling) {
         self.palette = palette
         self.ribbons = ribbons
         self.turbulence = turbulence
@@ -37,21 +46,24 @@ public struct SkyUniforms: Equatable, Sendable {
         self.stars = stars
         self.phase = phase
         self.octaves = octaves
+        self.limit = limit
     }
 
     /// The uniforms of `scene` at `phase` (0…1, for example ``SkyClock/phase``) and quality `level`: the palette is
-    /// decoded from sRGB to linear light and the octaves come from ``SkyShader/octaves(forLevel:)``.
-    public init(scene: SkyScene, phase: Double, level: Int) {
+    /// decoded from sRGB to linear light and the octaves come from ``SkyShader/octaves(forLevel:)``; `limit` defaults
+    /// to ``SkyShader/luminanceCeiling``.
+    public init(scene: SkyScene, phase: Double, level: Int, limit: Double = Double(SkyShader.luminanceCeiling)) {
         self.init(palette: scene.palette.map { SkyShader.linear($0) }, ribbons: scene.ribbons,
                   turbulence: Float(scene.turbulence), cloudiness: Float(scene.cloudiness), stars: scene.stars,
-                  phase: Float(phase), octaves: SkyShader.octaves(forLevel: level))
+                  phase: Float(phase), octaves: SkyShader.octaves(forLevel: level), limit: Float(limit))
     }
 
     /// The float parameters for `FullScreenShaderScene.parameters` (bound as `u_<name>`): `phase`, `ribbons`,
-    /// `turbulence`, `cloudiness`, `stars` and `octaves`. Every value converts back to the same `Float`.
+    /// `turbulence`, `cloudiness`, `stars`, `octaves` and `limit`. Every value converts back to the same `Float`.
     public var shaderParameters: [String: Double] {
         ["phase": Double(phase), "ribbons": Double(ribbons), "turbulence": Double(turbulence),
-         "cloudiness": Double(cloudiness), "stars": Double(stars), "octaves": Double(octaves)]
+         "cloudiness": Double(cloudiness), "stars": Double(stars), "octaves": Double(octaves),
+         "limit": Double(limit)]
     }
 }
 
@@ -66,12 +78,18 @@ public enum SkyShader {
     /// The largest Rec. 709 luminance (linear light) the soft knee reaches; below the declared 0.75 so that 8-bit
     /// rounding cannot cross it.
     public static let luminanceCeiling: Float = 0.72
-    /// The luminance where the soft knee starts.
+    /// The luminance where the soft knee starts at the default limit (``kneeRatio`` × ``luminanceCeiling``).
     public static let kneeStart: Float = 0.6
+    /// The knee's start as a share of the limit: 0.6 / 0.72 = 5/6 (about 0.83), so the default limit keeps the
+    /// A21-P01 knee (feature 153).
+    public static let kneeRatio: Float = 0.6 / 0.72
+    /// The accepted brightness limits (feature 153): 0.2…0.72.
+    public static let limitRange: ClosedRange<Double> = 0.2...0.72
     /// The twinkle amplitude: a star's brightness stays within ±30 % of its base.
     public static let twinkleAmplitude: Float = 0.3
     /// The sky-specific uniform names (besides `u_resolution`, `u_palette` and `u_paletteCount`).
-    public static let uniformNames = ["u_phase", "u_ribbons", "u_turbulence", "u_cloudiness", "u_stars", "u_octaves"]
+    public static let uniformNames = ["u_phase", "u_ribbons", "u_turbulence", "u_cloudiness", "u_stars", "u_octaves",
+                                      "u_limit"]
 
     /// The fbm octaves of quality `level`: 0 (or below) → 5, 1 (or above) → 3.
     public static func octaves(forLevel level: Int) -> Int { level <= 0 ? 5 : 3 }
@@ -101,6 +119,7 @@ public enum SkyShader {
     uniform float u_cloudiness;
     uniform float u_stars;
     uniform float u_octaves;
+    uniform float u_limit;
     out vec4 color;
 
     const float AU_TAU = 6.2831853;
@@ -159,12 +178,14 @@ public enum SkyShader {
             rgb += au_stop(1 + i % colours) * (k * (1.0 - 0.5 * cover));
         }
 
-        // Soft knee: luminance never exceeds 0.72 in linear light.
+        // Soft knee: luminance never exceeds the limit in linear light (start 5/6 of the limit).
         rgb = clamp(rgb, 0.0, 1.0);
         float lum = dot(rgb, vec3(0.2126, 0.7152, 0.0722));
-        if (lum > 0.6) {
-            float x = lum - 0.6;
-            rgb *= (0.6 + 0.12 * x / (x + 0.12)) / lum;
+        float knee = 0.8333333 * u_limit;
+        float room = u_limit - knee;
+        if (lum > knee) {
+            float x = lum - knee;
+            rgb *= (knee + room * x / (x + room)) / lum;
         }
         color = vec4(vc_srgbEncode(rgb), 1.0);
     }

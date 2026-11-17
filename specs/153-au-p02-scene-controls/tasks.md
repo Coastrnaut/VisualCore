@@ -33,7 +33,7 @@ VisualCore change. Precedent: `specs/146-zg-p02-sand-renderer/tasks.md`. Rollbac
 
 ## Phase 3: Story 2 — the brightness limit (P1)
 
-- [ ] T-A21-205 [US2] Add `u_limit` to `Packages/ExperiencesCreative/Aurora/Core/SkyShader.swift` and the limit to
+- [X] T-A21-205 [US2] Add `u_limit` to `Packages/ExperiencesCreative/Aurora/Core/SkyShader.swift` and the limit to — Verified 2026-11-17: 2026-11-17: u_limit in SkyShader and SkyReference (knee from 5/6 x limit to the limit after compositing; the default 0.72 keeps the A21-P01 pictures byte for byte); LimitTests (reference under 0.2, 0.4, 0.6, 0.72) and LimitRenderTests (every preset and the start, middle and end of all six changes: largest luminance 0.1998 at 0.2, 0.3939 at 0.4, 0.6825 at 0.72); .autonomy/checks/A21-P02.au-ios27.json exit 0; written by an agent, retested
   `SkyReference.swift` ("knee from 0.83 × limit to the limit", after compositing; default 0.72 keeps the A21-P01
   tests) with `CoreTests/LimitTests.swift` (the reference under every limit), and write
   `ExperienceTests/LimitRenderTests.swift`: every preset at limits 0.2, 0.4 and 0.72 and the start, middle and end of

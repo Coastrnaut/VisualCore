@@ -3,6 +3,9 @@
 // the `vc/` hash and noise. It follows the GPU's conventions: pixel centres (`gl_FragCoord` = x + 0.5, y + 0.5, origin
 // bottom-left), the exact sRGB encode of `vc/color.glsl` and round-to-nearest 8-bit conversion; the result is RGBA8
 // with rows top-down, the orientation of `StillImage` from `RenderHost.renderOffscreen`. Pure Swift; no GPU, no clock.
+//
+// Feature 153 (A21-P02) T-A21-205 (FR-A21-203): the knee follows the uniforms' `limit` (start 5/6 of it), as the
+// shader's `u_limit` does; the default limit 0.72 is the A21-P01 knee.
 import Foundation
 
 /// The CPU reference of `aurora-sky.frag`.
@@ -39,8 +42,8 @@ public enum SkyReference {
         return 1 + SkyShader.twinkleAmplitude * sin(tau * (cycles * ph + hs.y))
     }
 
-    /// The colour of one pixel in linear light, after the soft knee and before the sRGB encode, at `fragCoord`
-    /// (pixel centre, origin bottom-left) of a drawing of `resolution` pixels.
+    /// The colour of one pixel in linear light, after the soft knee of `u.limit` and before the sRGB encode, at
+    /// `fragCoord` (pixel centre, origin bottom-left) of a drawing of `resolution` pixels.
     public static func linearColor(_ u: SkyUniforms, fragCoord: SIMD2<Float>, resolution: SIMD2<Float>) -> SIMD3<Float> {
         let palette = Array(u.palette.prefix(8))
         let count = max(palette.count, 1)
@@ -102,9 +105,11 @@ public enum SkyReference {
         // Soft knee.
         rgb = SIMD3(min(max(rgb.x, 0), 1), min(max(rgb.y, 0), 1), min(max(rgb.z, 0), 1))
         let lum = luminance(rgb)
-        if lum > SkyShader.kneeStart {
-            let x = lum - 0.6
-            rgb *= (0.6 + 0.12 * x / (x + 0.12)) / lum
+        let knee: Float = 0.8333333 * u.limit
+        let room = u.limit - knee
+        if lum > knee {
+            let x = lum - knee
+            rgb *= (knee + room * x / (x + room)) / lum
         }
         return rgb
     }
