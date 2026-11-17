@@ -24,3 +24,15 @@
     returns `.failure(.doesNotFit(template:offered:))`, or `.failure(.noLimit)` when maxEdge ≤ 0.
 - **`ExportResult`:** width, height, profile name and bytes, from `ImageColorPipeline.inspect(_ data:)`.
   `verify(_:against:)` gives `.ok`, or the mismatches as `dimensions`, `profile` or `unreadable`.
+
+## As built (T-A19-115)
+
+- **`ExportRefusal`** has a third case, `unknownTemplate(String)`, for a project built in code with an unknown
+  template. `ExportRefusal.offeredPlan(format:)` turns the offered size into a plan with `fallback: true`; it is the
+  only place a fallback plan is made. The codes are `no-limit`, `does-not-fit` and `unknown-template`.
+- **`WallpaperProject.resolvedParameters`:** a scene parameter absent from a file takes its default, so a subset of
+  parameters is not refused. An unknown id, a non-finite value or a value out of range is `invalid-parameter`, and
+  so is an animation time outside 0…3600, with the id `animationTime`. An unknown `format` string fails the body and
+  is `damaged`.
+- **`RGBColor`** clamps each component to 0…1, with a non-finite component becoming 0, and has `init(hex:)`; it has
+  no alpha, so every colour is opaque.

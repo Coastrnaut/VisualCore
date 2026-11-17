@@ -18,3 +18,6 @@
   height and the profile `kCGColorSpaceSRGB`, with 0 mismatches.
 - **Scan:** `scan-platform-claims.sh` exits 0, finding no `AVAssetWriter`, `VideoToolbox`, `CVPixelBuffer`, "live
   wallpaper", "video" or "set as wallpaper" in `Packages/ExperiencesCreative/LivingWallpapers`.
+- **As built (T-A19-115):** the planner also refuses an unknown template (`unknown-template`), and
+  `offeredPlan(format:)` is the only fallback plan. A project file may omit scene parameters; they resolve to their
+  defaults.
