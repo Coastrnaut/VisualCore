@@ -650,7 +650,7 @@
       "id": "a19.living-wallpapers",
       "code": "A19",
       "title": "Living Wallpapers",
-      "summary": "A creator that exports striking still or supported video background files while respecting iOS wallpaper restrictions.",
+      "summary": "A creator of procedural backgrounds framed for a chosen iPhone or iPad screen: four curated scenes with colour presets, the device's crop frame and approximate safe areas, and a still exported at the template's exact size, read back to verify its dimensions and sRGB profile.",
       "kind": "creative",
       "tier": "free",
       "category": "ambient",
@@ -659,10 +659,25 @@
         "ambient-and-lifestyle"
       ],
       "order": 19,
-      "palette": [],
+      "palette": [
+        "#0B1D3A",
+        "#123F4F",
+        "#3A1F4D",
+        "#1F2A2E"
+      ],
       "tile_seed": 3776902180,
-      "capabilities": [],
-      "quality_tiers": [],
+      "capabilities": [
+        "four curated procedural scenes",
+        "three colour presets per scene",
+        "iPhone and iPad device templates",
+        "crop frame and safe-area guides",
+        "still export at template size",
+        "PNG, JPEG and HEIC, sRGB"
+      ],
+      "quality_tiers": [
+        "level-0",
+        "level-1"
+      ],
       "content": null,
       "available": false
     },

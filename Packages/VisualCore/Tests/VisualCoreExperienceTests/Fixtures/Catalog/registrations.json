@@ -441,6 +441,30 @@
       "manifest": "Packages/ExperiencesCreative/AmbientClock/scenario-manifest.json",
       "permissions": [],
       "summary": "A calm, readable clock over a slowly moving procedural noise gradient: locale-aware time and date from the system calendar and time zone, 12/24-hour and seconds options, and the spoken time for VoiceOver."
+    },
+    "a19.living-wallpapers": {
+      "capabilities": [
+        "four curated procedural scenes",
+        "three colour presets per scene",
+        "iPhone and iPad device templates",
+        "crop frame and safe-area guides",
+        "still export at template size",
+        "PNG, JPEG and HEIC, sRGB"
+      ],
+      "quality_tiers": [
+        "level-0",
+        "level-1"
+      ],
+      "palette": [
+        "#0B1D3A",
+        "#123F4F",
+        "#3A1F4D",
+        "#1F2A2E"
+      ],
+      "content": null,
+      "manifest": "Packages/ExperiencesCreative/LivingWallpapers/scenario-manifest.json",
+      "permissions": [],
+      "summary": "A creator of procedural backgrounds framed for a chosen iPhone or iPad screen: four curated scenes with colour presets, the device's crop frame and approximate safe areas, and a still exported at the template's exact size, read back to verify its dimensions and sRGB profile."
     }
   }
 }
