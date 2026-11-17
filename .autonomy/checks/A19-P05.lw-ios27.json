@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesCreative",
+    "--scheme",
+    "ExperiencesCreative-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "LivingWallpapersCoreTests",
+    "LivingWallpapersExperienceTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing LivingWallpapersCoreTests LivingWallpapersExperienceTests",
+  "elapsed_seconds": 14.235,
+  "exit_code": 0,
+  "finished": "2026-11-17T06:46:28+00:00",
+  "log": ".autonomy/logs/A19-P05.lw-ios27.log",
+  "log_sha256": "f21f7a4871a07182b56ce2eff6f44bc9b11aea956a1aff5d401128d856baa350",
+  "name": "lw-ios27",
+  "stage": "A19-P05",
+  "started": "2026-11-17T06:46:14+00:00",
+  "timed_out": false
+}

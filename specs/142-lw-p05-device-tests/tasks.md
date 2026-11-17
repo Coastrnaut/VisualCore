@@ -22,7 +22,7 @@ device step. No VisualCore change. Precedent: `specs/135-ac-p05-device-qa/tasks.
 
 ## Phase 4: Story 3 — the campaign plan (P2)
 
-- [ ] T-A19-506 [P] [US3] Write `docs/apps/living-wallpapers/device-campaign.md` with rows LW-D1 to LW-D8 of clarification Q3, each with device (D1, D2, D3), procedure, threshold and "pending device campaign"; no number claimed; D3 stays on iPadOS 26.5 (FR-A19-503, 504; SC-A19-503)
+- [X] T-A19-506 [P] [US3] Write `docs/apps/living-wallpapers/device-campaign.md` with rows LW-D1 to LW-D8 of clarification Q3, each with device (D1, D2, D3), procedure, threshold and "pending device campaign"; no number claimed; D3 stays on iPadOS 26.5 (FR-A19-503, 504; SC-A19-503) — Verified 2026-11-17: 2026-11-17: docs/apps/living-wallpapers/device-campaign.md rows LW-D1 to LW-D8, each with device (D1, D2, D3), procedure, threshold and pending device campaign; no measured number; facts checked in code (ExportGeometry 8192 and 64,000,000, templates, the add-only usage string); validate_docs exit 0; written by an agent, reviewed
 
 ## Phase 5: Records and evidence
 
