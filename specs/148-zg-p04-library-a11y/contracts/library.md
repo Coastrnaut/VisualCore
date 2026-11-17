@@ -9,3 +9,5 @@
   bytes, and a document within its caps.
 - **Still:** a 1600 × 1200 PNG is written and handed to `ShareLink`; a failure leaves no file; a second export
   replaces the first.
+- **As built:** the restore path, the index rules, the case rule, the extra refusals, the identifiers and the still's
+  file and failures of data-model.md "As built" (LibraryTests, AccessibilityTests, StillTests).
