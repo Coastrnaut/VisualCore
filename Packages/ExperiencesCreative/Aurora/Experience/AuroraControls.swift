@@ -1,5 +1,5 @@
 // AuroraControls — feature 153 (A21-P02) T-A21-203, T-A21-206 (FR-A21-201, FR-A21-205; clarification Q4;
-// contracts/experience.md "Chrome"). The native controls of Aurora. Every control reads the presenter's mirror, sends
+// contracts/experience.md "Chrome"); feature 154 (A21-P03) T-A21-305, T-A21-306 (FR-A21-304–306; clarification Q5). The native controls of Aurora. Every control reads the presenter's mirror, sends
 // through the action port, has a spoken label and value from one list (`labels(_:)`, also read by the tests), a hint
 // and the identifier `experience.a21.aurora.<name>` (`ExperienceActionPort.identifier`):
 //
@@ -8,6 +8,10 @@
 //     `turbulence` (0…100 % → `motion.turbulence`), `clouds` (0…100 % → `sky.clouds`) and `limit` ("Brightness
 //     limit", 20…72 % → `light.limit [0.2…0.72]`);
 //   - steppers `ribbons` (1…4 → `sky.ribbons`) and `stars` (0…400 in steps of 20 → `sky.stars`);
+//   - the sound choice (feature 154): a `sound` toggle ("Sound", On or Off) and a `volume` slider ("Volume",
+//     0…100 %). They send no action: the presenter keeps them in the preferences only (`setSound(on:)`,
+//     `setVolume(_:)`), so the snapshot, the digest and the scenario manifest do not change, and nothing plays;
+//   - `message`: the line about the saved choices (they could not be read, or could not be saved), when there is one;
 //   - `hide-controls` ("Hide controls"): the presenter hides the controls. While hidden only `show-controls` remains:
 //     a short line "Controls hidden. Tap the sky to show them." with the accessibility action "Show controls", so a
 //     VoiceOver user can always bring them back; a tap on the sky does the same (the presenter's pointer).
@@ -78,11 +82,13 @@ struct AuroraControls: View {
             AuroraControlLabel(name: "stars", title: "Stars", value: String(mirror.stars)),
             AuroraControlLabel(name: "clouds", title: "Clouds", value: percentText(mirror.clouds)),
             AuroraControlLabel(name: "limit", title: "Brightness limit", value: percentText(mirror.limit)),
+            AuroraControlLabel(name: "sound", title: "Sound", value: mirror.soundOn ? "On" : "Off"),
+            AuroraControlLabel(name: "volume", title: "Volume", value: percentText(mirror.volume)),
             AuroraControlLabel(name: "hide-controls", title: "Hide controls", value: "Controls shown"),
         ]
     }
 
-    /// The control each identifier name sends (the hide and show controls send nothing).
+    /// The control each identifier name sends (the sound, volume, hide and show controls send nothing).
     static let actionOfControl: [String: String] = [
         "preset": "preset.select", "hue": "colour.hue", "speed": "motion.speed", "turbulence": "motion.turbulence",
         "ribbons": "sky.ribbons", "stars": "sky.stars", "clouds": "sky.clouds", "limit": "light.limit",
@@ -118,6 +124,12 @@ struct AuroraControls: View {
     private func shown(_ spoken: [String: AuroraControlLabel]) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(verbatim: "Aurora").font(.headline).accessibilityAddTraits(.isHeader)
+            if let message = mirror.message {
+                Text(verbatim: message)
+                    .font(.footnote)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier(port.identifier("message"))
+            }
             Picker(selection: Binding(get: { mirror.preset },
                                       set: { next in
                                           guard next != mirror.preset else { return }
@@ -147,6 +159,23 @@ struct AuroraControls: View {
                    hint: "How much of the sky the clouds cover", spoken)
             slider("limit", control: "light.limit", value: mirror.limit, range: SkyCore.limitRange,
                    hint: "No part of the sky gets brighter than this", spoken)
+            Toggle(isOn: Binding(get: { mirror.soundOn }, set: { presenter.setSound(on: $0) })) {
+                Text(verbatim: spoken["sound"]?.title ?? "")
+            }
+            .spoken(spoken["sound"])
+            .accessibilityHint(Text(verbatim: "Keeps whether the sky's sound is on; nothing plays in this version"))
+            .accessibilityIdentifier(port.identifier("sound"))
+            VStack(alignment: .leading, spacing: 2) {
+                Text(verbatim: (spoken["volume"]?.title ?? "") + ": " + (spoken["volume"]?.value ?? ""))
+                    .font(.footnote)
+                    .accessibilityHidden(true)
+                Slider(value: Binding(get: { mirror.volume },
+                                      set: { presenter.setVolume(Self.clamped($0, SkyPreferences.volumeRange)) }),
+                       in: SkyPreferences.volumeRange)
+                    .spoken(spoken["volume"])
+                    .accessibilityHint(Text(verbatim: "How loud the sky's sound is when it is on"))
+                    .accessibilityIdentifier(port.identifier("volume"))
+            }
             Button {
                 presenter.hideControls()
             } label: {

@@ -37,7 +37,7 @@ VisualCore change. Precedent: `specs/147-zg-p03-stones/tasks.md`. Rollback: reve
 
 ## Phase 4: Story 3 — the sound choice outlives the drawing (P1)
 
-- [ ] T-A21-306 [US3] Add the sound control (on/off and volume, spoken labels, plays nothing) to
+- [X] T-A21-306 [US3] Add the sound control (on/off and volume, spoken labels, plays nothing) to — Verified 2026-11-17: 2026-11-17: sound toggle and volume slider (identifiers sound, volume; spoken labels) writing the preferences only, no engine action, nothing plays; SoundChoiceTests (2): unchanged after recreateContext, resize, suspend, resume and teardown with a new session, port revision, snapshot and digest unchanged; manifest unchanged; .autonomy/checks/A21-P03.au-ios27.json exit 0; written by an agent, retested
   `AuroraControls.swift`, kept only in the preferences (no engine action: the snapshot, digest and manifest are unchanged); `ExperienceTests/SoundChoiceTests.swift`: unchanged after
   teardown, setup, `recreateContext`, resize, suspend and resume (FR-A21-305, 306; SC-A21-303)
 
