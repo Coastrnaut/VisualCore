@@ -1,0 +1,164 @@
+{
+  "kind": "a17.review-record",
+  "payload": {
+    "contentVersion": 2,
+    "entries": [
+      {
+        "date": "2026-11-16",
+        "kind": "editorial",
+        "method": "Name and description read against the cited Gray's Anatomy (1918) section and Terminologia Anatomica (1998).",
+        "part": "knee.femur",
+        "reviewer": "Lead engineer (editorial review)",
+        "sources": [
+          "gray-1918-femur",
+          "ta-1998"
+        ]
+      },
+      {
+        "date": "2026-11-16",
+        "kind": "editorial",
+        "method": "Name and description read against the cited Gray's Anatomy (1918) section and Terminologia Anatomica (1998).",
+        "part": "knee.tibia",
+        "reviewer": "Lead engineer (editorial review)",
+        "sources": [
+          "gray-1918-tibia",
+          "ta-1998"
+        ]
+      },
+      {
+        "date": "2026-11-16",
+        "kind": "editorial",
+        "method": "Name and description read against the cited Gray's Anatomy (1918) section and Terminologia Anatomica (1998).",
+        "part": "knee.fibula",
+        "reviewer": "Lead engineer (editorial review)",
+        "sources": [
+          "gray-1918-fibula",
+          "ta-1998"
+        ]
+      },
+      {
+        "date": "2026-11-16",
+        "kind": "editorial",
+        "method": "Name and description read against the cited Gray's Anatomy (1918) section and Terminologia Anatomica (1998).",
+        "part": "knee.patella",
+        "reviewer": "Lead engineer (editorial review)",
+        "sources": [
+          "gray-1918-patella",
+          "ta-1998"
+        ]
+      },
+      {
+        "date": "2026-11-16",
+        "kind": "editorial",
+        "method": "Name and description read against the cited Gray's Anatomy (1918) section and Terminologia Anatomica (1998).",
+        "part": "knee.femoral-cartilage",
+        "reviewer": "Lead engineer (editorial review)",
+        "sources": [
+          "gray-1918-knee-joint",
+          "ta-1998"
+        ]
+      },
+      {
+        "date": "2026-11-16",
+        "kind": "editorial",
+        "method": "Name and description read against the cited Gray's Anatomy (1918) section and Terminologia Anatomica (1998).",
+        "part": "knee.tibial-cartilage",
+        "reviewer": "Lead engineer (editorial review)",
+        "sources": [
+          "gray-1918-knee-joint",
+          "ta-1998"
+        ]
+      },
+      {
+        "date": "2026-11-16",
+        "kind": "editorial",
+        "method": "Name and description read against the cited Gray's Anatomy (1918) section and Terminologia Anatomica (1998).",
+        "part": "knee.medial-meniscus",
+        "reviewer": "Lead engineer (editorial review)",
+        "sources": [
+          "gray-1918-knee-joint",
+          "ta-1998"
+        ]
+      },
+      {
+        "date": "2026-11-16",
+        "kind": "editorial",
+        "method": "Name and description read against the cited Gray's Anatomy (1918) section and Terminologia Anatomica (1998).",
+        "part": "knee.lateral-meniscus",
+        "reviewer": "Lead engineer (editorial review)",
+        "sources": [
+          "gray-1918-knee-joint",
+          "ta-1998"
+        ]
+      },
+      {
+        "date": "2026-11-16",
+        "kind": "editorial",
+        "method": "Name and description read against the cited Gray's Anatomy (1918) section and Terminologia Anatomica (1998).",
+        "part": "knee.acl",
+        "reviewer": "Lead engineer (editorial review)",
+        "sources": [
+          "gray-1918-knee-joint",
+          "ta-1998"
+        ]
+      },
+      {
+        "date": "2026-11-16",
+        "kind": "editorial",
+        "method": "Name and description read against the cited Gray's Anatomy (1918) section and Terminologia Anatomica (1998).",
+        "part": "knee.pcl",
+        "reviewer": "Lead engineer (editorial review)",
+        "sources": [
+          "gray-1918-knee-joint",
+          "ta-1998"
+        ]
+      },
+      {
+        "date": "2026-11-16",
+        "kind": "editorial",
+        "method": "Name and description read against the cited Gray's Anatomy (1918) section and Terminologia Anatomica (1998).",
+        "part": "knee.mcl",
+        "reviewer": "Lead engineer (editorial review)",
+        "sources": [
+          "gray-1918-knee-joint",
+          "ta-1998"
+        ]
+      },
+      {
+        "date": "2026-11-16",
+        "kind": "editorial",
+        "method": "Name and description read against the cited Gray's Anatomy (1918) section and Terminologia Anatomica (1998).",
+        "part": "knee.lcl",
+        "reviewer": "Lead engineer (editorial review)",
+        "sources": [
+          "gray-1918-knee-joint",
+          "ta-1998"
+        ]
+      },
+      {
+        "date": "2026-11-16",
+        "kind": "editorial",
+        "method": "Name and description read against the cited Gray's Anatomy (1918) section and Terminologia Anatomica (1998).",
+        "part": "knee.patellar-ligament",
+        "reviewer": "Lead engineer (editorial review)",
+        "sources": [
+          "gray-1918-knee-joint",
+          "ta-1998"
+        ]
+      },
+      {
+        "date": "2026-11-16",
+        "kind": "editorial",
+        "method": "Name and description read against the cited Gray's Anatomy (1918) section and Terminologia Anatomica (1998).",
+        "part": "knee.quadriceps-tendon",
+        "reviewer": "Lead engineer (editorial review)",
+        "sources": [
+          "gray-1918-quadriceps",
+          "ta-1998"
+        ]
+      }
+    ]
+  },
+  "savedAt": "2026-11-16T00:00:00Z",
+  "schemaVersion": 1
+}
