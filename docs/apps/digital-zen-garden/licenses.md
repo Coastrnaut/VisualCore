@@ -12,6 +12,7 @@ file, generated asset or third-party asset is bundled.
 | Stone kinds `river-pebble`, `flat-slate`, `round-granite`, `tall-basalt`, `moss-boulder` | written for VisualCore; procedural shapes from base radii in tray widths; drawn in A20-P03 | original, the repository's license |
 | Groove profile depth·cos(2π·tines·u/width) for \|u\| ≤ width/2 | written for VisualCore; a cosine formula | original, the repository's license |
 | Relief shader `SandScene.reliefFragment` (normals from height differences, one light, grain, tone) | written for VisualCore (A20-P02) over VisualCore's GLSL library `vc/` | original, the repository's license |
+| Stone shapes `StoneShape` (superellipse domes with a seeded edge wobble), stone colours and the five-tap soft shadow | written for VisualCore (A20-P03); numbers and a shader written here | original, the repository's license |
 
 Sound is optional, made of procedural
 tones from VisualCoreAudio and off by default; it is listed here when it is added. Nothing else is bundled, and

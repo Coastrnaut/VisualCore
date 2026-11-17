@@ -450,7 +450,7 @@
    "id": "M06",
    "capability": "Version 0.1 feature 01: one tray with visual sand relief, two rake styles and a stone palette",
    "source": "manual v0.1 feature 01; constitution A20 visuals are code",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/PingPongTarget.swift",
@@ -493,7 +493,7 @@
     "file": "Packages/ExperiencesCreative/SimulationLab/Experience/GrayScottGPU.swift",
     "symbol": "GrayScottGPU"
    },
-   "notes": "The machinery exists and is tested (PingPongTargetTests, FloatRenderSupportTests, FieldPassTests, ShaderBundleTests, MeshShapeTests, MeshRendererTests). The tray, the two rake footprints, the sand target and its relief, and the stone palette are experience code: G-DOCUMENT and G-STROKES (A20-P01), G-SAND and G-RELIEF (A20-P02), G-STONES (A20-P03). G-STROKES closed in A20-P01: StrokeResampler (0.004 tray widths, cap 512), RakeBrush and SandField (ResamplerTests, RakeTests). The row stays open for its remaining gaps. G-SAND, G-RELIEF closed in A20-P02; the row stays open for its remaining gaps."
+   "notes": "The machinery exists and is tested (PingPongTargetTests, FloatRenderSupportTests, FieldPassTests, ShaderBundleTests, MeshShapeTests, MeshRendererTests). The tray, the two rake footprints, the sand target and its relief, and the stone palette are experience code: G-DOCUMENT and G-STROKES (A20-P01), G-SAND and G-RELIEF (A20-P02), G-STONES (A20-P03). G-STROKES closed in A20-P01: StrokeResampler (0.004 tray widths, cap 512), RakeBrush and SandField (ResamplerTests, RakeTests). The row stays open for its remaining gaps. G-SAND, G-RELIEF closed in A20-P02; the row stays open for its remaining gaps. G-STONES closed in A20-P03 (StoneShapeTests, StoneLayerTests, SelectionTests, StoneActionTests, StoneRenderTests, StoneGestureTests, OrientationTests). Available."
   },
   {
    "id": "M07",
@@ -548,7 +548,7 @@
    "id": "M08",
    "capability": "Version 0.1 feature 03: stone placement, rotation, deletion and layer-aware selection",
    "source": "manual v0.1 feature 03; constitution A20 accessibility (selection never by colour alone)",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreMath/Matrix.swift",
@@ -597,7 +597,7 @@
     "file": "Packages/ExperiencesCreative/TinyWorlds/Core/GroundPick.swift",
     "symbol": "GroundPick"
    },
-   "notes": "2D transforms, hit testing by depth order and primitive containment are tested (SceneGraphTests, LinearAlgebraTests, GestureTests). No experience uses SceneNode.hitTest; Molecular Explorer and Interactive Anatomy pick with their own Core pickers. The stone edits and their placement in normalized tray coordinates are G-STONES (A20-P03); the layer-aware selection is G-SELECTION (A20-P03)."
+   "notes": "2D transforms, hit testing by depth order and primitive containment are tested (SceneGraphTests, LinearAlgebraTests, GestureTests). No experience uses SceneNode.hitTest; Molecular Explorer and Interactive Anatomy pick with their own Core pickers. The stone edits and their placement in normalized tray coordinates are G-STONES (A20-P03); the layer-aware selection is G-SELECTION (A20-P03). G-STONES, G-SELECTION closed in A20-P03 (StoneShapeTests, StoneLayerTests, SelectionTests, StoneActionTests, StoneRenderTests, StoneGestureTests, OrientationTests). Available."
   },
   {
    "id": "M09",
@@ -935,7 +935,7 @@
    "id": "M17",
    "capability": "Stones as procedural shapes (revolved, extruded or bevelled meshes or SDFs) drawn with one directional light",
    "source": "spec FR-A20-003; constitution A20 visuals are code",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshShapes.swift",
@@ -972,13 +972,13 @@
     "file": "Packages/ExperiencesCreative/TinyWorlds/Core/PropCatalog.swift",
     "symbol": "PropCatalog"
    },
-   "notes": "Procedural meshes and the lit renderer are tested (MeshShapeTests, MeshRendererTests, DepthMeshPassTests); Tiny Worlds builds its props this way. The stone palette is G-STONES (app-local, A20-P03)."
+   "notes": "Procedural meshes and the lit renderer are tested (MeshShapeTests, MeshRendererTests, DepthMeshPassTests); Tiny Worlds builds its props this way. The stone palette is G-STONES (app-local, A20-P03). G-STONES closed in A20-P03 (StoneShapeTests, StoneLayerTests, SelectionTests, StoneActionTests, StoneRenderTests, StoneGestureTests, OrientationTests). Available."
   },
   {
    "id": "M18",
    "capability": "Soft shadows of stones on the sand",
    "source": "spec FR-A20-003",
-   "status": "upstream gap",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshRenderer.swift",
@@ -1003,13 +1003,13 @@
     "file": "Packages/ExperiencesCreative/TinyWorlds/Experience/WorldsPresenter.swift",
     "symbol": "WorldsPresenter"
    },
-   "notes": "No shadow pass or shadow helper exists in any framework product (grep 2026-11-17). Soft contact shadows as an experience shader over vc/ are G-SHADOWS (app-local, A20-P03)."
+   "notes": "No shadow pass or shadow helper exists in any framework product (grep 2026-11-17). Soft contact shadows as an experience shader over vc/ are G-SHADOWS (app-local, A20-P03). G-SHADOWS closed in A20-P03 (StoneShapeTests, StoneLayerTests, SelectionTests, StoneActionTests, StoneRenderTests, StoneGestureTests, OrientationTests). Available."
   },
   {
    "id": "M19",
    "capability": "Layer-aware selection: the topmost stone under a touch selected by depth order, with a non-colour selection mark",
    "source": "spec FR-A20-003; constitution A20 accessibility",
-   "status": "upstream gap",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreScenes/SceneGraph.swift",
@@ -1034,7 +1034,7 @@
     "file": "Packages/ExperiencesCreative/MolecularExplorer/Core/AtomPicker.swift",
     "symbol": "AtomPicker"
    },
-   "notes": "SceneNode.hitTest and drawList give depth-ordered hits (SceneGraphTests) but no selection helper exists; Molecular Explorer and Interactive Anatomy keep their own pickers. The selection model is G-SELECTION (app-local, A20-P03)."
+   "notes": "SceneNode.hitTest and drawList give depth-ordered hits (SceneGraphTests) but no selection helper exists; Molecular Explorer and Interactive Anatomy keep their own pickers. The selection model is G-SELECTION (app-local, A20-P03). G-SELECTION closed in A20-P03 (StoneShapeTests, StoneLayerTests, SelectionTests, StoneActionTests, StoneRenderTests, StoneGestureTests, OrientationTests). Available."
   },
   {
    "id": "M20",
@@ -1163,7 +1163,7 @@
    "id": "M23",
    "capability": "Resize and orientation: positions stored in normalized tray coordinates; the sand target and stones rebuilt at the new size without changing the state",
    "source": "spec FR-A20-003; constitution A20 testable without the GPU",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceAction.swift",
@@ -1194,7 +1194,7 @@
     "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidFieldsScene.swift",
     "symbol": "FluidFieldsScene"
    },
-   "notes": "Normalized input and scene resize are tested (ExperienceActionTests, ShellRenderingTests, CachedSceneTests). Resizing the sand target is G-SAND (A20-P02); orientation-independent stone positions are G-STONES (A20-P03). G-SAND closed in A20-P02; the row stays open for its remaining gaps."
+   "notes": "Normalized input and scene resize are tested (ExperienceActionTests, ShellRenderingTests, CachedSceneTests). Resizing the sand target is G-SAND (A20-P02); orientation-independent stone positions are G-STONES (A20-P03). G-SAND closed in A20-P02; the row stays open for its remaining gaps. G-STONES closed in A20-P03 (StoneShapeTests, StoneLayerTests, SelectionTests, StoneActionTests, StoneRenderTests, StoneGestureTests, OrientationTests). Available."
   },
   {
    "id": "M24",
@@ -1553,10 +1553,10 @@
    ],
    "kind": "adaptation",
    "owner": "app-local",
-   "justification": "The stone palette as procedural shapes, and placement, rotation and deletion in normalized tray coordinates independent of orientation, are the experience's domain (manual phase 03).",
+   "justification": "The stone palette as procedural shapes, and placement, rotation and deletion in normalized tray coordinates independent of orientation, are the experience's domain (manual phase 03). As built (A20-P03, spec clarification Q1): stones are superellipse domes from the pure StoneShape, rasterized in depth order into a 480 × 360 StoneLayer and uploaded as a second target of the one relief pass, instead of meshes through a second depth-tested pass.",
    "phase": 3,
    "test": "Core host tests: place, rotate and delete commands round-trip; positions stay the same across orientations; caps on stones enforced; experience tests: each stone mesh is valid within the mesh budget",
-   "closed": null
+   "closed": "A20-P03"
   },
   {
    "id": "G-SELECTION",
@@ -1569,7 +1569,7 @@
    "justification": "Layer-aware selection over SceneNode.hitTest and drawList, with a non-colour selection mark, is experience code; no selection helper exists in VisualCore. No VisualCore change is planned (spec clarification Q4); a second user would justify moving it upstream later (Principle II).",
    "phase": 3,
    "test": "Core host tests: overlapping stones select the topmost; deleting the selection clears it; the selection mark is a shape, not only a colour",
-   "closed": null
+   "closed": "A20-P03"
   },
   {
    "id": "G-SHADOWS",
@@ -1581,7 +1581,7 @@
    "justification": "Soft contact shadows are an experience shader; no shadow pass exists in VisualCore. No VisualCore change is planned (spec clarification Q4); a second user would justify moving it upstream later (Principle II).",
    "phase": 3,
    "test": "Experience tests: a stone over flat sand darkens a bounded region under it; shadows rebuild with the sand after context loss; the shader compiles through ShaderBundle",
-   "closed": null
+   "closed": "A20-P03"
   },
   {
    "id": "G-LIBRARY",
