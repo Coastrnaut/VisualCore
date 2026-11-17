@@ -55,3 +55,7 @@ Package.swift, README and baseline (205), registration (211), manifest generatio
 
 MVP: the framed background (206–208). The export and the no-orphan fixture (209, 210) close the regression gate.
 Review checkpoints after 205 (VisualCore green) and after 210.
+
+## Phase 7: Convergence
+
+- [ ] T-A19-217 Record the as-built design in `specs/139-lw-p02-still-renderer/data-model.md` and `research.md`: the presenter's export limit is `context.resources.maxTextureSize` read at setup (a presenter cannot reach `RenderHost.maxRenderSize`; a size the host still refuses fails as `render`, and the tests pass `host.maxRenderSize`); `StillExport` retries through `run(plan:time:render:cancelAfter:)` with `ExportRefusal.offeredPlan(format:)`, keeps one file per exporter (a new run removes the previous file; `discard(_:)` removes a handed-back one), maps a failed file write to `encoding` and the planner's `unknownTemplate` to `does-not-fit`; `WallpaperCore` keeps the seed from `prepare(seed:)` in the digest and restores the snapshot's seed, parameter values are 0…40 per action and checked against the scene's range, `qualityProfile` level-1 shares 0.5; the presenter declares one probe "corner" (expected dark; every scene darkens its extreme corners to a quarter of the preset's deepest colour, also in exported files) and `maxFramesPerSecond` 30 per plan: data model, clarification Q5 (partial)
