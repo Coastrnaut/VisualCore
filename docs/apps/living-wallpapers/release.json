@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "experience": "a19.living-wallpapers",
+  "requiredDocs": [
+    "docs/apps/living-wallpapers/privacy-and-credits.md",
+    "docs/apps/living-wallpapers/store-listing.md",
+    "docs/apps/living-wallpapers/release-checklist.md",
+    "docs/apps/living-wallpapers/device-campaign.md",
+    "docs/apps/living-wallpapers/licenses.md",
+    "docs/apps/living-wallpapers/video-decision.md",
+    "docs/apps/living-wallpapers/visualcore-contract.md",
+    "docs/release/build-and-archive.md"
+  ],
+  "checklist": "docs/apps/living-wallpapers/release-checklist.md",
+  "copyCheck": {
+    "text": [
+      "docs/apps/living-wallpapers/store-listing.md"
+    ],
+    "swift": [
+      "Packages/ExperiencesCreative/LivingWallpapers/Experience/WallpaperControls.swift",
+      "Packages/ExperiencesCreative/LivingWallpapers/Experience/EditorModel.swift",
+      "Packages/ExperiencesCreative/LivingWallpapers/Experience/HelpView.swift",
+      "Packages/ExperiencesCreative/LivingWallpapers/Experience/Adapter/WallpaperCore.swift"
+    ],
+    "allow": [
+      "share"
+    ]
+  }
+}

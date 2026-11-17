@@ -5,7 +5,7 @@ backgrounds (archived manual `apps/19-living-wallpapers.md` §1–§2). Version 
 - curated procedural backgrounds with colour presets;
 - iPhone and iPad canvas templates with crop and safe-area guides;
 - still-image export in common formats with a verified colour profile;
-- an optional short video export, only after encoder and resource feasibility is shown;
+- no short video export: it was decided out of version 0.1 ([video-decision.md](video-decision.md));
 - export progress, cancellation, error recovery and a local history;
 - clear instructions for applying an exported image by hand.
 
@@ -25,3 +25,7 @@ as a wallpaper through the system's own controls. Its rules are the A19 subsecti
 | [video-decision.md](video-decision.md) | The short-video decision of Phase 01: no-go for version 0.1 |
 | [licenses.md](licenses.md) | License and provenance of the scenes, colour presets and template data |
 | [device-campaign.md](device-campaign.md) | Phase 05 device-campaign rows LW-D1 to LW-D8 (size limit, largest template, file size and profile, heat, memory, Photos prompt, declined path, audits), pending until the campaign after ImplementationLock-100 |
+| [privacy-and-credits.md](privacy-and-credits.md) | Phase 06 privacy and credits: the snapshot, `history.json` and the temporary export file, how to delete them, nothing sent, the add-only Photos string, the license inventory |
+| [store-listing.md](store-listing.md) | Phase 06 store text input with the claim → proving-test table |
+| [release-checklist.md](release-checklist.md) | Phase 06 release checklist (verified, pending-campaign-ii LW-D1 to LW-D8, owner-action) and artifact inventory |
+| [release.json](release.json) | Release configuration read by `scripts/check_experience_release.py` and `scripts/release_check.py` (`experience-release-a19`, `copy-claims-a19`) |

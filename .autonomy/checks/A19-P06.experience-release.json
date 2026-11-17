@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "experience-release-a19",
+    "copy-claims-a19"
+  ],
+  "command": "python3 scripts/release_check.py --only experience-release-a19 copy-claims-a19",
+  "elapsed_seconds": 0.086,
+  "exit_code": 0,
+  "finished": "2026-11-17T07:12:52+00:00",
+  "log": ".autonomy/logs/A19-P06.experience-release.log",
+  "log_sha256": "9801eee95d6aeeda7877a179702b19f9c5d495c554cb653a59884355f1fd3599",
+  "name": "experience-release",
+  "stage": "A19-P06",
+  "started": "2026-11-17T07:12:51+00:00",
+  "timed_out": false
+}

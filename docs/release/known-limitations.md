@@ -388,6 +388,33 @@ and `VisualCoreRendering` (iOS, GL). ADR-0003 and the package map record this. R
   sentence. A damaged, newer, too large or invalid favourites file gives an empty list and is left as it is until the
   next save, which replaces it. The settings are kept in the snapshot (schema 3); schemas 1 and 2 open migrated.
 
+### Living Wallpapers (A19; features 137–143)
+
+- No wallpaper is set by the app. Living Wallpapers exports a still image; the person keeps it through the system
+  share sheet and makes it the wallpaper in the Settings app (the help names the steps, which can differ between iOS
+  versions). The app makes no system-wallpaper call, and an export is never a moving wallpaper.
+- No short video in version 0.1: the Phase 01 decision is no-go
+  ([video-decision.md](../apps/living-wallpapers/video-decision.md)). Exports are stills only: PNG, JPEG or HEIC
+  (HEIC only where the device can encode it), tagged sRGB.
+- The export size is the device template's pixel size, capped by the device: a template fits only when both edges are
+  at most the device's export limit (the context's maximum texture size), the long edge at most 8192 and the pixel
+  count at most 64,000,000. A template that does not fit is refused with a notice that offers the largest size that
+  fits at the template's shape. Nine templates in version 0.1 (five iPhone, four iPad); no custom size.
+- The safe-area guides are approximate design fractions of the canvas (a top band of 0.22, a bottom band of 0.10, side
+  margins of 0.04), not system measurements; the system may place the time or widgets differently.
+- Four scenes in version 0.1 (Aurora Bands, Ink Flow, Soft Cells and Ripple Dunes), each with three colour presets
+  whose four colours can be edited; two drawing levels, `level-0` and `level-1`.
+- The export history keeps at most 20 entries in `history.json` on the device only (no sync), newest first, and the
+  controls list the newest five; "Clear history" removes the file. A damaged, newer or too large history file gives an
+  empty history and is left as it is until the next written export. The temporary export folder holds at most one
+  file. The settings are kept in the snapshot (schema 2); schema 1 opens migrated.
+- The size limit and the largest templates per device, the written file's size and profile in Files and Photos, the
+  heat and memory during the largest exports, the add-only Photos prompt and the declined path, and the system
+  accessibility audits wait for the device campaign
+  ([device-campaign.md](../apps/living-wallpapers/device-campaign.md), rows LW-D1 to LW-D8). No size-limit, thermal,
+  memory or timing figure is stated; the simulator's limit is larger than every template, so no template is refused
+  there.
+
 ## Distribution
 
 - No App Store submission, signing or purchase setup is part of this release; those are owner actions.
