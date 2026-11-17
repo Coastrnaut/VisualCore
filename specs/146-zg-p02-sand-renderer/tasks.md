@@ -23,7 +23,7 @@ commits.
 
 ## Phase 4: Story 2 — the brush preview (P1)
 
-- [ ] T-A20-206 [US2] Create `Packages/ExperiencesCreative/DigitalZenGarden/Experience/BrushPreview.swift` (the canvas overlay of clarification Q4: a rectangle of the rake's width across the drag direction with one line per tine, scaled to the fitted tray; hidden from accessibility) and `ExperienceTests/BrushPreviewTests.swift` (visible during a drag with the style's width and tines; follows the style change; hidden after the lift and after `cancelPointers`; never changes the digest) (FR-A20-204)
+- [X] T-A20-206 [US2] Create `Packages/ExperiencesCreative/DigitalZenGarden/Experience/BrushPreview.swift` (the canvas overlay of clarification Q4: a rectangle of the rake's width across the drag direction with one line per tine, scaled to the fitted tray; hidden from accessibility) and `ExperienceTests/BrushPreviewTests.swift` (visible during a drag with the style's width and tines; follows the style change; hidden after the lift and after `cancelPointers`; never changes the digest) (FR-A20-204) — Verified 2026-11-17: 2026-11-17: Experience/BrushPreview.swift (the overlay of clarification Q4, hidden from accessibility) and ExperienceTests/BrushPreviewTests.swift (visible during a drag with the style's width and tines, follows the style, hidden after the lift and a cancel, digest unchanged) pass in .autonomy/checks/A20-P02.zg-ios27.json exit 0; written by an agent, retested
 
 ## Phase 5: Registration and manifest
 
