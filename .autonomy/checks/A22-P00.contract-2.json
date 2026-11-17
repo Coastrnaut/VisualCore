@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_app_contract.py",
+    "--app",
+    "shader-studio",
+    "--render"
+  ],
+  "command": "python3 scripts/check_app_contract.py --app shader-studio --render",
+  "elapsed_seconds": 0.044,
+  "exit_code": 0,
+  "finished": "2026-11-17T13:10:30+00:00",
+  "log": ".autonomy/logs/A22-P00.contract-2.log",
+  "log_sha256": "4db81f9751bcb110f749fe3cfcc8c2ac1b7d9f19f2e83bd07a424e0aee475cf8",
+  "name": "contract-2",
+  "stage": "A22-P00",
+  "started": "2026-11-17T13:10:30+00:00",
+  "timed_out": false
+}

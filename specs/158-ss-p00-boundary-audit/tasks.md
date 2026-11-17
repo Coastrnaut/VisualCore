@@ -55,7 +55,7 @@
 
 ## Phase 6: User Story 4 — Stop/go decision (P2)
 
-- [ ] T-A22-008 [US4] Complete the contract, then rerun the checker (`--name contract-2`):
+- [X] T-A22-008 [US4] Complete the contract, then rerun the checker (`--name contract-2`): — Verified 2026-11-17: 2026-11-17: 13 gaps, all app-local adaptations with phases A22-P01..P06 per research D4 (G-MODEL, G-VALIDATE, G-LINES, G-TEMPLATES; G-PREVIEW, G-RUN; G-EDITOR, G-INSPECTOR, G-TEXTURES; G-LIBRARY, G-WATCHDOG; G-DEVICE; G-RELEASE), no upstream gap; the three manual risks as negative entries (manual §13 risk 1-3) with owner, verification and release blocker; decision go with reasons, no blockers; .autonomy/checks/A22-P00.contract-2.json exit 0
   - **`gaps`:** for every non-available row, the owning module and the phase per research D4. All are app-local per
     clarifications Q3–Q5: the preview scene with its last-good swap, the watchdog, the editor, the project library,
     the texture inputs and the source validator. No upstream gap.
