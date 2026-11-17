@@ -330,6 +330,37 @@ and `VisualCoreRendering` (iOS, GL). ADR-0003 and the package map record this. R
   and nothing is written to Photos.
 - One drawing level (`level-0`): there is no lower level under Low Power Mode or a serious thermal state.
 
+### Interactive Anatomy (A17; features 123–129)
+
+- The frame pacing at both drawing levels, the thermal state over a loop of use and the memory high-water mark are
+  unmeasured on devices; they wait for the device campaign
+  ([device-campaign.md](../apps/interactive-anatomy/device-campaign.md), rows IA-D1 to IA-D3). No frame-time, thermal,
+  power or memory figure is stated.
+- VoiceOver on hardware with the list alone (row IA-D4), Dynamic Type at the largest size (row IA-D5), Reduce Motion
+  on hardware (row IA-D6) and the system accessibility audits (row IA-D7) wait for the device campaign; selection from
+  the list alone, the labels, values and hints, the layer signs, the canvas description, the rate-limited announcements
+  and the native control for every gesture are proved by the experience's tests on the simulator only.
+- Educational, not medical. One region in version 0.1, the right knee, with 14 parts in three layers (bones;
+  cartilage and menisci; ligaments and tendons); no other region, no full-body atlas and no patient files.
+- The model is schematic: every shape is procedural geometry made in code and simplified, and the experience says so
+  ("Schematic model for learning; shapes are simplified."). Two drawing levels, `level-0` (6,444 triangles) and
+  `level-1` (2,716 triangles), each in 20 draws.
+- The text is not reviewed by a clinician: every part shows "Not reviewed by a clinician." The lead engineer checked
+  the text against its cited sources (an editorial check, not a clinical review); a clinical review is an owner action
+  ([review.md](../apps/interactive-anatomy/review.md)). The sources are Gray's Anatomy, 20th edition (1918, public
+  domain), cited by section, and Terminologia Anatomica (1998) for the standard names; the descriptions are original
+  ([content-sources.md](../apps/interactive-anatomy/content-sources.md)).
+- In-scene labels are capped at 16 and never overlap: a label that would overlap another, leave the canvas or belong
+  to a ghosted or hidden part is skipped, so the model may show fewer names than parts. The structure list always
+  names every part, and every part can be selected from it.
+- The camera turns in 15° steps, tilts in 10° steps within −6…6 and zooms in × 0.85 steps within −4…6; a step beyond a
+  limit is refused with "The camera is at its limit." Nothing animates, with Reduce Motion or without.
+- Ghosts need the additive translucent stage of the depth pass; if that draw fails, the ghosts are off for the rest of
+  the session, the isolate is drawn as in the hide mode and the panel says "Ghosts are off."
+- One saved view, `view.json`, kept on the device only (no sync, no export) and replaced on each view change. A
+  damaged, newer, foreign or oversized file (more than 65,536 bytes) is refused and left as it is, and the opening
+  view opens; view schema 1 opens migrated.
+
 ## Distribution
 
 - No App Store submission, signing or purchase setup is part of this release; those are owner actions.

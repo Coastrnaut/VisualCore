@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "experience": "a17.interactive-anatomy",
+  "requiredDocs": [
+    "docs/apps/interactive-anatomy/privacy-and-credits.md",
+    "docs/apps/interactive-anatomy/store-listing.md",
+    "docs/apps/interactive-anatomy/release-checklist.md",
+    "docs/apps/interactive-anatomy/device-campaign.md",
+    "docs/apps/interactive-anatomy/review.md",
+    "docs/apps/interactive-anatomy/content-sources.md",
+    "docs/apps/interactive-anatomy/visualcore-contract.md",
+    "docs/release/build-and-archive.md"
+  ],
+  "checklist": "docs/apps/interactive-anatomy/release-checklist.md",
+  "copyCheck": {
+    "text": [
+      "docs/apps/interactive-anatomy/store-listing.md"
+    ],
+    "swift": [
+      "Packages/ExperiencesCreative/InteractiveAnatomy/Experience/AnatomyControls.swift",
+      "Packages/ExperiencesCreative/InteractiveAnatomy/Experience/AnatomyPresenter.swift",
+      "Packages/ExperiencesCreative/InteractiveAnatomy/Experience/AnatomyOverlay.swift",
+      "Packages/ExperiencesCreative/InteractiveAnatomy/Experience/Adapter/AnatomyCore.swift",
+      "Packages/ExperiencesCreative/InteractiveAnatomy/Core/AnatomyReview.swift"
+    ],
+    "allow": [
+      "camera"
+    ]
+  }
+}

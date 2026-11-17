@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "sh",
+    "specs/129-ia-p06-release/scan-claims-release.sh"
+  ],
+  "command": "sh specs/129-ia-p06-release/scan-claims-release.sh",
+  "elapsed_seconds": 0.455,
+  "exit_code": 0,
+  "finished": "2026-11-17T00:23:13+00:00",
+  "log": ".autonomy/logs/A17-P06.ia-claims.log",
+  "log_sha256": "b8e9de1a5727df4ddd735963c28b1c3f3263db4d0994714eebe082245240f5e8",
+  "name": "ia-claims",
+  "stage": "A17-P06",
+  "started": "2026-11-17T00:23:13+00:00",
+  "timed_out": false
+}
