@@ -22,7 +22,7 @@ VisualCore change. Precedent: `specs/145-zg-p01-document-strokes/tasks.md`. Roll
   `newer-version`, `too-large`, `not-finite`, `out-of-range`, `unknown-preset`, `palette-size`; setters clamp and ignore
   non-finite values; presets `polar-night`, `violet-veil`, `dawn-haze` (version 1, attribution "written for
   VisualCore"); `///` on every public declaration (FR-A21-101–103)
-- [ ] T-A21-104 [P] [US1] Write `Packages/ExperiencesCreative/Aurora/CoreTests/{SceneTests,PresetTests}.swift`: each
+- [X] T-A21-104 [P] [US1] Write `Packages/ExperiencesCreative/Aurora/CoreTests/{SceneTests,PresetTests}.swift`: each — Verified 2026-11-17: 2026-11-17: SceneTests (16) and PresetTests (6): exact round trips, one sample per refusal code, clamping at every bound, NaN and infinity ignored, unique valid presets; .autonomy/checks/A21-P01.au-core-ios27.json exit 0 (22 Swift Testing tests); written by an agent, retested
   preset round-trips exactly; one sample per refusal code; setters clamp each bound; NaN ignored; synthetic data only
   (SC-A21-101)
 
