@@ -81,7 +81,7 @@
 
 ## Phase 5: Story 4 — interface (P2)
 
-- [ ] T-A21-608 [P] [US4] Write `Apps/VisualCore/Tests/UI/Aurora/AUReleaseUITests.swift` per clarification Q5, with
+- [X] T-A21-608 [P] [US4] Write `Apps/VisualCore/Tests/UI/Aurora/AUReleaseUITests.swift` per clarification Q5, with — Verified 2026-11-17: 2026-11-17: AUReleaseUITests (a fresh start names Polar night on the canvas; sound, still and reduced-flash read off; no failure); added to serial chunk c3 in scripts/release_check.py; .autonomy/checks/A21-P06.app-ui.json exit 0 (chunk c3: 5 tests in 123.4 s on the iOS 27.2 phone, each under 60 s); A21-P06.script-tests.json exit 0; written by an agent, retested
   `AUSupport`:
   - a fresh start names "Polar night" on the canvas;
   - `sound`, `still` and `reduced-flash` read off;
