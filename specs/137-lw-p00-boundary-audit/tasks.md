@@ -50,3 +50,7 @@ completion review (008), the proofs and commits.
 
 MVP: the contract (002, 003, 008) with the baseline (001, 004, 005); the build proof (006, 007) and evidence close the
 phase. Review checkpoint after 003 (checker passes) and at 008 (decision).
+
+## Phase 8: Convergence
+
+- [ ] T-A19-012 Correct the spec's Clarifications facts (session 2026-11-17) and research D6 with what the contract audit verified: `RenderHost.maxRenderSize` is the smallest of the reported maximum texture, renderbuffer and viewport sizes (0 before a context reports them), and 2048 is only the OpenGL ES 3.0 minimum that `RenderCapabilities.floorFindings` checks the reported limits against (recorded, not applied); `maxOffscreenPixels` is public but no test names it, so it is cited only in "requires adaptation" rows per FR-A19-001 (partial)
