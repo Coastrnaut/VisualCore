@@ -9,7 +9,7 @@ migration, no VisualCore change).
 
 ## Phase 1: Setup
 
-- [ ] T-A20-601 Baseline: cite the A20-P05 evidence (`.autonomy/checks/A20-P05.{zg-ios27,app-ui,verify-27}.json`) on
+- [X] T-A20-601 Baseline: cite the A20-P05 evidence (`.autonomy/checks/A20-P05.{zg-ios27,app-ui,verify-27}.json`) on — Verified 2026-11-17: 2026-11-17: A20-P05 evidence cited: .autonomy/checks/A20-P05.zg-ios27.json, A20-P05.app-ui.json and A20-P05.verify-27.json, all exit 0; no Packages, Apps or project.yml change since the A20-P05 record commit 1b4b6289
   the tree recorded at A20-P05 (`1b4b6289`), whose Packages, Apps and project.yml are unchanged since (owner ruling of
   2026-11-14)
 
