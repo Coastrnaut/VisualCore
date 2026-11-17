@@ -25,7 +25,7 @@ VisualCore change. Precedent: `specs/147-zg-p03-stones/tasks.md`. Rollback: reve
 
 ## Phase 3: Story 2 — choices kept (P1)
 
-- [ ] T-A21-304 [P] [US2] Create `Packages/ExperiencesCreative/Aurora/Core/SkyPreferences.swift` per data-model.md:
+- [X] T-A21-304 [P] [US2] Create `Packages/ExperiencesCreative/Aurora/Core/SkyPreferences.swift` per data-model.md: — Verified 2026-11-17: 2026-11-17: SkyPreferences (schema 1, a21.preferences, prefs.v1, at most 4,096 bytes; ten fields with ranges and defaults; codes damaged, newer-version, out-of-range) and PreferencesTests (9: round trips, every code, size, defaults); .autonomy/checks/A21-P03.au-ios27.json exit 0; written by an agent, retested
   "schema 1, kind `a21.preferences`, experience value `prefs.v1`, ≤ 4,096 bytes"; fields and ranges as listed;
   defaults; codes `damaged`, `newer-version`, `out-of-range`; and `CoreTests/PreferencesTests.swift` (round trip, each
   code, defaults) (FR-A21-303, 304)
