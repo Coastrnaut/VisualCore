@@ -180,7 +180,8 @@ own each missing piece and in which phase.
   - four procedural themes with quality and motion controls;
   - readable typography over the theme (contrast, Dynamic Type, VoiceOver);
   - the theme editor with saveable favourites and their schema;
-  - night mode (brightness, red shift, lower frame rate) and the motion-reduction option;
+  - night mode (dimming and warming the drawing itself, never the system brightness; red shift; lower frame rate)
+    and the motion-reduction option;
   - screen care (pixel drift, dimming) and the keep-awake policy;
   - scene transitions between themes;
   - frame and particle budgets per quality level;
