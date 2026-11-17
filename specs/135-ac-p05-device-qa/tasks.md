@@ -45,3 +45,7 @@ release_check.py, README, API baseline, contract, runs, commits.
 
 MVP: the cache and the still rule (502, 503). The campaign (504) and the interface tests (505) close the phase. Review
 checkpoints after 502 and at 507.
+
+## Phase 7: Convergence
+
+- [ ] T-A18-509 Record in `specs/135-ac-p05-device-qa/data-model.md` and `research.md` the as-built details (the still key also mixes `displayScale` and the uniform time, a 64-bit FNV-1a mix; `CachedScene.isSetUp`; pass-through releases the target, so each switch from moving to still costs one draw; an offscreen export resizes and so redraws once) and in `docs/automatedtesting.md` that Swift Testing's per-test time includes queueing behind main-actor frame tests (the heaviest A18 frame test takes 4.5 s; a model test reported at 18 s waited for them). Per data-model and SC-A18-504 (unrequested)
