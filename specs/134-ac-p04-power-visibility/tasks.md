@@ -21,7 +21,7 @@ assert. Precedent: `specs/133-ac-p03-themes-favourites/tasks.md`.
 
 ## Phase 4: Story 2 — calm motion and a light load (P1)
 
-- [ ] T-A18-405 [P] [US2] Write `Packages/ExperiencesCreative/AmbientClock/ExperienceTests/{NightRenderTests,PowerCoreTests}.swift`: a night frame is darker (mean luma) than the day frame and non-blank; `motion.reduce` on gives identical stills at two times and a theme change cuts; a session's `host.framePacing.maxFPS == 30`; every new control refused out of range; schema-1 and schema-2 examples migrate to schema 3 with the defaults; schema 3 round-trips (SC-A18-401, 403; FR-A18-403, 404, 409)
+- [X] T-A18-405 [P] [US2] Write `Packages/ExperiencesCreative/AmbientClock/ExperienceTests/{NightRenderTests,PowerCoreTests}.swift`: a night frame is darker (mean luma) than the day frame and non-blank; `motion.reduce` on gives identical stills at two times and a theme change cuts; a session's `host.framePacing.maxFPS == 30`; every new control refused out of range; schema-1 and schema-2 examples migrate to schema 3 with the defaults; schema 3 round-trips (SC-A18-401, 403; FR-A18-403, 404, 409) — Verified 2026-11-16: 2026-11-16: NightRenderTests (4: night darker than day, schedule in New York, amber text, contrast) and PowerCoreTests (6: controls, migrations from schema 1 and 2, round trip, still frames and cuts under motion.reduce, the session cap 30) pass; 2026-11-16: .autonomy/checks/A18-P04.ac-ios27.json exit 0 (97 experience tests in 16 suites and 90 core tests, iOS 27.2); written by an agent, retested
 
 ## Phase 5: Story 3 — screen care and keeping the screen on (P2)
 
