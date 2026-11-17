@@ -70,7 +70,7 @@ import VisualCoreScenes
                 presenter.showControls()   // the accessibility action's handler
             }
             #expect(!presenter.mirror.controlsHidden, "trial \(trial)")
-            #expect(AuroraControls.labels(presenter.mirror).count == 9)
+            #expect(AuroraControls.labels(presenter.mirror).count == 11)
         }
         #expect(shell.port.revision == revision, "no action was sent")
         #expect(try shell.snapshot().payload == snapshot.payload, "the flag is not in the snapshot")

@@ -3,7 +3,8 @@
 // host at 64 × 48 off screen: every preset at the limits 0.2, 0.4 and 0.72, and the start, middle and end of every
 // change between the three presets (all six ordered pairs) at each of those limits, have no pixel whose Rec. 709
 // luminance (of the sRGB-decoded pixel) is above the limit + 1/255, and each drawing matches `SkyReference` of the
-// drawn uniforms within the A21-P01 tolerances (mean ≤ 2/255, largest ≤ 8/255). One test per limit for the changes, so
+// drawn uniforms within the A21-P01 tolerances (mean ≤ 2/255, largest ≤ 8/255); during a change (feature 154, the
+// 2.0 s crossfade) the reference is both skies' references mixed at the mix drawn. One test per limit for the changes, so
 // each stays well under 10 s (frames of 1/60 s at 32 × 24 points).
 import Foundation
 import Testing
@@ -64,16 +65,16 @@ import VisualCoreExperienceHost
         var largest: Float = 0
         for change in Self.changes {
             #expect(presenter.lastCore.presetIndex == change.from)
-            #expect(!presenter.blend.isBlending)
+            #expect(!presenter.transition.isChanging)
             AuroraTest.accept(shell, "preset.select", [Double(change.to)])
             let name = "\(change.from)→\(change.to) limit \(limit)"
-            #expect(presenter.blend.progress == 0)
             largest = max(largest, try check(session, shell, limit: limit, name + " start"))
-            try AuroraTest.draw(session, frames: 45)
-            #expect(abs(presenter.blend.progress - 0.5) < 1e-9)
+            #expect(presenter.transition.isChanging && presenter.transition.progress == 0)
+            try AuroraTest.draw(session, frames: 60)
+            #expect(abs(presenter.transition.progress - 0.5) < 1e-9)
             largest = max(largest, try check(session, shell, limit: limit, name + " middle"))
-            try AuroraTest.draw(session, frames: 45)
-            #expect(!presenter.blend.isBlending)
+            try AuroraTest.draw(session, frames: 60)
+            #expect(!presenter.transition.isChanging)
             largest = max(largest, try check(session, shell, limit: limit, name + " end"))
         }
         print("aurora-limit changes limit \(limit): max luminance \(largest)")

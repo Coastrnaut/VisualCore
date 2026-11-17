@@ -18,7 +18,7 @@ VisualCore change. Precedent: `specs/147-zg-p03-stones/tasks.md`. Rollback: reve
   `FullScreenShaderScene`s, each under the limit), progress "over 2.0 s of frame time, smoothstep", a new choice
   mid-change through `replaceIncoming`, immediate under Reduce Motion; the A21-P02 input blend stays for control
   changes within one sky (FR-A21-301, 302)
-- [ ] T-A21-303 [US1] Write `Packages/ExperiencesCreative/Aurora/ExperienceTests/TransitionTests.swift`: at progress 0,
+- [X] T-A21-303 [US1] Write `Packages/ExperiencesCreative/Aurora/ExperienceTests/TransitionTests.swift`: at progress 0, — Verified 2026-11-17: 2026-11-17: TransitionTests (5): at steps 0 to 1 the largest luminance stays under the limit (0.5805 at 0.6, 0.1992 at 0.2, 0.6813 at 0.72) and the mean difference from the incoming sky falls monotonically to 0; context loss and resize mid-change keep the picture; a restart from the current mix; Reduce Motion immediate; BlendTests, LimitRenderTests and ChromeTests updated for the crossfade and the two sound controls; .autonomy/checks/A21-P03.au-ios27.json exit 0; written by an agent, retested
   0.1, …, 1 no pixel above the limit + 1/255 and the mean absolute difference from the incoming sky never increases;
   a context loss and a resize mid-change keep the picture; a new choice restarts from the current mix; immediate under
   Reduce Motion (SC-A21-301)

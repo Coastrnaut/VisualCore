@@ -1,9 +1,9 @@
 // BlendTests — feature 153 (A21-P02) T-A21-204 (FR-A21-204; clarification Q3; contracts/experience.md "Blend"). The
 // change between skies: `SkyBlend` takes 1.5 s of frame time, eased with smoothstep, and a new selection mid-way starts
 // from the current blend; the five-stop inputs of a scene draw the same picture as the A21-P01 uniforms; the hue shift
-// turns the palette's hue and a shift of 0 changes nothing. Through the session host: a preset change starts at the
-// old picture, is half done after 0.75 s of frames and ends at the new preset's picture after 1.5 s; under Reduce Motion
-// the change is immediate and the sky still. Short runs only (frames of 1/60 s at 32 × 24 points).
+// turns the palette's hue and a shift of 0 changes nothing. Through the session host (feature 154, A21-P03): a control
+// within one sky follows at once, a preset change runs through the crossfade of two skies (TransitionTests), and a
+// control moved during it follows on the incoming sky; under Reduce Motion the change is immediate and the sky still. Short runs only (frames of 1/60 s at 32 × 24 points).
 import Foundation
 import Testing
 import AuroraCore
@@ -97,36 +97,30 @@ import VisualCoreExperienceHost
         #expect(SkyInputs(scene: SkyPresets.polarNight.scene, hue: 0.25) != Self.polar)
     }
 
-    @Test func aPresetChangeBlendsInTheSession() async throws {
+    @Test func aControlWithinOneSkyFollowsAtOnceAndAPresetChangeCrossfades() async throws {
+        // Feature 154 (A21-P03): a preset change runs through the crossfade of two skies (`SkyTransition`, see
+        // TransitionTests); the input blend stays for the controls within one sky, which follow at once.
         let session = ExperienceSession()
         defer { session.close() }
         let shell = try await AuroraTest.open(session)
         let presenter = shell.presenter
-        let before = try AuroraTest.still(session)
-        AuroraTest.accept(shell, "preset.select", [1])
-        #expect(presenter.blend.isBlending && presenter.blend.progress == 0)
-        let start = try AuroraTest.still(session)
-        #expect(AuroraTest.difference(start, before).max == 0, "the change starts at the old sky")
-        try AuroraTest.draw(session, frames: 45)
-        #expect(abs(presenter.blend.progress - 0.5) < 1e-9)
-        try AuroraTest.draw(session, frames: 44)
-        #expect(presenter.blend.isBlending)
-        try AuroraTest.draw(session, frames: 1)
-        #expect(!presenter.blend.isBlending, "done after 1.5 s of frames")
-        let end = try AuroraTest.still(session)
-        let uniforms = try #require(presenter.lastUniforms)
-        let target = SkyInputs(scene: SkyPresets.violetVeil.scene, hue: 0)
-        #expect(uniforms.palette == target.palette && uniforms.ribbons == 2)
-        let reference = try AuroraTest.reference(shell)
-        let diff = AuroraTest.difference(end, reference)
-        #expect(diff.mean <= 2 && diff.max <= 8, "\(diff)")
-        // A control moved during a change follows the target without restarting it.
-        AuroraTest.accept(shell, "preset.select", [2])
-        try AuroraTest.draw(session, frames: 30)
         AuroraTest.accept(shell, "sky.stars", [100])
-        #expect(presenter.blend.isBlending && abs(presenter.blend.progress - 1.0 / 3) < 1e-9)
-        try AuroraTest.draw(session, frames: 60)
-        #expect(!presenter.blend.isBlending && presenter.lastUniforms?.stars == 100)
+        try AuroraTest.draw(session)
+        #expect(!presenter.blend.isBlending && presenter.lastUniforms?.stars == 100, "a control is immediate")
+        AuroraTest.accept(shell, "preset.select", [1])
+        try AuroraTest.draw(session)
+        #expect(!presenter.blend.isBlending && presenter.transition.isChanging, "a preset change crossfades")
+        // A control moved during a change follows on the incoming sky without restarting the change.
+        try AuroraTest.draw(session, frames: 30)
+        let progress = presenter.transition.progress
+        AuroraTest.accept(shell, "sky.stars", [60])
+        try AuroraTest.draw(session)
+        #expect(presenter.transition.isChanging && presenter.transition.restarts == 0)
+        #expect(presenter.transition.progress > progress && presenter.lastUniforms?.stars == 60)
+        try AuroraTest.draw(session, frames: 100)
+        #expect(!presenter.transition.isChanging && presenter.lastUniforms?.stars == 60)
+        let diff = AuroraTest.difference(try AuroraTest.still(session), try AuroraTest.reference(shell))
+        #expect(diff.mean <= 2 && diff.max <= 8, "\(diff)")
     }
 
     @Test func underReduceMotionAChangeIsImmediateAndTheSkyStill() async throws {
@@ -137,6 +131,7 @@ import VisualCoreExperienceHost
         AuroraTest.accept(shell, "preset.select", [2])
         #expect(!presenter.blend.isBlending)
         try AuroraTest.draw(session)
+        #expect(!presenter.transition.isChanging)
         let first = try AuroraTest.still(session)
         let uniforms = try #require(presenter.lastUniforms)
         #expect(uniforms.palette == Self.dawn.palette && uniforms.ribbons == Self.dawn.ribbons)
