@@ -96,7 +96,7 @@
   - the purity scan (`--name core-purity`);
   - the documented API (`--name documented-api -- python3 scripts/check_documented_api.py --sources
     Packages/ExperiencesCreative/ShaderStudio`).
-- [ ] T-A22-114 Contract `docs/apps/shader-studio/visualcore-contract.json`: G-MODEL, G-VALIDATE, G-LINES and
+- [X] T-A22-114 Contract `docs/apps/shader-studio/visualcore-contract.json`: G-MODEL, G-VALIDATE, G-LINES and — Verified 2026-11-17: 2026-11-17: .autonomy/checks/A22-P01.contract.json exit 0 (G-MODEL, G-VALIDATE, G-LINES and G-TEMPLATES closed by A22-P01; M04, M12, M13 and M14 available with their evidence; M02, M05, M06, M07 and M11 wait for their later gaps)
   G-TEMPLATES are closed by "A22-P01", and rows whose gaps are all closed become available with evidence (`--name
   contract -- python3 scripts/check_app_contract.py --app shader-studio --render`)
 - [ ] T-A22-115 The packages, catalog and script tests and the app build:

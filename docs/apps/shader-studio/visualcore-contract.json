@@ -264,7 +264,7 @@
     "file": "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalScene.swift",
     "symbol": "FractalScene.errorMessage"
    },
-   "notes": "Parser tested in InfoLogParserTests. Missing: mapping through the template prefix back to the person's lines (G-LINES) and a diagnostics list (G-EDITOR); FullScreenShaderScene keeps only the first diagnostic and lastFailureLog is global, so neither is relied on."
+   "notes": "Parser tested in InfoLogParserTests. Missing: mapping through the template prefix back to the person's lines (G-LINES) and a diagnostics list (G-EDITOR); FullScreenShaderScene keeps only the first diagnostic and lastFailureLog is global, so neither is relied on. A22-P01 (feature 159): ShaderAssembly and DiagnosticMapper; five broken shaders compiled on ANGLE name the authored line (LineMappingCompileTests); still open: G-EDITOR."
   },
   {
    "id": "M03",
@@ -313,7 +313,7 @@
    "id": "M04",
    "capability": "Shader asset pipeline: starter templates over the vc/ library and the person's shader files stored, versioned and reopened",
    "source": "brainstorm: shader asset pipeline",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderBundle.swift",
@@ -350,7 +350,7 @@
     "file": "Packages/ExperiencesCreative/LivingWallpapers/Experience/SceneShaders.swift",
     "symbol": "SceneShaders"
    },
-   "notes": "Tested in ShaderBundleTests and ExperienceStorageTests. The templates are G-TEMPLATES and the project files G-LIBRARY."
+   "notes": "Tested in ShaderBundleTests and ExperienceStorageTests. The templates are G-TEMPLATES and the project files G-LIBRARY. A22-P01 (feature 159): ShaderTemplates gradient, noise-flow, rings compile and match their uniforms (TemplateCompileTests)."
   },
   {
    "id": "M05",
@@ -399,7 +399,7 @@
     "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Core/CompositionEditor.swift",
     "symbol": "CompositionEditor"
    },
-   "notes": "Tested in ParametersTests and ParameterEditorTests. Binding them to reflected uniforms and the inspector are G-INSPECTOR."
+   "notes": "Tested in ParametersTests and ParameterEditorTests. Binding them to reflected uniforms and the inspector are G-INSPECTOR. A22-P01 (feature 159): ShaderProject, ShaderLimits and ShaderProjectRefusal (ShaderStudio/Core/ShaderProject.swift; ProjectTests); still open: G-INSPECTOR."
   },
   {
    "id": "M06",
@@ -424,7 +424,7 @@
     "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Core/CompositionEditor.swift",
     "symbol": "CompositionEditor"
    },
-   "notes": "No code editor, line-numbered text view or syntax assistance exists in VisualCore (grep 2026-11-17). App-local SwiftUI editor, iPad and hardware keyboard first: G-EDITOR; line mapping: G-LINES."
+   "notes": "No code editor, line-numbered text view or syntax assistance exists in VisualCore (grep 2026-11-17). App-local SwiftUI editor, iPad and hardware keyboard first: G-EDITOR; line mapping: G-LINES. A22-P01 (feature 159): ShaderAssembly and DiagnosticMapper; five broken shaders compiled on ANGLE name the authored line (LineMappingCompileTests); still open: G-EDITOR."
   },
   {
    "id": "M07",
@@ -467,7 +467,7 @@
     "file": "Packages/ExperiencesCreative/LivingWallpapers/Experience/SceneShaders.swift",
     "symbol": "SceneShaders"
    },
-   "notes": "Tested in ShaderBundleTests and TextureUploadTests. FullScreenShaderScene has no texture input. Templates: G-TEMPLATES; texture inputs made in code: G-TEXTURES."
+   "notes": "Tested in ShaderBundleTests and TextureUploadTests. FullScreenShaderScene has no texture input. Templates: G-TEMPLATES; texture inputs made in code: G-TEXTURES. A22-P01 (feature 159): ShaderTemplates gradient, noise-flow, rings compile and match their uniforms (TemplateCompileTests); still open: G-TEXTURES."
   },
   {
    "id": "M08",
@@ -639,13 +639,13 @@
     "file": "Packages/ExperiencesCreative/DigitalZenGarden/Experience/GardenPresenter.swift",
     "symbol": "GardenPresenter.maxFramesPerSecond"
    },
-   "notes": "Tested in ShaderLibraryTests and PacingMeterTests. No watchdog, frame-time budget or hang detection exists. Pre-compile caps: G-VALIDATE; watchdog, stop and reset: G-WATCHDOG."
+   "notes": "Tested in ShaderLibraryTests and PacingMeterTests. No watchdog, frame-time budget or hang detection exists. Pre-compile caps: G-VALIDATE; watchdog, stop and reset: G-WATCHDOG. A22-P01 (feature 159): ShaderValidator (ShaderStudio/Core/ShaderValidator.swift; ValidatorTests); still open: G-WATCHDOG."
   },
   {
    "id": "M12",
    "capability": "Project, template, uniform and diagnostic models: pure, versioned, validated types with documented caps",
    "source": "spec FR-A22-003; research D4",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceCore.swift",
@@ -682,13 +682,13 @@
     "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Core/CompositionEditor.swift",
     "symbol": "CompositionEditor"
    },
-   "notes": "The versioning machinery exists and is tested (ExperienceSnapshotTests, MigrationTests); the models are G-MODEL."
+   "notes": "The versioning machinery exists and is tested (ExperienceSnapshotTests, MigrationTests); the models are G-MODEL. A22-P01 (feature 159): ShaderProject, ShaderLimits and ShaderProjectRefusal (ShaderStudio/Core/ShaderProject.swift; ProjectTests)."
   },
   {
    "id": "M13",
    "capability": "Source validator: size, line count, uniforms, inputs and preview size checked before any compile",
    "source": "spec FR-A22-003; clarification Q4",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreShaderSource/ShaderLibrary.swift",
@@ -719,13 +719,13 @@
     "file": "Packages/ExperiencesCreative/FractalExplorer/Core/GoToInput.swift",
     "symbol": "parse"
    },
-   "notes": "The expansion's 64 KiB limit stays the hard ceiling (ShaderLibraryTests); the app-local pure validator and its caps are G-VALIDATE (numbers decided with tests, research D4a)."
+   "notes": "The expansion's 64 KiB limit stays the hard ceiling (ShaderLibraryTests); the app-local pure validator and its caps are G-VALIDATE (numbers decided with tests, research D4a). A22-P01 (feature 159): ShaderValidator (ShaderStudio/Core/ShaderValidator.swift; ValidatorTests)."
   },
   {
    "id": "M14",
    "capability": "Line mapping: the template prefix (version, precision, includes) is inserted and diagnostics are mapped back to the person's lines",
    "source": "spec edge case: line numbers shifted by inserted code; clarification Q3",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreShaderSource/ShaderLibrary.swift",
@@ -762,7 +762,7 @@
     "file": "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalScene.swift",
     "symbol": "FractalScene"
    },
-   "notes": "Origins tested in ShaderLibraryTests; ShaderLibrary adds no precision line and no #line. G-LINES."
+   "notes": "Origins tested in ShaderLibraryTests; ShaderLibrary adds no precision line and no #line. G-LINES. A22-P01 (feature 159): ShaderAssembly and DiagnosticMapper; five broken shaders compiled on ANGLE name the authored line (LineMappingCompileTests)."
   },
   {
    "id": "M15",
@@ -1284,7 +1284,7 @@
    "justification": "The project, template, uniform and diagnostic models are the experience's domain, pure and GPU-free in its Core (manual phase 01, research D4). No VisualCore change is planned (clarification Q3); a second user would justify moving them upstream (Principle II).",
    "phase": 1,
    "test": "Core host tests: each model round-trips and migrates through MigrationChain; truncated, newer, NaN, infinite and out-of-range values are refused or clamped to the declared bounds; the digest is stable for the same inputs.",
-   "closed": null
+   "closed": "A22-P01"
   },
   {
    "id": "G-VALIDATE",
@@ -1297,7 +1297,7 @@
    "justification": "The pre-compile caps (source bytes, lines, uniforms, inputs, preview size) are Shader Studio's policy; ShaderLibrary's 64 KiB expansion limit stays the hard ceiling (clarification Q4). The numbers are decided with their tests (research D4a).",
    "phase": 1,
    "test": "Core host tests: sources at and one past each cap are accepted and refused with a named reason; no compile request is made for a refused source; empty, binary and non-UTF-8 text is refused.",
-   "closed": null
+   "closed": "A22-P01"
   },
   {
    "id": "G-LINES",
@@ -1311,7 +1311,7 @@
    "justification": "The template prefix (version, precision line, vc/ includes) is the experience's own; mapping diagnostics back to the person's lines over ExpandedShader.origin(ofExpandedLine:) is app-local (clarification Q3). Diagnostics stay line-only.",
    "phase": 1,
    "test": "Core host tests: a known error on person line N in each template maps to line N after the prefix; diagnostics on prefix lines map to the template and never to a person line; a log without a line keeps the message.",
-   "closed": null
+   "closed": "A22-P01"
   },
   {
    "id": "G-TEMPLATES",
@@ -1324,7 +1324,7 @@
    "justification": "The starter templates over vc/ with their declared uniforms and texture inputs are experience content written in code (manual phase 01; visuals are code).",
    "phase": 1,
    "test": "Core and experience tests: every template expands within the caps, declares only bounded uniforms and inputs, and compiles and links on the simulator host with no diagnostic.",
-   "closed": null
+   "closed": "A22-P01"
   },
   {
    "id": "G-PREVIEW",
