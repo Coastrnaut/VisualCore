@@ -13,7 +13,7 @@ migration, no VisualCore change).
 
 ## Phase 2: Story 1 — privacy and credits (P1) 🎯
 
-- [ ] T-A19-602 [P] [US1] Write `docs/apps/living-wallpapers/privacy-and-credits.md`: the session snapshot (scene, preset, edited colours, template, orientation, time, format, motion) and `history.json` (at most 20 exports) in the experience's storage, replaced on each change and removed when the app is deleted; the temporary export folder `LivingWallpapers-Export` (at most one file, replaced by the next export); nothing sent over the network; the add-only usage string "Saves exported artwork to your photo library when you choose Save Image.", asked by the system only when the person chooses Save Image in the share sheet; the experience never reads the library; the license inventory matching `licenses.md` (FR-A19-601)
+- [ ] T-A19-602 [P] [US1] Write `docs/apps/living-wallpapers/privacy-and-credits.md`: the session snapshot (scene, preset, seed, scene parameters, edited colours, template, orientation, animation time, format and the motion setting) and `history.json` (at most 20 exports) in the experience's storage, replaced on each change and removed when the app is deleted; the temporary export folder `LivingWallpapers-Export` (at most one file, replaced by the next export); nothing sent over the network; the add-only usage string "Saves exported artwork to your photo library when you choose Save Image.", asked by the system only when the person chooses Save Image in the share sheet; the experience never reads the library; the license inventory matching `licenses.md` (FR-A19-601)
 - [ ] T-A19-603 [US1] Write `specs/143-lw-p06-release/scan-sources-release.sh` refusing the APIs of Clarifications Q3 in `Packages/ExperiencesCreative/LivingWallpapers` (Swift files); run it (`--name lw-no-network -- sh specs/143-lw-p06-release/scan-sources-release.sh`) (FR-A19-602; SC-A19-601)
 
 ## Phase 3: Story 2 — recovery and stored files (P1)
@@ -23,7 +23,7 @@ migration, no VisualCore change).
 
 ## Phase 4: Story 3 — copy and checklist (P1)
 
-- [ ] T-A19-606 [P] [US3] Write the release documents in `docs/apps/living-wallpapers/`: `store-listing.md` (claims each with a proving test or interface class; the person sets the wallpaper in Settings; stills only), `release-checklist.md` (rows verified, pending-campaign-ii LW-D1–LW-D8, owner-action: signing, archive, upload), `release.json` per data-model.md (`copyCheck.allow` `["share"]`), the A19 section of `docs/release/known-limitations.md`, and the README document table; run `--name experience-release -- python3 scripts/release_check.py --only experience-release-a19 copy-claims-a19` (FR-A19-605, 606)
+- [ ] T-A19-606 [US3] Write the release documents in `docs/apps/living-wallpapers/`: `store-listing.md` (claims each with a proving test or interface class; the person sets the wallpaper in Settings; stills only), `release-checklist.md` (rows verified, pending-campaign-ii LW-D1–LW-D8, owner-action: signing, archive, upload), `release.json` per data-model.md (`copyCheck.allow` `["share"]`), the A19 section of `docs/release/known-limitations.md`, and the README document table; run `--name experience-release -- python3 scripts/release_check.py --only experience-release-a19 copy-claims-a19` (FR-A19-605, 606)
 - [ ] T-A19-607 [US3] Write `specs/143-lw-p06-release/scan-claims-release.sh` (the words of Clarifications Q2, whole words, case-insensitive, over the store text and the interface Swift of data-model.md; every named test exists) and run it (`--name lw-claims -- sh specs/143-lw-p06-release/scan-claims-release.sh`) (FR-A19-605; SC-A19-603)
 
 ## Phase 5: Story 4 — interface tests (P2)
@@ -40,8 +40,9 @@ migration, no VisualCore change).
 
 ## Dependencies
 
-T-A19-601 → {602, 603} → {604, 605} → {606, 607} → 608 → 609 → 610 → 611 → 612 → 613. 602, 605, 606 and 608 touch
-different files and may run in parallel; 606 needs 602's page for `requiredDocs`, and 607 needs 606's store text.
+T-A19-601 → {602, 603} → {604, 605} → {606, 607} → 608 → 609 → 610 → 611 → 612 → 613. 602, 605 and 608 touch
+different files and may run in parallel; 606 follows 602 (its `requiredDocs` names 602's page), and 607 follows 606
+(it scans 606's store text).
 
 ## Parallel examples
 
