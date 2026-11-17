@@ -164,7 +164,7 @@ A person can turn on night mode and the clock's own motion reduction from the co
 
 - **SC-A18-501**: Over 120 still frames the background is drawn exactly once; the frames are identical.
 - **SC-A18-502**: Each kind of change redraws exactly once; motion on draws every frame.
-- **SC-A18-503**: The campaign document has at least eight rows, all pending, each complete.
+- **SC-A18-503**: The campaign document has the ten rows AC-D1 to AC-D10, all pending, each complete.
 - **SC-A18-504**: The interface tests pass on the iOS 27 phone simulator in under 60 seconds each; every other test
   under 10 seconds.
 
