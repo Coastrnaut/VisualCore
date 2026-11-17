@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "bash",
+    "specs/141-lw-p04-save-share/scan-photos.sh"
+  ],
+  "command": "bash specs/141-lw-p04-save-share/scan-photos.sh",
+  "elapsed_seconds": 0.014,
+  "exit_code": 0,
+  "finished": "2026-11-17T06:47:39+00:00",
+  "log": ".autonomy/logs/A19-P05.photos-scan.log",
+  "log_sha256": "5efffbd8a8229a54dec62a70a7f418117355c3ef26c70ce2304cd050644c64c3",
+  "name": "photos-scan",
+  "stage": "A19-P05",
+  "started": "2026-11-17T06:47:39+00:00",
+  "timed_out": false
+}
