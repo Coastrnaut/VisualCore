@@ -1843,6 +1843,7 @@ VisualCorePersistence | var | public var id: UUID
 VisualCorePersistence | var | public var modifiedAt: Date
 VisualCorePersistence | var | public var name: String
 VisualCorePersistence | var | public var payload: Payload
+VisualCoreRendering | class | public final class CachedScene: RenderScene
 VisualCoreRendering | class | public final class ClearColorScene: RenderScene
 VisualCoreRendering | class | public final class CrossfadeScene: RenderScene
 VisualCoreRendering | class | public final class DepthMeshPass
@@ -1902,6 +1903,7 @@ VisualCoreRendering | func | public func floorFindings() -> [FloorFinding]
 VisualCoreRendering | func | public func fragmentMantissaBits(fallback: Int = 10) -> Int
 VisualCoreRendering | func | public func frame(delta: Double, output: FieldPass.Output, draw: (RenderTarget) throws -> Void) throws
 VisualCoreRendering | func | public func hash(into hasher: inout Hasher)
+VisualCoreRendering | func | public func invalidate()
 VisualCoreRendering | func | public func makeBuffer(bytes: Int, label: String) throws -> GPUBuffer
 VisualCoreRendering | func | public func makeRenderTarget(width: Int, height: Int, format: TextureFormat = .rgba8, depth: Bool = false,
 VisualCoreRendering | func | public func makeTexture(width: Int, height: Int, format: TextureFormat = .rgba8, label: String) throws -> Texture
@@ -1965,6 +1967,7 @@ VisualCoreRendering | init | public convenience init(mesh: Mesh, colors: [Vec4]?
 VisualCoreRendering | init | public convenience init(mesh: Mesh, registry: ResourceRegistry) throws
 VisualCoreRendering | init | public init()
 VisualCoreRendering | init | public init(center: Vec2, size: Vec2)
+VisualCoreRendering | init | public init(child: any RenderScene)
 VisualCoreRendering | init | public init(extensionReported: Bool, probeComplete: Bool)
 VisualCoreRendering | init | public init(files: [String: String])
 VisualCoreRendering | init | public init(folder: TemporaryFolder)
@@ -2062,6 +2065,8 @@ VisualCoreRendering | var | public internal(set) static var lastFailureLog
 VisualCoreRendering | var | public internal(set) var maxTextureSize
 VisualCoreRendering | var | public private(set) var cacheHits
 VisualCoreRendering | var | public private(set) var capabilities
+VisualCoreRendering | var | public private(set) var child: any RenderScene
+VisualCoreRendering | var | public private(set) var childDrawCount: Int
 VisualCoreRendering | var | public private(set) var compileCount
 VisualCoreRendering | var | public private(set) var errorMessage: String?
 VisualCoreRendering | var | public private(set) var evictionCount
@@ -2112,6 +2117,7 @@ VisualCoreRendering | var | public var height: Int
 VisualCoreRendering | var | public var image: RenderTarget?
 VisualCoreRendering | var | public var isSupported: Bool
 VisualCoreRendering | var | public var isValid: Bool
+VisualCoreRendering | var | public var key: Int
 VisualCoreRendering | var | public var lifecycleHistory: [RenderLifecycleEvent]
 VisualCoreRendering | var | public var lightDirection
 VisualCoreRendering | var | public var maxColorAttachments: Int?
@@ -2133,6 +2139,7 @@ VisualCoreRendering | var | public var name: String
 VisualCoreRendering | var | public var names: [String]
 VisualCoreRendering | var | public var palette: [SIMD3<Float>]
 VisualCoreRendering | var | public var parameters: [String: Double]
+VisualCoreRendering | var | public var passThrough: Bool
 VisualCoreRendering | var | public var pointerHandler: ((PointerEvent) -> Void)?
 VisualCoreRendering | var | public var precisionBits: Int
 VisualCoreRendering | var | public var progress: Double

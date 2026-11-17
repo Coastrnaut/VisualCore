@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "VisualCoreRenderingTests/CachedSceneTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --only-testing VisualCoreRenderingTests/CachedSceneTests",
+  "elapsed_seconds": 6.565,
+  "exit_code": 0,
+  "finished": "2026-11-17T04:12:23+00:00",
+  "log": ".autonomy/logs/A18-P05.cached-ios27.log",
+  "log_sha256": "46768656194f65c6ac12ee38f5bf76d0c67ec60196512fe440a251bcd2967cda",
+  "name": "cached-ios27",
+  "stage": "A18-P05",
+  "started": "2026-11-17T04:12:16+00:00",
+  "timed_out": false
+}
