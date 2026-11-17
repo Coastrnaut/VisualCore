@@ -77,3 +77,7 @@ Agent A: T-A21-402, 403 and the README rows of 404. Agent L: T-A21-406–408. Le
 
 MVP: the still view (406). Reduced flash (407) and the fallback and release (408) close G-LOWPOWER; the loop (402–405)
 closes G-LOOP. Review checkpoint at 409. One commit per task.
+
+## Phase 7: Convergence
+
+- [ ] T-A21-413 Record the as-built design in `specs/155-au-p04-loop-lowpower/data-model.md`, `contracts/loop.md` and `contracts/lowpower.md`: the public `AmbientLoopPartial` (cycles per loop, amplitude 0…1) and `sampleRate` as a static constant of the recipe; the swell `0.65 − 0.35·cos` (never silent) and the buffer scaled so its peak is the gain; the player's own output seam, default volume 1 and no self-restart; the shader's `u_twinkleOff` uniform (unset by default, so the default picture is unchanged); the injectable `fragmentHighp` (the app falls back on a compile failure only, since `RenderContext` carries no capabilities); sky compile failures fall back instead of throwing; the fallback is drawn through the cache per data-model and contracts (unrequested)
