@@ -8,7 +8,7 @@ VisualCore change. Precedent: `specs/140-lw-p03-editor/tasks.md`. Rollback: reve
 
 ## Phase 1: Setup
 
-- [ ] T-A20-301 Baseline: cite the A20-P02 evidence (`.autonomy/checks/A20-P02.{zg-ios27-2,app-unit,verify-27}.json`) on the tree recorded at A20-P02 (`6f236139`), whose Packages are unchanged since (owner ruling of 2026-11-14)
+- [X] T-A20-301 Baseline: cite the A20-P02 evidence (`.autonomy/checks/A20-P02.{zg-ios27-2,app-unit,verify-27}.json`) on the tree recorded at A20-P02 (`6f236139`), whose Packages are unchanged since (owner ruling of 2026-11-14) — Verified 2026-11-17: 2026-11-17: A20-P02 evidence cited: .autonomy/checks/A20-P02.zg-ios27-2.json, A20-P02.app-unit.json and A20-P02.verify-27.json, all exit 0; no Packages, Apps or project.yml change since the A20-P02 record commit 6f236139
 
 ## Phase 2: Foundational — the pure stone model
 
