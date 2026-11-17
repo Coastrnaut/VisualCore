@@ -1069,6 +1069,50 @@ engagement loops.
   place, rotate, delete, undo) also has a control; selection never depends on colour alone.
 - **Licenses:** every shader, stone shape and palette records its source and license.
 
+### A21 Aurora (`a21.aurora`)
+
+Ratified from the app manual's constitution prompt (2026-11-17). Like A05–A20, it never had a standalone target: it
+is built directly as an experience of the one app. Its product goal is a full-screen ambient aurora experience with
+procedural skies, gentle stars and optional soundscapes. Version 0.1 covers:
+- three procedural sky presets with aurora ribbons, stars and cloud layers;
+- colour, motion and intensity controls with sensible bounds;
+- scene transitions and saveable preferences;
+- a low-power static view and a reduced-flash mode;
+- an optional ambient sound loop with its own control;
+- a full-screen view that hides its controls and restores them with a tap.
+
+It does not forecast real aurora activity, has no weather integration, and neither requires background audio nor
+promises an always-on screen.
+
+- **Consumer, not fork:** an experience of the VisualCore app and a VisualCore consumer, never a fork of
+  projectm-ios. It uses only audited VisualCore public APIs over the OpenGL ES → ANGLE → Metal integration. It MUST
+  NOT create its own EGL/ANGLE initialization path or a second renderer, or link ProjectM engine code.
+- **Reuse first (Principle II):** noise, procedural shaders, particles, animation time, blending, transitions,
+  persistence, procedural sound and accessibility planning already in VisualCore are reused, not copied. A generic
+  capability the sky needs and VisualCore lacks goes into VisualCore with tests, docs, the API baseline and the
+  reference regression. The presets, palettes and copy stay in the experience.
+- **Visuals and sound are code:** aurora ribbons, stars, clouds and glow are procedural (shaders, noise, particles),
+  with no purchased, generated or photographic image. The optional ambient loop is synthesised procedurally, with
+  no bundled recording. Typography uses system fonts.
+- **Testable without the GPU:** scenes, presets, controls and their bounds, transitions, the luminance cap,
+  preferences and the animation clock are pure, versioned models tested through `swift test`. Rendered animation time
+  is kept apart from wall-clock time, so a return from the background never jumps. Drawing never changes the state.
+- **Bounded:** ribbon, star and cloud counts, speeds, intensities and file sizes have documented caps; files that
+  are truncated, of a newer version, or hold NaN, infinite or out-of-range values are refused safely. GPU passes are
+  bounded, created only in a valid host context and rebuilt from CPU state after a context loss or resize; a static
+  frame is shown when a shader feature or precision is unsupported.
+- **Calm and safe light:** ribbon frequency and luminance stay within comfort bounds, composited under an explicit
+  luminance cap that no transition exceeds; nothing flashes; Reduce Motion gives a stable frame and Reduce Flashing is
+  honoured. Sound is off by default and never required.
+- **Offline-first and private:** no networking, location, accounts, analytics or ads, and no permission is needed.
+  Preferences stay in the experience's storage.
+- **Truthful claims:** scenes are labelled as stylized art; the experience never claims a scientific depiction or a
+  forecast of real aurora activity, therapeutic or sleep effects, an always-on screen, or measured frame rates and
+  battery figures; such numbers come only from device measurements.
+- **Accessibility:** native SwiftUI controls with VoiceOver labels and Dynamic Type; hidden controls return with a tap
+  or an accessibility action; no information depends on colour or animation alone.
+- **Licenses:** every shader, palette and sound recipe records its source and license.
+
 ## Governance
 
 - Precedence: real Apple platform and toolchain behavior and observed test results → owner
@@ -1117,5 +1161,7 @@ engagement loops.
   its manual's constitution prompt at gate A19-P00 (feature 137); no principle changes.
 - Amendment 2.16.0 (2026-11-17, MINOR): App-Scoped Rules gain the A20 Digital Zen Garden subsection, ratified from
   its manual's constitution prompt at gate A20-P00 (feature 144); no principle changes.
+- Amendment 2.17.0 (2026-11-17, MINOR): App-Scoped Rules gain the A21 Aurora subsection, ratified from its
+  manual's constitution prompt at gate A21-P00 (feature 151); no principle changes.
 
-**Version**: 2.16.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-17
+**Version**: 2.17.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-17
