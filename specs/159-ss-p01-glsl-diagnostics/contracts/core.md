@@ -13,3 +13,6 @@
 - `ShaderTemplates.all` — three templates; each validates, compiles and has active uniforms equal to its declared
   ones (tests).
 - No GL call, clock, network or UI framework in `ShaderStudio/Core`.
+- VisualCore names the core and its tests use (documented-API check): `ShaderLibrary`, `SourceOrigin` (the expansion's
+  per-line origin), `ShaderDiagnostic` and its `Severity`, `ShaderStage`, `ShaderError`, `ShaderBundle`,
+  `ShaderProgram`, `ParameterDefinition`, `ParameterTransform`, `RenderHost`, `RenderScene`, `RenderContext`.

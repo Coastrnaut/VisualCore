@@ -89,7 +89,7 @@
 - [X] T-A22-112 [P] Write `docs/apps/shader-studio/licenses.md` (templates and prelude written in this repository; the — Verified 2026-11-17: 2026-11-17: docs/apps/shader-studio/licenses.md (templates and prelude written here; vc/ is VisualCore's; GLSL ES 3.00 word lists are facts; no third-party asset) listed in the README; validate_docs PASS
   `vc/` library is VisualCore's; the GLSL word lists are facts of the GLSL ES 3.00 specification; no third-party asset)
   and list it in `docs/apps/shader-studio/README.md`
-- [ ] T-A22-113 Core tests on sim-27.2, as a review checkpoint (SC-A22-105, FR-A22-107):
+- [X] T-A22-113 Core tests on sim-27.2, as a review checkpoint (SC-A22-105, FR-A22-107): — Verified 2026-11-17: 2026-11-17: review checkpoint: .autonomy/checks/A22-P01.ss-core-ios27-2.json exit 0 (51 tests in 7 suites on sim-27.2, each under 10 s), A22-P01.core-purity.json exit 0, A22-P01.documented-api-3.json exit 0 (the VisualCore names used are named in contracts/core.md; the first attempt failed on Severity and SourceOrigin) and A22-P01.isolation.json exit 0
   - `--name ss-core-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme
     ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing ShaderStudioCoreTests`, with each
     test under 10 s;
