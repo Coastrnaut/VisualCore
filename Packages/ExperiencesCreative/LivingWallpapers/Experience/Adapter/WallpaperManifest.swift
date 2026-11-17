@@ -11,6 +11,11 @@
 // values out of range, fractional choices, a parameter outside its scene's range and a wrong value count. The
 // expected digests are derived by playing the entries on a core exactly as the engine plays them (the steps of an
 // entry, then its action) and digesting it with the experience id as domain, as Ambient Clock's manifest does.
+//
+// Feature 140 (A19-P03) T-A19-310 (FR-A19-301): rejection also refuses `preset.color [0, 1.5, 0, 0]` (a component
+// outside 0…1, `action.out-of-range`) and `preset.color [0, 0.5, 0.5]` (three values instead of four,
+// `action.wrong-value-count`); the five fixtures are unchanged. The digests follow snapshot schema 2
+// ("a19.wallpaper.v2").
 #if DEBUG || VISUALCORE_AUTOMATION
 import VisualCoreExperience
 
@@ -54,7 +59,7 @@ extension WallpaperCore {
     }
 
     /// The entries of rejection, from the opening state: values out of range, fractional choices, a parameter
-    /// outside its scene's range and a wrong value count.
+    /// outside its scene's range, wrong value counts, and a colour component outside 0…1 (feature 140).
     public static var rejectionEntries: [ScenarioStep] {
         let invalid = "action.rule." + WallpaperRule.invalidChoice
         return [
@@ -65,6 +70,10 @@ extension WallpaperCore {
             ScenarioStep(steps: 0, action: ScriptedAction("canvas.orientation", [0.5]), result: invalid),
             ScenarioStep(steps: 0, action: ScriptedAction("motion.enabled", [2]), result: "action.out-of-range"),
             ScenarioStep(steps: 0, action: ScriptedAction("scene.parameter", [0]), result: "action.wrong-value-count"),
+            ScenarioStep(steps: 0, action: ScriptedAction("preset.color", [0, 1.5, 0, 0]),
+                         result: "action.out-of-range"),
+            ScenarioStep(steps: 0, action: ScriptedAction("preset.color", [0, 0.5, 0.5]),
+                         result: "action.wrong-value-count"),
         ]
     }
 

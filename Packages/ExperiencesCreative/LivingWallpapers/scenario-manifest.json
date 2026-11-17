@@ -7,7 +7,9 @@
     "canvas.orientation",
     "scene.time",
     "export.format",
-    "motion.enabled"
+    "motion.enabled",
+    "preset.color",
+    "preset.reset"
   ],
   "experience" : "a19.living-wallpapers",
   "kind" : "creative",
@@ -17,7 +19,7 @@
 
       ],
       "expect" : {
-        "initialDigest" : "dec58bda89ca15695d43b054d800bec6588e96a84ca9e7da539675112a16d6e7"
+        "initialDigest" : "3e3e70129f2e4696903382ccb39e73e2ed418edba81788de053df26fdfd64df7"
       },
       "name" : "launch-first-frame",
       "seed" : "1"
@@ -57,8 +59,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "ae6c0efca583128b650429ec658d0d4a4fd3f670534515318a667087e8dd63a4",
-        "initialDigest" : "dec58bda89ca15695d43b054d800bec6588e96a84ca9e7da539675112a16d6e7"
+        "finalDigest" : "72d7f888b55c3b5701de8ac8a3a9a8f8d4afedc5159901d0f7ef7d7cb4b4e1c7",
+        "initialDigest" : "3e3e70129f2e4696903382ccb39e73e2ed418edba81788de053df26fdfd64df7"
       },
       "name" : "input-response",
       "seed" : "1"
@@ -154,6 +156,31 @@
           },
           "result" : "action.wrong-value-count",
           "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "preset.color",
+            "values" : [
+              0,
+              1.5,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "preset.color",
+            "values" : [
+              0,
+              0.5,
+              0.5
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
         }
       ],
       "expect" : {
@@ -197,8 +224,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "ae6c0efca583128b650429ec658d0d4a4fd3f670534515318a667087e8dd63a4",
-        "initialDigest" : "dec58bda89ca15695d43b054d800bec6588e96a84ca9e7da539675112a16d6e7"
+        "finalDigest" : "72d7f888b55c3b5701de8ac8a3a9a8f8d4afedc5159901d0f7ef7d7cb4b4e1c7",
+        "initialDigest" : "3e3e70129f2e4696903382ccb39e73e2ed418edba81788de053df26fdfd64df7"
       },
       "name" : "save-restore",
       "seed" : "1"
@@ -238,7 +265,7 @@
         }
       ],
       "expect" : {
-        "initialDigest" : "dec58bda89ca15695d43b054d800bec6588e96a84ca9e7da539675112a16d6e7",
+        "initialDigest" : "3e3e70129f2e4696903382ccb39e73e2ed418edba81788de053df26fdfd64df7",
         "resetDigest" : true
       },
       "name" : "reset",
@@ -289,8 +316,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "3325825fd3c02bc765e76ac12940766658804e5a74344f83a03c389f55adac5d",
-        "initialDigest" : "dec58bda89ca15695d43b054d800bec6588e96a84ca9e7da539675112a16d6e7",
+        "finalDigest" : "1dd1d11b5648241fd6e432b0ab1a3a1da06fc3f5c12d12505c1224e53d0f222c",
+        "initialDigest" : "3e3e70129f2e4696903382ccb39e73e2ed418edba81788de053df26fdfd64df7",
         "outcome" : "scene-ink-flow"
       },
       "name" : "fixture-scene-ink-flow",
@@ -310,8 +337,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "b7fa86ce5b9bebfd7700f50d582164bd0e0937e754fc875e367e9c01449b0ba1",
-        "initialDigest" : "dec58bda89ca15695d43b054d800bec6588e96a84ca9e7da539675112a16d6e7",
+        "finalDigest" : "c252e03118894b12fe0dbbd4d82b7f06ff99fb9dee3cd4dfb6e67b0d979e0d1f",
+        "initialDigest" : "3e3e70129f2e4696903382ccb39e73e2ed418edba81788de053df26fdfd64df7",
         "outcome" : "scene-aurora-bands"
       },
       "name" : "fixture-preset-third",
@@ -341,8 +368,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "ac7823cc233c50be575e69a19afdf59d310dc3b3cce0fe20a89692c9cf7ce75e",
-        "initialDigest" : "dec58bda89ca15695d43b054d800bec6588e96a84ca9e7da539675112a16d6e7",
+        "finalDigest" : "1c64261af1026da5320a6364f0832f6f3918c9351a30cd665308240dee8bd262",
+        "initialDigest" : "3e3e70129f2e4696903382ccb39e73e2ed418edba81788de053df26fdfd64df7",
         "outcome" : "scene-aurora-bands"
       },
       "name" : "fixture-template-ipad-landscape",
@@ -362,8 +389,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "8e74edc72bf513dcb8bc9f1c91d0cb13791179a13173af2e5c83e45d7f760513",
-        "initialDigest" : "dec58bda89ca15695d43b054d800bec6588e96a84ca9e7da539675112a16d6e7",
+        "finalDigest" : "fe963c6a6b2b11f2184c343d8f8ba6aa50cb0ac61c8097214bae6aab2a3b18cf",
+        "initialDigest" : "3e3e70129f2e4696903382ccb39e73e2ed418edba81788de053df26fdfd64df7",
         "outcome" : "scene-aurora-bands"
       },
       "name" : "fixture-time-set",
@@ -384,8 +411,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "9c1378cb113f3e63f10e2dd317ef3f965e9b4f066396a140d0957c36e5b8a27d",
-        "initialDigest" : "dec58bda89ca15695d43b054d800bec6588e96a84ca9e7da539675112a16d6e7",
+        "finalDigest" : "bc032a275f065e641c0c8c0e4c7e5b218b31251d70410a2f6697a3b31097e79f",
+        "initialDigest" : "3e3e70129f2e4696903382ccb39e73e2ed418edba81788de053df26fdfd64df7",
         "outcome" : "scene-aurora-bands"
       },
       "name" : "fixture-parameter-changed",
