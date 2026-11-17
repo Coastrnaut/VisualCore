@@ -27,7 +27,7 @@ stored data exists yet).
 
 - [ ] T-A20-108 [US3] Create `Packages/ExperiencesCreative/DigitalZenGarden/Core/GardenHistory.swift` per data-model.md and clarification Q4: commands `rake`, `place`, `move`, `rotate`, `remove`, `tone` (each recording what its undo needs); `apply(_:)` refusing over-cap, unknown and out-of-range commands and commands on a missing id without a change; `undo()`, `redo()` (a new command clears redo); at most 100 undoable commands, the oldest folding into the checkpoint (document and field); `field()` rebuilt from the checkpoint
 - [ ] T-A20-109 [US3] Write `Packages/ExperiencesCreative/DigitalZenGarden/CoreTests/{HistoryTests,ReplayFixtureTests}.swift`: 60 mixed commands undone and redone give an identical command list and a field within 1e-6 per cell; redo cleared; empty undo and redo change nothing; 150 commands fold into the checkpoint and the rebuilt field equals a full replay within 1e-6; refusals leave the document unchanged (FR-A20-105, 106; SC-A20-103, 104)
-- [ ] T-A20-110 [P] Write `docs/apps/digital-zen-garden/licenses.md` (the tray, tones, rake styles and stone kinds are written in this repository; numbers only; no third-party asset)
+- [X] T-A20-110 [P] Write `docs/apps/digital-zen-garden/licenses.md` (the tray, tones, rake styles and stone kinds are written in this repository; numbers only; no third-party asset) — Verified 2026-11-17: 2026-11-17: docs/apps/digital-zen-garden/licenses.md (tray, tones, rake styles, stone kinds and the groove profile written in this repository; numbers only; no third-party asset; shaders and sound listed when added); validate_docs exit 0; written by an agent, reviewed
 
 ## Phase 5: Records and evidence
 
