@@ -25,6 +25,62 @@ Canonical overrides:
   the theme is a fragment shader over VisualCore's GLSL library; the text uses system fonts.
 - Follow `specs/125-ia-p02-scene-selection` and `specs/131-ac-p01-clock-a11y`.
 
+## Clarifications
+
+### Session 2026-11-16
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- An action carries only numbers (`ExperienceAction.values: [Double]`, at most 24 values).
+- `FrameInfo` gives `index`, `time` and `delta`. An experience's `make(id:storage:reduceMotion:…)` receives
+  `reduceMotion` (Infinite Geometry, `InfiniteGeometryExperience.swift:19`).
+- `FullScreenShaderScene` is owned by a presenter in Infinite Geometry (`GeometryPresenter.swift`).
+- The GLSL library has `vc_gradientNoise` and `vc_fbm(p, octaves, lacunarity, gain)` in `vc/noise.glsl`.
+- `QualityLevel` has `resolutionShare`, `elementShare`, `iterationShare` and `effectPasses`.
+- The host builds its `RenderHost` with the default frame cap (G-FRAMERATE, A18-P04), so no frame-rate budget can be
+  set in this phase.
+- The canvas overlay never takes touches and is hidden from assistive technology; the canvas label is `describe`.
+
+- Q: How do locale and zone reach the drawn text when actions carry only numbers? → A: The experience core
+  (`AmbientCore`) holds only numbers, so replays and digests stay deterministic:
+  - the instant (seconds since 1970);
+  - the hour cycle (0 system, 1 h12, 2 h24), seconds and the date line (0 or 1);
+  - motion (0 or 1) and speed (0.25–2);
+  - a time-change revision.
+
+  The presenter keeps an `AmbientClockState` (A18-P01) as its display model. It is fed with the same instants and
+  with the system's locale and zone from an injected environment provider (default: `Locale.current` and
+  `TimeZone.current` at the moment of the event). So a time-zone notification makes the presenter read the new zone,
+  send `time.changed` and show the new text.
+- Q: Which actions and controls? → A: `time.set` [seconds since 1970], `time.changed` [kind 0–4 in `TimeChangeKind`
+  order], `clock.format` [hour cycle 0–2, seconds 0/1, date 0/1], `theme.motion` [0/1] and `theme.speed` [0.25–2].
+  Values outside these ranges are refused by the input validator.
+  - The presenter's `tick(port:)` sends `time.set` with the source's instant and returns the next deadline.
+  - The overlay runs a task that calls `tick` and sleeps until that deadline (a whole minute, or a whole second with
+    seconds on).
+  - A `TimeChangeMonitor` with `applicationNames` sends `time.changed`; it starts at setup and stops at teardown.
+- Q: What is the theme, and what are the quality levels? → A: The theme is "Noise gradient": `vc_fbm` over a slowly
+  drifting coordinate maps through a palette of four calm colours. The palette is midnight blue, deep teal, dusk violet
+  and slate, all dark enough that white text reaches at least 4.5 : 1. Two levels:
+  - `level-0`: 5 octaves at full resolution;
+  - `level-1`: 3 octaves at half resolution (resolutionShare 0.5, iterationShare 0.6).
+
+  Each level makes exactly one full-screen draw. The time uniform is `frame.time × speed` when motion is on, and 0
+  when motion is off or Reduce Motion is on. The time text is white; the contrast rule is checked with
+  `AccessibleColors.contrastRatio` against every palette colour.
+- Q: How is the overlay laid out? → A: The time is centred, with the date below it.
+  - The time's font is the system font at 0.22 × the shorter canvas side, scaled by the Dynamic Type factor and capped
+    so the text fits 90 % of the width (`minimumScaleFactor` 0.3, one line).
+  - The date uses the title style.
+  - Both are white, with no shadow needed.
+- Q: How is it verified? → A: As for A17:
+  - a candidate registration with tiers `level-0` and `level-1` and permissions [];
+  - the nine standard scenarios in `AmbientClock/scenario-manifest.json`, with fixtures for a time-zone change and
+    motion off;
+  - presenter tests with a `FixedClock`, a private `NotificationCenter` and an environment provider that switches
+    New York to Kolkata;
+  - probes at the canvas centre with the colour class `dark`.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - A readable clock over a calm background (Priority: P1) 🎯
@@ -107,8 +163,8 @@ A person can stop the motion of the background or slow it, and with Reduce Motio
   and MUST rebuild the displayed text from the system's locale and zone at that moment.
 - **FR-A18-207**: With motion off or Reduce Motion on, the background MUST be still; motion MUST never affect the
   shown time.
-- **FR-A18-208**: Each quality level MUST have stated budgets (shader iterations, frame-rate cap, draws); a level over
-  budget MUST be refused.
+- **FR-A18-208**: Each quality level MUST have stated budgets (noise octaves, resolution share, one draw); the
+  frame-rate cap comes with G-FRAMERATE (A18-P04).
 - **FR-A18-209**: The experience's state MUST round-trip through its snapshot; the instant is not stored.
 - **FR-A18-210**: The nine standard verification scenarios MUST pass, with fixtures for a time-zone change and motion
   off.
