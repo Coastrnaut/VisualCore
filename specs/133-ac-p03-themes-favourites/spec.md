@@ -106,7 +106,7 @@ A person switches theme and sees a short crossfade; with Reduce Motion on, the c
 **Acceptance Scenarios**:
 
 1. **Given** a theme change, **When** the crossfade is at its start, **Then** the frame is the old theme; at its end the
-   new theme; midway their average within a small tolerance; no frame is black.
+   new theme; midway their average within 2 of 255 per channel; no frame is black.
 2. **Given** Reduce Motion on, **Then** the change is immediate.
 
 ---
@@ -167,8 +167,8 @@ reopening the clock.
 
 - **SC-A18-301**: 100 % of the theme and palette combinations reach 4.5 : 1 for the time text.
 - **SC-A18-302**: All four themes draw non-blank frames at both quality levels.
-- **SC-A18-303**: The crossfade's start, middle and end frames match the old picture, the average and the new picture
-  within the stated tolerance; under Reduce Motion the change takes no frames.
+- **SC-A18-303**: The crossfade's start, middle and end frames match the old picture, the average (within 2 of 255 per
+  channel) and the new picture; under Reduce Motion the change takes no frames.
 - **SC-A18-304**: Favourites round-trip after a reopen; every damaged, newer, oversized and over-cap case is refused.
 - **SC-A18-305**: Every test runs in under 10 seconds; the experience passes the nine standard scenarios on iOS 27.
 
