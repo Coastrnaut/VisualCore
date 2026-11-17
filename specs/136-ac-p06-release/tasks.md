@@ -9,7 +9,7 @@ migration, no VisualCore change).
 
 ## Phase 1: Setup
 
-- [ ] T-A18-601 Baseline: cite the A18-P05 evidence (`.autonomy/checks/A18-P05.{ac-ios27,app-ui,verify-27}.json`) on the tree recorded at A18-P05 (495ae6b6), whose Packages, Apps and project.yml are unchanged since (owner ruling of 2026-11-14)
+- [X] T-A18-601 Baseline: cite the A18-P05 evidence (`.autonomy/checks/A18-P05.{ac-ios27,app-ui,verify-27}.json`) on the tree recorded at A18-P05 (495ae6b6), whose Packages, Apps and project.yml are unchanged since (owner ruling of 2026-11-14) — Verified 2026-11-16: 2026-11-16: A18-P05 evidence cited: .autonomy/checks/A18-P05.ac-ios27.json, A18-P05.app-ui.json and A18-P05.verify-27.json, all exit 0; no Packages, Apps or project.yml change since the A18-P05 record commit 495ae6b6
 
 ## Phase 2: Story 1 — privacy and credits
 
