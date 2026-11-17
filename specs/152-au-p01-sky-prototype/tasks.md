@@ -34,7 +34,7 @@ VisualCore change. Precedent: `specs/145-zg-p01-document-strokes/tasks.md`. Roll
   `u_turbulence`, `u_cloudiness`, `u_stars`, `u_octaves`, palette) compositing stars ("twinkle ±30 %", "size ≤ 1.5
   pixels"), fbm clouds and up to four advected ribbons; levels "0 → 5 octaves, 1 → 3"; `SkyReference` evaluates the
   same formulas per pixel (FR-A21-104, 105)
-- [ ] T-A21-106 [P] [US2] Write `Packages/ExperiencesCreative/Aurora/CoreTests/{NoiseTests,SkyRenderTests}.swift`: the
+- [X] T-A21-106 [P] [US2] Write `Packages/ExperiencesCreative/Aurora/CoreTests/{NoiseTests,SkyRenderTests}.swift`: the — Verified 2026-11-17: 2026-11-17: NoiseTests (3: the port matches the GPU, 0/255) and SkyRenderTests (6): each preset at levels 0 and 1 matches SkyReference at 64 x 48 (mean and largest difference 0/255), luminance at most 0.679 and mean at least 0.040, fewer octaves at level 1, identical after recreateContext and a resize, a broken shader names aurora-sky; .autonomy/checks/A21-P01.au-core-ios27.json exit 0; written by an agent, retested
   noise port matches the GPU noise drawn off screen; each preset at levels 0 and 1 drawn at 64 × 48 through
   `FullScreenShaderScene` matches `SkyReference` ("mean absolute channel difference ≤ 2/255, largest ≤ 8/255"); every
   pixel's luminance ≤ 0.75 and the mean ≥ 0.02; level 1 uses fewer octaves; after `recreateContext` and after a resize
