@@ -108,7 +108,8 @@ import VisualCoreMath
     @Test func everyGestureActionHasANativeAlternative() async throws {
         let shell = try await GardenTest.shell()
         let presenter = shell.presenter
-        #expect(presenter.gestureActions == ["stroke.begin", "stroke.add", "stroke.end"])
+        #expect(presenter.gestureActions == ["stroke.begin", "stroke.add", "stroke.end", "stone.select", "stone.move",
+                                             "stone.rotate"])
         #expect(GestureAlternatives.missing(gesture: presenter.gestureActions, native: presenter.nativeActions).isEmpty)
         let required: Set<String> = ["stroke.begin", "stroke.add", "stroke.end", "rake.style", "sand.tone",
                                      "edit.undo", "edit.redo"]

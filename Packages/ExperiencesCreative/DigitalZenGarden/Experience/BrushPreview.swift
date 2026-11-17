@@ -5,6 +5,11 @@
 // direction in view points, the rake style, visible); the overlay only reads it. It disappears when the finger lifts or
 // the pointers are cancelled and it never changes the experience's state. The host never lets the overlay take touches
 // and hides it from assistive technology (the canvas label speaks the state).
+//
+// Feature 147 (A20-P03) T-A20-305 (FR-A20-303; clarification Q4; gap G-SELECTION): the overlay also draws the selected
+// stone's outline (`StoneShape.outline`, in normalized tray coordinates mapped into the fitted tray of the overlay's
+// size) as a dashed line with a small label of its kind's name, at the dragged place or turned while a stone gesture is
+// in progress. The selection is shown by the outline and spoken by the controls, never by colour alone.
 import DigitalZenGardenCore
 import Observation
 import SwiftUI
@@ -63,12 +68,42 @@ struct BrushPreviewState: Equatable, Sendable {
     }
 }
 
+/// The selected stone's outline the overlay draws (feature 147).
+struct SelectionOutlineState: Equatable, Sendable {
+    /// The outline in normalized tray coordinates, in order around the stone; empty when hidden.
+    var outline: [Vec2] = []
+    /// The kind's name drawn beside the outline.
+    var label = ""
+    /// Whether the outline is drawn.
+    var visible = false
+
+    /// The outline in view points for a view of `size` (the tray fitted as the sand draws it).
+    func viewPoints(size: Vec2) -> [Vec2] {
+        let tray = TrayFit.rect(width: size.x, height: size.y)
+        return outline.map { Vec2(tray.x + $0.x * tray.width, tray.y + $0.y * tray.height) }
+    }
+}
+
 /// The observable holder of the preview the overlay reads (feature 146).
 @MainActor
 @Observable
 final class BrushPreviewModel {
     /// The current preview; `visible` false while no finger rakes.
     var state = BrushPreviewState()
+    /// The selected stone's outline; `visible` false without a selection (feature 147).
+    var selection = SelectionOutlineState()
+
+    /// Shows the selection outline `outline` (normalized tray coordinates) with the label `label` (feature 147).
+    func showSelection(outline: [Vec2], label: String) {
+        let next = SelectionOutlineState(outline: outline, label: label, visible: true)
+        if next != selection { selection = next }
+    }
+
+    /// Hides the selection outline (feature 147).
+    func hideSelection() {
+        guard selection.visible else { return }
+        selection = SelectionOutlineState()
+    }
 
     /// Shows the preview at `position` along `direction` (normalized when it has a length) with `rakeStyle` over a
     /// tray `trayWidth` points wide.
@@ -92,7 +127,8 @@ final class BrushPreviewModel {
     }
 }
 
-/// The canvas overlay: the rake's outline and its tine lines at the touch while it is visible.
+/// The canvas overlay: the rake's outline and its tine lines at the touch while it is visible, and the selected stone's
+/// dashed outline with its label.
 struct BrushPreview: View {
     /// The preview to draw.
     let model: BrushPreviewModel
@@ -100,7 +136,22 @@ struct BrushPreview: View {
     /// The outline.
     var body: some View {
         let state = model.state
-        return Canvas { context, _ in
+        let selection = model.selection
+        return Canvas { context, size in
+            if selection.visible {
+                let points = selection.viewPoints(size: Vec2(Double(size.width), Double(size.height)))
+                if let first = points.first {
+                    var ring = Path()
+                    ring.addLines(points.map { CGPoint(x: $0.x, y: $0.y) })
+                    ring.closeSubpath()
+                    let style = StrokeStyle(lineWidth: 1.5, dash: [5, 4])
+                    context.stroke(ring, with: .color(.black.opacity(0.55)), style: StrokeStyle(lineWidth: 3))
+                    context.stroke(ring, with: .color(.white.opacity(0.95)), style: style)
+                    let top = points.min { $0.y < $1.y } ?? first
+                    context.draw(Text(verbatim: selection.label).font(.caption2).foregroundStyle(.white),
+                                 at: CGPoint(x: top.x, y: top.y - 9))
+                }
+            }
             guard state.visible else { return }
             var outline = Path()
             let corners = state.corners.map { CGPoint(x: $0.x, y: $0.y) }

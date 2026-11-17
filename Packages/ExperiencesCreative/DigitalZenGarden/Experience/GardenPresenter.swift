@@ -17,6 +17,23 @@
 //     `BrushPreview`; the controls are `GardenControls` over the mirror; the canvas label names the tone, the rake
 //     and the number of strokes. Probes: the top-leading corner is outside the tray (`dark`).
 //
+// Feature 147 (A20-P03) T-A20-303, T-A20-305 (FR-A20-301–306; clarifications Q1–Q5; contracts/stones.md "Gestures";
+// gaps G-STONES, G-SELECTION, G-SHADOWS):
+//   - Scene: each draw also brings the stone layer up to the garden's stones (`SandScene.syncStones`); the first
+//     draw after a resize and every `setup` (a new context) rasterize it again. The cache key includes the layer.
+//   - Tool: with `tool.mode [0]` (rake) a drag rakes as before and the stones stay on top. With `tool.mode [1]`
+//     (stones) one finger that lifts within 10 points of where it landed is a tap: `stone.select` with the id of the
+//     topmost stone under it (`StoneSelection.topmost`), or 0 on empty sand. A one-finger drag that starts on the
+//     selected stone moves it: the overlay shows the stone's outline at the dragged place and one `stone.move` (the
+//     new centre, clamped inside the tray) is sent when the finger lifts. A second finger turns the selected stone
+//     with `RotateRecognizer` (a drag in progress is dropped): the overlay shows the turned outline and one
+//     `stone.rotate` is sent when a finger of the pair lifts. A cancelled touch, or `cancelPointers`, sends nothing.
+//     Nothing animates: Reduce Motion changes nothing (placing and moving are direct).
+//   - Selection: the overlay draws a dashed outline of the selected stone with its kind's name (hidden from assistive
+//     technology); the controls speak "<kind> selected, <n> of <count>, turned <degrees>°" (n in depth order from the
+//     lowest; degrees positive clockwise), never colour alone.
+//   - Gestures: the stroke actions and `stone.select`, `stone.move` and `stone.rotate`; every one is a native action.
+//
 // No GL call: everything is drawn through VisualCoreRendering's scenes.
 import Foundation
 import DigitalZenGardenCore
@@ -42,8 +59,34 @@ final class GardenMirror {
     var canRedo = false
     /// The number of strokes of the garden.
     var strokeCount = 0
-    /// The short message of a refused stroke; nil when there is none.
+    /// The short message of a refused stroke or stone; nil when there is none.
     var message: String?
+    /// The canvas tool: 0 rake, 1 stones (feature 147).
+    var toolMode = 0
+    /// The garden's stones (feature 147).
+    var stones: [Stone] = []
+    /// The selected stone's id; nil when none is (feature 147).
+    var selectedStone: UInt32?
+    /// The kind index the "Place" control places (presentation only; feature 147).
+    var placeKind = 0
+    /// Whether a place was refused at the stone cap and the garden is still full (feature 147).
+    var stoneCapShown = false
+    /// The spoken selection: "<kind> selected, <n> of <count>, turned <degrees>°" or "No stone selected" (feature 147).
+    var selectionValue = GardenPresenter.noSelectionValue
+}
+
+/// A touch of the stone tool in progress (feature 147).
+struct StoneTouch: Equatable {
+    /// The pointer's id.
+    var id: Int
+    /// Where it landed, in view points.
+    var start: Vec2
+    /// The selected stone's centre when it landed, when it landed on that stone; nil otherwise.
+    var stoneStart: Vec2?
+    /// Whether it moved farther than ``GardenPresenter/tapSlop`` (no longer a tap).
+    var moved = false
+    /// The dragged stone's new centre (normalized tray coordinates) while it is dragged; nil otherwise.
+    var dragTo: Vec2?
 }
 
 /// Draws Digital Zen Garden and owns its presentation state (see the file header).
@@ -83,6 +126,20 @@ final class GardenPresenter: ExperiencePresenter {
     private(set) var cancelledStroke: [Vec2]?
     /// Whether the next draw replays the field (after a resize).
     private var replayPending = false
+    /// The touches of the stone tool (feature 147).
+    private(set) var stoneTracker = PointerTracker()
+    /// The two-finger turn of the selected stone (feature 147).
+    private(set) var rotator = RotateRecognizer()
+    /// The one-finger touch of the stone tool; nil without one (feature 147).
+    private(set) var stoneTouch: StoneTouch?
+    /// The selected stone's id and rotation when a two-finger turn began; nil without a turn (feature 147).
+    private(set) var turnStart: (id: UInt32, rotation: Double)?
+    /// The turned rotation shown while two fingers turn the selected stone; nil otherwise (feature 147).
+    private(set) var turnTo: Double?
+    /// How far, in view points, a finger may move and still tap (feature 147).
+    static let tapSlop = 10.0
+    /// The spoken selection without a selected stone (feature 147).
+    static let noSelectionValue = "No stone selected"
     /// The frame cap: 30 frames per second (nothing moves on its own).
     var maxFramesPerSecond: Int { 30 }
 
@@ -100,6 +157,7 @@ final class GardenPresenter: ExperiencePresenter {
         if let cache { cache.teardown(context) }
         let made = SandScene(forceFallback: forceFallback)
         made.rebuild(from: lastCore.document.strokes)
+        made.rebuildStones(from: lastCore.document.stones)
         made.stampInProgress(drawnPending(lastCore))
         let wrapper = CachedScene(child: made)
         wrapper.passThrough = false
@@ -126,14 +184,17 @@ final class GardenPresenter: ExperiencePresenter {
             replayPending = false
             sand.stampInProgress(pending)
             sand.rebuild(from: core.document.strokes)
+            sand.rebuildStones(from: core.document.stones)
         } else {
             sand.sync(strokes: core.document.strokes, pending: pending)
+            sand.syncStones(core.document.stones)
         }
         let tone = GardenPalette.tones[core.toneIndex]
         sand.tone = SIMD3(Float(tone.red), Float(tone.green), Float(tone.blue))
         sand.grain = tier == 0
         var hasher = Hasher()
         hasher.combine(sand.revision)
+        hasher.combine(sand.stoneRebuildCount)
         hasher.combine(core.toneIndex)
         hasher.combine(tier)
         cache.key = hasher.finalize()
@@ -164,9 +225,15 @@ final class GardenPresenter: ExperiencePresenter {
         TrayFit.rect(width: viewSize.x, height: viewSize.y).width
     }
 
-    /// Turns one finger's touches into the stroke actions (see the file header) and moves the preview.
+    /// Turns the touches into the stroke actions of the rake tool or the stone actions of the stone tool (see the file
+    /// header) and moves the preview.
     func pointer(_ event: PointerEvent, viewSize: Vec2, port: ExperienceActionPort) {
         guard viewSize.isFinite, viewSize.x > 0, viewSize.y > 0, event.location.isFinite else { return }
+        let stoneGesture = stoneTracker.count > 0
+        if stoneGesture || (event.phase == .began && activePointer == nil && lastCore.toolMode == GardenCore.stoneTool) {
+            stonePointer(event, viewSize: viewSize, port: port)
+            return
+        }
         switch event.phase {
         case .began:
             guard activePointer == nil else { return }
@@ -243,15 +310,124 @@ final class GardenPresenter: ExperiencePresenter {
         finishPointer()
     }
 
-    /// Forgets every touch in progress without committing a stroke and hides the preview.
+    /// Forgets every touch in progress without committing a stroke or a stone change and hides the preview.
     func cancelPointers() {
         cancelStroke()
+        resetStoneGesture()
     }
 
-    /// The three stroke actions a drag sends.
-    var gestureActions: Set<String> { GardenCore.strokeActionIDs }
+    // MARK: Stone tool
 
-    /// The actions of the native controls: the stroke actions (the patterns), the rake, the tone, undo and redo.
+    /// The stone tool's handling of `event` (see the file header).
+    private func stonePointer(_ event: PointerEvent, viewSize: Vec2, port: ExperienceActionPort) {
+        guard stoneTracker.handle(event) else { return }
+        rotator.handle(event, tracker: stoneTracker)
+        switch event.phase {
+        case .began:
+            if stoneTracker.count == 1 {
+                var touch = StoneTouch(id: event.id, start: event.location)
+                if let stone = lastCore.selected, let tray = TrayFit.trayPoint(event.location, viewSize: viewSize),
+                   StoneShape(stone: stone)?.contains(tray) == true {
+                    touch.stoneStart = stone.position
+                }
+                stoneTouch = touch
+            } else if stoneTracker.count == 2 {
+                // A second finger: the one-finger touch is dropped and a turn of the selected stone begins.
+                stoneTouch = nil
+                if let stone = lastCore.selected { turnStart = (stone.id, stone.rotation) }
+            }
+        case .moved:
+            if let start = turnStart {
+                if rotator.state.isActive { turnTo = Self.normalizedAngle(start.rotation - rotator.angle) }
+            } else if var touch = stoneTouch, touch.id == event.id {
+                if (event.location - touch.start).length > Self.tapSlop { touch.moved = true }
+                if touch.moved, let origin = touch.stoneStart {
+                    touch.dragTo = Self.draggedCentre(origin, from: touch.start, to: event.location, viewSize: viewSize)
+                }
+                stoneTouch = touch
+            }
+        case .ended:
+            if let start = turnStart {
+                if rotator.state == .ended, let angle = turnTo, lastCore.selectedStone == start.id {
+                    port.send("stone.rotate", [angle])
+                }
+                turnStart = nil
+                turnTo = nil
+            } else if let touch = stoneTouch, touch.id == event.id {
+                if let origin = touch.stoneStart, touch.moved {
+                    let target = Self.draggedCentre(origin, from: touch.start, to: event.location, viewSize: viewSize)
+                    port.send("stone.move", [target.x, target.y])
+                } else if !touch.moved, let tray = TrayFit.trayPoint(event.location, viewSize: viewSize) {
+                    let id = TrayFit.isInside(tray) ? StoneSelection.topmost(at: tray, in: lastCore.document.stones) : nil
+                    port.send("stone.select", [Double(id ?? 0)])
+                }
+                stoneTouch = nil
+            }
+            if stoneTracker.count == 0 { resetStoneGesture() }
+        case .cancelled:
+            resetStoneGesture()
+        }
+        updateSelectionOutline()
+    }
+
+    /// The centre of a stone that was at `origin` (normalized tray coordinates) dragged from the view point `from` to
+    /// `to`, clamped inside the tray.
+    nonisolated static func draggedCentre(_ origin: Vec2, from: Vec2, to: Vec2, viewSize: Vec2) -> Vec2 {
+        let tray = TrayFit.rect(width: viewSize.x, height: viewSize.y)
+        guard tray.width > 0, tray.height > 0 else { return origin }
+        let moved = Vec2(origin.x + (to.x - from.x) / tray.width, origin.y + (to.y - from.y) / tray.height)
+        return TrayFit.clamped(moved)
+    }
+
+    /// `angle` wrapped into −π…π.
+    nonisolated static func normalizedAngle(_ angle: Double) -> Double {
+        guard angle.isFinite else { return 0 }
+        return min(max(remainder(angle, 2 * Double.pi), -Double.pi), Double.pi)
+    }
+
+    /// Forgets the stone tool's touches, drag and turn; nothing is sent.
+    private func resetStoneGesture() {
+        stoneTracker = PointerTracker()
+        rotator.reset()
+        stoneTouch = nil
+        turnStart = nil
+        turnTo = nil
+        updateSelectionOutline()
+    }
+
+    /// The selected stone as the overlay shows it: moved to the dragged centre or turned to the shown rotation while a
+    /// gesture is in progress; nil without a selection.
+    var shownSelection: Stone? {
+        guard var stone = lastCore.selected else { return nil }
+        if let to = stoneTouch?.dragTo { stone.position = to }
+        if let turnTo, turnStart?.id == stone.id { stone.rotation = turnTo }
+        return stone
+    }
+
+    /// Brings the overlay's selection outline up to ``shownSelection``.
+    private func updateSelectionOutline() {
+        guard let stone = shownSelection, let shape = StoneShape(stone: stone) else {
+            preview.hideSelection()
+            return
+        }
+        let name = GardenPalette.stones[shape.kindIndex].name
+        preview.showSelection(outline: shape.outline(), label: name)
+    }
+
+    /// The spoken selection of `core`: "<kind> selected, <n> of <count>, turned <degrees>°" (n in depth order from the
+    /// lowest stone, degrees rounded and positive clockwise), or "No stone selected".
+    static func selectionValue(_ core: GardenCore) -> String {
+        guard let stone = core.selected, let place = StoneSelection.place(of: stone.id, in: core.document.stones),
+              let kind = GardenPalette.stone(id: stone.kind) else { return noSelectionValue }
+        let degrees = Int((stone.rotation * 180 / Double.pi).rounded())
+        return "\(kind.name) selected, \(place) of \(core.document.stones.count), turned \(degrees)°"
+    }
+
+    /// The stroke actions and the stone tool's `stone.select`, `stone.move` and `stone.rotate`.
+    var gestureActions: Set<String> { GardenCore.strokeActionIDs.union(GardenCore.stoneGestureActionIDs) }
+
+    /// The actions of the native controls: the stroke actions (the patterns), the rake, the tone, undo and redo, and
+    /// every stone and tool action (feature 147).
     var nativeActions: Set<String> { Set(GardenCore.actionIDs) }
 
     // MARK: Words, probes and views
@@ -264,19 +440,31 @@ final class GardenPresenter: ExperiencePresenter {
         if mirror.canUndo != core.history.canUndo { mirror.canUndo = core.history.canUndo }
         if mirror.canRedo != core.history.canRedo { mirror.canRedo = core.history.canRedo }
         if mirror.strokeCount != core.document.strokes.count { mirror.strokeCount = core.document.strokes.count }
-        let message: String? = core.lastRefusal == nil ? (core.isAtStrokeCap && core.isRaking ? Self.fullMessage : nil)
+        if mirror.stoneCapShown && !core.isAtStoneCap { mirror.stoneCapShown = false }
+        var message: String? = core.lastRefusal == nil ? (core.isAtStrokeCap && core.isRaking ? Self.fullMessage : nil)
             : Self.fullMessage
+        if message == nil, mirror.stoneCapShown { message = GardenCore.stoneCapMessage }
         if mirror.message != message { mirror.message = message }
+        if mirror.toolMode != core.toolMode { mirror.toolMode = core.toolMode }
+        if mirror.stones != core.document.stones { mirror.stones = core.document.stones }
+        if mirror.selectedStone != core.selectedStone { mirror.selectedStone = core.selectedStone }
+        let value = Self.selectionValue(core)
+        if mirror.selectionValue != value { mirror.selectionValue = value }
+        updateSelectionOutline()
     }
 
     /// The canvas label: "Zen garden, <tone>, <rake>, <n> strokes", for example "Zen garden, Pale sand, Fine rake,
-    /// 3 strokes".
+    /// 3 strokes"; with stones followed by ", <m> stones" and the spoken selection when a stone is selected.
     func describe(_ core: GardenCore) -> String {
         follow(core)
         let tone = GardenPalette.tones[core.toneIndex].name
         let rake = GardenCore.rake(index: core.rakeStyle).name
         let count = core.document.strokes.count
-        return "Zen garden, \(tone), \(rake), \(count) " + (count == 1 ? "stroke" : "strokes")
+        var label = "Zen garden, \(tone), \(rake), \(count) " + (count == 1 ? "stroke" : "strokes")
+        let stones = core.document.stones.count
+        if stones > 0 { label += ", \(stones) " + (stones == 1 ? "stone" : "stones") }
+        if core.selected != nil { label += ", " + Self.selectionValue(core) }
+        return label
     }
 
     /// One probe at the top-leading corner, outside the tray: `dark`.
