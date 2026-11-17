@@ -31,7 +31,7 @@
     least one test"), with the facts of the clarification session;
   - a `traceability` entry per capability and feature
   (FR-A22-001, FR-A22-002)
-- [ ] T-A22-003 [US1] Write the generated-block markers into `docs/apps/shader-studio/visualcore-contract.md` before
+- [X] T-A22-003 [US1] Write the generated-block markers into `docs/apps/shader-studio/visualcore-contract.md` before — Verified 2026-11-17: 2026-11-17: .autonomy/checks/A22-P00.contract.json exit 0 (PASS: 29 rows, 150 citations, 13 gaps, decision go; under 1 s); visualcore-contract.md rendered between its generated-block markers
   the first render, then run the contract checker and render the view (`--name contract -- python3
   scripts/check_app_contract.py --app shader-studio --render`) (FR-A22-007, SC-A22-001)
 
