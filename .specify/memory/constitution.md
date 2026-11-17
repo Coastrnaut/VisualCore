@@ -984,6 +984,49 @@ It is not an alarm, a timer, a weather display or a guaranteed always-on screen.
   the animated themes.
 - **Licenses:** every theme, palette and shader records its source and license.
 
+### A19 Living Wallpapers (`a19.living-wallpapers`)
+
+Ratified from the app manual's constitution prompt (2026-11-17). Like A05–A18, it never had a standalone target: it
+is built directly as an experience of the one app. Its product goal is a creator of procedural backgrounds that the
+person exports as correctly sized still images (and, only once proven feasible, short videos) and then applies
+through the system's own controls. Version 0.1 covers:
+- curated procedural backgrounds with colour presets;
+- iPhone and iPad canvas templates with crop and safe-area guides;
+- still-image export in common formats with a verified colour profile;
+- an optional short video export, only after encoder and resource feasibility is shown;
+- export progress, cancellation, error recovery and a local history;
+- clear instructions for applying an exported image by hand.
+
+It never sets the system wallpaper itself, never calls an export a live wallpaper, and does not render without limit
+(no unlimited 8K output).
+
+- **Consumer, not fork:** an experience of the VisualCore app and a VisualCore consumer, never a fork of
+  projectm-ios. It uses only audited VisualCore public APIs over the OpenGL ES → ANGLE → Metal integration. It MUST
+  NOT create its own EGL/ANGLE initialization path or a second renderer, or link ProjectM engine code.
+- **Reuse first (Principle II):** shaders, palettes, parameters, quality tiers, render targets, persistence and
+  accessibility planning already in VisualCore are reused, not copied. Offscreen rendering at output resolution,
+  pixel read-back and encoding that other experiences can use go into VisualCore with tests, docs, the API baseline
+  and the reference regression. The scenes, templates and copy stay in the experience.
+- **Platform truth:** only public Apple APIs. An exported file is applied by the person through the system's own
+  wallpaper controls, and the experience says so. Photos access is limited to what saving needs and is asked for only
+  when the person saves there; export to Files goes through the system document or share interface and needs no
+  Photos permission.
+- **Visuals are code:** every background is procedural (shaders, fields, SDFs, particles), with no purchased,
+  generated or photographic image. Typography uses system fonts.
+- **Testable without the GPU:** the project document, canvas templates, crop and safe-area geometry, export
+  requests and results, colour-profile choices and history are pure, versioned models tested through `swift test`.
+  The same project renders the same picture at the same size; drawing never changes the state.
+- **Bounded:** the output size is checked against the GPU's maximum texture size and a memory budget before any
+  allocation; larger sizes use a documented tiled strategy or are refused with a clear fallback. Export never blocks
+  the interface, can be cancelled, and leaves no orphan GPU resource or temporary file. The history has a cap.
+- **Offline-first and private:** no networking, accounts, analytics or ads. Nothing leaves the device except a file
+  the person chooses to save or hand to another app. Every permission is disclosed.
+- **Truthful claims:** dimensions, file sizes and colour profiles stated in the interface are those of the written
+  file. Performance, memory or thermal numbers come only from device measurements.
+- **Accessibility:** native SwiftUI controls with VoiceOver labels and Dynamic Type. Export progress and results are
+  announced. Information never depends on colour alone. Reduce Motion stills the animated preview.
+- **Licenses:** every scene, palette and shader records its source and license.
+
 ## Governance
 
 - Precedence: real Apple platform and toolchain behavior and observed test results → owner
@@ -1028,5 +1071,7 @@ It is not an alarm, a timer, a weather display or a guaranteed always-on screen.
   from its manual's constitution prompt at gate A17-P00 (feature 123); no principle changes.
 - Amendment 2.14.0 (2026-11-16, MINOR): App-Scoped Rules gain the A18 Ambient Clock subsection, ratified from its
   manual's constitution prompt at gate A18-P00 (feature 130); no principle changes.
+- Amendment 2.15.0 (2026-11-17, MINOR): App-Scoped Rules gain the A19 Living Wallpapers subsection, ratified from
+  its manual's constitution prompt at gate A19-P00 (feature 137); no principle changes.
 
-**Version**: 2.14.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-16
+**Version**: 2.15.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-17
