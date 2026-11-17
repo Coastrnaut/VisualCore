@@ -15,6 +15,11 @@
 //   - `hide-controls` ("Hide controls"): the presenter hides the controls. While hidden only `show-controls` remains:
 //     a short line "Controls hidden. Tap the sky to show them." with the accessibility action "Show controls", so a
 //     VoiceOver user can always bring them back; a tap on the sky does the same (the presenter's pointer).
+//   - feature 155 (A21-P04) T-A21-406, T-A21-407 (FR-A21-401, FR-A21-402): a `still` toggle ("Still sky", On or Off;
+//     the presenter's `setStillView(_:)`) and a `reduced-flash` toggle ("Reduced flashing", On or Off;
+//     `setReducedFlash(_:)`). Presentation only: they send no action and are not saved, so the snapshot, the digest and
+//     the scenario manifest do not change; `sky-notice`: the line "This device shows a simpler sky." while the fallback
+//     sky is drawn.
 // Every value is clamped to its range before it is sent; integer controls send whole numbers.
 import AuroraCore
 import Foundation
@@ -84,11 +89,15 @@ struct AuroraControls: View {
             AuroraControlLabel(name: "limit", title: "Brightness limit", value: percentText(mirror.limit)),
             AuroraControlLabel(name: "sound", title: "Sound", value: mirror.soundOn ? "On" : "Off"),
             AuroraControlLabel(name: "volume", title: "Volume", value: percentText(mirror.volume)),
+            AuroraControlLabel(name: "still", title: "Still sky", value: mirror.stillView ? "On" : "Off"),
+            AuroraControlLabel(name: "reduced-flash", title: "Reduced flashing",
+                               value: mirror.reducedFlash ? "On" : "Off"),
             AuroraControlLabel(name: "hide-controls", title: "Hide controls", value: "Controls shown"),
         ]
     }
 
-    /// The control each identifier name sends (the sound, volume, hide and show controls send nothing).
+    /// The control each identifier name sends (the sound, volume, still, reduced-flash, hide and show controls send
+    /// nothing).
     static let actionOfControl: [String: String] = [
         "preset": "preset.select", "hue": "colour.hue", "speed": "motion.speed", "turbulence": "motion.turbulence",
         "ribbons": "sky.ribbons", "stars": "sky.stars", "clouds": "sky.clouds", "limit": "light.limit",
@@ -129,6 +138,12 @@ struct AuroraControls: View {
                     .font(.footnote)
                     .fixedSize(horizontal: false, vertical: true)
                     .accessibilityIdentifier(port.identifier("message"))
+            }
+            if let notice = mirror.skyNotice {
+                Text(verbatim: notice)
+                    .font(.footnote)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier(port.identifier("sky-notice"))
             }
             Picker(selection: Binding(get: { mirror.preset },
                                       set: { next in
@@ -176,6 +191,18 @@ struct AuroraControls: View {
                     .accessibilityHint(Text(verbatim: "How loud the sky's sound is when it is on"))
                     .accessibilityIdentifier(port.identifier("volume"))
             }
+            Toggle(isOn: Binding(get: { mirror.stillView }, set: { presenter.setStillView($0) })) {
+                Text(verbatim: spoken["still"]?.title ?? "")
+            }
+            .spoken(spoken["still"])
+            .accessibilityHint(Text(verbatim: "Draws the sky once and holds it until you change something"))
+            .accessibilityIdentifier(port.identifier("still"))
+            Toggle(isOn: Binding(get: { mirror.reducedFlash }, set: { presenter.setReducedFlash($0) })) {
+                Text(verbatim: spoken["reduced-flash"]?.title ?? "")
+            }
+            .spoken(spoken["reduced-flash"])
+            .accessibilityHint(Text(verbatim: "Stops the stars twinkling and makes changes between skies slower"))
+            .accessibilityIdentifier(port.identifier("reduced-flash"))
             Button {
                 presenter.hideControls()
             } label: {

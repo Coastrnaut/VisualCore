@@ -32,6 +32,26 @@
 //   - Words: the canvas label names the preset, the colour shift, the speed, the ribbons, the stars, the clouds and
 //     the brightness limit. Probes: the bottom-leading corner is the dark sky below the ribbons (`dark`).
 //
+// Feature 155 (A21-P04) T-A21-406–408 (FR-A21-401–404; clarifications Q2–Q5; data-model.md;
+// contracts/lowpower.md):
+//
+//   - Picture: everything is drawn by one ``SkyPicture`` (the transition, the fallback sky or the clear colour) inside
+//     a `CachedScene`. The cache is in pass-through (the picture draws every frame, as before) unless the still view is
+//     on or the fallback sky is shown.
+//   - Still view ("Still sky", `setStillView(_:)`, presentation only: not in the core, the snapshot, the digest or the
+//     preferences, no action): the cache key is the state digest, the drawable size, the level, the clock time, the
+//     uniforms drawn, the mix of a running change and the reduced-flash flag, so the sky is drawn once and copied until
+//     one of them changes. The clock holds, a control change within one sky is immediate (no input blend), and a change
+//     between skies runs to its end (one draw per frame), then holds. With Reduce Motion on too, the change is
+//     immediate and the picture holds. The brightness limit applies as always.
+//   - Reduced flashing ("Reduced flashing", `setReducedFlash(_:)`, presentation only, or the system's Reduce Flashing
+//     given to the factory): the stars do not twinkle and a change between skies takes 4.0 s
+//     (``SkyTransition/reducedFlashDuration``), so consecutive frames' mean luminance changes slowly.
+//   - Fallback: when `aurora-sky.frag` fails to compile (at `setup` or when a change builds the second sky) or the
+//     host reports no fragment `highp` (``fragmentHighp``), the picture draws `SkyShader.fallbackSource` (the sky
+//     colour to 0.6 × at the horizon, under the limit) and the controls show ``fallbackMessage``. If the fallback
+//     fails too, the frame is cleared to the sky colour (never grey). ``breakShaders(sky:fallback:)`` is the tests' seam.
+//
 // No GL call: everything is drawn through VisualCoreRendering's scenes.
 import Foundation
 import AuroraCore
@@ -80,6 +100,166 @@ final class SkyMirror {
     var volume = SkyPreferences.defaults.volume
     /// The message about the saved choices; nil when there is none.
     var message: String?
+    /// Whether the still view is on (presentation only; feature 155).
+    var stillView = false
+    /// Whether the reduced-flash control is on (presentation only; feature 155).
+    var reducedFlash = false
+    /// The line about the sky shown (``AuroraPresenter/fallbackMessage``); nil when the full sky is drawn.
+    var skyNotice: String?
+}
+
+/// What ``SkyPicture`` draws (feature 155).
+enum SkyDrawMode: String, Equatable, Sendable {
+    /// The full sky: the transition of `aurora-sky.frag` skies.
+    case sky
+    /// The fallback still sky of `SkyShader.fallbackSource`.
+    case fallback
+    /// The clear colour (the sky colour): the fallback failed too.
+    case clear
+}
+
+/// The values the transition draws one frame with (feature 155).
+struct SkyFrame {
+    /// The incoming (or only) sky's inputs.
+    var incoming: SkyInputs
+    /// The incoming sky's uniforms.
+    var uniforms: SkyUniforms
+    /// The preset id shown.
+    var preset: String
+    /// The moving outgoing sky's uniforms during a change; nil without one.
+    var outgoingUniforms: SkyUniforms?
+    /// The animation time.
+    var time: Double
+}
+
+/// Everything Aurora draws as one scene, wrapped by the still view's cache (feature 155): the transition's skies, the
+/// fallback still sky, or the clear colour (see the presenter's file header).
+@MainActor
+final class SkyPicture: RenderScene {
+    /// The skies and the change between presets.
+    let transition: SkyTransition
+    /// The fallback's source (`SkyShader.fallbackSource`; a test seam replaces it before `setup`).
+    var fallbackFragment = SkyShader.fallbackSource
+    /// The fallback still sky; nil until the fallback is first needed.
+    private(set) var fallback: FullScreenShaderScene?
+    /// The clear of the last resort.
+    let clear = ClearColorScene()
+    /// What is drawn.
+    private(set) var mode: SkyDrawMode = .sky
+    /// Set before `setup` when the host reports no fragment `highp`: the fallback is drawn at once.
+    var highpMissing = false
+    /// Why the full sky is not drawn (the shader's message, or the missing precision); nil while it is.
+    private(set) var failure: String?
+    /// Whether the picture is set up (between `setup` and `teardown`).
+    private(set) var isSetUp = false
+    /// What the transition draws next (sky mode).
+    var frame: SkyFrame?
+    /// The sky colour in linear light (the fallback's top and the clear colour).
+    var skyColour = SIMD3<Float>(0, 0, 0)
+    /// The brightness limit (the fallback's cap).
+    var limit = SkyCore.defaultLimit
+
+    /// A picture of `transition`; nothing is allocated before `setup`.
+    init(transition: SkyTransition) {
+        self.transition = transition
+    }
+
+    /// Sets up the full sky; a compile or link failure, or a missing `highp`, sets up the fallback instead, and a
+    /// failing fallback leaves the clear colour. Never throws for a shader failure.
+    func setup(_ context: RenderContext) throws {
+        if mode == .sky {
+            if highpMissing {
+                failure = "no fragment highp"
+                mode = .fallback
+            } else {
+                do {
+                    try transition.setup(context)
+                    isSetUp = true
+                    return
+                } catch let error as SkyShaderError {
+                    failure = error.message
+                    mode = .fallback
+                }
+            }
+        }
+        setUpFallback(context)
+        isSetUp = true
+    }
+
+    /// Leaves the full sky for the fallback (a change could not build its second sky): the transition's GPU objects
+    /// are released.
+    func fallBack(_ context: RenderContext, failure: String) {
+        guard mode == .sky else { return }
+        if transition.isSetUp { transition.teardown(context) }
+        self.failure = failure
+        mode = .fallback
+        setUpFallback(context)
+    }
+
+    /// Builds the fallback scene; a failure leaves the clear colour.
+    private func setUpFallback(_ context: RenderContext) {
+        guard mode == .fallback else { return }
+        let scene = fallback ?? FullScreenShaderScene(fragment: fallbackFragment, fragmentName: SkyShader.fallbackName,
+                                                      bundle: ShaderBundle(files: [:]))
+        fallback = scene
+        do {
+            try scene.setup(context)
+        } catch {
+            mode = .clear
+            return
+        }
+        if scene.errorMessage != nil {
+            scene.teardown(context)
+            mode = .clear
+        }
+    }
+
+    /// Passes the drawable size to what is drawn.
+    func resize(_ context: RenderContext) {
+        switch mode {
+        case .sky: transition.resize(context)
+        case .fallback: fallback?.resize(context)
+        case .clear: break
+        }
+    }
+
+    /// Draws ``frame`` through the transition, the fallback with ``skyColour`` under ``limit``, or the clear colour.
+    func render(_ context: RenderContext, frame info: FrameInfo) throws {
+        switch mode {
+        case .sky:
+            guard let frame else { return }
+            try transition.render(context, frame: info, incoming: frame.incoming, uniforms: frame.uniforms,
+                                  preset: frame.preset, outgoingUniforms: frame.outgoingUniforms, time: frame.time)
+        case .fallback:
+            guard let fallback else { return }
+            fallback.resize(context)
+            fallback.palette = [skyColour]
+            fallback.parameters = ["limit": limit]
+            try fallback.render(context, frame: info)
+        case .clear:
+            let encoded = Self.encoded(skyColour)
+            clear.red = encoded.x
+            clear.green = encoded.y
+            clear.blue = encoded.z
+            try clear.render(context, frame: info)
+        }
+    }
+
+    /// Releases the GPU objects; the mode stays, so a later `setup` draws the same kind of picture.
+    func teardown(_ context: RenderContext) {
+        if transition.isSetUp { transition.teardown(context) }
+        fallback?.teardown(context)
+        isSetUp = false
+    }
+
+    /// A linear-light colour encoded to sRGB (the exact transfer function), each channel clamped to 0…1.
+    static func encoded(_ linear: SIMD3<Float>) -> SIMD3<Float> {
+        func encode(_ c: Float) -> Float {
+            let v = min(max(c, 0), 1)
+            return v <= 0.0031308 ? v * 12.92 : 1.055 * pow(v, 1 / 2.4) - 0.055
+        }
+        return SIMD3(encode(linear.x), encode(linear.y), encode(linear.z))
+    }
 }
 
 /// Draws Aurora and owns its presentation state (see the file header).
@@ -93,6 +273,13 @@ final class AuroraPresenter: ExperiencePresenter {
 
     /// Whether Reduce Motion is on: the sky holds still and every change is immediate.
     var reduceMotion: Bool
+    /// Whether the system's Reduce Flashing was on when the experience was made (feature 155).
+    let systemReduceFlashing: Bool
+    /// The line shown when the full sky cannot be drawn (feature 155).
+    static let fallbackMessage = "This device shows a simpler sky."
+    /// The fragment `highp` precision the host reports; nil when unknown (then only a compile failure leads to the
+    /// fallback). Read at every `setup`; the factory leaves it unknown and the tests set it.
+    var fragmentHighp: () -> RenderCapabilities.ShaderPrecision? = { nil }
     /// What the controls show.
     let mirror = SkyMirror()
     /// The port of the shell, for the controls; set by the factory.
@@ -104,6 +291,18 @@ final class AuroraPresenter: ExperiencePresenter {
 
     /// The skies drawn and the change between presets (see ``SkyTransition``).
     let transition = SkyTransition()
+    /// Everything drawn: the transition, the fallback or the clear colour (feature 155).
+    let picture: SkyPicture
+    /// The still view's cache around ``picture`` (pass-through unless the picture is held).
+    let cache: CachedScene
+    /// Whether the still view is on (presentation only; feature 155).
+    private(set) var stillView = false
+    /// Whether the reduced-flash control is on (presentation only; feature 155).
+    private(set) var reducedFlashControl = false
+    /// Whether reduced flashing applies: the control or the system's Reduce Flashing.
+    var reducedFlashing: Bool { reducedFlashControl || systemReduceFlashing }
+    /// How many times the sky was drawn (every pass-through frame and every refresh of the held picture).
+    var skyDrawCount: Int { cache.childDrawCount }
     /// The scene of the sky shown (the incoming sky during a change); nil while not set up.
     var scene: FullScreenShaderScene? { transition.isSetUp ? transition.sky.shader : nil }
     /// How many times `setup` set the skies up.
@@ -146,9 +345,13 @@ final class AuroraPresenter: ExperiencePresenter {
 
     /// A presenter; with `reduceMotion` on the sky holds still and changes are immediate. The preferences are read
     /// from `storage`'s value `prefs.v1` now, before the first frame (see the file header).
-    init(reduceMotion: Bool = false, storage: ExperienceStorage? = nil) {
+    init(reduceMotion: Bool = false, storage: ExperienceStorage? = nil, reduceFlashing: Bool = false) {
         self.reduceMotion = reduceMotion
+        self.systemReduceFlashing = reduceFlashing
         self.storage = storage
+        picture = SkyPicture(transition: transition)
+        cache = CachedScene(child: picture)
+        transition.reducedFlashing = reduceFlashing
         clock.reducedMotion = reduceMotion
         let read = Self.keptPreferences(storage)
         preferences = read.preferences
@@ -172,16 +375,75 @@ final class AuroraPresenter: ExperiencePresenter {
 
     // MARK: Render scene
 
-    /// Sets up the skies (the crossfade of a running change, or the sky alone), again after a context recreation; a
-    /// build error throws ``SkyShaderError``. The preferences and the sound choice are not touched.
+    /// Sets up the picture inside its cache (the crossfade of a running change, or the sky alone), again after a
+    /// context recreation; a build error or a missing `highp` sets up the fallback and shows ``fallbackMessage``. The
+    /// preferences and the sound choice are not touched.
     func setup(_ context: RenderContext) throws {
-        try transition.setup(context)
+        if let highp = fragmentHighp(), !highp.isSupported || highp.precisionBits <= 0 { picture.highpMissing = true }
+        try cache.setup(context)
         setupCount += 1
+        noteFallback()
     }
 
-    /// Passes the new drawable size to the skies.
+    /// Passes the new drawable size to the picture (the held picture is drawn again at the new size).
     func resize(_ context: RenderContext) {
-        transition.resize(context)
+        cache.resize(context)
+    }
+
+    /// Shows ``fallbackMessage`` while the full sky is not drawn.
+    private func noteFallback() {
+        let notice = picture.mode == .sky ? nil : Self.fallbackMessage
+        if mirror.skyNotice != notice { mirror.skyNotice = notice }
+    }
+
+    /// The tests' seam (feature 155): before `setup`, replaces the sky's source (`sky`) and the fallback's source
+    /// (`fallback`) with a source that does not compile.
+    func breakShaders(sky: Bool, fallback: Bool) {
+        let broken = "this is not a shader;"
+        if sky { transition.fragment = broken }
+        if fallback { picture.fallbackFragment = broken }
+    }
+
+    // MARK: Still view and reduced flash
+
+    /// Turns the still view on or off (presentation only: no action, nothing saved).
+    func setStillView(_ on: Bool) {
+        guard stillView != on else { return }
+        stillView = on
+        if mirror.stillView != on { mirror.stillView = on }
+    }
+
+    /// Turns the reduced-flash control on or off (presentation only: no action, nothing saved).
+    func setReducedFlash(_ on: Bool) {
+        guard reducedFlashControl != on else { return }
+        reducedFlashControl = on
+        if mirror.reducedFlash != on { mirror.reducedFlash = on }
+    }
+
+    /// The still view's cache key: the state digest, the drawable size, `tier`, the clock time, the uniforms drawn, the
+    /// mix of a running change, the mode and the reduced-flash flag.
+    private func stillKey(_ core: SkyCore, tier: Int, context: RenderContext, uniforms: SkyUniforms,
+                          outgoing: SkyUniforms?) throws -> Int {
+        var builder = DigestBuilder(domain: SkyCore.experienceID)
+        try core.writeDigest(into: &builder)
+        var hasher = Hasher()
+        hasher.combine(builder.finish().hex)
+        hasher.combine(context.pixelWidth)
+        hasher.combine(context.pixelHeight)
+        hasher.combine(tier)
+        hasher.combine(clock.time)
+        for value in [uniforms, outgoing].compactMap({ $0 }) {
+            for stop in value.palette { hasher.combine(stop.x); hasher.combine(stop.y); hasher.combine(stop.z) }
+            for (name, number) in value.shaderParameters.sorted(by: { $0.key < $1.key }) {
+                hasher.combine(name)
+                hasher.combine(number)
+            }
+        }
+        hasher.combine(transition.isChanging ? transition.eased : -1)
+        hasher.combine(transition.restarts)
+        hasher.combine(picture.mode)
+        hasher.combine(reducedFlashing)
+        return hasher.finalize()
     }
 
     /// Seeds a fresh state from the preferences (once), follows `core`, starts, restarts, advances or ends the change
@@ -190,39 +452,56 @@ final class AuroraPresenter: ExperiencePresenter {
         var core = core
         if seedPending, seedPreferences(core) { core = coreSource?() ?? core }
         follow(core)
-        guard transition.isSetUp else { return }
-        clock.reducedMotion = reduceMotion
+        guard cache.isSetUp else { return }
+        let holding = reduceMotion || stillView
+        clock.reducedMotion = holding
         clock.speed = core.scene.speed
         clock.advance(by: frame.delta)
-        if reduceMotion {
+        if holding {
             blend.finish()
         } else {
             blend.advance(by: frame.delta)
         }
-        if let shown = transition.sky.preset, shown != core.scene.preset {
-            if reduceMotion {
-                transition.finish(context)
-            } else {
-                try transition.begin(limit: core.limit, context: context)
+        transition.reducedFlashing = reducedFlashing
+        if picture.mode == .sky {
+            if let shown = transition.sky.preset, shown != core.scene.preset {
+                if reduceMotion {
+                    transition.finish(context)
+                } else {
+                    do {
+                        try transition.begin(limit: core.limit, context: context)
+                    } catch let error as SkyShaderError {
+                        picture.fallBack(context, failure: error.message)
+                        noteFallback()
+                    }
+                }
+            } else if transition.isChanging {
+                if reduceMotion { transition.finish(context) }
+                transition.advance(by: frame.delta)
             }
-        } else if transition.isChanging {
-            if reduceMotion { transition.finish(context) }
-            transition.advance(by: frame.delta)
+            if let still = transition.stillLimit, core.limit < still { transition.finish(context) }
+            if transition.isChanging, transition.progress >= 1 { transition.finish(context) }
         }
-        if let still = transition.stillLimit, core.limit < still { transition.finish(context) }
-        if transition.isChanging, transition.progress >= 1 { transition.finish(context) }
         let uniforms = blend.current.uniforms(phase: clock.phase, level: tier, limit: core.limit)
         let outgoing = transition.outgoing?.inputs?.uniforms(phase: clock.phase, level: tier, limit: core.limit)
-        try transition.render(context, frame: frame, incoming: blend.current, uniforms: uniforms,
-                              preset: core.scene.preset, outgoingUniforms: outgoing, time: clock.time)
+        picture.frame = SkyFrame(incoming: blend.current, uniforms: uniforms, preset: core.scene.preset,
+                                 outgoingUniforms: outgoing, time: clock.time)
+        picture.skyColour = blend.current.palette.first ?? .zero
+        picture.limit = core.limit
+        cache.passThrough = !(stillView || picture.mode != .sky)
+        if !cache.passThrough {
+            cache.key = try stillKey(core, tier: tier, context: context, uniforms: uniforms, outgoing: outgoing)
+        }
+        try cache.render(context, frame: frame)
         lastUniforms = uniforms
         lastOutgoingUniforms = transition.isChanging ? outgoing : nil
         lastMix = transition.isChanging ? transition.eased : nil
     }
 
-    /// Releases the skies' GPU objects; a running change, the clock and the preferences stay.
+    /// Releases the picture's GPU objects (and the held picture); a running change, the clock and the preferences
+    /// stay.
     func teardown(_ context: RenderContext) {
-        transition.teardown(context)
+        cache.teardown(context)
     }
 
     // MARK: Preferences

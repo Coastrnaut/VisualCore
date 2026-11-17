@@ -4,13 +4,16 @@
 // at the reference size (64 × 48, rows top-down, the same orientation as `SkyReference`), comparing pictures and
 // measuring luminance, and the engine digest of a core. Feature 154 (A21-P03): the reference of a mixed frame during a
 // change between presets (both skies' references mixed in display space), opening with a storage and a snapshot, and
-// a temporary storage. Short runs only (no sleep, no wall-clock assertion).
+// a temporary storage. Feature 155 (A21-P04): opening with the system's Reduce Flashing and a hook that configures the
+// presenter before its first `setup` (the fallback seams), frames at 30 per second, the window's mean luminance and
+// the GPU bytes held. Short runs only (no sleep, no wall-clock assertion).
 import CoreGraphics
 import Foundation
 import Testing
 import UIKit
 import AuroraCore
 @testable import AuroraExperience
+import VisualCoreDiagnostics
 import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreMath
@@ -51,15 +54,19 @@ enum AuroraTest {
 
     /// Opens Aurora in `session` through the factory (with `storage` and the session `snapshot` when given), lays
     /// the view out at `size` points and draws one frame. A session without a quality pin is pinned to level 0.
+    /// `reduceFlashing` is the system's Reduce Flashing; `configure` runs on the presenter before its first `setup`.
     static func open(_ session: ExperienceSession, reduceMotion: Bool = false,
                      size: CGSize = CGSize(width: 32, height: 24), storage: ExperienceStorage? = nil,
-                     snapshot: ExperienceSnapshot? = nil) async throws -> ExperienceShell<AuroraPresenter> {
+                     snapshot: ExperienceSnapshot? = nil, reduceFlashing: Bool = false,
+                     configure: ((AuroraPresenter) -> Void)? = nil) async throws -> ExperienceShell<AuroraPresenter> {
         let id = self.id
         var made: ExperienceShell<AuroraPresenter>?
         if session.qualityPin == nil { session.qualityPin = 0 }
         let request = ExperienceOpenRequest(id: id, seed: 1, snapshot: snapshot,
                                             refusedSnapshotFails: snapshot != nil) {
-            let shell = AuroraExperience.make(id: id, reduceMotion: reduceMotion, storage: storage)
+            let shell = AuroraExperience.make(id: id, reduceMotion: reduceMotion, storage: storage,
+                                              reduceFlashing: reduceFlashing)
+            configure?(shell.presenter)
             made = shell
             return shell
         }
@@ -79,6 +86,21 @@ enum AuroraTest {
         var drawn = 0
         for _ in 0..<count where host.renderOneFrame(present: false) { drawn += 1 }
         #expect(drawn == count)
+    }
+
+    /// Draws one frame of 1/30 s (two host frames of 1/60 s each), the frame interval at 30 frames per second.
+    static func drawAt30(_ session: ExperienceSession) throws {
+        try draw(session, frames: 2)
+    }
+
+    /// The live bytes of textures, buffers, framebuffers and renderbuffers (render targets) held by `session`'s host.
+    static func targetBytes(_ session: ExperienceSession) throws -> [ResourceKind: Int] {
+        let stats = try #require(session.renderHost).resources.stats
+        var bytes: [ResourceKind: Int] = [:]
+        for kind in [ResourceKind.texture, .buffer, .framebuffer, .renderbuffer] {
+            bytes[kind] = stats.liveBytes[kind] ?? 0
+        }
+        return bytes
     }
 
     /// An off-screen still of `session` at `width` × `height` (frame delta 0: the clock and the blend stay), RGBA8

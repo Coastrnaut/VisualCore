@@ -34,7 +34,7 @@ for the audio change, feature 077 (A10-P03). Rollback: revert the commits (the A
 
 ## Phase 3: Story 1 — a still sky (P1) 🎯
 
-- [ ] T-A21-406 [P] [US1] The still view in `Packages/ExperiencesCreative/Aurora/Experience/{AuroraPresenter,AuroraControls}.swift`
+- [X] T-A21-406 [P] [US1] The still view in `Packages/ExperiencesCreative/Aurora/Experience/{AuroraPresenter,AuroraControls}.swift` — Verified 2026-11-17: 2026-11-17: Still sky (identifier still, presentation only): SkyPicture in a CachedScene keyed by the digest, size and the drawn inputs; drawn once over 100 frames, once more after a change, a change between skies completes then holds, Reduce Motion as well holds; StillViewTests (3); .autonomy/checks/A21-P04.au-ios27.json exit 0; written by an agent, retested
   ("Still sky", identifier `still`, presentation only; `CachedScene` keyed by the digest and the size; the clock
   holds) and `ExperienceTests/StillViewTests.swift` (drawn once over 100 frames; once more after a change; a change
   between skies completes then holds; with Reduce Motion on as well, the still view wins and holds) (FR-A21-401; SC-A21-401)
