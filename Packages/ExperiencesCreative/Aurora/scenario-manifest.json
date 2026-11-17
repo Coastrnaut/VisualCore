@@ -1,0 +1,492 @@
+{
+  "controls" : [
+    "preset.select",
+    "colour.hue",
+    "motion.speed",
+    "motion.turbulence",
+    "sky.ribbons",
+    "sky.stars",
+    "sky.clouds",
+    "light.limit"
+  ],
+  "experience" : "a21.aurora",
+  "kind" : "creative",
+  "scenarios" : [
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+        "initialDigest" : "63098acc4cb15f1fb3739f766e70ba52e6f7713039b920f14f54aa9a783c0e78"
+      },
+      "name" : "launch-first-frame",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "colour.hue",
+            "values" : [
+              -0.20000000000000001
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "motion.speed",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "preset.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "58976827787426aba8f9428a42e53799a1c55a321c9e45272b408192a1c8fc05",
+        "initialDigest" : "63098acc4cb15f1fb3739f766e70ba52e6f7713039b920f14f54aa9a783c0e78"
+      },
+      "name" : "input-response",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "preset.select",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "outcome" : "preset-dawn-haze"
+      },
+      "name" : "completion",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "preset.select",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "preset.select",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "action.rule.a21.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "colour.hue",
+            "values" : [
+              0.75
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "motion.speed",
+            "values" : [
+              2.5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "motion.turbulence",
+            "values" : [
+              -0.10000000000000001
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "sky.ribbons",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "sky.ribbons",
+            "values" : [
+              2.5
+            ]
+          },
+          "result" : "action.rule.a21.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "sky.stars",
+            "values" : [
+              401
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "sky.stars",
+            "values" : [
+              10.5
+            ]
+          },
+          "result" : "action.rule.a21.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "sky.clouds",
+            "values" : [
+              1.5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "light.limit",
+            "values" : [
+              0.10000000000000001
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "light.limit",
+            "values" : [
+              0.80000000000000004
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "colour.hue",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "motion.speed",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+
+      },
+      "name" : "rejection",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "colour.hue",
+            "values" : [
+              -0.20000000000000001
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "motion.speed",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "preset.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "58976827787426aba8f9428a42e53799a1c55a321c9e45272b408192a1c8fc05",
+        "initialDigest" : "63098acc4cb15f1fb3739f766e70ba52e6f7713039b920f14f54aa9a783c0e78"
+      },
+      "name" : "save-restore",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "colour.hue",
+            "values" : [
+              -0.20000000000000001
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "motion.speed",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "preset.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "initialDigest" : "63098acc4cb15f1fb3739f766e70ba52e6f7713039b920f14f54aa9a783c0e78",
+        "resetDigest" : true
+      },
+      "name" : "reset",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "suspend-resume",
+      "seed" : "1"
+    },
+    {
+      "cycles" : 5,
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "teardown-reentry",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "cancel-prepare",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "preset.select",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "63098acc4cb15f1fb3739f766e70ba52e6f7713039b920f14f54aa9a783c0e78",
+        "initialDigest" : "63098acc4cb15f1fb3739f766e70ba52e6f7713039b920f14f54aa9a783c0e78",
+        "outcome" : "preset-polar-night"
+      },
+      "name" : "fixture-polar-night",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "preset.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "4c3fae52438bfd1c3794ffcc97250d525db9ce4b119230d0d82dd6631fd07600",
+        "initialDigest" : "63098acc4cb15f1fb3739f766e70ba52e6f7713039b920f14f54aa9a783c0e78",
+        "outcome" : "preset-violet-veil"
+      },
+      "name" : "fixture-violet-veil",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "preset.select",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "03b72d33cb1eb6979e43bd2d0d19731c870efa4c116bbf5657717e4e6355109b",
+        "initialDigest" : "63098acc4cb15f1fb3739f766e70ba52e6f7713039b920f14f54aa9a783c0e78",
+        "outcome" : "preset-dawn-haze"
+      },
+      "name" : "fixture-dawn-haze",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "colour.hue",
+            "values" : [
+              0.25
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "motion.speed",
+            "values" : [
+              1.5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sky.ribbons",
+            "values" : [
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sky.stars",
+            "values" : [
+              100
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sky.clouds",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d60c43385acae8618fc7819cf3648f3c06f9c5140b8382ad9fd941ea6360bce9",
+        "initialDigest" : "63098acc4cb15f1fb3739f766e70ba52e6f7713039b920f14f54aa9a783c0e78",
+        "outcome" : "preset-polar-night"
+      },
+      "name" : "fixture-tuned",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "light.limit",
+            "values" : [
+              0.20000000000000001
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "97639f0c1ba9784fd4e0e7d17d7239d9ba7ec964b85232a1f67cda00531a85e8",
+        "initialDigest" : "63098acc4cb15f1fb3739f766e70ba52e6f7713039b920f14f54aa9a783c0e78",
+        "outcome" : "preset-polar-night"
+      },
+      "name" : "fixture-low-limit",
+      "seed" : "1"
+    }
+  ],
+  "schema" : 1
+}

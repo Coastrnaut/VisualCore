@@ -54,7 +54,7 @@ VisualCore change. Precedent: `specs/146-zg-p02-sand-renderer/tasks.md`. Rollbac
   `aurora` (no examples: schema 1); `project.yml` product; the synthetic candidate id in
   `Apps/VisualCore/Tests/Unit/AppModelTests.swift` moves to `a22.shader-studio`; the candidate lists in app and script
   tests (FR-A21-206)
-- [ ] T-A21-208 Write `Packages/ExperiencesCreative/Aurora/Experience/Adapter/AuroraManifest.swift` (nine standard
+- [X] T-A21-208 Write `Packages/ExperiencesCreative/Aurora/Experience/Adapter/AuroraManifest.swift` (nine standard — Verified 2026-11-17: 2026-11-17: SkyCore.manifest(for:) in Adapter/AuroraManifest.swift (nine standard scenarios; fixtures for the three presets, a tuned sky and a lowered limit) and AuroraManifestTests (5); scenario-manifest.json generated with UPDATE_SCENARIO_MANIFEST=1 and matched on the plain run; .autonomy/checks/A21-P02.au-ios27.json exit 0; written by an agent, retested
   scenarios and fixtures for each preset, a tuned sky and a lowered limit) and `ExperienceTests/AuroraManifestTests.swift`;
   generate `scenario-manifest.json` with `UPDATE_SCENARIO_MANIFEST=1 TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`
 - [ ] T-A21-209 Aurora tests on sim-27.2 (`--name au-ios27 -- python3 scripts/xcodebuild_package.py --package
