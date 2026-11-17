@@ -59,9 +59,12 @@ in code:
   pixels, sRGB". The format comes from the plan and the profile from the file's name `kCGColorSpaceSRGB`, shown as
   "sRGB"; any other profile is shown by its name. It appears after a written export, together with a "How to use it"
   button.
-- Q: What does the help say, and how is it checked? → A: `WallpaperHelp` holds three short sections: saving the
-  image (the share sheet comes in A19-P04; in this phase the file is ready to save), setting it in Settings
-  (Wallpaper, Add New Wallpaper, Photos) and choosing the crop.
+- Q: What does the help say, and how is it checked? → A: `WallpaperHelp` holds three short sections:
+  - "Save the image": export it at the template's size, then save it to Photos. The saving controls come in
+    A19-P04; the help text names no phase;
+  - "Make it your wallpaper": in the Settings app choose Wallpaper, then Add New Wallpaper, and pick the image from
+    Photos. It notes that the steps can differ between iOS versions;
+  - "Fit the frame": the frame and the bands show what the screen shows.
   - It states that the person sets the wallpaper and the app does not, and that the system may move the time or
     widgets over the image.
   - It is reachable from the editor and from the export result.
