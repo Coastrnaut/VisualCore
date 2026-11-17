@@ -151,6 +151,9 @@ The sand is rebuilt from the garden after a size change, a rotation or a lost gr
   rebuilt sand MUST match the core's reference field within a stated tolerance.
 - **FR-A20-204**: A brush preview MUST show the chosen rake's width and tines at the touch while a finger is down.
 - **FR-A20-205**: Native controls MUST choose the rake style and undo and redo, each with a spoken label.
+- **FR-A20-207**: When nothing changes, the sand MUST be drawn once and reused (the manual's frame idling when
+  still), with the experience's frame rate capped at 30 frames per second; a change of the field or the size draws
+  it again.
 - **FR-A20-206**: The experience MUST be registered as a candidate with its scenarios, and make no GL call outside the
   host's scenes, no network request and no clock read in its core.
 
