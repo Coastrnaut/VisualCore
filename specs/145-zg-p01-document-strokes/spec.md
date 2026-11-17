@@ -22,6 +22,57 @@ Canonical overrides:
   pending core in `Packages/ExperiencesCreative/DigitalZenGarden/Core` until A20-P02 adds the experience.
 - **No VisualCore or ProjectM change.** Follow `specs/138-lw-p01-export-contract`.
 
+## Clarifications
+
+### Session 2026-11-17
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- `Vec2` (VisualCoreMath) is `Codable`, `Hashable` and `Sendable`. `ExperienceControl.maxValues` is 24, so A20-P02 sends
+  a stroke to the core in segments. `ExperienceSnapshot` allows 1 MiB and `StorageQuota` 16 MiB and 64 files.
+- The only undo in the repository is Light Maze's experience-local `MazeState.undo()`; no VisualCore product offers a
+  command history (contract G-UNDO).
+- Earlier pending cores (Living Wallpapers, Ambient Clock) were added as `<Name>Core` and `<Name>CoreTests` targets
+  in `Packages/ExperiencesCreative/Package.swift`.
+
+- Q: What is the tray, and how are positions stored? → A: One tray, `small-tray`, with a 4:3 aspect. Positions are
+  normalized: x in 0…1 across the width, y in 0…1 down the height. Distances are measured in tray-width units, with y
+  scaled by 0.75. There are three sand tones (`pale`, `warm`, `grey`), each an opaque sRGB colour. The reference sand
+  field is 160 × 120 cells (1/160 of the width per cell). Heights are in units of the deepest groove (−1…1); untouched
+  sand is 0.
+- Q: What are the caps and the resampling rule? → A:
+  - **Resampling:** points every 0.004 tray widths, linearly along each segment. Repeated points (closer than 1e-6)
+    are dropped, points outside the tray are clamped to its edge, and a non-finite point refuses the stroke.
+  - **Caps:** 512 points per stroke; a longer stroke ends at the cap and is marked capped. A garden holds at most 400
+    strokes and 24 stones, and the document is at most 262,144 bytes.
+  - **Dabs:** a stroke of one point is a dab.
+  - **Tolerance:** neighbouring points are at most the spacing plus 1e-9 apart.
+- Q: What are the two rake styles and the stone palette? → A:
+  - **Rake styles:**
+    - `fine-rake`: 5 tines, 0.06 tray widths wide, depth 0.6;
+    - `wide-rake`: 3 tines, 0.10 tray widths wide, depth 1.0.
+
+    The groove profile across a rake is depth·cos(2π·tines·u/width) for |u| ≤ width/2 (u being the signed distance
+    from the stroke's centre line), giving alternating grooves and ridges. Raking replaces the height under its
+    footprint rather than adding to it, so later strokes overwrite earlier ones in order.
+  - **Stone palette:** five kinds, `river-pebble`, `flat-slate`, `round-granite`, `tall-basalt` and `moss-boulder`,
+    each a procedural shape with base radii in tray widths. A stone has an id, kind, position (0…1), rotation (−π…π),
+    scale (0.5…2) and a depth order. Stones sit on the sand and do not change its heights in this phase.
+- Q: What are the commands and the history? → A:
+  - **Commands:** `rake(stroke)`, `place(stone)`, `move(id, position)`, `rotate(id, angle)`, `remove(id)` and
+    `tone(tone)`. Each command records what it needs to be undone exactly: `remove` keeps the removed stone and its
+    depth order.
+  - **Undo and redo:** they move commands between the two lists; a new command clears the redo list.
+  - **History:** at most 100 undoable commands. Beyond that, the oldest command folds into the checkpoint, which is a
+    document plus its reference field.
+  - **Rebuilding:** the field is rebuilt from the checkpoint by replaying the commands. The CPU replay is exact, so
+    the stated tolerance is a height difference of at most 1e-6 per cell.
+  - **Ids and time:** stone ids are assigned from a counter in the document. No time is stored: there are no
+    timestamps, and the core reads no clock.
+- Q: Where does the core live, and what does it depend on? → A: `Packages/ExperiencesCreative/DigitalZenGarden/Core`
+  as target `DigitalZenGardenCore` (dependencies `VisualCoreMath` and `VisualCoreExperience`), with
+  `DigitalZenGardenCoreTests`. It is a pending core until A20-P02 adds the experience, and nothing is registered.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - A garden is a small, safe file (Priority: P1) 🎯
@@ -126,7 +177,7 @@ sand rebuilt from the list matches the sand before the undo.
 
 ## Assumptions
 
-- Exact caps, spacing and tolerances are decided in clarification and recorded in the data model.
+- The caps, spacing and tolerances of the clarifications are recorded in the data model.
 - The drawn relief, stones and preview come in A20-P02 and A20-P03; this phase is the pure core.
 
 ## Traceability
