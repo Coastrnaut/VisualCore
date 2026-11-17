@@ -24,6 +24,91 @@ Canonical overrides:
 - **Constitution:** 2.18.0 adds the A22 experience rules (committed at the start of this gate, `27d7d83e`).
 - Follow `specs/151-au-p00-boundary-audit`.
 
+## Clarifications
+
+### Session 2026-11-17
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code by a read-only survey, then spot-checked:
+- **Commits:** the A22 constitution commit is `27d7d83e` and the A22-P00 specify commit is `6218b9a1`, the phase start
+  for the no-change diff of `Packages` and `External`. The reference submodule is pinned at `d93edd1`.
+- **Registry and catalog:**
+  - twenty-one experiences are registered in `Catalog/registrations.json` (A01–A21), and the candidates list is empty;
+  - `a22` appears in neither `Catalog/registrations.json` nor `Apps/VisualCore/App/ExperienceRegistry.swift`, and
+    `AppModelTests` uses it as a synthetic not-yet-integrated id;
+  - `release_check.py --list` prints 163 lines;
+  - the catalog lists Shader Studio as free, family "Developer and creator tools", launcher category tools.
+- **Host rule:** `RenderHost`, `ResourceRegistry`, `ShaderProgram`, `RenderScene` and the presenter are main-actor.
+  GL work happens only inside a scene's `setup`, `resize`, `render` and `teardown`, with the host's context current.
+  The pure modules (shader source, parameters, persistence, diagnostics) are `Sendable`.
+- **VisualCore offers** (public in a framework product and tested):
+  - **source expansion:** `ShaderLibrary` (VisualCoreShaderSource) expands `#include`s and defines up to 64 KiB, at
+    most 8 levels deep. It accepts only `#version 300 es`, inserts the version line when it is missing, and records
+    each expanded line's `SourceOrigin` (`ExpandedShader.origin(ofExpandedLine:)`). It adds no precision line and no
+    `#line`. Its refusals are `ShaderSourceError`;
+  - **diagnostics:** `InfoLogParser.parse(_:stage:map:)` turns a compile or link log into `[ShaderDiagnostic]`
+    (file, line, stage, severity, message; line only, no column) mapped to the original file and line;
+  - **compile and link:** `ResourceRegistry.program(vertex:fragment:defines:library:…)` throws
+    `ShaderError.source`, `.compile([ShaderDiagnostic])` or `.link([ShaderDiagnostic])`, and a failure never touches a
+    program the caller holds. It keeps a 64-program LRU cache. `ShaderProgram` reads the active uniforms (name, type,
+    size) and has typed setters. `ShaderProgram.lastFailureLog` is one global string;
+  - **full-screen drawing:** `FullScreenShaderScene` binds `u_time`, `u_resolution`, `u_seed`, an 8-entry palette and
+    one float per parameter. Its source is fixed at creation, it keeps only the first diagnostic, it has no texture
+    input, and a failure draws dark grey;
+  - **capabilities:** `RenderCapabilities` (GL and GLSL versions, extensions, texture, viewport and uniform limits,
+    shader precisions) on `RenderHost.capabilities`; the context is GLSL ES 3.00 only;
+  - **textures and targets:** `ResourceRegistry.makeTexture`, `Texture.upload(rgba:)`, `makeRenderTarget`,
+    `ResourceRegistry.stats`, `ResourceBudget` (256 MiB);
+  - **parameters:** `ParameterDefinition`, `ParameterSchema` (at most 64, NaN refused, out of range clamped),
+    `ParameterEditor`;
+  - **persistence:** `ExperienceStorage.write(_:to:)`, `read`, `list` and `remove` under `StorageQuota` (64 files,
+    16 MiB), `setValue(_:for:)` (64 values of 4 KB), `ExperienceSnapshot` and `MigrationChain`;
+    VisualCorePersistence's `DocumentStore` and `NamedLibrary` work on a directory, not on the experience storage;
+  - **pacing:** `FramePacing`, `PacingMeter`, `PerformanceRecord` and the presenter's `maxFramesPerSecond`.
+- **Missing everywhere:**
+  - a watchdog or frame-time budget for a slow shader, and no hang detection;
+  - a code editor, line-numbered text view or syntax assistance;
+  - a scene that swaps in a new program only on success and keeps the last good one;
+  - texture inputs for a full-screen shader;
+  - a library of named files over the experience storage (Digital Zen Garden's `GardenLibrary` is app-local and
+    internal);
+  - per-shader compile logs (only the global `lastFailureLog`).
+
+- Q: How is the manual's "compile an empty shell" gate met in the one app? → A: As for A21: the one app is the shell.
+  This phase proves it builds for testing with Shader Studio absent, and the targets come with A22-P01's first model.
+- Q: What makes a capability "available"? → A: A public declaration in a VisualCore framework product with at least
+  one test that exercises it. An implementation that exists only inside another experience or a harness is "requires
+  adaptation" at best.
+- Q: How are compiling, diagnostics and the last-good preview built from what exists? → A:
+  - **Assembly:** the person's fragment source is placed into the template with `ShaderLibrary`. The `vc/` includes
+    and a precision line come first.
+  - **Compile:** it goes through `ResourceRegistry.program` in an app-local preview scene, inside the host's context.
+  - **Diagnostics:** the `[ShaderDiagnostic]` of `ShaderError` are mapped back through the expansion's origins to the
+    person's lines. Diagnostics are line-only, and the column stays optional (none is shown).
+  - **Swap:** the scene swaps programs only on success and keeps the last good one otherwise. That is an app-local gap
+    (`FullScreenShaderScene` cannot replace its source and drops later diagnostics), with no VisualCore change
+    planned; a second user would justify moving the swap upstream later.
+  - **Per-shader logs:** the global `lastFailureLog` is not relied on.
+- Q: How are resource limits and the watchdog handled when VisualCore has none? → A:
+  - **Caps first:** the source size, line count, uniforms, inputs and the preview size are checked by an app-local
+    pure validator before any compile. The expansion's own 64 KiB limit stays the hard ceiling.
+  - **Preview pacing:** the preview is drawn at a capped size and at most 30 frames per second (the presenter's
+    `maxFramesPerSecond`).
+  - **Watchdog:** an app-local watchdog reads the drawn-frame intervals (`PacingMeter`). When frames stay slower than
+    its limit, it stops the preview and offers a reset to the last good program.
+  - **No sandbox claim:** a GPU shader can still hang a driver, and no sandbox is claimed.
+- Q: Where do the editor, the project files, the texture inputs and the compatibility profile live? → A:
+  - **Editor:** app-local SwiftUI, a monospaced text editor with line numbers, a diagnostics list that jumps to a
+    line, and a hardware keyboard, iPad first;
+  - **Project files:** named files in `ExperienceStorage`, after Digital Zen Garden's library (versioned envelopes,
+    a capped count and size, damaged and newer files refused and never deleted). This is an app-local adaptation;
+  - **Texture inputs:** small textures generated in code and uploaded with `Texture.upload(rgba:)` in the preview
+    scene, an app-local adaptation;
+  - **Compatibility profile:** read from `RenderCapabilities` (GLSL ES 3.00 only, highp, uniform and texture limits),
+    available.
+
+  No upstream gap is planned for Phase 00's decision.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - An evidence-backed integration matrix (Priority: P1) 🎯
