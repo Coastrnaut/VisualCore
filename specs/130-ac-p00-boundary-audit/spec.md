@@ -22,6 +22,67 @@ Canonical overrides:
 - **Visuals are code:** every theme is a shader, field, particle or SDF drawing. Typography uses system fonts.
 - **Constitution:** 2.14.0 adds the A18 experience rules (committed at the start of this gate, `84b3b311`).
 
+## Clarifications
+
+### Session 2026-11-16
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code by a read-only survey:
+- **Commits:** the A18 constitution commit is `84b3b311` and the A18-P00 specify commit is `43f3eb05`. The specify
+  commit is the phase start for the no-change diff of `Packages` and `External`. The reference submodule is pinned at
+  `d93edd1`.
+- **Registry:** seventeen experiences are registered in `Catalog/registrations.json` (A01–A17).
+- **VisualCore offers** (public in a framework product and tested):
+  - in `VisualCoreRendering`: `FullScreenShaderScene` (parameters, palette, `fixedTime`, `timeScale`), `FieldPass`,
+    `ShaderBundle`, the GLSL library `vc/` (palette, noise, SDF, hash, colour), `ParticleRenderer` and
+    `ParticleLayerScene` (with `brightnessCap`), and `RenderHost` (frame pacing to `maxFramesPerSecond`, foreground
+    notifications);
+  - in `VisualCoreUI`: `AccessibleColors.contrastRatio` (WCAG 1…21);
+  - in `VisualCoreSimulation`: `ParticleSystem`, `AnnouncementPlanner`, `StateSign`, `stateSignProblems`,
+    `transitionDuration(_:reduceMotion:)` and `AccessibilityPreferences`;
+  - in `VisualCorePersistence`: `NamedLibrary` (favourites first), `DocumentStore`, `DocumentEnvelope`,
+    `MigrationChain`;
+  - in `VisualCoreExperience`: `ExperienceStorage` with `StorageQuota`;
+  - in `VisualCoreDiagnostics`: `QualityProfile` and `QualityGovernor`;
+  - in the host: scene phase (`ExperienceSession.setScenePhase`), and the shell's suspend and resume without
+    catch-up.
+- **Missing everywhere:**
+  - a wall-clock time source and any time-change observer (significant time change, time zone, locale, day);
+  - text drawn in the GPU path (text is drawn by the host's canvas overlay);
+  - scene transitions or crossfades;
+  - a frame-rate control reachable from an experience;
+  - keep-awake, brightness and night-mode helpers;
+  - a pixel-drift or screen-care helper.
+- **Experience-only:** Solar System Explorer's injected `now: () -> Date` with its `date.set` action, and the
+  foreground observers of Music Lab, Oscilloscope Studio and Audio Odyssey.
+
+- Q: How is the manual's "compile an empty shell" gate met in the one app? → A: As for A17: the one app is the shell.
+  This phase proves it builds for testing with Ambient Clock absent, and the targets come with A18-P01's first model.
+- Q: What makes a capability "available"? → A: A public declaration in a VisualCore framework product with at least
+  one test that exercises it. An implementation that exists only inside another experience or a harness is "requires
+  adaptation" at best.
+- Q: Which package holds Ambient Clock? → A: `Packages/ExperiencesCreative/AmbientClock` (Auto-Creator.md §16), as
+  A05–A17 did; no new package is created.
+- Q: Does Ambient Clock need a permission, and how is "keep the screen on" handled? → A: It needs no permission and no
+  usage string, because it reads no location and sends nothing.
+  - **Keep-awake:** an opt-in setting "Keep the screen on while the clock is open", off by default. While it is on
+    and the clock is visible, the experience asks the system to keep the screen awake. It releases the request on
+    background, close and teardown.
+  - **Scan exception:** Ambient Clock is the first experience allowed to set `isIdleTimerDisabled`. Its release scan
+    allows it in exactly one named file, and the privacy page says so.
+  - **Brightness:** the system brightness is never set. Night mode dims and warms the drawing itself.
+
+  Both are recorded as gaps (G-AWAKE and G-NIGHT).
+- Q: How does the time enter deterministically, and what does the audit assume for the themes? → A: The time is
+  read only through an injected clock (Solar System Explorer's pattern), which defaults to the system's. It is
+  passed into the state as an action (`time.set`) on each displayed second or minute and on every time-change
+  notification, so replays use fixed dates. A generic, injectable clock source with time-change observation has two
+  consumers (A14's "Now" and A18), so its move into VisualCore is assessed as a gap (G-CLOCK).
+
+  The four themes are drawn with `FullScreenShaderScene`, fields and particles over the GLSL library: a noise
+  gradient, a particle drift, a wave field and SDF shapes. The text is drawn by the canvas overlay with system
+  fonts. Exact names, layouts and budgets are decided in A18-P01, not here.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - An evidence-backed integration matrix (Priority: P1) 🎯
