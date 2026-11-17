@@ -62,7 +62,7 @@ only).
 - [X] T-A21-010 Script tests (`--name script-tests -- python3 scripts/test_scripts.py`) and the release-check document — Verified 2026-11-17: 2026-11-17: .autonomy/checks/A21-P00.script-tests.json exit 0 (40.8 s) and A21-P00.fast-checks.json exit 0 (docs, app-contracts, compliance, dependencies; 3.0 s); every run-check of this gate within its limit; the contract check under 10 s (0.04 s)
   steps (`--name fast-checks -- python3 scripts/release_check.py --only docs app-contracts compliance dependencies`);
   every run-check of this gate stays within its limit and the contract check under 10 s (SC-A21-006)
-- [ ] T-A21-011 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+- [X] T-A21-011 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record — Verified 2026-11-17: 2026-11-17: /speckit-converge appended nothing on its first run (8 FR, 6 SC, 4 stories checked); .autonomy/evidence/A21-P00.json sealed; VERIFIED-GATE A21-P00 (151 pass); README updated; docs/automatedtesting.md unchanged (no new test tool, rule or lesson); build_catalog.py --check, validate_autocreator and validate_docs PASS
   A21-P00; update README.md (status, gate count) in the record commit (rule 16) and `docs/automatedtesting.md` if a
   test tool, rule or lesson changed (rule 17)
 

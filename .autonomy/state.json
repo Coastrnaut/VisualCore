@@ -1669,8 +1669,14 @@
       "status": "pass"
     },
     "A21-P00": {
-      "attempts": [],
-      "status": "pending"
+      "attempts": [
+        {
+          "at": "2026-11-17T10:36:56+00:00",
+          "evidence": ".autonomy/evidence/A21-P00.json",
+          "result": "pass"
+        }
+      ],
+      "status": "pass"
     },
     "A21-P01": {
       "attempts": [],
@@ -2221,5 +2227,5 @@
       "status": "pending"
     }
   },
-  "updated": "2026-11-17T10:05:02+00:00"
+  "updated": "2026-11-17T10:36:56+00:00"
 }
