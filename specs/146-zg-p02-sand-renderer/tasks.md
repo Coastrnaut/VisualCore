@@ -14,7 +14,7 @@ commits.
 
 ## Phase 2: Foundational — the sized field
 
-- [ ] T-A20-203 [P] Extend `Packages/ExperiencesCreative/DigitalZenGarden/Core/SandField.swift` with `init(columns:rows:)` ("defaults 160 × 120"; columns and rows 1…1024) keeping every A20-P01 behaviour at the default, and add `CoreTests/SandFieldSizeTests.swift` (a 480 × 360 field replays deterministically; a stroke covers the same tray region at both sizes within one cell; the default equals the A20-P01 field)
+- [X] T-A20-203 [P] Extend `Packages/ExperiencesCreative/DigitalZenGarden/Core/SandField.swift` with `init(columns:rows:)` ("defaults 160 × 120"; columns and rows 1…1024) keeping every A20-P01 behaviour at the default, and add `CoreTests/SandFieldSizeTests.swift` (a 480 × 360 field replays deterministically; a stroke covers the same tray region at both sizes within one cell; the default equals the A20-P01 field) — Verified 2026-11-17: 2026-11-17: Core/SandField.swift init(columns:rows:) (1...1024, default 160 x 120; A20-P01 behaviour unchanged at the default), RakeBrush stamping limited to the footprint's bounding box; CoreTests/SandFieldSizeTests.swift; 40 core tests pass in .autonomy/checks/A20-P02.zg-ios27.json exit 0; written by an agent, retested
 
 ## Phase 3: Story 1 — rake by dragging (P1) 🎯
 
