@@ -463,7 +463,9 @@
       ],
       "content": null,
       "manifest": "Packages/ExperiencesCreative/LivingWallpapers/scenario-manifest.json",
-      "permissions": [],
+      "permissions": [
+        "photo-library-add"
+      ],
       "summary": "A creator of procedural backgrounds framed for a chosen iPhone or iPad screen: four curated scenes with colour presets, the device's crop frame and approximate safe areas, and a still exported at the template's exact size, read back to verify its dimensions and sRGB profile."
     }
   }

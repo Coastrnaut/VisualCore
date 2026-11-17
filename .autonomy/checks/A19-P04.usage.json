@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "app-release-build",
+    "app-usage-descriptions"
+  ],
+  "command": "python3 scripts/release_check.py --only app-release-build app-usage-descriptions",
+  "elapsed_seconds": 23.092,
+  "exit_code": 0,
+  "finished": "2026-11-17T06:36:17+00:00",
+  "log": ".autonomy/logs/A19-P04.usage.log",
+  "log_sha256": "1d33723fa26036c81586f44d9858cda6d5bbb3599b952523595855535198ef03",
+  "name": "usage",
+  "stage": "A19-P04",
+  "started": "2026-11-17T06:35:54+00:00",
+  "timed_out": false
+}
