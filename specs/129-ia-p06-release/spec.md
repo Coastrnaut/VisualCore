@@ -30,6 +30,57 @@ Canonical overrides:
   `docs/release/build-and-archive.md`.
 - Follow `specs/122-sl-p06-release`.
 
+## Clarifications
+
+### Session 2026-11-16
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- `scripts/release_check.py` builds `experience-release-<code>` and `copy-claims-<code>` from
+  `docs/apps/<slug>/release.json`, and the last interface chunk is `x2` (A16-P06).
+- The shared denylist (`Configs/copy-claims-denylist.json`) refuses, among others, `camera`, `instant` and `share`.
+- The presenter already has the test seam `failNextTranslucentDraw` (A17-P03). The view file is written through
+  `ExperienceStorage` (A17-P03).
+
+- Q: Which statuses does the release checklist use? → A: The checker's:
+  - `verified`, with evidence;
+  - `pending-campaign-ii`, for device rows naming IA-D1 … IA-D7 of `docs/apps/interactive-anatomy/device-campaign.md`;
+  - `owner-action`, with the owner's steps from `docs/release/build-and-archive.md`. The clinical review is one more
+    owner-action row.
+- Q: Which words does the experience's own scan refuse? → A: It scans the store text and the interface Swift (controls,
+  presenter, overlay, the adapter's words and `AnatomyReview`), matching whole words case-insensitively:
+  - diagnose, diagnosis, diagnostic, treatment, cure, symptom, symptoms, therapy, medical advice;
+  - accurate, accuracy, precise, certified, certification, anatomically correct, realistic, lifelike, real-time;
+  - fps, frames per second, battery.
+
+  "clinician" stays allowed, because the not-reviewed sentence names one. The shared copy check runs with `camera`
+  allowed: in A17 it means the orbit camera of the 3D view ("Turn the camera", "The camera is at its limit."), never
+  the device camera. Every test named in the claims table must exist.
+- Q: What does the source scan refuse? → A: The A16 list, in `Packages/ExperiencesCreative/InteractiveAnatomy`:
+  `URLSession`, `import Network`, `CLLocation`, `AVCapture`, `AVAudioRecorder`, `inputNode`, `installTap`, `CMMotion`,
+  `CNContact`, `PHPhotoLibrary`, `UIImagePickerController`, `ASIdentifierManager`, `AppTrackingTransparency`,
+  `UIScreen.main.brightness` and `isIdleTimerDisabled`.
+- Q: Which interface journeys run, and how? → A: A new serial chunk `y2`, launched through `IASupport` as `SLSupport`
+  does. Each test takes under 60 s.
+  - `IAExploreUITests`:
+    - choose "Femur" in the list, and the panel shows "Femur", a citation and "Not reviewed by a clinician.";
+    - the About row shows the model statement;
+    - switch off the bones layer, and the femur row is marked hidden.
+  - `IASearchUITests`:
+    - type "ACL" in the search field and choose the first result, and the anterior cruciate ligament is selected;
+    - Isolate selected, then Show all.
+- Q: How are crash recovery, sample files and old views proved? → A: Three proofs:
+  - **Crash recovery:** a test-only `failNextDraw` seam in the presenter makes the next draw throw once. A test saves a
+    view to a temporary storage, sets the seam and draws, so the session fails. `view.json` must be byte-identical,
+    and a new session over the same storage opens with the view.
+  - **Sample files:** committed `view-{v2,v1,newer,damaged}.json` under the experience's test fixtures. They open, or
+    leave the opening view, as specified, and are byte-identical afterwards.
+  - **Old views:** view schema 1 (A17-P02) is the only older form, and it is covered by the v1 sample.
+
+  The license inventory in `privacy-and-credits.md` lists the content pack's sources (Gray's Anatomy 1918
+  public-domain, Terminologia Anatomica facts, original descriptions), the procedural geometry (original code), the
+  review record (original) and the colours (original).
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Nothing leaves the device and everything is credited (Priority: P1) 🎯
