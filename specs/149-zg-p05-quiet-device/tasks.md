@@ -46,7 +46,7 @@ device step. No VisualCore change. Precedent: `specs/142-lw-p05-device-tests/tas
   like `LWSupport` with `-vcCandidates`; identifiers `experience.a20.digital-zen-garden.<name>`) and
   `ZGGardenUITests.swift` (rake the rows pattern, undo empties the description's stroke count; stone tool: place a
   river pebble, remove it, undo restores it); each under 60 s (FR-A20-504; SC-A20-502)
-- [ ] T-A20-506 [P] [US2] Interface (agent U): `Apps/VisualCore/Tests/UI/DigitalZenGarden/ZGLibraryUITests.swift`
+- [X] T-A20-506 [P] [US2] Interface (agent U): `Apps/VisualCore/Tests/UI/DigitalZenGarden/ZGLibraryUITests.swift` — Verified 2026-11-17: 2026-11-17: ZGLibraryUITests: rows raked, saved as Evening, undone to no stroke, Evening opened with its stroke (33.7 s); .autonomy/checks/A20-P05.app-ui.json exit 0 (chunk b3, iOS 27.2 phone); written by an agent, retested
   (rake a pattern, save as "Evening", reset through undo, open "Evening"; the description shows one stroke); under
   60 s (FR-A20-504; SC-A20-502)
 - [X] T-A20-507 [US2] Add the serial chunk `"b3": ["ZGGardenUITests", "ZGLibraryUITests"]` to `scripts/release_check.py` — Verified 2026-11-17: 2026-11-17: scripts/release_check.py serial chunk b3 = ZGGardenUITests, ZGLibraryUITests, added to SERIAL_CHUNKS; scripts/test_scripts.py exit 0
