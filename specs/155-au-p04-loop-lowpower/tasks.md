@@ -14,7 +14,7 @@ for the audio change, feature 077 (A10-P03). Rollback: revert the commits (the A
 
 ## Phase 2: Story 4 — a sound loop the whole app can use (P2, VisualCore first)
 
-- [ ] T-A21-402 [P] [US4] Create `Packages/VisualCore/Sources/VisualCoreAudioDSP/AmbientLoop.swift` per data-model.md:
+- [X] T-A21-402 [P] [US4] Create `Packages/VisualCore/Sources/VisualCoreAudioDSP/AmbientLoop.swift` per data-model.md: — Verified 2026-11-17: 2026-11-17: AmbientLoopPartial, AmbientLoopRecipe (4 to 16 whole seconds at 48 kHz, 1 to 6 partials of whole cycles per loop, a swell of whole cycles, gain at most 0.3, gentle default) and AmbientLoopSynth.render (exact integer phase steps, deterministic, finite, peak equal to the gain, seamless at the wrap; invalid recipes empty) in VisualCoreAudioDSP with /// docs; AmbientLoopSynthTests (7); .autonomy/checks/A21-P04.audio-dsp-host.json exit 0 (115 tests); written by an agent, retested
   `AmbientLoopRecipe` ("`seconds` 4…16 (whole, default 8), `sampleRate` 48,000, `partials` 1…6 of (cycles per loop ≥
   1, amplitude 0…1), `swellCycles` ≥ 1, `gain` 0…0.3"; invalid recipes render no samples) and `AmbientLoopSynth.render`
   (deterministic, finite, |x| ≤ gain, seamless at the wrap); `///` on every public declaration; and
