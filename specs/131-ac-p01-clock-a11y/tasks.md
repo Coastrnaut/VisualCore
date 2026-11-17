@@ -9,7 +9,7 @@ raise a system prompt; no wall-clock assert. Precedent: `specs/124-ia-p01-conten
 
 ## Phase 1: Setup
 
-- [ ] T-A18-101 Baseline: cite the A18-P00 evidence on an unchanged `Packages` tree (`.autonomy/checks/A18-P00.{app-build,no-change}.json`) instead of a rerun (owner ruling of 2026-11-14)
+- [X] T-A18-101 Baseline: cite the A18-P00 evidence on an unchanged `Packages` tree (`.autonomy/checks/A18-P00.{app-build,no-change}.json`) instead of a rerun (owner ruling of 2026-11-14) — Verified 2026-11-16: 2026-11-16: A18-P00 evidence cited: .autonomy/checks/A18-P00.app-build.json and A18-P00.no-change.json, both exit 0; no Packages, Apps or project.yml change since the A18-P00 record commit 92d07215 (git diff --stat empty)
 
 ## Phase 2: Foundational — the VisualCore clock source (G-CLOCK)
 
