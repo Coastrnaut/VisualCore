@@ -61,7 +61,7 @@
 
 ## Phase 4: Story 4 — the editor model (P2)
 
-- [ ] T-A22-108 [P] [US4] Create `Packages/ExperiencesCreative/ShaderStudio/Core/{GLSLTokenizer,EditorDocument}.swift`
+- [X] T-A22-108 [P] [US4] Create `Packages/ExperiencesCreative/ShaderStudio/Core/{GLSLTokenizer,EditorDocument}.swift` — Verified 2026-11-17: 2026-11-17: GLSLTokenizer.swift (eleven token kinds, GLSL ES 3.00 word sets, one forward pass over UTF-8, lines split on LF, CRLF and CR) and EditorDocument.swift (numbered lines, tokens, diagnostics by line, outside); .autonomy/checks/A22-P01.ss-core-ios27-2.json exit 0; written by an agent, retested
   per clarification Q4 (FR-A22-105):
   - the token kinds in matching order, with GLSL ES 3.00 keyword, type and built-in sets;
   - lines split on `\n`, `\r\n` and `\r`, numbered from 1;
