@@ -20,6 +20,59 @@ Canonical overrides:
   still picture of the garden handed to the system share sheet.
 - **Experience A20 inside the one app; still a candidate.** Follow `specs/141-lw-p04-save-share`.
 
+## Clarifications
+
+### Session 2026-11-17
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- Fractal Explorer's `FractalBookmarks` keeps one file per saved item in the experience's `ExperienceStorage` (quota
+  16 MiB and 64 files), replacing `NamedLibrary`, whose files sat outside the experience's storage.
+- Generative Art Studio shares a still through SwiftUI `ShareLink` with a written file. Its registration declares
+  `photo-library-add`, and the app's add-only usage string already exists.
+- `GardenHistory` holds at most 100 undoable commands and folds older ones into a checkpoint. A stroke has at most 512
+  points, the raw stroke in progress at most 2,048, and the document at most 262,144 bytes.
+- The digest covers the document only, and `DigitalZenGardenExperience.make` receives the launch's `storage` (unused
+  until now).
+
+- Q: How are named gardens stored? → A: `GardenLibrary`, over the experience's `ExperienceStorage`:
+  - **Files:** one file per garden, `garden-<n>.json`, where n is a counter kept in `library.json` (no UUIDs). Each
+    holds `{name, order, document}`, with a 262,144-byte cap per file.
+  - **Caps:** at most 12 gardens. A name is trimmed and 1…40 characters.
+  - **Duplicate names:** saving under an existing name replaces that garden (after the person confirms it in the
+    controls); renaming to a used name is refused.
+  - **Refusals:** a damaged, newer-version or oversized file is listed as unreadable with its code and never opened or
+    deleted automatically. Saving a 13th garden is refused with "The library holds 12 gardens."
+  - **Opening:** replaces the garden; the undo history restarts at the opened document.
+- Q: What is the bound for long histories? → A:
+  - **Undo history:** `GardenHistory` holds at most 100 commands.
+  - **Byte bound:** the encoded history (its done and undone lists) stays under 100 × 512 points × 2 coordinates × 24
+    bytes ≈ 2.5 MB, an arithmetic bound on its JSON.
+  - **Caps:** the document stays within its caps.
+  - **Test:** 10,000 seeded commands of every kind. The stroke cap and the stone cap refuse beyond 400 strokes and 24
+    stones, and undo of the oldest command never reaches past the checkpoint.
+- Q: What is accessible, and how is it checked? → A:
+  - **Labels:** every control has a spoken label and value.
+  - **Description:** the canvas description says the tone, the number of strokes and stones, and the selected stone.
+  - **Announcements:** `port.announce` reports undo and redo ("Undid a stroke", "Redid moving a stone"), save, open,
+    delete and a refusal.
+  - **Large text:** at the accessibility text sizes the controls stack in one column and wrap, never clipped. A unit
+    test renders them with `ImageRenderer` at `.accessibility5` and checks the height grows and the width fits, as
+    Living Wallpapers did.
+  - **Audits:** system accessibility audits wait for the device campaign.
+- Q: What is the still picture, and where does it go? → A:
+  - **Picture:** a 1600 × 1200 PNG of the tray drawn by the session's still renderer (`experienceStillRenderer`),
+    written to the experience's temporary folder, with at most one file, which a new export or a failure replaces or
+    removes.
+  - **Sharing:** the file is handed to `ShareLink`. "Save Image" uses the app's add-only string, and the registration
+    declares `photo-library-add`.
+  - **Photos:** the experience never calls PhotoKit.
+- Q: Which controls and actions are added? → A: The library and the still are presentation features: they read and
+  write files and do not change the core's state, except "Open", which sends `garden.load`. That action carries no
+  values; the presenter supplies the opened document through the shell's restore path, so the history restarts and
+  the digest is the opened document's. The library's own actions (save, rename, delete, share) are native buttons
+  only, with no gestures.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Keep named gardens (Priority: P1) 🎯
@@ -127,7 +180,7 @@ A person shares a still picture of the garden through the system share sheet, fo
 
 ## Assumptions
 
-- The caps, the still size and the byte bound are decided in clarification.
+- The caps, the still size and the byte bound are those of the clarifications.
 
 ## Traceability
 
