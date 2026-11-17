@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a20.digital-zen-garden",
+    "--runtime",
+    "27"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a20.digital-zen-garden --runtime 27",
+  "elapsed_seconds": 53.016,
+  "exit_code": 0,
+  "finished": "2026-11-17T08:42:25+00:00",
+  "log": ".autonomy/logs/A20-P02.verify-27.log",
+  "log_sha256": "d34704dc6b28c646b636eb5c282c0dfa1c894a622aa84ac1ad7e5a2f9948d7b9",
+  "name": "verify-27",
+  "stage": "A20-P02",
+  "started": "2026-11-17T08:41:32+00:00",
+  "timed_out": false
+}
