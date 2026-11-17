@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "VisualCoreRenderingTests/CrossfadeSceneTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --only-testing VisualCoreRenderingTests/CrossfadeSceneTests",
+  "elapsed_seconds": 6.255,
+  "exit_code": 0,
+  "finished": "2026-11-17T03:14:17+00:00",
+  "log": ".autonomy/logs/A18-P03.crossfade-ios27.log",
+  "log_sha256": "c556698e8004c6d84db14f876c78363916640ce7c0f93c2a2240c2962cab57bc",
+  "name": "crossfade-ios27",
+  "stage": "A18-P03",
+  "started": "2026-11-17T03:14:11+00:00",
+  "timed_out": false
+}

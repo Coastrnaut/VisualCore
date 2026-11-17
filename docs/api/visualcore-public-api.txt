@@ -1843,6 +1843,7 @@ VisualCorePersistence | var | public var modifiedAt: Date
 VisualCorePersistence | var | public var name: String
 VisualCorePersistence | var | public var payload: Payload
 VisualCoreRendering | class | public final class ClearColorScene: RenderScene
+VisualCoreRendering | class | public final class CrossfadeScene: RenderScene
 VisualCoreRendering | class | public final class DepthMeshPass
 VisualCoreRendering | class | public final class FieldPass
 VisualCoreRendering | class | public final class FullScreenShaderScene: RenderScene
@@ -1884,6 +1885,7 @@ VisualCoreRendering | func | public func bind(target: Int32 = GL_ARRAY_BUFFER)
 VisualCoreRendering | func | public func bind(unit: Int)
 VisualCoreRendering | func | public func bindColor(unit: Int)
 VisualCoreRendering | func | public func capture(host: RenderHost, size: ExportSize, prefix: String) -> State
+VisualCoreRendering | func | public func captureOutgoingFromMix(_ context: RenderContext) throws
 VisualCoreRendering | func | public func clear()
 VisualCoreRendering | func | public func clearTrails()
 VisualCoreRendering | func | public func destroy()
@@ -1917,6 +1919,7 @@ VisualCoreRendering | func | public func removeFile()
 VisualCoreRendering | func | public func render(_ context: RenderContext, frame: FrameInfo) throws
 VisualCoreRendering | func | public func renderOffscreen(width: Int, height: Int, time: Double) throws(OffscreenRenderError) -> StillImage
 VisualCoreRendering | func | public func renderOneFrame(present: Bool = true) -> Bool
+VisualCoreRendering | func | public func replaceIncoming(_ scene: any RenderScene, context: RenderContext) throws
 VisualCoreRendering | func | public func replaceScene(_ newScene: RenderScene)
 VisualCoreRendering | func | public func resize(_ context: RenderContext)
 VisualCoreRendering | func | public func resume()
@@ -1965,6 +1968,7 @@ VisualCoreRendering | init | public init(extensionReported: Bool, probeComplete:
 VisualCoreRendering | init | public init(files: [String: String])
 VisualCoreRendering | init | public init(folder: TemporaryFolder)
 VisualCoreRendering | init | public init(fragment: String, fragmentName: String, bundle: ShaderBundle)
+VisualCoreRendering | init | public init(from: any RenderScene, to: any RenderScene)
 VisualCoreRendering | init | public init(index: Int, time: Double, targetTime: Double)
 VisualCoreRendering | init | public init(name: String, minimum: Int, reported: Int)
 VisualCoreRendering | init | public init(program: ShaderProgram, state: RenderState)
@@ -2060,7 +2064,9 @@ VisualCoreRendering | var | public private(set) var capabilities
 VisualCoreRendering | var | public private(set) var compileCount
 VisualCoreRendering | var | public private(set) var errorMessage: String?
 VisualCoreRendering | var | public private(set) var evictionCount
+VisualCoreRendering | var | public private(set) var from: any RenderScene
 VisualCoreRendering | var | public private(set) var generation: Int
+VisualCoreRendering | var | public private(set) var isSetUp
 VisualCoreRendering | var | public private(set) var lastError: RenderHostError?
 VisualCoreRendering | var | public private(set) var lastError: String?
 VisualCoreRendering | var | public private(set) var lastImage: StillImage?
@@ -2072,6 +2078,7 @@ VisualCoreRendering | var | public private(set) var read: RenderTarget
 VisualCoreRendering | var | public private(set) var resources: ResourceRegistry
 VisualCoreRendering | var | public private(set) var state
 VisualCoreRendering | var | public private(set) var swapCount
+VisualCoreRendering | var | public private(set) var to: any RenderScene
 VisualCoreRendering | var | public private(set) var trailLayer: TrailLayer?
 VisualCoreRendering | var | public private(set) var write: RenderTarget
 VisualCoreRendering | var | public var ambient
@@ -2127,6 +2134,7 @@ VisualCoreRendering | var | public var palette: [SIMD3<Float>]
 VisualCoreRendering | var | public var parameters: [String: Double]
 VisualCoreRendering | var | public var pointerHandler: ((PointerEvent) -> Void)?
 VisualCoreRendering | var | public var precisionBits: Int
+VisualCoreRendering | var | public var progress: Double
 VisualCoreRendering | var | public var rangeMax: Int
 VisualCoreRendering | var | public var rangeMin: Int
 VisualCoreRendering | var | public var red: Float, green: Float, blue: Float
