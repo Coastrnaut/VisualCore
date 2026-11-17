@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a18.ambient-clock",
+    "--runtime",
+    "27"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a18.ambient-clock --runtime 27",
+  "elapsed_seconds": 52.506,
+  "exit_code": 0,
+  "finished": "2026-11-17T04:38:26+00:00",
+  "log": ".autonomy/logs/A18-P06.verify-27.log",
+  "log_sha256": "e8639a31f0555a9eae159b35e9b99e84d20fb65243572759bd39b3ff25ac4e1f",
+  "name": "verify-27",
+  "stage": "A18-P06",
+  "started": "2026-11-17T04:37:34+00:00",
+  "timed_out": false
+}
