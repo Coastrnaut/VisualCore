@@ -32,7 +32,7 @@ only).
 
 ## Phase 7: Polish and evidence
 
-- [ ] T-A19-009 No-change proof (`--name no-change -- git diff --exit-code --stat 530855ef..HEAD -- Packages External`) (FR-A19-008, SC-A19-005)
+- [X] T-A19-009 No-change proof (`--name no-change -- git diff --exit-code --stat 530855ef..HEAD -- Packages External`) (FR-A19-008, SC-A19-005) — Verified 2026-11-17: 2026-11-17: .autonomy/checks/A19-P00.no-change.json exit 0 (empty diff of Packages and External since 530855ef)
 - [ ] T-A19-010 Script tests (`--name script-tests -- python3 scripts/test_scripts.py`) and the release-check document steps (`--name fast-checks -- python3 scripts/release_check.py --only docs app-contracts compliance dependencies`); every run-check of this gate stays within its 600 s limit and the contract check under 10 s (SC-A19-006)
 - [ ] T-A19-011 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A19-P00; update README.md (status, gate count) in the record commit (rule 16) and `docs/automatedtesting.md` if a test tool, rule or lesson changed (rule 17)
 
