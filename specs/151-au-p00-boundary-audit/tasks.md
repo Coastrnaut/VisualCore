@@ -9,7 +9,7 @@ only).
 
 ## Phase 1: Setup
 
-- [ ] T-A21-001 Create `docs/apps/aurora/README.md` (what the experience is per the manual §1–§2: a full-screen
+- [X] T-A21-001 Create `docs/apps/aurora/README.md` (what the experience is per the manual §1–§2: a full-screen — Verified 2026-11-17: 2026-11-17: docs/apps/aurora/README.md (the experience per the manual §1–§2, stylized and not a forecast, offline, no permission, an experience of the one app) and regression-baseline.md (phase start b40fdbee, constitution d143ebd2, pin d93edd1) written; validate_docs exit 0
   ambient aurora experience with procedural skies, gentle stars and optional synthesised sound, stylized and not a
   forecast, offline, no permission; that it is an experience of the one app; its documents) and
   `docs/apps/aurora/regression-baseline.md` with the phase start `b40fdbee` (the specify commit; constitution
