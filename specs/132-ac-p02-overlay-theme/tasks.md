@@ -8,7 +8,7 @@ raise a system prompt; no wall-clock assert. Precedent: `specs/125-ia-p02-scene-
 
 ## Phase 1: Setup
 
-- [ ] T-A18-201 Baseline: cite the A18-P01 evidence (`.autonomy/checks/A18-P01.{ac-core-ios27-2,app-build,experience-packages}.json`) on the tree recorded at A18-P01, whose Packages are unchanged since (owner ruling of 2026-11-14)
+- [X] T-A18-201 Baseline: cite the A18-P01 evidence (`.autonomy/checks/A18-P01.{ac-core-ios27-2,app-build,experience-packages}.json`) on the tree recorded at A18-P01, whose Packages are unchanged since (owner ruling of 2026-11-14) — Verified 2026-11-16: 2026-11-16: A18-P01 evidence cited: .autonomy/checks/A18-P01.ac-core-ios27-2.json, A18-P01.app-build.json and A18-P01.experience-packages.json, all exit 0; no Packages, Apps or project.yml change since the A18-P01 record commit 1d38f651
 
 ## Phase 2: Foundational — the experience target
 
