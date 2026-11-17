@@ -17,3 +17,6 @@
 - **D5 Crop geometry in the core (Q4):** pure and testable without the GPU; the overlay is native.
 - **D6 Export attempt (Q5):** synchronous on the main actor, a cancel flag between steps, and a temporary folder
   owned by the attempt. Progress for long exports comes with G-EXPORTJOB (A19-P04).
+- **D7 As built:** the export limit comes from the context's maximum texture size (data-model "As built"), and the
+  host's own check stays the last word. The retry uses the offered plan directly, so an export never re-plans
+  against the same limit that refused it.

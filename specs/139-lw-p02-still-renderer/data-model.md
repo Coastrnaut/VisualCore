@@ -23,3 +23,24 @@
   - state idle → planned → rendered → encoded → verified → written, or cancelled or failed with a reason (no-limit,
     does-not-fit, format-unavailable, render, encoding, verification);
   - it owns `TemporaryFolder("LivingWallpapers-Export")` and removes its file on cancel or failure.
+
+## As built (T-A19-217)
+
+- **Export limit:** the presenter reads `context.resources.maxTextureSize` at setup, because a presenter cannot
+  reach `RenderHost.maxRenderSize`. A size the host still refuses fails with the reason `render`; the tests pass
+  `host.maxRenderSize` directly.
+- **`StillExport`:**
+  - the retry goes through `run(plan:time:render:cancelAfter:)` with `ExportRefusal.offeredPlan(format:)`;
+  - an exporter keeps one file: a new run removes the previous file, and `discard(_:)` removes a handed-back one;
+  - a failed file write is `encoding`, and the planner's `unknownTemplate` (impossible from the core's index) is
+    `does-not-fit`.
+- **`WallpaperCore`:**
+  - the seed from `prepare(seed:)` is in the digest, and `restore(payload:seed:)` gives the restored core that seed;
+  - the snapshot keys are the eight fields;
+  - `scene.parameter` values are declared 0…40 (the union of the scenes' ranges) and checked against the chosen
+    scene's own range;
+  - `qualityProfile` level-1 has resolution and iteration shares of 0.5.
+- **Presenter:**
+  - one probe, "corner" at (0, 0), expected dark: every scene darkens its extreme corners to a quarter of the
+    preset's deepest colour, which also shows in exported files;
+  - `maxFramesPerSecond` is 30.
