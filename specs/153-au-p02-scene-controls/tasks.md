@@ -16,7 +16,7 @@ VisualCore change. Precedent: `specs/146-zg-p02-sand-renderer/tasks.md`. Rollbac
 
 ## Phase 2: Story 1 — choose and tune a sky (P1) 🎯
 
-- [ ] T-A21-203 [US1] Create `Packages/ExperiencesCreative/Aurora/Experience/{Adapter/AuroraCore.swift,AuroraPresenter.swift,
+- [X] T-A21-203 [US1] Create `Packages/ExperiencesCreative/Aurora/Experience/{Adapter/AuroraCore.swift,AuroraPresenter.swift, — Verified 2026-11-17: 2026-11-17: SkyCore (schema 1: scene, hue, limit; digest a21.aurora.v1; eight one-value actions with a21.not-whole for fractional integers; restore refusals; quality tiers level-0 and level-1), AuroraPresenter (one FullScreenShaderScene, fixedTime from SkyClock, 30 fps cap, rebuild from state), SkyBlend (1.5 s smoothstep, from the current blend, immediate under Reduce Motion), AuroraControls with spoken labels, AuroraExperience.make; .autonomy/checks/A21-P02.au-ios27.json exit 0; written by an agent, retested
   SkyBlend.swift,AuroraControls.swift,AuroraExperience.swift}` per data-model.md and contracts/experience.md:
   `AuroraCore` ("snapshot schema 1": the `SkyScene`, `hue` "−0.5…0.5 turns", `limit` "0.2…0.72, default 0.6"; digest
   of exactly these; actions `preset.select` "0…2 (integer)", `colour.hue`, `motion.speed` "0…2", `motion.turbulence`
