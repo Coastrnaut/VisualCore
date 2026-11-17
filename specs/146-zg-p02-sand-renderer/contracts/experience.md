@@ -9,3 +9,6 @@
 - **Preview:** visible with the rake's width and tine count during a drag; hidden after the lift or a cancel.
 - **Patterns:** each pattern commits one stroke through the same actions.
 - **Registration:** candidate `a20.digital-zen-garden`; the manifest is valid with its fixtures.
+- **As built:** the discard-on-begin rule, the at-cap outcome and message, the rule codes, the stored-value rgba8
+  comparison, the identifiers and the fixtures of data-model.md "As built" (GardenCoreTests, SandSceneTests,
+  GardenManifestTests).

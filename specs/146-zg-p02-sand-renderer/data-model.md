@@ -15,3 +15,14 @@
   `rebuild(from:)`, `stampInProgress(_:)`, `commit(_:)`.
 - **`BrushPreviewState`:** position (view points), direction, rake style, visible.
 - **`StrokePatterns`:** `rows`, `circle`, `wave`, `spiral`, each a list of points in 0…1.
+- **As built (convergence T-A20-213):**
+  - `stroke.begin` during a stroke discards the uncommitted one; there is no cancel action, and `cancelPointers` or a
+    cancelled phase ends a drag without a commit.
+  - At the stroke cap `stroke.end` is accepted with the garden unchanged: `lastRefusal` is `over-cap`, the outcome is
+    `refused-over-cap`, and the controls show "The garden holds 400 strokes. Undo one to rake again."
+  - Rule codes: `a20.invalid-choice`, `a20.no-stroke`, `a20.nothing-to-undo`, `a20.nothing-to-redo` and
+    `a20.<refusal code>`.
+  - The rgba8 read-back is compared in stored values (h × 0.5 + 0.5) within 1/255.
+  - Accessibility identifiers `experience.a20.digital-zen-garden.{rake, tone, undo, redo, pattern-rows,
+    pattern-circle, pattern-wave, pattern-spiral, message}`.
+  - Manifest fixtures `fixture-raked-garden`, `fixture-wide-rake`, `fixture-undo`, `fixture-redo`, `fixture-tone`.
