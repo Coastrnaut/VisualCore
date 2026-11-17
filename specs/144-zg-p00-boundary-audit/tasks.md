@@ -28,7 +28,7 @@ only).
 
 ## Phase 6: User Story 4 — Stop/go decision (P2)
 
-- [ ] T-A20-008 [US4] Complete the contract's `gaps` (every non-available row: owning module, VisualCore or app-local, and phase A20-P01..P06 per research D4; the brush-stamp pass, undo stack and named-garden store app-local per clarification Q4), the three manual risks as `negative` entries naming owner, verification method and release-blocker condition (source "manual §13 risk N"), and `decision` (keys `result`, `reasons`, `blockers`; "stop" if no working host, touch input or drawable persistent target); re-run the checker (`--name contract-2`) (FR-A20-003, FR-A20-006, SC-A20-002)
+- [X] T-A20-008 [US4] Complete the contract's `gaps` (every non-available row: owning module, VisualCore or app-local, and phase A20-P01..P06 per research D4; the brush-stamp pass, undo stack and named-garden store app-local per clarification Q4), the three manual risks as `negative` entries naming owner, verification method and release-blocker condition (source "manual §13 risk N"), and `decision` (keys `result`, `reasons`, `blockers`; "stop" if no working host, touch input or drawable persistent target); re-run the checker (`--name contract-2`) (FR-A20-003, FR-A20-006, SC-A20-002) — Verified 2026-11-17: 2026-11-17: 14 gaps, all app-local per clarification Q4 (G-DOCUMENT, G-STROKES, G-UNDO A20-P01; G-SAND, G-RELIEF, G-PREVIEW A20-P02; G-STONES, G-SELECTION, G-SHADOWS A20-P03; G-LIBRARY, G-A11Y A20-P04; G-QUIET, G-DEVICE A20-P05; G-RELEASE A20-P06); the three manual risks as negative entries with owner, verification and release-blocker condition; decision go, no blocker; .autonomy/checks/A20-P00.contract-2.json exit 0
 
 ## Phase 7: Polish and evidence
 

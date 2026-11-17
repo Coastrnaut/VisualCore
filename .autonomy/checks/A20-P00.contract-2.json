@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_app_contract.py",
+    "--app",
+    "digital-zen-garden"
+  ],
+  "command": "python3 scripts/check_app_contract.py --app digital-zen-garden",
+  "elapsed_seconds": 0.051,
+  "exit_code": 0,
+  "finished": "2026-11-17T07:54:23+00:00",
+  "log": ".autonomy/logs/A20-P00.contract-2.log",
+  "log_sha256": "42ff49e554c6413ad362c68c5b24ef3df10d406d54c18985dd43861143bc0a7e",
+  "name": "contract-2",
+  "stage": "A20-P00",
+  "started": "2026-11-17T07:54:23+00:00",
+  "timed_out": false
+}
