@@ -646,7 +646,7 @@
    "id": "M10",
    "capability": "Version 0.1 feature 05: saving and loading named gardens with a lightweight stroke history",
    "source": "manual v0.1 feature 05; spec clarification Q4",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
@@ -683,7 +683,7 @@
     "file": "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalBookmarks.swift",
     "symbol": "FractalBookmarks"
    },
-   "notes": "Experience storage with its quota and migration are tested (ExperienceStorageTests, SnapshotMigrationCheckTests). No named-document store over ExperienceStorage exists: NamedLibrary and DocumentStore take a directory URL, and Fractal Explorer's FractalBookmarks and Ambient Clock's AmbientFavourites are experience-local. The named-garden store with caps is G-LIBRARY (app-local, A20-P04) over the document G-DOCUMENT (A20-P01)."
+   "notes": "Experience storage with its quota and migration are tested (ExperienceStorageTests, SnapshotMigrationCheckTests). No named-document store over ExperienceStorage exists: NamedLibrary and DocumentStore take a directory URL, and Fractal Explorer's FractalBookmarks and Ambient Clock's AmbientFavourites are experience-local. The named-garden store with caps is G-LIBRARY (app-local, A20-P04) over the document G-DOCUMENT (A20-P01). G-LIBRARY closed in A20-P04 (LibraryTests, AccessibilityTests, BoundedHistoryTests, StillTests). Available."
   },
   {
    "id": "M11",
@@ -1077,7 +1077,7 @@
    "id": "M21",
    "capability": "Accessibility: native alternatives for every gesture (rake, place, rotate, delete, undo), VoiceOver descriptions of the garden, Dynamic Type, selection not by colour alone",
    "source": "spec FR-A20-003; constitution A20 accessibility",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreExperience/GestureAlternatives.swift",
@@ -1114,7 +1114,7 @@
     "file": "Packages/ExperiencesCreative/LightMaze/Experience/MazeGestures.swift",
     "symbol": "MazeGestures"
    },
-   "notes": "Tested in GestureAlternativesTests, AccessibilityPlansTests, ExperienceFeedbackTests and CanvasOverlayTests. The garden's controls, descriptions and layouts are G-A11Y (app-local, A20-P04)."
+   "notes": "Tested in GestureAlternativesTests, AccessibilityPlansTests, ExperienceFeedbackTests and CanvasOverlayTests. The garden's controls, descriptions and layouts are G-A11Y (app-local, A20-P04). G-A11Y closed in A20-P04 (LibraryTests, AccessibilityTests, BoundedHistoryTests, StillTests). Available."
   },
   {
    "id": "M22",
@@ -1593,7 +1593,7 @@
    "justification": "Named gardens saved and loaded in the experience's storage with caps; no named-document store over ExperienceStorage exists (NamedLibrary and DocumentStore take a directory URL; FractalBookmarks and AmbientFavourites are experience-local). No VisualCore change is planned (spec clarification Q4); a second user would justify moving it upstream later (Principle II).",
    "phase": 4,
    "test": "Experience tests: save, load, rename and delete named gardens within StorageQuota; damaged or newer files reported, not fatal; the stroke history survives a round trip",
-   "closed": null
+   "closed": "A20-P04"
   },
   {
    "id": "G-A11Y",
@@ -1605,7 +1605,7 @@
    "justification": "The garden's native controls for every gesture, VoiceOver descriptions and Dynamic Type layouts are its own interface (manual phase 04).",
    "phase": 4,
    "test": "Experience tests: GestureAlternatives.missing is empty for the declared gestures; every control has a label; descriptions summarise strokes and stones; announcements are rate-limited",
-   "closed": null
+   "closed": "A20-P04"
   },
   {
    "id": "G-QUIET",
