@@ -13,7 +13,7 @@ VisualCore change. Precedent: `specs/147-zg-p03-stones/tasks.md`. Rollback: reve
 
 ## Phase 2: Story 1 — one sky dissolves into the next (P1) 🎯
 
-- [ ] T-A21-302 [US1] Create `Packages/ExperiencesCreative/Aurora/Experience/SkyTransition.swift` and change
+- [X] T-A21-302 [US1] Create `Packages/ExperiencesCreative/Aurora/Experience/SkyTransition.swift` and change — Verified 2026-11-17: 2026-11-17: SkyTransition (CrossfadeScene of the shown moving sky and a new sky in a second shader slot; 2.0 s of frame time, smoothstep; replaceIncoming on a new choice; immediate under Reduce Motion; torn down at the end keeping the incoming sky) used by AuroraPresenter, SkyBlend kept for control changes; .autonomy/checks/A21-P03.au-ios27.json exit 0; written by an agent, retested
   `AuroraPresenter.swift` per data-model.md: a `CrossfadeScene` of the outgoing and incoming skies (two moving
   `FullScreenShaderScene`s, each under the limit), progress "over 2.0 s of frame time, smoothstep", a new choice
   mid-change through `replaceIncoming`, immediate under Reduce Motion; the A21-P02 input blend stays for control
