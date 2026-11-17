@@ -24,6 +24,56 @@ Canonical overrides:
   drift" are drawn procedurally in the shader.
 - Follow `specs/126-ia-p03-layers-search` and `specs/132-ac-p02-overlay-theme`.
 
+## Clarifications
+
+### Session 2026-11-16
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- `RenderContext.redirected(to:width:height:)` redirects a scene to another framebuffer.
+- `ResourceRegistry.makeRenderTarget(width:height:format:depth:label:)` and `RenderTarget.bind`, `bindColor(unit:)`
+  and `readPixels` exist.
+- `RenderHost.replaceScene` is a hard cut.
+- `transitionDuration(_:reduceMotion:)` (VisualCoreSimulation) gives 0 under Reduce Motion.
+- `NamedLibrary<Payload>` (VisualCorePersistence) holds entries with a name of at most 60 characters, a favourite
+  flag and a payload, and is validated through a `DocumentStore` with a `MigrationChain`.
+- Snapshot schemas above 1 need registered schema examples (`AnatomySchemaExamples.swift`, X-A17).
+
+- Q: Where does the crossfade live? → A: In VisualCoreRendering, as an additive `CrossfadeScene: RenderScene`. It
+  has two consumers: A18's theme change, and Generative Art Studio's family switch, which keeps its cut for now.
+  - It owns two `RenderTarget`s of the drawable size and draws the outgoing and the incoming scene into them through
+    `context.redirected`.
+  - It mixes them in one full-screen pass with `progress` 0…1 (linear mix in display space), and rebuilds both
+    targets on resize and in `setup` after a context loss.
+  - Under Reduce Motion the caller sets the duration with `transitionDuration` (0, a cut).
+  - Existing scenes are unchanged.
+- Q: Which themes, palettes and budgets? → A: Four themes, each a fragment over `vc/`:
+  - `noise-gradient`: the existing theme, fbm with 5 / 3 octaves;
+  - `particle-drift`: hashed cells holding one soft disc each, drifting; 48 / 24 cells along the shorter side;
+  - `wave-field`: the sum of sine waves; 6 / 3 waves;
+  - `sdf-shapes`: slowly rotating SDF circles and rounded boxes; 8 / 4 shapes.
+
+  Each theme has three curated dark palettes of four colours. White text MUST reach at least 4.5 : 1 against every
+  colour (a test checks all 12 palettes). The budgets per level are the counts above, and one draw (two during a
+  crossfade plus the mix).
+- Q: What is a theme preset, and what changes in the saved state? → A: `ThemePreset` holds:
+  - `theme` (0–3), `palette` (0–2), `speed` (0.25–2) and `motion` (0/1);
+  - kind `a18.theme-preset`, schema 1, at most 4,096 bytes;
+  - refusals `damaged`, `newer-version`, `too-large` and `out-of-range`.
+
+  The experience snapshot moves to schema 2, adding `theme` and `palette`. Schema 1 migrates to theme 0 and palette 0,
+  with registered schema-1 and schema-2 examples. New controls: `theme.select` [0…3] and `theme.palette` [0…2].
+- Q: How are favourites stored and capped? → A: In a `NamedLibrary<ThemePreset>` in the experience's
+  `ExperienceStorage` (directory `favourites`, kind `a18.favourites`). Up to 12 entries; a 13th is refused as
+  `over-cap`.
+  - Names are trimmed and limited to 60 characters; an empty name becomes "Favourite N".
+  - A duplicate name is refused as `duplicate-name`.
+  - Applying a favourite sends `theme.select`, `theme.palette`, `theme.speed` and `theme.motion`.
+  - A damaged library file is set aside by the store, and the list is empty with its problem shown.
+- Q: How long is the crossfade, and what happens on repeated changes? → A: 1.2 s, eased with smoothstep; 0 under
+  Reduce Motion. A new change during a crossfade starts a new one from the current mixed picture: the outgoing
+  target keeps the last mixed frame.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Four calm themes, all readable (Priority: P1) 🎯
