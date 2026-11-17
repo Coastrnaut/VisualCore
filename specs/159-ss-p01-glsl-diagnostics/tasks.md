@@ -50,7 +50,7 @@
     `uniform float u_time;`, `uniform vec2 u_resolution;`, `out vec4 fragColor;`, `#include "vc/noise.glsl"`,
     `#include "vc/color.glsl"`), `ss/shader.frag` (the source unchanged) and `ss/main.frag` (the two includes);
   - `DiagnosticMapper` keeps diagnostics of `ss/shader.frag` on their line and sends the others to "outside".
-- [ ] T-A22-107 [P] [US3] Write `Packages/ExperiencesCreative/ShaderStudio/CoreTests/{AssemblyTests,LineMappingCompileTests}.swift`
+- [X] T-A22-107 [P] [US3] Write `Packages/ExperiencesCreative/ShaderStudio/CoreTests/{AssemblyTests,LineMappingCompileTests}.swift` — Verified 2026-11-17: 2026-11-17: AssemblyTests and LineMappingCompileTests: five broken fixtures (unknown identifier line 4, type mismatch line 7, missing semicolon line 3, a vc_fbm line 5, after a block comment line 7) compiled through ResourceRegistry.program on the iOS 27.2 simulator's ANGLE each name ss/shader.frag and the authored line; a test-include error stays outside; a valid source gives none; CompileSupport compiles only (no GL call, isolation PASS); .autonomy/checks/A22-P01.ss-core-ios27-2.json and A22-P01.isolation.json exit 0; written by an agent, the GL calls removed by the lead, retested
   (SC-A22-102):
   - the assembly texts are exact;
   - the five broken-shader fixtures of clarification Q5 are compiled through `ResourceRegistry.program` with
