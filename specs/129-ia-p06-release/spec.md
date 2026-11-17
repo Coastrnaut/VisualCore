@@ -163,7 +163,8 @@ camera) and draws. Its interface tests run in a chunk of their own.
 ### Functional Requirements
 
 - **FR-A17-601**: A privacy-and-credits page MUST list the stored file, its place and deletion, "nothing is sent",
-  and the license inventory: pack sources, procedural geometry, review record, colours.
+  and the license inventory: pack sources, procedural geometry, review record, colours. A17 adds no permission
+  request and no usage-description string (the app's usage-description check stays unchanged).
 - **FR-A17-602**: A source scan MUST find no network, tracking or advertising API in the experience.
 - **FR-A17-603**: A drawing failure MUST fail the session with a message, leave the saved view file unchanged, and a
   new session MUST open with it.
