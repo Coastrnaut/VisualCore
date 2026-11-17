@@ -36,6 +36,8 @@ noise.
   | The ambient loop player in VisualCoreAudio (upstream); the low-power static view, the reduced-flash mode and the static fallback frame; GPU targets released on theme changes | A21-P04 |
   | The ambient loop with its own control in the experience; long-run thermal and comfort device plan; low-power cadence without a time jump | A21-P05 |
   | Release | A21-P06 |
+- **D4a Numbers later:** the luminance cap's value, the comfort bounds on ribbon frequency and brightness, and the
+  parameter ranges are decided with their tests in A21-P01 and A21-P02; this audit fixes only who owns them.
 - **D5 Permissions:** none. The loop and any tone use the ambient session and need no microphone; nothing uses
   location.
 - **D6 Sound:** synthesised, never a recording (manual risk 3 met by construction).
