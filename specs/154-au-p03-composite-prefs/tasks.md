@@ -38,7 +38,7 @@ VisualCore change. Precedent: `specs/147-zg-p03-stones/tasks.md`. Rollback: reve
 ## Phase 4: Story 3 — the sound choice outlives the drawing (P1)
 
 - [ ] T-A21-306 [US3] Add the sound control (on/off and volume, spoken labels, plays nothing) to
-  `AuroraControls.swift`, kept only in the preferences; `ExperienceTests/SoundChoiceTests.swift`: unchanged after
+  `AuroraControls.swift`, kept only in the preferences (no engine action: the snapshot, digest and manifest are unchanged); `ExperienceTests/SoundChoiceTests.swift`: unchanged after
   teardown, setup, `recreateContext`, resize, suspend and resume (FR-A21-305, 306; SC-A21-303)
 
 ## Phase 5: Records and evidence
