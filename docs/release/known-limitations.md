@@ -361,6 +361,33 @@ and `VisualCoreRendering` (iOS, GL). ADR-0003 and the package map record this. R
   damaged, newer, foreign or oversized file (more than 65,536 bytes) is refused and left as it is, and the opening
   view opens; view schema 1 opens migrated.
 
+### Ambient Clock (A18; features 130–136)
+
+- The overnight runs on power and on battery, the heat over 30 minutes, the memory high-water mark and the frame
+  pacing are unmeasured on devices; they wait for the device campaign
+  ([device-campaign.md](../apps/ambient-clock/device-campaign.md), rows AC-D1 to AC-D5). No frame-time, thermal,
+  power, battery or memory figure is stated.
+- The screen-care drift on OLED (row AC-D6), night readability in a dark room (row AC-D7), time changes made in the
+  device's Settings (row AC-D8), VoiceOver and Dynamic Type on hardware (row AC-D9) and the system accessibility audits
+  (row AC-D10) wait for the device campaign; the spoken time, the labels and values of the controls, the one-line time
+  at the largest text size, the contrast of the text and the motion rules are proved by the experience's tests on the
+  simulator only.
+- The clock shows the device's system time, formatted with the system's calendar, time zone and locale; it is as
+  correct as the system clock and reads no other time source. The text changes at each whole minute, or each whole
+  second with seconds shown. No alarms, timers, weather or network content.
+- Four themes in version 0.1 (Noise Gradient, Particle Drift, Wave Field and SDF Shapes), each with three fixed
+  palettes and no palette editor; two drawing levels, `level-0` and `level-1`. A theme whose shader fails to compile
+  keeps the previous theme; a failure of the noise gradient at setup fails the session with its message.
+- Night mode dims and warms only the drawing and turns the text warm amber; it never changes the system brightness.
+  The schedule is set in 15-minute steps.
+- Screen care moves the time and the scene by at most 8 points on either axis and dims them to 0.6 after ten minutes
+  without an action; under reduced motion there is no drift. It is not a guarantee against image retention.
+- Keep-awake is off by default, turned on only by the person, and holds the screen on only while the clock is open and
+  in the foreground; leaving the clock releases it.
+- At most 12 favourites, kept in `favourites.json` on the device only (no sync, no export); a 13th is refused with its
+  sentence. A damaged, newer, too large or invalid favourites file gives an empty list and is left as it is until the
+  next save, which replaces it. The settings are kept in the snapshot (schema 3); schemas 1 and 2 open migrated.
+
 ## Distribution
 
 - No App Store submission, signing or purchase setup is part of this release; those are owner actions.
