@@ -27,6 +27,80 @@ Canonical overrides:
   update and the reference regression in two chunks.
 - Follow `specs/132-ac-p02-overlay-theme`.
 
+## Clarifications
+
+### Session 2026-11-17
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- `StillImageEncoder.pngData` (`VisualCoreRendering/StillImage.swift`) builds an opaque sRGB `CGImage` and writes it
+  through `CGImageDestinationCreateWithData`. `OffscreenRenderError` is a public enum with the case `encoding`, and
+  adding a case would break exhaustive switches in consumers.
+- `ExperienceSession.renderStill(width:height:)` always passes `time: 0` to `RenderHost.renderOffscreen`, and
+  `ExperienceHostView` puts it in the environment as `experienceStillRenderer` (`ExperienceHostView.swift:277`).
+- `FullScreenShaderScene` sets `u_time` from `fixedTime`, or else from the frame time × `timeScale`.
+  `renderOffscreen` passes its `time` as the frame time.
+- `ResourceRegistry.stats` (`ResourceLedger.Snapshot`) gives the live count per kind and the live bytes; Audio
+  Odyssey's long-session test already compares them. `TemporaryFolder` has `fileCount` and `removeAll()`.
+- The planning catalog's design has five regression fixtures, so the content audit requires five manifest fixtures.
+  A18's themes are inline fragment sources (`ThemeShaders.swift`).
+- The phase starts at `43a6f0ca` (the specify commit).
+
+- Q: What does the encoder addition look like? → A: Additive and source-compatible in `VisualCoreRendering`:
+  - `public enum StillImageFormat: String, CaseIterable, Sendable { png, jpeg, heic }` with its uniform type
+    identifier;
+  - `StillImageEncoder.data(_:format:quality:)`, where quality is 0…1 with a default of 0.9 and is ignored for PNG.
+    It writes an opaque `CGImage` tagged sRGB through the same destination path. `pngData` stays and calls it;
+  - `StillImageEncoder.isAvailable(_:)`, which is true when the format's identifier is in
+    `CGImageDestinationCopyTypeIdentifiers()`. An unavailable format throws `.encoding`. The experience refuses it
+    before any rendering, with its own named reason `format-unavailable`.
+
+  Tests read every written file back: the width, the height, the colour space name `kCGColorSpaceSRGB`, and the type
+  identifier. JPEG pixels are compared within a tolerance, PNG exactly. HEIC is tested where `isAvailable(.heic)` is
+  true, and the test records the result; on the iOS 27.2 simulator it is expected true.
+- Q: How does a still get its time? → A: Additive in `VisualCoreExperienceHost`:
+  - `ExperienceSession.renderStill(width:height:time:)`; the two-argument form keeps passing 0;
+  - `ExperienceStillRenderer` gains `init(timed:)` and `callAsFunction(width:height:time:)`. The existing `init`
+    maps to time 0, so existing callers are unchanged;
+  - `ExperienceHostView` installs the timed renderer.
+
+  Living Wallpapers' scenes take `u_time` from the frame, scaled by the motion speed. Under Reduce Motion or with
+  motion off, `fixedTime` is the chosen animation time, so an export at that time matches the still preview.
+- Q: How are the four scenes drawn? → A: One `FullScreenShaderScene` per scene. The inline fragment sources use the
+  GLSL library (`vc/noise`, `vc/palette`, `vc/hash`, `vc/sdf`), with uniforms for the four preset colours, the
+  scene's parameters and the seed:
+  - **level-0:** full detail;
+  - **level-1:** fewer octaves and cells, with the pixel block of A18's pattern.
+
+  Equal state and time give identical pixels. The scene and the preset change by recompiling or updating uniforms;
+  there is no crossfade in this phase.
+- Q: How is the crop frame computed and shown? → A: Pure geometry in the core, so it is testable without the GPU:
+  - `CropFrame.fit(template:orientation:canvasWidth:canvasHeight:margin:)` gives the template's rectangle
+    aspect-fitted and centred inside the canvas, with a margin of 0.06 of the short canvas edge, plus the three guide
+    bands in canvas points;
+  - the experience's canvas overlay (SwiftUI, native) draws the frame outline, shades outside it, and marks the
+    guide bands. Its accessibility label names the template, the orientation and the pixel size.
+- Q: What is an export attempt, and how are cancelling and retrying proven? → A: `StillExport` in the experience,
+  on the main actor:
+  - **Steps:** plan (the A19-P01 planner, maxEdge = `RenderHost.maxRenderSize`), then render
+    (`renderStill(width:height:time:)`), then encode, then verify by reading back, then write one file into
+    `TemporaryFolder("LivingWallpapers-Export")`;
+  - **Cancelling:** a cancel flag checked after each step, or a failure at any step, removes that attempt's file.
+    The render target is released by `renderOffscreen` itself on every path;
+  - **The fixture:** in `ExperienceTests`, on the simulator with the real host, the live counts of
+    `host.resources.stats` and the folder's `fileCount` are compared before and after:
+    - a cancel after render;
+    - a cancel after encode;
+    - a failure from an oversize plan;
+    - a retry at the offered size.
+
+    The live picture still renders afterwards.
+
+  The manifest's five fixtures are `fixture-scene-ink-flow`, `fixture-preset-third`, `fixture-template-ipad-landscape`,
+  `fixture-time-set` and `fixture-parameter-changed`. The controls are `scene.select [i]`, `scene.preset [i]`,
+  `scene.parameter [index, value]`, `canvas.template [i]`, `canvas.orientation [0|1]`, `scene.time [seconds]`,
+  `export.format [i]` and `motion.enabled [0|1]`. Snapshot schema 1.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - See the background framed for the chosen device (Priority: P1) 🎯
