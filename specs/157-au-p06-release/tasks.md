@@ -11,7 +11,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T-A21-601 Baseline: cite the A21-P05 evidence (`.autonomy/checks/A21-P05.{au-ios27-2,app-ui,verify-27}.json`) on
+- [X] T-A21-601 Baseline: cite the A21-P05 evidence (`.autonomy/checks/A21-P05.{au-ios27-2,app-ui,verify-27}.json`) on — Verified 2026-11-17: 2026-11-17: A21-P05 evidence cited: .autonomy/checks/A21-P05.au-ios27-2.json, A21-P05.app-ui.json and A21-P05.verify-27.json, all exit 0; no Packages, Apps or project.yml change since the A21-P05 record commit 40aa885c
   the tree recorded at A21-P05 (`40aa885c`), whose Packages, Apps and project.yml are unchanged since (owner ruling of
   2026-11-14)
 
