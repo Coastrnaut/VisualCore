@@ -582,7 +582,8 @@ let package = Package(
                                .product(name: "VisualCoreRendering", package: rendering),
                                .product(name: "VisualCoreExperienceHost", package: rendering),
                                .product(name: "VisualCoreUI", package: rendering)],
-                    path: "InteractiveAnatomy/ExperienceTests"),
+                    path: "InteractiveAnatomy/ExperienceTests",
+                    resources: [.copy("Fixtures")]),
         // A15 Molecular Explorer (feature 110, A15-P01): a candidate until X-A15. The core is pure (Foundation and
         // VisualCoreMath for the scene and camera of feature 111).
         // A16 Simulation Lab (feature 117, A16-P01): a candidate until X-A16. The core is pure (Foundation and VisualCore
