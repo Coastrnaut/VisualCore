@@ -23,3 +23,7 @@ of the constitution (2.16.0).
 | [visualcore-contract.json](visualcore-contract.json) / [.md](visualcore-contract.md) | Phase 00 inventory, capability matrix, gaps, decision (checked by `scripts/check_app_contract.py`) |
 | [regression-baseline.md](regression-baseline.md) | Phase start, reference pin, the ProjectM reference regression results |
 | [device-campaign.md](device-campaign.md) | Device campaign plan, rows ZG-D1 to ZG-D8, all pending until after `ImplementationLock-100` |
+| [privacy-and-credits.md](privacy-and-credits.md) | Phase 06 stored data, the temporary picture, permissions, what is not done, the license inventory |
+| [store-listing.md](store-listing.md) | Phase 06 store text input with the claim → proving-test table |
+| [release-checklist.md](release-checklist.md) | Phase 06 release checklist (verified, pending device campaign, owner action) and artifact inventory |
+| [release.json](release.json) | Release configuration read by `scripts/check_experience_release.py` and `scripts/release_check.py` |

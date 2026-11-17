@@ -43,7 +43,7 @@ migration, no VisualCore change).
 
 ## Phase 4: Story 3 — copy and checklist (P1)
 
-- [ ] T-A20-606 [US3] Write the release documents in `docs/apps/digital-zen-garden/`: `store-listing.md` (claims each
+- [X] T-A20-606 [US3] Write the release documents in `docs/apps/digital-zen-garden/`: `store-listing.md` (claims each — Verified 2026-11-17: 2026-11-17: store-listing.md (sound, no physics, health or measured claim; claims table with 38 proving tests and the three ZG interface classes), release-checklist.md (36 rows: 25 verified, 8 pending-campaign-ii ZG-D1 to ZG-D8, 3 owner-action), release.json (copyCheck.allow share), known-limitations section Digital Zen Garden (A20; features 144-150), README table; check_experience_release exit 0, check_copy_claims exit 0, validate_docs exit 0; written by an agent, reviewed
   with a proving test or interface class; "sound", never "audio" or "music"; no physics, health or measured claim),
   `release-checklist.md` (rows verified, pending-campaign-ii ZG-D1–ZG-D8, owner-action: signing, archive, upload),
   `release.json` per data-model.md (`copyCheck.allow` `["share"]`), the section `### Digital Zen Garden (A20; features 144–150)` of

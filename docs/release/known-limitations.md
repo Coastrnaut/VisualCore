@@ -415,6 +415,28 @@ and `VisualCoreRendering` (iOS, GL). ADR-0003 and the package map record this. R
   memory or timing figure is stated; the simulator's limit is larger than every template, so no template is refused
   there.
 
+### Digital Zen Garden (A20; features 144–150)
+
+- No granular material physics. The sand is a height field changed by each rake stroke and drawn as a lit relief in
+  code; grains do not pile, flow or slide, and stones do not push sand. With the sand drift on, only the grain pattern
+  moves; Reduce Motion keeps the picture still.
+- No online gallery, sign-in or multiplayer. Gardens are saved on the device only (no sync); the picture leaves the
+  app only when the person hands it to the system share sheet.
+- One picture size in version 0.1: Make picture writes one PNG of 1600 by 1200 pixels, tagged sRGB, into the temporary
+  folder `DigitalZenGarden-Still`, which holds at most one file. No other size, format or crop.
+- The library holds at most 12 named gardens (unreadable files count until the person deletes them); a name is 1 to 40
+  characters. A damaged, newer or too large garden file is listed as unreadable and is never opened or deleted
+  automatically; an index of a newer version makes the library read only.
+- The undo history keeps the newest 100 commands; older ones fold into a checkpoint and cannot be undone. The history
+  restarts after a restore or when a saved garden is opened. A garden holds at most 24 stones and 400 strokes, and a
+  stroke at most 512 points.
+- The calm switches (sound, sand drift, haptics) are off by default and kept as the experience value `calm.v1`; the
+  tones are made in code and follow the silent switch.
+- Touch-to-groove latency, fast drags, idle drawing, heat, energy use during a long session, precision on the smallest
+  phone, the quiet defaults with the silent switch and the system accessibility audits wait for the device campaign
+  ([device-campaign.md](../apps/digital-zen-garden/device-campaign.md), rows ZG-D1 to ZG-D8). No latency, thermal,
+  energy or timing figure is stated.
+
 ## Distribution
 
 - No App Store submission, signing or purchase setup is part of this release; those are owner actions.
