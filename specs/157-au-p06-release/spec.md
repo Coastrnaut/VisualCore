@@ -168,8 +168,8 @@ the still and reduced-flashing views off.
 
 ### Functional Requirements
 
-- **FR-A21-601**: A privacy-and-credits page MUST list the stored data (snapshot, saved choices), its place and
-  removal, "nothing is sent", "no permission is asked", that the screen is never kept awake nor its brightness
+- **FR-A21-601**: A privacy-and-credits page MUST list the stored data (snapshot, saved choices), its place (the
+  experience's own storage, replaced on each change) and its removal (when the app is deleted), "nothing is sent", "no permission is asked", that the screen is never kept awake nor its brightness
   changed, and the licence inventory.
 - **FR-A21-602**: A source scan MUST find no network, location, tracking, sensor, microphone, camera, idle-timer or
   brightness API in the experience.
