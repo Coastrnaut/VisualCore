@@ -48,3 +48,7 @@ manifest regeneration, contract, commits.
 
 MVP: stone commands and drawing (302–304). Selection (305) and the orientation fixture (306) close the manual's gates.
 Review checkpoints after 304 and at 307.
+
+## Phase 7: Convergence
+
+- [ ] T-A20-311 Record the as-built design in `specs/147-zg-p03-stones/data-model.md` and `contracts/stones.md`: the stone target stores (height, (kind + 1)/5, 0, 1) without an offset in both formats; `stone.place` also selects the new stone; the stone cap is refused with `a20.stone-cap` (the message shown until the garden is below the cap) and selection codes `a20.no-selection`, `a20.unknown-stone`; a move or turn to the current value is accepted without a command; the presenter and nudges clamp before sending and the core clamps again; a positive rotation turns clockwise on screen ("Turn right" +15°) and a two-finger turn sends the old rotation minus the recognizer's angle, wrapped; a tap lifts within 10 points; cycling from no selection gives the lowest ("Next") or highest ("Previous") stone and the place counts from the lowest; the selection clears after an undo or redo whose stone is gone, a restore or a reset, and survives a tool change; the shadow uses five taps at 2…10 cells, occlusion smoothstep(0, 2, height × 12 cells − d) and a 40 % darkening; the five stone fixtures and six rejection entries per FR-A20-301, FR-A20-302, FR-A20-303 (partial)
