@@ -19,7 +19,8 @@ This closes G-PREVIEW and G-RUN. Research: [research.md](research.md). Data: [da
 
 - **Language:** Swift 6, SwiftUI.
 - **Dependencies:** the experience → `ShaderStudioCore`, `VisualCoreShaderSource`, `VisualCoreParameters`,
-  `VisualCoreExperience`, `VisualCoreDiagnostics`, `VisualCoreRendering`, `VisualCoreExperienceHost`, `VisualCoreUI`.
+  `VisualCoreExperience`, `VisualCoreRendering`, `VisualCoreExperienceHost`, `VisualCoreUI` (`VisualCoreDiagnostics` waits for
+  the A22-P04 watchdog).
   Only APIs verified at A22-P00 and A22-P01 are used:
   - `ExperienceControl`, `ExperienceShell` and `ExperiencePresenter`;
   - `context.resources.program`, `FullScreenShaderScene` and `ShaderBundle(files:)`;
