@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesCreative",
+    "--scheme",
+    "ExperiencesCreative-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "DigitalZenGardenCoreTests",
+    "DigitalZenGardenExperienceTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing DigitalZenGardenCoreTests DigitalZenGardenExperienceTests",
+  "elapsed_seconds": 12.995,
+  "exit_code": 0,
+  "finished": "2026-11-17T09:42:37+00:00",
+  "log": ".autonomy/logs/A20-P05.zg-ios27.log",
+  "log_sha256": "fb3a2812e9717d3e4f4a901ac8c78803961a72d06730e8834012fbb58e8dbf2b",
+  "name": "zg-ios27",
+  "stage": "A20-P05",
+  "started": "2026-11-17T09:42:24+00:00",
+  "timed_out": false
+}
