@@ -30,6 +30,55 @@ Canonical overrides:
   `docs/release/build-and-archive.md`.
 - Follow `specs/129-ia-p06-release`.
 
+## Clarifications
+
+### Session 2026-11-16
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- `scripts/release_check.py` builds `experience-release-<code>` and `copy-claims-<code>` from
+  `docs/apps/<slug>/release.json`, and the A18 interface chunk is `z2` (A18-P05).
+- The shared denylist refuses measured numbers next to `hours` (a "24 hour" phrase would match; "24-hour" does not),
+  the word `battery`, frame-rate phrases, `instant`, `smooth` and `share`, among others.
+- The presenter has the seam `failNextThemeCompile` (A18-P03), but no drawing-failure seam yet.
+- `AmbientFavourites` writes `favourites.json` through `ExperienceStorage` (A18-P03). The snapshot is schema 3 with
+  examples for 1, 2 and 3 (A18-P04).
+
+- Q: Which statuses does the release checklist use? → A: The checker's:
+  - `verified`, with evidence;
+  - `pending-campaign-ii`, for device rows naming AC-D1 … AC-D10 of `docs/apps/ambient-clock/device-campaign.md`;
+  - `owner-action`, with the steps of `docs/release/build-and-archive.md`.
+- Q: Which words does the experience's own scan refuse? → A: It scans the store text and the interface Swift (controls,
+  overlay, presenter and the adapter's words), matching whole words case-insensitively:
+  - accurate, accuracy, atomic, precise, precision, exact time, synchronized, synced;
+  - always on, always-on, never sleeps, screen stays on, burn-in proof, burn-in free;
+  - weather, forecast, temperature, location;
+  - fps, real-time, low power, energy-saving.
+
+  The shared copy check runs with no extra allowance. Every test named in the claims table must exist.
+- Q: What does the source scan refuse? → A: The A17 list, in `Packages/ExperiencesCreative/AmbientClock`:
+  - `URLSession`, `import Network`, `CLLocation`, `AVCapture`, `AVAudioRecorder`, `inputNode`, `installTap`,
+    `CMMotion`, `CNContact`, `PHPhotoLibrary`, `UIImagePickerController`, `ASIdentifierManager` and
+    `AppTrackingTransparency`;
+  - any `brightness =` write.
+
+  `isIdleTimerDisabled` is allowed only in `Experience/KeepAwake.swift`, and the scan fails if it appears in any other
+  file or not at all.
+- Q: How are crash recovery and sample files proved? → A:
+  - **Crash recovery:** a test-only `failNextDraw` seam in the presenter makes the next draw throw once. A test saves
+    two favourites to a temporary storage, sets the seam and draws, so the session fails. `favourites.json` must be
+    byte-identical, and a new session over the same storage opens and lists both.
+  - **Sample files:** committed fixtures under `ExperienceTests/Fixtures/`:
+    - snapshot payloads `snapshot-v1.json`, `snapshot-v2.json` and `snapshot-v3.json` (from the schema examples), plus
+      `snapshot-newer.json` and `snapshot-damaged.json`;
+    - `favourites-current.json`, `favourites-newer.json` and `favourites-damaged.json`.
+
+    v1 to v3 restore (older ones migrated); newer and damaged are refused; favourites load or report their problem;
+    every file stays byte-identical.
+- Q: Which interface journey runs? → A: `ACThemeUITests` joins chunk `z2`: pick the theme "Wave Field", save a
+  favourite named "Evening", switch the theme back, then apply "Evening", and the theme control shows "Wave Field"
+  again. It takes under 60 s.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Nothing leaves the device and everything is disclosed (Priority: P1) 🎯
