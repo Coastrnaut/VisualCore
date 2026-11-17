@@ -51,3 +51,7 @@ commits.
 
 MVP: the catalog and project (103–105). The planner, templates and fixture (106–108) prove the regression rule; the
 decision and scan (109, 110) close the platform risk. Review checkpoints after 108 (fixture passes) and at 112.
+
+## Phase 6: Convergence
+
+- [ ] T-A19-115 Record the as-built additions in `specs/138-lw-p01-export-contract/data-model.md` and `contracts/core.md`: `ExportRefusal.unknownTemplate(String)` (a project built in code with an unknown template) and `ExportRefusal.offeredPlan(format:)` (the offered size as a plan with `fallback: true`, the only fallback plan); `WallpaperProject.resolvedParameters` (a scene parameter absent from a file takes its default, a subset is not refused; unknown ids, non-finite or out-of-range values are `invalid-parameter`, and so is an animation time outside 0…3600, with id `animationTime`); `RGBColor` clamps to 0…1 with a non-finite component becoming 0, and has `init(hex:)` per plan: data model (unrequested)
