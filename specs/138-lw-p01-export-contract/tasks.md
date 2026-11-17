@@ -10,7 +10,7 @@ stored data exists yet).
 ## Phase 1: Setup
 
 - [X] T-A19-101 Baseline: cite the A19-P00 evidence (`.autonomy/checks/A19-P00.{app-build,no-change,experience-packages}.json`) on an unchanged `Packages` tree instead of a rerun (owner ruling of 2026-11-14) — Verified 2026-11-17: 2026-11-17: A19-P00 evidence cited: .autonomy/checks/A19-P00.app-build.json, A19-P00.no-change.json and A19-P00.experience-packages.json, all exit 0; no Packages, Apps or project.yml change since the A19-P00 record commit 6efbd66f
-- [ ] T-A19-102 Add the targets `LivingWallpapersCore` (path `LivingWallpapers/Core`, dependencies `VisualCoreScenes` and `VisualCoreExperience`) and `LivingWallpapersCoreTests` (path `LivingWallpapers/CoreTests`, dependencies the core, `VisualCoreScenes` and `VisualCoreRendering`) to `Packages/ExperiencesCreative/Package.swift` (lead), with a comment naming feature 138 and "a pending core until A19-P02 adds the experience"
+- [X] T-A19-102 Add the targets `LivingWallpapersCore` (path `LivingWallpapers/Core`, dependencies `VisualCoreScenes` and `VisualCoreExperience`) and `LivingWallpapersCoreTests` (path `LivingWallpapers/CoreTests`, dependencies the core, `VisualCoreScenes` and `VisualCoreRendering`) to `Packages/ExperiencesCreative/Package.swift` (lead), with a comment naming feature 138 and "a pending core until A19-P02 adds the experience" — Verified 2026-11-17: 2026-11-17: LivingWallpapersCore (VisualCoreScenes, VisualCoreExperience) and LivingWallpapersCoreTests (the core, VisualCoreScenes, VisualCoreRendering) added to Packages/ExperiencesCreative/Package.swift; the package builds and tests in .autonomy/checks/A19-P01.lw-core-ios27.json exit 0
 
 ## Phase 2: Story 1 — curated backgrounds and the project (P1) 🎯
 

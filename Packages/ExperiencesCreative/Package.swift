@@ -585,6 +585,18 @@ let package = Package(
                                .product(name: "VisualCoreUI", package: rendering)],
                     path: "InteractiveAnatomy/ExperienceTests",
                     resources: [.copy("Fixtures")]),
+        // A19 Living Wallpapers (feature 138, A19-P01): a pending core until A19-P02 adds the experience. The core is
+        // pure (Foundation, ImageIO and the export geometry of VisualCoreScenes) and draws nothing; its tests encode
+        // through VisualCoreRendering's still encoder on the CPU to prove the written file's size and colour profile.
+        .target(name: "LivingWallpapersCore",
+                dependencies: [.product(name: "VisualCoreScenes", package: visualCore),
+                               .product(name: "VisualCoreExperience", package: visualCore)],
+                path: "LivingWallpapers/Core"),
+        .testTarget(name: "LivingWallpapersCoreTests",
+                    dependencies: ["LivingWallpapersCore",
+                                   .product(name: "VisualCoreScenes", package: visualCore),
+                                   .product(name: "VisualCoreRendering", package: rendering)],
+                    path: "LivingWallpapers/CoreTests"),
         // A18 Ambient Clock (feature 131, A18-P01): a pending core until A18-P02 adds the experience. The core is pure
         // (Foundation, the clock source of VisualCoreExperience and the planner of VisualCoreSimulation) and reads no
         // clock: the time enters as actions.
