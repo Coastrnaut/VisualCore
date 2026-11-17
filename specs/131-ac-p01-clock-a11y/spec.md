@@ -26,6 +26,58 @@ Canonical overrides:
   the registration come in A18-P02, so nothing appears in the app now.
 - Follow `specs/124-ia-p01-content-schema`.
 
+## Clarifications
+
+### Session 2026-11-16
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- `VisualCoreExperience` imports no UIKit or SwiftUI and is tested on the host with `swift test`.
+- `ExperienceCore.prepare(seed:)` must use no clock (`ExperienceCore.swift`), so the wall time can enter a core only
+  as an action.
+- The presenter protocol (`VisualCoreExperienceHost/ExperiencePresenter.swift`) receives no scene phase. Music Lab,
+  Oscilloscope Studio and Audio Odyssey observe `willEnterForeground` themselves, and Solar System Explorer injects
+  `now: () -> Date` in its experience target (`SolarPresenter.swift:223`).
+- `AnnouncementPlanner(minimumInterval:)` (default 0.5 s) is public in `VisualCoreSimulation`.
+- The phase starts at `ee5767a3` (the specify commit). No A18 source exists yet.
+
+- Q: Where does the clock source live? → A: In VisualCore, as G-CLOCK proposes, because it has two consumers.
+  - `VisualCoreExperience` (Foundation only) gets `ClockSource` (the current instant), `SystemClock` (the default:
+    `Date()`, no offset), `FixedClock` (tests and replays), `TimeChangeKind` (foreground, significantTime, timeZone,
+    locale, calendarDay) and `TimeChangeMonitor`. The monitor maps notification names to kinds over an injected
+    `NotificationCenter` and reports one event per notification. Its Foundation names are `NSSystemTimeZoneDidChange`,
+    `NSCurrentLocaleDidChange` and `NSCalendarDayChanged`.
+  - `VisualCoreExperienceHost` (UIKit) adds the application names: `significantTimeChangeNotification` and
+    `willEnterForegroundNotification`.
+  - A14's "Now" keeps its own code in this phase; moving it to the shared source is not required.
+- Q: Which targets come in this phase? → A: Only `AmbientClockCore` (pure Swift, depending on `VisualCoreExperience`
+  and `VisualCoreSimulation`) and `AmbientClockCoreTests` in `Packages/ExperiencesCreative/Package.swift`, as A17-P01
+  did. The experience target, its presenter, the registration and the catalog entry come with the overlay and the
+  first theme in A18-P02. The core reads no clock: the time enters as the action `time.set` (an instant) and changes
+  as `time.changed` (a kind).
+- Q: Which fixtures pin correctness? → A: Four locales and two time zones, using the system's own locale data:
+  - **Locales:** `en_US` (12-hour), `de_DE` (24-hour), `ja_JP` (its own date order) and `ar_EG` (Arabic-Indic
+    digits).
+  - **Zones:** `America/New_York` (spring forward on 2026-03-08 at 07:00 UTC, fall back on 2026-11-01 at 06:00 UTC)
+    and `Asia/Kolkata` (UTC+5:30, no daylight saving).
+  - **Calendar:** Gregorian.
+  - **Comparison:** text is compared after mapping U+202F and U+00A0 to a plain space, because operating systems
+    differ in the space before AM/PM. Digits, order and the hour shown are compared exactly.
+- Q: What are the preferences and their refusals? → A: `ClockPreferences` schema 1, stored as an envelope of kind
+  `a18.clock-preferences`:
+  - `hourCycle` ∈ {system, h12, h24}; `showSeconds` and `showDate` booleans (defaults: system, off, on);
+  - `timeZone` and `locale`, each "system" or a fixed identifier.
+
+  Refusals are typed, each with a sentence: `damaged`, `newer-version`, `unknown-time-zone`, `unknown-locale` and
+  `too-large` (above 4,096 bytes). A refused file leaves the defaults. The calendar follows the locale. "System" means
+  the device's setting at the time of formatting.
+- Q: How is the time spoken and announced? → A: The spoken string is built from the same instant:
+  - the time in the locale's spoken form (time style short, with the hour cycle applied, so "10:42 PM" or "22:42");
+  - followed by the full date when the date line is shown.
+
+  The clock never announces minute changes. The canvas label always holds the current spoken string. An announcement
+  on request (the action `time.speak`) goes through `AnnouncementPlanner` at 0.5 s.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - The clock shows the right time (Priority: P1) 🎯
@@ -85,7 +137,7 @@ clock does not talk over them every minute.
 1. **Given** a formatted time, **Then** its spoken string names the hours, the minutes and the period or 24-hour
    form, and the date when the date line is shown.
 2. **Given** a run of minute changes, **Then** no announcement is made by itself; the spoken string is always the
-   current one, and an explicit request announces it at most as often as the planner allows.
+   current one, and an explicit request (`time.speak`) announces it at most once per 0.5 s.
 
 ### Edge Cases
 
@@ -105,8 +157,8 @@ clock does not talk over them every minute.
 
 - **FR-A18-101**: The clock's time MUST be read only from one injectable clock source. Its default MUST read the
   system clock; tests and replays MUST inject fixed instants. Nothing in production may offset or simulate time.
-- **FR-A18-102**: The source MUST report each of these time changes as one event: return to the foreground, a
-  significant time change, a time-zone change, a locale change and a calendar day change.
+- **FR-A18-102**: The time-change monitor MUST report each of these time changes as one event: return to the
+  foreground, a significant time change, a time-zone change, a locale change and a calendar day change.
 - **FR-A18-103**: Clock preferences MUST hold the 12/24-hour choice (system, 12-hour, 24-hour), seconds on or off,
   the date line on or off, and the time-zone and locale policy (system, or a fixed identifier). They MUST be
   versioned, round-trip unchanged, and refuse damaged, newer or unknown values with a named reason.
