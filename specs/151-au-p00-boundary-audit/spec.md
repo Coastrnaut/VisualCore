@@ -25,6 +25,74 @@ Canonical overrides:
 - **Constitution:** 2.17.0 adds the A21 experience rules (committed at the start of this gate, `d143ebd2`).
 - Follow `specs/144-zg-p00-boundary-audit`.
 
+## Clarifications
+
+### Session 2026-11-17
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code by a read-only survey:
+- **Commits:** the A21 constitution commit is `d143ebd2` and the A21-P00 specify commit is `b40fdbee`, the phase
+  start for the no-change diff of `Packages` and `External`. The reference submodule is pinned at `d93edd1`.
+- **Registry:** twenty experiences are registered in `Catalog/registrations.json` (A01–A20), and the candidates list
+  is empty. `a21` appears in neither `Catalog/registrations.json` nor `Apps/VisualCore/App/ExperienceRegistry.swift`;
+  `AppModelTests` uses it as a synthetic not-yet-integrated id. `release_check.py --list` prints 158 lines. The
+  catalog lists Aurora as free, family "Ambient and lifestyle", launcher category ambient.
+- **Host rule:** `RenderHost`, `RenderScene`, the presenter, the shell and the action port are main-actor; the core is
+  a `Sendable` value advanced in fixed steps (`ExperienceEngine.advance(frame:)`) that never reads a clock or draws.
+- **VisualCore offers** (public in a framework product and tested):
+  - **procedural shaders:** `FullScreenShaderScene` (`u_time`, `u_resolution`, `u_seed`, an 8-entry palette, one
+    float per parameter, `fixedTime`, `timeScale`), `ShaderBundle` with the `vc/` GLSL library (`vc_valueNoise`,
+    `vc_gradientNoise`, `vc_fbm`, hashes, `vc_palette`, sRGB encode and decode, SDFs), `FieldPass`, `EffectScene`;
+  - **noise:** the GLSL noise above and CPU `GradientNoise2D` and `FractalNoise2D`;
+  - **particles:** `ParticleSystem` with emitters, forces and `ParticleBudget`; `ParticleRenderer` (instanced soft
+    quads, normal or additive) and `ParticleLayerScene` with `brightnessCap`;
+  - **animation:** `FrameInfo` (its `time` is wall-clock; `delta` is clamped to 0…0.1 s), `SceneClock` (advances
+    only by frame deltas, each step capped at 0.25 s, `reducedMotionFactor` 0.5, speed, play, pause, scrub),
+    `FramePacing` (floor 30 frames per second; 30 under Low Power Mode or a serious thermal state, render scale 0.75
+    when critical) applied by the host's `FrameScheduler`, `maxFramesPerSecond`, `CachedScene`;
+  - **blending and compositing:** `RenderState.BlendMode` (alpha, premultiplied, additive), render targets through
+    `ResourceRegistry.makeRenderTarget`, `PingPongTarget`, `FloatRenderSupport`, the effect graph's bloom pass,
+    `FlashLimiterModel` (limits the rate of change of mean luminance, default 0.3 per second, as
+    `EffectScene.reduceFlashing`), and `brightnessCap` only on `TrailLayer` and `ParticleLayerScene`;
+  - **transitions:** `CrossfadeScene` (`progress` 0…1 set by the caller, two lazy RGBA8 targets, a linear mix), used
+    by Ambient Clock; easing curves in VisualCoreMath;
+  - **persistence:** `ExperienceSnapshot`, `MigrationChain`, `ExperienceStorage` with `setValue(_:for:)` (64 values of
+    4 KB) under `StorageQuota`;
+  - **sound:** `SoundEffectPlayer` (ambient session, four one-shot voices of at most 1 s, stops on interruption and in
+    the background, no player volume) over `SoundEffectSynth`;
+  - **precision and power:** `RenderCapabilities.fragmentHighp` and `fragmentMantissaBits`, `DeviceConditions`,
+    `QualityPolicy`, `QualityGovernor`; `FullScreenShaderScene` records a compile error and clears to dark grey;
+  - **accessibility:** `AccessibilityPreferences`, `SystemAccessibilityObserver`, `ExperienceLaunch.reduceMotion` and
+    `reduceFlashing`.
+- **Missing everywhere:** a continuous or looping sound player with a volume; a luminance cap for an arbitrary scene;
+  tone mapping; a hide-and-restore or full-screen mode for an experience's controls; a static fallback frame when a
+  shader feature is unsupported; CPU value noise.
+
+- Q: How is the manual's "compile an empty shell" gate met in the one app? → A: As for A20: the one app is the shell.
+  This phase proves it builds for testing with Aurora absent, and the targets come with A21-P01's first model.
+- Q: What makes a capability "available"? → A: A public declaration in a VisualCore framework product with at least
+  one test that exercises it. An implementation that exists only inside another experience or a harness is "requires
+  adaptation" at best.
+- Q: How are the sky, its light and its time built from what exists? → A: The sky is app-local shaders over `vc/` in
+  `FullScreenShaderScene` passes: aurora ribbons as slowly advected fbm colour bands, a hashed starfield with bounded
+  twinkle, and fbm cloud layers, at two quality levels. Rendered time comes from `SceneClock` into `fixedTime`, never
+  from `FrameInfo.time`, so a return from the background never jumps. An app-local final composite pass applies an
+  explicit luminance cap, and transitions run through `CrossfadeScene` with the cap applied after the mix, so no
+  transition exceeds it. A static fallback frame uses `RenderCapabilities` and `CachedScene`. The low-power view
+  rests on the host's `FramePacing` and an app-local still view. These are app-local gaps: no VisualCore change is
+  planned, and a second user of a luminance cap would justify moving it upstream later.
+- Q: How is the optional ambient loop built, given that VisualCore has only one-shot tones? → A: It is synthesised in
+  code (constitution 2.17.0), which replaces the manual's "locally bundled, licensed" loop; no media licence is needed,
+  so risk 3 is met by construction. A continuous speaker-output player is generic, so it is an upstream gap owned by
+  VisualCoreAudio: an ambient loop player on the ambient session with its own volume (0…1), stopped on interruption
+  and in the background, playing a procedural buffer from VisualCoreAudioDSP. It is built in A21-P04 with tests,
+  documentation, the API baseline and the reference regression; sound stays off by default and never changes the
+  state.
+- Q: How do the controls hide and come back in the one app? → A: In the experience: its control overlay hides on
+  request and returns with a tap on the canvas or the accessibility action "Show controls"; the app's shell and the
+  host are unchanged (no full-screen mode exists, and none is added). Reduce Motion gives a stable frame and Reduce
+  Flashing is honoured through `ExperienceLaunch`.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - An evidence-backed integration matrix (Priority: P1) 🎯
