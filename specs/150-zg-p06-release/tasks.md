@@ -70,7 +70,7 @@ migration, no VisualCore change).
 - [X] T-A20-611 Release build checks (review checkpoint; `--name release-checks -- python3 scripts/release_check.py — Verified 2026-11-17: 2026-11-17: review checkpoint: .autonomy/checks/A20-P06.release-checks.json exit 0 (8/8: app-release-build, app-release-symbols, app-privacy-manifest, app-no-tracking, app-licenses, app-usage-descriptions, experience-release-a20, copy-claims-a20)
   --only app-release-build app-release-symbols app-privacy-manifest app-no-tracking app-licenses app-usage-descriptions
   experience-release-a20 copy-claims-a20`)
-- [ ] T-A20-612 Contract: G-RELEASE closed by "A20-P06" (its iOS 26.x runner half is cited at X-A20); rows whose gaps are all closed become available with evidence
+- [X] T-A20-612 Contract: G-RELEASE closed by "A20-P06" (its iOS 26.x runner half is cited at X-A20); rows whose gaps are all closed become available with evidence — Verified 2026-11-17: 2026-11-17: .autonomy/checks/A20-P06.contract.json exit 0 (G-RELEASE closed by A20-P06; all 14 gaps closed and all 31 rows available, M27 last; the iOS 26.x runner half cited at X-A20); A20-P06.experience-packages.json, A20-P06.catalog.json and A20-P06.script-tests.json exit 0
   (`--name contract`); packages, catalog and script tests
 - [ ] T-A20-613 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
   A20-P06; update README.md (rule 16) and `docs/automatedtesting.md` (rule 17)

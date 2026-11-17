@@ -1311,7 +1311,7 @@
    "id": "M27",
    "capability": "Truthful claims: no claim of physical sand behaviour, therapeutic, medical or wellbeing effects, or latency and frame rates not measured on a device",
    "source": "constitution A20 truthful claims; manual non-goals",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/PerformanceRecord.swift",
@@ -1330,7 +1330,7 @@
     "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Core/ScientificReview.swift",
     "symbol": "ScientificReview"
    },
-   "notes": "PerformanceRecord is tested (SessionPerformanceTests); scripts/check_copy_claims.py is the claim checker. Device measurements are G-DEVICE (A20-P05); the A20 copy-claims step is G-RELEASE (A20-P06). G-DEVICE closed in A20-P05 with the device-campaign plan docs/apps/digital-zen-garden/device-campaign.md (rows ZG-D1 to ZG-D8 wait for devices after ImplementationLock-100)."
+   "notes": "PerformanceRecord is tested (SessionPerformanceTests); scripts/check_copy_claims.py is the claim checker. Device measurements are G-DEVICE (A20-P05); the A20 copy-claims step is G-RELEASE (A20-P06). G-DEVICE closed in A20-P05 with the device-campaign plan docs/apps/digital-zen-garden/device-campaign.md (rows ZG-D1 to ZG-D8 wait for devices after ImplementationLock-100). G-RELEASE closed in A20-P06 (release.json, experience-release-a20, copy-claims-a20, scan-claims-release.sh, scan-sources-release.sh, GardenRecoveryDrawTests, StoredSampleTests; the iOS 26.x runner half at X-A20). Available."
   },
   {
    "id": "M28",
@@ -1647,7 +1647,7 @@
    "justification": "The A20 copy-claims and verify release steps and the release notes are repository tooling for this experience (manual phase 06).",
    "phase": 6,
    "test": "Release-check steps: copy-claims-a20 finds no physics, therapeutic, medical, wellbeing or unmeasured performance claim; verify-a20 steps pass on the iOS 27.x and 26.x simulators",
-   "closed": null
+   "closed": "A20-P06"
   }
  ],
  "traceability": [
