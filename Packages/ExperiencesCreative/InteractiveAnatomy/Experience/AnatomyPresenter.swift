@@ -52,6 +52,11 @@
 //     ``announcementSink`` (by default a VoiceOver announcement, only while VoiceOver is running).
 //   - Reduce Motion: kept from the factory; nothing animates in any mode (framing, Reset view and every camera step cut
 //     in one frame), so ``cameraTransitionSeconds`` is `transitionDuration(0, reduceMotion:)`, always 0.
+// Feature 128 (A17-P05) T-A17-503 (FR-A17-503, FR-A17-504; clarification Q3; contracts/review.md):
+//   - Review: the panel is made with the review record of ``reviewRecordLoader`` (by default
+//     `AnatomyReviewRecord.bundled(for:)`), loaded at the first state seen and again after the loader changes. A
+//     refused record is counted in ``reviewRecordProblems`` and the panel then shows only "Not reviewed by a
+//     clinician." for every part; the content stays usable and nothing is shown as a review.
 import Foundation
 import InteractiveAnatomyCore
 import SwiftUI
@@ -224,6 +229,17 @@ public final class AnatomyPresenter: ExperiencePresenter {
     var announcementSink: @MainActor (String) -> Void = AnatomyPresenter.voiceOverAnnouncement
     /// Every announcement posted to the sink, oldest first (feature 127).
     private(set) var announced: [String] = []
+    /// Loads the review record of a region (test seam; by default the bundled record); setting it reloads (feature
+    /// 128).
+    var reviewRecordLoader: (AnatomyRegion) -> Result<AnatomyReviewRecord, ContentRefusal> =
+        AnatomyPresenter.bundledReviewRecord {
+        didSet { loadedReviewRecord = nil }
+    }
+    /// The review record the panel uses: nil before the first state, `.some(nil)` when the record was refused
+    /// (feature 128).
+    private var loadedReviewRecord: AnatomyReviewRecord??
+    /// How many times the review record was refused; each refusal leaves only the not-reviewed line (feature 128).
+    private(set) var reviewRecordProblems = 0
 
     /// The number of renderers made now.
     var rendererCount: Int { renderers.count }
@@ -508,11 +524,30 @@ public final class AnatomyPresenter: ExperiencePresenter {
         if mirror.solid != solid { mirror.solid = solid }
         if mirror.isolate != core.view.isolate { mirror.isolate = core.view.isolate }
         if mirror.isolateMode != core.isolateMode { mirror.isolateMode = core.isolateMode }
-        let panel = AnatomyPanel.make(partIndex: core.selectedIndex, region: core.region)
+        let panel = AnatomyPanel.make(partIndex: core.selectedIndex, region: core.region,
+                                      record: reviewRecord(for: core.region))
         if mirror.panel != panel { mirror.panel = panel }
         if mirror.ghostsOff != ghostsOff { mirror.ghostsOff = ghostsOff }
         noteView(core.view)
         noteSelection(core)
+    }
+
+    /// The bundled review record of `region`, `AnatomyReviewRecord.bundled(for:)` (feature 128).
+    nonisolated static func bundledReviewRecord(_ region: AnatomyRegion) -> Result<AnatomyReviewRecord, ContentRefusal> {
+        AnatomyReviewRecord.bundled(for: region)
+    }
+
+    /// The review record for `region` from ``reviewRecordLoader``, loaded once (again after the loader changes);
+    /// nil when it was refused, which is counted in ``reviewRecordProblems`` (feature 128).
+    func reviewRecord(for region: AnatomyRegion) -> AnatomyReviewRecord? {
+        if let loaded = loadedReviewRecord { return loaded }
+        let record: AnatomyReviewRecord?
+        switch reviewRecordLoader(region) {
+        case .success(let value): record = value
+        case .failure: record = nil; reviewRecordProblems += 1
+        }
+        loadedReviewRecord = .some(record)
+        return record
     }
 
     // MARK: View file

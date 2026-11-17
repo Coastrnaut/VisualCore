@@ -25,6 +25,12 @@
 // "<sign> <English name>" with the layer's colour-independent sign (`AnatomyLayerSign`: bones "●", cartilage and
 // menisci "◆", ligaments and tendons "▲") and is spoken "<English name>, <layer words>" (``rowText(name:layer:)``,
 // ``rowLabel(name:layer:)``).
+// Feature 128 (A17-P05) T-A17-503 (FR-A17-503, FR-A17-504; clarification Q3; contracts/review.md): the panel's lines
+// open with the model statement ("Schematic model for learning; shapes are simplified.", with or without a selection)
+// and give the selected part's review lines after its citations (the editorial line, then "Not reviewed by a
+// clinician." or "Reviewed by <reviewer> on <date>."; with nothing selected the manifest's review sentence). The model
+// statement is its own "About this model" row (`about-model`, valued with the statement) at the top of the panel; the
+// rest of the lines are the `panel` element.
 // The view holds references only (the port, the mirror and the presenter), as Molecular Explorer's controls do, so the
 // rebuilt view compares equal; actions go through the presenter.
 import InteractiveAnatomyCore
@@ -205,22 +211,47 @@ struct AnatomyControls: View {
         .accessibilityIdentifier(port.identifier("search-result-\(result.index)"))
     }
 
-    /// The lines of the description panel, in order.
+    /// The identifier name of the "About this model" row (feature 128).
+    static let aboutModelName = "about-model"
+    /// The label of the "About this model" row (feature 128).
+    static let aboutModelLabel = "About this model"
+
+    /// The lines of the description panel, in order: the model statement, the heading, the standard name, the layer,
+    /// the description, the citations, the review lines (with nothing selected the review sentence) and "Ghosts are
+    /// off." while ghosts are off.
     static func panelLines(_ panel: AnatomyPanel, ghostsOff: Bool) -> [String] {
-        var lines = [panel.heading]
+        var lines = [panel.modelStatement, panel.heading]
         if let standard = panel.standardName { lines.append(standard) }
         if let layer = panel.layerWords { lines.append(layer.prefix(1).uppercased() + layer.dropFirst()) }
         if let description = panel.description { lines.append(description) }
         lines += panel.citations
-        lines.append(panel.reviewSentence)
+        if panel.reviewLines.isEmpty {
+            lines.append(panel.reviewSentence)
+        } else {
+            lines += panel.reviewLines
+        }
         if ghostsOff { lines.append(AnatomyPresenter.ghostsOffSentence) }
         return lines
     }
 
-    /// The description panel of the selection (with "Ghosts are off." while ghosts are off).
+    /// The "About this model" row: the model statement, labelled "About this model" (feature 128).
+    private func aboutModelRow(_ statement: String) -> some View {
+        Text(verbatim: statement)
+            .font(.footnote)
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(Text(verbatim: Self.aboutModelLabel))
+            .accessibilityValue(Text(verbatim: statement))
+            .accessibilityIdentifier(port.identifier(Self.aboutModelName))
+    }
+
+    /// The description panel of the selection: the "About this model" row, then the rest of the lines (with "Ghosts
+    /// are off." while ghosts are off).
     @ViewBuilder private var panelSection: some View {
         if let panel = mirror.panel {
-            let lines = Self.panelLines(panel, ghostsOff: mirror.ghostsOff)
+            let lines = Array(Self.panelLines(panel, ghostsOff: mirror.ghostsOff).dropFirst())
+            aboutModelRow(panel.modelStatement)
             VStack(alignment: .leading, spacing: 4) {
                 ForEach(Array(lines.enumerated()), id: \.offset) { index, line in
                     Text(verbatim: line)
