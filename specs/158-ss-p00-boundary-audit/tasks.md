@@ -39,7 +39,7 @@
 
 - [X] T-A22-004 [US2] Reference chunk 1 (`--name reference-1 -- python3 scripts/release_check.py --only — Verified 2026-11-17: 2026-11-17: .autonomy/checks/A22-P00.reference-1.json exit 0 (3/3: reference-engine-xcframework, reference-build-projectm-ios-sim, reference-clean) on the phase-start tree
   reference-engine-xcframework reference-build-projectm-ios-sim reference-clean`)
-- [ ] T-A22-005 [US2] Reference chunk 2 (`--name reference-2 -- python3 scripts/release_check.py --only
+- [X] T-A22-005 [US2] Reference chunk 2 (`--name reference-2 -- python3 scripts/release_check.py --only — Verified 2026-11-17: 2026-11-17: .autonomy/checks/A22-P00.reference-2.json exit 0 (4/4: reference-test-anglerendering-ios27 and -ios26, projectm-reference-ios27 and -ios26); the 7 steps, commands and results recorded in docs/apps/shader-studio/regression-baseline.md
   reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27
   projectm-reference-ios26`); record the 7 steps, commands and results in
   `docs/apps/shader-studio/regression-baseline.md` (FR-A22-004, SC-A22-003)
