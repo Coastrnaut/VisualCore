@@ -59,6 +59,8 @@
   - `FramePacing(thermal: .nominal, lowPower: true, requestedMaxFPS: 60).maxFPS == 30`;
   - the presenter drawn off screen for 60 frames of 1/30 s and 120 frames of 1/60 s ends at the same clock time
     (±1e-6), with the pixels identical at the shared instants (every 1/30 s);
+  - a run that switches from 1/60 s to 1/30 s frames halfway (Low Power Mode turned on mid-motion) ends at the
+    same clock time as either cadence alone, with no step above one frame's span;
   - a 0.5 s stall given as `FramePacing.clampedDelta(0.5)` moves the clock by at most 0.1 s × speed;
   - under Reduce Motion and the still view the clock holds at both cadences;
   - each test runs under 10 s

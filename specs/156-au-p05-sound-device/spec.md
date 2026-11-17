@@ -135,7 +135,7 @@ turns the sound on and sets its volume, and hides and restores the controls.
 
 **Acceptance Scenarios**:
 
-1. **Given** Aurora open, **When** the person picks "Violet veil", **Then** the controls name that preset.
+1. **Given** Aurora open, **When** the person picks "Violet veil", **Then** the canvas label names that preset.
 2. **Given** Aurora open, **When** the sound is turned on and the volume set, **Then** the controls read the new
    choice, and on a new start the choice is restored.
 3. **Given** Aurora open, **When** the controls are hidden and the sky tapped, **Then** the controls are back.
