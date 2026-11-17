@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_documented_api.py",
+    "--sources",
+    "Packages/ExperiencesCreative/AmbientClock"
+  ],
+  "command": "python3 scripts/check_documented_api.py --sources Packages/ExperiencesCreative/AmbientClock",
+  "elapsed_seconds": 0.254,
+  "exit_code": 0,
+  "finished": "2026-11-17T02:31:59+00:00",
+  "log": ".autonomy/logs/A18-P01.documented-api.log",
+  "log_sha256": "1a2103a73f78fca3d16ea4d32223d54391a9790f75b777e0d2ddc557b12a5fb1",
+  "name": "documented-api",
+  "stage": "A18-P01",
+  "started": "2026-11-17T02:31:59+00:00",
+  "timed_out": false
+}

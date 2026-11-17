@@ -584,6 +584,18 @@ let package = Package(
                                .product(name: "VisualCoreUI", package: rendering)],
                     path: "InteractiveAnatomy/ExperienceTests",
                     resources: [.copy("Fixtures")]),
+        // A18 Ambient Clock (feature 131, A18-P01): a pending core until A18-P02 adds the experience. The core is pure
+        // (Foundation, the clock source of VisualCoreExperience and the planner of VisualCoreSimulation) and reads no
+        // clock: the time enters as actions.
+        .target(name: "AmbientClockCore",
+                dependencies: [.product(name: "VisualCoreExperience", package: visualCore),
+                               .product(name: "VisualCoreSimulation", package: visualCore)],
+                path: "AmbientClock/Core"),
+        .testTarget(name: "AmbientClockCoreTests",
+                    dependencies: ["AmbientClockCore",
+                                   .product(name: "VisualCoreExperience", package: visualCore),
+                                   .product(name: "VisualCoreSimulation", package: visualCore)],
+                    path: "AmbientClock/CoreTests"),
         // A15 Molecular Explorer (feature 110, A15-P01): a candidate until X-A15. The core is pure (Foundation and
         // VisualCoreMath for the scene and camera of feature 111).
         // A16 Simulation Lab (feature 117, A16-P01): a candidate until X-A16. The core is pure (Foundation and VisualCore
