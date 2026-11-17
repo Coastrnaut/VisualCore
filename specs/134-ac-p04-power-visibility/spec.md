@@ -190,6 +190,8 @@ visibility changes; scan the sources.
 ## Assumptions
 
 - Device measurements of brightness, heat and battery are A18-P05 {device} tasks.
+- The privacy page that states the keep-awake behaviour (A18-P00 clarification 4) is written in A18-P06 with the
+  release documents; this phase fixes the behaviour and the one named file it will cite.
 
 ## Traceability
 
