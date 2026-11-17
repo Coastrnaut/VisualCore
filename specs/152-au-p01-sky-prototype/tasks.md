@@ -51,7 +51,7 @@ VisualCore change. Precedent: `specs/145-zg-p01-document-strokes/tasks.md`. Roll
 
 ## Phase 5: Records and evidence
 
-- [ ] T-A21-109 [P] Write `docs/apps/aurora/licenses.md` (presets, palettes and shader written in this repository; the
+- [X] T-A21-109 [P] Write `docs/apps/aurora/licenses.md` (presets, palettes and shader written in this repository; the — Verified 2026-11-17: 2026-11-17: docs/apps/aurora/licenses.md (presets, bounds, aurora-sky.frag, the noise port and reference written here; vc/ is VisualCore's; no third-party asset) listed in docs/apps/aurora/README.md; validate_docs exit 0
   `vc/` library is VisualCore's; no third-party asset) and list it in `docs/apps/aurora/README.md`
 - [ ] T-A21-110 Core tests on sim-27.2 (`--name au-core-ios27 -- python3 scripts/xcodebuild_package.py --package
   Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing
