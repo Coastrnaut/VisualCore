@@ -1027,6 +1027,48 @@ It never sets the system wallpaper itself, never calls an export a live wallpape
   announced. Information never depends on colour alone. Reduce Motion stills the animated preview.
 - **Licenses:** every scene, palette and shader records its source and license.
 
+### A20 Digital Zen Garden (`a20.digital-zen-garden`)
+
+Ratified from the app manual's constitution prompt (2026-11-17). Like A05–A19, it never had a standalone target: it
+is built directly as an experience of the one app. Its product goal is a calm, tactile sand-raking and
+stone-arrangement experience whose compositions persist. Version 0.1 covers:
+- one tray with visual sand relief, two rake styles and a stone palette;
+- continuous multi-sample touch strokes with a brush preview;
+- stone placement, rotation, deletion and layer-aware selection;
+- undo and redo of strokes and placements;
+- saving and loading named gardens with a lightweight stroke history;
+- a low-stimulation mode, with sound and animation off by default.
+
+It does not simulate granular material physics, has no online gallery or multiplayer, no generative AI content and no
+engagement loops.
+
+- **Consumer, not fork:** an experience of the VisualCore app and a VisualCore consumer, never a fork of
+  projectm-ios. It uses only audited VisualCore public APIs over the OpenGL ES → ANGLE → Metal integration. It MUST
+  NOT create its own EGL/ANGLE initialization path or a second renderer, or link ProjectM engine code.
+- **Reuse first (Principle II):** touch input, procedural textures, feedback targets, animation time, persistence and
+  accessibility planning already in VisualCore are reused, not copied. A generic capability the garden needs and
+  VisualCore lacks goes into VisualCore with tests, docs, the API baseline and the reference regression. The tray,
+  rakes, stones and copy stay in the experience.
+- **Visuals are code:** sand relief, rake grooves, stones and shadows are procedural (shaders, height fields, SDFs,
+  procedural meshes), with no purchased, generated or photographic texture. Typography uses system fonts.
+- **Testable without the GPU:** the garden document, strokes, resampling, rake footprints, stone placement and
+  selection, and the undo/redo command log are pure, versioned models tested through `swift test`. Positions are
+  stored in normalized tray coordinates, independent of the screen. The sand picture is rebuilt deterministically
+  from the command log; drawing never changes the state, and undo is by command, not by texture snapshot.
+- **Bounded:** samples per stroke, strokes per garden, stones per garden, saved gardens and file sizes have documented
+  caps; files that are truncated, of a newer version, or hold NaN, infinite or out-of-range values are refused
+  safely. GPU targets are bounded, created only in a valid host context and rebuilt from CPU state after a context
+  loss or resize.
+- **Calm by default:** the low-stimulation mode keeps sound and animation off by default; nothing flashes; Reduce
+  Motion and Reduce Flashing are honoured. There are no streaks, rewards, timers or notifications.
+- **Offline-first and private:** no networking, accounts, analytics or ads, and no permission is needed. Gardens stay
+  in the experience's storage.
+- **Truthful claims:** the experience never claims physical sand behaviour, therapeutic, medical or wellbeing
+  effects, or measured latency and frame rates; such numbers come only from device measurements.
+- **Accessibility:** native SwiftUI controls with VoiceOver labels and Dynamic Type; every gesture action (rake,
+  place, rotate, delete, undo) also has a control; selection never depends on colour alone.
+- **Licenses:** every shader, stone shape and palette records its source and license.
+
 ## Governance
 
 - Precedence: real Apple platform and toolchain behavior and observed test results → owner
@@ -1073,5 +1115,7 @@ It never sets the system wallpaper itself, never calls an export a live wallpape
   manual's constitution prompt at gate A18-P00 (feature 130); no principle changes.
 - Amendment 2.15.0 (2026-11-17, MINOR): App-Scoped Rules gain the A19 Living Wallpapers subsection, ratified from
   its manual's constitution prompt at gate A19-P00 (feature 137); no principle changes.
+- Amendment 2.16.0 (2026-11-17, MINOR): App-Scoped Rules gain the A20 Digital Zen Garden subsection, ratified from
+  its manual's constitution prompt at gate A20-P00 (feature 144); no principle changes.
 
-**Version**: 2.15.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-17
+**Version**: 2.16.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-17
