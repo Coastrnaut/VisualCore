@@ -57,6 +57,8 @@
 //     `AnatomyReviewRecord.bundled(for:)`), loaded at the first state seen and again after the loader changes. A
 //     refused record is counted in ``reviewRecordProblems`` and the panel then shows only "Not reviewed by a
 //     clinician." for every part; the content stays usable and nothing is shown as a review.
+// Feature 129 (A17-P06) T-A17-604 (FR-A17-603): the test-only seam `failNextDraw` makes the next `draw` throw
+// `AnatomyDrawError.injected` once, before anything is synced, written or drawn; it is unreachable from the interface.
 import Foundation
 import InteractiveAnatomyCore
 import SwiftUI
@@ -70,6 +72,12 @@ import VisualCoreSimulation
 
 /// The error of the test seam `AnatomyPresenter.failNextTranslucentDraw`.
 struct AnatomyGhostFailure: Error {}
+
+/// Why a draw of Interactive Anatomy failed on purpose (feature 129, A17-P06, T-A17-604).
+enum AnatomyDrawError: Error, Equatable {
+    /// The test-only seam ``AnatomyPresenter/failNextDraw`` made this draw fail.
+    case injected
+}
 
 /// One row of the structure list: a part's English name and layer.
 struct AnatomyPartRow: Equatable, Sendable {
@@ -187,6 +195,10 @@ public final class AnatomyPresenter: ExperiencePresenter {
     public private(set) var ghostsOff = false
     /// The test seam: the next draw with ghosts throws (it clears itself).
     var failNextTranslucentDraw = false
+    /// Set by a test to make the next `draw` throw ``AnatomyDrawError/injected`` once, before it syncs, writes or
+    /// draws anything; the seam clears itself and nothing in the experience or its interface sets it (feature 129,
+    /// A17-P06, T-A17-604).
+    var failNextDraw = false
     /// How many times `view.json` was written.
     private(set) var viewWrites = 0
     /// How many writes of `view.json` failed.
@@ -284,6 +296,10 @@ public final class AnatomyPresenter: ExperiencePresenter {
 
     /// Draws the visible items with depth through the core's camera at the pixel aspect.
     public func draw(_ core: AnatomyCore, tier: Int, context: RenderContext, frame: FrameInfo) throws {
+        if failNextDraw {
+            failNextDraw = false
+            throw AnatomyDrawError.injected
+        }
         if frame.delta.isFinite, frame.delta > 0 { clock += frame.delta }
         defer { flushAnnouncements() }
         sync(core)
