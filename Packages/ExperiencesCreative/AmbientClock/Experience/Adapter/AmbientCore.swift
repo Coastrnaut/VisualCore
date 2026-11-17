@@ -1,5 +1,7 @@
 // AmbientCore — feature 132 T-A18-203 (FR-A18-2xx; G-OVERLAY/G-BUDGETS); feature 133 (A18-P03) T-A18-304
-// (FR-A18-301, FR-A18-303, FR-A18-306; G-THEMES; clarification Q3: snapshot schema 2 with the theme and its palette).
+// (FR-A18-301, FR-A18-303, FR-A18-306; G-THEMES; clarification Q3: snapshot schema 2 with the theme and its palette);
+// feature 134 (A18-P04) T-A18-404/406 (FR-A18-401–406, FR-A18-409; G-NIGHT/G-MOTION/G-SCREENCARE/G-AWAKE;
+// clarifications Q2, Q3: snapshot schema 3 with night mode, in-app reduced motion and keep-awake).
 // The state of Ambient Clock as an experience (clarification Q1): numbers only, so replays and digests stay
 // deterministic. The core never reads a clock, a locale or a time zone; the presenter (`AmbientPresenter`) reads the
 // injected clock source and environment and formats the text with the A18-P01 model (`AmbientClockState`).
@@ -7,7 +9,10 @@
 // Fields: the instant (seconds since 1970, 0 until the first `time.set`), the hour cycle (0 system, 1 h12, 2 h24),
 // seconds shown (default off), the date line shown (default on), motion (default on), the speed (0.25–2, default 1),
 // the time-change revision (+1 per accepted `time.changed`), and since schema 2 the theme (0–3, the order of
-// `ThemeCatalog.themes`, default 0 noise gradient) and its palette (0–2, default 0). The quality tier is presentation
+// `ThemeCatalog.themes`, default 0 noise gradient) and its palette (0–2, default 0), and since schema 3 night mode
+// (`nightMode` 0 off, 1 on, 2 scheduled, default 0; `nightStart` and `nightEnd` in minutes of the local day 0…1439,
+// defaults 1,320 and 420, that is 22:00 and 07:00; `nightDim` 0.3…1, default 0.5), the in-app reduced motion
+// (`reduceMotion`, default off) and keep-awake (`keepAwake`, default off). The quality tier is presentation
 // only: it is not in `==`, the digest or the snapshot, and it is kept across `reset()` (as Infinite Geometry's
 // `GeometryCore`).
 //
@@ -24,15 +29,25 @@
 //   theme.select [0…3]           the theme, a whole index of `ThemeCatalog.themes` (`a18.invalid-choice` otherwise);
 //                                choosing another theme resets the palette to 0 (choosing the shown one keeps it).
 //   theme.palette [0…2]          the palette of the theme, a whole index (`a18.invalid-choice` otherwise).
+//   night.mode [0…2]             night mode, a whole index (0 off, 1 on, 2 scheduled; `a18.invalid-choice` otherwise).
+//   night.window [0…1439, 0…1439] the scheduled window's start and end in whole minutes of the local day
+//                                (`a18.invalid-choice` for a fraction).
+//   night.dim [0.3…1]            the dim factor of the scene at night.
+//   motion.reduce [0…1]          exactly 0 or 1: the in-app reduced motion (`a18.invalid-choice` otherwise).
+//   screen.keepAwake [0…1]       exactly 0 or 1: keep the screen on while the clock is shown (`a18.invalid-choice`
+//                                otherwise).
 // A refusal changes nothing.
 //
-// Digest ("a18.ambient.v2"): the format and theme fields (hour cycle, seconds, date, motion, speed, theme, palette).
+// Digest ("a18.ambient.v3"): the format and theme fields (hour cycle, seconds, date, motion, speed, theme, palette),
+// then the night mode, window and dim, reduced motion and keep-awake.
 // The instant and the revision are derived from the wall clock and its notifications, so — as
 // `ExperienceCore.writeDigest` requires of anything derived from a clock — they stay out of the digest; they are not
-// stored either (FR-A18-209), so a snapshot round trip keeps the digest. Snapshot schema 2: `{"hourCycle", "motion",
-// "palette", "showDate", "showSeconds", "speed", "theme"}` as JSON with sorted keys; decoding refuses a value
-// outside its range. Schema 1 (A18-P02, without `theme` and `palette`) migrates to schema 2 with theme 0 and palette 0
-// (`migrations`); the stored examples are in `AmbientSchemaExamples.swift`.
+// stored either (FR-A18-209), so a snapshot round trip keeps the digest. Snapshot schema 3: `{"hourCycle",
+// "keepAwake", "motion", "nightDim", "nightEnd", "nightMode", "nightStart", "palette", "reduceMotion", "showDate",
+// "showSeconds", "speed", "theme"}` as JSON with sorted keys; decoding refuses a value outside its range. Schema 1
+// (A18-P02, without `theme` and `palette`) migrates to schema 2 with theme 0 and palette 0, and schema 2 (A18-P03)
+// to schema 3 with the night, motion and keep-awake defaults (0, 1,320, 420, 0.5, false, false) (`migrations`); the
+// stored examples are in `AmbientSchemaExamples.swift`.
 //
 // Quality (G-BUDGETS, FR-A18-208): `level-0` (5 noise octaves at the full resolution) and `level-1` (3 octaves at
 // half resolution: resolutionShare 0.5, iterationShare 0.6); each level makes exactly one full-screen draw. The
@@ -40,8 +55,8 @@
 // (`ThemeCatalog.budget(theme:tier:)`: octaves 5 / 3, cells 48 / 24, waves 6 / 3, shapes 8 / 4); a crossfade draws the
 // incoming theme once and the mix once per frame (the outgoing picture is a still).
 //
-// Outcome: `motion-off` while motion is off, else `theme-<id>` (for example `theme-wave-field`) for a theme other than
-// the noise gradient, else `showing-time`.
+// Outcome: `motion-off` while motion is off, else `night-on` while night mode is on (1), else `theme-<id>` (for example
+// `theme-wave-field`) for a theme other than the noise gradient, else `showing-time`.
 import AmbientClockCore
 import Foundation
 import VisualCoreDiagnostics
@@ -60,19 +75,21 @@ public enum AmbientRestoreError: Error, Equatable {
     case outOfRange(String)
 }
 
-/// The state of Ambient Clock (see the file header). Snapshot schema 2.
+/// The state of Ambient Clock (see the file header). Snapshot schema 3.
 public struct AmbientCore: ExperienceCore, Equatable, Codable {
     /// The experience's id in the catalog.
     public static let experienceID = "a18.ambient-clock"
     /// The action ids in declaration order.
     public static let actionIDs = ["time.set", "time.changed", "clock.format", "theme.motion", "theme.speed",
-                                   "theme.select", "theme.palette"]
+                                   "theme.select", "theme.palette", "night.mode", "night.window", "night.dim",
+                                   "motion.reduce", "screen.keepAwake"]
     /// The number of values each action carries, by action id.
     static let valueCounts: [String: Int] = ["time.set": 1, "time.changed": 1, "clock.format": 3,
                                              "theme.motion": 1, "theme.speed": 1, "theme.select": 1,
-                                             "theme.palette": 1]
+                                             "theme.palette": 1, "night.mode": 1, "night.window": 2, "night.dim": 1,
+                                             "motion.reduce": 1, "screen.keepAwake": 1]
     /// The snapshot schema this build writes.
-    public static let schemaVersion = 2
+    public static let schemaVersion = 3
     /// The number of themes (`ThemeCatalog.themes`).
     public static var themeCount: Int { ThemeCatalog.themes.count }
     /// The number of palettes of each theme.
@@ -91,8 +108,14 @@ public struct AmbientCore: ExperienceCore, Equatable, Codable {
     public static let motionOffCode = "motion-off"
     /// The prefix of the outcome code of a theme other than the noise gradient: `theme-<id>`.
     public static let themeCodePrefix = "theme-"
-    /// The digest's domain string (schema 2).
-    public static let digestDomain = "a18.ambient.v2"
+    /// The outcome code while night mode is on (1) and motion is on.
+    public static let nightOnCode = "night-on"
+    /// The digest's domain string (schema 3).
+    public static let digestDomain = "a18.ambient.v3"
+    /// The number of night modes (0 off, 1 on, 2 scheduled; `NightPolicy.Mode`).
+    public static var nightModeCount: Int { NightPolicy.Mode.allCases.count }
+    /// The number of minutes of a day (the window's values are whole minutes 0…1439).
+    public static var minutesPerDay: Int { NightPolicy.minuteRange.count }
 
     /// The last instant set, seconds since 1970; 0 until the first `time.set` (not stored, not in the digest).
     public private(set) var instant: Double = 0
@@ -111,6 +134,18 @@ public struct AmbientCore: ExperienceCore, Equatable, Codable {
     public private(set) var theme = 0
     /// The palette of the theme, 0–2 (default 0).
     public private(set) var palette = 0
+    /// Night mode: 0 off, 1 on, 2 scheduled (the raw values of `NightPolicy.Mode`; default 0).
+    public private(set) var nightMode = 0
+    /// The scheduled window's start in minutes of the local day, 0…1439 (default 1,320, 22:00).
+    public private(set) var nightStart = NightPolicy.defaultStart
+    /// The scheduled window's end in minutes of the local day, 0…1439, exclusive (default 420, 07:00).
+    public private(set) var nightEnd = NightPolicy.defaultEnd
+    /// The dim factor of the scene at night, 0.3…1 (default 0.5).
+    public private(set) var nightDim = NightPolicy.defaultDim
+    /// Whether the in-app reduced motion is on (default false): stills, cuts and no drift, as the system setting.
+    public private(set) var reduceMotion = false
+    /// Whether the screen is kept on while the clock is shown (default false).
+    public private(set) var keepAwake = false
     /// The number of accepted `time.changed` actions (not stored, not in the digest).
     public private(set) var revision: Int = 0
     /// The quality tier the host set (0 = level-0, 1 = level-1, clamped); presentation only — not in the digest,
@@ -120,10 +155,22 @@ public struct AmbientCore: ExperienceCore, Equatable, Codable {
     /// The opening state: no instant yet, the system hour cycle, no seconds, the date line, motion on at speed 1.
     public init() {}
 
-    /// A state with the given format and theme fields (every value is clamped into its range; the hour cycle is
-    /// rounded). `theme` and `palette` default to 0 and are clamped to 0–3 and 0–2.
+    /// A state with the given format, theme, night, motion and keep-awake fields (every value is clamped into its
+    /// range; the hour cycle is rounded). `theme` and `palette` default to 0 and are clamped to 0–3 and 0–2; the night
+    /// fields default to off, 22:00–07:00 and 0.5 and are clamped as `NightPolicy` clamps them (a night mode outside
+    /// 0…2 is clamped too); reduced motion and keep-awake default to off.
     public init(hourCycle: Int, showSeconds: Bool, showDate: Bool, motion: Bool, speed: Double, theme: Int = 0,
-                palette: Int = 0) {
+                palette: Int = 0, nightMode: Int = 0, nightStart: Int = NightPolicy.defaultStart,
+                nightEnd: Int = NightPolicy.defaultEnd, nightDim: Double = NightPolicy.defaultDim,
+                reduceMotion: Bool = false, keepAwake: Bool = false) {
+        let policy = NightPolicy(mode: NightPolicy.Mode(rawValue: min(max(nightMode, 0), Self.nightModeCount - 1))
+                                     ?? .off, start: nightStart, end: nightEnd, dim: nightDim)
+        self.nightMode = policy.mode.rawValue
+        self.nightStart = policy.start
+        self.nightEnd = policy.end
+        self.nightDim = policy.dim
+        self.reduceMotion = reduceMotion
+        self.keepAwake = keepAwake
         self.theme = min(max(theme, 0), Self.themeCount - 1)
         self.palette = min(max(palette, 0), Self.paletteCount - 1)
         self.hourCycle = min(max(hourCycle, 0), HourCycle.allCases.count - 1)
@@ -142,6 +189,12 @@ public struct AmbientCore: ExperienceCore, Equatable, Codable {
     /// The theme's preset with this state's palette, speed and motion.
     public var preset: ThemePreset? {
         try? ThemePreset(theme: theme, palette: palette, speed: speed, motion: motion)
+    }
+
+    /// The night policy of the night fields (mode, window and dim).
+    public var nightPolicy: NightPolicy {
+        NightPolicy(mode: NightPolicy.Mode(rawValue: nightMode) ?? .off, start: nightStart, end: nightEnd,
+                    dim: nightDim)
     }
 
     /// The hour cycle as the A18-P01 model names it.
@@ -219,21 +272,36 @@ public struct AmbientCore: ExperienceCore, Equatable, Codable {
         lhs.instant == rhs.instant && lhs.hourCycle == rhs.hourCycle && lhs.showSeconds == rhs.showSeconds
             && lhs.showDate == rhs.showDate && lhs.motion == rhs.motion && lhs.speed == rhs.speed
             && lhs.revision == rhs.revision && lhs.theme == rhs.theme && lhs.palette == rhs.palette
+            && lhs.nightMode == rhs.nightMode && lhs.nightStart == rhs.nightStart && lhs.nightEnd == rhs.nightEnd
+            && lhs.nightDim == rhs.nightDim && lhs.reduceMotion == rhs.reduceMotion && lhs.keepAwake == rhs.keepAwake
     }
 
     // MARK: Contract
 
-    /// Schema 2; the step from schema 1 adds `theme` 0 and `palette` 0 (keeping a value already present).
+    /// Schema 3; the step from schema 1 adds `theme` 0 and `palette` 0, and the step from schema 2 adds `nightMode` 0,
+    /// `nightStart` 1,320, `nightEnd` 420, `nightDim` 0.5, `reduceMotion` false and `keepAwake` false (each keeping a
+    /// value already present), so a schema-1 payload passes through both.
     public static var migrations: MigrationChain {
-        MigrationChain(currentVersion: schemaVersion, steps: [1: { payload in
-            var upgraded = payload
-            if upgraded[CodingKeys.theme.rawValue] == nil { upgraded[CodingKeys.theme.rawValue] = 0 }
-            if upgraded[CodingKeys.palette.rawValue] == nil { upgraded[CodingKeys.palette.rawValue] = 0 }
-            return upgraded
-        }])
+        MigrationChain(currentVersion: schemaVersion, steps: [
+            1: { payload in
+                var upgraded = payload
+                if upgraded[CodingKeys.theme.rawValue] == nil { upgraded[CodingKeys.theme.rawValue] = 0 }
+                if upgraded[CodingKeys.palette.rawValue] == nil { upgraded[CodingKeys.palette.rawValue] = 0 }
+                return upgraded
+            },
+            2: { payload in
+                var upgraded = payload
+                let defaults: [(CodingKeys, Any)] = [(.nightMode, 0), (.nightStart, NightPolicy.defaultStart),
+                                                     (.nightEnd, NightPolicy.defaultEnd),
+                                                     (.nightDim, NightPolicy.defaultDim), (.reduceMotion, false),
+                                                     (.keepAwake, false)]
+                for (key, value) in defaults where upgraded[key.rawValue] == nil { upgraded[key.rawValue] = value }
+                return upgraded
+            }
+        ])
     }
 
-    /// The seven controls with their declared ranges (see the file header).
+    /// The twelve controls with their declared ranges (see the file header).
     public static var controls: [ExperienceControl] {
         [ExperienceControl(id: "time.set", ranges: [0...maxInstant]),
          ExperienceControl(id: "time.changed", ranges: [0...Double(TimeChangeKind.allCases.count - 1)]),
@@ -241,7 +309,12 @@ public struct AmbientCore: ExperienceCore, Equatable, Codable {
          ExperienceControl(id: "theme.motion", ranges: [0...1]),
          ExperienceControl(id: "theme.speed", ranges: [speedRange]),
          ExperienceControl(id: "theme.select", ranges: [0...Double(themeCount - 1)]),
-         ExperienceControl(id: "theme.palette", ranges: [0...Double(paletteCount - 1)])]
+         ExperienceControl(id: "theme.palette", ranges: [0...Double(paletteCount - 1)]),
+         ExperienceControl(id: "night.mode", ranges: [0...Double(nightModeCount - 1)]),
+         ExperienceControl(id: "night.window", ranges: [0...Double(minutesPerDay - 1), 0...Double(minutesPerDay - 1)]),
+         ExperienceControl(id: "night.dim", ranges: [NightPolicy.dimRange]),
+         ExperienceControl(id: "motion.reduce", ranges: [0...1]),
+         ExperienceControl(id: "screen.keepAwake", ranges: [0...1])]
     }
 
     /// The opening state; the seed changes nothing (nothing is random) and no clock is read.
@@ -285,6 +358,23 @@ public struct AmbientCore: ExperienceCore, Equatable, Codable {
         case "theme.palette":
             guard let chosen = Self.choice(v[0], count: Self.paletteCount) else { return invalid }
             palette = chosen
+        case "night.mode":
+            guard let chosen = Self.choice(v[0], count: Self.nightModeCount) else { return invalid }
+            nightMode = chosen
+        case "night.window":
+            guard let start = Self.choice(v[0], count: Self.minutesPerDay),
+                  let end = Self.choice(v[1], count: Self.minutesPerDay) else { return invalid }
+            nightStart = start
+            nightEnd = end
+        case "night.dim":
+            guard NightPolicy.dimRange.contains(v[0]) else { return .rejected(.outOfRange(index: 0)) }
+            nightDim = v[0]
+        case "motion.reduce":
+            guard let on = Self.flag(v[0]) else { return invalid }
+            reduceMotion = on
+        case "screen.keepAwake":
+            guard let on = Self.flag(v[0]) else { return invalid }
+            keepAwake = on
         default:   // theme.speed
             guard Self.speedRange.contains(v[0]) else { return .rejected(.outOfRange(index: 0)) }
             speed = v[0]
@@ -310,16 +400,18 @@ public struct AmbientCore: ExperienceCore, Equatable, Codable {
         qualityTier = tier
     }
 
-    /// `motion-off` while motion is off, else `theme-<id>` for a theme other than the noise gradient (theme 0), else
-    /// `showing-time`.
+    /// `motion-off` while motion is off, else `night-on` while night mode is on (1), else `theme-<id>` for a theme
+    /// other than the noise gradient (theme 0), else `showing-time`.
     public var outcome: ExperienceOutcome? {
         guard motion else { return ExperienceOutcome(code: Self.motionOffCode) }
+        guard nightMode != NightPolicy.Mode.on.rawValue else { return ExperienceOutcome(code: Self.nightOnCode) }
         guard theme != 0 else { return ExperienceOutcome(code: Self.showingTimeCode) }
         return ExperienceOutcome(code: Self.themeCodePrefix + themeInfo.id)
     }
 
-    /// "a18.ambient.v2", then the hour cycle, seconds, date, motion, speed, theme and palette (the instant and the
-    /// revision come from the clock and stay out; see the file header).
+    /// "a18.ambient.v3", then the hour cycle, seconds, date, motion, speed, theme, palette, night mode, window start
+    /// and end, night dim, reduced motion and keep-awake (the instant and the revision come from the clock and stay
+    /// out; see the file header).
     public func writeDigest(into builder: inout DigestBuilder) throws(DigestError) {
         builder.add(Self.digestDomain)
         builder.add(hourCycle)
@@ -329,17 +421,24 @@ public struct AmbientCore: ExperienceCore, Equatable, Codable {
         try builder.add(speed)
         builder.add(theme)
         builder.add(palette)
+        builder.add(nightMode)
+        builder.add(nightStart)
+        builder.add(nightEnd)
+        try builder.add(nightDim)
+        builder.add(reduceMotion)
+        builder.add(keepAwake)
     }
 
     // MARK: Snapshot
 
     private enum CodingKeys: String, CodingKey {
-        case hourCycle, showSeconds, showDate, motion, speed, theme, palette
+        case hourCycle, showSeconds, showDate, motion, speed, theme, palette, nightMode, nightStart, nightEnd, nightDim
+        case reduceMotion, keepAwake
     }
 
-    /// Decodes the schema-2 fields; a value outside its range throws ``AmbientRestoreError/outOfRange(_:)``. The
-    /// instant and the revision start at 0 (the presenter sends the time again). A schema-1 payload reaches here only
-    /// through `migrations`, which adds theme 0 and palette 0.
+    /// Decodes the schema-3 fields; a value outside its range throws ``AmbientRestoreError/outOfRange(_:)``. The
+    /// instant and the revision start at 0 (the presenter sends the time again). A schema-1 or schema-2 payload
+    /// reaches here only through `migrations`, which adds the missing fields with their defaults.
     public init(from decoder: any Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         let cycle = try c.decode(Int.self, forKey: .hourCycle)
@@ -365,10 +464,32 @@ public struct AmbientCore: ExperienceCore, Equatable, Codable {
         }
         self.theme = theme
         self.palette = palette
+        let mode = try c.decode(Int.self, forKey: .nightMode)
+        guard (0..<Self.nightModeCount).contains(mode) else {
+            throw AmbientRestoreError.outOfRange(CodingKeys.nightMode.rawValue)
+        }
+        let start = try c.decode(Int.self, forKey: .nightStart)
+        guard NightPolicy.minuteRange.contains(start) else {
+            throw AmbientRestoreError.outOfRange(CodingKeys.nightStart.rawValue)
+        }
+        let end = try c.decode(Int.self, forKey: .nightEnd)
+        guard NightPolicy.minuteRange.contains(end) else {
+            throw AmbientRestoreError.outOfRange(CodingKeys.nightEnd.rawValue)
+        }
+        let dim = try c.decode(Double.self, forKey: .nightDim)
+        guard dim.isFinite, NightPolicy.dimRange.contains(dim) else {
+            throw AmbientRestoreError.outOfRange(CodingKeys.nightDim.rawValue)
+        }
+        nightMode = mode
+        nightStart = start
+        nightEnd = end
+        nightDim = dim
+        reduceMotion = try c.decode(Bool.self, forKey: .reduceMotion)
+        keepAwake = try c.decode(Bool.self, forKey: .keepAwake)
     }
 
-    /// Encodes the schema-2 fields: hour cycle, seconds, date, motion, speed, theme and palette (not the instant, the
-    /// revision or the quality tier).
+    /// Encodes the schema-3 fields: hour cycle, seconds, date, motion, speed, theme, palette, the night mode, window
+    /// and dim, reduced motion and keep-awake (not the instant, the revision or the quality tier).
     public func encode(to encoder: any Encoder) throws {
         var c = encoder.container(keyedBy: CodingKeys.self)
         try c.encode(hourCycle, forKey: .hourCycle)
@@ -378,5 +499,11 @@ public struct AmbientCore: ExperienceCore, Equatable, Codable {
         try c.encode(speed, forKey: .speed)
         try c.encode(theme, forKey: .theme)
         try c.encode(palette, forKey: .palette)
+        try c.encode(nightMode, forKey: .nightMode)
+        try c.encode(nightStart, forKey: .nightStart)
+        try c.encode(nightEnd, forKey: .nightEnd)
+        try c.encode(nightDim, forKey: .nightDim)
+        try c.encode(reduceMotion, forKey: .reduceMotion)
+        try c.encode(keepAwake, forKey: .keepAwake)
     }
 }

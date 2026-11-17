@@ -7,6 +7,9 @@
 //
 // Feature 133 (A18-P03) T-A18-306 (FR-A18-305; G-FAVOURITES): `storage` now holds the favourites
 // (`AmbientFavourites`, the file `favourites.json`, creation times from the same clock as the presenter).
+//
+// Feature 134 (A18-P04) T-A18-404/406 (FR-A18-407; G-AWAKE): the presenter's keep-awake writes the application's idle
+// timer (`ApplicationIdleTimer`); the test factory takes any `IdleTimerPort`.
 import Foundation
 import VisualCoreExperience
 import VisualCoreExperienceHost
@@ -28,15 +31,17 @@ public enum AmbientClockExperience {
     }
 
     /// The experience's shell with its presenter exposed (tests): the presenter gets `clock`, `environment`,
-    /// `center`, `reduceMotion`, `favourites` (none by default) and the shell's port.
+    /// `center`, `reduceMotion`, `favourites` (none by default), `idleTimer` (the application's idle timer by default)
+    /// and the shell's port.
     @MainActor
     static func make(id: ExperienceID, clock: any ClockSource = SystemClock(),
                      environment: @escaping AmbientPresenter.Environment = AmbientPresenter.systemEnvironment,
                      center: NotificationCenter = .default,
                      reduceMotion: Bool = false,
-                     favourites: AmbientFavourites? = nil) -> ExperienceShell<AmbientPresenter> {
+                     favourites: AmbientFavourites? = nil,
+                     idleTimer: any IdleTimerPort = ApplicationIdleTimer()) -> ExperienceShell<AmbientPresenter> {
         let presenter = AmbientPresenter(clock: clock, environment: environment, center: center,
-                                         reduceMotion: reduceMotion)
+                                         reduceMotion: reduceMotion, idleTimer: idleTimer)
         presenter.favourites = favourites
         let shell = ExperienceShell(id: id, presenter: presenter)
         presenter.port = shell.port

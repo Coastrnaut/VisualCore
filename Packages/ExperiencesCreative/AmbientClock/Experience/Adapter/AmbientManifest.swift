@@ -50,6 +50,13 @@ extension AmbientCore {
          [ScenarioStep(steps: 1, action: ScriptedAction("theme.select", [3]), result: "accepted"),
           ScenarioStep(steps: 1, action: ScriptedAction("theme.palette", [2]), result: "accepted")],
          themeCodePrefix + "sdf-shapes"),
+        // Feature 134 (A18-P04) T-A18-407: night mode on and the in-app motion reduction.
+        ("fixture-night-on",
+         [ScenarioStep(steps: 1, action: ScriptedAction("night.mode", [1]), result: "accepted")],
+         nightOnCode),
+        ("fixture-motion-reduced",
+         [ScenarioStep(steps: 1, action: ScriptedAction("motion.reduce", [1]), result: "accepted")],
+         showingTimeCode),
     ]
 
     /// The actions of input-response, save-restore and reset: 24-hour time with seconds, a slower background, the

@@ -26,6 +26,10 @@ enum AmbientFixtures {
     static let deDE = Locale(identifier: "de_DE")
     /// 2026-06-15T18:05:00Z: 2:05 PM in New York, 11:35 PM in Kolkata.
     static let instant = date("2026-06-15T18:05:00Z")
+    /// The thirteen keys of a schema-3 snapshot payload (A18-P04).
+    static let schemaThreeKeys: Set<String> = ["hourCycle", "keepAwake", "motion", "nightDim", "nightEnd", "nightMode",
+                                               "nightStart", "palette", "reduceMotion", "showDate", "showSeconds",
+                                               "speed", "theme"]
 
     /// The instant of an ISO 8601 UTC string such as "2026-06-15T18:05:00Z".
     static func date(_ iso: String) -> Date {

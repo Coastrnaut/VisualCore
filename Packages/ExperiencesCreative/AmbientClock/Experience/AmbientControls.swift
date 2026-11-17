@@ -12,8 +12,17 @@
 // button (`favourite-save`, saving what the controls show through `AmbientFavourites.save(name:preset:)` and showing
 // a refusal's sentence) and one Apply button per favourite (`favourite-<index>`, in list order, applying it through
 // `AmbientFavourites.apply(id:port:)`); the sentence of a file problem is shown above the list.
+//
+// Feature 134 (A18-P04) T-A18-404/406 (FR-A18-401, FR-A18-403, FR-A18-406, FR-A18-407; G-NIGHT/G-MOTION/
+// G-SCREENCARE/G-AWAKE; clarifications Q2, Q3): the night-mode menu (`night-mode`: Off, On, Scheduled →
+// `night.mode [0…2]`), the window's start and end steppers (`night-start`, `night-end`: 15-minute steps over the day,
+// shown as HH:MM → `night.window [start, end]`), the night dim slider (`night-dim` → `night.dim [0.3…1]`), the reduced
+// motion toggle (`reduce-motion` → `motion.reduce [0 / 1]`) and the keep-awake toggle (`keep-awake`, "Keep the screen
+// on while the clock is open" → `screen.keepAwake [0 / 1]`). Every send of a control and every favourite applied or
+// saved first calls `AmbientPresenter.noteAction()`, which ends the idle dim (the ticks never do).
 import AmbientClockCore
 import SwiftUI
+import VisualCoreExperience
 import VisualCoreExperienceHost
 
 /// The native controls of Ambient Clock (see the file header).
@@ -34,6 +43,22 @@ struct AmbientControls: View {
     /// The titles of the hour cycles, by index: "System", "12-hour", "24-hour".
     static let hourCycleTitles = ["System", "12-hour", "24-hour"]
 
+    /// The titles of the night modes, by index: "Off", "On", "Scheduled".
+    static let nightModeTitles = ["Off", "On", "Scheduled"]
+    /// The step of the night window's steppers, minutes.
+    static let windowStep = 15
+
+    /// A minute of the day (wrapped into 0…1439) as "HH:MM": 1,320 → "22:00", 420 → "07:00".
+    static func minuteWords(_ minute: Int) -> String {
+        let m = ((minute % 1440) + 1440) % 1440
+        return String(format: "%02d:%02d", m / 60, m % 60)
+    }
+
+    /// The night dim in words: "Night dim 50 percent".
+    static func dimWords(_ dim: Double) -> String {
+        "Night dim " + String(format: "%.0f", dim * 100) + " percent"
+    }
+
     /// The speed in words: "Speed 1.25 times".
     static func speedWords(_ speed: Double) -> String {
         "Speed " + String(format: "%.2f", speed) + " times"
@@ -51,11 +76,29 @@ struct AmbientControls: View {
                 sendFormat(showDate: on)
             }
             toggle("Motion", name: "motion", isOn: mirror.motion, hint: "Moves the background slowly") { on in
-                port.send("theme.motion", [on ? 1 : 0])
+                send("theme.motion", [on ? 1 : 0])
             }
             speedSlider
             themePicker
             palettePicker
+            nightModePicker
+            windowStepper("Night starts", name: "night-start", minute: mirror.nightStart,
+                          hint: "Sets when scheduled night mode begins") { minute in
+                send("night.window", [Double(minute), Double(mirror.nightEnd)])
+            }
+            windowStepper("Night ends", name: "night-end", minute: mirror.nightEnd,
+                          hint: "Sets when scheduled night mode ends") { minute in
+                send("night.window", [Double(mirror.nightStart), Double(minute)])
+            }
+            nightDimSlider
+            toggle("Reduce motion", name: "reduce-motion", isOn: mirror.reduceMotion,
+                   hint: "Keeps the background still and the clock in place") { on in
+                send("motion.reduce", [on ? 1 : 0])
+            }
+            toggle("Keep the screen on while the clock is open", name: "keep-awake", isOn: mirror.keepAwake,
+                   hint: "Stops the screen from turning off while the clock is shown") { on in
+                send("screen.keepAwake", [on ? 1 : 0])
+            }
             if let favourites { favouritesSection(favourites) }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -75,7 +118,7 @@ struct AmbientControls: View {
         let current = min(max(mirror.theme, 0), titles.count - 1)
         return menu("Theme", name: "theme", titles: titles, current: current,
                     hint: "Chooses the moving background") { index in
-            port.send("theme.select", [Double(index)])
+            send("theme.select", [Double(index)])
         }
     }
 
@@ -85,8 +128,62 @@ struct AmbientControls: View {
         let current = min(max(mirror.palette, 0), titles.count - 1)
         return menu("Palette", name: "palette", titles: titles, current: current,
                     hint: "Chooses the colours of the background") { index in
-            port.send("theme.palette", [Double(index)])
+            send("theme.palette", [Double(index)])
         }
+    }
+
+    /// The night-mode menu (sends `night.mode` when the choice changes).
+    private var nightModePicker: some View {
+        let titles = Self.nightModeTitles
+        let current = min(max(mirror.nightMode, 0), titles.count - 1)
+        return menu("Night mode", name: "night-mode", titles: titles, current: current,
+                    hint: "Dims the background and warms the colours: off, always or on a schedule") { index in
+            send("night.mode", [Double(index)])
+        }
+    }
+
+    /// A stepper titled `title` over the minutes of the day in steps of `windowStep`, wrapping at midnight, showing
+    /// HH:MM, calling `change` with the new minute.
+    private func windowStepper(_ title: String, name: String, minute: Int, hint: String,
+                               change: @escaping @MainActor (Int) -> Void) -> some View {
+        let words = Self.minuteWords(minute)
+        return Stepper {
+            Text(verbatim: title + " " + words).font(.body).fixedSize(horizontal: false, vertical: true)
+        } onIncrement: {
+            change((minute + Self.windowStep) % 1440)
+        } onDecrement: {
+            change((minute - Self.windowStep + 1440) % 1440)
+        }
+        .frame(minHeight: 44)
+        .accessibilityLabel(Text(verbatim: title))
+        .accessibilityValue(Text(verbatim: words))
+        .accessibilityHint(Text(verbatim: hint))
+        .accessibilityIdentifier(port.identifier(name))
+    }
+
+    /// The night dim slider, 0.3…1 (sends `night.dim` when the value changes).
+    private var nightDimSlider: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(verbatim: Self.dimWords(mirror.nightDim)).font(.body)
+            Slider(value: Binding(get: { mirror.nightDim },
+                                  set: { value in
+                                      guard value != mirror.nightDim else { return }
+                                      send("night.dim", [value])
+                                  }),
+                   in: NightPolicy.dimRange)
+                .frame(minHeight: 44)
+                .accessibilityLabel(Text(verbatim: "Night dim"))
+                .accessibilityValue(Text(verbatim: Self.dimWords(mirror.nightDim)))
+                .accessibilityHint(Text(verbatim: "Sets how bright the background stays at night"))
+                .accessibilityIdentifier(port.identifier("night-dim"))
+        }
+    }
+
+    /// Notes a person's action on the presenter (ending the idle dim), then sends `control` with `values`.
+    @discardableResult
+    private func send(_ control: String, _ values: [Double]) -> ActionResult {
+        presenter.noteAction()
+        return port.send(control, values)
     }
 
     /// A menu titled `title` with the identifier name `name` over `titles`, calling `send` only when the choice
@@ -138,6 +235,7 @@ struct AmbientControls: View {
             }
             ForEach(Array(favourites.entries.enumerated()), id: \.element.id) { index, entry in
                 Button {
+                    presenter.noteAction()
                     favourites.apply(id: entry.id, port: port)
                 } label: {
                     Text(verbatim: entry.name).frame(minHeight: 44, alignment: .leading)
@@ -160,6 +258,7 @@ struct AmbientControls: View {
 
     /// Saves what the controls show under the typed name; on success the field is cleared.
     private func saveFavourite(_ favourites: AmbientFavourites) {
+        presenter.noteAction()
         guard let preset = presenter.currentPreset else {
             saveMessage = "The current theme cannot be saved."
             return
@@ -202,7 +301,7 @@ struct AmbientControls: View {
             Slider(value: Binding(get: { mirror.speed },
                                   set: { value in
                                       guard value != mirror.speed else { return }
-                                      port.send("theme.speed", [value])
+                                      send("theme.speed", [value])
                                   }),
                    in: AmbientCore.speedRange)
                 .frame(minHeight: 44)
@@ -232,6 +331,7 @@ struct AmbientControls: View {
 
     /// Sends `clock.format` with the mirror's format, changed by the given values.
     private func sendFormat(hourCycle: Int? = nil, showSeconds: Bool? = nil, showDate: Bool? = nil) {
+        presenter.noteAction()
         presenter.setFormat(hourCycle: hourCycle ?? mirror.hourCycle, showSeconds: showSeconds ?? mirror.showSeconds,
                             showDate: showDate ?? mirror.showDate, port: port)
     }

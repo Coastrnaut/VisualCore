@@ -19,6 +19,21 @@
 //   - Budgets: the loops of the wave field and the SDF shapes stop at `u_count` (at most 16); the particle drift has
 //     `u_count` cells along the shorter side with one disc each; the noise gradient has `u_count` octaves. Each theme
 //     is one full-screen draw.
+//
+// Feature 134 (A18-P04) T-A18-404/406 (FR-A18-401, FR-A18-405, FR-A18-406; G-NIGHT/G-SCREENCARE; clarifications Q2,
+// Q3): night and screen care in the shared plumbing.
+//
+//   - Night: `u_night` (dim, tint red, tint green, tint blue) multiplies the colour `vca_write` writes **after** the
+//     sRGB encoding — `rgb *= u_night.x * u_night.yzw` on the encoded values, exactly as `NightPolicy.nightColor`
+//     does on the encoded palette colours, so the night text's contrast rule holds for what the screen shows. The dim
+//     `x` is the night dim (1 by day) times the idle dim of `ScreenCare.dimFactor`; the tint is `NightPolicy.tint` at
+//     night and (1, 1, 1) by day, so the day value is (1, 1, 1, 1) and changes nothing.
+//   - Drift: `u_drift` (pixels) shifts the sampling coordinate, `vca_pixel` reads `gl_FragCoord.xy − u_drift`, so the
+//     picture moves by `u_drift` (OpenGL's y axis points up: the presenter flips the overlay's downward y).
+//   - Binding: VisualCore's `FullScreenShaderScene` binds float uniforms only (`parameters`, `u_<name>`), so the two
+//     vectors are bound as the floats `u_nightDim`, `u_nightTintR`, `u_nightTintG`, `u_nightTintB`, `u_driftX` and
+//     `u_driftY` (`screenParameters(night:drift:)`) and assembled in the fragment as `u_night` and `u_drift` (macros
+//     of those floats). Every scene is made with the day values, so a float never left unbound reads 0 (black).
 import AmbientClockCore
 import Foundation
 import VisualCoreRendering
@@ -36,11 +51,19 @@ enum ThemeShaders {
     uniform float u_count;
     uniform float u_block;
     uniform vec3 u_palette[4];
+    uniform float u_nightDim;
+    uniform float u_nightTintR;
+    uniform float u_nightTintG;
+    uniform float u_nightTintB;
+    uniform float u_driftX;
+    uniform float u_driftY;
+    #define u_night vec4(u_nightDim, u_nightTintR, u_nightTintG, u_nightTintB)
+    #define u_drift vec2(u_driftX, u_driftY)
     out vec4 color;
 
     vec2 vca_pixel() {
         float block = max(floor(u_block + 0.5), 1.0);
-        return (floor(gl_FragCoord.xy / block) + 0.5) * block;
+        return (floor((gl_FragCoord.xy - u_drift) / block) + 0.5) * block;
     }
 
     vec3 vca_ramp(float t) {
@@ -66,7 +89,9 @@ enum ThemeShaders {
     }
 
     void vca_write(vec3 rgb) {
-        color = vec4(vc_srgbEncode(clamp(rgb, 0.0, 1.0)), 1.0);
+        vec3 encoded = vc_srgbEncode(clamp(rgb, 0.0, 1.0));
+        encoded *= u_night.x * u_night.yzw;
+        color = vec4(clamp(encoded, 0.0, 1.0), 1.0);
     }
     """
 
@@ -102,6 +127,31 @@ enum ThemeShaders {
          "block": Double(AmbientCore.pixelBlock(forTier: tier))]
     }
 
+    /// The night and screen-care uniforms of one frame: `u_night` = (`dim`, tint) and `u_drift` in pixels.
+    struct ScreenUniforms: Equatable {
+        /// The dim factor (x of `u_night`): the night dim (1 by day) × the idle dim.
+        var dim: Double
+        /// The tint (yzw of `u_night`): `NightPolicy.tint` at night, (1, 1, 1) by day.
+        var tint: SIMD3<Double>
+        /// The drift translation in pixels (`u_drift`, OpenGL axes: y up).
+        var drift: SIMD2<Double>
+
+        /// The day value: (1, 1, 1, 1) and no drift; changes nothing.
+        static let day = ScreenUniforms(dim: 1, tint: SIMD3(1, 1, 1), drift: .zero)
+
+        /// The value of `u_night` as a vector: (dim, tint red, tint green, tint blue).
+        var night: SIMD4<Double> { SIMD4(dim, tint.x, tint.y, tint.z) }
+    }
+
+    /// The float uniforms of `screen` (VisualCore binds floats only): `nightDim`, `nightTintR`, `nightTintG`,
+    /// `nightTintB`, `driftX` and `driftY` (non-finite values become the day values).
+    static func screenParameters(_ screen: ScreenUniforms = .day) -> [String: Double] {
+        func finite(_ value: Double, _ fallback: Double) -> Double { value.isFinite ? value : fallback }
+        return ["nightDim": finite(screen.dim, 1), "nightTintR": finite(screen.tint.x, 1),
+                "nightTintG": finite(screen.tint.y, 1), "nightTintB": finite(screen.tint.z, 1),
+                "driftX": finite(screen.drift.x, 0), "driftY": finite(screen.drift.y, 0)]
+    }
+
     /// The palette `palette` of theme `theme` (both clamped) in linear light, as `u_palette` receives it.
     static func palette(theme: Int, palette: Int) -> [SIMD3<Float>] {
         ThemeCatalog.palette(theme: theme, palette: palette).colors.map {
@@ -111,7 +161,8 @@ enum ThemeShaders {
     }
 
     /// A scene running theme `themeIndex`'s fragment (or, with `broken`, ``brokenFragment``) with the VisualCore
-    /// includes, its palette 0, the level-0 parameters and the time fixed at 0.
+    /// includes, its palette 0, the level-0 parameters with the day screen uniforms (``screenParameters(_:)``) and the
+    /// time fixed at 0.
     @MainActor
     static func makeScene(themeIndex: Int, broken: Bool = false) -> FullScreenShaderScene {
         let index = clamped(themeIndex)
@@ -119,7 +170,7 @@ enum ThemeShaders {
                                           fragmentName: fragmentName(themeIndex: index),
                                           bundle: ShaderBundle(files: [:]))
         scene.palette = palette(theme: index, palette: 0)
-        scene.parameters = parameters(theme: index, tier: 0)
+        scene.parameters = parameters(theme: index, tier: 0).merging(screenParameters()) { _, new in new }
         scene.fixedTime = 0
         return scene
     }

@@ -14,6 +14,13 @@
 //     restarts when the seconds switch changes and ends when the overlay disappears (cancellation).
 //   - The host draws the overlay with hit testing off and hides it from assistive technology; the canvas label is
 //     the spoken time (`AmbientPresenter.describe`). Nothing is announced.
+//
+// Feature 134 (A18-P04) T-A18-404/406 (FR-A18-401, FR-A18-405, FR-A18-406; G-NIGHT/G-SCREENCARE; clarifications Q2,
+// Q3): at night the text is warm amber (`NightPolicy.textColor`, at least 4.5 : 1 against every dimmed and tinted
+// palette colour), white by day; the overlay is offset by the presenter's shown drift (points, the same offset the
+// scene moves by) and its opacity is multiplied by the idle dim. The overlay hands the presenter its display scale,
+// which turns the drift into the scene's pixels.
+import AmbientClockCore
 import Foundation
 import SwiftUI
 import UIKit
@@ -44,6 +51,15 @@ struct ClockOverlay: View {
     let port: ExperienceActionPort
     /// The Dynamic Type factor: 1 at the default text size.
     @ScaledMetric(relativeTo: .body) private var typeFactor: CGFloat = 1
+    /// The points-to-pixels factor of the screen, handed to the presenter.
+    @Environment(\.displayScale) private var displayScale: CGFloat
+
+    /// The text colour: `NightPolicy.textColor` at night, else white (`NoiseGradientTheme.textColor`).
+    static func textColor(night: Bool) -> Color {
+        guard night else { return Color(uiColor: NoiseGradientTheme.textColor) }
+        let c = NightPolicy.textColor
+        return Color(.sRGB, red: c.x, green: c.y, blue: c.z, opacity: 1)
+    }
 
     /// The time's font size in points for a canvas of `canvas` points at the Dynamic Type factor `dynamicTypeFactor`
     /// (non-finite or not positive: 1): 0.22 × the shorter side × the factor, capped so `characters` glyphs fit 90 %
@@ -98,10 +114,14 @@ struct ClockOverlay: View {
                         .multilineTextAlignment(.center)
                 }
             }
-            .foregroundStyle(Color(uiColor: NoiseGradientTheme.textColor))
+            .foregroundStyle(Self.textColor(night: mirror.isNight))
             .frame(maxWidth: max(0, size.width * Self.widthShare))
             .frame(width: size.width, height: size.height)
+            .offset(x: mirror.drift.x, y: mirror.drift.y)
+            .opacity(mirror.dim)
         }
+        .onAppear { presenter.displayScale = Double(displayScale) }
+        .onChange(of: displayScale) { _, scale in presenter.displayScale = Double(scale) }
         .allowsHitTesting(false)
         .accessibilityHidden(true)
         .task(id: mirror.showSeconds) { await tickLoop() }

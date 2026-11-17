@@ -24,6 +24,10 @@
 //     4.5 : 1 (`minimumContrast()`, with `AccessibleColors.contrastRatio` on the sRGB-encoded colours: about 16.4 : 1);
 //     every channel of every colour stays at most 0.18 encoded, so any blend has a Rec. 709 luma below 40 (the probe's
 //     `dark`).
+//
+// Feature 134 (A18-P04) T-A18-404/406 (FR-A18-401, FR-A18-406; G-NIGHT/G-SCREENCARE): through the shared `vca_pixel`
+// and `vca_write` (`ThemeShaders`) the theme follows the drift translation `u_drift` and is multiplied by `u_night`
+// (dim and warm tint) after its sRGB encoding; by day both change nothing.
 import AmbientClockCore
 import Foundation
 import UIKit

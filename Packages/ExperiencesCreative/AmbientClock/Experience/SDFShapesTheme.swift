@@ -8,6 +8,10 @@
 //     uniform time, alternate shapes the other way (`vc_rotate`). The edge is antialiased over 1.5 pixel blocks.
 //   - Colour: each shape is its palette colour 1 + (i mod 3) mixed at most 0.75 over the background ramp; then the
 //     centre is quietened and the result sRGB-encoded (`ThemeShaders`).
+//
+// Feature 134 (A18-P04) T-A18-404/406 (FR-A18-401, FR-A18-406; G-NIGHT/G-SCREENCARE): through the shared `vca_pixel`
+// and `vca_write` (`ThemeShaders`) the theme follows the drift translation `u_drift` and is multiplied by `u_night`
+// (dim and warm tint) after its sRGB encoding; by day both change nothing.
 import AmbientClockCore
 import Foundation
 

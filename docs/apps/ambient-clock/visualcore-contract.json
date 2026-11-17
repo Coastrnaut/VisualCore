@@ -557,7 +557,7 @@
    "id": "M10",
    "capability": "Version 0.1 feature 05: a brightness-friendly night mode (dimmed, warm or red-shifted drawing, lower frame rate, contrast kept) and a motion-reduction option that stills the animated themes",
    "source": "manual v0.1 feature 05; constitution A18 bounded and accessibility",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ParticleLayerScene.swift",
@@ -718,7 +718,7 @@
    "id": "M15",
    "capability": "Contrast: the time stays readable over every theme and in night mode, checked as a WCAG contrast ratio between the text colour and the theme's brightest and darkest palette stops (or a scrim)",
    "source": "constitution A18 accessibility; spec FR-A18-003",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AccessibilitySettingsSection.swift",
@@ -927,7 +927,7 @@
    "id": "M20",
    "capability": "Night mode drawn in the scene: dimming, warming and red shift applied to the theme's palette and brightness cap inside the drawing; the system screen brightness is never set",
    "source": "spec clarification 4; constitution A18 bounded",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ParticleLayerScene.swift",
@@ -958,8 +958,14 @@
    "id": "M21",
    "capability": "Lower frame rate: night mode and still themes ask for a lower frame cap (for example 30 fps) than the host's default, without changing correctness",
    "source": "spec FR-A18-003 night mode lower frame rate; manual §12 dynamic frame cadence",
-   "status": "upstream gap",
+   "status": "available",
    "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+     "symbol": "maxFramesPerSecond",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
     {
      "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/FramePacing.swift",
      "symbol": "FramePacing",
@@ -1353,7 +1359,7 @@
    "justification": "Night mode (manual or scheduled, dim level, warm or red palette, lower brightness cap, contrast floor) is drawn in the scene; the system screen brightness is never set (spec clarification 4; manual phase 04).",
    "phase": 4,
    "test": "Core tests: night palettes keep contrast at least 4.5 with the text; brightness never above the cap; the schedule switches at its boundaries with fixed dates; a source scan finds no UIScreen brightness write",
-   "closed": null
+   "closed": "A18-P04"
   },
   {
    "id": "G-MOTION",
@@ -1365,7 +1371,7 @@
    "justification": "The motion-reduction option and Reduce Motion still the animated themes (SceneClock speed and reducedMotion, a still frame or very slow drift) as the experience's policy over AccessibilityPreferences.",
    "phase": 4,
    "test": "Core tests: with motion reduced the animation clock does not advance beyond the still rule; the system setting and the in-app option resolve through AccessibilityPreferences; transitions cut",
-   "closed": null
+   "closed": "A18-P04"
   },
   {
    "id": "G-FRAMERATE",
@@ -1375,10 +1381,10 @@
    ],
    "kind": "upstream",
    "owner": "VisualCore:VisualCoreExperienceHost",
-   "justification": "An experience cannot lower its frame cap: ExperienceSession creates RenderHost with the default maxFramesPerSecond. An experience-declared cap (never below FramePacing.minimumFPS) is generic and is assessed for VisualCoreExperienceHost in A18-P04, additive with the default unchanged for every other experience.",
+   "justification": "An experience cannot lower its frame cap: ExperienceSession creates RenderHost with the default maxFramesPerSecond. An experience-declared cap (never below FramePacing.minimumFPS) is generic and is assessed for VisualCoreExperienceHost in A18-P04, additive with the default unchanged for every other experience. Promoted at A18-P04 as ExperiencePresenter.maxFramesPerSecond and Experience.maxFramesPerSecond (VisualCoreExperienceHost, feature 134), with FrameCapTests.",
    "phase": 4,
    "test": "Host tests: a declared cap reaches host.framePacing.maxFPS; the default stays 60; Low Power Mode and heat still lower it; API baseline updated; reference regression passes",
-   "closed": null
+   "closed": "A18-P04"
   },
   {
    "id": "G-SCREENCARE",
@@ -1390,7 +1396,7 @@
    "justification": "A slow, bounded pixel drift of the text and scene and an idle dimming are the experience's screen-care policy (manual §13 risk 1); Digital Aquarium's AmbientDimmer is not copied, and a generic drift is assessed for VisualCoreSimulation in this phase only if a second consumer exists.",
    "phase": 4,
    "test": "Core tests with fixed dates: the drift offset stays within its bound, moves at most its rate per minute and is deterministic; dimming starts after the idle interval and a touch restores; Reduce Motion keeps the drift below its visible step",
-   "closed": null
+   "closed": "A18-P04"
   },
   {
    "id": "G-AWAKE",
@@ -1402,7 +1408,7 @@
    "justification": "The opt-in keep-awake setting (off by default) sets isIdleTimerDisabled only while the clock is visible, in exactly one named file of the experience, and releases it on background, close and teardown; the privacy page says so (spec clarification 4).",
    "phase": 4,
    "test": "Experience tests with an injected idle-timer port: on only when the setting is on and the clock is visible; off on background, close and teardown; a source scan finds isIdleTimerDisabled in exactly one file",
-   "closed": null
+   "closed": "A18-P04"
   },
   {
    "id": "G-DEVICE",

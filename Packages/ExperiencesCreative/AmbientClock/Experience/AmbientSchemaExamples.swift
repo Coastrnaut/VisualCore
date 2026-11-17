@@ -5,13 +5,19 @@
 // tests. The examples are built as Interactive Anatomy's are
 // (`AnatomySchemaExamples.swift`): a payload of that schema in an envelope of that schema at step 0, with the digest
 // that its restore through the migration chain gives.
+//
+// Feature 134 (A18-P04) T-A18-404/406 (FR-A18-409; clarification Q2): the snapshot moved to schema 3 (night mode,
+// in-app reduced motion and keep-awake), so both earlier examples — schema 1 and schema 2 — are registered for the
+// migration check; the schema-3 example (night on 21:30–06:15 at dim 0.4, reduced motion and keep-awake on) serves the
+// round-trip tests.
 import AmbientClockCore
 import Foundation
 import VisualCoreExperience
 
 extension AmbientCore {
     /// The payload of the stored example of schema `version`: the 24-hour clock with seconds, no date line, motion on
-    /// at speed 1.5; schema 2 adds the wave field (theme 2) with its palette 1. Nil for any other version.
+    /// at speed 1.5; schema 2 adds the wave field (theme 2) with its palette 1; schema 3 adds night mode on with the
+    /// window 21:30–06:15 (1,290 and 375) at dim 0.4, reduced motion on and keep-awake on. Nil for any other version.
     public static func schemaExamplePayload(version: Int) -> [String: Any]? {
         let schemaOne: [String: Any] = ["hourCycle": 2, "showSeconds": true, "showDate": false, "motion": true,
                                         "speed": 1.5]
@@ -20,6 +26,9 @@ extension AmbientCore {
             return schemaOne
         case 2:
             return schemaOne.merging(["theme": 2, "palette": 1]) { _, new in new }
+        case 3:
+            return schemaOne.merging(["theme": 2, "palette": 1, "nightMode": 1, "nightStart": 1290, "nightEnd": 375,
+                                      "nightDim": 0.4, "reduceMotion": true, "keepAwake": true]) { _, new in new }
         default:
             return nil
         }
@@ -43,10 +52,16 @@ extension AmbientCore {
         return MigrationExample(version: version, snapshot: encoded, expectedDigest: digest.hex)
     }
 
-    /// The stored schema-1 example (A18-P02: format, motion and speed; no theme or palette).
+    /// The stored schema-1 example (A18-P02: format, motion and speed; no theme or palette); registered.
     public static func schemaOneExample(seed: UInt64 = 7) -> MigrationExample? { schemaExample(version: 1, seed: seed) }
 
-    /// The schema-2 example (A18-P03: the wave field with its palette 1), for the round-trip tests; not registered,
-    /// because the registry's check takes earlier schemas only.
+    /// The stored schema-2 example (A18-P03: the wave field with its palette 1; no night, motion or keep-awake
+    /// fields); registered since schema 3.
     public static func schemaTwoExample(seed: UInt64 = 7) -> MigrationExample? { schemaExample(version: 2, seed: seed) }
+
+    /// The schema-3 example (A18-P04: night on, reduced motion and keep-awake), for the round-trip tests; not
+    /// registered, because the registry's check takes earlier schemas only.
+    public static func schemaThreeExample(seed: UInt64 = 7) -> MigrationExample? {
+        schemaExample(version: 3, seed: seed)
+    }
 }

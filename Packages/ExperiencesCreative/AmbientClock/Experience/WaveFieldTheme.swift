@@ -6,6 +6,10 @@
 //     with a_i = 0.4 + 2.39996 i and uv = pixel ÷ height; the loop stops at the count (at most 16).
 //   - Colour: x = 0.5 + 0.5 s + 0.5 (y − 0.5), clamped to 0…1, through `vca_ramp`, so the four palette colours appear
 //     as slow bands; then the centre is quietened and the result sRGB-encoded (`ThemeShaders`).
+//
+// Feature 134 (A18-P04) T-A18-404/406 (FR-A18-401, FR-A18-406; G-NIGHT/G-SCREENCARE): through the shared `vca_pixel`
+// and `vca_write` (`ThemeShaders`) the theme follows the drift translation `u_drift` and is multiplied by `u_night`
+// (dim and warm tint) after its sRGB encoding; by day both change nothing.
 import AmbientClockCore
 import Foundation
 

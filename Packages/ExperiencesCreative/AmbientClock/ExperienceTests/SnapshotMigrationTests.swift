@@ -1,11 +1,14 @@
 // SnapshotMigrationTests — feature 133 (A18-P03) T-A18-305 (FR-A18-301, FR-A18-306; G-THEMES; clarification Q3;
-// contracts/themes.md "Snapshot"; data-model.md "AmbientCore"). Snapshot schema 2 of Ambient Clock: the stored
-// schema-1 example (`AmbientCore.schemaOneExample()`) is accepted by the registry's `SnapshotMigrationCheck` and
-// restores through the migration to theme 0 and palette 0 with its format, motion and speed kept; a schema-1 payload
-// handed to the restore without the migration is refused; the schema-2 example round-trips through two engines with
-// its digest; `theme.select` 4 and `theme.palette` 3 are refused as out of range and 1.5 as `a18.invalid-choice`,
-// changing nothing; another theme resets the palette to 0 and the same theme keeps it; the outcome names the theme
-// (`theme-wave-field`); the digest (domain `a18.ambient.v2`) covers the theme and the palette.
+// contracts/themes.md "Snapshot"; data-model.md "AmbientCore"); feature 134 (A18-P04) T-A18-405 (FR-A18-409;
+// clarification Q5: snapshot schema 3). The snapshot of Ambient Clock is schema 3: the stored schema-1 and schema-2
+// examples (`AmbientCore.schemaOneExample()`, `schemaTwoExample()`) are accepted by the registry's
+// `SnapshotMigrationCheck` and the schema-3 example is refused there as "not an earlier version"; the schema-1 example
+// restores through the migrations to theme 0 and palette 0 and the night, motion and keep-awake defaults with its
+// format, motion and speed kept; a schema-1 payload handed to the restore without the migration is refused; the
+// schema-2 example round-trips through two engines with its digest; `theme.select` 4 and `theme.palette` 3 are refused
+// as out of range and 1.5 as `a18.invalid-choice`, changing nothing; another theme resets the palette to 0 and the same
+// theme keeps it; the outcome names the theme (`theme-wave-field`); the digest (domain `a18.ambient.v3`) covers the
+// theme and the palette.
 import Foundation
 import Testing
 import AmbientClockCore
@@ -14,21 +17,23 @@ import VisualCoreExperience
 
 @MainActor
 @Suite struct SnapshotMigrationTests {
-    @Test func theSchemaIsTwoAndTheSchemaOneExampleIsAcceptedByTheRegistryCheck() async throws {
-        #expect(AmbientCore.schemaVersion == 2)
-        #expect(AmbientCore.migrations.currentVersion == 2)
-        #expect(AmbientCore.digestDomain == "a18.ambient.v2")
+    @Test func theSchemaIsThreeAndTheEarlierExamplesAreAcceptedByTheRegistryCheck() async throws {
+        #expect(AmbientCore.schemaVersion == 3)
+        #expect(AmbientCore.migrations.currentVersion == 3)
+        #expect(AmbientCore.digestDomain == "a18.ambient.v3")
         let one = try #require(AmbientCore.schemaOneExample())
-        #expect(one.version == 1)
-        let problems = await SnapshotMigrationCheck.problems(for: AmbientCore.self, id: AmbientTest.id,
-                                                              examples: [one])
-        #expect(problems == [])
-        // The schema-2 example is of the current schema, which the check refuses as an example.
         let two = try #require(AmbientCore.schemaTwoExample())
+        #expect(one.version == 1 && two.version == 2)
+        let problems = await SnapshotMigrationCheck.problems(for: AmbientCore.self, id: AmbientTest.id,
+                                                              examples: [one, two])
+        #expect(problems == [])
+        // The schema-3 example is of the current schema, which the check refuses as an example.
+        let three = try #require(AmbientCore.schemaExample(version: 3))
+        #expect(three.version == 3)
         let refused = await SnapshotMigrationCheck.problems(for: AmbientCore.self, id: AmbientTest.id,
-                                                             examples: [one, two])
-        #expect(refused == ["version 2: not an earlier version (current is 2)"])
-        #expect(AmbientCore.schemaExample(version: 3) == nil)
+                                                             examples: [one, two, three])
+        #expect(refused == ["version 3: not an earlier version (current is 3)"])
+        #expect(AmbientCore.schemaExample(version: 4) == nil)
         #expect(AmbientCore.schemaExamplePayload(version: 0) == nil)
     }
 
@@ -49,10 +54,12 @@ import VisualCoreExperience
         #expect(try engine.digest().hex == one.expectedDigest)
         let expected = AmbientCore(hourCycle: 2, showSeconds: true, showDate: false, motion: true, speed: 1.5)
         #expect(core == expected)
-        // After the migration the state is written as schema 2, with the theme and the palette.
+        #expect(core.nightMode == 0 && core.nightStart == 1320 && core.nightEnd == 420 && core.nightDim == 0.5)
+        #expect(!core.reduceMotion && !core.keepAwake)
+        // After the migration the state is written as schema 3, with the theme, the palette and the A18-P04 fields.
         let written = try core.snapshotPayload()
         let object = try #require(try JSONSerialization.jsonObject(with: written) as? [String: Any])
-        #expect(Set(object.keys) == ["hourCycle", "motion", "palette", "showDate", "showSeconds", "speed", "theme"])
+        #expect(Set(object.keys) == AmbientFixtures.schemaThreeKeys)
         #expect(object["theme"] as? Int == 0 && object["palette"] as? Int == 0)
     }
 
@@ -75,6 +82,8 @@ import VisualCoreExperience
         #expect(core.hourCycle == 2 && core.showSeconds && !core.showDate && core.motion && core.speed == 1.5)
         #expect(try first.digest().hex == two.expectedDigest)
         #expect(core.outcome?.code == "theme-wave-field")
+        #expect(core.nightMode == 0 && core.nightStart == 1320 && core.nightEnd == 420 && core.nightDim == 0.5)
+        #expect(!core.reduceMotion && !core.keepAwake)
         let again = try first.snapshot()
         var second = try await AmbientTest.engine(seed: snapshot.seed)
         try second.restore(again)
@@ -88,13 +97,15 @@ import VisualCoreExperience
     }
 
     @Test func aStoredThemeOrPaletteOutsideItsRangeIsRefused() {
-        let theme = Data(#"{"hourCycle":0,"motion":true,"palette":0,"showDate":true,"showSeconds":false,"speed":1,"theme":4}"#
-            .utf8)
+        let theme = Data((#"{"hourCycle":0,"keepAwake":false,"motion":true,"nightDim":0.5,"nightEnd":420,"nightMode":0,"#
+            + #""nightStart":1320,"palette":0,"reduceMotion":false,"showDate":true,"showSeconds":false,"speed":1,"#
+            + #""theme":4}"#).utf8)
         #expect(throws: AmbientRestoreError.outOfRange("theme")) {
             _ = try AmbientCore.restore(payload: theme, seed: 1)
         }
-        let palette = Data(#"{"hourCycle":0,"motion":true,"palette":3,"showDate":true,"showSeconds":false,"speed":1,"theme":1}"#
-            .utf8)
+        let palette = Data((#"{"hourCycle":0,"keepAwake":false,"motion":true,"nightDim":0.5,"nightEnd":420,"nightMode":0,"#
+            + #""nightStart":1320,"palette":3,"reduceMotion":false,"showDate":true,"showSeconds":false,"speed":1,"#
+            + #""theme":1}"#).utf8)
         #expect(throws: AmbientRestoreError.outOfRange("palette")) {
             _ = try AmbientCore.restore(payload: palette, seed: 1)
         }

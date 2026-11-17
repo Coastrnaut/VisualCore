@@ -6,7 +6,12 @@
     "theme.motion",
     "theme.speed",
     "theme.select",
-    "theme.palette"
+    "theme.palette",
+    "night.mode",
+    "night.window",
+    "night.dim",
+    "motion.reduce",
+    "screen.keepAwake"
   ],
   "experience" : "a18.ambient-clock",
   "kind" : "creative",
@@ -16,7 +21,7 @@
 
       ],
       "expect" : {
-        "initialDigest" : "b8a8bb9832f8268b80d0cb2df688a995abe538b7f96dd412616459abb407dc91"
+        "initialDigest" : "fe6a79535f02118a8c6ff677558adad326ce180adf33eb3b18dc8f32a970e140"
       },
       "name" : "launch-first-frame",
       "seed" : "1"
@@ -59,8 +64,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "81bb94180951f77d3ad541a8a879f3516fa6599cbce5ca164e9e1e6ae9ce31f4",
-        "initialDigest" : "b8a8bb9832f8268b80d0cb2df688a995abe538b7f96dd412616459abb407dc91"
+        "finalDigest" : "cf611c04abeda68bb1f186693c182521adfd1195014339dc108b280ebdcc5d83",
+        "initialDigest" : "fe6a79535f02118a8c6ff677558adad326ce180adf33eb3b18dc8f32a970e140"
       },
       "name" : "input-response",
       "seed" : "1"
@@ -204,8 +209,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "81bb94180951f77d3ad541a8a879f3516fa6599cbce5ca164e9e1e6ae9ce31f4",
-        "initialDigest" : "b8a8bb9832f8268b80d0cb2df688a995abe538b7f96dd412616459abb407dc91"
+        "finalDigest" : "cf611c04abeda68bb1f186693c182521adfd1195014339dc108b280ebdcc5d83",
+        "initialDigest" : "fe6a79535f02118a8c6ff677558adad326ce180adf33eb3b18dc8f32a970e140"
       },
       "name" : "save-restore",
       "seed" : "1"
@@ -248,7 +253,7 @@
         }
       ],
       "expect" : {
-        "initialDigest" : "b8a8bb9832f8268b80d0cb2df688a995abe538b7f96dd412616459abb407dc91",
+        "initialDigest" : "fe6a79535f02118a8c6ff677558adad326ce180adf33eb3b18dc8f32a970e140",
         "resetDigest" : true
       },
       "name" : "reset",
@@ -309,8 +314,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "b8a8bb9832f8268b80d0cb2df688a995abe538b7f96dd412616459abb407dc91",
-        "initialDigest" : "b8a8bb9832f8268b80d0cb2df688a995abe538b7f96dd412616459abb407dc91",
+        "finalDigest" : "fe6a79535f02118a8c6ff677558adad326ce180adf33eb3b18dc8f32a970e140",
+        "initialDigest" : "fe6a79535f02118a8c6ff677558adad326ce180adf33eb3b18dc8f32a970e140",
         "outcome" : "showing-time"
       },
       "name" : "fixture-time-zone-changed",
@@ -330,8 +335,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "e7497559bd2712029dad8889e5a112490a90e87d392586daba0b3c78b49bc75b",
-        "initialDigest" : "b8a8bb9832f8268b80d0cb2df688a995abe538b7f96dd412616459abb407dc91",
+        "finalDigest" : "82d3601f23d09dfeebb63e3fd04d079e2e8514db9dc76a3e8b9263a3f1021f1b",
+        "initialDigest" : "fe6a79535f02118a8c6ff677558adad326ce180adf33eb3b18dc8f32a970e140",
         "outcome" : "motion-off"
       },
       "name" : "fixture-motion-off",
@@ -353,8 +358,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "fa890be4b20761b3546fe5fd1a4c6accd38f4915c229c01b6e44779094dc0438",
-        "initialDigest" : "b8a8bb9832f8268b80d0cb2df688a995abe538b7f96dd412616459abb407dc91",
+        "finalDigest" : "d3d9198a22c123e21c08df714274153cdddd92ab7acb1ddd2b09bfba6d8b4f4a",
+        "initialDigest" : "fe6a79535f02118a8c6ff677558adad326ce180adf33eb3b18dc8f32a970e140",
         "outcome" : "showing-time"
       },
       "name" : "fixture-twenty-four-hour",
@@ -376,8 +381,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "0e83adc80f59f8d8f137aa109813b02600a967a87697bc2e01aabb150db8a3c1",
-        "initialDigest" : "b8a8bb9832f8268b80d0cb2df688a995abe538b7f96dd412616459abb407dc91",
+        "finalDigest" : "c098e701405b5c640fb459703dbb6c81e1c5a4b8a31f2c848fb249d8d499fb97",
+        "initialDigest" : "fe6a79535f02118a8c6ff677558adad326ce180adf33eb3b18dc8f32a970e140",
         "outcome" : "showing-time"
       },
       "name" : "fixture-seconds-shown",
@@ -397,8 +402,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "8a1f949de6f5b62abcce3324e4fbbc14d7c20f65912d16852aceec63ee5a53c3",
-        "initialDigest" : "b8a8bb9832f8268b80d0cb2df688a995abe538b7f96dd412616459abb407dc91",
+        "finalDigest" : "6e5dbc56f124444d7be6d7daa285bc406431958cb83f72019bddb392c1cccd39",
+        "initialDigest" : "fe6a79535f02118a8c6ff677558adad326ce180adf33eb3b18dc8f32a970e140",
         "outcome" : "showing-time"
       },
       "name" : "fixture-slow-motion",
@@ -418,8 +423,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "fa9bdb3fbf7a1d0f58e5ea73ac25f60185cad6912defdbb3f5b0b64ebe24b53b",
-        "initialDigest" : "b8a8bb9832f8268b80d0cb2df688a995abe538b7f96dd412616459abb407dc91",
+        "finalDigest" : "b08e1740dd535966a2ddcb057ebde9ba98953b2c1bdf0576f1f6a0af660409bd",
+        "initialDigest" : "fe6a79535f02118a8c6ff677558adad326ce180adf33eb3b18dc8f32a970e140",
         "outcome" : "theme-wave-field"
       },
       "name" : "fixture-theme-waves",
@@ -449,11 +454,53 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "0f011ec9c5cb0fd338b461ff346d9da32ed80bde37a0c60fa29980baf5891606",
-        "initialDigest" : "b8a8bb9832f8268b80d0cb2df688a995abe538b7f96dd412616459abb407dc91",
+        "finalDigest" : "eda8f72606a9c960dc9865864227439568dbc88e8c28201edd3f5576b031ea4a",
+        "initialDigest" : "fe6a79535f02118a8c6ff677558adad326ce180adf33eb3b18dc8f32a970e140",
         "outcome" : "theme-sdf-shapes"
       },
       "name" : "fixture-theme-shapes-palette",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "night.mode",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d502bda19daf8a76e593edf5397085f100f9f69ce47e9a21e7de0799faaa1d02",
+        "initialDigest" : "fe6a79535f02118a8c6ff677558adad326ce180adf33eb3b18dc8f32a970e140",
+        "outcome" : "night-on"
+      },
+      "name" : "fixture-night-on",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "motion.reduce",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "caa3d41d5c8e0e13adcb34a345fd10682d3c81579e1686b17c5ee93fc2149cd7",
+        "initialDigest" : "fe6a79535f02118a8c6ff677558adad326ce180adf33eb3b18dc8f32a970e140",
+        "outcome" : "showing-time"
+      },
+      "name" : "fixture-motion-reduced",
       "seed" : "1"
     }
   ],

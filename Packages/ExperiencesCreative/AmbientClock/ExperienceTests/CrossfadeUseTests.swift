@@ -24,10 +24,12 @@ import VisualCoreRendering
     private static let changeTime = 2.0
 
     /// A fresh render of `theme` with `palette` alone at uniform time 0 (motion off), at the still size: a session in
-    /// which the theme was chosen and its fade has finished.
-    private func reference(theme: Int, palette: Int = 0) async throws -> StillImage {
+    /// which the theme was chosen and its fade has finished. With `reduceMotion` the session is made under Reduce
+    /// Motion, so the screen-care drift is zero as in a Reduce Motion session (A18-P04: the scene moves by the drift
+    /// of the clock's instant otherwise).
+    private func reference(theme: Int, palette: Int = 0, reduceMotion: Bool = false) async throws -> StillImage {
         let session = ExperienceSession()
-        let shell = try await AmbientTest.open(session)
+        let shell = try await AmbientTest.open(session, reduceMotion: reduceMotion)
         let off = shell.handle(control: "theme.motion", values: [0])
         #expect(off == .accepted)
         if theme != 0 {
@@ -58,8 +60,8 @@ import VisualCoreRendering
     }
 
     @Test func underReduceMotionAThemeChangeShowsTheNewThemeOnTheNextFrame() async throws {
-        let wave = try await reference(theme: 2)
-        let noise = try await reference(theme: 0)
+        let wave = try await reference(theme: 2, reduceMotion: true)
+        let noise = try await reference(theme: 0, reduceMotion: true)
         let session = ExperienceSession()
         let shell = try await AmbientTest.open(session, reduceMotion: true)
         let before = try AmbientTest.still(session, time: 1)
@@ -163,7 +165,7 @@ import VisualCoreRendering
     }
 
     @Test func aPaletteChangeFadesAndEndsOnThePalette() async throws {
-        let lagoon = try await reference(theme: 2, palette: 1)
+        let lagoon = try await reference(theme: 2, palette: 1, reduceMotion: true)
         let session = ExperienceSession()
         let shell = try await AmbientTest.open(session, reduceMotion: true)
         let chosen = shell.handle(control: "theme.select", values: [2])

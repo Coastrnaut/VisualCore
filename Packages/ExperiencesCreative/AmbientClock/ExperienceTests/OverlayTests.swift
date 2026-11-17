@@ -127,7 +127,9 @@ private let secondsInstant = AmbientFixtures.date("2026-06-15T18:05:09Z")
         #expect(probe.x == 0.5 && probe.y == 0.5)
         #expect(probe.expected == FrameColorClass.dark.rawValue)
         #expect(shell.presenter.nativeActions == ["clock.format", "theme.motion", "theme.speed", "theme.select",
-                                                 "theme.palette"])
+                                                 "theme.palette", "night.mode", "night.window", "night.dim",
+                                                 "motion.reduce", "screen.keepAwake"])
+        #expect(shell.presenter.nativeActions.count == 10)
     }
 
     @Test func theLargestTextFitsOneLineWithinNinetyPercentOfTheWidth() {

@@ -51,7 +51,8 @@ private let invalidChoiceSteps: [AmbientStep] = [
         let ids = AmbientCore.controls.map(\.id)
         #expect(ids == AmbientCore.actionIDs)
         #expect(ids == ["time.set", "time.changed", "clock.format", "theme.motion", "theme.speed", "theme.select",
-                       "theme.palette"])
+                       "theme.palette", "night.mode", "night.window", "night.dim", "motion.reduce",
+                       "screen.keepAwake"])
         #expect(AmbientCore.experienceID == "a18.ambient-clock")
     }
 
@@ -149,14 +150,14 @@ private let invalidChoiceSteps: [AmbientStep] = [
         #expect(core.revision == 1)
         let payload = try core.snapshotPayload()
         let object = try #require(try JSONSerialization.jsonObject(with: payload) as? [String: Any])
-        #expect(Set(object.keys) == ["hourCycle", "motion", "palette", "showDate", "showSeconds", "speed", "theme"])
+        #expect(Set(object.keys) == AmbientFixtures.schemaThreeKeys)
         let restored = try AmbientCore.restore(payload: payload, seed: 1)
         #expect(restored.hourCycle == 2 && restored.showSeconds && !restored.showDate)
         #expect(!restored.motion && restored.speed == 0.75)
         #expect(restored.instant == 0 && restored.revision == 0)
         #expect(try ambientDigest(restored) == ambientDigest(core))
         #expect(try restored.snapshotPayload() == payload)
-        #expect(AmbientCore.migrations.currentVersion == 2)
+        #expect(AmbientCore.migrations.currentVersion == 3)
     }
 
     @Test func anEngineSnapshotRestoresIntoAnotherEngine() async throws {

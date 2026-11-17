@@ -9,6 +9,10 @@
 //     stays within 0.18 of the cell's middle, so a disc never crosses into its neighbour.
 //   - Each disc is mixed over the background at most 0.9 (soft edge from 0.35 of its radius), then the centre is
 //     quietened and the result sRGB-encoded (`ThemeShaders`).
+//
+// Feature 134 (A18-P04) T-A18-404/406 (FR-A18-401, FR-A18-406; G-NIGHT/G-SCREENCARE): through the shared `vca_pixel`
+// and `vca_write` (`ThemeShaders`) the theme follows the drift translation `u_drift` and is multiplied by `u_night`
+// (dim and warm tint) after its sRGB encoding; by day both change nothing.
 import AmbientClockCore
 import Foundation
 

@@ -37,10 +37,35 @@
 //     actions sent by anyone else (the verification runner, a restore) show too.
 //   - The canvas label is the display's spoken string (`describe`), the overlay is `ClockOverlay` and the controls
 //     are `AmbientControls`; the probe is the canvas centre, `dark` (the overlay's text is not in the drawn frame).
+//
+// Feature 134 (A18-P04) T-A18-404/406 (FR-A18-401–409; G-NIGHT/G-MOTION/G-FRAMERATE/G-SCREENCARE/G-AWAKE;
+// clarifications Q1–Q5; contracts/power.md):
+//
+//   - Frame cap: `maxFramesPerSecond` is 30 at all times (the session passes it to its render host; `FramePacing`
+//     keeps its floor of 30 and its heat and Low Power Mode reductions).
+//   - Night: the core's `nightPolicy` (followed in `follow(_:)` and each `draw`) decides `isNightShown` from the
+//     local minute of the clock source's instant in the display environment's calendar
+//     (`NightPolicy.localMinute(of:calendar:)`). At night the scene's `u_night` is (night dim × idle dim, the warm
+//     tint) and the overlay's text is `NightPolicy.textColor`; by day `u_night` is (idle dim, 1, 1, 1).
+//   - Reduced motion: the system setting (`reduceMotion`, at creation) or the core's in-app `reduceMotion`
+//     (`effectiveReduceMotion`): the themes are stills, a theme change is a cut and the drift is zero.
+//   - Screen care: `currentDrift` is `ScreenCare.drift(at:reduceMotion:)` of the clock's instant (points); the overlay
+//     and the scene both move by `shownDrift`, the drift rounded to `driftStep` (0.5 point), so the overlay is redrawn
+//     only every few seconds. The scene's shift is that offset × `displayScale` in pixels, its y flipped (OpenGL's y
+//     points up). `currentDim` is `ScreenCare.dimFactor(now:lastAction:)` of the clock's instant and
+//     `lastActionInstant`, which starts at the clock's instant when the presenter is made and set up, and is renewed
+//     by `noteAction()` — called by the controls' and the favourites' sends only (the ticks' `time.set` and
+//     `time.changed` are not a person's action).
+//   - Keep-awake: a `KeepAwakeController` over the injected `IdleTimerPort` (by default `ApplicationIdleTimer`) holds
+//     the screen on while the core's `keepAwake` is on and the clock is visible: visible from `setup` and
+//     `didBecomeActive`, hidden at `willResignActive`, `didEnterBackground` and `teardown`. The three notifications are
+//     observed on the injected centre between `setup` and `teardown`, next to the time-change monitor. The device
+//     brightness is never written.
 import AmbientClockCore
 import Foundation
 import Observation
 import SwiftUI
+import UIKit
 import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreRendering
@@ -66,6 +91,24 @@ final class AmbientMirror {
     var theme = 0
     /// The palette's index (0–2).
     var palette = 0
+    /// Night mode: 0 off, 1 on, 2 scheduled.
+    var nightMode = 0
+    /// The scheduled window's start, minutes of the local day.
+    var nightStart = NightPolicy.defaultStart
+    /// The scheduled window's end, minutes of the local day.
+    var nightEnd = NightPolicy.defaultEnd
+    /// The dim factor of the scene at night.
+    var nightDim = NightPolicy.defaultDim
+    /// Whether the in-app reduced motion is on.
+    var reduceMotion = false
+    /// Whether the screen is kept on while the clock is shown.
+    var keepAwake = false
+    /// Whether night is shown now (the overlay's text is then `NightPolicy.textColor`).
+    var isNight = false
+    /// The drift offset the overlay is moved by, points (x right, y down), rounded to `AmbientPresenter.driftStep`.
+    var drift = SIMD2<Double>.zero
+    /// The idle dim factor the overlay's opacity is multiplied by (1, or 0.6 when idle).
+    var dim = 1.0
 }
 
 /// Draws Ambient Clock and owns its presentation state (see the file header).
@@ -78,6 +121,8 @@ final class AmbientPresenter: ExperiencePresenter {
 
     /// The length of a theme crossfade, seconds (0 under Reduce Motion, `transitionDuration`).
     static let fadeDuration = 1.2
+    /// The step the shown drift is rounded to, points (so the overlay moves at most every few seconds).
+    static let driftStep = 0.5
     /// The canvas label before any instant is known.
     static let fallbackDescription = "Ambient Clock"
     /// The system environment: `Locale.current` and `TimeZone.current` when called.
@@ -141,16 +186,46 @@ final class AmbientPresenter: ExperiencePresenter {
     var fadeProgress: Double { crossfade?.progress ?? 1 }
     /// How many time-change events reached the presenter.
     private(set) var timeChangeCount = 0
+    /// The frame cap: 30 frames per second at all times (clarification Q1).
+    var maxFramesPerSecond: Int { 30 }
+    /// The night policy of the last core followed or drawn.
+    private(set) var nightPolicy = NightPolicy()
+    /// The in-app reduced motion of the last core followed or drawn.
+    private(set) var inAppReduceMotion = false
+    /// The keep-awake setting of the last core followed or drawn.
+    private(set) var keepAwakeSetting = false
+    /// The instant of the last action of a person (seconds since 1970, from the clock source): the presenter's
+    /// creation, its `setup` and each `noteAction()`.
+    private(set) var lastActionInstant: Double
+    /// The points-to-pixels factor of the canvas (the overlay sets it from its environment's display scale; 1 until
+    /// then).
+    var displayScale = 1.0
+    /// The port that keeps the screen awake.
+    let idleTimer: any IdleTimerPort
+    /// Holds the screen awake while `keepAwakeSetting` is on and the clock is visible.
+    let keepAwake: KeepAwakeController
+    /// Whether the clock is visible: true from `setup` and `didBecomeActive`, false at `willResignActive`,
+    /// `didEnterBackground` and `teardown` (and before the first `setup`).
+    private(set) var isVisible = false
+    /// The visibility observers on `center`; registered between `setup` and `teardown`.
+    private var visibilityObservers: [any NSObjectProtocol] = []
+    /// The screen uniforms of the last frame drawn (`u_night` and `u_drift`).
+    private(set) var lastScreenUniforms = ThemeShaders.ScreenUniforms.day
 
     /// A presenter reading the time from `clock`, the system locale and zone from `environment`, observing the
-    /// time-change notifications on `center`; with `reduceMotion` on the background never moves.
+    /// time-change and visibility notifications on `center`; with `reduceMotion` on the background never moves;
+    /// keep-awake writes `idleTimer` (by default the application's idle timer).
     init(clock: any ClockSource = SystemClock(),
          environment: @escaping Environment = AmbientPresenter.systemEnvironment,
-         center: NotificationCenter = .default, reduceMotion: Bool = false) {
+         center: NotificationCenter = .default, reduceMotion: Bool = false,
+         idleTimer: any IdleTimerPort = ApplicationIdleTimer()) {
         self.clock = clock
         self.environment = environment
         self.center = center
         self.reduceMotion = reduceMotion
+        self.idleTimer = idleTimer
+        keepAwake = KeepAwakeController(port: idleTimer)
+        lastActionInstant = clock.now.timeIntervalSince1970
         let (locale, zone) = environment()
         display = AmbientClockState(preferences: ClockPreferences(), systemLocale: locale, systemTimeZone: zone)
     }
@@ -166,6 +241,7 @@ final class AmbientPresenter: ExperiencePresenter {
         adoptEnvironmentIfChanged()
         display.apply(.timeSet(now))
         port.send("time.set", [now.timeIntervalSince1970])
+        refreshScreenState()
         return display.nextDeadline
             ?? ClockSchedule.nextDeadline(after: now, showSeconds: display.preferences.showSeconds,
                                           calendar: display.environment.calendar)
@@ -199,6 +275,107 @@ final class AmbientPresenter: ExperiencePresenter {
     func setFormat(hourCycle: Int, showSeconds: Bool, showDate: Bool, port: ExperienceActionPort) -> ActionResult {
         let preferences = AmbientCore.preferences(hourCycle: hourCycle, showSeconds: showSeconds, showDate: showDate)
         return port.send("clock.format", AmbientCore.formatValues(preferences))
+    }
+
+    // MARK: Night, motion and screen care
+
+    /// Whether reduced motion applies: the system setting at creation or the in-app setting of the last core.
+    var effectiveReduceMotion: Bool { reduceMotion || inAppReduceMotion }
+
+    /// Whether night is shown now: the night policy at the local minute of the clock source's instant in the display
+    /// environment's calendar.
+    var isNightShown: Bool {
+        nightPolicy.isNight(localMinute: NightPolicy.localMinute(of: clock.now, calendar: display.environment.calendar))
+    }
+
+    /// The screen-care drift now, points (x right, y down): `ScreenCare.drift(at:reduceMotion:)` of the clock
+    /// source's instant, zero under reduced motion.
+    var currentDrift: SIMD2<Double> {
+        ScreenCare.drift(at: clock.now.timeIntervalSince1970, reduceMotion: effectiveReduceMotion)
+    }
+
+    /// The drift the overlay and the scene are moved by: `currentDrift` rounded to `driftStep`.
+    var shownDrift: SIMD2<Double> {
+        let drift = currentDrift
+        return SIMD2((drift.x / Self.driftStep).rounded() * Self.driftStep,
+                     (drift.y / Self.driftStep).rounded() * Self.driftStep)
+    }
+
+    /// The idle dim factor now: `ScreenCare.dimFactor(now:lastAction:)` of the clock source's instant and
+    /// `lastActionInstant` (1, or 0.6 after 600 s without an action).
+    var currentDim: Double {
+        ScreenCare.dimFactor(now: clock.now.timeIntervalSince1970, lastAction: lastActionInstant)
+    }
+
+    /// The scene's night and drift uniforms now: (night dim × idle dim, tint) at night, (idle dim, 1, 1, 1) by day;
+    /// the drift is `shownDrift` × `displayScale` in pixels with y flipped.
+    var screenUniforms: ThemeShaders.ScreenUniforms {
+        let night = isNightShown
+        let scale = displayScale.isFinite && displayScale > 0 ? displayScale : 1
+        let drift = shownDrift
+        return ThemeShaders.ScreenUniforms(dim: (night ? nightPolicy.dim : 1) * currentDim,
+                                           tint: night ? NightPolicy.tint : SIMD3(1, 1, 1),
+                                           drift: SIMD2(drift.x * scale, -drift.y * scale))
+    }
+
+    /// A person acted (a control or a favourite sent an action): the last-action instant becomes the clock source's
+    /// instant, which ends the idle dim.
+    func noteAction() {
+        lastActionInstant = clock.now.timeIntervalSince1970
+        refreshScreenState()
+    }
+
+    /// Adopts the night policy, the in-app reduced motion and the keep-awake setting of `core`; keep-awake is
+    /// updated when its setting changes.
+    private func adoptScreenSettings(_ core: AmbientCore) {
+        let policy = core.nightPolicy
+        if nightPolicy != policy { nightPolicy = policy }
+        if inAppReduceMotion != core.reduceMotion { inAppReduceMotion = core.reduceMotion }
+        if keepAwakeSetting != core.keepAwake {
+            keepAwakeSetting = core.keepAwake
+            keepAwake.update(setting: keepAwakeSetting, visible: isVisible)
+        }
+    }
+
+    /// Brings the mirror's night, drift and dim up to now (each written only when it changes).
+    private func refreshScreenState() {
+        let night = isNightShown, drift = shownDrift, dim = currentDim
+        if mirror.isNight != night { mirror.isNight = night }
+        if mirror.drift != drift { mirror.drift = drift }
+        if mirror.dim != dim { mirror.dim = dim }
+    }
+
+    // MARK: Visibility and keep-awake
+
+    /// Sets whether the clock is visible and updates keep-awake.
+    func setVisible(_ visible: Bool) {
+        isVisible = visible
+        keepAwake.update(setting: keepAwakeSetting, visible: visible)
+    }
+
+    /// Observes `didBecomeActive` (visible), `willResignActive` and `didEnterBackground` (hidden) on `center`; each
+    /// is handled on the main actor — at once when posted on the main thread.
+    private func startVisibilityObservers() {
+        guard visibilityObservers.isEmpty else { return }
+        let names: [(Notification.Name, Bool)] = [(UIApplication.didBecomeActiveNotification, true),
+                                                  (UIApplication.willResignActiveNotification, false),
+                                                  (UIApplication.didEnterBackgroundNotification, false)]
+        for (name, visible) in names {
+            let token = center.addObserver(forName: name, object: nil, queue: nil) { [weak self] _ in
+                if Thread.isMainThread {
+                    MainActor.assumeIsolated { self?.setVisible(visible) }
+                } else {
+                    Task { @MainActor in self?.setVisible(visible) }
+                }
+            }
+            visibilityObservers.append(token)
+        }
+    }
+
+    /// Removes the visibility observers.
+    private func stopVisibilityObservers() {
+        for token in visibilityObservers { center.removeObserver(token) }
+        visibilityObservers = []
     }
 
     // MARK: Monitor
@@ -254,6 +431,10 @@ final class AmbientPresenter: ExperiencePresenter {
     /// ``NoiseGradientShaderError``; another theme's error falls back to the noise gradient (`lastThemeError`).
     func setup(_ context: RenderContext) throws {
         startMonitoring()
+        startVisibilityObservers()
+        lastActionInstant = clock.now.timeIntervalSince1970
+        setVisible(true)
+        refreshScreenState()
         crossfade = nil
         themeScenes = [:]
         fadeStart = nil
@@ -288,6 +469,7 @@ final class AmbientPresenter: ExperiencePresenter {
     /// the effective time from `core` and `frame`, advances the fade and draws the crossfade.
     func draw(_ core: AmbientCore, tier: Int, context: RenderContext, frame: FrameInfo) throws {
         lastDrawCount = 0
+        adoptScreenSettings(core)
         guard let crossfade else { return }
         let wanted = ThemeChoice(theme: core.theme, palette: core.palette)
         if wanted != ThemeChoice(theme: shownTheme, palette: shownPalette), wanted != refusedChoice {
@@ -295,20 +477,24 @@ final class AmbientPresenter: ExperiencePresenter {
         }
         cutNextChange = false
         if let start = fadeStart {
-            let duration = transitionDuration(Self.fadeDuration, reduceMotion: reduceMotion)
+            let duration = transitionDuration(Self.fadeDuration, reduceMotion: effectiveReduceMotion)
             let linear = duration > 0 ? min(max((frame.time - start) / duration, 0), 1) : 1
             crossfade.progress = linear * linear * (3 - 2 * linear)
             if linear >= 1 { fadeStart = nil }
         }
         let time = NoiseGradientTheme.effectiveTime(frameTime: frame.time, speed: core.speed, motion: core.motion,
-                                                    reduceMotion: reduceMotion)
+                                                    reduceMotion: effectiveReduceMotion)
+        let screen = screenUniforms
         let incoming = themeScene(shownTheme)
         incoming.resize(context)
         incoming.parameters = ThemeShaders.parameters(theme: shownTheme, tier: tier)
+            .merging(ThemeShaders.screenParameters(screen)) { _, new in new }
         incoming.palette = ThemeShaders.palette(theme: shownTheme, palette: shownPalette)
         incoming.fixedTime = time
         try crossfade.render(context, frame: frame)
         lastUniformTime = time
+        lastScreenUniforms = screen
+        refreshScreenState()
         lastCount = ThemeCatalog.budget(theme: shownTheme, tier: tier)
         let progress = crossfade.progress
         lastDrawCount = progress > 0 && progress < 1 ? 3 : 1
@@ -342,7 +528,7 @@ final class AmbientPresenter: ExperiencePresenter {
         shownPalette = min(max(choice.palette, 0), AmbientCore.paletteCount - 1)
         refusedChoice = nil
         lastThemeError = nil
-        if cut || transitionDuration(Self.fadeDuration, reduceMotion: reduceMotion) == 0 {
+        if cut || transitionDuration(Self.fadeDuration, reduceMotion: effectiveReduceMotion) == 0 {
             crossfade.progress = 1
             fadeStart = nil
         } else {
@@ -364,9 +550,12 @@ final class AmbientPresenter: ExperiencePresenter {
         return message
     }
 
-    /// Releases the crossfade (and with it the theme scenes it holds) and stops the monitor.
+    /// Releases the crossfade (and with it the theme scenes it holds), stops the monitor and the visibility
+    /// observers and releases keep-awake (the clock is no longer visible).
     func teardown(_ context: RenderContext) {
         stopMonitoring()
+        stopVisibilityObservers()
+        setVisible(false)
         crossfade?.teardown(context)
         crossfade = nil
         themeScenes = [:]
@@ -377,8 +566,10 @@ final class AmbientPresenter: ExperiencePresenter {
     // MARK: Words, probes and views
 
     /// Brings the display and the mirror up to `core`: a new core instant (other than 0) is shown, and the core's
-    /// format becomes the display's preferences.
+    /// format becomes the display's preferences; the night, motion and keep-awake settings are adopted (keep-awake
+    /// follows a changed setting at once).
     func follow(_ core: AmbientCore) {
+        adoptScreenSettings(core)
         if followedInstant != core.instant {
             followedInstant = core.instant
             if let date = core.date, display.now != date { display.apply(.timeSet(date)) }
@@ -392,6 +583,13 @@ final class AmbientPresenter: ExperiencePresenter {
         if mirror.speed != core.speed { mirror.speed = core.speed }
         if mirror.theme != core.theme { mirror.theme = core.theme }
         if mirror.palette != core.palette { mirror.palette = core.palette }
+        if mirror.nightMode != core.nightMode { mirror.nightMode = core.nightMode }
+        if mirror.nightStart != core.nightStart { mirror.nightStart = core.nightStart }
+        if mirror.nightEnd != core.nightEnd { mirror.nightEnd = core.nightEnd }
+        if mirror.nightDim != core.nightDim { mirror.nightDim = core.nightDim }
+        if mirror.reduceMotion != core.reduceMotion { mirror.reduceMotion = core.reduceMotion }
+        if mirror.keepAwake != core.keepAwake { mirror.keepAwake = core.keepAwake }
+        refreshScreenState()
     }
 
     /// The canvas label: the display's spoken string (time, and the date when shown), or "Ambient Clock" before the
@@ -420,9 +618,13 @@ final class AmbientPresenter: ExperiencePresenter {
         return AnyView(AmbientControls(port: port, mirror: mirror, presenter: self, favourites: favourites))
     }
 
-    /// The actions of the native controls: the format, motion, speed, theme and palette (`time.set` and
-    /// `time.changed` are sent by the presenter itself; a favourite sends the four theme actions).
-    var nativeActions: Set<String> { ["clock.format", "theme.motion", "theme.speed", "theme.select", "theme.palette"] }
+    /// The actions of the native controls: the format, motion, speed, theme, palette, night mode, window and dim,
+    /// reduced motion and keep-awake (`time.set` and `time.changed` are sent by the presenter itself; a favourite
+    /// sends the four theme actions).
+    var nativeActions: Set<String> {
+        ["clock.format", "theme.motion", "theme.speed", "theme.select", "theme.palette", "night.mode", "night.window",
+         "night.dim", "motion.reduce", "screen.keepAwake"]
+    }
 
     /// The preset of what the controls show (theme, palette, speed, motion); nil when out of range.
     var currentPreset: ThemePreset? {
