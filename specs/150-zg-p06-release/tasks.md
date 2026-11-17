@@ -33,7 +33,7 @@ migration, no VisualCore change).
   `GardenDrawError.injected` once and clears the flag") and `ExperienceTests/GardenRecoveryDrawTests.swift` (two
   gardens saved in a temporary storage; a failed draw fails the session with the injected message; `library.json` and
   both garden files byte-identical; a new session over the same storage lists both) (FR-A20-603; SC-A20-602)
-- [ ] T-A20-605 [P] [US2] Commit `ExperienceTests/Fixtures/{snapshot-v1,snapshot-newer,snapshot-damaged,garden-current,
+- [X] T-A20-605 [P] [US2] Commit `ExperienceTests/Fixtures/{snapshot-v1,snapshot-newer,snapshot-damaged,garden-current, — Verified 2026-11-17: 2026-11-17: nine samples in ExperienceTests/Fixtures (snapshot v1, newer, damaged; garden current, newer, damaged; library current, newer, damaged), the Fixtures resource in Package.swift, StoredSampleTests (8: v1 restores with its digest, newer refused as newerSchema 2, damaged corrupt; current garden opens and re-encodes exactly; newer and damaged unreadable; index lists two; newer index read-only; damaged index not rewritten; every file byte-identical); .autonomy/checks/A20-P06.zg-ios27.json exit 0; written by an agent, retested
   garden-newer,garden-damaged,library-current,library-newer,library-damaged}.json`, declare the `Fixtures` resource of
   `DigitalZenGardenExperienceTests` in `Packages/ExperiencesCreative/Package.swift` (lead), and add
   `ExperienceTests/StoredSampleTests.swift`: snapshot v1 restores, newer (schema 2) and damaged refused; a current
