@@ -38,3 +38,7 @@ Agent C: T-A17-502. Agent E, after C: T-A17-503. Lead: T-A17-504 (docs), contrac
 
 MVP: the record and the review lines (502), which carry the phase's MVP. The list-only fixture (503) and the device
 plan (504) close the phase. Review checkpoint after 502 and at 506.
+
+## Phase 5: Convergence
+
+- [ ] T-A17-509 Record in `specs/128-ia-p05-review-device-qa/research.md` and `data-model.md` the stricter entry rules as built: a source must be one of the part's own citations; the root `knee.joint` is not a reviewable part; the record's helpers are `isISODate`, `entries(for:)` and `maxBytes` (65,536). Per data-model: review entry rules (unrequested)
