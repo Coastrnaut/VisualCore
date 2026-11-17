@@ -61,6 +61,19 @@
 //     `didBecomeActive`, hidden at `willResignActive`, `didEnterBackground` and `teardown`. The three notifications are
 //     observed on the injected centre between `setup` and `teardown`, next to the time-change monitor. The device
 //     brightness is never written.
+//
+// Feature 135 (A18-P05) T-A18-503 (FR-A18-501, FR-A18-502; SC-A18-501, SC-A18-502; clarifications Q1, Q2;
+// contracts/qa.md "Presenter"):
+//
+//   - Still work: the crossfade is the child of a VisualCoreRendering `CachedScene` (`cache`), which owns it while it
+//     is set up: `setup`, `resize` and `teardown` go to the cache, which forwards them to the crossfade (and through
+//     it to the themes); `replaceIncoming` is still called on the crossfade itself. The picture is still (`isStill`)
+//     when nothing moves (motion off, the in-app reduction or the system's Reduce Motion), the seconds are off and no
+//     fade runs; then the cache is not pass-through and its key is `stillKey`, a deterministic FNV-1a mix of
+//     everything the theme's picture depends on (theme, palette, tier, night dim and tint, the shown drift step, the
+//     idle dim, the display scale, the uniform time and the drawable size). Each frame still sets the uniforms; the
+//     theme draws again only when the key changes, otherwise the cached picture is copied. While anything moves the
+//     cache is pass-through and the theme draws every frame, as before. `backgroundDrawCount` is the theme's draws.
 import AmbientClockCore
 import Foundation
 import Observation
@@ -152,8 +165,10 @@ final class AmbientPresenter: ExperiencePresenter {
     var favourites: AmbientFavourites?
     /// The crossfade drawing the themes; made in `setup`, released in `teardown`.
     private(set) var crossfade: CrossfadeScene?
-    /// The scene drawn (the crossfade); nil before `setup` and after `teardown`.
+    /// The scene drawn inside the cache (the crossfade); nil before `setup` and after `teardown`.
     var scene: CrossfadeScene? { crossfade }
+    /// The cache around the crossfade (its owner while set up); made in `setup`, released in `teardown`.
+    private(set) var cache: CachedScene?
     /// The theme scenes made so far, by theme index (lazily; their GPU objects are the crossfade's to manage).
     private var themeScenes: [Int: FullScreenShaderScene] = [:]
     /// The theme drawn (the incoming one during a fade).
@@ -172,7 +187,8 @@ final class AmbientPresenter: ExperiencePresenter {
     var failNextThemeCompile = false
     /// The last core instant `describe` followed; nil before the first.
     private var followedInstant: Double?
-    /// The number of full-screen draws of the last frame (1 when drawn, 0 otherwise).
+    /// The number of full-screen draws of the last frame (1 when drawn, 0 otherwise); a cached still frame counts its
+    /// copy as its one draw (the theme's own draws are `backgroundDrawCount`).
     private(set) var lastDrawCount = 0
     /// The uniform time of the last frame.
     private(set) var lastUniformTime = 0.0
@@ -180,8 +196,22 @@ final class AmbientPresenter: ExperiencePresenter {
     private(set) var lastCount = 0
     /// The A18-P02 name of `lastCount` (for the noise gradient, its octaves).
     var lastOctaves: Int { lastCount }
-    /// The number of draws of the last frame (`lastDrawCount`): 1 outside a fade, 3 during one, 0 when not drawn.
+    /// The number of draws of the last frame (`lastDrawCount`): 1 outside a fade (the theme, or the cached picture's
+    /// copy while still), 3 during one, 0 when not drawn.
     var drawCount: Int { lastDrawCount }
+    /// How many times the background (the crossfade and its themes) has drawn through the cache since `setup`: one per
+    /// frame while moving, one per still picture while still (`CachedScene.childDrawCount`); 0 without a cache.
+    var backgroundDrawCount: Int { cache?.childDrawCount ?? 0 }
+    /// Whether the core's motion is on (the core of the last frame drawn or followed).
+    private(set) var coreMotion = true
+    /// Whether the core shows the seconds (the core of the last frame drawn or followed).
+    private(set) var coreShowSeconds = false
+    /// The quality tier of the last frame drawn.
+    private(set) var drawnTier = 0
+    /// The drawable size of the last frame drawn, pixels.
+    private(set) var drawnPixelSize = (width: 0, height: 0)
+    /// The uniform time of the frame being drawn (0 while nothing moves).
+    private var drawnUniformTime = 0.0
     /// How far the crossfade is (0…1); 1 when no crossfade exists.
     var fadeProgress: Double { crossfade?.progress ?? 1 }
     /// How many time-change events reached the presenter.
@@ -325,12 +355,14 @@ final class AmbientPresenter: ExperiencePresenter {
         refreshScreenState()
     }
 
-    /// Adopts the night policy, the in-app reduced motion and the keep-awake setting of `core`; keep-awake is
-    /// updated when its setting changes.
+    /// Adopts the night policy, the in-app reduced motion, the motion and seconds settings and the keep-awake setting
+    /// of `core`; keep-awake is updated when its setting changes.
     private func adoptScreenSettings(_ core: AmbientCore) {
         let policy = core.nightPolicy
         if nightPolicy != policy { nightPolicy = policy }
         if inAppReduceMotion != core.reduceMotion { inAppReduceMotion = core.reduceMotion }
+        if coreMotion != core.motion { coreMotion = core.motion }
+        if coreShowSeconds != core.showSeconds { coreShowSeconds = core.showSeconds }
         if keepAwakeSetting != core.keepAwake {
             keepAwakeSetting = core.keepAwake
             keepAwake.update(setting: keepAwakeSetting, visible: isVisible)
@@ -343,6 +375,67 @@ final class AmbientPresenter: ExperiencePresenter {
         if mirror.isNight != night { mirror.isNight = night }
         if mirror.drift != drift { mirror.drift = drift }
         if mirror.dim != dim { mirror.dim = dim }
+    }
+
+    // MARK: Still work
+
+    /// Whether the background's picture is still: no motion (the core's motion off, the in-app reduction or the
+    /// system's Reduce Motion), the seconds off and no fade running (`fadeProgress` 1).
+    var isStill: Bool {
+        (effectiveReduceMotion || !coreMotion) && !coreShowSeconds && fadeProgress >= 1
+    }
+
+    /// The identity of the still picture: an FNV-1a mix (64-bit, deterministic across runs) of the shown theme and
+    /// palette, the tier and size of the last frame drawn, whether night is shown with the night dim and tint, the
+    /// shown drift step, the idle dim, the display scale and the uniform time. It changes whenever the theme's
+    /// picture would.
+    var stillKey: Int {
+        let night = isNightShown
+        let tint = night ? NightPolicy.tint : SIMD3(1, 1, 1)
+        let drift = shownDrift
+        var mix = StillKeyMix()
+        mix.add(shownTheme)
+        mix.add(shownPalette)
+        mix.add(drawnTier)
+        mix.add(night ? 1 : 0)
+        mix.add(night ? nightPolicy.dim : 1)
+        mix.add(tint.x)
+        mix.add(tint.y)
+        mix.add(tint.z)
+        mix.add(drift.x)
+        mix.add(drift.y)
+        mix.add(currentDim)
+        mix.add(displayScale)
+        mix.add(drawnUniformTime)
+        mix.add(drawnPixelSize.width)
+        mix.add(drawnPixelSize.height)
+        return mix.value
+    }
+
+    /// A 64-bit FNV-1a mix of integers and doubles (by their bit patterns, with -0 as 0), independent of `Hasher`'s
+    /// per-process seed.
+    struct StillKeyMix {
+        /// The running hash (FNV-1a offset basis at the start).
+        private(set) var state: UInt64 = 0xcbf2_9ce4_8422_2325
+
+        /// Mixes the eight bytes of `word`, low byte first.
+        mutating func add(word: UInt64) {
+            var rest = word
+            for _ in 0..<8 {
+                state ^= rest & 0xff
+                state = state &* 0x0000_0100_0000_01b3
+                rest >>= 8
+            }
+        }
+
+        /// Mixes an integer.
+        mutating func add(_ value: Int) { add(word: UInt64(bitPattern: Int64(value))) }
+
+        /// Mixes a double by its bit pattern (-0 is mixed as 0).
+        mutating func add(_ value: Double) { add(word: (value == 0 ? 0 : value).bitPattern) }
+
+        /// The hash as an `Int`.
+        var value: Int { Int(truncatingIfNeeded: state) }
     }
 
     // MARK: Visibility and keep-awake
@@ -426,8 +519,9 @@ final class AmbientPresenter: ExperiencePresenter {
         return made
     }
 
-    /// Starts the monitor, then makes the crossfade with the shown theme as both children at progress 1 and sets it
-    /// up with the host's registry (again after a recreation). A shader error of the noise gradient throws
+    /// Starts the monitor, then makes the crossfade with the shown theme as both children at progress 1 inside a new
+    /// `CachedScene` and sets the cache (and through it the crossfade) up with the host's registry (again after a
+    /// recreation). A shader error of the noise gradient throws
     /// ``NoiseGradientShaderError``; another theme's error falls back to the noise gradient (`lastThemeError`).
     func setup(_ context: RenderContext) throws {
         startMonitoring()
@@ -436,6 +530,7 @@ final class AmbientPresenter: ExperiencePresenter {
         setVisible(true)
         refreshScreenState()
         crossfade = nil
+        cache = nil
         themeScenes = [:]
         fadeStart = nil
         refusedChoice = nil
@@ -445,14 +540,16 @@ final class AmbientPresenter: ExperiencePresenter {
             let shown = themeScene(theme)
             let made = CrossfadeScene(from: shown, to: shown)
             made.progress = 1
-            try made.setup(context)
+            let wrapped = CachedScene(child: made)
+            try wrapped.setup(context)
             guard let message = shown.errorMessage else {
                 crossfade = made
+                cache = wrapped
                 if theme != shownTheme { shownPalette = 0 }
                 shownTheme = theme
                 return
             }
-            made.teardown(context)
+            wrapped.teardown(context)
             themeScenes[theme] = nil
             guard theme != 0 else { throw NoiseGradientShaderError(message: message) }
             lastThemeError = ThemeShaderError(theme: theme, message: message).description
@@ -460,17 +557,19 @@ final class AmbientPresenter: ExperiencePresenter {
         }
     }
 
-    /// Passes the new drawable size to the crossfade (which resizes its children and releases its targets).
+    /// Passes the new drawable size to the cache, which releases its picture and resizes the crossfade (which resizes
+    /// its children and releases its targets).
     func resize(_ context: RenderContext) {
-        crossfade?.resize(context)
+        cache?.resize(context)
     }
 
     /// Follows a new theme or palette of `core` (a cut or a fade), sets the incoming theme's uniforms of `tier` and
-    /// the effective time from `core` and `frame`, advances the fade and draws the crossfade.
+    /// the effective time from `core` and `frame`, advances the fade and draws the crossfade through the cache: in
+    /// pass-through while anything moves, else keyed by `stillKey` (the theme draws only for a new still picture).
     func draw(_ core: AmbientCore, tier: Int, context: RenderContext, frame: FrameInfo) throws {
         lastDrawCount = 0
         adoptScreenSettings(core)
-        guard let crossfade else { return }
+        guard let crossfade, let cache else { return }
         let wanted = ThemeChoice(theme: core.theme, palette: core.palette)
         if wanted != ThemeChoice(theme: shownTheme, palette: shownPalette), wanted != refusedChoice {
             show(wanted, crossfade: crossfade, context: context, frame: frame, cut: cutNextChange)
@@ -491,7 +590,13 @@ final class AmbientPresenter: ExperiencePresenter {
             .merging(ThemeShaders.screenParameters(screen)) { _, new in new }
         incoming.palette = ThemeShaders.palette(theme: shownTheme, palette: shownPalette)
         incoming.fixedTime = time
-        try crossfade.render(context, frame: frame)
+        drawnTier = tier
+        drawnPixelSize = (context.pixelWidth, context.pixelHeight)
+        drawnUniformTime = time
+        let still = isStill
+        cache.passThrough = !still
+        if still { cache.key = stillKey }
+        try cache.render(context, frame: frame)
         lastUniformTime = time
         lastScreenUniforms = screen
         refreshScreenState()
@@ -550,13 +655,14 @@ final class AmbientPresenter: ExperiencePresenter {
         return message
     }
 
-    /// Releases the crossfade (and with it the theme scenes it holds), stops the monitor and the visibility
+    /// Releases the cache (and with it the crossfade and the theme scenes it holds), stops the monitor and the visibility
     /// observers and releases keep-awake (the clock is no longer visible).
     func teardown(_ context: RenderContext) {
         stopMonitoring()
         stopVisibilityObservers()
         setVisible(false)
-        crossfade?.teardown(context)
+        cache?.teardown(context)
+        cache = nil
         crossfade = nil
         themeScenes = [:]
         fadeStart = nil
