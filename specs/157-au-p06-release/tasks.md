@@ -101,7 +101,7 @@
 - [X] T-A21-611 Release build checks, as a review checkpoint: `--name release-checks -- python3 scripts/release_check.py — Verified 2026-11-17: 2026-11-17: review checkpoint: .autonomy/checks/A21-P06.release-checks.json exit 0 (8/8: app-release-build, app-release-symbols, app-privacy-manifest, app-no-tracking, app-licenses, app-usage-descriptions, experience-release-a21, copy-claims-a21)
   --only app-release-build app-release-symbols app-privacy-manifest app-no-tracking app-licenses app-usage-descriptions
   experience-release-a21 copy-claims-a21`
-- [ ] T-A21-612 Contract:
+- [X] T-A21-612 Contract: — Verified 2026-11-17: 2026-11-17: .autonomy/checks/A21-P06.contract.json exit 0 (G-RELEASE closed by A21-P06; all 13 gaps closed and all 26 rows available, M24 last; the iOS 26.x runner half cited at X-A21); A21-P06.experience-packages.json, A21-P06.catalog.json and A21-P06.script-tests.json exit 0
   - G-RELEASE is closed by "A21-P06"; its iOS 26.x runner half is cited at X-A21;
   - rows whose gaps are all closed become available, with evidence;
   - run `--name contract`, then the packages, catalog and script tests

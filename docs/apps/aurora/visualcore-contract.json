@@ -1150,7 +1150,7 @@
    "id": "M24",
    "capability": "Truthful claims: no aurora forecast or scientific claim, no therapeutic or sleep claim, no always-on-screen promise, and no battery or frame-rate figure not measured on a device",
    "source": "constitution A21 truthful claims; manual non-goals; spec FR-A21-006",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/PerformanceRecord.swift",
@@ -1169,7 +1169,7 @@
     "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Core/ScientificReview.swift",
     "symbol": "ScientificReview"
    },
-   "notes": "PerformanceRecord is tested (SessionPerformanceTests); scripts/check_copy_claims.py is the claim checker. Device measurements are G-DEVICE (A21-P05); the A21 copy-claims step is G-RELEASE (A21-P06). A21-P05 (feature 156): no device figure is claimed; every campaign row is pending (G-DEVICE closed as the plan; G-RELEASE remains)."
+   "notes": "PerformanceRecord is tested (SessionPerformanceTests); scripts/check_copy_claims.py is the claim checker. Device measurements are G-DEVICE (A21-P05); the A21 copy-claims step is G-RELEASE (A21-P06). A21-P05 (feature 156): no device figure is claimed; every campaign row is pending (G-DEVICE closed as the plan; G-RELEASE remains). A21-P06 (feature 157): the claims scan (specs/157-au-p06-release/scan-claims-release.sh) and copy-claims-a21 refuse forecast, scientific, therapeutic, sleep, always-on and unmeasured claims; experience-release-a21 passes; the iOS 26.x runner half is cited at X-A21 (G-RELEASE closed)."
   },
   {
    "id": "M25",
@@ -1413,7 +1413,7 @@
    "justification": "The A21 copy-claims and verify release steps and the release notes are repository tooling for this experience (manual phase 06).",
    "phase": 6,
    "test": "Release-check steps: copy-claims-a21 finds no forecast, scientific, therapeutic, sleep, always-on-screen or unmeasured performance claim; verify-a21 steps pass on the iOS 27.x and 26.x simulators",
-   "closed": null
+   "closed": "A21-P06"
   }
  ],
  "traceability": [
