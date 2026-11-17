@@ -1,0 +1,1641 @@
+{
+ "schema": 1,
+ "app": "aurora",
+ "gate": "A21-P00",
+ "date": "2026-11-17",
+ "inventory": [
+  {
+   "area": "Package products",
+   "description": "Pure, host-testable products of Packages/VisualCore: VisualCoreMath, VisualCoreSimulation, VisualCoreScenes, VisualCoreShaderSource, VisualCoreEffectsGraph, VisualCoreDiagnostics, VisualCoreAudioDSP, VisualCorePersistence, VisualCoreParameters, VisualCoreExperience. iOS products of Packages/VisualCoreRendering: VisualCoreRendering, VisualCoreEffects, VisualCoreUI, VisualCoreAudio, VisualCoreAutomation, VisualCoreExperienceHost. For Aurora (checked 2026-11-17): VisualCoreRendering has FullScreenShaderScene, ShaderBundle with the vc/ GLSL library (vc_valueNoise, vc_gradientNoise, vc_fbm), FieldPass, ParticleRenderer, ParticleLayerScene and TrailLayer (brightnessCap), ResourceRegistry.makeRenderTarget, PingPongTarget, FloatRenderSupport, CrossfadeScene, CachedScene and RenderCapabilities; VisualCoreEffects has EffectScene; VisualCoreEffectsGraph has FlashLimiterModel and PassSchemas (bloom); VisualCoreShaderSource has RenderState.BlendMode (alpha, premultiplied, additive); VisualCoreScenes has GradientNoise2D and FractalNoise2D; VisualCoreSimulation has ParticleSystem with Emitter, SceneClock and AccessibilityPreferences; VisualCoreDiagnostics has ParticleBudget, FramePacing, DeviceConditions, QualityPolicy and QualityGovernor; VisualCoreMath has ease and EasingCurve; VisualCoreParameters has ParameterSchema, ParameterDefinition, Palette and Preset; VisualCoreExperience has ExperienceSnapshot and ExperienceStorage (setValue); VisualCorePersistence has MigrationChain; VisualCoreAudio has SoundEffectPlayer (one-shot); VisualCoreAudioDSP has SoundEffectSynth; VisualCoreUI has SystemAccessibilityObserver. Missing in every framework product (grep 2026-11-17): a continuous or looping sound player with a volume, a luminance cap for an arbitrary scene, tone mapping, a hide-and-restore or full-screen mode for an experience's controls, a static fallback frame when a shader feature is unsupported, and CPU value noise.",
+   "paths": [
+    "Packages/VisualCore/Package.swift",
+    "Packages/VisualCoreRendering/Package.swift",
+    "Packages/ExperiencesCreative/Package.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderBundle.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ParticleLayerScene.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ParticleRenderer.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/CrossfadeScene.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/CachedScene.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderCapabilities.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectScene.swift",
+    "Packages/VisualCore/Sources/VisualCoreEffectsGraph/FlashLimiterModel.swift",
+    "Packages/VisualCore/Sources/VisualCoreShaderSource/RenderState.swift",
+    "Packages/VisualCore/Sources/VisualCoreScenes/GradientNoise2D.swift",
+    "Packages/VisualCore/Sources/VisualCoreSimulation/ParticleSystem.swift",
+    "Packages/VisualCore/Sources/VisualCoreSimulation/SceneClock.swift",
+    "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPreferences.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/ParticleBudget.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/FramePacing.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/DeviceConditions.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityPolicy.swift",
+    "Packages/VisualCore/Sources/VisualCoreMath/Easing.swift",
+    "Packages/VisualCore/Sources/VisualCoreParameters/ParameterSchema.swift",
+    "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreAudio/SoundEffectPlayer.swift",
+    "Packages/VisualCore/Sources/VisualCoreAudioDSP/SoundEffect.swift",
+    "docs/api/visualcore-public-api.txt",
+    "scripts/check_dependencies.py"
+   ],
+   "owner": "VisualCore packages (ADR-0003, ADR-0009)"
+  },
+  {
+   "area": "EGL render host and its main-thread rule",
+   "description": "RenderHost (@MainActor) owns the EGL display, context and surfaces over ANGLE's Metal backend (EGLDisplayProvider), the CAMetalLayer RenderView, the FrameScheduler (CADisplayLink paced by FramePacing: floor 30 frames per second; 30 under Low Power Mode or a serious thermal state, render scale 0.75 when critical; else the presenter's maxFramesPerSecond, 60 by default) and context generations; every GL call runs on the main thread inside RenderScene setup, resize, render and teardown. RenderHost, RenderScene, the presenter, the shell and the action port are main-actor; the core is a Sendable value advanced in fixed steps (ExperienceEngine.advance(frame:)) that never reads a clock or draws. RenderHost pauses in the background, resumes in the foreground, and rebuilds on memory warning and recreateContext. FrameInfo.time is wall-clock; FrameInfo.delta is clamped to 0...0.1 s (FramePacing.clampedDelta).",
+   "paths": [
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderView.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FrameScheduler.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/EGLDisplayProvider.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/FramePacing.swift",
+    "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceEngine.swift"
+   ],
+   "owner": "VisualCoreRendering (ADR-0002 seam)"
+  },
+  {
+   "area": "Shaders and resources (full-screen shaders, GLSL library, render targets and blending, particles, crossfade)",
+   "description": "FullScreenShaderScene draws one bundled fragment shader over the canvas with u_time (FrameInfo.time times timeScale, or fixedTime when set), u_resolution, u_seed (seedOffsets), up to 8 palette stops and one float uniform per parameter; a compile error is kept in errorMessage and the frame is cleared to dark grey. ShaderBundle and ShaderLibrary compile bundled GLSL with #include of the vc/ library (noise.glsl: vc_valueNoise, vc_gradientNoise, vc_fbm; hash, palette, color (sRGB), sdf, field). FieldPass runs a fragment program into a render target or over a PingPongTarget; ResourceRegistry.makeRenderTarget creates rgba8, rgba16f or r8 targets under a ResourceBudget, with release, acquireTarget, recycle and trimPools; FloatRenderSupport probes half-float rendering per context generation. RenderState.BlendMode offers none, alpha, premultiplied and additive. ParticleSystem (emitters, forces) under ParticleBudget is drawn by ParticleRenderer as instanced soft quads (ParticleBlend normal or additive) inside ParticleLayerScene, whose brightnessCap (like TrailLayer's) is the only brightness cap. EffectScene runs the effect graph (copy, colorMatrix, blur, bloom, distort, composite, feedback, flashLimit) and, with reduceFlashing, limits the rate of change of mean luminance through FlashLimiterModel (0.3 per second by default). CrossfadeScene mixes two scenes through two lazy RGBA8 targets by a caller-set progress 0...1 (used by Ambient Clock); CachedScene keeps a still frame until its key changes; RenderCapabilities reports fragmentHighp and fragmentMantissaBits.",
+   "paths": [
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderBundle.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderProgram.swift",
+    "Packages/VisualCore/Sources/VisualCoreShaderSource/ShaderLibrary.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/noise.glsl",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/hash.glsl",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/palette.glsl",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/color.glsl",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/sdf.glsl",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/field.glsl",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/PingPongTarget.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FloatRenderSupport.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+    "Packages/VisualCore/Sources/VisualCoreShaderSource/RenderState.swift",
+    "Packages/VisualCore/Sources/VisualCoreSimulation/ParticleSystem.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/ParticleBudget.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ParticleRenderer.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ParticleLayerScene.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/TrailLayer.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectScene.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectPasses.swift",
+    "Packages/VisualCore/Sources/VisualCoreEffectsGraph/PassSchemas.swift",
+    "Packages/VisualCore/Sources/VisualCoreEffectsGraph/FlashLimiterModel.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/CrossfadeScene.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/CachedScene.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderCapabilities.swift"
+   ],
+   "owner": "VisualCoreRendering + VisualCoreEffects + VisualCoreShaderSource + VisualCoreSimulation"
+  },
+  {
+   "area": "Animation, accessibility and sound",
+   "description": "SceneClock advances only by the frame deltas it is given, each step capped at 0.25 s (maxDelta), with speed 0...4, play, pause, scrub and reducedMotionFactor 0.5; ease and EasingCurve give easing curves. AccessibilityPreferences resolves Reduce Motion and Reduce Flashing against the system (SystemAccessibility, observed by SystemAccessibilityObserver) into EffectiveAccessibility; the app hands them to an experience through ExperienceLaunch.reduceMotion and reduceFlashing (Apps/VisualCore/App/ExperienceRegistry.swift). SoundEffectPlayer plays procedural one-shot SoundEffects rendered by SoundEffectSynth (four voices, at most 1 s each) in the ambient session category with no permission and no player volume, and stops on interruption and in the background (AudioSessionEvent). No continuous or looping player exists.",
+   "paths": [
+    "Packages/VisualCore/Sources/VisualCoreSimulation/SceneClock.swift",
+    "Packages/VisualCore/Sources/VisualCoreMath/Easing.swift",
+    "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPreferences.swift",
+    "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreUI/SystemAccessibilityObserver.swift",
+    "Apps/VisualCore/App/ExperienceRegistry.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreAudio/SoundEffectPlayer.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreAudio/AudioSessionEvent.swift",
+    "Packages/VisualCore/Sources/VisualCoreAudioDSP/SoundEffect.swift"
+   ],
+   "owner": "VisualCoreSimulation + VisualCoreMath + VisualCoreUI + VisualCoreAudio + VisualCoreAudioDSP"
+  },
+  {
+   "area": "Persistence and storage",
+   "description": "ExperienceSnapshot (at most 1 MiB, checksum, schema version) with StateDigest; MigrationChain migrates payloads forward and MigrationExample registers stored examples per schema; ExperienceStorage is the experience's own folder and small values (setValue(_:for:), 64 values of 4 KB) under StorageQuota (16 MiB, 64 files). VisualCoreParameters' ParameterSchema, Palette and Preset model bounded parameters. Ambient Clock's ThemePreset and AmbientFavourites are experience-local.",
+   "paths": [
+    "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceSnapshot.swift",
+    "Packages/VisualCore/Sources/VisualCoreExperience/StateDigest.swift",
+    "Packages/VisualCore/Sources/VisualCoreExperience/SnapshotMigrationCheck.swift",
+    "Packages/VisualCore/Sources/VisualCorePersistence/Migration.swift",
+    "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+    "Packages/VisualCore/Sources/VisualCoreParameters/ParameterSchema.swift",
+    "Packages/VisualCore/Sources/VisualCoreParameters/Palette.swift",
+    "Packages/VisualCore/Sources/VisualCoreParameters/Preset.swift",
+    "Packages/ExperiencesCreative/AmbientClock/Core/ThemePreset.swift",
+    "Packages/ExperiencesCreative/AmbientClock/Experience/AmbientFavourites.swift"
+   ],
+   "owner": "VisualCorePersistence + VisualCoreExperience + VisualCoreParameters"
+  },
+  {
+   "area": "Experience host",
+   "description": "ExperienceSession opens, checkpoints, closes and recovers an Experience on one RenderHost, applies quality (QualityGovernor over the QualityProfile with QualityPolicy, fed by DeviceConditions), memory-warning and scene-phase events and keeps a PerformanceRecord; ExperienceShell adapts an ExperiencePresenter (scene, controls, pointer input, canvas overlay through makeCanvasOverlay, maxFramesPerSecond); ExperienceCore is the GPU-free state with its qualityTiers; the one app registers experiences in ExperienceRegistry and Catalog/registrations.json (twenty registered, A01-A20, candidates empty, checked 2026-11-17; a21 appears in neither and Aurora stays unregistered and unavailable in A21-P00; scripts/check_experience_packages.py forbids unregistered targets). The app shell has no full-screen mode for an experience's controls.",
+   "paths": [
+    "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceShell.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceFeedback.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ScenarioRunner.swift",
+    "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceCore.swift",
+    "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceEngine.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/PerformanceRecord.swift",
+    "Apps/VisualCore/App/ExperienceRegistry.swift",
+    "Catalog/registrations.json",
+    "scripts/check_experience_packages.py",
+    "project.yml"
+   ],
+   "owner": "VisualCoreExperience + VisualCoreExperienceHost + the one app"
+  },
+  {
+   "area": "Build and release steps",
+   "description": "XcodeGen spec project.yml for the one app (target VisualCore), package schemes via scripts/xcodebuild_package.py, app tests via scripts/xcodebuild_app.py, and scripts/release_check.py: 158 lines listed by --list on 2026-11-17 (shared checks including app-contracts, which checks every docs/apps/*/visualcore-contract.json, licenses and usage-descriptions; package and app builds and tests; experience-release and copy-claims steps of the released experiences; verify steps of A01-A20 on iOS 27 and 26; the app's release audits; the seven reference regression steps and the ProjectM independence check). No A21 step exists yet; the A21 copy-claims and verify steps come with G-RELEASE.",
+   "paths": [
+    "project.yml",
+    "scripts/release_check.py",
+    "scripts/xcodebuild_package.py",
+    "scripts/xcodebuild_app.py",
+    "scripts/check_app_contract.py",
+    "scripts/check_licenses.py",
+    "scripts/check_copy_claims.py",
+    "scripts/check_usage_descriptions.py",
+    ".github/workflows/ci.yml"
+   ],
+   "owner": "repository tooling"
+  },
+  {
+   "area": "Source ownership",
+   "description": "Aurora owns its domain (the sky scene: three presets, palettes and the colour, motion and intensity parameters with bounds, versioned and validated; the rendered clock; the ribbon, star and cloud shaders over vc/ at two quality levels; the final composite pass with its explicit luminance cap and comfort bounds; transitions under the cap; saved preferences; the low-power still view, the reduced-flash mode and the static fallback frame; the control overlay that hides and returns; the experience's loop control and its procedural loop; copy) and UI under Packages/ExperiencesCreative/Aurora/ (Core GPU-free, CoreTests, Experience with Adapter/, ExperienceTests, Shaders, scenario-manifest.json; created in A21-P01, not present today). VisualCore owns reusable machinery: full-screen shaders, the GLSL library, render targets, blending, particles and crossfades (VisualCoreRendering, VisualCoreShaderSource, VisualCoreEffects), clocks and accessibility (VisualCoreSimulation), pacing and quality (VisualCoreDiagnostics), parameters (VisualCoreParameters), persistence (VisualCorePersistence), storage, snapshots and the host (VisualCoreExperience, VisualCoreExperienceHost), sound (VisualCoreAudio, VisualCoreAudioDSP; the new ambient loop player is G-LOOP). Ambient Clock's themes and crossfade use, Living Wallpapers' scene shaders and Digital Aquarium's caustics stay experience code and are not copied. ProjectM stays in the harness.",
+   "paths": [
+    ".specify/memory/constitution.md",
+    "Auto-Creator.md",
+    "docs/decisions/ADR-0009-unified-app.md",
+    "Packages/ExperiencesCreative/Package.swift",
+    "specs/151-au-p00-boundary-audit/spec.md"
+   ],
+   "owner": "constitution + ADR-0009"
+  },
+  {
+   "area": "ProjectM reference regression",
+   "description": "Reference pinned at d93edd1, read-only; scripts/run_reference_baseline.py lists the ordered reference steps; scripts/check_reference_clean.py checks the submodule; the 7 release-check steps run in two chunks via release_check.py --only (reference-engine-xcframework, reference-build-projectm-ios-sim, reference-clean; reference-test-anglerendering-ios27, reference-test-anglerendering-ios26, projectm-reference-ios27, projectm-reference-ios26), recorded in docs/apps/aurora/regression-baseline.md. Phase start for the no-change diff of Packages and External: b40fdbee.",
+   "paths": [
+    "scripts/run_reference_baseline.py",
+    "scripts/check_reference_clean.py",
+    "Harnesses/ProjectMReference/ProjectMReference.yml",
+    "docs/apps/aurora/regression-baseline.md",
+    "specs/151-au-p00-boundary-audit/research.md"
+   ],
+   "owner": "reference adapter (harness only)"
+  },
+  {
+   "area": "Determinism and budgets",
+   "description": "StateDigest fingerprints the core state; ScenarioManifest and ScenarioRunner replay recorded steps; QualityProfile levels and QualityGovernor with QualityPolicy and FramePacing step quality and frame cap down under heat and Low Power Mode; ResourceBudget bounds GPU bytes; ParticleBudget bounds particles per tier; ExperienceSnapshot.maxBytes and StorageQuota bound storage; SceneClock.maxDelta bounds a time step.",
+   "paths": [
+    "Packages/VisualCore/Sources/VisualCoreExperience/StateDigest.swift",
+    "Packages/VisualCore/Sources/VisualCoreExperience/ScenarioManifest.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityProfile.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityGovernor.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityPolicy.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/FramePacing.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/ResourceLedger.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/ParticleBudget.swift",
+    "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+    "Packages/VisualCore/Sources/VisualCoreSimulation/SceneClock.swift"
+   ],
+   "owner": "VisualCoreExperience + VisualCoreDiagnostics + VisualCoreSimulation"
+  }
+ ],
+ "matrix": [
+  {
+   "id": "M01",
+   "capability": "Procedural shaders: one bundled fragment shader drawn over the canvas with time, resolution, seed, an 8-entry palette and one float per parameter, a fixed time and a time scale; fragment passes into render targets; an effect scene over the effect graph",
+   "source": "brainstorm: procedural shaders; manual §6 capability audit; spec FR-A21-002",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+     "symbol": "FullScreenShaderScene",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+     "symbol": "FullScreenShaderScene.fixedTime",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+     "symbol": "FullScreenShaderScene.timeScale",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+     "symbol": "FullScreenShaderScene.palette",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderBundle.swift",
+     "symbol": "ShaderBundle.visualCoreLibrary",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+     "symbol": "FieldPass.run",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectScene.swift",
+     "symbol": "EffectScene",
+     "product": "VisualCoreEffects",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/AmbientClock/Experience/ThemeShaders.swift",
+    "symbol": "ThemeShaders"
+   },
+   "notes": "Tested in FullScreenShaderSceneTests, ShaderBundleTests and FieldPassTests. Ambient Clock, Living Wallpapers, Digital Aquarium and Fractal Explorer draw this way. The sky shaders themselves are G-SKY (A21-P01)."
+  },
+  {
+   "id": "M02",
+   "capability": "Noise functions: GLSL value noise, gradient noise and vc_fbm with hashes in the bundled vc/ library, and CPU gradient and fractal noise for deterministic, testable data",
+   "source": "brainstorm: noise functions; constitution A21 visuals are code",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderBundle.swift",
+     "symbol": "ShaderBundle.visualCoreLibrary",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreScenes/GradientNoise2D.swift",
+     "symbol": "GradientNoise2D",
+     "product": "VisualCoreScenes",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreScenes/GradientNoise2D.swift",
+     "symbol": "FractalNoise2D",
+     "product": "VisualCoreScenes",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/TinyWorlds/Core/WorldPreset.swift",
+    "symbol": "WorldPreset"
+   },
+   "notes": "vc_valueNoise, vc_gradientNoise and vc_fbm are in Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/noise.glsl, served by ShaderBundle.visualCoreLibrary; tested in ShaderBundleTests and GradientNoise2DTests. No CPU value noise exists; Aurora needs none (its noise is in the shaders, and CPU tests use FractalNoise2D)."
+  },
+  {
+   "id": "M03",
+   "capability": "Particle systems: a CPU particle system with emitters and forces under a per-tier particle budget, drawn as instanced soft quads with normal or additive blending in a particle layer with a brightness cap",
+   "source": "brainstorm: particle systems",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreSimulation/ParticleSystem.swift",
+     "symbol": "ParticleSystem.emitters",
+     "product": "VisualCoreSimulation",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreSimulation/ParticleSystem.swift",
+     "symbol": "Emitter",
+     "product": "VisualCoreSimulation",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/ParticleBudget.swift",
+     "symbol": "ParticleBudget.limit",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ParticleRenderer.swift",
+     "symbol": "ParticleRenderer.draw",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ParticleRenderer.swift",
+     "symbol": "ParticleBlend",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ParticleLayerScene.swift",
+     "symbol": "ParticleLayerScene.brightnessCap",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/ParticleUniverse/Experience/ParticlePresenter.swift",
+    "symbol": "ParticlePresenter"
+   },
+   "notes": "Tested in ParticleSystemTests, ParticleBudgetTests, ParticleRendererTests, ParticleBlendTests and ParticleLayerSceneTests. Aurora's stars are a hashed shader starfield (G-SKY); particles are optional sparkle, bounded by ParticleBudget if used."
+  },
+  {
+   "id": "M04",
+   "capability": "Animation: frame index, wall-clock time and a clamped delta per frame, a clock that advances only by capped frame deltas with speed, play, pause, scrub and a reduced-motion factor, a frame cap requested by the presenter and paced by FramePacing, a cached still frame, and easing curves",
+   "source": "brainstorm: animation; constitution A21 calm by default",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+     "symbol": "FrameInfo",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreSimulation/SceneClock.swift",
+     "symbol": "SceneClock.advance",
+     "product": "VisualCoreSimulation",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreSimulation/SceneClock.swift",
+     "symbol": "SceneClock.reducedMotionFactor",
+     "product": "VisualCoreSimulation",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/FramePacing.swift",
+     "symbol": "FramePacing.minimumFPS",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+     "symbol": "ExperiencePresenter.maxFramesPerSecond",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/CachedScene.swift",
+     "symbol": "CachedScene.invalidate",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreMath/Easing.swift",
+     "symbol": "ease",
+     "product": "VisualCoreMath",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/AmbientClock/Experience/AmbientPresenter.swift",
+    "symbol": "AmbientPresenter"
+   },
+   "notes": "Tested in SceneClockTests, FramePacingTests, FrameCapTests, CachedSceneTests, EasingTests and RenderHostTests. Using SceneClock into fixedTime for the sky is G-CLOCK (A21-P01)."
+  },
+  {
+   "id": "M05",
+   "capability": "Blending and compositing: alpha, premultiplied and additive blend modes, render targets under a byte budget, ping-pong pairs with half-float support, a bloom pass in the effect graph, a rate-based flash limiter on mean luminance, and a two-scene crossfade",
+   "source": "brainstorm: blending and compositing; spec clarification Q3",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreShaderSource/RenderState.swift",
+     "symbol": "RenderState.BlendMode",
+     "product": "VisualCoreShaderSource",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreShaderSource/RenderState.swift",
+     "symbol": "RenderState.additive",
+     "product": "VisualCoreShaderSource",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+     "symbol": "ResourceRegistry.makeRenderTarget",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/PingPongTarget.swift",
+     "symbol": "PingPongTarget.swap",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FloatRenderSupport.swift",
+     "symbol": "FloatRenderSupport.storageFormat",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreEffectsGraph/FlashLimiterModel.swift",
+     "symbol": "FlashLimiterModel.step",
+     "product": "VisualCoreEffectsGraph",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectScene.swift",
+     "symbol": "EffectScene.reduceFlashing",
+     "product": "VisualCoreEffects",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/CrossfadeScene.swift",
+     "symbol": "CrossfadeScene.progress",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/ParticleUniverse/Experience/ParticlePresenter.swift",
+    "symbol": "ParticlePresenter"
+   },
+   "notes": "Tested in RenderStateTests, ResourceLedgerTests, PingPongTargetTests, FloatRenderSupportTests, FlashLimiterModelTests, EffectSceneBypassTests and CrossfadeSceneTests. No luminance cap for an arbitrary scene and no tone mapping exist (row M14)."
+  },
+  {
+   "id": "M06",
+   "capability": "Version 0.1 feature 01: three procedural sky presets with aurora ribbons, stars and cloud layers",
+   "source": "manual v0.1 feature 01; manual §13 risk 1; spec clarification Q3",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+     "symbol": "FullScreenShaderScene",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+     "symbol": "FullScreenShaderScene.seedOffsets",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderBundle.swift",
+     "symbol": "ShaderBundle.visualCoreLibrary",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreParameters/Preset.swift",
+     "symbol": "Preset",
+     "product": "VisualCoreParameters",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreParameters/Palette.swift",
+     "symbol": "Palette",
+     "product": "VisualCoreParameters",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/LivingWallpapers/Experience/SceneShaders.swift",
+    "symbol": "SceneShaders"
+   },
+   "notes": "The drawing primitives exist; the three presets and palettes are G-SCENE and the ribbon (slowly advected fbm colour bands), star (hashed, bounded twinkle) and cloud (fbm layers) shaders are G-SKY, both app-local in A21-P01. 2D layered shaders, never volumetric (risk 1)."
+  },
+  {
+   "id": "M07",
+   "capability": "Version 0.1 feature 02: colour, motion and intensity controls with sensible bounds",
+   "source": "manual v0.1 feature 02; manual §13 risk 2; research D4a",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreParameters/ParameterSchema.swift",
+     "symbol": "ParameterDefinition.clamped",
+     "product": "VisualCoreParameters",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreParameters/ParameterSchema.swift",
+     "symbol": "ParameterSchema.maxParameters",
+     "product": "VisualCoreParameters",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+     "symbol": "FullScreenShaderScene.parameters",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceAction.swift",
+     "symbol": "ExperienceControl.maxValues",
+     "product": "VisualCoreExperience",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/Adapter/GenerativeArtCore.swift",
+    "symbol": "GenerativeArtCore"
+   },
+   "notes": "Bounded parameters are tested (ParametersTests, ParameterEditorTests, ExperienceActionTests). The parameter ranges and their validation are G-SCENE (A21-P01); the controls are G-CONTROLS (A21-P02). Numbers are decided with their tests (research D4a)."
+  },
+  {
+   "id": "M08",
+   "capability": "Version 0.1 feature 03: scene transitions that never exceed the luminance cap, and saveable preferences",
+   "source": "manual v0.1 feature 03; spec clarification Q3",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/CrossfadeScene.swift",
+     "symbol": "CrossfadeScene.progress",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/CrossfadeScene.swift",
+     "symbol": "CrossfadeScene.replaceIncoming",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreMath/Easing.swift",
+     "symbol": "ease",
+     "product": "VisualCoreMath",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+     "symbol": "ExperienceStorage.setValue",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+     "symbol": "StorageQuota.maxValues",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/Migration.swift",
+     "symbol": "MigrationChain.migrate",
+     "product": "VisualCorePersistence",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/AmbientClock/Experience/AmbientPresenter.swift",
+    "symbol": "AmbientPresenter"
+   },
+   "notes": "Tested in CrossfadeSceneTests, EasingTests, ExperienceStorageTests and SnapshotMigrationCheckTests. CrossfadeScene mixes linearly with no cap; transitions with the cap applied after the mix are G-COMPOSITE and saved preferences are G-PREFS (app-local, A21-P03)."
+  },
+  {
+   "id": "M09",
+   "capability": "Version 0.1 feature 04: a low-power static view and a reduced-flash mode",
+   "source": "manual v0.1 feature 04; manual §13 risks 1 and 2",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/FramePacing.swift",
+     "symbol": "FramePacing",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/DeviceConditions.swift",
+     "symbol": "DeviceConditions",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/CachedScene.swift",
+     "symbol": "CachedScene.invalidate",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreEffectsGraph/FlashLimiterModel.swift",
+     "symbol": "FlashLimiterModel",
+     "product": "VisualCoreEffectsGraph",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPreferences.swift",
+     "symbol": "AccessibilityPreferences.reduceFlashing",
+     "product": "VisualCoreSimulation",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/AmbientClock/Experience/AmbientPresenter.swift",
+    "symbol": "AmbientPresenter"
+   },
+   "notes": "Tested in FramePacingTests, CachedSceneTests, FlashLimiterModelTests and AccessibilityPreferencesTests. The host lowers the frame rate under Low Power Mode or heat; the experience's still view and reduced-flash mode are G-LOWPOWER (app-local, A21-P04); the long-run cadence on devices is G-DEVICE (A21-P05)."
+  },
+  {
+   "id": "M10",
+   "capability": "Version 0.1 feature 05: an optional ambient loop, synthesised in code, with its own sound control (volume 0...1), off by default, independent of the drawing lifecycle",
+   "source": "manual v0.1 feature 05; manual §13 risk 3; spec clarification Q4; research D6",
+   "status": "upstream gap",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreAudio/SoundEffectPlayer.swift",
+     "symbol": "SoundEffectPlayer.sessionCategory",
+     "product": "VisualCoreAudio",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreAudio/SoundEffectPlayer.swift",
+     "symbol": "SoundEffectPlayer.isEnabled",
+     "product": "VisualCoreAudio",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreAudio/AudioSessionEvent.swift",
+     "symbol": "AudioSessionEvent",
+     "product": "VisualCoreAudio",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/SoundEffect.swift",
+     "symbol": "SoundEffectSynth.render",
+     "product": "VisualCoreAudioDSP",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/DigitalZenGarden/Experience/GardenSounds.swift",
+    "symbol": "GardenSoundPlayer"
+   },
+   "notes": "Only one-shot tones exist (four voices of at most 1 s, no player volume; SoundEffectPlayerTests, SoundEffectSynthTests, AudioSessionEventTests). A continuous ambient loop player with a volume is G-LOOP (VisualCore:VisualCoreAudio, upstream, A21-P04); the experience's loop and control are G-SOUND (A21-P05). Never a recording."
+  },
+  {
+   "id": "M11",
+   "capability": "Version 0.1 feature 06: a full-screen view whose controls hide and come back with a tap on the canvas or the accessibility action \"Show controls\"",
+   "source": "manual v0.1 feature 06; spec clarification Q5",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+     "symbol": "makeCanvasOverlay",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceShell.swift",
+     "symbol": "ExperienceShell",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+     "symbol": "ExperiencePresenter.pointer",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidArtPresenter.swift",
+    "symbol": "FluidArtPresenter"
+   },
+   "notes": "The canvas overlay and pointer delivery are tested (ShellRenderingTests, ShellLifecycleTests); no hide-and-restore or full-screen mode exists and none is added to the shell or host. Hiding and restoring the experience's own overlay is G-CHROME (app-local, A21-P02)."
+  },
+  {
+   "id": "M12",
+   "capability": "The sky scene model: presets, palettes and parameter bounds as a pure, versioned, validated value in the GPU-free core",
+   "source": "spec FR-A21-003; research D4",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceCore.swift",
+     "symbol": "ExperienceCore",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceSnapshot.swift",
+     "symbol": "ExperienceSnapshot.maxBytes",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/StateDigest.swift",
+     "symbol": "StateDigest",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/SnapshotMigrationCheck.swift",
+     "symbol": "MigrationExample",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/Migration.swift",
+     "symbol": "MigrationChain.migrate",
+     "product": "VisualCorePersistence",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreParameters/ParameterSchema.swift",
+     "symbol": "ParameterSchema",
+     "product": "VisualCoreParameters",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/AmbientClock/Core/ThemePreset.swift",
+    "symbol": "ThemePreset"
+   },
+   "notes": "Tested in ExperienceSnapshotTests, StateDigestTests, SnapshotMigrationCheckTests and ParametersTests. The scene model is G-SCENE (app-local, A21-P01); a snapshot schema above 1 needs registered schema examples (earlier-gate lesson)."
+  },
+  {
+   "id": "M13",
+   "capability": "Ribbon, star and cloud layers drawn in bounded full-screen passes over vc/, at two quality levels",
+   "source": "spec FR-A21-003; spec clarification Q3; manual §13 risk 1",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+     "symbol": "FullScreenShaderScene",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderBundle.swift",
+     "symbol": "ShaderBundle.visualCoreLibrary",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceCore.swift",
+     "symbol": "ExperienceCore.qualityTiers",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+     "symbol": "ResourceRegistry.makeRenderTarget",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/DigitalAquarium/Experience/CausticsScene.swift",
+    "symbol": "CausticsScene"
+   },
+   "notes": "The pass machinery is tested (FullScreenShaderSceneTests, ShaderBundleTests); the shaders, their octave counts and the two levels are G-SKY (app-local, A21-P01)."
+  },
+  {
+   "id": "M14",
+   "capability": "Luminance cap: an explicit cap on displayed luminance in a final composite pass, with comfort bounds on ribbon frequency and brightness, applied after every mix",
+   "source": "spec FR-A21-003; spec clarification Q3; manual §13 risk 2",
+   "status": "upstream gap",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ParticleLayerScene.swift",
+     "symbol": "ParticleLayerScene.brightnessCap",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/TrailLayer.swift",
+     "symbol": "TrailLayer.brightnessCap",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreEffectsGraph/FlashLimiterModel.swift",
+     "symbol": "FlashLimiterModel",
+     "product": "VisualCoreEffectsGraph",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectScene.swift",
+     "symbol": "EffectScene.reduceFlashing",
+     "product": "VisualCoreEffects",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/ParticleUniverse/Experience/ParticlePresenter.swift",
+    "symbol": "ParticlePresenter"
+   },
+   "notes": "A brightness cap exists only on TrailLayer and ParticleLayerScene (ParticleLayerSceneTests, TrailLayerTests); FlashLimiterModel limits a rate, not a level. A cap for an arbitrary scene is G-CAP (pure math and a composite pass, app-local, A21-P02) and its use under transitions is G-COMPOSITE (A21-P03); the value is decided with its tests (research D4a). Moved upstream only when a second experience needs it."
+  },
+  {
+   "id": "M15",
+   "capability": "Context loss: every GPU object (shader programs, composite and crossfade targets) rebuilt from CPU state after a context recreation or memory warning",
+   "source": "spec FR-A21-003; constitution A21 bounded",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+     "symbol": "RenderHost.recreateContext",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+     "symbol": "RenderContext.generation",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+     "symbol": "ExperienceSession.handleMemoryWarning",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/PingPongTarget.swift",
+     "symbol": "PingPongTarget.isValid",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidFieldsScene.swift",
+    "symbol": "FluidFieldsScene"
+   },
+   "notes": "Tested in RenderHostTests, PingPongTargetTests, SessionPhaseMemoryTests and SessionLifecycleTests. The sky passes rebuild with G-SKY (A21-P01) and the composite and transition targets with G-COMPOSITE (A21-P03)."
+  },
+  {
+   "id": "M16",
+   "capability": "Resize and orientation: every pass and target resized without changing the state; the sky framed in normalized coordinates",
+   "source": "spec FR-A21-003",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+     "symbol": "RenderScene",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+     "symbol": "RenderContext.pixelWidth",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+     "symbol": "FullScreenShaderScene.resize",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/CrossfadeScene.swift",
+     "symbol": "CrossfadeScene.resize",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/AmbientClock/Experience/AmbientPresenter.swift",
+    "symbol": "AmbientPresenter"
+   },
+   "notes": "Scene resize is tested (CrossfadeSceneTests, CachedSceneTests, FullScreenShaderSceneTests). Aurora's passes resize with G-SKY (A21-P01) and its composite targets with G-COMPOSITE (A21-P03)."
+  },
+  {
+   "id": "M17",
+   "capability": "Quality tiers: the governor fed by thermal state and Low Power Mode, tiers declared by the core matching the presenter's levels",
+   "source": "constitution A21 bounded; earlier-gate lesson (declare quality tiers)",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityProfile.swift",
+     "symbol": "QualityProfile",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityGovernor.swift",
+     "symbol": "QualityGovernor",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityPolicy.swift",
+     "symbol": "QualityPolicy.decide",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/DeviceConditions.swift",
+     "symbol": "DeviceConditions",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceCore.swift",
+     "symbol": "ExperienceCore.qualityTiers",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+     "symbol": "ExperienceSession.refreshQuality",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/Adapter/FluidArtCore.swift",
+    "symbol": "FluidArtCore"
+   },
+   "notes": "Tested in QualityProfileTests, QualityGovernorTests, QualityPolicyTests and SessionQualityTests. Aurora's two levels (octaves, cloud layers) are declared with its first presenter (G-SKY)."
+  },
+  {
+   "id": "M18",
+   "capability": "Accessibility: VoiceOver labels and a scene description, Dynamic Type controls, a stable frame under Reduce Motion, Reduce Flashing honoured",
+   "source": "spec FR-A21-003; spec clarification Q5; constitution A21 calm by default",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPreferences.swift",
+     "symbol": "AccessibilityPreferences.reduceMotion",
+     "product": "VisualCoreSimulation",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPreferences.swift",
+     "symbol": "EffectiveAccessibility.reduceFlashing",
+     "product": "VisualCoreSimulation",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/SystemAccessibilityObserver.swift",
+     "symbol": "SystemAccessibilityObserver",
+     "product": "VisualCoreUI",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreSimulation/SceneClock.swift",
+     "symbol": "SceneClock.reducedMotionFactor",
+     "product": "VisualCoreSimulation",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/PlaygroundView.swift",
+    "symbol": "PlaygroundView"
+   },
+   "notes": "Tested in AccessibilityPreferencesTests, SystemAccessibilityObserverTests and SceneClockTests; the app passes both through ExperienceLaunch.reduceMotion and reduceFlashing. The reduced-motion stable frame is G-CLOCK (A21-P01); labels and Dynamic Type controls are G-CONTROLS and the \"Show controls\" action is G-CHROME (A21-P02)."
+  },
+  {
+   "id": "M19",
+   "capability": "Bounded resources: GPU targets under a byte budget, particles under a per-tier budget, snapshot 1 MiB, storage 16 MiB, 64 files and 64 values",
+   "source": "constitution A21 bounded",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/ResourceLedger.swift",
+     "symbol": "ResourceBudget",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/ParticleBudget.swift",
+     "symbol": "ParticleBudget",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceSnapshot.swift",
+     "symbol": "ExperienceSnapshot.maxBytes",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+     "symbol": "StorageQuota.maxValues",
+     "product": "VisualCoreExperience",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/FluidArtPlayground/Core/SplatQueue.swift",
+    "symbol": "SplatQueue"
+   },
+   "notes": "Tested in ResourceLedgerTests, ParticleBudgetTests, ExperienceSnapshotTests and ExperienceStorageTests."
+  },
+  {
+   "id": "M20",
+   "capability": "Permissions: none. Sound plays through the ambient session category with no microphone or usage string; preferences stay in the experience's storage; nothing uses location",
+   "source": "constitution A21 offline-first and private; research D5",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreAudio/SoundEffectPlayer.swift",
+     "symbol": "SoundEffectPlayer.sessionCategory",
+     "product": "VisualCoreAudio",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+     "symbol": "ExperienceStorage.setValue",
+     "product": "VisualCoreExperience",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/LightMaze/Experience/MazeSound.swift",
+    "symbol": "MazeSoundPlayer"
+   },
+   "notes": "Tested in SoundEffectPlayerTests and ExperienceStorageTests; app-usage-descriptions runs in the release check. The new loop player keeps the ambient category (G-LOOP)."
+  },
+  {
+   "id": "M21",
+   "capability": "Rendered versus wall-clock time: the sky's time comes from SceneClock into fixedTime, never from FrameInfo.time, so a return from the background or a lowered cadence never jumps",
+   "source": "spec FR-A21-003; spec clarification Q3; spec edge case (a long time in the background)",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreSimulation/SceneClock.swift",
+     "symbol": "SceneClock.advance",
+     "product": "VisualCoreSimulation",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreSimulation/SceneClock.swift",
+     "symbol": "SceneClock.maxDelta",
+     "product": "VisualCoreSimulation",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+     "symbol": "FullScreenShaderScene.fixedTime",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/FramePacing.swift",
+     "symbol": "FramePacing.clampedDelta",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/Adapter/GenerativeArtCore.swift",
+    "symbol": "GenerativeArtCore"
+   },
+   "notes": "Tested in SceneClockTests and FramePacingTests. FullScreenShaderScene uses FrameInfo.time (wall-clock) unless fixedTime is set; wiring the rendered clock is G-CLOCK (A21-P01); the low-power cadence without a time jump is measured in G-DEVICE (A21-P05)."
+  },
+  {
+   "id": "M22",
+   "capability": "Static fallback frame: when a shader fails to compile or highp precision is missing, a still frame is shown instead of a grey clear",
+   "source": "spec FR-A21-003; spec clarification Q3",
+   "status": "upstream gap",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderCapabilities.swift",
+     "symbol": "RenderCapabilities.fragmentHighp",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderCapabilities.swift",
+     "symbol": "RenderCapabilities.fragmentMantissaBits",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+     "symbol": "FullScreenShaderScene.errorMessage",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/CachedScene.swift",
+     "symbol": "CachedScene",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/FractalExplorer/Experience/ExplorerView.swift",
+    "symbol": "ExplorerModel"
+   },
+   "notes": "Precision probes are tested (RenderCapabilitiesPrecisionTests, RenderCapabilitiesProbeTests); FullScreenShaderScene records a compile error and clears to dark grey. No fallback frame exists; it is G-LOWPOWER (app-local, A21-P04)."
+  },
+  {
+   "id": "M23",
+   "capability": "GPU targets released on theme (preset) change: the outgoing preset's programs and targets are released or recycled, so memory stays flat across changes",
+   "source": "spec FR-A21-003",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+     "symbol": "ResourceRegistry.release",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+     "symbol": "ResourceRegistry.recycle",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+     "symbol": "ResourceRegistry.trimPools",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/CrossfadeScene.swift",
+     "symbol": "CrossfadeScene.replaceIncoming",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/AmbientClock/Experience/AmbientPresenter.swift",
+    "symbol": "AmbientPresenter"
+   },
+   "notes": "Tested in ResourceLedgerTests and CrossfadeSceneTests. Aurora's release on preset change is G-LOWPOWER (app-local, A21-P04)."
+  },
+  {
+   "id": "M24",
+   "capability": "Truthful claims: no aurora forecast or scientific claim, no therapeutic or sleep claim, no always-on-screen promise, and no battery or frame-rate figure not measured on a device",
+   "source": "constitution A21 truthful claims; manual non-goals; spec FR-A21-006",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/PerformanceRecord.swift",
+     "symbol": "PerformanceRecord",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+     "symbol": "ExperienceSession.performanceRecord",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Core/ScientificReview.swift",
+    "symbol": "ScientificReview"
+   },
+   "notes": "PerformanceRecord is tested (SessionPerformanceTests); scripts/check_copy_claims.py is the claim checker. Device measurements are G-DEVICE (A21-P05); the A21 copy-claims step is G-RELEASE (A21-P06)."
+  },
+  {
+   "id": "M25",
+   "capability": "Experience host: session, shell, presenter with the canvas overlay, checkpoints, pause in the background and restore on one render host",
+   "source": "ADR-0009; spec FR-A21-005",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+     "symbol": "ExperienceSession",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceShell.swift",
+     "symbol": "ExperienceShell",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+     "symbol": "ExperiencePresenter",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+     "symbol": "ExperienceSession.checkpoint",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+     "symbol": "RenderHost.pause",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/AmbientClock/Experience/AmbientPresenter.swift",
+    "symbol": "AmbientPresenter"
+   },
+   "notes": "Tested in SessionOpenCloseTests, SessionLifecycleTests, SessionRestoreTests and RenderHostTests."
+  },
+  {
+   "id": "M26",
+   "capability": "Licenses: every shader, palette and synthesised sound records its source and license in the license inventory",
+   "source": "constitution A21 licenses",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AcknowledgementsView.swift",
+     "symbol": "LicenseInventory",
+     "product": "VisualCoreUI",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AcknowledgementsView.swift",
+     "symbol": "AcknowledgementsView",
+     "product": "VisualCoreUI",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/DigitalAquarium/Core/LicenseAudit.swift",
+    "symbol": "LicenseAudit"
+   },
+   "notes": "Tested in AcknowledgementsViewTests; scripts/check_licenses.py runs in the release check. The A21 entries come with G-SKY and G-SOUND."
+  }
+ ],
+ "gaps": [
+  {
+   "id": "G-SCENE",
+   "matrix": [
+    "M06",
+    "M07",
+    "M12"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "The sky scene (three presets, palettes, the colour, motion and intensity parameters with their bounds), its schema, validation and migration are the experience's domain, GPU-free in its Core (manual phase 01). No VisualCore change is planned (spec clarification Q3); a second user would justify moving it upstream later (Principle II).",
+   "phase": 1,
+   "test": "Core host tests: each preset round-trips and migrates; truncated, newer, NaN, infinite and out-of-range values refused or clamped to the declared bounds; every action stays within 24 values; the digest is stable for the same inputs",
+   "closed": null
+  },
+  {
+   "id": "G-SKY",
+   "matrix": [
+    "M06",
+    "M13",
+    "M15",
+    "M16",
+    "M17"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "The aurora ribbon (slowly advected fbm colour bands), starfield (hashed, bounded twinkle) and cloud (fbm layers) shaders over vc/, drawn as 2D FullScreenShaderScene passes at two quality levels and rebuilt after resize and context loss (manual phase 01, risk 1). No VisualCore change is planned (spec clarification Q3); a second user would justify moving it upstream later (Principle II).",
+   "phase": 1,
+   "test": "Experience tests: every shader compiles through ShaderBundle; each preset renders non-empty and within its declared brightness range on the iOS 27.x simulator; level 1 draws fewer octaves than level 0; passes rebuild after recreateContext and resize with the same output; license inventory lists the shaders",
+   "closed": null
+  },
+  {
+   "id": "G-CLOCK",
+   "matrix": [
+    "M18",
+    "M21"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "The rendered clock (SceneClock advanced by frame deltas into FullScreenShaderScene.fixedTime, never FrameInfo.time) and the reduced-motion stable frame are the experience's policy (spec clarification Q3). No VisualCore change is planned (spec clarification Q3); a second user would justify moving it upstream later (Principle II).",
+   "phase": 1,
+   "test": "Core and experience tests: a long background gap advances rendered time by at most SceneClock.maxDelta; Reduce Motion gives the same frame on consecutive draws; the shader time equals the clock time",
+   "closed": null
+  },
+  {
+   "id": "G-CONTROLS",
+   "matrix": [
+    "M07",
+    "M18"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "Scene selection and the colour, motion and intensity controls with their bounds, VoiceOver labels and Dynamic Type layouts are the experience's interface (manual phase 02).",
+   "phase": 2,
+   "test": "Experience tests: each control maps to a bounded parameter and refuses values outside it; every control has a label and an adjustable action; layouts hold at the largest Dynamic Type size",
+   "closed": null
+  },
+  {
+   "id": "G-CAP",
+   "matrix": [
+    "M14"
+   ],
+   "kind": "upstream",
+   "owner": "app-local",
+   "justification": "No luminance cap for an arbitrary scene and no tone mapping exist in VisualCore (brightnessCap is only on TrailLayer and ParticleLayerScene). The cap as pure math in Core and the final composite pass applying it, with comfort bounds on ribbon frequency and brightness, are experience code (spec clarification Q3, manual risk 2). No VisualCore change is planned (spec clarification Q3); a second user would justify moving it upstream later (Principle II).",
+   "phase": 2,
+   "test": "Core host tests: the cap function never returns luminance above the declared cap for any input, including NaN and infinity; ribbon frequency and brightness stay within the comfort bounds; experience tests: a read-back of the composite never exceeds the cap",
+   "closed": null
+  },
+  {
+   "id": "G-CHROME",
+   "matrix": [
+    "M11",
+    "M18"
+   ],
+   "kind": "upstream",
+   "owner": "app-local",
+   "justification": "No hide-and-restore or full-screen mode exists for an experience's controls, and none is added to the shell or host. The experience's control overlay hides on request and returns with a tap on the canvas or the accessibility action \"Show controls\" (spec clarification Q5). No VisualCore change is planned (spec clarification Q3); a second user would justify moving it upstream later (Principle II).",
+   "phase": 2,
+   "test": "Experience tests: hiding removes the overlay and never changes the state; a canvas tap or the \"Show controls\" accessibility action restores it; VoiceOver can always reach the action",
+   "closed": null
+  },
+  {
+   "id": "G-COMPOSITE",
+   "matrix": [
+    "M08",
+    "M14",
+    "M15",
+    "M16"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "Multi-layer compositing (ribbons additively over stars and clouds) and preset transitions through CrossfadeScene with the cap applied after the mix, rebuilt after resize and context loss (manual phase 03). No VisualCore change is planned (spec clarification Q3); a second user would justify moving it upstream later (Principle II).",
+   "phase": 3,
+   "test": "Experience tests: at every progress step of a transition the read-back stays under the cap; the mix is monotonic in progress; composite targets rebuild after recreateContext and resize",
+   "closed": null
+  },
+  {
+   "id": "G-PREFS",
+   "matrix": [
+    "M08",
+    "M12"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "Saved preferences (preset, parameters, quality, sound choice) in the experience's storage values with a schema and migration (manual phase 03).",
+   "phase": 3,
+   "test": "Experience tests: preferences round-trip through ExperienceStorage.setValue within StorageQuota; damaged or newer values are reported and replaced by defaults, not fatal; a schema above 1 has registered examples; the sound setting is stored with the preferences and stays independent of the drawing lifecycle (manual Phase 03 fixture)",
+   "closed": null
+  },
+  {
+   "id": "G-LOOP",
+   "matrix": [
+    "M10"
+   ],
+   "kind": "upstream",
+   "owner": "VisualCore:VisualCoreAudio",
+   "justification": "A continuous speaker-output loop is generic and VisualCore has only one-shot tones (spec clarification Q4, research alternatives). VisualCoreAudio gains an ambient loop player: the ambient session category, its own volume 0...1, stopped on interruption and in the background, playing a procedural buffer rendered by VisualCoreAudioDSP; with /// documentation, tests, the API baseline update and the seven-step reference regression in two chunks (CLAUDE.md rule 13).",
+   "phase": 4,
+   "test": "Package tests: the loop's buffer is deterministic, finite, within ±gain and seamless at the loop point; volume is clamped to 0...1; the player stops on interruption and background events and uses the ambient category; API baseline updated; reference regression 7 of 7",
+   "closed": null
+  },
+  {
+   "id": "G-LOWPOWER",
+   "matrix": [
+    "M09",
+    "M22",
+    "M23"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "The low-power still view (CachedScene over the host's FramePacing), the reduced-flash mode, the static fallback frame when a shader fails or highp is missing (RenderCapabilities), and release of GPU targets on preset changes are the experience's policy (manual phase 04, spec clarification Q3). No fallback frame exists in VisualCore. No VisualCore change is planned (spec clarification Q3); a second user would justify moving it upstream later (Principle II).",
+   "phase": 4,
+   "test": "Experience tests: the still view draws the child once until its key changes; the reduced-flash mode keeps frame-to-frame luminance change under the declared limit; a forced compile failure or missing highp shows the fallback frame, not grey; target bytes return to the baseline after preset changes",
+   "closed": null
+  },
+  {
+   "id": "G-SOUND",
+   "matrix": [
+    "M10"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "The experience's optional ambient loop over the G-LOOP player, with its own control and volume, off by default and independent of the drawing lifecycle (manual phase 05; spec clarification Q4).",
+   "phase": 5,
+   "test": "Experience tests: sound is off by default; the volume control maps to 0...1; pausing, hiding or rebuilding the drawing never starts or stops the loop; sound never changes the digest",
+   "closed": null
+  },
+  {
+   "id": "G-DEVICE",
+   "matrix": [
+    "M09",
+    "M14",
+    "M21",
+    "M24"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "Long-run thermal behaviour, visual comfort and the low-power cadence without a time jump are measured on devices after ImplementationLock-100 (manual phase 05; short runs bounded by arithmetic).",
+   "phase": 5,
+   "test": "Device-campaign rows: thermal state and frame rate over a short run per preset, extrapolated; low-power cadence shows no time jump; the luminance cap and comfort bounds verified on screen; no figure claimed unless measured",
+   "closed": null
+  },
+  {
+   "id": "G-RELEASE",
+   "matrix": [
+    "M24"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "The A21 copy-claims and verify release steps and the release notes are repository tooling for this experience (manual phase 06).",
+   "phase": 6,
+   "test": "Release-check steps: copy-claims-a21 finds no forecast, scientific, therapeutic, sleep, always-on-screen or unmeasured performance claim; verify-a21 steps pass on the iOS 27.x and 26.x simulators",
+   "closed": null
+  }
+ ],
+ "traceability": [
+  {
+   "item": "brainstorm: procedural shaders",
+   "matrix": [
+    "M01",
+    "M06",
+    "M13"
+   ],
+   "phases": [
+    1
+   ]
+  },
+  {
+   "item": "brainstorm: noise functions",
+   "matrix": [
+    "M02",
+    "M13"
+   ],
+   "phases": [
+    1
+   ]
+  },
+  {
+   "item": "brainstorm: particle systems",
+   "matrix": [
+    "M03",
+    "M13"
+   ],
+   "phases": [
+    1
+   ]
+  },
+  {
+   "item": "brainstorm: animation",
+   "matrix": [
+    "M04",
+    "M21",
+    "M18"
+   ],
+   "phases": [
+    1,
+    5
+   ]
+  },
+  {
+   "item": "brainstorm: blending and compositing",
+   "matrix": [
+    "M05",
+    "M14",
+    "M08"
+   ],
+   "phases": [
+    2,
+    3
+   ]
+  },
+  {
+   "item": "v0.1 feature 01: three procedural sky presets with aurora ribbons, stars and cloud layers",
+   "matrix": [
+    "M06",
+    "M12",
+    "M13"
+   ],
+   "phases": [
+    1
+   ]
+  },
+  {
+   "item": "v0.1 feature 02: colour, motion and intensity controls with sensible bounds",
+   "matrix": [
+    "M07",
+    "M12"
+   ],
+   "phases": [
+    1,
+    2
+   ]
+  },
+  {
+   "item": "v0.1 feature 03: scene transitions and saveable preferences",
+   "matrix": [
+    "M08",
+    "M14"
+   ],
+   "phases": [
+    2,
+    3
+   ]
+  },
+  {
+   "item": "v0.1 feature 04: low-power static view and reduced-flash mode",
+   "matrix": [
+    "M09",
+    "M22",
+    "M23"
+   ],
+   "phases": [
+    4,
+    5
+   ]
+  },
+  {
+   "item": "v0.1 feature 05: optional ambient loop with its own sound control (synthesised in code)",
+   "matrix": [
+    "M10",
+    "M20"
+   ],
+   "phases": [
+    4,
+    5
+   ]
+  },
+  {
+   "item": "v0.1 feature 06: full-screen view that hides controls and restores them by tap",
+   "matrix": [
+    "M11",
+    "M18"
+   ],
+   "phases": [
+    2
+   ]
+  },
+  {
+   "item": "cross-cutting: context loss, resize, quality, accessibility, bounds, permissions, rendered time, luminance cap, fallback frame, claims, GPU release, host, licenses",
+   "matrix": [
+    "M15",
+    "M16",
+    "M17",
+    "M18",
+    "M19",
+    "M20",
+    "M21",
+    "M14",
+    "M22",
+    "M24",
+    "M23",
+    "M25",
+    "M26"
+   ],
+   "phases": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+   ]
+  }
+ ],
+ "negative": [
+  {
+   "rule": "No EGL display, context, surface or GL path of its own; all drawing goes through VisualCore's RenderHost on OpenGL ES -> ANGLE -> Metal",
+   "source": "constitution A21 consumer, not fork; CLAUDE.md rule 4; spec FR-A21-006"
+  },
+  {
+   "rule": "No second renderer: the sky, composite, transitions and fallback frame are RenderScene, FullScreenShaderScene, CrossfadeScene and CachedScene work on the session's host",
+   "source": "constitution A21 consumer, not fork; CLAUDE.md rule 4; spec FR-A21-006"
+  },
+  {
+   "rule": "No ProjectM types, engine or presets and no ProjectM code reused",
+   "source": "CLAUDE.md rule 12; spec FR-A21-006"
+  },
+  {
+   "rule": "No networking, accounts, analytics, tracking or advertising; no live aurora data; preferences stay in the experience's storage",
+   "source": "constitution A21 offline-first and private; CLAUDE.md rule 3; spec FR-A21-006"
+  },
+  {
+   "rule": "No location: nothing reads the person's position, and no location permission or usage string",
+   "source": "spec FR-A21-006; research D5"
+  },
+  {
+   "rule": "No private API, and no permission or usage string: sound uses the ambient session category",
+   "source": "spec FR-A21-006; research D5; spec negative requirements"
+  },
+  {
+   "rule": "No aurora forecast or scientific claim: the sky is an artistic procedural picture, never described as a simulation of real auroras or a prediction",
+   "source": "manual non-goals; constitution A21 truthful claims; spec FR-A21-006"
+  },
+  {
+   "rule": "No therapeutic, medical, wellbeing or sleep claim in the experience, its copy or the store text",
+   "source": "constitution A21 truthful claims; spec FR-A21-006"
+  },
+  {
+   "rule": "No always-on-screen promise: the experience never claims to keep the screen on, and the host's pacing and the system's auto-lock apply",
+   "source": "manual non-goals; spec FR-A21-006"
+  },
+  {
+   "rule": "No required background audio: sound is optional, off by default, in the ambient category, and stops in the background",
+   "source": "spec FR-A21-006; spec clarification Q4"
+  },
+  {
+   "rule": "No purchased, generated, scanned or photographic images and no bundled recordings: ribbons, stars, clouds and glow are shaders and the loop is synthesised in code",
+   "source": "CLAUDE.md rule 4; constitution A21 visuals and sound are code; spec FR-A21-006; research D6"
+  },
+  {
+   "rule": "No fork or copy of VisualCore, ANGLE or projectm-ios, no standalone app target and no copy of another experience's themes, crossfade use, scene shaders or caustics; generic needs become VisualCore gaps when a second user appears",
+   "source": "ADR-0009; constitution A21 reuse first; CLAUDE.md rule 1"
+  },
+  {
+   "rule": "Risk 1, expensive volumetric layers drain battery. Owner: the 2D layered sky shaders at two quality levels (app-local G-SKY in A21-P01), the low-power still view (G-LOWPOWER in A21-P04) and the device measurements (G-DEVICE in A21-P05). Verification: experience tests prove every layer is a 2D full-screen pass, level 1 draws fewer octaves than level 0 and the still view draws once until its key changes; a source scan finds no volumetric ray-march loop; the device campaign records thermal state and frame rate over a short run per preset, extrapolated. Release blocker: a volumetric layer, no quality level below full, no low-power view, or a battery or thermal figure not measured on a device.",
+   "source": "manual §13 risk 1"
+  },
+  {
+   "rule": "Risk 2, bright flashing imagery. Owner: the luminance cap and comfort bounds (app-local G-CAP in A21-P02), transitions under the cap (G-COMPOSITE in A21-P03), the reduced-flash mode (G-LOWPOWER in A21-P04) and Reduce Motion and Reduce Flashing (G-CLOCK in A21-P01, via ExperienceLaunch). Verification: Core tests prove the cap function never exceeds the cap and ribbon frequency and brightness stay within the comfort bounds; experience tests prove composite read-backs stay under the cap at every transition step and frame-to-frame luminance change stays under the declared limit with Reduce Flashing; the device campaign checks on screen. Release blocker: any frame above the cap, a transition exceeding it, a flash above the declared rate, or Reduce Motion or Reduce Flashing ignored.",
+   "source": "manual §13 risk 2"
+  },
+  {
+   "rule": "Risk 3, soundtrack licensing. Owner: the ambient loop player (VisualCore:VisualCoreAudio G-LOOP in A21-P04) and the experience's synthesised loop and control (app-local G-SOUND in A21-P05). Verification: package tests prove the loop buffer is rendered in code by VisualCoreAudioDSP; scripts/check_licenses.py and a resource scan find no bundled audio file; the license inventory lists the synthesised loop. Release blocker: any bundled or downloaded recording, a sound without a license entry, or sound on by default.",
+   "source": "manual §13 risk 3"
+  }
+ ],
+ "decision": {
+  "result": "go",
+  "reasons": [
+   "A working host exists: RenderHost on OpenGL ES -> ANGLE -> Metal (main-actor) draws any RenderScene, paced by FramePacing under Low Power Mode and heat, with pause in the background and recreateContext, all public and tested (RenderHostTests, FramePacingTests, SessionLifecycleTests).",
+   "Full-screen shader drawing exists: FullScreenShaderScene with fixedTime, timeScale, palette and parameters, ShaderBundle with the vc/ noise, hash and palette library, and FieldPass, as Ambient Clock, Living Wallpapers and Digital Aquarium use (FullScreenShaderSceneTests, ShaderBundleTests, FieldPassTests).",
+   "Additive compositing into render targets exists: RenderState.BlendMode.additive, ResourceRegistry.makeRenderTarget, PingPongTarget, FloatRenderSupport, ParticleLayerScene, CrossfadeScene, CachedScene and FlashLimiterModel (RenderStateTests, CrossfadeSceneTests, FlashLimiterModelTests); SceneClock gives a rendered time apart from wall-clock time (SceneClockTests).",
+   "10 of 26 rows are available with tests; all 16 non-available rows have owned gaps: G-SCENE, G-SKY and G-CLOCK in A21-P01; G-CONTROLS, G-CAP and G-CHROME in A21-P02; G-COMPOSITE and G-PREFS in A21-P03; G-LOOP (VisualCore:VisualCoreAudio, upstream) and G-LOWPOWER in A21-P04; G-SOUND and G-DEVICE in A21-P05; G-RELEASE in A21-P06. The only VisualCore change is G-LOOP; the luminance cap, fallback frame and hide-and-restore controls stay app-local (spec clarifications Q3 to Q5).",
+   "No permission is needed (sound is ambient and synthesised, nothing uses location). Aurora stays unregistered (20 registered, A01-A20) until A21-P01 creates Packages/ExperiencesCreative/Aurora with its targets and first real rules."
+  ],
+  "blockers": []
+ }
+}

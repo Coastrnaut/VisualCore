@@ -17,7 +17,7 @@ only).
 
 ## Phase 3: User Story 1 — Evidence-backed integration matrix (P1) 🎯
 
-- [ ] T-A21-002 [US1] Write `docs/apps/aurora/visualcore-contract.json` (schema 1; app `aurora`; gate `A21-P00`):
+- [X] T-A21-002 [US1] Write `docs/apps/aurora/visualcore-contract.json` (schema 1; app `aurora`; gate `A21-P00`): — Verified 2026-11-17: 2026-11-17: docs/apps/aurora/visualcore-contract.json (schema 1, gate A21-P00): 10 inventory areas with real paths (158 release-check lines), 26 matrix rows (5 brainstorm capabilities available, the 6 version 0.1 features, 15 cross-cutting rows) with evidence of public declarations in framework products, 12 traceability entries; written by an agent, reviewed
   `inventory` of every FR-A21-001 area with paths and the release-check line count from `python3
   scripts/release_check.py --list`; `matrix` rows covering the 5 brainstorm capabilities and the 6 version 0.1
   features (research D2) plus cross-cutting rows (context loss, resize and orientation, quality tiers, accessibility,
