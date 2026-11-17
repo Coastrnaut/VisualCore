@@ -624,6 +624,17 @@ let package = Package(
                     path: "LivingWallpapers/ExperienceTests",
                     // Feature 143 (A19-P06) T-A19-605: committed snapshot and history samples.
                     resources: [.copy("Fixtures")]),
+        // A20 Digital Zen Garden (feature 145, A20-P01): a pending core until A20-P02 adds the experience. The core is
+        // pure (Foundation and the vectors of VisualCoreMath): the garden document, strokes, rakes, the command history
+        // and a reference sand field rebuilt from the commands without the GPU; it reads no clock and draws nothing.
+        .target(name: "DigitalZenGardenCore",
+                dependencies: [.product(name: "VisualCoreMath", package: visualCore),
+                               .product(name: "VisualCoreExperience", package: visualCore)],
+                path: "DigitalZenGarden/Core"),
+        .testTarget(name: "DigitalZenGardenCoreTests",
+                    dependencies: ["DigitalZenGardenCore",
+                                   .product(name: "VisualCoreMath", package: visualCore)],
+                    path: "DigitalZenGarden/CoreTests"),
         // A18 Ambient Clock (feature 131, A18-P01): a pending core until A18-P02 adds the experience. The core is pure
         // (Foundation, the clock source of VisualCoreExperience and the planner of VisualCoreSimulation) and reads no
         // clock: the time enters as actions.
