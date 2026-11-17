@@ -460,7 +460,7 @@
    "id": "M06",
    "capability": "One reviewed region: the right knee joint (distal femur, proximal tibia, head of the fibula, patella; articular cartilage and the medial and lateral menisci; anterior and posterior cruciate, medial and lateral collateral and patellar ligaments; the quadriceps tendon) as a schematic procedural model with a structure inventory and a review record",
    "source": "manual v0.1: one reviewed region; spec clarification 5",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshShapes.swift",
@@ -503,7 +503,7 @@
     "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Core/BodyCatalog.swift",
     "symbol": "CelestialBody"
    },
-   "notes": "VisualCore gives the generators and budgets (M12) and hashing; no anatomy type exists in any framework product (grep 2026-11-16 for anatomy, femur, ligament: none outside docs). The structure inventory and graph are G-CONTENT (A17-P01), the procedural shapes G-SCENE (A17-P02), the review record G-REVIEW (A17-P05)."
+   "notes": "VisualCore gives the generators and budgets (M12) and hashing; no anatomy type exists in any framework product (grep 2026-11-16 for anatomy, femur, ligament: none outside docs). The structure inventory and graph are G-CONTENT (A17-P01), the procedural shapes G-SCENE (A17-P02), the review record G-REVIEW (A17-P05). Available from A17-P05: its gaps (G-CONTENT, G-SCENE, G-REVIEW) are closed."
   },
   {
    "id": "M07",
@@ -656,7 +656,7 @@
    "id": "M10",
    "capability": "Reviewed factual text with citations and provenance: each structure's plain-words description written from Gray's Anatomy, 20th edition (1918, public domain) and cited by section, names in Terminologia Anatomica (1998) with English equivalents, every text recording its source and license, and a not-reviewed-by-a-clinician label until the owner's clinical review",
    "source": "manual v0.1: reviewed factual text with citations and provenance; spec clarification 5",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AcknowledgementsView.swift",
@@ -681,7 +681,7 @@
     "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Core/SourceRecords.swift",
     "symbol": "SourceRecord"
    },
-   "notes": "Tested: AcknowledgementsViewTests (LicenseInventory). No citation or review record type exists in any framework product; Solar System Explorer's SourceRecord and CitationAudit are experience code. The texts and citations are G-TEXT (A17-P03); the review record, the not-reviewed label and its validation are G-REVIEW (A17-P05)."
+   "notes": "Tested: AcknowledgementsViewTests (LicenseInventory). No citation or review record type exists in any framework product; Solar System Explorer's SourceRecord and CitationAudit are experience code. The texts and citations are G-TEXT (A17-P03); the review record, the not-reviewed label and its validation are G-REVIEW (A17-P05). Available from A17-P05: its gaps (G-TEXT, G-REVIEW) are closed."
   },
   {
    "id": "M11",
@@ -988,7 +988,7 @@
    "id": "M18",
    "capability": "Content provenance and the review record: every name, synonym, description and shape parameter records its source, section, license and author; a review record names who reviewed what and when; the clinical review is an owner action",
    "source": "spec FR-A17-003, FR-A17-006; constitution A17 content provenance",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AcknowledgementsView.swift",
@@ -1013,7 +1013,7 @@
     "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Core/CitationAudit.swift",
     "symbol": "CitationAudit"
    },
-   "notes": "Tested: AcknowledgementsViewTests. No provenance or review type exists in a framework product (Solar System Explorer's CitationAudit and ScientificReview and Molecular Explorer's MoleculeReview are experience code). G-TEXT (A17-P03) and G-REVIEW (A17-P05)."
+   "notes": "Tested: AcknowledgementsViewTests. No provenance or review type exists in a framework product (Solar System Explorer's CitationAudit and ScientificReview and Molecular Explorer's MoleculeReview are experience code). G-TEXT (A17-P03) and G-REVIEW (A17-P05). Available from A17-P05: its gaps (G-TEXT, G-REVIEW) are closed."
   },
   {
    "id": "M19",
@@ -1682,8 +1682,8 @@
    "owner": "app-local",
    "justification": "The content review record (who reviewed which text when, the clinical review as an owner action) and the not-reviewed-by-a-clinician label until it exists are the experience's; the clinical review itself is BLOCKED_OWNER_ACTION, never done by the engineer.",
    "phase": 5,
-   "test": "Core host tests: without a clinical review record every text carries the not-reviewed label; the record validates (reviewer, date, scope); the schematic-model label is always present; validation of the whole pack passes",
-   "closed": null
+   "test": "Core tests: the review record (knee-right.review.json, a17.review-record schema 1, bound to content version 2) validates with 14 editorial entries and no clinical one; every refusal kind is named; without a clinical entry every part's panel says Not reviewed by a clinician., and the model statement Schematic model for learning; shapes are simplified. is always present; the whole pack validates (ReviewRecordTests, PanelTests, ContentPackTests); the generated review table in docs/apps/interactive-anatomy/review.md matches (ReviewDocumentTests). Experience tests: every part is selected from the list alone with the panel, announcement and state of a tap (AnatomyListOnlyTests). The clinical review stays BLOCKED_OWNER_ACTION; the device rows are in device-campaign.md.",
+   "closed": "A17-P05"
   },
   {
    "id": "G-RELEASE",
