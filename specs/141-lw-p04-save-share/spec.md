@@ -178,6 +178,8 @@ app, and can clear it.
 ## Assumptions
 
 - The share sheet's own "Save Image" is the system's; the experience only provides the file.
+- The export history is data stored on the device; A19-P06's privacy page names `history.json`, what it holds (no
+  image, only the export's settings and time), its bound and how to clear it.
 
 ## Traceability
 
