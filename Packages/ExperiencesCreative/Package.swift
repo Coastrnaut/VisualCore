@@ -42,6 +42,7 @@ let package = Package(
         // Feature 125 (A17-P02): Interactive Anatomy, a candidate until X-A17.
         .library(name: "InteractiveAnatomyExperience", targets: ["InteractiveAnatomyExperience"]),
         .library(name: "AmbientClockExperience", targets: ["AmbientClockExperience"]),
+        .library(name: "LivingWallpapersExperience", targets: ["LivingWallpapersExperience"]),
         // The standalone ParticleUniverse app target compiles the moved sources and needs the Core until X-A04.
         .library(name: "ParticleUniverseCore", targets: ["ParticleUniverseCore"]),
     ],
@@ -597,6 +598,30 @@ let package = Package(
                                    .product(name: "VisualCoreScenes", package: visualCore),
                                    .product(name: "VisualCoreRendering", package: rendering)],
                     path: "LivingWallpapers/CoreTests"),
+        // A19 Living Wallpapers experience (feature 139, A19-P02): a candidate until X-A19. The presenter owns one
+        // full-screen shader scene; exports render off screen on the session's host (no GL call here).
+        .target(name: "LivingWallpapersExperience",
+                dependencies: ["LivingWallpapersCore",
+                               .product(name: "VisualCoreSimulation", package: visualCore),
+                               .product(name: "VisualCoreDiagnostics", package: visualCore),
+                               .product(name: "VisualCorePersistence", package: visualCore),
+                               .product(name: "VisualCoreScenes", package: visualCore),
+                               .product(name: "VisualCoreExperience", package: visualCore),
+                               .product(name: "VisualCoreRendering", package: rendering),
+                               .product(name: "VisualCoreExperienceHost", package: rendering),
+                               .product(name: "VisualCoreUI", package: rendering)],
+                path: "LivingWallpapers/Experience"),
+        .testTarget(name: "LivingWallpapersExperienceTests",
+                    dependencies: ["LivingWallpapersExperience", "LivingWallpapersCore",
+                               .product(name: "VisualCoreSimulation", package: visualCore),
+                               .product(name: "VisualCoreDiagnostics", package: visualCore),
+                               .product(name: "VisualCorePersistence", package: visualCore),
+                               .product(name: "VisualCoreScenes", package: visualCore),
+                               .product(name: "VisualCoreExperience", package: visualCore),
+                               .product(name: "VisualCoreRendering", package: rendering),
+                               .product(name: "VisualCoreExperienceHost", package: rendering),
+                               .product(name: "VisualCoreUI", package: rendering)],
+                    path: "LivingWallpapers/ExperienceTests"),
         // A18 Ambient Clock (feature 131, A18-P01): a pending core until A18-P02 adds the experience. The core is pure
         // (Foundation, the clock source of VisualCoreExperience and the planner of VisualCoreSimulation) and reads no
         // clock: the time enters as actions.
