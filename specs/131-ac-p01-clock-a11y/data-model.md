@@ -30,7 +30,8 @@
   - Each refusal has a sentence naming the value. A refusal leaves the defaults.
 - `ClockEnvironment`: the resolved `Locale`, `TimeZone` and `Calendar`. Fixed policies win; otherwise the system's
   current values, captured when the environment is built.
-- `ClockDisplay`: `time`, `date` (empty when the date line is off) and `spoken`.
+- `ClockDisplay`: `time`, `date` (empty when the date line is off) and `spoken` (the shown time text, seconds
+  included when shown, then ", " and the full date when the date line is on).
 - `ClockFormatter.display(at: Date, preferences:, environment:) -> ClockDisplay`, plus `usesTwelveHourClock(locale:)`.
 - `ClockSchedule.nextDeadline(after: Date, showSeconds: Bool, calendar: Calendar) -> Date`, strictly later and on a
   boundary.

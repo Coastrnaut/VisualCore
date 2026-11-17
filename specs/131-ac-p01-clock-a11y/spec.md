@@ -73,7 +73,7 @@ in code:
   locale and time zone (as in the fixtures). "System" means
   the device's setting at the time of formatting.
 - Q: How is the time spoken and announced? → A: The spoken string is built from the same instant:
-  - the time in the locale's spoken form (time style short, with the hour cycle applied, so "10:42 PM" or "22:42");
+  - the shown time text with its hour cycle, seconds included when they are shown (so "10:42 PM" or "22:42");
   - followed by the full date when the date line is shown.
 
   The clock never announces minute changes. The canvas label always holds the current spoken string. An announcement

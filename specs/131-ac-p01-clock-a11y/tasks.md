@@ -63,4 +63,4 @@ and the spoken time (109) close the phase. Review checkpoints after 102 (host te
 
 ## Phase 9: Convergence
 
-- [ ] T-A18-116 Record in `specs/131-ac-p01-clock-a11y/spec.md` clarification Q5 and `data-model.md` (`ClockDisplay`) that the spoken time is the shown time text with its hour cycle (seconds included when they are shown), followed by ", " and the full date when the date line is shown, as `ClockFormatter.display` builds it. Per clarification Q5 (contradicts)
+- [X] T-A18-116 Record in `specs/131-ac-p01-clock-a11y/spec.md` clarification Q5 and `data-model.md` (`ClockDisplay`) that the spoken time is the shown time text with its hour cycle (seconds included when they are shown), followed by ", " and the full date when the date line is shown, as `ClockFormatter.display` builds it. Per clarification Q5 (contradicts) — Verified 2026-11-16: 2026-11-16: spec.md clarification Q5 and data-model.md ClockDisplay record that the spoken time is the shown time text (seconds when shown) followed by the full date when shown, matching ClockFormatter.display and SpokenTimeTests (A18-P01.ac-core-ios27-2.json exit 0); validate_docs.py PASS
