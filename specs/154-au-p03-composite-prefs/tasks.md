@@ -8,7 +8,7 @@ VisualCore change. Precedent: `specs/147-zg-p03-stones/tasks.md`. Rollback: reve
 
 ## Phase 1: Setup
 
-- [ ] T-A21-301 Baseline: cite the A21-P02 evidence (`.autonomy/checks/A21-P02.{au-ios27,app-unit-2,verify-27}.json`) on
+- [X] T-A21-301 Baseline: cite the A21-P02 evidence (`.autonomy/checks/A21-P02.{au-ios27,app-unit-2,verify-27}.json`) on — Verified 2026-11-17: 2026-11-17: A21-P02 evidence cited: .autonomy/checks/A21-P02.au-ios27.json, A21-P02.app-unit-2.json and A21-P02.verify-27.json, all exit 0; no Packages, Apps or project.yml change since the A21-P02 record commit a74f06f6
   the tree recorded at A21-P02 (`a74f06f6`), whose Packages are unchanged since (owner ruling of 2026-11-14)
 
 ## Phase 2: Story 1 — one sky dissolves into the next (P1) 🎯
