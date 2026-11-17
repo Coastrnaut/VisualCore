@@ -86,7 +86,7 @@
 
 ## Phase 6: Records and evidence
 
-- [ ] T-A22-112 [P] Write `docs/apps/shader-studio/licenses.md` (templates and prelude written in this repository; the
+- [X] T-A22-112 [P] Write `docs/apps/shader-studio/licenses.md` (templates and prelude written in this repository; the — Verified 2026-11-17: 2026-11-17: docs/apps/shader-studio/licenses.md (templates and prelude written here; vc/ is VisualCore's; GLSL ES 3.00 word lists are facts; no third-party asset) listed in the README; validate_docs PASS
   `vc/` library is VisualCore's; the GLSL word lists are facts of the GLSL ES 3.00 specification; no third-party asset)
   and list it in `docs/apps/shader-studio/README.md`
 - [ ] T-A22-113 Core tests on sim-27.2, as a review checkpoint (SC-A22-105, FR-A22-107):
