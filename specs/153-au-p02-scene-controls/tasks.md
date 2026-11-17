@@ -48,7 +48,7 @@ VisualCore change. Precedent: `specs/146-zg-p02-sand-renderer/tasks.md`. Rollbac
 
 ## Phase 5: Registration and evidence
 
-- [ ] T-A21-207 Register the candidate: `Catalog/registrations.json` entry for a21 (capabilities ≤ 40 characters each,
+- [X] T-A21-207 Register the candidate: `Catalog/registrations.json` entry for a21 (capabilities ≤ 40 characters each, — Verified 2026-11-17: 2026-11-17: Catalog/registrations.json a21 candidate (5 capabilities of at most 40 characters, quality tiers level-0 and level-1, palette, manifest, permissions [], a 267-character summary); build_catalog.py (catalog and fixtures; 20 available, A21 not); ExperienceRegistry candidate aurora (no examples: schema 1) with its manifest; project.yml product AuroraExperience; AppModelTests synthetic candidate a22.shader-studio; RealCatalogTests and test_scripts.py lists; .autonomy/checks/A21-P02.catalog-tests.json, A21-P02.script-tests.json and A21-P02.app-unit-2.json exit 0 (the first app-unit attempt failed to compile because the registration had been placed in the wrong extension; moved and rebuilt)
   quality_tiers ["level-0", "level-1"], palette, manifest `Packages/ExperiencesCreative/Aurora/scenario-manifest.json`,
   permissions []); `python3 scripts/build_catalog.py`; `Apps/VisualCore/App/ExperienceRegistry.swift` candidate
   `aurora` (no examples: schema 1); `project.yml` product; the synthetic candidate id in

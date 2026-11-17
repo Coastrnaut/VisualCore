@@ -492,6 +492,29 @@
         "photo-library-add"
       ],
       "summary": "A calm sand garden: rake a softly lit tray of sand with one finger in two rake styles and three sand tones, with a preview of the rake under the finger, undo and redo of every stroke, and patterns that rake rows, circles, waves and spirals for you."
+    },
+    "a21.aurora": {
+      "capabilities": [
+        "Three procedural aurora skies",
+        "Colour, motion and intensity controls",
+        "A brightness limit you choose",
+        "Smooth changes between skies",
+        "Controls that hide and return by tap"
+      ],
+      "quality_tiers": [
+        "level-0",
+        "level-1"
+      ],
+      "palette": [
+        "#050A24",
+        "#33D973",
+        "#8C4DD9",
+        "#F29966"
+      ],
+      "content": null,
+      "manifest": "Packages/ExperiencesCreative/Aurora/scenario-manifest.json",
+      "permissions": [],
+      "summary": "A full-screen ambient sky of procedural aurora ribbons, stars and clouds: three skies, colour, motion and intensity controls, a brightness limit no frame exceeds, smooth changes between skies and controls that hide and return with a tap. Stylized art, not a forecast."
     }
   }
 }
