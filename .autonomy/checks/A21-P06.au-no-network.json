@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "sh",
+    "specs/157-au-p06-release/scan-sources-release.sh"
+  ],
+  "command": "sh specs/157-au-p06-release/scan-sources-release.sh",
+  "elapsed_seconds": 0.031,
+  "exit_code": 0,
+  "finished": "2026-11-17T12:25:24+00:00",
+  "log": ".autonomy/logs/A21-P06.au-no-network.log",
+  "log_sha256": "25e8248a91397e2327ec4dbd70bb224fd168a2f048027ccd102ea621c3fb9576",
+  "name": "au-no-network",
+  "stage": "A21-P06",
+  "started": "2026-11-17T12:25:24+00:00",
+  "timed_out": false
+}

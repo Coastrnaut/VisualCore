@@ -26,7 +26,7 @@
   - the optional sound plays on the ambient session (silenced by the silent switch), off by default;
   - the licence inventory (code only; link `licenses.md`)
   (FR-A21-601)
-- [ ] T-A21-603 [US1] Write `specs/157-au-p06-release/scan-sources-release.sh` (after
+- [X] T-A21-603 [US1] Write `specs/157-au-p06-release/scan-sources-release.sh` (after — Verified 2026-11-17: 2026-11-17: specs/157-au-p06-release/scan-sources-release.sh (the APIs of clarification Q3); .autonomy/checks/A21-P06.au-no-network.json exit 0
   `specs/150-zg-p06-release/scan-sources-release.sh`):
   - it refuses the APIs of clarification Q3 in the Swift files of `Packages/ExperiencesCreative/Aurora`;
   - run it: `--name au-no-network -- sh specs/157-au-p06-release/scan-sources-release.sh`
