@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a21.aurora",
+    "--runtime",
+    "27"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a21.aurora --runtime 27",
+  "elapsed_seconds": 55.766,
+  "exit_code": 0,
+  "finished": "2026-11-17T11:58:45+00:00",
+  "log": ".autonomy/logs/A21-P04.verify-27.log",
+  "log_sha256": "85b5e438a216e106c67567689ed8f837adabdaacdf08b91fb5c4e96c7e28e30c",
+  "name": "verify-27",
+  "stage": "A21-P04",
+  "started": "2026-11-17T11:57:49+00:00",
+  "timed_out": false
+}

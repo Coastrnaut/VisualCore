@@ -58,7 +58,7 @@ for the audio change, feature 077 (A10-P03). Rollback: revert the commits (the A
 - [X] T-A21-409 Aurora tests on sim-27.2 (`--name au-ios27`), documented API, isolation, core purity (review checkpoint) — Verified 2026-11-17: 2026-11-17: review checkpoint: .autonomy/checks/A21-P04.au-ios27.json (53 Swift Testing and 21 XCTest tests, each under 10 s), A21-P04.documented-api.json, A21-P04.isolation.json, A21-P04.core-purity.json and A21-P04.audio-hot-path.json, all exit 0
 - [X] T-A21-410 Contract: G-LOOP and G-LOWPOWER closed by "A21-P04"; rows whose gaps are all closed become available — Verified 2026-11-17: 2026-11-17: .autonomy/checks/A21-P04.contract.json exit 0; G-LOOP and G-LOWPOWER closed by A21-P04 (the missing-highp path proven through a seam, recorded in the notes); M22 and M23 available; M09 and M10 stay open for G-DEVICE and G-SOUND
   with evidence (`--name contract`)
-- [ ] T-A21-411 Manifest (unchanged unless an engine action changed), catalog, app build and unit (`--name app-unit`),
+- [X] T-A21-411 Manifest (unchanged unless an engine action changed), catalog, app build and unit (`--name app-unit`), — Verified 2026-11-17: 2026-11-17: scenario-manifest.json unchanged (AuroraManifestTests pass in A21-P04.au-ios27.json; no engine action changed); .autonomy/checks/A21-P04.catalog.json, A21-P04.app-unit.json (build for testing and unit on iOS 27.2), A21-P04.verify-27.json, A21-P04.experience-packages.json and A21-P04.script-tests.json, all exit 0
   runner (`--name verify-27`), packages and script tests
 - [ ] T-A21-412 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
   A21-P04; update README.md (rule 16) and `docs/automatedtesting.md` (rule 17)
