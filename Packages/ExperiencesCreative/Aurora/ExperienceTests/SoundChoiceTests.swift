@@ -4,7 +4,8 @@
 // presenter (what the `sound` toggle and the `volume` slider call), it sends no action (the port's revision, the
 // snapshot and the digest do not change) and is kept in `prefs.v1`; it is unchanged after a context recreation (setup
 // again), a resize, a suspension and a resumption (scene phases), and after the teardown at close and a setup in a new
-// session. The controls have spoken labels; no action exists for the sound, so nothing plays. Short runs only.
+// session. The controls have spoken labels; no action exists for the sound. Since A21-P05 (feature 156) the choice
+// also drives the ambient loop, proved with a fake player in `SoundLoopTests`. Short runs only.
 import CoreGraphics
 import Foundation
 import Testing
