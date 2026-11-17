@@ -28,7 +28,7 @@ VisualCore change. Precedent: `specs/141-lw-p04-save-share/tasks.md`. Rollback: 
 
 ## Phase 6: Records and evidence
 
-- [ ] T-A20-406 Digital Zen Garden tests on sim-27.2 (`--name zg-ios27`), documented API, isolation, core purity and a Photos scan (`--name photos-scan -- sh -c '! grep -rnE "import Photos|PhotosUI|PHPhotoLibrary" Packages/ExperiencesCreative/DigitalZenGarden'`) (SC-A20-404)
+- [X] T-A20-406 Digital Zen Garden tests on sim-27.2 (`--name zg-ios27`), documented API, isolation, core purity and a Photos scan (`--name photos-scan -- sh -c '! grep -rnE "import Photos|PhotosUI|PHPhotoLibrary" Packages/ExperiencesCreative/DigitalZenGarden'`) (SC-A20-404) — Verified 2026-11-17: 2026-11-17: .autonomy/checks/A20-P04.zg-ios27.json (51 core, 75 experience tests, iOS 27.2), A20-P04.documented-api.json, A20-P04.isolation.json, A20-P04.core-purity.json and A20-P04.photos-scan.json, all exit 0, each read before this tick
 - [ ] T-A20-407 Contract: G-LIBRARY and G-A11Y closed by "A20-P04"; rows whose gaps are all closed become available with evidence (`--name contract`)
 - [ ] T-A20-408 Catalog, app build and unit (`xcodegen generate --spec project.yml`; `--name app-unit`), release usage descriptions (`--name usage -- python3 scripts/release_check.py --only app-release-build app-usage-descriptions`), runner (`--name verify-27`), packages and script tests
 - [ ] T-A20-409 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A20-P04; update README.md (rule 16) and `docs/automatedtesting.md` (rule 17)

@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "sh",
+    "-c",
+    "! grep -rnE \"import Photos|PhotosUI|PHPhotoLibrary\" Packages/ExperiencesCreative/DigitalZenGarden"
+  ],
+  "command": "sh -c '! grep -rnE \"import Photos|PhotosUI|PHPhotoLibrary\" Packages/ExperiencesCreative/DigitalZenGarden'",
+  "elapsed_seconds": 0.012,
+  "exit_code": 0,
+  "finished": "2026-11-17T09:22:05+00:00",
+  "log": ".autonomy/logs/A20-P04.photos-scan.log",
+  "log_sha256": "b6fd08d1b44873736bf05c24e5363d3923b2cc8b4401be1eea694ed6f8d09d9c",
+  "name": "photos-scan",
+  "stage": "A20-P04",
+  "started": "2026-11-17T09:22:05+00:00",
+  "timed_out": false
+}
