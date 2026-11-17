@@ -8,7 +8,7 @@ VisualCore change. Precedent: `specs/133-ac-p03-themes-favourites/tasks.md`. Rol
 
 ## Phase 1: Setup
 
-- [ ] T-A19-301 Baseline: cite the A19-P02 evidence (`.autonomy/checks/A19-P02.{lw-ios27,app-unit,verify-27}.json`) on the tree recorded at A19-P02 (`4ea0d03b`), whose Packages are unchanged since (owner ruling of 2026-11-14)
+- [X] T-A19-301 Baseline: cite the A19-P02 evidence (`.autonomy/checks/A19-P02.{lw-ios27,app-unit,verify-27}.json`) on the tree recorded at A19-P02 (`4ea0d03b`), whose Packages are unchanged since (owner ruling of 2026-11-14) — Verified 2026-11-17: 2026-11-17: A19-P02 evidence cited: .autonomy/checks/A19-P02.lw-ios27.json, A19-P02.app-unit.json and A19-P02.verify-27.json, all exit 0; no Packages, Apps or project.yml change since the A19-P02 record commit 4ea0d03b
 
 ## Phase 2: Story 1 — editable colours (P1) 🎯
 
