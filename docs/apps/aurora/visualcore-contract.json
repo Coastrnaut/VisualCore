@@ -497,7 +497,7 @@
    "id": "M07",
    "capability": "Version 0.1 feature 02: colour, motion and intensity controls with sensible bounds",
    "source": "manual v0.1 feature 02; manual §13 risk 2; research D4a",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreParameters/ParameterSchema.swift",
@@ -528,7 +528,7 @@
     "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/Adapter/GenerativeArtCore.swift",
     "symbol": "GenerativeArtCore"
    },
-   "notes": "Bounded parameters are tested (ParametersTests, ParameterEditorTests, ExperienceActionTests). The parameter ranges and their validation are G-SCENE (A21-P01); the controls are G-CONTROLS (A21-P02). Numbers are decided with their tests (research D4a). G-SCENE closed in A21-P01 (SkyScene, SkyPresets; SceneTests, PresetTests)."
+   "notes": "Bounded parameters are tested (ParametersTests, ParameterEditorTests, ExperienceActionTests). The parameter ranges and their validation are G-SCENE (A21-P01); the controls are G-CONTROLS (A21-P02). Numbers are decided with their tests (research D4a). G-SCENE closed in A21-P01 (SkyScene, SkyPresets; SceneTests, PresetTests). G-CONTROLS closed in A21-P02 (SkyCore eight bounded actions, AuroraControls, SkyBlend; AuroraCoreTests, BlendTests). Available."
   },
   {
    "id": "M08",
@@ -663,7 +663,7 @@
    "id": "M11",
    "capability": "Version 0.1 feature 06: a full-screen view whose controls hide and come back with a tap on the canvas or the accessibility action \"Show controls\"",
    "source": "manual v0.1 feature 06; spec clarification Q5",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
@@ -688,7 +688,7 @@
     "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidArtPresenter.swift",
     "symbol": "FluidArtPresenter"
    },
-   "notes": "The canvas overlay and pointer delivery are tested (ShellRenderingTests, ShellLifecycleTests); no hide-and-restore or full-screen mode exists and none is added to the shell or host. Hiding and restoring the experience's own overlay is G-CHROME (app-local, A21-P02)."
+   "notes": "The canvas overlay and pointer delivery are tested (ShellRenderingTests, ShellLifecycleTests); no hide-and-restore or full-screen mode exists and none is added to the shell or host. Hiding and restoring the experience's own overlay is G-CHROME (app-local, A21-P02). G-CHROME closed in A21-P02 (AuroraControls hide and restore by a tap or the accessibility action Show controls; ChromeTests). Available."
   },
   {
    "id": "M12",
@@ -811,7 +811,7 @@
     "file": "Packages/ExperiencesCreative/ParticleUniverse/Experience/ParticlePresenter.swift",
     "symbol": "ParticlePresenter"
    },
-   "notes": "A brightness cap exists only on TrailLayer and ParticleLayerScene (ParticleLayerSceneTests, TrailLayerTests); FlashLimiterModel limits a rate, not a level. A cap for an arbitrary scene is G-CAP (pure math and a composite pass, app-local, A21-P02) and its use under transitions is G-COMPOSITE (A21-P03); the value is decided with its tests (research D4a). Moved upstream only when a second experience needs it."
+   "notes": "A brightness cap exists only on TrailLayer and ParticleLayerScene (ParticleLayerSceneTests, TrailLayerTests); FlashLimiterModel limits a rate, not a level. A cap for an arbitrary scene is G-CAP (pure math and a composite pass, app-local, A21-P02) and its use under transitions is G-COMPOSITE (A21-P03); the value is decided with its tests (research D4a). Moved upstream only when a second experience needs it. G-CAP closed in A21-P02 (u_limit in SkyShader and SkyReference, knee 5/6 x limit to the limit; LimitTests, LimitRenderTests: every preset and every change midpoint under the limit)."
   },
   {
    "id": "M15",
@@ -940,7 +940,7 @@
    "id": "M18",
    "capability": "Accessibility: VoiceOver labels and a scene description, Dynamic Type controls, a stable frame under Reduce Motion, Reduce Flashing honoured",
    "source": "spec FR-A21-003; spec clarification Q5; constitution A21 calm by default",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPreferences.swift",
@@ -971,7 +971,7 @@
     "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/PlaygroundView.swift",
     "symbol": "PlaygroundView"
    },
-   "notes": "Tested in AccessibilityPreferencesTests, SystemAccessibilityObserverTests and SceneClockTests; the app passes both through ExperienceLaunch.reduceMotion and reduceFlashing. The reduced-motion stable frame is G-CLOCK (A21-P01); labels and Dynamic Type controls are G-CONTROLS and the \"Show controls\" action is G-CHROME (A21-P02). G-CLOCK closed in A21-P01 (SkyClock over SceneClock; ClockTests, ReducedMotionFrameTests)."
+   "notes": "Tested in AccessibilityPreferencesTests, SystemAccessibilityObserverTests and SceneClockTests; the app passes both through ExperienceLaunch.reduceMotion and reduceFlashing. The reduced-motion stable frame is G-CLOCK (A21-P01); labels and Dynamic Type controls are G-CONTROLS and the \"Show controls\" action is G-CHROME (A21-P02). G-CLOCK closed in A21-P01 (SkyClock over SceneClock; ClockTests, ReducedMotionFrameTests). G-CONTROLS closed in A21-P02 (SkyCore eight bounded actions, AuroraControls, SkyBlend; AuroraCoreTests, BlendTests). G-CHROME closed in A21-P02 (AuroraControls hide and restore by a tap or the accessibility action Show controls; ChromeTests). Available."
   },
   {
    "id": "M19",
@@ -1295,7 +1295,7 @@
    "justification": "Scene selection and the colour, motion and intensity controls with their bounds, VoiceOver labels and Dynamic Type layouts are the experience's interface (manual phase 02).",
    "phase": 2,
    "test": "Experience tests: each control maps to a bounded parameter and refuses values outside it; every control has a label and an adjustable action; layouts hold at the largest Dynamic Type size",
-   "closed": null
+   "closed": "A21-P02"
   },
   {
    "id": "G-CAP",
@@ -1307,7 +1307,7 @@
    "justification": "No luminance cap for an arbitrary scene and no tone mapping exist in VisualCore (brightnessCap is only on TrailLayer and ParticleLayerScene). The cap as pure math in Core and the final composite pass applying it, with comfort bounds on ribbon frequency and brightness, are experience code (spec clarification Q3, manual risk 2). No VisualCore change is planned (spec clarification Q3); a second user would justify moving it upstream later (Principle II).",
    "phase": 2,
    "test": "Core host tests: the cap function never returns luminance above the declared cap for any input, including NaN and infinity; ribbon frequency and brightness stay within the comfort bounds; experience tests: a read-back of the composite never exceeds the cap",
-   "closed": null
+   "closed": "A21-P02"
   },
   {
    "id": "G-CHROME",
@@ -1320,7 +1320,7 @@
    "justification": "No hide-and-restore or full-screen mode exists for an experience's controls, and none is added to the shell or host. The experience's control overlay hides on request and returns with a tap on the canvas or the accessibility action \"Show controls\" (spec clarification Q5). No VisualCore change is planned (spec clarification Q3); a second user would justify moving it upstream later (Principle II).",
    "phase": 2,
    "test": "Experience tests: hiding removes the overlay and never changes the state; a canvas tap or the \"Show controls\" accessibility action restores it; VoiceOver can always reach the action",
-   "closed": null
+   "closed": "A21-P02"
   },
   {
    "id": "G-COMPOSITE",

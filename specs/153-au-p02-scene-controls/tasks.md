@@ -60,7 +60,7 @@ VisualCore change. Precedent: `specs/146-zg-p02-sand-renderer/tasks.md`. Rollbac
 - [X] T-A21-209 Aurora tests on sim-27.2 (`--name au-ios27 -- python3 scripts/xcodebuild_package.py --package — Verified 2026-11-17: 2026-11-17: review checkpoint: .autonomy/checks/A21-P02.au-ios27.json (AuroraCoreTests and AuroraExperienceTests on sim-27.2), A21-P02.documented-api.json, A21-P02.isolation.json and A21-P02.core-purity.json, all exit 0
   Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing
   AuroraCoreTests AuroraExperienceTests`), the documented API, isolation and core purity (review checkpoint)
-- [ ] T-A21-210 Contract: G-CONTROLS, G-CAP and G-CHROME closed by "A21-P02"; rows whose gaps are all closed become
+- [X] T-A21-210 Contract: G-CONTROLS, G-CAP and G-CHROME closed by "A21-P02"; rows whose gaps are all closed become — Verified 2026-11-17: 2026-11-17: .autonomy/checks/A21-P02.contract.json exit 0; G-CONTROLS, G-CAP and G-CHROME closed by A21-P02; M07, M11 and M18 available; M14 stays open for G-COMPOSITE and G-DEVICE
   available with evidence (`--name contract`)
 - [ ] T-A21-211 Catalog (`--name catalog`); app build and unit (`xcodegen generate --spec project.yml`; `--name app-unit
   -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`); runner (`--name verify-27 --
