@@ -67,7 +67,7 @@ migration, no VisualCore change).
 - [X] T-A20-610 App build, unit and interface chunk (`xcodegen generate --spec project.yml`; `--name app-ui -- python3 — Verified 2026-11-17: 2026-11-17: xcodegen generate; .autonomy/checks/A20-P06.app-ui.json exit 0 (build for testing, unit, interface chunk b3: ZGGardenUITests 19.3 s and 27.0 s, ZGLibraryUITests 33.7 s, ZGReleaseUITests 27.1 s on the iOS 27.2 phone) and A20-P06.verify-27.json exit 0
   scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27 app-ui-ios27-b3`) and the runner (`--name
   verify-27`) (SC-A20-604)
-- [ ] T-A20-611 Release build checks (review checkpoint; `--name release-checks -- python3 scripts/release_check.py
+- [X] T-A20-611 Release build checks (review checkpoint; `--name release-checks -- python3 scripts/release_check.py — Verified 2026-11-17: 2026-11-17: review checkpoint: .autonomy/checks/A20-P06.release-checks.json exit 0 (8/8: app-release-build, app-release-symbols, app-privacy-manifest, app-no-tracking, app-licenses, app-usage-descriptions, experience-release-a20, copy-claims-a20)
   --only app-release-build app-release-symbols app-privacy-manifest app-no-tracking app-licenses app-usage-descriptions
   experience-release-a20 copy-claims-a20`)
 - [ ] T-A20-612 Contract: G-RELEASE closed by "A20-P06" (its iOS 26.x runner half is cited at X-A20); rows whose gaps are all closed become available with evidence
