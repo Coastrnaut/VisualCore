@@ -110,7 +110,7 @@
     app-ui-ios27-c3`;
   - the runner (`--name verify-27`), the experience packages and the script tests
   (FR-A21-501–506; SC-A21-501–503, 505)
-- [ ] T-A21-512 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+- [X] T-A21-512 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record — Verified 2026-11-17: 2026-11-17: /speckit-converge round 1 appended T-A21-513 and 514 (implemented), round 2 appended nothing (8 FR, 5 SC, 14 acceptance scenarios checked; every cited evidence file exit 0); .autonomy/evidence/A21-P05.json sealed; VERIFIED-GATE A21-P05 (156 of 263); planning index, matrix, distinctiveness, metadata, Auto-Creator, catalog (--check PASS), validate_autocreator and validate_docs PASS; README and docs/automatedtesting.md updated
   A21-P05; update README.md (rule 16) and `docs/automatedtesting.md` (rule 17)
 
 ## Dependencies
