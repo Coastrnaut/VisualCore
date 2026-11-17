@@ -6,8 +6,9 @@
 - `ShaderAssembly(project)` gives the three file texts and the entry name; adding them and
   `ShaderBundle.visualCoreLibrary` to a `ShaderLibrary` and compiling `ss/main.frag` with
   `FullScreenShaderScene.vertexSource` builds the person's shader.
-- `DiagnosticMapper.map(_ diagnostics: [ShaderDiagnostic])` → `[MappedDiagnostic]`: a diagnostic whose file is
-  `ss/shader.frag` keeps its line; any other file or `unknown` goes to `outside`.
+- `DiagnosticMapper.map(_ diagnostics: [ShaderDiagnostic])` → `[MappedDiagnostic]`: every diagnostic keeps its file
+  and line (nil for `unknown`, `<generated>` or line 0); `EditorDocument` attaches those of `ss/shader.frag` to their
+  line and puts the rest in `outside`.
 - `GLSLTokenizer.tokens(of line:)` covers the line exactly; `EditorDocument(source:diagnostics:)` numbers lines from 1
   over `\n`, `\r\n` and `\r`.
 - `ShaderTemplates.all` — three templates; each validates, compiles and has active uniforms equal to its declared

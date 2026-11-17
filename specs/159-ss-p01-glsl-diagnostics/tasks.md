@@ -129,7 +129,7 @@
 
 ## Phase 7: Convergence
 
-- [ ] T-A22-117 Record the as-built design in `specs/159-ss-p01-glsl-diagnostics/data-model.md` and `contracts/core.md`, per data-model "MappedDiagnostic" and the plan's structure (contradicts, unrequested):
+- [X] T-A22-117 Record the as-built design in `specs/159-ss-p01-glsl-diagnostics/data-model.md` and `contracts/core.md`, per data-model "MappedDiagnostic" and the plan's structure (contradicts, unrequested): — Verified 2026-11-17: 2026-11-17: as-built design recorded in data-model.md and contracts/core.md (MappedDiagnostic keeps other files' lines and the editor decides by file; isAcceptable, markedLines, tokens(of:), template(id:); line counts of validator and editor; templates without try!; the test scene compiles only, templates drawn through FullScreenShaderScene); documented-API check PASS; docs only, A22-P01.ss-core-ios27-2.json stands
   - `MappedDiagnostic.line` is nil only for `unknown`, `<generated>` or line 0, and a diagnostic of any other file keeps that file's line; the editor sends every file other than `ss/shader.frag` outside (`DiagnosticMapper.isInPersonSource`);
   - the additions `ShaderLimits.isAcceptable`, `EditorDocument.markedLines` and `GLSLTokenizer.tokens(of:)`;
   - the validator counts lines without a final empty line, while the editor shows one; line numbers agree;

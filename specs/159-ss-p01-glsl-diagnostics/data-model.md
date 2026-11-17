@@ -19,3 +19,19 @@
 - **EditorLine:** `number` (1-based), `text`, `tokens`, `diagnostics`. **EditorDocument:** `lines`, `outside`
   (diagnostics not in the person's file or with no line).
 - **ShaderTemplate:** `id` (`gradient`, `noise-flow`, `rings`), `title`, `source`, `uniforms`, `licence`.
+- **As built (A22-P01):**
+  - **`MappedDiagnostic.line`:** nil only for `unknown`, `<generated>` or line 0. A diagnostic of any other file keeps
+    that file's line, and the editor sends every file other than `ss/shader.frag` outside
+    (`DiagnosticMapper.isInPersonSource`).
+  - **Additions:**
+    - `ShaderLimits.isAcceptable`: bytes and lines 1…standard, uniforms and inputs 0…standard, bytes ≤ the ceiling;
+    - `EditorDocument.markedLines`: the line numbers that carry a diagnostic;
+    - `GLSLTokenizer.tokens(of:)`: one line, starting outside any comment;
+    - `ShaderTemplates.template(id:)`.
+  - **Line counts:** the validator counts lines without a final empty line (a trailing newline adds none), while the
+    editor shows one (each terminator starts a line, as an editor shows it). Line numbers agree, so a diagnostic's
+    line is the same in both.
+  - **Templates:** built with `try?` and no `try!` (the isolation check refuses `try!` on stored data); the tests
+    require all three.
+  - **Tests:** the test compile scene (`AssemblyCompileScene`) compiles and draws nothing, and templates are drawn
+    through `FullScreenShaderScene` with `ShaderBundle(files:)`. So no GL call is made outside VisualCore.
