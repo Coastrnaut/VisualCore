@@ -24,7 +24,7 @@ only).
   bounded resources, permissions, rendered versus wall-clock time, truthful claims), each with evidence per
   clarification Q2 ("a public declaration in a VisualCore framework product with at least one test"), and a
   `traceability` entry per capability and feature (FR-A21-001, FR-A21-002)
-- [ ] T-A21-003 [US1] Run the contract checker and render the view (`--name contract -- python3
+- [X] T-A21-003 [US1] Run the contract checker and render the view (`--name contract -- python3 — Verified 2026-11-17: 2026-11-17: .autonomy/checks/A21-P00.contract.json exit 0 (PASS: 26 rows, 143 citations, 13 gaps, decision go); visualcore-contract.md generated between its markers, which were written before the first render; README lists it
   scripts/check_app_contract.py --app aurora --render`); `docs/apps/aurora/visualcore-contract.md` is generated, with
   its generated-block markers written before the first render (FR-A21-007, SC-A21-001)
 
