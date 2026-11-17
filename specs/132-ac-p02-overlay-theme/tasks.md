@@ -53,3 +53,8 @@ generation (208), contract, runs, commits.
 
 MVP: the presenter, theme and overlay (203) with their tests (204). The time-zone fixture (205), still frames (206)
 and the registration (207, 208) close the phase. Review checkpoints after 204 and at 210.
+
+## Phase 8: Convergence
+
+- [ ] T-A18-213 Record the as-built design in `specs/132-ac-p02-overlay-theme/data-model.md` and `research.md`: level-1 shades every pixel and samples the noise once per 2 × 2 block (`u_block`, `AmbientCore.pixelBlock(forTier:)`), because `FullScreenShaderScene` has no smaller render target; the digest leaves out the instant and the revision (wall-clock values, `ExperienceCore.writeDigest`); `AmbientMirror`, `setFormat(hourCycle:showSeconds:showDate:port:)` and `follow(_:)` (actions from the runner or a restore are shown); `timeChanged` sends `time.changed` then `time.set`; the noise gain 1.5 and the float `u_octaves`; the foreground kind proven through `TimeChangeMonitor.applicationNames` and one `time.changed` (the port's handler is internal). Per data-model and contracts/experience.md (contradicts)
+- [ ] T-A18-214 Align the `test` text of G-BUDGETS in `docs/apps/ambient-clock/visualcore-contract.json` with what A18-P02 tests (fixed octaves 5 and 3 and blocks 1 and 2 per level, one draw, speeds outside 0.25–2 refused; presets come with A18-P03) and re-run the contract checker. Per contract G-BUDGETS (contradicts)
