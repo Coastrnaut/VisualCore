@@ -75,6 +75,7 @@
   - it matches the words of clarification Q2 as whole words, case-insensitive, over the store text and the
     interface Swift of data-model.md;
   - every named test exists, and the AU interface classes exist;
+  - the scan reads comments too, so a comment that matches is reworded, never allowed;
   - run: `--name au-claims -- sh specs/157-au-p06-release/scan-claims-release.sh`
   (FR-A21-605; SC-A21-603)
 
