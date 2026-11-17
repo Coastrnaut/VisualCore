@@ -1113,6 +1113,51 @@ promises an always-on screen.
   or an accessibility action; no information depends on colour or animation alone.
 - **Licenses:** every shader, palette and sound recipe records its source and license.
 
+### A22 Shader Studio (`a22.shader-studio`)
+
+Ratified from the app manual's constitution prompt (2026-11-17). Like A05–A21, it never had a standalone target: it
+is built directly as an experience of the one app. Its product goal is a mobile GLSL ES editor that compiles local
+shaders, shows diagnostics and safely previews bounded work. Version 0.1 covers:
+- a code editor with syntax assistance and line-numbered diagnostics;
+- local GLSL ES fragment shader templates with defined uniforms and texture inputs;
+- an explicit Compile and Run action with a last-known-good preview fallback;
+- a parameter inspector for bounded uniforms;
+- local project save and open with versioned shader files;
+- resource and complexity limits, a watchdog and recoverable failures.
+
+It runs no privileged native code, has no public shader marketplace, and makes no claim of a secure sandbox against
+malicious GPU shader code.
+
+- **Consumer, not fork:** an experience of the VisualCore app and a VisualCore consumer, never a fork of
+  projectm-ios. It uses only audited VisualCore public APIs over the OpenGL ES → ANGLE → Metal integration. It MUST
+  NOT create its own EGL/ANGLE initialization path or a second renderer, or link ProjectM engine code.
+- **Reuse first (Principle II):** shader compilation, the GLSL library, full-screen shader scenes, the precision and
+  capability probes, uniform parameters, persistence and the render host are reused, not copied. A generic
+  capability the editor needs and VisualCore lacks (for example structured compile diagnostics) goes into VisualCore
+  with tests, docs, the API baseline and the reference regression. Templates, the editor and copy stay in the
+  experience.
+- **Compile only in the owning context:** user GLSL is compiled and linked only on the render host's thread in its
+  valid context, never on the UI or audio thread; complete compile and link logs are captured and mapped to the
+  person's lines, including after inserted template code.
+- **Testable without the GPU:** projects, templates, the source validator, uniform bounds, diagnostic mapping and the
+  preview state are pure, versioned models tested through `swift test`. Drawing never changes the project.
+- **Bounded:** source size, line count, uniform count and ranges, texture inputs, preview size and frame rate have
+  documented caps checked before any compile; files that are truncated, of a newer version, or hold NaN, infinite or
+  out-of-range values are refused safely. A failed compile keeps the last good program; a stop and reset is always
+  available. GPU resources are created only in a valid host context and rebuilt from CPU state after a context loss
+  or resize.
+- **Truthful claims:** GLSL is GPU code, not a sandbox: the experience never claims isolation from a hostile shader,
+  never claims compatibility beyond the queried capability profile, and never states frame rates or timings not
+  measured on a device.
+- **Offline-first and private:** no networking, accounts, analytics or ads, no remote shader gallery, and no
+  permission is needed. Projects stay in the experience's storage.
+- **Visuals are code:** templates and their textures are written or generated in code; no purchased, generated or
+  photographic image is bundled. Typography uses system fonts, with a system monospaced font for code.
+- **Accessibility:** native SwiftUI controls with VoiceOver labels and Dynamic Type; diagnostics are text with line
+  numbers, never colour alone; the editor works with a hardware keyboard and is usable on iPhone, with iPad first
+  (manual risk 2).
+- **Licenses:** every template, texture recipe and GLSL snippet records its source and license.
+
 ## Governance
 
 - Precedence: real Apple platform and toolchain behavior and observed test results → owner
@@ -1163,5 +1208,7 @@ promises an always-on screen.
   its manual's constitution prompt at gate A20-P00 (feature 144); no principle changes.
 - Amendment 2.17.0 (2026-11-17, MINOR): App-Scoped Rules gain the A21 Aurora subsection, ratified from its
   manual's constitution prompt at gate A21-P00 (feature 151); no principle changes.
+- Amendment 2.18.0 (2026-11-17, MINOR): App-Scoped Rules gain the A22 Shader Studio subsection, ratified from its
+  manual's constitution prompt at gate A22-P00 (feature 158); no principle changes.
 
-**Version**: 2.17.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-17
+**Version**: 2.18.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-17
