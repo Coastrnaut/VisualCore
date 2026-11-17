@@ -182,7 +182,9 @@ module will own each missing piece and in which phase.
 - **Video encoding** (the manual's risk 3): the audit records whether any encoder path exists and assigns the
   feasibility decision to a phase; video stays optional until feasibility is shown.
 - **Saving to Photos:** saving goes through the share sheet with the app's existing add-only usage string; the
-  experience declares `photo-library-add` and never calls PhotoKit. Export to Files needs no permission.
+  experience declares `photo-library-add` and never calls PhotoKit. Export to Files needs no permission. If the
+  person declines Photos access, the system refuses only that destination; the file stays available for Files or
+  another app, and the experience shows no error of its own for the system's refusal.
 
 ## Requirements *(mandatory)*
 
