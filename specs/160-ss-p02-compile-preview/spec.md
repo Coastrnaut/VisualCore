@@ -23,6 +23,72 @@ Canonical overrides:
   `a23.visual-programming-lab`.
 - **No VisualCore or ProjectM change.** Follow `specs/153-au-p02-scene-controls`.
 
+## Clarifications
+
+### Session 2026-11-17
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- **Actions:** `ExperienceControl(id:ranges:)` declares an action with one range per value, and the engine refuses a
+  value outside its range before the core sees it. Aurora's presenter (`AuroraPresenter`) is the pattern for hosting
+  VisualCore child scenes inside the presenter's `setup`, `resize`, `draw` and `teardown`, with `maxFramesPerSecond`
+  30.
+- **Compile:** `context.resources.program(...)` (`ResourceRegistry`) compiles inside the presenter's calls with the
+  host's context current. It throws structured diagnostics and never touches a program the caller holds.
+- **Drawing:** `FullScreenShaderScene(fragment:fragmentName:bundle:)` binds `parameters` as `u_<name>`.
+  `ShaderBundle(files:)` adds the `vc/` library. A failed scene records `errorMessage` and clears to grey.
+- **Registration:** Aurora's candidate registration is the pattern. It has capabilities of at most 40 characters,
+  quality tiers, a palette, a manifest and permissions `[]`.
+
+- Q: What does the core hold, and which actions exist? → A: `StudioCore`, snapshot schema 1, digest
+  `a22.shader-studio.v1`.
+  - **State:** the template index, the normalized uniform values (0…1, one per declared uniform, at most 16) and the
+    run count.
+  - **Actions:**
+    - `template.select` `[0…2]`, an integer: it resets the values to the template's defaults and counts a run;
+    - `uniform.set` `[0…15, 0…1]`: the uniform index, an integer, and a normalized value. An index at or past the
+      template's uniform count, or a fractional index, is refused (`a22.no-uniform`, `a22.not-whole`);
+    - `shader.run` `[1…1]`: it counts a run.
+  - **Digest:** the template and the values. The run count is in the snapshot, not in the digest.
+  - **Source:** the edited source is the presenter's document, not core state. In this phase it is the template's
+    source, or one set through the presenter's `setSource(_:)` (the A22-P03 editor's entry point; a seam for tests
+    here). It is saved with the project library in A22-P04.
+- Q: How does Run reach the compiler, and how is the last good shader kept? → A:
+  - **Queue:** the presenter sees the run count grow at its next `draw` and takes the newest document as the one
+    pending request. `setSource` alone never compiles. It validates with `ShaderValidator`; a refusal shows the
+    issues and compiles nothing.
+  - **Compile:** otherwise it compiles `ShaderAssembly(...).entryText` through `context.resources.program` (vertex
+    `FullScreenShaderScene.vertexSource`), inside that draw.
+  - **Success:** a new `FullScreenShaderScene` for the same entry and files is built and set up (a cache hit). It
+    replaces the live one, and the old one is torn down.
+  - **Failure:** on a compile or link error, the `[ShaderDiagnostic]` are mapped (`DiagnosticMapper`) into the status,
+    and the live scene keeps drawing.
+  - **At most one compile per frame.** Before the first success, the first template's scene is live.
+- Q: How do uniforms reach the preview? → A: Each draw sets the live scene's `parameters` from the core's normalized
+  values, denormalized by the live project's `ParameterDefinition`s (the name without its `u_` prefix). There is no
+  recompile. The preview is drawn at most 30 frames per second, at one quality tier, `level-0`.
+- Q: What does the person see, and how is it tested? → A: Native controls with spoken labels:
+  - a template picker (Gradient, Noise flow, Rings);
+  - a Run button;
+  - a slider per uniform (title and value);
+  - a status line ("Compiled", "Failed: N errors", "Refused: <first issue>" or "Waiting");
+  - a diagnostics list of "Line N: message" entries, with anything outside the person's source listed first.
+
+  The experience tests drive the presenter through the session host off screen:
+  - pixels before and after a broken run are byte-identical;
+  - diagnostics name the authored lines;
+  - a fixed run changes the picture;
+  - N run requests before a frame give one compile (counted through the presenter's `compileCount`);
+  - a uniform change alters the picture without a compile;
+  - `recreateContext` and a resize redraw the same shader.
+- Q: How is Shader Studio registered? → A: As Aurora was at A21-P02:
+  - a candidate entry for `a22.shader-studio` in `Catalog/registrations.json`: capabilities of at most 40 characters,
+    quality tier `level-0`, a palette, manifest `Packages/ExperiencesCreative/ShaderStudio/scenario-manifest.json`
+    (nine standard scenarios and fixtures), and permissions `[]`;
+  - an `ExperienceRegistry` candidate (no examples: schema 1) and the `project.yml` product `ShaderStudioExperience`;
+  - the synthetic candidate in `AppModelTests` moves to `a23.visual-programming-lab`;
+  - the candidate lists of the app and script tests.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Start from a template and run it (Priority: P1) 🎯
