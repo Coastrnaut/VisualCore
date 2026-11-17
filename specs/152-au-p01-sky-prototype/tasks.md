@@ -16,7 +16,7 @@ VisualCore change. Precedent: `specs/145-zg-p01-document-strokes/tasks.md`. Roll
 
 ## Phase 2: Story 1 — a bounded scene (P1) 🎯
 
-- [ ] T-A21-103 [P] [US1] Create `Packages/ExperiencesCreative/Aurora/Core/{SkyScene,SkyPresets}.swift` per
+- [X] T-A21-103 [P] [US1] Create `Packages/ExperiencesCreative/Aurora/Core/{SkyScene,SkyPresets}.swift` per — Verified 2026-11-17: 2026-11-17: SkyScene (schema 1, a21.sky-scene, at most 4,096 bytes, bounds of data-model.md, seven refusal codes, clamping setters) and SkyPresets (polar-night, violet-veil, dawn-haze; version 1; written for VisualCore); .autonomy/checks/A21-P01.au-core-ios27.json exit 0; written by an agent, retested
   data-model.md: "schema 1, kind `a21.sky-scene`, ≤ 4,096 bytes"; `preset`, `palette` "2…4 opaque sRGB colours",
   `ribbons` "1…4", `turbulence` "0…1", `cloudiness` "0…1", `stars` "0…400", `speed` "0…2"; refusal codes `damaged`,
   `newer-version`, `too-large`, `not-finite`, `out-of-range`, `unknown-preset`, `palette-size`; setters clamp and ignore

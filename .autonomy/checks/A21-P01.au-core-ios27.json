@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesCreative",
+    "--scheme",
+    "ExperiencesCreative-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "AuroraCoreTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing AuroraCoreTests",
+  "elapsed_seconds": 6.503,
+  "exit_code": 0,
+  "finished": "2026-11-17T10:49:28+00:00",
+  "log": ".autonomy/logs/A21-P01.au-core-ios27.log",
+  "log_sha256": "0460ff8c308f7a6af075512b8a4b13f1e543ebf22f7c061d08fb9dae982460e9",
+  "name": "au-core-ios27",
+  "stage": "A21-P01",
+  "started": "2026-11-17T10:49:21+00:00",
+  "timed_out": false
+}
