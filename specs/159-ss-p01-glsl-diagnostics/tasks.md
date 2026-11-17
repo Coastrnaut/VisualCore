@@ -35,7 +35,7 @@
   - `no-main` and `version-line(line)`;
   - reserved names `u_time` and `u_resolution`, and duplicate names;
   - `undeclared-in-source` and `undeclared-in-project`, for both `uniform float` and `uniform sampler2D`.
-- [ ] T-A22-105 [P] [US1] Write `Packages/ExperiencesCreative/ShaderStudio/CoreTests/{ProjectTests,ValidatorTests}.swift`
+- [X] T-A22-105 [P] [US1] Write `Packages/ExperiencesCreative/ShaderStudio/CoreTests/{ProjectTests,ValidatorTests}.swift` — Verified 2026-11-17: 2026-11-17: ProjectTests (12) and ValidatorTests (15): byte-identical round trip, every refusal code, every limit at and past its bound, every issue, empty source; .autonomy/checks/A22-P01.ss-core-ios27-2.json exit 0; written by an agent, retested
   (SC-A22-101):
   - projects round-trip byte-identical, with one sample per refusal code;
   - each limit is tested at the limit and one past it;
