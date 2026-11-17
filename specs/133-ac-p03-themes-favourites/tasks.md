@@ -9,7 +9,7 @@ assert. Precedent: `specs/132-ac-p02-overlay-theme/tasks.md` and `specs/126-ia-p
 
 ## Phase 1: Setup
 
-- [ ] T-A18-301 Baseline: cite the A18-P02 evidence (`.autonomy/checks/A18-P02.{ac-ios27,app-unit,verify-27}.json`) on the tree recorded at A18-P02, whose Packages are unchanged since (owner ruling of 2026-11-14)
+- [X] T-A18-301 Baseline: cite the A18-P02 evidence (`.autonomy/checks/A18-P02.{ac-ios27,app-unit,verify-27}.json`) on the tree recorded at A18-P02, whose Packages are unchanged since (owner ruling of 2026-11-14) — Verified 2026-11-16: 2026-11-16: A18-P02 evidence cited: .autonomy/checks/A18-P02.ac-ios27.json, A18-P02.app-unit.json and A18-P02.verify-27.json, all exit 0; no Packages, Apps or project.yml change since the A18-P02 record commit 9e504a90
 
 ## Phase 2: Foundational — the VisualCore crossfade (G-TRANSITION)
 
