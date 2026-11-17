@@ -1,9 +1,12 @@
-# Contract: Aurora compositing and preferences (A21-P03)
 
-- **Transition:** at progress 0, 0.1, …, 1 no pixel exceeds the limit + 1/255 and the mean absolute difference from
-  the incoming sky never increases; a context loss or resize mid-change keeps the picture; a new choice restarts from
-  the current mix; immediate under Reduce Motion.
-- **Preferences:** a round trip through `prefs.v1` restores every field; damaged, newer and out-of-range samples open
-  with the defaults and their code; a failed save is reported once and the choices stay in memory; a restored session snapshot wins
-  over the saved sky, never over the sound choice.
-- **Sound choice:** unchanged after teardown, setup, `recreateContext`, resize, suspend and resume; nothing plays.
+
+- **As built (A21-P03):**
+  - the second sky is compiled with `#define AURORA_SKY_SLOT 1` appended, so the two skies never share one cached
+    program (tearing one down cannot delete the other's);
+  - a fade whose captured still was drawn under a higher limit ends at once when the limit is lowered;
+  - a fresh open seeds the saved preferences through the port at the first draw, and a refused send is retried at the
+    next draw;
+  - `SkyCore.isRestored` (presentation only, outside the digest, the snapshot and equality) tells a restore from a
+    fresh open;
+  - a failed save is forced in tests by filling the 64-value quota;
+  - the A21-P02 blend, limit and chrome tests now expect the crossfade and the two sound controls.

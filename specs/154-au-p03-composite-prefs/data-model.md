@@ -1,14 +1,12 @@
-# Data Model: A21-P03 (feature 154)
 
-- **SkyPreferences** (schema 1, kind `a21.preferences`, experience value `prefs.v1`, ≤ 4,096 bytes): `preset`
-  (catalog id), `hue` −0.5…0.5, `speed` 0…2, `turbulence` 0…1, `ribbons` 1…4, `stars` 0…400, `clouds` 0…1, `limit`
-  0.2…0.72, `soundOn` (default false), `volume` 0…1 (default 0.5). Codes: `damaged`, `newer-version`, `out-of-range`.
-  Defaults: preset `polar-night` with its scene, hue 0, limit 0.6, sound off, volume 0.5.
-- **Preferences and the session snapshot:** a fresh open seeds the state from `prefs.v1`; when the host restores a
-  session snapshot, the snapshot wins for the sky (preset, hue, limit and the scene values) and the preferences are
-  rewritten after the next accepted change; the sound choice always comes from the preferences (it is not in the
-  snapshot).
-- **SkyTransition:** a `CrossfadeScene` of the outgoing and incoming skies; progress over 2.0 s of frame time,
-  smoothstep; a new choice mid-change calls `replaceIncoming`; immediate under Reduce Motion.
-- **Messages:** "Your saved choices could not be read, so the default sky is shown." (damaged, newer, out of range);
-  "Your choices could not be saved." (a failed save, once).
+
+- **As built (A21-P03):**
+  - the second sky is compiled with `#define AURORA_SKY_SLOT 1` appended, so the two skies never share one cached
+    program (tearing one down cannot delete the other's);
+  - a fade whose captured still was drawn under a higher limit ends at once when the limit is lowered;
+  - a fresh open seeds the saved preferences through the port at the first draw, and a refused send is retried at the
+    next draw;
+  - `SkyCore.isRestored` (presentation only, outside the digest, the snapshot and equality) tells a restore from a
+    fresh open;
+  - a failed save is forced in tests by filling the 64-value quota;
+  - the A21-P02 blend, limit and chrome tests now expect the crossfade and the two sound controls.
