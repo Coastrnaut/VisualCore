@@ -19,6 +19,62 @@ Canonical overrides:
 - **Gaps built here:** G-STONES, G-SELECTION and G-SHADOWS of `docs/apps/digital-zen-garden/visualcore-contract.json`.
 - **Experience A20 inside the one app; still a candidate.** Follow `specs/140-lw-p03-editor`.
 
+## Clarifications
+
+### Session 2026-11-17
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- `SandScene` (A20-P02) draws one full-screen pass with a uniform dictionary and the sand target as its input. A second
+  target is bound the same way.
+- `GardenHistory` (A20-P01) already places, moves, rotates and removes stones as exact commands, with ids from
+  `nextStoneID` and unique depths kept in ascending order. Stone kinds have base radii in tray widths.
+- `RotateRecognizer` (VisualCoreScenes) gives an angle and a centre for two pointers.
+- The digest covers the document only (A20-P02 as built), so a selection is state that is neither saved nor in the
+  digest.
+
+- Q: How are stones shaped and drawn? → A: As a second CPU layer, drawn by the existing pass:
+  - **Shape:** a pure `StoneShape` in the core gives each kind a superellipse with an exponent (pebble 2.0, slate 2.6,
+    granite 2.0, basalt 3.0, boulder 2.2), the kind's radii times the stone's scale, the stone's rotation, and an edge
+    wobble of at most ±6 % from a fixed sine series seeded by the stone's id. `contains(point)` and the height profile
+    (a dome, (1 − d²)^½ times the kind's height) are pure and shared by drawing and selection.
+  - **Layer:** the stones are rasterized in depth order into a 480 × 360 layer (height and kind per cell) and
+    uploaded like the sand.
+  - **Drawing:** the relief shader colours stones by kind, lights them from their height, and darkens the sand with a
+    soft shadow of five taps toward the light, offset in proportion to stone height.
+  - **Rebuild:** the layer is rebuilt on every stone change, after undo, redo, restore and resize, and after a lost
+    context.
+  - **Why:** the meshes of the P00 contract would need a second, depth-tested pass. A rasterized layer keeps one pass,
+    one picture per document, and a CPU reference to test against (recorded in the contract).
+- Q: What are the actions? → A:
+  - `stone.place` [kind 0…4, x, y];
+  - `stone.select` [x, y]: the topmost stone containing the point, or none on empty sand;
+  - `stone.cycle` [direction 0 previous, 1 next], in depth order;
+  - `stone.move` [x, y]: the selected stone's new centre, clamped inside the tray;
+  - `stone.rotate` [angle −π…π]: the selected stone's new rotation;
+  - `stone.remove` [];
+  - `tool.mode` [0 rake, 1 stones].
+
+  Each changing action is one `GardenHistory` command, so undo and redo cover them. An action that needs a selection
+  while none is set is refused without a change. Placing at 24 stones is refused with the message "The garden holds
+  24 stones."
+- Q: How do gestures work in each tool? → A:
+  - **Rake tool:** a drag rakes; the stones stay on top.
+  - **Stone tool:** a tap selects. A one-finger drag that starts on the selected stone moves it: the presenter shows
+    the drag and sends one `stone.move` when the finger lifts. A two-finger rotation turns the selected stone, with
+    one `stone.rotate` at the end.
+  - **Native controls:** the tool toggle; a kind picker with "Place" (at the tray centre); previous and next stone;
+    turn left and right by 15°; nudges of 0.02 tray widths in four directions; "Remove"; undo and redo.
+  - **Gesture alternatives:** the gesture actions are the stroke actions plus `stone.select`, `stone.move` and
+    `stone.rotate`, all of which are native actions too.
+- Q: How is the selection shown? → A: The overlay draws a dashed outline around the selected stone's shape, with a
+  small label. The controls' spoken value says, for example, "Flat slate selected, 2 of 3, turned 30°". The selection
+  is never shown by colour alone, and it clears when its stone is removed or the garden is restored.
+- Q: How is the orientation fixture proved? → A: The same document is drawn in a 390 × 844 view and an 844 × 390 view.
+  The document is unchanged, the sand and stone layers are identical (they depend only on the document), and each
+  stone centre and stroke point mapped to the view and back is within one cell (1/480 tray widths) of its stored
+  value. The snapshot stays schema 1.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Place, move, rotate and remove stones (Priority: P1) 🎯
