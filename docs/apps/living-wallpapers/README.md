@@ -22,3 +22,6 @@ as a wallpaper through the system's own controls. Its rules are the A19 subsecti
 |---|---|
 | [visualcore-contract.json](visualcore-contract.json) / [.md](visualcore-contract.md) | Phase 00 inventory, capability matrix, gaps, decision (checked by `scripts/check_app_contract.py`) |
 | [regression-baseline.md](regression-baseline.md) | Phase start, reference pin, the ProjectM reference regression results |
+| [video-decision.md](video-decision.md) | The short-video decision of Phase 01: no-go for version 0.1 |
+| [licenses.md](licenses.md) | License and provenance of the scenes, colour presets and template data |
+| [device-campaign.md](device-campaign.md) | Phase 05 device-campaign rows LW-D1 to LW-D8 (size limit, largest template, file size and profile, heat, memory, Photos prompt, declined path, audits), pending until the campaign after ImplementationLock-100 |

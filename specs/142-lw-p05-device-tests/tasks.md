@@ -47,4 +47,4 @@ plan (506) closes G-DEVICE. Review checkpoint at 508.
 
 ## Phase 6: Convergence
 
-- [ ] T-A19-510 List `device-campaign.md`, `video-decision.md` and `licenses.md` in the document table of `docs/apps/living-wallpapers/README.md` per FR-A19-503 (partial)
+- [X] T-A19-510 List `device-campaign.md`, `video-decision.md` and `licenses.md` in the document table of `docs/apps/living-wallpapers/README.md` per FR-A19-503 (partial) — Verified 2026-11-17: 2026-11-17: docs/apps/living-wallpapers/README.md lists video-decision.md, licenses.md and device-campaign.md; validate_docs exit 0
