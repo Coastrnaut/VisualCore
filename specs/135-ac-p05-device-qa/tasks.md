@@ -8,7 +8,7 @@ action, no audit. Precedent: `specs/134-ac-p04-power-visibility/tasks.md`.
 
 ## Phase 1: Setup
 
-- [ ] T-A18-501 Baseline: cite the A18-P04 evidence (`.autonomy/checks/A18-P04.{ac-ios27,app-unit,verify-27}.json`) on the tree recorded at A18-P04, whose Packages are unchanged since (owner ruling of 2026-11-14)
+- [X] T-A18-501 Baseline: cite the A18-P04 evidence (`.autonomy/checks/A18-P04.{ac-ios27,app-unit,verify-27}.json`) on the tree recorded at A18-P04, whose Packages are unchanged since (owner ruling of 2026-11-14) — Verified 2026-11-16: 2026-11-16: A18-P04 evidence cited: .autonomy/checks/A18-P04.ac-ios27.json, A18-P04.app-unit.json and A18-P04.verify-27.json, all exit 0; no Packages, Apps or project.yml change since the A18-P04 record commit ffbbe020
 
 ## Phase 2: Foundational — the VisualCore cache (fixture)
 
