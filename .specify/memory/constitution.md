@@ -1136,9 +1136,11 @@ malicious GPU shader code.
   capability the editor needs and VisualCore lacks (for example structured compile diagnostics) goes into VisualCore
   with tests, docs, the API baseline and the reference regression. Templates, the editor and copy stay in the
   experience.
-- **Compile only in the owning context:** user GLSL is compiled and linked only on the render host's thread in its
-  valid context, never on the UI or audio thread; complete compile and link logs are captured and mapped to the
-  person's lines, including after inserted template code.
+- **Compile only in the owning context:** user GLSL is compiled and linked only inside the preview scene's calls, in
+  the render host's valid context. The host is main-actor, so its thread is the main thread: a control never compiles
+  directly; it queues a request that the scene compiles at its next frame, after the pre-compile caps, one at a time.
+  Nothing compiles on an audio thread. Complete compile and link logs are captured and mapped to the person's lines,
+  including after inserted template code.
 - **Testable without the GPU:** projects, templates, the source validator, uniform bounds, diagnostic mapping and the
   preview state are pure, versioned models tested through `swift test`. Drawing never changes the project.
 - **Bounded:** source size, line count, uniform count and ranges, texture inputs, preview size and frame rate have
@@ -1210,5 +1212,8 @@ malicious GPU shader code.
   manual's constitution prompt at gate A21-P00 (feature 151); no principle changes.
 - Amendment 2.18.0 (2026-11-17, MINOR): App-Scoped Rules gain the A22 Shader Studio subsection, ratified from its
   manual's constitution prompt at gate A22-P00 (feature 158); no principle changes.
+- Amendment 2.18.1 (2026-11-17, PATCH): the A22 compile rule is worded for VisualCore's main-actor render host (the
+  main thread is its only GL thread): a control queues a compile request that the preview scene runs at its next
+  frame; found by checklist CHK006 of feature 158 at gate A22-P00; no principle changes.
 
-**Version**: 2.18.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-17
+**Version**: 2.18.1 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-17

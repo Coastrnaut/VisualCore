@@ -21,7 +21,7 @@ Canonical overrides:
   A01–A21. The contract lives in `docs/apps/shader-studio/`.
 - **Visuals are code:** templates, their textures and every preview are code; no purchased, generated or
   photographic image.
-- **Constitution:** 2.18.0 adds the A22 experience rules (committed at the start of this gate, `27d7d83e`).
+- **Constitution:** 2.18.0 adds the A22 experience rules (committed at the start of this gate, `27d7d83e`); 2.18.1 words its compile rule for the main-thread host (checklist CHK006).
 - Follow `specs/151-au-p00-boundary-audit`.
 
 ## Clarifications
