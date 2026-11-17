@@ -103,7 +103,7 @@
   - G-SOUND and G-DEVICE are closed by "A21-P05" (G-DEVICE as the plan; its rows wait for devices);
   - rows whose gaps are all closed become available with evidence;
   - check: `--name contract`, `check_app_contract.py --app aurora --render`
-- [ ] T-A21-511 Tests (review checkpoint):
+- [X] T-A21-511 Tests (review checkpoint): — Verified 2026-11-17: 2026-11-17: review checkpoint: A21-P05.au-ios27 (65 tests in 15 suites, each under 10 s), documented-api, isolation, core-purity, app-ui (build for testing, unit, chunk c3 on the iOS 27.2 phone), verify-27, experience-packages and script-tests all exit 0, read before this tick
   - Aurora on sim-27.2 (`--name au-ios27`), the documented API, isolation and core purity;
   - `xcodegen generate --spec project.yml`;
   - `--name app-ui -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27
