@@ -493,7 +493,7 @@
     "file": "Packages/ExperiencesCreative/SimulationLab/Experience/GrayScottGPU.swift",
     "symbol": "GrayScottGPU"
    },
-   "notes": "The machinery exists and is tested (PingPongTargetTests, FloatRenderSupportTests, FieldPassTests, ShaderBundleTests, MeshShapeTests, MeshRendererTests). The tray, the two rake footprints, the sand target and its relief, and the stone palette are experience code: G-DOCUMENT and G-STROKES (A20-P01), G-SAND and G-RELIEF (A20-P02), G-STONES (A20-P03). G-STROKES closed in A20-P01: StrokeResampler (0.004 tray widths, cap 512), RakeBrush and SandField (ResamplerTests, RakeTests). The row stays open for its remaining gaps."
+   "notes": "The machinery exists and is tested (PingPongTargetTests, FloatRenderSupportTests, FieldPassTests, ShaderBundleTests, MeshShapeTests, MeshRendererTests). The tray, the two rake footprints, the sand target and its relief, and the stone palette are experience code: G-DOCUMENT and G-STROKES (A20-P01), G-SAND and G-RELIEF (A20-P02), G-STONES (A20-P03). G-STROKES closed in A20-P01: StrokeResampler (0.004 tray widths, cap 512), RakeBrush and SandField (ResamplerTests, RakeTests). The row stays open for its remaining gaps. G-SAND, G-RELIEF closed in A20-P02; the row stays open for its remaining gaps."
   },
   {
    "id": "M07",
@@ -542,7 +542,7 @@
     "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/PlaygroundView.swift",
     "symbol": "PlaygroundModel"
    },
-   "notes": "PointerVelocityTracker resamples a drag to uniform spacing with at most 16 samples per update and counts capped and rejected samples (PointerVelocityTrackerTests); it is linear, not a spline. Coalesced and predicted touch samples are not delivered by any framework product (grep 2026-11-17): assessed on devices (G-DEVICE, A20-P05). Stroke smoothing and the stroke model are G-STROKES (A20-P01); the brush preview and brush zoom are G-PREVIEW (A20-P02). G-STROKES closed in A20-P01: StrokeResampler (0.004 tray widths, cap 512), RakeBrush and SandField (ResamplerTests, RakeTests). The row stays open for its remaining gaps."
+   "notes": "PointerVelocityTracker resamples a drag to uniform spacing with at most 16 samples per update and counts capped and rejected samples (PointerVelocityTrackerTests); it is linear, not a spline. Coalesced and predicted touch samples are not delivered by any framework product (grep 2026-11-17): assessed on devices (G-DEVICE, A20-P05). Stroke smoothing and the stroke model are G-STROKES (A20-P01); the brush preview and brush zoom are G-PREVIEW (A20-P02). G-STROKES closed in A20-P01: StrokeResampler (0.004 tray widths, cap 512), RakeBrush and SandField (ResamplerTests, RakeTests). The row stays open for its remaining gaps. G-PREVIEW closed in A20-P02; the row stays open for its remaining gaps."
   },
   {
    "id": "M08",
@@ -603,7 +603,7 @@
    "id": "M09",
    "capability": "Version 0.1 feature 04: undo and redo of strokes and placements, by command, with checkpoints",
    "source": "manual v0.1 feature 04; manual §13 risk 1; spec clarification Q4; research D6",
-   "status": "upstream gap",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceAction.swift",
@@ -640,7 +640,7 @@
     "file": "Packages/ExperiencesCreative/LightMaze/Core/MazeState.swift",
     "symbol": "MazeState.undo"
    },
-   "notes": "No undo or command stack exists in any framework product (grep 2026-11-17); Light Maze's MazeState.undo is experience-local. The command semantics and fixtures are G-UNDO (app-local, A20-P01); rebuilding the sand by replaying the log from the nearest checkpoint is G-SAND (A20-P02). Undo is never by texture snapshot. G-UNDO closed in A20-P01: GardenHistory with exact undo and redo, 100 commands and a checkpoint (HistoryTests, ReplayFixtureTests). The row stays open for its remaining gaps."
+   "notes": "No undo or command stack exists in any framework product (grep 2026-11-17); Light Maze's MazeState.undo is experience-local. The command semantics and fixtures are G-UNDO (app-local, A20-P01); rebuilding the sand by replaying the log from the nearest checkpoint is G-SAND (A20-P02). Undo is never by texture snapshot. G-UNDO closed in A20-P01: GardenHistory with exact undo and redo, 100 commands and a checkpoint (HistoryTests, ReplayFixtureTests). The row stays open for its remaining gaps. G-UNDO (A20-P01) and G-SAND (A20-P02) closed: GardenHistory undoes and redoes every command exactly, and the drawn sand is rebuilt by replay after undo and redo (HistoryTests, ReplayFixtureTests, SandSceneTests). Available; the stone controls come with G-STONES."
   },
   {
    "id": "M10",
@@ -732,7 +732,7 @@
    "id": "M12",
    "capability": "The garden document: strokes, stones and the command log in normalized tray coordinates, versioned, with caps, refusing truncated, newer, NaN, infinite or out-of-range input, sent to the core as small actions within the 24-value limit",
    "source": "spec FR-A20-003; constitution A20 testable without the GPU and bounded; spec clarification Q4",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceAction.swift",
@@ -775,7 +775,7 @@
     "file": "Packages/ExperiencesCreative/ParticleUniverse/Core/SceneCommand.swift",
     "symbol": "SceneCommand"
    },
-   "notes": "Action validation, snapshots and digests are tested (ExperienceActionTests, ExperienceSnapshotTests, StateDigestTests). The document schema, caps and validation are G-DOCUMENT (app-local, A20-P01). G-DOCUMENT closed in A20-P01: GardenDocument (schema 1, kind a20.garden, normalized tray coordinates, caps 512 points, 400 strokes, 24 stones, 262,144 bytes) and DocumentRefusal with nine codes (DocumentTests); the transport to the core as small actions is G-SAND (A20-P02), so the row stays open."
+   "notes": "Action validation, snapshots and digests are tested (ExperienceActionTests, ExperienceSnapshotTests, StateDigestTests). The document schema, caps and validation are G-DOCUMENT (app-local, A20-P01). G-DOCUMENT closed in A20-P01: GardenDocument (schema 1, kind a20.garden, normalized tray coordinates, caps 512 points, 400 strokes, 24 stones, 262,144 bytes) and DocumentRefusal with nine codes (DocumentTests); the transport to the core as small actions is G-SAND (A20-P02), so the row stays open. G-SAND closed in A20-P02: strokes reach the core as stroke.begin, stroke.add (24 values) and stroke.end within ExperienceControl.maxValues (GardenCoreTests, PointerPathTests). Available."
   },
   {
    "id": "M13",
@@ -855,13 +855,13 @@
     "file": "Packages/ExperiencesCreative/FractalExplorer/Experience/ExplorerView.swift",
     "symbol": "ExplorerView"
    },
-   "notes": "The canvas overlay, pointer delivery and pinch recognition are tested (ShellRenderingTests, PointerPathTests, GestureTests). The preview ring and the brush zoom are G-PREVIEW (app-local, A20-P02); precision on the smallest phone is measured in G-DEVICE (A20-P05)."
+   "notes": "The canvas overlay, pointer delivery and pinch recognition are tested (ShellRenderingTests, PointerPathTests, GestureTests). The preview ring and the brush zoom are G-PREVIEW (app-local, A20-P02); precision on the smallest phone is measured in G-DEVICE (A20-P05). G-PREVIEW closed in A20-P02; the row stays open for its remaining gaps."
   },
   {
    "id": "M15",
    "capability": "Rake footprints drawn into a persistent sand height target and rebuilt deterministically from the command log",
    "source": "spec FR-A20-003; spec clarification Q4; constitution A20 testable without the GPU",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/PingPongTarget.swift",
@@ -898,13 +898,13 @@
     "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidFieldsScene.swift",
     "symbol": "FluidFieldsScene"
    },
-   "notes": "The target pair, the pass and the half-float fallback are tested (PingPongTargetTests, FieldPassTests, FloatRenderSupportTests, FloatTransferTests). No brush-stamp pass into a height target exists in VisualCore: the experience's stamp FieldPass and the replay are G-SAND (app-local, A20-P02); the footprint math is G-STROKES (A20-P01). G-STROKES closed in A20-P01: StrokeResampler (0.004 tray widths, cap 512), RakeBrush and SandField (ResamplerTests, RakeTests). The row stays open for its remaining gaps."
+   "notes": "The target pair, the pass and the half-float fallback are tested (PingPongTargetTests, FieldPassTests, FloatRenderSupportTests, FloatTransferTests). No brush-stamp pass into a height target exists in VisualCore: the experience's stamp FieldPass and the replay are G-SAND (app-local, A20-P02); the footprint math is G-STROKES (A20-P01). G-STROKES closed in A20-P01: StrokeResampler (0.004 tray widths, cap 512), RakeBrush and SandField (ResamplerTests, RakeTests). The row stays open for its remaining gaps. G-SAND closed in A20-P02: the 480 × 360 field is stamped on the CPU, uploaded to one target and rebuilt by replay; the read-back matches the CPU field within 1/1024 (SandSceneTests). Available."
   },
   {
    "id": "M16",
    "capability": "Sand relief lighting: normals from the height target and a soft directional light in GLSL",
    "source": "spec FR-A20-003; constitution A20 visuals are code",
-   "status": "upstream gap",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderBundle.swift",
@@ -929,7 +929,7 @@
     "file": "Packages/ExperiencesCreative/SimulationLab/Experience/WaveGPU.swift",
     "symbol": "WaveGPU"
    },
-   "notes": "The vc/ library has noise, SDFs, palette and field sampling but no normal-from-height or lighting helper (grep of GLSL/vc 2026-11-17); HeightField.normal is CPU-only. The relief shader is G-RELIEF (app-local, A20-P02)."
+   "notes": "The vc/ library has noise, SDFs, palette and field sampling but no normal-from-height or lighting helper (grep of GLSL/vc 2026-11-17); HeightField.normal is CPU-only. The relief shader is G-RELIEF (app-local, A20-P02). G-RELIEF closed in A20-P02: the relief shader (normals from height differences, one light, vc_fbm grain at level-0, tone colour) in SandScene (SandSceneTests). Available."
   },
   {
    "id": "M17",
@@ -1120,7 +1120,7 @@
    "id": "M22",
    "capability": "Context loss: every GPU object rebuilt from CPU state after a context recreation or memory warning; the sand target replayed from the command log",
    "source": "spec FR-A20-003; constitution A20 bounded",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
@@ -1157,7 +1157,7 @@
     "file": "Packages/ExperiencesCreative/SimulationLab/Experience/SimulationPresenter.swift",
     "symbol": "SimulationPresenter"
    },
-   "notes": "Tested in RenderHostTests, PingPongTargetTests (invalid after context loss), SessionPhaseMemoryTests and ShellLifecycleTests. The garden's rebuild by replay is G-SAND (app-local, A20-P02)."
+   "notes": "Tested in RenderHostTests, PingPongTargetTests (invalid after context loss), SessionPhaseMemoryTests and ShellLifecycleTests. The garden's rebuild by replay is G-SAND (app-local, A20-P02). G-SAND closed in A20-P02: a context recreation rebuilds the target from the core's strokes and draws the same frame (SandSceneTests). Available."
   },
   {
    "id": "M23",
@@ -1194,7 +1194,7 @@
     "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidFieldsScene.swift",
     "symbol": "FluidFieldsScene"
    },
-   "notes": "Normalized input and scene resize are tested (ExperienceActionTests, ShellRenderingTests, CachedSceneTests). Resizing the sand target is G-SAND (A20-P02); orientation-independent stone positions are G-STONES (A20-P03)."
+   "notes": "Normalized input and scene resize are tested (ExperienceActionTests, ShellRenderingTests, CachedSceneTests). Resizing the sand target is G-SAND (A20-P02); orientation-independent stone positions are G-STONES (A20-P03). G-SAND closed in A20-P02; the row stays open for its remaining gaps."
   },
   {
    "id": "M24",
@@ -1512,10 +1512,10 @@
    ],
    "kind": "adaptation",
    "owner": "app-local",
-   "justification": "The sand height target (rgba16f through FloatRenderSupport, rgba8 fallback) on a PingPongTarget with the experience's stamp FieldPass, and its replay from the nearest checkpoint after undo, redo, restore, resize or context loss (manual phase 02). No brush-stamp pass exists in VisualCore. No VisualCore change is planned (spec clarification Q4); a second user would justify moving it upstream later (Principle II). It also sends each stroke to the core as small actions within ExperienceControl.maxValues (the transport part of M12), with the experience in A20-P02.",
+   "justification": "The sand height target (rgba16f through FloatRenderSupport, rgba8 fallback) on a PingPongTarget with the experience's stamp FieldPass, and its replay from the nearest checkpoint after undo, redo, restore, resize or context loss (manual phase 02). No brush-stamp pass exists in VisualCore. No VisualCore change is planned (spec clarification Q4); a second user would justify moving it upstream later (Principle II). It also sends each stroke to the core as small actions within ExperienceControl.maxValues (the transport part of M12), with the experience in A20-P02. As built (A20-P02, spec clarification Q1): the strokes are stamped on the CPU into a 480 × 360 SandField and uploaded with RenderTarget.upload(rgbaFloats:) to one rgba16f target (rgba8 fallback), because FieldUniform carries no arrays and a GPU stamp pass would cost a full-target pass per sample; the GPU draws the relief.",
    "phase": 2,
    "test": "Experience tests: replaying a log gives the same read-back heights (readFloatPixels) as drawing it live; after context loss or resize the target is rebuilt and equal; the rgba8 fallback is exercised; checkpoints bound replay length",
-   "closed": null
+   "closed": "A20-P02"
   },
   {
    "id": "G-RELIEF",
@@ -1528,7 +1528,7 @@
    "justification": "Normal-from-height and soft lighting of the sand are experience shaders over vc/; no lighting helper exists in the GLSL library. No VisualCore change is planned (spec clarification Q4); a second user would justify moving it upstream later (Principle II).",
    "phase": 2,
    "test": "Experience tests: a known height fixture lights to the expected brightness range; the shader compiles through ShaderBundle; no flashing between frames; license inventory lists the shader",
-   "closed": null
+   "closed": "A20-P02"
   },
   {
    "id": "G-PREVIEW",
@@ -1541,7 +1541,7 @@
    "justification": "The brush preview ring and the brush zoom for small screens are the experience's interface over the canvas overlay (manual risk 2).",
    "phase": 2,
    "test": "Experience tests: the preview follows the pointer and matches the footprint size; the zoom keeps strokes in tray coordinates; the preview never changes the state",
-   "closed": null
+   "closed": "A20-P02"
   },
   {
    "id": "G-STONES",
