@@ -8,7 +8,7 @@ VisualCore change. Precedent: `specs/146-zg-p02-sand-renderer/tasks.md`. Rollbac
 
 ## Phase 1: Setup
 
-- [ ] T-A21-201 Baseline: cite the A21-P01 evidence (`.autonomy/checks/A21-P01.{au-core-ios27,app-build,experience-packages}.json`)
+- [X] T-A21-201 Baseline: cite the A21-P01 evidence (`.autonomy/checks/A21-P01.{au-core-ios27,app-build,experience-packages}.json`) — Verified 2026-11-17: 2026-11-17: A21-P01 evidence cited: .autonomy/checks/A21-P01.au-core-ios27.json, A21-P01.app-build.json and A21-P01.experience-packages.json, all exit 0; no Packages, Apps or project.yml change since the A21-P01 record commit f7154f4d
   on the tree recorded at A21-P01 (`f7154f4d`), whose Packages are unchanged since (owner ruling of 2026-11-14)
 - [ ] T-A21-202 Add the targets `AuroraExperience` (path `Aurora/Experience`) and `AuroraExperienceTests` (path
   `Aurora/ExperienceTests`) and the product `AuroraExperience` to `Packages/ExperiencesCreative/Package.swift` (lead;
