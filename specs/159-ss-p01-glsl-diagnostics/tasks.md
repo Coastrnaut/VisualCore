@@ -79,7 +79,7 @@
 - [X] T-A22-110 [P] [US5] Create `Packages/ExperiencesCreative/ShaderStudio/Core/ShaderTemplates.swift`: `gradient`, — Verified 2026-11-17: 2026-11-17: ShaderTemplates.swift: gradient (u_speed), noise-flow (vc_fbm; u_scale, u_speed), rings (u_count, u_width), each a ShaderProject built without try! and validating with no issue; .autonomy/checks/A22-P01.ss-core-ios27-2.json exit 0; written by an agent, retested
   `noise-flow` and `rings` per clarification Q5, each a valid `ShaderProject` with its uniforms and a licence line
   (FR-A22-106)
-- [ ] T-A22-111 [P] [US5] Write `Packages/ExperiencesCreative/ShaderStudio/CoreTests/TemplateCompileTests.swift`
+- [X] T-A22-111 [P] [US5] Write `Packages/ExperiencesCreative/ShaderStudio/CoreTests/TemplateCompileTests.swift` — Verified 2026-11-17: 2026-11-17: TemplateCompileTests: each template validates, compiles and links with no diagnostics, its active uniforms equal its declared ones, and FullScreenShaderScene draws it at 64 x 48 with more than one colour and no error; .autonomy/checks/A22-P01.ss-core-ios27-2.json exit 0 (51 tests in 7 suites); written by an agent, drawing moved to FullScreenShaderScene by the lead, retested
   (SC-A22-104):
   - each template validates with no issue, compiles and draws one frame off screen at 64 × 48;
   - its active uniforms (`ShaderProgram.uniforms`, other than `u_time` and `u_resolution`) equal the declared ones.
