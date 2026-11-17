@@ -29,7 +29,7 @@
     `name` "1…40 characters", `source`, `uniforms` (`ParameterDefinition`, float only), `limits`, `textureInputs`
     "0…2 names";
   - refusal codes `damaged`, `newer-version`, `too-large`, `not-finite`, `out-of-range`.
-- [ ] T-A22-104 [P] [US1] Create `Packages/ExperiencesCreative/ShaderStudio/Core/ShaderValidator.swift` per
+- [X] T-A22-104 [P] [US1] Create `Packages/ExperiencesCreative/ShaderStudio/Core/ShaderValidator.swift` per — Verified 2026-11-17: 2026-11-17: ShaderValidator.swift: limits, no-main, version-line, reserved and duplicate names, undeclared in source or project for uniform float and uniform sampler2D (comments blanked first), issues in source order; .autonomy/checks/A22-P01.ss-core-ios27-2.json exit 0; written by an agent, retested
   clarification Q2 and data-model.md "ValidationIssue". It returns every issue in source order (FR-A22-103):
   - size, line, uniform and texture-input limits;
   - `no-main` and `version-line(line)`;
