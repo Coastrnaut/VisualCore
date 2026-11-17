@@ -65,6 +65,11 @@
 //   - Cadence: the clock follows the drawn-frame deltas (the host's clamped delta), so 30 and 60 frames per second
 //     reach the same sky time. ``fixedDelta`` (nil in the app) is a test-only seam that sets each frame's delta.
 //
+// Feature 157 (A21-P06) T-A21-604 (FR-A21-603; SC-A21-602; clarification Q4): the test-only seam `failNextDraw`
+// makes the next `draw` throw `SkyDrawError.injected` once, before anything is seeded, followed or drawn; the seam
+// clears itself and is unreachable from the interface. The session then fails with the error's message, and `prefs.v1` is not
+// touched (only an accepted change writes it).
+//
 // No GL call: everything is drawn through VisualCoreRendering's scenes.
 import Foundation
 import AuroraCore
@@ -83,6 +88,20 @@ struct SkyShaderError: Error, Equatable, CustomStringConvertible {
 
     /// "The Aurora sky shader failed: <message>".
     var description: String { "The Aurora sky shader failed: " + message }
+}
+
+/// Why a draw of Aurora failed on purpose (feature 157, A21-P06, T-A21-604).
+enum SkyDrawError: Error, Equatable, CustomStringConvertible {
+    /// The test-only seam ``AuroraPresenter/failNextDraw`` made this draw fail.
+    case injected
+
+    /// The message the failed session shows: "The Aurora draw failed: the test seam injected a failure."
+    var description: String {
+        switch self {
+        case .injected:
+            return "The Aurora draw failed: the test seam injected a failure."
+        }
+    }
 }
 
 /// What the controls show, updated only when a field changes.
@@ -359,6 +378,10 @@ final class AuroraPresenter: ExperiencePresenter {
     var fixedDelta: Double?
     /// The frame cap: 30 frames per second (the sky moves slowly).
     var maxFramesPerSecond: Int { 30 }
+    /// Test-only seam: when true, the next `draw` throws ``SkyDrawError/injected`` once, before it seeds, follows or
+    /// draws anything; the seam clears itself and nothing in the experience or its interface sets it (feature 157,
+    /// A21-P06, T-A21-604).
+    var failNextDraw = false
 
     /// A presenter; with `reduceMotion` on the sky holds still and changes are immediate. The preferences are read
     /// from `storage`'s value `prefs.v1` now, before the first frame (see the file header); `loopFactory` makes the
@@ -468,8 +491,13 @@ final class AuroraPresenter: ExperiencePresenter {
     }
 
     /// Seeds a fresh state from the preferences (once), follows `core`, starts, restarts, advances or ends the change
-    /// between presets and draws the sky (or the mix of both skies) once at `tier`.
+    /// between presets and draws the sky (or the mix of both skies) once at `tier`. Throws ``SkyDrawError/injected``
+    /// once while ``failNextDraw`` is set (it is cleared first).
     func draw(_ core: SkyCore, tier: Int, context: RenderContext, frame: FrameInfo) throws {
+        if failNextDraw {
+            failNextDraw = false
+            throw SkyDrawError.injected
+        }
         var core = core
         if seedPending, seedPreferences(core) { core = coreSource?() ?? core }
         follow(core)

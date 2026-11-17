@@ -34,7 +34,7 @@
 
 ## Phase 3: Story 2 — recovery and stored files (P1)
 
-- [ ] T-A21-604 [US2] Add the recovery seam and its test:
+- [X] T-A21-604 [US2] Add the recovery seam and its test: — Verified 2026-11-17: 2026-11-17: AuroraPresenter.failNextDraw (test-only; the next draw throws SkyDrawError.injected once and clears itself) and SkyRecoveryDrawTests (Violet veil and the sound saved; the session fails at the draw stage with the injected message; prefs.v1 byte-identical; a new session opens on Violet veil with the sound on); .autonomy/checks/A21-P06.au-ios27.json exit 0 (71 experience, 32 core tests); written by an agent, retested
   - in `Packages/ExperiencesCreative/Aurora/Experience/AuroraPresenter.swift`, the test-only seam
     `var failNextDraw = false` ("the next `draw` throws `SkyDrawError.injected` once and clears the flag");
   - `ExperienceTests/SkyRecoveryDrawTests.swift`, in a temporary storage:
