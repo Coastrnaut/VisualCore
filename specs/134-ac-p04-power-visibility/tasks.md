@@ -29,7 +29,7 @@ assert. Precedent: `specs/133-ac-p03-themes-favourites/tasks.md`.
 
 ## Phase 6: Registration and verification
 
-- [ ] T-A18-407 Extend `Adapter/AmbientManifest.swift` with `fixture-night-on` (`night.mode [1]`) and `fixture-motion-reduced` (`motion.reduce [1]`), regenerate `scenario-manifest.json` and update `AmbientManifestTests.swift`
+- [X] T-A18-407 Extend `Adapter/AmbientManifest.swift` with `fixture-night-on` (`night.mode [1]`) and `fixture-motion-reduced` (`motion.reduce [1]`), regenerate `scenario-manifest.json` and update `AmbientManifestTests.swift` — Verified 2026-11-16: 2026-11-16: AmbientManifest adds fixture-night-on and fixture-motion-reduced; scenario-manifest.json regenerated; AmbientManifestTests pass in 2026-11-16: .autonomy/checks/A18-P04.ac-ios27.json exit 0 (97 experience tests in 16 suites and 90 core tests, iOS 27.2)
 
 ## Phase 7: Records and evidence
 
