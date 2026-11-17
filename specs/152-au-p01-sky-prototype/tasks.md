@@ -42,7 +42,7 @@ VisualCore change. Precedent: `specs/145-zg-p01-document-strokes/tasks.md`. Roll
 
 ## Phase 4: Story 3 — time and stillness (P1)
 
-- [ ] T-A21-107 [P] [US3] Create `Packages/ExperiencesCreative/Aurora/Core/SkyClock.swift` per clarification Q4: a
+- [X] T-A21-107 [P] [US3] Create `Packages/ExperiencesCreative/Aurora/Core/SkyClock.swift` per clarification Q4: a — Verified 2026-11-17: 2026-11-17: SkyClock over a SceneClock of 600 s: frame-delta steps of at most 0.25 s x speed, held under Reduce Motion and at speed 0, phase = time / 600; .autonomy/checks/A21-P01.au-core-ios27.json exit 0; written by an agent, retested
   `SceneClock` of period 600 s, advanced by the frame delta (≤ 0.25 s per step) × speed, held under Reduce Motion or at
   speed 0; `phase = time / 600` (FR-A21-106)
 - [ ] T-A21-108 [P] [US3] Write `Packages/ExperiencesCreative/Aurora/CoreTests/{ClockTests,ReducedMotionFrameTests}.swift`:
