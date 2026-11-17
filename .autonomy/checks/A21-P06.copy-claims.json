@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_copy_claims.py",
+    "--config",
+    "Configs/copy-claims-denylist.json",
+    "--text",
+    "docs/apps/aurora/store-listing.md",
+    "--swift",
+    "Packages/ExperiencesCreative/Aurora/Experience/AuroraControls.swift",
+    "Packages/ExperiencesCreative/Aurora/Experience/AuroraPresenter.swift",
+    "Packages/ExperiencesCreative/Aurora/Experience/Adapter/AuroraCore.swift",
+    "Packages/ExperiencesCreative/Aurora/Experience/SkySound.swift"
+  ],
+  "command": "python3 scripts/check_copy_claims.py --config Configs/copy-claims-denylist.json --text docs/apps/aurora/store-listing.md --swift Packages/ExperiencesCreative/Aurora/Experience/AuroraControls.swift Packages/ExperiencesCreative/Aurora/Experience/AuroraPresenter.swift Packages/ExperiencesCreative/Aurora/Experience/Adapter/AuroraCore.swift Packages/ExperiencesCreative/Aurora/Experience/SkySound.swift",
+  "elapsed_seconds": 0.028,
+  "exit_code": 0,
+  "finished": "2026-11-17T12:33:06+00:00",
+  "log": ".autonomy/logs/A21-P06.copy-claims.log",
+  "log_sha256": "eb9347888a9334366fc396b27f9ead99dd0e28258afdc71632f4991962df3559",
+  "name": "copy-claims",
+  "stage": "A21-P06",
+  "started": "2026-11-17T12:33:06+00:00",
+  "timed_out": false
+}

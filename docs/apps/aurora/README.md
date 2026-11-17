@@ -23,3 +23,7 @@ location and needs no permission. Its rules are the A21 subsection of the consti
 | [regression-baseline.md](regression-baseline.md) | Phase start, reference pin, the ProjectM reference regression results |
 | [licenses.md](licenses.md) | Licenses and provenance of everything the experience draws |
 | [device-campaign.md](device-campaign.md) | Device-campaign plan AU-D1 to AU-D8 (pending until the campaign after ImplementationLock-100) |
+| [privacy-and-credits.md](privacy-and-credits.md) | Phase 06 stored data, no temporary file, no permission, the screen and the sound, what is not done, the license inventory |
+| [store-listing.md](store-listing.md) | Phase 06 store text input with the claim → proving-test table |
+| [release-checklist.md](release-checklist.md) | Phase 06 release checklist (verified, pending device campaign, owner action) and artifact inventory |
+| [release.json](release.json) | Release configuration read by `scripts/check_experience_release.py` and `scripts/release_check.py` |

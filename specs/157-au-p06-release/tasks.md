@@ -58,7 +58,7 @@
 
 ## Phase 4: Story 3 — copy and checklist (P1)
 
-- [ ] T-A21-606 [US3] Write the release documents:
+- [X] T-A21-606 [US3] Write the release documents: — Verified 2026-11-17: 2026-11-17: store-listing.md (sound, never audio or music; no forecast, scientific, therapeutic, sleep, always-on or measured claim; 13-row claims table), release-checklist.md (36 rows: 25 verified, 8 pending-campaign-ii AU-D1 to AU-D8, 3 owner-action), release.json (copyCheck.allow []), known-limitations section Aurora (A21; features 151-157), README table; the catalog capability and summary say gentle, not smooth (build_catalog --check PASS); device-campaign.md default brightness limit corrected to 0.6 (range 0.2 to 0.72); A21-P06.experience-release, copy-claims and docs exit 0; written by an agent, reviewed
   - in `docs/apps/aurora/`, `store-listing.md`:
     - each claim names a proving test or interface class;
     - "sound", never "audio" or "music";

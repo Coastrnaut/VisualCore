@@ -437,6 +437,35 @@ and `VisualCoreRendering` (iOS, GL). ADR-0003 and the package map record this. R
   ([device-campaign.md](../apps/digital-zen-garden/device-campaign.md), rows ZG-D1 to ZG-D8). No latency, thermal,
   energy or timing figure is stated.
 
+### Aurora (A21; features 151–157)
+
+- Stylized skies, not a depiction of the real sky. The three skies (Polar night, Violet veil, Dawn haze) are one
+  fragment shader of ribbons, stars and clouds over noise, drawn in code and looping seamlessly every 600 s. Aurora
+  reads no live or measured aurora data, no weather and no position, and predicts nothing.
+- The brightness limit caps the drawn sky only (a soft knee on each pixel's Rec. 709 luminance, from 0.2 to 0.72,
+  0.6 by default). Aurora never changes the screen brightness and never keeps the screen awake; the system's
+  auto-lock applies as usual.
+- The optional sound is one loop synthesised in code (`AmbientLoopRecipe.gentle`) on the ambient session category,
+  so the silent switch silences it and other playback continues. It is off by default and plays only while Aurora is
+  open in the active app with the sound on; it does not play in the background and does not restart by itself after
+  an interruption. No other sound, no sound file and no recording.
+- "Still sky" draws the sky once and repeats the cached picture until a control changes; "Reduced flashing" turns the
+  star twinkle off and makes a change between skies take 4.0 s instead of 2.0 s. Under Reduce Motion the sky holds
+  and every change is immediate. Under Low Power Mode the host draws at most 30 frames per second; the sky time is the
+  same at either cadence.
+- When the sky shader fails to compile or the device reports no fragment `highp`, Aurora shows a simpler still sky
+  under the same limit with the line "This device shows a simpler sky."; if that fails too, the frame is the sky
+  colour.
+- The saved choices (`prefs.v1`: the sky preset, the colour shift, the motion and sky values, the brightness limit,
+  the sound on or off and the volume) are kept on the device only (no sync). A damaged, newer or out-of-range value
+  opens the defaults with a message and is left as it is until the next accepted change. Aurora writes no temporary
+  file and exports no picture.
+- Heat and frame rate per sky, battery use over a session, the low-power cadence, the comfort of the brightness limit
+  and reduced flashing on a real screen, the still view's idle drawing, the loop on the speaker with the silent switch,
+  shader compilation at both refresh rates and the system accessibility audits wait for the device campaign
+  ([device-campaign.md](../apps/aurora/device-campaign.md), rows AU-D1 to AU-D8). No thermal, battery, frame or timing
+  figure from a device is stated.
+
 ## Distribution
 
 - No App Store submission, signing or purchase setup is part of this release; those are owner actions.

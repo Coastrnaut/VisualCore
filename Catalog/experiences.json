@@ -719,7 +719,7 @@
       "id": "a21.aurora",
       "code": "A21",
       "title": "Aurora",
-      "summary": "A full-screen ambient sky of procedural aurora ribbons, stars and clouds: three skies, colour, motion and intensity controls, a brightness limit no frame exceeds, smooth changes between skies and controls that hide and return with a tap. Stylized art, not a forecast.",
+      "summary": "A full-screen ambient sky of procedural aurora ribbons, stars and clouds: three skies, colour, motion and intensity controls, a brightness limit no frame exceeds, gentle changes between skies and controls that hide and return with a tap. Stylized art, not a forecast.",
       "kind": "creative",
       "tier": "free",
       "category": "ambient",
@@ -739,7 +739,7 @@
         "Three procedural aurora skies",
         "Colour, motion and intensity controls",
         "A brightness limit you choose",
-        "Smooth changes between skies",
+        "Gentle changes between skies",
         "Controls that hide and return by tap"
       ],
       "quality_tiers": [

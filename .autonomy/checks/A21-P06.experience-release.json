@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_experience_release.py",
+    "--config",
+    "docs/apps/aurora/release.json"
+  ],
+  "command": "python3 scripts/check_experience_release.py --config docs/apps/aurora/release.json",
+  "elapsed_seconds": 0.024,
+  "exit_code": 0,
+  "finished": "2026-11-17T12:33:06+00:00",
+  "log": ".autonomy/logs/A21-P06.experience-release.log",
+  "log_sha256": "36051b1aa73ab7ee0132baec9379ce770e2e4bc22661bab34200d944036a4b24",
+  "name": "experience-release",
+  "stage": "A21-P06",
+  "started": "2026-11-17T12:33:06+00:00",
+  "timed_out": false
+}

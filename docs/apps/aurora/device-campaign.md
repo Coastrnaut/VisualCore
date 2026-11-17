@@ -11,9 +11,10 @@ session is bounded by arithmetic from the short run, never run (owner ruling of 
 Aurora draws its sky in one fragment shader, `aurora-sky.frag` (`SkyShader`), over VisualCore's GLSL library `vc/`,
 on the OpenGL ES → ANGLE → Metal path; the sky loops seamlessly every 600 s. Three presets are offered:
 `polar-night`, `violet-veil` and `dawn-haze`. A soft knee keeps every pixel's Rec. 709 luminance at most the
-brightness limit, 0.72 by default (`SkyShader.luminanceCeiling`), which the person can lower to 0.2 ("Brightness
-limit"). Reduced flashing turns the star twinkle off and makes a change between skies take 4.0 s; Reduce Motion holds
-the sky still. The still view ("Still sky") draws the sky once inside a `CachedScene` and repeats the cached picture;
+brightness limit, 0.6 by default (`SkyCore.defaultLimit`), which the person can set from 0.2 to 0.72 ("Brightness
+limit"; 0.72 is `SkyShader.luminanceCeiling`). Reduced flashing turns the star twinkle off and makes a change between
+skies take 4.0 s; Reduce Motion holds the sky still. The still view ("Still sky") draws the sky once inside a
+`CachedScene` and repeats the cached picture;
 the same cache holds the fallback sky (`SkyShader.fallbackSource`), drawn when the sky shader fails to compile or the
 host reports no fragment `highp`, with the line "This device shows a simpler sky." The host caps frames at 30 per
 second under Low Power Mode (`FramePacing`), and the sky clock (`SkyClock`) advances by each frame's clamped delta
