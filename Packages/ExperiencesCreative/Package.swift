@@ -43,6 +43,7 @@ let package = Package(
         .library(name: "InteractiveAnatomyExperience", targets: ["InteractiveAnatomyExperience"]),
         .library(name: "AmbientClockExperience", targets: ["AmbientClockExperience"]),
         .library(name: "LivingWallpapersExperience", targets: ["LivingWallpapersExperience"]),
+        .library(name: "DigitalZenGardenExperience", targets: ["DigitalZenGardenExperience"]),
         // The standalone ParticleUniverse app target compiles the moved sources and needs the Core until X-A04.
         .library(name: "ParticleUniverseCore", targets: ["ParticleUniverseCore"]),
     ],
@@ -635,6 +636,33 @@ let package = Package(
                     dependencies: ["DigitalZenGardenCore",
                                    .product(name: "VisualCoreMath", package: visualCore)],
                     path: "DigitalZenGarden/CoreTests"),
+        // A20 Digital Zen Garden experience (feature 146, A20-P02): a candidate until X-A20. The presenter stamps the
+        // core's strokes into a CPU height field, uploads it to one render target and draws the lit relief through the
+        // host's context (no GL call outside the scene protocol).
+        .target(name: "DigitalZenGardenExperience",
+                dependencies: ["DigitalZenGardenCore",
+                               .product(name: "VisualCoreMath", package: visualCore),
+                               .product(name: "VisualCoreScenes", package: visualCore),
+                               .product(name: "VisualCoreSimulation", package: visualCore),
+                               .product(name: "VisualCoreDiagnostics", package: visualCore),
+                               .product(name: "VisualCorePersistence", package: visualCore),
+                               .product(name: "VisualCoreExperience", package: visualCore),
+                               .product(name: "VisualCoreRendering", package: rendering),
+                               .product(name: "VisualCoreExperienceHost", package: rendering),
+                               .product(name: "VisualCoreUI", package: rendering)],
+                path: "DigitalZenGarden/Experience"),
+        .testTarget(name: "DigitalZenGardenExperienceTests",
+                    dependencies: ["DigitalZenGardenExperience", "DigitalZenGardenCore",
+                               .product(name: "VisualCoreMath", package: visualCore),
+                               .product(name: "VisualCoreScenes", package: visualCore),
+                               .product(name: "VisualCoreSimulation", package: visualCore),
+                               .product(name: "VisualCoreDiagnostics", package: visualCore),
+                               .product(name: "VisualCorePersistence", package: visualCore),
+                               .product(name: "VisualCoreExperience", package: visualCore),
+                               .product(name: "VisualCoreRendering", package: rendering),
+                               .product(name: "VisualCoreExperienceHost", package: rendering),
+                               .product(name: "VisualCoreUI", package: rendering)],
+                    path: "DigitalZenGarden/ExperienceTests"),
         // A18 Ambient Clock (feature 131, A18-P01): a pending core until A18-P02 adds the experience. The core is pure
         // (Foundation, the clock source of VisualCoreExperience and the planner of VisualCoreSimulation) and reads no
         // clock: the time enters as actions.
