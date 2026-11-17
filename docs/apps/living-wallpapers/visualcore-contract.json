@@ -365,7 +365,7 @@
    "id": "M05",
    "capability": "Export pipelines: request (template, format, time) -> offscreen render -> encode -> temporary file -> share sheet, with progress, cancellation, cleanup and a result record",
    "source": "brainstorm: export pipelines",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillImage.swift",
@@ -408,7 +408,7 @@
     "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/ExportSheet.swift",
     "symbol": "ExportModel"
    },
-   "notes": "Tested in OffscreenExportTests (pngData), StillCaptureTests, TemporaryFolderTests and ExportGeometryTests. Missing: JPEG and HEIC (G-ENCODE), an export job with progress and cancellation (G-EXPORTJOB), the request and result model (G-MODEL), the share-sheet path with the permission word (G-SAVE) and video (G-VIDEO). G-MODEL, G-VIDEO closed in A19-P01; the row stays open for its remaining gaps. G-ENCODE closed in A19-P02; the row stays open for its remaining gaps."
+   "notes": "Tested in OffscreenExportTests (pngData), StillCaptureTests, TemporaryFolderTests and ExportGeometryTests. Missing: JPEG and HEIC (G-ENCODE), an export job with progress and cancellation (G-EXPORTJOB), the request and result model (G-MODEL), the share-sheet path with the permission word (G-SAVE) and video (G-VIDEO). G-MODEL, G-VIDEO closed in A19-P01; the row stays open for its remaining gaps. G-ENCODE closed in A19-P02; the row stays open for its remaining gaps. Available from A19-P04: G-MODEL, G-VIDEO (A19-P01), G-ENCODE (A19-P02), G-SAVE and G-EXPORTJOB are closed; request, offscreen render, encode, read-back verification, a temporary file and the system share sheet form the pipeline (ExportJobTests, ShareFileTests)."
   },
   {
    "id": "M06",
@@ -574,7 +574,7 @@
    "id": "M10",
    "capability": "Version 0.1 feature 05: export progress, cancellation, error recovery and a local history of exports",
    "source": "manual v0.1 feature 05",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillImage.swift",
@@ -611,7 +611,7 @@
     "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/ExportSheet.swift",
     "symbol": "ExportModel"
    },
-   "notes": "Errors, capture state, cancellation of preparation and temporary cleanup are tested (OffscreenExportTests, StillCaptureTests, ShellLifecycleTests, SessionLifecycleTests, TemporaryFolderTests, ExperienceStorageTests). The export job with progress and cancellation is G-EXPORTJOB, the history G-HISTORY (both app-local, A19-P04)."
+   "notes": "Errors, capture state, cancellation of preparation and temporary cleanup are tested (OffscreenExportTests, StillCaptureTests, ShellLifecycleTests, SessionLifecycleTests, TemporaryFolderTests, ExperienceStorageTests). The export job with progress and cancellation is G-EXPORTJOB, the history G-HISTORY (both app-local, A19-P04). Available from A19-P04: G-EXPORTJOB and G-HISTORY are closed; the export job publishes its progress, cancels between steps, names failures with retry and leaves no file or GPU resource, and a bounded history of exports is kept in the experience's storage (ExportJobTests, ExportHistoryTests, HistoryStoreTests)."
   },
   {
    "id": "M11",
@@ -821,13 +821,13 @@
     "file": "Packages/ExperiencesCreative/SimulationLab/Experience/SimulationCapture.swift",
     "symbol": "SimulationCaptureFile"
    },
-   "notes": "Capture and temporary files are tested (StillCaptureTests, TemporaryFolderTests). The ShareLink with a Transferable file exists only in five experiences. The share path and the registration's photo-library-add declaration (so app-usage-descriptions stays exact) are G-SAVE (app-local, A19-P04); the release scans are G-RELEASE."
+   "notes": "Capture and temporary files are tested (StillCaptureTests, TemporaryFolderTests). The ShareLink with a Transferable file exists only in five experiences. The share path and the registration's photo-library-add declaration (so app-usage-descriptions stays exact) are G-SAVE (app-local, A19-P04); the release scans are G-RELEASE. G-SAVE closed in A19-P04; the row stays open for its remaining gaps."
   },
   {
    "id": "M17",
    "capability": "Export job with progress, cancellation and cleanup: off the interface's critical path, cancellable between steps, temporary files and GPU targets removed on every path",
    "source": "manual v0.1 feature 05; manual §11; manual §13 risk 3",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCorePersistence/TemporaryFolder.swift",
@@ -858,13 +858,13 @@
     "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/ExportSheet.swift",
     "symbol": "ExportModel"
    },
-   "notes": "The cleanup pieces are tested (TemporaryFolderTests, ResourceRegistryTests, StillCaptureTests, ShellLifecycleTests). The offscreen render is synchronous on the main thread; the job with progress and cancellation is G-EXPORTJOB (app-local, A19-P04)."
+   "notes": "The cleanup pieces are tested (TemporaryFolderTests, ResourceRegistryTests, StillCaptureTests, ShellLifecycleTests). The offscreen render is synchronous on the main thread; the job with progress and cancellation is G-EXPORTJOB (app-local, A19-P04). Available from A19-P04: G-EXPORTJOB is closed; render on the main actor, encode and verify off it, progress per step, cancellation and cleanup on every path (ExportJobTests)."
   },
   {
    "id": "M18",
    "capability": "History in experience storage: a bounded local list of exports (template, format, size, time, result) in the experience's own storage",
    "source": "manual v0.1 feature 05",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
@@ -889,7 +889,7 @@
     "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/GenerativeArtLibrary.swift",
     "symbol": "GenerativeArtLibrary"
    },
-   "notes": "Tested in ExperienceStorageTests and DocumentStoreTests. The history document and its bound are G-HISTORY (app-local, A19-P04)."
+   "notes": "Tested in ExperienceStorageTests and DocumentStoreTests. The history document and its bound are G-HISTORY (app-local, A19-P04). Available from A19-P04: G-HISTORY is closed; history.json in ExperienceStorage, newest first up to 20, refused files reported (ExportHistoryTests, HistoryStoreTests)."
   },
   {
    "id": "M19",
@@ -1306,7 +1306,7 @@
    "justification": "The export file is handed to the system share sheet (ShareLink with a Transferable file); 'Save Image' uses the app's existing add-only string; the registration declares photo-library-add so app-usage-descriptions stays exact; no PhotoKit call (manual phase 04).",
    "phase": 4,
    "test": "Experience tests: the share item is the written file with the right type; registration declares photo-library-add; usage-descriptions passes; a source scan finds no PhotoKit import",
-   "closed": null
+   "closed": "A19-P04"
   },
   {
    "id": "G-EXPORTJOB",
@@ -1320,7 +1320,7 @@
    "justification": "The export job (render, encode, write) runs off the interface's critical path with progress and cancellation between steps, error recovery and cleanup of temporary files and GPU targets on every path (manual phase 04).",
    "phase": 4,
    "test": "Experience tests: progress reaches 1 on success; cancel at each step leaves no temporary file and no live export target (ResourceRegistry counts); a failed render keeps the live scene and offers retry",
-   "closed": null
+   "closed": "A19-P04"
   },
   {
    "id": "G-HISTORY",
@@ -1333,7 +1333,7 @@
    "justification": "A bounded local history of exports in ExperienceStorage under StorageQuota is the experience's data (manual phase 04).",
    "phase": 4,
    "test": "Core tests: the history keeps the newest entries up to its bound, round-trips and migrates; damaged history is reported, not fatal",
-   "closed": null
+   "closed": "A19-P04"
   },
   {
    "id": "G-DEVICE",
