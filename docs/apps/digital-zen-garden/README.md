@@ -13,7 +13,9 @@ Non-goals: granular material physics, online galleries or multiplayer, generativ
 
 Digital Zen Garden is an experience of the one VisualCore app (ADR-0009). From Phase 01 on it is built in
 `Packages/ExperiencesCreative/DigitalZenGarden`, and it never has a standalone target. Sand, grooves, stones and
-shadows are drawn in code. It works offline, sends nothing and needs no permission. Its rules are the A20 subsection
+shadows are drawn in code. It works offline and sends nothing. Its only permission is the add-only Photos prompt
+(`photo-library-add`), asked by the system when a still is saved through the share sheet. The calm switches (sound,
+sand drift and haptics, all off by default) are kept as the experience value `calm.v1`. Its rules are the A20 subsection
 of the constitution (2.16.0).
 
 | Document | Content |
