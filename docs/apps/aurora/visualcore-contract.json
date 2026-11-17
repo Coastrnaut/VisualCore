@@ -620,7 +620,7 @@
     "file": "Packages/ExperiencesCreative/AmbientClock/Experience/AmbientPresenter.swift",
     "symbol": "AmbientPresenter"
    },
-   "notes": "Tested in FramePacingTests, CachedSceneTests, FlashLimiterModelTests and AccessibilityPreferencesTests. The host lowers the frame rate under Low Power Mode or heat; the experience's still view and reduced-flash mode are G-LOWPOWER (app-local, A21-P04); the long-run cadence on devices is G-DEVICE (A21-P05)."
+   "notes": "Tested in FramePacingTests, CachedSceneTests, FlashLimiterModelTests and AccessibilityPreferencesTests. The host lowers the frame rate under Low Power Mode or heat; the experience's still view and reduced-flash mode are G-LOWPOWER (app-local, A21-P04); the long-run cadence on devices is G-DEVICE (A21-P05). G-LOWPOWER closed in A21-P04 (still sky over CachedScene, reduced flashing, fallback sky, released targets; StillViewTests, ReducedFlashTests, FallbackTests, TargetReleaseTests). The missing-highp path is proven through an injectable capability seam; in the app a compile failure triggers the fallback (RenderContext carries no capabilities)."
   },
   {
    "id": "M10",
@@ -657,7 +657,7 @@
     "file": "Packages/ExperiencesCreative/DigitalZenGarden/Experience/GardenSounds.swift",
     "symbol": "GardenSoundPlayer"
    },
-   "notes": "Only one-shot tones exist (four voices of at most 1 s, no player volume; SoundEffectPlayerTests, SoundEffectSynthTests, AudioSessionEventTests). A continuous ambient loop player with a volume is G-LOOP (VisualCore:VisualCoreAudio, upstream, A21-P04); the experience's loop and control are G-SOUND (A21-P05). Never a recording."
+   "notes": "Only one-shot tones exist (four voices of at most 1 s, no player volume; SoundEffectPlayerTests, SoundEffectSynthTests, AudioSessionEventTests). A continuous ambient loop player with a volume is G-LOOP (VisualCore:VisualCoreAudio, upstream, A21-P04); the experience's loop and control are G-SOUND (A21-P05). Never a recording. G-LOOP closed in A21-P04: VisualCoreAudioDSP AmbientLoopRecipe and AmbientLoopSynth, VisualCoreAudio AmbientLoopPlayer (AmbientLoopSynthTests, AmbientLoopPlayerTests), the API baseline updated (23 added), both READMEs, and the reference regression 7 of 7."
   },
   {
    "id": "M11",
@@ -1076,7 +1076,7 @@
    "id": "M22",
    "capability": "Static fallback frame: when a shader fails to compile or highp precision is missing, a still frame is shown instead of a grey clear",
    "source": "spec FR-A21-003; spec clarification Q3",
-   "status": "upstream gap",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderCapabilities.swift",
@@ -1107,13 +1107,13 @@
     "file": "Packages/ExperiencesCreative/FractalExplorer/Experience/ExplorerView.swift",
     "symbol": "ExplorerModel"
    },
-   "notes": "Precision probes are tested (RenderCapabilitiesPrecisionTests, RenderCapabilitiesProbeTests); FullScreenShaderScene records a compile error and clears to dark grey. No fallback frame exists; it is G-LOWPOWER (app-local, A21-P04)."
+   "notes": "Precision probes are tested (RenderCapabilitiesPrecisionTests, RenderCapabilitiesProbeTests); FullScreenShaderScene records a compile error and clears to dark grey. No fallback frame exists; it is G-LOWPOWER (app-local, A21-P04). G-LOWPOWER closed in A21-P04 (still sky over CachedScene, reduced flashing, fallback sky, released targets; StillViewTests, ReducedFlashTests, FallbackTests, TargetReleaseTests). The missing-highp path is proven through an injectable capability seam; in the app a compile failure triggers the fallback (RenderContext carries no capabilities). Available."
   },
   {
    "id": "M23",
    "capability": "GPU targets released on theme (preset) change: the outgoing preset's programs and targets are released or recycled, so memory stays flat across changes",
    "source": "spec FR-A21-003",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
@@ -1144,7 +1144,7 @@
     "file": "Packages/ExperiencesCreative/AmbientClock/Experience/AmbientPresenter.swift",
     "symbol": "AmbientPresenter"
    },
-   "notes": "Tested in ResourceLedgerTests and CrossfadeSceneTests. Aurora's release on preset change is G-LOWPOWER (app-local, A21-P04)."
+   "notes": "Tested in ResourceLedgerTests and CrossfadeSceneTests. Aurora's release on preset change is G-LOWPOWER (app-local, A21-P04). G-LOWPOWER closed in A21-P04 (still sky over CachedScene, reduced flashing, fallback sky, released targets; StillViewTests, ReducedFlashTests, FallbackTests, TargetReleaseTests). The missing-highp path is proven through an injectable capability seam; in the app a compile failure triggers the fallback (RenderContext carries no capabilities). Available."
   },
   {
    "id": "M24",
@@ -1360,7 +1360,7 @@
    "justification": "A continuous speaker-output loop is generic and VisualCore has only one-shot tones (spec clarification Q4, research alternatives). VisualCoreAudio gains an ambient loop player: the ambient session category, its own volume 0...1, stopped on interruption and in the background, playing a procedural buffer rendered by VisualCoreAudioDSP; with /// documentation, tests, the API baseline update and the seven-step reference regression in two chunks (CLAUDE.md rule 13).",
    "phase": 4,
    "test": "Package tests: the loop's buffer is deterministic, finite, within ±gain and seamless at the loop point; volume is clamped to 0...1; the player stops on interruption and background events and uses the ambient category; API baseline updated; reference regression 7 of 7",
-   "closed": null
+   "closed": "A21-P04"
   },
   {
    "id": "G-LOWPOWER",
@@ -1374,7 +1374,7 @@
    "justification": "The low-power still view (CachedScene over the host's FramePacing), the reduced-flash mode, the static fallback frame when a shader fails or highp is missing (RenderCapabilities), and release of GPU targets on preset changes are the experience's policy (manual phase 04, spec clarification Q3). No fallback frame exists in VisualCore. No VisualCore change is planned (spec clarification Q3); a second user would justify moving it upstream later (Principle II).",
    "phase": 4,
    "test": "Experience tests: the still view draws the child once until its key changes; the reduced-flash mode keeps frame-to-frame luminance change under the declared limit; a forced compile failure or missing highp shows the fallback frame, not grey; target bytes return to the baseline after preset changes",
-   "closed": null
+   "closed": "A21-P04"
   },
   {
    "id": "G-SOUND",
