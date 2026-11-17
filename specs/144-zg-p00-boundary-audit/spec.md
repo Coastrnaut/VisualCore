@@ -246,4 +246,4 @@ module will own each missing piece and in which phase.
 ## Negative Requirements
 
 - No VisualCore or ProjectM change; no experience target, registration or interface in this phase; no artwork; no
-  network; no private API.
+  network; no private API; no permission and no usage string (sound is an ambient one-shot player that needs none).
