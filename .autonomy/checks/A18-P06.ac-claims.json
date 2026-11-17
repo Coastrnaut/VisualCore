@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "sh",
+    "specs/136-ac-p06-release/scan-claims-release.sh"
+  ],
+  "command": "sh specs/136-ac-p06-release/scan-claims-release.sh",
+  "elapsed_seconds": 0.425,
+  "exit_code": 0,
+  "finished": "2026-11-17T04:34:14+00:00",
+  "log": ".autonomy/logs/A18-P06.ac-claims.log",
+  "log_sha256": "74af87c01800ac0868eb7296adea5ebba4d672d0f99aa55351ecd6763c3fceff",
+  "name": "ac-claims",
+  "stage": "A18-P06",
+  "started": "2026-11-17T04:34:14+00:00",
+  "timed_out": false
+}
