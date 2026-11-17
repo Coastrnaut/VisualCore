@@ -54,3 +54,7 @@ commits.
 
 MVP: the four themes with the contrast rule (303, 304). The crossfade (302, 305) and the favourites (306) close the
 phase. Review checkpoints after 302 (crossfade tests pass) and at 309.
+
+## Phase 8: Convergence
+
+- [ ] T-A18-312 Record the as-built design in `specs/133-ac-p03-themes-favourites/research.md` and `data-model.md`: only the schema-1 example is registered (the migration check refuses an example of the current schema); `CrossfadeScene` owns its children (setup, resize, teardown), the presenter keeps it at progress 1 instead of drawing the incoming scene alone, the outgoing picture during a fade is a captured still, and a theme change compiles the new theme twice (a check, then the crossfade's setup); `AmbientFavourites` adds `remove(id:)`, an injectable id generator, the `store-failed` refusal and static `decode`/`encode`. Per research D5, plan lifecycle and data-model (contradicts)
