@@ -134,6 +134,8 @@ the tray.
 - **Undo of a removal:** the stone returns at its layer.
 - **Raking under a stone:** the stone stays on top; raking does not move it.
 - **Reduce Motion:** placing and moving are direct; nothing animates.
+- **A cancelled stone drag or rotation** (pointers cancelled, the app suspended): nothing is sent and the stone stays
+  where it was.
 
 ## Requirements *(mandatory)*
 
