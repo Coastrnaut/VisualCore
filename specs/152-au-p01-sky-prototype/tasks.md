@@ -64,7 +64,7 @@ VisualCore change. Precedent: `specs/145-zg-p01-document-strokes/tasks.md`. Roll
 - [X] T-A21-112 Packages, catalog, script tests and the app build (`--name experience-packages`, `--name catalog -- — Verified 2026-11-17: 2026-11-17: .autonomy/checks/A21-P01.experience-packages.json (20 experiences, a pending core), A21-P01.catalog.json, A21-P01.script-tests.json and A21-P01.app-build.json, all exit 0
   python3 scripts/build_catalog.py --check`, `--name script-tests -- python3 scripts/test_scripts.py`, `--name app-build
   -- python3 scripts/release_check.py --only app-build-for-testing-ios27`)
-- [ ] T-A21-113 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+- [X] T-A21-113 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record — Verified 2026-11-17: 2026-11-17: converge round 1 appended T-A21-114 (implemented), round 2 converged with nothing appended; A21-P01 sealed (.autonomy/evidence/A21-P01.json) and recorded (VERIFIED-GATE A21-P01, 152 of 263); planning index, matrix, distinctiveness, metadata, Auto-Creator, catalog (--check PASS), validate_autocreator and validate_docs PASS; README and docs/automatedtesting.md updated
   A21-P01; update README.md (rule 16) and `docs/automatedtesting.md` (rule 17)
 
 ## Dependencies
