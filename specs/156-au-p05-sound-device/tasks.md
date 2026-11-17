@@ -132,3 +132,8 @@
 - **Then:** the cadence fixture (505) proves fixture 5; the interface journeys (506–508) prove the app; the plan (509)
   closes G-DEVICE.
 - **Review checkpoint:** at 511. **Commit boundaries:** one commit per task.
+
+## Phase 7: Convergence
+
+- [ ] T-A21-513 Update the header of `Packages/ExperiencesCreative/Aurora/ExperienceTests/SoundChoiceTests.swift`, which still says "nothing plays", to say that the choice now drives the A21-P05 loop (proved in `SoundLoopTests`), per FR-A21-502 (contradicts)
+- [ ] T-A21-514 Record the as-built design in `specs/156-au-p05-sound-device/{plan.md,data-model.md,contracts/sound.md}` and the presenter header. `AuroraPresenter.fixedDelta` is a test-only seam (nil in the app, where the host's clamped delta drives the clock). `shedCaches` belongs to the core, not to the presenter, so the drawing calls that never touch the sound are `setup`, `resize`, `draw` and `teardown`. Per plan: test seam (unrequested)
