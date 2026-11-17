@@ -80,3 +80,7 @@ Agent S: T-A21-103, 104. Agent R: T-A21-105–108. Lead: Package.swift (102), li
 
 MVP: the scene and presets (103, 104). The sky and its reference (105, 106) prove the prototype; the clock (107, 108)
 proves the regression fixture. Review checkpoint at 110. One commit per task.
+
+## Phase 6: Convergence
+
+- [ ] T-A21-114 Record the as-built additions in `specs/152-au-p01-sky-prototype/data-model.md` and `contracts/core.md`: `SkyUniforms(scene:phase:level:)` with a linear-light palette (stop 0 the sky, the rest the ribbons) and `shaderParameters`; the soft luminance knee (start 0.6, ceiling 0.72) before the sRGB encode and the `vc/color.glsl` include; one star cell per reference pixel (≤ 1 pixel); and the tests' read-back through `RenderHost.renderOffscreen` per data-model and contract (unrequested)
