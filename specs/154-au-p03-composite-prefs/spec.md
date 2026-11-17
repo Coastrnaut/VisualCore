@@ -19,6 +19,41 @@ Canonical overrides:
 - **Gaps built here:** G-COMPOSITE and G-PREFS of `docs/apps/aurora/visualcore-contract.json`.
 - **Aurora stays a candidate.** No VisualCore or ProjectM change. Follow `specs/147-zg-p03-stones`.
 
+## Clarifications
+
+### Session 2026-11-17
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- `CrossfadeScene` (VisualCoreRendering) owns the lifecycle of its two child scenes, mixes them linearly in display
+  space from two lazy RGBA8 targets, never reads the clock (the caller sets `progress`), and on
+  `replaceIncoming(_:context:)` captures the current mix as a still outgoing picture; after a context recreation the
+  still picture is re-uploaded.
+- A linear mix in display space of two pictures that each obey the limit also obeys it: sRGB decoding is convex, so
+  the decoded mix is at most the mix of the decoded values, and luminance is a positive weighting of them.
+- `ExperienceStorage.setValue(_:for:)` keeps values of at most 4,096 bytes (64 values per experience); the A21-P02
+  presenter applies the limit in the shader of each sky.
+
+- Q: How does a change between presets run now? → A: Through `CrossfadeScene`: the outgoing sky and the incoming sky
+  are two `FullScreenShaderScene`s that both keep moving, mixed over 2.0 s of drawn-frame time with smoothstep easing,
+  each drawn under the person's limit. A new choice mid-change restarts the fade from the current mix
+  (`replaceIncoming`), whose captured still picture then fades out. Under Reduce Motion the change is immediate. The
+  A21-P02 input blend stays for control changes within one sky.
+- Q: How is "moves steadily from old to new" measured? → A: At progress steps 0, 0.1, …, 1 the read-back's mean
+  absolute difference from the incoming sky's own picture (at the same frame time) never increases, and no pixel's
+  luminance exceeds the limit + 1/255.
+- Q: What is saved, where, and what is not? → A: Preferences schema 1, kind `a21.preferences`, as the experience value
+  `prefs.v1` (at most 4,096 bytes): `preset`, `hue`, `speed`, `turbulence`, `ribbons`, `stars`, `clouds`, `limit`,
+  `soundOn` (default false) and `volume` (0…1, default 0.5). Quality is the host's choice and is not saved. Saved after
+  every accepted change; restored when the experience opens, before the first frame.
+- Q: What happens to a bad or newer saved value, or a failed save? → A: A damaged, newer-version or out-of-range value
+  is reported with its code (`damaged`, `newer-version`, `out-of-range`) through the experience's message, and the
+  defaults (the `polar-night` preset, limit 0.6, sound off, volume 0.5) are used and saved over it only after the next
+  accepted change. A failed save is reported once ("Your choices could not be saved.") and the choices stay in memory.
+- Q: How is the sound choice kept independent of the drawing? → A: It lives in the preferences, not in the presenter's
+  scenes or the snapshot digest: teardown, setup, `recreateContext`, resize, suspend and resume never read or write it.
+  A sound control (on/off and volume) is added to the controls; it plays nothing until A21-P05.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - One sky dissolves into the next (Priority: P1) 🎯
@@ -40,7 +75,7 @@ fades out as the new fades in, and nothing in between is brighter than the perso
 
 ### User Story 2 - The sky the person chose is there next time (Priority: P1)
 
-A person's choices (the sky, its colours and motion, the brightness limit, the quality and the sound choice) are kept
+A person's choices (the sky, its colours and motion, the brightness limit and the sound choice) are kept
 and come back the next time the experience opens. A damaged or newer saved choice is reported and replaced by
 defaults, and the experience still opens.
 
@@ -86,8 +121,8 @@ loss, a resize, suspending and resuming never change them.
   with the brightness limit applied to every mixed frame, and MUST be immediate under Reduce Motion.
 - **FR-A21-302**: The mix MUST move steadily (monotonically) from old to new, and MUST survive a context loss or
   resize.
-- **FR-A21-303**: The person's choices (preset, hue, speed, turbulence, ribbons, stars, clouds, limit, quality, sound
-  on/off and volume) MUST be saved in the experience's own storage with a version and restored on open.
+- **FR-A21-303**: The person's choices (preset, hue, speed, turbulence, ribbons, stars, clouds, limit, sound on/off
+  and volume; quality is the host's choice) MUST be saved in the experience's own storage with a version and restored on open.
 - **FR-A21-304**: A damaged, newer or out-of-range saved choice MUST be reported and replaced by defaults, without
   stopping the experience; a failed save MUST be reported and the choices kept in memory.
 - **FR-A21-305**: The sound choice MUST be independent of the drawing lifecycle.
@@ -95,8 +130,7 @@ loss, a resize, suspending and resuming never change them.
 
 ### Key Entities
 
-- **Preferences**: version, preset, hue, speed, turbulence, ribbons, stars, clouds, limit, quality, sound on/off,
-  volume.
+- **Preferences**: version, preset, hue, speed, turbulence, ribbons, stars, clouds, limit, sound on/off, volume.
 - **Transition**: from picture, to picture, progress, duration.
 
 ## Success Criteria *(mandatory)*
