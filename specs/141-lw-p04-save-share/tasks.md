@@ -8,7 +8,7 @@ VisualCore change. Precedent: `specs/134-ac-p04-night-power/tasks.md`. Rollback:
 
 ## Phase 1: Setup
 
-- [ ] T-A19-401 Baseline: cite the A19-P03 evidence (`.autonomy/checks/A19-P03.{lw-ios27,app-unit,verify-27}.json`) on the tree recorded at A19-P03 (`eab4605a`), whose Packages are unchanged since (owner ruling of 2026-11-14)
+- [X] T-A19-401 Baseline: cite the A19-P03 evidence (`.autonomy/checks/A19-P03.{lw-ios27,app-unit,verify-27}.json`) on the tree recorded at A19-P03 (`eab4605a`), whose Packages are unchanged since (owner ruling of 2026-11-14) — Verified 2026-11-17: 2026-11-17: A19-P03 evidence cited: .autonomy/checks/A19-P03.lw-ios27.json, A19-P03.app-unit.json and A19-P03.verify-27.json, all exit 0; no Packages, Apps or project.yml change since the A19-P03 record commit eab4605a
 
 ## Phase 2: Story 3 foundation — the history model (P2, needed by Story 2)
 
