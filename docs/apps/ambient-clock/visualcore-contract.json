@@ -1294,7 +1294,7 @@
    "owner": "app-local",
    "justification": "Resolution share, iteration and particle counts per quality tier for each theme are the experience's numbers over QualityLevel, ParticleSystem.capacity and ResourceBudget.",
    "phase": 2,
-   "test": "Core tests: every theme's settings stay within each tier's budget; Core.qualityTiers matches the presenter's levels; over-budget presets refused with a typed reason",
+   "test": "Experience tests (A18-P02): Core.qualityTiers is 2 with level-0 and level-1; fixed noise octaves 5 and 3 and pixel blocks 1 and 2 per level; one full-screen draw per frame; speeds outside 0.25-2 refused; frames at both levels not blank (theme presets and their budgets come with A18-P03)",
    "closed": "A18-P02"
   },
   {
