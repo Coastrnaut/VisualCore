@@ -3905,10 +3905,10 @@
      "A19-P01",
      "A19-P02",
      "A19-P03",
-     "A19-P04"
+     "A19-P04",
+     "A19-P05"
     ],
     "legacy_gates_pending": [
-     "A19-P05",
      "A19-P06"
     ],
     "unified_integration": "pending"
