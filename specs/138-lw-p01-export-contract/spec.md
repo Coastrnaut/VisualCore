@@ -165,13 +165,13 @@ exports video, unless a recorded decision shows that to be possible with public 
   parameters with ranges and defaults, and at least three opaque colour presets, with a license and provenance
   record.
 - **FR-A19-102**: A project document MUST record scene, preset, seed, template, orientation and animation time in a
-  versioned file with typed refusals (damaged, newer version, unknown scene, preset or template, too large); a
-  refused file leaves the defaults.
+  versioned file with typed refusals (damaged, newer version, unknown scene, preset or template, invalid parameter,
+  too large); a refused file leaves the defaults.
 - **FR-A19-103**: The template catalog MUST hold iPhone and iPad screen sizes in pixels with both orientations and
   safe-area guides, each with a provenance record.
 - **FR-A19-104**: Export planning MUST turn a project and a format into an exact pixel size and colour profile, refuse
-  sizes above the reported size limit or the pixel cap before any allocation, and offer the largest fitting size with
-  the same aspect.
+  sizes above the reported size limit or the pixel cap before any allocation, and offer the largest fitting size at
+  the template's aspect (edges even, so the aspect holds within that rounding).
 - **FR-A19-105**: A written file MUST be inspected by reading it back: its dimensions, colour profile and byte count
   form the export result, and a mismatch with the plan is a named failure.
 - **FR-A19-106**: The video feasibility decision MUST be recorded with the public interface, its cost bounds, the
