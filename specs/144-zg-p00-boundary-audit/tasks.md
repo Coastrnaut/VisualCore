@@ -24,7 +24,7 @@ only).
 ## Phase 5: User Story 3 — The shell builds with the experience absent (P2)
 
 - [X] T-A20-006 [US3] Build the one app for testing (`--name app-build -- python3 scripts/release_check.py --only app-build-for-testing-ios27`) — Verified 2026-11-17: 2026-11-17: .autonomy/checks/A20-P00.app-build.json exit 0 (app-build-for-testing-ios27 passes with Digital Zen Garden absent)
-- [ ] T-A20-007 [US3] Experience package check (`--name experience-packages -- python3 scripts/check_experience_packages.py`: 19 experiences, none A20); `grep -c a20 Catalog/registrations.json Apps/VisualCore/App/ExperienceRegistry.swift` gives 0 (FR-A20-005, SC-A20-004)
+- [X] T-A20-007 [US3] Experience package check (`--name experience-packages -- python3 scripts/check_experience_packages.py`: 19 experiences, none A20); `grep -c a20 Catalog/registrations.json Apps/VisualCore/App/ExperienceRegistry.swift` gives 0 (FR-A20-005, SC-A20-004) — Verified 2026-11-17: 2026-11-17: .autonomy/checks/A20-P00.experience-packages.json exit 0 (19 experiences in 1 package, none A20); grep -c a20 gives 0 in Catalog/registrations.json and Apps/VisualCore/App/ExperienceRegistry.swift
 
 ## Phase 6: User Story 4 — Stop/go decision (P2)
 
