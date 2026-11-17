@@ -9,7 +9,8 @@
   `damaged`, `newer-version`, `too-large`, `not-finite`, `out-of-range`.
 - **ValidationIssue:** `source-too-large(bytes)`, `too-many-lines(n)`, `too-many-uniforms(n)`,
   `too-many-texture-inputs(n)`, `no-main`, `version-line(line)`, `reserved-name(name)`, `duplicate-name(name)`,
-  `undeclared-in-source(name)`, `undeclared-in-project(name)`.
+  `undeclared-in-source(name)`, `undeclared-in-project(name)` (both for float uniforms and for `sampler2D` texture
+  inputs).
 - **ShaderAssembly:** files `ss/prelude.glsl`, `ss/shader.frag` (the person's source), `ss/main.frag` (entry);
   `personFile` = `ss/shader.frag`.
 - **MappedDiagnostic:** `line` (Int? — nil when outside the person's file), `file`, `severity`, `message`, `stage`.

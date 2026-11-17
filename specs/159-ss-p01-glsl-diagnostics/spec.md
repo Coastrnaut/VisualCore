@@ -69,8 +69,9 @@ in code:
   - **Validator:** it also refuses:
     - a source without `void main`;
     - any `#version` line;
-    - a declared uniform missing from the source (matched as `uniform float <name>;`);
-    - a source `uniform float` that the project does not declare (reported by name);
+    - a declared uniform missing from the source (matched as `uniform float <name>;`), or a declared texture input
+      missing from it (matched as `uniform sampler2D <name>;`);
+    - a source `uniform float` or `uniform sampler2D` that the project does not declare (reported by name);
     - a reserved name;
     - a duplicate name.
 - Q: What is the project file? → A:
