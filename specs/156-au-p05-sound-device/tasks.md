@@ -82,7 +82,7 @@
   - a relaunch over the same storage restores it;
   - each test runs under 60 s
   (FR-A21-502, 506; SC-A21-503)
-- [ ] T-A21-508 [US3] Add the serial chunk `"c3": ["AUSkyUITests", "AUSoundUITests"]` to `scripts/release_check.py`
+- [X] T-A21-508 [US3] Add the serial chunk `"c3": ["AUSkyUITests", "AUSoundUITests"]` to `scripts/release_check.py` — Verified 2026-11-17: 2026-11-17: serial chunk c3 (AUSkyUITests, AUSoundUITests) in scripts/release_check.py and SERIAL_CHUNKS; .autonomy/checks/A21-P05.script-tests.json exit 0; app-ui (c3) and verify-27 exit 0
   and to `SERIAL_CHUNKS` (lead); `scripts/test_scripts.py` passes
 
 ## Phase 5: Story 4 — the campaign plan (P2)
