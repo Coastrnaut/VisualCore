@@ -28,7 +28,7 @@ VisualCore change. Precedent: `specs/145-zg-p01-document-strokes/tasks.md`. Roll
 
 ## Phase 3: Story 2 — layered light within bounds (P1)
 
-- [ ] T-A21-105 [P] [US2] Create `Packages/ExperiencesCreative/Aurora/Core/{SkyNoise,SkyShader,SkyReference}.swift` per
+- [X] T-A21-105 [P] [US2] Create `Packages/ExperiencesCreative/Aurora/Core/{SkyNoise,SkyShader,SkyReference}.swift` per — Verified 2026-11-17: 2026-11-17: SkyNoise (bit-pattern port of vc/ hash and noise), SkyShader (aurora-sky.frag: stars with twinkle 1 +/- 0.3, fbm clouds, up to 4 additive ribbons, circular noise path for a seamless 600 s loop, soft knee to luminance 0.72; levels 5 and 3 octaves), SkyReference and SkyUniforms(scene:phase:level:); .autonomy/checks/A21-P01.au-core-ios27.json exit 0; written by an agent, retested
   clarification Q2 and data-model.md: a Swift `Float` port of `vc_pcg`, `vc_hash21`, `vc_hash22`, `vc_gradientNoise`
   and `vc_fbm`; `aurora-sky.frag` source text (`#include "vc/noise.glsl"`, uniforms `u_phase`, `u_ribbons`,
   `u_turbulence`, `u_cloudiness`, `u_stars`, `u_octaves`, palette) compositing stars ("twinkle ±30 %", "size ≤ 1.5
