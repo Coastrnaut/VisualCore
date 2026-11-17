@@ -4,6 +4,10 @@
   (catalog id), `hue` −0.5…0.5, `speed` 0…2, `turbulence` 0…1, `ribbons` 1…4, `stars` 0…400, `clouds` 0…1, `limit`
   0.2…0.72, `soundOn` (default false), `volume` 0…1 (default 0.5). Codes: `damaged`, `newer-version`, `out-of-range`.
   Defaults: preset `polar-night` with its scene, hue 0, limit 0.6, sound off, volume 0.5.
+- **Preferences and the session snapshot:** a fresh open seeds the state from `prefs.v1`; when the host restores a
+  session snapshot, the snapshot wins for the sky (preset, hue, limit and the scene values) and the preferences are
+  rewritten after the next accepted change; the sound choice always comes from the preferences (it is not in the
+  snapshot).
 - **SkyTransition:** a `CrossfadeScene` of the outgoing and incoming skies; progress over 2.0 s of frame time,
   smoothstep; a new choice mid-change calls `replaceIncoming`; immediate under Reduce Motion.
 - **Messages:** "Your saved choices could not be read, so the default sky is shown." (damaged, newer, out of range);

@@ -4,5 +4,6 @@
   the incoming sky never increases; a context loss or resize mid-change keeps the picture; a new choice restarts from
   the current mix; immediate under Reduce Motion.
 - **Preferences:** a round trip through `prefs.v1` restores every field; damaged, newer and out-of-range samples open
-  with the defaults and their code; a failed save is reported once and the choices stay in memory.
+  with the defaults and their code; a failed save is reported once and the choices stay in memory; a restored session snapshot wins
+  over the saved sky, never over the sound choice.
 - **Sound choice:** unchanged after teardown, setup, `recreateContext`, resize, suspend and resume; nothing plays.
