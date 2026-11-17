@@ -1,0 +1,1679 @@
+{
+ "schema": 1,
+ "app": "ambient-clock",
+ "gate": "A18-P00",
+ "date": "2026-11-16",
+ "inventory": [
+  {
+   "area": "Package products",
+   "description": "Pure, host-testable products of Packages/VisualCore: VisualCoreMath, VisualCoreSimulation, VisualCoreScenes, VisualCoreShaderSource, VisualCoreEffectsGraph, VisualCoreDiagnostics, VisualCoreAudioDSP, VisualCorePersistence, VisualCoreParameters, VisualCoreExperience (+ VisualCoreTestSupport for test targets). iOS products of Packages/VisualCoreRendering: VisualCoreRendering, VisualCoreEffects, VisualCoreUI, VisualCoreAudio, VisualCoreAutomation, VisualCoreExperienceHost. For Ambient Clock (checked 2026-11-16): VisualCoreRendering has FullScreenShaderScene (parameters, palette up to 8 stops, seedOffsets, fixedTime, timeScale), FieldPass, ShaderBundle with the vc/ GLSL library, ParticleRenderer and ParticleLayerScene (brightnessCap); VisualCoreSimulation has SceneClock (animation time, not wall time), ParticleSystem, AnnouncementPlanner, StateSign, stateSignProblems, transitionDuration(_:reduceMotion:) and AccessibilityPreferences; VisualCorePersistence has NamedLibrary (favourites), DocumentStore, DocumentEnvelope and MigrationChain; VisualCoreExperience has ExperienceStorage with StorageQuota; VisualCoreDiagnostics has QualityProfile, QualityGovernor, DeviceConditions and FramePacing; VisualCoreUI has AccessibleColors.contrastRatio. Missing in every framework product (grep 2026-11-16): a wall-clock source, any time-change observer (significant time change, time zone, locale, day), GPU text, a crossfade between scenes, a frame-rate control reachable from an experience, keep-awake, night-mode and pixel-drift helpers.",
+   "paths": [
+    "Packages/VisualCore/Package.swift",
+    "Packages/VisualCoreRendering/Package.swift",
+    "Packages/ExperiencesCreative/Package.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderBundle.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ParticleLayerScene.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ParticleRenderer.swift",
+    "Packages/VisualCore/Sources/VisualCoreSimulation/SceneClock.swift",
+    "Packages/VisualCore/Sources/VisualCoreSimulation/ParticleSystem.swift",
+    "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
+    "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPreferences.swift",
+    "Packages/VisualCore/Sources/VisualCorePersistence/NamedLibrary.swift",
+    "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityProfile.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityGovernor.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/FramePacing.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreUI/AccessibilitySettingsSection.swift",
+    "scripts/check_dependencies.py",
+    "docs/api/visualcore-public-api.txt"
+   ],
+   "owner": "VisualCore packages (ADR-0003, ADR-0009)"
+  },
+  {
+   "area": "EGL render host and thread",
+   "description": "RenderHost (@MainActor) owns the EGL display, context and surfaces over ANGLE's Metal backend (EGLDisplayProvider), the CAMetalLayer RenderView, the FrameScheduler (CADisplayLink, FramePacing cap: 30 fps floor, 30 under Low Power Mode or serious thermal state, else the requested maximum, 60 by default) and context generations; every GL call runs on the main thread inside RenderScene setup, resize, render and teardown. RenderHost pauses on didEnterBackground, resumes on willEnterForeground, rebuilds on memory warning and recreateContext, and swaps scenes with replaceScene (a hard cut). RenderHost.init takes maxFramesPerSecond, but ExperienceSession creates its host with the default, so no experience can lower its frame rate today.",
+   "paths": [
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderView.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FrameScheduler.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/EGLDisplayProvider.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/FramePacing.swift"
+   ],
+   "owner": "VisualCoreRendering (ADR-0002 seam)"
+  },
+  {
+   "area": "Shaders and resources (full-screen shaders, fields, palettes, particles, text overlays)",
+   "description": "FullScreenShaderScene draws one bundled fragment shader over the canvas with named float uniforms, a palette of up to 8 colour stops, seed offsets and an explicit or scaled time; FieldPass runs a fragment program into a render target or the framebuffer (with PingPongTarget for feedback); ShaderBundle and ShaderLibrary compile bundled GLSL with #include of the vc/ library (palette, noise, sdf, hash, colour, field); ParticleSystem simulates on the CPU and ParticleRenderer/ParticleLayerScene draw it with blend modes, trails and a brightness cap; ResourceRegistry creates buffers, textures, programs and render targets under a ResourceBudget. Text is never drawn in the GPU path: ExperiencePresenter.makeCanvasOverlay puts native SwiftUI text over the canvas, so system fonts, Dynamic Type and VoiceOver apply.",
+   "paths": [
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/PingPongTarget.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderBundle.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderProgram.swift",
+    "Packages/VisualCore/Sources/VisualCoreShaderSource/ShaderLibrary.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ParticleLayerScene.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ParticleRenderer.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/TrailLayer.swift",
+    "Packages/VisualCore/Sources/VisualCoreSimulation/ParticleSystem.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/palette.glsl",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/noise.glsl",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/sdf.glsl",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/hash.glsl",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/color.glsl",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/field.glsl",
+    "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift"
+   ],
+   "owner": "VisualCoreRendering + VisualCoreShaderSource + VisualCoreSimulation"
+  },
+  {
+   "area": "Time, animation and lifecycle signals",
+   "description": "SceneClock is a bounded animation clock (play, pause, speed, reducedMotion factor 0.5), not a wall clock; FullScreenShaderScene.fixedTime renders a scene at an explicit time. Scene phase reaches an experience through ExperienceSession.setScenePhase (ScenePhaseInput) and ExperienceShell.suspend/resume, which resume without catch-up. No framework product reads Date(), the calendar, the locale or the time zone for an experience, and none observes significantTimeChange, NSSystemTimeZoneDidChange or currentLocaleDidChange. Experience-only precedents: Solar System Explorer's injected now: () -> Date with its date.set action, and the willEnterForeground observers of Music Lab, Oscilloscope Studio and Audio Odyssey.",
+   "paths": [
+    "Packages/VisualCore/Sources/VisualCoreSimulation/SceneClock.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+    "Packages/VisualCore/Sources/VisualCoreExperience/SessionLifecycle.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceShell.swift",
+    "Packages/VisualCore/Sources/VisualCoreSimulation/PlaybackState.swift",
+    "Packages/ExperiencesCreative/SolarSystemExplorer/Experience/SolarSystemExplorerExperience.swift",
+    "Packages/ExperiencesCreative/SolarSystemExplorer/Experience/Adapter/SolarCore.swift",
+    "Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/MusicLabPresenter.swift",
+    "Packages/ExperiencesCreative/OscilloscopeStudio/Experience/ScopePresenter.swift",
+    "Packages/ExperiencesCreative/AudioOdyssey/Experience/OdysseyPresenter.swift"
+   ],
+   "owner": "VisualCoreSimulation + VisualCoreExperience + VisualCoreExperienceHost"
+  },
+  {
+   "area": "Accessibility, contrast and screen care",
+   "description": "AccessibilityPreferences resolves Reduce Motion and Reduce Flashing against SystemAccessibility (observed by SystemAccessibilityObserver); AnnouncementPlanner rate-limits announcements and AnnouncementSink speaks them; StateSign and stateSignProblems keep information independent of colour; transitionDuration shortens animations under Reduce Motion; AccessibleColors.contrastRatio gives the WCAG ratio (1 to 21) of two colours. In-scene dimming exists only in Digital Aquarium (AmbientDimmer, public in its Core, A09-P05), which never touches the system brightness or the idle timer; no pixel-drift helper exists anywhere.",
+   "paths": [
+    "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPreferences.swift",
+    "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreUI/SystemAccessibilityObserver.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreUI/AccessibilityPlayers.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreUI/AccessibilitySettingsSection.swift",
+    "Packages/ExperiencesCreative/DigitalAquarium/Core/AmbientDimmer.swift"
+   ],
+   "owner": "VisualCoreSimulation + VisualCoreUI"
+  },
+  {
+   "area": "Persistence and storage",
+   "description": "DocumentStore writes versioned documents (DocumentEnvelope kind and schemaVersion) atomically under a byte cap (maxBytes) and migrates them forward through a MigrationChain, reporting damaged or newer files as problems instead of crashing; NamedLibrary keeps named documents with save, duplicate, rename, setFavorite and delete, favourites first; ExperienceStorage is the experience's own folder with StorageQuota.",
+   "paths": [
+    "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
+    "Packages/VisualCore/Sources/VisualCorePersistence/Envelope.swift",
+    "Packages/VisualCore/Sources/VisualCorePersistence/Migration.swift",
+    "Packages/VisualCore/Sources/VisualCorePersistence/NamedLibrary.swift",
+    "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+    "Packages/VisualCore/Sources/VisualCoreExperience/SavedStateStore.swift"
+   ],
+   "owner": "VisualCorePersistence + VisualCoreExperience"
+  },
+  {
+   "area": "Experience host",
+   "description": "ExperienceSession opens, checkpoints, closes and recovers an Experience on one RenderHost, applies the quality level (QualityGovernor over the experience's QualityProfile, fed by DeviceConditions thermal state and Low Power Mode), memory and scene-phase events, and keeps a PerformanceRecord (frame cap, render scale, GPU bytes) for measured claims; ExperienceShell adapts an ExperiencePresenter (scene, controls, canvas overlay through makeCanvasOverlay) to Experience; ExperienceCore is the GPU-free state with its qualityTiers; ScenarioRunner replays a ScenarioManifest; the one app registers experiences in ExperienceRegistry and Catalog/registrations.json (seventeen registered, A01-A17, checked 2026-11-16; Ambient Clock joins in A18-P01 and stays unregistered and unavailable in A18-P00; scripts/check_experience_packages.py forbids unregistered targets). Version 0.1 needs no permission and no usage string.",
+   "paths": [
+    "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceShell.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceFeedback.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ScenarioRunner.swift",
+    "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceCore.swift",
+    "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+    "Packages/VisualCore/Sources/VisualCoreExperience/ScenarioManifest.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/PerformanceRecord.swift",
+    "Apps/VisualCore/App/ExperienceRegistry.swift",
+    "Catalog/registrations.json",
+    "scripts/check_experience_packages.py",
+    "project.yml"
+   ],
+   "owner": "VisualCoreExperience + VisualCoreExperienceHost + the one app"
+  },
+  {
+   "area": "Build and release steps",
+   "description": "XcodeGen spec project.yml for the one app (target VisualCore), package schemes via scripts/xcodebuild_package.py, app tests via scripts/xcodebuild_app.py, and scripts/release_check.py: 143 named steps listed by --list on 2026-11-16 (shared checks including app-contracts, which checks every docs/apps/*/visualcore-contract.json, package and app builds and tests, experience-release and copy-claims steps of the released experiences, verify steps of A01-A17 on iOS 27 and 26, release audits of the one app, the seven reference regression steps and the ProjectM independence check). No release scan refuses isIdleTimerDisabled or a screen-brightness write today (grep of scripts/ 2026-11-16); the A18 release step adds one (G-RELEASE).",
+   "paths": [
+    "project.yml",
+    "scripts/release_check.py",
+    "scripts/xcodebuild_package.py",
+    "scripts/xcodebuild_app.py",
+    "scripts/check_app_contract.py",
+    "scripts/check_licenses.py",
+    "scripts/check_copy_claims.py",
+    ".github/workflows/ci.yml"
+   ],
+   "owner": "repository tooling"
+  },
+  {
+   "area": "Source ownership",
+   "description": "Ambient Clock owns its domain (clock preferences: 12/24 hours, seconds, calendar, time-zone and locale policy; the formatter and the full spoken time; the update schedule on second or minute boundaries and on time-change notifications; the four themes and their presets; the theme editor and favourite documents with their schema; night-mode, motion, screen-care and keep-awake policies; budgets per tier; copy) and UI under Packages/ExperiencesCreative/AmbientClock/ (Core GPU-free, CoreTests, Experience with Adapter/, ExperienceTests, Shaders, scenario-manifest.json; created in A18-P01, not present today). VisualCore owns reusable machinery: full-screen shaders, fields, the GLSL library, particles and render targets (VisualCoreRendering), animation clocks and accessibility planning (VisualCoreSimulation), persistence (VisualCorePersistence), storage, digests and the host (VisualCoreExperience, VisualCoreExperienceHost), quality and pacing (VisualCoreDiagnostics). Solar System Explorer's injected clock, Digital Aquarium's AmbientDimmer and the foreground observers of other experiences stay experience code and are not copied. ProjectM stays in the harness.",
+   "paths": [
+    ".specify/memory/constitution.md",
+    "Auto-Creator.md",
+    "docs/decisions/ADR-0009-unified-app.md",
+    "Packages/ExperiencesCreative/Package.swift",
+    "specs/130-ac-p00-boundary-audit/spec.md"
+   ],
+   "owner": "constitution + ADR-0009"
+  },
+  {
+   "area": "ProjectM reference regression",
+   "description": "Reference pinned at d93edd1, read-only; scripts/run_reference_baseline.py lists the ordered reference steps; scripts/check_reference_clean.py checks the submodule; the 7 release-check steps run in two chunks via release_check.py --only (reference-engine-xcframework, reference-build-projectm-ios-sim, reference-clean; reference-test-anglerendering-ios27, reference-test-anglerendering-ios26, projectm-reference-ios27, projectm-reference-ios26), recorded in docs/apps/ambient-clock/regression-baseline.md.",
+   "paths": [
+    "scripts/run_reference_baseline.py",
+    "scripts/check_reference_clean.py",
+    "Harnesses/ProjectMReference/ProjectMReference.yml",
+    "docs/apps/ambient-clock/regression-baseline.md",
+    "specs/130-ac-p00-boundary-audit/research.md"
+   ],
+   "owner": "reference adapter (harness only)"
+  },
+  {
+   "area": "Determinism and budgets",
+   "description": "StateDigest fingerprints experience state so the same preferences, theme and injected date give the same digest; ScenarioManifest and ScenarioRunner replay recorded steps with fixed dates; QualityProfile levels carry resolution, element, iteration and effect-pass shares; QualityGovernor and FramePacing step quality and frame cap down under heat and Low Power Mode; ParticleSystem has a fixed capacity; DocumentStore.maxBytes and StorageQuota bound storage.",
+   "paths": [
+    "Packages/VisualCore/Sources/VisualCoreExperience/StateDigest.swift",
+    "Packages/VisualCore/Sources/VisualCoreExperience/ScenarioManifest.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityProfile.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityGovernor.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/FramePacing.swift",
+    "Packages/VisualCore/Sources/VisualCoreSimulation/ParticleSystem.swift",
+    "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
+    "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift"
+   ],
+   "owner": "VisualCoreExperience + VisualCoreDiagnostics"
+  }
+ ],
+ "matrix": [
+  {
+   "id": "M01",
+   "capability": "Shader backgrounds: procedural full-screen backgrounds drawn by bundled GLSL over the canvas through RenderHost, with named uniforms, a palette of colour stops and the vc/ noise, SDF, hash and colour library; fields for flowing backgrounds",
+   "source": "brainstorm: shader backgrounds; constitution A18 visuals are code",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+     "symbol": "FullScreenShaderScene",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+     "symbol": "FullScreenShaderScene.parameters",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+     "symbol": "FullScreenShaderScene.palette",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+     "symbol": "FieldPass",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderBundle.swift",
+     "symbol": "ShaderBundle.visualCoreLibrary",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreShaderSource/ShaderLibrary.swift",
+     "symbol": "ShaderLibrary",
+     "product": "VisualCoreShaderSource",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+     "symbol": "RenderHost",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/DigitalAquarium/Experience/CausticsScene.swift",
+    "symbol": "CausticsScene"
+   },
+   "notes": "Tested in FullScreenShaderSceneTests, FieldPassTests, ShaderBundleTests, ShaderLibraryTests, ShaderHashParityTests and SymmetryParityTests. Generative Art Studio, Fractal Explorer and Digital Aquarium draw full-screen shader scenes this way; Fluid Art Playground and Simulation Lab use FieldPass. The four clock themes are G-THEMES (M07)."
+  },
+  {
+   "id": "M02",
+   "capability": "Animation: theme motion driven by an animation clock separate from wall time (play, pause, speed, Reduce Motion factor), scenes rendered at an explicit time, CPU particles drawn with blend modes and trails",
+   "source": "brainstorm: animation; manual §6 rule: display animation time is never the wall clock",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreSimulation/SceneClock.swift",
+     "symbol": "SceneClock",
+     "product": "VisualCoreSimulation",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreSimulation/SceneClock.swift",
+     "symbol": "SceneClock.reducedMotionFactor",
+     "product": "VisualCoreSimulation",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+     "symbol": "FullScreenShaderScene.fixedTime",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreSimulation/ParticleSystem.swift",
+     "symbol": "ParticleSystem",
+     "product": "VisualCoreSimulation",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ParticleLayerScene.swift",
+     "symbol": "ParticleLayerScene",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ParticleRenderer.swift",
+     "symbol": "ParticleRenderer",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPreferences.swift",
+     "symbol": "EffectiveAccessibility.playbackRate",
+     "product": "VisualCoreSimulation",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/ClockedArtScene.swift",
+    "symbol": "ClockedArtScene"
+   },
+   "notes": "Tested in SceneClockTests, FullScreenShaderSceneTests (fixedTime), ParticleSystemTests, ParticleLayerSceneTests, ParticleRendererTests and AccessibilityPreferencesTests. FullScreenShaderScene.timeScale is public but no test names it (grep 2026-11-16), so the themes drive time through SceneClock and fixedTime. The wall clock never drives animation (M12)."
+  },
+  {
+   "id": "M03",
+   "capability": "Typography integration: the time and date drawn as native text with system fonts over the shader background, legible on every theme, laid out for portrait and landscape and for 12/24 hours with and without seconds",
+   "source": "brainstorm: typography integration; manual §6 rule 3 (text in native UI over the background)",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+     "symbol": "makeCanvasOverlay",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+     "symbol": "ExperiencePresenter",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AccessibilitySettingsSection.swift",
+     "symbol": "AccessibleColors.contrastRatio",
+     "product": "VisualCoreUI",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/MolecularExplorer/Experience/MoleculeOverlay.swift",
+    "symbol": "MoleculeOverlay"
+   },
+   "notes": "Framework part tested: CanvasOverlayTests (a presenter's overlay reaches the shell; the host view builds with and without one) and AccessibilitySettingsSectionTests (contrastRatio). No text is drawn in the GPU path, by design: the overlay keeps the time readable when rendering pauses or fails (manual §6). The clock overlay, its layouts and the contrast rule over each theme are G-OVERLAY (A18-P02); the text itself comes from G-FORMAT (A18-P01)."
+  },
+  {
+   "id": "M04",
+   "capability": "Scene transitions: switching themes with a short crossfade between two full-screen scenes (a cut under Reduce Motion), without a frame of black and without rebuilding the clock text",
+   "source": "brainstorm: scene transitions",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+     "symbol": "RenderHost.replaceScene",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+     "symbol": "ResourceRegistry.makeRenderTarget",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+     "symbol": "RenderTarget",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+     "symbol": "FieldPass",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
+     "symbol": "transitionDuration",
+     "product": "VisualCoreSimulation",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/GenerativeArtPresenter.swift",
+    "symbol": "ArtCanvasScene"
+   },
+   "notes": "Tested in RenderHostTests and ShellLifecycleTests (replaceScene), ResourceRegistryTests, FieldPassTests and AccessibilityPlansTests (transitionDuration). replaceScene and Generative Art Studio's ArtCanvasScene swap scenes as a hard cut; no crossfade exists in any framework product (grep 2026-11-16). Two render targets and a mix pass would build one; a generic crossfade between full-screen scenes is G-TRANSITION (VisualCoreRendering, assessed in A18-P03)."
+  },
+  {
+   "id": "M05",
+   "capability": "Configuration and presets: each theme's parameters with declared ranges, palettes, quality and motion settings as named presets; built-in presets plus saved favourites",
+   "source": "brainstorm: configuration and presets",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreParameters/ParameterSchema.swift",
+     "symbol": "ParameterSchema",
+     "product": "VisualCoreParameters",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreParameters/Palette.swift",
+     "symbol": "Palette",
+     "product": "VisualCoreParameters",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/NamedLibrary.swift",
+     "symbol": "NamedLibrary",
+     "product": "VisualCorePersistence",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/NamedLibrary.swift",
+     "symbol": "NamedLibrary.setFavorite",
+     "product": "VisualCorePersistence",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Core/SceneFamily.swift",
+    "symbol": "SceneFamily"
+   },
+   "notes": "Tested in ParametersTests, ParameterEditorTests, ParameterPanelTests and NamedLibraryTests. The machinery exists; the ThemePreset model (shader id, palette, speed, contrast, quality) and the built-in presets are G-THEMES (A18-P03), the saved favourites G-FAVOURITES (A18-P03)."
+  },
+  {
+   "id": "M06",
+   "capability": "Version 0.1 feature 01: accurate, locale-aware time and date from the system calendar, locale and time zone, entering the experience through an injected clock so tests and replays use fixed dates",
+   "source": "manual v0.1 feature 01; constitution A18 time is the system's; spec clarification 5",
+   "status": "upstream gap",
+   "evidence": [],
+   "example": {
+    "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Experience/Adapter/SolarCore.swift",
+    "symbol": "SolarCore"
+   },
+   "notes": "No framework product reads the wall clock, calendar, locale or time zone for an experience (grep 2026-11-16). Solar System Explorer injects now: () -> Date and sends it as its date.set action (experience code, not reusable). The injectable clock source is G-CLOCK (VisualCoreExperience, A18-P01, second consumer A14's Now); the formatting with Foundation's Calendar, Locale and TimeZone is G-FORMAT (app-local, A18-P01)."
+  },
+  {
+   "id": "M07",
+   "capability": "Version 0.1 feature 02: four procedural themes (a noise gradient, a particle drift, a wave field and SDF shapes) with quality and motion controls",
+   "source": "manual v0.1 feature 02; spec clarification 5",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+     "symbol": "FullScreenShaderScene",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+     "symbol": "FieldPass",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ParticleLayerScene.swift",
+     "symbol": "ParticleLayerScene",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityProfile.swift",
+     "symbol": "QualityProfile",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPreferences.swift",
+     "symbol": "AccessibilityPreferences",
+     "product": "VisualCoreSimulation",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/GenerativeArtPresenter.swift",
+    "symbol": "GenerativeArtPresenter"
+   },
+   "notes": "Every drawing piece is public and tested (FullScreenShaderSceneTests, FieldPassTests, ParticleLayerSceneTests, QualityProfileTests, AccessibilityPreferencesTests). The themes' shaders, uniforms and per-tier settings are app content: the first theme is G-OVERLAY (A18-P02), the other three G-THEMES (A18-P03)."
+  },
+  {
+   "id": "M08",
+   "capability": "Version 0.1 feature 03: readable 12/24-hour typography with optional seconds, following the system's 24-hour setting unless the user overrides it",
+   "source": "manual v0.1 feature 03",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+     "symbol": "makeCanvasOverlay",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+     "symbol": "ExperienceSession",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/SimulationLab/Experience/SimulationLegend.swift",
+    "symbol": "SimulationLegendOverlay"
+   },
+   "notes": "The overlay exists (CanvasOverlayTests); the format model (ClockPreferences, 12/24 hours, seconds, locale policy) and the formatter are G-FORMAT (A18-P01), the spoken form and Dynamic Type G-TIMEA11Y (A18-P01), the drawn layout G-OVERLAY (A18-P02)."
+  },
+  {
+   "id": "M09",
+   "capability": "Version 0.1 feature 04: a theme editor with saveable favourites: edit a theme's parameters and palette within their ranges, save, rename, duplicate, favourite and delete named themes",
+   "source": "manual v0.1 feature 04",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/NamedLibrary.swift",
+     "symbol": "NamedLibrary",
+     "product": "VisualCorePersistence",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/NamedLibrary.swift",
+     "symbol": "NamedLibrary.save",
+     "product": "VisualCorePersistence",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/NamedLibrary.swift",
+     "symbol": "NamedLibrary.setFavorite",
+     "product": "VisualCorePersistence",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreParameters/ParameterSchema.swift",
+     "symbol": "ParameterSchema",
+     "product": "VisualCoreParameters",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreParameters/Palette.swift",
+     "symbol": "Palette",
+     "product": "VisualCoreParameters",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalBookmarks.swift",
+    "symbol": "FractalBookmarks"
+   },
+   "notes": "Tested in NamedLibraryTests, ParametersTests and ParameterEditorTests. Fractal Explorer keeps bookmarks in a NamedLibrary this way. The theme document, its schema, validation and the editor are G-FAVOURITES (A18-P03)."
+  },
+  {
+   "id": "M10",
+   "capability": "Version 0.1 feature 05: a brightness-friendly night mode (dimmed, warm or red-shifted drawing, lower frame rate, contrast kept) and a motion-reduction option that stills the animated themes",
+   "source": "manual v0.1 feature 05; constitution A18 bounded and accessibility",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ParticleLayerScene.swift",
+     "symbol": "ParticleLayerScene.brightnessCap",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+     "symbol": "FullScreenShaderScene.palette",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/FramePacing.swift",
+     "symbol": "FramePacing",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPreferences.swift",
+     "symbol": "AccessibilityPreferences",
+     "product": "VisualCoreSimulation",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
+     "symbol": "transitionDuration",
+     "product": "VisualCoreSimulation",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreSimulation/SceneClock.swift",
+     "symbol": "SceneClock.reducedMotion",
+     "product": "VisualCoreSimulation",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/DigitalAquarium/Core/AmbientDimmer.swift",
+    "symbol": "AmbientDimmer"
+   },
+   "notes": "Tested in ParticleLayerSceneTests (brightnessCap), FullScreenShaderSceneTests, FramePacingTests, AccessibilityPreferencesTests, AccessibilityPlansTests and SceneClockTests. The night-mode rule is G-NIGHT (app-local, A18-P04), the motion option G-MOTION (A18-P04); a lower frame rate needs G-FRAMERATE (M21). Digital Aquarium's AmbientDimmer shows in-scene dimming without touching the system brightness (experience code, not copied)."
+  },
+  {
+   "id": "M11",
+   "capability": "Version 0.1 feature 06: correct display at once after returning to the foreground and after time-zone, daylight-saving, locale and significant time changes",
+   "source": "manual v0.1 feature 06; manual §6 rule 2",
+   "status": "upstream gap",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/SessionLifecycle.swift",
+     "symbol": "ScenePhaseInput",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+     "symbol": "ExperienceSession.setScenePhase",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceShell.swift",
+     "symbol": "ExperienceShell.resume",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/MusicLabPresenter.swift",
+    "symbol": "MusicLabPresenter"
+   },
+   "notes": "Scene phase reaches an experience (SessionPhaseMemoryTests, SessionRestoreTests, ShellLifecycleTests), but no framework product observes significantTimeChange, NSSystemTimeZoneDidChange or currentLocaleDidChange (grep 2026-11-16). Music Lab, Oscilloscope Studio and Audio Odyssey observe willEnterForeground in their own presenters. Time-change observation is part of G-CLOCK (A18-P01)."
+  },
+  {
+   "id": "M12",
+   "capability": "Injected clock: the only reader of the system clock is one injectable source (system by default, fixed in tests and replays); the time enters the state as an action (time.set) on each shown second or minute and after each time change; animation time never stands in for wall time",
+   "source": "constitution A18 time is the system's; spec clarification 5; manual §13 risk 2",
+   "status": "upstream gap",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ScenarioManifest.swift",
+     "symbol": "ScenarioManifest",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/StateDigest.swift",
+     "symbol": "StateDigest",
+     "product": "VisualCoreExperience",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Experience/SolarSystemExplorerExperience.swift",
+    "symbol": "SolarSystemExplorerExperience"
+   },
+   "notes": "Replays and digests exist (ScenarioManifestTests, StateDigestTests), but no clock source does. Solar System Explorer injects now: () -> Date through SolarSystemExplorerExperience (experience-only). G-CLOCK assesses a generic injectable clock source with time-change observation for VisualCoreExperience in A18-P01 (two consumers: A14's Now and A18)."
+  },
+  {
+   "id": "M13",
+   "capability": "Time-change handling: foreground return, time zone, daylight-saving transitions, locale and calendar changes, significant time change (midnight, clock set) each re-read the time and reschedule the next tick on the next second or minute boundary",
+   "source": "spec FR-A18-003; manual §6 rules 1-2; manual §13 risk 2",
+   "status": "upstream gap",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/SessionLifecycle.swift",
+     "symbol": "ScenePhaseInput",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceShell.swift",
+     "symbol": "ExperienceShell.suspend",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/OscilloscopeStudio/Experience/ScopePresenter.swift",
+    "symbol": "ScopePresenter"
+   },
+   "notes": "Only the foreground signal exists in the host; the notification set and the boundary schedule are G-CLOCK (observation, VisualCoreExperience assessed) and G-FORMAT (the next-tick deadline, app-local), both A18-P01. Fixtures cover a DST jump, a time-zone change, a locale change and midnight with fixed dates."
+  },
+  {
+   "id": "M14",
+   "capability": "Text via the canvas overlay: native SwiftUI text over the render canvas from a presenter, outside the GPU path, hit-testable and accessible",
+   "source": "spec clarification 5; manual §4 contracts (native overlays separate from shader drawing)",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+     "symbol": "makeCanvasOverlay",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+     "symbol": "ExperiencePresenter",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceShell.swift",
+     "symbol": "ExperienceShell",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/SimulationLab/Experience/SimulationLegend.swift",
+    "symbol": "SimulationLegendOverlay"
+   },
+   "notes": "Tested in CanvasOverlayTests; Simulation Lab and Molecular Explorer draw overlays this way. The overlay is the text-over-shader path of the decision."
+  },
+  {
+   "id": "M15",
+   "capability": "Contrast: the time stays readable over every theme and in night mode, checked as a WCAG contrast ratio between the text colour and the theme's brightest and darkest palette stops (or a scrim)",
+   "source": "constitution A18 accessibility; spec FR-A18-003",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AccessibilitySettingsSection.swift",
+     "symbol": "AccessibleColors.contrastRatio",
+     "product": "VisualCoreUI",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+     "symbol": "FullScreenShaderScene.palette",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/AdjustPanel.swift",
+    "symbol": "AdjustPanel"
+   },
+   "notes": "contrastRatio is tested (AccessibilitySettingsSectionTests) for two UIColors; a rule over an animated background (palette bounds, scrim) is app work: G-OVERLAY (A18-P02) for day themes, G-NIGHT (A18-P04) for night mode."
+  },
+  {
+   "id": "M16",
+   "capability": "Dynamic Type and VoiceOver: the time scales with Dynamic Type, is always spoken in full (hours, minutes, AM/PM or 24-hour, date), minute changes are not announced more often than the planner allows, every control has a VoiceOver label",
+   "source": "constitution A18 accessibility; spec FR-A18-003",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
+     "symbol": "AnnouncementPlanner",
+     "product": "VisualCoreSimulation",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPreferences.swift",
+     "symbol": "AccessibilityPreferences",
+     "product": "VisualCoreSimulation",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/SystemAccessibilityObserver.swift",
+     "symbol": "SystemAccessibilityObserver",
+     "product": "VisualCoreUI",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AccessibilityPlayers.swift",
+     "symbol": "AnnouncementSink",
+     "product": "VisualCoreUI",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
+     "symbol": "StateSign",
+     "product": "VisualCoreSimulation",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/NeonArcade/Experience/ArcadePresenter.swift",
+    "symbol": "ArcadePresenter"
+   },
+   "notes": "Tested in AccessibilityPlansTests, AccessibilityPreferencesTests, SystemAccessibilityObserverTests and AccessibilityPlayersTests. No framework helper for Dynamic Type exists; system fonts in the SwiftUI overlay provide it. The spoken time, labels and announcement policy are G-TIMEA11Y (A18-P01). System accessibility audits wait for device testing."
+  },
+  {
+   "id": "M17",
+   "capability": "Favourites with schema and migration: favourite themes stored as named, versioned documents in the experience's storage, migrated forward, damaged or newer files reported without a crash, capped in count and bytes",
+   "source": "constitution A18 bounded (favourites have a cap); spec FR-A18-003",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/NamedLibrary.swift",
+     "symbol": "NamedLibrary",
+     "product": "VisualCorePersistence",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/NamedLibrary.swift",
+     "symbol": "NamedLibrary.setFavorite",
+     "product": "VisualCorePersistence",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/Envelope.swift",
+     "symbol": "DocumentEnvelope",
+     "product": "VisualCorePersistence",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/Migration.swift",
+     "symbol": "MigrationChain",
+     "product": "VisualCorePersistence",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
+     "symbol": "DocumentStore.maxBytes",
+     "product": "VisualCorePersistence",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+     "symbol": "ExperienceStorage",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+     "symbol": "StorageQuota",
+     "product": "VisualCoreExperience",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalBookmarks.swift",
+    "symbol": "FractalBookmarks"
+   },
+   "notes": "Tested in NamedLibraryTests, DocumentStoreTests (envelope, schema version, migration, byte cap) and ExperienceStorageTests. The theme schema and the count cap are G-FAVOURITES."
+  },
+  {
+   "id": "M18",
+   "capability": "Quality tiers: the governor fed by thermal state and Low Power Mode, declared tiers matching the presenter's levels, the frame cap and render scale from FramePacing",
+   "source": "constitution A18 bounded; spec FR-A18-003",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityProfile.swift",
+     "symbol": "QualityProfile",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityProfile.swift",
+     "symbol": "QualityLevel",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityGovernor.swift",
+     "symbol": "QualityGovernor",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/DeviceConditions.swift",
+     "symbol": "DeviceConditions",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/FramePacing.swift",
+     "symbol": "FramePacing",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceCore.swift",
+     "symbol": "ExperienceCore.qualityTiers",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+     "symbol": "ExperienceSession.refreshQuality",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/Adapter/FluidArtCore.swift",
+    "symbol": "FluidArtCore"
+   },
+   "notes": "Tested in QualityProfileTests, QualityDeclarationTests, QualityGovernorTests, FramePacingTests and SessionQualityTests. Core.qualityTiers must match the presenter's levels (earlier-gate lesson)."
+  },
+  {
+   "id": "M19",
+   "capability": "Budgets per quality level: frame cost, shader iterations, particle count and resolution share fixed per tier for each theme, the night tier the cheapest",
+   "source": "constitution A18 bounded; spec FR-A18-003 frame and particle budgets",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityProfile.swift",
+     "symbol": "QualityLevel",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreSimulation/ParticleSystem.swift",
+     "symbol": "ParticleSystem.capacity",
+     "product": "VisualCoreSimulation",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+     "symbol": "ResourceRegistry",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/Adapter/FluidArtCore.swift",
+    "symbol": "FluidArtCore"
+   },
+   "notes": "The budget types are tested (QualityProfileTests, ParticleSystemTests, LiveLimitTests, ResourceRegistryTests); the numbers per theme and tier are app data: G-BUDGETS (A18-P02). Absolute frame-time or battery targets come only from the device campaign (G-DEVICE)."
+  },
+  {
+   "id": "M20",
+   "capability": "Night mode drawn in the scene: dimming, warming and red shift applied to the theme's palette and brightness cap inside the drawing; the system screen brightness is never set",
+   "source": "spec clarification 4; constitution A18 bounded",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ParticleLayerScene.swift",
+     "symbol": "ParticleLayerScene.brightnessCap",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+     "symbol": "FullScreenShaderScene.palette",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+     "symbol": "FullScreenShaderScene.parameters",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/DigitalAquarium/Core/AmbientDimmer.swift",
+    "symbol": "AmbientDimmer"
+   },
+   "notes": "The drawing hooks are tested (ParticleLayerSceneTests, FullScreenShaderSceneTests). No night-mode helper exists in a framework product; the rule (schedule or manual, dim level, warm palette, contrast floor) is G-NIGHT (app-local, A18-P04)."
+  },
+  {
+   "id": "M21",
+   "capability": "Lower frame rate: night mode and still themes ask for a lower frame cap (for example 30 fps) than the host's default, without changing correctness",
+   "source": "spec FR-A18-003 night mode lower frame rate; manual §12 dynamic frame cadence",
+   "status": "upstream gap",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/FramePacing.swift",
+     "symbol": "FramePacing",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/FramePacing.swift",
+     "symbol": "FramePacing.maxFPS",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+     "symbol": "RenderHost.framePacing",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FrameScheduler.swift",
+    "symbol": "FrameScheduler"
+   },
+   "notes": "RenderHost.init takes maxFramesPerSecond and FramePacing caps it (FramePacingTests, SessionPerformanceTests read host.framePacing.maxFPS), but ExperienceSession builds its host with the default and no experience can request a cap (grep 2026-11-16). An experience-declared frame cap through the session is G-FRAMERATE (VisualCoreExperienceHost, assessed in A18-P04)."
+  },
+  {
+   "id": "M22",
+   "capability": "Screen care: a slow, bounded pixel drift of the clock text and scene and an idle dimming protect OLED screens over long sessions; Reduce Motion keeps the drift imperceptible",
+   "source": "constitution A18 screen care; manual §13 risk 1",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ParticleLayerScene.swift",
+     "symbol": "ParticleLayerScene.brightnessCap",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+     "symbol": "FullScreenShaderScene.seedOffsets",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+     "symbol": "makeCanvasOverlay",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/DigitalAquarium/Core/AmbientDimmer.swift",
+    "symbol": "AmbientDimmer"
+   },
+   "notes": "Dimming hooks and the overlay are tested; no pixel-drift helper exists anywhere and in-scene dimming exists only in Digital Aquarium's AmbientDimmer. The drift and dimming policy is G-SCREENCARE (app-local, A18-P04; a generic drift is assessed for VisualCoreSimulation there if a second consumer exists); overnight verification is G-DEVICE (A18-P05)."
+  },
+  {
+   "id": "M23",
+   "capability": "Opt-in keep-awake: a setting 'Keep the screen on while the clock is open', off by default; while on and visible the experience asks the system to keep the screen awake and releases the request on background, close and teardown; never a screen-on guarantee",
+   "source": "spec clarification 4; manual non-goals",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/SessionLifecycle.swift",
+     "symbol": "ScenePhaseInput",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+     "symbol": "ExperienceSession.setScenePhase",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceShell.swift",
+     "symbol": "ExperienceShell.suspend",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+     "symbol": "ExperienceSession.close",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/DigitalAquarium/Experience/AquariumPresenter.swift",
+    "symbol": "AquariumPresenter"
+   },
+   "notes": "The release points (scene phase, suspend, close) are tested (SessionPhaseMemoryTests, ShellLifecycleTests, SessionOpenCloseTests). No keep-awake API exists in a framework product and no experience sets isIdleTimerDisabled today. The request in one named file and its scan exception are G-AWAKE (app-local, A18-P04) and G-RELEASE (A18-P06)."
+  },
+  {
+   "id": "M24",
+   "capability": "Lifecycle with resize and context loss: context loss, resize, background and memory warning rebuild every GPU object from CPU state; nothing renders in the background; the time is re-read on return",
+   "source": "constitution A18 consumer; spec FR-A18-003; manual non-goals (no background rendering)",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+     "symbol": "RenderHost.recreateContext",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+     "symbol": "RenderHost.pause",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+     "symbol": "FullScreenShaderScene.resize",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+     "symbol": "ResourceRegistry",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+     "symbol": "ExperienceSession.handleMemoryWarning",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+     "symbol": "ExperienceSession.checkpoint",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreSimulation/PlaybackState.swift",
+     "symbol": "PlaybackState.enterBackground",
+     "product": "VisualCoreSimulation",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/GenerativeArtPresenter.swift",
+    "symbol": "GenerativeArtPresenter"
+   },
+   "notes": "Tested in RenderHostTests, ResourceRegistryTests, FullScreenShaderSceneTests, ShellRenderingTests, SessionPhaseMemoryTests, SessionRestoreTests and PlaybackStateTests. Re-reading the time on return is G-CLOCK (M11)."
+  },
+  {
+   "id": "M25",
+   "capability": "Licenses: every theme, palette and shader records its source and license in the license inventory; fonts are the system's",
+   "source": "constitution A18 licenses",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AcknowledgementsView.swift",
+     "symbol": "LicenseInventory",
+     "product": "VisualCoreUI",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AcknowledgementsView.swift",
+     "symbol": "AcknowledgementsView",
+     "product": "VisualCoreUI",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/DigitalAquarium/Core/LicenseAudit.swift",
+    "symbol": "LicenseAudit"
+   },
+   "notes": "Tested in AcknowledgementsViewTests; scripts/check_licenses.py runs in the release check. The A18 shader entries come with the themes (G-THEMES)."
+  },
+  {
+   "id": "M26",
+   "capability": "Truthful claims: performance, battery and thermal numbers only from device measurements; copy never claims more accuracy than the system clock, an always-on screen or a weather forecast",
+   "source": "constitution A18 truthful claims; manual non-goals",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/PerformanceRecord.swift",
+     "symbol": "PerformanceRecord",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+     "symbol": "ExperienceSession.performanceRecord",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Core/ScientificReview.swift",
+    "symbol": "ScientificReview"
+   },
+   "notes": "PerformanceRecord is tested (SessionPerformanceTests). No claim checker exists in a framework product other than the repository's scripts/check_copy_claims.py release step. Device measurements are G-DEVICE (A18-P05); the A18 copy-claims step is G-RELEASE (A18-P06)."
+  },
+  {
+   "id": "M27",
+   "capability": "Experience host: session, shell, presenter with the canvas overlay, feedback and scenario runner in the one app, no new target",
+   "source": "ADR-0009; spec FR-A18-005",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+     "symbol": "ExperienceSession",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceShell.swift",
+     "symbol": "ExperienceShell",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+     "symbol": "ExperiencePresenter",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+     "symbol": "makeCanvasOverlay",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/SimulationLab/Experience/SimulationPresenter.swift",
+    "symbol": "SimulationPresenter"
+   },
+   "notes": "Tested in SessionOpenCloseTests, ShellLifecycleTests, ShellRenderingTests, CanvasOverlayTests and ScenarioRunnerTests."
+  },
+  {
+   "id": "M28",
+   "capability": "Determinism and GPU-free testability: the same preferences, theme and injected date give the same state digest and the same text; formatting, documents, night-mode and motion rules and the schedule are pure models tested with swift test",
+   "source": "constitution A18 testable without the GPU",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/StateDigest.swift",
+     "symbol": "StateDigest",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ScenarioManifest.swift",
+     "symbol": "ScenarioManifest",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceCore.swift",
+     "symbol": "ExperienceCore",
+     "product": "VisualCoreExperience",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Experience/Adapter/SolarCore.swift",
+    "symbol": "SolarCore"
+   },
+   "notes": "Tested in StateDigestTests, ExperienceSnapshotTests and the ScenarioManifestTests. The injected date is G-CLOCK."
+  }
+ ],
+ "gaps": [
+  {
+   "id": "G-CLOCK",
+   "matrix": [
+    "M06",
+    "M11",
+    "M12",
+    "M13"
+   ],
+   "kind": "upstream",
+   "owner": "VisualCore:VisualCoreExperience",
+   "justification": "No framework product offers a wall-clock source or time-change observation. An injectable clock (system by default, fixed in tests) that also reports foreground return, significant time change, time-zone and locale changes has two consumers (A14's Now and A18), so it is assessed for VisualCoreExperience in A18-P01 (the observation side, needing UIKit notifications, in VisualCoreExperienceHost if required). If the assessment keeps it app-local, the experience implements the same contract in its Core without copying Solar System Explorer's code. The production path never offsets or simulates time.",
+   "phase": 1,
+   "test": "Host tests with a fixed clock: the source returns the injected date; each notification (foreground, significant time change, time zone, locale) emits one change event; the default reads the system clock; API baseline and documentation updated if it lands in VisualCore; the seven-step reference regression passes",
+   "closed": null
+  },
+  {
+   "id": "G-FORMAT",
+   "matrix": [
+    "M03",
+    "M06",
+    "M08",
+    "M13"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "ClockPreferences (12/24 hours or system, seconds, calendar, time-zone and locale policy) and the formatter over Foundation's Calendar, Locale, TimeZone and DateFormatter, plus the next-tick deadline on second or minute boundaries, are the clock's domain (manual phase 01).",
+   "phase": 1,
+   "test": "Core host tests with fixed dates: 12/24 hours in en_US, de_DE, ja_JP and ar; seconds on and off; the DST spring-forward and fall-back hours in a fixed zone; a time-zone change; midnight rollover; next-tick deadlines on boundaries; invalid preferences refused",
+   "closed": null
+  },
+  {
+   "id": "G-TIMEA11Y",
+   "matrix": [
+    "M08",
+    "M16"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "The time spoken in full, the VoiceOver labels, Dynamic Type sizes for the clock text and the announcement policy are the experience's UI over the public planners (manual phase 01).",
+   "phase": 1,
+   "test": "Core tests: the spoken string names hours, minutes and period or 24-hour form and the date for each test locale; announcements are rate-limited by AnnouncementPlanner; experience tests: the overlay's accessibility label equals the spoken string at every Dynamic Type size",
+   "closed": null
+  },
+  {
+   "id": "G-OVERLAY",
+   "matrix": [
+    "M03",
+    "M07",
+    "M08",
+    "M15"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "The native clock overlay (through makeCanvasOverlay), its layouts for portrait and landscape, the contrast rule against the theme's palette and the first shader theme (noise gradient) are app work over the public overlay and FullScreenShaderScene (manual phase 02).",
+   "phase": 2,
+   "test": "Core tests: the contrast ratio of the text against every palette stop of the first theme is at least 4.5 (contrastRatio); experience tests: the overlay shows the formatted time over a rendered frame; the text stays when the scene fails to compile",
+   "closed": null
+  },
+  {
+   "id": "G-BUDGETS",
+   "matrix": [
+    "M19"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "Resolution share, iteration and particle counts per quality tier for each theme are the experience's numbers over QualityLevel, ParticleSystem.capacity and ResourceBudget.",
+   "phase": 2,
+   "test": "Core tests: every theme's settings stay within each tier's budget; Core.qualityTiers matches the presenter's levels; over-budget presets refused with a typed reason",
+   "closed": null
+  },
+  {
+   "id": "G-THEMES",
+   "matrix": [
+    "M05",
+    "M07"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "The other three themes (particle drift, wave field, SDF shapes), the ThemePreset model with its quality and motion controls, the built-in presets and their license entries are content (manual phase 03).",
+   "phase": 3,
+   "test": "Core tests: four themes, each with valid presets inside declared ranges; experience tests: every theme compiles and renders a frame at every tier; each shader has a license entry",
+   "closed": null
+  },
+  {
+   "id": "G-TRANSITION",
+   "matrix": [
+    "M04"
+   ],
+   "kind": "upstream",
+   "owner": "VisualCore:VisualCoreRendering",
+   "justification": "replaceScene is a hard cut and no crossfade exists. A generic crossfade between two full-screen scenes (both rendered into render targets, mixed by a pass over a duration, cut under Reduce Motion) has consumers beyond A18 (Generative Art Studio switches families with a cut), so it is assessed for VisualCoreRendering in A18-P03 as an additive scene; existing scenes are unchanged. If not promoted, the experience composes it from public render targets and FieldPass; never a second renderer.",
+   "phase": 3,
+   "test": "Rendering tests: the mix at t=0 equals scene A, at t=1 scene B, midway the average within tolerance; no black frame; resize and context loss rebuild both targets; transitionDuration gives a cut under Reduce Motion; reference regression passes",
+   "closed": null
+  },
+  {
+   "id": "G-FAVOURITES",
+   "matrix": [
+    "M05",
+    "M09"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "The theme document (schema version, validation, migration), the editor and the favourites count cap are the experience's, stored in a NamedLibrary in its ExperienceStorage (manual phase 03).",
+   "phase": 3,
+   "test": "Core tests: a theme round-trips; an older schema migrates; damaged, oversized or newer documents are refused without a crash; the cap refuses one more favourite; names normalised",
+   "closed": null
+  },
+  {
+   "id": "G-NIGHT",
+   "matrix": [
+    "M10",
+    "M15",
+    "M20"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "Night mode (manual or scheduled, dim level, warm or red palette, lower brightness cap, contrast floor) is drawn in the scene; the system screen brightness is never set (spec clarification 4; manual phase 04).",
+   "phase": 4,
+   "test": "Core tests: night palettes keep contrast at least 4.5 with the text; brightness never above the cap; the schedule switches at its boundaries with fixed dates; a source scan finds no UIScreen brightness write",
+   "closed": null
+  },
+  {
+   "id": "G-MOTION",
+   "matrix": [
+    "M10"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "The motion-reduction option and Reduce Motion still the animated themes (SceneClock speed and reducedMotion, a still frame or very slow drift) as the experience's policy over AccessibilityPreferences.",
+   "phase": 4,
+   "test": "Core tests: with motion reduced the animation clock does not advance beyond the still rule; the system setting and the in-app option resolve through AccessibilityPreferences; transitions cut",
+   "closed": null
+  },
+  {
+   "id": "G-FRAMERATE",
+   "matrix": [
+    "M10",
+    "M21"
+   ],
+   "kind": "upstream",
+   "owner": "VisualCore:VisualCoreExperienceHost",
+   "justification": "An experience cannot lower its frame cap: ExperienceSession creates RenderHost with the default maxFramesPerSecond. An experience-declared cap (never below FramePacing.minimumFPS) is generic and is assessed for VisualCoreExperienceHost in A18-P04, additive with the default unchanged for every other experience.",
+   "phase": 4,
+   "test": "Host tests: a declared cap reaches host.framePacing.maxFPS; the default stays 60; Low Power Mode and heat still lower it; API baseline updated; reference regression passes",
+   "closed": null
+  },
+  {
+   "id": "G-SCREENCARE",
+   "matrix": [
+    "M22"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "A slow, bounded pixel drift of the text and scene and an idle dimming are the experience's screen-care policy (manual §13 risk 1); Digital Aquarium's AmbientDimmer is not copied, and a generic drift is assessed for VisualCoreSimulation in this phase only if a second consumer exists.",
+   "phase": 4,
+   "test": "Core tests with fixed dates: the drift offset stays within its bound, moves at most its rate per minute and is deterministic; dimming starts after the idle interval and a touch restores; Reduce Motion keeps the drift below its visible step",
+   "closed": null
+  },
+  {
+   "id": "G-AWAKE",
+   "matrix": [
+    "M23"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "The opt-in keep-awake setting (off by default) sets isIdleTimerDisabled only while the clock is visible, in exactly one named file of the experience, and releases it on background, close and teardown; the privacy page says so (spec clarification 4).",
+   "phase": 4,
+   "test": "Experience tests with an injected idle-timer port: on only when the setting is on and the clock is visible; off on background, close and teardown; a source scan finds isIdleTimerDisabled in exactly one file",
+   "closed": null
+  },
+  {
+   "id": "G-DEVICE",
+   "matrix": [
+    "M19",
+    "M22",
+    "M26"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "Overnight device tests (plugged in and on battery), thermal and frame-pacing records and the QA rows belong to the device campaign after ImplementationLock-100 (manual phase 05); device actions by the owner are BLOCKED_OWNER_ACTION.",
+   "phase": 5,
+   "test": "Device-campaign rows: an overnight run records PerformanceRecord frame cap, thermal state and memory; screen-care drift visible on the device; no claim without a measurement; rows pending until the campaign",
+   "closed": null
+  },
+  {
+   "id": "G-RELEASE",
+   "matrix": [
+    "M23",
+    "M26"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "Registration, the A18 copy-claims step (no accuracy beyond the system clock, no always-on, battery or weather claims), the idle-timer scan allowing isIdleTimerDisabled in only the one named file and refusing brightness writes, verify steps on iOS 27 and 26 and the release notes belong to the release phase (manual phase 06).",
+   "phase": 6,
+   "test": "Release-check steps: copy-claims-a18 and the idle-timer scan pass; verify-a18 steps pass on the iOS 27.x and 26.x simulators; the experience package check lists A18 as registered",
+   "closed": null
+  }
+ ],
+ "traceability": [
+  {
+   "item": "brainstorm: shader backgrounds",
+   "matrix": [
+    "M01",
+    "M07"
+   ],
+   "phases": [
+    2,
+    3
+   ]
+  },
+  {
+   "item": "brainstorm: animation",
+   "matrix": [
+    "M02",
+    "M10"
+   ],
+   "phases": [
+    2,
+    4
+   ]
+  },
+  {
+   "item": "brainstorm: typography integration",
+   "matrix": [
+    "M03",
+    "M08",
+    "M14",
+    "M15",
+    "M16"
+   ],
+   "phases": [
+    1,
+    2
+   ]
+  },
+  {
+   "item": "brainstorm: scene transitions",
+   "matrix": [
+    "M04"
+   ],
+   "phases": [
+    3
+   ]
+  },
+  {
+   "item": "brainstorm: configuration and presets",
+   "matrix": [
+    "M05",
+    "M09",
+    "M17"
+   ],
+   "phases": [
+    3
+   ]
+  },
+  {
+   "item": "v0.1 feature 01: accurate locale-aware time and date",
+   "matrix": [
+    "M06",
+    "M12"
+   ],
+   "phases": [
+    1
+   ]
+  },
+  {
+   "item": "v0.1 feature 02: four procedural themes with quality and motion controls",
+   "matrix": [
+    "M07",
+    "M01",
+    "M18",
+    "M19"
+   ],
+   "phases": [
+    2,
+    3
+   ]
+  },
+  {
+   "item": "v0.1 feature 03: readable 12/24-hour typography and optional seconds",
+   "matrix": [
+    "M08",
+    "M03",
+    "M16"
+   ],
+   "phases": [
+    1,
+    2
+   ]
+  },
+  {
+   "item": "v0.1 feature 04: theme editor with saveable favourites",
+   "matrix": [
+    "M09",
+    "M17"
+   ],
+   "phases": [
+    3
+   ]
+  },
+  {
+   "item": "v0.1 feature 05: night mode and motion reduction",
+   "matrix": [
+    "M10",
+    "M20",
+    "M21"
+   ],
+   "phases": [
+    4
+   ]
+  },
+  {
+   "item": "v0.1 feature 06: foreground, time-zone and DST updates",
+   "matrix": [
+    "M11",
+    "M13"
+   ],
+   "phases": [
+    1
+   ]
+  },
+  {
+   "item": "FR-A18-003: screen care and keep-awake",
+   "matrix": [
+    "M22",
+    "M23"
+   ],
+   "phases": [
+    4,
+    5,
+    6
+   ]
+  },
+  {
+   "item": "FR-A18-003: resize and context-loss rebuild",
+   "matrix": [
+    "M24"
+   ],
+   "phases": [
+    2
+   ]
+  },
+  {
+   "item": "constitution A18: licenses and truthful claims",
+   "matrix": [
+    "M25",
+    "M26"
+   ],
+   "phases": [
+    3,
+    5,
+    6
+   ]
+  },
+  {
+   "item": "constitution A18: testable without the GPU; determinism",
+   "matrix": [
+    "M28",
+    "M12"
+   ],
+   "phases": [
+    1
+   ]
+  },
+  {
+   "item": "ADR-0009: one app, experience host",
+   "matrix": [
+    "M27",
+    "M14"
+   ],
+   "phases": [
+    1,
+    6
+   ]
+  },
+  {
+   "item": "manual §13 risks 1-3",
+   "matrix": [
+    "M22",
+    "M21",
+    "M19",
+    "M12",
+    "M13",
+    "M06",
+    "M26"
+   ],
+   "phases": [
+    1,
+    4,
+    5,
+    6
+   ]
+  }
+ ],
+ "negative": [
+  {
+   "rule": "No EGL display, context, surface or GL path of its own; all drawing goes through VisualCore's RenderHost on OpenGL ES -> ANGLE -> Metal",
+   "source": "constitution A18 consumer, not fork; CLAUDE.md rule 4; spec FR-A18-006"
+  },
+  {
+   "rule": "No second renderer: every theme is drawn through FullScreenShaderScene, FieldPass, ParticleLayerScene or an additive VisualCore extension of that pipeline (G-TRANSITION); text is native SwiftUI in the canvas overlay, never a GPU text renderer of the experience",
+   "source": "constitution A18 consumer, not fork; CLAUDE.md rule 4; spec FR-A18-006"
+  },
+  {
+   "rule": "No ProjectM types, engine or presets and no ProjectM code reused",
+   "source": "CLAUDE.md rule 12; spec FR-A18-006"
+  },
+  {
+   "rule": "No networking, location, weather, accounts, analytics, tracking or advertising, and no permission or usage string; themes are bundled and favourites stay in the experience's storage",
+   "source": "constitution A18 offline-first and private; manual non-goals; CLAUDE.md rule 3; spec FR-A18-006"
+  },
+  {
+   "rule": "No simulated or offset clock in production: the shown time comes only from the system clock, calendar, locale and time zone through the injected source; fixed dates exist only in tests and scenario replays",
+   "source": "constitution A18 time is the system's; manual §13 risk 2; spec FR-A18-006"
+  },
+  {
+   "rule": "No screen-on guarantee: the experience may ask to stay awake only while visible and with the opt-in setting on, and its copy says the system may still lock the screen",
+   "source": "manual non-goals; spec clarification 4; spec FR-A18-006"
+  },
+  {
+   "rule": "No background rendering: nothing is drawn while the app is in the background; the time is re-read on return",
+   "source": "manual non-goals; spec FR-A18-006"
+  },
+  {
+   "rule": "No purchased, generated, scanned or photographic images: every theme is procedural (shaders, fields, particles, SDFs) and the typography uses system fonts",
+   "source": "CLAUDE.md rule 4; constitution A18 visuals are code; spec FR-A18-006"
+  },
+  {
+   "rule": "The system screen brightness is never set: night mode and dimming change only the drawing",
+   "source": "spec clarification 4; constitution A18 bounded"
+  },
+  {
+   "rule": "isIdleTimerDisabled is set only in one named file of the experience, only for the opt-in keep-awake setting, and released on background, close and teardown; no other experience sets it",
+   "source": "spec clarification 4"
+  },
+  {
+   "rule": "No alarm, timer or weather display in version 0.1, and no claim of accuracy beyond the system clock",
+   "source": "constitution A18 product goal and truthful claims; manual non-goals"
+  },
+  {
+   "rule": "No fork or copy of VisualCore, ANGLE or projectm-ios, no standalone app target and no copy of another experience's code (Solar System Explorer's injected clock, Digital Aquarium's AmbientDimmer, the foreground observers of Music Lab, Oscilloscope Studio or Audio Odyssey); generic needs become VisualCore gaps",
+   "source": "ADR-0009; constitution A18 reuse first; CLAUDE.md rule 1"
+  },
+  {
+   "rule": "Risk 1, thermal load and OLED burn-in over long sessions. Owner: Ambient Clock screen care and budgets (app-local G-SCREENCARE, G-NIGHT and G-BUDGETS; G-FRAMERATE in VisualCoreExperienceHost assessed in A18-P04) with the overnight device runs in A18-P05 (G-DEVICE). Verification: host tests bound the drift offset and rate, the dimming schedule, the brightness cap and every tier's budget; the night tier asks for a lower frame cap; the overnight device run records thermal state and frame pacing. Release blocker: a static, undimmed layout over a long session, a drift outside its bound, a theme over its tier budget, or a performance, battery or thermal claim without a device measurement.",
+   "source": "manual §13 risk 1"
+  },
+  {
+   "rule": "Risk 2, time correctness errors break trust. Owner: the clock source and formatter (G-CLOCK in VisualCoreExperience assessed in A18-P01; app-local G-FORMAT in A18-P01). Verification: host tests with fixed dates cover 12/24 hours in several locales, DST spring-forward and fall-back, time-zone and locale changes, midnight and significant time change, and the next-tick schedule; a source scan finds no Date() or clock read outside the injected source in the production path. Release blocker: any wrong formatted time in the fixtures, a missed update after a time change or foreground return, or a simulated or offset clock in the production path.",
+   "source": "manual §13 risk 2"
+  },
+  {
+   "rule": "Risk 3, weather implies permissions and data terms. Owner: Ambient Clock release (G-RELEASE in A18-P06); weather is out of version 0.1. Verification: the dependency and usage-description checks find no location, network or weather API and no usage string added for A18; the copy-claims step refuses weather and forecast wording. Release blocker: any location or network use, any new usage string, or any weather claim in the experience, its copy or the store text.",
+   "source": "manual §13 risk 3"
+  }
+ ],
+ "decision": {
+  "result": "go",
+  "reasons": [
+   "A working host and a buildable text-over-shader path exist: RenderHost on OpenGL ES -> ANGLE -> Metal draws FullScreenShaderScene, FieldPass and ParticleLayerScene over the vc/ GLSL library, and ExperiencePresenter.makeCanvasOverlay puts native SwiftUI text over the canvas, all public and tested (FullScreenShaderSceneTests, FieldPassTests, ParticleLayerSceneTests, CanvasOverlayTests); Simulation Lab already combines FieldPass drawing with a canvas overlay on it, and Generative Art Studio, Fractal Explorer and Digital Aquarium draw full-screen shader scenes.",
+   "9 of 28 rows are available with tests: shader backgrounds, animation, the canvas overlay for text, favourites with schema and migration, quality tiers, lifecycle with resize and context loss, licenses, the experience host and determinism.",
+   "All 19 non-available rows have owned gaps: G-CLOCK (VisualCoreExperience assessed, second consumer A14), G-FORMAT and G-TIMEA11Y in A18-P01; G-OVERLAY and G-BUDGETS in A18-P02; G-THEMES, G-FAVOURITES and the additive VisualCoreRendering crossfade G-TRANSITION in A18-P03; G-NIGHT, G-MOTION, G-SCREENCARE, G-AWAKE and the additive VisualCoreExperienceHost frame cap G-FRAMERATE in A18-P04; G-DEVICE in A18-P05; G-RELEASE in A18-P06. No upstream change is needed to start.",
+   "No permission and no privacy answer changes; the only platform exception is the opt-in keep-awake in one named file (G-AWAKE, G-RELEASE). Ambient Clock stays unregistered (17 registered, A01-A17) until A18-P01 creates Packages/ExperiencesCreative/AmbientClock with its targets and first real rules."
+  ],
+  "blockers": []
+ }
+}

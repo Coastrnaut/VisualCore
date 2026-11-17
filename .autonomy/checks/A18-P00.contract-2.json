@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_app_contract.py",
+    "--app",
+    "ambient-clock",
+    "--render"
+  ],
+  "command": "python3 scripts/check_app_contract.py --app ambient-clock --render",
+  "elapsed_seconds": 0.043,
+  "exit_code": 0,
+  "finished": "2026-11-17T02:15:36+00:00",
+  "log": ".autonomy/logs/A18-P00.contract-2.log",
+  "log_sha256": "bffc22c033b3c5c9c17ce86f3ecabc36e208574806226bdf023bcd6d01fc44be",
+  "name": "contract-2",
+  "stage": "A18-P00",
+  "started": "2026-11-17T02:15:36+00:00",
+  "timed_out": false
+}

@@ -8,7 +8,7 @@ Precedent: `specs/123-ia-p00-boundary-audit/tasks.md`.
 
 ## Phase 1: Setup
 
-- [ ] T-A18-001 Create `docs/apps/ambient-clock/README.md` (what the experience is per the manual §1–§2: a calm, readable clock over procedural shader themes, offline, with night mode and screen care; that it is an experience of the one app; its documents) and `docs/apps/ambient-clock/regression-baseline.md` with the phase start `43f3eb05` (the specify commit; constitution `84b3b311`) and the reference pin `d93edd1`
+- [X] T-A18-001 Create `docs/apps/ambient-clock/README.md` (what the experience is per the manual §1–§2: a calm, readable clock over procedural shader themes, offline, with night mode and screen care; that it is an experience of the one app; its documents) and `docs/apps/ambient-clock/regression-baseline.md` with the phase start `43f3eb05` (the specify commit; constitution `84b3b311`) and the reference pin `d93edd1` — Verified 2026-11-16: 2026-11-16: docs/apps/ambient-clock/README.md and regression-baseline.md written (phase start 43f3eb05, constitution 84b3b311, reference pin d93edd1); validate_docs.py PASS
 
 ## Phase 3: User Story 1 — Evidence-backed integration matrix (P1) 🎯
 
