@@ -8,7 +8,7 @@ device step. No VisualCore change. Precedent: `specs/135-ac-p05-device-qa/tasks.
 
 ## Phase 1: Setup
 
-- [ ] T-A19-501 Baseline: cite the A19-P04 evidence (`.autonomy/checks/A19-P04.{lw-ios27,app-unit,verify-27}.json`) on the tree recorded at A19-P04 (`a011b924`), whose Packages are unchanged since (owner ruling of 2026-11-14)
+- [X] T-A19-501 Baseline: cite the A19-P04 evidence (`.autonomy/checks/A19-P04.{lw-ios27,app-unit,verify-27}.json`) on the tree recorded at A19-P04 (`a011b924`), whose Packages are unchanged since (owner ruling of 2026-11-14) — Verified 2026-11-17: 2026-11-17: A19-P04 evidence cited: .autonomy/checks/A19-P04.lw-ios27.json, A19-P04.app-unit.json and A19-P04.verify-27.json, all exit 0; no Packages, Apps or project.yml change since the A19-P04 record commit a011b924
 
 ## Phase 2: Story 1 — the export journey in the app (P1) 🎯
 
