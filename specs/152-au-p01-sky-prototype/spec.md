@@ -21,6 +21,51 @@ Canonical overrides:
   `Packages/ExperiencesCreative/Aurora/Core` until A21-P02 adds the experience.
 - **No VisualCore or ProjectM change.** Follow `specs/145-zg-p01-document-strokes`.
 
+## Clarifications
+
+### Session 2026-11-17
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- `SceneClock` (VisualCoreSimulation) advances by `min(max(delta, 0), 0.25) × speed`, wraps at `duration`, clamps
+  speed to 0…4, and under `reducedMotion` multiplies the step by 0.5; it does not stop.
+- `FullScreenShaderScene` binds `u_time` (or `fixedTime`), `u_resolution`, `u_seed`, up to 8 linear-light palette stops
+  (`u_palette`, `u_paletteCount`) and one float `u_<name>` per parameter; a compile failure sets `errorMessage` naming
+  the file and line. Its tests draw off screen with `RenderHost(scene:)` and `readPixels()`, and Living Wallpapers'
+  core tests already depend on VisualCoreRendering to draw.
+- The `vc/` hashes are integer PCG hashes of the float bit patterns (`vc_pcg`, `vc_hash21`, `vc_hash22`), and
+  `vc_gradientNoise` and `vc_fbm` are polynomial, so a Swift port reproduces them in `Float`.
+- A pending core is `<Name>Core` and `<Name>CoreTests` in `Packages/ExperiencesCreative/Package.swift` with no
+  experience target (`scripts/check_experience_packages.py`, the pending-core allowance).
+
+- Q: What does a sky scene hold, with which bounds, and what happens to a bad value? → A: Scene schema 1, kind
+  `a21.sky-scene`, at most 4,096 bytes: `preset` (one of the catalog ids), `palette` (2…4 opaque sRGB colours),
+  `ribbons` 1…4 (integer), `turbulence` 0…1, `cloudiness` 0…1, `stars` 0…400 (integer), `speed` 0…2. Decoding refuses
+  a damaged, newer, oversized, non-finite or out-of-range file with a code (`damaged`, `newer-version`, `too-large`,
+  `not-finite`, `out-of-range`, `unknown-preset`, `palette-size`). A value set through the scene's setters is clamped
+  to its bound; a non-finite one is ignored. Three presets: `polar-night` (deep blue sky, green ribbons, many stars),
+  `violet-veil` (violet and rose ribbons, light clouds) and `dawn-haze` (warm haze, fewer stars, more clouds), each
+  with version 1 and the attribution "written for VisualCore".
+- Q: How is the sky drawn, and how is it checked without the GPU? → A: One fragment shader, `aurora-sky.frag`, kept by
+  the core as source text with `#include "vc/noise.glsl"`, composites three layers in order: hashed stars with a
+  bounded twinkle, fbm clouds, and up to four ribbons as slowly advected fbm colour bands mixed with additive light.
+  Level 0 uses 5 octaves and level 1 uses 3. `SkyReference` in the core evaluates the same formulas per pixel in
+  `Float` with a Swift port of the `vc/` hash and noise. The core tests draw each preset off screen at 64 × 48 through
+  `FullScreenShaderScene` and compare with the reference.
+- Q: What tolerance and brightness range does the drawing meet? → A: Against the reference, the mean absolute channel
+  difference is at most 2/255 and the largest at most 8/255 (8-bit read-back). Brightness: every pixel's Rec. 709
+  luminance of the sRGB-decoded colour is at most 0.75, and the mean is at least 0.02, so the picture is never empty
+  and never glaring; the luminance cap of A21-P02 comes on top.
+- Q: How does time advance, and how is Reduce Motion still? → A: `SkyClock` wraps a `SceneClock` with a period of 600 s
+  and the scene's speed. Each drawn frame advances it by the frame delta (at most 0.25 s per step). The shader takes
+  the phase `time / 600` and moves the noise along a circle in noise space, so the wrap is seamless. Under Reduce
+  Motion, or at speed 0, the clock holds its time, so consecutive frames are identical; `SceneClock`'s half-speed
+  factor is not used for that.
+- Q: Which targets and dependencies does the pending core have? → A: `AuroraCore` (path `Aurora/Core`, dependencies
+  `VisualCoreMath`, `VisualCoreSimulation` and `VisualCoreExperience`) and `AuroraCoreTests` (path `Aurora/CoreTests`,
+  dependencies `AuroraCore` and `VisualCoreRendering`, which draws the shader off screen). The core issues no GL call
+  and reads no clock; the shader text is data.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - A sky is a small, bounded scene (Priority: P1) 🎯
@@ -119,7 +164,7 @@ never jumps. With Reduce Motion on, consecutive frames are identical.
 ## Assumptions
 
 - The experience's presenter, controls and registration come in A21-P02; this phase adds only the pending core.
-- Brightness bounds and tolerances are numbers decided in clarification and recorded in the data model.
+- Brightness bounds and tolerances are those of clarifications Q2–Q3.
 
 ## Traceability
 
