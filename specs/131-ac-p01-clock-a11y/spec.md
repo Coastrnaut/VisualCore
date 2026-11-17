@@ -171,7 +171,7 @@ clock does not talk over them every minute.
 - **FR-A18-107**: The clock MUST NOT announce minute changes by itself; an announcement on request MUST go through
   the rate-limited planner.
 - **FR-A18-108**: If the clock source lands in VisualCore, it MUST carry `///` documentation, an API baseline update,
-  tests and the seven-step reference regression in two chunks.
+  tests, and the seven-step reference regression in two chunks at X-A18 (owner ruling of 2026-11-14).
 - **FR-A18-109**: The model MUST be testable without a GPU; the experience is not registered in this phase and no
   interface appears.
 
@@ -192,8 +192,8 @@ clock does not talk over them every minute.
   next deadline that is always later than the current instant and on a boundary.
 - **SC-A18-103**: Each of the five time-change kinds produces exactly one recomputation in a test.
 - **SC-A18-104**: Preferences round-trip unchanged; every damaged, newer or unknown input is refused with its reason.
-- **SC-A18-105**: Every test runs in under 10 seconds; the app's registry and catalog are unchanged; if VisualCore
-  changes, the reference regression passes 7 of 7 steps.
+- **SC-A18-105**: Every test runs in under 10 seconds; the app's registry and catalog are unchanged; the reference
+  regression passes 7 of 7 steps at X-A18.
 
 ## Assumptions
 
