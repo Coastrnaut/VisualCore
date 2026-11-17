@@ -33,7 +33,7 @@ assert. Precedent: `specs/133-ac-p03-themes-favourites/tasks.md`.
 
 ## Phase 7: Records and evidence
 
-- [ ] T-A18-408 Contract: G-NIGHT, G-MOTION, G-FRAMERATE (promoted to VisualCoreExperienceHost as `ExperiencePresenter.maxFramesPerSecond`), G-SCREENCARE and G-AWAKE closed by "A18-P04"; rows whose gaps are all closed become available with evidence (`--name contract -- python3 scripts/check_app_contract.py --app ambient-clock --render`)
+- [X] T-A18-408 Contract: G-NIGHT, G-MOTION, G-FRAMERATE (promoted to VisualCoreExperienceHost as `ExperiencePresenter.maxFramesPerSecond`), G-SCREENCARE and G-AWAKE closed by "A18-P04"; rows whose gaps are all closed become available with evidence (`--name contract -- python3 scripts/check_app_contract.py --app ambient-clock --render`) — Verified 2026-11-16: 2026-11-16: .autonomy/checks/A18-P04.contract.json exit 0 (PASS: 28 rows, 141 citations); G-NIGHT, G-MOTION, G-FRAMERATE (promoted to VisualCoreExperienceHost as maxFramesPerSecond, cited in M21), G-SCREENCARE and G-AWAKE closed by A18-P04; M10, M15, M20 and M21 available
 - [ ] T-A18-409 Tests: host on sim-27.2 (`--name host-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --only-testing VisualCoreExperienceHostTests`), Ambient Clock on sim-27.2 (`--name ac-ios27`), public API and documented API (SC-A18-405)
 - [ ] T-A18-410 Catalog, app build and unit, runner (`--name verify-27`), packages and script tests (SC-A18-405)
 - [ ] T-A18-411 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A18-P04; update README.md (rule 16) and `docs/automatedtesting.md` (rule 17)
