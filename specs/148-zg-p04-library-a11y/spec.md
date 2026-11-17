@@ -67,11 +67,10 @@ in code:
   - **Sharing:** the file is handed to `ShareLink`. "Save Image" uses the app's add-only string, and the registration
     declares `photo-library-add`.
   - **Photos:** the experience never calls PhotoKit.
-- Q: Which controls and actions are added? → A: The library and the still are presentation features: they read and
-  write files and do not change the core's state, except "Open", which sends `garden.load`. That action carries no
-  values; the presenter supplies the opened document through the shell's restore path, so the history restarts and
-  the digest is the opened document's. The library's own actions (save, rename, delete, share) are native buttons
-  only, with no gestures.
+- Q: Which controls and actions are added? → A: No new core action. The library and the still are presentation
+  features that read and write files. "Open" restores the saved document through the shell's restore path, so the
+  digest equals the opened document's and the undo history restarts. The library's buttons (save, open, rename,
+  delete) and the share control are native only, with no gestures, so the gesture rule is unaffected.
 
 ## User Scenarios & Testing *(mandatory)*
 
