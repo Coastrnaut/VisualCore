@@ -493,7 +493,7 @@
     "file": "Packages/ExperiencesCreative/SimulationLab/Experience/GrayScottGPU.swift",
     "symbol": "GrayScottGPU"
    },
-   "notes": "The machinery exists and is tested (PingPongTargetTests, FloatRenderSupportTests, FieldPassTests, ShaderBundleTests, MeshShapeTests, MeshRendererTests). The tray, the two rake footprints, the sand target and its relief, and the stone palette are experience code: G-DOCUMENT and G-STROKES (A20-P01), G-SAND and G-RELIEF (A20-P02), G-STONES (A20-P03)."
+   "notes": "The machinery exists and is tested (PingPongTargetTests, FloatRenderSupportTests, FieldPassTests, ShaderBundleTests, MeshShapeTests, MeshRendererTests). The tray, the two rake footprints, the sand target and its relief, and the stone palette are experience code: G-DOCUMENT and G-STROKES (A20-P01), G-SAND and G-RELIEF (A20-P02), G-STONES (A20-P03). G-STROKES closed in A20-P01: StrokeResampler (0.004 tray widths, cap 512), RakeBrush and SandField (ResamplerTests, RakeTests). The row stays open for its remaining gaps."
   },
   {
    "id": "M07",
@@ -542,7 +542,7 @@
     "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/PlaygroundView.swift",
     "symbol": "PlaygroundModel"
    },
-   "notes": "PointerVelocityTracker resamples a drag to uniform spacing with at most 16 samples per update and counts capped and rejected samples (PointerVelocityTrackerTests); it is linear, not a spline. Coalesced and predicted touch samples are not delivered by any framework product (grep 2026-11-17): assessed on devices (G-DEVICE, A20-P05). Stroke smoothing and the stroke model are G-STROKES (A20-P01); the brush preview and brush zoom are G-PREVIEW (A20-P02)."
+   "notes": "PointerVelocityTracker resamples a drag to uniform spacing with at most 16 samples per update and counts capped and rejected samples (PointerVelocityTrackerTests); it is linear, not a spline. Coalesced and predicted touch samples are not delivered by any framework product (grep 2026-11-17): assessed on devices (G-DEVICE, A20-P05). Stroke smoothing and the stroke model are G-STROKES (A20-P01); the brush preview and brush zoom are G-PREVIEW (A20-P02). G-STROKES closed in A20-P01: StrokeResampler (0.004 tray widths, cap 512), RakeBrush and SandField (ResamplerTests, RakeTests). The row stays open for its remaining gaps."
   },
   {
    "id": "M08",
@@ -640,7 +640,7 @@
     "file": "Packages/ExperiencesCreative/LightMaze/Core/MazeState.swift",
     "symbol": "MazeState.undo"
    },
-   "notes": "No undo or command stack exists in any framework product (grep 2026-11-17); Light Maze's MazeState.undo is experience-local. The command semantics and fixtures are G-UNDO (app-local, A20-P01); rebuilding the sand by replaying the log from the nearest checkpoint is G-SAND (A20-P02). Undo is never by texture snapshot."
+   "notes": "No undo or command stack exists in any framework product (grep 2026-11-17); Light Maze's MazeState.undo is experience-local. The command semantics and fixtures are G-UNDO (app-local, A20-P01); rebuilding the sand by replaying the log from the nearest checkpoint is G-SAND (A20-P02). Undo is never by texture snapshot. G-UNDO closed in A20-P01: GardenHistory with exact undo and redo, 100 commands and a checkpoint (HistoryTests, ReplayFixtureTests). The row stays open for its remaining gaps."
   },
   {
    "id": "M10",
@@ -775,7 +775,7 @@
     "file": "Packages/ExperiencesCreative/ParticleUniverse/Core/SceneCommand.swift",
     "symbol": "SceneCommand"
    },
-   "notes": "Action validation, snapshots and digests are tested (ExperienceActionTests, ExperienceSnapshotTests, StateDigestTests). The document schema, caps and validation are G-DOCUMENT (app-local, A20-P01)."
+   "notes": "Action validation, snapshots and digests are tested (ExperienceActionTests, ExperienceSnapshotTests, StateDigestTests). The document schema, caps and validation are G-DOCUMENT (app-local, A20-P01). G-DOCUMENT closed in A20-P01: GardenDocument (schema 1, kind a20.garden, normalized tray coordinates, caps 512 points, 400 strokes, 24 stones, 262,144 bytes) and DocumentRefusal with nine codes (DocumentTests); the transport to the core as small actions is G-SAND (A20-P02), so the row stays open."
   },
   {
    "id": "M13",
@@ -818,7 +818,7 @@
     "file": "Packages/ExperiencesCreative/FluidArtPlayground/Core/SplatQueue.swift",
     "symbol": "SplatQueue"
    },
-   "notes": "Linear resampling with a cap is tested (PointerVelocityTrackerTests); there is no spline smoothing and no coalesced-touch path in any framework product. Stroke resampling and smoothing as pure math are G-STROKES (A20-P01); coalesced touches are assessed on devices in G-DEVICE (A20-P05)."
+   "notes": "Linear resampling with a cap is tested (PointerVelocityTrackerTests); there is no spline smoothing and no coalesced-touch path in any framework product. Stroke resampling and smoothing as pure math are G-STROKES (A20-P01); coalesced touches are assessed on devices in G-DEVICE (A20-P05). G-STROKES closed in A20-P01: StrokeResampler (0.004 tray widths, cap 512), RakeBrush and SandField (ResamplerTests, RakeTests). The row stays open for its remaining gaps."
   },
   {
    "id": "M14",
@@ -898,7 +898,7 @@
     "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidFieldsScene.swift",
     "symbol": "FluidFieldsScene"
    },
-   "notes": "The target pair, the pass and the half-float fallback are tested (PingPongTargetTests, FieldPassTests, FloatRenderSupportTests, FloatTransferTests). No brush-stamp pass into a height target exists in VisualCore: the experience's stamp FieldPass and the replay are G-SAND (app-local, A20-P02); the footprint math is G-STROKES (A20-P01)."
+   "notes": "The target pair, the pass and the half-float fallback are tested (PingPongTargetTests, FieldPassTests, FloatRenderSupportTests, FloatTransferTests). No brush-stamp pass into a height target exists in VisualCore: the experience's stamp FieldPass and the replay are G-SAND (app-local, A20-P02); the footprint math is G-STROKES (A20-P01). G-STROKES closed in A20-P01: StrokeResampler (0.004 tray widths, cap 512), RakeBrush and SandField (ResamplerTests, RakeTests). The row stays open for its remaining gaps."
   },
   {
    "id": "M16",
@@ -1471,7 +1471,7 @@
    "justification": "The garden document (tray, strokes, stones, the command log in normalized tray coordinates), its caps, validation and schema are the experience's domain, GPU-free in its Core (manual phase 01).",
    "phase": 1,
    "test": "Core host tests: documents round-trip and migrate; truncated, newer, NaN, infinite and out-of-range input refused; caps on samples per stroke, strokes and stones enforced; every action stays within 24 values",
-   "closed": null
+   "closed": "A20-P01"
   },
   {
    "id": "G-STROKES",
@@ -1486,7 +1486,7 @@
    "justification": "Stroke resampling to uniform spacing with a cap, smoothing and the two rake footprints are pure math over PointerVelocityTracker's samples; they are specific to raking. No VisualCore change is planned (spec clarification Q4); a second user would justify moving it upstream later (Principle II).",
    "phase": 1,
    "test": "Core host tests: a fast drag resampled at the declared spacing leaves no gap; the cap is counted, not exceeded; smoothing keeps endpoints; each rake style gives its footprint fixture",
-   "closed": null
+   "closed": "A20-P01"
   },
   {
    "id": "G-UNDO",
@@ -1498,7 +1498,7 @@
    "justification": "No undo or command stack exists in VisualCore; Light Maze's is experience-local. The garden's undo/redo is by command over its log, never by texture snapshot (research D6). No VisualCore change is planned (spec clarification Q4); a second user would justify moving it upstream later (Principle II).",
    "phase": 1,
    "test": "Core host tests: undo and redo of strokes and stone edits restore the earlier digest; redo cleared by a new command; the log cap holds; fixtures for each command kind",
-   "closed": null
+   "closed": "A20-P01"
   },
   {
    "id": "G-SAND",
@@ -1507,11 +1507,12 @@
     "M09",
     "M15",
     "M22",
-    "M23"
+    "M23",
+    "M12"
    ],
    "kind": "adaptation",
    "owner": "app-local",
-   "justification": "The sand height target (rgba16f through FloatRenderSupport, rgba8 fallback) on a PingPongTarget with the experience's stamp FieldPass, and its replay from the nearest checkpoint after undo, redo, restore, resize or context loss (manual phase 02). No brush-stamp pass exists in VisualCore. No VisualCore change is planned (spec clarification Q4); a second user would justify moving it upstream later (Principle II).",
+   "justification": "The sand height target (rgba16f through FloatRenderSupport, rgba8 fallback) on a PingPongTarget with the experience's stamp FieldPass, and its replay from the nearest checkpoint after undo, redo, restore, resize or context loss (manual phase 02). No brush-stamp pass exists in VisualCore. No VisualCore change is planned (spec clarification Q4); a second user would justify moving it upstream later (Principle II). It also sends each stroke to the core as small actions within ExperienceControl.maxValues (the transport part of M12), with the experience in A20-P02.",
    "phase": 2,
    "test": "Experience tests: replaying a log gives the same read-back heights (readFloatPixels) as drawing it live; after context loss or resize the target is rebuilt and equal; the rgba8 fallback is exercised; checkpoints bound replay length",
    "closed": null
