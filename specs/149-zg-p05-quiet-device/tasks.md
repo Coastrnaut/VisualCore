@@ -8,7 +8,7 @@ device step. No VisualCore change. Precedent: `specs/142-lw-p05-device-tests/tas
 
 ## Phase 1: Setup
 
-- [ ] T-A20-501 Baseline: cite the A20-P04 evidence (`.autonomy/checks/A20-P04.{zg-ios27,app-unit,verify-27}.json`) on
+- [X] T-A20-501 Baseline: cite the A20-P04 evidence (`.autonomy/checks/A20-P04.{zg-ios27,app-unit,verify-27}.json`) on — Verified 2026-11-17: 2026-11-17: A20-P04 evidence cited: .autonomy/checks/A20-P04.zg-ios27.json, A20-P04.app-unit.json and A20-P04.verify-27.json, all exit 0; no Packages, Apps or project.yml change since the A20-P04 record commit 1d8c1637
   the tree recorded at A20-P04 (`1d8c1637`), whose Packages, Apps and `project.yml` are unchanged since (owner ruling
   of 2026-11-14)
 - [ ] T-A20-502 Add `VisualCoreAudio` (package `rendering`) and `VisualCoreAudioDSP` (package `visualCore`) to the
