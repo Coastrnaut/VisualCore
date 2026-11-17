@@ -1222,7 +1222,7 @@
    "justification": "No framework product offers a wall-clock source or time-change observation. An injectable clock (system by default, fixed in tests) that also reports foreground return, significant time change, time-zone and locale changes has two consumers (A14's Now and A18), so it is assessed for VisualCoreExperience in A18-P01 (the observation side, needing UIKit notifications, in VisualCoreExperienceHost if required). If the assessment keeps it app-local, the experience implements the same contract in its Core without copying Solar System Explorer's code. The production path never offsets or simulates time.",
    "phase": 1,
    "test": "Host tests with a fixed clock: the source returns the injected date; each notification (foreground, significant time change, time zone, locale) emits one change event; the default reads the system clock; API baseline and documentation updated if it lands in VisualCore; the seven-step reference regression passes",
-   "closed": null
+   "closed": "A18-P01"
   },
   {
    "id": "G-FORMAT",
@@ -1237,7 +1237,7 @@
    "justification": "ClockPreferences (12/24 hours or system, seconds, calendar, time-zone and locale policy) and the formatter over Foundation's Calendar, Locale, TimeZone and DateFormatter, plus the next-tick deadline on second or minute boundaries, are the clock's domain (manual phase 01).",
    "phase": 1,
    "test": "Core host tests with fixed dates: 12/24 hours in en_US, de_DE, ja_JP and ar; seconds on and off; the DST spring-forward and fall-back hours in a fixed zone; a time-zone change; midnight rollover; next-tick deadlines on boundaries; invalid preferences refused",
-   "closed": null
+   "closed": "A18-P01"
   },
   {
    "id": "G-TIMEA11Y",
@@ -1249,20 +1249,25 @@
    "owner": "app-local",
    "justification": "The time spoken in full, the VoiceOver labels, Dynamic Type sizes for the clock text and the announcement policy are the experience's UI over the public planners (manual phase 01).",
    "phase": 1,
-   "test": "Core tests: the spoken string names hours, minutes and period or 24-hour form and the date for each test locale; announcements are rate-limited by AnnouncementPlanner; experience tests: the overlay's accessibility label equals the spoken string at every Dynamic Type size",
-   "closed": null
+   "test": "Core tests: the spoken string names the time with its period or 24-hour form and the date when shown for each test locale; no minute change announces; time.speak bursts are rate-limited by AnnouncementPlanner at 0.5 s (the overlay label at every Dynamic Type size is tested with G-OVERLAY, A18-P02)",
+   "closed": "A18-P01"
   },
   {
    "id": "G-OVERLAY",
    "matrix": [
     "M03",
+    "M06",
     "M07",
     "M08",
-    "M15"
+    "M11",
+    "M12",
+    "M13",
+    "M15",
+    "M16"
    ],
    "kind": "adaptation",
    "owner": "app-local",
-   "justification": "The native clock overlay (through makeCanvasOverlay), its layouts for portrait and landscape, the contrast rule against the theme's palette and the first shader theme (noise gradient) are app work over the public overlay and FullScreenShaderScene (manual phase 02).",
+   "justification": "The native clock overlay (through makeCanvasOverlay), its layouts for portrait and landscape, the contrast rule against the theme's palette and the first shader theme (noise gradient) are app work over the public overlay and FullScreenShaderScene (manual phase 02). It also holds the presenter that reads the clock source, sends time.set at each scheduled deadline and time.changed from TimeChangeMonitor.applicationNames, and gives the canvas the spoken string as its accessibility label at every Dynamic Type size (moved here from G-TIMEA11Y at A18-P01, whose part is the core).",
    "phase": 2,
    "test": "Core tests: the contrast ratio of the text against every palette stop of the first theme is at least 4.5 (contrastRatio); experience tests: the overlay shows the formatted time over a rendered frame; the text stays when the scene fails to compile",
    "closed": null
