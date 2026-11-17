@@ -6,7 +6,7 @@
 - **D2 Refused words (Q2):** physics and simulation wording is refused because granular sand physics is a non-goal and
   the relief is stamped, not simulated; therapeutic, medical and wellbeing wording because no health effect is
   measured or claimed (manual risk 3, constitution A20); "unlimited" because the library holds 12 gardens and the
-  history 100 commands; "lossless" is kept for symmetry with the shared still wording. The shared denylist already
+  history 100 commands. "Lossless" is not refused, because the still is a PNG. The shared denylist already
   refuses measured numbers, frame-rate phrases, `audio`, `music` and `smooth`; the copy says "sound". `share` is
   allowed because the still really goes to the share sheet. Alternative: allow `sharing` too; rejected, the copy does
   not need it.

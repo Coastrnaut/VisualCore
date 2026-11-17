@@ -64,7 +64,9 @@ in code:
   - physics, realistic sand, simulation;
   - therapy, therapeutic, medical, clinical, wellbeing, well-being, mental health, stress relief, anxiety, heal,
     healing, mindfulness, meditation;
-  - fps, real-time, unlimited, lossless.
+  - fps, real-time, unlimited.
+
+  "Lossless" is not refused: the still is a PNG, which is lossless.
 
   The shared copy check runs with `copyCheck.allow: ["share"]` and nothing else. Every test named in the claims table
   must exist.
@@ -187,7 +189,8 @@ In the one app, a still picture of the garden is made and offered to the share s
   specified.
 - **FR-A20-605**: The store text MUST make only claims a named test proves; refused words MUST not appear in the store
   text or the interface's words.
-- **FR-A20-606**: The release checklist and release.json MUST list every document and result; the experience-release
+- **FR-A20-606**: The release checklist and release.json MUST list every document and result, and
+  `docs/release/known-limitations.md` MUST gain an A20 section (no physics, no gallery, device rows pending); the experience-release
   and copy-claims steps for A20 MUST pass. The device rows MUST be `pending-campaign-ii` and name their campaign rows
   ZG-D1 … ZG-D8 of `docs/apps/digital-zen-garden/device-campaign.md`.
 - **FR-A20-607**: The interface tests MUST cover the calm switches off at a fresh start and a still made and offered to
