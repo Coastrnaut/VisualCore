@@ -75,7 +75,7 @@ in code:
   - **Snapshot:** the core's snapshot is schema 1: the garden document only. A stroke in progress is not saved; the
     undo history restarts after a restore.
   - **Registration:** the experience is registered as a candidate `a20.digital-zen-garden` with quality levels
-    `level-0` (no grain) and `level-1`, permissions none, and a scenario manifest of the nine standard scenarios plus
+    `level-0` (the full level, with grain) and `level-1` (without grain), permissions none, and a scenario manifest of the nine standard scenarios plus
     fixtures for a raked garden, both rake styles, undo, redo and the tone. The app's synthetic candidate test id
     moves to `a21`.
 

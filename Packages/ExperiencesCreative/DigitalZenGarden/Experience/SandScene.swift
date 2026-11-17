@@ -1,0 +1,331 @@
+// SandScene — feature 146 (A20-P02) T-A20-204 (FR-A20-202, FR-A20-203, FR-A20-207; clarification Q1; data-model.md
+// "SandScene"; contracts/experience.md "Sand"; gaps G-SAND and G-RELIEF). The drawn sand of Digital Zen Garden:
+//
+//   - Field: a 480 × 360 `SandField` on the CPU. The committed strokes are stamped once into the base field; the
+//     stroke in progress is stamped over a copy of the base (the shown field) whenever it changes, and on commit the
+//     stroke is stamped into the base itself. `rebuild(from:)` replays the strokes into a fresh base (after undo,
+//     redo, restore, resize or a lost context); `sync(strokes:pending:)` decides between a commit and a rebuild.
+//   - Target: one render target of the field's size in the format `FloatRenderSupport.storageFormat(forceFallback:)`
+//     picks: `rgba16f` holds the height itself, the `rgba8` fallback holds height × 0.5 + 0.5. The shown field is
+//     uploaded with `RenderTarget.upload(rgbaFloats:)` (rows bottom-up) only when it changed.
+//     A read-back target matches the shown field within 1/1024 (`rgba16f`) or 1/255 (`rgba8`) in stored values.
+//   - Relief: one `FieldPass` over the framebuffer. Inside the tray (4:3, fitted to the view with a margin, `TrayFit`)
+//     the height is read exactly (`vc_fieldBilinear`), the normal comes from the height differences of the
+//     neighbouring cells, one light falls from the upper left, the sand tone (linear light) is the albedo and at
+//     level-0 (the full level) a `vc_fbm` grain varies it; outside the tray a dark neutral. Equal inputs give identical pixels.
+//
+// No GL call: the target, the upload and the pass are VisualCoreRendering's, used inside the host's scene callbacks.
+import Foundation
+import DigitalZenGardenCore
+import VisualCoreMath
+import VisualCoreRendering
+
+/// The 4:3 tray fitted inside a view: the largest 4:3 rectangle inside the view less a margin, centred.
+enum TrayFit {
+    /// The margin around the tray as a share of the view's shorter side.
+    static let marginShare = 0.04
+
+    /// The tray rectangle inside a view of `width` × `height` (any unit), origin top-left: x, y, width, height.
+    /// A view that is not positive gives a zero rectangle.
+    static func rect(width: Double, height: Double) -> (x: Double, y: Double, width: Double, height: Double) {
+        guard width.isFinite, height.isFinite, width > 0, height > 0 else { return (0, 0, 0, 0) }
+        let margin = marginShare * min(width, height)
+        let available = (max(width - 2 * margin, 0), max(height - 2 * margin, 0))
+        let aspect = GardenPalette.smallTray.aspect
+        let trayWidth: Double
+        let trayHeight: Double
+        if available.0 / max(available.1, .leastNonzeroMagnitude) > aspect {
+            trayHeight = available.1
+            trayWidth = trayHeight * aspect
+        } else {
+            trayWidth = available.0
+            trayHeight = trayWidth / aspect
+        }
+        return ((width - trayWidth) / 2, (height - trayHeight) / 2, trayWidth, trayHeight)
+    }
+
+    /// The normalized tray position (0…1 each when inside) of the view point `point` (origin top-left) in a view of
+    /// `size`; nil when the tray is empty.
+    static func trayPoint(_ point: Vec2, viewSize size: Vec2) -> Vec2? {
+        let tray = rect(width: size.x, height: size.y)
+        guard tray.width > 0, tray.height > 0 else { return nil }
+        return Vec2((point.x - tray.x) / tray.width, (point.y - tray.y) / tray.height)
+    }
+
+    /// Whether `point` lies inside the tray (0…1 on both axes).
+    static func isInside(_ point: Vec2) -> Bool {
+        point.isFinite && (0...1).contains(point.x) && (0...1).contains(point.y)
+    }
+
+    /// `point` clamped to the tray (0…1 on both axes).
+    static func clamped(_ point: Vec2) -> Vec2 {
+        Vec2(min(max(point.x, 0), 1), min(max(point.y, 0), 1))
+    }
+}
+
+/// Draws the sand of the garden (see the file header).
+@MainActor
+final class SandScene: RenderScene {
+    /// The number of columns of the drawn field.
+    static let columns = 480
+    /// The number of rows of the drawn field.
+    static let rows = 360
+    /// The colour outside the tray (sRGB): a dark neutral.
+    static let surround = SIMD3<Float>(0.075, 0.075, 0.08)
+
+    /// The relief fragment (see the file header). Uniforms: `u_sand` (the field), `u_tray` (x, y, width, height in
+    /// framebuffer pixels, origin bottom-left), `u_tone` (the sand tone, sRGB, alpha 1), `u_decode` (scale and
+    /// offset from the stored value to the height) and `u_grain` (0 or 1).
+    static let reliefFragment = """
+    precision highp float;
+    #include "vc/hash.glsl"
+    #include "vc/noise.glsl"
+    #include "vc/field.glsl"
+    #include "vc/color.glsl"
+    in vec2 v_uv;
+    uniform sampler2D u_sand;
+    uniform vec4 u_tray;
+    uniform vec4 u_tone;
+    uniform vec2 u_decode;
+    uniform float u_grain;
+    out vec4 color;
+
+    float zg_height(vec2 cell) {
+        return vc_fieldBilinear(u_sand, cell).r * u_decode.x + u_decode.y;
+    }
+
+    void main() {
+        vec2 t = (gl_FragCoord.xy - u_tray.xy) / max(u_tray.zw, vec2(1.0));
+        if (t.x < 0.0 || t.y < 0.0 || t.x > 1.0 || t.y > 1.0) {
+            color = vec4(\(SandScene.surround.x), \(SandScene.surround.y), \(SandScene.surround.z), 1.0);
+            return;
+        }
+        vec2 size = vec2(textureSize(u_sand, 0));
+        vec2 cell = t * size;
+        float h = zg_height(cell);
+        float dx = zg_height(cell + vec2(1.0, 0.0)) - zg_height(cell - vec2(1.0, 0.0));
+        float dy = zg_height(cell + vec2(0.0, 1.0)) - zg_height(cell - vec2(0.0, 1.0));
+        vec3 n = normalize(vec3(-0.45 * dx, -0.45 * dy, 1.0));
+        vec3 light = normalize(vec3(-0.55, 0.6, 0.58));
+        float facing = light.z;
+        float shade = 0.3 + 0.7 * clamp(dot(n, light), 0.0, 1.0) / facing;
+        vec3 albedo = vc_srgbDecode(u_tone.rgb) * (0.94 + 0.06 * clamp(h, -1.0, 1.0));
+        float grain = vc_fbm(gl_FragCoord.xy * 0.45, 3, 2.0, 0.5);
+        albedo *= 1.0 + u_grain * 0.08 * grain;
+        float edge = min(min(t.x, 1.0 - t.x), min(t.y, 1.0 - t.y) * 0.75);
+        float rim = 0.82 + 0.18 * smoothstep(0.0, 0.012, edge);
+        vec3 lit = clamp(albedo * shade * rim, 0.0, 1.0);
+        color = vec4(clamp(vc_srgbEncode(lit), 0.0, 1.0), 1.0);
+    }
+    """
+
+    /// Whether the 8-bit fallback is used even where half floats render (tests).
+    let forceFallback: Bool
+    /// The base field: every committed stroke, in order.
+    private(set) var base = SandField(columns: SandScene.columns, rows: SandScene.rows)
+    /// The shown field: the base with the stroke in progress stamped over it.
+    private(set) var shown = SandField(columns: SandScene.columns, rows: SandScene.rows)
+    /// The strokes the base field holds.
+    private(set) var baseStrokes: [RakeStroke] = []
+    /// The stroke in progress stamped into the shown field; nil when none is.
+    private(set) var shownPending: RakeStroke?
+    /// The render target of the field; nil before `setup` and after `teardown`.
+    private(set) var target: RenderTarget?
+    /// The format of `target` (`rgba16f` or `rgba8`).
+    private(set) var format: TextureFormat = .rgba8
+    /// The sand tone drawn (sRGB).
+    var tone = SIMD3<Float>(0.93, 0.89, 0.80)
+    /// Whether the grain is drawn (level-0, the full level).
+    var grain = false
+    /// The fitted tray of the last frame drawn, in framebuffer pixels (origin bottom-left).
+    private(set) var trayPixels = SIMD4<Float>(0, 0, 0, 0)
+    /// Grows with every change of the shown field.
+    private(set) var revision = 0
+    /// How many times the field was replayed from strokes.
+    private(set) var replayCount = 0
+    /// How many times a committed stroke was stamped into the base.
+    private(set) var commitCount = 0
+    /// How many times the shown field was uploaded.
+    private(set) var uploadCount = 0
+    /// How many relief passes were drawn.
+    private(set) var drawCount = 0
+    /// Whether the shown field must be uploaded before the next draw.
+    private var needsUpload = true
+    /// The relief pass; nil before `setup` and after `teardown`.
+    private var pass: FieldPass?
+    /// The registry that made `target` and `pass`.
+    private weak var registry: ResourceRegistry?
+
+    /// A scene with an empty field; `forceFallback` stores the field in `rgba8` even where `rgba16f` renders.
+    init(forceFallback: Bool = false) {
+        self.forceFallback = forceFallback
+    }
+
+    // MARK: Field
+
+    /// Replays `strokes` into a fresh base field and restamps the stroke in progress over it.
+    func rebuild(from strokes: [RakeStroke]) {
+        base = SandField.replay(strokes, columns: Self.columns, rows: Self.rows)
+        baseStrokes = strokes
+        replayCount += 1
+        restamp()
+    }
+
+    /// Stamps the committed `stroke` into the base field; `pending` (none by default) is the stroke in progress
+    /// stamped over it afterwards.
+    func commit(_ stroke: RakeStroke, pending: RakeStroke? = nil) {
+        base.apply(stroke)
+        baseStrokes.append(stroke)
+        commitCount += 1
+        shownPending = pending
+        restamp()
+    }
+
+    /// Stamps `stroke` (the stroke in progress, or nil for none) over a copy of the base field when it changed.
+    func stampInProgress(_ stroke: RakeStroke?) {
+        guard stroke != shownPending else { return }
+        shownPending = stroke
+        restamp()
+    }
+
+    /// Brings the fields up to the garden's `strokes` and the stroke in progress `pending`: one stroke more than the
+    /// base is a commit, any other difference a rebuild; then the stroke in progress is stamped when it changed.
+    func sync(strokes: [RakeStroke], pending: RakeStroke?) {
+        if strokes != baseStrokes {
+            let count = baseStrokes.count
+            if strokes.count == count + 1, strokes.prefix(count).elementsEqual(baseStrokes), let last = strokes.last {
+                commit(last, pending: pending)
+                return
+            }
+            shownPending = pending
+            rebuild(from: strokes)
+            return
+        }
+        stampInProgress(pending)
+    }
+
+    /// The shown field becomes the base with `shownPending` stamped over it; it is uploaded before the next draw.
+    private func restamp() {
+        var field = base
+        if let shownPending { field.apply(shownPending) }
+        shown = field
+        revision += 1
+        needsUpload = true
+    }
+
+    /// The values uploaded for `field` in `format`: four equal channels per cell, rows bottom-up; the height itself
+    /// for `rgba16f`, height × 0.5 + 0.5 for `rgba8`.
+    static func uploadValues(_ field: SandField, format: TextureFormat) -> [Float] {
+        let encode = format != .rgba16f
+        var values = [Float](repeating: 0, count: field.columns * field.rows * 4)
+        var index = 0
+        for glRow in 0..<field.rows {
+            let row = field.rows - 1 - glRow
+            for column in 0..<field.columns {
+                let height = field[column, row]
+                let value = encode ? height * 0.5 + 0.5 : height
+                values[index] = value
+                values[index + 1] = value
+                values[index + 2] = value
+                values[index + 3] = 1
+                index += 4
+            }
+        }
+        return values
+    }
+
+    /// The scale and offset from a stored value to the height: (1, 0) for `rgba16f`, (2, −1) for `rgba8`.
+    static func decode(_ format: TextureFormat) -> SIMD2<Float> {
+        format == .rgba16f ? SIMD2(1, 0) : SIMD2(2, -1)
+    }
+
+    /// The largest difference between the stored values `values` read back from the target (rows bottom-up, the
+    /// first channel of each pixel) and the values `field` stores in `format` (the height for `rgba16f`, height ×
+    /// 0.5 + 0.5 for `rgba8`); infinity for a wrong count.
+    static func maxDifference(_ values: [Float], field: SandField, format: TextureFormat) -> Float {
+        guard values.count == field.columns * field.rows * 4 else { return .infinity }
+        let encode = format != .rgba16f
+        var largest: Float = 0
+        for glRow in 0..<field.rows {
+            let row = field.rows - 1 - glRow
+            for column in 0..<field.columns {
+                let height = field[column, row]
+                let expected = encode ? height * 0.5 + 0.5 : height
+                largest = max(largest, abs(values[(glRow * field.columns + column) * 4] - expected))
+            }
+        }
+        return largest
+    }
+
+    // MARK: Render scene
+
+    /// Makes the field's render target in the context's storage format and the relief pass; the field is uploaded
+    /// before the next draw. A compile error throws `FieldPassError.compile`.
+    func setup(_ context: RenderContext) throws {
+        releaseObjects()
+        let resources = context.resources
+        format = FloatRenderSupport.detect(in: resources).storageFormat(forceFallback: forceFallback)
+        let made = try resources.makeRenderTarget(width: Self.columns, height: Self.rows, format: format,
+                                                  label: "zg.sand")
+        do {
+            pass = try FieldPass(registry: resources, fragment: Self.reliefFragment, inputs: ["u_sand"],
+                                 label: "zg.relief")
+        } catch {
+            resources.release(made)
+            throw error
+        }
+        target = made
+        registry = resources
+        needsUpload = true
+    }
+
+    /// The field does not depend on the drawable size; the tray is fitted again at the next draw.
+    func resize(_ context: RenderContext) {}
+
+    /// Uploads the shown field when it changed, then draws the relief over the whole framebuffer.
+    func render(_ context: RenderContext, frame: FrameInfo) throws {
+        guard let target, let pass else { return }
+        if needsUpload {
+            guard target.upload(rgbaFloats: Self.uploadValues(shown, format: format)) else {
+                throw SandSceneError.uploadFailed
+            }
+            needsUpload = false
+            uploadCount += 1
+        }
+        let tray = TrayFit.rect(width: Double(context.pixelWidth), height: Double(context.pixelHeight))
+        trayPixels = SIMD4(Float(tray.x), Float(Double(context.pixelHeight) - tray.y - tray.height),
+                           Float(tray.width), Float(tray.height))
+        try pass.run(output: .framebuffer(name: context.framebuffer, width: context.pixelWidth,
+                                          height: context.pixelHeight),
+                     inputs: ["u_sand": target],
+                     uniforms: ["u_tray": .vec4(trayPixels), "u_tone": .vec4(SIMD4(tone, 1)),
+                                "u_decode": .vec2(Self.decode(format)), "u_grain": .float(grain ? 1 : 0)])
+        drawCount += 1
+    }
+
+    /// Releases the target and the pass.
+    func teardown(_ context: RenderContext) {
+        releaseObjects()
+    }
+
+    /// Releases the target and the pass to their registry (objects of an ended generation are only forgotten).
+    private func releaseObjects() {
+        if let target, let registry, target.handle.generation == registry.generation { registry.release(target) }
+        pass?.release()
+        target = nil
+        pass = nil
+    }
+}
+
+/// Why the sand could not be drawn (feature 146).
+enum SandSceneError: Error, Equatable, CustomStringConvertible {
+    /// The field could not be uploaded to its render target.
+    case uploadFailed
+
+    /// "The sand field could not be uploaded."
+    var description: String {
+        switch self {
+        case .uploadFailed: return "The sand field could not be uploaded."
+        }
+    }
+}
