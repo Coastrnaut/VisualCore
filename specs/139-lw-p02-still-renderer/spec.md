@@ -23,8 +23,8 @@ Canonical overrides:
   - G-SCENES: the four curated scenes drawn in code (app-local).
 - **Experience A19 inside the one app:** registered as a candidate experience, not a standalone app. Visuals are code:
   every scene is a fragment shader over VisualCore's GLSL library.
-- **VisualCore change:** both additions are additive public API with `///` documentation, tests, an API baseline
-  update and the reference regression in two chunks.
+- **VisualCore change:** both additions are additive public API with `///` documentation, tests and an API baseline
+  update; the reference regression in two chunks runs at X-A19 (owner ruling of 2026-11-14, faster gates).
 - Follow `specs/132-ac-p02-overlay-theme`.
 
 ## Clarifications
@@ -200,7 +200,8 @@ failed export and after a retry.
   lies inside the canvas.
 - **SC-A19-204**: Every scene at both levels draws a picture that is not blank; equal state and time give identical
   pixels.
-- **SC-A19-205**: The reference regression passes 7 of 7 steps; unit tests run under 10 seconds each.
+- **SC-A19-205**: The VisualCore and rendering package tests and the public API baseline pass; the reference regression
+  (7 of 7 steps) runs at X-A19 (owner ruling of 2026-11-14); unit tests run under 10 seconds each.
 
 ## Assumptions
 
