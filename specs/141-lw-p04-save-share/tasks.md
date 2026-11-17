@@ -48,3 +48,7 @@ Agent K: T-A19-402. Agent E: T-A19-403, 405, 406, 407. Lead: registration and sc
 
 MVP: the share file and the permission (403, 404). The job (405, 406) and the history (402, 407) close the phase.
 Review checkpoints after 404 and at 410.
+
+## Phase 7: Convergence
+
+- [ ] T-A19-412 Record the as-built design in `specs/141-lw-p04-save-share/data-model.md`: the controls start only `ExportJob` (the shipping path); `StillExport` keeps the single implementation of each step (`formatStep`, `encodeStep`, `verifyStep`, `writeStep`) and its synchronous `run` plus `presenter.export` compose the same steps for the A19-P02 and A19-P03 tests; JPEG files use the extension `.jpg`; `/` and `:` in a file name become `-`; `WallpaperExportFile` declares one `FileRepresentation` per format with an exporting condition; the controls list the 5 newest history entries; a missing `history.json` is an empty history with no problem per clarification Q1–Q3 (unrequested)
