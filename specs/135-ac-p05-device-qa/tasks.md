@@ -20,7 +20,7 @@ action, no audit. Precedent: `specs/134-ac-p04-power-visibility/tasks.md`.
 
 ## Phase 4: Story 2 — the overnight campaign (P1)
 
-- [ ] T-A18-504 [P] [US2] Write `docs/apps/ambient-clock/device-campaign.md` with rows AC-D1 to AC-D10 of clarification Q3, each with device class, procedure, threshold and "pending device campaign"; no number claimed (FR-A18-504, 506; SC-A18-503)
+- [X] T-A18-504 [P] [US2] Write `docs/apps/ambient-clock/device-campaign.md` with rows AC-D1 to AC-D10 of clarification Q3, each with device class, procedure, threshold and "pending device campaign"; no number claimed (FR-A18-504, 506; SC-A18-503) — Verified 2026-11-16: 2026-11-16: docs/apps/ambient-clock/device-campaign.md lists AC-D1 to AC-D10 (overnight on power and on battery, heat, memory, frame pacing, OLED drift, night readability, time changes, VoiceOver and Dynamic Type, the accessibility audit), each with device class, procedure, threshold and pending status; no number claimed; validate_docs.py PASS
 
 ## Phase 5: Story 3 — night and motion from the interface (P2)
 
