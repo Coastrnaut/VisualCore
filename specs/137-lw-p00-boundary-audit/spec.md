@@ -41,7 +41,9 @@ in code by a read-only survey:
       context. It validates the size first, releases its target on every path and restores the live scene
       (`OffscreenExportTests`).
     - `RenderHost.maxRenderSize`: the smallest of the maximum texture, renderbuffer and viewport sizes, reported by
-      `RenderCapabilities` with a floor of 2048. Also `RenderHost.maxOffscreenPixels` (64,000,000).
+      `RenderCapabilities` (0 before a context reports them). 2048 is only the OpenGL ES 3.0 minimum that
+      `RenderCapabilities.floorFindings` checks the reported limits against; it is recorded, not applied. Also
+      `RenderHost.maxOffscreenPixels` (64,000,000), public but named by no test.
     - `StillImage` (RGBA8, top-down), `OffscreenRenderError` and `StillImageEncoder.pngData` (an opaque PNG tagged
       sRGB, the only encoder).
     - `StillCapture` (one PNG in a temporary folder; it writes nothing to Photos).
