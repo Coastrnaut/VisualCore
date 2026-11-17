@@ -57,7 +57,7 @@ VisualCore change. Precedent: `specs/146-zg-p02-sand-renderer/tasks.md`. Rollbac
 - [X] T-A21-208 Write `Packages/ExperiencesCreative/Aurora/Experience/Adapter/AuroraManifest.swift` (nine standard — Verified 2026-11-17: 2026-11-17: SkyCore.manifest(for:) in Adapter/AuroraManifest.swift (nine standard scenarios; fixtures for the three presets, a tuned sky and a lowered limit) and AuroraManifestTests (5); scenario-manifest.json generated with UPDATE_SCENARIO_MANIFEST=1 and matched on the plain run; .autonomy/checks/A21-P02.au-ios27.json exit 0; written by an agent, retested
   scenarios and fixtures for each preset, a tuned sky and a lowered limit) and `ExperienceTests/AuroraManifestTests.swift`;
   generate `scenario-manifest.json` with `UPDATE_SCENARIO_MANIFEST=1 TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`
-- [ ] T-A21-209 Aurora tests on sim-27.2 (`--name au-ios27 -- python3 scripts/xcodebuild_package.py --package
+- [X] T-A21-209 Aurora tests on sim-27.2 (`--name au-ios27 -- python3 scripts/xcodebuild_package.py --package — Verified 2026-11-17: 2026-11-17: review checkpoint: .autonomy/checks/A21-P02.au-ios27.json (AuroraCoreTests and AuroraExperienceTests on sim-27.2), A21-P02.documented-api.json, A21-P02.isolation.json and A21-P02.core-purity.json, all exit 0
   Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing
   AuroraCoreTests AuroraExperienceTests`), the documented API, isolation and core purity (review checkpoint)
 - [ ] T-A21-210 Contract: G-CONTROLS, G-CAP and G-CHROME closed by "A21-P02"; rows whose gaps are all closed become
