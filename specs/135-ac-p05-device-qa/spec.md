@@ -24,6 +24,61 @@ Canonical overrides:
   directly.
 - Follow `specs/128-ia-p05-review-device-qa`.
 
+## Clarifications
+
+### Session 2026-11-16
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- `CrossfadeScene` (VisualCoreRendering, A18-P03) owns RGBA8 render targets through `ResourceRegistry.makeRenderTarget`
+  and copies pictures with a framebuffer copy.
+- Experiences may not call the graphics API directly: the isolation check reports `vcgl` calls
+  (`scripts/test_scripts.py`, `ExperienceIsolationTests`).
+- The interface chunks `x2` (A16) and `y2` (A17) are serial in `scripts/release_check.py`.
+- `IASupport` launches with `-vcCandidates`, `-vcResetData` and `-openExperience`.
+
+- Q: What does the cache scene look like? → A: VisualCoreRendering gets an additive `CachedScene: RenderScene` that
+  wraps one child and keeps an RGBA8 target of the drawable size:
+  - `var key: Int` is set by the owner;
+  - when the key differs from the last drawn key, or the target is missing (setup, resize, context loss), the child
+    draws into the target and the scene copies the target to the framebuffer;
+  - otherwise it only copies;
+  - `childDrawCount` counts the child's draws;
+  - with `passThrough = true` it draws the child straight to the framebuffer every frame, as before.
+
+  Existing scenes are unchanged.
+- Q: When is the clock's picture still, and what is its key? → A: It is still when there is no motion (motion off, the
+  in-app reduction, or the system's Reduce Motion), seconds are off, and no crossfade is running. The key hashes:
+  - the theme and palette;
+  - the quality level;
+  - the night dim and tint;
+  - the shown drift step, idle dim and size.
+
+  While moving, the presenter uses `passThrough`. Seconds on keep the picture moving, because the overlay redraws
+  every second anyway, so the cache saves nothing there and stays out of the way.
+- Q: Which campaign rows? → A: Ten rows, AC-D1 to AC-D10:
+  - AC-D1: an overnight run of 8 hours on power;
+  - AC-D2: 8 hours on battery;
+  - AC-D3: heat over 30 minutes;
+  - AC-D4: memory;
+  - AC-D5: frame pacing at 30 per second;
+  - AC-D6: drift visible on an OLED device;
+  - AC-D7: night readability in a dark room;
+  - AC-D8: a daylight-saving change and a time-zone change on the device;
+  - AC-D9: VoiceOver and Dynamic Type;
+  - AC-D10: the system accessibility audit (`VC_RUN_AUDITS=1`).
+
+  Each row names its device class (D1 iPhone on iOS 27, D2 and D3 iPads), procedure, threshold and "pending device
+  campaign".
+- Q: Which interface tests and chunk? → A: `Apps/VisualCore/Tests/UI/AmbientClock/{ACSupport,ACPowerUITests}.swift`,
+  launched like `IASupport`, in a new serial chunk `"z2": ["ACPowerUITests"]`. The tests:
+  - the clock opens with its time label;
+  - turning night mode on and reduce motion on changes their values;
+  - a relaunch without the reset keeps them.
+
+  Each test takes under 60 s.
+- Q: Does anything here change the saved state? → A: No. The schema stays 3, and the cache is presentation only.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - A still clock does almost no work (Priority: P1) 🎯
