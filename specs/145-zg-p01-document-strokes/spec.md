@@ -136,6 +136,8 @@ sand rebuilt from the list matches the sand before the undo.
 - **Too many strokes or stones:** the command is refused with a reason and the garden stays as it was.
 - **Undo with nothing to undo, redo with nothing to redo:** refused without a change.
 - **A stone of an unknown kind:** refused.
+- **A stone command on a missing id, or a stone value out of range** (position outside 0…1, rotation outside −π…π,
+  scale outside 0.5…2): refused without a change; a rotation is normalized into −π…π before the check.
 
 ## Requirements *(mandatory)*
 
