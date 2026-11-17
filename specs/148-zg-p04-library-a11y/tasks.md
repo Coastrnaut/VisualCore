@@ -20,7 +20,7 @@ VisualCore change. Precedent: `specs/141-lw-p04-save-share/tasks.md`. Rollback: 
 
 ## Phase 4: Story 3 — bounded history (P1)
 
-- [ ] T-A20-404 [US3] Write `Packages/ExperiencesCreative/DigitalZenGarden/ExperienceTests/BoundedHistoryTests.swift`: 10,000 seeded commands of every kind (strokes of at most 64 points) leave `done.count ≤ 100`, an encoded done + undone under 2,457,600 bytes, a document within its caps and refusals beyond 400 strokes and 24 stones; under 10 s (FR-A20-404; SC-A20-402)
+- [X] T-A20-404 [US3] Write `Packages/ExperiencesCreative/DigitalZenGarden/ExperienceTests/BoundedHistoryTests.swift`: 10,000 seeded commands of every kind (strokes of at most 64 points) leave `done.count ≤ 100`, an encoded done + undone under 2,457,600 bytes, a document within its caps and refusals beyond 400 strokes and 24 stones; under 10 s (FR-A20-404; SC-A20-402) — Verified 2026-11-17: 2026-11-17: ExperienceTests/BoundedHistoryTests.swift (10,000 seeded commands through GardenCore actions: done at most 100, encoded history under 2,457,600 bytes checked every 500 commands, caps refused, undo lands on the checkpoint; 2,400 raw points stop at 2,048; 1.24 s) passes in .autonomy/checks/A20-P04.zg-ios27.json exit 0; written by an agent, retested
 
 ## Phase 5: Story 4 — share a still (P2)
 
