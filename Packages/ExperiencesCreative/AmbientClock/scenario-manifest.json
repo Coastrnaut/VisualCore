@@ -1,0 +1,397 @@
+{
+  "controls" : [
+    "time.set",
+    "time.changed",
+    "clock.format",
+    "theme.motion",
+    "theme.speed"
+  ],
+  "experience" : "a18.ambient-clock",
+  "kind" : "creative",
+  "scenarios" : [
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+        "initialDigest" : "cbe8f50113c5051d66179c7f056aaf0666c7858ebf6b2078ed55b6bd7e67b35c"
+      },
+      "name" : "launch-first-frame",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "clock.format",
+            "values" : [
+              2,
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "theme.speed",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "clock.format",
+            "values" : [
+              2,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "2b3b49064a14d29e1f0236439df64108483db44ec8d33246e201e7f50738849e",
+        "initialDigest" : "cbe8f50113c5051d66179c7f056aaf0666c7858ebf6b2078ed55b6bd7e67b35c"
+      },
+      "name" : "input-response",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "theme.motion",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "outcome" : "motion-off"
+      },
+      "name" : "completion",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "theme.speed",
+            "values" : [
+              2.5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "time.changed",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "clock.format",
+            "values" : [
+              3,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "time.changed",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "action.rule.a18.invalid-choice",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "theme.motion",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "action.rule.a18.invalid-choice",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "clock.format",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+
+      },
+      "name" : "rejection",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "clock.format",
+            "values" : [
+              2,
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "theme.speed",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "clock.format",
+            "values" : [
+              2,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "2b3b49064a14d29e1f0236439df64108483db44ec8d33246e201e7f50738849e",
+        "initialDigest" : "cbe8f50113c5051d66179c7f056aaf0666c7858ebf6b2078ed55b6bd7e67b35c"
+      },
+      "name" : "save-restore",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "clock.format",
+            "values" : [
+              2,
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "theme.speed",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "clock.format",
+            "values" : [
+              2,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "initialDigest" : "cbe8f50113c5051d66179c7f056aaf0666c7858ebf6b2078ed55b6bd7e67b35c",
+        "resetDigest" : true
+      },
+      "name" : "reset",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "suspend-resume",
+      "seed" : "1"
+    },
+    {
+      "cycles" : 5,
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "teardown-reentry",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "cancel-prepare",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "time.set",
+            "values" : [
+              1781546700
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.changed",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "cbe8f50113c5051d66179c7f056aaf0666c7858ebf6b2078ed55b6bd7e67b35c",
+        "initialDigest" : "cbe8f50113c5051d66179c7f056aaf0666c7858ebf6b2078ed55b6bd7e67b35c",
+        "outcome" : "showing-time"
+      },
+      "name" : "fixture-time-zone-changed",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "theme.motion",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "2253b5b48648ae7f07adc59e1659dcb857713761bb44c6f44b68505f5f7f944b",
+        "initialDigest" : "cbe8f50113c5051d66179c7f056aaf0666c7858ebf6b2078ed55b6bd7e67b35c",
+        "outcome" : "motion-off"
+      },
+      "name" : "fixture-motion-off",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "clock.format",
+            "values" : [
+              2,
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "96cecb825de6a470fe7751620782b42a03fece8bd880c33688916dd9c5ad9b83",
+        "initialDigest" : "cbe8f50113c5051d66179c7f056aaf0666c7858ebf6b2078ed55b6bd7e67b35c",
+        "outcome" : "showing-time"
+      },
+      "name" : "fixture-twenty-four-hour",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "clock.format",
+            "values" : [
+              0,
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8f896828c20d7505ae0e459452d272cf5063ad2c9f3016e5c4df0569b08d4fad",
+        "initialDigest" : "cbe8f50113c5051d66179c7f056aaf0666c7858ebf6b2078ed55b6bd7e67b35c",
+        "outcome" : "showing-time"
+      },
+      "name" : "fixture-seconds-shown",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "theme.speed",
+            "values" : [
+              0.25
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "bbfa8df779d05334b762e5d12d35ab4c3b8819fb65de57e33f25e1c3f281a81b",
+        "initialDigest" : "cbe8f50113c5051d66179c7f056aaf0666c7858ebf6b2078ed55b6bd7e67b35c",
+        "outcome" : "showing-time"
+      },
+      "name" : "fixture-slow-motion",
+      "seed" : "1"
+    }
+  ],
+  "schema" : 1
+}

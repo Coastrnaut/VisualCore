@@ -41,6 +41,7 @@ let package = Package(
         .library(name: "SimulationLabExperience", targets: ["SimulationLabExperience"]),
         // Feature 125 (A17-P02): Interactive Anatomy, a candidate until X-A17.
         .library(name: "InteractiveAnatomyExperience", targets: ["InteractiveAnatomyExperience"]),
+        .library(name: "AmbientClockExperience", targets: ["AmbientClockExperience"]),
         // The standalone ParticleUniverse app target compiles the moved sources and needs the Core until X-A04.
         .library(name: "ParticleUniverseCore", targets: ["ParticleUniverseCore"]),
     ],
@@ -596,6 +597,28 @@ let package = Package(
                                    .product(name: "VisualCoreExperience", package: visualCore),
                                    .product(name: "VisualCoreSimulation", package: visualCore)],
                     path: "AmbientClock/CoreTests"),
+        // A18 Ambient Clock experience (feature 132, A18-P02): a candidate until X-A18. The presenter owns one
+        // FullScreenShaderScene through the host's context and reads the time only from an injected ClockSource.
+        .target(name: "AmbientClockExperience",
+                dependencies: ["AmbientClockCore",
+                               .product(name: "VisualCoreSimulation", package: visualCore),
+                               .product(name: "VisualCoreDiagnostics", package: visualCore),
+                               .product(name: "VisualCorePersistence", package: visualCore),
+                               .product(name: "VisualCoreExperience", package: visualCore),
+                               .product(name: "VisualCoreRendering", package: rendering),
+                               .product(name: "VisualCoreExperienceHost", package: rendering),
+                               .product(name: "VisualCoreUI", package: rendering)],
+                path: "AmbientClock/Experience"),
+        .testTarget(name: "AmbientClockExperienceTests",
+                    dependencies: ["AmbientClockExperience", "AmbientClockCore",
+                               .product(name: "VisualCoreSimulation", package: visualCore),
+                               .product(name: "VisualCoreDiagnostics", package: visualCore),
+                               .product(name: "VisualCorePersistence", package: visualCore),
+                               .product(name: "VisualCoreExperience", package: visualCore),
+                               .product(name: "VisualCoreRendering", package: rendering),
+                               .product(name: "VisualCoreExperienceHost", package: rendering),
+                               .product(name: "VisualCoreUI", package: rendering)],
+                    path: "AmbientClock/ExperienceTests"),
         // A15 Molecular Explorer (feature 110, A15-P01): a candidate until X-A15. The core is pure (Foundation and
         // VisualCoreMath for the scene and camera of feature 111).
         // A16 Simulation Lab (feature 117, A16-P01): a candidate until X-A16. The core is pure (Foundation and VisualCore

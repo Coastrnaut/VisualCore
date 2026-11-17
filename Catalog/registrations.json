@@ -417,6 +417,30 @@
       "manifest": "Packages/ExperiencesCreative/InteractiveAnatomy/scenario-manifest.json",
       "permissions": [],
       "summary": "An interactive anatomy reference of the right knee: a procedural, schematic 3D model with bones, cartilage and ligaments in layers, tap or list selection and cited plain-language text, educational and not medical."
+    },
+    "a18.ambient-clock": {
+      "capabilities": [
+        "locale-aware 12/24-hour clock",
+        "date line and optional seconds",
+        "noise gradient background",
+        "motion and speed controls",
+        "time-zone and DST updates",
+        "spoken time for VoiceOver"
+      ],
+      "quality_tiers": [
+        "level-0",
+        "level-1"
+      ],
+      "palette": [
+        "#0A0F2E",
+        "#240F2E",
+        "#05242A",
+        "#1A1F26"
+      ],
+      "content": null,
+      "manifest": "Packages/ExperiencesCreative/AmbientClock/scenario-manifest.json",
+      "permissions": [],
+      "summary": "A calm, readable clock over a slowly moving procedural noise gradient: locale-aware time and date from the system calendar and time zone, 12/24-hour and seconds options, and the spoken time for VoiceOver."
     }
   }
 }

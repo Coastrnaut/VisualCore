@@ -12,7 +12,7 @@ raise a system prompt; no wall-clock assert. Precedent: `specs/125-ia-p02-scene-
 
 ## Phase 2: Foundational — the experience target
 
-- [ ] T-A18-202 Add the targets `AmbientClockExperience` (path `AmbientClock/Experience`) and `AmbientClockExperienceTests` (path `AmbientClock/ExperienceTests`) and the product `AmbientClockExperience` to `Packages/ExperiencesCreative/Package.swift` (the lead writes this file; dependencies as the Interactive Anatomy experience plus `AmbientClockCore`)
+- [X] T-A18-202 Add the targets `AmbientClockExperience` (path `AmbientClock/Experience`) and `AmbientClockExperienceTests` (path `AmbientClock/ExperienceTests`) and the product `AmbientClockExperience` to `Packages/ExperiencesCreative/Package.swift` (the lead writes this file; dependencies as the Interactive Anatomy experience plus `AmbientClockCore`) — Verified 2026-11-16: 2026-11-16: targets AmbientClockExperience and AmbientClockExperienceTests and the product AmbientClockExperience in Packages/ExperiencesCreative/Package.swift; 2026-11-16: .autonomy/checks/A18-P02.ac-ios27.json exit 0 (47 experience tests in 7 suites and 59 core tests, iOS 27.2); A18-P02.experience-packages.json exit 0 (18 experiences)
 
 ## Phase 3: Story 1 — a readable clock over a calm background (P1) 🎯 MVP
 

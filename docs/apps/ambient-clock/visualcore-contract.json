@@ -304,7 +304,7 @@
    "id": "M03",
    "capability": "Typography integration: the time and date drawn as native text with system fonts over the shader background, legible on every theme, laid out for portrait and landscape and for 12/24 hours with and without seconds",
    "source": "brainstorm: typography integration; manual §6 rule 3 (text in native UI over the background)",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
@@ -415,8 +415,21 @@
    "id": "M06",
    "capability": "Version 0.1 feature 01: accurate, locale-aware time and date from the system calendar, locale and time zone, entering the experience through an injected clock so tests and replays use fixed dates",
    "source": "manual v0.1 feature 01; constitution A18 time is the system's; spec clarification 5",
-   "status": "upstream gap",
-   "evidence": [],
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ClockSource.swift",
+     "symbol": "SystemClock",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/TimeChangeMonitor.swift",
+     "symbol": "TimeChangeMonitor",
+     "product": "VisualCoreExperience",
+     "public": true
+    }
+   ],
    "example": {
     "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Experience/Adapter/SolarCore.swift",
     "symbol": "SolarCore"
@@ -470,7 +483,7 @@
    "id": "M08",
    "capability": "Version 0.1 feature 03: readable 12/24-hour typography with optional seconds, following the system's 24-hour setting unless the user overrides it",
    "source": "manual v0.1 feature 03",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
@@ -587,7 +600,7 @@
    "id": "M11",
    "capability": "Version 0.1 feature 06: correct display at once after returning to the foreground and after time-zone, daylight-saving, locale and significant time changes",
    "source": "manual v0.1 feature 06; manual §6 rule 2",
-   "status": "upstream gap",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreExperience/SessionLifecycle.swift",
@@ -618,7 +631,7 @@
    "id": "M12",
    "capability": "Injected clock: the only reader of the system clock is one injectable source (system by default, fixed in tests and replays); the time enters the state as an action (time.set) on each shown second or minute and after each time change; animation time never stands in for wall time",
    "source": "constitution A18 time is the system's; spec clarification 5; manual §13 risk 2",
-   "status": "upstream gap",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreExperience/ScenarioManifest.swift",
@@ -643,7 +656,7 @@
    "id": "M13",
    "capability": "Time-change handling: foreground return, time zone, daylight-saving transitions, locale and calendar changes, significant time change (midnight, clock set) each re-read the time and reschedule the next tick on the next second or minute boundary",
    "source": "spec FR-A18-003; manual §6 rules 1-2; manual §13 risk 2",
-   "status": "upstream gap",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreExperience/SessionLifecycle.swift",
@@ -724,7 +737,7 @@
    "id": "M16",
    "capability": "Dynamic Type and VoiceOver: the time scales with Dynamic Type, is always spoken in full (hours, minutes, AM/PM or 24-hour, date), minute changes are not announced more often than the planner allows, every control has a VoiceOver label",
    "source": "constitution A18 accessibility; spec FR-A18-003",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
@@ -1270,7 +1283,7 @@
    "justification": "The native clock overlay (through makeCanvasOverlay), its layouts for portrait and landscape, the contrast rule against the theme's palette and the first shader theme (noise gradient) are app work over the public overlay and FullScreenShaderScene (manual phase 02). It also holds the presenter that reads the clock source, sends time.set at each scheduled deadline and time.changed from TimeChangeMonitor.applicationNames, and gives the canvas the spoken string as its accessibility label at every Dynamic Type size (moved here from G-TIMEA11Y at A18-P01, whose part is the core).",
    "phase": 2,
    "test": "Core tests: the contrast ratio of the text against every palette stop of the first theme is at least 4.5 (contrastRatio); experience tests: the overlay shows the formatted time over a rendered frame; the text stays when the scene fails to compile",
-   "closed": null
+   "closed": "A18-P02"
   },
   {
    "id": "G-BUDGETS",
@@ -1282,7 +1295,7 @@
    "justification": "Resolution share, iteration and particle counts per quality tier for each theme are the experience's numbers over QualityLevel, ParticleSystem.capacity and ResourceBudget.",
    "phase": 2,
    "test": "Core tests: every theme's settings stay within each tier's budget; Core.qualityTiers matches the presenter's levels; over-budget presets refused with a typed reason",
-   "closed": null
+   "closed": "A18-P02"
   },
   {
    "id": "G-THEMES",
