@@ -46,7 +46,7 @@ Post-design: PASS.
 ## Project Structure
 
 ```text
-Packages/ExperiencesCreative/LivingWallpapers/Core/{WallpaperProject,ExportNotice,WallpaperHelp}.swift         modify/new
+Packages/ExperiencesCreative/LivingWallpapers/Core/{WallpaperProject,ExportNotice,ExportResultLine,WallpaperHelp}.swift         modify/new
 Packages/ExperiencesCreative/LivingWallpapers/CoreTests/{ProjectTests,ExportNoticeTests,HelpTests}.swift      modify/new
 Packages/ExperiencesCreative/LivingWallpapers/Experience/{Adapter/WallpaperCore,Adapter/AdapterSchemaExamples,
   WallpaperPresenter,WallpaperControls,HelpView}.swift                                                       modify/new
