@@ -44,7 +44,7 @@ Packages/ExperiencesCreative/Package.swift                                 modif
 Packages/ExperiencesCreative/Aurora/Core/{SkyShader,SkyReference}.swift      modify  u_limit, reference limit
 Packages/ExperiencesCreative/Aurora/CoreTests/LimitTests.swift               new     reference under every limit
 Packages/ExperiencesCreative/Aurora/Experience/Adapter/{AuroraCore,AuroraManifest}.swift   new
-Packages/ExperiencesCreative/Aurora/Experience/{SkyScene+Blend,AuroraPresenter,AuroraControls,AuroraExperience}.swift new
+Packages/ExperiencesCreative/Aurora/Experience/{SkyBlend,AuroraPresenter,AuroraControls,AuroraExperience}.swift new
 Packages/ExperiencesCreative/Aurora/ExperienceTests/{AuroraCoreTests,LimitRenderTests,BlendTests,ChromeTests,
   AuroraManifestTests,RebuildTests}.swift                                    new
 Packages/ExperiencesCreative/Aurora/scenario-manifest.json                   new

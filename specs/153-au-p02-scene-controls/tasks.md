@@ -23,7 +23,7 @@ VisualCore change. Precedent: `specs/146-zg-p02-sand-renderer/tasks.md`. Rollbac
   "0…1", `sky.ribbons` "1…4 (integer)", `sky.stars` "0…400 (integer)", `sky.clouds` "0…1", `light.limit`; a fractional
   integer value refused; refusals leave the state unchanged; a newer, damaged or refused snapshot refused on restore;
   quality tiers `level-0`, `level-1`); `AuroraPresenter` (one `FullScreenShaderScene` with the core's shader, `fixedTime`
-  from `SkyClock` by frame deltas, `maxFramesPerSecond` 30, rebuild after context loss or resize); `SkyBlend` ("1.5 s
+  from `SkyClock` by frame deltas, `maxFramesPerSecond` 30, rebuild after context loss or resize); the hue shift applied to the palette before `SkyUniforms` (data-model "Hue"); `SkyBlend` ("1.5 s
   of frame time", smoothstep, from the current blend, immediate under Reduce Motion); native controls with spoken
   labels; the factory as Digital Zen Garden's (FR-A21-201, 202, 204, 207)
 - [ ] T-A21-204 [US1] Write `Packages/ExperiencesCreative/Aurora/ExperienceTests/{AuroraTestSupport,AuroraCoreTests,

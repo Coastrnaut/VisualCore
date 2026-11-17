@@ -6,6 +6,8 @@
   −0.5…0.5, `motion.speed` 0…2, `motion.turbulence` 0…1, `sky.ribbons` 1…4 (integer), `sky.stars` 0…400 (integer),
   `sky.clouds` 0…1, `light.limit` 0.2…0.72. A fractional integer value is refused; a refusal leaves the state
   unchanged. Quality tiers `level-0` (5 octaves) and `level-1` (3).
+- **Hue:** the presenter rotates every palette colour's hue by `hue` turns (in a perceptual-enough HSV of the sRGB
+  colour) before building `SkyUniforms`; the core's `SkyUniforms(scene:phase:level:)` is unchanged.
 - **Blend:** from (current blended inputs), to (target inputs), progress 0…1 over 1.5 s of frame time, smoothstep
   eased; immediate under Reduce Motion.
 - **Limit in the shader:** `u_limit`; knee from 0.83 × limit to the limit, applied after compositing; every pixel's
