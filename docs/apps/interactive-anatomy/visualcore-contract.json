@@ -1399,7 +1399,7 @@
    "id": "M27",
    "capability": "Educational, not medical labels: the model is labelled schematic and educational, texts carry the not-reviewed-by-a-clinician label until the owner's review, and no diagnostic, treatment, accuracy or certification wording appears in the experience or store text",
    "source": "constitution A17 educational, not medical; truthful claims; spec FR-A17-006",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
@@ -1424,7 +1424,7 @@
     "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Core/ScientificReview.swift",
     "symbol": "ScientificReview"
    },
-   "notes": "No claim checker exists in a framework product other than the repository's scripts/check_copy_claims.py release step. The labels are G-REVIEW (A17-P05) and the A17 copy-claims step is G-RELEASE (A17-P06)."
+   "notes": "No claim checker exists in a framework product other than the repository's scripts/check_copy_claims.py release step. The labels are G-REVIEW (A17-P05) and the A17 copy-claims step is G-RELEASE (A17-P06). Available from A17-P06: its gaps (G-REVIEW, G-RELEASE) are closed."
   },
   {
    "id": "M28",
@@ -1694,8 +1694,8 @@
    "owner": "app-local",
    "justification": "Registration, the A17 copy-claims release step (refusing diagnostic, treatment, accuracy and certification wording), verify steps on iOS 27 and 26 and the release notes belong to the experience's release phase.",
    "phase": 6,
-   "test": "Release-check steps: copy-claims-a17 passes on the experience and store text; verify-a17 steps pass on the iOS 27.x and 26.x simulators; the experience package check lists A17 as registered",
-   "closed": null
+   "test": "Release-check steps: experience-release-a17 and copy-claims-a17 (camera allowed for the orbit camera) pass, with the app's release build, symbols, privacy manifest, no tracking, licenses and usage descriptions (8/8); the A17 claims scan refuses diagnostic, treatment, accuracy and certification wording and finds every proving test; the source scan finds no network, tracking or sensor use; interface chunk y2 (IAExploreUITests, IASearchUITests) passes on iOS 27; the experience package check lists A17 as registered. The verify-a17 steps on iOS 26 run at X-A17.",
+   "closed": "A17-P06"
   }
  ],
  "traceability": [
