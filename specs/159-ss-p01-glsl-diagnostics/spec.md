@@ -24,6 +24,84 @@ Canonical overrides:
   Core` until A22-P02 adds the experience.
 - **No VisualCore or ProjectM change.** Follow `specs/152-au-p01-sky-prototype`.
 
+## Clarifications
+
+### Session 2026-11-17
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- **Program compiles:**
+  - `ResourceRegistry.program(vertex:fragment:defines:library:vertexName:fragmentName:)` expands the fragment text
+    with the given `ShaderLibrary`, compiles it and links it. It throws `ShaderError.source`, `.compile` or `.link`,
+    the last two with `[ShaderDiagnostic]`.
+  - `InfoLogParser` maps each log line through the expansion's origins, so an error inside an included file carries
+    that file's name and line. Diagnostics have no column.
+- **Expansion:**
+  - `ShaderLibrary` (VisualCoreShaderSource, pure) refuses a `#version` other than `#version 300 es`, and any
+    `#version` inside an include.
+  - It inserts the version line itself and adds no precision line. Its expansion is at most 64 KiB, with includes at
+    most 8 deep.
+  - `ShaderBundle.visualCoreLibrary` (VisualCoreRendering) holds the `vc/` include texts.
+- **Full-screen drawing:** `FullScreenShaderScene.vertexSource` provides `out vec2 v_uv` (0…1, origin bottom-left).
+- **Uniform declarations:** `ParameterDefinition` (VisualCoreParameters, pure) takes a name matching
+  `^[a-zA-Z][a-zA-Z0-9_]{0,31}$`, a finite range with min < max and a default inside it, so a GLSL uniform name such as
+  `u_speed` is a valid parameter name.
+- **Package layout:** a pending core is `<Name>Core` with `<Name>CoreTests` and no experience target (the pending-core
+  allowance of `scripts/check_experience_packages.py`). Its tests may depend on VisualCoreRendering to draw off screen,
+  as Aurora's did.
+
+- Q: How is the person's source placed into the template, so that lines map back? → A: Three named files in one
+  `ShaderLibrary`, with the `vc/` includes added:
+  - `ss/prelude.glsl`: `precision highp float;`, `in vec2 v_uv;`, `uniform float u_time;`, `uniform vec2
+    u_resolution;`, `out vec4 fragColor;`, and `#include "vc/noise.glsl"` and `#include "vc/color.glsl"`;
+  - `ss/shader.frag`: the person's source, unchanged;
+  - `ss/main.frag`: the entry, `#include "ss/prelude.glsl"` and then `#include "ss/shader.frag"`.
+
+  A diagnostic in the person's code then names `ss/shader.frag` and the authored line; one in the prelude or in a
+  `vc/` file names that file. The core builds the three texts and the mapping rule. It does not expand or compile:
+  the caller adds `ShaderBundle.visualCoreLibrary`. The person's source must not contain `#version`, `precision`
+  redeclarations are allowed, and the person writes `void main()` with `fragColor`.
+- Q: What are the limits, and which uniforms exist in 0.1? → A:
+  - **Limits** (`ShaderLimits`, documented, under the 64 KiB ceiling): at most 16,384 bytes of source and 400 lines;
+    at most 16 uniforms; at most 2 texture inputs, which are declared but bound only from A22-P03.
+  - **Uniforms:** float uniforms only (a `ParameterDefinition` each). The prelude's `u_time` and `u_resolution` are
+    reserved names.
+  - **Validator:** it also refuses:
+    - a source without `void main`;
+    - any `#version` line;
+    - a declared uniform missing from the source (matched as `uniform float <name>;`);
+    - a source `uniform float` that the project does not declare (reported by name);
+    - a reserved name;
+    - a duplicate name.
+- Q: What is the project file? → A:
+  - **Envelope:** `ShaderProject` is a versioned envelope, kind `a22.shader-project`, schema 1, at most 65,536 bytes
+    encoded, holding the name (1 to 40 characters), the source, the uniforms and the limits.
+  - **Refusal codes:** `damaged`, `newer-version`, `too-large`, `not-finite` and `out-of-range` (a uniform's default
+    outside its range, a reversed range, or a limit above the hard ceiling).
+  - **Round trip:** encoding is canonical (sorted keys), so a round trip is byte-identical.
+- Q: Which syntax tokens does the editor model produce? → A: Kinds, in order of matching:
+  - comment (`//` to the end of the line, `/* … */` across lines, and an unclosed one to the end of the source);
+  - preprocessor (a line starting with `#`);
+  - number (integers, floats, exponents and the `u` suffix);
+  - keyword (GLSL ES 3.00 control and qualifier words);
+  - type (`float`, `vec2` … `mat4`, `sampler2D`, `bool`, `int`, `uint`, `void`);
+  - built-in function (`sin`, `mix`, `smoothstep` and the other GLSL ES 3.00 functions) or built-in variable
+    (`gl_FragCoord`);
+  - identifier, operator or punctuation, whitespace.
+
+  Lines are split on `\n`, `\r\n` or `\r` and numbered from 1; tokens never span a line in the model (a block
+  comment is cut at line ends). Diagnostics attach to lines of `ss/shader.frag`; any other file's diagnostics are
+  "outside the source" and listed above it.
+- Q: Which templates ship, and how is "compiles" proved? → A: Three, written in code with a licence record each:
+  - `gradient` (`v_uv` and `u_time`; uniform `u_speed`);
+  - `noise-flow` (`vc_fbm` from `vc/noise.glsl`; uniforms `u_scale` and `u_speed`);
+  - `rings` (concentric rings; uniforms `u_count` and `u_width`).
+
+  The core's tests compile each through `ResourceRegistry.program` with `FullScreenShaderScene.vertexSource`, draw one
+  frame off screen and compare the active uniforms with the declared ones. The regression fixtures (one broken
+  shader per error class: an unknown identifier, a type mismatch, a missing semicolon, an error in a `vc/`-using line,
+  and an error after a multi-line block comment) are compiled the same way.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - A shader project is a small, bounded document (Priority: P1) 🎯
