@@ -9,7 +9,7 @@ stored data exists yet).
 
 ## Phase 1: Setup
 
-- [ ] T-A20-101 Baseline: cite the A20-P00 evidence (`.autonomy/checks/A20-P00.{app-build,no-change,experience-packages}.json`) on an unchanged `Packages` tree instead of a rerun (owner ruling of 2026-11-14)
+- [X] T-A20-101 Baseline: cite the A20-P00 evidence (`.autonomy/checks/A20-P00.{app-build,no-change,experience-packages}.json`) on an unchanged `Packages` tree instead of a rerun (owner ruling of 2026-11-14) — Verified 2026-11-17: 2026-11-17: A20-P00 evidence cited: .autonomy/checks/A20-P00.app-build.json, A20-P00.no-change.json and A20-P00.experience-packages.json, all exit 0; no Packages, Apps or project.yml change since the A20-P00 record commit 71992be8
 - [ ] T-A20-102 Add the targets `DigitalZenGardenCore` (path `DigitalZenGarden/Core`, dependencies `VisualCoreMath` and `VisualCoreExperience`) and `DigitalZenGardenCoreTests` (path `DigitalZenGarden/CoreTests`, dependencies the core and `VisualCoreMath`) to `Packages/ExperiencesCreative/Package.swift` (lead), with a comment naming feature 145 and "a pending core until A20-P02 adds the experience"
 
 ## Phase 2: Story 1 — a garden is a small, safe file (P1) 🎯
