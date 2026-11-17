@@ -54,7 +54,7 @@ device step. No VisualCore change. Precedent: `specs/142-lw-p05-device-tests/tas
 
 ## Phase 4: Story 3 — the campaign plan (P2)
 
-- [ ] T-A20-508 [P] [US3] Write `docs/apps/digital-zen-garden/device-campaign.md` (agent D, after
+- [X] T-A20-508 [P] [US3] Write `docs/apps/digital-zen-garden/device-campaign.md` (agent D, after — Verified 2026-11-17: 2026-11-17: docs/apps/digital-zen-garden/device-campaign.md rows ZG-D1 to ZG-D8, each with devices (D1, D2, D3), procedure, threshold and pending device campaign; no measured number; facts checked in code (30 fps cap, cached still, 480 x 360 field, resampler 0.004 and 512, ambient session); listed in the README; validate_docs exit 0; written by an agent, reviewed
   `docs/apps/living-wallpapers/device-campaign.md`) with rows ZG-D1 to ZG-D8 of clarification Q5, each with devices
   (D1, D2, D3), procedure, threshold and "pending device campaign"; no number claimed; D3 stays on iPadOS 26.5; list
   it in `docs/apps/digital-zen-garden/README.md` (FR-A20-505, 506; SC-A20-503)
