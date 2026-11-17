@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "sh",
+    "specs/157-au-p06-release/scan-claims-release.sh"
+  ],
+  "command": "sh specs/157-au-p06-release/scan-claims-release.sh",
+  "elapsed_seconds": 0.281,
+  "exit_code": 0,
+  "finished": "2026-11-17T12:33:51+00:00",
+  "log": ".autonomy/logs/A21-P06.au-claims.log",
+  "log_sha256": "d40794bdb3a132640681e245e0b4f328065d1b8bb3f108596b589380f34d977a",
+  "name": "au-claims",
+  "stage": "A21-P06",
+  "started": "2026-11-17T12:33:51+00:00",
+  "timed_out": false
+}

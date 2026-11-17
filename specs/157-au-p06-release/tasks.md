@@ -71,7 +71,7 @@
   - the section `### Aurora (A21; features 151–157)` of `docs/release/known-limitations.md`, after the A20 section;
   - the README document table
   (FR-A21-605, 606)
-- [ ] T-A21-607 [US3] Write `specs/157-au-p06-release/scan-claims-release.sh`, then run it:
+- [X] T-A21-607 [US3] Write `specs/157-au-p06-release/scan-claims-release.sh`, then run it: — Verified 2026-11-17: 2026-11-17: specs/157-au-p06-release/scan-claims-release.sh (the words of clarification Q2 over the store text and four interface Swift files, comments included; every named test, suite and AU interface class exists); .autonomy/checks/A21-P06.au-claims.json exit 0 (40 proving tests found)
   - it matches the words of clarification Q2 as whole words, case-insensitive, over the store text and the
     interface Swift of data-model.md;
   - every named test exists, and the AU interface classes exist;
