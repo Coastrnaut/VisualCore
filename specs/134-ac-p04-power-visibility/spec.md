@@ -24,6 +24,65 @@ Canonical overrides:
   - G-AWAKE: opt-in keep-awake.
 - Follow `specs/133-ac-p03-themes-favourites`.
 
+## Clarifications
+
+### Session 2026-11-16
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- `RenderHost(scene:maxFramesPerSecond:budget:)` defaults to 60, and `ExperienceSession.swift:287` builds it without a
+  cap.
+- `FramePacing(thermal:lowPower:requestedMaxFPS:)` keeps a floor of `FramePacing.minimumFPS` (30) and lowers the rate
+  for heat and Low Power Mode.
+- No source in the repository sets `isIdleTimerDisabled` or writes `UIScreen.brightness`.
+- The presenter receives no scene phase; `UIApplication` notifications reach it through the injected centre (A18-P02).
+- The snapshot is schema 2 (A18-P03).
+
+- Q: How does an experience declare its frame cap? → A: An additive requirement of `ExperiencePresenter` in
+  VisualCoreExperienceHost: `var maxFramesPerSecond: Int { get }`, defaulting to 60 in a protocol extension.
+  `ExperienceSession` passes it to `RenderHost(scene:maxFramesPerSecond:budget:)` when it builds the host.
+  `FramePacing` still applies its floor of 30 and its heat and Low Power Mode reductions. Every other experience
+  keeps 60.
+
+  Ambient Clock declares 30 at all times. Its text changes once a second at most and its themes move slowly, so night
+  mode needs no lower cap (30 is the floor).
+- Q: What is night mode exactly? → A: The core holds:
+  - `nightMode` (0 off, 1 on, 2 scheduled) with `nightStart` and `nightEnd` in minutes of the day (defaults 1,320 and
+    420, that is 22:00 and 07:00);
+  - `nightDim` (0.3–1, default 0.5).
+
+  At night the shader multiplies its colour by `nightDim` and by a warm tint (1, 0.75, 0.55). The time text becomes
+  warm amber, #FFB27A, which must reach at least 4.5 : 1 against every dimmed and tinted palette colour (checked over
+  all 48 colours). Scheduled mode reads the local time from the presenter's display environment: start ≤ end means
+  [start, end), start > end wraps midnight, and start = end is never night.
+- Q: How do screen care's drift and dimming work? → A: Drift:
+  - offset = 8 points × (sin(2π·t/600), sin(2π·t/840)), with t the instant in seconds;
+  - so at most 8 points, and at most 2π·8/600 × 60 ≈ 5 points per minute.
+
+  The spec's "1 point per minute" is corrected to "at most 6 points per minute". Under reduced motion the offset is
+  zero. It moves the overlay and the scene by the same points.
+
+  Idle dimming: after 600 s without an action, a dim factor of 0.6 multiplies the scene and the text opacity. Any sent
+  action restores it, with the last-action instant taken from the clock source.
+- Q: How is keep-awake made testable and confined? → A: Through an `IdleTimerPort` protocol with one production type,
+  `ApplicationIdleTimer`, in `Experience/KeepAwake.swift`. It is the only file that names `isIdleTimerDisabled`.
+  - The presenter sets it on when the `keepAwake` setting is on and the clock is visible (setup or
+    `didBecomeActive`).
+  - It sets it off on `willResignActive`, `didEnterBackground`, teardown and setting off.
+  - Tests inject a recording port.
+
+  A source-scan test over the experience's folder finds `isIdleTimerDisabled` in exactly `KeepAwake.swift`, and
+  `brightness =` in no file.
+- Q: What changes in the saved state, and what is the resume fixture? → A: Snapshot schema 3 adds `nightMode`,
+  `nightStart`, `nightEnd`, `nightDim`, `reduceMotion` (the in-app option) and `keepAwake`. The defaults are off, 1,320,
+  420, 0.5, off and off. Migration 2 → 3 fills the defaults, and the schema-1 and schema-2 examples are registered.
+
+  New controls: `night.mode` [0…2], `night.window` [0…1439, 0…1439], `night.dim` [0.3…1], `motion.reduce` [0…1] and
+  `screen.keepAwake` [0…1].
+
+  The resume fixture: the display shows the old minute; the clock advances 30 minutes; posting `willEnterForeground`
+  makes the display show the new time before any `draw`.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - A clock that is kind at night (Priority: P1) 🎯
@@ -76,7 +135,7 @@ visibility changes; scan the sources.
 
 **Acceptance Scenarios**:
 
-1. **Given** any instant, **Then** the drift offset stays within 8 points, moves at most 1 point per minute and is the
+1. **Given** any instant, **Then** the drift offset stays within 8 points, moves at most 6 points per minute and is the
    same for the same instant.
 2. **Given** 10 minutes without an action, **Then** the clock dims; any action restores it.
 3. **Given** keep-awake on and the clock visible, **Then** the idle timer is disabled; on background, close or teardown
@@ -102,7 +161,7 @@ visibility changes; scan the sources.
   changes.
 - **FR-A18-404**: An experience MUST be able to declare a frame cap, never below the platform floor; the default for
   every other experience MUST stay unchanged; Ambient Clock declares 30.
-- **FR-A18-405**: The picture and text MUST drift within 8 points, at most 1 point per minute, deterministically from
+- **FR-A18-405**: The picture and text MUST drift within 8 points, at most 6 points per minute, deterministically from
   the instant; under reduced motion the drift is still.
 - **FR-A18-406**: After 10 minutes without an action the clock MUST dim; any action MUST restore it.
 - **FR-A18-407**: Keep-awake MUST be off by default and, when on, disable the idle timer only while the clock is
