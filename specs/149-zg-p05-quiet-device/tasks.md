@@ -86,3 +86,8 @@ Agent E: T-A20-503, 504. Agent U: T-A20-505, 506. Agent D: T-A20-508. Lead: Pack
 
 MVP: the quiet defaults and the reduced-motion fixture (503, 504). The interface journeys (505–507) prove the named
 gardens in the app; the plan (508) closes G-DEVICE. Review checkpoint at 510. Commit boundaries: one commit per task.
+
+## Phase 6: Convergence
+
+- [ ] T-A20-512 Correct `docs/apps/digital-zen-garden/README.md`: the experience asks only for the add-only Photos permission (`photo-library-add` in `Catalog/registrations.json`, when the still is saved through the share sheet), and the calm switches (sound, sand drift, haptics; off by default) are kept as the experience value `calm.v1` per FR-A20-506 (contradicts)
+- [ ] T-A20-513 Record in `specs/149-zg-p05-quiet-device/data-model.md` that a garden reset keeps the calm switches (a preference, like the quality tier), while a snapshot restore starts them off and the presenter re-sends the kept `calm.v1` switches at the next draw per data-model calm settings (unrequested)
