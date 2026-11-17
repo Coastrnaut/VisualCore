@@ -4512,10 +4512,10 @@
    "implementation": {
     "state": "standalone-partial",
     "legacy_gates_passed": [
-     "A22-P00"
+     "A22-P00",
+     "A22-P01"
     ],
     "legacy_gates_pending": [
-     "A22-P01",
      "A22-P02",
      "A22-P03",
      "A22-P04",
