@@ -48,7 +48,7 @@
 
 - [X] T-A22-006 [US3] Build the one app for testing (`--name app-build -- python3 scripts/release_check.py --only — Verified 2026-11-17: 2026-11-17: .autonomy/checks/A22-P00.app-build.json exit 0 (build for testing on the iOS 27.2 phone simulator with Shader Studio absent)
   app-build-for-testing-ios27`)
-- [ ] T-A22-007 [US3] Experience package check:
+- [X] T-A22-007 [US3] Experience package check: — Verified 2026-11-17: 2026-11-17: .autonomy/checks/A22-P00.experience-packages.json exit 0 (PASS: 21 experiences); grep -c a22 Catalog/registrations.json Apps/VisualCore/App/ExperienceRegistry.swift gives 0 and 0
   - `--name experience-packages -- python3 scripts/check_experience_packages.py` passes (21 experiences, none A22);
   - `grep -c a22 Catalog/registrations.json Apps/VisualCore/App/ExperienceRegistry.swift` gives 0
   (FR-A22-005, SC-A22-004)
