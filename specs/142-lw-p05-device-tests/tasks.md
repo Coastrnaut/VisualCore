@@ -26,7 +26,7 @@ device step. No VisualCore change. Precedent: `specs/135-ac-p05-device-qa/tasks.
 
 ## Phase 5: Records and evidence
 
-- [ ] T-A19-507 Contract: G-DEVICE closed by "A19-P05" (the plan; its rows wait for devices); rows whose gaps are all closed become available with evidence (`--name contract`)
+- [X] T-A19-507 Contract: G-DEVICE closed by "A19-P05" (the plan; its rows wait for devices); rows whose gaps are all closed become available with evidence (`--name contract`) — Verified 2026-11-17: 2026-11-17: .autonomy/checks/A19-P05.contract.json exit 0; G-DEVICE closed by A19-P05 with the campaign plan (its rows wait for devices); M02 and M12 available; M24 stays open for G-RELEASE
 - [ ] T-A19-508 Tests: Living Wallpapers on sim-27.2 (`--name lw-ios27`), documented API, isolation, the scans; app build, unit and interface (`xcodegen generate --spec project.yml`; `--name app-ui -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27 app-ui-ios27-a3`); runner (`--name verify-27`); packages and script tests; the isolation check and the scans prove no GL, wallpaper or Photos library call in the experience (FR-A19-505; SC-A19-501, 504)
 - [ ] T-A19-509 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A19-P05; update README.md (rule 16) and `docs/automatedtesting.md` (rule 17)
 

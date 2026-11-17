@@ -230,7 +230,7 @@
    "id": "M02",
    "capability": "High-resolution rendering: device-sized stills (for example a tablet's 2732-pixel edge) when the GPU allows them, with the limits queried before allocation",
    "source": "brainstorm: high-resolution rendering; manual non-goal: no unlimited 8K on all devices",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
@@ -267,7 +267,7 @@
     "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/ExportSheet.swift",
     "symbol": "ExportRunner"
    },
-   "notes": "maxRenderSize and the pixel cap are tested (OffscreenExportTests, StillCaptureTests), ExportGeometry in ExportGeometryTests. The code guarantees only the OpenGL ES 3.0 floor of 2048 per edge; real device limits are measured in A19-P05 (G-DEVICE), never assumed. Fitting each template to the reported limit with the fallback to the largest size that fits is G-TEMPLATES (A19-P01). Tiling is rejected for 0.1 (research D6). G-TEMPLATES closed in A19-P01; the row stays open for its remaining gaps."
+   "notes": "maxRenderSize and the pixel cap are tested (OffscreenExportTests, StillCaptureTests), ExportGeometry in ExportGeometryTests. The code guarantees only the OpenGL ES 3.0 floor of 2048 per edge; real device limits are measured in A19-P05 (G-DEVICE), never assumed. Fitting each template to the reported limit with the fallback to the largest size that fits is G-TEMPLATES (A19-P01). Tiling is rejected for 0.1 (research D6). G-TEMPLATES closed in A19-P01; the row stays open for its remaining gaps. G-DEVICE closed in A19-P05 with the device-campaign plan (docs/apps/living-wallpapers/device-campaign.md, rows LW-D1 and LW-D2 pending device campaign); the per-device limit is measured there, never assumed. Available."
   },
   {
    "id": "M03",
@@ -642,7 +642,7 @@
    "id": "M12",
    "capability": "Size limits and the fallback: a template whose edge exceeds maxRenderSize or whose pixel count exceeds the cap is refused before allocation and offered at the largest size that fits",
    "source": "manual §13 risk 2; spec clarification 5; research D6",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
@@ -679,7 +679,7 @@
     "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/ExportSheet.swift",
     "symbol": "ExportRunner"
    },
-   "notes": "renderOffscreen throws invalidSize before any GPU work (OffscreenExportTests); ExportGeometry clamps (ExportGeometryTests). The template fit and the offered fallback are G-TEMPLATES (A19-P01); device limits are G-DEVICE (A19-P05). G-TEMPLATES closed in A19-P01; the row stays open for its remaining gaps."
+   "notes": "renderOffscreen throws invalidSize before any GPU work (OffscreenExportTests); ExportGeometry clamps (ExportGeometryTests). The template fit and the offered fallback are G-TEMPLATES (A19-P01); device limits are G-DEVICE (A19-P05). G-TEMPLATES closed in A19-P01; the row stays open for its remaining gaps. G-DEVICE closed in A19-P05 with the device-campaign plan (rows LW-D1 and LW-D2 pending device campaign); the interface test LWExportUITests reaches the notice and the offered size with the automation-only -lwExportLimit. Available."
   },
   {
    "id": "M13",
@@ -1093,7 +1093,7 @@
     "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Core/ScientificReview.swift",
     "symbol": "ScientificReview"
    },
-   "notes": "PerformanceRecord is tested (SessionPerformanceTests). The repository's scripts/check_copy_claims.py is the claim checker; device measurements are G-DEVICE (A19-P05), the A19 copy-claims step G-RELEASE (A19-P06)."
+   "notes": "PerformanceRecord is tested (SessionPerformanceTests). The repository's scripts/check_copy_claims.py is the claim checker; device measurements are G-DEVICE (A19-P05), the A19 copy-claims step G-RELEASE (A19-P06). G-DEVICE closed in A19-P05 with the device-campaign plan (rows LW-D3 to LW-D5 pending; no number claimed) and the interface claims test LWClaimsUITests; the row stays open for G-RELEASE."
   },
   {
    "id": "M25",
@@ -1347,7 +1347,7 @@
    "justification": "Resolution, colour and heat device tests (real maxRenderSize per device, exported profile on device, thermal cost of the largest template) belong to the device campaign after ImplementationLock-100 (manual phase 05); device actions by the owner are BLOCKED_OWNER_ACTION.",
    "phase": 5,
    "test": "Device-campaign rows: maxRenderSize recorded per device; the largest template exports or falls back; the exported file's profile and size verified on device; thermal state recorded; rows pending until the campaign",
-   "closed": null
+   "closed": "A19-P05"
   },
   {
    "id": "G-RELEASE",
