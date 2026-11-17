@@ -20,8 +20,8 @@ Research: [research.md](research.md). Data: [data-model.md](data-model.md). Cont
 
 - **Language:** Swift 6 and GLSL ES 3.00 (as text).
 - **Dependencies:**
-  - the core: `VisualCoreShaderSource` (`ShaderDiagnostic`, `ShaderLibrary` limits), `VisualCoreParameters`
-    (`ParameterDefinition`) and `VisualCorePersistence` (none needed if the envelope is app-local; see research D3);
+  - the core: `VisualCoreShaderSource` (`ShaderDiagnostic`, `ShaderLibrary` limits) and `VisualCoreParameters`
+    (`ParameterDefinition`) only; the project envelope is app-local (research D3);
   - the core tests: also `VisualCoreRendering` (`RenderHost`, `ResourceRegistry.program`, `ShaderBundle`,
     `FullScreenShaderScene.vertexSource`).
 - **Testing:** `ShaderStudioCoreTests` on sim-27.2 through `scripts/xcodebuild_package.py`; each test under 10 s.
