@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_app_contract.py",
+    "--app",
+    "living-wallpapers",
+    "--render"
+  ],
+  "command": "python3 scripts/check_app_contract.py --app living-wallpapers --render",
+  "elapsed_seconds": 0.043,
+  "exit_code": 0,
+  "finished": "2026-11-17T05:17:07+00:00",
+  "log": ".autonomy/logs/A19-P00.contract.log",
+  "log_sha256": "b76b347fa3959c8c7c7cbd6ce89cdadf93fdb2171b4e9c728b0feb7f524aba14",
+  "name": "contract",
+  "stage": "A19-P00",
+  "started": "2026-11-17T05:17:07+00:00",
+  "timed_out": false
+}
