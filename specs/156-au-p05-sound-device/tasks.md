@@ -99,7 +99,7 @@
 
 ## Phase 6: Records and evidence
 
-- [ ] T-A21-510 Contract:
+- [X] T-A21-510 Contract: — Verified 2026-11-17: 2026-11-17: .autonomy/checks/A21-P05.contract.json exit 0 (G-SOUND and G-DEVICE closed by A21-P05, G-DEVICE as the plan; M09, M10, M14 and M21 available; M24 waits for G-RELEASE); A21-P05.experience-packages.json exit 0
   - G-SOUND and G-DEVICE are closed by "A21-P05" (G-DEVICE as the plan; its rows wait for devices);
   - rows whose gaps are all closed become available with evidence;
   - check: `--name contract`, `check_app_contract.py --app aurora --render`
