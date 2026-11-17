@@ -190,6 +190,8 @@ will own each missing piece and in which phase.
   support and the iPad-first layout.
 - **Shader language support varies** (the manual's risk 3): the audit records which capability queries exist and
   where the compatibility profile is owned.
+- **A compile requested while another waits:** only the newest request is kept, and at most one compile runs per
+  frame.
 - **Line numbers shifted by inserted code:** the audit records where a prefix (version, precision, includes) is added
   and how the person's line numbers are recovered.
 
@@ -208,7 +210,10 @@ will own each missing piece and in which phase.
   and the phase that will build it. At least these MUST be assessed:
   - the project, template and uniform models, versioned and validated, with documented caps;
   - a source validator run before any compile (size, lines, uniforms, inputs);
-  - compiling and linking a person's fragment shader in the host's context, with the complete log captured;
+  - compiling and linking a person's fragment shader in the host's context, with the complete log captured. The
+    host's thread is the main thread (VisualCore has no other GL thread), so a compile is never run from a control's
+    action: the action queues a request that the preview scene compiles at its next frame, after the pre-compile caps,
+    one request at a time, with the newest request replacing a waiting one;
   - mapping log lines to the person's lines after inserted template code;
   - an explicit Compile and Run action that swaps programs only on success and keeps the last good preview;
   - a bounded preview surface (size and frame rate) with a stop, reset and watchdog for slow frames;
