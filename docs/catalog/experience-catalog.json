@@ -4110,10 +4110,10 @@
      "A20-P01",
      "A20-P02",
      "A20-P03",
-     "A20-P04"
+     "A20-P04",
+     "A20-P05"
     ],
     "legacy_gates_pending": [
-     "A20-P05",
      "A20-P06"
     ],
     "unified_integration": "pending"

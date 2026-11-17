@@ -69,7 +69,7 @@ device step. No VisualCore change. Precedent: `specs/142-lw-p05-device-tests/tas
   scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27 app-ui-ios27-b3`; runner (`--name
   verify-27`); experience packages and script tests; isolation proves no GL call outside the scene protocol
   (FR-A20-501–504; SC-A20-501, 502, 504)
-- [ ] T-A20-511 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+- [X] T-A20-511 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record — Verified 2026-11-17: 2026-11-17: converge round 1 appended T-A20-512 and T-A20-513 (implemented), round 2 converged with nothing appended; A20-P05 sealed (.autonomy/evidence/A20-P05.json) and recorded (VERIFIED-GATE A20-P05, 149 of 263); planning index, matrix, distinctiveness, metadata, Auto-Creator, catalog (--check PASS), validate_autocreator and validate_docs PASS; README and docs/automatedtesting.md updated
   A20-P05; update README.md (rule 16) and `docs/automatedtesting.md` (rule 17)
 
 ## Dependencies

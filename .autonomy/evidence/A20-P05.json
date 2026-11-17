@@ -1,0 +1,68 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/A20-P05.app-ui.json",
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27 app-ui-ios27-b3",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A20-P05.app-ui.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A20-P05.contract.json",
+      "command": "python3 scripts/check_app_contract.py --app digital-zen-garden --render",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A20-P05.contract.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A20-P05.core-purity.json",
+      "command": "sh -c '! grep -rnE \"import (UIKit|SwiftUI|OpenGLES|Network)|URLSession|Date\\(\\)|ContinuousClock|CFAbsoluteTime\" Packages/ExperiencesCreative/DigitalZenGarden/Core'",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A20-P05.core-purity.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A20-P05.documented-api.json",
+      "command": "python3 scripts/check_documented_api.py --sources Packages/ExperiencesCreative/DigitalZenGarden",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A20-P05.documented-api.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A20-P05.experience-packages.json",
+      "command": "python3 scripts/check_experience_packages.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A20-P05.experience-packages.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A20-P05.isolation.json",
+      "command": "python3 scripts/check_app_isolation.py --experiences Packages/ExperiencesCreative/DigitalZenGarden",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A20-P05.isolation.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A20-P05.photos-scan.json",
+      "command": "sh -c '! grep -rnE \"import Photos|PhotosUI|PHPhotoLibrary\" Packages/ExperiencesCreative/DigitalZenGarden'",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A20-P05.photos-scan.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A20-P05.script-tests.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A20-P05.script-tests.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A20-P05.verify-27.json",
+      "command": "python3 scripts/verify_experiences.py --only a20.digital-zen-garden --runtime 27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A20-P05.verify-27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A20-P05.zg-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing DigitalZenGardenCoreTests DigitalZenGardenExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A20-P05.zg-ios27.log"
+    }
+  ],
+  "generated": "2026-11-17T09:48:42+00:00",
+  "method": "deterministic-run-check",
+  "stage": "A20-P05",
+  "status": "pass"
+}
