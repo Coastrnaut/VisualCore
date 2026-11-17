@@ -941,6 +941,49 @@ It is not diagnostic or treatment advice, a full-body atlas, or a viewer for pat
   animated camera moves with cuts.
 - **Licenses:** every content text, palette and shader records its source and license.
 
+### A18 Ambient Clock (`a18.ambient-clock`)
+
+Ratified from the app manual's constitution prompt (2026-11-16). Like A05–A17, it never had a standalone target: it
+is built directly as an experience of the one app. Its product goal is a readable bedside or desk clock over a
+procedural ambient visual. Version 0.1 covers:
+- accurate, locale-aware time and date from the system calendar and time zone;
+- four procedural visual themes with quality and motion controls;
+- readable 12/24-hour typography with optional seconds;
+- a theme editor with saveable favourites;
+- a brightness-friendly night mode and a motion-reduction option;
+- correct updates after returning to the foreground and after time-zone and daylight-saving changes.
+
+It is not an alarm, a timer, a weather display or a guaranteed always-on screen.
+
+- **Consumer, not fork:** an experience of the VisualCore app and a VisualCore consumer, never a fork of
+  projectm-ios. It uses only audited VisualCore public APIs over the OpenGL ES → ANGLE → Metal integration. It MUST
+  NOT create its own EGL/ANGLE initialization path or a second renderer, or link ProjectM engine code.
+- **Reuse first (Principle II):** shaders, fields, palettes, parameters, quality tiers, persistence, text overlays
+  and accessibility planning already in VisualCore are reused, not copied. New generic machinery goes into VisualCore
+  with tests, docs, the API baseline and the reference regression when it is reusable. The clock's themes, layouts
+  and copy stay in the experience.
+- **Time is the system's:** the shown time and date come only from the system clock, calendar, locale and time zone.
+  The production path has no simulated or offset clock. For determinism, the current date enters the experience as
+  an injected value or an action, so tests and scenario replays use fixed dates. Time-zone, daylight-saving, locale
+  and foreground changes update the display at once.
+- **Visuals are code:** every theme is procedural (shaders, fields, particles, SDFs), with no purchased, generated or
+  photographic image. Typography uses system fonts.
+- **Testable without the GPU:** formatting (12/24 hours, seconds, locale), theme and favourite documents, night-mode
+  and motion rules and the update schedule are pure, versioned models, tested through `swift test`. Drawing never
+  changes the state.
+- **Screen care:** a slow, bounded pixel drift and dimming protect OLED screens over long sessions. The experience
+  never promises to keep the screen on; it may ask the system to stay awake only while it is visible, and says so.
+- **Bounded:** frame cost, particle and shader budgets are fixed per quality level, and night mode lowers the frame
+  rate and the brightness. Stored favourites have a cap.
+- **Offline-first and private:** no networking, location, weather, accounts, analytics or ads. No permission
+  beyond what a feature actually needs, and each one is disclosed.
+- **Truthful claims:** performance, battery or thermal numbers come only from device measurements. Copy never
+  claims more accuracy than the system clock gives.
+- **Accessibility:** native SwiftUI controls with VoiceOver labels and Dynamic Type. The time is always spoken in
+  full, and contrast stays readable in night mode. Information never depends on colour alone. Reduce Motion stills
+  the animated themes.
+- **Licenses:** every theme, palette and shader records its source and license.
+
 ## Governance
 
 - Precedence: real Apple platform and toolchain behavior and observed test results → owner
@@ -983,5 +1026,7 @@ It is not diagnostic or treatment advice, a full-body atlas, or a viewer for pat
   its manual's constitution prompt at gate A16-P00 (feature 116); no principle changes.
 - Amendment 2.13.0 (2026-11-16, MINOR): App-Scoped Rules gain the A17 Interactive Anatomy subsection, ratified
   from its manual's constitution prompt at gate A17-P00 (feature 123); no principle changes.
+- Amendment 2.14.0 (2026-11-16, MINOR): App-Scoped Rules gain the A18 Ambient Clock subsection, ratified from its
+  manual's constitution prompt at gate A18-P00 (feature 130); no principle changes.
 
-**Version**: 2.13.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-16
+**Version**: 2.14.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-16
