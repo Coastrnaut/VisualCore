@@ -9,7 +9,7 @@ only).
 
 ## Phase 1: Setup
 
-- [ ] T-A20-001 Create `docs/apps/digital-zen-garden/README.md` (what the experience is per the manual §1–§2: a calm, tactile sand-raking and stone-arrangement experience with persistent compositions, offline, no permission; that it is an experience of the one app; its documents) and `docs/apps/digital-zen-garden/regression-baseline.md` with the phase start `4a0ba17b` (the specify commit; constitution `eb1f1233`) and the reference pin `d93edd1`
+- [X] T-A20-001 Create `docs/apps/digital-zen-garden/README.md` (what the experience is per the manual §1–§2: a calm, tactile sand-raking and stone-arrangement experience with persistent compositions, offline, no permission; that it is an experience of the one app; its documents) and `docs/apps/digital-zen-garden/regression-baseline.md` with the phase start `4a0ba17b` (the specify commit; constitution `eb1f1233`) and the reference pin `d93edd1` — Verified 2026-11-17: 2026-11-17: docs/apps/digital-zen-garden/README.md and regression-baseline.md written (phase start 4a0ba17b, constitution eb1f1233, reference pin d93edd1 read from the submodule)
 
 ## Phase 3: User Story 1 — Evidence-backed integration matrix (P1) 🎯
 
