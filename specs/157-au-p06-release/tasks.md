@@ -91,7 +91,7 @@
 
 ## Phase 6: Records and evidence
 
-- [ ] T-A21-609 Aurora tests on sim-27.2 (`--name au-ios27`; each under 10 s) and the documented API
+- [X] T-A21-609 Aurora tests on sim-27.2 (`--name au-ios27`; each under 10 s) and the documented API — Verified 2026-11-17: 2026-11-17: .autonomy/checks/A21-P06.au-ios27.json exit 0 (32 core, 71 experience tests on sim-27.2; each under 10 s, the suites about 15 s) and A21-P06.documented-api.json exit 0, both read before this tick
   (`--name documented-api`) (SC-A21-604)
 - [ ] T-A21-610 App build, unit tests and interface chunk:
   - `xcodegen generate --spec project.yml`;
