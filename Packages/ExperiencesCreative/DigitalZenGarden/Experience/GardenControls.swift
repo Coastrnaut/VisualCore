@@ -21,6 +21,20 @@
 //   - `stone-nudge-left`, `-right`, `-up` and `-down` (`stone.move` by 0.02 tray widths, clamped inside the tray);
 //   - `stone-remove` (`stone.remove []`).
 // The selection controls are disabled without a selected stone; previous and next without stones.
+//
+// Feature 148 (A20-P04) T-A20-402, T-A20-403, T-A20-405 (FR-A20-401, FR-A20-403, FR-A20-405; clarifications Q1, Q3,
+// Q4; gaps G-LIBRARY, G-A11Y). Every control's spoken label and value come from one list (`labels(...)`, also read by
+// the tests), for example "Rake" / "Fine rake", "Undo" / "a stroke", "Open Morning" / "Saved garden 1 of 2":
+//   - Library: `library-name` (the name field), `library-save` ("Save garden"; a name that a garden already has asks
+//     "Replace the garden called <name>?" first), and per saved garden `library-open-<n>`, `library-rename-<n>` (an
+//     alert with a name field) and `library-delete-<n>` (asks first); an unreadable file is listed as
+//     `library-unreadable-<n>` ("Unreadable garden <name>", its code) with its delete button; `library-message`.
+//   - Picture: `still-make` ("Make picture", 1600 by 1200 pixels) and, once written, `still-share` (a `ShareLink`
+//     of the PNG file); `still-message`.
+//   - Undo, redo, Place and the patterns go through the presenter, which announces them (or their refusal).
+//   - At the accessibility text sizes every row stacks in one column and the text wraps (never clipped); the
+//     segmented pickers become a column of buttons.
+// The library and picture buttons are native controls only: no gesture is added.
 import DigitalZenGardenCore
 import Foundation
 import SwiftUI
@@ -64,17 +78,52 @@ enum StoneControlValues {
     }
 }
 
+/// One spoken label of a control: its identifier name, its title and its value (feature 148).
+struct GardenControlLabel: Equatable, Sendable {
+    /// The identifier name (`experience.a20.digital-zen-garden.<name>`).
+    var name: String
+    /// The spoken title, for example "Rake".
+    var title: String
+    /// The spoken value, for example "Fine rake".
+    var value: String
+
+    /// "<title>, <value>".
+    var text: String { title + ", " + value }
+}
+
+extension View {
+    /// Applies `label`'s title and value as the accessibility label and value (feature 148).
+    func spoken(_ label: GardenControlLabel?) -> some View {
+        accessibilityLabel(Text(verbatim: label?.title ?? ""))
+            .accessibilityValue(Text(verbatim: label?.value ?? ""))
+    }
+}
+
 /// The native controls of Digital Zen Garden (see the file header).
 struct GardenControls: View {
     /// The port the controls send through.
     let port: ExperienceActionPort
     /// What the controls show.
     let mirror: GardenMirror
+    /// The presenter: the library, the picture and the announced actions (feature 148).
+    let presenter: GardenPresenter
+
+    @Environment(\.dynamicTypeSize) private var typeSize
+    @Environment(\.experienceStillRenderer) private var stillRenderer
+    @State private var name = ""
+    @State private var replacing: String?
+    @State private var renaming: GardenLibraryEntry?
+    @State private var newName = ""
+    @State private var deleting: GardenLibraryEntry?
 
     /// The rake titles, by index of `GardenPalette.rakes`.
     static var rakeTitles: [String] { GardenPalette.rakes.map(\.name) }
     /// The tone titles, by index of `GardenPalette.tones`.
     static var toneTitles: [String] { GardenPalette.tones.map(\.name) }
+    /// The tool titles: "Rake" and "Stones" (feature 147).
+    static let toolTitles = ["Rake", "Stones"]
+    /// The spoken value of the picture controls (feature 148).
+    static let stillValue = "PNG, \(GardenStill.width) by \(GardenStill.height) pixels"
 
     /// The spoken label of the pattern button at `index`: "Rake rows", "Rake a circle", "Rake a wave", "Rake a
     /// spiral".
@@ -82,58 +131,200 @@ struct GardenControls: View {
         ["Rake rows", "Rake a circle", "Rake a wave", "Rake a spiral"][min(max(index, 0), 3)]
     }
 
-    /// The controls.
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(verbatim: "Digital Zen Garden").font(.headline).accessibilityAddTraits(.isHeader)
-            rakePicker
-            toneMenu
-            HStack(spacing: 12) {
-                editButton("Undo", name: "undo", control: "edit.undo", enabled: mirror.canUndo,
-                           hint: "Removes the last stroke or tone change")
-                editButton("Redo", name: "redo", control: "edit.redo", enabled: mirror.canRedo,
-                           hint: "Restores what was undone last")
+    /// The selection buttons: identifier name, title and hint (feature 147).
+    static let selectionButtons: [(name: String, title: String)] = [
+        ("stone-previous", "Previous"), ("stone-next", "Next"), ("stone-remove", "Remove"),
+        ("stone-turn-left", "Turn left"), ("stone-turn-right", "Turn right"), ("stone-nudge-left", "Move left"),
+        ("stone-nudge-right", "Move right"), ("stone-nudge-up", "Move up"), ("stone-nudge-down", "Move down"),
+    ]
+
+    /// The spoken label of every control shown for `mirror`, the saved gardens `entries` (nil without a library),
+    /// the name field's text `name` and whether a written picture is offered (`stillReady`), in display order
+    /// (feature 148).
+    static func labels(_ mirror: GardenMirror, entries: [GardenLibraryEntry]?, name: String,
+                       stillReady: Bool) -> [GardenControlLabel] {
+        let rake = rakeTitles[min(max(mirror.rakeStyle, 0), rakeTitles.count - 1)]
+        let kind = GardenPalette.stones[min(max(mirror.placeKind, 0), GardenPalette.stones.count - 1)].name
+        var labels = [
+            GardenControlLabel(name: "rake", title: "Rake", value: rake),
+            GardenControlLabel(name: "tone", title: "Sand tone",
+                               value: toneTitles[min(max(mirror.tone, 0), toneTitles.count - 1)]),
+            GardenControlLabel(name: "undo", title: "Undo", value: mirror.undoValue),
+            GardenControlLabel(name: "redo", title: "Redo", value: mirror.redoValue),
+        ]
+        for (index, pattern) in StrokePatterns.names.enumerated() {
+            labels.append(GardenControlLabel(name: "pattern-" + pattern, title: patternLabel(index), value: rake))
+        }
+        labels.append(GardenControlLabel(name: "tool", title: "Tool",
+                                         value: toolTitles[min(max(mirror.toolMode, 0), toolTitles.count - 1)]))
+        labels.append(GardenControlLabel(name: "stone-kind", title: "Stone", value: kind))
+        labels.append(GardenControlLabel(name: "stone-place", title: "Place stone", value: kind))
+        labels.append(GardenControlLabel(name: "selection", title: "Selection", value: mirror.selectionValue))
+        for button in selectionButtons {
+            labels.append(GardenControlLabel(name: button.name, title: button.title, value: mirror.selectionValue))
+        }
+        if let entries {
+            let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+            labels.append(GardenControlLabel(name: "library-name", title: "Garden name",
+                                             value: trimmed.isEmpty ? "empty" : trimmed))
+            labels.append(GardenControlLabel(name: "library-save", title: "Save garden",
+                                             value: trimmed.isEmpty ? "no name" : trimmed))
+            let readable = entries.filter(\.isReadable)
+            for (index, entry) in readable.enumerated() {
+                let value = "Saved garden \(index + 1) of \(readable.count)"
+                let n = String(entry.number)
+                labels.append(GardenControlLabel(name: "library-open-" + n, title: "Open " + entry.name, value: value))
+                labels.append(GardenControlLabel(name: "library-rename-" + n, title: "Rename " + entry.name,
+                                                 value: value))
+                labels.append(GardenControlLabel(name: "library-delete-" + n, title: "Delete " + entry.name,
+                                                 value: value))
             }
-            patternButtons
-            stoneControls
-            if let message = mirror.message {
-                Text(verbatim: message).font(.footnote)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .accessibilityIdentifier(port.identifier("message"))
+            for entry in entries where !entry.isReadable {
+                let n = String(entry.number)
+                let code = entry.refusal ?? "damaged"
+                labels.append(GardenControlLabel(name: "library-unreadable-" + n,
+                                                 title: "Unreadable garden " + entry.name, value: code))
+                labels.append(GardenControlLabel(name: "library-delete-" + n, title: "Delete " + entry.name,
+                                                 value: "unreadable, " + code))
             }
         }
+        labels.append(GardenControlLabel(name: "still-make", title: "Make picture", value: stillValue))
+        if stillReady { labels.append(GardenControlLabel(name: "still-share", title: "Share picture", value: stillValue)) }
+        return labels
+    }
+
+    /// Whether the text is at an accessibility size (the rows then stack in one column).
+    private var stacked: Bool { typeSize.isAccessibilitySize }
+
+    /// A row: horizontal, or one column at the accessibility sizes.
+    private var row: AnyLayout {
+        stacked ? AnyLayout(VStackLayout(alignment: .leading, spacing: 8)) : AnyLayout(HStackLayout(spacing: 8))
+    }
+
+    /// The controls.
+    var body: some View {
+        let entries = presenter.library?.entries
+        let stillReady = mirror.stillURL != nil
+        let list = Self.labels(mirror, entries: entries, name: name, stillReady: stillReady)
+        let spokenLabels = Dictionary(list.map { ($0.name, $0) }, uniquingKeysWith: { first, _ in first })
+        return VStack(alignment: .leading, spacing: 8) {
+            Text(verbatim: "Digital Zen Garden").font(.headline).accessibilityAddTraits(.isHeader)
+            rakePicker(spokenLabels)
+            toneMenu(spokenLabels)
+            row {
+                editButton("Undo", name: "undo", enabled: mirror.canUndo,
+                           hint: "Undoes the last stroke, stone change or tone change", spokenLabels) {
+                    presenter.undo(port: port)
+                }
+                editButton("Redo", name: "redo", enabled: mirror.canRedo,
+                           hint: "Restores what was undone last", spokenLabels) {
+                    presenter.redo(port: port)
+                }
+            }
+            patternButtons(spokenLabels)
+            stoneControls(spokenLabels)
+            if let message = mirror.message {
+                wrapping(message).font(.footnote)
+                    .accessibilityIdentifier(port.identifier("message"))
+            }
+            if let entries { librarySection(entries, spokenLabels) }
+            stillSection(spokenLabels)
+        }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .onAppear { if name.isEmpty, let opened = presenter.openedName { name = opened } }
+        .confirmationDialog(Text(verbatim: "Replace the garden called \(replacing ?? "")?"),
+                            isPresented: Binding(get: { replacing != nil }, set: { if !$0 { replacing = nil } }),
+                            titleVisibility: .visible, presenting: replacing) { target in
+            Button(role: .destructive) { presenter.saveGarden(named: target) } label: { Text(verbatim: "Replace") }
+                .accessibilityIdentifier(port.identifier("library-replace-confirm"))
+        }
+        .alert(Text(verbatim: "Rename garden"),
+               isPresented: Binding(get: { renaming != nil }, set: { if !$0 { renaming = nil } }),
+               presenting: renaming) { entry in
+            TextField(text: $newName) { Text(verbatim: "Garden name") }
+                .accessibilityIdentifier(port.identifier("library-rename-name"))
+            Button {
+                if case .success(let renamed) = presenter.renameGarden(entry.file, to: newName),
+                   name == entry.name { name = renamed.name }
+            } label: { Text(verbatim: "Rename") }
+                .accessibilityIdentifier(port.identifier("library-rename-confirm"))
+            Button(role: .cancel) {} label: { Text(verbatim: "Cancel") }
+        }
+        .confirmationDialog(Text(verbatim: "Delete the saved garden \(deleting?.name ?? "")?"),
+                            isPresented: Binding(get: { deleting != nil }, set: { if !$0 { deleting = nil } }),
+                            titleVisibility: .visible, presenting: deleting) { entry in
+            Button(role: .destructive) { presenter.deleteGarden(entry.file) } label: { Text(verbatim: "Delete") }
+                .accessibilityIdentifier(port.identifier("library-delete-confirm"))
+        }
+    }
+
+    /// `text` wrapping onto as many lines as it needs.
+    private func wrapping(_ text: String) -> some View {
+        Text(verbatim: text).fixedSize(horizontal: false, vertical: true).multilineTextAlignment(.leading)
+    }
+
+    /// A segmented picker of `titles`, or at the accessibility sizes a column of buttons (the selected one marked),
+    /// sending `control` when the choice changes.
+    @ViewBuilder
+    private func choicePicker(_ titles: [String], current: Int, control: String, title: String, name: String,
+                              hint: String, _ spokenLabels: [String: GardenControlLabel]) -> some View {
+        if stacked {
+            VStack(alignment: .leading, spacing: 4) {
+                wrapping(title).accessibilityHidden(true)
+                ForEach(Array(titles.enumerated()), id: \.offset) { index, choice in
+                    Button {
+                        guard index != current else { return }
+                        port.send(control, [Double(index)])
+                    } label: {
+                        HStack(spacing: 8) {
+                            wrapping(choice)
+                            if index == current { Image(systemName: "checkmark").accessibilityHidden(true) }
+                        }
+                        .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                        .contentShape(Rectangle())
+                    }
+                    .accessibilityLabel(Text(verbatim: title + ", " + choice))
+                    .accessibilityAddTraits(index == current ? .isSelected : [])
+                    .accessibilityHint(Text(verbatim: hint))
+                    .accessibilityIdentifier(port.identifier(name + "-" + String(index)))
+                }
+            }
+            .accessibilityElement(children: .contain)
+            .accessibilityIdentifier(port.identifier(name))
+        } else {
+            Picker(selection: Binding(get: { current },
+                                      set: { next in
+                                          guard next != current else { return }
+                                          port.send(control, [Double(next)])
+                                      })) {
+                ForEach(Array(titles.enumerated()), id: \.offset) { index, choice in
+                    Text(verbatim: choice).tag(index)
+                }
+            } label: {
+                Text(verbatim: title)
+            }
+            .pickerStyle(.segmented)
+            .frame(minHeight: 44)
+            .spoken(spokenLabels[name])
+            .accessibilityHint(Text(verbatim: hint))
+            .accessibilityIdentifier(port.identifier(name))
+        }
     }
 
     /// The rake picker (sends `rake.style` when the choice changes).
-    private var rakePicker: some View {
+    private func rakePicker(_ spokenLabels: [String: GardenControlLabel]) -> some View {
         let titles = Self.rakeTitles
-        let current = min(max(mirror.rakeStyle, 0), titles.count - 1)
-        return Picker(selection: Binding(get: { current },
-                                         set: { next in
-                                             guard next != current else { return }
-                                             port.send("rake.style", [Double(next)])
-                                         })) {
-            ForEach(Array(titles.enumerated()), id: \.offset) { index, title in
-                Text(verbatim: title).tag(index)
-            }
-        } label: {
-            Text(verbatim: "Rake")
-        }
-        .pickerStyle(.segmented)
-        .frame(minHeight: 44)
-        .accessibilityLabel(Text(verbatim: "Rake, " + titles[current]))
-        .accessibilityHint(Text(verbatim: "Chooses the rake of the next stroke"))
-        .accessibilityIdentifier(port.identifier("rake"))
+        return choicePicker(titles, current: min(max(mirror.rakeStyle, 0), titles.count - 1), control: "rake.style",
+                            title: "Rake", name: "rake", hint: "Chooses the rake of the next stroke", spokenLabels)
     }
 
     /// The tone menu (sends `sand.tone` when the choice changes).
-    private var toneMenu: some View {
+    private func toneMenu(_ spokenLabels: [String: GardenControlLabel]) -> some View {
         let titles = Self.toneTitles
         let current = min(max(mirror.tone, 0), titles.count - 1)
-        return HStack {
-            Text(verbatim: "Sand").accessibilityHidden(true)
-            Spacer(minLength: 8)
+        return row {
+            wrapping("Sand").accessibilityHidden(true)
+            if !stacked { Spacer(minLength: 8) }
             Menu {
                 ForEach(Array(titles.enumerated()), id: \.offset) { index, title in
                     Button(title) {
@@ -142,104 +333,88 @@ struct GardenControls: View {
                     }
                 }
             } label: {
-                Text(verbatim: titles[current]).frame(minHeight: 44)
+                wrapping(titles[current]).frame(minHeight: 44)
             }
-            .accessibilityLabel(Text(verbatim: "Sand tone, " + titles[current]))
+            .spoken(spokenLabels["tone"])
             .accessibilityHint(Text(verbatim: "Chooses the colour of the sand"))
             .accessibilityIdentifier(port.identifier("tone"))
         }
     }
 
-    /// An undo or redo button sending `control`, disabled unless `enabled`.
-    private func editButton(_ title: String, name: String, control: String, enabled: Bool,
-                            hint: String) -> some View {
-        Button {
-            port.send(control)
-        } label: {
-            Text(verbatim: title).frame(minWidth: 44, minHeight: 44)
+    /// An undo or redo button running `action`, disabled unless `enabled`.
+    private func editButton(_ title: String, name: String, enabled: Bool, hint: String,
+                            _ spokenLabels: [String: GardenControlLabel],
+                            action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            wrapping(title).frame(minWidth: 44, minHeight: 44)
         }
         .disabled(!enabled)
-        .accessibilityLabel(Text(verbatim: title))
+        .spoken(spokenLabels[name])
         .accessibilityHint(Text(verbatim: hint))
         .accessibilityIdentifier(port.identifier(name))
     }
 
-    /// The tool titles: "Rake" and "Stones" (feature 147).
-    static let toolTitles = ["Rake", "Stones"]
-
     /// The stone controls (feature 147; see the file header).
-    private var stoneControls: some View {
+    private func stoneControls(_ spokenLabels: [String: GardenControlLabel]) -> some View {
         let hasSelection = mirror.selectedStone != nil && mirror.stones.contains { $0.id == mirror.selectedStone }
         return VStack(alignment: .leading, spacing: 6) {
-            toolPicker
-            HStack(spacing: 8) {
-                kindMenu
-                Spacer(minLength: 8)
+            toolPicker(spokenLabels)
+            row {
+                kindMenu(spokenLabels)
+                if !stacked { Spacer(minLength: 8) }
                 Button {
-                    let result = port.send("stone.place", StoneControlValues.place(kind: mirror.placeKind))
-                    if result.code == "action.rule." + GardenRule.stoneCap { mirror.stoneCapShown = true }
+                    presenter.placeStone(kind: mirror.placeKind, port: port)
                 } label: {
-                    Text(verbatim: "Place").frame(minWidth: 44, minHeight: 44)
+                    wrapping("Place").frame(minWidth: 44, minHeight: 44)
                 }
-                .accessibilityLabel(Text(verbatim: "Place stone"))
+                .spoken(spokenLabels["stone-place"])
                 .accessibilityHint(Text(verbatim: "Places the chosen stone at the centre of the tray"))
                 .accessibilityIdentifier(port.identifier("stone-place"))
             }
-            Text(verbatim: mirror.selectionValue).font(.footnote)
-                .accessibilityLabel(Text(verbatim: "Selection"))
-                .accessibilityValue(Text(verbatim: mirror.selectionValue))
+            wrapping(mirror.selectionValue).font(.footnote)
+                .spoken(spokenLabels["selection"])
                 .accessibilityIdentifier(port.identifier("selection"))
-            HStack(spacing: 8) {
+            row {
                 stoneButton("Previous", name: "stone-previous", hint: "Selects the stone below in layer order",
                             values: StoneControlValues.select(direction: -1, stones: mirror.stones,
-                                                              selected: mirror.selectedStone), control: "stone.select")
+                                                              selected: mirror.selectedStone), control: "stone.select",
+                            spokenLabels)
                 stoneButton("Next", name: "stone-next", hint: "Selects the stone above in layer order",
                             values: StoneControlValues.select(direction: 1, stones: mirror.stones,
-                                                              selected: mirror.selectedStone), control: "stone.select")
+                                                              selected: mirror.selectedStone), control: "stone.select",
+                            spokenLabels)
                 stoneButton("Remove", name: "stone-remove", hint: "Removes the selected stone",
-                            values: hasSelection ? [] : nil, control: "stone.remove")
+                            values: hasSelection ? [] : nil, control: "stone.remove", spokenLabels)
             }
-            HStack(spacing: 8) {
+            row {
                 stoneButton("Turn left", name: "stone-turn-left", hint: "Turns the selected stone 15 degrees left",
                             values: StoneControlValues.turn(steps: -1, stones: mirror.stones,
-                                                            selected: mirror.selectedStone), control: "stone.rotate")
+                                                            selected: mirror.selectedStone), control: "stone.rotate",
+                            spokenLabels)
                 stoneButton("Turn right", name: "stone-turn-right", hint: "Turns the selected stone 15 degrees right",
                             values: StoneControlValues.turn(steps: 1, stones: mirror.stones,
-                                                            selected: mirror.selectedStone), control: "stone.rotate")
+                                                            selected: mirror.selectedStone), control: "stone.rotate",
+                            spokenLabels)
             }
-            HStack(spacing: 8) {
-                nudgeButton("Left", name: "left", dx: -1, dy: 0)
-                nudgeButton("Right", name: "right", dx: 1, dy: 0)
-                nudgeButton("Up", name: "up", dx: 0, dy: -1)
-                nudgeButton("Down", name: "down", dx: 0, dy: 1)
+            row {
+                nudgeButton("Left", name: "left", dx: -1, dy: 0, spokenLabels)
+                nudgeButton("Right", name: "right", dx: 1, dy: 0, spokenLabels)
+                nudgeButton("Up", name: "up", dx: 0, dy: -1, spokenLabels)
+                nudgeButton("Down", name: "down", dx: 0, dy: 1, spokenLabels)
             }
         }
     }
 
     /// The tool picker (sends `tool.mode` when the choice changes).
-    private var toolPicker: some View {
+    private func toolPicker(_ spokenLabels: [String: GardenControlLabel]) -> some View {
         let titles = Self.toolTitles
-        let current = min(max(mirror.toolMode, 0), titles.count - 1)
-        return Picker(selection: Binding(get: { current },
-                                         set: { next in
-                                             guard next != current else { return }
-                                             port.send("tool.mode", [Double(next)])
-                                         })) {
-            ForEach(Array(titles.enumerated()), id: \.offset) { index, title in
-                Text(verbatim: title).tag(index)
-            }
-        } label: {
-            Text(verbatim: "Tool")
-        }
-        .pickerStyle(.segmented)
-        .frame(minHeight: 44)
-        .accessibilityLabel(Text(verbatim: "Tool, " + titles[current]))
-        .accessibilityHint(Text(verbatim: "Chooses whether a touch rakes the sand or moves stones"))
-        .accessibilityIdentifier(port.identifier("tool"))
+        return choicePicker(titles, current: min(max(mirror.toolMode, 0), titles.count - 1), control: "tool.mode",
+                            title: "Tool", name: "tool",
+                            hint: "Chooses whether a touch rakes the sand or moves stones", spokenLabels)
     }
 
     /// The kind menu of the "Place" control (presentation only).
-    private var kindMenu: some View {
+    private func kindMenu(_ spokenLabels: [String: GardenControlLabel]) -> some View {
         let kinds = GardenPalette.stones
         let current = min(max(mirror.placeKind, 0), kinds.count - 1)
         return Menu {
@@ -247,51 +422,159 @@ struct GardenControls: View {
                 Button(kind.name) { mirror.placeKind = index }
             }
         } label: {
-            Text(verbatim: kinds[current].name).frame(minHeight: 44)
+            wrapping(kinds[current].name).frame(minHeight: 44)
         }
-        .accessibilityLabel(Text(verbatim: "Stone, " + kinds[current].name))
+        .spoken(spokenLabels["stone-kind"])
         .accessibilityHint(Text(verbatim: "Chooses the stone that Place puts on the sand"))
         .accessibilityIdentifier(port.identifier("stone-kind"))
     }
 
     /// A stone button sending `control` with `values`, disabled when `values` is nil.
     private func stoneButton(_ title: String, name: String, hint: String, values: [Double]?,
-                             control: String, spoken: String? = nil) -> some View {
+                             control: String, _ spokenLabels: [String: GardenControlLabel]) -> some View {
         Button {
             guard let values else { return }
             port.send(control, values)
         } label: {
-            Text(verbatim: title).frame(minWidth: 44, minHeight: 44)
+            wrapping(title).frame(minWidth: 44, minHeight: 44)
         }
         .disabled(values == nil)
-        .accessibilityLabel(Text(verbatim: spoken ?? title))
+        .spoken(spokenLabels[name])
         .accessibilityHint(Text(verbatim: hint))
         .accessibilityIdentifier(port.identifier(name))
     }
 
     /// A nudge button moving the selected stone by `dx`, `dy` nudge steps.
-    private func nudgeButton(_ title: String, name: String, dx: Int, dy: Int) -> some View {
+    private func nudgeButton(_ title: String, name: String, dx: Int, dy: Int,
+                             _ spokenLabels: [String: GardenControlLabel]) -> some View {
         stoneButton(title, name: "stone-nudge-" + name, hint: "Moves the selected stone a little " + name,
                     values: StoneControlValues.nudge(dx: dx, dy: dy, stones: mirror.stones,
                                                      selected: mirror.selectedStone),
-                    control: "stone.move", spoken: "Move " + name)
+                    control: "stone.move", spokenLabels)
     }
 
     /// The four pattern buttons, each raking one stroke with the chosen rake.
-    private var patternButtons: some View {
+    private func patternButtons(_ spokenLabels: [String: GardenControlLabel]) -> some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(verbatim: "Rake a pattern").font(.subheadline).accessibilityHidden(true)
-            HStack(spacing: 8) {
-                ForEach(Array(StrokePatterns.names.enumerated()), id: \.offset) { index, name in
+            wrapping("Rake a pattern").font(.subheadline).accessibilityHidden(true)
+            row {
+                ForEach(Array(StrokePatterns.names.enumerated()), id: \.offset) { index, pattern in
                     Button {
-                        StrokePatterns.send(StrokePatterns.points(index: index), rake: mirror.rakeStyle, port: port)
+                        presenter.rakePattern(index, port: port)
                     } label: {
-                        Text(verbatim: StrokePatterns.titles[index]).frame(minHeight: 44)
+                        wrapping(StrokePatterns.titles[index]).frame(minHeight: 44)
                     }
-                    .accessibilityLabel(Text(verbatim: Self.patternLabel(index)))
+                    .spoken(spokenLabels["pattern-" + pattern])
                     .accessibilityHint(Text(verbatim: "Rakes the pattern into the sand with the chosen rake"))
-                    .accessibilityIdentifier(port.identifier("pattern-" + name))
+                    .accessibilityIdentifier(port.identifier("pattern-" + pattern))
                 }
+            }
+        }
+    }
+
+    // MARK: Library and picture (feature 148)
+
+    /// The library: the name field, Save, and each saved garden with Open, Rename and Delete.
+    private func librarySection(_ entries: [GardenLibraryEntry],
+                                _ spokenLabels: [String: GardenControlLabel]) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            wrapping("Saved gardens").font(.subheadline).accessibilityAddTraits(.isHeader)
+            row {
+                TextField(text: $name) { Text(verbatim: "Garden name") }
+                    .textFieldStyle(.roundedBorder)
+                    .frame(minHeight: 44)
+                    .spoken(spokenLabels["library-name"])
+                    .accessibilityIdentifier(port.identifier("library-name"))
+                Button {
+                    if presenter.library?.entry(named: name) != nil, let clean = GardenLibrary.cleanName(name) {
+                        replacing = clean
+                    } else {
+                        presenter.saveGarden(named: name)
+                    }
+                } label: {
+                    wrapping("Save").frame(minWidth: 44, minHeight: 44)
+                }
+                .spoken(spokenLabels["library-save"])
+                .accessibilityHint(Text(verbatim: "Saves the garden under this name"))
+                .accessibilityIdentifier(port.identifier("library-save"))
+            }
+            ForEach(entries) { entry in
+                let n = String(entry.number)
+                if entry.isReadable {
+                    VStack(alignment: .leading, spacing: 4) {
+                        wrapping(entry.name).accessibilityHidden(true)
+                        row {
+                            libraryButton("Open", name: "library-open-" + n, hint: "Opens this garden; the undo "
+                                          + "history starts again", spokenLabels) {
+                                if case .success(let opened) = presenter.openGarden(entry.file) { name = opened.name }
+                            }
+                            libraryButton("Rename", name: "library-rename-" + n, hint: "Gives this garden a new name",
+                                          spokenLabels) {
+                                newName = entry.name
+                                renaming = entry
+                            }
+                            libraryButton("Delete", name: "library-delete-" + n,
+                                          hint: "Deletes the saved copy; the open garden stays", spokenLabels) {
+                                deleting = entry
+                            }
+                        }
+                    }
+                } else {
+                    row {
+                        wrapping("Unreadable: \(entry.name) (\(entry.refusal ?? "damaged"))").font(.footnote)
+                            .spoken(spokenLabels["library-unreadable-" + n])
+                            .accessibilityIdentifier(port.identifier("library-unreadable-" + n))
+                        libraryButton("Delete", name: "library-delete-" + n, hint: "Deletes the unreadable file",
+                                      spokenLabels) {
+                            deleting = entry
+                        }
+                    }
+                }
+            }
+            if let message = mirror.libraryMessage {
+                wrapping(message).font(.footnote)
+                    .accessibilityIdentifier(port.identifier("library-message"))
+            }
+        }
+    }
+
+    /// A library button running `action`.
+    private func libraryButton(_ title: String, name: String, hint: String,
+                               _ spokenLabels: [String: GardenControlLabel],
+                               action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            wrapping(title).frame(minWidth: 44, minHeight: 44)
+        }
+        .spoken(spokenLabels[name])
+        .accessibilityHint(Text(verbatim: hint))
+        .accessibilityIdentifier(port.identifier(name))
+    }
+
+    /// The picture: "Make picture" and, once written, the share control of the PNG file.
+    private func stillSection(_ spokenLabels: [String: GardenControlLabel]) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            wrapping("Picture").font(.subheadline).accessibilityAddTraits(.isHeader)
+            row {
+                Button {
+                    presenter.makeStill(renderer: stillRenderer)
+                } label: {
+                    wrapping("Make picture").frame(minWidth: 44, minHeight: 44)
+                }
+                .spoken(spokenLabels["still-make"])
+                .accessibilityHint(Text(verbatim: "Draws the garden at \(GardenStill.width) by \(GardenStill.height) "
+                                        + "pixels"))
+                .accessibilityIdentifier(port.identifier("still-make"))
+                if let url = mirror.stillURL {
+                    ShareLink(item: GardenStillFile(url: url), preview: SharePreview(Text(verbatim: "Zen garden"))) {
+                        wrapping("Share picture").frame(minWidth: 44, minHeight: 44)
+                    }
+                    .spoken(spokenLabels["still-share"])
+                    .accessibilityIdentifier(port.identifier("still-share"))
+                }
+            }
+            if let message = mirror.stillMessage {
+                wrapping(message).font(.footnote)
+                    .accessibilityIdentifier(port.identifier("still-message"))
             }
         }
     }

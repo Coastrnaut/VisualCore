@@ -34,6 +34,21 @@
 //     lowest; degrees positive clockwise), never colour alone.
 //   - Gestures: the stroke actions and `stone.select`, `stone.move` and `stone.rotate`; every one is a native action.
 //
+// Feature 148 (A20-P04) T-A20-402, T-A20-403, T-A20-405 (FR-A20-401, FR-A20-403, FR-A20-405; clarifications Q1, Q3,
+// Q4, Q5; gaps G-LIBRARY, G-A11Y):
+//   - Library: the presenter holds the `GardenLibrary` over the launch's storage (nil without storage) and the
+//     library actions (`saveGarden`, `openGarden`, `renameGarden`, `deleteGarden`, in GardenLibrary.swift). Opening
+//     restores the saved document through the shell (`restoreDocument`, set by the factory), so the undo history
+//     restarts and the digest equals the opened document's.
+//   - Words: the canvas description always names the tone, the rake, the strokes, the stones and the selection, for
+//     example "Zen garden, Pale sand, Fine rake, 3 strokes, 2 stones, No stone selected". The mirror carries the
+//     spoken values of undo and redo ("a stroke", "moving a stone", "nothing to undo").
+//   - Announcements through `port.announce` (route `feedback`): "Undid <command>" and "Redid <command>" (for
+//     example "Undid a stroke", "Redid moving a stone"), "Saved <name>.", "Opened <name>.", "Renamed <old> to
+//     <new>.", "Deleted <name>.", the picture's outcome, and each refusal (a full garden, the stone cap, a library
+//     refusal) of kind `.rejection`.
+//   - Still: `makeStill(renderer:)` exports the 1600 × 1200 PNG through `GardenStill` for the share control.
+//
 // No GL call: everything is drawn through VisualCoreRendering's scenes.
 import Foundation
 import DigitalZenGardenCore
@@ -44,6 +59,7 @@ import VisualCoreExperienceHost
 import VisualCoreMath
 import VisualCoreRendering
 import VisualCoreScenes
+import VisualCoreSimulation
 
 /// What the controls show, updated only when a field changes.
 @MainActor
@@ -73,6 +89,16 @@ final class GardenMirror {
     var stoneCapShown = false
     /// The spoken selection: "<kind> selected, <n> of <count>, turned <degrees>°" or "No stone selected" (feature 147).
     var selectionValue = GardenPresenter.noSelectionValue
+    /// The spoken value of undo: the command it undoes ("a stroke") or "nothing to undo" (feature 148).
+    var undoValue = GardenPresenter.nothingToUndo
+    /// The spoken value of redo: the command it redoes or "nothing to redo" (feature 148).
+    var redoValue = GardenPresenter.nothingToRedo
+    /// The last sentence of the library (saved, opened, renamed, deleted or refused); nil before one (feature 148).
+    var libraryMessage: String?
+    /// The written still the share control offers; nil before an export and after a failure (feature 148).
+    var stillURL: URL?
+    /// The sentence of the last still export; nil before one (feature 148).
+    var stillMessage: String?
 }
 
 /// A touch of the stone tool in progress (feature 147).
@@ -142,13 +168,37 @@ final class GardenPresenter: ExperiencePresenter {
     static let noSelectionValue = "No stone selected"
     /// The frame cap: 30 frames per second (nothing moves on its own).
     var maxFramesPerSecond: Int { 30 }
+    /// The spoken value of undo with nothing to undo (feature 148).
+    static let nothingToUndo = "nothing to undo"
+    /// The spoken value of redo with nothing to redo (feature 148).
+    static let nothingToRedo = "nothing to redo"
+
+    /// The named gardens in the launch's storage; nil when the experience was made without storage (feature 148).
+    let library: GardenLibrary?
+    /// The still export for the share control (feature 148).
+    let still: GardenStill
+    /// Restores a document through the shell (the undo history restarts); set by the factory; returns whether the
+    /// shell accepted it (feature 148).
+    var restoreDocument: ((GardenDocument) -> Bool)?
+    /// The shell's current core; set by the factory; nil falls back to the last core followed (feature 148).
+    var coreSource: (() -> GardenCore?)?
+    /// The route of the announcements (`ExperienceFeedback.shared` in the app; a recording route in tests).
+    var feedback: ExperienceFeedback = .shared
+    /// The name of the garden last saved or opened, the name field's suggestion; nil before one (feature 148).
+    var openedName: String?
 
     /// A presenter; `reduceMotion` is recorded (raking is direct and nothing animates); `forceFallback` stores the
-    /// field in `rgba8`.
-    init(reduceMotion: Bool = false, forceFallback: Bool = false) {
+    /// field in `rgba8`; `storage` holds the library (none without it); `still` is the still export (feature 148).
+    init(reduceMotion: Bool = false, forceFallback: Bool = false, storage: ExperienceStorage? = nil,
+         still: GardenStill = GardenStill()) {
         self.reduceMotion = reduceMotion
         self.forceFallback = forceFallback
+        library = storage.map { GardenLibrary(storage: $0) }
+        self.still = still
     }
+
+    /// The shell's current core, or the last core followed (feature 148).
+    var currentCore: GardenCore { coreSource?() ?? lastCore }
 
     // MARK: Render scene
 
@@ -249,6 +299,7 @@ final class GardenPresenter: ExperiencePresenter {
             if isStroking {
                 move(event, viewSize: viewSize, port: port)
                 port.send("stroke.end")
+                announceStrokeRefusal()
             }
             finishPointer()
         case .cancelled:
@@ -450,11 +501,111 @@ final class GardenPresenter: ExperiencePresenter {
         if mirror.selectedStone != core.selectedStone { mirror.selectedStone = core.selectedStone }
         let value = Self.selectionValue(core)
         if mirror.selectionValue != value { mirror.selectionValue = value }
+        let undo = core.history.done.last.map(Self.phrase) ?? Self.nothingToUndo
+        if mirror.undoValue != undo { mirror.undoValue = undo }
+        let redo = core.history.undone.last.map(Self.phrase) ?? Self.nothingToRedo
+        if mirror.redoValue != redo { mirror.redoValue = redo }
         updateSelectionOutline()
     }
 
-    /// The canvas label: "Zen garden, <tone>, <rake>, <n> strokes", for example "Zen garden, Pale sand, Fine rake,
-    /// 3 strokes"; with stones followed by ", <m> stones" and the spoken selection when a stone is selected.
+    // MARK: Announced actions (feature 148)
+
+    /// The spoken name of `command`: "a stroke", "placing a stone", "moving a stone", "turning a stone", "removing a
+    /// stone" or "a sand tone change".
+    nonisolated static func phrase(_ command: GardenCommand) -> String {
+        switch command {
+        case .rake: return "a stroke"
+        case .place: return "placing a stone"
+        case .move: return "moving a stone"
+        case .rotate: return "turning a stone"
+        case .remove: return "removing a stone"
+        case .tone: return "a sand tone change"
+        }
+    }
+
+    /// Announces `text` with `kind` through the port (or straight through ``feedback`` before the port is set).
+    func announce(_ text: String, kind: AnnouncementKind) {
+        if let port {
+            port.announce(text, kind: kind, route: feedback)
+        } else {
+            feedback.announce(text, kind: kind)
+        }
+    }
+
+    /// Sends `edit.undo` through `port` and announces "Undid <command>", for example "Undid a stroke".
+    @discardableResult
+    func undo(port: ExperienceActionPort) -> ActionResult {
+        let command = currentCore.history.done.last
+        let result = port.send("edit.undo")
+        if result.isAccepted, let command { announce("Undid " + Self.phrase(command), kind: .outcome) }
+        return result
+    }
+
+    /// Sends `edit.redo` through `port` and announces "Redid <command>", for example "Redid moving a stone".
+    @discardableResult
+    func redo(port: ExperienceActionPort) -> ActionResult {
+        let command = currentCore.history.undone.last
+        let result = port.send("edit.redo")
+        if result.isAccepted, let command { announce("Redid " + Self.phrase(command), kind: .outcome) }
+        return result
+    }
+
+    /// Places a stone of the kind index `kind` at the tray centre through `port`; at the stone cap the controls show
+    /// and announce "The garden holds 24 stones.".
+    @discardableResult
+    func placeStone(kind: Int, port: ExperienceActionPort) -> ActionResult {
+        let result = port.send("stone.place", StoneControlValues.place(kind: kind))
+        if result.code == "action.rule." + GardenRule.stoneCap {
+            mirror.stoneCapShown = true
+            follow(currentCore)
+            announce(GardenCore.stoneCapMessage, kind: .rejection)
+        }
+        return result
+    }
+
+    /// Rakes the pattern `index` with the chosen rake through `port`; a stroke refused at the stroke cap is announced.
+    @discardableResult
+    func rakePattern(_ index: Int, port: ExperienceActionPort) -> [ActionResult] {
+        let results = StrokePatterns.send(StrokePatterns.points(index: index), rake: mirror.rakeStyle, port: port)
+        announceStrokeRefusal()
+        return results
+    }
+
+    /// Announces the full-garden sentence when the last stroke was refused.
+    private func announceStrokeRefusal() {
+        if currentCore.lastRefusal != nil { announce(Self.fullMessage, kind: .rejection) }
+    }
+
+    /// Exports the 1600 × 1200 still with `renderer` (nil: no experience is open) for the share control and
+    /// announces the outcome; returns it.
+    @discardableResult
+    func makeStill(renderer: ExperienceStillRenderer?) -> Result<URL, StillFailure> {
+        var render: GardenStill.Render?
+        if let renderer {
+            render = { (width: Int, height: Int) throws(OffscreenRenderError) -> StillImage in
+                try renderer(width: width, height: height)
+            }
+        }
+        let result = still.export(render: render)
+        switch result {
+        case .success(let url):
+            mirror.stillURL = url
+            mirror.stillMessage = Self.stillMadeMessage
+            announce(Self.stillMadeMessage, kind: .outcome)
+        case .failure(let failure):
+            mirror.stillURL = nil
+            mirror.stillMessage = failure.sentence
+            announce(failure.sentence, kind: .rejection)
+        }
+        return result
+    }
+
+    /// The sentence of a written still.
+    static let stillMadeMessage = "The picture is ready to share: \(GardenStill.width) by \(GardenStill.height) pixels."
+
+    /// The canvas label: "Zen garden, <tone>, <rake>, <n> strokes, <m> stones, <selection>", for example "Zen
+    /// garden, Pale sand, Fine rake, 3 strokes, 2 stones, Flat slate selected, 2 of 2, turned 0°" or "…, 0 stones,
+    /// No stone selected" (feature 148: the stones and the selection are always named).
     func describe(_ core: GardenCore) -> String {
         follow(core)
         let tone = GardenPalette.tones[core.toneIndex].name
@@ -462,8 +613,8 @@ final class GardenPresenter: ExperiencePresenter {
         let count = core.document.strokes.count
         var label = "Zen garden, \(tone), \(rake), \(count) " + (count == 1 ? "stroke" : "strokes")
         let stones = core.document.stones.count
-        if stones > 0 { label += ", \(stones) " + (stones == 1 ? "stone" : "stones") }
-        if core.selected != nil { label += ", " + Self.selectionValue(core) }
+        label += ", \(stones) " + (stones == 1 ? "stone" : "stones")
+        label += ", " + Self.selectionValue(core)
         return label
     }
 
@@ -479,6 +630,6 @@ final class GardenPresenter: ExperiencePresenter {
 
     /// The native controls (``GardenControls``), sending through `port`.
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
-        AnyView(GardenControls(port: port, mirror: mirror))
+        AnyView(GardenControls(port: port, mirror: mirror, presenter: self))
     }
 }
