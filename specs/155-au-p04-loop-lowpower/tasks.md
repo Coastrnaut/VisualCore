@@ -24,7 +24,7 @@ for the audio change, feature 077 (A10-P03). Rollback: revert the commits (the A
   node "clamped to 0…1, non-finite ignored", `isEnabled`, `isPlaying`, `play()`, `stop()`, stopped on interruption,
   media-services reset and backgrounding, injected output and notification center) and
   `Packages/VisualCoreRendering/Tests/VisualCoreAudioTests/AmbientLoopPlayerTests.swift` (FR-A21-405)
-- [ ] T-A21-404 [US4] Add both types to the module rows of `Packages/VisualCore/README.md` and
+- [X] T-A21-404 [US4] Add both types to the module rows of `Packages/VisualCore/README.md` and — Verified 2026-11-17: 2026-11-17: feature 155 entries in the VisualCoreAudioDSP row of Packages/VisualCore/README.md and the VisualCoreAudio row of Packages/VisualCoreRendering/README.md; docs/api/visualcore-public-api.txt updated with check_public_api.py --update (23 added, 0 removed, 0 undocumented); .autonomy/checks/A21-P04.public-api.json, A21-P04.visualcore-host.json and A21-P04.audio-ios27.json exit 0
   `Packages/VisualCoreRendering/README.md`; update `docs/api/visualcore-public-api.txt` with `python3
   scripts/check_public_api.py --update` (additive only), then check it (`--name public-api`); VisualCore host tests
   (`--name visualcore-host -- swift test --package-path Packages/VisualCore`) and the audio tests (`--name
