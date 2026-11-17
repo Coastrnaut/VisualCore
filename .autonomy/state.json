@@ -1479,8 +1479,14 @@
       "status": "pass"
     },
     "A18-P02": {
-      "attempts": [],
-      "status": "pending"
+      "attempts": [
+        {
+          "at": "2026-11-17T03:04:04+00:00",
+          "evidence": ".autonomy/evidence/A18-P02.json",
+          "result": "pass"
+        }
+      ],
+      "status": "pass"
     },
     "A18-P03": {
       "attempts": [],
@@ -2107,5 +2113,5 @@
       "status": "pending"
     }
   },
-  "updated": "2026-11-17T02:35:44+00:00"
+  "updated": "2026-11-17T03:04:04+00:00"
 }
