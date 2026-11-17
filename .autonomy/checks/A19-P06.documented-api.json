@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_documented_api.py",
+    "--sources",
+    "Packages/ExperiencesCreative/LivingWallpapers"
+  ],
+  "command": "python3 scripts/check_documented_api.py --sources Packages/ExperiencesCreative/LivingWallpapers",
+  "elapsed_seconds": 0.82,
+  "exit_code": 0,
+  "finished": "2026-11-17T07:08:53+00:00",
+  "log": ".autonomy/logs/A19-P06.documented-api.log",
+  "log_sha256": "9701e8c837e966532c2fe1b60a147ccdbe44247d3d9cb3493bf588331eb32699",
+  "name": "documented-api",
+  "stage": "A19-P06",
+  "started": "2026-11-17T07:08:52+00:00",
+  "timed_out": false
+}

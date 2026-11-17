@@ -33,6 +33,11 @@
 // the synchronous composition of the same steps for the tests. ``stillRender(_:)`` turns the environment's renderer
 // into the job's renderer.
 //
+// Feature 143 (A19-P06) T-A19-604 (FR-A19-603; SC-A19-602; clarification Q4): the test-only seam `failNextDraw` makes
+// the next `draw` throw `WallpaperDrawError.injected` once, before anything is followed, set or drawn; the seam clears
+// itself and is unreachable from the interface. The session then fails with the error's message, and the history file
+// is not touched (only a recorded export or a clear writes it).
+//
 // No GL call: everything is drawn through VisualCoreRendering's scene; no platform-wallpaper call.
 import Foundation
 import LivingWallpapersCore
@@ -41,6 +46,20 @@ import SwiftUI
 import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreRendering
+
+/// Why a draw of Living Wallpapers failed on purpose (feature 143, A19-P06, T-A19-604).
+enum WallpaperDrawError: Error, Equatable, CustomStringConvertible {
+    /// The test-only seam ``WallpaperPresenter/failNextDraw`` made this draw fail.
+    case injected
+
+    /// The message the failed session shows: "The Living Wallpapers draw failed: the test seam injected a failure."
+    var description: String {
+        switch self {
+        case .injected:
+            return "The Living Wallpapers draw failed: the test seam injected a failure."
+        }
+    }
+}
 
 /// What the overlay and the controls show, updated only when a field changes.
 @MainActor
@@ -112,6 +131,10 @@ final class WallpaperPresenter: ExperiencePresenter {
     private(set) var lastCore = WallpaperCore()
     /// The frame cap: 30 frames per second (the scenes move slowly).
     var maxFramesPerSecond: Int { 30 }
+    /// Test-only seam: when true, the next `draw` throws ``WallpaperDrawError/injected`` once, before it follows, sets
+    /// or draws anything; the seam clears itself and nothing in the experience or its interface sets it (feature 143,
+    /// A19-P06, T-A19-604).
+    var failNextDraw = false
 
     /// A presenter; with `reduceMotion` on the scene never moves; `stillExport` is the export attempt, `history` the
     /// stored history the job records in and `editor` the editor's model.
@@ -167,8 +190,13 @@ final class WallpaperPresenter: ExperiencePresenter {
     }
 
     /// Follows a new scene of `core` (rebuilding the program), sets the uniforms of `core` at `tier` and the time of
-    /// `frame`, and draws once.
+    /// `frame`, and draws once. Throws ``WallpaperDrawError/injected`` once while ``failNextDraw`` is set (it is
+    /// cleared first).
     func draw(_ core: WallpaperCore, tier: Int, context: RenderContext, frame: FrameInfo) throws {
+        if failNextDraw {
+            failNextDraw = false
+            throw WallpaperDrawError.injected
+        }
         lastDrawCount = 0
         lastCore = core
         if core.scene != shownScene || scene == nil {
