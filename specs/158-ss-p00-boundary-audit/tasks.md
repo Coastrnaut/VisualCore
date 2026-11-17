@@ -67,7 +67,7 @@
 
 ## Phase 7: Polish and evidence
 
-- [ ] T-A22-009 No-change proof (`--name no-change -- git diff --exit-code --stat 6218b9a1..HEAD -- Packages
+- [X] T-A22-009 No-change proof (`--name no-change -- git diff --exit-code --stat 6218b9a1..HEAD -- Packages — Verified 2026-11-17: 2026-11-17: .autonomy/checks/A22-P00.no-change.json exit 0 (git diff --exit-code --stat 6218b9a1..HEAD -- Packages External is empty)
   External`) (FR-A22-008, SC-A22-005)
 - [ ] T-A22-010 Run the script tests (`--name script-tests -- python3 scripts/test_scripts.py`) and the release-check
   document steps (`--name fast-checks -- python3 scripts/release_check.py --only docs app-contracts compliance
