@@ -51,3 +51,7 @@ contract, commits.
 
 MVP: the document (103–105). Strokes and rakes (106, 107) and the history with its fixture (108, 109) close the manual's
 regression rule. Review checkpoints after 107 and at 109 (fixture passes).
+
+## Phase 6: Convergence
+
+- [ ] T-A20-115 Record the as-built additions in `specs/145-zg-p01-document-strokes/data-model.md` and `contracts/core.md`: the `GardenHistory` builders (`rake(_:rake:)` resampling a drag, `placeStone(kind:position:rotation:scale:)` with id `nextStoneID` and depth max + 1, `moveStone`, `rotateStone`, `removeStone`, `setTone`); stones kept in ascending depth order (a loaded document's stones are sorted by depth); the refusal codes of commands (`outOfRange("id")` for a missing or different stone, `outOfRange("position")`, `outOfRange("rotation")`, `outOfRange("tone")`, `unknownTone`); undo of a place restores `nextStoneID`; and that a rake's tines are its ridges (interior maxima of the profile) per FR-A20-104, FR-A20-105 (partial)
