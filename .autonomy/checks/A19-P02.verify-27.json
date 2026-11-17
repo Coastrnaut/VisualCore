@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a19.living-wallpapers",
+    "--runtime",
+    "27"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a19.living-wallpapers --runtime 27",
+  "elapsed_seconds": 62.172,
+  "exit_code": 0,
+  "finished": "2026-11-17T05:56:16+00:00",
+  "log": ".autonomy/logs/A19-P02.verify-27.log",
+  "log_sha256": "1f38f65e8a903a503b8ac8892b4ba05cdcaafa1b166d3674842856245fd4c17b",
+  "name": "verify-27",
+  "stage": "A19-P02",
+  "started": "2026-11-17T05:55:14+00:00",
+  "timed_out": false
+}
