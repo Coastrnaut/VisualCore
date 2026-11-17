@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-16 (A17-P05: a review record beside the content, a list-only accessibility fixture; A17-P04: every VisualCore name used must be named in a README or a feature contract, never tick in the command that runs the checks; A17-P03: an edited snapshot fails the host's digest check, test storages removed by an observer; A17-P02: probe rays for picking tests, a snapshot envelope refuses non-JSON; A17-P01: a core before its experience passes the package check; A17-P00: an audit corrects the clarification; A16-P06: interface chunk x2, a scan that allows a named format; A16-P05: a generated validation report; mirrors reload after an edit; A16-P04: no mutating call inside #expect; A16-P03: round to half in the shader, test the mirror while it runs; A16-P02: GPU parity against both half roundings; A16-P01: fixture count from the catalog).
+Last updated: 2026-11-16 (A17-P06: interface chunk y2, the copy check allows camera for an orbit camera; A17-P05: a review record beside the content, a list-only accessibility fixture; A17-P04: every VisualCore name used must be named in a README or a feature contract, never tick in the command that runs the checks; A17-P03: an edited snapshot fails the host's digest check, test storages removed by an observer; A17-P02: probe rays for picking tests, a snapshot envelope refuses non-JSON; A17-P01: a core before its experience passes the package check; A17-P00: an audit corrects the clarification; A16-P06: interface chunk x2, a scan that allows a named format; A16-P05: a generated validation report; mirrors reload after an edit; A16-P04: no mutating call inside #expect; A16-P03: round to half in the shader, test the mirror while it runs; A16-P02: GPU parity against both half roundings; A16-P01: fixture count from the catalog).
 
 ## 1. What is tested, and where
 
@@ -105,7 +105,7 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   before writing a gap, and treat the audit's file and symbol checks as the truth (A17-P00).
 - **A claims scan may allow one named phrase, never a word.** Simulation Lab's label says "half-precision values";
   the scan removes that exact phrase before refusing "precision", so the word stays refused everywhere else (A16-P06,
-  `specs/122-sl-p06-release/scan-claims-release.sh`). Interface journeys for A16 run in the serial chunk `x2`.
+  `specs/122-sl-p06-release/scan-claims-release.sh`). Interface journeys for A16 run in the serial chunk `x2`, and for A17 in `y2`.
 - **Generate a report from the tests and check it is current.** `SimulationValidationTests` writes
   `docs/apps/simulation-lab/validation-report.md` under `UPDATE_VALIDATION_REPORT=1` and otherwise compares its
   deterministic lines with the committed file. Timing lines are excluded and labelled a simulator figure (A16-P05).
