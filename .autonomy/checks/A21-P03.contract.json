@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_app_contract.py",
+    "--app",
+    "aurora",
+    "--render"
+  ],
+  "command": "python3 scripts/check_app_contract.py --app aurora --render",
+  "elapsed_seconds": 0.044,
+  "exit_code": 0,
+  "finished": "2026-11-17T11:32:59+00:00",
+  "log": ".autonomy/logs/A21-P03.contract.log",
+  "log_sha256": "df6821fb4c8baf66f04e83bdb440dbcb756f69065a2bf0ec18b5a729bd26d110",
+  "name": "contract",
+  "stage": "A21-P03",
+  "started": "2026-11-17T11:32:59+00:00",
+  "timed_out": false
+}

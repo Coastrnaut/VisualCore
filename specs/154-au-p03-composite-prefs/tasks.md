@@ -45,7 +45,7 @@ VisualCore change. Precedent: `specs/147-zg-p03-stones/tasks.md`. Rollback: reve
 
 - [X] T-A21-307 Aurora tests on sim-27.2 (`--name au-ios27`), documented API, isolation and core purity (review — Verified 2026-11-17: 2026-11-17: review checkpoint: .autonomy/checks/A21-P03.au-ios27.json, A21-P03.documented-api.json, A21-P03.isolation.json and A21-P03.core-purity.json, all exit 0; every test under 10 s (longest 5.6 s)
   checkpoint; SC-A21-304)
-- [ ] T-A21-308 Contract: G-COMPOSITE and G-PREFS closed by "A21-P03" (record that quality is the host's choice, not a
+- [X] T-A21-308 Contract: G-COMPOSITE and G-PREFS closed by "A21-P03" (record that quality is the host's choice, not a — Verified 2026-11-17: 2026-11-17: .autonomy/checks/A21-P03.contract.json exit 0; G-COMPOSITE and G-PREFS closed by A21-P03 (quality recorded as the host's choice, not saved); M08, M12, M15 and M16 available; M14 stays open for G-DEVICE
   preference); rows whose gaps are all closed become available with evidence (`--name contract`)
 - [ ] T-A21-309 Manifest (regenerate `scenario-manifest.json` if the controls changed), catalog, app build and unit
   (`--name app-unit`), runner (`--name verify-27`), packages and script tests

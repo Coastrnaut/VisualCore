@@ -534,7 +534,7 @@
    "id": "M08",
    "capability": "Version 0.1 feature 03: scene transitions that never exceed the luminance cap, and saveable preferences",
    "source": "manual v0.1 feature 03; spec clarification Q3",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/CrossfadeScene.swift",
@@ -577,7 +577,7 @@
     "file": "Packages/ExperiencesCreative/AmbientClock/Experience/AmbientPresenter.swift",
     "symbol": "AmbientPresenter"
    },
-   "notes": "Tested in CrossfadeSceneTests, EasingTests, ExperienceStorageTests and SnapshotMigrationCheckTests. CrossfadeScene mixes linearly with no cap; transitions with the cap applied after the mix are G-COMPOSITE and saved preferences are G-PREFS (app-local, A21-P03)."
+   "notes": "Tested in CrossfadeSceneTests, EasingTests, ExperienceStorageTests and SnapshotMigrationCheckTests. CrossfadeScene mixes linearly with no cap; transitions with the cap applied after the mix are G-COMPOSITE and saved preferences are G-PREFS (app-local, A21-P03). G-COMPOSITE closed in A21-P03 (SkyTransition over CrossfadeScene, both skies moving and capped, 2.0 s smoothstep; TransitionTests: every step under the limit, the difference from the incoming sky monotonic, context loss and resize mid-change). G-PREFS closed in A21-P03 (SkyPreferences prefs.v1 schema 1 with refusal codes; PreferencesTests, PreferencesStoreTests, SoundChoiceTests). Quality is the host's choice and is not saved. Available."
   },
   {
    "id": "M09",
@@ -694,7 +694,7 @@
    "id": "M12",
    "capability": "The sky scene model: presets, palettes and parameter bounds as a pure, versioned, validated value in the GPU-free core",
    "source": "spec FR-A21-003; research D4",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceCore.swift",
@@ -737,7 +737,7 @@
     "file": "Packages/ExperiencesCreative/AmbientClock/Core/ThemePreset.swift",
     "symbol": "ThemePreset"
    },
-   "notes": "Tested in ExperienceSnapshotTests, StateDigestTests, SnapshotMigrationCheckTests and ParametersTests. The scene model is G-SCENE (app-local, A21-P01); a snapshot schema above 1 needs registered schema examples (earlier-gate lesson). G-SCENE closed in A21-P01 (SkyScene, SkyPresets; SceneTests, PresetTests)."
+   "notes": "Tested in ExperienceSnapshotTests, StateDigestTests, SnapshotMigrationCheckTests and ParametersTests. The scene model is G-SCENE (app-local, A21-P01); a snapshot schema above 1 needs registered schema examples (earlier-gate lesson). G-SCENE closed in A21-P01 (SkyScene, SkyPresets; SceneTests, PresetTests). G-PREFS closed in A21-P03 (SkyPreferences prefs.v1 schema 1 with refusal codes; PreferencesTests, PreferencesStoreTests, SoundChoiceTests). Quality is the host's choice and is not saved. Available."
   },
   {
    "id": "M13",
@@ -811,13 +811,13 @@
     "file": "Packages/ExperiencesCreative/ParticleUniverse/Experience/ParticlePresenter.swift",
     "symbol": "ParticlePresenter"
    },
-   "notes": "A brightness cap exists only on TrailLayer and ParticleLayerScene (ParticleLayerSceneTests, TrailLayerTests); FlashLimiterModel limits a rate, not a level. A cap for an arbitrary scene is G-CAP (pure math and a composite pass, app-local, A21-P02) and its use under transitions is G-COMPOSITE (A21-P03); the value is decided with its tests (research D4a). Moved upstream only when a second experience needs it. G-CAP closed in A21-P02 (u_limit in SkyShader and SkyReference, knee 5/6 x limit to the limit; LimitTests, LimitRenderTests: every preset and every change midpoint under the limit)."
+   "notes": "A brightness cap exists only on TrailLayer and ParticleLayerScene (ParticleLayerSceneTests, TrailLayerTests); FlashLimiterModel limits a rate, not a level. A cap for an arbitrary scene is G-CAP (pure math and a composite pass, app-local, A21-P02) and its use under transitions is G-COMPOSITE (A21-P03); the value is decided with its tests (research D4a). Moved upstream only when a second experience needs it. G-CAP closed in A21-P02 (u_limit in SkyShader and SkyReference, knee 5/6 x limit to the limit; LimitTests, LimitRenderTests: every preset and every change midpoint under the limit). G-COMPOSITE closed in A21-P03 (SkyTransition over CrossfadeScene, both skies moving and capped, 2.0 s smoothstep; TransitionTests: every step under the limit, the difference from the incoming sky monotonic, context loss and resize mid-change)."
   },
   {
    "id": "M15",
    "capability": "Context loss: every GPU object (shader programs, composite and crossfade targets) rebuilt from CPU state after a context recreation or memory warning",
    "source": "spec FR-A21-003; constitution A21 bounded",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
@@ -848,13 +848,13 @@
     "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidFieldsScene.swift",
     "symbol": "FluidFieldsScene"
    },
-   "notes": "Tested in RenderHostTests, PingPongTargetTests, SessionPhaseMemoryTests and SessionLifecycleTests. The sky passes rebuild with G-SKY (A21-P01) and the composite and transition targets with G-COMPOSITE (A21-P03). G-SKY closed in A21-P01 (SkyShader aurora-sky.frag, SkyNoise, SkyReference; NoiseTests, SkyRenderTests drawing off screen through FullScreenShaderScene; the presenter of A21-P02 draws it in the app)."
+   "notes": "Tested in RenderHostTests, PingPongTargetTests, SessionPhaseMemoryTests and SessionLifecycleTests. The sky passes rebuild with G-SKY (A21-P01) and the composite and transition targets with G-COMPOSITE (A21-P03). G-SKY closed in A21-P01 (SkyShader aurora-sky.frag, SkyNoise, SkyReference; NoiseTests, SkyRenderTests drawing off screen through FullScreenShaderScene; the presenter of A21-P02 draws it in the app). G-COMPOSITE closed in A21-P03 (SkyTransition over CrossfadeScene, both skies moving and capped, 2.0 s smoothstep; TransitionTests: every step under the limit, the difference from the incoming sky monotonic, context loss and resize mid-change). Available."
   },
   {
    "id": "M16",
    "capability": "Resize and orientation: every pass and target resized without changing the state; the sky framed in normalized coordinates",
    "source": "spec FR-A21-003",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
@@ -885,7 +885,7 @@
     "file": "Packages/ExperiencesCreative/AmbientClock/Experience/AmbientPresenter.swift",
     "symbol": "AmbientPresenter"
    },
-   "notes": "Scene resize is tested (CrossfadeSceneTests, CachedSceneTests, FullScreenShaderSceneTests). Aurora's passes resize with G-SKY (A21-P01) and its composite targets with G-COMPOSITE (A21-P03). G-SKY closed in A21-P01 (SkyShader aurora-sky.frag, SkyNoise, SkyReference; NoiseTests, SkyRenderTests drawing off screen through FullScreenShaderScene; the presenter of A21-P02 draws it in the app)."
+   "notes": "Scene resize is tested (CrossfadeSceneTests, CachedSceneTests, FullScreenShaderSceneTests). Aurora's passes resize with G-SKY (A21-P01) and its composite targets with G-COMPOSITE (A21-P03). G-SKY closed in A21-P01 (SkyShader aurora-sky.frag, SkyNoise, SkyReference; NoiseTests, SkyRenderTests drawing off screen through FullScreenShaderScene; the presenter of A21-P02 draws it in the app). G-COMPOSITE closed in A21-P03 (SkyTransition over CrossfadeScene, both skies moving and capped, 2.0 s smoothstep; TransitionTests: every step under the limit, the difference from the incoming sky monotonic, context loss and resize mid-change). Available."
   },
   {
    "id": "M17",
@@ -1335,7 +1335,7 @@
    "justification": "Multi-layer compositing (ribbons additively over stars and clouds) and preset transitions through CrossfadeScene with the cap applied after the mix, rebuilt after resize and context loss (manual phase 03). No VisualCore change is planned (spec clarification Q3); a second user would justify moving it upstream later (Principle II).",
    "phase": 3,
    "test": "Experience tests: at every progress step of a transition the read-back stays under the cap; the mix is monotonic in progress; composite targets rebuild after recreateContext and resize",
-   "closed": null
+   "closed": "A21-P03"
   },
   {
    "id": "G-PREFS",
@@ -1348,7 +1348,7 @@
    "justification": "Saved preferences (preset, parameters, quality, sound choice) in the experience's storage values with a schema and migration (manual phase 03).",
    "phase": 3,
    "test": "Experience tests: preferences round-trip through ExperienceStorage.setValue within StorageQuota; damaged or newer values are reported and replaced by defaults, not fatal; a schema above 1 has registered examples; the sound setting is stored with the preferences and stays independent of the drawing lifecycle (manual Phase 03 fixture)",
-   "closed": null
+   "closed": "A21-P03"
   },
   {
    "id": "G-LOOP",
