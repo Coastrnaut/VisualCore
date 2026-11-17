@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_app_isolation.py",
+    "--experiences",
+    "Packages/ExperiencesCreative/LivingWallpapers"
+  ],
+  "command": "python3 scripts/check_app_isolation.py --experiences Packages/ExperiencesCreative/LivingWallpapers",
+  "elapsed_seconds": 0.039,
+  "exit_code": 0,
+  "finished": "2026-11-17T06:35:20+00:00",
+  "log": ".autonomy/logs/A19-P04.isolation.log",
+  "log_sha256": "8db1b8519d0ee17e5b9e45b3029bbe820ccd67891e1b51923bc1943fc2d4b9a2",
+  "name": "isolation",
+  "stage": "A19-P04",
+  "started": "2026-11-17T06:35:20+00:00",
+  "timed_out": false
+}

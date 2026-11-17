@@ -30,7 +30,7 @@ VisualCore change. Precedent: `specs/134-ac-p04-night-power/tasks.md`. Rollback:
 
 ## Phase 6: Records and evidence
 
-- [ ] T-A19-408 Tests on sim-27.2 (`--name lw-ios27`), documented API, isolation, and the scans (`--name platform-claims`, `--name help-claims`, `--name photos-scan`) (FR-A19-405, 406; SC-A19-404)
+- [X] T-A19-408 Tests on sim-27.2 (`--name lw-ios27`), documented API, isolation, and the scans (`--name platform-claims`, `--name help-claims`, `--name photos-scan`) (FR-A19-405, 406; SC-A19-404) — Verified 2026-11-17: 2026-11-17: .autonomy/checks/A19-P04.lw-ios27.json exit 0 (52 core and 61 experience tests on sim-27.2), .autonomy/checks/A19-P04.documented-api.json, A19-P04.isolation.json, A19-P04.platform-claims.json and A19-P04.help-claims.json exit 0 (the short-loop decision unchanged and its scan green), each read before this tick
 - [ ] T-A19-409 Contract: G-SAVE, G-EXPORTJOB and G-HISTORY closed by "A19-P04"; rows whose gaps are all closed become available with evidence (`--name contract`)
 - [ ] T-A19-410 Catalog, app build and unit (`xcodegen generate --spec project.yml`; `--name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`), the release steps (`--name usage -- python3 scripts/release_check.py --only app-release-build app-usage-descriptions`), runner (`--name verify-27`), packages and script tests (SC-A19-401)
 - [ ] T-A19-411 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A19-P04; update README.md (rule 16) and `docs/automatedtesting.md` (rule 17)
