@@ -47,7 +47,7 @@ for the audio change, feature 077 (A10-P03). Rollback: revert the commits (the A
 
 ## Phase 5: Story 3 — fallback and released targets (P1)
 
-- [ ] T-A21-408 [US3] `SkyShader.fallbackSource` in `Packages/ExperiencesCreative/Aurora/Core/SkyShader.swift` and the
+- [X] T-A21-408 [US3] `SkyShader.fallbackSource` in `Packages/ExperiencesCreative/Aurora/Core/SkyShader.swift` and the — Verified 2026-11-17: 2026-11-17: SkyShader.fallbackSource (mediump gradient of the sky colour to 0.6 at the horizon, under the limit) shown on a compile failure or a missing highp with the message This device shows a simpler sky., the clear colour if it fails too; FallbackTests (5); TargetReleaseTests (2): live bytes 0 after the first frame, 55,296 at the peak of a change, 0 after ten changes, none leaked; .autonomy/checks/A21-P04.au-ios27.json exit 0; written by an agent, retested
   fallback path in the presenter (a compile failure or `fragmentHighp` false → the gradient sky under the limit and
   the message "This device shows a simpler sky."; a test seam forces each path), with
   `ExperienceTests/FallbackTests.swift` and `ExperienceTests/TargetReleaseTests.swift` (render-target, texture and

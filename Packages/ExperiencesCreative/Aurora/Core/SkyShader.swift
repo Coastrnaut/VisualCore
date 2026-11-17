@@ -11,6 +11,12 @@
 // knee starts at ``SkyShader/kneeRatio`` (5/6, about 0.83) × limit and approaches the limit, after compositing and
 // before the sRGB encode, so every pixel's luminance is at most the limit. The default limit 0.72 gives the A21-P01
 // knee (start 0.6, ceiling 0.72) unchanged.
+//
+// Feature 155 (A21-P04) T-A21-407, T-A21-408 (FR-A21-402, FR-A21-403; clarifications Q2, Q4): the reduced-flash switch
+// `u_twinkleOff` (0 by default, which GL gives an unset uniform, so the default picture is unchanged: the factor
+// `1 − 0` is exactly 1) sets the twinkle amplitude to 0 when 1; it is not one of ``SkyShader/uniformNames`` (the
+// experience binds it, ``SkyShader/twinkleOffParameter``). ``SkyShader/fallbackSource`` is the minimal still sky for a
+// device that cannot run `aurora-sky.frag`: the sky colour at the top to 0.6 × at the horizon, under the limit.
 import Foundation
 
 /// The values `aurora-sky.frag` is drawn with. The palette is in **linear light** (as `FullScreenShaderScene.palette`
@@ -91,6 +97,14 @@ public enum SkyShader {
     public static let uniformNames = ["u_phase", "u_ribbons", "u_turbulence", "u_cloudiness", "u_stars", "u_octaves",
                                       "u_limit"]
 
+    /// The parameter name (bound as `u_twinkleOff`) that turns the twinkle off when 1 (feature 155, reduced flash);
+    /// unset it is 0 and the picture is the default one.
+    public static let twinkleOffParameter = "twinkleOff"
+    /// The fallback shader's name in diagnostics (feature 155).
+    public static let fallbackName = "aurora-fallback.frag"
+    /// The fallback's darkening at the horizon: the sky colour × 0.6 (feature 155).
+    public static let fallbackHorizon: Float = 0.6
+
     /// The fbm octaves of quality `level`: 0 (or below) → 5, 1 (or above) → 3.
     public static func octaves(forLevel level: Int) -> Int { level <= 0 ? 5 : 3 }
 
@@ -120,6 +134,7 @@ public enum SkyShader {
     uniform float u_stars;
     uniform float u_octaves;
     uniform float u_limit;
+    uniform float u_twinkleOff;
     out vec4 color;
 
     const float AU_TAU = 6.2831853;
@@ -148,7 +163,7 @@ public enum SkyShader {
         vec2 centre = base + 0.5 + (hj - 0.5) * 0.5;
         float shape = 1.0 - smoothstep(0.0, 0.75, length(q - centre));
         float cycles = floor(1.0 + hj.y * 3.0);
-        float twinkle = 1.0 + 0.3 * sin(AU_TAU * (cycles * ph + hs.y));
+        float twinkle = 1.0 + 0.3 * (1.0 - u_twinkleOff) * sin(AU_TAU * (cycles * ph + hs.y));
         float bright = 0.25 + 0.5 * vc_hash21(cell + vec2(0.0, 59.0));
         float star = present * shape * bright * twinkle * smoothstep(0.0, 0.25, uv.y);
 
@@ -188,6 +203,34 @@ public enum SkyShader {
             rgb *= (knee + room * x / (x + room)) / lum;
         }
         color = vec4(vc_srgbEncode(rgb), 1.0);
+    }
+    """
+}
+
+extension SkyShader {
+    /// The minimal fallback sky (feature 155, GLSL ES 3.00 with `mediump` only, no include): the sky colour
+    /// (`u_palette[0]`, linear light) at the top to ``fallbackHorizon`` × that colour at the horizon, scaled down when
+    /// its Rec. 709 luminance would pass `u_limit`, then sRGB-encoded. It needs no `highp` and draws a still picture.
+    public static let fallbackSource = """
+    precision mediump float;
+    uniform vec2 u_resolution;
+    uniform vec3 u_palette[8];
+    uniform float u_limit;
+    out vec4 color;
+
+    vec3 au_encode(vec3 c) {
+        vec3 lo = c * 12.92;
+        vec3 hi = 1.055 * pow(max(c, vec3(0.0031308)), vec3(1.0 / 2.4)) - 0.055;
+        return mix(hi, lo, vec3(lessThanEqual(c, vec3(0.0031308))));
+    }
+
+    void main() {
+        float y = gl_FragCoord.y / u_resolution.y;
+        vec3 rgb = clamp(u_palette[0] * mix(0.6, 1.0, y), 0.0, 1.0);
+        float lum = dot(rgb, vec3(0.2126, 0.7152, 0.0722));
+        float cap = max(u_limit, 0.0);
+        if (lum > cap) rgb *= cap / max(lum, 1e-4);
+        color = vec4(au_encode(rgb), 1.0);
     }
     """
 }
