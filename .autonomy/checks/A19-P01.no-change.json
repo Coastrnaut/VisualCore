@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "git",
+    "diff",
+    "--exit-code",
+    "--stat",
+    "9d453506..HEAD",
+    "--",
+    "Packages/VisualCore",
+    "Packages/VisualCoreRendering",
+    "External"
+  ],
+  "command": "git diff --exit-code --stat 9d453506..HEAD -- Packages/VisualCore Packages/VisualCoreRendering External",
+  "elapsed_seconds": 0.01,
+  "exit_code": 0,
+  "finished": "2026-11-17T05:32:17+00:00",
+  "log": ".autonomy/logs/A19-P01.no-change.log",
+  "log_sha256": "1da194a08e017d6d283e33f8b588ea348e4e2bdc50494887eb5cfd3a776fcb6e",
+  "name": "no-change",
+  "stage": "A19-P01",
+  "started": "2026-11-17T05:32:17+00:00",
+  "timed_out": false
+}
