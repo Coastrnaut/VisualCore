@@ -13,7 +13,7 @@
 - [X] T-A21-501 Baseline: cite the A21-P04 evidence (`.autonomy/checks/A21-P04.{au-ios27,app-unit,verify-27}.json`) on — Verified 2026-11-17: 2026-11-17: A21-P04 evidence cited: .autonomy/checks/A21-P04.au-ios27.json, A21-P04.app-unit.json and A21-P04.verify-27.json, all exit 0; no Packages, Apps or project.yml change since the A21-P04 record commit dce6aed6
   the tree recorded at A21-P04 (`dce6aed6`), whose Packages, Apps and `project.yml` are unchanged since (owner ruling
   of 2026-11-14)
-- [ ] T-A21-502 Add `VisualCoreAudio` (package `rendering`) and `VisualCoreAudioDSP` (package `visualCore`) to the
+- [X] T-A21-502 Add `VisualCoreAudio` (package `rendering`) and `VisualCoreAudioDSP` (package `visualCore`) to the — Verified 2026-11-17: 2026-11-17: AuroraExperience and AuroraExperienceTests gain VisualCoreAudio and VisualCoreAudioDSP (commit 4be85523); the package resolves (swift package describe) and builds and tests: .autonomy/checks/A21-P05.au-ios27.json exit 0
   `AuroraExperience` target of `Packages/ExperiencesCreative/Package.swift` (lead; the package still resolves and
   builds)
 
