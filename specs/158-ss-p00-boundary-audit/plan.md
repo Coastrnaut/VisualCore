@@ -45,9 +45,10 @@ No NEEDS CLARIFICATION remains.
 | XII | PASS |
 | XIII | PASS: no assets; templates and texture recipes later carry a license record |
 
-A22 rules (constitution 2.18.0): PASS.
+A22 rules (constitution 2.18.1): PASS.
 - **Reuse:** a consumer, not a fork; reuse first.
-- **Context:** compiles only in the owning context.
+- **Context:** compiles only in the owning context; a control queues a request that the preview scene compiles at
+  its next frame (2.18.1).
 - **Testing:** testable without the GPU (projects, validator, mapping).
 - **Bounded:** caps before compile, last good program kept, stop and reset.
 - **Claims:** truthful, with no sandbox claim.
