@@ -414,7 +414,7 @@
    "id": "M06",
    "capability": "Version 0.1 feature 01: curated procedural backgrounds and colour presets, every background drawn by shaders, fields, particles or SDFs",
    "source": "manual v0.1 feature 01; constitution A19 visuals are code",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
@@ -463,13 +463,13 @@
     "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/GenerativeArtPresenter.swift",
     "symbol": "ArtCanvasScene"
    },
-   "notes": "The machinery is tested (FullScreenShaderSceneTests, ShaderBundleTests, ParametersTests, NamedLibraryTests). The curated scenes and their shaders are G-SCENES (A19-P02); the presets and their editing are G-EDITOR (A19-P03) over the project model G-MODEL (A19-P01). G-MODEL closed in A19-P01; the row stays open for its remaining gaps. G-SCENES closed in A19-P02; the row stays open for its remaining gaps."
+   "notes": "The machinery is tested (FullScreenShaderSceneTests, ShaderBundleTests, ParametersTests, NamedLibraryTests). The curated scenes and their shaders are G-SCENES (A19-P02); the presets and their editing are G-EDITOR (A19-P03) over the project model G-MODEL (A19-P01). G-MODEL closed in A19-P01; the row stays open for its remaining gaps. G-SCENES closed in A19-P02; the row stays open for its remaining gaps. Available from A19-P03: G-MODEL (A19-P01), G-SCENES (A19-P02) and G-EDITOR are closed; the four curated scenes with three presets each are drawn as fragment shaders and their colours are editable (preset.color, preset.reset; snapshot schema 2 with the stored schema-1 example; ColourEditTests, SnapshotMigrationTests)."
   },
   {
    "id": "M07",
    "capability": "Version 0.1 feature 02: iPhone and iPad canvas templates with crop and safe-area guides over the preview",
    "source": "manual v0.1 feature 02",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreScenes/ExportGeometry.swift",
@@ -500,7 +500,7 @@
     "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/ExportSheet.swift",
     "symbol": "ExportRunner"
    },
-   "notes": "ExportAspect (public init with any ratio) and ExportSize are tested (ExportGeometryTests); the canvas overlay is tested (CanvasOverlayTests). No catalog of device screen sizes or safe areas exists anywhere: the templates with their provenance are G-TEMPLATES (A19-P01), the crop and safe-area guides drawn as native overlay are G-EDITOR (A19-P03). G-TEMPLATES closed in A19-P01; the row stays open for its remaining gaps."
+   "notes": "ExportAspect (public init with any ratio) and ExportSize are tested (ExportGeometryTests); the canvas overlay is tested (CanvasOverlayTests). No catalog of device screen sizes or safe areas exists anywhere: the templates with their provenance are G-TEMPLATES (A19-P01), the crop and safe-area guides drawn as native overlay are G-EDITOR (A19-P03). G-TEMPLATES closed in A19-P01; the row stays open for its remaining gaps. Available from A19-P03: G-TEMPLATES (A19-P01) and G-EDITOR are closed; the device picker, orientation and the crop frame with its guides sit together in the editor, with the fallback notice beside the picker (CropOverlayTests, NoticeAndResultTests)."
   },
   {
    "id": "M08",
@@ -617,7 +617,7 @@
    "id": "M11",
    "capability": "Version 0.1 feature 06: clear instructions for applying an exported image by hand through the system's own Settings or Photos controls",
    "source": "manual v0.1 feature 06; spec clarification 4",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
@@ -636,7 +636,7 @@
     "file": "Packages/ExperiencesCreative/SimulationLab/Experience/SimulationControls.swift",
     "symbol": "SimulationControls"
    },
-   "notes": "Presenter controls and the overlay are tested (CanvasOverlayTests, ShellRenderingTests). No public API sets the system wallpaper; the help text naming the system's own steps, with no claim that the app sets or installs a wallpaper, is G-HELP (app-local, A19-P03)."
+   "notes": "Presenter controls and the overlay are tested (CanvasOverlayTests, ShellRenderingTests). No public API sets the system wallpaper; the help text naming the system's own steps, with no claim that the app sets or installs a wallpaper, is G-HELP (app-local, A19-P03). Available from A19-P03: G-HELP is closed; the help (Core/WallpaperHelp.swift) explains how the person sets the wallpaper through Settings and Photos and is reachable from the editor and the export result; scan-help-claims.sh and the platform scan refuse any claim that the app sets it (HelpTests, NoticeAndResultTests)."
   },
   {
    "id": "M12",
@@ -1006,7 +1006,7 @@
    "id": "M22",
    "capability": "Accessibility: VoiceOver labels and Dynamic Type for the editor, templates and export controls; progress announced; Reduce Motion and Reduce Flashing respected in the preview",
    "source": "constitution A19 accessible; manual §11 app UI and accessibility",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPreferences.swift",
@@ -1031,13 +1031,19 @@
      "symbol": "EffectScene.reduceFlashing",
      "product": "VisualCoreEffects",
      "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceFeedback.swift",
+     "symbol": "ExperienceFeedback",
+     "product": "VisualCoreExperienceHost",
+     "public": true
     }
    ],
    "example": {
     "file": "Packages/ExperiencesCreative/SimulationLab/Experience/SimulationControls.swift",
     "symbol": "SimulationControls"
    },
-   "notes": "The planners are tested (AccessibilityPreferencesTests, AccessibilityPlansTests, AccessibilitySettingsSectionTests, EffectSceneBypassTests). The labels, announcements and layouts of the experience's UI are G-A11Y (app-local, A19-P03)."
+   "notes": "The planners are tested (AccessibilityPreferencesTests, AccessibilityPlansTests, AccessibilitySettingsSectionTests, EffectSceneBypassTests). The labels, announcements and layouts of the experience's UI are G-A11Y (app-local, A19-P03). Available from A19-P03: G-A11Y is closed; every editor control carries a label with its value, each export outcome is announced once through ExperienceFeedback (AnnouncementPlanner rate limit) and rows stack at accessibility text sizes (EditorAccessibilityTests); system audits wait for the device campaign."
   },
   {
    "id": "M23",
@@ -1263,7 +1269,7 @@
    "justification": "Project and preset editing, the template picker and the crop and safe-area guides drawn as native overlay over the preview are the experience's UI (manual phase 03).",
    "phase": 3,
    "test": "Core tests: crop rectangle and safe-area insets for every template; preset edits clamp to declared ranges; experience tests: the overlay shows the guides for the chosen template",
-   "closed": null
+   "closed": "A19-P03"
   },
   {
    "id": "G-HELP",
@@ -1275,7 +1281,7 @@
    "justification": "The help text explains how to apply a saved image as a wallpaper through the system's own Settings or Photos controls; no public API sets a wallpaper, so the text never claims the app does (manual phase 03).",
    "phase": 3,
    "test": "Experience tests: the help is reachable from the export result; the copy-claims scan finds no 'set wallpaper', 'live wallpaper' or automatic-setting claim",
-   "closed": null
+   "closed": "A19-P03"
   },
   {
    "id": "G-A11Y",
@@ -1287,7 +1293,7 @@
    "justification": "VoiceOver labels, Dynamic Type layouts and progress announcements of the experience's editor and export UI over the public planners (manual phase 03).",
    "phase": 3,
    "test": "Experience tests: every control has a label; progress is announced through AnnouncementPlanner at a bounded rate; layouts hold at the largest Dynamic Type size",
-   "closed": null
+   "closed": "A19-P03"
   },
   {
    "id": "G-SAVE",
