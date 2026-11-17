@@ -10,3 +10,6 @@
 - **Orientation:** 390 × 844 and 844 × 390 views give the same document and layers; mapped positions round-trip
   within 1/480 tray widths.
 - **Gestures:** gesture actions ⊆ native actions.
+- **As built:** the encoding, selection, refusal, clamping, rotation-direction, tap, cycle, lifetime, shadow and
+  manifest rules of data-model.md "As built" (StoneActionTests, StoneGestureTests, StoneRenderTests,
+  GardenManifestTests).
