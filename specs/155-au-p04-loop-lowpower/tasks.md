@@ -29,7 +29,7 @@ for the audio change, feature 077 (A10-P03). Rollback: revert the commits (the A
   scripts/check_public_api.py --update` (additive only), then check it (`--name public-api`); VisualCore host tests
   (`--name visualcore-host -- swift test --package-path Packages/VisualCore`) and the audio tests (`--name
   audio-ios27`) (FR-A21-405)
-- [ ] T-A21-405 [US4] The seven-step reference regression in two chunks (`--name reference-1`, `--name reference-2`)
+- [X] T-A21-405 [US4] The seven-step reference regression in two chunks (`--name reference-1`, `--name reference-2`) — Verified 2026-11-17: 2026-11-17: .autonomy/checks/A21-P04.reference-1.json and A21-P04.reference-2.json exit 0: the seven-step ProjectM reference regression passes after the VisualCore audio change
   after the VisualCore change (FR-A21-406; SC-A21-404)
 
 ## Phase 3: Story 1 — a still sky (P1) 🎯
