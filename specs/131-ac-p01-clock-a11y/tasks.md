@@ -55,3 +55,8 @@ Agent V: T-A18-102 and 103 (VisualCore). Agent C: T-A18-105 and 107 (core source
 
 MVP: the clock source (102) and the formatter with its fixtures (105, 106). The schedule, DST and state (107, 108)
 and the spoken time (109) close the phase. Review checkpoints after 102 (host tests pass) and at 111.
+
+## Phase 8: Convergence
+
+- [ ] T-A18-114 Record the as-built rules: in `specs/131-ac-p01-clock-a11y/data-model.md` `unknown-time-zone` means `TimeZone(identifier:)` is nil (the system's known list omits current names such as `Asia/Kolkata`); in `research.md` D3 the deadline is offset arithmetic at the instant's zone offset (exact because every offset is whole minutes), not `Calendar.nextDate`; in `spec.md` clarification Q4 the calendar is Gregorian with the resolved locale and zone (as Q3), not the locale's. Per data-model and research D3 (contradicts)
+- [ ] T-A18-115 Record the unrequested additions: in `plan.md` Project Structure `scripts/test_scripts.py` (ClockSource.swift and TimeChangeMonitor.swift named as the module's clock files, Synchronization allowed); in `data-model.md` `AmbientClockState.flushAnnouncement(at:)`, `time.changed` carrying the new system locale and zone, and `isRunning` read-only; in `research.md` D8 why M06, M11, M12, M13 and M16 also name G-OVERLAY (the presenter and the canvas label come in A18-P02). Per plan: project structure (unrequested)
