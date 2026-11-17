@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "sh",
+    "specs/129-ia-p06-release/scan-sources-release.sh"
+  ],
+  "command": "sh specs/129-ia-p06-release/scan-sources-release.sh",
+  "elapsed_seconds": 0.047,
+  "exit_code": 0,
+  "finished": "2026-11-17T00:18:54+00:00",
+  "log": ".autonomy/logs/A17-P06.ia-no-network.log",
+  "log_sha256": "99000d6a7852d392b9eb4baacca6935027493649b089b9c683191b812d578cd9",
+  "name": "ia-no-network",
+  "stage": "A17-P06",
+  "started": "2026-11-17T00:18:54+00:00",
+  "timed_out": false
+}

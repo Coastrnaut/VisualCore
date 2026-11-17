@@ -13,7 +13,7 @@ after every task (no trailers); run checks, read each exit, then tick in a separ
 ## Phase 2: Story 1 — privacy and credits
 
 - [ ] T-A17-602 [P] [US1] Write `docs/apps/interactive-anatomy/privacy-and-credits.md` (stored `view.json` in the experience's storage, replaced on every view change and removed when the app is deleted; nothing sent; no permission or usage string; license inventory of the pack's sources, the procedural geometry, the review record and the colours) (FR-A17-601)
-- [ ] T-A17-603 [US1] Write `specs/129-ia-p06-release/scan-sources-release.sh` refusing the APIs of Clarifications Q3 in `Packages/ExperiencesCreative/InteractiveAnatomy` and run it (`--name ia-no-network -- sh specs/129-ia-p06-release/scan-sources-release.sh`) (FR-A17-602; SC-A17-601)
+- [X] T-A17-603 [US1] Write `specs/129-ia-p06-release/scan-sources-release.sh` refusing the APIs of Clarifications Q3 in `Packages/ExperiencesCreative/InteractiveAnatomy` and run it (`--name ia-no-network -- sh specs/129-ia-p06-release/scan-sources-release.sh`) (FR-A17-602; SC-A17-601) — Verified 2026-11-16: 2026-11-16: specs/129-ia-p06-release/scan-sources-release.sh; .autonomy/checks/A17-P06.ia-no-network.json exit 0 (no scanned use in 59 Swift files of Packages/ExperiencesCreative/InteractiveAnatomy)
 
 ## Phase 3: Story 2 — recovery and stored files
 
