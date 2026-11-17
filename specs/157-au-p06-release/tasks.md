@@ -17,7 +17,7 @@
 
 ## Phase 2: Story 1 — nothing leaves the device (P1) 🎯
 
-- [ ] T-A21-602 [P] [US1] Write `docs/apps/aurora/privacy-and-credits.md`:
+- [X] T-A21-602 [P] [US1] Write `docs/apps/aurora/privacy-and-credits.md`: — Verified 2026-11-17: 2026-11-17: docs/apps/aurora/privacy-and-credits.md: state.json (schema 1, the open sky) and prefs.v1 (a21.preferences) in the experience's storage, replaced on each change, removed with the app; refused values open the defaults and are not rewritten by reading; no temporary file; nothing sent; no permission; screen never kept awake, brightness never changed; the ambient sound off by default; licence inventory; facts checked in code; A21-P06.docs.json exit 0; written by an agent, reviewed
   - the session snapshot (the open sky, schema 1) and the saved choices (`prefs.v1`: the sky, the brightness limit,
     the sound on/off and volume) in the experience's storage, replaced on each change and removed when the app is
     deleted;
