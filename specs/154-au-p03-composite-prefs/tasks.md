@@ -49,7 +49,7 @@ VisualCore change. Precedent: `specs/147-zg-p03-stones/tasks.md`. Rollback: reve
   preference); rows whose gaps are all closed become available with evidence (`--name contract`)
 - [X] T-A21-309 Manifest (regenerate `scenario-manifest.json` if the controls changed), catalog, app build and unit — Verified 2026-11-17: 2026-11-17: scenario-manifest.json unchanged (AuroraManifestTests in A21-P03.au-ios27.json pass; no engine action changed); .autonomy/checks/A21-P03.catalog.json, A21-P03.app-unit.json (build for testing and unit on iOS 27.2), A21-P03.verify-27.json, A21-P03.experience-packages.json and A21-P03.script-tests.json, all exit 0
   (`--name app-unit`), runner (`--name verify-27`), packages and script tests
-- [ ] T-A21-310 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+- [X] T-A21-310 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record — Verified 2026-11-17: 2026-11-17: converge round 1 appended T-A21-311 (implemented), round 2 converged with nothing appended; A21-P03 sealed (.autonomy/evidence/A21-P03.json) and recorded (VERIFIED-GATE A21-P03, 154 of 263); planning index, matrix, distinctiveness, metadata, Auto-Creator, catalog (--check PASS), validate_autocreator and validate_docs PASS; README and docs/automatedtesting.md updated
   A21-P03; update README.md (rule 16) and `docs/automatedtesting.md` (rule 17)
 
 ## Dependencies
