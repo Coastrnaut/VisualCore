@@ -9,7 +9,7 @@ the same command. iOS 27 only; iOS 26 and the reference regression at X-A19. Pre
 
 ## Phase 1: Setup
 
-- [ ] T-A19-201 Baseline: cite the A19-P01 evidence (`.autonomy/checks/A19-P01.{lw-core-ios27,app-build,experience-packages}.json`) on the tree recorded at A19-P01 (`caac74c3`), whose Packages are unchanged since (owner ruling of 2026-11-14)
+- [X] T-A19-201 Baseline: cite the A19-P01 evidence (`.autonomy/checks/A19-P01.{lw-core-ios27,app-build,experience-packages}.json`) on the tree recorded at A19-P01 (`caac74c3`), whose Packages are unchanged since (owner ruling of 2026-11-14) — Verified 2026-11-17: 2026-11-17: A19-P01 evidence cited: .autonomy/checks/A19-P01.lw-core-ios27.json, A19-P01.app-build.json and A19-P01.experience-packages.json, all exit 0; no Packages, Apps or project.yml change since the A19-P01 record commit caac74c3
 - [ ] T-A19-202 Add the targets `LivingWallpapersExperience` (path `LivingWallpapers/Experience`) and `LivingWallpapersExperienceTests` (path `LivingWallpapers/ExperienceTests`) and the product `LivingWallpapersExperience` to `Packages/ExperiencesCreative/Package.swift` (lead; dependencies as the Ambient Clock experience plus `VisualCoreScenes` and `VisualCorePersistence`)
 
 ## Phase 2: Foundational — VisualCore additions (G-ENCODE, G-STILLTIME)
