@@ -55,7 +55,7 @@
 
 ## Phase 3: Story 2 — low-power cadence (P1)
 
-- [ ] T-A21-505 [P] [US2] Tests (agent E), `ExperienceTests/LowPowerCadenceTests.swift`:
+- [X] T-A21-505 [P] [US2] Tests (agent E), `ExperienceTests/LowPowerCadenceTests.swift`: — Verified 2026-11-17: 2026-11-17: LowPowerCadenceTests (5: Low Power Mode cap 30; 60 x 1/30 and 120 x 1/60 end at the same clock time within 1e-6 with identical stills at the 60 shared instants; a mid-run switch ends at the same time with largest step 0.0333; clamped 0.5 s stall moves at most 0.1 x speed; Reduce Motion and the still view hold), each under 10 s; .autonomy/checks/A21-P05.au-ios27.json exit 0; written by an agent, retested
   - `FramePacing(thermal: .nominal, lowPower: true, requestedMaxFPS: 60).maxFPS == 30`;
   - the presenter drawn off screen for 60 frames of 1/30 s and 120 frames of 1/60 s ends at the same clock time
     (±1e-6), with the pixels identical at the shared instants (every 1/30 s);
