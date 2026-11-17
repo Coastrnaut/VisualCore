@@ -27,6 +27,62 @@ Canonical overrides:
   `docs/release/build-and-archive.md`.
 - Follow `specs/150-zg-p06-release`.
 
+## Clarifications
+
+### Session 2026-11-17
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- **Permissions:** `Catalog/registrations.json` gives `a21.aurora` the permissions `[]`, so no usage string is needed.
+- **Copy steps:** `scripts/release_check.py` builds `experience-release-a21` and `copy-claims-a21` from
+  `docs/apps/aurora/release.json`. The shared denylist refuses `audio`, `music`, `smooth`, `instant`, `share` and
+  `camera`, measured numbers with units (`%`, `fps`, `hz`, hours) and the words `battery` and `frame rate`. Aurora
+  shares nothing, so `copyCheck.allow` is empty.
+- **Stored data:**
+  - the session snapshot (schema 1, digest `a21.aurora.v1`);
+  - `prefs.v1`, the experience value (kind `a21.preferences`, schema 1) with the refusals `damaged`,
+    `newer-version` and `out-of-range`.
+
+  A refused value opens the defaults with `readFailedMessage`, and it is overwritten only by the next accepted
+  change. No temporary file is written.
+- **Screen:** the experience never changes the idle timer or the brightness; the source shows no such call.
+- **Drawing failure:** the presenter has no drawing-failure seam yet. `breakShaders` leads to the fallback sky, not to
+  a failure.
+- **Interface chunk:** the A21 interface chunk is `c3` (A21-P05).
+
+- Q: Which statuses does the release checklist use? → A: The checker's:
+  - `verified`, with evidence;
+  - `pending-campaign-ii`, for device rows naming AU-D1 … AU-D8 of `docs/apps/aurora/device-campaign.md`;
+  - `owner-action`, with the steps of `docs/release/build-and-archive.md`.
+- Q: Which words does the experience's own claims scan refuse? → A: It scans the store text and the interface Swift
+  (controls, presenter, the adapter's words and SkySound), matching whole words case-insensitively:
+  - forecast, prediction, real-time aurora, live aurora, aurora activity, kp index, northern lights forecast,
+    scientific, accurate, realistic, simulation of the aurora;
+  - therapy, therapeutic, medical, clinical, wellbeing, well-being, mental health, stress relief, anxiety, heal,
+    healing, sleep, insomnia, meditation, hypnotic;
+  - always-on, keeps the screen on, screensaver, fps, unlimited.
+
+  Every test named in the claims table must exist.
+- Q: What does the source scan refuse? → A: The A20 list, in `Packages/ExperiencesCreative/Aurora`:
+  - `URLSession`, `import Network`, `CLLocation` and `import CoreLocation`;
+  - `AVCapture`, `AVAudioRecorder`, `inputNode`, `installTap` and `CMMotion`;
+  - `CNContact`, `PHPhotoLibrary`, `import Photos` and `PhotosUI`;
+  - `ASIdentifierManager`, `AppTrackingTransparency` and `isIdleTimerDisabled`;
+  - any `brightness =` write.
+- Q: How are crash recovery and the sample files proved? → A:
+  - **Crash recovery:** a test-only `failNextDraw` seam in the presenter makes the next draw throw once
+    (`SkyDrawError.injected`). A test saves the choices (a preset, the sound on), sets the seam and draws, so the
+    session fails with the injected message. `prefs.v1` must be byte-identical, and a new session over the same
+    storage opens with the saved preset and the sound on.
+  - **Sample files:** committed fixtures under `ExperienceTests/Fixtures/`:
+    - `snapshot-v1.json` (from the schema-1 example), `snapshot-newer.json` and `snapshot-damaged.json`;
+    - `prefs-current.json`, `prefs-newer.json`, `prefs-damaged.json` and `prefs-out-of-range.json`.
+
+    The current samples open. The newer and damaged snapshots are refused (`newerSchema`, `corrupt`). The refused
+    preferences open the defaults with their code. Every file stays byte-identical after reading.
+- Q: Which interface journey runs? → A: `AUReleaseUITests` joins chunk `c3`. A fresh start shows the canvas naming
+  "Polar night", and `sound`, `still` and `reduced-flash` read off. The test takes under 60 s.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Nothing leaves the device (Priority: P1) 🎯
