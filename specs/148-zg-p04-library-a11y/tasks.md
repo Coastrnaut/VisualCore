@@ -46,3 +46,7 @@ Agent E: T-A20-402–405 sources and tests. Lead: registration permission, runs,
 
 MVP: named gardens (402). Accessibility (403) and the bounded history (404) close the gates; the still (405) completes
 the phase title. Review checkpoints after 402 and at 406.
+
+## Phase 7: Convergence
+
+- [ ] T-A20-410 Record the as-built design in `specs/148-zg-p04-library-a11y/data-model.md` and `contracts/library.md`: opening builds an `ExperienceSnapshot` from the document with the shell's seed and step and restores it (selection and tool reset); the garden files are the truth and `library.json` an index (counter max(index next, highest file + 1); a damaged index rebuilt on the next change; a newer index makes the library read only); unreadable files count toward the cap and are deletable; names compared without case, a save keeping the new spelling; order max + 1 on save, kept on rename, readable gardens newest first; unreadable codes include the document's own refusal codes; the extra refusals and messages (size refused before writing, invalid name, not found, read only, unavailable, storage code) and the announcement forms; the new control identifiers; the still's fixed file name "Zen Garden 1600x1200.png" and failures `no-renderer`, `render`, `encoding`, `write`; labels split into title and value per FR-A20-401–403, FR-A20-405 (partial)
