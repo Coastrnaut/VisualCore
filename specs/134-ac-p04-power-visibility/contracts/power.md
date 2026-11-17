@@ -6,7 +6,8 @@
   - with the window 22:00–07:00, `isNight` at 21:59, 22:00, 06:59 and 07:00 gives false, true, true and false;
   - with 13:00–14:00, 12:59 gives false, 13:00 true and 14:00 false; start = end is never night;
   - the night text reaches at least 4.5 : 1 against all dimmed palette colours;
-  - a night frame is darker than the day frame (mean luma) and non-blank.
+  - a night frame is darker than the day frame (mean luma) and not black, with a non-zero luma spread. The dimmed
+    palette falls below the general non-blank spread of 8, so the day frame keeps that check.
 - **Brightness:** no source in `Packages/ExperiencesCreative/AmbientClock` contains `brightness =`.
 - **Drift:**
   - |x|, |y| ≤ 8 for 1,440 sampled instants of a day (every 60 s);

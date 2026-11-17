@@ -14,3 +14,9 @@
 - **D4 Keep-awake (Q4):** an injectable `IdleTimerPort`, so tests never touch `UIApplication`. A source-scan test pins
   the single file.
 - **D5 Schema 3 (Q5):** the defaults fill the new fields, and the schema-1 and schema-2 examples are both registered.
+- **D6 As built:**
+  - The frame cap is also an `Experience` requirement, forwarded by `ExperienceShell`.
+  - The night and drift values are float uniforms joined by `#define`.
+  - The idle-timer port's property is `keepsScreenAwake`.
+  - The drift is shown in steps of 0.5 point.
+  - A person's action is a control or favourite action, never a time action.
