@@ -65,3 +65,7 @@ Agent C: T-A21-302, 303, then 305, 306. Agent P: T-A21-304. Lead: runs, contract
 
 MVP: the transition (302, 303). Preferences (304, 305) and the sound choice (306) close G-PREFS. Review checkpoint at
 307. One commit per task.
+
+## Phase 6: Convergence
+
+- [ ] T-A21-311 Record the as-built design in `specs/154-au-p03-composite-prefs/data-model.md` and `contracts/experience.md`: the second sky is compiled with `#define AURORA_SKY_SLOT 1` so the two skies never share one cached program; a fade whose captured still was drawn under a higher limit ends at once when the limit is lowered; a fresh open seeds the saved preferences through the port at the first draw (a refused send is retried at the next draw); `SkyCore.isRestored` (presentation only, outside the digest, the snapshot and equality) tells a restore from a fresh open; a failed save is forced in tests by filling the 64-value quota; and the A21-P02 blend, limit and chrome tests now expect the crossfade and the two sound controls per data-model and contract (unrequested)
