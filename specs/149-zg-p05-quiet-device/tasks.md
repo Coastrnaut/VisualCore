@@ -49,7 +49,7 @@ device step. No VisualCore change. Precedent: `specs/142-lw-p05-device-tests/tas
 - [ ] T-A20-506 [P] [US2] Interface (agent U): `Apps/VisualCore/Tests/UI/DigitalZenGarden/ZGLibraryUITests.swift`
   (rake a pattern, save as "Evening", reset through undo, open "Evening"; the description shows one stroke); under
   60 s (FR-A20-504; SC-A20-502)
-- [ ] T-A20-507 [US2] Add the serial chunk `"b3": ["ZGGardenUITests", "ZGLibraryUITests"]` to `scripts/release_check.py`
+- [X] T-A20-507 [US2] Add the serial chunk `"b3": ["ZGGardenUITests", "ZGLibraryUITests"]` to `scripts/release_check.py` — Verified 2026-11-17: 2026-11-17: scripts/release_check.py serial chunk b3 = ZGGardenUITests, ZGLibraryUITests, added to SERIAL_CHUNKS; scripts/test_scripts.py exit 0
   and to `SERIAL_CHUNKS` (lead); `scripts/test_scripts.py` passes
 
 ## Phase 4: Story 3 — the campaign plan (P2)
