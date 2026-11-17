@@ -33,7 +33,7 @@ device step. No VisualCore change. Precedent: `specs/142-lw-p05-device-tests/tas
     `GardenSoundSink` (nil: `SoundEffectPlayer`) and an `ExperienceFeedback` (nil: `.shared`);
   - no GL call outside the scene protocol; `///` on every new declaration
   (FR-A20-501, 502, 503)
-- [ ] T-A20-504 [P] [US1] Tests (agent E): `ExperienceTests/CalmTests.swift` (defaults off; switches persist across a
+- [X] T-A20-504 [P] [US1] Tests (agent E): `ExperienceTests/CalmTests.swift` (defaults off; switches persist across a — Verified 2026-11-17: 2026-11-17: CalmTests (10: defaults off, calm.v1 across a reopen, damaged ignored, digest unchanged, tones and haptics only when on, sink disabled while off, stop on suspend) and ReducedMotionTests (5: identical frames with drift off and under Reduce Motion, different with drift on, luminance step 6.4e-06 below 0.02, Reduce Flashing unchanged); 90 experience and 51 core tests pass, each under 10 s; .autonomy/checks/A20-P05.zg-ios27.json exit 0; written by an agent, retested
   reopen through `calm.v1`; damaged value ignored; digest unchanged by the switches; tone and haptic requests only
   when on; player disabled while sound is off) and `ExperienceTests/ReducedMotionTests.swift` (two renders at
   different frame times identical with the drift off and with the drift on under Reduce Motion, different with the

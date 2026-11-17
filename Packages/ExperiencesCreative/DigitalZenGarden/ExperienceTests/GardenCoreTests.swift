@@ -36,7 +36,7 @@ import VisualCoreMath
         #expect(core.lastRefusal == nil && core.outcome?.code == "strokes-0")
         #expect(GardenCore.controls.map(\.id) == GardenCore.actionIDs)
         let counts = GardenCore.controls.map(\.ranges.count)
-        #expect(counts == [3, 24, 0, 1, 1, 0, 0, 3, 1, 2, 1, 0, 1])
+        #expect(counts == [3, 24, 0, 1, 1, 0, 0, 3, 1, 2, 1, 0, 1, 1, 1, 1])
         #expect(GardenCore.controls.allSatisfy { $0.ranges.count <= ExperienceControl.maxValues })
         #expect(GardenCore.qualityTiers == 2)
         #expect(GardenCore.qualityProfile.levels.map(\.name) == ["level-0", "level-1"])

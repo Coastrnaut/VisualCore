@@ -57,13 +57,20 @@ enum GardenTest {
 
     /// Opens Digital Zen Garden in `session` through the factory (with `forceFallback`), lays the view out at `size`
     /// points and draws one frame. A session without a quality pin is pinned to level 0.
+    /// `reduceMotion`, `storage` and `configure` (run on the shell before it is opened, for example to set a recording
+    /// sound sink) are the calm tests' additions (feature 149).
     static func open(_ session: ExperienceSession, forceFallback: Bool = false,
-                     size: CGSize = CGSize(width: 160, height: 120)) async throws -> ExperienceShell<GardenPresenter> {
+                     size: CGSize = CGSize(width: 160, height: 120), reduceMotion: Bool = false,
+                     storage: ExperienceStorage? = nil,
+                     configure: ((ExperienceShell<GardenPresenter>) -> Void)? = nil) async throws
+        -> ExperienceShell<GardenPresenter> {
         let id = self.id
         var made: ExperienceShell<GardenPresenter>?
         if session.qualityPin == nil { session.qualityPin = 0 }
         let request = ExperienceOpenRequest(id: id, seed: 1, snapshot: nil, refusedSnapshotFails: false) {
-            let shell = DigitalZenGardenExperience.make(id: id, forceFallback: forceFallback)
+            let shell = DigitalZenGardenExperience.make(id: id, reduceMotion: reduceMotion, forceFallback: forceFallback,
+                                                        storage: storage)
+            configure?(shell)
             made = shell
             return shell
         }
