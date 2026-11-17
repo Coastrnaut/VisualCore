@@ -11,7 +11,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T-A22-001 Create the two starting documents:
+- [X] T-A22-001 Create the two starting documents: — Verified 2026-11-17: 2026-11-17: docs/apps/shader-studio/README.md (the manual's product goal, version 0.1 features, non-goals and no sandbox claim; an experience of the one app; constitution 2.18.1) and regression-baseline.md (phase start 6218b9a1, constitution 27d7d83e amended 0577dcb0, pin d93edd1); validate_docs PASS
   - `docs/apps/shader-studio/README.md`, from the manual §1–§2: a mobile GLSL ES editor that compiles local shaders,
     shows diagnostics and safely previews bounded work; offline; no permission; no sandbox claim; an experience of the
     one app; its documents;
