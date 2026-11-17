@@ -24,6 +24,66 @@ Canonical overrides:
 - **Constitution:** 2.16.0 adds the A20 experience rules (committed at the start of this gate, `eb1f1233`).
 - Follow `specs/137-lw-p00-boundary-audit`.
 
+## Clarifications
+
+### Session 2026-11-17
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code by a read-only survey:
+- **Commits:** the A20 constitution commit is `eb1f1233` and the A20-P00 specify commit is `4a0ba17b`, the phase
+  start for the no-change diff of `Packages` and `External`. The reference submodule is pinned at `d93edd1`.
+- **Registry:** nineteen experiences are registered in `Catalog/registrations.json` (A01–A19), and the candidates list
+  is empty. `a20` appears in neither `Catalog/registrations.json` nor `Apps/VisualCore/App/ExperienceRegistry.swift`;
+  `AppModelTests` uses it as a synthetic not-yet-integrated id. `release_check.py --list` prints 153 lines.
+- **Host rule:** `RenderHost`, `RenderScene`, the presenter, the shell and the action port are main-actor; the core is
+  a `Sendable` value advanced in fixed steps (`ExperienceEngine.advance(frame:)`) that never reads a clock or draws.
+- **VisualCore offers** (public in a framework product and tested):
+  - **touch:** `RenderHost.pointerHandler` with stable touch ids and timestamps (`TouchAdapterTests`), `PointerEvent`,
+    `PointerTracker` (10 pointers), the recognizers and `GestureArbiter` (VisualCoreScenes), `ExperiencePresenter.pointer`
+    and `cancelPointers` (`PointerPathTests`, `PointerCancelTests`), `ExperienceInput.normalized` and
+    `ExperienceControl.maxValues` (24 values per action), and `GestureAlternatives` (every gesture needs a native
+    control);
+  - **resampling:** `PointerVelocityTracker` (uniform spacing, at most 16 samples per update, counters for capped and
+    rejected samples; `PointerVelocityTrackerTests`), used by Fluid Art Playground; linear, not a spline;
+  - **procedural textures:** the GLSL library `vc/` (hash, value and gradient noise, `vc_fbm`, 2D and 3D SDFs, palette,
+    sRGB, field sampling) and CPU `HeightField`, `GradientNoise2D`, `FractalNoise2D`;
+  - **feedback:** `ResourceRegistry.makeRenderTarget` (`rgba8`, `rgba16f`, `r8`), `RenderTarget.readPixels` and
+    `readFloatPixels`, `PingPongTarget` (invalidated on context loss), `FieldPass`, `FloatRenderSupport` (falls back to
+    `rgba8`), `TrailLayer`;
+  - **animation:** `FrameInfo`, `maxFramesPerSecond` with `FramePacing` (floor 30), `CachedScene` for a still frame,
+    `SceneClock.reducedMotionFactor`;
+  - **meshes and placement:** `Mat3` 2D transforms, `SceneNode.hitTest` and `drawList` by depth, `Primitive.contains`,
+    `Mesh.revolution`, `extrusion`, `bevelledBox`, `MeshRenderer` (one directional light), `DepthMeshPass`;
+  - **save and restore:** `ExperienceSnapshot` (1 MiB), `StateDigest`, `MigrationChain`, `MigrationExample`,
+    `ExperienceStorage` with `StorageQuota` (16 MiB, 64 files);
+  - **sound, haptics, accessibility:** `SoundEffectPlayer` (ambient session, one-shot procedural tones, no permission),
+    `ExperienceFeedback` haptics and announcements, `AnnouncementPlanner`, `SystemAccessibilityObserver`.
+- **Missing everywhere:** coalesced or predicted touch samples; stroke smoothing (splines); a brush-stamp pass into a
+  height target; normal-from-height and lighting helpers in GLSL; shadows; an undo or command stack; a named-document
+  store over `ExperienceStorage` (`NamedLibrary` and `DocumentStore` take a directory URL, and experiences write their
+  own small stores, as Fractal Explorer's bookmarks and Ambient Clock's favourites do); a selection helper.
+
+- Q: How is the manual's "compile an empty shell" gate met in the one app? → A: As for A19: the one app is the shell.
+  This phase proves it builds for testing with Digital Zen Garden absent, and the targets come with A20-P01's first
+  model.
+- Q: What makes a capability "available"? → A: A public declaration in a VisualCore framework product with at least
+  one test that exercises it. An implementation that exists only inside another experience or a harness is "requires
+  adaptation" at best.
+- Q: Which package holds Digital Zen Garden? → A: `Packages/ExperiencesCreative/DigitalZenGarden` (Auto-Creator.md
+  §16), as A05–A19 did; no new package is created.
+- Q: How are the sand picture and undo built from what exists? → A: The garden is a command log in normalized tray
+  coordinates (strokes and stone edits), sent to the core as small actions within the 24-value limit. The sand is a
+  height target (`rgba16f` through `FloatRenderSupport`, `rgba8` fallback) on a `PingPongTarget`, into which an
+  experience-local `FieldPass` stamps rake footprints. It is rebuilt by replaying the log from the nearest checkpoint
+  after undo, redo, restore, resize or context loss. Undo is by command, never by texture snapshot. Normal-from-height
+  lighting and soft shadows are experience shaders over `vc/`. All of these are app-local gaps: no VisualCore change is
+  planned, and a second user of a brush-stamp pass or an undo stack would justify moving it upstream later.
+- Q: Which touch samples does a stroke use, and are sound and haptics in scope? → A: `RenderHost.pointerHandler`
+  positions resampled to uniform spacing with a cap per stroke (`PointerVelocityTracker`), so a fast drag leaves no
+  gap. Coalesced touches are recorded as "requires adaptation" and assessed at the device phase (A20-P05); no
+  VisualCore change in version 0.1. Sound is optional through `SoundEffectPlayer`, off by default; haptics through
+  `ExperienceFeedback`, off when the person's switch is off. Neither changes the state.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - An evidence-backed integration matrix (Priority: P1) 🎯
