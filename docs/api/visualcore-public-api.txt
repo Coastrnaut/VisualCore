@@ -1273,6 +1273,7 @@ VisualCoreExperienceHost | func | public func announce(_ text: String, kind: Ann
 VisualCoreExperienceHost | func | public func back()
 VisualCoreExperienceHost | func | public func beginDeactivation() throws(ExperienceError)
 VisualCoreExperienceHost | func | public func callAsFunction(width: Int, height: Int) throws(OffscreenRenderError) -> StillImage
+VisualCoreExperienceHost | func | public func callAsFunction(width: Int, height: Int, time: Double) throws(OffscreenRenderError) -> StillImage
 VisualCoreExperienceHost | func | public func cancelPointers()
 VisualCoreExperienceHost | func | public func cancelPreparation()
 VisualCoreExperienceHost | func | public func checkpoint()
@@ -1294,6 +1295,7 @@ VisualCoreExperienceHost | func | public func probes(_ core: Core) -> [FrameProb
 VisualCoreExperienceHost | func | public func recreateContext()
 VisualCoreExperienceHost | func | public func refreshQuality(now: Double? = nil)
 VisualCoreExperienceHost | func | public func renderStill(width: Int, height: Int) throws(OffscreenRenderError) -> StillImage
+VisualCoreExperienceHost | func | public func renderStill(width: Int, height: Int, time: Double) throws(OffscreenRenderError) -> StillImage
 VisualCoreExperienceHost | func | public func reset() throws(ExperienceError)
 VisualCoreExperienceHost | func | public func resize(_ context: RenderContext)
 VisualCoreExperienceHost | func | public func restore(_ snapshot: ExperienceSnapshot) throws(ExperienceError)
@@ -1322,6 +1324,7 @@ VisualCoreExperienceHost | init | public init(session: ExperienceSession)
 VisualCoreExperienceHost | init | public init(session: ExperienceSession, onRetry: (@MainActor () async -> Void)? = nil)
 VisualCoreExperienceHost | init | public init(snapshotSink: SnapshotSink? = nil)
 VisualCoreExperienceHost | init | public init(text: String, onBack: @escaping @MainActor () -> Void)
+VisualCoreExperienceHost | init | public init(timed: @escaping @MainActor @Sendable (Int, Int, Double) throws(OffscreenRenderError) -> StillImage)
 VisualCoreExperienceHost | init | public init(title: String, detail: String, code: String,
 VisualCoreExperienceHost | let | public let accessibilityPrefix: String
 VisualCoreExperienceHost | let | public let frame: (pixels: [UInt8], width: Int, height: Int)?
@@ -1877,6 +1880,7 @@ VisualCoreRendering | enum | public enum ResourceError: Error, Equatable, Sendab
 VisualCoreRendering | enum | public enum ShaderError: Error, Equatable, Sendable
 VisualCoreRendering | enum | public enum State: Equatable, Sendable
 VisualCoreRendering | enum | public enum StillImageEncoder
+VisualCoreRendering | enum | public enum StillImageFormat: String, CaseIterable, Sendable
 VisualCoreRendering | enum | public enum TextureFormat: Sendable, Equatable
 VisualCoreRendering | func | public func acquireTarget(width: Int, height: Int, format: TextureFormat = .rgba8, depth: Bool = false) throws -> RenderTarget
 VisualCoreRendering | func | public func addErrorObserver(_ observer: @escaping @MainActor (RenderHostError) -> Void)
@@ -1952,10 +1956,12 @@ VisualCoreRendering | func | public nonisolated static func folder(named name: S
 VisualCoreRendering | func | public nonisolated static func message(for error: OffscreenRenderError) -> String
 VisualCoreRendering | func | public static func == (lhs: Pipeline, rhs: Pipeline) -> Bool
 VisualCoreRendering | func | public static func apply(_ pipeline: Pipeline, resources: ResourceRegistry) -> Bool
+VisualCoreRendering | func | public static func data(_ image: StillImage, format: StillImageFormat,
 VisualCoreRendering | func | public static func detect(in registry: ResourceRegistry) -> FloatRenderSupport
 VisualCoreRendering | func | public static func fit(world: WorldRect, viewSize: Vec2) -> (camera: Camera2D, metrics: ViewMetrics)?
 VisualCoreRendering | func | public static func fittedSize(width: Int, height: Int) -> (width: Int, height: Int)?
 VisualCoreRendering | func | public static func footprint() -> Int?
+VisualCoreRendering | func | public static func isAvailable(_ format: StillImageFormat) -> Bool
 VisualCoreRendering | func | public static func pngData(_ image: StillImage) throws(OffscreenRenderError) -> Data
 VisualCoreRendering | func | public static func resetForVisualCore(framebuffer: UInt32, width: Int, height: Int)
 VisualCoreRendering | func | public static func square(halfExtent: Double) -> WorldRect
@@ -2160,6 +2166,7 @@ VisualCoreRendering | var | public var strength: Double
 VisualCoreRendering | var | public var supported: Bool
 VisualCoreRendering | var | public var timeScale: Double
 VisualCoreRendering | var | public var trailStrength: Double
+VisualCoreRendering | var | public var typeIdentifier: String
 VisualCoreRendering | var | public var usesTrailLayer: Bool
 VisualCoreRendering | var | public var vendor
 VisualCoreRendering | var | public var vertexHighp: ShaderPrecision?

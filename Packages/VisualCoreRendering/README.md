@@ -185,6 +185,15 @@ scene is resized back to the live surface, also when the export fails. A failure
 - `host.maxRenderSize` is the smallest of the max texture, renderbuffer and viewport sizes. Sizes above it, or above
   64 million pixels (`RenderHost.maxOffscreenPixels`), are refused before any GPU work.
 - `StillImageEncoder.pngData(_:)` writes an opaque PNG tagged sRGB (alpha is dropped).
+- `StillImageEncoder.data(_:format:quality:)` writes a `StillImageFormat` (`.png`, `.jpeg` or `.heic`), opaque and tagged
+  sRGB; `quality` (0…1, default 0.9) applies to JPEG and HEIC only, and `data(_, format: .png)` is byte-identical to
+  `pngData`. `StillImageEncoder.isAvailable(_:)` says whether this device can write a format (from
+  `CGImageDestinationCopyTypeIdentifiers()`); an unavailable format throws `.encoding` before any work (feature 139,
+  A19-P02, G-ENCODE).
+- In `VisualCoreExperienceHost`, `ExperienceSession.renderStill(width:height:time:)` renders the open experience at a
+  chosen frame time, and `ExperienceStillRenderer(timed:)` with `callAsFunction(width:height:time:)` carries it in the
+  `experienceStillRenderer` environment value; the two-argument forms keep rendering at time 0 (feature 139, A19-P02,
+  G-STILLTIME).
 - Scenes that size content in points (for example particles) should scale it for the export's pixel size; shader
   scenes that use `u_resolution` need nothing.
 
