@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "docs",
+    "app-contracts",
+    "compliance",
+    "dependencies"
+  ],
+  "command": "python3 scripts/release_check.py --only docs app-contracts compliance dependencies",
+  "elapsed_seconds": 3.098,
+  "exit_code": 0,
+  "finished": "2026-11-17T13:11:15+00:00",
+  "log": ".autonomy/logs/A22-P00.fast-checks.log",
+  "log_sha256": "cf8c34cf8892a6cbcd1a574c8776c77c963fe10a131594426d233f64af3026b2",
+  "name": "fast-checks",
+  "stage": "A22-P00",
+  "started": "2026-11-17T13:11:11+00:00",
+  "timed_out": false
+}

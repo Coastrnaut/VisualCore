@@ -69,7 +69,7 @@
 
 - [X] T-A22-009 No-change proof (`--name no-change -- git diff --exit-code --stat 6218b9a1..HEAD -- Packages — Verified 2026-11-17: 2026-11-17: .autonomy/checks/A22-P00.no-change.json exit 0 (git diff --exit-code --stat 6218b9a1..HEAD -- Packages External is empty)
   External`) (FR-A22-008, SC-A22-005)
-- [ ] T-A22-010 Run the script tests (`--name script-tests -- python3 scripts/test_scripts.py`) and the release-check
+- [X] T-A22-010 Run the script tests (`--name script-tests -- python3 scripts/test_scripts.py`) and the release-check — Verified 2026-11-17: 2026-11-17: .autonomy/checks/A22-P00.script-tests.json and A22-P00.fast-checks.json exit 0 (docs, app-contracts, compliance, dependencies); every run-check within its limit, the contract check under 1 s
   document steps (`--name fast-checks -- python3 scripts/release_check.py --only docs app-contracts compliance
   dependencies`). Every run-check of this gate stays within its limit, and the contract check runs in under 10 s
   (SC-A22-006)
