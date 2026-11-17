@@ -4,6 +4,9 @@
 // does not have); a refusal changes nothing; equal actions give equal digests and every field changes the digest; a
 // scene change resets the preset and parameters; the snapshot round trip keeps the digest and a damaged payload is
 // refused; the outcome, the quality tiers and the project.
+// Feature 140 (A19-P03) T-A19-304 (FR-A19-301; clarification Q1): the ten controls with `preset.color` and
+// `preset.reset`; their refusals; the schema-2 keys `custom` and `colors` in the snapshot and their damaged values;
+// the project carries the edited colours only while `custom` is 1.
 import Foundation
 import Testing
 import LivingWallpapersCore
@@ -17,6 +20,7 @@ import VisualCoreExperience
     static let accepted: [(String, [Double])] = [
         ("scene.select", [2]), ("scene.preset", [1]), ("scene.parameter", [0, 7]), ("canvas.template", [8]),
         ("canvas.orientation", [1]), ("scene.time", [3600]), ("export.format", [2]), ("motion.enabled", [0]),
+        ("preset.color", [1, 0.4, 0.2, 0.6]),
     ]
 
     /// Values the engine refuses for their declared range or count.
@@ -24,14 +28,16 @@ import VisualCoreExperience
         ("scene.select", [4]), ("scene.select", [-1]), ("scene.preset", [3]), ("scene.parameter", [3, 1]),
         ("scene.parameter", [0, 41]), ("canvas.template", [9]), ("canvas.orientation", [2]), ("scene.time", [3601]),
         ("scene.time", [-0.5]), ("export.format", [3]), ("motion.enabled", [-1]), ("scene.select", [1, 2]),
-        ("scene.parameter", [0]), ("scene.unknown", [0]),
+        ("scene.parameter", [0]), ("scene.unknown", [0]), ("preset.color", [4, 0, 0, 0]),
+        ("preset.color", [0, 1.5, 0, 0]), ("preset.color", [0, 0, -0.1, 0]), ("preset.color", [0, 0, 0, 2]),
+        ("preset.color", [0, 0.5, 0.5]), ("preset.color", [0, 0.5, 0.5, 0.5, 0.5]), ("preset.reset", [1]),
     ]
 
     /// Values inside the declared ranges that the core's rules refuse.
     static let refusedByCore: [(String, [Double])] = [
         ("scene.select", [1.5]), ("scene.preset", [0.5]), ("scene.parameter", [0.5, 4]), ("scene.parameter", [0, 9]),
         ("scene.parameter", [0, 1]), ("canvas.template", [2.5]), ("canvas.orientation", [0.5]),
-        ("export.format", [1.2]), ("motion.enabled", [0.3]),
+        ("export.format", [1.2]), ("motion.enabled", [0.3]), ("preset.color", [0.5, 0.2, 0.2, 0.2]),
     ]
 
     @Test func everyControlIsAcceptedInsideItsRange() async throws {
@@ -41,6 +47,26 @@ import VisualCoreExperience
             let result = engine.handle(control: control, values: values)
             #expect(result == .accepted, "\(control) \(values)")
         }
+        var engine = try await WallpaperTest.engine()
+        #expect(engine.handle(control: "preset.reset", values: []) == .accepted)
+    }
+
+    @Test func theColourActionsAreRefusedDirectlyByTheCore() {
+        let cases: [([Double], ActionResult)] = [
+            ([0, 1.5, 0, 0], .rejected(.outOfRange(index: 1))), ([0, 0, -0.1, 0], .rejected(.outOfRange(index: 2))),
+            ([0, 0, 0, 2], .rejected(.outOfRange(index: 3))),
+            ([4, 0, 0, 0], .rejected(.rule(code: WallpaperRule.invalidChoice))),
+            ([0, 0.5, 0.5], .rejected(.wrongValueCount(expected: 4, found: 3))),
+            ([0, .nan, 0, 0], .rejected(.nonFinite(index: 1))),
+        ]
+        for (values, expected) in cases {
+            let (core, result) = wallpaperApplied(WallpaperCore(), "preset.color", values)
+            #expect(result == expected, "\(values)")
+            #expect(core == WallpaperCore(), "\(values)")
+        }
+        let (core, result) = wallpaperApplied(WallpaperCore(), "preset.reset", [0])
+        #expect(result == .rejected(.wrongValueCount(expected: 0, found: 1)))
+        #expect(core == WallpaperCore())
     }
 
     @Test func outOfRangeAndMalformedActionsAreRefusedAndChangeNothing() async throws {
@@ -103,8 +129,9 @@ import VisualCoreExperience
         let core = try #require(engine.core)
         let payload = try core.snapshotPayload()
         let object = try #require(try JSONSerialization.jsonObject(with: payload) as? [String: Any])
-        #expect(Set(object.keys) == ["animationTime", "format", "motion", "orientation", "parameters", "preset",
-                                     "scene", "template"])
+        #expect(Set(object.keys) == WallpaperCore.schemaOneKeys.union(["colors", "custom"]))
+        #expect(object["custom"] as? Int == 1)
+        #expect(core.custom == 1 && core.colors[3...5] == [0.4, 0.2, 0.6])
         let restored = try WallpaperCore.restore(payload: payload, seed: 7)
         #expect(restored == core)
         #expect(try wallpaperDigest(restored) == (try wallpaperDigest(core)))
@@ -119,7 +146,10 @@ import VisualCoreExperience
         let object = try #require(try JSONSerialization.jsonObject(with: good) as? [String: Any])
         let damaged: [(String, Any)] = [("scene", 4), ("preset", 3), ("template", 9), ("orientation", 2),
                                         ("format", 3), ("animationTime", 3601), ("parameters", [9, 0.35, 0.6]),
-                                        ("parameters", [4, 0.35]), ("parameters", [4, 0.35, 0.6, 0])]
+                                        ("parameters", [4, 0.35]), ("parameters", [4, 0.35, 0.6, 0]),
+                                        ("custom", 2), ("custom", -1), ("colors", [Double](repeating: 0.5, count: 11)),
+                                        ("colors", [Double](repeating: 0.5, count: 13)),
+                                        ("colors", [1.5] + [Double](repeating: 0.5, count: 11))]
         for (key, value) in damaged {
             var changed = object
             changed[key] = value
@@ -177,5 +207,17 @@ import VisualCoreExperience
         let plan = try ExportPlanner.plan(project: project, maxEdge: 4096).get()
         #expect(plan.width == 2752 && plan.height == 2064)
         #expect(WallpaperCore().project == WallpaperProject.default)
+        #expect(project.customColors == nil)
+        let (edited, accepted) = wallpaperApplied(core, "preset.color", [3, 0.1, 0.2, 0.3])
+        #expect(accepted == .accepted)
+        let colours = try #require(edited.project.customColors)
+        #expect(colours.count == 4)
+        #expect(colours[3] == RGBColor(r: 0.1, g: 0.2, b: 0.3))
+        #expect(Array(colours[0..<3]) == Array(core.presetDefinition.colors[0..<3]))
+        #expect(edited.project.validation() == nil)
+        var reset = edited
+        #expect(reset.apply(ExperienceAction(control: "preset.reset", values: [], step: 0)) == .accepted)
+        #expect(reset.project.customColors == nil)
+        #expect(reset == core)
     }
 }
