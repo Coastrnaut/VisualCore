@@ -261,11 +261,12 @@ UI_CHUNKS = {
     "v2": ["SSEViewUITests", "SSETourUITests"],   # feature 108 A14-P06 (T-A14-609)
     "w2": ["MEExploreUITests", "MELibraryUITests"],   # feature 115 A15-P06 (T-A15-609)
     "x2": ["SLExploreUITests", "SLLibraryUITests"],   # feature 122 A16-P06 (T-A16-608)
+    "y2": ["IAExploreUITests", "IASearchUITests"],   # feature 129 A17-P06 (T-A17-608)
 }
 # Chunks that run on one simulator (feature 066 A08-P06): the oscilloscope draws every frame on the main thread, and
 # two parallel clones competing for the host's CPU kept XCTest's idle wait from settling (single tests took 60–89 s in
 # parallel, 23–41 s serially, with the same total time).
-SERIAL_CHUNKS = {"p2", "q2", "r2", "s2", "t2", "u2", "v2", "w2", "x2"}
+SERIAL_CHUNKS = {"p2", "q2", "r2", "s2", "t2", "u2", "v2", "w2", "x2", "y2"}
 UNIFIED_LIMIT = 590       # seconds, below the ten-minute limit of one foreground command
 RELEASE_FORBIDDEN = ["DebugLaunch", "DebugExperience", "DebugInventory", "ScenarioLaunch", "ScenarioHostView",
                      "vcDamageStat", "vcCandidates", "vc_ci_angle_standin"]

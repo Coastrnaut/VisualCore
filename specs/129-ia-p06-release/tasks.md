@@ -27,7 +27,7 @@ after every task (no trailers); run checks, read each exit, then tick in a separ
 
 ## Phase 5: Story 4 — interface tests
 
-- [ ] T-A17-608 [P] [US4] Write `Apps/VisualCore/Tests/UI/InteractiveAnatomy/{IASupport,IAExploreUITests,IASearchUITests}.swift` per Clarifications Q4 (launched like `SLSupport`; identifiers `experience.a17.interactive-anatomy.<name>`), and add the serial chunk `"y2": ["IAExploreUITests", "IASearchUITests"]` to `scripts/release_check.py` (lead) and to `SERIAL_CHUNKS` (FR-A17-607)
+- [X] T-A17-608 [P] [US4] Write `Apps/VisualCore/Tests/UI/InteractiveAnatomy/{IASupport,IAExploreUITests,IASearchUITests}.swift` per Clarifications Q4 (launched like `SLSupport`; identifiers `experience.a17.interactive-anatomy.<name>`), and add the serial chunk `"y2": ["IAExploreUITests", "IASearchUITests"]` to `scripts/release_check.py` (lead) and to `SERIAL_CHUNKS` (FR-A17-607) — Verified 2026-11-16: 2026-11-16: Apps/VisualCore/Tests/UI/InteractiveAnatomy/{IASupport,IAExploreUITests,IASearchUITests}.swift and the serial chunk y2 in scripts/release_check.py; .autonomy/checks/A17-P06.app-ui.json exit 0 (app-build-for-testing-ios27, app-unit-ios27, app-ui-ios27-y2: 5/5 interface tests, slowest 40.5 s); written by an agent, retested
 
 ## Phase 6: Records and evidence
 
