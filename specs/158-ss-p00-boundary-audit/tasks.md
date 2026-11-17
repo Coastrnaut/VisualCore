@@ -20,7 +20,7 @@
 
 ## Phase 3: User Story 1 — Evidence-backed integration matrix (P1) 🎯
 
-- [ ] T-A22-002 [US1] Write `docs/apps/shader-studio/visualcore-contract.json` (schema 1; app `shader-studio`; gate
+- [X] T-A22-002 [US1] Write `docs/apps/shader-studio/visualcore-contract.json` (schema 1; app `shader-studio`; gate — Verified 2026-11-17: 2026-11-17: docs/apps/shader-studio/visualcore-contract.json: 10 inventory areas with real paths (release_check --list 163 lines), 29 matrix rows (5 capabilities, 6 features, the FR-A22-003 items and cross-cutting rows; 10 available, 19 requires adaptation), 150 citations of public VisualCore symbols, traceability for every capability and feature; written by an agent, reviewed and checked
   `A22-P00`), with:
   - an `inventory` of every FR-A22-001 area, with paths and the release-check line count (163, from `python3
     scripts/release_check.py --list`);
