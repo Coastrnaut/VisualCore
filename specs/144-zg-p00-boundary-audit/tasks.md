@@ -33,7 +33,7 @@ only).
 ## Phase 7: Polish and evidence
 
 - [X] T-A20-009 No-change proof (`--name no-change -- git diff --exit-code --stat 4a0ba17b..HEAD -- Packages External`) (FR-A20-008, SC-A20-005) — Verified 2026-11-17: 2026-11-17: .autonomy/checks/A20-P00.no-change.json exit 0 (empty diff of Packages and External since 4a0ba17b)
-- [ ] T-A20-010 Script tests (`--name script-tests -- python3 scripts/test_scripts.py`) and the release-check document steps (`--name fast-checks -- python3 scripts/release_check.py --only docs app-contracts compliance dependencies`); every run-check of this gate stays within its 600 s limit and the contract check under 10 s (SC-A20-006)
+- [X] T-A20-010 Script tests (`--name script-tests -- python3 scripts/test_scripts.py`) and the release-check document steps (`--name fast-checks -- python3 scripts/release_check.py --only docs app-contracts compliance dependencies`); every run-check of this gate stays within its 600 s limit and the contract check under 10 s (SC-A20-006) — Verified 2026-11-17: 2026-11-17: .autonomy/checks/A20-P00.script-tests.json exit 0 and A20-P00.fast-checks.json exit 0 (docs, app-contracts, compliance, dependencies); every run-check of this gate within 600 s; the contract check under 10 s
 - [ ] T-A20-011 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A20-P00; update README.md (status, gate count) in the record commit (rule 16) and `docs/automatedtesting.md` if a test tool, rule or lesson changed (rule 17)
 
 ## Dependencies
