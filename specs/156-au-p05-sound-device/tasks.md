@@ -87,7 +87,7 @@
 
 ## Phase 5: Story 4 — the campaign plan (P2)
 
-- [ ] T-A21-509 [P] [US4] Write `docs/apps/aurora/device-campaign.md` (agent D, after
+- [X] T-A21-509 [P] [US4] Write `docs/apps/aurora/device-campaign.md` (agent D, after — Verified 2026-11-17: 2026-11-17: docs/apps/aurora/device-campaign.md (AU-D1 to AU-D8, each with devices, procedure, pass condition and pending device campaign; no number claimed; D3 stays on iPadOS 26.5), licenses.md row for AmbientLoopRecipe.gentle (synthesised in code, no recording), README table row; .autonomy/checks/A21-P05.docs.json exit 0; written by an agent, reviewed
   `docs/apps/digital-zen-garden/device-campaign.md`):
   - rows AU-D1 to AU-D8 of clarification Q4, each with devices (D1, D2, D3), procedure, pass condition and "pending
     device campaign";

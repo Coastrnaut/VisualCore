@@ -22,3 +22,4 @@ location and needs no permission. Its rules are the A21 subsection of the consti
 | [visualcore-contract.json](visualcore-contract.json) / [.md](visualcore-contract.md) | Phase 00 inventory, capability matrix, gaps, decision (checked by `scripts/check_app_contract.py`) |
 | [regression-baseline.md](regression-baseline.md) | Phase start, reference pin, the ProjectM reference regression results |
 | [licenses.md](licenses.md) | Licenses and provenance of everything the experience draws |
+| [device-campaign.md](device-campaign.md) | Device-campaign plan AU-D1 to AU-D8 (pending until the campaign after ImplementationLock-100) |

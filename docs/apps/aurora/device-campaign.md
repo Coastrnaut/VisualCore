@@ -1,0 +1,41 @@
+# Aurora — device campaign plan (A21-P05, feature 156)
+
+These measurements need real devices. They run only after `ImplementationLock-100` (CLAUDE.md rule 5), in the order
+D1 → D2 → D3, and D3 is not updated from iPadOS 26.5. Until then every row is pending, and no frame, heat, battery,
+cadence, brightness, sound or accessibility number is claimed anywhere. Simulator results never stand in for these
+rows: the simulator gives no thermal state, no battery, no Low Power Mode cadence on real hardware, no panel
+brightness and no speaker. Every row is a {device} task (FR-A21-507, FR-A21-508) and closes the device part of gap
+G-DEVICE in [visualcore-contract.json](visualcore-contract.json). Runs are short (minutes at most, no soak); a longer
+session is bounded by arithmetic from the short run, never run (owner ruling of 2026-11-13).
+
+Aurora draws its sky in one fragment shader, `aurora-sky.frag` (`SkyShader`), over VisualCore's GLSL library `vc/`,
+on the OpenGL ES → ANGLE → Metal path; the sky loops seamlessly every 600 s. Three presets are offered:
+`polar-night`, `violet-veil` and `dawn-haze`. A soft knee keeps every pixel's Rec. 709 luminance at most the
+brightness limit, 0.72 by default (`SkyShader.luminanceCeiling`), which the person can lower to 0.2 ("Brightness
+limit"). Reduced flashing turns the star twinkle off and makes a change between skies take 4.0 s; Reduce Motion holds
+the sky still. The still view ("Still sky") draws the sky once inside a `CachedScene` and repeats the cached picture;
+the same cache holds the fallback sky (`SkyShader.fallbackSource`), drawn when the sky shader fails to compile or the
+host reports no fragment `highp`, with the line "This device shows a simpler sky." The host caps frames at 30 per
+second under Low Power Mode (`FramePacing`), and the sky clock (`SkyClock`) advances by each frame's clamped delta
+(at most 0.1 s) times the speed, so a lower cadence changes no sky time. The optional ambient loop
+(`AmbientLoopRecipe.gentle`, synthesised in code by VisualCoreAudioDSP) plays through `AmbientLoopPlayer` in the
+ambient audio session category, which mixes with other audio and follows the silent switch; it is off by default,
+kept with the other choices in `prefs.v1`, plays only while Aurora is shown, the scene is active and the sound is on,
+and stops on an interruption, a media-services reset or the background without restarting by itself. The devices are
+D1 iPhone 15 (iOS 27), D2 iPad Pro 13-inch (M5) and D3 iPad (A16) on iPadOS 26.5.
+
+Owner actions: the devices in hand, unlocking them, trusting the computer, the developer-mode and signing steps,
+charging and unplugging, Low Power Mode, the silent switch, a call or an alarm, the display refresh setting, and
+turning Reduce Motion, Reduce Flashing and the text size on and off in Settings are done by the owner. Each such step
+is recorded as `BLOCKED_OWNER_ACTION` with its exact steps when the campaign reaches it, and the other rows continue.
+
+| Row | Measurement | Device | Procedure | Threshold | Status |
+|---|---|---|---|---|---|
+| AU-D1 | Thermal state and frame rate per preset | D1 reference iPhone (iOS 27), D2, D3 | Open Aurora with the defaults and show each preset in turn (`polar-night`, `violet-veil`, `dawn-haze`) for a short run of a few minutes. Record Instruments (Animation Hitches, thermal state) during each run, and log `ProcessInfo.thermalState` every 5 s. Extrapolate the thermal trend of each run to a long session by arithmetic; do not run the long session. | frames at the host's cap with no recorded hitch in steady drawing; thermal state never reaches `.critical` and the extrapolated trend does not reach it either; any time at `.serious` is recorded | pending device campaign |
+| AU-D2 | Battery over a short session | D1, D2, D3 | On battery, unplugged after charging (owner action), keep Aurora open with the defaults for a short session of a few minutes, once with the full sky and once with "Still sky" on. Log the battery level at the start and the end, and extrapolate each run to an hour by arithmetic. | battery use is recorded for both runs and the extrapolation is shown with its arithmetic; no claim is made from it; the still view uses no more than the full sky; Aurora is still open and drawn correctly at the end | pending device campaign |
+| AU-D3 | Low-power cadence without a time jump | D1, D2, D3 | Show `violet-veil` at speed 1 and turn Low Power Mode on, then off, then on again (owner action) while recording the screen and Instruments (Animation Hitches) for a short run. Read the frame rate before and after each switch. | under Low Power Mode frames come at no more than 30 per second; the ribbons keep moving at the same apparent speed; no visible time jump at either switch (no step larger than one frame's movement); no hitch at the switch | pending device campaign |
+| AU-D4 | Brightness limit, reduced flashing and comfort on screen | D1, D2, D3 | At full system brightness, show each preset at the default limit, then lower "Brightness limit" to its lowest and back. Turn "Reduced flashing" on and change between skies; repeat with Reduce Flashing on in Settings (owner action). Look at the screen in a dark room for a short run and photograph it at a fixed exposure. | no area of the sky reads as a bright flash or a hot spot at the default limit, and the sky dims when the limit is lowered; with reduced flashing no star twinkles and every change between skies is a slow fade (no cut, no flash); nothing is uncomfortable to watch in the dark; any discomfort is recorded as a follow-up task, not a pass | pending device campaign |
+| AU-D5 | The still view's idle drawing | D1, D2, D3 | Turn "Still sky" on and leave Aurora untouched for a short run; record Instruments (Metal System Trace and Animation Hitches). Repeat with Reduce Motion on (owner action), and once with the still view off for comparison. | with the still view on, the sky pass is run once and only the cached picture is repeated between inputs; with the still view off, the sky draws every frame at the host's cap; a change of a control redraws the sky once | pending device campaign |
+| AU-D6 | The ambient loop on the speaker | D1, D2, D3 | On a fresh install, open Aurora and confirm no sound. Turn "Sound" on with the silent switch on, then off (owner action), and change "Volume"; play music in another app with the sound on. Receive a call or an alarm (owner action) while the loop plays, end it, and return to Aurora; send the app to the background and bring it back; leave Aurora and return. Close and reopen the app. | nothing sounds with the defaults; the loop is silent with the silent switch on and audible with it off; the volume applies at once; other audio keeps playing; the loop stops for the call or alarm, the background and leaving Aurora, never restarts by itself while Aurora is not shown, and plays again on returning to Aurora with the sound on; the choice is restored after reopening; no click or gap is heard at the loop point | pending device campaign |
+| AU-D7 | Shader compilation, fallback and refresh rates | D1, D2 (ProMotion), D3 | Open Aurora and read the diagnostics for the sky shader's compilation on the ANGLE Metal path; open it again after a relaunch. Show each preset with the display at its high refresh rate on D2 and with Limit Frame Rate on (owner action), and at 60 Hz on D1 and D3. Exercise the fallback sky with the tests' seam on a development build. | the sky shader compiles on every device with no fallback line shown; the first frame is a sky, never a grey clear; the fallback sky, when forced, is a still sky under the limit with the line "This device shows a simpler sky."; motion is even at both refresh rates and the sky time is the same at either rate | pending device campaign |
+| AU-D8 | Accessibility audit | D1, D2, D3 | Run the system accessibility audits (`VC_RUN_AUDITS=1` only on devices, owner ruling of 2026-11-13) on the Aurora screen, its controls (sky, colour, motion, brightness limit, sound and volume, still sky, reduced flashing, hide controls), the hidden-controls view and the library, at the default and the largest text size. | no audit issue in the Aurora screens at either size | pending device campaign |

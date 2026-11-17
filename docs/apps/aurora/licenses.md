@@ -10,6 +10,7 @@ recording, generated asset or third-party asset is bundled.
 | Sky shader `aurora-sky.frag` (stars, clouds and ribbons over noise, a 600 s seamless loop) | written for VisualCore (A21-P01) over VisualCore's GLSL library `vc/` | original, the repository's license |
 | Noise port `SkyNoise` and reference `SkyReference` | written for VisualCore; a Swift port of VisualCore's `vc/` hash and noise | original, the repository's license |
 | GLSL library `vc/` (hashes, gradient noise, fbm) | VisualCore (`Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/`) | the repository's license |
+| Ambient loop `AmbientLoopRecipe.gentle` (the optional sound) | synthesised in code for VisualCore by VisualCoreAudioDSP (A21-P04, feature 155); no recording and no sound file | original, the repository's license |
 
-The scenes are stylized art, not a depiction of measured aurora activity. The optional sound comes in later phases,
-synthesised in code; it is listed here when it is added. Nothing else is bundled, and nothing is downloaded.
+The scenes are stylized art, not a depiction of measured aurora activity. The optional sound is the ambient loop
+above, synthesised in code at run time. Nothing else is bundled, and nothing is downloaded.
