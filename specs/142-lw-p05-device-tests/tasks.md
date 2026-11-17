@@ -18,7 +18,7 @@ device step. No VisualCore change. Precedent: `specs/135-ac-p05-device-qa/tasks.
 ## Phase 3: Story 2 — no claim on any screen (P1)
 
 - [ ] T-A19-504 [US2] Interface: `Apps/VisualCore/Tests/UI/LivingWallpapers/LWClaimsUITests.swift`: collect the static texts and button labels of the experience and of its help sheet; none of the refused phrases (case-insensitive); the help contains "You set the wallpaper yourself" (FR-A19-502; SC-A19-502)
-- [ ] T-A19-505 Add the serial chunk `"a3": ["LWExportUITests", "LWClaimsUITests"]` to `scripts/release_check.py` and to `SERIAL_CHUNKS` (lead)
+- [X] T-A19-505 Add the serial chunk `"a3": ["LWExportUITests", "LWClaimsUITests"]` to `scripts/release_check.py` and to `SERIAL_CHUNKS` (lead) — Verified 2026-11-17: 2026-11-17: scripts/release_check.py serial chunk a3 = LWExportUITests, LWClaimsUITests, added to SERIAL_CHUNKS; scripts/test_scripts.py exit 0
 
 ## Phase 4: Story 3 — the campaign plan (P2)
 
