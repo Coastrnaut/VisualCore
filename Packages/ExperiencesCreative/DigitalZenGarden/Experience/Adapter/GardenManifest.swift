@@ -12,6 +12,14 @@
 // the snapshot and the digest are the garden document (clarification Q5), so the restored garden has the same digest.
 // The expected digests are derived by playing the entries on a core exactly as the engine plays them (the steps of an
 // entry, then its action) and digesting it with the experience id as domain, as Living Wallpapers' manifest does.
+//
+// Feature 147 (A20-P03) T-A20-307 (FR-A20-301, FR-A20-303; SC-A20-301; contracts/stones.md "Commands"): five stone
+// fixtures, each ending at `strokes-0` (no stroke is raked): `fixture-stone-placed` (`tool.mode [1]` and
+// `stone.place [2, 0.4, 0.5]`, a round granite), `fixture-stone-moved` (placed, `stone.select [1]` and `stone.move
+// [0.7, 0.3]`), `fixture-stone-rotated` (placed and `stone.rotate [0.5]`), `fixture-stone-removed` (placed and
+// `stone.remove`) and `fixture-stone-remove-undone` (placed, removed and `edit.undo`: the stone is back, unselected).
+// Rejection also refuses `stone.move`, `stone.rotate` and `stone.remove` without a selection, `stone.select` of an
+// unknown id and a fractional `tool.mode`.
 #if DEBUG || VISUALCORE_AUTOMATION
 import DigitalZenGardenCore
 import VisualCoreExperience
@@ -55,6 +63,20 @@ extension GardenCore {
             ("fixture-undo", first + [accepted("edit.undo")], strokesCode(0)),
             ("fixture-redo", first + [accepted("edit.undo"), accepted("edit.redo")], strokesCode(1)),
             ("fixture-tone", [accepted("sand.tone", [2])], strokesCode(0)),
+        ] + stoneFixtures
+    }
+
+    /// The five stone fixtures (feature 147; see the file header).
+    public static var stoneFixtures: [(name: String, entries: [ScenarioStep], outcome: String)] {
+        let placed = [accepted("tool.mode", [1]), accepted("stone.place", [2, 0.4, 0.5])]
+        return [
+            ("fixture-stone-placed", placed, strokesCode(0)),
+            ("fixture-stone-moved", placed + [accepted("stone.select", [1]), accepted("stone.move", [0.7, 0.3])],
+             strokesCode(0)),
+            ("fixture-stone-rotated", placed + [accepted("stone.rotate", [0.5])], strokesCode(0)),
+            ("fixture-stone-removed", placed + [accepted("stone.remove")], strokesCode(0)),
+            ("fixture-stone-remove-undone", placed + [accepted("stone.remove"), accepted("edit.undo")],
+             strokesCode(0)),
         ]
     }
 
@@ -89,6 +111,13 @@ extension GardenCore {
             ScenarioStep(steps: 0, action: ScriptedAction("rake.style", [2]), result: "action.out-of-range"),
             ScenarioStep(steps: 0, action: ScriptedAction("rake.style", [0.5]), result: rule + GardenRule.invalidChoice),
             ScenarioStep(steps: 0, action: ScriptedAction("sand.tone", [3]), result: "action.out-of-range"),
+            ScenarioStep(steps: 0, action: ScriptedAction("stone.move", [0.5, 0.5]), result: rule + GardenRule.noSelection),
+            ScenarioStep(steps: 0, action: ScriptedAction("stone.rotate", [0.5]), result: rule + GardenRule.noSelection),
+            ScenarioStep(steps: 0, action: ScriptedAction("stone.remove"), result: rule + GardenRule.noSelection),
+            ScenarioStep(steps: 0, action: ScriptedAction("stone.select", [7]), result: rule + GardenRule.unknownStone),
+            ScenarioStep(steps: 0, action: ScriptedAction("tool.mode", [0.5]), result: rule + GardenRule.invalidChoice),
+            ScenarioStep(steps: 0, action: ScriptedAction("stone.place", [5, 0.5, 0.5]),
+                         result: "action.out-of-range"),
         ]
     }
 

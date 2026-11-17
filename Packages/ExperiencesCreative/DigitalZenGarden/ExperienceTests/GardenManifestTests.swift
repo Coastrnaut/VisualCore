@@ -8,6 +8,7 @@ import Testing
 import DigitalZenGardenCore
 @testable import DigitalZenGardenExperience
 import VisualCoreExperience
+import VisualCoreMath
 
 private let manifestID = ExperienceID(rawValue: GardenCore.experienceID)!
 
@@ -29,14 +30,15 @@ private func playManifest(_ spec: ScenarioSpec) async throws -> (initial: String
 }
 
 @Suite struct GardenManifestTests {
-    /// The names of the five fixtures.
+    /// The names of the ten fixtures (five of feature 146, five stone fixtures of feature 147).
     static let fixtureNames = ["fixture-raked-garden", "fixture-wide-rake", "fixture-undo", "fixture-redo",
-                               "fixture-tone"]
+                               "fixture-tone", "fixture-stone-placed", "fixture-stone-moved", "fixture-stone-rotated",
+                               "fixture-stone-removed", "fixture-stone-remove-undone"]
 
     @Test func theManifestIsValidWithTheStandardScenariosAndFiveFixtures() {
         let manifest = GardenCore.manifest(for: manifestID)
         let problems = ScenarioManifestValidator.problems(manifest, controls: GardenCore.controls,
-                                                          content: ContentRequirement(fixtures: 5))
+                                                          content: ContentRequirement(fixtures: 10))
         #expect(problems.isEmpty, "\(problems)")
         #expect(manifest.scenarios.map(\.name) == ScenarioManifest.standardNames + Self.fixtureNames)
         #expect(GardenCore.fixtures.map(\.name) == Self.fixtureNames)
@@ -80,6 +82,7 @@ private func playManifest(_ spec: ScenarioSpec) async throws -> (initial: String
             let played = try await playManifest(spec)
             let core = try #require(played.core, "\(fixture.name)")
             let strokes = core.document.strokes
+            let stones = core.document.stones
             switch fixture.name {
             case "fixture-raked-garden":
                 #expect(strokes.count == 2 && strokes.allSatisfy { $0.rake == "fine-rake" })
@@ -91,6 +94,17 @@ private func playManifest(_ spec: ScenarioSpec) async throws -> (initial: String
                 #expect(strokes.count == 1 && !core.history.canRedo && core.history.canUndo)
             case "fixture-tone":
                 #expect(core.document.tone == "grey" && strokes.isEmpty)
+            case "fixture-stone-placed":
+                #expect(stones.count == 1 && stones[0].kind == "round-granite" && core.selectedStone == 1)
+                #expect(stones[0].position == Vec2(0.4, 0.5) && core.toolMode == 1)
+            case "fixture-stone-moved":
+                #expect(stones.count == 1 && stones[0].position == Vec2(0.7, 0.3) && core.history.done.count == 2)
+            case "fixture-stone-rotated":
+                #expect(stones.count == 1 && stones[0].rotation == 0.5)
+            case "fixture-stone-removed":
+                #expect(stones.isEmpty && core.selectedStone == nil && core.history.canUndo)
+            case "fixture-stone-remove-undone":
+                #expect(stones.count == 1 && stones[0].id == 1 && core.selectedStone == nil && core.history.canRedo)
             default:
                 Issue.record("unexpected fixture \(fixture.name)")
             }

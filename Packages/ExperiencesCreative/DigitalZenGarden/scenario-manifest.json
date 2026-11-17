@@ -6,7 +6,13 @@
     "rake.style",
     "sand.tone",
     "edit.undo",
-    "edit.redo"
+    "edit.redo",
+    "stone.place",
+    "stone.select",
+    "stone.move",
+    "stone.rotate",
+    "stone.remove",
+    "tool.mode"
   ],
   "experience" : "a20.digital-zen-garden",
   "kind" : "creative",
@@ -306,6 +312,69 @@
             "control" : "sand.tone",
             "values" : [
               3
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "stone.move",
+            "values" : [
+              0.5,
+              0.5
+            ]
+          },
+          "result" : "action.rule.a20.no-selection",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "stone.rotate",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "action.rule.a20.no-selection",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "stone.remove",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.a20.no-selection",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "stone.select",
+            "values" : [
+              7
+            ]
+          },
+          "result" : "action.rule.a20.unknown-stone",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "tool.mode",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "action.rule.a20.invalid-choice",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "stone.place",
+            "values" : [
+              5,
+              0.5,
+              0.5
             ]
           },
           "result" : "action.out-of-range",
@@ -897,6 +966,232 @@
         "outcome" : "strokes-0"
       },
       "name" : "fixture-tone",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "tool.mode",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "stone.place",
+            "values" : [
+              2,
+              0.40000000000000002,
+              0.5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "3d9a5c3f5a9df5934b6a1bb8658b8783acc2abb9e139944440d360a2383dca84",
+        "initialDigest" : "705a3b42b6f4ec3c7d0b3b80985d212b5feb7072934343bbbd136972c45dc7ca",
+        "outcome" : "strokes-0"
+      },
+      "name" : "fixture-stone-placed",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "tool.mode",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "stone.place",
+            "values" : [
+              2,
+              0.40000000000000002,
+              0.5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "stone.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "stone.move",
+            "values" : [
+              0.69999999999999996,
+              0.29999999999999999
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d9006cb261be676711c83ab91d015bdcbd4dc50474c95b60fe117af83d7083d1",
+        "initialDigest" : "705a3b42b6f4ec3c7d0b3b80985d212b5feb7072934343bbbd136972c45dc7ca",
+        "outcome" : "strokes-0"
+      },
+      "name" : "fixture-stone-moved",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "tool.mode",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "stone.place",
+            "values" : [
+              2,
+              0.40000000000000002,
+              0.5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "stone.rotate",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a9e4a389ae31430b960ba8ec628ad3aac3f60eac38496b941a9c1d2487f9d9e6",
+        "initialDigest" : "705a3b42b6f4ec3c7d0b3b80985d212b5feb7072934343bbbd136972c45dc7ca",
+        "outcome" : "strokes-0"
+      },
+      "name" : "fixture-stone-rotated",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "tool.mode",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "stone.place",
+            "values" : [
+              2,
+              0.40000000000000002,
+              0.5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "stone.remove",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "891e06d12dc2ca2ec41497bdd028a0edf26fd6095b5614baf42e00daad5a952b",
+        "initialDigest" : "705a3b42b6f4ec3c7d0b3b80985d212b5feb7072934343bbbd136972c45dc7ca",
+        "outcome" : "strokes-0"
+      },
+      "name" : "fixture-stone-removed",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "tool.mode",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "stone.place",
+            "values" : [
+              2,
+              0.40000000000000002,
+              0.5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "stone.remove",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "edit.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "3d9a5c3f5a9df5934b6a1bb8658b8783acc2abb9e139944440d360a2383dca84",
+        "initialDigest" : "705a3b42b6f4ec3c7d0b3b80985d212b5feb7072934343bbbd136972c45dc7ca",
+        "outcome" : "strokes-0"
+      },
+      "name" : "fixture-stone-remove-undone",
       "seed" : "1"
     }
   ],
