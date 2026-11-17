@@ -3899,10 +3899,11 @@
     ]
    },
    "implementation": {
-    "state": "not-started",
-    "legacy_gates_passed": [],
+    "state": "standalone-partial",
+    "legacy_gates_passed": [
+     "A19-P00"
+    ],
     "legacy_gates_pending": [
-     "A19-P00",
      "A19-P01",
      "A19-P02",
      "A19-P03",
