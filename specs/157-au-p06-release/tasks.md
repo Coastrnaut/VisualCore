@@ -105,7 +105,7 @@
   - G-RELEASE is closed by "A21-P06"; its iOS 26.x runner half is cited at X-A21;
   - rows whose gaps are all closed become available, with evidence;
   - run `--name contract`, then the packages, catalog and script tests
-- [ ] T-A21-613 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+- [X] T-A21-613 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record — Verified 2026-11-17: 2026-11-17: /speckit-converge appended nothing on its first run (7 FR, 4 SC, 4 stories checked; every evidence file cited in the release checklist exists with exit 0); .autonomy/evidence/A21-P06.json sealed; VERIFIED-GATE A21-P06 (157 of 263); planning index, matrix, distinctiveness, metadata, Auto-Creator, catalog (--check PASS), validate_autocreator and validate_docs PASS; README and docs/automatedtesting.md updated
   A21-P06; update README.md (rule 16) and `docs/automatedtesting.md` (rule 17)
 
 ## Dependencies
