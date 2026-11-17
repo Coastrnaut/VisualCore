@@ -16,7 +16,7 @@ action, no audit. Precedent: `specs/134-ac-p04-power-visibility/tasks.md`.
 
 ## Phase 3: Story 1 — a still clock does almost no work (P1) 🎯 MVP
 
-- [ ] T-A18-503 [US1] Update `Packages/ExperiencesCreative/AmbientClock/Experience/AmbientPresenter.swift`: wrap the crossfade in a `CachedScene`; `isStill` = (no motion or reduced) ∧ ¬seconds ∧ no fade; `stillKey` over theme, palette, tier, night dim and tint, drift step, idle dim and size; `passThrough = !isStill`; `backgroundDrawCount`; and `ExperienceTests/StillWorkTests.swift` (motion off, seconds off: 120 frames at a fixed instant, one background draw and identical frames; a palette change one more; motion on 120; seconds on with motion off is pass-through; a resize redraws once) (FR-A18-501, 502; SC-A18-501, 502)
+- [ ] T-A18-503 [US1] Update `Packages/ExperiencesCreative/AmbientClock/Experience/AmbientPresenter.swift`: wrap the crossfade in a `CachedScene`; `isStill` = (no motion or reduced) ∧ ¬seconds ∧ no fade; `stillKey` over theme, palette, tier, night dim and tint, drift step, idle dim and size; `passThrough = !isStill`; `backgroundDrawCount`; and `ExperienceTests/StillWorkTests.swift` (motion off, seconds off: 120 frames at a fixed instant, one background draw and identical frames; a palette change one more; motion on 120; seconds on with motion off is pass-through; a resize redraws once; advancing the fixed clock until the shown drift step changes redraws once, and 60 frames inside one step draw nothing more) (FR-A18-501, 502; SC-A18-501, 502)
 
 ## Phase 4: Story 2 — the overnight campaign (P1)
 
