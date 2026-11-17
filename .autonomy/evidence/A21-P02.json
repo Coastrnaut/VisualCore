@@ -1,0 +1,74 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/A21-P02.app-unit-2.json",
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A21-P02.app-unit-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A21-P02.au-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing AuroraCoreTests AuroraExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A21-P02.au-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A21-P02.catalog-tests.json",
+      "command": "swift test --package-path Packages/VisualCore --filter VisualCoreExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A21-P02.catalog-tests.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A21-P02.catalog.json",
+      "command": "python3 scripts/build_catalog.py --check",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A21-P02.catalog.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A21-P02.contract.json",
+      "command": "python3 scripts/check_app_contract.py --app aurora --render",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A21-P02.contract.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A21-P02.core-purity.json",
+      "command": "sh -c '! grep -rnE \"import (UIKit|SwiftUI|OpenGLES|Network)|URLSession|Date\\(\\)|ContinuousClock|CFAbsoluteTime\" Packages/ExperiencesCreative/Aurora/Core'",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A21-P02.core-purity.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A21-P02.documented-api.json",
+      "command": "python3 scripts/check_documented_api.py --sources Packages/ExperiencesCreative/Aurora",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A21-P02.documented-api.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A21-P02.experience-packages.json",
+      "command": "python3 scripts/check_experience_packages.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A21-P02.experience-packages.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A21-P02.isolation.json",
+      "command": "python3 scripts/check_app_isolation.py --experiences Packages/ExperiencesCreative/Aurora",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A21-P02.isolation.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A21-P02.script-tests.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A21-P02.script-tests.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A21-P02.verify-27.json",
+      "command": "python3 scripts/verify_experiences.py --only a21.aurora --runtime 27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A21-P02.verify-27.log"
+    }
+  ],
+  "generated": "2026-11-17T11:15:43+00:00",
+  "method": "deterministic-run-check",
+  "stage": "A21-P02",
+  "status": "pass"
+}

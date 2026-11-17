@@ -65,7 +65,7 @@ VisualCore change. Precedent: `specs/146-zg-p02-sand-renderer/tasks.md`. Rollbac
 - [X] T-A21-211 Catalog (`--name catalog`); app build and unit (`xcodegen generate --spec project.yml`; `--name app-unit — Verified 2026-11-17: 2026-11-17: .autonomy/checks/A21-P02.catalog.json, A21-P02.app-unit-2.json (xcodegen generate; app-build-for-testing-ios27 and app-unit-ios27), A21-P02.verify-27.json (the runner on iOS 27.2 for a21.aurora), A21-P02.experience-packages.json (21 experiences) and A21-P02.script-tests.json, all exit 0
   -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`); runner (`--name verify-27 --
   python3 scripts/verify_experiences.py --only a21.aurora --runtime 27`); packages and script tests
-- [ ] T-A21-212 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+- [X] T-A21-212 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record — Verified 2026-11-17: 2026-11-17: converge round 1 appended T-A21-213 (implemented), round 2 converged with nothing appended; A21-P02 sealed (.autonomy/evidence/A21-P02.json; the failed first app-unit attempt skipped) and recorded (VERIFIED-GATE A21-P02, 153 of 263); planning index, matrix, distinctiveness, metadata, Auto-Creator, catalog (--check PASS), validate_autocreator and validate_docs PASS; README and docs/automatedtesting.md updated
   A21-P02; update README.md (rule 16) and `docs/automatedtesting.md` (rule 17)
 
 ## Dependencies
