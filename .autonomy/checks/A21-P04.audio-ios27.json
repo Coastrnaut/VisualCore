@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "VisualCoreAudioTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --only-testing VisualCoreAudioTests",
+  "elapsed_seconds": 9.829,
+  "exit_code": 0,
+  "finished": "2026-11-17T11:54:07+00:00",
+  "log": ".autonomy/logs/A21-P04.audio-ios27.log",
+  "log_sha256": "ef632a230b904d5d05998a07b7141ab1244d93c9af48344b1cfad555d171e045",
+  "name": "audio-ios27",
+  "stage": "A21-P04",
+  "started": "2026-11-17T11:53:57+00:00",
+  "timed_out": false
+}

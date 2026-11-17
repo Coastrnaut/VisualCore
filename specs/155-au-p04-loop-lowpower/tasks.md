@@ -19,7 +19,7 @@ for the audio change, feature 077 (A10-P03). Rollback: revert the commits (the A
   1, amplitude 0…1), `swellCycles` ≥ 1, `gain` 0…0.3"; invalid recipes render no samples) and `AmbientLoopSynth.render`
   (deterministic, finite, |x| ≤ gain, seamless at the wrap); `///` on every public declaration; and
   `Packages/VisualCore/Tests/VisualCoreAudioDSPTests/AmbientLoopSynthTests.swift` (FR-A21-405)
-- [ ] T-A21-403 [US4] Create `Packages/VisualCoreRendering/Sources/VisualCoreAudio/AmbientLoopPlayer.swift` after
+- [X] T-A21-403 [US4] Create `Packages/VisualCoreRendering/Sources/VisualCoreAudio/AmbientLoopPlayer.swift` after — Verified 2026-11-17: 2026-11-17: AmbientLoopPlayer in VisualCoreAudio (own engine and player node, .ambient, the buffer rendered once and scheduled looped, volume on the node clamped with non-finite ignored, isEnabled, isPlaying, play, stop; stopped on interruption, media-services reset and backgrounding through an injected center; no input) with /// docs; AmbientLoopPlayerTests (8); .autonomy/checks/A21-P04.audio-ios27.json exit 0 (84 audio tests on sim-27.2); written by an agent, retested
   `SoundEffectPlayer` (an engine and player node of its own, `.ambient`, the buffer scheduled looped, `volume` on the
   node "clamped to 0…1, non-finite ignored", `isEnabled`, `isPlaying`, `play()`, `stop()`, stopped on interruption,
   media-services reset and backgrounding, injected output and notification center) and
