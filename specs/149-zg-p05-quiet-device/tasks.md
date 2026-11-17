@@ -42,7 +42,7 @@ device step. No VisualCore change. Precedent: `specs/142-lw-p05-device-tests/tas
 
 ## Phase 3: Story 2 — the garden in the app (P1)
 
-- [ ] T-A20-505 [P] [US2] Interface (agent U): `Apps/VisualCore/Tests/UI/DigitalZenGarden/ZGSupport.swift` (launch
+- [X] T-A20-505 [P] [US2] Interface (agent U): `Apps/VisualCore/Tests/UI/DigitalZenGarden/ZGSupport.swift` (launch — Verified 2026-11-17: 2026-11-17: ZGSupport (launch with -vcCandidates, identifiers experience.a20.digital-zen-garden.<name>) and ZGGardenUITests: rows pattern adds a stroke and undo takes it back (17.9 s); a placed river pebble is removed and undo restores it (27.9 s); .autonomy/checks/A20-P05.app-ui.json exit 0 (build, unit, chunk b3, iOS 27.2 phone); written by an agent, retested
   like `LWSupport` with `-vcCandidates`; identifiers `experience.a20.digital-zen-garden.<name>`) and
   `ZGGardenUITests.swift` (rake the rows pattern, undo empties the description's stroke count; stone tool: place a
   river pebble, remove it, undo restores it); each under 60 s (FR-A20-504; SC-A20-502)
