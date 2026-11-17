@@ -18,7 +18,7 @@ raise a system prompt; no wall-clock assert. Precedent: `specs/124-ia-p01-conten
 
 ## Phase 3: The core targets
 
-- [ ] T-A18-104 Add the targets `AmbientClockCore` (path `AmbientClock/Core`, dependencies `VisualCoreExperience`, `VisualCoreSimulation`, `VisualCorePersistence`) and `AmbientClockCoreTests` (path `AmbientClock/CoreTests`) to `Packages/ExperiencesCreative/Package.swift` (the lead writes this file); no experience target, product or registration (FR-A18-109; clarification Q2)
+- [ ] T-A18-104 Add the targets `AmbientClockCore` (path `AmbientClock/Core`, dependencies `VisualCoreExperience` and `VisualCoreSimulation`) and `AmbientClockCoreTests` (path `AmbientClock/CoreTests`) to `Packages/ExperiencesCreative/Package.swift` (the lead writes this file); no experience target, product or registration (FR-A18-109; clarification Q2)
 
 ## Phase 4: Story 1 — the right time (P1) 🎯 MVP
 

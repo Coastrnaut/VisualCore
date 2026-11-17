@@ -18,7 +18,7 @@
   seconds off, its seconds are zero, in the clock's zone, including across both 2026 New York transitions.
 - **DST:**
   - formatting each minute from 06:58 to 07:01 UTC on 2026-03-08 in New York never shows 02:xx;
-  - from 05:58 to 06:01 UTC on 2026-11-01, 01:59 is shown twice, about an hour apart (at 05:59 and 06:59 UTC).
+  - from 05:58 to 07:00 UTC on 2026-11-01, 01:59 is shown twice, about an hour apart (at 05:59 and 06:59 UTC).
 - **State:**
   - `time.changed` adds exactly one recomputation for each of the five kinds;
   - a burst of `time.speak` within 0.5 s posts at most one announcement, and the last is kept as pending;
