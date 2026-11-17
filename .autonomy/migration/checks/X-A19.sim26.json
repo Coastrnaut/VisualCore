@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a19.living-wallpapers",
+    "--runtime",
+    "26"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a19.living-wallpapers --runtime 26",
+  "elapsed_seconds": 49.218,
+  "exit_code": 0,
+  "finished": "2026-11-17T07:28:00+00:00",
+  "gate": "X-A19",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-A19.sim26.log",
+  "log_sha256": "97572b80326850d4ad548ad55221c762adb33510ae7f32464e5a718209f2dc65",
+  "name": "sim26",
+  "started": "2026-11-17T07:27:11+00:00",
+  "timed_out": false
+}

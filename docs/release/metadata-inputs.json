@@ -151,9 +151,19 @@
       "name": "Ambient Clock",
       "permissions": [],
       "tier": "free"
+    },
+    {
+      "category": "ambient",
+      "code": "A19",
+      "id": "a19.living-wallpapers",
+      "name": "Living Wallpapers",
+      "permissions": [
+        "photo-library-add"
+      ],
+      "tier": "free"
     }
   ],
-  "ledger_sha256": "c4d9c07f5b557a80538ad09fa8ae3f87a85fd7d130665b8950a43dc93adca378",
+  "ledger_sha256": "cfdb12b5ea1918c40789c015566f544d53263e01e05cb635ebbd025c596365ab",
   "privacy_answers": "unproven",
   "schema": 1
 }

@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "app-build-for-testing-ios27",
+    "app-unit-ios27",
+    "app-ui-ios27-a3"
+  ],
+  "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27 app-ui-ios27-a3",
+  "elapsed_seconds": 212.491,
+  "exit_code": 0,
+  "finished": "2026-11-17T07:37:31+00:00",
+  "gate": "X-A19",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-A19.followthrough-app.log",
+  "log_sha256": "26af08baee5c4266605974271fe86e0fede352f810cd47087cad5cac2643e62a",
+  "name": "followthrough-app",
+  "started": "2026-11-17T07:33:59+00:00",
+  "timed_out": false
+}

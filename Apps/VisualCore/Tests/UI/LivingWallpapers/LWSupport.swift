@@ -1,7 +1,7 @@
 // LWSupport — feature 142 (A19-P05) T-A19-503, T-A19-504 (FR-A19-501, FR-A19-502; SC-A19-501, SC-A19-502): helpers
-// of the interface tests of Living Wallpapers (A19) inside the one app, modelled on `ACSupport`. A19 is a candidate,
-// so every launch carries `-vcCandidates` (DebugLaunch: the candidates' catalog entries become available and are
-// registered). A start erases the data (`-vcResetData`, so the export history is empty), skips the welcome and opens
+// of the interface tests of Living Wallpapers (A19) inside the one app, modelled on `ACSupport`. A19 was a candidate
+// until X-A19 (integrated 2026-11-17); every launch carries `-vcCandidates` (DebugLaunch: the candidates' catalog
+// entries become available and are registered; harmless once A19 is integrated). A start erases the data (`-vcResetData`, so the export history is empty), skips the welcome and opens
 // the experience directly with `-openExperience a19.living-wallpapers`; ``limited(_:)`` adds the automation-only
 // argument `-lwExportLimit <n>` (`LaunchOptions`, read under `DEBUG || VISUALCORE_AUTOMATION`), which caps the
 // presenter's export limit at n so that a template larger than n shows the notice of `ExportNotice`. A fresh project

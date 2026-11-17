@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a19.living-wallpapers",
+    "--runtime",
+    "27"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a19.living-wallpapers --runtime 27",
+  "elapsed_seconds": 0.18,
+  "exit_code": 0,
+  "finished": "2026-11-17T07:37:31+00:00",
+  "gate": "X-A19",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-A19.followthrough-verify27.log",
+  "log_sha256": "e52c6ccc0277e08973d7b7a16c9df73f38ef753890933f04d52faf0bc02bca13",
+  "name": "followthrough-verify27",
+  "started": "2026-11-17T07:37:31+00:00",
+  "timed_out": false
+}

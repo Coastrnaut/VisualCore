@@ -1,0 +1,80 @@
+{
+  "branch": "main",
+  "dirty": true,
+  "dirty_paths": [
+    "docs/verification/a19.living-wallpapers/summary-27.2.json",
+    "docs/verification/a19.living-wallpapers/summary-26.5.json"
+  ],
+  "failed_attempts": [],
+  "gate": "X-A19",
+  "ledger": "migration",
+  "passing_checks": [
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --result-name xa19-host",
+      "exit_code": 0,
+      "finished": "2026-11-17T07:25:10+00:00",
+      "log": ".autonomy/logs/migration/X-A19.host.log",
+      "log_sha256": "f5ecb775d4ae9ec652718c59e851c1e8656a4723e757abe6c679c93507a58c99",
+      "name": "host"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean",
+      "exit_code": 0,
+      "finished": "2026-11-17T07:31:45+00:00",
+      "log": ".autonomy/logs/migration/X-A19.reference-1.log",
+      "log_sha256": "bb9e330cd5fa265c8b333dbd396d1f2ca3b5e27fe08d70b749efd8f3930185c5",
+      "name": "reference-1"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26",
+      "exit_code": 0,
+      "finished": "2026-11-17T07:32:12+00:00",
+      "log": ".autonomy/logs/migration/X-A19.reference-2.log",
+      "log_sha256": "b2bcddf305fc4befa3700531e48765c662cd083d81b2430e83b53ca37caf0732",
+      "name": "reference-2"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a19.living-wallpapers --runtime 26",
+      "exit_code": 0,
+      "finished": "2026-11-17T07:28:00+00:00",
+      "log": ".autonomy/logs/migration/X-A19.sim26.log",
+      "log_sha256": "97572b80326850d4ad548ad55221c762adb33510ae7f32464e5a718209f2dc65",
+      "name": "sim26"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a19.living-wallpapers --runtime 27",
+      "exit_code": 0,
+      "finished": "2026-11-17T07:27:11+00:00",
+      "log": ".autonomy/logs/migration/X-A19.sim27.log",
+      "log_sha256": "49ed2cf0549feb827427d2b5b722ae404081509f710434d74a5f290f245dbb7d",
+      "name": "sim27"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-ui-ios27-a3",
+      "exit_code": 0,
+      "finished": "2026-11-17T07:31:21+00:00",
+      "log": ".autonomy/logs/migration/X-A19.ui-a3.log",
+      "log_sha256": "a8444896c7eee9773df66703c05640253e14c575a32409b435d633fd157112da",
+      "name": "ui-a3"
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "finished": "2026-11-17T07:25:35+00:00",
+      "log": ".autonomy/logs/migration/X-A19.visualcore-host.log",
+      "log_sha256": "e248a1befd081652ca662e8e3ff934625e4559a5bf77d92ad5bb3e1bf87be24d",
+      "name": "visualcore-host"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name xa19-rendering",
+      "exit_code": 0,
+      "finished": "2026-11-17T07:26:17+00:00",
+      "log": ".autonomy/logs/migration/X-A19.visualcore-rendering.log",
+      "log_sha256": "57898839f7d35d2add664ae234f220f6b81d535cb4b979786533608321ba652d",
+      "name": "visualcore-rendering"
+    }
+  ],
+  "revision": "e6cc7502fb9d60cc03fbd09b9edc0c264765e9f6",
+  "revision_number": 1,
+  "sealed": "2026-11-17T07:32:16+00:00"
+}

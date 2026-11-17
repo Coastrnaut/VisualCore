@@ -1316,7 +1316,7 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     "InteractiveAnatomyExperience",
                                     # Feature 132 (A18-P02): Ambient Clock, integrated at X-A18.
                                     "AmbientClockExperience",
-                                    # Feature 139 (A19-P02): Living Wallpapers, a candidate until X-A19.
+                                    # Feature 139 (A19-P02): Living Wallpapers, integrated at X-A19.
                                     "LivingWallpapersExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):

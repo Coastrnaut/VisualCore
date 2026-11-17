@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesCreative",
+    "--scheme",
+    "ExperiencesCreative-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--result-name",
+    "xa19-host"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --result-name xa19-host",
+  "elapsed_seconds": 311.302,
+  "exit_code": 0,
+  "finished": "2026-11-17T07:25:10+00:00",
+  "gate": "X-A19",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-A19.host.log",
+  "log_sha256": "f5ecb775d4ae9ec652718c59e851c1e8656a4723e757abe6c679c93507a58c99",
+  "name": "host",
+  "started": "2026-11-17T07:19:59+00:00",
+  "timed_out": false
+}
