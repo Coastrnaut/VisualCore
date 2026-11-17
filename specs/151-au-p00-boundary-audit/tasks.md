@@ -41,7 +41,7 @@ only).
 
 - [X] T-A21-006 [US3] Build the one app for testing (`--name app-build -- python3 scripts/release_check.py --only — Verified 2026-11-17: 2026-11-17: .autonomy/checks/A21-P00.app-build.json exit 0 (app-build-for-testing-ios27 passes with Aurora absent)
   app-build-for-testing-ios27`)
-- [ ] T-A21-007 [US3] Experience package check (`--name experience-packages -- python3
+- [X] T-A21-007 [US3] Experience package check (`--name experience-packages -- python3 — Verified 2026-11-17: 2026-11-17: .autonomy/checks/A21-P00.experience-packages.json exit 0 (20 experiences in 1 package, none A21); grep -c a21 gives 0 in Catalog/registrations.json and Apps/VisualCore/App/ExperienceRegistry.swift
   scripts/check_experience_packages.py`: 20 experiences, none A21); `grep -c a21 Catalog/registrations.json
   Apps/VisualCore/App/ExperienceRegistry.swift` gives 0 (FR-A21-005, SC-A21-004)
 
