@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "scripts/build_catalog.py",
+    "--check"
+  ],
+  "command": "python3 scripts/build_catalog.py --check",
+  "elapsed_seconds": 0.042,
+  "exit_code": 0,
+  "finished": "2026-11-17T09:22:37+00:00",
+  "log": ".autonomy/logs/A20-P04.catalog.log",
+  "log_sha256": "0aca4a6822a1aabcc4e6826e7eaf5c4a43782040d1af47bc98d667037917be5e",
+  "name": "catalog",
+  "stage": "A20-P04",
+  "started": "2026-11-17T09:22:37+00:00",
+  "timed_out": false
+}
