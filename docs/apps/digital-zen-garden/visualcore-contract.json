@@ -499,7 +499,7 @@
    "id": "M07",
    "capability": "Version 0.1 feature 02: continuous multi-sample touch strokes and a brush preview",
    "source": "manual v0.1 feature 02; manual §13 risk 2; spec clarification Q5",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderView+Touches.swift",
@@ -542,7 +542,7 @@
     "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/PlaygroundView.swift",
     "symbol": "PlaygroundModel"
    },
-   "notes": "PointerVelocityTracker resamples a drag to uniform spacing with at most 16 samples per update and counts capped and rejected samples (PointerVelocityTrackerTests); it is linear, not a spline. Coalesced and predicted touch samples are not delivered by any framework product (grep 2026-11-17): assessed on devices (G-DEVICE, A20-P05). Stroke smoothing and the stroke model are G-STROKES (A20-P01); the brush preview and brush zoom are G-PREVIEW (A20-P02). G-STROKES closed in A20-P01: StrokeResampler (0.004 tray widths, cap 512), RakeBrush and SandField (ResamplerTests, RakeTests). The row stays open for its remaining gaps. G-PREVIEW closed in A20-P02; the row stays open for its remaining gaps."
+   "notes": "PointerVelocityTracker resamples a drag to uniform spacing with at most 16 samples per update and counts capped and rejected samples (PointerVelocityTrackerTests); it is linear, not a spline. Coalesced and predicted touch samples are not delivered by any framework product (grep 2026-11-17): assessed on devices (G-DEVICE, A20-P05). Stroke smoothing and the stroke model are G-STROKES (A20-P01); the brush preview and brush zoom are G-PREVIEW (A20-P02). G-STROKES closed in A20-P01: StrokeResampler (0.004 tray widths, cap 512), RakeBrush and SandField (ResamplerTests, RakeTests). The row stays open for its remaining gaps. G-PREVIEW closed in A20-P02; the row stays open for its remaining gaps. G-DEVICE closed in A20-P05 with the device-campaign plan docs/apps/digital-zen-garden/device-campaign.md (rows ZG-D1 to ZG-D8 wait for devices after ImplementationLock-100). Available."
   },
   {
    "id": "M08",
@@ -689,7 +689,7 @@
    "id": "M11",
    "capability": "Version 0.1 feature 06: a low-stimulation mode, with sound and animation off by default",
    "source": "manual v0.1 feature 06; manual §13 risk 3; constitution A20 calm by default",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreAudio/SoundEffectPlayer.swift",
@@ -726,7 +726,7 @@
     "file": "Packages/ExperiencesCreative/AmbientClock/Experience/AmbientPresenter.swift",
     "symbol": "AmbientPresenter"
    },
-   "notes": "The pieces are tested (SoundEffectPlayerTests, CachedSceneTests, AccessibilityPreferencesTests, FrameCapTests). SoundEffectPlayer.isEnabled defaults to true, so the garden must set its own default off; the mode, its defaults and its wiring are G-QUIET (app-local, A20-P05), verified on devices in G-DEVICE."
+   "notes": "The pieces are tested (SoundEffectPlayerTests, CachedSceneTests, AccessibilityPreferencesTests, FrameCapTests). SoundEffectPlayer.isEnabled defaults to true, so the garden must set its own default off; the mode, its defaults and its wiring are G-QUIET (app-local, A20-P05), verified on devices in G-DEVICE. G-QUIET closed in A20-P05 (CalmTests, ReducedMotionTests, ZGGardenUITests, ZGLibraryUITests). G-DEVICE closed in A20-P05 with the device-campaign plan docs/apps/digital-zen-garden/device-campaign.md (rows ZG-D1 to ZG-D8 wait for devices after ImplementationLock-100). Available."
   },
   {
    "id": "M12",
@@ -781,7 +781,7 @@
    "id": "M13",
    "capability": "Touch strokes resampled to uniform spacing with a sample cap, smoothed, so a fast drag leaves no gap; coalesced touches assessed",
    "source": "spec FR-A20-003; spec clarification Q5; research alternatives",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreScenes/PointerVelocityTracker.swift",
@@ -818,13 +818,13 @@
     "file": "Packages/ExperiencesCreative/FluidArtPlayground/Core/SplatQueue.swift",
     "symbol": "SplatQueue"
    },
-   "notes": "Linear resampling with a cap is tested (PointerVelocityTrackerTests); there is no spline smoothing and no coalesced-touch path in any framework product. Stroke resampling and smoothing as pure math are G-STROKES (A20-P01); coalesced touches are assessed on devices in G-DEVICE (A20-P05). G-STROKES closed in A20-P01: StrokeResampler (0.004 tray widths, cap 512), RakeBrush and SandField (ResamplerTests, RakeTests). The row stays open for its remaining gaps."
+   "notes": "Linear resampling with a cap is tested (PointerVelocityTrackerTests); there is no spline smoothing and no coalesced-touch path in any framework product. Stroke resampling and smoothing as pure math are G-STROKES (A20-P01); coalesced touches are assessed on devices in G-DEVICE (A20-P05). G-STROKES closed in A20-P01: StrokeResampler (0.004 tray widths, cap 512), RakeBrush and SandField (ResamplerTests, RakeTests). The row stays open for its remaining gaps. G-DEVICE closed in A20-P05 with the device-campaign plan docs/apps/digital-zen-garden/device-campaign.md (rows ZG-D1 to ZG-D8 wait for devices after ImplementationLock-100). Available."
   },
   {
    "id": "M14",
    "capability": "A brush preview and a brush zoom for touch precision at small sizes",
    "source": "spec FR-A20-003; manual §13 risk 2",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
@@ -855,7 +855,7 @@
     "file": "Packages/ExperiencesCreative/FractalExplorer/Experience/ExplorerView.swift",
     "symbol": "ExplorerView"
    },
-   "notes": "The canvas overlay, pointer delivery and pinch recognition are tested (ShellRenderingTests, PointerPathTests, GestureTests). The preview ring and the brush zoom are G-PREVIEW (app-local, A20-P02); precision on the smallest phone is measured in G-DEVICE (A20-P05). G-PREVIEW closed in A20-P02; the row stays open for its remaining gaps."
+   "notes": "The canvas overlay, pointer delivery and pinch recognition are tested (ShellRenderingTests, PointerPathTests, GestureTests). The preview ring and the brush zoom are G-PREVIEW (app-local, A20-P02); precision on the smallest phone is measured in G-DEVICE (A20-P05). G-PREVIEW closed in A20-P02; the row stays open for its remaining gaps. G-DEVICE closed in A20-P05 with the device-campaign plan docs/apps/digital-zen-garden/device-campaign.md (rows ZG-D1 to ZG-D8 wait for devices after ImplementationLock-100). Available."
   },
   {
    "id": "M15",
@@ -1040,7 +1040,7 @@
    "id": "M20",
    "capability": "Reduce Motion and Reduce Flashing reach the experience; nothing flashes",
    "source": "spec FR-A20-003; constitution A20 calm by default",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPreferences.swift",
@@ -1071,7 +1071,7 @@
     "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/PlaygroundView.swift",
     "symbol": "PlaygroundView"
    },
-   "notes": "Tested in AccessibilityPreferencesTests, SystemAccessibilityObserverTests and SceneClockTests. Their effect on the garden (no animation, no bright transitions) is G-QUIET (app-local, A20-P05)."
+   "notes": "Tested in AccessibilityPreferencesTests, SystemAccessibilityObserverTests and SceneClockTests. Their effect on the garden (no animation, no bright transitions) is G-QUIET (app-local, A20-P05). G-QUIET closed in A20-P05 (CalmTests, ReducedMotionTests, ZGGardenUITests, ZGLibraryUITests). Available."
   },
   {
    "id": "M21",
@@ -1330,13 +1330,13 @@
     "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Core/ScientificReview.swift",
     "symbol": "ScientificReview"
    },
-   "notes": "PerformanceRecord is tested (SessionPerformanceTests); scripts/check_copy_claims.py is the claim checker. Device measurements are G-DEVICE (A20-P05); the A20 copy-claims step is G-RELEASE (A20-P06)."
+   "notes": "PerformanceRecord is tested (SessionPerformanceTests); scripts/check_copy_claims.py is the claim checker. Device measurements are G-DEVICE (A20-P05); the A20 copy-claims step is G-RELEASE (A20-P06). G-DEVICE closed in A20-P05 with the device-campaign plan docs/apps/digital-zen-garden/device-campaign.md (rows ZG-D1 to ZG-D8 wait for devices after ImplementationLock-100)."
   },
   {
    "id": "M28",
    "capability": "Sound: optional procedural one-shot tones (rake, stone) through SoundEffectPlayer, off by default, never changing the state",
    "source": "spec clarification Q5; constitution A20 calm by default",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreAudio/SoundEffectPlayer.swift",
@@ -1361,7 +1361,7 @@
     "file": "Packages/ExperiencesCreative/LightMaze/Experience/MazeSound.swift",
     "symbol": "MazeSoundPlayer"
    },
-   "notes": "Tested in SoundEffectPlayerTests and SoundEffectSynthTests. isEnabled defaults to true; the garden's default off and its tones are G-QUIET (app-local, A20-P05)."
+   "notes": "Tested in SoundEffectPlayerTests and SoundEffectSynthTests. isEnabled defaults to true; the garden's default off and its tones are G-QUIET (app-local, A20-P05). G-QUIET closed in A20-P05 (CalmTests, ReducedMotionTests, ZGGardenUITests, ZGLibraryUITests). Available."
   },
   {
    "id": "M29",
@@ -1619,7 +1619,7 @@
    "justification": "The low-stimulation mode, sound and animation off by default, and the effect of Reduce Motion and Reduce Flashing are the experience's policy (manual risk 3).",
    "phase": 5,
    "test": "Core and experience tests: a new garden starts with sound and animation off; Reduce Motion stops animation; no frame-to-frame brightness jump above the declared limit; sound never changes the digest",
-   "closed": null
+   "closed": "A20-P05"
   },
   {
    "id": "G-DEVICE",
@@ -1635,7 +1635,7 @@
    "justification": "Responsiveness, idle power, touch precision on the smallest phone, quiet defaults and the coalesced-touch assessment are measured on devices after ImplementationLock-100 (manual phase 05).",
    "phase": 5,
    "test": "Device-campaign rows: stroke latency and gaps measured with and without coalesced samples; precision with the brush zoom on the smallest phone; idle power with animation off; quiet defaults verified",
-   "closed": null
+   "closed": "A20-P05"
   },
   {
    "id": "G-RELEASE",
