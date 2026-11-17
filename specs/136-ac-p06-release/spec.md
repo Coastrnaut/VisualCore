@@ -170,7 +170,9 @@ In the one app, the clock opens, a theme is chosen and a favourite saved through
 - **FR-A18-605**: The store text MUST make only claims a named test proves; refused words MUST not appear in the store
   text or the interface's words.
 - **FR-A18-606**: The release checklist and release.json MUST list every document and result; the experience-release
-  and copy-claims steps for A18 MUST pass.
+  and copy-claims steps for A18 MUST pass. The device rows MUST be `pending-campaign-ii` and name their campaign rows:
+  performance and heat (AC-D1, AC-D3), the remaining device checks (AC-D2, AC-D4 … AC-D9) and the accessibility
+  audits (AC-D10).
 - **FR-A18-607**: The interface tests MUST cover picking a theme and saving and applying a favourite, in the A18 chunk.
 
 ### Key Entities
