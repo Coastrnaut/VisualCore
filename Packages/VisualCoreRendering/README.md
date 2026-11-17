@@ -329,6 +329,14 @@ experience is suspended; the default does nothing, and a presenter that tracks t
 finger held through a suspension is not mistaken for a second finger after resuming. Tested by `PointerCancelTests`.
 Used by Molecular Explorer (A15).
 
+## Frame cap (feature 134, A18-P04)
+
+`ExperiencePresenter.maxFramesPerSecond` lets an experience ask for a lower frame rate; the default is 60, so existing
+presenters are unchanged. `ExperienceShell` forwards it as `Experience.maxFramesPerSecond` (default 60 for other
+conformers), and `ExperienceSession` passes it to `RenderHost(scene:maxFramesPerSecond:budget:)`. `FramePacing` raises
+a value below 30 to 30 and lowers the cap to 30 under Low Power Mode or serious or critical heat. Tested by
+`FrameCapTests`. Used by Ambient Clock (A18) at 30.
+
 ## Scenario runner (feature 195, UA-F09)
 
 `ScenarioRunner(session:)` runs a scenario of an experience's manifest in the app's session: every action goes

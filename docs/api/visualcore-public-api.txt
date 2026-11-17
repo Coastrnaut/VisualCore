@@ -1392,6 +1392,7 @@ VisualCoreExperienceHost | var | public var diagnostics: SessionDiagnostics
 VisualCoreExperienceHost | var | public var frameProbes: [FrameProbe]
 VisualCoreExperienceHost | var | public var gestureActions: Set<String>
 VisualCoreExperienceHost | var | public var hapticsEnabled: Bool
+VisualCoreExperienceHost | var | public var maxFramesPerSecond: Int
 VisualCoreExperienceHost | var | public var memoryPressureLimit: Int?
 VisualCoreExperienceHost | var | public var nativeActions: Set<String>
 VisualCoreExperienceHost | var | public var performanceRecord: PerformanceRecord?

@@ -284,7 +284,9 @@ public final class ExperienceSession {
         let scene = SessionScene(inner: experience.scene)
         let host: RenderHost
         do {
-            host = try RenderHost(scene: scene, budget: request.budget)
+            // The experience's frame cap (feature 134, FR-A18-404): 60 unless its presenter declares another.
+            host = try RenderHost(scene: scene, maxFramesPerSecond: experience.maxFramesPerSecond,
+                                  budget: request.budget)
         } catch {
             let reason = ExperienceFailure(code: SessionFailure.hostFailedCode, message: String(describing: error))
             return .failed(fail(SessionFailure(reason, stage: .createHost)))

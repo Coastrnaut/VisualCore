@@ -6,6 +6,8 @@
 // specs/106-sse-p04-time-tours/contracts/canvas-overlay.md). Feature 112 (A15-P03) T-A15-313 adds the optional
 // `cancelPointers()`, which the shell calls on suspension: pointer events are dropped while an experience is suspended,
 // so the system's cancellation of the touches would otherwise never reach a presenter that tracks them.
+// Feature 134 (A18-P04) T-A18-402 (FR-A18-404, FR-A18-409) adds the optional frame cap `maxFramesPerSecond` (default
+// 60) and `Experience.maxFramesPerSecond`, which the session passes to its render host (contracts/power.md "Frame cap").
 import SwiftUI
 import VisualCoreDiagnostics
 import VisualCoreExperience
@@ -58,6 +60,10 @@ public protocol ExperiencePresenter: AnyObject {
     /// The action ids its native controls can send; every gesture action must be among them
     /// (`GestureAlternatives.missing`). Default: none.
     var nativeActions: Set<String> { get }
+    /// The highest frame rate this experience asks for (feature 134, FR-A18-404): the session passes it to its
+    /// render host as `RenderHost(scene:maxFramesPerSecond:budget:)`. `FramePacing` raises a value below 30 to 30
+    /// and lowers the cap to 30 under Low Power Mode or serious or critical heat. Default: 60.
+    var maxFramesPerSecond: Int { get }
 }
 
 extension ExperiencePresenter {
@@ -75,6 +81,8 @@ extension ExperiencePresenter {
     public var gestureActions: Set<String> { [] }
     /// No declared native actions.
     public var nativeActions: Set<String> { [] }
+    /// 60 frames per second: an experience that declares no cap keeps the render host's default.
+    public var maxFramesPerSecond: Int { 60 }
     /// No canvas overlay.
     public func makeCanvasOverlay(_ port: ExperienceActionPort) -> AnyView? { nil }
 }
@@ -102,6 +110,9 @@ public protocol Experience: AnyObject {
     var qualityProfile: QualityProfile { get }
     /// The frame probes of the current state (feature 195); empty without a state or without probes.
     var frameProbes: [FrameProbe] { get }
+    /// The highest frame rate the experience asks for, passed by the session to its render host (feature 134,
+    /// FR-A18-404). Default: 60.
+    var maxFramesPerSecond: Int { get }
 
     /// Prepares the state from `seed` off the main actor, under an optional time limit; ends in ready.
     func prepare(seed: UInt64, timeLimit: Duration?) async throws(ExperienceError)
@@ -147,4 +158,6 @@ extension Experience {
     public var frameProbes: [FrameProbe] { [] }
     /// No canvas overlay.
     public var canvasOverlay: AnyView? { nil }
+    /// 60 frames per second: an experience that declares no cap keeps the render host's default.
+    public var maxFramesPerSecond: Int { 60 }
 }

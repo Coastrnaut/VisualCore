@@ -82,6 +82,8 @@ public final class ExperienceShell<Presenter: ExperiencePresenter>: Experience {
     public var diagnostics: ExperienceDiagnostics { engine.diagnostics(gpu: gpuCounts) }
     /// The quality profile the core declares.
     public var qualityProfile: QualityProfile { Presenter.Core.qualityProfile }
+    /// The presenter's frame cap (feature 134, FR-A18-404); 60 when the presenter declares none.
+    public var maxFramesPerSecond: Int { presenter.maxFramesPerSecond }
 
     // MARK: Preparation
 
