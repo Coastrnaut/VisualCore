@@ -1539,8 +1539,14 @@
       "status": "pass"
     },
     "A19-P01": {
-      "attempts": [],
-      "status": "pending"
+      "attempts": [
+        {
+          "at": "2026-11-17T05:33:09+00:00",
+          "evidence": ".autonomy/evidence/A19-P01.json",
+          "result": "pass"
+        }
+      ],
+      "status": "pass"
     },
     "A19-P02": {
       "attempts": [],
@@ -2143,5 +2149,5 @@
       "status": "pending"
     }
   },
-  "updated": "2026-11-17T05:18:59+00:00"
+  "updated": "2026-11-17T05:33:09+00:00"
 }
