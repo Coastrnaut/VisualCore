@@ -30,7 +30,7 @@ assert. Precedent: `specs/132-ac-p02-overlay-theme/tasks.md` and `specs/126-ia-p
 
 ## Phase 6: Registration and verification
 
-- [ ] T-A18-307 Extend `Packages/ExperiencesCreative/AmbientClock/Experience/Adapter/AmbientManifest.swift` with `fixture-theme-waves` (`theme.select [2]`) and `fixture-theme-shapes-palette` (`theme.select [3]`, `theme.palette [2]`), regenerate `scenario-manifest.json` (`UPDATE_SCENARIO_MANIFEST=1 TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`) and update `ExperienceTests/AmbientManifestTests.swift`; `docs/apps/ambient-clock/licenses.md` lists the four shaders as original code (FR-A18-308)
+- [X] T-A18-307 Extend `Packages/ExperiencesCreative/AmbientClock/Experience/Adapter/AmbientManifest.swift` with `fixture-theme-waves` (`theme.select [2]`) and `fixture-theme-shapes-palette` (`theme.select [3]`, `theme.palette [2]`), regenerate `scenario-manifest.json` (`UPDATE_SCENARIO_MANIFEST=1 TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`) and update `ExperienceTests/AmbientManifestTests.swift`; `docs/apps/ambient-clock/licenses.md` lists the four shaders as original code (FR-A18-308) — Verified 2026-11-16: 2026-11-16: AmbientManifest adds fixture-theme-waves and fixture-theme-shapes-palette and refuses theme.select [4]; scenario-manifest.json regenerated (UPDATE_SCENARIO_MANIFEST=1); AmbientManifestTests pass in 2026-11-16: .autonomy/checks/A18-P03.ac-ios27.json exit 0 (78 experience tests in 11 suites and 77 core tests, iOS 27.2); docs/apps/ambient-clock/licenses.md lists the four shaders as original code
 
 ## Phase 7: Records and evidence
 
