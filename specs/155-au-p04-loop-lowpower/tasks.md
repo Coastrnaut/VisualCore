@@ -9,7 +9,7 @@ for the audio change, feature 077 (A10-P03). Rollback: revert the commits (the A
 
 ## Phase 1: Setup
 
-- [ ] T-A21-401 Baseline: cite the A21-P03 evidence (`.autonomy/checks/A21-P03.{au-ios27,app-unit,verify-27}.json`) on
+- [X] T-A21-401 Baseline: cite the A21-P03 evidence (`.autonomy/checks/A21-P03.{au-ios27,app-unit,verify-27}.json`) on — Verified 2026-11-17: 2026-11-17: A21-P03 evidence cited: .autonomy/checks/A21-P03.au-ios27.json, A21-P03.app-unit.json and A21-P03.verify-27.json, all exit 0; no Packages, Apps or project.yml change since the A21-P03 record commit dc198171
   the tree recorded at A21-P03 (`dc198171`), whose Packages are unchanged since (owner ruling of 2026-11-14)
 
 ## Phase 2: Story 4 — a sound loop the whole app can use (P2, VisualCore first)
