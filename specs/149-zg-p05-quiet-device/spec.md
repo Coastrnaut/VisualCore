@@ -22,6 +22,61 @@ Canonical overrides:
   device-campaign plan whose rows are {device} and stay pending until the campaign after ImplementationLock-100.
 - **Experience A20 inside the one app; still a candidate.** Follow `specs/142-lw-p05-device-tests`.
 
+## Clarifications
+
+### Session 2026-11-17
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- `SoundEffectPlayer` (VisualCoreAudio) uses the ambient session, which the silent switch mutes. Its `isEnabled`
+  defaults to `true`, so the experience must set it off. Its effects are procedural one-shot tones from
+  VisualCoreAudioDSP, with no sound file.
+- `ExperienceFeedback.haptic` plays only while the person's Settings switch is on.
+- `ExperienceStorage.setValue(_:for:)` and `value(for:)` keep small per-experience values (at most 64 values of 4,096
+  bytes).
+- The sand scene already reuses a still frame when nothing changes (A20-P02) and caps frames at 30 per second. The
+  interface chunks of `scripts/release_check.py` end at `a3`, a serial chunk; the next is `b3`.
+
+- Q: What are the calm settings, and where are they kept? → A:
+  - **Switches:** `calm.sound`, `calm.drift` and `calm.haptics`, each [0…1] and off by default. They are core state
+    and not in the digest, so the garden is unchanged by them.
+  - **Storage:** the switches are kept as experience values under `calm.v1`, restored when the experience opens,
+    with damaged values ignored.
+  - **Reduce Motion and Reduce Flashing:** read from the launch, as today. Reduce Motion forces the drift off at
+    draw time without changing the switch.
+- Q: What is the drift, and how is "no change" proved? → A:
+  - **Drift:** a slow sideways drift of the sand grain only (the grain's noise offset moves at 0.01 tray widths per
+    second). The relief, stones and shadows never move, and nothing flashes.
+  - **Off:** the cached still frame is reused, so no frame is redrawn without input.
+  - **Proof:** two renders at different frame times are identical with the drift off, or with Reduce Motion on, and
+    differ with the drift on.
+  - **Reduce Flashing:** it changes nothing, because nothing flashes.
+- Q: What do sound and haptics do when on? → A:
+  - **Sound:** a soft procedural one-shot tone, quiet and low, when a stroke is committed, a stone is placed, and a
+    stone is removed. It plays through `SoundEffectPlayer`, with `isEnabled` following `calm.sound`.
+  - **Haptics:** a light selection haptic on stone selection and a light impact on placement, through the port's
+    haptic route, only when `calm.haptics` is on and the person's switch allows it.
+  - **State:** neither changes the state.
+- Q: Which interface tests run, and in which chunk? → A: A new serial chunk `b3` with `ZGGardenUITests` and
+  `ZGLibraryUITests`, launched with the candidates argument, as `LWSupport` is:
+  - `ZGGardenUITests`: rake the rows pattern; undo empties the description's stroke count. In the stone tool, place a
+    river pebble, remove it, then undo restores it.
+  - `ZGLibraryUITests`: rake a pattern, save as "Evening", reset the garden through undo, then open "Evening"; the
+    description shows one stroke again.
+  - **Limits:** each test under 60 s.
+- Q: Which campaign rows does the plan hold? → A: Rows ZG-D1 to ZG-D8 in
+  `docs/apps/digital-zen-garden/device-campaign.md`:
+  - ZG-D1: touch-to-groove latency;
+  - ZG-D2: coalesced touches, and whether fast drags need them;
+  - ZG-D3: idle drawing (frames drawn while untouched);
+  - ZG-D4: heat during ten minutes of raking;
+  - ZG-D5: battery during a long session;
+  - ZG-D6: precision on the smallest phone and the need for a brush zoom (manual risk 2);
+  - ZG-D7: the quiet defaults and the silent switch on a real device;
+  - ZG-D8: the accessibility audits at the default and the largest text size.
+
+  Each row has its devices (D1, D2, D3), procedure, threshold and "pending device campaign". No number is claimed.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Quiet by default (Priority: P1) 🎯
