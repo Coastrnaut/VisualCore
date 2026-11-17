@@ -4,10 +4,14 @@
 import Foundation
 import VisualCoreScenes
 
-/// The file format of an export. Version 0.1 writes PNG only.
+/// The file format of an export: PNG, JPEG or HEIC.
 public enum ExportFormat: String, Codable, Equatable, Hashable, Sendable, CaseIterable {
     /// An opaque PNG tagged sRGB.
     case png
+    /// A JPEG still (feature 139, A19-P02).
+    case jpeg
+    /// A HEIC still (feature 139, A19-P02).
+    case heic
 }
 
 /// A planned export: the format, the exact pixel size, the colour profile and whether the size is a fallback.
