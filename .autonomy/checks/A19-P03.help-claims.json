@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "sh",
+    "specs/140-lw-p03-editor/scan-help-claims.sh"
+  ],
+  "command": "sh specs/140-lw-p03-editor/scan-help-claims.sh",
+  "elapsed_seconds": 0.019,
+  "exit_code": 0,
+  "finished": "2026-11-17T06:16:08+00:00",
+  "log": ".autonomy/logs/A19-P03.help-claims.log",
+  "log_sha256": "5c0c62601a4622715593e0cf8763509459b6313190f3d48147f9c8d18e19a37e",
+  "name": "help-claims",
+  "stage": "A19-P03",
+  "started": "2026-11-17T06:16:08+00:00",
+  "timed_out": false
+}
