@@ -126,3 +126,12 @@
 - **Then:** the editor model (108, 109) and the templates (110, 111) complete the phase.
 - **Review checkpoint:** at 113.
 - **Commits:** one per task.
+
+## Phase 7: Convergence
+
+- [ ] T-A22-117 Record the as-built design in `specs/159-ss-p01-glsl-diagnostics/data-model.md` and `contracts/core.md`, per data-model "MappedDiagnostic" and the plan's structure (contradicts, unrequested):
+  - `MappedDiagnostic.line` is nil only for `unknown`, `<generated>` or line 0, and a diagnostic of any other file keeps that file's line; the editor sends every file other than `ss/shader.frag` outside (`DiagnosticMapper.isInPersonSource`);
+  - the additions `ShaderLimits.isAcceptable`, `EditorDocument.markedLines` and `GLSLTokenizer.tokens(of:)`;
+  - the validator counts lines without a final empty line, while the editor shows one; line numbers agree;
+  - the templates are built with `try?` and no `try!` (the isolation check), and the tests require all three;
+  - the test compile scene draws nothing, and templates are drawn through `FullScreenShaderScene`, so no GL call is made outside VisualCore.
