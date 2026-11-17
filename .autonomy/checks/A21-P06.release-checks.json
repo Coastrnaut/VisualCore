@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "app-release-build",
+    "app-release-symbols",
+    "app-privacy-manifest",
+    "app-no-tracking",
+    "app-licenses",
+    "app-usage-descriptions",
+    "experience-release-a21",
+    "copy-claims-a21"
+  ],
+  "command": "python3 scripts/release_check.py --only app-release-build app-release-symbols app-privacy-manifest app-no-tracking app-licenses app-usage-descriptions experience-release-a21 copy-claims-a21",
+  "elapsed_seconds": 20.163,
+  "exit_code": 0,
+  "finished": "2026-11-17T12:36:18+00:00",
+  "log": ".autonomy/logs/A21-P06.release-checks.log",
+  "log_sha256": "dc88e307e66b37f76bd3e2b3b1475f9a423fd830fdf0473ed959a03b12d432c7",
+  "name": "release-checks",
+  "stage": "A21-P06",
+  "started": "2026-11-17T12:35:58+00:00",
+  "timed_out": false
+}
