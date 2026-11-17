@@ -49,3 +49,7 @@ completion review (008), the proofs and commits.
 
 MVP: the contract (002, 003, 008) with the baseline (001, 004, 005); the build proof (006, 007) and evidence close the
 phase. Review checkpoint after 003 (checker passes) and at 008 (decision).
+
+## Phase 8: Convergence
+
+- [ ] T-A18-012 Correct the spec's Clarifications facts (session 2026-11-16), its keep-awake edge case and research D4 with what the contract audit verified: `ExperienceSession` builds its `RenderHost` with the default cap (`ExperienceSession.swift:287`), so an experience cannot lower its frame rate and a third VisualCore gap G-FRAMERATE (`VisualCoreExperienceHost`, A18-P04) exists; no script yet refuses `isIdleTimerDisabled` or brightness writes (the scan comes with G-RELEASE, A18-P06); `FullScreenShaderScene.timeScale` is public but untested (animation rests on `SceneClock` and `fixedTime`). Per FR-A18-001 (contradicts)
