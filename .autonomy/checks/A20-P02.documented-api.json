@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_documented_api.py",
+    "--sources",
+    "Packages/ExperiencesCreative/DigitalZenGarden"
+  ],
+  "command": "python3 scripts/check_documented_api.py --sources Packages/ExperiencesCreative/DigitalZenGarden",
+  "elapsed_seconds": 0.575,
+  "exit_code": 0,
+  "finished": "2026-11-17T08:40:25+00:00",
+  "log": ".autonomy/logs/A20-P02.documented-api.log",
+  "log_sha256": "222d1c2c76513086a00050b6d657cbb5e5f7cf5cdd75df7ab20ae3e431e47b72",
+  "name": "documented-api",
+  "stage": "A20-P02",
+  "started": "2026-11-17T08:40:24+00:00",
+  "timed_out": false
+}
