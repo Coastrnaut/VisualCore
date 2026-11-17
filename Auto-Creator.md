@@ -5796,11 +5796,11 @@ source, the canonical target (a section of this document or a path that holds th
 | document | 0 | 0 | 39 | 5 | 0 | 15 | 59 |
 | experience | 19 | 0 | 281 | 0 | 0 | 0 | 300 |
 | experience-section | 0 | 0 | 3325 | 0 | 0 | 0 | 3325 |
-| feature | 146 | 0 | 2883 | 60 | 0 | 0 | 3089 |
+| feature | 147 | 0 | 2882 | 60 | 0 | 0 | 3089 |
 | heading | 126 | 6 | 375 | 145 | 1 | 530 | 1183 |
 | level-manifest | 0 | 0 | 275 | 0 | 0 | 0 | 275 |
 | scenario-table | 0 | 0 | 525 | 0 | 0 | 0 | 525 |
-| **Total** | **291** | **6** | **7978** | **221** | **1** | **545** | **9042** |
+| **Total** | **292** | **6** | **7977** | **221** | **1** | **545** | **9042** |
 <!-- GENERATED:END traceability-summary -->
 
 Known limits of the matrix, stated plainly:
