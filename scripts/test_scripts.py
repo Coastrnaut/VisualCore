@@ -3586,6 +3586,13 @@ class ExperienceModuleTests(unittest.TestCase):
     # the module that reach files and defaults, each confined to one experience's namespace. Every other word stays
     # forbidden in them, and every other file of the module stays without storage.
     STORAGE_FILES = {"ExperienceStorage.swift": ("FileManager", "UserDefaults"), "SavedStateStore.swift": ("FileManager",)}
+    # A18-P01 (feature 131, clarification Q1, G-CLOCK): the clock source is the one injectable reader of the wall clock
+    # (`SystemClock` calls `Date()`; tests inject `FixedClock`), and the time-change monitor observes an injected
+    # notification centre, including the locale-change name. Every other word stays forbidden in them, and every other
+    # file of the module stays without a clock or notifications. Both may import the standard library's
+    # Synchronization (a mutex; no input or output).
+    CLOCK_FILES = {"ClockSource.swift": ("Date(",), "TimeChangeMonitor.swift": ("NotificationCenter", "Locale")}
+    SYNCHRONIZED_FILES = {"ClockSource.swift", "TimeChangeMonitor.swift"}
 
     def test_module_reads_no_clock_language_file_or_network(self):
         files = sorted(self.SOURCES.glob("*.swift"))
@@ -3594,7 +3601,7 @@ class ExperienceModuleTests(unittest.TestCase):
             text = path.read_text(encoding="utf-8")
             code = "\n".join(line.split("//")[0] for line in text.splitlines())
             for word in self.FORBIDDEN:
-                if word in self.STORAGE_FILES.get(path.name, ()):
+                if word in self.STORAGE_FILES.get(path.name, ()) or word in self.CLOCK_FILES.get(path.name, ()):
                     continue
                 self.assertNotIn(word, code, f"{path.name} names {word}")
             imports = set(re.findall(r"^import\s+(\w+)", text, re.M))
@@ -3602,9 +3609,13 @@ class ExperienceModuleTests(unittest.TestCase):
             # UA-F06 adds the diagnostics module: an experience declares its quality profile with it.
             allowed = {"Foundation", "VisualCoreMath", "VisualCoreSimulation", "VisualCorePersistence",
                        "VisualCoreDiagnostics"}
+            if path.name in self.SYNCHRONIZED_FILES:
+                allowed = allowed | {"Synchronization"}
             self.assertLessEqual(imports, allowed, f"{path.name} imports {sorted(imports)}")
         for name in self.STORAGE_FILES:
             self.assertTrue((self.SOURCES / name).is_file(), f"{name} is named as a storage file and does not exist")
+        for name in self.CLOCK_FILES:
+            self.assertTrue((self.SOURCES / name).is_file(), f"{name} is named as a clock file and does not exist")
 
     def test_package_test_tool_passes_language_and_region(self):
         tool = load("xcodebuild_package")
