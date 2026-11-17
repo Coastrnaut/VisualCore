@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "sh",
+    "specs/143-lw-p06-release/scan-sources-release.sh"
+  ],
+  "command": "sh specs/143-lw-p06-release/scan-sources-release.sh",
+  "elapsed_seconds": 0.032,
+  "exit_code": 0,
+  "finished": "2026-11-17T07:08:52+00:00",
+  "log": ".autonomy/logs/A19-P06.lw-no-network.log",
+  "log_sha256": "0ea0efe8332ea8f93fb6e4873a8a70a255ed25cc5d47178286e300c3e0bf122a",
+  "name": "lw-no-network",
+  "stage": "A19-P06",
+  "started": "2026-11-17T07:08:52+00:00",
+  "timed_out": false
+}
