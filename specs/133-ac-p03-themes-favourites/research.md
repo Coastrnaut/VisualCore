@@ -11,8 +11,11 @@
     and a deterministic frame.
 - **D3 Curated palettes:** there are 12 palettes in all (three per theme). Each channel is at most 0.2 encoded, so
   white text reaches more than 4.5 : 1 and the probe reads `dark`.
-- **D4 Preset and favourites (Q3, Q4):** `ThemePreset` is pure core data. The favourites use `NamedLibrary` in
-  `ExperienceStorage`, with a cap of 12.
+- **D4 Preset and favourites (Q3, Q4):**
+  - `ThemePreset` is pure core data.
+  - The favourites are one `favourites.json` file through `ExperienceStorage`, with a cap of 12.
+  - **Alternative:** `NamedLibrary`. Rejected, because it needs a folder, and `ExperienceStorage` exposes only flat
+    files. A public folder API would be a VisualCore change with one consumer.
 - **D5 Snapshot schema 2:** `theme` and `palette` are added, and schema 1 migrates to theme 0 and palette 0. The
   schema-1 and schema-2 examples are registered in `ExperienceRegistry` (the lesson of X-A17).
 - **D6 Crossfade timing (Q5):** 1.2 s, smoothstep, `transitionDuration` under Reduce Motion. A change during a fade

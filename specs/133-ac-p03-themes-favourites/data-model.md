@@ -29,8 +29,9 @@
 - **`AmbientCore` schema 2:** adds `theme` (0–3) and `palette` (0–2). The controls `theme.select` [0…3] and
   `theme.palette` [0…2] are added; a theme change resets the palette to 0.
 - **Migration 1 → 2:** theme 0, palette 0.
-- **Favourites:** `AmbientFavourites` wraps `NamedLibrary<ThemePreset>` (kind `a18.favourites`) in the experience
-  storage directory `favourites`.
+- **Favourites:** `AmbientFavourites` keeps `favourites.json` in the experience storage: kind `a18.favourites`,
+  schema 1, entries with an id, a name, `createdAt` and a preset, at most 12 entries and 65,536 bytes; problems
+  `damaged`, `newer-version`, `too-large` and `invalid-entry`.
   - `save(name:preset:)` normalises the name, refuses a 13th entry (`over-cap`) and a duplicate (`duplicate-name`).
   - `apply(id:port:)` sends the four controls.
 - **Outcomes:** `showing-time`, `motion-off` and `theme-<id>`. The outcome is the theme when it is not the noise

@@ -63,13 +63,17 @@ in code:
 
   The experience snapshot moves to schema 2, adding `theme` and `palette`. Schema 1 migrates to theme 0 and palette 0,
   with registered schema-1 and schema-2 examples. New controls: `theme.select` [0…3] and `theme.palette` [0…2].
-- Q: How are favourites stored and capped? → A: In a `NamedLibrary<ThemePreset>` in the experience's
-  `ExperienceStorage` (directory `favourites`, kind `a18.favourites`). Up to 12 entries; a 13th is refused as
-  `over-cap`.
+- Q: How are favourites stored and capped? → A: In one file, `favourites.json`, written and read through the public
+  `ExperienceStorage` API, which namespaces the file and counts it against the experience's quota. It is an envelope
+  of kind `a18.favourites`, schema 1, at most 65,536 bytes.
+
+  `NamedLibrary` needs a folder URL, and `ExperienceStorage` gives an experience only flat files, so it is not used.
+  Up to 12 entries; a 13th is refused as `over-cap`.
   - Names are trimmed and limited to 60 characters; an empty name becomes "Favourite N".
   - A duplicate name is refused as `duplicate-name`.
   - Applying a favourite sends `theme.select`, `theme.palette`, `theme.speed` and `theme.motion`.
-  - A damaged library file is set aside by the store, and the list is empty with its problem shown.
+  - A damaged, newer or oversized file gives an empty list with its problem shown, and the file is kept until the
+    person saves again.
 - Q: How long is the crossfade, and what happens on repeated changes? → A: 1.2 s, eased with smoothstep; 0 under
   Reduce Motion. A new change during a crossfade starts a new one from the current mixed picture: the outgoing
   target keeps the last mixed frame.

@@ -26,7 +26,7 @@ assert. Precedent: `specs/132-ac-p02-overlay-theme/tasks.md` and `specs/126-ia-p
 
 ## Phase 5: Story 3 — saving favourites (P2)
 
-- [ ] T-A18-306 [US3] Create `Packages/ExperiencesCreative/AmbientClock/Experience/AmbientFavourites.swift` (`NamedLibrary<ThemePreset>` kind `a18.favourites` in the experience storage directory `favourites`; save with names "trimmed, ≤ 60 characters, empty becomes Favourite N", cap 12 (`over-cap`), `duplicate-name`; apply sends `theme.select`, `theme.palette`, `theme.speed`, `theme.motion`), the save and favourites list in `AmbientControls.swift`, and `ExperienceTests/FavouritesTests.swift` (save, reopen with a new library over the same storage, apply restores the preset; 13th refused; duplicate refused; empty name named; a damaged library file gives an empty list with a problem and no crash) (FR-A18-304, 305; SC-A18-304)
+- [ ] T-A18-306 [US3] Create `Packages/ExperiencesCreative/AmbientClock/Experience/AmbientFavourites.swift` (`favourites.json` through `ExperienceStorage`, kind `a18.favourites`, schema 1, at most 65,536 bytes; save with names "trimmed, ≤ 60 characters, empty becomes Favourite N", cap 12 (`over-cap`), `duplicate-name`; apply sends `theme.select`, `theme.palette`, `theme.speed`, `theme.motion`), the save and favourites list in `AmbientControls.swift`, and `ExperienceTests/FavouritesTests.swift` (save, reopen with a new library over the same storage, apply restores the preset; 13th refused; duplicate refused; empty name named; a damaged library file gives an empty list with a problem and no crash) (FR-A18-304, 305; SC-A18-304)
 
 ## Phase 6: Registration and verification
 
