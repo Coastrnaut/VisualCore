@@ -1,6 +1,6 @@
 # Contract: Living Wallpapers core (A19-P01)
 
-- **Catalog:** 4 scenes; each has 2–3 parameters (min < default < max, or default at a bound) and 3 presets of 4
+- **Catalog:** 4 scenes; each has 2–3 parameters (minimum < maximum, minimum ≤ default ≤ maximum) and 3 presets of 4
   opaque colours; the ids are unique.
 - **Templates:** 9 templates with the sizes of clarification Q3; landscape swaps the edges; every template has a
   provenance record.

@@ -86,7 +86,7 @@ in code:
     shared with other exporters).
 
   A source scan, run at every later phase of A19, refuses `AVAssetWriter`, `VideoToolbox`, `CVPixelBuffer`,
-  `UIScreen.main.brightness`, private wallpaper calls and the words "live wallpaper", "video" and "set as wallpaper"
+  `UIScreen.main.brightness` and the words "live wallpaper", "video" and "set as wallpaper"
   in the experience's sources and copy. The help text can still say how to apply an image through the system's
   controls.
 

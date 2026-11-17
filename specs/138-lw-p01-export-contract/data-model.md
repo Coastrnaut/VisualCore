@@ -3,8 +3,8 @@
 - **`SceneDefinition`:**
   - `id`, one of aurora-bands, ink-flow, soft-cells or ripple-dunes;
   - `name`;
-  - `parameters`: [`SceneParameter`(id, name, minimum, maximum, default)], two or three per scene, with min < max and
-    the default inside the range;
+  - `parameters`: [`SceneParameter`(id, name, minimum, maximum, default)], two or three per scene, with minimum < maximum
+    and minimum ≤ default ≤ maximum;
   - `presets`: three `ColorPreset`(id, name, colours: four `RGBColor` with r, g, b in 0…1, opaque by construction).
   - `SceneCatalog.scenes` is fixed and in catalog order.
 - **`CanvasTemplate`:**
