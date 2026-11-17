@@ -17,6 +17,13 @@
 // `cancelled`. A cancel or a failure at any step removes that attempt's file, so nothing of the attempt is left. A new
 // attempt first removes the file the previous one wrote, so the folder holds at most one file of this exporter. The
 // template of a core project is always known; the planner's `unknown-template` is reported as `does-not-fit`.
+//
+// Feature 141 (A19-P04) T-A19-403, T-A19-405 (FR-A19-401, FR-A19-403; clarifications Q1, Q2): the steps are shared
+// step code. `planStep`, `encodeStep`, `verifyStep` and `writeStep` are the only implementation of each step; this
+// synchronous `run` composes them for the tests and the presenter's direct export, and `ExportJob` (the one shipping
+// path, used by the controls) drives the same steps with the encode and the verify in a detached task. A written
+// file is named "<Scene> <Device> <W>x<H>.<ext>" (`WallpaperExportFile.fileName`) when the project is known, else
+// `wallpaper-<UUID>.<ext>`.
 import Foundation
 import LivingWallpapersCore
 import VisualCorePersistence
@@ -132,22 +139,22 @@ public final class StillExport {
         begin()
         switch ExportPlanner.plan(project: project, maxEdge: maxEdge) {
         case .success(let plan):
-            return proceed(plan: plan, time: project.animationTime, render: render, cancelAfter: cancelAfter)
+            return proceed(plan: plan, time: project.animationTime, render: render, cancelAfter: cancelAfter,
+                           name: WallpaperExportFile.fileName(project: project, plan: plan))
         case .failure(let refusal):
             lastRefusal = refusal
-            switch refusal {
-            case .noLimit: return fail(.noLimit, file: nil)
-            case .doesNotFit, .unknownTemplate: return fail(.doesNotFit, file: nil)
-            }
+            return fail(Self.reason(of: refusal), file: nil)
         }
     }
 
     /// Runs the attempt with an existing `plan` (for example a refusal's offered plan on a retry) at the animation
-    /// `time`; `cancelAfter` (a test seam) cancels after that step.
+    /// `time`; `cancelAfter` (a test seam) cancels after that step. `name` is the file name to write (feature 141);
+    /// nil writes `wallpaper-<UUID>.<ext>`.
     @discardableResult
-    public func run(plan: ExportPlan, time: Double, render: Render, cancelAfter: Step? = nil) -> Output? {
+    public func run(plan: ExportPlan, time: Double, render: Render, cancelAfter: Step? = nil,
+                    name: String? = nil) -> Output? {
         begin()
-        return proceed(plan: plan, time: time, render: render, cancelAfter: cancelAfter)
+        return proceed(plan: plan, time: time, render: render, cancelAfter: cancelAfter, name: name)
     }
 
     /// Removes the file of `output` (once the caller has handed it on); returns whether a file was removed.
@@ -159,7 +166,7 @@ public final class StillExport {
     }
 
     /// The file extension of `format`: png, jpg or heic.
-    public static func fileExtension(_ format: ExportFormat) -> String {
+    nonisolated public static func fileExtension(_ format: ExportFormat) -> String {
         switch format {
         case .png: return "png"
         case .jpeg: return "jpg"
@@ -168,7 +175,7 @@ public final class StillExport {
     }
 
     /// The VisualCore encoder format of `format`.
-    public static func imageFormat(_ format: ExportFormat) -> StillImageFormat {
+    nonisolated public static func imageFormat(_ format: ExportFormat) -> StillImageFormat {
         switch format {
         case .png: return .png
         case .jpeg: return .jpeg
@@ -189,10 +196,10 @@ public final class StillExport {
         state = .idle
     }
 
-    /// The steps after planning (see the file header).
-    private func proceed(plan: ExportPlan, time: Double, render: Render, cancelAfter: Step?) -> Output? {
-        let format = Self.imageFormat(plan.format)
-        guard StillImageEncoder.isAvailable(format) else { return fail(.formatUnavailable, file: nil) }
+    /// The steps after planning (see the file header), each through the shared step code.
+    private func proceed(plan: ExportPlan, time: Double, render: Render, cancelAfter: Step?,
+                         name: String?) -> Output? {
+        if let refused = Self.formatStep(plan) { return fail(refused, file: nil) }
         state = .planned(plan)
         if stop(after: .planned, cancelAfter, file: nil) { return nil }
 
@@ -206,36 +213,72 @@ public final class StillExport {
         state = .rendered
         if stop(after: .rendered, cancelAfter, file: nil) { return nil }
 
-        let data: Data
-        do {
-            data = try StillImageEncoder.data(image, format: format)
-        } catch {
-            return fail(.encoding, file: nil)
-        }
+        guard let data = Self.encodeStep(image, plan: plan) else { return fail(.encoding, file: nil) }
         state = .encoded
         if stop(after: .encoded, cancelAfter, file: nil) { return nil }
 
-        guard ImageColorPipeline.verify(data, against: plan).isEmpty,
-              let result = ImageColorPipeline.inspect(data) else { return fail(.verification, file: nil) }
+        guard let result = Self.verifyStep(data, plan: plan) else { return fail(.verification, file: nil) }
         state = .verified
         if stop(after: .verified, cancelAfter, file: nil) { return nil }
 
-        let url: URL
-        do {
-            url = try folder.makeFileURL(prefix: "wallpaper", extension: Self.fileExtension(plan.format))
-        } catch {
-            return fail(.encoding, file: nil)
-        }
-        do {
-            try data.write(to: url, options: .atomic)
-        } catch {
-            return fail(.encoding, file: url)
-        }
+        guard let url = writeStep(data, plan: plan, name: name) else { return fail(.encoding, file: nil) }
         state = .written(url)
         if stop(after: .written, cancelAfter, file: url) { return nil }
         let output = Output(url: url, result: result, plan: plan)
         lastOutput = output
         return output
+    }
+
+    // MARK: Step code (shared with ExportJob, feature 141)
+
+    /// The failure reason of a planner `refusal`: `no-limit`, or `does-not-fit` (an unknown template included).
+    nonisolated static func reason(of refusal: ExportRefusal) -> FailureReason {
+        switch refusal {
+        case .noLimit: return .noLimit
+        case .doesNotFit, .unknownTemplate: return .doesNotFit
+        }
+    }
+
+    /// The format check of the plan step: `format-unavailable` when the plan's format cannot be written here, else
+    /// nil.
+    nonisolated static func formatStep(_ plan: ExportPlan) -> FailureReason? {
+        StillImageEncoder.isAvailable(imageFormat(plan.format)) ? nil : .formatUnavailable
+    }
+
+    /// The encode step: `image` as the plan's format, opaque and tagged sRGB; nil when it cannot be encoded. CPU
+    /// work only, safe off the main actor.
+    nonisolated static func encodeStep(_ image: StillImage, plan: ExportPlan) -> Data? {
+        try? StillImageEncoder.data(image, format: imageFormat(plan.format))
+    }
+
+    /// The verify step: what `data` reads back as when it matches the plan's size and profile; nil otherwise. CPU
+    /// work only, safe off the main actor.
+    nonisolated static func verifyStep(_ data: Data, plan: ExportPlan) -> ExportResult? {
+        guard ImageColorPipeline.verify(data, against: plan).isEmpty else { return nil }
+        return ImageColorPipeline.inspect(data)
+    }
+
+    /// The write step: `data` written atomically into the folder as `name` (a single path component; nil gives
+    /// `wallpaper-<UUID>.<ext>`); nil when the file could not be written, leaving no file.
+    func writeStep(_ data: Data, plan: ExportPlan, name: String?) -> URL? {
+        let url: URL
+        do {
+            if let name {
+                try FileManager.default.createDirectory(at: folder.url, withIntermediateDirectories: true)
+                url = folder.url.appendingPathComponent(name, isDirectory: false)
+            } else {
+                url = try folder.makeFileURL(prefix: "wallpaper", extension: Self.fileExtension(plan.format))
+            }
+        } catch {
+            return nil
+        }
+        do {
+            try data.write(to: url, options: .atomic)
+        } catch {
+            remove(url)
+            return nil
+        }
+        return url
     }
 
     /// Records `step` as completed; when a cancel was asked for (or `cancelAfter` is `step`) removes `file` and ends
@@ -257,7 +300,7 @@ public final class StillExport {
     }
 
     /// Removes `file` when it exists.
-    private func remove(_ file: URL?) {
+    func remove(_ file: URL?) {
         guard let file, FileManager.default.fileExists(atPath: file.path) else { return }
         try? FileManager.default.removeItem(at: file)
     }
