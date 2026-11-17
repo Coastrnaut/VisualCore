@@ -68,7 +68,7 @@
 
 ## Phase 4: Story 3 — Aurora in the app (P1)
 
-- [ ] T-A21-506 [P] [US3] Interface (agent U): `Apps/VisualCore/Tests/UI/Aurora/AUSupport.swift` (after `ZGSupport`:
+- [X] T-A21-506 [P] [US3] Interface (agent U): `Apps/VisualCore/Tests/UI/Aurora/AUSupport.swift` (after `ZGSupport`: — Verified 2026-11-17: 2026-11-17: AUSupport (fresh and relaunch arguments, AU.reopen) and AUSkyUITests (Violet veil named on the canvas; Still sky and Reduced flashing on; hidden controls back with a tap); .autonomy/checks/A21-P05.app-ui.json exit 0 (chunk c3 on the iOS 27.2 phone: 4 tests in 115.4 s, the three sky tests about 75 s together); written by an agent, retested
   `-vcCandidates`, `-vcResetData`, skip welcome, `-openExperience a21.aurora`; identifiers
   `experience.a21.aurora.<name>`; a relaunch without the reset) and `AUSkyUITests.swift`:
   - pick "Violet veil", and the canvas label names it;
