@@ -62,7 +62,7 @@ in code:
   Motion, or at speed 0, the clock holds its time, so consecutive frames are identical; `SceneClock`'s half-speed
   factor is not used for that.
 - Q: Which targets and dependencies does the pending core have? → A: `AuroraCore` (path `Aurora/Core`, dependencies
-  `VisualCoreMath`, `VisualCoreSimulation` and `VisualCoreExperience`) and `AuroraCoreTests` (path `Aurora/CoreTests`,
+  `VisualCoreMath` and `VisualCoreSimulation`) and `AuroraCoreTests` (path `Aurora/CoreTests`,
   dependencies `AuroraCore` and `VisualCoreRendering`, which draws the shader off screen). The core issues no GL call
   and reads no clock; the shader text is data.
 

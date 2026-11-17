@@ -10,8 +10,7 @@ VisualCore change. Precedent: `specs/145-zg-p01-document-strokes/tasks.md`. Roll
 
 - [ ] T-A21-101 Baseline: cite the A21-P00 evidence (`.autonomy/checks/A21-P00.{app-build,no-change,experience-packages}.json`)
   on the tree recorded at A21-P00 (`417e6556`), whose Packages are unchanged since (owner ruling of 2026-11-14)
-- [ ] T-A21-102 Add the targets `AuroraCore` (path `Aurora/Core`, dependencies `VisualCoreMath`, `VisualCoreSimulation`
-  and `VisualCoreExperience`) and `AuroraCoreTests` (path `Aurora/CoreTests`, dependencies `AuroraCore` and
+- [ ] T-A21-102 Add the targets `AuroraCore` (path `Aurora/Core`, dependencies `VisualCoreMath` and `VisualCoreSimulation`) and `AuroraCoreTests` (path `Aurora/CoreTests`, dependencies `AuroraCore` and
   `VisualCoreRendering`) to `Packages/ExperiencesCreative/Package.swift` (lead); the package check still passes (a
   pending core)
 

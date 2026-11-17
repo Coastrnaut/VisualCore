@@ -15,8 +15,8 @@ Research: [research.md](research.md). Data: [data-model.md](data-model.md). Cont
 
 ## Technical Context
 
-- **Language:** Swift 6 and GLSL ES 3.00 (as text). **Dependencies:** `VisualCoreMath`, `VisualCoreSimulation`,
-  `VisualCoreExperience` for the core; `VisualCoreRendering` for the core tests only.
+- **Language:** Swift 6 and GLSL ES 3.00 (as text). **Dependencies:** `VisualCoreMath` and `VisualCoreSimulation`
+  for the core; `VisualCoreRendering` for the core tests only.
 - **Testing:** `AuroraCoreTests` on sim-27.2 through `scripts/xcodebuild_package.py`; each test under 10 s.
 - **Constraints:** the core is pure (no GL, clock, network, UIKit or SwiftUI); no VisualCore change; no registration.
   No NEEDS CLARIFICATION remains.
