@@ -60,7 +60,7 @@ for the audio change, feature 077 (A10-P03). Rollback: revert the commits (the A
   with evidence (`--name contract`)
 - [X] T-A21-411 Manifest (unchanged unless an engine action changed), catalog, app build and unit (`--name app-unit`), — Verified 2026-11-17: 2026-11-17: scenario-manifest.json unchanged (AuroraManifestTests pass in A21-P04.au-ios27.json; no engine action changed); .autonomy/checks/A21-P04.catalog.json, A21-P04.app-unit.json (build for testing and unit on iOS 27.2), A21-P04.verify-27.json, A21-P04.experience-packages.json and A21-P04.script-tests.json, all exit 0
   runner (`--name verify-27`), packages and script tests
-- [ ] T-A21-412 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+- [X] T-A21-412 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record — Verified 2026-11-17: 2026-11-17: converge round 1 appended T-A21-413 (implemented), round 2 converged with nothing appended; A21-P04 sealed (.autonomy/evidence/A21-P04.json) and recorded (VERIFIED-GATE A21-P04, 155 of 263); planning index, matrix, distinctiveness, metadata, Auto-Creator, catalog (--check PASS), validate_autocreator and validate_docs PASS; README and docs/automatedtesting.md updated
   A21-P04; update README.md (rule 16) and `docs/automatedtesting.md` (rule 17)
 
 ## Dependencies

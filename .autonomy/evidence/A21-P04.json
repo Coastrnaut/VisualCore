@@ -1,0 +1,110 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/A21-P04.app-unit.json",
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A21-P04.app-unit.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A21-P04.au-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing AuroraCoreTests AuroraExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A21-P04.au-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A21-P04.audio-dsp-host.json",
+      "command": "swift test --package-path Packages/VisualCore --filter VisualCoreAudioDSPTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A21-P04.audio-dsp-host.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A21-P04.audio-hot-path.json",
+      "command": "python3 scripts/check_audio_hot_path.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A21-P04.audio-hot-path.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A21-P04.audio-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --only-testing VisualCoreAudioTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A21-P04.audio-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A21-P04.catalog.json",
+      "command": "python3 scripts/build_catalog.py --check",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A21-P04.catalog.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A21-P04.contract.json",
+      "command": "python3 scripts/check_app_contract.py --app aurora --render",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A21-P04.contract.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A21-P04.core-purity.json",
+      "command": "sh -c '! grep -rnE \"import (UIKit|SwiftUI|OpenGLES|Network)|URLSession|Date\\(\\)|ContinuousClock|CFAbsoluteTime\" Packages/ExperiencesCreative/Aurora/Core'",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A21-P04.core-purity.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A21-P04.documented-api.json",
+      "command": "python3 scripts/check_documented_api.py --sources Packages/ExperiencesCreative/Aurora",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A21-P04.documented-api.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A21-P04.experience-packages.json",
+      "command": "python3 scripts/check_experience_packages.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A21-P04.experience-packages.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A21-P04.isolation.json",
+      "command": "python3 scripts/check_app_isolation.py --experiences Packages/ExperiencesCreative/Aurora",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A21-P04.isolation.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A21-P04.public-api.json",
+      "command": "python3 scripts/check_public_api.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A21-P04.public-api.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A21-P04.reference-1.json",
+      "command": "python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A21-P04.reference-1.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A21-P04.reference-2.json",
+      "command": "python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A21-P04.reference-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A21-P04.script-tests.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A21-P04.script-tests.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A21-P04.verify-27.json",
+      "command": "python3 scripts/verify_experiences.py --only a21.aurora --runtime 27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A21-P04.verify-27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A21-P04.visualcore-host.json",
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A21-P04.visualcore-host.log"
+    }
+  ],
+  "generated": "2026-11-17T11:59:25+00:00",
+  "method": "deterministic-run-check",
+  "stage": "A21-P04",
+  "status": "pass"
+}
