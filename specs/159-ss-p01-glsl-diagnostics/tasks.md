@@ -76,7 +76,7 @@
 
 ## Phase 5: Story 5 — starter templates (P2)
 
-- [ ] T-A22-110 [P] [US5] Create `Packages/ExperiencesCreative/ShaderStudio/Core/ShaderTemplates.swift`: `gradient`,
+- [X] T-A22-110 [P] [US5] Create `Packages/ExperiencesCreative/ShaderStudio/Core/ShaderTemplates.swift`: `gradient`, — Verified 2026-11-17: 2026-11-17: ShaderTemplates.swift: gradient (u_speed), noise-flow (vc_fbm; u_scale, u_speed), rings (u_count, u_width), each a ShaderProject built without try! and validating with no issue; .autonomy/checks/A22-P01.ss-core-ios27-2.json exit 0; written by an agent, retested
   `noise-flow` and `rings` per clarification Q5, each a valid `ShaderProject` with its uniforms and a licence line
   (FR-A22-106)
 - [ ] T-A22-111 [P] [US5] Write `Packages/ExperiencesCreative/ShaderStudio/CoreTests/TemplateCompileTests.swift`
