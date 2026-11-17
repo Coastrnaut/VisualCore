@@ -57,7 +57,7 @@ only).
 
 ## Phase 7: Polish and evidence
 
-- [ ] T-A21-009 No-change proof (`--name no-change -- git diff --exit-code --stat b40fdbee..HEAD -- Packages
+- [X] T-A21-009 No-change proof (`--name no-change -- git diff --exit-code --stat b40fdbee..HEAD -- Packages — Verified 2026-11-17: 2026-11-17: .autonomy/checks/A21-P00.no-change.json exit 0 (empty diff of Packages and External since b40fdbee)
   External`) (FR-A21-008, SC-A21-005)
 - [ ] T-A21-010 Script tests (`--name script-tests -- python3 scripts/test_scripts.py`) and the release-check document
   steps (`--name fast-checks -- python3 scripts/release_check.py --only docs app-contracts compliance dependencies`);
