@@ -6,4 +6,14 @@
 
 ## ProjectM reference regression (7 steps, two chunks)
 
-The results are recorded by T-A21-004 and T-A21-005 of `specs/151-au-p00-boundary-audit/tasks.md`.
+| Step | Command | Result |
+|---|---|---|
+| 1 `reference-engine-xcframework` | `python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean` | pass (2026-11-17) |
+| 2 `reference-build-projectm-ios-sim` | same chunk | pass (2026-11-17) |
+| 3 `reference-clean` | same chunk | pass (2026-11-17) — `.autonomy/checks/A21-P00.reference-1.json` |
+| 4 `reference-test-anglerendering-ios27` | `python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26` | pass (2026-11-17) |
+| 5 `reference-test-anglerendering-ios26` | same chunk | pass (2026-11-17) |
+| 6 `projectm-reference-ios27` | same chunk | pass (2026-11-17) |
+| 7 `projectm-reference-ios26` | same chunk | pass (2026-11-17) — `.autonomy/checks/A21-P00.reference-2.json` |
+
+All 7 steps pass (2026-11-17) before any Aurora work.
