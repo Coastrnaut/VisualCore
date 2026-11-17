@@ -36,6 +36,26 @@
 // Outcome: `strokes-<n>` with the number of strokes of the garden, or `refused-<code>` while the last stroke was
 // refused (for example `refused-over-cap`). Quality: `level-0` (the full level: the relief with `vc_fbm` grain) and
 // `level-1` (without grain), each one full-screen draw (clarification Q5).
+//
+// Feature 147 (A20-P03) T-A20-303 (FR-A20-301, FR-A20-303, FR-A20-304; clarification Q2; data-model.md "GardenCore
+// additions"; contracts/stones.md "Commands", "Selection"; gaps G-STONES, G-SELECTION). Stones and the tool:
+//   stone.place [kind 0…4, x 0…1, y 0…1]   places a stone of `GardenPalette.stones[kind]` (a whole index,
+//                                          `a20.invalid-choice` otherwise) centred at (x, y) with rotation 0 and scale
+//                                          1, as one `GardenHistory` command, and selects it. At
+//                                          `GardenDocument.maxStones` stones it is refused with `a20.stone-cap` (the
+//                                          controls say "The garden holds 24 stones.").
+//   stone.select [id 0…4,294,967,295]      selects the stone with that id, or none for 0; an id that no stone has, or
+//                                          that is not whole, is refused with `a20.unknown-stone`.
+//   stone.move [x 0…1, y 0…1]              moves the selected stone's centre to (x, y), clamped inside the tray.
+//   stone.rotate [angle −π…π]              turns the selected stone to `angle` (radians; positive turns its x axis
+//                                          towards the tray's +y, clockwise on the screen).
+//   stone.remove []                        removes the selected stone; the selection clears.
+//   tool.mode [0…1]                        the canvas tool, a whole index: 0 rake, 1 stones (`a20.invalid-choice`).
+// A move or rotate that names the stone's current value is accepted without a command. Move, rotate and remove without a
+// selection are refused with `a20.no-selection`. Each changing stone action is one command, so `edit.undo` and
+// `edit.redo` cover it. The selection and the tool are state, not document: they are compared by `==` but are not in
+// the digest or the snapshot (a restore opens with no selection and the rake). The selection clears when its stone
+// leaves the garden (removal, an undo of its placement, a redo of its removal, a restore or a reset).
 import Foundation
 import DigitalZenGardenCore
 import VisualCoreDiagnostics
@@ -53,8 +73,23 @@ public enum GardenRule {
     public static let nothingToUndo = "a20.nothing-to-undo"
     /// `edit.redo` with nothing to redo.
     public static let nothingToRedo = "a20.nothing-to-redo"
+    /// `stone.move`, `stone.rotate` or `stone.remove` without a selected stone (feature 147).
+    public static let noSelection = "a20.no-selection"
+    /// `stone.select` with an id that no stone of the garden has (feature 147).
+    public static let unknownStone = "a20.unknown-stone"
+    /// `stone.place` while the garden holds `GardenDocument.maxStones` stones (feature 147).
+    public static let stoneCap = "a20.stone-cap"
     /// The rule code of a history refusal: `a20.<code>` of the ``DocumentRefusal``.
     public static func refusal(_ refusal: DocumentRefusal) -> String { "a20." + refusal.code }
+}
+
+/// Clamping a position inside the tray (feature 147).
+enum TrayClamp {
+    /// (x, y) clamped into 0…1 on both axes; a value that is not finite becomes 0.5.
+    static func clamped(_ x: Double, _ y: Double) -> Vec2 {
+        func clamp(_ value: Double) -> Double { value.isFinite ? min(max(value, 0), 1) : 0.5 }
+        return Vec2(clamp(x), clamp(y))
+    }
 }
 
 /// The state of Digital Zen Garden (see the file header). Snapshot schema 1.
@@ -63,9 +98,19 @@ public struct GardenCore: ExperienceCore, Equatable {
     public static let experienceID = "a20.digital-zen-garden"
     /// The action ids in declaration order.
     public static let actionIDs = ["stroke.begin", "stroke.add", "stroke.end", "rake.style", "sand.tone",
-                                   "edit.undo", "edit.redo"]
+                                   "edit.undo", "edit.redo", "stone.place", "stone.select", "stone.move",
+                                   "stone.rotate", "stone.remove", "tool.mode"]
     /// The actions a canvas drag sends.
     public static let strokeActionIDs: Set<String> = ["stroke.begin", "stroke.add", "stroke.end"]
+    /// The actions a canvas gesture of the stone tool sends: a tap selects, a drag moves, two fingers turn (feature
+    /// 147).
+    public static let stoneGestureActionIDs: Set<String> = ["stone.select", "stone.move", "stone.rotate"]
+    /// The sentence the controls show when a stone is refused because the garden holds its most stones (feature 147).
+    public static let stoneCapMessage = "The garden holds \(GardenDocument.maxStones) stones."
+    /// The canvas tool of index 0: raking.
+    public static let rakeTool = 0
+    /// The canvas tool of index 1: stones.
+    public static let stoneTool = 1
     /// The snapshot schema this build writes.
     public static let schemaVersion = 1
     /// The digest's domain string (schema 1).
@@ -90,6 +135,10 @@ public struct GardenCore: ExperienceCore, Equatable {
     public private(set) var rakeStyle = 0
     /// The refusal code of the last stroke the history refused (for example `over-cap`); nil otherwise.
     public private(set) var lastRefusal: String?
+    /// The canvas tool: ``rakeTool`` (0, the default) or ``stoneTool`` (1). State, not in the digest (feature 147).
+    public private(set) var toolMode = 0
+    /// The id of the selected stone; nil when none is. State, not in the digest (feature 147).
+    public private(set) var selectedStone: UInt32?
     /// The quality tier the host set (0 = level-0, 1 = level-1, clamped); presentation only — not in the digest,
     /// the snapshot or `==`.
     public private(set) var qualityTier = 0
@@ -152,7 +201,24 @@ public struct GardenCore: ExperienceCore, Equatable {
     /// Equal states: every stored value except the presentation-only `qualityTier`.
     public static func == (lhs: GardenCore, rhs: GardenCore) -> Bool {
         lhs.history == rhs.history && lhs.inProgress == rhs.inProgress && lhs.inProgressRake == rhs.inProgressRake
-            && lhs.rakeStyle == rhs.rakeStyle && lhs.lastRefusal == rhs.lastRefusal
+            && lhs.rakeStyle == rhs.rakeStyle && lhs.lastRefusal == rhs.lastRefusal && lhs.toolMode == rhs.toolMode
+            && lhs.selectedStone == rhs.selectedStone
+    }
+
+    /// The selected stone of the garden; nil without a selection (feature 147).
+    public var selected: Stone? {
+        guard let selectedStone else { return nil }
+        return document.stones.first { $0.id == selectedStone }
+    }
+
+    /// Whether the garden holds as many stones as it may (`GardenDocument.maxStones`; feature 147).
+    public var isAtStoneCap: Bool { document.stones.count >= GardenDocument.maxStones }
+
+    /// Clears the selection when its stone is no longer in the garden.
+    private mutating func dropMissingSelection() {
+        if let selectedStone, !document.stones.contains(where: { $0.id == selectedStone }) {
+            self.selectedStone = nil
+        }
     }
 
     // MARK: Contract
@@ -170,9 +236,15 @@ public struct GardenCore: ExperienceCore, Equatable {
         ExperienceControl(id: "sand.tone", ranges: [0...Double(GardenPalette.tones.count - 1)]),
         ExperienceControl(id: "edit.undo", ranges: []),
         ExperienceControl(id: "edit.redo", ranges: []),
+        ExperienceControl(id: "stone.place", ranges: [0...Double(GardenPalette.stones.count - 1), 0...1, 0...1]),
+        ExperienceControl(id: "stone.select", ranges: [0...Double(UInt32.max)]),
+        ExperienceControl(id: "stone.move", ranges: [0...1, 0...1]),
+        ExperienceControl(id: "stone.rotate", ranges: [-Double.pi...Double.pi]),
+        ExperienceControl(id: "stone.remove", ranges: []),
+        ExperienceControl(id: "tool.mode", ranges: [0...1]),
     ]
 
-    /// The seven controls with their declared ranges (see the file header).
+    /// The thirteen controls with their declared ranges (see the file header).
     public static var controls: [ExperienceControl] { declaredControls }
 
     /// The opening state; nothing depends on the seed and no clock is read.
@@ -235,12 +307,80 @@ public struct GardenCore: ExperienceCore, Equatable {
         case "edit.undo":
             guard history.canUndo else { return .rejected(.rule(code: GardenRule.nothingToUndo)) }
             history.undo()
+            dropMissingSelection()
             lastRefusal = nil
-        default:   // edit.redo
+        case "edit.redo":
             guard history.canRedo else { return .rejected(.rule(code: GardenRule.nothingToRedo)) }
             history.redo()
+            dropMissingSelection()
             lastRefusal = nil
+        default:
+            return applyStone(action.control, v)
         }
+        return .accepted
+    }
+
+    /// Carries out a stone or tool action whose values the declared ranges accepted (feature 147; see the file
+    /// header); a refused action changes nothing.
+    private mutating func applyStone(_ control: String, _ v: [Double]) -> ActionResult {
+        let invalid = ActionResult.rejected(.rule(code: GardenRule.invalidChoice))
+        let noSelection = ActionResult.rejected(.rule(code: GardenRule.noSelection))
+        switch control {
+        case "stone.place":
+            guard let kind = Self.choice(v[0], count: GardenPalette.stones.count) else { return invalid }
+            guard !isAtStoneCap else { return .rejected(.rule(code: GardenRule.stoneCap)) }
+            var next = history
+            switch next.placeStone(kind: GardenPalette.stones[kind].id, position: TrayClamp.clamped(v[1], v[2])) {
+            case let .success(stone):
+                history = next
+                selectedStone = stone.id
+            case let .failure(refusal):
+                return .rejected(.rule(code: GardenRule.refusal(refusal)))
+            }
+        case "stone.select":
+            let value = v[0]
+            guard value == value.rounded() else { return .rejected(.rule(code: GardenRule.unknownStone)) }
+            let id = UInt32(value)
+            if id == 0 {
+                selectedStone = nil
+            } else {
+                guard document.stones.contains(where: { $0.id == id }) else {
+                    return .rejected(.rule(code: GardenRule.unknownStone))
+                }
+                selectedStone = id
+            }
+        case "stone.move":
+            guard let stone = selected else { return noSelection }
+            let target = TrayClamp.clamped(v[0], v[1])
+            if target != stone.position {
+                var next = history
+                if case let .failure(refusal) = next.moveStone(id: stone.id, to: target) {
+                    return .rejected(.rule(code: GardenRule.refusal(refusal)))
+                }
+                history = next
+            }
+        case "stone.rotate":
+            guard let stone = selected else { return noSelection }
+            if v[0] != stone.rotation {
+                var next = history
+                if case let .failure(refusal) = next.rotateStone(id: stone.id, to: v[0]) {
+                    return .rejected(.rule(code: GardenRule.refusal(refusal)))
+                }
+                history = next
+            }
+        case "stone.remove":
+            guard let stone = selected else { return noSelection }
+            var next = history
+            if case let .failure(refusal) = next.removeStone(id: stone.id) {
+                return .rejected(.rule(code: GardenRule.refusal(refusal)))
+            }
+            history = next
+            selectedStone = nil
+        default:   // tool.mode
+            guard let tool = Self.choice(v[0], count: 2) else { return invalid }
+            toolMode = tool
+        }
+        lastRefusal = nil
         return .accepted
     }
 

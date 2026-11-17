@@ -14,6 +14,20 @@
 //     neighbouring cells, one light falls from the upper left, the sand tone (linear light) is the albedo and at
 //     level-0 (the full level) a `vc_fbm` grain varies it; outside the tray a dark neutral. Equal inputs give identical pixels.
 //
+// Feature 147 (A20-P03) T-A20-303 (FR-A20-302, FR-A20-306; clarification Q1; contracts/stones.md "Drawing"; gaps
+// G-STONES, G-SHADOWS). The stones are a second CPU layer drawn by the same pass:
+//
+//   - Stone layer: a 480 × 360 `StoneLayer` of the garden's stones (rasterized in ascending depth), rebuilt by
+//     `syncStones(_:)` whenever the stones differ from the ones it holds and by `rebuildStones(from:)` (after undo, redo,
+//     restore, resize or a lost context).
+//   - Stone target: a second render target of the same size and format, holding per cell (height, (kind + 1)/5, 0, 1)
+//     in both formats (every value lies in 0…1, so the `rgba8` fallback needs no offset); uploaded only when the layer
+//     changed. A read-back matches the layer within 1/1024 (`rgba16f`) or 1/255 (`rgba8`).
+//   - Relief: where a stone lies (kind > 0) the pixel takes the kind's colour (five calm stone colours, linear light),
+//     lit by the same light from the normal of the stone's height; elsewhere the sand is darkened by a soft shadow of
+//     five taps toward the light (2, 4, …, 10 cells), each occluded when the stone height there times 12 cells reaches
+//     beyond the tap, so a taller stone casts a longer shadow.
+//
 // No GL call: the target, the upload and the pass are VisualCoreRendering's, used inside the host's scene callbacks.
 import Foundation
 import DigitalZenGardenCore
@@ -73,6 +87,18 @@ final class SandScene: RenderScene {
     /// The colour outside the tray (sRGB): a dark neutral.
     static let surround = SIMD3<Float>(0.075, 0.075, 0.08)
 
+    /// The five stone colours (sRGB), by index of `GardenPalette.stones`: a grey pebble, a blue-grey slate, a warm
+    /// light granite, a dark basalt and a muted moss green (feature 147).
+    static let stoneColors: [SIMD3<Float>] = [SIMD3(0.56, 0.56, 0.54), SIMD3(0.37, 0.40, 0.43),
+                                              SIMD3(0.67, 0.63, 0.58), SIMD3(0.23, 0.23, 0.25),
+                                              SIMD3(0.43, 0.48, 0.37)]
+    /// The distance between shadow taps, in cells (feature 147).
+    static let shadowTapCells = 2.0
+    /// The shadow length of a stone of height 1, in cells (feature 147).
+    static let shadowLengthCells = 12.0
+    /// How much a full shadow darkens the sand (feature 147).
+    static let shadowStrength = 0.4
+
     /// The relief fragment (see the file header). Uniforms: `u_sand` (the field), `u_tray` (x, y, width, height in
     /// framebuffer pixels, origin bottom-left), `u_tone` (the sand tone, sRGB, alpha 1), `u_decode` (scale and
     /// offset from the stored value to the height) and `u_grain` (0 or 1).
@@ -84,6 +110,7 @@ final class SandScene: RenderScene {
     #include "vc/color.glsl"
     in vec2 v_uv;
     uniform sampler2D u_sand;
+    uniform sampler2D u_stones;
     uniform vec4 u_tray;
     uniform vec4 u_tone;
     uniform vec2 u_decode;
@@ -94,6 +121,18 @@ final class SandScene: RenderScene {
         return vc_fieldBilinear(u_sand, cell).r * u_decode.x + u_decode.y;
     }
 
+    float zg_stoneHeight(vec2 cell) {
+        return vc_fieldBilinear(u_stones, cell).r;
+    }
+
+    vec3 zg_stoneColor(int kind) {
+        if (kind == 0) return vec3(\(SandScene.stoneColors[0].x), \(SandScene.stoneColors[0].y), \(SandScene.stoneColors[0].z));
+        if (kind == 1) return vec3(\(SandScene.stoneColors[1].x), \(SandScene.stoneColors[1].y), \(SandScene.stoneColors[1].z));
+        if (kind == 2) return vec3(\(SandScene.stoneColors[2].x), \(SandScene.stoneColors[2].y), \(SandScene.stoneColors[2].z));
+        if (kind == 3) return vec3(\(SandScene.stoneColors[3].x), \(SandScene.stoneColors[3].y), \(SandScene.stoneColors[3].z));
+        return vec3(\(SandScene.stoneColors[4].x), \(SandScene.stoneColors[4].y), \(SandScene.stoneColors[4].z));
+    }
+
     void main() {
         vec2 t = (gl_FragCoord.xy - u_tray.xy) / max(u_tray.zw, vec2(1.0));
         if (t.x < 0.0 || t.y < 0.0 || t.x > 1.0 || t.y > 1.0) {
@@ -102,18 +141,39 @@ final class SandScene: RenderScene {
         }
         vec2 size = vec2(textureSize(u_sand, 0));
         vec2 cell = t * size;
+        vec3 light = normalize(vec3(-0.55, 0.6, 0.58));
+        float facing = light.z;
+        float edge = min(min(t.x, 1.0 - t.x), min(t.y, 1.0 - t.y) * 0.75);
+        float rim = 0.82 + 0.18 * smoothstep(0.0, 0.012, edge);
+        vec4 stone = vc_fieldTexel(u_stones, ivec2(floor(cell)));
+        int kind = int(floor(stone.g * 5.0 + 0.5)) - 1;
+        if (kind >= 0) {
+            float sh = zg_stoneHeight(cell);
+            float sx = zg_stoneHeight(cell + vec2(1.0, 0.0)) - zg_stoneHeight(cell - vec2(1.0, 0.0));
+            float sy = zg_stoneHeight(cell + vec2(0.0, 1.0)) - zg_stoneHeight(cell - vec2(0.0, 1.0));
+            vec3 sn = normalize(vec3(-6.0 * sx, -6.0 * sy, 1.0));
+            float stoneShade = 0.32 + 0.68 * clamp(dot(sn, light), 0.0, 1.0) / facing;
+            vec3 stoneAlbedo = vc_srgbDecode(zg_stoneColor(kind)) * (0.86 + 0.14 * sh);
+            vec3 stoneLit = clamp(stoneAlbedo * stoneShade * rim, 0.0, 1.0);
+            color = vec4(clamp(vc_srgbEncode(stoneLit), 0.0, 1.0), 1.0);
+            return;
+        }
         float h = zg_height(cell);
         float dx = zg_height(cell + vec2(1.0, 0.0)) - zg_height(cell - vec2(1.0, 0.0));
         float dy = zg_height(cell + vec2(0.0, 1.0)) - zg_height(cell - vec2(0.0, 1.0));
         vec3 n = normalize(vec3(-0.45 * dx, -0.45 * dy, 1.0));
-        vec3 light = normalize(vec3(-0.55, 0.6, 0.58));
-        float facing = light.z;
         float shade = 0.3 + 0.7 * clamp(dot(n, light), 0.0, 1.0) / facing;
+        vec2 toLight = normalize(light.xy);
+        float occlusion = 0.0;
+        for (int k = 1; k <= 5; k++) {
+            float d = float(k) * \(SandScene.shadowTapCells);
+            float tapHeight = zg_stoneHeight(cell + toLight * d);
+            occlusion += smoothstep(0.0, 2.0, tapHeight * \(SandScene.shadowLengthCells) - d);
+        }
+        shade *= 1.0 - \(SandScene.shadowStrength) * occlusion / 5.0;
         vec3 albedo = vc_srgbDecode(u_tone.rgb) * (0.94 + 0.06 * clamp(h, -1.0, 1.0));
         float grain = vc_fbm(gl_FragCoord.xy * 0.45, 3, 2.0, 0.5);
         albedo *= 1.0 + u_grain * 0.08 * grain;
-        float edge = min(min(t.x, 1.0 - t.x), min(t.y, 1.0 - t.y) * 0.75);
-        float rim = 0.82 + 0.18 * smoothstep(0.0, 0.012, edge);
         vec3 lit = clamp(albedo * shade * rim, 0.0, 1.0);
         color = vec4(clamp(vc_srgbEncode(lit), 0.0, 1.0), 1.0);
     }
@@ -131,6 +191,18 @@ final class SandScene: RenderScene {
     private(set) var shownPending: RakeStroke?
     /// The render target of the field; nil before `setup` and after `teardown`.
     private(set) var target: RenderTarget?
+    /// The stone layer drawn (feature 147).
+    private(set) var stones = StoneLayer()
+    /// The stones the stone layer holds (feature 147).
+    private(set) var baseStones: [Stone] = []
+    /// The render target of the stone layer; nil before `setup` and after `teardown` (feature 147).
+    private(set) var stoneTarget: RenderTarget?
+    /// How many times the stone layer was rasterized (feature 147).
+    private(set) var stoneRebuildCount = 0
+    /// How many times the stone layer was uploaded (feature 147).
+    private(set) var stoneUploadCount = 0
+    /// Whether the stone layer must be uploaded before the next draw (feature 147).
+    private var needsStoneUpload = true
     /// The format of `target` (`rgba16f` or `rgba8`).
     private(set) var format: TextureFormat = .rgba8
     /// The sand tone drawn (sRGB).
@@ -257,6 +329,55 @@ final class SandScene: RenderScene {
         return largest
     }
 
+    // MARK: Stones
+
+    /// Rasterizes `stones` into a fresh stone layer (feature 147).
+    func rebuildStones(from stones: [Stone]) {
+        self.stones = StoneLayer(stones: stones, columns: Self.columns, rows: Self.rows)
+        baseStones = stones
+        stoneRebuildCount += 1
+        revision += 1
+        needsStoneUpload = true
+    }
+
+    /// Rebuilds the stone layer when `stones` differ from the ones it holds (feature 147).
+    func syncStones(_ stones: [Stone]) {
+        guard stones != baseStones else { return }
+        rebuildStones(from: stones)
+    }
+
+    /// The values uploaded for `layer`: per cell (height, (kind + 1)/5, 0, 1), rows bottom-up (feature 147).
+    static func stoneUploadValues(_ layer: StoneLayer) -> [Float] {
+        var values = [Float](repeating: 0, count: layer.columns * layer.rows * 4)
+        var index = 0
+        for glRow in 0..<layer.rows {
+            let row = layer.rows - 1 - glRow
+            for column in 0..<layer.columns {
+                values[index] = layer.height(column: column, row: row)
+                values[index + 1] = Float(layer.kind(column: column, row: row)) / 5
+                values[index + 3] = 1
+                index += 4
+            }
+        }
+        return values
+    }
+
+    /// The largest difference between the values `values` read back from the stone target (rows bottom-up) and the
+    /// values `layer` stores (height and (kind + 1)/5); infinity for a wrong count (feature 147).
+    static func stoneMaxDifference(_ values: [Float], layer: StoneLayer) -> Float {
+        guard values.count == layer.columns * layer.rows * 4 else { return .infinity }
+        var largest: Float = 0
+        for glRow in 0..<layer.rows {
+            let row = layer.rows - 1 - glRow
+            for column in 0..<layer.columns {
+                let base = (glRow * layer.columns + column) * 4
+                largest = max(largest, abs(values[base] - layer.height(column: column, row: row)))
+                largest = max(largest, abs(values[base + 1] - Float(layer.kind(column: column, row: row)) / 5))
+            }
+        }
+        return largest
+    }
+
     // MARK: Render scene
 
     /// Makes the field's render target in the context's storage format and the relief pass; the field is uploaded
@@ -267,16 +388,27 @@ final class SandScene: RenderScene {
         format = FloatRenderSupport.detect(in: resources).storageFormat(forceFallback: forceFallback)
         let made = try resources.makeRenderTarget(width: Self.columns, height: Self.rows, format: format,
                                                   label: "zg.sand")
+        let madeStones: RenderTarget
         do {
-            pass = try FieldPass(registry: resources, fragment: Self.reliefFragment, inputs: ["u_sand"],
-                                 label: "zg.relief")
+            madeStones = try resources.makeRenderTarget(width: Self.columns, height: Self.rows, format: format,
+                                                        label: "zg.stones")
         } catch {
             resources.release(made)
             throw error
         }
+        do {
+            pass = try FieldPass(registry: resources, fragment: Self.reliefFragment, inputs: ["u_sand", "u_stones"],
+                                 label: "zg.relief")
+        } catch {
+            resources.release(made)
+            resources.release(madeStones)
+            throw error
+        }
         target = made
+        stoneTarget = madeStones
         registry = resources
         needsUpload = true
+        needsStoneUpload = true
     }
 
     /// The field does not depend on the drawable size; the tray is fitted again at the next draw.
@@ -284,7 +416,7 @@ final class SandScene: RenderScene {
 
     /// Uploads the shown field when it changed, then draws the relief over the whole framebuffer.
     func render(_ context: RenderContext, frame: FrameInfo) throws {
-        guard let target, let pass else { return }
+        guard let target, let stoneTarget, let pass else { return }
         if needsUpload {
             guard target.upload(rgbaFloats: Self.uploadValues(shown, format: format)) else {
                 throw SandSceneError.uploadFailed
@@ -292,27 +424,38 @@ final class SandScene: RenderScene {
             needsUpload = false
             uploadCount += 1
         }
+        if needsStoneUpload {
+            guard stoneTarget.upload(rgbaFloats: Self.stoneUploadValues(stones)) else {
+                throw SandSceneError.uploadFailed
+            }
+            needsStoneUpload = false
+            stoneUploadCount += 1
+        }
         let tray = TrayFit.rect(width: Double(context.pixelWidth), height: Double(context.pixelHeight))
         trayPixels = SIMD4(Float(tray.x), Float(Double(context.pixelHeight) - tray.y - tray.height),
                            Float(tray.width), Float(tray.height))
         try pass.run(output: .framebuffer(name: context.framebuffer, width: context.pixelWidth,
                                           height: context.pixelHeight),
-                     inputs: ["u_sand": target],
+                     inputs: ["u_sand": target, "u_stones": stoneTarget],
                      uniforms: ["u_tray": .vec4(trayPixels), "u_tone": .vec4(SIMD4(tone, 1)),
                                 "u_decode": .vec2(Self.decode(format)), "u_grain": .float(grain ? 1 : 0)])
         drawCount += 1
     }
 
-    /// Releases the target and the pass.
+    /// Releases the targets and the pass.
     func teardown(_ context: RenderContext) {
         releaseObjects()
     }
 
-    /// Releases the target and the pass to their registry (objects of an ended generation are only forgotten).
+    /// Releases the targets and the pass to their registry (objects of an ended generation are only forgotten).
     private func releaseObjects() {
         if let target, let registry, target.handle.generation == registry.generation { registry.release(target) }
+        if let stoneTarget, let registry, stoneTarget.handle.generation == registry.generation {
+            registry.release(stoneTarget)
+        }
         pass?.release()
         target = nil
+        stoneTarget = nil
         pass = nil
     }
 }
