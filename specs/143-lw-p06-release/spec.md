@@ -32,6 +32,56 @@ Canonical overrides:
   `docs/release/build-and-archive.md`.
 - Follow `specs/136-ac-p06-release`.
 
+## Clarifications
+
+### Session 2026-11-17
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- `scripts/release_check.py` builds `experience-release-<code>` and `copy-claims-<code>` from
+  `docs/apps/<slug>/release.json`; `copyCheck.allow` removes shared denylist words that name a real feature. The A19
+  interface chunk is `a3` (A19-P05).
+- The shared denylist refuses `share` and `sharing` as features most experiences lack; Living Wallpapers does hand its
+  file to the share sheet (A19-P04). It also refuses `video export`, which A19 does not have.
+- The presenter has no drawing-failure seam yet. A shader error already fails setup or draw with `SceneShaderError`.
+- `HistoryStore` writes `history.json` through `ExperienceStorage`, with refusal codes `damaged`, `newer-version` and
+  `too-large`. The snapshot is schema 2 with a registered schema-1 example (A19-P03). Exports go to the temporary
+  folder `LivingWallpapers-Export`, which holds at most one file (A19-P04).
+
+- Q: Which statuses does the release checklist use? → A: The checker's:
+  - `verified`, with evidence;
+  - `pending-campaign-ii`, for device rows naming LW-D1 … LW-D8 of `docs/apps/living-wallpapers/device-campaign.md`
+    (size limit and largest template LW-D1, LW-D2; file size and profile LW-D3; heat and memory LW-D4, LW-D5; the
+    Photos prompt and the declined path LW-D6, LW-D7; the accessibility audits LW-D8);
+  - `owner-action`, with the steps of `docs/release/build-and-archive.md`.
+- Q: Which words does the experience's own claims scan refuse? → A: It scans the store text and the interface Swift
+  (controls, editor model, help view and the adapter's words), matching whole words case-insensitively:
+  - live wallpaper, animated wallpaper, set as wallpaper, sets your wallpaper, automatically, installs;
+  - video, unlimited, 8k, any size;
+  - fps, real-time, lossless.
+
+  The shared copy check runs with `copyCheck.allow: ["share"]` and nothing else. Every test named in the claims table
+  must exist.
+- Q: What does the source scan refuse? → A: The A18 list, in `Packages/ExperiencesCreative/LivingWallpapers`:
+  `URLSession`, `import Network`, `CLLocation`, `AVCapture`, `AVAudioRecorder`, `inputNode`, `installTap`,
+  `CMMotion`, `CNContact`, `PHPhotoLibrary`, `import Photos`, `PhotosUI`, `UIImagePickerController`,
+  `ASIdentifierManager`, `AppTrackingTransparency`, `isIdleTimerDisabled` and any `brightness =` write.
+- Q: How are crash recovery and sample files proved? → A:
+  - **Crash recovery:** a test-only `failNextDraw` seam in the presenter makes the next draw throw once
+    (`WallpaperDrawError.injected`). A test records two exports in a temporary storage's history, sets the seam and
+    draws, so the session fails with the injected message. `history.json` must be byte-identical, and a new session
+    over the same storage opens and lists both entries.
+  - **Sample files:** committed fixtures under `ExperienceTests/Fixtures/`:
+    - snapshot payloads `snapshot-v1.json` and `snapshot-v2.json` (from the schema examples), plus
+      `snapshot-newer.json` and `snapshot-damaged.json`;
+    - `history-current.json`, `history-newer.json` and `history-damaged.json`.
+
+    v1 and v2 restore (v1 migrated); newer and damaged are refused; the history loads or reports `newer-version` or
+    `damaged`; every file stays byte-identical.
+- Q: Which interface journey runs? → A: `LWHistoryUITests` joins chunk `a3`: a fresh start exports the iPhone SE
+  template, `history-0` names it, "Clear history" is tapped, and no history entry nor the Clear history button
+  remains. It takes under 60 s.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Nothing leaves the device unless the person shares it (Priority: P1) 🎯
@@ -117,7 +167,8 @@ In the one app, an export is listed in the history and "Clear history" empties i
 - **FR-A19-601**: A privacy-and-credits page MUST list the stored data (snapshot, `history.json`), its place and
   removal, the temporary export file, "nothing is sent", the add-only Photos string and when it is asked, and the
   license inventory.
-- **FR-A19-602**: A source scan MUST find no network, tracking, sensor or Photos library API in the experience.
+- **FR-A19-602**: A source scan MUST find no network, tracking, sensor, Photos library, idle-timer or brightness API in
+  the experience.
 - **FR-A19-603**: A drawing failure MUST fail the session with a message, leave the history file unchanged, and a new
   session MUST open and list the history.
 - **FR-A19-604**: Committed samples of the snapshot and the history file MUST open or be refused as specified.
