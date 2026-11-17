@@ -51,7 +51,8 @@ import Testing
                          "a16.simulation-lab",
                          "a17.interactive-anatomy",
                          "a18.ambient-clock",
-                         "a19.living-wallpapers"].compactMap(ExperienceID.init(rawValue:))
+                         "a19.living-wallpapers",
+                         "a20.digital-zen-garden"].compactMap(ExperienceID.init(rawValue:))
         #expect(manifest.registryReport(registered: integrated).isMatch)
         #expect(manifest.registryReport(registered: []).missingRegistrations == integrated)
     }

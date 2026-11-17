@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a20.digital-zen-garden",
+    "--runtime",
+    "27"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a20.digital-zen-garden --runtime 27",
+  "elapsed_seconds": 48.651,
+  "exit_code": 0,
+  "finished": "2026-11-17T10:13:08+00:00",
+  "gate": "X-A20",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-A20.sim27.log",
+  "log_sha256": "8b8680a5c417f58711ea1bc4c2a69de77d00dcad63ea1e3ed62915118304a5d9",
+  "name": "sim27",
+  "started": "2026-11-17T10:12:20+00:00",
+  "timed_out": false
+}

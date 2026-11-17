@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a20.digital-zen-garden",
+    "--runtime",
+    "27"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a20.digital-zen-garden --runtime 27",
+  "elapsed_seconds": 0.184,
+  "exit_code": 0,
+  "finished": "2026-11-17T10:21:19+00:00",
+  "gate": "X-A20",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-A20.followthrough-verify27.log",
+  "log_sha256": "4f999357bd0c4b185ffa5689b5be501b55aa53709216bb351b7fc7b67d663a5c",
+  "name": "followthrough-verify27",
+  "started": "2026-11-17T10:21:18+00:00",
+  "timed_out": false
+}

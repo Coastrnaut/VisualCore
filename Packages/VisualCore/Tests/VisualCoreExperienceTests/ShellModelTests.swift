@@ -265,7 +265,8 @@ import Testing
                          "a16.simulation-lab",
                          "a17.interactive-anatomy",
                          "a18.ambient-clock",
-                         "a19.living-wallpapers"])
+                         "a19.living-wallpapers",
+                         "a20.digital-zen-garden"])
         for search in ["", "aurora"] {
             #expect(LauncherModel.state(manifest: .success(manifest), categories: categories, registered: [],
                                         searchText: search) == .empty, "nothing registered shows nothing")

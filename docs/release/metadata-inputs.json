@@ -161,9 +161,19 @@
         "photo-library-add"
       ],
       "tier": "free"
+    },
+    {
+      "category": "ambient",
+      "code": "A20",
+      "id": "a20.digital-zen-garden",
+      "name": "Digital Zen Garden",
+      "permissions": [
+        "photo-library-add"
+      ],
+      "tier": "free"
     }
   ],
-  "ledger_sha256": "cfdb12b5ea1918c40789c015566f544d53263e01e05cb635ebbd025c596365ab",
+  "ledger_sha256": "b0b41c27e13bc0209ba34b13d2570f9177ab12b69cbfa3aab675655cf9a6b665",
   "privacy_answers": "unproven",
   "schema": 1
 }

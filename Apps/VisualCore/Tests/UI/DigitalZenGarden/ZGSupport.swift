@@ -1,6 +1,6 @@
 // ZGSupport — feature 149 (A20-P05) T-A20-505, T-A20-506 (FR-A20-504; SC-A20-502): helpers of the interface tests
-// of Digital Zen Garden (A20) inside the one app, modelled on `LWSupport`. A20 is a candidate until X-A20
-// (`ExperienceRegistry.candidates`); every launch carries `-vcCandidates` (DebugLaunch: the candidates' catalog entries
+// of Digital Zen Garden (A20) inside the one app, modelled on `LWSupport`. A20 was a candidate until X-A20
+// (integrated 2026-11-17); every launch carries `-vcCandidates` (DebugLaunch: the candidates' catalog entries
 // become available and are registered; harmless once A20 is integrated). A start erases the data (`-vcResetData`, so
 // the library of saved gardens is empty), skips the welcome and opens the experience directly with
 // `-openExperience a20.digital-zen-garden`. A fresh garden is Pale sand, Fine rake, the Rake tool, no strokes and no
