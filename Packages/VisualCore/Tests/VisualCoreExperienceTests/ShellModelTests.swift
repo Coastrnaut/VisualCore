@@ -263,7 +263,8 @@ import Testing
                          "a14.solar-system-explorer",
                          "a15.molecular-explorer",
                          "a16.simulation-lab",
-                         "a17.interactive-anatomy"])
+                         "a17.interactive-anatomy",
+                         "a18.ambient-clock"])
         for search in ["", "aurora"] {
             #expect(LauncherModel.state(manifest: .success(manifest), categories: categories, registered: [],
                                         searchText: search) == .empty, "nothing registered shows nothing")

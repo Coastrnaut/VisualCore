@@ -143,9 +143,17 @@
       "name": "Interactive Anatomy",
       "permissions": [],
       "tier": "free"
+    },
+    {
+      "category": "ambient",
+      "code": "A18",
+      "id": "a18.ambient-clock",
+      "name": "Ambient Clock",
+      "permissions": [],
+      "tier": "free"
     }
   ],
-  "ledger_sha256": "5755b763901383a6a7304b110b800ac27bb2a43e3c0e2657d268b0e1cbee6510",
+  "ledger_sha256": "c4d9c07f5b557a80538ad09fa8ae3f87a85fd7d130665b8950a43dc93adca378",
   "privacy_answers": "unproven",
   "schema": 1
 }

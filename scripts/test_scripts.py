@@ -1314,7 +1314,7 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     "SimulationLabExperience",
                                     # Feature 125 (A17-P02): Interactive Anatomy, integrated at X-A17.
                                     "InteractiveAnatomyExperience",
-                                    # Feature 132 (A18-P02): Ambient Clock, a candidate until X-A18.
+                                    # Feature 132 (A18-P02): Ambient Clock, integrated at X-A18.
                                     "AmbientClockExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):

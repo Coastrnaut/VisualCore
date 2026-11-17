@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--result-name",
+    "xa18-rendering"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name xa18-rendering",
+  "elapsed_seconds": 41.419,
+  "exit_code": 0,
+  "finished": "2026-11-17T04:47:54+00:00",
+  "gate": "X-A18",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-A18.visualcore-rendering.log",
+  "log_sha256": "7442d6a4fb1bc074cc29278c1315ec0b4dd7aa33fdcc41347b9b0f5c4520377a",
+  "name": "visualcore-rendering",
+  "started": "2026-11-17T04:47:12+00:00",
+  "timed_out": false
+}

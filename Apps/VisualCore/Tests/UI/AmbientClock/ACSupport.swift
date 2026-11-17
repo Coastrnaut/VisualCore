@@ -1,6 +1,7 @@
 // ACSupport — feature 135 (A18-P05) T-A18-505 (FR-A18-505; SC-A18-504): helpers of the interface tests of Ambient
-// Clock (A18) inside the one app, modelled on `IASupport`. A18 is a candidate; every launch carries `-vcCandidates`
-// (DebugLaunch: the candidates' catalog entries become available and are registered). A first start erases the data
+// Clock (A18) inside the one app, modelled on `IASupport`. A18 was a candidate until X-A18 (integrated 2026-11-16);
+// every launch carries `-vcCandidates` (DebugLaunch: the candidates' catalog entries become available and are
+// registered; harmless once A18 is integrated). A first start erases the data
 // (`-vcResetData`), skips the welcome and opens the experience directly with `-openExperience a18.ambient-clock`;
 // ``again`` opens it once more without the reset, so the shell restores the stored snapshot (schema 3: night mode,
 // in-app reduced motion and keep-awake among it). The canvas is labelled with the display's spoken string

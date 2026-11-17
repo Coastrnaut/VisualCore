@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a18.ambient-clock",
+    "--runtime",
+    "27"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a18.ambient-clock --runtime 27",
+  "elapsed_seconds": 48.641,
+  "exit_code": 0,
+  "finished": "2026-11-17T04:48:49+00:00",
+  "gate": "X-A18",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-A18.sim27.log",
+  "log_sha256": "3c040af4a8660a57c7975a5603ae2f48ff65fda9bc6e8d95d3da21652e060db3",
+  "name": "sim27",
+  "started": "2026-11-17T04:48:01+00:00",
+  "timed_out": false
+}
