@@ -15,7 +15,7 @@ migration, no VisualCore change).
 
 ## Phase 2: Story 1 — privacy and credits (P1) 🎯
 
-- [ ] T-A20-602 [P] [US1] Write `docs/apps/digital-zen-garden/privacy-and-credits.md`: the session snapshot (the open
+- [X] T-A20-602 [P] [US1] Write `docs/apps/digital-zen-garden/privacy-and-credits.md`: the session snapshot (the open — Verified 2026-11-17: 2026-11-17: docs/apps/digital-zen-garden/privacy-and-credits.md: state.json (schema 1, the garden document), garden-<n>.json (at most 12) and library.json, calm.v1, the temporary DigitalZenGarden-Still folder (one PNG), nothing sent, the add-only Photos string asked only by Save Image, declined path in campaign row ZG-D7, licence inventory; facts checked in code; validate_docs exit 0; written by an agent, reviewed
   garden document, schema 1), the named-garden library (`garden-<n>.json`, at most 12, and `library.json`) and the calm
   switches (`calm.v1`) in the experience's storage, replaced on each change and removed when the app is deleted; the
   temporary still folder `DigitalZenGarden-Still` (at most one PNG, replaced by the next still, removed with the app's
