@@ -59,7 +59,7 @@ only).
 
 - [X] T-A21-009 No-change proof (`--name no-change -- git diff --exit-code --stat b40fdbee..HEAD -- Packages — Verified 2026-11-17: 2026-11-17: .autonomy/checks/A21-P00.no-change.json exit 0 (empty diff of Packages and External since b40fdbee)
   External`) (FR-A21-008, SC-A21-005)
-- [ ] T-A21-010 Script tests (`--name script-tests -- python3 scripts/test_scripts.py`) and the release-check document
+- [X] T-A21-010 Script tests (`--name script-tests -- python3 scripts/test_scripts.py`) and the release-check document — Verified 2026-11-17: 2026-11-17: .autonomy/checks/A21-P00.script-tests.json exit 0 (40.8 s) and A21-P00.fast-checks.json exit 0 (docs, app-contracts, compliance, dependencies; 3.0 s); every run-check of this gate within its limit; the contract check under 10 s (0.04 s)
   steps (`--name fast-checks -- python3 scripts/release_check.py --only docs app-contracts compliance dependencies`);
   every run-check of this gate stays within its limit and the contract check under 10 s (SC-A21-006)
 - [ ] T-A21-011 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
