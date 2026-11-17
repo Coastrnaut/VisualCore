@@ -12,7 +12,7 @@ VisualCore change. Precedent: `specs/134-ac-p04-night-power/tasks.md`. Rollback:
 
 ## Phase 2: Story 3 foundation — the history model (P2, needed by Story 2)
 
-- [ ] T-A19-402 [P] [US3] Core: `Packages/ExperiencesCreative/LivingWallpapers/Core/ExportHistory.swift` per data-model.md ("schema 1, kind `a19.export-history`, ≤ 16,384 bytes; entries newest first, bound 20; Entry scene, template, orientation, format, width, height, madeAt finite"; `adding(_:)`, `cleared()`; `HistoryRefusal` damaged, newer-version, too-large with code and sentence); `CoreTests/ExportHistoryTests.swift` (bound and order, exact round trip, each refusal, cleared) (FR-A19-404; SC-A19-403)
+- [X] T-A19-402 [P] [US3] Core: `Packages/ExperiencesCreative/LivingWallpapers/Core/ExportHistory.swift` per data-model.md ("schema 1, kind `a19.export-history`, ≤ 16,384 bytes; entries newest first, bound 20; Entry scene, template, orientation, format, width, height, madeAt finite"; `adding(_:)`, `cleared()`; `HistoryRefusal` damaged, newer-version, too-large with code and sentence); `CoreTests/ExportHistoryTests.swift` (bound and order, exact round trip, each refusal, cleared) (FR-A19-404; SC-A19-403) — Verified 2026-11-17: 2026-11-17: Core/ExportHistory.swift (schema 1, kind a19.export-history, 16,384 bytes, bound 20 newest first, adding and cleared, Entry with finite madeAt and positive size, HistoryRefusal damaged, newer-version, too-large); ExportHistoryTests (5) pass in .autonomy/checks/A19-P04.lw-ios27.json exit 0 (52 core and 61 experience tests on sim-27.2); written by an agent, retested
 
 ## Phase 3: Story 1 — share without broad permission (P1) 🎯
 
