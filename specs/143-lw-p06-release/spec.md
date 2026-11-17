@@ -165,7 +165,8 @@ In the one app, an export is listed in the history and "Clear history" empties i
 ### Functional Requirements
 
 - **FR-A19-601**: A privacy-and-credits page MUST list the stored data (snapshot, `history.json`), its place and
-  removal, the temporary export file, "nothing is sent", the add-only Photos string and when it is asked, and the
+  removal, the temporary export file (at most one, replaced by the next export and removed with the app's temporary
+  data), "nothing is sent", the add-only Photos string and when it is asked, and the
   license inventory.
 - **FR-A19-602**: A source scan MUST find no network, tracking, sensor, Photos library, idle-timer or brightness API in
   the experience.
