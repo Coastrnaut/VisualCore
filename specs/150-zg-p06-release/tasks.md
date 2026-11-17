@@ -21,7 +21,7 @@ migration, no VisualCore change).
   temporary still folder `DigitalZenGarden-Still` (at most one PNG, replaced by the next still, removed with the app's
   temporary data); nothing is sent; the add-only Photos usage string, asked by the system only when the person
   chooses Save Image in the share sheet; the license inventory (code only; link `licenses.md`) (FR-A20-601)
-- [ ] T-A20-603 [US1] Write `specs/150-zg-p06-release/scan-sources-release.sh` (after
+- [X] T-A20-603 [US1] Write `specs/150-zg-p06-release/scan-sources-release.sh` (after — Verified 2026-11-17: 2026-11-17: specs/150-zg-p06-release/scan-sources-release.sh (the APIs of clarification Q3); .autonomy/checks/A20-P06.zg-no-network.json exit 0
   `specs/143-lw-p06-release/scan-sources-release.sh`) refusing the APIs of Clarifications Q3 in
   `Packages/ExperiencesCreative/DigitalZenGarden` (Swift files); run it (`--name zg-no-network -- sh
   specs/150-zg-p06-release/scan-sources-release.sh`) (FR-A20-602; SC-A20-601)

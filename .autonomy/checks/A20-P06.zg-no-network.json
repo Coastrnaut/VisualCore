@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "sh",
+    "specs/150-zg-p06-release/scan-sources-release.sh"
+  ],
+  "command": "sh specs/150-zg-p06-release/scan-sources-release.sh",
+  "elapsed_seconds": 0.037,
+  "exit_code": 0,
+  "finished": "2026-11-17T09:54:28+00:00",
+  "log": ".autonomy/logs/A20-P06.zg-no-network.log",
+  "log_sha256": "3f5572bb7ea8808c909ed2ccd06226acb3dc3b77c5088ec9d72b09a6fd0690ce",
+  "name": "zg-no-network",
+  "stage": "A20-P06",
+  "started": "2026-11-17T09:54:28+00:00",
+  "timed_out": false
+}
