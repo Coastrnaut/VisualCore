@@ -40,6 +40,8 @@ encoding, no tiling, no device-size catalog, no export job with progress, and no
 - **Alternatives considered:**
   - PhotoKit with add-only authorization (rejected: the share sheet covers saving without a PhotoKit call and keeps
     one permission path for the app);
-  - tiled rendering for sizes over `maxRenderSize` (rejected for 0.1: the device limits cover phone and tablet screen
-    sizes, and tiling needs sub-rectangle projection in every scene);
+  - tiled rendering for sizes over `maxRenderSize` (rejected for 0.1: tiling needs sub-rectangle projection in every
+    scene). The code guarantees only the 2048 floor, below a tablet's 2732-pixel edge, so a host that reports less
+    than a template's edge gets the fallback (the largest size that fits); the limits of real devices are measured in
+    A19-P05 and never assumed;
   - Display P3 output (rejected: the renderer draws 8-bit sRGB, so a P3 tag would claim more than the pixels hold).
