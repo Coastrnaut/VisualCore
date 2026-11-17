@@ -31,4 +31,4 @@
 
 ## Notes
 
-- Validated by the lead on 2026-11-16. The region, the facts behind "available" and the package are left to `/speckit-clarify`.
+- Validated by the lead on 2026-11-16. The themes, the facts behind "available", the package and the keep-awake policy are left to `/speckit-clarify`.
