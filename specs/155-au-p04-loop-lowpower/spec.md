@@ -24,6 +24,48 @@ Canonical overrides:
 - **Aurora stays a candidate.** The experience does not play the loop yet (its control comes in A21-P05). Follow
   `specs/148-zg-p04-library-a11y` and, for the audio change, A10-P03's `SoundEffectPlayer` (feature 077).
 
+## Clarifications
+
+### Session 2026-11-17
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- `SoundEffectPlayer` (VisualCoreAudio) runs an `AVAudioEngine` with `AVAudioPlayerNode` voices on the `.ambient`
+  session, starts lazily, schedules each buffer once, observes the interruption, media-services reset and
+  `didEnterBackground` notifications on an injected `NotificationCenter`, and has an injected output for tests.
+  `SoundEffectSynth` (VisualCoreAudioDSP) renders bounded one-shot effects of at most 1 s.
+- `ResourceRegistry.stats` (VisualCoreRendering) reports live counts and bytes of textures, buffers and render
+  targets; `CachedScene` reuses one drawn picture until its key changes; `RenderCapabilities.fragmentHighp` reports
+  high fragment precision.
+- The public API baseline is `docs/api/visualcore-public-api.txt`, checked by `scripts/check_public_api.py` and
+  rewritten deliberately with `--update`; VisualCoreRendering's README lists each module's public types.
+
+- Q: What does VisualCore gain for the loop, and where? → A: Two public types, each with `///` documentation and
+  tests:
+  - `AmbientLoopRecipe` and `AmbientLoopSynth` in VisualCoreAudioDSP: a loop of a whole number of seconds (4…16,
+    default 8) at 48 kHz built from up to six sine partials, each with a whole number of cycles per loop, and a slow
+    amplitude swell with a whole number of cycles per loop, so the end meets the start exactly; peak gain at most 0.3;
+    deterministic for the same recipe; finite.
+  - `AmbientLoopPlayer` in VisualCoreAudio: plays one recipe's buffer looped on an `AVAudioPlayerNode` of its own
+    engine on the `.ambient` session, `volume` clamped to 0…1 (a non-finite value ignored), `isEnabled`, `play()`,
+    `stop()`, stopped on interruption, media-services reset and backgrounding (as `SoundEffectPlayer`), with an
+    injected output and notification center for tests. No microphone and no permission.
+- Q: How is the reduced-flash mode defined and measured? → A: On (by its control or the system's Reduce Flashing), the
+  twinkle amplitude is 0 and the change between skies takes 4.0 s instead of 2.0 s; the frame-to-frame change in mean
+  luminance (Rec. 709 of the sRGB-decoded pixels) stays under 0.02 of full scale, measured off screen at 30 frames
+  per second, including during a change between skies.
+- Q: What is the still view? → A: A "Still sky" control (presentation only, not saved in 0.1) wraps the sky in a
+  `CachedScene` whose key is the state digest and the size: the sky is drawn once and reused until a change; the
+  clock does not advance while it is on. The person's limit applies. A change between skies in the still view
+  completes, then holds.
+- Q: What is the fallback when the shader cannot run? → A: When `aurora-sky.frag` fails to compile or
+  `RenderCapabilities.fragmentHighp` is false, the experience draws a minimal gradient shader (the preset's sky colour
+  to a darker horizon, under the limit) and shows "This device shows a simpler sky." If even that fails, the host's
+  clear colour (the sky colour) remains; never grey. A test seam forces each path.
+- Q: How is the release of GPU targets measured? → A: `ResourceRegistry.stats` bytes after the first drawn frame are
+  the baseline; after ten preset changes, each finished, the live bytes of textures, buffers and render targets equal
+  the baseline.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - A still sky that saves power (Priority: P1) 🎯
