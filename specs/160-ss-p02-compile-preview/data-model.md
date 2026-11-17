@@ -11,8 +11,9 @@
 - **Refusal rules:** `a22.not-whole`, `a22.no-uniform`.
 - **Document** (presenter): a `ShaderProject`. It is the template's project when a template is selected; set by
   `setSource(_:)` it keeps the template's uniforms.
-- **PreviewStatus:** `.waiting`, `.compiled`, `.failed([MappedDiagnostic])` or `.refused([ValidationIssue])`. The
-  status line reads "Waiting", "Compiled", "Failed: N errors" (N being the error-severity diagnostics) or "Refused:
+- **PreviewStatus:** `.waiting`, `.compiled([MappedDiagnostic])` (warnings only), `.failed([MappedDiagnostic])` or
+  `.refused([ValidationIssue])`. The status line reads "Waiting", "Compiled" ("Compiled, N warnings" when there are
+  warnings), "Failed: N errors" (N being the error-severity diagnostics) or "Refused:
   <first issue code>".
 - **PreviewPipeline** (presenter-owned):
   - `pending: ShaderProject?`;

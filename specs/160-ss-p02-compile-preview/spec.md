@@ -165,6 +165,8 @@ back with the last good shader and its uniform values.
 - **Run pressed several times before the next frame:** only one compile happens, for the newest source.
 - **The first run fails** (no good shader yet): the preview shows the first template's picture until a shader works.
 - **A shader that compiles but fails to link:** treated as a failure; the preview is unchanged.
+- **A shader that compiles with warnings only:** it replaces the preview; the warnings are listed with their lines and
+  the status reads "Compiled" with the warning count.
 - **Switching templates while a compile waits:** the waiting compile is for the newly picked template.
 - **The experience is closed with a compile waiting:** nothing is compiled after it closes.
 
