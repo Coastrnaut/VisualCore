@@ -67,7 +67,7 @@
   - lines split on `\n`, `\r\n` and `\r`, numbered from 1;
   - block comments are cut at line ends, and an unclosed one runs to the end of the source;
   - diagnostics are attached by line, and the rest go to `outside`.
-- [ ] T-A22-109 [P] [US4] Write `Packages/ExperiencesCreative/ShaderStudio/CoreTests/{TokenizerTests,EditorDocumentTests}.swift`
+- [X] T-A22-109 [P] [US4] Write `Packages/ExperiencesCreative/ShaderStudio/CoreTests/{TokenizerTests,EditorDocumentTests}.swift` — Verified 2026-11-17: 2026-11-17: TokenizerTests (9) and EditorDocumentTests (4): tokens rebuild every line, every kind classified, line endings, comments, number forms, a 16,384-byte line, diagnostics on lines 3 and 7, the rest outside; .autonomy/checks/A22-P01.ss-core-ios27-2.json exit 0; written by an agent, retested
   (SC-A22-103):
   - tokens rebuild every line exactly, and every kind is classified;
   - CRLF and a final line with no newline;
