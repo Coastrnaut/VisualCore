@@ -73,7 +73,7 @@
   document steps (`--name fast-checks -- python3 scripts/release_check.py --only docs app-contracts compliance
   dependencies`). Every run-check of this gate stays within its limit, and the contract check runs in under 10 s
   (SC-A22-006)
-- [ ] T-A22-011 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+- [X] T-A22-011 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record — Verified 2026-11-17: 2026-11-17: /speckit-converge appended nothing on its first run (8 FR, 6 SC, 9 acceptance scenarios and the eleven FR-A22-003 areas checked against the 29 matrix rows; every evidence file exit 0); .autonomy/evidence/A22-P00.json sealed; VERIFIED-GATE A22-P00 (158 of 263); planning index, matrix, distinctiveness, metadata, Auto-Creator, catalog (--check PASS), validate_autocreator and validate_docs PASS; README and docs/automatedtesting.md updated
   A22-P00. Update README.md (status, gate count) in the record commit (rule 16), and `docs/automatedtesting.md` if a
   test tool, rule or lesson changed (rule 17)
 
