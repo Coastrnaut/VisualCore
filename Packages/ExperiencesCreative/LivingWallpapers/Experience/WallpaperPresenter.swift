@@ -23,6 +23,12 @@
 // twelve components for the colour editor; the controls get the presenter's export limit (`maxEdge`) and their
 // ``EditorModel`` (notice, result line, help and the announcement of each export outcome).
 //
+// Feature 141 (A19-P04) T-A19-405, T-A19-407 (FR-A19-403, FR-A19-404): the controls export through the presenter's
+// ``ExportJob`` (the one shipping path, over the same `StillExport` step code and folder), which records each written
+// export in the presenter's ``HistoryStore`` when one is given; `export(using:)` and `export(plan:using:)` stay as
+// the synchronous composition of the same steps for the tests. ``stillRender(_:)`` turns the environment's renderer
+// into the job's renderer.
+//
 // No GL call: everything is drawn through VisualCoreRendering's scene; no platform-wallpaper call.
 import Foundation
 import LivingWallpapersCore
@@ -79,7 +85,11 @@ final class WallpaperPresenter: ExperiencePresenter {
     /// The export attempt (its temporary folder is `LivingWallpapers-Export`).
     let stillExport: StillExport
     /// The editor's model: notice, result line, help and announcements (feature 140).
-    let editor = EditorModel()
+    let editor: EditorModel
+    /// The stored history of written exports; nil when the experience was made without storage (feature 141).
+    let history: HistoryStore?
+    /// The export job of the controls, over `stillExport`'s step code and folder (feature 141).
+    let job: ExportJob
     /// The scene drawn; made in `setup`, released in `teardown`.
     private(set) var scene: FullScreenShaderScene?
     /// The scene index of `scene`.
@@ -99,10 +109,15 @@ final class WallpaperPresenter: ExperiencePresenter {
     /// The frame cap: 30 frames per second (the scenes move slowly).
     var maxFramesPerSecond: Int { 30 }
 
-    /// A presenter; with `reduceMotion` on the scene never moves; `stillExport` is the export attempt.
-    init(reduceMotion: Bool = false, stillExport: StillExport = StillExport()) {
+    /// A presenter; with `reduceMotion` on the scene never moves; `stillExport` is the export attempt, `history` the
+    /// stored history the job records in and `editor` the editor's model.
+    init(reduceMotion: Bool = false, stillExport: StillExport = StillExport(), history: HistoryStore? = nil,
+         editor: EditorModel = EditorModel()) {
         self.reduceMotion = reduceMotion
         self.stillExport = stillExport
+        self.history = history
+        self.editor = editor
+        self.job = ExportJob(export: stillExport, editor: editor, history: history)
     }
 
     // MARK: Time
@@ -236,6 +251,16 @@ final class WallpaperPresenter: ExperiencePresenter {
         }
         return stillExport.run(plan: plan, time: lastCore.animationTime, render: render)
     }
+
+    /// The job's renderer over the environment's timed still `renderer` (feature 141).
+    static func stillRender(_ renderer: ExperienceStillRenderer) -> StillExport.Render {
+        { (width: Int, height: Int, time: Double) throws(OffscreenRenderError) -> StillImage in
+            try renderer(width: width, height: height, time: time)
+        }
+    }
+
+    /// The core's project (the last core drawn or followed), what the job exports (feature 141).
+    var project: WallpaperProject { lastCore.project }
 
     /// The planner's result for the core's project at the recorded edge limit (what the notice describes).
     var plannedExport: Result<ExportPlan, ExportRefusal> {
