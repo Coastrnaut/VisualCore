@@ -25,7 +25,7 @@ raise a system prompt; no wall-clock assert. Precedent: `specs/125-ia-p02-scene-
 
 ## Phase 5: Story 3 — calm motion (P2)
 
-- [ ] T-A18-206 [US3] Add to `Packages/ExperiencesCreative/AmbientClock/ExperienceTests/AmbientRenderTests.swift`: with motion off, and with Reduce Motion on, two frames at times 1 and 7 are identical; with motion on they differ; speed outside 0.25–2 is refused (FR-A18-207; SC-A18-204)
+- [X] T-A18-206 [US3] Add to `Packages/ExperiencesCreative/AmbientClock/ExperienceTests/AmbientRenderTests.swift`: with motion off, and with Reduce Motion on, two frames at times 1 and 7 are identical; with motion on they differ; speed outside 0.25–2 is refused (FR-A18-207; SC-A18-204) — Verified 2026-11-16: 2026-11-16: AmbientRenderTests: motion off and Reduce Motion give identical stills at times 1 and 7, motion on differs, speeds outside 0.25-2 refused; 2026-11-16: .autonomy/checks/A18-P02.ac-ios27.json exit 0 (47 experience tests in 7 suites and 59 core tests, iOS 27.2)
 
 ## Phase 6: Registration and verification
 
