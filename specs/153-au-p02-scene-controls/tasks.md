@@ -42,7 +42,7 @@ VisualCore change. Precedent: `specs/146-zg-p02-sand-renderer/tasks.md`. Rollbac
 
 ## Phase 4: Story 3 — controls step aside (P2)
 
-- [ ] T-A21-206 [US3] In `AuroraControls.swift` and the presenter: "Hide controls" hides them; a tap on the canvas or
+- [X] T-A21-206 [US3] In `AuroraControls.swift` and the presenter: "Hide controls" hides them; a tap on the canvas or — Verified 2026-11-17: 2026-11-17: Hide controls hides them; a tap on the sky or the accessibility action Show controls restores them; the flag is presenter-only; ChromeTests; .autonomy/checks/A21-P02.au-ios27.json exit 0; written by an agent, retested
   the accessibility action "Show controls" restores them; the flag is not in the state; `ExperienceTests/ChromeTests.swift`
   (FR-A21-205; SC-A21-203)
 
