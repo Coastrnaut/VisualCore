@@ -55,7 +55,7 @@ for the audio change, feature 077 (A10-P03). Rollback: revert the commits (the A
 
 ## Phase 6: Records and evidence
 
-- [ ] T-A21-409 Aurora tests on sim-27.2 (`--name au-ios27`), documented API, isolation, core purity (review checkpoint)
+- [X] T-A21-409 Aurora tests on sim-27.2 (`--name au-ios27`), documented API, isolation, core purity (review checkpoint) — Verified 2026-11-17: 2026-11-17: review checkpoint: .autonomy/checks/A21-P04.au-ios27.json (53 Swift Testing and 21 XCTest tests, each under 10 s), A21-P04.documented-api.json, A21-P04.isolation.json, A21-P04.core-purity.json and A21-P04.audio-hot-path.json, all exit 0
 - [ ] T-A21-410 Contract: G-LOOP and G-LOWPOWER closed by "A21-P04"; rows whose gaps are all closed become available
   with evidence (`--name contract`)
 - [ ] T-A21-411 Manifest (unchanged unless an engine action changed), catalog, app build and unit (`--name app-unit`),

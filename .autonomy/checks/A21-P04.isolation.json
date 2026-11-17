@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_app_isolation.py",
+    "--experiences",
+    "Packages/ExperiencesCreative/Aurora"
+  ],
+  "command": "python3 scripts/check_app_isolation.py --experiences Packages/ExperiencesCreative/Aurora",
+  "elapsed_seconds": 0.042,
+  "exit_code": 0,
+  "finished": "2026-11-17T11:56:08+00:00",
+  "log": ".autonomy/logs/A21-P04.isolation.log",
+  "log_sha256": "ecd02955d6563b55d8b90d03a4f785a7805e4486a72bf1f0180816125a425517",
+  "name": "isolation",
+  "stage": "A21-P04",
+  "started": "2026-11-17T11:56:08+00:00",
+  "timed_out": false
+}
