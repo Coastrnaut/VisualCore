@@ -76,7 +76,7 @@
   - hide the controls and tap the sky; the controls are back;
   - each test runs under 60 s
   (FR-A21-506; SC-A21-503)
-- [ ] T-A21-507 [P] [US3] Interface (agent U): `Apps/VisualCore/Tests/UI/Aurora/AUSoundUITests.swift`:
+- [X] T-A21-507 [P] [US3] Interface (agent U): `Apps/VisualCore/Tests/UI/Aurora/AUSoundUITests.swift`: — Verified 2026-11-17: 2026-11-17: AUSoundUITests (sound off on a fresh start; on with a new volume; both restored after a relaunch without the reset) 40.3 s; .autonomy/checks/A21-P05.app-ui.json exit 0; written by an agent, retested
   - a fresh start reads the sound off;
   - turn it on and set the volume, and the controls read the new choice;
   - a relaunch over the same storage restores it;
