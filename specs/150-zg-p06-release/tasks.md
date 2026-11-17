@@ -64,7 +64,7 @@ migration, no VisualCore change).
 
 - [X] T-A20-609 Digital Zen Garden tests on sim-27.2 (`--name zg-ios27`; each under 10 s) and the documented API — Verified 2026-11-17: 2026-11-17: .autonomy/checks/A20-P06.zg-ios27.json exit 0 (51 core, 99 experience tests on sim-27.2; every test under 10 s, the suites about 6 s) and A20-P06.documented-api.json exit 0, both read before this tick
   (`--name documented-api`) (SC-A20-604)
-- [ ] T-A20-610 App build, unit and interface chunk (`xcodegen generate --spec project.yml`; `--name app-ui -- python3
+- [X] T-A20-610 App build, unit and interface chunk (`xcodegen generate --spec project.yml`; `--name app-ui -- python3 — Verified 2026-11-17: 2026-11-17: xcodegen generate; .autonomy/checks/A20-P06.app-ui.json exit 0 (build for testing, unit, interface chunk b3: ZGGardenUITests 19.3 s and 27.0 s, ZGLibraryUITests 33.7 s, ZGReleaseUITests 27.1 s on the iOS 27.2 phone) and A20-P06.verify-27.json exit 0
   scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27 app-ui-ios27-b3`) and the runner (`--name
   verify-27`) (SC-A20-604)
 - [ ] T-A20-611 Release build checks (review checkpoint; `--name release-checks -- python3 scripts/release_check.py
