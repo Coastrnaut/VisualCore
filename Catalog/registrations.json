@@ -467,6 +467,29 @@
         "photo-library-add"
       ],
       "summary": "A creator of procedural backgrounds framed for a chosen iPhone or iPad screen: four curated scenes with colour presets, the device's crop frame and approximate safe areas, and a still exported at the template's exact size, read back to verify its dimensions and sRGB profile."
+    },
+    "a20.digital-zen-garden": {
+      "capabilities": [
+        "Rake sand with one finger",
+        "Two rakes and three sand tones",
+        "Undo and redo every stroke",
+        "Rake rows, circles, waves, spirals",
+        "A rake preview under the finger"
+      ],
+      "quality_tiers": [
+        "level-0",
+        "level-1"
+      ],
+      "palette": [
+        "#EDE3CC",
+        "#DBBD8F",
+        "#B8B5AD",
+        "#131315"
+      ],
+      "content": null,
+      "manifest": "Packages/ExperiencesCreative/DigitalZenGarden/scenario-manifest.json",
+      "permissions": [],
+      "summary": "A calm sand garden: rake a softly lit tray of sand with one finger in two rake styles and three sand tones, with a preview of the rake under the finger, undo and redo of every stroke, and patterns that rake rows, circles, waves and spirals for you."
     }
   }
 }

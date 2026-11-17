@@ -685,7 +685,7 @@
       "id": "a20.digital-zen-garden",
       "code": "A20",
       "title": "Digital Zen Garden",
-      "summary": "A calm tactile sand-raking and stone-arrangement experience with persistent compositions.",
+      "summary": "A calm sand garden: rake a softly lit tray of sand with one finger in two rake styles and three sand tones, with a preview of the rake under the finger, undo and redo of every stroke, and patterns that rake rows, circles, waves and spirals for you.",
       "kind": "creative",
       "tier": "free",
       "category": "ambient",
@@ -694,10 +694,24 @@
         "ambient-and-lifestyle"
       ],
       "order": 20,
-      "palette": [],
+      "palette": [
+        "#EDE3CC",
+        "#DBBD8F",
+        "#B8B5AD",
+        "#131315"
+      ],
       "tile_seed": 1934530510,
-      "capabilities": [],
-      "quality_tiers": [],
+      "capabilities": [
+        "Rake sand with one finger",
+        "Two rakes and three sand tones",
+        "Undo and redo every stroke",
+        "Rake rows, circles, waves, spirals",
+        "A rake preview under the finger"
+      ],
+      "quality_tiers": [
+        "level-0",
+        "level-1"
+      ],
       "content": null,
       "available": false
     },

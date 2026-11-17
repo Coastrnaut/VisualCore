@@ -1317,7 +1317,9 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     # Feature 132 (A18-P02): Ambient Clock, integrated at X-A18.
                                     "AmbientClockExperience",
                                     # Feature 139 (A19-P02): Living Wallpapers, integrated at X-A19.
-                                    "LivingWallpapersExperience"])
+                                    "LivingWallpapersExperience",
+                                    # Feature 146 (A20-P02): Digital Zen Garden, a candidate until X-A20.
+                                    "DigitalZenGardenExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):
         listing = subprocess.run([sys.executable, str(HERE / "release_check.py"), "--list"],

@@ -112,7 +112,9 @@ enum CatalogFixture {
                                // Feature 132 (A18-P02); integrated at X-A18.
                                "a18.ambient-clock",
                                // Feature 139 (A19-P02); integrated at X-A19.
-                               "a19.living-wallpapers"],
+                               "a19.living-wallpapers",
+                               // Feature 146 (A20-P02); a candidate until X-A20.
+                               "a20.digital-zen-garden"],
                 "the registrations of Catalog/registrations.json")
     }
 
