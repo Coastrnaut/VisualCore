@@ -671,6 +671,19 @@ let package = Package(
                     path: "DigitalZenGarden/ExperienceTests",
                     // Feature 150 (A20-P06): the committed stored-file samples.
                     resources: [.copy("Fixtures")]),
+        // A22 Shader Studio (feature 159, A22-P01): a pending core until A22-P02 adds the experience. The core is pure
+        // (the project, limits, validator, template assembly, diagnostic mapping, tokenizer, editor model and starter
+        // templates); its tests compile real shaders off screen to prove the line mapping.
+        .target(name: "ShaderStudioCore",
+                dependencies: [.product(name: "VisualCoreShaderSource", package: visualCore),
+                               .product(name: "VisualCoreParameters", package: visualCore)],
+                path: "ShaderStudio/Core"),
+        .testTarget(name: "ShaderStudioCoreTests",
+                    dependencies: ["ShaderStudioCore",
+                                   .product(name: "VisualCoreShaderSource", package: visualCore),
+                                   .product(name: "VisualCoreParameters", package: visualCore),
+                                   .product(name: "VisualCoreRendering", package: rendering)],
+                    path: "ShaderStudio/CoreTests"),
         // A21 Aurora (feature 152, A21-P01): a pending core until A21-P02 adds the experience. The core is pure (the
         // sky scene, presets, clock, noise port, reference and shader text); its tests draw the shader off screen.
         .target(name: "AuroraCore",

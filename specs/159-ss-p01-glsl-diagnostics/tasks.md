@@ -13,7 +13,7 @@
 
 - [X] T-A22-101 Baseline: cite the A22-P00 evidence (`.autonomy/checks/A22-P00.{app-build,no-change,experience-packages}.json`) — Verified 2026-11-17: 2026-11-17: A22-P00 evidence cited: .autonomy/checks/A22-P00.app-build.json, A22-P00.no-change.json and A22-P00.experience-packages.json, all exit 0; no Packages change since the A22-P00 record commit 32523449
   on the tree recorded at A22-P00 (`32523449`), whose Packages are unchanged since (owner ruling of 2026-11-14)
-- [ ] T-A22-102 Add two targets to `Packages/ExperiencesCreative/Package.swift` (lead); the package check still passes
+- [X] T-A22-102 Add two targets to `Packages/ExperiencesCreative/Package.swift` (lead); the package check still passes — Verified 2026-11-17: 2026-11-17: ShaderStudioCore (VisualCoreShaderSource, VisualCoreParameters) and ShaderStudioCoreTests (also VisualCoreRendering) in Packages/ExperiencesCreative/Package.swift; .autonomy/checks/A22-P01.experience-packages.json exit 0 (a pending core)
   (a pending core):
   - `ShaderStudioCore` (path `ShaderStudio/Core`, dependencies `VisualCoreShaderSource` and `VisualCoreParameters`);
   - `ShaderStudioCoreTests` (path `ShaderStudio/CoreTests`, dependencies `ShaderStudioCore`, `VisualCoreShaderSource`,
