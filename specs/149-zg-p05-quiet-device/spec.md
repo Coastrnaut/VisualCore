@@ -135,6 +135,8 @@ the accessibility audits.
 - **Reduce Flashing:** nothing in the garden flashes in either state.
 - **Sound on with the device's silent switch on:** the sound stays silent (the ambient session respects it).
 - **The person's haptics switch off:** no haptic plays even with the experience's haptics on.
+- **The app moves to the background while a tone plays or the drift runs:** the tone stops and drawing stops;
+  both resume only with the experience.
 - **A row that needs the owner** (a device in hand, an audit): recorded as an owner action in the campaign.
 
 ## Requirements *(mandatory)*
