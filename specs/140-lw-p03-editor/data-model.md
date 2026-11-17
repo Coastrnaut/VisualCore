@@ -17,3 +17,12 @@
   - the device name, pixel sizes and limit are formatted as integers with "×".
 - **`ExportResultLine`:** `line(plan:result:) -> String`, for example "PNG, 1206 × 2622 pixels, sRGB".
 - **`WallpaperHelp`:** three sections, each a title and a body.
+
+## As built (T-A19-315)
+
+- **Digest:** the domain is `a19.wallpaper.v2`.
+- **Edits:** choosing the preset or scene already shown keeps an edit; only a real change, or `preset.reset`, clears
+  it. While `custom` is 0 the stored components are ignored and the preset's own colours are used, so the colours
+  equal the preset whenever there is no edit.
+- **Labels:** sliders carry their value in both the label and the accessibility value.
+- **Export message:** after a written export, the message under the button reads "Exported <result line>."

@@ -12,3 +12,7 @@
   The view only lays them out.
 - **D5 Announcements (Q5):** through `ExperienceFeedback.announce`, which already rate-limits with
   `AnnouncementPlanner`. A test injects a recording sink.
+- **D6 Evidence limit, as built:** the accessibility-five test proves the stacking by the layout's height growing over
+  `.large`, and it bounds the rendered width at 390 points. A flexible outer frame can hide a child's overflow, so
+  the width check alone is not the evidence; the system audits at the largest text size are row AC-style device work
+  for the campaign (owner ruling of 2026-11-13).
