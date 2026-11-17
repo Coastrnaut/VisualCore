@@ -267,7 +267,7 @@
     "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/ExportSheet.swift",
     "symbol": "ExportRunner"
    },
-   "notes": "maxRenderSize and the pixel cap are tested (OffscreenExportTests, StillCaptureTests), ExportGeometry in ExportGeometryTests. The code guarantees only the OpenGL ES 3.0 floor of 2048 per edge; real device limits are measured in A19-P05 (G-DEVICE), never assumed. Fitting each template to the reported limit with the fallback to the largest size that fits is G-TEMPLATES (A19-P01). Tiling is rejected for 0.1 (research D6)."
+   "notes": "maxRenderSize and the pixel cap are tested (OffscreenExportTests, StillCaptureTests), ExportGeometry in ExportGeometryTests. The code guarantees only the OpenGL ES 3.0 floor of 2048 per edge; real device limits are measured in A19-P05 (G-DEVICE), never assumed. Fitting each template to the reported limit with the fallback to the largest size that fits is G-TEMPLATES (A19-P01). Tiling is rejected for 0.1 (research D6). G-TEMPLATES closed in A19-P01; the row stays open for its remaining gaps."
   },
   {
    "id": "M03",
@@ -408,7 +408,7 @@
     "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/ExportSheet.swift",
     "symbol": "ExportModel"
    },
-   "notes": "Tested in OffscreenExportTests (pngData), StillCaptureTests, TemporaryFolderTests and ExportGeometryTests. Missing: JPEG and HEIC (G-ENCODE), an export job with progress and cancellation (G-EXPORTJOB), the request and result model (G-MODEL), the share-sheet path with the permission word (G-SAVE) and video (G-VIDEO)."
+   "notes": "Tested in OffscreenExportTests (pngData), StillCaptureTests, TemporaryFolderTests and ExportGeometryTests. Missing: JPEG and HEIC (G-ENCODE), an export job with progress and cancellation (G-EXPORTJOB), the request and result model (G-MODEL), the share-sheet path with the permission word (G-SAVE) and video (G-VIDEO). G-MODEL, G-VIDEO closed in A19-P01; the row stays open for its remaining gaps."
   },
   {
    "id": "M06",
@@ -463,7 +463,7 @@
     "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/GenerativeArtPresenter.swift",
     "symbol": "ArtCanvasScene"
    },
-   "notes": "The machinery is tested (FullScreenShaderSceneTests, ShaderBundleTests, ParametersTests, NamedLibraryTests). The curated scenes and their shaders are G-SCENES (A19-P02); the presets and their editing are G-EDITOR (A19-P03) over the project model G-MODEL (A19-P01)."
+   "notes": "The machinery is tested (FullScreenShaderSceneTests, ShaderBundleTests, ParametersTests, NamedLibraryTests). The curated scenes and their shaders are G-SCENES (A19-P02); the presets and their editing are G-EDITOR (A19-P03) over the project model G-MODEL (A19-P01). G-MODEL closed in A19-P01; the row stays open for its remaining gaps."
   },
   {
    "id": "M07",
@@ -500,7 +500,7 @@
     "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/ExportSheet.swift",
     "symbol": "ExportRunner"
    },
-   "notes": "ExportAspect (public init with any ratio) and ExportSize are tested (ExportGeometryTests); the canvas overlay is tested (CanvasOverlayTests). No catalog of device screen sizes or safe areas exists anywhere: the templates with their provenance are G-TEMPLATES (A19-P01), the crop and safe-area guides drawn as native overlay are G-EDITOR (A19-P03)."
+   "notes": "ExportAspect (public init with any ratio) and ExportSize are tested (ExportGeometryTests); the canvas overlay is tested (CanvasOverlayTests). No catalog of device screen sizes or safe areas exists anywhere: the templates with their provenance are G-TEMPLATES (A19-P01), the crop and safe-area guides drawn as native overlay are G-EDITOR (A19-P03). G-TEMPLATES closed in A19-P01; the row stays open for its remaining gaps."
   },
   {
    "id": "M08",
@@ -531,13 +531,13 @@
     "file": "Packages/ExperiencesCreative/SimulationLab/Experience/SimulationCapture.swift",
     "symbol": "SimulationCapture"
    },
-   "notes": "PNG tagged sRGB exists and is tested (OffscreenExportTests). JPEG and HEIC through the same ImageIO path, tagged sRGB and verified by reading the file back, are G-ENCODE (VisualCoreRendering, A19-P02); the format choice in the request is G-MODEL."
+   "notes": "PNG tagged sRGB exists and is tested (OffscreenExportTests). JPEG and HEIC through the same ImageIO path, tagged sRGB and verified by reading the file back, are G-ENCODE (VisualCoreRendering, A19-P02); the format choice in the request is G-MODEL. G-MODEL closed in A19-P01; the row stays open for its remaining gaps."
   },
   {
    "id": "M09",
    "capability": "Version 0.1 feature 04: an optional short video export, only after encoder and resource feasibility is shown",
    "source": "manual v0.1 feature 04; manual §13 risk 3; spec clarification 5",
-   "status": "upstream gap",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
@@ -556,7 +556,7 @@
     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillCapture.swift",
     "symbol": "StillCapture"
    },
-   "notes": "No framework product or experience writes video (no AVAssetWriter, pixel buffer or VideoToolbox use; grep 2026-11-17). Sequential offscreen frames at chosen times are the only building block. Feasibility from public APIs is decided in A19-P01 (G-VIDEO, app-local; any encoder assessed for VisualCore ownership then); until it is shown feasible no video code, copy or control exists."
+   "notes": "No framework product or experience writes video (no AVAssetWriter, pixel buffer or VideoToolbox use; grep 2026-11-17). Sequential offscreen frames at chosen times are the only building block. Feasibility from public APIs is decided in A19-P01 (G-VIDEO, app-local; any encoder assessed for VisualCore ownership then); until it is shown feasible no video code, copy or control exists. Available from A19-P01 as decided, not as built: G-VIDEO is closed by the no-go decision for version 0.1 (docs/apps/living-wallpapers/video-decision.md), so feature 04's obligation for 0.1 is the recorded decision and its guard (specs/138-lw-p01-export-contract/scan-platform-claims.sh refuses a movie encoder and the word in the experience's sources); no control, copy or code for it exists in 0.1."
   },
   {
    "id": "M10",
@@ -667,7 +667,7 @@
     "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/ExportSheet.swift",
     "symbol": "ExportRunner"
    },
-   "notes": "renderOffscreen throws invalidSize before any GPU work (OffscreenExportTests); ExportGeometry clamps (ExportGeometryTests). The template fit and the offered fallback are G-TEMPLATES (A19-P01); device limits are G-DEVICE (A19-P05)."
+   "notes": "renderOffscreen throws invalidSize before any GPU work (OffscreenExportTests); ExportGeometry clamps (ExportGeometryTests). The template fit and the offered fallback are G-TEMPLATES (A19-P01); device limits are G-DEVICE (A19-P05). G-TEMPLATES closed in A19-P01; the row stays open for its remaining gaps."
   },
   {
    "id": "M13",
@@ -865,7 +865,7 @@
    "id": "M19",
    "capability": "Device templates with provenance: iPhone and iPad screen sizes and safe areas as app data, each with a provenance record (Apple's published screen sizes)",
    "source": "manual v0.1 feature 02; spec clarification 5",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreScenes/ExportGeometry.swift",
@@ -884,7 +884,7 @@
     "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/ExportSheet.swift",
     "symbol": "ExportRunner"
    },
-   "notes": "ExportAspect and ExportSize are tested (ExportGeometryTests); no device catalog exists anywhere (grep 2026-11-17). G-TEMPLATES (app-local, A19-P01)."
+   "notes": "ExportAspect and ExportSize are tested (ExportGeometryTests); no device catalog exists anywhere (grep 2026-11-17). G-TEMPLATES (app-local, A19-P01). Available from A19-P01: G-TEMPLATES is closed; the nine templates with portrait and landscape sizes, the approximate safe-area guides and the provenance record are LivingWallpapersCore/CanvasTemplates.swift (app-local), fitted through ExportGeometry and ExportAspect by ExportPlanner.swift (TemplateTests, PlannerTests)."
   },
   {
    "id": "M20",
@@ -1153,7 +1153,7 @@
    "justification": "The project model (scene, preset, template, crop, output format, animation time), export requests and results with their validation are the experience's domain, GPU-free in its Core (manual phase 01).",
    "phase": 1,
    "test": "Core host tests: a request names scene, template, format and time; invalid requests refused; results record size, format and profile; project documents round-trip and migrate",
-   "closed": null
+   "closed": "A19-P01"
   },
   {
    "id": "G-TEMPLATES",
@@ -1168,7 +1168,7 @@
    "justification": "iPhone and iPad templates (pixel size, safe areas) are app data with a provenance record of Apple's published screen sizes; fitting a template to maxRenderSize and the pixel cap and offering the largest size that fits are app rules over ExportGeometry (manual phase 01). No tiling in 0.1.",
    "phase": 1,
    "test": "Core host tests: every template has provenance; a template above the reported limit or the pixel cap is refused before allocation and the fallback is the largest even size that fits with the same aspect; fixtures at 2048, 4096 and 8192 limits",
-   "closed": null
+   "closed": "A19-P01"
   },
   {
    "id": "G-VIDEO",
@@ -1181,7 +1181,7 @@
    "justification": "Video is optional. A19-P01 decides feasibility from public APIs (encoder, disk and thermal cost, cancellation) and records the decision; any encoder is assessed for VisualCore ownership then. Until it is shown feasible no video code, copy or control exists.",
    "phase": 1,
    "test": "Decision record in A19-P01 with the public API, the measured or bounded cost and the owner; a source scan finds no AVAssetWriter, VideoToolbox or video copy unless the decision is go",
-   "closed": null
+   "closed": "A19-P01"
   },
   {
    "id": "G-ENCODE",
