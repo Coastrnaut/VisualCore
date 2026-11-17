@@ -62,7 +62,7 @@ VisualCore change. Precedent: `specs/146-zg-p02-sand-renderer/tasks.md`. Rollbac
   AuroraCoreTests AuroraExperienceTests`), the documented API, isolation and core purity (review checkpoint)
 - [X] T-A21-210 Contract: G-CONTROLS, G-CAP and G-CHROME closed by "A21-P02"; rows whose gaps are all closed become — Verified 2026-11-17: 2026-11-17: .autonomy/checks/A21-P02.contract.json exit 0; G-CONTROLS, G-CAP and G-CHROME closed by A21-P02; M07, M11 and M18 available; M14 stays open for G-COMPOSITE and G-DEVICE
   available with evidence (`--name contract`)
-- [ ] T-A21-211 Catalog (`--name catalog`); app build and unit (`xcodegen generate --spec project.yml`; `--name app-unit
+- [X] T-A21-211 Catalog (`--name catalog`); app build and unit (`xcodegen generate --spec project.yml`; `--name app-unit — Verified 2026-11-17: 2026-11-17: .autonomy/checks/A21-P02.catalog.json, A21-P02.app-unit-2.json (xcodegen generate; app-build-for-testing-ios27 and app-unit-ios27), A21-P02.verify-27.json (the runner on iOS 27.2 for a21.aurora), A21-P02.experience-packages.json (21 experiences) and A21-P02.script-tests.json, all exit 0
   -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`); runner (`--name verify-27 --
   python3 scripts/verify_experiences.py --only a21.aurora --runtime 27`); packages and script tests
 - [ ] T-A21-212 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
