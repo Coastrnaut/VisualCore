@@ -1,0 +1,74 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/A18-P05.ac-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing AmbientClockCoreTests AmbientClockExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A18-P05.ac-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A18-P05.app-ui.json",
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27 app-ui-ios27-z2",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A18-P05.app-ui.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A18-P05.cached-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --only-testing VisualCoreRenderingTests/CachedSceneTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A18-P05.cached-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A18-P05.catalog.json",
+      "command": "python3 scripts/build_catalog.py --check",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A18-P05.catalog.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A18-P05.contract.json",
+      "command": "python3 scripts/check_app_contract.py --app ambient-clock --render",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A18-P05.contract.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A18-P05.documented-api.json",
+      "command": "python3 scripts/check_documented_api.py --sources Packages/ExperiencesCreative/AmbientClock",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A18-P05.documented-api.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A18-P05.experience-packages.json",
+      "command": "python3 scripts/check_experience_packages.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A18-P05.experience-packages.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A18-P05.public-api.json",
+      "command": "python3 scripts/check_public_api.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A18-P05.public-api.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A18-P05.rendering-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --only-testing VisualCoreRenderingTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A18-P05.rendering-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A18-P05.script-tests.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A18-P05.script-tests.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A18-P05.verify-27.json",
+      "command": "python3 scripts/verify_experiences.py --only a18.ambient-clock --runtime 27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A18-P05.verify-27.log"
+    }
+  ],
+  "generated": "2026-11-17T04:23:16+00:00",
+  "method": "deterministic-run-check",
+  "stage": "A18-P05",
+  "status": "pass"
+}
