@@ -26,7 +26,7 @@ VisualCore change. Precedent: `specs/146-zg-p02-sand-renderer/tasks.md`. Rollbac
   from `SkyClock` by frame deltas, `maxFramesPerSecond` 30, rebuild after context loss or resize); the hue shift applied to the palette before `SkyUniforms` (data-model "Hue"); `SkyBlend` ("1.5 s
   of frame time", smoothstep, from the current blend, immediate under Reduce Motion); native controls with spoken
   labels; the factory as Digital Zen Garden's (FR-A21-201, 202, 204, 207)
-- [ ] T-A21-204 [US1] Write `Packages/ExperiencesCreative/Aurora/ExperienceTests/{AuroraTestSupport,AuroraCoreTests,
+- [X] T-A21-204 [US1] Write `Packages/ExperiencesCreative/Aurora/ExperienceTests/{AuroraTestSupport,AuroraCoreTests, — Verified 2026-11-17: 2026-11-17: AuroraTestSupport, AuroraCoreTests, BlendTests and RebuildTests: actions in range accepted, out of range or fractional refused with the state unchanged, snapshot round trip and restore refusals, the blend's duration, interruption and Reduce Motion, the picture equal after recreateContext and a resize; .autonomy/checks/A21-P02.au-ios27.json exit 0; written by an agent, retested
   BlendTests,RebuildTests}.swift`: every action accepted in range and refused outside or fractional; snapshot round
   trip and restore refusals; the blend's duration, interruption and Reduce Motion; the picture equal after
   `recreateContext` and a resize (SC-A21-201)
