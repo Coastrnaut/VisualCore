@@ -18,7 +18,7 @@ only).
 
 ## Phase 4: User Story 2 — The reference stays proven (P1)
 
-- [ ] T-A20-004 [US2] Reference chunk 1 (`--name reference-1 -- python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean`)
+- [X] T-A20-004 [US2] Reference chunk 1 (`--name reference-1 -- python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean`) — Verified 2026-11-17: 2026-11-17: .autonomy/checks/A20-P00.reference-1.json exit 0 (reference-engine-xcframework, reference-build-projectm-ios-sim, reference-clean pass)
 - [ ] T-A20-005 [US2] Reference chunk 2 (`--name reference-2 -- python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26`); record the 7 steps, commands and results in `docs/apps/digital-zen-garden/regression-baseline.md` (FR-A20-004, SC-A20-003)
 
 ## Phase 5: User Story 3 — The shell builds with the experience absent (P2)
