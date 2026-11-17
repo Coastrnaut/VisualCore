@@ -28,7 +28,7 @@ migration, no VisualCore change).
 
 ## Phase 5: Story 4 — interface tests (P2)
 
-- [ ] T-A19-608 [P] [US4] Write `Apps/VisualCore/Tests/UI/LivingWallpapers/LWHistoryUITests.swift` per Clarifications Q5 (with `LWSupport`; export iPhone SE, `history-0` names it, Clear history, no `history-0` and no `clear-history`; under 60 s), and add it to the serial chunk `a3` in `scripts/release_check.py` (lead) (FR-A19-607)
+- [X] T-A19-608 [P] [US4] Write `Apps/VisualCore/Tests/UI/LivingWallpapers/LWHistoryUITests.swift` per Clarifications Q5 (with `LWSupport`; export iPhone SE, `history-0` names it, Clear history, no `history-0` and no `clear-history`; under 60 s), and add it to the serial chunk `a3` in `scripts/release_check.py` (lead) (FR-A19-607) — Verified 2026-11-17: 2026-11-17: Apps/VisualCore/Tests/UI/LivingWallpapers/LWHistoryUITests.swift (export iPhone SE, history-0 names it, Clear history, neither history-0 nor clear-history remains) and LWHistoryUITests added to the serial chunk a3 in scripts/release_check.py; .autonomy/checks/A19-P06.app-ui.json exit 0 (a3: 5/5 interface tests, LWHistoryUITests 30.2 s in the interim run); written by an agent, retested
 
 ## Phase 6: Records and evidence
 

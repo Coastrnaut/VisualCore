@@ -263,7 +263,7 @@ UI_CHUNKS = {
     "x2": ["SLExploreUITests", "SLLibraryUITests"],   # feature 122 A16-P06 (T-A16-608)
     "y2": ["IAExploreUITests", "IASearchUITests"],   # feature 129 A17-P06 (T-A17-608)
     "z2": ["ACPowerUITests", "ACThemeUITests"],   # features 135 and 136 A18-P05, A18-P06 (T-A18-505, T-A18-608)
-    "a3": ["LWExportUITests", "LWClaimsUITests"],   # feature 142 A19-P05 (T-A19-505)
+    "a3": ["LWExportUITests", "LWClaimsUITests", "LWHistoryUITests"],   # features 142 and 143 A19-P05, A19-P06 (T-A19-505, T-A19-608)
 }
 # Chunks that run on one simulator (feature 066 A08-P06): the oscilloscope draws every frame on the main thread, and
 # two parallel clones competing for the host's CPU kept XCTest's idle wait from settling (single tests took 60–89 s in
