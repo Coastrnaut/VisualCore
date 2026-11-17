@@ -44,7 +44,7 @@
 
 ## Phase 3: Story 3 — errors point to the authored line (P1)
 
-- [ ] T-A22-106 [P] [US3] Create `Packages/ExperiencesCreative/ShaderStudio/Core/{ShaderAssembly,DiagnosticMapper}.swift`
+- [X] T-A22-106 [P] [US3] Create `Packages/ExperiencesCreative/ShaderStudio/Core/{ShaderAssembly,DiagnosticMapper}.swift` — Verified 2026-11-17: 2026-11-17: ShaderAssembly.swift (ss/prelude.glsl, ss/shader.frag unchanged, ss/main.frag) and DiagnosticMapper.swift (MappedDiagnostic; the person's file keeps its line, other files and unknown lines go outside); .autonomy/checks/A22-P01.ss-core-ios27-2.json exit 0; written by an agent, retested
   per clarification Q1 and contracts/core.md (FR-A22-104):
   - `ShaderAssembly` gives the files `ss/prelude.glsl` (`precision highp float;`, `in vec2 v_uv;`,
     `uniform float u_time;`, `uniform vec2 u_resolution;`, `out vec4 fragColor;`, `#include "vc/noise.glsl"`,
