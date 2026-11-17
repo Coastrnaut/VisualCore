@@ -30,7 +30,7 @@ only).
 
 ## Phase 4: User Story 2 — The reference stays proven (P1)
 
-- [ ] T-A21-004 [US2] Reference chunk 1 (`--name reference-1 -- python3 scripts/release_check.py --only
+- [X] T-A21-004 [US2] Reference chunk 1 (`--name reference-1 -- python3 scripts/release_check.py --only — Verified 2026-11-17: 2026-11-17: .autonomy/checks/A21-P00.reference-1.json exit 0 (reference-engine-xcframework, reference-build-projectm-ios-sim, reference-clean pass)
   reference-engine-xcframework reference-build-projectm-ios-sim reference-clean`)
 - [ ] T-A21-005 [US2] Reference chunk 2 (`--name reference-2 -- python3 scripts/release_check.py --only
   reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27
