@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesCreative",
+    "--scheme",
+    "ExperiencesCreative-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "AmbientClockCoreTests",
+    "AmbientClockExperienceTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing AmbientClockCoreTests AmbientClockExperienceTests",
+  "elapsed_seconds": 8.325,
+  "exit_code": 0,
+  "finished": "2026-11-17T03:37:37+00:00",
+  "log": ".autonomy/logs/A18-P03.ac-ios27.log",
+  "log_sha256": "e67fde05be428b3a62a2039c9db17dae9f2479a4de51763957570866db214c9a",
+  "name": "ac-ios27",
+  "stage": "A18-P03",
+  "started": "2026-11-17T03:37:29+00:00",
+  "timed_out": false
+}

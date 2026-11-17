@@ -50,7 +50,8 @@ private let invalidChoiceSteps: [AmbientStep] = [
     @Test func theControlsAreDeclaredInOrder() {
         let ids = AmbientCore.controls.map(\.id)
         #expect(ids == AmbientCore.actionIDs)
-        #expect(ids == ["time.set", "time.changed", "clock.format", "theme.motion", "theme.speed"])
+        #expect(ids == ["time.set", "time.changed", "clock.format", "theme.motion", "theme.speed", "theme.select",
+                       "theme.palette"])
         #expect(AmbientCore.experienceID == "a18.ambient-clock")
     }
 
@@ -148,14 +149,14 @@ private let invalidChoiceSteps: [AmbientStep] = [
         #expect(core.revision == 1)
         let payload = try core.snapshotPayload()
         let object = try #require(try JSONSerialization.jsonObject(with: payload) as? [String: Any])
-        #expect(Set(object.keys) == ["hourCycle", "showSeconds", "showDate", "motion", "speed"])
+        #expect(Set(object.keys) == ["hourCycle", "motion", "palette", "showDate", "showSeconds", "speed", "theme"])
         let restored = try AmbientCore.restore(payload: payload, seed: 1)
         #expect(restored.hourCycle == 2 && restored.showSeconds && !restored.showDate)
         #expect(!restored.motion && restored.speed == 0.75)
         #expect(restored.instant == 0 && restored.revision == 0)
         #expect(try ambientDigest(restored) == ambientDigest(core))
         #expect(try restored.snapshotPayload() == payload)
-        #expect(AmbientCore.migrations.currentVersion == 1)
+        #expect(AmbientCore.migrations.currentVersion == 2)
     }
 
     @Test func anEngineSnapshotRestoresIntoAnotherEngine() async throws {
@@ -172,11 +173,13 @@ private let invalidChoiceSteps: [AmbientStep] = [
     }
 
     @Test func aStoredValueOutsideItsRangeIsRefused() throws {
-        let speed = Data(#"{"hourCycle":0,"motion":true,"showDate":true,"showSeconds":false,"speed":3}"#.utf8)
+        let speed = Data(#"{"hourCycle":0,"motion":true,"palette":0,"showDate":true,"showSeconds":false,"speed":3,"theme":0}"#
+            .utf8)
         #expect(throws: AmbientRestoreError.outOfRange("speed")) {
             _ = try AmbientCore.restore(payload: speed, seed: 1)
         }
-        let cycle = Data(#"{"hourCycle":3,"motion":true,"showDate":true,"showSeconds":false,"speed":1}"#.utf8)
+        let cycle = Data(#"{"hourCycle":3,"motion":true,"palette":0,"showDate":true,"showSeconds":false,"speed":1,"theme":0}"#
+            .utf8)
         #expect(throws: AmbientRestoreError.outOfRange("hourCycle")) {
             _ = try AmbientCore.restore(payload: cycle, seed: 1)
         }

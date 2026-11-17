@@ -4,7 +4,9 @@
     "time.changed",
     "clock.format",
     "theme.motion",
-    "theme.speed"
+    "theme.speed",
+    "theme.select",
+    "theme.palette"
   ],
   "experience" : "a18.ambient-clock",
   "kind" : "creative",
@@ -14,7 +16,7 @@
 
       ],
       "expect" : {
-        "initialDigest" : "cbe8f50113c5051d66179c7f056aaf0666c7858ebf6b2078ed55b6bd7e67b35c"
+        "initialDigest" : "b8a8bb9832f8268b80d0cb2df688a995abe538b7f96dd412616459abb407dc91"
       },
       "name" : "launch-first-frame",
       "seed" : "1"
@@ -57,8 +59,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "2b3b49064a14d29e1f0236439df64108483db44ec8d33246e201e7f50738849e",
-        "initialDigest" : "cbe8f50113c5051d66179c7f056aaf0666c7858ebf6b2078ed55b6bd7e67b35c"
+        "finalDigest" : "81bb94180951f77d3ad541a8a879f3516fa6599cbce5ca164e9e1e6ae9ce31f4",
+        "initialDigest" : "b8a8bb9832f8268b80d0cb2df688a995abe538b7f96dd412616459abb407dc91"
       },
       "name" : "input-response",
       "seed" : "1"
@@ -146,6 +148,16 @@
           },
           "result" : "action.wrong-value-count",
           "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "theme.select",
+            "values" : [
+              4
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
         }
       ],
       "expect" : {
@@ -192,8 +204,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "2b3b49064a14d29e1f0236439df64108483db44ec8d33246e201e7f50738849e",
-        "initialDigest" : "cbe8f50113c5051d66179c7f056aaf0666c7858ebf6b2078ed55b6bd7e67b35c"
+        "finalDigest" : "81bb94180951f77d3ad541a8a879f3516fa6599cbce5ca164e9e1e6ae9ce31f4",
+        "initialDigest" : "b8a8bb9832f8268b80d0cb2df688a995abe538b7f96dd412616459abb407dc91"
       },
       "name" : "save-restore",
       "seed" : "1"
@@ -236,7 +248,7 @@
         }
       ],
       "expect" : {
-        "initialDigest" : "cbe8f50113c5051d66179c7f056aaf0666c7858ebf6b2078ed55b6bd7e67b35c",
+        "initialDigest" : "b8a8bb9832f8268b80d0cb2df688a995abe538b7f96dd412616459abb407dc91",
         "resetDigest" : true
       },
       "name" : "reset",
@@ -297,8 +309,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "cbe8f50113c5051d66179c7f056aaf0666c7858ebf6b2078ed55b6bd7e67b35c",
-        "initialDigest" : "cbe8f50113c5051d66179c7f056aaf0666c7858ebf6b2078ed55b6bd7e67b35c",
+        "finalDigest" : "b8a8bb9832f8268b80d0cb2df688a995abe538b7f96dd412616459abb407dc91",
+        "initialDigest" : "b8a8bb9832f8268b80d0cb2df688a995abe538b7f96dd412616459abb407dc91",
         "outcome" : "showing-time"
       },
       "name" : "fixture-time-zone-changed",
@@ -318,8 +330,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "2253b5b48648ae7f07adc59e1659dcb857713761bb44c6f44b68505f5f7f944b",
-        "initialDigest" : "cbe8f50113c5051d66179c7f056aaf0666c7858ebf6b2078ed55b6bd7e67b35c",
+        "finalDigest" : "e7497559bd2712029dad8889e5a112490a90e87d392586daba0b3c78b49bc75b",
+        "initialDigest" : "b8a8bb9832f8268b80d0cb2df688a995abe538b7f96dd412616459abb407dc91",
         "outcome" : "motion-off"
       },
       "name" : "fixture-motion-off",
@@ -341,8 +353,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "96cecb825de6a470fe7751620782b42a03fece8bd880c33688916dd9c5ad9b83",
-        "initialDigest" : "cbe8f50113c5051d66179c7f056aaf0666c7858ebf6b2078ed55b6bd7e67b35c",
+        "finalDigest" : "fa890be4b20761b3546fe5fd1a4c6accd38f4915c229c01b6e44779094dc0438",
+        "initialDigest" : "b8a8bb9832f8268b80d0cb2df688a995abe538b7f96dd412616459abb407dc91",
         "outcome" : "showing-time"
       },
       "name" : "fixture-twenty-four-hour",
@@ -364,8 +376,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "8f896828c20d7505ae0e459452d272cf5063ad2c9f3016e5c4df0569b08d4fad",
-        "initialDigest" : "cbe8f50113c5051d66179c7f056aaf0666c7858ebf6b2078ed55b6bd7e67b35c",
+        "finalDigest" : "0e83adc80f59f8d8f137aa109813b02600a967a87697bc2e01aabb150db8a3c1",
+        "initialDigest" : "b8a8bb9832f8268b80d0cb2df688a995abe538b7f96dd412616459abb407dc91",
         "outcome" : "showing-time"
       },
       "name" : "fixture-seconds-shown",
@@ -385,11 +397,63 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "bbfa8df779d05334b762e5d12d35ab4c3b8819fb65de57e33f25e1c3f281a81b",
-        "initialDigest" : "cbe8f50113c5051d66179c7f056aaf0666c7858ebf6b2078ed55b6bd7e67b35c",
+        "finalDigest" : "8a1f949de6f5b62abcce3324e4fbbc14d7c20f65912d16852aceec63ee5a53c3",
+        "initialDigest" : "b8a8bb9832f8268b80d0cb2df688a995abe538b7f96dd412616459abb407dc91",
         "outcome" : "showing-time"
       },
       "name" : "fixture-slow-motion",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "theme.select",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "fa9bdb3fbf7a1d0f58e5ea73ac25f60185cad6912defdbb3f5b0b64ebe24b53b",
+        "initialDigest" : "b8a8bb9832f8268b80d0cb2df688a995abe538b7f96dd412616459abb407dc91",
+        "outcome" : "theme-wave-field"
+      },
+      "name" : "fixture-theme-waves",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "theme.select",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "theme.palette",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "0f011ec9c5cb0fd338b461ff346d9da32ed80bde37a0c60fa29980baf5891606",
+        "initialDigest" : "b8a8bb9832f8268b80d0cb2df688a995abe538b7f96dd412616459abb407dc91",
+        "outcome" : "theme-sdf-shapes"
+      },
+      "name" : "fixture-theme-shapes-palette",
       "seed" : "1"
     }
   ],

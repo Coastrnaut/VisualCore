@@ -5,7 +5,10 @@
 //     instant, then `time.changed [2]`), `fixture-motion-off` (`theme.motion [0]`), `fixture-twenty-four-hour`
 //     (`clock.format [2, 0, 1]`), `fixture-seconds-shown` (`clock.format [0, 1, 1]`) and `fixture-slow-motion`
 //     (`theme.speed [0.25]`), expecting the outcomes `showing-time`, `motion-off`, `showing-time`, `showing-time` and
-//     `showing-time`.
+//     `showing-time`;
+//   - feature 133 (A18-P03) T-A18-307: `fixture-theme-waves` (`theme.select [2]`) and `fixture-theme-shapes-palette`
+//     (`theme.select [3]`, `theme.palette [2]`), expecting `theme-wave-field` and `theme-sdf-shapes`; the rejection
+//     scenario also refuses `theme.select [4]` (out of range).
 // The completion scenario turns motion off and expects `motion-off`. The instant and the time-change revision come
 // from the wall clock and are left out of the digest (research D1), so a fixture of time actions alone keeps the
 // opening digest. The expected digests are derived by playing the entries on a core exactly as the engine plays them
@@ -39,6 +42,14 @@ extension AmbientCore {
         ("fixture-slow-motion",
          [ScenarioStep(steps: 1, action: ScriptedAction("theme.speed", [0.25]), result: "accepted")],
          showingTimeCode),
+        // Feature 133 (A18-P03) T-A18-307 (FR-A18-308): two theme fixtures.
+        ("fixture-theme-waves",
+         [ScenarioStep(steps: 1, action: ScriptedAction("theme.select", [2]), result: "accepted")],
+         themeCodePrefix + "wave-field"),
+        ("fixture-theme-shapes-palette",
+         [ScenarioStep(steps: 1, action: ScriptedAction("theme.select", [3]), result: "accepted"),
+          ScenarioStep(steps: 1, action: ScriptedAction("theme.palette", [2]), result: "accepted")],
+         themeCodePrefix + "sdf-shapes"),
     ]
 
     /// The actions of input-response, save-restore and reset: 24-hour time with seconds, a slower background, the
@@ -65,6 +76,7 @@ extension AmbientCore {
             ScenarioStep(steps: 0, action: ScriptedAction("time.changed", [0.5]), result: invalid),
             ScenarioStep(steps: 0, action: ScriptedAction("theme.motion", [0.5]), result: invalid),
             ScenarioStep(steps: 0, action: ScriptedAction("clock.format", [0, 1]), result: "action.wrong-value-count"),
+            ScenarioStep(steps: 0, action: ScriptedAction("theme.select", [4]), result: "action.out-of-range"),
         ]
     }
 

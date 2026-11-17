@@ -28,14 +28,15 @@ private func playManifest(_ spec: ScenarioSpec) async throws -> (initial: String
 }
 
 @Suite struct AmbientManifestTests {
-    /// The names of the five fixtures.
+    /// The names of the seven fixtures (five of A18-P02, two themes of A18-P03).
     static let fixtureNames = ["fixture-time-zone-changed", "fixture-motion-off", "fixture-twenty-four-hour",
-                               "fixture-seconds-shown", "fixture-slow-motion"]
+                               "fixture-seconds-shown", "fixture-slow-motion", "fixture-theme-waves",
+                               "fixture-theme-shapes-palette"]
 
-    @Test func theManifestIsValidWithTheStandardScenariosAndFiveFixtures() {
+    @Test func theManifestIsValidWithTheStandardScenariosAndSevenFixtures() {
         let manifest = AmbientCore.manifest(for: manifestID)
         let problems = ScenarioManifestValidator.problems(manifest, controls: AmbientCore.controls,
-                                                          content: ContentRequirement(fixtures: 5))
+                                                          content: ContentRequirement(fixtures: 7))
         #expect(problems.isEmpty, "\(problems)")
         #expect(manifest.scenarios.map(\.name) == ScenarioManifest.standardNames + Self.fixtureNames)
         #expect(AmbientCore.fixtures.map(\.name) == Self.fixtureNames)
@@ -80,6 +81,10 @@ private func playManifest(_ spec: ScenarioSpec) async throws -> (initial: String
                 #expect(core.hourCycle == 0 && core.showSeconds && core.showDate)
             case "fixture-slow-motion":
                 #expect(core.speed == 0.25 && core.motion)
+            case "fixture-theme-waves":
+                #expect(core.theme == 2 && core.palette == 0)
+            case "fixture-theme-shapes-palette":
+                #expect(core.theme == 3 && core.palette == 2)
             default:
                 Issue.record("unexpected fixture \(fixture.name)")
             }

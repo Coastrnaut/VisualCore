@@ -388,7 +388,9 @@ extension ExperienceRegistry {
     /// A18 Ambient Clock (feature 132, A18-P02): a candidate until X-A18.
     fileprivate static var ambientClock: ExperienceRegistration? {
         guard let id = AmbientClockExperience.id else { return nil }
-        var registration = ExperienceRegistration(id: id, core: AmbientCore.self) { launch in
+        // Schema 2 (feature 133, A18-P03) adds the theme and palette; the stored schema-1 example proves the migration.
+        let examples = [AmbientCore.schemaOneExample()].compactMap { $0 }
+        var registration = ExperienceRegistration(id: id, core: AmbientCore.self, examples: examples) { launch in
             let system = SystemAccessibilityObserver.systemValues()
             return AmbientClockExperience.make(
                 id: id, storage: launch.storage,

@@ -1,11 +1,27 @@
 // AmbientPresenter — feature 132 T-A18-203 (FR-A18-202–207; G-OVERLAY/G-BUDGETS; clarifications Q1–Q5; contracts/
-// experience.md). Draws Ambient Clock through the host only and owns its presentation state:
+// experience.md); feature 133 (A18-P03) T-A18-304, T-A18-306 (FR-A18-301, FR-A18-303, FR-A18-304, FR-A18-306;
+// G-THEMES/G-TRANSITION/G-FAVOURITES; clarifications Q1, Q2, Q4). Draws Ambient Clock through the host only and owns
+// its presentation state:
 //
-//   - Background: one `FullScreenShaderScene` running `NoiseGradientTheme`, made and compiled in `setup` (so it is
-//     remade after a context recreation) and released in `teardown`; a compile or link error throws
-//     `NoiseGradientShaderError`, which fails the session's setup with its message. `draw` sets the uniforms from the
-//     core and the frame (octaves and pixel block of the tier; the effective time: 0 with motion off or Reduce Motion
-//     on, else frame time × speed) and draws exactly once.
+//   - Background: four theme scenes (`ThemeShaders.makeScene(themeIndex:)`, a `FullScreenShaderScene` each), made
+//     lazily, drawn through one VisualCore `CrossfadeScene`, which owns their lifecycle while it holds them: it sets
+//     up, resizes and tears down its children, and `replaceIncoming(_:context:)` sets up the new theme and tears down
+//     the one it drops. The crossfade is made in `setup` with the shown theme as both children at progress 1 (so it
+//     is remade after a context recreation) and released in `teardown`. A compile or link error of the noise
+//     gradient at setup throws `NoiseGradientShaderError`, which fails the session's setup with its message; another
+//     theme failing at setup falls back to the noise gradient.
+//   - Theme change: `draw` compares the core's theme and palette with the shown ones. The first frame after `setup`
+//     cuts to the core's choice; afterwards, under Reduce Motion (`transitionDuration(1.2, reduceMotion:)` is 0) the
+//     change is a cut (progress 1 on that frame), else a fade of 1.2 s eased with smoothstep over the frame time from
+//     the frame that saw the change. A change during a fade restarts it from the picture shown (the crossfade
+//     captures it). Before a new theme is handed to the crossfade it is compiled once on its own and torn down
+//     again; a theme whose fragment fails keeps the previous theme drawn, records `lastThemeError` and is not tried
+//     again until the core asks for another choice (the time and its overlay are untouched). `failNextThemeCompile`
+//     (a test-only seam) makes the next theme change compile a broken fragment.
+//   - Draw: the incoming theme's uniforms come from the core and the frame (its count at the tier,
+//     `ThemeCatalog.budget(theme:tier:)`; the pixel block of the tier; its palette from `ThemeCatalog`; the effective
+//     time: 0 with motion off or Reduce Motion on, else frame time × speed); one draw outside a fade, three during
+//     one (the still outgoing picture, the incoming theme and the mix).
 //   - Time: the presenter reads the wall time only from its injected `ClockSource` (FR-A18-206) and the system's
 //     locale and zone only from its injected environment provider, at the moment of each event. Its display model is
 //     the A18-P01 `AmbientClockState` (`display`); `tick(port:)` sends `time.set` with the source's instant and
@@ -28,6 +44,7 @@ import SwiftUI
 import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreRendering
+import VisualCoreSimulation
 
 /// What the overlay and the controls show, updated only when a field changes.
 @MainActor
@@ -45,6 +62,10 @@ final class AmbientMirror {
     var motion = true
     /// The background's speed.
     var speed = AmbientCore.defaultSpeed
+    /// The theme's index (0–3).
+    var theme = 0
+    /// The palette's index (0–2).
+    var palette = 0
 }
 
 /// Draws Ambient Clock and owns its presentation state (see the file header).
@@ -55,6 +76,8 @@ final class AmbientPresenter: ExperiencePresenter {
     /// Supplies the system's locale and time zone at the moment of an event.
     typealias Environment = @Sendable () -> (Locale, TimeZone)
 
+    /// The length of a theme crossfade, seconds (0 under Reduce Motion, `transitionDuration`).
+    static let fadeDuration = 1.2
     /// The canvas label before any instant is known.
     static let fallbackDescription = "Ambient Clock"
     /// The system environment: `Locale.current` and `TimeZone.current` when called.
@@ -79,16 +102,43 @@ final class AmbientPresenter: ExperiencePresenter {
     }
     /// The time-change monitor (`applicationNames` over `center`); running between `setup` and `teardown`.
     private(set) var monitor: TimeChangeMonitor?
-    /// The theme's full-screen scene; made in `setup`, released in `teardown`.
-    private(set) var scene: FullScreenShaderScene?
+    /// The saved favourites (`favourites.json` in the experience's storage), set by the factory; nil only for a
+    /// presenter made without storage (tests).
+    var favourites: AmbientFavourites?
+    /// The crossfade drawing the themes; made in `setup`, released in `teardown`.
+    private(set) var crossfade: CrossfadeScene?
+    /// The scene drawn (the crossfade); nil before `setup` and after `teardown`.
+    var scene: CrossfadeScene? { crossfade }
+    /// The theme scenes made so far, by theme index (lazily; their GPU objects are the crossfade's to manage).
+    private var themeScenes: [Int: FullScreenShaderScene] = [:]
+    /// The theme drawn (the incoming one during a fade).
+    private(set) var shownTheme = 0
+    /// The palette drawn (the incoming one during a fade).
+    private(set) var shownPalette = 0
+    /// The frame time at which the running fade started; nil when no fade runs.
+    private(set) var fadeStart: Double?
+    /// The choice whose theme failed to compile; not tried again until the core asks for another choice.
+    private var refusedChoice: ThemeChoice?
+    /// Whether the next frame cuts to the core's choice (the first frame after `setup`).
+    private var cutNextChange = true
+    /// The last theme compile failure (`ThemeShaderError.description`); nil after a theme was shown successfully.
+    private(set) var lastThemeError: String?
+    /// Test-only seam: when true, the next theme change compiles a broken fragment (and fails); reset by that change.
+    var failNextThemeCompile = false
     /// The last core instant `describe` followed; nil before the first.
     private var followedInstant: Double?
     /// The number of full-screen draws of the last frame (1 when drawn, 0 otherwise).
     private(set) var lastDrawCount = 0
     /// The uniform time of the last frame.
     private(set) var lastUniformTime = 0.0
-    /// The noise octaves of the last frame.
-    private(set) var lastOctaves = 0
+    /// The element count of the shown theme at the last frame's tier (octaves, cells, waves or shapes).
+    private(set) var lastCount = 0
+    /// The A18-P02 name of `lastCount` (for the noise gradient, its octaves).
+    var lastOctaves: Int { lastCount }
+    /// The number of draws of the last frame (`lastDrawCount`): 1 outside a fade, 3 during one, 0 when not drawn.
+    var drawCount: Int { lastDrawCount }
+    /// How far the crossfade is (0…1); 1 when no crossfade exists.
+    var fadeProgress: Double { crossfade?.progress ?? 1 }
     /// How many time-change events reached the presenter.
     private(set) var timeChangeCount = 0
 
@@ -182,46 +232,145 @@ final class AmbientPresenter: ExperiencePresenter {
 
     // MARK: Render scene
 
-    /// Starts the monitor, then makes and compiles the theme's scene with the host's registry (again after a
-    /// recreation); a shader error throws ``NoiseGradientShaderError``.
+    /// A theme and one of its palettes.
+    struct ThemeChoice: Equatable {
+        /// The theme's index (0–3).
+        var theme: Int
+        /// The palette's index (0–2).
+        var palette: Int
+    }
+
+    /// The scene of theme `index` (clamped), made on first use.
+    private func themeScene(_ index: Int) -> FullScreenShaderScene {
+        let theme = ThemeShaders.clamped(index)
+        if let made = themeScenes[theme] { return made }
+        let made = ThemeShaders.makeScene(themeIndex: theme)
+        themeScenes[theme] = made
+        return made
+    }
+
+    /// Starts the monitor, then makes the crossfade with the shown theme as both children at progress 1 and sets it
+    /// up with the host's registry (again after a recreation). A shader error of the noise gradient throws
+    /// ``NoiseGradientShaderError``; another theme's error falls back to the noise gradient (`lastThemeError`).
     func setup(_ context: RenderContext) throws {
         startMonitoring()
-        scene = nil
-        let made = NoiseGradientTheme.makeScene()
-        try made.setup(context)
-        if let message = made.errorMessage {
+        crossfade = nil
+        themeScenes = [:]
+        fadeStart = nil
+        refusedChoice = nil
+        cutNextChange = true
+        var theme = shownTheme
+        while true {
+            let shown = themeScene(theme)
+            let made = CrossfadeScene(from: shown, to: shown)
+            made.progress = 1
+            try made.setup(context)
+            guard let message = shown.errorMessage else {
+                crossfade = made
+                if theme != shownTheme { shownPalette = 0 }
+                shownTheme = theme
+                return
+            }
             made.teardown(context)
-            throw NoiseGradientShaderError(message: message)
+            themeScenes[theme] = nil
+            guard theme != 0 else { throw NoiseGradientShaderError(message: message) }
+            lastThemeError = ThemeShaderError(theme: theme, message: message).description
+            theme = 0
         }
-        scene = made
     }
 
-    /// Passes the new drawable size to the scene.
+    /// Passes the new drawable size to the crossfade (which resizes its children and releases its targets).
     func resize(_ context: RenderContext) {
-        scene?.resize(context)
+        crossfade?.resize(context)
     }
 
-    /// Sets the uniforms of `tier` and the effective time from `core` and `frame`, and draws the theme once.
+    /// Follows a new theme or palette of `core` (a cut or a fade), sets the incoming theme's uniforms of `tier` and
+    /// the effective time from `core` and `frame`, advances the fade and draws the crossfade.
     func draw(_ core: AmbientCore, tier: Int, context: RenderContext, frame: FrameInfo) throws {
         lastDrawCount = 0
-        guard let scene else { return }
+        guard let crossfade else { return }
+        let wanted = ThemeChoice(theme: core.theme, palette: core.palette)
+        if wanted != ThemeChoice(theme: shownTheme, palette: shownPalette), wanted != refusedChoice {
+            show(wanted, crossfade: crossfade, context: context, frame: frame, cut: cutNextChange)
+        }
+        cutNextChange = false
+        if let start = fadeStart {
+            let duration = transitionDuration(Self.fadeDuration, reduceMotion: reduceMotion)
+            let linear = duration > 0 ? min(max((frame.time - start) / duration, 0), 1) : 1
+            crossfade.progress = linear * linear * (3 - 2 * linear)
+            if linear >= 1 { fadeStart = nil }
+        }
         let time = NoiseGradientTheme.effectiveTime(frameTime: frame.time, speed: core.speed, motion: core.motion,
                                                     reduceMotion: reduceMotion)
-        scene.resize(context)
-        scene.parameters = NoiseGradientTheme.parameters(tier: tier)
-        scene.palette = NoiseGradientTheme.palette
-        scene.fixedTime = time
-        try scene.render(context, frame: frame)
+        let incoming = themeScene(shownTheme)
+        incoming.resize(context)
+        incoming.parameters = ThemeShaders.parameters(theme: shownTheme, tier: tier)
+        incoming.palette = ThemeShaders.palette(theme: shownTheme, palette: shownPalette)
+        incoming.fixedTime = time
+        try crossfade.render(context, frame: frame)
         lastUniformTime = time
-        lastOctaves = AmbientCore.octaves(forTier: tier)
-        lastDrawCount = 1
+        lastCount = ThemeCatalog.budget(theme: shownTheme, tier: tier)
+        let progress = crossfade.progress
+        lastDrawCount = progress > 0 && progress < 1 ? 3 : 1
     }
 
-    /// Releases the scene and stops the monitor.
+    /// Shows `choice`: a new theme is first compiled on its own (and torn down again); when it fails the previous
+    /// theme stays, `lastThemeError` is set and the choice is refused until another one is asked for. Then the
+    /// crossfade restarts from the picture shown towards the theme (`replaceIncoming`) and either cuts (`cut`, or
+    /// Reduce Motion) or starts a fade at the frame's time.
+    private func show(_ choice: ThemeChoice, crossfade: CrossfadeScene, context: RenderContext, frame: FrameInfo,
+                      cut: Bool) {
+        let theme = ThemeShaders.clamped(choice.theme)
+        if theme != shownTheme {
+            let broken = failNextThemeCompile
+            failNextThemeCompile = false
+            let candidate = broken ? ThemeShaders.makeScene(themeIndex: theme, broken: true) : themeScene(theme)
+            if candidate !== crossfade.from, let message = compileProblem(of: candidate, context: context) {
+                lastThemeError = ThemeShaderError(theme: theme, message: message).description
+                refusedChoice = choice
+                return
+            }
+        }
+        do {
+            try crossfade.replaceIncoming(themeScene(theme), context: context)
+        } catch {
+            lastThemeError = ThemeShaderError(theme: theme, message: String(describing: error)).description
+            refusedChoice = choice
+            return
+        }
+        shownTheme = theme
+        shownPalette = min(max(choice.palette, 0), AmbientCore.paletteCount - 1)
+        refusedChoice = nil
+        lastThemeError = nil
+        if cut || transitionDuration(Self.fadeDuration, reduceMotion: reduceMotion) == 0 {
+            crossfade.progress = 1
+            fadeStart = nil
+        } else {
+            crossfade.progress = 0
+            fadeStart = frame.time
+        }
+    }
+
+    /// Compiles `scene` on its own and tears it down again; the first diagnostic, or nil when it compiled.
+    private func compileProblem(of scene: FullScreenShaderScene, context: RenderContext) -> String? {
+        do {
+            try scene.setup(context)
+        } catch {
+            scene.teardown(context)
+            return String(describing: error)
+        }
+        let message = scene.errorMessage
+        scene.teardown(context)
+        return message
+    }
+
+    /// Releases the crossfade (and with it the theme scenes it holds) and stops the monitor.
     func teardown(_ context: RenderContext) {
         stopMonitoring()
-        scene?.teardown(context)
-        scene = nil
+        crossfade?.teardown(context)
+        crossfade = nil
+        themeScenes = [:]
+        fadeStart = nil
         lastDrawCount = 0
     }
 
@@ -241,6 +390,8 @@ final class AmbientPresenter: ExperiencePresenter {
         if mirror.showDate != core.showDate { mirror.showDate = core.showDate }
         if mirror.motion != core.motion { mirror.motion = core.motion }
         if mirror.speed != core.speed { mirror.speed = core.speed }
+        if mirror.theme != core.theme { mirror.theme = core.theme }
+        if mirror.palette != core.palette { mirror.palette = core.palette }
     }
 
     /// The canvas label: the display's spoken string (time, and the date when shown), or "Ambient Clock" before the
@@ -266,10 +417,15 @@ final class AmbientPresenter: ExperiencePresenter {
     /// set.
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
         if self.port == nil { self.port = port }
-        return AnyView(AmbientControls(port: port, mirror: mirror, presenter: self))
+        return AnyView(AmbientControls(port: port, mirror: mirror, presenter: self, favourites: favourites))
     }
 
-    /// The actions of the native controls: the format, motion and speed (`time.set` and `time.changed` are sent by
-    /// the presenter itself).
-    var nativeActions: Set<String> { ["clock.format", "theme.motion", "theme.speed"] }
+    /// The actions of the native controls: the format, motion, speed, theme and palette (`time.set` and
+    /// `time.changed` are sent by the presenter itself; a favourite sends the four theme actions).
+    var nativeActions: Set<String> { ["clock.format", "theme.motion", "theme.speed", "theme.select", "theme.palette"] }
+
+    /// The preset of what the controls show (theme, palette, speed, motion); nil when out of range.
+    var currentPreset: ThemePreset? {
+        try? ThemePreset(theme: mirror.theme, palette: mirror.palette, speed: mirror.speed, motion: mirror.motion)
+    }
 }

@@ -335,8 +335,14 @@
    "id": "M04",
    "capability": "Scene transitions: switching themes with a short crossfade between two full-screen scenes (a cut under Reduce Motion), without a frame of black and without rebuilding the clock text",
    "source": "brainstorm: scene transitions",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/CrossfadeScene.swift",
+     "symbol": "CrossfadeScene",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
      "symbol": "RenderHost.replaceScene",
@@ -378,7 +384,7 @@
    "id": "M05",
    "capability": "Configuration and presets: each theme's parameters with declared ranges, palettes, quality and motion settings as named presets; built-in presets plus saved favourites",
    "source": "brainstorm: configuration and presets",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreParameters/ParameterSchema.swift",
@@ -440,7 +446,7 @@
    "id": "M07",
    "capability": "Version 0.1 feature 02: four procedural themes (a noise gradient, a particle drift, a wave field and SDF shapes) with quality and motion controls",
    "source": "manual v0.1 feature 02; spec clarification 5",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
@@ -508,7 +514,7 @@
    "id": "M09",
    "capability": "Version 0.1 feature 04: a theme editor with saveable favourites: edit a theme's parameters and palette within their ranges, save, rename, duplicate, favourite and delete named themes",
    "source": "manual v0.1 feature 04",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCorePersistence/NamedLibrary.swift",
@@ -1308,7 +1314,7 @@
    "justification": "The other three themes (particle drift, wave field, SDF shapes), the ThemePreset model with its quality and motion controls, the built-in presets and their license entries are content (manual phase 03).",
    "phase": 3,
    "test": "Core tests: four themes, each with valid presets inside declared ranges; experience tests: every theme compiles and renders a frame at every tier; each shader has a license entry",
-   "closed": null
+   "closed": "A18-P03"
   },
   {
    "id": "G-TRANSITION",
@@ -1317,10 +1323,10 @@
    ],
    "kind": "upstream",
    "owner": "VisualCore:VisualCoreRendering",
-   "justification": "replaceScene is a hard cut and no crossfade exists. A generic crossfade between two full-screen scenes (both rendered into render targets, mixed by a pass over a duration, cut under Reduce Motion) has consumers beyond A18 (Generative Art Studio switches families with a cut), so it is assessed for VisualCoreRendering in A18-P03 as an additive scene; existing scenes are unchanged. If not promoted, the experience composes it from public render targets and FieldPass; never a second renderer.",
+   "justification": "replaceScene is a hard cut and no crossfade exists. A generic crossfade between two full-screen scenes (both rendered into render targets, mixed by a pass over a duration, cut under Reduce Motion) has consumers beyond A18 (Generative Art Studio switches families with a cut), so it is assessed for VisualCoreRendering in A18-P03 as an additive scene; existing scenes are unchanged. If not promoted, the experience composes it from public render targets and FieldPass; never a second renderer. Promoted at A18-P03 as VisualCoreRendering's CrossfadeScene (feature 133), with CrossfadeSceneTests.",
    "phase": 3,
    "test": "Rendering tests: the mix at t=0 equals scene A, at t=1 scene B, midway the average within tolerance; no black frame; resize and context loss rebuild both targets; transitionDuration gives a cut under Reduce Motion; reference regression passes",
-   "closed": null
+   "closed": "A18-P03"
   },
   {
    "id": "G-FAVOURITES",
@@ -1333,7 +1339,7 @@
    "justification": "The theme document (schema version, validation, migration), the editor and the favourites count cap are the experience's, stored in a NamedLibrary in its ExperienceStorage (manual phase 03).",
    "phase": 3,
    "test": "Core tests: a theme round-trips; an older schema migrates; damaged, oversized or newer documents are refused without a crash; the cap refuses one more favourite; names normalised",
-   "closed": null
+   "closed": "A18-P03"
   },
   {
    "id": "G-NIGHT",
