@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "sh",
+    "specs/143-lw-p06-release/scan-claims-release.sh"
+  ],
+  "command": "sh specs/143-lw-p06-release/scan-claims-release.sh",
+  "elapsed_seconds": 0.312,
+  "exit_code": 0,
+  "finished": "2026-11-17T07:12:52+00:00",
+  "log": ".autonomy/logs/A19-P06.lw-claims.log",
+  "log_sha256": "887b61b5fbb43c51c4d02e42d7b09f1dc5e820c6254b583b527900225522224a",
+  "name": "lw-claims",
+  "stage": "A19-P06",
+  "started": "2026-11-17T07:12:52+00:00",
+  "timed_out": false
+}
