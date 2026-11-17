@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "sh",
+    "-c",
+    "! grep -rnE \"import (UIKit|SwiftUI|OpenGLES|Network)|URLSession|Date\\(\\)|ContinuousClock|CFAbsoluteTime\" Packages/ExperiencesCreative/DigitalZenGarden/Core"
+  ],
+  "command": "sh -c '! grep -rnE \"import (UIKit|SwiftUI|OpenGLES|Network)|URLSession|Date\\(\\)|ContinuousClock|CFAbsoluteTime\" Packages/ExperiencesCreative/DigitalZenGarden/Core'",
+  "elapsed_seconds": 0.009,
+  "exit_code": 0,
+  "finished": "2026-11-17T09:45:58+00:00",
+  "log": ".autonomy/logs/A20-P05.core-purity.log",
+  "log_sha256": "f540bfb4f097194904d82a50ce46681f28e2f2813054800b2c61d632c4a0e5c6",
+  "name": "core-purity",
+  "stage": "A20-P05",
+  "started": "2026-11-17T09:45:58+00:00",
+  "timed_out": false
+}

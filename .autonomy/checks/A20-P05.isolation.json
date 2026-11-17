@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_app_isolation.py",
+    "--experiences",
+    "Packages/ExperiencesCreative/DigitalZenGarden"
+  ],
+  "command": "python3 scripts/check_app_isolation.py --experiences Packages/ExperiencesCreative/DigitalZenGarden",
+  "elapsed_seconds": 0.045,
+  "exit_code": 0,
+  "finished": "2026-11-17T09:45:58+00:00",
+  "log": ".autonomy/logs/A20-P05.isolation.log",
+  "log_sha256": "0eeb7cfe50031815f5731c5b9b3947507f1dc60992db34186850ab4c78ec8ae3",
+  "name": "isolation",
+  "stage": "A20-P05",
+  "started": "2026-11-17T09:45:58+00:00",
+  "timed_out": false
+}

@@ -64,7 +64,7 @@ device step. No VisualCore change. Precedent: `specs/142-lw-p05-device-tests/tas
 - [X] T-A20-509 Contract: G-QUIET and G-DEVICE closed by "A20-P05" (G-DEVICE as the plan; its rows wait for devices); — Verified 2026-11-17: 2026-11-17: .autonomy/checks/A20-P05.contract.json exit 0; G-QUIET closed by A20-P05 (CalmTests, ReducedMotionTests, the b3 journeys) and G-DEVICE closed by A20-P05 with the campaign plan (its rows wait for devices); M07, M11, M13, M14, M20 and M28 available; M27 stays open for G-RELEASE
   rows whose gaps are all closed become available with evidence (`--name contract`, `check_app_contract.py --app
   digital-zen-garden --render`)
-- [ ] T-A20-510 Tests (review checkpoint): Digital Zen Garden on sim-27.2 (`--name zg-ios27`), documented API,
+- [X] T-A20-510 Tests (review checkpoint): Digital Zen Garden on sim-27.2 (`--name zg-ios27`), documented API, — Verified 2026-11-17: 2026-11-17: review checkpoint: .autonomy/checks/A20-P05.zg-ios27.json, app-ui.json (build, unit, chunk b3), verify-27.json, documented-api.json, isolation.json, core-purity.json, photos-scan.json, experience-packages.json and script-tests.json, all exit 0; isolation proves no GL call outside the scene protocol
   isolation, core purity, the Photos scan; `xcodegen generate --spec project.yml`; `--name app-ui -- python3
   scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27 app-ui-ios27-b3`; runner (`--name
   verify-27`); experience packages and script tests; isolation proves no GL call outside the scene protocol
