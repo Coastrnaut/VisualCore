@@ -15,7 +15,9 @@
   `unknown-stone`, `out-of-range`, `over-cap`, each with a sentence.
 - **`StrokeResampler`:** `resample(_ points:, spacing: 0.004, cap: 512) -> Result<(points, capped), DocumentRefusal>`
   (a non-finite point refuses).
-- **`RakeBrush`:** `height(across u:, style:)`; `stamp(into field:, at point:, direction:, style:)`.
+- **`RakeBrush`:** `height(across u:, style:)`; `stamp(into field:, at point:, direction:, style:)`. The direction at a
+  point is the unit tangent from its neighbours (the next point minus the previous one, one-sided at the ends); a dab
+  uses the tray's x axis.
 - **`SandField`:** 160 × 120 `[Float]`, zero at rest; `replay(_ strokes:)`; `maxDifference(_:)`.
 - **`GardenCommand`:** `rake(RakeStroke)`, `place(Stone)`, `move(id, from, to)`, `rotate(id, from, to)`,
   `remove(Stone)`, `tone(from, to)`.
