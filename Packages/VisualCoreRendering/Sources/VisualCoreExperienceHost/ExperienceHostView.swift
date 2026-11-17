@@ -274,9 +274,10 @@ public struct ExperienceHostView: View {
                     experience.controls
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .environment(\.experienceStillRenderer, ExperienceStillRenderer { [session] (width: Int, height: Int) throws(OffscreenRenderError) -> StillImage in
-                            try session.renderStill(width: width, height: height)
-                        })
+                        .environment(\.experienceStillRenderer, ExperienceStillRenderer(timed: { [session]
+                            (width: Int, height: Int, time: Double) throws(OffscreenRenderError) -> StillImage in
+                            try session.renderStill(width: width, height: height, time: time)
+                        }))
                 }
                 // Controls near the edges keep full contrast: no scroll-edge fade over them (rule E-12; feature 193,
                 // as A01's standalone controls did).
