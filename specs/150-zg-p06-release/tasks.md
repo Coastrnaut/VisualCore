@@ -46,8 +46,8 @@ migration, no VisualCore change).
 - [ ] T-A20-606 [US3] Write the release documents in `docs/apps/digital-zen-garden/`: `store-listing.md` (claims each
   with a proving test or interface class; "sound", never "audio" or "music"; no physics, health or measured claim),
   `release-checklist.md` (rows verified, pending-campaign-ii ZG-D1–ZG-D8, owner-action: signing, archive, upload),
-  `release.json` per data-model.md (`copyCheck.allow` `["share"]`), the A20 section of
-  `docs/release/known-limitations.md`, and the README document table (FR-A20-605, 606)
+  `release.json` per data-model.md (`copyCheck.allow` `["share"]`), the section `### Digital Zen Garden (A20; features 144–150)` of
+  `docs/release/known-limitations.md` (after the A19 section), and the README document table (FR-A20-605, 606)
 - [ ] T-A20-607 [US3] Write `specs/150-zg-p06-release/scan-claims-release.sh` (the words of Clarifications Q2, whole
   words, case-insensitive, over the store text and the interface Swift of data-model.md; every named test exists; ZG
   interface classes exist) and run it (`--name zg-claims -- sh specs/150-zg-p06-release/scan-claims-release.sh`)
@@ -70,7 +70,7 @@ migration, no VisualCore change).
 - [ ] T-A20-611 Release build checks (review checkpoint; `--name release-checks -- python3 scripts/release_check.py
   --only app-release-build app-release-symbols app-privacy-manifest app-no-tracking app-licenses app-usage-descriptions
   experience-release-a20 copy-claims-a20`)
-- [ ] T-A20-612 Contract: G-RELEASE closed by "A20-P06"; rows whose gaps are all closed become available with evidence
+- [ ] T-A20-612 Contract: G-RELEASE closed by "A20-P06" (its iOS 26.x runner half is cited at X-A20); rows whose gaps are all closed become available with evidence
   (`--name contract`); packages, catalog and script tests
 - [ ] T-A20-613 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
   A20-P06; update README.md (rule 16) and `docs/automatedtesting.md` (rule 17)

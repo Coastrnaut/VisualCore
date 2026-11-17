@@ -23,8 +23,9 @@ Research: [research.md](research.md). Data: [data-model.md](data-model.md). Cont
   - `DigitalZenGardenExperienceTests` (recovery, samples) on sim-27.2;
   - chunk `b3` on the iOS 27.2 phone;
   - `release_check.py --only experience-release-a20 copy-claims-a20` and the app release steps.
-- **Constraints:** no signing, archive or upload. iOS 27 only; iOS 26 and the reference regression at X-A20. No NEEDS
-  CLARIFICATION remains.
+- **Constraints:** no signing, archive or upload. iOS 27 only; iOS 26 and the reference regression at X-A20 (owner
+  ruling of 2026-11-14), where the iOS 26.x half of G-RELEASE's test ("verify-a20 on 27.x and 26.x") is run and
+  cited. No NEEDS CLARIFICATION remains.
 
 ## Constitution Check
 
