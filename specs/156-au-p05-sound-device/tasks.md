@@ -40,7 +40,7 @@
   - `Experience/AuroraExperience.swift`: the test factory takes an optional loop factory;
   - `///` on every new declaration; no GL call outside the scene protocol
   (FR-A21-501–504)
-- [ ] T-A21-504 [P] [US1] Tests (agent E), `ExperienceTests/SoundLoopTests.swift`, with a fake `SkyLoopPlaying` that
+- [X] T-A21-504 [P] [US1] Tests (agent E), `ExperienceTests/SoundLoopTests.swift`, with a fake `SkyLoopPlaying` that — Verified 2026-11-17: 2026-11-17: SoundLoopTests (7: fresh start off and no player; plays only while on, on screen and active; volume 0.4 and 0; drawing lifecycle leaves play/stop counts unchanged; failed play keeps the choice and the sky; digest, snapshot and manifest equal; restored over the same storage, damaged prefs.v1 off), each under 10 s; .autonomy/checks/A21-P05.au-ios27.json exit 0 (65 tests in 15 suites); written by an agent, retested
   counts plays and stops (no audio):
   - a fresh start has the sound off, makes no player and plays nothing;
   - sound on, on screen and active plays; off, off screen or inactive stops; back on screen and active plays again;

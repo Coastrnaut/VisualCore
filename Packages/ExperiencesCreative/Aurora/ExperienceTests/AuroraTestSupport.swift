@@ -6,7 +6,7 @@
 // change between presets (both skies' references mixed in display space), opening with a storage and a snapshot, and
 // a temporary storage. Feature 155 (A21-P04): opening with the system's Reduce Flashing and a hook that configures the
 // presenter before its first `setup` (the fallback seams), frames at 30 per second, the window's mean luminance and
-// the GPU bytes held. Short runs only (no sleep, no wall-clock assertion).
+// the GPU bytes held. Feature 156 (A21-P05): opening with a loop factory (a fake player). Short runs only (no sleep, no wall-clock assertion).
 import CoreGraphics
 import Foundation
 import Testing
@@ -54,18 +54,21 @@ enum AuroraTest {
 
     /// Opens Aurora in `session` through the factory (with `storage` and the session `snapshot` when given), lays
     /// the view out at `size` points and draws one frame. A session without a quality pin is pinned to level 0.
-    /// `reduceFlashing` is the system's Reduce Flashing; `configure` runs on the presenter before its first `setup`.
+    /// `reduceFlashing` is the system's Reduce Flashing; `configure` runs on the presenter before its first `setup`;
+    /// `loopFactory` (after `configure`, so a trailing closure stays `configure`) makes the sound's player (nil: the
+    /// ambient loop player).
     static func open(_ session: ExperienceSession, reduceMotion: Bool = false,
                      size: CGSize = CGSize(width: 32, height: 24), storage: ExperienceStorage? = nil,
                      snapshot: ExperienceSnapshot? = nil, reduceFlashing: Bool = false,
-                     configure: ((AuroraPresenter) -> Void)? = nil) async throws -> ExperienceShell<AuroraPresenter> {
+                     configure: ((AuroraPresenter) -> Void)? = nil,
+                     loopFactory: (() -> any SkyLoopPlaying)? = nil) async throws -> ExperienceShell<AuroraPresenter> {
         let id = self.id
         var made: ExperienceShell<AuroraPresenter>?
         if session.qualityPin == nil { session.qualityPin = 0 }
         let request = ExperienceOpenRequest(id: id, seed: 1, snapshot: snapshot,
                                             refusedSnapshotFails: snapshot != nil) {
             let shell = AuroraExperience.make(id: id, reduceMotion: reduceMotion, storage: storage,
-                                              reduceFlashing: reduceFlashing)
+                                              reduceFlashing: reduceFlashing, loopFactory: loopFactory)
             configure?(shell.presenter)
             made = shell
             return shell
