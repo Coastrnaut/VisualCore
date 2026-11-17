@@ -9,7 +9,7 @@ commits.
 
 ## Phase 1: Setup
 
-- [ ] T-A20-201 Baseline: cite the A20-P01 evidence (`.autonomy/checks/A20-P01.{zg-core-ios27,app-build,experience-packages}.json`) on the tree recorded at A20-P01 (`b4ce48a4`), whose Packages are unchanged since (owner ruling of 2026-11-14)
+- [X] T-A20-201 Baseline: cite the A20-P01 evidence (`.autonomy/checks/A20-P01.{zg-core-ios27,app-build,experience-packages}.json`) on the tree recorded at A20-P01 (`b4ce48a4`), whose Packages are unchanged since (owner ruling of 2026-11-14) — Verified 2026-11-17: 2026-11-17: A20-P01 evidence cited: .autonomy/checks/A20-P01.zg-core-ios27.json, A20-P01.app-build.json and A20-P01.experience-packages.json, all exit 0; no Packages, Apps or project.yml change since the A20-P01 record commit b4ce48a4
 - [ ] T-A20-202 Add the targets `DigitalZenGardenExperience` (path `DigitalZenGarden/Experience`) and `DigitalZenGardenExperienceTests` (path `DigitalZenGarden/ExperienceTests`) and the product `DigitalZenGardenExperience` to `Packages/ExperiencesCreative/Package.swift` (lead; dependencies as the Ambient Clock experience plus the core and `VisualCoreMath`)
 
 ## Phase 2: Foundational — the sized field
