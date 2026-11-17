@@ -8,7 +8,7 @@ after every task (no trailers); run checks, read each exit, then tick in a separ
 
 ## Phase 1: Setup
 
-- [ ] T-A17-601 Baseline: cite the A17-P05 evidence (`.autonomy/checks/A17-P05.{ia-ios27,app-unit,verify-27}.json`) on the tree recorded at A17-P05, whose Packages are unchanged since (owner ruling of 2026-11-14)
+- [X] T-A17-601 Baseline: cite the A17-P05 evidence (`.autonomy/checks/A17-P05.{ia-ios27,app-unit,verify-27}.json`) on the tree recorded at A17-P05, whose Packages are unchanged since (owner ruling of 2026-11-14) — Verified 2026-11-16: 2026-11-16: A17-P05 evidence cited: .autonomy/checks/A17-P05.ia-ios27.json, A17-P05.app-unit.json and A17-P05.verify-27.json, all exit 0; no Packages, Apps or project.yml change since the A17-P05 record commit 45d9ab3d
 
 ## Phase 2: Story 1 — privacy and credits
 
