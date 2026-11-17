@@ -2,7 +2,7 @@
 
 A calm, readable clock over slow procedural visuals (archived manual `apps/18-ambient-clock.md` §1–§2), for people
 who want a bedside, desk or kiosk clock that is pleasant to look at and easy to read. Version 0.1 covers:
-- accurate locale-aware time and date from the system calendar and time zone;
+- locale-aware time and date from the system calendar and time zone;
 - four procedural visual themes with quality and motion controls;
 - readable 12/24-hour typography with optional seconds;
 - a theme editor with saveable favourites;
