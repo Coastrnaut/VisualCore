@@ -8,7 +8,7 @@ VisualCore change. Precedent: `specs/141-lw-p04-save-share/tasks.md`. Rollback: 
 
 ## Phase 1: Setup
 
-- [ ] T-A20-401 Baseline: cite the A20-P03 evidence (`.autonomy/checks/A20-P03.{zg-ios27,app-unit,verify-27}.json`) on the tree recorded at A20-P03 (`3fe9ab7a`), whose Packages are unchanged since (owner ruling of 2026-11-14)
+- [X] T-A20-401 Baseline: cite the A20-P03 evidence (`.autonomy/checks/A20-P03.{zg-ios27,app-unit,verify-27}.json`) on the tree recorded at A20-P03 (`3fe9ab7a`), whose Packages are unchanged since (owner ruling of 2026-11-14) — Verified 2026-11-17: 2026-11-17: A20-P03 evidence cited: .autonomy/checks/A20-P03.zg-ios27.json, A20-P03.app-unit.json and A20-P03.verify-27.json, all exit 0; no Packages, Apps or project.yml change since the A20-P03 record commit 3fe9ab7a
 
 ## Phase 2: Story 1 — named gardens (P1) 🎯
 
