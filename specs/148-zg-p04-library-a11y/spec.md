@@ -144,6 +144,9 @@ A person shares a still picture of the garden through the system share sheet, fo
 - **The library at its cap:** saving a new garden is refused with a message; replacing an existing one works.
 - **A damaged, newer or oversized saved garden:** reported, never opened, never deleted automatically.
 - **Opening a garden:** the undo history restarts.
+- **A failed save** (the storage quota reached or a write error): a message; the previous file of that name, if any,
+  is unchanged.
+- **Deleting the saved garden that is open:** the open garden stays as it is; only the saved copy is removed.
 - **A failed still export:** a message; no file is left behind.
 - **The person declines saving to Photos:** the share sheet's other destinations still work.
 
