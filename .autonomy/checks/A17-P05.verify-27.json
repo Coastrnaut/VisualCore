@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a17.interactive-anatomy",
+    "--runtime",
+    "27"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a17.interactive-anatomy --runtime 27",
+  "elapsed_seconds": 52.226,
+  "exit_code": 0,
+  "finished": "2026-11-17T00:10:41+00:00",
+  "log": ".autonomy/logs/A17-P05.verify-27.log",
+  "log_sha256": "b0c269e3d3cd42a3dd84016ed018ea3758f0be02b6d01d95f269ad180ceed060",
+  "name": "verify-27",
+  "stage": "A17-P05",
+  "started": "2026-11-17T00:09:49+00:00",
+  "timed_out": false
+}
