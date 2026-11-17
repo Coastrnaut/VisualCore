@@ -42,7 +42,7 @@
 // clarifications Q1–Q5; contracts/power.md):
 //
 //   - Frame cap: `maxFramesPerSecond` is 30 at all times (the session passes it to its render host; `FramePacing`
-//     keeps its floor of 30 and its heat and Low Power Mode reductions).
+//     keeps its floor of 30 and its reductions for heat and for the system power-saving mode).
 //   - Night: the core's `nightPolicy` (followed in `follow(_:)` and each `draw`) decides `isNightShown` from the
 //     local minute of the clock source's instant in the display environment's calendar
 //     (`NightPolicy.localMinute(of:calendar:)`). At night the scene's `u_night` is (night dim × idle dim, the warm
@@ -74,6 +74,11 @@
 //     idle dim, the display scale, the uniform time and the drawable size). Each frame still sets the uniforms; the
 //     theme draws again only when the key changes, otherwise the cached picture is copied. While anything moves the
 //     cache is pass-through and the theme draws every frame, as before. `backgroundDrawCount` is the theme's draws.
+//
+// Feature 136 (A18-P06) T-A18-604 (FR-A18-603; SC-A18-602; clarification Q4): the test-only seam `failNextDraw` makes
+// the next `draw` throw `AmbientDrawError.injected` once, before anything is followed, set or drawn; the seam clears
+// itself and is unreachable from the interface. The session then fails with the error's message, and the favourites
+// file is not touched (only a save or a removal writes it).
 import AmbientClockCore
 import Foundation
 import Observation
@@ -83,6 +88,20 @@ import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreRendering
 import VisualCoreSimulation
+
+/// Why a draw of Ambient Clock failed on purpose (feature 136, A18-P06, T-A18-604).
+enum AmbientDrawError: Error, Equatable, CustomStringConvertible {
+    /// The test-only seam ``AmbientPresenter/failNextDraw`` made this draw fail.
+    case injected
+
+    /// The message the failed session shows: "The Ambient Clock draw failed: the test seam injected a failure."
+    var description: String {
+        switch self {
+        case .injected:
+            return "The Ambient Clock draw failed: the test seam injected a failure."
+        }
+    }
+}
 
 /// What the overlay and the controls show, updated only when a field changes.
 @MainActor
@@ -185,6 +204,10 @@ final class AmbientPresenter: ExperiencePresenter {
     private(set) var lastThemeError: String?
     /// Test-only seam: when true, the next theme change compiles a broken fragment (and fails); reset by that change.
     var failNextThemeCompile = false
+    /// Test-only seam: when true, the next `draw` throws ``AmbientDrawError/injected`` once, before it follows, sets
+    /// or draws anything; the seam clears itself and nothing in the experience or its interface sets it (feature 136,
+    /// A18-P06, T-A18-604).
+    var failNextDraw = false
     /// The last core instant `describe` followed; nil before the first.
     private var followedInstant: Double?
     /// The number of full-screen draws of the last frame (1 when drawn, 0 otherwise); a cached still frame counts its
@@ -566,7 +589,12 @@ final class AmbientPresenter: ExperiencePresenter {
     /// Follows a new theme or palette of `core` (a cut or a fade), sets the incoming theme's uniforms of `tier` and
     /// the effective time from `core` and `frame`, advances the fade and draws the crossfade through the cache: in
     /// pass-through while anything moves, else keyed by `stillKey` (the theme draws only for a new still picture).
+    /// Throws ``AmbientDrawError/injected`` once while ``failNextDraw`` is set (it is cleared first).
     func draw(_ core: AmbientCore, tier: Int, context: RenderContext, frame: FrameInfo) throws {
+        if failNextDraw {
+            failNextDraw = false
+            throw AmbientDrawError.injected
+        }
         lastDrawCount = 0
         adoptScreenSettings(core)
         guard let crossfade, let cache else { return }
