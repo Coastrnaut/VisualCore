@@ -16,9 +16,14 @@
   - `theme.motion` [0…1] and `theme.speed` [0.25…2].
 - **Quality:** `qualityTiers == 2`; `qualityProfile` has `level-0` (iterationShare 1, resolutionShare 1) and
   `level-1` (iterationShare 0.6, resolutionShare 0.5). Octaves are 5 and 3.
+  - Level-1 shades every pixel and samples the noise once per 2 × 2 block (`u_block`,
+    `AmbientCore.pixelBlock(forTier:)` gives 1 and 2), because `FullScreenShaderScene` has no smaller render target.
+  - The saving is two octaves and the blocks.
 - **Snapshot:** schema 1 holds `hourCycle`, `showSeconds`, `showDate`, `motion` and `speed`; the instant and the
   revision are not stored.
 - **Outcome:** `showing-time`, and `motion-off` when motion is off.
+- **Digest:** `a18.ambient.v1`, then the hour cycle, seconds, date, motion and speed. The instant and the revision
+  come from the wall clock and are left out, as `ExperienceCore.writeDigest` requires.
 
 ## Presenter
 
@@ -27,7 +32,10 @@
 - `display: AmbientClockState` follows the core's instants and format, with the environment read on each `time.set`
   and `time.changed`.
 - `tick(port:) -> Date`: sends `time.set` with `clock.now` and returns the next deadline.
-- `timeChanged(_ kind:, port:)`: sends `time.changed`.
+- `timeChanged(_ kind:, port:)`: sends `time.changed`, then `time.set` through `tick`.
+- `setFormat(hourCycle:showSeconds:showDate:port:)` sends `clock.format`.
+- `follow(_ core:)` (from `describe`) shows actions that come from the runner or a restore.
+- `AmbientMirror` is the observable state that the overlay and the controls read.
 - `describe(core)` is the spoken string, and `probes` holds the centre as `dark`.
 - `NoiseGradientTheme`: the fragment source, the palette (four linear colours), the uniforms (`u_resolution`,
   `u_time`, `u_octaves`, `u_palette`) and `textColor` (white), with `minimumContrast()`.

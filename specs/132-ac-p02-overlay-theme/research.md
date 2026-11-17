@@ -26,3 +26,10 @@
   - `fixture-slow-motion`.
 
   The probe at the canvas centre is `dark`.
+- **D7 As built:**
+  - The noise is mapped to 0…1 as `clamp(0.5 + 1.5 n)`; the gain gives a frame enough luma spread for the
+    non-blank check.
+  - `u_octaves` is a float uniform, because the scene binds only float parameters.
+  - The foreground kind is proven through `TimeChangeMonitor.applicationNames` (foreground ↦
+    `willEnterForegroundNotification`) together with exactly one `time.changed` sent. The value on the wire is not
+    observed, because the port's handler is internal to the host.
