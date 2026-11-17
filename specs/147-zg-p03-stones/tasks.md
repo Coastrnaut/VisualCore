@@ -25,7 +25,7 @@ VisualCore change. Precedent: `specs/140-lw-p03-editor/tasks.md`. Rollback: reve
 
 ## Phase 5: Story 3 — orientation keeps the garden (P1)
 
-- [ ] T-A20-306 [US3] Write `Packages/ExperiencesCreative/DigitalZenGarden/ExperienceTests/OrientationTests.swift`: the same document drawn in 390 × 844 and 844 × 390 views gives an unchanged document, identical sand and stone layers, and every stone centre and stroke point mapped to the view and back within 1/480 tray widths (FR-A20-305; SC-A20-303)
+- [X] T-A20-306 [US3] Write `Packages/ExperiencesCreative/DigitalZenGarden/ExperienceTests/OrientationTests.swift`: the same document drawn in 390 × 844 and 844 × 390 views gives an unchanged document, identical sand and stone layers, and every stone centre and stroke point mapped to the view and back within 1/480 tray widths (FR-A20-305; SC-A20-303) — Verified 2026-11-17: 2026-11-17: ExperienceTests/OrientationTests.swift (390 x 844 and 844 x 390 views: the document unchanged, sand and stone layers identical, stone centres and stroke points round-trip within 1/480 tray widths) passes in .autonomy/checks/A20-P03.zg-ios27.json exit 0; written by an agent, retested
 
 ## Phase 6: Records and evidence
 
