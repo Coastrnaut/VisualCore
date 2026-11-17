@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "sh",
+    "specs/150-zg-p06-release/scan-claims-release.sh"
+  ],
+  "command": "sh specs/150-zg-p06-release/scan-claims-release.sh",
+  "elapsed_seconds": 0.325,
+  "exit_code": 0,
+  "finished": "2026-11-17T09:59:24+00:00",
+  "log": ".autonomy/logs/A20-P06.zg-claims.log",
+  "log_sha256": "73fc2dd8a1b325e23bd7d03a5970537bb63d031c1a9cf056774b4799d908cc07",
+  "name": "zg-claims",
+  "stage": "A20-P06",
+  "started": "2026-11-17T09:59:24+00:00",
+  "timed_out": false
+}

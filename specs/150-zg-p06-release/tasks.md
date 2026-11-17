@@ -48,7 +48,7 @@ migration, no VisualCore change).
   `release-checklist.md` (rows verified, pending-campaign-ii ZG-D1–ZG-D8, owner-action: signing, archive, upload),
   `release.json` per data-model.md (`copyCheck.allow` `["share"]`), the section `### Digital Zen Garden (A20; features 144–150)` of
   `docs/release/known-limitations.md` (after the A19 section), and the README document table (FR-A20-605, 606)
-- [ ] T-A20-607 [US3] Write `specs/150-zg-p06-release/scan-claims-release.sh` (the words of Clarifications Q2, whole
+- [X] T-A20-607 [US3] Write `specs/150-zg-p06-release/scan-claims-release.sh` (the words of Clarifications Q2, whole — Verified 2026-11-17: 2026-11-17: specs/150-zg-p06-release/scan-claims-release.sh (the words of clarification Q2 over the store text and four interface Swift files; every named test, suite and ZG interface class exists); .autonomy/checks/A20-P06.zg-claims.json exit 0 (38 proving tests found)
   words, case-insensitive, over the store text and the interface Swift of data-model.md; every named test exists; ZG
   interface classes exist) and run it (`--name zg-claims -- sh specs/150-zg-p06-release/scan-claims-release.sh`)
   (FR-A20-605; SC-A20-603)
