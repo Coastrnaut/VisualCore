@@ -694,7 +694,10 @@ let package = Package(
                                .product(name: "VisualCoreExperience", package: visualCore),
                                .product(name: "VisualCoreRendering", package: rendering),
                                .product(name: "VisualCoreExperienceHost", package: rendering),
-                               .product(name: "VisualCoreUI", package: rendering)],
+                               .product(name: "VisualCoreUI", package: rendering),
+                               // Feature 156 (A21-P05) T-A21-502: the ambient loop (G-SOUND).
+                               .product(name: "VisualCoreAudioDSP", package: visualCore),
+                               .product(name: "VisualCoreAudio", package: rendering)],
                 path: "Aurora/Experience"),
         .testTarget(name: "AuroraExperienceTests",
                     dependencies: ["AuroraExperience", "AuroraCore",
@@ -706,7 +709,9 @@ let package = Package(
                                .product(name: "VisualCoreExperience", package: visualCore),
                                .product(name: "VisualCoreRendering", package: rendering),
                                .product(name: "VisualCoreExperienceHost", package: rendering),
-                               .product(name: "VisualCoreUI", package: rendering)],
+                               .product(name: "VisualCoreUI", package: rendering),
+                               .product(name: "VisualCoreAudioDSP", package: visualCore),
+                               .product(name: "VisualCoreAudio", package: rendering)],
                     path: "Aurora/ExperienceTests"),
         // A18 Ambient Clock (feature 131, A18-P01): a pending core until A18-P02 adds the experience. The core is pure
         // (Foundation, the clock source of VisualCoreExperience and the planner of VisualCoreSimulation) and reads no
