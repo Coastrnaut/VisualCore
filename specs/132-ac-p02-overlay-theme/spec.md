@@ -179,7 +179,8 @@ A person can stop the motion of the background or slow it, and with Reduce Motio
 
 ### Measurable Outcomes
 
-- **SC-A18-201**: The overlay text equals the formatter's output for the fixed instant in 100 % of the fixtures.
+- **SC-A18-201**: The overlay text equals the formatter's output for the fixed instant in 100 % of the fixtures
+  (New York and Kolkata; the hour cycle system, h12 and h24; seconds on and off; the date on and off).
 - **SC-A18-202**: The time-zone fixture shows Kolkata time within one update of the notification.
 - **SC-A18-203**: The text colour's contrast is at least 4.5 : 1 against all palette colours.
 - **SC-A18-204**: Still frames are identical; moving frames differ; frames at both levels are not blank.
