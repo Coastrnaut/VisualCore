@@ -8,3 +8,5 @@
 - **Clock:** a one-hour delta moves time by at most 0.25 s × speed; under Reduce Motion or speed 0 two frames are
   identical; the phase loops without a seam (phase 0 and phase 1 give the same picture).
 - **Purity:** the core imports no UIKit, SwiftUI, OpenGLES or Network and reads no clock.
+- **As built:** `SkyUniforms(scene:phase:level:)` is the one adapter from a scene to the shader; the luminance knee
+  (0.6 to 0.72) keeps every pixel under 0.75; the tests compare `renderOffscreen` pictures with `SkyReference`.

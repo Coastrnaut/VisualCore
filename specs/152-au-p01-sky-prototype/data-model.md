@@ -14,3 +14,11 @@
 - **SkyReference:** per-pixel colour at a resolution, phase and level, from the same formulas.
 - **Tolerances:** mean absolute channel difference ≤ 2/255, largest ≤ 8/255; luminance (Rec. 709, sRGB-decoded)
   ≤ 0.75 per pixel and ≥ 0.02 mean; off-screen size 64 × 48.
+- **As built (A21-P01):**
+  - `SkyUniforms(scene:phase:level:)` decodes the scene's sRGB colours to a linear-light palette (stop 0 the sky, the
+    others the ribbons in turn), as `FullScreenShaderScene.palette` expects, and gives `shaderParameters` (phase,
+    ribbons, turbulence, cloudiness, stars, octaves);
+  - the shader also includes `vc/color.glsl`, and a soft knee on linear luminance (start 0.6, ceiling 0.72) runs before
+    the sRGB encode, so no pixel passes 0.75 after 8-bit rounding;
+  - stars sit one per hashed cell of the 48-row reference grid, so a star is at most 1 pixel at 64 × 48;
+  - the tests read the picture back through `RenderHost.renderOffscreen` at the exact size, rows top-down.
