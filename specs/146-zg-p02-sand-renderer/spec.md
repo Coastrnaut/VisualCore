@@ -21,6 +21,64 @@ Canonical overrides:
   candidate (not available until X-A20).
 - **Experience A20 inside the one app.** Follow `specs/139-lw-p02-still-renderer`.
 
+## Clarifications
+
+### Session 2026-11-17
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- `FieldUniform` (VisualCoreRendering) carries a float, vec2, vec4 or int, with no arrays. A GPU stamp pass would
+  therefore cost one full-target pass per sample: a full replay of 400 strokes of 512 points is about 200,000 passes.
+- `RenderTarget.upload(rgbaFloats:)` replaces a target's colour with floats. `.rgba16f` keeps half precision and
+  `.rgba8` stores n/255. `FloatRenderSupport.storageFormat(forceFallback:)` picks `rgba16f` or the `rgba8` fallback.
+- `ExperienceControl` validates that the number of values equals the number of declared ranges, at most 24.
+  `GestureAlternatives.missing(gesture:native:)` requires every gesture action to be a native action too.
+- The canvas overlay (`makeCanvasOverlay`) takes no touches and is hidden from accessibility; presenter pointer events
+  arrive in view points with the view size (`pointer(_:viewSize:port:)`).
+- At A20-P01, a fine rake's tine period is about 1.9 cells of the 160 × 120 reference field, too coarse to draw.
+
+- Q: How is the sand height field made and drawn? → A: On the CPU, then uploaded:
+  - **Field:** `SandField` gains a size (columns × rows; the default stays 160 × 120). The drawn field is 480 × 360,
+    where the fine rake's period is about 5.8 cells.
+  - **Strokes:** the committed strokes are stamped once into a base field. The stroke in progress is stamped over a
+    copy of the base field as its points arrive, and on commit it is stamped into the base field itself.
+  - **Upload and draw:** the field is uploaded to one render target (`rgba16f`, or `rgba8` holding height × 0.5 + 0.5)
+    whenever it changes. A full-screen relief shader draws it: normals from height differences, one light from the
+    upper left, `vc_fbm` grain and the sand tone colour, inside a 4:3 tray fitted to the view.
+  - **Rebuild:** after undo, redo, restore, resize or a lost context, the field is replayed from the core's strokes.
+  - **Why:** this replaces the GPU stamp pass of the P00 contract clarification, which costs a pass per sample
+    (recorded in the contract). The GPU's role is the drawing; the field stays exact and testable.
+  - **Tolerance:** a drawn target read back with `readFloatPixels` matches the CPU field within 1/1024 for `rgba16f`
+    and 1/255 for `rgba8`.
+- Q: How does a drag reach the core? → A: Three actions:
+  - `stroke.begin`, with values x, y and rake (0 or 1);
+  - `stroke.add`, with exactly 24 values, 12 points of x and y in 0…1; unused pairs repeat the last point, and the
+    resampler drops repeats;
+  - `stroke.end`, with no values.
+
+  View points map into the fitted tray and are clamped while raking. The core keeps the raw points of the stroke in
+  progress (at most 2,048) and resamples them with `StrokeResampler`. `stroke.end` commits them through
+  `GardenHistory.rake(_:rake:)`; a stroke refused at the stroke cap leaves the garden unchanged with its refusal as
+  the outcome. A drag ending outside the tray still ends the stroke. A second finger is ignored.
+- Q: What do the native controls do? → A:
+  - **Rake:** `rake.style` (0 fine, 1 wide).
+  - **Undo and redo:** `edit.undo` and `edit.redo`, each with no values and disabled when the history cannot go that
+    way.
+  - **Patterns:** four native "rake a pattern" buttons (rows, circle, wave, spiral). They send the same
+    `stroke.begin`, `stroke.add` and `stroke.end` actions with points made by the experience, so every gesture action
+    has a native alternative (`GestureAlternatives`).
+  - **Tone:** `sand.tone` (0…2).
+- Q: What is the brush preview? → A: While a finger is down, a native overlay draws the rake's outline at the touch:
+  a rectangle of the rake's width across the drag direction, with one line per tine, scaled to the fitted tray. It
+  disappears when the finger lifts or the pointers are cancelled, and it never changes the state.
+- Q: What is registered and saved? → A:
+  - **Snapshot:** the core's snapshot is schema 1: the garden document only. A stroke in progress is not saved; the
+    undo history restarts after a restore.
+  - **Registration:** the experience is registered as a candidate `a20.digital-zen-garden` with quality levels
+    `level-0` (no grain) and `level-1`, permissions none, and a scenario manifest of the nine standard scenarios plus
+    fixtures for a raked garden, both rake styles, undo, redo and the tone. The app's synthetic candidate test id
+    moves to `a21`.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Rake the sand by dragging (Priority: P1) 🎯
@@ -114,7 +172,7 @@ The sand is rebuilt from the garden after a size change, a rotation or a lost gr
 ## Assumptions
 
 - Stones, their shadows and selection come in A20-P03; named gardens and accessibility in A20-P04.
-- The tolerance and the target size are decided in clarification.
+- The tolerance and the target size are those of clarification Q1.
 
 ## Traceability
 
