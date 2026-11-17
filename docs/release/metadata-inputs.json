@@ -135,9 +135,17 @@
       "name": "Simulation Lab",
       "permissions": [],
       "tier": "free"
+    },
+    {
+      "category": "learn",
+      "code": "A17",
+      "id": "a17.interactive-anatomy",
+      "name": "Interactive Anatomy",
+      "permissions": [],
+      "tier": "free"
     }
   ],
-  "ledger_sha256": "d808d5beb29002f711c2575978ee187b15a71586c97452c08c2ade4836b9ac77",
+  "ledger_sha256": "5755b763901383a6a7304b110b800ac27bb2a43e3c0e2657d268b0e1cbee6510",
   "privacy_answers": "unproven",
   "schema": 1
 }

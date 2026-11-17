@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--result-name",
+    "xa17-rendering"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name xa17-rendering",
+  "elapsed_seconds": 44.941,
+  "exit_code": 0,
+  "finished": "2026-11-17T01:43:09+00:00",
+  "gate": "X-A17",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-A17.visualcore-rendering.log",
+  "log_sha256": "a2a89ff655dc8a8aa519664468f2f55e7daa1ddd28fd6dbe5d9eb3d8b1a84694",
+  "name": "visualcore-rendering",
+  "started": "2026-11-17T01:42:24+00:00",
+  "timed_out": false
+}

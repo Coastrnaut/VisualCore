@@ -1,5 +1,5 @@
 // IASupport — feature 129 (A17-P06) T-A17-608 (clarification Q4; FR-A17-607): helpers of the interface tests of
-// Interactive Anatomy (A17) inside the one app, modelled on `SLSupport`. A17 is a candidate until X-A17; every launch
+// Interactive Anatomy (A17) inside the one app, modelled on `SLSupport`. A17 was a candidate until X-A17 (integrated 2026-11-16); every launch
 // carries `-vcCandidates` (DebugLaunch: the candidates' catalog entries become available and are registered). A first
 // start erases the data (`-vcResetData`), skips the welcome and opens the experience directly with
 // `-openExperience a17.interactive-anatomy`. A fresh start shows the right knee with every layer shown and nothing

@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a17.interactive-anatomy",
+    "--runtime",
+    "27"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a17.interactive-anatomy --runtime 27",
+  "elapsed_seconds": 48.758,
+  "exit_code": 0,
+  "finished": "2026-11-17T01:44:03+00:00",
+  "gate": "X-A17",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-A17.sim27.log",
+  "log_sha256": "b5723884dca21d033c0fea3cf4395fc73594a387fff46cc070537c106df72a80",
+  "name": "sim27",
+  "started": "2026-11-17T01:43:15+00:00",
+  "timed_out": false
+}
