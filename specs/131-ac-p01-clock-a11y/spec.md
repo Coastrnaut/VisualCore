@@ -69,7 +69,8 @@ in code:
   - `timeZone` and `locale`, each "system" or a fixed identifier.
 
   Refusals are typed, each with a sentence: `damaged`, `newer-version`, `unknown-time-zone`, `unknown-locale` and
-  `too-large` (above 4,096 bytes). A refused file leaves the defaults. The calendar follows the locale. "System" means
+  `too-large` (above 4,096 bytes). A refused file leaves the defaults. The calendar is Gregorian with the resolved
+  locale and time zone (as in the fixtures). "System" means
   the device's setting at the time of formatting.
 - Q: How is the time spoken and announced? → A: The spoken string is built from the same instant:
   - the time in the locale's spoken form (time style short, with the hour cycle applied, so "10:42 PM" or "22:42");

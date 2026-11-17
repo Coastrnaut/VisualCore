@@ -9,7 +9,7 @@
 - `final class TimeChangeMonitor`:
   - `init(center: NotificationCenter = .default, names: [Notification.Name: TimeChangeKind] = foundationNames,
     handler: @escaping @Sendable (TimeChangeKind) -> Void)`;
-  - `start()` and `stop()`, with `isRunning`;
+  - `start()` and `stop()`, with the read-only `isRunning`;
   - one handler call per posted notification;
   - `static let foundationNames` holds `.NSSystemTimeZoneDidChange` (timeZone),
     `NSLocale.currentLocaleDidChangeNotification` (locale) and `.NSCalendarDayChanged` (calendarDay).
@@ -24,8 +24,8 @@
   - `showSeconds: Bool` (default false) and `showDate: Bool` (default true);
   - `timeZone: ZonePolicy` and `locale: LocalePolicy`, each `.system` or `.fixed(String)`.
 - Preferences file: an envelope of kind `a18.clock-preferences`, `schemaVersion` 1, holding the preferences.
-  - Refusals (`PreferencesRefusal`): `damaged`, `newer-version`, `unknown-time-zone` (not in
-    `TimeZone.knownTimeZoneIdentifiers`), `unknown-locale` (not in `Locale.availableIdentifiers`) and `too-large`
+  - Refusals (`PreferencesRefusal`): `damaged`, `newer-version`, `unknown-time-zone` (`TimeZone(identifier:)` is nil;
+    the system's known list omits current names such as `Asia/Kolkata`), `unknown-locale` (not in `Locale.availableIdentifiers`) and `too-large`
     (above 4,096 bytes).
   - Each refusal has a sentence naming the value. A refusal leaves the defaults.
 - `ClockEnvironment`: the resolved `Locale`, `TimeZone` and `Calendar`. Fixed policies win; otherwise the system's
@@ -39,8 +39,10 @@
     `planner: AnnouncementPlanner`;
   - actions:
     - `time.set(Date)` formats the instant and reschedules;
-    - `time.changed(TimeChangeKind)` rebuilds the environment, reformats the current instant and adds one
+    - `time.changed(TimeChangeKind, systemLocale:, systemTimeZone:)` carries the device's locale and zone at the
+      time of the event, rebuilds the environment, reformats the current instant and adds one
       recomputation;
     - `prefs.set(ClockPreferences)` reformats;
     - `time.speak(at: Double)` asks the planner and returns the posted announcement, if any.
+  - `flushAnnouncement(at:)` posts the announcement the planner held back, once its interval has passed.
   - Equal actions give equal states.
