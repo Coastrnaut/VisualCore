@@ -670,6 +670,17 @@ let package = Package(
                     path: "DigitalZenGarden/ExperienceTests",
                     // Feature 150 (A20-P06): the committed stored-file samples.
                     resources: [.copy("Fixtures")]),
+        // A21 Aurora (feature 152, A21-P01): a pending core until A21-P02 adds the experience. The core is pure (the
+        // sky scene, presets, clock, noise port, reference and shader text); its tests draw the shader off screen.
+        .target(name: "AuroraCore",
+                dependencies: [.product(name: "VisualCoreMath", package: visualCore),
+                               .product(name: "VisualCoreSimulation", package: visualCore)],
+                path: "Aurora/Core"),
+        .testTarget(name: "AuroraCoreTests",
+                    dependencies: ["AuroraCore",
+                                   .product(name: "VisualCoreSimulation", package: visualCore),
+                                   .product(name: "VisualCoreRendering", package: rendering)],
+                    path: "Aurora/CoreTests"),
         // A18 Ambient Clock (feature 131, A18-P01): a pending core until A18-P02 adds the experience. The core is pure
         // (Foundation, the clock source of VisualCoreExperience and the planner of VisualCoreSimulation) and reads no
         // clock: the time enters as actions.
