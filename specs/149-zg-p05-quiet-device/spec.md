@@ -54,8 +54,8 @@ in code:
 - Q: What do sound and haptics do when on? → A:
   - **Sound:** a soft procedural one-shot tone, quiet and low, when a stroke is committed, a stone is placed, and a
     stone is removed. It plays through `SoundEffectPlayer`, with `isEnabled` following `calm.sound`.
-  - **Haptics:** a light selection haptic on stone selection and a light impact on placement, through the port's
-    haptic route, only when `calm.haptics` is on and the person's switch allows it.
+  - **Haptics:** a light selection haptic on stone selection and a light impact on placement, through the shared
+    haptic route (`ExperienceFeedback`), only when `calm.haptics` is on and the person's switch allows it.
   - **State:** neither changes the state.
 - Q: Which interface tests run, and in which chunk? → A: A new serial chunk `b3` with `ZGGardenUITests` and
   `ZGLibraryUITests`, launched with the candidates argument, as `LWSupport` is:

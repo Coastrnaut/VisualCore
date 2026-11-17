@@ -11,7 +11,8 @@ device step. No VisualCore change. Precedent: `specs/142-lw-p05-device-tests/tas
 - [ ] T-A20-501 Baseline: cite the A20-P04 evidence (`.autonomy/checks/A20-P04.{zg-ios27,app-unit,verify-27}.json`) on
   the tree recorded at A20-P04 (`1d8c1637`), whose Packages, Apps and `project.yml` are unchanged since (owner ruling
   of 2026-11-14)
-- [ ] T-A20-502 Add `VisualCoreAudio` and `VisualCoreAudioDSP` to the `DigitalZenGardenExperience` target of
+- [ ] T-A20-502 Add `VisualCoreAudio` (package `rendering`) and `VisualCoreAudioDSP` (package `visualCore`) to the
+  `DigitalZenGardenExperience` target of
   `Packages/ExperiencesCreative/Package.swift` (lead; the package still resolves and builds)
 
 ## Phase 2: Story 1 — quiet by default (P1) 🎯
@@ -27,7 +28,9 @@ device step. No VisualCore change. Precedent: `specs/142-lw-p05-device-tests/tas
     180–420 Hz, gain ≤ 0.2)" from VisualCoreAudioDSP through `SoundEffectPlayer`, whose `isEnabled` follows
     `calm.sound` (set off at start); the player stops when the experience suspends;
   - `Experience/GardenPresenter.swift`: tones on stroke commit, stone placement and removal only with sound on; a
-    light selection haptic on stone selection and a light impact on placement through the port, only with haptics on;
+    light selection haptic on stone selection and a light impact on placement through `ExperienceFeedback.haptic(_:)` (`HapticKind.selection`,
+    `.impactLight`; the person's switch and rate limit), only with haptics on; test seams after `MazePresenter`: a
+    `GardenSoundSink` (nil: `SoundEffectPlayer`) and an `ExperienceFeedback` (nil: `.shared`);
   - no GL call outside the scene protocol; `///` on every new declaration
   (FR-A20-501, 502, 503)
 - [ ] T-A20-504 [P] [US1] Tests (agent E): `ExperienceTests/CalmTests.swift` (defaults off; switches persist across a

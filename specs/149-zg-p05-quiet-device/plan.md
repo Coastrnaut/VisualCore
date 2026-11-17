@@ -14,8 +14,10 @@ Research: [research.md](research.md). Data: [data-model.md](data-model.md). Cont
 ## Technical Context
 
 - **Language:** Swift 6, SwiftUI, XCTest UI tests and Markdown.
-- **Dependencies:** adds `VisualCoreAudio` and `VisualCoreAudioDSP` to the experience target for `SoundEffectPlayer`
-  and procedural tones (Package.swift, lead).
+- **Dependencies:** adds `VisualCoreAudio` (package `VisualCoreRendering`) and `VisualCoreAudioDSP` (package
+  `VisualCore`) to the experience target for `SoundEffectPlayer` and `SoundEffect` tones (Package.swift, lead; both
+  products already serve other targets of the manifest). Haptics go through `ExperienceFeedback.haptic(_:)`
+  (VisualCoreExperienceHost; the person's switch and rate limit) with `HapticKind.selection` and `.impactLight`.
 - **Testing:** the A20 package tests on sim-27.2; `release_check.py --only app-build-for-testing-ios27 app-unit-ios27
   app-ui-ios27-b3`; the runner on iOS 27.
 - **Constraints:** interface tests under 60 s each; audits wait for devices; no device install before
@@ -46,6 +48,8 @@ docs/apps/digital-zen-garden/visualcore-contract.json (G-QUIET, G-DEVICE closed)
 ```
 
 - **Lifecycle:** the sound player stops when the experience suspends (its own background rule).
+- **Test seams:** after `MazePresenter`, the presenter takes a `GardenSoundSink` (nil: `SoundEffectPlayer`) and an
+  `ExperienceFeedback` (nil: `.shared`), so tests count tone and haptic requests.
 - **Migration:** none; the snapshot is unchanged. **Rollback:** revert the commits.
 
 ## Parallel work
