@@ -33,6 +33,63 @@ Canonical overrides:
   `docs/release/build-and-archive.md`.
 - Follow `specs/143-lw-p06-release`.
 
+## Clarifications
+
+### Session 2026-11-17
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- `scripts/release_check.py` builds `experience-release-<code>` and `copy-claims-<code>` from
+  `docs/apps/<slug>/release.json`; `copyCheck.allow` removes shared denylist words that name a real feature. The shared
+  denylist (`Configs/copy-claims-denylist.json`) refuses `share` and `sharing`, and A20 hands its still to the share
+  sheet. It also refuses `audio`, `music` and `smooth`: the copy says "sound" for the optional tones and never calls
+  the sand smooth.
+- The presenter has no drawing-failure seam yet; a shader error already fails setup or draw.
+- `GardenLibrary` keeps `garden-<n>.json` (envelope kind `a20.saved-garden`, version 1) and `library.json` (kind
+  `a20.garden-library`, version 1) in `ExperienceStorage`. Unreadable files are listed with `damaged`,
+  `newer-version`, `too-large` or a `DocumentRefusal` code and never opened or deleted; a newer index makes the library
+  read-only. The snapshot is schema 1 (the garden document only). The still goes to the temporary folder
+  `DigitalZenGarden-Still`, which holds at most one file, and its message reads "The picture is ready to share: 1600
+  by 1200 pixels."
+- The A20 interface chunk is `b3` (A20-P05).
+
+- Q: Which statuses does the release checklist use? → A: The checker's:
+  - `verified`, with evidence;
+  - `pending-campaign-ii`, for device rows naming ZG-D1 … ZG-D8 of `docs/apps/digital-zen-garden/device-campaign.md`
+    (latency and coalesced touches ZG-D1, ZG-D2; idle drawing ZG-D3; heat and battery ZG-D4, ZG-D5; small-screen
+    precision ZG-D6; the quiet defaults ZG-D7; the accessibility audits ZG-D8);
+  - `owner-action`, with the steps of `docs/release/build-and-archive.md`.
+- Q: Which words does the experience's own claims scan refuse? → A: It scans the store text and the interface Swift
+  (controls, presenter, the adapter's words and the still), matching whole words case-insensitively:
+  - physics, realistic sand, simulation;
+  - therapy, therapeutic, medical, clinical, wellbeing, well-being, mental health, stress relief, anxiety, heal,
+    healing, mindfulness, meditation;
+  - fps, real-time, unlimited, lossless.
+
+  The shared copy check runs with `copyCheck.allow: ["share"]` and nothing else. Every test named in the claims table
+  must exist.
+- Q: What does the source scan refuse? → A: The A19 list, in `Packages/ExperiencesCreative/DigitalZenGarden`:
+  `URLSession`, `import Network`, `CLLocation`, `AVCapture`, `AVAudioRecorder`, `inputNode`, `installTap`,
+  `CMMotion`, `CNContact`, `PHPhotoLibrary`, `import Photos`, `PhotosUI`, `UIImagePickerController`,
+  `ASIdentifierManager`, `AppTrackingTransparency`, `isIdleTimerDisabled` and any `brightness =` write.
+- Q: How are crash recovery and sample files proved? → A:
+  - **Crash recovery:** a test-only `failNextDraw` seam in the presenter makes the next draw throw once
+    (`GardenDrawError.injected`). A test saves two gardens in a temporary storage, sets the seam and draws, so the
+    session fails with the injected message. `library.json` and both `garden-<n>.json` files must be byte-identical,
+    and a new session over the same storage opens and lists both gardens.
+  - **Sample files:** committed fixtures under `ExperienceTests/Fixtures/`:
+    - snapshot payloads `snapshot-v1.json` (from the schema-1 document), `snapshot-newer.json` and
+      `snapshot-damaged.json`;
+    - `garden-current.json`, `garden-newer.json` and `garden-damaged.json`;
+    - `library-current.json`, `library-newer.json` and `library-damaged.json`.
+
+    Current samples open; newer and damaged snapshots are refused; garden files are listed as unreadable with
+    `newer-version` or `damaged`; a newer index makes the library read-only and a damaged one is rebuilt only by the
+    next change; every file stays byte-identical after reading.
+- Q: Which interface journey runs? → A: `ZGReleaseUITests` joins chunk `b3`: a fresh start shows `calm-sound`,
+  `calm-drift` and `calm-haptics` off; "Make picture" is tapped; the message reads "The picture is ready to share: 1600
+  by 1200 pixels." and `still-share` exists. It takes under 60 s.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Nothing leaves the device unless the person shares it (Priority: P1) 🎯
@@ -103,12 +160,13 @@ In the one app, a still picture of the garden is made and offered to the share s
 **Acceptance Scenarios**:
 
 1. **Given** a fresh start, **Then** the three calm switches are off; **When** a still is made, **Then** its message
-   names the PNG and 1600 × 1200, and the share button exists.
+   names 1600 by 1200 pixels, and the share control exists.
 
 ### Edge Cases
 
 - **A sample of a schema not yet written:** refused as newer.
 - **Copy that implies relaxation as a health effect:** refused; the copy describes what the person does, not an effect.
+- **Copy that names the optional tones:** it says "sound", never "audio" or "music" (shared denylist words).
 - **The person declines the Photos prompt:** saving to Files still works; the copy promises nothing about Photos.
 - **A damaged library index:** the gardens it cannot list stay on disk and are reported, never deleted.
 - **A device-only check:** pending the campaign, never claimed.
