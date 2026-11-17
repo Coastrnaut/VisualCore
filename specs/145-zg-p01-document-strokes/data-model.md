@@ -23,3 +23,15 @@
   `remove(Stone)`, `tone(from, to)`.
 - **`GardenHistory`:** `document`, `checkpoint` (document and field), `done` (≤ 100), `undone`; `apply(_:)`,
   `undo()`, `redo()`, `field()` (rebuilt from the checkpoint).
+- **As built (convergence T-A20-115):**
+  - `GardenHistory` builders: `rake(_:rake:)` resamples a drag with `StrokeResampler` and applies it;
+    `placeStone(kind:position:rotation:scale:)` builds a stone with id `nextStoneID` and depth max + 1 (0 when there
+    is none); `moveStone(id:to:)`, `rotateStone(id:to:)` (normalized into −π…π), `removeStone(id:)`, `setTone(_:)`.
+  - Stones are kept in ascending depth order; the history sorts a given document's stones by depth.
+  - Command refusals: a missing or different stone gives `outOfRange("id")`; a wrong `from` or an out-of-range `to`
+    gives `outOfRange("position")`, `outOfRange("rotation")` or `outOfRange("tone")`; an unknown tone gives
+    `unknownTone`.
+  - Undo of a place restores `nextStoneID` to the stone's id; the command stored for a rotation carries the
+    normalized angle.
+  - A rake's tines are its ridges: the interior maxima of depth·cos(2π·tines·u/width) over |u| ≤ width/2 number
+    exactly `tines`.

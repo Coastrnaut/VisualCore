@@ -9,3 +9,5 @@
   a new command clears redo; beyond 100 commands the oldest folds into the checkpoint and rebuilding from it equals
   rebuilding from the start within 1e-6; undo and redo with empty lists change nothing.
 - **Purity:** no GL, UIKit, SwiftUI, network or clock in the core.
+- **As built:** the builders, depth-ordered stones, the command refusal codes and the ridge count of data-model.md
+  "As built" (HistoryTests, RakeTests).
