@@ -54,7 +54,7 @@ The A18 rules pass (visuals are code). Post-design: PASS.
 ```text
 Packages/VisualCoreRendering/Sources/VisualCoreRendering/CrossfadeScene.swift                    new
 Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/CrossfadeSceneTests.swift            new
-Packages/VisualCoreRendering/README.md (or the rendering section of Packages/VisualCore/README.md), docs/api/visualcore-public-api.txt  modify
+Packages/VisualCoreRendering/README.md (scene table), docs/api/visualcore-public-api.txt     modify
 Packages/ExperiencesCreative/AmbientClock/Core/{ThemePreset,ThemeCatalog}.swift                  new
 Packages/ExperiencesCreative/AmbientClock/CoreTests/{ThemePresetTests,ThemeCatalogTests}.swift   new
 Packages/ExperiencesCreative/AmbientClock/Experience/{ParticleDriftTheme,WaveFieldTheme,SDFShapesTheme,ThemeShaders,

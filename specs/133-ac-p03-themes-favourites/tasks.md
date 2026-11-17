@@ -13,7 +13,7 @@ assert. Precedent: `specs/132-ac-p02-overlay-theme/tasks.md` and `specs/126-ia-p
 
 ## Phase 2: Foundational — the VisualCore crossfade (G-TRANSITION)
 
-- [ ] T-A18-302 Create `Packages/VisualCoreRendering/Sources/VisualCoreRendering/CrossfadeScene.swift` per data-model.md and contracts/crossfade.md ("two `RenderTarget`s of the drawable size; `from` and `to` drawn through `context.redirected(to:width:height:)`; one mix pass with `progress` clamped 0…1; rebuilt on resize and repeated setup; teardown releases everything"; `replaceIncoming(_:)` and restart from the current mix), every public symbol with `///`, and `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/CrossfadeSceneTests.swift` (progress 0 equals `from` byte for byte, 1 equals `to`, 0.5 within 2 of the average; no pixel darker than both inputs; resize and repeated setup give the same frame; teardown leaves no GPU object); the README row and the API baseline (`check_public_api.py --update`, then `check_public_api.py`) (FR-A18-303, 307)
+- [ ] T-A18-302 Create `Packages/VisualCoreRendering/Sources/VisualCoreRendering/CrossfadeScene.swift` per data-model.md and contracts/crossfade.md ("two `RenderTarget`s of the drawable size; `from` and `to` drawn through `context.redirected(to:width:height:)`; one mix pass with `progress` clamped 0…1; rebuilt on resize and repeated setup; teardown releases everything"; `replaceIncoming(_:)` and restart from the current mix), every public symbol with `///`, and `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/CrossfadeSceneTests.swift` (progress 0 equals `from` byte for byte, 1 equals `to`, 0.5 within 2 of the average; no pixel darker than both inputs; resize and repeated setup give the same frame; teardown leaves no GPU object); the row in `Packages/VisualCoreRendering/README.md` and the API baseline (`check_public_api.py --update`, then `check_public_api.py`) (FR-A18-303, 307)
 
 ## Phase 3: Story 1 — four calm themes, all readable (P1) 🎯 MVP
 
@@ -22,7 +22,7 @@ assert. Precedent: `specs/132-ac-p02-overlay-theme/tasks.md` and `specs/126-ia-p
 
 ## Phase 4: Story 2 — changing theme without a jolt (P1)
 
-- [ ] T-A18-305 [P] [US2] Write `Packages/ExperiencesCreative/AmbientClock/ExperienceTests/{ThemeRenderTests,CrossfadeUseTests,SnapshotMigrationTests}.swift`: every theme at both levels non-blank with a dark centre; a theme change under Reduce Motion shows the new theme on the next frame; otherwise a frame 0.6 s into the fade differs from both themes and the frame at 1.2 s equals the new theme; a change during a fade restarts it; the schema-1 example migrates to theme 0 palette 0 and schema 2 round-trips; `theme.select` 4 and `theme.palette` 3 refused (SC-A18-302, 303; FR-A18-306)
+- [ ] T-A18-305 [P] [US2] Write `Packages/ExperiencesCreative/AmbientClock/ExperienceTests/{ThemeRenderTests,CrossfadeUseTests,SnapshotMigrationTests}.swift`: every theme at both levels non-blank with a dark centre; a theme change under Reduce Motion shows the new theme on the next frame; otherwise a frame 0.6 s into the fade differs from both themes and the frame at 1.2 s equals the new theme; a change during a fade restarts it; the schema-1 example migrates to theme 0 palette 0 and schema 2 round-trips; `theme.select` 4 and `theme.palette` 3 refused; a theme whose fragment fails to compile (a test-only seam) leaves the previous theme drawn and the time unchanged (SC-A18-302, 303; FR-A18-306; spec edge case)
 
 ## Phase 5: Story 3 — saving favourites (P2)
 
