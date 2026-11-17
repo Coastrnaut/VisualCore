@@ -28,16 +28,32 @@
 //   motion.enabled [0…1]          exactly 0 (still) or 1 (moving); `a19.invalid-choice` otherwise.
 // A refusal changes nothing.
 //
-// Digest ("a19.wallpaper.v1"): scene, preset, the three parameter values, template, orientation, animation time,
-// format, motion and seed. Snapshot schema 1: `{"animationTime", "format", "motion", "orientation", "parameters",
-// "preset", "scene", "template"}` as JSON with sorted keys; decoding refuses a value outside its range (a parameter
-// outside its scene's range, an unused slot other than 0). The seed is not stored: `restore(payload:seed:)` takes the
-// session's seed, so a round trip keeps the digest.
+// Digest of A19-P02 ("a19.wallpaper.v1"): scene, preset, the three parameter values, template, orientation,
+// animation time, format, motion and seed. Snapshot schema 1 (A19-P02): `{"animationTime", "format", "motion",
+// "orientation", "parameters", "preset", "scene", "template"}` as JSON with sorted keys; decoding refuses a value
+// outside its range (a parameter outside its scene's range, an unused slot other than 0). The seed is not stored:
+// `restore(payload:seed:)` takes the session's seed, so a round trip keeps the digest.
 //
 // Quality: `level-0` (full detail, resolution and iteration shares 1) and `level-1` (shares 0.5: fewer octaves, cells
 // or layers and one sample per 2 × 2 pixels); each level is one full-screen draw.
 //
 // Outcome: `scene-<id>` of the scene shown, for example `scene-ink-flow`.
+//
+// Feature 140 (A19-P03) T-A19-303 (FR-A19-301; clarification Q1; data-model.md "WallpaperCore snapshot schema 2"):
+// the four colours of the preset can be edited.
+//   - Fields: `custom` 0 (the preset's colours) or 1 (edited), and `colors`, twelve components (r, g, b of the four
+//     slots, each 0…1). While `custom` is 0 the components are the preset's own colours.
+//   - Actions: `preset.color [slot 0…3, r 0…1, g 0…1, b 0…1]` sets one slot (a slot that is not a whole index is
+//     `a19.invalid-choice`, a component outside 0…1 `action.out-of-range` at its index) and sets `custom` 1;
+//     `preset.reset []` sets `custom` 0 and the preset's colours again. Another scene or another preset
+//     (`scene.select`, `scene.preset`) sets `custom` 0 and the new preset's colours; choosing the shown scene or
+//     preset keeps the edit.
+//   - Digest ("a19.wallpaper.v2"): the schema-1 fields, then `custom`, then the twelve components only when `custom`
+//     is 1, then the seed.
+//   - Snapshot schema 2: the schema-1 keys plus `custom` (0/1) and `colors` (twelve numbers in 0…1). The migration
+//     1 → 2 sets `custom` 0 and copies the stored preset's colours. A schema-1 payload handed to the restore without
+//     the migration is refused (the new keys are missing).
+//   - `project` carries `customColors` (the four edited colours) only when `custom` is 1.
 import Foundation
 import LivingWallpapersCore
 import VisualCoreDiagnostics
@@ -58,21 +74,29 @@ public enum WallpaperRestoreError: Error, Equatable {
     case outOfRange(String)
 }
 
-/// The state of Living Wallpapers (see the file header). Snapshot schema 1.
+/// The state of Living Wallpapers (see the file header). Snapshot schema 2 (feature 140).
 public struct WallpaperCore: ExperienceCore, Equatable, Codable {
     /// The experience's id in the catalog.
     public static let experienceID = "a19.living-wallpapers"
     /// The action ids in declaration order.
     public static let actionIDs = ["scene.select", "scene.preset", "scene.parameter", "canvas.template",
-                                   "canvas.orientation", "scene.time", "export.format", "motion.enabled"]
+                                   "canvas.orientation", "scene.time", "export.format", "motion.enabled",
+                                   "preset.color", "preset.reset"]
     /// The number of values each action carries, by action id.
     static let valueCounts: [String: Int] = ["scene.select": 1, "scene.preset": 1, "scene.parameter": 2,
                                              "canvas.template": 1, "canvas.orientation": 1, "scene.time": 1,
-                                             "export.format": 1, "motion.enabled": 1]
-    /// The snapshot schema this build writes.
-    public static let schemaVersion = 1
-    /// The digest's domain string (schema 1).
-    public static let digestDomain = "a19.wallpaper.v1"
+                                             "export.format": 1, "motion.enabled": 1, "preset.color": 4,
+                                             "preset.reset": 0]
+    /// The snapshot schema this build writes (2 since feature 140: the edited colours).
+    public static let schemaVersion = 2
+    /// The digest's domain string (schema 2).
+    public static let digestDomain = "a19.wallpaper.v2"
+    /// The number of colour slots of a preset.
+    public static let colorSlots = 4
+    /// The number of colour components: r, g and b of every slot.
+    public static let componentCount = 12
+    /// The range of one colour component.
+    public static let componentRange: ClosedRange<Double> = 0...1
     /// The prefix of the outcome code: `scene-<id>`.
     public static let sceneCodePrefix = "scene-"
     /// The number of parameter slots (the most parameters a scene has).
@@ -113,6 +137,10 @@ public struct WallpaperCore: ExperienceCore, Equatable, Codable {
     public private(set) var motion = true
     /// The seed of the preparation (not stored; in the digest).
     public private(set) var seed: UInt64 = 1
+    /// Whether the colours are edited: 0 the preset's own, 1 edited (default 0).
+    public private(set) var custom = 0
+    /// The twelve colour components (r, g, b of the four slots); while `custom` is 0 the preset's own colours.
+    public private(set) var colors: [Double] = WallpaperCore.presetComponents(scene: 0, preset: 0)
     /// The quality tier the host set (0 = level-0, 1 = level-1, clamped); presentation only — not in the digest,
     /// the snapshot or `==`.
     public private(set) var qualityTier = 0
@@ -139,6 +167,35 @@ public struct WallpaperCore: ExperienceCore, Equatable, Codable {
         CanvasTemplates.all[min(max(template, 0), Self.templateCount - 1)]
     }
 
+    /// The four colours drawn: the edited ones when `custom` is 1, else the preset's.
+    public var palette: [RGBColor] {
+        custom == 1 ? Self.rgbColors(colors) : presetDefinition.colors
+    }
+
+    /// The four edited colours when `custom` is 1; nil otherwise.
+    public var customColors: [RGBColor]? { custom == 1 ? Self.rgbColors(colors) : nil }
+
+    /// The twelve components of preset `preset` of scene `scene` (both clamped); a missing slot is black.
+    public static func presetComponents(scene: Int, preset: Int) -> [Double] {
+        let presets = SceneCatalog.scenes[clampedScene(scene)].presets
+        let chosen = presets[min(max(preset, 0), presets.count - 1)]
+        var values = [Double](repeating: 0, count: componentCount)
+        for (slot, color) in chosen.colors.prefix(colorSlots).enumerated() {
+            values[slot * 3] = color.r
+            values[slot * 3 + 1] = color.g
+            values[slot * 3 + 2] = color.b
+        }
+        return values
+    }
+
+    /// The colours of twelve components, in slot order.
+    static func rgbColors(_ components: [Double]) -> [RGBColor] {
+        (0..<colorSlots).map { slot in
+            func at(_ index: Int) -> Double { index < components.count ? components[index] : 0 }
+            return RGBColor(r: at(slot * 3), g: at(slot * 3 + 1), b: at(slot * 3 + 2))
+        }
+    }
+
     /// The orientation as the core model names it.
     public var orientationValue: Orientation { orientation == 1 ? .landscape : .portrait }
 
@@ -146,16 +203,19 @@ public struct WallpaperCore: ExperienceCore, Equatable, Codable {
     public var formatValue: ExportFormat { ExportFormat.allCases[min(max(format, 0), Self.formatCount - 1)] }
 
     /// The A19-P01 project of this state, which the export planner plans: the scene, preset, seed, the scene's
-    /// parameters by id, the template id, the orientation, the animation time and the format.
+    /// parameters by id, the template id, the orientation, the animation time and the format, and the edited colours
+    /// (`customColors`) when `custom` is 1.
     public var project: WallpaperProject {
         let definition = sceneDefinition
         var values: [String: Double] = [:]
         for (index, parameter) in definition.parameters.enumerated() where index < parameters.count {
             values[parameter.id] = parameters[index]
         }
-        return WallpaperProject(scene: definition.id, preset: preset, seed: seed, parameters: values,
-                                template: templateDefinition.id, orientation: orientationValue,
-                                animationTime: animationTime, format: formatValue)
+        var made = WallpaperProject(scene: definition.id, preset: preset, seed: seed, parameters: values,
+                                    template: templateDefinition.id, orientation: orientationValue,
+                                    animationTime: animationTime, format: formatValue)
+        made.customColors = customColors
+        return made
     }
 
     /// The three parameter values of scene `scene` (clamped) at their defaults, unused slots 0.
@@ -194,15 +254,36 @@ public struct WallpaperCore: ExperienceCore, Equatable, Codable {
         lhs.scene == rhs.scene && lhs.preset == rhs.preset && lhs.parameters == rhs.parameters
             && lhs.template == rhs.template && lhs.orientation == rhs.orientation
             && lhs.animationTime == rhs.animationTime && lhs.format == rhs.format && lhs.motion == rhs.motion
-            && lhs.seed == rhs.seed
+            && lhs.seed == rhs.seed && lhs.custom == rhs.custom && lhs.colors == rhs.colors
     }
 
     // MARK: Contract
 
-    /// Schema 1; no migration steps yet.
-    public static var migrations: MigrationChain { MigrationChain(currentVersion: schemaVersion) }
+    /// Schema 2; the step from schema 1 adds `custom` 0 and `colors`, the stored preset's twelve components (a scene
+    /// or preset that is not a whole index in range throws ``WallpaperRestoreError/outOfRange(_:)``).
+    public static var migrations: MigrationChain {
+        MigrationChain(currentVersion: schemaVersion, steps: [
+            1: { payload in
+                var upgraded = payload
+                guard let scene = (payload[CodingKeys.scene.rawValue] as? NSNumber)?.intValue,
+                      (0..<WallpaperCore.sceneCount).contains(scene) else {
+                    throw WallpaperRestoreError.outOfRange(CodingKeys.scene.rawValue)
+                }
+                guard let preset = (payload[CodingKeys.preset.rawValue] as? NSNumber)?.intValue,
+                      (0..<SceneCatalog.scenes[scene].presets.count).contains(preset) else {
+                    throw WallpaperRestoreError.outOfRange(CodingKeys.preset.rawValue)
+                }
+                if upgraded[CodingKeys.custom.rawValue] == nil { upgraded[CodingKeys.custom.rawValue] = 0 }
+                if upgraded[CodingKeys.colors.rawValue] == nil {
+                    upgraded[CodingKeys.colors.rawValue] = WallpaperCore.presetComponents(scene: scene,
+                                                                                          preset: preset)
+                }
+                return upgraded
+            },
+        ])
+    }
 
-    /// The eight controls with their declared ranges (see the file header).
+    /// The ten controls with their declared ranges (see the file header).
     public static var controls: [ExperienceControl] {
         [ExperienceControl(id: "scene.select", ranges: [0...Double(sceneCount - 1)]),
          ExperienceControl(id: "scene.preset", ranges: [0...Double(presetCount - 1)]),
@@ -211,7 +292,10 @@ public struct WallpaperCore: ExperienceCore, Equatable, Codable {
          ExperienceControl(id: "canvas.orientation", ranges: [0...1]),
          ExperienceControl(id: "scene.time", ranges: [timeRange]),
          ExperienceControl(id: "export.format", ranges: [0...Double(formatCount - 1)]),
-         ExperienceControl(id: "motion.enabled", ranges: [0...1])]
+         ExperienceControl(id: "motion.enabled", ranges: [0...1]),
+         ExperienceControl(id: "preset.color", ranges: [0...Double(colorSlots - 1), componentRange, componentRange,
+                                                        componentRange]),
+         ExperienceControl(id: "preset.reset", ranges: [])]
     }
 
     /// The opening state with `seed`; nothing is random beyond the seed and no clock is read.
@@ -237,10 +321,23 @@ public struct WallpaperCore: ExperienceCore, Equatable, Codable {
                 scene = chosen
                 preset = 0
                 parameters = Self.defaultParameters(scene: chosen)
+                clearColors()
             }
         case "scene.preset":
             guard let chosen = Self.choice(v[0], count: sceneDefinition.presets.count) else { return invalid }
-            preset = chosen
+            if chosen != preset {
+                preset = chosen
+                clearColors()
+            }
+        case "preset.color":
+            guard let slot = Self.choice(v[0], count: Self.colorSlots) else { return invalid }
+            for index in 1...3 where !Self.componentRange.contains(v[index]) {
+                return .rejected(.outOfRange(index: index))
+            }
+            custom = 1
+            colors.replaceSubrange((slot * 3)..<(slot * 3 + 3), with: v[1...3])
+        case "preset.reset":
+            clearColors()
         case "scene.parameter":
             guard let index = Self.choice(v[0], count: Self.parameterSlots) else { return invalid }
             let definitions = sceneDefinition.parameters
@@ -268,6 +365,12 @@ public struct WallpaperCore: ExperienceCore, Equatable, Codable {
         return .accepted
     }
 
+    /// Sets `custom` 0 and the colours of the shown preset.
+    private mutating func clearColors() {
+        custom = 0
+        colors = Self.presetComponents(scene: scene, preset: preset)
+    }
+
     /// The index named by `value`: a finite whole number in `0..<count`; nil otherwise.
     static func choice(_ value: Double, count: Int) -> Int? {
         guard value.isFinite, value == value.rounded(), value >= 0, value < Double(count) else { return nil }
@@ -291,8 +394,8 @@ public struct WallpaperCore: ExperienceCore, Equatable, Codable {
         ExperienceOutcome(code: Self.sceneCodePrefix + sceneDefinition.id)
     }
 
-    /// "a19.wallpaper.v1", then scene, preset, the three parameter values, template, orientation, animation time,
-    /// format, motion and seed.
+    /// "a19.wallpaper.v2", then scene, preset, the three parameter values, template, orientation, animation time,
+    /// format, motion, `custom`, the twelve colour components only when `custom` is 1, and the seed.
     public func writeDigest(into builder: inout DigestBuilder) throws(DigestError) {
         builder.add(Self.digestDomain)
         builder.add(scene)
@@ -303,16 +406,20 @@ public struct WallpaperCore: ExperienceCore, Equatable, Codable {
         try builder.add(animationTime)
         builder.add(format)
         builder.add(motion)
+        builder.add(custom)
+        if custom == 1 {
+            for value in colors { try builder.add(value) }
+        }
         builder.add(seed)
     }
 
     // MARK: Snapshot
 
     private enum CodingKeys: String, CodingKey {
-        case scene, preset, parameters, template, orientation, animationTime, format, motion
+        case scene, preset, parameters, template, orientation, animationTime, format, motion, custom, colors
     }
 
-    /// Decodes the schema-1 fields; a value outside its range throws ``WallpaperRestoreError/outOfRange(_:)``. The
+    /// Decodes the schema-2 fields; a value outside its range throws ``WallpaperRestoreError/outOfRange(_:)``. The
     /// seed is 1 here; `restore(payload:seed:)` sets the session's seed.
     public init(from decoder: any Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -344,11 +451,19 @@ public struct WallpaperCore: ExperienceCore, Equatable, Codable {
         animationTime = time
         format = try index(.format, count: Self.formatCount)
         motion = try c.decode(Bool.self, forKey: .motion)
+        custom = try index(.custom, count: 2)
+        let components = try c.decode([Double].self, forKey: .colors)
+        guard components.count == Self.componentCount,
+              components.allSatisfy({ $0.isFinite && Self.componentRange.contains($0) }) else {
+            throw WallpaperRestoreError.outOfRange(CodingKeys.colors.rawValue)
+        }
+        // While the colours are not edited they are the preset's own (the stored ones are not kept).
+        colors = custom == 1 ? components : Self.presetComponents(scene: scene, preset: preset)
         seed = 1
     }
 
-    /// Encodes the schema-1 fields: scene, preset, parameters, template, orientation, animation time, format and
-    /// motion (not the seed or the quality tier).
+    /// Encodes the schema-2 fields: scene, preset, parameters, template, orientation, animation time, format,
+    /// motion, `custom` and `colors` (not the seed or the quality tier).
     public func encode(to encoder: any Encoder) throws {
         var c = encoder.container(keyedBy: CodingKeys.self)
         try c.encode(scene, forKey: .scene)
@@ -359,9 +474,11 @@ public struct WallpaperCore: ExperienceCore, Equatable, Codable {
         try c.encode(animationTime, forKey: .animationTime)
         try c.encode(format, forKey: .format)
         try c.encode(motion, forKey: .motion)
+        try c.encode(custom, forKey: .custom)
+        try c.encode(colors, forKey: .colors)
     }
 
-    /// The core decoded from its schema-1 payload with `seed` as its seed.
+    /// The core decoded from its schema-2 payload with `seed` as its seed.
     public static func restore(payload: Data, seed: UInt64) throws -> WallpaperCore {
         var core = try JSONDecoder().decode(WallpaperCore.self, from: payload)
         core.seed = seed

@@ -404,11 +404,12 @@ extension ExperienceRegistry {
         return registration
     }
 
-    /// A19 Living Wallpapers (feature 139, A19-P02): a candidate until X-A19. Snapshot schema 1, so no earlier
-    /// example is stored yet.
+    /// A19 Living Wallpapers (features 139–140, A19-P02…P03): a candidate until X-A19. Snapshot schema 2 (feature 140
+    /// adds editable colours); the stored schema-1 example proves the migration.
     fileprivate static var livingWallpapers: ExperienceRegistration? {
         guard let id = LivingWallpapersExperience.id else { return nil }
-        var registration = ExperienceRegistration(id: id, core: WallpaperCore.self) { launch in
+        let examples = [WallpaperCore.schemaOneExample()].compactMap { $0 }
+        var registration = ExperienceRegistration(id: id, core: WallpaperCore.self, examples: examples) { launch in
             let system = SystemAccessibilityObserver.systemValues()
             return LivingWallpapersExperience.make(
                 id: id, storage: launch.storage,

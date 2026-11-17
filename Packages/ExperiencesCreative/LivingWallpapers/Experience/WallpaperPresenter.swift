@@ -18,6 +18,11 @@
 //     the environment's timed still renderer and the edge limit recorded at `setup`
 //     (`context.resources.maxTextureSize`; a size the host still refuses fails with the reason `render`).
 //
+// Feature 140 (A19-P03) T-A19-303, T-A19-307, T-A19-309 (FR-A19-301–305): the palette uniforms are the core's
+// `palette`, the edited colours when `custom` is 1 and the preset's otherwise; the mirror carries `custom` and the
+// twelve components for the colour editor; the controls get the presenter's export limit (`maxEdge`) and their
+// ``EditorModel`` (notice, result line, help and the announcement of each export outcome).
+//
 // No GL call: everything is drawn through VisualCoreRendering's scene; no platform-wallpaper call.
 import Foundation
 import LivingWallpapersCore
@@ -47,6 +52,10 @@ final class WallpaperMirror {
     var format = 0
     /// Whether the scene moves.
     var motion = true
+    /// Whether the colours are edited (0 or 1).
+    var custom = 0
+    /// The twelve colour components shown (the preset's while `custom` is 0).
+    var colors = WallpaperCore.presetComponents(scene: 0, preset: 0)
 
     /// The template's definition.
     var templateDefinition: CanvasTemplate {
@@ -69,6 +78,8 @@ final class WallpaperPresenter: ExperiencePresenter {
     let mirror = WallpaperMirror()
     /// The export attempt (its temporary folder is `LivingWallpapers-Export`).
     let stillExport: StillExport
+    /// The editor's model: notice, result line, help and announcements (feature 140).
+    let editor = EditorModel()
     /// The scene drawn; made in `setup`, released in `teardown`.
     private(set) var scene: FullScreenShaderScene?
     /// The scene index of `scene`.
@@ -145,7 +156,7 @@ final class WallpaperPresenter: ExperiencePresenter {
         let time = Self.uniformTime(frameTime: frame.time, animationTime: core.animationTime, motion: core.motion,
                                     reduceMotion: reduceMotion)
         scene.resize(context)
-        scene.palette = SceneShaders.palette(core.presetDefinition)
+        scene.palette = SceneShaders.palette(colors: core.palette)
         scene.parameters = SceneShaders.parameters(core.parameters, tier: tier)
         scene.seedOffsets = SceneShaders.seedOffsets(seed: core.seed)
         scene.fixedTime = time
@@ -175,6 +186,8 @@ final class WallpaperPresenter: ExperiencePresenter {
         if mirror.animationTime != core.animationTime { mirror.animationTime = core.animationTime }
         if mirror.format != core.format { mirror.format = core.format }
         if mirror.motion != core.motion { mirror.motion = core.motion }
+        if mirror.custom != core.custom { mirror.custom = core.custom }
+        if mirror.colors != core.colors { mirror.colors = core.colors }
     }
 
     /// The canvas label: "<scene>, <preset>, <template label>", for example "Aurora Bands, Polar Night, iPhone 16
@@ -197,10 +210,10 @@ final class WallpaperPresenter: ExperiencePresenter {
 
     /// The native controls (``WallpaperControls``), sending through `port`.
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
-        AnyView(WallpaperControls(port: port, mirror: mirror, presenter: self))
+        AnyView(WallpaperControls(port: port, mirror: mirror, presenter: self, model: editor))
     }
 
-    /// The actions of the native controls: all eight.
+    /// The actions of the native controls: all ten.
     var nativeActions: Set<String> { Set(WallpaperCore.actionIDs) }
 
     // MARK: Export
@@ -212,5 +225,20 @@ final class WallpaperPresenter: ExperiencePresenter {
             try renderer(width: width, height: height, time: time)
         }
         return stillExport.run(project: lastCore.project, maxEdge: maxEdge, render: render)
+    }
+
+    /// Exports the offered fallback `plan` (a refusal's `offeredPlan(format:)`) at the core's animation time with
+    /// `renderer` (feature 140).
+    @discardableResult
+    func export(plan: ExportPlan, using renderer: ExperienceStillRenderer) -> StillExport.Output? {
+        func render(_ width: Int, _ height: Int, _ time: Double) throws(OffscreenRenderError) -> StillImage {
+            try renderer(width: width, height: height, time: time)
+        }
+        return stillExport.run(plan: plan, time: lastCore.animationTime, render: render)
+    }
+
+    /// The planner's result for the core's project at the recorded edge limit (what the notice describes).
+    var plannedExport: Result<ExportPlan, ExportRefusal> {
+        ExportPlanner.plan(project: lastCore.project, maxEdge: maxEdge)
     }
 }

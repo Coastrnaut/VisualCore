@@ -204,7 +204,13 @@ enum SceneShaders {
 
     /// The four colours of `preset` decoded to linear light, as `u_palette` receives them.
     static func palette(_ preset: ColorPreset) -> [SIMD3<Float>] {
-        preset.colors.map { SIMD3(Float(srgbDecode($0.r)), Float(srgbDecode($0.g)), Float(srgbDecode($0.b))) }
+        palette(colors: preset.colors)
+    }
+
+    /// `colors` (sRGB-encoded, for example the edited colours of feature 140) decoded to linear light, as
+    /// `u_palette` receives them.
+    static func palette(colors: [RGBColor]) -> [SIMD3<Float>] {
+        colors.map { SIMD3(Float(srgbDecode($0.r)), Float(srgbDecode($0.g)), Float(srgbDecode($0.b))) }
     }
 
     /// The sRGB transfer function's decode of one encoded channel (0…1), as `vc_srgbDecode`.

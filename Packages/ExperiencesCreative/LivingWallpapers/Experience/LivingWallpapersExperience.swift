@@ -2,8 +2,8 @@
 // `LivingWallpapersExperience`: the experience's id and the factory the one app's registry calls (the same parameter
 // list as Ambient Clock's, so the registry entry mirrors it). Reduce Motion stills the preview at the chosen
 // animation time; nothing flashes, so Reduce Flashing changes nothing. The state travels in the host's saved session
-// state (snapshot schema 1); this phase stores nothing in `storage` (exports go to a temporary folder only; saving
-// and the history come in A19-P04).
+// state (snapshot schema 1; schema 2 since feature 140, A19-P03, with the edited colours); nothing is stored in
+// `storage` yet (exports go to a temporary folder only; saving and the history come in A19-P04).
 import Foundation
 import VisualCoreExperience
 import VisualCoreExperienceHost
