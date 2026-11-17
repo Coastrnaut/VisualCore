@@ -44,3 +44,7 @@ commits.
 
 MVP: the export journey in the interface (502, 503). The claims test (504, 505) closes the regression fixture; the
 plan (506) closes G-DEVICE. Review checkpoint at 508.
+
+## Phase 6: Convergence
+
+- [ ] T-A19-510 List `device-campaign.md`, `video-decision.md` and `licenses.md` in the document table of `docs/apps/living-wallpapers/README.md` per FR-A19-503 (partial)
