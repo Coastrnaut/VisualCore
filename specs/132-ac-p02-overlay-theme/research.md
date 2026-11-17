@@ -17,5 +17,12 @@
   0.25–2 (default 1).
 - **D5 Layout:** the time font is 0.22 × the shorter side times the Dynamic Type factor, one line, with a minimum
   scale factor of 0.3 within 90 % of the width; the date uses the title style below it.
-- **D6 Verification:** the nine standard scenarios plus fixtures "time zone changed" and "motion off"; the probe at
-  the canvas centre is `dark`.
+- **D6 Verification:** the nine standard scenarios plus five fixtures, because the content-counts audit
+  (`verify_experiences.py`, `content_requirement`) requires the planning catalog's count of 5 for A18:
+  - `fixture-time-zone-changed`;
+  - `fixture-motion-off`;
+  - `fixture-twenty-four-hour`;
+  - `fixture-seconds-shown`;
+  - `fixture-slow-motion`.
+
+  The probe at the canvas centre is `dark`.
