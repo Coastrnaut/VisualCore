@@ -9,7 +9,7 @@ only).
 
 ## Phase 1: Setup
 
-- [ ] T-A19-001 Create `docs/apps/living-wallpapers/README.md` (what the experience is per the manual §1–§2: a creator of procedural backgrounds exported as correctly sized stills, applied by the person through the system's own controls, offline; that it is an experience of the one app; its documents) and `docs/apps/living-wallpapers/regression-baseline.md` with the phase start `530855ef` (the specify commit; constitution `2f592d76`) and the reference pin `d93edd1`
+- [X] T-A19-001 Create `docs/apps/living-wallpapers/README.md` (what the experience is per the manual §1–§2: a creator of procedural backgrounds exported as correctly sized stills, applied by the person through the system's own controls, offline; that it is an experience of the one app; its documents) and `docs/apps/living-wallpapers/regression-baseline.md` with the phase start `530855ef` (the specify commit; constitution `2f592d76`) and the reference pin `d93edd1` — Verified 2026-11-17: 2026-11-17: docs/apps/living-wallpapers/README.md and regression-baseline.md written (phase start 530855ef, constitution 2f592d76, reference pin d93edd1); validate_docs.py PASS
 
 ## Phase 3: User Story 1 — Evidence-backed integration matrix (P1) 🎯
 
