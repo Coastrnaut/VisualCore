@@ -53,7 +53,7 @@
     StudioInspector, StudioLibraryView, StudioPresenter, Adapter/StudioCore; `allow: []`);
   - an A22 section in `docs/release/known-limitations.md` (no sandbox; GLSL ES 3.00 fragment shaders only; no sharing
     or export; device rows pending).
-- [ ] T-A22-607 [US3] Write `specs/164-ss-p06-release/scan-claims-release.sh` with the words of clarification Q2, then
+- [X] T-A22-607 [US3] Write `specs/164-ss-p06-release/scan-claims-release.sh` with the words of clarification Q2, then — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A22-P06.scan-claims.json exit 0 (no refused word in the store text and six interface Swift files; not a sandbox present; 58 proving tests found)
   run it (`--name scan-claims`); it requires "not a sandbox" and that every named test exists (SC-A22-603).
 
 ## Phase 5: Story 4 — a first session in the app (P2)

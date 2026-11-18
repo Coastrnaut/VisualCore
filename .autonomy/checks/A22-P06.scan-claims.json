@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "sh",
+    "specs/164-ss-p06-release/scan-claims-release.sh"
+  ],
+  "command": "sh specs/164-ss-p06-release/scan-claims-release.sh",
+  "elapsed_seconds": 0.483,
+  "exit_code": 0,
+  "finished": "2026-11-18T22:37:38+00:00",
+  "log": ".autonomy/logs/A22-P06.scan-claims.log",
+  "log_sha256": "b243d964c64531739bc22945b750701d1a7f35d4f4ed3a5e581e6f42a52aebd7",
+  "name": "scan-claims",
+  "stage": "A22-P06",
+  "started": "2026-11-18T22:37:37+00:00",
+  "timed_out": false
+}
