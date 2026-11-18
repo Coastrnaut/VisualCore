@@ -66,7 +66,7 @@
 
 ## Phase 5: Story 3 — keep projects between visits (P2)
 
-- [ ] T-A22-408 [P] [US3] Create `Experience/ProjectLibrary.swift` per data-model.md (FR-A22-405, 406):
+- [X] T-A22-408 [P] [US3] Create `Experience/ProjectLibrary.swift` per data-model.md (FR-A22-405, 406): — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A22-P04.ss-guidance-watchdog.json exit 0 (ShaderStudioCoreTests 76, ShaderStudioExperienceTests 66 on sim-27.2) (LibraryTests in it)
   - files `project-<n>.json` ("at most 131,072 bytes", kind `a22.saved-project`, version 1, body `{name, order,
     project, values[16], textures[2]}`) and the index `library.json` (kind `a22.project-library`);
   - caps: "24 projects" counting unreadable files, names "trimmed, 1…40 characters", the same name ignoring case;
