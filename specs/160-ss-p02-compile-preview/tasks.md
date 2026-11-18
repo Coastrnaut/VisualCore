@@ -113,7 +113,7 @@
 
 ## Phase 6: Convergence
 
-- [ ] T-A22-214 Record the as-built design in `specs/160-ss-p02-compile-preview/{data-model.md,contracts/experience.md}` (spec edge case "warnings only"; data-model `PreviewPipeline` and `PreviewStatus`; plan structure; partial, contradicts and unrequested):
+- [X] T-A22-214 Record the as-built design in `specs/160-ss-p02-compile-preview/{data-model.md,contracts/experience.md}` (spec edge case "warnings only"; data-model `PreviewPipeline` and `PreviewStatus`; plan structure; partial, contradicts and unrequested): — Verified 2026-11-18: 2026-11-18: as-built design recorded in data-model.md and contracts/experience.md (no warnings from a linked program; the probe program kept when reused; teardown drops a pending request; expansion errors as unknown; the warm-corner probe, the fifth fixture, setupCount); validate_docs PASS; docs only, A22-P02.ss-ios27-4 and verify-27-3 stand
   - **Warnings:** a linked program's warnings are not available from VisualCore (`ResourceRegistry.program` returns no log on success), so `.compiled` carries none in practice. The warnings path is tested with built diagnostics.
   - **Probe program:** it is not released after a success, because the registry's program cache is shared and has no reference counts. A run identical to the live source keeps the live scene. The probe is released only when the new scene compiled a program of its own. Nothing leaks.
   - **Pending requests:** a teardown, including the one before a context rebuild, drops a pending request.

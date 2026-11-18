@@ -10,3 +10,6 @@
 - `recreateContext` and a resize redraw the last good source with the current values.
 - Controls: identifiers `template`, `run`, `uniform-<k>`, `status`, `diagnostics`; every control has a spoken label.
 - Candidate registration; not available.
+- As built: a successful compile carries no warnings (VisualCore returns no log for a linked program); the probe program
+  is kept, not released, when the new scene reuses it; a teardown drops a pending request; the frame probe
+  `warm-corner` (red) is declared for the opening template; the manifest has five fixtures (see data-model.md).
