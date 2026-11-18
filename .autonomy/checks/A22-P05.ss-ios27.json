@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesCreative",
+    "--scheme",
+    "ExperiencesCreative-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "ShaderStudioCoreTests",
+    "ShaderStudioExperienceTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing ShaderStudioCoreTests ShaderStudioExperienceTests",
+  "elapsed_seconds": 8.814,
+  "exit_code": 0,
+  "finished": "2026-11-18T22:19:59+00:00",
+  "log": ".autonomy/logs/A22-P05.ss-ios27.log",
+  "log_sha256": "6aecd81b6dea29a4b105af28d233e459551ed405a5f87cfee6300602dd63e087",
+  "name": "ss-ios27",
+  "stage": "A22-P05",
+  "started": "2026-11-18T22:19:50+00:00",
+  "timed_out": false
+}

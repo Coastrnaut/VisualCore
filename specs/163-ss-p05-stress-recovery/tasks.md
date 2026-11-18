@@ -83,7 +83,7 @@
   - add the fixture `fixture-shape` (`document.shape [3, 1]`, then `uniform.set [2, 0.5]`);
   - add `document.shape` refusals to the rejection scenario;
   - regenerate `scenario-manifest.json`.
-- [ ] T-A22-511 Review checkpoint:
+- [X] T-A22-511 Review checkpoint: — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A22-P05.{ss-ios27,isolation,documented-api,core-purity}.json all exit 0
   - Shader Studio tests on sim-27.2 (`--name ss-ios27`);
   - the documented API, isolation and core purity.
 - [ ] T-A22-512 Contract: close G-DEVICE with "A22-P05" (the plan exists; its rows stay pending); M28 stays
