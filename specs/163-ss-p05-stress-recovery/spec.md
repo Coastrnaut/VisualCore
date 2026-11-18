@@ -24,6 +24,54 @@ Canonical overrides:
 - **Still a candidate.** No VisualCore or ProjectM change. Follow `specs/156-au-p05-sound-device` (device plan) and
   `specs/162-ss-p04-limits-error-ux`.
 
+## Clarifications
+
+### Session 2026-11-18
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- **Resource level:** `ResourceRegistry.stats` (a `ResourceLedger.Snapshot`) gives `liveCount` and `liveBytes` per
+  `ResourceKind`, `totalBytes`, `peakBytes` and `leaked`, the objects still live when a context was destroyed or
+  recreated.
+- **Context rebuild:** `ExperienceSession.recreateContext()` and `RenderHost.recreateContext()` rebuild the context;
+  the presenter tears down and sets up again (A22-P02 `RebuildTests`).
+- **Bounds:** `StudioCore` bounds `uniform.set` and `texture.set` by
+  `uniformCount(template:)` and `textureInputCount(template:)` (`a22.no-uniform`, `a22.no-texture`).
+- **Device plan:** Aurora's `docs/apps/aurora/device-campaign.md` is the pattern; D1 iPhone 15 (iOS 27), D2 iPad Pro
+  13-inch (M5), D3 iPad (A16) on iPadOS 26.5.
+
+- Q: What is the "resource level" and when is it taken? → A: `liveCount` for every kind plus `totalBytes` of the
+  host's registry, read after the first cycle (the warm-up) and after the last; the two MUST be equal, and `leaked`
+  MUST stay 0 across rebuilds.
+- Q: How does the core learn the live project's shape? → A:
+  - **Action:** the core action `document.shape [0…16, 0…2]`, both whole. The presenter sends it whenever the
+    document's uniform count or texture-input count changes (an edit, an open, a template choice, a restore). It is
+    deterministic and replayable, and the core still reads no source.
+  - **Bounds:** `uniform.set k` needs k < the shape's uniforms; `texture.set i` needs i < the shape's inputs.
+  - **Snapshot:** `shape` is an optional field. Without it, a snapshot reads the template's counts, so A22-P04
+    snapshots restore. The digest covers it.
+  - **Values:** values are kept by position. A uniform at position k keeps value k across a shape change, and
+    positions past the new count are ignored until they return.
+- Q: How is the stress run kept short? → A:
+  - **Cycles:** 50 cycles of three runs each (a new source that compiles, a source that fails to compile, a refused
+    source), then 20 template changes, 10 stop-and-reset cycles, and 10 rebuilds in each of 5 states.
+  - **Drawing:** each run draws one frame at 32 × 24, so the counts are bounded by arithmetic.
+  - **Placement:** the tests are split into several so that each finishes in under 10 s on the simulator.
+- Q: How is "survives a relaunch" proved? → A: An interface test, `SSRecoveryUITests` in the serial chunk `d3`:
+  1. launch with `-vcResetData` and save "Waves";
+  2. terminate the app and launch it again without `-vcResetData`;
+  3. open the library: `project-0` is "Waves", and opening it gives the saved source.
+
+  An experience test also reopens the library from a new `ExperienceStorage` on the same root.
+- Q: Which rows does the device plan hold? → A: `docs/apps/shader-studio/device-campaign.md`, with rows SS-D1 to
+  SS-D6 per device, all pending:
+  - **SS-D1:** a slow template is stopped by the watchdog within 3 s, and Reset recovers;
+  - **SS-D2:** a compile error is marked on the line the person wrote;
+  - **SS-D3:** a hardware keyboard: typing, ⌘R and ⌘'. On D1 this needs a keyboard connected by the owner;
+  - **SS-D4:** a saved project survives a relaunch;
+  - **SS-D5:** the compatibility profile (GLES version, fragment `highp`, maximum texture size) is recorded;
+  - **SS-D6:** moving to the background and back keeps the picture, with no leak.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Many runs, no build-up (Priority: P1) 🎯
@@ -101,9 +149,10 @@ the compatibility profile.
 - **A cycle that ends while a compile is queued:** the queued request is dropped by a teardown and never leaks.
 - **A context rebuild during a stopped preview:** it stays stopped (A22-P04) and the flat frame is rebuilt.
 - **A context rebuild with a library sheet open:** the sheet is unaffected; the picture comes back behind it.
-- **A project whose uniforms change on a later edit:** the values of the uniforms still present are kept by name order;
-  the ones removed are dropped; new ones take their defaults.
-- **A snapshot from A22-P04:** it restores; its bounds are taken from the restored document's project.
+- **A project whose uniforms change on a later edit:** values are kept by position; positions past the new count are
+  ignored until a later shape includes them again.
+- **A snapshot from A22-P04:** it restores; without `shape` its bounds are the template's counts until the presenter
+  sends the document's shape.
 - **Memory warnings:** handled by the host's context rebuild; Shader Studio holds no other cache.
 
 ## Requirements *(mandatory)*
