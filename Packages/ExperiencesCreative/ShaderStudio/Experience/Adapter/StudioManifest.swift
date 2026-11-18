@@ -1,12 +1,14 @@
 // StudioManifest — feature 160 (A22-P02) T-A22-209 (FR-A22-207). The scenarios the verification runner plays for
 // Shader Studio, all short (owner rule of 2026-11-13):
 //   - the nine standard scenarios, prepared with seed 1 (nothing depends on the seed);
-//   - four fixtures: one per template (`fixture-gradient`, `fixture-noise-flow`, `fixture-rings`, each
+//   - five fixtures: one per template (`fixture-gradient`, `fixture-noise-flow`, `fixture-rings`, each
 //     `template.select [i]` then `shader.run [1]`, outcome `template-<id>`) and a broken run that keeps the preview
 //     (`fixture-broken-run-keeps-preview`: a run of the opening template, a refused uniform index past its uniform
 //     count, a refused fractional template, then a uniform change; the outcome stays `template-gradient`). The core
 //     holds no source, so the broken compile itself is the experience tests' (`LastGoodPreviewTests`); the fixture
-//     proves the state a failed run leaves is the state before it.
+//     proves the state a failed run leaves is the state before it; and repeated runs (`fixture-repeated-runs`: Rings
+//     run three times, then Gradient picked and run, outcome `template-gradient`; manual fixture 5, whose leak check is
+//     the experience tests' `RebuildTests` and `RunQueueTests`).
 // Input-response and reset pick Rings, move both its uniforms and run; completion picks Noise flow and expects
 // `template-noise-flow`; rejection refuses values out of range, fractional and missing uniform indices and wrong value
 // counts. The expected digests are derived by playing the entries on a core exactly as the engine plays them (the steps
@@ -42,6 +44,9 @@ extension StudioCore {
                                    result: "action.rule." + StudioRule.notWhole),
                       accepted("uniform.set", [0, 0.75])]
         list.append(("fixture-broken-run-keeps-preview", broken, templateCode(0)))
+        let repeated = [accepted("template.select", [2]), accepted("shader.run", [1]), accepted("shader.run", [1]),
+                        accepted("shader.run", [1]), accepted("template.select", [0]), accepted("shader.run", [1])]
+        list.append(("fixture-repeated-runs", repeated, templateCode(0)))
         return list
     }
 

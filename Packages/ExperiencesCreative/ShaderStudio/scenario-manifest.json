@@ -481,6 +481,77 @@
       },
       "name" : "fixture-broken-run-keeps-preview",
       "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "template.select",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "shader.run",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "shader.run",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "shader.run",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "template.select",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "shader.run",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "0987b2c90dab3229434af5ba662fd692d8ccd3a855ccc67d9bb0cec94601a2a5",
+        "initialDigest" : "0987b2c90dab3229434af5ba662fd692d8ccd3a855ccc67d9bb0cec94601a2a5",
+        "outcome" : "template-gradient"
+      },
+      "name" : "fixture-repeated-runs",
+      "seed" : "1"
     }
   ],
   "schema" : 1

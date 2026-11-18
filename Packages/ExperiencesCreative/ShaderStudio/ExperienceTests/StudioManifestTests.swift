@@ -1,5 +1,5 @@
 // StudioManifestTests — feature 160 (A22-P02) T-A22-209 (FR-A22-207). The scenario manifest of Shader Studio: valid
-// with the nine standard scenarios and the four fixtures; its derived digests, results and outcomes equal to what the
+// with the nine standard scenarios and the five fixtures; its derived digests, results and outcomes equal to what the
 // engine gives when the runner plays them; every fixture ending in the state its actions describe; and the committed
 // `scenario-manifest.json` equal to the Swift manifest (`UPDATE_SCENARIO_MANIFEST=1`, on the simulator
 // `TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`, rewrites it).
@@ -29,14 +29,14 @@ private func playManifest(_ spec: ScenarioSpec) async throws -> (initial: String
 }
 
 @Suite struct StudioManifestTests {
-    /// The names of the four fixtures.
+    /// The names of the five fixtures.
     static let fixtureNames = ["fixture-gradient", "fixture-noise-flow", "fixture-rings",
-                               "fixture-broken-run-keeps-preview"]
+                               "fixture-broken-run-keeps-preview", "fixture-repeated-runs"]
 
-    @Test func theManifestIsValidWithTheStandardScenariosAndFourFixtures() {
+    @Test func theManifestIsValidWithTheStandardScenariosAndFiveFixtures() {
         let manifest = StudioCore.manifest(for: manifestID)
         let problems = ScenarioManifestValidator.problems(manifest, controls: StudioCore.controls,
-                                                          content: ContentRequirement(fixtures: 4))
+                                                          content: ContentRequirement(fixtures: 5))
         #expect(problems.isEmpty, "\(problems)")
         #expect(manifest.scenarios.map(\.name) == ScenarioManifest.standardNames + Self.fixtureNames)
         #expect(StudioCore.fixtures.map(\.name) == Self.fixtureNames)
@@ -88,6 +88,10 @@ private func playManifest(_ spec: ScenarioSpec) async throws -> (initial: String
             case "fixture-broken-run-keeps-preview":
                 #expect(core.template == 0 && core.runs == 1)
                 #expect(core.values[0] == 0.75 && core.values.dropFirst().allSatisfy { $0 == 0 })
+            case "fixture-repeated-runs":
+                // Rings picked (one run) and run three times, then Gradient picked (one run) and run once.
+                #expect(core.template == 0 && core.runs == 6)
+                #expect(core.values == StudioCore.defaultValues(template: 0))
             default:
                 Issue.record("unexpected fixture \(fixture.name)")
             }
