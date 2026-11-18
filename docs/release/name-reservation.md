@@ -1,6 +1,6 @@
 # VisualCore — one-time App Store name and bundle reservation
 
-**Status: `BLOCKED_OWNER_ACTION`.** Owner request of 2026-11-14: after Digital Aquarium (A09) is complete, release one
+**Status: `BLOCKED_OWNER_ACTION`** (updated 2026-11-18: an early App Store release after A22, below). Owner request of 2026-11-14: after Digital Aquarium (A09) is complete, release one
 store app version to reserve the app's name and bundle identifier — only this one time. X-A09 was recorded on
 2026-11-14, so the reservation is due now. Every step below needs the owner's Apple account, so the agent does none of
 them (CLAUDE.md rule 6). Nothing here changes the device-testing order: no device install or TestFlight test before
@@ -43,9 +43,66 @@ them (CLAUDE.md rule 6). Nothing here changes the device-testing order: no devic
    this document, in [build-and-archive.md](build-and-archive.md) and in the README, and keeps the placeholders out of
    the code.
 
+## Early App Store release after A22 (owner request of 2026-11-18)
+
+The owner asked on 2026-11-18, during A22-P04: "after a22 is done lets release on the app store to reserve the name and
+get feedback", then "skip testlight, go directly to app store". X-A22 was recorded on 2026-11-18. This request
+supersedes step 6 above for this one early release: the build **is** submitted for review and released on the App
+Store, **without TestFlight**. Every step needs the owner's Apple account, so the agent does none of them (CLAUDE.md
+rule 6). The agent's own device testing still waits for `ImplementationLock-100` (rule 5); the public release is the
+owner's action.
+
+### What the early release contains (agent, 2026-11-18)
+
+| Item | State | Evidence |
+|---|---|---|
+| Experiences | 22 free experiences, A01–A22, each through its X gate | `python3 scripts/migration_ledger.py status`; `Catalog/experiences.json` (22 available) |
+| Premium experiences | none built yet; the launcher shows only integrated experiences, so no premium tile appears | `ShellModelTests.realCatalogShowsOnlyTheIntegratedExperiences` |
+| In-app purchase | none in this release; create the USD 1.99 non-consumable only when premium experiences exist | ADR-0009 D-03 |
+| Version | `CFBundleShortVersionString` 1.0.0, `CFBundleVersion` 1 (`project.yml`) | `project.yml` |
+| Release build, generic iOS device | `xcodebuild build -scheme VisualCore -configuration Release -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO` succeeds | run on 2026-11-18 at the X-A22 record (`99f05833`) |
+| Release checks | release build, symbols, privacy manifest, no tracking, licences, usage descriptions, A22 experience release and copy claims pass | `.autonomy/checks/A22-P06.release-checks.json` |
+| Encryption | `ITSAppUsesNonExemptEncryption` false | `project.yml` |
+| App Privacy answers | Tracking: No; Data Not Collected (inputs; not yet proven on devices) | [metadata-inputs.json](metadata-inputs.json) |
+| Store text | per experience, every claim names a test, for example [Shader Studio](../apps/shader-studio/store-listing.md) and [Aurora](../apps/aurora/store-listing.md) | `docs/apps/*/store-listing.md` |
+| Known limitations | [known-limitations.md](known-limitations.md) | — |
+
+### Owner steps (BLOCKED_OWNER_ACTION), in order
+
+1. **Bundle identifier.** Decide it (step 1 above). It is permanent after the first upload; tell the agent if it is
+   not `dev.visualcore.VisualCore`, and the agent changes `project.yml` and reruns the release checks first.
+2. **Signing.** Xcode › Settings › Accounts with the developer account; `Configs/Signing.local.xcconfig` holds
+   `DEVELOPMENT_TEAM` and is never committed.
+3. **App ID.** Register the bundle identifier in the developer portal (step 3 above).
+4. **App Store Connect record.** Apps › + › New App with the name "VisualCore" (or the name chosen if it is taken);
+   accept the agreements App Store Connect requires. This record reserves the name.
+5. **Archive and upload.** `xcodegen generate --spec project.yml`; open `VisualCore.xcodeproj`, scheme `VisualCore`,
+   "Any iOS Device (arm64)", Product › Archive; in the Organizer, Validate App, then Distribute App › App Store
+   Connect › Upload.
+6. **Listing.** Name, subtitle, description (from the experiences' store texts; no claim without a test, no measured
+   number, no "sandbox" claim for Shader Studio), keywords, support URL, privacy policy URL, age rating, category,
+   price Free, and screenshots at the sizes App Store Connect asks for (taken by the owner from the simulator or a
+   device; the agent may prepare simulator screenshots on request).
+7. **App Privacy.** Tracking: No; Data Not Collected.
+8. **Submit for review and release.** Attach the build, add review notes (no account needed; everything works offline;
+   no purchase in this version), submit, and release when approved.
+9. **Tell the agent** the name, the bundle identifier, the build number and the review outcome; the agent records them
+   here, in [build-and-archive.md](build-and-archive.md) and in the README.
+
+### Review risks to know before submitting
+
+- **App Review 4.2 (minimum functionality) and 2.1 (completeness):** 22 complete experiences ship; nothing in the app
+  says "coming soon".
+- **Shader Studio:** it runs the person's own GPU code. The copy says GPU code is not a sandbox, and the watchdog
+  stops slow previews (A22-P04). It downloads no code.
+- **Device behaviour:** no experience has been measured on a device yet (the device campaign follows
+  `ImplementationLock-100`). Feedback from the public release is not device evidence for the ledgers.
+
 ## Record
 
 | Date | Step | Result |
 |---|---|---|
 | 2026-11-14 | Preparation by the agent | done (table above) |
 | — | Owner steps 1–7 | `BLOCKED_OWNER_ACTION` |
+| 2026-11-18 | Early-release preparation by the agent after X-A22 (owner request: direct App Store release, no TestFlight) | done (section above) |
+| — | Early-release owner steps 1–9 | `BLOCKED_OWNER_ACTION` |
