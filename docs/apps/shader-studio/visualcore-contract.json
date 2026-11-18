@@ -1250,7 +1250,7 @@
    "id": "M29",
    "capability": "Release: registration, the A22 release-check, copy-claims and verify steps, licenses and the catalog availability",
    "source": "manual \u00a79 phase 06; Auto-Creator.md \u00a718",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceDescriptor.swift",
@@ -1269,7 +1269,7 @@
     "file": "Packages/ExperiencesCreative/DigitalAquarium/Core/LicenseAudit.swift",
     "symbol": "LicenseAudit"
    },
-   "notes": "No A22 release step exists (163 lines listed on 2026-11-17). G-RELEASE."
+   "notes": "No A22 release step exists (163 lines listed on 2026-11-17). G-RELEASE. A22-P06 (feature 164): privacy-and-credits.md, store-listing.md (every claim names a test; not a sandbox), release-checklist.md (36 rows) and release.json; scan-sources and scan-claims pass; experience-release-a22 and copy-claims-a22 pass with the release build checks; the iOS 26.x runner half is cited at X-A22 (G-RELEASE closed)."
   }
  ],
  "gaps": [
@@ -1439,7 +1439,7 @@
    "justification": "Registration, the A22 release-check, copy-claims and verify steps, the license entries and the catalog availability are the experience's release work (manual phase 06).",
    "phase": 6,
    "test": "Release check lists the A22 steps and passes; check_copy_claims.py finds no sandbox or unmeasured performance claim; Shader Studio is registered and available only after its release gate.",
-   "closed": null
+   "closed": "A22-P06"
   }
  ],
  "traceability": [
