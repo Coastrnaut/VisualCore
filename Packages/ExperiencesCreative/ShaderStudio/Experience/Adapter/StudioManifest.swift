@@ -10,7 +10,12 @@
 //     proves the state a failed run leaves is the state before it; and repeated runs (`fixture-repeated-runs`: Rings
 //     run three times, then Gradient picked and run, outcome `template-gradient`; manual fixture 5, whose leak check is
 //     the experience tests' `RebuildTests` and `RunQueueTests`); and from feature 161 `fixture-textures` (Texture mix
-//     picked, noise on input 0 and checker on input 1, then a run, outcome `template-texture-mix`).
+//     picked, noise on input 0 and checker on input 1, then a run, outcome `template-texture-mix`); and from feature 162
+//     `fixture-reset` (a run, then `preview.reset [1]`: the reset count is state and in the digest, outcome
+//     `template-gradient`). The planned `fixture-version-line-guidance` cannot be expressed here: the manifest plays
+//     core actions only and the edited source is the presenter's document, not core state, so a `#version` refusal
+//     and its guidance are proved by the experience tests (`GuidanceDisplayTests`) and the interface test
+//     (`SSLibraryUITests`) instead.
 // Input-response and reset pick Rings, move both its uniforms and run; completion picks Noise flow and expects
 // `template-noise-flow`; rejection refuses values out of range, fractional and missing uniform and texture indices
 // (Gradient has no texture input), a preview reset other than 1 (feature 162) and wrong value
@@ -54,6 +59,8 @@ extension StudioCore {
         let textures = [accepted("template.select", [mix]), accepted("texture.set", [0, 2]),
                         accepted("texture.set", [1, 0]), accepted("shader.run", [1])]
         list.append(("fixture-textures", textures, templateCode(Int(mix))))
+        let reset = [accepted("shader.run", [1]), accepted("preview.reset", [1])]
+        list.append(("fixture-reset", reset, templateCode(0)))
         return list
     }
 

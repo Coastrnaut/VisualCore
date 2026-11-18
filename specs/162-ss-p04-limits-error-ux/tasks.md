@@ -93,7 +93,7 @@
 
 ## Phase 6: Interface and evidence
 
-- [ ] T-A22-411 [P] Update `Experience/Adapter/StudioManifest.swift` and `ExperienceTests/StudioManifestTests.swift`:
+- [X] T-A22-411 [P] Update `Experience/Adapter/StudioManifest.swift` and `ExperienceTests/StudioManifestTests.swift`: — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A22-P04.ss-library.json exit 0 (ShaderStudioCoreTests 76, ShaderStudioExperienceTests 69 on sim-27.2); fixture-reset added, the version-line case is a source edit (not core state) and is covered by GuidanceDisplayTests and SSLibraryUITests
   - add the fixtures `fixture-version-line-guidance` and `fixture-reset`;
   - regenerate `scenario-manifest.json`;
   - update `StudioCoreTests` for `preview.reset`.

@@ -702,6 +702,37 @@
       },
       "name" : "fixture-textures",
       "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "shader.run",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "preview.reset",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "24483598db9eac74f0b90c3fe4a39db3cf0e1e00c1aa5fc3fa8eb8485a49215a",
+        "initialDigest" : "575edd8f207c908001a44314b4aed4bd5a7433bdc3a3c1ec6751b6b15cda472c",
+        "outcome" : "template-gradient"
+      },
+      "name" : "fixture-reset",
+      "seed" : "1"
     }
   ],
   "schema" : 1
