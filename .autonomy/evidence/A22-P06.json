@@ -1,0 +1,116 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/A22-P06.app-ui-2.json",
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-ui-ios27-d3",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A22-P06.app-ui-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A22-P06.app-ui.json",
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27 app-ui-ios27-d3",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A22-P06.app-ui.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A22-P06.catalog.json",
+      "command": "python3 scripts/build_catalog.py --check",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A22-P06.catalog.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A22-P06.contract.json",
+      "command": "python3 scripts/check_app_contract.py --app shader-studio",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A22-P06.contract.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A22-P06.copy-release-2.json",
+      "command": "python3 scripts/release_check.py --only experience-release-a22 copy-claims-a22",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A22-P06.copy-release-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A22-P06.core-purity.json",
+      "command": "sh -c '! grep -rnE \"import (UIKit|SwiftUI|OpenGLES|Network)|URLSession|Date\\(\\)|ContinuousClock|CFAbsoluteTime\" Packages/ExperiencesCreative/ShaderStudio/Core'",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A22-P06.core-purity.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A22-P06.documented-api.json",
+      "command": "python3 scripts/check_documented_api.py --sources Packages/ExperiencesCreative/ShaderStudio",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A22-P06.documented-api.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A22-P06.experience-packages.json",
+      "command": "python3 scripts/check_experience_packages.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A22-P06.experience-packages.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A22-P06.isolation.json",
+      "command": "python3 scripts/check_app_isolation.py --experiences Packages/ExperiencesCreative/ShaderStudio",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A22-P06.isolation.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A22-P06.realcatalog.json",
+      "command": "swift test --package-path Packages/VisualCore --filter VisualCoreExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A22-P06.realcatalog.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A22-P06.release-checks.json",
+      "command": "python3 scripts/release_check.py --only app-release-build app-release-symbols app-privacy-manifest app-no-tracking app-licenses app-usage-descriptions experience-release-a22 copy-claims-a22",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A22-P06.release-checks.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A22-P06.scan-claims-2.json",
+      "command": "sh specs/164-ss-p06-release/scan-claims-release.sh",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A22-P06.scan-claims-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A22-P06.scan-claims.json",
+      "command": "sh specs/164-ss-p06-release/scan-claims-release.sh",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A22-P06.scan-claims.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A22-P06.scan-sources.json",
+      "command": "sh specs/164-ss-p06-release/scan-sources-release.sh",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A22-P06.scan-sources.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A22-P06.script-tests.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A22-P06.script-tests.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A22-P06.ss-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing ShaderStudioCoreTests ShaderStudioExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A22-P06.ss-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A22-P06.ss-recovery-samples.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing ShaderStudioCoreTests ShaderStudioExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A22-P06.ss-recovery-samples.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A22-P06.verify-27.json",
+      "command": "python3 scripts/verify_experiences.py --only a22.shader-studio --runtime 27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A22-P06.verify-27.log"
+    }
+  ],
+  "generated": "2026-11-18T22:45:37+00:00",
+  "method": "deterministic-run-check",
+  "stage": "A22-P06",
+  "status": "pass"
+}
