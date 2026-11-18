@@ -89,7 +89,7 @@
   - each test under 60 s;
   - the serial chunk `"d3": ["SSEditorUITests"]` in `scripts/release_check.py` and `SERIAL_CHUNKS` (lead).
 - [X] T-A22-312 [P] Add the textures and `texture-mix` to `docs/apps/shader-studio/licenses.md`. — Verified 2026-11-18: 2026-11-18: docs/apps/shader-studio/licenses.md lists texture-mix and the three code-made textures; validate_docs passes
-- [ ] T-A22-313 Review checkpoint:
+- [X] T-A22-313 Review checkpoint: — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A22-P03.{ss-ios27,isolation,documented-api,core-purity}.json all exit 0
   - Shader Studio tests on sim-27.2 (`--name ss-ios27`);
   - the documented API, isolation and core purity.
 - [ ] T-A22-314 Contract: G-EDITOR, G-INSPECTOR and G-TEXTURES closed by "A22-P03"; rows whose gaps are all closed
