@@ -88,7 +88,7 @@
   - the documented API, isolation and core purity.
 - [X] T-A22-512 Contract: close G-DEVICE with "A22-P05" (the plan exists; its rows stay pending); M28 stays — Verified 2026-11-18: 2026-11-18: G-DEVICE closed by A22-P05 as the plan; M28 available with its 3 evidence items and a note that its device rows are pending (the contract check refuses a requires-adaptation row without an open gap; Aurora A21-P05 did the same); .autonomy/checks/A22-P05.contract-2.json exit 0
   "requires adaptation" with a note pointing to the plan, because its evidence is device evidence (`--name contract`)
-- [ ] T-A22-513 The catalog, app and runner checks, with the packages and script tests:
+- [X] T-A22-513 The catalog, app and runner checks, with the packages and script tests: — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A22-P05.{catalog,realcatalog,experience-packages,script-tests,app-unit,app-ui,verify-27}.json all exit 0; xcodegen generated
   - the catalog (`--name catalog`);
   - `xcodegen generate --spec project.yml`;
   - the app unit tests (`--name app-unit`);
