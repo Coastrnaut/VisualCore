@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesCreative",
+    "--scheme",
+    "ExperiencesCreative-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "ShaderStudioCoreTests",
+    "ShaderStudioExperienceTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing ShaderStudioCoreTests ShaderStudioExperienceTests",
+  "elapsed_seconds": 9.501,
+  "exit_code": 0,
+  "finished": "2026-11-18T22:10:58+00:00",
+  "log": ".autonomy/logs/A22-P05.ss-stress-recovery.log",
+  "log_sha256": "e88e84bc413cf15a0f6078e8e0805567dab61dbbcd875ba4a9927ae7297e0dcd",
+  "name": "ss-stress-recovery",
+  "stage": "A22-P05",
+  "started": "2026-11-18T22:10:49+00:00",
+  "timed_out": false
+}

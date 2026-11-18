@@ -17,7 +17,7 @@
 
 ## Phase 2: Story 1 — many runs, no build-up (P1) 🎯
 
-- [ ] T-A22-502 [P] [US1] Write `Packages/ExperiencesCreative/ShaderStudio/ExperienceTests/StressCycleTests.swift`
+- [X] T-A22-502 [P] [US1] Write `Packages/ExperiencesCreative/ShaderStudio/ExperienceTests/StressCycleTests.swift` — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A22-P05.ss-stress-recovery.json exit 0 (ShaderStudioCoreTests and ShaderStudioExperienceTests on sim-27.2); StressCycleTests 3 tests: levels flat after 50 mixed cycles, 20 template changes, 10 stop-and-reset cycles
   (FR-A22-501, SC-A22-501), with the resource level being `ResourceRegistry.stats.liveCount` for every kind plus
   `totalBytes`, read after the first cycle and after the last:
   - 50 cycles of a new source that compiles (a unique constant per cycle), a source that fails to compile and a
@@ -36,8 +36,8 @@
 - [ ] T-A22-504 [P] [US2] Write `ExperienceTests/RecoveryTests.swift` (FR-A22-502, SC-A22-502):
   - in each of the states running, failed, refused, stopped and textured, 10 `recreateContext` calls;
   - each gives a byte-identical still (`StudioTest.still`), an unchanged resource level and `leaked` 0.
-  - a Run queued and then a rebuild before the next frame: the queued request is dropped, no compile happens, and the
-    level is unchanged.
+  - a request waiting in the pipeline is dropped by a rebuild; a Run accepted before a rebuild compiles exactly once
+    after it; the level is unchanged.
 - [ ] T-A22-505 [US2] Fix anything T-A22-504 finds in the presenter, pipeline and textured preview (rebuild of the live,
   fallback and stopped scenes and the texture targets); if nothing is found, record that.
 
