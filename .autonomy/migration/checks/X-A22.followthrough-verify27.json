@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a22.shader-studio",
+    "--runtime",
+    "27"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a22.shader-studio --runtime 27",
+  "elapsed_seconds": 0.205,
+  "exit_code": 0,
+  "finished": "2026-11-18T23:07:06+00:00",
+  "gate": "X-A22",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-A22.followthrough-verify27.log",
+  "log_sha256": "ad7aaf7621a7a47144e7c447be11bca35a0ce19f4f71f1793a677fb774bb1b34",
+  "name": "followthrough-verify27",
+  "started": "2026-11-18T23:07:06+00:00",
+  "timed_out": false
+}

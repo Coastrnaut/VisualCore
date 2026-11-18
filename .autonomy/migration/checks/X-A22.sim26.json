@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a22.shader-studio",
+    "--runtime",
+    "26"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a22.shader-studio --runtime 26",
+  "elapsed_seconds": 49.792,
+  "exit_code": 0,
+  "finished": "2026-11-18T22:54:42+00:00",
+  "gate": "X-A22",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-A22.sim26.log",
+  "log_sha256": "cc3c1f7ab0cd23b205855731ce1d79290f706123aad26d1ca12a658999bf80e2",
+  "name": "sim26",
+  "started": "2026-11-18T22:53:52+00:00",
+  "timed_out": false
+}

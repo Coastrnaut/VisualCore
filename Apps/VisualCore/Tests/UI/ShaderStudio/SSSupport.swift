@@ -1,7 +1,7 @@
 // SSSupport — feature 161 (A22-P03) T-A22-311 (FR-A22-307; contracts/editor.md "Interface"): helpers of the interface
-// tests of Shader Studio (A22) inside the one app, modelled on `AUSupport`. A22 is a candidate; every launch carries
-// `-vcCandidates` (DebugLaunch: the candidates' catalog entries become available and are registered). A fresh start
-// erases the data (`-vcResetData`), skips the welcome and opens the experience directly with
+// tests of Shader Studio (A22) inside the one app, modelled on `AUSupport`. A22 was a candidate until X-A22 (integrated
+// 2026-11-18); every launch carries `-vcCandidates` (DebugLaunch: the candidates' catalog entries become available and
+// are registered; harmless now that A22 is integrated). A fresh start erases the data (`-vcResetData`), skips the welcome and opens the experience directly with
 // `-openExperience a22.shader-studio`. A fresh studio opens on the Gradient template (one uniform, `u_speed`, 0…4,
 // default 1, shown as "1.00"); its status reads "Waiting" until the first run.
 //

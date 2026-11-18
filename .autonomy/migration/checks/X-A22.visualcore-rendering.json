@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--result-name",
+    "xa22-rendering"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name xa22-rendering",
+  "elapsed_seconds": 44.604,
+  "exit_code": 0,
+  "finished": "2026-11-18T22:52:56+00:00",
+  "gate": "X-A22",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-A22.visualcore-rendering.log",
+  "log_sha256": "6134b1323228e1e0cf1ae645c53ffaa6c1344d825abfbf0ef6b9d7e00ff4a546",
+  "name": "visualcore-rendering",
+  "started": "2026-11-18T22:52:11+00:00",
+  "timed_out": false
+}

@@ -1,0 +1,80 @@
+{
+  "branch": "main",
+  "dirty": true,
+  "dirty_paths": [
+    "docs/verification/a22.shader-studio/summary-27.2.json",
+    "docs/verification/a22.shader-studio/summary-26.5.json"
+  ],
+  "failed_attempts": [],
+  "gate": "X-A22",
+  "ledger": "migration",
+  "passing_checks": [
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --result-name xa22-host",
+      "exit_code": 0,
+      "finished": "2026-11-18T22:51:44+00:00",
+      "log": ".autonomy/logs/migration/X-A22.host.log",
+      "log_sha256": "c2c3eedc3a0c6bebcb22936d31963c53ea084455ed1c62ad8f960081b2b89596",
+      "name": "host"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean",
+      "exit_code": 0,
+      "finished": "2026-11-18T22:55:08+00:00",
+      "log": ".autonomy/logs/migration/X-A22.reference-1.log",
+      "log_sha256": "3c73030ba18ee5666e8811c3c2fb48a4c339695e7add3177e277dcf38dc7c9b9",
+      "name": "reference-1"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26",
+      "exit_code": 0,
+      "finished": "2026-11-18T22:55:35+00:00",
+      "log": ".autonomy/logs/migration/X-A22.reference-2.log",
+      "log_sha256": "e78b4104c01c62c0114f9de0fa578be62ef4b9a3e117cf4393fee419de3c48ae",
+      "name": "reference-2"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a22.shader-studio --runtime 26",
+      "exit_code": 0,
+      "finished": "2026-11-18T22:54:42+00:00",
+      "log": ".autonomy/logs/migration/X-A22.sim26.log",
+      "log_sha256": "cc3c1f7ab0cd23b205855731ce1d79290f706123aad26d1ca12a658999bf80e2",
+      "name": "sim26"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a22.shader-studio --runtime 27",
+      "exit_code": 0,
+      "finished": "2026-11-18T22:53:45+00:00",
+      "log": ".autonomy/logs/migration/X-A22.sim27.log",
+      "log_sha256": "1389ccbabb023c522aa5a855ecedf0c45256d966cfb0ff71aac6755aa6649609",
+      "name": "sim27"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-ui-ios27-d3",
+      "exit_code": 0,
+      "finished": "2026-11-18T22:59:59+00:00",
+      "log": ".autonomy/logs/migration/X-A22.ui-d3.log",
+      "log_sha256": "3504b1212f2a613b3f76fb7229330518b1d97f5f294a9ba1f503b842a590406b",
+      "name": "ui-d3"
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "finished": "2026-11-18T22:52:11+00:00",
+      "log": ".autonomy/logs/migration/X-A22.visualcore-host.log",
+      "log_sha256": "e7b6125bbb16e786dbdc4d7745768c8d46f7f77175369275e09dcb0c296ecdf3",
+      "name": "visualcore-host"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name xa22-rendering",
+      "exit_code": 0,
+      "finished": "2026-11-18T22:52:56+00:00",
+      "log": ".autonomy/logs/migration/X-A22.visualcore-rendering.log",
+      "log_sha256": "6134b1323228e1e0cf1ae645c53ffaa6c1344d825abfbf0ef6b9d7e00ff4a546",
+      "name": "visualcore-rendering"
+    }
+  ],
+  "revision": "99f0583339d3b4e67ce523963cbcc0a37b27236d",
+  "revision_number": 1,
+  "sealed": "2026-11-18T23:00:06+00:00"
+}
