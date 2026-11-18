@@ -27,6 +27,66 @@ Canonical overrides:
   `docs/release/build-and-archive.md`.
 - Follow `specs/157-au-p06-release`.
 
+## Clarifications
+
+### Session 2026-11-18
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- **Permissions:** `Catalog/registrations.json` gives `a22.shader-studio` the permissions `[]`, so no usage string is
+  needed.
+- **Copy steps:** `scripts/release_check.py` builds `experience-release-a22` and `copy-claims-a22` from
+  `docs/apps/shader-studio/release.json` (as Aurora's). The shared denylist is `Configs/copy-claims-denylist.json`,
+  and the shared check reads Swift string literals only. Shader Studio shares nothing, so `copyCheck.allow` is empty.
+- **Stored data:**
+  - the session snapshot (schema 1; the digest domain is the experience id; optional fields `textures`, `resets`
+    and `shape`);
+  - `project-<n>.json` (kind `a22.saved-project`, version 1, at most 131,072 bytes);
+  - `library.json` (kind `a22.project-library`, version 1).
+
+  The refusals are `damaged`, `newer-version`, `too-large` and the `ShaderProject` codes. No temporary file is
+  written.
+- **Screen:** the experience never changes the idle timer or the brightness; the source shows no such call.
+- **Drawing failure:** `StudioPresenter.draw` throws to the session; there is no test seam yet.
+- **Interface chunk:** the A22 interface chunk is `d3` (A22-P03 to P05).
+
+- Q: Which statuses does the release checklist use? → A: The checker's:
+  - `verified`, with evidence;
+  - `pending-campaign-ii`, for device rows naming SS-D1 … SS-D6 of `docs/apps/shader-studio/device-campaign.md`;
+  - `owner-action`, with the steps of `docs/release/build-and-archive.md`.
+- Q: Which words does the experience's own claims scan refuse? → A: It scans the store text and the interface Swift
+  (controls, editor, inspector, library view, presenter and the adapter's words), whole words, case-insensitively:
+  - sandboxed, sandboxing, safe to run, runs safely, secure, protected, isolated from;
+  - Shadertoy, WebGL, desktop GLSL, Vulkan, Metal Shading Language, compute shader, ray tracing;
+  - upload, export, cloud, sync, account;
+  - fps, unlimited, real-time.
+
+  The phrase "not a sandbox" is required in the store text. Every test named in the claims table must exist.
+- Q: What does the source scan refuse? → A: The A21 list, in `Packages/ExperiencesCreative/ShaderStudio`:
+  - `URLSession`, `import Network`, `CLLocation` and `import CoreLocation`;
+  - `AVCapture`, `AVAudioRecorder`, `inputNode`, `installTap` and `CMMotion`;
+  - `CNContact`, `PHPhotoLibrary`, `import Photos` and `PhotosUI`;
+  - `ASIdentifierManager`, `AppTrackingTransparency` and `isIdleTimerDisabled`;
+  - any `brightness =` write;
+  - plus `UIPasteboard` and `ShareLink`.
+- Q: How are crash recovery and the sample files proved? → A:
+  - **Crash recovery:** a test-only `failNextDraw` seam in the presenter makes the next draw throw once
+    (`StudioDrawError.injected`). A test saves two projects, sets the seam and draws, so the session fails with the
+    injected message. Every storage file must be byte-identical, and a new session over the same storage lists and
+    opens both projects.
+  - **Sample files:** committed fixtures under `ExperienceTests/Fixtures/`:
+    - `snapshot-v1.json` (current, with every optional field), `snapshot-p02.json` (without the optional fields),
+      `snapshot-newer.json` and `snapshot-damaged.json`;
+    - `project-current.json`, `project-newer.json` and `project-damaged.json`;
+    - `library-current.json` and `library-newer.json`.
+
+    The current and P02 samples open. The newer and damaged snapshots are refused. A newer or damaged project file is
+    listed as unreadable with its code. A newer index makes the library read-only. Every file stays byte-identical
+    after reading.
+- Q: Which interface journey runs? → A: `SSReleaseUITests` joins chunk `d3`. A fresh start shows the status
+  "Compiled", no `diagnostic-0`, `uniform-0` present and no `uniform-1`, and an empty library (no `project-0`). The
+  test takes under 60 s.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Nothing leaves the device (Priority: P1) 🎯
