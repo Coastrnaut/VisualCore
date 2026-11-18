@@ -43,10 +43,12 @@ No NEEDS CLARIFICATION remains.
 | Principle | Result |
 |---|---|
 | I, III | PASS: drawing stays in the host's context through `FullScreenShaderScene` and `FieldPass`; the stopped frame is a scene clear |
-| II | PASS: reuses `ExperienceStorage`, the `ShaderProject` envelope and the library pattern; nothing copied from another experience's module |
-| IV | PASS: `Guidance` and `FrameWatchdog` are pure core types with tests |
-| VI | PASS: files are versioned; damaged and newer files are refused and never deleted |
-| IX | PASS: spoken labels, Dynamic Type, keyboard reachable; guidance is text, not colour |
+| II | PASS: no VisualCore API change; `ExperienceStorage`, the `ShaderProject` envelope and the library pattern are reused as they are |
+| IV | PASS: `Guidance` and `FrameWatchdog` are pure core types, tested first |
+| VI | PASS: guidance patterns proved against the real ANGLE compiler; the watchdog's numbers are left to device measurement |
+| VII | PASS: spoken labels, Dynamic Type, keyboard reachable; guidance is text, not colour |
+| VIII | PASS: no network, no account; files only in the experience's own storage |
+| IX | PASS: versioned project files with caps; damaged, oversized and newer files refused and never deleted |
 | A22 (2.18.1) | PASS: caps before compile, queued compiles, a watchdog and reset, no sandbox claim |
 
 Post-design: PASS.
