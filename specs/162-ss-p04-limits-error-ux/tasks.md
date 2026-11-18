@@ -26,10 +26,10 @@
     `stopped` (FR-A22-401, 402, 403).
 - [ ] T-A22-403 [P] Write the core tests (SC-A22-401, 402):
   - `CoreTests/GuidanceTests.swift`: every code, distinct sentences, the line named, the `#version` and
-    undeclared-uniform sentences;
+    undeclared-uniform sentences, and an unrecognised message keeps its text with the general sentence;
   - `CoreTests/GuidanceCompileTests.swift`: compile real broken shaders through `CompileSupport` (compile only) on
     ANGLE, and each of the three patterns matches the real message;
-  - `CoreTests/FrameWatchdogTests.swift`: 8 slow intervals stop it; 7 slow then 1 normal do not; non-finite values
+  - `CoreTests/FrameWatchdogTests.swift`: 8 slow intervals stop it; 7 slow then 1 normal do not; a single long interval (a pause) counts once; non-finite values
     are ignored; the interval after `rearm` is skipped; `reset` returns to watching.
 
 ## Phase 3: Story 1 — errors that say what to change (P1) 🎯
@@ -79,13 +79,17 @@
   - every cap refuses with its message and leaves the storage unchanged;
   - damaged, oversized and newer files are listed and still on disk after the listing and the attempts to open them;
   - a full quota (a filler file) refuses and keeps the previous file;
-  - the order is newest first.
+  - the order is newest first;
+  - a project whose source is refused saves as text;
+  - an unreadable file can be removed by the person, but opening or renaming it is refused.
 - [ ] T-A22-410 [US3] Wire the library (FR-A22-405, 407):
   - `Experience/ShaderStudioExperience.swift` passes `storage`;
   - `Experience/StudioLibraryView.swift` (new) shows the list with `library`, `save`, `project-<k>`, `open`, `rename`
     and `remove`, with spoken labels, and opens in the controls;
   - opening sets the document, values and textures, then queues a Run; the inspector lists the opened uniforms;
-  - add a presenter test of opening in `LibraryTests.swift`.
+  - the library view's hint says opening replaces the editor's document; it stacks at accessibility text sizes;
+  - add presenter tests in `LibraryTests.swift`: opening lists the opened uniforms; opening a project whose source
+    is now refused shows its refusal and guidance and the preview keeps the last good shader.
 
 ## Phase 6: Interface and evidence
 
