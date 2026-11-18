@@ -176,6 +176,15 @@ final class StudioPresenter: ExperiencePresenter {
         "Shader Studio, " + Self.templateTitle(core) + ", " + pipeline.status.text
     }
 
+    /// The frame probes of the verification runner: for the opening template (Gradient), the top-right corner is red
+    /// at every time. There the mix towards the warm colour stays between 0.475 and 1, so red leads green and blue by
+    /// more than 30 of 255. Other templates declare none.
+    func probes(_ core: StudioCore) -> [FrameProbe] {
+        guard core.template == 0 else { return [] }
+        return [FrameProbe(name: "warm-corner", x: 0.95, y: 0.05, expected: FrameColorClass.red.rawValue)]
+            .compactMap { $0 }
+    }
+
     /// The actions of the native controls: all three.
     var nativeActions: Set<String> { Set(StudioCore.actionIDs) }
 
