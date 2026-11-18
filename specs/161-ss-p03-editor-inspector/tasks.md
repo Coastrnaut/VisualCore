@@ -39,7 +39,9 @@
   - the palette maps every token kind, and weights differ from colours;
   - a broken run marks exactly its lines;
   - outside-source entries come first;
-  - a fix clears the marks.
+  - a fix clears the marks;
+  - choosing a diagnostic gives its line's start offset (a pure `EditorDocument` helper, `lineStart(_:)`), covering
+    US1/AC3.
 
 ## Phase 4: Story 2 — too big never reaches the driver (P1)
 
@@ -79,7 +81,7 @@
 - [ ] T-A22-310 [P] Update `Experience/Adapter/StudioManifest.swift` and `ExperienceTests/StudioManifestTests.swift`:
   - the fixtures add `fixture-texture-mix` and `fixture-textures`;
   - regenerate `scenario-manifest.json`;
-  - raise the content count only if the planning catalog requires it.
+  - the manifest's content requirement stays at the planning catalog's 5 fixtures (more fixtures are allowed).
 - [ ] T-A22-311 [P] Write the interface tests (FR-A22-307):
   - `Apps/VisualCore/Tests/UI/ShaderStudio/{SSSupport,SSEditorUITests}.swift`, after `AUSupport` with `-vcCandidates`;
   - type a broken line, Run, read the gutter marker and the list, fix, Run, and the marker is gone;
