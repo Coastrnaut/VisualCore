@@ -63,7 +63,7 @@
 
 ## Phase 6: Evidence
 
-- [ ] T-A22-609 Shader Studio tests on sim-27.2 (`--name ss-ios27`; each under 10 s) and the documented API, isolation
+- [X] T-A22-609 Shader Studio tests on sim-27.2 (`--name ss-ios27`; each under 10 s) and the documented API, isolation — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A22-P06.{ss-ios27,isolation,documented-api,core-purity}.json all exit 0
   and core purity
 - [ ] T-A22-610 App build, unit tests and the interface chunk: `xcodegen generate --spec project.yml`, then
   `--name app-ui -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27 app-ui-ios27-d3`
