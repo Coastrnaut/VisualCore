@@ -56,7 +56,7 @@
 
 ## Phase 4: Stories 3 and 4 — uniforms and interruptions (P2)
 
-- [ ] T-A22-207 [US3, US4] Write `ExperienceTests/{UniformPreviewTests,RebuildTests}.swift` (FR-A22-205, 206):
+- [X] T-A22-207 [US3, US4] Write `ExperienceTests/{UniformPreviewTests,RebuildTests}.swift` (FR-A22-205, 206): — Verified 2026-11-18: 2026-11-18: UniformPreviewTests (two values give different pictures and no compile; out-of-range and fractional indices refused) and RebuildTests (recreateContext and a resize redraw the same shader with the same values, nothing leaked); .autonomy/checks/A22-P02.ss-ios27.json exit 0; written by an agent, retested
   - two values of a uniform give different pictures and no compile;
   - an out-of-range or fractional index is refused;
   - after `recreateContext` and after a resize, the same shader draws with the same values.
