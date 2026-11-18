@@ -27,7 +27,7 @@
   - restore refusals for damaged or out-of-range snapshots;
   - `///` on every declaration
   (FR-A22-201, 205)
-- [ ] T-A22-204 [US1] Create `Experience/{PreviewPipeline,StudioPresenter,StudioControls,ShaderStudioExperience}.swift`
+- [X] T-A22-204 [US1] Create `Experience/{PreviewPipeline,StudioPresenter,StudioControls,ShaderStudioExperience}.swift` — Verified 2026-11-18: 2026-11-18: PreviewPipeline (newest request, validate, compile through context.resources.program at the next draw, at most one per frame, swap a FullScreenShaderScene only on success, compileCount, rebuild after context loss), StudioPresenter (document, setSource seam, denormalized uniforms, 30 fps, level-0, no GL call), StudioControls (template, run, uniform-k, status, diagnostics with spoken labels), ShaderStudioExperience.make(id:storage:); isolation PASS; .autonomy/checks/A22-P02.ss-ios27.json and A22-P02.isolation.json exit 0; written by an agent, retested
   per clarifications Q2–Q4 and contracts/experience.md (FR-A22-201–206):
   - `PreviewPipeline` takes the newest request, validates it and compiles through `context.resources.program` at the
     next draw, at most once per frame. A `FullScreenShaderScene` (`ShaderBundle(files:)` of the assembly) is swapped in
