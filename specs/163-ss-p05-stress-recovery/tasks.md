@@ -26,7 +26,7 @@
   - 10 stop-and-reset cycles through the watchdog seam;
   - the level after the last cycle equals the level after the first;
   - each test under 10 s.
-- [ ] T-A22-503 [US1] Fix any leak that T-A22-502 finds in `Experience/{PreviewPipeline,StudioPresenter,TexturedPreview}.swift`:
+- [X] T-A22-503 [US1] Fix any leak that T-A22-502 finds in `Experience/{PreviewPipeline,StudioPresenter,TexturedPreview}.swift`: — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A22-P05.ss-stress-recovery.json exit 0 (ShaderStudioCoreTests and ShaderStudioExperienceTests on sim-27.2); no leak found by T-A22-502, so no source change was needed
   - release replaced scenes and programs that are neither live nor the fallback;
   - drop queued requests at teardown;
   - if no leak is found, record that in the task's evidence.
