@@ -17,7 +17,7 @@
 
 ## Phase 2: Foundational — textures and the fourth template (core)
 
-- [ ] T-A22-302 [P] Create `Packages/ExperiencesCreative/ShaderStudio/Core/TextureRecipes.swift` per data-model.md
+- [X] T-A22-302 [P] Create `Packages/ExperiencesCreative/ShaderStudio/Core/TextureRecipes.swift` per data-model.md — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A22-P03.ss-core-editor.json exit 0 (ShaderStudioCoreTests 59, ShaderStudioExperienceTests 43 on sim-27.2)
   ("64 × 64 RGBA floats (0…1, rows bottom-up)"; `checker` "8 × 8 cells, 0.85 and 0.25 grey"; `ramp` "(0.05, 0.10,
   0.40) to (0.95, 0.55, 0.20)"; `noise` "value noise of an integer hash over an 8 × 8 lattice") and add the template
   `texture-mix` to `Core/ShaderTemplates.swift` (inputs `u_texture0`, `u_texture1`; uniform `u_blend` 0…1, default
