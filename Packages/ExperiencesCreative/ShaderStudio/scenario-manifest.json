@@ -2,6 +2,7 @@
   "controls" : [
     "template.select",
     "uniform.set",
+    "texture.set",
     "shader.run"
   ],
   "experience" : "a22.shader-studio",
@@ -12,7 +13,7 @@
 
       ],
       "expect" : {
-        "initialDigest" : "0987b2c90dab3229434af5ba662fd692d8ccd3a855ccc67d9bb0cec94601a2a5"
+        "initialDigest" : "625c630af3f5c4f5d9a92fb6ddb04343d6b7b9f55512ae673be382d4bdae8ed8"
       },
       "name" : "launch-first-frame",
       "seed" : "1"
@@ -63,8 +64,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "7209aa259106ca3521219f7a3b6742c1639bc5299090f1d651934c6d3705691f",
-        "initialDigest" : "0987b2c90dab3229434af5ba662fd692d8ccd3a855ccc67d9bb0cec94601a2a5"
+        "finalDigest" : "99ec624e8b9303e3ce712a7c9c9332132f3f35aaa6ac0875aaa2582dcf2ba62b",
+        "initialDigest" : "625c630af3f5c4f5d9a92fb6ddb04343d6b7b9f55512ae673be382d4bdae8ed8"
       },
       "name" : "input-response",
       "seed" : "1"
@@ -166,6 +167,50 @@
         },
         {
           "action" : {
+            "control" : "texture.set",
+            "values" : [
+              0.5,
+              0
+            ]
+          },
+          "result" : "action.rule.a22.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "texture.set",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "action.rule.a22.no-texture",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "texture.set",
+            "values" : [
+              2,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "texture.set",
+            "values" : [
+              0,
+              3
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
             "control" : "shader.run",
             "values" : [
               0
@@ -247,8 +292,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "7209aa259106ca3521219f7a3b6742c1639bc5299090f1d651934c6d3705691f",
-        "initialDigest" : "0987b2c90dab3229434af5ba662fd692d8ccd3a855ccc67d9bb0cec94601a2a5"
+        "finalDigest" : "99ec624e8b9303e3ce712a7c9c9332132f3f35aaa6ac0875aaa2582dcf2ba62b",
+        "initialDigest" : "625c630af3f5c4f5d9a92fb6ddb04343d6b7b9f55512ae673be382d4bdae8ed8"
       },
       "name" : "save-restore",
       "seed" : "1"
@@ -299,7 +344,7 @@
         }
       ],
       "expect" : {
-        "initialDigest" : "0987b2c90dab3229434af5ba662fd692d8ccd3a855ccc67d9bb0cec94601a2a5",
+        "initialDigest" : "625c630af3f5c4f5d9a92fb6ddb04343d6b7b9f55512ae673be382d4bdae8ed8",
         "resetDigest" : true
       },
       "name" : "reset",
@@ -360,8 +405,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "0987b2c90dab3229434af5ba662fd692d8ccd3a855ccc67d9bb0cec94601a2a5",
-        "initialDigest" : "0987b2c90dab3229434af5ba662fd692d8ccd3a855ccc67d9bb0cec94601a2a5",
+        "finalDigest" : "625c630af3f5c4f5d9a92fb6ddb04343d6b7b9f55512ae673be382d4bdae8ed8",
+        "initialDigest" : "625c630af3f5c4f5d9a92fb6ddb04343d6b7b9f55512ae673be382d4bdae8ed8",
         "outcome" : "template-gradient"
       },
       "name" : "fixture-gradient",
@@ -391,8 +436,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "36ec71b33e0da327942325dc159f80f5f41ef40bc6d3f7a4983262abd1d455fd",
-        "initialDigest" : "0987b2c90dab3229434af5ba662fd692d8ccd3a855ccc67d9bb0cec94601a2a5",
+        "finalDigest" : "46ed073110a419f8d4fd560d1d296ecae2e32d5e3d4afc4acafbe81be5cc509c",
+        "initialDigest" : "625c630af3f5c4f5d9a92fb6ddb04343d6b7b9f55512ae673be382d4bdae8ed8",
         "outcome" : "template-noise-flow"
       },
       "name" : "fixture-noise-flow",
@@ -422,8 +467,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "90e937b8ff62d7f4b1a7febad74d4597a1540c56a5b2c45de2a7ad9df9991b88",
-        "initialDigest" : "0987b2c90dab3229434af5ba662fd692d8ccd3a855ccc67d9bb0cec94601a2a5",
+        "finalDigest" : "24cf0725192316ce733d799b4381ea05e41f9c215243f13c271e6d213f1ca315",
+        "initialDigest" : "625c630af3f5c4f5d9a92fb6ddb04343d6b7b9f55512ae673be382d4bdae8ed8",
         "outcome" : "template-rings"
       },
       "name" : "fixture-rings",
@@ -453,8 +498,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "e15bc3ba8e82adba5d1c8c33c055c2dd43bc2656ff864791e1f9b7d7a5af8272",
-        "initialDigest" : "0987b2c90dab3229434af5ba662fd692d8ccd3a855ccc67d9bb0cec94601a2a5",
+        "finalDigest" : "1d31e3957a30d8c7b1adb2a50e8add822d06cd3be485d7ca67df12ad6297b365",
+        "initialDigest" : "625c630af3f5c4f5d9a92fb6ddb04343d6b7b9f55512ae673be382d4bdae8ed8",
         "outcome" : "template-texture-mix"
       },
       "name" : "fixture-texture-mix",
@@ -506,8 +551,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "bbfc60a07648ab54060fcff4208f7ecc24c5e081a3842348a5fbf842afbc0481",
-        "initialDigest" : "0987b2c90dab3229434af5ba662fd692d8ccd3a855ccc67d9bb0cec94601a2a5",
+        "finalDigest" : "d1c1e9c68cde019e52342f619cbfd28c82719c10532d86994c7addb4ca7f25a3",
+        "initialDigest" : "625c630af3f5c4f5d9a92fb6ddb04343d6b7b9f55512ae673be382d4bdae8ed8",
         "outcome" : "template-gradient"
       },
       "name" : "fixture-broken-run-keeps-preview",
@@ -577,11 +622,64 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "0987b2c90dab3229434af5ba662fd692d8ccd3a855ccc67d9bb0cec94601a2a5",
-        "initialDigest" : "0987b2c90dab3229434af5ba662fd692d8ccd3a855ccc67d9bb0cec94601a2a5",
+        "finalDigest" : "625c630af3f5c4f5d9a92fb6ddb04343d6b7b9f55512ae673be382d4bdae8ed8",
+        "initialDigest" : "625c630af3f5c4f5d9a92fb6ddb04343d6b7b9f55512ae673be382d4bdae8ed8",
         "outcome" : "template-gradient"
       },
       "name" : "fixture-repeated-runs",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "template.select",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "texture.set",
+            "values" : [
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "texture.set",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "shader.run",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f21fa4e56bd17c5b2c7bfc9e1450daff7bc9d5beaaebf3f82a86dcbe6e1323e1",
+        "initialDigest" : "625c630af3f5c4f5d9a92fb6ddb04343d6b7b9f55512ae673be382d4bdae8ed8",
+        "outcome" : "template-texture-mix"
+      },
+      "name" : "fixture-textures",
       "seed" : "1"
     }
   ],

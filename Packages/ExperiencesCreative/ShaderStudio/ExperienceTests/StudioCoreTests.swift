@@ -2,7 +2,7 @@
 // data-model.md "StudioCore"). The adapter core `StudioCore`: the three actions with their ranges; a template resets
 // the values to its defaults and counts a run; a uniform index that is fractional or past the template's uniform
 // count is refused (`a22.not-whole`, `a22.no-uniform`) with the state unchanged; the digest covers the template and
-// the values, not the run count; the snapshot round trip and the restore refusals; one quality tier `level-0`. Then
+// the values and (feature 161) the textures, not the run count; the snapshot round trip and the restore refusals; one quality tier `level-0`. Then
 // every template drawn in the session host off screen with the status Compiled. Short runs only.
 import Foundation
 import Testing
@@ -20,6 +20,7 @@ import VisualCoreExperienceHost
         let ranges = Dictionary(uniqueKeysWithValues: StudioCore.controls.map { ($0.id, $0.ranges) })
         #expect(ranges["template.select"] == [0...3])
         #expect(ranges["uniform.set"] == [0...15, 0...1])
+        #expect(ranges["texture.set"] == [0...1, 0...2])
         #expect(ranges["shader.run"] == [1...1])
         #expect(StudioCore.qualityTiers == 1 && StudioCore.qualityProfile.names == ["level-0"])
         #expect(StudioCore.migrations.currentVersion == 1)
@@ -29,6 +30,7 @@ import VisualCoreExperienceHost
         let speed = ShaderTemplates.all[0].uniforms[0]
         #expect(core.values[0] == speed.normalized(speed.defaultValue))
         #expect(core.values.dropFirst().allSatisfy { $0 == 0 })
+        #expect(core.textures == [0, 1] && StudioCore.defaultTextures == [0, 1])
     }
 
     @Test func aTemplateResetsTheValuesAndCountsARun() throws {
@@ -83,7 +85,8 @@ import VisualCoreExperienceHost
         let before = try StudioTest.core(shell)
         let digest = try shell.engine.digest()
         for (control, values) in [("uniform.set", [2.0, 0.5]), ("uniform.set", [0.5, 0.5]),
-                                  ("template.select", [1.5]), ("shader.run", [2.0])] {
+                                  ("template.select", [1.5]), ("shader.run", [2.0]), ("texture.set", [0, 1]),
+                                  ("texture.set", [0, .nan])] {
             #expect(!shell.handle(control: control, values: values).isAccepted, "\(control) \(values)")
         }
         #expect(try StudioTest.core(shell) == before)
@@ -98,6 +101,10 @@ import VisualCoreExperienceHost
         #expect(try studioDigest(moved) != studioDigest(StudioCore()))
         let (noise, _) = studioApplied(StudioCore(), "template.select", [1])
         #expect(try studioDigest(noise) != studioDigest(StudioCore()))
+        let (mix, _) = studioApplied(StudioCore(), "template.select", [3])
+        let (textured, result) = studioApplied(mix, "texture.set", [1, 2])
+        #expect(result == .accepted && textured.textures == [0, 2])
+        #expect(try studioDigest(textured) != studioDigest(mix), "the digest covers the textures")
     }
 
     @Test func theSnapshotRoundTripsAndDamageIsRefused() throws {
@@ -121,6 +128,9 @@ import VisualCoreExperienceHost
             (#"{"runs":0,"template":0,"values":[0,0.5,\#(Array(repeating: "0", count: 14).joined(separator: ","))]}"#,
              .outOfRange("values")),
             (#"{"runs":-1,"template":0,"values":[\#(zeros)]}"#, .outOfRange("runs")),
+            (#"{"runs":0,"template":3,"textures":[0],"values":[\#(zeros)]}"#, .outOfRange("textures")),
+            (#"{"runs":0,"template":3,"textures":[0,3],"values":[\#(zeros)]}"#, .outOfRange("textures")),
+            (#"{"runs":0,"template":3,"textures":"a","values":[\#(zeros)]}"#, .damaged),
         ]
         for (text, refusal) in refused {
             #expect(throws: refusal, "\(text)") { _ = try StudioCore.restore(payload: Data(text.utf8), seed: 1) }

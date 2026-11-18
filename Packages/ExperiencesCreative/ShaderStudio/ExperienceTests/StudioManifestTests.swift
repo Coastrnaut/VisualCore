@@ -31,7 +31,7 @@ private func playManifest(_ spec: ScenarioSpec) async throws -> (initial: String
 @Suite struct StudioManifestTests {
     /// The names of the fixtures (`fixture-texture-mix` from feature 161; the content requirement stays at five).
     static let fixtureNames = ["fixture-gradient", "fixture-noise-flow", "fixture-rings", "fixture-texture-mix",
-                               "fixture-broken-run-keeps-preview", "fixture-repeated-runs"]
+                               "fixture-broken-run-keeps-preview", "fixture-repeated-runs", "fixture-textures"]
 
     @Test func theManifestIsValidWithTheStandardScenariosAndFiveFixtures() {
         let manifest = StudioCore.manifest(for: manifestID)
@@ -88,6 +88,9 @@ private func playManifest(_ spec: ScenarioSpec) async throws -> (initial: String
             case "fixture-broken-run-keeps-preview":
                 #expect(core.template == 0 && core.runs == 1)
                 #expect(core.values[0] == 0.75 && core.values.dropFirst().allSatisfy { $0 == 0 })
+            case "fixture-textures":
+                #expect(core.template == 3 && core.runs == 2 && core.textures == [2, 0])
+                #expect(core.values == StudioCore.defaultValues(template: 3))
             case "fixture-repeated-runs":
                 // Rings picked (one run) and run three times, then Gradient picked (one run) and run once.
                 #expect(core.template == 0 && core.runs == 6)

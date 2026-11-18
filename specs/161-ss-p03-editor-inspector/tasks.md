@@ -78,7 +78,7 @@
 
 ## Phase 7: Interface and evidence
 
-- [ ] T-A22-310 [P] Update `Experience/Adapter/StudioManifest.swift` and `ExperienceTests/StudioManifestTests.swift`:
+- [X] T-A22-310 [P] Update `Experience/Adapter/StudioManifest.swift` and `ExperienceTests/StudioManifestTests.swift`: — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A22-P03.ss-textures.json exit 0 (ShaderStudioCoreTests 59, ShaderStudioExperienceTests 48 on sim-27.2)
   - the fixtures add `fixture-texture-mix` and `fixture-textures`;
   - regenerate `scenario-manifest.json`;
   - the manifest's content requirement stays at the planning catalog's 5 fixtures (more fixtures are allowed).
