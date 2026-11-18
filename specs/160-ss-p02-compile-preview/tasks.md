@@ -88,7 +88,7 @@
   - the app build and unit tests: `xcodegen generate --spec project.yml`, then `--name app-unit -- python3
     scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`;
   - the runner: `--name verify-27 -- python3 scripts/verify_experiences.py --only a22.shader-studio --runtime 27`.
-- [ ] T-A22-213 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+- [X] T-A22-213 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record — Verified 2026-11-18: 2026-11-18: /speckit-converge round 1 appended T-A22-214 (implemented), round 2 appended nothing (7 FR, 4 SC, 9 acceptance scenarios, 7 edge cases checked; every evidence file exit 0); .autonomy/evidence/A22-P02.json sealed; VERIFIED-GATE A22-P02 (160 of 263); planning index, matrix, distinctiveness, metadata, Auto-Creator, catalog (--check PASS), validate_autocreator and validate_docs PASS; README and docs/automatedtesting.md updated
   A22-P02; update README.md (rule 16) and `docs/automatedtesting.md` (rule 17)
 
 ## Dependencies
