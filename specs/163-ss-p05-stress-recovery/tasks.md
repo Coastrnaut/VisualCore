@@ -79,7 +79,7 @@
 
 ## Phase 6: Interface and evidence
 
-- [ ] T-A22-510 [P] Update `Experience/Adapter/StudioManifest.swift` and `ExperienceTests/StudioManifestTests.swift`:
+- [X] T-A22-510 [P] Update `Experience/Adapter/StudioManifest.swift` and `ExperienceTests/StudioManifestTests.swift`: — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A22-P05.ss-shape.json exit 0 (ShaderStudioCoreTests 76, ShaderStudioExperienceTests 85 on sim-27.2); fixture-shape and four document.shape refusals; manifest regenerated
   - add the fixture `fixture-shape` (`document.shape [3, 1]`, then `uniform.set [2, 0.5]`);
   - add `document.shape` refusals to the rejection scenario;
   - regenerate `scenario-manifest.json`.

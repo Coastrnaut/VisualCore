@@ -15,10 +15,12 @@
 //     `template-gradient`). The planned `fixture-version-line-guidance` cannot be expressed here: the manifest plays
 //     core actions only and the edited source is the presenter's document, not core state, so a `#version` refusal
 //     and its guidance are proved by the experience tests (`GuidanceDisplayTests`) and the interface test
-//     (`SSLibraryUITests`) instead.
+//     (`SSLibraryUITests`) instead; and from feature 163 `fixture-shape` (`document.shape [3, 1]`, then
+//     `uniform.set [2, 0.5]`, a value past Gradient's single uniform, outcome `template-gradient`).
 // Input-response and reset pick Rings, move both its uniforms and run; completion picks Noise flow and expects
 // `template-noise-flow`; rejection refuses values out of range, fractional and missing uniform and texture indices
-// (Gradient has no texture input), a preview reset other than 1 (feature 162) and wrong value
+// (Gradient has no texture input), a preview reset other than 1 (feature 162), shapes out of range or fractional
+// (feature 163) and wrong value
 // counts (a template index one past the last is out of range). The expected digests are derived by playing the entries on a core exactly as the engine plays them (the steps
 // of an entry, then its action) and digesting it with the experience id as domain, as Aurora's manifest does.
 #if DEBUG || VISUALCORE_AUTOMATION
@@ -61,6 +63,8 @@ extension StudioCore {
         list.append(("fixture-textures", textures, templateCode(Int(mix))))
         let reset = [accepted("shader.run", [1]), accepted("preview.reset", [1])]
         list.append(("fixture-reset", reset, templateCode(0)))
+        let shape = [accepted("document.shape", [3, 1]), accepted("uniform.set", [2, 0.5])]
+        list.append(("fixture-shape", shape, templateCode(0)))
         return list
     }
 
@@ -98,6 +102,10 @@ extension StudioCore {
             ScenarioStep(steps: 0, action: ScriptedAction("shader.run", [0]), result: outOfRange),
             ScenarioStep(steps: 0, action: ScriptedAction("preview.reset", [0]), result: outOfRange),
             ScenarioStep(steps: 0, action: ScriptedAction("preview.reset", []), result: count),
+            ScenarioStep(steps: 0, action: ScriptedAction("document.shape", [17, 0]), result: outOfRange),
+            ScenarioStep(steps: 0, action: ScriptedAction("document.shape", [1, 3]), result: outOfRange),
+            ScenarioStep(steps: 0, action: ScriptedAction("document.shape", [1.5, 0]), result: notWhole),
+            ScenarioStep(steps: 0, action: ScriptedAction("document.shape", [1]), result: count),
             ScenarioStep(steps: 0, action: ScriptedAction("shader.run", []), result: count),
             ScenarioStep(steps: 0, action: ScriptedAction("uniform.set", [0]), result: count),
         ]

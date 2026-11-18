@@ -32,7 +32,7 @@ private func playManifest(_ spec: ScenarioSpec) async throws -> (initial: String
     /// The names of the fixtures (`fixture-texture-mix` from feature 161; the content requirement stays at five).
     static let fixtureNames = ["fixture-gradient", "fixture-noise-flow", "fixture-rings", "fixture-texture-mix",
                                "fixture-broken-run-keeps-preview", "fixture-repeated-runs", "fixture-textures",
-                               "fixture-reset"]
+                               "fixture-reset", "fixture-shape"]
 
     @Test func theManifestIsValidWithTheStandardScenariosAndFiveFixtures() {
         let manifest = StudioCore.manifest(for: manifestID)
@@ -92,6 +92,9 @@ private func playManifest(_ spec: ScenarioSpec) async throws -> (initial: String
             case "fixture-textures":
                 #expect(core.template == 3 && core.runs == 2 && core.textures == [2, 0])
                 #expect(core.values == StudioCore.defaultValues(template: 3))
+            case "fixture-shape":
+                #expect(core.template == 0 && core.runs == 0 && core.shape == [3, 1])
+                #expect(core.values[2] == 0.5 && core.values[0] == StudioCore.defaultValues(template: 0)[0])
             case "fixture-reset":
                 #expect(core.template == 0 && core.runs == 1 && core.resets == 1)
                 #expect(core.values == StudioCore.defaultValues(template: 0) && core.textures == [0, 1])
