@@ -45,7 +45,7 @@
 
 ## Phase 3: Story 2 — a broken shader never breaks the preview (P1)
 
-- [ ] T-A22-206 [US2] Write `ExperienceTests/{LastGoodPreviewTests,RunQueueTests}.swift` (SC-A22-201–203):
+- [X] T-A22-206 [US2] Write `ExperienceTests/{LastGoodPreviewTests,RunQueueTests}.swift` (SC-A22-201–203): — Verified 2026-11-18: 2026-11-18: LastGoodPreviewTests and RunQueueTests: compile error, link error (an unwritten varying), refused source and a failing first run leave the read-back pixels byte-identical; diagnostics on the authored lines; a fix replaces the picture and clears them; three runs before a frame give one compile; a template switch while pending compiles the new template; teardown with a pending request compiles nothing; .autonomy/checks/A22-P02.ss-ios27.json exit 0; written by an agent, retested
   - each failure leaves the read-back pixels byte-identical: a compile error, a link error, a refused source, and a
     first run that fails;
   - diagnostics are on the authored lines, and a fix replaces the picture and clears them;
