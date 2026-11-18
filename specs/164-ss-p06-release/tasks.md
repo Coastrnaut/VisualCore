@@ -17,7 +17,7 @@
 
 ## Phase 2: Story 1 — nothing leaves the device (P1) 🎯
 
-- [ ] T-A22-602 [P] [US1] Write `docs/apps/shader-studio/privacy-and-credits.md` (FR-A22-601), after
+- [X] T-A22-602 [P] [US1] Write `docs/apps/shader-studio/privacy-and-credits.md` (FR-A22-601), after — Verified 2026-11-18: 2026-11-18: docs/apps/shader-studio/privacy-and-credits.md names the snapshot, project-<n>.json and library.json, their place and removal, nothing is sent, no permission is asked, GPU code is not a sandbox, the licences; validate_docs passes
   `docs/apps/aurora/privacy-and-credits.md`:
   - the stored data (the snapshot; `project-<n>.json`; `library.json`), its place (the experience's own storage) and
     its removal (Remove in the library, or deleting the app);
