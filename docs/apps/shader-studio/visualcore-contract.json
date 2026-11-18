@@ -270,7 +270,7 @@
    "id": "M03",
    "capability": "Render previews: a bounded preview that draws the person's shader full screen with time, resolution and uniforms, at a capped size and frame rate",
    "source": "brainstorm: render previews",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
@@ -307,7 +307,7 @@
     "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/ArtSceneFactory.swift",
     "symbol": "ArtSceneFactory"
    },
-   "notes": "FullScreenShaderScene's source is fixed at creation, a failure draws dark grey and it has no texture input; the app-local preview scene is G-PREVIEW."
+   "notes": "FullScreenShaderScene's source is fixed at creation, a failure draws dark grey and it has no texture input; the app-local preview scene is G-PREVIEW. A22-P02 (feature 160): PreviewPipeline compiles the newest request through ResourceRegistry.program at the next draw and swaps a FullScreenShaderScene only on success, so a failure keeps the last good preview (LastGoodPreviewTests, RunQueueTests, RebuildTests)."
   },
   {
    "id": "M04",
@@ -473,7 +473,7 @@
    "id": "M08",
    "capability": "Version 0.1 feature 03: an explicit Compile and Run action with a last-known-good preview fallback",
    "source": "manual \u00a72 version 0.1 feature 3",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
@@ -504,7 +504,7 @@
     "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidFieldsScene.swift",
     "symbol": "FluidFieldsScene.rebuildFields"
    },
-   "notes": "ResourceRegistry.program never touches a held program on failure (ShaderProgramTests), but no scene swaps only on success and keeps the last good program; rebuilding a FullScreenShaderScene per compile was rejected (research D6 alternatives). G-PREVIEW and G-RUN."
+   "notes": "ResourceRegistry.program never touches a held program on failure (ShaderProgramTests), but no scene swaps only on success and keeps the last good program; rebuilding a FullScreenShaderScene per compile was rejected (research D6 alternatives). G-PREVIEW and G-RUN. A22-P02 (feature 160): PreviewPipeline compiles the newest request through ResourceRegistry.program at the next draw and swaps a FullScreenShaderScene only on success, so a failure keeps the last good preview (LastGoodPreviewTests, RunQueueTests, RebuildTests); shader.run and template.select count a run that the presenter compiles at its next frame (StudioCoreTests, RunQueueTests)."
   },
   {
    "id": "M09",
@@ -848,7 +848,7 @@
    "id": "M17",
    "capability": "Context loss: the preview program, textures and targets rebuilt from the project's source after a context recreation",
    "source": "spec FR-A22-003; constitution III",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
@@ -873,7 +873,7 @@
     "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidFieldsScene.swift",
     "symbol": "FluidFieldsScene"
    },
-   "notes": "Tested in SessionPhaseMemoryTests and ShellRenderingTests. Rebuilding the person's last good program from source is G-PREVIEW."
+   "notes": "Tested in SessionPhaseMemoryTests and ShellRenderingTests. Rebuilding the person's last good program from source is G-PREVIEW. A22-P02 (feature 160): PreviewPipeline compiles the newest request through ResourceRegistry.program at the next draw and swaps a FullScreenShaderScene only on success, so a failure keeps the last good preview (LastGoodPreviewTests, RunQueueTests, RebuildTests)."
   },
   {
    "id": "M18",
@@ -1095,7 +1095,7 @@
    "id": "M24",
    "capability": "Render thread and compile requests: the host's thread is the main thread; a control queues a compile request that the preview scene compiles at its next frame, one at a time, the newest replacing a waiting one",
    "source": "spec FR-A22-003; constitution 2.18.1 A22 compile rule; spec edge case",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
@@ -1120,7 +1120,7 @@
     "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidFieldsScene.swift",
     "symbol": "FluidFieldsScene.pendingRebuild"
    },
-   "notes": "RenderHost, ResourceRegistry and ShaderProgram are main-actor; GL work only inside setup, resize, render and teardown. The request queue is G-PREVIEW."
+   "notes": "RenderHost, ResourceRegistry and ShaderProgram are main-actor; GL work only inside setup, resize, render and teardown. The request queue is G-PREVIEW. A22-P02 (feature 160): PreviewPipeline compiles the newest request through ResourceRegistry.program at the next draw and swaps a FullScreenShaderScene only on success, so a failure keeps the last good preview (LastGoodPreviewTests, RunQueueTests, RebuildTests)."
   },
   {
    "id": "M25",
@@ -1339,7 +1339,7 @@
    "justification": "The preview scene compiles queued requests in the host's context at its next frame, one at a time with the newest replacing a waiting one, swaps programs only on success, keeps the last good program, binds uniforms from reflection and rebuilds from source after context loss. FullScreenShaderScene cannot replace its source and drops later diagnostics, so the swap is app-local with no VisualCore change (clarification Q3); a second user would justify moving it upstream.",
    "phase": 2,
    "test": "Experience tests: a failing compile keeps drawing the last good program (read-back unchanged) and reports every diagnostic; two queued requests compile only the newest; at most one compile per frame; after recreateContext the last good program is rebuilt from source.",
-   "closed": null
+   "closed": "A22-P02"
   },
   {
    "id": "G-RUN",
@@ -1351,7 +1351,7 @@
    "justification": "The explicit Compile and Run action and its states (idle, queued, compiled, failed) are the experience's interface over the preview scene (manual phase 02).",
    "phase": 2,
    "test": "Experience tests: Run queues exactly one request; a control never calls ResourceRegistry.program directly; a failed run shows the diagnostics and leaves the preview on the last good program.",
-   "closed": null
+   "closed": "A22-P02"
   },
   {
    "id": "G-EDITOR",

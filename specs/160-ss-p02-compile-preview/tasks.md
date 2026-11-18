@@ -81,7 +81,7 @@
     Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test
     --only-testing ShaderStudioCoreTests ShaderStudioExperienceTests`;
   - the documented API, isolation and core purity.
-- [ ] T-A22-211 Contract: G-PREVIEW and G-RUN are closed by "A22-P02", and rows whose gaps are all closed become
+- [X] T-A22-211 Contract: G-PREVIEW and G-RUN are closed by "A22-P02", and rows whose gaps are all closed become — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A22-P02.contract.json exit 0 (G-PREVIEW and G-RUN closed by A22-P02; M03, M08, M17 and M24 available with their evidence)
   available with evidence (`--name contract`)
 - [ ] T-A22-212 The catalog, app and runner checks, with the packages and script tests:
   - the catalog (`--name catalog`);
