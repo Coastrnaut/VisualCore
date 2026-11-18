@@ -120,6 +120,11 @@ enum SS {
         waitFor(editor(app), timeout: VC.wait, "the editor is there", file: file, line: line)
         XCTAssertTrue(waitForLabel(canvas(app)) { $0.hasPrefix("Shader Studio") },
                       "the canvas is labelled with the studio: \(description(app))", file: file, line: line)
+        // The opening template compiles at the first frames; its status settling marks the end of the editor's
+        // first loads, so an edit made after this is not reset by them (A22-P04: a caret placed before the first
+        // compile finished went back to the start).
+        XCTAssertTrue(waitForValue(control(app, "status"), timeout: runWait) { $0.hasPrefix("Compiled") },
+                      "the opening template compiled", file: file, line: line)
         return app
     }
 
@@ -201,24 +206,32 @@ enum SS {
         return true
     }
 
-    /// Puts the caret at the end of the document: scrolls the editor into view, taps it unless it already has the
-    /// keyboard focus, waits for the focus, then presses ⌘↓ (the end of the document). True when the editor has the
-    /// focus.
+    /// Puts the caret at the end of the document. The editor is as tall as its wrapped text plus one spare line
+    /// (A22-P03), so a tap in that spare line places the caret after the last character: the controls are dragged
+    /// until the editor's bottom edge is inside them (at most ``maxDrags`` drags), then the editor is tapped 6
+    /// points above its bottom edge, near its right side. Waits for the keyboard focus; true when the editor has it.
+    /// (⌘↓ from the hardware keyboard did not move the caret of this editor on the iOS 27.2 simulator, A22-P04.)
     @MainActor
     @discardableResult
     static func caretToEnd(_ app: XCUIApplication, file: StaticString = #filePath, line: UInt = #line) -> Bool {
         let e = editor(app)
         guard waitFor(e, timeout: shortWait, "the editor is there", file: file, line: line) else { return false }
-        reveal(app, e, required: false)
-        // Focus with a tap on the element itself (its visible centre, wherever the layout put it), then move the
-        // caret to the end of the document with ⌘↓ from the hardware keyboard, which works whatever the tap hit.
+        let list = controlsList(app)
+        var drags = 0
+        while drags < maxDrags, list.exists, e.exists,
+              e.frame.maxY > list.frame.maxY - 2 || e.frame.maxY < list.frame.minY + 30 {
+            let below = e.frame.maxY - (list.frame.maxY - 2)
+            drag(app, by: below > 0 ? below + 24 : e.frame.maxY - list.frame.midY)
+            drags += 1
+        }
+        let frame = e.frame
+        e.coordinate(withNormalizedOffset: .zero)
+            .withOffset(CGVector(dx: frame.width * 0.9, dy: max(frame.height - 6, 1))).tap()
         func hasFocus() -> Bool { e.value(forKey: "hasKeyboardFocus") as? Bool ?? false }
-        if !hasFocus() { e.tap() }
         let deadline = Date().addingTimeInterval(shortWait)
         while !hasFocus(), Date() < deadline { usleep(200_000) }
         let focused = hasFocus()
         XCTAssertTrue(focused, "the editor has the keyboard focus", file: file, line: line)
-        if focused { e.typeKey(XCUIKeyboardKey.downArrow, modifierFlags: .command) }
         return focused
     }
 
@@ -242,6 +255,15 @@ enum SS {
                            file: StaticString = #filePath, line: UInt = #line) -> Bool {
         guard caretToEnd(app, file: file, line: line) else { return false }
         editor(app).typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: count))
+        // A burst of deletes can lose a few keys on the simulator (A22-P04: three were left); the characters still
+        // past the expected text are deleted again, at most three rounds.
+        var rounds = 0
+        while rounds < 3, !waitForValue(editor(app), timeout: 1, { $0 == expected }) {
+            let now = source(app)
+            guard now.hasPrefix(expected), now.count > expected.count else { break }
+            editor(app).typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: now.count - expected.count))
+            rounds += 1
+        }
         let restored = waitForValue(editor(app)) { $0 == expected }
         XCTAssertTrue(restored, "the editor is back to the valid source: \(source(app))", file: file, line: line)
         return restored
@@ -293,5 +315,69 @@ enum SS {
         let deadline = Date().addingTimeInterval(timeout)
         while query.count > 0, Date() < deadline { usleep(200_000) }
         return query.count == 0
+    }
+}
+
+// Feature 162 (A22-P04) T-A22-412 (FR-A22-407; contracts/limits.md "Guidance", "Library"): helpers of
+// `SSLibraryUITests`. The guidance sentence under the status is `guidance` (its label). The library is opened with
+// `library`; inside it `save` asks for a name in `project-name` and `save-confirm` saves; the rows are `project-<k>`
+// (k from 0, newest first, labelled with the name); tapping a row selects it and `open`, `rename`, `remove` act on it.
+// The library may be a sheet or a section, so its controls are tapped where they are (scrolled to only when not
+// hittable), and the editor is reached again by closing a sheet that still covers it.
+extension SS {
+    /// The guidance sentence under the status (the `guidance` control's label, or its value when it has no label).
+    @MainActor
+    static func guidance(_ app: XCUIApplication) -> String {
+        let g = control(app, "guidance")
+        guard g.exists else { return "" }
+        return g.label.isEmpty ? (g.value as? String ?? "") : g.label
+    }
+
+    /// The library row `k` (from 0, newest first).
+    @MainActor
+    static func project(_ app: XCUIApplication, _ k: Int) -> XCUIElement { control(app, "project-\(k)") }
+
+    /// Waits for the control `name`, wherever it is (the controls or the library sheet), and taps it: directly when
+    /// it can be tapped, otherwise after scrolling the controls to it. True when it was tapped.
+    @MainActor
+    @discardableResult
+    static func tapAnywhere(_ app: XCUIApplication, _ name: String,
+                            file: StaticString = #filePath, line: UInt = #line) -> Bool {
+        let target = control(app, name)
+        guard waitFor(target, timeout: shortWait, "\(name) is there", file: file, line: line) else { return false }
+        if !target.isHittable { reveal(app, target, required: false) }
+        let deadline = Date().addingTimeInterval(shortWait)
+        while !target.isHittable, Date() < deadline { usleep(200_000) }
+        XCTAssertTrue(target.isHittable, "\(name) can be tapped", file: file, line: line)
+        guard target.isHittable else { return false }
+        target.tap()
+        return true
+    }
+
+    /// Brings the editor back: when a library sheet still covers it, the sheet is swiped down (at most twice). True
+    /// when the editor can be tapped.
+    @MainActor
+    @discardableResult
+    static func backToEditor(_ app: XCUIApplication, file: StaticString = #filePath, line: UInt = #line) -> Bool {
+        let e = editor(app)
+        var swipes = 0
+        while swipes < 2, !(e.exists && e.isHittable) {
+            let window = app.windows.firstMatch
+            window.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.15))
+                .press(forDuration: 0.05, thenDragTo: window.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.95)))
+            _ = waitForHittable(e)
+            swipes += 1
+        }
+        let back = e.exists && e.isHittable
+        XCTAssertTrue(back, "the editor can be reached again", file: file, line: line)
+        return back
+    }
+
+    /// Waits until `target` can be tapped; true when it can.
+    @MainActor
+    static func waitForHittable(_ target: XCUIElement, timeout: TimeInterval = SS.shortWait) -> Bool {
+        let deadline = Date().addingTimeInterval(timeout)
+        while !(target.exists && target.isHittable), Date() < deadline { usleep(200_000) }
+        return target.exists && target.isHittable
     }
 }

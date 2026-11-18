@@ -97,7 +97,7 @@
   - add the fixtures `fixture-version-line-guidance` and `fixture-reset`;
   - regenerate `scenario-manifest.json`;
   - update `StudioCoreTests` for `preview.reset`.
-- [ ] T-A22-412 [P] Write `Apps/VisualCore/Tests/UI/ShaderStudio/SSLibraryUITests.swift`, using `SSSupport` (FR-A22-407):
+- [X] T-A22-412 [P] Write `Apps/VisualCore/Tests/UI/ShaderStudio/SSLibraryUITests.swift`, using `SSSupport` (FR-A22-407): — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A22-P04.app-ui-4.json exit 0 (chunk d3: SSEditorUITests 2 and SSLibraryUITests 2 on the iOS 27.2 phone, each under 60 s; the caret goes to the end by a tap in the editor's spare last line, lost deletes retried)
   - a `#version` line shows its guidance;
   - save "Waves", change the source, open "Waves", and the source is back;
   - each test under 60 s;
