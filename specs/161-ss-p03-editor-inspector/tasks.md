@@ -88,7 +88,7 @@
   - move a uniform slider in the inspector;
   - each test under 60 s;
   - the serial chunk `"d3": ["SSEditorUITests"]` in `scripts/release_check.py` and `SERIAL_CHUNKS` (lead).
-- [ ] T-A22-312 [P] Add the textures and `texture-mix` to `docs/apps/shader-studio/licenses.md`.
+- [X] T-A22-312 [P] Add the textures and `texture-mix` to `docs/apps/shader-studio/licenses.md`. — Verified 2026-11-18: 2026-11-18: docs/apps/shader-studio/licenses.md lists texture-mix and the three code-made textures; validate_docs passes
 - [ ] T-A22-313 Review checkpoint:
   - Shader Studio tests on sim-27.2 (`--name ss-ios27`);
   - the documented API, isolation and core purity.
