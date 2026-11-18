@@ -34,6 +34,13 @@
 //     live scene the watchdog had not stopped) back without a compile, or, without one, the template's starter is
 //     submitted. The editor's document is kept. `feedWatchdog(_:)` is the tests' seam.
 //
+// Feature 162 (A22-P04) T-A22-410 (FR-A22-405; clarification Q4): the presenter holds the `ProjectLibrary` over the
+// experience's storage (nil without one, as in tests that build the experience without storage). `saveProject(name:)`
+// saves the document with the mirror's values and textures; `openProject(_:)` reads a project and `apply(_:)` sets the
+// document, then sends `uniform.set` for each of its uniforms' values and `texture.set` for each of its texture inputs
+// (the core refuses an index past the selected template's counts, which is left as it is), then `shader.run [1]`;
+// the next frame compiles it, never the control.
+//
 // No GL call: everything is drawn through VisualCore's `FullScreenShaderScene` and `FieldPass`.
 import Foundation
 import Observation
@@ -105,10 +112,16 @@ final class StudioPresenter: ExperiencePresenter {
     var maxFramesPerSecond: Int { 30 }
 
     /// A presenter whose document and first live scene are the first template's.
-    init() {
+    /// The saved projects (feature 162); nil when the experience has no storage.
+    let library: ProjectLibrary?
+
+    /// A presenter whose document and first live scene are the first template's, with a project library over
+    /// `storage` when one is given.
+    init(storage: ExperienceStorage? = nil) {
         let first = ShaderTemplates.all.first?.project ?? Self.emptyProject
         document = first
         pipeline = PreviewPipeline(initial: first)
+        library = storage.map { ProjectLibrary(storage: $0) }
     }
 
     /// A project used only if no template could be built (the core tests prove all three are).
@@ -144,6 +157,44 @@ final class StudioPresenter: ExperiencePresenter {
         guard mirror.source != document.source else { return }
         mirror.source = document.source
         mirror.editor = EditorDocument(source: document.source, diagnostics: mirror.diagnostics)
+    }
+
+    // MARK: Library
+
+    /// Saves the document with the mirror's values and textures as `name` (feature 162); `.unavailable` without a
+    /// library.
+    @discardableResult
+    func saveProject(name: String) -> Result<ProjectLibraryEntry, ProjectLibraryFailure> {
+        guard let library else { return .failure(.unavailable) }
+        return library.save(name: name, project: document, values: mirror.values, textures: mirror.textures)
+    }
+
+    /// Opens the saved project `file` (feature 162): reads it and ``apply(_:)``s it; `.unavailable` without a
+    /// library, or the library's refusal (nothing changes).
+    @discardableResult
+    func openProject(_ file: String) -> Result<OpenedProject, ProjectLibraryFailure> {
+        guard let library else { return .failure(.unavailable) }
+        let result = library.open(file)
+        if case .success(let opened) = result { apply(opened) }
+        return result
+    }
+
+    /// Sets `opened`'s project as the document, then sends its values (`uniform.set`, one per uniform of the
+    /// project), its texture choices (`texture.set`, one per texture input) and `shader.run [1]` through the port;
+    /// returns the results in that order (empty without a port). Nothing compiles here.
+    @discardableResult
+    func apply(_ opened: OpenedProject) -> [ActionResult] {
+        replaceDocument(opened.project)
+        guard let port else { return [] }
+        var results: [ActionResult] = []
+        for k in opened.project.uniforms.indices where opened.values.indices.contains(k) {
+            results.append(port.send("uniform.set", [Double(k), opened.values[k]]))
+        }
+        for k in opened.project.textureInputs.indices where opened.textures.indices.contains(k) {
+            results.append(port.send("texture.set", [Double(k), Double(opened.textures[k])]))
+        }
+        results.append(port.send("shader.run", [1]))
+        return results
     }
 
     // MARK: Inspector
@@ -329,8 +380,13 @@ final class StudioPresenter: ExperiencePresenter {
     /// The native controls (``StudioControls``, with ``StudioEditor`` and ``StudioInspector``), sending through
     /// `port`; the editor's edits reach ``setSource(_:)``.
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
-        AnyView(StudioControls(port: port, mirror: mirror, edit: { [weak self] source in
+        let actions = library.map { library in
+            StudioLibraryActions(library: library,
+                                 save: { [weak self] name in self?.saveProject(name: name) ?? .failure(.unavailable) },
+                                 open: { [weak self] file in self?.openProject(file) ?? .failure(.unavailable) })
+        }
+        return AnyView(StudioControls(port: port, mirror: mirror, edit: { [weak self] source in
             self?.setSource(source)
-        }))
+        }, library: actions))
     }
 }

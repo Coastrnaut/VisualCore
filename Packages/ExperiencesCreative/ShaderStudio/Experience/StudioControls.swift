@@ -12,6 +12,8 @@
 //   - `guidance` (feature 162): the sentence under the status saying what to change (the core's `Guidance`), shown
 //     when there is one; its spoken label is the sentence;
 //   - `preview-reset` (feature 162): a button shown while the watchdog has stopped the preview (`preview.reset [1]`);
+//   - `library` (feature 162, T-A22-410): a button, shown when the experience has storage, that opens
+//     ``StudioLibraryView`` in a sheet;
 //   - ``StudioEditor``: `editor`, `gutter` (`gutter-line-<n>`), `next-diagnostic` (⌘') and `diagnostics`
 //     (`diagnostic-<k>`, "Line N: message", anything outside the person's source first, as "<file>: message", or
 //     "Shader: message" without a file);
@@ -48,6 +50,10 @@ struct StudioControls: View {
     let mirror: StudioMirror
     /// Sets the presenter's document source (the editor's edits); never compiles.
     var edit: @MainActor (String) -> Void = { _ in }
+    /// The project library's actions (feature 162); nil when the experience has no storage.
+    var library: StudioLibraryActions?
+    /// Whether the library sheet is shown.
+    @State private var showsLibrary = false
     /// The width class of the environment.
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     /// The type size of the environment.
@@ -126,6 +132,16 @@ struct StudioControls: View {
             .keyboardShortcut("r", modifiers: .command)
             .accessibilityHint(Text(verbatim: "Compiles the shader; the preview keeps the last working one on an error"))
             .accessibilityIdentifier(port.identifier("run"))
+            if library != nil {
+                Button {
+                    showsLibrary = true
+                } label: {
+                    Text(verbatim: "Library").frame(minHeight: 44)
+                }
+                .accessibilityLabel(Text(verbatim: "Library"))
+                .accessibilityHint(Text(verbatim: "Saves, opens, renames and removes your shader projects"))
+                .accessibilityIdentifier(port.identifier("library"))
+            }
             Text(verbatim: mirror.status)
                 .font(.footnote)
                 .spoken(spoken["status"])
@@ -160,6 +176,11 @@ struct StudioControls: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .sheet(isPresented: $showsLibrary) {
+            if let library {
+                StudioLibraryView(port: port, actions: library, close: { showsLibrary = false })
+            }
+        }
     }
 }
 

@@ -169,8 +169,13 @@ message; damaged and newer files are refused and still present afterwards.
 - **A pause in drawing** (the app in the background, a sheet over the preview): it gives one long interval, which
   counts once; a stop still needs 8 consecutive slow intervals.
 - **Opening a project over unsaved edits:** the open replaces the editor's document without asking; the person saves
-  first if they want to keep it (the library view says so in its hint).
+  first if they want to keep it (the library view says so in its hint). After a save the library stays open with the
+  new project listed first; it closes after an open.
 - **A context loss while stopped:** the preview stays stopped; the fallback is rebuilt from its source.
+- **A project with more uniforms or texture inputs than the selected template** (decision at T-A22-410): the core
+  bounds `uniform.set` and `texture.set` by the template's counts (A22-P02, A22-P03), so values past them are refused
+  as `a22.no-uniform` / `a22.no-texture` and show their defaults; the source, and every value within the template's
+  counts, open unchanged. Binding the core's bounds to the live project is left to A22-P05.
 - **An unreadable file:** it can be removed by the person, but not opened or renamed.
 - **Large text size and a hardware keyboard:** the library, the guidance and the Reset action stay usable.
 

@@ -82,7 +82,7 @@
   - the order is newest first;
   - a project whose source is refused saves as text;
   - an unreadable file can be removed by the person, but opening or renaming it is refused.
-- [ ] T-A22-410 [US3] Wire the library (FR-A22-405, 407):
+- [X] T-A22-410 [US3] Wire the library (FR-A22-405, 407): — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A22-P04.ss-library.json exit 0 (ShaderStudioCoreTests 76, ShaderStudioExperienceTests 69 on sim-27.2) (PresenterLibraryTests 3)
   - `Experience/ShaderStudioExperience.swift` passes `storage`;
   - `Experience/StudioLibraryView.swift` (new) shows the list with `library`, `save`, `project-<k>`, `open`, `rename`
     and `remove`, with spoken labels, and opens in the controls;

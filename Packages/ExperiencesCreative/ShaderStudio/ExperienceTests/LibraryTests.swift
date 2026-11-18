@@ -7,11 +7,17 @@
 // quota (a filler file) refuses a save and a rename and keeps the previous file; the order is newest first, then the
 // unreadable files; a project whose source the validator refuses saves as text; a newer index makes the library read
 // only. Synthetic names only; short runs, no clock.
+// Feature 162 T-A22-410 adds the presenter's side (`PresenterLibraryTests`): opening a saved project through the one
+// app's session host lists its uniforms in the inspector with its values; opening a project whose source is now
+// refused shows its refusal and guidance while the preview keeps the last good shader; without storage the library
+// is unavailable.
+import CoreGraphics
 import Foundation
 import Testing
 import ShaderStudioCore
 @testable import ShaderStudioExperience
 import VisualCoreExperience
+import VisualCoreExperienceHost
 
 /// A temporary storage of the experience: its own folder and defaults suite.
 @MainActor
@@ -276,5 +282,97 @@ enum StudioLibraryTest {
         #expect(StudioLibraryTest.failure(library.remove(entry.file)) == .readOnly)
         #expect(StudioLibraryTest.failure(library.open(entry.file)) == nil)
         #expect(try place.contents() == before)
+    }
+}
+
+/// The presenter's library (feature 162, T-A22-410), through the one app's session host.
+@MainActor
+@Suite(.serialized) struct PresenterLibraryTests {
+    /// Opens Shader Studio in `session` with a library over `storage`, lays it out at 32 × 24 points and draws one
+    /// frame.
+    static func open(_ session: ExperienceSession, storage: ExperienceStorage) async throws
+        -> ExperienceShell<StudioPresenter> {
+        let id = StudioTest.id
+        var made: ExperienceShell<StudioPresenter>?
+        session.qualityPin = 0
+        let request = ExperienceOpenRequest(id: id, seed: 1, snapshot: nil, refusedSnapshotFails: false) {
+            let shell = ShaderStudioExperience.make(id: id, storage: Optional(storage))
+            made = shell
+            return shell
+        }
+        #expect(await session.open(request) == .running)
+        let view = try #require(session.renderHost?.view)
+        view.frame = CGRect(x: 0, y: 0, width: 32, height: 24)
+        view.layoutIfNeeded()
+        try StudioTest.draw(session)
+        return try #require(made)
+    }
+
+    @Test func openingListsTheOpenedUniformsWithTheirValues() async throws {
+        let place = try StudioStoragePlace("presenter-open")
+        defer { place.remove() }
+        let session = ExperienceSession()
+        defer { session.close() }
+        let shell = try await Self.open(session, storage: place.storage)
+        let presenter = shell.presenter
+        #expect(presenter.library != nil)
+        StudioTest.accept(shell, "template.select", [1])   // Noise flow: u_scale, u_speed
+        StudioTest.accept(shell, "uniform.set", [0, 0.8])
+        try StudioTest.draw(session)
+        let entry = try #require(StudioLibraryTest.saved(presenter.saveProject(name: "Flow")))
+        let flow = ShaderTemplates.all[1]
+
+        StudioTest.accept(shell, "template.select", [2])   // Rings: two uniforms as well
+        try StudioTest.draw(session)
+        #expect(presenter.mirror.uniforms.map(\.name) == ["u_count", "u_width"])
+        let compiles = presenter.pipeline.compileCount
+        guard case .success(let opened) = presenter.openProject(entry.file) else {
+            Issue.record("not opened")
+            return
+        }
+        #expect(opened.project == flow.project)
+        #expect(presenter.pipeline.compileCount == compiles, "opening compiles nothing in the control")
+        #expect(presenter.mirror.source == flow.source)
+        try StudioTest.draw(session)
+        #expect(presenter.pipeline.compileCount == compiles + 1, "the queued run compiles at the frame")
+        #expect(presenter.mirror.uniforms.map(\.name) == flow.uniforms.map(\.name), "the inspector lists them")
+        #expect(try StudioTest.core(shell).values[0] == 0.8)
+        #expect(StudioInspector.rows(presenter.mirror).map(\.name) == ["u_scale", "u_speed"])
+        #expect(presenter.mirror.status == "Compiled")
+    }
+
+    @Test func openingARefusedSourceShowsItsRefusalAndKeepsThePreview() async throws {
+        let place = try StudioStoragePlace("presenter-refused")
+        defer { place.remove() }
+        let session = ExperienceSession()
+        defer { session.close() }
+        let shell = try await Self.open(session, storage: place.storage)
+        let presenter = shell.presenter
+        let library = try #require(presenter.library)
+        let refused = try StudioLibraryTest.project(source: StudioTest.refusedSource)
+        let entry = try #require(StudioLibraryTest.saved(library.save(name: "Old", project: refused,
+                                                                       values: StudioCore.defaultValues(template: 0),
+                                                                       textures: StudioCore.defaultTextures)))
+        let before = try StudioTest.still(session)
+        let live = presenter.pipeline.liveProject
+        let results = presenter.apply(try #require(try? library.open(entry.file).get()))
+        #expect(results.allSatisfy { $0 == .accepted }, "\(results)")
+        try StudioTest.draw(session)
+        #expect(presenter.mirror.source == StudioTest.refusedSource, "it opens in the editor")
+        #expect(presenter.mirror.status == "Refused: version-line")
+        #expect(presenter.mirror.guidance == Guidance.forIssue(.versionLine(1)))
+        #expect(presenter.pipeline.liveProject == live)
+        #expect(try StudioTest.still(session) == before, "the preview keeps the last good shader")
+    }
+
+    @Test func withoutStorageTheLibraryIsUnavailable() async throws {
+        let shell = try await StudioTest.shell()
+        #expect(shell.presenter.library == nil)
+        #expect(StudioLibraryTest.failure(shell.presenter.saveProject(name: "Waves")) == .unavailable)
+        #expect(StudioLibraryTest.failure(shell.presenter.openProject("project-1.json")) == .unavailable)
+        #expect(StudioLibraryView.stacksButtons(.accessibility1) && !StudioLibraryView.stacksButtons(.large))
+        let unreadable = ProjectLibraryEntry(file: "project-3.json", name: "project-3.json", order: 0,
+                                             refusal: "damaged")
+        #expect(StudioLibraryView.rowLabel(unreadable) == "project-3.json, unreadable: damaged")
     }
 }
