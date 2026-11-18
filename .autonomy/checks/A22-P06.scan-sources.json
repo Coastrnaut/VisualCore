@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "sh",
+    "specs/164-ss-p06-release/scan-sources-release.sh"
+  ],
+  "command": "sh specs/164-ss-p06-release/scan-sources-release.sh",
+  "elapsed_seconds": 0.04,
+  "exit_code": 0,
+  "finished": "2026-11-18T22:27:45+00:00",
+  "log": ".autonomy/logs/A22-P06.scan-sources.log",
+  "log_sha256": "3808c073849e7ff925dd2405353de848709660c843ccaf4285ed30552823299c",
+  "name": "scan-sources",
+  "stage": "A22-P06",
+  "started": "2026-11-18T22:27:45+00:00",
+  "timed_out": false
+}

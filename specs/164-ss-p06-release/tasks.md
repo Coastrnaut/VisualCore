@@ -23,7 +23,7 @@
     its removal (Remove in the library, or deleting the app);
   - "nothing is sent", "no permission is asked" and "GPU code is not a sandbox";
   - the licence inventory (link `licenses.md`).
-- [ ] T-A22-603 [US1] Write `specs/164-ss-p06-release/scan-sources-release.sh`, after
+- [X] T-A22-603 [US1] Write `specs/164-ss-p06-release/scan-sources-release.sh`, after — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A22-P06.scan-sources.json exit 0 (no scanned use in 52 Swift files of Packages/ExperiencesCreative/ShaderStudio)
   `specs/157-au-p06-release/scan-sources-release.sh`, with the APIs of clarification Q3 (plus `UIPasteboard` and
   `ShareLink`) over `Packages/ExperiencesCreative/ShaderStudio`; run it (`--name scan-sources`) (FR-A22-602, SC-A22-601).
 
