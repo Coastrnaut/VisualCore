@@ -188,7 +188,9 @@ the inspector showing the template's uniform.
   `docs/release/known-limitations.md` MUST gain an A22 section (no sandbox, GLSL ES 3.00 fragment shaders only, no
   sharing or export, device rows pending); the experience-release and copy-claims steps for A22 MUST pass. The device
   rows MUST be `pending-campaign-ii` and name their campaign rows SS-D1 … SS-D6 of
-  `docs/apps/shader-studio/device-campaign.md`.
+  `docs/apps/shader-studio/device-campaign.md`. Accessibility is listed with its automated evidence (spoken labels,
+  Dynamic Type layout, keyboard shortcuts) as `verified`, and the system accessibility audits as `pending-campaign-ii`
+  (they run only in the device campaign, owner ruling of 2026-11-13).
 - **FR-A22-607**: The interface tests MUST cover the first-session defaults in the A22 chunk.
 
 ### Key Entities
