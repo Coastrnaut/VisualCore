@@ -102,7 +102,7 @@
   - save "Waves", change the source, open "Waves", and the source is back;
   - each test under 60 s;
   - add `SSLibraryUITests` to the chunk `d3` in `scripts/release_check.py` (lead).
-- [ ] T-A22-413 Review checkpoint:
+- [X] T-A22-413 Review checkpoint: — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A22-P04.{ss-ios27,isolation,documented-api,core-purity}.json all exit 0
   - Shader Studio tests on sim-27.2 (`--name ss-ios27`);
   - the documented API, isolation and core purity.
 - [ ] T-A22-414 Contract: close G-LIBRARY and G-WATCHDOG with "A22-P04"; rows whose gaps are all closed become

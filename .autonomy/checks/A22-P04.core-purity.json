@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "sh",
+    "-c",
+    "! grep -rnE \"import (UIKit|SwiftUI|OpenGLES|Network)|URLSession|Date\\(\\)|ContinuousClock|CFAbsoluteTime\" Packages/ExperiencesCreative/ShaderStudio/Core"
+  ],
+  "command": "sh -c '! grep -rnE \"import (UIKit|SwiftUI|OpenGLES|Network)|URLSession|Date\\(\\)|ContinuousClock|CFAbsoluteTime\" Packages/ExperiencesCreative/ShaderStudio/Core'",
+  "elapsed_seconds": 0.008,
+  "exit_code": 0,
+  "finished": "2026-11-18T21:58:39+00:00",
+  "log": ".autonomy/logs/A22-P04.core-purity.log",
+  "log_sha256": "701f7d87b7a2197943a54ef7cfed322168966633d74d33148561ee786098f24a",
+  "name": "core-purity",
+  "stage": "A22-P04",
+  "started": "2026-11-18T21:58:39+00:00",
+  "timed_out": false
+}
