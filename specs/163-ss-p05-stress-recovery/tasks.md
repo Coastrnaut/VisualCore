@@ -11,7 +11,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T-A22-501 Baseline: cite the A22-P04 evidence (`.autonomy/checks/A22-P04.{ss-ios27,app-unit,app-ui-4,verify-27}.json`)
+- [X] T-A22-501 Baseline: cite the A22-P04 evidence (`.autonomy/checks/A22-P04.{ss-ios27,app-unit,app-ui-4,verify-27}.json`) — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A22-P04.{ss-ios27,app-unit,app-ui-4,verify-27}.json exit 0 at 2bcb4693; Packages, Apps, project.yml unchanged since
   on the tree recorded at A22-P04 (`2bcb4693`), whose Packages, Apps and project.yml are unchanged since (owner ruling
   of 2026-11-14)
 
