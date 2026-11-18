@@ -148,7 +148,8 @@ the compatibility profile.
 
 - **A cycle that ends while a compile is queued:** the queued request is dropped by a teardown and never leaks.
 - **A context rebuild during a stopped preview:** it stays stopped (A22-P04) and the flat frame is rebuilt.
-- **A context rebuild with a library sheet open:** the sheet is unaffected; the picture comes back behind it.
+- **A context rebuild with a library sheet open:** the sheet is native interface, independent of the graphics context,
+  so it is unaffected by construction; the picture comes back behind it.
 - **A project whose uniforms change on a later edit:** values are kept by position; positions past the new count are
   ignored until a later shape includes them again.
 - **A snapshot from A22-P04:** it restores; without `shape` its bounds are the template's counts until the presenter

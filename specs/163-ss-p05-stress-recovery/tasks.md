@@ -36,6 +36,8 @@
 - [ ] T-A22-504 [P] [US2] Write `ExperienceTests/RecoveryTests.swift` (FR-A22-502, SC-A22-502):
   - in each of the states running, failed, refused, stopped and textured, 10 `recreateContext` calls;
   - each gives a byte-identical still (`StudioTest.still`), an unchanged resource level and `leaked` 0.
+  - a Run queued and then a rebuild before the next frame: the queued request is dropped, no compile happens, and the
+    level is unchanged.
 - [ ] T-A22-505 [US2] Fix anything T-A22-504 finds in the presenter, pipeline and textured preview (rebuild of the live,
   fallback and stopped scenes and the texture targets); if nothing is found, record that.
 
