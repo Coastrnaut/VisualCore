@@ -9,9 +9,11 @@
 //     holds no source, so the broken compile itself is the experience tests' (`LastGoodPreviewTests`); the fixture
 //     proves the state a failed run leaves is the state before it; and repeated runs (`fixture-repeated-runs`: Rings
 //     run three times, then Gradient picked and run, outcome `template-gradient`; manual fixture 5, whose leak check is
-//     the experience tests' `RebuildTests` and `RunQueueTests`).
+//     the experience tests' `RebuildTests` and `RunQueueTests`); and from feature 161 `fixture-textures` (Texture mix
+//     picked, noise on input 0 and checker on input 1, then a run, outcome `template-texture-mix`).
 // Input-response and reset pick Rings, move both its uniforms and run; completion picks Noise flow and expects
-// `template-noise-flow`; rejection refuses values out of range, fractional and missing uniform indices and wrong value
+// `template-noise-flow`; rejection refuses values out of range, fractional and missing uniform and texture indices
+// (Gradient has no texture input) and wrong value
 // counts (a template index one past the last is out of range). The expected digests are derived by playing the entries on a core exactly as the engine plays them (the steps
 // of an entry, then its action) and digesting it with the experience id as domain, as Aurora's manifest does.
 #if DEBUG || VISUALCORE_AUTOMATION
@@ -48,6 +50,10 @@ extension StudioCore {
         let repeated = [accepted("template.select", [2]), accepted("shader.run", [1]), accepted("shader.run", [1]),
                         accepted("shader.run", [1]), accepted("template.select", [0]), accepted("shader.run", [1])]
         list.append(("fixture-repeated-runs", repeated, templateCode(0)))
+        let mix = Double(ShaderTemplates.ids.firstIndex(of: "texture-mix") ?? 3)
+        let textures = [accepted("template.select", [mix]), accepted("texture.set", [0, 2]),
+                        accepted("texture.set", [1, 0]), accepted("shader.run", [1])]
+        list.append(("fixture-textures", textures, templateCode(Int(mix))))
         return list
     }
 
@@ -66,6 +72,7 @@ extension StudioCore {
     public static var rejectionEntries: [ScenarioStep] {
         let notWhole = "action.rule." + StudioRule.notWhole
         let noUniform = "action.rule." + StudioRule.noUniform
+        let noTexture = "action.rule." + StudioRule.noTexture
         let outOfRange = "action.out-of-range"
         let count = "action.wrong-value-count"
         return [
@@ -77,6 +84,10 @@ extension StudioCore {
             ScenarioStep(steps: 0, action: ScriptedAction("uniform.set", [0, 1.5]), result: outOfRange),
             ScenarioStep(steps: 0, action: ScriptedAction("uniform.set", [0.5, 0.5]), result: notWhole),
             ScenarioStep(steps: 0, action: ScriptedAction("uniform.set", [1, 0.5]), result: noUniform),
+            ScenarioStep(steps: 0, action: ScriptedAction("texture.set", [0.5, 0]), result: notWhole),
+            ScenarioStep(steps: 0, action: ScriptedAction("texture.set", [0, 1]), result: noTexture),
+            ScenarioStep(steps: 0, action: ScriptedAction("texture.set", [2, 0]), result: outOfRange),
+            ScenarioStep(steps: 0, action: ScriptedAction("texture.set", [0, 3]), result: outOfRange),
             ScenarioStep(steps: 0, action: ScriptedAction("shader.run", [0]), result: outOfRange),
             ScenarioStep(steps: 0, action: ScriptedAction("shader.run", []), result: count),
             ScenarioStep(steps: 0, action: ScriptedAction("uniform.set", [0]), result: count),

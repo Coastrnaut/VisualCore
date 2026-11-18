@@ -8,7 +8,9 @@
 //   - sending: ``StudioInspector/send(_:normalized:port:)`` refuses a non-finite value (nothing is sent) and clamps
 //     to 0…1 before `uniform.set [k, v]`; ``StudioInspector/send(_:value:definition:port:)`` clamps a value in the
 //     uniform's own range first; the core keeps the normalized values;
-//   - Reset (`reset`): `uniform.set [k, default]` for every row, the defaults normalized by their definitions.
+//   - Reset (`reset`): `uniform.set [k, default]` for every row, the defaults normalized by their definitions;
+//   - textures (feature 161, T-A22-308): one segmented picker `texture-<i>` per texture input of the live project
+//     (Checker, Ramp, Noise), sending `texture.set [i, recipe]`; the spoken value is the recipe's title.
 //
 // Nothing here compiles: the values reach the live scene's parameters at the next frame.
 import Foundation
@@ -99,7 +101,23 @@ struct StudioInspector: View {
         }
     }
 
-    /// The rows and the Reset button.
+    /// One texture row per texture input of the live project: the input name and the chosen recipe (the checker
+    /// when the choice is missing or unknown).
+    static func textureRows(inputs: [String], choices: [Int]) -> [(index: Int, name: String, recipe: TextureRecipe)] {
+        inputs.enumerated().map { k, name in
+            let choice = choices.indices.contains(k) ? choices[k] : 0
+            return (k, name, TextureRecipes.recipe(at: choice) ?? .checker)
+        }
+    }
+
+    /// Sends `texture.set [input, recipe]`.
+    @MainActor
+    @discardableResult
+    static func sendTexture(_ input: Int, recipe: Int, port: ExperienceActionPort) -> ActionResult {
+        port.send("texture.set", [Double(input), Double(recipe)])
+    }
+
+    /// The rows, the texture pickers and the Reset button.
     var body: some View {
         let rows = Self.rows(mirror)
         return VStack(alignment: .leading, spacing: 8) {
@@ -110,6 +128,9 @@ struct StudioInspector: View {
             ForEach(rows, id: \.index) { row in
                 rowView(row)
             }
+            ForEach(Self.textureRows(inputs: mirror.textureInputs, choices: mirror.textures), id: \.index) { row in
+                textureView(row.index, name: row.name, recipe: row.recipe)
+            }
             Button {
                 Self.reset(mirror.uniforms, port: port)
             } label: {
@@ -119,6 +140,29 @@ struct StudioInspector: View {
             .accessibilityLabel(Text(verbatim: "Reset"))
             .accessibilityHint(Text(verbatim: "Sets every uniform back to its default"))
             .accessibilityIdentifier(port.identifier("reset"))
+        }
+    }
+
+    /// One texture picker of input `k`, sending `texture.set [k, recipe]`.
+    private func textureView(_ k: Int, name: String, recipe: TextureRecipe) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(verbatim: "Texture \(k + 1) (" + name + ")").font(.footnote).accessibilityHidden(true)
+            Picker(selection: Binding(get: { recipe.rawValue },
+                                      set: { next in
+                                          guard next != recipe.rawValue else { return }
+                                          Self.sendTexture(k, recipe: next, port: port)
+                                      })) {
+                ForEach(TextureRecipes.all, id: \.rawValue) { choice in
+                    Text(verbatim: choice.title).tag(choice.rawValue)
+                }
+            } label: {
+                Text(verbatim: "Texture \(k + 1)")
+            }
+            .pickerStyle(.segmented)
+            .accessibilityLabel(Text(verbatim: "Texture \(k + 1)"))
+            .accessibilityValue(Text(verbatim: recipe.title))
+            .accessibilityHint(Text(verbatim: "Chooses the texture made in code that " + name + " samples"))
+            .accessibilityIdentifier(port.identifier("texture-\(k)"))
         }
     }
 

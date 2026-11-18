@@ -18,7 +18,12 @@
 //   - Rebuild: `setup` builds the live scene from the last good project (the first template's before any success),
 //     again after a context loss. `teardown` tears the scenes down and drops a pending request.
 //
-// No GL call: everything is drawn by VisualCore's `FullScreenShaderScene`.
+// Feature 161 (A22-P03) T-A22-308 (FR-A22-304): a live project with texture inputs is drawn by a ``TexturedPreview``
+// (VisualCore's `FieldPass` with textures made in code, sampled by the core's texture choices passed to `drawFrame`);
+// a project without texture inputs is drawn by a `FullScreenShaderScene` exactly as in A22-P02. Both share the probe's
+// cached program by the same rule.
+//
+// No GL call: everything is drawn by VisualCore's `FullScreenShaderScene` and `FieldPass`.
 import Foundation
 import ShaderStudioCore
 import VisualCoreRendering
@@ -70,7 +75,7 @@ final class PreviewPipeline {
     /// The newest request not yet compiled; nil when there is none.
     private(set) var pending: ShaderProject?
     /// The scene drawn; nil while not set up.
-    private(set) var live: FullScreenShaderScene?
+    private(set) var live: (any PreviewScene)?
     /// The project the live scene draws: the last good one (the first template's before any success).
     private(set) var liveProject: ShaderProject
     /// How many compiles were attempted (one per request that passed the validator).
@@ -93,8 +98,10 @@ final class PreviewPipeline {
         pending = project
     }
 
-    /// The `FullScreenShaderScene` of `project`'s assembly.
-    static func scene(for project: ShaderProject) -> FullScreenShaderScene {
+    /// The scene of `project`'s assembly: a ``TexturedPreview`` when it has texture inputs, otherwise the
+    /// `FullScreenShaderScene` of A22-P02.
+    static func scene(for project: ShaderProject) -> any PreviewScene {
+        if !project.textureInputs.isEmpty { return TexturedPreview(project: project) }
         let assembly = ShaderAssembly(project: project)
         return FullScreenShaderScene(fragment: assembly.entryText, fragmentName: ShaderAssembly.entryFile,
                                      bundle: ShaderBundle(files: assembly.files))
@@ -121,8 +128,9 @@ final class PreviewPipeline {
     }
 
     /// Compiles the pending request (at most one per frame, see the file header), then draws the live scene with
-    /// `parameters` (keyed by the uniform name without its `u_` prefix).
-    func drawFrame(_ context: RenderContext, frame: FrameInfo,
+    /// `parameters` (keyed by the uniform name without its `u_` prefix) and, for a textured scene, the recipe
+    /// `textures[k]` on texture input `k`.
+    func drawFrame(_ context: RenderContext, frame: FrameInfo, textures: [Int] = StudioCore.defaultTextures,
                    parameters: (ShaderProject) -> [String: Double]) throws {
         if let request = pending {
             pending = nil
@@ -130,6 +138,7 @@ final class PreviewPipeline {
         }
         guard let live else { return }
         live.parameters = parameters(liveProject)
+        if let textured = live as? TexturedPreview { textured.choices = textures }
         try live.render(context, frame: frame)
     }
 
@@ -166,8 +175,7 @@ final class PreviewPipeline {
             return
         }
         let compilesBefore = context.resources.compileCount
-        let scene = FullScreenShaderScene(fragment: assembly.entryText, fragmentName: ShaderAssembly.entryFile,
-                                          bundle: bundle)
+        let scene = Self.scene(for: request)
         do {
             try scene.setup(context)
         } catch {

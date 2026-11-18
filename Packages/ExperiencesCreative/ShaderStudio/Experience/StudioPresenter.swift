@@ -43,6 +43,10 @@ final class StudioMirror {
     var uniforms: [ParameterDefinition] = ShaderTemplates.all.first?.uniforms ?? []
     /// The core's normalized values (16 entries).
     var values: [Double] = StudioCore.defaultValues(template: 0)
+    /// The texture inputs of the live project, in order (feature 161): the inspector's texture rows.
+    var textureInputs: [String] = ShaderTemplates.all.first?.textureInputs ?? []
+    /// The core's texture choices (recipe indices, 2 entries).
+    var textures: [Int] = StudioCore.defaultTextures
     /// The status line (``PreviewStatus/text``).
     var status = PreviewStatus.waiting.text
     /// The diagnostics shown, outside-source ones first.
@@ -136,6 +140,13 @@ final class StudioPresenter: ExperiencePresenter {
         return StudioInspector.send(k, value: value, definition: mirror.uniforms[k], port: port)
     }
 
+    /// Sends `texture.set [input, recipe]` through the port (the inspector's texture picker); nil without a port.
+    @discardableResult
+    func setTexture(_ input: Int, recipe: Int) -> ActionResult? {
+        guard let port else { return nil }
+        return StudioInspector.sendTexture(input, recipe: recipe, port: port)
+    }
+
     /// Sends every live uniform's default (the inspector's Reset); the results in order.
     @discardableResult
     func resetUniforms() -> [ActionResult] {
@@ -184,7 +195,7 @@ final class StudioPresenter: ExperiencePresenter {
         if core.runs > seenRuns { pipeline.submit(document) }
         seenRuns = core.runs
         let values = core.values
-        try pipeline.drawFrame(context, frame: frame) { Self.parameters($0, values: values) }
+        try pipeline.drawFrame(context, frame: frame, textures: core.textures) { Self.parameters($0, values: values) }
         follow(core)
         noteStatus()
     }
@@ -202,6 +213,9 @@ final class StudioPresenter: ExperiencePresenter {
         let uniforms = pipeline.liveProject.uniforms
         if mirror.uniforms != uniforms { mirror.uniforms = uniforms }
         if mirror.values != core.values { mirror.values = core.values }
+        let inputs = pipeline.liveProject.textureInputs
+        if mirror.textureInputs != inputs { mirror.textureInputs = inputs }
+        if mirror.textures != core.textures { mirror.textures = core.textures }
     }
 
     /// The diagnostics in display order: outside the person's source first, then by line; the order is otherwise
@@ -241,7 +255,7 @@ final class StudioPresenter: ExperiencePresenter {
             .compactMap { $0 }
     }
 
-    /// The actions of the native controls: all three.
+    /// The actions of the native controls: all four.
     var nativeActions: Set<String> { Set(StudioCore.actionIDs) }
 
     /// The native controls (``StudioControls``, with ``StudioEditor`` and ``StudioInspector``), sending through

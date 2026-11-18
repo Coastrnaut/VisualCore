@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesCreative",
+    "--scheme",
+    "ExperiencesCreative-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "ShaderStudioCoreTests",
+    "ShaderStudioExperienceTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing ShaderStudioCoreTests ShaderStudioExperienceTests",
+  "elapsed_seconds": 7.299,
+  "exit_code": 0,
+  "finished": "2026-11-18T21:18:08+00:00",
+  "log": ".autonomy/logs/A22-P03.ss-textures.log",
+  "log_sha256": "0f06b3d55921fb555bac3a2b884aa180bf35ebf999c7b30e4096d0e014fada82",
+  "name": "ss-textures",
+  "stage": "A22-P03",
+  "started": "2026-11-18T21:18:01+00:00",
+  "timed_out": false
+}

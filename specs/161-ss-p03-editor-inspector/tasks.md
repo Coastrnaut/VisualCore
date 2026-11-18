@@ -62,7 +62,7 @@
 
 ## Phase 6: Story 4 — textures made in code (P2)
 
-- [ ] T-A22-308 [US4] Change the core adapter and add the textured preview (FR-A22-304, 305):
+- [X] T-A22-308 [US4] Change the core adapter and add the textured preview (FR-A22-304, 305): — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A22-P03.ss-textures.json exit 0 (ShaderStudioCoreTests 59, ShaderStudioExperienceTests 48 on sim-27.2)
   - `Experience/Adapter/StudioCore.swift`: `textures [2]` (an optional payload field, default [0, 1]), `texture.set
     [0…1, 0…2]` with the rule `a22.no-texture`, `template.select [0…3]`, and the digest over the template, values and
     textures;

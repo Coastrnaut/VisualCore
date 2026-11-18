@@ -12,7 +12,7 @@
 //     (`diagnostic-<k>`, "Line N: message", anything outside the person's source first, as "<file>: message", or
 //     "Shader: message" without a file);
 //   - ``StudioInspector``: a slider `uniform-<k>` per live uniform (its title, its value with its unit at two
-//     decimals, its range) and `reset`.
+//     decimals, its range), a picker `texture-<i>` per live texture input (`texture.set`) and `reset`.
 //
 // Layout (``StudioEditorLayout/arrangement(horizontalSizeClass:dynamicTypeSize:)``): the editor beside the inspector
 // in a regular width at a non-accessibility type size, stacked otherwise; the preview stays above the controls, whose
@@ -74,6 +74,10 @@ struct StudioControls: View {
                     StudioControlLabel(name: "run", title: "Run", value: "Compiles the shader")]
         for row in StudioInspector.rows(mirror) {
             list.append(StudioControlLabel(name: "uniform-\(row.index)", title: row.title, value: row.valueText))
+        }
+        for row in StudioInspector.textureRows(inputs: mirror.textureInputs, choices: mirror.textures) {
+            list.append(StudioControlLabel(name: "texture-\(row.index)", title: "Texture \(row.index + 1)",
+                                           value: row.recipe.title))
         }
         list.append(StudioControlLabel(name: "status", title: "Status", value: mirror.status))
         let lines = diagnosticLines(mirror)
