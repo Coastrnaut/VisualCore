@@ -76,7 +76,7 @@
 - [X] T-A22-209 Write `Experience/Adapter/StudioManifest.swift` (nine standard scenarios, plus fixtures per template and — Verified 2026-11-18: 2026-11-18: Adapter/StudioManifest.swift (StudioCore.manifest(for:): nine standard scenarios and fixtures gradient, noise-flow, rings and broken-run-keeps-preview), StudioManifestTests, scenario-manifest.json generated and matching; .autonomy/checks/A22-P02.ss-ios27.json exit 0; written by an agent, retested
   for a broken run that keeps the preview) and `ExperienceTests/StudioManifestTests.swift`. Generate
   `scenario-manifest.json` with `UPDATE_SCENARIO_MANIFEST=1 TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`.
-- [ ] T-A22-210 Review checkpoint:
+- [X] T-A22-210 Review checkpoint: — Verified 2026-11-18: 2026-11-18: review checkpoint: .autonomy/checks/A22-P02.ss-ios27-3.json exit 0 (51 core and 26 experience tests on sim-27.2, each under 10 s), A22-P02.documented-api.json, A22-P02.isolation.json and A22-P02.core-purity.json exit 0
   - Shader Studio tests on sim-27.2: `--name ss-ios27 -- python3 scripts/xcodebuild_package.py --package
     Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test
     --only-testing ShaderStudioCoreTests ShaderStudioExperienceTests`;

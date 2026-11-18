@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_documented_api.py",
+    "--sources",
+    "Packages/ExperiencesCreative/ShaderStudio"
+  ],
+  "command": "python3 scripts/check_documented_api.py --sources Packages/ExperiencesCreative/ShaderStudio",
+  "elapsed_seconds": 0.578,
+  "exit_code": 0,
+  "finished": "2026-11-18T20:17:27+00:00",
+  "log": ".autonomy/logs/A22-P02.documented-api.log",
+  "log_sha256": "45f43d9f3af9958ef56920383380e9bec96656bc08c54b65a494b75a412a5157",
+  "name": "documented-api",
+  "stage": "A22-P02",
+  "started": "2026-11-18T20:17:27+00:00",
+  "timed_out": false
+}
