@@ -3,6 +3,8 @@
 // each with its syntax tokens and the diagnostics that name it. A diagnostic of `ss/shader.frag` with a line inside
 // the source attaches to that line; every other one (another file such as the prelude or a `vc/` include, no line, or
 // a line past the end) is "outside the source", listed above it by the view. Input order is kept in both places.
+// Feature 161 (A22-P03) T-A22-304 (FR-A22-301; US1 AC3) adds `lineStarts` and `lineStart(_:)`: the UTF-8 byte offset
+// at which each line begins in the source, so the editor can put its selection at a diagnostic's line.
 // Pure Swift; no UI framework, GL call, clock or network.
 
 /// One numbered line of the editor: its text, tokens and the diagnostics reported on it.
@@ -27,6 +29,12 @@ public struct EditorLine: Sendable, Equatable {
 
 /// The editor model of a source: its lines with tokens and attached diagnostics, and the diagnostics outside it.
 public struct EditorDocument: Sendable, Equatable {
+    /// Two documents are equal when their lines and outside diagnostics are: ``lineStarts`` is derived from the line
+    /// terminators, which the model normalises (`"a\r\nb"` and `"a\nb"` are the same document).
+    public static func == (a: EditorDocument, b: EditorDocument) -> Bool {
+        a.lines == b.lines && a.outside == b.outside
+    }
+
     /// The file name under which the person's source is compiled; only its diagnostics attach to lines.
     public static let personFile = "ss/shader.frag"
 
@@ -34,11 +42,15 @@ public struct EditorDocument: Sendable, Equatable {
     public let lines: [EditorLine]
     /// Diagnostics not on a line of the source (another file, no line, or a line out of range), in input order.
     public let outside: [MappedDiagnostic]
+    /// The UTF-8 byte offset in the source at which each line begins (`lineStarts[n - 1]` for line `n`); a line
+    /// start always follows a whole terminator (`\n`, `\r` or `\r\n`), so it lies on a character boundary.
+    public let lineStarts: [Int]
 
     /// Builds the model: splits and tokenizes `source`, then attaches each diagnostic of `personFile` whose line is
     /// in 1…`lines.count` to that line and lists the rest in `outside`, keeping the given order in both.
     public init(source: String, diagnostics: [MappedDiagnostic] = []) {
         let split = GLSLTokenizer.split(source)
+        lineStarts = GLSLTokenizer.lineRanges(Array(source.utf8)).map(\.lowerBound)
         var perLine = [[MappedDiagnostic]](repeating: [], count: split.count)
         var outside: [MappedDiagnostic] = []
         for diagnostic in diagnostics {
@@ -57,4 +69,10 @@ public struct EditorDocument: Sendable, Equatable {
 
     /// The lines that carry at least one diagnostic (the view's error markers), in line order.
     public var markedLines: [Int] { lines.filter { !$0.diagnostics.isEmpty }.map(\.number) }
+
+    /// The UTF-8 byte offset in the source at which the 1-based line `line` begins; nil for a line outside
+    /// 1…`lines.count` (feature 161, US1 AC3: choosing a diagnostic moves the editor to this offset).
+    public func lineStart(_ line: Int) -> Int? {
+        lineStarts.indices.contains(line - 1) ? lineStarts[line - 1] : nil
+    }
 }

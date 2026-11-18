@@ -169,7 +169,7 @@ chooses which one feeds each input, and the preview samples it.
 - **An empty editor:** Run refuses with "no main" and compiles nothing.
 - **A diagnostic outside the person's source** (in a shared include): listed above the source with its file, not
   marked on any line.
-- **A very long line:** it scrolls; numbering stays aligned.
+- **A very long line:** it wraps inside the editor's width (decision at T-A22-304: the editor stays within a phone's width and does not scroll sideways); each number stays on its line's first row.
 - **Large text size:** the editor and the inspector stay usable, and line numbers stay readable.
 - **A texture input declared but not chosen:** the first texture (checker) is bound.
 - **A hardware keyboard:** typing works; Run is reachable by a keyboard shortcut.

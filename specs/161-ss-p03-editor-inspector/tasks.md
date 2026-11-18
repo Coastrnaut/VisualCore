@@ -28,7 +28,7 @@
 
 ## Phase 3: Story 1 — edit and see where it fails (P1) 🎯
 
-- [ ] T-A22-304 [US1] Create `Experience/{SyntaxPalette,StudioEditor}.swift` per clarification Q1 and
+- [X] T-A22-304 [US1] Create `Experience/{SyntaxPalette,StudioEditor}.swift` per clarification Q1 and — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A22-P03.ss-core-editor.json exit 0 (ShaderStudioCoreTests 59, ShaderStudioExperienceTests 43 on sim-27.2)
   contracts/editor.md, and wire them into `StudioControls.swift` and `StudioPresenter.swift` (FR-A22-301, 306):
   - `StudioEditor` is a monospaced iOS 26 `TextEditor` over an `AttributedString`, recoloured from `EditorDocument`;
   - a gutter shows the line numbers and the markers;

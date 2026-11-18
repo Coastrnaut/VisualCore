@@ -1,16 +1,22 @@
 // StudioControls — feature 160 (A22-P02) T-A22-204 (FR-A22-201, FR-A22-205, FR-A22-207; clarification Q4;
-// contracts/experience.md "Controls"). The native controls of Shader Studio. Every control reads the presenter's
-// mirror, sends through the action port (never compiling: the next frame does), has a spoken label and value from one
-// list (`labels(_:)`, also read by the tests), a hint and the identifier `experience.a22.shader-studio.<name>`
-// (`ExperienceActionPort.identifier`):
+// contracts/experience.md "Controls"); feature 161 (A22-P03) T-A22-304, T-A22-307 (FR-A22-301, FR-A22-303,
+// FR-A22-306; clarifications Q1, Q3) added the editor and the inspector. The native controls of Shader Studio. Every
+// control reads the presenter's mirror, sends through the action port (never compiling: the next frame does), has a
+// spoken label and value from one list (`labels(_:)`, also read by the tests), a hint and the identifier
+// `experience.a22.shader-studio.<name>` (`ExperienceActionPort.identifier`):
 //
-//   - `template` segmented picker (Gradient, Noise flow, Rings → `template.select [0…2]`);
-//   - `run` button ("Run" → `shader.run [1]`);
-//   - a slider `uniform-<k>` per uniform of the document (its title and value in its own range; it sends the
-//     normalized value → `uniform.set [k, 0…1]`);
+//   - `template` segmented picker (the titles of `ShaderTemplates.all` → `template.select [i]`);
+//   - `run` button ("Run" → `shader.run [1]`; ⌘R on a hardware keyboard);
 //   - `status`: the status line ("Waiting", "Compiled", "Failed: N errors", "Refused: <first issue>");
-//   - `diagnostics`: one "Line N: message" entry per diagnostic, anything outside the person's source first (as
-//     "<file>: message", or "Shader: message" without a file).
+//   - ``StudioEditor``: `editor`, `gutter` (`gutter-line-<n>`), `next-diagnostic` (⌘') and `diagnostics`
+//     (`diagnostic-<k>`, "Line N: message", anything outside the person's source first, as "<file>: message", or
+//     "Shader: message" without a file);
+//   - ``StudioInspector``: a slider `uniform-<k>` per live uniform (its title, its value with its unit at two
+//     decimals, its range) and `reset`.
+//
+// Layout (``StudioEditorLayout/arrangement(horizontalSizeClass:dynamicTypeSize:)``): the editor beside the inspector
+// in a regular width at a non-accessibility type size, stacked otherwise; the preview stays above the controls, whose
+// height the session host bounds.
 import Foundation
 import ShaderStudioCore
 import SwiftUI
@@ -36,12 +42,15 @@ struct StudioControls: View {
     let port: ExperienceActionPort
     /// What the controls show.
     let mirror: StudioMirror
+    /// Sets the presenter's document source (the editor's edits); never compiles.
+    var edit: @MainActor (String) -> Void = { _ in }
+    /// The width class of the environment.
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    /// The type size of the environment.
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     /// The template titles, by index of `ShaderTemplates.all`.
     static var templateTitles: [String] { ShaderTemplates.all.map(\.title) }
-
-    /// A uniform's value in its own range, for example "1.50".
-    static func valueText(_ value: Double) -> String { String(format: "%.2f", value) }
 
     /// One diagnostic as a line: "Line N: message" in the person's source, "<file>: message" outside it, or
     /// "Shader: message" without a file.
@@ -63,10 +72,8 @@ struct StudioControls: View {
         let template = titles.isEmpty ? "" : titles[min(max(mirror.template, 0), titles.count - 1)]
         var list = [StudioControlLabel(name: "template", title: "Template", value: template),
                     StudioControlLabel(name: "run", title: "Run", value: "Compiles the shader")]
-        for (k, definition) in mirror.uniforms.enumerated() {
-            let normalized = mirror.values.indices.contains(k) ? mirror.values[k] : 0
-            list.append(StudioControlLabel(name: "uniform-\(k)", title: definition.title,
-                                           value: valueText(definition.value(normalized: normalized))))
+        for row in StudioInspector.rows(mirror) {
+            list.append(StudioControlLabel(name: "uniform-\(row.index)", title: row.title, value: row.valueText))
         }
         list.append(StudioControlLabel(name: "status", title: "Status", value: mirror.status))
         let lines = diagnosticLines(mirror)
@@ -101,48 +108,26 @@ struct StudioControls: View {
                 Text(verbatim: "Run").frame(minHeight: 44)
             }
             .spoken(spoken["run"])
+            .keyboardShortcut("r", modifiers: .command)
             .accessibilityHint(Text(verbatim: "Compiles the shader; the preview keeps the last working one on an error"))
             .accessibilityIdentifier(port.identifier("run"))
-            ForEach(Array(mirror.uniforms.enumerated()), id: \.offset) { k, definition in
-                slider(k, definition, spoken)
-            }
             Text(verbatim: mirror.status)
                 .font(.footnote)
                 .spoken(spoken["status"])
                 .accessibilityIdentifier(port.identifier("status"))
-            VStack(alignment: .leading, spacing: 2) {
-                ForEach(Array(Self.diagnosticLines(mirror).enumerated()), id: \.offset) { _, line in
-                    Text(verbatim: line)
-                        .font(.footnote.monospaced())
-                        .fixedSize(horizontal: false, vertical: true)
+            switch StudioEditorLayout.arrangement(horizontalSizeClass: horizontalSizeClass,
+                                                  dynamicTypeSize: dynamicTypeSize) {
+            case .sideBySide:
+                HStack(alignment: .top, spacing: 16) {
+                    StudioEditor(port: port, mirror: mirror, edit: edit).frame(maxWidth: .infinity)
+                    StudioInspector(port: port, mirror: mirror).frame(width: 300)
                 }
+            case .stacked:
+                StudioEditor(port: port, mirror: mirror, edit: edit)
+                StudioInspector(port: port, mirror: mirror)
             }
-            .accessibilityElement(children: .ignore)
-            .spoken(spoken["diagnostics"])
-            .accessibilityIdentifier(port.identifier("diagnostics"))
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    /// A titled slider of uniform `k`, sending `uniform.set [k, normalized]`.
-    private func slider(_ k: Int, _ definition: ParameterDefinition,
-                        _ spoken: [String: StudioControlLabel]) -> some View {
-        let name = "uniform-\(k)"
-        let value = mirror.values.indices.contains(k) ? mirror.values[k] : 0
-        return VStack(alignment: .leading, spacing: 2) {
-            Text(verbatim: (spoken[name]?.title ?? "") + ": " + (spoken[name]?.value ?? ""))
-                .font(.footnote)
-                .accessibilityHidden(true)
-            Slider(value: Binding(get: { value },
-                                  set: { next in
-                                      let sent = min(max(next, 0), 1)
-                                      guard sent != value else { return }
-                                      port.send("uniform.set", [Double(k), sent])
-                                  }), in: StudioCore.valueRange)
-                .spoken(spoken[name])
-                .accessibilityHint(Text(verbatim: "Changes the uniform " + definition.name + " in the preview"))
-                .accessibilityIdentifier(port.identifier(name))
-        }
     }
 }
 

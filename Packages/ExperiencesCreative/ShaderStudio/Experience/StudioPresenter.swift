@@ -16,6 +16,13 @@
 //   - Words: the canvas label, for example "Shader Studio, Gradient, Compiled". Probes: none here (the picture
 //     depends on the person's shader). `maxFramesPerSecond` 30; one quality tier, `level-0`.
 //
+// Feature 161 (A22-P03) T-A22-304, T-A22-306, T-A22-307 (FR-A22-301–303; clarifications Q1–Q3) adds what the editor
+// and the inspector need: the mirror carries the document's source and its `EditorDocument` (lines, tokens and the
+// last run's diagnostics, so the marked lines), and its uniforms are the live project's (a uniform dropped by a
+// successful recompile leaves the inspector). `setSource(_:)` updates the mirror and never compiles;
+// `replaceDocument(_:)` is the oversized-project test seam; `setUniform`/`resetUniforms` send through the port with
+// the inspector's clamping. The controls get the editor's `setSource` through `makeControls`.
+//
 // No GL call: everything is drawn through VisualCore's `FullScreenShaderScene`.
 import Foundation
 import Observation
@@ -32,7 +39,7 @@ import VisualCoreRendering
 final class StudioMirror {
     /// The selected template's index in `ShaderTemplates.all`.
     var template = 0
-    /// The uniforms of the document, in order.
+    /// The uniforms of the live project (the last good one), in order: the inspector's rows.
     var uniforms: [ParameterDefinition] = ShaderTemplates.all.first?.uniforms ?? []
     /// The core's normalized values (16 entries).
     var values: [Double] = StudioCore.defaultValues(template: 0)
@@ -40,6 +47,10 @@ final class StudioMirror {
     var status = PreviewStatus.waiting.text
     /// The diagnostics shown, outside-source ones first.
     var diagnostics: [MappedDiagnostic] = []
+    /// The document's source, as the editor shows it.
+    var source: String = ShaderTemplates.all.first?.source ?? ""
+    /// The editor model of ``source`` with ``diagnostics`` attached (its `markedLines` are the gutter's markers).
+    var editor = EditorDocument(source: ShaderTemplates.all.first?.source ?? "")
 }
 
 /// Draws Shader Studio and owns its presentation state (see the file header).
@@ -89,7 +100,47 @@ final class StudioPresenter: ExperiencePresenter {
             return false
         }
         document = next
+        noteDocument()
         return true
+    }
+
+    /// Test seam (feature 161, T-A22-306): replaces the whole document, for example with a project of more uniforms
+    /// than the limits allow, which no template or edit can produce. Nothing is compiled; a run submits it.
+    func replaceDocument(_ project: ShaderProject) {
+        document = project
+        noteDocument()
+    }
+
+    /// Brings the mirror's source and editor model up to the document.
+    private func noteDocument() {
+        guard mirror.source != document.source else { return }
+        mirror.source = document.source
+        mirror.editor = EditorDocument(source: document.source, diagnostics: mirror.diagnostics)
+    }
+
+    // MARK: Inspector
+
+    /// Sends uniform `k` at the normalized `normalized` through the port, clamped to 0…1; a non-finite value or a
+    /// missing port sends nothing and gives nil (``StudioInspector/send(_:normalized:port:)``).
+    @discardableResult
+    func setUniform(_ k: Int, normalized: Double) -> ActionResult? {
+        guard let port else { return nil }
+        return StudioInspector.send(k, normalized: normalized, port: port)
+    }
+
+    /// Sends uniform `k` at `value` in its own range (clamped to the live uniform's range, then normalized); nil when
+    /// `k` is not a live uniform, the value is not finite or there is no port.
+    @discardableResult
+    func setUniform(_ k: Int, value: Double) -> ActionResult? {
+        guard let port, mirror.uniforms.indices.contains(k) else { return nil }
+        return StudioInspector.send(k, value: value, definition: mirror.uniforms[k], port: port)
+    }
+
+    /// Sends every live uniform's default (the inspector's Reset); the results in order.
+    @discardableResult
+    func resetUniforms() -> [ActionResult] {
+        guard let port else { return [] }
+        return StudioInspector.reset(mirror.uniforms, port: port)
     }
 
     /// Takes the core's template as the document when it changed.
@@ -97,6 +148,7 @@ final class StudioPresenter: ExperiencePresenter {
         guard core.template != documentTemplate else { return }
         documentTemplate = core.template
         if let template = core.selectedTemplate { document = template.project }
+        noteDocument()
     }
 
     /// The live scene's parameters: each of `project`'s uniforms at the core's value, denormalized, keyed by the name
@@ -144,10 +196,11 @@ final class StudioPresenter: ExperiencePresenter {
 
     // MARK: Mirror and words
 
-    /// Brings the mirror's template, uniforms and values up to `core` and the document.
+    /// Brings the mirror's template, uniforms (the live project's) and values up to `core` and the pipeline.
     func follow(_ core: StudioCore) {
         if mirror.template != core.template { mirror.template = core.template }
-        if mirror.uniforms != document.uniforms { mirror.uniforms = document.uniforms }
+        let uniforms = pipeline.liveProject.uniforms
+        if mirror.uniforms != uniforms { mirror.uniforms = uniforms }
         if mirror.values != core.values { mirror.values = core.values }
     }
 
@@ -165,7 +218,10 @@ final class StudioPresenter: ExperiencePresenter {
         let text = pipeline.status.text
         if mirror.status != text { mirror.status = text }
         let diagnostics = Self.ordered(pipeline.status.diagnostics)
-        if mirror.diagnostics != diagnostics { mirror.diagnostics = diagnostics }
+        if mirror.diagnostics != diagnostics {
+            mirror.diagnostics = diagnostics
+            mirror.editor = EditorDocument(source: mirror.source, diagnostics: diagnostics)
+        }
     }
 
     /// The selected template's title of `core`.
@@ -188,8 +244,11 @@ final class StudioPresenter: ExperiencePresenter {
     /// The actions of the native controls: all three.
     var nativeActions: Set<String> { Set(StudioCore.actionIDs) }
 
-    /// The native controls (``StudioControls``), sending through `port`.
+    /// The native controls (``StudioControls``, with ``StudioEditor`` and ``StudioInspector``), sending through
+    /// `port`; the editor's edits reach ``setSource(_:)``.
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
-        AnyView(StudioControls(port: port, mirror: mirror))
+        AnyView(StudioControls(port: port, mirror: mirror, edit: { [weak self] source in
+            self?.setSource(source)
+        }))
     }
 }
