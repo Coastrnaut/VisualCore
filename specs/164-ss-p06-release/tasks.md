@@ -96,3 +96,10 @@
 - **Then:** recovery and samples, copy and checklist, the journey, and the evidence.
 - **Review checkpoint:** at 611.
 - **Commits:** one per task.
+
+## Phase 7: Convergence
+
+- [ ] T-A22-614 Prove the store text's "Command-R runs it": in `Apps/VisualCore/Tests/UI/ShaderStudio/SSReleaseUITests.swift`
+  add a test that focuses the editor, appends a broken line and presses ⌘R through the hardware keyboard
+  (`typeKey("r", modifierFlags: .command)`, never the Run button); the status starts with "Failed"; then name that test
+  in the store text's claims table, per FR-A22-605 / SC-A22-603 (partial)
