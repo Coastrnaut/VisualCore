@@ -41,6 +41,12 @@
 // (the core refuses an index past the selected template's counts, which is left as it is), then `shader.run [1]`;
 // the next frame compiles it, never the control.
 //
+// Feature 163 (A22-P05) T-A22-506 (FR-A22-503; clarification Q2): the core bounds `uniform.set` and `texture.set` by
+// the document's shape, so the presenter sends `document.shape [uniforms, inputs]` (clamped to 16 and 2) whenever the
+// document's counts may differ from the core's: an edit (`setSource`), `replaceDocument` and an open, a template
+// choice, and the first draw (which follows a restore). It compares with the core's shape as last seen at a draw
+// (or as last accepted), so an action that set the shape is not undone at a later frame. Nothing compiles.
+//
 // No GL call: everything is drawn through VisualCore's `FullScreenShaderScene` and `FieldPass`.
 import Foundation
 import Observation
@@ -99,6 +105,10 @@ final class StudioPresenter: ExperiencePresenter {
     private(set) var seenRuns = 0
     /// The reset count last seen at a draw (feature 162).
     private(set) var seenResets = 0
+    /// The core's shape as last seen at a draw or last accepted from ``syncShape()`` (feature 163); nil before.
+    private(set) var knownShape: [Int]?
+    /// Whether a draw has run (the first one syncs the shape after a restore).
+    private var hasDrawn = false
     /// The frame watchdog (feature 162), fed each drawn frame's interval.
     private(set) var watchdog = FrameWatchdog()
     /// The status shown while the watchdog has stopped the preview.
@@ -142,6 +152,7 @@ final class StudioPresenter: ExperiencePresenter {
         }
         document = next
         noteDocument()
+        syncShape()
         return true
     }
 
@@ -150,6 +161,23 @@ final class StudioPresenter: ExperiencePresenter {
     func replaceDocument(_ project: ShaderProject) {
         document = project
         noteDocument()
+        syncShape()
+    }
+
+    /// The document's shape as the core holds it: its uniform and texture-input counts, clamped to 16 and 2.
+    var documentShape: [Int] {
+        [min(document.uniforms.count, StudioCore.valueCount), min(document.textureInputs.count, StudioCore.textureCount)]
+    }
+
+    /// Sends `document.shape` with ``documentShape`` when it differs from the core's known shape (or none is known);
+    /// returns the result, or nil when nothing was sent (no port, or the shapes agree).
+    @discardableResult
+    func syncShape() -> ActionResult? {
+        let target = documentShape
+        guard let port, knownShape != target else { return nil }
+        let result = port.send("document.shape", target.map(Double.init))
+        if result.isAccepted { knownShape = target }
+        return result
     }
 
     /// Brings the mirror's source and editor model up to the document.
@@ -179,9 +207,10 @@ final class StudioPresenter: ExperiencePresenter {
         return result
     }
 
-    /// Sets `opened`'s project as the document, then sends its values (`uniform.set`, one per uniform of the
-    /// project), its texture choices (`texture.set`, one per texture input) and `shader.run [1]` through the port;
-    /// returns the results in that order (empty without a port). Nothing compiles here.
+    /// Sets `opened`'s project as the document (which sends its shape, feature 163), then sends its values
+    /// (`uniform.set`, one per uniform of the project), its texture choices (`texture.set`, one per texture input)
+    /// and `shader.run [1]` through the port; returns the results of the values, textures and run in that order
+    /// (empty without a port). Nothing compiles here.
     @discardableResult
     func apply(_ opened: OpenedProject) -> [ActionResult] {
         replaceDocument(opened.project)
@@ -235,6 +264,7 @@ final class StudioPresenter: ExperiencePresenter {
         documentTemplate = core.template
         if let template = core.selectedTemplate { document = template.project }
         noteDocument()
+        syncShape()
     }
 
     /// The live scene's parameters: each of `project`'s uniforms at the core's value, denormalized, keyed by the name
@@ -269,7 +299,12 @@ final class StudioPresenter: ExperiencePresenter {
     /// or the flat stopped frame while the watchdog has stopped it.
     func draw(_ core: StudioCore, tier: Int, context: RenderContext, frame: FrameInfo) throws {
         drawCount += 1
+        knownShape = core.shape
         followTemplate(core)
+        if !hasDrawn {
+            hasDrawn = true
+            syncShape()
+        }
         let wasStopped = watchdog.state == .stopped
         if core.runs > seenRuns {
             pipeline.submit(document)

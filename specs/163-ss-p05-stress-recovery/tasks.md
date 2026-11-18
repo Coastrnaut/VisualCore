@@ -43,7 +43,7 @@
 
 ## Phase 4: Story 3 — my project is still there tomorrow (P1)
 
-- [ ] T-A22-506 [US3] Bind the core's bounds to the live project (FR-A22-503):
+- [X] T-A22-506 [US3] Bind the core's bounds to the live project (FR-A22-503): — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A22-P05.ss-shape.json exit 0 (ShaderStudioCoreTests 76, ShaderStudioExperienceTests 85 on sim-27.2); restore no longer requires values past the shape to be 0 (values kept by position)
   - in `Experience/Adapter/StudioCore.swift`: `shape [uniforms 0…16, inputs 0…2]` (optional in the payload; when
     absent, the template's counts) and the action `document.shape [0…16, 0…2]`, both whole (`a22.not-whole`);
   - `uniform.set k` needs k < `shape[0]` and `texture.set i` needs i < `shape[1]`; `template.select` sets the
