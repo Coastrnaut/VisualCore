@@ -63,7 +63,7 @@
 
 ## Phase 5: Registration and evidence
 
-- [ ] T-A22-208 Register the candidate (FR-A22-207):
+- [X] T-A22-208 Register the candidate (FR-A22-207): — Verified 2026-11-18: 2026-11-18: Catalog/registrations.json candidate a22.shader-studio (five capabilities of at most 40 characters, quality tier level-0, palette, manifest, permissions []), build_catalog; ExperienceRegistry candidate shaderStudio (no examples, schema 1); project.yml product ShaderStudioExperience; the synthetic candidate in AppModelTests moved to a23.visual-programming-lab; RealCatalogTests and test_scripts lists; .autonomy/checks/A22-P02.catalog.json, A22-P02.realcatalog.json, A22-P02.experience-packages.json and A22-P02.script-tests-2.json exit 0 (the first script-tests attempt failed on the content-count audit: 4 fixtures below 5, fixed)
   - a `Catalog/registrations.json` entry for a22: capabilities of at most 40 characters each, quality_tiers
     ["level-0"], a palette, manifest `Packages/ExperiencesCreative/ShaderStudio/scenario-manifest.json`, permissions
     []; then run `python3 scripts/build_catalog.py`;

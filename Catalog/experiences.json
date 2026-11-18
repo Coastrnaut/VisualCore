@@ -753,7 +753,7 @@
       "id": "a22.shader-studio",
       "code": "A22",
       "title": "Shader Studio",
-      "summary": "A mobile GLSL ES editor that compiles local shaders, shows diagnostics and safely previews bounded work.",
+      "summary": "A small GLSL ES fragment shader studio: start from a gradient, a noise flow or rings, run it, and see each compiler error on the line you wrote while the last working preview keeps drawing. Uniform sliders stay within their ranges. Offline; GPU code is not a sandbox.",
       "kind": "creative",
       "tier": "free",
       "category": "tools",
@@ -762,10 +762,23 @@
         "developer-and-creator-tools"
       ],
       "order": 22,
-      "palette": [],
+      "palette": [
+        "#0B0F1A",
+        "#3D7BFF",
+        "#F2C14E",
+        "#E8EEF7"
+      ],
       "tile_seed": 3608590787,
-      "capabilities": [],
-      "quality_tiers": [],
+      "capabilities": [
+        "Starter GLSL templates with uniforms",
+        "Compile and run on demand",
+        "Errors on the line you wrote",
+        "Last working preview kept on failure",
+        "Uniform sliders within their ranges"
+      ],
+      "quality_tiers": [
+        "level-0"
+      ],
       "content": null,
       "available": false
     },

@@ -22,6 +22,7 @@ import AmbientClockExperience
 import LivingWallpapersExperience
 import DigitalZenGardenExperience
 import AuroraExperience
+import ShaderStudioExperience
 import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreUI
@@ -86,7 +87,7 @@ enum ExperienceRegistry {
     /// each carries its scenario manifest, so that the verification runner can open it, but it stays unavailable
     /// in the catalog and outside `all`. Debug builds show them with `-vcCandidates`. Recording an experience's X
     /// gate moves its registration from here to `all`.
-    static let candidates: [ExperienceRegistration] = []
+    static let candidates: [ExperienceRegistration] = [shaderStudio].compactMap { $0 }
 
     /// A01 Generative Art Studio (feature 193, US1).
     private static var generativeArtStudio: ExperienceRegistration? {
@@ -455,6 +456,19 @@ extension ExperienceRegistry {
         }
         #if DEBUG || VISUALCORE_AUTOMATION
         registration.scenarioManifest = SkyCore.manifest(for: id)
+        #endif
+        return registration
+    }
+
+    /// A22 Shader Studio (feature 160, A22-P02): a candidate until X-A22. Snapshot schema 1, so no earlier example is
+    /// stored yet.
+    fileprivate static var shaderStudio: ExperienceRegistration? {
+        guard let id = ShaderStudioExperience.id else { return nil }
+        var registration = ExperienceRegistration(id: id, core: StudioCore.self) { launch in
+            ShaderStudioExperience.make(id: id, storage: launch.storage)
+        }
+        #if DEBUG || VISUALCORE_AUTOMATION
+        registration.scenarioManifest = StudioCore.manifest(for: id)
         #endif
         return registration
     }

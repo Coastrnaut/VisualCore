@@ -515,6 +515,28 @@
       "manifest": "Packages/ExperiencesCreative/Aurora/scenario-manifest.json",
       "permissions": [],
       "summary": "A full-screen ambient sky of procedural aurora ribbons, stars and clouds: three skies, colour, motion and intensity controls, a brightness limit no frame exceeds, gentle changes between skies and controls that hide and return with a tap. Stylized art, not a forecast."
+    },
+    "a22.shader-studio": {
+      "capabilities": [
+        "Starter GLSL templates with uniforms",
+        "Compile and run on demand",
+        "Errors on the line you wrote",
+        "Last working preview kept on failure",
+        "Uniform sliders within their ranges"
+      ],
+      "quality_tiers": [
+        "level-0"
+      ],
+      "palette": [
+        "#0B0F1A",
+        "#3D7BFF",
+        "#F2C14E",
+        "#E8EEF7"
+      ],
+      "content": null,
+      "manifest": "Packages/ExperiencesCreative/ShaderStudio/scenario-manifest.json",
+      "permissions": [],
+      "summary": "A small GLSL ES fragment shader studio: start from a gradient, a noise flow or rings, run it, and see each compiler error on the line you wrote while the last working preview keeps drawing. Uniform sliders stay within their ranges. Offline; GPU code is not a sandbox."
     }
   }
 }

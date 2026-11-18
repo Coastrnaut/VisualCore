@@ -1321,7 +1321,9 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     # Feature 146 (A20-P02): Digital Zen Garden, integrated at X-A20.
                                     "DigitalZenGardenExperience",
                                     # Feature 153 (A21-P02): Aurora, integrated at X-A21.
-                                    "AuroraExperience"])
+                                    "AuroraExperience",
+                                    # Feature 160 (A22-P02): Shader Studio, a candidate until X-A22.
+                                    "ShaderStudioExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):
         listing = subprocess.run([sys.executable, str(HERE / "release_check.py"), "--list"],

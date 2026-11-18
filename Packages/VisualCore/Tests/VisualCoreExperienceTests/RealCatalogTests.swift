@@ -118,7 +118,9 @@ enum CatalogFixture {
                                // Feature 146 (A20-P02); integrated at X-A20.
                                "a20.digital-zen-garden",
                                // Feature 153 (A21-P02); integrated at X-A21.
-                               "a21.aurora"],
+                               "a21.aurora",
+                               // Feature 160 (A22-P02); a candidate until X-A22.
+                               "a22.shader-studio"],
                 "the registrations of Catalog/registrations.json")
     }
 
