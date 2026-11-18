@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_app_isolation.py",
+    "--experiences",
+    "Packages/ExperiencesCreative/ShaderStudio"
+  ],
+  "command": "python3 scripts/check_app_isolation.py --experiences Packages/ExperiencesCreative/ShaderStudio",
+  "elapsed_seconds": 0.04,
+  "exit_code": 0,
+  "finished": "2026-11-18T20:27:56+00:00",
+  "log": ".autonomy/logs/A22-P02.isolation-2.log",
+  "log_sha256": "8062e25855b6117b630ca3cc1dbbe9e5a6a543b5132416c2f47288d5dc3d18b8",
+  "name": "isolation-2",
+  "stage": "A22-P02",
+  "started": "2026-11-18T20:27:56+00:00",
+  "timed_out": false
+}
