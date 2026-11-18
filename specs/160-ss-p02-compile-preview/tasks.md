@@ -19,7 +19,7 @@
 
 ## Phase 2: Story 1 — start from a template and run it (P1) 🎯
 
-- [ ] T-A22-203 [US1] Create `Packages/ExperiencesCreative/ShaderStudio/Experience/Adapter/StudioCore.swift` per data-model.md:
+- [X] T-A22-203 [US1] Create `Packages/ExperiencesCreative/ShaderStudio/Experience/Adapter/StudioCore.swift` per data-model.md: — Verified 2026-11-18: 2026-11-18: Adapter/StudioCore.swift: snapshot schema 1, digest a22.shader-studio.v1 over template and 16 normalized values, runs in the snapshot only; template.select, uniform.set, shader.run; rules a22.not-whole, a22.no-uniform; restore refusals; .autonomy/checks/A22-P02.ss-ios27.json exit 0; written by an agent, retested
   - "snapshot schema 1, digest `a22.shader-studio.v1` over template and values";
   - `template` "0…2, integer"; `values` "16 entries, 0…1"; `runs`;
   - the actions `template.select [0…2]`, `uniform.set [0…15, 0…1]` and `shader.run [1…1]`;
