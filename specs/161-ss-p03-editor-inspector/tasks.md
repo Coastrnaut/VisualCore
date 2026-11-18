@@ -82,7 +82,7 @@
   - the fixtures add `fixture-texture-mix` and `fixture-textures`;
   - regenerate `scenario-manifest.json`;
   - the manifest's content requirement stays at the planning catalog's 5 fixtures (more fixtures are allowed).
-- [ ] T-A22-311 [P] Write the interface tests (FR-A22-307):
+- [X] T-A22-311 [P] Write the interface tests (FR-A22-307): — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A22-P03.app-ui-2.json exit 0 (SSEditorUITests 2 tests in chunk d3 on the iOS 27.2 phone; caret moved with ⌘↓ after a focus tap)
   - `Apps/VisualCore/Tests/UI/ShaderStudio/{SSSupport,SSEditorUITests}.swift`, after `AUSupport` with `-vcCandidates`;
   - type a broken line, Run, read the gutter marker and the list, fix, Run, and the marker is gone;
   - move a uniform slider in the inspector;

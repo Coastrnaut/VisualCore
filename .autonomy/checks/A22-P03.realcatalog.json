@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "VisualCoreExperienceTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter VisualCoreExperienceTests",
+  "elapsed_seconds": 3.553,
+  "exit_code": 0,
+  "finished": "2026-11-18T21:19:28+00:00",
+  "log": ".autonomy/logs/A22-P03.realcatalog.log",
+  "log_sha256": "57fb07738ba6e6f573c1d83b3638f58e0516eb7341a6ebf3a738fb18f8f49354",
+  "name": "realcatalog",
+  "stage": "A22-P03",
+  "started": "2026-11-18T21:19:25+00:00",
+  "timed_out": false
+}
