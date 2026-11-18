@@ -41,8 +41,12 @@ in code:
   `RenderTarget.upload(rgbaFloats:)` fills an `.rgba8` target from code, clamping each value to 0…1.
 - **Counts and units:** `ResourceRegistry.compileCount` counts every program compile. `ParameterDefinition.unit`
   holds a unit string.
-- **Templates:** the A22-P01 templates declare no texture input. The app's deployment target is iOS 26, where
-  SwiftUI's `TextEditor` edits an `AttributedString`.
+- **Templates:** the A22-P01 templates declare no texture input.
+- **Editor API:** the app's deployment target is iOS 26.0. In the iOS 27.2 SDK,
+  `TextEditor(text: Binding<AttributedString>, selection: Binding<AttributedTextSelection>?)` is available from
+  iOS 26.0.
+- **Validated:** these answers were drafted before the clarify skill ran and checked inside it against the code and
+  the SDK interface (2026-11-18).
 
 - Q: How is the editor built? → A: `StudioEditor` (app-local SwiftUI):
   - **Editing:** a monospaced `TextEditor` over an `AttributedString` of the presenter's document source, recoloured
