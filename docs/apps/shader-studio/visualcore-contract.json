@@ -547,7 +547,7 @@
    "id": "M10",
    "capability": "Version 0.1 feature 05: local project save and open with versioned shader files; damaged and newer files refused and never deleted",
    "source": "manual \u00a72 version 0.1 feature 5",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
@@ -590,13 +590,13 @@
     "file": "Packages/ExperiencesCreative/DigitalZenGarden/Experience/GardenLibrary.swift",
     "symbol": "GardenLibrary"
    },
-   "notes": "Tested in ExperienceStorageTests and MigrationTests. No named-file library over the experience storage exists in VisualCore (GardenLibrary is app-local and internal; NamedLibrary works on a raw directory, research D6). G-LIBRARY."
+   "notes": "Tested in ExperienceStorageTests and MigrationTests. No named-file library over the experience storage exists in VisualCore (GardenLibrary is app-local and internal; NamedLibrary works on a raw directory, research D6). G-LIBRARY. A22-P04 (feature 162): ProjectLibrary saves, lists, opens, renames and removes up to 24 named projects (project-<n>.json, version 1, at most 131,072 bytes) in the experience's ExperienceStorage; damaged, oversized and newer files are listed as unreadable and never deleted automatically; a full quota keeps the previous file (LibraryTests, PresenterLibraryTests, SSLibraryUITests)."
   },
   {
    "id": "M11",
    "capability": "Version 0.1 feature 06: resource and complexity limits, watchdog UX and recoverable failures",
    "source": "manual \u00a72 version 0.1 feature 6",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreShaderSource/ShaderLibrary.swift",
@@ -639,7 +639,7 @@
     "file": "Packages/ExperiencesCreative/DigitalZenGarden/Experience/GardenPresenter.swift",
     "symbol": "GardenPresenter.maxFramesPerSecond"
    },
-   "notes": "Tested in ShaderLibraryTests and PacingMeterTests. No watchdog, frame-time budget or hang detection exists. Pre-compile caps: G-VALIDATE; watchdog, stop and reset: G-WATCHDOG. A22-P01 (feature 159): ShaderValidator (ShaderStudio/Core/ShaderValidator.swift; ValidatorTests); still open: G-WATCHDOG."
+   "notes": "Tested in ShaderLibraryTests and PacingMeterTests. No watchdog, frame-time budget or hang detection exists. Pre-compile caps: G-VALIDATE; watchdog, stop and reset: G-WATCHDOG. A22-P01 (feature 159): ShaderValidator (ShaderStudio/Core/ShaderValidator.swift; ValidatorTests); still open: G-WATCHDOG. A22-P04 (feature 162): every validator refusal and the common ANGLE compiler errors carry a guidance sentence (Guidance, GuidanceTests, GuidanceCompileTests, GuidanceDisplayTests); the watchdog stops a slow preview and Reset recovers without a relaunch (WatchdogTests)."
   },
   {
    "id": "M12",
@@ -805,7 +805,7 @@
    "id": "M16",
    "capability": "Watchdog: frames slower than a limit stop the preview and offer a reset to the last good program",
    "source": "spec FR-A22-003; clarification Q4; manual \u00a713 risk 1",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/PacingMeter.swift",
@@ -842,7 +842,7 @@
     "file": "Packages/ExperiencesCreative/DigitalZenGarden/Experience/GardenPresenter.swift",
     "symbol": "GardenPresenter"
    },
-   "notes": "No watchdog exists; a VisualCore watchdog now was rejected (one user, Principle II). G-WATCHDOG."
+   "notes": "No watchdog exists; a VisualCore watchdog now was rejected (one user, Principle II). G-WATCHDOG. A22-P04 (feature 162): FrameWatchdog stops the preview after 8 consecutive drawn frames above 0.25 s, the stopped preview draws a flat frame, and preview.reset swaps back the previous live shader with no compile (FrameWatchdogTests, WatchdogTests); no sandbox is claimed."
   },
   {
    "id": "M17",
@@ -1402,7 +1402,7 @@
    "justification": "Named, versioned project files over ExperienceStorage after Digital Zen Garden's GardenLibrary pattern (capped count and size, damaged and newer files refused and never deleted) are app-local; NamedLibrary works on a raw directory (research D6).",
    "phase": 4,
    "test": "Experience tests: save, open, rename and remove round-trip; the count and size caps refuse with a message; damaged and newer files are refused and still present afterwards; StorageQuota is never exceeded.",
-   "closed": null
+   "closed": "A22-P04"
   },
   {
    "id": "G-WATCHDOG",
@@ -1415,7 +1415,7 @@
    "justification": "A watchdog over PacingMeter's drawn-frame intervals that stops the preview and offers a reset to the last good program is app-local; a VisualCore watchdog was rejected with one user (research D6). No sandbox is claimed.",
    "phase": 4,
    "test": "Experience tests with injected intervals: frames slower than the limit for the declared window stop the preview; reset restores the last good program; recovery needs no relaunch; normal frames never trigger it.",
-   "closed": null
+   "closed": "A22-P04"
   },
   {
    "id": "G-DEVICE",

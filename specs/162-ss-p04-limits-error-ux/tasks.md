@@ -105,7 +105,7 @@
 - [X] T-A22-413 Review checkpoint: — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A22-P04.{ss-ios27,isolation,documented-api,core-purity}.json all exit 0
   - Shader Studio tests on sim-27.2 (`--name ss-ios27`);
   - the documented API, isolation and core purity.
-- [ ] T-A22-414 Contract: close G-LIBRARY and G-WATCHDOG with "A22-P04"; rows whose gaps are all closed become
+- [X] T-A22-414 Contract: close G-LIBRARY and G-WATCHDOG with "A22-P04"; rows whose gaps are all closed become — Verified 2026-11-18: 2026-11-18: G-LIBRARY and G-WATCHDOG closed by A22-P04; M10, M11, M16 available; .autonomy/checks/A22-P04.contract.json exit 0
   available with evidence (`--name contract`)
 - [ ] T-A22-415 The catalog, app and runner checks, with the packages and script tests:
   - the catalog (`--name catalog`);
