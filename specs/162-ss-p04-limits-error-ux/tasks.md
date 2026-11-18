@@ -24,7 +24,7 @@
     operand types" / "no matching overloaded function", with the fallback "Check this line for a typing mistake.";
   - `FrameWatchdog` has "limit 0.25 s", "window 8", `record`, `rearm` and `reset`, with states `watching` and
     `stopped` (FR-A22-401, 402, 403).
-- [ ] T-A22-403 [P] Write the core tests (SC-A22-401, 402):
+- [X] T-A22-403 [P] Write the core tests (SC-A22-401, 402): — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A22-P04.ss-core.json exit 0 (ShaderStudioCoreTests 76 tests on sim-27.2); guidance patterns matched against real ANGLE messages
   - `CoreTests/GuidanceTests.swift`: every code, distinct sentences, the line named, the `#version` and
     undeclared-uniform sentences, and an unrecognised message keeps its text with the general sentence;
   - `CoreTests/GuidanceCompileTests.swift`: compile real broken shaders through `CompileSupport` (compile only) on
