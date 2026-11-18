@@ -110,3 +110,15 @@
 - **Then:** uniforms and rebuild (207), the manifest and registration (208, 209) and the evidence.
 - **Review checkpoint:** at 210.
 - **Commits:** one per task.
+
+## Phase 6: Convergence
+
+- [ ] T-A22-214 Record the as-built design in `specs/160-ss-p02-compile-preview/{data-model.md,contracts/experience.md}` (spec edge case "warnings only"; data-model `PreviewPipeline` and `PreviewStatus`; plan structure; partial, contradicts and unrequested):
+  - **Warnings:** a linked program's warnings are not available from VisualCore (`ResourceRegistry.program` returns no log on success), so `.compiled` carries none in practice. The warnings path is tested with built diagnostics.
+  - **Probe program:** it is not released after a success, because the registry's program cache is shared and has no reference counts. A run identical to the live source keeps the live scene. The probe is released only when the new scene compiled a program of its own. Nothing leaks.
+  - **Pending requests:** a teardown, including the one before a context rebuild, drops a pending request.
+  - **Expansion errors:** an expansion error or a scene that fails to build is reported as one diagnostic in file `unknown`.
+  - **Additions:**
+    - the frame probe `warm-corner` (red, at x 0.95 and y 0.05, opening template only) with `ProbeTests`;
+    - the fifth fixture `fixture-repeated-runs` (manual fixture 5; the content-count audit);
+    - `PreviewPipeline.setupCount` and the internal `ShaderStudioExperience.make(id:)` for tests.
