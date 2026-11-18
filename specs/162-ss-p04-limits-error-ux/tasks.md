@@ -74,7 +74,7 @@
     <name>.";
   - unreadable files are listed with their code, never opened, renamed or deleted automatically; a newer index makes
     the library read-only; a failed write keeps the previous file.
-- [ ] T-A22-409 [P] [US3] Write `ExperienceTests/LibraryTests.swift` (SC-A22-403):
+- [X] T-A22-409 [P] [US3] Write `ExperienceTests/LibraryTests.swift` (SC-A22-403): — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A22-P04.ss-guidance-watchdog.json exit 0 (ShaderStudioCoreTests 76, ShaderStudioExperienceTests 66 on sim-27.2) (LibraryTests 7 tests)
   - save, open, rename and remove round trips;
   - every cap refuses with its message and leaves the storage unchanged;
   - damaged, oversized and newer files are listed and still on disk after the listing and the attempts to open them;
