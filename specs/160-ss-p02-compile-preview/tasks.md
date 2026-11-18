@@ -39,7 +39,7 @@
   - `StudioControls` has the template picker, Run, uniform sliders, status and diagnostics, with the identifiers
     `template`, `run`, `uniform-<k>`, `status` and `diagnostics`, and spoken labels.
   - `ShaderStudioExperience.make(id:storage:)` follows `AuroraExperience`.
-- [ ] T-A22-205 [US1] Write `ExperienceTests/{StudioTestSupport,StudioCoreTests}.swift` (SC-A22-204):
+- [X] T-A22-205 [US1] Write `ExperienceTests/{StudioTestSupport,StudioCoreTests}.swift` (SC-A22-204): — Verified 2026-11-18: 2026-11-18: StudioTestSupport and StudioCoreTests (actions, refusals, digest ignores runs; each template draws Compiled off screen); .autonomy/checks/A22-P02.ss-ios27.json exit 0 (26 experience tests); written by an agent, retested
   - the actions and refusals, and a digest that ignores the run count;
   - each template draws in the session host off screen with the status Compiled.
 
