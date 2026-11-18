@@ -1219,7 +1219,7 @@
    "id": "M28",
    "capability": "Device verification: drivers, hardware keyboards, iPhone ergonomics and slow shaders measured on the D1-D3 devices",
    "source": "manual \u00a79 phase 05; CLAUDE.md rule 5",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/PerformanceRecord.swift",
@@ -1244,7 +1244,7 @@
     "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Core/ScientificReview.swift",
     "symbol": "ScientificReview"
    },
-   "notes": "Simulator results are never device evidence; the device plan is G-DEVICE."
+   "notes": "Simulator results are never device evidence; the device plan is G-DEVICE. A22-P05 (feature 163): the device plan docs/apps/shader-studio/device-campaign.md holds 18 pending rows (SS-D1 to SS-D6 on D1 to D3); the device measurements wait for ImplementationLock-100 (G-DEVICE closed as the plan, as Aurora's A21-P05). Simulator stress and recovery runs (StressCycleTests, RecoveryTests) are not device evidence."
   },
   {
    "id": "M29",
@@ -1427,7 +1427,7 @@
    "justification": "Driver behaviour of slow shaders, hardware keyboards and iPhone ergonomics can only be measured on the D1-D3 devices after ImplementationLock-100 (CLAUDE.md rule 5).",
    "phase": 5,
    "test": "Device plan lists per device: a slow template stopped by the watchdog, a compile error mapped to the right line, a hardware-keyboard run and the compatibility profile; results recorded as device evidence only.",
-   "closed": null
+   "closed": "A22-P05"
   },
   {
    "id": "G-RELEASE",
