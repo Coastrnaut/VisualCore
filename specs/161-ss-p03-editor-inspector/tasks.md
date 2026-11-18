@@ -45,7 +45,7 @@
 
 ## Phase 4: Story 2 — too big never reaches the driver (P1)
 
-- [ ] T-A22-306 [US2] Write `ExperienceTests/OversizedProjectTests.swift` (SC-A22-301):
+- [X] T-A22-306 [US2] Write `ExperienceTests/OversizedProjectTests.swift` (SC-A22-301): — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A22-P03.ss-core-editor.json exit 0 (ShaderStudioCoreTests 59, ShaderStudioExperienceTests 43 on sim-27.2)
   - a 16,385-byte source, a 17-uniform project (a test seam on the presenter) and an empty source;
   - each is refused with its code;
   - the pipeline's `compileCount` and `ResourceRegistry.compileCount` are unchanged;
