@@ -56,7 +56,7 @@
     clear to (0.05, 0.05, 0.07) and draw no shader; the status is "Stopped: frames took longer than 0.25 s";
   - `Experience/StudioControls.swift`: `preview-reset`;
   - an internal test seam feeds intervals.
-- [ ] T-A22-407 [US2] Write `ExperienceTests/WatchdogTests.swift` (SC-A22-402):
+- [X] T-A22-407 [US2] Write `ExperienceTests/WatchdogTests.swift` (SC-A22-402): — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A22-P04.ss-guidance-watchdog.json exit 0 (ShaderStudioCoreTests 76, ShaderStudioExperienceTests 66 on sim-27.2)
   - injected slow intervals stop the preview, and the read-back is the flat colour;
   - normal intervals never stop it;
   - Reset restores the fallback's picture with `compileCount` unchanged;
