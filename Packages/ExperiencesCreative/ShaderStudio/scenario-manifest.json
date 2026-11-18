@@ -1,0 +1,487 @@
+{
+  "controls" : [
+    "template.select",
+    "uniform.set",
+    "shader.run"
+  ],
+  "experience" : "a22.shader-studio",
+  "kind" : "creative",
+  "scenarios" : [
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+        "initialDigest" : "0987b2c90dab3229434af5ba662fd692d8ccd3a855ccc67d9bb0cec94601a2a5"
+      },
+      "name" : "launch-first-frame",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "template.select",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "uniform.set",
+            "values" : [
+              0,
+              0.25
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "uniform.set",
+            "values" : [
+              1,
+              0.80000000000000004
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "shader.run",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7209aa259106ca3521219f7a3b6742c1639bc5299090f1d651934c6d3705691f",
+        "initialDigest" : "0987b2c90dab3229434af5ba662fd692d8ccd3a855ccc67d9bb0cec94601a2a5"
+      },
+      "name" : "input-response",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "template.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "outcome" : "template-noise-flow"
+      },
+      "name" : "completion",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "template.select",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "template.select",
+            "values" : [
+              -1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "template.select",
+            "values" : [
+              1.5
+            ]
+          },
+          "result" : "action.rule.a22.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "uniform.set",
+            "values" : [
+              16,
+              0.5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "uniform.set",
+            "values" : [
+              0,
+              1.5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "uniform.set",
+            "values" : [
+              0.5,
+              0.5
+            ]
+          },
+          "result" : "action.rule.a22.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "uniform.set",
+            "values" : [
+              1,
+              0.5
+            ]
+          },
+          "result" : "action.rule.a22.no-uniform",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "shader.run",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "shader.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "uniform.set",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+
+      },
+      "name" : "rejection",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "template.select",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "uniform.set",
+            "values" : [
+              0,
+              0.25
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "uniform.set",
+            "values" : [
+              1,
+              0.80000000000000004
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "shader.run",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7209aa259106ca3521219f7a3b6742c1639bc5299090f1d651934c6d3705691f",
+        "initialDigest" : "0987b2c90dab3229434af5ba662fd692d8ccd3a855ccc67d9bb0cec94601a2a5"
+      },
+      "name" : "save-restore",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "template.select",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "uniform.set",
+            "values" : [
+              0,
+              0.25
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "uniform.set",
+            "values" : [
+              1,
+              0.80000000000000004
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "shader.run",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "initialDigest" : "0987b2c90dab3229434af5ba662fd692d8ccd3a855ccc67d9bb0cec94601a2a5",
+        "resetDigest" : true
+      },
+      "name" : "reset",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "suspend-resume",
+      "seed" : "1"
+    },
+    {
+      "cycles" : 5,
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "teardown-reentry",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "cancel-prepare",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "template.select",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "shader.run",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "0987b2c90dab3229434af5ba662fd692d8ccd3a855ccc67d9bb0cec94601a2a5",
+        "initialDigest" : "0987b2c90dab3229434af5ba662fd692d8ccd3a855ccc67d9bb0cec94601a2a5",
+        "outcome" : "template-gradient"
+      },
+      "name" : "fixture-gradient",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "template.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "shader.run",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "36ec71b33e0da327942325dc159f80f5f41ef40bc6d3f7a4983262abd1d455fd",
+        "initialDigest" : "0987b2c90dab3229434af5ba662fd692d8ccd3a855ccc67d9bb0cec94601a2a5",
+        "outcome" : "template-noise-flow"
+      },
+      "name" : "fixture-noise-flow",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "template.select",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "shader.run",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "90e937b8ff62d7f4b1a7febad74d4597a1540c56a5b2c45de2a7ad9df9991b88",
+        "initialDigest" : "0987b2c90dab3229434af5ba662fd692d8ccd3a855ccc67d9bb0cec94601a2a5",
+        "outcome" : "template-rings"
+      },
+      "name" : "fixture-rings",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "shader.run",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "uniform.set",
+            "values" : [
+              1,
+              0.5
+            ]
+          },
+          "result" : "action.rule.a22.no-uniform",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "template.select",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "action.rule.a22.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "uniform.set",
+            "values" : [
+              0,
+              0.75
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "bbfc60a07648ab54060fcff4208f7ecc24c5e081a3842348a5fbf842afbc0481",
+        "initialDigest" : "0987b2c90dab3229434af5ba662fd692d8ccd3a855ccc67d9bb0cec94601a2a5",
+        "outcome" : "template-gradient"
+      },
+      "name" : "fixture-broken-run-keeps-preview",
+      "seed" : "1"
+    }
+  ],
+  "schema" : 1
+}

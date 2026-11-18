@@ -73,7 +73,7 @@
   - in `Apps/VisualCore/Tests/Unit/AppModelTests.swift`, the synthetic candidate id moves to
     `a23.visual-programming-lab`;
   - the candidate lists in the app and script tests.
-- [ ] T-A22-209 Write `Experience/Adapter/StudioManifest.swift` (nine standard scenarios, plus fixtures per template and
+- [X] T-A22-209 Write `Experience/Adapter/StudioManifest.swift` (nine standard scenarios, plus fixtures per template and — Verified 2026-11-18: 2026-11-18: Adapter/StudioManifest.swift (StudioCore.manifest(for:): nine standard scenarios and fixtures gradient, noise-flow, rings and broken-run-keeps-preview), StudioManifestTests, scenario-manifest.json generated and matching; .autonomy/checks/A22-P02.ss-ios27.json exit 0; written by an agent, retested
   for a broken run that keeps the preview) and `ExperienceTests/StudioManifestTests.swift`. Generate
   `scenario-manifest.json` with `UPDATE_SCENARIO_MANIFEST=1 TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`.
 - [ ] T-A22-210 Review checkpoint:
