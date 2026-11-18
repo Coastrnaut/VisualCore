@@ -189,6 +189,8 @@ chooses which one feeds each input, and the preview samples it.
 - **FR-A22-305**: The uniform values and texture choices MUST be kept in the session snapshot and restored with it.
 - **FR-A22-306**: Every control MUST carry a spoken label and value, work at large text sizes, and be usable with a
   hardware keyboard.
+- **FR-A22-307**: Interface tests MUST cover editing the source, running a broken and a fixed shader with the line
+  marked and cleared, and changing a uniform in the inspector, in the one app on the iOS 27 phone.
 
 ### Key Entities
 
