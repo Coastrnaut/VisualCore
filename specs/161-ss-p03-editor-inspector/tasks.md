@@ -53,7 +53,7 @@
 
 ## Phase 5: Story 3 — the inspector (P1)
 
-- [ ] T-A22-307 [US3] Create `Experience/StudioInspector.swift` per clarification Q3 and write
+- [X] T-A22-307 [US3] Create `Experience/StudioInspector.swift` per clarification Q3 and write — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A22-P03.ss-core-editor.json exit 0 (ShaderStudioCoreTests 59, ShaderStudioExperienceTests 43 on sim-27.2)
   `ExperienceTests/InspectorTests.swift` (FR-A22-303, 305; SC-A22-303):
   - **Inspector:** rows of title, value with unit and range; sliders send normalized values clamped by the
     presenter; Reset sends the defaults; identifiers `uniform-<k>` and `reset`.
