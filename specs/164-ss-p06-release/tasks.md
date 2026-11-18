@@ -34,7 +34,7 @@
     `StudioDrawError.injected` once and clears it;
   - `ExperienceTests/StudioRecoveryDrawTests.swift`: save two projects, set the seam and draw; the session fails with
     the message; every storage file is byte-identical; a new session over the same storage lists and opens both.
-- [ ] T-A22-605 [P] [US2] Commit the stored samples and test them (FR-A22-604):
+- [X] T-A22-605 [P] [US2] Commit the stored samples and test them (FR-A22-604): — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A22-P06.ss-recovery-samples.json exit 0 (ShaderStudioCoreTests 76, ShaderStudioExperienceTests 95 on sim-27.2); StoredSampleTests 9 over ten committed samples generated through the real encoders
   - `ExperienceTests/Fixtures/` holds the ten files of data-model.md, generated once through the real encoders
     (`StudioCore.snapshotPayload`, `ProjectLibrary.encode`) and then committed;
   - add the resources to `Packages/ExperiencesCreative/Package.swift` if the test target needs them;
