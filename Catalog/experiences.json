@@ -753,7 +753,7 @@
       "id": "a22.shader-studio",
       "code": "A22",
       "title": "Shader Studio",
-      "summary": "A small GLSL ES fragment shader studio: start from a gradient, a noise flow or rings, run it, and see each compiler error on the line you wrote while the last working preview keeps drawing. Uniform sliders stay within their ranges. Offline; GPU code is not a sandbox.",
+      "summary": "A small GLSL ES fragment shader studio: start from a gradient, a noise flow, rings or a texture mix, edit with line numbers, run, and see each error on the line you wrote while the last working preview keeps drawing. The inspector keeps uniforms in range. Offline; GPU code is not a sandbox.",
       "kind": "creative",
       "tier": "free",
       "category": "tools",
@@ -771,10 +771,11 @@
       "tile_seed": 3608590787,
       "capabilities": [
         "Starter GLSL templates with uniforms",
-        "Compile and run on demand",
+        "Editor with syntax colours and lines",
         "Errors on the line you wrote",
         "Last working preview kept on failure",
-        "Uniform sliders within their ranges"
+        "Uniform inspector with ranges and reset",
+        "Textures made in code, never stored"
       ],
       "quality_tiers": [
         "level-0"
