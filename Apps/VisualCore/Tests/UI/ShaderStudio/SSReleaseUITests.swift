@@ -4,6 +4,8 @@
 // listed (no `diagnostic-0`), the inspector shows the template's one uniform (`uniform-0`, no `uniform-1`), and the
 // library (`library`) is empty (no `project-0`). One journey in chunk `d3`, well under 60 s, every wait bounded.
 // System accessibility audits wait for the device campaign (owner ruling of 2026-11-13).
+// T-A22-614 (convergence; FR-A22-605): the store text's "Command-R runs it" is proved by pressing ⌘R on the
+// hardware keyboard, never the Run button, after a broken line is typed: the status turns to "Failed".
 import XCTest
 
 final class SSReleaseUITests: XCTestCase {
@@ -29,6 +31,18 @@ final class SSReleaseUITests: XCTestCase {
         XCTAssertFalse(SS.project(app, 0).waitForExistence(timeout: Self.emptyLibraryWait),
                        "a fresh library lists no project: \(SS.project(app, 0).label)")
         XCTAssertTrue(SS.backToEditor(app), "the editor is reached again")
+        XCTAssertFalse(element(app, "session.failure").exists, "no failure")
+    }
+
+    /// Command-R on the hardware keyboard runs the shader: a broken line typed into the editor fails at the run that
+    /// ⌘R starts (the Run button is never tapped).
+    @MainActor
+    func testCommandRRunsTheShader() {
+        let app = SS.open(arguments: SS.fresh)
+        XCTAssertTrue(SS.append(app, "vec4 broken = vec4(undefinedThing);"), "the broken line is typed")
+        app.typeKey("r", modifierFlags: .command)
+        XCTAssertTrue(SS.waitForValue(SS.control(app, "status"), timeout: SS.runWait) { $0.hasPrefix("Failed") },
+                      "Command-R ran the broken shader: \(SS.status(app))")
         XCTAssertFalse(element(app, "session.failure").exists, "no failure")
     }
 }

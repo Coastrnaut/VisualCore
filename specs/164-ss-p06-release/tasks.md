@@ -99,7 +99,7 @@
 
 ## Phase 7: Convergence
 
-- [ ] T-A22-614 Prove the store text's "Command-R runs it": in `Apps/VisualCore/Tests/UI/ShaderStudio/SSReleaseUITests.swift`
+- [X] T-A22-614 Prove the store text's "Command-R runs it": in `Apps/VisualCore/Tests/UI/ShaderStudio/SSReleaseUITests.swift` — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A22-P06.app-ui-2.json exit 0 (SSReleaseUITests.testCommandRRunsTheShader 19.1 s: ⌘R on the hardware keyboard runs a broken line and the status turns to Failed; all seven d3 tests pass); store claims table names it; .autonomy/checks/A22-P06.{scan-claims-2,copy-release-2}.json exit 0
   add a test that focuses the editor, appends a broken line and presses ⌘R through the hardware keyboard
   (`typeKey("r", modifierFlags: .command)`, never the Run button); the status starts with "Failed"; then name that test
   in the store text's claims table, per FR-A22-605 / SC-A22-603 (partial)

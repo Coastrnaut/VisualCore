@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "experience-release-a22",
+    "copy-claims-a22"
+  ],
+  "command": "python3 scripts/release_check.py --only experience-release-a22 copy-claims-a22",
+  "elapsed_seconds": 0.087,
+  "exit_code": 0,
+  "finished": "2026-11-18T22:45:13+00:00",
+  "log": ".autonomy/logs/A22-P06.copy-release-2.log",
+  "log_sha256": "010f58a4584a10424c09964defc225b3b373237341fdbf8b3fa478bc56450e7d",
+  "name": "copy-release-2",
+  "stage": "A22-P06",
+  "started": "2026-11-18T22:45:13+00:00",
+  "timed_out": false
+}
