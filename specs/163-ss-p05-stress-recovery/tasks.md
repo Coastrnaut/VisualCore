@@ -38,7 +38,7 @@
   - each gives a byte-identical still (`StudioTest.still`), an unchanged resource level and `leaked` 0.
   - a request waiting in the pipeline is dropped by a rebuild; a Run accepted before a rebuild compiles exactly once
     after it; the level is unchanged.
-- [ ] T-A22-505 [US2] Fix anything T-A22-504 finds in the presenter, pipeline and textured preview (rebuild of the live,
+- [X] T-A22-505 [US2] Fix anything T-A22-504 finds in the presenter, pipeline and textured preview (rebuild of the live, — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A22-P05.ss-stress-recovery.json exit 0 (ShaderStudioCoreTests and ShaderStudioExperienceTests on sim-27.2); RecoveryTests found no rebuild defect, so no source change was needed
   fallback and stopped scenes and the texture targets); if nothing is found, record that.
 
 ## Phase 4: Story 3 — my project is still there tomorrow (P1)
