@@ -167,7 +167,8 @@ the compatibility profile.
   texture-input counts, so that a project with its own uniforms keeps and changes every value.
 - **FR-A22-504**: Saved projects MUST survive a relaunch of the app and open with their source, values and textures.
 - **FR-A22-505**: A device-campaign plan MUST list, for D1, D2 and D3, the rows SS-D1 to SS-D6 with steps and expected
-  results, every row pending until the campaign after `ImplementationLock-100`.
+  results and the owner actions each row needs, every row pending until the campaign after
+  `ImplementationLock-100`.
 - **FR-A22-506**: Interface tests MUST cover a project surviving a relaunch, in the one app on the iOS 27 phone.
 
 ### Key Entities
@@ -195,6 +196,8 @@ the compatibility profile.
 - The A22-P02 pipeline, the A22-P03 textures and the A22-P04 watchdog and library are reused.
 - The host's `recreateContext` stands for a lost context in tests; real driver behaviour is measured on devices.
 - Cycle counts are short (bounded by arithmetic, not soak runs).
+- The experience's storage persists across app launches and is cleared only by `-vcResetData` (the app's test
+  argument) or by the person deleting the app.
 
 ## Traceability
 
