@@ -25,6 +25,67 @@ Canonical overrides:
   G-LIBRARY (A22-P04).
 - **Still a candidate.** No VisualCore or ProjectM change. Follow `specs/154-au-p03-composite-prefs`.
 
+## Clarifications
+
+### Session 2026-11-18
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- **`FieldPass`** (VisualCoreRendering, public, tested by `FieldPassTests`):
+  - it compiles a fragment with `FullScreenShaderScene.vertexSource` through the registry's program cache;
+  - it samples named `RenderTarget` inputs on units 0, 1, … in order;
+  - it sets typed `FieldUniform`s, which must be active uniforms;
+  - it draws into `.framebuffer(name:width:height:)`;
+  - it validates everything before drawing.
+- **Render targets from code:** `ResourceRegistry.makeRenderTarget(width:height:format:label:)` makes a render target.
+  `RenderTarget.upload(rgbaFloats:)` fills an `.rgba8` target from code, clamping each value to 0…1.
+- **Counts and units:** `ResourceRegistry.compileCount` counts every program compile. `ParameterDefinition.unit`
+  holds a unit string.
+- **Templates:** the A22-P01 templates declare no texture input. The app's deployment target is iOS 26, where
+  SwiftUI's `TextEditor` edits an `AttributedString`.
+
+- Q: How is the editor built? → A: `StudioEditor` (app-local SwiftUI):
+  - **Editing:** a monospaced `TextEditor` over an `AttributedString` of the presenter's document source, recoloured
+    from `EditorDocument` tokens on each edit by a pure `SyntaxPalette` (token kind → colour role). Colour is never
+    the only cue: kinds also differ in weight (keywords bold, comments italic).
+  - **Gutter:** line numbers, with a marker on each line that carries a diagnostic.
+  - **Diagnostics:** a list ("Line N: message", outside-source entries first, with their file). Choosing one sets the
+    editor's selection to that line's start.
+  - **Edits and Run:** an edit calls `setSource(_:)` and never compiles. Run (also ⌘R on a hardware keyboard) sends
+    `shader.run`.
+  - **Identifiers:** `editor`, `gutter`, `diagnostics`, `diagnostic-<k>`.
+- Q: How is "rejected before GPU work" proved? → A: An experience test runs a source of 16,385 bytes and a project with
+  17 uniforms (built through the presenter's `setSource` and a test project seam). For each, the status is "Refused:"
+  with the limit's code, the pipeline's `compileCount` is unchanged, `ResourceRegistry.compileCount` is unchanged
+  and the read-back preview is byte-identical. An empty editor is refused as `no-main`.
+- Q: What does the inspector show and send? → A: For each uniform of the live project:
+  - **Shown:** the title, the value in its unit (two decimals) and the range ("0.00 to 4.00"), with a slider that
+    sends `uniform.set [k, normalized]`. The presenter clamps before sending.
+  - **Reset:** it sends the defaults.
+  - **Values:** they stay in the core (normalized). Nothing compiles.
+  - **Identifiers:** `uniform-<k>` (slider) and `reset`.
+- Q: Which textures exist, and how are they bound? → A:
+  - **Textures:** three, made in code at 64 × 64 `.rgba8` by a pure `TextureRecipes` (RGBA float arrays):
+    - `checker`: 8 × 8 cells, light and dark grey;
+    - `ramp`: a horizontal ramp from deep blue to warm orange;
+    - `noise`: a value-noise tile from an integer hash.
+  - **Fourth template:** `texture-mix` joins the starter templates. It has the texture inputs `u_texture0` and
+    `u_texture1` and the uniform `u_blend` (0…1, default 0.5). A22-P01's template tests count sampler uniforms as
+    texture inputs, not floats.
+  - **Choices:** they are core state, `textures [2]` (0 checker, 1 ramp, 2 noise; default `[0, 1]`), set by
+    `texture.set [0…1, 0…2]`, both whole. An input index at or past the project's input count is refused
+    (`a22.no-texture`).
+  - **Drawing:** a live project with texture inputs is drawn by a `FieldPass` into the context's framebuffer, with the
+    chosen targets and the active float uniforms (`u_time`, `u_resolution` and the project's). A project without
+    texture inputs keeps the A22-P02 `FullScreenShaderScene`. Targets are made in setup, rebuilt after a context loss
+    and released in teardown.
+- Q: What is persisted, and does the snapshot schema change? → A:
+  - **Snapshot:** schema 1 stays. `textures` is added as an optional field, and a snapshot without it reads `[0, 1]`,
+    so A22-P02 snapshots restore. The digest covers the template, the values and the textures. `template.select`
+    widens to `[0…3]`.
+  - **Not persisted here:** the edited source is not persisted in this phase (G-LIBRARY, A22-P04).
+  - **Restore:** restoring a snapshot gives identical values and texture choices, tested.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Edit the shader and see where it fails (Priority: P1) 🎯
