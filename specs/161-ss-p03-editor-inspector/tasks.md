@@ -69,7 +69,7 @@
   - `Experience/TexturedPreview.swift`: render targets from `TextureRecipes` and a `FieldPass` into the context's
     framebuffer with the active float uniforms; rebuilt after a context loss, released in teardown;
   - `PreviewPipeline` uses it for projects with texture inputs.
-- [ ] T-A22-309 [US4] Write `ExperienceTests/TextureInputTests.swift` (SC-A22-303, 304):
+- [X] T-A22-309 [US4] Write `ExperienceTests/TextureInputTests.swift` (SC-A22-303, 304): — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A22-P03.ss-textures.json exit 0 (ShaderStudioCoreTests 59, ShaderStudioExperienceTests 48 on sim-27.2)
   - three choices give three pairwise different pictures for `texture-mix`;
   - after `recreateContext` the picture is the same and nothing leaks;
   - an A22-P02 snapshot without `textures` restores as [0, 1];
