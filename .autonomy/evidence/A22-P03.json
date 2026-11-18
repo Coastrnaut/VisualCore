@@ -1,0 +1,92 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/A22-P03.app-ui-2.json",
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-ui-ios27-d3",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A22-P03.app-ui-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A22-P03.app-unit.json",
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A22-P03.app-unit.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A22-P03.catalog.json",
+      "command": "python3 scripts/build_catalog.py --check",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A22-P03.catalog.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A22-P03.contract.json",
+      "command": "python3 scripts/check_app_contract.py --app shader-studio",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A22-P03.contract.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A22-P03.core-purity.json",
+      "command": "sh -c '! grep -rnE \"import (UIKit|SwiftUI|OpenGLES|Network)|URLSession|Date\\(\\)|ContinuousClock|CFAbsoluteTime\" Packages/ExperiencesCreative/ShaderStudio/Core'",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A22-P03.core-purity.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A22-P03.documented-api.json",
+      "command": "python3 scripts/check_documented_api.py --sources Packages/ExperiencesCreative/ShaderStudio",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A22-P03.documented-api.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A22-P03.experience-packages.json",
+      "command": "python3 scripts/check_experience_packages.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A22-P03.experience-packages.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A22-P03.isolation.json",
+      "command": "python3 scripts/check_app_isolation.py --experiences Packages/ExperiencesCreative/ShaderStudio",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A22-P03.isolation.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A22-P03.realcatalog.json",
+      "command": "swift test --package-path Packages/VisualCore --filter VisualCoreExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A22-P03.realcatalog.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A22-P03.script-tests.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A22-P03.script-tests.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A22-P03.ss-core-editor.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing ShaderStudioCoreTests ShaderStudioExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A22-P03.ss-core-editor.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A22-P03.ss-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing ShaderStudioCoreTests ShaderStudioExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A22-P03.ss-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A22-P03.ss-textures.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing ShaderStudioCoreTests ShaderStudioExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A22-P03.ss-textures.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A22-P03.verify-27.json",
+      "command": "python3 scripts/verify_experiences.py --only a22.shader-studio --runtime 27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A22-P03.verify-27.log"
+    }
+  ],
+  "generated": "2026-11-18T21:26:26+00:00",
+  "method": "deterministic-run-check",
+  "stage": "A22-P03",
+  "status": "pass"
+}

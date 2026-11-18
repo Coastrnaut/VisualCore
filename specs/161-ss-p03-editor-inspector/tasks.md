@@ -99,7 +99,7 @@
   - `xcodegen generate --spec project.yml`;
   - `--name app-ui -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27 app-ui-ios27-d3`;
   - the runner (`--name verify-27`).
-- [ ] T-A22-316 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+- [X] T-A22-316 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record — Verified 2026-11-18: 2026-11-18: converge appended nothing; .autonomy/evidence/A22-P03.json sealed and recorded (VERIFIED-GATE A22-P03); README and docs/automatedtesting.md updated
   A22-P03; update README.md (rule 16) and `docs/automatedtesting.md` (rule 17)
 
 ## Dependencies

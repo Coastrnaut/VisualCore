@@ -1769,8 +1769,14 @@
       "status": "pass"
     },
     "A22-P03": {
-      "attempts": [],
-      "status": "pending"
+      "attempts": [
+        {
+          "at": "2026-11-18T21:26:30+00:00",
+          "evidence": ".autonomy/evidence/A22-P03.json",
+          "result": "pass"
+        }
+      ],
+      "status": "pass"
     },
     "A22-P04": {
       "attempts": [],
@@ -2281,5 +2287,5 @@
       "status": "pending"
     }
   },
-  "updated": "2026-11-18T20:28:03+00:00"
+  "updated": "2026-11-18T21:26:30+00:00"
 }
