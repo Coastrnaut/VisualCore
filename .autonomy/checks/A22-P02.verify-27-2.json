@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a22.shader-studio",
+    "--runtime",
+    "27"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a22.shader-studio --runtime 27",
+  "elapsed_seconds": 14.176,
+  "exit_code": 0,
+  "finished": "2026-11-18T20:25:23+00:00",
+  "log": ".autonomy/logs/A22-P02.verify-27-2.log",
+  "log_sha256": "7396f680700b98c0e11c3477b409991c9312c3e1aaee9dbf1efeb5e266cbe0f0",
+  "name": "verify-27-2",
+  "stage": "A22-P02",
+  "started": "2026-11-18T20:25:09+00:00",
+  "timed_out": false
+}

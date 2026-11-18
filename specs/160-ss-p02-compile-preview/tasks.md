@@ -83,7 +83,7 @@
   - the documented API, isolation and core purity.
 - [X] T-A22-211 Contract: G-PREVIEW and G-RUN are closed by "A22-P02", and rows whose gaps are all closed become — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A22-P02.contract.json exit 0 (G-PREVIEW and G-RUN closed by A22-P02; M03, M08, M17 and M24 available with their evidence)
   available with evidence (`--name contract`)
-- [ ] T-A22-212 The catalog, app and runner checks, with the packages and script tests:
+- [X] T-A22-212 The catalog, app and runner checks, with the packages and script tests: — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A22-P02.catalog.json exit 0; xcodegen generate; .autonomy/checks/A22-P02.app-unit-2.json exit 0 (build for testing and unit tests with the candidate); .autonomy/checks/A22-P02.verify-27-3.json exit 0 (all nine runner scenarios on iOS 27.2 at 0dd8a3b0; the first attempt failed launch-first-frame: no probe declared, fixed with the warm-corner probe and ProbeTests); A22-P02.experience-packages and A22-P02.script-tests-2 exit 0
   - the catalog (`--name catalog`);
   - the app build and unit tests: `xcodegen generate --spec project.yml`, then `--name app-unit -- python3
     scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`;
