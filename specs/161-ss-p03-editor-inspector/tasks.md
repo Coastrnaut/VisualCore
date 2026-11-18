@@ -35,7 +35,7 @@
   - a diagnostics list jumps to a line by setting the selection;
   - edits call `setSource` and never compile; Run and ⌘R send `shader.run`;
   - the identifiers are `editor`, `gutter`, `diagnostics` and `diagnostic-<k>`, with spoken labels.
-- [ ] T-A22-305 [US1] Write `ExperienceTests/EditorModelTests.swift`:
+- [X] T-A22-305 [US1] Write `ExperienceTests/EditorModelTests.swift`: — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A22-P03.ss-core-editor.json exit 0 (ShaderStudioCoreTests 59, ShaderStudioExperienceTests 43 on sim-27.2)
   - the palette maps every token kind, and weights differ from colours;
   - a broken run marks exactly its lines;
   - outside-source entries come first;
