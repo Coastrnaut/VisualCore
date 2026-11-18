@@ -67,7 +67,7 @@
 
 ## Phase 5: Story 4 — a plan for the devices (P2)
 
-- [ ] T-A22-509 [P] [US4] Write `docs/apps/shader-studio/device-campaign.md` after `docs/apps/aurora/device-campaign.md`
+- [X] T-A22-509 [P] [US4] Write `docs/apps/shader-studio/device-campaign.md` after `docs/apps/aurora/device-campaign.md` — Verified 2026-11-18: 2026-11-18: docs/apps/shader-studio/device-campaign.md with 18 pending rows (SS-D1 to SS-D6 on D1 to D3), linked from the README; validate_docs passes
   (FR-A22-505, SC-A22-504):
   - rows SS-D1 to SS-D6 for each of D1 iPhone 15 (iOS 27), D2 iPad Pro 13-inch (M5) and D3 iPad (A16) on iPadOS 26.5,
     18 rows in all;

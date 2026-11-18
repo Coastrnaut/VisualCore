@@ -23,3 +23,4 @@ constitution (2.18.1).
 | [visualcore-contract.json](visualcore-contract.json) / [.md](visualcore-contract.md) | Phase 00 inventory, capability matrix, gaps, decision (checked by `scripts/check_app_contract.py`) |
 | [regression-baseline.md](regression-baseline.md) | Phase start, reference pin, the ProjectM reference regression results |
 | [licenses.md](licenses.md) | Licenses and provenance of everything the experience ships |
+| [device-campaign.md](device-campaign.md) | Device campaign plan (A22-P05): rows SS-D1 to SS-D6 on D1, D2 and D3, all pending until after ImplementationLock-100 |
