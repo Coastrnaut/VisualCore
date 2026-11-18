@@ -15,7 +15,8 @@
 //     rows, estimated from the monospaced advance (``StudioEditorLayout/rows(of:columns:)``, greedy word wrap).
 //   - Diagnostics (`diagnostics`, a container of separate elements): one button per diagnostic, `diagnostic-<k>` from 0,
 //     in the mirror's order (outside the source first, then by line), labelled "Line N: message"
-//     (`StudioControls.diagnosticText`). Choosing one in the person's source puts the selection at its line's start
+//     (`StudioControls.diagnosticText`), followed by its guidance (feature 162, `Guidance.forDiagnostic`), shown under it
+//     and spoken after it (``StudioEditorLayout/diagnosticLabel(_:)``). Choosing one in the person's source puts the selection at its line's start
 //     (`EditorDocument.lineStart(_:)`, a UTF-8 offset, converted by ``StudioEditorLayout/index(in:utf8Offset:)``).
 //   - Keyboard: ⌘' ("Next error", `next-diagnostic`) moves to the next diagnostic in the person's source, wrapping
 //     around (``StudioEditorLayout/nextDiagnostic(after:in:)``); Run is ⌘R on the controls' Run button.
@@ -100,6 +101,11 @@ enum StudioEditorLayout {
         guard let first = line.diagnostics.first else { return "Line \(line.number)" }
         let kind = line.diagnostics.contains { $0.severity == .error } ? "error" : "warning"
         return "Line \(line.number), \(kind): " + first.message
+    }
+
+    /// The spoken label of a diagnostics entry (feature 162): "Line N: message. <guidance>".
+    static func diagnosticLabel(_ diagnostic: MappedDiagnostic) -> String {
+        StudioControls.diagnosticText(diagnostic) + ". " + Guidance.forDiagnostic(message: diagnostic.message)
     }
 
     /// The UTF-8 offset in `document`'s source at which `diagnostic`'s line starts; nil for a diagnostic outside the
@@ -238,13 +244,18 @@ struct StudioEditor: View {
                 Button {
                     choose(k)
                 } label: {
-                    Text(verbatim: line)
-                        .font(.footnote.monospaced())
-                        .multilineTextAlignment(.leading)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(verbatim: line)
+                            .font(.footnote.monospaced())
+                        Text(verbatim: Guidance.forDiagnostic(message: diagnostic.message))
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
+                    .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
                 }
-                .accessibilityLabel(Text(verbatim: line))
+                .accessibilityLabel(Text(verbatim: StudioEditorLayout.diagnosticLabel(diagnostic)))
                 .accessibilityHint(Text(verbatim: DiagnosticMapper.isInPersonSource(diagnostic)
                                         ? "Moves the cursor to this line" : "Outside your source"))
                 .accessibilityIdentifier(port.identifier("diagnostic-\(k)"))

@@ -34,7 +34,7 @@
 
 ## Phase 3: Story 1 — errors that say what to change (P1) 🎯
 
-- [ ] T-A22-404 [US1] Show the guidance (FR-A22-401, 402):
+- [X] T-A22-404 [US1] Show the guidance (FR-A22-401, 402): — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A22-P04.ss-guidance-watchdog.json exit 0 (ShaderStudioCoreTests 76, ShaderStudioExperienceTests 66 on sim-27.2)
   - in `Experience/StudioPresenter.swift` (mirror `guidance`, the refusal's sentence or the first diagnostic's);
   - in `Experience/StudioControls.swift` (a `guidance` text under the status, with a spoken label);
   - in `Experience/StudioEditor.swift` (each diagnostic entry's label adds its guidance).
