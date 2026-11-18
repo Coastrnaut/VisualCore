@@ -94,7 +94,7 @@
           "action" : {
             "control" : "template.select",
             "values" : [
-              3
+              4
             ]
           },
           "result" : "action.out-of-range",
@@ -427,6 +427,37 @@
         "outcome" : "template-rings"
       },
       "name" : "fixture-rings",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "template.select",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "shader.run",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e15bc3ba8e82adba5d1c8c33c055c2dd43bc2656ff864791e1f9b7d7a5af8272",
+        "initialDigest" : "0987b2c90dab3229434af5ba662fd692d8ccd3a855ccc67d9bb0cec94601a2a5",
+        "outcome" : "template-texture-mix"
+      },
+      "name" : "fixture-texture-mix",
       "seed" : "1"
     },
     {

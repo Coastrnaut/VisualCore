@@ -29,8 +29,8 @@ private func playManifest(_ spec: ScenarioSpec) async throws -> (initial: String
 }
 
 @Suite struct StudioManifestTests {
-    /// The names of the five fixtures.
-    static let fixtureNames = ["fixture-gradient", "fixture-noise-flow", "fixture-rings",
+    /// The names of the fixtures (`fixture-texture-mix` from feature 161; the content requirement stays at five).
+    static let fixtureNames = ["fixture-gradient", "fixture-noise-flow", "fixture-rings", "fixture-texture-mix",
                                "fixture-broken-run-keeps-preview", "fixture-repeated-runs"]
 
     @Test func theManifestIsValidWithTheStandardScenariosAndFiveFixtures() {
@@ -81,7 +81,7 @@ private func playManifest(_ spec: ScenarioSpec) async throws -> (initial: String
             let played = try await playManifest(spec)
             let core = try #require(played.core, "\(fixture.name)")
             switch fixture.name {
-            case "fixture-gradient", "fixture-noise-flow", "fixture-rings":
+            case "fixture-gradient", "fixture-noise-flow", "fixture-rings", "fixture-texture-mix":
                 let index = try #require(ShaderTemplates.all.firstIndex { "fixture-" + $0.id == fixture.name })
                 #expect(core.template == index && core.runs == 2)
                 #expect(core.values == StudioCore.defaultValues(template: index))

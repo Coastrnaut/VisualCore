@@ -1,7 +1,8 @@
 // StudioManifest — feature 160 (A22-P02) T-A22-209 (FR-A22-207). The scenarios the verification runner plays for
 // Shader Studio, all short (owner rule of 2026-11-13):
 //   - the nine standard scenarios, prepared with seed 1 (nothing depends on the seed);
-//   - five fixtures: one per template (`fixture-gradient`, `fixture-noise-flow`, `fixture-rings`, each
+//   - the fixtures: one per template (`fixture-gradient`, `fixture-noise-flow`, `fixture-rings` and, from feature 161,
+//     `fixture-texture-mix`, each
 //     `template.select [i]` then `shader.run [1]`, outcome `template-<id>`) and a broken run that keeps the preview
 //     (`fixture-broken-run-keeps-preview`: a run of the opening template, a refused uniform index past its uniform
 //     count, a refused fractional template, then a uniform change; the outcome stays `template-gradient`). The core
@@ -11,7 +12,7 @@
 //     the experience tests' `RebuildTests` and `RunQueueTests`).
 // Input-response and reset pick Rings, move both its uniforms and run; completion picks Noise flow and expects
 // `template-noise-flow`; rejection refuses values out of range, fractional and missing uniform indices and wrong value
-// counts. The expected digests are derived by playing the entries on a core exactly as the engine plays them (the steps
+// counts (a template index one past the last is out of range). The expected digests are derived by playing the entries on a core exactly as the engine plays them (the steps
 // of an entry, then its action) and digesting it with the experience id as domain, as Aurora's manifest does.
 #if DEBUG || VISUALCORE_AUTOMATION
 import ShaderStudioCore
@@ -68,7 +69,8 @@ extension StudioCore {
         let outOfRange = "action.out-of-range"
         let count = "action.wrong-value-count"
         return [
-            ScenarioStep(steps: 0, action: ScriptedAction("template.select", [3]), result: outOfRange),
+            ScenarioStep(steps: 0, action: ScriptedAction("template.select", [Double(ShaderTemplates.all.count)]),
+                         result: outOfRange),
             ScenarioStep(steps: 0, action: ScriptedAction("template.select", [-1]), result: outOfRange),
             ScenarioStep(steps: 0, action: ScriptedAction("template.select", [1.5]), result: notWhole),
             ScenarioStep(steps: 0, action: ScriptedAction("uniform.set", [16, 0.5]), result: outOfRange),

@@ -5,7 +5,7 @@
 //
 // Actions (the engine refuses a value outside the declared range, a non-finite value and a wrong value count before
 // the core sees it; called directly, the core refuses them itself with the same reasons):
-//   template.select [0…2]       the template at that index of `ShaderTemplates.all`, a whole number (`a22.not-whole`);
+//   template.select [0…3]       the template at that index of `ShaderTemplates.all`, a whole number (`a22.not-whole`);
 //                               the values become the template's defaults, normalized, and the run count grows by 1;
 //   uniform.set [0…15, 0…1]     the uniform index, a whole number (`a22.not-whole`) below the template's uniform
 //                               count (`a22.no-uniform`), and its normalized value;

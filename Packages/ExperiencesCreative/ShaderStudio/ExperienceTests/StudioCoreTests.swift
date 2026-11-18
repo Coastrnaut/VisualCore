@@ -18,7 +18,7 @@ import VisualCoreExperienceHost
         #expect(ShaderStudioExperience.id?.rawValue == "a22.shader-studio")
         #expect(StudioCore.controls.map(\.id) == StudioCore.actionIDs)
         let ranges = Dictionary(uniqueKeysWithValues: StudioCore.controls.map { ($0.id, $0.ranges) })
-        #expect(ranges["template.select"] == [0...2])
+        #expect(ranges["template.select"] == [0...3])
         #expect(ranges["uniform.set"] == [0...15, 0...1])
         #expect(ranges["shader.run"] == [1...1])
         #expect(StudioCore.qualityTiers == 1 && StudioCore.qualityProfile.names == ["level-0"])
@@ -69,7 +69,7 @@ import VisualCoreExperienceHost
             #expect(result.code == item.code, "\(item.values)")
             #expect(next == item.core, "\(item.values) changes nothing")
         }
-        for values: [Double] in [[3], [-1], [1.5]] {
+        for values: [Double] in [[Double(ShaderTemplates.all.count)], [-1], [1.5]] {
             let (next, result) = studioApplied(StudioCore(), "template.select", values)
             #expect(!result.isAccepted && next == StudioCore(), "\(values)")
         }
@@ -114,7 +114,7 @@ import VisualCoreExperienceHost
             ("not json", .damaged),
             (#"{"runs":0,"template":0}"#, .damaged),
             (#"{"runs":0,"template":"a","values":[\#(zeros)]}"#, .damaged),
-            (#"{"runs":0,"template":3,"values":[\#(zeros)]}"#, .outOfRange("template")),
+            (#"{"runs":0,"template":4,"values":[\#(zeros)]}"#, .outOfRange("template")),
             (#"{"runs":0,"template":0,"values":[0]}"#, .outOfRange("values")),
             (#"{"runs":0,"template":0,"values":[2,\#(Array(repeating: "0", count: 15).joined(separator: ","))]}"#,
              .outOfRange("values")),

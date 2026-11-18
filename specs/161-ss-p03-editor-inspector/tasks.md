@@ -22,7 +22,7 @@
   0.40) to (0.95, 0.55, 0.20)"; `noise` "value noise of an integer hash over an 8 × 8 lattice") and add the template
   `texture-mix` to `Core/ShaderTemplates.swift` (inputs `u_texture0`, `u_texture1`; uniform `u_blend` 0…1, default
   0.5); `///` on every declaration (FR-A22-304)
-- [ ] T-A22-303 [P] Write `CoreTests/TextureRecipeTests.swift` (sizes, ranges, determinism, the three recipes
+- [X] T-A22-303 [P] Write `CoreTests/TextureRecipeTests.swift` (sizes, ranges, determinism, the three recipes — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A22-P03.ss-core-editor.json exit 0 (ShaderStudioCoreTests 59, ShaderStudioExperienceTests 43 on sim-27.2)
   differ) and update `CoreTests/TemplateCompileTests.swift` (four templates; active sampler uniforms equal the declared
   texture inputs and float uniforms equal the declared uniforms; `texture-mix` validates and compiles) (SC-A22-304)
 
