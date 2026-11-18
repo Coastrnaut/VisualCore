@@ -1,0 +1,165 @@
+# Feature Specification: Shader Studio — Phase 05 Stress-test shader failures and device recovery
+
+**Feature Branch**: `163-ss-p05-stress-recovery` (spec directory only; work stays on `main`)
+
+**Created**: 2026-11-18
+
+**Status**: Draft
+
+**Ledger gate**: A22-P05 (legacy ledger) · ID namespace FR-A22-5##, SC-A22-5##, T-A22-5##
+
+**Input**: User description: archived manual `apps/22-shader-studio.md` §9 Phase 05 `/speckit-specify` prompt
+(verbatim in the invocation).
+
+Canonical overrides:
+- **Phase gates (manual §9 Phase 05):**
+  - MVP: local project save and open with versioned shader files. It was built in A22-P04 (`ProjectLibrary`) and is
+    proved again here across a relaunch;
+  - regression fixture: repeated compile and run cycles do not leak shader or program objects;
+  - graphics context ownership stays solely in the audited VisualCore host.
+- **Gap built here:** G-DEVICE of `docs/apps/shader-studio/visualcore-contract.json`: a device-campaign plan whose
+  rows stay pending until the campaign after `ImplementationLock-100` (CLAUDE.md rule 5).
+- **A22-P04 deferral:** the core's uniform and texture bounds follow the live project, not the selected template, so
+  an opened or edited project with its own uniforms keeps every value.
+- **Still a candidate.** No VisualCore or ProjectM change. Follow `specs/156-au-p05-sound-device` (device plan) and
+  `specs/162-ss-p04-limits-error-ux`.
+
+## User Scenarios & Testing *(mandatory)*
+
+### User Story 1 - Many runs, no build-up (Priority: P1) 🎯
+
+A person spends an evening iterating: hundreds of edits, failed runs, successful runs, template changes and slow
+shaders that get stopped. The studio uses the same graphics resources at the end as after the first few runs.
+
+**Why this priority**: it is the manual's regression fixture for this phase; a leak would end in a crash on a device.
+
+**Independent Test**: run a fixed cycle of failing, refused, succeeding and stopped shaders many times and compare the
+live graphics objects and bytes after the warm-up with those at the end.
+
+**Acceptance Scenarios**:
+
+1. **Given** 50 cycles of a successful run of a new source, a failing run and a refused run, **Then** the live
+   programs, textures and bytes after the last cycle equal those after the first cycle.
+2. **Given** 20 template changes across all four templates (with textures), **Then** the same holds.
+3. **Given** a slow shader stopped and reset 10 times, **Then** the same holds.
+
+---
+
+### User Story 2 - Recovery after the system takes the graphics away (Priority: P1)
+
+The system takes the graphics context away (memory pressure, the app moving to the background, a display change). When
+Shader Studio comes back, the person's shader, its values, its textures and the stopped or running state are as
+before, and nothing is left behind.
+
+**Why this priority**: device recovery is the phase's title; a lost context is ordinary on iOS.
+
+**Independent Test**: rebuild the context 10 times at each state (running, failed, stopped, textured) and compare the
+picture and the live resources.
+
+**Acceptance Scenarios**:
+
+1. **Given** each state, **When** the context is rebuilt, **Then** the picture is the same as before and the live
+   resources return to the same count.
+2. **Given** 10 rebuilds in a row, **Then** nothing accumulates.
+
+---
+
+### User Story 3 - My project is still there tomorrow (Priority: P1)
+
+A person saves a project, closes the app, and opens it again later. The project is in the library and opens with its
+source, values and textures, including uniforms the starter template did not have.
+
+**Why this priority**: the phase's MVP; A22-P04 left values past the template's uniforms at their defaults.
+
+**Independent Test**: save, relaunch the app without resetting data, open, and compare.
+
+**Acceptance Scenarios**:
+
+1. **Given** a saved project, **When** the app is relaunched, **Then** it is listed and opens with the same source.
+2. **Given** a project with more uniforms or texture inputs than the selected template, **When** it is opened or
+   edited, **Then** every value and texture choice is kept and can be changed in the inspector.
+
+---
+
+### User Story 4 - A plan for the devices (Priority: P2)
+
+The owner has a device plan that lists, per device, what to measure once implementation is locked: a slow template
+stopped by the watchdog, a compile error on the right line, a hardware-keyboard run, the library across a relaunch, and
+the compatibility profile.
+
+**Why this priority**: G-DEVICE; simulator results are never device evidence.
+
+**Independent Test**: the plan's rows exist per device with their steps and stay pending.
+
+**Acceptance Scenarios**:
+
+1. **Given** the plan, **Then** each of D1, D2 and D3 has rows SS-D1 to SS-D6 with steps and expected results, all
+   pending.
+
+### Edge Cases
+
+- **A cycle that ends while a compile is queued:** the queued request is dropped by a teardown and never leaks.
+- **A context rebuild during a stopped preview:** it stays stopped (A22-P04) and the flat frame is rebuilt.
+- **A context rebuild with a library sheet open:** the sheet is unaffected; the picture comes back behind it.
+- **A project whose uniforms change on a later edit:** the values of the uniforms still present are kept by name order;
+  the ones removed are dropped; new ones take their defaults.
+- **A snapshot from A22-P04:** it restores; its bounds are taken from the restored document's project.
+- **Memory warnings:** handled by the host's context rebuild; Shader Studio holds no other cache.
+
+## Requirements *(mandatory)*
+
+### Functional Requirements
+
+- **FR-A22-501**: Repeated cycles of successful, failing, refused and stopped runs and of template changes MUST leave
+  the live graphics programs, textures and bytes equal to their level after the first cycle.
+- **FR-A22-502**: A context rebuild in every state (running, failed, refused, stopped, textured) MUST restore the same
+  picture and the same live resource counts; repeated rebuilds MUST NOT accumulate resources.
+- **FR-A22-503**: The core's bounds for `uniform.set` and `texture.set` MUST follow the live project's uniform and
+  texture-input counts, so that a project with its own uniforms keeps and changes every value.
+- **FR-A22-504**: Saved projects MUST survive a relaunch of the app and open with their source, values and textures.
+- **FR-A22-505**: A device-campaign plan MUST list, for D1, D2 and D3, the rows SS-D1 to SS-D6 with steps and expected
+  results, every row pending until the campaign after `ImplementationLock-100`.
+- **FR-A22-506**: Interface tests MUST cover a project surviving a relaunch, in the one app on the iOS 27 phone.
+
+### Key Entities
+
+- **Stress cycle**: a fixed sequence of actions (sources, runs, template changes, stops and resets), repeated a declared
+  number of times.
+- **Resource level**: the live programs, textures and bytes of the host's resource registry.
+- **Project shape**: the live project's uniform count and texture-input count, which bound the core's actions.
+- **Device row**: a device, an identifier, steps, the expected result and its state (pending).
+
+## Success Criteria *(mandatory)*
+
+### Measurable Outcomes
+
+- **SC-A22-501**: After 50 mixed cycles, 20 template changes and 10 stop-and-reset cycles, the resource level equals the
+  level after the first cycle in 100% of runs.
+- **SC-A22-502**: 10 context rebuilds in each of 5 states give byte-identical pictures and an unchanged resource level.
+- **SC-A22-503**: A project with uniforms beyond its template opens with 100% of its values; a relaunch keeps 100% of
+  saved projects.
+- **SC-A22-504**: The device plan has 18 pending rows (6 per device); the interface tests each finish in under 60
+  seconds and unit tests in under 10 seconds.
+
+## Assumptions
+
+- The A22-P02 pipeline, the A22-P03 textures and the A22-P04 watchdog and library are reused.
+- The host's `recreateContext` stands for a lost context in tests; real driver behaviour is measured on devices.
+- Cycle counts are short (bounded by arithmetic, not soak runs).
+
+## Traceability
+
+| Source | Requirement |
+|---|---|
+| MVP: local project save/open and versioned shader files (A22-P04, proved across a relaunch) | FR-A22-504, 506 |
+| Regression fixture: compile/run repeated cycles do not leak shader/program objects | FR-A22-501, SC-A22-501 |
+| A22-P04 deferral: bounds follow the live project | FR-A22-503 |
+| Risk 1 (driver behaviour), device verification | FR-A22-502, 505 |
+| Contract G-DEVICE | FR-A22-505 |
+
+## Negative Requirements
+
+- No VisualCore or ProjectM change; no GL call outside VisualCore's scenes; no compile from a control's action.
+- No device install, launch or test before `ImplementationLock-100`; simulator results are never device evidence.
+- No soak or long-duration run; no sandbox claim.
+- Not available before X-A22.
