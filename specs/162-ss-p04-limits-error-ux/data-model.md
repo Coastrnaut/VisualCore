@@ -16,7 +16,8 @@
     - `record(_ interval:) -> State` ignores non-finite and non-positive intervals and skips one after `rearm()`;
     - `rearm()` is called at setup, resize, Run and Reset;
     - `reset()` returns to `watching`.
-  - It is stopped when 8 consecutive recorded intervals are each above 0.25 s.
+  - It is stopped when 8 consecutive recorded intervals are each above 0.25 s. While stopped, the preview clears to
+  the flat colour (0.05, 0.05, 0.07) and draws no shader.
 - **StudioCore** (schema 1): adds `resets` (optional in the payload, default 0) and the action `preview.reset [1…1]`.
   The digest covers `resets`.
 - **Saved project** `project-<n>.json`:

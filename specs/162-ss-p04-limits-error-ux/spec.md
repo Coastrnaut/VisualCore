@@ -165,6 +165,12 @@ message; damaged and newer files are refused and still present afterwards.
 - **Opening a project whose source is now refused:** it opens in the editor with its refusal and guidance; the
   preview keeps the last good shader.
 - **A full storage quota:** the save is refused with a message and the previous file is unchanged.
+- **A pause in drawing** (the app in the background, a sheet over the preview): it gives one long interval, which
+  counts once; a stop still needs 8 consecutive slow intervals.
+- **Opening a project over unsaved edits:** the open replaces the editor's document without asking; the person saves
+  first if they want to keep it (the library view says so in its hint).
+- **A context loss while stopped:** the preview stays stopped; the fallback is rebuilt from its source.
+- **An unreadable file:** it can be removed by the person, but not opened or renamed.
 - **Large text size and a hardware keyboard:** the library, the guidance and the Reset action stay usable.
 
 ## Requirements *(mandatory)*
