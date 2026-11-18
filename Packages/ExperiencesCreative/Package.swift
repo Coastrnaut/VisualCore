@@ -45,6 +45,7 @@ let package = Package(
         .library(name: "LivingWallpapersExperience", targets: ["LivingWallpapersExperience"]),
         .library(name: "DigitalZenGardenExperience", targets: ["DigitalZenGardenExperience"]),
         .library(name: "AuroraExperience", targets: ["AuroraExperience"]),
+        .library(name: "ShaderStudioExperience", targets: ["ShaderStudioExperience"]),
         // The standalone ParticleUniverse app target compiles the moved sources and needs the Core until X-A04.
         .library(name: "ParticleUniverseCore", targets: ["ParticleUniverseCore"]),
     ],
@@ -684,6 +685,29 @@ let package = Package(
                                    .product(name: "VisualCoreParameters", package: visualCore),
                                    .product(name: "VisualCoreRendering", package: rendering)],
                     path: "ShaderStudio/CoreTests"),
+        // A22 Shader Studio experience (feature 160, A22-P02): a candidate until X-A22. The presenter compiles a person's
+        // shader through VisualCore at its next frame and draws it in VisualCore's full-screen scene; no GL call of its
+        // own.
+        .target(name: "ShaderStudioExperience",
+                dependencies: ["ShaderStudioCore",
+                               .product(name: "VisualCoreShaderSource", package: visualCore),
+                               .product(name: "VisualCoreParameters", package: visualCore),
+                               .product(name: "VisualCoreExperience", package: visualCore),
+                               .product(name: "VisualCorePersistence", package: visualCore),
+                               .product(name: "VisualCoreRendering", package: rendering),
+                               .product(name: "VisualCoreExperienceHost", package: rendering),
+                               .product(name: "VisualCoreUI", package: rendering)],
+                path: "ShaderStudio/Experience"),
+        .testTarget(name: "ShaderStudioExperienceTests",
+                    dependencies: ["ShaderStudioExperience", "ShaderStudioCore",
+                                   .product(name: "VisualCoreShaderSource", package: visualCore),
+                                   .product(name: "VisualCoreParameters", package: visualCore),
+                                   .product(name: "VisualCoreExperience", package: visualCore),
+                                   .product(name: "VisualCorePersistence", package: visualCore),
+                                   .product(name: "VisualCoreRendering", package: rendering),
+                                   .product(name: "VisualCoreExperienceHost", package: rendering),
+                                   .product(name: "VisualCoreUI", package: rendering)],
+                    path: "ShaderStudio/ExperienceTests"),
         // A21 Aurora (feature 152, A21-P01): a pending core until A21-P02 adds the experience. The core is pure (the
         // sky scene, presets, clock, noise port, reference and shader text); its tests draw the shader off screen.
         .target(name: "AuroraCore",

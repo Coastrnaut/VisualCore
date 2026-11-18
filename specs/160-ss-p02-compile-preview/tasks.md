@@ -13,7 +13,7 @@
 
 - [X] T-A22-201 Baseline: cite the A22-P01 evidence (`.autonomy/checks/A22-P01.{ss-core-ios27-2,app-build,experience-packages}.json`) — Verified 2026-11-17: 2026-11-17: A22-P01 evidence cited: .autonomy/checks/A22-P01.ss-core-ios27-2.json, A22-P01.app-build.json and A22-P01.experience-packages.json, all exit 0; no Packages change since the A22-P01 record commit 5133f65e
   on the tree recorded at A22-P01 (`5133f65e`), whose Packages are unchanged since (owner ruling of 2026-11-14)
-- [ ] T-A22-202 Add the targets `ShaderStudioExperience` (path `ShaderStudio/Experience`) and
+- [X] T-A22-202 Add the targets `ShaderStudioExperience` (path `ShaderStudio/Experience`) and — Verified 2026-11-18: 2026-11-18: ShaderStudioExperience and ShaderStudioExperienceTests targets and the ShaderStudioExperience product in Packages/ExperiencesCreative/Package.swift (VisualCorePersistence added for MigrationChain); .autonomy/checks/A22-P02.ss-ios27.json exit 0
   `ShaderStudioExperienceTests` (path `ShaderStudio/ExperienceTests`), with the products of plan.md and the
   `ShaderStudioExperience` library product, to `Packages/ExperiencesCreative/Package.swift` (lead)
 
