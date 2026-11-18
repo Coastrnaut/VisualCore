@@ -7,7 +7,11 @@
 //
 //   - `template` segmented picker (the titles of `ShaderTemplates.all` → `template.select [i]`);
 //   - `run` button ("Run" → `shader.run [1]`; ⌘R on a hardware keyboard);
-//   - `status`: the status line ("Waiting", "Compiled", "Failed: N errors", "Refused: <first issue>");
+//   - `status`: the status line ("Waiting", "Compiled", "Failed: N errors", "Refused: <first issue>", "Stopped: frames
+//     took longer than 0.25 s");
+//   - `guidance` (feature 162): the sentence under the status saying what to change (the core's `Guidance`), shown
+//     when there is one; its spoken label is the sentence;
+//   - `preview-reset` (feature 162): a button shown while the watchdog has stopped the preview (`preview.reset [1]`);
 //   - ``StudioEditor``: `editor`, `gutter` (`gutter-line-<n>`), `next-diagnostic` (⌘') and `diagnostics`
 //     (`diagnostic-<k>`, "Line N: message", anything outside the person's source first, as "<file>: message", or
 //     "Shader: message" without a file);
@@ -80,6 +84,13 @@ struct StudioControls: View {
                                            value: row.recipe.title))
         }
         list.append(StudioControlLabel(name: "status", title: "Status", value: mirror.status))
+        if !mirror.guidance.isEmpty {
+            list.append(StudioControlLabel(name: "guidance", title: mirror.guidance, value: ""))
+        }
+        if mirror.stopped {
+            list.append(StudioControlLabel(name: "preview-reset", title: "Reset preview",
+                                           value: "Goes back to the last shader that ran well"))
+        }
         let lines = diagnosticLines(mirror)
         list.append(StudioControlLabel(name: "diagnostics", title: "Diagnostics",
                                        value: lines.isEmpty ? "None" : lines.joined(separator: ". ")))
@@ -119,6 +130,23 @@ struct StudioControls: View {
                 .font(.footnote)
                 .spoken(spoken["status"])
                 .accessibilityIdentifier(port.identifier("status"))
+            if !mirror.guidance.isEmpty {
+                Text(verbatim: mirror.guidance)
+                    .font(.footnote)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityLabel(Text(verbatim: mirror.guidance))
+                    .accessibilityIdentifier(port.identifier("guidance"))
+            }
+            if mirror.stopped {
+                Button {
+                    port.send("preview.reset", [1])
+                } label: {
+                    Text(verbatim: "Reset preview").frame(minHeight: 44)
+                }
+                .accessibilityLabel(Text(verbatim: "Reset preview"))
+                .accessibilityHint(Text(verbatim: "Goes back to the last shader that ran well; nothing is compiled"))
+                .accessibilityIdentifier(port.identifier("preview-reset"))
+            }
             switch StudioEditorLayout.arrangement(horizontalSizeClass: horizontalSizeClass,
                                                   dynamicTypeSize: dynamicTypeSize) {
             case .sideBySide:

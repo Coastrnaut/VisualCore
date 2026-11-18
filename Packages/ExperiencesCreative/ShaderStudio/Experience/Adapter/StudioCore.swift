@@ -1,6 +1,6 @@
 // StudioCore — feature 160 (A22-P02) T-A22-203 (FR-A22-201, FR-A22-205; clarification Q1; data-model.md
 // "StudioCore"); feature 161 (A22-P03) T-A22-308 (FR-A22-304, FR-A22-305; clarifications Q4, Q5; data-model.md)
-// added the texture choices. The state of Shader Studio as an experience: the selected template, the normalized
+// added the texture choices; feature 162 (A22-P04) T-A22-406 (FR-A22-404; clarification Q3) the reset count. The state of Shader Studio as an experience: the selected template, the normalized
 // uniform values, the texture choices and the run count. The edited source is not state: it is the presenter's document (`StudioPresenter`), set from the
 // template or through `setSource(_:)`. The core never draws, never compiles and reads no clock.
 //
@@ -14,13 +14,16 @@
 //                               both whole numbers (`a22.not-whole`); the input index must be below the selected
 //                               template's texture-input count (`a22.no-texture`). The choices are kept across a
 //                               template change (a template without texture inputs simply does not use them);
-//   shader.run [1…1]            the run count grows by 1 (a request to compile the presenter's document).
+//   shader.run [1…1]            the run count grows by 1 (a request to compile the presenter's document);
+//   preview.reset [1…1]         the reset count grows by 1 (feature 162: the presenter swaps its fallback back at the
+//                               next draw, or queues the template's starter; nothing compiles from the control).
 // A refused action changes nothing.
 //
-// Digest ("a22.shader-studio.v1"): the template, then the 16 values, then the 2 texture choices (from feature 161).
-// The run count is in the snapshot, not in the digest. Snapshot schema 1: the JSON object
-// `{"runs", "template", "textures", "values"}` with sorted keys; `textures` is optional on restore, and a payload
-// without it (written by A22-P02) restores with the default choices `[0, 1]`. Restoring a damaged payload throws
+// Digest ("a22.shader-studio.v1"): the template, then the 16 values, then the 2 texture choices (from feature 161),
+// then the reset count (from feature 162). The run count is in the snapshot, not in the digest. Snapshot schema 1:
+// the JSON object `{"resets", "runs", "template", "textures", "values"}` with sorted keys; `textures` and `resets` are
+// optional on restore: a payload without `textures` (A22-P02) restores with the default choices `[0, 1]`, one without
+// `resets` (A22-P03) with 0. Restoring a damaged payload throws
 // `StudioRestoreRefusal.damaged`, and a template, value, texture choice or run count out of range `.outOfRange(_:)`.
 // Outcome `template-<id>`, for example `template-gradient`. Quality: one tier, `level-0`.
 import Foundation
@@ -44,7 +47,7 @@ public enum StudioRestoreRefusal: Error, Equatable, Sendable {
     /// The payload is not the JSON object `{"runs", "template", "values"}` (with an optional `textures`) or a field
     /// has the wrong type.
     case damaged
-    /// A field is outside its range; the value names it (`template`, `values`, `textures` or `runs`).
+    /// A field is outside its range; the value names it (`template`, `values`, `textures`, `runs` or `resets`).
     case outOfRange(String)
 }
 
@@ -57,7 +60,7 @@ public struct StudioCore: ExperienceCore, Equatable {
     /// The digest's domain string (schema 1).
     public static let digestDomain = "a22.shader-studio.v1"
     /// The action ids in declaration order.
-    public static let actionIDs = ["template.select", "uniform.set", "texture.set", "shader.run"]
+    public static let actionIDs = ["template.select", "uniform.set", "texture.set", "shader.run", "preview.reset"]
     /// The number of uniform values held (``ShaderLimits/standard`` `maxUniforms`, 16).
     public static let valueCount = ShaderLimits.standard.maxUniforms
     /// The accepted normalized value of a uniform.
@@ -79,6 +82,8 @@ public struct StudioCore: ExperienceCore, Equatable {
     public private(set) var textures: [Int]
     /// How many runs were requested (in the snapshot, not in the digest).
     public private(set) var runs: Int
+    /// How many preview resets were requested (feature 162; in the snapshot and the digest).
+    public private(set) var resets: Int
 
     /// The opening state: the first template with its default values, the default textures and no run.
     public init() {
@@ -86,11 +91,13 @@ public struct StudioCore: ExperienceCore, Equatable {
     }
 
     /// A state with the values as given (nothing is checked; ``restore(payload:seed:)`` checks).
-    public init(template: Int, values: [Double], textures: [Int] = StudioCore.defaultTextures, runs: Int) {
+    public init(template: Int, values: [Double], textures: [Int] = StudioCore.defaultTextures, runs: Int,
+                resets: Int = 0) {
         self.template = template
         self.values = values
         self.textures = textures
         self.runs = runs
+        self.resets = resets
     }
 
     /// The selected template; the first when the index is unknown.
@@ -136,9 +143,10 @@ public struct StudioCore: ExperienceCore, Equatable {
         ExperienceControl(id: "uniform.set", ranges: [0...Double(valueCount - 1), valueRange]),
         ExperienceControl(id: "texture.set", ranges: [0...Double(textureCount - 1), recipeRange]),
         ExperienceControl(id: "shader.run", ranges: [1...1]),
+        ExperienceControl(id: "preview.reset", ranges: [1...1]),
     ]
 
-    /// The four controls with their declared ranges (see the file header).
+    /// The five controls with their declared ranges (see the file header).
     public static var controls: [ExperienceControl] { declaredControls }
 
     /// The opening state; nothing depends on the seed and no clock is read.
@@ -177,6 +185,8 @@ public struct StudioCore: ExperienceCore, Equatable {
                 return .rejected(.rule(code: StudioRule.noTexture))
             }
             textures[input] = recipe
+        case "preview.reset":
+            resets += 1
         default:   // shader.run
             runs += 1
         }
@@ -200,7 +210,8 @@ public struct StudioCore: ExperienceCore, Equatable {
         return ExperienceOutcome(code: Self.templateCodePrefix + id)
     }
 
-    /// "a22.shader-studio.v1", then the template, the 16 values and the 2 texture choices (not the run count).
+    /// "a22.shader-studio.v1", then the template, the 16 values, the 2 texture choices and the reset count (not the
+    /// run count).
     public func writeDigest(into builder: inout DigestBuilder) throws(DigestError) {
         builder.add(Self.digestDomain)
         builder.add(template)
@@ -208,30 +219,33 @@ public struct StudioCore: ExperienceCore, Equatable {
         for value in values { try builder.add(value) }
         builder.add(textures.count)
         for texture in textures { builder.add(texture) }
+        builder.add(resets)
     }
 
     // MARK: Snapshot
 
     /// The payload's JSON form.
     private struct Payload: Codable {
+        var resets: Int?
         var runs: Int
         var template: Int
         var textures: [Int]?
         var values: [Double]
     }
 
-    /// The JSON object `{"runs", "template", "textures", "values"}` with sorted keys.
+    /// The JSON object `{"resets", "runs", "template", "textures", "values"}` with sorted keys.
     public func snapshotPayload() throws -> Data {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
-        return try encoder.encode(Payload(runs: runs, template: template, textures: textures, values: values))
+        return try encoder.encode(Payload(resets: resets, runs: runs, template: template, textures: textures,
+                                           values: values))
     }
 
     /// The core of `payload`; throws ``StudioRestoreRefusal/damaged`` for a payload that does not decode and
     /// ``StudioRestoreRefusal/outOfRange(_:)`` for a template outside `ShaderTemplates.all`, values that are not
     /// ``valueCount`` finite numbers in 0…1 (or non-zero past the template's uniform count), texture choices that
     /// are not ``textureCount`` recipe indices (a missing `textures` reads as ``defaultTextures``), or a negative run
-    /// count. The seed changes nothing.
+    /// or reset count (a missing `resets` reads as 0). The seed changes nothing.
     public static func restore(payload: Data, seed: UInt64) throws -> StudioCore {
         guard let decoded = try? JSONDecoder().decode(Payload.self, from: payload) else {
             throw StudioRestoreRefusal.damaged
@@ -250,6 +264,9 @@ public struct StudioCore: ExperienceCore, Equatable {
             throw StudioRestoreRefusal.outOfRange("textures")
         }
         guard decoded.runs >= 0 else { throw StudioRestoreRefusal.outOfRange("runs") }
-        return StudioCore(template: decoded.template, values: decoded.values, textures: textures, runs: decoded.runs)
+        let resets = decoded.resets ?? 0
+        guard resets >= 0 else { throw StudioRestoreRefusal.outOfRange("resets") }
+        return StudioCore(template: decoded.template, values: decoded.values, textures: textures, runs: decoded.runs,
+                          resets: resets)
     }
 }

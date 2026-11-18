@@ -13,7 +13,7 @@
 //     picked, noise on input 0 and checker on input 1, then a run, outcome `template-texture-mix`).
 // Input-response and reset pick Rings, move both its uniforms and run; completion picks Noise flow and expects
 // `template-noise-flow`; rejection refuses values out of range, fractional and missing uniform and texture indices
-// (Gradient has no texture input) and wrong value
+// (Gradient has no texture input), a preview reset other than 1 (feature 162) and wrong value
 // counts (a template index one past the last is out of range). The expected digests are derived by playing the entries on a core exactly as the engine plays them (the steps
 // of an entry, then its action) and digesting it with the experience id as domain, as Aurora's manifest does.
 #if DEBUG || VISUALCORE_AUTOMATION
@@ -89,6 +89,8 @@ extension StudioCore {
             ScenarioStep(steps: 0, action: ScriptedAction("texture.set", [2, 0]), result: outOfRange),
             ScenarioStep(steps: 0, action: ScriptedAction("texture.set", [0, 3]), result: outOfRange),
             ScenarioStep(steps: 0, action: ScriptedAction("shader.run", [0]), result: outOfRange),
+            ScenarioStep(steps: 0, action: ScriptedAction("preview.reset", [0]), result: outOfRange),
+            ScenarioStep(steps: 0, action: ScriptedAction("preview.reset", []), result: count),
             ScenarioStep(steps: 0, action: ScriptedAction("shader.run", []), result: count),
             ScenarioStep(steps: 0, action: ScriptedAction("uniform.set", [0]), result: count),
         ]

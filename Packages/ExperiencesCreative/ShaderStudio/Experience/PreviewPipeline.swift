@@ -23,6 +23,17 @@
 // a project without texture inputs is drawn by a `FullScreenShaderScene` exactly as in A22-P02. Both share the probe's
 // cached program by the same rule.
 //
+// Feature 162 (A22-P04) T-A22-406 (FR-A22-403, FR-A22-404; clarifications Q2, Q3; research R4): the watchdog's
+// fallback and stopped frame.
+//
+//   - Fallback: when a run swaps the live scene, the previous live scene is kept built as the fallback (the older
+//     fallback is torn down), unless the watchdog had stopped it. A run whose files are the fallback's swaps the two
+//     back without a new scene (the probe is the fallback's own cached program). `restoreFallback` (Reset) makes the
+//     fallback live again and tears the stopped live scene down; nothing compiles. `setup` rebuilds the fallback from
+//     its project after a context loss (a fallback that does not build is dropped) and `teardown` tears it down.
+//   - Stopped frame: while the presenter says the preview is stopped, `drawFrame` draws ``stoppedScene``, a
+//     `FullScreenShaderScene` of the flat colour ``stoppedColor``, built in `setup`, instead of the live scene.
+//
 // No GL call: everything is drawn by VisualCore's `FullScreenShaderScene` and `FieldPass`.
 import Foundation
 import ShaderStudioCore
@@ -84,6 +95,20 @@ final class PreviewPipeline {
     private(set) var status: PreviewStatus = .waiting
     /// How many times `setup` built the live scene.
     private(set) var setupCount = 0
+    /// The previous live scene the watchdog had not stopped, kept built for Reset; nil when there is none.
+    private(set) var fallback: (any PreviewScene)?
+    /// The project ``fallback`` draws; kept across a context loss so the fallback is rebuilt.
+    private(set) var fallbackProject: ShaderProject?
+    /// The flat frame drawn while the preview is stopped; nil while not set up.
+    private(set) var stoppedScene: FullScreenShaderScene?
+    /// The colour of the stopped frame (linear RGB, as written by the fragment).
+    static let stoppedColor: SIMD3<Float> = SIMD3(0.05, 0.05, 0.07)
+    /// The fragment of the stopped frame.
+    static let stoppedFragment = """
+    precision mediump float;
+    out vec4 fragColor;
+    void main() { fragColor = vec4(0.05, 0.05, 0.07, 1.0); }
+    """
 
     /// A pipeline whose first live scene draws `initial`.
     init(initial: ShaderProject) {
@@ -114,6 +139,20 @@ final class PreviewPipeline {
         try scene.setup(context)
         live = scene
         setupCount += 1
+        let stopped = FullScreenShaderScene(fragment: Self.stoppedFragment, fragmentName: "ss/stopped.frag",
+                                            bundle: ShaderBundle(files: [:]))
+        try stopped.setup(context)
+        stoppedScene = stopped
+        if let project = fallbackProject {
+            let kept = Self.scene(for: project)
+            if (try? kept.setup(context)) != nil, kept.errorMessage == nil {
+                fallback = kept
+            } else {
+                kept.teardown(context)
+                fallback = nil
+                fallbackProject = nil
+            }
+        }
         if let message = scene.errorMessage {
             status = .failed([MappedDiagnostic(file: "unknown", line: nil, severity: .error, stage: .fragment,
                                                message: message)])
@@ -130,11 +169,18 @@ final class PreviewPipeline {
     /// Compiles the pending request (at most one per frame, see the file header), then draws the live scene with
     /// `parameters` (keyed by the uniform name without its `u_` prefix) and, for a textured scene, the recipe
     /// `textures[k]` on texture input `k`.
+    /// `liveWasStopped` says the watchdog had stopped the live scene, so a swap does not keep it as the fallback;
+    /// `stopped` draws the flat stopped frame instead of the live scene.
     func drawFrame(_ context: RenderContext, frame: FrameInfo, textures: [Int] = StudioCore.defaultTextures,
+                   liveWasStopped: Bool = false, stopped: Bool = false,
                    parameters: (ShaderProject) -> [String: Double]) throws {
         if let request = pending {
             pending = nil
-            process(request, context: context)
+            process(request, context: context, liveWasStopped: liveWasStopped)
+        }
+        if stopped {
+            try stoppedScene?.render(context, frame: frame)
+            return
         }
         guard let live else { return }
         live.parameters = parameters(liveProject)
@@ -143,7 +189,7 @@ final class PreviewPipeline {
     }
 
     /// Validates and compiles `request`; swaps the live scene only on success.
-    private func process(_ request: ShaderProject, context: RenderContext) {
+    private func process(_ request: ShaderProject, context: RenderContext, liveWasStopped: Bool) {
         let issues = ShaderValidator.validate(request)
         guard issues.isEmpty else {
             status = .refused(issues)
@@ -174,6 +220,16 @@ final class PreviewPipeline {
             status = .compiled([])
             return
         }
+        if let kept = fallback, let keptProject = fallbackProject, assembly == ShaderAssembly(project: keptProject) {
+            // The fallback's files: the probe is the fallback's own cached program; the two scenes change places.
+            fallback = nil
+            fallbackProject = nil
+            retire(context, keep: !liveWasStopped)
+            live = kept
+            liveProject = request
+            status = .compiled([])
+            return
+        }
         let compilesBefore = context.resources.compileCount
         let scene = Self.scene(for: request)
         do {
@@ -194,10 +250,41 @@ final class PreviewPipeline {
                                                message: message)])
             return
         }
-        live?.teardown(context)
+        if !liveWasStopped {
+            fallback?.teardown(context)
+            fallback = nil
+            fallbackProject = nil
+        }
+        retire(context, keep: !liveWasStopped)
         live = scene
         liveProject = request
         status = .compiled([])
+    }
+
+    /// Moves the live scene into the fallback slot (with `keep`; the caller has emptied the slot) or tears it down
+    /// (a live scene the watchdog stopped is never a fallback; the older fallback then stays).
+    private func retire(_ context: RenderContext, keep: Bool) {
+        if keep, let current = live {
+            fallback = current
+            fallbackProject = liveProject
+        } else {
+            live?.teardown(context)
+        }
+        live = nil
+    }
+
+    /// Reset (feature 162): makes the fallback live again and tears the current live scene down, with no compile.
+    /// Returns false, changing nothing, when there is no fallback.
+    @discardableResult
+    func restoreFallback(_ context: RenderContext) -> Bool {
+        guard let kept = fallback, let keptProject = fallbackProject else { return false }
+        live?.teardown(context)
+        live = kept
+        liveProject = keptProject
+        fallback = nil
+        fallbackProject = nil
+        status = .compiled([])
+        return true
     }
 
     /// Tears the scenes down and drops a pending request; the last good project stays for the next `setup`.
@@ -205,5 +292,9 @@ final class PreviewPipeline {
         pending = nil
         live?.teardown(context)
         live = nil
+        fallback?.teardown(context)
+        fallback = nil
+        stoppedScene?.teardown(context)
+        stoppedScene = nil
     }
 }

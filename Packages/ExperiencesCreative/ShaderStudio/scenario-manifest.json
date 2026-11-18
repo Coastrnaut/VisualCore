@@ -3,7 +3,8 @@
     "template.select",
     "uniform.set",
     "texture.set",
-    "shader.run"
+    "shader.run",
+    "preview.reset"
   ],
   "experience" : "a22.shader-studio",
   "kind" : "creative",
@@ -13,7 +14,7 @@
 
       ],
       "expect" : {
-        "initialDigest" : "625c630af3f5c4f5d9a92fb6ddb04343d6b7b9f55512ae673be382d4bdae8ed8"
+        "initialDigest" : "575edd8f207c908001a44314b4aed4bd5a7433bdc3a3c1ec6751b6b15cda472c"
       },
       "name" : "launch-first-frame",
       "seed" : "1"
@@ -64,8 +65,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "99ec624e8b9303e3ce712a7c9c9332132f3f35aaa6ac0875aaa2582dcf2ba62b",
-        "initialDigest" : "625c630af3f5c4f5d9a92fb6ddb04343d6b7b9f55512ae673be382d4bdae8ed8"
+        "finalDigest" : "11890701530156d17e9725e240a4c31b02e0c0c4a1d66a48db8d2db7514a860f",
+        "initialDigest" : "575edd8f207c908001a44314b4aed4bd5a7433bdc3a3c1ec6751b6b15cda472c"
       },
       "name" : "input-response",
       "seed" : "1"
@@ -221,6 +222,26 @@
         },
         {
           "action" : {
+            "control" : "preview.reset",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "preview.reset",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
             "control" : "shader.run",
             "values" : [
 
@@ -292,8 +313,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "99ec624e8b9303e3ce712a7c9c9332132f3f35aaa6ac0875aaa2582dcf2ba62b",
-        "initialDigest" : "625c630af3f5c4f5d9a92fb6ddb04343d6b7b9f55512ae673be382d4bdae8ed8"
+        "finalDigest" : "11890701530156d17e9725e240a4c31b02e0c0c4a1d66a48db8d2db7514a860f",
+        "initialDigest" : "575edd8f207c908001a44314b4aed4bd5a7433bdc3a3c1ec6751b6b15cda472c"
       },
       "name" : "save-restore",
       "seed" : "1"
@@ -344,7 +365,7 @@
         }
       ],
       "expect" : {
-        "initialDigest" : "625c630af3f5c4f5d9a92fb6ddb04343d6b7b9f55512ae673be382d4bdae8ed8",
+        "initialDigest" : "575edd8f207c908001a44314b4aed4bd5a7433bdc3a3c1ec6751b6b15cda472c",
         "resetDigest" : true
       },
       "name" : "reset",
@@ -405,8 +426,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "625c630af3f5c4f5d9a92fb6ddb04343d6b7b9f55512ae673be382d4bdae8ed8",
-        "initialDigest" : "625c630af3f5c4f5d9a92fb6ddb04343d6b7b9f55512ae673be382d4bdae8ed8",
+        "finalDigest" : "575edd8f207c908001a44314b4aed4bd5a7433bdc3a3c1ec6751b6b15cda472c",
+        "initialDigest" : "575edd8f207c908001a44314b4aed4bd5a7433bdc3a3c1ec6751b6b15cda472c",
         "outcome" : "template-gradient"
       },
       "name" : "fixture-gradient",
@@ -436,8 +457,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "46ed073110a419f8d4fd560d1d296ecae2e32d5e3d4afc4acafbe81be5cc509c",
-        "initialDigest" : "625c630af3f5c4f5d9a92fb6ddb04343d6b7b9f55512ae673be382d4bdae8ed8",
+        "finalDigest" : "87d6e007b185057be33ccf6a0ed1632fb9cd0e6f6d656f68bc461b7b0c9bfb20",
+        "initialDigest" : "575edd8f207c908001a44314b4aed4bd5a7433bdc3a3c1ec6751b6b15cda472c",
         "outcome" : "template-noise-flow"
       },
       "name" : "fixture-noise-flow",
@@ -467,8 +488,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "24cf0725192316ce733d799b4381ea05e41f9c215243f13c271e6d213f1ca315",
-        "initialDigest" : "625c630af3f5c4f5d9a92fb6ddb04343d6b7b9f55512ae673be382d4bdae8ed8",
+        "finalDigest" : "279a0e907fef6a316c91fc931182a506aa06e5d33dba92faac9a6c04f05de71c",
+        "initialDigest" : "575edd8f207c908001a44314b4aed4bd5a7433bdc3a3c1ec6751b6b15cda472c",
         "outcome" : "template-rings"
       },
       "name" : "fixture-rings",
@@ -498,8 +519,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "1d31e3957a30d8c7b1adb2a50e8add822d06cd3be485d7ca67df12ad6297b365",
-        "initialDigest" : "625c630af3f5c4f5d9a92fb6ddb04343d6b7b9f55512ae673be382d4bdae8ed8",
+        "finalDigest" : "108a460cc9b271f6f87235bf283be30f521c1904987f8b2958497824be6453c6",
+        "initialDigest" : "575edd8f207c908001a44314b4aed4bd5a7433bdc3a3c1ec6751b6b15cda472c",
         "outcome" : "template-texture-mix"
       },
       "name" : "fixture-texture-mix",
@@ -551,8 +572,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "d1c1e9c68cde019e52342f619cbfd28c82719c10532d86994c7addb4ca7f25a3",
-        "initialDigest" : "625c630af3f5c4f5d9a92fb6ddb04343d6b7b9f55512ae673be382d4bdae8ed8",
+        "finalDigest" : "9702829e2314cad5b4b655f659dd1586f06fe34922b694ecfeb3ee95f5b08b10",
+        "initialDigest" : "575edd8f207c908001a44314b4aed4bd5a7433bdc3a3c1ec6751b6b15cda472c",
         "outcome" : "template-gradient"
       },
       "name" : "fixture-broken-run-keeps-preview",
@@ -622,8 +643,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "625c630af3f5c4f5d9a92fb6ddb04343d6b7b9f55512ae673be382d4bdae8ed8",
-        "initialDigest" : "625c630af3f5c4f5d9a92fb6ddb04343d6b7b9f55512ae673be382d4bdae8ed8",
+        "finalDigest" : "575edd8f207c908001a44314b4aed4bd5a7433bdc3a3c1ec6751b6b15cda472c",
+        "initialDigest" : "575edd8f207c908001a44314b4aed4bd5a7433bdc3a3c1ec6751b6b15cda472c",
         "outcome" : "template-gradient"
       },
       "name" : "fixture-repeated-runs",
@@ -675,8 +696,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "f21fa4e56bd17c5b2c7bfc9e1450daff7bc9d5beaaebf3f82a86dcbe6e1323e1",
-        "initialDigest" : "625c630af3f5c4f5d9a92fb6ddb04343d6b7b9f55512ae673be382d4bdae8ed8",
+        "finalDigest" : "c3c4113e358bb8adb7b7e020edf68ee8eb247039ea7a34b56cbc9be948b7baba",
+        "initialDigest" : "575edd8f207c908001a44314b4aed4bd5a7433bdc3a3c1ec6751b6b15cda472c",
         "outcome" : "template-texture-mix"
       },
       "name" : "fixture-textures",

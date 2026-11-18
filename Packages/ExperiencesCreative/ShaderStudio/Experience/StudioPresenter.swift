@@ -23,7 +23,18 @@
 // `replaceDocument(_:)` is the oversized-project test seam; `setUniform`/`resetUniforms` send through the port with
 // the inspector's clamping. The controls get the editor's `setSource` through `makeControls`.
 //
-// No GL call: everything is drawn through VisualCore's `FullScreenShaderScene`.
+// Feature 162 (A22-P04) T-A22-404, T-A22-406 (FR-A22-401–404; clarifications Q1–Q3; contracts/limits.md):
+//
+//   - Guidance: the mirror's `guidance` is one sentence of the core's `Guidance` (``guidance(for:limits:)``): a
+//     refusal's first issue, a failure's first error message, the stop's advice, or nothing.
+//   - Watchdog: every draw feeds `frame.delta` to a `FrameWatchdog` (rearmed at setup and resize; reset by a Run or a
+//     `preview.reset`, which also rearm it). When it stops, the pipeline draws its flat dark frame instead of the live
+//     shader, the status is ``stoppedStatus`` and the controls show `preview-reset`. A context loss keeps it stopped.
+//   - Reset (`preview.reset`, applied at the next draw like a run): the pipeline swaps its fallback (the previous
+//     live scene the watchdog had not stopped) back without a compile, or, without one, the template's starter is
+//     submitted. The editor's document is kept. `feedWatchdog(_:)` is the tests' seam.
+//
+// No GL call: everything is drawn through VisualCore's `FullScreenShaderScene` and `FieldPass`.
 import Foundation
 import Observation
 import ShaderStudioCore
@@ -55,6 +66,10 @@ final class StudioMirror {
     var source: String = ShaderTemplates.all.first?.source ?? ""
     /// The editor model of ``source`` with ``diagnostics`` attached (its `markedLines` are the gutter's markers).
     var editor = EditorDocument(source: ShaderTemplates.all.first?.source ?? "")
+    /// The guidance sentence under the status (feature 162); empty when there is nothing to change.
+    var guidance = ""
+    /// Whether the watchdog stopped the preview (feature 162): the controls then show `preview-reset`.
+    var stopped = false
 }
 
 /// Draws Shader Studio and owns its presentation state (see the file header).
@@ -75,6 +90,15 @@ final class StudioPresenter: ExperiencePresenter {
     private(set) var documentTemplate = 0
     /// The run count last seen at a draw.
     private(set) var seenRuns = 0
+    /// The reset count last seen at a draw (feature 162).
+    private(set) var seenResets = 0
+    /// The frame watchdog (feature 162), fed each drawn frame's interval.
+    private(set) var watchdog = FrameWatchdog()
+    /// The status shown while the watchdog has stopped the preview.
+    static let stoppedStatus = "Stopped: frames took longer than 0.25 s"
+    /// The guidance shown while the watchdog has stopped the preview.
+    static let stoppedGuidance = "The shader is too slow to draw. Reset goes back to the last shader that ran well, "
+        + "or edit the source and Run."
     /// How many times `draw` ran.
     private(set) var drawCount = 0
     /// The frame cap: 30 frames per second.
@@ -179,24 +203,47 @@ final class StudioPresenter: ExperiencePresenter {
     /// Builds the live scene (again after a context loss).
     func setup(_ context: RenderContext) throws {
         try pipeline.setup(context)
+        watchdog.rearm()
         noteStatus()
     }
 
-    /// Passes the new drawable size to the live scene.
+    /// Passes the new drawable size to the live scene; the next interval is not counted by the watchdog.
     func resize(_ context: RenderContext) {
         pipeline.resize(context)
+        watchdog.rearm()
     }
 
-    /// Follows the template, submits the document when the run count grew, compiles it (at most once) and draws the
-    /// live scene with the core's values.
+    /// Follows the template, submits the document when the run count grew, applies a reset when the reset count
+    /// grew, feeds the watchdog, compiles a request (at most once) and draws the live scene with the core's values,
+    /// or the flat stopped frame while the watchdog has stopped it.
     func draw(_ core: StudioCore, tier: Int, context: RenderContext, frame: FrameInfo) throws {
         drawCount += 1
         followTemplate(core)
-        if core.runs > seenRuns { pipeline.submit(document) }
+        let wasStopped = watchdog.state == .stopped
+        if core.runs > seenRuns {
+            pipeline.submit(document)
+            watchdog.reset()
+        }
         seenRuns = core.runs
+        if core.resets > seenResets {
+            if !pipeline.restoreFallback(context), let starter = core.selectedTemplate?.project {
+                pipeline.submit(starter)
+            }
+            watchdog.reset()
+        }
+        seenResets = core.resets
+        watchdog.record(frame.delta)
         let values = core.values
-        try pipeline.drawFrame(context, frame: frame, textures: core.textures) { Self.parameters($0, values: values) }
+        try pipeline.drawFrame(context, frame: frame, textures: core.textures, liveWasStopped: wasStopped,
+                               stopped: watchdog.state == .stopped) { Self.parameters($0, values: values) }
         follow(core)
+        noteStatus()
+    }
+
+    /// Test seam (feature 162, T-A22-406): records `intervals` in the watchdog as if they were drawn frames'
+    /// intervals; the next draw follows the state they leave.
+    func feedWatchdog(_ intervals: [Double]) {
+        for interval in intervals { watchdog.record(interval) }
         noteStatus()
     }
 
@@ -229,8 +276,12 @@ final class StudioPresenter: ExperiencePresenter {
 
     /// Brings the mirror's status and diagnostics up to the pipeline.
     private func noteStatus() {
-        let text = pipeline.status.text
+        let stopped = watchdog.state == .stopped
+        if mirror.stopped != stopped { mirror.stopped = stopped }
+        let text = statusText
         if mirror.status != text { mirror.status = text }
+        let guidance = stopped ? Self.stoppedGuidance : Self.guidance(for: pipeline.status, limits: document.limits)
+        if mirror.guidance != guidance { mirror.guidance = guidance }
         let diagnostics = Self.ordered(pipeline.status.diagnostics)
         if mirror.diagnostics != diagnostics {
             mirror.diagnostics = diagnostics
@@ -243,7 +294,24 @@ final class StudioPresenter: ExperiencePresenter {
 
     /// The canvas label, for example "Shader Studio, Gradient, Compiled".
     func describe(_ core: StudioCore) -> String {
-        "Shader Studio, " + Self.templateTitle(core) + ", " + pipeline.status.text
+        "Shader Studio, " + Self.templateTitle(core) + ", " + statusText
+    }
+
+    /// The status line: ``stoppedStatus`` while the watchdog has stopped the preview, else the pipeline's.
+    var statusText: String { watchdog.state == .stopped ? Self.stoppedStatus : pipeline.status.text }
+
+    /// The guidance sentence of `status` (feature 162): a refusal's first issue (with `limits`), a failure's first
+    /// error message (or its first diagnostic), nothing otherwise.
+    static func guidance(for status: PreviewStatus, limits: ShaderLimits) -> String {
+        switch status {
+        case .refused(let issues):
+            return issues.first.map { Guidance.forIssue($0, limits: limits) } ?? ""
+        case .failed(let diagnostics):
+            let first = diagnostics.first { $0.severity == .error } ?? diagnostics.first
+            return first.map { Guidance.forDiagnostic(message: $0.message) } ?? ""
+        case .waiting, .compiled:
+            return ""
+        }
     }
 
     /// The frame probes of the verification runner: for the opening template (Gradient), the top-right corner is red
@@ -255,7 +323,7 @@ final class StudioPresenter: ExperiencePresenter {
             .compactMap { $0 }
     }
 
-    /// The actions of the native controls: all four.
+    /// The actions of the native controls: all five.
     var nativeActions: Set<String> { Set(StudioCore.actionIDs) }
 
     /// The native controls (``StudioControls``, with ``StudioEditor`` and ``StudioInspector``), sending through

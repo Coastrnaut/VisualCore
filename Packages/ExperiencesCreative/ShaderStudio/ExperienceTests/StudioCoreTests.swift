@@ -21,6 +21,7 @@ import VisualCoreExperienceHost
         #expect(ranges["template.select"] == [0...3])
         #expect(ranges["uniform.set"] == [0...15, 0...1])
         #expect(ranges["texture.set"] == [0...1, 0...2])
+        #expect(ranges["preview.reset"] == [1...1])
         #expect(ranges["shader.run"] == [1...1])
         #expect(StudioCore.qualityTiers == 1 && StudioCore.qualityProfile.names == ["level-0"])
         #expect(StudioCore.migrations.currentVersion == 1)
@@ -31,6 +32,7 @@ import VisualCoreExperienceHost
         #expect(core.values[0] == speed.normalized(speed.defaultValue))
         #expect(core.values.dropFirst().allSatisfy { $0 == 0 })
         #expect(core.textures == [0, 1] && StudioCore.defaultTextures == [0, 1])
+        #expect(core.resets == 0)
     }
 
     @Test func aTemplateResetsTheValuesAndCountsARun() throws {
@@ -131,6 +133,7 @@ import VisualCoreExperienceHost
             (#"{"runs":0,"template":3,"textures":[0],"values":[\#(zeros)]}"#, .outOfRange("textures")),
             (#"{"runs":0,"template":3,"textures":[0,3],"values":[\#(zeros)]}"#, .outOfRange("textures")),
             (#"{"runs":0,"template":3,"textures":"a","values":[\#(zeros)]}"#, .damaged),
+            (#"{"resets":-1,"runs":0,"template":0,"values":[\#(zeros)]}"#, .outOfRange("resets")),
         ]
         for (text, refusal) in refused {
             #expect(throws: refusal, "\(text)") { _ = try StudioCore.restore(payload: Data(text.utf8), seed: 1) }

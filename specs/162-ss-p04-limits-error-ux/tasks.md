@@ -46,7 +46,7 @@
 
 ## Phase 4: Story 2 — a slow shader never locks the studio (P1)
 
-- [ ] T-A22-406 [US2] Add the watchdog to the experience (FR-A22-403, 404):
+- [X] T-A22-406 [US2] Add the watchdog to the experience (FR-A22-403, 404): — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A22-P04.ss-guidance-watchdog.json exit 0 (ShaderStudioCoreTests 76, ShaderStudioExperienceTests 66 on sim-27.2)
   - `Experience/Adapter/StudioCore.swift`: `resets` (optional in the payload, default 0), the action
     `preview.reset [1…1]`, and the digest over `resets`;
   - `Experience/PreviewPipeline.swift`: the fallback (the previous live scene not stopped) is kept built, torn down
