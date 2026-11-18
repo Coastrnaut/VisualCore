@@ -38,7 +38,7 @@
   - in `Experience/StudioPresenter.swift` (mirror `guidance`, the refusal's sentence or the first diagnostic's);
   - in `Experience/StudioControls.swift` (a `guidance` text under the status, with a spoken label);
   - in `Experience/StudioEditor.swift` (each diagnostic entry's label adds its guidance).
-- [ ] T-A22-405 [US1] Write `ExperienceTests/GuidanceDisplayTests.swift`:
+- [X] T-A22-405 [US1] Write `ExperienceTests/GuidanceDisplayTests.swift`: — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A22-P04.ss-guidance-watchdog.json exit 0 (ShaderStudioCoreTests 76, ShaderStudioExperienceTests 66 on sim-27.2)
   - a `#version` source shows its sentence and line;
   - a source using `u_speed` undeclared shows "Declare u_speed …";
   - a broken compile's entries carry their guidance;
