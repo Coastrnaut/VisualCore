@@ -51,7 +51,7 @@
   - values are kept by position, and the digest covers `shape`;
   - in `Experience/StudioPresenter.swift`: send `document.shape` whenever the document's counts change (an edit, an
     open, a template choice, a restore), never compiling.
-- [ ] T-A22-507 [US3] Write `ExperienceTests/ShapeTests.swift`:
+- [X] T-A22-507 [US3] Write `ExperienceTests/ShapeTests.swift`: — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A22-P05.ss-shape.json exit 0 (ShaderStudioCoreTests 76, ShaderStudioExperienceTests 85 on sim-27.2) (ShapeTests 6)
   - a project with more uniforms and inputs than its template opens with every value and texture choice, and each
     can be changed;
   - an A22-P04 snapshot without `shape` reads the template's counts;

@@ -8,7 +8,8 @@
 // unreadable files; a project whose source the validator refuses saves as text; a newer index makes the library read
 // only. Synthetic names only; short runs, no clock.
 // Feature 162 T-A22-410 adds the presenter's side (`PresenterLibraryTests`): opening a saved project through the one
-// app's session host lists its uniforms in the inspector with its values; opening a project whose source is now
+// app's session host lists its uniforms in the inspector with all its values (from feature 163 also past the selected
+// template's uniform count); opening a project whose source is now
 // refused shows its refusal and guidance while the preview keeps the last good shader; without storage the library
 // is unavailable.
 import CoreGraphics
@@ -318,13 +319,15 @@ enum StudioLibraryTest {
         #expect(presenter.library != nil)
         StudioTest.accept(shell, "template.select", [1])   // Noise flow: u_scale, u_speed
         StudioTest.accept(shell, "uniform.set", [0, 0.8])
+        StudioTest.accept(shell, "uniform.set", [1, 0.6])
         try StudioTest.draw(session)
         let entry = try #require(StudioLibraryTest.saved(presenter.saveProject(name: "Flow")))
         let flow = ShaderTemplates.all[1]
 
-        StudioTest.accept(shell, "template.select", [2])   // Rings: two uniforms as well
+        // Gradient has one uniform: since feature 163 the opened project's shape bounds the values, so both are kept.
+        StudioTest.accept(shell, "template.select", [0])
         try StudioTest.draw(session)
-        #expect(presenter.mirror.uniforms.map(\.name) == ["u_count", "u_width"])
+        #expect(presenter.mirror.uniforms.map(\.name) == ["u_speed"])
         let compiles = presenter.pipeline.compileCount
         guard case .success(let opened) = presenter.openProject(entry.file) else {
             Issue.record("not opened")
@@ -337,6 +340,8 @@ enum StudioLibraryTest {
         #expect(presenter.pipeline.compileCount == compiles + 1, "the queued run compiles at the frame")
         #expect(presenter.mirror.uniforms.map(\.name) == flow.uniforms.map(\.name), "the inspector lists them")
         #expect(try StudioTest.core(shell).values[0] == 0.8)
+        #expect(try StudioTest.core(shell).values[1] == 0.6, "the value past Gradient's uniform is kept")
+        #expect(try StudioTest.core(shell).shape == [2, 0])
         #expect(StudioInspector.rows(presenter.mirror).map(\.name) == ["u_scale", "u_speed"])
         #expect(presenter.mirror.status == "Compiled")
     }
