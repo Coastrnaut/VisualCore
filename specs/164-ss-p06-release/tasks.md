@@ -43,7 +43,7 @@
 
 ## Phase 4: Story 3 — honest copy and a complete checklist (P1)
 
-- [ ] T-A22-606 [US3] Write the release documents (FR-A22-605, 606):
+- [X] T-A22-606 [US3] Write the release documents (FR-A22-605, 606): — Verified 2026-11-18: 2026-11-18: store-listing.md, release-checklist.md (36 rows), release.json and the A22 section of docs/release/known-limitations.md; check_experience_release.py PASS (7 documents, 36 rows) and check_copy_claims.py PASS (7 files)
   - `docs/apps/shader-studio/store-listing.md`: says "not a sandbox"; every claim names a proving test; no shared
     denylist word;
   - `docs/apps/shader-studio/release-checklist.md`: the statuses of clarification Q1; device rows name SS-D1 …

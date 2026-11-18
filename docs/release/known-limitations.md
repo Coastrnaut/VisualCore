@@ -466,6 +466,34 @@ and `VisualCoreRendering` (iOS, GL). ADR-0003 and the package map record this. R
   ([device-campaign.md](../apps/aurora/device-campaign.md), rows AU-D1 to AU-D8). No thermal, battery, frame or timing
   figure from a device is stated.
 
+### Shader Studio (A22; features 158–164)
+
+- No sandbox. A person's shader runs on the device's graphics processor through the app's renderer (OpenGL ES over
+  ANGLE on Metal); GPU code is not a sandbox, and Shader Studio makes no claim that a shader is harmless to run. What
+  it does: the source validator refuses a source past the limits before any compile, a failed compile keeps drawing
+  the last good program, and a frame watchdog stops the preview after 8 consecutive frame intervals each above
+  0.25 s (one interval after a Run or a Reset is skipped) and draws a flat dark frame until "Reset preview" brings
+  back the last good program. A shader can still keep the graphics processor busy until the watchdog stops it.
+- GLSL ES 3.00 fragment shaders only. The person writes one fragment shader over the template prelude (the version
+  line, precision, `u_time`, `u_resolution` and the output come from the prelude); there are no vertex, geometry or
+  compute stages, and only float uniforms (at most 16) and texture inputs (at most 2) bound to the
+  three textures made in code (Checker, Ramp, Noise). Other shader languages and dialects are not accepted.
+- Values beyond the limits are refused, never truncated: a source above 16,384 bytes or 400 lines, more than 16
+  uniforms or 2 texture inputs, a `#version` line, a reserved or undeclared name and a source without `void main` are
+  refused with their reason before any compile; the expanded shader stays under 64 KiB. The library holds at most 24
+  projects, names of 1 to 40 characters (names differing only in case are the same) and files of at most 131,072
+  bytes; a 25th save, a used name or a full storage quota is refused with its message and changes nothing.
+- No sharing or export. Projects stay in the experience's own storage on the device (no sync, no file export, no
+  share sheet, no import from other apps). The snapshot keeps the template, the uniform values, the texture choices
+  and the document's shape, not the edited source: unsaved edits are kept only by saving a project.
+- A damaged, newer, too-large or out-of-range project file is listed as unreadable with its code and never opened,
+  renamed or removed automatically; an index of a newer version makes the library read only; a damaged index is
+  rebuilt by the next change.
+- The stop of a slow shader, the line mapping of compile errors, the hardware keyboard, a project kept across a
+  relaunch, the compatibility profile of each device's context, background and return, and the system accessibility
+  audits wait for the device campaign ([device-campaign.md](../apps/shader-studio/device-campaign.md), rows SS-D1 to
+  SS-D6). No frame, stop, heat, battery or capability figure from a device is stated.
+
 ## Distribution
 
 - No App Store submission, signing or purchase setup is part of this release; those are owner actions.
