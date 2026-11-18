@@ -47,6 +47,11 @@
 // choice, and the first draw (which follows a restore). It compares with the core's shape as last seen at a draw
 // (or as last accepted), so an action that set the shape is not undone at a later frame. Nothing compiles.
 //
+// Feature 164 (A22-P06) T-A22-604 (FR-A22-603; SC-A22-602; clarification Q4): the test-only seam `failNextDraw`
+// makes the next `draw` throw `StudioDrawError.injected` once, before it follows, submits, compiles or draws anything;
+// the seam clears itself and nothing in the experience or its interface sets it. The session then fails with the
+// error's message, and the library's files are not touched (only an explicit save, rename or removal writes them).
+//
 // No GL call: everything is drawn through VisualCore's `FullScreenShaderScene` and `FieldPass`.
 import Foundation
 import Observation
@@ -56,6 +61,20 @@ import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreParameters
 import VisualCoreRendering
+
+/// Why a draw of Shader Studio failed on purpose (feature 164, A22-P06, T-A22-604).
+enum StudioDrawError: Error, Equatable, CustomStringConvertible {
+    /// The test-only seam ``StudioPresenter/failNextDraw`` made this draw fail.
+    case injected
+
+    /// The message the failed session shows: "The Shader Studio draw failed: the test seam injected a failure."
+    var description: String {
+        switch self {
+        case .injected:
+            return "The Shader Studio draw failed: the test seam injected a failure."
+        }
+    }
+}
 
 /// What the controls show, updated only when a field changes.
 @MainActor
@@ -120,6 +139,10 @@ final class StudioPresenter: ExperiencePresenter {
     private(set) var drawCount = 0
     /// The frame cap: 30 frames per second.
     var maxFramesPerSecond: Int { 30 }
+    /// Test-only seam: when true, the next `draw` throws ``StudioDrawError/injected`` once, before it follows,
+    /// submits, compiles or draws anything; the seam clears itself and nothing in the experience or its interface
+    /// sets it (feature 164, A22-P06, T-A22-604).
+    var failNextDraw = false
 
     /// A presenter whose document and first live scene are the first template's.
     /// The saved projects (feature 162); nil when the experience has no storage.
@@ -296,8 +319,13 @@ final class StudioPresenter: ExperiencePresenter {
 
     /// Follows the template, submits the document when the run count grew, applies a reset when the reset count
     /// grew, feeds the watchdog, compiles a request (at most once) and draws the live scene with the core's values,
-    /// or the flat stopped frame while the watchdog has stopped it.
+    /// or the flat stopped frame while the watchdog has stopped it. Throws ``StudioDrawError/injected`` once while
+    /// ``failNextDraw`` is set (it is cleared first).
     func draw(_ core: StudioCore, tier: Int, context: RenderContext, frame: FrameInfo) throws {
+        if failNextDraw {
+            failNextDraw = false
+            throw StudioDrawError.injected
+        }
         drawCount += 1
         knownShape = core.shape
         followTemplate(core)

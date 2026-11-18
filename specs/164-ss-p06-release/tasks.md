@@ -29,7 +29,7 @@
 
 ## Phase 3: Story 2 — recover without losing the projects (P1)
 
-- [ ] T-A22-604 [US2] Add the recovery seam and its test (FR-A22-603, SC-A22-602):
+- [X] T-A22-604 [US2] Add the recovery seam and its test (FR-A22-603, SC-A22-602): — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A22-P06.ss-recovery-samples.json exit 0 (ShaderStudioCoreTests 76, ShaderStudioExperienceTests 95 on sim-27.2); StudioRecoveryDrawTests: an injected draw failure fails the session with its message, every storage file byte-identical, a new session lists and opens both projects
   - `Experience/StudioPresenter.swift`: an internal, test-only `failNextDraw`; the next draw throws
     `StudioDrawError.injected` once and clears it;
   - `ExperienceTests/StudioRecoveryDrawTests.swift`: save two projects, set the seam and draw; the session fails with
