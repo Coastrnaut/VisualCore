@@ -35,7 +35,7 @@
   - `ExperienceTests/StudioRecoveryDrawTests.swift`: save two projects, set the seam and draw; the session fails with
     the message; every storage file is byte-identical; a new session over the same storage lists and opens both.
 - [ ] T-A22-605 [P] [US2] Commit the stored samples and test them (FR-A22-604):
-  - `ExperienceTests/Fixtures/` holds the nine files of data-model.md, generated once through the real encoders
+  - `ExperienceTests/Fixtures/` holds the ten files of data-model.md, generated once through the real encoders
     (`StudioCore.snapshotPayload`, `ProjectLibrary.encode`) and then committed;
   - add the resources to `Packages/ExperiencesCreative/Package.swift` if the test target needs them;
   - `ExperienceTests/StoredSampleTests.swift`: each file opens or is refused as listed, and every file is
@@ -78,7 +78,7 @@
 
 ## Dependencies
 
-601 → {602, 603, 605, 608} → 604 → 606 → 607 → 609 → 610 → 611 → 612 → 613.
+601 → {602, 603, 604, 605, 606, 608}; 606 → 607; {602 … 608} → 609 → 610 → 611 → 612 → 613.
 - **Shared files:** 604 touches the presenter.
 - **Independent files:** 602, 603, 605 and 608 write their own files.
 

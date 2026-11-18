@@ -17,6 +17,7 @@
   | `project-damaged.json` | saved project | listed as unreadable, `damaged` |
   | `library-current.json` | index | lists |
   | `library-newer.json` | index | the library is read-only |
+  | `library-damaged.json` | index | projects still listed from their files; the index is not rewritten by reading |
 
   Every file is byte-identical after reading.
 - **Recovery seam:** `StudioPresenter.failNextDraw`, internal. The next draw throws `StudioDrawError.injected` once.

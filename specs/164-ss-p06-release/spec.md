@@ -78,7 +78,7 @@ in code:
     - `snapshot-v1.json` (current, with every optional field), `snapshot-p02.json` (without the optional fields),
       `snapshot-newer.json` and `snapshot-damaged.json`;
     - `project-current.json`, `project-newer.json` and `project-damaged.json`;
-    - `library-current.json` and `library-newer.json`.
+    - `library-current.json`, `library-newer.json` and `library-damaged.json`.
 
     The current and P02 samples open. The newer and damaged snapshots are refused. A newer or damaged project file is
     listed as unreadable with its code. A newer index makes the library read-only. Every file stays byte-identical
