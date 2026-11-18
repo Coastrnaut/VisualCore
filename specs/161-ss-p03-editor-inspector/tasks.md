@@ -92,7 +92,7 @@
 - [X] T-A22-313 Review checkpoint: — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A22-P03.{ss-ios27,isolation,documented-api,core-purity}.json all exit 0
   - Shader Studio tests on sim-27.2 (`--name ss-ios27`);
   - the documented API, isolation and core purity.
-- [ ] T-A22-314 Contract: G-EDITOR, G-INSPECTOR and G-TEXTURES closed by "A22-P03"; rows whose gaps are all closed
+- [X] T-A22-314 Contract: G-EDITOR, G-INSPECTOR and G-TEXTURES closed by "A22-P03"; rows whose gaps are all closed — Verified 2026-11-18: 2026-11-18: G-EDITOR, G-INSPECTOR, G-TEXTURES closed by A22-P03; M02, M05, M06, M07, M09, M15 available; .autonomy/checks/A22-P03.contract.json exit 0
   become available with evidence (`--name contract`)
 - [ ] T-A22-315 The catalog, app and runner checks, with the packages and script tests:
   - the catalog (`--name catalog`);

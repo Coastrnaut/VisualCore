@@ -221,7 +221,7 @@
    "id": "M02",
    "capability": "Diagnostics and error reporting: compile and link logs parsed into line-mapped diagnostics (file, line, stage, severity, message; no column) and shown against the person's own lines",
    "source": "brainstorm: diagnostics and error reporting; spec clarification Q3",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreShaderSource/InfoLogParser.swift",
@@ -264,7 +264,7 @@
     "file": "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalScene.swift",
     "symbol": "FractalScene.errorMessage"
    },
-   "notes": "Parser tested in InfoLogParserTests. Missing: mapping through the template prefix back to the person's lines (G-LINES) and a diagnostics list (G-EDITOR); FullScreenShaderScene keeps only the first diagnostic and lastFailureLog is global, so neither is relied on. A22-P01 (feature 159): ShaderAssembly and DiagnosticMapper; five broken shaders compiled on ANGLE name the authored line (LineMappingCompileTests); still open: G-EDITOR."
+   "notes": "Parser tested in InfoLogParserTests. Missing: mapping through the template prefix back to the person's lines (G-LINES) and a diagnostics list (G-EDITOR); FullScreenShaderScene keeps only the first diagnostic and lastFailureLog is global, so neither is relied on. A22-P01 (feature 159): ShaderAssembly and DiagnosticMapper; five broken shaders compiled on ANGLE name the authored line (LineMappingCompileTests); still open: G-EDITOR. A22-P03 (feature 161): StudioEditor shows the mapped diagnostics in a gutter and a list that jumps to the line, outside-source entries first (EditorModelTests)."
   },
   {
    "id": "M03",
@@ -356,7 +356,7 @@
    "id": "M05",
    "capability": "Parameter controls: bounded uniforms with a title, range and default, clamped and refused when not finite",
    "source": "brainstorm: parameter controls",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreParameters/ParameterSchema.swift",
@@ -399,13 +399,13 @@
     "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Core/CompositionEditor.swift",
     "symbol": "CompositionEditor"
    },
-   "notes": "Tested in ParametersTests and ParameterEditorTests. Binding them to reflected uniforms and the inspector are G-INSPECTOR. A22-P01 (feature 159): ShaderProject, ShaderLimits and ShaderProjectRefusal (ShaderStudio/Core/ShaderProject.swift; ProjectTests); still open: G-INSPECTOR."
+   "notes": "Tested in ParametersTests and ParameterEditorTests. Binding them to reflected uniforms and the inspector are G-INSPECTOR. A22-P01 (feature 159): ShaderProject, ShaderLimits and ShaderProjectRefusal (ShaderStudio/Core/ShaderProject.swift; ProjectTests); still open: G-INSPECTOR. A22-P03 (feature 161): StudioInspector rows of the live project's uniforms with value, unit and range; values clamped, non-finite refused, Reset to defaults, a dropped uniform leaves the rows (InspectorTests)."
   },
   {
    "id": "M06",
    "capability": "Version 0.1 feature 01: a code editor with syntax assistance and line-numbered diagnostics",
    "source": "manual \u00a72 version 0.1 feature 1",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreShaderSource/InfoLogParser.swift",
@@ -424,13 +424,13 @@
     "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Core/CompositionEditor.swift",
     "symbol": "CompositionEditor"
    },
-   "notes": "No code editor, line-numbered text view or syntax assistance exists in VisualCore (grep 2026-11-17). App-local SwiftUI editor, iPad and hardware keyboard first: G-EDITOR; line mapping: G-LINES. A22-P01 (feature 159): ShaderAssembly and DiagnosticMapper; five broken shaders compiled on ANGLE name the authored line (LineMappingCompileTests); still open: G-EDITOR."
+   "notes": "No code editor, line-numbered text view or syntax assistance exists in VisualCore (grep 2026-11-17). App-local SwiftUI editor, iPad and hardware keyboard first: G-EDITOR; line mapping: G-LINES. A22-P01 (feature 159): ShaderAssembly and DiagnosticMapper; five broken shaders compiled on ANGLE name the authored line (LineMappingCompileTests); still open: G-EDITOR. A22-P03 (feature 161): the monospaced editor with line numbers, syntax colouring (SyntaxPalette), Run on \u2318R and next diagnostic on \u2318' (EditorModelTests, SSEditorUITests)."
   },
   {
    "id": "M07",
    "capability": "Version 0.1 feature 02: local GLSL ES fragment templates with defined uniforms and texture inputs",
    "source": "manual \u00a72 version 0.1 feature 2",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderBundle.swift",
@@ -467,7 +467,7 @@
     "file": "Packages/ExperiencesCreative/LivingWallpapers/Experience/SceneShaders.swift",
     "symbol": "SceneShaders"
    },
-   "notes": "Tested in ShaderBundleTests and TextureUploadTests. FullScreenShaderScene has no texture input. Templates: G-TEMPLATES; texture inputs made in code: G-TEXTURES. A22-P01 (feature 159): ShaderTemplates gradient, noise-flow, rings compile and match their uniforms (TemplateCompileTests); still open: G-TEXTURES."
+   "notes": "Tested in ShaderBundleTests and TextureUploadTests. FullScreenShaderScene has no texture input. Templates: G-TEMPLATES; texture inputs made in code: G-TEXTURES. A22-P01 (feature 159): ShaderTemplates gradient, noise-flow, rings compile and match their uniforms (TemplateCompileTests); still open: G-TEXTURES. A22-P03 (feature 161): the fourth template texture-mix samples two inputs (TemplateCompileTests, TextureInputTests)."
   },
   {
    "id": "M08",
@@ -510,7 +510,7 @@
    "id": "M09",
    "capability": "Version 0.1 feature 04: a parameter inspector for bounded uniforms",
    "source": "manual \u00a72 version 0.1 feature 4",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreParameters/ParameterSchema.swift",
@@ -541,7 +541,7 @@
     "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Core/CompositionEditor.swift",
     "symbol": "CompositionEditor"
    },
-   "notes": "Uniform reflection (ShaderProgram.uniforms) and bounded parameters exist and are tested; the inspector is G-INSPECTOR."
+   "notes": "Uniform reflection (ShaderProgram.uniforms) and bounded parameters exist and are tested; the inspector is G-INSPECTOR. A22-P03 (feature 161): the inspector's sliders send normalized uniform.set actions clamped by the core; nothing compiles (InspectorTests)."
   },
   {
    "id": "M10",
@@ -768,7 +768,7 @@
    "id": "M15",
    "capability": "Texture inputs: small textures generated in code, uploaded and bound for the preview",
    "source": "spec FR-A22-003; clarification Q5",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
@@ -799,7 +799,7 @@
     "file": "Packages/ExperiencesCreative/SimulationLab/Experience/WaveGPU.swift",
     "symbol": "WaveGPU"
    },
-   "notes": "Tested in TextureUploadTests; FullScreenShaderScene has no texture input. G-TEXTURES."
+   "notes": "Tested in TextureUploadTests; FullScreenShaderScene has no texture input. G-TEXTURES. A22-P03 (feature 161): TextureRecipes makes checker, ramp and noise in code (pinned checksums, TextureRecipeTests); TexturedPreview uploads them to render targets, binds them through FieldPass and rebuilds them after context loss (TextureInputTests)."
   },
   {
    "id": "M16",
@@ -1364,7 +1364,7 @@
    "justification": "No code editor exists in VisualCore. A monospaced SwiftUI editor with line numbers, a diagnostics list that jumps to a line, syntax assistance, hardware-keyboard support and an iPad-first layout is app-local (clarification Q5; manual \u00a713 risk 2).",
    "phase": 3,
    "test": "Experience tests: line numbers match the text; selecting a diagnostic moves the cursor to its line; keyboard shortcuts for Run and next diagnostic work; the layout keeps editor and preview usable at iPhone and iPad sizes with Dynamic Type.",
-   "closed": null
+   "closed": "A22-P03"
   },
   {
    "id": "G-INSPECTOR",
@@ -1377,7 +1377,7 @@
    "justification": "The inspector binds bounded uniforms (ParameterSchema, ParameterEditor) to reflected uniforms (ShaderProgram.uniforms) of the person's program; the binding is experience logic (manual phase 03).",
    "phase": 3,
    "test": "Experience tests: only declared, reflected float and vector uniforms appear; values are clamped to their bounds and NaN refused; a uniform missing after recompile is dropped without a crash.",
-   "closed": null
+   "closed": "A22-P03"
   },
   {
    "id": "G-TEXTURES",
@@ -1390,7 +1390,7 @@
    "justification": "Small texture inputs generated in code and uploaded with Texture.upload(rgba:) in the preview scene are app-local; FullScreenShaderScene has no texture input (clarification Q5).",
    "phase": 3,
    "test": "Experience tests: each generated input has the declared size and checksum, is bound to its sampler unit, stays within ResourceBudget and is rebuilt after context loss.",
-   "closed": null
+   "closed": "A22-P03"
   },
   {
    "id": "G-LIBRARY",
