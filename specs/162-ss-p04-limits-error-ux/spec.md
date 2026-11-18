@@ -50,8 +50,9 @@ in code:
     shaders on the simulator's ANGLE:
     - "undeclared identifier" → declare it (the name is taken from the quoted word);
     - "syntax error" → a missing semicolon or bracket;
-    - "cannot convert", "wrong operand types" or "no matching overloaded function" → a type mismatch, such as `1`
-      where `1.0` is needed.
+    - "cannot convert", "dimension mismatch", "wrong operand types" or "no matching overloaded function" → a type
+      mismatch, such as `1` where `1.0` is needed ("dimension mismatch" added at T-A22-402: it is ANGLE's first message
+      for `float x = vec2(1.0);`).
   - **Anything else:** the raw message, with "Check this line for a typing mistake.".
   - **Display:** the guidance is shown under the status and with each entry of the diagnostics list.
 - Q: What does the watchdog measure, and when does it stop the preview? → A: A pure `FrameWatchdog` in the core:

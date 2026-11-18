@@ -17,10 +17,10 @@
 
 ## Phase 2: Foundational — guidance and the watchdog (core)
 
-- [ ] T-A22-402 [P] Create `Packages/ExperiencesCreative/ShaderStudio/Core/{Guidance,FrameWatchdog}.swift` per
+- [X] T-A22-402 [P] Create `Packages/ExperiencesCreative/ShaderStudio/Core/{Guidance,FrameWatchdog}.swift` per — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A22-P04.ss-core.json exit 0 (ShaderStudioCoreTests 76 tests on sim-27.2)
   data-model.md, with `///` on every declaration:
   - `Guidance.forIssue(_:)` gives one distinct sentence per refusal code, with the line where known;
-  - `Guidance.forDiagnostic(message:)` covers "undeclared identifier", "syntax error", and "cannot convert" / "wrong
+  - `Guidance.forDiagnostic(message:)` covers "undeclared identifier", "syntax error", and "cannot convert" / "dimension mismatch" / "wrong
     operand types" / "no matching overloaded function", with the fallback "Check this line for a typing mistake.";
   - `FrameWatchdog` has "limit 0.25 s", "window 8", `record`, `rearm` and `reset`, with states `watching` and
     `stopped` (FR-A22-401, 402, 403).

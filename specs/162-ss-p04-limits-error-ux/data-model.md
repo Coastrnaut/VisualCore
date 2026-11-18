@@ -1,10 +1,10 @@
 # Data Model: A22-P04 (feature 162)
 
-- **Guidance** (core, pure): `Guidance.forIssue(_ issue: ShaderIssue) -> String` gives one sentence per code, with
+- **Guidance** (core, pure): `Guidance.forIssue(_ issue: ValidationIssue, limits:) -> String` gives one sentence per code, with
   the line where the issue has one. `Guidance.forDiagnostic(message:) -> String` covers:
   - "undeclared identifier" → "Declare <name> before it is used, for example `uniform float <name>;`."
   - "syntax error" → "A semicolon or bracket is missing on or just before this line."
-  - "cannot convert" / "wrong operand types" / "no matching overloaded function" → "The types do not match: write
+  - "cannot convert" / "dimension mismatch" / "wrong operand types" / "no matching overloaded function" → "The types do not match: write
     1.0 for a float, and match vec sizes."
   - otherwise → "Check this line for a typing mistake."
 
