@@ -58,7 +58,7 @@
 
 ## Phase 5: Story 4 — a first session in the app (P2)
 
-- [ ] T-A22-608 [P] [US4] Write `Apps/VisualCore/Tests/UI/ShaderStudio/SSReleaseUITests.swift` per clarification Q5, and
+- [X] T-A22-608 [P] [US4] Write `Apps/VisualCore/Tests/UI/ShaderStudio/SSReleaseUITests.swift` per clarification Q5, and — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A22-P06.app-ui.json exit 0 (build for testing, unit, chunk d3: SSReleaseUITests 28.8 s and the five earlier tests pass on the iOS 27.2 phone)
   add it to the chunk `d3` in `scripts/release_check.py` (lead) (FR-A22-607)
 
 ## Phase 6: Evidence
