@@ -381,3 +381,22 @@ extension SS {
         return target.exists && target.isHittable
     }
 }
+
+// Feature 163 (A22-P05) T-A22-508 (FR-A22-504, FR-A22-506; contracts/recovery.md "Relaunch"): helpers of
+// `SSRecoveryUITests`. A relaunch (`SS.relaunch`) is the fresh start without the reset (`-vcResetData`), so the second
+// launch reads the storage the first one wrote; `SS.reopen` ends the app after a moment in which the stored project
+// reaches the disk and opens A22 again over the same storage, waiting as ``open(arguments:file:line:)`` does.
+extension SS {
+    /// A start over the existing storage, straight into A22 (``fresh`` without the reset).
+    static let relaunch = [VC.skipWelcome, candidates, VC.openExperience, experienceID]
+
+    /// Ends `app` (after a second in which the stored data reaches the disk) and opens A22 again without the reset.
+    @MainActor
+    @discardableResult
+    static func reopen(_ app: XCUIApplication, file: StaticString = #filePath, line: UInt = #line)
+        -> XCUIApplication {
+        usleep(1_000_000)
+        app.terminate()
+        return open(arguments: relaunch, file: file, line: line)
+    }
+}

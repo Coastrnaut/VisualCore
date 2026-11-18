@@ -59,7 +59,7 @@
   - out-of-range shapes are refused;
   - reopening the library from a new `ExperienceStorage` on the same root lists and opens the project;
   - update `StudioCoreTests` (controls, digest, restore) and `PresenterLibraryTests` (the A22-P04 limitation is gone).
-- [ ] T-A22-508 [P] [US3] Write `Apps/VisualCore/Tests/UI/ShaderStudio/SSRecoveryUITests.swift` (FR-A22-504, 506):
+- [X] T-A22-508 [P] [US3] Write `Apps/VisualCore/Tests/UI/ShaderStudio/SSRecoveryUITests.swift` (FR-A22-504, 506): — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A22-P05.app-ui.json exit 0 (chunk d3 on the iOS 27.2 phone: SSRecoveryUITests.testSavedProjectSurvivesRelaunch 39.3 s, the other four pass)
   - launch with `-vcResetData`, save "Waves", terminate, and launch without `-vcResetData`;
   - `project-0` is "Waves" and opens with the saved source;
   - under 60 s;
