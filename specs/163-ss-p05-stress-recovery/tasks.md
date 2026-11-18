@@ -33,7 +33,7 @@
 
 ## Phase 3: Story 2 — recovery after the graphics are taken away (P1)
 
-- [ ] T-A22-504 [P] [US2] Write `ExperienceTests/RecoveryTests.swift` (FR-A22-502, SC-A22-502):
+- [X] T-A22-504 [P] [US2] Write `ExperienceTests/RecoveryTests.swift` (FR-A22-502, SC-A22-502): — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A22-P05.ss-stress-recovery.json exit 0 (ShaderStudioCoreTests and ShaderStudioExperienceTests on sim-27.2); RecoveryTests 7 tests: 10 rebuilds in 5 states byte-identical with a flat level and leaked 0; pending request dropped; an accepted Run compiles once after a rebuild (decision recorded in the spec)
   - in each of the states running, failed, refused, stopped and textured, 10 `recreateContext` calls;
   - each gives a byte-identical still (`StudioTest.still`), an unchanged resource level and `leaked` 0.
   - a request waiting in the pipeline is dropped by a rebuild; a Run accepted before a rebuild compiles exactly once

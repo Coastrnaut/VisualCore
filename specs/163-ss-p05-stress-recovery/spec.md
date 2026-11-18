@@ -146,7 +146,9 @@ the compatibility profile.
 
 ### Edge Cases
 
-- **A cycle that ends while a compile is queued:** the queued request is dropped by a teardown and never leaks.
+- **A cycle that ends while a compile is queued:** a request already waiting inside the pipeline is dropped by a
+  teardown; a Run the core accepted before a rebuild compiles once after it (decision at T-A22-504: the core has
+  counted it, so the preview follows the core); nothing leaks.
 - **A context rebuild during a stopped preview:** it stays stopped (A22-P04) and the flat frame is rebuilt.
 - **A context rebuild with a library sheet open:** the sheet is native interface, independent of the graphics context,
   so it is unaffected by construction; the picture comes back behind it.
