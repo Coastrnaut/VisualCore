@@ -10,6 +10,10 @@
 // built node by node (`GraphBuild`) and drawn through the presenter's `graphOverride`; the inset (the bottom-left
 // square of a third of the shorter side) is read back with references at each pixel's centre in its 0…1
 // coordinates.
+//
+// Feature 169 (A23-P04) T-A23-405, T-A23-406 (SC-A23-401–404): a temporary experience storage (`LabStoragePlace`: its
+// own folder and defaults suite, removed afterwards), shells and session openings with a library over it (and, for the
+// migration tests, another `MigrationChain`), and the library's result helpers (`LabLibraryTest`).
 import CoreGraphics
 import Foundation
 import Testing
@@ -17,6 +21,7 @@ import UIKit
 import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreMath
+import VisualCorePersistence
 import VisualCoreRendering
 import VisualCoreScenes
 @testable import VisualProgrammingLabExperience
@@ -49,9 +54,12 @@ enum LabTest {
         return engine
     }
 
-    /// The shell of the factory, prepared and active but without a render host, with ``identityView``.
-    static func shell() async throws -> ExperienceShell<LabPresenter> {
-        let shell = VisualProgrammingLabExperience.make(id: id)
+    /// The shell of the factory, prepared and active but without a render host, with ``identityView``; with a
+    /// library over `storage` (none by default) reading graph files through `migrations`.
+    static func shell(storage: ExperienceStorage? = nil,
+                      migrations: MigrationChain = GraphDocument.migrations) async throws
+        -> ExperienceShell<LabPresenter> {
+        let shell = VisualProgrammingLabExperience.make(id: id, storage: storage, migrations: migrations)
         try await shell.prepare(seed: 1)
         try shell.activate()
         shell.presenter.view = identityView
@@ -137,14 +145,16 @@ enum LabTest {
     /// quality pin is pinned to level 0.
     /// The preview is shown when `preview` is true, or when it is nil and `keepDefaultView` is set (the runner's
     /// opening); otherwise it is hidden before the first frame (the grid tests of A23-P02).
+    /// With `storage` the presenter has a library over it (feature 169).
     static func open(_ session: ExperienceSession, size: CGSize = CGSize(width: 64, height: 48),
                      keepDefaultView: Bool = false, preview: Bool? = nil,
-                     graph: VisualGraph? = nil) async throws -> ExperienceShell<LabPresenter> {
+                     graph: VisualGraph? = nil,
+                     storage: ExperienceStorage? = nil) async throws -> ExperienceShell<LabPresenter> {
         let id = self.id
         var made: ExperienceShell<LabPresenter>?
         if session.qualityPin == nil { session.qualityPin = 0 }
         let request = ExperienceOpenRequest(id: id, seed: 1, snapshot: nil, refusedSnapshotFails: false) {
-            let shell = VisualProgrammingLabExperience.make(id: id)
+            let shell = VisualProgrammingLabExperience.make(id: id, storage: storage)
             made = shell
             return shell
         }
@@ -307,4 +317,81 @@ func labApplied(_ core: LabCore, _ control: String, _ values: [Double]) -> (LabC
     var next = core
     let result = next.apply(ExperienceAction(control: control, values: values, step: 0))
     return (next, result)
+}
+
+// MARK: Library (feature 169, A23-P04)
+
+/// A temporary storage of the experience: its own folder and defaults suite (removed by ``remove()``).
+@MainActor
+struct LabStoragePlace {
+    /// The defaults suite and folder name.
+    let suite: String
+    /// The root folder.
+    let root: URL
+    /// The handle.
+    let storage: ExperienceStorage
+
+    /// A fresh place named `name`.
+    init(_ name: String) throws {
+        suite = "a23.library-tests." + name
+        root = FileManager.default.temporaryDirectory.appendingPathComponent(suite, isDirectory: true)
+        try? FileManager.default.removeItem(at: root)
+        let defaults = try #require(UserDefaults(suiteName: suite))
+        storage = ExperienceStorage(id: LabTest.id, root: root, defaults: defaults)
+    }
+
+    /// Removes the folder and the defaults suite.
+    func remove() {
+        try? FileManager.default.removeItem(at: root)
+        UserDefaults(suiteName: suite)?.removePersistentDomain(forName: suite)
+    }
+
+    /// Every file of the storage with its bytes.
+    func contents() throws -> [String: Data] {
+        var files: [String: Data] = [:]
+        for name in storage.list() { files[name] = try storage.read(name) }
+        return files
+    }
+}
+
+/// Library helpers.
+@MainActor
+enum LabLibraryTest {
+    /// The saved entry of `result`, recording an issue for a failure.
+    static func saved<T>(_ result: Result<T, GraphLibraryFailure>,
+                         sourceLocation: SourceLocation = #_sourceLocation) -> T? {
+        switch result {
+        case .success(let value): return value
+        case .failure(let failure):
+            Issue.record("refused: \(failure.code)", sourceLocation: sourceLocation)
+            return nil
+        }
+    }
+
+    /// The failure of `result`; nil for a success.
+    static func failure<T>(_ result: Result<T, GraphLibraryFailure>) -> GraphLibraryFailure? {
+        if case .failure(let failure) = result { return failure }
+        return nil
+    }
+
+    /// The fingerprint text of `graph` (recording an issue when it cannot be computed).
+    static func fingerprint(_ graph: VisualGraph, sourceLocation: SourceLocation = #_sourceLocation) -> String {
+        guard let text = LabPresenter.fingerprintText(graph) else {
+            Issue.record("no fingerprint", sourceLocation: sourceLocation)
+            return ""
+        }
+        return text
+    }
+
+    /// The journey graph with every kind but Constant: Time into Noise, Noise and Gradient into Mix, Blur, Output, with
+    /// parameters off their defaults (the example `mixed-clouds`).
+    static var journey: VisualGraph { LabExamples.mixedClouds.graph }
+
+    /// A graph other than the starter and the journey: Gradient (angle 30) into Output, at (100, 60) and (400, 60).
+    static var ramp: VisualGraph {
+        VisualGraph(nodes: [GraphNode(id: NodeID(1), kind: .gradient, parameters: ["angle": 30],
+                                      position: CanvasPoint(x: 100, y: 60)),
+                            GraphNode(id: NodeID(2), kind: .output, position: CanvasPoint(x: 400, y: 60))],
+                    edges: [GraphEdge(from: NodeID(1), "image", to: NodeID(2), "image")])
+    }
 }

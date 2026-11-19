@@ -28,7 +28,7 @@
   `save(name:)`, `open(file:)`, `rename(file:to:)`, `remove(file:)`, opening through a `restoreGraph` closure that calls
   `shell.restore(_:)` with a `LabCore` snapshot (no selection); the replace confirmation when the open graph differs
   from the last saved or opened one; `LabLibraryView` with the identifiers of contracts/library.md
-- [ ] T-A23-405 [US1] [US2] Write `ExperienceTests/{LibraryTests,LibraryRefusalTests,MigrationTests,StoredSampleTests}.swift`
+- [X] T-A23-405 [US1] [US2] Write `ExperienceTests/{LibraryTests,LibraryRefusalTests,MigrationTests,StoredSampleTests}.swift` — Verified 2026-11-18: 2026-11-18: LibraryTests (5), LibraryRefusalTests (4), MigrationTests (3) and StoredSampleTests (2): round trips with equal fingerprints, caps at and one past, damaged, newer, oversized and out-of-range files listed, refused and kept, a full quota writes nothing, a newer index read only, a synthetic version-0 file migrating and opening, the committed sample written byte for byte by the encoder, the replace confirmation, one compile after opening; .autonomy/checks/A23-P04.vpl-ios27.json exit 0 (162 core and 63 experience tests on sim-27.2, slowest 1.27 s); written by an agent, one #expect macro error fixed by the lead, retested
   (SC-A23-401–403): save, open (equal fingerprint), rename and remove round trips with a temporary storage; the caps at
   and one past each bound; damaged, newer and oversized samples listed, refused and still present; a quota refusal
   writes nothing; a synthetic version-0 file migrates and opens; the committed schema-1 sample
