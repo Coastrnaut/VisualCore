@@ -49,7 +49,7 @@
 
 - [X] T-A23-508 Review checkpoint: `--name vpl-ios27` (both package test targets on sim-27.2, each under 10 s), the — Verified 2026-11-19: 2026-11-19: review checkpoint: .autonomy/checks/A23-P05.vpl-ios27-2.json exit 0 (162 core and 73 experience tests on sim-27.2, after the inline lists), A23-P05.documented-api.json, A23-P05.isolation.json and A23-P05.core-purity.json exit 0
   documented API, isolation and core purity
-- [ ] T-A23-509 Contract: G-DEVICE closed by "A23-P05" as the plan (its rows stay pending); M31 notes the pending rows
+- [X] T-A23-509 Contract: G-DEVICE closed by "A23-P05" as the plan (its rows stay pending); M31 notes the pending rows — Verified 2026-11-19: 2026-11-19: .autonomy/checks/A23-P05.contract.json exit 0 (G-DEVICE closed by A23-P05 as the plan; M31 available with a note that its device rows stay pending)
   (`--name contract`)
 - [ ] T-A23-510 The catalog, packages and script tests; `xcodegen generate`; `--name app-unit -- python3 scripts/release_check.py
   --only app-build-for-testing-ios27 app-unit-ios27 app-ui-ios27-e3`; the runner (`--name verify-27`)

@@ -1340,7 +1340,7 @@
    "id": "M31",
    "capability": "Device verification: texture memory of large graphs, touch wiring on small screens and preview pacing measured on devices",
    "source": "manual \u00a79 phase 05; manual \u00a713 risks 1-2",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/PerformanceRecord.swift",
@@ -1359,7 +1359,7 @@
     "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Core/ScientificReview.swift",
     "symbol": "ScientificReview"
    },
-   "notes": "Simulator results are never device evidence; the device plan is G-DEVICE."
+   "notes": "Simulator results are never device evidence; the device plan is G-DEVICE. A23-P05 (feature 170): the device plan exists (docs/apps/visual-programming-lab/device-campaign.md, rows VPL-D1 to VPL-D6 on D1, D2 and D3); every row stays pending until after ImplementationLock-100, and no device figure is claimed."
   },
   {
    "id": "M32",
@@ -1505,7 +1505,7 @@
    "justification": "Texture memory of large graphs, touch wiring on small screens and preview pacing can only be measured on the D1-D3 devices after ImplementationLock-100 (CLAUDE.md rule 5); the device plan is written in A23-P05.",
    "phase": 5,
    "test": "Device plan lists per device: the largest allowed example graph within the static budget, wiring and the list form on an iPhone, and preview pacing; results recorded as device evidence only.",
-   "closed": null
+   "closed": "A23-P05"
   },
   {
    "id": "G-RELEASE",
