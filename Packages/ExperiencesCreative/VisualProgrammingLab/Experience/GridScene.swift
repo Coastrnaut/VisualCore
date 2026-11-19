@@ -10,9 +10,11 @@
 // the view's middle: the pan) and `width` and `height` (the view in points). The picture therefore depends only on
 // the view state, never on the drawable's pixel size beyond its sampling.
 //
-// Picture: a dark slate background with minor lines every 32 canvas points and major lines every 160, each about one
-// screen point wide (full within 0.5 points of the line, fading out by 1.5 points). Every colour keeps a Rec. 709
-// luma below 40 of 255, so the whole canvas is of the colour class `dark` (the presenter's frame probe).
+// Picture: a dark slate background with a soft vignette and minor lines every 32 canvas points and major lines every
+// 160, each about one pixel wide (full within 0.5 pixels of the line, fading out by 1.5, through `fwidth`, so a line
+// never falls between pixel centres; the vignette keeps a luma spread in every frame, as the verification runner's
+// non-blank check asks). Every colour keeps a Rec. 709 luma below 40 of 255, so the whole canvas is of the colour
+// class `dark` (the presenter's frame probe).
 import VisualCoreRendering
 
 /// The canvas grid as one full-screen shader.
@@ -36,9 +38,11 @@ final class GridScene {
     uniform float u_height;
     out vec4 color;
 
-    // How much of a line of `spacing` canvas points covers this fragment, from its distance in screen points.
-    float lineCover(float c, float spacing, float zoom) {
-        float d = abs(fract(c / spacing + 0.5) - 0.5) * spacing * zoom;
+    // How much of a line of `spacing` canvas points covers this fragment: its distance in pixels (through `fwidth`, so
+    // a line is at least one pixel wide whatever the ratio of points to pixels), full within 0.5 pixels, gone by 1.5.
+    float lineCover(float c, float spacing) {
+        float pixel = max(fwidth(c), 1e-4);
+        float d = abs(fract(c / spacing + 0.5) - 0.5) * spacing / pixel;
         return 1.0 - smoothstep(0.5, 1.5, d);
     }
 
@@ -47,9 +51,12 @@ final class GridScene {
         vec2 size = vec2(max(u_width, 1.0), max(u_height, 1.0));
         vec2 view = vec2(v_uv.x * size.x, (1.0 - v_uv.y) * size.y);
         vec2 canvas = vec2(u_panX, u_panY) + (view - 0.5 * size) / zoom;
-        float minor = max(lineCover(canvas.x, 32.0, zoom), lineCover(canvas.y, 32.0, zoom));
-        float major = max(lineCover(canvas.x, 160.0, zoom), lineCover(canvas.y, 160.0, zoom));
-        vec3 background = vec3(0.07, 0.08, 0.10);
+        float minor = max(lineCover(canvas.x, 32.0), lineCover(canvas.y, 32.0));
+        float major = max(lineCover(canvas.x, 160.0), lineCover(canvas.y, 160.0));
+        // A soft vignette, brighter at the middle (luma about 26 of 255) than at the corners (about 12), so every
+        // frame has a luma spread above the runner's 8 even where no line falls on a pixel centre.
+        float vignette = clamp(length(v_uv - 0.5) * 1.41421356, 0.0, 1.0);
+        vec3 background = mix(vec3(0.09, 0.10, 0.125), vec3(0.04, 0.045, 0.06), vignette);
         vec3 minorColour = vec3(0.10, 0.115, 0.14);
         vec3 majorColour = vec3(0.13, 0.145, 0.18);
         vec3 c = mix(background, minorColour, minor);

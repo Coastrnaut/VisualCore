@@ -126,10 +126,11 @@ enum LabTest {
     // MARK: Session host
 
     /// Opens Visual Programming Lab in `session` through the factory, lays the view out at `size` points, sets the
-    /// presenter's view to `size` with the canvas origin at its middle and draws one frame. A session without a
+    /// presenter's view to `size` with the canvas origin at its middle (unless `keepDefaultView`, as the verification
+    /// runner leaves it) and draws one frame. A session without a
     /// quality pin is pinned to level 0.
-    static func open(_ session: ExperienceSession,
-                     size: CGSize = CGSize(width: 64, height: 48)) async throws -> ExperienceShell<LabPresenter> {
+    static func open(_ session: ExperienceSession, size: CGSize = CGSize(width: 64, height: 48),
+                     keepDefaultView: Bool = false) async throws -> ExperienceShell<LabPresenter> {
         let id = self.id
         var made: ExperienceShell<LabPresenter>?
         if session.qualityPin == nil { session.qualityPin = 0 }
@@ -144,8 +145,10 @@ enum LabTest {
         view.frame = CGRect(origin: .zero, size: size)
         view.layoutIfNeeded()
         let shell = try #require(made)
-        shell.presenter.view = CanvasView(size: Vec2(Double(size.width), Double(size.height)),
-                                          centre: CanvasPoint(x: 5, y: 7))
+        if !keepDefaultView {
+            shell.presenter.view = CanvasView(size: Vec2(Double(size.width), Double(size.height)),
+                                              centre: CanvasPoint(x: 5, y: 7))
+        }
         try draw(session)
         return shell
     }
