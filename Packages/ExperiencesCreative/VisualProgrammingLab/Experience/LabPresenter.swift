@@ -39,6 +39,15 @@
 //     ``currentCore`` (the factory sets it to the shell's engine state), else the last drawn core, else the opening
 //     state.
 //
+// Feature 169 (A23-P04) T-A23-404 (FR-A23-401, FR-A23-402, FR-A23-404; clarification Q2; contracts/library.md
+// "Presenter"; Edge Case "Opening over unsaved work"): the presenter holds the ``GraphLibrary`` over the launch's
+// storage (``library``, nil without storage), the factory's ``restoreGraph`` (a `LabCore` snapshot of a graph with no
+// selection through `shell.restore(_:)`) and the fingerprint of the graph last saved, opened or started from
+// (``baseline``; the starter graph at first). The library actions, the examples and the replace confirmation are in
+// GraphLibrary.swift; the mirror carries the library's last sentence (``LabMirror/libraryMessage``) and the pending
+// replacement the controls ask about (``LabMirror/pendingReplace``). An opened graph compiles at the next frame,
+// because its fingerprint differs from the last compile's.
+//
 // No GL call: everything is drawn through VisualCore's `FieldPass`.
 import Foundation
 import Observation
@@ -46,6 +55,7 @@ import SwiftUI
 import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreMath
+import VisualCorePersistence
 import VisualCoreRendering
 import VisualCoreScenes
 import VisualProgrammingLabCore
@@ -84,6 +94,13 @@ final class LabMirror {
     var preview = PreviewState.ready
     /// Whether the preview is shown (view state).
     var previewVisible = true
+    /// The library's last sentence (saved, opened, renamed, removed or refused); nil before one (feature 169).
+    var libraryMessage: String?
+    /// The saved graph or example waiting for the person to confirm that it replaces the open graph; nil when none
+    /// (feature 169).
+    var pendingReplace: LabOpenTarget?
+    /// The checker's problems on the nodes they concern (feature 169, T-A23-408; `GraphDiagnostics.byNode`).
+    var diagnostics: [NodeID: [String]] = [:]
 }
 
 /// Draws Visual Programming Lab and owns its presentation state (see the file header).
@@ -111,6 +128,20 @@ final class LabPresenter: ExperiencePresenter {
     let pipeline = PreviewPipeline()
     /// The graph of the last compile, and its fingerprint (nil when it could not be computed).
     private var compiled: (graph: VisualGraph, fingerprint: String?)?
+    /// The saved graphs over the launch's storage; nil when the experience was made without storage (feature 169).
+    let library: GraphLibrary?
+    /// Replaces the shell's state by a graph with no selection through the shell's restore path and answers whether
+    /// it was accepted; set by the factory (feature 169).
+    var restoreGraph: (@MainActor (VisualGraph) -> Bool)?
+    /// The fingerprint text of the graph last saved, opened or started from (the starter graph at first): opening
+    /// over a graph that differs from it asks first (feature 169).
+    var baseline: String? = LabPresenter.fingerprintText(LabCore.starterGraph)
+
+    /// A presenter with a library over `storage` (none without it) whose graph files are read through `migrations`
+    /// (`GraphDocument.migrations` unless a test gives another chain).
+    init(storage: ExperienceStorage? = nil, migrations: MigrationChain = GraphDocument.migrations) {
+        library = storage.map { GraphLibrary(storage: $0, migrations: migrations) }
+    }
 
     /// Whether the preview is shown (view state, a test seam: settable); never an action, never in the digest.
     var previewVisible = true {
@@ -450,6 +481,8 @@ final class LabPresenter: ExperiencePresenter {
         }
         let status = EditMessages.status(for: core.check, in: core.graph)
         if mirror.status != status { mirror.status = status }
+        let diagnostics = GraphDiagnostics.byNode(core.check, in: core.graph)
+        if mirror.diagnostics != diagnostics { mirror.diagnostics = diagnostics }
         if mirror.selection != core.selection { mirror.selection = core.selection }
         if mirror.view != view { mirror.view = view }
         let preview = previewState
@@ -493,7 +526,7 @@ final class LabPresenter: ExperiencePresenter {
             self?.addPosition ?? CanvasPoint(x: 0, y: 0)
         }, setPreview: { [weak self] visible in
             self?.setPreviewVisible(visible)
-        }))
+        }, library: LabLibraryActions(presenter: self)))
     }
 
     /// The canvas overlay (``CanvasOverlay``): nodes, ports, wires, the selection, the rubber wire and the preview's

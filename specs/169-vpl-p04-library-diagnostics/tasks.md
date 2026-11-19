@@ -24,7 +24,7 @@
   1…40, unique ignoring case", the three messages, unreadable files listed with their code and never deleted
   automatically, atomic writes through `storage.write`, a reader through `GraphDocument.migrations` with a test seam
   for another chain
-- [ ] T-A23-404 [US1] Wire the presenter and factory (`LabPresenter`, `VisualProgrammingLabExperience`): `library`,
+- [X] T-A23-404 [US1] Wire the presenter and factory (`LabPresenter`, `VisualProgrammingLabExperience`): `library`, — Verified 2026-11-18: 2026-11-18: LabPresenter (library, save, open, rename, remove, examples, the replace confirmation by fingerprint baseline, restoreGraph), VisualProgrammingLabExperience (storage passed on; restore through shell.restore with a LabCore snapshot), LabControls (library button, examples menu, library-message, replace dialog) and LabLibraryView; .autonomy/checks/A23-P04.vpl-ios27.json exit 0 (162 core and 63 experience tests on sim-27.2, slowest 1.27 s); written by an agent, retested
   `save(name:)`, `open(file:)`, `rename(file:to:)`, `remove(file:)`, opening through a `restoreGraph` closure that calls
   `shell.restore(_:)` with a `LabCore` snapshot (no selection); the replace confirmation when the open graph differs
   from the last saved or opened one; `LabLibraryView` with the identifiers of contracts/library.md
