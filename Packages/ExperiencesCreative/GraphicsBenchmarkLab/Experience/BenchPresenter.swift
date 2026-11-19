@@ -48,6 +48,15 @@
 //   - Summary: a "GPU time" line with p50, p95 and p99 only when the summary has a GPU distribution; otherwise the
 //     flag's sentence "GPU time not available on this device."
 //
+// Feature 176 (A24-P04) T-A24-406 (FR-A24-402, 404, 405; clarifications Q2–Q5; contracts/results.md):
+//   - Library: the presenter holds a ``ResultLibrary`` over the experience's storage (nil without storage) and an
+//     ``ResultExporter`` over `TemporaryFolder(name: "GraphicsBenchmarkLab-Export")`; the result actions are the
+//     extension in ResultsView.swift. After a run ends (finished, stopped or interrupted) the mirror's ``BenchMirror/canSave``
+//     is on and `result-save` saves that ended run once: the presenter remembers the run it saved last and refuses an
+//     equal run with "This result is already saved.". Saving and exporting touch no graphics.
+//   - Exports are written only by the person's tap; `teardown` (the session closing, or a context rebuild) empties the
+//     export folder and drops the share item, and `init` empties what a killed session left behind.
+//
 // Maximum 60 frames per second; one quality tier, `level-0`. No GL call: everything is drawn by the workload and the
 // VisualCore GPU timer.
 import Foundation
@@ -71,6 +80,20 @@ final class BenchMirror {
     var running = false
     /// The summary block's lines after a finished run; empty otherwise.
     var summaryLines: [String] = []
+    /// Whether an ended run (finished, stopped or interrupted) can be saved: `result-save` is shown.
+    var canSave = false
+    /// Whether the inline results list is shown.
+    var showingResults = false
+    /// The saved results, newest first, as the list shows them.
+    var resultEntries: [ResultLibraryEntry] = []
+    /// Whether the library is read only (its index was written by a newer version).
+    var resultsReadOnly = false
+    /// The opened saved result; nil when none is open.
+    var openedResult: OpenedResult?
+    /// The outcome of the last result action, or its refusal's sentence; empty before any.
+    var resultMessage = ""
+    /// The share item of the last export of the opened result; nil before an export.
+    var exportItem: ResultExportFile?
 }
 
 /// Draws Graphics Benchmark Lab and records its runs (see the file header).
@@ -126,8 +149,20 @@ final class BenchPresenter: ExperiencePresenter {
     /// The reason of ``timerSupport`` when the extension is listed but the timer could not be created.
     nonisolated static let notCreatedReason = "the GPU timer could not be created on this context"
 
-    /// A presenter with no workload until `setup`.
-    init() {}
+    /// The saved results over the experience's storage; nil when the experience was made without storage.
+    let library: ResultLibrary?
+    /// The writer of exports (a test seam: tests give their own folder).
+    let exporter: ResultExporter
+    /// The ended run saved last by this presenter; an equal run is refused as already saved.
+    var savedRun: BenchmarkRun?
+
+    /// A presenter with no workload until `setup`, its library over `storage` (none without storage) and its exports
+    /// written through `exporter`, whose folder is emptied now (what a killed session left behind).
+    init(storage: ExperienceStorage? = nil, exporter: ResultExporter = ResultExporter()) {
+        library = storage.map { ResultLibrary(storage: $0) }
+        self.exporter = exporter
+        exporter.clear()
+    }
 
     /// The frame cap: 60 frames per second.
     var maxFramesPerSecond: Int { 60 }
@@ -273,6 +308,7 @@ final class BenchPresenter: ExperiencePresenter {
         timedFrames = [:]
         workload?.release()
         workload = nil
+        clearExports()
         followRecorder()
     }
 
@@ -349,7 +385,12 @@ final class BenchPresenter: ExperiencePresenter {
     /// The spoken title of the case at `index` ("Textured quads", "Shader ALU", "Particles").
     nonisolated static func title(ofCase index: Int) -> String {
         guard BenchCore.cases.indices.contains(index) else { return "Unknown case" }
-        switch BenchCore.cases[index].workload {
+        return title(of: BenchCore.cases[index].workload)
+    }
+
+    /// The spoken title of a case of `workload` ("Textured quads", "Shader ALU", "Particles"), whatever its version.
+    nonisolated static func title(of workload: Workload) -> String {
+        switch workload {
         case .quads: return "Textured quads"
         case .alu: return "Shader ALU"
         case .particles: return "Particles"
@@ -370,6 +411,9 @@ final class BenchPresenter: ExperiencePresenter {
         if mirror.running != running { mirror.running = running }
         let lines = summaryLines
         if mirror.summaryLines != lines { mirror.summaryLines = lines }
+        let ended = recorder.state != .idle && recorder.state != .running && recorder.summary != nil
+            && recorder.benchmarkCase != nil
+        if mirror.canSave != ended { mirror.canSave = ended }
     }
 
     /// The canvas label, for example "Graphics Benchmark Lab, Textured quads, Ready", with the summary after a
@@ -420,6 +464,6 @@ final class BenchPresenter: ExperiencePresenter {
 
     /// The native controls (``GBLControls``).
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
-        AnyView(GBLControls(port: port, mirror: mirror))
+        AnyView(GBLControls(port: port, mirror: mirror, presenter: self))
     }
 }

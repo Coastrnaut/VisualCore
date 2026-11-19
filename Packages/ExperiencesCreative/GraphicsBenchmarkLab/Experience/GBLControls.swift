@@ -9,11 +9,15 @@
 //   - `status`: the status word ("Ready", "Warm-up", "Measuring", "Cool-down", "Finished", "Stopped",
 //     "Interrupted");
 //   - `summary`: after a finished run, the summary block (interval percentiles, frame counts, flag sentences).
+//   - Feature 176 (A24-P04) T-A24-406: `result-save` ("Save result"), shown after a run ends (finished, stopped or
+//     interrupted), saves that run once; `results` ("Saved results") shows the inline ``ResultsView``;
+//     `result-message` speaks the outcome or the refusal ("This result is already saved.", "The library holds 12
+//     results.", "There is not enough space to save this result.").
 //
 // Inline buttons, never a `Menu`, a menu-style `Picker`, a popover or a sheet over the drawing (the A23-P05 lesson: while
 // a menu is up over a canvas that presents new frames, the system never reports the app idle). The view stores only
 // references (the port and the mirror), never a closure: a controls view that stores closures never compares equal and
-// is rebuilt every frame. Every button is at least 44 points high; the text wraps with Dynamic Type.
+// is rebuilt every frame. The result buttons call the presenter, held as a reference. Every button is at least 44 points high; the text wraps with Dynamic Type.
 import GraphicsBenchmarkLabCore
 import SwiftUI
 import VisualCoreExperienceHost
@@ -24,6 +28,8 @@ struct GBLControls: View {
     let port: ExperienceActionPort
     /// What the controls show.
     let mirror: BenchMirror
+    /// The presenter whose result actions the result buttons call.
+    let presenter: BenchPresenter
 
     /// The identifier name of the button of the case at `index`: `case-<id>`, for example `case-alu`.
     static func caseName(_ index: Int) -> String {
@@ -78,8 +84,43 @@ struct GBLControls: View {
                 .accessibilityLabel(Text(verbatim: "Summary, " + mirror.summaryLines.joined(separator: ", ")))
                 .accessibilityIdentifier(port.identifier("summary"))
             }
+            resultButtons
+            if !mirror.resultMessage.isEmpty {
+                Text(verbatim: mirror.resultMessage)
+                    .font(.footnote)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityLabel(Text(verbatim: mirror.resultMessage))
+                    .accessibilityIdentifier(port.identifier("result-message"))
+            }
+            if mirror.showingResults {
+                ResultsView(port: port, mirror: mirror, presenter: presenter)
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    /// `result-save` after a run ends and `results` (shows or hides the saved results).
+    private var resultButtons: some View {
+        HStack(spacing: 12) {
+            if mirror.canSave {
+                Button {
+                    _ = presenter.saveResult()
+                } label: {
+                    Text(verbatim: "Save result").frame(minHeight: 44)
+                }
+                .accessibilityLabel(Text(verbatim: "Save result"))
+                .accessibilityHint(Text(verbatim: "Keeps the ended run with its settings and report"))
+                .accessibilityIdentifier(port.identifier("result-save"))
+            }
+            Button {
+                if mirror.showingResults { presenter.hideResults() } else { presenter.showResults() }
+            } label: {
+                Text(verbatim: "Saved results").frame(minHeight: 44)
+            }
+            .accessibilityLabel(Text(verbatim: "Saved results"))
+            .accessibilityValue(Text(verbatim: mirror.showingResults ? "Shown" : "Hidden"))
+            .accessibilityIdentifier(port.identifier("results"))
+        }
     }
 
     /// The button of the case at `index`, marked when it is the selected case.

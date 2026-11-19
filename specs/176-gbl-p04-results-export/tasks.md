@@ -42,7 +42,7 @@
 
 ## Phase 5: The interface and export action (P1)
 
-- [ ] T-A24-406 [US1] [US2] [US3] `Experience/{ResultExportFile,ResultsView}.swift` and the `BenchPresenter` and
+- [X] T-A24-406 [US1] [US2] [US3] `Experience/{ResultExportFile,ResultsView}.swift` and the `BenchPresenter` and — Verified 2026-11-19: 2026-11-19: .autonomy/checks/A24-P04.gbl-ios27.json exit 0 (79 core and 53 experience tests); ResultExportFile, ResultExporter (on tap only, temporary folder emptied at teardown), ResultsView (inline list, opened result with settings and report), save after a run ends
   `GBLControls` changes (FR-A24-404, 405; contracts/results.md identifiers): `result-save` after a run ends, the results
   sheet with rows, open (summary and report shown), remove, `result-export-json` and `result-export-csv` writing to
   `TemporaryFolder(name: "GraphicsBenchmarkLab-Export")` only on the tap, then `result-share` (a `ShareLink` of a
