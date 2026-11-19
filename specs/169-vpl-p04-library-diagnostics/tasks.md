@@ -18,7 +18,7 @@
 
 ## Phase 2: Stories 1–2 — save, open and keep unreadable files (P1) 🎯
 
-- [ ] T-A23-403 [US1] [US2] Create `Packages/ExperiencesCreative/VisualProgrammingLab/Experience/GraphLibrary.swift` per
+- [X] T-A23-403 [US1] [US2] Create `Packages/ExperiencesCreative/VisualProgrammingLab/Experience/GraphLibrary.swift` per — Verified 2026-11-18: 2026-11-18: GraphLibrary.swift: graph-<n>.json (a23.saved-graph v1, body name, order and the embedded graph, at most 81,920 bytes) and library.json (a23.graph-library v1), 24 graphs, names trimmed 1...40 unique ignoring case, the three messages, unreadable files listed with their code and never deleted automatically, a newer index read only, atomic writes, a reader through an injectable MigrationChain; .autonomy/checks/A23-P04.vpl-ios27.json exit 0 (162 core and 63 experience tests on sim-27.2, slowest 1.27 s); written by an agent, retested
   clarification Q1 and data-model.md: `graph-<n>.json` ("envelope kind `a23.saved-graph`, version 1, body `{name,
   order, graph}`; at most 81,920 bytes"), `library.json` (kind `a23.graph-library`), "24 graphs", names "trimmed
   1…40, unique ignoring case", the three messages, unreadable files listed with their code and never deleted
