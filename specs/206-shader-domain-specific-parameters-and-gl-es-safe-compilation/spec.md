@@ -35,6 +35,59 @@ Canonical overrides:
 - **Owner rulings:** tests are short; system accessibility audits wait for the device campaign; independent files go to
   parallel agents.
 
+## Clarifications
+
+### Session 2026-11-19
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time (archived clarify
+prompt: data types, precision, lifecycle, error states, ownership, cross-game API, fallbacks, acceptance). Facts checked
+in code (read-only audit, 2026-11-19): `ShaderLibrary` (VisualCoreShaderSource) recognises only `#include "name"`,
+detects cycles, limits depth to 8 and text to 64 KiB, but pastes a file included twice twice and compares the
+mid-expansion size against the line count (`ShaderLibrary.swift:121`); defines are sorted `#define K V` lines, not
+validated; `ResourceRegistry.program(vertex:fragment:defines:library:vertexName:fragmentName:)` caches 64 programs by
+`ShaderCacheKey` (SHA-256 of both expanded texts), retiring evicted ones; `ShaderProgram` reads info logs into a fixed
+4,096-byte buffer, reads the log only on failure and parses link logs without a file map; it reflects active uniforms
+(`glGetActiveUniform`) with typed setters; `RenderCapabilities` reports `fragmentHighp`/`fragmentMediump` but nothing
+uses it; `ParameterSchema` (VisualCoreParameters) declares `ParameterDefinition(name, …, range, defaultValue,
+transform)` whose name is documented as the `u_<name>` uniform suffix, with no binding code; VisualCoreRendering does
+not depend on VisualCoreParameters yet. The bundled `vc/*.glsl` files already carry `#ifndef` guards.
+
+- Q: Where do the new types live, and what depends on what? → A: Pure text work in VisualCoreShaderSource: `DefineSet`
+  (validated defines), `ShaderVariantSet` (switches and combinations), `PrecisionPolicy` (default float precision) and
+  `UniformLayout` with a `UniformType` enum (float, vec2–4, int, ivec2–4, bool, mat3, mat4, sampler2D, sampler3D,
+  samplerCube). GL work in VisualCoreRendering: `ResourceRegistry.prewarm(_:)`, the layout check against a
+  `ShaderProgram`, the longer logs and warnings, and `ParameterUniformBinding`; VisualCoreRendering gains a dependency
+  on the pure VisualCoreParameters product. Rationale: pure parts are testable on the host; no cycle (VisualCoreParameters
+  depends on nothing in rendering). Impact: the public-API baseline grows in both packages.
+- Q: Does any existing behaviour change? → A: Only where it was unsafe: a second include of one file is skipped (it
+  produced redefinition errors before, so no working shader depends on it); the size guard measures bytes; defines are
+  validated (every define in the repository already passes); the default precision is inserted only into a fragment
+  shader that has no float precision statement (such a shader fails to compile in GLSL ES today). `program(...)` keeps
+  its signature and gains an overload taking a `DefineSet` and a precision policy. Rationale: no Stage One breakage
+  (FR-R02F06-009). Impact: the 25 experiences' shader validation tests must pass unchanged.
+- Q: How are variants keyed and compiled in advance? → A: A `ShaderVariantSet` holds up to 6 switches, each a define
+  name and its allowed values (1–8 each), at most 64 combinations; combinations are enumerated in lexicographic order of
+  switch name then value index; a combination's key is `name=value` pairs joined by `;` in switch-name order.
+  `ResourceRegistry.prewarm(set, vertex:fragment:library:)` compiles every combination through the existing cache and
+  returns a `PrewarmReport` listing each key with `compiled`, `cached` or `failed([ShaderDiagnostic])`. Rationale:
+  deterministic, bounded, reuses the one cache. Impact: SC-R02F06-002 counts cache hits through `cacheHits`.
+- Q: What do diagnostics and reason codes look like? → A: Logs are read with their reported length, capped at 65,536
+  bytes; warnings of a successful compile are kept in `ShaderProgram.warnings: [ShaderDiagnostic]`; a link diagnostic's
+  file reads `<vertexName>+<fragmentName>`; an unparsed log line becomes one diagnostic with file `unknown`, line 0.
+  Every refusal maps to a stable reason code: `shader.include-cycle`, `shader.include-depth`, `shader.too-large`,
+  `shader.unknown-include`, `shader.unsupported-version`, `shader.define-name`, `shader.define-reserved`,
+  `shader.define-value`, `shader.too-many-defines`, `shader.too-many-variants`, `shader.compile`, `shader.link`,
+  `shader.uniform-undeclared`, `shader.uniform-type`, `shader.parameter-not-finite`; `ShaderFailureReport` carries
+  `feature: "R2-F06"`, the reason code, the diagnostics and the caller's optional experience id, seed, tick and
+  capability tier. Rationale: observability rule of the source prompt. Impact: tests assert codes by name.
+- Q: How do parameter bindings behave over time and context loss? → A: `ParameterUniformBinding(schema:program:)`
+  matches each parameter to the active float uniform `u_<name>`; `apply(_ values: ResolvedParameters)` clamps through
+  the schema, refuses a non-finite value with `shader.parameter-not-finite` before setting anything, sets the uniforms
+  on the bound program, and reports parameters without a uniform once (`unused`). After a context rebuild the caller
+  makes the binding again from the new program (bindings hold no GPU object across `teardown`, as presenters do), and
+  the same values give the same uniform values. Rationale: follows the presenter lifecycle of UA-F02. Impact:
+  SC-R02F06-004 reads the uniforms back with `glGetUniformfv` before and after `recreateContext`.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - A shader mistake is named before anything is drawn (Priority: P1) 🎯
