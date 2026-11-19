@@ -82,6 +82,18 @@ enum BenchTest {
         #expect(drawn, "a frame at \(time) s", sourceLocation: sourceLocation)
     }
 
+    /// Draws one frame of `session` with `shell`'s presenter fed the frame time `time` (seconds) and presents it, as
+    /// the display link does (feature 175 T-A24-310): the presentation submits the frame's GL work, so its GPU timer
+    /// result becomes available a few frames later; a burst of frames drawn without presenting may leave the work
+    /// unsubmitted and time nothing.
+    static func drawPresented(_ session: ExperienceSession, _ shell: ExperienceShell<BenchPresenter>, at time: Double,
+                              sourceLocation: SourceLocation = #_sourceLocation) throws {
+        let host = try #require(session.renderHost, sourceLocation: sourceLocation)
+        shell.presenter.feedTime = time
+        let drawn = host.renderOneFrame(present: true)
+        #expect(drawn, "a presented frame at \(time) s", sourceLocation: sourceLocation)
+    }
+
     /// Draws one frame at each of `times` (seconds).
     static func draw(_ session: ExperienceSession, _ shell: ExperienceShell<BenchPresenter>,
                      times: [Double]) throws {

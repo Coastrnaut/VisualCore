@@ -9,6 +9,10 @@
 //   - stopping mid-run gives "Stopped"; choosing another case mid-run ends the run as "Stopped" before the new case is
 //     drawn; closing the session mid-run and a context rebuild mid-run give "Interrupted" with the samples kept;
 //   - a restored snapshot with start requests never resumes a run.
+// Feature 175 (A24-P03) T-A24-310 (SC-A24-301; clarification Q4): every interval above 25 ms is flagged dropped and
+// counted while its interval still counts; a 30 ms interval in the measurement is the one dropped frame of a run fed
+// at 1/64 s; warm-up and cool-down frames are excluded and counted. The checks that no sample has a GPU time hold for
+// the recorder alone (no timer results applied) and for the presenter with the probe forced to unsupported.
 import CoreGraphics
 import Foundation
 import Testing
@@ -49,7 +53,10 @@ import GraphicsBenchmarkLabCore
         #expect(samples.first?.intervalMs == nil, "the run's first frame has no interval")
         let intervals = samples.dropFirst().compactMap(\.intervalMs)
         #expect(intervals.count == 71 && intervals.allSatisfy { $0 == 250 })
-        #expect(samples.allSatisfy { $0.cpuMs == 1.5 && !$0.dropped })
+        for sample in samples {
+            let dropped = sample.intervalMs != nil
+            #expect(sample.cpuMs == 1.5 && sample.dropped == dropped, "every 250 ms interval is dropped")
+        }
 
         let summary = try #require(recorder.summary)
         #expect(summary.measured == 40)
@@ -57,8 +64,10 @@ import GraphicsBenchmarkLabCore
         #expect(summary.coolDownExcluded == 20)
         #expect(summary.interval.count == 40 && summary.interval.p50 == 250)
         #expect(summary.cpu.count == 40)
+        let droppedCount = summary.dropped
+        #expect(droppedCount == 40, "every measured frame has a 250 ms interval")
         let flags = summary.flags
-        #expect(flags.contains(.tooFewForP99) && !flags.contains(.tooFewForP95))
+        #expect(flags.contains(.tooFewForP99) && !flags.contains(.tooFewForP95) && flags.contains(.droppedFrames))
     }
 
     @Test func noSampleHasAGPUTimeAndTheRunFileHoldsNone() throws {
@@ -77,7 +86,12 @@ import GraphicsBenchmarkLabCore
         #expect(run.caseFingerprint == fingerprint)
         let text = String(decoding: try RunDocument.encode(run), as: UTF8.self)
         #expect(!text.contains("gpuMs"), "no sample stores a GPU time")
-        #expect(!text.contains("\"gpu\""), "the summary stores no GPU distribution")
+        let reopened = try RunDocument.decode(RunDocument.encode(run)).get()
+        var withGPU = 0
+        for sample in reopened.samples where sample.gpuMs != nil { withGPU += 1 }
+        #expect(withGPU == 0, "no stored sample has a GPU time")
+        let storedGPU = reopened.summary.gpu
+        #expect(storedGPU == nil, "the stored summary has no GPU distribution")
         let lines = BenchPresenter.summaryLines(summary)
         #expect(lines.contains("GPU time not available on this device."))
         #expect(lines.joined(separator: " ").contains("GPU time not available"))
@@ -127,7 +141,8 @@ import GraphicsBenchmarkLabCore
         recorder.record(frameTime: 0.25, cpuMs: 1)
         recorder.record(frameTime: .nan, cpuMs: 1)
         #expect(recorder.samples.count == 2, "a frame earlier than the last one and a non-finite time are skipped")
-        // A 1.2 s gap: the run ends as interrupted, the two earlier samples kept, nothing clamped or marked dropped.
+        // A 1.2 s gap: the run ends as interrupted, the two earlier samples kept, nothing clamped; the 500 ms interval is
+        // dropped by the A24-P03 rule.
         recorder.record(frameTime: 1.7, cpuMs: 1)
         let state = recorder.state
         #expect(state == .interrupted)
@@ -135,7 +150,8 @@ import GraphicsBenchmarkLabCore
         #expect(samples.count == 2)
         for sample in samples {
             let interval = sample.intervalMs ?? 0
-            #expect(interval <= 500 && !sample.dropped && sample.cpuMs == 1)
+            let dropped = sample.intervalMs != nil
+            #expect(interval <= 500 && sample.dropped == dropped && sample.cpuMs == 1)
         }
     }
 
@@ -155,6 +171,53 @@ import GraphicsBenchmarkLabCore
         #expect(negativeState == .interrupted)
     }
 
+    @Test func aThirtyMillisecondIntervalIsDroppedAndCountedAndTheExcludedPhasesAreCounted() throws {
+        let plan = RunPlan(warmUpSeconds: 1, measureSeconds: 1, coolDownSeconds: 1)
+        let benchmarkCase = BenchmarkCase(id: "quads", version: 1, workload: .quads,
+                                          config: BenchmarkCase.quads.config, plan: plan)
+        let step = 1.0 / 64.0
+        var times: [Double] = []
+        var time = 0.0
+        while time < 1.5 {
+            times.append(time)
+            time += step
+        }
+        let lateTime = (times.last ?? 0) + 0.030
+        time = lateTime
+        while time < 3.0 {
+            times.append(time)
+            time += step
+        }
+        times.append(3.0)
+        var expectedWarmUp = 0
+        var expectedMeasured = 0
+        var expectedCoolDown = 0
+        for value in times {
+            if value < 1 { expectedWarmUp += 1 } else if value < 2 { expectedMeasured += 1 }
+            else if value < 3 { expectedCoolDown += 1 }
+        }
+        let recorder = RunRecorder()
+        recorder.start(case: benchmarkCase, at: 0)
+        for value in times { recorder.record(frameTime: value, cpuMs: 1) }
+        let state = recorder.state
+        #expect(state == .finished)
+        let samples = recorder.samples
+        var droppedSamples: [FrameSample] = []
+        for sample in samples where sample.dropped { droppedSamples.append(sample) }
+        #expect(droppedSamples.count == 1, "only the 30 ms interval is above 25 ms")
+        let late = try #require(droppedSamples.first)
+        let lateInterval = try #require(late.intervalMs)
+        #expect(late.phase == .measure && abs(lateInterval - 30) < 1e-6)
+        let summary = try #require(recorder.summary)
+        #expect(summary.dropped == 1 && summary.flags.contains(.droppedFrames))
+        #expect(summary.measured == expectedMeasured)
+        #expect(summary.warmUpExcluded == expectedWarmUp && summary.coolDownExcluded == expectedCoolDown)
+        let intervalCount = summary.interval.count
+        #expect(intervalCount == expectedMeasured, "the dropped frame's interval still counts")
+        let largest = try #require(summary.interval.p99 ?? summary.interval.p95)
+        #expect(largest <= lateInterval + 1e-6)
+    }
+
     // MARK: Through the presenter
 
     @Test func aRunThroughThePresenterMeasuresTheCPUTimeAndSaysGPUTimeIsNotAvailable() async throws {
@@ -162,6 +225,7 @@ import GraphicsBenchmarkLabCore
         defer { session.close() }
         let shell = try await BenchTest.open(session)
         let presenter = shell.presenter
+        presenter.forceTimerUnsupported = true
         #expect(presenter.status == "Ready" && presenter.mirror.status == "Ready")
         BenchTest.accept(shell, "run.start")
         try BenchTest.draw(session, shell, at: 100)
@@ -177,7 +241,10 @@ import GraphicsBenchmarkLabCore
         let samples = presenter.recorder.samples
         #expect(samples.count == 36)
         #expect(samples.allSatisfy { $0.cpuMs > 0 }, "the CPU submit time is measured, never a placeholder zero")
-        #expect(samples.allSatisfy { $0.gpuMs == nil })
+        var withGPU = 0
+        for sample in samples where sample.gpuMs != nil { withGPU += 1 }
+        #expect(withGPU == 0, "the probe is forced to unsupported, so no sample has a GPU time")
+        #expect(presenter.timer == nil)
         let summary = try #require(presenter.recorder.summary)
         #expect(summary.measured == 20 && summary.warmUpExcluded == 6 && summary.coolDownExcluded == 10)
         #expect(summary.gpu == nil && summary.flags.contains(.gpuTimeNotAvailable))

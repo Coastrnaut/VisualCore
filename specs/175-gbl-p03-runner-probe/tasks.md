@@ -53,7 +53,7 @@
 - [X] T-A24-309 [US3] `Experience/ReportSource.swift` (FR-A24-307): `utsname` machine, `operatingSystemVersion`, the — Verified 2026-11-19: 2026-11-19: .autonomy/checks/A24-P03.gbl-ios27.json exit 0 (66 core and 42 experience tests); ReportSource builds the report from public sources and the presenter attaches it to every ended run
   bundle's version and build, `renderCapabilities`, tier, `DeviceConditions.current()` at start and end; the report is
   attached to the finished run
-- [ ] T-A24-310 [US1] [US2] [US3] Tests `ExperienceTests/{GPUTimingTests,ReportTests}.swift` and `RecorderTests.swift`
+- [X] T-A24-310 [US1] [US2] [US3] Tests `ExperienceTests/{GPUTimingTests,ReportTests}.swift` and `RecorderTests.swift` — Verified 2026-11-19: 2026-11-19: .autonomy/checks/A24-P03.gbl-ios27.json exit 0 (66 core and 42 experience tests); GPUTimingTests (supported on the simulator, measured frames timed 0.02 to 0.17 ms, not device evidence; forced unsupported none), ReportTests, RecorderTests (30 ms dropped, warm-up and cool-down excluded and counted)
   (SC-A24-301–304): warm-up and cool-down excluded and counted; on the simulator a run records GPU times that are
   finite, non-negative and within 1,000 ms for measured frames only; with the seam, none and the flag; every report
   field filled; a 30 ms interval flagged dropped and counted
