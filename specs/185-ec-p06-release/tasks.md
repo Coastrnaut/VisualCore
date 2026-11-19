@@ -58,7 +58,7 @@
 - [X] T-A25-610 App: `xcodegen generate --spec project.yml`, then `--name app-ui -- python3 scripts/release_check.py — Verified 2026-11-19: 2026-11-19 xcodegen generated; .autonomy/checks/A25-P06.{app-ui,verify-27,script-tests,catalog}.json (exit 0 each)
   --only app-build-for-testing-ios27 app-unit-ios27 app-ui-ios27-h3`; `--name verify-27`; `--name script-tests`
   (the new chunk); `--name catalog`
-- [ ] T-A25-611 Release checks as a review checkpoint: `--name release-checks -- python3 scripts/release_check.py
+- [X] T-A25-611 Release checks as a review checkpoint: `--name release-checks -- python3 scripts/release_check.py — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P06.release-checks.json (exit 0: app-release-build, app-release-symbols, app-privacy-manifest, app-no-tracking, app-licenses, app-usage-descriptions, experience-release-a25, copy-claims-a25); both scans PASS
   --only experience-release-a25 copy-claims-a25`, plus both scans
 - [ ] T-A25-612 Contract: close G-RELEASE with "A25-P06" (all 14 gaps closed; the iOS 26.x runner half cited at
   X-A25), `--name contract`; experience README

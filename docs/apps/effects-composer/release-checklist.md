@@ -62,11 +62,9 @@ The App Store Connect record, the App Privacy answers (no data collected, no tra
 `BLOCKED_OWNER_ACTION`; the agent never does them.
 
 The app-wide Release build checks (`app-release-build`, `app-release-symbols`, `app-privacy-manifest`,
-`app-no-tracking`, `app-licenses`, `app-usage-descriptions`) are not part of this phase's release checks (T-A25-611
-runs `experience-release-a25` and `copy-claims-a25`). They last passed in `.autonomy/checks/A24-P06.release-checks.json`,
-before Effects Composer was linked into the app (A25-P02 T-A25-210); the app's privacy manifest, usage strings and
-third-party inventory have not changed since, and the experience adds no required-reason use, no usage string and no
-third-party component.
+`app-no-tracking`, `app-licenses`, `app-usage-descriptions`) passed with Effects Composer linked into the app, together
+with `experience-release-a25` and `copy-claims-a25`, in `.autonomy/checks/A25-P06.release-checks.json` (T-A25-611);
+the experience adds no required-reason use, no usage string and no third-party component.
 
 ## Accessibility: proved so far and pending for devices
 
