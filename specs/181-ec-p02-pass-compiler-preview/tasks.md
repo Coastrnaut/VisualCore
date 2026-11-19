@@ -40,7 +40,7 @@
 
 ## Phase 4: Stories 4 and 5 — diagnostics and a bounded pool (P2)
 
-- [ ] T-A25-208 [US4] [US5] Write `Packages/ExperiencesCreative/EffectsComposer/ExperienceTests/{DiagnosticTests,PoolTests}.swift`: a broken program for one effect
+- [X] T-A25-208 [US4] [US5] Write `Packages/ExperiencesCreative/EffectsComposer/ExperienceTests/{DiagnosticTests,PoolTests}.swift`: a broken program for one effect — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P02.ec-ios27.json exit 0 (42 core and 27 experience tests on sim-27.2); a broken Blur gives 'Blur, line 8: ...' and keeps the last good picture; 50 cycles, 10 rebuilds and a resize leave 11 live objects and 1,048,576 bytes; a25.pool-cap refusals
   gives one diagnostic with the effect and a line and the result is unchanged; 50 edit-and-draw cycles and 10
   `recreateContext` calls and a resize leave `ResourceRegistry.stats` live counts and bytes equal to those after the
   first draw; a request above the pool cap is refused with `a25.pool-cap` (SC-A25-204, 205)
