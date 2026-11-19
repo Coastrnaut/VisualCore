@@ -79,7 +79,7 @@
   "A23-P01", and rows whose gaps are all closed become available with evidence (`--name contract -- python3
   scripts/check_app_contract.py --app visual-programming-lab --render`); list the core in
   `docs/apps/visual-programming-lab/README.md`
-- [ ] T-A23-111 The packages, catalog and script tests and the app build:
+- [X] T-A23-111 The packages, catalog and script tests and the app build: — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A23-P01.experience-packages.json, A23-P01.catalog.json, A23-P01.script-tests.json and A23-P01.app-build.json exit 0
   - `--name experience-packages`;
   - `--name catalog -- python3 scripts/build_catalog.py --check`;
   - `--name script-tests -- python3 scripts/test_scripts.py`;
