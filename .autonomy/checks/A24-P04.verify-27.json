@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a24.graphics-benchmark-lab",
+    "--runtime",
+    "27"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a24.graphics-benchmark-lab --runtime 27",
+  "elapsed_seconds": 55.194,
+  "exit_code": 0,
+  "finished": "2026-11-19T17:20:28+00:00",
+  "log": ".autonomy/logs/A24-P04.verify-27.log",
+  "log_sha256": "701b3721e50b19562a94ad414f5bd2ac5bbca31218ffc849c5422fbd0286ea9e",
+  "name": "verify-27",
+  "stage": "A24-P04",
+  "started": "2026-11-19T17:19:33+00:00",
+  "timed_out": false
+}

@@ -57,7 +57,7 @@
   documented API, isolation, core purity and `--name scan-identifiers`
 - [X] T-A24-409 Contract: G-RESULTS and G-EXPORT closed by "A24-P04", rows whose gaps are all closed available — Verified 2026-11-19: 2026-11-19: G-RESULTS and G-EXPORT closed by A24-P04, M10, M20 and M21 available; .autonomy/checks/A24-P04.contract.json exit 0; README updated
   (`--name contract`); the experience README updated
-- [ ] T-A24-410 The catalog, packages, script tests, app and runner: `--name catalog`, `experience-packages`,
+- [X] T-A24-410 The catalog, packages, script tests, app and runner: `--name catalog`, `experience-packages`, — Verified 2026-11-19: 2026-11-19: .autonomy/checks/A24-P04.{catalog,experience-packages,script-tests,app-unit,verify-27}.json exit 0 (runner 9 of 9 on iOS 27.2)
   `script-tests`; `xcodegen generate --spec project.yml`, then `--name app-unit`; `--name verify-27`
 - [ ] T-A24-411 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
   A24-P04; update README.md (rule 16) and `docs/automatedtesting.md` (rule 17)
