@@ -60,7 +60,7 @@
   `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/ShaderBindingTests.swift` (layout errors and unused;
   parameter values read back with `glGetUniformfv` before and after `recreateContext`; non-finite refused; unused
   parameter reported once)
-- [ ] T-R02F06-008 [US1] Simulator runs: `--name rendering-27 --` the VisualCoreRendering scheme on sim-27.2 and
+- [X] T-R02F06-008 [US1] Simulator runs: `--name rendering-27 --` the VisualCoreRendering scheme on sim-27.2 and — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F06.{rendering-27,rendering-26}.json (exit 0 on iOS 27.2 and 26.5)
   `--name rendering-26 --` on sim-26.5 (all existing shader, cache and validation tests pass)
 
 ## Phase 6: Regression, documentation and close
