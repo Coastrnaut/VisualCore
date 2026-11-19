@@ -1239,7 +1239,7 @@
    "id": "M31",
    "capability": "Truthful claims: no CPU time labelled GPU time, no ranking, no invented or published benchmark number",
    "source": "cross-cutting; constitution truthful claims; CLAUDE.md rule 9",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/PerformanceRecord.swift",
@@ -1258,7 +1258,7 @@
     "file": "Apps/VisualCore/App/SettingsView.swift",
     "symbol": "SettingsView"
    },
-   "notes": "PerformanceRecord holds measured values only (PerformanceRecordTests); the lab's copy and store claims are G-EXPLAIN (A24-P05) and checked by copy-claims in G-RELEASE (A24-P06). A24-P05 (feature 177): the explanation's copy passes the copy-claims scan (G-EXPLAIN closed); the store copy is G-RELEASE (A24-P06)."
+   "notes": "PerformanceRecord holds measured values only (PerformanceRecordTests); the lab's copy and store claims are G-EXPLAIN (A24-P05) and checked by copy-claims in G-RELEASE (A24-P06). A24-P05 (feature 177): the explanation's copy passes the copy-claims scan (G-EXPLAIN closed); the store copy is G-RELEASE (A24-P06). A24-P06 (feature 178): the store text claims only what a named test proves and says the lab does not rank devices; the experience's claims scan (specs/178-gbl-p06-release/scan-claims-release.sh) finds no ranking, score, precision, other-tool, upload or speed word, and copy-claims-a24 passes with only \"share\" allowed (G-RELEASE closed)."
   },
   {
    "id": "M32",
@@ -1332,7 +1332,7 @@
    "id": "M34",
    "capability": "Release: registration, the A24 release-check, copy-claims and verify steps, licenses and catalog availability",
    "source": "manual \u00a79 phase 06",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceDescriptor.swift",
@@ -1351,7 +1351,7 @@
     "file": "Packages/ExperiencesCreative/DigitalAquarium/Core/LicenseAudit.swift",
     "symbol": "LicenseAudit"
    },
-   "notes": "No A24 release step exists (173 lines listed by python3 scripts/release_check.py --list on 2026-11-19; AcknowledgementsViewTests). G-RELEASE (A24-P06)."
+   "notes": "No A24 release step exists (173 lines listed by python3 scripts/release_check.py --list on 2026-11-19; AcknowledgementsViewTests). G-RELEASE (A24-P06). A24-P06 (feature 178): docs/apps/graphics-benchmark-lab/release.json drives experience-release-a24 and copy-claims-a24 in release_check.py (both pass, with the unsigned release build); privacy and credits, licences, the store text, a 35-row release checklist and the A24 section of docs/release/known-limitations.md exist; the iOS 26.x runner half is cited at X-A24 (G-RELEASE closed)."
   },
   {
    "id": "M35",
@@ -1678,7 +1678,7 @@
    "justification": "Registration, the A24 release-check, copy-claims and verify steps, privacy and credits, and catalog availability are the experience's release work in the one app.",
    "phase": 6,
    "test": "experience-release-a24 and copy-claims-a24 pass in release_check.py; the verify steps pass on iOS 27 and 26; every store claim names a test.",
-   "closed": null
+   "closed": "A24-P06"
   }
  ],
  "traceability": [
