@@ -39,7 +39,7 @@ with every gate that changes what it says (see [Keeping this README current](#ke
 
 ## Status
 
-State on **2026-11-18**. Progress lives in two ledgers, never in prose; the commands below print the live state. A
+State on **2026-11-18**. VisualCore 1.0 (22 free experiences, build 1.0.0 (1)) was submitted to the App Store on 2026-11-18 and is waiting for review ([record](docs/release/name-reservation.md)). Progress lives in two ledgers, never in prose; the commands below print the live state. A
 gate is "pass" when its host and simulator checks passed and its evidence is recorded. **Pass is never device
 evidence**: no physical-device test of the unified app has been run.
 

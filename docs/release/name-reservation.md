@@ -1,6 +1,6 @@
 # VisualCore — one-time App Store name and bundle reservation
 
-**Status: `BLOCKED_OWNER_ACTION`** (updated 2026-11-18: an early App Store release after A22, below). Owner request of 2026-11-14: after Digital Aquarium (A09) is complete, release one
+**Status: submitted** (2026-11-18: VisualCore 1.0, build 1, Waiting for Review; see the record below). Owner request of 2026-11-14: after Digital Aquarium (A09) is complete, release one
 store app version to reserve the app's name and bundle identifier — only this one time. X-A09 was recorded on
 2026-11-14, so the reservation is due now. Every step below needs the owner's Apple account, so the agent does none of
 them (CLAUDE.md rule 6). Nothing here changes the device-testing order: no device install or TestFlight test before
@@ -121,4 +121,8 @@ owner's action.
 | 2026-11-18 | Support URL | https://github.com/Coastrnaut/VisualCore/issues (as projectm-ios does) |
 | 2026-11-18 | App Review contact | copied from the projectM-iOS record at the owner's request |
 | 2026-11-18 | Screenshots on the product page | Media Manager: six iPhone screenshots resized to 1206 × 2622 (the required 6.1"/6.3" slot) and four iPad 13" (2064 × 2752) |
-| — | Release option, Add for Review, Submit | `BLOCKED_OWNER_ACTION` (the owner's final click) |
+| 2026-11-18 | Release option | automatic release after approval (owner) |
+| 2026-11-18 | Sign-in required | unticked again (it had reverted); the app has no sign-in |
+| 2026-11-18 | China mainland | removed from availability at the owner's request (174 countries or regions): a new app needs a Security Assessment and an AIGC services declaration for China mainland; it can be added back once those exist |
+| 2026-11-18 | Submitted for review | VisualCore 1.0, build 1.0.0 (1), at the owner's request; status Waiting for Review (Apple: up to 48 hours) |
+| — | Review outcome | pending |
