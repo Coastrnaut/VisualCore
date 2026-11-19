@@ -23,6 +23,49 @@ Canonical overrides:
   the system share sheet; nothing is uploaded.
 - **No VisualCore or ProjectM change.** Follow `specs/169-vpl-p04-library-diagnostics` (the library) and A19's export.
 
+## Clarifications
+
+### Session 2026-11-19
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- **Storage:** `ExperienceStorage` (VisualCoreExperience) writes atomically within a quota of 16 MiB and 64 files;
+  Visual Programming Lab's `GraphLibrary` (A23-P04) is the precedent for one file per item, an index, unreadable files
+  listed and kept, and a newer index making the library read only.
+- **Share:** Living Wallpapers' `WallpaperExportFile` (A19-P04) is a `Transferable` with a `FileRepresentation` of the
+  written file, offered through `ShareLink` only while the file exists; temporary files go through
+  `TemporaryFolder(name:base:)` (VisualCorePersistence).
+- **Run file today:** version 2 stores the case as `{fingerprint, id, version}` only.
+
+- Q: How are the case's settings stored with a run (the regression fixture)? → A: Run file version 3: the body's `case`
+  holds the whole `BenchmarkCase` (`id`, `version`, `workload`, `config`, `plan`) plus its `fingerprint`; the reader
+  recomputes the fingerprint from the stored settings and refuses a mismatch as `damaged`. The migration 2 → 3 fills the
+  settings from the built-in case with the same id and version when its fingerprint matches, and refuses the file as
+  `damaged` otherwise (no version-2 file was ever stored, so this only guards hand-made files).
+- Q: How are results stored, and what are the caps? → A: `result-<n>.json` with the envelope `{"body", "kind":
+  "a24.saved-result", "version": 1}` whose body is `{order, run}` (the run file embedded as a JSON object), at most
+  2,162,688 bytes; the index `results.json` (`a24.result-library`, version 1, `{next, entries: [{file, order}]}`); at
+  most 12 results (unreadable ones count); n is a counter never reused. Refusals of a file: `damaged`, `newer-version`,
+  `too-large` and the run file's codes. A newer index makes the library read only; a damaged index is rebuilt by the
+  next change, never by reading. Messages: "The library holds 12 results." and "There is not enough space to save this
+  result.".
+- Q: What does the list show? → A: Newest first (by order): the case title, the state ("Finished", "Stopped",
+  "Interrupted"), "p50 <x> ms, p95 <y> ms" of the frame interval (two decimals, or "not enough frames"), and "GPU timed"
+  when the summary has a GPU distribution; an unreadable entry shows its file name and reason. Rows are
+  `result-row-<n>`, opened with `result-open-<n>` and removed with `result-remove-<n>`.
+- Q: What exactly are the JSON and CSV exports? → A: JSON is the run file itself (version 3, sorted keys), named
+  "Benchmark <case title> <order>.json". CSV (`a24.benchmark-run.csv`, version 1), named the same with `.csv`, is in two
+  parts separated by one empty line: first `key,value` rows (`format`, `format_version`, `case_id`, `case_version`,
+  `case_fingerprint`, every workload setting and plan length, `state`, then every report field and timing source, the
+  summary's p50, p95 and p99 of interval, CPU and GPU (empty when absent) and its flags joined by `;`), then the samples
+  with the header `frame_index,phase,interval_ms,cpu_ms,gpu_ms,dropped` and one row per sample; numbers in Swift's
+  shortest round-trip form, an absent value empty, lines ending in CRLF, fields with a comma, quote or line break quoted
+  with quotes doubled (RFC 4180).
+- Q: When is an export file written? → A: Only when the person taps "Export JSON" or "Export CSV" on an opened result:
+  the file is written to `TemporaryFolder(name: "GraphicsBenchmarkLab-Export")`, then a `ShareLink` with a
+  `ResultExportFile` (`Transferable`, `.json` or `.commaSeparatedText`) appears; the folder is emptied when the session
+  closes. The experience never writes an export by itself.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - A finished run is kept with what was measured (Priority: P1) 🎯
