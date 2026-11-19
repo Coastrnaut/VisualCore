@@ -26,6 +26,63 @@ Canonical overrides:
   (since A22-P02); this phase keeps it, and A23-P02 moves it on when A23 becomes a real candidate.
 - Follow `specs/158-ss-p00-boundary-audit`.
 
+## Clarifications
+
+### Session 2026-11-18
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code by a read-only survey, then spot-checked:
+- **Commits:** the A23 constitution commit is `0a9405b5` and the A23-P00 specify commit is `7b64fedf`, the phase start
+  for the no-change diff of `Packages` and `External`. The reference submodule is pinned at `d93edd1`.
+- **Registry and catalog:**
+  - twenty-two experiences are registered in `Catalog/registrations.json` (A01–A22), and the candidates list is
+    empty;
+  - `a23` appears in neither file as a registration; `AppModelTests` uses it as the synthetic not-yet-integrated id;
+  - the catalog lists Visual Programming Lab as free, family "Developer and creator tools", launcher category tools.
+- **Host rule:** `RenderHost`, `ResourceRegistry`, `RenderScene` and `ExperiencePresenter` are main-actor. GL work
+  happens only inside a scene's `setup`, `resize`, `render` and `teardown`, with the host's context current.
+- **VisualCore offers** (public in a framework product and tested):
+  - **pass graphs:** `EffectGraphDescription` (VisualCoreEffectsGraph; `Codable`, `currentVersion = 1`) and
+    `EffectGraphValidator.validate(_:width:height:quotaBytes:)` (a private Kahn topological order, `EffectGraphError`
+    with `.cycle`, a 32-pass limit `PassSchemas.maxPasses`, a 256 MiB default quota). `EffectRenderer` and
+    `EffectScene` (VisualCoreEffects) draw a validated graph. The pass types are a closed set (`PassSchemas.all`:
+    copy, colorMatrix, blur, bloom, distort, composite, feedback, flashLimit), every pass consumes a texture chain,
+    and there is no generator, constant, time or scalar mix pass;
+  - **passes and targets:** `FieldPass` (named sampler inputs, typed `FieldUniform`s, drawing into a target or the
+    framebuffer; it refuses to sample its own output), `PingPongTarget`, `ResourceRegistry.makeRenderTarget` with
+    target pools, `ResourceBudget` and `ResourceLedger`;
+  - **GLSL:** the `vc/` library (`noise.glsl`: `vc_valueNoise`, `vc_gradientNoise`, `vc_fbm`; `color.glsl`;
+    `palette.glsl`: `vc_palette`; `hash.glsl`; `sdf.glsl`; `field.glsl`). The blur shader is internal to
+    VisualCoreEffects;
+  - **parameters:** `ParameterDefinition`, `ParameterSchema`, `ParameterEditor`, `ParameterHash` (VisualCoreParameters)
+    and the parameter panel (VisualCoreUI);
+  - **persistence:** `MigrationChain`, `NamedLibrary`, `DocumentStore` (VisualCorePersistence), `ExperienceStorage`
+    and `ExperienceSnapshot` (VisualCoreExperience), and `DigestBuilder` / `StableHash` for content hashes;
+  - **canvas math:** `PlaneViewport` and `Camera2D` (VisualCoreMath) and the gesture recognizers (VisualCoreScenes).
+- **Missing:** no public DAG or topological-sort utility, no typed ports, no node-editor canvas, no content-hash cache
+  for compiled subgraphs, no migration for `EffectGraphDescription`, and no existing node-graph experience.
+
+- Q: Does the graph compile into VisualCore's effect graph or into the experience's own pass schedule? → A: Into the
+  experience's own pass schedule, drawn with VisualCore's public `FieldPass`, render targets and `vc/` GLSL. The
+  effect graph's pass set is closed and chain-only (no generators, constants, time or scalar ports), so mapping nodes
+  onto it would need a VisualCore change in every phase. The schedule is app-local (gap G-COMPILE), with a note that a
+  second user would justify an upstream pass-registry change.
+- Q: Who owns typed ports, type checking, topological order and cycle rejection? → A: The experience's pure core
+  (gaps G-MODEL and G-TYPES), tested by `swift test`. VisualCore's Kahn order is private and works on passes, not
+  typed ports. A cycle is reported with its path of edges.
+- Q: How are blur and the other node operators drawn? → A: As app-local fragment programs over `FieldPass`, using the
+  `vc/` noise, palette and colour functions. Blur is a separable two-pass Gaussian with a capped radius, written in the
+  experience, because VisualCoreEffects' blur shader is internal (gap G-OPERATORS). No VisualCore change is planned.
+- Q: How are graphs persisted? → A: As versioned envelopes in the experience's `ExperienceStorage`, with a
+  `MigrationChain` for the graph schema and named graphs after Shader Studio's `ProjectLibrary` (gap G-LIBRARY). The
+  session snapshot holds the open graph. Damaged and newer files are refused and never deleted automatically (the
+  manual's risk 3).
+- Q: Who owns the canvas and the memory budget? → A: The canvas is app-local SwiftUI over `PlaneViewport` and the
+  gesture recognizers, with large targets, zoom and an accessible list form (gap G-CANVAS; risk 2). A static texture
+  budget is computed from the compiled schedule before any target is allocated and checked against
+  `ResourceBudget` (gap G-BUDGET; risk 1). The caps (nodes, edges, texture count and size, blur radius) are set in
+  A23-P01 and A23-P03.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - An evidence-backed integration matrix (Priority: P1) 🎯
