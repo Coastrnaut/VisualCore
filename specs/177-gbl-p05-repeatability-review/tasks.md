@@ -50,7 +50,7 @@
 - [X] T-A24-509 Review checkpoint: `--name gbl-ios27`, documented API, isolation, core purity, scan-identifiers — Verified 2026-11-19: 2026-11-19 review checkpoint: .autonomy/checks/A24-P05.{gbl-ios27,documented-api,isolation,core-purity,scan-identifiers}.json exit 0
 - [X] T-A24-510 App and interface: `xcodegen generate --spec project.yml`, then `--name app-ui -- python3 — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A24-P05.app-ui-2.json: build-for-testing, 78 app unit tests and 2 f3 interface tests on iOS 27.2, exit 0
   scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27 app-ui-ios27-f3`
-- [ ] T-A24-511 Contract: G-DEVICE and G-EXPLAIN closed by "A24-P05", rows whose gaps are all closed available
+- [X] T-A24-511 Contract: G-DEVICE and G-EXPLAIN closed by "A24-P05", rows whose gaps are all closed available — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A24-P05.{contract,catalog,experience-packages,script-tests,verify-27}.json exit 0; G-DEVICE and G-EXPLAIN closed, M11/M22/M33 available
   (`--name contract`); README of the experience; `--name catalog`, `experience-packages`, `script-tests`,
   `verify-27`
 - [ ] T-A24-512 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record

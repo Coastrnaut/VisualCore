@@ -31,7 +31,14 @@ renderer, tier, thermal state and timing sources from public APIs only (run file
 Results (A24-P04) are kept in the experience's own storage (at most 12, with the case's every setting stored in run
 file version 3) and export as the JSON run file or a CSV through the share sheet only when the person taps Export.
 
+Review (A24-P05): every run is qualified Valid, Limited or Invalid with its named reasons; saved runs of one case,
+fingerprint, device and build are summarised as trials with their spread, and the rest are listed as not comparable
+(CSV version 2 carries the qualification). "About these numbers" explains what is measured and the limits of each
+number, with no ranking. The device plan is [device-campaign.md](device-campaign.md); it is pending until
+ImplementationLock-100, and simulator numbers are never device evidence.
+
 | Document | Content |
 |---|---|
 | [visualcore-contract.json](visualcore-contract.json) / [.md](visualcore-contract.md) | Phase 00 inventory, capability matrix, gaps, decision (checked by `scripts/check_app_contract.py`) |
 | [regression-baseline.md](regression-baseline.md) | Phase start, reference pin, the ProjectM reference regression results |
+| [device-campaign.md](device-campaign.md) | The device plan GBL-D1 to D6 on D1, D2 and D3 (A24-P05), all pending |

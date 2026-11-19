@@ -595,7 +595,7 @@
    "id": "M11",
    "capability": "Version 0.1 feature 06: an in-app explanation of limits and variability",
    "source": "manual \u00a72 feature 06; spec FR-A24-002",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
@@ -611,10 +611,10 @@
     }
    ],
    "example": {
-    "file": "Packages/ExperiencesCreative/FractalExplorer/Experience/ExplorerView.swift",
-    "symbol": "PrecisionNotice"
+    "file": "Packages/ExperiencesCreative/GraphicsBenchmarkLab/Experience/ExplanationView.swift",
+    "symbol": "ExplanationView"
    },
-   "notes": "ExperiencePresenter supplies the controls a shell shows (ShellPortTests); the explanation copy (thermal and refresh skew, no GPU time where unsupported, no ranking) is app-local (G-EXPLAIN, A24-P05). Fractal Explorer's PrecisionNotice is the closest consumer of a limits notice."
+   "notes": "ExperiencePresenter supplies the controls a shell shows (ShellPortTests); the explanation copy (thermal and refresh skew, no GPU time where unsupported, no ranking) is app-local (G-EXPLAIN, A24-P05). Fractal Explorer's PrecisionNotice is the closest consumer of a limits notice. A24-P05 (feature 177): the explanation (GBLExplanation, ExplanationView) is reached from a finished run and an opened result through the explain button; it names what is measured, the warm-up and measurement windows, dropped frames, GPU time only where the renderer offers the timer query, thermal and refresh effects, simulator numbers and why results are not comparable, with no ranking or scientific claim; each section is one VoiceOver element (ExplanationTests, GBLRunUITests; copy-claims scan) (G-EXPLAIN closed)."
   },
   {
    "id": "M12",
@@ -954,7 +954,7 @@
    "id": "M22",
    "capability": "An in-app explanation of limits and variability",
    "source": "spec FR-A24-003 area 11; manual \u00a713 risks 1-2",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
@@ -964,10 +964,10 @@
     }
    ],
    "example": {
-    "file": "Packages/ExperiencesCreative/FractalExplorer/Experience/ExplorerView.swift",
-    "symbol": "PrecisionNotice"
+    "file": "Packages/ExperiencesCreative/GraphicsBenchmarkLab/Experience/ExplanationView.swift",
+    "symbol": "ExplanationView"
    },
-   "notes": "See M11 (ShellPortTests). G-EXPLAIN (A24-P05)."
+   "notes": "See M11 (ShellPortTests). G-EXPLAIN (A24-P05). A24-P05 (feature 177): see M11 (ExplanationTests, GBLRunUITests) (G-EXPLAIN closed)."
   },
   {
    "id": "M23",
@@ -1258,7 +1258,7 @@
     "file": "Apps/VisualCore/App/SettingsView.swift",
     "symbol": "SettingsView"
    },
-   "notes": "PerformanceRecord holds measured values only (PerformanceRecordTests); the lab's copy and store claims are G-EXPLAIN (A24-P05) and checked by copy-claims in G-RELEASE (A24-P06)."
+   "notes": "PerformanceRecord holds measured values only (PerformanceRecordTests); the lab's copy and store claims are G-EXPLAIN (A24-P05) and checked by copy-claims in G-RELEASE (A24-P06). A24-P05 (feature 177): the explanation's copy passes the copy-claims scan (G-EXPLAIN closed); the store copy is G-RELEASE (A24-P06)."
   },
   {
    "id": "M32",
@@ -1307,7 +1307,7 @@
    "id": "M33",
    "capability": "Device verification: repeatability across trials, thermal context and the device plan",
    "source": "manual \u00a79 phase 05; manual \u00a713 risks 1 and 3",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/DeviceConditions.swift",
@@ -1323,10 +1323,10 @@
     }
    ],
    "example": {
-    "file": "Apps/VisualCore/App/SettingsView.swift",
-    "symbol": "SettingsView"
+    "file": "Packages/ExperiencesCreative/GraphicsBenchmarkLab/Core/Repeatability.swift",
+    "symbol": "Repeatability"
    },
-   "notes": "DeviceConditions and PerformanceRecord exist (FramePacingTests, PerformanceRecordTests); repeated trials, their spread and the device plan are G-DEVICE (A24-P05). Simulator results are never device evidence."
+   "notes": "DeviceConditions and PerformanceRecord exist (FramePacingTests, PerformanceRecordTests); repeated trials, their spread and the device plan are G-DEVICE (A24-P05). Simulator results are never device evidence. A24-P05 (feature 177): every run is qualified Valid, Limited or Invalid with named reasons (RunQualification); runs of one case, fingerprint, device and build are summarised as trials with their spread and thermal states, and others listed as not comparable (Repeatability, RepeatabilityView); the device plan GBL-D1 to D6 on D1, D2 and D3 is docs/apps/graphics-benchmark-lab/device-campaign.md, all pending until ImplementationLock-100 (RunQualificationTests, RepeatabilityTests, QualificationDisplayTests) (G-DEVICE closed)."
   },
   {
    "id": "M34",
@@ -1651,7 +1651,7 @@
    "justification": "Repeated trials, their spread, the thermal context of each trial and the device plan are the experience's device campaign after ImplementationLock-100 (CLAUDE.md rule 5).",
    "phase": 5,
    "test": "Core tests of the repeatability summary with fixtures; the device plan names the devices, trials and the thermal states recorded; simulator results are never cited as device evidence.",
-   "closed": null
+   "closed": "A24-P05"
   },
   {
    "id": "G-EXPLAIN",
@@ -1665,7 +1665,7 @@
    "justification": "The in-app explanation of limits and variability (thermal and refresh skew, simulator versus device, no GPU time where unsupported, no ranking or scientific claim) is the experience's copy.",
    "phase": 5,
    "test": "Experience tests prove the explanation is reachable from results, names each limit and is labelled for VoiceOver; the copy-claims scan finds no ranking, scientific or invented-number claim.",
-   "closed": null
+   "closed": "A24-P05"
   },
   {
    "id": "G-RELEASE",
