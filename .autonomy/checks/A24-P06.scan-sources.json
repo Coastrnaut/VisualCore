@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "sh",
+    "specs/178-gbl-p06-release/scan-sources-release.sh"
+  ],
+  "command": "sh specs/178-gbl-p06-release/scan-sources-release.sh",
+  "elapsed_seconds": 0.055,
+  "exit_code": 0,
+  "finished": "2026-11-19T18:14:35+00:00",
+  "log": ".autonomy/logs/A24-P06.scan-sources.log",
+  "log_sha256": "41ad18cfdd153e0ca31881ec67cd853583cef86acc2b12e42fcf09b63284098a",
+  "name": "scan-sources",
+  "stage": "A24-P06",
+  "started": "2026-11-19T18:14:35+00:00",
+  "timed_out": false
+}

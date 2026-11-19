@@ -26,7 +26,7 @@
   - "no permission is asked"; the report's device facts (model identifier, OS version, bundle version, thermal state,
     Low Power Mode) come from public APIs only, with no vendor or advertising identifier and not the device's name;
   - the licence inventory (every workload picture made in code; no bundled asset).
-- [ ] T-A24-603 [US1] Write `specs/178-gbl-p06-release/scan-sources-release.sh`, after
+- [X] T-A24-603 [US1] Write `specs/178-gbl-p06-release/scan-sources-release.sh`, after — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A24-P06.scan-sources.json exit 0 (no scanned use in 55 Swift files; ShareLink only in Experience/ResultsView.swift)
   `specs/171-vpl-p06-release/scan-sources-release.sh`, with the APIs of clarification Q3 over
   `Packages/ExperiencesCreative/GraphicsBenchmarkLab`; `ShareLink` is refused everywhere except
   `Experience/ResultsView.swift`, where it must appear; run it (`--name scan-sources`) (FR-A24-602, SC-A24-601).
