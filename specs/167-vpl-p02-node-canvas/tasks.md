@@ -104,7 +104,7 @@
 
 ## Phase 6: Convergence
 
-- [ ] T-A23-215 Record the as-built design in `specs/167-vpl-p02-node-canvas/data-model.md` and `contracts/experience.md`, per spec clarifications Q1 and Q4 and contracts/experience.md (contradicts, unrequested):
+- [X] T-A23-215 Record the as-built design in `specs/167-vpl-p02-node-canvas/data-model.md` and `contracts/experience.md`, per spec clarifications Q1 and Q4 and contracts/experience.md (contradicts, unrequested): — Verified 2026-11-18: 2026-11-18: as-built design recorded in data-model.md and contracts/experience.md (grid uniforms and one-pixel lines with the vignette, the ninth refusal, sentence(for:in:), the graph-ready outcome, extra identifiers, the overlay outside the accessibility tree with the list form as the spoken path, five fixtures); .autonomy/checks/A23-P02.documented-api-3.json exit 0; docs only, A23-P02.vpl-ios27-3.json stands
   - the grid's uniforms are `zoom`, `panX`, `panY`, `width` and `height` (`FullScreenShaderScene` binds floats only); its lines are about one pixel wide through `fwidth` and a vignette keeps a luma spread, because the runner's 96-point surface sampled one-point lines at a single phase (fix 566622de; ProbeTests);
   - the ninth refusal `a23.too-many-edges` (a connection past 64) and `EditMessages.sentence(for:in:)`;
   - `LabCore.outcome` is `graph-ready` while the checker accepts the graph;

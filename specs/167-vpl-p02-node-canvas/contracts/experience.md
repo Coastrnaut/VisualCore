@@ -12,3 +12,10 @@
 - **VisualCore names used:** `ExperienceCore`, `ExperienceControl`, `ExperienceSnapshot`, `DigestBuilder`,
   `StateDigest`, `ExperiencePresenter`, `ExperienceShell`, `ExperienceActionPort`, `RenderContext`, `FrameInfo`,
   `FullScreenShaderScene`, `ShaderBundle`, `PointerEvent`, `PointerPhase`, `PlaneViewport`, `Vec2`.
+- **As built (A23-P02):**
+  - more identifiers: `move-left`, `move-right`, `move-up`, `move-down` (the selected node by 32 points, the native
+    form of `node.move`), `node-row-<id>` (select) and `connection-<target>-<index>` (a connection line of the list);
+  - the overlay is drawn over the host, which keeps it out of the accessibility tree, so the list form is the spoken
+    path for every node, port and connection (labels from `EditMessages`);
+  - the presenter learns the canvas size in points from `pointer`'s `viewSize` and the overlay's report, 1,024 × 768
+    until then; test seams also `mirror`, `grid` and `clamp`.

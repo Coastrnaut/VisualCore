@@ -22,3 +22,15 @@ Experience:
   Output (id 2, at 320, 80).
 - **LabPresenter:** `view: CanvasView`, the grid scene, the drag state (`none`, `wire(from port, to point)`,
   `move(node, offset)`, `pan`, `pinch`), `feedback: String?`.
+- **As built (A23-P02):**
+  - **Grid:** `GridScene` wraps `FullScreenShaderScene` (`fixedTime` 0) with the float uniforms `zoom`, `panX`,
+    `panY` (the view's centre), `width` and `height` (the view in points), because the scene binds floats only. Lines
+    are about one pixel wide through `fwidth`, and a soft vignette keeps a luma spread in every frame: the verification
+    runner's 96-point surface sampled one-point lines at a single phase and saw a flat frame (fix 566622de; ProbeTests).
+    Every colour stays of the class `dark` (probe `canvas-dark` at the middle).
+  - **Refusals:** a ninth, `tooManyEdges` (`a23.too-many-edges`, "A graph holds at most 64 connections."), for a
+    connection past 64; `EditMessages.sentence(for:in:)` names the kind of a taken input from the graph.
+  - **LabCore:** `outcome` is `graph-ready` while `GraphChecker` accepts the graph; the snapshot is `graph` and
+    `selection` (0 for none).
+  - **Manifest:** five fixtures (the planning catalog's count): starter graph, journey graph, refused connection,
+    refused loop and refused second output.
