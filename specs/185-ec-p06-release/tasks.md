@@ -26,7 +26,7 @@
   `Packages/ExperiencesCreative/EffectsComposer/Experience/ComposerPresenter.swift`; write
   `Packages/ExperiencesCreative/EffectsComposer/ExperienceTests/ComposerRecoveryTests.swift` (two saved looks; the
   session fails with the message; every storage file byte-identical; a new session lists and opens both)
-- [ ] T-A25-605 [US2] Generate the nine samples of data-model.md once through the real encoders into
+- [X] T-A25-605 [US2] Generate the nine samples of data-model.md once through the real encoders into — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P06.ec-recovery-samples.json (exit 0; ReleaseSampleTests 10 passed, nine samples byte-identical, oversized look too-large and kept)
   `Packages/ExperiencesCreative/EffectsComposer/ExperienceTests/Fixtures/` (the lead adds `resources: [.copy("Fixtures")]`
   to `EffectsComposerExperienceTests` in `Packages/ExperiencesCreative/Package.swift`, analyze U1) and write
   `Packages/ExperiencesCreative/EffectsComposer/ExperienceTests/ReleaseSampleTests.swift` (each outcome of

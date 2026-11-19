@@ -1,0 +1,1 @@
+{"body":{"chain":{"body":{"nodes":[{"effect":"grade","enabled":true,"id":1,"values":{"contrast":1,"exposure":1,"saturation":1}},{"effect":"distort","enabled":true,"id":2,"values":{"amplitude":0.01,"frequency":4}}]},"kind":"a25.effect-chain","version":1},"name":"Warm look","order":1},"kind":"a25.preset","version":2}
