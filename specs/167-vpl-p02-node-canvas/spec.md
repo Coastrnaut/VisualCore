@@ -21,9 +21,83 @@ Canonical overrides:
 - **Gap built here:** G-CANVAS of `docs/apps/visual-programming-lab/visualcore-contract.json`.
 - **The experience arrives:** Visual Programming Lab is drawn in the one app for the first time and registered as a
   candidate; it is not yet available to a person (that is X-A23). The synthetic candidate of the app's tests moves to
-  `a24.audio-reactive-wallpaper` or the next experience's identifier.
+  `a24.graphics-benchmark-lab`.
 - **Not here:** the preview of the graph's picture (A23-P03), saving and examples (A23-P04).
 - **No VisualCore or ProjectM change.** Follow `specs/160-ss-p02-compile-preview`.
+
+## Clarifications
+
+### Session 2026-11-18
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- **Host:** `ExperiencePresenter` (VisualCoreExperienceHost) offers `setup`, `resize`, `draw`, `teardown`,
+  `makeControls(_:)`, `makeCanvasOverlay(_:)` (a native view over the drawing) and `pointer(_:viewSize:port:)` with
+  `cancelPointers()`; `PointerEvent` (VisualCoreScenes) carries `id`, `phase` (began, moved, ended, cancelled),
+  `location` in view points (origin top-left) and `timestamp`.
+- **Actions:** `ExperienceControl(id:ranges:)` declares an action with one range per value (at most 24), and the engine
+  refuses a value outside its range before the core sees it.
+- **View:** `PlaneViewport` (VisualCoreMath) maps a plane (y up) to the screen (y down) with `plane(fromScreen:)`,
+  `screen(fromPlane:)`, an anchored `pinched(by:anchor:)`, `panned(by:)` and `resized(to:)`.
+- **Drawing:** `FullScreenShaderScene` binds `parameters` as `u_<name>`, as Shader Studio's presenter uses it.
+
+- Q: What does the core hold, and which actions exist? → A: `LabCore`, snapshot schema 1, digest
+  `a23.visual-programming-lab.v1`:
+  - **State:** the graph (A23-P01's `VisualGraph`) and the selected node (or none). The digest covers the graph only;
+    the selection is in the snapshot, not in the digest.
+  - **Actions:**
+    - `node.add [kind 0…6, x −4,096…4,096, y −4,096…4,096]`: the new node takes the smallest unused identity; refused
+      at 32 nodes (`a23.too-many-nodes`) and for a second output (`a23.one-output`);
+    - `node.move [id 1…9,999, x, y]`; `node.remove [id]` (removes its connections; clears the selection if it was
+      selected); `node.select [id 0…9,999]` (0 clears);
+    - `edge.connect [source 1…9,999, output index 0…1, target 1…9,999, input index 0…2]`: the indices count the
+      kind's outputs and inputs in declaration order;
+    - `edge.disconnect [target, input index]`.
+  - **Refusals** (rule ids): `a23.not-whole`, `a23.unknown-node`, `a23.unknown-port`, `a23.type-mismatch`,
+    `a23.input-taken`, `a23.cycle`, `a23.too-many-nodes`, `a23.one-output`.
+  - **Pure editing:** `GraphEditor` in the core applies each edit to a `VisualGraph` and refuses with a
+    `GraphEditRefusal`. A connection is checked by running `GraphChecker` on the graph with the new connection: any
+    connection-stage issue or a cycle refuses it; output-stage issues (an incomplete graph) do not.
+- Q: Where is each node and port on the canvas, and how big are touch targets? → A: `CanvasLayout` in the core, in
+  canvas points (y down):
+  - a node's position is its box's top-left corner; the box is 168 points wide, with a 32-point title row and one
+    36-point row per port row (the larger of its input and output counts, at least one);
+  - inputs sit on the left edge and outputs on the right edge, each at the middle of its row;
+  - a port's target is a 44 × 44-point square centred on it, scaled by the zoom;
+  - a wire is a cubic curve from the output to the input, with horizontal handles of length max(40, |dx| / 2);
+  - hit testing takes a port first, then the topmost node box (the largest identity), else empty canvas.
+- Q: How do touches map to edits? → A: In the presenter's `pointer`:
+  - one finger starting on a port draws a rubber wire; ending on a port of the other direction connects (the output
+    end is the source); ending on a port of the same direction shows "Connect an output to an input." and sends
+    nothing; ending elsewhere does nothing;
+  - one finger starting on a node body moves it (`node.move` on each move, the position clamped to ±4,096); a touch
+    that moves less than 10 points selects the node; on empty canvas it pans the view, and a tap clears the
+    selection;
+  - two fingers pinch to zoom about their midpoint and pan with it.
+
+  The view is `CanvasView`, a `PlaneViewport` with the canvas's y flipped: zoom 0.5…2 (1 by default) and the centre
+  clamped to ±4,096. It is view state in the presenter, not part of the snapshot, and never sends an action.
+- Q: What is drawn by the graphics host, and what by native views? → A:
+  - **Host:** a full-screen grid shader drawn by `FullScreenShaderScene` (minor lines every 32 canvas points, major
+    every 160) with the uniforms `zoom` and `pan`, at most 30 frames per second, at one quality tier (`level-0`);
+  - **Native overlay** (`makeCanvasOverlay`): node boxes with titles and port labels, port dots coloured by type and
+    marked by shape (circle scalar, diamond colour, square texture, triangle time), wires, the selection outline and
+    the rubber wire; every node, port and wire has a spoken label;
+  - **Controls** (`makeControls`): an "Add node" menu, "Remove", the list form (each node with each input and a
+    picker of the outputs, connections shown as "Noise 2 image → Output 1 image"), a status line from `GraphChecker`
+    ("Ready", "No output", "Output not connected", "Mix 3: input b is empty") and the feedback line for the last
+    refusal.
+  - The experience tests draw the canvas off screen: the picture changes with pan and zoom, and stays byte-identical
+    after 10 `recreateContext` calls and after a resize there and back, with `leaked` 0.
+- Q: How is Visual Programming Lab registered? → A: As Shader Studio was at A22-P02:
+  - a candidate entry `a23.visual-programming-lab` in `Catalog/registrations.json` (capabilities of at most 40
+    characters, quality tier `level-0`, a palette, manifest
+    `Packages/ExperiencesCreative/VisualProgrammingLab/scenario-manifest.json`, permissions `[]`);
+  - an `ExperienceRegistry` candidate (no examples: schema 1) and the `project.yml` product
+    `VisualProgrammingLabExperience`;
+  - the synthetic candidate in `AppModelTests` moves to `a24.graphics-benchmark-lab`;
+  - the candidate lists of the app and script tests;
+  - refusal sentences are built in the core (`EditMessages`), so they are tested without the GPU.
 
 ## User Scenarios & Testing *(mandatory)*
 
