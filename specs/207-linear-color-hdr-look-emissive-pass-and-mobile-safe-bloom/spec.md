@@ -50,7 +50,7 @@ Rec. 709 luma with a ±0.1 soft knee, blurs once at full size (9 taps, σ = radi
 - Q: What is the new pass and what are its parameters? → A: Type `emissive`, inputs `["input"]`, parameters (ranges,
   defaults): `threshold` 0…16, 1.0 (linear units); `knee` 0…1, 0.5 (fraction of the threshold); `intensity` 0…4, 1.0;
   `radius` 1…16, 4 (texels of the blur target); `quality` 0…1, 0 (0 = half, 1 = quarter resolution, rounded);
-  `exposure` −4…4, 0 (stops); `tonemap` 0…2, 2 (0 none, 1 Reinhard `x/(1+x)`, 2 filmic, the Narkowicz ACES fit
+  `exposure` −4…4, 0 (stops); `tonemap` 0…2, 0 (0 none, the default, so dim parts stay untouched (analyze C1), 1 Reinhard `x/(1+x)`, 2 filmic, the Narkowicz ACES fit
   `(x(2.51x+0.03))/(x(2.43x+0.59)+0.14)` clamped to 0…1), rounded. Declared in `PassSchemas.all`; the memory estimate
   counts the two blur targets and the output. Rationale: linear thresholds let values above 1 glow on the high-precision
   path. Impact: graph JSON fixtures can use the pass at once.

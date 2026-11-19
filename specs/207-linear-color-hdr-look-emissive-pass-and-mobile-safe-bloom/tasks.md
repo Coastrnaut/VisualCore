@@ -21,7 +21,7 @@
   0…64; premultiplied over formula)
 - [ ] T-R02F07-003 [P] Modify `Packages/VisualCore/Sources/VisualCoreEffectsGraph/PassSchemas.swift` (`emissive` with
   `threshold` 0…16 default 1, `knee` 0…1 0.5, `intensity` 0…4 1, `radius` 1…16 4, `quality` 0…1 0, `exposure` −4…4 0,
-  `tonemap` 0…2 2; `composite.mode` 0…2; `flashLimit.linear` 0…1 default 0; memory estimate counting the output and
+  `tonemap` 0…2 0; `composite.mode` 0…2; `flashLimit.linear` 0…1 default 0; memory estimate counting the output and
   two blur targets) and `Packages/VisualCore/Sources/VisualCoreShaderSource/RenderState.swift`
   (`premultipliedBlended`), with `Packages/VisualCore/Tests/VisualCoreEffectsGraphTests/EmissiveSchemaTests.swift`
   (defaults, ranges, out-of-range and non-finite refused by the validator, estimate, existing schemas unchanged)
@@ -36,7 +36,7 @@
   composite mode 2; limiter `linear`), `EffectRenderer.swift` (`emissive` case) and `EffectScene.swift` (limiter
   `linear` = 1 only when the graph contains an emissive pass); tests in
   `Packages/VisualCoreRendering/Tests/VisualCoreEffectsTests/EmissivePassTests.swift`: below threshold equals input
-  within 1/255; bright point glow vs reference within 2/255 (high precision) and 4/255 (forced standard); tone-mapped
+  within 1/255 (tonemap 0, exposure 0; analyze U1); bright point glow vs reference within 2/255 (high precision) and 4/255 (forced standard); tone-mapped
   values above 1 on the high path below 1 and matching each operator within 2/255; blur target sizes for 512² (256²,
   128²) and 3 × 1 (1 × 1); 100 frames keep the pool count constant; premultiplied composite equals the formula within
   1/255 and the preset draws the same; 30 Hz strobe through a graph with the pass bounded by the limiter when reduced,
