@@ -71,3 +71,10 @@
 - **Then:** recovery (504), the interface tests (505, 506) and the device plan (507).
 - **Review checkpoint:** at 508.
 - **Commits:** one per task.
+
+## Phase 7: Convergence
+
+- [ ] T-A23-512 Record the as-built design in `specs/170-vpl-p05-budget-usability/{data-model.md,contracts/tests.md}` and `specs/167-vpl-p02-node-canvas/contracts/experience.md` (as an A23-P05 note), per SC-A23-501, clarification Q4 and contracts/tests.md (contradicts, unrequested):
+  - the stress comparison: the three examples hold 1, 2 and 3 slots, so each cycle's level is compared with the first cycle showing the same example (cycle 49 with cycle 1, cycle 50 with cycle 2), with `leaked` 0 after every cycle; `LabLevel` is in StressCycleTests;
+  - the Add node menu, the Examples menu and the list form's pickers became inline expanding button lists (`add-node` with `add-node-<kind>`, `examples` with `example-<id>`, `input-<id>-<index>` with `input-<id>-<index>-option-<tag>`), because XCTest never saw the app idle while a system menu was open over a canvas presenting 30 frames a second;
+  - `PreviewPipeline` notes the programs and slots it holds on release and rebuilds them on restore in every state but failed, so a rebuild keeps the level in the invalid and refused states.
