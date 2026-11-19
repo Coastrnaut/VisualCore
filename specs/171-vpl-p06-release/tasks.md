@@ -17,7 +17,7 @@
 
 ## Phase 2: Story 1 — nothing leaves the device (P1) 🎯
 
-- [ ] T-A23-602 [P] [US1] Write `docs/apps/visual-programming-lab/privacy-and-credits.md` (FR-A23-601), after
+- [X] T-A23-602 [P] [US1] Write `docs/apps/visual-programming-lab/privacy-and-credits.md` (FR-A23-601), after — Verified 2026-11-19: 2026-11-19: docs/apps/visual-programming-lab/privacy-and-credits.md names state.json, graph-<n>.json and library.json, their place and removal, nothing is sent, no permission is asked, the licences (facts checked against LabCore and ExperienceStorage); validate_docs passes
   `docs/apps/shader-studio/privacy-and-credits.md`:
   - the stored data (the session snapshot; `graph-<n>.json`; `library.json`), its place (the experience's own
     storage) and its removal (Remove in the library, or deleting the app);
