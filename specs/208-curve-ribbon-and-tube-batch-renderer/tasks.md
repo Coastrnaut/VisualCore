@@ -35,7 +35,7 @@
 
 ## Phase 4: Story 3 and 4 — ribbons, tubes, merge (P1, P2)
 
-- [ ] T-R02F08-004 [US3] [US4] Create `Packages/VisualCore/Sources/VisualCoreScenes/CurveMeshes.swift`
+- [X] T-R02F08-004 [US3] [US4] Create `Packages/VisualCore/Sources/VisualCoreScenes/CurveMeshes.swift` — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F08.host.json (CurveMeshTests; existing tube digests unchanged; tiled v reports only uvOutOfRange)
   (`RibbonWidth`; `Mesh.ribbon` per clarification Q4 and data-model "Ribbon mesh"; `Mesh.tube(samples:radius:sides:
   caps:repeatLength:budget:)`; `Mesh.merged` per clarification Q5) with
   `Packages/VisualCore/Tests/VisualCoreScenesTests/CurveMeshTests.swift` (v grows 1 per repeat length within 1e-9; closed
