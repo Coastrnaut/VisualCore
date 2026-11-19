@@ -38,7 +38,7 @@
     `ExportGeometry`, `RenderCapabilities`; no byte upload into a target, no image decoding, no picker);
   - a `traceability` entry per capability and feature
   (FR-A25-001, FR-A25-002)
-- [ ] T-A25-003 [US1] Write the generated-block markers into `docs/apps/effects-composer/visualcore-contract.md`
+- [X] T-A25-003 [US1] Write the generated-block markers into `docs/apps/effects-composer/visualcore-contract.md` — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P00.contract.json exit 0 (PASS: 37 rows, 189 citations, 14 gaps, decision go); visualcore-contract.md rendered
   before the first render, then run the contract checker and render the view (`--name contract -- python3
   scripts/check_app_contract.py --app effects-composer --render`) (FR-A25-007, SC-A25-001)
 
