@@ -51,7 +51,7 @@
 
 ## Phase 4: Story 5 — the canvas survives interruptions (P2)
 
-- [ ] T-A23-208 [US5] Write `ExperienceTests/{CanvasDrawTests,RebuildTests}.swift` (SC-A23-205): the picture drawn off
+- [X] T-A23-208 [US5] Write `ExperienceTests/{CanvasDrawTests,RebuildTests}.swift` (SC-A23-205): the picture drawn off — Verified 2026-11-18: 2026-11-18: CanvasDrawTests (the off-screen still changes with pan and zoom, the digest does not) and RebuildTests (10 recreateContext and a resize to 96 x 72 and back give a byte-identical still, leaked 0); .autonomy/checks/A23-P02.vpl-ios27.json exit 0 (125 core and 27 experience tests on sim-27.2, slowest 0.199 s); written by an agent, retested
   screen changes with pan and zoom; 10 `recreateContext` calls and a resize there and back give a byte-identical
   picture with `leaked` 0
 
