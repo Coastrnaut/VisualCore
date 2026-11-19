@@ -47,8 +47,9 @@ encoded on write, `Core/ColorDomain.swift`), distort and posterize on stored val
 half-float where the device can draw into it and 8-bit otherwise, and an empty chain leaves the picture exactly as it
 was. `export-png`, `export-jpeg` and `export-heic` draw the chain again at the picture's full size, refuse an
 unavailable format or an oversized picture before drawing, write the file tagged sRGB in a temporary folder
-(`Experience/StillExport.swift`) and offer it through the system share sheet (`share`); the file is removed before
-the next export and when the experience closes. A context loss rebuilds the same preview, an interrupted export
+(`Experience/StillExport.swift`) and offer it through the system share sheet (`share`); the file survives a context
+rebuild and is removed before the next export and when the experience closes (the share sheet reports no completion,
+so a shared file stays until then). A context loss rebuilds the same preview, an interrupted export
 leaves no file, and a memory warning releases idle pictures. Device measurements are planned in
 [device-campaign.md](device-campaign.md) and wait for ImplementationLock-100. Release work follows in A25-P06.
 

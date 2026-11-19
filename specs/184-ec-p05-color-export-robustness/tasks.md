@@ -96,6 +96,6 @@ MVP is story 1 on top of story 2's colour path: export depends on the final colo
   closing); add to `Packages/ExperiencesCreative/EffectsComposer/ExperienceTests/RobustnessTests.swift`: an export
   finished before `recreateContext` still exists afterwards with its share item, and releasing the presenter removes
   the folder, per spec Edge Cases (background during an export), FR-A25-506 (contradicts)
-- [ ] T-A25-513 Record in `specs/184-ec-p05-color-export-robustness/research.md` and
+- [X] T-A25-513 Record in `specs/184-ec-p05-color-export-robustness/research.md` and — Verified 2026-11-19: 2026-11-19 research.md R10 and docs/apps/effects-composer/README.md record the file lifetime; validate_docs PASS
   `docs/apps/effects-composer/README.md` that the share sheet reports no completion, so the file stays until the next
   export or the experience closes, per FR-A25-508 (partial)

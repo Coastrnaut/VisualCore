@@ -26,3 +26,8 @@
 - **R9 Memory warning.** Decision: the presenter observes `UIApplication.didReceiveMemoryWarningNotification` on an
   injected `NotificationCenter` and calls `trimPools()` through the renderer. Rationale: held targets stay alive, so
   only idle ones go and the preview is unchanged.
+- **R10 As built: export file lifetime (T-A25-512, T-A25-513, 2026-11-19).** The host has one `teardown` for a
+  context rebuild and for closing, so teardown keeps a written export and its share item (only a request not yet
+  drawn fails as interrupted). The export folder is removed before the next export and when the presenter is
+  released (`isolated deinit`), which happens when the experience closes. `ShareLink` reports no completion, so a
+  shared file is not removed right after sharing; it stays until the next export or the close.
