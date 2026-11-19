@@ -74,7 +74,7 @@
     ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing VisualProgrammingLabCoreTests
     VisualProgrammingLabExperienceTests`, each test under 10 s (SC-A23-206);
   - the documented API, the isolation check and the core purity scan.
-- [ ] T-A23-212 Contract: G-CANVAS is closed by "A23-P02", and rows whose gaps are all closed become available with
+- [X] T-A23-212 Contract: G-CANVAS is closed by "A23-P02", and rows whose gaps are all closed become available with — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A23-P02.contract.json exit 0 (G-CANVAS closed by A23-P02; M08, M09 and M18 available with their notes)
   evidence (`--name contract`)
 - [ ] T-A23-213 The catalog, app and runner checks, with the packages and script tests:
   - `--name catalog`; `--name experience-packages`; `--name script-tests`;

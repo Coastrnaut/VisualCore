@@ -471,7 +471,7 @@
    "id": "M08",
    "capability": "Version 0.1 feature 03: a touch graph canvas with wire routing, zoom and selection",
    "source": "manual \u00a72 feature 03; spec FR-A23-002",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreMath/PlaneViewport.swift",
@@ -514,13 +514,13 @@
     "file": "Packages/ExperiencesCreative/TinyWorlds/Experience/WorldsGestures.swift",
     "symbol": "WorldsGestures"
    },
-   "notes": "Canvas math and gestures are tested (PlaneViewportTests, Camera2DTests, GestureTests, SceneGraphTests); no node-editor canvas exists (grep 2026-11-18). G-CANVAS (manual \u00a713 risk 2)."
+   "notes": "Canvas math and gestures are tested (PlaneViewportTests, Camera2DTests, GestureTests, SceneGraphTests); no node-editor canvas exists (grep 2026-11-18). G-CANVAS (manual \u00a713 risk 2). A23-P02 (feature 167): the touch canvas (VisualProgrammingLab/Experience/LabPresenter.swift, CanvasOverlay.swift; Core/CanvasLayout.swift, CanvasView.swift over PlaneViewport): place, move, select and wire nodes, zoom 0.5...2 and pan within 4,096, 44-point port targets (TouchTests, CanvasLayoutTests, CanvasViewTests)."
   },
   {
    "id": "M09",
    "capability": "Version 0.1 feature 04: cycle detection and clear invalid-connection feedback",
    "source": "manual \u00a72 feature 04; spec FR-A23-002",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreEffectsGraph/EffectGraphValidation.swift",
@@ -545,7 +545,7 @@
     "file": "Packages/ExperiencesCreative/SimulationLab/Experience/GrayScottGPU.swift",
     "symbol": "GrayScottGPU"
    },
-   "notes": "EffectGraphError.cycle and the pass order exist for effect passes only (ValidationTests) and the order is private; FieldPassError.inputIsOutput refuses feedback at draw time (FieldPassTests). Cycle rejection with the path of edges and type-mismatch feedback in the pure core are G-TYPES; showing them on the canvas is G-CANVAS. Feedback nodes are a non-goal."
+   "notes": "EffectGraphError.cycle and the pass order exist for effect passes only (ValidationTests) and the order is private; FieldPassError.inputIsOutput refuses feedback at draw time (FieldPassTests). Cycle rejection with the path of edges and type-mismatch feedback in the pure core are G-TYPES; showing them on the canvas is G-CANVAS. Feedback nodes are a non-goal. A23-P02 (feature 167): invalid connections refused with one sentence naming both types, the loop, the fed input or the limit (Core/GraphEditor.swift, EditMessages.swift; EditorTests, EditMessagesTests, LabCoreTests)."
   },
   {
    "id": "M10",
@@ -871,7 +871,7 @@
    "id": "M18",
    "capability": "Touch canvas with wires, zoom, pan and selection, plus an accessible list form",
    "source": "spec FR-A23-003 area 7; manual \u00a713 risk 2",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreMath/PlaneViewport.swift",
@@ -908,7 +908,7 @@
     "file": "Packages/ExperiencesCreative/FractalExplorer/Experience/ExplorerView.swift",
     "symbol": "ExplorerModel"
    },
-   "notes": "Tested in PlaneViewportTests, GestureArbiterTests, GestureTests and GestureAlternativesTests. The SwiftUI canvas with large targets, zoom and the list form is G-CANVAS."
+   "notes": "Tested in PlaneViewportTests, GestureArbiterTests, GestureTests and GestureAlternativesTests. The SwiftUI canvas with large targets, zoom and the list form is G-CANVAS. A23-P02 (feature 167): the canvas with wires, zoom, pan and selection and the accessible list form with input pickers (Experience/LabControls.swift; TouchTests, LabCoreTests); the grid drawn by FullScreenShaderScene and rebuilt byte-identically after 10 context rebuilds (RebuildTests)."
   },
   {
    "id": "M19",
@@ -1433,7 +1433,7 @@
    "justification": "No node-editor canvas exists in VisualCore. The SwiftUI canvas over PlaneViewport and the gesture recognizers, with wire routing, zoom, pan, selection, large touch targets, connection feedback and an accessible list form, is app-local (clarification Q5; manual \u00a713 risk 2).",
    "phase": 2,
    "test": "Experience tests: a drag from an output port to a compatible input creates one edge and to an incompatible one shows the refusal; hit targets are at least 44 points at every zoom; pinch zoom is clamped; every canvas action has a list-form alternative (GestureAlternatives.missing is empty) at iPhone and iPad sizes with Dynamic Type.",
-   "closed": null
+   "closed": "A23-P02"
   },
   {
    "id": "G-COMPILE",
