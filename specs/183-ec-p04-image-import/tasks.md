@@ -10,7 +10,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T-A25-401 Baseline: cite the A25-P03 evidence (`.autonomy/checks/A25-P03.{ec-ios27-2,app-unit-2,verify-27}.json`)
+- [X] T-A25-401 Baseline: cite the A25-P03 evidence (`.autonomy/checks/A25-P03.{ec-ios27-2,app-unit-2,verify-27}.json`) — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P03.{ec-ios27-2,app-unit-2,verify-27}.json exit 0
 
 ## Phase 2: VisualCore — U-RGBAUPLOAD (P1)
 
