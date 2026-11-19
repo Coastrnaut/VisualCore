@@ -78,3 +78,10 @@
 - **Then:** the invalid and budget states (306), the queue and rebuild (307).
 - **Review checkpoint:** at 308.
 - **Commits:** one per task.
+
+## Phase 6: Convergence
+
+- [ ] T-A23-312 Record the as-built design in `specs/168-vpl-p03-graph-compiler/{research.md,data-model.md,contracts/preview.md}`, per research D7, data-model and contracts/preview.md (contradicts, unrequested):
+  - research D7 corrected: `RenderHost` sets the viewport to the whole drawable before each frame (`RenderHost.swift` line 419, and `renderOffscreen`), so the inset's viewport never carries over; the grid drawn by a full-framebuffer `FieldPass` stays, harmless, and its test (`afterAnInsetFrameTheNextGridCoversTheWholeDrawable`) holds either way;
+  - blur's direction is the floats `u_directionX` and `u_directionY`; both blur operators share one program, keyed by the program name "blur", because the registry caches programs by source; colours are `PassColour` (r, g, b); `Pass` and `PassSchedule` have public initialisers; keys use resolved parameter values, exclude positions and identities, and mark an input closing a loop "loop";
+  - the presenter's seams `graphOverride`, the pipeline's `fragmentOverrides` and `runCount`; `LabTest.open` hides the preview by default so A23-P02's grid tests see the grid alone; a refused or invalid compile keeps the earlier slots; the failed message is "The preview could not be drawn: <diagnostic>"; a node move recompiles once (the fingerprint holds positions) without changing slots or programs.
