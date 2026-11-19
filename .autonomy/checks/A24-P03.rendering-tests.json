@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--result-name",
+    "xa24p03-rendering"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name xa24p03-rendering",
+  "elapsed_seconds": 44.375,
+  "exit_code": 0,
+  "finished": "2026-11-19T16:40:00+00:00",
+  "log": ".autonomy/logs/A24-P03.rendering-tests.log",
+  "log_sha256": "962d3e6632fbca665484afe7632815b76229f6988ce54a384a8faa43a32a4941",
+  "name": "rendering-tests",
+  "stage": "A24-P03",
+  "started": "2026-11-19T16:39:15+00:00",
+  "timed_out": false
+}

@@ -63,7 +63,7 @@
 
 ## Phase 5: Evidence
 
-- [ ] T-A24-312 VisualCore evidence: `--name rendering-tests` (the VisualCoreRendering test package on sim-27.2),
+- [X] T-A24-312 VisualCore evidence: `--name rendering-tests` (the VisualCoreRendering test package on sim-27.2), — Verified 2026-11-19: 2026-11-19: .autonomy/checks/A24-P03.{rendering-tests,public-api,reference-1,reference-2}.json exit 0 (VisualCoreRendering 84 tests on sim-27.2; API baseline matches; reference regression 7 of 7 in two chunks)
   `--name public-api` (`python3 scripts/check_public_api.py`), `--name reference-1` and `--name reference-2` (the two
   reference chunks of quickstart.md) (SC-A24-305)
 - [ ] T-A24-313 Review checkpoint: `--name gbl-ios27` (both A24 test targets on sim-27.2, each test under 10 s), the
