@@ -88,7 +88,8 @@ sample, the summary and the provenance report; opening it later shows the same n
 
 ### User Story 2 - A list of saved results that never loses one (Priority: P1)
 
-The person sees saved results newest first (case, date order, the frame-interval p50 and p95, "GPU timed" or not),
+The person sees saved results newest first by save order (case, state, the frame-interval p50 and p95, "GPU timed"
+or not; no date or clock time is stored),
 opens one, removes one. A damaged or newer file is listed as unreadable with its reason and is never deleted by itself.
 
 **Why this priority**: local persistence (constitution IX).
@@ -126,6 +127,8 @@ made only from the person's action.
 - **Storage full:** saving is refused with a message; nothing else changes.
 - **A result saved by a newer app version:** listed as unreadable ("saved by a newer version"), kept.
 - **A run that was stopped or interrupted:** can be saved, and is listed with its state.
+- **Saving with no ended run:** the save control is shown only after a run ends (finished, stopped or interrupted)
+  and saves that run once; a second save of the same run is refused ("This result is already saved.").
 - **A run without GPU times:** the CSV's GPU column is empty, never 0.
 - **Opening a result of a case version the app no longer has:** the stored settings are shown; the result still opens.
 
