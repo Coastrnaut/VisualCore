@@ -1291,7 +1291,7 @@
     "file": "Packages/ExperiencesCreative/SolarSystemExplorer/Core/ScientificReview.swift",
     "symbol": "ScientificReview"
    },
-   "notes": "Tested in PerformanceRecordTests; scripts/check_copy_claims.py runs in the release check. The A23 copy claims come with G-RELEASE."
+   "notes": "Tested in PerformanceRecordTests; scripts/check_copy_claims.py runs in the release check. The A23 copy claims come with G-RELEASE. A23-P06: copy-claims-a23 passes in the release check (G-RELEASE closed)."
   },
   {
    "id": "M30",
@@ -1365,7 +1365,7 @@
    "id": "M32",
    "capability": "Release: registration, the A23 release-check, copy-claims and verify steps, licenses and catalog availability",
    "source": "manual \u00a79 phase 06",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceDescriptor.swift",
@@ -1384,7 +1384,7 @@
     "file": "Packages/ExperiencesCreative/DigitalAquarium/Core/LicenseAudit.swift",
     "symbol": "LicenseAudit"
    },
-   "notes": "No A23 release step exists (168 lines listed by python3 scripts/release_check.py --list on 2026-11-18). G-RELEASE."
+   "notes": "No A23 release step exists (168 lines listed by python3 scripts/release_check.py --list on 2026-11-18). G-RELEASE. A23-P06 (feature 171): privacy-and-credits.md, store-listing.md (every claim names a test; no code to type), release-checklist.md (35 rows) and release.json; scan-sources and scan-claims pass; experience-release-a23 and copy-claims-a23 pass with the release build checks; the iOS 26.x runner half is cited at X-A23 (G-RELEASE closed)."
   }
  ],
  "gaps": [
@@ -1518,7 +1518,7 @@
    "justification": "Registration, the A23 release-check, copy-claims and verify steps, the license entries and the catalog availability are the experience's release work (manual phase 06).",
    "phase": 6,
    "test": "Release check lists the A23 steps and passes; check_copy_claims.py finds no unmeasured performance claim; Visual Programming Lab is registered and available only after its release gate.",
-   "closed": null
+   "closed": "A23-P06"
   }
  ],
  "traceability": [
