@@ -23,7 +23,8 @@
   `Packages/ExperiencesCreative/EffectsComposer/Core/EffectPrograms.swift` (`#include "vc/color.glsl"`; decode/encode
   in grade, blur, vignette); tests in `Packages/ExperiencesCreative/EffectsComposer/CoreTests/ColorDomainTests.swift`
   (transfer round trip over 256 values within 1/255; domains; grade defaults are the identity; mid-grey exposure +1
-  equals the linear computation)
+  equals the linear computation); update every existing core or experience test whose expected values assumed
+  encoded-value grade, blur or vignette, recording each change in the test's header (analyze U1)
 - [ ] T-A25-503 [US2] Renderer intermediates in
   `Packages/ExperiencesCreative/EffectsComposer/Experience/PreviewRenderer.swift`: slots use
   `FloatRenderSupport.detect(in:).storageFormat(forceFallback: forceStandardPrecision)` chosen in `setup`; source and
@@ -46,7 +47,10 @@
   removed on close), `ECControls` (`export-png`, `export-jpeg`, `export-heic`, `share`); add to
   `StillExportTests.swift`: the regression fixture (96 × 64 gradient, grade+blur+vignette; PNG within 1/255 of the
   preview read-back everywhere; JPEG and HEIC within a mean of 3/255), refusals before drawing (render count unchanged,
-  no file), a second export removes the first file, a call while exporting is ignored
+  no file), a second export removes the first file, a call while exporting is ignored, an all-disabled chain exports
+  the source exactly, an export started while a picture is being read uses the shown picture, a full pool refuses
+  as `a25.export-memory` and the preview keeps working, and closing the experience removes the export folder
+  (analyze C1–C3)
 
 ## Phase 4: Story 3 — nothing breaks (P2)
 
@@ -54,7 +58,7 @@
   presenter's memory-warning observer (injected `NotificationCenter`, `trimPools()`): 10 rebuilds byte-identical; an
   export interrupted by `recreateContext` in `beforeReadBack` fails as `a25.export-interrupted` with no file and the
   next export succeeds; two framebuffer sizes letterbox the same result; a memory warning leaves the preview
-  byte-identical
+  byte-identical; the interruption test stands for a background move during export (analyze C4)
 - [ ] T-A25-507 [US3] Write `docs/apps/effects-composer/device-plan.md`: D1, D2, D3 rows tagged {device} (after
   ImplementationLock-100; D3 stays on iPadOS 26.5): peak memory with a 2,048-pixel picture and eight effects ≤ 200 MiB,
   preview frame time while editing ≤ 33 ms, export time per format ≤ 3 s, recovery after backgrounding
