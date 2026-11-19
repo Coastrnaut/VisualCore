@@ -18,10 +18,12 @@
 - [ ] T-A25-303 [US2] Write `Packages/ExperiencesCreative/EffectsComposer/ExperienceTests/PresetLibraryTests.swift`: save and open round-trip (equal, same
   fingerprint); rename; remove; the 25th save, an empty or 41-character name and a duplicate name are refused and
   change nothing; damaged, newer and oversized files are listed as unreadable and stay byte-identical; a newer index
-  makes the library read only; a damaged index is rebuilt only by the next change
+  makes the library read only; a damaged index is rebuilt only by the next change; a full storage quota refuses a save
+  with "There is not enough space to save this preset." and writes nothing
 - [ ] T-A25-304 [US2] Add `ChainEdit.replace` to `Packages/ExperiencesCreative/EffectsComposer/Core/ChainEditing.swift` and its tests to
   `Packages/ExperiencesCreative/EffectsComposer/CoreTests/HistoryTests.swift` (replace then undo returns the earlier chain exactly), and the presenter's library
-  actions and the inline `presets` controls in `Packages/ExperiencesCreative/EffectsComposer/Experience/{ComposerPresenter,ECControls}.swift` per clarification Q3
+  actions (opening a preset through the presenter, then undo, returns the chain before opening) and the inline `presets`
+  controls in `Packages/ExperiencesCreative/EffectsComposer/Experience/{ComposerPresenter,ECControls}.swift` per clarification Q3
 
 ## Phase 3: Story 1 — compare (P1)
 
