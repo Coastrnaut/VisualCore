@@ -30,7 +30,7 @@
 
 ## Phase 3: Story 2 — variants in advance (P1)
 
-- [ ] T-R02F06-004 [P] [US2] Create `Packages/VisualCore/Sources/VisualCoreShaderSource/ShaderVariantSet.swift`
+- [X] T-R02F06-004 [P] [US2] Create `Packages/VisualCore/Sources/VisualCoreShaderSource/ShaderVariantSet.swift` — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F06.host.json (swift test Packages/VisualCore exit 0; 62 ShaderSource tests, 35 new); VariantSetTests 6 (64 accepted, 70 and 128 refused)
   (≤ 6 switches, 1–8 unique values each, ≤ 64 combinations, lexicographic order, key `name=value;…`, `VariantError`)
   with `Packages/VisualCore/Tests/VisualCoreShaderSourceTests/VariantSetTests.swift`
 
