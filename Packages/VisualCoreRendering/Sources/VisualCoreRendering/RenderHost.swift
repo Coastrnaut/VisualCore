@@ -346,6 +346,7 @@ public final class RenderHost {
         caps.generation = lifecycle.generation
         capabilities = caps
         resources.maxTextureSize = caps.maxTextureSize
+        resources.renderCapabilities = caps
     }
 
     /// Destroys and recreates the context (API, tests, or after EGL_CONTEXT_LOST); the scene is set up again.

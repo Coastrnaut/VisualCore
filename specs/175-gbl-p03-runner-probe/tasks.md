@@ -17,7 +17,7 @@
 
 ## Phase 2: VisualCore — U-RENDERINFO and U-GPUTIMER (P1)
 
-- [ ] T-A24-302 [P] In VisualCoreRendering: `ResourceRegistry.renderCapabilities` (public read, internal set) set by
+- [X] T-A24-302 [P] In VisualCoreRendering: `ResourceRegistry.renderCapabilities` (public read, internal set) set by — Verified 2026-11-19: 2026-11-19: ResourceRegistry.renderCapabilities set in takeCapabilities; RegistryCapabilitiesTests pass (.autonomy/checks/A24-P03.rendering-new.json exit 0): equal to host.capabilities, follows recreateContext
   `RenderHost.takeCapabilities` beside `maxTextureSize`; `Tests/VisualCoreRenderingTests/RegistryCapabilitiesTests.swift`
   proves the registry's copy equals `RenderHost.capabilities` after the first frame and after `recreateContext()`
   (its `generation` follows) (FR-A24-303)

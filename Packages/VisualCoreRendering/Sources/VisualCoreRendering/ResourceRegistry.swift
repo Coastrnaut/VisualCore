@@ -69,6 +69,11 @@ public final class ResourceRegistry {
     /// Scenes size their own targets (for example simulation grids) within it; larger targets are refused.
     public internal(set) var maxTextureSize = 4096
 
+    /// The current context generation's capabilities (feature 175 T-A24-302, U-RENDERINFO): set by the host each time
+    /// it queries them (at context creation and after every `recreateContext()`), so `context.resources.renderCapabilities`
+    /// in a scene callback describes the context that callback runs on. `RenderCapabilities()` before the first context.
+    public internal(set) var renderCapabilities = RenderCapabilities()
+
     private func validate(_ width: Int, _ height: Int) throws(ResourceError) {
         guard width > 0, height > 0, width <= maxTextureSize, height <= maxTextureSize else {
             throw .invalidSize(width: width, height: height, max: maxTextureSize)
