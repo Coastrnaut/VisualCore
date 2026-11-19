@@ -21,7 +21,7 @@
 
 - [X] T-A25-203 [P] [US1] Create `Packages/ExperiencesCreative/EffectsComposer/Core/PassPlan.swift` per clarification Q1 and add `TestImage.make(size:)` (`make()` — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P02.ec-ios27.json exit 0 (42 core and 27 experience tests on sim-27.2); PassPlan per clarification Q1, TestImage.make(size:)
   stays 64 × 64) to `Packages/ExperiencesCreative/EffectsComposer/Core/TestImage.swift`
-- [ ] T-A25-204 [US1] Write `Packages/ExperiencesCreative/EffectsComposer/CoreTests/PassPlanTests.swift`: empty, single, all-disabled, mixed and full chains; no pass
+- [X] T-A25-204 [US1] Write `Packages/ExperiencesCreative/EffectsComposer/CoreTests/PassPlanTests.swift`: empty, single, all-disabled, mixed and full chains; no pass — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P02.ec-ios27.json exit 0 (42 core and 27 experience tests on sim-27.2); PassPlanTests 7: every chain shape, no pass reads its output, at most two live slots
   reads its output; each slot ends at its single reader; at most two slots; the 256 × 256 test image keeps the pattern
   (SC-A25-201)
 
