@@ -4934,10 +4934,11 @@
     ]
    },
    "implementation": {
-    "state": "not-started",
-    "legacy_gates_passed": [],
+    "state": "standalone-partial",
+    "legacy_gates_passed": [
+     "A24-P00"
+    ],
     "legacy_gates_pending": [
-     "A24-P00",
      "A24-P01",
      "A24-P02",
      "A24-P03",
