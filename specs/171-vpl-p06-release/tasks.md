@@ -65,7 +65,7 @@
 
 - [X] T-A23-609 Visual Programming Lab tests on sim-27.2 (`--name vpl-ios27`; each under 10 s) and the documented API, — Verified 2026-11-19: 2026-11-19: .autonomy/checks/A23-P06.{vpl-ios27,documented-api,isolation,core-purity}.json all exit 0 (162 core and 83 experience tests on sim-27.2)
   isolation and core purity
-- [ ] T-A23-610 App build, unit tests and the interface chunk: `xcodegen generate --spec project.yml`, then
+- [X] T-A23-610 App build, unit tests and the interface chunk: `xcodegen generate --spec project.yml`, then — Verified 2026-11-19: 2026-11-19: xcodegen generated; .autonomy/checks/A23-P06.app-ui.json exit 0 (build for testing 10.3 s, unit tests, chunk e3 4/4)
   `--name app-ui -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27 app-ui-ios27-e3`
 - [ ] T-A23-611 Release build checks, as a review checkpoint: `--name release-checks -- python3 scripts/release_check.py
   --only app-release-build app-release-symbols app-privacy-manifest app-no-tracking app-licenses app-usage-descriptions
