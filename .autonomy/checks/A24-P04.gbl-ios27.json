@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesCreative",
+    "--scheme",
+    "ExperiencesCreative-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "GraphicsBenchmarkLabCoreTests",
+    "GraphicsBenchmarkLabExperienceTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing GraphicsBenchmarkLabCoreTests GraphicsBenchmarkLabExperienceTests",
+  "elapsed_seconds": 14.607,
+  "exit_code": 0,
+  "finished": "2026-11-19T17:17:30+00:00",
+  "log": ".autonomy/logs/A24-P04.gbl-ios27.log",
+  "log_sha256": "ea824ebf3971572d7ee0d88d91d1b0c97bd6bcdd8aa94cf38bd61479ea8b541e",
+  "name": "gbl-ios27",
+  "stage": "A24-P04",
+  "started": "2026-11-19T17:17:15+00:00",
+  "timed_out": false
+}

@@ -47,7 +47,7 @@
   sheet with rows, open (summary and report shown), remove, `result-export-json` and `result-export-csv` writing to
   `TemporaryFolder(name: "GraphicsBenchmarkLab-Export")` only on the tap, then `result-share` (a `ShareLink` of a
   `ResultExportFile`); the folder emptied at session close; native controls with spoken labels, no system menu
-- [ ] T-A24-407 [US3] `ExperienceTests/ExportTests.swift` (SC-A24-403, 404): no export file exists before the action;
+- [X] T-A24-407 [US3] `ExperienceTests/ExportTests.swift` (SC-A24-403, 404): no export file exists before the action; — Verified 2026-11-19: 2026-11-19: .autonomy/checks/A24-P04.gbl-ios27.json exit 0 (79 core and 53 experience tests); ExportTests (no file before the tap, bytes equal the encoders, content types, folder emptied at close)
   the tap writes the JSON or CSV equal to `RunDocument.encode` or `RunCSV.text`; the share item's content type matches;
   closing the session empties the folder
 
