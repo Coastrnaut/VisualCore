@@ -21,6 +21,49 @@ Canonical overrides:
 - **No VisualCore or ProjectM change.** Follow `specs/162-ss-p04-limits-error-ux` (Shader Studio's project library)
   and `specs/168-vpl-p03-graph-compiler`.
 
+## Clarifications
+
+### Session 2026-11-18
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- **Storage:** `ExperienceStorage` (VisualCoreExperience) holds an experience's files within `StorageQuota` (16 MiB and
+  64 files); `write(_:to:)` is atomic and throws `StorageError.tooLarge`, `.quotaExceeded("files" | "bytes")` or
+  `.writeFailed`, keeping the previous file of that name; `read`, `exists`, `list` and `remove` complete it.
+- **Precedents:** Shader Studio's `ProjectLibrary` and Digital Zen Garden's `GardenLibrary` keep one file per item and
+  an index; Zen Garden opens a saved garden into its core by building a snapshot and calling `shell.restore(_:)`.
+
+- Q: How are graphs stored? → A: `GraphLibrary` in the experience, after `ProjectLibrary`:
+  - `graph-<n>.json`: the envelope `{"body", "kind": "a23.saved-graph", "version": 1}` whose body is `{name, order,
+    graph}`, the graph being the `GraphDocument` encoding embedded as a JSON object; at most 81,920 bytes; n is a
+    counter, never reused while the index or a higher file exists;
+  - `library.json`: the envelope `{"body", "kind": "a23.graph-library", "version": 1}` holding the counter and the
+    names; the graph files are the truth;
+  - caps: at most 24 graphs (unreadable files count); a name trimmed and 1…40 characters; names differing only in case
+    are the same; messages "The library holds 24 graphs.", "A name has 1 to 40 characters." and "A graph is already
+    called <name>.";
+  - a file refused as `damaged`, `newer-version`, `too-large` or with the `GraphDocumentRefusal` code of its graph is
+    listed as unreadable with that code, never opened, renamed or deleted automatically; the person may remove it.
+- Q: How does an opened graph reach the core? → A: As Zen Garden does: the presenter builds a `LabCore` snapshot with
+  the opened graph and no selection and calls `shell.restore(_:)`; a refused restore leaves the graph as it was. The
+  preview compiles it at the next frame. The session snapshot (A23-P02) already keeps the open graph across a
+  relaunch.
+- Q: How is migration exercised when only one format exists? → A: The graph file stays schema 1. Reading goes through
+  `GraphDocument.migrations` (`MigrationChain`); a test gives the library's reader a chain with a step from a synthetic
+  version 0 shape (nodes named `items`) and proves an old file migrates and opens; a committed schema-1 sample written by
+  today's encoder is read back unchanged (a stored-file sample, as Shader Studio's).
+- Q: Which examples ship? → A: `LabExamples` in the experience, written in this repository: `clouds` (Time into Noise
+  into Output), `soft-gradient` (a Constant colour into Gradient's start, Gradient into Blur into Output) and
+  `mixed-clouds` (the journey graph); each opened through the same restore path from an "Examples" menu
+  (`example-<id>`), recorded in `docs/apps/visual-programming-lab/licenses.md`.
+- Q: How are problems mapped to nodes? → A: `GraphDiagnostics.byNode(_ result: CheckResult, in graph)` in the core
+  (pure): `inputUnconnected(node, port)` → that node "Input <port> is empty."; `outputDisconnected(id)` → the Output
+  "Nothing is connected to this Output."; `cycle(edges)` → every source node "This node is part of a loop.";
+  `multipleOutputs(ids)` → each Output "Only one Output may exist."; connection-stage issues → the target node with the
+  `EditMessages` sentence; `noOutput` and limits → no node (the graph-level status). The overlay draws a marked node
+  with a dashed red outline and a "!" badge (not by colour alone) and the list form shows the sentences under the node;
+  both are spoken.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Save a graph and open it again (Priority: P1) 🎯
