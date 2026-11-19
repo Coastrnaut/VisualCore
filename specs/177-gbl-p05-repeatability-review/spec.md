@@ -65,6 +65,8 @@ in code:
   measured" (frame interval, presenter CPU time, GPU time where a timer exists), "Valid, qualified, invalid", "Why
   numbers differ" (thermal state, Low Power Mode, display refresh, background work, the case's version), "Simulator
   numbers" (say nothing about a device), "What the lab does not do" (rank devices, claim precision, send results).
+  The explanation's literals carry no number with a unit (ms, fps, %, Hz) and never the phrases "frame rate" or
+  "refresh rate" (the shared denylist refuses them); it says "display refresh" and "a gap of over a second".
   The interface tests (`GBLRunUITests` in chunk `f3`) run quads to Finished (18 s), save, open, explain, and a second
   test sends the app to the background mid-run for at least 2 seconds (longer than the 1,000 ms sample cap) and expects
   "Interrupted"; each under 60 s. The explanation's words are scanned with `scripts/check_copy_claims.py` and the shared
