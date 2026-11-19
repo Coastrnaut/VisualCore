@@ -111,7 +111,7 @@
   outside 0…1,000 ms (or is not finite) instead of clamping it, keep `dropped` false until A24-P03's rule, and test it
   in `ExperienceTests/RecorderTests.swift` (a 1.2 s gap interrupts with the earlier samples kept and no clamped value),
   per clarification Q2, the phase's regression gate and constitution A24 provenance (contradicts)
-- [ ] T-A24-217 Record the as-built design in `specs/174-gbl-p02-workload-renderers/{data-model.md,contracts/experience.md}`:
+- [X] T-A24-217 Record the as-built design in `specs/174-gbl-p02-workload-renderers/{data-model.md,contracts/experience.md}`: — Verified 2026-11-19: 2026-11-19: as-built notes in data-model.md (WorkloadRenderer, recorder rules, interruptions) and contracts/experience.md (five fixtures, outcome, probe, titles); validate_docs passes
   five manifest fixtures (the planning catalog's count: one per case, a start-stop run and a refused value), the
   quads probe at the centre of checker cell (1,2) computed from the last drawn frame, the outcome `case-<id>`, the
   presenter class `WorkloadRenderer` (renamed from `Workload`, which the core's enum already names), a frame time
