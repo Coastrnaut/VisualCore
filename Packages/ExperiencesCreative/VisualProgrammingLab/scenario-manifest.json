@@ -1,0 +1,749 @@
+{
+  "controls" : [
+    "node.add",
+    "node.move",
+    "node.remove",
+    "node.select",
+    "edge.connect",
+    "edge.disconnect"
+  ],
+  "experience" : "a23.visual-programming-lab",
+  "kind" : "creative",
+  "scenarios" : [
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+        "initialDigest" : "240f3f8b105c767c46466fa831e0773df45f9c9a81f653a5bd196972637ff946"
+      },
+      "name" : "launch-first-frame",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "node.add",
+            "values" : [
+              3,
+              40,
+              240
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "node.move",
+            "values" : [
+              3,
+              60,
+              260
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "node.select",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e2a5c805e2a7f4c7b70da5f6c228493350fc56df19584268989b2eb510f90ac4",
+        "initialDigest" : "240f3f8b105c767c46466fa831e0773df45f9c9a81f653a5bd196972637ff946"
+      },
+      "name" : "input-response",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "node.remove",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "node.add",
+            "values" : [
+              6,
+              320,
+              80
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "edge.connect",
+            "values" : [
+              1,
+              0,
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "outcome" : "graph-ready"
+      },
+      "name" : "completion",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "node.add",
+            "values" : [
+              7,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "node.add",
+            "values" : [
+              0,
+              5000,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "node.move",
+            "values" : [
+              0,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "node.select",
+            "values" : [
+              -1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "edge.connect",
+            "values" : [
+              1,
+              2,
+              2,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "edge.disconnect",
+            "values" : [
+              2,
+              3
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "node.add",
+            "values" : [
+              0.5,
+              0,
+              0
+            ]
+          },
+          "result" : "action.rule.a23.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "node.select",
+            "values" : [
+              1.5
+            ]
+          },
+          "result" : "action.rule.a23.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "edge.connect",
+            "values" : [
+              1,
+              0,
+              2,
+              0.5
+            ]
+          },
+          "result" : "action.rule.a23.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "node.move",
+            "values" : [
+              9,
+              0,
+              0
+            ]
+          },
+          "result" : "action.rule.a23.unknown-node",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "node.remove",
+            "values" : [
+              9
+            ]
+          },
+          "result" : "action.rule.a23.unknown-node",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "node.select",
+            "values" : [
+              9
+            ]
+          },
+          "result" : "action.rule.a23.unknown-node",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "edge.connect",
+            "values" : [
+              1,
+              0,
+              2,
+              1
+            ]
+          },
+          "result" : "action.rule.a23.unknown-port",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "edge.connect",
+            "values" : [
+              1,
+              0,
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.a23.type-mismatch",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "edge.connect",
+            "values" : [
+              1,
+              0,
+              2,
+              0
+            ]
+          },
+          "result" : "action.rule.a23.input-taken",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "node.add",
+            "values" : [
+              6,
+              0,
+              0
+            ]
+          },
+          "result" : "action.rule.a23.one-output",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "node.add",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "node.select",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "edge.disconnect",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+
+      },
+      "name" : "rejection",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "node.add",
+            "values" : [
+              3,
+              40,
+              240
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "node.move",
+            "values" : [
+              3,
+              60,
+              260
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "node.select",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e2a5c805e2a7f4c7b70da5f6c228493350fc56df19584268989b2eb510f90ac4",
+        "initialDigest" : "240f3f8b105c767c46466fa831e0773df45f9c9a81f653a5bd196972637ff946"
+      },
+      "name" : "save-restore",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "node.add",
+            "values" : [
+              3,
+              40,
+              240
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "node.move",
+            "values" : [
+              3,
+              60,
+              260
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "node.select",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "initialDigest" : "240f3f8b105c767c46466fa831e0773df45f9c9a81f653a5bd196972637ff946",
+        "resetDigest" : true
+      },
+      "name" : "reset",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "suspend-resume",
+      "seed" : "1"
+    },
+    {
+      "cycles" : 5,
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "teardown-reentry",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "cancel-prepare",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "node.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "240f3f8b105c767c46466fa831e0773df45f9c9a81f653a5bd196972637ff946",
+        "initialDigest" : "240f3f8b105c767c46466fa831e0773df45f9c9a81f653a5bd196972637ff946",
+        "outcome" : "graph-ready"
+      },
+      "name" : "fixture-starter-graph",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "node.add",
+            "values" : [
+              3,
+              40,
+              240
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "node.add",
+            "values" : [
+              4,
+              320,
+              240
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "node.add",
+            "values" : [
+              5,
+              600,
+              240
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "edge.disconnect",
+            "values" : [
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "edge.connect",
+            "values" : [
+              1,
+              0,
+              4,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "edge.connect",
+            "values" : [
+              3,
+              0,
+              4,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "edge.connect",
+            "values" : [
+              4,
+              0,
+              5,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "edge.connect",
+            "values" : [
+              5,
+              0,
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8a0959de1b90ca58b5874b96d899a8f7bbf9efa852fea157d97b51e7ef5525a8",
+        "initialDigest" : "240f3f8b105c767c46466fa831e0773df45f9c9a81f653a5bd196972637ff946",
+        "outcome" : "graph-ready"
+      },
+      "name" : "fixture-journey-graph",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "node.add",
+            "values" : [
+              1,
+              40,
+              240
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "edge.connect",
+            "values" : [
+              3,
+              1,
+              1,
+              1
+            ]
+          },
+          "result" : "action.rule.a23.type-mismatch",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "3462a48fbd433f24aa3c3811d07cc07c3f8c76ddda41cb496e8d11c5e0a31bcb",
+        "initialDigest" : "240f3f8b105c767c46466fa831e0773df45f9c9a81f653a5bd196972637ff946",
+        "outcome" : "graph-ready"
+      },
+      "name" : "fixture-refused-connection",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "node.add",
+            "values" : [
+              4,
+              40,
+              240
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "node.add",
+            "values" : [
+              5,
+              320,
+              240
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "edge.connect",
+            "values" : [
+              1,
+              0,
+              3,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "edge.connect",
+            "values" : [
+              3,
+              0,
+              4,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "edge.connect",
+            "values" : [
+              4,
+              0,
+              3,
+              1
+            ]
+          },
+          "result" : "action.rule.a23.cycle",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "edge.connect",
+            "values" : [
+              1,
+              0,
+              3,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "560db67c140309dda3529c75925683c3621713bc12ee85ed7fe75be45cb74060",
+        "initialDigest" : "240f3f8b105c767c46466fa831e0773df45f9c9a81f653a5bd196972637ff946",
+        "outcome" : "graph-ready"
+      },
+      "name" : "fixture-refused-loop",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "node.add",
+            "values" : [
+              6,
+              600,
+              240
+            ]
+          },
+          "result" : "action.rule.a23.one-output",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "node.add",
+            "values" : [
+              3,
+              40,
+              240
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "83ae4e15b84a135887ea404b52519081fb0cddf16519685bec4e4c9a494fed67",
+        "initialDigest" : "240f3f8b105c767c46466fa831e0773df45f9c9a81f653a5bd196972637ff946",
+        "outcome" : "graph-ready"
+      },
+      "name" : "fixture-refused-second-output",
+      "seed" : "1"
+    }
+  ],
+  "schema" : 1
+}
