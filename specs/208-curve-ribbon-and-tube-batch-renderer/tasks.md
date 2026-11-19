@@ -68,3 +68,17 @@
 ## Parallel examples
 
 - **Agent A:** 002, 003, 004 in one package (one builder). **Lead:** 001, 005–012.
+
+## Phase 6: Convergence
+
+- [ ] T-R02F08-013 Record in `specs/208-curve-ribbon-and-tube-batch-renderer/data-model.md` that a ribbon or tube whose v
+  tiles beyond 1 (repeat length shorter than the curve) is reported by `Mesh.validate` only as `uvOutOfRange` (the
+  validator's 0…1 rule is for atlased meshes) and validates fully when the repeat length is the curve length, per
+  data-model "Ribbon mesh" (contradicts)
+- [ ] T-R02F08-014 Record in `research.md` and `data-model.md` that on closed curves the frame rotation bound is the bend
+  plus the closing twist spread per step (|closing angle| × step / length), open curves keep the strict bound, per
+  SC-R02F08-002 (partial)
+- [ ] T-R02F08-015 Record the as-built API in `contracts/api.md`: `CurveSamples.init(positions:closed:)`,
+  `CubicBezierChain.controlPoints(segment:)`, `CatmullRomSpline.neighbourhood(segment:)` and `alpha`,
+  `CurveSampler.maxDepth`, the budget clamp to 2…65,536, `Mesh.merged` refusing mismatched attribute counts, closed
+  frames returning count + 1 with a seam frame, and no welding in ribbons and tubes, per contracts/api.md (partial)
