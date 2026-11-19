@@ -41,7 +41,7 @@
   (quality 0.9, off the main actor, atomic, file `Look <W>x<H>.<ext>`), `EffectsExportFile` (`Transferable`); tests in
   `Packages/ExperiencesCreative/EffectsComposer/ExperienceTests/StillExportTests.swift` for validation and writing
   (each format decodes at its size tagged sRGB; refusals; file name)
-- [ ] T-A25-505 [US1] Integrate per contracts/export.md: `PreviewRenderer.exportPicture(_:)` (fresh `.rgba8` target,
+- [X] T-A25-505 [US1] Integrate per contracts/export.md: `PreviewRenderer.exportPicture(_:)` (fresh `.rgba8` target, — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P05.ec-ios27.json (exit 0; PresenterExport: PNG max 0/255, JPEG mean 1.96, HEIC mean 2.19; refusals, one file, disabled chain, held import, full pool, close)
   `beforeReadBack` seam, `.interrupted`, `.memory`, target released; `PreviewPool.maxTargets` 5),
   `ComposerPresenter.export(format:)` (status "Exporting…"/"Exported", one at a time, earlier file removed, folder
   removed on close), `ECControls` (`export-png`, `export-jpeg`, `export-heic`, `share`); add to

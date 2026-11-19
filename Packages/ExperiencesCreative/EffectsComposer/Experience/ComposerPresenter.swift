@@ -38,11 +38,32 @@
 //   - The picture is the presenter's, not the core's: it is in neither the digest nor the snapshot, so a restored
 //     session shows the test picture. Test seam: ``decoder`` (the decoding function, replaced to order two imports).
 //
+// Feature 184 (A25-P05) T-A25-505, T-A25-506 (FR-A25-501, FR-A25-502, FR-A25-506 – FR-A25-508; clarification Q2;
+// data-model.md "Export state"; contracts/export.md, robustness.md):
+//   - Export (`export(format:)`, ``startExport(format:)``): the request is checked first with
+//     ``StillExport/validate(width:height:format:maxTextureSize:available:)`` against the picture shown now (the
+//     renderer's ``PreviewRenderer/pictureSource``, so a picture still being read is not used) and the renderer's
+//     ``PreviewRenderer/maxTextureSize``; a refusal shows its sentence and nothing is drawn or written. Otherwise the
+//     status reads "Exporting…", the earlier file is removed and the request waits for the next frame: GPU work needs
+//     the host's context current, which it is only inside the host's callbacks, so `draw` draws the export
+//     (``PreviewRenderer/exportPicture(_:)``, the chain shown in that frame) after rendering the preview and hands the
+//     read-back picture to the request, which encodes and writes it off the main actor (``StillExport/write(_:format:in:)``).
+//     The status then reads "Exported" (``exportFile`` and the mirror's share item set) or the refusal's sentence.
+//     A call while an export runs is ignored (one file). `exportBase` (the folder that holds `EffectsComposer`,
+//     the temporary folder by default), `formatAvailable` and `exportTextureLimit` are test seams.
+//   - Teardown (closing the experience, and a context rebuild): a request not yet drawn fails as
+//     ``ExportRefusal/interrupted``, a write that finishes after it is removed again, and the export folder is
+//     removed, so no export file outlives the experience and the share item disappears until the next export.
+//   - Memory warning: the presenter observes `UIApplication.didReceiveMemoryWarningNotification` on a notification
+//     centre (`.default`, or the one given to ``observeMemoryWarnings(on:)``) and trims the renderer's idle pooled
+//     targets on the main actor (``PreviewRenderer/trimPools()``); the preview is unchanged.
+//
 // Maximum 60 frames per second; one quality tier, `level-0`. No GL call outside the renderer's `FieldPass`es.
 import EffectsComposerCore
 import Foundation
 import Observation
 import SwiftUI
+import UIKit
 import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreRendering
@@ -111,6 +132,10 @@ final class ComposerMirror {
     var hasLibrary = false
     /// The library's last sentence; nil before the first library action.
     var libraryMessage: String?
+    /// The written export the `share` link offers; nil before the first export and after it was removed.
+    var exportFile: EffectsExportFile?
+    /// Whether an export is running (the export buttons are disabled).
+    var isExporting = false
 
     /// The status word shown: "Original" while compare is on and nothing was refused, else ``status``.
     var shownStatus: String {
@@ -132,6 +157,10 @@ final class ComposerPresenter: ExperiencePresenter {
     nonisolated static let readingWord = "Reading the picture…"
     /// The status once a picked picture is the source.
     nonisolated static let yourPictureWord = "Your picture"
+    /// The status while an export is drawn and written.
+    nonisolated static let exportingWord = "Exporting…"
+    /// The status once an export was written.
+    nonisolated static let exportedWord = "Exported"
 
     /// What the controls show.
     let mirror = ComposerMirror()
@@ -152,12 +181,34 @@ final class ComposerPresenter: ExperiencePresenter {
     /// The number of the latest import request; an outcome of an earlier one is dropped.
     private(set) var importRequest = 0
 
-    /// A presenter with a library over `storage` (none without storage).
-    init(storage: ExperienceStorage? = nil) {
+    /// The folder that holds the export folder `EffectsComposer` (a test seam; the temporary folder by default).
+    var exportBase = FileManager.default.temporaryDirectory
+    /// Whether the system can write a format (a test seam; `StillImageEncoder.isAvailable`).
+    var formatAvailable: (StillImageFormat) -> Bool = StillImageEncoder.isAvailable
+    /// The texture limit an export is validated against instead of the renderer's (a test seam; nil in the app).
+    var exportTextureLimit: Int?
+    /// The written export; nil before the first and after it was removed.
+    private(set) var exportFile: EffectsExportFile?
+    /// Whether an export is running.
+    private(set) var isExporting = false
+    /// The export request waiting for the next frame's draw.
+    private var pendingExport: AsyncStream<Result<RGBAImage, ExportRefusal>>.Continuation?
+    /// Counts teardowns; a write that finishes after one is removed again.
+    private var exportEpoch = 0
+    /// The memory-warning observation.
+    private var memoryObservation: MemoryWarningObservation?
+
+    /// A presenter with a library over `storage` (none without storage) that trims its idle targets on the memory
+    /// warnings of `notificationCenter`.
+    init(storage: ExperienceStorage? = nil, notificationCenter: NotificationCenter = .default) {
         library = storage.map { LookLibrary(storage: $0) }
         mirror.hasLibrary = library != nil
         followLibrary()
+        observeMemoryWarnings(on: notificationCenter)
     }
+
+    /// The export folder: `exportBase/EffectsComposer`.
+    var exportFolder: URL { StillExport.folder(in: exportBase) }
 
     /// Replacement program texts by effect (a test seam, read at `setup`; never set by the app).
     var programOverride: [EffectID: String] {
@@ -195,13 +246,31 @@ final class ComposerPresenter: ExperiencePresenter {
     /// Renders the chain when it changed, presents the result and follows the core.
     func draw(_ core: ComposerCore, tier: Int, context: RenderContext, frame: FrameInfo) throws {
         renderer.render(core.chain, context: context)
+        if let pending = pendingExport {
+            pendingExport = nil
+            let outcome: Result<RGBAImage, ExportRefusal>
+            do throws(ExportRefusal) {
+                outcome = .success(try renderer.exportPicture(core.chain))
+            } catch {
+                outcome = .failure(error)
+            }
+            pending.yield(outcome)
+            pending.finish()
+        }
         renderer.present(context, compare: core.compare)
         lastSize = (context.pixelWidth, context.pixelHeight)
         follow(core)
     }
 
-    /// Releases the preview.
+    /// Releases the preview; a waiting export fails as interrupted and the export folder is removed.
     func teardown(_ context: RenderContext) {
+        exportEpoch += 1
+        if let pending = pendingExport {
+            pendingExport = nil
+            pending.yield(.failure(.interrupted))
+            pending.finish()
+        }
+        removeExport()
         renderer.release(context)
     }
 
@@ -345,6 +414,134 @@ extension ComposerPresenter {
     }
 }
 
+// MARK: Export and memory
+
+extension ComposerPresenter {
+    /// Exports the picture shown now as `format` (see the file header) and returns once the file was written or the
+    /// export refused; a call while an export runs returns at once and changes nothing. The export is drawn at the
+    /// next frame.
+    func export(format: StillImageFormat) async {
+        await startExport(format: format)?.value
+    }
+
+    /// Starts an export as `format`: checked first (a refusal shows its sentence and returns nil, nothing drawn or
+    /// written), then the status reads "Exporting…", the earlier file is removed and the request waits for the next
+    /// frame's draw; the returned task writes the drawn picture off the main actor. Nil while an export runs.
+    @discardableResult
+    func startExport(format: StillImageFormat) -> Task<Void, Never>? {
+        guard !isExporting else { return nil }
+        let picture = renderer.pictureSource.picture
+        if let refusal = StillExport.validate(width: picture.width, height: picture.height, format: format,
+                                              maxTextureSize: exportTextureLimit ?? renderer.maxTextureSize,
+                                              available: formatAvailable) {
+            show(refusal.message)
+            return nil
+        }
+        setExporting(true)
+        removeExport()
+        show(Self.exportingWord)
+        let (drawn, continuation) = AsyncStream<Result<RGBAImage, ExportRefusal>>.makeStream(
+            bufferingPolicy: .bufferingNewest(1))
+        pendingExport = continuation
+        let folder = exportFolder
+        let epoch = exportEpoch
+        return Task { @MainActor [weak self] in
+            var outcome: Result<RGBAImage, ExportRefusal> = .failure(.interrupted)
+            for await value in drawn {
+                outcome = value
+                break
+            }
+            let written: Result<EffectsExportFile, ExportRefusal>
+            switch outcome {
+            case .success(let picture):
+                do throws(ExportRefusal) {
+                    written = .success(try await StillExport.write(picture, format: format, in: folder))
+                } catch {
+                    written = .failure(error)
+                }
+            case .failure(let refusal):
+                written = .failure(refusal)
+            }
+            guard let self else {
+                if case .success(let file) = written { try? FileManager.default.removeItem(at: file.url) }
+                return
+            }
+            self.finishExport(written, epoch: epoch)
+        }
+    }
+
+    /// Applies the outcome of an export started in `epoch`: a file written after a teardown is removed again and
+    /// counts as interrupted; a file is offered to `share` ("Exported"); a refusal shows its sentence.
+    private func finishExport(_ written: Result<EffectsExportFile, ExportRefusal>, epoch: Int) {
+        setExporting(false)
+        switch written {
+        case .success(let file) where epoch != exportEpoch:
+            try? FileManager.default.removeItem(at: file.url)
+            show(ExportRefusal.interrupted.message)
+        case .success(let file):
+            exportFile = file
+            if mirror.exportFile != file { mirror.exportFile = file }
+            show(Self.exportedWord)
+        case .failure(let refusal):
+            show(refusal.message)
+        }
+    }
+
+    /// Removes the written export and the export folder; the share item disappears.
+    func removeExport() {
+        exportFile = nil
+        if mirror.exportFile != nil { mirror.exportFile = nil }
+        StillExport.removeFolder(exportFolder)
+    }
+
+    /// Marks whether an export runs, in the presenter and the mirror.
+    private func setExporting(_ running: Bool) {
+        isExporting = running
+        if mirror.isExporting != running { mirror.isExporting = running }
+    }
+
+    /// Shows `text` in the status line.
+    private func show(_ text: String) {
+        if mirror.status != text { mirror.status = text }
+    }
+
+    /// Observes `UIApplication.didReceiveMemoryWarningNotification` on `center` (instead of any centre observed
+    /// before): each warning trims the renderer's idle pooled targets on the main actor.
+    func observeMemoryWarnings(on center: NotificationCenter) {
+        memoryObservation = MemoryWarningObservation(center: center) { [weak self] in
+            self?.renderer.trimPools()
+        }
+    }
+}
+
+/// An observation of `UIApplication.didReceiveMemoryWarningNotification` that runs a handler on the main actor and
+/// ends when it is released.
+final class MemoryWarningObservation: @unchecked Sendable {
+    /// The observed centre.
+    private let center: NotificationCenter
+    /// The centre's token of the observation.
+    private let token: any NSObjectProtocol
+
+    /// Observes the memory warnings of `center` and runs `handler` on the main actor for each (at once when the
+    /// warning is posted on the main thread).
+    init(center: NotificationCenter, handler: @escaping @MainActor @Sendable () -> Void) {
+        self.center = center
+        token = center.addObserver(forName: UIApplication.didReceiveMemoryWarningNotification, object: nil,
+                                   queue: nil) { _ in
+            if Thread.isMainThread {
+                MainActor.assumeIsolated { handler() }
+            } else {
+                Task { @MainActor in handler() }
+            }
+        }
+    }
+
+    /// Ends the observation.
+    deinit {
+        center.removeObserver(token)
+    }
+}
+
 // MARK: Presets and named actions
 
 extension ComposerPresenter {
@@ -479,9 +676,12 @@ struct ComposerPresetActions {
     let importPicture: @MainActor (Data) -> Void
     /// Returns to the built-in test picture (``ComposerPresenter/useTestPicture()``).
     let useTestPicture: @MainActor () -> Void
+    /// Starts an export of the shown picture (``ComposerPresenter/startExport(format:)``).
+    let export: @MainActor (StillImageFormat) -> Void
 
     /// The actions of `presenter`, held weakly.
     init(presenter: ComposerPresenter) {
+        export = { [weak presenter] format in presenter?.startExport(format: format) }
         importPicture = { [weak presenter] data in presenter?.startImport(data: data) }
         useTestPicture = { [weak presenter] in presenter?.useTestPicture() }
         save = { [weak presenter] name in presenter?.save(name: name) ?? .failure(.unavailable) }

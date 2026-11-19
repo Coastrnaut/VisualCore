@@ -27,6 +27,13 @@
 //     photo can be picked again;
 //   - `test-picture` ("Use the test picture"): returns to the built-in test picture.
 // The presets section acts through ``ComposerPresetActions`` (the presenter's actions, held weakly).
+// Feature 184 (A25-P05) T-A25-505 (FR-A25-501; clarification Q2; contracts/export.md): the export section, inline
+// (never a system menu or picker over the live canvas, the A23-P05 lesson):
+//   - `export-png`, `export-jpeg`, `export-heic` ("Export as PNG", "Export as JPEG", "Export as HEIC"): start an export
+//     of the shown picture at its full size through the presenter (``ComposerPresetActions/export``); disabled while
+//     an export runs. The status line says "Exporting…", then "Exported" or the refusal's sentence;
+//   - `share` ("Share the exported picture"): a `ShareLink` to the written ``EffectsExportFile``, with the file name as
+//     its preview, shown only while a written file exists; the share sheet opens only when the person taps it.
 //
 // Every edit is a button, so nothing needs dragging (constitution A25 accessibility). Inline buttons, never a `Menu`, a
 // popover or a sheet over the drawing (the A23-P05 lesson). The view stores the port, the mirror and the presenter's
@@ -38,6 +45,7 @@ import PhotosUI
 import SwiftUI
 import VisualCoreExperience
 import VisualCoreExperienceHost
+import VisualCoreRendering
 
 /// The spoken labels and value steps of the controls (pure, for the tests).
 enum ComposerLabels {
@@ -150,6 +158,28 @@ enum ComposerLabels {
     /// The spoken label of `test-picture`: "Use the test picture".
     static let testPictureLabel = "Use the test picture"
 
+    /// The spoken label of `export-<format>`: "Export as PNG", "Export as JPEG" or "Export as HEIC".
+    static func exportLabel(_ format: StillImageFormat) -> String {
+        "Export as " + exportTitle(format)
+    }
+
+    /// The title of `export-<format>`: "PNG", "JPEG" or "HEIC".
+    static func exportTitle(_ format: StillImageFormat) -> String {
+        switch format {
+        case .png: return "PNG"
+        case .jpeg: return "JPEG"
+        case .heic: return "HEIC"
+        }
+    }
+
+    /// The identifier name of the export button of `format`: `export-png`, `export-jpeg` or `export-heic`.
+    static func exportName(_ format: StillImageFormat) -> String {
+        "export-" + StillExport.fileExtension(format)
+    }
+
+    /// The spoken label of `share`: "Share the exported picture".
+    static let shareLabel = "Share the exported picture"
+
     /// The label of `preset-row-<n>`: the preset's name, or "<name>, unreadable (<code>)".
     static func presetLabel(_ entry: LookLibraryEntry) -> String {
         entry.refusal.map { entry.name + ", unreadable (" + $0 + ")" } ?? entry.name
@@ -210,6 +240,7 @@ struct ECControls: View {
                     .accessibilityIdentifier(port.identifier("diagnostics"))
             }
             pictureSection
+            exportSection
             presetsSection
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -245,6 +276,33 @@ struct ECControls: View {
         }
         .accessibilityElement(children: .contain)
         .accessibilityLabel(Text(verbatim: "Picture"))
+    }
+
+    /// The inline export controls: one button per format and, while a written file exists, `share`.
+    private var exportSection: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(verbatim: "Export").font(.subheadline).accessibilityAddTraits(.isHeader)
+            HStack(spacing: 12) {
+                ForEach(StillImageFormat.allCases, id: \.self) { format in
+                    button(ComposerLabels.exportTitle(format), label: ComposerLabels.exportLabel(format),
+                           name: ComposerLabels.exportName(format), enabled: !mirror.isExporting) {
+                        presets.export(format)
+                    }
+                }
+            }
+            if let file = mirror.exportFile {
+                let name = file.url.lastPathComponent
+                ShareLink(item: file, preview: SharePreview(Text(verbatim: name))) {
+                    Text(verbatim: "Share")
+                        .fixedSize(horizontal: false, vertical: true)
+                        .frame(minWidth: 44, minHeight: 44)
+                }
+                .accessibilityLabel(Text(verbatim: ComposerLabels.shareLabel))
+                .accessibilityIdentifier(port.identifier("share"))
+            }
+        }
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel(Text(verbatim: "Export"))
     }
 
     /// The inline presets: the name field, the save button, one row per preset and the library's message.

@@ -6,6 +6,18 @@
 // 2,048 × 1,024 on a 16,384 device; the refusal codes and messages and the file name are the contract's. Each test
 // writes into its own folder under the temporary folder (named by the test and a counter, no UUID) and removes it.
 // Short tests: no sleep, no clock. The renderer tests of T-A25-505 go in a separate suite in this file.
+//
+// Feature 184 (A25-P05) T-A25-505 (FR-A25-501 – FR-A25-503, FR-A25-508; contracts/export.md; analyze C1–C3): the suite
+// `PresenterExport` exports through the presenter and the renderer in the one app's session host, each test with its
+// own export base folder (`ComposerPresenter.exportBase`). An export is started (`startExport(format:)`), drawn in the
+// next frame (`ComposerTest.draw`) and awaited. The regression fixture: the 96 × 64 gradient of `PictureSourceTests`
+// imported through the normal path, chain grade (exposure +0.4), blur, vignette; the PNG decoded with ImageIO equals
+// the preview's result read-back within 1/255 at every pixel, JPEG and HEIC (where the system writes it) within a mean
+// of 3/255. Refusals (an unavailable format, a size above the texture limit seam) draw nothing (render and export
+// counts unchanged) and write nothing; a second export removes the first file; a second call while one runs is ignored
+// (one file); an all-disabled chain exports the source exactly; an export while an import is held back (the decoder
+// seam waits on an `AsyncStream`) uses the shown picture; a full pool refuses as `a25.export-memory` and the preview
+// keeps rendering; closing the experience removes the export folder.
 import CoreGraphics
 import EffectsComposerCore
 import Foundation
@@ -13,6 +25,8 @@ import ImageIO
 import Synchronization
 import Testing
 import UniformTypeIdentifiers
+import VisualCoreExperience
+import VisualCoreExperienceHost
 @testable import EffectsComposerExperience
 import VisualCoreRendering
 
@@ -198,5 +212,251 @@ struct StillExportTests {
         let base = URL(fileURLWithPath: "/base", isDirectory: true)
         #expect(StillExport.folder(in: base).path == "/base/EffectsComposer")
         #expect(StillExport.quality == 0.9)
+    }
+}
+
+/// Opening Effects Composer with a test export folder and running exports through the presenter.
+@MainActor
+enum ComposerExport {
+    /// Opens Effects Composer in `session` with its export base in a fresh folder named after `test` (removed by
+    /// ``close(_:_:)``), `configure` run before the first `setup`.
+    static func open(_ session: ExperienceSession, test: String, size: CGSize = CGSize(width: 64, height: 48),
+                     configure: @escaping (ComposerPresenter) -> Void = { _ in }) async throws
+        -> ExperienceShell<ComposerPresenter> {
+        let base = StillExportFixtures.freshFolder(test)
+        return try await ComposerTest.open(session, size: size) { presenter in
+            presenter.exportBase = base
+            configure(presenter)
+        }
+    }
+
+    /// Closes `session` and removes `shell`'s export base folder.
+    static func close(_ session: ExperienceSession, _ shell: ExperienceShell<ComposerPresenter>?) {
+        session.close()
+        if let shell { StillExport.removeFolder(shell.presenter.exportBase) }
+    }
+
+    /// Starts an export as `format`, draws the next frame (where the export is drawn) and waits for the write.
+    /// Returns whether the export was started (false when refused before drawing or ignored).
+    @discardableResult
+    static func run(_ shell: ExperienceShell<ComposerPresenter>, _ session: ExperienceSession,
+                    _ format: StillImageFormat) async throws -> Bool {
+        let task = shell.presenter.startExport(format: format)
+        try ComposerTest.draw(session)
+        await task?.value
+        return task != nil
+    }
+
+    /// The names of the files in `shell`'s export folder, sorted; empty when the folder does not exist.
+    static func files(_ shell: ExperienceShell<ComposerPresenter>) -> [String] {
+        ((try? FileManager.default.contentsOfDirectory(atPath: shell.presenter.exportFolder.path)) ?? []).sorted()
+    }
+
+    /// The written export of `shell` decoded with ImageIO into 8-bit sRGB RGBA, rows top-down.
+    static func decoded(_ shell: ExperienceShell<ComposerPresenter>) throws -> RGBAImage {
+        let file = try #require(shell.presenter.exportFile)
+        let decoded = try #require(StillExportFixtures.decode(file.url))
+        let pixels = try #require(StillExportFixtures.pixels(decoded.image))
+        return RGBAImage(width: decoded.image.width, height: decoded.image.height, bytes: pixels)
+    }
+
+    /// The mean absolute difference of the colour channels of `a` and `b`, in code values.
+    static func meanDifference(_ a: RGBAImage, _ b: RGBAImage) -> Double {
+        var sum = 0, count = 0
+        for i in 0..<a.bytes.count where i % 4 != 3 {
+            sum += abs(Int(a.bytes[i]) - Int(b.bytes[i]))
+            count += 1
+        }
+        return count == 0 ? 0 : Double(sum) / Double(count)
+    }
+
+    /// Imports the 96 × 64 gradient through the normal path and adds grade (exposure +0.4), blur and vignette.
+    static func regressionFixture(_ shell: ExperienceShell<ComposerPresenter>,
+                                  _ session: ExperienceSession) async throws -> RGBAImage {
+        let data = PictureSourceTests.gradient()
+        let picture = try PictureSourceTests.decoded(data)
+        await shell.presenter.importPicture(data: data)
+        ComposerTest.accept(shell, "chain.add", [0, 0])
+        ComposerTest.accept(shell, "chain.set", [0, 0, 0.6])
+        ComposerTest.accept(shell, "chain.add", [1, 1])
+        ComposerTest.accept(shell, "chain.add", [3, 2])
+        try ComposerTest.draw(session)
+        return picture
+    }
+}
+
+/// Exports through the presenter and the renderer (T-A25-505; see the file header).
+@MainActor
+@Suite("PresenterExport", .serialized)
+struct PresenterExportTests {
+    @Test("the PNG export equals the preview within 1/255; JPEG and HEIC within a mean of 3/255")
+    func regressionFixture() async throws {
+        let session = ExperienceSession()
+        var shell: ExperienceShell<ComposerPresenter>?
+        defer { ComposerExport.close(session, shell) }
+        let opened = try await ComposerExport.open(session, test: "regression")
+        shell = opened
+        let picture = try await ComposerExport.regressionFixture(opened, session)
+        let preview = try #require(opened.presenter.lastResult)
+        #expect(preview.width == 96 && preview.height == 64)
+        #expect(preview != picture, "the chain changes the picture")
+
+        try await ComposerExport.run(opened, session, .png)
+        #expect(opened.presenter.mirror.status == ComposerPresenter.exportedWord)
+        #expect(opened.presenter.mirror.exportFile == opened.presenter.exportFile)
+        #expect(opened.presenter.renderer.exportCount == 1)
+        let png = try ComposerExport.decoded(opened)
+        #expect(png.width == 96 && png.height == 64)
+        let d = png.maxChannelDifference(ComposerTest.opaque(preview))
+        #expect(d <= 1, "PNG against the preview: \(d)/255")
+
+        for format in [StillImageFormat.jpeg, .heic] {
+            guard StillImageEncoder.isAvailable(format) else {
+                print("PresenterExport: \(format) skipped: the system cannot write it here")
+                continue
+            }
+            try await ComposerExport.run(opened, session, format)
+            #expect(opened.presenter.mirror.status == ComposerPresenter.exportedWord, "\(format)")
+            let lossy = try ComposerExport.decoded(opened)
+            let mean = ComposerExport.meanDifference(lossy, preview)
+            #expect(mean <= 3, "\(format) mean \(mean)/255")
+            print("PresenterExport regression: PNG max \(d)/255, \(format) mean \(mean)/255")
+        }
+    }
+
+    @Test("an unavailable format and a too-large size are refused before drawing and write nothing")
+    func refusalsBeforeDrawing() async throws {
+        let session = ExperienceSession()
+        var shell: ExperienceShell<ComposerPresenter>?
+        defer { ComposerExport.close(session, shell) }
+        let opened = try await ComposerExport.open(session, test: "refusals")
+        shell = opened
+        _ = try await ComposerExport.regressionFixture(opened, session)
+        let renders = opened.presenter.renderer.renderCount
+
+        opened.presenter.formatAvailable = { _ in false }
+        #expect(try await ComposerExport.run(opened, session, .png) == false)
+        #expect(opened.presenter.mirror.status == ExportRefusal.formatUnavailable.message)
+
+        opened.presenter.formatAvailable = StillImageEncoder.isAvailable
+        opened.presenter.exportTextureLimit = 64
+        #expect(try await ComposerExport.run(opened, session, .png) == false)
+        #expect(opened.presenter.mirror.status == ExportRefusal.tooLarge.message)
+
+        #expect(opened.presenter.renderer.renderCount == renders, "nothing was drawn")
+        #expect(opened.presenter.renderer.exportCount == 0)
+        #expect(opened.presenter.exportFile == nil)
+        #expect(!FileManager.default.fileExists(atPath: opened.presenter.exportFolder.path))
+    }
+
+    @Test("a second export removes the first file; a call while exporting is ignored")
+    func oneFileAtATime() async throws {
+        let session = ExperienceSession()
+        var shell: ExperienceShell<ComposerPresenter>?
+        defer { ComposerExport.close(session, shell) }
+        let opened = try await ComposerExport.open(session, test: "one-file")
+        shell = opened
+        _ = try await ComposerExport.regressionFixture(opened, session)
+
+        try await ComposerExport.run(opened, session, .png)
+        #expect(ComposerExport.files(opened) == ["Look 96x64.png"])
+        try await ComposerExport.run(opened, session, .jpeg)
+        #expect(ComposerExport.files(opened) == ["Look 96x64.jpeg"], "the earlier file was removed")
+
+        let first = opened.presenter.startExport(format: .png)
+        #expect(first != nil)
+        #expect(opened.presenter.mirror.status == ComposerPresenter.exportingWord)
+        #expect(opened.presenter.mirror.isExporting)
+        #expect(opened.presenter.startExport(format: .jpeg) == nil, "ignored while exporting")
+        try ComposerTest.draw(session)
+        await first?.value
+        #expect(ComposerExport.files(opened) == ["Look 96x64.png"])
+        #expect(opened.presenter.renderer.exportCount == 3)
+        #expect(!opened.presenter.mirror.isExporting)
+    }
+
+    @Test("an all-disabled chain exports the source exactly")
+    func allDisabledExportsTheSource() async throws {
+        let session = ExperienceSession()
+        var shell: ExperienceShell<ComposerPresenter>?
+        defer { ComposerExport.close(session, shell) }
+        let opened = try await ComposerExport.open(session, test: "disabled")
+        shell = opened
+        let picture = try await ComposerExport.regressionFixture(opened, session)
+        for i in 0..<3 { ComposerTest.accept(opened, "chain.enable", [Double(i), 0]) }
+        try await ComposerExport.run(opened, session, .png)
+        #expect(try ComposerExport.decoded(opened) == picture)
+    }
+
+    @Test("an export while a picture is being read uses the shown picture")
+    func exportWhileImporting() async throws {
+        let session = ExperienceSession()
+        var shell: ExperienceShell<ComposerPresenter>?
+        defer { ComposerExport.close(session, shell) }
+        let opened = try await ComposerExport.open(session, test: "importing")
+        shell = opened
+        let shown = PictureSourceTests.gradient(shift: 0)
+        let pending = PictureSourceTests.gradient(shift: 100)
+        let shownPicture = try PictureSourceTests.decoded(shown)
+        await opened.presenter.importPicture(data: shown)
+        try ComposerTest.draw(session)
+        let (gate, open) = AsyncStream<Void>.makeStream()
+        opened.presenter.decoder = { data, limit in
+            if data == pending {
+                for await _ in gate { break }
+            }
+            return ImageImport.decode(data, limit: limit)
+        }
+        let reading = opened.presenter.startImport(data: pending)
+        #expect(opened.presenter.mirror.status == ComposerPresenter.readingWord)
+        try await ComposerExport.run(opened, session, .png)
+        #expect(try ComposerExport.decoded(opened) == shownPicture)
+        open.yield()
+        open.finish()
+        await reading.value
+        #expect(opened.presenter.mirror.status == ComposerPresenter.yourPictureWord)
+    }
+
+    @Test("a full pool refuses as a25.export-memory and the preview keeps working")
+    func fullPoolRefusesAsMemory() async throws {
+        let session = ExperienceSession()
+        var shell: ExperienceShell<ComposerPresenter>?
+        defer { ComposerExport.close(session, shell) }
+        let opened = try await ComposerExport.open(session, test: "memory")
+        shell = opened
+        let picture = try await ComposerExport.regressionFixture(opened, session)
+        let pool = try #require(opened.presenter.renderer.pool)
+        var held: [RenderTarget] = []
+        while pool.held < PreviewPool.maxTargets { held.append(try pool.acquire(width: 8, height: 8)) }
+        #expect(try await ComposerExport.run(opened, session, .png))
+        #expect(opened.presenter.mirror.status == ExportRefusal.memory.message)
+        #expect(ExportRefusal.memory.code == "a25.export-memory")
+        #expect(opened.presenter.exportFile == nil)
+        #expect(ComposerExport.files(opened).isEmpty)
+        #expect(pool.held == PreviewPool.maxTargets, "the refused export took nothing")
+        for target in held { pool.release(target) }
+
+        ComposerTest.accept(opened, "chain.set", [0, 0, 0.7])
+        try ComposerTest.draw(session)
+        let chain = try ComposerTest.core(opened).chain
+        let result = try #require(opened.presenter.lastResult)
+        #expect(result.maxChannelDifference(EffectReference.apply(chain, to: picture)) <= ComposerTest.tolerance(chain))
+        try await ComposerExport.run(opened, session, .png)
+        #expect(opened.presenter.mirror.status == ComposerPresenter.exportedWord)
+    }
+
+    @Test("closing the experience removes the export folder")
+    func closingRemovesTheFolder() async throws {
+        let session = ExperienceSession()
+        let opened = try await ComposerExport.open(session, test: "close")
+        defer { StillExport.removeFolder(opened.presenter.exportBase) }
+        try await ComposerExport.run(opened, session, .png)
+        let file = try #require(opened.presenter.exportFile)
+        #expect(file.width == 256 && file.height == 256, "the test picture exports at its size")
+        #expect(FileManager.default.fileExists(atPath: file.url.path))
+        session.close()
+        #expect(!FileManager.default.fileExists(atPath: opened.presenter.exportFolder.path))
+        #expect(opened.presenter.exportFile == nil)
+        #expect(opened.presenter.mirror.exportFile == nil)
     }
 }
