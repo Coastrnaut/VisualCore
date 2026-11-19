@@ -7,5 +7,6 @@
   `GL_EXT_disjoint_timer_query`.
 - **DroppedFrameRule** (core): `periodMs` = 1,000 / 60, `factor` = 1.5; `isDropped(intervalMs:)`.
 - **RunReport** (core): the fields of clarification Q5; validation: every string 1…128 characters, booleans, the
-  thermal states as `FramePacing.Thermal` raw values, timing sources from a fixed set.
+  thermal states as `FramePacing.Thermal` raw values, timing sources from a fixed set; `flags` (sorted, unique) whose
+  only value is `thermal-changed` when `thermalStart` and `thermalEnd` differ (A24-P01's `QualityFlag` is unchanged).
 - **Run file:** version 2, body `{case, report, samples, state, summary}`; version 1 migrates with `report: null`.
