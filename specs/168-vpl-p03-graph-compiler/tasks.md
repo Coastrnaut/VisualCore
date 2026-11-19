@@ -16,7 +16,7 @@
 
 ## Phase 2: Core compiler (blocking)
 
-- [ ] T-A23-302 [P] Create `Packages/ExperiencesCreative/VisualProgrammingLab/Core/{GraphCompiler,PreviewValues}.swift` with
+- [X] T-A23-302 [P] Create `Packages/ExperiencesCreative/VisualProgrammingLab/Core/{GraphCompiler,PreviewValues}.swift` with — Verified 2026-11-18: 2026-11-18: GraphCompiler.swift (passes for texture nodes reaching the Output in the checker's order, Blur as blur-h and blur-v, Time and Constant as values, lowest-free-slot assignment freed after the last read, 256 x 256 x 4 bytes per slot, the 6-slot limit with its sentence, invalid graphs refused with the checker's status, content keys without positions and changed(from:to:)) and PreviewValues.swift; CompilerTests (10), SlotTests (6), ContentKeyTests (8), PreviewValuesTests (3); .autonomy/checks/A23-P03.vpl-ios27.json and A23-P03.vpl-ios27-2.json exit 0 (152 core and 46 experience tests on sim-27.2, slowest 0.93 s); written by an agent, retested
   `CoreTests/{CompilerTests,SlotTests,ContentKeyTests,PreviewValuesTests}.swift` per data-model.md and clarifications
   Q1–Q3 (FR-A23-301, 303, 304, 305): passes for texture nodes reaching the Output in the checker's order (Blur two),
   values for Time and Constant; "lowest free slot, freed after the last read"; "256 × 256 × 4 bytes" per slot and a
