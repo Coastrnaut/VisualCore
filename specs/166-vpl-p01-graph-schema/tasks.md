@@ -84,7 +84,7 @@
   - `--name catalog -- python3 scripts/build_catalog.py --check`;
   - `--name script-tests -- python3 scripts/test_scripts.py`;
   - `--name app-build -- python3 scripts/release_check.py --only app-build-for-testing-ios27`.
-- [ ] T-A23-112 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+- [X] T-A23-112 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record — Verified 2026-11-18: 2026-11-18: /speckit-converge round 1 appended T-A23-113 (implemented), round 2 appended nothing (7 FR, 6 SC, 14 acceptance scenarios, 8 edge cases checked; every evidence file exit 0); .autonomy/evidence/A23-P01.json sealed; VERIFIED-GATE A23-P01 (166 of 263); planning index, matrix, distinctiveness, metadata, Auto-Creator, catalog (--check PASS), validate_autocreator and validate_docs PASS; README and docs/automatedtesting.md updated
   A23-P01; update README.md (rule 16) and `docs/automatedtesting.md` (rule 17)
 
 ## Dependencies
