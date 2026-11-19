@@ -26,6 +26,56 @@ Canonical overrides:
   colour boundaries and robustness (A25-P05).
 - **No VisualCore or ProjectM change.** Follow `specs/174-gbl-p02-workload-renderers`.
 
+## Clarifications
+
+### Session 2026-11-19
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- **Pool:** `ResourceRegistry.acquireTarget(width:height:format:depth:)` hands out a pooled target of that key (or makes
+  one), `recycle(_:)` returns it for reuse and `trimPools()` releases the free ones; `ResourceRegistry.stats` counts
+  live targets and bytes.
+- **Passes:** `FieldPass` refuses a pass that samples its output (`FieldPassError.inputIsOutput`) and reports a build
+  failure as `FieldPassError.compile("<file>:<line>: <message>")`.
+- **Host and controls:** `ExperiencePresenter` (`setup`, `resize`, `draw(_:tier:context:frame:)`, `teardown`,
+  `makeControls(_:)`), `ExperienceControl(id:ranges:)` with at most 24 values, `RenderHost.recreateContext()`; the A24
+  experience is the closest precedent (core adapter, presenter, inline controls, scenario manifest, candidate
+  registration).
+- **Registration:** a candidate in `Catalog/registrations.json` (capabilities of at most 40 characters, `quality_tiers`
+  ["level-0"], a palette, the manifest path, permissions, a summary of at most 300 characters) and in
+  `ExperienceRegistry.candidates`.
+
+- Q: How does the compiler lay out the passes? → A: `PassPlan.compile(_ chain:)` in the core gives, for the enabled
+  nodes in order, passes reading `.source` (the first) or slot `(k − 1) % 2` and writing slot `k % 2`, except the last,
+  which writes `.result`; an empty plan is one `copy` pass from `.source` to `.result`. Each slot's lifetime runs from
+  its writer to its single reader, so at most two slots are alive and no pass reads its output. The plan names the
+  passes, the slots used (0, 1 or 2) and the lifetimes; it is pure and tested on every chain shape.
+- Q: What does the preview draw, and how big is it? → A: The source is the built-in test image at 256 × 256 (the core
+  gains `TestImage.make(size:)` with the same pattern, `make()` staying 64 × 64). The presenter uploads it into a
+  `.rgba8` source target, runs the plan with the five effect programs plus a `copy` program into a `.result` target of
+  the source's size, and draws the result to the framebuffer with a `present` pass that fits it in the drawable
+  (letterboxed, nearest sampling at whole multiples). Slots and the result come from `acquireTarget` and go back with
+  `recycle` after each frame; the pool cap is 4 targets of at most 2,048 × 2,048, and a larger request is refused with
+  the rule id `a25.pool-cap` and the message "The picture is larger than the preview allows.".
+- Q: Which actions does the experience offer? → A: `ComposerCore` (snapshot schema 1: the chain as the chain file's
+  body; digest `a25.effects-composer.v1` over the chain's fingerprint) holds the chain and an `EditHistory` (not
+  stored; a restored session starts with an empty history). Actions: `chain.add [effect 0…4, position 0…8]`,
+  `chain.remove [index 0…7]`, `chain.move [from 0…7, to 0…7]`, `chain.enable [index 0…7, on 0…1]`,
+  `chain.set [index 0…7, parameter 0…3, value 0…1]` (the value maps to the parameter's range as lower + v·(upper −
+  lower), rounded for whole parameters), `edit.undo []` and `edit.redo []`. Fractions where whole numbers are needed are
+  refused with `a25.not-whole`; a refused edit gives its `ChainRefusal` code as the rule id `a25.<code>`.
+- Q: How are diagnostics produced and shown? → A: The presenter builds one `FieldPass` per effect at setup. A build
+  failure's text is parsed into a `ProgramDiagnostic` (effect, line, message); a chain using a broken effect keeps
+  drawing the last good result, and the controls show "<effect title>, line <n>: <message>". A test-only
+  `programOverride` replaces one effect's source to inject the failure; it is never set by the app.
+- Q: What does the interface show, and how is it registered? → A: Native inline controls (`ECControls`, no system
+  menu): `add-<effect>` buttons, a row per node `node-<i>` with `enable-<i>`, `up-<i>`, `down-<i>` and `remove-<i>`,
+  for each parameter `value-<i>-<name>` with `-down`/`-up` steps of a tenth of its range, `undo` and `redo`, a
+  `status` line ("Ready" or the refusal's message) and a `diagnostics` line. The experience registers as a candidate
+  with the permission `photo-library-add` (A25-P00 clarification Q5), one tier `level-0`, `maxFramesPerSecond` 60, and
+  an `ECManifest` with the standard scenarios and a fixture per effect; the runner runs on iOS 27.2. The app tests'
+  synthetic candidate moves to `r02-g01.aurora-loom`.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - A chain becomes an ordered set of passes (Priority: P1) 🎯
