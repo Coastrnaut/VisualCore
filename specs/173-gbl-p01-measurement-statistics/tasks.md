@@ -32,7 +32,7 @@
   (FR-A24-102): `RunPhase`, `FrameSample` ("every duration finite and within 0…1,000 ms; intervalMs absent only for
   the run's first frame"), `SampleLimits` ("maxSamples 20,000"), `SampleError`, `SampleSet.validate` (frame indices
   strictly increasing, phases never going back).
-- [ ] T-A24-105 [P] [US1] [US3] Write `Packages/ExperiencesCreative/GraphicsBenchmarkLab/CoreTests/{CaseTests,SampleTests}.swift`
+- [X] T-A24-105 [P] [US1] [US3] Write `Packages/ExperiencesCreative/GraphicsBenchmarkLab/CoreTests/{CaseTests,SampleTests}.swift` — Verified 2026-11-19: 2026-11-19: CaseTests and SampleTests pass in .autonomy/checks/A24-P01.gbl-core-ios27.json (40 tests, 0.088 s)
   (SC-A24-102, 103): the built-ins validate with three distinct stable fingerprints; one changed value changes the
   fingerprint; each cap at and one past its bound; a field of the wrong workload refused; NaN, infinity, negative and
   over-1,000 ms durations refused naming frame and field; out-of-order indices and phases; 20,001 samples.
