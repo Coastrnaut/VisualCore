@@ -34,7 +34,7 @@
 
 ## Phase 3: Stories 1–2 — build a graph; wrong connections refused (P1) 🎯
 
-- [ ] T-A23-205 [US1] [US2] Create `Packages/ExperiencesCreative/VisualProgrammingLab/Experience/Adapter/LabCore.swift` per
+- [X] T-A23-205 [US1] [US2] Create `Packages/ExperiencesCreative/VisualProgrammingLab/Experience/Adapter/LabCore.swift` per — Verified 2026-11-18: 2026-11-18: Adapter/LabCore.swift: snapshot schema 1 (graph and selection), digest a23.visual-programming-lab.v1 over the graph's fingerprint only, the six controls with their ranges, nine rule ids (with a23.too-many-edges), restore refusals, the starter graph Noise 1 into Output 2, outcome graph-ready when the checker accepts; .autonomy/checks/A23-P02.vpl-ios27.json exit 0 (125 core and 27 experience tests on sim-27.2, slowest 0.199 s); written by an agent, retested
   clarification Q1: "snapshot schema 1, digest `a23.visual-programming-lab.v1` over the graph", selection in the
   snapshot only, the six actions with their ranges, the eight rule ids, the starter graph "Noise (id 1, at 40, 80) into
   Output (id 2, at 320, 80)", restore refusals for damaged or out-of-range snapshots; `///` everywhere
