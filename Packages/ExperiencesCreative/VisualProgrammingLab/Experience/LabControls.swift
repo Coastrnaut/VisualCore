@@ -4,23 +4,35 @@
 // mirror, sends through the presenter (so a refusal sets the feedback line), has a spoken label from
 // `EditMessages.label(…)` and an identifier `experience.a23.visual-programming-lab.<name>`:
 //
-//   - `add-node`: a menu of the seven kinds ("Add node" → `node.add [kind, x, y]` at the view's middle);
+//   - `add-node`: "Add node", a button that shows or hides an inline list of the seven kinds, one button
+//     `add-node-<kind>` each ("Mix", `add-node-mix`; `node.add [kind, x, y]` at the view's middle, then the list
+//     closes);
 //   - `remove-node`: "Remove" (`node.remove [selection]`), shown while a node is selected; with it `move-left`,
 //     `move-right`, `move-up` and `move-down` (`node.move` by 32 canvas points, the grid's minor spacing);
 //   - `status`: the checker's status line ("Ready", "No output", "Output not connected", "Mix 3: input b is empty");
 //   - `feedback`: the sentence of the last refusal, shown when there is one;
 //   - `node-list`: one row per node in identity order: a select button (`node-row-<id>`, `node.select`, "Noise 2"),
-//     and per input a picker `input-<id>-<index>` of "None" and every output of every other node ("Noise 1 image");
+//     and per input a button `input-<id>-<index>` (label the input's name, value the current source's title, "None" or
+//     "Noise 1 image") that shows or hides an inline list of option buttons `input-<id>-<index>-option-<tag>`: "None"
+//     (tag ``LabControls/noneTag``) and every output of every other node (tag "<id>-<output>", "Noise 1 image");
 //     choosing an output sends `edge.connect` (with the canvas's refusals), choosing None `edge.disconnect`;
 //   - the connections, one line each (`connection-<target>-<index>`, "Noise 1 image → Output 2 image");
 //   - `preview-toggle` (feature 168, A23-P03, T-A23-304; clarification Q5): a native switch "Preview" that shows or
 //     hides the preview inset; view state only, so it sends no action and changes neither the graph nor its digest.
 //   - Feature 169 (A23-P04) T-A23-404, T-A23-406 (FR-A23-401, FR-A23-404; clarifications Q1, Q2, Q4;
 //     contracts/library.md "Identifiers"): `library` ("Library", shown when the experience has storage) opens the
-//     graph library (``LabLibraryView``) in a sheet; `examples` is the "Examples" menu, one item `example-<id>` per
-//     example ("Open the example Clouds"), opened through the presenter's `request(_:)`; when the open graph differs
-//     from the last saved or opened one, `library-replace-confirm` asks first (``ReplaceConfirmation``, here while the
-//     sheet is down and in the sheet while it is up) and declining changes nothing.
+//     graph library (``LabLibraryView``) in a sheet; `examples` is the "Examples" button that shows or hides an inline
+//     list, one button `example-<id>` per example ("Open the example Clouds"), opened through the presenter's
+//     `request(_:)`; when the open graph differs from the last saved or opened one, `library-replace-confirm` asks
+//     first (``ReplaceConfirmation``, here while the sheet is down and in the sheet while it is up) and declining
+//     changes nothing.
+//
+// Inline lists, not menus (feature 170, A23-P05, T-A23-505): the kinds, the sources and the examples are inline,
+// expanding lists of buttons, never a `Menu`, a menu-style `Picker`, a popover or a sheet. While a menu is up over the
+// canvas, which presents a new frame 30 times a second, the system never reports the app idle, so the interface tests
+// wait 60 s per tap and taps on menu entries are unreliable; plain buttons in the controls' own scroll view have no
+// such overlay. At most one list is open at a time (``LabControls/openList``); every choice closes it. Every button is
+// at least 44 points high and keeps its spoken label and hint.
 import SwiftUI
 import VisualCoreExperienceHost
 import VisualProgrammingLabCore
@@ -80,6 +92,34 @@ struct LabControls: View {
 
     /// Whether the library sheet is up.
     @State private var showingLibrary = false
+    /// The key of the one inline list that is open (``addListKey``, ``examplesListKey`` or an input's identifier
+    /// name `input-<id>-<index>`); nil when every list is closed.
+    @State private var openList: String?
+
+    /// The key of the inline list of kinds.
+    static let addListKey = "add-node"
+    /// The key of the inline list of examples.
+    static let examplesListKey = "examples"
+
+    /// The identifier name of the add button of `kind`: `add-node-<kind>`, for example `add-node-mix`.
+    static func addName(_ kind: NodeKind) -> String { "add-node-" + kind.rawValue }
+
+    /// The identifier name of the button of input `index` of `node`: `input-<id>-<index>`.
+    static func inputName(_ node: NodeID, input index: Int) -> String { "input-\(node.rawValue)-\(index)" }
+
+    /// The identifier name of the option `tag` of input `index` of `node`: `input-<id>-<index>-option-<tag>`, for
+    /// example `input-3-0-option-1-0` or `input-3-0-option-none`.
+    static func optionName(_ node: NodeID, input index: Int, tag: String) -> String {
+        inputName(node, input: index) + "-option-" + tag
+    }
+
+    /// The title of the source with `tag` among `options`: "None" for ``noneTag`` or a tag that names no option.
+    static func title(ofTag tag: String, in options: [SourceOption]) -> String {
+        options.first { $0.tag == tag }?.title ?? "None"
+    }
+
+    /// Opens the inline list `key`, or closes it when it is the open one (closing any other).
+    private func toggle(_ key: String) { openList = openList == key ? nil : key }
 
     /// Every output a picker for an input of `target` offers: each output of every other node, in identity order.
     static func sourceOptions(for target: NodeID, in graph: VisualGraph) -> [SourceOption] {
@@ -135,15 +175,8 @@ struct LabControls: View {
         return VStack(alignment: .leading, spacing: 8) {
             Text(verbatim: "Visual Programming Lab").font(.headline).accessibilityAddTraits(.isHeader)
             HStack(spacing: 12) {
-                Menu {
-                    ForEach(Array(NodeKind.allCases.enumerated()), id: \.offset) { index, kind in
-                        Button {
-                            let at = addPosition()
-                            send("node.add", [Double(index), at.x, at.y])
-                        } label: {
-                            Text(verbatim: EditMessages.title(of: kind))
-                        }
-                    }
+                Button {
+                    toggle(Self.addListKey)
                 } label: {
                     Text(verbatim: "Add node").frame(minHeight: 44)
                 }
@@ -161,6 +194,7 @@ struct LabControls: View {
                     moveButtons(node)
                 }
             }
+            if openList == Self.addListKey { addList() }
             if let library { libraryRow(library) }
             Toggle(isOn: Binding(get: { mirror.previewVisible }, set: { visible in setPreview(visible) })) {
                 Text(verbatim: "Preview")
@@ -219,22 +253,29 @@ struct LabControls: View {
                 .accessibilityHint(Text(verbatim: "Saves the open graph, or opens, renames or removes a saved graph"))
                 .accessibilityIdentifier(port.identifier("library"))
             }
-            Menu {
-                ForEach(LabExamples.all) { example in
-                    Button {
-                        _ = actions.request(.example(example.id))
-                    } label: {
-                        Text(verbatim: example.title)
-                    }
-                    .accessibilityLabel(Text(verbatim: LabExamples.spokenLabel(example)))
-                    .accessibilityIdentifier(port.identifier(LabExamples.identifierName(example)))
-                }
+            Button {
+                toggle(Self.examplesListKey)
             } label: {
                 Text(verbatim: "Examples").frame(minHeight: 44)
             }
             .accessibilityLabel(Text(verbatim: "Examples"))
             .accessibilityHint(Text(verbatim: "Opens an example graph in place of the open graph"))
             .accessibilityIdentifier(port.identifier("examples"))
+        }
+        if openList == Self.examplesListKey {
+            VStack(alignment: .leading, spacing: 2) {
+                ForEach(LabExamples.all) { example in
+                    Button {
+                        openList = nil
+                        _ = actions.request(.example(example.id))
+                    } label: {
+                        Text(verbatim: example.title).frame(minHeight: 44)
+                    }
+                    .accessibilityLabel(Text(verbatim: LabExamples.spokenLabel(example)))
+                    .accessibilityIdentifier(port.identifier(LabExamples.identifierName(example)))
+                }
+            }
+            .padding(.leading, 16)
         }
         if !showingLibrary, let message = mirror.libraryMessage {
             Text(verbatim: message)
@@ -243,6 +284,26 @@ struct LabControls: View {
                 .accessibilityLabel(Text(verbatim: message))
                 .accessibilityIdentifier(port.identifier("library-message"))
         }
+    }
+
+    /// The inline list of the seven kinds: one button `add-node-<kind>` each, which adds the kind at the view's middle
+    /// and closes the list.
+    private func addList() -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            ForEach(Array(NodeKind.allCases.enumerated()), id: \.offset) { index, kind in
+                Button {
+                    openList = nil
+                    let at = addPosition()
+                    send("node.add", [Double(index), at.x, at.y])
+                } label: {
+                    Text(verbatim: EditMessages.title(of: kind)).frame(minHeight: 44)
+                }
+                .accessibilityLabel(Text(verbatim: EditMessages.title(of: kind)))
+                .accessibilityHint(Text(verbatim: "Adds a node of this kind in the middle of the canvas"))
+                .accessibilityIdentifier(port.identifier(Self.addName(kind)))
+            }
+        }
+        .padding(.leading, 16)
     }
 
     /// The four buttons that move the selected node by ``moveStep``.
@@ -260,7 +321,7 @@ struct LabControls: View {
         }
     }
 
-    /// One node of the list form: its select button and a picker per input.
+    /// One node of the list form: its select button and, per input, its button with an inline list of sources.
     private func nodeRow(_ node: GraphNode, in graph: VisualGraph) -> some View {
         let selected = mirror.selection == node.id
         let options = Self.sourceOptions(for: node.id, in: graph)
@@ -284,23 +345,62 @@ struct LabControls: View {
                 .accessibilityIdentifier(port.identifier("node-diagnostic-row-\(node.id.rawValue)"))
             }
             ForEach(Array(node.kind.inputs.enumerated()), id: \.offset) { index, declaration in
-                Picker(selection: Binding(get: { Self.currentTag(of: node, input: index, in: graph) },
-                                          set: { tag in
-                                              guard tag != Self.currentTag(of: node, input: index, in: graph),
-                                                    let action = Self.action(choosing: tag, for: node.id,
-                                                                             input: index) else { return }
-                                              send(action.0, action.1)
-                                          })) {
-                    Text(verbatim: "None").tag(Self.noneTag)
-                    ForEach(options, id: \.tag) { option in
-                        Text(verbatim: option.title).tag(option.tag)
-                    }
-                } label: {
-                    Text(verbatim: EditMessages.label(port: declaration, of: node))
-                }
-                .accessibilityLabel(Text(verbatim: EditMessages.label(port: declaration, of: node)))
-                .accessibilityIdentifier(port.identifier("input-\(node.id.rawValue)-\(index)"))
+                inputRow(node, input: index, declaration: declaration, options: options, in: graph)
             }
+        }
+    }
+}
+
+// MARK: - Inputs
+
+/// One entry of an input's inline list: the option tag ("none" or "<id>-<output>") and its title.
+private struct InputChoice: Hashable {
+    /// The option tag.
+    var tag: String
+    /// The spoken title, for example "None" or "Noise 1 image".
+    var title: String
+}
+
+extension LabControls {
+    /// The button of one input (label the input's name, value the current source's title) and, while it is open, its
+    /// inline list of options: "None" and every output of every other node. A choice sends what
+    /// ``action(choosing:for:input:)`` gives (nothing when it is the current source) and closes the list.
+    @ViewBuilder
+    fileprivate func inputRow(_ node: GraphNode, input index: Int, declaration: PortDeclaration,
+                              options: [SourceOption], in graph: VisualGraph) -> some View {
+        let key = Self.inputName(node.id, input: index)
+        let current = Self.currentTag(of: node, input: index, in: graph)
+        let currentTitle = Self.title(ofTag: current, in: options)
+        let name = EditMessages.label(port: declaration, of: node)
+        Button {
+            toggle(key)
+        } label: {
+            Text(verbatim: name + ": " + currentTitle).frame(minHeight: 44)
+        }
+        .accessibilityLabel(Text(verbatim: name))
+        .accessibilityValue(Text(verbatim: currentTitle))
+        .accessibilityHint(Text(verbatim: "Shows the outputs that can feed this input"))
+        .accessibilityIdentifier(port.identifier(key))
+        if openList == key {
+            let choices = [InputChoice(tag: Self.noneTag, title: "None")]
+                + options.map { InputChoice(tag: $0.tag, title: $0.title) }
+            VStack(alignment: .leading, spacing: 2) {
+                ForEach(choices, id: \.tag) { choice in
+                    let tag = choice.tag, title = choice.title
+                    Button {
+                        openList = nil
+                        guard tag != Self.currentTag(of: node, input: index, in: graph),
+                              let action = Self.action(choosing: tag, for: node.id, input: index) else { return }
+                        send(action.0, action.1)
+                    } label: {
+                        Text(verbatim: title).frame(minHeight: 44)
+                    }
+                    .accessibilityLabel(Text(verbatim: title))
+                    .accessibilityAddTraits(tag == current ? .isSelected : [])
+                    .accessibilityIdentifier(port.identifier(Self.optionName(node.id, input: index, tag: tag)))
+                }
+            }
+            .padding(.leading, 16)
         }
     }
 }

@@ -33,7 +33,7 @@
 
 ## Phase 4: Story 4 — usability on the phone (P2)
 
-- [ ] T-A23-505 [P] [US4] Write `Apps/VisualCore/Tests/UI/VisualProgrammingLab/{VPLSupport,VPLCanvasUITests,VPLRecoveryUITests}.swift`
+- [X] T-A23-505 [P] [US4] Write `Apps/VisualCore/Tests/UI/VisualProgrammingLab/{VPLSupport,VPLCanvasUITests,VPLRecoveryUITests}.swift` — Verified 2026-11-19: 2026-11-19: Apps/VisualCore/Tests/UI/VisualProgrammingLab/{VPLSupport,VPLCanvasUITests,VPLRecoveryUITests}.swift: the list-form Mix journey to Ready (44.7 s), a mismatched choice's refusal sentence (29.4 s), a saved graph listed and opened after a relaunch (37.6 s), all passing in .autonomy/checks/A23-P05.app-unit-2.json on the iOS 27.2 phone; the first run (A23-P05.app-unit.json) failed because XCTest never saw the app idle while a SwiftUI menu was open over the canvas, which presents 30 frames a second, so LabControls' Add node, Examples and input pickers became inline expanding button lists (add-node-<kind>, example-<id>, input-<id>-<index>-option-<tag>); A23-P05.vpl-ios27-2.json exit 0 after the change; written by agents, retested
   per clarification Q4 and contracts/tests.md (SC-A23-504): the list-form journey to "Ready", the mismatched choice's
   refusal sentence, and save → terminate → relaunch → listed and opens; each under 60 s
 - [ ] T-A23-506 Add the chunk `"e3": ["VPLCanvasUITests", "VPLRecoveryUITests"]` to `scripts/release_check.py` (`UI_CHUNKS`
