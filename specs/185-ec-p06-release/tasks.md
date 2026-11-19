@@ -27,16 +27,18 @@
   `Packages/ExperiencesCreative/EffectsComposer/ExperienceTests/ComposerRecoveryTests.swift` (two saved looks; the
   session fails with the message; every storage file byte-identical; a new session lists and opens both)
 - [ ] T-A25-605 [US2] Generate the nine samples of data-model.md once through the real encoders into
-  `Packages/ExperiencesCreative/EffectsComposer/ExperienceTests/Fixtures/` (declare the folder as a test resource in
-  `Packages/ExperiencesCreative/Package.swift` if needed) and write
+  `Packages/ExperiencesCreative/EffectsComposer/ExperienceTests/Fixtures/` (the lead adds `resources: [.copy("Fixtures")]`
+  to `EffectsComposerExperienceTests` in `Packages/ExperiencesCreative/Package.swift`, analyze U1) and write
   `Packages/ExperiencesCreative/EffectsComposer/ExperienceTests/ReleaseSampleTests.swift` (each outcome of
-  data-model.md; every file byte-identical after reading); `--name ec-recovery-samples`
+  data-model.md; every file byte-identical after reading; a look file above 69,632 bytes written by the test into a
+  temporary storage is listed unreadable as `too-large` and kept, analyze C1); `--name ec-recovery-samples`
 
 ## Phase 4: Story 3 — honest copy and a complete checklist (P1)
 
 - [ ] T-A25-606 [US3] Write `docs/apps/effects-composer/store-listing.md` (claims table naming proving tests; contains
   "Nothing is sent"), `docs/apps/effects-composer/release-checklist.md` (one table: `| Item | Status | Evidence |`,
-  statuses `verified`, `pending-campaign-ii` for EC-D1 … EC-D7, `owner-action` with `docs/release/build-and-archive.md`),
+  statuses `verified`, `pending-campaign-ii` for EC-D1 … EC-D7, `owner-action` with `docs/release/build-and-archive.md`; the leftover-export row cites A25-P05's
+  `PresenterExport` "one file at a time" test, analyze C2),
   `docs/apps/effects-composer/release.json` (data-model.md), the A25 section of `docs/release/known-limitations.md`
   (FR-A25-606's four limits), and the a25 summary and capabilities in `Catalog/registrations.json` (built features,
   keeps "shader", ≤ 300 characters); `--name experience-release -- python3 scripts/release_check.py --only
