@@ -47,10 +47,16 @@ enum SampleFixtures {
         return loaded
     }
 
-    /// The fixture files present in the bundle, by name, sorted.
+    /// The sample-set fixture files present in the bundle, by name, sorted. The golden export files of
+    /// `RunCSVTests` (named `golden-*`) are not sample sets and are left out.
     static func bundledNames() -> [String] {
         let urls = Bundle.module.urls(forResourcesWithExtension: "json", subdirectory: "Fixtures") ?? []
-        return urls.map { $0.deletingPathExtension().lastPathComponent }.sorted()
+        var names: [String] = []
+        for url in urls {
+            let name = url.deletingPathExtension().lastPathComponent
+            if name.hasPrefix("golden-") == false { names.append(name) }
+        }
+        return names.sorted()
     }
 
     /// `samples` with the measured frames' values (interval, CPU, GPU, dropped) permuted by a fixed linear

@@ -58,9 +58,8 @@ struct BenchmarkCoreWork: Equatable {
               let summary = summaries.first else {
             return BenchmarkCoreWork(validatedCases: validated, summaries: summaries, encodedRun: Data())
         }
-        let run = BenchmarkRun(caseID: benchmarkCase.id, caseVersion: benchmarkCase.version,
-                               caseFingerprint: try benchmarkCase.fingerprint().hex, samples: first.fixture.samples,
-                               summary: summary, state: .completed)
+        let run = try BenchmarkRun(benchmarkCase: benchmarkCase, samples: first.fixture.samples, summary: summary,
+                                   state: .completed)
         return BenchmarkCoreWork(validatedCases: validated, summaries: summaries, encodedRun: try RunDocument.encode(run))
     }
 }

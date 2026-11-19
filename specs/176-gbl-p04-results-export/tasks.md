@@ -16,7 +16,7 @@
 
 ## Phase 2: Story 1 — settings stored with the run (P1) 🎯
 
-- [ ] T-A24-402 [US1] Run file version 3 in `Core/BenchmarkRun.swift` per clarification Q1 (FR-A24-401): the whole case
+- [X] T-A24-402 [US1] Run file version 3 in `Core/BenchmarkRun.swift` per clarification Q1 (FR-A24-401): the whole case — Verified 2026-11-19: 2026-11-19: .autonomy/checks/A24-P04.gbl-core.json exit 0 (79 core and 42 experience tests); run file version 3 stores the whole case with its fingerprint recomputed on read; 2 to 3 from the built-in case; tampered setting damaged; version 4 newer
   in the body's `case`, the fingerprint recomputed on read ("a mismatch is `damaged`"), migration 2 → 3 from the
   built-in case of the same id and version; `CoreTests/RunDocumentTests.swift`: version 3 round-trips byte-identically
   with every setting; a version 2 file of a built-in case opens with its settings; a tampered setting is `damaged`;

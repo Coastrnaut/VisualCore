@@ -18,6 +18,13 @@
 // `report: null`, so a version 1 file opens with no report and a version 3 file is `newer-version`. A present report
 // is checked after the case reference with ``RunReport/validate()``; an invalid field is `out-of-range` of
 // `report.<field>`. The `report` key is required in a version 2 body (missing: `damaged`).
+// Feature 176 (A24-P04) T-A24-402 (FR-A24-401; clarification Q1): schema 3 stores the whole case, so the body's
+// `case` is `{config, fingerprint, id, plan, version, workload}` (only the workload's configuration fields present)
+// and a saved run names exactly what was measured. Reading recomputes the fingerprint from the stored settings
+// (``BenchmarkCase/fingerprint()``) and refuses a mismatch as `damaged`; an invalid stored case is `damaged` (id,
+// workload fields), `out-of-range` of `caseVersion` or `case.<field>`, or `not-finite`. The chain's step 2 → 3 fills
+// the settings from the built-in case with the same id and version whose fingerprint equals the stored one, and
+// refuses any other version 2 file as `damaged`; a version 4 file is `newer-version`.
 import Foundation
 import VisualCoreExperience
 import VisualCorePersistence
@@ -32,13 +39,12 @@ public enum RunState: String, Codable, Sendable {
     case interrupted
 }
 
-/// A run record: the case it ran, its samples, their summary and how it ended.
+/// A run record: the case it ran (with every setting), its samples, their summary and how it ended.
 public struct BenchmarkRun: Codable, Equatable, Sendable {
-    /// The id of the case run.
-    public var caseID: String
-    /// The version of the case run.
-    public var caseVersion: Int
-    /// The hex of the case's fingerprint (``BenchmarkCase/fingerprint()``).
+    /// The case run, with its id, version, workload, configuration and run plan.
+    public var benchmarkCase: BenchmarkCase
+    /// The hex of the case's fingerprint (``BenchmarkCase/fingerprint()``) as recorded with the run; a file whose
+    /// stored fingerprint differs from the one recomputed from ``benchmarkCase`` is refused as damaged.
     public var caseFingerprint: String
     /// The run's frame samples, at most ``SampleLimits/maxSamples``.
     public var samples: [FrameSample]
@@ -49,11 +55,16 @@ public struct BenchmarkRun: Codable, Equatable, Sendable {
     /// The conditions the run was measured under, or nil (a run written before schema 2, or recorded without one).
     public var report: RunReport?
 
-    /// A run with the given values (not checked; see ``RunDocument/encode(_:)``).
-    public init(caseID: String, caseVersion: Int, caseFingerprint: String, samples: [FrameSample], summary: Summary,
+    /// The id of the case run (``BenchmarkCase/id`` of ``benchmarkCase``).
+    public var caseID: String { benchmarkCase.id }
+    /// The version of the case run (``BenchmarkCase/version`` of ``benchmarkCase``).
+    public var caseVersion: Int { benchmarkCase.version }
+
+    /// A run of `benchmarkCase` with the given recorded fingerprint and values (not checked; see
+    /// ``RunDocument/encode(_:)``).
+    public init(benchmarkCase: BenchmarkCase, caseFingerprint: String, samples: [FrameSample], summary: Summary,
                 state: RunState, report: RunReport? = nil) {
-        self.caseID = caseID
-        self.caseVersion = caseVersion
+        self.benchmarkCase = benchmarkCase
         self.caseFingerprint = caseFingerprint
         self.samples = samples
         self.summary = summary
@@ -61,43 +72,60 @@ public struct BenchmarkRun: Codable, Equatable, Sendable {
         self.report = report
     }
 
-    /// The body's keys: the case reference, the report, the samples, the summary and the state.
+    /// A run of `benchmarkCase` whose recorded fingerprint is computed from the case; throws what
+    /// ``BenchmarkCase/fingerprint()`` throws for an invalid case.
+    public init(benchmarkCase: BenchmarkCase, samples: [FrameSample], summary: Summary, state: RunState,
+                report: RunReport? = nil) throws(CaseError) {
+        let fingerprint = try benchmarkCase.fingerprint()
+        self.init(benchmarkCase: benchmarkCase, caseFingerprint: fingerprint.hex, samples: samples, summary: summary,
+                  state: state, report: report)
+    }
+
+    /// The body's keys: the case, the report, the samples, the summary and the state.
     private enum CodingKeys: String, CodingKey {
-        case caseReference = "case"
+        case benchmarkCase = "case"
         case report, samples, summary, state
     }
 
-    /// The keys of the case reference.
+    /// The keys of the body's `case` object: the case's own keys and its fingerprint.
     private enum CaseKeys: String, CodingKey {
-        case id, version, fingerprint
+        case id, version, workload, config, plan, fingerprint
     }
 
-    /// Decodes a run from the body `{case: {fingerprint, id, version}, report, samples, summary, state}`; `report`
-    /// must be present, as a report or null.
+    /// Decodes a run from the version 3 body `{case: {config, fingerprint, id, plan, version, workload}, report,
+    /// samples, summary, state}`; `report` must be present, as a report or null.
     public init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        let reference = try container.nestedContainer(keyedBy: CaseKeys.self, forKey: .caseReference)
-        caseID = try reference.decode(String.self, forKey: .id)
-        caseVersion = try reference.decode(Int.self, forKey: .version)
-        caseFingerprint = try reference.decode(String.self, forKey: .fingerprint)
+        let stored = try container.nestedContainer(keyedBy: CaseKeys.self, forKey: .benchmarkCase)
+        benchmarkCase = BenchmarkCase(
+            id: try stored.decode(String.self, forKey: .id),
+            version: try stored.decode(Int.self, forKey: .version),
+            workload: try stored.decode(Workload.self, forKey: .workload),
+            config: try stored.decode(WorkloadConfig.self, forKey: .config),
+            plan: try stored.decode(RunPlan.self, forKey: .plan))
+        caseFingerprint = try stored.decode(String.self, forKey: .fingerprint)
         samples = try container.decode([FrameSample].self, forKey: .samples)
         summary = try container.decode(Summary.self, forKey: .summary)
         state = try container.decode(RunState.self, forKey: .state)
         guard container.contains(.report) else {
             throw DecodingError.keyNotFound(CodingKeys.report, DecodingError.Context(
-                codingPath: container.codingPath, debugDescription: "a version 2 body holds a report or null"))
+                codingPath: container.codingPath, debugDescription: "a version 3 body holds a report or null"))
         }
         report = try container.decodeNil(forKey: .report) ? nil : container.decode(RunReport.self, forKey: .report)
     }
 
-    /// Encodes the run as the body `{case: {fingerprint, id, version}, report, samples, summary, state}`, with
-    /// `report` null when absent.
+    /// Encodes the run as the version 3 body `{case: {config, fingerprint, id, plan, version, workload}, report,
+    /// samples, summary, state}`, with `report` null when absent and only the workload's configuration fields
+    /// present.
     public func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        var reference = container.nestedContainer(keyedBy: CaseKeys.self, forKey: .caseReference)
-        try reference.encode(caseID, forKey: .id)
-        try reference.encode(caseVersion, forKey: .version)
-        try reference.encode(caseFingerprint, forKey: .fingerprint)
+        var stored = container.nestedContainer(keyedBy: CaseKeys.self, forKey: .benchmarkCase)
+        try stored.encode(benchmarkCase.id, forKey: .id)
+        try stored.encode(benchmarkCase.version, forKey: .version)
+        try stored.encode(benchmarkCase.workload, forKey: .workload)
+        try stored.encode(benchmarkCase.config, forKey: .config)
+        try stored.encode(benchmarkCase.plan, forKey: .plan)
+        try stored.encode(caseFingerprint, forKey: .fingerprint)
         try container.encode(samples, forKey: .samples)
         try container.encode(summary, forKey: .summary)
         try container.encode(state, forKey: .state)
@@ -112,16 +140,17 @@ public struct BenchmarkRun: Codable, Equatable, Sendable {
 /// Why a run file was refused or a run could not be written.
 public enum RunRefusal: Error, Equatable, Sendable {
     /// Not the envelope, the wrong kind, a missing or ill-typed field, a version below 1 or without a migration step,
-    /// a malformed case reference, or a stored summary that differs from the one recomputed from the samples.
+    /// a malformed case, a stored case fingerprint that differs from the recomputed one, or a stored summary that
+    /// differs from the one recomputed from the samples.
     case damaged
     /// The file was written by a newer version (above ``RunDocument/schemaVersion``).
     case newerVersion
     /// The file or the encoding is above ``RunDocument/maxBytes``.
     case tooLarge
-    /// A sample duration is NaN or infinite.
+    /// A sample duration or the case's resolution scale is NaN or infinite.
     case notFinite
-    /// The named field is outside its range (a sample duration, an absent interval after the first sample, or
-    /// `caseVersion` below 1).
+    /// The named field is outside its range (a sample duration, an absent interval after the first sample,
+    /// `caseVersion` below 1, or a case setting `case.<field>` outside its cap).
     case outOfRange(field: String)
     /// A frame index or a phase goes back.
     case outOfOrder
@@ -153,22 +182,54 @@ public enum RunRefusal: Error, Equatable, Sendable {
     }
 }
 
-/// Reads and writes run files (kind `a24.benchmark-run`, schema 2).
+/// Reads and writes run files (kind `a24.benchmark-run`, schema 3).
 public enum RunDocument {
     /// The envelope kind of a run file.
     public static let kind = "a24.benchmark-run"
     /// The schema version this code writes and reads.
-    public static let schemaVersion = 2
+    public static let schemaVersion = 3
     /// The largest run file accepted or written, in bytes.
     public static let maxBytes = 2_097_152
-    /// The migrations to ``schemaVersion``: step 1 → 2 adds `report: null` to the body.
+    /// The migrations to ``schemaVersion``: step 1 → 2 adds `report: null` to the body; step 2 → 3 fills the case's
+    /// settings from the built-in case of the same id and version whose fingerprint equals the stored one, and
+    /// throws (read as ``RunRefusal/damaged``) for any other case.
     public static let migrations = MigrationChain(currentVersion: schemaVersion, steps: [
         1: { body in
             var migrated = body
             migrated["report"] = NSNull()
             return migrated
         },
+        2: { body in
+            var migrated = body
+            migrated["case"] = try builtInCaseObject(for: body["case"])
+            return migrated
+        },
     ])
+
+    /// A version 2 case reference that names no built-in case with the same id, version and fingerprint.
+    struct UnknownCaseReference: Error {}
+
+    /// The version 3 `case` object of the version 2 reference `reference` (`{fingerprint, id, version}`): the
+    /// built-in case with the same id and version, encoded, plus the stored fingerprint. Throws
+    /// ``UnknownCaseReference`` when the reference is malformed, names no built-in case, or its fingerprint differs.
+    static func builtInCaseObject(for reference: Any?) throws -> [String: Any] {
+        guard let reference = reference as? [String: Any], let id = reference["id"] as? String,
+              let version = reference["version"] as? Int, let fingerprint = reference["fingerprint"] as? String
+        else { throw UnknownCaseReference() }
+        var match: BenchmarkCase?
+        for candidate in BenchmarkCase.builtIn where candidate.id == id && candidate.version == version {
+            match = candidate
+        }
+        guard let match, let digest = try? match.fingerprint(), digest.hex == fingerprint else {
+            throw UnknownCaseReference()
+        }
+        let encoded = try JSONEncoder().encode(match)
+        guard var object = try JSONSerialization.jsonObject(with: encoded) as? [String: Any] else {
+            throw UnknownCaseReference()
+        }
+        object["fingerprint"] = fingerprint
+        return object
+    }
 
     /// The strings that stand for non-finite numbers in a file, so that they are refused as
     /// ``RunRefusal/notFinite`` rather than as damage.
@@ -232,12 +293,27 @@ public enum RunDocument {
         return .success(run)
     }
 
-    /// The refusal of a run the file may not hold, or nil: a malformed case reference, then an invalid report
-    /// (`out-of-range` of `report.<field>`), then the samples, then a stored summary that differs from the recomputed
-    /// one.
+    /// The refusal of a run the file may not hold, or nil: a malformed case (a fingerprint that is not a digest, an
+    /// empty or malformed id, fields of another workload: `damaged`; a version below 1: `out-of-range` of
+    /// `caseVersion`; another setting outside its cap: `out-of-range` of `case.<field>`; a non-finite resolution
+    /// scale: `not-finite`), a stored fingerprint that differs from the recomputed one (`damaged`), then an invalid
+    /// report (`out-of-range` of `report.<field>`), then the samples, then a stored summary that differs from the
+    /// recomputed one.
     static func check(_ run: BenchmarkRun) -> RunRefusal? {
-        guard run.caseID.isEmpty == false, StateDigest(hex: run.caseFingerprint) != nil else { return .damaged }
-        guard run.caseVersion >= 1 else { return .outOfRange(field: "caseVersion") }
+        guard StateDigest(hex: run.caseFingerprint) != nil else { return .damaged }
+        let recomputedFingerprint: StateDigest
+        do {
+            recomputedFingerprint = try run.benchmarkCase.fingerprint()
+        } catch {
+            switch error {
+            case .outOfRange(field: "id"): return .damaged
+            case .outOfRange(field: "version"): return .outOfRange(field: "caseVersion")
+            case let .outOfRange(field): return .outOfRange(field: "case.\(field)")
+            case .notFinite: return .notFinite
+            case .wrongWorkloadFields: return .damaged
+            }
+        }
+        guard recomputedFingerprint.hex == run.caseFingerprint else { return .damaged }
         if let report = run.report {
             do {
                 try report.validate()

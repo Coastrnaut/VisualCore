@@ -175,8 +175,7 @@ final class RunRecorder {
         case .interrupted: runState = .interrupted
         }
         guard let benchmarkCase, let summary, let fingerprint = try? benchmarkCase.fingerprint() else { return nil }
-        return BenchmarkRun(caseID: benchmarkCase.id, caseVersion: benchmarkCase.version,
-                            caseFingerprint: fingerprint.hex, samples: samples, summary: summary, state: runState,
-                            report: report)
+        return BenchmarkRun(benchmarkCase: benchmarkCase, caseFingerprint: fingerprint.hex, samples: samples,
+                            summary: summary, state: runState, report: report)
     }
 }
