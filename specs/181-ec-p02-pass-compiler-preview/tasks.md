@@ -47,7 +47,7 @@
 
 ## Phase 5: Registration and verification
 
-- [ ] T-A25-209 Write `Packages/ExperiencesCreative/EffectsComposer/Experience/Adapter/ECManifest.swift` (the standard scenarios plus a fixture per effect) and
+- [X] T-A25-209 Write `Packages/ExperiencesCreative/EffectsComposer/Experience/Adapter/ECManifest.swift` (the standard scenarios plus a fixture per effect) and — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P02.ec-ios27.json exit 0 (42 core and 27 experience tests on sim-27.2); ECManifest 9 standard scenarios and 5 fixtures; scenario-manifest.json generated and confirmed
   `Packages/ExperiencesCreative/EffectsComposer/ExperienceTests/ECManifestTests.swift`; generate `Packages/ExperiencesCreative/EffectsComposer/scenario-manifest.json` with `UPDATE_SCENARIO_MANIFEST=1
   TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`
 - [ ] T-A25-210 Register the candidate (FR-A25-207):

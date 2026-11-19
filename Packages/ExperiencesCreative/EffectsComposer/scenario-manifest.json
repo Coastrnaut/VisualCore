@@ -1,0 +1,732 @@
+{
+  "controls" : [
+    "chain.add",
+    "chain.remove",
+    "chain.move",
+    "chain.enable",
+    "chain.set",
+    "edit.undo",
+    "edit.redo"
+  ],
+  "experience" : "a25.effects-composer",
+  "kind" : "creative",
+  "scenarios" : [
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+        "initialDigest" : "2ab50961bb6fdb810bf42a9bed818e53def4991e2edb177a22376420327a2da2"
+      },
+      "name" : "launch-first-frame",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "chain.add",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "chain.add",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "chain.set",
+            "values" : [
+              0,
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "chain.move",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "chain.enable",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "edit.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9507c699def18777a27f6585aa48a30790b313cd0e53e5e229a38e98b9f126d0",
+        "initialDigest" : "2ab50961bb6fdb810bf42a9bed818e53def4991e2edb177a22376420327a2da2"
+      },
+      "name" : "input-response",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "chain.add",
+            "values" : [
+              3,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "outcome" : "effects-1"
+      },
+      "name" : "completion",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "chain.add",
+            "values" : [
+              5,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "chain.add",
+            "values" : [
+              0,
+              9
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "chain.add",
+            "values" : [
+              0.5,
+              0
+            ]
+          },
+          "result" : "action.rule.a25.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "chain.add",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "action.rule.a25.bad-index",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "chain.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.a25.bad-index",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "chain.remove",
+            "values" : [
+              1.5
+            ]
+          },
+          "result" : "action.rule.a25.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "chain.move",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "action.rule.a25.bad-index",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "chain.enable",
+            "values" : [
+              0,
+              0.5
+            ]
+          },
+          "result" : "action.rule.a25.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "chain.set",
+            "values" : [
+              0,
+              0,
+              0.5
+            ]
+          },
+          "result" : "action.rule.a25.bad-index",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "edit.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.a25.nothing-to-undo",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "edit.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.a25.nothing-to-redo",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "chain.add",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "edit.undo",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+
+      },
+      "name" : "rejection",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "chain.add",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "chain.add",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "chain.set",
+            "values" : [
+              0,
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "chain.move",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "chain.enable",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "edit.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9507c699def18777a27f6585aa48a30790b313cd0e53e5e229a38e98b9f126d0",
+        "initialDigest" : "2ab50961bb6fdb810bf42a9bed818e53def4991e2edb177a22376420327a2da2"
+      },
+      "name" : "save-restore",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "chain.add",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "chain.add",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "chain.set",
+            "values" : [
+              0,
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "chain.move",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "chain.enable",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "edit.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "initialDigest" : "2ab50961bb6fdb810bf42a9bed818e53def4991e2edb177a22376420327a2da2",
+        "resetDigest" : true
+      },
+      "name" : "reset",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "suspend-resume",
+      "seed" : "1"
+    },
+    {
+      "cycles" : 5,
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "teardown-reentry",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "cancel-prepare",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "chain.add",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "chain.set",
+            "values" : [
+              0,
+              0,
+              0.75
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "chain.enable",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "chain.enable",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "93bafb36f4f3d767e31d988af14a308275aaae86cc5f1b8418766f8b098aa85d",
+        "initialDigest" : "2ab50961bb6fdb810bf42a9bed818e53def4991e2edb177a22376420327a2da2",
+        "outcome" : "effects-1"
+      },
+      "name" : "fixture-grade",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "chain.add",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "chain.set",
+            "values" : [
+              0,
+              0,
+              0.75
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "chain.enable",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "chain.enable",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8675ce0aee79f3f606205adc34c8f044f00d0a094b9d80c4ffdb862c16889c65",
+        "initialDigest" : "2ab50961bb6fdb810bf42a9bed818e53def4991e2edb177a22376420327a2da2",
+        "outcome" : "effects-1"
+      },
+      "name" : "fixture-blur",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "chain.add",
+            "values" : [
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "chain.set",
+            "values" : [
+              0,
+              0,
+              0.75
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "chain.enable",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "chain.enable",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "4505885f1a0594699cb77c99cab20152cfdb44ec72e5ddb58bab132bce5ef9bc",
+        "initialDigest" : "2ab50961bb6fdb810bf42a9bed818e53def4991e2edb177a22376420327a2da2",
+        "outcome" : "effects-1"
+      },
+      "name" : "fixture-distort",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "chain.add",
+            "values" : [
+              3,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "chain.set",
+            "values" : [
+              0,
+              0,
+              0.75
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "chain.enable",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "chain.enable",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8748377eafd35cea1fbc8b144e24c0a3b52a9cb0096522f0e9322b35f1c0c700",
+        "initialDigest" : "2ab50961bb6fdb810bf42a9bed818e53def4991e2edb177a22376420327a2da2",
+        "outcome" : "effects-1"
+      },
+      "name" : "fixture-vignette",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "chain.add",
+            "values" : [
+              4,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "chain.set",
+            "values" : [
+              0,
+              0,
+              0.75
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "chain.enable",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "chain.enable",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e4bb3537869036e0fc754a47cac0e1c092e1067cebefca910d8baf15fc89eb49",
+        "initialDigest" : "2ab50961bb6fdb810bf42a9bed818e53def4991e2edb177a22376420327a2da2",
+        "outcome" : "effects-1"
+      },
+      "name" : "fixture-posterize",
+      "seed" : "1"
+    }
+  ],
+  "schema" : 1
+}
