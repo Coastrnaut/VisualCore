@@ -154,6 +154,8 @@ the output.
 
 - **A threshold of 0:** everything glows; the result stays finite.
 - **Radius at its maximum on a tiny target:** the blur clamps at the edges; no sampling outside the picture.
+- **An output smaller than the blur divisor (for example 3 × 1 at quarter quality):** each blur target side is at
+  least 1 pixel (`max(1, side / divisor)`, rounded down).
 - **Non-finite or out-of-range parameters:** refused by the graph validator before any target is made.
 - **A context rebuild:** the pass's targets and programs are made again; the next output equals the one before.
 - **The existing bloom pass:** unchanged, byte for byte, on its existing fixtures.
