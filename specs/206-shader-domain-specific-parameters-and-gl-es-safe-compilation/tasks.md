@@ -77,7 +77,7 @@
   reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27
   projectm-reference-ios26`)
 - [X] T-R02F06-013 Script tests (`--name script-tests -- python3 scripts/test_scripts.py`) — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F06.script-tests.json (exit 0)
-- [ ] T-R02F06-014 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+- [X] T-R02F06-014 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record — Verified 2026-11-19: 2026-11-19 converge round 2 clean; .autonomy/migration/evidence/R02-F06.json sealed (11 passing); R02-F06 recorded pass
   R02-F06; README.md and `docs/automatedtesting.md`
 
 ## Dependencies
