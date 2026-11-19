@@ -37,7 +37,7 @@ final class AppModelTests: XCTestCase {
         let report = manifest.registryReport(registered: registered)
         XCTAssertTrue(report.isMatch, "missing \(report.missingRegistrations), unexpected "
             + "\(report.unexpectedRegistrations), duplicates \(report.duplicates)")
-        // A01–A24 are integrated (X-A01 to X-A24 pass): registered and available, nothing else.
+        // A01–A25 are integrated (X-A01 to X-A25 pass): registered and available, nothing else.
         XCTAssertEqual(registered.count, manifest.available.count)
         XCTAssertEqual(registered.map(\.rawValue), ["a01.generative-art-studio", "a02.fluid-art-playground",
                                                      "a03.fractal-explorer", "a04.particle-universe",
@@ -50,7 +50,8 @@ final class AppModelTests: XCTestCase {
                                                      "a17.interactive-anatomy", "a18.ambient-clock",
                                                      "a19.living-wallpapers", "a20.digital-zen-garden",
                                                      "a21.aurora", "a22.shader-studio",
-                                                     "a23.visual-programming-lab", "a24.graphics-benchmark-lab"])
+                                                     "a23.visual-programming-lab", "a24.graphics-benchmark-lab",
+                                                     "a25.effects-composer"])
         XCTAssertEqual(manifest.available.map(\.id), registered)
     }
 
@@ -75,8 +76,8 @@ final class AppModelTests: XCTestCase {
     func testTheCandidatesArgumentMakesTheCandidatesAvailableAndRegistersThem() throws {
         let storage = try TestStorage(self)
         let integrated = ExperienceRegistry.all.map(\.id)
-        // Any catalog experience before its X gate works as a candidate; R02-G01 is one (unavailable, not in `all`; A25 is
-        // a real candidate since A25-P02). The synthetic debug registration stands in for one.
+        // Any catalog experience before its X gate works as a candidate; R02-G01 is one (unavailable, not in `all`; A25 was
+        // a candidate until X-A25). The synthetic debug registration stands in for one.
         let id = try XCTUnwrap(ExperienceID(rawValue: "r02-g01.aurora-loom"))
         XCTAssertFalse(integrated.contains(id), "the synthetic candidate is not integrated")
         let candidate = DebugExperience.registration(for: id)
@@ -107,7 +108,7 @@ final class AppModelTests: XCTestCase {
         XCTAssertEqual(Set(ScenarioLaunch.targets().keys), all)
     }
 
-    /// The real catalog with the real registry shows the integrated experiences (A01–A24 since their X gates).
+    /// The real catalog with the real registry shows the integrated experiences (A01–A25 since their X gates).
     func testTheRealCatalogShowsTheIntegratedExperiences() throws {
         let storage = try TestStorage(self)
         let model = AppModel(environment: storage.environment(catalog: try bundled("experiences"),
@@ -474,7 +475,7 @@ final class AppModelTests: XCTestCase {
             XCTAssertEqual(QualityDeclaration.problems(profile: profile, tierCount: profile.count,
                                                        catalogNames: names), [], "\(registration.id)")
         }
-        XCTAssertEqual(ExperienceRegistry.all.count, 24, "A01–A24 are integrated")
+        XCTAssertEqual(ExperienceRegistry.all.count, 25, "A01–A25 are integrated")
     }
 
     /// FR-U06-013: a pinned level is in force when the first frame is drawn, and the record says so.

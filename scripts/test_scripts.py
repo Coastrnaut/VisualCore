@@ -1328,7 +1328,7 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     "VisualProgrammingLabExperience",
                                     # Feature 174 (A24-P02): Graphics Benchmark Lab, integrated at X-A24.
                                     "GraphicsBenchmarkLabExperience",
-                                    # Feature 181 (A25-P02): Effects Composer, a candidate until X-A25.
+                                    # Feature 181 (A25-P02): Effects Composer, integrated at X-A25.
                                     "EffectsComposerExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):

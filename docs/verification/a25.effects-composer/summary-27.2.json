@@ -1,60 +1,60 @@
 {
   "bundle": null,
-  "commit": "6768bb66e243ed6cafca705e66a82736ca4e2ad3",
+  "commit": "21a8fa56f07ee000cf0fa9b5ab626ad95ec9de7a",
   "device_type": "com.apple.CoreSimulator.SimDeviceType.iPhone-18-Pro",
   "experience": "a25.effects-composer",
   "results": [
     {
-      "commit": "6768bb66e243ed6cafca705e66a82736ca4e2ad3",
-      "record_sha256": "db0ab80ee98209d3ee2aed642606d7db1a776623fdb6ec55967a91ef9d128f20",
+      "commit": "21a8fa56f07ee000cf0fa9b5ab626ad95ec9de7a",
+      "record_sha256": "bac9717d79db0693dbd56cdca8230eec231532ff23d3b28df814871c0cb7b3e8",
       "result": "pass",
       "scenario": "launch-first-frame"
     },
     {
-      "commit": "6768bb66e243ed6cafca705e66a82736ca4e2ad3",
-      "record_sha256": "6e9627c29ea055ce15a247fd6ba0071705a9bd61d11eb8f37da5dc07a022e513",
+      "commit": "21a8fa56f07ee000cf0fa9b5ab626ad95ec9de7a",
+      "record_sha256": "69d0ca1b79be24faf602b58666af09f65ece7d3130425f0238631fb0ee240b21",
       "result": "pass",
       "scenario": "input-response"
     },
     {
-      "commit": "6768bb66e243ed6cafca705e66a82736ca4e2ad3",
-      "record_sha256": "a824c781a626d5a58fe6128f070165bb1299d098708df6659a49e177e822d21e",
+      "commit": "21a8fa56f07ee000cf0fa9b5ab626ad95ec9de7a",
+      "record_sha256": "7161927076e99205d2d71aadbed99d2369aea6c012c32aa94db2e7d3867bb00d",
       "result": "pass",
       "scenario": "completion"
     },
     {
-      "commit": "6768bb66e243ed6cafca705e66a82736ca4e2ad3",
-      "record_sha256": "56ed260fc65dcef2c581b08a6f50429c70c0f9f8dd7857530bf6e68e379c4119",
+      "commit": "21a8fa56f07ee000cf0fa9b5ab626ad95ec9de7a",
+      "record_sha256": "e42ffe5757fe6c27badb9145c42276bab3c84ed47856963e3845a71833b39768",
       "result": "pass",
       "scenario": "rejection"
     },
     {
-      "commit": "6768bb66e243ed6cafca705e66a82736ca4e2ad3",
-      "record_sha256": "5d2cae62e538e8b5c476d3797b5906ad7b5dadf3b14a948bb4776609cc08d16b",
+      "commit": "21a8fa56f07ee000cf0fa9b5ab626ad95ec9de7a",
+      "record_sha256": "ff1d5ed4740ccc7a6683b14c137f45d5a1d451d22a0c7ced84d7483f6baa22ab",
       "result": "pass",
       "scenario": "save-restore"
     },
     {
-      "commit": "6768bb66e243ed6cafca705e66a82736ca4e2ad3",
-      "record_sha256": "51c9f3431d3dce213e812a811c9c1e75e8b804c07040f2fb3c0bde76d8a25c69",
+      "commit": "21a8fa56f07ee000cf0fa9b5ab626ad95ec9de7a",
+      "record_sha256": "2f2508afb4b8bc209978ebbccda87ba9efea2d52c12432f721562f5b0b02e0dc",
       "result": "pass",
       "scenario": "reset"
     },
     {
-      "commit": "6768bb66e243ed6cafca705e66a82736ca4e2ad3",
-      "record_sha256": "cb9e6aa03fd1d2dda7a10e356872e6310fb7a5739bfc3fa7486539aebef39ff7",
+      "commit": "21a8fa56f07ee000cf0fa9b5ab626ad95ec9de7a",
+      "record_sha256": "20a68b7584f287d0468ea9e65e15e25931e2ed9a1ae70c801df20afbe147d9ef",
       "result": "pass",
       "scenario": "suspend-resume"
     },
     {
-      "commit": "6768bb66e243ed6cafca705e66a82736ca4e2ad3",
-      "record_sha256": "072ae39da3ca2bcc3508daccef0e031c396d19ef4d53a3e096bb109b5242246f",
+      "commit": "21a8fa56f07ee000cf0fa9b5ab626ad95ec9de7a",
+      "record_sha256": "9c57703d1ee48a5a71c53818f76ca497a189cfc3d2b379bc9437bfb6fe93ff8e",
       "result": "pass",
       "scenario": "teardown-reentry"
     },
     {
-      "commit": "6768bb66e243ed6cafca705e66a82736ca4e2ad3",
-      "record_sha256": "2dbe97b37f6213d9dc0c0ff42b598741430041bba402b684bd3b9445d2d7f12d",
+      "commit": "21a8fa56f07ee000cf0fa9b5ab626ad95ec9de7a",
+      "record_sha256": "f8d3f468230fdf3071a7077c0a54c75d3de36fdcf3961c9ea32dd00a0659fb6a",
       "result": "pass",
       "scenario": "cancel-prepare"
     }

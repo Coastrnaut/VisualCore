@@ -203,9 +203,19 @@
       "name": "Graphics Benchmark Lab",
       "permissions": [],
       "tier": "free"
+    },
+    {
+      "category": "tools",
+      "code": "A25",
+      "id": "a25.effects-composer",
+      "name": "Effects Composer",
+      "permissions": [
+        "photo-library-add"
+      ],
+      "tier": "free"
     }
   ],
-  "ledger_sha256": "b6a22e609601cf2fe7845ef0ee28c880244ae2e063a3b305dc94ade54825643f",
+  "ledger_sha256": "b69401ca1af43c09de2d2b5ab707c3a428e03cc657f3737f64758ad74dd0a399",
   "privacy_answers": "unproven",
   "schema": 1
 }

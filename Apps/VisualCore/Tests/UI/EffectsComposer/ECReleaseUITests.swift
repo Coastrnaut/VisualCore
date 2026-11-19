@@ -1,7 +1,7 @@
 // ECReleaseUITests — feature 185 (A25-P06) T-A25-608 (contracts/release.md "Interface", chunk `h3`): the
 // first-session defaults of Effects Composer (A25) inside the one app, at the release gate. A fresh start erases the
-// data (`-vcResetData`), skips the welcome, makes the candidates available (`-vcCandidates`, DebugLaunch: A25 is
-// registered before its X gate) and opens A25 directly (`-openExperience a25.effects-composer`). The controls are
+// data (`-vcResetData`), skips the welcome, makes the candidates available (`-vcCandidates`, DebugLaunch; harmless since
+// A25 was integrated at X-A25, 2026-11-19) and opens A25 directly (`-openExperience a25.effects-composer`). The controls are
 // found by the identifiers of `ECControls` (`port.identifier(name)`, that is `experience.a25.effects-composer.<name>`).
 // The status reads "Ready" (spoken "Status, Ready"); the chain is empty (no `node-0`, no `remove-0`); `export-png`,
 // `export-jpeg`, `export-heic` and `test-picture` are there, `export-png` spoken "Export as PNG" and `test-picture`
