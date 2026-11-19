@@ -26,7 +26,7 @@
 
 ## Phase 3: Story 2 — frames (P1)
 
-- [ ] T-R02F08-003 [US2] Create `Packages/VisualCore/Sources/VisualCoreScenes/CurveFrames.swift` (`CurveFrame`,
+- [X] T-R02F08-003 [US2] Create `Packages/VisualCore/Sources/VisualCoreScenes/CurveFrames.swift` (`CurveFrame`, — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F08.host.json (orthonormal 2.2e-16; seams 3.5e-17; agreement with pathFrames 2.2e-16; closed curves allow the closing twist spread)
   `CurveFrames.parallelTransport` per clarification Q3: scale-aware collapse 1e-9 × (1 + extent), reversal tangent from
   the chord ahead, normal kept at a reversal, `initialNormal` or least-parallel axis, closed twist spread by arc length)
   with `Packages/VisualCore/Tests/VisualCoreScenesTests/CurveFrameTests.swift` (orthonormal within 1e-9; rotation ≤
