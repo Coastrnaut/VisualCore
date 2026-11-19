@@ -11,3 +11,11 @@
   `unavailable`; `message`.
 - **LabExample:** `id` (`clouds`, `soft-gradient`, `mixed-clouds`), `title`, `graph`, `licence`.
 - **NodeDiagnostics:** `[NodeID: [String]]` from `GraphDiagnostics.byNode(_:in:)`.
+- **As built (A23-P04):**
+  - `GraphLibraryFailure` also has `readOnly` (a `library.json` of a newer version is never overwritten; opening still
+    works) and `graph(code)` (`GraphDocument.encode` refuses the graph); an oversized write is `storage(tooLarge)`.
+  - `GraphDiagnostics` exposes its sentences as constants and helpers (`emptyInput(_:)`, `outputDisconnected`,
+    `partOfLoop`, `multipleOutputs`, `duplicateEdge`, `duplicateNode`, `unknownParameter(_:)`,
+    `parameterOutOfRange(_:)`); a taken input reuses `EditMessages`' sentence, which names its node.
+  - The library's sentences are shown in `library-message` with an accessibility label; they are not announced,
+    because the experience target does not depend on VisualCoreSimulation's announcement kinds.

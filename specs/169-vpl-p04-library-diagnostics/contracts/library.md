@@ -8,3 +8,6 @@
   `node-diagnostic-<id>`, `library-replace-confirm`.
 - **VisualCore names used:** `ExperienceStorage`, `StorageError`, `StorageQuota`, `MigrationChain`, `ExperienceShell`,
   `ExperienceSnapshot` (and the A23-P03 set).
+- **As built (A23-P04):** `<file>` in an identifier is the file name without `.json` (`library-row-graph-1`); further
+  identifiers `library-done`, `library-rename-name`, `library-rename-confirm`, `library-remove-confirm` (removal asks
+  first), `library-replace-cancel` and `node-diagnostic-row-<id>` (the list form's sentences).
