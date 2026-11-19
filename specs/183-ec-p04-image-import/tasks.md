@@ -23,7 +23,7 @@
 
 ## Phase 3: Stories 1 and 2 — use my own picture, upright and in the right colours (P1) 🎯
 
-- [ ] T-A25-404 [P] [US1] [US2] Create `Packages/ExperiencesCreative/EffectsComposer/Experience/ImageImport.swift` per clarification Q2 and data-model.md
+- [X] T-A25-404 [P] [US1] [US2] Create `Packages/ExperiencesCreative/EffectsComposer/Experience/ImageImport.swift` per clarification Q2 and data-model.md — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P04.image-import.json exit 0; ImageImport per clarification Q2 (never upscales; damaged when ImageIO reads no complete image)
   (data above 50 MiB refused before decoding; under 8 pixels refused; longer edge at most `limit`; orientation applied;
   sRGB; straight alpha; rows top-down)
 - [ ] T-A25-405 [US2] Write `Packages/ExperiencesCreative/EffectsComposer/ExperienceTests/{ImportFixtures,ImageImportTests}.swift` per clarification Q3: the 8
