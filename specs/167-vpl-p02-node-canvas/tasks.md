@@ -38,7 +38,7 @@
   clarification Q1: "snapshot schema 1, digest `a23.visual-programming-lab.v1` over the graph", selection in the
   snapshot only, the six actions with their ranges, the eight rule ids, the starter graph "Noise (id 1, at 40, 80) into
   Output (id 2, at 320, 80)", restore refusals for damaged or out-of-range snapshots; `///` everywhere
-- [ ] T-A23-206 [US1] [US3] [US5] Create `Experience/{GridScene,LabPresenter,CanvasOverlay,LabControls,VisualProgrammingLabExperience}.swift`
+- [X] T-A23-206 [US1] [US3] [US5] Create `Experience/{GridScene,LabPresenter,CanvasOverlay,LabControls,VisualProgrammingLabExperience}.swift` — Verified 2026-11-18: 2026-11-18: GridScene (FullScreenShaderScene grid, minor 32 and major 160 canvas points, uniforms zoom, panX, panY, width, height), LabPresenter (30 frames per second, level-0, touch mapping of clarification Q3, view state, feedback, rubber wire, cancelPointers), CanvasOverlay (wires, boxes, port shapes by type, selection, identifiers and labels), LabControls (add menu, remove, move buttons, list form with input pickers, status, feedback) and VisualProgrammingLabExperience; .autonomy/checks/A23-P02.isolation.json exit 0; .autonomy/checks/A23-P02.vpl-ios27.json exit 0 (125 core and 27 experience tests on sim-27.2, slowest 0.199 s); written by an agent, retested
   per clarifications Q3–Q4 and contracts/experience.md (FR-A23-201–206): the grid through `FullScreenShaderScene`
   ("minor lines every 32 canvas points, major every 160", uniforms `zoom` and `pan`), 30 frames per second, tier
   `level-0`; the touch mapping; the overlay and controls with the identifiers of the contract and spoken labels; no GL
