@@ -11,7 +11,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T-A24-601 Baseline: cite the A24-P05 evidence (`.autonomy/checks/A24-P05.{gbl-ios27-3,app-ui-3,verify-27}.json`)
+- [X] T-A24-601 Baseline: cite the A24-P05 evidence (`.autonomy/checks/A24-P05.{gbl-ios27-3,app-ui-3,verify-27}.json`) — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A24-P05.{gbl-ios27-3,app-ui-3,verify-27}.json exit 0; Packages/ExperiencesCreative, Apps and project.yml unchanged since 975f9aa4
   on the tree recorded at A24-P05, whose `Packages/ExperiencesCreative`, `Apps` and `project.yml` are unchanged since
   the A24-P05 record `975f9aa4` (owner ruling of 2026-11-14)
 
