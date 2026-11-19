@@ -48,7 +48,7 @@
 
 ## Phase 5: Story 4 — a first session (P2)
 
-- [ ] T-A25-608 [P] [US4] Write `Apps/VisualCore/Tests/UI/EffectsComposer/ECReleaseUITests.swift` per contracts/release.md
+- [X] T-A25-608 [P] [US4] Write `Apps/VisualCore/Tests/UI/EffectsComposer/ECReleaseUITests.swift` per contracts/release.md — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P06.app-ui.json exit 0 (chunk h3: ECReleaseUITests 1/1 passed)
   and add chunk `"h3": ["ECReleaseUITests"]` to `scripts/release_check.py` (serial, in `SERIAL_CHUNKS`)
 
 ## Phase 6: Evidence and close
