@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "sh",
+    "specs/171-vpl-p06-release/scan-sources-release.sh"
+  ],
+  "command": "sh specs/171-vpl-p06-release/scan-sources-release.sh",
+  "elapsed_seconds": 0.049,
+  "exit_code": 0,
+  "finished": "2026-11-19T14:40:36+00:00",
+  "log": ".autonomy/logs/A23-P06.scan-sources.log",
+  "log_sha256": "d0466b211e5ff5b1109fb2db5cc8acf0969cc9f8a2fd890fb2110db2383f985c",
+  "name": "scan-sources",
+  "stage": "A23-P06",
+  "started": "2026-11-19T14:40:36+00:00",
+  "timed_out": false
+}

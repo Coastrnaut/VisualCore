@@ -23,7 +23,7 @@
     storage) and its removal (Remove in the library, or deleting the app);
   - "nothing is sent" and "no permission is asked";
   - the licence inventory (link `licenses.md`).
-- [ ] T-A23-603 [US1] Write `specs/171-vpl-p06-release/scan-sources-release.sh`, after
+- [X] T-A23-603 [US1] Write `specs/171-vpl-p06-release/scan-sources-release.sh`, after — Verified 2026-11-19: 2026-11-19: .autonomy/checks/A23-P06.scan-sources.json exit 0 (no scanned use in 62 Swift files of Packages/ExperiencesCreative/VisualProgrammingLab)
   `specs/164-ss-p06-release/scan-sources-release.sh`, with the APIs of clarification Q3 over
   `Packages/ExperiencesCreative/VisualProgrammingLab`; run it (`--name scan-sources`) (FR-A23-602, SC-A23-601).
 
