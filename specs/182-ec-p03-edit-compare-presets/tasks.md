@@ -46,7 +46,7 @@
 - [X] T-A25-308 Review checkpoint: `--name ec-ios27` (both test targets), the documented API, isolation and core purity — Verified 2026-11-19: 2026-11-19 review checkpoint: .autonomy/checks/A25-P03.{ec-ios27,documented-api,isolation,core-purity}.json exit 0
 - [X] T-A25-309 Contract: G-EDIT, G-COMPARE and G-PRESETS closed by "A25-P03"; G-PRESETS's phase 3, G-IMPORT and — Verified 2026-11-19: 2026-11-19 G-EDIT, G-COMPARE and G-PRESETS closed by A25-P03 (M08, M09, M18, M19, M20 available); G-IMPORT and U-RGBAUPLOAD phase 4, G-EXPORT phase 5, traceability phases follow the manual's gates; .autonomy/checks/A25-P03.contract.json exit 0
   U-RGBAUPLOAD phase 4, G-EXPORT phase 5 (`--name contract`); README of the experience
-- [ ] T-A25-310 `--name catalog`, `experience-packages`, `script-tests`; `xcodegen generate --spec project.yml`, then
+- [X] T-A25-310 `--name catalog`, `experience-packages`, `script-tests`; `xcodegen generate --spec project.yml`, then — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P03.{catalog,experience-packages,script-tests,app-unit-2,verify-27}.json exit 0 (app-unit failed first: the dependency audit denies 'presetlibrary', fixed by renaming to LookLibrary)
   `--name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`; `--name verify-27`
 - [ ] T-A25-311 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
   A25-P03; update README.md (rule 16) and `docs/automatedtesting.md` (rule 17)
