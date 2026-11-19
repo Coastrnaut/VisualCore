@@ -5,6 +5,6 @@
   factory's `restoreGraph` closure (as Zen Garden's `restoreDocument`).
 - **Identifiers:** `library`, `library-save`, `library-name`, `library-row-<file>`, `library-open-<file>`,
   `library-rename-<file>`, `library-remove-<file>`, `library-message`, `examples`, `example-<id>`,
-  `node-diagnostic-<id>`.
+  `node-diagnostic-<id>`, `library-replace-confirm`.
 - **VisualCore names used:** `ExperienceStorage`, `StorageError`, `StorageQuota`, `MigrationChain`, `ExperienceShell`,
   `ExperienceSnapshot` (and the A23-P03 set).

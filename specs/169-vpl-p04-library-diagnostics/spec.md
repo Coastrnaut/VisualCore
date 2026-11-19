@@ -142,6 +142,8 @@ diagnostics to graph nodes).
 - **The storage quota reached while saving:** refused with a message; nothing is half-written.
 - **Opening a graph while the preview is compiling:** the opened graph compiles at the next frame.
 - **The session restored after a relaunch:** the open graph returns from the session snapshot.
+- **Opening over unsaved work:** when the open graph differs from the last saved or opened one, opening another
+  (or an example) first asks to replace it; declining changes nothing.
 
 ## Requirements *(mandatory)*
 
