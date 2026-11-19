@@ -55,7 +55,7 @@
 
 ## Phase 5: Story 4 — interruptions (P2)
 
-- [ ] T-A24-209 [US4] Write `ExperienceTests/RebuildTests.swift` (SC-A24-204): 10 `recreateContext` calls and a resize
+- [X] T-A24-209 [US4] Write `ExperienceTests/RebuildTests.swift` (SC-A24-204): 10 `recreateContext` calls and a resize — Verified 2026-11-19: 2026-11-19: .autonomy/checks/A24-P02.gbl-ios27.json exit 0 (50 core and 33 experience tests on sim-27.2); RebuildTests: 10 recreateContext calls and a resize there and back give a byte-identical frame with leaked 0 (plus the interrupted run in RecorderTests)
   there and back give a byte-identical picture of the same frame with `leaked` 0; a rebuild during a run ends it as
   interrupted with its samples kept
 
