@@ -40,7 +40,7 @@
   (`UniformType` of data-model.md, `UniformDeclaration`, `UniformLayout` with unique names, `UniformLayoutReport`
   `undeclared`/`mistyped`/`unused`, `isValid`, a pure `check(active: [String: UniformType])`) with
   `Packages/VisualCore/Tests/VisualCoreShaderSourceTests/UniformLayoutTests.swift`
-- [ ] T-R02F06-006 Host checkpoint: `--name host -- swift test --package-path Packages/VisualCore`
+- [X] T-R02F06-006 Host checkpoint: `--name host -- swift test --package-path Packages/VisualCore` — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F06.host.json (swift test Packages/VisualCore exit 0; 62 ShaderSource tests, 35 new)
 
 ## Phase 5: Story 1 — mistakes named before drawing, GL side (P1) 🎯
 
