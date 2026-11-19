@@ -10,4 +10,8 @@
 - **Errors**: `MeshError.invalidInput` (too few points, non-finite, bad tolerance, bad width) and `MeshError.budget`.
 - **Ribbon mesh**: an open surface; triangles wound counter-clockwise seen from the side the frame normal points to
   (the mesh convention of R02-F05); boundary edges are the two long sides (and the ends of an open curve); validates
-  with no problem other than being open.
+  with no problem other than being open when the repeat length is the curve length; when v tiles beyond 1 (a shorter
+  repeat length), `Mesh.validate` also reports `uvOutOfRange`, its 0…1 rule being meant for atlased meshes, and nothing
+  else (T-R02F08-013).
+- **Frame rotation bound** (T-R02F08-014): open curves rotate by no more than the bend; closed curves by no more than
+  the bend plus the closing twist spread per step, |closing angle| × step / length.

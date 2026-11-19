@@ -71,7 +71,7 @@
 
 ## Phase 6: Convergence
 
-- [ ] T-R02F08-013 Record in `specs/208-curve-ribbon-and-tube-batch-renderer/data-model.md` that a ribbon or tube whose v
+- [X] T-R02F08-013 Record in `specs/208-curve-ribbon-and-tube-batch-renderer/data-model.md` that a ribbon or tube whose v — Verified 2026-11-19: 2026-11-19 data-model.md Ribbon mesh records uvOutOfRange for tiled v (matches CurveMeshTests); validate_docs PASS
   tiles beyond 1 (repeat length shorter than the curve) is reported by `Mesh.validate` only as `uvOutOfRange` (the
   validator's 0…1 rule is for atlased meshes) and validates fully when the repeat length is the curve length, per
   data-model "Ribbon mesh" (contradicts)
