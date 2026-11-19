@@ -20,7 +20,7 @@
 
 ## Phase 2: Core additions (blocking)
 
-- [ ] T-A23-203 [P] Create `Packages/ExperiencesCreative/VisualProgrammingLab/Core/{GraphEditor,EditMessages}.swift` with
+- [X] T-A23-203 [P] Create `Packages/ExperiencesCreative/VisualProgrammingLab/Core/{GraphEditor,EditMessages}.swift` with — Verified 2026-11-18: 2026-11-18: GraphEditor.swift (add with the smallest unused identity, 32-node and one-output refusals; move and add clamped to 4,096; remove with its connections; connect refusing unknown nodes and ports, mismatched types, a fed input, a 65th connection (tooManyEdges, a23.too-many-edges, added by the lead) and a checker cycle, accepting incomplete graphs; disconnect) and EditMessages.swift (sentences, status, titles, spoken labels of nodes, ports and connections); EditorTests (22) and EditMessagesTests (11); .autonomy/checks/A23-P02.vpl-ios27.json exit 0 (125 core and 27 experience tests on sim-27.2, slowest 0.199 s); written by an agent, the edge limit added by the lead, retested
   `CoreTests/{EditorTests,EditMessagesTests}.swift` per data-model.md and clarification Q1 (FR-A23-202, 203): the new
   node takes "the smallest unused identity"; refused "at 32 nodes" and "for a second output"; remove takes its
   connections; connect refuses any connection-stage issue or a cycle of `GraphChecker` and accepts an incomplete graph;
