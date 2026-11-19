@@ -54,7 +54,7 @@
 
 ## Phase 4: Run file (P1)
 
-- [ ] T-A24-108 [US3] Create `Packages/ExperiencesCreative/GraphicsBenchmarkLab/Core/BenchmarkRun.swift` per
+- [X] T-A24-108 [US3] Create `Packages/ExperiencesCreative/GraphicsBenchmarkLab/Core/BenchmarkRun.swift` per — Verified 2026-11-19: 2026-11-19: Packages/ExperiencesCreative/GraphicsBenchmarkLab/Core/BenchmarkRun.swift (a24.benchmark-run v1, 2,097,152 bytes, refusal codes, recomputed summary); gbl-core-ios27 exit 0
   clarification Q4 (FR-A24-105): `RunState`, `BenchmarkRun`, `RunDocument` (kind `a24.benchmark-run`, version 1,
   "≤ 2,097,152 bytes", sorted keys, `MigrationChain(currentVersion: 1)`), `RunRefusal` with its codes; the reader
   recomputes the summary and refuses a mismatch as `damaged`.
