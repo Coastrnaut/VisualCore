@@ -54,7 +54,8 @@
   - loops of 1, 2, 3 and 8 nodes and two separate loops, each refused with exactly the connections of the named loop;
     acyclic fixtures ordered with every node after its inputs, identical across 10 runs;
   - no output, two outputs, a disconnected output, an empty required input (each naming node and port); an empty
-    optional input passes; a node not reaching the output is marked.
+    optional input passes; a node not reaching the output is marked;
+  - an undeclared parameter and a value outside its range are refused by name; a missing parameter takes its default.
 
 ## Phase 4: Story 5 — checking before graphics work (P2)
 
@@ -72,7 +73,8 @@
   - the purity scan (`--name core-purity`, the quickstart's grep);
   - the documented API (`--name documented-api -- python3 scripts/check_documented_api.py --sources
     Packages/ExperiencesCreative/VisualProgrammingLab`);
-  - the isolation check (`--name isolation`, as in A22-P01).
+  - the isolation check (`--name isolation -- python3 scripts/check_app_isolation.py --experiences
+    Packages/ExperiencesCreative/VisualProgrammingLab`).
 - [ ] T-A23-110 Contract `docs/apps/visual-programming-lab/visualcore-contract.json`: G-MODEL and G-TYPES are closed by
   "A23-P01", and rows whose gaps are all closed become available with evidence (`--name contract -- python3
   scripts/check_app_contract.py --app visual-programming-lab --render`); list the core in

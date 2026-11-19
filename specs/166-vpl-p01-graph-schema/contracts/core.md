@@ -29,3 +29,8 @@ enum GraphChecker { static func check(_ graph: VisualGraph) -> CheckResult }
 ```
 
 The checker runs the stages of the spec's clarification Q4 in order and stops after a stage that refused.
+
+VisualCore names this core and its tests use (all public, unchanged): `ParameterDefinition`, `ParameterError`
+(VisualCoreParameters); `MigrationChain`, `MigrationError` (VisualCorePersistence); `DigestBuilder`, `DigestError`,
+`StateDigest` (VisualCoreExperience); and, in the tests only, `RenderHost`, `RenderScene`, `RenderContext`,
+`FrameInfo`, `ResourceRegistry` and `ResourceLedger` (VisualCoreRendering).
