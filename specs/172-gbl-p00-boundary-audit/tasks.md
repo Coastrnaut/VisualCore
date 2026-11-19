@@ -38,7 +38,7 @@
     internal `CVisualCoreGL` shim);
   - a `traceability` entry per capability and feature
   (FR-A24-001, FR-A24-002)
-- [ ] T-A24-003 [US1] Write the generated-block markers into `docs/apps/graphics-benchmark-lab/visualcore-contract.md`
+- [X] T-A24-003 [US1] Write the generated-block markers into `docs/apps/graphics-benchmark-lab/visualcore-contract.md` — Verified 2026-11-19: 2026-11-19: .autonomy/checks/A24-P00.contract.json exit 0 (PASS: 38 rows, 166 citations, 12 gaps, decision go); visualcore-contract.md rendered
   before the first render, then run the contract checker and render the view (`--name contract -- python3
   scripts/check_app_contract.py --app graphics-benchmark-lab --render`) (FR-A24-007, SC-A24-001)
 

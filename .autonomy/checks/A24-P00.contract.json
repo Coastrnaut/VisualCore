@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_app_contract.py",
+    "--app",
+    "graphics-benchmark-lab",
+    "--render"
+  ],
+  "command": "python3 scripts/check_app_contract.py --app graphics-benchmark-lab --render",
+  "elapsed_seconds": 0.046,
+  "exit_code": 0,
+  "finished": "2026-11-19T15:24:36+00:00",
+  "log": ".autonomy/logs/A24-P00.contract.log",
+  "log_sha256": "a7d55b51d5896bf41596cdbb2b69a7edbccbf7cae8f7ec2c7ae3e73663ba6ea1",
+  "name": "contract",
+  "stage": "A24-P00",
+  "started": "2026-11-19T15:24:36+00:00",
+  "timed_out": false
+}
