@@ -24,7 +24,7 @@
   ("warm-up while t − start < warm-up; measure while < warm-up + measure; cool-down while < total; then nil") and
   `endTime`; `ParticleField` (a hash for the start position, a fixed velocity, wrapped into the view, pure in index and
   frame)
-- [ ] T-A24-204 [P] Write `CoreTests/{RunTimelineTests,ParticleFieldTests}.swift` (SC-A24-202): the spec's US2 frame
+- [X] T-A24-204 [P] Write `CoreTests/{RunTimelineTests,ParticleFieldTests}.swift` (SC-A24-202): the spec's US2 frame — Verified 2026-11-19: 2026-11-19: .autonomy/checks/A24-P02.gbl-ios27.json exit 0 (50 core and 33 experience tests on sim-27.2); RunTimelineTests and ParticleFieldTests pass
   times give the expected phases, the boundaries at exactly 3, 13 and 18 s; the particle field is identical for the
   same index and frame and stays inside the view
 
