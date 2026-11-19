@@ -46,7 +46,7 @@
 
 ## Phase 4: Stories 4–5 — compile queue and rebuild (P2)
 
-- [ ] T-A23-307 [US4] [US5] Write `ExperienceTests/{CompileQueueTests,PreviewRebuildTests}.swift` (SC-A23-304, 305): N
+- [X] T-A23-307 [US4] [US5] Write `ExperienceTests/{CompileQueueTests,PreviewRebuildTests}.swift` (SC-A23-304, 305): N — Verified 2026-11-18: 2026-11-18: CompileQueueTests (2: six edits before a frame give one compile; a view change or a selection compiles nothing) and PreviewRebuildTests (3: 10 context rebuilds and a resize there and back byte-identical with leaked 0 and no extra compile; stills equal at one time and different at another; the grid covers the whole drawable after an inset frame); .autonomy/checks/A23-P03.vpl-ios27.json and A23-P03.vpl-ios27-2.json exit 0 (152 core and 46 experience tests on sim-27.2, slowest 0.93 s); written by an agent, retested
   edits before a frame give one compile; a view change gives none; 10 `recreateContext` and a resize there and back
   give a byte-identical inset with `leaked` 0; two stills at the same frame time are equal and at another time differ
   when Noise is fed by Time; after a frame with the inset the next frame's grid covers the whole drawable again
