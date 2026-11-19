@@ -13,7 +13,8 @@ Core (pure, `VisualProgrammingLabCore`):
   `.empty`).
 - **CanvasView:** wraps `PlaneViewport`; `zoom` 0.5…2 (default 1), centre clamped to ±4,096; `canvas(fromScreen:)`,
   `screen(fromCanvas:)`, `pinched(by:anchor:)`, `panned(by:)`, `resized(to:)`.
-- **EditMessages:** `sentence(for: GraphEditRefusal) -> String`, `status(for: CheckResult, in graph) -> String`.
+- **EditMessages:** `sentence(for: GraphEditRefusal) -> String`, `status(for: CheckResult, in graph) -> String`, and
+  the spoken labels `label(node:)`, `label(port:)` and `label(edge:in:)`, used by the overlay and the list form.
 
 Experience:
 - **LabCore** (snapshot schema 1, digest `a23.visual-programming-lab.v1` over the graph): `graph`, `selection`

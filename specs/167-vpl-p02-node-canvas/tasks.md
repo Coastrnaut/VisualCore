@@ -24,7 +24,8 @@
   `CoreTests/{EditorTests,EditMessagesTests}.swift` per data-model.md and clarification Q1 (FR-A23-202, 203): the new
   node takes "the smallest unused identity"; refused "at 32 nodes" and "for a second output"; remove takes its
   connections; connect refuses any connection-stage issue or a cycle of `GraphChecker` and accepts an incomplete graph;
-  positions "clamped to ±4,096"; one sentence per refusal and per checker status (SC-A23-202)
+  positions "clamped to ±4,096"; one sentence per refusal and per checker status, and the spoken labels of a node, a port
+  and a connection ("Noise 2 image → Output 1 image") (SC-A23-202, FR-A23-205)
 - [ ] T-A23-204 [P] Create `Packages/ExperiencesCreative/VisualProgrammingLab/Core/{CanvasLayout,CanvasView}.swift` with
   `CoreTests/{CanvasLayoutTests,CanvasViewTests}.swift` per data-model.md and clarifications Q2–Q3 (FR-A23-204, 205):
   box "168 points wide, a 32-point title row and one 36-point row per port row"; "44 × 44-point" targets scaled by the
@@ -45,7 +46,8 @@
 - [ ] T-A23-207 [US1] [US2] [US4] Write `ExperienceTests/{LabTestSupport,LabCoreTests,TouchTests}.swift`
   (SC-A23-201–204): the journey graph built by actions and by simulated touches gives the same fingerprint; every
   refusal fixture leaves the digest unchanged and sets its sentence; zoom and pan never change the digest; the
-  starter graph's port targets are at least 44 points
+  starter graph's port targets are at least 44 points; a drag between two inputs sends nothing and shows "Connect an
+  output to an input."; `cancelPointers` mid-drag leaves the graph as of the last move and no rubber wire
 
 ## Phase 4: Story 5 — the canvas survives interruptions (P2)
 
