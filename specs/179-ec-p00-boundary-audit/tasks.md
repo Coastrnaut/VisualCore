@@ -46,7 +46,7 @@
 
 - [X] T-A25-004 [US2] Reference chunk 1 (`--name reference-1 -- python3 scripts/release_check.py --only — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P00.reference-1.json exit 0 (reference-engine-xcframework, reference-build-projectm-ios-sim, reference-clean)
   reference-engine-xcframework reference-build-projectm-ios-sim reference-clean`)
-- [ ] T-A25-005 [US2] Reference chunk 2 (`--name reference-2 -- python3 scripts/release_check.py --only
+- [X] T-A25-005 [US2] Reference chunk 2 (`--name reference-2 -- python3 scripts/release_check.py --only — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P00.reference-2.json exit 0; regression-baseline.md records 7 of 7 steps pass
   reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27
   projectm-reference-ios26`); record the 7 steps, commands and results in
   `docs/apps/effects-composer/regression-baseline.md` (FR-A25-004, SC-A25-003)
