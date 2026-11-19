@@ -58,7 +58,8 @@ in code:
   the id, the version and every parameter's name, range and default.
 - Q: What are the chain's caps and its edit history? → A: At most 8 nodes; node identifiers are whole numbers 1…65,535,
   unique in a chain, and a new node takes the smallest unused one. The edits are add (an effect at a position, with
-  its defaults), remove, move (from, to), set enabled and set a value. Each validated edit is pushed on the undo stack;
+  its defaults), remove, move (from, to: the node at `from` ends at index `to` of the resulting chain), set enabled
+  and set a value; undoing a remove re-inserts the same node, with its identifier, at its old position. Each validated edit is pushed on the undo stack;
   undo applies its inverse and pushes it on the redo stack; any new edit clears the redo stack. The history keeps at
   most 64 edits and drops the oldest. The chain's fingerprint is a `DigestBuilder` in the domain
   `a25.effect-chain.v1` over the nodes in order (identifier, effect id and version, enabled, values in name order).
