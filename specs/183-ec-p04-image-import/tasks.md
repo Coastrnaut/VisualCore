@@ -44,7 +44,7 @@
 - [X] T-A25-408 Review checkpoint: `--name ec-ios27` (both experience test targets), the documented API (also for — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P04.{ec-ios27,documented-api,documented-api-rendering,isolation,core-purity}.json (all exit 0)
   `Packages/VisualCoreRendering/Sources`), isolation and core purity
 - [X] T-A25-409 Contract: G-IMPORT and U-RGBAUPLOAD closed by "A25-P04" (`--name contract`); README of the experience — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P04.contract.json (exit 0; G-IMPORT, U-RGBAUPLOAD closed)
-- [ ] T-A25-410 `--name catalog`, `experience-packages`, `script-tests`; `xcodegen generate --spec project.yml`, then
+- [X] T-A25-410 `--name catalog`, `experience-packages`, `script-tests`; `xcodegen generate --spec project.yml`, then — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P04.{catalog,experience-packages,script-tests-2,app-unit,verify-27}.json (all exit 0; script-tests attempt 1 failed on a fixture naming the passed A25-P03, fixed)
   `--name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`; `--name verify-27`
 - [ ] T-A25-411 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
   A25-P04; update README.md (rule 16) and `docs/automatedtesting.md` (rule 17)

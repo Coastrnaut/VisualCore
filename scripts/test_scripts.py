@@ -3243,17 +3243,25 @@ class PromptCoverageTests(unittest.TestCase):
     def test_a_missing_or_empty_prompt_names_the_feature_and_the_stage(self):
         root = self.copy()
         self.assertEqual(planidx.prompt_coverage(root)[2], [])
+        # Only pending gates' prompts are walked, so the phase-gate cases are chosen among the gates still pending
+        # (fixed names broke each time one passed: A10-P03, A24-P00, A25-P03).
+        legacy = json.loads((ROOT_DIR / ".autonomy/state.json").read_text())
+        manifest_gates = [f["gate"] for f in json.loads(
+            (ROOT_DIR / "docs/process/speckit-prompt-manifest.json").read_text())["features"]]
+        pending = [g for g in manifest_gates if legacy["stages"].get(g, {}).get("status") != "pass"]
+        emptied = pending[0] if len(pending) > 1 else None
+        dropped = pending[-1] if pending else None
 
         def drop_round_stage(index):
             next(f for f in index["features"] if f["id"] == "R03-G05-07")["prompts"].pop("plan")
             next(f for f in index["features"] if f["id"] == "R02-F01")["prompts"].clear()  # superseded: never walked
 
         def empty_phase_stage(manifest):
-            # A gate that stays pending for long (a passed gate's prompts are not walked; A10-P03 passed 2026-11-14).
-            entry = next(f for f in manifest["features"] if f["gate"] == "A25-P03")
-            next(c for c in entry["commands"] if c["command"] == "speckit-tasks")["prompt"] = "  "
-            # A whole gate that stays pending for long (A24-P00 passed 2026-11-19, so its prompts are no longer walked).
-            manifest["features"] = [f for f in manifest["features"] if f["gate"] != "A25-P06"]
+            if emptied:
+                entry = next(f for f in manifest["features"] if f["gate"] == emptied)
+                next(c for c in entry["commands"] if c["command"] == "speckit-tasks")["prompt"] = "  "
+            if dropped:
+                manifest["features"] = [f for f in manifest["features"] if f["gate"] != dropped]
 
         self.edit(root, "docs/catalog/feature-index.json", drop_round_stage)
         self.edit(root, "docs/process/speckit-prompt-manifest.json", empty_phase_stage)
@@ -3262,11 +3270,13 @@ class PromptCoverageTests(unittest.TestCase):
                   lambda briefs: briefs.update(features=[b for b in briefs["features"] if b["id"] != "UA-F13"]))
         features, prompts, problems = planidx.prompt_coverage(root)
         self.assertEqual(prompts, 8 * features - len(problems))
-        self.assertEqual(len(problems), 1 + 1 + 8 + 8)
+        self.assertEqual(len(problems), 1 + (1 if emptied else 0) + (8 if dropped else 0) + 8)
         self.assertTrue(any(p.startswith("R03-G05-07 plan: ") for p in problems), problems[:4])
-        self.assertTrue(any(p.startswith("A25-P03 tasks: ") for p in problems))
+        if emptied:
+            self.assertTrue(any(p.startswith(f"{emptied} tasks: ") for p in problems))
         for stage in planidx.STAGES:
-            self.assertTrue(any(p.startswith(f"A25-P06 {stage}: ") for p in problems), stage)
+            if dropped:
+                self.assertTrue(any(p.startswith(f"{dropped} {stage}: ") for p in problems), stage)
             self.assertTrue(any(p.startswith(f"UA-F13 {stage}: ") for p in problems), stage)
         self.assertFalse(any(p.startswith("R02-F01 ") for p in problems))
 
