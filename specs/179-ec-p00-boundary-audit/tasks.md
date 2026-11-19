@@ -80,7 +80,7 @@
 
 - [X] T-A25-009 No-change proof (`--name no-change -- git diff --exit-code --stat a2d68e21..HEAD -- Packages — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P00.no-change.json exit 0 (empty diff of Packages and External since a2d68e21)
   External`) (FR-A25-008, SC-A25-005)
-- [ ] T-A25-010 Run the script tests (`--name script-tests -- python3 scripts/test_scripts.py`) and the release-check
+- [X] T-A25-010 Run the script tests (`--name script-tests -- python3 scripts/test_scripts.py`) and the release-check — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P00.script-tests.json and fast-checks.json exit 0; the contract check runs in about 0.05 s
   document steps (`--name fast-checks -- python3 scripts/release_check.py --only docs app-contracts compliance
   dependencies`). Every run-check of this gate stays within its limit, and the contract check runs in under 10 s
   (SC-A25-006)
