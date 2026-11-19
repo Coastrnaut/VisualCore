@@ -27,6 +27,55 @@ Canonical overrides:
 - **Privacy:** the exported file goes only where the person sends it with the system share sheet; nothing is saved to
   the photo library without that choice; nothing leaves the device otherwise.
 
+## Clarifications
+
+### Session 2026-11-19
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- **Preview today:** every pass target is a pooled `.rgba8` target of the source's size (`PreviewPool.acquire`); the
+  effects work on stored values (A25-P01/P02 specs); render targets sample with `GL_LINEAR`.
+- **VisualCore:** `FieldPass` resolves `#include` against the VisualCore includes, which hold `vc/color.glsl` with
+  `vc_srgbEncode` and `vc_srgbDecode`; `FloatRenderSupport.detect(in:)` and `storageFormat(forceFallback:)` choose
+  `.rgba16f` or `.rgba8`; `RenderTarget.readPixels()` returns `[]` for a stale or released target;
+  `ResourceRegistry.trimPools()` frees every pooled, unused target; `StillImageEncoder.isAvailable(_:)` and
+  `data(_:format:quality:)` write PNG, JPEG and HEIC tagged sRGB with alpha forced opaque; `ExportGeometry(maxEdge:
+  maxPixels:)` caps the edge at 8,192 and the pixels at 64,000,000. No CPU sRGB transfer function exists in VisualCore.
+- **Platform:** Living Wallpapers hands a written file to `ShareLink` through a `Transferable` with a
+  `FileRepresentation` (`WallpaperExportFile`); no photo-library permission is involved.
+
+- Q: Which effects work on linear light, and what do intermediate pictures hold? → A: grade, blur and vignette decode
+  their input with `vc_srgbDecode` and encode their output with `vc_srgbEncode`; distort (a resampling) and posterize
+  (perceptual levels) work on stored values. Every target holds sRGB-encoded values, so the two precision paths differ
+  only in precision: the ping-pong intermediates are `.rgba16f` where `FloatRenderSupport` reports it renderable and
+  `.rgba8` otherwise (a `forceFallback` switch for tests); the source and the result stay `.rgba8`. `EffectReference`
+  (the CPU reference in the core) applies the same transfer functions, written in the core with the exact piecewise
+  sRGB formula.
+- Q: How does export work, and what is validated? → A: `export` offers inline PNG, JPEG and HEIC buttons
+  (`export-png`, `export-jpeg`, `export-heic`; inline, never a system menu over the live canvas, lesson of A23-P05).
+  The size is the source's. Before drawing, the request is refused as `a25.export-format-unavailable` ("This format
+  cannot be written here.") when `StillImageEncoder.isAvailable` is false and as `a25.export-too-large` ("This
+  picture is too large to export.") when the size exceeds `ExportGeometry(maxEdge: min(maxTextureSize, 2048))`. The
+  renderer draws the chain into a fresh export result target, reads it back and checks the read is complete; the
+  bytes are encoded at quality 0.9 off the main thread and written to `tmp/EffectsComposer/Look <W>x<H>.<ext>`; the
+  status reads "Exporting…" and then "Exported"; a `share` link (`ShareLink` with an `EffectsExportFile`
+  `Transferable`) appears while the file exists. A second export while one runs is ignored; the earlier file is
+  removed before a new export and when the experience closes.
+- Q: How is the regression fixture built? → A: A generated 96 × 64 gradient imported through the normal path with the
+  chain grade, blur, vignette; the PNG export decoded with ImageIO equals the preview's result read-back at every
+  pixel within 1/255, and JPEG and HEIC are within a mean absolute difference of 3/255 over all channels.
+- Q: How are interruptions handled and tested? → A: A context loss during export is detected by an empty read-back
+  or a refused draw and reported as `a25.export-interrupted` ("The export was interrupted. Try again."), writing
+  nothing; tests trigger it through a renderer seam called between drawing and reading back, where they call
+  `recreateContext`. Not enough graphics memory for the export target is `a25.export-memory` ("There is not enough
+  memory to export this picture."). A memory warning (`UIApplication.didReceiveMemoryWarningNotification`, observed
+  through an injectable `NotificationCenter`) calls `ResourceRegistry.trimPools()`; held targets stay, so the preview
+  is unchanged. A size change letterboxes the unchanged result into the new view.
+- Q: What is written for the devices? → A: `docs/apps/effects-composer/device-plan.md`: for D1, D2 and D3 ({device},
+  after ImplementationLock-100; D3 stays on iPadOS 26.5) the peak memory of a 2,048-pixel picture with eight effects,
+  the preview frame time while editing, the export time per format and recovery after backgrounding, each with the
+  limit it must meet.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Export the finished picture (Priority: P1)
@@ -126,9 +175,10 @@ The preview and the export survive a lost graphics context, a change of size and
 
 ### Key Entities
 
-- **Export request**: format and quality; the size is the source's.
-- **Export result**: a temporary file with its format and size, or a refusal or failure with a code and message.
-- **Colour domain**: per effect, linear light or stored values.
+- **Export request**: format (PNG, JPEG, HEIC) and quality 0.9; the size is the source's.
+- **Export result**: a temporary file with its format and size, or a refusal (`a25.export-format-unavailable`,
+  `a25.export-too-large`, `a25.export-memory`) or failure (`a25.export-interrupted`) with a code and message.
+- **Colour domain**: per effect, linear light (grade, blur, vignette) or stored values (distort, posterize).
 
 ## Success Criteria *(mandatory)*
 
