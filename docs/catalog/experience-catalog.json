@@ -5148,10 +5148,10 @@
     "legacy_gates_passed": [
      "A25-P00",
      "A25-P01",
-     "A25-P02"
+     "A25-P02",
+     "A25-P03"
     ],
     "legacy_gates_pending": [
-     "A25-P03",
      "A25-P04",
      "A25-P05",
      "A25-P06"

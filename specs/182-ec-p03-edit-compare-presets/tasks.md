@@ -48,7 +48,7 @@
   U-RGBAUPLOAD phase 4, G-EXPORT phase 5 (`--name contract`); README of the experience
 - [X] T-A25-310 `--name catalog`, `experience-packages`, `script-tests`; `xcodegen generate --spec project.yml`, then — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P03.{catalog,experience-packages,script-tests,app-unit-2,verify-27}.json exit 0 (app-unit failed first: the dependency audit denies 'presetlibrary', fixed by renaming to LookLibrary)
   `--name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`; `--name verify-27`
-- [ ] T-A25-311 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+- [X] T-A25-311 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record — Verified 2026-11-19: 2026-11-19 converge appended nothing on its first pass; .autonomy/evidence/A25-P03.json sealed, VERIFIED-GATE A25-P03 (182 of 263); post-record pipeline, validate_autocreator, validate_docs, build_catalog --check PASS; README and docs/automatedtesting.md updated
   A25-P03; update README.md (rule 16) and `docs/automatedtesting.md` (rule 17)
 
 ## Dependencies

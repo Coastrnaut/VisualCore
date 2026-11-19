@@ -1,0 +1,74 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/A25-P03.app-unit-2.json",
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A25-P03.app-unit-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A25-P03.catalog.json",
+      "command": "python3 scripts/build_catalog.py --check",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A25-P03.catalog.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A25-P03.contract.json",
+      "command": "python3 scripts/check_app_contract.py --app effects-composer --render",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A25-P03.contract.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A25-P03.core-purity.json",
+      "command": "sh -c '! grep -rnE \"import (UIKit|SwiftUI|OpenGLES|VisualCoreRendering)|vcgl|Date\\(\\)\" Packages/ExperiencesCreative/EffectsComposer/Core'",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A25-P03.core-purity.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A25-P03.documented-api.json",
+      "command": "python3 scripts/check_documented_api.py --sources Packages/ExperiencesCreative/EffectsComposer",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A25-P03.documented-api.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A25-P03.ec-ios27-2.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing EffectsComposerCoreTests EffectsComposerExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A25-P03.ec-ios27-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A25-P03.ec-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing EffectsComposerCoreTests EffectsComposerExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A25-P03.ec-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A25-P03.experience-packages.json",
+      "command": "python3 scripts/check_experience_packages.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A25-P03.experience-packages.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A25-P03.isolation.json",
+      "command": "python3 scripts/check_app_isolation.py --experiences Packages/ExperiencesCreative/EffectsComposer",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A25-P03.isolation.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A25-P03.script-tests.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A25-P03.script-tests.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A25-P03.verify-27.json",
+      "command": "python3 scripts/verify_experiences.py --only a25.effects-composer --runtime 27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A25-P03.verify-27.log"
+    }
+  ],
+  "generated": "2026-11-19T20:01:54+00:00",
+  "method": "deterministic-run-check",
+  "stage": "A25-P03",
+  "status": "pass"
+}
