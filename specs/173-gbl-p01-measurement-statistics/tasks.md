@@ -70,7 +70,7 @@
 
 ## Phase 6: Records and evidence
 
-- [ ] T-A24-111 Core tests on sim-27.2, as a review checkpoint (SC-A24-106, FR-A24-108):
+- [X] T-A24-111 Core tests on sim-27.2, as a review checkpoint (SC-A24-106, FR-A24-108): — Verified 2026-11-19: 2026-11-19: .autonomy/checks/A24-P01.{gbl-core-ios27,core-purity,documented-api,isolation}.json all exit 0 (40 tests in 0.088 s)
   - `--name gbl-core-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme
     ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing GraphicsBenchmarkLabCoreTests`,
     with each test under 10 s;
