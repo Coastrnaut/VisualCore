@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "VisualCoreRenderingTests/RegistryCapabilitiesTests",
+    "VisualCoreRenderingTests/GPUFrameTimerTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --only-testing VisualCoreRenderingTests/RegistryCapabilitiesTests VisualCoreRenderingTests/GPUFrameTimerTests",
+  "elapsed_seconds": 3.251,
+  "exit_code": 0,
+  "finished": "2026-11-19T16:25:11+00:00",
+  "log": ".autonomy/logs/A24-P03.rendering-new.log",
+  "log_sha256": "6b6b55d81f00dec189150c284b100e65ac907e819d8b0742113035b26e4fbc76",
+  "name": "rendering-new",
+  "stage": "A24-P03",
+  "started": "2026-11-19T16:25:08+00:00",
+  "timed_out": false
+}

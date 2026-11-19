@@ -24,7 +24,7 @@
 - [X] T-A24-303 [P] The loader's extension block (`CVisualCoreGLLoad.h`, `VCGLLoadFromEGL.c`): `vcglHasDisjointTimerQuery`, — Verified 2026-11-19: 2026-11-19: loader extension block (GL_TIME_ELAPSED_EXT, GL_GPU_DISJOINT_EXT, vcglHasDisjointTimerQuery, vcglGetQueryObjectui64vEXT) resolved optionally; generated header untouched; .autonomy/checks/A24-P03.rendering-new.json exit 0
   `vcglGetQueryObjectui64vEXT`, `GL_TIME_ELAPSED_EXT` 0x88BF, `GL_GPU_DISJOINT_EXT` 0x8FBB, resolved optionally (never
   counted as missing); the generated `CVisualCoreGL.h` untouched
-- [ ] T-A24-304 `Sources/VisualCoreRendering/GPUFrameTimer.swift` per contracts/visualcore.md and clarification Q2
+- [X] T-A24-304 `Sources/VisualCoreRendering/GPUFrameTimer.swift` per contracts/visualcore.md and clarification Q2 — Verified 2026-11-19: 2026-11-19: GPUFrameTimer (ring of 4 GL_TIME_ELAPSED_EXT queries, ns to ms, disjoint discards, old generations never read); GPUFrameTimerTests pass (.autonomy/checks/A24-P03.rendering-new.json exit 0): 7 results of 0.06 to 12.4 ms within 4 frames on the simulator (not device evidence), nil without the extension, nothing after recreation
   (FR-A24-305): ring of 4 `GL_TIME_ELAPSED_EXT` queries, results in milliseconds ("nanoseconds / 1,000,000") only when
   available and not disjoint, a disjoint read discards every pending query, older generations never read, `release()`;
   `Tests/VisualCoreRenderingTests/GPUFrameTimerTests.swift`: where the extension is listed and resolved, a known draw
