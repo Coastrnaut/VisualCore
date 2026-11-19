@@ -13,7 +13,7 @@
 
 - [ ] T-A24-601 Baseline: cite the A24-P05 evidence (`.autonomy/checks/A24-P05.{gbl-ios27-3,app-ui-3,verify-27}.json`)
   on the tree recorded at A24-P05, whose `Packages/ExperiencesCreative`, `Apps` and `project.yml` are unchanged since
-  the A24-P05 record (owner ruling of 2026-11-14)
+  the A24-P05 record `975f9aa4` (owner ruling of 2026-11-14)
 
 ## Phase 2: Story 1 — nothing leaves the device without the person's tap (P1) 🎯
 
@@ -55,7 +55,8 @@
     GBL-D1 … GBL-D6; accessibility is `verified` (automated) with the audits `pending-campaign-ii`; signing, archive
     and upload are `owner-action`;
   - `docs/apps/graphics-benchmark-lab/release.json`, after Visual Programming Lab's (`copyCheck.swift`: every Swift
-    file of `Experience/` and `Experience/Adapter/`; `allow: ["share"]`);
+    file of `Experience/` and `Experience/Adapter/`, the explanation included, unlike the experience's own claims
+    scan of T-A24-607, research R2; `allow: ["share"]`);
   - an A24 section in `docs/release/known-limitations.md` (three cases; a run of at most its plan; at most 12 saved
     results; GPU time only where the timer exists; simulator numbers are not device evidence; a hot device ends a
     run; no ranking or comparison; device rows pending).
