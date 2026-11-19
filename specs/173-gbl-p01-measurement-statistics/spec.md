@@ -24,6 +24,53 @@ Canonical overrides:
 - **No VisualCore or ProjectM change.** Follow `specs/166-vpl-p01-graph-schema`.
 - **No benchmark number:** fixtures are synthetic samples with hand-computed expectations, never device measurements.
 
+## Clarifications
+
+### Session 2026-11-19
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- **Fingerprint:** `DigestBuilder(domain:)` (VisualCoreExperience, pure) adds typed fields (`add(_:)` for Int, UInt64,
+  Bool, String and bytes; `add(_ value: Double) throws(DigestError)`, which refuses NaN and infinity; `add(count:)`)
+  and `finish()` gives a `StateDigest`.
+- **Migration:** `MigrationChain(currentVersion:steps:)` (VisualCorePersistence, pure) migrates a JSON object payload
+  with `migrate(_:from:)`.
+- **Particles:** `ParticleSystem.maxCapacity` (VisualCoreSimulation) is 100,000 and `defaultCapacity` 10,000.
+- **Host counts:** `RenderHost(scene:)` runs a `RenderScene` off screen, and `ResourceRegistry.stats` gives
+  `liveCount` per kind and `totalBytes`, as the Visual Programming Lab core tests use (A23-P01).
+- **Package layout:** a pending core is `<Name>Core` with `<Name>CoreTests` and no experience target (the pending-core
+  allowance of `scripts/check_experience_packages.py`); its tests may depend on VisualCoreRendering.
+
+- Q: What are the three built-in cases and their caps? → A: Version 1 of each, every value inside its cap:
+
+  | Case id | Workload | Configuration (value; cap) | Resolution scale (value; cap) |
+  |---|---|---|---|
+  | `quads` | textured quads | 8 full-screen layers (1…64), a 256 × 256 texture made in code (64…1,024, power of two) | 1.0 (0.25…1.0) |
+  | `alu` | shader ALU stress | 64 iterations per fragment (1…1,024) | 1.0 (0.25…1.0) |
+  | `particles` | particles | 5,000 particles (1…100,000, `ParticleSystem.maxCapacity`) | 1.0 (0.25…1.0) |
+
+  Every case has the run plan warm-up 3 s (1…30), measurement 10 s (1…60) and cool-down 5 s (0…120), so a run lasts
+  at most 210 s. The fingerprint is a `DigestBuilder` in the domain `a24.benchmark-case.v1` over the id, the version,
+  the workload, every configuration value, the resolution scale and the plan.
+- Q: What exactly is a percentile here? → A: The nearest-rank percentile over the measured values sorted ascending:
+  rank = ⌈p · n / 100⌉ computed in integers as (p · n + 99) / 100, value = the rank-th smallest. p50 needs n ≥ 1,
+  p95 n ≥ 20 and p99 n ≥ 100; below that the percentile is absent and the summary is flagged. No interpolation, no
+  mean as a headline.
+- Q: What is a frame sample, and what are its caps? → A: `frameIndex` (an integer, strictly increasing within a run),
+  `phase` (warm-up, measurement or cool-down; phases never go back), `intervalMs` (the time from the previous frame,
+  absent for the run's first frame), `cpuMs` (the presenter's own submit time), `gpuMs` (absent unless a timer is
+  confirmed) and `dropped`. Every duration is finite and within 0…1,000 ms. A run holds at most 20,000 samples
+  (60 s at 120 Hz is 7,200). A measured sample without an interval is not counted in the interval percentiles.
+- Q: What is the run record's file? → A: The envelope `{"body", "kind": "a24.benchmark-run", "version": 1}` with the
+  body `{case, samples, summary, state}` (`state` ∈ completed, stopped, interrupted), at most 2,097,152 bytes, read
+  through a `MigrationChain`. Refusal codes: `damaged` (not the envelope, the wrong kind or body, or a stored summary
+  that differs from the one recomputed from the samples), `newer-version`, `too-large`, `not-finite`, `out-of-range`
+  (with the field), `out-of-order` (frame index or phase) and `too-many-samples`.
+- Q: How is "no graphics work" proved? → A: As in A23-P01: a core test runs a scene on `RenderHost` and, inside its
+  callbacks, validates the cases, summarises every fixture and encodes a run, then compares `ResourceRegistry.stats`
+  (`liveCount` per kind and `totalBytes`) before and after; they are equal. The core target depends only on the pure
+  VisualCoreExperience and VisualCorePersistence products.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - A benchmark case is a fixed, bounded recipe (Priority: P1) 🎯
