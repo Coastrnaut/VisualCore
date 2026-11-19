@@ -8,3 +8,6 @@
 - **CurveFrame**: `position`, `tangent`, `normal`, `binormal` (= tangent × normal), orthonormal.
 - **RibbonWidth**: `.constant(Double)` or `.perSample([Double])`; finite, > 0; per-sample count equals the samples'.
 - **Errors**: `MeshError.invalidInput` (too few points, non-finite, bad tolerance, bad width) and `MeshError.budget`.
+- **Ribbon mesh**: an open surface; triangles wound counter-clockwise seen from the side the frame normal points to
+  (the mesh convention of R02-F05); boundary edges are the two long sides (and the ends of an open curve); validates
+  with no problem other than being open.
