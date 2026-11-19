@@ -43,7 +43,7 @@
 
 ## Phase 4: Story 3 — honest copy and a complete checklist (P1)
 
-- [ ] T-A23-606 [US3] Write the release documents (FR-A23-605, 606):
+- [X] T-A23-606 [US3] Write the release documents (FR-A23-605, 606): — Verified 2026-11-19: 2026-11-19: store-listing.md, release-checklist.md (35 rows), release.json and the A23 section of docs/release/known-limitations.md; check_experience_release.py PASS (7 documents, 35 rows); copy-claims PASS (6 files)
   - `docs/apps/visual-programming-lab/store-listing.md`: says "no code to type"; every claim names a proving test; no
     shared denylist word; names no frame rate or timing (the 30-a-second cap is not measured on a device);
   - `docs/apps/visual-programming-lab/release-checklist.md`: the statuses of clarification Q1; device rows name

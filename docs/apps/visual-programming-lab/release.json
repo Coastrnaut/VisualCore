@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "experience": "a23.visual-programming-lab",
+  "requiredDocs": [
+    "docs/apps/visual-programming-lab/privacy-and-credits.md",
+    "docs/apps/visual-programming-lab/store-listing.md",
+    "docs/apps/visual-programming-lab/release-checklist.md",
+    "docs/apps/visual-programming-lab/device-campaign.md",
+    "docs/apps/visual-programming-lab/licenses.md",
+    "docs/apps/visual-programming-lab/visualcore-contract.md",
+    "docs/release/build-and-archive.md"
+  ],
+  "checklist": "docs/apps/visual-programming-lab/release-checklist.md",
+  "copyCheck": {
+    "text": [
+      "docs/apps/visual-programming-lab/store-listing.md"
+    ],
+    "swift": [
+      "Packages/ExperiencesCreative/VisualProgrammingLab/Experience/LabControls.swift",
+      "Packages/ExperiencesCreative/VisualProgrammingLab/Experience/CanvasOverlay.swift",
+      "Packages/ExperiencesCreative/VisualProgrammingLab/Experience/LabLibraryView.swift",
+      "Packages/ExperiencesCreative/VisualProgrammingLab/Experience/LabPresenter.swift",
+      "Packages/ExperiencesCreative/VisualProgrammingLab/Experience/Adapter/LabCore.swift"
+    ],
+    "allow": []
+  }
+}

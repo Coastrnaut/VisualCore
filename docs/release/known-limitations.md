@@ -494,6 +494,30 @@ and `VisualCoreRendering` (iOS, GL). ADR-0003 and the package map record this. R
   audits wait for the device campaign ([device-campaign.md](../apps/shader-studio/device-campaign.md), rows SS-D1 to
   SS-D6). No frame, stop, heat, battery or capability figure from a device is stated.
 
+### Visual Programming Lab (A23; features 165–171)
+
+- No typed code. A picture is composed only from a graph of the seven node kinds written in code (Time, Constant,
+  Noise, Gradient, Mix, Blur and Output) and their parameters within their ranges; the person types no code, script or
+  shader, and only the preview operators written in this repository are compiled. There are no loops, feedback nodes
+  or custom nodes.
+- Values beyond the limits are refused, never truncated: a graph holds at most 32 nodes and 64 connections; a 33rd
+  node, a second Output, a 65th connection, a connection of the wrong type, into an input already fed or closing a
+  loop is refused with its sentence and changes nothing. The preview uses at most six 256 × 256 textures (1.5 MiB);
+  a graph needing more is refused with "This graph needs N textures; the preview allows 6." before any texture is
+  allocated. The library holds at most 24 graphs, names of 1 to 40 characters (names differing only in case are the
+  same) and files of at most 81,920 bytes; a 25th save, a used name or a full storage quota is refused with its
+  message and changes nothing.
+- No sharing or export. Graphs stay in the experience's own storage on the device (no sync, no file export, no share
+  sheet, no import from other apps). The snapshot keeps the open graph and the selection; named graphs are kept only
+  by saving them in the library.
+- A damaged, newer, too-large or out-of-range graph file is listed as unreadable with its code and never opened,
+  renamed or removed automatically; an older graph file is migrated when a migration step exists; an index of a newer
+  version makes the library read only; a damaged index is rebuilt by the next change.
+- The largest example's texture memory and pacing, the refusal of a 7-texture graph, touch wiring and the list form by
+  a finger, pacing under heat and Low Power Mode, background and return, and the system accessibility audits wait for
+  the device campaign ([device-campaign.md](../apps/visual-programming-lab/device-campaign.md), rows VPL-D1 to
+  VPL-D6). No frame, memory, heat, battery or capability figure from a device is stated.
+
 ## Distribution
 
 - No App Store submission, signing or purchase setup is part of this release; those are owner actions.
