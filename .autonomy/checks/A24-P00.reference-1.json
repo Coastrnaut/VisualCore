@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "reference-engine-xcframework",
+    "reference-build-projectm-ios-sim",
+    "reference-clean"
+  ],
+  "command": "python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean",
+  "elapsed_seconds": 25.36,
+  "exit_code": 0,
+  "finished": "2026-11-19T15:18:51+00:00",
+  "log": ".autonomy/logs/A24-P00.reference-1.log",
+  "log_sha256": "bb7150577e4a1430dc0c0eb32bd5a53487d620bdc21714a2206da0660c5d82d8",
+  "name": "reference-1",
+  "stage": "A24-P00",
+  "started": "2026-11-19T15:18:26+00:00",
+  "timed_out": false
+}
