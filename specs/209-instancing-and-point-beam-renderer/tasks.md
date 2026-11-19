@@ -7,7 +7,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T-R02F09-001 Baselines: `--name baseline-host -- swift test --package-path Packages/VisualCore` and
+- [X] T-R02F09-001 Baselines: `--name baseline-host -- swift test --package-path Packages/VisualCore` and — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F09.{baseline-host,baseline-rendering}.json (exit 0)
   `--name baseline-rendering --` the VisualCoreRendering scheme on sim-27.2
 
 ## Phase 2: Foundational (pure)
