@@ -1,0 +1,80 @@
+{
+  "branch": "main",
+  "dirty": true,
+  "dirty_paths": [
+    "docs/verification/a25.effects-composer/summary-27.2.json",
+    "docs/verification/a25.effects-composer/summary-26.5.json"
+  ],
+  "failed_attempts": [],
+  "gate": "X-A25",
+  "ledger": "migration",
+  "passing_checks": [
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --result-name xa25-host",
+      "exit_code": 0,
+      "finished": "2026-11-19T21:24:38+00:00",
+      "log": ".autonomy/logs/migration/X-A25.host.log",
+      "log_sha256": "18c1bdb3a4717888e0eb8a1cc5b86255c52d54a3aae98c4d96a0d9a0e136f1cc",
+      "name": "host"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean",
+      "exit_code": 0,
+      "finished": "2026-11-19T21:26:27+00:00",
+      "log": ".autonomy/logs/migration/X-A25.reference-1.log",
+      "log_sha256": "f952581043e8252c197684c5c2b01597fbd94eb91b752f592d97fcdc07c00476",
+      "name": "reference-1"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26",
+      "exit_code": 0,
+      "finished": "2026-11-19T21:27:05+00:00",
+      "log": ".autonomy/logs/migration/X-A25.reference-2.log",
+      "log_sha256": "0a488c4c7a909538392c84d72562ac9496c3685d1b92bccb29ce604cedea87d8",
+      "name": "reference-2"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a25.effects-composer --runtime 26",
+      "exit_code": 0,
+      "finished": "2026-11-19T21:18:11+00:00",
+      "log": ".autonomy/logs/migration/X-A25.sim26.log",
+      "log_sha256": "3b7eaab1b4d01b20d5291b405acbeb007a8de1806b20ba7a43477e46a6bfd0b7",
+      "name": "sim26"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a25.effects-composer --runtime 27",
+      "exit_code": 0,
+      "finished": "2026-11-19T21:17:15+00:00",
+      "log": ".autonomy/logs/migration/X-A25.sim27.log",
+      "log_sha256": "91b73d13fe1b7cdcdf87ed2b768d92980eace24f6bcdd1a1de569b6e6f4233d6",
+      "name": "sim27"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-ui-ios27-h3",
+      "exit_code": 0,
+      "finished": "2026-11-19T21:28:17+00:00",
+      "log": ".autonomy/logs/migration/X-A25.ui-h3.log",
+      "log_sha256": "a657a0521800cf6f4512eece37d5c9d2db31d072b112053de43b79f5fa6edb12",
+      "name": "ui-h3"
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "finished": "2026-11-19T21:25:05+00:00",
+      "log": ".autonomy/logs/migration/X-A25.visualcore-host.log",
+      "log_sha256": "f493206a09bedb92e1887f856ee6d8d3648281f69940b5aba0a0bb88c5470686",
+      "name": "visualcore-host"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name xa25-rendering",
+      "exit_code": 0,
+      "finished": "2026-11-19T21:25:50+00:00",
+      "log": ".autonomy/logs/migration/X-A25.visualcore-rendering.log",
+      "log_sha256": "6f308a86db58623f6b738272fc36128ce6426101e3141f020c2494ab5e3e348f",
+      "name": "visualcore-rendering"
+    }
+  ],
+  "revision": "6768bb66e243ed6cafca705e66a82736ca4e2ad3",
+  "revision_number": 1,
+  "sealed": "2026-11-19T21:28:22+00:00"
+}

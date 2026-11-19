@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "app-build-for-testing-ios27",
+    "app-ui-ios27-h3"
+  ],
+  "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-ui-ios27-h3",
+  "elapsed_seconds": 67.631,
+  "exit_code": 0,
+  "finished": "2026-11-19T21:28:17+00:00",
+  "gate": "X-A25",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-A25.ui-h3.log",
+  "log_sha256": "a657a0521800cf6f4512eece37d5c9d2db31d072b112053de43b79f5fa6edb12",
+  "name": "ui-h3",
+  "started": "2026-11-19T21:27:09+00:00",
+  "timed_out": false
+}
