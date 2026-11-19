@@ -112,4 +112,11 @@ owner's action.
 | 2026-11-18 | App icon | added, drawn in code by `scripts/make_app_icon.py` (the first upload was refused for a missing icon) |
 | 2026-11-18 | Build | 1.0.0 (1) archived and uploaded with `xcodebuild -exportArchive` (method app-store-connect, automatic signing) |
 | 2026-11-18 | Listing | promotional text, description, keywords, copyright, review notes, subtitle and categories (Entertainment, Graphics & Design) entered; "Sign-in required" off |
-| — | Content rights, age rating, App Privacy, pricing, support and privacy policy URLs, review contact, screenshots, build selection, Submit for Review | `BLOCKED_OWNER_ACTION` (screenshots in `Build/screenshots/`, not committed) |
+| 2026-11-18 | Age rating | answered by the owner (4+, with Apple's regional exceptions) |
+| 2026-11-18 | Screenshots | six iPhone 6.9" and four iPad 13" simulator captures uploaded to the Asset Library (in Chrome) |
+| 2026-11-18 | Build selection | build 1 attached to version 1.0; App Store Connect shows the code-drawn icon in its included assets |
+| 2026-11-18 | Pricing and availability | Free, all 175 countries or regions |
+| 2026-11-18 | Content rights | yes, with the necessary rights (public-domain molecule records in Molecular Explorer) |
+| 2026-11-18 | App Privacy | Data Not Collected, published; privacy policy URL https://github.com/Coastrnaut/VisualCore/blob/main/docs/privacy-policy.md (as projectm-ios does) |
+| 2026-11-18 | Support URL | https://github.com/Coastrnaut/VisualCore/issues (as projectm-ios does) |
+| — | App Review contact (name, phone, email), Add for Review, Submit | `BLOCKED_OWNER_ACTION` |
