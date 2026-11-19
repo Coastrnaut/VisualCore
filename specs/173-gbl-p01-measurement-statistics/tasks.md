@@ -22,7 +22,7 @@
 
 ## Phase 2: Story 1 — a fixed, bounded case (P1) 🎯
 
-- [ ] T-A24-103 [P] [US1] Create `Packages/ExperiencesCreative/GraphicsBenchmarkLab/Core/BenchmarkCase.swift` per
+- [X] T-A24-103 [P] [US1] Create `Packages/ExperiencesCreative/GraphicsBenchmarkLab/Core/BenchmarkCase.swift` per — Verified 2026-11-19: 2026-11-19: Packages/ExperiencesCreative/GraphicsBenchmarkLab/Core/BenchmarkCase.swift (cases, caps, fingerprint domain a24.benchmark-case.v1, three built-ins); .autonomy/checks/A24-P01.gbl-core-ios27.json exit 0
   data-model.md and contracts/core.md, with `///` on every public declaration (FR-A24-101, 102): `Workload`,
   `WorkloadConfig`, `RunPlan`, `CaseLimits` ("layers 1…64; textureSize 64…1,024, a power of two; iterations 1…1,024;
   particles 1…100,000; resolutionScale 0.25…1.0; warmUpSeconds 1…30; measureSeconds 1…60; coolDownSeconds 0…120"),
