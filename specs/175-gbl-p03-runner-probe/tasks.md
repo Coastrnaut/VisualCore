@@ -50,7 +50,7 @@
   dropped rule; stop at the next frame; the probe from `context.resources.renderCapabilities.extensions`; a
   `GPUFrameTimer` only when supported (seam `forceTimerUnsupported`), bracketing the workload draw; `gpuMs` filled from
   `poll()` results for measured frames; the summary text's GPU line only when GPU times exist
-- [ ] T-A24-309 [US3] `Experience/ReportSource.swift` (FR-A24-307): `utsname` machine, `operatingSystemVersion`, the
+- [X] T-A24-309 [US3] `Experience/ReportSource.swift` (FR-A24-307): `utsname` machine, `operatingSystemVersion`, the — Verified 2026-11-19: 2026-11-19: .autonomy/checks/A24-P03.gbl-ios27.json exit 0 (66 core and 42 experience tests); ReportSource builds the report from public sources and the presenter attaches it to every ended run
   bundle's version and build, `renderCapabilities`, tier, `DeviceConditions.current()` at start and end; the report is
   attached to the finished run
 - [ ] T-A24-310 [US1] [US2] [US3] Tests `ExperienceTests/{GPUTimingTests,ReportTests}.swift` and `RecorderTests.swift`
