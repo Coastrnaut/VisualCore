@@ -39,7 +39,7 @@
 
 ## Phase 4: Evidence
 
-- [ ] T-A25-407 VisualCore evidence: `--name rendering-tests` (the VisualCoreRendering package on sim-27.2),
+- [X] T-A25-407 VisualCore evidence: `--name rendering-tests` (the VisualCoreRendering package on sim-27.2), — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P04.{rendering-tests,public-api,reference-1,reference-2}.json (all exit 0)
   `--name public-api` (`python3 scripts/check_public_api.py`), `--name reference-1` and `--name reference-2` (quickstart)
 - [ ] T-A25-408 Review checkpoint: `--name ec-ios27` (both experience test targets), the documented API (also for
   `Packages/VisualCoreRendering/Sources`), isolation and core purity
