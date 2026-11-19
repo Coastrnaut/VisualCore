@@ -22,7 +22,7 @@
 
 ## Phase 2: Story 1 — a bounded graph document (P1) 🎯
 
-- [ ] T-A23-103 [P] [US1] Create `Packages/ExperiencesCreative/VisualProgrammingLab/Core/{ValueType,NodeLibrary,VisualGraph}.swift`
+- [X] T-A23-103 [P] [US1] Create `Packages/ExperiencesCreative/VisualProgrammingLab/Core/{ValueType,NodeLibrary,VisualGraph}.swift` — Verified 2026-11-18: 2026-11-18: ValueType.swift (four value types, directions, port declarations), NodeLibrary.swift (the seven kinds' ports and ParameterDefinitions per clarification Q1; separate input(_:) and output(_:) because blur has an input and an output named image) and VisualGraph.swift (NodeID 1...9,999, CanvasPoint within 4,096, GraphNode, GraphEdge ordered by target, port, source, port; GraphLimits 32 and 64; the output is the node of kind output, not a stored field); .autonomy/checks/A23-P01.vpl-core-ios27.json exit 0 (70 tests in 7 suites on sim-27.2, slowest 0.047 s); written by an agent, retested
   per data-model.md and contracts/core.md, with `///` on every public declaration (FR-A23-101, 103):
   - `ValueType` (scalar, colour, texture, time), `PortDirection`, `PortDeclaration` (name "lowercase letters, 1…16",
     required for inputs only);
