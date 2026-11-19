@@ -42,7 +42,7 @@
   1/255 and the preset draws the same; 30 Hz strobe through a graph with the pass bounded by the limiter when reduced,
   following the input when not; a context rebuild gives the same output; existing bloom, composite and limiter tests
   unchanged
-- [ ] T-R02F07-006 Simulator runs: `--name rendering-27` and `--name rendering-26` (the VisualCoreRendering scheme on
+- [X] T-R02F07-006 Simulator runs: `--name rendering-27` and `--name rendering-26` (the VisualCoreRendering scheme on — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F07.{rendering-27,rendering-26}.json (exit 0 on iOS 27.2 and 26.5)
   sim-27.2 and sim-26.5)
 
 ## Phase 4: Regression, documentation and close
