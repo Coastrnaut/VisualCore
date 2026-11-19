@@ -9,3 +9,6 @@
 - **Caps:** 12 results; messages "The library holds 12 results." and "There is not enough space to save this result.".
 - **CSV** `a24.benchmark-run.csv` v1: the `key,value` part, an empty line, the sample table; CRLF; RFC 4180 quoting.
 - **ResultExportFile:** url, format (json, csv); `Transferable` with the matching content type.
+- **As built (A24-P04):** the repeated-save rule is held by the presenter (`savedRun`: the last saved run is refused
+  again with "This result is already saved."), not by the library; the export folder is emptied in the presenter's
+  `teardown`, so also after a context rebuild, and the next tap writes the file again.

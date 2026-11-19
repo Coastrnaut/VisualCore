@@ -77,7 +77,7 @@
 
 ## Phase 7: Convergence
 
-- [ ] T-A24-412 Record the as-built design in `specs/176-gbl-p04-results-export/{contracts/results.md,data-model.md}`:
+- [X] T-A24-412 Record the as-built design in `specs/176-gbl-p04-results-export/{contracts/results.md,data-model.md}`: — Verified 2026-11-19: 2026-11-19: as-built notes in contracts/results.md (extra identifiers, save returns n, failures, removal without confirmation) and data-model.md (presenter-held repeated save, export folder emptied in teardown); validate_docs passes
   the extra identifiers `result-message` and `result-opened`; the failures `noRun`, `exportFailed` and `run(code)`
   (codes prefixed `a24.`); the repeated-save rule held by the presenter (`savedRun`), not the library; removal without
   a confirmation over the drawing; the export folder emptied in `teardown`, so also after a context rebuild (the next
