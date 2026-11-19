@@ -38,7 +38,7 @@
 
 ## Phase 4: Story 3 and Story 4 — the render contract (P1, P2)
 
-- [ ] T-A25-107 [P] [US3] [US4] Create `Packages/ExperiencesCreative/EffectsComposer/Core/{TestImage,EffectReference,EffectPrograms}.swift` per clarifications Q1
+- [X] T-A25-107 [P] [US3] [US4] Create `Packages/ExperiencesCreative/EffectsComposer/Core/{TestImage,EffectReference,EffectPrograms}.swift` per clarifications Q1 — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P01.ec-core-ios27.json exit 0 (35 tests in 8 suites on sim-27.2); test image, CPU references and five programs
   and Q4: the 64 × 64 test image, `RGBAImage`, the CPU reference of each effect, and each effect's fragment program
   (input `u_source`, packed `u_params`/`u_params2` vec4 and `u_texel`)
 - [ ] T-A25-108 [US3] [US4] Write `Packages/ExperiencesCreative/EffectsComposer/CoreTests/{ReferenceTests,ProgramRenderTests,OrderTests,RenderSupport}.swift`:
