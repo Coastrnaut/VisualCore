@@ -36,7 +36,7 @@
 
 ## Phase 3: Core — probe, dropped rule, report (P1)
 
-- [ ] T-A24-306 [P] Create `Core/{TimerProbe,DroppedFrameRule,RunReport}.swift` per data-model.md and clarifications
+- [X] T-A24-306 [P] Create `Core/{TimerProbe,DroppedFrameRule,RunReport}.swift` per data-model.md and clarifications — Verified 2026-11-19: 2026-11-19: TimerProbe, DroppedFrameRule (25 ms), RunReport (validated fields, thermal-changed) with tests; .autonomy/checks/A24-P03.gbl-core.json exit 0 (66 core tests)
   Q3–Q5 with their tests `CoreTests/{TimerProbeTests,DroppedFrameRuleTests,RunReportTests}.swift`: the probe's two
   outcomes; "interval > 1.5 × 1,000 / 60 ms" dropped; every report field validated ("strings 1…128 characters", the
   thermal raw values, the timing sources from the fixed set), `thermal-changed`
