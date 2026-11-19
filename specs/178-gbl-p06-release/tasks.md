@@ -38,7 +38,7 @@
     `BenchDrawError.injected` once and clears it;
   - `ExperienceTests/BenchRecoveryDrawTests.swift`: save two results, set the seam and draw; the session fails with
     the message; every storage file is byte-identical; a new session over the same storage lists and opens both.
-- [ ] T-A24-605 [P] [US2] Commit the stored samples and test them (FR-A24-604):
+- [X] T-A24-605 [P] [US2] Commit the stored samples and test them (FR-A24-604): — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A24-P06.gbl-recovery-samples.json exit 0; ReleaseSampleTests 10 over nine committed samples plus a 2,162,689-byte result refused too-large and kept; every file byte-identical
   - `ExperienceTests/Fixtures/` holds the nine files of data-model.md, generated once through the real encoders
     (`BenchCore` snapshot, `ResultLibrary` save) and then committed; `Packages/ExperiencesCreative/Package.swift`
     copies the folder as a resource of `GraphicsBenchmarkLabExperienceTests` (lead);
