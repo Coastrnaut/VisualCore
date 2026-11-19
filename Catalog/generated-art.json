@@ -1,4 +1,10 @@
 {
-  "files": [],
+  "files": [
+    {
+      "generator": "scripts/make_app_icon.py",
+      "path": "Apps/VisualCore/Resources/Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png",
+      "sha256": "5ea9198f9b52a5e06196b07f9f4948e9b18cc8b689d06c217e638102b97d365d"
+    }
+  ],
   "schema": 1
 }
