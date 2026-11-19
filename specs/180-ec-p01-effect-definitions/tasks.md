@@ -64,7 +64,7 @@
   - the purity scan (`--name core-purity -- sh -c '! grep -rnE "import (UIKit|SwiftUI|OpenGLES|VisualCoreRendering)|vcgl|Date\(\)" Packages/ExperiencesCreative/EffectsComposer/Core'`);
   - the documented API (`--name documented-api -- python3 scripts/check_documented_api.py --sources Packages/ExperiencesCreative/EffectsComposer`);
   - the isolation check (`--name isolation -- python3 scripts/check_app_isolation.py --experiences Packages/ExperiencesCreative/EffectsComposer`).
-- [ ] T-A25-112 Contract `docs/apps/effects-composer/visualcore-contract.json`: G-MODEL and G-EFFECTS are closed by
+- [X] T-A25-112 Contract `docs/apps/effects-composer/visualcore-contract.json`: G-MODEL and G-EFFECTS are closed by — Verified 2026-11-19: 2026-11-19 G-MODEL and G-EFFECTS closed by A25-P01 (M13, M14 available); .autonomy/checks/A25-P01.contract-2.json exit 0; README lists the core
   "A25-P01", and rows whose gaps are all closed become available with evidence (`--name contract -- python3
   scripts/check_app_contract.py --app effects-composer --render`); list the core in `docs/apps/effects-composer/README.md`
 - [ ] T-A25-113 The packages, catalog and script tests and the app build:

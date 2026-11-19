@@ -18,6 +18,12 @@ test image are generated in code; an imported image is the person's input, never
 nothing; an image is read only from the system picker the person opens, and an export is written only when the person
 chooses it. Its rules are the A25 subsection of the constitution (2.21.0).
 
+The pending core (A25-P01) is `Packages/ExperiencesCreative/EffectsComposer/Core`: the five effects with bounded
+parameters (`EffectDefinition.swift`), the chain of at most eight effects with its exact undo and redo
+(`EffectChain.swift`, `ChainEditing.swift`), the versioned chain file (`ChainDocument.swift`), the test image made in
+code (`TestImage.swift`), and each effect's CPU reference and fragment program (`EffectReference.swift`,
+`EffectPrograms.swift`), tested in `CoreTests` inside a running render host.
+
 | Document | Content |
 |---|---|
 | [visualcore-contract.json](visualcore-contract.json) / [.md](visualcore-contract.md) | Phase 00 inventory, capability matrix, gaps, decision (checked by `scripts/check_app_contract.py`) |

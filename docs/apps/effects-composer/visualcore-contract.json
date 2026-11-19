@@ -554,7 +554,7 @@
     "file": "Packages/ExperiencesCreative/VisualProgrammingLab/Experience/PreviewPipeline.swift",
     "symbol": "PreviewPipeline"
    },
-   "notes": "Drawing and parameters exist (FieldPassTests, ParametersTests); the chain, node and effect models, the five effect programs and the compiler are app-local (G-MODEL, G-EFFECTS, G-COMPILER)."
+   "notes": "Drawing and parameters exist (FieldPassTests, ParametersTests); the chain, node and effect models, the five effect programs and the compiler are app-local (G-MODEL, G-EFFECTS, G-COMPILER). A25-P01 (feature 180): the pending core EffectsComposerCore holds the five effects (grade, blur, distort, vignette, posterize) with bounded parameters and fingerprints, the chain (at most 8 nodes) with five edits and an exact undo and redo history (depth 64), the versioned chain file with its refusals, the 64 x 64 test image, the CPU reference and the fragment program of each effect; inside the host every program compiles with FieldPass and matches its reference within 0/255 to 1/255, the order of two effects changes the picture and undo restores it byte for byte, and the core creates no graphics resource (DefinitionTests, ChainTests, HistoryTests, ChainDocumentTests, ReferenceTests, ProgramRenderTests, OrderTests, HostCountTests) (G-MODEL, G-EFFECTS closed)."
   },
   {
    "id": "M08",
@@ -757,7 +757,7 @@
    "id": "M13",
    "capability": "Effect definition, node, chain, parameter and output-settings models: versioned, validated, with caps",
    "source": "spec FR-A25-003; manual \u00a76",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreParameters/ParameterSchema.swift",
@@ -779,16 +779,16 @@
     }
    ],
    "example": {
-    "file": "Packages/ExperiencesCreative/VisualProgrammingLab/Core/GraphDocument.swift",
-    "symbol": "GraphDocument"
+    "file": "Packages/ExperiencesCreative/EffectsComposer/Core/EffectChain.swift",
+    "symbol": "EffectChain"
    },
-   "notes": "ParametersTests, DocumentStoreTests. The models and their caps (chain length, parameter ranges, source and export edges; research D5) are G-MODEL (A25-P01), pure in the experience's Core. Visual Programming Lab's GraphDocument is the closest consumer."
+   "notes": "ParametersTests, DocumentStoreTests. The models and their caps (chain length, parameter ranges, source and export edges; research D5) are G-MODEL (A25-P01), pure in the experience's Core. Visual Programming Lab's GraphDocument is the closest consumer. A25-P01 (feature 180): the pending core EffectsComposerCore holds the five effects (grade, blur, distort, vignette, posterize) with bounded parameters and fingerprints, the chain (at most 8 nodes) with five edits and an exact undo and redo history (depth 64), the versioned chain file with its refusals, the 64 x 64 test image, the CPU reference and the fragment program of each effect; inside the host every program compiles with FieldPass and matches its reference within 0/255 to 1/255, the order of two effects changes the picture and undo restores it byte for byte, and the core creates no graphics resource (DefinitionTests, ChainTests, HistoryTests, ChainDocumentTests, ReferenceTests, ProgramRenderTests, OrderTests, HostCountTests) (G-MODEL, G-EFFECTS closed)."
   },
   {
    "id": "M14",
    "capability": "Five built-in effects with bounded parameters, drawn as FieldPass programs",
    "source": "spec FR-A25-003; manual \u00a72 feature 01",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
@@ -816,10 +816,10 @@
     }
    ],
    "example": {
-    "file": "Packages/ExperiencesCreative/LivingWallpapers/Experience/SceneShaders.swift",
-    "symbol": "SceneShaders"
+    "file": "Packages/ExperiencesCreative/EffectsComposer/Core/EffectPrograms.swift",
+    "symbol": "EffectPrograms"
    },
-   "notes": "FieldPassTests, ShaderBundleTests, ParametersTests. The five effect programs, their uniforms (wider parameters packed into vec4) and parameter bounds are G-EFFECTS (A25-P01)."
+   "notes": "FieldPassTests, ShaderBundleTests, ParametersTests. The five effect programs, their uniforms (wider parameters packed into vec4) and parameter bounds are G-EFFECTS (A25-P01). A25-P01 (feature 180): the pending core EffectsComposerCore holds the five effects (grade, blur, distort, vignette, posterize) with bounded parameters and fingerprints, the chain (at most 8 nodes) with five edits and an exact undo and redo history (depth 64), the versioned chain file with its refusals, the 64 x 64 test image, the CPU reference and the fragment program of each effect; inside the host every program compiles with FieldPass and matches its reference within 0/255 to 1/255, the order of two effects changes the picture and undo restores it byte for byte, and the core creates no graphics resource (DefinitionTests, ChainTests, HistoryTests, ChainDocumentTests, ReferenceTests, ProgramRenderTests, OrderTests, HostCountTests) (G-MODEL, G-EFFECTS closed)."
   },
   {
    "id": "M15",
@@ -1643,7 +1643,7 @@
    "justification": "The effect definition, node, chain, parameter and output-settings models (manual \u00a76) are the experience's domain, pure and GPU-free in its Core, versioned with MigrationChain and with documented caps on chain length, parameter ranges and source and export edges (research D5). No second user exists for them (Principle II).",
    "phase": 1,
    "test": "Core host tests: each model round-trips and migrates; truncated, newer, NaN, infinite and out-of-range values and values one past each cap (chain length, parameter range, edges) are refused with a named reason.",
-   "closed": null
+   "closed": "A25-P01"
   },
   {
    "id": "G-EFFECTS",
@@ -1656,7 +1656,7 @@
    "justification": "The five built-in effects are the experience's content: FieldPass fragment programs generated in code with bounded parameters, wider values packed into vec4 uniforms (clarification Q1). EffectRenderer's closed pass set cannot take them (research D6).",
    "phase": 1,
    "test": "Core tests: each effect's parameter set has finite bounds and defaults inside them; experience tests compile each program in the host's context and check a known pixel of each effect on the built-in test image against a CPU reference within a tolerance.",
-   "closed": null
+   "closed": "A25-P01"
   },
   {
    "id": "G-COMPILER",
