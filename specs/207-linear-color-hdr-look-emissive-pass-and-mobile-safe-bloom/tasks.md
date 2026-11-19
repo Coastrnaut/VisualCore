@@ -65,3 +65,13 @@
 ## Parallel examples
 
 - **Agent R:** 002, 003 (pure). **Agent G:** 005 after 004. **Lead:** 001, 004, 006–012.
+
+## Phase 5: Convergence
+
+- [ ] T-R02F07-013 Record the as-built design in `specs/207-linear-color-hdr-look-emissive-pass-and-mobile-safe-bloom/research.md`,
+  `data-model.md` and `contracts/api.md`: four draws (prefilter into A, horizontal blur into B, vertical blur into A,
+  composite) instead of three; prefilter taps at ±0.25 blur texel (one input texel centre each at half, 2×2 averages
+  at quarter); blur 9 taps one texel apart, σ = max(radius/2, 0.5); `EffectGraphError.nonFiniteParameter` for every
+  pass and `parameterOutOfRange` with `PassSchema.refusesOutOfRange` for `emissive` only (composite mode 3 clamps to
+  2); `EffectShaders.emissiveFragments`; the per-renderer `forceStandardPrecision` and the test hooks
+  `lastBlurSize`/`lastBlurFormat` per plan, contracts/api.md (partial)
