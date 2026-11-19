@@ -49,7 +49,9 @@
 - [ ] T-A24-208 [US2] [US3] Write `ExperienceTests/{BenchCoreTests,RecorderTests}.swift` (SC-A24-202, 203): actions and
   refusals; a run fed synthetic frame times passes warm-up, measure and cool-down and finishes with a summary counting
   only measured frames; every sample has `gpuMs` nil and the encoded run file holds no GPU value; the summary has no
-  GPU distribution and the flag "gpu-time-not-available"; the status text names it; stop mid-run gives "Stopped"
+  GPU distribution and the flag "gpu-time-not-available"; the status text names it; stop mid-run gives "Stopped";
+  choosing another case mid-run ends the run as "Stopped" before the new case is drawn; closing the session mid-run
+  ends it as "Interrupted"
 
 ## Phase 5: Story 4 — interruptions (P2)
 
