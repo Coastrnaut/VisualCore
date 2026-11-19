@@ -21,7 +21,7 @@
 
 ## Phase 3: Stories 1–3 — the renderers (P1) 🎯
 
-- [ ] T-R02F09-003 [US1] [US3] Create `Packages/VisualCoreRendering/Sources/VisualCoreRendering/InstancingError.swift`
+- [X] T-R02F09-003 [US1] [US3] Create `Packages/VisualCoreRendering/Sources/VisualCoreRendering/InstancingError.swift` — Verified 2026-11-19: lead retest: R02-F09/rendering-27 exit=0, 219 tests 0 failures incl. InstancedMeshRendererTests (500 instances = 500 MeshRenderer draws, max 0/255)
   and `InstancedMeshRenderer.swift` (`MeshInstance`; per-instance matrix at locations 3–6 and colour at 7, divisor 1,
   reset after the draw; one `vcglDrawElementsInstanced`; shader of `MeshRenderer` with the instance matrix; fog;
   translucent: sorted with `InstanceOrder`, premultiplied blending, depth write off; limit 16,384; reused buffer;
