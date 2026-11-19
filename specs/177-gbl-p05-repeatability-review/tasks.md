@@ -79,7 +79,7 @@
 
 ## Phase 7: Convergence
 
-- [ ] T-A24-515 Say in "About these numbers" that a run ends as interrupted (Invalid) when the device becomes hot
+- [X] T-A24-515 Say in "About these numbers" that a run ends as interrupted (Invalid) when the device becomes hot — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A24-P05.gbl-ios27-3.json (64 experience, 95 core tests) and A24-P05.copy-explanation-2.json, exit 0
   (serious or critical thermal state), with its ExplanationTests assertion and the copy scan, per FR-A24-504 and
   T-A24-513 (partial)
 - [ ] T-A24-516 Add to device-campaign.md the expected "Interrupted: the device is hot" ending when a device reaches a

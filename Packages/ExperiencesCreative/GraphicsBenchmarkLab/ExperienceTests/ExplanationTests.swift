@@ -32,7 +32,8 @@ import GraphicsBenchmarkLabCore
     @Test func everyLimitOfUserStoryThreeIsNamed() {
         let text = GBLExplanation.fullText.lowercased()
         let limits = ["frame interval", "cpu", "gpu", "thermal", "low power mode", "display refresh", "background",
-                      "case version", "simulator", "rank", "a gap of over a second"]
+                      "case version", "simulator", "rank", "a gap of over a second",
+                      "ends as interrupted when the device becomes hot"]
         for limit in limits {
             let present = text.contains(limit)
             #expect(present, "the explanation names \(limit)")

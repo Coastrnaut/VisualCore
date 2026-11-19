@@ -47,7 +47,8 @@ enum GBLExplanation {
                 + "were dropped, there were too few frames for p99, or no device report was kept. An invalid run "
                 + "is not a measurement: it was stopped before the end, it was interrupted (for example by leaving "
                 + "the app, by the app going to the background, or by a gap of over a second between frames), or "
-                + "no frame was measured. Each result lists its reasons."),
+                + "no frame was measured. A run also ends as interrupted when the device becomes hot (a serious or "
+                + "critical thermal state), so the lab never keeps a hot device busy. Each result lists its reasons."),
         GBLExplanationSection(
             title: "Why numbers differ",
             text: "The same case can give other numbers from one run to the next and from one device to another. "
