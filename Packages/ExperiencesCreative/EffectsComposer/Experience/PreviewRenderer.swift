@@ -23,6 +23,12 @@
 //     ``lastResult`` (the result's pixels, rows top-down, read after each render that ran), ``renderCount`` and
 //     ``lastPlan``.
 //
+// Feature 182 (A25-P03) T-A25-305, T-A25-306 (clarifications Q1, Q4): `present(_:compare:)` draws the source target
+// instead of the result while compare is on (the result is still rendered whenever the chain changes, so turning
+// compare off shows it at once). Test seams: ``presentedTargetIsSource`` (what the last present drew),
+// ``lastPresentSize`` (the drawable of the last present) and ``sourceTextureName`` (the source's colour texture,
+// which no pass may write).
+//
 // Choice recorded here: the result target is held across frames (taken at setup, given back at release) rather than
 // taken and recycled each frame, so that a broken program keeps the last good picture in it; the slots come from the
 // pool and go back to it within each render. No GL call: programs, targets and draws are VisualCore's (`FieldPass`,
@@ -194,6 +200,13 @@ final class PreviewRenderer {
     private(set) var runFailure: String?
     /// The error of the last present pass that failed on the driver; nil after one that ran (a test seam).
     private(set) var presentFailure: String?
+    /// Whether the last present drew the source (compare on) rather than the result (a test seam).
+    private(set) var presentedTargetIsSource = false
+    /// The drawable size (pixels) of the last present that ran; nil before the first (a test seam).
+    private(set) var lastPresentSize: (width: Int, height: Int)?
+    /// The colour texture name of the source target; nil without one (a test seam for the aliasing audit).
+    var sourceTextureName: UInt32? { source?.colorTexture }
+
     /// Whether the chain last seen uses an effect whose program did not build (its picture is not drawn).
     private(set) var blocked = false
 
@@ -348,9 +361,10 @@ final class PreviewRenderer {
         }
     }
 
-    /// Draws the result letterboxed into the context's framebuffer (see the file header).
-    func present(_ context: RenderContext) {
-        guard let presentPass, let result,
+    /// Draws the result, or the source while `compare` is on, letterboxed into the context's framebuffer (see the
+    /// file header).
+    func present(_ context: RenderContext, compare: Bool = false) {
+        guard let presentPass, let result, let shown = compare ? source : result,
               let rect = Self.presentRect(width: context.pixelWidth, height: context.pixelHeight,
                                           side: result.width) else { return }
         let values: [String: [Float]] = [
@@ -360,9 +374,11 @@ final class PreviewRenderer {
         do {
             try presentPass.run(output: .framebuffer(name: context.framebuffer, width: context.pixelWidth,
                                                      height: context.pixelHeight),
-                                inputs: [EffectPrograms.sourceInput: result],
+                                inputs: [EffectPrograms.sourceInput: shown],
                                 uniforms: Self.uniforms(values, for: presentPass))
             presentFailure = nil
+            presentedTargetIsSource = compare
+            lastPresentSize = (context.pixelWidth, context.pixelHeight)
         } catch {
             presentFailure = "\(error)"
         }

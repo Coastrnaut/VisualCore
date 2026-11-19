@@ -22,6 +22,22 @@
 // and wrapped in the same envelope again on restore, so `ChainDocument` stays the only reader and writer of nodes and
 // every number is read back exactly as written). Restoring a payload `ChainDocument` refuses throws that
 // `ChainRefusal`; a restored core starts with an empty history.
+// Feature 182 (A25-P03) T-A25-304, T-A25-305 (clarifications Q1, Q3):
+//   view.compare [on 0…1]                          shows the source (1) or the result (0); not an edit (no history),
+//                                                  neither stored nor digested, so a restored core shows the result;
+//   chain.stage [index 0…7, id 1…65535, effect 0…4, on 0…1, v0…v3 −65535…65535]
+//                                                  holds node `index` of a chain to replace the current one with: its
+//                                                  identifier, effect, enabled flag and the raw values of its
+//                                                  parameters in definition order (the slots beyond the effect's
+//                                                  parameters are ignored); staging changes neither the chain nor the
+//                                                  history, and the staged nodes are neither stored nor digested;
+//   chain.replace [count 0…8]                      replaces the chain by the staged nodes 0..<count as one edit
+//                                                  (`ChainEdit.replace`, undone by replacing back the earlier chain)
+//                                                  and clears the staging; a position not staged is refused with
+//                                                  `a25.not-staged`, an invalid chain with its `ChainRefusal`.
+// Choice recorded here: an action carries at most 24 numbers (`ExperienceControl.maxValues`) and a chain needs up to
+// 8 × 7, so a preset is handed to the core node by node and committed by `chain.replace`; the raw values travel
+// exactly (no fraction conversion), so the opened chain equals the saved one with the same fingerprint.
 // Outcome (choice recorded here: the completion scenario needs one): nil for an empty chain, else `effects-<k>` with k
 // the number of enabled nodes. Quality: one tier, `level-0`.
 import EffectsComposerCore
@@ -35,6 +51,8 @@ public enum ComposerRule {
     public static let prefix = "a25."
     /// A value that must be whole is a fraction.
     public static let notWhole = "a25.not-whole"
+    /// `chain.replace` names a position no `chain.stage` filled.
+    public static let notStaged = "a25.not-staged"
 
     /// The rule id of a refused edit: `a25.<code>`.
     public static func id(_ refusal: ChainRefusal) -> String { prefix + refusal.code }
@@ -50,7 +68,7 @@ public struct ComposerCore: ExperienceCore {
     public static let digestDomain = "a25.effects-composer.v1"
     /// The action ids in declaration order.
     public static let actionIDs = ["chain.add", "chain.remove", "chain.move", "chain.enable", "chain.set",
-                                   "edit.undo", "edit.redo"]
+                                   "edit.undo", "edit.redo", "view.compare", "chain.stage", "chain.replace"]
     /// The effects in the order of `chain.add`'s first value.
     public static let effects: [EffectID] = EffectID.allCases
     /// The prefix of the outcome code (`effects-2`).
@@ -59,11 +77,17 @@ public struct ComposerCore: ExperienceCore {
     static let maxIndex = Double(ChainLimits.maxNodes - 1)
     /// The most parameters an effect has.
     static let maxParameters = 4
+    /// The magnitude bound of a staged raw value (`chain.stage`'s value slots).
+    static let maxStagedValue = 65_535.0
 
     /// The chain being edited.
     public private(set) var chain: EffectChain
     /// The undo and redo history of the chain's edits (not stored, not digested).
     public private(set) var history: EditHistory
+    /// Whether the preview shows the source instead of the result (`view.compare`; not stored, not digested).
+    public private(set) var compare = false
+    /// The nodes staged by `chain.stage` for the next `chain.replace`, by position (not stored, not digested).
+    public private(set) var staged: [Int: EffectNode] = [:]
 
     /// The opening state: an empty chain and an empty history.
     public init() {
@@ -91,9 +115,14 @@ public struct ComposerCore: ExperienceCore {
         ExperienceControl(id: "chain.set", ranges: [0...maxIndex, 0...Double(maxParameters - 1), 0...1]),
         ExperienceControl(id: "edit.undo", ranges: []),
         ExperienceControl(id: "edit.redo", ranges: []),
+        ExperienceControl(id: "view.compare", ranges: [0...1]),
+        ExperienceControl(id: "chain.stage", ranges: [0...maxIndex, Double(ChainLimits.nodeIDs.lowerBound)...Double(
+            ChainLimits.maxNodeID), 0...Double(EffectID.allCases.count - 1), 0...1]
+            + Array(repeating: -maxStagedValue...maxStagedValue, count: maxParameters)),
+        ExperienceControl(id: "chain.replace", ranges: [0...Double(ChainLimits.maxNodes)]),
     ]
 
-    /// The seven controls with their declared ranges (see the file header).
+    /// The ten with their declared ranges (see the file header).
     public static var controls: [ExperienceControl] { declaredControls }
 
     /// The opening state; nothing depends on the seed and no clock is read.
@@ -161,6 +190,31 @@ public struct ComposerCore: ExperienceCore {
         }
     }
 
+    /// The node `chain.stage` with `values` describes, with its position, or the rejection of a fraction where a
+    /// whole number is needed.
+    static func stagedNode(_ values: [Double]) -> Result<(index: Int, node: EffectNode), ActionRejection> {
+        guard let index = whole(values[0]), let id = whole(values[1]), let effect = whole(values[2]),
+              let on = whole(values[3]) else { return .failure(.rule(code: ComposerRule.notWhole)) }
+        guard effects.indices.contains(effect) else { return .failure(.outOfRange(index: 2)) }
+        let definition = EffectLibrary.definition(effects[effect])
+        var parameters: [String: Double] = [:]
+        for (slot, parameter) in definition.parameters.enumerated() where slot < maxParameters {
+            parameters[parameter.name] = values[4 + slot]
+        }
+        return .success((index, EffectNode(id: id, effect: effects[effect], enabled: on == 1, values: parameters)))
+    }
+
+    /// The edit `chain.replace [count]` asks for: the staged nodes 0..<count, or `a25.not-staged`.
+    private func replacement(_ values: [Double]) -> Result<ChainEdit?, ActionRejection> {
+        guard let count = Self.whole(values[0]) else { return .failure(.rule(code: ComposerRule.notWhole)) }
+        var nodes: [EffectNode] = []
+        for index in 0..<count {
+            guard let node = staged[index] else { return .failure(.rule(code: ComposerRule.notStaged)) }
+            nodes.append(node)
+        }
+        return .success(.replace(EffectChain(nodes: nodes)))
+    }
+
     /// Carries out a well-formed action (see the file header); a refused action changes nothing.
     public mutating func apply(_ action: ExperienceAction) -> ActionResult {
         if let refusal = ExperienceInput.validate(control: action.control, values: action.values,
@@ -170,6 +224,24 @@ public struct ComposerCore: ExperienceCore {
         var history = self.history
         let result: Result<EffectChain, ChainRefusal>
         switch action.control {
+        case "view.compare":
+            guard let on = Self.whole(action.values[0]) else { return .rejected(.rule(code: ComposerRule.notWhole)) }
+            compare = on == 1
+            return .accepted
+        case "chain.stage":
+            switch Self.stagedNode(action.values) {
+            case .failure(let rejection): return .rejected(rejection)
+            case .success(let staging):
+                staged[staging.index] = staging.node
+                return .accepted
+            }
+        case "chain.replace":
+            switch replacement(action.values) {
+            case .failure(let rejection): return .rejected(rejection)
+            case .success(let edit):
+                result = history.apply(edit ?? .replace(chain), to: chain)
+            }
+            if case .success = result { staged = [:] }
         case "edit.undo":
             result = history.undo(chain)
         case "edit.redo":

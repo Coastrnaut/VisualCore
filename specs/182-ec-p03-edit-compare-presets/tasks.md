@@ -27,7 +27,7 @@
 
 ## Phase 3: Story 1 — compare (P1)
 
-- [ ] T-A25-305 [US1] Add `view.compare` to `Packages/ExperiencesCreative/EffectsComposer/Experience/Adapter/ComposerCore.swift`, the compare present path to
+- [X] T-A25-305 [US1] Add `view.compare` to `Packages/ExperiencesCreative/EffectsComposer/Experience/Adapter/ComposerCore.swift`, the compare present path to — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P03.ec-ios27.json exit 0 (44 core and 45 experience tests on sim-27.2); CompareTests: on shows the source, off the result, empty chain the source, source shown again after recreateContext
   `Packages/ExperiencesCreative/EffectsComposer/Experience/PreviewRenderer.swift` and the `compare` toggle to `ECControls` per clarification Q1; write
   `Packages/ExperiencesCreative/EffectsComposer/ExperienceTests/CompareTests.swift`: on shows the source's pixels, off the result's; empty chain both the source;
   after `recreateContext` with compare on the source is shown again
