@@ -542,10 +542,19 @@ VisualCoreEffects | var | public var reduceFlashing
 VisualCoreEffectsGraph | enum | public enum EffectGraphError: Error, Equatable, Sendable
 VisualCoreEffectsGraph | enum | public enum EffectGraphValidator
 VisualCoreEffectsGraph | enum | public enum EffectsGraphInfo
+VisualCoreEffectsGraph | enum | public enum EmissiveReference
 VisualCoreEffectsGraph | enum | public enum PassSchemas
+VisualCoreEffectsGraph | enum | public enum ToneMapOperator: Int, Sendable, CaseIterable
 VisualCoreEffectsGraph | func | public mutating func reset()
 VisualCoreEffectsGraph | func | public mutating func step(measured: Double, dt: Double) -> (displayed: Double, gain: Double, bias: Double)
+VisualCoreEffectsGraph | func | public static func composite(base: SIMD3<Double>, glow: SIMD3<Double>, intensity: Double, exposure: Double,
+VisualCoreEffectsGraph | func | public static func luminance(_ rgb: SIMD3<Double>) -> Double
+VisualCoreEffectsGraph | func | public static func prefilter(_ rgb: SIMD3<Double>, threshold: Double, knee: Double) -> SIMD3<Double>
+VisualCoreEffectsGraph | func | public static func premultipliedOver(overlay: SIMD4<Double>, base: SIMD4<Double>, opacity: Double) -> SIMD4<Double>
 VisualCoreEffectsGraph | func | public static func schema(for type: String) -> PassSchema?
+VisualCoreEffectsGraph | func | public static func srgbDecode(_ x: Double) -> Double
+VisualCoreEffectsGraph | func | public static func srgbEncode(_ x: Double) -> Double
+VisualCoreEffectsGraph | func | public static func toneMap(_ x: Double, _ op: ToneMapOperator) -> Double
 VisualCoreEffectsGraph | func | public static func validate(_ graph: EffectGraphDescription, width: Int, height: Int,
 VisualCoreEffectsGraph | init | public init(_ defaultValue: [Double], _ range: ClosedRange<Double>)
 VisualCoreEffectsGraph | init | public init(from decoder: Decoder) throws
@@ -561,6 +570,7 @@ VisualCoreEffectsGraph | let | public let order: [String]
 VisualCoreEffectsGraph | let | public let parameters: [String: ParameterSpec]
 VisualCoreEffectsGraph | let | public let parameters: [String: [String: [Double]]]
 VisualCoreEffectsGraph | let | public let range: ClosedRange<Double>
+VisualCoreEffectsGraph | let | public let refusesOutOfRange: Bool
 VisualCoreEffectsGraph | let | public let type: String
 VisualCoreEffectsGraph | let | public let warnings: [String]
 VisualCoreEffectsGraph | let | public static let all: [String: PassSchema]
@@ -2625,6 +2635,7 @@ VisualCoreShaderSource | let | public static let maxValueLength
 VisualCoreShaderSource | let | public static let maxValuesPerSwitch
 VisualCoreShaderSource | let | public static let opaque
 VisualCoreShaderSource | let | public static let opaque3D
+VisualCoreShaderSource | let | public static let premultipliedBlended
 VisualCoreShaderSource | let | public static let version
 VisualCoreShaderSource | let | public static let versionLine
 VisualCoreShaderSource | struct | public struct ColorMask: Hashable, Sendable

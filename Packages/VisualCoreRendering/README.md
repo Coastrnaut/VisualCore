@@ -405,6 +405,13 @@ gives `ShaderError.reasonCode` and checks a `UniformLayout` (`check(_:)`); `Para
 `ParameterSchema`'s values on the `u_<name>` float uniforms, clamped, refusing non-finite values. Rules:
 [docs/architecture/shaders.md](../../docs/architecture/shaders.md).
 
+## Emissive pass (feature 207, R02-F07)
+
+`EffectRenderer` draws the `emissive` pass in four draws over two pooled blur targets of half or a quarter of the
+output size (half-float where supported), with exposure and tone mapping in linear light; `EffectScene` makes its
+flash limiter measure linear light for graphs that contain it. Rules:
+[docs/architecture/shaders.md](../../docs/architecture/shaders.md).
+
 ## Resource ownership and pipelines (feature 204, R02-F04)
 
 The ownership rules are unchanged: every GPU handle carries its context generation, stale handles are refused and

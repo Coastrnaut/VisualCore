@@ -49,6 +49,24 @@ program's `u_<name>` float uniforms (`ParameterUniformBinding`): values are clam
 is refused before anything is set, and a parameter without a uniform is reported once. Bindings hold no GPU object
 across a context rebuild; they are made again from the new program and give the same uniform values.
 
+## Emissive pass and mobile-safe bloom (R02-F07, feature 207)
+
+The effect graph's `emissive` pass gives glowing looks that behave like light, cheaply enough for phones:
+- the input (an 8-bit sRGB-encoded scene) is decoded to linear light, without clamping above 1 in the intermediates;
+- light above a threshold (linear units, quadratic soft knee) is extracted while the picture is reduced to half or a
+  quarter of its size, blurred there with a separable 9-tap Gaussian, and added back with one bilinear upsample —
+  four draws (prefilter, horizontal and vertical blur, composite), two small targets from the pool, returned every frame;
+- an exposure in stops and a tone map (none by default, Reinhard, or the Narkowicz ACES fit) are applied before the
+  result is encoded to sRGB; the input's alpha is kept;
+- the blur targets are half-float where the device can draw into them; otherwise they are 8-bit, the glow is limited
+  to 1, and the renderer warns once;
+- `composite` mode 2 is premultiplied "over" and `RenderState.premultipliedBlended` draws premultiplied layers, so soft
+  edges have no fringes;
+- when flashing is reduced, the flash limiter still runs last and, for graphs that contain an emissive pass, measures
+  brightness in linear light. Existing graphs measure as before.
+The formulas live once on the CPU (`EmissiveReference`, VisualCoreEffectsGraph) and the GPU passes are tested against
+them.
+
 ## Out of scope
 
 Uniform blocks, shader binaries on disk, shaders downloaded at run time. The device drivers' behaviour is checked in

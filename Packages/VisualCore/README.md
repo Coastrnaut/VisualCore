@@ -351,6 +351,14 @@ a float precision statement `highp` or `mediump` from the device report and flag
 `UniformLayout` declares uniforms and checks them against a program's active ones; `ShaderReasonCode` and
 `ShaderFailureReport` name every refusal. Rules: [docs/architecture/shaders.md](../../docs/architecture/shaders.md).
 
+## Emissive reference and pass schema (feature 207, R02-F07)
+
+VisualCoreEffectsGraph declares the `emissive` pass (threshold, knee, intensity, radius, quality, exposure, tonemap)
+and holds its CPU reference, `EmissiveReference` (sRGB transfer, luminance, soft-knee prefilter, tone maps,
+composite, premultiplied over); `composite` mode 2 is premultiplied over; the validator refuses non-finite parameters
+and out-of-range emissive ones. `RenderState.premultipliedBlended` draws premultiplied layers. Rules:
+[docs/architecture/shaders.md](../../docs/architecture/shaders.md).
+
 ## Numerical foundations (feature 203, R02-F03)
 
 Time and randomness reuse `FixedStepClock`, `SceneClock`, `SplitMix64` and `SeededRandom` unchanged; their output and

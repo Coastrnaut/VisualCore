@@ -78,7 +78,7 @@
     "RenderTarget"
    ],
    "home": "VisualCoreEffects",
-   "note": "Linear-colour emissive pass and mobile-safe bloom; the bloom and flash limiter of VisualCoreEffects are the starting point."
+   "note": "As built (feature 207): the effect graph gains the emissive pass (decode to linear light without clamping intermediates, quadratic soft-knee extraction while reducing to half or a quarter, separable 9-tap Gaussian there, one bilinear upsample, exposure, tone map none/Reinhard/ACES fit, sRGB encode; half-float blur targets via FloatRenderSupport, 8-bit with one warning otherwise; four draws, two pooled targets); composite mode 2 is premultiplied over and RenderState.premultipliedBlended joins the presets; the flash limiter measures linear light for graphs with an emissive pass; EmissiveReference is the CPU reference; the validator refuses non-finite parameters for every pass and out-of-range ones for emissive (docs/architecture/shaders.md)."
   },
   "F08": {
    "disposition": "new",
