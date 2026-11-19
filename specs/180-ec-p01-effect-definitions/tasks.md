@@ -22,7 +22,7 @@
   `ParameterSpec` (range closed and finite, default inside, whole), `EffectDefinition` (fingerprint domain
   `a25.effect.v1`), `EffectLibrary.all` (grade, blur, distort, vignette, posterize) and value validation naming the
   effect and parameter
-- [ ] T-A25-104 [P] [US1] Write `Packages/ExperiencesCreative/EffectsComposer/CoreTests/DefinitionTests.swift`: every default validates; unknown, missing,
+- [ ] T-A25-104 [US1] Write `Packages/ExperiencesCreative/EffectsComposer/CoreTests/DefinitionTests.swift`: every default validates; unknown, missing,
   non-finite, fractional-whole and out-of-range values are refused with their code; fingerprints are distinct and stable
 
 ## Phase 3: Story 2 — a chain that can be edited and undone exactly (P1)
@@ -31,7 +31,8 @@
   nodes, identifiers 1…65,535 unique (smallest unused for a new node), the five edits with move's index semantics,
   `EditHistory` (undo and redo, depth 64, a new edit clears redo, a refused edit changes nothing), the chain
   fingerprint (domain `a25.effect-chain.v1`)
-- [ ] T-A25-106 [P] [US2] Write `Packages/ExperiencesCreative/EffectsComposer/CoreTests/{ChainTests,HistoryTests}.swift`: caps and refusals; a recorded sequence of
+- [ ] T-A25-106 [US2] Write `Packages/ExperiencesCreative/EffectsComposer/CoreTests/{ChainTests,HistoryTests}.swift`: caps and refusals;
+  empty, full-length, all-disabled and duplicate-effect chains and values at exactly a range end are valid; a recorded sequence of
   every edit kind undone to the start is equal with the same fingerprint, and redone to the end equal again; undo or redo
   with nothing to do is refused; the depth cap drops the oldest edit
 
@@ -60,7 +61,7 @@
   - `--name ec-core-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme
     ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing EffectsComposerCoreTests`, with each
     test under 10 s;
-  - the purity scan (`--name core-purity -- sh -c '! grep -rnE "import (UIKit|SwiftUI|OpenGLES|VisualCoreRendering)|vcgl|Date\\(\\)" Packages/ExperiencesCreative/EffectsComposer/Core'`);
+  - the purity scan (`--name core-purity -- sh -c '! grep -rnE "import (UIKit|SwiftUI|OpenGLES|VisualCoreRendering)|vcgl|Date\(\)" Packages/ExperiencesCreative/EffectsComposer/Core'`);
   - the documented API (`--name documented-api -- python3 scripts/check_documented_api.py --sources Packages/ExperiencesCreative/EffectsComposer`);
   - the isolation check (`--name isolation -- python3 scripts/check_app_isolation.py --experiences Packages/ExperiencesCreative/EffectsComposer`).
 - [ ] T-A25-112 Contract `docs/apps/effects-composer/visualcore-contract.json`: G-MODEL and G-EFFECTS are closed by
