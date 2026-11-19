@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "sh",
+    "specs/185-ec-p06-release/scan-sources-release.sh"
+  ],
+  "command": "sh specs/185-ec-p06-release/scan-sources-release.sh",
+  "elapsed_seconds": 0.06,
+  "exit_code": 0,
+  "finished": "2026-11-19T21:04:37+00:00",
+  "log": ".autonomy/logs/A25-P06.scan-sources.log",
+  "log_sha256": "e4eeb70a94b7059b323dc77aa68627cd592d545565c9e6d7912a0e4f020b9791",
+  "name": "scan-sources",
+  "stage": "A25-P06",
+  "started": "2026-11-19T21:04:37+00:00",
+  "timed_out": false
+}

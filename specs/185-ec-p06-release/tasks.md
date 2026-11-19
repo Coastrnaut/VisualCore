@@ -16,7 +16,7 @@
   clarification "Stored data"; the picker; the export and the add-only Photos prompt with its usage string word for
   word; "Nothing is sent automatically"; code-made visuals) and `docs/apps/effects-composer/licenses.md` (the licence
   inventory: VisualCore's own code and the system frameworks; no third-party asset)
-- [ ] T-A25-603 [P] [US1] Write `specs/185-ec-p06-release/scan-sources-release.sh` per contracts/release.md (after
+- [X] T-A25-603 [P] [US1] Write `specs/185-ec-p06-release/scan-sources-release.sh` per contracts/release.md (after — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P06.scan-sources.json (exit 0; 47 Swift files; PhotosUI, PhotosPicker, ShareLink only in ECControls.swift; whole-line comments skipped for those three names, stated in the header)
   `specs/178-gbl-p06-release/scan-sources-release.sh`; `PhotosUI`, `PhotosPicker`, `ShareLink` only in
   `Experience/ECControls.swift`, each required there); `--name scan-sources`
 
