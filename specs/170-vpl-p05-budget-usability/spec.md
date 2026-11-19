@@ -22,6 +22,40 @@ Canonical overrides:
 - **Still a candidate:** not available to a person until X-A23.
 - **No VisualCore or ProjectM change.** Follow `specs/163-ss-p05-stress-recovery`.
 
+## Clarifications
+
+### Session 2026-11-19
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- **Seams from A23-P03/P04:** the presenter's `pipeline` exposes `runCount` (passes run), `compileCount`, `state`,
+  `slots` and `fragmentOverrides`; the presenter's `graphOverride` draws a graph that no action can build; the host's
+  `ResourceRegistry.stats` gives `liveCount` per kind, `totalBytes` and `leaked`.
+- **Interface tests:** Shader Studio's tests launch with `-vcResetData`, `-vcSkipWelcome`, `-vcCandidates` and
+  `-openExperience <id>` and run in a serial chunk of `scripts/release_check.py` (`UI_CHUNKS`, `SERIAL_CHUNKS`).
+
+- Q: What is a stress cycle, and how is "no growth" judged? → A: One cycle adds a Mix, connects it, disconnects and
+  removes it, opens the next example (of three), draws, then draws a 7-slot graph through `graphOverride` (refused) and
+  returns to the example; every 10th cycle also rebuilds the context. The level (`liveCount` per kind and `totalBytes`)
+  after cycle 1 (the warm-up) equals the level after cycle 50, and `leaked` is 0.
+- Q: How is "no unnecessary pass" counted? → A: Through `runCount` over one frame: Gradient into Output runs 2 passes
+  (gradient, output); adding an unconnected Noise and a Constant feeding nothing keeps 2 and the same pixels (within 2
+  of 255 of the gradient reference); the journey graph runs 6 (noise, gradient, mix, blur-h, blur-v, output).
+- Q: Which states are rebuilt, and how? → A: ready (the starter), invalid (Output disconnected), refused (a 7-slot
+  graph), failed (an operator text replaced through `fragmentOverrides`) and hidden (the preview switched off); in each,
+  10 `recreateContext` calls each followed by a frame give a byte-identical off-screen still, the same state, the same
+  level and `leaked` 0. A compile requested just before a rebuild happens once, at the first frame after it.
+- Q: Which interface tests, and where? → A: `Apps/VisualCore/Tests/UI/VisualProgrammingLab/` with `VPLSupport`
+  (after `SSSupport`), `VPLCanvasUITests` (add a Mix from the add menu; pick sources in the list form for its two image
+  inputs and for the Output; the status reads "Ready"; pick Constant's colour for Noise's scale and read the refusal
+  sentence in `feedback`) and `VPLRecoveryUITests` (save "Clouds" from the library, terminate, relaunch without
+  `-vcResetData`; the row is listed and opens), each under 60 seconds, in a new serial chunk `e3`.
+- Q: What does the device plan hold? → A: `docs/apps/visual-programming-lab/device-campaign.md`, after Shader Studio's,
+  with rows VPL-D1 to VPL-D6 for D1 (iPhone 15, iOS 27), D2 (iPad Pro 13-inch, M5) and D3 (iPad, A16, iPadOS 26.5):
+  the largest example's memory and pacing; a 7-slot refusal; touch wiring on the phone and the list form; preview
+  pacing at 30 frames per second under heat; context loss on background and return; the accessibility audits (VoiceOver
+  through the list form, Dynamic Type). All pending; G-DEVICE closes as the plan (the A22-P05 precedent).
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Heavy editing never grows the memory in use (Priority: P1) 🎯
