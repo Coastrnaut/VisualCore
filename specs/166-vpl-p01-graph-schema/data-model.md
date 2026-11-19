@@ -19,3 +19,15 @@
   `type-mismatch(edge, from, to)`, `input-already-connected(node, port)`, `duplicate-edge(edge)`, `cycle([edge])`,
   `no-output`, `multiple-outputs([id])`, `output-disconnected(id)`, `input-unconnected(node, port)`.
 - **CheckResult:** `accepted(order: [NodeID], reaching: Set<NodeID>)` or `refused([GraphIssue])`.
+- **As built (A23-P01):**
+  - **`VisualGraph`** stores `nodes` and `edges` only. `outputNodes` (the identities of the nodes of kind `output`,
+    ascending) and `output` (the single one, or nil) are derived, so the fingerprint covers the output through the
+    nodes.
+  - **`NodeKind`** has `input(_:)`, `output(_:)` and `parameter(_:)` in place of `port(_:)`, because blur has an input
+    and an output named `image`. `GraphNode.value(of:)` gives the stored value or the kind's default.
+  - **`GraphDocument`** also refuses an edge end outside 1…9,999 as `out-of-range`, reads `"NaN"`, `"Infinity"` and
+    `"-Infinity"` strings as `not-finite`, and refuses a non-finite value of any parameter, declared or not (undeclared
+    names stay the checker's). `GraphDocumentRefusal.code` gives the code.
+  - **`GraphChecker`** reports a duplicated identity once; a missing source and a missing target node of one edge are
+    both reported; a repeated edge gives only `duplicate-edge`; `input-unconnected` covers nodes that do not reach the
+    output, and the output's own empty input is `output-disconnected`.

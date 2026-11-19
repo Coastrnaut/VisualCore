@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_documented_api.py",
+    "--sources",
+    "Packages/ExperiencesCreative/VisualProgrammingLab"
+  ],
+  "command": "python3 scripts/check_documented_api.py --sources Packages/ExperiencesCreative/VisualProgrammingLab",
+  "elapsed_seconds": 0.396,
+  "exit_code": 0,
+  "finished": "2026-11-19T02:46:21+00:00",
+  "log": ".autonomy/logs/A23-P01.documented-api-2.log",
+  "log_sha256": "865466126336e1b3bc3127780390bda20969d8c2fe558e2283ac8bf576813763",
+  "name": "documented-api-2",
+  "stage": "A23-P01",
+  "started": "2026-11-19T02:46:20+00:00",
+  "timed_out": false
+}

@@ -8,22 +8,23 @@ enum PortDirection: String { input, output }
 struct PortDeclaration { name, direction, type, required }
 enum NodeKind: String, CaseIterable { time, constant, noise, gradient, mix, blur, output }
   var inputs: [PortDeclaration]; var outputs: [PortDeclaration]; var parameters: [ParameterDefinition]
-  func port(_ name: String) -> PortDeclaration?
-struct NodeID: RawRepresentable<Int>, Comparable (1…9,999)
+  func input(_ name: String) -> PortDeclaration?; func output(_ name: String) -> PortDeclaration?
+  func parameter(_ name: String) -> ParameterDefinition?
+struct NodeID: Comparable { rawValue: Int; init(_:); validRange 1…9,999; isValid }
 struct CanvasPoint { x, y }
 struct GraphNode { id, kind, parameters, position }
 struct GraphEdge: Comparable { sourceNode, sourcePort, targetNode, targetPort }
 struct GraphLimits { static maxNodes = 32; static maxEdges = 64 }
-struct VisualGraph { nodes, edges, output }
+struct VisualGraph { nodes, edges; outputNodes: [NodeID] (derived); output: NodeID? (derived) }
 enum GraphDocument {
   static kind = "a23.visual-graph"; static schemaVersion = 1; static maxEncodedBytes = 65_536
   static migrations: MigrationChain
-  static func encode(_ graph: VisualGraph) throws -> Data
+  static func encode(_ graph: VisualGraph) throws(GraphDocumentRefusal) -> Data
   static func decode(_ data: Data) throws(GraphDocumentRefusal) -> VisualGraph
-  static func fingerprint(of graph: VisualGraph) throws -> StateDigest
+  static func fingerprint(of graph: VisualGraph) throws(GraphDocumentRefusal) -> StateDigest
 }
-enum GraphDocumentRefusal: Error { damaged, newerVersion, tooLarge, notFinite, outOfRange }  (codes as data-model)
-enum GraphIssue: Error, Equatable  (cases as data-model)
+enum GraphDocumentRefusal: String, Error { damaged, newerVersion, tooLarge, notFinite, outOfRange; code }
+enum GraphIssue: Error, Equatable, Hashable  (cases as data-model; code)
 enum CheckResult { accepted(order:reaching:), refused([GraphIssue]) }
 enum GraphChecker { static func check(_ graph: VisualGraph) -> CheckResult }
 ```

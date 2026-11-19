@@ -109,7 +109,7 @@
 
 ## Phase 6: Convergence
 
-- [ ] T-A23-113 Record the as-built design in `specs/166-vpl-p01-graph-schema/data-model.md` and `contracts/core.md`, per plan: data model and contracts/core.md (contradicts, unrequested):
+- [X] T-A23-113 Record the as-built design in `specs/166-vpl-p01-graph-schema/data-model.md` and `contracts/core.md`, per plan: data model and contracts/core.md (contradicts, unrequested): — Verified 2026-11-18: 2026-11-18: as-built design recorded in data-model.md and contracts/core.md (derived output, input(_:)/output(_:)/parameter(_:), edge-end and NaN-string refusals, refusal code, checker reporting rules); .autonomy/checks/A23-P01.documented-api-2.json exit 0; docs only, A23-P01.vpl-core-ios27.json stands
   - `VisualGraph` stores `nodes` and `edges` only; `outputNodes` and `output` are derived from the nodes of kind `output`, so the fingerprint covers the output through the nodes;
   - `NodeKind` has `input(_:)`, `output(_:)` and `parameter(_:)` in place of `port(_:)`, because blur has an input and an output named `image`;
   - `GraphDocument` refuses edge ends outside 1…9,999 as `out-of-range`, reads `"NaN"`, `"Infinity"` and `"-Infinity"` strings as `not-finite`, refuses a non-finite value of any parameter (declared or not), and `GraphDocumentRefusal.code` gives the refusal code;
