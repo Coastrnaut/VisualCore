@@ -46,7 +46,7 @@
   actions, the recorder (interval from consecutive frame times, absent for the first; `cpuMs` from `ContinuousClock`
   around the workload draw; `gpuMs` absent), the status words and summary text, inline case buttons, 60 frames per
   second, tier `level-0`
-- [ ] T-A24-208 [US2] [US3] Write `ExperienceTests/{BenchCoreTests,RecorderTests}.swift` (SC-A24-202, 203): actions and
+- [X] T-A24-208 [US2] [US3] Write `ExperienceTests/{BenchCoreTests,RecorderTests}.swift` (SC-A24-202, 203): actions and — Verified 2026-11-19: 2026-11-19: .autonomy/checks/A24-P02.gbl-ios27.json exit 0 (50 core and 33 experience tests on sim-27.2); BenchCoreTests and RecorderTests pass (phases, measured-only summary, gpuMs nil and no GPU key, flag and sentence, stop, case change, close and rebuild mid-run)
   refusals; a run fed synthetic frame times passes warm-up, measure and cool-down and finishes with a summary counting
   only measured frames; every sample has `gpuMs` nil and the encoded run file holds no GPU value; the summary has no
   GPU distribution and the flag "gpu-time-not-available"; the status text names it; stop mid-run gives "Stopped";
