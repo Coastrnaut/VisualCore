@@ -119,8 +119,8 @@ the separation check for every deficiency; a red–green pair is reported under 
 
 1. **Given** a colour and a deficiency, **When** it is simulated, **Then** the result matches the reference values within
    1e-6, and a neutral grey is unchanged.
-2. **Given** a palette, **When** it is checked, **Then** every pair whose perceptual difference falls below the stated
-   threshold under any deficiency is reported with the pair and the deficiency.
+2. **Given** a palette, **When** it is checked, **Then** every pair whose ΔE_OK falls below 0.08 under normal vision or any
+   deficiency is reported with the pair and the deficiency.
 3. **Given** a built-in preset, **When** it is checked, **Then** no pair is reported.
 
 ### User Story 3 - Hue and brightness change without breaking contrast (Priority: P2)
@@ -128,8 +128,7 @@ the separation check for every deficiency; a red–green pair is reported under 
 The engineer of Hue Compass rotates hues and dims colours over time. Hue rotation keeps perceived lightness, brightness
 is compared perceptually, and a contrast ratio can be computed for any two colours, not only interface colours.
 
-**Independent Test**: a rotation by 360° returns the colour; a rotation keeps the perceptual lightness within the stated
-tolerance; the CPU and shader results agree on the simulator; the contrast of black and white is 21.
+**Independent Test**: a rotation by 360° returns the colour; a rotation keeps the perceptual lightness within 1e-9; the CPU and shader results agree on the simulator; the contrast of black and white is 21.
 
 **Acceptance Scenarios**:
 
