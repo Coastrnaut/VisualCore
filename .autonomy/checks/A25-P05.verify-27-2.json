@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a25.effects-composer",
+    "--runtime",
+    "27"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a25.effects-composer --runtime 27",
+  "elapsed_seconds": 62.956,
+  "exit_code": 0,
+  "finished": "2026-11-19T20:56:58+00:00",
+  "log": ".autonomy/logs/A25-P05.verify-27-2.log",
+  "log_sha256": "94f84d3054ba6099412072982e01e53486850840bf3d2b653b97537b3758e4af",
+  "name": "verify-27-2",
+  "stage": "A25-P05",
+  "started": "2026-11-19T20:55:55+00:00",
+  "timed_out": false
+}
