@@ -16,7 +16,7 @@
 
 ## Phase 2: Stories 1–2 — no growth; exact passes (P1) 🎯
 
-- [ ] T-A23-502 [P] [US1] Write `Packages/ExperiencesCreative/VisualProgrammingLab/ExperienceTests/StressCycleTests.swift`
+- [X] T-A23-502 [P] [US1] Write `Packages/ExperiencesCreative/VisualProgrammingLab/ExperienceTests/StressCycleTests.swift` — Verified 2026-11-19: 2026-11-19: StressCycleTests: 50 mixed cycles (a Mix added, wired, unwired and removed; the next example opened; a 7-slot graph refused; every 10th cycle a context rebuild), leaked 0 after every cycle, every cycle's level equal to the first cycle showing the same example (three examples hold 1, 2 and 3 slots, so cycle 50 is compared with cycle 2 and cycle 49 with cycle 1); the level comparison after a rebuild needed the pipeline fix of T-A23-504; .autonomy/checks/A23-P05.vpl-ios27.json exit 0 (162 core and 73 experience tests on sim-27.2); written by an agent, one #expect comment fixed by the lead, retested
   per clarification Q1 (SC-A23-501): 50 cycles (add, connect, disconnect and remove a Mix; open the next example; a
   7-slot graph through `graphOverride`, refused; back to the example; every 10th cycle a `recreateContext`), the level
   after cycle 1 equal to the level after cycle 50, `leaked` 0, each test under 10 s; fix any leak found in the
