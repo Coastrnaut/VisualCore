@@ -54,7 +54,7 @@
 
 ## Phase 4: Story 3 — nothing breaks (P2)
 
-- [ ] T-A25-506 [US3] `Packages/ExperiencesCreative/EffectsComposer/ExperienceTests/RobustnessTests.swift` and the
+- [X] T-A25-506 [US3] `Packages/ExperiencesCreative/EffectsComposer/ExperienceTests/RobustnessTests.swift` and the — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P05.ec-ios27.json (exit 0; RobustnessTests: 10 rebuilds byte-identical, interrupted export no file, two sizes, memory warning 11→9 live)
   presenter's memory-warning observer (injected `NotificationCenter`, `trimPools()`): 10 rebuilds byte-identical; an
   export interrupted by `recreateContext` in `beforeReadBack` fails as `a25.export-interrupted` with no file and the
   next export succeeds; two framebuffer sizes letterbox the same result; a memory warning leaves the preview
