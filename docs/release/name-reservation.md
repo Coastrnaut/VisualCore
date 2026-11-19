@@ -105,4 +105,11 @@ owner's action.
 | 2026-11-14 | Preparation by the agent | done (table above) |
 | — | Owner steps 1–7 | `BLOCKED_OWNER_ACTION` |
 | 2026-11-18 | Early-release preparation by the agent after X-A22 (owner request: direct App Store release, no TestFlight) | done (section above) |
-| — | Early-release owner steps 1–9 | `BLOCKED_OWNER_ACTION` |
+| 2026-11-18 | Owner asked the agent to do the upload by computer control | the agent did the steps below with the owner signed in |
+| 2026-11-18 | Bundle identifier | kept `dev.visualcore.VisualCore` (owner: "everything looks good") |
+| 2026-11-18 | App ID | registered in the developer portal (explicit, `dev.visualcore.VisualCore`) |
+| 2026-11-18 | App Store Connect record | created: name VisualCore, iOS, English (U.S.), SKU `visualcore-ios`, full access (the name is reserved) |
+| 2026-11-18 | App icon | added, drawn in code by `scripts/make_app_icon.py` (the first upload was refused for a missing icon) |
+| 2026-11-18 | Build | 1.0.0 (1) archived and uploaded with `xcodebuild -exportArchive` (method app-store-connect, automatic signing) |
+| 2026-11-18 | Listing | promotional text, description, keywords, copyright, review notes, subtitle and categories (Entertainment, Graphics & Design) entered; "Sign-in required" off |
+| — | Content rights, age rating, App Privacy, pricing, support and privacy policy URLs, review contact, screenshots, build selection, Submit for Review | `BLOCKED_OWNER_ACTION` (screenshots in `Build/screenshots/`, not committed) |
