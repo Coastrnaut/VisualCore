@@ -11,7 +11,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T-A23-601 Baseline: cite the A23-P05 evidence (`.autonomy/checks/A23-P05.{vpl-ios27-2,app-unit-2,verify-27}.json`)
+- [X] T-A23-601 Baseline: cite the A23-P05 evidence (`.autonomy/checks/A23-P05.{vpl-ios27-2,app-unit-2,verify-27}.json`) — Verified 2026-11-19: 2026-11-19: .autonomy/checks/A23-P05.{vpl-ios27-2,app-unit-2,verify-27}.json exit 0; Packages/ExperiencesCreative, Apps and project.yml unchanged since 4318a204
   on the tree recorded at A23-P05, whose `Packages/ExperiencesCreative`, `Apps` and `project.yml` are unchanged since
   `4318a204` (owner ruling of 2026-11-14)
 
