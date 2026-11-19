@@ -380,6 +380,13 @@ pending query (`disjointCount`). A timer of an older context generation reads no
 Call it only inside scene callbacks. Tested by `RegistryCapabilitiesTests` and `GPUFrameTimerTests`; simulator times
 are context only.
 
+## Byte upload into a render target (feature 183, A25-P04)
+
+`RenderTarget.upload(rgba:)` replaces a target's colour texture with RGBA bytes, rows bottom-up: `.rgba8` stores the
+bytes as given and `.rgba16f` stores each byte n as n/255. It needs width × height × 4 bytes, a quarter of the memory
+of `upload(rgbaFloats:)`, so a decoded picture can become a `FieldPass` input directly. `.r8`, a wrong count and a
+stale or released target are refused (false). Call it only inside scene callbacks. Tested by `ByteUploadTests`.
+
 ## Haptics and announcements (feature 226, R02-F26)
 
 `ExperienceFeedback.shared` routes an experience's `port.haptic(_:)` and `port.announce(_:kind:)` to the system's

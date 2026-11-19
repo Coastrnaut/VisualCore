@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_documented_api.py",
+    "--sources",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering"
+  ],
+  "command": "python3 scripts/check_documented_api.py --sources Packages/VisualCoreRendering/Sources/VisualCoreRendering",
+  "elapsed_seconds": 0.642,
+  "exit_code": 0,
+  "finished": "2026-11-19T20:06:41+00:00",
+  "log": ".autonomy/logs/A25-P04.documented-api-rendering.log",
+  "log_sha256": "da10fd189f02a91655c5ba063550a1db44cb74eb8b82b14d8ef7fad463c2784f",
+  "name": "documented-api-rendering",
+  "stage": "A25-P04",
+  "started": "2026-11-19T20:06:40+00:00",
+  "timed_out": false
+}

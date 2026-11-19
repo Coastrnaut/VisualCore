@@ -18,7 +18,7 @@
   contracts/visualcore.md; `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/ByteUploadTests.swift`: bytes into `.rgba8` read back
   equal, into `.rgba16f` within half-float precision of n/255 (read with `readFloatPixels`), `.r8`, a wrong count and a
   stale target after `recreateContext` refused (FR-A25-401)
-- [ ] T-A25-403 The public API baseline (`python3 scripts/check_public_api.py --update`, then the check), `///` on the
+- [X] T-A25-403 The public API baseline (`python3 scripts/check_public_api.py --update`, then the check), `///` on the — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P04.{public-api,documented-api-rendering}.json exit 0 (the baseline line upload(rgba pixels: [UInt8]) -> Bool already listed for Texture, so it is unchanged); both READMEs
   addition, and the two README paragraphs (`Packages/VisualCoreRendering/README.md`, `Packages/VisualCore/README.md`)
 
 ## Phase 3: Stories 1 and 2 — use my own picture, upright and in the right colours (P1) 🎯

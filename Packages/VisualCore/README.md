@@ -383,3 +383,8 @@ once. Contract: [clock.md](../../specs/131-ac-p01-clock-a11y/contracts/clock.md)
 The renderer's facts reach a presenter as `ResourceRegistry.renderCapabilities`, and GPU frame times come only from
 `GPUFrameTimer` (both in VisualCoreRendering) where `GL_EXT_disjoint_timer_query` is offered; without it no GPU time is
 reported.
+
+## Pictures as pass inputs (feature 183, A25-P04)
+
+A picture decoded on the CPU becomes a pass input through `RenderTarget.upload(rgba:)` (VisualCoreRendering), one byte
+per channel; the experience keeps the bytes to upload them again after a context loss.
