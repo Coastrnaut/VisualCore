@@ -164,7 +164,7 @@
    "id": "M01",
    "capability": "Render graph: a typed node graph ordered and validated before any GPU work and drawn as a chain of passes over render targets",
    "source": "brainstorm: render graph; manual \u00a76 capability audit; spec FR-A23-002",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreEffectsGraph/EffectGraph.swift",
@@ -207,13 +207,13 @@
     "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/GenerativeArtPresenter.swift",
     "symbol": "GenerativeArtPresenter"
    },
-   "notes": "EffectGraphDescription and EffectGraphValidator are tested (ValidationTests), but the pass set is closed and chain-only (PassSchemas.all: copy, colorMatrix, blur, bloom, distort, composite, feedback, flashLimit; every pass consumes a texture chain; no generator, constant, time or scalar pass), the Kahn order is private (topologicalOrder) and it works on passes, not typed ports; 32 passes (maxPasses) and a 256 MiB default quota (defaultQuota). Not used (clarification Q1, research D5). The graph model is G-MODEL and the schedule over FieldPass is G-COMPILE."
+   "notes": "EffectGraphDescription and EffectGraphValidator are tested (ValidationTests), but the pass set is closed and chain-only (PassSchemas.all: copy, colorMatrix, blur, bloom, distort, composite, feedback, flashLimit; every pass consumes a texture chain; no generator, constant, time or scalar pass), the Kahn order is private (topologicalOrder) and it works on passes, not typed ports; 32 passes (maxPasses) and a 256 MiB default quota (defaultQuota). Not used (clarification Q1, research D5). The graph model is G-MODEL and the schedule over FieldPass is G-COMPILE. A23-P03 (feature 168): the graph compiles into its own pass schedule over FieldPass (VisualProgrammingLab/Core/GraphCompiler.swift, Experience/PreviewPipeline.swift, Operators.swift): the seven operators, slot reuse by lifetime, a 6-slot static budget checked before allocation, content keys with downstream invalidation, one compile per frame at the next draw, rebuilt after context loss and resize (CompilerTests, SlotTests, ContentKeyTests, OperatorPixelTests, BudgetTests, CompileQueueTests, PreviewRebuildTests)."
   },
   {
    "id": "M02",
    "capability": "Compositing: one pass samples one or more earlier outputs and blends or mixes them into a target or the framebuffer",
    "source": "brainstorm: compositing; spec FR-A23-002",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
@@ -250,7 +250,7 @@
     "file": "Packages/ExperiencesCreative/ShaderStudio/Experience/TexturedPreview.swift",
     "symbol": "TexturedPreview"
    },
-   "notes": "FieldPass draws into a target or the framebuffer with named sampler inputs and refuses to sample its own output (FieldPassTests, FieldBilinearTests). Shader Studio's TexturedPreview samples code-made inputs. The Mix and Output operators are G-OPERATORS; their order in the schedule is G-COMPILE."
+   "notes": "FieldPass draws into a target or the framebuffer with named sampler inputs and refuses to sample its own output (FieldPassTests, FieldBilinearTests). Shader Studio's TexturedPreview samples code-made inputs. The Mix and Output operators are G-OPERATORS; their order in the schedule is G-COMPILE. A23-P03 (feature 168): the graph compiles into its own pass schedule over FieldPass (VisualProgrammingLab/Core/GraphCompiler.swift, Experience/PreviewPipeline.swift, Operators.swift): the seven operators, slot reuse by lifetime, a 6-slot static budget checked before allocation, content keys with downstream invalidation, one compile per frame at the next draw, rebuilt after context loss and resize (CompilerTests, SlotTests, ContentKeyTests, OperatorPixelTests, BudgetTests, CompileQueueTests, PreviewRebuildTests)."
   },
   {
    "id": "M03",
@@ -305,7 +305,7 @@
    "id": "M04",
    "capability": "Reusable effects: noise, gradient, palette, colour and blur operators shared as GLSL functions and reusable passes",
    "source": "brainstorm: reusable effects; spec FR-A23-002",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderBundle.swift",
@@ -342,7 +342,7 @@
     "file": "Packages/ExperiencesCreative/LivingWallpapers/Experience/SceneShaders.swift",
     "symbol": "SceneShaders"
    },
-   "notes": "The vc/ library (noise.glsl: vc_valueNoise, vc_gradientNoise, vc_fbm; palette.glsl: vc_palette; color, hash, sdf, field) is tested in ShaderBundleTests and FullScreenShaderSceneTests. The blur shader of VisualCoreEffects is internal (EffectShaders.blur, EffectPasses.blur are not public), so Blur is an app-local separable two-pass Gaussian with a capped radius (G-OPERATORS, clarification Q3)."
+   "notes": "The vc/ library (noise.glsl: vc_valueNoise, vc_gradientNoise, vc_fbm; palette.glsl: vc_palette; color, hash, sdf, field) is tested in ShaderBundleTests and FullScreenShaderSceneTests. The blur shader of VisualCoreEffects is internal (EffectShaders.blur, EffectPasses.blur are not public), so Blur is an app-local separable two-pass Gaussian with a capped radius (G-OPERATORS, clarification Q3). A23-P03 (feature 168): the graph compiles into its own pass schedule over FieldPass (VisualProgrammingLab/Core/GraphCompiler.swift, Experience/PreviewPipeline.swift, Operators.swift): the seven operators, slot reuse by lifetime, a 6-slot static budget checked before allocation, content keys with downstream invalidation, one compile per frame at the next draw, rebuilt after context loss and resize (CompilerTests, SlotTests, ContentKeyTests, OperatorPixelTests, BudgetTests, CompileQueueTests, PreviewRebuildTests)."
   },
   {
    "id": "M05",
@@ -434,7 +434,7 @@
    "id": "M07",
    "capability": "Version 0.1 feature 02: an initial node library: Time, Constant, Noise, Gradient, Mix, Blur and Output",
    "source": "manual \u00a72 feature 02; spec FR-A23-002",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderBundle.swift",
@@ -465,7 +465,7 @@
     "file": "Packages/ExperiencesCreative/LivingWallpapers/Experience/SceneShaders.swift",
     "symbol": "SceneShaders"
    },
-   "notes": "No generator, constant, time or scalar-mix pass exists in VisualCore; the node kinds are G-TYPES and their fragment programs over FieldPass and vc/ are G-OPERATORS."
+   "notes": "No generator, constant, time or scalar-mix pass exists in VisualCore; the node kinds are G-TYPES and their fragment programs over FieldPass and vc/ are G-OPERATORS. A23-P03 (feature 168): the graph compiles into its own pass schedule over FieldPass (VisualProgrammingLab/Core/GraphCompiler.swift, Experience/PreviewPipeline.swift, Operators.swift): the seven operators, slot reuse by lifetime, a 6-slot static budget checked before allocation, content keys with downstream invalidation, one compile per frame at the next draw, rebuilt after context loss and resize (CompilerTests, SlotTests, ContentKeyTests, OperatorPixelTests, BudgetTests, CompileQueueTests, PreviewRebuildTests)."
   },
   {
    "id": "M08",
@@ -551,7 +551,7 @@
    "id": "M10",
    "capability": "Version 0.1 feature 05: a preview renderer that compiles a bounded acyclic graph into passes",
    "source": "manual \u00a72 feature 05; spec FR-A23-002",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
@@ -594,7 +594,7 @@
     "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidFieldsScene.swift",
     "symbol": "FluidFieldsScene.rebuildFields"
    },
-   "notes": "Passes, targets with pools and the budget are tested (FieldPassTests, ResourceRegistryTests, ResourceLedgerTests). The compiled schedule with texture lifetimes is G-COMPILE; the static budget before allocation is G-BUDGET."
+   "notes": "Passes, targets with pools and the budget are tested (FieldPassTests, ResourceRegistryTests, ResourceLedgerTests). The compiled schedule with texture lifetimes is G-COMPILE; the static budget before allocation is G-BUDGET. A23-P03 (feature 168): the graph compiles into its own pass schedule over FieldPass (VisualProgrammingLab/Core/GraphCompiler.swift, Experience/PreviewPipeline.swift, Operators.swift): the seven operators, slot reuse by lifetime, a 6-slot static budget checked before allocation, content keys with downstream invalidation, one compile per frame at the next draw, rebuilt after context loss and resize (CompilerTests, SlotTests, ContentKeyTests, OperatorPixelTests, BudgetTests, CompileQueueTests, PreviewRebuildTests)."
   },
   {
    "id": "M11",
@@ -742,7 +742,7 @@
    "id": "M15",
    "capability": "Compiling a graph into a bounded pass schedule with texture lifetimes and a static memory budget",
    "source": "spec FR-A23-003 area 4; manual \u00a76 algorithm 3",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/ResourceLedger.swift",
@@ -785,7 +785,7 @@
     "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidFieldsScene.swift",
     "symbol": "FluidFieldsScene"
    },
-   "notes": "Target pools and the ledger are tested (ResourceRegistryTests, ResourceLedgerTests). The schedule is G-COMPILE; the budget computed from the schedule before any target is allocated and checked against ResourceBudget is G-BUDGET (manual \u00a713 risk 1)."
+   "notes": "Target pools and the ledger are tested (ResourceRegistryTests, ResourceLedgerTests). The schedule is G-COMPILE; the budget computed from the schedule before any target is allocated and checked against ResourceBudget is G-BUDGET (manual \u00a713 risk 1). A23-P03 (feature 168): the graph compiles into its own pass schedule over FieldPass (VisualProgrammingLab/Core/GraphCompiler.swift, Experience/PreviewPipeline.swift, Operators.swift): the seven operators, slot reuse by lifetime, a 6-slot static budget checked before allocation, content keys with downstream invalidation, one compile per frame at the next draw, rebuilt after context loss and resize (CompilerTests, SlotTests, ContentKeyTests, OperatorPixelTests, BudgetTests, CompileQueueTests, PreviewRebuildTests)."
   },
   {
    "id": "M16",
@@ -834,7 +834,7 @@
    "id": "M17",
    "capability": "Node operators Time, Constant, Noise, Gradient, Mix, Blur and Output as bounded fragment programs",
    "source": "spec FR-A23-003 area 6; manual \u00a72 feature 02",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderBundle.swift",
@@ -865,7 +865,7 @@
     "file": "Packages/ExperiencesCreative/LivingWallpapers/Experience/SceneShaders.swift",
     "symbol": "SceneShaders"
    },
-   "notes": "vc/ noise, palette and colour functions are tested (ShaderBundleTests); the blur shader of VisualCoreEffects is internal. The operators are G-OPERATORS (blur: separable two-pass Gaussian, radius capped in A23-P03)."
+   "notes": "vc/ noise, palette and colour functions are tested (ShaderBundleTests); the blur shader of VisualCoreEffects is internal. The operators are G-OPERATORS (blur: separable two-pass Gaussian, radius capped in A23-P03). A23-P03 (feature 168): the graph compiles into its own pass schedule over FieldPass (VisualProgrammingLab/Core/GraphCompiler.swift, Experience/PreviewPipeline.swift, Operators.swift): the seven operators, slot reuse by lifetime, a 6-slot static budget checked before allocation, content keys with downstream invalidation, one compile per frame at the next draw, rebuilt after context loss and resize (CompilerTests, SlotTests, ContentKeyTests, OperatorPixelTests, BudgetTests, CompileQueueTests, PreviewRebuildTests)."
   },
   {
    "id": "M18",
@@ -957,7 +957,7 @@
    "id": "M20",
    "capability": "Caching compiled results by content hash and invalidating downstream nodes on edits",
    "source": "spec FR-A23-003 area 9; manual \u00a76 algorithm 4",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreMath/StableHash.swift",
@@ -994,13 +994,13 @@
     "file": "Packages/ExperiencesCreative/InfiniteGeometry/Core/Composition.swift",
     "symbol": "Composition"
    },
-   "notes": "Hashing is tested (StableHashTests, StateDigestTests, ParametersTests); ResourceRegistry caches programs (LRU of 64, ProgramCacheTests). No compiled-subgraph cache exists; the per-node content hash and downstream invalidation are G-COMPILE."
+   "notes": "Hashing is tested (StableHashTests, StateDigestTests, ParametersTests); ResourceRegistry caches programs (LRU of 64, ProgramCacheTests). No compiled-subgraph cache exists; the per-node content hash and downstream invalidation are G-COMPILE. A23-P03 (feature 168): the graph compiles into its own pass schedule over FieldPass (VisualProgrammingLab/Core/GraphCompiler.swift, Experience/PreviewPipeline.swift, Operators.swift): the seven operators, slot reuse by lifetime, a 6-slot static budget checked before allocation, content keys with downstream invalidation, one compile per frame at the next draw, rebuilt after context loss and resize (CompilerTests, SlotTests, ContentKeyTests, OperatorPixelTests, BudgetTests, CompileQueueTests, PreviewRebuildTests)."
   },
   {
    "id": "M21",
    "capability": "Resize, orientation and context-loss rebuild of passes and textures from the graph",
    "source": "spec FR-A23-003 area 10; spec edge cases",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
@@ -1031,7 +1031,7 @@
     "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidFieldsScene.swift",
     "symbol": "FluidFieldsScene"
    },
-   "notes": "Host rebuild is tested (FieldPassTests testStaleAfterContextRecreation, CleanupSweepTests). Rebuilding the compiled schedule's passes and targets from the graph is G-COMPILE."
+   "notes": "Host rebuild is tested (FieldPassTests testStaleAfterContextRecreation, CleanupSweepTests). Rebuilding the compiled schedule's passes and targets from the graph is G-COMPILE. A23-P03 (feature 168): the graph compiles into its own pass schedule over FieldPass (VisualProgrammingLab/Core/GraphCompiler.swift, Experience/PreviewPipeline.swift, Operators.swift): the seven operators, slot reuse by lifetime, a 6-slot static budget checked before allocation, content keys with downstream invalidation, one compile per frame at the next draw, rebuilt after context loss and resize (CompilerTests, SlotTests, ContentKeyTests, OperatorPixelTests, BudgetTests, CompileQueueTests, PreviewRebuildTests)."
   },
   {
    "id": "M22",
@@ -1235,7 +1235,7 @@
    "id": "M28",
    "capability": "Render thread and compile timing: the host's thread is the main thread; graph edits queue a compile that the preview scene performs at its next frame in the host's context",
    "source": "cross-cutting; spec clarifications host rule; FR-A23-006",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
@@ -1266,7 +1266,7 @@
     "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidFieldsScene.swift",
     "symbol": "FluidFieldsScene.pendingRebuild"
    },
-   "notes": "RenderHost, ResourceRegistry, RenderScene and ExperiencePresenter are main-actor; GL work only inside setup, resize, render and teardown. The queued compile in the preview scene is G-COMPILE."
+   "notes": "RenderHost, ResourceRegistry, RenderScene and ExperiencePresenter are main-actor; GL work only inside setup, resize, render and teardown. The queued compile in the preview scene is G-COMPILE. A23-P03 (feature 168): the graph compiles into its own pass schedule over FieldPass (VisualProgrammingLab/Core/GraphCompiler.swift, Experience/PreviewPipeline.swift, Operators.swift): the seven operators, slot reuse by lifetime, a 6-slot static budget checked before allocation, content keys with downstream invalidation, one compile per frame at the next draw, rebuilt after context loss and resize (CompilerTests, SlotTests, ContentKeyTests, OperatorPixelTests, BudgetTests, CompileQueueTests, PreviewRebuildTests)."
   },
   {
    "id": "M29",
@@ -1451,7 +1451,7 @@
    "justification": "The graph compiles into the experience's own bounded pass schedule (ordered FieldPasses with texture lifetimes), drawn with VisualCore's public FieldPass, render targets and vc/ GLSL, queued from edits and compiled by the preview scene at its next frame in the host's context, cached per node by content hash with downstream invalidation, and rebuilt from the graph after resize or context loss. EffectGraphDescription's pass set is closed and chain-only, so mapping onto it would need a VisualCore change in every phase (clarification Q1, research D5); a second user would justify an upstream pass registry and schedule (constitution A23 reuse first, Principle II).",
    "phase": 3,
    "test": "Experience tests: a compiled example graph draws the expected pixels (read-back against a CPU reference); an edit recompiles only the edited node and its downstream nodes; at most one compile per frame and none from a control; after recreateContext and after a resize the schedule is rebuilt from the graph with the same pixels.",
-   "closed": null
+   "closed": "A23-P03"
   },
   {
    "id": "G-OPERATORS",
@@ -1466,7 +1466,7 @@
    "justification": "The node operators Time, Constant, Noise, Gradient, Mix, Blur and Output are app-local fragment programs over FieldPass using the vc/ noise, palette and colour functions; Blur is a separable two-pass Gaussian with a capped radius because VisualCoreEffects' blur shader is internal (clarification Q3). No VisualCore change is planned.",
    "phase": 3,
    "test": "Experience tests: each operator compiles and links on the simulator host and matches a CPU reference within a stated tolerance; Blur at the radius cap and one past it is accepted and refused; Constant and Time produce the declared values; Output writes the framebuffer.",
-   "closed": null
+   "closed": "A23-P03"
   },
   {
    "id": "G-BUDGET",
@@ -1479,7 +1479,7 @@
    "justification": "A static texture budget computed from the compiled schedule (texture count, sizes and formats over their lifetimes) before any target is allocated and checked against ResourceBudget is app-local (clarification Q5; manual \u00a713 risk 1). The caps are set in A23-P01 and A23-P03 and measured on devices in the campaign. A reusable texture-lifetime allocator moves to VisualCore when a second user appears (constitution A23 reuse first, Principle II).",
    "phase": 3,
    "test": "Core and experience tests: a graph whose static budget is one past the cap is refused before any allocation (ResourceRegistry.stats unchanged); the computed bytes equal the bytes the registry reports after allocation for the example graphs; texture reuse by lifetime lowers the peak.",
-   "closed": null
+   "closed": "A23-P03"
   },
   {
    "id": "G-LIBRARY",

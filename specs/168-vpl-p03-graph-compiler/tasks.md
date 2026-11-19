@@ -56,7 +56,7 @@
 - [X] T-A23-308 Review checkpoint: `--name vpl-ios27` (both test targets on sim-27.2, each test under 10 s, — Verified 2026-11-18: 2026-11-18: review checkpoint: .autonomy/checks/A23-P03.vpl-ios27.json and A23-P03.vpl-ios27-2.json exit 0 (152 core and 46 experience tests on sim-27.2, slowest 0.93 s); A23-P03.documented-api.json, A23-P03.isolation.json and A23-P03.core-purity.json exit 0; the manifest test passes without regeneration
   SC-A23-306), the documented API, the isolation check and the core purity scan; regenerate `scenario-manifest.json`
   if the manifest test asks for it
-- [ ] T-A23-309 Contract: G-COMPILE, G-OPERATORS and G-BUDGET closed by "A23-P03", rows whose gaps are all closed
+- [X] T-A23-309 Contract: G-COMPILE, G-OPERATORS and G-BUDGET closed by "A23-P03", rows whose gaps are all closed — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A23-P03.contract.json exit 0 (G-COMPILE, G-OPERATORS and G-BUDGET closed by A23-P03; M01, M02, M04, M07, M10, M15, M17, M20, M21 and M28 available with their notes)
   available with evidence (`--name contract`)
 - [ ] T-A23-310 The catalog, packages and script tests, `xcodegen generate`, the app build and unit tests (`--name
   app-unit`) and the runner (`--name verify-27`)
