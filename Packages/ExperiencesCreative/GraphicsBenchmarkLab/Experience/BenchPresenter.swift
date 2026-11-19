@@ -16,9 +16,9 @@
 //     time. A context rebuild (`teardown`, then `setup`) and the session closing (`teardown`) end a running run as
 //     interrupted, keeping its samples; a draw on a context of another generation than the last one does too.
 //   - Words: the status line is one of "Ready", "Warm-up", "Measuring", "Cool-down", "Finished", "Stopped",
-//     "Interrupted"; after a finished run the summary block gives the frame interval p50, p95 and p99 in milliseconds
-//     with two decimals (or "not enough frames"), the frame counts and the flags as sentences ("GPU time not available
-//     on this device."). No frame rate is shown.
+//     "Interrupted" (or "Interrupted: the device is hot", T-A24-513); after a finished run the summary block gives the
+//     frame interval p50, p95 and p99 in milliseconds with two decimals (or "not enough frames"), the frame counts
+//     and the flags as sentences ("GPU time not available on this device."). No frame rate is shown.
 //   - Mirror: ``BenchMirror`` is what the controls show; it is updated at each draw, a field only when it changed.
 //   - Test seams: ``recorder``, ``workloadFrame``, ``drawnFrames``, ``workloadCase`` and ``feedTime`` (a synthetic
 //     frame time used instead of `FrameInfo.time` while set).
@@ -56,6 +56,12 @@
 //     equal run with "This result is already saved.". Saving and exporting touch no graphics.
 //   - Exports are written only by the person's tap; `teardown` (the session closing, or a context rebuild) empties the
 //     export folder and drops the share item, and `init` empties what a killed session left behind.
+//
+// Feature 177 (A24-P05) T-A24-513 (visualcore-contract risk 3; FR-A24-501): every frame of a running run reads the
+//   device conditions through ``conditionsSource`` (a test seam, `DeviceConditions.current()` by default); a serious or
+//   critical thermal state ends the run as interrupted before the frame is drawn, its report carries the hot end
+//   state, its qualification is Invalid (interrupted) and the status reads
+//   "Interrupted: the device is hot". The run start and the report's end conditions use the same source.
 //
 // Feature 177 (A24-P05) T-A24-505 (FR-A24-502, 503, 504; clarifications Q1–Q5; contracts/review.md):
 //   - Qualification: after any run ends (finished, stopped or interrupted) the mirror's ``BenchMirror/runQualification``
@@ -159,6 +165,13 @@ final class BenchPresenter: ExperiencePresenter {
     private var qualifiedKey: String?
     /// The conditions at the current run's start, waiting for its report; nil when no report is pending.
     private var runStart: (conditions: DeviceConditions, capabilities: RenderCapabilities, tier: Int)?
+    /// The device conditions now (a test seam; `DeviceConditions.current()` by default), read at a run's start, at
+    /// its end and on every frame while it runs.
+    var conditionsSource: () -> DeviceConditions = { DeviceConditions.current() }
+    /// Whether the last run was ended by a serious or critical thermal state; reset when a run starts.
+    private(set) var stoppedForHeat = false
+    /// The status of a run ended by heat.
+    nonisolated static let hotWord = "Interrupted: the device is hot"
 
     /// The reason of ``timerSupport`` before a context was probed.
     nonisolated static let notProbedReason = "no render context has been probed"
@@ -244,7 +257,7 @@ final class BenchPresenter: ExperiencePresenter {
             break
         }
         let report = ReportSource.report(case: benchmarkCase, capabilities: start.capabilities, tier: start.tier,
-                                         start: start.conditions, end: DeviceConditions.current(),
+                                         start: start.conditions, end: conditionsSource(),
                                          gpuMeasured: gpuMeasured)
         recorder.attachReport(report)
         runStart = nil
@@ -279,6 +292,7 @@ final class BenchPresenter: ExperiencePresenter {
             workload = try WorkloadRenderer(benchmarkCase: workloadCase, context: context)
         }
         actOnRequests(core, at: time, tier: tier, context: context)
+        stopIfHot()
         let timing = recorder.state == .running ? timer : nil
         let key = drawnFrames
         let index = recorder.nextFrameIndex
@@ -311,9 +325,21 @@ final class BenchPresenter: ExperiencePresenter {
             recorder.start(case: workloadCase, at: time)
             workloadFrame = 0
             timedFrames = [:]
-            runStart = (DeviceConditions.current(), context.resources.renderCapabilities, tier)
+            runStart = (conditionsSource(), context.resources.renderCapabilities, tier)
+            stoppedForHeat = false
         }
         seenRequests = (core.startRequests, core.stopRequests)
+    }
+
+    /// Ends a running run as interrupted, with its report, when the device's thermal state is serious or critical
+    /// (visualcore-contract risk 3: a run never continues while the device is hot).
+    private func stopIfHot() {
+        guard recorder.state == .running else { return }
+        let thermal = conditionsSource().thermal
+        guard thermal == .serious || thermal == .critical else { return }
+        recorder.interrupt()
+        stoppedForHeat = true
+        attachReportIfEnded()
     }
 
     /// Ends a running run as interrupted (attaching its report), releases the GPU timer and the workload.
@@ -355,7 +381,9 @@ final class BenchPresenter: ExperiencePresenter {
     }
 
     /// The status word of the current run.
-    var status: String { Self.statusWord(recorder) }
+    var status: String {
+        recorder.state == .interrupted && stoppedForHeat ? Self.hotWord : Self.statusWord(recorder)
+    }
 
     /// `value` in milliseconds with two decimals ("16.67 ms"), or "not enough frames".
     nonisolated static func milliseconds(text value: Double?) -> String {

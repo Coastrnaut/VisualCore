@@ -71,7 +71,7 @@
 
 ## Phase 6: Convergence
 
-- [ ] T-A24-513 Stop a running run when the thermal state becomes serious or critical (BenchPresenter reads an
+- [X] T-A24-513 Stop a running run when the thermal state becomes serious or critical (BenchPresenter reads an — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A24-P05.gbl-ios27-2.json: 64 experience tests (ThermalStopTests 2) and 95 core tests, exit 0; A24-P05.documented-api-2.json exit 0
   injectable thermal source each frame; the run ends as interrupted, the status names the heat, and the qualification
   is Invalid), with an experience test, per visualcore-contract risk 3 and FR-A24-501 (missing)
 - [ ] T-A24-514 Give the repeatability block's explain button its own identifier `repeatability-explain` (the opened
