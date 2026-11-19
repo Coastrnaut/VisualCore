@@ -220,7 +220,8 @@ setting at its default and the reduce-motion and reduce-flashing choices unchang
   rotation keeps lightness within 1e-9 for in-range results and returns the colour after 360° within 1e-9.
 - **SC-R02F10-002**: Simulated deficiencies match the published matrices (checked against independently computed spot
   values) within 1e-6; greys are
-  unchanged within 1e-12.
+  unchanged within 1e-12 under normal vision and within 1e-6 under a simulated condition (the published matrices carry
+  six decimals, so their rows sum to 1 only within about 1e-6).
 - **SC-R02F10-003**: Every built-in preset passes the palette check under all five conditions; a classic red–green pair
   is reported under protanopia and deuteranopia.
 - **SC-R02F10-004**: Shader and CPU results agree within 2/255 at every sampled pixel for conversions, hue rotation,

@@ -25,7 +25,7 @@
   within 1e-9; OKLab of sRGB white (1, 0, 0) and published reference points; hue 360° returns the colour within 1e-9;
   lightness kept within 1e-9 when in gamut; greys unchanged; out-of-gamut rotation lands in 0…1 with L and h kept;
   contrast black/white 21, equal colours 1; non-finite and out-of-range refused); `--name host`
-- [ ] T-R02F10-003 [P] Create `Packages/VisualCore/Sources/VisualCoreParameters/ColorVision.swift`
+- [X] T-R02F10-003 [P] Create `Packages/VisualCore/Sources/VisualCoreParameters/ColorVision.swift` — Verified 2026-11-19: 2026-11-19 R02-F10.host.json (exit 0; ColorVisionTests 5 passed; grey error 4.4e-7 < 1e-6, research R13; presets have no separation issue)
   (`ColorVisionCondition` normal/protanopia/deuteranopia/tritanopia/achromatopsia with the Machado 2009 severity-1.0
   matrices in linear sRGB, achromatopsia = Y on all channels, clamp 0…1; `PaletteSeparation.threshold = 0.08`,
   `issues(_:)` over all pairs and five conditions; `ColorVisionPresets.warmCool`/`redCyan`/`lightness` as `Palette`s

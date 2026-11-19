@@ -40,3 +40,10 @@
   choices, so a picker alone would be dropped. Decision: `ShellPreferences.colorVision: ColorVisionChoice?` (absent →
   standard, schema stays 1, exactly like the R02-F26 haptics switch), carried by `AppModel.setAccessibility`,
   `SettingsView` and `ExperienceLaunch`. Alternatives: a second store for one value (two sources of truth).
+- **R13 Measured precision (implementation, 2026-11-19).** With the published six-decimal Machado matrices a grey moves
+  by at most 4.4e-7 (rows sum to 1 within ~1e-6), so SC-R02F10-002 checks greys within 1e-6 under simulation and 1e-12
+  under normal vision. With Ottosson's published M2, sRGB white has OKLab chroma 3.7e-8, so `rotateHue` returns any
+  colour with equal channels unchanged instead of testing a chroma threshold; the OKLab inverses are computed exactly
+  from M1/M2 so the 1,000-colour round trip stays within 1e-9. The classic pair (0.8, 0.2, 0.2)/(0.2, 0.7, 0.2) stays
+  above 0.08 under protanopia and deuteranopia, so the red–green fixture is (0.85, 0.4, 0.2)/(0.0, 0.6, 0.2) (ΔE_OK
+  0.27 normal, 0.064 protan, 0.063 deutan).
