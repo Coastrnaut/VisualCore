@@ -342,6 +342,15 @@ and the person's switches; `stateSignProblems` checks that every state has a dis
 `transitionDuration(_:reduceMotion:)` makes animated transitions instant under Reduce Motion. `ShellPreferences.haptics`
 is the Settings switch (absent means on).
 
+## Shader expansion, variants, precision and uniform layouts (feature 206, R02-F06)
+
+VisualCoreShaderSource expands shader text safely: `ShaderLibrary` pastes each included file once and refuses cycles,
+depth above 8 and more than 64 KiB (counted in bytes); `DefineSet` validates defines; `ShaderVariantSet` declares a
+shader's switches (at most 64 combinations, stable order and keys); `PrecisionPolicy` gives a fragment shader without
+a float precision statement `highp` or `mediump` from the device report and flags `highp` where it is missing;
+`UniformLayout` declares uniforms and checks them against a program's active ones; `ShaderReasonCode` and
+`ShaderFailureReport` name every refusal. Rules: [docs/architecture/shaders.md](../../docs/architecture/shaders.md).
+
 ## Numerical foundations (feature 203, R02-F03)
 
 Time and randomness reuse `FixedStepClock`, `SceneClock`, `SplitMix64` and `SeededRandom` unchanged; their output and

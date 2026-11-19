@@ -396,6 +396,15 @@ VoiceOver runs), through the planners' rate limits and the haptics switch. It ne
 Tests substitute `RecordingAnnouncementSink` (and `RecordingHapticSink`), which record what would have been
 announced or played instead of reaching the system.
 
+## Safe compilation and parameter bindings (feature 206, R02-F06)
+
+`ResourceRegistry.program(vertex:fragment:defines:precision:…)` compiles with a validated `DefineSet` and a
+`PrecisionPolicy`; `prewarm(_:…)` compiles every combination of a `ShaderVariantSet` and reports each as compiled,
+cached or failed; `ShaderProgram` reads whole logs (up to 64 KiB), keeps `warnings`, names both files of a link error,
+gives `ShaderError.reasonCode` and checks a `UniformLayout` (`check(_:)`); `ParameterUniformBinding` sets a
+`ParameterSchema`'s values on the `u_<name>` float uniforms, clamped, refusing non-finite values. Rules:
+[docs/architecture/shaders.md](../../docs/architecture/shaders.md).
+
 ## Resource ownership and pipelines (feature 204, R02-F04)
 
 The ownership rules are unchanged: every GPU handle carries its context generation, stale handles are refused and

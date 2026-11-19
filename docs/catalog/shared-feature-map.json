@@ -67,7 +67,7 @@
     "ShaderCacheKey"
    ],
    "home": "VisualCoreShaderSource, VisualCoreRendering",
-   "note": "Typed per-domain shader parameters and safe GLSL ES compilation on the existing shader pipeline."
+   "note": "As built (feature 206): ShaderLibrary includes each file once and guards the 64 KiB limit in bytes; DefineSet validates defines (identifier, no GL_/__ prefix, one line of at most 256 characters, at most 32); ShaderVariantSet declares up to 64 combinations with stable keys and ResourceRegistry.prewarm compiles them all through the one cache; PrecisionPolicy inserts highp or mediump into a fragment shader without a precision statement from RenderCapabilities; logs are read whole up to 64 KiB with warnings kept and link files named; ShaderReasonCode and ShaderFailureReport (R2-F06); UniformLayout checks declared uniforms against the program and ParameterUniformBinding sets u_<name> from ParameterSchema, clamped, refusing non-finite values (docs/architecture/shaders.md)."
   },
   "F07": {
    "disposition": "extend",

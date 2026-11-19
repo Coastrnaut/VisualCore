@@ -1895,7 +1895,9 @@ VisualCoreRendering | enum | public enum FieldPassError: Error, Equatable, Senda
 VisualCoreRendering | enum | public enum FieldUniform: Sendable, Equatable
 VisualCoreRendering | enum | public enum GLState
 VisualCoreRendering | enum | public enum OffscreenRenderError: Error, Equatable, Sendable
+VisualCoreRendering | enum | public enum Outcome: Equatable, Sendable
 VisualCoreRendering | enum | public enum Output
+VisualCoreRendering | enum | public enum ParameterBindingError: Error, Equatable, Sendable
 VisualCoreRendering | enum | public enum ParticleBlend: Sendable, Equatable, CaseIterable
 VisualCoreRendering | enum | public enum ProcessMemory
 VisualCoreRendering | enum | public enum RenderHostError: Error, Equatable, Sendable
@@ -1910,6 +1912,7 @@ VisualCoreRendering | func | public func acquireTarget(width: Int, height: Int, 
 VisualCoreRendering | func | public func addErrorObserver(_ observer: @escaping @MainActor (RenderHostError) -> Void)
 VisualCoreRendering | func | public func addObserver(_ observer: @escaping @MainActor (RenderLifecycleEvent) -> Void)
 VisualCoreRendering | func | public func addPresentObserver(_ observer: @escaping @MainActor (PresentedFrame) -> Void)
+VisualCoreRendering | func | public func apply(_ values: ResolvedParameters) throws(ParameterBindingError)
 VisualCoreRendering | func | public func begin(frame: Int)
 VisualCoreRendering | func | public func bind()
 VisualCoreRendering | func | public func bind(target: Int32 = GL_ARRAY_BUFFER)
@@ -1917,6 +1920,7 @@ VisualCoreRendering | func | public func bind(unit: Int)
 VisualCoreRendering | func | public func bindColor(unit: Int)
 VisualCoreRendering | func | public func capture(host: RenderHost, size: ExportSize, prefix: String) -> State
 VisualCoreRendering | func | public func captureOutgoingFromMix(_ context: RenderContext) throws
+VisualCoreRendering | func | public func check(_ layout: UniformLayout) -> UniformLayoutReport
 VisualCoreRendering | func | public func clear()
 VisualCoreRendering | func | public func clearTrails()
 VisualCoreRendering | func | public func destroy()
@@ -1940,6 +1944,8 @@ VisualCoreRendering | func | public func makeTexture(width: Int, height: Int, fo
 VisualCoreRendering | func | public func pause()
 VisualCoreRendering | func | public func pixel(x: Int, y: Int) -> SIMD4<UInt8>
 VisualCoreRendering | func | public func poll() -> [GPUFrameTime]
+VisualCoreRendering | func | public func prewarm(_ set: ShaderVariantSet, vertex: String, fragment: String,
+VisualCoreRendering | func | public func program(vertex: String, fragment: String, defines: DefineSet, precision: PrecisionPolicy?,
 VisualCoreRendering | func | public func program(vertex: String, fragment: String, defines: [String: String] = [:],
 VisualCoreRendering | func | public func readFloatPixels() -> [Float]
 VisualCoreRendering | func | public func readPixels() -> [UInt8]
@@ -1981,6 +1987,7 @@ VisualCoreRendering | func | public func warn(_ message: String) -> Bool
 VisualCoreRendering | func | public nonisolated static func == (a: RenderContext, b: RenderContext) -> Bool
 VisualCoreRendering | func | public nonisolated static func folder(named name: String) -> TemporaryFolder
 VisualCoreRendering | func | public nonisolated static func message(for error: OffscreenRenderError) -> String
+VisualCoreRendering | func | public nonisolated static func uniformType(glType: GLenum) -> UniformType
 VisualCoreRendering | func | public static func == (lhs: Pipeline, rhs: Pipeline) -> Bool
 VisualCoreRendering | func | public static func apply(_ pipeline: Pipeline, resources: ResourceRegistry) -> Bool
 VisualCoreRendering | func | public static func data(_ image: StillImage, format: StillImageFormat,
@@ -1992,6 +1999,7 @@ VisualCoreRendering | func | public static func isAvailable(_ format: StillImage
 VisualCoreRendering | func | public static func pngData(_ image: StillImage) throws(OffscreenRenderError) -> Data
 VisualCoreRendering | func | public static func resetForVisualCore(framebuffer: UInt32, width: Int, height: Int)
 VisualCoreRendering | func | public static func square(halfExtent: Double) -> WorldRect
+VisualCoreRendering | func | public static func uniformName(_ parameter: String) -> String
 VisualCoreRendering | func | public static func viewPoint(_ worldPoint: Vec2, viewSize: Vec2, world: WorldRect) -> Vec2?
 VisualCoreRendering | func | public static func worldPoint(_ viewPoint: Vec2, viewSize: Vec2, world: WorldRect) -> Vec2?
 VisualCoreRendering | init | public convenience init(bundle: Bundle, subdirectory: String? = "Shaders")
@@ -2001,6 +2009,7 @@ VisualCoreRendering | init | public convenience init(mesh: Mesh, registry: Resou
 VisualCoreRendering | init | public init()
 VisualCoreRendering | init | public init(center: Vec2, size: Vec2)
 VisualCoreRendering | init | public init(child: any RenderScene)
+VisualCoreRendering | init | public init(entries: [Entry])
 VisualCoreRendering | init | public init(extensionReported: Bool, probeComplete: Bool)
 VisualCoreRendering | init | public init(files: [String: String])
 VisualCoreRendering | init | public init(folder: TemporaryFolder)
@@ -2008,6 +2017,7 @@ VisualCoreRendering | init | public init(fragment: String, fragmentName: String,
 VisualCoreRendering | init | public init(frame: Int, milliseconds: Double)
 VisualCoreRendering | init | public init(from: any RenderScene, to: any RenderScene)
 VisualCoreRendering | init | public init(index: Int, time: Double, targetTime: Double)
+VisualCoreRendering | init | public init(key: String, outcome: Outcome, reasonCode: ShaderReasonCode? = nil)
 VisualCoreRendering | init | public init(name: String, minimum: Int, reported: Int)
 VisualCoreRendering | init | public init(program: ShaderProgram, state: RenderState)
 VisualCoreRendering | init | public init(rangeMin: Int, rangeMax: Int, precisionBits: Int)
@@ -2019,11 +2029,13 @@ VisualCoreRendering | init | public init(registry: ResourceRegistry, width: Int,
 VisualCoreRendering | init | public init(registry: ResourceRegistry, width: Int, height: Int, format: TextureFormat, label: String) throws
 VisualCoreRendering | init | public init(renderer: MeshRenderer, model: Mat4 = .identity, color: Vec4, center: Vec3 = .zero)
 VisualCoreRendering | init | public init(scene: RenderScene, maxFramesPerSecond: Int = 60, budget: ResourceBudget = ResourceBudget()) throws
+VisualCoreRendering | init | public init(schema: ParameterSchema, program: ShaderProgram)
 VisualCoreRendering | init | public init(world: WorldRect, background: Vec4 = Vec4(0, 0, 0, 1), source: @escaping @MainActor (FrameInfo) -> [ParticleInstance])
 VisualCoreRendering | init | public init?(context: RenderContext)
 VisualCoreRendering | init | public init?(start: Double, end: Double, color: Vec4)
 VisualCoreRendering | init | public init?(width: Int, height: Int, bottomUpRGBA: [UInt8])
 VisualCoreRendering | init | public init?(width: Int, height: Int, topDownRGBA rgba: [UInt8])
+VisualCoreRendering | let | public let bound: [String: GLint]
 VisualCoreRendering | let | public let bytes: Int
 VisualCoreRendering | let | public let cacheKey: String
 VisualCoreRendering | let | public let color: Vec4
@@ -2031,6 +2043,7 @@ VisualCoreRendering | let | public let colorTexture: GLuint
 VisualCoreRendering | let | public let delta: Double
 VisualCoreRendering | let | public let depthRenderbuffer: GLuint
 VisualCoreRendering | let | public let end: Double
+VisualCoreRendering | let | public let entries: [Entry]
 VisualCoreRendering | let | public let extensionReported: Bool
 VisualCoreRendering | let | public let folder: TemporaryFolder
 VisualCoreRendering | let | public let format: TextureFormat
@@ -2042,6 +2055,7 @@ VisualCoreRendering | let | public let height: Int
 VisualCoreRendering | let | public let index: Int
 VisualCoreRendering | let | public let inputs: [String: UInt32]
 VisualCoreRendering | let | public let inputs: [String]
+VisualCoreRendering | let | public let key: String
 VisualCoreRendering | let | public let kind: ResourceKind
 VisualCoreRendering | let | public let label: String
 VisualCoreRendering | let | public let library: ShaderLibrary
@@ -2050,14 +2064,17 @@ VisualCoreRendering | let | public let mesh: Mesh
 VisualCoreRendering | let | public let milliseconds: Double
 VisualCoreRendering | let | public let name: GLuint
 VisualCoreRendering | let | public let name: UInt32
+VisualCoreRendering | let | public let outcome: Outcome
 VisualCoreRendering | let | public let output: UInt32
 VisualCoreRendering | let | public let outputIsFramebuffer: Bool
 VisualCoreRendering | let | public let pixelHeight: Int
 VisualCoreRendering | let | public let pixelWidth: Int
 VisualCoreRendering | let | public let probeComplete: Bool
 VisualCoreRendering | let | public let program: ShaderProgram
+VisualCoreRendering | let | public let reasonCode: ShaderReasonCode?
 VisualCoreRendering | let | public let resources: ResourceRegistry
 VisualCoreRendering | let | public let rgba: [UInt8]
+VisualCoreRendering | let | public let schema: ParameterSchema
 VisualCoreRendering | let | public let size: GLint
 VisualCoreRendering | let | public let start: Double
 VisualCoreRendering | let | public let state: RenderState
@@ -2066,6 +2083,7 @@ VisualCoreRendering | let | public let targetTimestamp: Double
 VisualCoreRendering | let | public let time: Double
 VisualCoreRendering | let | public let type: GLenum
 VisualCoreRendering | let | public let uniforms: [String: Uniform]
+VisualCoreRendering | let | public let unused: [String]
 VisualCoreRendering | let | public let width: Int
 VisualCoreRendering | let | public let width: Int, height: Int
 VisualCoreRendering | let | public static let extensionName
@@ -2073,6 +2091,7 @@ VisualCoreRendering | let | public static let extensions: Set<String>
 VisualCoreRendering | let | public static let maxCachedPrograms
 VisualCoreRendering | let | public static let maxCircleSegments
 VisualCoreRendering | let | public static let maxEdge
+VisualCoreRendering | let | public static let maxInfoLogBytes
 VisualCoreRendering | let | public static let maxOffscreenPixels
 VisualCoreRendering | let | public static let maxPaletteStops
 VisualCoreRendering | let | public static let minCircleSegments
@@ -2083,6 +2102,7 @@ VisualCoreRendering | let | public static let visualCoreIncludes: ShaderLibrary
 VisualCoreRendering | let | public static let visualCoreLibrary: [String: String]
 VisualCoreRendering | protocol | public protocol GPUResource: AnyObject
 VisualCoreRendering | protocol | public protocol RenderScene: AnyObject
+VisualCoreRendering | struct | public struct Entry: Equatable, Sendable
 VisualCoreRendering | struct | public struct FloatRenderSupport: Sendable, Equatable
 VisualCoreRendering | struct | public struct FloorFinding: Sendable, Equatable, Codable
 VisualCoreRendering | struct | public struct FrameInfo: Sendable, Equatable
@@ -2090,8 +2110,10 @@ VisualCoreRendering | struct | public struct GPUFrameTime: Sendable, Equatable
 VisualCoreRendering | struct | public struct GPUHandle: Sendable, Equatable
 VisualCoreRendering | struct | public struct Item
 VisualCoreRendering | struct | public struct MeshFog: Sendable, Equatable
+VisualCoreRendering | struct | public struct ParameterUniformBinding
 VisualCoreRendering | struct | public struct Pipeline: Hashable
 VisualCoreRendering | struct | public struct PresentedFrame: Sendable, Equatable
+VisualCoreRendering | struct | public struct PrewarmReport: Equatable, Sendable
 VisualCoreRendering | struct | public struct RenderCapabilities: Sendable, Equatable, Codable
 VisualCoreRendering | struct | public struct RenderContext: Equatable
 VisualCoreRendering | struct | public struct Run: Sendable, Equatable
@@ -2128,7 +2150,10 @@ VisualCoreRendering | var | public private(set) var state
 VisualCoreRendering | var | public private(set) var swapCount
 VisualCoreRendering | var | public private(set) var to: any RenderScene
 VisualCoreRendering | var | public private(set) var trailLayer: TrailLayer?
+VisualCoreRendering | var | public private(set) var warnings: [ShaderDiagnostic]
 VisualCoreRendering | var | public private(set) var write: RenderTarget
+VisualCoreRendering | var | public var activeUniformTypes: [String: UniformType]
+VisualCoreRendering | var | public var allSucceeded: Bool
 VisualCoreRendering | var | public var ambient
 VisualCoreRendering | var | public var background: SIMD3<Float>
 VisualCoreRendering | var | public var background: Vec4
@@ -2137,15 +2162,18 @@ VisualCoreRendering | var | public var brightnessCap: Double
 VisualCoreRendering | var | public var budget: ResourceBudget
 VisualCoreRendering | var | public var bytes: Int
 VisualCoreRendering | var | public var bytesPerPixel: Int
+VisualCoreRendering | var | public var cachedCount: Int
 VisualCoreRendering | var | public var cachedProgramCount: Int
 VisualCoreRendering | var | public var center: Vec2
 VisualCoreRendering | var | public var center: Vec3
 VisualCoreRendering | var | public var clearColor
 VisualCoreRendering | var | public var color: Vec4
+VisualCoreRendering | var | public var compiledCount: Int
 VisualCoreRendering | var | public var eglExtensions: [String]?
 VisualCoreRendering | var | public var eglVendor
 VisualCoreRendering | var | public var eglVersion: String?
 VisualCoreRendering | var | public var extensions: [String]
+VisualCoreRendering | var | public var failedCount: Int
 VisualCoreRendering | var | public var fixedTime: Double?
 VisualCoreRendering | var | public var fragmentHighInt: ShaderPrecision?
 VisualCoreRendering | var | public var fragmentHighp: ShaderPrecision?
@@ -2187,6 +2215,7 @@ VisualCoreRendering | var | public var precisionBits: Int
 VisualCoreRendering | var | public var progress: Double
 VisualCoreRendering | var | public var rangeMax: Int
 VisualCoreRendering | var | public var rangeMin: Int
+VisualCoreRendering | var | public var reasonCode: ShaderReasonCode
 VisualCoreRendering | var | public var red: Float, green: Float, blue: Float
 VisualCoreRendering | var | public var rejectedTransitions: Int
 VisualCoreRendering | var | public var renderer
@@ -2203,6 +2232,7 @@ VisualCoreRendering | var | public var supported: Bool
 VisualCoreRendering | var | public var timeScale: Double
 VisualCoreRendering | var | public var trailStrength: Double
 VisualCoreRendering | var | public var typeIdentifier: String
+VisualCoreRendering | var | public var uniformType: UniformType
 VisualCoreRendering | var | public var usesTrailLayer: Bool
 VisualCoreRendering | var | public var vendor
 VisualCoreRendering | var | public var vertexHighp: ShaderPrecision?
@@ -2510,49 +2540,110 @@ VisualCoreScenes | var | public var volume: Double?
 VisualCoreScenes | var | public var z: Int
 VisualCoreShaderSource | enum | public enum BlendMode: Hashable, Sendable
 VisualCoreShaderSource | enum | public enum CullMode: Hashable, Sendable
+VisualCoreShaderSource | enum | public enum DefineError: Error, Equatable, Sendable
 VisualCoreShaderSource | enum | public enum InfoLogParser
+VisualCoreShaderSource | enum | public enum PrecisionPolicy: String, Sendable, CaseIterable
 VisualCoreShaderSource | enum | public enum Severity: String, Sendable, Codable
 VisualCoreShaderSource | enum | public enum ShaderCacheKey
+VisualCoreShaderSource | enum | public enum ShaderReasonCode: String, Sendable, CaseIterable, Codable
 VisualCoreShaderSource | enum | public enum ShaderSourceError: Error, Equatable, Sendable
 VisualCoreShaderSource | enum | public enum ShaderSourceInfo
 VisualCoreShaderSource | enum | public enum ShaderStage: String, Sendable, Codable
+VisualCoreShaderSource | enum | public enum ShaderStageKind: String, Sendable, CaseIterable
+VisualCoreShaderSource | enum | public enum UniformLayoutError: Error, Equatable, Sendable
+VisualCoreShaderSource | enum | public enum UniformType: Equatable, Hashable, Sendable
+VisualCoreShaderSource | enum | public enum VariantError: Error, Equatable, Sendable
+VisualCoreShaderSource | func | public func check(active: [String: UniformType]) -> UniformLayoutReport
 VisualCoreShaderSource | func | public func contains(_ name: String) -> Bool
+VisualCoreShaderSource | func | public func expand(_ name: String, defines: DefineSet, precision: PrecisionPolicy?, stage: ShaderStageKind) throws(ShaderSourceError) -> ExpandedShader
 VisualCoreShaderSource | func | public func expand(_ name: String, defines: [String: String] = [:]) throws(ShaderSourceError) -> ExpandedShader
+VisualCoreShaderSource | func | public func expand(source text: String, named name: String, defines: DefineSet, precision: PrecisionPolicy?,
 VisualCoreShaderSource | func | public func expand(source text: String, named name: String, defines: [String: String] = [:]) throws(ShaderSourceError) -> ExpandedShader
 VisualCoreShaderSource | func | public func origin(ofExpandedLine line: Int) -> SourceOrigin
+VisualCoreShaderSource | func | public func type(of name: String) -> UniformType?
 VisualCoreShaderSource | func | public mutating func add(_ name: String, _ text: String)
 VisualCoreShaderSource | func | public static func make(vertex: ExpandedShader, fragment: ExpandedShader) -> String
 VisualCoreShaderSource | func | public static func parse(_ log: String, stage: ShaderStage, map: ExpandedShader?) -> [ShaderDiagnostic]
 VisualCoreShaderSource | func | public static func sha256Hex(_ text: String) -> String
+VisualCoreShaderSource | func | public static func validate(name: String, value: String) throws(DefineError)
 VisualCoreShaderSource | init | public init()
+VisualCoreShaderSource | init | public init(_ declarations: [UniformDeclaration]) throws(UniformLayoutError)
+VisualCoreShaderSource | init | public init(_ defines: [String: String]) throws(DefineError)
+VisualCoreShaderSource | init | public init(_ switches: [VariantSwitch]) throws(VariantError)
 VisualCoreShaderSource | init | public init(blend: BlendMode = .none, depthTest: Bool = false, depthWrite: Bool = false,
+VisualCoreShaderSource | init | public init(code: ShaderReasonCode, diagnostics: [ShaderDiagnostic] = [], experience: String? = nil,
 VisualCoreShaderSource | init | public init(file: String, line: Int)
+VisualCoreShaderSource | init | public init(file: String, line: Int, message: String)
 VisualCoreShaderSource | init | public init(file: String, line: Int, stage: ShaderStage, severity: Severity, message: String)
+VisualCoreShaderSource | init | public init(fragmentHighpSupported: Bool)
+VisualCoreShaderSource | init | public init(name: String, declared: UniformType, actual: UniformType)
+VisualCoreShaderSource | init | public init(name: String, type: UniformType)
+VisualCoreShaderSource | init | public init(name: String, values: [String]) throws(VariantError)
 VisualCoreShaderSource | init | public init(red: Bool, green: Bool, blue: Bool, alpha: Bool)
+VisualCoreShaderSource | init | public init(undeclared: [String], mistyped: [UniformMismatch], unused: [String])
+VisualCoreShaderSource | let | public let actual: UniformType
+VisualCoreShaderSource | let | public let code: ShaderReasonCode
+VisualCoreShaderSource | let | public let combinations: [VariantCombination]
+VisualCoreShaderSource | let | public let declarations: [UniformDeclaration]
+VisualCoreShaderSource | let | public let declared: UniformType
+VisualCoreShaderSource | let | public let defines: DefineSet
+VisualCoreShaderSource | let | public let defines: [String: String]
 VisualCoreShaderSource | let | public let defines: [String]
+VisualCoreShaderSource | let | public let diagnostics: [ShaderDiagnostic]
+VisualCoreShaderSource | let | public let experience: String?
+VisualCoreShaderSource | let | public let feature: String
 VisualCoreShaderSource | let | public let file: String
+VisualCoreShaderSource | let | public let key: String
 VisualCoreShaderSource | let | public let line: Int
 VisualCoreShaderSource | let | public let message: String
+VisualCoreShaderSource | let | public let mistyped: [UniformMismatch]
+VisualCoreShaderSource | let | public let name: String
 VisualCoreShaderSource | let | public let origins: [SourceOrigin]
+VisualCoreShaderSource | let | public let seed: UInt64?
 VisualCoreShaderSource | let | public let severity: Severity
 VisualCoreShaderSource | let | public let stage: ShaderStage
+VisualCoreShaderSource | let | public let switches: [VariantSwitch]
 VisualCoreShaderSource | let | public let text: String
+VisualCoreShaderSource | let | public let tick: Int?
+VisualCoreShaderSource | let | public let tier: Int?
+VisualCoreShaderSource | let | public let type: UniformType
+VisualCoreShaderSource | let | public let undeclared: [String]
+VisualCoreShaderSource | let | public let unused: [String]
+VisualCoreShaderSource | let | public let values: [String]
 VisualCoreShaderSource | let | public static let additive
 VisualCoreShaderSource | let | public static let all
 VisualCoreShaderSource | let | public static let alphaBlended
+VisualCoreShaderSource | let | public static let empty
+VisualCoreShaderSource | let | public static let featureID
 VisualCoreShaderSource | let | public static let generated
+VisualCoreShaderSource | let | public static let maxCombinations
+VisualCoreShaderSource | let | public static let maxDefines
 VisualCoreShaderSource | let | public static let maxExpandedBytes
 VisualCoreShaderSource | let | public static let maxIncludeDepth
+VisualCoreShaderSource | let | public static let maxSwitches
+VisualCoreShaderSource | let | public static let maxValueLength
+VisualCoreShaderSource | let | public static let maxValuesPerSwitch
 VisualCoreShaderSource | let | public static let opaque
 VisualCoreShaderSource | let | public static let opaque3D
 VisualCoreShaderSource | let | public static let version
 VisualCoreShaderSource | let | public static let versionLine
 VisualCoreShaderSource | struct | public struct ColorMask: Hashable, Sendable
+VisualCoreShaderSource | struct | public struct DefineSet: Equatable, Sendable
 VisualCoreShaderSource | struct | public struct ExpandedShader: Sendable, Equatable
+VisualCoreShaderSource | struct | public struct PrecisionFinding: Equatable, Hashable, Sendable
 VisualCoreShaderSource | struct | public struct RenderState: Hashable, Sendable
 VisualCoreShaderSource | struct | public struct ShaderDiagnostic: Sendable, Equatable, Codable, CustomStringConvertible
+VisualCoreShaderSource | struct | public struct ShaderFailureReport: Equatable, Sendable, Codable
 VisualCoreShaderSource | struct | public struct ShaderLibrary: Sendable
+VisualCoreShaderSource | struct | public struct ShaderVariantSet: Equatable, Sendable
 VisualCoreShaderSource | struct | public struct SourceOrigin: Sendable, Equatable, Hashable, Codable
+VisualCoreShaderSource | struct | public struct UniformDeclaration: Equatable, Hashable, Sendable
+VisualCoreShaderSource | struct | public struct UniformLayout: Equatable, Sendable
+VisualCoreShaderSource | struct | public struct UniformLayoutReport: Equatable, Sendable
+VisualCoreShaderSource | struct | public struct UniformMismatch: Equatable, Sendable
+VisualCoreShaderSource | struct | public struct VariantCombination: Equatable, Sendable
+VisualCoreShaderSource | struct | public struct VariantSwitch: Equatable, Sendable
+VisualCoreShaderSource | var | public internal(set) var precisionFindings: [PrecisionFinding]
 VisualCoreShaderSource | var | public var alpha: Bool
 VisualCoreShaderSource | var | public var blend: BlendMode
 VisualCoreShaderSource | var | public var blue: Bool
@@ -2561,8 +2652,15 @@ VisualCoreShaderSource | var | public var cull: CullMode
 VisualCoreShaderSource | var | public var depthTest: Bool
 VisualCoreShaderSource | var | public var depthWrite: Bool
 VisualCoreShaderSource | var | public var description: String
+VisualCoreShaderSource | var | public var glslName: String
 VisualCoreShaderSource | var | public var green: Bool
+VisualCoreShaderSource | var | public var isValid: Bool
+VisualCoreShaderSource | var | public var lines: [String]
+VisualCoreShaderSource | var | public var names: [String]
+VisualCoreShaderSource | var | public var reasonCode: ShaderReasonCode
+VisualCoreShaderSource | var | public var reasonCode: ShaderReasonCode?
 VisualCoreShaderSource | var | public var red: Bool
+VisualCoreShaderSource | var | public var statement: String
 VisualCoreSimulation | enum | public enum AccessibilityChoice: String, Sendable, Codable, CaseIterable, Identifiable
 VisualCoreSimulation | enum | public enum AnnouncementKind: String, Sendable, Equatable, CaseIterable
 VisualCoreSimulation | enum | public enum BroadPhase2D
