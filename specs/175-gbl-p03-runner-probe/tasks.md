@@ -40,7 +40,7 @@
   Q3–Q5 with their tests `CoreTests/{TimerProbeTests,DroppedFrameRuleTests,RunReportTests}.swift`: the probe's two
   outcomes; "interval > 1.5 × 1,000 / 60 ms" dropped; every report field validated ("strings 1…128 characters", the
   thermal raw values, the timing sources from the fixed set), `thermal-changed`
-- [ ] T-A24-307 Run file version 2 in `Core/BenchmarkRun.swift` (body `{case, report, samples, state, summary}`, a
+- [X] T-A24-307 Run file version 2 in `Core/BenchmarkRun.swift` (body `{case, report, samples, state, summary}`, a — Verified 2026-11-19: 2026-11-19: run file version 2 with report (migration 1 to 2 adds report null; version 3 refused); RunDocumentTests pass in .autonomy/checks/A24-P03.gbl-core.json
   `MigrationChain` step 1 → 2 adding `report: null`) and `CoreTests/RunDocumentTests.swift` (a version 1 file opens
   with no report; version 2 round-trips; version 3 refused as newer) (FR-A24-307)
 

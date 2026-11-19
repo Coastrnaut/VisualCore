@@ -1,8 +1,9 @@
 // BenchmarkRun — feature 173 (A24-P01) T-A24-108 (FR-A24-105; clarification Q4; data-model.md "BenchmarkRun",
 // "Run file"). A run record: the case it ran (id, version, fingerprint), its frame samples, the summary computed from
 // them and how the run ended; and its file, a versioned JSON envelope `{"body", "kind", "version"}` of kind
-// `a24.benchmark-run` (schema 1, at most 2,097,152 bytes) whose body is `{case, samples, summary, state}` with
-// `case` = `{fingerprint, id, version}`. Sorted keys, so encode(decode(encode(r))) is byte-identical to encode(r).
+// `a24.benchmark-run` (schema 1; 2 since A24-P03, below; at most 2,097,152 bytes) whose body is
+// `{case, samples, summary, state}` with `case` = `{fingerprint, id, version}`. Sorted keys, so
+// encode(decode(encode(r))) is byte-identical to encode(r).
 // Choices recorded here: reading checks, in order, the size (`too-large`), the JSON object and its kind (`damaged`),
 // the version (above the chain: `newer-version`; missing or below 1: `damaged`), the body through the
 // `MigrationChain`, the decoding of the body (`damaged`), the case reference (an empty id or a fingerprint that is not
@@ -12,6 +13,11 @@
 // or infinity token; a file that carries one as the string "NaN", "Infinity" or "-Infinity" where a number belongs is
 // read as that value and refused as `not-finite`. Writing refuses the same runs with the same codes, then a result
 // above the size cap. Pure Foundation; no UI, GPU or clock.
+// Feature 175 (A24-P03) T-A24-307 (FR-A24-307; clarification Q5): schema 2 adds the body key `report` (a
+// ``RunReport`` or JSON null), so the body is `{case, report, samples, state, summary}`; the chain's step 1 → 2 adds
+// `report: null`, so a version 1 file opens with no report and a version 3 file is `newer-version`. A present report
+// is checked after the case reference with ``RunReport/validate()``; an invalid field is `out-of-range` of
+// `report.<field>`. The `report` key is required in a version 2 body (missing: `damaged`).
 import Foundation
 import VisualCoreExperience
 import VisualCorePersistence
@@ -40,22 +46,25 @@ public struct BenchmarkRun: Codable, Equatable, Sendable {
     public var summary: Summary
     /// How the run ended.
     public var state: RunState
+    /// The conditions the run was measured under, or nil (a run written before schema 2, or recorded without one).
+    public var report: RunReport?
 
     /// A run with the given values (not checked; see ``RunDocument/encode(_:)``).
     public init(caseID: String, caseVersion: Int, caseFingerprint: String, samples: [FrameSample], summary: Summary,
-                state: RunState) {
+                state: RunState, report: RunReport? = nil) {
         self.caseID = caseID
         self.caseVersion = caseVersion
         self.caseFingerprint = caseFingerprint
         self.samples = samples
         self.summary = summary
         self.state = state
+        self.report = report
     }
 
-    /// The body's keys: the case reference, the samples, the summary and the state.
+    /// The body's keys: the case reference, the report, the samples, the summary and the state.
     private enum CodingKeys: String, CodingKey {
         case caseReference = "case"
-        case samples, summary, state
+        case report, samples, summary, state
     }
 
     /// The keys of the case reference.
@@ -63,7 +72,8 @@ public struct BenchmarkRun: Codable, Equatable, Sendable {
         case id, version, fingerprint
     }
 
-    /// Decodes a run from the body `{case: {fingerprint, id, version}, samples, summary, state}`.
+    /// Decodes a run from the body `{case: {fingerprint, id, version}, report, samples, summary, state}`; `report`
+    /// must be present, as a report or null.
     public init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let reference = try container.nestedContainer(keyedBy: CaseKeys.self, forKey: .caseReference)
@@ -73,9 +83,15 @@ public struct BenchmarkRun: Codable, Equatable, Sendable {
         samples = try container.decode([FrameSample].self, forKey: .samples)
         summary = try container.decode(Summary.self, forKey: .summary)
         state = try container.decode(RunState.self, forKey: .state)
+        guard container.contains(.report) else {
+            throw DecodingError.keyNotFound(CodingKeys.report, DecodingError.Context(
+                codingPath: container.codingPath, debugDescription: "a version 2 body holds a report or null"))
+        }
+        report = try container.decodeNil(forKey: .report) ? nil : container.decode(RunReport.self, forKey: .report)
     }
 
-    /// Encodes the run as the body `{case: {fingerprint, id, version}, samples, summary, state}`.
+    /// Encodes the run as the body `{case: {fingerprint, id, version}, report, samples, summary, state}`, with
+    /// `report` null when absent.
     public func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         var reference = container.nestedContainer(keyedBy: CaseKeys.self, forKey: .caseReference)
@@ -85,6 +101,11 @@ public struct BenchmarkRun: Codable, Equatable, Sendable {
         try container.encode(samples, forKey: .samples)
         try container.encode(summary, forKey: .summary)
         try container.encode(state, forKey: .state)
+        if let report {
+            try container.encode(report, forKey: .report)
+        } else {
+            try container.encodeNil(forKey: .report)
+        }
     }
 }
 
@@ -132,14 +153,22 @@ public enum RunRefusal: Error, Equatable, Sendable {
     }
 }
 
-/// Reads and writes run files (kind `a24.benchmark-run`, schema 1).
+/// Reads and writes run files (kind `a24.benchmark-run`, schema 2).
 public enum RunDocument {
     /// The envelope kind of a run file.
     public static let kind = "a24.benchmark-run"
     /// The schema version this code writes and reads.
-    public static let schemaVersion = 1
+    public static let schemaVersion = 2
     /// The largest run file accepted or written, in bytes.
     public static let maxBytes = 2_097_152
+    /// The migrations to ``schemaVersion``: step 1 → 2 adds `report: null` to the body.
+    public static let migrations = MigrationChain(currentVersion: schemaVersion, steps: [
+        1: { body in
+            var migrated = body
+            migrated["report"] = NSNull()
+            return migrated
+        },
+    ])
 
     /// The strings that stand for non-finite numbers in a file, so that they are refused as
     /// ``RunRefusal/notFinite`` rather than as damage.
@@ -178,7 +207,7 @@ public enum RunDocument {
     /// or below 1: ``RunRefusal/damaged``), the body through `migrations`, the decoding of the body
     /// (``RunRefusal/damaged``), then the run as ``encode(_:)`` checks it.
     public static func decode(_ data: Data,
-                              migrations: MigrationChain = MigrationChain(currentVersion: 1))
+                              migrations: MigrationChain = RunDocument.migrations)
         -> Result<BenchmarkRun, RunRefusal> {
         guard data.count <= maxBytes else { return .failure(.tooLarge) }
         guard let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
@@ -203,11 +232,21 @@ public enum RunDocument {
         return .success(run)
     }
 
-    /// The refusal of a run the file may not hold, or nil: a malformed case reference, then the samples, then a
-    /// stored summary that differs from the recomputed one.
+    /// The refusal of a run the file may not hold, or nil: a malformed case reference, then an invalid report
+    /// (`out-of-range` of `report.<field>`), then the samples, then a stored summary that differs from the recomputed
+    /// one.
     static func check(_ run: BenchmarkRun) -> RunRefusal? {
         guard run.caseID.isEmpty == false, StateDigest(hex: run.caseFingerprint) != nil else { return .damaged }
         guard run.caseVersion >= 1 else { return .outOfRange(field: "caseVersion") }
+        if let report = run.report {
+            do {
+                try report.validate()
+            } catch {
+                switch error {
+                case let .invalid(field): return .outOfRange(field: "report.\(field)")
+                }
+            }
+        }
         do {
             try SampleSet.validate(run.samples)
         } catch {

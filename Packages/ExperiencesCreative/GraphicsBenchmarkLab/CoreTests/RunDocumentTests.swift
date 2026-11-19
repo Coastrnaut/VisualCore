@@ -4,6 +4,10 @@
 // version 2 envelope), too-large (one byte past the cap), not-finite (a "NaN" duration), out-of-range with its field,
 // out-of-order and too-many-samples (20,001 samples); writing refuses a run whose summary does not match its samples.
 // JSON has no NaN token, so the file carries it as the string "NaN". Synthetic data only.
+// Feature 175 (A24-P03) T-A24-307 (FR-A24-307): the file is version 2 with the body key `report`; a version 1 file
+// (a version 2 body without `report`, enveloped by hand) opens with no report; version 2 round-trips byte-identically
+// with and without a report; a version 3 file is refused as newer; an invalid report is `out-of-range` of
+// `report.<field>`; a version 2 body without the `report` key is damaged.
 import Foundation
 import Testing
 import VisualCoreExperience
@@ -70,10 +74,12 @@ import VisualCoreExperience
         let kind = envelope["kind"] as? String
         let version = envelope["version"] as? Int
         #expect(kind == "a24.benchmark-run")
-        #expect(version == 1)
+        #expect(version == 2)
         let body = try #require(envelope["body"] as? [String: Any])
         let keys = body.keys.sorted()
-        #expect(keys == ["case", "samples", "state", "summary"])
+        #expect(keys == ["case", "report", "samples", "state", "summary"])
+        let report = body["report"]
+        #expect(report is NSNull)
     }
 
     @Test func everyStateRoundTrips() throws {
@@ -133,7 +139,7 @@ import VisualCoreExperience
 
     @Test func newerVersionRefused() throws {
         var envelope = try Self.object(RunDocument.encode(Self.run()))
-        envelope["version"] = 2
+        envelope["version"] = 3
         let refusal = Self.refusal(try Self.data(envelope))
         #expect(refusal == .newerVersion)
         #expect(refusal?.code == "newer-version")
@@ -187,6 +193,69 @@ import VisualCoreExperience
         let refusal = Self.refusal(data)
         #expect(refusal == .tooManySamples)
         #expect(refusal?.code == "too-many-samples")
+    }
+
+    @Test func versionOneOpensWithoutReport() throws {
+        let original = try Self.run()
+        var envelope = try Self.object(RunDocument.encode(original))
+        var body = try #require(envelope["body"] as? [String: Any])
+        body["report"] = nil
+        envelope["body"] = body
+        envelope["version"] = 1
+        let decoded = try RunDocument.decode(try Self.data(envelope)).get()
+        #expect(decoded.report == nil)
+        #expect(decoded == original)
+        let reencoded = try RunDocument.encode(decoded)
+        let expected = try RunDocument.encode(original)
+        #expect(reencoded == expected)
+    }
+
+    @Test func versionTwoRoundTripsWithAndWithoutReport() throws {
+        var withReport = try Self.run()
+        withReport.report = SyntheticReport.make(thermalStart: "nominal", thermalEnd: "fair")
+        let runs = [try Self.run(), withReport]
+        for run in runs {
+            let encoded = try RunDocument.encode(run)
+            let decoded = try RunDocument.decode(encoded).get()
+            #expect(decoded == run)
+            let reencoded = try RunDocument.encode(decoded)
+            #expect(reencoded == encoded)
+        }
+        let text = String(decoding: try RunDocument.encode(withReport), as: UTF8.self)
+        #expect(text.contains("\"flags\":[\"thermal-changed\"]"))
+        #expect(text.contains("\"gpu\":\"GPU timer\""))
+    }
+
+    @Test func invalidReportRefusedWithItsField() throws {
+        var run = try Self.run()
+        var report = SyntheticReport.make()
+        report.osVersion = ""
+        run.report = report
+        #expect(throws: RunRefusal.outOfRange(field: "report.osVersion")) { try RunDocument.encode(run) }
+        var envelope = try Self.object(RunDocument.encode(Self.run()))
+        var body = try #require(envelope["body"] as? [String: Any])
+        var stored = try #require(try JSONSerialization.jsonObject(with: JSONEncoder().encode(SyntheticReport.make()))
+            as? [String: Any])
+        stored["thermalEnd"] = "melting"
+        body["report"] = stored
+        envelope["body"] = body
+        let refusal = Self.refusal(try Self.data(envelope))
+        #expect(refusal == .outOfRange(field: "report.thermalEnd"))
+    }
+
+    @Test func versionTwoWithoutReportKeyIsDamaged() throws {
+        var envelope = try Self.object(RunDocument.encode(Self.run()))
+        var body = try #require(envelope["body"] as? [String: Any])
+        body["report"] = nil
+        envelope["body"] = body
+        let refusal = Self.refusal(try Self.data(envelope))
+        #expect(refusal == .damaged)
+    }
+
+    @Test func migrationChainEndsAtVersionTwo() {
+        let current = RunDocument.migrations.currentVersion
+        #expect(current == 2)
+        #expect(RunDocument.schemaVersion == 2)
     }
 
     @Test func refusalCodes() {
