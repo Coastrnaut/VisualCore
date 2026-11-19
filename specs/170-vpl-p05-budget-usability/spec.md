@@ -48,7 +48,8 @@ in code:
 - Q: Which interface tests, and where? → A: `Apps/VisualCore/Tests/UI/VisualProgrammingLab/` with `VPLSupport`
   (after `SSSupport`), `VPLCanvasUITests` (add a Mix from the add menu; pick sources in the list form for its two image
   inputs and for the Output; the status reads "Ready"; pick Constant's colour for Noise's scale and read the refusal
-  sentence in `feedback`) and `VPLRecoveryUITests` (save "Clouds" from the library, terminate, relaunch without
+  sentence in `feedback`; the list form offers every other node's outputs, so a mismatched choice is possible and is
+  refused like a drag) and `VPLRecoveryUITests` (save "Clouds" from the library, terminate, relaunch without
   `-vcResetData`; the row is listed and opens), each under 60 seconds, in a new serial chunk `e3`.
 - Q: What does the device plan hold? → A: `docs/apps/visual-programming-lab/device-campaign.md`, after Shader Studio's,
   with rows VPL-D1 to VPL-D6 for D1 (iPhone 15, iOS 27), D2 (iPad Pro 13-inch, M5) and D3 (iPad, A16, iPadOS 26.5):
