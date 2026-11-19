@@ -13,7 +13,7 @@
 
 ## Phase 2: Foundational (pure, VisualCoreShaderSource)
 
-- [ ] T-R02F06-002 [P] Create `Packages/VisualCore/Sources/VisualCoreShaderSource/DefineSet.swift` (name
+- [X] T-R02F06-002 [P] Create `Packages/VisualCore/Sources/VisualCoreShaderSource/DefineSet.swift` (name — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F06.host.json (swift test Packages/VisualCore exit 0; 62 ShaderSource tests, 35 new); DefineSetTests 10
   `[A-Za-z_][A-Za-z0-9_]*`, not starting `GL_` or `__`; value without line break, ≤ 256 characters; ≤ 32 defines;
   `DefineError`) and `Packages/VisualCore/Sources/VisualCoreShaderSource/ShaderReasonCode.swift` (the fifteen codes of
   clarification Q4, `ShaderFailureReport` with `feature = "R2-F06"`), with
