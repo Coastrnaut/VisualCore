@@ -121,3 +121,11 @@ every position, normal and texture-coordinate component as its IEEE-754 binary64
 every index. Mesh builders and shapes use only arithmetic and the trusted functions of section 3, so the same
 description gives the same digest on the host and on both simulator runtimes; committed digests are checked on all
 three. A change in a digest is a change in geometry.
+
+## 10. Curves (feature 208, R02-F08)
+
+Curve sampling and frames are deterministic: the same control points, tolerance and initial normal give the same
+samples, frames and meshes, byte for byte. Sampling splits recursively to a fixed depth (20) in a fixed order; repeated
+samples are dropped with a scale-aware threshold (1e-9 × (1 + largest coordinate magnitude)); the first normal is the
+caller's or the world axis least parallel to the first tangent; a closed loop's leftover twist is spread linearly by
+arc length.

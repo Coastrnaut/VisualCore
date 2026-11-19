@@ -359,6 +359,15 @@ composite, premultiplied over); `composite` mode 2 is premultiplied over; the va
 and out-of-range emissive ones. `RenderState.premultipliedBlended` draws premultiplied layers. Rules:
 [docs/architecture/shaders.md](../../docs/architecture/shaders.md).
 
+## Curves, ribbons and tubes (feature 208, R02-F08)
+
+VisualCoreScenes builds curves from code: `CubicBezierChain` and centripetal `CatmullRomSpline` (open or closed),
+`CurveSampler.sample` (samples within a tolerance, dense where the curve bends, with arc length),
+`CurveFrames.parallelTransport` (frames that do not twist, closing on loops, defined through cusps and reversals),
+`Mesh.ribbon` and `Mesh.tube(samples:)` (texture coordinate along the curve in world units, continuous across closed
+seams; tiled values above 1 are reported by the validator's 0…1 rule, which applies to atlased meshes) and
+`Mesh.merged`, so the existing `MeshRenderer` draws many curves in one call.
+
 ## Numerical foundations (feature 203, R02-F03)
 
 Time and randomness reuse `FixedStepClock`, `SceneClock`, `SplitMix64` and `SeededRandom` unchanged; their output and

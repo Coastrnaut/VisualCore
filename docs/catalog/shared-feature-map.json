@@ -87,7 +87,7 @@
     "MeshRenderer"
    ],
    "home": "(new) VisualCoreGeometry, VisualCoreRendering",
-   "note": "Curve, ribbon and tube batches with parallel-transport frames."
+   "note": "As built (feature 208, in VisualCoreScenes beside the one Mesh): CubicBezierChain and centripetal CatmullRomSpline (ParametricCurve), CurveSampler.sample (adaptive to a tolerance, at most 65,536 samples, cumulative arc length), CurveFrames.parallelTransport (double reflection, scale-aware collapse, reversal-safe, closed loops close), Mesh.ribbon and Mesh.tube(samples:) with world-unit texture coordinates continuous across closed seams, and Mesh.merged so the existing MeshRenderer draws many curves in one call (200 ribbons tested)."
   },
   "F09": {
    "disposition": "extend",
