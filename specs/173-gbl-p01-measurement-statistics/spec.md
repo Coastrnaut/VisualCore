@@ -170,7 +170,8 @@ statistics before and after.
 - **Only warm-up samples:** the measurement is empty and flagged "no samples".
 - **A sample with a CPU time but no interval (the first frame):** the interval of the first measured frame is not
   defined and is not counted; its CPU time is.
-- **A dropped frame:** counted and flagged, its interval still counts.
+- **A dropped frame:** counted and flagged, its interval still counts. The core only reads the flag; the runner
+  (A24-P03) sets it by a rule it documents there, so the core takes no frame-rate assumption.
 - **A result file that is damaged, of a newer version or holds non-finite numbers:** refused with a code, never
   partly read.
 
