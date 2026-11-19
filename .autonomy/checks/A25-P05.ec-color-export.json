@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesCreative",
+    "--scheme",
+    "ExperiencesCreative-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "EffectsComposerCoreTests",
+    "EffectsComposerExperienceTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing EffectsComposerCoreTests EffectsComposerExperienceTests",
+  "elapsed_seconds": 21.055,
+  "exit_code": 0,
+  "finished": "2026-11-19T20:34:21+00:00",
+  "log": ".autonomy/logs/A25-P05.ec-color-export.log",
+  "log_sha256": "93ab60c2b47a9e7de3728249467bf73186d340566c03eab2c418410971b75fdd",
+  "name": "ec-color-export",
+  "stage": "A25-P05",
+  "started": "2026-11-19T20:34:00+00:00",
+  "timed_out": false
+}

@@ -2,6 +2,8 @@
 // has the bytes of clarification Q4; the CPU reference leaves the picture unchanged for the identities (grade at its
 // defaults, blur radius 0, distort amplitude 0, vignette amount 0) and for a disabled node; spot values of each
 // formula; a chain applies its enabled nodes in order.
+// A25-P05: grade, blur and vignette work on linear light (T-A25-502), so the grade and blur spot values are now the
+// linear computations (contrast pivot 0.18, luma and mean of decoded values, encoded again); tolerances unchanged.
 import Testing
 import EffectsComposerCore
 
@@ -43,13 +45,15 @@ import EffectsComposerCore
 
     @Test func eachFormulaGivesItsSpotValues() {
         let image = TestImage.make()
-        // grade: contrast 1.5 maps b to (1.5·b − 63.75)/255: 125 → 123.75 → 124, 68 → 38.25 → 38, 0 → 0 (clamped).
+        // grade: contrast 1.5 maps linear c to (c − 0.18)·1.5 + 0.18: 125 (c 0.2051) → 0.2177 → 128.48 → 128;
+        // 68 (c 0.0595) → −0.0008 → 0 (clamped); 0 → 0.
         let contrast = EffectReference.apply(Self.node(.grade, ["contrast": 1.5]), to: image)
-        #expect(contrast.pixel(x: 31, y: 17) == SIMD4(124, 38, 0, 255))
-        // grade: saturation 0 gives the Rec. 709 luma in every channel.
+        #expect(contrast.pixel(x: 31, y: 17) == SIMD4(128, 0, 0, 255))
+        // grade: saturation 0 gives the encoded Rec. 709 luma of the linear values in every channel (82.27 → 82).
         let grey = EffectReference.apply(Self.node(.grade, ["saturation": 0]), to: image)
-        let l = (0.2126 * 125 + 0.7152 * 68 + 0.0722 * 0) as Float
-        let luma = UInt8(l.rounded())
+        let l = 0.2126 * SRGB.decode(125 / 255) + 0.7152 * SRGB.decode(68 / 255) + 0.0722 * SRGB.decode(0)
+        let luma = UInt8((SRGB.encode(l) * 255).rounded())
+        #expect(luma == 82)
         #expect(grey.pixel(x: 31, y: 17) == SIMD4(luma, luma, luma, 255))
         // posterize 2 levels: each channel 0 or 255 by x ≥ 0.5.
         let two = EffectReference.apply(Self.node(.posterize, ["levels": 2]), to: image)
@@ -60,13 +64,17 @@ import EffectsComposerCore
         let dark = EffectReference.apply(strong, to: image)
         #expect(dark.pixel(x: 0, y: 0) == SIMD4(0, 0, 0, 255))
         #expect(dark.pixel(x: 31, y: 31) == image.pixel(x: 31, y: 31))
-        // blur radius 1 at an interior pixel: the mean of the 3 × 3 block around it.
+        // blur radius 1 at an interior pixel: the encoded mean of the linear values of the 3 × 3 block around it.
         let blurred = EffectReference.apply(Self.node(.blur, ["radius": 1]), to: image)
-        var sum = SIMD4<Int>(repeating: 0)
+        var sum = SIMD3<Float>(repeating: 0)
         for j in -1...1 {
-            for i in -1...1 { sum &+= SIMD4<Int>(truncatingIfNeeded: image.pixel(x: 20 + i, y: 20 + j)) }
+            for i in -1...1 {
+                let p = image.pixel(x: 20 + i, y: 20 + j)
+                sum += SRGB.decode(SIMD3(Float(p.x), Float(p.y), Float(p.z)) / 255)
+            }
         }
-        let mean = SIMD4<UInt8>((0..<4).map { UInt8((Float(sum[$0]) / 9).rounded()) })
+        let encoded = SRGB.encode(sum / 9)
+        let mean = SIMD4<UInt8>((0..<3).map { UInt8((encoded[$0] * 255).rounded()) } + [255])
         #expect(blurred.pixel(x: 20, y: 20) == mean)
     }
 

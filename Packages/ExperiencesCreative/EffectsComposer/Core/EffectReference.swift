@@ -1,17 +1,22 @@
 // EffectReference — feature 180 (A25-P01) T-A25-107 (FR-A25-104, FR-A25-105; SC-A25-103, SC-A25-104; clarifications
-// Q1, Q4; research R2). The CPU picture of each effect, computed with the formulas of clarification Q1 in `Float` on
-// the stored values x = byte/255, so each effect's fragment program (`EffectPrograms`) can be checked against it:
+// Q1, Q4; research R2), changed by feature 184 (A25-P05) T-A25-502 (clarification Q1; research R1, R2, R4). The CPU
+// picture of each effect, computed with the formulas of clarification Q1 in `Float`, so each effect's fragment program
+// (`EffectPrograms`) can be checked against it. The stored values are x = byte/255 (sRGB-encoded). Since A25-P05 the
+// linear effects (grade, blur, vignette; `EffectID.colorDomain`) decode every value they read with `SRGB.decode`,
+// compute on linear light c and encode the result with `SRGB.encode`; distort and posterize work on x:
 //
-//   grade      y = x·2^exposure; y = (y − 0.5)·contrast + 0.5; L = 0.2126 r + 0.7152 g + 0.0722 b of y;
-//              y = L + (y − L)·saturation
-//   blur       the mean of the (2·radius + 1)² texel centres around the pixel, each index clamped to the picture
-//   distort    the bilinear sample at uv + amplitude·(sin(2π·frequency·uv.y), sin(2π·frequency·uv.x))
-//   vignette   d = 2·‖uv − 0.5‖/√2; rgb·(1 − amount·smoothstep(radius − softness, radius, d))
+//   grade      y = c·2^exposure; y = (y − 0.18)·contrast + 0.18; L = 0.2126 r + 0.7152 g + 0.0722 b of y;
+//              y = L + (y − L)·saturation  (A25-P05: linear light, pivot 0.18 instead of 0.5 on stored values)
+//   blur       the mean of the linear values of the (2·radius + 1)² texel centres around the pixel, each index
+//              clamped to the picture
+//   distort    the bilinear sample of x at uv + amplitude·(sin(2π·frequency·uv.y), sin(2π·frequency·uv.x))
+//   vignette   d = 2·‖uv − 0.5‖/√2; c·(1 − amount·smoothstep(radius − softness, radius, d))
 //   posterize  y = floor(x·(levels − 1) + 0.5)/(levels − 1)
 //
-// Every result is clamped to 0…1 and stored as round(y·255); alpha is kept. A disabled node returns the picture
-// unchanged; a chain applies its enabled nodes in order, storing 8-bit values between nodes as the GPU's `.rgba8`
-// targets do.
+// Every result is clamped to 0…1 (encoding clamps as `vc_srgbEncode` does); alpha is kept. A disabled node returns
+// the picture unchanged; a chain applies its enabled nodes in order, storing the picture between nodes as the GPU's
+// intermediates do: 8-bit (`ReferenceStorage.byte`, `.rgba8`) or half-float (`.half`, `.rgba16f`), and the result
+// as 8-bit (the result target is `.rgba8`).
 // Choices recorded here: the texture coordinate uv is the GL one, origin at the bottom-left, at texel centres:
 // uv = ((x + 0.5)/w, 1 − (y + 0.5)/h) for column x and top-down row y, which is `v_uv` of `FieldPass` when the
 // picture is uploaded with its rows flipped to bottom-up. Bilinear sampling follows GL `LINEAR` with clamp to edge
@@ -19,41 +24,43 @@
 // parameter's default of clarification Q1. Pure Swift; no UI, GPU or clock.
 import Foundation
 
-/// The CPU reference of every effect (clarification Q1).
+/// The CPU reference of every effect (clarification Q1), on linear light for the linear effects (A25-P05).
 public enum EffectReference {
     /// The picture `node` makes of `image`; `image` itself when the node is disabled.
     public static func apply(_ node: EffectNode, to image: RGBAImage) -> RGBAImage {
         guard node.enabled else { return image }
-        let source = FloatPicture(image)
-        let w = image.width, h = image.height
-        var out = image
-        for y in 0..<h {
-            for x in 0..<w {
-                let uv = SIMD2<Float>((Float(x) + 0.5) / Float(w), 1 - (Float(y) + 0.5) / Float(h))
-                let input = source.texel(x, y)
-                var rgb: SIMD3<Float>
-                switch node.effect {
-                case .grade: rgb = grade(input, node)
-                case .blur: rgb = blur(source, x, y, node)
-                case .distort: rgb = distort(source, uv, node)
-                case .vignette: rgb = vignette(input, uv, node)
-                case .posterize: rgb = posterize(input, node)
-                }
-                rgb = clamp01(rgb)
-                let i = out.offset(x: x, y: y)
-                out.bytes[i] = store(rgb.x)
-                out.bytes[i + 1] = store(rgb.y)
-                out.bytes[i + 2] = store(rgb.z)
-            }
-        }
-        return out
+        return FloatPicture(image).applying(node).image(alphaOf: image)
     }
 
-    /// The picture the enabled nodes of `chain` make of `image`, applied in order.
+    /// The picture the enabled nodes of `chain` make of `image`, applied in order, with 8-bit storage between nodes.
     public static func apply(_ chain: EffectChain, to image: RGBAImage) -> RGBAImage {
-        var picture = image
-        for node in chain.nodes where node.enabled { picture = apply(node, to: picture) }
-        return picture
+        applyChain(chain, to: image, storage: .byte)
+    }
+
+    /// The picture the enabled nodes of `chain` make of `image`, applied in order; between nodes the picture is
+    /// stored with `storage` (8-bit or half-float, research R4) and the result as 8-bit.
+    public static func applyChain(_ chain: EffectChain, to image: RGBAImage,
+                                  storage: ReferenceStorage = .byte) -> RGBAImage {
+        let nodes = chain.nodes.filter(\.enabled)
+        guard !nodes.isEmpty else { return image }
+        var picture = FloatPicture(image)
+        for node in nodes { picture = picture.applying(node).quantised(storage) }
+        return picture.image(alphaOf: image)
+    }
+
+    /// The RGB value `node` makes at column `x`, top-down row `y` of `source`, already clamped to 0…1. `source`
+    /// holds linear values for a linear effect and stored values otherwise.
+    static func value(_ node: EffectNode, _ source: FloatPicture, _ x: Int, _ y: Int) -> SIMD3<Float> {
+        let w = source.width, h = source.height
+        let uv = SIMD2<Float>((Float(x) + 0.5) / Float(w), 1 - (Float(y) + 0.5) / Float(h))
+        let input = source.texel(x, y)
+        switch node.effect {
+        case .grade: return SRGB.encode(grade(input, node))
+        case .blur: return SRGB.encode(blur(source, x, y, node))
+        case .distort: return clamp01(distort(source, uv, node))
+        case .vignette: return SRGB.encode(vignette(input, uv, node))
+        case .posterize: return clamp01(posterize(input, node))
+        }
     }
 
     /// The 8-bit value stored for `value` in 0…1: round(value·255).
@@ -64,18 +71,18 @@ public enum EffectReference {
         SIMD3(min(max(v.x, 0), 1), min(max(v.y, 0), 1), min(max(v.z, 0), 1))
     }
 
-    /// `grade` of one pixel.
+    /// `grade` of one pixel of linear light `x` (pivot 0.18), unclamped.
     static func grade(_ x: SIMD3<Float>, _ node: EffectNode) -> SIMD3<Float> {
         let exposure = NodeValues.value(node, "exposure")
         let contrast = NodeValues.value(node, "contrast")
         let saturation = NodeValues.value(node, "saturation")
         var y = x * exp2f(exposure)
-        y = (y - SIMD3(repeating: 0.5)) * contrast + SIMD3(repeating: 0.5)
+        y = (y - SIMD3(repeating: 0.18)) * contrast + SIMD3(repeating: 0.18)
         let l = 0.2126 * y.x + 0.7152 * y.y + 0.0722 * y.z
         return SIMD3(repeating: l) + (y - SIMD3(repeating: l)) * saturation
     }
 
-    /// `blur` of the pixel at column `x`, top-down row `y`.
+    /// `blur` of the pixel at column `x`, top-down row `y` (the mean of `source`'s values; linear light).
     static func blur(_ source: FloatPicture, _ x: Int, _ y: Int, _ node: EffectNode) -> SIMD3<Float> {
         let r = min(max(Int(NodeValues.value(node, "radius").rounded()), 0), 8)
         var sum = SIMD3<Float>(repeating: 0)
@@ -95,7 +102,7 @@ public enum EffectReference {
         return source.bilinear(at)
     }
 
-    /// `vignette` of one pixel at texture coordinate `uv`.
+    /// `vignette` of one pixel of linear light `x` at texture coordinate `uv`.
     static func vignette(_ x: SIMD3<Float>, _ uv: SIMD2<Float>, _ node: EffectNode) -> SIMD3<Float> {
         let amount = NodeValues.value(node, "amount")
         let radius = NodeValues.value(node, "radius")
@@ -116,7 +123,8 @@ public enum EffectReference {
     }
 }
 
-/// A picture as floats x = byte/255 in RGB, rows top-down, with clamped texel and bilinear reads.
+/// A picture as floats in RGB (x = byte/255, or their linear light), rows top-down, with clamped texel and bilinear
+/// reads.
 struct FloatPicture {
     /// Width in pixels.
     let width: Int
@@ -135,6 +143,47 @@ struct FloatPicture {
             values.append(SIMD3(Float(image.bytes[i]), Float(image.bytes[i + 1]), Float(image.bytes[i + 2])) / 255)
         }
         self.values = values
+    }
+
+    /// A picture of `width × height` with `values`.
+    init(width: Int, height: Int, values: [SIMD3<Float>]) {
+        self.width = width
+        self.height = height
+        self.values = values
+    }
+
+    /// The picture `node` (enabled) makes of this stored-value picture: decoded first for a linear effect; every
+    /// value clamped to 0…1 and encoded again.
+    func applying(_ node: EffectNode) -> FloatPicture {
+        let source = node.effect.colorDomain == .linear
+            ? FloatPicture(width: width, height: height, values: values.map(SRGB.decode)) : self
+        var out: [SIMD3<Float>] = []
+        out.reserveCapacity(values.count)
+        for y in 0..<height {
+            for x in 0..<width { out.append(EffectReference.value(node, source, x, y)) }
+        }
+        return FloatPicture(width: width, height: height, values: out)
+    }
+
+    /// The picture as stored with `storage`: round(x·255)/255 (`.byte`) or rounded to `Float16` (`.half`).
+    func quantised(_ storage: ReferenceStorage) -> FloatPicture {
+        let q: (Float) -> Float = switch storage {
+        case .byte: { Float(EffectReference.store($0)) / 255 }
+        case .half: { Float(Float16($0)) }
+        }
+        return FloatPicture(width: width, height: height, values: values.map { SIMD3(q($0.x), q($0.y), q($0.z)) })
+    }
+
+    /// The 8-bit picture of these values with the alpha of `original` (round(x·255)).
+    func image(alphaOf original: RGBAImage) -> RGBAImage {
+        var out = original
+        for (k, v) in values.enumerated() {
+            let i = 4 * k
+            out.bytes[i] = EffectReference.store(v.x)
+            out.bytes[i + 1] = EffectReference.store(v.y)
+            out.bytes[i + 2] = EffectReference.store(v.z)
+        }
+        return out
     }
 
     /// The texel at column `x` and top-down row `y`, each index clamped to the picture (clamp to edge).

@@ -15,7 +15,7 @@
 
 ## Phase 2: Story 2 — colours behave like light (P1, foundational for export)
 
-- [ ] T-A25-502 [P] [US2] Create `Packages/ExperiencesCreative/EffectsComposer/Core/ColorDomain.swift`: `ColorDomain`
+- [X] T-A25-502 [P] [US2] Create `Packages/ExperiencesCreative/EffectsComposer/Core/ColorDomain.swift`: `ColorDomain` — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P05.ec-color-export.json (exit 0; ColorDomainTests 5 passed; ReferenceTests spot values updated for linear light; ProgramRenderTests max 0/255, distort 1/255)
   (`.linear`, `.stored`), `EffectID.colorDomain` (grade, blur, vignette → `.linear`; distort, posterize → `.stored`),
   `SRGB.decode`/`encode` (the exact piecewise formula of `vc/color.glsl`), `ReferenceStorage` (`.byte`, `.half`);
   update `Packages/ExperiencesCreative/EffectsComposer/Core/EffectReference.swift` (linear effects decode, compute,

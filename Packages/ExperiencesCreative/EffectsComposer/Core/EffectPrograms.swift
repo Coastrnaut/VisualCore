@@ -10,7 +10,11 @@
 //   vignette   u_params = (amount, radius, softness, 0)
 //   posterize  u_params = (levels, 0, 0, 0)
 //
-// The formulas are those of `EffectReference`. Choices recorded here: the programs sample at texel centres with
+// The formulas are those of `EffectReference`. Since feature 184 (A25-P05) T-A25-502 (clarification Q1; research R1,
+// R2; contracts/color.md) grade, blur and vignette include VisualCore's `vc/color.glsl` (resolved by `FieldPass`
+// against the VisualCore includes), decode every sample with `vc_srgbDecode`, compute on linear light and write
+// `vc_srgbEncode` of the result (which clamps to 0…1); alpha passes unchanged; grade's contrast pivot is 0.18 in
+// linear light. distort and posterize work on the stored values as before. Choices recorded here: the programs sample at texel centres with
 // `texture` (exact for an `.rgba8` source) except `distort`, which samples between them with the target's `LINEAR`
 // filter; `blur` loops over the constant bound −8…8 and skips taps outside the radius, so GLSL ES compiles it, and
 // clamps each tap to the edge texel centres; no effect needs `u_params2` in version 1 (research R4 keeps it for a
@@ -62,20 +66,26 @@ public enum EffectPrograms {
 
     """
 
-    /// `grade`: exposure, contrast and saturation (Rec. 709 luma).
-    static let grade = header + """
+    /// The header of a linear-light program: `header` with VisualCore's sRGB transfer functions.
+    static let linearHeader = header + """
+    #include "vc/color.glsl"
+
+    """
+
+    /// `grade`: exposure, contrast (pivot 0.18) and saturation (Rec. 709 luma) on linear light.
+    static let grade = linearHeader + """
     void main() {
         vec4 x = texture(u_source, v_uv);
-        vec3 y = x.rgb * exp2(u_params.x);
-        y = (y - 0.5) * u_params.y + 0.5;
+        vec3 y = vc_srgbDecode(x.rgb) * exp2(u_params.x);
+        y = (y - 0.18) * u_params.y + 0.18;
         float l = 0.2126 * y.r + 0.7152 * y.g + 0.0722 * y.b;
         y = l + (y - l) * u_params.z;
-        color = vec4(clamp(y, 0.0, 1.0), x.a);
+        color = vec4(vc_srgbEncode(y), x.a);
     }
     """
 
-    /// `blur`: the mean of the (2r + 1)² texel centres around the pixel, clamped to the edge.
-    static let blur = header + """
+    /// `blur`: the mean of the linear light of the (2r + 1)² texel centres around the pixel, clamped to the edge.
+    static let blur = linearHeader + """
     uniform vec2 u_texel;
     void main() {
         int r = int(floor(u_params.x + 0.5));
@@ -87,11 +97,11 @@ public enum EffectPrograms {
             for (int i = -8; i <= 8; i++) {
                 if (abs(i) > r) continue;
                 vec2 at = clamp(v_uv + vec2(float(i), float(j)) * u_texel, lo, hi);
-                sum += texture(u_source, at).rgb;
+                sum += vc_srgbDecode(texture(u_source, at).rgb);
             }
         }
         float n = float((2 * r + 1) * (2 * r + 1));
-        color = vec4(clamp(sum / n, 0.0, 1.0), texture(u_source, v_uv).a);
+        color = vec4(vc_srgbEncode(sum / n), texture(u_source, v_uv).a);
     }
     """
 
@@ -104,15 +114,15 @@ public enum EffectPrograms {
     }
     """
 
-    /// `vignette`: darkening towards the corners.
-    static let vignette = header + """
+    /// `vignette`: darkening of linear light towards the corners.
+    static let vignette = linearHeader + """
     void main() {
         vec4 x = texture(u_source, v_uv);
         float d = 2.0 * length(v_uv - 0.5) / sqrt(2.0);
         float e0 = u_params.y - u_params.z;
         float t = clamp((d - e0) / (u_params.y - e0), 0.0, 1.0);
         float s = t * t * (3.0 - 2.0 * t);
-        color = vec4(clamp(x.rgb * (1.0 - u_params.x * s), 0.0, 1.0), x.a);
+        color = vec4(vc_srgbEncode(vc_srgbDecode(x.rgb) * (1.0 - u_params.x * s)), x.a);
     }
     """
 
