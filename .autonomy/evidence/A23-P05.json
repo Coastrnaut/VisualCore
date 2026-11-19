@@ -1,0 +1,80 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/A23-P05.app-unit-2.json",
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27 app-ui-ios27-e3",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A23-P05.app-unit-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A23-P05.catalog.json",
+      "command": "python3 scripts/build_catalog.py --check",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A23-P05.catalog.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A23-P05.contract.json",
+      "command": "python3 scripts/check_app_contract.py --app visual-programming-lab --render",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A23-P05.contract.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A23-P05.core-purity.json",
+      "command": "sh -c '! grep -rnE \"import (UIKit|SwiftUI|OpenGLES|Network)|URLSession|Date\\(\\)|ContinuousClock|CFAbsoluteTime\" Packages/ExperiencesCreative/VisualProgrammingLab/Core'",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A23-P05.core-purity.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A23-P05.documented-api-2.json",
+      "command": "python3 scripts/check_documented_api.py --sources Packages/ExperiencesCreative/VisualProgrammingLab",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A23-P05.documented-api-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A23-P05.documented-api.json",
+      "command": "python3 scripts/check_documented_api.py --sources Packages/ExperiencesCreative/VisualProgrammingLab",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A23-P05.documented-api.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A23-P05.experience-packages.json",
+      "command": "python3 scripts/check_experience_packages.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A23-P05.experience-packages.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A23-P05.isolation.json",
+      "command": "python3 scripts/check_app_isolation.py --experiences Packages/ExperiencesCreative/VisualProgrammingLab",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A23-P05.isolation.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A23-P05.script-tests.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A23-P05.script-tests.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A23-P05.verify-27.json",
+      "command": "python3 scripts/verify_experiences.py --only a23.visual-programming-lab --runtime 27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A23-P05.verify-27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A23-P05.vpl-ios27-2.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing VisualProgrammingLabCoreTests VisualProgrammingLabExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A23-P05.vpl-ios27-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A23-P05.vpl-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing VisualProgrammingLabCoreTests VisualProgrammingLabExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A23-P05.vpl-ios27.log"
+    }
+  ],
+  "generated": "2026-11-19T14:30:27+00:00",
+  "method": "deterministic-run-check",
+  "stage": "A23-P05",
+  "status": "pass"
+}

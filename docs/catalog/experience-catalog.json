@@ -4730,10 +4730,10 @@
      "A23-P01",
      "A23-P02",
      "A23-P03",
-     "A23-P04"
+     "A23-P04",
+     "A23-P05"
     ],
     "legacy_gates_pending": [
-     "A23-P05",
      "A23-P06"
     ],
     "unified_integration": "pending"

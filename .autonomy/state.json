@@ -1859,8 +1859,14 @@
       "status": "pass"
     },
     "A23-P05": {
-      "attempts": [],
-      "status": "pending"
+      "attempts": [
+        {
+          "at": "2026-11-19T14:30:32+00:00",
+          "evidence": ".autonomy/evidence/A23-P05.json",
+          "result": "pass"
+        }
+      ],
+      "status": "pass"
     },
     "A23-P06": {
       "attempts": [],
@@ -2335,5 +2341,5 @@
       "status": "pending"
     }
   },
-  "updated": "2026-11-19T04:18:27+00:00"
+  "updated": "2026-11-19T14:30:32+00:00"
 }
