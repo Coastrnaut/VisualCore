@@ -11,7 +11,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T-A23-201 Baseline: cite the A23-P01 evidence (`.autonomy/checks/A23-P01.{vpl-core-ios27,app-build,experience-packages}.json`)
+- [X] T-A23-201 Baseline: cite the A23-P01 evidence (`.autonomy/checks/A23-P01.{vpl-core-ios27,app-build,experience-packages}.json`) — Verified 2026-11-18: 2026-11-18: A23-P01 evidence cited: .autonomy/checks/A23-P01.vpl-core-ios27.json, A23-P01.app-build.json and A23-P01.experience-packages.json, all exit 0; no Packages change since the A23-P01 record commit bcaa472a
   on the tree recorded at A23-P01 (`bcaa472a`), whose Packages are unchanged since (owner ruling of 2026-11-14)
 - [ ] T-A23-202 In `Packages/ExperiencesCreative/Package.swift` (lead): add `VisualCoreMath` to the core and its tests;
   add the targets `VisualProgrammingLabExperience` (path `VisualProgrammingLab/Experience`) and
