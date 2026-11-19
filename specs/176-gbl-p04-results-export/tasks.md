@@ -24,7 +24,7 @@
 
 ## Phase 3: Story 3 — the exports (P1)
 
-- [ ] T-A24-403 [P] [US3] `Core/RunCSV.swift` per clarification Q4 (FR-A24-404) and `CoreTests/RunCSVTests.swift` with
+- [X] T-A24-403 [P] [US3] `Core/RunCSV.swift` per clarification Q4 (FR-A24-404) and `CoreTests/RunCSVTests.swift` with — Verified 2026-11-19: 2026-11-19: .autonomy/checks/A24-P04.gbl-core.json exit 0 (79 core and 42 experience tests); RunCSV (two parts, CRLF, RFC 4180) and RunCSVTests match golden-run.json and golden-run.csv byte for byte; .gitattributes keeps the CSV's CRLF
   committed golden files `CoreTests/Fixtures/golden-run.json` and `golden-run.csv` of a fixture run (with a GPU time
   on some samples and none on others, a report and a quote and comma in a field): the JSON is the run file, the CSV
   matches byte for byte (CRLF, RFC 4180), an absent value is empty, never 0

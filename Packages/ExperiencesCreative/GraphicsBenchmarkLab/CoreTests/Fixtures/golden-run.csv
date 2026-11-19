@@ -1,0 +1,56 @@
+format,a24.benchmark-run.csv
+format_version,1
+case_id,quads
+case_version,1
+case_fingerprint,8eca5988ddf9eeb353f48becb40e7db4712b46edb5f74f3294d81d27b9a47084
+workload,quads
+layers,8
+texture_size,256
+resolution_scale,1.0
+warm_up_seconds,3
+measure_seconds,10
+cool_down_seconds,5
+state,completed
+device_model,"iPhone99,1"
+os_version,27.2
+app_version,1.0
+app_build,42
+renderer,"ANGLE (Apple, ""Metal"")"
+gl_version,OpenGL ES 3.0 (ANGLE 2.1)
+quality_tier,level-0
+thermal_start,nominal
+thermal_end,fair
+low_power_start,false
+low_power_end,true
+timing_interval,frame time
+timing_cpu,presenter CPU time
+timing_gpu,GPU timer
+report_flags,thermal-changed
+interval_p50,16.75
+interval_p95,
+interval_p99,
+cpu_p50,2.5
+cpu_p95,
+cpu_p99,
+gpu_p50,
+gpu_p95,
+gpu_p99,
+measured,7
+warm_up_excluded,3
+cool_down_excluded,2
+dropped,1
+flags,dropped-frames;gpu-time-not-available;too-few-for-p95;too-few-for-p99
+
+frame_index,phase,interval_ms,cpu_ms,gpu_ms,dropped
+0,warmUp,,2.0,,false
+1,warmUp,16.5,2.125,,false
+2,warmUp,16.75,2.25,,false
+3,measure,16.625,2.5,4.5,false
+4,measure,17.0,2.375,4.75,false
+5,measure,16.5,2.1,4.625,false
+6,measure,33.25,2.75,5.1,false
+7,measure,16.875,3.0,,true
+8,measure,16.5,2.2,,false
+9,measure,16.75,2.625,,false
+10,coolDown,16.6,1.875,4.25,false
+11,coolDown,16.7,1.5,4.0,false

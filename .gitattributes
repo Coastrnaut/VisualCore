@@ -1,2 +1,5 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Golden CSV exports of Graphics Benchmark Lab end lines in CRLF by format (RFC 4180); keep their bytes.
+Packages/ExperiencesCreative/GraphicsBenchmarkLab/CoreTests/Fixtures/*.csv -text
