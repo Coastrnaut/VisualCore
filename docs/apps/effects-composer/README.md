@@ -51,7 +51,14 @@ unavailable format or an oversized picture before drawing, write the file tagged
 rebuild and is removed before the next export and when the experience closes (the share sheet reports no completion,
 so a shared file stays until then). A context loss rebuilds the same preview, an interrupted export
 leaves no file, and a memory warning releases idle pictures. Device measurements are planned in
-[device-campaign.md](device-campaign.md) and wait for ImplementationLock-100. Release work follows in A25-P06.
+[device-campaign.md](device-campaign.md) and wait for ImplementationLock-100.
+
+Release (A25-P06): [privacy-and-credits.md](privacy-and-credits.md), [licenses.md](licenses.md),
+[store-listing.md](store-listing.md) and [release-checklist.md](release-checklist.md), checked by `release.json`
+(`experience-release-a25`, `copy-claims-a25`) and by the source and claims scans of `specs/185-ec-p06-release`; a
+drawing failure leaves the saved looks unchanged (`ComposerRecoveryTests`); nine committed samples pin the stored
+formats (`ReleaseSampleTests`); a first session in the app is checked by `ECReleaseUITests` (chunk `h3`). All 14 gaps
+of the contract are closed; integration into the app's available list is X-A25.
 
 | Document | Content |
 |---|---|

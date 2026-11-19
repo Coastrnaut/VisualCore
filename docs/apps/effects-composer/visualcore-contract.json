@@ -1479,7 +1479,7 @@
    "id": "M33",
    "capability": "Truthful claims: no professional colour-accuracy claim and no preset compatibility with another editor",
    "source": "cross-cutting; manual \u00a72 non-goals; CLAUDE.md rule 9",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceDescriptor.swift",
@@ -1495,16 +1495,16 @@
     }
    ],
    "example": {
-    "file": "Packages/ExperiencesCreative/LivingWallpapers/Core/ImageColorPipeline.swift",
-    "symbol": "ImageColorPipeline"
+    "file": "Packages/ExperiencesCreative/EffectsComposer/Experience/ECControls.swift",
+    "symbol": "ComposerLabels"
    },
-   "notes": "StillImageEncoder tags exports sRGB (StillFormatTests); the experience's copy and store claims are checked by copy-claims in G-RELEASE (A25-P06)."
+   "notes": "StillImageEncoder tags exports sRGB (StillFormatTests); the experience's copy and store claims are checked by copy-claims in G-RELEASE (A25-P06). A25-P06 (feature 185): the registration names the built features (a picked photo, linear-light colour, saved looks, full-size export through the share sheet) with the photo-library-add permission and the app's add-only usage string; the privacy and credits, licences, store listing, release checklist and device campaign documents pass experience-release-a25, copy-claims-a25 passes with only \"share\" allowed, the app's release build, privacy-manifest, no-tracking, licence and usage-description steps pass with the experience linked; the claims scan (specs/185-ec-p06-release/scan-claims-release.sh) finds no video, layer, RAW, HDR, AI, professional, lossless, cloud or upload word and every named proving test exists; the iOS 27.2 runner passes and its iOS 26.x half is cited at X-A25 (G-RELEASE closed)."
   },
   {
    "id": "M34",
    "capability": "Release: registration, the A25 release-check, copy-claims and verify steps, licenses and catalog availability",
    "source": "manual \u00a79 phase 06",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceDescriptor.swift",
@@ -1520,10 +1520,10 @@
     }
    ],
    "example": {
-    "file": "Packages/ExperiencesCreative/DigitalAquarium/Core/LicenseAudit.swift",
-    "symbol": "LicenseAudit"
+    "file": "Packages/ExperiencesCreative/EffectsComposer/Experience/EffectsComposerExperience.swift",
+    "symbol": "EffectsComposerExperience"
    },
-   "notes": "No A25 release step exists (178 lines listed by python3 scripts/release_check.py --list on 2026-11-19; AcknowledgementsViewTests). G-RELEASE (A25-P06)."
+   "notes": "No A25 release step exists (178 lines listed by python3 scripts/release_check.py --list on 2026-11-19; AcknowledgementsViewTests). G-RELEASE (A25-P06). A25-P06 (feature 185): the registration names the built features (a picked photo, linear-light colour, saved looks, full-size export through the share sheet) with the photo-library-add permission and the app's add-only usage string; the privacy and credits, licences, store listing, release checklist and device campaign documents pass experience-release-a25, copy-claims-a25 passes with only \"share\" allowed, the app's release build, privacy-manifest, no-tracking, licence and usage-description steps pass with the experience linked; the claims scan (specs/185-ec-p06-release/scan-claims-release.sh) finds no video, layer, RAW, HDR, AI, professional, lossless, cloud or upload word and every named proving test exists; the iOS 27.2 runner passes and its iOS 26.x half is cited at X-A25 (G-RELEASE closed)."
   },
   {
    "id": "M35",
@@ -1812,7 +1812,7 @@
    "justification": "Registration (with photo-library-add), the A25 release-check, copy-claims and verify steps, privacy and credits, licenses and catalog availability are the experience's release work in the one app.",
    "phase": 6,
    "test": "experience-release-a25 and copy-claims-a25 pass in release_check.py; the verify steps pass on iOS 27 and 26; every store claim names a test; no professional colour-accuracy or editor-compatibility claim appears.",
-   "closed": null
+   "closed": "A25-P06"
   }
  ],
  "traceability": [
