@@ -570,7 +570,7 @@
    "id": "M10",
    "capability": "Version 0.1 feature 05: export of results as versioned JSON or CSV through a system sheet the person opens",
    "source": "manual \u00a72 feature 05; spec FR-A24-002",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
@@ -586,10 +586,10 @@
     }
    ],
    "example": {
-    "file": "Packages/ExperiencesCreative/LivingWallpapers/Experience/WallpaperExportFile.swift",
-    "symbol": "WallpaperExportFile"
+    "file": "Packages/ExperiencesCreative/GraphicsBenchmarkLab/Experience/ResultExportFile.swift",
+    "symbol": "ResultExportFile"
    },
-   "notes": "DocumentStore writes Codable JSON documents (DocumentStoreTests); no CSV writer and no shared export helper exist (each exporting experience has its own Transferable with ShareLink, for images only; Living Wallpapers' WallpaperExportFile is the pattern). G-EXPORT (A24-P04)."
+   "notes": "DocumentStore writes Codable JSON documents (DocumentStoreTests); no CSV writer and no shared export helper exist (each exporting experience has its own Transferable with ShareLink, for images only; Living Wallpapers' WallpaperExportFile is the pattern). G-EXPORT (A24-P04). A24-P04 (feature 176): a saved result stores the case's every setting and version with its recomputed fingerprint (run file version 3), its samples, summary and report; the library keeps at most 12 results in the experience's storage and lists damaged, newer, oversized and non-finite files as unreadable without deleting them; an opened result exports as the JSON run file or a two-part CSV (CRLF, RFC 4180) through the share sheet only on the person's tap, matching golden files (RunDocumentTests, RunCSVTests, ResultLibraryTests, ExportTests) (G-RESULTS, G-EXPORT closed)."
   },
   {
    "id": "M11",
@@ -898,7 +898,7 @@
    "id": "M20",
    "capability": "Local result storage with versioned files; damaged and newer files refused and never deleted automatically",
    "source": "spec FR-A24-003 area 9",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
@@ -926,16 +926,16 @@
     }
    ],
    "example": {
-    "file": "Packages/ExperiencesCreative/VisualProgrammingLab/Experience/GraphLibrary.swift",
-    "symbol": "GraphLibrary"
+    "file": "Packages/ExperiencesCreative/GraphicsBenchmarkLab/Experience/ResultLibrary.swift",
+    "symbol": "ResultLibrary"
    },
-   "notes": "ExperienceStorage, MigrationChain, NamedLibrary and DocumentStore are public and tested (ExperienceStorageTests, NamedLibraryTests, DocumentStoreTests); the result envelope and its refusal policy are app-local (G-RESULTS, A24-P04). Visual Programming Lab's GraphLibrary is the pattern."
+   "notes": "ExperienceStorage, MigrationChain, NamedLibrary and DocumentStore are public and tested (ExperienceStorageTests, NamedLibraryTests, DocumentStoreTests); the result envelope and its refusal policy are app-local (G-RESULTS, A24-P04). Visual Programming Lab's GraphLibrary is the pattern. A24-P04 (feature 176): a saved result stores the case's every setting and version with its recomputed fingerprint (run file version 3), its samples, summary and report; the library keeps at most 12 results in the experience's storage and lists damaged, newer, oversized and non-finite files as unreadable without deleting them; an opened result exports as the JSON run file or a two-part CSV (CRLF, RFC 4180) through the share sheet only on the person's tap, matching golden files (RunDocumentTests, RunCSVTests, ResultLibraryTests, ExportTests) (G-RESULTS, G-EXPORT closed)."
   },
   {
    "id": "M21",
    "capability": "Export as versioned JSON or CSV through a system sheet the person opens",
    "source": "spec FR-A24-003 area 10",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
@@ -945,10 +945,10 @@
     }
    ],
    "example": {
-    "file": "Packages/ExperiencesCreative/LivingWallpapers/Experience/WallpaperExportFile.swift",
-    "symbol": "WallpaperExportFile"
+    "file": "Packages/ExperiencesCreative/GraphicsBenchmarkLab/Experience/ResultExportFile.swift",
+    "symbol": "ResultExportFile"
    },
-   "notes": "No CSV and no shared export helper (see M10). G-EXPORT (A24-P04): a Transferable and ShareLink after Living Wallpapers; nothing is uploaded."
+   "notes": "No CSV and no shared export helper (see M10). G-EXPORT (A24-P04): a Transferable and ShareLink after Living Wallpapers; nothing is uploaded. A24-P04 (feature 176): a saved result stores the case's every setting and version with its recomputed fingerprint (run file version 3), its samples, summary and report; the library keeps at most 12 results in the experience's storage and lists damaged, newer, oversized and non-finite files as unreadable without deleting them; an opened result exports as the JSON run file or a two-part CSV (CRLF, RFC 4180) through the share sheet only on the person's tap, matching golden files (RunDocumentTests, RunCSVTests, ResultLibraryTests, ExportTests) (G-RESULTS, G-EXPORT closed)."
   },
   {
    "id": "M22",
@@ -1626,7 +1626,7 @@
    "justification": "Results are versioned envelopes in ExperienceStorage; damaged and newer files are refused and never deleted automatically (clarification Q5). App-local over public persistence.",
    "phase": 4,
    "test": "Experience tests: save and open round-trip; truncated, newer and non-finite files refused with a named reason and kept on disk; storage caps respected.",
-   "closed": null
+   "closed": "A24-P04"
   },
   {
    "id": "G-EXPORT",
@@ -1639,7 +1639,7 @@
    "justification": "Versioned JSON and CSV written through a Transferable and ShareLink that the person opens, after Living Wallpapers' WallpaperExportFile; no upload (clarification Q5). No shared export helper exists in VisualCore.",
    "phase": 4,
    "test": "Core tests: the JSON and CSV of a fixture run match golden files, carry the format version and the report, and escape fields; an experience test proves export starts only from the person's action.",
-   "closed": null
+   "closed": "A24-P04"
   },
   {
    "id": "G-DEVICE",

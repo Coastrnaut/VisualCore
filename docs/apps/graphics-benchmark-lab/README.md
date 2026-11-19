@@ -28,6 +28,9 @@ from VisualCore's `GPUFrameTimer` where the renderer offers `GL_EXT_disjoint_tim
 simulator; simulator values are not device evidence), and each finished run carries a report of its device, OS, build,
 renderer, tier, thermal state and timing sources from public APIs only (run file version 2).
 
+Results (A24-P04) are kept in the experience's own storage (at most 12, with the case's every setting stored in run
+file version 3) and export as the JSON run file or a CSV through the share sheet only when the person taps Export.
+
 | Document | Content |
 |---|---|
 | [visualcore-contract.json](visualcore-contract.json) / [.md](visualcore-contract.md) | Phase 00 inventory, capability matrix, gaps, decision (checked by `scripts/check_app_contract.py`) |
