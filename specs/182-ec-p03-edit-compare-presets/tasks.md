@@ -12,7 +12,7 @@
 
 ## Phase 2: Story 2 — save a look and open it again (P1) 🎯
 
-- [ ] T-A25-302 [P] [US2] Create `Packages/ExperiencesCreative/EffectsComposer/Experience/PresetLibrary.swift` per clarification Q2 (files, index, 24 presets,
+- [X] T-A25-302 [P] [US2] Create `Packages/ExperiencesCreative/EffectsComposer/Experience/PresetLibrary.swift` per clarification Q2 (files, index, 24 presets, — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P03.ec-ios27.json exit 0 (44 core and 45 experience tests on sim-27.2); PresetLibrary per clarification Q2
   names 1…40 unique ignoring case, refusals `damaged`, `newer-version`, `too-large` and the chain file's codes,
   the four messages, newest first, read-only on a newer index, never deleting automatically)
 - [ ] T-A25-303 [US2] Write `Packages/ExperiencesCreative/EffectsComposer/ExperienceTests/PresetLibraryTests.swift`: save and open round-trip (equal, same
