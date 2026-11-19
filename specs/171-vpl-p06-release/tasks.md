@@ -45,7 +45,7 @@
 
 - [ ] T-A23-606 [US3] Write the release documents (FR-A23-605, 606):
   - `docs/apps/visual-programming-lab/store-listing.md`: says "no code to type"; every claim names a proving test; no
-    shared denylist word;
+    shared denylist word; names no frame rate or timing (the 30-a-second cap is not measured on a device);
   - `docs/apps/visual-programming-lab/release-checklist.md`: the statuses of clarification Q1; device rows name
     VPL-D1 … VPL-D6; accessibility is `verified` (automated) with the audits `pending-campaign-ii`; signing, archive
     and upload are `owner-action`;

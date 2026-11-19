@@ -59,6 +59,8 @@ in code:
   (controls, canvas overlay, library view, presenter and the adapter's words), whole words, case-insensitively:
   - programming language, write code, coding, script, scripting, type shaders, shader code editor;
   - Shadertoy, TouchDesigner, Blender, Unreal, Unity, node-based compositor;
+  - compatible with, imports, educational, teaches, learn to code, scientific (the A23 section of the constitution:
+    no compatibility claim, no educational or scientific outcome claim);
   - upload, export, cloud, sync, account, share;
   - fps, unlimited, real-time.
 
