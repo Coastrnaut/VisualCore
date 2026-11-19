@@ -12,7 +12,7 @@
 
 ## Phase 2: Foundational (pure)
 
-- [ ] T-R02F09-002 [P] Create `Packages/VisualCore/Sources/VisualCoreScenes/InstanceOrder.swift` (`backToFront(depths:)`:
+- [X] T-R02F09-002 [P] Create `Packages/VisualCore/Sources/VisualCoreScenes/InstanceOrder.swift` (`backToFront(depths:)`: — Verified 2026-11-19: migration_ledger run-check R02-F09/host exit=0 (swift test, InstanceOrderTests + BeamProfileTests)
   ascending view-space z, ties by index, non-finite refused with `MeshError.invalidInput`) and
   `Packages/VisualCore/Sources/VisualCoreScenes/BeamProfile.swift` (`falloff(r)` = exp(−4 r²) for r ≤ 1 else 0,
   `distanceToSegment`, `coverage`), with `Packages/VisualCore/Tests/VisualCoreScenesTests/InstanceOrderTests.swift`
