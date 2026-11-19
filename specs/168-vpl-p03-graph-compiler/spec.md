@@ -208,9 +208,10 @@ leaked graphics resource.
 
 ### Measurable Outcomes
 
-- **SC-A23-301**: Gradient, Mix and Constant pictures match their references within 2 of 255 per channel; Noise is
-  deterministic for a fixed time and differs with scale; Blur of a linear ramp equals the ramp away from the edges
-  within 2 of 255; Output copies its input exactly.
+- **SC-A23-301**: Gradient, Mix and Constant pictures match their references within 2 of 255 per channel, the
+  references taken at each read pixel's centre in the picture's 0…1 coordinates (so the preview's displayed size does
+  not matter); Noise is deterministic for a fixed time and differs with scale; Blur of a linear ramp equals the ramp
+  farther than its radius from the edges within 2 of 255; Output copies its input within 2 of 255.
 - **SC-A23-302**: 100% of invalid-graph fixtures compile no pass and show their message.
 - **SC-A23-303**: A graph at the slot limit compiles and its counted bytes equal the bytes the host reports; one past
   is refused with the host's counts unchanged; a chain of 5 passes needs at most 2 slots.
