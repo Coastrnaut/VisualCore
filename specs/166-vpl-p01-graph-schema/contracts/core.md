@@ -1,0 +1,31 @@
+# Contract: VisualProgrammingLabCore (A23-P01)
+
+Public declarations, each with `///` documentation:
+
+```text
+enum ValueType: String { scalar, colour, texture, time }
+enum PortDirection: String { input, output }
+struct PortDeclaration { name, direction, type, required }
+enum NodeKind: String, CaseIterable { time, constant, noise, gradient, mix, blur, output }
+  var inputs: [PortDeclaration]; var outputs: [PortDeclaration]; var parameters: [ParameterDefinition]
+  func port(_ name: String) -> PortDeclaration?
+struct NodeID: RawRepresentable<Int>, Comparable (1…9,999)
+struct CanvasPoint { x, y }
+struct GraphNode { id, kind, parameters, position }
+struct GraphEdge: Comparable { sourceNode, sourcePort, targetNode, targetPort }
+struct GraphLimits { static maxNodes = 32; static maxEdges = 64 }
+struct VisualGraph { nodes, edges, output }
+enum GraphDocument {
+  static kind = "a23.visual-graph"; static schemaVersion = 1; static maxEncodedBytes = 65_536
+  static migrations: MigrationChain
+  static func encode(_ graph: VisualGraph) throws -> Data
+  static func decode(_ data: Data) throws(GraphDocumentRefusal) -> VisualGraph
+  static func fingerprint(of graph: VisualGraph) throws -> StateDigest
+}
+enum GraphDocumentRefusal: Error { damaged, newerVersion, tooLarge, notFinite, outOfRange }  (codes as data-model)
+enum GraphIssue: Error, Equatable  (cases as data-model)
+enum CheckResult { accepted(order:reaching:), refused([GraphIssue]) }
+enum GraphChecker { static func check(_ graph: VisualGraph) -> CheckResult }
+```
+
+The checker runs the stages of the spec's clarification Q4 in order and stops after a stage that refused.
