@@ -34,7 +34,7 @@
     `LabDrawError.injected` once and clears it;
   - `ExperienceTests/LabRecoveryDrawTests.swift`: save two graphs, set the seam and draw; the session fails with the
     message; every storage file is byte-identical; a new session over the same storage lists and opens both.
-- [ ] T-A23-605 [P] [US2] Commit the stored samples and test them (FR-A23-604):
+- [X] T-A23-605 [P] [US2] Commit the stored samples and test them (FR-A23-604): — Verified 2026-11-19: 2026-11-19: .autonomy/checks/A23-P06.vpl-recovery-samples.json exit 0; ReleaseSampleTests 9 over eight committed samples generated through the real encoders plus an 81,921-byte graph refused too-large and kept; every file byte-identical
   - `ExperienceTests/Fixtures/` gains the eight files of data-model.md (beside `graph-sample.json`), generated once
     through the real encoders (`LabCore.snapshotPayload`, `GraphLibrary.encode`) and then committed;
   - `ExperienceTests/ReleaseSampleTests.swift`: each file opens or is refused as listed, an 81,921-byte graph file

@@ -1,0 +1,1 @@
+{"body":{"graph":{"body":{"edges":[{"sourceNode":1,"sourcePort":"image","targetNode":2,"targetPort":"image"}],"nodes":[{"id":1,"kind":"gradient","parameters":{"angle":30},"position":{"x":100,"y":60}},{"id":2,"kind":"output","parameters":{},"position":{"x":400,"y":60}}]},"kind":"a23.visual-graph","version":1},"name":"Sample ramp","order":2},"kind":"a23.saved-graph","version":2}
