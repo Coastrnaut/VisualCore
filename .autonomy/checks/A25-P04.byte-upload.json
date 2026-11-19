@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "VisualCoreRenderingTests/ByteUploadTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --only-testing VisualCoreRenderingTests/ByteUploadTests",
+  "elapsed_seconds": 2.69,
+  "exit_code": 0,
+  "finished": "2026-11-19T20:06:40+00:00",
+  "log": ".autonomy/logs/A25-P04.byte-upload.log",
+  "log_sha256": "cd3691dc4535546bdeccf14078692c45a072ba63b0cb6480b2e1ca534fe112e8",
+  "name": "byte-upload",
+  "stage": "A25-P04",
+  "started": "2026-11-19T20:06:38+00:00",
+  "timed_out": false
+}

@@ -187,6 +187,25 @@ public final class RenderTarget: GPUResource {
         return vcglGetError() == GLenum(GL_NO_ERROR)
     }
 
+    /// Replaces the whole color texture with RGBA bytes, rows bottom-up (feature 183, A25-P04 T-A25-402; gap
+    /// U-RGBAUPLOAD): `.rgba8` stores the bytes as given; `.rgba16f` stores each byte n as the half float n/255. A
+    /// picture of width × height pixels needs width × height × 4 bytes, a quarter of what ``upload(rgbaFloats:)`` takes.
+    /// Returns false for `.r8`, a count other than width × height × 4, or a stale or released target.
+    @discardableResult
+    public func upload(rgba pixels: [UInt8]) -> Bool {
+        guard format != .r8, pixels.count == width * height * 4,
+              !released, let registry, registry.accept(generation: handle.generation) else { return false }
+        if format == .rgba16f { return upload(rgbaFloats: pixels.map { Float($0) / 255 }) }
+        vcglBindTexture(GLenum(GL_TEXTURE_2D), colorTexture)
+        vcglPixelStorei(GLenum(GL_UNPACK_ALIGNMENT), 1)
+        pixels.withUnsafeBytes {
+            vcglTexSubImage2D(GLenum(GL_TEXTURE_2D), 0, 0, 0, GLsizei(width), GLsizei(height),
+                              GLenum(GL_RGBA), GLenum(GL_UNSIGNED_BYTE), $0.baseAddress)
+        }
+        vcglPixelStorei(GLenum(GL_UNPACK_ALIGNMENT), 4)
+        return vcglGetError() == GLenum(GL_NO_ERROR)
+    }
+
     /// The color attachment as RGBA floats, rows bottom-up (feature 019): `.rgba16f` is read as GL floats, `.rgba8`
     /// as bytes divided by 255. Empty for `.r8`, a GL error, or a stale or released target. Leaves this target bound.
     public func readFloatPixels() -> [Float] {

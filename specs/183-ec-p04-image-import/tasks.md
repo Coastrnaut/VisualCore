@@ -14,7 +14,7 @@
 
 ## Phase 2: VisualCore — U-RGBAUPLOAD (P1)
 
-- [ ] T-A25-402 [P] In `Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift`: `RenderTarget.upload(rgba:)` per
+- [X] T-A25-402 [P] In `Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift`: `RenderTarget.upload(rgba:)` per — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P04.byte-upload.json exit 0 (ByteUploadTests 3: rgba8 equal, rgba16f n/255, refusals)
   contracts/visualcore.md; `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/ByteUploadTests.swift`: bytes into `.rgba8` read back
   equal, into `.rgba16f` within half-float precision of n/255 (read with `readFloatPixels`), `.r8`, a wrong count and a
   stale target after `recreateContext` refused (FR-A25-401)
