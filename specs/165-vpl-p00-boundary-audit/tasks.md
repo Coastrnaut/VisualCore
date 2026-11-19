@@ -35,7 +35,7 @@
     `PlaneViewport`, `Camera2D`);
   - a `traceability` entry per capability and feature
   (FR-A23-001, FR-A23-002)
-- [ ] T-A23-003 [US1] Write the generated-block markers into `docs/apps/visual-programming-lab/visualcore-contract.md`
+- [X] T-A23-003 [US1] Write the generated-block markers into `docs/apps/visual-programming-lab/visualcore-contract.md` — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A23-P00.contract.json exit 0 (PASS: 32 rows, 167 citations, 9 gaps, decision go; 0.05 s); visualcore-contract.md rendered between its generated-block markers
   before the first render, then run the contract checker and render the view (`--name contract -- python3
   scripts/check_app_contract.py --app visual-programming-lab --render`) (FR-A23-007, SC-A23-001)
 
