@@ -58,7 +58,7 @@
   - in `Apps/VisualCore/App/ExperienceRegistry.swift`, the candidate `effectsComposer`; the `project.yml` product;
   - in `Apps/VisualCore/Tests/Unit/AppModelTests.swift`, the synthetic candidate id moves to `r02-g01.aurora-loom`;
   - the candidate lists in the app and script tests.
-- [ ] T-A25-211 Review checkpoint:
+- [X] T-A25-211 Review checkpoint: — Verified 2026-11-19: 2026-11-19 review checkpoint: .autonomy/checks/A25-P02.{ec-ios27,documented-api,isolation,core-purity}.json exit 0; slowest test 2.7 s
   - `--name ec-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme
     ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing EffectsComposerCoreTests
     EffectsComposerExperienceTests`, each test under 10 s (SC-A25-206);
