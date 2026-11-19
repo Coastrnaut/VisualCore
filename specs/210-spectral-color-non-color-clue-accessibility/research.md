@@ -35,3 +35,8 @@
   ids; the pure colour model has no app id, seed, tick or capability tier, so the consuming experience adds them when
   it reports (the existing failure-report path of the experience host). Rationale: keeps the model pure (constitution
   IV). Alternatives: passing app context into colour functions (couples a pure module to the host).
+- **R12 App wiring (implementation, 2026-11-19).** Finding: the app does not store `AccessibilityPreferences`; its
+  `SettingsView` builds them from `ShellPreferences` (VisualCoreExperience, schema 1) and writes back only the two
+  choices, so a picker alone would be dropped. Decision: `ShellPreferences.colorVision: ColorVisionChoice?` (absent →
+  standard, schema stays 1, exactly like the R02-F26 haptics switch), carried by `AppModel.setAccessibility`,
+  `SettingsView` and `ExperienceLaunch`. Alternatives: a second store for one value (two sources of truth).

@@ -75,6 +75,11 @@
   wrapping name, accessibility label = name; `ColorVisionChoice.palette`) and edit `AccessibilitySettingsSection.swift`
   (a colour-vision picker with identifier `<prefix>.colorVision`; `AccessibleColors.contrastRatio` delegates to
   `PerceptualColor.contrastRatio` with unchanged results) with
+  the app wiring (research R12): `ShellPreferences.colorVision: ColorVisionChoice?` in
+  `Packages/VisualCore/Sources/VisualCoreExperience/ShellModel.swift` (optional, `decodeIfPresent`, schema stays 1, as
+  the haptics switch), `AppModel.setAccessibility` gains `colorVision`, `SettingsView`'s binding carries it,
+  `ExperienceLaunch.colorVision` hands it to experiences, with a ShellModel test that schema-1 JSON without the key
+  decodes as nil (`standard`) and a round trip;
   `Packages/VisualCoreRendering/Tests/VisualCoreUITests/ClueBadgeTests.swift` (label equals name; renders at the
   largest accessibility size in compact and regular widths without truncation via `ImageRenderer` size checks;
   `contrastRatio` gives the same values as before for the existing pairs; picker present)
