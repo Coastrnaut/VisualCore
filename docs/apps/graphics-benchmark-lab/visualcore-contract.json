@@ -1,0 +1,1837 @@
+{
+ "schema": 1,
+ "app": "graphics-benchmark-lab",
+ "gate": "A24-P00",
+ "date": "2026-11-19",
+ "inventory": [
+  {
+   "area": "Package products",
+   "description": "Pure, host-testable products of Packages/VisualCore: VisualCoreMath, VisualCoreSimulation, VisualCoreScenes, VisualCoreShaderSource, VisualCoreEffectsGraph, VisualCoreDiagnostics, VisualCoreAudioDSP, VisualCorePersistence, VisualCoreParameters, VisualCoreExperience (plus VisualCoreTestSupport for tests). iOS products of Packages/VisualCoreRendering: VisualCoreRendering, VisualCoreEffects, VisualCoreUI, VisualCoreAudio, VisualCoreAutomation, VisualCoreExperienceHost. For Graphics Benchmark Lab (checked 2026-11-19): VisualCoreRendering has RenderHost (capabilities, presentedFrameCount, addPresentObserver, renderOffscreen, readPixels), RenderContext, FrameInfo, PresentedFrame, RenderCapabilities, FieldPass, FullScreenShaderScene, ParticleRenderer, Texture.upload(rgba:), ResourceRegistry (program, makeRenderTarget, stats, budget), ShaderBundle with the vc/ library and ProcessMemory; VisualCoreDiagnostics has PacingMeter, PacingSummary, PerformanceRecord, GrowthRule, ResourceBudget, ResourceLedger, RenderLifecycle, DeviceConditions, FramePacing, QualityProfile, QualityLevel and QualityGovernor; VisualCoreSimulation has ParticleSystem and ParticleInstance; VisualCoreExperience has RendererRecord, ExperienceStorage, ExperienceSnapshot and ExperienceCore; VisualCorePersistence has MigrationChain, DocumentStore and NamedLibrary. Missing in every framework product (grep 2026-11-19): a GPU timer query, the renderer's facts on RenderContext, a public device, OS and build reporter, the ANGLE build at run time, the display refresh rate, statistics over raw samples, CSV writing, a shared export helper, a textured-quad helper, procedural textures, a phase runner and any benchmark scene.",
+   "paths": [
+    "Packages/VisualCore/Package.swift",
+    "Packages/VisualCoreRendering/Package.swift",
+    "Packages/ExperiencesCreative/Package.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderCapabilities.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ParticleRenderer.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ProcessMemory.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/PacingMeter.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/PerformanceRecord.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/GrowthRule.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/ResourceLedger.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/RenderLifecycle.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/DeviceConditions.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/FramePacing.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityProfile.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityGovernor.swift",
+    "Packages/VisualCore/Sources/VisualCoreSimulation/ParticleSystem.swift",
+    "Packages/VisualCore/Sources/VisualCoreExperience/RendererRecord.swift",
+    "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+    "Packages/VisualCore/Sources/VisualCorePersistence/Migration.swift",
+    "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
+    "Packages/VisualCore/Sources/VisualCorePersistence/NamedLibrary.swift",
+    "docs/api/visualcore-public-api.txt",
+    "scripts/check_dependencies.py"
+   ],
+   "owner": "VisualCore packages (ADR-0003, ADR-0009)"
+  },
+  {
+   "area": "EGL render host and its main-thread rule",
+   "description": "RenderHost (@MainActor) owns the EGL display, context and surfaces over ANGLE's Metal backend (EGLDisplayProvider), the CAMetalLayer RenderView, the FrameScheduler paced by FramePacing and the context generations, and exposes capabilities (RenderCapabilities), resources (ResourceRegistry), presentedFrameCount, addPresentObserver, replaceScene, pause, resume and recreateContext. RenderHost, ResourceRegistry, RenderScene and ExperiencePresenter are main-actor: GL work happens only inside a scene's setup, resize, render and teardown with the host's context current, on the main thread. A presenter receives a RenderContext (generation, pixel size, framebuffer, resources), never the host. The core ES 3.0 query calls exist only in the internal CVisualCoreGL shim, which is no product.",
+   "paths": [
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderView.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FrameScheduler.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/EGLDisplayProvider.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/FramePacing.swift",
+    "Packages/VisualCoreRendering/Sources/CVisualCoreGL/CVisualCoreGL.c",
+    "Packages/VisualCoreRendering/Sources/CVisualCoreGL/include/CVisualCoreGL.h"
+   ],
+   "owner": "VisualCoreRendering (ADR-0002 seam)"
+  },
+  {
+   "area": "Programs, full-screen passes, particles and textures",
+   "description": "ResourceRegistry.program(vertex:fragment:defines:library:...) compiles and links in the host's context with ShaderError diagnostics and an LRU program cache. FullScreenShaderScene draws one fragment program over the drawable; FieldPass runs a fragment over every pixel of a RenderTarget or the framebuffer with named sampler2D inputs and typed FieldUniform values, validated before any draw. ParticleRenderer draws instanced ParticleInstance quads (ParticleSystem.defaultCapacity 10,000, maxCapacity 100,000). Texture.upload(rgba:) uploads pixels generated in code.",
+   "paths": [
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderProgram.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ParticleRenderer.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+    "Packages/VisualCore/Sources/VisualCoreSimulation/ParticleSystem.swift",
+    "Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/FieldPassTests.swift",
+    "Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/FullScreenShaderSceneTests.swift",
+    "Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/ParticleRendererTests.swift",
+    "Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/TextureUploadTests.swift"
+   ],
+   "owner": "VisualCoreRendering + VisualCoreSimulation"
+  },
+  {
+   "area": "Render targets, ResourceBudget, off-screen rendering and read-back",
+   "description": "ResourceRegistry.makeRenderTarget(width:height:format:depth:) creates targets; acquireTarget, recycle and trimPools pool them; ResourceRegistry.stats (ResourceLedger.Snapshot) and budget (ResourceBudget, 256 MiB by default, per-kind limits) bound GPU bytes and refuse allocations over budget. RenderHost.renderOffscreen renders a still and RenderHost.readPixels reads the framebuffer back.",
+   "paths": [
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/ResourceLedger.swift",
+    "Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/ResourceRegistryTests.swift",
+    "Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/OffscreenExportTests.swift"
+   ],
+   "owner": "VisualCoreRendering + VisualCoreDiagnostics"
+  },
+  {
+   "area": "The vc/ GLSL library",
+   "description": "ShaderBundle compiles bundled GLSL ES 3.00 with #include of the vc/ library (ShaderBundle.visualCoreLibrary): noise.glsl, palette.glsl, color.glsl, hash.glsl, sdf.glsl and field.glsl. The ALU stress program and the generated textures may include them (G-SCENES).",
+   "paths": [
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderBundle.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/noise.glsl",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/palette.glsl",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/color.glsl",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/hash.glsl",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/sdf.glsl",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/field.glsl"
+   ],
+   "owner": "VisualCoreRendering"
+  },
+  {
+   "area": "Frame clock and frame information",
+   "description": "FrameInfo (index, time in seconds since the host started rendering, delta clamped to 0\u20260.1 s by FramePacing.clampedDelta, targetTimestamp) is passed to every render call; PresentedFrame and addPresentObserver report presentations; presentedFrameCount counts them; ExperiencePresenter.maxFramesPerSecond caps the presenter's rate. Frame intervals for results come from consecutive FrameInfo.time values (clarification Q3).",
+   "paths": [
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FrameScheduler.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/FramePacing.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+    "Packages/VisualCoreRendering/Tests/VisualCoreExperienceHostTests/FrameCapTests.swift"
+   ],
+   "owner": "VisualCoreRendering + VisualCoreDiagnostics"
+  },
+  {
+   "area": "Diagnostics, resource statistics, device conditions and renderer capabilities",
+   "description": "PacingMeter and PacingSummary (0.25 ms histogram; median, p95, p99 rounded to bins; private percentile function), PerformanceRecord (versioned per-run record of the session), GrowthRule, ResourceRegistry.stats, ResourceLedger, RenderLifecycle, RenderHostError.contextLost and ProcessMemory.footprint(); DeviceConditions.current() (thermal state and Low Power Mode from ProcessInfo) and FramePacing (frame cap under heat and Low Power Mode); RenderCapabilities (GL and GLSL version, renderer, vendor, extension list, limits) on RenderHost.capabilities and the pure RendererRecord (no extension list). The only device, OS and build reader (AutomationRunner in VisualCoreAutomation) is internal and debug-only.",
+   "paths": [
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/PacingMeter.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/PerformanceRecord.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/GrowthRule.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/ResourceLedger.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/RenderLifecycle.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/DeviceConditions.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/FramePacing.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ProcessMemory.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderCapabilities.swift",
+    "Packages/VisualCore/Sources/VisualCoreExperience/RendererRecord.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreAutomation/AutomationRunner.swift",
+    "Packages/VisualCore/Tests/VisualCoreDiagnosticsTests/PacingMeterTests.swift",
+    "Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/RenderCapabilitiesProbeTests.swift"
+   ],
+   "owner": "VisualCoreDiagnostics + VisualCoreRendering + VisualCoreExperience"
+  },
+  {
+   "area": "Experience host",
+   "description": "ExperienceSession opens, checkpoints, closes and recovers an Experience on one RenderHost, applies quality (QualityGovernor over the QualityProfile, fed by DeviceConditions), memory-warning and scene-phase events and keeps a PerformanceRecord (lastPerformanceRecord); ExperienceShell adapts an ExperiencePresenter (scene, controls, pointer input, canvas overlay, maxFramesPerSecond); ExperienceCore is the GPU-free state with its qualityTiers; ExperienceStorage and ExperienceSnapshot persist it. The one app registers experiences in ExperienceRegistry and Catalog/registrations.json: twenty-three registered (A01-A23), candidates empty (checked 2026-11-19); a24 appears in neither file as a registration, AppModelTests uses a24.graphics-benchmark-lab as the synthetic not-yet-integrated id, and Graphics Benchmark Lab stays unregistered and unavailable in A24-P00. The catalog lists it as free, family Developer and creator tools, launcher category tools.",
+   "paths": [
+    "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceShell.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+    "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceCore.swift",
+    "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+    "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceSnapshot.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityGovernor.swift",
+    "Apps/VisualCore/App/ExperienceRegistry.swift",
+    "Apps/VisualCore/Tests/Unit/AppModelTests.swift",
+    "Catalog/registrations.json",
+    "docs/catalog/experience-catalog.json",
+    "scripts/check_experience_packages.py",
+    "project.yml"
+   ],
+   "owner": "VisualCoreExperience + VisualCoreExperienceHost + the one app"
+  },
+  {
+   "area": "Build and release steps",
+   "description": "XcodeGen spec project.yml for the one app (target VisualCore), package schemes via scripts/xcodebuild_package.py, app tests via scripts/xcodebuild_app.py, and scripts/release_check.py: python3 scripts/release_check.py --list prints 173 lines (2026-11-19): shared checks including app-contracts (every docs/apps/*/visualcore-contract.json), licenses and usage-descriptions; package and app builds and tests; experience-release and copy-claims steps of the released experiences; verify steps of the registered experiences on iOS 27 and 26; the release audits; the seven reference regression steps and the ProjectM independence check. No A24 step exists yet; they come with G-RELEASE.",
+   "paths": [
+    "project.yml",
+    "scripts/release_check.py",
+    "scripts/xcodebuild_package.py",
+    "scripts/xcodebuild_app.py",
+    "scripts/check_app_contract.py",
+    "scripts/check_licenses.py",
+    "scripts/check_copy_claims.py",
+    "scripts/check_usage_descriptions.py",
+    ".github/workflows/ci.yml"
+   ],
+   "owner": "repository tooling"
+  },
+  {
+   "area": "Source ownership",
+   "description": "Graphics Benchmark Lab owns its domain and UI under Packages/ExperiencesCreative/GraphicsBenchmarkLab/ (Core GPU-free, CoreTests, Experience with Adapter/, ExperienceTests; created in A24-P01, not present today): the case, run, sample and summary models and their caps; the statistics; the three workload scenes and their configurations; the phase runner and the CPU submit timer; the device report; result storage and export; the explanation of limits; copy. VisualCore owns reusable machinery: the host, passes, particles, targets and programs (VisualCoreRendering, VisualCoreExperienceHost), pacing, budgets, conditions and quality (VisualCoreDiagnostics), particles (VisualCoreSimulation), persistence (VisualCorePersistence) and storage (VisualCoreExperience); U-RENDERINFO and U-GPUTIMER are VisualCoreRendering's. ProjectM stays in the harness.",
+   "paths": [
+    ".specify/memory/constitution.md",
+    "Auto-Creator.md",
+    "docs/decisions/ADR-0009-unified-app.md",
+    "Packages/ExperiencesCreative/Package.swift",
+    "docs/apps/graphics-benchmark-lab/README.md",
+    "specs/172-gbl-p00-boundary-audit/spec.md",
+    "specs/172-gbl-p00-boundary-audit/research.md"
+   ],
+   "owner": "Graphics Benchmark Lab (app-local) + VisualCore packages"
+  },
+  {
+   "area": "ProjectM reference regression",
+   "description": "Reference pinned at d93edd1, read-only; scripts/run_reference_baseline.py lists the ordered reference steps; scripts/check_reference_clean.py checks the submodule; the 7 release-check steps run in two chunks via release_check.py --only (reference-engine-xcframework, reference-build-projectm-ios-sim, reference-clean; reference-test-anglerendering-ios27, reference-test-anglerendering-ios26, projectm-reference-ios27, projectm-reference-ios26), recorded in docs/apps/graphics-benchmark-lab/regression-baseline.md. Phase start for the no-change diff of Packages and External: 7de0f2af (after the A24 constitution commit 6c0a7d35).",
+   "paths": [
+    "scripts/run_reference_baseline.py",
+    "scripts/check_reference_clean.py",
+    "Harnesses/ProjectMReference/ProjectMReference.yml",
+    "docs/apps/graphics-benchmark-lab/regression-baseline.md",
+    "specs/172-gbl-p00-boundary-audit/research.md"
+   ],
+   "owner": "reference adapter (harness only)"
+  }
+ ],
+ "matrix": [
+  {
+   "id": "M01",
+   "capability": "GPU timing: elapsed GPU time per measured frame, shown only where a supported timer query confirms non-disjoint results",
+   "source": "brainstorm: GPU timing; manual \u00a76 capability audit; spec FR-A24-002",
+   "status": "upstream gap",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderCapabilities.swift",
+     "symbol": "RenderCapabilities.extensions",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+     "symbol": "RenderHost.capabilities",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/Aurora/Experience/AuroraPresenter.swift",
+    "symbol": "AuroraPresenter"
+   },
+   "notes": "No GPU timer exists in any framework product (grep 2026-11-19): no GL_EXT_disjoint_timer_query binding, no 64-bit query result (GL_TIME_ELAPSED_EXT, glGetQueryObjectui64vEXT) and no GL_GPU_DISJOINT_EXT check; the core ES 3.0 query calls (vcglGenQueries and friends) exist only in the internal CVisualCoreGL shim (Packages/VisualCoreRendering/Sources/CVisualCoreGL), which is no product and is never linked by an experience (research D6). RenderCapabilities.extensions holds the renderer's extension list, read on RenderHost.capabilities, so a capability probe can look for the extension (RenderCapabilitiesProbeTests). U-GPUTIMER (A24-P03, clarification Q1): built only if the probe finds the extension on the iOS 27.2 simulator; otherwise closed as not supported, the lab shows \"GPU time not available on this device\" and never labels a CPU time as GPU time. Aurora is the closest consumer (it reads RenderCapabilities precision)."
+  },
+  {
+   "id": "M02",
+   "capability": "Diagnostics: frame pacing, per-run performance record, resource statistics, render lifecycle and memory footprint",
+   "source": "brainstorm: diagnostics; spec FR-A24-002",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/PacingMeter.swift",
+     "symbol": "PacingMeter",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/PacingMeter.swift",
+     "symbol": "PacingSummary",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/PerformanceRecord.swift",
+     "symbol": "PerformanceRecord",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+     "symbol": "ResourceRegistry.stats",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/RenderLifecycle.swift",
+     "symbol": "RenderLifecycle",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ProcessMemory.swift",
+     "symbol": "ProcessMemory.footprint",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Apps/VisualCore/App/SettingsView.swift",
+    "symbol": "SettingsView"
+   },
+   "notes": "All public and tested (PacingMeterTests, PerformanceRecordTests, ResourceRegistryTests, RenderLifecycleTests, SessionPerformanceTests). They describe the session, not a benchmark run: PacingMeter rounds intervals to 0.25 ms bins (binWidth) and keeps its percentile function private, so it stays the session's pacing record and is not used for results (clarification Q3). The run's own samples, counts and quality flags are G-STATS and G-RUNNER. The app's Settings shows the session's PerformanceRecord."
+  },
+  {
+   "id": "M03",
+   "capability": "Profiling: frame intervals and CPU submit time captured per frame during a measured phase",
+   "source": "brainstorm: profiling; spec FR-A24-002",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+     "symbol": "FrameInfo",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+     "symbol": "FrameInfo.time",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+     "symbol": "PresentedFrame",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+     "symbol": "RenderHost.addPresentObserver",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/LivingWallpapers/Experience/WallpaperPresenter.swift",
+    "symbol": "WallpaperPresenter"
+   },
+   "notes": "FrameInfo.time is seconds since the host started rendering, monotonic per frame; delta is clamped to 0\u20260.1 s (FramePacing.clampedDelta) and is never used for results. PresentedFrame and addPresentObserver report presentations to the host's owner (RenderHostTests, FrameCapTests). No per-frame CPU submit timer exists: the presenter measures its own draw calls with a monotonic clock (G-RUNNER, A24-P03)."
+  },
+  {
+   "id": "M04",
+   "capability": "Benchmark scenes: repeatable GPU workloads drawn in the host's context",
+   "source": "brainstorm: benchmark scenes; spec FR-A24-002",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+     "symbol": "FieldPass",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+     "symbol": "FullScreenShaderScene",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ParticleRenderer.swift",
+     "symbol": "ParticleRenderer",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+     "symbol": "Texture.upload",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/ParticlesArtScene.swift",
+    "symbol": "ParticlesArtScene"
+   },
+   "notes": "The building blocks are public and tested (FieldPassTests, FullScreenShaderSceneTests, ParticleRendererTests, TextureUploadTests); no benchmark scene, textured-quad helper or procedural texture exists in VisualCore. The three scenes are app-local (G-SCENES, A24-P02, clarification Q4). Generative Art Studio draws particles with ParticleRenderer."
+  },
+  {
+   "id": "M05",
+   "capability": "Device and configuration reporting: device, OS, build, renderer, quality tier and thermal context recorded with a result",
+   "source": "brainstorm: device and configuration reporting; spec FR-A24-002",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/DeviceConditions.swift",
+     "symbol": "DeviceConditions.current",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderCapabilities.swift",
+     "symbol": "RenderCapabilities",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/RendererRecord.swift",
+     "symbol": "RendererRecord",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityProfile.swift",
+     "symbol": "QualityLevel",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/ParticleUniverse/Core/SceneQuality.swift",
+    "symbol": "SceneQuality"
+   },
+   "notes": "DeviceConditions.current() reads thermal state and Low Power Mode from ProcessInfo (FramePacingTests, QualityGovernorTests); RenderCapabilities (RenderCapabilitiesProbeTests) and the pure RendererRecord (RendererRecordTests, no extension list) describe the renderer. No public device, OS and build reporter exists (the only one, in VisualCoreAutomation's AutomationRunner, is internal and debug-only), nor the ANGLE build at run time or the display's refresh rate. The report is G-REPORT; the renderer facts reach a presenter only through U-RENDERINFO (A24-P03)."
+  },
+  {
+   "id": "M06",
+   "capability": "Version 0.1 feature 01: repeatable baseline scenes (textured quads, shader ALU stress, particles) with fixed, versioned configurations",
+   "source": "manual \u00a72 feature 01; spec FR-A24-002",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+     "symbol": "FieldPass",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ParticleRenderer.swift",
+     "symbol": "ParticleRenderer",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreSimulation/ParticleSystem.swift",
+     "symbol": "ParticleSystem",
+     "product": "VisualCoreSimulation",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/Migration.swift",
+     "symbol": "MigrationChain",
+     "product": "VisualCorePersistence",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidFieldsScene.swift",
+    "symbol": "FluidFieldsScene"
+   },
+   "notes": "Drawing is covered by FieldPass and ParticleRenderer (FieldPassTests, ParticleRendererTests, ParticleSystemTests); the scene configurations, their versions and caps are app-local (G-MODEL, G-SCENES). Fluid Art Playground draws FieldPasses over a texture uploaded with Texture.upload(rgba:)."
+  },
+  {
+   "id": "M07",
+   "capability": "Version 0.1 feature 02: a warm-up, measurement and cool-down runner with a capped duration and an immediate stop",
+   "source": "manual \u00a72 feature 02; spec FR-A24-002",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+     "symbol": "FrameInfo.time",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/GrowthRule.swift",
+     "symbol": "GrowthRule",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+     "symbol": "RenderHost.pause",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+     "symbol": "ExperienceSession",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ScenarioRunner.swift",
+    "symbol": "ScenarioRunner"
+   },
+   "notes": "GrowthRule gives a growth verdict after a warm-up (GrowthRuleTests) and ScenarioRunner steps scripted phases for automation (ScenarioRunnerTests), but neither is a benchmark phase runner. Phases, duration caps, cool-down and stop are G-RUNNER (A24-P03)."
+  },
+  {
+   "id": "M08",
+   "capability": "Version 0.1 feature 03: frame-time percentiles, CPU submit time and an optional GPU timer",
+   "source": "manual \u00a72 feature 03; spec FR-A24-002",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+     "symbol": "FrameInfo.time",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/PacingMeter.swift",
+     "symbol": "PacingSummary",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/PacingMeter.swift",
+     "symbol": "PacingMeter.binWidth",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderCapabilities.swift",
+     "symbol": "RenderCapabilities.extensions",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+    "symbol": "ExperienceSession"
+   },
+   "notes": "PacingSummary reports median, p95 and p99 rounded to 0.25 ms bins (PacingMeterTests); results need exact nearest-rank percentiles over raw intervals with the warm-up excluded (G-STATS, A24-P01), CPU submit time around the presenter's draw calls (G-RUNNER) and a GPU timer only where supported (U-GPUTIMER). ExperienceSession feeds its PacingMeter from presented frames."
+  },
+  {
+   "id": "M09",
+   "capability": "Version 0.1 feature 04: a device, OS, build, quality-tier and thermal-context report",
+   "source": "manual \u00a72 feature 04; spec FR-A24-002",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/DeviceConditions.swift",
+     "symbol": "DeviceConditions",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/FramePacing.swift",
+     "symbol": "FramePacing.Thermal",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceCore.swift",
+     "symbol": "ExperienceCore.qualityTiers",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/RendererRecord.swift",
+     "symbol": "RendererRecord",
+     "product": "VisualCoreExperience",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/ParticleUniverse/Core/SceneQuality.swift",
+    "symbol": "SceneQuality"
+   },
+   "notes": "Thermal state, Low Power Mode and quality tiers are public and tested (FramePacingTests, QualityDeclarationTests, RendererRecordTests); the machine identifier from uname, ProcessInfo.operatingSystemVersion and the bundle's version and build are read app-locally (G-REPORT, clarification Q5); renderer strings come with U-RENDERINFO. No private identifier is used."
+  },
+  {
+   "id": "M10",
+   "capability": "Version 0.1 feature 05: export of results as versioned JSON or CSV through a system sheet the person opens",
+   "source": "manual \u00a72 feature 05; spec FR-A24-002",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
+     "symbol": "DocumentStore",
+     "product": "VisualCorePersistence",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/Migration.swift",
+     "symbol": "MigrationChain",
+     "product": "VisualCorePersistence",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/LivingWallpapers/Experience/WallpaperExportFile.swift",
+    "symbol": "WallpaperExportFile"
+   },
+   "notes": "DocumentStore writes Codable JSON documents (DocumentStoreTests); no CSV writer and no shared export helper exist (each exporting experience has its own Transferable with ShareLink, for images only; Living Wallpapers' WallpaperExportFile is the pattern). G-EXPORT (A24-P04)."
+  },
+  {
+   "id": "M11",
+   "capability": "Version 0.1 feature 06: an in-app explanation of limits and variability",
+   "source": "manual \u00a72 feature 06; spec FR-A24-002",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+     "symbol": "ExperiencePresenter",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/DeviceConditions.swift",
+     "symbol": "DeviceConditions",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/FractalExplorer/Experience/ExplorerView.swift",
+    "symbol": "PrecisionNotice"
+   },
+   "notes": "ExperiencePresenter supplies the controls a shell shows (ShellPortTests); the explanation copy (thermal and refresh skew, no GPU time where unsupported, no ranking) is app-local (G-EXPLAIN, A24-P05). Fractal Explorer's PrecisionNotice is the closest consumer of a limits notice."
+  },
+  {
+   "id": "M12",
+   "capability": "Benchmark case, run, frame sample and summary models: versioned, validated, with documented caps",
+   "source": "spec FR-A24-003 area 1; manual \u00a76 schemas",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/Migration.swift",
+     "symbol": "MigrationChain",
+     "product": "VisualCorePersistence",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/Migration.swift",
+     "symbol": "MigrationChain.migrate",
+     "product": "VisualCorePersistence",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceSnapshot.swift",
+     "symbol": "ExperienceSnapshot",
+     "product": "VisualCoreExperience",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/VisualProgrammingLab/Core/GraphDocument.swift",
+    "symbol": "GraphDocument"
+   },
+   "notes": "MigrationChain and ExperienceSnapshot are public and tested (ExperienceSnapshotTests, SnapshotMigrationCheckTests); the models are the experience's pure Core (G-MODEL, A24-P01). Visual Programming Lab's GraphDocument is the versioned-envelope pattern."
+  },
+  {
+   "id": "M13",
+   "capability": "Percentile statistics (p50, p95, p99) over raw samples with the warm-up excluded and sample counts",
+   "source": "spec FR-A24-003 area 2; manual \u00a76 algorithm",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/PacingMeter.swift",
+     "symbol": "PacingSummary",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/PacingMeter.swift",
+     "symbol": "PacingMeter.binWidth",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+    "symbol": "ExperienceSession"
+   },
+   "notes": "No public statistics over raw samples exist; PacingMeter's histogram (binWidth 0.00025 s, binCount 1000) rounds to bins (PacingMeterTests) and is rejected for results (research D6). G-STATS (A24-P01), tested with fixed sample fixtures under swift test."
+  },
+  {
+   "id": "M14",
+   "capability": "The three workload scenes: textured quads, shader ALU stress and particles, each with a fixed configuration and caps checked before allocation",
+   "source": "spec FR-A24-003 area 3; manual \u00a76 render sequence",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+     "symbol": "FieldPass",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+     "symbol": "Texture.upload",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+     "symbol": "ResourceRegistry.program",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ParticleRenderer.swift",
+     "symbol": "ParticleRenderer",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreSimulation/ParticleSystem.swift",
+     "symbol": "ParticleSystem.defaultCapacity",
+     "product": "VisualCoreSimulation",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidFieldsScene.swift",
+    "symbol": "FluidFieldsScene"
+   },
+   "notes": "Textured quads as layered FieldPass draws sampling a texture generated in code with Texture.upload(rgba:); ALU stress as a fragment program compiled by ResourceRegistry.program with a bounded iteration count; particles through ParticleRenderer with ParticleInstance (ParticleSystem.defaultCapacity 10,000, maxCapacity 100,000). Tested by FieldPassTests, TextureUploadTests, ShaderProgramTests and ParticleRendererTests. G-SCENES (A24-P02)."
+  },
+  {
+   "id": "M15",
+   "capability": "Run phases (warm-up, measurement, cool-down), a capped duration and an immediate stop",
+   "source": "spec FR-A24-003 area 4; manual \u00a713 risk 3",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+     "symbol": "ExperienceSession",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+     "symbol": "ExperiencePresenter",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+     "symbol": "RenderHost.pause",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/VisualProgrammingLab/Experience/LabPresenter.swift",
+    "symbol": "LabPresenter"
+   },
+   "notes": "The session pauses and resumes the host (SessionOpenCloseTests, RenderHostTests); no benchmark phase machine, cap or cool-down exists. G-RUNNER (A24-P03)."
+  },
+  {
+   "id": "M16",
+   "capability": "Frame-time and CPU submit-time capture from a monotonic clock",
+   "source": "spec FR-A24-003 area 5",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+     "symbol": "FrameInfo.time",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+     "symbol": "FrameInfo.targetTimestamp",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+     "symbol": "PresentedFrame",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+     "symbol": "RenderHost.presentedFrameCount",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/LivingWallpapers/Experience/WallpaperPresenter.swift",
+    "symbol": "WallpaperPresenter"
+   },
+   "notes": "Frame intervals come from consecutive FrameInfo.time values, never the clamped delta (clarification Q3; FrameCapTests, StillTimeTests); CPU submit time is measured app-locally around the presenter's own draw calls (G-RUNNER, A24-P03)."
+  },
+  {
+   "id": "M17",
+   "capability": "A GPU timer only where supported, detected by a capability probe",
+   "source": "spec FR-A24-003 area 6; manual \u00a713 risk 2",
+   "status": "upstream gap",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderCapabilities.swift",
+     "symbol": "RenderCapabilities.extensions",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/Aurora/Experience/AuroraPresenter.swift",
+    "symbol": "AuroraPresenter"
+   },
+   "notes": "No GPU timer exists in any framework product (grep 2026-11-19): no GL_EXT_disjoint_timer_query binding, no 64-bit query result (GL_TIME_ELAPSED_EXT, glGetQueryObjectui64vEXT) and no GL_GPU_DISJOINT_EXT check; the core ES 3.0 query calls (vcglGenQueries and friends) exist only in the internal CVisualCoreGL shim (Packages/VisualCoreRendering/Sources/CVisualCoreGL), which is no product and is never linked by an experience (research D6). RenderCapabilities.extensions holds the renderer's extension list, read on RenderHost.capabilities, so a capability probe can look for the extension (RenderCapabilitiesProbeTests). U-GPUTIMER (A24-P03)."
+  },
+  {
+   "id": "M18",
+   "capability": "The renderer's facts (GL version, renderer string, extension list) reaching the experience without the host or the internal GL shim",
+   "source": "spec FR-A24-003 area 7",
+   "status": "upstream gap",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+     "symbol": "RenderContext",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+     "symbol": "RenderHost.capabilities",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderCapabilities.swift",
+     "symbol": "RenderCapabilities",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/RendererRecord.swift",
+     "symbol": "RendererRecord",
+     "product": "VisualCoreExperience",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/FractalExplorer/Experience/ExplorerView.swift",
+    "symbol": "ExplorerModel"
+   },
+   "notes": "RenderHost.capabilities holds the facts (RenderCapabilitiesProbeTests), but a presenter receives a RenderContext (generation, pixel size, framebuffer, resources) that carries neither RenderCapabilities nor a RendererRecord. Fractal Explorer's view model reads host.capabilities for shader precision only. U-RENDERINFO (A24-P03, clarification Q2): a read-only copy for the presenter, with tests, docs, the API baseline and the reference regression; linking the internal shim is refused."
+  },
+  {
+   "id": "M19",
+   "capability": "Device, OS, build, quality-tier and thermal-context report from public APIs only",
+   "source": "spec FR-A24-003 area 8; manual \u00a713 risk 1",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/DeviceConditions.swift",
+     "symbol": "DeviceConditions.current",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/FramePacing.swift",
+     "symbol": "FramePacing.Thermal",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityProfile.swift",
+     "symbol": "QualityLevel",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceCore.swift",
+     "symbol": "ExperienceCore.qualityTiers",
+     "product": "VisualCoreExperience",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/ParticleUniverse/Core/SceneQuality.swift",
+    "symbol": "SceneQuality"
+   },
+   "notes": "See M05 and M09 (FramePacingTests, QualityProfileTests). G-REPORT (A24-P03)."
+  },
+  {
+   "id": "M20",
+   "capability": "Local result storage with versioned files; damaged and newer files refused and never deleted automatically",
+   "source": "spec FR-A24-003 area 9",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+     "symbol": "ExperienceStorage",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/Migration.swift",
+     "symbol": "MigrationChain",
+     "product": "VisualCorePersistence",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/NamedLibrary.swift",
+     "symbol": "NamedLibrary",
+     "product": "VisualCorePersistence",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
+     "symbol": "DocumentStore",
+     "product": "VisualCorePersistence",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/VisualProgrammingLab/Experience/GraphLibrary.swift",
+    "symbol": "GraphLibrary"
+   },
+   "notes": "ExperienceStorage, MigrationChain, NamedLibrary and DocumentStore are public and tested (ExperienceStorageTests, NamedLibraryTests, DocumentStoreTests); the result envelope and its refusal policy are app-local (G-RESULTS, A24-P04). Visual Programming Lab's GraphLibrary is the pattern."
+  },
+  {
+   "id": "M21",
+   "capability": "Export as versioned JSON or CSV through a system sheet the person opens",
+   "source": "spec FR-A24-003 area 10",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
+     "symbol": "DocumentStore",
+     "product": "VisualCorePersistence",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/LivingWallpapers/Experience/WallpaperExportFile.swift",
+    "symbol": "WallpaperExportFile"
+   },
+   "notes": "No CSV and no shared export helper (see M10). G-EXPORT (A24-P04): a Transferable and ShareLink after Living Wallpapers; nothing is uploaded."
+  },
+  {
+   "id": "M22",
+   "capability": "An in-app explanation of limits and variability",
+   "source": "spec FR-A24-003 area 11; manual \u00a713 risks 1-2",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+     "symbol": "ExperiencePresenter",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/FractalExplorer/Experience/ExplorerView.swift",
+    "symbol": "PrecisionNotice"
+   },
+   "notes": "See M11 (ShellPortTests). G-EXPLAIN (A24-P05)."
+  },
+  {
+   "id": "M23",
+   "capability": "Resize, orientation and context loss during a run: the run is marked interrupted and resources rebuilt from CPU state",
+   "source": "spec FR-A24-003 area 12; spec edge cases",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+     "symbol": "RenderScene",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+     "symbol": "RenderContext.generation",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+     "symbol": "RenderHost.recreateContext",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+     "symbol": "RenderHostError",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/ParticleUniverse/Experience/ParticleStage.swift",
+    "symbol": "ParticleStage"
+   },
+   "notes": "Rebuild after loss and resize is available (M24, M25; RenderHostTests, ShellRenderingTests); marking a measured run interrupted and discarding its samples is G-RUNNER (A24-P03)."
+  },
+  {
+   "id": "M24",
+   "capability": "Context loss: GPU objects of an earlier context are refused and rebuilt from CPU state",
+   "source": "cross-cutting; manual \u00a74 contracts",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+     "symbol": "RenderHost.recreateContext",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+     "symbol": "RenderContext.generation",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+     "symbol": "RenderHostError",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+     "symbol": "ExperienceSession.recreateContext",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/ParticleUniverse/Experience/ParticleStage.swift",
+    "symbol": "ParticleStage"
+   },
+   "notes": "RenderHost.recreateContext and ExperienceSession.recreateContext tear down and set up the scene in a new generation; RenderHostError has a contextLost case (RenderHostTests, ShellRenderingTests, SessionFailureTests). Particle Universe's ParticleStage handles it."
+  },
+  {
+   "id": "M25",
+   "capability": "Resize and orientation: scenes follow the drawable's pixel size",
+   "source": "cross-cutting",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+     "symbol": "RenderScene",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+     "symbol": "RenderContext.pixelWidth",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/VisualProgrammingLab/Experience/PreviewPipeline.swift",
+    "symbol": "PreviewPipeline"
+   },
+   "notes": "RenderScene.resize receives the new RenderContext (pixelWidth, pixelHeight) (RenderHostTests, ShellRenderingTests); Visual Programming Lab's PreviewPipeline rebuilds its targets on resize."
+  },
+  {
+   "id": "M26",
+   "capability": "Quality tiers: the governor fed by thermal state and Low Power Mode, tiers declared by the core",
+   "source": "cross-cutting",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityGovernor.swift",
+     "symbol": "QualityGovernor",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityProfile.swift",
+     "symbol": "QualityProfile",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityProfile.swift",
+     "symbol": "QualityLevel",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceCore.swift",
+     "symbol": "ExperienceCore.qualityTiers",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/FramePacing.swift",
+     "symbol": "FramePacing",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/PhysicsPlayground/Experience/Adapter/PlaygroundCore.swift",
+    "symbol": "PlaygroundCore"
+   },
+   "notes": "QualityGovernorTests, QualityProfileTests, SessionQualityTests, QualityDeclarationTests. A run records the tier it ran at (G-REPORT); the tier is not changed during a measured phase (G-RUNNER)."
+  },
+  {
+   "id": "M27",
+   "capability": "Accessibility: VoiceOver labels, Dynamic Type and Reduce Motion respected",
+   "source": "cross-cutting; constitution A24 accessibility",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPreferences.swift",
+     "symbol": "AccessibilityPreferences",
+     "product": "VisualCoreSimulation",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPreferences.swift",
+     "symbol": "AccessibilityPreferences.reduceMotion",
+     "product": "VisualCoreSimulation",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/SceneScreen.swift",
+    "symbol": "AppAccessibility"
+   },
+   "notes": "AccessibilityPreferencesTests, SystemAccessibilityObserverTests. Generative Art Studio's SceneScreen applies them. The lab's controls and results are labelled app-locally in later phases."
+  },
+  {
+   "id": "M28",
+   "capability": "Bounded resources: GPU bytes, particles and storage under declared caps",
+   "source": "cross-cutting; manual \u00a713 risk 3",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/ResourceLedger.swift",
+     "symbol": "ResourceBudget",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/ResourceLedger.swift",
+     "symbol": "ResourceLedger",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+     "symbol": "ResourceRegistry.budget",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreSimulation/ParticleSystem.swift",
+     "symbol": "ParticleSystem.maxCapacity",
+     "product": "VisualCoreSimulation",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+     "symbol": "ExperienceStorage.maxBytes",
+     "product": "VisualCoreExperience",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/ShaderStudio/Experience/TexturedPreview.swift",
+    "symbol": "TexturedPreview"
+   },
+   "notes": "ResourceBudget (256 MiB by default) refuses allocations over budget (ResourceLedgerTests, ResourceRegistryTests); ParticleSystem.maxCapacity and ExperienceStorage.maxBytes bound particles and files (ParticleSystemTests, ExperienceStorageTests). The workloads' own caps are set in G-SCENES and G-RUNNER as bounds, not targets (research D5)."
+  },
+  {
+   "id": "M29",
+   "capability": "Permissions: none. No network, no upload, no usage string; results stay in the experience's own storage",
+   "source": "cross-cutting; spec negative requirements",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+     "symbol": "ExperienceStorage",
+     "product": "VisualCoreExperience",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/VisualProgrammingLab/Experience/GraphLibrary.swift",
+    "symbol": "GraphLibrary"
+   },
+   "notes": "ExperienceStorage is local to the experience (ExperienceStorageTests); export goes only through a share sheet the person opens. scripts/check_usage_descriptions.py keeps the app's usage strings unchanged."
+  },
+  {
+   "id": "M30",
+   "capability": "The render thread: GL work only inside a scene's setup, resize, render and teardown on the main thread",
+   "source": "cross-cutting; spec clarifications host rule",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+     "symbol": "RenderHost",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+     "symbol": "RenderScene",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+     "symbol": "ResourceRegistry",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+     "symbol": "ExperiencePresenter",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/VisualProgrammingLab/Experience/LabPresenter.swift",
+    "symbol": "LabPresenter"
+   },
+   "notes": "RenderHost, ResourceRegistry, RenderScene and ExperiencePresenter are main-actor (RenderHostTests, GLStateTests); CPU submit time is therefore measured on the main thread inside render."
+  },
+  {
+   "id": "M31",
+   "capability": "Truthful claims: no CPU time labelled GPU time, no ranking, no invented or published benchmark number",
+   "source": "cross-cutting; constitution truthful claims; CLAUDE.md rule 9",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/PerformanceRecord.swift",
+     "symbol": "PerformanceRecord",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceDescriptor.swift",
+     "symbol": "ExperienceDescriptor",
+     "product": "VisualCoreExperience",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Apps/VisualCore/App/SettingsView.swift",
+    "symbol": "SettingsView"
+   },
+   "notes": "PerformanceRecord holds measured values only (PerformanceRecordTests); the lab's copy and store claims are G-EXPLAIN (A24-P05) and checked by copy-claims in G-RELEASE (A24-P06)."
+  },
+  {
+   "id": "M32",
+   "capability": "Experience host: session, shell, presenter, checkpoints, memory-warning and scene-phase handling",
+   "source": "spec FR-A24-001 experience host",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+     "symbol": "ExperienceSession",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceShell.swift",
+     "symbol": "ExperienceShell",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+     "symbol": "ExperiencePresenter",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+     "symbol": "ExperiencePresenter.maxFramesPerSecond",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceCore.swift",
+     "symbol": "ExperienceCore",
+     "product": "VisualCoreExperience",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/VisualProgrammingLab/Experience/VisualProgrammingLabExperience.swift",
+    "symbol": "VisualProgrammingLabExperience"
+   },
+   "notes": "SessionOpenCloseTests, ShellLifecycleTests, ShellRenderingTests, FrameCapTests. Graphics Benchmark Lab stays unregistered in A24-P00 (23 registered, A01-A23, candidates empty)."
+  },
+  {
+   "id": "M33",
+   "capability": "Device verification: repeatability across trials, thermal context and the device plan",
+   "source": "manual \u00a79 phase 05; manual \u00a713 risks 1 and 3",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/DeviceConditions.swift",
+     "symbol": "DeviceConditions",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/PerformanceRecord.swift",
+     "symbol": "PerformanceRecord",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Apps/VisualCore/App/SettingsView.swift",
+    "symbol": "SettingsView"
+   },
+   "notes": "DeviceConditions and PerformanceRecord exist (FramePacingTests, PerformanceRecordTests); repeated trials, their spread and the device plan are G-DEVICE (A24-P05). Simulator results are never device evidence."
+  },
+  {
+   "id": "M34",
+   "capability": "Release: registration, the A24 release-check, copy-claims and verify steps, licenses and catalog availability",
+   "source": "manual \u00a79 phase 06",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceDescriptor.swift",
+     "symbol": "ExperienceDescriptor",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AcknowledgementsView.swift",
+     "symbol": "LicenseInventory",
+     "product": "VisualCoreUI",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/DigitalAquarium/Core/LicenseAudit.swift",
+    "symbol": "LicenseAudit"
+   },
+   "notes": "No A24 release step exists (173 lines listed by python3 scripts/release_check.py --list on 2026-11-19; AcknowledgementsViewTests). G-RELEASE (A24-P06)."
+  },
+  {
+   "id": "M35",
+   "capability": "Versioned local storage primitives: ExperienceStorage with MigrationChain, newer versions refused",
+   "source": "cross-cutting; spec clarifications persistence",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+     "symbol": "ExperienceStorage",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/Migration.swift",
+     "symbol": "MigrationChain",
+     "product": "VisualCorePersistence",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/Migration.swift",
+     "symbol": "MigrationChain.migrate",
+     "product": "VisualCorePersistence",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceSnapshot.swift",
+     "symbol": "ExperienceSnapshot",
+     "product": "VisualCoreExperience",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/VisualProgrammingLab/Experience/GraphLibrary.swift",
+    "symbol": "GraphLibrary"
+   },
+   "notes": "ExperienceStorageTests, ExperienceSnapshotTests, SnapshotMigrationCheckTests; used by Visual Programming Lab's GraphLibrary."
+  },
+  {
+   "id": "M36",
+   "capability": "Thermal state and Low Power Mode readable from public API",
+   "source": "cross-cutting; manual \u00a713 risk 1",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/DeviceConditions.swift",
+     "symbol": "DeviceConditions.current",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/FramePacing.swift",
+     "symbol": "FramePacing.Thermal",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/FramePacing.swift",
+     "symbol": "FramePacing",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/FramePacing.swift",
+     "symbol": "FramePacing.clampedDelta",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/ParticleUniverse/Core/SceneQuality.swift",
+    "symbol": "SceneQuality"
+   },
+   "notes": "DeviceConditions.current() reads ProcessInfo.thermalState and isLowPowerModeEnabled; FramePacing caps the frame rate under heat and Low Power Mode (FramePacingTests, QualityGovernorTests). Particle Universe's SceneQuality uses it."
+  },
+  {
+   "id": "M37",
+   "capability": "A bounded workload drawn in the host's context (US4 scenario 2 stop condition)",
+   "source": "spec US4 scenario 2; manual \u00a79 phase 00 stop point",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+     "symbol": "FieldPass",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+     "symbol": "FullScreenShaderScene",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ParticleRenderer.swift",
+     "symbol": "ParticleRenderer",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+     "symbol": "ResourceRegistry.makeRenderTarget",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderProgram.swift",
+     "symbol": "ShaderError",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderBundle.swift",
+     "symbol": "ShaderBundle.visualCoreLibrary",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/ParticlesArtScene.swift",
+    "symbol": "ParticlesArtScene"
+   },
+   "notes": "FieldPassTests, FullScreenShaderSceneTests, ParticleRendererTests, ResourceRegistryTests, ShaderProgramTests, ShaderBundleTests. The stop condition is not met."
+  },
+  {
+   "id": "M38",
+   "capability": "A monotonic frame time per frame and off-screen read-back (US4 scenario 2 stop condition)",
+   "source": "spec US4 scenario 2",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+     "symbol": "FrameInfo",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+     "symbol": "FrameInfo.time",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+     "symbol": "RenderHost.renderOffscreen",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+     "symbol": "RenderHost.readPixels",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/SimulationLab/Experience/AutomatonGPU.swift",
+    "symbol": "AutomatonGPU"
+   },
+   "notes": "FrameInfo.time increases with FrameInfo.index (FrameCapTests, StillTimeTests); renderOffscreen and readPixels read pixels back (OffscreenExportTests, StillCaptureTests). The stop condition is not met."
+  }
+ ],
+ "gaps": [
+  {
+   "id": "G-MODEL",
+   "matrix": [
+    "M06",
+    "M12"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "The benchmark case, run, frame sample and summary models (manual \u00a76) are the experience's domain, pure and GPU-free in its Core, versioned with MigrationChain and with documented caps on duration, samples and counts (research D4). No second user exists for them (Principle II).",
+   "phase": 1,
+   "test": "Core host tests: each model round-trips and migrates; truncated, newer, NaN, infinite and out-of-range values and values one past each cap are refused with a named reason.",
+   "closed": null
+  },
+  {
+   "id": "G-STATS",
+   "matrix": [
+    "M02",
+    "M08",
+    "M13"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "Exact nearest-rank percentiles (p50, p95, p99) over raw frame intervals with the warm-up excluded, sample counts and quality flags; PacingMeter is not used because it rounds to 0.25 ms bins (clarification Q3, research D6). Pure, in the experience's Core.",
+   "phase": 1,
+   "test": "swift test with fixed sample fixtures: known percentiles for odd, even, single and empty inputs; warm-up samples excluded; non-finite samples refused; counts and flags reported.",
+   "closed": null
+  },
+  {
+   "id": "G-SCENES",
+   "matrix": [
+    "M04",
+    "M06",
+    "M14"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "The three workloads are drawn over public building blocks (FieldPass, Texture.upload(rgba:), ResourceRegistry.program, ParticleRenderer) with fixed, versioned configurations and caps checked before allocation; textures are generated in code (clarification Q4). No VisualCore change is planned.",
+   "phase": 2,
+   "test": "Experience tests on the iOS 27.2 simulator: each scene draws in the host's context with the expected pixels, allocates exactly its declared bytes, refuses a configuration one past each cap before any allocation and rebuilds after context loss.",
+   "closed": null
+  },
+  {
+   "id": "G-RUNNER",
+   "matrix": [
+    "M02",
+    "M03",
+    "M07",
+    "M08",
+    "M15",
+    "M16",
+    "M23"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "The phase machine (warm-up, measurement, cool-down), duration caps, the immediate stop, frame intervals from consecutive FrameInfo.time values and CPU submit time from a monotonic clock around the presenter's draw calls; a run interrupted by context loss, resize or backgrounding is marked interrupted (clarifications Q3, Q5). App-local because only this experience runs benchmark phases.",
+   "phase": 3,
+   "test": "Core tests drive the phase machine with a fake clock (caps, stop, cool-down, interruption); experience tests prove intervals come from FrameInfo.time, a stop ends drawing within one frame and a context loss marks the run interrupted.",
+   "closed": null
+  },
+  {
+   "id": "G-REPORT",
+   "matrix": [
+    "M05",
+    "M09",
+    "M19"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "The device report uses public APIs only: the machine identifier from uname, ProcessInfo.operatingSystemVersion, the app's version and build from its bundle, DeviceConditions, the quality tier and the renderer strings from U-RENDERINFO; no private identifier (clarification Q5).",
+   "phase": 3,
+   "test": "Core tests encode and validate the report; an experience test proves every field comes from a public source and a source scan finds no private API or identifier.",
+   "closed": null
+  },
+  {
+   "id": "U-RENDERINFO",
+   "matrix": [
+    "M05",
+    "M09",
+    "M18"
+   ],
+   "kind": "upstream",
+   "owner": "VisualCore:VisualCoreRendering",
+   "justification": "A presenter receives a RenderContext without the renderer's facts; the host gives the presenter a read-only copy of its RenderCapabilities (for example on RenderContext), additive and public (clarification Q2). Linking the internal GL shim from the experience is refused.",
+   "phase": 3,
+   "test": "VisualCoreRendering tests prove the presenter's copy equals RenderHost.capabilities and is refreshed after recreateContext; /// docs, the API baseline update and the seven-step reference regression in two chunks.",
+   "closed": null
+  },
+  {
+   "id": "U-GPUTIMER",
+   "matrix": [
+    "M01",
+    "M08",
+    "M17"
+   ],
+   "kind": "upstream",
+   "owner": "VisualCore:VisualCoreRendering",
+   "justification": "Built only if the capability probe finds GL_EXT_disjoint_timer_query in the renderer's extension list on the iOS 27.2 simulator: then an additive, public timer query in VisualCoreRendering with the disjoint check (clarification Q1). Otherwise the gap closes as not supported, the lab shows \"GPU time not available on this device\" and GPU time is never shown. No timer code is written before the probe has run.",
+   "phase": 3,
+   "test": "The probe's result is recorded first; if supported, VisualCoreRendering tests prove non-disjoint 64-bit results for a known draw and refusal on disjoint, with docs, the API baseline and the reference regression; if not, an experience test proves the lab never shows a GPU time and never labels CPU time as GPU time.",
+   "closed": null
+  },
+  {
+   "id": "G-RESULTS",
+   "matrix": [
+    "M20"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "Results are versioned envelopes in ExperienceStorage; damaged and newer files are refused and never deleted automatically (clarification Q5). App-local over public persistence.",
+   "phase": 4,
+   "test": "Experience tests: save and open round-trip; truncated, newer and non-finite files refused with a named reason and kept on disk; storage caps respected.",
+   "closed": null
+  },
+  {
+   "id": "G-EXPORT",
+   "matrix": [
+    "M10",
+    "M21"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "Versioned JSON and CSV written through a Transferable and ShareLink that the person opens, after Living Wallpapers' WallpaperExportFile; no upload (clarification Q5). No shared export helper exists in VisualCore.",
+   "phase": 4,
+   "test": "Core tests: the JSON and CSV of a fixture run match golden files, carry the format version and the report, and escape fields; an experience test proves export starts only from the person's action.",
+   "closed": null
+  },
+  {
+   "id": "G-DEVICE",
+   "matrix": [
+    "M33"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "Repeated trials, their spread, the thermal context of each trial and the device plan are the experience's device campaign after ImplementationLock-100 (CLAUDE.md rule 5).",
+   "phase": 5,
+   "test": "Core tests of the repeatability summary with fixtures; the device plan names the devices, trials and the thermal states recorded; simulator results are never cited as device evidence.",
+   "closed": null
+  },
+  {
+   "id": "G-EXPLAIN",
+   "matrix": [
+    "M11",
+    "M22",
+    "M31"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "The in-app explanation of limits and variability (thermal and refresh skew, simulator versus device, no GPU time where unsupported, no ranking or scientific claim) is the experience's copy.",
+   "phase": 5,
+   "test": "Experience tests prove the explanation is reachable from results, names each limit and is labelled for VoiceOver; the copy-claims scan finds no ranking, scientific or invented-number claim.",
+   "closed": null
+  },
+  {
+   "id": "G-RELEASE",
+   "matrix": [
+    "M31",
+    "M34"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "Registration, the A24 release-check, copy-claims and verify steps, privacy and credits, and catalog availability are the experience's release work in the one app.",
+   "phase": 6,
+   "test": "experience-release-a24 and copy-claims-a24 pass in release_check.py; the verify steps pass on iOS 27 and 26; every store claim names a test.",
+   "closed": null
+  }
+ ],
+ "traceability": [
+  {
+   "item": "brainstorm: GPU timing",
+   "matrix": [
+    "M01",
+    "M08",
+    "M17"
+   ],
+   "phases": [
+    3
+   ]
+  },
+  {
+   "item": "brainstorm: diagnostics",
+   "matrix": [
+    "M02",
+    "M13",
+    "M28"
+   ],
+   "phases": [
+    1,
+    3
+   ]
+  },
+  {
+   "item": "brainstorm: profiling",
+   "matrix": [
+    "M03",
+    "M08",
+    "M16",
+    "M30"
+   ],
+   "phases": [
+    1,
+    3
+   ]
+  },
+  {
+   "item": "brainstorm: benchmark scenes",
+   "matrix": [
+    "M04",
+    "M06",
+    "M14",
+    "M37"
+   ],
+   "phases": [
+    2
+   ]
+  },
+  {
+   "item": "brainstorm: device and configuration reporting",
+   "matrix": [
+    "M05",
+    "M09",
+    "M18",
+    "M19",
+    "M36"
+   ],
+   "phases": [
+    3,
+    5
+   ]
+  },
+  {
+   "item": "version 0.1 feature 01: baseline scenes",
+   "matrix": [
+    "M06",
+    "M12",
+    "M14"
+   ],
+   "phases": [
+    1,
+    2
+   ]
+  },
+  {
+   "item": "version 0.1 feature 02: warm-up, measurement and cool-down",
+   "matrix": [
+    "M07",
+    "M15",
+    "M23"
+   ],
+   "phases": [
+    3
+   ]
+  },
+  {
+   "item": "version 0.1 feature 03: frame-time percentiles, CPU submit time and optional GPU timer",
+   "matrix": [
+    "M08",
+    "M13",
+    "M16",
+    "M17",
+    "M38"
+   ],
+   "phases": [
+    1,
+    3
+   ]
+  },
+  {
+   "item": "version 0.1 feature 04: device, OS, build, quality and thermal report",
+   "matrix": [
+    "M09",
+    "M19",
+    "M26",
+    "M36"
+   ],
+   "phases": [
+    3
+   ]
+  },
+  {
+   "item": "version 0.1 feature 05: JSON or CSV export",
+   "matrix": [
+    "M10",
+    "M20",
+    "M21",
+    "M35"
+   ],
+   "phases": [
+    4
+   ]
+  },
+  {
+   "item": "version 0.1 feature 06: explanation of limits",
+   "matrix": [
+    "M11",
+    "M22",
+    "M31",
+    "M33"
+   ],
+   "phases": [
+    5
+   ]
+  }
+ ],
+ "negative": [
+  {
+   "rule": "No EGL display, context, surface or GL path of its own; all drawing goes through VisualCore's RenderHost on OpenGL ES -> ANGLE -> Metal, and the internal CVisualCoreGL shim is never linked by the experience",
+   "source": "constitution A24 consumer, not fork; CLAUDE.md rule 4; spec FR-A24-006; research D6"
+  },
+  {
+   "rule": "No second renderer: the workloads are FieldPasses, fragment programs and ParticleRenderer draws on the session's host; a missing host is a blocker, never permission for a second backend",
+   "source": "manual \u00a79 phase 00 stop point; CLAUDE.md rule 4; spec FR-A24-006"
+  },
+  {
+   "rule": "No ProjectM types, engine or presets and no ProjectM code reused",
+   "source": "CLAUDE.md rule 12; spec FR-A24-006"
+  },
+  {
+   "rule": "No networking and no upload: results leave the device only through a share sheet the person opens",
+   "source": "manual \u00a72 non-goals; spec FR-A24-006 and negative requirements"
+  },
+  {
+   "rule": "No private API and no private hardware identifier: the device report uses uname, ProcessInfo, the bundle and DeviceConditions only",
+   "source": "CLAUDE.md rule 12; spec FR-A24-006; clarification Q5"
+  },
+  {
+   "rule": "No CPU time labelled as GPU time: GPU time is shown only where U-GPUTIMER confirms non-disjoint results, otherwise \"GPU time not available on this device\"",
+   "source": "manual \u00a713 risk 2; spec FR-A24-006; clarification Q1"
+  },
+  {
+   "rule": "No device ranking, leaderboard, score or scientific claim; results describe one run on one device",
+   "source": "manual \u00a72 non-goals; constitution truthful claims; spec FR-A24-006"
+  },
+  {
+   "rule": "No invented or published benchmark number: no figure appears in copy, documents or the store listing that was not measured, and caps are bounds, not targets",
+   "source": "CLAUDE.md rule 9; research D5; spec FR-A24-006"
+  },
+  {
+   "rule": "No unbounded stress run: every run has a capped duration, a cool-down and an immediate stop",
+   "source": "manual \u00a713 risk 3; spec FR-A24-006"
+  },
+  {
+   "rule": "No purchased, generated or photographic images: every texture and scene is generated in code",
+   "source": "CLAUDE.md rule 4; spec canonical overrides; spec FR-A24-006"
+  },
+  {
+   "rule": "No VisualCore or ProjectM change in A24-P00 (empty diff of Packages and External since 7de0f2af), no experience target, registration or interface, no permission and no usage string",
+   "source": "spec FR-A24-008 and negative requirements"
+  },
+  {
+   "rule": "Risk 1, thermal throttling and display refresh skew results. Owner: the run report with the thermal state, Low Power Mode, frame cap and quality tier of each run (app-local G-REPORT and G-RUNNER in A24-P03), the explanation of limits (G-EXPLAIN in A24-P05) and repeated trials (G-DEVICE in A24-P05). Verification: Core tests prove each result carries its conditions and that a run whose thermal state or frame cap changed is flagged; the device campaign repeats trials per device and records their spread. Release blocker: a result shown or exported without its thermal context, or a comparison across runs with different conditions presented without a flag.",
+   "source": "manual \u00a713 risk 1"
+  },
+  {
+   "rule": "Risk 2, GL timing extension availability is uncertain. Owner: the capability probe and U-GPUTIMER (VisualCore:VisualCoreRendering, A24-P03) and the explanation (G-EXPLAIN, A24-P05). Verification: the probe's result on the iOS 27.2 simulator is recorded before any timer code; if supported, VisualCoreRendering tests prove non-disjoint results; otherwise an experience test proves GPU time is never shown and CPU time is never labelled GPU time. Release blocker: any GPU time shown without a confirmed non-disjoint timer, or CPU time labelled as GPU time anywhere in the interface, exports or store copy.",
+   "source": "manual \u00a713 risk 2"
+  },
+  {
+   "rule": "Risk 3, aggressive stress testing can overheat devices. Owner: the scene caps (G-SCENES, A24-P02), the runner's duration cap, cool-down and immediate stop (G-RUNNER, A24-P03) and the device campaign (G-DEVICE, A24-P05). Verification: Core tests prove a configuration one past each cap is refused and a run ends at its cap; experience tests prove a stop ends drawing within one frame and a serious or critical thermal state stops the run; the device campaign records thermal state through the longest allowed run. Release blocker: a run without a duration cap or stop, or a run that continues at a critical thermal state.",
+   "source": "manual \u00a713 risk 3"
+  }
+ ],
+ "decision": {
+  "result": "go",
+  "reasons": [
+   "A working host exists: RenderHost on OpenGL ES -> ANGLE -> Metal (main-actor) draws any RenderScene inside setup, resize, render and teardown, with pause, resume and recreateContext, all public and tested (RenderHostTests, SessionOpenCloseTests, ShellRenderingTests).",
+   "Bounded workloads can be drawn in the host's context over public, tested building blocks: FieldPass with textures uploaded by Texture.upload(rgba:), FullScreenShaderScene and ResourceRegistry.program for fragment work, ParticleRenderer with ParticleInstance for instanced particles, all under ResourceBudget (FieldPassTests, FullScreenShaderSceneTests, ParticleRendererTests, ResourceRegistryTests).",
+   "A monotonic frame time exists: FrameInfo.time is seconds since the host started rendering, one value per frame (FrameCapTests, StillTimeTests); frame intervals are taken from it, never from the clamped delta. The stop condition of US4 scenario 2 is therefore not met.",
+   "12 of 38 rows are available with tests; all 26 non-available rows have owned gaps: G-MODEL and G-STATS in A24-P01; G-SCENES in A24-P02; G-RUNNER, G-REPORT, U-RENDERINFO and U-GPUTIMER in A24-P03; G-RESULTS and G-EXPORT in A24-P04; G-DEVICE and G-EXPLAIN in A24-P05; G-RELEASE in A24-P06.",
+   "The two upstream gaps are additive: U-RENDERINFO gives presenters a read-only copy of RenderCapabilities and U-GPUTIMER adds a timer query only if the probe finds GL_EXT_disjoint_timer_query; without it the lab shows no GPU time, which blocks nothing.",
+   "No permission is needed (no network, no upload, no usage string). Graphics Benchmark Lab stays unregistered (23 registered, A01-A23, candidates empty) until A24-P01 creates Packages/ExperiencesCreative/GraphicsBenchmarkLab with its targets and first real rules."
+  ],
+  "blockers": []
+ }
+}

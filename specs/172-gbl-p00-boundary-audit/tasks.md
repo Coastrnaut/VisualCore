@@ -21,7 +21,7 @@
 
 ## Phase 3: User Story 1 — Evidence-backed integration matrix (P1) 🎯
 
-- [ ] T-A24-002 [US1] Write `docs/apps/graphics-benchmark-lab/visualcore-contract.json` (schema 1; app
+- [X] T-A24-002 [US1] Write `docs/apps/graphics-benchmark-lab/visualcore-contract.json` (schema 1; app — Verified 2026-11-19: 2026-11-19: docs/apps/graphics-benchmark-lab/visualcore-contract.json: 11 inventory areas, 38 rows (12 available, 23 requires adaptation, 3 upstream gap), 166 citations, 11 traceability entries
   `graphics-benchmark-lab`; gate `A24-P00`), with:
   - an `inventory` of every FR-A24-001 area, with paths and the release-check line count (from `python3
     scripts/release_check.py --list`);
