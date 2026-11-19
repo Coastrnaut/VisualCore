@@ -86,3 +86,16 @@
 ## Implementation strategy
 
 MVP is story 1 on top of story 2's colour path: export depends on the final colour behaviour, so colour lands first.
+
+## Phase 6: Convergence
+
+- [ ] T-A25-512 Keep a written export across a context rebuild in
+  `Packages/ExperiencesCreative/EffectsComposer/Experience/ComposerPresenter.swift`: `teardown` fails only a request
+  not yet drawn (as interrupted) and keeps `exportFile` and its file; a write finishing after a rebuild is kept; the
+  export folder is removed before the next export and when the presenter is released (`deinit`, the experience
+  closing); add to `Packages/ExperiencesCreative/EffectsComposer/ExperienceTests/RobustnessTests.swift`: an export
+  finished before `recreateContext` still exists afterwards with its share item, and releasing the presenter removes
+  the folder, per spec Edge Cases (background during an export), FR-A25-506 (contradicts)
+- [ ] T-A25-513 Record in `specs/184-ec-p05-color-export-robustness/research.md` and
+  `docs/apps/effects-composer/README.md` that the share sheet reports no completion, so the file stays until the next
+  export or the experience closes, per FR-A25-508 (partial)
