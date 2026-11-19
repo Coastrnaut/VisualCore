@@ -32,7 +32,8 @@
   (SC-A23-401–403): save, open (equal fingerprint), rename and remove round trips with a temporary storage; the caps at
   and one past each bound; damaged, newer and oversized samples listed, refused and still present; a quota refusal
   writes nothing; a synthetic version-0 file migrates and opens; the committed schema-1 sample
-  `Fixtures/graph-sample.json` reads back unchanged
+  `Fixtures/graph-sample.json` reads back unchanged; opening over unsaved work asks first and declining changes nothing;
+  an opened graph compiles once at the next frame
 
 ## Phase 3: Story 3 — examples (P2)
 
