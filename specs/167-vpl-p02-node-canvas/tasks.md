@@ -101,3 +101,12 @@
 - **Then:** the drawing and rebuild proofs (206, 208) and the registration (209, 210).
 - **Review checkpoint:** at 211.
 - **Commits:** one per task.
+
+## Phase 6: Convergence
+
+- [ ] T-A23-215 Record the as-built design in `specs/167-vpl-p02-node-canvas/data-model.md` and `contracts/experience.md`, per spec clarifications Q1 and Q4 and contracts/experience.md (contradicts, unrequested):
+  - the grid's uniforms are `zoom`, `panX`, `panY`, `width` and `height` (`FullScreenShaderScene` binds floats only); its lines are about one pixel wide through `fwidth` and a vignette keeps a luma spread, because the runner's 96-point surface sampled one-point lines at a single phase (fix 566622de; ProbeTests);
+  - the ninth refusal `a23.too-many-edges` (a connection past 64) and `EditMessages.sentence(for:in:)`;
+  - `LabCore.outcome` is `graph-ready` while the checker accepts the graph;
+  - the controls add move buttons for the selected node (`move-left`, `move-right`, `move-up`, `move-down`), `node-row-<id>` select buttons and `connection-<target>-<index>` lines; the overlay is drawn over the host, which keeps it out of the accessibility tree, so the list form is the spoken path for every node, port and connection;
+  - the manifest has five fixtures (the planning catalog's count): starter graph, journey graph, refused connection, refused loop and refused second output.
