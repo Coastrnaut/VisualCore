@@ -59,3 +59,10 @@
 ## Parallel examples
 
 - **Agent P:** 002. **Agent G:** 003 then 004 (one builder). **Lead:** 001, 005–011.
+
+## Phase 5: Convergence
+
+- [ ] T-R02F09-012 Add `testOneHundredFramesKeepLiveCountsConstant` to
+  `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/BeamRendererTests.swift` (100 frames alternating 500 and
+  300 beams: `liveCount`, `liveBytes` and `compileCount` constant, 100 draw calls, no GL error, 0 leaks after destroy);
+  rerun `--name rendering-27-3` per SC-R02F09-004 (partial)
