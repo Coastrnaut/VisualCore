@@ -26,7 +26,7 @@
   connections; connect refuses any connection-stage issue or a cycle of `GraphChecker` and accepts an incomplete graph;
   positions "clamped to ±4,096"; one sentence per refusal and per checker status, and the spoken labels of a node, a port
   and a connection ("Noise 2 image → Output 1 image") (SC-A23-202, FR-A23-205)
-- [ ] T-A23-204 [P] Create `Packages/ExperiencesCreative/VisualProgrammingLab/Core/{CanvasLayout,CanvasView}.swift` with
+- [X] T-A23-204 [P] Create `Packages/ExperiencesCreative/VisualProgrammingLab/Core/{CanvasLayout,CanvasView}.swift` with — Verified 2026-11-18: 2026-11-18: CanvasLayout.swift (168-point boxes, 32-point title, 36-point rows, 44-point port targets in canvas points, wire handles max(40, |dx|/2), hit order port, topmost node, empty) and CanvasView.swift (PlaneViewport with y flipped, zoom 0.5...2 with the anchor kept, centre within 4,096); CanvasLayoutTests (11) and CanvasViewTests (9); .autonomy/checks/A23-P02.vpl-ios27.json exit 0 (125 core and 27 experience tests on sim-27.2, slowest 0.199 s); written by an agent, retested
   `CoreTests/{CanvasLayoutTests,CanvasViewTests}.swift` per data-model.md and clarifications Q2–Q3 (FR-A23-204, 205):
   box "168 points wide, a 32-point title row and one 36-point row per port row"; "44 × 44-point" targets scaled by the
   zoom; wire handles "max(40, |dx| / 2)"; hit order port, topmost node, empty; zoom "0.5…2 (1 by default)", centre
