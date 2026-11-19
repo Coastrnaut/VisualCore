@@ -201,7 +201,7 @@ graphics host running and its resource counts unchanged.
 - **Several separate loops:** one loop is named, the one reached first in node order, so the refusal is stable.
 - **A node not connected to the output:** allowed and ordered, but marked as not reaching the output, so later
   phases can skip it.
-- **A connection to a node or port that does not exist, or from an input:** refused by name.
+- **A connection to a node or port that does not exist, from an input or into an output:** refused by name.
 - **A duplicate node identity or an unknown node kind:** refused by name.
 - **A parameter the kind does not declare, or a missing one:** an unknown one is refused; a missing one takes its
   default.
