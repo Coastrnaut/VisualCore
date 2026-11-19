@@ -1,0 +1,427 @@
+{
+  "controls" : [
+    "case.select",
+    "run.start",
+    "run.stop"
+  ],
+  "experience" : "a24.graphics-benchmark-lab",
+  "kind" : "creative",
+  "scenarios" : [
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+        "initialDigest" : "9b06eafc0b7b85b75fef9c5d963c6678e840fd3f3a84feb430e6646c32c4baba"
+      },
+      "name" : "launch-first-frame",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "case.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "run.start",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "run.stop",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "64297e3fefe79372ce12c17c8ca6206dd4f05b675ad1c4f82da39306a42bab94",
+        "initialDigest" : "9b06eafc0b7b85b75fef9c5d963c6678e840fd3f3a84feb430e6646c32c4baba"
+      },
+      "name" : "input-response",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "case.select",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "outcome" : "case-particles"
+      },
+      "name" : "completion",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "case.select",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "case.select",
+            "values" : [
+              -1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "case.select",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "action.rule.a24.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "case.select",
+            "values" : [
+              1.5
+            ]
+          },
+          "result" : "action.rule.a24.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "case.select",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "case.select",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "run.start",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "run.stop",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+
+      },
+      "name" : "rejection",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "case.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "run.start",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "run.stop",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "64297e3fefe79372ce12c17c8ca6206dd4f05b675ad1c4f82da39306a42bab94",
+        "initialDigest" : "9b06eafc0b7b85b75fef9c5d963c6678e840fd3f3a84feb430e6646c32c4baba"
+      },
+      "name" : "save-restore",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "case.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "run.start",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "run.stop",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "initialDigest" : "9b06eafc0b7b85b75fef9c5d963c6678e840fd3f3a84feb430e6646c32c4baba",
+        "resetDigest" : true
+      },
+      "name" : "reset",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "suspend-resume",
+      "seed" : "1"
+    },
+    {
+      "cycles" : 5,
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "teardown-reentry",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "cancel-prepare",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "case.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "case.select",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9b06eafc0b7b85b75fef9c5d963c6678e840fd3f3a84feb430e6646c32c4baba",
+        "initialDigest" : "9b06eafc0b7b85b75fef9c5d963c6678e840fd3f3a84feb430e6646c32c4baba",
+        "outcome" : "case-quads"
+      },
+      "name" : "fixture-case-quads",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "case.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "64297e3fefe79372ce12c17c8ca6206dd4f05b675ad1c4f82da39306a42bab94",
+        "initialDigest" : "9b06eafc0b7b85b75fef9c5d963c6678e840fd3f3a84feb430e6646c32c4baba",
+        "outcome" : "case-alu"
+      },
+      "name" : "fixture-case-alu",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "case.select",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5adf4ad88fedb0812e320d7f3d9ce16a461afd9580a5d8b9990ee2d0a3620cc2",
+        "initialDigest" : "9b06eafc0b7b85b75fef9c5d963c6678e840fd3f3a84feb430e6646c32c4baba",
+        "outcome" : "case-particles"
+      },
+      "name" : "fixture-case-particles",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "case.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "run.start",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "run.stop",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "64297e3fefe79372ce12c17c8ca6206dd4f05b675ad1c4f82da39306a42bab94",
+        "initialDigest" : "9b06eafc0b7b85b75fef9c5d963c6678e840fd3f3a84feb430e6646c32c4baba",
+        "outcome" : "case-alu"
+      },
+      "name" : "fixture-run-start-stop",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "case.select",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "action.rule.a24.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "case.select",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5adf4ad88fedb0812e320d7f3d9ce16a461afd9580a5d8b9990ee2d0a3620cc2",
+        "initialDigest" : "9b06eafc0b7b85b75fef9c5d963c6678e840fd3f3a84feb430e6646c32c4baba",
+        "outcome" : "case-particles"
+      },
+      "name" : "fixture-refused-fraction",
+      "seed" : "1"
+    }
+  ],
+  "schema" : 1
+}

@@ -70,7 +70,7 @@
   - the `project.yml` product;
   - in `Apps/VisualCore/Tests/Unit/AppModelTests.swift`, the synthetic candidate id moves to `a25.effects-composer`;
   - the candidate lists in the app and script tests.
-- [ ] T-A24-211 Write `Experience/Adapter/GBLManifest.swift` (nine standard scenarios plus a fixture per case, and a
+- [X] T-A24-211 Write `Experience/Adapter/GBLManifest.swift` (nine standard scenarios plus a fixture per case, and a — Verified 2026-11-19: 2026-11-19: GBLManifest (nine standard scenarios, five fixtures, a red-class probe at the centre of checker cell (1,2) on quads) and GBLManifestTests pass in .autonomy/checks/A24-P02.gbl-ios27.json; scenario-manifest.json generated
   frame probe chosen where the opening picture's colour class holds at every time) and
   `ExperienceTests/GBLManifestTests.swift`; generate `scenario-manifest.json` with `UPDATE_SCENARIO_MANIFEST=1
   TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`
