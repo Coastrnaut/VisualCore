@@ -106,3 +106,11 @@
 - **Then:** the host-count proof (108) completes the phase.
 - **Review checkpoint:** at 109.
 - **Commits:** one per task.
+
+## Phase 6: Convergence
+
+- [ ] T-A23-113 Record the as-built design in `specs/166-vpl-p01-graph-schema/data-model.md` and `contracts/core.md`, per plan: data model and contracts/core.md (contradicts, unrequested):
+  - `VisualGraph` stores `nodes` and `edges` only; `outputNodes` and `output` are derived from the nodes of kind `output`, so the fingerprint covers the output through the nodes;
+  - `NodeKind` has `input(_:)`, `output(_:)` and `parameter(_:)` in place of `port(_:)`, because blur has an input and an output named `image`;
+  - `GraphDocument` refuses edge ends outside 1…9,999 as `out-of-range`, reads `"NaN"`, `"Infinity"` and `"-Infinity"` strings as `not-finite`, refuses a non-finite value of any parameter (declared or not), and `GraphDocumentRefusal.code` gives the refusal code;
+  - the checker reports a duplicated identity once, and a missing source and target node of one edge both; `inputUnconnected` covers nodes that do not reach the output.
