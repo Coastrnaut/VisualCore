@@ -29,7 +29,7 @@
 
 ## Phase 3: Story 2 — recover without losing the graphs (P1)
 
-- [ ] T-A23-604 [US2] Add the recovery seam and its test (FR-A23-603, SC-A23-602):
+- [X] T-A23-604 [US2] Add the recovery seam and its test (FR-A23-603, SC-A23-602): — Verified 2026-11-19: 2026-11-19: .autonomy/checks/A23-P06.vpl-recovery-samples.json exit 0 (162 core and 83 experience tests on sim-27.2); LabRecoveryDrawTests: an injected draw failure fails the session with its message, every storage file byte-identical, a new session lists and opens both graphs
   - `Experience/LabPresenter.swift`: an internal, test-only `failNextDraw`; the next draw throws
     `LabDrawError.injected` once and clears it;
   - `ExperienceTests/LabRecoveryDrawTests.swift`: save two graphs, set the seam and draw; the session fails with the

@@ -48,6 +48,11 @@
 // replacement the controls ask about (``LabMirror/pendingReplace``). An opened graph compiles at the next frame,
 // because its fingerprint differs from the last compile's.
 //
+// Feature 171 (A23-P06) T-A23-604 (FR-A23-603; SC-A23-602): the test-only seam ``failNextDraw`` makes the next
+// `draw` throw ``LabDrawError/injected`` once, before it draws the grid, compiles or draws anything; the seam clears
+// itself and nothing in the experience or its interface sets it. The session then fails with the error's message, and
+// the library's files are not touched (only an explicit save, rename or removal writes them).
+//
 // No GL call: everything is drawn through VisualCore's `FieldPass`.
 import Foundation
 import Observation
@@ -72,6 +77,23 @@ struct RubberWire: Equatable {
     var start: CanvasPoint
     /// The finger's point.
     var end: CanvasPoint
+}
+
+/// A drawing failure of Visual Programming Lab (feature 171, A23-P06, T-A23-604).
+enum LabDrawError: Error, Equatable, CustomStringConvertible, LocalizedError {
+    /// The test-only seam ``LabPresenter/failNextDraw`` made this draw fail.
+    case injected
+
+    /// The message the failed session shows: "The drawing failed (injected by a test)."
+    var description: String {
+        switch self {
+        case .injected:
+            return "The drawing failed (injected by a test)."
+        }
+    }
+
+    /// The same message as ``description``.
+    var errorDescription: String? { description }
 }
 
 /// What the overlay and the controls show, updated only when a field changes.
@@ -151,6 +173,11 @@ final class LabPresenter: ExperiencePresenter {
     /// A graph the preview compiles instead of the core's (a test seam); nil by default.
     var graphOverride: VisualGraph?
 
+    /// Test-only seam: when true, the next `draw` throws ``LabDrawError/injected`` once, before it draws the grid,
+    /// compiles or draws anything; the seam clears itself and nothing in the experience or its interface sets it
+    /// (feature 171, A23-P06, T-A23-604).
+    var failNextDraw = false
+
     /// What the preview shows: ``PreviewState/hidden`` while switched off, else the pipeline's state.
     var previewState: PreviewState { previewVisible ? pipeline.state : .hidden }
     /// The core of the last draw.
@@ -208,8 +235,12 @@ final class LabPresenter: ExperiencePresenter {
     }
 
     /// Draws the grid with the view's parameters, then the preview (see the file header), and brings the mirror up
-    /// to `core`.
+    /// to `core`. Throws ``LabDrawError/injected`` once while ``failNextDraw`` is set (it is cleared first).
     func draw(_ core: LabCore, tier: Int, context: RenderContext, frame: FrameInfo) throws {
+        if failNextDraw {
+            failNextDraw = false
+            throw LabDrawError.injected
+        }
         drawnFrames += 1
         lastCore = core
         grid.configure(GridScene.parameters(zoom: view.zoom, centreX: view.centre.x, centreY: view.centre.y,
