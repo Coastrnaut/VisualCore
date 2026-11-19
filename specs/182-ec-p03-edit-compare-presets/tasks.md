@@ -8,7 +8,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T-A25-301 Baseline: cite the A25-P02 evidence (`.autonomy/checks/A25-P02.{ec-ios27,app-unit,verify-27}.json`)
+- [X] T-A25-301 Baseline: cite the A25-P02 evidence (`.autonomy/checks/A25-P02.{ec-ios27,app-unit,verify-27}.json`) — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P02.{ec-ios27,app-unit,verify-27}.json exit 0
 
 ## Phase 2: Story 2 — save a look and open it again (P1) 🎯
 
