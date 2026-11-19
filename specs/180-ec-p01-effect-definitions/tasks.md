@@ -67,7 +67,7 @@
 - [X] T-A25-112 Contract `docs/apps/effects-composer/visualcore-contract.json`: G-MODEL and G-EFFECTS are closed by — Verified 2026-11-19: 2026-11-19 G-MODEL and G-EFFECTS closed by A25-P01 (M13, M14 available); .autonomy/checks/A25-P01.contract-2.json exit 0; README lists the core
   "A25-P01", and rows whose gaps are all closed become available with evidence (`--name contract -- python3
   scripts/check_app_contract.py --app effects-composer --render`); list the core in `docs/apps/effects-composer/README.md`
-- [ ] T-A25-113 The packages, catalog and script tests and the app build:
+- [X] T-A25-113 The packages, catalog and script tests and the app build: — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P01.{experience-packages,catalog,script-tests,app-build}.json exit 0
   - `--name experience-packages -- python3 scripts/check_experience_packages.py`;
   - `--name catalog -- python3 scripts/build_catalog.py --check`;
   - `--name script-tests -- python3 scripts/test_scripts.py`;
