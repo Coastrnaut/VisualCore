@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_documented_api.py",
+    "--sources",
+    "Packages/ExperiencesCreative/GraphicsBenchmarkLab"
+  ],
+  "command": "python3 scripts/check_documented_api.py --sources Packages/ExperiencesCreative/GraphicsBenchmarkLab",
+  "elapsed_seconds": 0.886,
+  "exit_code": 0,
+  "finished": "2026-11-19T16:41:11+00:00",
+  "log": ".autonomy/logs/A24-P03.documented-api.log",
+  "log_sha256": "c2b78e11e43ab1d37f4849406dce3d6b17fa6c0f7c4e3210e4c57fd37fd723d2",
+  "name": "documented-api",
+  "stage": "A24-P03",
+  "started": "2026-11-19T16:41:10+00:00",
+  "timed_out": false
+}
