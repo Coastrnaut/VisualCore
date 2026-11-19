@@ -40,7 +40,7 @@
 
 ## Phase 4: Stories 2 and 3 — the run (P1)
 
-- [ ] T-A24-207 [US2] [US3] Create `Experience/Adapter/BenchCore.swift` (clarification Q3) and
+- [X] T-A24-207 [US2] [US3] Create `Experience/Adapter/BenchCore.swift` (clarification Q3) and — Verified 2026-11-19: 2026-11-19: .autonomy/checks/A24-P02.gbl-ios27.json exit 0 (50 core and 33 experience tests on sim-27.2); BenchCore, RunRecorder, BenchPresenter (ContinuousClock cpuMs, gpuMs nil, resize and rebuild interrupt), GBLControls (inline buttons), GraphicsBenchmarkLabExperience
   `Experience/{RunRecorder,BenchPresenter,GBLControls,GraphicsBenchmarkLabExperience}.swift` (clarifications Q2, Q4;
   contracts/experience.md) (FR-A24-203–205): "snapshot schema 1, digest `a24.graphics-benchmark-lab.v1`", the three
   actions, the recorder (interval from consecutive frame times, absent for the first; `cpuMs` from `ContinuousClock`
