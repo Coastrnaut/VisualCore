@@ -76,3 +76,11 @@
   is Invalid), with an experience test, per visualcore-contract risk 3 and FR-A24-501 (missing)
 - [X] T-A24-514 Give the repeatability block's explain button its own identifier `repeatability-explain` (the opened — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A24-P05.app-ui-3.json: 78 app unit and 2 f3 interface tests on iOS 27.2, exit 0; A24-P05.gbl-ios27-2.json exit 0
   result keeps `explain`) and record it in contracts/review.md, per contracts/review.md identifiers (partial)
+
+## Phase 7: Convergence
+
+- [ ] T-A24-515 Say in "About these numbers" that a run ends as interrupted (Invalid) when the device becomes hot
+  (serious or critical thermal state), with its ExplanationTests assertion and the copy scan, per FR-A24-504 and
+  T-A24-513 (partial)
+- [ ] T-A24-516 Add to device-campaign.md the expected "Interrupted: the device is hot" ending when a device reaches a
+  serious thermal state during GBL-D2, per FR-A24-506 and visualcore-contract risk 3 (partial)
