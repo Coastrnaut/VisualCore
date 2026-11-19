@@ -44,7 +44,7 @@
 
 ## Phase 4: Story 4 — diagnostics on nodes (P2)
 
-- [ ] T-A23-407 [US4] Create `Core/GraphDiagnostics.swift` and `CoreTests/DiagnosticsTests.swift` per clarification Q5
+- [X] T-A23-407 [US4] Create `Core/GraphDiagnostics.swift` and `CoreTests/DiagnosticsTests.swift` per clarification Q5 — Verified 2026-11-18: 2026-11-18: Core/GraphDiagnostics.swift (byNode and sentences, per clarification Q5) and CoreTests/DiagnosticsTests.swift (10: every fixture marks exactly the nodes the checker names, accepted graphs mark none, loops mark each node of the named loop); .autonomy/checks/A23-P04.vpl-ios27.json exit 0 (162 core and 63 experience tests on sim-27.2, slowest 1.27 s); written by an agent, retested
   (SC-A23-405): exactly the nodes the checker names are marked, with their sentences; a valid graph marks none
 - [ ] T-A23-408 [US4] Show the marks in `Experience/{CanvasOverlay,LabControls}.swift` (a dashed outline and a "!" badge,
   `node-diagnostic-<id>`, spoken; the sentences under the node in the list form) and write
