@@ -8,3 +8,7 @@
 - **`flashLimit.linear`**: [0,1] 0.
 - **`RenderState.premultipliedBlended`**: blend `.premultiplied`, depth test off, depth write off.
 - **`ToneMapOperator`** (pure): none, reinhard, filmic. **`EmissiveReference`** (pure): functions of clarification Q5.
+
+As built (T-R02F07-013): the validator refuses a non-finite parameter on every pass
+(`EffectGraphError.nonFiniteParameter`) and an out-of-range one only where `PassSchema.refusesOutOfRange` is true
+(`emissive`; `parameterOutOfRange`); other passes still clamp, so `composite.mode` 3 becomes 2.

@@ -9,3 +9,11 @@ VisualCoreShaderSource: `RenderState.premultipliedBlended`.
 
 VisualCoreEffects: no new public type required; the pass is reached through graph descriptions (`EffectRenderer`),
 plus an internal `forceStandardPrecision` switch for tests.
+## As built (T-R02F07-013, 2026-11-19)
+
+- VisualCoreEffectsGraph: `EffectGraphError.nonFiniteParameter(pass:parameter:)`,
+  `EffectGraphError.parameterOutOfRange(pass:parameter:value:)`, `PassSchema.refusesOutOfRange`,
+  `PassSchemas.auxiliaryBytes` (two blur targets at 8 B/px of `max(1, w/d) × max(1, h/d)`).
+- VisualCoreEffects (internal, for tests): `EffectShaders.emissiveFragments` (kept apart from `fragments`, whose count
+  existing tests pin), the per-renderer `forceStandardPrecision`, `EmissivePass.blurSize(width:height:quality:)`,
+  `lastBlurSize` and `lastBlurFormat`; four draws per frame (research R6).

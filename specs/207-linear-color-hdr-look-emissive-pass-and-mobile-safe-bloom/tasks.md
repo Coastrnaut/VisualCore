@@ -68,7 +68,7 @@
 
 ## Phase 5: Convergence
 
-- [ ] T-R02F07-013 Record the as-built design in `specs/207-linear-color-hdr-look-emissive-pass-and-mobile-safe-bloom/research.md`,
+- [X] T-R02F07-013 Record the as-built design in `specs/207-linear-color-hdr-look-emissive-pass-and-mobile-safe-bloom/research.md`, — Verified 2026-11-19: 2026-11-19 research.md R6, data-model.md and contracts/api.md record the as-built design (names checked by grep in the sources); validate_docs PASS
   `data-model.md` and `contracts/api.md`: four draws (prefilter into A, horizontal blur into B, vertical blur into A,
   composite) instead of three; prefilter taps at ±0.25 blur texel (one input texel centre each at half, 2×2 averages
   at quarter); blur 9 taps one texel apart, σ = max(radius/2, 0.5); `EffectGraphError.nonFiniteParameter` for every
