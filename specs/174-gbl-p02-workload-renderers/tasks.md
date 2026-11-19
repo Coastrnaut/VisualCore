@@ -79,7 +79,7 @@
     ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing GraphicsBenchmarkLabCoreTests
     GraphicsBenchmarkLabExperienceTests`, each test under 10 s (SC-A24-206);
   - the documented API, the isolation check and the core purity scan.
-- [ ] T-A24-213 Contract: G-SCENES is closed by "A24-P02", and rows whose gaps are all closed become available with
+- [X] T-A24-213 Contract: G-SCENES is closed by "A24-P02", and rows whose gaps are all closed become available with — Verified 2026-11-19: 2026-11-19: G-SCENES closed by A24-P02, M04, M06 and M14 available; .autonomy/checks/A24-P02.contract.json exit 0
   evidence (`--name contract`)
 - [ ] T-A24-214 The catalog, app and runner checks, with the packages and script tests:
   - `--name catalog`; `--name experience-packages`; `--name script-tests`;

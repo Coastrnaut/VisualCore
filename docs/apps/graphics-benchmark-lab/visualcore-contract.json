@@ -312,7 +312,7 @@
    "id": "M04",
    "capability": "Benchmark scenes: repeatable GPU workloads drawn in the host's context",
    "source": "brainstorm: benchmark scenes; spec FR-A24-002",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
@@ -340,10 +340,10 @@
     }
    ],
    "example": {
-    "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/ParticlesArtScene.swift",
-    "symbol": "ParticlesArtScene"
+    "file": "Packages/ExperiencesCreative/GraphicsBenchmarkLab/Experience/Workloads.swift",
+    "symbol": "WorkloadRenderer"
    },
-   "notes": "The building blocks are public and tested (FieldPassTests, FullScreenShaderSceneTests, ParticleRendererTests, TextureUploadTests); no benchmark scene, textured-quad helper or procedural texture exists in VisualCore. The three scenes are app-local (G-SCENES, A24-P02, clarification Q4). Generative Art Studio draws particles with ParticleRenderer."
+   "notes": "The building blocks are public and tested (FieldPassTests, FullScreenShaderSceneTests, ParticleRendererTests, TextureUploadTests); no benchmark scene, textured-quad helper or procedural texture exists in VisualCore. The three scenes are app-local (G-SCENES, A24-P02, clarification Q4). Generative Art Studio draws particles with ParticleRenderer. A24-P02 (feature 174): the three workloads (textured quads, ALU stress, particles) are drawn through FieldPass, render targets and ParticleRenderer as a function of the case and the workload frame only, byte-identical across hosts and after ten context rebuilds (WorkloadDrawTests, RebuildTests); a case over the texture limit allocates nothing (G-SCENES closed)."
   },
   {
    "id": "M05",
@@ -386,7 +386,7 @@
    "id": "M06",
    "capability": "Version 0.1 feature 01: repeatable baseline scenes (textured quads, shader ALU stress, particles) with fixed, versioned configurations",
    "source": "manual \u00a72 feature 01; spec FR-A24-002",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
@@ -414,10 +414,10 @@
     }
    ],
    "example": {
-    "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidFieldsScene.swift",
-    "symbol": "FluidFieldsScene"
+    "file": "Packages/ExperiencesCreative/GraphicsBenchmarkLab/Experience/Workloads.swift",
+    "symbol": "WorkloadRenderer"
    },
-   "notes": "Drawing is covered by FieldPass and ParticleRenderer (FieldPassTests, ParticleRendererTests, ParticleSystemTests); the scene configurations, their versions and caps are app-local (G-MODEL, G-SCENES). Fluid Art Playground draws FieldPasses over a texture uploaded with Texture.upload(rgba:)."
+   "notes": "Drawing is covered by FieldPass and ParticleRenderer (FieldPassTests, ParticleRendererTests, ParticleSystemTests); the scene configurations, their versions and caps are app-local (G-MODEL, G-SCENES). Fluid Art Playground draws FieldPasses over a texture uploaded with Texture.upload(rgba:). A24-P02 (feature 174): the three workloads (textured quads, ALU stress, particles) are drawn through FieldPass, render targets and ParticleRenderer as a function of the case and the workload frame only, byte-identical across hosts and after ten context rebuilds (WorkloadDrawTests, RebuildTests); a case over the texture limit allocates nothing (G-SCENES closed)."
   },
   {
    "id": "M07",
@@ -640,7 +640,7 @@
    "id": "M14",
    "capability": "The three workload scenes: textured quads, shader ALU stress and particles, each with a fixed configuration and caps checked before allocation",
    "source": "spec FR-A24-003 area 3; manual \u00a76 render sequence",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
@@ -674,10 +674,10 @@
     }
    ],
    "example": {
-    "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidFieldsScene.swift",
-    "symbol": "FluidFieldsScene"
+    "file": "Packages/ExperiencesCreative/GraphicsBenchmarkLab/Experience/Workloads.swift",
+    "symbol": "WorkloadRenderer"
    },
-   "notes": "Textured quads as layered FieldPass draws sampling a texture generated in code with Texture.upload(rgba:); ALU stress as a fragment program compiled by ResourceRegistry.program with a bounded iteration count; particles through ParticleRenderer with ParticleInstance (ParticleSystem.defaultCapacity 10,000, maxCapacity 100,000). Tested by FieldPassTests, TextureUploadTests, ShaderProgramTests and ParticleRendererTests. G-SCENES (A24-P02)."
+   "notes": "Textured quads as layered FieldPass draws sampling a texture generated in code with Texture.upload(rgba:); ALU stress as a fragment program compiled by ResourceRegistry.program with a bounded iteration count; particles through ParticleRenderer with ParticleInstance (ParticleSystem.defaultCapacity 10,000, maxCapacity 100,000). Tested by FieldPassTests, TextureUploadTests, ShaderProgramTests and ParticleRendererTests. G-SCENES (A24-P02). A24-P02 (feature 174): the three workloads (textured quads, ALU stress, particles) are drawn through FieldPass, render targets and ParticleRenderer as a function of the case and the workload frame only, byte-identical across hosts and after ten context rebuilds (WorkloadDrawTests, RebuildTests); a case over the texture limit allocates nothing (G-SCENES closed)."
   },
   {
    "id": "M15",
@@ -1500,7 +1500,7 @@
    "justification": "The three workloads are drawn over public building blocks (FieldPass, Texture.upload(rgba:), ResourceRegistry.program, ParticleRenderer) with fixed, versioned configurations and caps checked before allocation; textures are generated in code (clarification Q4). No VisualCore change is planned.",
    "phase": 2,
    "test": "Experience tests on the iOS 27.2 simulator: each scene draws in the host's context with the expected pixels, allocates exactly its declared bytes, refuses a configuration one past each cap before any allocation and rebuilds after context loss.",
-   "closed": null
+   "closed": "A24-P02"
   },
   {
    "id": "G-RUNNER",
