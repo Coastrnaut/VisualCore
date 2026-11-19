@@ -69,7 +69,7 @@
   `keys(prefix:)` unchanged; load/save extended) with
   `Packages/VisualCore/Tests/VisualCoreSimulationTests/ColorVisionPreferenceTests.swift` (JSON from before the feature
   decodes with old choices kept and `.standard`; unknown raw value → `.standard`; storage round trip; the existing
-  `AccessibilityPreferencesTests` unchanged and passing); `--name host`
+  `AccessibilityPreferencesTests` unchanged and passing; SC-R02F10-005); `--name host`
 - [ ] T-R02F10-008 [US3] [US4] Create `Packages/VisualCoreRendering/Sources/VisualCoreUI/ClueBadge.swift` (`ClueBadge`
   drawing the shape, pattern and outline with SwiftUI `Path`/`Canvas` from `ClueReference`, `@ScaledMetric` size,
   wrapping name, accessibility label = name; `ColorVisionChoice.palette`) and edit `AccessibilitySettingsSection.swift`
@@ -83,7 +83,8 @@
 ## Phase 6: Regression, documentation and close
 
 - [ ] T-R02F10-010 No Stage One breakage: `--name experiences --` ExperiencesCreative on sim-27.2, and the app's
-  settings tests (`--name app-settings --` the app test chunk that covers `SettingsView`)
+  settings tests (`--name app-settings -- python3 scripts/release_check.py --only app-build-for-testing-ios27
+  app-unit-ios27 app-ui-ios27-b`, as R02-F26)
 - [ ] T-R02F10-011 API baseline and docs: `check_public_api.py --update`, `--name public-api`, `--name documented-api
   -- python3 scripts/check_documented_api.py --sources Apps/VisualCore`; new `docs/architecture/color-accessibility.md`
   (OKLab and Machado sources with licences, threshold, presets, clue set, reason codes); sections in

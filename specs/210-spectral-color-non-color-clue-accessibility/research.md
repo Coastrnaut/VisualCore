@@ -31,3 +31,7 @@
 - **R10 Sources.** OKLab: Björn Ottosson, "A perceptual color space for image processing" (2020), reference code MIT /
   public domain. Machado, Oliveira, Fernandes, "A Physiologically-based Model for Simulation of Color Vision Deficiency",
   IEEE TVCG 15(6), 2009 — matrices published in the paper; cited in docs/architecture/color-accessibility.md.
+- **R11 Observability.** Decision: every refusal carries a stable `r2-f10.*` reason code with the offending index or
+  ids; the pure colour model has no app id, seed, tick or capability tier, so the consuming experience adds them when
+  it reports (the existing failure-report path of the experience host). Rationale: keeps the model pure (constitution
+  IV). Alternatives: passing app context into colour functions (couples a pure module to the host).
