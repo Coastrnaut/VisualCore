@@ -75,7 +75,7 @@
 
 - [X] T-A23-009 No-change proof (`--name no-change -- git diff --exit-code --stat 7b64fedf..HEAD -- Packages — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A23-P00.no-change.json exit 0 (git diff --exit-code --stat 7b64fedf..HEAD -- Packages External is empty)
   External`) (FR-A23-008, SC-A23-005)
-- [ ] T-A23-010 Run the script tests (`--name script-tests -- python3 scripts/test_scripts.py`) and the release-check
+- [X] T-A23-010 Run the script tests (`--name script-tests -- python3 scripts/test_scripts.py`) and the release-check — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A23-P00.script-tests-3.json and A23-P00.fast-checks.json exit 0 (docs, app-contracts, compliance, dependencies); script-tests and script-tests-2 failed on the unlisted app-icon raster, fixed in 8b2cad02 and cad96724; every run-check within its limit, the contract check 0.05 s
   document steps (`--name fast-checks -- python3 scripts/release_check.py --only docs app-contracts compliance
   dependencies`). Every run-check of this gate stays within its limit, and the contract check runs in under 10 s
   (SC-A23-006)
