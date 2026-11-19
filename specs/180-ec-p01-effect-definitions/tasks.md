@@ -41,7 +41,7 @@
 - [X] T-A25-107 [P] [US3] [US4] Create `Packages/ExperiencesCreative/EffectsComposer/Core/{TestImage,EffectReference,EffectPrograms}.swift` per clarifications Q1 — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P01.ec-core-ios27.json exit 0 (35 tests in 8 suites on sim-27.2); test image, CPU references and five programs
   and Q4: the 64 × 64 test image, `RGBAImage`, the CPU reference of each effect, and each effect's fragment program
   (input `u_source`, packed `u_params`/`u_params2` vec4 and `u_texel`)
-- [ ] T-A25-108 [US3] [US4] Write `Packages/ExperiencesCreative/EffectsComposer/CoreTests/{ReferenceTests,ProgramRenderTests,OrderTests,RenderSupport}.swift`:
+- [X] T-A25-108 [US3] [US4] Write `Packages/ExperiencesCreative/EffectsComposer/CoreTests/{ReferenceTests,ProgramRenderTests,OrderTests,RenderSupport}.swift`: — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P01.ec-core-ios27.json exit 0 (35 tests in 8 suites on sim-27.2); every program compiles; max GPU-CPU difference 0/255 (grade, blur, vignette, posterize) and 1/255 (distort) over all 4,096 pixels; order fixture differs up to 43/255 and undo redraws byte-identically
   reference identities (defaults of grade, radius-0 blur, amplitude-0 distort and amount-0 vignette leave the image
   unchanged); inside a `RenderHost` scene every program compiles with `FieldPass` and chosen pixels at defaults and at
   one non-default value match the reference within 2/255 (4/255 for distort); grade (contrast 2) then posterize (4)
