@@ -29,7 +29,7 @@
   - `NodeKind` with the seven kinds' ports and `ParameterDefinition`s exactly as the spec's clarification Q1 table;
   - `NodeID` "an integer 1…9,999", `CanvasPoint` "finite, each within −4,096…4,096", `GraphNode`, `GraphEdge`,
     `VisualGraph`, `GraphLimits` "`maxNodes` 32, `maxEdges` 64".
-- [ ] T-A23-104 [P] [US1] Create `Packages/ExperiencesCreative/VisualProgrammingLab/Core/GraphDocument.swift` per
+- [X] T-A23-104 [P] [US1] Create `Packages/ExperiencesCreative/VisualProgrammingLab/Core/GraphDocument.swift` per — Verified 2026-11-18: 2026-11-18: GraphDocument.swift: kind a23.visual-graph, schema 1, at most 65,536 bytes, canonical JSON (sorted keys, nodes by id, edges sorted), body through MigrationChain(currentVersion: 1), refusals damaged, newer-version, too-large, not-finite (also NaN and Infinity strings on reading), out-of-range (ids incl. edge ends, positions, declared parameters), fingerprint by DigestBuilder(domain: a23.visual-graph); .autonomy/checks/A23-P01.vpl-core-ios27.json exit 0 (70 tests in 7 suites on sim-27.2, slowest 0.047 s); written by an agent, retested
   clarification Q3 (FR-A23-102): kind `a23.visual-graph`, schema 1, "≤ 65,536 bytes encoded, canonical JSON with
   sorted keys", the body through `MigrationChain(currentVersion: 1)`, refusal codes `damaged`, `newer-version`,
   `too-large`, `not-finite`, `out-of-range`, and `fingerprint(of:)` with `DigestBuilder(domain: "a23.visual-graph")`
