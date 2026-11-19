@@ -19,7 +19,7 @@
 
 ## Phase 2: Core (pure)
 
-- [ ] T-A24-203 [P] Create `Packages/ExperiencesCreative/GraphicsBenchmarkLab/Core/{RunTimeline,ParticleField}.swift`
+- [X] T-A24-203 [P] Create `Packages/ExperiencesCreative/GraphicsBenchmarkLab/Core/{RunTimeline,ParticleField}.swift` — Verified 2026-11-19: 2026-11-19: .autonomy/checks/A24-P02.gbl-ios27.json exit 0 (50 core and 33 experience tests on sim-27.2); RunTimeline (half-open phase bounds) and ParticleField (splitmix64, wrapped)
   per clarifications Q1–Q2 and data-model.md, with `///` everywhere: `RunTimeline(plan:start:)` with `phase(at:)`
   ("warm-up while t − start < warm-up; measure while < warm-up + measure; cool-down while < total; then nil") and
   `endTime`; `ParticleField` (a hash for the start position, a fixed velocity, wrapped into the view, pure in index and
