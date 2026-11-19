@@ -38,13 +38,15 @@
 - [ ] T-A23-306 [US2] [US3] Write `ExperienceTests/{PreviewStateTests,BudgetTests}.swift` (SC-A23-302, 303): every
   invalid fixture gives `invalid(message)` and no pass drawn; reconnecting restores `ready`; a graph at 6 slots
   compiles and its bytes equal the registry's render-target bytes; 7 slots is refused with the registry unchanged;
-  a 5-pass chain uses 2 slots
+  a 5-pass chain uses 2 slots; the preview hidden draws no pass and leaves the digest unchanged; a failing operator
+  (a test seam replacing its text) gives `failed(message)` and the canvas keeps drawing
 
 ## Phase 4: Stories 4–5 — compile queue and rebuild (P2)
 
 - [ ] T-A23-307 [US4] [US5] Write `ExperienceTests/{CompileQueueTests,PreviewRebuildTests}.swift` (SC-A23-304, 305): N
   edits before a frame give one compile; a view change gives none; 10 `recreateContext` and a resize there and back
-  give a byte-identical inset with `leaked` 0
+  give a byte-identical inset with `leaked` 0; two stills at the same frame time are equal and at another time differ
+  when Noise is fed by Time; after a frame with the inset the next frame's grid covers the whole drawable again
 
 ## Phase 5: Evidence
 
