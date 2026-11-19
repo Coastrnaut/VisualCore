@@ -27,6 +27,66 @@ Canonical overrides:
   `docs/release/build-and-archive.md`.
 - Follow `specs/164-ss-p06-release`.
 
+## Clarifications
+
+### Session 2026-11-19
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- **Permissions:** `Catalog/registrations.json` gives `a23.visual-programming-lab` the permissions `[]`, so no usage
+  string is needed.
+- **Copy steps:** `scripts/release_check.py` builds `experience-release-<code>` and `copy-claims-<code>` from an
+  experience's `release.json` (as Shader Studio's `docs/apps/shader-studio/release.json`). The shared denylist is
+  `Configs/copy-claims-denylist.json`; the lab shares nothing, so `copyCheck.allow` is empty.
+- **Stored data:**
+  - the session snapshot (`LabCore`, schema 1, digest domain `a23.visual-programming-lab.v1`: the graph and the
+    selection);
+  - `graph-<n>.json` (kind `a23.saved-graph`, version 1, at most 81,920 bytes, embedding the graph file
+    `a23.visual-graph` version 1);
+  - `library.json` (kind `a23.graph-library`, version 1), at most 24 graphs.
+
+  The refusals are `damaged`, `newer-version`, `too-large` and the graph file's codes. No temporary file is written.
+- **Screen:** the experience never changes the idle timer or the brightness; the source shows no such call.
+- **Drawing failure:** `LabPresenter.draw` throws to the session; there is no test seam yet.
+- **Interface chunk:** the A23 interface chunk is `e3` (A23-P02 to P05).
+
+- Q: Which statuses does the release checklist use? → A: The checker's:
+  - `verified`, with evidence;
+  - `pending-campaign-ii`, for device rows naming VPL-D1 … VPL-D6 of
+    `docs/apps/visual-programming-lab/device-campaign.md`;
+  - `owner-action`, with the steps of `docs/release/build-and-archive.md`.
+- Q: Which words does the experience's own claims scan refuse? → A: It scans the store text and the interface Swift
+  (controls, canvas overlay, library view, presenter and the adapter's words), whole words, case-insensitively:
+  - programming language, write code, coding, script, scripting, type shaders, shader code editor;
+  - Shadertoy, TouchDesigner, Blender, Unreal, Unity, node-based compositor;
+  - upload, export, cloud, sync, account, share;
+  - fps, unlimited, real-time.
+
+  The phrase "no code to type" is required in the store text. Every test named in the claims table must exist.
+- Q: What does the source scan refuse? → A: The A22 list, in `Packages/ExperiencesCreative/VisualProgrammingLab`:
+  - `URLSession`, `import Network`, `CLLocation` and `import CoreLocation`;
+  - `AVCapture`, `AVAudioRecorder`, `inputNode`, `installTap` and `CMMotion`;
+  - `CNContact`, `PHPhotoLibrary`, `import Photos` and `PhotosUI`;
+  - `ASIdentifierManager`, `AppTrackingTransparency` and `isIdleTimerDisabled`;
+  - any `brightness =` write;
+  - `UIPasteboard` and `ShareLink`.
+- Q: How are crash recovery and the sample files proved? → A:
+  - **Crash recovery:** a test-only `failNextDraw` seam in the presenter makes the next draw throw once
+    (`LabDrawError.injected`). A test saves two graphs, sets the seam and draws, so the session fails with the injected
+    message. Every storage file must be byte-identical, and a new session over the same storage lists and opens both
+    graphs.
+  - **Sample files:** committed fixtures under `ExperienceTests/Fixtures/` beside the A23-P04 `graph-sample.json`:
+    - `snapshot-v1.json` (current), `snapshot-newer.json` and `snapshot-damaged.json`;
+    - `graph-newer.json` and `graph-damaged.json` (the current saved graph is `graph-sample.json`);
+    - `library-current.json`, `library-newer.json` and `library-damaged.json`.
+
+    The current samples open. The newer and damaged snapshots are refused. A newer or damaged graph file is listed as
+    unreadable with its code. A newer index makes the library read-only; a damaged index still lists the graphs from
+    their files. Every file stays byte-identical after reading.
+- Q: Which interface journey runs? → A: `VPLReleaseUITests` joins chunk `e3`. A fresh start shows the status "Ready",
+  the list form's rows `node-row-1` and `node-row-2` and no `node-row-3`, no `feedback`, and an empty library (no
+  `library-row-graph-1`). The test takes under 60 s.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Nothing leaves the device (Priority: P1) 🎯
@@ -96,8 +156,8 @@ shown and an empty library.
 
 **Acceptance Scenarios**:
 
-1. **Given** a fresh start, **Then** the list form shows two nodes, the status names a valid graph, no problem badge
-   is shown, and the library lists no graph.
+1. **Given** a fresh start, **Then** the list form shows two nodes, the status reads "Ready", no feedback is shown,
+   and the library lists no graph.
 
 ### Edge Cases
 
