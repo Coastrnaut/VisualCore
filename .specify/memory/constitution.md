@@ -1251,6 +1251,54 @@ hardware identifier and uploads nothing.
   and tables, never colour or a chart alone; stress scenes offer a warning before they run and can be stopped at once.
 - **Licenses:** every shader, scene definition and statistical method records its source and license.
 
+### A25 Effects Composer (`a25.effects-composer`)
+
+Ratified from the app manual's constitution prompt (2026-11-19). Like A05–A24, it never had a standalone target: it
+is built directly as an experience of the one app. Its product goal is a visual effects-chain editor for building,
+previewing and exporting reusable shader looks. Version 0.1 covers:
+- a linear chain editor with five built-in effects and bounded parameters;
+- editable reorder, enable and disable, and an immediate preview;
+- a before and after compare, and preset saves;
+- local image import through the system picker with scoped access;
+- still export with dimension and format validation;
+- controlled render-target pooling and shader compile diagnostics.
+
+It is no video editor, runs no user-written code and imports nothing from a cloud library without the person's
+choice; the chain is linear and acyclic, keeping a typed graph possible later without promising one.
+
+- **Consumer, not fork:** an experience of the VisualCore app and a VisualCore consumer, never a fork of
+  projectm-ios. It uses only audited VisualCore public APIs over the OpenGL ES → ANGLE → Metal integration. It MUST
+  NOT create its own EGL/ANGLE initialization path or a second renderer, or link ProjectM engine code. Effect passes
+  are drawn through VisualCore's host, field passes and render targets.
+- **Reuse first (Principle II):** the render host, field passes with sampler inputs, render targets and ping-pong
+  pairs, the GLSL library, the resource registry and budget, texture upload and offscreen read-back are reused, not
+  copied. A generic capability the composer needs and VisualCore lacks goes into VisualCore with tests, docs, the API
+  baseline and the reference regression. Effect definitions, the chain compiler's rules and copy stay in the
+  experience.
+- **Domain truth is pure and testable without the GPU:** effect definitions, parameter ranges, the chain, its
+  compilation into an ordered pass plan with target lifetimes, presets and the export settings are pure, versioned
+  models tested through `swift test` with fixed fixtures. Drawing never changes the chain; a pass never samples the
+  target it writes.
+- **Bounded:** the chain length, every parameter, the source and export dimensions and the number and bytes of
+  intermediate targets have documented caps checked before allocation; an image larger than the cap is refused or
+  scaled by a stated rule; targets come from a fixed pool, are created only in a valid host context and are rebuilt
+  from CPU state after a context loss or resize. Files that are truncated, of a newer version or hold NaN, infinite or
+  out-of-range values are refused safely and never deleted automatically.
+- **Colour correctness:** each pass states whether it works on linear or sRGB values, and the compare shows the
+  untouched source beside the processed result.
+- **Offline-first and private:** no networking, accounts, analytics or ads, and no automatic upload. An imported image
+  comes only from the system picker the person opens and is read with the access it grants; an export is written only
+  when the person chooses it. Every permission the experience asks for is disclosed with its purpose; none is asked at
+  launch.
+- **Visuals are code:** effects and the built-in test image are generated in code; no purchased, generated or
+  photographic image is bundled. A person's imported image is their input, never bundled. Typography uses system
+  fonts.
+- **Truthful claims:** no claim of professional colour accuracy, of compatibility with another editor's presets or
+  of a measured speed that was not measured on a device and attributed.
+- **Accessibility:** native SwiftUI controls with VoiceOver labels and Dynamic Type; every effect, its parameters
+  and its order can be edited without dragging, and the compare is labelled in words, never colour alone.
+- **Licenses:** every shader, effect definition and bundled value records its source and license.
+
 ## Governance
 
 - Precedence: real Apple platform and toolchain behavior and observed test results → owner
@@ -1310,5 +1358,7 @@ hardware identifier and uploads nothing.
   from its manual's constitution prompt at gate A23-P00 (feature 165); no principle changes.
 - Amendment 2.20.0 (2026-11-19, MINOR): App-Scoped Rules gain the A24 Graphics Benchmark Lab subsection, ratified
   from its manual's constitution prompt at gate A24-P00 (feature 172); no principle changes.
+- Amendment 2.21.0 (2026-11-19, MINOR): App-Scoped Rules gain the A25 Effects Composer subsection, ratified from its
+  manual's constitution prompt at gate A25-P00 (feature 179); no principle changes.
 
-**Version**: 2.20.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-19
+**Version**: 2.21.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-19
