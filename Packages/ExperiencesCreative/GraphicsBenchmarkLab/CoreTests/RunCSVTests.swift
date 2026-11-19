@@ -1,4 +1,6 @@
-// RunCSVTests — feature 176 (A24-P04) T-A24-403 (FR-A24-404; SC-A24-403; clarification Q4; User Story 3). The JSON
+// RunCSVTests — feature 176 (A24-P04) T-A24-403 (FR-A24-404; SC-A24-403; clarification Q4; User Story 3), CSV
+// version 2 by feature 177 (A24-P05) T-A24-504 (FR-A24-502: `qualification` and `qualification_reasons` after
+// `state`). The JSON
 // export (the run file) and the CSV export of a fixed fixture run equal the committed golden files
 // `Fixtures/golden-run.json` and `Fixtures/golden-run.csv` byte for byte; the CSV's lines end in CRLF, the renderer
 // field with a comma and quotes is quoted with its quotes doubled, an absent GPU time or percentile is an empty field
@@ -151,7 +153,8 @@ struct GoldenMissing: Error, CustomStringConvertible {
         let expected = [
             "format", "format_version", "case_id", "case_version", "case_fingerprint", "workload", "layers",
             "texture_size", "resolution_scale", "warm_up_seconds", "measure_seconds", "cool_down_seconds", "state",
-            "device_model", "os_version", "app_version", "app_build", "renderer", "gl_version", "quality_tier",
+            "qualification", "qualification_reasons", "device_model", "os_version", "app_version", "app_build",
+            "renderer", "gl_version", "quality_tier",
             "thermal_start", "thermal_end", "low_power_start", "low_power_end", "timing_interval", "timing_cpu",
             "timing_gpu", "report_flags", "interval_p50", "interval_p95", "interval_p99", "cpu_p50", "cpu_p95",
             "cpu_p99", "gpu_p50", "gpu_p95", "gpu_p99", "measured", "warm_up_excluded", "cool_down_excluded",
@@ -162,7 +165,12 @@ struct GoldenMissing: Error, CustomStringConvertible {
         let version = Self.value("format_version", in: text)
         let flags = Self.value("flags", in: text)
         let reportFlags = Self.value("report_flags", in: text)
-        #expect(format == "a24.benchmark-run.csv" && version == "1")
+        let qualification = Self.value("qualification", in: text)
+        let reasons = Self.value("qualification_reasons", in: text)
+        #expect(format == "a24.benchmark-run.csv" && version == "2")
+        #expect(RunCSV.version == 2)
+        #expect(qualification == "qualified")
+        #expect(reasons == "thermal-changed;low-power;dropped-frames;too-few-for-p99")
         #expect(flags == "dropped-frames;gpu-time-not-available;too-few-for-p95;too-few-for-p99")
         #expect(reportFlags == "thermal-changed")
     }
@@ -172,9 +180,14 @@ struct GoldenMissing: Error, CustomStringConvertible {
         run.report = nil
         let text = RunCSV.text(of: run)
         let renderer = Self.value("renderer", in: text)
-        let stateIndex = try #require(Self.lines(text).firstIndex(of: "state,completed"))
-        let next = Self.lines(text)[stateIndex + 1]
+        let lines = Self.lines(text)
+        let stateIndex = try #require(lines.firstIndex(of: "state,completed"))
+        let qualification = lines[stateIndex + 1]
+        let reasons = lines[stateIndex + 2]
+        let next = lines[stateIndex + 3]
         #expect(renderer == nil)
+        #expect(qualification == "qualification,qualified")
+        #expect(reasons == "qualification_reasons,dropped-frames;too-few-for-p99;no-report")
         #expect(next.hasPrefix("interval_p50,"))
     }
 
@@ -186,6 +199,17 @@ struct GoldenMissing: Error, CustomStringConvertible {
         let particles = Self.value("particles", in: text)
         let layers = Self.value("layers", in: text)
         let state = Self.value("state", in: text)
+        let qualification = Self.value("qualification", in: text)
+        let reasons = Self.value("qualification_reasons", in: text)
         #expect(particles == "5000" && layers == nil && state == "stopped")
+        #expect(qualification == "invalid" && reasons == "stopped")
+    }
+
+    @Test func aValidRunHasAnEmptyReasonsField() throws {
+        let text = RunCSV.text(of: try QualificationFixture.run())
+        let qualification = Self.value("qualification", in: text)
+        let reasons = Self.value("qualification_reasons", in: text)
+        #expect(qualification == "valid")
+        #expect(reasons == "")
     }
 }

@@ -22,7 +22,7 @@
 - [X] T-A24-503 [P] [US2] `Core/Repeatability.swift` per clarification Q3 (FR-A24-503) and — Verified 2026-11-19: 2026-11-19: .autonomy/checks/A24-P05.gbl-core.json exit 0 (95 core and 53 experience tests); Repeatability (comparability keys, not-comparable reasons, spreads) and RepeatabilityTests (7)
   `CoreTests/RepeatabilityTests.swift` (SC-A24-502): three comparable trials and their spread; each not-comparable
   reason; one trial; a mixed GPU set (no GPU spread)
-- [ ] T-A24-504 [US1] `Core/RunCSV.swift` version 2 (`qualification`, `qualification_reasons` after `state`), the golden
+- [X] T-A24-504 [US1] `Core/RunCSV.swift` version 2 (`qualification`, `qualification_reasons` after `state`), the golden — Verified 2026-11-19: 2026-11-19: .autonomy/checks/A24-P05.gbl-core.json exit 0 (95 core and 53 experience tests); RunCSV version 2 with qualification rows after state, golden CSV regenerated (CRLF), RunCSVTests (9)
   CSV regenerated through the real writer, `RunCSVTests` updated (FR-A24-502)
 
 ## Phase 3: Experience — display and explanation (P1)

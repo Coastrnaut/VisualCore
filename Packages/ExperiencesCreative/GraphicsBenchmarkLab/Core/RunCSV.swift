@@ -1,13 +1,16 @@
-// RunCSV — feature 176 (A24-P04) T-A24-403 (FR-A24-404; clarification Q4; data-model.md "CSV"). The CSV export of a
-// run, format `a24.benchmark-run.csv` version 1, in two parts separated by one empty line:
+// RunCSV — feature 176 (A24-P04) T-A24-403 (FR-A24-404; clarification Q4; data-model.md "CSV"); version 2 by
+// feature 177 (A24-P05) T-A24-504 (FR-A24-502; clarification Q2). The CSV export of a run, format
+// `a24.benchmark-run.csv` version 2, in two parts separated by one empty line:
 //
 // 1. `key,value` rows (no header), in this order: `format`, `format_version`, `case_id`, `case_version`,
 //    `case_fingerprint`, `workload`, each configuration setting present in the order `layers`, `texture_size`,
 //    `iterations`, `particles`, `resolution_scale`, then `warm_up_seconds`, `measure_seconds`, `cool_down_seconds`,
-//    `state`; when the run has a report: `device_model`, `os_version`, `app_version`, `app_build`, `renderer`,
-//    `gl_version`, `quality_tier`, `thermal_start`, `thermal_end`, `low_power_start`, `low_power_end`,
-//    `timing_interval`, `timing_cpu`, `timing_gpu`, `report_flags`; then the summary: `interval_p50`, `interval_p95`,
-//    `interval_p99`, `cpu_p50`, `cpu_p95`, `cpu_p99`, `gpu_p50`, `gpu_p95`, `gpu_p99`, `measured`,
+//    `state`, `qualification` (valid, qualified or invalid; ``RunQualification``), `qualification_reasons` (the
+//    reason codes joined by `;`, empty when there is none); when the run has a report: `device_model`,
+//    `os_version`, `app_version`, `app_build`, `renderer`, `gl_version`, `quality_tier`, `thermal_start`,
+//    `thermal_end`, `low_power_start`, `low_power_end`, `timing_interval`, `timing_cpu`, `timing_gpu`,
+//    `report_flags`; then the summary: `interval_p50`, `interval_p95`, `interval_p99`, `cpu_p50`, `cpu_p95`,
+//    `cpu_p99`, `gpu_p50`, `gpu_p95`, `gpu_p99`, `measured`,
 //    `warm_up_excluded`, `cool_down_excluded`, `dropped`, `flags`.
 // 2. The header `frame_index,phase,interval_ms,cpu_ms,gpu_ms,dropped` and one row per sample in frame order.
 //
@@ -24,7 +27,8 @@ public enum RunCSV {
     /// The format name written in the `format` row.
     public static let format = "a24.benchmark-run.csv"
     /// The format version written in the `format_version` row.
-    public static let version = 1
+    /// Version 2 (A24-P05) added the `qualification` and `qualification_reasons` rows after `state`.
+    public static let version = 2
     /// The header of the sample table.
     public static let sampleHeader = ["frame_index", "phase", "interval_ms", "cpu_ms", "gpu_ms", "dropped"]
     /// The line end of every line: CR LF.
@@ -71,6 +75,9 @@ public enum RunCSV {
         pairs.append(("measure_seconds", String(benchmarkCase.plan.measureSeconds)))
         pairs.append(("cool_down_seconds", String(benchmarkCase.plan.coolDownSeconds)))
         pairs.append(("state", run.state.rawValue))
+        let qualification = RunQualification.qualify(run)
+        pairs.append(("qualification", qualification.class.rawValue))
+        pairs.append(("qualification_reasons", qualification.reasonCodes))
         if let report = run.report {
             pairs.append(("device_model", report.deviceModel))
             pairs.append(("os_version", report.osVersion))
