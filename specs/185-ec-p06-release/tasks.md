@@ -12,7 +12,7 @@
 
 ## Phase 2: Story 1 — nothing leaves without the person's choice (P1) 🎯
 
-- [ ] T-A25-602 [P] [US1] Write `docs/apps/effects-composer/privacy-and-credits.md` (stored data, places and removal of
+- [X] T-A25-602 [P] [US1] Write `docs/apps/effects-composer/privacy-and-credits.md` (stored data, places and removal of — Verified 2026-11-19: 2026-11-19 privacy-and-credits.md (usage string word for word, stored data, removal) and licenses.md; .autonomy/checks/A25-P06.experience-release.json exit 0
   clarification "Stored data"; the picker; the export and the add-only Photos prompt with its usage string word for
   word; "Nothing is sent automatically"; code-made visuals) and `docs/apps/effects-composer/licenses.md` (the licence
   inventory: VisualCore's own code and the system frameworks; no third-party asset)
