@@ -13,7 +13,7 @@
 
 ## Phase 2: Foundational (pure colour science)
 
-- [ ] T-R02F10-002 [P] Create `Packages/VisualCore/Sources/VisualCoreParameters/ColorAccessError.swift`
+- [X] T-R02F10-002 [P] Create `Packages/VisualCore/Sources/VisualCoreParameters/ColorAccessError.swift` — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F10.host.json (exit 0; PerceptualColorTests 9 passed, 0 failures in the run)
   (`nonFinite(index:)`, `outOfRange(index:)`, `sameClue(String, String)`, `emptyName(index:)`, `duplicateName(String)`,
   `duplicateID(String)`, `tooManyStates(count:limit:)`; `reasonCode` `r2-f10.non-finite`, `r2-f10.out-of-range`,
   `r2-f10.same-clue`, `r2-f10.empty-name`, `r2-f10.duplicate-name`, `r2-f10.duplicate-id`, `r2-f10.too-many-states`) and
