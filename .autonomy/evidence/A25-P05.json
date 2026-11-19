@@ -1,0 +1,104 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/A25-P05.app-unit-2.json",
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A25-P05.app-unit-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A25-P05.app-unit.json",
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A25-P05.app-unit.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A25-P05.baseline.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing EffectsComposerCoreTests EffectsComposerExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A25-P05.baseline.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A25-P05.catalog.json",
+      "command": "python3 scripts/build_catalog.py --check",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A25-P05.catalog.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A25-P05.contract.json",
+      "command": "python3 scripts/check_app_contract.py --app effects-composer --render",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A25-P05.contract.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A25-P05.core-purity.json",
+      "command": "sh -c '! grep -rnE \"import (UIKit|SwiftUI|OpenGLES|VisualCoreRendering)|vcgl|Date\\(\\)\" Packages/ExperiencesCreative/EffectsComposer/Core'",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A25-P05.core-purity.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A25-P05.device-campaign.json",
+      "command": "sh -c 'test $(grep -c \"| pending device campaign |\" docs/apps/effects-composer/device-campaign.md) -eq 7 && python3 scripts/validate_docs.py'",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A25-P05.device-campaign.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A25-P05.documented-api.json",
+      "command": "python3 scripts/check_documented_api.py --sources Packages/ExperiencesCreative/EffectsComposer",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A25-P05.documented-api.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A25-P05.ec-color-export.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing EffectsComposerCoreTests EffectsComposerExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A25-P05.ec-color-export.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A25-P05.ec-ios27-3.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing EffectsComposerCoreTests EffectsComposerExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A25-P05.ec-ios27-3.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A25-P05.ec-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing EffectsComposerCoreTests EffectsComposerExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A25-P05.ec-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A25-P05.experience-packages.json",
+      "command": "python3 scripts/check_experience_packages.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A25-P05.experience-packages.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A25-P05.isolation.json",
+      "command": "python3 scripts/check_app_isolation.py --experiences Packages/ExperiencesCreative/EffectsComposer",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A25-P05.isolation.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A25-P05.script-tests.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A25-P05.script-tests.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A25-P05.verify-27-2.json",
+      "command": "python3 scripts/verify_experiences.py --only a25.effects-composer --runtime 27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A25-P05.verify-27-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A25-P05.verify-27.json",
+      "command": "python3 scripts/verify_experiences.py --only a25.effects-composer --runtime 27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A25-P05.verify-27.log"
+    }
+  ],
+  "generated": "2026-11-19T20:57:02+00:00",
+  "method": "deterministic-run-check",
+  "stage": "A25-P05",
+  "status": "pass"
+}
