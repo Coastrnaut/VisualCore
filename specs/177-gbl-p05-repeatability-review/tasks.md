@@ -68,3 +68,11 @@
 ## Implementation strategy
 
 - **MVP:** 502, 505. **Review checkpoint:** at 509. **Commits:** one per task.
+
+## Phase 6: Convergence
+
+- [ ] T-A24-513 Stop a running run when the thermal state becomes serious or critical (BenchPresenter reads an
+  injectable thermal source each frame; the run ends as interrupted, the status names the heat, and the qualification
+  is Invalid), with an experience test, per visualcore-contract risk 3 and FR-A24-501 (missing)
+- [ ] T-A24-514 Give the repeatability block's explain button its own identifier `repeatability-explain` (the opened
+  result keeps `explain`) and record it in contracts/review.md, per contracts/review.md identifiers (partial)
