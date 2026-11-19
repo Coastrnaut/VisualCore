@@ -80,7 +80,7 @@
 - [X] T-A24-612 Contract: close G-RELEASE with "A24-P06" (all 12 gaps closed; the iOS 26.x runner half is cited at — Verified 2026-11-19: 2026-11-19 G-RELEASE closed by A24-P06 (all 12 gaps closed, M31 and M34 available); .autonomy/checks/A24-P06.{contract,catalog,realcatalog,experience-packages,script-tests,verify-27}.json all exit 0
   X-A24) (`--name contract`), and the catalog, packages, script tests and runner (`--name catalog`, `realcatalog`,
   `experience-packages`, `script-tests`, `verify-27`)
-- [ ] T-A24-613 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+- [X] T-A24-613 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record — Verified 2026-11-19: 2026-11-19 converge round 2 appended nothing; .autonomy/evidence/A24-P06.json sealed, record VERIFIED-GATE A24-P06 (178 of 263); post-record pipeline, validate_autocreator, validate_docs, build_catalog --check PASS; README and docs/automatedtesting.md updated
   A24-P06; update README.md (rule 16) and `docs/automatedtesting.md` (rule 17)
 
 ## Dependencies

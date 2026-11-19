@@ -5794,13 +5794,13 @@ source, the canonical target (a section of this document or a path that holds th
 | assertion-outline | 0 | 0 | 275 | 0 | 0 | 0 | 275 |
 | constitution-prompt | 0 | 0 | 0 | 11 | 0 | 0 | 11 |
 | document | 0 | 0 | 39 | 5 | 0 | 15 | 59 |
-| experience | 23 | 0 | 277 | 0 | 0 | 0 | 300 |
+| experience | 24 | 0 | 276 | 0 | 0 | 0 | 300 |
 | experience-section | 0 | 0 | 3325 | 0 | 0 | 0 | 3325 |
-| feature | 177 | 0 | 2852 | 60 | 0 | 0 | 3089 |
+| feature | 178 | 0 | 2851 | 60 | 0 | 0 | 3089 |
 | heading | 126 | 6 | 375 | 145 | 1 | 530 | 1183 |
 | level-manifest | 0 | 0 | 275 | 0 | 0 | 0 | 275 |
 | scenario-table | 0 | 0 | 525 | 0 | 0 | 0 | 525 |
-| **Total** | **326** | **6** | **7943** | **221** | **1** | **545** | **9042** |
+| **Total** | **328** | **6** | **7941** | **221** | **1** | **545** | **9042** |
 <!-- GENERATED:END traceability-summary -->
 
 Known limits of the matrix, stated plainly:
