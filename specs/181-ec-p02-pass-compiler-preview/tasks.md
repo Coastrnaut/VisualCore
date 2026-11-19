@@ -12,7 +12,7 @@
 ## Phase 1: Setup
 
 - [X] T-A25-201 Baseline: cite the A25-P01 evidence (`.autonomy/checks/A25-P01.{ec-core-ios27,app-build,experience-packages}.json`) — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P01.{ec-core-ios27,app-build,experience-packages}.json exit 0
-- [ ] T-A25-202 In `Packages/ExperiencesCreative/Package.swift` (lead): the targets `EffectsComposerExperience` (path
+- [X] T-A25-202 In `Packages/ExperiencesCreative/Package.swift` (lead): the targets `EffectsComposerExperience` (path — Verified 2026-11-19: 2026-11-19 EffectsComposerExperience(+Tests) and product; .autonomy/checks/A25-P02.experience-packages-2.json exit 0 (after registration)
   `EffectsComposer/Experience`; the core, VisualCoreExperience, VisualCorePersistence, VisualCoreRendering,
   VisualCoreExperienceHost, VisualCoreUI) and `EffectsComposerExperienceTests`, and the library product
   `EffectsComposerExperience`

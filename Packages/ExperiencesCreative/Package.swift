@@ -49,6 +49,7 @@ let package = Package(
         // Feature 167 (A23-P02): Visual Programming Lab, a candidate until X-A23.
         .library(name: "VisualProgrammingLabExperience", targets: ["VisualProgrammingLabExperience"]),
         .library(name: "GraphicsBenchmarkLabExperience", targets: ["GraphicsBenchmarkLabExperience"]),
+        .library(name: "EffectsComposerExperience", targets: ["EffectsComposerExperience"]),
         // The standalone ParticleUniverse app target compiles the moved sources and needs the Core until X-A04.
         .library(name: "ParticleUniverseCore", targets: ["ParticleUniverseCore"]),
     ],
@@ -817,6 +818,30 @@ let package = Package(
                                    .product(name: "VisualCorePersistence", package: visualCore),
                                    .product(name: "VisualCoreRendering", package: rendering)],
                     path: "EffectsComposer/CoreTests"),
+        // A25 Effects Composer experience (feature 181, A25-P02): a candidate until X-A25. The chain is compiled into
+        // field passes over pooled render targets; no GL call of its own.
+        .target(name: "EffectsComposerExperience",
+                dependencies: ["EffectsComposerCore",
+                               .product(name: "VisualCoreExperience", package: visualCore),
+                               .product(name: "VisualCorePersistence", package: visualCore),
+                               .product(name: "VisualCoreMath", package: visualCore),
+                               .product(name: "VisualCoreScenes", package: visualCore),
+                               .product(name: "VisualCoreDiagnostics", package: visualCore),
+                               .product(name: "VisualCoreRendering", package: rendering),
+                               .product(name: "VisualCoreExperienceHost", package: rendering),
+                               .product(name: "VisualCoreUI", package: rendering)],
+                path: "EffectsComposer/Experience"),
+        .testTarget(name: "EffectsComposerExperienceTests",
+                    dependencies: ["EffectsComposerExperience", "EffectsComposerCore",
+                                   .product(name: "VisualCoreExperience", package: visualCore),
+                                   .product(name: "VisualCorePersistence", package: visualCore),
+                                   .product(name: "VisualCoreMath", package: visualCore),
+                                   .product(name: "VisualCoreScenes", package: visualCore),
+                                   .product(name: "VisualCoreDiagnostics", package: visualCore),
+                                   .product(name: "VisualCoreRendering", package: rendering),
+                                   .product(name: "VisualCoreExperienceHost", package: rendering),
+                                   .product(name: "VisualCoreUI", package: rendering)],
+                    path: "EffectsComposer/ExperienceTests"),
         // A21 Aurora (feature 152, A21-P01): a pending core until A21-P02 adds the experience. The core is pure (the
         // sky scene, presets, clock, noise port, reference and shader text); its tests draw the shader off screen.
         .target(name: "AuroraCore",
