@@ -55,7 +55,7 @@
   -- python3 scripts/check_documented_api.py --sources Apps/VisualCore`; section in `Packages/VisualCore/README.md`;
   curve rules in `docs/architecture/determinism.md`; section 13.4 row R02-F08 "As built" in
   `docs/catalog/shared-feature-map.json` and `render_autocreator.py`
-- [ ] T-R02F08-009 Reference regression chunk 1 (`--name reference-1`)
+- [X] T-R02F08-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F08.reference-1.json (exit 0)
 - [ ] T-R02F08-010 Reference regression chunk 2 (`--name reference-2`)
 - [ ] T-R02F08-011 Script tests (`--name script-tests`)
 - [ ] T-R02F08-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
