@@ -30,7 +30,8 @@ Canonical overrides:
   compares brightness and must prove that every rule coded by colour can be read another way.
 - **Prerequisites:** R02-F07 (linear-light emissive path) and UA-F02 (common settings) are pass.
 - **Superseded parts of the source prompt:** the USD 1.99–4.99 purchase model (ADR-0009: one USD 1.99 unlock); the
-  Round 2 lock (ImplementationLock-100). **Device-only items:** viewing the presets on D1–D3 displays. **Owner-only
+  Round 2 lock (ImplementationLock-100). **Device-only items:** viewing the three presets and the clue badges on the D1–D3 displays in light and dark
+  mode, recorded as rows of the device campaign after ImplementationLock-100. **Owner-only
   items:** none.
 
 ## Clarifications
@@ -190,6 +191,13 @@ setting at its default and the reduce-motion and reduce-flashing choices unchang
   default, and MUST be shown in the common accessibility settings.
 - **FR-R02F10-011**: Invalid input (non-finite or out-of-range components, a bad set of states) MUST be refused before
   drawing with a stable `r2-f10.*` reason code naming the offending index or ids.
+- **FR-R02F10-013**: A drawn clue MUST carry an outline whose contrast ratio with the state colour and with the
+  background it is placed on is at least 3:1 (WCAG non-text contrast); the clue badge and the colour-vision picker MUST
+  scale with Dynamic Type up to the largest accessibility size and fit compact iPhone and regular iPad widths without
+  truncating the name.
+- **FR-R02F10-014**: The sources of the OKLab constants and the Machado et al. matrices, with their licences, MUST be
+  cited in the architecture document; the presets and clue shapes are original and the copyright scan finds no image,
+  font or icon asset added.
 - **FR-R02F10-012**: Existing palettes, sRGB functions, state signs, accessibility preferences and their tests MUST be
   unchanged in behaviour; every new public name carries documentation; the API baseline and the reference regression are
   updated.
@@ -239,6 +247,8 @@ setting at its default and the reduce-motion and reduce-flashing choices unchang
 | Non-colour status | FR-R02F10-007, 008, 011 |
 | Schema migration | FR-R02F10-010 |
 | Observability | FR-R02F10-011 |
+| Layout and non-text contrast | FR-R02F10-013 |
+| Source licence | FR-R02F10-014 |
 | No Stage One breakage | FR-R02F10-012 |
 
 ## Negative Requirements / Excluded scope
