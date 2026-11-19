@@ -560,7 +560,7 @@
       "content": null,
       "manifest": "Packages/ExperiencesCreative/VisualProgrammingLab/scenario-manifest.json",
       "permissions": [],
-      "summary": "A node graph lab: place Time, Constant, Noise, Gradient, Mix, Blur and Output nodes on a canvas and wire outputs to inputs of the same type. A wrong connection is refused with a sentence saying why, and every connection can also be made from a list. Offline; nothing is sent."
+      "summary": "A node graph lab: wire Time, Constant, Noise, Gradient, Mix, Blur and Output nodes by matching types; the graph compiles into GPU shader passes shown in a preview. A wrong connection is refused with a reason, and every connection can be made from a list. Offline; nothing is sent."
     }
   }
 }
