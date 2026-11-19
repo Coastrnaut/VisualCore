@@ -70,7 +70,7 @@
   documented API, isolation and core purity
 - [X] T-A24-314 Contract: G-RUNNER, G-REPORT, U-RENDERINFO and U-GPUTIMER closed by "A24-P03", rows whose gaps are all — Verified 2026-11-19: 2026-11-19: G-RUNNER, G-REPORT, U-RENDERINFO and U-GPUTIMER closed by A24-P03, 13 rows available (GPUFrameTimer and ResourceRegistry.renderCapabilities cited); .autonomy/checks/A24-P03.contract.json exit 0; README updated
   closed available (`--name contract`); the README of the experience updated
-- [ ] T-A24-315 The catalog, packages, script tests, app and runner: `--name catalog`, `experience-packages`,
+- [X] T-A24-315 The catalog, packages, script tests, app and runner: `--name catalog`, `experience-packages`, — Verified 2026-11-19: 2026-11-19: .autonomy/checks/A24-P03.{catalog,experience-packages,script-tests,app-unit,verify-27}.json exit 0 (xcodegen generated; runner 9 of 9 on iOS 27.2)
   `script-tests`; `xcodegen generate --spec project.yml`, then `--name app-unit`; `--name verify-27`
 - [ ] T-A24-316 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
   A24-P03; update README.md (rule 16) and `docs/automatedtesting.md` (rule 17)
