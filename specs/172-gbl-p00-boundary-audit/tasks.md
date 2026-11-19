@@ -55,7 +55,7 @@
 
 - [X] T-A24-006 [US3] Build the one app for testing (`--name app-build -- python3 scripts/release_check.py --only — Verified 2026-11-19: 2026-11-19: .autonomy/checks/A24-P00.app-build.json exit 0 (build for testing on the iOS 27.2 phone simulator)
   app-build-for-testing-ios27`)
-- [ ] T-A24-007 [US3] Experience package check:
+- [X] T-A24-007 [US3] Experience package check: — Verified 2026-11-19: 2026-11-19: .autonomy/checks/A24-P00.experience-packages.json exit 0 (23 experiences, none A24); grep -c a24 gives 0 and 0
   - `--name experience-packages -- python3 scripts/check_experience_packages.py` passes (23 experiences, none A24);
   - `grep -c a24 Catalog/registrations.json Apps/VisualCore/App/ExperienceRegistry.swift` gives 0 and 0 (the colour
     `#050A24` is matched case-sensitively as `0A24`, not `a24`)
