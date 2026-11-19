@@ -7,7 +7,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T-R02F06-001 Record the baselines: `--name baseline-host -- swift test --package-path Packages/VisualCore` and
+- [X] T-R02F06-001 Record the baselines: `--name baseline-host -- swift test --package-path Packages/VisualCore` and — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F06.{baseline-host,baseline-rendering}.json (exit 0)
   `--name baseline-rendering -- python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme
   VisualCoreRendering-Package --destination sim-27.2 --action test`
 
