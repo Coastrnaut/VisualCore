@@ -1,0 +1,62 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/A24-P01.app-build.json",
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A24-P01.app-build.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A24-P01.catalog.json",
+      "command": "python3 scripts/build_catalog.py --check",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A24-P01.catalog.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A24-P01.contract.json",
+      "command": "python3 scripts/check_app_contract.py --app graphics-benchmark-lab --render",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A24-P01.contract.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A24-P01.core-purity.json",
+      "command": "sh -c '! grep -rnE \"import (UIKit|SwiftUI|OpenGLES|Network)|URLSession|Date\\(\\)|ContinuousClock|CFAbsoluteTime\" Packages/ExperiencesCreative/GraphicsBenchmarkLab/Core'",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A24-P01.core-purity.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A24-P01.documented-api.json",
+      "command": "python3 scripts/check_documented_api.py --sources Packages/ExperiencesCreative/GraphicsBenchmarkLab",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A24-P01.documented-api.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A24-P01.experience-packages.json",
+      "command": "python3 scripts/check_experience_packages.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A24-P01.experience-packages.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A24-P01.gbl-core-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing GraphicsBenchmarkLabCoreTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A24-P01.gbl-core-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A24-P01.isolation.json",
+      "command": "python3 scripts/check_app_isolation.py --experiences Packages/ExperiencesCreative/GraphicsBenchmarkLab",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A24-P01.isolation.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A24-P01.script-tests-2.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A24-P01.script-tests-2.log"
+    }
+  ],
+  "generated": "2026-11-19T15:41:33+00:00",
+  "method": "deterministic-run-check",
+  "stage": "A24-P01",
+  "status": "pass"
+}

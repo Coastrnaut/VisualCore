@@ -1889,8 +1889,14 @@
       "status": "pass"
     },
     "A24-P01": {
-      "attempts": [],
-      "status": "pending"
+      "attempts": [
+        {
+          "at": "2026-11-19T15:41:33+00:00",
+          "evidence": ".autonomy/evidence/A24-P01.json",
+          "result": "pass"
+        }
+      ],
+      "status": "pass"
     },
     "A24-P02": {
       "attempts": [],
@@ -2353,5 +2359,5 @@
       "status": "pending"
     }
   },
-  "updated": "2026-11-19T15:25:27+00:00"
+  "updated": "2026-11-19T15:41:33+00:00"
 }
