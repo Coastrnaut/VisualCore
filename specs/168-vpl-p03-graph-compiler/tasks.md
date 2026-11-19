@@ -25,7 +25,7 @@
 
 ## Phase 3: Stories 1–3 — picture, invalid state, budget (P1) 🎯
 
-- [ ] T-A23-303 [US1] Create `Packages/ExperiencesCreative/VisualProgrammingLab/Experience/{Operators,PreviewPipeline}.swift`
+- [X] T-A23-303 [US1] Create `Packages/ExperiencesCreative/VisualProgrammingLab/Experience/{Operators,PreviewPipeline}.swift` — Verified 2026-11-18: 2026-11-18: Operators.swift (noise with vc_fbm, gradient, mix, a normalised Gaussian blur of 2r + 1 taps for both directions, output copy) and PreviewPipeline.swift (one FieldPass per program per context, rgba8 256 x 256 slots allocated only after the budget passes, the passes and the bottom-left inset of a third of the shorter side, PreviewState, compileCount, release on teardown); .autonomy/checks/A23-P03.vpl-ios27.json and A23-P03.vpl-ios27-2.json exit 0 (152 core and 46 experience tests on sim-27.2, slowest 0.93 s); written by an agent, retested
   per clarifications Q4–Q5 and contracts/preview.md: the six operator texts; programs built once per context through
   `FieldPass`; slots through `makeRenderTarget` (rgba8 256 × 256) only after the budget passes; the passes and the
   bottom-left inset; `PreviewState`; `compileCount`; release on teardown
