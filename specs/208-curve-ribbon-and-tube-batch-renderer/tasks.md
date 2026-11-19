@@ -43,7 +43,7 @@
   expected); merge of 200 meshes has summed counts, offset indices, validates; budget refusal; existing `Mesh.tube`
   output unchanged)
 - [X] T-R02F08-005 Host checkpoint: `--name host -- swift test --package-path Packages/VisualCore` — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F08.host.json (exit 0)
-- [ ] T-R02F08-006 [US4] Create `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/CurveBatchRuntimeTests.swift`:
+- [X] T-R02F08-006 [US4] Create `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/CurveBatchRuntimeTests.swift`: — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F08.{rendering-27,rendering-26}.json (exit 0; CurveBatchRuntimeTests: 200 merged ribbons, one draw, every centre lit)
   200 ribbons on a grid merged and drawn by one `MeshRenderer` draw; pixels at every ribbon's projected centre differ
   from the background; `--name rendering-27` and `--name rendering-26` (the VisualCoreRendering scheme on sim-27.2 and
   sim-26.5)
