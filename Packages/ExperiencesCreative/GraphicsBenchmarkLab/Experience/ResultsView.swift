@@ -15,6 +15,9 @@
 //     the start and the end, timing sources); `result-export-json` ("Export JSON") and `result-export-csv` ("Export
 //     CSV") write the file only on the tap, then `result-share` (a `ShareLink` of the ``ResultExportFile``) appears;
 //   - `results-done` hides the list.
+//   - Feature 177 (A24-P05) T-A24-505: each row label ends with the run's class (", Valid", ", Qualified" or
+//     ", Invalid"); the opened result shows its `qualification` (class and reason sentences), `explain` ("About these
+//     numbers"), the `repeatability` block (``RepeatabilityView``) and, once asked for, the inline ``ExplanationView``.
 //
 // The view stores only references (the port, the mirror and the presenter), never a closure. Every button is at least
 // 44 points high; the text wraps with Dynamic Type. The presenter's result actions are the extension at the end of this
@@ -49,6 +52,7 @@ struct ResultsView: View {
             + BenchPresenter.milliseconds(text: info.intervalP50) + ", p95 "
             + BenchPresenter.milliseconds(text: info.intervalP95)
         if info.gpuTimed { text += ", GPU timed" }
+        text += ", " + QualificationText.word(info.qualification)
         return text
     }
 
@@ -197,6 +201,21 @@ struct ResultsView: View {
                 .accessibilityHint(Text(verbatim: "Writes the frame samples as CSV, then offers them to share"))
                 .accessibilityIdentifier(port.identifier("result-export-csv"))
             }
+            QualificationView(port: port, qualification: RunQualification.qualify(opened.run))
+            Button {
+                presenter.showExplanation(from: .result)
+            } label: {
+                Text(verbatim: "About these numbers").frame(minHeight: 44)
+            }
+            .accessibilityLabel(Text(verbatim: "About these numbers"))
+            .accessibilityHint(Text(verbatim: "Explains what is measured and the limits of these numbers"))
+            .accessibilityIdentifier(port.identifier("explain"))
+            if let summary = mirror.repeatability {
+                RepeatabilityView(port: port, summary: summary, presenter: presenter)
+            }
+            if mirror.explanationSource != nil {
+                ExplanationView(port: port, presenter: presenter)
+            }
             if let share {
                 ShareLink(item: share, preview: SharePreview(Text(verbatim: share.url.lastPathComponent))) {
                     Text(verbatim: "Share " + share.url.lastPathComponent).frame(minHeight: 44)
@@ -243,8 +262,8 @@ extension BenchPresenter {
         closeResult()
     }
 
-    /// Opens the saved result `file`: its summary, settings and report are shown and "Opened result <n>." or the
-    /// refusal; the previous export's share item is dropped.
+    /// Opens the saved result `file`: its summary, settings, report, qualification and repeatability are shown and
+    /// "Opened result <n>." or the refusal; the previous export's share item and any explanation are dropped.
     @discardableResult
     func openResult(file: String) -> Result<OpenedResult, ResultLibraryFailure> {
         guard let library else { return refuse(.unavailable) }
@@ -253,6 +272,7 @@ extension BenchPresenter {
         case .success(let opened):
             if mirror.openedResult != opened { mirror.openedResult = opened }
             if mirror.exportItem != nil { mirror.exportItem = nil }
+            hideExplanation()
             report("Opened result \(opened.entry.number).")
         case .failure(let failure):
             report(failure.message)
@@ -261,9 +281,11 @@ extension BenchPresenter {
         return result
     }
 
-    /// Closes the opened result and drops its share item.
+    /// Closes the opened result, its repeatability block and its explanation, and drops its share item.
     func closeResult() {
         if mirror.openedResult != nil { mirror.openedResult = nil }
+        if mirror.repeatability != nil { mirror.repeatability = nil }
+        hideExplanation()
         if mirror.exportItem != nil { mirror.exportItem = nil }
     }
 
@@ -303,10 +325,15 @@ extension BenchPresenter {
         if mirror.exportItem != nil { mirror.exportItem = nil }
     }
 
-    /// Brings the mirror's entries and read-only flag up to the library.
+    /// Brings the mirror's entries and read-only flag up to the library, and the opened result's repeatability up to
+    /// the saved results.
     private func followLibrary() {
         let entries = library?.entries ?? []
         if mirror.resultEntries != entries { mirror.resultEntries = entries }
+        if let opened = mirror.openedResult {
+            let summary = repeatability(of: opened)
+            if mirror.repeatability != summary { mirror.repeatability = summary }
+        }
         let readOnly = library?.isReadOnly ?? false
         if mirror.resultsReadOnly != readOnly { mirror.resultsReadOnly = readOnly }
     }

@@ -13,6 +13,8 @@
 //     interrupted), saves that run once; `results` ("Saved results") shows the inline ``ResultsView``;
 //     `result-message` speaks the outcome or the refusal ("This result is already saved.", "The library holds 12
 //     results.", "There is not enough space to save this result.").
+//   - Feature 177 (A24-P05) T-A24-505: `qualification` (``QualificationView``) after any run ends (finished, stopped or
+//     interrupted): the class word and the reason sentences.
 //
 // Inline buttons, never a `Menu`, a menu-style `Picker`, a popover or a sheet over the drawing (the A23-P05 lesson: while
 // a menu is up over a canvas that presents new frames, the system never reports the app idle). The view stores only
@@ -83,6 +85,9 @@ struct GBLControls: View {
                 .accessibilityElement(children: .combine)
                 .accessibilityLabel(Text(verbatim: "Summary, " + mirror.summaryLines.joined(separator: ", ")))
                 .accessibilityIdentifier(port.identifier("summary"))
+            }
+            if let qualification = mirror.runQualification {
+                QualificationView(port: port, qualification: qualification)
             }
             resultButtons
             if !mirror.resultMessage.isEmpty {

@@ -32,8 +32,8 @@ import GraphicsBenchmarkLabCore
 import Observation
 import VisualCoreExperience
 
-/// What a readable saved result shows in the list: the case title, how the run ended, the frame interval p50 and p95
-/// and whether the summary has a GPU distribution.
+/// What a readable saved result shows in the list: the case title, how the run ended, the frame interval p50 and p95,
+/// whether the summary has a GPU distribution and the run's class (feature 177).
 struct ResultListInfo: Equatable, Sendable {
     /// The case title ("Textured quads", "Shader ALU", "Particles").
     var caseTitle: String
@@ -45,6 +45,8 @@ struct ResultListInfo: Equatable, Sendable {
     var intervalP95: Double?
     /// Whether the summary has a GPU distribution.
     var gpuTimed: Bool
+    /// The run's class (feature 177, `RunQualification`): computed, never stored.
+    var qualification: QualificationClass
 
     /// The list information of `run`.
     init(run: BenchmarkRun) {
@@ -53,6 +55,7 @@ struct ResultListInfo: Equatable, Sendable {
         intervalP50 = run.summary.interval.p50
         intervalP95 = run.summary.interval.p95
         gpuTimed = run.summary.gpu != nil
+        qualification = RunQualification.qualify(run).class
     }
 }
 

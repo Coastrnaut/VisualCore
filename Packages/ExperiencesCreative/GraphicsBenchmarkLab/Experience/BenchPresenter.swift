@@ -57,6 +57,14 @@
 //   - Exports are written only by the person's tap; `teardown` (the session closing, or a context rebuild) empties the
 //     export folder and drops the share item, and `init` empties what a killed session left behind.
 //
+// Feature 177 (A24-P05) T-A24-505 (FR-A24-502, 503, 504; clarifications Q1–Q5; contracts/review.md):
+//   - Qualification: after any run ends (finished, stopped or interrupted) the mirror's ``BenchMirror/runQualification``
+//     is `RunQualification.qualify` of the ended run (computed again only when the state, the sample count or the
+//     report's presence changes); an ended run without a summary is invalid with `stopped`, `interrupted` or
+//     `no-samples`. It is nil while idle or running.
+//   - Opening a result computes ``BenchMirror/repeatability`` (``repeatability(of:)``); `explain` sets
+//     ``BenchMirror/explanationSource`` (RepeatabilityView.swift).
+//
 // Maximum 60 frames per second; one quality tier, `level-0`. No GL call: everything is drawn by the workload and the
 // VisualCore GPU timer.
 import Foundation
@@ -94,6 +102,13 @@ final class BenchMirror {
     var resultMessage = ""
     /// The share item of the last export of the opened result; nil before an export.
     var exportItem: ResultExportFile?
+    /// The qualification of the ended run (finished, stopped or interrupted) shown in the controls; nil while idle or
+    /// running (feature 177).
+    var runQualification: Qualification?
+    /// The repeatability of the opened result among the saved results; nil when none is open (feature 177).
+    var repeatability: RepeatabilitySummary?
+    /// Where "About these numbers" was opened from; nil while it is hidden (feature 177).
+    var explanationSource: ExplanationSource?
 }
 
 /// Draws Graphics Benchmark Lab and records its runs (see the file header).
@@ -139,6 +154,9 @@ final class BenchPresenter: ExperiencePresenter {
     private var timerGeneration: Int?
     /// The current run's timed frames: the drawn-frame key passed to the timer → the index of the recorded sample.
     private var timedFrames: [Int: Int] = [:]
+    /// What ``BenchMirror/runQualification`` was computed from: the state, the sample count and whether a report is
+    /// attached; nil while idle or running.
+    private var qualifiedKey: String?
     /// The conditions at the current run's start, waiting for its report; nil when no report is pending.
     private var runStart: (conditions: DeviceConditions, capabilities: RenderCapabilities, tier: Int)?
 
@@ -414,6 +432,26 @@ final class BenchPresenter: ExperiencePresenter {
         let ended = recorder.state != .idle && recorder.state != .running && recorder.summary != nil
             && recorder.benchmarkCase != nil
         if mirror.canSave != ended { mirror.canSave = ended }
+        let qualification = endedQualification()
+        if mirror.runQualification != qualification { mirror.runQualification = qualification }
+    }
+
+    /// The qualification of the ended run, or nil while idle or running (see the file header).
+    private func endedQualification() -> Qualification? {
+        let state = recorder.state
+        guard state != .idle, state != .running else {
+            qualifiedKey = nil
+            return nil
+        }
+        let key = state.rawValue + " \(recorder.samples.count) " + (recorder.report == nil ? "none" : "report")
+        if key == qualifiedKey, let known = mirror.runQualification { return known }
+        qualifiedKey = key
+        if let run = recorder.runRecord() { return RunQualification.qualify(run) }
+        switch state {
+        case .stopped: return Qualification(class: .invalid, reasons: [.stopped])
+        case .interrupted: return Qualification(class: .invalid, reasons: [.interrupted])
+        default: return Qualification(class: .invalid, reasons: [.noSamples])
+        }
     }
 
     /// The canvas label, for example "Graphics Benchmark Lab, Textured quads, Ready", with the summary after a
