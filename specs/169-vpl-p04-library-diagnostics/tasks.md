@@ -11,7 +11,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T-A23-401 Baseline: cite the A23-P03 evidence (`.autonomy/checks/A23-P03.{vpl-ios27-2,app-unit,verify-27}.json`)
+- [X] T-A23-401 Baseline: cite the A23-P03 evidence (`.autonomy/checks/A23-P03.{vpl-ios27-2,app-unit,verify-27}.json`) — Verified 2026-11-18: 2026-11-18: A23-P03 evidence cited: .autonomy/checks/A23-P03.vpl-ios27-2.json, A23-P03.app-unit.json and A23-P03.verify-27.json, all exit 0; no Packages change since the A23-P03 record commit 7508f7ed
   on the tree recorded at A23-P03 (`7508f7ed`), whose Packages are unchanged since (owner ruling of 2026-11-14)
 - [ ] T-A23-402 In `Packages/ExperiencesCreative/Package.swift` (lead), give `VisualProgrammingLabExperienceTests` the
   resources `[.copy("Fixtures")]`, with `ExperienceTests/Fixtures/` holding the stored samples
