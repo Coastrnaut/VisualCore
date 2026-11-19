@@ -35,7 +35,7 @@
 
 ## Phase 3: Story 1 — export the finished picture (P1) 🎯
 
-- [ ] T-A25-504 [P] [US1] Create `Packages/ExperiencesCreative/EffectsComposer/Experience/StillExport.swift`:
+- [X] T-A25-504 [P] [US1] Create `Packages/ExperiencesCreative/EffectsComposer/Experience/StillExport.swift`: — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P05.ec-color-export.json (exit 0; suite StillExport passed, PNG/JPEG/HEIC decode at size tagged sRGB, refusals, file name)
   `ExportRefusal` (codes and messages of data-model.md verbatim), `StillExport.validate(width:height:format:
   maxTextureSize:available:)` (`ExportGeometry(maxEdge: min(maxTextureSize, 2048))`), `StillExport.write(_:format:in:)`
   (quality 0.9, off the main actor, atomic, file `Look <W>x<H>.<ext>`), `EffectsExportFile` (`Transferable`); tests in
