@@ -1,0 +1,110 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/A24-P03.app-unit.json",
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A24-P03.app-unit.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A24-P03.catalog.json",
+      "command": "python3 scripts/build_catalog.py --check",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A24-P03.catalog.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A24-P03.contract.json",
+      "command": "python3 scripts/check_app_contract.py --app graphics-benchmark-lab --render",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A24-P03.contract.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A24-P03.core-purity.json",
+      "command": "sh -c '! grep -rnE \"import (UIKit|SwiftUI|OpenGLES|Network)|URLSession|Date\\(\\)|ContinuousClock|CFAbsoluteTime\" Packages/ExperiencesCreative/GraphicsBenchmarkLab/Core'",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A24-P03.core-purity.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A24-P03.documented-api.json",
+      "command": "python3 scripts/check_documented_api.py --sources Packages/ExperiencesCreative/GraphicsBenchmarkLab",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A24-P03.documented-api.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A24-P03.experience-packages.json",
+      "command": "python3 scripts/check_experience_packages.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A24-P03.experience-packages.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A24-P03.gbl-core.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing GraphicsBenchmarkLabCoreTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A24-P03.gbl-core.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A24-P03.gbl-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing GraphicsBenchmarkLabCoreTests GraphicsBenchmarkLabExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A24-P03.gbl-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A24-P03.isolation.json",
+      "command": "python3 scripts/check_app_isolation.py --experiences Packages/ExperiencesCreative/GraphicsBenchmarkLab",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A24-P03.isolation.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A24-P03.public-api.json",
+      "command": "python3 scripts/check_public_api.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A24-P03.public-api.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A24-P03.reference-1.json",
+      "command": "python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A24-P03.reference-1.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A24-P03.reference-2.json",
+      "command": "python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A24-P03.reference-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A24-P03.rendering-new.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --only-testing VisualCoreRenderingTests/RegistryCapabilitiesTests VisualCoreRenderingTests/GPUFrameTimerTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A24-P03.rendering-new.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A24-P03.rendering-tests.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name xa24p03-rendering",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A24-P03.rendering-tests.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A24-P03.scan-identifiers.json",
+      "command": "sh specs/175-gbl-p03-runner-probe/scan-identifiers.sh",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A24-P03.scan-identifiers.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A24-P03.script-tests.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A24-P03.script-tests.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A24-P03.verify-27.json",
+      "command": "python3 scripts/verify_experiences.py --only a24.graphics-benchmark-lab --runtime 27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A24-P03.verify-27.log"
+    }
+  ],
+  "generated": "2026-11-19T16:44:56+00:00",
+  "method": "deterministic-run-check",
+  "stage": "A24-P03",
+  "status": "pass"
+}

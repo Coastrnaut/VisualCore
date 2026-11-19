@@ -4938,10 +4938,10 @@
     "legacy_gates_passed": [
      "A24-P00",
      "A24-P01",
-     "A24-P02"
+     "A24-P02",
+     "A24-P03"
     ],
     "legacy_gates_pending": [
-     "A24-P03",
      "A24-P04",
      "A24-P05",
      "A24-P06"
