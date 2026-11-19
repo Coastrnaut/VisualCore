@@ -17,7 +17,9 @@
   `[A-Za-z_][A-Za-z0-9_]*`, not starting `GL_` or `__`; value without line break, ≤ 256 characters; ≤ 32 defines;
   `DefineError`) and `Packages/VisualCore/Sources/VisualCoreShaderSource/ShaderReasonCode.swift` (the fifteen codes of
   clarification Q4, `ShaderFailureReport` with `feature = "R2-F06"`), with
-  `Packages/VisualCore/Tests/VisualCoreShaderSourceTests/DefineSetTests.swift`
+  `Packages/VisualCore/Tests/VisualCoreShaderSourceTests/DefineSetTests.swift` (also: every `ShaderSourceError`,
+  `DefineError` and `VariantError` maps to its reason code; a `ShaderFailureReport` carries `R2-F06` and the caller's
+  experience id, seed, tick and tier, analyze C1)
 - [ ] T-R02F06-003 [P] Modify `Packages/VisualCore/Sources/VisualCoreShaderSource/ShaderLibrary.swift`: include each
   file once per expansion; byte-count size guard; `ShaderStageKind`; overload `expand(_:defines: DefineSet, precision:
   PrecisionPolicy?, stage:)`; create `Packages/VisualCore/Sources/VisualCoreShaderSource/PrecisionPolicy.swift`
@@ -52,7 +54,9 @@
   gains the VisualCoreParameters product; tests in
   `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/SafeCompileTests.swift` (the planted mistakes of
   SC-R02F06-001 on the simulator; six-variant prewarm with six keys and six later cache hits; a failing combination
-  reported while others compile; precision inserted and compiled for both policies) and
+  reported while others compile; precision inserted and compiled for both policies; `shader.compile` and
+  `shader.link` reason codes; a program evicted from a warm set compiles again on the next request and counts a miss,
+  analyze C1, C2) and
   `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/ShaderBindingTests.swift` (layout errors and unused;
   parameter values read back with `glGetUniformfv` before and after `recreateContext`; non-finite refused; unused
   parameter reported once)
@@ -78,8 +82,8 @@
 
 ## Dependencies
 
-001 → {002, 003, 004, 005} → 006 → 007 → 008 → 009 → 010 → 011 → 012 → 013 → 014. 004 and 005 use 002's `DefineSet`
-and 003's `ShaderStageKind` by the names of contracts/api.md.
+001 → {002, 003, 005}; 002 → 004; {003, 004, 005} → 006 → 007 → 008 → 009 → 010 → 011 → 012 → 013 → 014. 004 uses
+002's `DefineSet` by the names of contracts/api.md; 005 depends on nothing new (analyze I1).
 
 ## Parallel examples
 

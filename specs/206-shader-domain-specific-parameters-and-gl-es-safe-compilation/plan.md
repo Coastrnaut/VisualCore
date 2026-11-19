@@ -17,7 +17,8 @@ VisualCoreParameters (new dependency of VisualCoreRendering, pure). **Storage**:
 --package-path Packages/VisualCore` (pure parts); VisualCoreRendering on sim-27.2 and sim-26.5 (GL parts);
 ExperiencesCreative on sim-27.2 (no Stage One breakage); reference regression in two chunks.
 **Target platform**: iOS 26+, simulator ANGLE path; device drivers in the device campaign.
-**Performance goals**: expanding and validating a 64 KiB shader under 50 ms on the host; each test < 10 s.
+**Performance goals**: bounded by arithmetic, not a clock (no wall-clock asserts on CI): each file is read once per
+expansion, at most 64 KiB of text, 32 defines and 64 variant combinations; each test < 10 s (analyze A1).
 **Constraints**: additive public API; `program(...)` signature kept; every existing shader compiles unchanged.
 **Scale/scope**: 5 new source files, 1 modified source file in each package, 7 new test files.
 
