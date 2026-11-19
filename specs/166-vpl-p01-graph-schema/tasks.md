@@ -47,7 +47,7 @@
   clarification Q4 and data-model "GraphIssue" and "CheckResult" (FR-A23-104–106): the five stages in order, stopping
   after a stage that refused; Kahn's order with the smallest ready identity first; the cycle path by the backward walk,
   reported forward from the connection whose source has the smallest identity; the nodes reaching the output.
-- [ ] T-A23-107 [P] [US2] [US3] [US4] Write `Packages/ExperiencesCreative/VisualProgrammingLab/CoreTests/{GraphFixtures,TypeCheckTests,CycleTests,OutputTests}.swift`
+- [X] T-A23-107 [P] [US2] [US3] [US4] Write `Packages/ExperiencesCreative/VisualProgrammingLab/CoreTests/{GraphFixtures,TypeCheckTests,CycleTests,OutputTests}.swift` — Verified 2026-11-18: 2026-11-18: GraphFixtures (53 graphs) with TypeCheckTests (16: exactly 4 of 16 type pairs connect, colour into scalar names both, unknown node and port, both wrong directions, an input fed twice, a duplicate, parameters), CycleTests (11: loops of 1, 2, 3, 8, two loops, stable order across 10 runs) and OutputTests (9: no output, two outputs, disconnected, empty required input, optional inputs, unreached nodes, journey graphs); .autonomy/checks/A23-P01.vpl-core-ios27.json exit 0 (70 tests in 7 suites on sim-27.2, slowest 0.047 s); written by an agent, retested
   (SC-A23-102–104):
   - all 16 type pairs, exactly 4 connecting; unknown node and port, from an input, into an output, an input fed twice,
     a duplicate connection;
