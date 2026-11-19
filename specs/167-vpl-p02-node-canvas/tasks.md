@@ -57,7 +57,7 @@
 
 ## Phase 5: Registration and evidence
 
-- [ ] T-A23-209 Register the candidate (FR-A23-207):
+- [X] T-A23-209 Register the candidate (FR-A23-207): — Verified 2026-11-18: 2026-11-18: Catalog/registrations.json candidate a23.visual-programming-lab (five capabilities of at most 40 characters, quality tier level-0, palette, manifest, permissions []), build_catalog (100 experiences, 22 available; .autonomy/checks/A23-P02.catalog.json exit 0); ExperienceRegistry candidate visualProgrammingLab; project.yml product; AppModelTests synthetic candidate a24.graphics-benchmark-lab; RealCatalogTests and test_scripts lists; .autonomy/checks/A23-P02.script-tests-2.json and A23-P02.experience-packages.json exit 0 (the first script-tests attempt failed on the content-count audit: 3 fixtures below 5, fixed in T-A23-210)
   - a `Catalog/registrations.json` entry for a23: capabilities of at most 40 characters each, quality_tiers
     ["level-0"], a palette, manifest `Packages/ExperiencesCreative/VisualProgrammingLab/scenario-manifest.json`,
     permissions []; then `python3 scripts/build_catalog.py`;

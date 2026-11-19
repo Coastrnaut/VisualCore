@@ -539,6 +539,28 @@
       "manifest": "Packages/ExperiencesCreative/ShaderStudio/scenario-manifest.json",
       "permissions": [],
       "summary": "A small GLSL ES fragment shader studio: start from a template, edit with line numbers, run, and see each error on the line you wrote with what to change, while the last working preview keeps drawing. Projects stay on the device; a too-slow shader is stopped. Offline; GPU code is not a sandbox."
+    },
+    "a23.visual-programming-lab": {
+      "capabilities": [
+        "Seven typed nodes on a touch canvas",
+        "Wires only between matching types",
+        "Refusals that say why",
+        "Zoom, pan and select",
+        "A list form for every connection"
+      ],
+      "quality_tiers": [
+        "level-0"
+      ],
+      "palette": [
+        "#0A0E14",
+        "#2FB8AC",
+        "#F2A541",
+        "#E6EDF3"
+      ],
+      "content": null,
+      "manifest": "Packages/ExperiencesCreative/VisualProgrammingLab/scenario-manifest.json",
+      "permissions": [],
+      "summary": "A node graph lab: place Time, Constant, Noise, Gradient, Mix, Blur and Output nodes on a canvas and wire outputs to inputs of the same type. A wrong connection is refused with a sentence saying why, and every connection can also be made from a list. Offline; nothing is sent."
     }
   }
 }
