@@ -21,7 +21,7 @@
   7-slot graph through `graphOverride`, refused; back to the example; every 10th cycle a `recreateContext`), the level
   after cycle 1 equal to the level after cycle 50, `leaked` 0, each test under 10 s; fix any leak found in the
   experience and record it
-- [ ] T-A23-503 [P] [US2] Write `ExperienceTests/PassCountTests.swift` per clarification Q2 (SC-A23-502): Gradient into
+- [X] T-A23-503 [P] [US2] Write `ExperienceTests/PassCountTests.swift` per clarification Q2 (SC-A23-502): Gradient into — Verified 2026-11-19: 2026-11-19: PassCountTests (3): Gradient into Output runs 2 passes per frame within 2 of 255 of its reference; with an unconnected Noise and a Constant still 2 passes and a byte-identical inset; the journey runs 6 (noise, gradient, mix, blur-h, blur-v, output); .autonomy/checks/A23-P05.vpl-ios27.json exit 0 (162 core and 73 experience tests on sim-27.2); written by an agent, retested
   Output runs 2 passes per frame and matches its reference within 2 of 255; with an unconnected Noise and a Constant
   it runs 2 and draws the same pixels; the journey graph runs 6
 
