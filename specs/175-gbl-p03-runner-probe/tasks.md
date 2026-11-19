@@ -21,7 +21,7 @@
   `RenderHost.takeCapabilities` beside `maxTextureSize`; `Tests/VisualCoreRenderingTests/RegistryCapabilitiesTests.swift`
   proves the registry's copy equals `RenderHost.capabilities` after the first frame and after `recreateContext()`
   (its `generation` follows) (FR-A24-303)
-- [ ] T-A24-303 [P] The loader's extension block (`CVisualCoreGLLoad.h`, `VCGLLoadFromEGL.c`): `vcglHasDisjointTimerQuery`,
+- [X] T-A24-303 [P] The loader's extension block (`CVisualCoreGLLoad.h`, `VCGLLoadFromEGL.c`): `vcglHasDisjointTimerQuery`, — Verified 2026-11-19: 2026-11-19: loader extension block (GL_TIME_ELAPSED_EXT, GL_GPU_DISJOINT_EXT, vcglHasDisjointTimerQuery, vcglGetQueryObjectui64vEXT) resolved optionally; generated header untouched; .autonomy/checks/A24-P03.rendering-new.json exit 0
   `vcglGetQueryObjectui64vEXT`, `GL_TIME_ELAPSED_EXT` 0x88BF, `GL_GPU_DISJOINT_EXT` 0x8FBB, resolved optionally (never
   counted as missing); the generated `CVisualCoreGL.h` untouched
 - [ ] T-A24-304 `Sources/VisualCoreRendering/GPUFrameTimer.swift` per contracts/visualcore.md and clarification Q2
