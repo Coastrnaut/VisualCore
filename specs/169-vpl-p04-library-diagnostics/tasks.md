@@ -37,7 +37,7 @@
 
 ## Phase 3: Story 3 — examples (P2)
 
-- [ ] T-A23-406 [US3] Create `Experience/LabExamples.swift` (`clouds`, `soft-gradient`, `mixed-clouds` per
+- [X] T-A23-406 [US3] Create `Experience/LabExamples.swift` (`clouds`, `soft-gradient`, `mixed-clouds` per — Verified 2026-11-18: 2026-11-18: LabExamples.swift (clouds, soft-gradient, mixed-clouds) with the examples menu through the restore path, ExampleTests (each passes the checker, compiles within budget and draws a non-flat inset), docs/apps/visual-programming-lab/licenses.md listed in the README; validate_docs PASS; .autonomy/checks/A23-P04.vpl-ios27.json exit 0 (162 core and 63 experience tests on sim-27.2, slowest 1.27 s); written by an agent, retested
   clarification Q4) with an "Examples" menu (`example-<id>`) through the same restore path, and
   `ExperienceTests/ExampleTests.swift` (SC-A23-404): each passes the checker, compiles within the budget and draws a
   non-flat inset; write `docs/apps/visual-programming-lab/licenses.md` and list it in the README
