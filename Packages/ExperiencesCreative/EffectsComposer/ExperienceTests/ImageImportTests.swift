@@ -90,6 +90,23 @@ struct ImageImportTests {
         #expect(ImportRefusal.imageDamaged.message == "This picture cannot be read.")
     }
 
+    @Test("A PNG cut in its image data decodes at its stated size or is refused, never anything else")
+    func truncatedInData() {
+        // As built (T-A25-412): ImageIO decodes a PNG cut in the middle of its compressed data, the missing rows
+        // coming back blank, so such a cut is not always refused. Whatever ImageIO does, the import yields either a
+        // picture of the stated size or the damaged refusal.
+        let png = ImportFixtures.flat(width: 64, height: 64, red: 9, green: 9, blue: 9)
+        for cut in [png.count / 2, png.count - 12] {
+            switch ImageImport.decode(png.prefix(cut), limit: 2_048) {
+            case .success(let picture):
+                #expect(picture.width == 64 && picture.height == 64)
+                #expect(picture.bytes.count == 64 * 64 * 4)
+            case .failure(let refusal):
+                #expect(refusal == .imageDamaged)
+            }
+        }
+    }
+
     @Test("A 4 × 4 picture is refused as a25.image-too-small")
     func tooSmall() {
         #expect(refusal(ImportFixtures.flat(width: 4, height: 4, red: 1, green: 1, blue: 1)) == .imageTooSmall)

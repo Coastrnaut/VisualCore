@@ -59,7 +59,7 @@
 
 ## Phase 5: Convergence
 
-- [ ] T-A25-412 Record the as-built limit that a PNG truncated in its image data is decoded by ImageIO (missing rows
+- [X] T-A25-412 Record the as-built limit that a PNG truncated in its image data is decoded by ImageIO (missing rows — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P04.ec-ios27-2.json (exit 0; truncatedInData passed in 0.029 s)
   come back blank) rather than refused, in `specs/183-ec-p04-image-import/research.md` and
   `docs/apps/effects-composer/README.md`, and pin it with a test in
   `Packages/ExperiencesCreative/EffectsComposer/ExperienceTests/ImageImportTests.swift` (a truncated PNG either decodes at

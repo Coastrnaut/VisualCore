@@ -37,7 +37,8 @@ accessibility actions, without dragging.
 Image import (A25-P04): the `import` control opens the system photo picker, which runs outside the app and needs no
 permission. `Experience/ImageImport.swift` decodes the picture off the main thread with ImageIO into upright sRGB RGBA
 bytes, scaled so the longer edge is at most the smaller of the texture limit and 2,048 pixels; damaged, tiny (under
-8 pixels) and oversized (over 50 MiB) data is refused with a message. The bytes go into the source target with
+8 pixels) and oversized (over 50 MiB) data is refused with a message; a PNG cut short in its image data is
+decoded by ImageIO with the missing rows blank rather than refused. The bytes go into the source target with
 VisualCore's `RenderTarget.upload(rgba:)` and are uploaded again after a context rebuild. The picture is not stored:
 a restored session shows the test picture, which `test-picture` brings back at any time. Still export follows in A25-P05.
 
