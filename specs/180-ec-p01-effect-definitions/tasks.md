@@ -31,7 +31,7 @@
   nodes, identifiers 1…65,535 unique (smallest unused for a new node), the five edits with move's index semantics,
   `EditHistory` (undo and redo, depth 64, a new edit clears redo, a refused edit changes nothing), the chain
   fingerprint (domain `a25.effect-chain.v1`)
-- [ ] T-A25-106 [US2] Write `Packages/ExperiencesCreative/EffectsComposer/CoreTests/{ChainTests,HistoryTests}.swift`: caps and refusals;
+- [X] T-A25-106 [US2] Write `Packages/ExperiencesCreative/EffectsComposer/CoreTests/{ChainTests,HistoryTests}.swift`: caps and refusals; — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P01.ec-core-ios27.json exit 0 (35 tests in 8 suites on sim-27.2); ChainTests and HistoryTests
   empty, full-length, all-disabled and duplicate-effect chains and values at exactly a range end are valid; a recorded sequence of
   every edit kind undone to the start is equal with the same fingerprint, and redone to the end equal again; undo or redo
   with nothing to do is refused; the depth cap drops the oldest edit
