@@ -71,7 +71,8 @@ in code:
 - Q: What does the interface show, and how is it registered? → A: Native inline controls (`ECControls`, no system
   menu): `add-<effect>` buttons, a row per node `node-<i>` with `enable-<i>`, `up-<i>`, `down-<i>` and `remove-<i>`,
   for each parameter `value-<i>-<name>` with `-down`/`-up` steps of a tenth of its range, `undo` and `redo`, a
-  `status` line ("Ready" or the refusal's message) and a `diagnostics` line. The experience registers as a candidate
+  `status` line ("Ready" or the refusal's message) and a `diagnostics` line. Every control has a spoken label naming the effect,
+  its position and the value, and every edit is a button, so nothing needs dragging (constitution A25 accessibility). The experience registers as a candidate
   with the permission `photo-library-add` (A25-P00 clarification Q5), one tier `level-0`, `maxFramesPerSecond` 60, and
   an `ECManifest` with the standard scenarios and a fixture per effect; the runner runs on iOS 27.2. The app tests'
   synthetic candidate moves to `r02-g01.aurora-loom`.
