@@ -43,7 +43,7 @@
 
 ## Phase 3: Stories 2–4 — the checker (P1, P2)
 
-- [ ] T-A23-106 [US2] [US3] [US4] Create `Packages/ExperiencesCreative/VisualProgrammingLab/Core/GraphChecker.swift` per
+- [X] T-A23-106 [US2] [US3] [US4] Create `Packages/ExperiencesCreative/VisualProgrammingLab/Core/GraphChecker.swift` per — Verified 2026-11-18: 2026-11-18: GraphChecker.swift: GraphIssue (16 codes), CheckResult and the five stages (limits, nodes, connections, Kahn order with the smallest ready identity, output), stopping after a refusing stage; the loop by the backward walk from the smallest remaining identity, reported forward from the smallest source; reaching set backwards from the output; reviewed by the lead; .autonomy/checks/A23-P01.vpl-core-ios27.json exit 0 (70 tests in 7 suites on sim-27.2, slowest 0.047 s); written by an agent, retested
   clarification Q4 and data-model "GraphIssue" and "CheckResult" (FR-A23-104–106): the five stages in order, stopping
   after a stage that refused; Kahn's order with the smallest ready identity first; the cycle path by the backward walk,
   reported forward from the connection whose source has the smallest identity; the nodes reaching the output.
