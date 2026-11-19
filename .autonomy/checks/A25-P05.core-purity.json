@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "sh",
+    "-c",
+    "! grep -rnE \"import (UIKit|SwiftUI|OpenGLES|VisualCoreRendering)|vcgl|Date\\(\\)\" Packages/ExperiencesCreative/EffectsComposer/Core"
+  ],
+  "command": "sh -c '! grep -rnE \"import (UIKit|SwiftUI|OpenGLES|VisualCoreRendering)|vcgl|Date\\(\\)\" Packages/ExperiencesCreative/EffectsComposer/Core'",
+  "elapsed_seconds": 0.008,
+  "exit_code": 0,
+  "finished": "2026-11-19T20:48:00+00:00",
+  "log": ".autonomy/logs/A25-P05.core-purity.log",
+  "log_sha256": "5bfd5b15e1437f3dc703f8e4c6a439fcd9a82cd6b2d3296d3df45eabf279ba98",
+  "name": "core-purity",
+  "stage": "A25-P05",
+  "started": "2026-11-19T20:48:00+00:00",
+  "timed_out": false
+}

@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_documented_api.py",
+    "--sources",
+    "Packages/ExperiencesCreative/EffectsComposer"
+  ],
+  "command": "python3 scripts/check_documented_api.py --sources Packages/ExperiencesCreative/EffectsComposer",
+  "elapsed_seconds": 1.146,
+  "exit_code": 0,
+  "finished": "2026-11-19T20:48:00+00:00",
+  "log": ".autonomy/logs/A25-P05.documented-api.log",
+  "log_sha256": "b998a9ff18ba6f99ca905c674c21e53fd5ab5ac659336673e341980c28db4f5c",
+  "name": "documented-api",
+  "stage": "A25-P05",
+  "started": "2026-11-19T20:47:59+00:00",
+  "timed_out": false
+}

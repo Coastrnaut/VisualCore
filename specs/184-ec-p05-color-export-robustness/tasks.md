@@ -65,7 +65,7 @@
 
 ## Phase 5: Evidence and close
 
-- [ ] T-A25-508 Review checkpoint: `--name ec-ios27`, `documented-api`, `isolation`, `core-purity` (commands of
+- [X] T-A25-508 Review checkpoint: `--name ec-ios27`, `documented-api`, `isolation`, `core-purity` (commands of — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P05.{ec-ios27,documented-api,isolation,core-purity}.json (all exit 0)
   quickstart.md steps 1–2)
 - [ ] T-A25-509 Contract: G-COLOR, G-EXPORT, G-ROBUST closed by "A25-P05" with notes on rows M11, M23, M24, M25, M36
   (`--name contract`); `docs/apps/effects-composer/README.md`
