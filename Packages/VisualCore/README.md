@@ -377,3 +377,9 @@ twice observes once, and `stop()` or deinitialization ends the observation. `fou
 zone, the current locale and the calendar day; `TimeChangeMonitor.applicationNames` (VisualCoreExperienceHost, UIKit)
 adds `UIApplication.significantTimeChangeNotification` and `willEnterForegroundNotification`, so every kind is mapped
 once. Contract: [clock.md](../../specs/131-ac-p01-clock-a11y/contracts/clock.md).
+
+## Benchmark timing sources (feature 175, A24-P03)
+
+The renderer's facts reach a presenter as `ResourceRegistry.renderCapabilities`, and GPU frame times come only from
+`GPUFrameTimer` (both in VisualCoreRendering) where `GL_EXT_disjoint_timer_query` is offered; without it no GPU time is
+reported.

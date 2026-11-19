@@ -30,7 +30,7 @@
   `Tests/VisualCoreRenderingTests/GPUFrameTimerTests.swift`: where the extension is listed and resolved, a known draw
   gives a finite, non-negative time within 1,000 ms within 4 frames; a timer created before `recreateContext()` reads
   nothing afterwards; where it is not, `init?` is nil and the test says so
-- [ ] T-A24-305 The public API baseline (`python3 scripts/check_public_api.py --update`, then the check), `///` on every
+- [X] T-A24-305 The public API baseline (`python3 scripts/check_public_api.py --update`, then the check), `///` on every — Verified 2026-11-19: 2026-11-19: API baseline updated (13 additions), .autonomy/checks/A24-P03.public-api.json exit 0 (0 undocumented); README paragraphs in VisualCoreRendering and VisualCore; contract records ringSize and GPUFrameTime.init
   addition (`check_documented_api` for VisualCoreRendering), and the two README paragraphs
   (`Packages/VisualCoreRendering/README.md`, `Packages/VisualCore/README.md`) (FR-A24-308)
 

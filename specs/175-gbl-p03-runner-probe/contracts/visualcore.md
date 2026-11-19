@@ -14,3 +14,6 @@
 - Loader: `int vcglHasDisjointTimerQuery(void)`, `void vcglGetQueryObjectui64vEXT(GLuint, GLenum, GLuint64*)`,
   `GL_TIME_ELAPSED_EXT 0x88BF`, `GL_GPU_DISJOINT_EXT 0x8FBB`; resolved optionally after `vcglLoadFromEGL`.
 - Every addition carries `///` docs, is listed in the API baseline and both READMEs.
+- **As built:** also public `GPUFrameTimer.ringSize` (4) and `GPUFrameTime.init(frame:milliseconds:)`, so the
+  experience and its tests can build values; `vcglHasDisjointTimerQuery()` is 1 only when the extension call and the
+  core query calls all resolve.

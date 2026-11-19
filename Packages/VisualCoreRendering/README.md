@@ -367,6 +367,19 @@ enabled: the window surface stays single-sampled without depth (ADR-0002). `Rend
 VisualCoreExperienceHost) turns the report into the evidence's `environment.renderer`, which the verification runner
 fills from the frame it reads (`ScenarioRunResult.renderer`).
 
+## Renderer facts and the GPU frame timer (feature 175, A24-P03)
+
+`ResourceRegistry.renderCapabilities` is the current context generation's `RenderCapabilities`, set by the host
+beside `maxTextureSize` whenever it queries them, so a scene reads `context.resources.renderCapabilities` in any
+callback (`RenderCapabilities()` before the first context). `GPUFrameTimer(context:)` is nil unless
+`GL_EXT_disjoint_timer_query` is listed there and the loader resolved its entry points (`vcglHasDisjointTimerQuery()`,
+an optional entry point never counted as missing). `begin(frame:)` and `end()` bracket one frame's draw calls with a
+`GL_TIME_ELAPSED_EXT` query from a ring of four; `poll()` returns `GPUFrameTime` values (frame, milliseconds) in frame
+order only when a result is available and `GL_GPU_DISJOINT_EXT` reads false, and a disjoint read discards every
+pending query (`disjointCount`). A timer of an older context generation reads nothing; `release()` deletes the queries.
+Call it only inside scene callbacks. Tested by `RegistryCapabilitiesTests` and `GPUFrameTimerTests`; simulator times
+are context only.
+
 ## Haptics and announcements (feature 226, R02-F26)
 
 `ExperienceFeedback.shared` routes an experience's `port.haptic(_:)` and `port.announce(_:kind:)` to the system's
