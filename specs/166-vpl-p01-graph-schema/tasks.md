@@ -59,7 +59,7 @@
 
 ## Phase 4: Story 5 — checking before graphics work (P2)
 
-- [ ] T-A23-108 [US5] Write `Packages/ExperiencesCreative/VisualProgrammingLab/CoreTests/HostCountTests.swift` per
+- [X] T-A23-108 [US5] Write `Packages/ExperiencesCreative/VisualProgrammingLab/CoreTests/HostCountTests.swift` per — Verified 2026-11-18: 2026-11-18: HostCountTests: a scene on RenderHost(scene:) checks all 53 fixtures in setup and in two rendered frames; liveCount for every kind and totalBytes equal before and after each, and every in-host result equals the result outside the host; the scene draws nothing; .autonomy/checks/A23-P01.vpl-core-ios27.json exit 0 (70 tests in 7 suites on sim-27.2, slowest 0.047 s); .autonomy/checks/A23-P01.isolation.json exit 0; written by an agent, retested
   clarification Q5 (SC-A23-105, FR-A23-107): a `RenderScene` on `RenderHost(scene:)` checks every fixture of
   `GraphFixtures` in `setup` and `render`, and `ResourceRegistry.stats` (`liveCount` for every kind, `totalBytes`) is
   the same before and after; the scene draws nothing and issues no GL call.
