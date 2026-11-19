@@ -30,7 +30,10 @@
   `FieldPass`; slots through `makeRenderTarget` (rgba8 256 × 256) only after the budget passes; the passes and the
   bottom-left inset; `PreviewState`; `compileCount`; release on teardown
 - [ ] T-A23-304 [US1] [US2] [US3] Modify `Experience/{LabPresenter,CanvasOverlay,LabControls}.swift`: compile at the next
-  `draw` when the fingerprint changed (once per frame), draw grid then passes then inset; the inset frame
+  `draw` when the fingerprint changed (once per frame), draw grid then passes then inset; the grid becomes a
+  `FieldPass` drawn to `.framebuffer(name: context.framebuffer, width: context.pixelWidth, height: context.pixelHeight)`
+  (same fragment and parameters), because `FieldPass` sets the full viewport while `FullScreenShaderScene` sets none
+  and the host does not reset it, so the inset's viewport would otherwise carry into the next frame; the inset frame
   (`preview`), its message (`preview-message`) and the switch (`preview-toggle`)
 - [ ] T-A23-305 [US1] Write `ExperienceTests/OperatorPixelTests.swift` (SC-A23-301): gradient, mix (0, 0.5, 1) and flat
   colour within 2 of 255 at the read pixel centres; noise deterministic and scale-dependent; blur of a ramp equal to

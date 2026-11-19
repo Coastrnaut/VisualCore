@@ -11,3 +11,6 @@
   sets the viewport from the origin; no VisualCore change.
 - **D6 References (Q4):** gradient, mix, flat colour, blur-of-ramp and copy have closed-form CPU references; noise is
   tested for determinism and dependence on its parameters, not against a CPU port.
+- **D7 Viewport (analyze):** `FieldPass.run` sets the viewport to its output and leaves it; `FullScreenShaderScene`
+  sets none and the host does not reset it between frames, so the grid is drawn by a full-framebuffer `FieldPass` first
+  in every frame (checked in code: `FieldPass.swift` line 138; no viewport call in `FullScreenShaderScene.swift`).
