@@ -39,7 +39,7 @@
 
 ## Phase 3: Stories 2 and 4 — statistics and flags (P1, P2)
 
-- [ ] T-A24-106 [US2] [US4] Create `Packages/ExperiencesCreative/GraphicsBenchmarkLab/Core/Statistics.swift` per
+- [X] T-A24-106 [US2] [US4] Create `Packages/ExperiencesCreative/GraphicsBenchmarkLab/Core/Statistics.swift` per — Verified 2026-11-19: 2026-11-19: Packages/ExperiencesCreative/GraphicsBenchmarkLab/Core/Statistics.swift (nearest rank, minimum counts 1/20/100, Distribution, QualityFlag, Summary.make); gbl-core-ios27 exit 0
   clarification Q2 (FR-A24-103, 104): `Percentiles.nearestRank` ("rank = (p·n + 99) / 100, the rank-th smallest";
   minimum counts p50 1, p95 20, p99 100), `Distribution`, `QualityFlag`, `Summary` and `Summary.make` (validates the
   set first; warm-up and cool-down left out and counted; a measured sample without an interval not counted in the
