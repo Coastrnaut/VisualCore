@@ -23,7 +23,7 @@ Canonical overrides:
 - **The experience arrives:** Graphics Benchmark Lab is drawn in the one app for the first time and registered as a
   candidate; it is not yet available to a person (that is X-A24). The synthetic candidate of the app's tests moves to
   `a25.effects-composer`.
-- **Not here:** the run's caps, stop rule, CPU submit time and dropped-frame rule, the device report and the renderer
+- **Not here:** the run's caps, stop rule, dropped-frame rule and the CPU timing's validation on devices, the device report and the renderer
   facts (A24-P03), saving and export (A24-P04).
 - **No VisualCore or ProjectM change.** Follow `specs/167-vpl-p02-node-canvas`.
 - **No benchmark number** is shown or claimed; results on the simulator are never device evidence.
@@ -60,7 +60,8 @@ in code:
 - Q: Where do the phases and samples come from? → A: The core's pure `RunTimeline(plan:start:)` maps a frame time to
   warm-up (t − start < warm-up), measure (< warm-up + measure), cool-down (< total) or finished. The presenter's
   `RunRecorder` appends one `FrameSample` per drawn frame while the run is not finished: `frameIndex` counts from 0,
-  `intervalMs` = (t − previous t) × 1,000 (absent for the run's first frame), `cpuMs` 0 until A24-P03 measures it, and
+  `intervalMs` = (t − previous t) × 1,000 (absent for the run's first frame), `cpuMs` the presenter's own submit time for that frame, read from a monotonic clock (`ContinuousClock`) around its
+  workload draw calls (never a placeholder zero), and
   `gpuMs` always absent (no timer, A24-P00 gap U-GPUTIMER). A frame at or after the end finishes the run and builds the
   summary with A24-P01's `Summary.make`. Tests feed synthetic times; no test waits for a plan.
 - Q: What does the core hold, and which actions exist? → A: `BenchCore`, snapshot schema 1, digest
@@ -93,8 +94,8 @@ so the same frame of the same case looks the same on every run.
 
 **Acceptance Scenarios**:
 
-1. **Given** each case, **When** frame 0 and frame 60 are drawn off screen, **Then** each picture is not blank and
-   differs between the two frames.
+1. **Given** each case, **When** frame 0 and frame 60 are drawn off screen, **Then** each picture is not blank (its
+   luma spans at least 16 of 255) and differs between the two frames.
 2. **Given** the same case and frame drawn in two hosts, **When** the pictures are compared, **Then** they are
    byte-identical.
 3. **Given** a case outside its caps, **When** it is chosen, **Then** nothing is allocated and the refusal names the
