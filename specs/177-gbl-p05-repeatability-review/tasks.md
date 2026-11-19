@@ -16,7 +16,7 @@
 
 ## Phase 2: Core — qualification and repeatability (P1) 🎯
 
-- [ ] T-A24-502 [P] [US1] `Core/RunQualification.swift` per clarification Q1 (FR-A24-501) and
+- [X] T-A24-502 [P] [US1] `Core/RunQualification.swift` per clarification Q1 (FR-A24-501) and — Verified 2026-11-19: 2026-11-19: .autonomy/checks/A24-P05.gbl-core.json exit 0 (95 core and 53 experience tests); RunQualification (classes, ten reasons in fixed order, sentences) and RunQualificationTests (8)
   `CoreTests/RunQualificationTests.swift` (SC-A24-501): one fixture per class and reason, reasons in their fixed order,
   every sentence
 - [ ] T-A24-503 [P] [US2] `Core/Repeatability.swift` per clarification Q3 (FR-A24-503) and
