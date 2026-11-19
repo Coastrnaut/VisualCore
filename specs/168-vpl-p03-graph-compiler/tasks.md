@@ -11,7 +11,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T-A23-301 Baseline: cite the A23-P02 evidence (`.autonomy/checks/A23-P02.{vpl-ios27-3,app-unit-2,verify-27-2}.json`)
+- [X] T-A23-301 Baseline: cite the A23-P02 evidence (`.autonomy/checks/A23-P02.{vpl-ios27-3,app-unit-2,verify-27-2}.json`) — Verified 2026-11-18: 2026-11-18: A23-P02 evidence cited: .autonomy/checks/A23-P02.vpl-ios27-3.json, A23-P02.app-unit-2.json and A23-P02.verify-27-2.json, all exit 0; no Packages change since the A23-P02 record commit 24ffe464
   on the tree recorded at A23-P02 (`24ffe464`), whose Packages are unchanged since (owner ruling of 2026-11-14)
 
 ## Phase 2: Core compiler (blocking)
