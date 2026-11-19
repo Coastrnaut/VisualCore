@@ -32,6 +32,53 @@ Canonical overrides:
   (ImplementationLock-100). **Device-only items:** frame cost and thermal behaviour of the glow on D1–D3 are device
   campaign items. **Owner-only items:** none.
 
+## Clarifications
+
+### Session 2026-11-19
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time. Facts checked in
+code (read-only audit, 2026-11-19): pass types and their parameter specs are declared in `PassSchemas.all`
+(VisualCoreEffectsGraph, pure) and validated by `EffectGraphValidator` before any target is made; `EffectRenderer`
+switches on the type string (`EffectRenderer.swift:103–115`), sizes each pass's output by its `scale` and makes it
+`.rgba8` except bloom with `hdr` (`.rgba16f`, without checking `FloatRenderSupport`); `BloomPass` extracts on encoded
+Rec. 709 luma with a ±0.1 soft knee, blurs once at full size (9 taps, σ = radius/2) and adds with a clamp to 1;
+`composite` has modes 0 (straight-alpha mix) and 1 (clamped add); `RenderState` has the blend `.premultiplied`
+(ONE, ONE_MINUS_SRC_ALPHA) but no preset for it; `EffectScene` appends a `flashLimit` pass
+(`EffectScene.flashLimitPassID`, param `limit`) when flashing is reduced; `FlashLimitPass` measures encoded luma on a
+16 × 16 probe; `vc/color.glsl` clamps to 0…1; no tone mapping exists.
+
+- Q: What is the new pass and what are its parameters? → A: Type `emissive`, inputs `["input"]`, parameters (ranges,
+  defaults): `threshold` 0…16, 1.0 (linear units); `knee` 0…1, 0.5 (fraction of the threshold); `intensity` 0…4, 1.0;
+  `radius` 1…16, 4 (texels of the blur target); `quality` 0…1, 0 (0 = half, 1 = quarter resolution, rounded);
+  `exposure` −4…4, 0 (stops); `tonemap` 0…2, 2 (0 none, 1 Reinhard `x/(1+x)`, 2 filmic, the Narkowicz ACES fit
+  `(x(2.51x+0.03))/(x(2.43x+0.59)+0.14)` clamped to 0…1), rounded. Declared in `PassSchemas.all`; the memory estimate
+  counts the two blur targets and the output. Rationale: linear thresholds let values above 1 glow on the high-precision
+  path. Impact: graph JSON fixtures can use the pass at once.
+- Q: How is the pass drawn? → A: Three steps per frame: (1) prefilter at the blur size: sample the input with
+  `vc_srgbDecode`, average 4 bilinear taps covering the footprint, keep `max(0, L − (threshold − knee·threshold))`
+  shaped by a quadratic soft knee times colour over L (L = Rec. 709 luminance of linear light); (2) separable Gaussian
+  blur (horizontal, vertical) at the blur size, 9 taps, σ = radius/2, clamped to edge texel centres; (3) composite at
+  the output size: decode the input, add the bilinearly upsampled glow × intensity, multiply by 2^exposure, tone-map,
+  `vc_srgbEncode`, alpha from the input. Output `.rgba8`; blur targets `.rgba16f` from the pool where `FloatRenderSupport`
+  reports it, `.rgba8` otherwise. The pass includes a local unclamped decode so values above 1 survive. Rationale:
+  standard mobile bloom (prefilter + downsampled blur + single upsample), three draws. Impact: the CPU reference mirrors
+  each step.
+- Q: What happens without high-precision targets? → A: The blur targets are `.rgba8`, so the glow is limited to 0…1
+  linear (values above clamp) and loses precision; the renderer warns once per renderer ("emissive: standard precision,
+  glow limited to 1") through `ResourceRegistry.warn`; tests force this path with an internal switch and compare within
+  4/255. Rationale: visible but safe degradation. Impact: SC-R02F07-001's second tolerance.
+- Q: How do premultiplied alpha and the limiter change? → A: `composite` gains mode 2, premultiplied over
+  `overlay·opacity + base·(1 − overlay.a·opacity)` (range of `mode` widens to 0…2, existing values unchanged);
+  `RenderState.premultipliedBlended` (blend `.premultiplied`, no depth test or write) joins the presets.
+  `flashLimit` gains `linear` 0…1, default 0: with 1 the probe's luma is computed on decoded values; `EffectScene` sets
+  `linear` to 1 only when its graph contains an `emissive` pass, so existing graphs measure exactly as before.
+  Rationale: no Stage One change; the glow's brightness is judged as light. Impact: existing limiter tests unchanged.
+- Q: Where is the CPU reference and what does it cover? → A: `EmissiveReference` in VisualCoreEffectsGraph (pure):
+  `srgbDecode`/`srgbEncode` (exact piecewise, unclamped decode), `luminance`, `prefilter(colour, threshold, knee)`,
+  `toneMap(_:operator:)`, `composite(base:glow:intensity:exposure:operator:)` and `premultipliedOver`; the GPU tests
+  compare whole pictures against it (the blur compared through a 1-D Gaussian of the same σ on a single bright point).
+  Rationale: formulas tested on the host; GPU parity on the simulator. Impact: SC-R02F07-001, 002, 004.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - A glow that behaves like light (Priority: P1) 🎯
