@@ -1160,6 +1160,51 @@ malicious GPU shader code.
   (manual risk 2).
 - **Licenses:** every template, texture recipe and GLSL snippet records its source and license.
 
+### A23 Visual Programming Lab (`a23.visual-programming-lab`)
+
+Ratified from the app manual's constitution prompt (2026-11-18). Like A05–A22, it never had a standalone target: it
+is built directly as an experience of the one app. Its product goal is a constrained node-graph editor for composing
+parameterized visuals without writing shader code. Version 0.1 covers:
+- a typed node graph for scalar, colour, texture and time values;
+- an initial node library: Time, Constant, Noise, Gradient, Mix, Blur and Output;
+- a touch graph canvas with wire routing, zoom and selection;
+- cycle detection and clear feedback for invalid connections;
+- a preview that compiles a bounded acyclic graph into VisualCore passes;
+- versioned graph persistence with migration hooks.
+
+It runs no arbitrary scripts or user code, has no unbounded loops or feedback nodes in the MVP, and is not a
+desktop-class editor with hundreds of nodes.
+
+- **Consumer, not fork:** an experience of the VisualCore app and a VisualCore consumer, never a fork of
+  projectm-ios. It uses only audited VisualCore public APIs over the OpenGL ES → ANGLE → Metal integration. It MUST
+  NOT create its own EGL/ANGLE initialization path or a second renderer, or link ProjectM engine code. Node-graph
+  semantics are a product layer on top of VisualCore's effects and passes, not a reason for a second backend.
+- **Reuse first (Principle II):** field passes, render targets, the GLSL library, parameter schemas, persistence and
+  the render host are reused, not copied. A generic capability the graph needs and VisualCore lacks (for example a
+  reusable pass schedule or texture-lifetime allocator) goes into VisualCore with tests, docs, the API baseline and the
+  reference regression. The node library, the canvas and copy stay in the experience.
+- **Graph truth is pure and testable without the GPU:** graphs, ports, edges, the node registry, type checking,
+  topological sorting, cycle rejection, compilation into a pass schedule and persistence are pure, versioned models
+  tested through `swift test`. Drawing never changes the graph; GPU passes are rebuilt from the compiled schedule.
+- **Validate before GPU work:** a graph is type-checked and sorted, and cycles and invalid connections are rejected
+  with feedback on the affected nodes and ports, before any pass is compiled or any texture is allocated. Only known
+  node operators compile; there is no free-form code.
+- **Bounded:** node count, edge count, texture size and count, blur radius and preview size and frame rate have
+  documented caps checked before compile; files that are truncated, of a newer version, or hold NaN, infinite or
+  out-of-range values are refused safely and never deleted automatically. GPU resources are created only in a valid
+  host context, compiled only in the owning context at a frame, and rebuilt from CPU state after a context loss or
+  resize.
+- **Truthful claims:** no claim of compatibility with other node editors or formats, no scientific or educational
+  outcome claim, and no frame rates or timings not measured on a device.
+- **Offline-first and private:** no networking, accounts, analytics or ads, no community sharing, and no permission
+  is needed. Graphs stay in the experience's storage.
+- **Visuals are code:** every node's output and the example graphs are made in code; no purchased, generated or
+  photographic image is bundled. Typography uses system fonts.
+- **Accessibility:** native SwiftUI controls with VoiceOver labels and Dynamic Type; the graph has an accessible list
+  form (nodes, ports and connections as text), connection errors are text, never colour alone, and the canvas works
+  with a hardware keyboard and pointer as well as touch.
+- **Licenses:** every node implementation, GLSL snippet and example graph records its source and license.
+
 ## Governance
 
 - Precedence: real Apple platform and toolchain behavior and observed test results → owner
@@ -1216,4 +1261,4 @@ malicious GPU shader code.
   main thread is its only GL thread): a control queues a compile request that the preview scene runs at its next
   frame; found by checklist CHK006 of feature 158 at gate A22-P00; no principle changes.
 
-**Version**: 2.18.1 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-17
+**Version**: 2.19.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-18
