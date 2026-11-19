@@ -3,6 +3,11 @@
 // opening the experience in the one app's session host (with the presenter configured before its first `setup`),
 // drawing frames, the engine digest of a core, an action applied to a core directly and the CPU reference of a chain
 // on the 256 × 256 test image. Short runs only: no sleep, no wall-clock assertion.
+//
+// Feature 184 (A25-P05) T-A25-503 (research R4): the preview's intermediates are `.rgba16f` where the context can draw
+// into them, so `difference(_:_:)` compares with `EffectReference.applyChain(_:to:storage:)` at the storage of the
+// renderer's path (``ComposerTest/storage(_:)``: `.half` for `.rgba16f`, `.byte` for `.rgba8`); a posterize after
+// another effect could otherwise flip a level between the precisions.
 import CoreGraphics
 import EffectsComposerCore
 import Foundation
@@ -10,6 +15,7 @@ import Testing
 import UIKit
 import VisualCoreExperience
 import VisualCoreExperienceHost
+import VisualCoreRendering
 @testable import EffectsComposerExperience
 
 /// Building, opening and driving Effects Composer in tests.
@@ -129,11 +135,17 @@ enum ComposerTest {
         EffectReference.apply(chain, to: image)
     }
 
-    /// The largest channel difference between the preview's last result and the CPU reference of `chain`.
+    /// The reference storage of `shell`'s intermediates: `.half` for `.rgba16f`, `.byte` for `.rgba8`.
+    static func storage(_ shell: ExperienceShell<ComposerPresenter>) -> ReferenceStorage {
+        shell.presenter.renderer.slotFormat == .rgba16f ? .half : .byte
+    }
+
+    /// The largest channel difference between the preview's last result and the CPU reference of `chain` on the
+    /// test image, stored between nodes as the preview's intermediates are.
     static func difference(_ shell: ExperienceShell<ComposerPresenter>, _ chain: EffectChain,
                            sourceLocation: SourceLocation = #_sourceLocation) throws -> Int {
         let result = try #require(shell.presenter.lastResult, sourceLocation: sourceLocation)
-        return result.maxChannelDifference(reference(chain))
+        return result.maxChannelDifference(EffectReference.applyChain(chain, to: image, storage: storage(shell)))
     }
 
     /// The tolerance of a chain: 4/255 when an enabled distort is in it, else 2/255.

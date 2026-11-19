@@ -42,6 +42,25 @@
 // taken and recycled each frame, so that a broken program keeps the last good picture in it; the slots come from the
 // pool and go back to it within each render. No GL call: programs, targets and draws are VisualCore's (`FieldPass`,
 // `RenderTarget`, `ResourceRegistry`).
+//
+// Feature 184 (A25-P05) T-A25-503, T-A25-505, T-A25-506 (FR-A25-501 – FR-A25-507; clarifications Q1, Q2; research
+// R3, R6, R8, R9; contracts/color.md, export.md, robustness.md):
+//   - Precision: the ping-pong slots take ``slotFormat``, chosen at `setup` as
+//     `FloatRenderSupport.detect(in:).storageFormat(forceFallback: forceStandardPrecision)` (`.rgba16f` where the
+//     context can draw into it, `.rgba8` otherwise; ``forceStandardPrecision`` is a test seam read at `setup`); the
+//     source, the result and the export target stay `.rgba8`. Every target holds sRGB-encoded values (research R3).
+//     ``PreviewPool/acquire(width:height:format:)`` takes the format; the registry pools by size and format.
+//   - Drawing a plan: `draw(_:from:into:pool:)` runs a compiled plan from the source into a given output target, so
+//     the preview's result and an export target are drawn by the same code with the same programs.
+//   - Export (``exportPicture(_:)``, called inside a frame, with the context current): the chain's plan is drawn into
+//     a fresh `.rgba8` target of the source's size taken from the pool (released again on every path), the test seam
+//     ``beforeReadBack`` runs, and the target is read back; an empty or short read-back (a context lost in between)
+//     is ``ExportRefusal/interrupted``, as is a plan that cannot be drawn (an effect without a built program, a pass
+//     the driver refused); a pool or registry refusal of a target is ``ExportRefusal/memory``. The pool's cap is now
+//     5: the source, the result, two slots and the export target. ``maxTextureSize`` is the registry's, read at
+//     `setup` (0 before). Test seams: ``exportCount`` and ``readResult()``.
+//   - Memory warning: ``trimPools()`` frees the registry's idle pooled targets; the source and the result are held,
+//     so the preview is unchanged.
 import EffectsComposerCore
 import Foundation
 import VisualCoreExperience
@@ -122,8 +141,8 @@ enum PreviewSource: Equatable, Sendable {
 /// The preview's bounded share of the registry's target pool (see the file header).
 @MainActor
 final class PreviewPool {
-    /// The most targets the preview holds at once (source, result, two slots).
-    nonisolated static let maxTargets = 4
+    /// The most targets the preview holds at once (source, result, two slots and an export target, A25-P05).
+    nonisolated static let maxTargets = 5
     /// The largest side of a target, pixels.
     nonisolated static let maxSide = 2_048
 
@@ -143,11 +162,11 @@ final class PreviewPool {
         return nil
     }
 
-    /// A pooled `.rgba8` target of `width × height`; throws ``PreviewRefusal/poolCap`` before anything is made when
-    /// the request is above the cap, or the registry's error.
-    func acquire(width: Int, height: Int) throws -> RenderTarget {
+    /// A pooled target of `width × height` in `format`; throws ``PreviewRefusal/poolCap`` before anything is made
+    /// when the request is above the cap, or the registry's error.
+    func acquire(width: Int, height: Int, format: TextureFormat = .rgba8) throws -> RenderTarget {
         if let refusal = Self.check(width: width, height: height, held: held) { throw refusal }
-        let target = try registry.acquireTarget(width: width, height: height, format: .rgba8)
+        let target = try registry.acquireTarget(width: width, height: height, format: format)
         held += 1
         return target
     }
@@ -163,6 +182,16 @@ final class PreviewPool {
         held = max(0, held - 1)
         registry.release(target)
     }
+}
+
+/// Why a plan was not drawn to its end.
+enum PlanDrawFailure: Error, Equatable {
+    /// The pool refused a target (its cap).
+    case refused(PreviewRefusal)
+    /// The registry could not make a target (its budget or the device's limits).
+    case resource(String)
+    /// A pass failed on the driver, or a slot was missing.
+    case pass(String)
 }
 
 /// Draws the chain's preview (see the file header).
@@ -261,6 +290,17 @@ final class PreviewRenderer {
     /// Whether the chain last seen uses an effect whose program did not build (its picture is not drawn).
     private(set) var blocked = false
 
+    /// When true, the intermediates use `.rgba8` even where `.rgba16f` is renderable (a test seam, read at `setup`).
+    var forceStandardPrecision = false
+    /// The format of the ping-pong intermediates, chosen at `setup` (`.rgba8` before the first).
+    private(set) var slotFormat: TextureFormat = .rgba8
+    /// The registry's largest texture side, read at `setup`; 0 before the first.
+    private(set) var maxTextureSize = 0
+    /// Runs between an export's draw and its read-back (a test seam; never set by the app).
+    var beforeReadBack: (() -> Void)?
+    /// How many exports drew their plan (a test seam).
+    private(set) var exportCount = 0
+
     /// The effect programs that built.
     private var passes: [EffectID: FieldPass] = [:]
     /// The copy program.
@@ -323,6 +363,8 @@ final class PreviewRenderer {
                                     inputs: [EffectPrograms.sourceInput], label: "a25-present.frag")
         importLimit = registry.maxTextureSize > 0 ? ImageImport.limit(maxTextureSize: registry.maxTextureSize)
             : ImageImport.maximumEdge
+        maxTextureSize = registry.maxTextureSize
+        slotFormat = FloatRenderSupport.detect(in: registry).storageFormat(forceFallback: forceStandardPrecision)
         self.pool = PreviewPool(registry: registry)
         try takeSourceTargets()
     }
@@ -400,60 +442,119 @@ final class PreviewRenderer {
                 return
             }
         }
-        guard let pool, let source, let result, let copyPass else { return }
+        guard let pool, let source, let result, copyPass != nil else { return }
         let plan = PassPlan.compile(chain)
-        blocked = plan.passes.contains { pass in pass.node.map { passes[$0.effect] == nil } ?? false }
+        blocked = isBlocked(plan)
         guard !blocked else { return }
         runFailure = nil
-        var slots: [Int: RenderTarget] = [:]
-        defer { for target in slots.values { pool.recycle(target) } }
-        for planned in plan.passes {
-            let input: RenderTarget
-            switch planned.input {
-            case .source: input = source
-            case .result: input = result
-            case .slot(let s):
-                guard let target = slots[s] else { runFailure = "slot \(s) missing"; return }
-                input = target
+        if let failure = draw(plan, from: source, into: result, pool: pool) {
+            switch failure {
+            case .refused(let refused): refusal = refused
+            case .resource(let text), .pass(let text): runFailure = text
             }
-            let output: RenderTarget
-            switch planned.output {
-            case .result, .source: output = result
-            case .slot(let s):
-                do {
-                    let target = try pool.acquire(width: source.width, height: source.height)
-                    slots[s] = target
-                    output = target
-                } catch let refused as PreviewRefusal {
-                    refusal = refused
-                    return
-                } catch {
-                    runFailure = "\(error)"
-                    return
-                }
-            }
-            let program: FieldPass
-            var values: [String: [Float]] = [:]
-            if let node = planned.node, let pass = passes[node.effect] {
-                program = pass
-                values = EffectPrograms.uniforms(for: node, width: output.width, height: output.height)
-            } else {
-                program = copyPass
-            }
-            do {
-                try program.run(output: .target(output), inputs: [EffectPrograms.sourceInput: input],
-                                uniforms: Self.uniforms(values, for: program))
-            } catch {
-                runFailure = "\(error)"
-                return
-            }
-            if case .slot(let s) = planned.input, let target = slots.removeValue(forKey: s) { pool.recycle(target) }
+            return
         }
         lastPlan = plan
         renderCount += 1
         if captureResult {
             lastResult = Self.topDown(result.readPixels(), width: result.width, height: result.height)
         }
+    }
+
+    /// Whether `plan` uses an effect whose program did not build.
+    private func isBlocked(_ plan: PassPlan) -> Bool {
+        plan.passes.contains { pass in pass.node.map { passes[$0.effect] == nil } ?? false }
+    }
+
+    /// Runs `plan`'s passes in order from `source` into `output`: each slot's target (``slotFormat``) is taken from
+    /// `pool` when its writer runs and recycled as soon as its single reader ran, and every slot left is recycled at
+    /// the end. Returns why the plan stopped, or nil when every pass ran.
+    private func draw(_ plan: PassPlan, from source: RenderTarget, into output: RenderTarget,
+                      pool: PreviewPool) -> PlanDrawFailure? {
+        guard let copyPass else { return .pass("no copy program") }
+        var slots: [Int: RenderTarget] = [:]
+        defer { for target in slots.values { pool.recycle(target) } }
+        for planned in plan.passes {
+            let input: RenderTarget
+            switch planned.input {
+            case .source: input = source
+            case .result: input = output
+            case .slot(let s):
+                guard let target = slots[s] else { return .pass("slot \(s) missing") }
+                input = target
+            }
+            let target: RenderTarget
+            switch planned.output {
+            case .result, .source: target = output
+            case .slot(let s):
+                do {
+                    let slot = try pool.acquire(width: source.width, height: source.height, format: slotFormat)
+                    slots[s] = slot
+                    target = slot
+                } catch let refused as PreviewRefusal {
+                    return .refused(refused)
+                } catch {
+                    return .resource("\(error)")
+                }
+            }
+            let program: FieldPass
+            var values: [String: [Float]] = [:]
+            if let node = planned.node, let pass = passes[node.effect] {
+                program = pass
+                values = EffectPrograms.uniforms(for: node, width: target.width, height: target.height)
+            } else {
+                program = copyPass
+            }
+            do {
+                try program.run(output: .target(target), inputs: [EffectPrograms.sourceInput: input],
+                                uniforms: Self.uniforms(values, for: program))
+            } catch {
+                return .pass("\(error)")
+            }
+            if case .slot(let s) = planned.input, let slot = slots.removeValue(forKey: s) { pool.recycle(slot) }
+        }
+        return nil
+    }
+
+    /// The picture of `chain` on the source at the source's size, drawn into a fresh `.rgba8` export target and read
+    /// back, rows top-down (see the file header). Call inside a frame, with the context current. Throws
+    /// ``ExportRefusal/memory`` when the pool or the registry refuses a target and ``ExportRefusal/interrupted`` when
+    /// the plan cannot be drawn or the read-back is empty or short; the export target is released in every case.
+    func exportPicture(_ chain: EffectChain) throws(ExportRefusal) -> RGBAImage {
+        guard let pool, let source, !sourceStale, copyPass != nil else { throw .interrupted }
+        let plan = PassPlan.compile(chain)
+        guard !isBlocked(plan) else { throw .interrupted }
+        let target: RenderTarget
+        do {
+            target = try pool.acquire(width: source.width, height: source.height, format: .rgba8)
+        } catch {
+            throw .memory
+        }
+        defer { pool.release(target) }
+        if let failure = draw(plan, from: source, into: target, pool: pool) {
+            switch failure {
+            case .refused, .resource: throw .memory
+            case .pass: throw .interrupted
+            }
+        }
+        exportCount += 1
+        beforeReadBack?()
+        guard let picture = Self.topDown(target.readPixels(), width: target.width, height: target.height)
+        else { throw .interrupted }
+        return picture
+    }
+
+    /// The result target's pixels, rows top-down; nil without a result target or when the read-back is empty (a test
+    /// seam).
+    func readResult() -> RGBAImage? {
+        guard let result else { return nil }
+        return Self.topDown(result.readPixels(), width: result.width, height: result.height)
+    }
+
+    /// Frees the registry's idle pooled targets (a memory warning); the held source and result stay, so the preview
+    /// is unchanged.
+    func trimPools() {
+        pool?.registry.trimPools()
     }
 
     /// Draws the result, or the source while `compare` is on, letterboxed into the context's framebuffer (see the

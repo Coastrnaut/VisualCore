@@ -3,6 +3,9 @@
 // rebuilds (`RenderHost.recreateContext`) and a resize leave `ResourceRegistry.stats` live counts and bytes equal to
 // those after the first draw, with nothing leaked; the preview holds at most four targets (two between frames); and a
 // request above the cap (a fifth target, or a side above 2,048) is refused with `a25.pool-cap` before anything is made.
+//
+// Feature 184 (A25-P05) T-A25-505: the cap is now five targets (an export target besides the source, the result and
+// two slots), so the refused count is `PreviewPool.maxTargets` (5) instead of 4.
 import CoreGraphics
 import EffectsComposerCore
 import Foundation
@@ -62,7 +65,9 @@ import VisualCoreRendering
     @Test func aRequestAboveTheCapIsRefusedBeforeAnythingIsMade() async throws {
         #expect(PreviewPool.check(width: 256, height: 256, held: 0) == nil)
         #expect(PreviewPool.check(width: 2_048, height: 2_048, held: 3) == nil)
-        #expect(PreviewPool.check(width: 256, height: 256, held: 4) == .poolCap)
+        #expect(PreviewPool.maxTargets == 5)
+        #expect(PreviewPool.check(width: 256, height: 256, held: 4) == nil)
+        #expect(PreviewPool.check(width: 256, height: 256, held: 5) == .poolCap)
         #expect(PreviewPool.check(width: 2_049, height: 256, held: 0) == .poolCap)
         #expect(PreviewPool.check(width: 256, height: 4_096, held: 0) == .poolCap)
         #expect(PreviewRefusal.poolCap.ruleID == "a25.pool-cap")

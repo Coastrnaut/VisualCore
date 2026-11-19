@@ -4,6 +4,11 @@
 // while compare is on, so turning it off shows the edited picture at once; an empty chain shows the source either
 // way; after `recreateContext` with compare on the source is shown again; compare is neither digested nor stored, so a
 // restored core shows the result. Short runs; no clock, no sleep.
+//
+// Feature 184 (A25-P05) T-A25-503 (research R4): `onShowsTheSourceAndOffTheResult` runs on standard-precision
+// intermediates (`forceStandardPrecision`): its chain is a colour grade (contrast 1.85) followed by posterize, and on the
+// half-float path a few test-image pixels sit on a posterize level boundary where the GPU's and the CPU's `pow` differ
+// by less than a half-float step yet land on different levels; the precision paths are covered by ColorPathTests.
 import CoreGraphics
 import EffectsComposerCore
 import Foundation
@@ -26,7 +31,9 @@ import VisualCoreExperienceHost
     @Test func onShowsTheSourceAndOffTheResult() async throws {
         let session = ExperienceSession()
         defer { session.close() }
-        let shell = try await ComposerTest.open(session, size: Self.size)
+        let shell = try await ComposerTest.open(session, size: Self.size) { presenter in
+            presenter.renderer.forceStandardPrecision = true
+        }
         let source = ComposerTest.opaque(ComposerTest.image)
         ComposerTest.accept(shell, "chain.add", [0, 0])
         ComposerTest.accept(shell, "chain.set", [0, 1, 0.9])

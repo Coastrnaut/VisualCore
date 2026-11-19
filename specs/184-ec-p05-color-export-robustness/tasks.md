@@ -25,7 +25,7 @@
   (transfer round trip over 256 values within 1/255; domains; grade defaults are the identity; mid-grey exposure +1
   equals the linear computation); update every existing core or experience test whose expected values assumed
   encoded-value grade, blur or vignette, recording each change in the test's header (analyze U1)
-- [ ] T-A25-503 [US2] Renderer intermediates in
+- [X] T-A25-503 [US2] Renderer intermediates in — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P05.ec-ios27.json (exit 0, 83+49 tests; ColorPathTests identity 0/255 both paths, blur edge 187, every effect within 1/255)
   `Packages/ExperiencesCreative/EffectsComposer/Experience/PreviewRenderer.swift`: slots use
   `FloatRenderSupport.detect(in:).storageFormat(forceFallback: forceStandardPrecision)` chosen in `setup`; source and
   result stay `.rgba8`; `PreviewPool.acquire` takes a format; tests in
