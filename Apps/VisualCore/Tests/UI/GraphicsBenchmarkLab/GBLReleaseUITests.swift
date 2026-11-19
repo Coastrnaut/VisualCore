@@ -51,12 +51,12 @@ final class GBLReleaseUITests: XCTestCase {
         XCTAssertLessThan(elapsed, Self.journeyLimit, "the journey took \(elapsed) s")
     }
 
-    /// Whether the case button `target` is the selected case: the selected trait, or its spoken value "Selected"
-    /// (both are set together by `GBLControls.caseButton`), waited for at most ``GBL/shortWait``.
+    /// Whether the case button `target` is the selected case: its selected trait only (clarification Q5, T-A24-614),
+    /// waited for at most ``GBL/shortWait``.
     @MainActor
     private func isSelectedCase(_ target: XCUIElement) -> Bool {
         let deadline = Date().addingTimeInterval(GBL.shortWait)
-        func selected() -> Bool { target.exists && (target.isSelected || (target.value as? String) == "Selected") }
+        func selected() -> Bool { target.exists && target.isSelected }
         while !selected(), Date() < deadline { usleep(200_000) }
         return selected()
     }

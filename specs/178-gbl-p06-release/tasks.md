@@ -106,5 +106,5 @@
 
 ## Phase 7: Convergence
 
-- [ ] T-A24-614 Make `GBLReleaseUITests`'s selection check use the selected trait only (`isSelected`, no accessibility
+- [X] T-A24-614 Make `GBLReleaseUITests`'s selection check use the selected trait only (`isSelected`, no accessibility — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A24-P06.app-ui-2.json exit 0 (chunk f3 3/3 with the trait-only selection check)
   value fallback) and rerun chunk `f3`, per clarification Q5 (partial)
