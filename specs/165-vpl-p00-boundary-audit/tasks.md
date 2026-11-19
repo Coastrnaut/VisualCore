@@ -11,7 +11,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T-A23-001 Create the two starting documents:
+- [X] T-A23-001 Create the two starting documents: — Verified 2026-11-18: 2026-11-18: docs/apps/visual-programming-lab/README.md (manual §1-§2 product goal, version 0.1 features, non-goals; an experience of the one app; constitution 2.19.0) and regression-baseline.md (phase start 7b64fedf, constitution 0a9405b5, pin d93edd1); validate_docs PASS
   - `docs/apps/visual-programming-lab/README.md`, from the manual §1–§2: a node-based visual programming lab whose
     typed graphs compile into bounded GPU passes drawn in the host's context; offline; no permission; no arbitrary
     scripting; an experience of the one app; its documents;
