@@ -31,7 +31,9 @@ let package = Package(
                                .product(name: "VisualCoreMath", package: "VisualCore"),
                                .product(name: "VisualCoreSimulation", package: "VisualCore"),
                                .product(name: "VisualCoreScenes", package: "VisualCore"),
-                               .product(name: "VisualCorePersistence", package: "VisualCore")],
+                               .product(name: "VisualCorePersistence", package: "VisualCore"),
+                               // Feature 206 T-R02F06-007: ParameterUniformBinding binds a ParameterSchema to u_<name> uniforms.
+                               .product(name: "VisualCoreParameters", package: "VisualCore")],
                 // VisualCore GLSL include library (vc/*.glsl), loaded by ShaderBundle (feature 012).
                 resources: [.copy("GLSL")],
                 linkerSettings: [.linkedFramework("QuartzCore"), .linkedFramework("UIKit")]),
@@ -76,7 +78,8 @@ let package = Package(
                                    .product(name: "VisualCoreMath", package: "VisualCore"),
                                    .product(name: "VisualCoreSimulation", package: "VisualCore"),
                                    .product(name: "VisualCoreScenes", package: "VisualCore"),
-                                   .product(name: "VisualCorePersistence", package: "VisualCore")]),
+                                   .product(name: "VisualCorePersistence", package: "VisualCore"),
+                                   .product(name: "VisualCoreParameters", package: "VisualCore")]),
     ],
     swiftLanguageModes: [.v6]
 )

@@ -1,6 +1,8 @@
 // ResourceRegistry.swift — one per RenderHost: creates and tracks GPU objects against budgets,
 // rejects stale generations and reports leaks (feature 004 T-F311/T-F313/T-F315; FR-F305–FR-F313,
 // FR-F316). Contract: specs/004-resources-shaders/contracts/resources-shaders-api.md.
+// Feature 206 T-R02F06-007 (FR-R02F06-002, FR-R02F06-003, FR-R02F06-004): an overload taking a validated `DefineSet`
+// and a `PrecisionPolicy`, and `prewarm(_:)` compiling a `ShaderVariantSet` through the same cache and counters.
 import CVisualCoreGL
 import VisualCoreDiagnostics
 import VisualCoreShaderSource
@@ -244,39 +246,113 @@ public final class ResourceRegistry {
             ledger.noteShaderFailure()
             throw ShaderError.source(error)
         }
+        return try obtainProgram(v, f, vertexName: vertexName, fragmentName: fragmentName).program
+    }
+
+    /// Expands both stages with a validated `DefineSet` (the vertex stage as `.vertex`, the fragment stage as
+    /// `.fragment` with `precision`, so a fragment shader without a float precision statement gets one), then compiles
+    /// and links through the same cache, key scheme (SHA-256 of both expanded texts) and counters as
+    /// `program(vertex:fragment:defines:library:vertexName:fragmentName:)` (feature 206, FR-R02F06-002, FR-R02F06-004).
+    /// Throws `ShaderError`; a failure never touches a program the caller already holds.
+    public func program(vertex: String, fragment: String, defines: DefineSet, precision: PrecisionPolicy?,
+                        library: ShaderLibrary = ShaderLibrary(),
+                        vertexName: String = "vertex", fragmentName: String = "fragment") throws -> ShaderProgram {
+        let v: ExpandedShader, f: ExpandedShader
+        do {
+            (v, f) = try expandStages(vertex: vertex, fragment: fragment, defines: defines, precision: precision,
+                                      library: library, vertexName: vertexName, fragmentName: fragmentName)
+        } catch { throw error.error }
+        return try obtainProgram(v, f, vertexName: vertexName, fragmentName: fragmentName).program
+    }
+
+    /// Compiles every combination of `set` in order through the program cache (feature 206, FR-R02F06-003): each
+    /// entry is `compiled`, `cached` (already in the cache) or `failed` with its diagnostics; a failure does not stop
+    /// the rest. Valid for the current context generation only; after `recreateContext()` prewarm again.
+    public func prewarm(_ set: ShaderVariantSet, vertex: String, fragment: String,
+                        library: ShaderLibrary = ShaderLibrary(), precision: PrecisionPolicy? = nil,
+                        vertexName: String = "vertex", fragmentName: String = "fragment") -> PrewarmReport {
+        var entries: [PrewarmReport.Entry] = []
+        for combination in set.combinations {
+            do {
+                let (v, f) = try expandStages(vertex: vertex, fragment: fragment, defines: combination.defines,
+                                              precision: precision, library: library,
+                                              vertexName: vertexName, fragmentName: fragmentName)
+                let (_, wasCached) = try obtainProgram(v, f, vertexName: vertexName, fragmentName: fragmentName)
+                entries.append(.init(key: combination.key, outcome: wasCached ? .cached : .compiled))
+            } catch let staged as StagedSourceError {
+                entries.append(.init(key: combination.key, outcome: .failed(staged.error.diagnostics(sourceStage: staged.stage)),
+                                     reasonCode: staged.error.reasonCode))
+            } catch let error as ShaderError {
+                entries.append(.init(key: combination.key, outcome: .failed(error.diagnostics(sourceStage: .link)),
+                                     reasonCode: error.reasonCode))
+            } catch {
+                let d = ShaderDiagnostic(file: "\(vertexName)+\(fragmentName)", line: 0, stage: .link, severity: .error,
+                                         message: "\(error)")
+                entries.append(.init(key: combination.key, outcome: .failed([d])))
+            }
+        }
+        return PrewarmReport(entries: entries)
+    }
+
+    /// Expands both stages; a refusal is counted as a shader failure and thrown as `ShaderError.source` together
+    /// with the stage it came from (`stage` labels prewarm diagnostics).
+    private func expandStages(vertex: String, fragment: String, defines: DefineSet, precision: PrecisionPolicy?,
+                              library: ShaderLibrary, vertexName: String,
+                              fragmentName: String) throws(StagedSourceError) -> (ExpandedShader, ExpandedShader) {
+        var stage = ShaderStage.vertex
+        do {
+            let v = try library.expand(source: vertex, named: vertexName, defines: defines, precision: precision, stage: .vertex)
+            stage = .fragment
+            let f = try library.expand(source: fragment, named: fragmentName, defines: defines, precision: precision, stage: .fragment)
+            return (v, f)
+        } catch {
+            ledger.noteShaderFailure()
+            throw StagedSourceError(stage: stage, error: .source(error))
+        }
+    }
+
+    /// A source refusal and the stage whose expansion refused it.
+    struct StagedSourceError: Error { let stage: ShaderStage; let error: ShaderError }
+
+    /// The cached program for the expanded pair, or a newly compiled and linked one (counted, cached, LRU-evicting).
+    private func obtainProgram(_ v: ExpandedShader, _ f: ExpandedShader, vertexName: String,
+                               fragmentName: String) throws -> (program: ShaderProgram, cached: Bool) {
         let key = ShaderCacheKey.make(vertex: v, fragment: f)
         if let cached = cache[key], !cached.released {
             cacheHits += 1
             touch(key)
-            return cached
+            return (cached, true)
         }
         compileCount += 1
-        let (vs, vDiag) = ShaderProgram.compileShader(GLenum(GL_VERTEX_SHADER), v, stage: .vertex)
+        let vertexStage = ShaderProgram.compileShader(GLenum(GL_VERTEX_SHADER), v, stage: .vertex)
+        let vs = vertexStage.shader
         try ledger.allocate(.shader, bytes: 0)
-        let (fs, fDiag) = ShaderProgram.compileShader(GLenum(GL_FRAGMENT_SHADER), f, stage: .fragment)
+        let fragmentStage = ShaderProgram.compileShader(GLenum(GL_FRAGMENT_SHADER), f, stage: .fragment)
+        let fs = fragmentStage.shader
         try ledger.allocate(.shader, bytes: 0)
         defer {
             vcglDeleteShader(vs); ledger.release(.shader, bytes: 0)
             vcglDeleteShader(fs); ledger.release(.shader, bytes: 0)
         }
-        if !vDiag.isEmpty || !fDiag.isEmpty {
+        if !vertexStage.errors.isEmpty || !fragmentStage.errors.isEmpty {
             ledger.noteShaderFailure()
-            throw ShaderError.compile(vDiag + fDiag)
+            throw ShaderError.compile(vertexStage.errors + fragmentStage.errors)
         }
         let name = vcglCreateProgram()
         vcglAttachShader(name, vs)
         vcglAttachShader(name, fs)
         vcglLinkProgram(name)
-        let linkDiag = ShaderProgram.linkLog(name)
-        guard linkDiag.isEmpty else {
+        let link = ShaderProgram.linkLog(name, label: "\(vertexName)+\(fragmentName)")
+        guard link.errors.isEmpty else {
             vcglDeleteProgram(name)
             ledger.noteShaderFailure()
-            throw ShaderError.link(linkDiag)
+            throw ShaderError.link(link.errors)
         }
         vcglDetachShader(name, vs)
         vcglDetachShader(name, fs)
         try ledger.allocate(.program, bytes: 0)
-        let program = ShaderProgram(name: name, generation: generation, cacheKey: key, registry: self)
+        let program = ShaderProgram(name: name, generation: generation, cacheKey: key, registry: self,
+                                    warnings: vertexStage.warnings + fragmentStage.warnings + link.warnings)
         cache[key] = program
         touch(key)
         if cache.count > Self.maxCachedPrograms, let oldest = lru.first {
@@ -287,7 +363,7 @@ public final class ResourceRegistry {
                 evictionCount += 1
             }
         }
-        return program
+        return (program, false)
     }
 
     // MARK: Program cache (FR-F306)

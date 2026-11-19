@@ -44,7 +44,7 @@
 
 ## Phase 5: Story 1 — mistakes named before drawing, GL side (P1) 🎯
 
-- [ ] T-R02F06-007 [US1] Modify `Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderProgram.swift` (log by
+- [X] T-R02F06-007 [US1] Modify `Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderProgram.swift` (log by — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F06.rendering-27.json (exit 0; SafeCompileTests 9, ShaderBindingTests 5; whole scheme 517 tests)
   `GL_INFO_LOG_LENGTH` up to 65,536 bytes; `warnings` from successful compiles; link diagnostics labelled
   `<vertexName>+<fragmentName>`; unparsed line kept; `ShaderError.reasonCode`; reflected `UniformType`;
   `check(_ layout:)`) and `Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift` (overload
