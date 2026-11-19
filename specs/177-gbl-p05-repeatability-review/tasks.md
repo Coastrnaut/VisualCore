@@ -48,7 +48,7 @@
 ## Phase 5: Evidence
 
 - [ ] T-A24-509 Review checkpoint: `--name gbl-ios27`, documented API, isolation, core purity, scan-identifiers
-- [ ] T-A24-510 App and interface: `xcodegen generate --spec project.yml`, then `--name app-ui -- python3
+- [X] T-A24-510 App and interface: `xcodegen generate --spec project.yml`, then `--name app-ui -- python3 — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A24-P05.app-ui-2.json: build-for-testing, 78 app unit tests and 2 f3 interface tests on iOS 27.2, exit 0
   scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27 app-ui-ios27-f3`
 - [ ] T-A24-511 Contract: G-DEVICE and G-EXPLAIN closed by "A24-P05", rows whose gaps are all closed available
   (`--name contract`); README of the experience; `--name catalog`, `experience-packages`, `script-tests`,
