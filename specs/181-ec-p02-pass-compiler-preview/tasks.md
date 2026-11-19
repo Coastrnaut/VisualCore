@@ -27,7 +27,7 @@
 
 ## Phase 3: Stories 2 and 3 — the preview follows every edit; disabled is identity (P1)
 
-- [ ] T-A25-205 [US2] Create `Packages/ExperiencesCreative/EffectsComposer/Experience/Adapter/ComposerCore.swift` per clarification Q3 (snapshot schema 1, digest
+- [X] T-A25-205 [US2] Create `Packages/ExperiencesCreative/EffectsComposer/Experience/Adapter/ComposerCore.swift` per clarification Q3 (snapshot schema 1, digest — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P02.ec-ios27.json exit 0 (42 core and 27 experience tests on sim-27.2); ComposerCore schema 1, seven actions, rule ids
   `a25.effects-composer.v1`, the seven actions, rule ids)
 - [ ] T-A25-206 [US2] [US3] Create `Packages/ExperiencesCreative/EffectsComposer/Experience/{PreviewRenderer,ComposerPresenter,ECControls,EffectsComposerExperience}.swift`
   per clarifications Q2, Q4 and Q5 (programs built in setup, pooled targets, plan recompiled on a fingerprint change,
