@@ -59,7 +59,7 @@
   export interrupted by `recreateContext` in `beforeReadBack` fails as `a25.export-interrupted` with no file and the
   next export succeeds; two framebuffer sizes letterbox the same result; a memory warning leaves the preview
   byte-identical; the interruption test stands for a background move during export (analyze C4)
-- [ ] T-A25-507 [US3] Write `docs/apps/effects-composer/device-plan.md`: D1, D2, D3 rows tagged {device} (after
+- [X] T-A25-507 [US3] Write `docs/apps/effects-composer/device-campaign.md`: D1, D2, D3 rows tagged {device} (after — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P05.device-campaign.json (exit 0; 7 rows pending device campaign)
   ImplementationLock-100; D3 stays on iPadOS 26.5): peak memory with a 2,048-pixel picture and eight effects ≤ 200 MiB,
   preview frame time while editing ≤ 33 ms, export time per format ≤ 3 s, recovery after backgrounding
 
