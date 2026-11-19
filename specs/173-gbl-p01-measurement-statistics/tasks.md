@@ -58,7 +58,7 @@
   clarification Q4 (FR-A24-105): `RunState`, `BenchmarkRun`, `RunDocument` (kind `a24.benchmark-run`, version 1,
   "≤ 2,097,152 bytes", sorted keys, `MigrationChain(currentVersion: 1)`), `RunRefusal` with its codes; the reader
   recomputes the summary and refuses a mismatch as `damaged`.
-- [ ] T-A24-109 [P] [US3] Write `CoreTests/RunDocumentTests.swift` (SC-A24-104): a run round-trips byte-identical; one
+- [X] T-A24-109 [P] [US3] Write `CoreTests/RunDocumentTests.swift` (SC-A24-104): a run round-trips byte-identical; one — Verified 2026-11-19: 2026-11-19: RunDocumentTests pass (round trip, every refusal code, tampered summary) in gbl-core-ios27 exit 0
   sample per refusal code (damaged, newer-version, too-large, not-finite, out-of-range with its field, out-of-order,
   too-many-samples, a tampered summary).
 
