@@ -33,6 +33,58 @@ Canonical overrides:
   `docs/release/build-and-archive.md`.
 - Follow `specs/178-gbl-p06-release`.
 
+## Clarifications
+
+### Session 2026-11-19
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- **Permissions:** `Catalog/registrations.json` gives `a25.effects-composer` the permissions `["photo-library-add"]`;
+  the app's `NSPhotoLibraryAddUsageDescription` reads "Saves exported artwork to your photo library when you choose
+  Save Image." (`Apps/VisualCore/Generated/Info.plist`, checked by `BundleTests`). `PhotosPicker` (PhotosUI) runs out
+  of process and needs no usage string; the share sheet needs none.
+- **Copy steps:** `scripts/release_check.py` builds `experience-release-a25` and `copy-claims-a25` from
+  `docs/apps/effects-composer/release.json`. Over the experience's nine Swift files, the shared denylist
+  `Configs/copy-claims-denylist.json` finds only the word "share" (five lines of `ECControls.swift`), a feature the
+  experience has, so `copyCheck.allow` is `["share"]`.
+- **Stored data:** the session snapshot (`ComposerCore`, schema 1, digest domain `a25.effects-composer.v1`: the chain
+  file's body `{"nodes": [...]}`); `preset-<n>.json` (kind `a25.preset`, version 1, at most 69,632 bytes, embedding the
+  chain file `a25.effect-chain` version 1); `presets.json` (kind `a25.preset-library`, version 1), at most 24 looks;
+  export files in the temporary folder `EffectsComposer`, removed before the next export and when the experience
+  closes. A picked picture is held in memory only. The refusals are `damaged`, `newer-version`, `too-large` and the
+  chain file's codes.
+- **Catalog entry:** the registration's summary and capabilities still describe A25-P02 (a picture made in code only);
+  they must name import and export truthfully, keep "shader" (CatalogSearchTests) and stay within 300 characters.
+- **Drawing failure:** `ComposerPresenter.draw` throws to the session; there is no test seam yet.
+- **Interface chunk:** no A25 chunk exists; the next free chunk name after `f3` is `g3`.
+
+- Q: Which statuses does the release checklist use? → A: The checker's: `verified` with evidence;
+  `pending-campaign-ii` for device rows naming EC-D1 … EC-D7 of `docs/apps/effects-composer/device-campaign.md`;
+  `owner-action` with the steps of `docs/release/build-and-archive.md`.
+- Q: Which words does the experience's own claims scan refuse? → A: Whole words, case-insensitively, in the store
+  text, the catalog entry and the interface Swift (controls, presenter, renderer, export, import, library and the
+  adapter): video, animated, animation, layers, layer, masks, mask, RAW, HDR, AI, "machine learning", neural,
+  professional, pro-grade, lossless, unlimited, real-time, instant, fps, cloud, sync, account, upload, Photoshop,
+  Lightroom, Instagram, filter-pack. The store text must contain the phrase "Nothing is sent". Every test named in the
+  claims table must exist.
+- Q: What does the source scan refuse? → A: The A24 list in `Packages/ExperiencesCreative/EffectsComposer`
+  (`URLSession`, `import Network`, `CLLocation`, `import CoreLocation`, `AVCapture`, `AVAudioRecorder`, `inputNode`,
+  `installTap`, `CMMotion`, `CNContact`, `PHPhotoLibrary`, `import Photos`, `ASIdentifierManager`,
+  `AppTrackingTransparency`, `identifierForVendor`, `UIDevice.current.name`, `isIdleTimerDisabled`, any `brightness =`
+  write, `UIPasteboard`); `PhotosUI`, `PhotosPicker` and `ShareLink` everywhere except
+  `Experience/ECControls.swift`, where each must appear.
+- Q: How are crash recovery and the sample files proved? → A: A test-only `failNextDraw` seam in the presenter makes
+  the next draw throw once (`ComposerDrawError.injected`). A test saves two looks, sets the seam and draws, so the
+  session fails with the injected message; every storage file is byte-identical and a new session over the same
+  storage lists and opens both looks. Committed fixtures under `ExperienceTests/Fixtures/`: `snapshot-v1.json`,
+  `snapshot-newer.json`, `snapshot-damaged.json`; `preset-current.json`, `preset-newer.json`, `preset-damaged.json`;
+  `presets-current.json`, `presets-newer.json`, `presets-damaged.json`. Current samples open; the newer and damaged
+  snapshots are refused; a newer or damaged look file is listed as unreadable with its code; a newer index makes the
+  library read only; a damaged index still lists the looks from their files; every file stays byte-identical.
+- Q: Which interface journey runs? → A: `ECReleaseUITests` in the new chunk `g3` (serial): a fresh start shows the
+  status "Ready", no effect row, the buttons `export-png`, `export-jpeg`, `export-heic` and `test-picture`, no `share`,
+  and no saved look; it takes under 60 s.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Nothing leaves the device without the person's choice (Priority: P1) 🎯
