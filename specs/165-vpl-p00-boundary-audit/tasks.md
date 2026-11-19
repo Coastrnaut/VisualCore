@@ -20,7 +20,7 @@
 
 ## Phase 3: User Story 1 — Evidence-backed integration matrix (P1) 🎯
 
-- [ ] T-A23-002 [US1] Write `docs/apps/visual-programming-lab/visualcore-contract.json` (schema 1; app
+- [X] T-A23-002 [US1] Write `docs/apps/visual-programming-lab/visualcore-contract.json` (schema 1; app — Verified 2026-11-18: 2026-11-18: docs/apps/visual-programming-lab/visualcore-contract.json: 9 inventory areas with real paths (release_check --list 168 lines), 32 matrix rows (5 capabilities, 6 features, the ten FR-A23-003 areas and cross-cutting rows; 9 available, 23 requires adaptation), 167 citations of public VisualCore symbols, traceability for every capability and feature; written by an agent, reviewed and checked
   `visual-programming-lab`; gate `A23-P00`), with:
   - an `inventory` of every FR-A23-001 area, with paths and the release-check line count (168, from `python3
     scripts/release_check.py --list`);
