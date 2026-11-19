@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesCreative",
+    "--scheme",
+    "ExperiencesCreative-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "VisualProgrammingLabCoreTests",
+    "VisualProgrammingLabExperienceTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing VisualProgrammingLabCoreTests VisualProgrammingLabExperienceTests",
+  "elapsed_seconds": 8.738,
+  "exit_code": 0,
+  "finished": "2026-11-19T04:14:51+00:00",
+  "log": ".autonomy/logs/A23-P04.vpl-ios27.log",
+  "log_sha256": "d57ddda3ba5bb16ff323cb1ae7f39013dd976b744c94bc75b98901e017530626",
+  "name": "vpl-ios27",
+  "stage": "A23-P04",
+  "started": "2026-11-19T04:14:42+00:00",
+  "timed_out": false
+}
