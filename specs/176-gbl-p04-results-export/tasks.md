@@ -74,3 +74,12 @@
 ## Implementation strategy
 
 - **MVP:** 402, 404. **Review checkpoint:** at 408. **Commits:** one per task.
+
+## Phase 7: Convergence
+
+- [ ] T-A24-412 Record the as-built design in `specs/176-gbl-p04-results-export/{contracts/results.md,data-model.md}`:
+  the extra identifiers `result-message` and `result-opened`; the failures `noRun`, `exportFailed` and `run(code)`
+  (codes prefixed `a24.`); the repeated-save rule held by the presenter (`savedRun`), not the library; removal without
+  a confirmation over the drawing; the export folder emptied in `teardown`, so also after a context rebuild (the next
+  tap writes the file again); `save` returning the file number n, per contracts/results.md and data-model.md
+  (unrequested)
