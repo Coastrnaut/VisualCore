@@ -83,7 +83,7 @@
   by "A24-P01", and rows whose gaps are all closed become available with evidence (`--name contract -- python3
   scripts/check_app_contract.py --app graphics-benchmark-lab --render`); list the core in
   `docs/apps/graphics-benchmark-lab/README.md`
-- [ ] T-A24-113 The packages, catalog and script tests and the app build:
+- [X] T-A24-113 The packages, catalog and script tests and the app build: — Verified 2026-11-19: 2026-11-19: .autonomy/checks/A24-P01.{experience-packages,catalog,app-build}.json exit 0; script-tests failed once (the prompt-coverage fixture removed A24-P00, now passed) and script-tests-2 exit 0 after moving the fixture to A25-P06
   - `--name experience-packages`;
   - `--name catalog -- python3 scripts/build_catalog.py --check`;
   - `--name script-tests -- python3 scripts/test_scripts.py`;

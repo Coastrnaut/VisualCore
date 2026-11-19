@@ -3248,8 +3248,8 @@ class PromptCoverageTests(unittest.TestCase):
             # A gate that stays pending for long (a passed gate's prompts are not walked; A10-P03 passed 2026-11-14).
             entry = next(f for f in manifest["features"] if f["gate"] == "A25-P03")
             next(c for c in entry["commands"] if c["command"] == "speckit-tasks")["prompt"] = "  "
-            # A whole gate that stays pending for long (A11-P00 passed 2026-11-15, so its prompts are no longer walked).
-            manifest["features"] = [f for f in manifest["features"] if f["gate"] != "A24-P00"]
+            # A whole gate that stays pending for long (A24-P00 passed 2026-11-19, so its prompts are no longer walked).
+            manifest["features"] = [f for f in manifest["features"] if f["gate"] != "A25-P06"]
 
         self.edit(root, "docs/catalog/feature-index.json", drop_round_stage)
         self.edit(root, "docs/process/speckit-prompt-manifest.json", empty_phase_stage)
@@ -3262,7 +3262,7 @@ class PromptCoverageTests(unittest.TestCase):
         self.assertTrue(any(p.startswith("R03-G05-07 plan: ") for p in problems), problems[:4])
         self.assertTrue(any(p.startswith("A25-P03 tasks: ") for p in problems))
         for stage in planidx.STAGES:
-            self.assertTrue(any(p.startswith(f"A24-P00 {stage}: ") for p in problems), stage)
+            self.assertTrue(any(p.startswith(f"A25-P06 {stage}: ") for p in problems), stage)
             self.assertTrue(any(p.startswith(f"UA-F13 {stage}: ") for p in problems), stage)
         self.assertFalse(any(p.startswith("R02-F01 ") for p in problems))
 
