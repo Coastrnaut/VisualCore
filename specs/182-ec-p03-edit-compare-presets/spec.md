@@ -130,7 +130,8 @@ preview follows at once.
 - **Saving under an empty or too long name:** refused with a message.
 - **A name another preset has** (compared after trimming, ignoring case): refused with "A preset is already called
   <name>."
-- **Opening a preset:** becomes one undoable edit of the chain.
+- **Opening a preset over unsaved changes:** no confirmation is asked, because opening is one undoable edit of the
+  chain and undo returns the changes.
 - **A context loss with compare on:** the original is uploaded again; compare still shows it.
 - **Storage full:** a save is refused with a message and nothing changes.
 
