@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_app_contract.py",
+    "--app",
+    "effects-composer",
+    "--render"
+  ],
+  "command": "python3 scripts/check_app_contract.py --app effects-composer --render",
+  "elapsed_seconds": 0.05,
+  "exit_code": 0,
+  "finished": "2026-11-19T19:57:15+00:00",
+  "log": ".autonomy/logs/A25-P03.contract.log",
+  "log_sha256": "a0353a59fd364b1cd398ee4491ddbcd2ba3606ba4f26b332cd74bbb348453584",
+  "name": "contract",
+  "stage": "A25-P03",
+  "started": "2026-11-19T19:57:15+00:00",
+  "timed_out": false
+}

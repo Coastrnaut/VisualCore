@@ -560,7 +560,7 @@
    "id": "M08",
    "capability": "Version 0.1 feature 02: editable effects with reorder, enable and disable, and an immediate preview",
    "source": "manual \u00a72 feature 02; spec FR-A25-002",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
@@ -588,16 +588,16 @@
     }
    ],
    "example": {
-    "file": "Packages/ExperiencesCreative/VisualProgrammingLab/Experience/LabControls.swift",
-    "symbol": "LabControls"
+    "file": "Packages/ExperiencesCreative/EffectsComposer/Experience/ECControls.swift",
+    "symbol": "ComposerLabels"
    },
-   "notes": "ExperiencePresenter, ExperienceControl and ParameterPanel exist (ShellRenderingTests, ExperienceActionTests, ParameterPanelTests); reorder, enable and disable and the recompiled preview are G-EDIT (A25-P03). Visual Programming Lab's LabControls moves nodes."
+   "notes": "ExperiencePresenter, ExperienceControl and ParameterPanel exist (ShellRenderingTests, ExperienceActionTests, ParameterPanelTests); reorder, enable and disable and the recompiled preview are G-EDIT (A25-P03). Visual Programming Lab's LabControls moves nodes. A25-P03 (feature 182): compare shows the untouched source while on and the result while off; a preset library keeps up to 24 named chains as versioned files in the experience's storage, lists damaged, newer and oversized files as unreadable without deleting them and opens a preset as one undoable edit (ChainEdit.replace); every node has named accessibility actions (move, turn on or off, raise or lower each value); an audit of every drawn pass found none reading its output or writing the source (CompareTests, PresetLibraryTests, PresetPresenterTests, AliasingTests, AccessibilityActionTests) (G-EDIT, G-COMPARE, G-PRESETS closed). The later gaps follow the manual's phase gates: G-IMPORT and U-RGBAUPLOAD in A25-P04 (image import), G-EXPORT in A25-P05 (still export)."
   },
   {
    "id": "M09",
    "capability": "Version 0.1 feature 03: a before and after compare and preset saves",
    "source": "manual \u00a72 feature 03; spec FR-A25-002",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
@@ -625,10 +625,10 @@
     }
    ],
    "example": {
-    "file": "Packages/ExperiencesCreative/ShaderStudio/Experience/TexturedPreview.swift",
-    "symbol": "TexturedPreview"
+    "file": "Packages/ExperiencesCreative/EffectsComposer/Experience/PreviewRenderer.swift",
+    "symbol": "PreviewRenderer"
    },
-   "notes": "Targets and storage exist (ResourceRegistryTests, DocumentStoreTests); keeping the untouched source and showing it is G-COMPARE (A25-P03); the preset envelope is G-PRESETS (A25-P04)."
+   "notes": "Targets and storage exist (ResourceRegistryTests, DocumentStoreTests); keeping the untouched source and showing it is G-COMPARE (A25-P03); the preset envelope is G-PRESETS (A25-P04). A25-P03 (feature 182): compare shows the untouched source while on and the result while off; a preset library keeps up to 24 named chains as versioned files in the experience's storage, lists damaged, newer and oversized files as unreadable without deleting them and opens a preset as one undoable edit (ChainEdit.replace); every node has named accessibility actions (move, turn on or off, raise or lower each value); an audit of every drawn pass found none reading its output or writing the source (CompareTests, PresetLibraryTests, PresetPresenterTests, AliasingTests, AccessibilityActionTests) (G-EDIT, G-COMPARE, G-PRESETS closed). The later gaps follow the manual's phase gates: G-IMPORT and U-RGBAUPLOAD in A25-P04 (image import), G-EXPORT in A25-P05 (still export)."
   },
   {
    "id": "M10",
@@ -954,7 +954,7 @@
    "id": "M18",
    "capability": "Reorder, enable and disable with an immediate preview",
    "source": "spec FR-A25-003; manual \u00a72 feature 02",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
@@ -976,16 +976,16 @@
     }
    ],
    "example": {
-    "file": "Packages/ExperiencesCreative/VisualProgrammingLab/Experience/LabControls.swift",
-    "symbol": "LabControls"
+    "file": "Packages/ExperiencesCreative/EffectsComposer/Experience/ECControls.swift",
+    "symbol": "ComposerLabels"
    },
-   "notes": "ShellRenderingTests, ExperienceActionTests, ParameterPanelTests. The edit operations, their accessible alternatives and the recompile on edit are G-EDIT (A25-P03)."
+   "notes": "ShellRenderingTests, ExperienceActionTests, ParameterPanelTests. The edit operations, their accessible alternatives and the recompile on edit are G-EDIT (A25-P03). A25-P03 (feature 182): compare shows the untouched source while on and the result while off; a preset library keeps up to 24 named chains as versioned files in the experience's storage, lists damaged, newer and oversized files as unreadable without deleting them and opens a preset as one undoable edit (ChainEdit.replace); every node has named accessibility actions (move, turn on or off, raise or lower each value); an audit of every drawn pass found none reading its output or writing the source (CompareTests, PresetLibraryTests, PresetPresenterTests, AliasingTests, AccessibilityActionTests) (G-EDIT, G-COMPARE, G-PRESETS closed). The later gaps follow the manual's phase gates: G-IMPORT and U-RGBAUPLOAD in A25-P04 (image import), G-EXPORT in A25-P05 (still export)."
   },
   {
    "id": "M19",
    "capability": "A before and after compare that keeps the untouched source",
    "source": "spec FR-A25-003; manual \u00a72 feature 03",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
@@ -1007,16 +1007,16 @@
     }
    ],
    "example": {
-    "file": "Packages/ExperiencesCreative/ShaderStudio/Experience/TexturedPreview.swift",
-    "symbol": "TexturedPreview"
+    "file": "Packages/ExperiencesCreative/EffectsComposer/Experience/PreviewRenderer.swift",
+    "symbol": "PreviewRenderer"
    },
-   "notes": "ResourceRegistryTests, FieldPassTests. Keeping the source target untouched and showing it beside or in place of the result is G-COMPARE (A25-P03)."
+   "notes": "ResourceRegistryTests, FieldPassTests. Keeping the source target untouched and showing it beside or in place of the result is G-COMPARE (A25-P03). A25-P03 (feature 182): compare shows the untouched source while on and the result while off; a preset library keeps up to 24 named chains as versioned files in the experience's storage, lists damaged, newer and oversized files as unreadable without deleting them and opens a preset as one undoable edit (ChainEdit.replace); every node has named accessibility actions (move, turn on or off, raise or lower each value); an audit of every drawn pass found none reading its output or writing the source (CompareTests, PresetLibraryTests, PresetPresenterTests, AliasingTests, AccessibilityActionTests) (G-EDIT, G-COMPARE, G-PRESETS closed). The later gaps follow the manual's phase gates: G-IMPORT and U-RGBAUPLOAD in A25-P04 (image import), G-EXPORT in A25-P05 (still export)."
   },
   {
    "id": "M20",
    "capability": "Preset storage with versioned files; damaged and newer files refused and never deleted automatically",
    "source": "spec FR-A25-003; clarification Q4",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
@@ -1044,10 +1044,10 @@
     }
    ],
    "example": {
-    "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Core/CompositionLibrary.swift",
-    "symbol": "CompositionLibrary"
+    "file": "Packages/ExperiencesCreative/EffectsComposer/Experience/PresetLibrary.swift",
+    "symbol": "PresetLibrary"
    },
-   "notes": "ExperienceStorageTests, DocumentStoreTests. The preset envelope, its version, non-finite refusal and the no-automatic-deletion rule are G-PRESETS (A25-P04)."
+   "notes": "ExperienceStorageTests, DocumentStoreTests. The preset envelope, its version, non-finite refusal and the no-automatic-deletion rule are G-PRESETS (A25-P04). A25-P03 (feature 182): compare shows the untouched source while on and the result while off; a preset library keeps up to 24 named chains as versioned files in the experience's storage, lists damaged, newer and oversized files as unreadable without deleting them and opens a preset as one undoable edit (ChainEdit.replace); every node has named accessibility actions (move, turn on or off, raise or lower each value); an audit of every drawn pass found none reading its output or writing the source (CompareTests, PresetLibraryTests, PresetPresenterTests, AliasingTests, AccessibilityActionTests) (G-EDIT, G-COMPARE, G-PRESETS closed). The later gaps follow the manual's phase gates: G-IMPORT and U-RGBAUPLOAD in A25-P04 (image import), G-EXPORT in A25-P05 (still export)."
   },
   {
    "id": "M21",
@@ -1709,7 +1709,7 @@
    "justification": "Reorder, enable and disable with an immediate recompiled preview, with accessible non-drag alternatives, are the experience's editing interface.",
    "phase": 3,
    "test": "Core tests: reorder, enable and disable produce the expected chain and are undoable; experience tests: an edit recompiles and redraws within one frame, and VoiceOver move actions reorder without drag.",
-   "closed": null
+   "closed": "A25-P03"
   },
   {
    "id": "G-COMPARE",
@@ -1722,7 +1722,7 @@
    "justification": "The before and after compare keeps the decoded source target untouched and shows it beside or instead of the result; the compare mode is the experience's interface.",
    "phase": 3,
    "test": "Experience test: with compare on, the shown pixels equal the source's; the source target is never a pass output in any plan (Core plan check).",
-   "closed": null
+   "closed": "A25-P03"
   },
   {
    "id": "G-IMPORT",
@@ -1733,7 +1733,7 @@
    "kind": "adaptation",
    "owner": "app-local",
    "justification": "The system photo picker (SwiftUI system API, out of process, no permission or usage string), ImageIO decoding into RGBA bytes on the CPU scaled so the longer edge is at most the smaller of RenderCapabilities.maxTextureSize and the experience's cap, kept for re-upload after context loss, and the cancelled-pick fallback to the built-in test image (clarification Q2). No other experience imports images.",
-   "phase": 3,
+   "phase": 4,
    "test": "Experience tests with generated image fixtures: an image above the limit is scaled to the stated edge, a damaged file is refused with a named reason, a cancelled pick keeps the built-in test image, and the kept bytes re-upload after recreateContext.",
    "closed": null
   },
@@ -1746,7 +1746,7 @@
    "kind": "upstream",
    "owner": "VisualCore:VisualCoreRendering",
    "justification": "An additive, public byte-wise RenderTarget.upload(rgba:) in VisualCoreRendering, because Texture.upload(rgba:) fills a Texture that FieldPass cannot sample and upload(rgbaFloats:) needs four floats per pixel, quadrupling the CPU memory of a large image (clarification Q2). Generic: any experience that feeds bytes into a pass input can use it.",
-   "phase": 3,
+   "phase": 4,
    "test": "VisualCoreRendering tests: bytes uploaded into an rgba8 and an rgba16f target read back equal (or within half-float tolerance); a wrong-length array and a stale target are refused; with /// docs, the API baseline update and the seven-step reference regression in two chunks.",
    "closed": null
   },
@@ -1759,9 +1759,9 @@
    "kind": "adaptation",
    "owner": "app-local",
    "justification": "Presets are versioned envelopes in ExperienceStorage over MigrationChain and DocumentStore; damaged, newer and non-finite files are refused and never deleted automatically (clarification Q4). The preset format is the experience's.",
-   "phase": 4,
+   "phase": 3,
    "test": "Core and experience tests: a preset round-trips; truncated, newer, wrong-kind, oversize and NaN files are refused with a named reason and left on disk; a saved preset reloads the same chain.",
-   "closed": null
+   "closed": "A25-P03"
   },
   {
    "id": "G-EXPORT",
@@ -1772,7 +1772,7 @@
    "kind": "adaptation",
    "owner": "app-local",
    "justification": "Export renders the chain at the export size into a pooled target, reads it back, encodes it with StillImageEncoder after a size and format check against ExportGeometry and StillImageEncoder.isAvailable, and hands the file to a Transferable and ShareLink the person opens, after Living Wallpapers (clarification Q4). No shared still-export Transferable exists.",
-   "phase": 4,
+   "phase": 5,
    "test": "Experience tests: an export at a valid size produces a decodable PNG, JPEG or HEIC of that size tagged sRGB; sizes over the edge or pixel cap and unavailable formats are refused before rendering; the temporary file is removed after the share.",
    "closed": null
   },
@@ -1869,7 +1869,7 @@
     "M20"
    ],
    "phases": [
-    4
+    3
    ]
   },
   {
@@ -1880,7 +1880,7 @@
     "M37"
    ],
    "phases": [
-    4
+    5
    ]
   },
   {
@@ -1903,6 +1903,7 @@
     "M18"
    ],
    "phases": [
+    2,
     3
    ]
   },
@@ -1914,8 +1915,7 @@
     "M20"
    ],
    "phases": [
-    3,
-    4
+    3
    ]
   },
   {
@@ -1927,7 +1927,7 @@
     "M31"
    ],
    "phases": [
-    3
+    4
    ]
   },
   {
@@ -1938,7 +1938,6 @@
     "M23"
    ],
    "phases": [
-    4,
     5
    ]
   },

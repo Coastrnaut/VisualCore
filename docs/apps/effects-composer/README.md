@@ -29,6 +29,11 @@ result (`Core/PassPlan.swift`) and draws a live preview of a 256 × 256 picture 
 (`Experience/PreviewRenderer.swift`); every edit can be undone, a disabled effect changes nothing, and a broken effect
 program is named with its line while the last good picture stays.
 
+Editing, compare and presets (A25-P03): compare shows the untouched picture; up to 24 named looks are kept as versioned
+files in the experience's own storage (`Experience/PresetLibrary.swift`), unreadable files are listed and never deleted
+automatically, and opening a look is one undoable edit; every effect can be moved, switched and tuned with named
+accessibility actions, without dragging. Image import follows in A25-P04 and still export in A25-P05.
+
 | Document | Content |
 |---|---|
 | [visualcore-contract.json](visualcore-contract.json) / [.md](visualcore-contract.md) | Phase 00 inventory, capability matrix, gaps, decision (checked by `scripts/check_app_contract.py`) |
