@@ -86,7 +86,7 @@
   - `xcodegen generate --spec project.yml`, then `--name app-unit -- python3 scripts/release_check.py --only
     app-build-for-testing-ios27 app-unit-ios27`;
   - `--name verify-27 -- python3 scripts/verify_experiences.py --only a24.graphics-benchmark-lab --runtime 27`.
-- [ ] T-A24-215 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+- [X] T-A24-215 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record — Verified 2026-11-19: 2026-11-19: converge round 1 appended T-A24-216 and 217, round 2 nothing; .autonomy/evidence/A24-P02.json sealed, VERIFIED-GATE A24-P02 (174 of 263); post-record pipeline, validate_autocreator, validate_docs, build_catalog --check PASS; README and docs/automatedtesting.md updated
   A24-P02; update README.md (rule 16) and `docs/automatedtesting.md` (rule 17)
 
 ## Dependencies
