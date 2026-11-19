@@ -34,7 +34,7 @@
   over `FieldPass`, render targets and `ParticleRenderer`, built from a validated `BenchmarkCase`, refusing a case
   over `ResourceRegistry.maxTextureSize` before allocation; setup, draw(frame n), resize and release; no GL call of
   their own
-- [ ] T-A24-206 [US1] Write `ExperienceTests/{BenchTestSupport,WorkloadDrawTests}.swift` (SC-A24-201): for each case,
+- [X] T-A24-206 [US1] Write `ExperienceTests/{BenchTestSupport,WorkloadDrawTests}.swift` (SC-A24-201): for each case, — Verified 2026-11-19: 2026-11-19: .autonomy/checks/A24-P02.gbl-ios27.json exit 0 (50 core and 33 experience tests on sim-27.2); WorkloadDrawTests: each case non-blank (luma spread >= 16), frames 0 and 60 differ, byte-identical across two hosts; over-limit and 2048 refused with the level unchanged
   frames 0 and 60 drawn off screen are not blank ("luma spans at least 16 of 255"), differ from each other, and are
   byte-identical across two hosts; a case over the limit allocates nothing
 
