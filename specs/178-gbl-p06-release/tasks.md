@@ -103,3 +103,8 @@
 - **Then:** recovery and samples, copy and checklist, the journey, and the evidence.
 - **Review checkpoint:** at 611.
 - **Commits:** one per task.
+
+## Phase 7: Convergence
+
+- [ ] T-A24-614 Make `GBLReleaseUITests`'s selection check use the selected trait only (`isSelected`, no accessibility
+  value fallback) and rerun chunk `f3`, per clarification Q5 (partial)
