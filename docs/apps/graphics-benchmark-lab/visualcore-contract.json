@@ -201,7 +201,7 @@
    "id": "M01",
    "capability": "GPU timing: elapsed GPU time per measured frame, shown only where a supported timer query confirms non-disjoint results",
    "source": "brainstorm: GPU timing; manual \u00a76 capability audit; spec FR-A24-002",
-   "status": "upstream gap",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderCapabilities.swift",
@@ -214,19 +214,31 @@
      "symbol": "RenderHost.capabilities",
      "product": "VisualCoreRendering",
      "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUFrameTimer.swift",
+     "symbol": "GPUFrameTimer",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUFrameTimer.swift",
+     "symbol": "GPUFrameTime",
+     "product": "VisualCoreRendering",
+     "public": true
     }
    ],
    "example": {
-    "file": "Packages/ExperiencesCreative/Aurora/Experience/AuroraPresenter.swift",
-    "symbol": "AuroraPresenter"
+    "file": "Packages/ExperiencesCreative/GraphicsBenchmarkLab/Experience/BenchPresenter.swift",
+    "symbol": "BenchPresenter"
    },
-   "notes": "No GPU timer exists in any framework product (grep 2026-11-19): no GL_EXT_disjoint_timer_query binding, no 64-bit query result (GL_TIME_ELAPSED_EXT, glGetQueryObjectui64vEXT) and no GL_GPU_DISJOINT_EXT check; the core ES 3.0 query calls (vcglGenQueries and friends) exist only in the internal CVisualCoreGL shim (Packages/VisualCoreRendering/Sources/CVisualCoreGL), which is no product and is never linked by an experience (research D6). RenderCapabilities.extensions holds the renderer's extension list, read on RenderHost.capabilities, so a capability probe can look for the extension (RenderCapabilitiesProbeTests). U-GPUTIMER (A24-P03, clarification Q1): built only if the probe finds the extension on the iOS 27.2 simulator; otherwise closed as not supported, the lab shows \"GPU time not available on this device\" and never labels a CPU time as GPU time. Aurora is the closest consumer (it reads RenderCapabilities precision)."
+   "notes": "No GPU timer exists in any framework product (grep 2026-11-19): no GL_EXT_disjoint_timer_query binding, no 64-bit query result (GL_TIME_ELAPSED_EXT, glGetQueryObjectui64vEXT) and no GL_GPU_DISJOINT_EXT check; the core ES 3.0 query calls (vcglGenQueries and friends) exist only in the internal CVisualCoreGL shim (Packages/VisualCoreRendering/Sources/CVisualCoreGL), which is no product and is never linked by an experience (research D6). RenderCapabilities.extensions holds the renderer's extension list, read on RenderHost.capabilities, so a capability probe can look for the extension (RenderCapabilitiesProbeTests). U-GPUTIMER (A24-P03, clarification Q1): built only if the probe finds the extension on the iOS 27.2 simulator; otherwise closed as not supported, the lab shows \"GPU time not available on this device\" and never labels a CPU time as GPU time. Aurora is the closest consumer (it reads RenderCapabilities precision). A24-P03 (feature 175): the runner measures only measurement-phase frames (warm-up and cool-down excluded and counted), stops at the next frame, ends as interrupted on a stall, resize or rebuild and flags a frame dropped above 25 ms; ResourceRegistry.renderCapabilities gives every scene callback the renderer's facts; the probe finds GL_EXT_disjoint_timer_query on the iOS 27.2 simulator and GPUFrameTimer (VisualCoreRendering, ring of 4 elapsed-time queries, no result from a disjoint or unavailable query) times each measured frame (simulator values, not device evidence); a finished run carries a RunReport from public sources in run file version 2 (RegistryCapabilitiesTests, GPUFrameTimerTests, GPUTimingTests, ReportTests, RecorderTests; reference regression 7 of 7) (G-RUNNER, G-REPORT, U-RENDERINFO, U-GPUTIMER closed)."
   },
   {
    "id": "M02",
    "capability": "Diagnostics: frame pacing, per-run performance record, resource statistics, render lifecycle and memory footprint",
    "source": "brainstorm: diagnostics; spec FR-A24-002",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/PacingMeter.swift",
@@ -266,16 +278,16 @@
     }
    ],
    "example": {
-    "file": "Apps/VisualCore/App/SettingsView.swift",
-    "symbol": "SettingsView"
+    "file": "Packages/ExperiencesCreative/GraphicsBenchmarkLab/Experience/BenchPresenter.swift",
+    "symbol": "BenchPresenter"
    },
-   "notes": "All public and tested (PacingMeterTests, PerformanceRecordTests, ResourceRegistryTests, RenderLifecycleTests, SessionPerformanceTests). They describe the session, not a benchmark run: PacingMeter rounds intervals to 0.25 ms bins (binWidth) and keeps its percentile function private, so it stays the session's pacing record and is not used for results (clarification Q3). The run's own samples, counts and quality flags are G-STATS and G-RUNNER. The app's Settings shows the session's PerformanceRecord."
+   "notes": "All public and tested (PacingMeterTests, PerformanceRecordTests, ResourceRegistryTests, RenderLifecycleTests, SessionPerformanceTests). They describe the session, not a benchmark run: PacingMeter rounds intervals to 0.25 ms bins (binWidth) and keeps its percentile function private, so it stays the session's pacing record and is not used for results (clarification Q3). The run's own samples, counts and quality flags are G-STATS and G-RUNNER. The app's Settings shows the session's PerformanceRecord. A24-P03 (feature 175): the runner measures only measurement-phase frames (warm-up and cool-down excluded and counted), stops at the next frame, ends as interrupted on a stall, resize or rebuild and flags a frame dropped above 25 ms; ResourceRegistry.renderCapabilities gives every scene callback the renderer's facts; the probe finds GL_EXT_disjoint_timer_query on the iOS 27.2 simulator and GPUFrameTimer (VisualCoreRendering, ring of 4 elapsed-time queries, no result from a disjoint or unavailable query) times each measured frame (simulator values, not device evidence); a finished run carries a RunReport from public sources in run file version 2 (RegistryCapabilitiesTests, GPUFrameTimerTests, GPUTimingTests, ReportTests, RecorderTests; reference regression 7 of 7) (G-RUNNER, G-REPORT, U-RENDERINFO, U-GPUTIMER closed)."
   },
   {
    "id": "M03",
    "capability": "Profiling: frame intervals and CPU submit time captured per frame during a measured phase",
    "source": "brainstorm: profiling; spec FR-A24-002",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
@@ -303,10 +315,10 @@
     }
    ],
    "example": {
-    "file": "Packages/ExperiencesCreative/LivingWallpapers/Experience/WallpaperPresenter.swift",
-    "symbol": "WallpaperPresenter"
+    "file": "Packages/ExperiencesCreative/GraphicsBenchmarkLab/Experience/BenchPresenter.swift",
+    "symbol": "BenchPresenter"
    },
-   "notes": "FrameInfo.time is seconds since the host started rendering, monotonic per frame; delta is clamped to 0\u20260.1 s (FramePacing.clampedDelta) and is never used for results. PresentedFrame and addPresentObserver report presentations to the host's owner (RenderHostTests, FrameCapTests). No per-frame CPU submit timer exists: the presenter measures its own draw calls with a monotonic clock (G-RUNNER, A24-P03)."
+   "notes": "FrameInfo.time is seconds since the host started rendering, monotonic per frame; delta is clamped to 0\u20260.1 s (FramePacing.clampedDelta) and is never used for results. PresentedFrame and addPresentObserver report presentations to the host's owner (RenderHostTests, FrameCapTests). No per-frame CPU submit timer exists: the presenter measures its own draw calls with a monotonic clock (G-RUNNER, A24-P03). A24-P03 (feature 175): the runner measures only measurement-phase frames (warm-up and cool-down excluded and counted), stops at the next frame, ends as interrupted on a stall, resize or rebuild and flags a frame dropped above 25 ms; ResourceRegistry.renderCapabilities gives every scene callback the renderer's facts; the probe finds GL_EXT_disjoint_timer_query on the iOS 27.2 simulator and GPUFrameTimer (VisualCoreRendering, ring of 4 elapsed-time queries, no result from a disjoint or unavailable query) times each measured frame (simulator values, not device evidence); a finished run carries a RunReport from public sources in run file version 2 (RegistryCapabilitiesTests, GPUFrameTimerTests, GPUTimingTests, ReportTests, RecorderTests; reference regression 7 of 7) (G-RUNNER, G-REPORT, U-RENDERINFO, U-GPUTIMER closed)."
   },
   {
    "id": "M04",
@@ -349,7 +361,7 @@
    "id": "M05",
    "capability": "Device and configuration reporting: device, OS, build, renderer, quality tier and thermal context recorded with a result",
    "source": "brainstorm: device and configuration reporting; spec FR-A24-002",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/DeviceConditions.swift",
@@ -374,13 +386,19 @@
      "symbol": "QualityLevel",
      "product": "VisualCoreDiagnostics",
      "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+     "symbol": "ResourceRegistry.renderCapabilities",
+     "product": "VisualCoreRendering",
+     "public": true
     }
    ],
    "example": {
-    "file": "Packages/ExperiencesCreative/ParticleUniverse/Core/SceneQuality.swift",
-    "symbol": "SceneQuality"
+    "file": "Packages/ExperiencesCreative/GraphicsBenchmarkLab/Experience/ReportSource.swift",
+    "symbol": "ReportSource"
    },
-   "notes": "DeviceConditions.current() reads thermal state and Low Power Mode from ProcessInfo (FramePacingTests, QualityGovernorTests); RenderCapabilities (RenderCapabilitiesProbeTests) and the pure RendererRecord (RendererRecordTests, no extension list) describe the renderer. No public device, OS and build reporter exists (the only one, in VisualCoreAutomation's AutomationRunner, is internal and debug-only), nor the ANGLE build at run time or the display's refresh rate. The report is G-REPORT; the renderer facts reach a presenter only through U-RENDERINFO (A24-P03)."
+   "notes": "DeviceConditions.current() reads thermal state and Low Power Mode from ProcessInfo (FramePacingTests, QualityGovernorTests); RenderCapabilities (RenderCapabilitiesProbeTests) and the pure RendererRecord (RendererRecordTests, no extension list) describe the renderer. No public device, OS and build reporter exists (the only one, in VisualCoreAutomation's AutomationRunner, is internal and debug-only), nor the ANGLE build at run time or the display's refresh rate. The report is G-REPORT; the renderer facts reach a presenter only through U-RENDERINFO (A24-P03). A24-P03 (feature 175): the runner measures only measurement-phase frames (warm-up and cool-down excluded and counted), stops at the next frame, ends as interrupted on a stall, resize or rebuild and flags a frame dropped above 25 ms; ResourceRegistry.renderCapabilities gives every scene callback the renderer's facts; the probe finds GL_EXT_disjoint_timer_query on the iOS 27.2 simulator and GPUFrameTimer (VisualCoreRendering, ring of 4 elapsed-time queries, no result from a disjoint or unavailable query) times each measured frame (simulator values, not device evidence); a finished run carries a RunReport from public sources in run file version 2 (RegistryCapabilitiesTests, GPUFrameTimerTests, GPUTimingTests, ReportTests, RecorderTests; reference regression 7 of 7) (G-RUNNER, G-REPORT, U-RENDERINFO, U-GPUTIMER closed)."
   },
   {
    "id": "M06",
@@ -423,7 +441,7 @@
    "id": "M07",
    "capability": "Version 0.1 feature 02: a warm-up, measurement and cool-down runner with a capped duration and an immediate stop",
    "source": "manual \u00a72 feature 02; spec FR-A24-002",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
@@ -451,16 +469,16 @@
     }
    ],
    "example": {
-    "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ScenarioRunner.swift",
-    "symbol": "ScenarioRunner"
+    "file": "Packages/ExperiencesCreative/GraphicsBenchmarkLab/Experience/BenchPresenter.swift",
+    "symbol": "BenchPresenter"
    },
-   "notes": "GrowthRule gives a growth verdict after a warm-up (GrowthRuleTests) and ScenarioRunner steps scripted phases for automation (ScenarioRunnerTests), but neither is a benchmark phase runner. Phases, duration caps, cool-down and stop are G-RUNNER (A24-P03)."
+   "notes": "GrowthRule gives a growth verdict after a warm-up (GrowthRuleTests) and ScenarioRunner steps scripted phases for automation (ScenarioRunnerTests), but neither is a benchmark phase runner. Phases, duration caps, cool-down and stop are G-RUNNER (A24-P03). A24-P03 (feature 175): the runner measures only measurement-phase frames (warm-up and cool-down excluded and counted), stops at the next frame, ends as interrupted on a stall, resize or rebuild and flags a frame dropped above 25 ms; ResourceRegistry.renderCapabilities gives every scene callback the renderer's facts; the probe finds GL_EXT_disjoint_timer_query on the iOS 27.2 simulator and GPUFrameTimer (VisualCoreRendering, ring of 4 elapsed-time queries, no result from a disjoint or unavailable query) times each measured frame (simulator values, not device evidence); a finished run carries a RunReport from public sources in run file version 2 (RegistryCapabilitiesTests, GPUFrameTimerTests, GPUTimingTests, ReportTests, RecorderTests; reference regression 7 of 7) (G-RUNNER, G-REPORT, U-RENDERINFO, U-GPUTIMER closed)."
   },
   {
    "id": "M08",
    "capability": "Version 0.1 feature 03: frame-time percentiles, CPU submit time and an optional GPU timer",
    "source": "manual \u00a72 feature 03; spec FR-A24-002",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
@@ -485,19 +503,31 @@
      "symbol": "RenderCapabilities.extensions",
      "product": "VisualCoreRendering",
      "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUFrameTimer.swift",
+     "symbol": "GPUFrameTimer",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUFrameTimer.swift",
+     "symbol": "GPUFrameTime",
+     "product": "VisualCoreRendering",
+     "public": true
     }
    ],
    "example": {
-    "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
-    "symbol": "ExperienceSession"
+    "file": "Packages/ExperiencesCreative/GraphicsBenchmarkLab/Experience/BenchPresenter.swift",
+    "symbol": "BenchPresenter"
    },
-   "notes": "PacingSummary reports median, p95 and p99 rounded to 0.25 ms bins (PacingMeterTests); results need exact nearest-rank percentiles over raw intervals with the warm-up excluded (G-STATS, A24-P01), CPU submit time around the presenter's draw calls (G-RUNNER) and a GPU timer only where supported (U-GPUTIMER). ExperienceSession feeds its PacingMeter from presented frames."
+   "notes": "PacingSummary reports median, p95 and p99 rounded to 0.25 ms bins (PacingMeterTests); results need exact nearest-rank percentiles over raw intervals with the warm-up excluded (G-STATS, A24-P01), CPU submit time around the presenter's draw calls (G-RUNNER) and a GPU timer only where supported (U-GPUTIMER). ExperienceSession feeds its PacingMeter from presented frames. A24-P03 (feature 175): the runner measures only measurement-phase frames (warm-up and cool-down excluded and counted), stops at the next frame, ends as interrupted on a stall, resize or rebuild and flags a frame dropped above 25 ms; ResourceRegistry.renderCapabilities gives every scene callback the renderer's facts; the probe finds GL_EXT_disjoint_timer_query on the iOS 27.2 simulator and GPUFrameTimer (VisualCoreRendering, ring of 4 elapsed-time queries, no result from a disjoint or unavailable query) times each measured frame (simulator values, not device evidence); a finished run carries a RunReport from public sources in run file version 2 (RegistryCapabilitiesTests, GPUFrameTimerTests, GPUTimingTests, ReportTests, RecorderTests; reference regression 7 of 7) (G-RUNNER, G-REPORT, U-RENDERINFO, U-GPUTIMER closed)."
   },
   {
    "id": "M09",
    "capability": "Version 0.1 feature 04: a device, OS, build, quality-tier and thermal-context report",
    "source": "manual \u00a72 feature 04; spec FR-A24-002",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/DeviceConditions.swift",
@@ -522,13 +552,19 @@
      "symbol": "RendererRecord",
      "product": "VisualCoreExperience",
      "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+     "symbol": "ResourceRegistry.renderCapabilities",
+     "product": "VisualCoreRendering",
+     "public": true
     }
    ],
    "example": {
-    "file": "Packages/ExperiencesCreative/ParticleUniverse/Core/SceneQuality.swift",
-    "symbol": "SceneQuality"
+    "file": "Packages/ExperiencesCreative/GraphicsBenchmarkLab/Experience/ReportSource.swift",
+    "symbol": "ReportSource"
    },
-   "notes": "Thermal state, Low Power Mode and quality tiers are public and tested (FramePacingTests, QualityDeclarationTests, RendererRecordTests); the machine identifier from uname, ProcessInfo.operatingSystemVersion and the bundle's version and build are read app-locally (G-REPORT, clarification Q5); renderer strings come with U-RENDERINFO. No private identifier is used."
+   "notes": "Thermal state, Low Power Mode and quality tiers are public and tested (FramePacingTests, QualityDeclarationTests, RendererRecordTests); the machine identifier from uname, ProcessInfo.operatingSystemVersion and the bundle's version and build are read app-locally (G-REPORT, clarification Q5); renderer strings come with U-RENDERINFO. No private identifier is used. A24-P03 (feature 175): the runner measures only measurement-phase frames (warm-up and cool-down excluded and counted), stops at the next frame, ends as interrupted on a stall, resize or rebuild and flags a frame dropped above 25 ms; ResourceRegistry.renderCapabilities gives every scene callback the renderer's facts; the probe finds GL_EXT_disjoint_timer_query on the iOS 27.2 simulator and GPUFrameTimer (VisualCoreRendering, ring of 4 elapsed-time queries, no result from a disjoint or unavailable query) times each measured frame (simulator values, not device evidence); a finished run carries a RunReport from public sources in run file version 2 (RegistryCapabilitiesTests, GPUFrameTimerTests, GPUTimingTests, ReportTests, RecorderTests; reference regression 7 of 7) (G-RUNNER, G-REPORT, U-RENDERINFO, U-GPUTIMER closed)."
   },
   {
    "id": "M10",
@@ -683,7 +719,7 @@
    "id": "M15",
    "capability": "Run phases (warm-up, measurement, cool-down), a capped duration and an immediate stop",
    "source": "spec FR-A24-003 area 4; manual \u00a713 risk 3",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
@@ -705,16 +741,16 @@
     }
    ],
    "example": {
-    "file": "Packages/ExperiencesCreative/VisualProgrammingLab/Experience/LabPresenter.swift",
-    "symbol": "LabPresenter"
+    "file": "Packages/ExperiencesCreative/GraphicsBenchmarkLab/Experience/BenchPresenter.swift",
+    "symbol": "BenchPresenter"
    },
-   "notes": "The session pauses and resumes the host (SessionOpenCloseTests, RenderHostTests); no benchmark phase machine, cap or cool-down exists. G-RUNNER (A24-P03)."
+   "notes": "The session pauses and resumes the host (SessionOpenCloseTests, RenderHostTests); no benchmark phase machine, cap or cool-down exists. G-RUNNER (A24-P03). A24-P03 (feature 175): the runner measures only measurement-phase frames (warm-up and cool-down excluded and counted), stops at the next frame, ends as interrupted on a stall, resize or rebuild and flags a frame dropped above 25 ms; ResourceRegistry.renderCapabilities gives every scene callback the renderer's facts; the probe finds GL_EXT_disjoint_timer_query on the iOS 27.2 simulator and GPUFrameTimer (VisualCoreRendering, ring of 4 elapsed-time queries, no result from a disjoint or unavailable query) times each measured frame (simulator values, not device evidence); a finished run carries a RunReport from public sources in run file version 2 (RegistryCapabilitiesTests, GPUFrameTimerTests, GPUTimingTests, ReportTests, RecorderTests; reference regression 7 of 7) (G-RUNNER, G-REPORT, U-RENDERINFO, U-GPUTIMER closed)."
   },
   {
    "id": "M16",
    "capability": "Frame-time and CPU submit-time capture from a monotonic clock",
    "source": "spec FR-A24-003 area 5",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
@@ -742,35 +778,47 @@
     }
    ],
    "example": {
-    "file": "Packages/ExperiencesCreative/LivingWallpapers/Experience/WallpaperPresenter.swift",
-    "symbol": "WallpaperPresenter"
+    "file": "Packages/ExperiencesCreative/GraphicsBenchmarkLab/Experience/BenchPresenter.swift",
+    "symbol": "BenchPresenter"
    },
-   "notes": "Frame intervals come from consecutive FrameInfo.time values, never the clamped delta (clarification Q3; FrameCapTests, StillTimeTests); CPU submit time is measured app-locally around the presenter's own draw calls (G-RUNNER, A24-P03)."
+   "notes": "Frame intervals come from consecutive FrameInfo.time values, never the clamped delta (clarification Q3; FrameCapTests, StillTimeTests); CPU submit time is measured app-locally around the presenter's own draw calls (G-RUNNER, A24-P03). A24-P03 (feature 175): the runner measures only measurement-phase frames (warm-up and cool-down excluded and counted), stops at the next frame, ends as interrupted on a stall, resize or rebuild and flags a frame dropped above 25 ms; ResourceRegistry.renderCapabilities gives every scene callback the renderer's facts; the probe finds GL_EXT_disjoint_timer_query on the iOS 27.2 simulator and GPUFrameTimer (VisualCoreRendering, ring of 4 elapsed-time queries, no result from a disjoint or unavailable query) times each measured frame (simulator values, not device evidence); a finished run carries a RunReport from public sources in run file version 2 (RegistryCapabilitiesTests, GPUFrameTimerTests, GPUTimingTests, ReportTests, RecorderTests; reference regression 7 of 7) (G-RUNNER, G-REPORT, U-RENDERINFO, U-GPUTIMER closed)."
   },
   {
    "id": "M17",
    "capability": "A GPU timer only where supported, detected by a capability probe",
    "source": "spec FR-A24-003 area 6; manual \u00a713 risk 2",
-   "status": "upstream gap",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderCapabilities.swift",
      "symbol": "RenderCapabilities.extensions",
      "product": "VisualCoreRendering",
      "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUFrameTimer.swift",
+     "symbol": "GPUFrameTimer",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUFrameTimer.swift",
+     "symbol": "GPUFrameTime",
+     "product": "VisualCoreRendering",
+     "public": true
     }
    ],
    "example": {
-    "file": "Packages/ExperiencesCreative/Aurora/Experience/AuroraPresenter.swift",
-    "symbol": "AuroraPresenter"
+    "file": "Packages/ExperiencesCreative/GraphicsBenchmarkLab/Experience/BenchPresenter.swift",
+    "symbol": "BenchPresenter"
    },
-   "notes": "No GPU timer exists in any framework product (grep 2026-11-19): no GL_EXT_disjoint_timer_query binding, no 64-bit query result (GL_TIME_ELAPSED_EXT, glGetQueryObjectui64vEXT) and no GL_GPU_DISJOINT_EXT check; the core ES 3.0 query calls (vcglGenQueries and friends) exist only in the internal CVisualCoreGL shim (Packages/VisualCoreRendering/Sources/CVisualCoreGL), which is no product and is never linked by an experience (research D6). RenderCapabilities.extensions holds the renderer's extension list, read on RenderHost.capabilities, so a capability probe can look for the extension (RenderCapabilitiesProbeTests). U-GPUTIMER (A24-P03)."
+   "notes": "No GPU timer exists in any framework product (grep 2026-11-19): no GL_EXT_disjoint_timer_query binding, no 64-bit query result (GL_TIME_ELAPSED_EXT, glGetQueryObjectui64vEXT) and no GL_GPU_DISJOINT_EXT check; the core ES 3.0 query calls (vcglGenQueries and friends) exist only in the internal CVisualCoreGL shim (Packages/VisualCoreRendering/Sources/CVisualCoreGL), which is no product and is never linked by an experience (research D6). RenderCapabilities.extensions holds the renderer's extension list, read on RenderHost.capabilities, so a capability probe can look for the extension (RenderCapabilitiesProbeTests). U-GPUTIMER (A24-P03). A24-P03 (feature 175): the runner measures only measurement-phase frames (warm-up and cool-down excluded and counted), stops at the next frame, ends as interrupted on a stall, resize or rebuild and flags a frame dropped above 25 ms; ResourceRegistry.renderCapabilities gives every scene callback the renderer's facts; the probe finds GL_EXT_disjoint_timer_query on the iOS 27.2 simulator and GPUFrameTimer (VisualCoreRendering, ring of 4 elapsed-time queries, no result from a disjoint or unavailable query) times each measured frame (simulator values, not device evidence); a finished run carries a RunReport from public sources in run file version 2 (RegistryCapabilitiesTests, GPUFrameTimerTests, GPUTimingTests, ReportTests, RecorderTests; reference regression 7 of 7) (G-RUNNER, G-REPORT, U-RENDERINFO, U-GPUTIMER closed)."
   },
   {
    "id": "M18",
    "capability": "The renderer's facts (GL version, renderer string, extension list) reaching the experience without the host or the internal GL shim",
    "source": "spec FR-A24-003 area 7",
-   "status": "upstream gap",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
@@ -795,19 +843,25 @@
      "symbol": "RendererRecord",
      "product": "VisualCoreExperience",
      "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+     "symbol": "ResourceRegistry.renderCapabilities",
+     "product": "VisualCoreRendering",
+     "public": true
     }
    ],
    "example": {
-    "file": "Packages/ExperiencesCreative/FractalExplorer/Experience/ExplorerView.swift",
-    "symbol": "ExplorerModel"
+    "file": "Packages/ExperiencesCreative/GraphicsBenchmarkLab/Experience/BenchPresenter.swift",
+    "symbol": "BenchPresenter"
    },
-   "notes": "RenderHost.capabilities holds the facts (RenderCapabilitiesProbeTests), but a presenter receives a RenderContext (generation, pixel size, framebuffer, resources) that carries neither RenderCapabilities nor a RendererRecord. Fractal Explorer's view model reads host.capabilities for shader precision only. U-RENDERINFO (A24-P03, clarification Q2): a read-only copy for the presenter, with tests, docs, the API baseline and the reference regression; linking the internal shim is refused."
+   "notes": "RenderHost.capabilities holds the facts (RenderCapabilitiesProbeTests), but a presenter receives a RenderContext (generation, pixel size, framebuffer, resources) that carries neither RenderCapabilities nor a RendererRecord. Fractal Explorer's view model reads host.capabilities for shader precision only. U-RENDERINFO (A24-P03, clarification Q2): a read-only copy for the presenter, with tests, docs, the API baseline and the reference regression; linking the internal shim is refused. A24-P03 (feature 175): the runner measures only measurement-phase frames (warm-up and cool-down excluded and counted), stops at the next frame, ends as interrupted on a stall, resize or rebuild and flags a frame dropped above 25 ms; ResourceRegistry.renderCapabilities gives every scene callback the renderer's facts; the probe finds GL_EXT_disjoint_timer_query on the iOS 27.2 simulator and GPUFrameTimer (VisualCoreRendering, ring of 4 elapsed-time queries, no result from a disjoint or unavailable query) times each measured frame (simulator values, not device evidence); a finished run carries a RunReport from public sources in run file version 2 (RegistryCapabilitiesTests, GPUFrameTimerTests, GPUTimingTests, ReportTests, RecorderTests; reference regression 7 of 7) (G-RUNNER, G-REPORT, U-RENDERINFO, U-GPUTIMER closed)."
   },
   {
    "id": "M19",
    "capability": "Device, OS, build, quality-tier and thermal-context report from public APIs only",
    "source": "spec FR-A24-003 area 8; manual \u00a713 risk 1",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/DeviceConditions.swift",
@@ -835,10 +889,10 @@
     }
    ],
    "example": {
-    "file": "Packages/ExperiencesCreative/ParticleUniverse/Core/SceneQuality.swift",
-    "symbol": "SceneQuality"
+    "file": "Packages/ExperiencesCreative/GraphicsBenchmarkLab/Experience/ReportSource.swift",
+    "symbol": "ReportSource"
    },
-   "notes": "See M05 and M09 (FramePacingTests, QualityProfileTests). G-REPORT (A24-P03)."
+   "notes": "See M05 and M09 (FramePacingTests, QualityProfileTests). G-REPORT (A24-P03). A24-P03 (feature 175): the runner measures only measurement-phase frames (warm-up and cool-down excluded and counted), stops at the next frame, ends as interrupted on a stall, resize or rebuild and flags a frame dropped above 25 ms; ResourceRegistry.renderCapabilities gives every scene callback the renderer's facts; the probe finds GL_EXT_disjoint_timer_query on the iOS 27.2 simulator and GPUFrameTimer (VisualCoreRendering, ring of 4 elapsed-time queries, no result from a disjoint or unavailable query) times each measured frame (simulator values, not device evidence); a finished run carries a RunReport from public sources in run file version 2 (RegistryCapabilitiesTests, GPUFrameTimerTests, GPUTimingTests, ReportTests, RecorderTests; reference regression 7 of 7) (G-RUNNER, G-REPORT, U-RENDERINFO, U-GPUTIMER closed)."
   },
   {
    "id": "M20",
@@ -919,7 +973,7 @@
    "id": "M23",
    "capability": "Resize, orientation and context loss during a run: the run is marked interrupted and resources rebuilt from CPU state",
    "source": "spec FR-A24-003 area 12; spec edge cases",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
@@ -947,10 +1001,10 @@
     }
    ],
    "example": {
-    "file": "Packages/ExperiencesCreative/ParticleUniverse/Experience/ParticleStage.swift",
-    "symbol": "ParticleStage"
+    "file": "Packages/ExperiencesCreative/GraphicsBenchmarkLab/Experience/BenchPresenter.swift",
+    "symbol": "BenchPresenter"
    },
-   "notes": "Rebuild after loss and resize is available (M24, M25; RenderHostTests, ShellRenderingTests); marking a measured run interrupted and discarding its samples is G-RUNNER (A24-P03)."
+   "notes": "Rebuild after loss and resize is available (M24, M25; RenderHostTests, ShellRenderingTests); marking a measured run interrupted and discarding its samples is G-RUNNER (A24-P03). A24-P03 (feature 175): the runner measures only measurement-phase frames (warm-up and cool-down excluded and counted), stops at the next frame, ends as interrupted on a stall, resize or rebuild and flags a frame dropped above 25 ms; ResourceRegistry.renderCapabilities gives every scene callback the renderer's facts; the probe finds GL_EXT_disjoint_timer_query on the iOS 27.2 simulator and GPUFrameTimer (VisualCoreRendering, ring of 4 elapsed-time queries, no result from a disjoint or unavailable query) times each measured frame (simulator values, not device evidence); a finished run carries a RunReport from public sources in run file version 2 (RegistryCapabilitiesTests, GPUFrameTimerTests, GPUTimingTests, ReportTests, RecorderTests; reference regression 7 of 7) (G-RUNNER, G-REPORT, U-RENDERINFO, U-GPUTIMER closed)."
   },
   {
    "id": "M24",
@@ -1518,7 +1572,7 @@
    "justification": "The phase machine (warm-up, measurement, cool-down), duration caps, the immediate stop, frame intervals from consecutive FrameInfo.time values and CPU submit time from a monotonic clock around the presenter's draw calls; a run interrupted by context loss, resize or backgrounding is marked interrupted (clarifications Q3, Q5). App-local because only this experience runs benchmark phases.",
    "phase": 3,
    "test": "Core tests drive the phase machine with a fake clock (caps, stop, cool-down, interruption); experience tests prove intervals come from FrameInfo.time, a stop ends drawing within one frame and a context loss marks the run interrupted.",
-   "closed": null
+   "closed": "A24-P03"
   },
   {
    "id": "G-REPORT",
@@ -1532,7 +1586,7 @@
    "justification": "The device report uses public APIs only: the machine identifier from uname, ProcessInfo.operatingSystemVersion, the app's version and build from its bundle, DeviceConditions, the quality tier and the renderer strings from U-RENDERINFO; no private identifier (clarification Q5).",
    "phase": 3,
    "test": "Core tests encode and validate the report; an experience test proves every field comes from a public source and a source scan finds no private API or identifier.",
-   "closed": null
+   "closed": "A24-P03"
   },
   {
    "id": "U-RENDERINFO",
@@ -1546,7 +1600,7 @@
    "justification": "A presenter receives a RenderContext without the renderer's facts; the host gives the presenter a read-only copy of its RenderCapabilities (for example on RenderContext), additive and public (clarification Q2). Linking the internal GL shim from the experience is refused.",
    "phase": 3,
    "test": "VisualCoreRendering tests prove the presenter's copy equals RenderHost.capabilities and is refreshed after recreateContext; /// docs, the API baseline update and the seven-step reference regression in two chunks.",
-   "closed": null
+   "closed": "A24-P03"
   },
   {
    "id": "U-GPUTIMER",
@@ -1560,7 +1614,7 @@
    "justification": "Built only if the capability probe finds GL_EXT_disjoint_timer_query in the renderer's extension list on the iOS 27.2 simulator: then an additive, public timer query in VisualCoreRendering with the disjoint check (clarification Q1). Otherwise the gap closes as not supported, the lab shows \"GPU time not available on this device\" and GPU time is never shown. No timer code is written before the probe has run.",
    "phase": 3,
    "test": "The probe's result is recorded first; if supported, VisualCoreRendering tests prove non-disjoint 64-bit results for a known draw and refusal on disjoint, with docs, the API baseline and the reference regression; if not, an experience test proves the lab never shows a GPU time and never labels CPU time as GPU time.",
-   "closed": null
+   "closed": "A24-P03"
   },
   {
    "id": "G-RESULTS",

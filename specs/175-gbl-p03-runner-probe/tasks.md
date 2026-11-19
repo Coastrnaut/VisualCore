@@ -68,7 +68,7 @@
   reference chunks of quickstart.md) (SC-A24-305)
 - [X] T-A24-313 Review checkpoint: `--name gbl-ios27` (both A24 test targets on sim-27.2, each test under 10 s), the — Verified 2026-11-19: 2026-11-19: review checkpoint: .autonomy/checks/A24-P03.{gbl-ios27,documented-api,isolation,core-purity}.json exit 0 (each test well under 10 s)
   documented API, isolation and core purity
-- [ ] T-A24-314 Contract: G-RUNNER, G-REPORT, U-RENDERINFO and U-GPUTIMER closed by "A24-P03", rows whose gaps are all
+- [X] T-A24-314 Contract: G-RUNNER, G-REPORT, U-RENDERINFO and U-GPUTIMER closed by "A24-P03", rows whose gaps are all — Verified 2026-11-19: 2026-11-19: G-RUNNER, G-REPORT, U-RENDERINFO and U-GPUTIMER closed by A24-P03, 13 rows available (GPUFrameTimer and ResourceRegistry.renderCapabilities cited); .autonomy/checks/A24-P03.contract.json exit 0; README updated
   closed available (`--name contract`); the README of the experience updated
 - [ ] T-A24-315 The catalog, packages, script tests, app and runner: `--name catalog`, `experience-packages`,
   `script-tests`; `xcodegen generate --spec project.yml`, then `--name app-unit`; `--name verify-27`

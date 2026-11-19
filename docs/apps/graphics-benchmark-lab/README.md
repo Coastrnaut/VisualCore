@@ -23,6 +23,11 @@ nearest-rank statistics with quality flags (`Statistics.swift`) and the run file
 `a24.benchmark-run`, schema 1), tested in `CoreTests` against committed fixtures, and inside a running render host to
 prove that none of it creates a graphics resource.
 
+The runner (A24-P03) measures only measurement-phase frames and flags a frame dropped above 25 ms; a GPU time comes only
+from VisualCore's `GPUFrameTimer` where the renderer offers `GL_EXT_disjoint_timer_query` (it does on the iOS 27.2
+simulator; simulator values are not device evidence), and each finished run carries a report of its device, OS, build,
+renderer, tier, thermal state and timing sources from public APIs only (run file version 2).
+
 | Document | Content |
 |---|---|
 | [visualcore-contract.json](visualcore-contract.json) / [.md](visualcore-contract.md) | Phase 00 inventory, capability matrix, gaps, decision (checked by `scripts/check_app_contract.py`) |
