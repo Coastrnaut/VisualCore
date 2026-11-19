@@ -57,7 +57,7 @@
 ## Phase 6: Records and evidence
 
 - [X] T-A25-110 Write `Packages/ExperiencesCreative/EffectsComposer/CoreTests/HostCountTests.swift` per clarification Q5 (FR-A25-107, SC-A25-106) — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P01.ec-core-ios27.json exit 0 (35 tests in 8 suites on sim-27.2); HostCountTests: stats unchanged after definitions, edits, encoding and references inside the host
-- [ ] T-A25-111 Core tests on sim-27.2, as a review checkpoint (SC-A25-106, FR-A25-108):
+- [X] T-A25-111 Core tests on sim-27.2, as a review checkpoint (SC-A25-106, FR-A25-108): — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P01.{ec-core-ios27,core-purity,documented-api,isolation}.json exit 0; each test under 1 s
   - `--name ec-core-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme
     ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing EffectsComposerCoreTests`, with each
     test under 10 s;
