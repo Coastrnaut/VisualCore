@@ -25,7 +25,7 @@
   two blur targets) and `Packages/VisualCore/Sources/VisualCoreShaderSource/RenderState.swift`
   (`premultipliedBlended`), with `Packages/VisualCore/Tests/VisualCoreEffectsGraphTests/EmissiveSchemaTests.swift`
   (defaults, ranges, out-of-range and non-finite refused by the validator, estimate, existing schemas unchanged)
-- [ ] T-R02F07-004 Host checkpoint: `--name host -- swift test --package-path Packages/VisualCore`
+- [X] T-R02F07-004 Host checkpoint: `--name host -- swift test --package-path Packages/VisualCore` — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F07.host.json (exit 0)
 
 ## Phase 3: Stories 1, 2 and 4 — the pass (P1) 🎯
 
