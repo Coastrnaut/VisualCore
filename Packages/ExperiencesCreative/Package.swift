@@ -48,6 +48,7 @@ let package = Package(
         .library(name: "ShaderStudioExperience", targets: ["ShaderStudioExperience"]),
         // Feature 167 (A23-P02): Visual Programming Lab, a candidate until X-A23.
         .library(name: "VisualProgrammingLabExperience", targets: ["VisualProgrammingLabExperience"]),
+        .library(name: "GraphicsBenchmarkLabExperience", targets: ["GraphicsBenchmarkLabExperience"]),
         // The standalone ParticleUniverse app target compiles the moved sources and needs the Core until X-A04.
         .library(name: "ParticleUniverseCore", targets: ["ParticleUniverseCore"]),
     ],
@@ -760,16 +761,44 @@ let package = Package(
         // every fixture inside a running render host to prove that none of it creates a graphics resource.
         .target(name: "GraphicsBenchmarkLabCore",
                 dependencies: [.product(name: "VisualCoreExperience", package: visualCore),
-                               .product(name: "VisualCorePersistence", package: visualCore)],
+                               .product(name: "VisualCorePersistence", package: visualCore),
+                               .product(name: "VisualCoreMath", package: visualCore),
+                               .product(name: "VisualCoreSimulation", package: visualCore)],
                 path: "GraphicsBenchmarkLab/Core"),
         .testTarget(name: "GraphicsBenchmarkLabCoreTests",
                     dependencies: ["GraphicsBenchmarkLabCore",
                                    .product(name: "VisualCoreExperience", package: visualCore),
                                    .product(name: "VisualCorePersistence", package: visualCore),
+                                   .product(name: "VisualCoreMath", package: visualCore),
+                                   .product(name: "VisualCoreSimulation", package: visualCore),
                                    .product(name: "VisualCoreRendering", package: rendering)],
                     path: "GraphicsBenchmarkLab/CoreTests",
                     // The committed sample sets with their expected summaries.
                     resources: [.copy("Fixtures")]),
+        // A24 Graphics Benchmark Lab experience (feature 174, A24-P02): a candidate until X-A24. The three workloads are
+        // drawn through VisualCore's field passes and particle renderer; no GL call of its own.
+        .target(name: "GraphicsBenchmarkLabExperience",
+                dependencies: ["GraphicsBenchmarkLabCore",
+                               .product(name: "VisualCoreExperience", package: visualCore),
+                               .product(name: "VisualCorePersistence", package: visualCore),
+                               .product(name: "VisualCoreMath", package: visualCore),
+                               .product(name: "VisualCoreSimulation", package: visualCore),
+                               .product(name: "VisualCoreScenes", package: visualCore),
+                               .product(name: "VisualCoreRendering", package: rendering),
+                               .product(name: "VisualCoreExperienceHost", package: rendering),
+                               .product(name: "VisualCoreUI", package: rendering)],
+                path: "GraphicsBenchmarkLab/Experience"),
+        .testTarget(name: "GraphicsBenchmarkLabExperienceTests",
+                    dependencies: ["GraphicsBenchmarkLabExperience", "GraphicsBenchmarkLabCore",
+                                   .product(name: "VisualCoreExperience", package: visualCore),
+                                   .product(name: "VisualCorePersistence", package: visualCore),
+                                   .product(name: "VisualCoreMath", package: visualCore),
+                                   .product(name: "VisualCoreSimulation", package: visualCore),
+                               .product(name: "VisualCoreScenes", package: visualCore),
+                                   .product(name: "VisualCoreRendering", package: rendering),
+                                   .product(name: "VisualCoreExperienceHost", package: rendering),
+                                   .product(name: "VisualCoreUI", package: rendering)],
+                    path: "GraphicsBenchmarkLab/ExperienceTests"),
         // A21 Aurora (feature 152, A21-P01): a pending core until A21-P02 adds the experience. The core is pure (the
         // sky scene, presets, clock, noise port, reference and shader text); its tests draw the shader off screen.
         .target(name: "AuroraCore",
