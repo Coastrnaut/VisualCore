@@ -36,7 +36,7 @@
 
 ## Phase 3: Story 1 — readable without colour (P1) 🎯
 
-- [ ] T-R02F10-004 [US1] Create `Packages/VisualCore/Sources/VisualCoreParameters/CodedState.swift` (`ClueShape` 8 cases
+- [X] T-R02F10-004 [US1] Create `Packages/VisualCore/Sources/VisualCoreParameters/CodedState.swift` (`ClueShape` 8 cases — Verified 2026-11-19: 2026-11-19 R02-F10.host.json (exit 0; CodedStateTests 10 passed: empty/one/32 accepted, 33, shared clue, duplicates, blank/long names, NaN/out-of-range, Codable, shapes and patterns)
   Int 0…7, `CluePattern` 4 cases Int 0…3; `CodedState` id `^[a-z0-9-]{1,40}$`, colour sRGB 0…1, shape, pattern, name
   "1…40 characters after trimming", Codable schema 1; `CodedStateSet.maxStates = 32`, `init(_:) throws(ColorAccessError)`
   refusing repeated ids, repeated names, shared (shape, pattern) pairs, empty names, bad colours and more than 32;
