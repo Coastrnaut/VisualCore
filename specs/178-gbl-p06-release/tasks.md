@@ -65,7 +65,7 @@
 
 ## Phase 5: Story 4 — a first session in the app (P2)
 
-- [ ] T-A24-608 [P] [US4] Write `Apps/VisualCore/Tests/UI/GraphicsBenchmarkLab/GBLReleaseUITests.swift` per
+- [X] T-A24-608 [P] [US4] Write `Apps/VisualCore/Tests/UI/GraphicsBenchmarkLab/GBLReleaseUITests.swift` per — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A24-P06.app-ui.json exit 0 (chunk f3 3/3: GBLReleaseUITests and the two GBLRunUITests on the iOS 27.2 phone)
   clarification Q5, and add it to the chunk `f3` in `scripts/release_check.py` (lead) (FR-A24-607)
 
 ## Phase 6: Evidence
