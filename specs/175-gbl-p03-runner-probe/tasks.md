@@ -57,7 +57,7 @@
   (SC-A24-301–304): warm-up and cool-down excluded and counted; on the simulator a run records GPU times that are
   finite, non-negative and within 1,000 ms for measured frames only; with the seam, none and the flag; every report
   field filled; a 30 ms interval flagged dropped and counted
-- [ ] T-A24-311 Write and run `specs/175-gbl-p03-runner-probe/scan-identifiers.sh` (`--name scan-identifiers`): no
+- [X] T-A24-311 Write and run `specs/175-gbl-p03-runner-probe/scan-identifiers.sh` (`--name scan-identifiers`): no — Verified 2026-11-19: 2026-11-19: .autonomy/checks/A24-P03.scan-identifiers.json exit 0 (no identifier or private use in 38 Swift files)
   `identifierForVendor`, `advertisingIdentifier`, `UIDevice.current.name`, private framework or `dlopen` in
   `Packages/ExperiencesCreative/GraphicsBenchmarkLab` (SC-A24-304)
 
