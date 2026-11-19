@@ -15,7 +15,7 @@
 - [X] T-A25-302 [P] [US2] Create `Packages/ExperiencesCreative/EffectsComposer/Experience/PresetLibrary.swift` per clarification Q2 (files, index, 24 presets, — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P03.ec-ios27.json exit 0 (44 core and 45 experience tests on sim-27.2); PresetLibrary per clarification Q2
   names 1…40 unique ignoring case, refusals `damaged`, `newer-version`, `too-large` and the chain file's codes,
   the four messages, newest first, read-only on a newer index, never deleting automatically)
-- [ ] T-A25-303 [US2] Write `Packages/ExperiencesCreative/EffectsComposer/ExperienceTests/PresetLibraryTests.swift`: save and open round-trip (equal, same
+- [X] T-A25-303 [US2] Write `Packages/ExperiencesCreative/EffectsComposer/ExperienceTests/PresetLibraryTests.swift`: save and open round-trip (equal, same — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P03.ec-ios27.json exit 0 (44 core and 45 experience tests on sim-27.2); PresetLibraryTests 7 (round trip, caps, names, damaged/newer/oversized kept byte-identical, read-only index, rebuilt index, full quota)
   fingerprint); rename; remove; the 25th save, an empty or 41-character name and a duplicate name are refused and
   change nothing; damaged, newer and oversized files are listed as unreadable and stay byte-identical; a newer index
   makes the library read only; a damaged index is rebuilt only by the next change; a full storage quota refuses a save
