@@ -11,7 +11,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T-A23-501 Baseline: cite the A23-P04 evidence (`.autonomy/checks/A23-P04.{vpl-ios27,app-unit,verify-27}.json`) on
+- [X] T-A23-501 Baseline: cite the A23-P04 evidence (`.autonomy/checks/A23-P04.{vpl-ios27,app-unit,verify-27}.json`) on — Verified 2026-11-19: 2026-11-19: A23-P04 evidence cited: .autonomy/checks/A23-P04.vpl-ios27.json, A23-P04.app-unit.json and A23-P04.verify-27.json, all exit 0; since the A23-P04 record commit 993257e7 only Catalog files and the VisualCore catalog fixtures changed (e918deca, the A23 summary)
   the tree recorded at A23-P04 (`993257e7`); since then only the catalog summary fix `e918deca` changed (Catalog only)
 
 ## Phase 2: Stories 1–2 — no growth; exact passes (P1) 🎯
