@@ -69,7 +69,7 @@
   quickstart.md steps 1–2)
 - [X] T-A25-509 Contract: G-COLOR, G-EXPORT, G-ROBUST closed by "A25-P05" with notes on rows M11, M23, M24, M25, M36 — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P05.contract.json (exit 0; G-COLOR, G-EXPORT, G-ROBUST closed; M11, M23, M24, M25, M36 available)
   (`--name contract`); `docs/apps/effects-composer/README.md`
-- [ ] T-A25-510 `--name catalog`, `experience-packages`, `script-tests`; `xcodegen generate --spec project.yml`, then
+- [X] T-A25-510 `--name catalog`, `experience-packages`, `script-tests`; `xcodegen generate --spec project.yml`, then — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P05.{catalog,experience-packages,script-tests,app-unit,verify-27}.json (all exit 0)
   `--name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`;
   `--name verify-27`
 - [ ] T-A25-511 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
