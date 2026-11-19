@@ -5144,10 +5144,11 @@
     ]
    },
    "implementation": {
-    "state": "not-started",
-    "legacy_gates_passed": [],
+    "state": "standalone-partial",
+    "legacy_gates_passed": [
+     "A25-P00"
+    ],
     "legacy_gates_pending": [
-     "A25-P00",
      "A25-P01",
      "A25-P02",
      "A25-P03",
