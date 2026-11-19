@@ -1205,6 +1205,52 @@ desktop-class editor with hundreds of nodes.
   with a hardware keyboard and pointer as well as touch.
 - **Licenses:** every node implementation, GLSL snippet and example graph records its source and license.
 
+### A24 Graphics Benchmark Lab (`a24.graphics-benchmark-lab`)
+
+Ratified from the app manual's constitution prompt (2026-11-19). Like A05–A23, it never had a standalone target: it
+is built directly as an experience of the one app. Its product goal is a transparent, repeatable suite of GPU
+graphics workloads and instrumentation with measured-device caveats. Version 0.1 covers:
+- repeatable baseline scenes: textured quads (fill rate), shader ALU stress and particles;
+- warm-up, controlled measurement and cool-down phases;
+- frame-time percentiles, CPU submit time and GPU timer metrics only where a supported timer exists;
+- a device, OS, build, quality and thermal-context report with provenance;
+- results kept locally and exported as versioned JSON or CSV through a system sheet the person opens;
+- an in-app explanation of benchmark limits and variability.
+
+It does not rank devices from a single run as truth, claims no GPU time without a supported timer, collects no private
+hardware identifier and uploads nothing.
+
+- **Consumer, not fork:** an experience of the VisualCore app and a VisualCore consumer, never a fork of
+  projectm-ios. It uses only audited VisualCore public APIs over the OpenGL ES → ANGLE → Metal integration. It MUST
+  NOT create its own EGL/ANGLE initialization path or a second renderer, or link ProjectM engine code. Workload
+  scenes are drawn through VisualCore's host and passes.
+- **Reuse first (Principle II):** the render host, field passes, render targets, the GLSL library, the resource
+  registry, diagnostics and the frame clock are reused, not copied. A generic capability the lab needs and VisualCore
+  lacks (for example a supported GPU timer query or a frame-interval recorder) goes into VisualCore with tests, docs,
+  the API baseline and the reference regression. Workload definitions, statistics and copy stay in the experience.
+- **Measurement truth is pure and testable without the GPU:** benchmark cases, run phases, frame samples, percentile
+  statistics, the capability probe's decisions and the result file format are pure, versioned models tested through
+  `swift test` with fixed sample fixtures. Warm-up is partitioned from measurement and every duration comes from a
+  monotonic clock.
+- **Measurement provenance is a requirement:** every result records its case, version, device model, OS, app build,
+  quality tier, thermal state and timing source; a CPU time is never labelled a GPU time, and a GPU time is reported
+  only when the implementation confirms an accurate, non-disjoint timer. Results show distributions, not a single
+  average, and mark comparability caveats.
+- **Bounded:** each run has a capped duration, a cool-down and an immediate stop; draw counts, particle counts,
+  texture sizes and render targets have documented caps checked before allocation; GPU resources are created only in a
+  valid host context and rebuilt from CPU state after a context loss or resize. Result files that are truncated, of a
+  newer version or hold NaN, infinite or out-of-range values are refused safely and never deleted automatically.
+- **Truthful claims:** no published or invented benchmark numbers, no claim of scientific rigour, device ranking or
+  platform comparison, and no frame rates or timings in copy that were not measured on a device and attributed.
+- **Offline-first and private:** no networking, accounts, analytics or ads, no automatic upload, and no private
+  hardware identifier; the device model and OS come only from public APIs. No permission is needed; an export happens
+  only when the person chooses it.
+- **Visuals are code:** every workload scene is generated in code; no purchased, generated or photographic image is
+  bundled. Typography uses system fonts.
+- **Accessibility:** native SwiftUI controls with VoiceOver labels and Dynamic Type; results are readable as text
+  and tables, never colour or a chart alone; stress scenes offer a warning before they run and can be stopped at once.
+- **Licenses:** every shader, scene definition and statistical method records its source and license.
+
 ## Governance
 
 - Precedence: real Apple platform and toolchain behavior and observed test results → owner
@@ -1260,5 +1306,9 @@ desktop-class editor with hundreds of nodes.
 - Amendment 2.18.1 (2026-11-17, PATCH): the A22 compile rule is worded for VisualCore's main-actor render host (the
   main thread is its only GL thread): a control queues a compile request that the preview scene runs at its next
   frame; found by checklist CHK006 of feature 158 at gate A22-P00; no principle changes.
+- Amendment 2.19.0 (2026-11-18, MINOR): App-Scoped Rules gain the A23 Visual Programming Lab subsection, ratified
+  from its manual's constitution prompt at gate A23-P00 (feature 165); no principle changes.
+- Amendment 2.20.0 (2026-11-19, MINOR): App-Scoped Rules gain the A24 Graphics Benchmark Lab subsection, ratified
+  from its manual's constitution prompt at gate A24-P00 (feature 172); no principle changes.
 
-**Version**: 2.19.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-18
+**Version**: 2.20.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-19
