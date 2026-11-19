@@ -68,12 +68,12 @@
     U-RGBAUPLOAD (VisualCore, A25-P03, per clarification Q2); G-PRESETS, G-EXPORT (A25-P04); G-COLOR, G-ROBUST
     (A25-P05); G-RELEASE (A25-P06).
   - **Risks:** the three manual risks (colour-space mistakes, images above the texture limit, unbounded intermediate
-    targets) as `negative` entries naming the owner, verification method and release-blocker condition (source "manual §13
-    risk N"); plus the FR-A25-006 negative rules.
-  - **`decision`:** keys `result`, `reasons`, `blockers`. It is "stop" (US4 scenario 2) if a bounded workload cannot
-    be drawn: a full-screen pass sampling a texture into an offscreen target in the host's context over the
-    existing renderer; a missing
+    targets) as `negative` entries naming the owner, verification method and release-blocker condition (source
+    "manual §13 risk N"); plus the FR-A25-006 negative rules.
+  - **`decision`:** keys `result`, `reasons`, `blockers`. It is "stop" (US4 scenario 2) if a full-screen pass sampling
+    a texture into an offscreen target cannot be drawn in the host's context over the existing renderer; a missing
     host never permits a second backend.
+  - **G-ROBUST** (A25-P05) owns memory limits, oversized sources and the device plan, after the risks above.
   (FR-A25-003, FR-A25-006, SC-A25-002)
 
 ## Phase 7: Polish and evidence
