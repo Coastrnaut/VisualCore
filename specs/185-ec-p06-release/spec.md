@@ -83,7 +83,7 @@ in code:
   library read only; a damaged index still lists the looks from their files; every file stays byte-identical.
 - Q: Which interface journey runs? → A: `ECReleaseUITests` in the new chunk `g3` (serial): a fresh start shows the
   status "Ready", no effect row, the buttons `export-png`, `export-jpeg`, `export-heic` and `test-picture`, no `share`,
-  and no saved look; it takes under 60 s.
+  and no saved look, and reads the spoken labels "Export as PNG" and "Use the test picture"; it takes under 60 s.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -190,7 +190,9 @@ look and no export to share.
   what tests prove and contain no refused word; the catalog summary MUST stay within 300 characters and keep the words
   the catalog search tests expect.
 - **FR-A25-606**: A release checklist MUST give every row a status (`verified`, `pending-campaign-ii`,
-  `owner-action`) with evidence, and the experience's release steps MUST pass in the release checks.
+  `owner-action`) with evidence, and the experience's release steps MUST pass in the release checks; the known
+  limitations (the truncated-PNG decode, the share sheet's missing completion, the 2,048-pixel limit, the half-float
+  posterize boundary) MUST be listed in `docs/release/known-limitations.md`.
 - **FR-A25-607**: A first-session interface journey MUST pass on iOS 27.
 - **FR-A25-608**: G-RELEASE MUST be closed with evidence; README and testing documents MUST be current.
 

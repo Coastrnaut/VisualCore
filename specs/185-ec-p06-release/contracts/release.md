@@ -11,4 +11,5 @@
   drawn."; every storage file byte-identical; a new session lists and opens both looks.
 - Samples: per data-model.md; every file byte-identical after reading.
 - Interface: `ECReleaseUITests` (chunk `g3`): status "Ready", no effect row, `export-png`, `export-jpeg`,
-  `export-heic`, `test-picture` present, no `share`, no saved look; under 60 s.
+  `export-heic`, `test-picture` present with the labels "Export as PNG" and "Use the test picture", no `share`, no
+  saved look; under 60 s.
