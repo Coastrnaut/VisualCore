@@ -77,6 +77,9 @@ public struct RenderState: Hashable, Sendable {
     public static let opaque = RenderState()
     /// Straight-alpha transparent 2D draw; otherwise as `opaque`.
     public static let alphaBlended = RenderState(blend: .alpha)
+    /// Premultiplied-alpha 2D draw, `src + dst × (1 − src alpha)`; no depth test or write, otherwise as `opaque`
+    /// (feature 207 R02-F07 T-R02F07-003; FR-R02F07-004).
+    public static let premultipliedBlended = RenderState(blend: .premultiplied, depthTest: false, depthWrite: false)
     /// Additive glow or particle draw without depth write; otherwise as `opaque`.
     public static let additive = RenderState(blend: .additive, depthWrite: false)
     /// Opaque 3D draw: no blending, depth test and write on, back faces culled, all channels.

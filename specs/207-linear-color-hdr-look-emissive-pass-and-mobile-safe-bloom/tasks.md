@@ -19,7 +19,7 @@
   `Packages/VisualCore/Tests/VisualCoreEffectsGraphTests/EmissiveReferenceTests.swift` (round trip of 256 values;
   prefilter zero below `threshold − knee·threshold`, continuous at both knee ends; tone maps monotonic and below 1 for
   0…64; premultiplied over formula)
-- [ ] T-R02F07-003 [P] Modify `Packages/VisualCore/Sources/VisualCoreEffectsGraph/PassSchemas.swift` (`emissive` with
+- [X] T-R02F07-003 [P] Modify `Packages/VisualCore/Sources/VisualCoreEffectsGraph/PassSchemas.swift` (`emissive` with — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F07.host.json (exit 0; EmissiveSchemaTests 7; RenderStateTests premultipliedBlended; as built: NaN refused on every pass, out-of-range refused for emissive only, composite mode 3 clamps)
   `threshold` 0…16 default 1, `knee` 0…1 0.5, `intensity` 0…4 1, `radius` 1…16 4, `quality` 0…1 0, `exposure` −4…4 0,
   `tonemap` 0…2 0; `composite.mode` 0…2; `flashLimit.linear` 0…1 default 0; memory estimate counting the output and
   two blur targets) and `Packages/VisualCore/Sources/VisualCoreShaderSource/RenderState.swift`

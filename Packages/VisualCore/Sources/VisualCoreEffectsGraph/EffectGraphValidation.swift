@@ -14,13 +14,19 @@ public enum EffectGraphError: Error, Equatable, Sendable {
     case missingOutput(String)
     case cycle([String])
     case overQuota(bytes: Int, quota: Int)
+    /// A given parameter component is NaN or infinite (feature 207 T-R02F07-003; every pass type).
+    case nonFiniteParameter(pass: String, parameter: String)
+    /// A given parameter component lies outside its range on a pass type that refuses instead of clamping
+    /// (`PassSchema.refusesOutOfRange`, feature 207 T-R02F07-003).
+    case parameterOutOfRange(pass: String, parameter: String, value: Double)
 }
 
 /// A graph that passed validation: execution order, memory estimate, resolved parameters and warnings.
 public struct ValidatedGraph: Sendable, Equatable {
     /// Pass ids in execution order.
     public let order: [String]
-    /// Estimated render-target bytes (4 B/px, 8 B/px for HDR bloom, doubled for feedback history).
+    /// Estimated render-target bytes (4 B/px, 8 B/px for HDR bloom, doubled for feedback history,
+    /// plus two 8 B/px half- or quarter-size blur targets per emissive pass).
     public let estimatedBytes: Int
     /// Parameters after defaults and clamping, per pass id.
     public let parameters: [String: [String: [Double]]]
@@ -33,7 +39,7 @@ public enum EffectGraphValidator {
     /// Default render-target memory quota: 256 MiB.
     public static let defaultQuota = 256 << 20
 
-    /// Validates `graph` for a `width`×`height` view; throws `EffectGraphError` on a bad version, more than 32 passes, duplicate ids/outputs, unknown types, missing slots or inputs, scale outside 0<s≤1, missing output, cycles or exceeding `quotaBytes`.
+    /// Validates `graph` for a `width`×`height` view; throws `EffectGraphError` on a bad version, more than 32 passes, duplicate ids/outputs, unknown types, missing slots or inputs, scale outside 0<s≤1, missing output, cycles, non-finite parameters, out-of-range parameters of a refusing schema (`emissive`) or exceeding `quotaBytes`.
     public static func validate(_ graph: EffectGraphDescription, width: Int, height: Int,
                                 quotaBytes: Int = defaultQuota) throws(EffectGraphError) -> ValidatedGraph {
         guard graph.version == EffectGraphDescription.currentVersion else { throw .unsupportedVersion(graph.version) }
@@ -57,8 +63,15 @@ public enum EffectGraphValidator {
             }
             guard p.scale > 0, p.scale <= 1 else { throw .invalidScale(pass: p.id, p.scale) }
             var resolved: [String: [Double]] = [:]
-            for (key, spec) in schema.parameters {
+            for key in schema.parameters.keys.sorted() {
+                let spec = schema.parameters[key]!
                 let given = p.params[key] ?? spec.defaultValue
+                for v in given {
+                    guard v.isFinite else { throw .nonFiniteParameter(pass: p.id, parameter: key) }
+                    if schema.refusesOutOfRange, !spec.range.contains(v) {
+                        throw .parameterOutOfRange(pass: p.id, parameter: key, value: v)
+                    }
+                }
                 resolved[key] = given.map { min(max($0, spec.range.lowerBound), spec.range.upperBound) }
             }
             for key in p.params.keys.sorted() where schema.parameters[key] == nil {
@@ -77,6 +90,7 @@ public enum EffectGraphValidator {
             let target = w * h * PassSchemas.bytesPerPixel(type: p.type, params: parameters[p.id] ?? [:])
             bytes += target
             if p.type == "feedback" { bytes += target }   // history buffer (FR-F412)
+            bytes += PassSchemas.auxiliaryBytes(type: p.type, width: w, height: h, params: parameters[p.id] ?? [:])
         }
         guard bytes <= quotaBytes else { throw .overQuota(bytes: bytes, quota: quotaBytes) }
         return ValidatedGraph(order: order, estimatedBytes: bytes, parameters: parameters, warnings: warnings)

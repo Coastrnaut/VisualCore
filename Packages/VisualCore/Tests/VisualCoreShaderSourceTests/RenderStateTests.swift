@@ -68,3 +68,14 @@ import VisualCoreShaderSource
     let again: Set<RenderState> = [.opaque, .alphaBlended, .additive, .opaque3D, .opaque, RenderState()]
     #expect(again.count == 4)
 }
+
+// Feature 207 R02-F07 T-R02F07-003 (FR-R02F07-004): the premultiplied preset changes only the blend mode.
+@Test func premultipliedBlendedPresetOnlyChangesTheBlendMode() {
+    let s = RenderState.premultipliedBlended
+    #expect(s.blend == .premultiplied)
+    #expect(s.depthTest == false)
+    #expect(s.depthWrite == false)
+    #expect(s.cull == .none)
+    #expect(s.colorMask == .all)
+    #expect(s != .alphaBlended && s != .opaque && s != .additive)
+}
