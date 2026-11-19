@@ -710,6 +710,21 @@ let package = Package(
                     path: "ShaderStudio/ExperienceTests",
                     // Feature 164 (A22-P06): the committed stored-file samples.
                     resources: [.copy("Fixtures")]),
+        // A23 Visual Programming Lab (feature 166, A23-P01): a pending core until A23-P02 adds the experience. The core
+        // is pure (the value types, node library, graph model, graph file and checker); its tests check every fixture
+        // inside a running render host to prove that checking creates no graphics resource.
+        .target(name: "VisualProgrammingLabCore",
+                dependencies: [.product(name: "VisualCoreParameters", package: visualCore),
+                               .product(name: "VisualCorePersistence", package: visualCore),
+                               .product(name: "VisualCoreExperience", package: visualCore)],
+                path: "VisualProgrammingLab/Core"),
+        .testTarget(name: "VisualProgrammingLabCoreTests",
+                    dependencies: ["VisualProgrammingLabCore",
+                                   .product(name: "VisualCoreParameters", package: visualCore),
+                                   .product(name: "VisualCorePersistence", package: visualCore),
+                                   .product(name: "VisualCoreExperience", package: visualCore),
+                                   .product(name: "VisualCoreRendering", package: rendering)],
+                    path: "VisualProgrammingLab/CoreTests"),
         // A21 Aurora (feature 152, A21-P01): a pending core until A21-P02 adds the experience. The core is pure (the
         // sky scene, presets, clock, noise port, reference and shader text); its tests draw the shader off screen.
         .target(name: "AuroraCore",
