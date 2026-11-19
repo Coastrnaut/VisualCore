@@ -119,4 +119,6 @@ owner's action.
 | 2026-11-18 | Content rights | yes, with the necessary rights (public-domain molecule records in Molecular Explorer) |
 | 2026-11-18 | App Privacy | Data Not Collected, published; privacy policy URL https://github.com/Coastrnaut/VisualCore/blob/main/docs/privacy-policy.md (as projectm-ios does) |
 | 2026-11-18 | Support URL | https://github.com/Coastrnaut/VisualCore/issues (as projectm-ios does) |
-| — | App Review contact (name, phone, email), Add for Review, Submit | `BLOCKED_OWNER_ACTION` |
+| 2026-11-18 | App Review contact | copied from the projectM-iOS record at the owner's request |
+| 2026-11-18 | Screenshots on the product page | Media Manager: six iPhone screenshots resized to 1206 × 2622 (the required 6.1"/6.3" slot) and four iPad 13" (2064 × 2752) |
+| — | Release option, Add for Review, Submit | `BLOCKED_OWNER_ACTION` (the owner's final click) |
