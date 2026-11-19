@@ -752,7 +752,9 @@ let package = Package(
                                    .product(name: "VisualCoreRendering", package: rendering),
                                    .product(name: "VisualCoreExperienceHost", package: rendering),
                                    .product(name: "VisualCoreUI", package: rendering)],
-                    path: "VisualProgrammingLab/ExperienceTests"),
+                    path: "VisualProgrammingLab/ExperienceTests",
+                    // Feature 169 (A23-P04): the committed stored-file samples.
+                    resources: [.copy("Fixtures")]),
         // A21 Aurora (feature 152, A21-P01): a pending core until A21-P02 adds the experience. The core is pure (the
         // sky scene, presets, clock, noise port, reference and shader text); its tests draw the shader off screen.
         .target(name: "AuroraCore",

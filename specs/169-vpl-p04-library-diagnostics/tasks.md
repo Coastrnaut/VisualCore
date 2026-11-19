@@ -13,7 +13,7 @@
 
 - [X] T-A23-401 Baseline: cite the A23-P03 evidence (`.autonomy/checks/A23-P03.{vpl-ios27-2,app-unit,verify-27}.json`) — Verified 2026-11-18: 2026-11-18: A23-P03 evidence cited: .autonomy/checks/A23-P03.vpl-ios27-2.json, A23-P03.app-unit.json and A23-P03.verify-27.json, all exit 0; no Packages change since the A23-P03 record commit 7508f7ed
   on the tree recorded at A23-P03 (`7508f7ed`), whose Packages are unchanged since (owner ruling of 2026-11-14)
-- [ ] T-A23-402 In `Packages/ExperiencesCreative/Package.swift` (lead), give `VisualProgrammingLabExperienceTests` the
+- [X] T-A23-402 In `Packages/ExperiencesCreative/Package.swift` (lead), give `VisualProgrammingLabExperienceTests` the — Verified 2026-11-18: 2026-11-18: VisualProgrammingLabExperienceTests resources [.copy("Fixtures")] in Packages/ExperiencesCreative/Package.swift with ExperienceTests/Fixtures/graph-sample.json; .autonomy/checks/A23-P04.vpl-ios27.json exit 0 (162 core and 63 experience tests on sim-27.2, slowest 1.27 s)
   resources `[.copy("Fixtures")]`, with `ExperienceTests/Fixtures/` holding the stored samples
 
 ## Phase 2: Stories 1–2 — save, open and keep unreadable files (P1) 🎯
