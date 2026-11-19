@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_app_isolation.py",
+    "--experiences",
+    "Packages/ExperiencesCreative/EffectsComposer"
+  ],
+  "command": "python3 scripts/check_app_isolation.py --experiences Packages/ExperiencesCreative/EffectsComposer",
+  "elapsed_seconds": 0.049,
+  "exit_code": 0,
+  "finished": "2026-11-19T20:16:10+00:00",
+  "log": ".autonomy/logs/A25-P04.isolation.log",
+  "log_sha256": "c18ff8b3e840ba860c984ee488a07089fde4d5ded1535f887841b7e7b6e6012a",
+  "name": "isolation",
+  "stage": "A25-P04",
+  "started": "2026-11-19T20:16:10+00:00",
+  "timed_out": false
+}
