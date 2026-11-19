@@ -6,8 +6,10 @@
   - `inventory`: area, description, paths, owner;
   - `matrix`: id M##, capability, source, status ∈ {available, requires adaptation, upstream gap}, evidence (file,
     symbol, product, public), example (file, symbol), notes;
-  - `gaps`: id G-… or U-…, matrix (row ids), kind, owner (a VisualCore module or app-local), justification, phase,
-    test, closed;
+  - `gaps`: id G-… or U-…, matrix (row ids), kind ∈ {adaptation, upstream}, owner (`VisualCore:<Module>` or
+    `app-local`, the checker's two forms), justification (required for app-local), phase 1–6, test, closed (the gate
+    that closed it, or null). U-RENDERINFO and U-GPUTIMER are `upstream`, owner `VisualCore:VisualCoreRendering`; the
+    G- gaps are `adaptation`, owner `app-local`;
   - `traceability`: item, matrix, phases;
   - `negative`: rule, source;
   - `decision`: result go|stop, reasons, blockers.
