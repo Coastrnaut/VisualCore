@@ -4923,8 +4923,11 @@ class AuditTests(unittest.TestCase):
         if not registered:
             self.assertIn("SKIP: reducer-bypass (nothing to audit yet: 0 registered experiences)", lines)
             self.assertIn("SKIP: content-counts (nothing to audit yet: 0 registered experiences)", lines)
+        # The only generated raster is the code-drawn app icon (scripts/make_app_icon.py, 2026-11-18).
         art = json.loads((ROOT_DIR / "Catalog" / "generated-art.json").read_text())
-        self.assertEqual(art, {"schema": 1, "files": []})
+        self.assertEqual(art["schema"], 1)
+        self.assertEqual([(f["path"], f["generator"]) for f in art["files"]],
+                         [(verify.APP_ICON_SET + "AppIcon-1024.png", "scripts/make_app_icon.py")])
 
 
 class ScenarioReleaseSymbolTests(unittest.TestCase):
