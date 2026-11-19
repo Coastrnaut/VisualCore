@@ -63,7 +63,7 @@
 
 ## Phase 6: User Story 4 — Stop/go decision (P2)
 
-- [ ] T-A24-008 [US4] Complete the contract, then rerun the checker (`--name contract-2`):
+- [X] T-A24-008 [US4] Complete the contract, then rerun the checker (`--name contract-2`): — Verified 2026-11-19: 2026-11-19: 12 gaps (G-MODEL, G-STATS P1; G-SCENES P2; G-RUNNER, G-REPORT, U-RENDERINFO, U-GPUTIMER P3; G-RESULTS, G-EXPORT P4; G-DEVICE, G-EXPLAIN P5; G-RELEASE P6), 14 negative entries with the three manual risks, decision go with no blockers; .autonomy/checks/A24-P00.contract-2.json exit 0
   - **`gaps`:** for every non-available row, the owning module and the phase per research D4: G-MODEL, G-STATS
     (A24-P01); G-SCENES (A24-P02); G-RUNNER, G-REPORT (A24-P03), plus the upstream gaps U-RENDERINFO and U-GPUTIMER
     (VisualCore, A24-P03, per clarifications Q1 and Q2); G-RESULTS, G-EXPORT (A24-P04); G-DEVICE, G-EXPLAIN
