@@ -30,6 +30,47 @@ Canonical overrides:
   (ImplementationLock-100). **Device-only items:** draw cost of large instance counts on D1–D3. **Owner-only items:**
   none.
 
+## Clarifications
+
+### Session 2026-11-19
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time. Facts checked in
+code (read-only audit, 2026-11-19): `ParticleRenderer` draws 2D instanced quads with `vcglDrawArraysInstanced` and
+per-instance attributes at divisor 1 through the internal `DynamicVertexBuffer` (grows by doubling, rebuilt after
+context loss), premultiplied soft discs `(1 − smoothstep(0.8, 1, r))`, no depth, no sort, capped at 100,000;
+`MeshRenderer` (Lambert with `lightDirection`/`ambient`, optional linear fog `MeshFog`, back-face culling, depth left to
+the caller) draws one mesh per call with `vcglDrawElements`; `DepthMeshPass.backToFront(_:view:)` sorts items by
+view-space z with an index tie-break; `vcglDrawElementsInstanced` and `vcglVertexAttribDivisor` are loaded but
+`DrawElementsInstanced` is unused; `RenderState.premultipliedBlended` exists (R02-F07).
+
+- Q: What do the two renderers look like? → A: `InstancedMeshRenderer(mesh:registry:)` with `draw(_ instances:
+  [MeshInstance], view:projection:fog:translucent:)` — per-instance model matrix (4 vec4 attributes) and colour (vec4) at
+  divisor 1, one `vcglDrawElementsInstanced` per call, the shader of `MeshRenderer` with `u_model` replaced by the
+  instance matrix (normals by its upper 3 × 3), same `lightDirection`, `ambient` and fog; and `BeamRenderer(registry:)`
+  with `draw(_ beams: [Beam], view:projection:blend:)` — 6 vertices per instance, `vcglDrawArraysInstanced`. Both in
+  VisualCoreRendering, per-instance data in a reused growing buffer like `ParticleRenderer`. Limits: 16,384 mesh
+  instances and 65,536 beams per call (refused above). Rationale: same conventions as the existing renderers, generic.
+  Impact: SC-R02F09-001 compares against `MeshRenderer` draws.
+- Q: How is a beam built and shaded? → A: The two end points are transformed to view space; the strip runs from
+  A − d·(w/2) to B + d·(w/2) along the segment direction d (in view space, projected to the plane facing the eye),
+  widened by w/2 on each side perpendicular to d and to the view direction; a degenerate (end-on or zero-length)
+  segment uses an eye-facing square of side w. The fragment computes r = distance to the segment divided by w/2 and
+  shades `colour × falloff(r)` with falloff(r) = exp(−4 r²) for r ≤ 1, 0 beyond (a Gaussian whose edge is about 2% of
+  the centre), premultiplied. Blends: `.premultiplied` (sorted) or `.additive` (not sorted). Depth test on, depth write
+  off. Rationale: round ends and a soft glow from one formula; points are the zero-length case. Impact: the CPU
+  reference `BeamProfile.falloff(_:)` and `BeamProfile.coverage(point:a:b:width:)` are pure.
+- Q: Where does ordering live and how is depth taken? → A: `InstanceOrder.backToFront(depths:)` in VisualCoreScenes
+  (pure): indices sorted by view-space z ascending (farthest first, z negative in front of the eye), ties by index,
+  non-finite depths refused. Mesh instances use the instance's translation; beams the midpoint of A and B. Translucent
+  mesh instances are drawn with blending premultiplied, depth write off, after sorting. Rationale: one stable rule, the
+  same as `DepthMeshPass`. Impact: SC-R02F09-003.
+- Q: What happens with bad input or limits? → A: `InstancingError.tooMany(count, limit)`, `.notFinite(index)`,
+  `.badWidth(index)` (≤ 0) thrown before any GL call; an empty list draws nothing. Rationale: no partial frames.
+  Impact: tests per case.
+- Q: How is "one draw call" proven? → A: Both renderers count their draw calls in an internal `drawCallCount` (tests);
+  the instanced 500-mesh picture is compared pixel by pixel with 500 `MeshRenderer.draw` calls into another target.
+  Rationale: direct evidence without GPU counters. Impact: SC-R02F09-001.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Many solids in one draw (Priority: P1) 🎯
