@@ -11,9 +11,9 @@
 // Cases: a beam lying in Π (its cross-section), a zero-length point, a diagonal beam seen through a rotated camera,
 // an oblique beam (keeps its full width), an end-on beam (a round point). Further: zero width, non-finite values and the
 // limit are refused with nothing drawn; scrambled premultiplied beams give the sorted picture, equal to one-at-a-time
-// back-to-front draws; additive beams are order-free; one draw call; the previous GL state is restored; a context
-// recreation gives the same picture. Errors are captured inside the GL closure because `RenderHost` reports scene
-// errors itself.
+// back-to-front draws; additive beams are order-free; one draw call; the previous GL state is restored; 100 frames
+// keep the live counts constant (T-R02F09-012); a context recreation gives the same picture. Errors are captured
+// inside the GL closure because `RenderHost` reports scene errors itself.
 import CVisualCoreGL
 import Foundation
 import VisualCoreMath
@@ -258,6 +258,31 @@ final class BeamRendererTests: XCTestCase {
         XCTAssertEqual(factors, [GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO].map { GLint($0) })
     }
 
+    /// T-R02F09-012 (SC-R02F09-004): 100 frames alternating 500 and 300 beams reuse one instance buffer and program.
+    func testOneHundredFramesKeepLiveCountsConstant() throws {
+        let scene = BeamScene()
+        let all = (0..<500).map { i -> BeamInstance in
+            let x = -1.5 + 3 * Double(i % 25) / 24, y = -1.5 + 3 * Double(i / 25) / 19
+            return BeamInstance(a: Vec3(x - 0.05, y, -5), b: Vec3(x + 0.05, y, -5), width: 0.06,
+                                color: Vec4(0.4, 0.3, 0.2, 0.5))
+        }
+        scene.perFrame = { frame in Array(all.prefix(frame % 2 == 0 ? 500 : 300)) }
+        let h = try RenderHost(scene: scene)
+        host = h
+        h.view.frame = CGRect(x: 0, y: 0, width: 24, height: 24)
+        h.view.layoutIfNeeded()
+        XCTAssertTrue(h.renderOneFrame(present: false))
+        let live = h.resources.stats.liveCount, bytes = h.resources.stats.liveBytes, compiles = h.resources.compileCount
+        for _ in 1..<100 { XCTAssertTrue(h.renderOneFrame(present: false)) }
+        XCTAssertEqual(h.resources.stats.liveCount, live, "no GPU object added over 100 frames")
+        XCTAssertEqual(h.resources.stats.liveBytes, bytes, "the instance buffer is reused")
+        XCTAssertEqual(h.resources.compileCount, compiles)
+        XCTAssertEqual(scene.renderer?.drawCallCount, 100, "one draw call per frame")
+        XCTAssertEqual(vcglGetError(), GLenum(GL_NO_ERROR))
+        h.destroy()
+        XCTAssertEqual(h.resources.stats.leaked, 0)
+    }
+
     func testContextRecreationGivesTheSamePicture() throws {
         let scene = BeamScene()
         scene.beams = Self.translucentSorted()
@@ -287,7 +312,10 @@ final class BeamRendererTests: XCTestCase {
 @MainActor
 private final class BeamScene: RenderScene {
     var beams: [BeamInstance] = []
+    /// When set, the beams of frame `n` (counted from 0) instead of ``beams``.
+    var perFrame: ((Int) -> [BeamInstance])?
     private(set) var renderer: BeamRenderer?
+    private var frameIndex = 0
 
     func setup(_ c: RenderContext) throws {
         if renderer == nil { renderer = try BeamRenderer(registry: c.resources) }
@@ -296,7 +324,8 @@ private final class BeamScene: RenderScene {
     func render(_ c: RenderContext, frame: FrameInfo) throws {
         vcglClearColor(0, 0, 0, 1)
         vcglClear(GLbitfield(GL_COLOR_BUFFER_BIT))
-        try renderer?.draw(beams, view: .identity, projection: BeamRendererTests.projection)
+        try renderer?.draw(perFrame?(frameIndex) ?? beams, view: .identity, projection: BeamRendererTests.projection)
+        frameIndex += 1
     }
     func teardown(_ c: RenderContext) { renderer?.release() }
 }

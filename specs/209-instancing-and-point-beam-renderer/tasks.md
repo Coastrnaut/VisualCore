@@ -62,7 +62,7 @@
 
 ## Phase 5: Convergence
 
-- [ ] T-R02F09-012 Add `testOneHundredFramesKeepLiveCountsConstant` to
+- [X] T-R02F09-012 Add `testOneHundredFramesKeepLiveCountsConstant` to — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F09.rendering-27-3.json (exit 0, 220 tests, BeamRendererTests.testOneHundredFramesKeepLiveCountsConstant passed)
   `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/BeamRendererTests.swift` (100 frames alternating 500 and
   300 beams: `liveCount`, `liveBytes` and `compileCount` constant, 100 draw calls, no GL error, 0 leaks after destroy);
   rerun `--name rendering-27-3` per SC-R02F09-004 (partial)
