@@ -22,7 +22,7 @@
   `ParameterSpec` (range closed and finite, default inside, whole), `EffectDefinition` (fingerprint domain
   `a25.effect.v1`), `EffectLibrary.all` (grade, blur, distort, vignette, posterize) and value validation naming the
   effect and parameter
-- [ ] T-A25-104 [US1] Write `Packages/ExperiencesCreative/EffectsComposer/CoreTests/DefinitionTests.swift`: every default validates; unknown, missing,
+- [X] T-A25-104 [US1] Write `Packages/ExperiencesCreative/EffectsComposer/CoreTests/DefinitionTests.swift`: every default validates; unknown, missing, — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P01.ec-core-ios27.json exit 0 (35 tests in 8 suites on sim-27.2); DefinitionTests
   non-finite, fractional-whole and out-of-range values are refused with their code; fingerprints are distinct and stable
 
 ## Phase 3: Story 2 — a chain that can be edited and undone exactly (P1)
