@@ -62,7 +62,7 @@
 
 ## Phase 5: Stories 3–4 — contrast, preference and settings (P2)
 
-- [ ] T-R02F10-007 [P] [US4] Edit `Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPreferences.swift`
+- [X] T-R02F10-007 [P] [US4] Edit `Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPreferences.swift` — Verified 2026-11-19: 2026-11-19 R02-F10.host.json (exit 0; ColorVisionPreferenceTests 5 passed; AccessibilityPreferencesTests unchanged and passing)
   (`ColorVisionChoice` standard/warmCool/redCyan/lightness with `init(storedValue:)` and `title`; `colorVision` field
   defaulting to `.standard`; memberwise init gains `colorVision: ColorVisionChoice = .standard`; hand-written
   `init(from:)` with `decodeIfPresent`, unknown → `.standard`; `colorVisionKey(prefix:)` = `<prefix>.colorVision`;

@@ -73,17 +73,78 @@ public struct EffectiveAccessibility: Sendable, Equatable {
     public var playbackRate: Double { reduceMotion ? SceneClock.reducedMotionFactor : 1 }
 }
 
-/// An app's accessibility choices for animated content; each defaults to following the system.
+// feature 210 (R02-F10) T-R02F10-007: colour-vision choice (FR-R02F10, research R7, SC-R02F10-005).
+/// The colour scheme an app uses for colour-coded content: the standard colours or one of three colour-vision presets.
+public enum ColorVisionChoice: String, Sendable, Codable, CaseIterable, Identifiable {
+    /// The experience's own colours (the default).
+    case standard
+    /// A warm-and-cool preset (orange against blue) that stays apart under red-green colour blindness.
+    case warmCool
+    /// A red-and-cyan preset that stays apart under blue-yellow colour blindness.
+    case redCyan
+    /// A lightness-only preset that relies on brightness differences, not hue.
+    case lightness
+
+    /// Stable identifier (the raw value).
+    public var id: String { rawValue }
+    /// Display title: "Standard colours", "Warm and cool", "Red and cyan" or "Lightness".
+    public var title: String {
+        switch self {
+        case .standard: return "Standard colours"
+        case .warmCool: return "Warm and cool"
+        case .redCyan: return "Red and cyan"
+        case .lightness: return "Lightness"
+        }
+    }
+
+    /// Reads a stored raw value; nil or an unknown value becomes `.standard`.
+    public init(storedValue: String?) {
+        self = storedValue.flatMap(ColorVisionChoice.init(rawValue:)) ?? .standard
+    }
+
+    /// Decodes a raw string; an unknown value becomes `.standard` instead of failing.
+    public init(from decoder: Decoder) throws {
+        self.init(storedValue: try decoder.singleValueContainer().decode(String.self))
+    }
+}
+
+/// An app's accessibility choices for animated content; motion and flashing default to following the system and
+/// the colour-vision choice defaults to `.standard`.
 public struct AccessibilityPreferences: Sendable, Equatable, Codable {
     /// Reduce Motion choice.
     public var reduceMotion: AccessibilityChoice
     /// Reduce Flashing choice.
     public var reduceFlashing: AccessibilityChoice
+    /// Colour-vision choice (feature 210 T-R02F10-007); `.standard` keeps the experience's own colours.
+    public var colorVision: ColorVisionChoice
 
-    /// Creates preferences; both default to `.system`.
-    public init(reduceMotion: AccessibilityChoice = .system, reduceFlashing: AccessibilityChoice = .system) {
+    /// Creates preferences; motion and flashing default to `.system`, colour vision to `.standard`.
+    public init(reduceMotion: AccessibilityChoice = .system, reduceFlashing: AccessibilityChoice = .system,
+                colorVision: ColorVisionChoice = .standard) {
         self.reduceMotion = reduceMotion
         self.reduceFlashing = reduceFlashing
+        self.colorVision = colorVision
+    }
+
+    /// JSON keys; the first two keep the names used before feature 210 so older data decodes.
+    private enum CodingKeys: String, CodingKey {
+        case reduceMotion, reduceFlashing, colorVision
+    }
+
+    /// Decodes preferences; an absent key takes its default, so JSON written before feature 210 still decodes.
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        self.init(reduceMotion: try c.decodeIfPresent(AccessibilityChoice.self, forKey: .reduceMotion) ?? .system,
+                  reduceFlashing: try c.decodeIfPresent(AccessibilityChoice.self, forKey: .reduceFlashing) ?? .system,
+                  colorVision: try c.decodeIfPresent(ColorVisionChoice.self, forKey: .colorVision) ?? .standard)
+    }
+
+    /// Encodes all three choices as raw strings.
+    public func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(reduceMotion, forKey: .reduceMotion)
+        try c.encode(reduceFlashing, forKey: .reduceFlashing)
+        try c.encode(colorVision, forKey: .colorVision)
     }
 
     /// Combines the choices with the system values: `.system` takes the system flag, `.on`/`.off` override it.
@@ -102,17 +163,26 @@ extension AccessibilityPreferences {
         ("\(prefix).reduceMotion", "\(prefix).reduceFlashing")
     }
 
-    /// Reads the choices stored under `prefix`; absent or unknown values become `.system`.
+    /// The `UserDefaults` key of the colour-vision choice: `<prefix>.colorVision` (a raw `ColorVisionChoice`
+    /// value; feature 210 T-R02F10-007). Kept apart from `keys(prefix:)` so that tuple's shape stays unchanged.
+    public static func colorVisionKey(prefix: String) -> String {
+        "\(prefix).colorVision"
+    }
+
+    /// Reads the choices stored under `prefix`; absent or unknown motion and flashing values become `.system`,
+    /// an absent or unknown colour-vision value becomes `.standard`.
     public static func load(from defaults: UserDefaults, keyPrefix prefix: String) -> AccessibilityPreferences {
         let k = keys(prefix: prefix)
         return AccessibilityPreferences(reduceMotion: AccessibilityChoice(storedValue: defaults.string(forKey: k.reduceMotion)),
-                                        reduceFlashing: AccessibilityChoice(storedValue: defaults.string(forKey: k.reduceFlashing)))
+                                        reduceFlashing: AccessibilityChoice(storedValue: defaults.string(forKey: k.reduceFlashing)),
+                                        colorVision: ColorVisionChoice(storedValue: defaults.string(forKey: colorVisionKey(prefix: prefix))))
     }
 
-    /// Stores both choices under `prefix` as raw values.
+    /// Stores all three choices under `prefix` as raw values.
     public func save(to defaults: UserDefaults, keyPrefix prefix: String) {
         let k = Self.keys(prefix: prefix)
         defaults.set(reduceMotion.rawValue, forKey: k.reduceMotion)
         defaults.set(reduceFlashing.rawValue, forKey: k.reduceFlashing)
+        defaults.set(colorVision.rawValue, forKey: Self.colorVisionKey(prefix: prefix))
     }
 }
