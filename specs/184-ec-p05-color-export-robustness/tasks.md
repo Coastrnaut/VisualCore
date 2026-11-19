@@ -10,7 +10,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T-A25-501 Baseline: `--name baseline` runs both Effects Composer test targets on sim-27.2 at the start commit
+- [X] T-A25-501 Baseline: `--name baseline` runs both Effects Composer test targets on sim-27.2 at the start commit — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P05.baseline.json (exit 0)
   (`specs/184-ec-p05-color-export-robustness/quickstart.md` step 1) and must exit 0
 
 ## Phase 2: Story 2 — colours behave like light (P1, foundational for export)
