@@ -52,7 +52,7 @@
 
 - [X] T-A23-006 [US3] Build the one app for testing (`--name app-build -- python3 scripts/release_check.py --only — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A23-P00.app-build.json exit 0 (build for testing on the iOS 27.2 phone simulator with Visual Programming Lab absent)
   app-build-for-testing-ios27`)
-- [ ] T-A23-007 [US3] Experience package check:
+- [X] T-A23-007 [US3] Experience package check: — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A23-P00.experience-packages.json exit 0 (PASS: 22 experiences); grep -c a23 Catalog/registrations.json Apps/VisualCore/App/ExperienceRegistry.swift gives 0 and 0
   - `--name experience-packages -- python3 scripts/check_experience_packages.py` passes (22 experiences, none A23);
   - `grep -c a23 Catalog/registrations.json Apps/VisualCore/App/ExperienceRegistry.swift` gives 0 and 0
   (FR-A23-005, SC-A23-004)
