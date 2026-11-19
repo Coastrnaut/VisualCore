@@ -58,7 +58,7 @@
   if the manifest test asks for it
 - [X] T-A23-309 Contract: G-COMPILE, G-OPERATORS and G-BUDGET closed by "A23-P03", rows whose gaps are all closed — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A23-P03.contract.json exit 0 (G-COMPILE, G-OPERATORS and G-BUDGET closed by A23-P03; M01, M02, M04, M07, M10, M15, M17, M20, M21 and M28 available with their notes)
   available with evidence (`--name contract`)
-- [ ] T-A23-310 The catalog, packages and script tests, `xcodegen generate`, the app build and unit tests (`--name
+- [X] T-A23-310 The catalog, packages and script tests, `xcodegen generate`, the app build and unit tests (`--name — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A23-P03.catalog.json, A23-P03.experience-packages.json and A23-P03.script-tests.json exit 0; xcodegen generate; A23-P03.app-unit.json exit 0 (build for testing and app unit tests on iOS 27.2); A23-P03.verify-27.json exit 0 (all 9 scenarios on iOS 27.2)
   app-unit`) and the runner (`--name verify-27`)
 - [ ] T-A23-311 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
   A23-P03; update README.md (rule 16) and `docs/automatedtesting.md` (rule 17)
