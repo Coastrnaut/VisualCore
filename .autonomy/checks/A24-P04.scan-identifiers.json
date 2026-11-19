@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "sh",
+    "specs/175-gbl-p03-runner-probe/scan-identifiers.sh"
+  ],
+  "command": "sh specs/175-gbl-p03-runner-probe/scan-identifiers.sh",
+  "elapsed_seconds": 0.028,
+  "exit_code": 0,
+  "finished": "2026-11-19T17:17:48+00:00",
+  "log": ".autonomy/logs/A24-P04.scan-identifiers.log",
+  "log_sha256": "5c21f12a5af0d120bd9ccd289350515c27c0e0d99a1748315911e7e8b94e5ec0",
+  "name": "scan-identifiers",
+  "stage": "A24-P04",
+  "started": "2026-11-19T17:17:48+00:00",
+  "timed_out": false
+}

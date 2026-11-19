@@ -53,7 +53,7 @@
 
 ## Phase 6: Evidence
 
-- [ ] T-A24-408 Review checkpoint: `--name gbl-ios27` (both A24 test targets on sim-27.2, each test under 10 s), the
+- [X] T-A24-408 Review checkpoint: `--name gbl-ios27` (both A24 test targets on sim-27.2, each test under 10 s), the — Verified 2026-11-19: 2026-11-19: review checkpoint: .autonomy/checks/A24-P04.{gbl-ios27,documented-api,isolation,core-purity,scan-identifiers}.json exit 0
   documented API, isolation, core purity and `--name scan-identifiers`
 - [ ] T-A24-409 Contract: G-RESULTS and G-EXPORT closed by "A24-P04", rows whose gaps are all closed available
   (`--name contract`); the experience README updated
