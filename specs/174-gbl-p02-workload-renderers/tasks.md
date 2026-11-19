@@ -30,7 +30,7 @@
 
 ## Phase 3: Story 1 — three deterministic workloads (P1) 🎯
 
-- [ ] T-A24-205 [US1] Create `Experience/Workloads.swift` per clarification Q1 (FR-A24-201, 202): the three workloads
+- [X] T-A24-205 [US1] Create `Experience/Workloads.swift` per clarification Q1 (FR-A24-201, 202): the three workloads — Verified 2026-11-19: 2026-11-19: .autonomy/checks/A24-P02.gbl-ios27.json exit 0 (50 core and 33 experience tests on sim-27.2); WorkloadRenderer (quads, alu, particles) over FieldPass, render targets and ParticleRenderer; no GL call of its own
   over `FieldPass`, render targets and `ParticleRenderer`, built from a validated `BenchmarkCase`, refusing a case
   over `ResourceRegistry.maxTextureSize` before allocation; setup, draw(frame n), resize and release; no GL call of
   their own
