@@ -1,0 +1,2028 @@
+{
+ "schema": 1,
+ "app": "effects-composer",
+ "gate": "A25-P00",
+ "date": "2026-11-19",
+ "inventory": [
+  {
+   "area": "Package products",
+   "description": "Pure, host-testable products of Packages/VisualCore: VisualCoreMath, VisualCoreSimulation, VisualCoreScenes, VisualCoreShaderSource, VisualCoreEffectsGraph, VisualCoreDiagnostics, VisualCoreAudioDSP, VisualCorePersistence, VisualCoreParameters, VisualCoreExperience (plus VisualCoreTestSupport for tests). iOS products of Packages/VisualCoreRendering: VisualCoreRendering, VisualCoreEffects, VisualCoreUI, VisualCoreAudio, VisualCoreAutomation, VisualCoreExperienceHost. For Effects Composer (checked 2026-11-19): VisualCoreRendering has RenderHost (renderOffscreen, readPixels, recreateContext), RenderContext, FieldPass with FieldUniform and FieldPassError, RenderTarget (readPixels, upload(rgbaFloats:)), Texture.upload(rgba:), TextureFormat (rgba8, rgba16f, r8), PingPongTarget, FloatRenderSupport, ResourceRegistry (program, makeRenderTarget, acquireTarget, recycle, trimPools, stats, budget, maxTextureSize), RenderCapabilities, ShaderBundle with the vc/ library, StillImage, StillImageEncoder and StillCapture; VisualCoreEffectsGraph has EffectGraphDescription, EffectGraphValidator and PassSchemas; VisualCoreEffects has EffectRenderer and EffectScene; VisualCoreShaderSource has ShaderLibrary, InfoLogParser and ShaderDiagnostic; VisualCoreParameters has ParameterDefinition, ParameterSchema, ParameterEditor and Preset; VisualCorePersistence has MigrationChain, DocumentStore, DocumentEnvelope, StoreProblem, NamedLibrary and TemporaryFolder; VisualCoreScenes has ExportGeometry; VisualCoreExperience has ExperienceStorage, ExperienceControl and ExperienceCore. Missing in every framework product (grep 2026-11-19): a byte-wise upload into a RenderTarget, any image decoding into pixels (no CGImage or UIImage path), a photo picker, an sRGB texture format, vec3 and mat4 field uniforms, a shared still-export Transferable and structured per-pass diagnostics from EffectRenderer.",
+   "paths": [
+    "Packages/VisualCore/Package.swift",
+    "Packages/VisualCoreRendering/Package.swift",
+    "Packages/ExperiencesCreative/Package.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/PingPongTarget.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FloatRenderSupport.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderCapabilities.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderBundle.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillImage.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillCapture.swift",
+    "Packages/VisualCore/Sources/VisualCoreEffectsGraph/EffectGraph.swift",
+    "Packages/VisualCore/Sources/VisualCoreEffectsGraph/EffectGraphValidation.swift",
+    "Packages/VisualCore/Sources/VisualCoreEffectsGraph/PassSchemas.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectRenderer.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectScene.swift",
+    "Packages/VisualCore/Sources/VisualCoreShaderSource/ShaderLibrary.swift",
+    "Packages/VisualCore/Sources/VisualCoreShaderSource/InfoLogParser.swift",
+    "Packages/VisualCore/Sources/VisualCoreParameters/ParameterSchema.swift",
+    "Packages/VisualCore/Sources/VisualCoreParameters/ParameterEditor.swift",
+    "Packages/VisualCore/Sources/VisualCoreParameters/Preset.swift",
+    "Packages/VisualCore/Sources/VisualCorePersistence/Migration.swift",
+    "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
+    "Packages/VisualCore/Sources/VisualCorePersistence/Envelope.swift",
+    "Packages/VisualCore/Sources/VisualCorePersistence/NamedLibrary.swift",
+    "Packages/VisualCore/Sources/VisualCorePersistence/TemporaryFolder.swift",
+    "Packages/VisualCore/Sources/VisualCoreScenes/ExportGeometry.swift",
+    "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+    "docs/api/visualcore-public-api.txt",
+    "scripts/check_dependencies.py"
+   ],
+   "owner": "VisualCore packages (ADR-0003, ADR-0009)"
+  },
+  {
+   "area": "EGL render host and its main-thread rule",
+   "description": "RenderHost (@MainActor) owns the EGL display, context and surfaces over ANGLE's Metal backend (EGLDisplayProvider), the CAMetalLayer RenderView, the FrameScheduler and the context generations, and exposes capabilities, resources (ResourceRegistry), renderOffscreen, readPixels, pause, resume and recreateContext. RenderHost, ResourceRegistry, RenderScene and ExperiencePresenter are main-actor: GL work happens only inside a scene's setup, resize, render and teardown with the host's context current, on the main thread. A presenter receives a RenderContext (generation, pixel size, framebuffer, resources), never the host. The GL calls exist only in the internal CVisualCoreGL shim, which is no product.",
+   "paths": [
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderView.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FrameScheduler.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/EGLDisplayProvider.swift",
+    "Packages/VisualCoreRendering/Sources/CVisualCoreGL/CVisualCoreGL.c",
+    "Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/RenderHostTests.swift"
+   ],
+   "owner": "VisualCoreRendering (ADR-0002 seam)"
+  },
+  {
+   "area": "Programs, full-screen passes with sampler inputs, render targets and their budget",
+   "description": "ResourceRegistry.program(vertex:fragment:defines:library:...) compiles and links in the host's context with ShaderError diagnostics and an LRU program cache (maxCachedPrograms 64). FieldPass runs a fragment over every pixel of a RenderTarget or the framebuffer with named sampler2D RenderTarget inputs and typed FieldUniform values (float, vec2, vec4, int), validated before any draw; it refuses to sample its own output (FieldPassError.inputIsOutput) and reports compile failures as FieldPassError.compile. ResourceRegistry.makeRenderTarget checks framebuffer completeness; acquireTarget, recycle and trimPools pool targets; PingPongTarget pairs two; TextureFormat is rgba8, rgba16f or r8; FloatRenderSupport reports whether rgba16f is renderable; ResourceBudget (256 MiB by default, per-kind limits) refuses allocations over budget and ResourceRegistry.stats reports live bytes, peaks and shader failures.",
+   "paths": [
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderProgram.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/PingPongTarget.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FloatRenderSupport.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/ResourceLedger.swift",
+    "Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/FieldPassTests.swift",
+    "Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/ResourceRegistryTests.swift",
+    "Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/PingPongTargetTests.swift",
+    "Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/FloatRenderSupportTests.swift",
+    "Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/ProgramCacheTests.swift"
+   ],
+   "owner": "VisualCoreRendering + VisualCoreDiagnostics"
+  },
+  {
+   "area": "Read-back and texture upload",
+   "description": "RenderTarget.readPixels and RenderHost.readPixels read RGBA8 bytes back; RenderHost.renderOffscreen renders a still into a StillImage. Texture.upload(rgba:) uploads RGBA8 bytes into a Texture, which FieldPass cannot sample (its inputs are RenderTargets); RenderTarget.upload(rgbaFloats:) takes four floats per pixel. No byte-wise RenderTarget upload exists (U-RGBAUPLOAD).",
+   "paths": [
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillImage.swift",
+    "Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/TextureUploadTests.swift",
+    "Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/OffscreenExportTests.swift",
+    "Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/FloatTransferTests.swift"
+   ],
+   "owner": "VisualCoreRendering"
+  },
+  {
+   "area": "The vc/ GLSL library and shader sources",
+   "description": "ShaderLibrary (VisualCoreShaderSource) expands #include with line origins and caps (maxExpandedBytes, maxIncludeDepth); ShaderBundle compiles bundled GLSL ES 3.00 with the vc/ library (ShaderBundle.visualCoreLibrary): noise.glsl, palette.glsl, color.glsl (vc_srgbEncode, vc_srgbDecode), hash.glsl, sdf.glsl and field.glsl. InfoLogParser turns a GL info log into ShaderDiagnostic lines mapped to source origins.",
+   "paths": [
+    "Packages/VisualCore/Sources/VisualCoreShaderSource/ShaderLibrary.swift",
+    "Packages/VisualCore/Sources/VisualCoreShaderSource/InfoLogParser.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderBundle.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/color.glsl",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/noise.glsl",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/palette.glsl",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/hash.glsl",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/sdf.glsl",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/field.glsl",
+    "Packages/VisualCore/Tests/VisualCoreShaderSourceTests/ShaderLibraryTests.swift",
+    "Packages/VisualCore/Tests/VisualCoreShaderSourceTests/InfoLogParserTests.swift",
+    "Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/ShaderBundleTests.swift"
+   ],
+   "owner": "VisualCoreShaderSource + VisualCoreRendering"
+  },
+  {
+   "area": "Effects graph",
+   "description": "EffectGraphDescription (Codable), EffectGraphValidator (quota, cycles, at most 32 passes) and PassSchemas describe a graph; the GPU EffectRenderer and EffectScene render it with pooled targets over a closed set of pass types (copy, colorMatrix, blur, bloom, distort, composite, feedback, flashLimit) whose runners and shaders are internal, so new effects cannot be added from outside, and its diagnostics are registry warnings (lastWarnings, failedPasses). Effects Composer does not use it (clarification Q1, research D6).",
+   "paths": [
+    "Packages/VisualCore/Sources/VisualCoreEffectsGraph/EffectGraph.swift",
+    "Packages/VisualCore/Sources/VisualCoreEffectsGraph/EffectGraphValidation.swift",
+    "Packages/VisualCore/Sources/VisualCoreEffectsGraph/PassSchemas.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectRenderer.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectScene.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectPasses.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectShaders.swift",
+    "Packages/VisualCore/Tests/VisualCoreEffectsGraphTests/ValidationTests.swift",
+    "Packages/VisualCoreRendering/Tests/VisualCoreEffectsTests/EffectRendererTests.swift"
+   ],
+   "owner": "VisualCoreEffectsGraph + VisualCoreEffects"
+  },
+  {
+   "area": "Frame clock and frame information",
+   "description": "FrameInfo (index, time, delta clamped by FramePacing, targetTimestamp) is passed to every render call; ExperiencePresenter.maxFramesPerSecond caps the presenter's rate. Effects Composer redraws its preview when the chain, a parameter or the source changes.",
+   "paths": [
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FrameScheduler.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/FramePacing.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+    "Packages/VisualCoreRendering/Tests/VisualCoreExperienceHostTests/FrameCapTests.swift"
+   ],
+   "owner": "VisualCoreRendering + VisualCoreDiagnostics"
+  },
+  {
+   "area": "Diagnostics, resource statistics and renderer capabilities",
+   "description": "ResourceRegistry.stats (ResourceLedger.Snapshot with liveBytes, peakBytes, staleRejected, shaderFailures and warnings), ResourceBudget, RenderLifecycle, RenderHostError.contextLost, ProcessMemory.footprint(); RenderCapabilities (GL and GLSL version, renderer, extensions, maxTextureSize) on RenderHost.capabilities, ResourceRegistry.maxTextureSize and ResourceRegistry.renderCapabilities; InfoLogParser and ShaderDiagnostic for compile and link logs.",
+   "paths": [
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/ResourceLedger.swift",
+    "Packages/VisualCore/Sources/VisualCoreDiagnostics/RenderLifecycle.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ProcessMemory.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderCapabilities.swift",
+    "Packages/VisualCore/Sources/VisualCoreShaderSource/InfoLogParser.swift",
+    "Packages/VisualCore/Tests/VisualCoreDiagnosticsTests/ResourceLedgerTests.swift",
+    "Packages/VisualCore/Tests/VisualCoreDiagnosticsTests/RenderLifecycleTests.swift",
+    "Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/RenderCapabilitiesProbeTests.swift"
+   ],
+   "owner": "VisualCoreDiagnostics + VisualCoreRendering + VisualCoreShaderSource"
+  },
+  {
+   "area": "Parameters, persistence and export",
+   "description": "ParameterDefinition (range, default, clamped, normalized), ParameterSchema, ParameterEditor, Preset and ExperienceControl describe bounded controls; ParameterPanel (VisualCoreUI) shows them. ExperienceStorage (StorageQuota 16 MiB, 64 files) holds an experience's files; MigrationChain, DocumentStore, DocumentEnvelope and StoreProblem (corrupt, wrongKind, newerVersion, tooLarge) give versioned envelopes that refuse damaged and newer files; NamedLibrary keeps named items. StillImageEncoder writes PNG, JPEG and HEIC through ImageIO tagged sRGB (isAvailable per format); ExportGeometry bounds export sizes (hardMaxEdge 8,192, defaultMaxPixels 64,000,000); TemporaryFolder holds export files.",
+   "paths": [
+    "Packages/VisualCore/Sources/VisualCoreParameters/ParameterSchema.swift",
+    "Packages/VisualCore/Sources/VisualCoreParameters/ParameterEditor.swift",
+    "Packages/VisualCore/Sources/VisualCoreParameters/Preset.swift",
+    "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceAction.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreUI/ParameterPanel.swift",
+    "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+    "Packages/VisualCore/Sources/VisualCorePersistence/Migration.swift",
+    "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
+    "Packages/VisualCore/Sources/VisualCorePersistence/Envelope.swift",
+    "Packages/VisualCore/Sources/VisualCorePersistence/NamedLibrary.swift",
+    "Packages/VisualCore/Sources/VisualCorePersistence/TemporaryFolder.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillImage.swift",
+    "Packages/VisualCore/Sources/VisualCoreScenes/ExportGeometry.swift",
+    "Packages/VisualCore/Tests/VisualCoreParametersTests/ParametersTests.swift",
+    "Packages/VisualCore/Tests/VisualCorePersistenceTests/DocumentStoreTests.swift",
+    "Packages/VisualCore/Tests/VisualCoreExperienceTests/ExperienceStorageTests.swift",
+    "Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/StillFormatTests.swift",
+    "Packages/VisualCore/Tests/VisualCoreScenesTests/ExportGeometryTests.swift"
+   ],
+   "owner": "VisualCoreParameters + VisualCorePersistence + VisualCoreExperience + VisualCoreScenes + VisualCoreRendering"
+  },
+  {
+   "area": "Experience host",
+   "description": "ExperienceSession opens, checkpoints, closes and recovers an Experience on one RenderHost and applies quality, memory-warning and scene-phase events and recreateContext; ExperienceShell adapts an ExperiencePresenter (scene, controls, pointer input, canvas overlay, maxFramesPerSecond); ExperienceCore is the GPU-free state with its qualityTiers; ExperienceStorage and ExperienceSnapshot persist it. The one app registers experiences in ExperienceRegistry and Catalog/registrations.json: twenty-four registered (A01-A24), candidates empty (checked 2026-11-19); a25 is no registration, AppModelTests uses it as the synthetic not-yet-integrated id, and Effects Composer stays unregistered and unavailable in A25-P00. The catalog lists it as free, family Developer and creator tools, launcher category tools. The app already carries NSPhotoLibraryAddUsageDescription (project.yml) for experiences that declare photo-library-add.",
+   "paths": [
+    "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceShell.swift",
+    "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+    "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceCore.swift",
+    "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+    "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceSnapshot.swift",
+    "Apps/VisualCore/App/ExperienceRegistry.swift",
+    "Apps/VisualCore/Tests/Unit/AppModelTests.swift",
+    "Catalog/registrations.json",
+    "docs/catalog/experience-catalog.json",
+    "scripts/check_experience_packages.py",
+    "project.yml"
+   ],
+   "owner": "VisualCoreExperience + VisualCoreExperienceHost + the one app"
+  },
+  {
+   "area": "Build and release steps",
+   "description": "XcodeGen spec project.yml for the one app (target VisualCore), package schemes via scripts/xcodebuild_package.py, app tests via scripts/xcodebuild_app.py, and scripts/release_check.py: python3 scripts/release_check.py --list prints 178 lines (2026-11-19): shared checks including app-contracts (every docs/apps/*/visualcore-contract.json), licenses, copy claims and usage-descriptions; package and app builds and tests; experience-release and copy-claims steps of the released experiences; verify steps of the registered experiences on iOS 27 and 26; the release audits; the seven reference regression steps and the ProjectM independence check. No A25 step exists yet; they come with G-RELEASE.",
+   "paths": [
+    "project.yml",
+    "scripts/release_check.py",
+    "scripts/xcodebuild_package.py",
+    "scripts/xcodebuild_app.py",
+    "scripts/check_app_contract.py",
+    "scripts/check_licenses.py",
+    "scripts/check_copy_claims.py",
+    "scripts/check_usage_descriptions.py",
+    ".github/workflows/ci.yml"
+   ],
+   "owner": "repository tooling"
+  },
+  {
+   "area": "Source ownership",
+   "description": "Effects Composer owns its domain and UI under Packages/ExperiencesCreative/EffectsComposer/ (Core GPU-free, CoreTests, Experience with Adapter/, ExperienceTests; created in A25-P01, not present today): the effect definition, node, chain, parameter and output-settings models and their caps; the five effect programs; the chain compiler and its pass plan; the target pool policy; the diagnostics mapping; editing, preview and compare; the image import (system picker, ImageIO decoding, scaling cap); colour boundaries; presets; still export and its Transferable; copy. VisualCore owns reusable machinery: the host, passes, targets, programs and read-back (VisualCoreRendering, VisualCoreExperienceHost), shader sources and diagnostics (VisualCoreShaderSource), parameters (VisualCoreParameters), persistence (VisualCorePersistence), export geometry (VisualCoreScenes) and storage (VisualCoreExperience); U-RGBAUPLOAD is VisualCoreRendering's. ProjectM stays in the harness.",
+   "paths": [
+    ".specify/memory/constitution.md",
+    "Auto-Creator.md",
+    "docs/decisions/ADR-0009-unified-app.md",
+    "Packages/ExperiencesCreative/Package.swift",
+    "specs/179-ec-p00-boundary-audit/spec.md",
+    "specs/179-ec-p00-boundary-audit/research.md"
+   ],
+   "owner": "Effects Composer (app-local) + VisualCore packages"
+  },
+  {
+   "area": "ProjectM reference regression",
+   "description": "Reference pinned at d93edd1, read-only; scripts/run_reference_baseline.py lists the ordered reference steps; scripts/check_reference_clean.py checks the submodule; the 7 release-check steps run in two chunks via release_check.py --only (reference-engine-xcframework, reference-build-projectm-ios-sim, reference-clean; reference-test-anglerendering-ios27, reference-test-anglerendering-ios26, projectm-reference-ios27, projectm-reference-ios26), recorded in docs/apps/effects-composer/regression-baseline.md (T-A25-001, T-A25-005). Phase start for the no-change diff of Packages and External: a2d68e21 (after the A25 constitution commit eec911ea).",
+   "paths": [
+    "scripts/run_reference_baseline.py",
+    "scripts/check_reference_clean.py",
+    "Harnesses/ProjectMReference/ProjectMReference.yml",
+    "specs/179-ec-p00-boundary-audit/tasks.md"
+   ],
+   "owner": "reference adapter (harness only)"
+  }
+ ],
+ "matrix": [
+  {
+   "id": "M01",
+   "capability": "Render graph: an ordered set of passes over intermediate targets compiled from the experience's chain",
+   "source": "brainstorm: render graph; manual \u00a76 capability audit; spec FR-A25-002",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+     "symbol": "FieldPass",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreEffectsGraph/EffectGraph.swift",
+     "symbol": "EffectGraphDescription",
+     "product": "VisualCoreEffectsGraph",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreEffectsGraph/EffectGraphValidation.swift",
+     "symbol": "EffectGraphValidator",
+     "product": "VisualCoreEffectsGraph",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectRenderer.swift",
+     "symbol": "EffectRenderer",
+     "product": "VisualCoreEffects",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/VisualProgrammingLab/Core/GraphCompiler.swift",
+    "symbol": "GraphCompiler"
+   },
+   "notes": "EffectGraphDescription and EffectGraphValidator (quota, cycles, at most 32 passes; ValidationTests) and the GPU EffectRenderer (EffectRendererTests, PassPixelTests) exist, but EffectRenderer's pass set is closed (copy, colorMatrix, blur, bloom, distort, composite, feedback, flashLimit, internal runners and shaders), so new effects cannot be added from outside (research D6). The linear chain compiles app-locally into a FieldPass plan (G-COMPILER, A25-P02), after Visual Programming Lab's GraphCompiler and PreviewPipeline."
+  },
+  {
+   "id": "M02",
+   "capability": "Framebuffer pipelines: full-screen passes that sample render targets and write offscreen targets in the host's context",
+   "source": "brainstorm: framebuffer pipelines; spec FR-A25-002",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+     "symbol": "FieldPass",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+     "symbol": "FieldPass.run",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+     "symbol": "RenderTarget",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+     "symbol": "ResourceRegistry.makeRenderTarget",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/PingPongTarget.swift",
+     "symbol": "PingPongTarget",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+     "symbol": "FieldPassError",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidFieldsScene.swift",
+    "symbol": "FluidFieldsScene"
+   },
+   "notes": "Public and tested (FieldPassTests, FieldBilinearTests, PingPongTargetTests, ResourceRegistryTests): FieldPass reads named RenderTarget inputs and writes a RenderTarget or the framebuffer; makeRenderTarget checks completeness; FieldPass refuses to sample its output (inputIsOutput). Fluid Art Playground's FluidFieldsScene chains FieldPasses over PingPongTargets."
+  },
+  {
+   "id": "M03",
+   "capability": "Shader library: GLSL ES 3.00 sources with #include, the vc/ library and compiled program caching",
+   "source": "brainstorm: shader library; spec FR-A25-002",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreShaderSource/ShaderLibrary.swift",
+     "symbol": "ShaderLibrary",
+     "product": "VisualCoreShaderSource",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderBundle.swift",
+     "symbol": "ShaderBundle",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderBundle.swift",
+     "symbol": "ShaderBundle.visualCoreLibrary",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+     "symbol": "ResourceRegistry.program",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderProgram.swift",
+     "symbol": "ShaderError",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/LivingWallpapers/Experience/SceneShaders.swift",
+    "symbol": "SceneShaders"
+   },
+   "notes": "ShaderLibraryTests, ShaderBundleTests, ProgramCacheTests, ShaderProgramTests and ShaderValidationTests. vc/color.glsl provides vc_srgbEncode and vc_srgbDecode for the colour boundaries (G-COLOR). Living Wallpapers' SceneShaders includes vc/color.glsl."
+  },
+  {
+   "id": "M04",
+   "capability": "Effect parameters: bounded, typed parameters with defaults, edited in a panel and passed to programs as uniforms",
+   "source": "brainstorm: effect parameters; spec FR-A25-002",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreParameters/ParameterSchema.swift",
+     "symbol": "ParameterDefinition",
+     "product": "VisualCoreParameters",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreParameters/ParameterSchema.swift",
+     "symbol": "ParameterDefinition.clamped",
+     "product": "VisualCoreParameters",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreParameters/ParameterSchema.swift",
+     "symbol": "ParameterSchema",
+     "product": "VisualCoreParameters",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreParameters/ParameterEditor.swift",
+     "symbol": "ParameterEditor",
+     "product": "VisualCoreParameters",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceAction.swift",
+     "symbol": "ExperienceControl",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+     "symbol": "FieldUniform",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/SimulationLab/Core/ParameterCatalog.swift",
+    "symbol": "ParameterCatalog"
+   },
+   "notes": "ParametersTests, ParameterEditorTests, ParameterPanelTests, FieldPassTests. FieldUniform has float, vec2, vec4 and int; there is no vec3 or mat4, so a colour matrix is packed into several vec4 uniforms (clarification Q1); no VisualCore change is planned. The five effects' parameter sets and caps are app-local (G-MODEL, G-EFFECTS). Simulation Lab's ParameterCatalog declares ParameterDefinitions."
+  },
+  {
+   "id": "M05",
+   "capability": "Preset serialization: versioned files with migration and refusal of damaged and newer files",
+   "source": "brainstorm: preset serialization; spec FR-A25-002",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+     "symbol": "ExperienceStorage",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/Migration.swift",
+     "symbol": "MigrationChain",
+     "product": "VisualCorePersistence",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
+     "symbol": "DocumentStore",
+     "product": "VisualCorePersistence",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/Envelope.swift",
+     "symbol": "DocumentEnvelope",
+     "product": "VisualCorePersistence",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/Envelope.swift",
+     "symbol": "StoreProblem",
+     "product": "VisualCorePersistence",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreParameters/Preset.swift",
+     "symbol": "Preset",
+     "product": "VisualCoreParameters",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Core/CompositionLibrary.swift",
+    "symbol": "CompositionLibrary"
+   },
+   "notes": "The building blocks are public and tested (ExperienceStorageTests, DocumentStoreTests, NamedLibraryTests, ParametersTests): StoreProblem names corrupt, wrongKind, newerVersion and tooLarge files. The preset envelope, its version and its refusal policy are app-local (G-PRESETS, A25-P04, row M20). Generative Art Studio's CompositionLibrary stores documents with DocumentStore."
+  },
+  {
+   "id": "M06",
+   "capability": "Offscreen rendering and export: render at an export size into a target, read it back and encode an image",
+   "source": "brainstorm: offscreen rendering and export; spec FR-A25-002",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+     "symbol": "RenderTarget.readPixels",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+     "symbol": "RenderHost.renderOffscreen",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillImage.swift",
+     "symbol": "StillImage",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillImage.swift",
+     "symbol": "StillImageEncoder",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillImage.swift",
+     "symbol": "StillImageEncoder.isAvailable",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreScenes/ExportGeometry.swift",
+     "symbol": "ExportGeometry",
+     "product": "VisualCoreScenes",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/TemporaryFolder.swift",
+     "symbol": "TemporaryFolder",
+     "product": "VisualCorePersistence",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/LivingWallpapers/Experience/StillExport.swift",
+    "symbol": "StillExport"
+   },
+   "notes": "OffscreenExportTests, StillFormatTests, StillCaptureTests, ExportGeometryTests, TemporaryFolderTests: RenderTarget.readPixels reads RGBA8 back, StillImageEncoder writes PNG, JPEG and HEIC tagged sRGB, ExportGeometry caps the edge at 8,192. No shared still-export Transferable exists; Effects Composer's export file and share flow are app-local after Living Wallpapers' StillExport and WallpaperExportFile (G-EXPORT, A25-P04, row M24)."
+  },
+  {
+   "id": "M07",
+   "capability": "Version 0.1 feature 01: a linear chain of five built-in effects with bounded parameters",
+   "source": "manual \u00a72 feature 01; spec FR-A25-002",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+     "symbol": "FieldPass",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreParameters/ParameterSchema.swift",
+     "symbol": "ParameterDefinition",
+     "product": "VisualCoreParameters",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/Migration.swift",
+     "symbol": "MigrationChain",
+     "product": "VisualCorePersistence",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderBundle.swift",
+     "symbol": "ShaderBundle.visualCoreLibrary",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/VisualProgrammingLab/Experience/PreviewPipeline.swift",
+    "symbol": "PreviewPipeline"
+   },
+   "notes": "Drawing and parameters exist (FieldPassTests, ParametersTests); the chain, node and effect models, the five effect programs and the compiler are app-local (G-MODEL, G-EFFECTS, G-COMPILER)."
+  },
+  {
+   "id": "M08",
+   "capability": "Version 0.1 feature 02: editable effects with reorder, enable and disable, and an immediate preview",
+   "source": "manual \u00a72 feature 02; spec FR-A25-002",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+     "symbol": "ExperiencePresenter",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceAction.swift",
+     "symbol": "ExperienceControl",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/ParameterPanel.swift",
+     "symbol": "ParameterPanel",
+     "product": "VisualCoreUI",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+     "symbol": "FieldPass",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/VisualProgrammingLab/Experience/LabControls.swift",
+    "symbol": "LabControls"
+   },
+   "notes": "ExperiencePresenter, ExperienceControl and ParameterPanel exist (ShellRenderingTests, ExperienceActionTests, ParameterPanelTests); reorder, enable and disable and the recompiled preview are G-EDIT (A25-P03). Visual Programming Lab's LabControls moves nodes."
+  },
+  {
+   "id": "M09",
+   "capability": "Version 0.1 feature 03: a before and after compare and preset saves",
+   "source": "manual \u00a72 feature 03; spec FR-A25-002",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+     "symbol": "RenderTarget",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+     "symbol": "FieldPass",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+     "symbol": "ExperienceStorage",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
+     "symbol": "DocumentStore",
+     "product": "VisualCorePersistence",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/ShaderStudio/Experience/TexturedPreview.swift",
+    "symbol": "TexturedPreview"
+   },
+   "notes": "Targets and storage exist (ResourceRegistryTests, DocumentStoreTests); keeping the untouched source and showing it is G-COMPARE (A25-P03); the preset envelope is G-PRESETS (A25-P04)."
+  },
+  {
+   "id": "M10",
+   "capability": "Version 0.1 feature 04: local image import through the system picker with scoped access",
+   "source": "manual \u00a72 feature 04; spec FR-A25-002",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderCapabilities.swift",
+     "symbol": "RenderCapabilities.maxTextureSize",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+     "symbol": "ResourceRegistry.maxTextureSize",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+     "symbol": "Texture.upload",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+     "symbol": "RenderTarget.upload",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/LivingWallpapers/Experience/WallpaperPresenter.swift",
+    "symbol": "WallpaperPresenter"
+   },
+   "notes": "No picker and no image decoder exist in the repository (grep 2026-11-19). The system photo picker (SwiftUI, out of process, no permission) and ImageIO decoding scaled to the texture limit are app-local (G-IMPORT, A25-P03); a byte-wise upload into a RenderTarget is the upstream gap U-RGBAUPLOAD (A25-P03, row M22)."
+  },
+  {
+   "id": "M11",
+   "capability": "Version 0.1 feature 05: still export with dimension and format validation",
+   "source": "manual \u00a72 feature 05; spec FR-A25-002",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+     "symbol": "RenderTarget.readPixels",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillImage.swift",
+     "symbol": "StillImageEncoder.isAvailable",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillImage.swift",
+     "symbol": "StillImageEncoder.data",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreScenes/ExportGeometry.swift",
+     "symbol": "ExportGeometry",
+     "product": "VisualCoreScenes",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/LivingWallpapers/Experience/WallpaperExportFile.swift",
+    "symbol": "WallpaperExportFile"
+   },
+   "notes": "OffscreenExportTests, StillFormatTests, ExportGeometryTests. The export plan, its validation against ExportGeometry and StillImageEncoder.isAvailable, the Transferable and the ShareLink are G-EXPORT (A25-P04)."
+  },
+  {
+   "id": "M12",
+   "capability": "Version 0.1 feature 06: controlled render-target pooling and shader compile diagnostics",
+   "source": "manual \u00a72 feature 06; spec FR-A25-002",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+     "symbol": "ResourceRegistry.acquireTarget",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+     "symbol": "ResourceRegistry.recycle",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+     "symbol": "ResourceRegistry.trimPools",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/ResourceLedger.swift",
+     "symbol": "ResourceBudget",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreShaderSource/InfoLogParser.swift",
+     "symbol": "InfoLogParser",
+     "product": "VisualCoreShaderSource",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreShaderSource/InfoLogParser.swift",
+     "symbol": "ShaderDiagnostic",
+     "product": "VisualCoreShaderSource",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/ShaderStudio/Core/DiagnosticMapper.swift",
+    "symbol": "DiagnosticMapper"
+   },
+   "notes": "ResourceRegistryTests, ResourceLedgerTests, InfoLogParserTests. The pool's caps and lifetime policy are G-POOL (A25-P02); mapping FieldPassError.compile text to ShaderDiagnostic lines per effect is G-DIAG (A25-P02), after Shader Studio's DiagnosticMapper."
+  },
+  {
+   "id": "M13",
+   "capability": "Effect definition, node, chain, parameter and output-settings models: versioned, validated, with caps",
+   "source": "spec FR-A25-003; manual \u00a76",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreParameters/ParameterSchema.swift",
+     "symbol": "ParameterDefinition",
+     "product": "VisualCoreParameters",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/Migration.swift",
+     "symbol": "MigrationChain",
+     "product": "VisualCorePersistence",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/Envelope.swift",
+     "symbol": "DocumentEnvelope",
+     "product": "VisualCorePersistence",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/VisualProgrammingLab/Core/GraphDocument.swift",
+    "symbol": "GraphDocument"
+   },
+   "notes": "ParametersTests, DocumentStoreTests. The models and their caps (chain length, parameter ranges, source and export edges; research D5) are G-MODEL (A25-P01), pure in the experience's Core. Visual Programming Lab's GraphDocument is the closest consumer."
+  },
+  {
+   "id": "M14",
+   "capability": "Five built-in effects with bounded parameters, drawn as FieldPass programs",
+   "source": "spec FR-A25-003; manual \u00a72 feature 01",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+     "symbol": "FieldPass",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+     "symbol": "FieldUniform",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderBundle.swift",
+     "symbol": "ShaderBundle.visualCoreLibrary",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreParameters/ParameterSchema.swift",
+     "symbol": "ParameterDefinition.clamped",
+     "product": "VisualCoreParameters",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/LivingWallpapers/Experience/SceneShaders.swift",
+    "symbol": "SceneShaders"
+   },
+   "notes": "FieldPassTests, ShaderBundleTests, ParametersTests. The five effect programs, their uniforms (wider parameters packed into vec4) and parameter bounds are G-EFFECTS (A25-P01)."
+  },
+  {
+   "id": "M15",
+   "capability": "Chain compilation into an ordered pass plan with intermediate-target lifetimes; a pass never samples the target it writes",
+   "source": "spec FR-A25-003; clarification Q1",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+     "symbol": "FieldPass",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+     "symbol": "FieldPassError",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+     "symbol": "ResourceRegistry.acquireTarget",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+     "symbol": "ResourceRegistry.recycle",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/VisualProgrammingLab/Experience/PreviewPipeline.swift",
+    "symbol": "PreviewPipeline"
+   },
+   "notes": "FieldPass refuses inputIsOutput (FieldPassTests); acquireTarget and recycle pool targets (ResourceRegistryTests). The pass plan, its lifetimes and its proof are G-COMPILER (A25-P02), after Visual Programming Lab's PreviewPipeline."
+  },
+  {
+   "id": "M16",
+   "capability": "A bounded pool of intermediate targets",
+   "source": "spec FR-A25-003; manual \u00a713 risk 3",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+     "symbol": "ResourceRegistry.acquireTarget",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+     "symbol": "ResourceRegistry.recycle",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+     "symbol": "ResourceRegistry.trimPools",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/ResourceLedger.swift",
+     "symbol": "ResourceBudget",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+     "symbol": "ResourceRegistry.stats",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/VisualProgrammingLab/Experience/PreviewPipeline.swift",
+    "symbol": "PreviewPipeline"
+   },
+   "notes": "ResourceRegistryTests and ResourceLedgerTests prove pooling and budget refusal. The pool's target-count and byte caps for the chain are G-POOL (A25-P02)."
+  },
+  {
+   "id": "M17",
+   "capability": "Shader compile and link diagnostics visible to the experience",
+   "source": "spec FR-A25-003; manual \u00a72 feature 06",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+     "symbol": "FieldPassError",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderProgram.swift",
+     "symbol": "ShaderError",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreShaderSource/InfoLogParser.swift",
+     "symbol": "InfoLogParser",
+     "product": "VisualCoreShaderSource",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreShaderSource/InfoLogParser.swift",
+     "symbol": "InfoLogParser.parse",
+     "product": "VisualCoreShaderSource",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreShaderSource/InfoLogParser.swift",
+     "symbol": "ShaderDiagnostic",
+     "product": "VisualCoreShaderSource",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/ResourceLedger.swift",
+     "symbol": "ResourceLedger",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/ShaderStudio/Core/DiagnosticMapper.swift",
+    "symbol": "DiagnosticMapper"
+   },
+   "notes": "FieldPassTests, ShaderProgramTests, InfoLogParserTests. EffectRenderer's diagnostics are only registry warnings (research D6). Mapping a failed effect's FieldPassError.compile text to ShaderDiagnostic lines is G-DIAG (A25-P02), after Shader Studio's DiagnosticMapper."
+  },
+  {
+   "id": "M18",
+   "capability": "Reorder, enable and disable with an immediate preview",
+   "source": "spec FR-A25-003; manual \u00a72 feature 02",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+     "symbol": "ExperiencePresenter",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceAction.swift",
+     "symbol": "ExperienceControl",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/ParameterPanel.swift",
+     "symbol": "ParameterPanel",
+     "product": "VisualCoreUI",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/VisualProgrammingLab/Experience/LabControls.swift",
+    "symbol": "LabControls"
+   },
+   "notes": "ShellRenderingTests, ExperienceActionTests, ParameterPanelTests. The edit operations, their accessible alternatives and the recompile on edit are G-EDIT (A25-P03)."
+  },
+  {
+   "id": "M19",
+   "capability": "A before and after compare that keeps the untouched source",
+   "source": "spec FR-A25-003; manual \u00a72 feature 03",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+     "symbol": "RenderTarget",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+     "symbol": "FieldPass",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+     "symbol": "RenderContext",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/ShaderStudio/Experience/TexturedPreview.swift",
+    "symbol": "TexturedPreview"
+   },
+   "notes": "ResourceRegistryTests, FieldPassTests. Keeping the source target untouched and showing it beside or in place of the result is G-COMPARE (A25-P03)."
+  },
+  {
+   "id": "M20",
+   "capability": "Preset storage with versioned files; damaged and newer files refused and never deleted automatically",
+   "source": "spec FR-A25-003; clarification Q4",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+     "symbol": "ExperienceStorage",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/Migration.swift",
+     "symbol": "MigrationChain",
+     "product": "VisualCorePersistence",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
+     "symbol": "DocumentStore",
+     "product": "VisualCorePersistence",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/Envelope.swift",
+     "symbol": "StoreProblem",
+     "product": "VisualCorePersistence",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Core/CompositionLibrary.swift",
+    "symbol": "CompositionLibrary"
+   },
+   "notes": "ExperienceStorageTests, DocumentStoreTests. The preset envelope, its version, non-finite refusal and the no-automatic-deletion rule are G-PRESETS (A25-P04)."
+  },
+  {
+   "id": "M21",
+   "capability": "Image import through the system picker with scoped access, decoded within the texture limit",
+   "source": "spec FR-A25-003; clarification Q2; manual \u00a713 risk 2",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderCapabilities.swift",
+     "symbol": "RenderCapabilities.maxTextureSize",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+     "symbol": "ResourceRegistry.maxTextureSize",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/LivingWallpapers/Experience/WallpaperPresenter.swift",
+    "symbol": "WallpaperPresenter"
+   },
+   "notes": "RenderCapabilitiesProbeTests, RegistryCapabilitiesTests. No picker or decoder exists (grep 2026-11-19). The system photo picker (SwiftUI system API, out of process, no permission), ImageIO decoding into RGBA bytes scaled so the longer edge is at most min(texture limit, cap), keeping the bytes for re-upload, and the cancelled-pick fallback to the built-in test image are G-IMPORT (A25-P03). Living Wallpapers' WallpaperPresenter reads maxTextureSize."
+  },
+  {
+   "id": "M22",
+   "capability": "An imported image's bytes reach a pass input (a render target) without four floats per pixel",
+   "source": "spec FR-A25-003; clarification Q2; research D2, D6",
+   "status": "upstream gap",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+     "symbol": "RenderTarget.upload",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+     "symbol": "Texture.upload",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidFieldsScene.swift",
+    "symbol": "FluidFieldsScene"
+   },
+   "notes": "Texture.upload(rgba:) fills a Texture, which FieldPass cannot sample, and RenderTarget.upload(rgbaFloats:) takes four floats per pixel, quadrupling a large image's CPU memory (TextureUploadTests, FloatTransferTests). U-RGBAUPLOAD (VisualCore:VisualCoreRendering, A25-P03) adds a byte-wise RenderTarget.upload(rgba:). Fluid Art Playground seeds a RenderTarget with upload(rgbaFloats:)."
+  },
+  {
+   "id": "M23",
+   "capability": "Colour-space boundaries: sRGB source and export, linear intermediate work",
+   "source": "spec FR-A25-003; clarification Q3; manual \u00a713 risk 1",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderBundle.swift",
+     "symbol": "ShaderBundle.visualCoreLibrary",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FloatRenderSupport.swift",
+     "symbol": "FloatRenderSupport",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FloatRenderSupport.swift",
+     "symbol": "FloatRenderSupport.storageFormat",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+     "symbol": "TextureFormat",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillImage.swift",
+     "symbol": "StillImageEncoder",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/LivingWallpapers/Core/ImageColorPipeline.swift",
+    "symbol": "ImageColorPipeline"
+   },
+   "notes": "ShaderBundleTests, FloatRenderSupportTests, StillFormatTests. No sRGB texture format exists; each pass states whether it decodes (vc_srgbDecode) and encodes (vc_srgbEncode), intermediates are rgba16f where FloatRenderSupport reports it renderable and rgba8 otherwise (G-COLOR, A25-P05). Living Wallpapers' ImageColorPipeline is the closest consumer."
+  },
+  {
+   "id": "M24",
+   "capability": "Still export at a validated size and format, rendered offscreen and encoded",
+   "source": "spec FR-A25-003; clarification Q4",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+     "symbol": "RenderTarget.readPixels",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillImage.swift",
+     "symbol": "StillImageEncoder.isAvailable",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillImage.swift",
+     "symbol": "StillImageEncoder.data",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillImage.swift",
+     "symbol": "StillImageFormat",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreScenes/ExportGeometry.swift",
+     "symbol": "ExportGeometry",
+     "product": "VisualCoreScenes",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/TemporaryFolder.swift",
+     "symbol": "TemporaryFolder",
+     "product": "VisualCorePersistence",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/LivingWallpapers/Experience/WallpaperExportFile.swift",
+    "symbol": "WallpaperExportFile"
+   },
+   "notes": "OffscreenExportTests, StillFormatTests, ExportGeometryTests, TemporaryFolderTests. Rendering the chain at the export size into a pooled target, reading it back, encoding it, and the Transferable and ShareLink are G-EXPORT (A25-P04), after Living Wallpapers' WallpaperExportFile."
+  },
+  {
+   "id": "M25",
+   "capability": "Resize, orientation and context loss during editing or export: targets rebuilt from CPU state and the source re-uploaded",
+   "source": "spec FR-A25-003; spec edge cases",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+     "symbol": "RenderHost.recreateContext",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+     "symbol": "ExperienceSession.recreateContext",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+     "symbol": "RenderContext.generation",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/RenderLifecycle.swift",
+     "symbol": "RenderLifecycle",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+     "symbol": "ExperiencePresenter.resize",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/SimulationLab/Experience/SimulationPresenter.swift",
+    "symbol": "SimulationPresenter"
+   },
+   "notes": "RenderHostTests, SessionFailureTests, RenderLifecycleTests, ShellRenderingTests. Rebuilding the pass plan, the pool and the source target from the kept bytes after a new generation, and an export interrupted by a context loss, are G-ROBUST (A25-P05)."
+  },
+  {
+   "id": "M26",
+   "capability": "Context loss: GPU objects of an earlier context are refused and rebuilt from CPU state",
+   "source": "cross-cutting; manual \u00a74 contracts",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+     "symbol": "RenderHost.recreateContext",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+     "symbol": "RenderContext.generation",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+     "symbol": "RenderHostError",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+     "symbol": "ResourceRegistry.generation",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+     "symbol": "ExperienceSession.recreateContext",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/SimulationLab/Experience/SimulationPresenter.swift",
+    "symbol": "SimulationPresenter"
+   },
+   "notes": "RenderHost.recreateContext and ExperienceSession.recreateContext tear down and set up the scene in a new generation; RenderHostError has a contextLost case and FieldPass refuses stale objects (RenderHostTests, SessionFailureTests, FieldPassTests, CleanupSweepTests). Simulation Lab's presenter rebuilds its targets."
+  },
+  {
+   "id": "M27",
+   "capability": "Resize and orientation: passes follow the drawable's pixel size",
+   "source": "cross-cutting; manual \u00a74 contracts",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+     "symbol": "RenderContext.pixelWidth",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+     "symbol": "ExperiencePresenter.resize",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/GenerativeArtPresenter.swift",
+    "symbol": "GenerativeArtPresenter"
+   },
+   "notes": "RenderContext carries pixelWidth and pixelHeight and ExperiencePresenter.resize is called on every drawable change (ShellRenderingTests, RenderHostTests)."
+  },
+  {
+   "id": "M28",
+   "capability": "Quality tiers: the governor fed by thermal state and Low Power Mode, tiers declared by the core",
+   "source": "cross-cutting; constitution quality tiers",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityGovernor.swift",
+     "symbol": "QualityGovernor",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityProfile.swift",
+     "symbol": "QualityLevel",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceCore.swift",
+     "symbol": "ExperienceCore.qualityTiers",
+     "product": "VisualCoreExperience",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/Adapter/FluidArtCore.swift",
+    "symbol": "FluidArtCore"
+   },
+   "notes": "QualityGovernorTests, QualityProfileTests, QualityDeclarationTests. Effects Composer declares its tiers in its core (preview scale) when it registers; Fluid Art Playground's FluidArtCore declares qualityTiers."
+  },
+  {
+   "id": "M29",
+   "capability": "Accessibility: VoiceOver labels, Dynamic Type and Reduce Motion respected",
+   "source": "cross-cutting; constitution accessibility",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPreferences.swift",
+     "symbol": "AccessibilityPreferences",
+     "product": "VisualCoreSimulation",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPreferences.swift",
+     "symbol": "AccessibilityPreferences.reduceMotion",
+     "product": "VisualCoreSimulation",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/ParameterPanel.swift",
+     "symbol": "ParameterPanel",
+     "product": "VisualCoreUI",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/SceneScreen.swift",
+    "symbol": "AppAccessibility"
+   },
+   "notes": "AccessibilityPreferencesTests, SystemAccessibilityObserverTests, ParameterPanelTests. Generative Art Studio's SceneScreen applies them; the chain editor's labels and non-drag reorder are app-local in G-EDIT."
+  },
+  {
+   "id": "M30",
+   "capability": "Bounded resources: GPU bytes, targets, storage and export sizes under declared caps",
+   "source": "cross-cutting; manual \u00a713 risks 2 and 3",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/ResourceLedger.swift",
+     "symbol": "ResourceBudget",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+     "symbol": "ResourceRegistry.stats",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+     "symbol": "StorageQuota",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreScenes/ExportGeometry.swift",
+     "symbol": "ExportGeometry.hardMaxEdge",
+     "product": "VisualCoreScenes",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderCapabilities.swift",
+     "symbol": "RenderCapabilities.maxTextureSize",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/VisualProgrammingLab/Experience/PreviewPipeline.swift",
+    "symbol": "PreviewPipeline"
+   },
+   "notes": "ResourceRegistryTests, ResourceLedgerTests, ExperienceStorageTests, ExportGeometryTests: allocations over budget are refused, storage is capped at 16 MiB and 64 files, export edges at 8,192. The experience's own caps are set in G-MODEL and G-POOL."
+  },
+  {
+   "id": "M31",
+   "capability": "Permissions: photo-library-add only (Save Image from the share sheet); the system picker needs no read permission; no network, no upload",
+   "source": "cross-cutting; clarification Q5",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+     "symbol": "ExperienceStorage",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillImage.swift",
+     "symbol": "StillImageEncoder",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCorePersistence/TemporaryFolder.swift",
+     "symbol": "TemporaryFolder",
+     "product": "VisualCorePersistence",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/LivingWallpapers/Experience/WallpaperExportFile.swift",
+    "symbol": "WallpaperExportFile"
+   },
+   "notes": "The app already carries NSPhotoLibraryAddUsageDescription (project.yml) for Living Wallpapers and Digital Zen Garden, which declare photo-library-add; the system photo picker runs out of process and needs no usage string. The registration's permissions are set at A25-P02 and checked at release (G-RELEASE); scripts/check_usage_descriptions.py keeps the app's usage strings unchanged."
+  },
+  {
+   "id": "M32",
+   "capability": "The render thread: GL work only inside a scene's setup, resize, render and teardown on the main thread with the host's context current",
+   "source": "cross-cutting; manual \u00a74 contracts",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+     "symbol": "RenderHost",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+     "symbol": "RenderScene",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+     "symbol": "RenderContext",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+     "symbol": "ExperiencePresenter",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/VisualProgrammingLab/Experience/LabPresenter.swift",
+    "symbol": "LabPresenter"
+   },
+   "notes": "RenderHost, ResourceRegistry, RenderScene and ExperiencePresenter are main-actor (RenderHostTests, ShellRenderingTests). Image decoding happens on the CPU off the render calls and only the upload runs inside render (G-IMPORT)."
+  },
+  {
+   "id": "M33",
+   "capability": "Truthful claims: no professional colour-accuracy claim and no preset compatibility with another editor",
+   "source": "cross-cutting; manual \u00a72 non-goals; CLAUDE.md rule 9",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceDescriptor.swift",
+     "symbol": "ExperienceDescriptor",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillImage.swift",
+     "symbol": "StillImageEncoder",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/LivingWallpapers/Core/ImageColorPipeline.swift",
+    "symbol": "ImageColorPipeline"
+   },
+   "notes": "StillImageEncoder tags exports sRGB (StillFormatTests); the experience's copy and store claims are checked by copy-claims in G-RELEASE (A25-P06)."
+  },
+  {
+   "id": "M34",
+   "capability": "Release: registration, the A25 release-check, copy-claims and verify steps, licenses and catalog availability",
+   "source": "manual \u00a79 phase 06",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceDescriptor.swift",
+     "symbol": "ExperienceDescriptor",
+     "product": "VisualCoreExperience",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AcknowledgementsView.swift",
+     "symbol": "LicenseInventory",
+     "product": "VisualCoreUI",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/DigitalAquarium/Core/LicenseAudit.swift",
+    "symbol": "LicenseAudit"
+   },
+   "notes": "No A25 release step exists (178 lines listed by python3 scripts/release_check.py --list on 2026-11-19; AcknowledgementsViewTests). G-RELEASE (A25-P06)."
+  },
+  {
+   "id": "M35",
+   "capability": "Experience host: session, shell, presenter, checkpoints, memory-warning and scene-phase handling",
+   "source": "cross-cutting; ADR-0009",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+     "symbol": "ExperienceSession",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceShell.swift",
+     "symbol": "ExperienceShell",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+     "symbol": "ExperiencePresenter",
+     "product": "VisualCoreExperienceHost",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceCore.swift",
+     "symbol": "ExperienceCore",
+     "product": "VisualCoreExperience",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/GenerativeArtPresenter.swift",
+    "symbol": "GenerativeArtPresenter"
+   },
+   "notes": "SessionOpenCloseTests, SessionRestoreTests, SessionPhaseMemoryTests, ShellRenderingTests, ExperienceConformanceTests."
+  },
+  {
+   "id": "M36",
+   "capability": "Memory limits, oversized sources and the device plan",
+   "source": "manual \u00a79 phase 05; manual \u00a713 risks 2 and 3",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderCapabilities.swift",
+     "symbol": "RenderCapabilities.maxTextureSize",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/ResourceLedger.swift",
+     "symbol": "ResourceBudget",
+     "product": "VisualCoreDiagnostics",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+     "symbol": "ResourceRegistry.stats",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/LivingWallpapers/Experience/WallpaperPresenter.swift",
+    "symbol": "WallpaperPresenter"
+   },
+   "notes": "RenderCapabilitiesProbeTests, ResourceLedgerTests. Oversized-source refusal or scaling at the edges, memory warnings during editing and export, and the device plan are G-ROBUST (A25-P05). Simulator results are never device evidence."
+  },
+  {
+   "id": "M37",
+   "capability": "A full-screen pass sampling a texture into an offscreen target in the host's context, read back (US4 scenario 2 stop condition)",
+   "source": "spec US4 scenario 2; manual \u00a79 phase 00 stop point",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+     "symbol": "FieldPass.run",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+     "symbol": "ResourceRegistry.makeRenderTarget",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+     "symbol": "RenderTarget.readPixels",
+     "product": "VisualCoreRendering",
+     "public": true
+    },
+    {
+     "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+     "symbol": "RenderHost",
+     "product": "VisualCoreRendering",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/ExperiencesCreative/VisualProgrammingLab/Experience/PreviewPipeline.swift",
+    "symbol": "PreviewPipeline"
+   },
+   "notes": "FieldPassTests and OffscreenExportTests draw FieldPasses that sample RenderTargets into offscreen RenderTargets in the host's context and read the pixels back; Visual Programming Lab's PreviewPipeline does this in shipping code. The stop condition is therefore not met."
+  }
+ ],
+ "gaps": [
+  {
+   "id": "G-MODEL",
+   "matrix": [
+    "M07",
+    "M13"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "The effect definition, node, chain, parameter and output-settings models (manual \u00a76) are the experience's domain, pure and GPU-free in its Core, versioned with MigrationChain and with documented caps on chain length, parameter ranges and source and export edges (research D5). No second user exists for them (Principle II).",
+   "phase": 1,
+   "test": "Core host tests: each model round-trips and migrates; truncated, newer, NaN, infinite and out-of-range values and values one past each cap (chain length, parameter range, edges) are refused with a named reason.",
+   "closed": null
+  },
+  {
+   "id": "G-EFFECTS",
+   "matrix": [
+    "M07",
+    "M14"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "The five built-in effects are the experience's content: FieldPass fragment programs generated in code with bounded parameters, wider values packed into vec4 uniforms (clarification Q1). EffectRenderer's closed pass set cannot take them (research D6).",
+   "phase": 1,
+   "test": "Core tests: each effect's parameter set has finite bounds and defaults inside them; experience tests compile each program in the host's context and check a known pixel of each effect on the built-in test image against a CPU reference within a tolerance.",
+   "closed": null
+  },
+  {
+   "id": "G-COMPILER",
+   "matrix": [
+    "M01",
+    "M07",
+    "M15"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "Compiling the linear chain into an ordered pass plan with intermediate-target lifetimes, skipping disabled effects and never letting a pass sample the target it writes, after Visual Programming Lab's PreviewPipeline (clarification Q1). The rules are specific to the chain.",
+   "phase": 2,
+   "test": "Core tests: plans for empty, single, all-disabled and full chains; no pass reads its output; each intermediate's lifetime ends after its last reader; the peak number of live targets is at most two. Experience test: a compiled chain draws and matches the effects applied one by one.",
+   "closed": null
+  },
+  {
+   "id": "G-POOL",
+   "matrix": [
+    "M12",
+    "M16"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "The chain's target pool reuses ResourceRegistry.acquireTarget and recycle under the ResourceBudget, with app-local caps on target count and bytes per preview and export size (manual \u00a713 risk 3).",
+   "phase": 2,
+   "test": "Experience tests: repeated edits and recompiles leave ResourceRegistry.stats live target count and bytes constant; a request over the cap is refused with a named reason; trimPools after close returns the pool to zero.",
+   "closed": null
+  },
+  {
+   "id": "G-DIAG",
+   "matrix": [
+    "M12",
+    "M17"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "Compile and link failures arrive as FieldPassError.compile text and are mapped to ShaderDiagnostic lines per effect, after Shader Studio's DiagnosticMapper (clarification Q4); EffectRenderer's diagnostics are only registry warnings.",
+   "phase": 2,
+   "test": "Experience test: a deliberately broken program fixture yields a diagnostic naming the effect and line, the chain keeps the last good preview, and ResourceRegistry.stats counts the shader failure.",
+   "closed": null
+  },
+  {
+   "id": "G-EDIT",
+   "matrix": [
+    "M08",
+    "M18"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "Reorder, enable and disable with an immediate recompiled preview, with accessible non-drag alternatives, are the experience's editing interface.",
+   "phase": 3,
+   "test": "Core tests: reorder, enable and disable produce the expected chain and are undoable; experience tests: an edit recompiles and redraws within one frame, and VoiceOver move actions reorder without drag.",
+   "closed": null
+  },
+  {
+   "id": "G-COMPARE",
+   "matrix": [
+    "M09",
+    "M19"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "The before and after compare keeps the decoded source target untouched and shows it beside or instead of the result; the compare mode is the experience's interface.",
+   "phase": 3,
+   "test": "Experience test: with compare on, the shown pixels equal the source's; the source target is never a pass output in any plan (Core plan check).",
+   "closed": null
+  },
+  {
+   "id": "G-IMPORT",
+   "matrix": [
+    "M10",
+    "M21"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "The system photo picker (SwiftUI system API, out of process, no permission or usage string), ImageIO decoding into RGBA bytes on the CPU scaled so the longer edge is at most the smaller of RenderCapabilities.maxTextureSize and the experience's cap, kept for re-upload after context loss, and the cancelled-pick fallback to the built-in test image (clarification Q2). No other experience imports images.",
+   "phase": 3,
+   "test": "Experience tests with generated image fixtures: an image above the limit is scaled to the stated edge, a damaged file is refused with a named reason, a cancelled pick keeps the built-in test image, and the kept bytes re-upload after recreateContext.",
+   "closed": null
+  },
+  {
+   "id": "U-RGBAUPLOAD",
+   "matrix": [
+    "M10",
+    "M22"
+   ],
+   "kind": "upstream",
+   "owner": "VisualCore:VisualCoreRendering",
+   "justification": "An additive, public byte-wise RenderTarget.upload(rgba:) in VisualCoreRendering, because Texture.upload(rgba:) fills a Texture that FieldPass cannot sample and upload(rgbaFloats:) needs four floats per pixel, quadrupling the CPU memory of a large image (clarification Q2). Generic: any experience that feeds bytes into a pass input can use it.",
+   "phase": 3,
+   "test": "VisualCoreRendering tests: bytes uploaded into an rgba8 and an rgba16f target read back equal (or within half-float tolerance); a wrong-length array and a stale target are refused; with /// docs, the API baseline update and the seven-step reference regression in two chunks.",
+   "closed": null
+  },
+  {
+   "id": "G-PRESETS",
+   "matrix": [
+    "M09",
+    "M20"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "Presets are versioned envelopes in ExperienceStorage over MigrationChain and DocumentStore; damaged, newer and non-finite files are refused and never deleted automatically (clarification Q4). The preset format is the experience's.",
+   "phase": 4,
+   "test": "Core and experience tests: a preset round-trips; truncated, newer, wrong-kind, oversize and NaN files are refused with a named reason and left on disk; a saved preset reloads the same chain.",
+   "closed": null
+  },
+  {
+   "id": "G-EXPORT",
+   "matrix": [
+    "M11",
+    "M24"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "Export renders the chain at the export size into a pooled target, reads it back, encodes it with StillImageEncoder after a size and format check against ExportGeometry and StillImageEncoder.isAvailable, and hands the file to a Transferable and ShareLink the person opens, after Living Wallpapers (clarification Q4). No shared still-export Transferable exists.",
+   "phase": 4,
+   "test": "Experience tests: an export at a valid size produces a decodable PNG, JPEG or HEIC of that size tagged sRGB; sizes over the edge or pixel cap and unavailable formats are refused before rendering; the temporary file is removed after the share.",
+   "closed": null
+  },
+  {
+   "id": "G-COLOR",
+   "matrix": [
+    "M23"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "Colour-space boundaries: sRGB-encoded source and export bytes; each pass states whether it decodes to linear light (vc_srgbDecode) and encodes back (vc_srgbEncode); intermediates are rgba16f where FloatRenderSupport reports it renderable and rgba8 otherwise (clarification Q3). The per-effect rules are the experience's.",
+   "phase": 5,
+   "test": "Experience tests: an identity chain round-trips a generated sRGB ramp within one code value on both the rgba16f and the forced rgba8 path; a known effect on a mid-grey matches a CPU linear-light reference.",
+   "closed": null
+  },
+  {
+   "id": "G-ROBUST",
+   "matrix": [
+    "M25",
+    "M36"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "Memory limits, oversized sources, resize, orientation and context loss during editing and export (rebuilding the plan, pool and source target from CPU state), memory warnings, and the device plan are the experience's robustness work over VisualCore's recreateContext and budget (manual \u00a713 risks 2 and 3).",
+   "phase": 5,
+   "test": "Experience tests: after recreateContext the preview matches the one before; a resize mid-edit redraws at the new size; an export interrupted by a context loss reports a named failure and leaves no file; a memory warning trims the pool. Device plan written for D1-D3.",
+   "closed": null
+  },
+  {
+   "id": "G-RELEASE",
+   "matrix": [
+    "M33",
+    "M34"
+   ],
+   "kind": "adaptation",
+   "owner": "app-local",
+   "justification": "Registration (with photo-library-add), the A25 release-check, copy-claims and verify steps, privacy and credits, licenses and catalog availability are the experience's release work in the one app.",
+   "phase": 6,
+   "test": "experience-release-a25 and copy-claims-a25 pass in release_check.py; the verify steps pass on iOS 27 and 26; every store claim names a test; no professional colour-accuracy or editor-compatibility claim appears.",
+   "closed": null
+  }
+ ],
+ "traceability": [
+  {
+   "item": "brainstorm: render graph",
+   "matrix": [
+    "M01",
+    "M15",
+    "M37"
+   ],
+   "phases": [
+    2
+   ]
+  },
+  {
+   "item": "brainstorm: framebuffer pipelines",
+   "matrix": [
+    "M02",
+    "M15",
+    "M16",
+    "M37"
+   ],
+   "phases": [
+    2
+   ]
+  },
+  {
+   "item": "brainstorm: shader library",
+   "matrix": [
+    "M03",
+    "M14",
+    "M17"
+   ],
+   "phases": [
+    1,
+    2
+   ]
+  },
+  {
+   "item": "brainstorm: effect parameters",
+   "matrix": [
+    "M04",
+    "M13",
+    "M14"
+   ],
+   "phases": [
+    1
+   ]
+  },
+  {
+   "item": "brainstorm: preset serialization",
+   "matrix": [
+    "M05",
+    "M20"
+   ],
+   "phases": [
+    4
+   ]
+  },
+  {
+   "item": "brainstorm: offscreen rendering and export",
+   "matrix": [
+    "M06",
+    "M24",
+    "M37"
+   ],
+   "phases": [
+    4
+   ]
+  },
+  {
+   "item": "version 0.1 feature 01: linear chain with five built-in effects and bounded parameters",
+   "matrix": [
+    "M07",
+    "M13",
+    "M14",
+    "M15"
+   ],
+   "phases": [
+    1,
+    2
+   ]
+  },
+  {
+   "item": "version 0.1 feature 02: reorder, enable and disable with an immediate preview",
+   "matrix": [
+    "M08",
+    "M18"
+   ],
+   "phases": [
+    3
+   ]
+  },
+  {
+   "item": "version 0.1 feature 03: before and after compare and preset saves",
+   "matrix": [
+    "M09",
+    "M19",
+    "M20"
+   ],
+   "phases": [
+    3,
+    4
+   ]
+  },
+  {
+   "item": "version 0.1 feature 04: local image import through the system picker with scoped access",
+   "matrix": [
+    "M10",
+    "M21",
+    "M22",
+    "M31"
+   ],
+   "phases": [
+    3
+   ]
+  },
+  {
+   "item": "version 0.1 feature 05: still export with dimension and format validation",
+   "matrix": [
+    "M11",
+    "M24",
+    "M23"
+   ],
+   "phases": [
+    4,
+    5
+   ]
+  },
+  {
+   "item": "version 0.1 feature 06: render-target pooling and shader compile diagnostics",
+   "matrix": [
+    "M12",
+    "M16",
+    "M17",
+    "M30"
+   ],
+   "phases": [
+    2
+   ]
+  }
+ ],
+ "negative": [
+  {
+   "rule": "No EGL display, context, surface or GL path of its own; all drawing goes through VisualCore's RenderHost on OpenGL ES -> ANGLE -> Metal, and the internal CVisualCoreGL shim is never linked by the experience",
+   "source": "constitution A25 consumer, not fork; CLAUDE.md rule 4; spec FR-A25-006"
+  },
+  {
+   "rule": "No second renderer: the effects are FieldPasses on the session's host; a missing host is a blocker, never permission for a second backend (no Core Image, Metal or vImage rendering path)",
+   "source": "manual \u00a79 phase 00 stop point; CLAUDE.md rule 4; spec FR-A25-006"
+  },
+  {
+   "rule": "No ProjectM types, engine or presets and no ProjectM code reused",
+   "source": "CLAUDE.md rule 12; spec FR-A25-006"
+  },
+  {
+   "rule": "No networking and no upload: images and presets stay on the device; an export leaves it only through a share sheet the person opens",
+   "source": "manual \u00a72 non-goals; spec FR-A25-006"
+  },
+  {
+   "rule": "No private API",
+   "source": "CLAUDE.md rule 12; spec FR-A25-006"
+  },
+  {
+   "rule": "No user-written code: the five effects are built in; a person edits parameters, order and enablement only, never shader source",
+   "source": "manual \u00a72 non-goals; spec FR-A25-006"
+  },
+  {
+   "rule": "No video editing: still images only",
+   "source": "manual \u00a72 non-goals; spec FR-A25-006"
+  },
+  {
+   "rule": "No import without the person's pick: images arrive only through the system picker the person opens; no photo-library read permission and no automatic library access",
+   "source": "spec FR-A25-006; clarification Q2 and Q5"
+  },
+  {
+   "rule": "No claim of professional colour accuracy and no claim of preset compatibility with another editor",
+   "source": "manual \u00a72 non-goals; constitution truthful claims; spec FR-A25-006"
+  },
+  {
+   "rule": "No purchased, generated or photographic bundled images: the built-in test image and the effects are generated in code; a person's imported image is their input, never bundled",
+   "source": "CLAUDE.md rule 4; spec canonical overrides; spec FR-A25-006"
+  },
+  {
+   "rule": "No VisualCore or ProjectM change in A25-P00 (empty diff of Packages and External since a2d68e21), no experience target, registration or interface, no permission and no usage string",
+   "source": "spec FR-A25-008 and negative requirements"
+  },
+  {
+   "rule": "Risk 1, colour-space mistakes create wrong output. Owner: the colour boundaries of each pass and the intermediate format choice (app-local G-COLOR, A25-P05) over vc_srgbDecode, vc_srgbEncode, FloatRenderSupport and StillImageEncoder's sRGB tagging. Verification: experience tests round-trip a generated sRGB ramp through an identity chain within one code value on the rgba16f and the forced rgba8 path, and compare a known effect against a CPU linear-light reference; exports are checked to be tagged sRGB. Release blocker: an identity chain that shifts colours beyond one code value, an export without an sRGB tag, or any pass whose colour boundary is undeclared.",
+   "source": "manual \u00a713 risk 1"
+  },
+  {
+   "rule": "Risk 2, large images exceed texture limits. Owner: the import (app-local G-IMPORT, A25-P03) scaling the decoded image so its longer edge is at most the smaller of RenderCapabilities.maxTextureSize and the experience's cap, the byte-wise upload (U-RGBAUPLOAD, VisualCore:VisualCoreRendering, A25-P03) and oversized-source handling on devices (G-ROBUST, A25-P05). Verification: experience tests import generated images above the limit and check the stated edge, refuse damaged files, and check that an export over ExportGeometry's edge or pixel cap is refused before rendering; the device campaign imports the largest supported photo. Release blocker: any texture or target allocated above maxTextureSize, a crash or memory termination on a large image, or an image silently cropped.",
+   "source": "manual \u00a713 risk 2"
+  },
+  {
+   "rule": "Risk 3, intermediate targets grow without bound. Owner: the pass plan's lifetimes (G-COMPILER, A25-P02) and the bounded pool over ResourceRegistry.acquireTarget, recycle and trimPools under ResourceBudget (G-POOL, A25-P02), with memory warnings in G-ROBUST (A25-P05). Verification: Core tests prove the peak number of live targets for any chain; experience tests prove repeated edits, recompiles and exports leave ResourceRegistry.stats live bytes constant and a request over the cap is refused. Release blocker: live target bytes that grow with edits or exports, or any allocation outside the pool's caps.",
+   "source": "manual \u00a713 risk 3"
+  }
+ ],
+ "decision": {
+  "result": "go",
+  "reasons": [
+   "A working host exists: RenderHost on OpenGL ES -> ANGLE -> Metal (main-actor) draws any RenderScene inside setup, resize, render and teardown, with renderOffscreen, readPixels and recreateContext, all public and tested (RenderHostTests, SessionOpenCloseTests, ShellRenderingTests).",
+   "FieldPass samples render targets into offscreen render targets in the host's context and refuses to sample its own output; Visual Programming Lab's PreviewPipeline and Fluid Art Playground already chain FieldPasses this way (FieldPassTests, PingPongTargetTests, OffscreenExportTests). The stop condition of US4 scenario 2 is therefore not met.",
+   "Targets, pools, the budget, read-back, the encoder and storage exist as public, tested building blocks: ResourceRegistry.makeRenderTarget, acquireTarget, recycle, trimPools, ResourceBudget and stats; RenderTarget.readPixels; StillImageEncoder and ExportGeometry; ExperienceStorage, MigrationChain and DocumentStore; ShaderLibrary, the vc/ library with vc_srgbEncode and vc_srgbDecode, and InfoLogParser (ResourceRegistryTests, ResourceLedgerTests, StillFormatTests, ExportGeometryTests, DocumentStoreTests, InfoLogParserTests).",
+   "14 of 37 rows are available with tests; all 23 non-available rows have owned gaps: G-MODEL and G-EFFECTS in A25-P01; G-COMPILER, G-POOL and G-DIAG in A25-P02; G-EDIT, G-COMPARE, G-IMPORT and U-RGBAUPLOAD in A25-P03; G-PRESETS and G-EXPORT in A25-P04; G-COLOR and G-ROBUST in A25-P05; G-RELEASE in A25-P06.",
+   "The one upstream gap is additive and has a planned phase: U-RGBAUPLOAD adds a byte-wise RenderTarget.upload(rgba:) to VisualCoreRendering in A25-P03 with tests, docs, the API baseline and the reference regression; until then nothing blocks the model, effects and compiler phases, which use generated test images.",
+   "The only permission is photo-library-add (Save Image from the share sheet), already described by the app; the system picker needs none. Effects Composer stays unregistered (24 registered, A01-A24, candidates empty) until A25-P01 creates Packages/ExperiencesCreative/EffectsComposer with its targets and first real rules."
+  ],
+  "blockers": []
+ }
+}

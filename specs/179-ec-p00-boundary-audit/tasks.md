@@ -21,7 +21,7 @@
 
 ## Phase 3: User Story 1 — Evidence-backed integration matrix (P1) 🎯
 
-- [ ] T-A25-002 [US1] Write `docs/apps/effects-composer/visualcore-contract.json` (schema 1; app
+- [X] T-A25-002 [US1] Write `docs/apps/effects-composer/visualcore-contract.json` (schema 1; app — Verified 2026-11-19: 2026-11-19 docs/apps/effects-composer/visualcore-contract.json: 13 inventory areas, 37 rows (14 available, 22 requires adaptation, 1 upstream gap), 189 citations, 12 traceability entries
   `effects-composer`; gate `A25-P00`), with:
   - an `inventory` of every FR-A25-001 area, with paths and the release-check line count (from `python3
     scripts/release_check.py --list`);
