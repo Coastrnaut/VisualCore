@@ -12,7 +12,7 @@
 
 ## Phase 2: Foundational (pure)
 
-- [ ] T-R02F07-002 [P] Create `Packages/VisualCore/Sources/VisualCoreEffectsGraph/EmissiveReference.swift`
+- [X] T-R02F07-002 [P] Create `Packages/VisualCore/Sources/VisualCoreEffectsGraph/EmissiveReference.swift` — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F07.host.json (swift test exit 0; EmissiveReferenceTests 8)
   (`ToneMapOperator`; `EmissiveReference` functions of contracts/api.md: exact piecewise sRGB, decode not clamped
   above 1; Rec. 709 luminance; quadratic soft-knee prefilter; none/Reinhard/filmic tone maps clamped to 0…1;
   composite; premultiplied over) with
