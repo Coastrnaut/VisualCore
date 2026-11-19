@@ -53,7 +53,7 @@
 - [X] T-A24-511 Contract: G-DEVICE and G-EXPLAIN closed by "A24-P05", rows whose gaps are all closed available — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A24-P05.{contract,catalog,experience-packages,script-tests,verify-27}.json exit 0; G-DEVICE and G-EXPLAIN closed, M11/M22/M33 available
   (`--name contract`); README of the experience; `--name catalog`, `experience-packages`, `script-tests`,
   `verify-27`
-- [ ] T-A24-512 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+- [X] T-A24-512 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record — Verified 2026-11-19: 2026-11-19 converge round 3 appended nothing; .autonomy/evidence/A24-P05.json sealed, record VERIFIED-GATE A24-P05 (177 of 263)
   A24-P05; update README.md (rule 16) and `docs/automatedtesting.md` (rule 17)
 
 ## Dependencies
