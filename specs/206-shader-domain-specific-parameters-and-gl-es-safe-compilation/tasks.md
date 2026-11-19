@@ -20,7 +20,7 @@
   `Packages/VisualCore/Tests/VisualCoreShaderSourceTests/DefineSetTests.swift` (also: every `ShaderSourceError`,
   `DefineError` and `VariantError` maps to its reason code; a `ShaderFailureReport` carries `R2-F06` and the caller's
   experience id, seed, tick and tier, analyze C1)
-- [ ] T-R02F06-003 [P] Modify `Packages/VisualCore/Sources/VisualCoreShaderSource/ShaderLibrary.swift`: include each
+- [X] T-R02F06-003 [P] Modify `Packages/VisualCore/Sources/VisualCoreShaderSource/ShaderLibrary.swift`: include each — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F06.host.json (swift test Packages/VisualCore exit 0; 62 ShaderSource tests, 35 new); IncludeOnceTests 5, PrecisionPolicyTests 8, ShaderLibraryTests unchanged
   file once per expansion; byte-count size guard; `ShaderStageKind`; overload `expand(_:defines: DefineSet, precision:
   PrecisionPolicy?, stage:)`; create `Packages/VisualCore/Sources/VisualCoreShaderSource/PrecisionPolicy.swift`
   (insert `precision highp|mediump float;` after the defines into a fragment shader without a float precision

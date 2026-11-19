@@ -1,12 +1,25 @@
 // ShaderLibrary.swift — named GLSL ES 3.00 sources with #include expansion and a line map
 // (feature 004 T-F305; FR-F301–FR-F303, FR-F317). Contract:
 // specs/002-architecture-contracts/contracts/resources-shaders-errors.md §Shaders.
+// Feature 206 T-R02F06-003 (FR-R02F06-001, FR-R02F06-004): each file is included at most once per expansion,
+// the mid-expansion size guard counts UTF-8 bytes, and an overload takes a validated `DefineSet`, a
+// `PrecisionPolicy` and the `ShaderStageKind`.
 //
 import Foundation
 
 // Expanded layout: line 1 `#version 300 es` (from the main source, or generated), then one generated
-// `#define` line per define (sorted by name), then the content with every `#include "name"` replaced
-// recursively. Every expanded line maps back to (file, line); generated lines map to `<generated>`.
+// `#define` line per define (sorted by name), then (fragment stage with a precision policy and no float precision
+// statement only) one generated `precision … float;` line, then the content with every `#include "name"` replaced
+// recursively; a file already included in this expansion is skipped. Every expanded line maps back to (file, line);
+// generated lines map to `<generated>`.
+
+/// The shader stage an expansion is for; only fragment shaders get a default precision (feature 206).
+public enum ShaderStageKind: String, Sendable, CaseIterable {
+    /// A vertex shader (GLSL ES 3.00 gives it `highp float` by default).
+    case vertex
+    /// A fragment shader (no default float precision).
+    case fragment
+}
 
 /// Where an expanded line came from.
 public struct SourceOrigin: Sendable, Equatable, Hashable, Codable {
@@ -38,6 +51,8 @@ public struct ExpandedShader: Sendable, Equatable {
     public let origins: [SourceOrigin]
     /// Defines in the order they were emitted (sorted by name).
     public let defines: [String]
+    /// `highp` requests a `.medium` policy cannot honour, in expanded-line order; empty otherwise (feature 206).
+    public internal(set) var precisionFindings: [PrecisionFinding] = []
 
     /// Origin of a 1-based expanded line; `<generated>` when out of range.
     public func origin(ofExpandedLine line: Int) -> SourceOrigin {
@@ -74,39 +89,79 @@ public struct ShaderLibrary: Sendable {
 
     /// Expands an inline source whose includes resolve against this library.
     public func expand(source text: String, named name: String, defines: [String: String] = [:]) throws(ShaderSourceError) -> ExpandedShader {
-        var lines: [String] = []
-        var origins: [SourceOrigin] = []
+        try expand(source: text, named: name, defineLines: defineLines(defines), precision: nil, stage: .vertex)
+    }
+
+    /// Expands a named source with validated defines; a fragment shader without a float precision statement gets
+    /// `policy.statement` as a generated line after the defines (`precision` nil inserts nothing). With `.medium`,
+    /// every fragment-source `highp` is reported in `precisionFindings` (feature 206, FR-R02F06-004).
+    public func expand(_ name: String, defines: DefineSet, precision: PrecisionPolicy?, stage: ShaderStageKind) throws(ShaderSourceError) -> ExpandedShader {
+        guard let text = sources[name] else { throw .unknownSource(name) }
+        return try expand(source: text, named: name, defines: defines, precision: precision, stage: stage)
+    }
+
+    /// Expands an inline source with validated defines, a precision policy and a stage (see `expand(_:defines:precision:stage:)`).
+    public func expand(source text: String, named name: String, defines: DefineSet, precision: PrecisionPolicy?,
+                       stage: ShaderStageKind) throws(ShaderSourceError) -> ExpandedShader {
+        try expand(source: text, named: name, defineLines: defines.lines, precision: precision, stage: stage)
+    }
+
+    private func expand(source text: String, named name: String, defineLines emittedDefines: [String],
+                        precision: PrecisionPolicy?, stage: ShaderStageKind) throws(ShaderSourceError) -> ExpandedShader {
+        var output = Output()
         var body = splitLines(text)
+        var firstBodyLine = 1
         // Version: an explicit first non-empty line must be exactly GLSL ES 3.00.
-        var versionOrigin = SourceOrigin.generated
         if let first = body.firstIndex(where: { !$0.trimmingCharacters(in: .whitespaces).isEmpty }),
            body[first].trimmingCharacters(in: .whitespaces).hasPrefix("#version") {
             guard isES300(body[first]) else { throw .unsupportedVersion(file: name, line: first + 1) }
-            versionOrigin = SourceOrigin(file: name, line: first + 1)
-            body[first] = ""   // keep numbering; the version line is emitted first below
-            if first == 0 { body.removeFirst() } else { body[first] = "" }
-            lines.append(Self.versionLine)
-            origins.append(versionOrigin)
-            let emittedDefines = defineLines(defines)
-            lines += emittedDefines
-            origins += Array(repeating: .generated, count: emittedDefines.count)
-            try append(lines: body, from: name, startingAt: first == 0 ? 2 : 1, stack: [name], into: &lines, origins: &origins)
+            // Keep numbering; the version line is emitted first below.
+            if first == 0 { body.removeFirst(); firstBodyLine = 2 } else { body[first] = "" }
+            try output.add(Self.versionLine, SourceOrigin(file: name, line: first + 1))
         } else {
-            lines.append(Self.versionLine)
-            origins.append(.generated)
-            let emittedDefines = defineLines(defines)
-            lines += emittedDefines
-            origins += Array(repeating: .generated, count: emittedDefines.count)
-            try append(lines: body, from: name, startingAt: 1, stack: [name], into: &lines, origins: &origins)
+            try output.add(Self.versionLine, .generated)
         }
-        let result = lines.joined(separator: "\n")
+        for line in emittedDefines { try output.add(line, .generated) }
+        let headerCount = output.lines.count
+        var included: Set<String> = [name]
+        try append(lines: body, from: name, startingAt: firstBodyLine, stack: [name], included: &included, into: &output)
+        var findings: [PrecisionFinding] = []
+        if stage == .fragment, let precision {
+            if !output.lines.contains(where: PrecisionScan.isFloatPrecisionStatement) {
+                output.lines.insert(precision.statement, at: headerCount)
+                output.origins.insert(.generated, at: headerCount)
+            }
+            if precision == .medium {
+                for (line, origin) in zip(output.lines, output.origins) where origin != .generated {
+                    if let finding = PrecisionScan.finding(line, origin: origin) { findings.append(finding) }
+                }
+            }
+        }
+        let result = output.lines.joined(separator: "\n")
         let bytes = result.utf8.count
         guard bytes <= Self.maxExpandedBytes else { throw .tooLarge(bytes) }
-        return ExpandedShader(text: result, origins: origins, defines: defineLines(defines))
+        var expanded = ExpandedShader(text: result, origins: output.origins, defines: emittedDefines)
+        expanded.precisionFindings = findings
+        return expanded
+    }
+
+    /// Expanded lines with a running UTF-8 byte count of their `\n`-joined text (FR-R02F06-001, research R2).
+    private struct Output {
+        var lines: [String] = []
+        var origins: [SourceOrigin] = []
+        var bytes = 0
+
+        mutating func add(_ line: String, _ origin: SourceOrigin) throws(ShaderSourceError) {
+            bytes += (lines.isEmpty ? 0 : 1) + line.utf8.count
+            // Size guard during expansion so pathological includes stop early.
+            guard bytes <= ShaderLibrary.maxExpandedBytes else { throw .tooLarge(bytes) }
+            lines.append(line)
+            origins.append(origin)
+        }
     }
 
     private func append(lines body: [String], from file: String, startingAt firstLine: Int, stack: [String],
-                        into lines: inout [String], origins: inout [SourceOrigin]) throws(ShaderSourceError) {
+                        included: inout Set<String>, into output: inout Output) throws(ShaderSourceError) {
         for (offset, line) in body.enumerated() {
             let lineNumber = firstLine + offset
             let trimmed = line.trimmingCharacters(in: .whitespaces)
@@ -114,15 +169,16 @@ public struct ShaderLibrary: Sendable {
             if let include = includeName(trimmed) {
                 if stack.contains(include) { throw .cycle(stack + [include]) }
                 guard let text = sources[include] else { throw .unknownInclude(include, file: file, line: lineNumber) }
+                // Include once: a file already pasted in this expansion is skipped (FR-R02F06-001, research R1).
+                if included.contains(include) { continue }
                 let depth = stack.count   // main file has depth 0, its includes depth 1, ...
                 guard depth <= Self.maxIncludeDepth else { throw .tooDeep(depth) }
-                try append(lines: splitLines(text), from: include, startingAt: 1, stack: stack + [include], into: &lines, origins: &origins)
-                // Size guard during expansion so pathological includes stop early.
-                if lines.count > Self.maxExpandedBytes { throw .tooLarge(lines.joined(separator: "\n").utf8.count) }
+                included.insert(include)
+                try append(lines: splitLines(text), from: include, startingAt: 1, stack: stack + [include],
+                           included: &included, into: &output)
                 continue
             }
-            lines.append(line)
-            origins.append(SourceOrigin(file: file, line: lineNumber))
+            try output.add(line, SourceOrigin(file: file, line: lineNumber))
         }
     }
 
