@@ -48,7 +48,7 @@
 
 ## Phase 4: Story 3 — honest copy and a complete checklist (P1)
 
-- [ ] T-A24-606 [US3] Write the release documents (FR-A24-605, 606):
+- [X] T-A24-606 [US3] Write the release documents (FR-A24-605, 606): — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A24-P06.experience-release.json exit 0 (7 documents, 35 rows); copy-claims PASS (15 files, allow share); known-limitations A24 section
   - `docs/apps/graphics-benchmark-lab/store-listing.md`: says "does not rank devices"; every claim names a proving
     test; no shared denylist word except "share"; names no frame rate, timing or benchmark number;
   - `docs/apps/graphics-benchmark-lab/release-checklist.md`: the statuses of clarification Q1; device rows name

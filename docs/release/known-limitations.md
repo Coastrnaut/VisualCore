@@ -518,6 +518,33 @@ and `VisualCoreRendering` (iOS, GL). ADR-0003 and the package map record this. R
   the device campaign ([device-campaign.md](../apps/visual-programming-lab/device-campaign.md), rows VPL-D1 to
   VPL-D6). No frame, memory, heat, battery or capability figure from a device is stated.
 
+### Graphics Benchmark Lab (A24; features 172–178)
+
+- Three built-in cases only: Textured quads (8 layers over a 256 × 256 texture made in code), Shader ALU (64
+  iterations per fragment) and Particles (5,000 particles), each version 1 at resolution 1.0. There is no custom case,
+  no other workload and no setting the person changes.
+- A run lasts exactly its plan: a warm-up of 3 s, a measurement of 10 s and a cool-down of 5 s
+  (`BenchmarkCase.builtInPlan`); only the measured frames count. Stopping it, choosing another case, closing the
+  session, a context rebuild, a size change or leaving the app ends it early (stopped or interrupted), and such a run
+  is invalid. A serious or critical thermal state ends a run at once as "Interrupted: the device is hot".
+- The library holds at most 12 saved results of at most 2,162,688 bytes each; a 13th save or a full storage quota is
+  refused with its message and changes nothing. A damaged, newer, too-large or refused result file is listed as
+  unreadable with its code and never opened or removed automatically; an index of a newer version makes the library
+  read only.
+- GPU time only where the renderer offers `GL_EXT_disjoint_timer_query`; otherwise the result says "GPU time not
+  available on this device." and no other time is shown as GPU time. The presenter draws at most 60 frames per second.
+- Runs are qualified as Valid, Qualified or Invalid with their reasons; the repeatability view compares only trials
+  of the same case fingerprint, device model, OS version, app build and quality tier. There is no ranking, no overall
+  figure and no comparison with other devices' results or with other tools.
+- A result leaves the device only as a JSON run file or a CSV exported on the person's tap and handed to the system
+  share sheet; the export files are temporary and removed when the session closes and when the experience opens
+  again. Nothing is sent automatically.
+- Simulator numbers are not device evidence: they come from the computer that runs the simulator. Repeatability,
+  thermal behaviour, Low Power Mode, pacing and dropped frames, GPU timing on hardware, and the system accessibility
+  audits wait for the device campaign ([device-campaign.md](../apps/graphics-benchmark-lab/device-campaign.md), rows
+  GBL-D1 to GBL-D6). No frame interval, CPU or GPU time, spread, heat, battery or capability figure from a device is
+  stated.
+
 ## Distribution
 
 - No App Store submission, signing or purchase setup is part of this release; those are owner actions.

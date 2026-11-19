@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "experience": "a24.graphics-benchmark-lab",
+  "requiredDocs": [
+    "docs/apps/graphics-benchmark-lab/privacy-and-credits.md",
+    "docs/apps/graphics-benchmark-lab/store-listing.md",
+    "docs/apps/graphics-benchmark-lab/release-checklist.md",
+    "docs/apps/graphics-benchmark-lab/device-campaign.md",
+    "docs/apps/graphics-benchmark-lab/licenses.md",
+    "docs/apps/graphics-benchmark-lab/visualcore-contract.md",
+    "docs/release/build-and-archive.md"
+  ],
+  "checklist": "docs/apps/graphics-benchmark-lab/release-checklist.md",
+  "copyCheck": {
+    "text": [
+      "docs/apps/graphics-benchmark-lab/store-listing.md"
+    ],
+    "swift": [
+      "Packages/ExperiencesCreative/GraphicsBenchmarkLab/Experience/Adapter/BenchCore.swift",
+      "Packages/ExperiencesCreative/GraphicsBenchmarkLab/Experience/Adapter/GBLManifest.swift",
+      "Packages/ExperiencesCreative/GraphicsBenchmarkLab/Experience/BenchPresenter.swift",
+      "Packages/ExperiencesCreative/GraphicsBenchmarkLab/Experience/ExplanationView.swift",
+      "Packages/ExperiencesCreative/GraphicsBenchmarkLab/Experience/GBLControls.swift",
+      "Packages/ExperiencesCreative/GraphicsBenchmarkLab/Experience/GBLExplanation.swift",
+      "Packages/ExperiencesCreative/GraphicsBenchmarkLab/Experience/GraphicsBenchmarkLabExperience.swift",
+      "Packages/ExperiencesCreative/GraphicsBenchmarkLab/Experience/RepeatabilityView.swift",
+      "Packages/ExperiencesCreative/GraphicsBenchmarkLab/Experience/ReportSource.swift",
+      "Packages/ExperiencesCreative/GraphicsBenchmarkLab/Experience/ResultExportFile.swift",
+      "Packages/ExperiencesCreative/GraphicsBenchmarkLab/Experience/ResultLibrary.swift",
+      "Packages/ExperiencesCreative/GraphicsBenchmarkLab/Experience/ResultsView.swift",
+      "Packages/ExperiencesCreative/GraphicsBenchmarkLab/Experience/RunRecorder.swift",
+      "Packages/ExperiencesCreative/GraphicsBenchmarkLab/Experience/Workloads.swift"
+    ],
+    "allow": [
+      "share"
+    ]
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_experience_release.py",
+    "--config",
+    "docs/apps/graphics-benchmark-lab/release.json"
+  ],
+  "command": "python3 scripts/check_experience_release.py --config docs/apps/graphics-benchmark-lab/release.json",
+  "elapsed_seconds": 0.025,
+  "exit_code": 0,
+  "finished": "2026-11-19T18:19:43+00:00",
+  "log": ".autonomy/logs/A24-P06.experience-release.log",
+  "log_sha256": "6c21edf49bc05f3c48681f55baad9134cd0ca195a17bf0d250db3d4c9ac4a0ee",
+  "name": "experience-release",
+  "stage": "A24-P06",
+  "started": "2026-11-19T18:19:43+00:00",
+  "timed_out": false
+}
