@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesCreative",
+    "--scheme",
+    "ExperiencesCreative-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "EffectsComposerExperienceTests/ImageImportTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing EffectsComposerExperienceTests/ImageImportTests",
+  "elapsed_seconds": 7.268,
+  "exit_code": 0,
+  "finished": "2026-11-19T20:10:06+00:00",
+  "log": ".autonomy/logs/A25-P04.image-import.log",
+  "log_sha256": "e567cf8a4a0bbad7071fc4f95edf13d8ffbccedeb27d7b4d6eea834d6eba98d4",
+  "name": "image-import",
+  "stage": "A25-P04",
+  "started": "2026-11-19T20:09:59+00:00",
+  "timed_out": false
+}

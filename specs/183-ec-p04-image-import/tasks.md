@@ -26,7 +26,7 @@
 - [X] T-A25-404 [P] [US1] [US2] Create `Packages/ExperiencesCreative/EffectsComposer/Experience/ImageImport.swift` per clarification Q2 and data-model.md — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P04.image-import.json exit 0; ImageImport per clarification Q2 (never upscales; damaged when ImageIO reads no complete image)
   (data above 50 MiB refused before decoding; under 8 pixels refused; longer edge at most `limit`; orientation applied;
   sRGB; straight alpha; rows top-down)
-- [ ] T-A25-405 [US2] Write `Packages/ExperiencesCreative/EffectsComposer/ExperienceTests/{ImportFixtures,ImageImportTests}.swift` per clarification Q3: the 8
+- [X] T-A25-405 [US2] Write `Packages/ExperiencesCreative/EffectsComposer/ExperienceTests/{ImportFixtures,ImageImportTests}.swift` per clarification Q3: the 8 — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P04.image-import.json exit 0 (7 tests: 8 orientations top-left corner and size, Display P3 red within 3/255, 4000x1000 to 2048x512, damaged/too small/too large refused, alpha kept)
   orientations put the marked corner top left with the right size; Display P3 red within 3/255 of its sRGB value;
   4,000 × 1,000 decodes to 2,048 × 512; damaged, tiny and oversized data refused with their codes; alpha kept
   (SC-A25-401–403)
