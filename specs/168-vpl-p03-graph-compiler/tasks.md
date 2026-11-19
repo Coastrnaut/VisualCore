@@ -29,7 +29,7 @@
   per clarifications Q4–Q5 and contracts/preview.md: the six operator texts; programs built once per context through
   `FieldPass`; slots through `makeRenderTarget` (rgba8 256 × 256) only after the budget passes; the passes and the
   bottom-left inset; `PreviewState`; `compileCount`; release on teardown
-- [ ] T-A23-304 [US1] [US2] [US3] Modify `Experience/{LabPresenter,CanvasOverlay,LabControls}.swift`: compile at the next
+- [X] T-A23-304 [US1] [US2] [US3] Modify `Experience/{LabPresenter,CanvasOverlay,LabControls}.swift`: compile at the next — Verified 2026-11-18: 2026-11-18: LabPresenter (pipeline, previewVisible, previewState; at most one compile at the next draw when the graph changed; restore on setup, release on teardown), GridScene as a full-framebuffer FieldPass (same fragment and floats), CanvasOverlay (the preview frame, Preview label and preview-message), LabControls (preview-toggle), LabTestSupport helpers; .autonomy/checks/A23-P03.vpl-ios27.json and A23-P03.vpl-ios27-2.json exit 0 (152 core and 46 experience tests on sim-27.2, slowest 0.93 s); .autonomy/checks/A23-P03.isolation.json exit 0; written by an agent, retested
   `draw` when the fingerprint changed (once per frame), draw grid then passes then inset; the grid becomes a
   `FieldPass` drawn to `.framebuffer(name: context.framebuffer, width: context.pixelWidth, height: context.pixelHeight)`
   (same fragment and parameters), because `FieldPass` sets the full viewport while `FullScreenShaderScene` sets none

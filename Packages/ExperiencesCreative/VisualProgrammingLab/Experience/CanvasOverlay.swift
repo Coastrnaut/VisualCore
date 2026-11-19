@@ -9,6 +9,11 @@
 // identifier (`node-<id>`, `port-<id>-in-<index>`, `port-<id>-out-<index>`, `wire-<target>-<index>`) under the
 // experience's prefix; the list form in the controls is the accessible way to make the same edits. The overlay
 // reports its size to the presenter (the canvas view's size in points).
+//
+// The preview (feature 168, A23-P03, T-A23-304; clarifications Q4, Q5; contracts/preview.md "Identifiers"): while
+// shown, a frame `preview` around the bottom-left square of a third of the canvas's shorter side (in points, where the
+// presenter draws the inset in pixels), labelled "Preview" (spoken "Preview, ready" or "Preview, <message>"), and,
+// when the preview cannot draw, its message `preview-message` inside the square.
 import SwiftUI
 import VisualCoreExperienceHost
 import VisualCoreMath
@@ -140,12 +145,54 @@ struct CanvasOverlay: View {
                     Self.path(Self.curve(rubber), view)
                         .stroke(Color.white, style: StrokeStyle(lineWidth: max(2 * zoom, 1), dash: [6, 4]))
                 }
+                if mirror.previewVisible {
+                    previewFrame(size: geometry.size)
+                }
             }
             .frame(width: geometry.size.width, height: geometry.size.height, alignment: .topLeading)
             .onAppear { reportSize(geometry.size) }
             .onChange(of: geometry.size) { _, size in reportSize(size) }
         }
         .allowsHitTesting(false)
+    }
+
+    /// The preview inset's frame in an overlay of `size` points: the bottom-left square of a third of the shorter
+    /// side.
+    static func previewRect(in size: CGSize) -> CGRect {
+        let side = max(0, min(size.width, size.height) / 3)
+        return CGRect(x: 0, y: size.height - side, width: side, height: side)
+    }
+
+    /// The preview's frame, label and message (see the file header).
+    private func previewFrame(size: CGSize) -> some View {
+        let rect = Self.previewRect(in: size)
+        let message = mirror.preview.message
+        return ZStack(alignment: .topLeading) {
+            Rectangle()
+                .stroke(Color.white.opacity(0.8), lineWidth: 1)
+                .frame(width: rect.width, height: rect.height)
+                .accessibilityElement()
+                .accessibilityLabel(Text(verbatim: "Preview, " + (message ?? "ready")))
+                .accessibilityIdentifier(port.identifier("preview"))
+            Text(verbatim: "Preview")
+                .font(.caption2.weight(.semibold))
+                .foregroundStyle(Color.white)
+                .padding(.horizontal, 4)
+                .background(Color.black.opacity(0.6))
+                .accessibilityHidden(true)
+            if let message {
+                Text(verbatim: message)
+                    .font(.caption)
+                    .foregroundStyle(Color.white)
+                    .multilineTextAlignment(.center)
+                    .padding(6)
+                    .frame(width: rect.width, height: rect.height)
+                    .accessibilityLabel(Text(verbatim: message))
+                    .accessibilityIdentifier(port.identifier("preview-message"))
+            }
+        }
+        .frame(width: rect.width, height: rect.height, alignment: .topLeading)
+        .position(x: rect.midX, y: rect.midY)
     }
 
     /// Reports `size` to the presenter.

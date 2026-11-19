@@ -12,7 +12,9 @@
 //   - `node-list`: one row per node in identity order: a select button (`node-row-<id>`, `node.select`, "Noise 2"),
 //     and per input a picker `input-<id>-<index>` of "None" and every output of every other node ("Noise 1 image");
 //     choosing an output sends `edge.connect` (with the canvas's refusals), choosing None `edge.disconnect`;
-//   - the connections, one line each (`connection-<target>-<index>`, "Noise 1 image → Output 2 image").
+//   - the connections, one line each (`connection-<target>-<index>`, "Noise 1 image → Output 2 image");
+//   - `preview-toggle` (feature 168, A23-P03, T-A23-304; clarification Q5): a native switch "Preview" that shows or
+//     hides the preview inset; view state only, so it sends no action and changes neither the graph nor its digest.
 import SwiftUI
 import VisualCoreExperienceHost
 import VisualProgrammingLabCore
@@ -65,6 +67,8 @@ struct LabControls: View {
     var send: @MainActor (String, [Double]) -> Void = { _, _ in }
     /// Where a node added from the menu goes.
     var addPosition: @MainActor () -> CanvasPoint = { CanvasPoint(x: 0, y: 0) }
+    /// Shows or hides the preview (view state).
+    var setPreview: @MainActor (Bool) -> Void = { _ in }
 
     /// Every output a picker for an input of `target` offers: each output of every other node, in identity order.
     static func sourceOptions(for target: NodeID, in graph: VisualGraph) -> [SourceOption] {
@@ -146,6 +150,13 @@ struct LabControls: View {
                     moveButtons(node)
                 }
             }
+            Toggle(isOn: Binding(get: { mirror.previewVisible }, set: { visible in setPreview(visible) })) {
+                Text(verbatim: "Preview")
+            }
+            .frame(minHeight: 44)
+            .accessibilityLabel(Text(verbatim: "Preview"))
+            .accessibilityHint(Text(verbatim: "Shows or hides the picture the graph makes"))
+            .accessibilityIdentifier(port.identifier("preview-toggle"))
             Text(verbatim: mirror.status)
                 .font(.footnote)
                 .accessibilityLabel(Text(verbatim: "Status, " + mirror.status))

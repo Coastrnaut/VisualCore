@@ -1,23 +1,25 @@
-// GridScene — feature 167 (A23-P02) T-A23-206 (FR-A23-201, FR-A23-206; clarification Q4; plan.md "Lifecycle"). The
-// canvas background of Visual Programming Lab: one full-screen fragment shader (GLSL ES 3.00, inline source with the
-// VisualCore includes, `ShaderBundle(files: [:])`) drawn by VisualCore's `FullScreenShaderScene` inside the host's
-// context and registry; no context and no GL call of its own.
+// GridScene — feature 167 (A23-P02) T-A23-206 (FR-A23-201, FR-A23-206; clarification Q4; plan.md "Lifecycle"); drawn
+// by a field pass since feature 168 (A23-P03) T-A23-304 (FR-A23-307; research D7). The canvas background of Visual
+// Programming Lab: one full-screen fragment shader (GLSL ES 3.00, inline source) drawn by VisualCore's `FieldPass`
+// into the context's framebuffer at the drawable's full size, inside the host's context and registry; no context and
+// no GL call of its own. A field pass sets the viewport to its output and leaves it there, so drawing the grid first
+// in every frame at the full size gives every frame the whole drawable, whatever the preview's inset pass set last.
 //
 // Mapping: the drawable covers the whole canvas view, so `v_uv` (0…1, origin bottom-left) maps to the view point
 // (`v_uv.x × u_width`, `(1 − v_uv.y) × u_height`) (origin top-left, y down), and that point to the canvas point
 // `centre + (point − size / 2) / zoom`, exactly as `CanvasView.canvas(fromScreen:)` maps it. The parameters (bound as
-// `u_<name>` floats by the scene) are `zoom` (screen points per canvas point), `panX` and `panY` (the canvas point at
-// the view's middle: the pan) and `width` and `height` (the view in points). The picture therefore depends only on
-// the view state, never on the drawable's pixel size beyond its sampling.
+// `u_<name>` floats, the active ones only) are `zoom` (screen points per canvas point), `panX` and `panY` (the canvas
+// point at the view's middle: the pan) and `width` and `height` (the view in points). The picture therefore depends
+// only on the view state, never on the drawable's pixel size beyond its sampling, nor on the frame time.
 //
 // Picture: a dark slate background with a soft vignette and minor lines every 32 canvas points and major lines every
 // 160, each about one pixel wide (full within 0.5 pixels of the line, fading out by 1.5, through `fwidth`, so a line
 // never falls between pixel centres; the vignette keeps a luma spread in every frame, as the verification runner's
 // non-blank check asks). Every colour keeps a Rec. 709 luma below 40 of 255, so the whole canvas is of the colour
-// class `dark` (the presenter's frame probe).
+// class `dark` (the presenter's frame probe). A fragment that does not build sets ``errorMessage`` and draws nothing.
 import VisualCoreRendering
 
-/// The canvas grid as one full-screen shader.
+/// The canvas grid as one full-screen field pass.
 @MainActor
 final class GridScene {
     /// The fragment's name in diagnostics.
@@ -65,18 +67,19 @@ final class GridScene {
     }
     """
 
-    /// The full-screen scene that runs the fragment.
-    let inner: FullScreenShaderScene
+    /// The fragment drawn: ``fragment`` or the test seam's override.
+    let source: String
+    /// The parameters of the next frame.
+    private(set) var parameters: [String: Double] = [:]
+    /// The field pass; nil while not set up or after a build failure.
+    private(set) var pass: FieldPass?
+    /// The first build diagnostic, or nil.
+    private(set) var errorMessage: String?
 
-    /// A scene running ``fragment``, or `fragmentOverride` when given (a test seam).
+    /// A grid running ``fragment``, or `fragmentOverride` when given (a test seam).
     init(fragmentOverride: String? = nil) {
-        inner = FullScreenShaderScene(fragment: fragmentOverride ?? Self.fragment, fragmentName: Self.fragmentName,
-                                      bundle: ShaderBundle(files: [:]))
-        inner.fixedTime = 0
+        source = fragmentOverride ?? Self.fragment
     }
-
-    /// The shader's first compile or link diagnostic, or nil.
-    var errorMessage: String? { inner.errorMessage }
 
     /// The parameters of the view: `zoom`, `panX`, `panY`, `width` and `height` (see the file header).
     nonisolated static func parameters(zoom: Double, centreX: Double, centreY: Double, width: Double,
@@ -86,26 +89,44 @@ final class GridScene {
 
     /// Sets what the next frame draws.
     func configure(_ parameters: [String: Double]) {
-        inner.parameters = parameters
+        self.parameters = parameters
     }
 
     /// Builds the program in the host's context (again after a context loss).
     func setup(_ context: RenderContext) throws {
-        try inner.setup(context)
+        pass?.release()
+        pass = nil
+        do {
+            pass = try FieldPass(registry: context.resources, fragment: source, inputs: [], label: Self.fragmentName)
+            errorMessage = nil
+        } catch {
+            if case .compile(let message) = error { errorMessage = message } else { errorMessage = "\(error)" }
+        }
     }
 
-    /// Passes the new drawable size on.
-    func resize(_ context: RenderContext) {
-        inner.resize(context)
+    /// Nothing to do: the grid reads the drawable's size from each frame's context.
+    func resize(_ context: RenderContext) {}
+
+    /// The active float uniforms `u_<name>` of the parameters.
+    func uniforms(_ program: ShaderProgram) -> [String: FieldUniform] {
+        var uniforms: [String: FieldUniform] = [:]
+        for (name, value) in parameters where program.uniforms["u_" + name] != nil {
+            uniforms["u_" + name] = .float(Float(value))
+        }
+        return uniforms
     }
 
-    /// Draws the grid.
+    /// Draws the grid over the whole drawable (nothing when the program did not build).
     func render(_ context: RenderContext, frame: FrameInfo) throws {
-        try inner.render(context, frame: frame)
+        guard let pass else { return }
+        try pass.run(output: .framebuffer(name: context.framebuffer, width: context.pixelWidth,
+                                          height: context.pixelHeight),
+                     inputs: [:], uniforms: uniforms(pass.program))
     }
 
     /// Releases the program.
     func teardown(_ context: RenderContext) {
-        inner.teardown(context)
+        pass?.release()
+        pass = nil
     }
 }

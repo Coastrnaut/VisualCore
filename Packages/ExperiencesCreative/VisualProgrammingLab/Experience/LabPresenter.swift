@@ -1,10 +1,17 @@
 // LabPresenter — feature 167 (A23-P02) T-A23-206 (FR-A23-201–206; clarifications Q3, Q4; contracts/experience.md
-// "Presenter"; data-model.md "LabPresenter"). Draws Visual Programming Lab through the host only and owns its
-// presentation state:
+// "Presenter"; data-model.md "LabPresenter"); the preview since feature 168 (A23-P03) T-A23-304 (FR-A23-301,
+// FR-A23-303, FR-A23-305, FR-A23-306, FR-A23-307; clarifications Q3–Q5; contracts/preview.md "Presenter"; research
+// D7). Draws Visual Programming Lab through the host only and owns its presentation state:
 //
-//   - Drawing: the canvas grid (``GridScene``, a VisualCore `FullScreenShaderScene`) is built in `setup`, gets the view's
-//     parameters at each `draw`, is passed the drawable size in `resize` and torn down in `teardown`; a context rebuild
-//     sets it up again from the same view state. `maxFramesPerSecond` 30; one quality tier, `level-0`.
+//   - Drawing: the canvas grid (``GridScene``, a VisualCore `FieldPass` over the whole drawable) is built in `setup`,
+//     gets the view's parameters at each `draw` and is torn down in `teardown`; a context rebuild sets it up again
+//     from the same view state. `maxFramesPerSecond` 30; one quality tier, `level-0`.
+//   - Preview (``pipeline``, a ``PreviewPipeline``): each `draw` draws the grid first (full size, so the viewport the
+//     inset pass left in the previous frame never carries over), then, while ``previewVisible``, compiles the graph
+//     when its `GraphDocument` fingerprint changed since the last compile (at most once per frame, at a draw only:
+//     never from a control, and a view change never compiles), then the schedule's passes and the bottom-left inset.
+//     `setup` restores the pipeline's programs and slots from the same schedule; `teardown` releases them. Hidden,
+//     the preview compiles and draws nothing and the graph and its digest are unchanged (view state).
 //   - View: ``view`` (`CanvasView`: zoom 0.5…2, the centre within ±4,096) is view state, not part of the snapshot, and
 //     never sends an action. Its size in points follows the canvas: the size a touch reports and the size the overlay
 //     reports (rotation, split view); the drawable covers the canvas, so the grid needs no point size from `resize`.
@@ -26,11 +33,13 @@
 //     other refusal of an edit with ``rangeFeedback``; an accepted action clears the feedback.
 //   - Mirror: ``LabMirror`` is what the overlay and the controls show (graph, selection, status, feedback, rubber
 //     wire, view); it is updated at each draw and after each action the presenter sends.
-//   - Test seams: ``view`` (settable), ``feedback`` and ``drawnFrames``. The current state is read through
+//   - Test seams: ``view`` (settable), ``feedback``, ``drawnFrames``, ``pipeline``, ``previewVisible`` (settable)
+//     and ``graphOverride`` (a graph the preview compiles instead of the core's, for graphs with parameter values
+//     no action sets yet). The current state is read through
 //     ``currentCore`` (the factory sets it to the shell's engine state), else the last drawn core, else the opening
 //     state.
 //
-// No GL call: everything is drawn through VisualCore's `FullScreenShaderScene`.
+// No GL call: everything is drawn through VisualCore's `FieldPass`.
 import Foundation
 import Observation
 import SwiftUI
@@ -71,6 +80,10 @@ final class LabMirror {
     var rubber: RubberWire?
     /// The canvas view.
     var view = CanvasView(size: LabPresenter.defaultSize)
+    /// What the preview shows.
+    var preview = PreviewState.ready
+    /// Whether the preview is shown (view state).
+    var previewVisible = true
 }
 
 /// Draws Visual Programming Lab and owns its presentation state (see the file header).
@@ -94,6 +107,21 @@ final class LabPresenter: ExperiencePresenter {
     var currentCore: (@MainActor () -> LabCore?)?
     /// The canvas grid.
     let grid = GridScene()
+    /// The preview of the graph.
+    let pipeline = PreviewPipeline()
+    /// The graph of the last compile, and its fingerprint (nil when it could not be computed).
+    private var compiled: (graph: VisualGraph, fingerprint: String?)?
+
+    /// Whether the preview is shown (view state, a test seam: settable); never an action, never in the digest.
+    var previewVisible = true {
+        didSet { if mirror.previewVisible != previewVisible { mirror.previewVisible = previewVisible } }
+    }
+
+    /// A graph the preview compiles instead of the core's (a test seam); nil by default.
+    var graphOverride: VisualGraph?
+
+    /// What the preview shows: ``PreviewState/hidden`` while switched off, else the pipeline's state.
+    var previewState: PreviewState { previewVisible ? pipeline.state : .hidden }
     /// The core of the last draw.
     private(set) var lastCore: LabCore?
     /// How many frames were drawn (a test seam).
@@ -137,29 +165,53 @@ final class LabPresenter: ExperiencePresenter {
 
     // MARK: Render scene
 
-    /// Builds the grid (again after a context loss).
+    /// Builds the grid and restores the preview's programs and slots (again after a context loss).
     func setup(_ context: RenderContext) throws {
         try grid.setup(context)
+        pipeline.restore(context)
     }
 
-    /// Passes the new drawable size to the grid.
+    /// Passes the new drawable size to the grid (the slots stay 256 × 256; the inset follows each frame's size).
     func resize(_ context: RenderContext) {
         grid.resize(context)
     }
 
-    /// Draws the grid with the view's parameters and brings the mirror up to `core`.
+    /// Draws the grid with the view's parameters, then the preview (see the file header), and brings the mirror up
+    /// to `core`.
     func draw(_ core: LabCore, tier: Int, context: RenderContext, frame: FrameInfo) throws {
         drawnFrames += 1
         lastCore = core
         grid.configure(GridScene.parameters(zoom: view.zoom, centreX: view.centre.x, centreY: view.centre.y,
                                             width: view.size.x, height: view.size.y))
         try grid.render(context, frame: frame)
+        if previewVisible {
+            let graph = graphOverride ?? core.graph
+            if needsCompile(graph) {
+                pipeline.compile(graph, context: context)
+            }
+            pipeline.draw(context, time: frame.time)
+        }
         follow(core)
     }
 
-    /// Tears the grid down.
+    /// Whether `graph` differs from the graph of the last compile by its fingerprint; remembers it when it does.
+    /// An equal graph is never fingerprinted again; one equal by fingerprint (the same content in another order) is
+    /// remembered without a compile.
+    private func needsCompile(_ graph: VisualGraph) -> Bool {
+        if let compiled, compiled.graph == graph { return false }
+        let fingerprint = try? GraphDocument.fingerprint(of: graph).hex
+        if let compiled, let fingerprint, compiled.fingerprint == fingerprint {
+            self.compiled = (graph, fingerprint)
+            return false
+        }
+        compiled = (graph, fingerprint)
+        return true
+    }
+
+    /// Tears the grid and the preview's programs and slots down.
     func teardown(_ context: RenderContext) {
         grid.teardown(context)
+        pipeline.release(context)
     }
 
     // MARK: Actions
@@ -400,6 +452,15 @@ final class LabPresenter: ExperiencePresenter {
         if mirror.status != status { mirror.status = status }
         if mirror.selection != core.selection { mirror.selection = core.selection }
         if mirror.view != view { mirror.view = view }
+        let preview = previewState
+        if mirror.preview != preview { mirror.preview = preview }
+    }
+
+    /// Shows or hides the preview (view state: no action is sent and the graph is unchanged).
+    func setPreviewVisible(_ visible: Bool) {
+        previewVisible = visible
+        let preview = previewState
+        if mirror.preview != preview { mirror.preview = preview }
     }
 
     /// The canvas label, for example "Visual Programming Lab, 2 nodes, 1 connection, Ready".
@@ -411,8 +472,9 @@ final class LabPresenter: ExperiencePresenter {
             + EditMessages.status(for: core.check, in: core.graph)
     }
 
-    /// The frame probe of the verification runner: the canvas is dark everywhere (every grid colour keeps a luma
-    /// below 40 of 255), so its middle is of the class `dark` at any view.
+    /// The frame probe of the verification runner: the canvas is dark everywhere outside the preview's inset (every
+    /// grid colour keeps a luma below 40 of 255; the inset covers the bottom-left third only), so its middle is of
+    /// the class `dark` at any view.
     func probes(_ core: LabCore) -> [FrameProbe] {
         [FrameProbe(name: "canvas-dark", x: 0.5, y: 0.5, expected: FrameColorClass.dark.rawValue)].compactMap { $0 }
     }
@@ -429,10 +491,13 @@ final class LabPresenter: ExperiencePresenter {
             _ = self?.send(control, values, port: port)
         }, addPosition: { [weak self] in
             self?.addPosition ?? CanvasPoint(x: 0, y: 0)
+        }, setPreview: { [weak self] visible in
+            self?.setPreviewVisible(visible)
         }))
     }
 
-    /// The canvas overlay (``CanvasOverlay``): nodes, ports, wires, the selection and the rubber wire.
+    /// The canvas overlay (``CanvasOverlay``): nodes, ports, wires, the selection, the rubber wire and the preview's
+    /// frame and message.
     func makeCanvasOverlay(_ port: ExperienceActionPort) -> AnyView? {
         AnyView(CanvasOverlay(port: port, mirror: mirror, report: { [weak self] size in
             self?.noteCanvasSize(size)
