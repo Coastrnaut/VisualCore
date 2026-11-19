@@ -33,7 +33,8 @@
   per clarifications Q2, Q4 and Q5 (programs built in setup, pooled targets, plan recompiled on a fingerprint change,
   present pass, diagnostics, the test seams `programOverride` and `lastResult`, the inline controls with spoken labels)
 - [ ] T-A25-207 [US2] [US3] Write `Packages/ExperiencesCreative/EffectsComposer/ExperienceTests/{ComposerTestSupport,ComposerCoreTests,PreviewDrawTests,IdentityTests}.swift`:
-  every action and refusal; after each edit kind the next frame's result matches `EffectReference.apply(chain:)` within
+  every action and refusal; the snapshot round-trips the chain and a restored core starts with an empty history; the
+  spoken labels of a node row and a value control name the effect, its position and the value; after each edit kind the next frame's result matches `EffectReference.apply(chain:)` within
   2/255 (4/255 with distort) and undo restores it byte for byte; a chain with one more disabled effect draws the same
   picture (SC-A25-202, 203)
 
