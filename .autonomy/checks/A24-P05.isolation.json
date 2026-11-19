@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_app_isolation.py",
+    "--experiences",
+    "Packages/ExperiencesCreative/GraphicsBenchmarkLab"
+  ],
+  "command": "python3 scripts/check_app_isolation.py --experiences Packages/ExperiencesCreative/GraphicsBenchmarkLab",
+  "elapsed_seconds": 0.047,
+  "exit_code": 0,
+  "finished": "2026-11-19T17:56:47+00:00",
+  "log": ".autonomy/logs/A24-P05.isolation.log",
+  "log_sha256": "3d3824921dffe660b838b1d9de5254fe1695c87cc75146aa378540ddadba451e",
+  "name": "isolation",
+  "stage": "A24-P05",
+  "started": "2026-11-19T17:56:47+00:00",
+  "timed_out": false
+}
