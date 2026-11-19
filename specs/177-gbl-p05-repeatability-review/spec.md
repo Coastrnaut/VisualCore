@@ -66,7 +66,9 @@ in code:
   numbers differ" (thermal state, Low Power Mode, display refresh, background work, the case's version), "Simulator
   numbers" (say nothing about a device), "What the lab does not do" (rank devices, claim precision, send results).
   The interface tests (`GBLRunUITests` in chunk `f3`) run quads to Finished (18 s), save, open, explain, and a second
-  test sends the app to the background mid-run and expects "Interrupted"; each under 60 s.
+  test sends the app to the background mid-run for at least 2 seconds (longer than the 1,000 ms sample cap) and expects
+  "Interrupted"; each under 60 s. The explanation's words are scanned with `scripts/check_copy_claims.py` and the shared
+  denylist over `GBLExplanation.swift` (the full claims scan of the store text comes with A24-P06).
 
 ## User Scenarios & Testing *(mandatory)*
 
