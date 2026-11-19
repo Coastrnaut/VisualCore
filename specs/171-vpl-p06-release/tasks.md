@@ -58,7 +58,7 @@
 
 ## Phase 5: Story 4 — a first session in the app (P2)
 
-- [ ] T-A23-608 [P] [US4] Write `Apps/VisualCore/Tests/UI/VisualProgrammingLab/VPLReleaseUITests.swift` per
+- [X] T-A23-608 [P] [US4] Write `Apps/VisualCore/Tests/UI/VisualProgrammingLab/VPLReleaseUITests.swift` per — Verified 2026-11-19: 2026-11-19: .autonomy/checks/A23-P06.app-ui.json exit 0 (chunk e3: VPLReleaseUITests.testAFreshStartIsReadyWithTwoNodesAndAnEmptyLibrary 22.3 s and the three earlier VPL tests pass on the iOS 27.2 phone)
   clarification Q5, and add it to the chunk `e3` in `scripts/release_check.py` (lead) (FR-A23-607)
 
 ## Phase 6: Evidence
