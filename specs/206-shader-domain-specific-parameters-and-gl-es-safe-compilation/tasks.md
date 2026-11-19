@@ -36,7 +36,7 @@
 
 ## Phase 4: Story 4 — uniforms and parameters (P1)
 
-- [ ] T-R02F06-005 [P] [US4] Create `Packages/VisualCore/Sources/VisualCoreShaderSource/UniformLayout.swift`
+- [X] T-R02F06-005 [P] [US4] Create `Packages/VisualCore/Sources/VisualCoreShaderSource/UniformLayout.swift` — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F06.host.json (swift test Packages/VisualCore exit 0; 62 ShaderSource tests, 35 new); UniformLayoutTests 6
   (`UniformType` of data-model.md, `UniformDeclaration`, `UniformLayout` with unique names, `UniformLayoutReport`
   `undeclared`/`mistyped`/`unused`, `isValid`, a pure `check(active: [String: UniformType])`) with
   `Packages/VisualCore/Tests/VisualCoreShaderSourceTests/UniformLayoutTests.swift`
