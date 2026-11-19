@@ -13,7 +13,7 @@
 
 - [X] T-A23-201 Baseline: cite the A23-P01 evidence (`.autonomy/checks/A23-P01.{vpl-core-ios27,app-build,experience-packages}.json`) — Verified 2026-11-18: 2026-11-18: A23-P01 evidence cited: .autonomy/checks/A23-P01.vpl-core-ios27.json, A23-P01.app-build.json and A23-P01.experience-packages.json, all exit 0; no Packages change since the A23-P01 record commit bcaa472a
   on the tree recorded at A23-P01 (`bcaa472a`), whose Packages are unchanged since (owner ruling of 2026-11-14)
-- [ ] T-A23-202 In `Packages/ExperiencesCreative/Package.swift` (lead): add `VisualCoreMath` to the core and its tests;
+- [X] T-A23-202 In `Packages/ExperiencesCreative/Package.swift` (lead): add `VisualCoreMath` to the core and its tests; — Verified 2026-11-18: 2026-11-18: VisualCoreMath added to VisualProgrammingLabCore and its tests; VisualProgrammingLabExperience (core, Parameters, Experience, Persistence, Math, Scenes, Rendering, ExperienceHost, UI) and VisualProgrammingLabExperienceTests targets and the VisualProgrammingLabExperience product in Packages/ExperiencesCreative/Package.swift; .autonomy/checks/A23-P02.vpl-ios27.json exit 0 (125 core and 27 experience tests on sim-27.2, slowest 0.199 s)
   add the targets `VisualProgrammingLabExperience` (path `VisualProgrammingLab/Experience`) and
   `VisualProgrammingLabExperienceTests` (path `VisualProgrammingLab/ExperienceTests`) with the products of plan.md, and
   the `VisualProgrammingLabExperience` library product
