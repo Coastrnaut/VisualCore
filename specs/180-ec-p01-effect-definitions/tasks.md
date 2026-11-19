@@ -27,7 +27,7 @@
 
 ## Phase 3: Story 2 — a chain that can be edited and undone exactly (P1)
 
-- [ ] T-A25-105 [US2] Create `Packages/ExperiencesCreative/EffectsComposer/Core/EffectChain.swift` and `Packages/ExperiencesCreative/EffectsComposer/Core/ChainEditing.swift` per clarification Q2: at most 8
+- [X] T-A25-105 [US2] Create `Packages/ExperiencesCreative/EffectsComposer/Core/EffectChain.swift` and `Packages/ExperiencesCreative/EffectsComposer/Core/ChainEditing.swift` per clarification Q2: at most 8 — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P01.ec-core-ios27.json exit 0 (35 tests in 8 suites on sim-27.2); chain caps, five edits with exact inverses, history depth 64
   nodes, identifiers 1…65,535 unique (smallest unused for a new node), the five edits with move's index semantics,
   `EditHistory` (undo and redo, depth 64, a new edit clears redo, a refused edit changes nothing), the chain
   fingerprint (domain `a25.effect-chain.v1`)
