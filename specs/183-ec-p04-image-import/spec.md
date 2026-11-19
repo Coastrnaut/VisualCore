@@ -134,6 +134,8 @@ After a graphics context rebuild, the imported picture is still the source.
 - **A picture with transparency:** alpha kept.
 - **A restored session:** the imported picture is not stored; the built-in picture is shown.
 - **Data far larger than any picture should be:** refused before decoding.
+- **A pick while another picture is being read:** the status reads "Reading the picture…" while decoding; the latest
+  pick wins and an earlier result arriving later is dropped.
 
 ## Requirements *(mandatory)*
 
