@@ -583,6 +583,30 @@
       "manifest": "Packages/ExperiencesCreative/GraphicsBenchmarkLab/scenario-manifest.json",
       "permissions": [],
       "summary": "Three repeatable GPU workloads (textured quads, an arithmetic stress pass and particles) run through warm-up, measurement and cool-down and report frame-time percentiles with their limits. A GPU time is shown only where the device can measure it. Offline; nothing is sent."
+    },
+    "a25.effects-composer": {
+      "capabilities": [
+        "A chain of five built-in effects",
+        "Reorder, switch and tune each effect",
+        "Every edit can be undone",
+        "A live preview of the chain",
+        "Pictures made in code"
+      ],
+      "quality_tiers": [
+        "level-0"
+      ],
+      "palette": [
+        "#14121F",
+        "#E85D75",
+        "#5CC8C2",
+        "#F2E9E4"
+      ],
+      "content": null,
+      "manifest": "Packages/ExperiencesCreative/EffectsComposer/scenario-manifest.json",
+      "permissions": [
+        "photo-library-add"
+      ],
+      "summary": "A chain editor for shader effects: colour grade, blur, distort, vignette and posterize are applied in order to a picture made in code, with a live preview. Effects can be added, moved, switched off, tuned and every edit undone. Offline; nothing is sent."
     }
   }
 }

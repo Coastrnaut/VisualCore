@@ -1327,7 +1327,9 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     # Feature 167 (A23-P02): Visual Programming Lab, integrated at X-A23.
                                     "VisualProgrammingLabExperience",
                                     # Feature 174 (A24-P02): Graphics Benchmark Lab, integrated at X-A24.
-                                    "GraphicsBenchmarkLabExperience"])
+                                    "GraphicsBenchmarkLabExperience",
+                                    # Feature 181 (A25-P02): Effects Composer, a candidate until X-A25.
+                                    "EffectsComposerExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):
         listing = subprocess.run([sys.executable, str(HERE / "release_check.py"), "--list"],

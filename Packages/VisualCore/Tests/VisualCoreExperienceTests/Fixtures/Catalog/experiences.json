@@ -854,7 +854,7 @@
       "id": "a25.effects-composer",
       "code": "A25",
       "title": "Effects Composer",
-      "summary": "A visual effects-chain editor for building, previewing and exporting reusable shader looks.",
+      "summary": "A chain editor for shader effects: colour grade, blur, distort, vignette and posterize are applied in order to a picture made in code, with a live preview. Effects can be added, moved, switched off, tuned and every edit undone. Offline; nothing is sent.",
       "kind": "creative",
       "tier": "free",
       "category": "tools",
@@ -863,10 +863,23 @@
         "developer-and-creator-tools"
       ],
       "order": 25,
-      "palette": [],
+      "palette": [
+        "#14121F",
+        "#E85D75",
+        "#5CC8C2",
+        "#F2E9E4"
+      ],
       "tile_seed": 3017671393,
-      "capabilities": [],
-      "quality_tiers": [],
+      "capabilities": [
+        "A chain of five built-in effects",
+        "Reorder, switch and tune each effect",
+        "Every edit can be undone",
+        "A live preview of the chain",
+        "Pictures made in code"
+      ],
+      "quality_tiers": [
+        "level-0"
+      ],
       "content": null,
       "available": false
     },

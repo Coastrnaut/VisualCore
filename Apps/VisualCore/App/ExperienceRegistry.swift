@@ -25,6 +25,7 @@ import AuroraExperience
 import ShaderStudioExperience
 import VisualProgrammingLabExperience
 import GraphicsBenchmarkLabExperience
+import EffectsComposerExperience
 import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreUI
@@ -90,7 +91,7 @@ enum ExperienceRegistry {
     /// each carries its scenario manifest, so that the verification runner can open it, but it stays unavailable
     /// in the catalog and outside `all`. Debug builds show them with `-vcCandidates`. Recording an experience's X
     /// gate moves its registration from here to `all`.
-    static let candidates: [ExperienceRegistration] = []
+    static let candidates: [ExperienceRegistration] = [effectsComposer].compactMap { $0 }
 
     /// A01 Generative Art Studio (feature 193, US1).
     private static var generativeArtStudio: ExperienceRegistration? {
@@ -498,6 +499,19 @@ extension ExperienceRegistry {
         }
         #if DEBUG || VISUALCORE_AUTOMATION
         registration.scenarioManifest = BenchCore.manifest(for: id)
+        #endif
+        return registration
+    }
+
+    /// A25 Effects Composer (feature 181, A25-P02): a candidate until X-A25. Snapshot schema 1, so no earlier
+    /// example is stored yet.
+    fileprivate static var effectsComposer: ExperienceRegistration? {
+        guard let id = EffectsComposerExperience.id else { return nil }
+        var registration = ExperienceRegistration(id: id, core: ComposerCore.self) { launch in
+            EffectsComposerExperience.make(id: id, storage: launch.storage)
+        }
+        #if DEBUG || VISUALCORE_AUTOMATION
+        registration.scenarioManifest = ComposerCore.manifest(for: id)
         #endif
         return registration
     }

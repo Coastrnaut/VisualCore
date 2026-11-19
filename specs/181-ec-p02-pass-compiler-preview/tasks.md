@@ -50,7 +50,7 @@
 - [X] T-A25-209 Write `Packages/ExperiencesCreative/EffectsComposer/Experience/Adapter/ECManifest.swift` (the standard scenarios plus a fixture per effect) and — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P02.ec-ios27.json exit 0 (42 core and 27 experience tests on sim-27.2); ECManifest 9 standard scenarios and 5 fixtures; scenario-manifest.json generated and confirmed
   `Packages/ExperiencesCreative/EffectsComposer/ExperienceTests/ECManifestTests.swift`; generate `Packages/ExperiencesCreative/EffectsComposer/scenario-manifest.json` with `UPDATE_SCENARIO_MANIFEST=1
   TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`
-- [ ] T-A25-210 Register the candidate (FR-A25-207):
+- [X] T-A25-210 Register the candidate (FR-A25-207): — Verified 2026-11-19: 2026-11-19 a25 registered as a candidate (5 capabilities, 253-character summary with 'shader', permissions photo-library-add); .autonomy/checks/A25-P02.{catalog-search-2,experience-packages-2,script-tests,app-unit}.json exit 0; synthetic candidate r02-g01.aurora-loom
   - a `Catalog/registrations.json` entry for a25 (capabilities of at most 40 characters, a summary of at most 300
     characters keeping the words CatalogSearchTests searches for, quality_tiers ["level-0"], a palette, the manifest,
     permissions ["photo-library-add"]); then `python3 scripts/build_catalog.py` and `swift test --package-path
