@@ -18,5 +18,6 @@
   | `library-newer.json` | index | the library is read-only |
   | `library-damaged.json` | index | graphs still listed from their files; the index is not rewritten by reading |
 
-  Every file is byte-identical after reading.
+  Every file is byte-identical after reading. An oversized saved graph (81,921 bytes, written by the test into its
+  temporary storage, not committed) is listed as unreadable, `too-large`, and kept.
 - **Recovery seam:** `LabPresenter.failNextDraw`, internal. The next draw throws `LabDrawError.injected` once.
