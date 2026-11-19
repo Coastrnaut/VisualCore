@@ -62,6 +62,12 @@
 //     centre (`.default`, or the one given to ``observeMemoryWarnings(on:)``) and trims the renderer's idle pooled
 //     targets on the main actor (``PreviewRenderer/trimPools()``); the preview is unchanged.
 //
+// Feature 185 (A25-P06) T-A25-604 (clarification Q4; data-model.md "Seam"; contracts/release.md "Recovery"): the
+//   test-only seam ``ComposerPresenter/failNextDraw`` makes the next `draw` throw ``ComposerDrawError/injected`` once,
+//   before it renders, exports or follows the core; the seam clears itself and nothing in the experience or its
+//   interface sets it. The session then fails with the error's message, "The picture could not be drawn.", and the
+//   saved looks are not touched (only an explicit save, rename or removal writes them).
+//
 // Maximum 60 frames per second; one quality tier, `level-0`. No GL call outside the renderer's `FieldPass`es.
 import EffectsComposerCore
 import Foundation
@@ -71,6 +77,23 @@ import UIKit
 import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreRendering
+
+/// A drawing failure of Effects Composer (feature 185, A25-P06, T-A25-604).
+enum ComposerDrawError: Error, Equatable, CustomStringConvertible, LocalizedError {
+    /// The test-only seam ``ComposerPresenter/failNextDraw`` made this draw fail.
+    case injected
+
+    /// The message the failed session shows: "The picture could not be drawn."
+    var description: String {
+        switch self {
+        case .injected:
+            return "The picture could not be drawn."
+        }
+    }
+
+    /// The same message as ``description``.
+    var errorDescription: String? { description }
+}
 
 /// One parameter of a node as the controls show it.
 struct ParameterRow: Equatable, Sendable {
@@ -187,6 +210,10 @@ final class ComposerPresenter: ExperiencePresenter {
 
     /// The folder that holds the export folder `EffectsComposer` (a test seam; the temporary folder by default).
     var exportBase = FileManager.default.temporaryDirectory
+    /// Test-only seam: when true, the next `draw` throws ``ComposerDrawError/injected`` once, before it renders,
+    /// exports or follows the core; the seam clears itself and nothing in the experience or its interface sets it
+    /// (feature 185, A25-P06, T-A25-604).
+    var failNextDraw = false
     /// Whether the system can write a format (a test seam; `StillImageEncoder.isAvailable`).
     var formatAvailable: (StillImageFormat) -> Bool = StillImageEncoder.isAvailable
     /// The texture limit an export is validated against instead of the renderer's (a test seam; nil in the app).
@@ -258,8 +285,13 @@ final class ComposerPresenter: ExperiencePresenter {
     /// source picture's size).
     func resize(_ context: RenderContext) {}
 
-    /// Renders the chain when it changed, presents the result and follows the core.
+    /// Renders the chain when it changed, presents the result and follows the core. Throws
+    /// ``ComposerDrawError/injected`` once while ``failNextDraw`` is set (it is cleared first).
     func draw(_ core: ComposerCore, tier: Int, context: RenderContext, frame: FrameInfo) throws {
+        if failNextDraw {
+            failNextDraw = false
+            throw ComposerDrawError.injected
+        }
         renderer.render(core.chain, context: context)
         if let pending = pendingExport {
             pendingExport = nil

@@ -22,7 +22,7 @@
 
 ## Phase 3: Story 2 — recover without losing the looks (P1)
 
-- [ ] T-A25-604 [US2] Add `failNextDraw` and `ComposerDrawError.injected` ("The picture could not be drawn.") to
+- [X] T-A25-604 [US2] Add `failNextDraw` and `ComposerDrawError.injected` ("The picture could not be drawn.") to — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P06.ec-recovery-samples.json (exit 0, 95+49; ComposerRecoveryTests: failed draw leaves the looks byte-identical, a new session opens both)
   `Packages/ExperiencesCreative/EffectsComposer/Experience/ComposerPresenter.swift`; write
   `Packages/ExperiencesCreative/EffectsComposer/ExperienceTests/ComposerRecoveryTests.swift` (two saved looks; the
   session fails with the message; every storage file byte-identical; a new session lists and opens both)
