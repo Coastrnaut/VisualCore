@@ -821,7 +821,7 @@
       "id": "a24.graphics-benchmark-lab",
       "code": "A24",
       "title": "Graphics Benchmark Lab",
-      "summary": "A transparent, repeatable suite of GPU graphics workloads and instrumentation with measured-device caveats.",
+      "summary": "Three repeatable GPU workloads (textured quads, an arithmetic stress pass and particles) run through warm-up, measurement and cool-down and report frame-time percentiles with their limits. A GPU time is shown only where the device can measure it. Offline; nothing is sent.",
       "kind": "creative",
       "tier": "free",
       "category": "tools",
@@ -830,10 +830,23 @@
         "developer-and-creator-tools"
       ],
       "order": 24,
-      "palette": [],
+      "palette": [
+        "#0B1020",
+        "#3FA7D6",
+        "#F4D35E",
+        "#EDF2F4"
+      ],
       "tile_seed": 1597107587,
-      "capabilities": [],
-      "quality_tiers": [],
+      "capabilities": [
+        "Three repeatable GPU workloads",
+        "Warm-up, measurement and cool-down",
+        "Frame-time p50, p95 and p99",
+        "No GPU time without a real timer",
+        "Results that state their limits"
+      ],
+      "quality_tiers": [
+        "level-0"
+      ],
       "content": null,
       "available": false
     },

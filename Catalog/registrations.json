@@ -561,6 +561,28 @@
       "manifest": "Packages/ExperiencesCreative/VisualProgrammingLab/scenario-manifest.json",
       "permissions": [],
       "summary": "A node graph lab: wire Time, Constant, Noise, Gradient, Mix, Blur and Output nodes by matching types; the graph compiles into GPU shader passes shown in a preview. A wrong connection is refused with a reason, and every connection can be made from a list. Offline; nothing is sent."
+    },
+    "a24.graphics-benchmark-lab": {
+      "capabilities": [
+        "Three repeatable GPU workloads",
+        "Warm-up, measurement and cool-down",
+        "Frame-time p50, p95 and p99",
+        "No GPU time without a real timer",
+        "Results that state their limits"
+      ],
+      "quality_tiers": [
+        "level-0"
+      ],
+      "palette": [
+        "#0B1020",
+        "#3FA7D6",
+        "#F4D35E",
+        "#EDF2F4"
+      ],
+      "content": null,
+      "manifest": "Packages/ExperiencesCreative/GraphicsBenchmarkLab/scenario-manifest.json",
+      "permissions": [],
+      "summary": "Three repeatable GPU workloads (textured quads, an arithmetic stress pass and particles) run through warm-up, measurement and cool-down and report frame-time percentiles with their limits. A GPU time is shown only where the device can measure it. Offline; nothing is sent."
     }
   }
 }

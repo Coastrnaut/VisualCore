@@ -124,7 +124,9 @@ enum CatalogFixture {
                                // Feature 160 (A22-P02); integrated at X-A22.
                                "a22.shader-studio",
                                // Feature 167 (A23-P02); integrated at X-A23.
-                               "a23.visual-programming-lab"],
+                               "a23.visual-programming-lab",
+                               // Feature 174 (A24-P02); a candidate until X-A24.
+                               "a24.graphics-benchmark-lab"],
                 "the registrations of Catalog/registrations.json")
     }
 

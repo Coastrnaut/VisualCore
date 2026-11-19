@@ -61,7 +61,7 @@
 
 ## Phase 6: Registration and evidence
 
-- [ ] T-A24-210 Register the candidate (FR-A24-207):
+- [X] T-A24-210 Register the candidate (FR-A24-207): — Verified 2026-11-19: 2026-11-19: a24 registered as a candidate (5 capabilities, a 272-character summary without the searched words, level-0, palette, manifest, no permission); ExperienceRegistry candidate, project.yml product, synthetic id a25.effects-composer; .autonomy/checks/A24-P02.{catalog,catalog-search,script-tests}.json exit 0
   - a `Catalog/registrations.json` entry for a24 (capabilities of at most 40 characters each, a summary of at most 300
     characters keeping the words CatalogSearchTests searches for, quality_tiers ["level-0"], a palette, manifest
     `Packages/ExperiencesCreative/GraphicsBenchmarkLab/scenario-manifest.json`, permissions []); then

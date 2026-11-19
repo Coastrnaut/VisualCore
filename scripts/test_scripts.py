@@ -1325,7 +1325,9 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     # Feature 160 (A22-P02): Shader Studio, integrated at X-A22.
                                     "ShaderStudioExperience",
                                     # Feature 167 (A23-P02): Visual Programming Lab, integrated at X-A23.
-                                    "VisualProgrammingLabExperience"])
+                                    "VisualProgrammingLabExperience",
+                                    # Feature 174 (A24-P02): Graphics Benchmark Lab, a candidate until X-A24.
+                                    "GraphicsBenchmarkLabExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):
         listing = subprocess.run([sys.executable, str(HERE / "release_check.py"), "--list"],

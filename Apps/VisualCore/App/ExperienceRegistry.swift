@@ -24,6 +24,7 @@ import DigitalZenGardenExperience
 import AuroraExperience
 import ShaderStudioExperience
 import VisualProgrammingLabExperience
+import GraphicsBenchmarkLabExperience
 import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreUI
@@ -89,7 +90,7 @@ enum ExperienceRegistry {
     /// each carries its scenario manifest, so that the verification runner can open it, but it stays unavailable
     /// in the catalog and outside `all`. Debug builds show them with `-vcCandidates`. Recording an experience's X
     /// gate moves its registration from here to `all`.
-    static let candidates: [ExperienceRegistration] = []
+    static let candidates: [ExperienceRegistration] = [graphicsBenchmarkLab].compactMap { $0 }
 
     /// A01 Generative Art Studio (feature 193, US1).
     private static var generativeArtStudio: ExperienceRegistration? {
@@ -484,6 +485,19 @@ extension ExperienceRegistry {
         }
         #if DEBUG || VISUALCORE_AUTOMATION
         registration.scenarioManifest = LabCore.manifest(for: id)
+        #endif
+        return registration
+    }
+
+    /// A24 Graphics Benchmark Lab (feature 174, A24-P02): a candidate until X-A24. Snapshot schema 1, so no earlier
+    /// example is stored yet.
+    fileprivate static var graphicsBenchmarkLab: ExperienceRegistration? {
+        guard let id = GraphicsBenchmarkLabExperience.id else { return nil }
+        var registration = ExperienceRegistration(id: id, core: BenchCore.self) { launch in
+            GraphicsBenchmarkLabExperience.make(id: id, storage: launch.storage)
+        }
+        #if DEBUG || VISUALCORE_AUTOMATION
+        registration.scenarioManifest = BenchCore.manifest(for: id)
         #endif
         return registration
     }
