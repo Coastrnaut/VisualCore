@@ -62,7 +62,7 @@
   --only experience-release-a25 copy-claims-a25`, plus both scans
 - [X] T-A25-612 Contract: close G-RELEASE with "A25-P06" (all 14 gaps closed; the iOS 26.x runner half cited at — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P06.contract.json (exit 0; G-RELEASE closed, all 14 gaps closed; iOS 26.x runner half cited at X-A25)
   X-A25), `--name contract`; experience README
-- [ ] T-A25-613 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+- [X] T-A25-613 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record — Verified 2026-11-19: 2026-11-19 converge round 1 clean; .autonomy/evidence/A25-P06.json sealed; ledger 185 of 263
   A25-P06; update README.md (rule 16) and `docs/automatedtesting.md` (rule 17)
 
 ## Dependencies
