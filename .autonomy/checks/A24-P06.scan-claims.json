@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "sh",
+    "specs/178-gbl-p06-release/scan-claims-release.sh"
+  ],
+  "command": "sh specs/178-gbl-p06-release/scan-claims-release.sh",
+  "elapsed_seconds": 0.562,
+  "exit_code": 0,
+  "finished": "2026-11-19T18:19:43+00:00",
+  "log": ".autonomy/logs/A24-P06.scan-claims.log",
+  "log_sha256": "a7b9b1734f0162516b85fefcb430f26f64aa71fc9576c1f568cf07674c586b07",
+  "name": "scan-claims",
+  "stage": "A24-P06",
+  "started": "2026-11-19T18:19:43+00:00",
+  "timed_out": false
+}

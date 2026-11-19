@@ -60,7 +60,7 @@
   - an A24 section in `docs/release/known-limitations.md` (three cases; a run of at most its plan; at most 12 saved
     results; GPU time only where the timer exists; simulator numbers are not device evidence; a hot device ends a
     run; no ranking or comparison; device rows pending).
-- [ ] T-A24-607 [US3] Write `specs/178-gbl-p06-release/scan-claims-release.sh` with the words of clarification Q2, then
+- [X] T-A24-607 [US3] Write `specs/178-gbl-p06-release/scan-claims-release.sh` with the words of clarification Q2, then — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A24-P06.scan-claims.json exit 0 (no refused word, does not rank devices present, 64 proving tests found)
   run it (`--name scan-claims`); it requires "does not rank devices" and that every named test exists (SC-A24-603).
 
 ## Phase 5: Story 4 — a first session in the app (P2)
