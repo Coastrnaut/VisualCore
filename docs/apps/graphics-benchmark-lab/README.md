@@ -17,6 +17,12 @@ Graphics Benchmark Lab is an experience of the one VisualCore app (ADR-0009). Fr
 texture is generated in code. It works offline, sends nothing and needs no permission. Its rules are the A24
 subsection of the constitution (2.20.0).
 
+The pending core (A24-P01) is `Packages/ExperiencesCreative/GraphicsBenchmarkLab/Core`: the three benchmark cases
+with their caps and fingerprints (`BenchmarkCase.swift`), the frame sample and its validation (`FrameSample.swift`), the
+nearest-rank statistics with quality flags (`Statistics.swift`) and the run file (`BenchmarkRun.swift`: kind
+`a24.benchmark-run`, schema 1), tested in `CoreTests` against committed fixtures, and inside a running render host to
+prove that none of it creates a graphics resource.
+
 | Document | Content |
 |---|---|
 | [visualcore-contract.json](visualcore-contract.json) / [.md](visualcore-contract.md) | Phase 00 inventory, capability matrix, gaps, decision (checked by `scripts/check_app_contract.py`) |

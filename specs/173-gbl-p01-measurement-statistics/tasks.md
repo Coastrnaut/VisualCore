@@ -79,7 +79,7 @@
     Packages/ExperiencesCreative/GraphicsBenchmarkLab`);
   - the isolation check (`--name isolation -- python3 scripts/check_app_isolation.py --experiences
     Packages/ExperiencesCreative/GraphicsBenchmarkLab`).
-- [ ] T-A24-112 Contract `docs/apps/graphics-benchmark-lab/visualcore-contract.json`: G-MODEL and G-STATS are closed
+- [X] T-A24-112 Contract `docs/apps/graphics-benchmark-lab/visualcore-contract.json`: G-MODEL and G-STATS are closed — Verified 2026-11-19: 2026-11-19: G-MODEL and G-STATS closed by A24-P01, M12 and M13 available; .autonomy/checks/A24-P01.contract.json exit 0; README lists the core
   by "A24-P01", and rows whose gaps are all closed become available with evidence (`--name contract -- python3
   scripts/check_app_contract.py --app graphics-benchmark-lab --render`); list the core in
   `docs/apps/graphics-benchmark-lab/README.md`

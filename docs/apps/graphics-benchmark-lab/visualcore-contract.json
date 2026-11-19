@@ -584,7 +584,7 @@
    "id": "M12",
    "capability": "Benchmark case, run, frame sample and summary models: versioned, validated, with documented caps",
    "source": "spec FR-A24-003 area 1; manual \u00a76 schemas",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCorePersistence/Migration.swift",
@@ -606,16 +606,16 @@
     }
    ],
    "example": {
-    "file": "Packages/ExperiencesCreative/VisualProgrammingLab/Core/GraphDocument.swift",
-    "symbol": "GraphDocument"
+    "file": "Packages/ExperiencesCreative/GraphicsBenchmarkLab/Core/BenchmarkRun.swift",
+    "symbol": "RunDocument"
    },
-   "notes": "MigrationChain and ExperienceSnapshot are public and tested (ExperienceSnapshotTests, SnapshotMigrationCheckTests); the models are the experience's pure Core (G-MODEL, A24-P01). Visual Programming Lab's GraphDocument is the versioned-envelope pattern."
+   "notes": "MigrationChain and ExperienceSnapshot are public and tested (ExperienceSnapshotTests, SnapshotMigrationCheckTests); the models are the experience's pure Core (G-MODEL, A24-P01). Visual Programming Lab's GraphDocument is the versioned-envelope pattern. A24-P01 (feature 173): BenchmarkCase (three built-in cases, caps, fingerprint), FrameSample with SampleSet.validate, and RunDocument (a24.benchmark-run v1, at most 2,097,152 bytes, refusal codes, the summary recomputed on read), tested in GraphicsBenchmarkLabCoreTests (CaseTests, SampleTests, RunDocumentTests, HostCountTests) (G-MODEL closed)."
   },
   {
    "id": "M13",
    "capability": "Percentile statistics (p50, p95, p99) over raw samples with the warm-up excluded and sample counts",
    "source": "spec FR-A24-003 area 2; manual \u00a76 algorithm",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/PacingMeter.swift",
@@ -631,10 +631,10 @@
     }
    ],
    "example": {
-    "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
-    "symbol": "ExperienceSession"
+    "file": "Packages/ExperiencesCreative/GraphicsBenchmarkLab/Core/Statistics.swift",
+    "symbol": "Summary"
    },
-   "notes": "No public statistics over raw samples exist; PacingMeter's histogram (binWidth 0.00025 s, binCount 1000) rounds to bins (PacingMeterTests) and is rejected for results (research D6). G-STATS (A24-P01), tested with fixed sample fixtures under swift test."
+   "notes": "No public statistics over raw samples exist; PacingMeter's histogram (binWidth 0.00025 s, binCount 1000) rounds to bins (PacingMeterTests) and is rejected for results (research D6). G-STATS (A24-P01), tested with fixed sample fixtures under swift test. A24-P01 (feature 173): nearest-rank p50, p95 and p99 (minimum counts 1, 20 and 100) with warm-up and cool-down left out, quality flags and a GPU distribution only when every measured sample has a GPU time, matching 14 committed fixtures and a 20,000-sample rule set exactly (FixtureTests, StatisticsTests) (G-STATS closed)."
   },
   {
    "id": "M14",
@@ -1472,7 +1472,7 @@
    "justification": "The benchmark case, run, frame sample and summary models (manual \u00a76) are the experience's domain, pure and GPU-free in its Core, versioned with MigrationChain and with documented caps on duration, samples and counts (research D4). No second user exists for them (Principle II).",
    "phase": 1,
    "test": "Core host tests: each model round-trips and migrates; truncated, newer, NaN, infinite and out-of-range values and values one past each cap are refused with a named reason.",
-   "closed": null
+   "closed": "A24-P01"
   },
   {
    "id": "G-STATS",
@@ -1486,7 +1486,7 @@
    "justification": "Exact nearest-rank percentiles (p50, p95, p99) over raw frame intervals with the warm-up excluded, sample counts and quality flags; PacingMeter is not used because it rounds to 0.25 ms bins (clarification Q3, research D6). Pure, in the experience's Core.",
    "phase": 1,
    "test": "swift test with fixed sample fixtures: known percentiles for odd, even, single and empty inputs; warm-up samples excluded; non-finite samples refused; counts and flags reported.",
-   "closed": null
+   "closed": "A24-P01"
   },
   {
    "id": "G-SCENES",
