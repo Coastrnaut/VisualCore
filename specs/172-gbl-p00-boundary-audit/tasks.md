@@ -78,7 +78,7 @@
 
 ## Phase 7: Polish and evidence
 
-- [ ] T-A24-009 No-change proof (`--name no-change -- git diff --exit-code --stat 7de0f2af..HEAD -- Packages
+- [X] T-A24-009 No-change proof (`--name no-change -- git diff --exit-code --stat 7de0f2af..HEAD -- Packages — Verified 2026-11-19: 2026-11-19: .autonomy/checks/A24-P00.no-change.json and no-change-2.json exit 0 (empty diff of Packages and External since 7de0f2af)
   External`) (FR-A24-008, SC-A24-005)
 - [ ] T-A24-010 Run the script tests (`--name script-tests -- python3 scripts/test_scripts.py`) and the release-check
   document steps (`--name fast-checks -- python3 scripts/release_check.py --only docs app-contracts compliance
