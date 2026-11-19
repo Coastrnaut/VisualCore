@@ -73,7 +73,7 @@
   Auto-Creator.md section 13.4 row R02-F06 "As built"
 - [X] T-R02F06-011 Reference regression chunk 1 (`--name reference-1 -- python3 scripts/release_check.py --only — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F06.reference-1.json (exit 0)
   reference-engine-xcframework reference-build-projectm-ios-sim reference-clean`)
-- [ ] T-R02F06-012 Reference regression chunk 2 (`--name reference-2 -- python3 scripts/release_check.py --only
+- [X] T-R02F06-012 Reference regression chunk 2 (`--name reference-2 -- python3 scripts/release_check.py --only — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F06.reference-2.json (exit 0)
   reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27
   projectm-reference-ios26`)
 - [ ] T-R02F06-013 Script tests (`--name script-tests -- python3 scripts/test_scripts.py`)
