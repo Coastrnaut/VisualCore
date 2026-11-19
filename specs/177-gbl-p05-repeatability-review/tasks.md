@@ -11,7 +11,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T-A24-501 Baseline: cite the A24-P04 evidence (`.autonomy/checks/A24-P04.{gbl-ios27,app-unit,verify-27}.json`) on
+- [X] T-A24-501 Baseline: cite the A24-P04 evidence (`.autonomy/checks/A24-P04.{gbl-ios27,app-unit,verify-27}.json`) on — Verified 2026-11-19: 2026-11-19: .autonomy/checks/A24-P04.{gbl-ios27,app-unit,verify-27}.json exit 0 at A24-P04; Packages unchanged since 5553af36
   the tree recorded at A24-P04 (`5553af36`), whose Packages are unchanged since (owner ruling of 2026-11-14)
 
 ## Phase 2: Core — qualification and repeatability (P1) 🎯
