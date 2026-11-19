@@ -28,7 +28,7 @@
   particles 1…100,000; resolutionScale 0.25…1.0; warmUpSeconds 1…30; measureSeconds 1…60; coolDownSeconds 0…120"),
   `CaseError`, `BenchmarkCase` with `validate()`, `fingerprint()` (`DigestBuilder(domain: "a24.benchmark-case.v1")`)
   and the three built-ins of clarification Q1.
-- [ ] T-A24-104 [P] [US1] [US3] Create `Packages/ExperiencesCreative/GraphicsBenchmarkLab/Core/FrameSample.swift`
+- [X] T-A24-104 [P] [US1] [US3] Create `Packages/ExperiencesCreative/GraphicsBenchmarkLab/Core/FrameSample.swift` — Verified 2026-11-19: 2026-11-19: Packages/ExperiencesCreative/GraphicsBenchmarkLab/Core/FrameSample.swift (phases, sample caps, SampleSet.validate); gbl-core-ios27 exit 0
   (FR-A24-102): `RunPhase`, `FrameSample` ("every duration finite and within 0…1,000 ms; intervalMs absent only for
   the run's first frame"), `SampleLimits` ("maxSamples 20,000"), `SampleError`, `SampleSet.validate` (frame indices
   strictly increasing, phases never going back).
