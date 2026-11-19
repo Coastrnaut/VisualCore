@@ -149,6 +149,9 @@ The preview and the export survive a lost graphics context, a change of size and
 - **High precision unavailable:** standard-precision intermediates are used and the ramp still round-trips.
 - **A repeated tap on export while one is running:** ignored; one file is written.
 - **Not enough graphics memory for the export:** refused with a named message; the preview keeps working.
+- **The app goes to the background during an export:** a draw already read back is encoded and written; a draw not
+  yet read back fails as interrupted when the context is lost.
+- **A restored session:** no export file survives; the share link appears only after a new export.
 
 ## Requirements *(mandatory)*
 
