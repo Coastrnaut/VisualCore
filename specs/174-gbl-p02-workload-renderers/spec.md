@@ -28,6 +28,57 @@ Canonical overrides:
 - **No VisualCore or ProjectM change.** Follow `specs/167-vpl-p02-node-canvas`.
 - **No benchmark number** is shown or claimed; results on the simulator are never device evidence.
 
+## Clarifications
+
+### Session 2026-11-19
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- **Passes:** `FieldPass(registry:fragment:inputs:label:)` (VisualCoreRendering) compiles a fragment program with the
+  full-screen vertex shader; `run(output:inputs:uniforms:)` draws into a `RenderTarget` or the framebuffer, sampling
+  only `RenderTarget`s by name, with blending disabled for the draw. `ResourceRegistry.makeRenderTarget` makes the
+  targets, and `ResourceRegistry.maxTextureSize` (4,096 until the host reads the context's limit) refuses larger sizes.
+- **Particles:** `ParticleRenderer(registry:)` draws `[ParticleInstance]` (position, size, colour) as instanced quads
+  with `draw(_:camera:metrics:blend:)`, as Neon Arcade's presenter does.
+- **Host:** `ExperiencePresenter` offers `setup`, `resize`, `draw(_:tier:context:frame:)`, `teardown`,
+  `makeControls(_:)` and `maxFramesPerSecond` (default 60); `FrameInfo.time` is the host's monotonic frame time;
+  `RenderHost.recreateContext()` rebuilds the context. Actions with no value are declared with `ranges: []`, as Digital
+  Zen Garden's `edit.undo` is.
+
+- Q: How is each workload drawn, and how is it made deterministic? → A: Every picture is a function of the case and the
+  workload frame number n (frames drawn since the case was chosen or the run started), never of the clock:
+  - **quads:** at setup a `FieldPass` writes a code-made texture (a checker of 16 cells mixed with a value-noise pattern)
+    into a `textureSize` × `textureSize` render target; each frame then draws `layers` full-screen `FieldPass` layers
+    to the framebuffer, layer k sampling the texture with the offset (k + n) / 64 of a turn, so every layer fills every
+    pixel;
+  - **alu:** one full-screen `FieldPass` whose loop runs `iterations` steps of a bounded trigonometric recurrence (the
+    loop bound is the constant 1,024 with an early exit at the uniform `u_iterations`), with the phase n / 60;
+  - **particles:** `particles` instances placed by a pure function of the index and n (a hash for the start position, a
+    fixed velocity, wrapped into the view), drawn with `ParticleRenderer`.
+
+  The resolution scale is applied to the drawable size; at 1.0 the framebuffer is drawn directly.
+- Q: Where do the phases and samples come from? → A: The core's pure `RunTimeline(plan:start:)` maps a frame time to
+  warm-up (t − start < warm-up), measure (< warm-up + measure), cool-down (< total) or finished. The presenter's
+  `RunRecorder` appends one `FrameSample` per drawn frame while the run is not finished: `frameIndex` counts from 0,
+  `intervalMs` = (t − previous t) × 1,000 (absent for the run's first frame), `cpuMs` 0 until A24-P03 measures it, and
+  `gpuMs` always absent (no timer, A24-P00 gap U-GPUTIMER). A frame at or after the end finishes the run and builds the
+  summary with A24-P01's `Summary.make`. Tests feed synthetic times; no test waits for a plan.
+- Q: What does the core hold, and which actions exist? → A: `BenchCore`, snapshot schema 1, digest
+  `a24.graphics-benchmark-lab.v1` over the selected case: actions `case.select [0…2]` (in `BenchmarkCase.builtIn`
+  order), `run.start []` and `run.stop []`. `run.start` and `run.stop` count requests (`startRequests`, `stopRequests`)
+  that the presenter acts on; a restored snapshot never resumes a run. Rule ids `a24.not-whole` and
+  `a24.unknown-case`. The last summary is shown by the presenter and not stored (storage is A24-P04).
+- Q: What does the interface show? → A: Native controls in `GBLControls`: an inline list of the three cases (buttons
+  `case-<id>`, never a system menu over the drawing, the A23-P05 lesson), `run-start` and `run-stop`, a `status` line
+  ("Ready", "Warm-up", "Measuring", "Cool-down", "Finished", "Stopped", "Interrupted"), and after a finished run a
+  `summary` block: frame interval p50, p95 and p99 in milliseconds with two decimals (or "not enough frames"), the
+  frame counts, and the flags as sentences, including "GPU time not available on this device". No frame rate is shown.
+- Q: How is it registered and verified? → A: As A23-P02: a candidate in `Catalog/registrations.json` (capabilities of at
+  most 40 characters, `quality_tiers` ["level-0"], a palette, the scenario manifest, permissions []) and in
+  `ExperienceRegistry.candidates`; `maxFramesPerSecond` 60 and one tier `level-0`; a `GBLManifest` with the nine
+  standard scenarios plus fixtures for each case, and the runner on iOS 27.2. The synthetic candidate id of the app's
+  tests moves to `a25.effects-composer`.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Three workloads, the same picture every time (Priority: P1) 🎯
@@ -133,7 +184,7 @@ nothing leaked.
 
 - **Run timeline**: plan, start time, phase of a frame time.
 - **Recorder**: the samples of the current run and its state.
-- **Session state (snapshot)**: the selected case and the last finished run's summary.
+- **Session state (snapshot)**: the selected case and the run request counts; the last summary is not stored.
 
 ## Success Criteria *(mandatory)*
 
