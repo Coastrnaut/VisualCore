@@ -69,7 +69,7 @@
 - [X] T-A23-210 Write `Experience/Adapter/LabManifest.swift` (nine standard scenarios, plus fixtures for the starter — Verified 2026-11-18: 2026-11-18: Adapter/LabManifest.swift (nine standard scenarios and five fixtures: starter graph, journey graph, refused connection, refused loop, refused second output; the last two added by the lead for the planning catalog's count) and LabManifestTests (5); scenario-manifest.json generated with UPDATE_SCENARIO_MANIFEST=1 TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1; .autonomy/checks/A23-P02.vpl-ios27-2.json exit 0 (125 core and 27 experience tests)
   graph, the journey graph and a refused connection) and `ExperienceTests/LabManifestTests.swift`; generate
   `scenario-manifest.json` with `UPDATE_SCENARIO_MANIFEST=1 TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`
-- [ ] T-A23-211 Review checkpoint:
+- [X] T-A23-211 Review checkpoint: — Verified 2026-11-18: 2026-11-18: review checkpoint: .autonomy/checks/A23-P02.vpl-ios27-2.json exit 0 (125 core and 27 experience tests on sim-27.2, slowest 0.2 s), A23-P02.documented-api-2.json, A23-P02.isolation-2.json and A23-P02.core-purity.json exit 0
   - `--name vpl-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme
     ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing VisualProgrammingLabCoreTests
     VisualProgrammingLabExperienceTests`, each test under 10 s (SC-A23-206);

@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_app_isolation.py",
+    "--experiences",
+    "Packages/ExperiencesCreative/VisualProgrammingLab"
+  ],
+  "command": "python3 scripts/check_app_isolation.py --experiences Packages/ExperiencesCreative/VisualProgrammingLab",
+  "elapsed_seconds": 0.044,
+  "exit_code": 0,
+  "finished": "2026-11-19T03:11:29+00:00",
+  "log": ".autonomy/logs/A23-P02.isolation.log",
+  "log_sha256": "46f095c8b69cb218f43af8337cd7cd4e2c3d89a6bd65d359c25316597168daeb",
+  "name": "isolation",
+  "stage": "A23-P02",
+  "started": "2026-11-19T03:11:29+00:00",
+  "timed_out": false
+}
