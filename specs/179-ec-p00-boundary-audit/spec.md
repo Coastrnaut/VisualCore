@@ -196,6 +196,7 @@ will own each missing piece and in which phase.
   - a before and after compare that keeps the untouched source;
   - preset storage with versioned files, and refusal of damaged or newer files;
   - image import through the system picker with scoped access, and decoding to a texture within the texture limit;
+  - how an imported image's bytes reach a pass input (a render target) without four floats per pixel;
   - colour-space boundaries (linear and sRGB);
   - still export at a validated size and format, rendered offscreen and encoded;
   - resize, orientation and context-loss handling.
