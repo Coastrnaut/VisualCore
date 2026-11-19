@@ -43,7 +43,7 @@
   ("minor lines every 32 canvas points, major every 160", uniforms `zoom` and `pan`), 30 frames per second, tier
   `level-0`; the touch mapping; the overlay and controls with the identifiers of the contract and spoken labels; no GL
   call of the experience
-- [ ] T-A23-207 [US1] [US2] [US4] Write `ExperienceTests/{LabTestSupport,LabCoreTests,TouchTests}.swift`
+- [X] T-A23-207 [US1] [US2] [US4] Write `ExperienceTests/{LabTestSupport,LabCoreTests,TouchTests}.swift` — Verified 2026-11-18: 2026-11-18: LabTestSupport, LabCoreTests (10) and TouchTests (10): the journey graph by touch equals the journey by actions (fingerprint and digest); every refusal leaves the digest unchanged and shows its sentence; zoom held at 0.5 and 2 and pan never change the digest; starter port targets at least 44 points; wrong direction shows its sentence and sends nothing; cancelPointers mid-drag drops the wire; .autonomy/checks/A23-P02.vpl-ios27.json exit 0 (125 core and 27 experience tests on sim-27.2, slowest 0.199 s); written by an agent, retested
   (SC-A23-201–204): the journey graph built by actions and by simulated touches gives the same fingerprint; every
   refusal fixture leaves the digest unchanged and sets its sentence; zoom and pan never change the digest; the
   starter graph's port targets are at least 44 points; a drag between two inputs sends nothing and shows "Connect an
