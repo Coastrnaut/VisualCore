@@ -97,8 +97,8 @@
     "ParticleLayerScene",
     "ParticleSystem"
    ],
-   "home": "VisualCoreRendering",
-   "note": "Instanced points exist; add beams and generic instancing."
+   "home": "VisualCoreRendering, VisualCoreScenes",
+   "note": "As built (feature 209): InstancedMeshRenderer (MeshInstance, up to 16,384 copies of one Mesh in one instanced draw, lit like MeshRenderer, translucent ones ordered by InstanceOrder.backToFront) and BeamRenderer (BeamInstance, up to 65,536 eye-facing strips in one draw with the BeamProfile Gaussian falloff, round points, premultiplied sorted or additive) in VisualCoreRendering; the pure InstanceOrder and BeamProfile in VisualCoreScenes. ParticleSystem lives in VisualCoreSimulation, not VisualCoreRendering."
   },
   "F10": {
    "disposition": "extend",

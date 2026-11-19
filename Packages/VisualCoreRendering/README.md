@@ -412,6 +412,17 @@ output size (half-float where supported), with exposure and tone mapping in line
 flash limiter measure linear light for graphs that contain it. Rules:
 [docs/architecture/shaders.md](../../docs/architecture/shaders.md).
 
+## Instancing and beams (feature 209, R02-F09)
+
+`InstancedMeshRenderer` draws up to 16,384 copies of one `Mesh` (`MeshInstance`: model matrix and colour) in one
+instanced draw with the lighting and fog of `MeshRenderer`; translucent instances are ordered back to front by
+`InstanceOrder.backToFront` (VisualCoreScenes) and blended premultiplied with depth writes off. `BeamRenderer` draws
+up to 65,536 `BeamInstance`s (two end points, width, premultiplied colour) as eye-facing strips in one instanced draw;
+the fragment falloff is `BeamProfile.coverage` (exp(−4 r²) inside the beam, 0 outside), a zero-length or end-on beam
+is a round point, `.premultiplied` sorts back to front and `.additive` does not, and the caller's blend, depth and cull
+state is restored. Both refuse too many, non-finite or (beams) non-positive widths with `InstancingError` before any GL
+call, and rebuild after a context recreation.
+
 ## Resource ownership and pipelines (feature 204, R02-F04)
 
 The ownership rules are unchanged: every GPU handle carries its context generation, stale handles are refused and

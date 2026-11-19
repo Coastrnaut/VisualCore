@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_public_api.py"
+  ],
+  "command": "python3 scripts/check_public_api.py",
+  "elapsed_seconds": 0.153,
+  "exit_code": 0,
+  "finished": "2026-11-19T23:40:08+00:00",
+  "gate": "R02-F09",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-F09.public-api.log",
+  "log_sha256": "dc9afd2b3810cf6d65742e9e3047d383718c37e10f956ac3e4ed19c9f5a23c8c",
+  "name": "public-api",
+  "started": "2026-11-19T23:40:08+00:00",
+  "timed_out": false
+}

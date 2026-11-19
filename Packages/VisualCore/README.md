@@ -359,6 +359,14 @@ composite, premultiplied over); `composite` mode 2 is premultiplied over; the va
 and out-of-range emissive ones. `RenderState.premultipliedBlended` draws premultiplied layers. Rules:
 [docs/architecture/shaders.md](../../docs/architecture/shaders.md).
 
+## Instance order and beam profile (feature 209, R02-F09)
+
+`InstanceOrder.backToFront(depths:)` (VisualCoreScenes) orders translucent instances by view-space z, farthest first,
+ties in submission order, and refuses a non-finite depth with `MeshError.invalidInput`. `BeamProfile` is the CPU
+reference of a beam's cross-section: `falloff(r)` = exp(−4 r²) for r ≤ 1 and 0 beyond, `distanceToSegment` and
+`coverage(point:a:b:width:)`; a beam whose ends coincide is a round point. `BeamRenderer` and `InstancedMeshRenderer`
+in VisualCoreRendering use them.
+
 ## Curves, ribbons and tubes (feature 208, R02-F08)
 
 VisualCoreScenes builds curves from code: `CubicBezierChain` and centripetal `CatmullRomSpline` (open or closed),

@@ -1879,6 +1879,7 @@ VisualCorePersistence | var | public var id: UUID
 VisualCorePersistence | var | public var modifiedAt: Date
 VisualCorePersistence | var | public var name: String
 VisualCorePersistence | var | public var payload: Payload
+VisualCoreRendering | class | public final class BeamRenderer
 VisualCoreRendering | class | public final class CachedScene: RenderScene
 VisualCoreRendering | class | public final class ClearColorScene: RenderScene
 VisualCoreRendering | class | public final class CrossfadeScene: RenderScene
@@ -1888,6 +1889,7 @@ VisualCoreRendering | class | public final class FullScreenShaderScene: RenderSc
 VisualCoreRendering | class | public final class GPUBuffer: GPUResource
 VisualCoreRendering | class | public final class GPUFrameTimer
 VisualCoreRendering | class | public final class GradientQuadScene: RenderScene
+VisualCoreRendering | class | public final class InstancedMeshRenderer
 VisualCoreRendering | class | public final class MeshRenderer
 VisualCoreRendering | class | public final class ParticleLayerScene: RenderScene
 VisualCoreRendering | class | public final class ParticleRenderer
@@ -1901,9 +1903,11 @@ VisualCoreRendering | class | public final class ShaderProgram
 VisualCoreRendering | class | public final class StillCapture
 VisualCoreRendering | class | public final class Texture: GPUResource
 VisualCoreRendering | class | public final class TrailLayer
+VisualCoreRendering | enum | public enum BeamBlend: Sendable
 VisualCoreRendering | enum | public enum FieldPassError: Error, Equatable, Sendable
 VisualCoreRendering | enum | public enum FieldUniform: Sendable, Equatable
 VisualCoreRendering | enum | public enum GLState
+VisualCoreRendering | enum | public enum InstancingError: Error, Equatable, Sendable
 VisualCoreRendering | enum | public enum OffscreenRenderError: Error, Equatable, Sendable
 VisualCoreRendering | enum | public enum Outcome: Equatable, Sendable
 VisualCoreRendering | enum | public enum Output
@@ -1934,6 +1938,8 @@ VisualCoreRendering | func | public func check(_ layout: UniformLayout) -> Unifo
 VisualCoreRendering | func | public func clear()
 VisualCoreRendering | func | public func clearTrails()
 VisualCoreRendering | func | public func destroy()
+VisualCoreRendering | func | public func draw(_ beams: [BeamInstance], view: Mat4, projection: Mat4, blend: BeamBlend = .premultiplied) throws
+VisualCoreRendering | func | public func draw(_ instances: [MeshInstance], view: Mat4, projection: Mat4, fog: MeshFog?,
 VisualCoreRendering | func | public func draw(_ items: [Item], camera: OrbitCamera, context: RenderContext) throws
 VisualCoreRendering | func | public func draw(_ items: [Item], view: Mat4, projection: Mat4, fog: MeshFog?, context: RenderContext) throws
 VisualCoreRendering | func | public func draw(_ opaque: [Item], translucent: [Item], camera: OrbitCamera, context: RenderContext) throws
@@ -2017,6 +2023,7 @@ VisualCoreRendering | init | public convenience init(fragmentName: String, bundl
 VisualCoreRendering | init | public convenience init(mesh: Mesh, colors: [Vec4]?, registry: ResourceRegistry) throws
 VisualCoreRendering | init | public convenience init(mesh: Mesh, registry: ResourceRegistry) throws
 VisualCoreRendering | init | public init()
+VisualCoreRendering | init | public init(a: Vec3, b: Vec3, width: Double, color: Vec4)
 VisualCoreRendering | init | public init(center: Vec2, size: Vec2)
 VisualCoreRendering | init | public init(child: any RenderScene)
 VisualCoreRendering | init | public init(entries: [Entry])
@@ -2028,6 +2035,8 @@ VisualCoreRendering | init | public init(frame: Int, milliseconds: Double)
 VisualCoreRendering | init | public init(from: any RenderScene, to: any RenderScene)
 VisualCoreRendering | init | public init(index: Int, time: Double, targetTime: Double)
 VisualCoreRendering | init | public init(key: String, outcome: Outcome, reasonCode: ShaderReasonCode? = nil)
+VisualCoreRendering | init | public init(mesh: Mesh, registry: ResourceRegistry) throws
+VisualCoreRendering | init | public init(model: Mat4, color: Vec4)
 VisualCoreRendering | init | public init(name: String, minimum: Int, reported: Int)
 VisualCoreRendering | init | public init(program: ShaderProgram, state: RenderState)
 VisualCoreRendering | init | public init(rangeMin: Int, rangeMax: Int, precisionBits: Int)
@@ -2098,10 +2107,12 @@ VisualCoreRendering | let | public let width: Int
 VisualCoreRendering | let | public let width: Int, height: Int
 VisualCoreRendering | let | public static let extensionName
 VisualCoreRendering | let | public static let extensions: Set<String>
+VisualCoreRendering | let | public static let maxBeams
 VisualCoreRendering | let | public static let maxCachedPrograms
 VisualCoreRendering | let | public static let maxCircleSegments
 VisualCoreRendering | let | public static let maxEdge
 VisualCoreRendering | let | public static let maxInfoLogBytes
+VisualCoreRendering | let | public static let maxInstances
 VisualCoreRendering | let | public static let maxOffscreenPixels
 VisualCoreRendering | let | public static let maxPaletteStops
 VisualCoreRendering | let | public static let minCircleSegments
@@ -2112,6 +2123,7 @@ VisualCoreRendering | let | public static let visualCoreIncludes: ShaderLibrary
 VisualCoreRendering | let | public static let visualCoreLibrary: [String: String]
 VisualCoreRendering | protocol | public protocol GPUResource: AnyObject
 VisualCoreRendering | protocol | public protocol RenderScene: AnyObject
+VisualCoreRendering | struct | public struct BeamInstance: Sendable, Equatable
 VisualCoreRendering | struct | public struct Entry: Equatable, Sendable
 VisualCoreRendering | struct | public struct FloatRenderSupport: Sendable, Equatable
 VisualCoreRendering | struct | public struct FloorFinding: Sendable, Equatable, Codable
@@ -2120,6 +2132,7 @@ VisualCoreRendering | struct | public struct GPUFrameTime: Sendable, Equatable
 VisualCoreRendering | struct | public struct GPUHandle: Sendable, Equatable
 VisualCoreRendering | struct | public struct Item
 VisualCoreRendering | struct | public struct MeshFog: Sendable, Equatable
+VisualCoreRendering | struct | public struct MeshInstance: Sendable, Equatable
 VisualCoreRendering | struct | public struct ParameterUniformBinding
 VisualCoreRendering | struct | public struct Pipeline: Hashable
 VisualCoreRendering | struct | public struct PresentedFrame: Sendable, Equatable
@@ -2162,9 +2175,11 @@ VisualCoreRendering | var | public private(set) var to: any RenderScene
 VisualCoreRendering | var | public private(set) var trailLayer: TrailLayer?
 VisualCoreRendering | var | public private(set) var warnings: [ShaderDiagnostic]
 VisualCoreRendering | var | public private(set) var write: RenderTarget
+VisualCoreRendering | var | public var a: Vec3
 VisualCoreRendering | var | public var activeUniformTypes: [String: UniformType]
 VisualCoreRendering | var | public var allSucceeded: Bool
 VisualCoreRendering | var | public var ambient
+VisualCoreRendering | var | public var b: Vec3
 VisualCoreRendering | var | public var background: SIMD3<Float>
 VisualCoreRendering | var | public var background: Vec4
 VisualCoreRendering | var | public var blend: ParticleBlend
@@ -2248,14 +2263,17 @@ VisualCoreRendering | var | public var vendor
 VisualCoreRendering | var | public var vertexHighp: ShaderPrecision?
 VisualCoreRendering | var | public var vertexMediump: ShaderPrecision?
 VisualCoreRendering | var | public var view: UIView
+VisualCoreRendering | var | public var width: Double
 VisualCoreRendering | var | public var width: Int
 VisualCoreRendering | var | public var world: WorldRect
 VisualCoreScenes | class | public final class MeshCache
 VisualCoreScenes | class | public final class SceneNode
+VisualCoreScenes | enum | public enum BeamProfile
 VisualCoreScenes | enum | public enum CurveFrames
 VisualCoreScenes | enum | public enum CurveSampler
 VisualCoreScenes | enum | public enum GestureKind: String, Sendable, Equatable, Codable, CaseIterable
 VisualCoreScenes | enum | public enum GestureState: String, Sendable, Equatable
+VisualCoreScenes | enum | public enum InstanceOrder
 VisualCoreScenes | enum | public enum Kind: String, Sendable, Codable, CaseIterable
 VisualCoreScenes | enum | public enum MeshBounds: Sendable, Equatable
 VisualCoreScenes | enum | public enum MeshError: Error, Sendable, Equatable
@@ -2316,9 +2334,13 @@ VisualCoreScenes | func | public mutating func tick(now: Double)
 VisualCoreScenes | func | public mutating func tick(now: Double) -> [GestureOutcome]
 VisualCoreScenes | func | public mutating func triangle(_ a: UInt32, _ b: UInt32, _ c: UInt32) throws(MeshError)
 VisualCoreScenes | func | public mutating func vertex(_ position: Vec3, normal: Vec3, uv: Vec2) throws(MeshError) -> UInt32
+VisualCoreScenes | func | public static func backToFront(depths: [Double]) throws(MeshError) -> [Int]
 VisualCoreScenes | func | public static func bevelledBox(size: Vec3, radius: Double, segments: Int,
+VisualCoreScenes | func | public static func coverage(point: Vec3, a: Vec3, b: Vec3, width: Double) -> Double
 VisualCoreScenes | func | public static func cube() -> Mesh
+VisualCoreScenes | func | public static func distanceToSegment(point: Vec3, a: Vec3, b: Vec3) -> Double
 VisualCoreScenes | func | public static func extrusion(outline: [Vec2], depth: Double, caps: Bool,
+VisualCoreScenes | func | public static func falloff(_ r: Double) -> Double
 VisualCoreScenes | func | public static func merged(_ meshes: [Mesh], budget: MeshBudget = .default) throws(MeshError) -> Mesh
 VisualCoreScenes | func | public static func parallelTransport(_ samples: CurveSamples,
 VisualCoreScenes | func | public static func plane(subdivisions: Int = 1) -> Mesh
