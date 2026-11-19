@@ -53,7 +53,7 @@
     CanvasOverlay, LabLibraryView, LabPresenter, Adapter/LabCore; `allow: []`);
   - an A23 section in `docs/release/known-limitations.md` (seven node kinds; at most 32 nodes and 64 connections; at
     most six preview textures; no typed code; no sharing or export; device rows pending).
-- [ ] T-A23-607 [US3] Write `specs/171-vpl-p06-release/scan-claims-release.sh` with the words of clarification Q2, then
+- [X] T-A23-607 [US3] Write `specs/171-vpl-p06-release/scan-claims-release.sh` with the words of clarification Q2, then — Verified 2026-11-19: 2026-11-19: .autonomy/checks/A23-P06.scan-claims.json exit 0 (no refused word in the store text and five interface Swift files; no code to type present; 59 proving tests found)
   run it (`--name scan-claims`); it requires "no code to type" and that every named test exists (SC-A23-603).
 
 ## Phase 5: Story 4 — a first session in the app (P2)

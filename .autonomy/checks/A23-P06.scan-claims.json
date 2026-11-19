@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "sh",
+    "specs/171-vpl-p06-release/scan-claims-release.sh"
+  ],
+  "command": "sh specs/171-vpl-p06-release/scan-claims-release.sh",
+  "elapsed_seconds": 0.562,
+  "exit_code": 0,
+  "finished": "2026-11-19T14:41:13+00:00",
+  "log": ".autonomy/logs/A23-P06.scan-claims.log",
+  "log_sha256": "a1d199d6bf590e60b703b7abda37d7025b786a4d5615337050c914da6a923af5",
+  "name": "scan-claims",
+  "stage": "A23-P06",
+  "started": "2026-11-19T14:41:13+00:00",
+  "timed_out": false
+}
