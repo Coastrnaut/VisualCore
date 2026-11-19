@@ -31,6 +31,55 @@ Canonical overrides:
   (ImplementationLock-100). **Device-only items:** draw cost of large curve batches on D1–D3 is a device campaign item.
   **Owner-only items:** none.
 
+## Clarifications
+
+### Session 2026-11-19
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time. Facts checked in
+code (read-only audit, 2026-11-19): `Mesh` (VisualCoreScenes) holds `Double` `Vec3` positions and normals, `Vec2`
+texture coordinates and `UInt32` indices; `MeshBudget.default` is 262,144 vertices and 1,572,864 indices and builders
+throw `MeshError.budget` or `.invalidInput`; `Mesh.tube(path:radius:sides:caps:closed:budget:)` uses an internal
+`pathFrames` (double reflection, first normal the world axis least parallel to the first tangent, closed-loop twist
+spread by arc length, one seam frame appended) with v normalised 0…1; `CameraRail` (VisualCoreMath) is closed-only
+centripetal Catmull-Rom with fixed sampling; `MeshRenderer` draws one mesh per call; no curve, ribbon or merge type
+exists.
+
+- Q: Where do the new types live and what do they look like? → A: In VisualCoreScenes beside `Mesh` (pure, `Double`,
+  `Vec3`): `CubicBezierChain(points:closed:)` (3n + 1 control points open, 3n closed), `CatmullRomSpline(points:closed:
+  alpha: 0.5)` (centripetal), both conforming to `ParametricCurve` (`segmentCount`, `position(segment:t:)`,
+  `derivative(segment:t:)`); `CurveSampler.sample(_:tolerance:budget:) throws(MeshError) -> CurveSamples` (positions,
+  unit tangents, cumulative arc lengths, closed flag); `CurveFrames.parallelTransport(_ samples:initialNormal:)` →
+  `[CurveFrame]` (position, tangent, normal, binormal); `Mesh.ribbon(_:width:repeatLength:budget:)`, an overload
+  `Mesh.tube(samples:radius:sides:caps:repeatLength:budget:)` and `Mesh.merged(_:budget:)`. The existing tube and rail
+  are unchanged. Rationale: one mesh type, one module, pure and host-testable. Impact: section 13 home stays
+  VisualCoreScenes (no new module).
+- Q: How is adaptive sampling decided and bounded? → A: Each segment is subdivided recursively; an interval is kept
+  when the curve at 5 interior parameters (1/6 … 5/6) lies within the tolerance of the chord; otherwise it is split at
+  its midpoint, to a depth of 20. Every segment is split at least once unless its control points are collinear within
+  the tolerance (so a straight line yields its two end points). Budget: at most 65,536 samples (refused as
+  `MeshError.budget` above it). Tolerance must be finite and positive. Arc lengths are cumulative chord lengths.
+  Rationale: deterministic, simple, tight enough for cubic segments. Impact: SC-R02F08-001 measures on 1,000 points per
+  segment.
+- Q: How are collapses and reversals handled? → A: Samples closer than 1e-9 × (1 + largest extent of the samples) to
+  the previous kept sample are dropped first (closed curves also drop a last sample equal to the first). The tangent
+  at a sample is the normalised sum of its two unit chords; where the sum is shorter than 1e-6 (a reversal), it is the
+  chord ahead. Frames are carried by double reflection; at a reversal the normal is kept (only the tangent turns), so
+  no frame is undefined and no normal jumps. The first normal is the caller's `initialNormal` made orthogonal to the
+  first tangent, or the world axis least parallel to it. Closed curves spread the closing twist linearly by arc length,
+  so the last frame equals the first. Rationale: scale-aware, smooth through cusps. Impact: SC-R02F08-002 includes a
+  180° reversal and repeated points.
+- Q: How are ribbon geometry and texture coordinates defined? → A: A ribbon has two vertices per sample at
+  `position ± binormal × width/2`, surface normal the frame normal, u = 0 and 1 across, v = arc length / repeat length;
+  for a closed curve the repeat length becomes `L / max(1, round(L / repeat))` so the seam meets, and a seam pair
+  repeats the first samples with v = L / repeat. Width is constant or one value per sample (finite, positive). The
+  tube overload uses the same frames and v. Rationale: pattern size stays constant; seams continuous. Impact:
+  SC-R02F08-003.
+- Q: How are meshes merged and drawn? → A: `Mesh.merged` concatenates positions, normals and texture coordinates in
+  order and offsets each part's indices by the vertices before it; it refuses an empty list and results above the
+  budget, and never welds across parts. The merged mesh is drawn by one `MeshRenderer` draw; the GPU test merges 200
+  ribbons laid out on a grid, draws them once and reads pixels at every ribbon's projected centre. Rationale: the
+  existing renderer, one buffer, one draw. Impact: SC-R02F08-004.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - A smooth curve with just enough points (Priority: P1) 🎯
