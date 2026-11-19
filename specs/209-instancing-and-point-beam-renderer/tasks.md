@@ -37,7 +37,7 @@
   (cross-section and point match `BeamProfile` within 2/255 at sampled pixels; full width at an oblique angle; end-on
   beam is a round point; zero width and non-finite refused; scrambled translucent beams equal sorted; additive order
   free; one draw call; context rebuild same picture)
-- [ ] T-R02F09-005 Simulator runs: `--name rendering-27` and `--name rendering-26`
+- [X] T-R02F09-005 Simulator runs: `--name rendering-27` and `--name rendering-26` — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F09.rendering-27.json and R02-F09.rendering-26.json (exit 0, 219 tests, 0 failures each)
 
 ## Phase 4: Regression, documentation and close
 
