@@ -256,7 +256,7 @@
    "id": "M03",
    "capability": "Parameter system: bounded per-node parameters (title, range, default), clamped and refused when not finite, edited by native controls",
    "source": "brainstorm: parameter system; spec FR-A23-002",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreParameters/ParameterSchema.swift",
@@ -299,7 +299,7 @@
     "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/ControlsSheet.swift",
     "symbol": "ControlsSheet"
    },
-   "notes": "Tested in ParametersTests, ParameterEditorTests and ParameterPanelTests. Declaring each node kind's parameters in the node registry and binding them to the operator uniforms is G-TYPES."
+   "notes": "Tested in ParametersTests, ParameterEditorTests and ParameterPanelTests. Declaring each node kind's parameters in the node registry and binding them to the operator uniforms is G-TYPES. A23-P01 (feature 166): every node kind declares bounded parameters as ParameterDefinitions (VisualProgrammingLab/Core/NodeLibrary.swift; LibraryTests); out-of-range and undeclared parameters are refused by GraphChecker (TypeCheckTests)."
   },
   {
    "id": "M04",
@@ -397,7 +397,7 @@
    "id": "M06",
    "capability": "Version 0.1 feature 01: a typed node graph for scalar, colour, texture and time values",
    "source": "manual \u00a72 feature 01; spec FR-A23-002",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
@@ -428,7 +428,7 @@
     "file": "Packages/ExperiencesCreative/SimulationLab/Experience/GrayScottGPU.swift",
     "symbol": "GrayScottGPU"
    },
-   "notes": "VisualCore has uniform types (FieldUniform float, vec2, vec4, int), texture formats and frame time (FrameInfo) but no typed ports or graph model (grep 2026-11-18). G-MODEL and G-TYPES."
+   "notes": "VisualCore has uniform types (FieldUniform float, vec2, vec4, int), texture formats and frame time (FrameInfo) but no typed ports or graph model (grep 2026-11-18). G-MODEL and G-TYPES. A23-P01 (feature 166): ValueType (scalar, colour, texture, time), PortDeclaration and VisualGraph (VisualProgrammingLab/Core/ValueType.swift, VisualGraph.swift); exact type matching by GraphChecker (TypeCheckTests: exactly 4 of 16 pairs connect)."
   },
   {
    "id": "M07",
@@ -643,7 +643,7 @@
    "id": "M12",
    "capability": "Graph, node, port and edge models: pure, versioned, validated types with documented caps on nodes and edges",
    "source": "spec FR-A23-003 area 1; manual \u00a76 schemas",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceCore.swift",
@@ -674,13 +674,13 @@
     "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/Adapter/FluidArtCore.swift",
     "symbol": "FluidArtCore"
    },
-   "notes": "The versioning machinery is tested (ExperienceSnapshotTests, StateDigestTests); the models and their caps are G-MODEL (numbers set in A23-P01, research D4a)."
+   "notes": "The versioning machinery is tested (ExperienceSnapshotTests, StateDigestTests); the models and their caps are G-MODEL (numbers set in A23-P01, research D4a). A23-P01 (feature 166): NodeID, CanvasPoint, GraphNode, GraphEdge, VisualGraph and GraphLimits (32 nodes, 64 connections), and GraphDocument (schema 1 through MigrationChain, five refusal codes, DigestBuilder fingerprint) (VisualProgrammingLab/Core/VisualGraph.swift, GraphDocument.swift; GraphModelTests, DocumentTests)."
   },
   {
    "id": "M13",
    "capability": "Node registry and typed ports: scalar, colour, texture and time, with per-kind inputs, outputs and parameters",
    "source": "spec FR-A23-003 area 2; manual \u00a72 feature 01",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
@@ -705,13 +705,13 @@
     "file": "Packages/ExperiencesCreative/SimulationLab/Experience/GrayScottGPU.swift",
     "symbol": "GrayScottGPU"
    },
-   "notes": "No typed ports exist (PassSchemas.all is texture-only). G-TYPES."
+   "notes": "No typed ports exist (PassSchemas.all is texture-only). G-TYPES. A23-P01 (feature 166): NodeKind and its seven kinds' typed ports (VisualProgrammingLab/Core/NodeLibrary.swift; LibraryTests)."
   },
   {
    "id": "M14",
    "capability": "Type checking, topological ordering and cycle rejection before any GPU work",
    "source": "spec FR-A23-003 area 3; manual \u00a76 algorithm 1-2",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreEffectsGraph/EffectGraphValidation.swift",
@@ -736,7 +736,7 @@
     "file": "Packages/ExperiencesCreative/SimulationLab/Experience/GrayScottGPU.swift",
     "symbol": "GrayScottGPU"
    },
-   "notes": "VisualCore's Kahn order is private (EffectGraphValidator.topologicalOrder) and works on passes; promoting it was rejected for one user (research D5). The core's own order, type check and cycle path are G-TYPES, tested by swift test."
+   "notes": "VisualCore's Kahn order is private (EffectGraphValidator.topologicalOrder) and works on passes; promoting it was rejected for one user (research D5). The core's own order, type check and cycle path are G-TYPES, tested by swift test. A23-P01 (feature 166): GraphChecker's staged checks, Kahn order with the smallest ready identity and the cycle path by the backward walk (VisualProgrammingLab/Core/GraphChecker.swift; CycleTests, OutputTests), with no graphics resource created while checking (HostCountTests)."
   },
   {
    "id": "M15",
@@ -1402,7 +1402,7 @@
    "justification": "The graph, node, port and edge models (GraphNode, GraphPort, GraphEdge, VisualGraph after manual \u00a76) are the experience's domain, pure and GPU-free in its Core, with caps on nodes and edges set in A23-P01 (research D4, D4a). The graph schema is versioned with MigrationChain. No VisualCore change is planned (clarification Q2); a second user would justify moving them upstream (Principle II).",
    "phase": 1,
    "test": "Core host tests: each model round-trips and migrates through MigrationChain; truncated, newer, NaN, infinite and out-of-range values and graphs one past each cap are refused with a named reason; the digest is stable for the same graph.",
-   "closed": null
+   "closed": "A23-P01"
   },
   {
    "id": "G-TYPES",
@@ -1419,7 +1419,7 @@
    "justification": "The node registry (kinds, typed ports scalar, colour, texture and time, per-kind parameters over ParameterDefinition), type checking, the topological order and cycle rejection with the path of edges are app-local in the pure core (clarification Q2). VisualCore's Kahn order is private and works on passes, not typed ports; promoting it was rejected for one user (research D5).",
    "phase": 1,
    "test": "Core host tests: every kind declares its ports and bounded parameters; a mismatched connection is refused with both port types named; a cycle is refused with its path of edges; the order is deterministic and puts every node after its inputs; no GPU object is touched by validation.",
-   "closed": null
+   "closed": "A23-P01"
   },
   {
    "id": "G-CANVAS",

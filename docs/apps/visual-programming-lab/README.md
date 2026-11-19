@@ -18,6 +18,12 @@ Visual Programming Lab is an experience of the one VisualCore app (ADR-0009). Fr
 graphs are written in code. It works offline, sends nothing and needs no permission. Its rules are the A23 subsection
 of the constitution (2.19.0).
 
+The pending core (A23-P01) is `Packages/ExperiencesCreative/VisualProgrammingLab/Core`: the value types and node
+library (`ValueType.swift`, `NodeLibrary.swift`), the graph model with its limits (`VisualGraph.swift`: at most 32 nodes
+and 64 connections), the graph file (`GraphDocument.swift`: kind `a23.visual-graph`, schema 1) and the checker
+(`GraphChecker.swift`: types, order, cycles with their path, output rules), tested in `CoreTests` without the GPU except
+a host test that proves checking creates no graphics resource.
+
 | Document | Content |
 |---|---|
 | [visualcore-contract.json](visualcore-contract.json) / [.md](visualcore-contract.md) | Phase 00 inventory, capability matrix, gaps, decision (checked by `scripts/check_app_contract.py`) |

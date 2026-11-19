@@ -75,7 +75,7 @@
     Packages/ExperiencesCreative/VisualProgrammingLab`);
   - the isolation check (`--name isolation -- python3 scripts/check_app_isolation.py --experiences
     Packages/ExperiencesCreative/VisualProgrammingLab`).
-- [ ] T-A23-110 Contract `docs/apps/visual-programming-lab/visualcore-contract.json`: G-MODEL and G-TYPES are closed by
+- [X] T-A23-110 Contract `docs/apps/visual-programming-lab/visualcore-contract.json`: G-MODEL and G-TYPES are closed by — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A23-P01.contract.json exit 0 (G-MODEL and G-TYPES closed by A23-P01; M03, M06, M12, M13 and M14 available with their notes; the other rows wait for their later gaps); README lists the core
   "A23-P01", and rows whose gaps are all closed become available with evidence (`--name contract -- python3
   scripts/check_app_contract.py --app visual-programming-lab --render`); list the core in
   `docs/apps/visual-programming-lab/README.md`
