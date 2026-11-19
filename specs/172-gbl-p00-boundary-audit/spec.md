@@ -26,6 +26,77 @@ Canonical overrides:
   (since X-A23); this phase keeps it, and A24-P02 moves it on when A24 becomes a real candidate.
 - Follow `specs/165-vpl-p00-boundary-audit`.
 
+## Clarifications
+
+### Session 2026-11-19
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code by a read-only survey, then spot-checked:
+- **Commits:** the A24 constitution commit is `6c0a7d35` and the A24-P00 specify commit is `7de0f2af`, the phase start
+  for the no-change diff of `Packages` and `External`. The reference submodule is pinned at `d93edd1`.
+- **Registry and catalog:**
+  - twenty-three experiences are registered in `Catalog/registrations.json` (A01–A23), and the candidates list is
+    empty;
+  - `a24` appears in neither file as a registration; `AppModelTests` uses it as the synthetic not-yet-integrated id;
+  - the catalog lists Graphics Benchmark Lab as free, family "Developer and creator tools", launcher category tools.
+- **Host rule:** `RenderHost`, `ResourceRegistry`, `RenderScene` and `ExperiencePresenter` are main-actor. GL work
+  happens only inside a scene's `setup`, `resize`, `render` and `teardown`, with the host's context current. A
+  presenter receives a `RenderContext` (generation, pixel size, framebuffer, `resources`), never the host.
+- **VisualCore offers** (public in a framework product and tested):
+  - **frame information:** `FrameInfo` (`index`, `time`, `delta` clamped to 0…0.1 s, `targetTimestamp`), the host's
+    `presentedFrameCount`, `addPresentObserver` and `PresentedFrame`, and `ExperiencePresenter.maxFramesPerSecond`;
+  - **diagnostics:** `PacingMeter` and `PacingSummary` (a 0.25 ms histogram; median, p95, p99 rounded to bins; its
+    percentile function is private), `PerformanceRecord` (versioned, the session's per-run record), `GrowthRule` (a
+    growth verdict after a warm-up), `ResourceRegistry.stats`, `ResourceBudget`, `ResourceLedger`, `RenderLifecycle`,
+    `RenderHostError.contextLost` and `ProcessMemory.footprint()`;
+  - **device conditions:** `DeviceConditions.current()` (thermal state and Low Power Mode from `ProcessInfo`) and
+    `FramePacing` (the frame cap under heat and Low Power Mode); quality tiers through `QualityProfile`,
+    `QualityLevel` and `ExperienceCore.qualityTiers`;
+  - **renderer facts:** `RenderCapabilities` (GL and GLSL version, renderer, vendor, the extension list, limits) on
+    `RenderHost.capabilities`, and the pure `RendererRecord` (no extension list);
+  - **workload building blocks:** `FullScreenShaderScene` and `FieldPass` (fragment work), `ParticleRenderer` with
+    `ParticleInstance` and `ParticleSystem` (instanced quads, capacity 10,000), `Texture.upload(rgba:)`,
+    `ResourceRegistry.makeRenderTarget`, `RenderHost.renderOffscreen` and `readPixels`;
+  - **persistence:** `ExperienceStorage`, `MigrationChain`, `DocumentStore`, `NamedLibrary` and versioned envelopes.
+- **Missing:**
+  - a GPU timer: no `GL_EXT_disjoint_timer_query` binding, no 64-bit query result, no disjoint check; the core ES 3.0
+    query calls exist only in the internal `CVisualCoreGL` shim, which is no product;
+  - a presenter's view of the renderer: `RenderContext` carries neither `RenderCapabilities` nor a `RendererRecord`;
+  - a public device, OS and build reporter (the only one, in VisualCoreAutomation, is internal and debug-only), the
+    ANGLE build at run time, and the display's refresh rate;
+  - public statistics over raw samples, CSV writing, a shared export helper (each exporting experience has its own
+    `Transferable` with `ShareLink`, for images only), a textured-quad helper, procedural textures, a phase runner and
+    any benchmark scene.
+
+- Q: How is GPU time handled when VisualCore has no timer query? → A: GPU time is shown only where a capability probe
+  finds `GL_EXT_disjoint_timer_query` in the renderer's extension list and an upstream VisualCore timer (gap
+  U-GPUTIMER, A24-P03, with tests, docs, the API baseline and the reference regression) confirms non-disjoint results.
+  Where the extension is absent, the gap closes as "not supported": the lab shows "GPU time not available on this
+  device" and never labels a CPU time as GPU time. No timer code is written before the probe has run on the simulator.
+- Q: How does the experience learn the renderer's facts (extensions, GL_RENDERER, GL_VERSION)? → A: Through a
+  VisualCore change (gap U-RENDERINFO, A24-P03): the host gives the presenter a read-only copy of its
+  `RenderCapabilities` (for example on `RenderContext`), with tests, docs, the API baseline and the reference
+  regression. Linking the internal GL shim from the experience is refused.
+- Q: Who owns the measurement model and the statistics? → A: The experience's pure core (gaps G-MODEL and G-STATS,
+  A24-P01), tested by `swift test` with fixed sample fixtures: exact nearest-rank percentiles (p50, p95, p99) over the
+  raw frame intervals with the warm-up excluded, sample counts and quality flags. `PacingMeter` is not used for
+  results because it rounds to 0.25 ms bins; it stays the session's own pacing record. Frame intervals come from
+  consecutive `FrameInfo.time` values (never the clamped `delta`), and CPU submit time from a monotonic clock around
+  the presenter's own draw calls (gap G-RUNNER, A24-P03).
+- Q: How are the three workload scenes drawn? → A: App-locally over VisualCore's public building blocks (gap
+  G-SCENES, A24-P02): textured quads as layered `FieldPass` draws sampling a texture generated in code with
+  `Texture.upload(rgba:)`, ALU stress as a fragment program with a bounded iteration count, and particles through
+  `ParticleRenderer`. Each scene has a fixed, versioned configuration and caps checked before allocation. No
+  VisualCore change is planned for the scenes.
+- Q: Where do the device report, result storage and export live? → A: App-locally. The report (gap G-REPORT, A24-P03)
+  uses public APIs only: the machine identifier from `uname`, `ProcessInfo.operatingSystemVersion`, the app's version
+  and build from its bundle, `DeviceConditions`, the quality tier and the renderer strings from U-RENDERINFO; no
+  private identifier. Results (gap G-RESULTS, A24-P04) are versioned envelopes in `ExperienceStorage` with damaged and
+  newer files refused and never deleted automatically; export (gap G-EXPORT, A24-P04) writes versioned JSON and CSV
+  through a `Transferable` and `ShareLink` that the person opens, after Living Wallpapers. Phases, duration caps,
+  cool-down and stop are G-RUNNER (A24-P03); repeatability, thermal context and the device plan are G-DEVICE
+  (A24-P05); the in-app explanation of limits is G-EXPLAIN (A24-P05); release is G-RELEASE (A24-P06).
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - An evidence-backed integration matrix (Priority: P1) 🎯

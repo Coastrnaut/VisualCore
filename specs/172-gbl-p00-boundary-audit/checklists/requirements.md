@@ -32,5 +32,5 @@
 ## Notes
 
 - Validated 2026-11-19 in the specify step. The spec names existing tools and paths (the contract checker,
-  the contract folder) only in canonical overrides and assumptions, as A22-P00 did; no measurement is claimed in
+  the contract folder) only in canonical overrides and assumptions, as A23-P00 did; no measurement is claimed in
   the success criteria.
