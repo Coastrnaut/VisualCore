@@ -21,6 +21,44 @@ Canonical overrides:
   still export (G-EXPORT) A25-P05's; the contract's phases are updated in this phase.
 - **No VisualCore or ProjectM change.** Follow `specs/169-vpl-p04-graph-library` for the preset library.
 
+## Clarifications
+
+### Session 2026-11-19
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- **Library precedent:** Visual Programming Lab's `GraphLibrary` (A23-P04) keeps one file per graph and an index in
+  `ExperienceStorage` (quota 16 MiB and 64 files), refuses damaged, newer and oversized files with a code, never deletes
+  them automatically, makes a newer index read only, and writes atomically through `storage.write`.
+- **Pass audit:** `FieldPass.runObserver` (VisualCoreRendering, public, app-wide, set by tests) receives every validated
+  run with its label, output texture or framebuffer name and the input texture names.
+- **Accessibility actions:** SwiftUI's named accessibility actions on a view; the presenter applies the same core
+  actions the buttons send.
+
+- Q: How is compare shown? → A: A core action `view.compare [0…1]` (not stored; a restored session shows the result).
+  While on, the present pass draws the source target instead of the result; the result is still drawn when the chain
+  changes, so turning compare off shows it at once. A `compare` toggle (identifier `compare`, label "Show original" /
+  "Show result") is in the controls; the status says "Original" while on.
+- Q: What are the preset files? → A: After `GraphLibrary`: `preset-<n>.json` (envelope `{"body", "kind": "a25.preset",
+  "version": 1}`, body `{name, order, chain}` with the chain file's object embedded, at most 69,632 bytes) and
+  `presets.json` (envelope kind `a25.preset-library`, version 1, body `{next, entries: [{file, name, order}]}`); at most
+  24 presets; a name is trimmed and 1…40 characters; a name another preset has, ignoring case, is refused. Refusal
+  codes: `damaged`, `newer-version`, `too-large` and the chain file's codes. Messages: "The library holds 24 presets.",
+  "A name has 1 to 40 characters.", "A preset is already called <name>." and "There is not enough space to save this
+  preset.". Listed newest first; unreadable files by number after the readable ones.
+- Q: How does opening a preset become one undoable edit? → A: The core's `ChainEdit` gains `replace(EffectChain)`, whose
+  inverse replaces back the earlier chain; `EditHistory` handles it like every other edit. The presenter's library
+  actions (`save(name:)`, `open(file:)`, `rename(file:to:)`, `remove(file:)`) call the library and, for open, apply
+  `replace` through the core; the controls show a `presets` list (`preset-row-<n>`, `preset-open-<n>`,
+  `preset-remove-<n>`, `preset-name`, `preset-save`) inline, never as a system menu.
+- Q: How is the aliasing fixture proved? → A: A test sets `FieldPass.runObserver`, runs 50 edits (every kind, compare
+  toggled every 5) with a frame after each, and checks every run: no input texture equals the output, and no output is
+  the source target's texture. The pure plan check of A25-P02 (no pass reads its output) stays.
+- Q: Which accessibility actions does a node offer? → A: "Move up", "Move down" (absent at the ends), "Turn off" or
+  "Turn on", and for each parameter "Raise <name>" and "Lower <name>" (a tenth of the range), listed by the pure
+  `ComposerLabels.actions(for:)` and applied through the core's actions; the contract's phases move G-IMPORT and
+  U-RGBAUPLOAD to 4 and G-EXPORT to 5 with this phase's contract update.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Compare the look with the original (Priority: P1) 🎯
@@ -90,7 +128,8 @@ preview follows at once.
 
 - **Compare with an empty chain:** both views show the original.
 - **Saving under an empty or too long name:** refused with a message.
-- **Two presets with the same name:** both kept, the second numbered; names are compared after trimming and case-folding.
+- **A name another preset has** (compared after trimming, ignoring case): refused with "A preset is already called
+  <name>."
 - **Opening a preset:** becomes one undoable edit of the chain.
 - **A context loss with compare on:** the original is uploaded again; compare still shows it.
 - **Storage full:** a save is refused with a message and nothing changes.
