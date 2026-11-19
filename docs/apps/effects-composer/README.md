@@ -24,6 +24,11 @@ parameters (`EffectDefinition.swift`), the chain of at most eight effects with i
 code (`TestImage.swift`), and each effect's CPU reference and fragment program (`EffectReference.swift`,
 `EffectPrograms.swift`), tested in `CoreTests` inside a running render host.
 
+The experience (A25-P02, a candidate until X-A25) compiles the chain into passes over two ping-pong targets and a
+result (`Core/PassPlan.swift`) and draws a live preview of a 256 × 256 picture made in code with pooled targets
+(`Experience/PreviewRenderer.swift`); every edit can be undone, a disabled effect changes nothing, and a broken effect
+program is named with its line while the last good picture stays.
+
 | Document | Content |
 |---|---|
 | [visualcore-contract.json](visualcore-contract.json) / [.md](visualcore-contract.md) | Phase 00 inventory, capability matrix, gaps, decision (checked by `scripts/check_app_contract.py`) |

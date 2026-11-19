@@ -241,7 +241,7 @@
    "id": "M01",
    "capability": "Render graph: an ordered set of passes over intermediate targets compiled from the experience's chain",
    "source": "brainstorm: render graph; manual \u00a76 capability audit; spec FR-A25-002",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
@@ -269,10 +269,10 @@
     }
    ],
    "example": {
-    "file": "Packages/ExperiencesCreative/VisualProgrammingLab/Core/GraphCompiler.swift",
-    "symbol": "GraphCompiler"
+    "file": "Packages/ExperiencesCreative/EffectsComposer/Core/PassPlan.swift",
+    "symbol": "PassPlan"
    },
-   "notes": "EffectGraphDescription and EffectGraphValidator (quota, cycles, at most 32 passes; ValidationTests) and the GPU EffectRenderer (EffectRendererTests, PassPixelTests) exist, but EffectRenderer's pass set is closed (copy, colorMatrix, blur, bloom, distort, composite, feedback, flashLimit, internal runners and shaders), so new effects cannot be added from outside (research D6). The linear chain compiles app-locally into a FieldPass plan (G-COMPILER, A25-P02), after Visual Programming Lab's GraphCompiler and PreviewPipeline."
+   "notes": "EffectGraphDescription and EffectGraphValidator (quota, cycles, at most 32 passes; ValidationTests) and the GPU EffectRenderer (EffectRendererTests, PassPixelTests) exist, but EffectRenderer's pass set is closed (copy, colorMatrix, blur, bloom, distort, composite, feedback, flashLimit, internal runners and shaders), so new effects cannot be added from outside (research D6). The linear chain compiles app-locally into a FieldPass plan (G-COMPILER, A25-P02), after Visual Programming Lab's GraphCompiler and PreviewPipeline. A25-P02 (feature 181): PassPlan compiles the enabled effects into passes over two ping-pong slots and a result target, never reading what a pass writes (PassPlanTests); the experience draws the plan over pooled targets (acquireTarget and recycle, at most four, each at most 2,048 x 2,048, refused above with a25.pool-cap), every edit redraws a preview equal to the CPU reference within 1/255 and undo restores it byte for byte, a disabled effect draws the same picture, a broken program yields a diagnostic with the effect and line while the last good picture stays, and 50 edit cycles with 10 context rebuilds leave the live counts and bytes unchanged (PreviewDrawTests, IdentityTests, DiagnosticTests, PoolTests) (G-COMPILER, G-POOL, G-DIAG closed)."
   },
   {
    "id": "M02",
@@ -523,7 +523,7 @@
    "id": "M07",
    "capability": "Version 0.1 feature 01: a linear chain of five built-in effects with bounded parameters",
    "source": "manual \u00a72 feature 01; spec FR-A25-002",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
@@ -551,10 +551,10 @@
     }
    ],
    "example": {
-    "file": "Packages/ExperiencesCreative/VisualProgrammingLab/Experience/PreviewPipeline.swift",
-    "symbol": "PreviewPipeline"
+    "file": "Packages/ExperiencesCreative/EffectsComposer/Core/PassPlan.swift",
+    "symbol": "PassPlan"
    },
-   "notes": "Drawing and parameters exist (FieldPassTests, ParametersTests); the chain, node and effect models, the five effect programs and the compiler are app-local (G-MODEL, G-EFFECTS, G-COMPILER). A25-P01 (feature 180): the pending core EffectsComposerCore holds the five effects (grade, blur, distort, vignette, posterize) with bounded parameters and fingerprints, the chain (at most 8 nodes) with five edits and an exact undo and redo history (depth 64), the versioned chain file with its refusals, the 64 x 64 test image, the CPU reference and the fragment program of each effect; inside the host every program compiles with FieldPass and matches its reference within 0/255 to 1/255, the order of two effects changes the picture and undo restores it byte for byte, and the core creates no graphics resource (DefinitionTests, ChainTests, HistoryTests, ChainDocumentTests, ReferenceTests, ProgramRenderTests, OrderTests, HostCountTests) (G-MODEL, G-EFFECTS closed)."
+   "notes": "Drawing and parameters exist (FieldPassTests, ParametersTests); the chain, node and effect models, the five effect programs and the compiler are app-local (G-MODEL, G-EFFECTS, G-COMPILER). A25-P01 (feature 180): the pending core EffectsComposerCore holds the five effects (grade, blur, distort, vignette, posterize) with bounded parameters and fingerprints, the chain (at most 8 nodes) with five edits and an exact undo and redo history (depth 64), the versioned chain file with its refusals, the 64 x 64 test image, the CPU reference and the fragment program of each effect; inside the host every program compiles with FieldPass and matches its reference within 0/255 to 1/255, the order of two effects changes the picture and undo restores it byte for byte, and the core creates no graphics resource (DefinitionTests, ChainTests, HistoryTests, ChainDocumentTests, ReferenceTests, ProgramRenderTests, OrderTests, HostCountTests) (G-MODEL, G-EFFECTS closed). A25-P02 (feature 181): PassPlan compiles the enabled effects into passes over two ping-pong slots and a result target, never reading what a pass writes (PassPlanTests); the experience draws the plan over pooled targets (acquireTarget and recycle, at most four, each at most 2,048 x 2,048, refused above with a25.pool-cap), every edit redraws a preview equal to the CPU reference within 1/255 and undo restores it byte for byte, a disabled effect draws the same picture, a broken program yields a diagnostic with the effect and line while the last good picture stays, and 50 edit cycles with 10 context rebuilds leave the live counts and bytes unchanged (PreviewDrawTests, IdentityTests, DiagnosticTests, PoolTests) (G-COMPILER, G-POOL, G-DIAG closed)."
   },
   {
    "id": "M08",
@@ -708,7 +708,7 @@
    "id": "M12",
    "capability": "Version 0.1 feature 06: controlled render-target pooling and shader compile diagnostics",
    "source": "manual \u00a72 feature 06; spec FR-A25-002",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
@@ -748,10 +748,10 @@
     }
    ],
    "example": {
-    "file": "Packages/ExperiencesCreative/ShaderStudio/Core/DiagnosticMapper.swift",
-    "symbol": "DiagnosticMapper"
+    "file": "Packages/ExperiencesCreative/EffectsComposer/Experience/PreviewRenderer.swift",
+    "symbol": "PreviewRenderer"
    },
-   "notes": "ResourceRegistryTests, ResourceLedgerTests, InfoLogParserTests. The pool's caps and lifetime policy are G-POOL (A25-P02); mapping FieldPassError.compile text to ShaderDiagnostic lines per effect is G-DIAG (A25-P02), after Shader Studio's DiagnosticMapper."
+   "notes": "ResourceRegistryTests, ResourceLedgerTests, InfoLogParserTests. The pool's caps and lifetime policy are G-POOL (A25-P02); mapping FieldPassError.compile text to ShaderDiagnostic lines per effect is G-DIAG (A25-P02), after Shader Studio's DiagnosticMapper. A25-P02 (feature 181): PassPlan compiles the enabled effects into passes over two ping-pong slots and a result target, never reading what a pass writes (PassPlanTests); the experience draws the plan over pooled targets (acquireTarget and recycle, at most four, each at most 2,048 x 2,048, refused above with a25.pool-cap), every edit redraws a preview equal to the CPU reference within 1/255 and undo restores it byte for byte, a disabled effect draws the same picture, a broken program yields a diagnostic with the effect and line while the last good picture stays, and 50 edit cycles with 10 context rebuilds leave the live counts and bytes unchanged (PreviewDrawTests, IdentityTests, DiagnosticTests, PoolTests) (G-COMPILER, G-POOL, G-DIAG closed)."
   },
   {
    "id": "M13",
@@ -825,7 +825,7 @@
    "id": "M15",
    "capability": "Chain compilation into an ordered pass plan with intermediate-target lifetimes; a pass never samples the target it writes",
    "source": "spec FR-A25-003; clarification Q1",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
@@ -853,16 +853,16 @@
     }
    ],
    "example": {
-    "file": "Packages/ExperiencesCreative/VisualProgrammingLab/Experience/PreviewPipeline.swift",
-    "symbol": "PreviewPipeline"
+    "file": "Packages/ExperiencesCreative/EffectsComposer/Core/PassPlan.swift",
+    "symbol": "PassPlan"
    },
-   "notes": "FieldPass refuses inputIsOutput (FieldPassTests); acquireTarget and recycle pool targets (ResourceRegistryTests). The pass plan, its lifetimes and its proof are G-COMPILER (A25-P02), after Visual Programming Lab's PreviewPipeline."
+   "notes": "FieldPass refuses inputIsOutput (FieldPassTests); acquireTarget and recycle pool targets (ResourceRegistryTests). The pass plan, its lifetimes and its proof are G-COMPILER (A25-P02), after Visual Programming Lab's PreviewPipeline. A25-P02 (feature 181): PassPlan compiles the enabled effects into passes over two ping-pong slots and a result target, never reading what a pass writes (PassPlanTests); the experience draws the plan over pooled targets (acquireTarget and recycle, at most four, each at most 2,048 x 2,048, refused above with a25.pool-cap), every edit redraws a preview equal to the CPU reference within 1/255 and undo restores it byte for byte, a disabled effect draws the same picture, a broken program yields a diagnostic with the effect and line while the last good picture stays, and 50 edit cycles with 10 context rebuilds leave the live counts and bytes unchanged (PreviewDrawTests, IdentityTests, DiagnosticTests, PoolTests) (G-COMPILER, G-POOL, G-DIAG closed)."
   },
   {
    "id": "M16",
    "capability": "A bounded pool of intermediate targets",
    "source": "spec FR-A25-003; manual \u00a713 risk 3",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
@@ -896,16 +896,16 @@
     }
    ],
    "example": {
-    "file": "Packages/ExperiencesCreative/VisualProgrammingLab/Experience/PreviewPipeline.swift",
-    "symbol": "PreviewPipeline"
+    "file": "Packages/ExperiencesCreative/EffectsComposer/Experience/PreviewRenderer.swift",
+    "symbol": "PreviewRenderer"
    },
-   "notes": "ResourceRegistryTests and ResourceLedgerTests prove pooling and budget refusal. The pool's target-count and byte caps for the chain are G-POOL (A25-P02)."
+   "notes": "ResourceRegistryTests and ResourceLedgerTests prove pooling and budget refusal. The pool's target-count and byte caps for the chain are G-POOL (A25-P02). A25-P02 (feature 181): PassPlan compiles the enabled effects into passes over two ping-pong slots and a result target, never reading what a pass writes (PassPlanTests); the experience draws the plan over pooled targets (acquireTarget and recycle, at most four, each at most 2,048 x 2,048, refused above with a25.pool-cap), every edit redraws a preview equal to the CPU reference within 1/255 and undo restores it byte for byte, a disabled effect draws the same picture, a broken program yields a diagnostic with the effect and line while the last good picture stays, and 50 edit cycles with 10 context rebuilds leave the live counts and bytes unchanged (PreviewDrawTests, IdentityTests, DiagnosticTests, PoolTests) (G-COMPILER, G-POOL, G-DIAG closed)."
   },
   {
    "id": "M17",
    "capability": "Shader compile and link diagnostics visible to the experience",
    "source": "spec FR-A25-003; manual \u00a72 feature 06",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
@@ -945,10 +945,10 @@
     }
    ],
    "example": {
-    "file": "Packages/ExperiencesCreative/ShaderStudio/Core/DiagnosticMapper.swift",
-    "symbol": "DiagnosticMapper"
+    "file": "Packages/ExperiencesCreative/EffectsComposer/Experience/PreviewRenderer.swift",
+    "symbol": "ProgramDiagnostic"
    },
-   "notes": "FieldPassTests, ShaderProgramTests, InfoLogParserTests. EffectRenderer's diagnostics are only registry warnings (research D6). Mapping a failed effect's FieldPassError.compile text to ShaderDiagnostic lines is G-DIAG (A25-P02), after Shader Studio's DiagnosticMapper."
+   "notes": "FieldPassTests, ShaderProgramTests, InfoLogParserTests. EffectRenderer's diagnostics are only registry warnings (research D6). Mapping a failed effect's FieldPassError.compile text to ShaderDiagnostic lines is G-DIAG (A25-P02), after Shader Studio's DiagnosticMapper. A25-P02 (feature 181): PassPlan compiles the enabled effects into passes over two ping-pong slots and a result target, never reading what a pass writes (PassPlanTests); the experience draws the plan over pooled targets (acquireTarget and recycle, at most four, each at most 2,048 x 2,048, refused above with a25.pool-cap), every edit redraws a preview equal to the CPU reference within 1/255 and undo restores it byte for byte, a disabled effect draws the same picture, a broken program yields a diagnostic with the effect and line while the last good picture stays, and 50 edit cycles with 10 context rebuilds leave the live counts and bytes unchanged (PreviewDrawTests, IdentityTests, DiagnosticTests, PoolTests) (G-COMPILER, G-POOL, G-DIAG closed)."
   },
   {
    "id": "M18",
@@ -1670,7 +1670,7 @@
    "justification": "Compiling the linear chain into an ordered pass plan with intermediate-target lifetimes, skipping disabled effects and never letting a pass sample the target it writes, after Visual Programming Lab's PreviewPipeline (clarification Q1). The rules are specific to the chain.",
    "phase": 2,
    "test": "Core tests: plans for empty, single, all-disabled and full chains; no pass reads its output; each intermediate's lifetime ends after its last reader; the peak number of live targets is at most two. Experience test: a compiled chain draws and matches the effects applied one by one.",
-   "closed": null
+   "closed": "A25-P02"
   },
   {
    "id": "G-POOL",
@@ -1683,7 +1683,7 @@
    "justification": "The chain's target pool reuses ResourceRegistry.acquireTarget and recycle under the ResourceBudget, with app-local caps on target count and bytes per preview and export size (manual \u00a713 risk 3).",
    "phase": 2,
    "test": "Experience tests: repeated edits and recompiles leave ResourceRegistry.stats live target count and bytes constant; a request over the cap is refused with a named reason; trimPools after close returns the pool to zero.",
-   "closed": null
+   "closed": "A25-P02"
   },
   {
    "id": "G-DIAG",
@@ -1696,7 +1696,7 @@
    "justification": "Compile and link failures arrive as FieldPassError.compile text and are mapped to ShaderDiagnostic lines per effect, after Shader Studio's DiagnosticMapper (clarification Q4); EffectRenderer's diagnostics are only registry warnings.",
    "phase": 2,
    "test": "Experience test: a deliberately broken program fixture yields a diagnostic naming the effect and line, the chain keeps the last good preview, and ResourceRegistry.stats counts the shader failure.",
-   "closed": null
+   "closed": "A25-P02"
   },
   {
    "id": "G-EDIT",
