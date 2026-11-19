@@ -33,7 +33,7 @@
 
 ## Phase 3: Story 2 — recover without losing the results (P1)
 
-- [ ] T-A24-604 [US2] Add the recovery seam and its test (FR-A24-603, SC-A24-602):
+- [X] T-A24-604 [US2] Add the recovery seam and its test (FR-A24-603, SC-A24-602): — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A24-P06.gbl-recovery-samples.json exit 0 (75 experience, 95 core tests); BenchRecoveryDrawTests: an injected draw failure fails the session, every storage file byte-identical, a new session lists and opens both results
   - `Experience/BenchPresenter.swift`: an internal, test-only `failNextDraw`; the next draw throws
     `BenchDrawError.injected` once and clears it;
   - `ExperienceTests/BenchRecoveryDrawTests.swift`: save two results, set the seam and draw; the session fails with

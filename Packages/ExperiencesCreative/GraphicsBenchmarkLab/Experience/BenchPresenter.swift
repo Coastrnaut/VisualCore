@@ -71,6 +71,11 @@
 //   - Opening a result computes ``BenchMirror/repeatability`` (``repeatability(of:)``); `explain` sets
 //     ``BenchMirror/explanationSource`` (RepeatabilityView.swift).
 //
+// Feature 178 (A24-P06) T-A24-604 (FR-A24-603; SC-A24-602): the test-only seam ``BenchPresenter/failNextDraw`` makes
+//   the next `draw` throw ``BenchDrawError/injected`` once, before it acts on the core, records or draws anything; the
+//   seam clears itself and nothing in the experience or its interface sets it. The session then fails with the error's
+//   message, and the saved results are not touched (only an explicit save or removal writes them).
+//
 // Maximum 60 frames per second; one quality tier, `level-0`. No GL call: everything is drawn by the workload and the
 // VisualCore GPU timer.
 import Foundation
@@ -81,6 +86,23 @@ import VisualCoreDiagnostics
 import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreRendering
+
+/// A drawing failure of Graphics Benchmark Lab (feature 178, A24-P06, T-A24-604).
+enum BenchDrawError: Error, Equatable, CustomStringConvertible, LocalizedError {
+    /// The test-only seam ``BenchPresenter/failNextDraw`` made this draw fail.
+    case injected
+
+    /// The message the failed session shows: "The drawing failed (injected by a test)."
+    var description: String {
+        switch self {
+        case .injected:
+            return "The drawing failed (injected by a test)."
+        }
+    }
+
+    /// The same message as ``description``.
+    var errorDescription: String? { description }
+}
 
 /// What the controls show, updated only when a field changes.
 @MainActor
@@ -144,6 +166,10 @@ final class BenchPresenter: ExperiencePresenter {
     private(set) var drawnFrames = 0
     /// A frame time, seconds, used instead of `FrameInfo.time` while set (a test seam for synthetic runs).
     var feedTime: Double?
+    /// Test-only seam: when true, the next `draw` throws ``BenchDrawError/injected`` once, before it acts on the
+    /// core, records or draws anything; the seam clears itself and nothing in the experience or its interface sets it
+    /// (feature 178, A24-P06, T-A24-604).
+    var failNextDraw = false
     /// The request counters last acted on; nil until the first state is drawn.
     private var seenRequests: (start: Int, stop: Int)?
     /// The generation and pixel size of the last context drawn into; nil before the first frame.
@@ -274,8 +300,13 @@ final class BenchPresenter: ExperiencePresenter {
     }
 
     /// Acts on the core's case and requests, draws workload frame n timed by `ContinuousClock`, records the frame and
-    /// brings the mirror up to date (see the file header).
+    /// brings the mirror up to date (see the file header). Throws ``BenchDrawError/injected`` once while
+    /// ``failNextDraw`` is set (it is cleared first).
     func draw(_ core: BenchCore, tier: Int, context: RenderContext, frame: FrameInfo) throws {
+        if failNextDraw {
+            failNextDraw = false
+            throw BenchDrawError.injected
+        }
         let time = feedTime ?? frame.time
         if let lastContext, lastContext.generation != context.generation { recorder.interrupt() }
         if timerGeneration != context.generation || (forceTimerUnsupported && timer != nil) {
