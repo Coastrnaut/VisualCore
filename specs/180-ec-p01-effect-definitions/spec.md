@@ -24,6 +24,61 @@ Canonical overrides:
 - **No VisualCore or ProjectM change.** Follow `specs/173-gbl-p01-measurement-statistics`.
 - **Visuals are code:** the built-in test image and every effect are generated in code.
 
+## Clarifications
+
+### Session 2026-11-19
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- **Programs:** `FieldPass(registry:fragment:inputs:label:library:)` compiles a fragment program with
+  `FullScreenShaderScene.vertexSource`, which gives `in vec2 v_uv` at texel centres when output and input sizes match;
+  inputs are `sampler2D` uniforms bound in order; uniforms are `FieldUniform` float, vec2, vec4 and int.
+- **Test-image upload:** `RenderTarget.upload(rgbaFloats:)` stores each value of an `.rgba8` target as n/255 after
+  clamping, so a picture made of n/255 values uploads exactly; `RenderTarget.readPixels()` reads the RGBA bytes back
+  (rows bottom-up).
+- **Host:** `RenderHost(scene:)` runs a `RenderScene` off screen; `ResourceRegistry.stats` gives `liveCount` per kind
+  and `totalBytes` (as the A24-P01 host-count test uses).
+- **Fingerprint and migration:** `DigestBuilder(domain:)` and `MigrationChain(currentVersion:steps:)`, as in A24-P01.
+- **Package layout:** a pending core `EffectsComposerCore` with `EffectsComposerCoreTests`, no experience target; the
+  tests may depend on VisualCoreRendering.
+
+- Q: What are the five effects and their formulas? → A: Version 1 of each, on stored values x in 0…1 at texture
+  coordinate uv, sampling with clamp to edge; every result is clamped to 0…1:
+
+  | Id | Parameters (range; default) | Formula |
+  |---|---|---|
+  | `grade` | `exposure` (−2…2; 0), `contrast` (0.5…2; 1), `saturation` (0…2; 1) | y = x·2^exposure; y = (y − 0.5)·contrast + 0.5; L = 0.2126 r + 0.7152 g + 0.0722 b of y; y = L + (y − L)·saturation |
+  | `blur` | `radius` (0…8 whole pixels; 2) | the mean of the (2·radius + 1)² texel centres around the pixel |
+  | `distort` | `amplitude` (0…0.05 of the size; 0.01), `frequency` (1…16 cycles; 4) | sample at uv + amplitude·(sin(2π·frequency·uv.y), sin(2π·frequency·uv.x)) |
+  | `vignette` | `amount` (0…1; 0.5), `radius` (0.2…1; 0.75), `softness` (0.05…1; 0.3) | d = 2·‖uv − 0.5‖/√2; rgb·(1 − amount·smoothstep(radius − softness, radius, d)) |
+  | `posterize` | `levels` (2…32 whole; 8) | y = floor(x·(levels − 1) + 0.5)/(levels − 1) |
+
+  Alpha is kept. The values of a node are a dictionary from parameter name to a finite number; whole-number
+  parameters refuse fractions. Each definition's fingerprint is a `DigestBuilder` in the domain `a25.effect.v1` over
+  the id, the version and every parameter's name, range and default.
+- Q: What are the chain's caps and its edit history? → A: At most 8 nodes; node identifiers are whole numbers 1…65,535,
+  unique in a chain, and a new node takes the smallest unused one. The edits are add (an effect at a position, with
+  its defaults), remove, move (from, to), set enabled and set a value. Each validated edit is pushed on the undo stack;
+  undo applies its inverse and pushes it on the redo stack; any new edit clears the redo stack. The history keeps at
+  most 64 edits and drops the oldest. The chain's fingerprint is a `DigestBuilder` in the domain
+  `a25.effect-chain.v1` over the nodes in order (identifier, effect id and version, enabled, values in name order).
+- Q: How is a chain stored? → A: The envelope `{"body", "kind": "a25.effect-chain", "version": 1}` with the body
+  `{"nodes": [{"id", "effect", "enabled", "values"}]}`, sorted keys, at most 65,536 bytes, read through a
+  `MigrationChain`. Refusal codes: `damaged`, `newer-version`, `too-large`, `not-finite`, `out-of-range` (with the
+  field), `unknown-effect`, `unknown-parameter`, `missing-parameter`, `too-many-nodes` and `duplicate-node`.
+- Q: What is the test image, and how are pictures compared? → A: A 64 × 64 picture made in code: red rises with x,
+  green with y (each n/255 with n = ⌊255·i/63⌋), blue 255 on 8 × 8 checker squares and 0 elsewhere, alpha 255. Each
+  effect's program is drawn into an `.rgba8` target of the same size inside a `RenderHost` scene and read back. A
+  checked pixel matches its CPU reference when every channel differs by at most 2/255 (`grade`, `blur`, `vignette`,
+  `posterize`) or 4/255 (`distort`, which samples between texel centres); `posterize` is checked away from level
+  edges. The order fixture draws `grade` (contrast 2) then `posterize` (4 levels) and the reverse; the pictures
+  differ, and the picture after the swap is undone equals the first byte for byte.
+- Q: How is "no graphics work in the core" proved? → A: As in A24-P01: a test runs a scene on `RenderHost` and, inside
+  its callbacks, validates every definition, edits and undoes a chain and encodes it, then compares
+  `ResourceRegistry.stats` before and after; they are equal. The core target depends only on the pure
+  VisualCoreExperience and VisualCorePersistence products; programs are strings in the core, compiled only by tests
+  and later by the experience.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Five effects with bounded parameters (Priority: P1) 🎯
