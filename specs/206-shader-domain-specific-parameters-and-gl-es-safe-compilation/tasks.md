@@ -65,7 +65,7 @@
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02F06-009 No Stage One breakage: `--name experiences -- python3 scripts/xcodebuild_package.py --package
+- [X] T-R02F06-009 No Stage One breakage: `--name experiences -- python3 scripts/xcodebuild_package.py --package — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F06.experiences.json (ExperiencesCreative on sim-27.2 exit 0)
   Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test`
 - [ ] T-R02F06-010 API baseline and documentation: `python3 scripts/check_public_api.py --update` then `--name
   public-api -- python3 scripts/check_public_api.py`; `///` on every new public symbol; sections in
