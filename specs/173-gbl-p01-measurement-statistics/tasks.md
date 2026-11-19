@@ -64,7 +64,7 @@
 
 ## Phase 5: Story 5 — apart from graphics work (P2)
 
-- [ ] T-A24-110 [US5] Write `CoreTests/HostCountTests.swift` per clarification Q5 (SC-A24-105, FR-A24-107): a
+- [X] T-A24-110 [US5] Write `CoreTests/HostCountTests.swift` per clarification Q5 (SC-A24-105, FR-A24-107): a — Verified 2026-11-19: 2026-11-19: HostCountTests pass (resource level unchanged in setup and two frames) in .autonomy/checks/A24-P01.gbl-core-ios27.json exit 0
   `RenderScene` on `RenderHost(scene:)` validates the cases, summarises every fixture and encodes a run in `setup` and
   `render`, and `ResourceRegistry.stats` (`liveCount` for every kind, `totalBytes`) is the same before and after.
 
