@@ -26,6 +26,18 @@
 //   - Accessibility actions: ``perform(accessibilityAction:at:)`` applies a named action of
 //     ``ComposerLabels/actions(for:in:)`` through the port, the same core action the button sends.
 //
+// Feature 183 (A25-P04) T-A25-406 (clarification Q4; contracts/import.md):
+//   - `importPicture(data:)`: the status reads "Reading the picture…"; the data is decoded off the main actor
+//     (`Task.detached`, ``ImageImport/decode(_:limit:)`` with the renderer's ``PreviewRenderer/importLimit``); back on
+//     the main actor the outcome is applied only when it belongs to the latest request (a request counter, so the
+//     latest pick wins and an earlier one finishing later is dropped). A picture becomes the source
+//     (``PreviewRenderer/setSource(_:)``, at the next frame) and the status reads "Your picture"; a refusal leaves the
+//     source and shows its sentence. ``startImport(data:)`` is the same request as a task (the controls and tests).
+//   - `useTestPicture()` returns to the built-in test picture (and cancels a pending import) and the status reads
+//     "Ready".
+//   - The picture is the presenter's, not the core's: it is in neither the digest nor the snapshot, so a restored
+//     session shows the test picture. Test seam: ``decoder`` (the decoding function, replaced to order two imports).
+//
 // Maximum 60 frames per second; one quality tier, `level-0`. No GL call outside the renderer's `FieldPass`es.
 import EffectsComposerCore
 import Foundation
@@ -116,6 +128,10 @@ final class ComposerPresenter: ExperiencePresenter {
     nonisolated static let readyWord = "Ready"
     /// The status word while compare shows the source.
     nonisolated static let originalWord = "Original"
+    /// The status while a picked picture is decoded.
+    nonisolated static let readingWord = "Reading the picture…"
+    /// The status once a picked picture is the source.
+    nonisolated static let yourPictureWord = "Your picture"
 
     /// What the controls show.
     let mirror = ComposerMirror()
@@ -129,6 +145,12 @@ final class ComposerPresenter: ExperiencePresenter {
     var port: ExperienceActionPort?
     /// The shell's current core, set by the factory (saving reads the chain from it).
     var currentCore: (@MainActor () -> ComposerCore?)?
+    /// The decoding function of an import, run off the main actor (a test seam; ``ImageImport/decode(_:limit:)``).
+    var decoder: @Sendable (Data, Int) async -> Result<ImportedPicture, ImportRefusal> = { data, limit in
+        ImageImport.decode(data, limit: limit)
+    }
+    /// The number of the latest import request; an outcome of an earlier one is dropped.
+    private(set) var importRequest = 0
 
     /// A presenter with a library over `storage` (none without storage).
     init(storage: ExperienceStorage? = nil) {
@@ -166,7 +188,8 @@ final class ComposerPresenter: ExperiencePresenter {
         followRenderer()
     }
 
-    /// Nothing depends on the drawable size but the present pass, which reads it at each frame.
+    /// Nothing depends on the drawable size but the present pass, which reads it at each frame (the targets have the
+    /// source picture's size).
     func resize(_ context: RenderContext) {}
 
     /// Renders the chain when it changed, presents the result and follows the core.
@@ -254,7 +277,8 @@ final class ComposerPresenter: ExperiencePresenter {
     /// The probe of the frame last drawn (see the file header): `blue` at the checker cell (2, 2) while the plan is
     /// the copy of the test image; none otherwise.
     func probes(_ core: ComposerCore) -> [FrameProbe] {
-        guard let plan = renderer.lastPlan, plan.passes.allSatisfy({ $0.node == nil }), !renderer.blocked,
+        guard renderer.pictureSource.isTestPicture,
+              let plan = renderer.lastPlan, plan.passes.allSatisfy({ $0.node == nil }), !renderer.blocked,
               let size = lastSize,
               let point = Self.probePoint(width: size.width, height: size.height,
                                           side: PreviewRenderer.previewSide) else { return [] }
@@ -270,6 +294,54 @@ final class ComposerPresenter: ExperiencePresenter {
     /// The native controls (``ECControls``).
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
         AnyView(ECControls(port: port, mirror: mirror, presets: ComposerPresetActions(presenter: self)))
+    }
+}
+
+// MARK: Picture source
+
+extension ComposerPresenter {
+    /// Imports the picture in `data` (see the file header) and returns once its outcome was applied or dropped.
+    func importPicture(data: Data) async {
+        await startImport(data: data).value
+    }
+
+    /// Starts importing the picture in `data`: the request is numbered and the status reads "Reading the picture…"
+    /// now; the returned task decodes off the main actor and applies the outcome only if no later request was made.
+    @discardableResult
+    func startImport(data: Data) -> Task<Void, Never> {
+        importRequest += 1
+        let request = importRequest
+        let limit = renderer.importLimit
+        let decoder = self.decoder
+        if mirror.status != Self.readingWord { mirror.status = Self.readingWord }
+        return Task { @MainActor [weak self] in
+            let outcome = await Task.detached { await decoder(data, limit) }.value
+            self?.apply(outcome, request: request)
+        }
+    }
+
+    /// Applies the outcome of import `request` when it is still the latest: a picture becomes the source ("Your
+    /// picture"); a refusal leaves the source and shows its sentence. Returns whether it was applied.
+    @discardableResult
+    func apply(_ outcome: Result<ImportedPicture, ImportRefusal>, request: Int) -> Bool {
+        guard request == importRequest else { return false }
+        let status: String
+        switch outcome {
+        case .success(let picture):
+            renderer.setSource(.imported(picture))
+            status = Self.yourPictureWord
+        case .failure(let refusal):
+            status = refusal.message
+        }
+        if mirror.status != status { mirror.status = status }
+        return true
+    }
+
+    /// Returns to the built-in test picture; a pending import is dropped and the status reads "Ready".
+    func useTestPicture() {
+        importRequest += 1
+        renderer.setSource(.testPicture)
+        if mirror.status != Self.readyWord { mirror.status = Self.readyWord }
     }
 }
 
@@ -390,8 +462,9 @@ extension ComposerPresenter {
     }
 }
 
-/// What the presets section of the controls acts with: the presenter's library actions, held weakly (each refused as
-/// `unavailable` once the presenter is gone).
+/// What the presets and picture sections of the controls act with: the presenter's library and picture actions, held
+/// weakly (each library action refused as `unavailable`, each picture action doing nothing, once the presenter is
+/// gone).
 @MainActor
 struct ComposerPresetActions {
     /// Saves the current chain under a name (``ComposerPresenter/save(name:)``).
@@ -402,9 +475,15 @@ struct ComposerPresetActions {
     let remove: @MainActor (String) -> Result<LookLibraryEntry, LookLibraryFailure>
     /// Applies a named accessibility action of a node (``ComposerPresenter/perform(accessibilityAction:at:)``).
     let perform: @MainActor (String, Int) -> Void
+    /// Imports picked picture data (``ComposerPresenter/startImport(data:)``).
+    let importPicture: @MainActor (Data) -> Void
+    /// Returns to the built-in test picture (``ComposerPresenter/useTestPicture()``).
+    let useTestPicture: @MainActor () -> Void
 
     /// The actions of `presenter`, held weakly.
     init(presenter: ComposerPresenter) {
+        importPicture = { [weak presenter] data in presenter?.startImport(data: data) }
+        useTestPicture = { [weak presenter] in presenter?.useTestPicture() }
         save = { [weak presenter] name in presenter?.save(name: name) ?? .failure(.unavailable) }
         open = { [weak presenter] file in presenter?.open(file: file) ?? .failure(.unavailable) }
         remove = { [weak presenter] file in presenter?.remove(file: file) ?? .failure(.unavailable) }

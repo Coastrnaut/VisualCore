@@ -30,7 +30,7 @@
   orientations put the marked corner top left with the right size; Display P3 red within 3/255 of its sRGB value;
   4,000 × 1,000 decodes to 2,048 × 512; damaged, tiny and oversized data refused with their codes; alpha kept
   (SC-A25-401–403)
-- [ ] T-A25-406 [US1] [US4] Integrate per clarification Q4 in `Packages/ExperiencesCreative/EffectsComposer/Experience/{PreviewRenderer,ComposerPresenter,ECControls}.swift`:
+- [X] T-A25-406 [US1] [US4] Integrate per clarification Q4 in `Packages/ExperiencesCreative/EffectsComposer/Experience/{PreviewRenderer,ComposerPresenter,ECControls}.swift`: — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P04.ec-ios27.json (exit 0, 119 tests incl. 6 PictureSourceTests)
   `importPicture(data:)` (background decode, latest pick wins, "Reading the picture…"), `useTestPicture()`, the source at
   the picture's size uploaded with `upload(rgba:)`, re-upload after a rebuild, the `import` (PhotosPicker) and
   `test-picture` controls; `Packages/ExperiencesCreative/EffectsComposer/ExperienceTests/PictureSourceTests.swift`: an imported picture becomes the source and the

@@ -20,6 +20,12 @@
 //   - each node row `node-<i>` offers the named accessibility actions of ``ComposerLabels/actions(for:in:)`` ("Move
 //     up", "Move down", "Turn off" or "Turn on", "Raise <name>", "Lower <name>"), applied through the presenter as
 //     the matching buttons apply them.
+// Feature 183 (A25-P04) T-A25-406 (clarification Q4; contracts/import.md): the picture section, inline:
+//   - `import` ("Choose a picture"): the system photo picker (SwiftUI `PhotosPicker`, images only), which runs out of
+//     process; the picked item's data (`loadTransferable(type: Data.self)`) goes to the presenter's import. A cancelled
+//     pick (no item) and an item without data change nothing; the selection is cleared after each pick, so the same
+//     photo can be picked again;
+//   - `test-picture` ("Use the test picture"): returns to the built-in test picture.
 // The presets section acts through ``ComposerPresetActions`` (the presenter's actions, held weakly).
 //
 // Every edit is a button, so nothing needs dragging (constitution A25 accessibility). Inline buttons, never a `Menu`, a
@@ -28,6 +34,7 @@
 // the pure static functions of ``ComposerLabels`` so that tests can read them.
 import EffectsComposerCore
 import Foundation
+import PhotosUI
 import SwiftUI
 import VisualCoreExperience
 import VisualCoreExperienceHost
@@ -138,6 +145,11 @@ enum ComposerLabels {
         }
     }
 
+    /// The spoken label of `import`: "Choose a picture".
+    static let importLabel = "Choose a picture"
+    /// The spoken label of `test-picture`: "Use the test picture".
+    static let testPictureLabel = "Use the test picture"
+
     /// The label of `preset-row-<n>`: the preset's name, or "<name>, unreadable (<code>)".
     static func presetLabel(_ entry: LookLibraryEntry) -> String {
         entry.refusal.map { entry.name + ", unreadable (" + $0 + ")" } ?? entry.name
@@ -154,6 +166,8 @@ struct ECControls: View {
     let presets: ComposerPresetActions
     /// The name typed into `preset-name`.
     @State private var presetName = ""
+    /// The item picked in `import`; nil when nothing is picked (or after it was handed over).
+    @State private var pickedItem: PhotosPickerItem?
 
     /// Sends `control` with `values` and shows "Ready" or the refusal's message in the status line.
     @MainActor
@@ -195,9 +209,42 @@ struct ECControls: View {
                     .accessibilityLabel(Text(verbatim: "Program problems, " + mirror.diagnostics))
                     .accessibilityIdentifier(port.identifier("diagnostics"))
             }
+            pictureSection
             presetsSection
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .onChange(of: pickedItem) { _, item in
+            guard let item else { return }
+            pickedItem = nil
+            Self.load(item, into: presets.importPicture)
+        }
+    }
+
+    /// Loads the data of the picked `item` and hands it to `importPicture`; an item without data does nothing.
+    @MainActor
+    static func load(_ item: PhotosPickerItem, into importPicture: @escaping @MainActor (Data) -> Void) {
+        Task { @MainActor in
+            guard let data = try? await item.loadTransferable(type: Data.self) else { return }
+            importPicture(data)
+        }
+    }
+
+    /// The inline picture controls: `import` (the photo picker) and `test-picture`.
+    private var pictureSection: some View {
+        HStack(spacing: 12) {
+            PhotosPicker(selection: $pickedItem, matching: .images) {
+                Text(verbatim: ComposerLabels.importLabel)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(minWidth: 44, minHeight: 44)
+            }
+            .accessibilityLabel(Text(verbatim: ComposerLabels.importLabel))
+            .accessibilityIdentifier(port.identifier("import"))
+            button("Test picture", label: ComposerLabels.testPictureLabel, name: "test-picture", enabled: true) {
+                presets.useTestPicture()
+            }
+        }
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel(Text(verbatim: "Picture"))
     }
 
     /// The inline presets: the name field, the save button, one row per preset and the library's message.

@@ -29,6 +29,15 @@
 // ``lastPresentSize`` (the drawable of the last present) and ``sourceTextureName`` (the source's colour texture,
 // which no pass may write).
 //
+// Feature 183 (A25-P04) T-A25-406 (clarification Q4; contracts/import.md): the source is a value, ``PreviewSource``:
+// the built-in test picture or a picture the person imported (an ``ImportedPicture``, rows top-down). The renderer
+// keeps its bytes and uploads them with `RenderTarget.upload(rgba:)` (rows flipped to GL's bottom-up order) into a
+// source target of the picture's size; the result and the slots take the same size (each side at most the pool's
+// 2,048). ``setSource(_:)`` changes it: the next render gives back the source and result targets, takes new ones of the
+// new size, uploads the bytes and draws the chain anew (the programs do not depend on the size and are kept). After a
+// context loss `setup` uploads the kept bytes again, so the source is byte-identical. ``importLimit`` is
+// `ImageImport.limit(maxTextureSize:)` of the context's registry, read at `setup`. Test seam: ``readSource()``.
+//
 // Choice recorded here: the result target is held across frames (taken at setup, given back at release) rather than
 // taken and recycled each frame, so that a broken program keeps the last good picture in it; the slots come from the
 // pool and go back to it within each render. No GL call: programs, targets and draws are VisualCore's (`FieldPass`,
@@ -84,8 +93,30 @@ public enum PreviewRefusal: Error, Equatable, Sendable {
 
 /// Why the preview could not be set up.
 enum PreviewSetupError: Error, Equatable {
-    /// The test image could not be uploaded into the source target.
+    /// The source picture could not be uploaded into the source target.
     case upload
+}
+
+/// The picture the chain is applied to: the built-in test picture or one the person imported.
+enum PreviewSource: Equatable, Sendable {
+    /// The built-in test picture (`TestImage.make(size: 256)`).
+    case testPicture
+    /// A picture the person imported, decoded by ``ImageImport``.
+    case imported(ImportedPicture)
+
+    /// The built-in test picture, made once.
+    static let testImage = TestImage.make(size: PreviewRenderer.previewSide)
+
+    /// The picture's pixels, rows top-down.
+    var picture: RGBAImage {
+        switch self {
+        case .testPicture: return Self.testImage
+        case .imported(let picture): return picture
+        }
+    }
+
+    /// Whether this is the built-in test picture.
+    var isTestPicture: Bool { self == .testPicture }
 }
 
 /// The preview's bounded share of the registry's target pool (see the file header).
@@ -176,10 +207,30 @@ final class PreviewRenderer {
     /// `width × height` drawable: the largest whole multiple of `side` that fits, or, in a smaller drawable, the
     /// shorter side; centred. Nil for an empty drawable.
     nonisolated static func presentRect(width: Int, height: Int, side: Int) -> (x: Int, y: Int, width: Int, height: Int)? {
-        guard width > 0, height > 0, side > 0 else { return nil }
-        let shorter = min(width, height)
-        let drawn = shorter >= side ? (shorter / side) * side : shorter
-        return ((width - drawn) / 2, (height - drawn) / 2, drawn, drawn)
+        presentRect(width: width, height: height, pictureWidth: side, pictureHeight: side)
+    }
+
+    /// The rectangle (x, y from the bottom-left, width, height, pixels) a `pictureWidth × pictureHeight` picture takes
+    /// in a `width × height` drawable: the largest whole multiple of the picture's size that fits, or, in a smaller
+    /// drawable, the picture scaled down to fit with its proportions kept; centred. Nil for an empty drawable or
+    /// picture.
+    nonisolated static func presentRect(width: Int, height: Int, pictureWidth: Int,
+                                        pictureHeight: Int) -> (x: Int, y: Int, width: Int, height: Int)? {
+        guard width > 0, height > 0, pictureWidth > 0, pictureHeight > 0 else { return nil }
+        let scale = min(width / pictureWidth, height / pictureHeight)
+        let drawnWidth: Int
+        let drawnHeight: Int
+        if scale >= 1 {
+            drawnWidth = pictureWidth * scale
+            drawnHeight = pictureHeight * scale
+        } else if width * pictureHeight <= height * pictureWidth {
+            drawnWidth = width
+            drawnHeight = max(1, pictureHeight * width / pictureWidth)
+        } else {
+            drawnWidth = max(1, pictureWidth * height / pictureHeight)
+            drawnHeight = height
+        }
+        return ((width - drawnWidth) / 2, (height - drawnHeight) / 2, drawnWidth, drawnHeight)
     }
 
     /// Replacement program texts by effect (a test seam, read at `setup`; never set by the app).
@@ -218,8 +269,16 @@ final class PreviewRenderer {
     private var presentPass: FieldPass?
     /// The targets' pool of the current context.
     private(set) var pool: PreviewPool?
-    /// The source target holding the test image.
+    /// The source target holding the source picture's bytes.
     private var source: RenderTarget?
+    /// The picture the chain is applied to; kept across context losses.
+    private(set) var pictureSource: PreviewSource = .testPicture
+    /// Whether the source target no longer matches ``pictureSource`` (set by ``setSource(_:)``, cleared by the next
+    /// render that takes and fills the targets).
+    private var sourceStale = false
+    /// The longer-edge limit of an imported picture: `ImageImport.limit(maxTextureSize:)` of the registry, read at
+    /// `setup`; ``ImageImport/maximumEdge`` before the first.
+    private(set) var importLimit = ImageImport.maximumEdge
     /// The result target holding the last good picture.
     private var result: RenderTarget?
     /// The fingerprint (hex) of the chain last rendered or refused; nil when the next render must draw.
@@ -239,7 +298,7 @@ final class PreviewRenderer {
         return uniforms
     }
 
-    /// Builds the programs, uploads the test image and takes the result target (see the file header). Throws only
+    /// Builds the programs, uploads the source picture and takes the result target (see the file header). Throws only
     /// when the renderer's own copy or present program does not build or a target cannot be made.
     func setup(_ context: RenderContext) throws {
         release(context)
@@ -262,30 +321,58 @@ final class PreviewRenderer {
                                  label: "a25-copy.frag")
         presentPass = try FieldPass(registry: registry, fragment: Self.presentProgram,
                                     inputs: [EffectPrograms.sourceInput], label: "a25-present.frag")
-        let pool = PreviewPool(registry: registry)
-        self.pool = pool
-        let side = Self.previewSide
+        importLimit = registry.maxTextureSize > 0 ? ImageImport.limit(maxTextureSize: registry.maxTextureSize)
+            : ImageImport.maximumEdge
+        self.pool = PreviewPool(registry: registry)
+        try takeSourceTargets()
+    }
+
+    /// Makes `next` the picture the chain is applied to; the next render takes targets of its size, uploads it and
+    /// draws the chain anew. Setting the picture already shown changes nothing.
+    func setSource(_ next: PreviewSource) {
+        guard next != pictureSource else { return }
+        pictureSource = next
+        sourceStale = true
+        renderedKey = nil
+    }
+
+    /// Gives back the source and result targets, takes new ones of the source picture's size and uploads its bytes
+    /// (rows flipped to bottom-up); a size above the pool's cap is recorded as ``refusal``. Throws
+    /// ``PreviewSetupError/upload`` when the bytes are not taken.
+    private func takeSourceTargets() throws {
+        guard let pool else { return }
+        if let source { pool.release(source) }
+        if let result { pool.release(result) }
+        source = nil
+        result = nil
+        sourceStale = false
+        let picture = pictureSource.picture
         do {
-            let source = try pool.acquire(width: side, height: side)
+            let source = try pool.acquire(width: picture.width, height: picture.height)
             self.source = source
-            guard source.upload(rgbaFloats: Self.bottomUpFloats(TestImage.make(size: side))) else {
-                throw PreviewSetupError.upload
-            }
-            result = try pool.acquire(width: side, height: side)
+            guard source.upload(rgba: Self.bottomUp(picture)) else { throw PreviewSetupError.upload }
+            result = try pool.acquire(width: picture.width, height: picture.height)
+            refusal = nil
         } catch let refused as PreviewRefusal {
             refusal = refused
         }
     }
 
-    /// The bytes of `image` as floats 0…1 with the rows flipped to bottom-up (GL's order).
-    nonisolated static func bottomUpFloats(_ image: RGBAImage) -> [Float] {
-        var floats = [Float](repeating: 0, count: image.bytes.count)
+    /// The bytes of `image` with the rows flipped to bottom-up (GL's order).
+    nonisolated static func bottomUp(_ image: RGBAImage) -> [UInt8] {
+        var bytes = [UInt8](repeating: 0, count: image.bytes.count)
         let rowBytes = image.width * 4
         for y in 0..<image.height {
             let from = y * rowBytes, to = (image.height - 1 - y) * rowBytes
-            for i in 0..<rowBytes { floats[to + i] = Float(image.bytes[from + i]) / 255 }
+            bytes[to..<(to + rowBytes)] = image.bytes[from..<(from + rowBytes)]
         }
-        return floats
+        return bytes
+    }
+
+    /// The source target's pixels, rows top-down; nil without a source target (a test seam).
+    func readSource() -> RGBAImage? {
+        guard let source else { return nil }
+        return Self.topDown(source.readPixels(), width: source.width, height: source.height)
     }
 
     /// `pixels` (rows bottom-up, as GL reads them) as a top-down picture of `width × height`; nil for a wrong count.
@@ -305,6 +392,14 @@ final class PreviewRenderer {
         let key = chain.fingerprint().hex
         guard key != renderedKey else { return }
         renderedKey = key
+        if sourceStale {
+            do {
+                try takeSourceTargets()
+            } catch {
+                runFailure = "\(error)"
+                return
+            }
+        }
         guard let pool, let source, let result, let copyPass else { return }
         let plan = PassPlan.compile(chain)
         blocked = plan.passes.contains { pass in pass.node.map { passes[$0.effect] == nil } ?? false }
@@ -366,7 +461,7 @@ final class PreviewRenderer {
     func present(_ context: RenderContext, compare: Bool = false) {
         guard let presentPass, let result, let shown = compare ? source : result,
               let rect = Self.presentRect(width: context.pixelWidth, height: context.pixelHeight,
-                                          side: result.width) else { return }
+                                          pictureWidth: result.width, pictureHeight: result.height) else { return }
         let values: [String: [Float]] = [
             "u_rect": [Float(rect.x), Float(rect.y), Float(rect.width), Float(rect.height)],
             "u_background": [Self.background.x, Self.background.y, Self.background.z, Self.background.w],
