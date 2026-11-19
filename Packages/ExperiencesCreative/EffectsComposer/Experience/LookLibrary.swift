@@ -1,4 +1,4 @@
-// PresetLibrary — feature 182 (A25-P03) T-A25-302 (FR-A25-302, FR-A25-303; clarification Q2; data-model.md "Preset
+// LookLibrary — feature 182 (A25-P03) T-A25-302 (FR-A25-302, FR-A25-303; clarification Q2; data-model.md "Preset
 // file", "Index", "Caps"; contracts/presets.md; gap G-PRESETS). The named chains of Effects Composer, one file per
 // preset in the experience's own storage (`ExperienceStorage`, whose quota is 16 MiB and 64 files), after Visual
 // Programming Lab's `GraphLibrary` and Graphics Benchmark Lab's `ResultLibrary`:
@@ -23,7 +23,7 @@
 //     quota or a file system error) keeps the previous file of that name, so a refusal changes nothing.
 //   - Messages: "The library holds 24 presets.", "A name has 1 to 40 characters.", "A preset is already called
 //     <name>." and "There is not enough space to save this preset." (a storage quota of bytes or files), plus the
-//     sentences of `PresetLibraryFailure.message`.
+//     sentences of `LookLibraryFailure.message`.
 //   - Order: each save takes the next modification order (the largest + 1); a rename keeps it. The list shows the
 //     readable presets newest first, then the unreadable files by number.
 //
@@ -35,7 +35,7 @@ import Observation
 import VisualCoreExperience
 
 /// Whether a preset file can be opened, or the code of its refusal.
-enum PresetLibraryState: Equatable, Sendable {
+enum LookLibraryState: Equatable, Sendable {
     /// The file reads as a preset.
     case readable
     /// The file was refused with this code (`damaged`, `newer-version`, `too-large` or a chain file code).
@@ -43,7 +43,7 @@ enum PresetLibraryState: Equatable, Sendable {
 }
 
 /// One preset of the library: readable (with its name and order) or unreadable (with its refusal code).
-struct PresetLibraryEntry: Equatable, Identifiable, Sendable {
+struct LookLibraryEntry: Equatable, Identifiable, Sendable {
     /// The file in the experience's storage: `preset-<n>.json`.
     var file: String
     /// The preset's name; for an unreadable file the name the index remembers, else the file name.
@@ -51,7 +51,7 @@ struct PresetLibraryEntry: Equatable, Identifiable, Sendable {
     /// The modification order (larger is newer); 0 for an unreadable file.
     var order: Int
     /// Whether the file can be opened.
-    var state: PresetLibraryState
+    var state: LookLibraryState
 
     /// The entry's identity: its file name.
     var id: String { file }
@@ -63,13 +63,13 @@ struct PresetLibraryEntry: Equatable, Identifiable, Sendable {
         return nil
     }
     /// The file's counter n of `preset-<n>.json` (0 if the name does not parse).
-    var number: Int { PresetLibrary.number(of: file) ?? 0 }
+    var number: Int { LookLibrary.number(of: file) ?? 0 }
     /// The file's name without `.json` (`preset-<n>`).
     var stem: String { file.hasSuffix(".json") ? String(file.dropLast(5)) : file }
 }
 
 /// Why a library operation was refused; a refused operation changes nothing on disk.
-enum PresetLibraryFailure: Error, Equatable, Sendable {
+enum LookLibraryFailure: Error, Equatable, Sendable {
     /// A 25th preset: "The library holds 24 presets."
     case full
     /// A name that is empty or longer than 40 characters after trimming: "A name has 1 to 40 characters."
@@ -110,12 +110,12 @@ enum PresetLibraryFailure: Error, Equatable, Sendable {
     /// One sentence for the person.
     var message: String {
         switch self {
-        case .full: return PresetLibrary.fullMessage
-        case .badName: return PresetLibrary.nameMessage
-        case .taken(let name): return PresetLibrary.takenMessage(name)
+        case .full: return LookLibrary.fullMessage
+        case .badName: return LookLibrary.nameMessage
+        case .taken(let name): return LookLibrary.takenMessage(name)
         case .unreadable(let code): return "This preset cannot be opened (\(code))."
         case .missing: return "This preset is no longer in the library."
-        case .noSpace: return PresetLibrary.noSpaceMessage
+        case .noSpace: return LookLibrary.noSpaceMessage
         case .storage(let error): return "The library could not be changed (\(error.code))."
         case .unavailable: return "The library is not available."
         case .readOnly: return "The library was written by a newer version, so it cannot be changed."
@@ -180,7 +180,7 @@ enum PresetJSONValue: Codable, Equatable, Sendable {
 /// The named chains in the experience's storage (see the file header).
 @MainActor
 @Observable
-final class PresetLibrary {
+final class LookLibrary {
     /// The index file.
     nonisolated static let indexFile = "presets.json"
     /// The envelope kind of the index.
@@ -254,7 +254,7 @@ final class PresetLibrary {
     /// The experience's storage.
     let storage: ExperienceStorage
     /// The presets: the readable ones newest first, then the unreadable ones by number.
-    private(set) var entries: [PresetLibraryEntry] = []
+    private(set) var entries: [LookLibraryEntry] = []
     /// The next file counter.
     private(set) var next = 1
     /// Whether the index was written by a newer version (the library is then read only).
@@ -290,16 +290,16 @@ final class PresetLibrary {
     }
 
     /// The readable preset called `name` (trimmed; compared without regard to case); nil when there is none.
-    func entry(named name: String) -> PresetLibraryEntry? {
+    func entry(named name: String) -> LookLibraryEntry? {
         guard let clean = Self.cleanName(name) else { return nil }
         return entries.first { $0.isReadable && $0.name.caseInsensitiveCompare(clean) == .orderedSame }
     }
 
     /// The entry of `file`; nil when there is none.
-    func entry(file: String) -> PresetLibraryEntry? { entries.first { $0.file == file } }
+    func entry(file: String) -> LookLibraryEntry? { entries.first { $0.file == file } }
 
     /// The readable presets.
-    var readable: [PresetLibraryEntry] { entries.filter(\.isReadable) }
+    var readable: [LookLibraryEntry] { entries.filter(\.isReadable) }
 
     // MARK: Encoding
 
@@ -354,8 +354,8 @@ final class PresetLibrary {
         return .success(index)
     }
 
-    /// The failure of a refused storage write: a quota of bytes or files is ``PresetLibraryFailure/noSpace``.
-    nonisolated static func failure(of error: StorageError) -> PresetLibraryFailure {
+    /// The failure of a refused storage write: a quota of bytes or files is ``LookLibraryFailure/noSpace``.
+    nonisolated static func failure(of error: StorageError) -> LookLibraryFailure {
         if case .quotaExceeded = error { return .noSpace }
         return .storage(error)
     }
@@ -383,20 +383,20 @@ final class PresetLibrary {
             }
         }
         let names = Dictionary(index.entries.map { ($0.file, $0.name) }, uniquingKeysWith: { first, _ in first })
-        var good: [PresetLibraryEntry] = []
-        var bad: [PresetLibraryEntry] = []
+        var good: [LookLibraryEntry] = []
+        var bad: [LookLibraryEntry] = []
         var highest = 0
         for file in storage.list() {
             guard let n = Self.number(of: file) else { continue }
             highest = max(highest, n)
             switch read(file) {
             case .success(let found):
-                good.append(PresetLibraryEntry(file: file, name: found.saved.name, order: found.saved.order,
+                good.append(LookLibraryEntry(file: file, name: found.saved.name, order: found.saved.order,
                                                state: .readable))
             case .failure(let failure):
                 let code: String
                 if case .unreadable(let refusal) = failure { code = refusal } else { code = "damaged" }
-                bad.append(PresetLibraryEntry(file: file, name: names[file] ?? file, order: 0,
+                bad.append(LookLibraryEntry(file: file, name: names[file] ?? file, order: 0,
                                               state: .unreadable(code)))
             }
         }
@@ -415,7 +415,7 @@ final class PresetLibrary {
     }
 
     /// Writes the preset file `file`; the failure of an oversized file or the storage, or nil.
-    private func write(name: String, order: Int, chain: EffectChain, to file: String) -> PresetLibraryFailure? {
+    private func write(name: String, order: Int, chain: EffectChain, to file: String) -> LookLibraryFailure? {
         let data: Data
         do {
             data = try Self.encode(name: name, order: order, chain: chain)
@@ -432,7 +432,7 @@ final class PresetLibrary {
     }
 
     /// The preset of `file`, or the failure of a missing or unreadable file.
-    private func read(_ file: String) -> Result<(saved: SavedPreset, chain: EffectChain), PresetLibraryFailure> {
+    private func read(_ file: String) -> Result<(saved: SavedPreset, chain: EffectChain), LookLibraryFailure> {
         let data: Data
         do {
             data = try storage.read(file)
@@ -448,7 +448,7 @@ final class PresetLibrary {
     /// (compared without regard to case), the library holds fewer than 24 files and the chain passes
     /// `EffectChain.validate()`. Returns the saved entry; a refusal changes nothing on disk.
     @discardableResult
-    func save(name raw: String, chain: EffectChain) -> Result<PresetLibraryEntry, PresetLibraryFailure> {
+    func save(name raw: String, chain: EffectChain) -> Result<LookLibraryEntry, LookLibraryFailure> {
         guard !isReadOnly else { return .failure(.readOnly) }
         guard let name = Self.cleanName(raw) else { return .failure(.badName) }
         if let other = entry(named: name) { return .failure(.taken(other.name)) }
@@ -470,7 +470,7 @@ final class PresetLibrary {
     /// The chain of the readable file `file`, read again from it. An unreadable file is refused with its code (and
     /// the list is read again when the file changed since it was listed). Opening writes nothing and works in a
     /// read-only library.
-    func open(file: String) -> Result<EffectChain, PresetLibraryFailure> {
+    func open(file: String) -> Result<EffectChain, LookLibraryFailure> {
         guard let entry = entry(file: file) else { return .failure(.missing) }
         if let code = entry.refusal { return .failure(.unreadable(code)) }
         switch read(file) {
@@ -486,7 +486,7 @@ final class PresetLibrary {
     /// with "A preset is already called <name>." when another preset has that name, and with the code of an
     /// unreadable file.
     @discardableResult
-    func rename(file: String, to raw: String) -> Result<PresetLibraryEntry, PresetLibraryFailure> {
+    func rename(file: String, to raw: String) -> Result<LookLibraryEntry, LookLibraryFailure> {
         guard !isReadOnly else { return .failure(.readOnly) }
         guard let entry = entry(file: file) else { return .failure(.missing) }
         if let code = entry.refusal { return .failure(.unreadable(code)) }
@@ -511,7 +511,7 @@ final class PresetLibrary {
     /// Removes the preset `file`, readable or not. Only this explicit call removes a file; nothing is deleted
     /// automatically.
     @discardableResult
-    func remove(file: String) -> Result<Void, PresetLibraryFailure> {
+    func remove(file: String) -> Result<Void, LookLibraryFailure> {
         guard !isReadOnly else { return .failure(.readOnly) }
         guard entry(file: file) != nil else { return .failure(.missing) }
         do {

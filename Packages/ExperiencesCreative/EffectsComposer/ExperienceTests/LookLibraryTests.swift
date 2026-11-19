@@ -1,4 +1,4 @@
-// PresetLibraryTests — feature 182 (A25-P03) T-A25-303 (FR-A25-302, FR-A25-303; clarification Q2; User Story 2;
+// LookLibraryTests — feature 182 (A25-P03) T-A25-303 (FR-A25-302, FR-A25-303; clarification Q2; User Story 2;
 // Edge Cases "A name another preset has", "The preset cap reached"). The preset library over a temporary storage
 // (`PresetStoragePlace`, removed after), after Visual Programming Lab's `LibraryTests` and `LibraryRefusalTests`:
 // save and open round trip (equal chain, same fingerprint); rename; remove; a 25th save, an empty or 41-character name
@@ -62,7 +62,7 @@ enum PresetTest {
     static let single = EffectChain(nodes: [EffectNode(id: 1, effect: .posterize)])
 
     /// The value of a success; records an issue for a failure.
-    static func value<T>(_ result: Result<T, PresetLibraryFailure>,
+    static func value<T>(_ result: Result<T, LookLibraryFailure>,
                          sourceLocation: SourceLocation = #_sourceLocation) -> T? {
         switch result {
         case .success(let value): return value
@@ -73,24 +73,24 @@ enum PresetTest {
     }
 
     /// The failure of `result`; nil for a success.
-    static func failure<T>(_ result: Result<T, PresetLibraryFailure>) -> PresetLibraryFailure? {
+    static func failure<T>(_ result: Result<T, LookLibraryFailure>) -> LookLibraryFailure? {
         if case .failure(let failure) = result { return failure }
         return nil
     }
 }
 
 @MainActor
-@Suite(.serialized) struct PresetLibraryTests {
+@Suite(.serialized) struct LookLibraryTests {
     @Test func saveOpenRenameAndRemoveRoundTrip() throws {
         let place = try PresetStoragePlace("round-trip")
         defer { place.remove() }
-        let library = PresetLibrary(storage: place.storage)
+        let library = LookLibrary(storage: place.storage)
         #expect(library.entries.isEmpty && library.next == 1 && !library.isReadOnly)
         let chain = PresetTest.mixed
         let entry = try #require(PresetTest.value(library.save(name: "  Warm edge ", chain: chain)))
         #expect(entry.file == "preset-1.json" && entry.name == "Warm edge" && entry.order == 1 && entry.isReadable)
         #expect(entry.stem == "preset-1" && entry.number == 1)
-        #expect(place.storage.exists(PresetLibrary.indexFile))
+        #expect(place.storage.exists(LookLibrary.indexFile))
         let opened = try #require(PresetTest.value(library.open(file: entry.file)))
         #expect(opened == chain && opened.fingerprint() == chain.fingerprint())
         #expect(ChainDocument.encode(opened) == ChainDocument.encode(chain))
@@ -102,7 +102,7 @@ enum PresetTest {
         #expect(Set(body.keys) == ["chain", "name", "order"])
         #expect((body["chain"] as? [String: Any])?["kind"] as? String == ChainDocument.kind)
         // A second library over the same storage reads the same list and counter.
-        let again = PresetLibrary(storage: place.storage)
+        let again = LookLibrary(storage: place.storage)
         #expect(again.entries == library.entries && again.next == 2)
         // A second preset is listed first (newest).
         let twin = try #require(PresetTest.value(library.save(name: "Posterized", chain: PresetTest.single)))
@@ -129,8 +129,8 @@ enum PresetTest {
     @Test func refusedSavesAndRenamesChangeNothing() throws {
         let place = try PresetStoragePlace("refusals")
         defer { place.remove() }
-        let library = PresetLibrary(storage: place.storage)
-        for n in 1...PresetLibrary.maxPresets {
+        let library = LookLibrary(storage: place.storage)
+        for n in 1...LookLibrary.maxPresets {
             #expect(PresetTest.value(library.save(name: "Preset \(n)", chain: PresetTest.single)) != nil)
         }
         let before = try place.contents()
@@ -158,7 +158,7 @@ enum PresetTest {
         let place = try PresetStoragePlace("unreadable")
         defer { place.remove() }
         let storage = place.storage
-        let library = PresetLibrary(storage: storage)
+        let library = LookLibrary(storage: storage)
         let good = try #require(PresetTest.value(library.save(name: "Good", chain: PresetTest.mixed)))
         let valid = try storage.read(good.file)
         let validText = try #require(String(data: valid, encoding: .utf8))
@@ -166,11 +166,11 @@ enum PresetTest {
         let tail = "\"version\":1}"
         #expect(validText.hasSuffix(tail))
         try storage.write(Data((String(validText.dropLast(tail.count)) + "\"version\":2}").utf8), to: "preset-3.json")
-        try storage.write(Data(count: PresetLibrary.maxFileBytes + 1), to: "preset-4.json")
+        try storage.write(Data(count: LookLibrary.maxFileBytes + 1), to: "preset-4.json")
         try storage.write(Data(validText.replacingOccurrences(of: "\"vignette\"", with: "\"sparkle\"").utf8),
                           to: "preset-5.json")
         let before = try place.contents()
-        let listed = PresetLibrary(storage: storage)
+        let listed = LookLibrary(storage: storage)
         #expect(listed.entries.map(\.file) == ["preset-1.json", "preset-2.json", "preset-3.json", "preset-4.json",
                                                "preset-5.json"])
         #expect(listed.entries.map(\.refusal) == [nil, "damaged", "newer-version", "too-large", "unknown-effect"])
@@ -187,7 +187,7 @@ enum PresetTest {
         // A save after them takes the next number and keeps them; one is removed only on request.
         let saved = try #require(PresetTest.value(listed.save(name: "Later", chain: PresetTest.single)))
         #expect(saved.file == "preset-6.json" && listed.entries.first == saved)
-        for (name, data) in before where name != PresetLibrary.indexFile {
+        for (name, data) in before where name != LookLibrary.indexFile {
             #expect(try storage.read(name) == data, "\(name) kept")
         }
         #expect(PresetTest.failure(listed.remove(file: "preset-2.json")) == nil)
@@ -198,12 +198,12 @@ enum PresetTest {
         let place = try PresetStoragePlace("newer-index")
         defer { place.remove() }
         let storage = place.storage
-        let entry = try #require(PresetTest.value(PresetLibrary(storage: storage)
+        let entry = try #require(PresetTest.value(LookLibrary(storage: storage)
             .save(name: "Warm", chain: PresetTest.mixed)))
         try storage.write(Data("{\"body\":{},\"kind\":\"a25.preset-library\",\"version\":2}".utf8),
-                          to: PresetLibrary.indexFile)
+                          to: LookLibrary.indexFile)
         let before = try place.contents()
-        let library = PresetLibrary(storage: storage)
+        let library = LookLibrary(storage: storage)
         #expect(library.isReadOnly && library.indexProblem == "newer-version" && library.entries == [entry])
         #expect(PresetTest.failure(library.save(name: "Cold", chain: PresetTest.single)) == .readOnly)
         #expect(PresetTest.failure(library.rename(file: entry.file, to: "Cold")) == .readOnly)
@@ -216,12 +216,12 @@ enum PresetTest {
         let place = try PresetStoragePlace("damaged-index")
         defer { place.remove() }
         let storage = place.storage
-        let entry = try #require(PresetTest.value(PresetLibrary(storage: storage)
+        let entry = try #require(PresetTest.value(LookLibrary(storage: storage)
             .save(name: "Warm", chain: PresetTest.mixed)))
         let damaged = Data("[1, 2".utf8)
-        try storage.write(damaged, to: PresetLibrary.indexFile)
+        try storage.write(damaged, to: LookLibrary.indexFile)
         let before = try place.contents()
-        let library = PresetLibrary(storage: storage)
+        let library = LookLibrary(storage: storage)
         #expect(!library.isReadOnly && library.indexProblem == "damaged" && library.entries == [entry])
         #expect(library.next == 2, "the counter is recovered from the files")
         #expect(PresetTest.value(library.open(file: entry.file)) == PresetTest.mixed)
@@ -229,16 +229,16 @@ enum PresetTest {
         #expect(try place.contents() == before, "reading and opening do not rewrite the index")
         let saved = try #require(PresetTest.value(library.save(name: "Cold", chain: PresetTest.single)))
         #expect(saved.file == "preset-2.json")
-        let index = try PresetLibrary.decodeIndex(storage.read(PresetLibrary.indexFile)).get()
+        let index = try LookLibrary.decodeIndex(storage.read(LookLibrary.indexFile)).get()
         #expect(index.next == 3 && index.entries.map(\.file) == ["preset-2.json", "preset-1.json"])
-        #expect(PresetLibrary(storage: storage).indexProblem == nil)
+        #expect(LookLibrary(storage: storage).indexProblem == nil)
     }
 
     @Test func aFullQuotaRefusesWithTheMessageAndWritesNothing() throws {
         let place = try PresetStoragePlace("quota")
         defer { place.remove() }
         let storage = place.storage
-        let library = PresetLibrary(storage: storage)
+        let library = LookLibrary(storage: storage)
         let entry = try #require(PresetTest.value(library.save(name: "Warm", chain: PresetTest.mixed)))
         let used = try place.contents().values.reduce(0) { $0 + $1.count }
         try storage.write(Data(count: StorageQuota.maxBytes - used - 8), to: "filler.bin")
@@ -256,7 +256,7 @@ enum PresetTest {
     @Test func anInvalidChainIsRefusedBeforeWriting() throws {
         let place = try PresetStoragePlace("invalid-chain")
         defer { place.remove() }
-        let library = PresetLibrary(storage: place.storage)
+        let library = LookLibrary(storage: place.storage)
         let bad = EffectChain(nodes: [EffectNode(id: 1, effect: .grade, enabled: true,
                                                  values: ["exposure": 9, "contrast": 1, "saturation": 1])])
         #expect(PresetTest.failure(library.save(name: "Bad", chain: bad)) == .chain("out-of-range"))

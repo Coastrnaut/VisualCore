@@ -1,6 +1,6 @@
 # Contract: Effects Composer presets, compare and actions (A25-P03)
 
-- **Presenter:** `save(name:)`, `open(file:)`, `rename(file:to:)`, `remove(file:)`; results are `PresetLibraryFailure`
+- **Presenter:** `save(name:)`, `open(file:)`, `rename(file:to:)`, `remove(file:)`; results are `LookLibraryFailure`
   codes and messages.
 - **Identifiers:** `compare`, `presets`, `preset-name`, `preset-save`, `preset-row-<n>`, `preset-open-<n>`,
   `preset-remove-<n>`.

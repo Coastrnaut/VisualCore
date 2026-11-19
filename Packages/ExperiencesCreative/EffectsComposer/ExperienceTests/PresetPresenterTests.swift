@@ -65,7 +65,7 @@ import VisualCoreExperienceHost
         #expect(presenter.mirror.presets.isEmpty)
         #expect(try ComposerTest.core(shell).chain == saved, "removing keeps the chain")
         #expect(presenter.open(file: entry.file) == .failure(.missing))
-        #expect(presenter.mirror.libraryMessage == PresetLibraryFailure.missing.message)
+        #expect(presenter.mirror.libraryMessage == LookLibraryFailure.missing.message)
     }
 
     @Test func aRefusedSaveShowsItsMessageAndChangesNothing() async throws {
@@ -96,7 +96,7 @@ import VisualCoreExperienceHost
         #expect(presenter.open(file: "preset-1.json") == .failure(.unavailable))
         #expect(presenter.rename(file: "preset-1.json", to: "B") == .failure(.unavailable))
         #expect(presenter.remove(file: "preset-1.json") == .failure(.unavailable))
-        #expect(presenter.mirror.libraryMessage == PresetLibraryFailure.unavailable.message)
+        #expect(presenter.mirror.libraryMessage == LookLibraryFailure.unavailable.message)
     }
 
     @Test func replacingNeedsEveryPositionStaged() throws {

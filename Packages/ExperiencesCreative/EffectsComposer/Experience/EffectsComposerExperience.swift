@@ -3,7 +3,7 @@
 // the one app's registry calls, as `GraphicsBenchmarkLabExperience` does. The chain travels in the host's saved session
 // state (snapshot schema 1); the edit history does not.
 //
-// Feature 182 (A25-P03) T-A25-304 (clarification Q3): `storage` holds the presets (`PresetLibrary`); the factory hands
+// Feature 182 (A25-P03) T-A25-304 (clarification Q3): `storage` holds the presets (`LookLibrary`); the factory hands
 // the presenter the shell's port and current core, so opening a preset is one undoable edit through the core.
 import Foundation
 import VisualCoreExperience

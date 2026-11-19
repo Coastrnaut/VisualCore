@@ -17,7 +17,7 @@
 // Feature 182 (A25-P03) T-A25-304, T-A25-305, T-A25-307 (clarifications Q1, Q3, Q5; contracts/presets.md):
 //   - Compare: `draw` presents the source while the core's `compare` is on (the result is still rendered when the
 //     chain changes); the status line then says "Original" unless a refusal is shown.
-//   - Presets: the presenter holds the ``PresetLibrary`` over the launch's storage (nil without storage, then every
+//   - Presets: the presenter holds the ``LookLibrary`` over the launch's storage (nil without storage, then every
 //     library action is refused as `unavailable`) and the library actions `save(name:)`, `open(file:)`,
 //     `rename(file:to:)` and `remove(file:)`. Opening sends the preset's nodes to the core (`chain.stage`) and commits
 //     them with `chain.replace`, so opening is one undoable edit; the mirror carries the library's last sentence
@@ -92,7 +92,7 @@ final class ComposerMirror {
     /// Whether the preview shows the source (`view.compare` on).
     var compare = false
     /// The presets as the library lists them.
-    var presets: [PresetLibraryEntry] = []
+    var presets: [LookLibraryEntry] = []
     /// Whether the library is read only (written by a newer version).
     var presetsReadOnly = false
     /// Whether the experience has a library (made with storage).
@@ -124,7 +124,7 @@ final class ComposerPresenter: ExperiencePresenter {
     /// The pixel size of the last frame drawn; nil before the first.
     private var lastSize: (width: Int, height: Int)?
     /// The named chains in the launch's storage; nil when the experience was made without storage.
-    let library: PresetLibrary?
+    let library: LookLibrary?
     /// The shell's port, set by the factory (the library's open and the accessibility actions send through it).
     var port: ExperienceActionPort?
     /// The shell's current core, set by the factory (saving reads the chain from it).
@@ -132,7 +132,7 @@ final class ComposerPresenter: ExperiencePresenter {
 
     /// A presenter with a library over `storage` (none without storage).
     init(storage: ExperienceStorage? = nil) {
-        library = storage.map { PresetLibrary(storage: $0) }
+        library = storage.map { LookLibrary(storage: $0) }
         mirror.hasLibrary = library != nil
         followLibrary()
     }
@@ -278,7 +278,7 @@ final class ComposerPresenter: ExperiencePresenter {
 extension ComposerPresenter {
     /// Saves the current chain as `name` and shows "Saved <name>." or the refusal.
     @discardableResult
-    func save(name: String) -> Result<PresetLibraryEntry, PresetLibraryFailure> {
+    func save(name: String) -> Result<LookLibraryEntry, LookLibraryFailure> {
         guard let library else { return refuse(.unavailable) }
         guard let core = currentCore?() else { return refuse(.unavailable) }
         let result = library.save(name: name, chain: core.chain)
@@ -292,7 +292,7 @@ extension ComposerPresenter {
     /// Opens the preset `file` as one undoable edit (its nodes staged in the core, then `chain.replace`) and shows
     /// "Opened <name>." or the refusal; a refused open changes nothing in the chain or its history.
     @discardableResult
-    func open(file: String) -> Result<PresetLibraryEntry, PresetLibraryFailure> {
+    func open(file: String) -> Result<LookLibraryEntry, LookLibraryFailure> {
         guard let library, let port else { return refuse(.unavailable) }
         guard let entry = library.entry(file: file) else { return refuse(.missing) }
         switch library.open(file: file) {
@@ -308,7 +308,7 @@ extension ComposerPresenter {
 
     /// Renames the preset `file` to `name` and shows "Renamed <old> to <new>." or the refusal.
     @discardableResult
-    func rename(file: String, to name: String) -> Result<PresetLibraryEntry, PresetLibraryFailure> {
+    func rename(file: String, to name: String) -> Result<LookLibraryEntry, LookLibraryFailure> {
         guard let library else { return refuse(.unavailable) }
         let old = library.entry(file: file)?.name ?? file
         let result = library.rename(file: file, to: name)
@@ -321,7 +321,7 @@ extension ComposerPresenter {
 
     /// Removes the preset `file` (the chain stays as it is) and shows "Removed <name>." or the refusal.
     @discardableResult
-    func remove(file: String) -> Result<PresetLibraryEntry, PresetLibraryFailure> {
+    func remove(file: String) -> Result<LookLibraryEntry, LookLibraryFailure> {
         guard let library else { return refuse(.unavailable) }
         guard let entry = library.entry(file: file) else { return refuse(.missing) }
         switch library.remove(file: file) {
@@ -378,7 +378,7 @@ extension ComposerPresenter {
     }
 
     /// Shows `failure`'s sentence and returns it.
-    private func refuse(_ failure: PresetLibraryFailure) -> Result<PresetLibraryEntry, PresetLibraryFailure> {
+    private func refuse(_ failure: LookLibraryFailure) -> Result<LookLibraryEntry, LookLibraryFailure> {
         report(failure.message)
         return .failure(failure)
     }
@@ -395,11 +395,11 @@ extension ComposerPresenter {
 @MainActor
 struct ComposerPresetActions {
     /// Saves the current chain under a name (``ComposerPresenter/save(name:)``).
-    let save: @MainActor (String) -> Result<PresetLibraryEntry, PresetLibraryFailure>
+    let save: @MainActor (String) -> Result<LookLibraryEntry, LookLibraryFailure>
     /// Opens a preset (``ComposerPresenter/open(file:)``).
-    let open: @MainActor (String) -> Result<PresetLibraryEntry, PresetLibraryFailure>
+    let open: @MainActor (String) -> Result<LookLibraryEntry, LookLibraryFailure>
     /// Removes a preset (``ComposerPresenter/remove(file:)``).
-    let remove: @MainActor (String) -> Result<PresetLibraryEntry, PresetLibraryFailure>
+    let remove: @MainActor (String) -> Result<LookLibraryEntry, LookLibraryFailure>
     /// Applies a named accessibility action of a node (``ComposerPresenter/perform(accessibilityAction:at:)``).
     let perform: @MainActor (String, Int) -> Void
 

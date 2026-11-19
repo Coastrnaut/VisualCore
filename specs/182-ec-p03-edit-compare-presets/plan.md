@@ -40,10 +40,10 @@ Post-design: PASS.
 ```text
 Packages/ExperiencesCreative/EffectsComposer/Core/ChainEditing.swift (replace edit)                          modify
 Packages/ExperiencesCreative/EffectsComposer/CoreTests/HistoryTests.swift (replace and its undo)             modify
-Packages/ExperiencesCreative/EffectsComposer/Experience/PresetLibrary.swift                                  new
+Packages/ExperiencesCreative/EffectsComposer/Experience/LookLibrary.swift                                  new
 Packages/ExperiencesCreative/EffectsComposer/Experience/Adapter/ComposerCore.swift (view.compare)            modify
 Packages/ExperiencesCreative/EffectsComposer/Experience/{PreviewRenderer,ComposerPresenter,ECControls}.swift modify  compare, library actions, accessibility actions
-Packages/ExperiencesCreative/EffectsComposer/ExperienceTests/{CompareTests,PresetLibraryTests,AliasingTests,AccessibilityActionTests}.swift new
+Packages/ExperiencesCreative/EffectsComposer/ExperienceTests/{CompareTests,LookLibraryTests,AliasingTests,AccessibilityActionTests}.swift new
 docs/apps/effects-composer/visualcore-contract.json (G-EDIT, G-COMPARE, G-PRESETS closed; phases moved)  modify
 ```
 
@@ -53,7 +53,7 @@ docs/apps/effects-composer/visualcore-contract.json (G-EDIT, G-COMPARE, G-PRESET
 
 ## Parallel work
 
-- **Agent L:** PresetLibrary and PresetLibraryTests.
+- **Agent L:** LookLibrary and LookLibraryTests.
 - **Agent V:** replace edit, compare, accessibility actions, the audit and their tests (after L's library exists for the
   presenter actions).
 - **Lead:** the contract, runs and commits.

@@ -139,7 +139,7 @@ enum ComposerLabels {
     }
 
     /// The label of `preset-row-<n>`: the preset's name, or "<name>, unreadable (<code>)".
-    static func presetLabel(_ entry: PresetLibraryEntry) -> String {
+    static func presetLabel(_ entry: LookLibraryEntry) -> String {
         entry.refusal.map { entry.name + ", unreadable (" + $0 + ")" } ?? entry.name
     }
 }
@@ -236,7 +236,7 @@ struct ECControls: View {
     }
 
     /// The row of one preset: its name, `preset-open-<n>` (readable only) and `preset-remove-<n>`.
-    private func presetRow(_ entry: PresetLibraryEntry) -> some View {
+    private func presetRow(_ entry: LookLibraryEntry) -> some View {
         let n = entry.number
         return HStack(spacing: 12) {
             Text(verbatim: ComposerLabels.presetLabel(entry))
