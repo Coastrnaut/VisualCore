@@ -19,7 +19,7 @@
 
 ## Phase 2: Story 1 — a chain becomes an ordered set of passes (P1) 🎯
 
-- [ ] T-A25-203 [P] [US1] Create `Packages/ExperiencesCreative/EffectsComposer/Core/PassPlan.swift` per clarification Q1 and add `TestImage.make(size:)` (`make()`
+- [X] T-A25-203 [P] [US1] Create `Packages/ExperiencesCreative/EffectsComposer/Core/PassPlan.swift` per clarification Q1 and add `TestImage.make(size:)` (`make()` — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P02.ec-ios27.json exit 0 (42 core and 27 experience tests on sim-27.2); PassPlan per clarification Q1, TestImage.make(size:)
   stays 64 × 64) to `Packages/ExperiencesCreative/EffectsComposer/Core/TestImage.swift`
 - [ ] T-A25-204 [US1] Write `Packages/ExperiencesCreative/EffectsComposer/CoreTests/PassPlanTests.swift`: empty, single, all-disabled, mixed and full chains; no pass
   reads its output; each slot ends at its single reader; at most two slots; the 256 × 256 test image keeps the pattern

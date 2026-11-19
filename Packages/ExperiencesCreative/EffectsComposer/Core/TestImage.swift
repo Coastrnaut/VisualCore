@@ -5,6 +5,8 @@
 // Choices recorded here: the row index `y` counts from the top (row 0 is the first row of `bytes`). OpenGL stores and
 // reads textures bottom-up, so the tests flip rows when they upload or read back; the CPU reference states its
 // texture coordinate in the GL convention (see `EffectReference`). Pure Swift; no UI, GPU or clock.
+// Feature 181 (A25-P02) T-A25-203 (clarification Q2) adds `make(size:)`, the same pattern at any side 8…2,048 (clamped)
+// with checker cells of side/8 pixels, for the 256 × 256 preview source; `make()` stays the 64 × 64 image.
 
 /// An RGBA picture with 8 bits per channel, rows stored top-down.
 public struct RGBAImage: Equatable, Sendable {
@@ -54,17 +56,28 @@ public enum TestImage {
     /// The side of the square test image in pixels.
     public static let size = 64
 
+    /// The smallest side `make(size:)` accepts; smaller sides are clamped up to it.
+    public static let minimumSize = 8
+    /// The largest side `make(size:)` accepts (the preview pool's cap); larger sides are clamped down to it.
+    public static let maximumSize = 2_048
+
     /// The 64 × 64 test image: red ⌊255·x/63⌋, green ⌊255·y/63⌋ (y the top-down row), blue 255 where
-    /// (x/8 + y/8) is even and 0 elsewhere, alpha 255.
-    public static func make() -> RGBAImage {
-        let n = size
+    /// (x/8 + y/8) is even and 0 elsewhere, alpha 255. Equal to `make(size: 64)`.
+    public static func make() -> RGBAImage { make(size: size) }
+
+    /// The test image at `size × size` pixels (feature 181 T-A25-203, clarification Q2): red ⌊255·x/(n−1)⌋, green
+    /// ⌊255·y/(n−1)⌋ (y the top-down row), blue 255 on the checker cells of n/8 pixels where (x/cell + y/cell) is
+    /// even and 0 elsewhere, alpha 255, with n = `size` clamped to `minimumSize…maximumSize`.
+    public static func make(size: Int) -> RGBAImage {
+        let n = min(max(size, minimumSize), maximumSize)
+        let cell = n / 8
         var bytes = [UInt8](repeating: 0, count: n * n * 4)
         for y in 0..<n {
             for x in 0..<n {
                 let i = (y * n + x) * 4
                 bytes[i] = UInt8(255 * x / (n - 1))
                 bytes[i + 1] = UInt8(255 * y / (n - 1))
-                bytes[i + 2] = (x / 8 + y / 8) % 2 == 0 ? 255 : 0
+                bytes[i + 2] = (x / cell + y / cell) % 2 == 0 ? 255 : 0
                 bytes[i + 3] = 255
             }
         }
