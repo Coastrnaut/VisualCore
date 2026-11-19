@@ -1989,8 +1989,14 @@
       "status": "pass"
     },
     "A25-P04": {
-      "attempts": [],
-      "status": "pending"
+      "attempts": [
+        {
+          "at": "2026-11-19T20:23:02+00:00",
+          "evidence": ".autonomy/evidence/A25-P04.json",
+          "result": "pass"
+        }
+      ],
+      "status": "pass"
     },
     "A25-P05": {
       "attempts": [],
@@ -2413,5 +2419,5 @@
       "status": "pending"
     }
   },
-  "updated": "2026-11-19T20:01:55+00:00"
+  "updated": "2026-11-19T20:23:02+00:00"
 }
