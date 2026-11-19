@@ -49,7 +49,7 @@
 
 ## Phase 5: Story 5 — the chain file (P2)
 
-- [ ] T-A25-109 [P] [US5] Create `Packages/ExperiencesCreative/EffectsComposer/Core/ChainDocument.swift` per clarification Q3 and write
+- [X] T-A25-109 [P] [US5] Create `Packages/ExperiencesCreative/EffectsComposer/Core/ChainDocument.swift` per clarification Q3 and write — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P01.ec-core-ios27.json exit 0 (35 tests in 8 suites on sim-27.2); ChainDocument byte-identical round trip and every refusal code
   `Packages/ExperiencesCreative/EffectsComposer/CoreTests/ChainDocumentTests.swift`: byte-identical round trip; every refusal code from a damaged, newer,
   oversized, non-finite, out-of-range, unknown-effect, unknown-parameter, missing-parameter, too-many-nodes and
   duplicate-node file
