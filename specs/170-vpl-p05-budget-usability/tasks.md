@@ -41,7 +41,7 @@
 
 ## Phase 5: Story 5 — the device plan (P3)
 
-- [ ] T-A23-507 [P] [US5] Write `docs/apps/visual-programming-lab/device-campaign.md` per clarification Q5 (rows VPL-D1 to
+- [X] T-A23-507 [P] [US5] Write `docs/apps/visual-programming-lab/device-campaign.md` per clarification Q5 (rows VPL-D1 to — Verified 2026-11-19: 2026-11-19: docs/apps/visual-programming-lab/device-campaign.md: rows VPL-D1 to VPL-D6 for D1 iPhone 15 (iOS 27), D2 iPad Pro 13-inch (M5) and D3 iPad (A16) on iPadOS 26.5 (18 rows, all pending; steps, expected results, owner actions; only code constants, no measured figure), linked from the README; validate_docs PASS; written by an agent, reviewed
   VPL-D6 for D1, D2, D3; steps, expected result, owner actions, state pending) after
   `docs/apps/shader-studio/device-campaign.md`, and link it from the README (SC-A23-505)
 

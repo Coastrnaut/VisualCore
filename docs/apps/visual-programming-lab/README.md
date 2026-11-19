@@ -29,3 +29,4 @@ a host test that proves checking creates no graphics resource.
 | [visualcore-contract.json](visualcore-contract.json) / [.md](visualcore-contract.md) | Phase 00 inventory, capability matrix, gaps, decision (checked by `scripts/check_app_contract.py`) |
 | [regression-baseline.md](regression-baseline.md) | Phase start, reference pin, the ProjectM reference regression results |
 | [licenses.md](licenses.md) | Licenses and provenance: the example graphs, node kinds, operators and grid written in this repository; VisualCore's `vc/` GLSL; no third-party asset (A23-P04) |
+| [device-campaign.md](device-campaign.md) | Device campaign plan: rows VPL-D1 to VPL-D6 for D1, D2 and D3 (largest example's texture memory and pacing, a 7-slot refusal, touch wiring and the list form, pacing under heat and Low Power Mode, context loss, the deferred accessibility audits), all pending until after ImplementationLock-100 (A23-P05) |
