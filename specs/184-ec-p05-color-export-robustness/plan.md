@@ -60,7 +60,7 @@ Packages/ExperiencesCreative/EffectsComposer/Experience/ECControls.swift        
 Packages/ExperiencesCreative/EffectsComposer/ExperienceTests/ColorPathTests.swift   new
 Packages/ExperiencesCreative/EffectsComposer/ExperienceTests/StillExportTests.swift new
 Packages/ExperiencesCreative/EffectsComposer/ExperienceTests/RobustnessTests.swift  new
-docs/apps/effects-composer/device-plan.md                                           new     D1–D3 {device}
+docs/apps/effects-composer/device-campaign.md                                           new     D1–D3 {device}
 docs/apps/effects-composer/visualcore-contract.json; README.md                      modify  G-COLOR, G-EXPORT, G-ROBUST closed
 ```
 

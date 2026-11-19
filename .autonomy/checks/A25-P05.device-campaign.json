@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "sh",
+    "-c",
+    "test $(grep -c \"| pending device campaign |\" docs/apps/effects-composer/device-campaign.md) -eq 7 && python3 scripts/validate_docs.py"
+  ],
+  "command": "sh -c 'test $(grep -c \"| pending device campaign |\" docs/apps/effects-composer/device-campaign.md) -eq 7 && python3 scripts/validate_docs.py'",
+  "elapsed_seconds": 0.148,
+  "exit_code": 0,
+  "finished": "2026-11-19T20:31:31+00:00",
+  "log": ".autonomy/logs/A25-P05.device-campaign.log",
+  "log_sha256": "1ae33110b9755402354397c70a83e42658a2763fa3250c4eed51a52d0bde95ed",
+  "name": "device-campaign",
+  "stage": "A25-P05",
+  "started": "2026-11-19T20:31:31+00:00",
+  "timed_out": false
+}

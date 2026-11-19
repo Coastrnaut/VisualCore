@@ -71,7 +71,7 @@ in code:
   memory to export this picture."). A memory warning (`UIApplication.didReceiveMemoryWarningNotification`, observed
   through an injectable `NotificationCenter`) calls `ResourceRegistry.trimPools()`; held targets stay, so the preview
   is unchanged. A size change letterboxes the unchanged result into the new view.
-- Q: What is written for the devices? → A: `docs/apps/effects-composer/device-plan.md`: for D1, D2 and D3 ({device},
+- Q: What is written for the devices? → A: `docs/apps/effects-composer/device-campaign.md`: for D1, D2 and D3 ({device},
   after ImplementationLock-100; D3 stays on iPadOS 26.5) the peak memory of a 2,048-pixel picture with eight effects,
   the preview frame time while editing, the export time per format and recovery after backgrounding, each with the
   limit it must meet.
