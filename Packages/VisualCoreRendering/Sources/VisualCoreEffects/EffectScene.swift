@@ -1,6 +1,7 @@
 // EffectScene.swift — wraps any RenderScene with an effect graph (feature 005 T-F415; FR-F410, FR-F411).
 // The content renders into a pooled-size scene target, the graph runs over it, and the result is
 // copied to the window. With `reduceFlashing` the flash limiter is appended as the final pass.
+// Feature 207 R02-F07 T-R02F07-005: for a graph with an `emissive` pass the limiter measures linear light.
 import CVisualCoreGL
 import VisualCoreEffectsGraph
 import VisualCoreRendering
@@ -38,12 +39,16 @@ public final class EffectScene: RenderScene {
         self.graph = graph
     }
 
-    /// The graph actually run: the app graph plus the limiter when Reduce Flashing is on.
+    /// The graph actually run: the app graph plus the limiter when Reduce Flashing is on. When the app graph contains
+    /// an `emissive` pass the limiter also gets `linear` = 1, so it measures linear light (feature 207); otherwise its
+    /// parameters are only `limit`.
     public var effectiveGraph: EffectGraphDescription {
         guard reduceFlashing else { return graph }
         var g = graph
+        var params: [String: [Double]] = ["limit": [flashLimitPerSecond]]
+        if graph.passes.contains(where: { $0.type == "emissive" }) { params["linear"] = [1] }
         g.passes.append(EffectPassDescription(id: Self.flashLimitPassID, type: "flashLimit", inputs: ["input": graph.output],
-                                              output: Self.flashLimitPassID, params: ["limit": [flashLimitPerSecond]]))
+                                              output: Self.flashLimitPassID, params: params))
         g.output = Self.flashLimitPassID
         return g
     }

@@ -29,7 +29,7 @@
 
 ## Phase 3: Stories 1, 2 and 4 — the pass (P1) 🎯
 
-- [ ] T-R02F07-005 [US1] [US2] [US4] Modify `Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectShaders.swift`
+- [X] T-R02F07-005 [US1] [US2] [US4] Modify `Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectShaders.swift` — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F07.rendering-27.json (exit 0; EmissivePassTests 12; worst 1.28/255 vs 2/255)
   (emissive prefilter, blur and composite programs with a local unclamped decode; composite mode 2; limiter linear
   luma), `EffectPasses.swift` (`EmissivePass`: blur targets `max(1, side/2)` or `max(1, side/4)` from the pool, half
   float via `FloatRenderSupport` else rgba8 with one `ResourceRegistry.warn`, internal `forceStandardPrecision`;

@@ -1,5 +1,6 @@
 // EffectRenderer.swift — runs a validated effect graph on pooled targets (feature 005; FR-F402–FR-F408,
-// FR-F411). Contract: specs/005-effects-graph/contracts/effects-api.md.
+// FR-F411). Contract: specs/005-effects-graph/contracts/effects-api.md. Feature 207 R02-F07 T-R02F07-005: the
+// `emissive` pass type (output `.rgba8` at the pass's scale; its blur targets are the pass's own pooled targets).
 import CVisualCoreGL
 import VisualCoreEffectsGraph
 import VisualCoreRendering
@@ -21,7 +22,10 @@ public final class EffectRenderer {
     /// Test hook: passes forced to fail at build time (fault injection, T-F413).
     var injectedFailures: Set<String> = []
 
-    private var runners: [String: EffectPassRunner] = [:]
+    /// Test switch (feature 207): emissive passes of this renderer use `.rgba8` blur targets.
+    var forceStandardPrecision = false
+
+    private(set) var runners: [String: EffectPassRunner] = [:]
     private var fallback: CopyPass?
     private var generation = -1
     private var heldTargets: [RenderTarget] = []
@@ -92,6 +96,7 @@ public final class EffectRenderer {
         do {
             if injectedFailures.contains(pass.id) { throw ShaderError.compile([]) }
             let r = try EffectRenderer.makeRunner(type: pass.type, registry: registry)
+            (r as? EmissivePass)?.forceStandardPrecision = forceStandardPrecision
             runners[pass.id] = r
             return r
         } catch {
@@ -110,6 +115,7 @@ public final class EffectRenderer {
         case "composite": return try CompositePass(registry: registry)
         case "feedback": return try FeedbackPass(registry: registry)
         case "flashLimit": return try FlashLimitPass(registry: registry)
+        case "emissive": return try EmissivePass(registry: registry)
         default: throw EffectGraphError.unknownType(type, pass: "")
         }
     }

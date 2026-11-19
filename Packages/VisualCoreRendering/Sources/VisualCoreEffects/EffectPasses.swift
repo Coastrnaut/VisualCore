@@ -1,5 +1,6 @@
 // EffectPasses.swift — built-in pass runners (feature 005; FR-F405, FR-F406). Each pass owns its
 // program(s) (from the registry cache) and draws into a pooled target supplied by EffectRenderer.
+// Feature 207 R02-F07 T-R02F07-005: EmissivePass, composite mode 2 and the limiter's `linear` luma.
 import CVisualCoreGL
 import VisualCoreEffectsGraph
 import VisualCoreRendering
@@ -141,7 +142,7 @@ final class DistortPass: EffectPassRunner {
     }
 }
 
-/// `composite`: base + overlay, mode 0 = over (alpha × opacity), mode 1 = add.
+/// `composite`: base + overlay, mode 0 = over (alpha × opacity), mode 1 = add, mode 2 = premultiplied over (feature 207).
 @MainActor
 final class CompositePass: EffectPassRunner {
     private let program: ShaderProgram
@@ -213,7 +214,10 @@ final class FlashLimitPass: EffectPassRunner {
             probe = try io.registry.makeRenderTarget(width: Self.grid, height: Self.grid, label: "flash limiter probe")
         }
         guard let probe else { return }
-        drawFullscreen(luma, into: probe, textures: [("input", input)])
+        // Feature 207: `linear` = 1 measures decoded (linear-light) luma; 0 measures the encoded values as before.
+        drawFullscreen(luma, into: probe, textures: [("input", input)]) {
+            $0.set("u_linear", io.params.scalar("linear", 0) >= 0.5 ? Float(1) : Float(0))
+        }
         let pixels = probe.readPixels()
         let count = max(1, pixels.count / 4)
         let mean = stride(from: 0, to: pixels.count, by: 4).reduce(0.0) { $0 + Double(pixels[$1]) } / Double(count) / 255
@@ -228,5 +232,79 @@ final class FlashLimitPass: EffectPassRunner {
         if let probe { registry.release(probe) }
         probe = nil
         model = nil
+    }
+}
+
+/// `emissive` (feature 207 R02-F07 T-R02F07-005; FR-R02F07-001…003; research R1–R4): linear-light bright extraction
+/// with a soft knee into a half- or quarter-size target, a separable 9-tap Gaussian there, then one composite at the
+/// output size that adds the upsampled glow, applies exposure and the tone map and encodes to sRGB.
+///
+/// The two blur targets are `max(1, w / d) × max(1, h / d)` (d = 2 for `quality` 0, 4 for 1, rounded) of the pass's
+/// output, taken from the registry pool and recycled every frame. They are `.rgba16f` when
+/// `FloatRenderSupport.detect(in:)` reports support and `forceStandardPrecision` is off; otherwise `.rgba8`, which
+/// limits the glow to 1, warned once per pass instance.
+@MainActor
+final class EmissivePass: EffectPassRunner {
+    /// Warning recorded once per renderer when the blur targets fall back to 8 bits.
+    static let standardPrecisionWarning = "emissive: standard precision, glow limited to 1"
+
+    private let prefilter: ShaderProgram, blur: ShaderProgram, composite: ShaderProgram
+    /// Test switch: use `.rgba8` blur targets even where half float is supported.
+    var forceStandardPrecision = false
+    /// Size of the blur targets of the last frame (tests).
+    private(set) var lastBlurSize: SIMD2<Int>?
+    /// Format of the blur targets of the last frame (tests).
+    private(set) var lastBlurFormat: TextureFormat?
+    private var warned = false
+
+    init(registry: ResourceRegistry) throws {
+        prefilter = try registry.program(vertex: EffectShaders.vertex, fragment: EffectShaders.emissivePrefilter)
+        blur = try registry.program(vertex: EffectShaders.vertex, fragment: EffectShaders.emissiveBlur)
+        composite = try registry.program(vertex: EffectShaders.vertex, fragment: EffectShaders.emissiveComposite)
+    }
+
+    /// Side divisor from `quality`: 2 (half) below 0.5, 4 (quarter) from 0.5, as `PassSchemas.emissiveBlurDivisor`.
+    nonisolated static func divisor(quality: Double) -> Int { quality.rounded() >= 1 ? 4 : 2 }
+
+    /// Blur-target size for an output of `width × height`: `max(1, side / d)` with integer division.
+    nonisolated static func blurSize(width: Int, height: Int, quality: Double) -> SIMD2<Int> {
+        let d = divisor(quality: quality)
+        return SIMD2(max(1, width / d), max(1, height / d))
+    }
+
+    func run(_ io: PassIO) throws {
+        guard let input = io.inputs["input"] else { return }
+        let r = io.registry
+        let size = Self.blurSize(width: io.output.width, height: io.output.height, quality: io.params["quality"]?.first ?? 0)
+        let format: TextureFormat
+        if !forceStandardPrecision, FloatRenderSupport.detect(in: r).supported {
+            format = .rgba16f
+        } else {
+            format = .rgba8
+            if !warned { warned = true; _ = r.warn(Self.standardPrecisionWarning) }
+        }
+        lastBlurSize = size
+        lastBlurFormat = format
+        let a = try r.acquireTarget(width: size.x, height: size.y, format: format)
+        defer { r.recycle(a) }
+        let b = try r.acquireTarget(width: size.x, height: size.y, format: format)
+        defer { r.recycle(b) }
+        let radius = io.params.scalar("radius", 4)
+        drawFullscreen(prefilter, into: a, textures: [("input", input)]) { p in
+            p.set("u_tapOffset", SIMD2<Float>(0.25 / Float(size.x), 0.25 / Float(size.y)))
+            p.set("u_threshold", io.params.scalar("threshold", 1))
+            p.set("u_knee", io.params.scalar("knee", 0.5))
+        }
+        drawFullscreen(blur, into: b, textures: [("input", a)]) { p in
+            p.set("u_direction", SIMD2<Float>(1, 0)); p.set("u_radius", radius)
+        }
+        drawFullscreen(blur, into: a, textures: [("input", b)]) { p in
+            p.set("u_direction", SIMD2<Float>(0, 1)); p.set("u_radius", radius)
+        }
+        drawFullscreen(composite, into: io.output, textures: [("input", input), ("glow", a)]) { p in
+            p.set("u_intensity", io.params.scalar("intensity", 1))
+            p.set("u_exposure", io.params.scalar("exposure", 0))
+            p.set("u_tonemap", Float((io.params["tonemap"]?.first ?? 0).rounded()))
+        }
     }
 }
