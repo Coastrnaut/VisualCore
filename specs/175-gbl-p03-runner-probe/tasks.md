@@ -12,7 +12,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T-A24-301 Baseline: cite the A24-P02 evidence (`.autonomy/checks/A24-P02.{gbl-ios27-2,app-unit,verify-27-2}.json`)
+- [X] T-A24-301 Baseline: cite the A24-P02 evidence (`.autonomy/checks/A24-P02.{gbl-ios27-2,app-unit,verify-27-2}.json`) — Verified 2026-11-19: 2026-11-19: .autonomy/checks/A24-P02.{gbl-ios27-2,app-unit,verify-27-2}.json exit 0 at A24-P02; Packages unchanged since b993d3a5
   on the tree recorded at A24-P02 (`b993d3a5`), whose Packages are unchanged since (owner ruling of 2026-11-14)
 
 ## Phase 2: VisualCore — U-RENDERINFO and U-GPUTIMER (P1)
