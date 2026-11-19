@@ -12,7 +12,7 @@
 
 ## Phase 2: Story 1 — adaptive curves (P1) 🎯
 
-- [ ] T-R02F08-002 [US1] Create `Packages/VisualCore/Sources/VisualCoreScenes/CurveSplines.swift` (`ParametricCurve`,
+- [X] T-R02F08-002 [US1] Create `Packages/VisualCore/Sources/VisualCoreScenes/CurveSplines.swift` (`ParametricCurve`, — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F08.host.json (swift test exit 0; 18 of 18 curve/tolerance cases within tolerance, worst ratio 0.996)
   `CubicBezierChain` — open 3n + 1, closed 3n control points, n ≥ 1, finite; `CatmullRomSpline` — centripetal alpha 0.5,
   ≥ 2 distinct points open with phantom end points, ≥ 3 closed; exact positions and derivatives) and
   `Packages/VisualCore/Sources/VisualCoreScenes/CurveSampler.swift` (`CurveSamples`; `CurveSampler.sample` per
