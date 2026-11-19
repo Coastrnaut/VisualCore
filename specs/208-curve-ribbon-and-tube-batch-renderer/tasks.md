@@ -19,8 +19,10 @@
   clarification Q2: 5 interior points, depth 20, at least one split unless collinear, ≤ 65,536 samples, finite
   positive tolerance, cumulative chord arc lengths), with tests
   `Packages/VisualCore/Tests/VisualCoreScenesTests/CurveSplineTests.swift` (end points interpolated, derivative vs
-  finite differences, refusals) and `CurveSamplerTests.swift` (6 reference curves × 3 tolerances within tolerance on
-  1,000 points per segment; straight line → 2 samples; budget refusal; deterministic)
+  finite differences, refusals) and `CurveSamplerTests.swift` (6 reference curves × 3 tolerances within tolerance, measured against the spline itself on 1,000 points per
+  segment; the circle, helix, trefoil and Lissajous figure are Catmull-Rom splines through points of the analytic
+  shape (closed where it closes), the S curve a two-segment Bézier chain; the straight line is a one-segment Bézier
+  with collinear control points → 2 samples; budget refusal; deterministic; analyze A1, A2)
 
 ## Phase 3: Story 2 — frames (P1)
 
