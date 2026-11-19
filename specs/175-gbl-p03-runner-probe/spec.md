@@ -154,6 +154,10 @@ context rebuild or leaving, and flags frames it judges dropped by a documented r
 - **Thermal state changes during a run:** both the start and end states are recorded and the report flags the change.
 - **Low Power Mode on:** recorded; the run still measures.
 - **The extension missing on a device:** the probe reports unsupported and nothing is timed.
+- **The extension listed but its entry points not resolved (for example a stand-in renderer on a build machine):** the
+  timer is not created and the run behaves as unsupported; the timer tests then assert that and say so, never a pass
+  that timed nothing.
+- **Units:** the query result is in nanoseconds; GPU times are stored in milliseconds (nanoseconds / 1,000,000).
 
 ## Requirements *(mandatory)*
 
