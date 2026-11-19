@@ -24,6 +24,69 @@ Canonical overrides:
 - **Constitution:** 2.21.0 adds the A25 experience rules (committed at the start of this gate, `eec911ea`).
 - Follow `specs/172-gbl-p00-boundary-audit`.
 
+## Clarifications
+
+### Session 2026-11-19
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code by a read-only survey, then spot-checked:
+- **Commits:** the A25 constitution commit is `eec911ea` and the A25-P00 specify commit is `a2d68e21`, the phase start
+  for the no-change diff of `Packages` and `External`. The reference submodule is pinned at `d93edd1`.
+- **Registry and catalog:** twenty-four experiences are registered in `Catalog/registrations.json` (A01–A24) and the
+  candidates list is empty; `a25` is no registration (`AppModelTests` uses it as the synthetic not-yet-integrated id);
+  the catalog lists Effects Composer as free, family "Developer and creator tools", launcher category tools,
+  unavailable.
+- **Host rule:** `RenderHost`, `ResourceRegistry`, `RenderScene` and `ExperiencePresenter` are main-actor. GL work
+  happens only inside a scene's `setup`, `resize`, `render` and `teardown`, with the host's context current. A
+  presenter receives a `RenderContext` (generation, pixel size, framebuffer, `resources`), never the host.
+- **VisualCore offers** (public in a framework product and tested):
+  - **passes and targets:** `FieldPass` (a full-screen fragment program with named `RenderTarget` inputs and
+    `FieldUniform` values float, vec2, vec4 and int; `FieldPassError.compile`), `ResourceRegistry.makeRenderTarget`
+    (completeness checked), `acquireTarget`/`recycle`/`trimPools`, `PingPongTarget`, `TextureFormat` rgba8, rgba16f and
+    r8, `FloatRenderSupport`, `ResourceBudget` and `ResourceRegistry.stats`;
+  - **an effects graph:** `EffectGraphDescription`, `EffectGraphValidator` (quota, cycles, at most 32 passes) and the
+    GPU `EffectRenderer`/`EffectScene` with pooled targets, over a closed set of pass types (copy, colorMatrix, blur,
+    bloom, distort, composite, feedback, flashLimit) whose runners and shaders are internal;
+  - **shaders:** `ShaderLibrary` with `#include`, the bundled `vc/color.glsl` (`vc_srgbEncode`, `vc_srgbDecode`),
+    `InfoLogParser` and `ShaderDiagnostic`, the program cache on `ResourceRegistry.program`;
+  - **parameters and persistence:** `ParameterDefinition`, `ParameterSchema`, `ExperienceControl`, `ExperienceStorage`,
+    `MigrationChain`, `DocumentStore`, `NamedLibrary` and versioned envelopes;
+  - **export:** `RenderTarget.readPixels`, `RenderHost.renderOffscreen`, `StillImage`, `StillImageEncoder` (PNG,
+    JPEG, HEIC through ImageIO, tagged sRGB), `ExportGeometry` (hard maximum edge 8,192) and `TemporaryFolder`;
+  - **limits:** `RenderCapabilities.maxTextureSize` and `ResourceRegistry.maxTextureSize`.
+- **Missing:**
+  - a byte-wise upload into a render target: `Texture.upload(rgba:)` fills a `Texture`, which `FieldPass` cannot sample,
+    and a `RenderTarget` takes only `upload(rgbaFloats:)` (four floats per pixel);
+  - any image decoding into pixels (no CGImage or UIImage path) and any photo picker in the repository;
+  - an sRGB texture format, `vec3` and `mat4` field uniforms, and a shared still-export `Transferable`.
+
+- Q: How are the five effects drawn? → A: App-locally as `FieldPass` programs compiled from the experience's own
+  linear chain (gaps G-EFFECTS and G-COMPILER, A25-P01 and A25-P02), after Visual Programming Lab's preview pipeline:
+  each pass reads named targets and writes a pooled target, never the one it reads. The internal `EffectRenderer` pass
+  set is not used, because new effects cannot be added to it from outside. Parameters wider than `vec4` are packed into
+  several `vec4` uniforms; no VisualCore change is planned for passes or uniforms.
+- Q: How does an imported image become an input? → A: The person picks it with the system photo picker, which runs out
+  of process and needs no usage string or permission word (gap G-IMPORT, A25-P03); the experience decodes it with
+  ImageIO into RGBA bytes on the CPU, scaled by a stated rule so its longer edge is at most the smaller of the texture
+  limit and the experience's cap, and keeps those bytes so the source is uploaded again after a context loss. The
+  upload needs a byte-wise `RenderTarget.upload(rgba:)` in VisualCoreRendering (gap U-RGBAUPLOAD, A25-P03, with tests,
+  docs, the API baseline and the reference regression), because four floats per pixel would quadruple the memory of a
+  large image. A cancelled pick leaves the built-in test image.
+- Q: Where are colour-space boundaries? → A: The source and the export are sRGB-encoded bytes; each pass states whether
+  it decodes to linear light (`vc_srgbDecode`) and encodes back (`vc_srgbEncode`), with intermediate targets in
+  `rgba16f` where `FloatRenderSupport` reports it renderable and `rgba8` otherwise (gap G-COLOR, A25-P05).
+- Q: How are diagnostics, presets and export owned? → A: App-locally. Compile and link failures arrive as
+  `FieldPassError.compile` text and are mapped to `ShaderDiagnostic` lines after Shader Studio (gap G-DIAG, A25-P02).
+  Presets are versioned envelopes in `ExperienceStorage` with damaged and newer files refused and never deleted
+  automatically (gap G-PRESETS, A25-P04). Export renders the chain at the export size into a pooled target, reads it
+  back, encodes it with `StillImageEncoder` after a size and format check against `ExportGeometry` and
+  `StillImageEncoder.isAvailable`, and hands the file to a `Transferable` and `ShareLink` the person opens, after Living
+  Wallpapers (gap G-EXPORT, A25-P04).
+- Q: Which permission does the experience declare? → A: `photo-library-add`, like Living Wallpapers and Digital Zen
+  Garden, because the share sheet's Save Image writes to the photo library; the app already carries
+  `NSPhotoLibraryAddUsageDescription`. No read permission is declared, because the picker needs none. The
+  registration's permissions are set when the experience registers (A25-P02) and checked at release (G-RELEASE).
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - An evidence-backed integration matrix (Priority: P1) 🎯
