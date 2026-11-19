@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test",
+  "elapsed_seconds": 44.859,
+  "exit_code": 0,
+  "finished": "2026-11-19T22:46:14+00:00",
+  "gate": "R02-F08",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-F08.baseline-rendering.log",
+  "log_sha256": "c002745ed1df95a99e2f6889ffc93eca979564d832f277a5b58a3377364ca141",
+  "name": "baseline-rendering",
+  "started": "2026-11-19T22:45:29+00:00",
+  "timed_out": false
+}
