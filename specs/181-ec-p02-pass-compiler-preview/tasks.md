@@ -90,3 +90,11 @@
 - **Then:** diagnostics and the pool (208), registration (209, 210).
 - **Review checkpoint:** at 211.
 - **Commits:** one per task.
+
+## Phase 6: Convergence
+
+- [ ] T-A25-215 Record the as-built design in `specs/181-ec-p02-pass-compiler-preview/{data-model.md,contracts/experience.md}`:
+  the result target is held from setup to teardown (slots are recycled per render) so a broken program keeps the last
+  good picture; the chain is redrawn only when its fingerprint changes; the outcome `effects-<k>`; the frame probe at
+  checker cell (2,2); the extra test seams; 0-based node identifiers, per clarifications Q2 and Q5 (contradicts,
+  unrequested)
