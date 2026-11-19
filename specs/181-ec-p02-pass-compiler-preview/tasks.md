@@ -29,7 +29,7 @@
 
 - [X] T-A25-205 [US2] Create `Packages/ExperiencesCreative/EffectsComposer/Experience/Adapter/ComposerCore.swift` per clarification Q3 (snapshot schema 1, digest — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P02.ec-ios27.json exit 0 (42 core and 27 experience tests on sim-27.2); ComposerCore schema 1, seven actions, rule ids
   `a25.effects-composer.v1`, the seven actions, rule ids)
-- [ ] T-A25-206 [US2] [US3] Create `Packages/ExperiencesCreative/EffectsComposer/Experience/{PreviewRenderer,ComposerPresenter,ECControls,EffectsComposerExperience}.swift`
+- [X] T-A25-206 [US2] [US3] Create `Packages/ExperiencesCreative/EffectsComposer/Experience/{PreviewRenderer,ComposerPresenter,ECControls,EffectsComposerExperience}.swift` — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P02.ec-ios27.json exit 0 (42 core and 27 experience tests on sim-27.2); preview renderer, presenter, inline controls with spoken labels
   per clarifications Q2, Q4 and Q5 (programs built in setup, pooled targets, plan recompiled on a fingerprint change,
   present pass, diagnostics, the test seams `programOverride` and `lastResult`, the inline controls with spoken labels)
 - [ ] T-A25-207 [US2] [US3] Write `Packages/ExperiencesCreative/EffectsComposer/ExperienceTests/{ComposerTestSupport,ComposerCoreTests,PreviewDrawTests,IdentityTests}.swift`:
