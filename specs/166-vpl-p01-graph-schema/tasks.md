@@ -66,7 +66,7 @@
 
 ## Phase 5: Records and evidence
 
-- [ ] T-A23-109 Core tests on sim-27.2, as a review checkpoint (SC-A23-106, FR-A23-107):
+- [X] T-A23-109 Core tests on sim-27.2, as a review checkpoint (SC-A23-106, FR-A23-107): — Verified 2026-11-18: 2026-11-18: review checkpoint: .autonomy/checks/A23-P01.vpl-core-ios27.json exit 0 (70 tests in 7 suites on sim-27.2, slowest 0.047 s), A23-P01.core-purity.json, A23-P01.documented-api.json and A23-P01.isolation.json exit 0
   - `--name vpl-core-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme
     ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing VisualProgrammingLabCoreTests`,
     with each test under 10 s;
