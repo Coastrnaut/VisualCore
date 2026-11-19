@@ -34,7 +34,7 @@
 - [X] T-A24-404 [US2] `Experience/ResultLibrary.swift` per clarification Q2 (FR-A24-402, 403): `result-<n>.json` and — Verified 2026-11-19: 2026-11-19: .autonomy/checks/A24-P04.gbl-ios27.json exit 0 (79 core and 53 experience tests); ResultLibrary (result-<n>.json and results.json, at most 12 results of 2,162,688 bytes, refusal codes, read-only newer index, messages)
   `results.json`, "at most 12 results", files of "at most 2,162,688 bytes", refusal codes, a newer index read only, a
   damaged index rebuilt only by the next change, the two messages, newest first by order
-- [ ] T-A24-405 [US2] `ExperienceTests/ResultLibraryTests.swift` (SC-A24-401, 402): save and open in a new session
+- [X] T-A24-405 [US2] `ExperienceTests/ResultLibraryTests.swift` (SC-A24-401, 402): save and open in a new session — Verified 2026-11-19: 2026-11-19: .autonomy/checks/A24-P04.gbl-ios27.json exit 0 (79 core and 53 experience tests); ResultLibraryTests (round trip, cap, unreadable files kept, full storage, remove, repeated save, unknown case version)
   give equal runs; the 13th save is refused and nothing is removed; damaged, truncated, newer, oversized and
   non-finite files are listed with their reason and stay byte-identical; a full storage refuses with the message;
   remove deletes only the chosen file; a repeated save of the same run is refused; a saved result of a case version the app does not
