@@ -11,6 +11,7 @@
   sets the viewport from the origin; no VisualCore change.
 - **D6 References (Q4):** gradient, mix, flat colour, blur-of-ramp and copy have closed-form CPU references; noise is
   tested for determinism and dependence on its parameters, not against a CPU port.
-- **D7 Viewport (analyze):** `FieldPass.run` sets the viewport to its output and leaves it; `FullScreenShaderScene`
-  sets none and the host does not reset it between frames, so the grid is drawn by a full-framebuffer `FieldPass` first
-  in every frame (checked in code: `FieldPass.swift` line 138; no viewport call in `FullScreenShaderScene.swift`).
+- **D7 Viewport (analyze, corrected at implement):** the analyze step read that the host never resets the viewport, but
+  `RenderHost` sets it to the whole drawable before each frame (`RenderHost.swift` line 419, and `renderOffscreen`), so
+  an inset's viewport never carries into the next frame. The grid drawn by a full-framebuffer `FieldPass` was kept: it
+  is harmless, and its test (`afterAnInsetFrameTheNextGridCoversTheWholeDrawable`) holds either way.
