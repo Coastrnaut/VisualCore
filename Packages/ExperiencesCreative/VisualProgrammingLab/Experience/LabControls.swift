@@ -15,6 +15,12 @@
 //   - the connections, one line each (`connection-<target>-<index>`, "Noise 1 image → Output 2 image");
 //   - `preview-toggle` (feature 168, A23-P03, T-A23-304; clarification Q5): a native switch "Preview" that shows or
 //     hides the preview inset; view state only, so it sends no action and changes neither the graph nor its digest.
+//   - Feature 169 (A23-P04) T-A23-404, T-A23-406 (FR-A23-401, FR-A23-404; clarifications Q1, Q2, Q4;
+//     contracts/library.md "Identifiers"): `library` ("Library", shown when the experience has storage) opens the
+//     graph library (``LabLibraryView``) in a sheet; `examples` is the "Examples" menu, one item `example-<id>` per
+//     example ("Open the example Clouds"), opened through the presenter's `request(_:)`; when the open graph differs
+//     from the last saved or opened one, `library-replace-confirm` asks first (``ReplaceConfirmation``, here while the
+//     sheet is down and in the sheet while it is up) and declining changes nothing.
 import SwiftUI
 import VisualCoreExperienceHost
 import VisualProgrammingLabCore
@@ -69,6 +75,11 @@ struct LabControls: View {
     var addPosition: @MainActor () -> CanvasPoint = { CanvasPoint(x: 0, y: 0) }
     /// Shows or hides the preview (view state).
     var setPreview: @MainActor (Bool) -> Void = { _ in }
+    /// The library, the examples and the replace confirmation (feature 169); nil in previews of the controls alone.
+    var library: LabLibraryActions?
+
+    /// Whether the library sheet is up.
+    @State private var showingLibrary = false
 
     /// Every output a picker for an input of `target` offers: each output of every other node, in identity order.
     static func sourceOptions(for target: NodeID, in graph: VisualGraph) -> [SourceOption] {
@@ -150,6 +161,7 @@ struct LabControls: View {
                     moveButtons(node)
                 }
             }
+            if let library { libraryRow(library) }
             Toggle(isOn: Binding(get: { mirror.previewVisible }, set: { visible in setPreview(visible) })) {
                 Text(verbatim: "Preview")
             }
@@ -184,6 +196,53 @@ struct LabControls: View {
             .accessibilityIdentifier(port.identifier("node-list"))
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .modifier(OptionalReplaceConfirmation(port: port, mirror: mirror, actions: library,
+                                              active: !showingLibrary))
+        .sheet(isPresented: $showingLibrary) {
+            if let library {
+                LabLibraryView(port: port, mirror: mirror, actions: library, close: { showingLibrary = false })
+            }
+        }
+    }
+
+    /// The "Library" button (with storage only) and the "Examples" menu (feature 169).
+    @ViewBuilder
+    private func libraryRow(_ actions: LabLibraryActions) -> some View {
+        HStack(spacing: 12) {
+            if actions.library != nil {
+                Button {
+                    showingLibrary = true
+                } label: {
+                    Text(verbatim: "Library").frame(minHeight: 44)
+                }
+                .accessibilityLabel(Text(verbatim: "Library"))
+                .accessibilityHint(Text(verbatim: "Saves the open graph, or opens, renames or removes a saved graph"))
+                .accessibilityIdentifier(port.identifier("library"))
+            }
+            Menu {
+                ForEach(LabExamples.all) { example in
+                    Button {
+                        _ = actions.request(.example(example.id))
+                    } label: {
+                        Text(verbatim: example.title)
+                    }
+                    .accessibilityLabel(Text(verbatim: LabExamples.spokenLabel(example)))
+                    .accessibilityIdentifier(port.identifier(LabExamples.identifierName(example)))
+                }
+            } label: {
+                Text(verbatim: "Examples").frame(minHeight: 44)
+            }
+            .accessibilityLabel(Text(verbatim: "Examples"))
+            .accessibilityHint(Text(verbatim: "Opens an example graph in place of the open graph"))
+            .accessibilityIdentifier(port.identifier("examples"))
+        }
+        if !showingLibrary, let message = mirror.libraryMessage {
+            Text(verbatim: message)
+                .font(.footnote)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityLabel(Text(verbatim: message))
+                .accessibilityIdentifier(port.identifier("library-message"))
+        }
     }
 
     /// The four buttons that move the selected node by ``moveStep``.
@@ -215,6 +274,15 @@ struct LabControls: View {
             .accessibilityAddTraits(selected ? .isSelected : [])
             .accessibilityHint(Text(verbatim: "Selects the node"))
             .accessibilityIdentifier(port.identifier("node-row-\(node.id.rawValue)"))
+            // Feature 169 (T-A23-408): the checker's sentences for this node, under its name.
+            if let problems = mirror.diagnostics[node.id], !problems.isEmpty {
+                ForEach(Array(problems.enumerated()), id: \.offset) { _, sentence in
+                    Label { Text(verbatim: sentence) } icon: { Text(verbatim: "!") }
+                        .font(.footnote)
+                }
+                .accessibilityElement(children: .combine)
+                .accessibilityIdentifier(port.identifier("node-diagnostic-row-\(node.id.rawValue)"))
+            }
             ForEach(Array(node.kind.inputs.enumerated()), id: \.offset) { index, declaration in
                 Picker(selection: Binding(get: { Self.currentTag(of: node, input: index, in: graph) },
                                           set: { tag in
@@ -233,6 +301,28 @@ struct LabControls: View {
                 .accessibilityLabel(Text(verbatim: EditMessages.label(port: declaration, of: node)))
                 .accessibilityIdentifier(port.identifier("input-\(node.id.rawValue)-\(index)"))
             }
+        }
+    }
+}
+
+/// ``ReplaceConfirmation`` when the controls have the library's actions; nothing otherwise (feature 169).
+struct OptionalReplaceConfirmation: ViewModifier {
+    /// The port that names the elements.
+    let port: ExperienceActionPort
+    /// What the controls show.
+    let mirror: LabMirror
+    /// The presenter's actions; nil without them.
+    let actions: LabLibraryActions?
+    /// Whether the controls present the dialog (not while the library sheet is up).
+    var active: Bool
+
+    /// The view, with the dialog when there are actions.
+    @ViewBuilder
+    func body(content: Content) -> some View {
+        if let actions {
+            content.modifier(ReplaceConfirmation(port: port, mirror: mirror, actions: actions, active: active))
+        } else {
+            content
         }
     }
 }

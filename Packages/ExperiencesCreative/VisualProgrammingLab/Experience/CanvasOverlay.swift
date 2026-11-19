@@ -213,6 +213,22 @@ struct CanvasOverlay: View {
                 .fill(Color(red: 0.16, green: 0.17, blue: 0.21).opacity(0.94))
             RoundedRectangle(cornerRadius: 8 * zoom)
                 .stroke(selected ? Color.yellow : Color.white.opacity(0.35), lineWidth: selected ? 3 : 1)
+            // Feature 169 (T-A23-408): a node the checker names gets a dashed red outline and a "!" badge, so the mark
+            // never depends on colour alone.
+            if let problems = mirror.diagnostics[node.id], !problems.isEmpty {
+                RoundedRectangle(cornerRadius: 10 * zoom)
+                    .stroke(Color(red: 1, green: 0.35, blue: 0.35), style: StrokeStyle(lineWidth: 2, dash: [6, 4]))
+                    .padding(-4 * zoom)
+                Text(verbatim: "!")
+                    .font(.system(size: 14 * zoom, weight: .bold))
+                    .foregroundStyle(Color.black)
+                    .frame(width: 20 * zoom, height: 20 * zoom)
+                    .background(Circle().fill(Color(red: 1, green: 0.35, blue: 0.35)))
+                    .position(x: width - 4 * zoom, y: 0)
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel(Text(verbatim: problems.joined(separator: " ")))
+                    .accessibilityIdentifier(port.identifier("node-diagnostic-\(node.id.rawValue)"))
+            }
             Text(verbatim: EditMessages.label(node: node))
                 .font(.system(size: 14 * zoom, weight: .semibold))
                 .foregroundStyle(Color.white)
@@ -235,7 +251,8 @@ struct CanvasOverlay: View {
         }
         .frame(width: width, height: height)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Text(verbatim: EditMessages.label(node: node)))
+        .accessibilityLabel(Text(verbatim: ([EditMessages.label(node: node)] + (mirror.diagnostics[node.id] ?? []))
+            .joined(separator: ". ")))
         .accessibilityAddTraits(selected ? .isSelected : [])
         .accessibilityIdentifier(port.identifier("node-\(node.id.rawValue)"))
         .position(x: origin.x + width / 2, y: origin.y + height / 2)
