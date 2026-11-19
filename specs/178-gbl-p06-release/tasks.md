@@ -72,7 +72,7 @@
 
 - [ ] T-A24-609 Graphics Benchmark Lab tests on sim-27.2 (`--name gbl-ios27`; each under 10 s) and the documented API,
   isolation and core purity
-- [ ] T-A24-610 App build, unit tests and the interface chunk: `xcodegen generate --spec project.yml`, then
+- [X] T-A24-610 App build, unit tests and the interface chunk: `xcodegen generate --spec project.yml`, then — Verified 2026-11-19: 2026-11-19 xcodegen generated; .autonomy/checks/A24-P06.app-ui.json exit 0 (build for testing, 78 unit tests, chunk f3 3/3)
   `--name app-ui -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27 app-ui-ios27-f3`
 - [ ] T-A24-611 Release build checks, as a review checkpoint: `--name release-checks -- python3 scripts/release_check.py
   --only app-release-build app-release-symbols app-privacy-manifest app-no-tracking app-licenses app-usage-descriptions
