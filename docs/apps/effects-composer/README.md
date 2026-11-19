@@ -40,7 +40,17 @@ bytes, scaled so the longer edge is at most the smaller of the texture limit and
 8 pixels) and oversized (over 50 MiB) data is refused with a message; a PNG cut short in its image data is
 decoded by ImageIO with the missing rows blank rather than refused. The bytes go into the source target with
 VisualCore's `RenderTarget.upload(rgba:)` and are uploaded again after a context rebuild. The picture is not stored:
-a restored session shows the test picture, which `test-picture` brings back at any time. Still export follows in A25-P05.
+a restored session shows the test picture, which `test-picture` brings back at any time.
+
+Colour, export and robustness (A25-P05): grade, blur and vignette work on light values (decoded from sRGB on read and
+encoded on write, `Core/ColorDomain.swift`), distort and posterize on stored values; intermediate pictures are
+half-float where the device can draw into it and 8-bit otherwise, and an empty chain leaves the picture exactly as it
+was. `export-png`, `export-jpeg` and `export-heic` draw the chain again at the picture's full size, refuse an
+unavailable format or an oversized picture before drawing, write the file tagged sRGB in a temporary folder
+(`Experience/StillExport.swift`) and offer it through the system share sheet (`share`); the file is removed before
+the next export and when the experience closes. A context loss rebuilds the same preview, an interrupted export
+leaves no file, and a memory warning releases idle pictures. Device measurements are planned in
+[device-campaign.md](device-campaign.md) and wait for ImplementationLock-100. Release work follows in A25-P06.
 
 | Document | Content |
 |---|---|

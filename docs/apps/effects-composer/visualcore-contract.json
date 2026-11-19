@@ -671,7 +671,7 @@
    "id": "M11",
    "capability": "Version 0.1 feature 05: still export with dimension and format validation",
    "source": "manual \u00a72 feature 05; spec FR-A25-002",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
@@ -699,10 +699,10 @@
     }
    ],
    "example": {
-    "file": "Packages/ExperiencesCreative/LivingWallpapers/Experience/WallpaperExportFile.swift",
-    "symbol": "WallpaperExportFile"
+    "file": "Packages/ExperiencesCreative/EffectsComposer/Experience/StillExport.swift",
+    "symbol": "EffectsExportFile"
    },
-   "notes": "OffscreenExportTests, StillFormatTests, ExportGeometryTests. The export plan, its validation against ExportGeometry and StillImageEncoder.isAvailable, the Transferable and the ShareLink are G-EXPORT (A25-P04)."
+   "notes": "OffscreenExportTests, StillFormatTests, ExportGeometryTests. The export plan, its validation against ExportGeometry and StillImageEncoder.isAvailable, the Transferable and the ShareLink are G-EXPORT (A25-P04). A25-P05 (feature 184): grade, blur and vignette work on linear light (vc_srgbDecode on read, vc_srgbEncode on write, grade pivot 0.18) while distort and posterize keep stored values; every target holds sRGB-encoded values, with rgba16f intermediates where FloatRenderSupport reports them renderable and rgba8 otherwise, and an empty chain returns a 256-value ramp exactly on both paths; a full-size export draws the chain again into its own target, is refused before drawing for an unavailable format or a size above ExportGeometry(maxEdge: min(maxTextureSize, 2048)), is encoded as PNG, JPEG or HEIC tagged sRGB off the main thread and handed to ShareLink, and matches the preview (PNG 0/255, JPEG and HEIC within a mean of 3/255); ten context rebuilds give a byte-identical preview, an export interrupted by a context loss fails as a25.export-interrupted with no file, a memory warning trims idle pooled targets without changing the preview, and the device rows EC-D1\u2026EC-D7 of device-campaign.md wait for ImplementationLock-100 (ColorDomainTests, ColorPathTests, StillExportTests, RobustnessTests) (G-COLOR, G-EXPORT, G-ROBUST closed)."
   },
   {
    "id": "M12",
@@ -1103,7 +1103,7 @@
    "id": "M23",
    "capability": "Colour-space boundaries: sRGB source and export, linear intermediate work",
    "source": "spec FR-A25-003; clarification Q3; manual \u00a713 risk 1",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderBundle.swift",
@@ -1137,16 +1137,16 @@
     }
    ],
    "example": {
-    "file": "Packages/ExperiencesCreative/LivingWallpapers/Core/ImageColorPipeline.swift",
-    "symbol": "ImageColorPipeline"
+    "file": "Packages/ExperiencesCreative/EffectsComposer/Core/ColorDomain.swift",
+    "symbol": "ColorDomain"
    },
-   "notes": "ShaderBundleTests, FloatRenderSupportTests, StillFormatTests. No sRGB texture format exists; each pass states whether it decodes (vc_srgbDecode) and encodes (vc_srgbEncode), intermediates are rgba16f where FloatRenderSupport reports it renderable and rgba8 otherwise (G-COLOR, A25-P05). Living Wallpapers' ImageColorPipeline is the closest consumer."
+   "notes": "ShaderBundleTests, FloatRenderSupportTests, StillFormatTests. No sRGB texture format exists; each pass states whether it decodes (vc_srgbDecode) and encodes (vc_srgbEncode), intermediates are rgba16f where FloatRenderSupport reports it renderable and rgba8 otherwise (G-COLOR, A25-P05). Living Wallpapers' ImageColorPipeline is the closest consumer. A25-P05 (feature 184): grade, blur and vignette work on linear light (vc_srgbDecode on read, vc_srgbEncode on write, grade pivot 0.18) while distort and posterize keep stored values; every target holds sRGB-encoded values, with rgba16f intermediates where FloatRenderSupport reports them renderable and rgba8 otherwise, and an empty chain returns a 256-value ramp exactly on both paths; a full-size export draws the chain again into its own target, is refused before drawing for an unavailable format or a size above ExportGeometry(maxEdge: min(maxTextureSize, 2048)), is encoded as PNG, JPEG or HEIC tagged sRGB off the main thread and handed to ShareLink, and matches the preview (PNG 0/255, JPEG and HEIC within a mean of 3/255); ten context rebuilds give a byte-identical preview, an export interrupted by a context loss fails as a25.export-interrupted with no file, a memory warning trims idle pooled targets without changing the preview, and the device rows EC-D1\u2026EC-D7 of device-campaign.md wait for ImplementationLock-100 (ColorDomainTests, ColorPathTests, StillExportTests, RobustnessTests) (G-COLOR, G-EXPORT, G-ROBUST closed)."
   },
   {
    "id": "M24",
    "capability": "Still export at a validated size and format, rendered offscreen and encoded",
    "source": "spec FR-A25-003; clarification Q4",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
@@ -1186,16 +1186,16 @@
     }
    ],
    "example": {
-    "file": "Packages/ExperiencesCreative/LivingWallpapers/Experience/WallpaperExportFile.swift",
-    "symbol": "WallpaperExportFile"
+    "file": "Packages/ExperiencesCreative/EffectsComposer/Experience/StillExport.swift",
+    "symbol": "StillExport"
    },
-   "notes": "OffscreenExportTests, StillFormatTests, ExportGeometryTests, TemporaryFolderTests. Rendering the chain at the export size into a pooled target, reading it back, encoding it, and the Transferable and ShareLink are G-EXPORT (A25-P04), after Living Wallpapers' WallpaperExportFile."
+   "notes": "OffscreenExportTests, StillFormatTests, ExportGeometryTests, TemporaryFolderTests. Rendering the chain at the export size into a pooled target, reading it back, encoding it, and the Transferable and ShareLink are G-EXPORT (A25-P04), after Living Wallpapers' WallpaperExportFile. A25-P05 (feature 184): grade, blur and vignette work on linear light (vc_srgbDecode on read, vc_srgbEncode on write, grade pivot 0.18) while distort and posterize keep stored values; every target holds sRGB-encoded values, with rgba16f intermediates where FloatRenderSupport reports them renderable and rgba8 otherwise, and an empty chain returns a 256-value ramp exactly on both paths; a full-size export draws the chain again into its own target, is refused before drawing for an unavailable format or a size above ExportGeometry(maxEdge: min(maxTextureSize, 2048)), is encoded as PNG, JPEG or HEIC tagged sRGB off the main thread and handed to ShareLink, and matches the preview (PNG 0/255, JPEG and HEIC within a mean of 3/255); ten context rebuilds give a byte-identical preview, an export interrupted by a context loss fails as a25.export-interrupted with no file, a memory warning trims idle pooled targets without changing the preview, and the device rows EC-D1\u2026EC-D7 of device-campaign.md wait for ImplementationLock-100 (ColorDomainTests, ColorPathTests, StillExportTests, RobustnessTests) (G-COLOR, G-EXPORT, G-ROBUST closed)."
   },
   {
    "id": "M25",
    "capability": "Resize, orientation and context loss during editing or export: targets rebuilt from CPU state and the source re-uploaded",
    "source": "spec FR-A25-003; spec edge cases",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
@@ -1229,10 +1229,10 @@
     }
    ],
    "example": {
-    "file": "Packages/ExperiencesCreative/SimulationLab/Experience/SimulationPresenter.swift",
-    "symbol": "SimulationPresenter"
+    "file": "Packages/ExperiencesCreative/EffectsComposer/Experience/PreviewRenderer.swift",
+    "symbol": "PreviewRenderer"
    },
-   "notes": "RenderHostTests, SessionFailureTests, RenderLifecycleTests, ShellRenderingTests. Rebuilding the pass plan, the pool and the source target from the kept bytes after a new generation, and an export interrupted by a context loss, are G-ROBUST (A25-P05)."
+   "notes": "RenderHostTests, SessionFailureTests, RenderLifecycleTests, ShellRenderingTests. Rebuilding the pass plan, the pool and the source target from the kept bytes after a new generation, and an export interrupted by a context loss, are G-ROBUST (A25-P05). A25-P05 (feature 184): grade, blur and vignette work on linear light (vc_srgbDecode on read, vc_srgbEncode on write, grade pivot 0.18) while distort and posterize keep stored values; every target holds sRGB-encoded values, with rgba16f intermediates where FloatRenderSupport reports them renderable and rgba8 otherwise, and an empty chain returns a 256-value ramp exactly on both paths; a full-size export draws the chain again into its own target, is refused before drawing for an unavailable format or a size above ExportGeometry(maxEdge: min(maxTextureSize, 2048)), is encoded as PNG, JPEG or HEIC tagged sRGB off the main thread and handed to ShareLink, and matches the preview (PNG 0/255, JPEG and HEIC within a mean of 3/255); ten context rebuilds give a byte-identical preview, an export interrupted by a context loss fails as a25.export-interrupted with no file, a memory warning trims idle pooled targets without changing the preview, and the device rows EC-D1\u2026EC-D7 of device-campaign.md wait for ImplementationLock-100 (ColorDomainTests, ColorPathTests, StillExportTests, RobustnessTests) (G-COLOR, G-EXPORT, G-ROBUST closed)."
   },
   {
    "id": "M26",
@@ -1566,7 +1566,7 @@
    "id": "M36",
    "capability": "Memory limits, oversized sources and the device plan",
    "source": "manual \u00a79 phase 05; manual \u00a713 risks 2 and 3",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderCapabilities.swift",
@@ -1588,10 +1588,10 @@
     }
    ],
    "example": {
-    "file": "Packages/ExperiencesCreative/LivingWallpapers/Experience/WallpaperPresenter.swift",
-    "symbol": "WallpaperPresenter"
+    "file": "Packages/ExperiencesCreative/EffectsComposer/Experience/ComposerPresenter.swift",
+    "symbol": "ComposerPresenter"
    },
-   "notes": "RenderCapabilitiesProbeTests, ResourceLedgerTests. Oversized-source refusal or scaling at the edges, memory warnings during editing and export, and the device plan are G-ROBUST (A25-P05). Simulator results are never device evidence."
+   "notes": "RenderCapabilitiesProbeTests, ResourceLedgerTests. Oversized-source refusal or scaling at the edges, memory warnings during editing and export, and the device plan are G-ROBUST (A25-P05). Simulator results are never device evidence. A25-P05 (feature 184): grade, blur and vignette work on linear light (vc_srgbDecode on read, vc_srgbEncode on write, grade pivot 0.18) while distort and posterize keep stored values; every target holds sRGB-encoded values, with rgba16f intermediates where FloatRenderSupport reports them renderable and rgba8 otherwise, and an empty chain returns a 256-value ramp exactly on both paths; a full-size export draws the chain again into its own target, is refused before drawing for an unavailable format or a size above ExportGeometry(maxEdge: min(maxTextureSize, 2048)), is encoded as PNG, JPEG or HEIC tagged sRGB off the main thread and handed to ShareLink, and matches the preview (PNG 0/255, JPEG and HEIC within a mean of 3/255); ten context rebuilds give a byte-identical preview, an export interrupted by a context loss fails as a25.export-interrupted with no file, a memory warning trims idle pooled targets without changing the preview, and the device rows EC-D1\u2026EC-D7 of device-campaign.md wait for ImplementationLock-100 (ColorDomainTests, ColorPathTests, StillExportTests, RobustnessTests) (G-COLOR, G-EXPORT, G-ROBUST closed)."
   },
   {
    "id": "M37",
@@ -1774,7 +1774,7 @@
    "justification": "Export renders the chain at the export size into a pooled target, reads it back, encodes it with StillImageEncoder after a size and format check against ExportGeometry and StillImageEncoder.isAvailable, and hands the file to a Transferable and ShareLink the person opens, after Living Wallpapers (clarification Q4). No shared still-export Transferable exists.",
    "phase": 5,
    "test": "Experience tests: an export at a valid size produces a decodable PNG, JPEG or HEIC of that size tagged sRGB; sizes over the edge or pixel cap and unavailable formats are refused before rendering; the temporary file is removed after the share.",
-   "closed": null
+   "closed": "A25-P05"
   },
   {
    "id": "G-COLOR",
@@ -1786,7 +1786,7 @@
    "justification": "Colour-space boundaries: sRGB-encoded source and export bytes; each pass states whether it decodes to linear light (vc_srgbDecode) and encodes back (vc_srgbEncode); intermediates are rgba16f where FloatRenderSupport reports it renderable and rgba8 otherwise (clarification Q3). The per-effect rules are the experience's.",
    "phase": 5,
    "test": "Experience tests: an identity chain round-trips a generated sRGB ramp within one code value on both the rgba16f and the forced rgba8 path; a known effect on a mid-grey matches a CPU linear-light reference.",
-   "closed": null
+   "closed": "A25-P05"
   },
   {
    "id": "G-ROBUST",
@@ -1799,7 +1799,7 @@
    "justification": "Memory limits, oversized sources, resize, orientation and context loss during editing and export (rebuilding the plan, pool and source target from CPU state), memory warnings, and the device plan are the experience's robustness work over VisualCore's recreateContext and budget (manual \u00a713 risks 2 and 3).",
    "phase": 5,
    "test": "Experience tests: after recreateContext the preview matches the one before; a resize mid-edit redraws at the new size; an export interrupted by a context loss reports a named failure and leaves no file; a memory warning trims the pool. Device plan written for D1-D3.",
-   "closed": null
+   "closed": "A25-P05"
   },
   {
    "id": "G-RELEASE",
