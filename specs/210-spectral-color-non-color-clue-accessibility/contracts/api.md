@@ -22,3 +22,8 @@ GLSL (`#include "vc/spectral.glsl"`, `"vc/clue.glsl"`): `vec3 vc_linearToOklab(v
 `vec3 vc_hueRotate(vec3 linearRGB, float radians)`, `vec3 vc_simulateCVD(vec3 linearRGB, int condition)`,
 `float vc_clueShape(vec2 p, int shape)`, `float vc_cluePattern(vec2 p, int pattern)`,
 `float vc_clueCoverage(vec2 p, int shape, int pattern, float aa)`.
+
+Outline and layout (FR-R02F10-013): `PerceptualColor.outline(for color: SIMD3<Double>, on background: SIMD3<Double>) -> SIMD3<Double>`
+returns black or white, whichever has the larger minimum contrast with both (at least 3:1 is checked in tests for the
+presets on black and white backgrounds); `ClueBadge` draws that outline, uses `@ScaledMetric` for its size and wraps the
+name (no truncation); GLSL `float vc_clueOutline(vec2 p, int shape, float width, float aa)` gives the outline band.

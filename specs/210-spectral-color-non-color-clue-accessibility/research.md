@@ -25,3 +25,9 @@
   Alternatives: a third tuple element (breaks callers), storing in VisualCoreParameters (Simulation cannot see it).
 - **R8 Contrast.** Decision: `PerceptualColor.contrastRatio(_:_:)` on sRGB triples per WCAG 2.x; `AccessibleColors`
   keeps its signature and converts its `UIColor`s to call it. Rationale: one formula. Alternatives: two copies.
+- **R9 Outline and layout.** Decision: a black or white outline chosen for the larger minimum contrast against the state
+  colour and the background; badge size by `@ScaledMetric`; names wrap. Rationale: WCAG 1.4.11 non-text contrast 3:1;
+  Dynamic Type. Alternatives: a fixed dark outline (fails on dark backgrounds).
+- **R10 Sources.** OKLab: Björn Ottosson, "A perceptual color space for image processing" (2020), reference code MIT /
+  public domain. Machado, Oliveira, Fernandes, "A Physiologically-based Model for Simulation of Color Vision Deficiency",
+  IEEE TVCG 15(6), 2009 — matrices published in the paper; cited in docs/architecture/color-accessibility.md.
