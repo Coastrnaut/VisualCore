@@ -32,7 +32,14 @@ program is named with its line while the last good picture stays.
 Editing, compare and presets (A25-P03): compare shows the untouched picture; up to 24 named looks are kept as versioned
 files in the experience's own storage (`Experience/LookLibrary.swift`), unreadable files are listed and never deleted
 automatically, and opening a look is one undoable edit; every effect can be moved, switched and tuned with named
-accessibility actions, without dragging. Image import follows in A25-P04 and still export in A25-P05.
+accessibility actions, without dragging.
+
+Image import (A25-P04): the `import` control opens the system photo picker, which runs outside the app and needs no
+permission. `Experience/ImageImport.swift` decodes the picture off the main thread with ImageIO into upright sRGB RGBA
+bytes, scaled so the longer edge is at most the smaller of the texture limit and 2,048 pixels; damaged, tiny (under
+8 pixels) and oversized (over 50 MiB) data is refused with a message. The bytes go into the source target with
+VisualCore's `RenderTarget.upload(rgba:)` and are uploaded again after a context rebuild. The picture is not stored:
+a restored session shows the test picture, which `test-picture` brings back at any time. Still export follows in A25-P05.
 
 | Document | Content |
 |---|---|

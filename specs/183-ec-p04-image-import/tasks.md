@@ -43,7 +43,7 @@
   `--name public-api` (`python3 scripts/check_public_api.py`), `--name reference-1` and `--name reference-2` (quickstart)
 - [X] T-A25-408 Review checkpoint: `--name ec-ios27` (both experience test targets), the documented API (also for — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P04.{ec-ios27,documented-api,documented-api-rendering,isolation,core-purity}.json (all exit 0)
   `Packages/VisualCoreRendering/Sources`), isolation and core purity
-- [ ] T-A25-409 Contract: G-IMPORT and U-RGBAUPLOAD closed by "A25-P04" (`--name contract`); README of the experience
+- [X] T-A25-409 Contract: G-IMPORT and U-RGBAUPLOAD closed by "A25-P04" (`--name contract`); README of the experience — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P04.contract.json (exit 0; G-IMPORT, U-RGBAUPLOAD closed)
 - [ ] T-A25-410 `--name catalog`, `experience-packages`, `script-tests`; `xcodegen generate --spec project.yml`, then
   `--name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`; `--name verify-27`
 - [ ] T-A25-411 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record

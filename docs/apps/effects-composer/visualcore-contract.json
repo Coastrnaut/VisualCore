@@ -634,7 +634,7 @@
    "id": "M10",
    "capability": "Version 0.1 feature 04: local image import through the system picker with scoped access",
    "source": "manual \u00a72 feature 04; spec FR-A25-002",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderCapabilities.swift",
@@ -662,10 +662,10 @@
     }
    ],
    "example": {
-    "file": "Packages/ExperiencesCreative/LivingWallpapers/Experience/WallpaperPresenter.swift",
-    "symbol": "WallpaperPresenter"
+    "file": "Packages/ExperiencesCreative/EffectsComposer/Experience/ECControls.swift",
+    "symbol": "ECControls"
    },
-   "notes": "No picker and no image decoder exist in the repository (grep 2026-11-19). The system photo picker (SwiftUI, out of process, no permission) and ImageIO decoding scaled to the texture limit are app-local (G-IMPORT, A25-P03); a byte-wise upload into a RenderTarget is the upstream gap U-RGBAUPLOAD (A25-P03, row M22)."
+   "notes": "No picker and no image decoder exist in the repository (grep 2026-11-19). The system photo picker (SwiftUI, out of process, no permission) and ImageIO decoding scaled to the texture limit are app-local (G-IMPORT, A25-P03); a byte-wise upload into a RenderTarget is the upstream gap U-RGBAUPLOAD (A25-P03, row M22). A25-P04 (feature 183): the system photo picker (PhotosPicker, out of process, no permission) hands over the data; ImageImport decodes it off the main thread with ImageIO into sRGB RGBA bytes, upright, scaled so the longer edge is at most min(maxTextureSize, 2048), refusing damaged, tiny (under 8 px) and oversized (over 50 MiB) data with a named message; the renderer uploads the bytes into a source target at the picture's size with the new RenderTarget.upload(rgba:) and again after a context rebuild; the latest pick wins and the test picture returns on request (ImageImportTests, PictureSourceTests, ByteUploadTests) (G-IMPORT, U-RGBAUPLOAD closed)."
   },
   {
    "id": "M11",
@@ -1053,7 +1053,7 @@
    "id": "M21",
    "capability": "Image import through the system picker with scoped access, decoded within the texture limit",
    "source": "spec FR-A25-003; clarification Q2; manual \u00a713 risk 2",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderCapabilities.swift",
@@ -1069,16 +1069,16 @@
     }
    ],
    "example": {
-    "file": "Packages/ExperiencesCreative/LivingWallpapers/Experience/WallpaperPresenter.swift",
-    "symbol": "WallpaperPresenter"
+    "file": "Packages/ExperiencesCreative/EffectsComposer/Experience/ImageImport.swift",
+    "symbol": "ImageImport"
    },
-   "notes": "RenderCapabilitiesProbeTests, RegistryCapabilitiesTests. No picker or decoder exists (grep 2026-11-19). The system photo picker (SwiftUI system API, out of process, no permission), ImageIO decoding into RGBA bytes scaled so the longer edge is at most min(texture limit, cap), keeping the bytes for re-upload, and the cancelled-pick fallback to the built-in test image are G-IMPORT (A25-P03). Living Wallpapers' WallpaperPresenter reads maxTextureSize."
+   "notes": "RenderCapabilitiesProbeTests, RegistryCapabilitiesTests. No picker or decoder exists (grep 2026-11-19). The system photo picker (SwiftUI system API, out of process, no permission), ImageIO decoding into RGBA bytes scaled so the longer edge is at most min(texture limit, cap), keeping the bytes for re-upload, and the cancelled-pick fallback to the built-in test image are G-IMPORT (A25-P03). Living Wallpapers' WallpaperPresenter reads maxTextureSize. A25-P04 (feature 183): the system photo picker (PhotosPicker, out of process, no permission) hands over the data; ImageImport decodes it off the main thread with ImageIO into sRGB RGBA bytes, upright, scaled so the longer edge is at most min(maxTextureSize, 2048), refusing damaged, tiny (under 8 px) and oversized (over 50 MiB) data with a named message; the renderer uploads the bytes into a source target at the picture's size with the new RenderTarget.upload(rgba:) and again after a context rebuild; the latest pick wins and the test picture returns on request (ImageImportTests, PictureSourceTests, ByteUploadTests) (G-IMPORT, U-RGBAUPLOAD closed)."
   },
   {
    "id": "M22",
    "capability": "An imported image's bytes reach a pass input (a render target) without four floats per pixel",
    "source": "spec FR-A25-003; clarification Q2; research D2, D6",
-   "status": "upstream gap",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
@@ -1094,10 +1094,10 @@
     }
    ],
    "example": {
-    "file": "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidFieldsScene.swift",
-    "symbol": "FluidFieldsScene"
+    "file": "Packages/ExperiencesCreative/EffectsComposer/Experience/PreviewRenderer.swift",
+    "symbol": "PreviewRenderer"
    },
-   "notes": "Texture.upload(rgba:) fills a Texture, which FieldPass cannot sample, and RenderTarget.upload(rgbaFloats:) takes four floats per pixel, quadrupling a large image's CPU memory (TextureUploadTests, FloatTransferTests). U-RGBAUPLOAD (VisualCore:VisualCoreRendering, A25-P03) adds a byte-wise RenderTarget.upload(rgba:). Fluid Art Playground seeds a RenderTarget with upload(rgbaFloats:)."
+   "notes": "Texture.upload(rgba:) fills a Texture, which FieldPass cannot sample, and RenderTarget.upload(rgbaFloats:) takes four floats per pixel, quadrupling a large image's CPU memory (TextureUploadTests, FloatTransferTests). U-RGBAUPLOAD (VisualCore:VisualCoreRendering, A25-P03) adds a byte-wise RenderTarget.upload(rgba:). Fluid Art Playground seeds a RenderTarget with upload(rgbaFloats:). A25-P04 (feature 183): the system photo picker (PhotosPicker, out of process, no permission) hands over the data; ImageImport decodes it off the main thread with ImageIO into sRGB RGBA bytes, upright, scaled so the longer edge is at most min(maxTextureSize, 2048), refusing damaged, tiny (under 8 px) and oversized (over 50 MiB) data with a named message; the renderer uploads the bytes into a source target at the picture's size with the new RenderTarget.upload(rgba:) and again after a context rebuild; the latest pick wins and the test picture returns on request (ImageImportTests, PictureSourceTests, ByteUploadTests) (G-IMPORT, U-RGBAUPLOAD closed)."
   },
   {
    "id": "M23",
@@ -1735,7 +1735,7 @@
    "justification": "The system photo picker (SwiftUI system API, out of process, no permission or usage string), ImageIO decoding into RGBA bytes on the CPU scaled so the longer edge is at most the smaller of RenderCapabilities.maxTextureSize and the experience's cap, kept for re-upload after context loss, and the cancelled-pick fallback to the built-in test image (clarification Q2). No other experience imports images.",
    "phase": 4,
    "test": "Experience tests with generated image fixtures: an image above the limit is scaled to the stated edge, a damaged file is refused with a named reason, a cancelled pick keeps the built-in test image, and the kept bytes re-upload after recreateContext.",
-   "closed": null
+   "closed": "A25-P04"
   },
   {
    "id": "U-RGBAUPLOAD",
@@ -1748,7 +1748,7 @@
    "justification": "An additive, public byte-wise RenderTarget.upload(rgba:) in VisualCoreRendering, because Texture.upload(rgba:) fills a Texture that FieldPass cannot sample and upload(rgbaFloats:) needs four floats per pixel, quadrupling the CPU memory of a large image (clarification Q2). Generic: any experience that feeds bytes into a pass input can use it.",
    "phase": 4,
    "test": "VisualCoreRendering tests: bytes uploaded into an rgba8 and an rgba16f target read back equal (or within half-float tolerance); a wrong-length array and a stale target are refused; with /// docs, the API baseline update and the seven-step reference regression in two chunks.",
-   "closed": null
+   "closed": "A25-P04"
   },
   {
    "id": "G-PRESETS",
