@@ -76,7 +76,7 @@
   - the documented API, the isolation check and the core purity scan.
 - [X] T-A23-212 Contract: G-CANVAS is closed by "A23-P02", and rows whose gaps are all closed become available with — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A23-P02.contract.json exit 0 (G-CANVAS closed by A23-P02; M08, M09 and M18 available with their notes)
   evidence (`--name contract`)
-- [ ] T-A23-213 The catalog, app and runner checks, with the packages and script tests:
+- [X] T-A23-213 The catalog, app and runner checks, with the packages and script tests: — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A23-P02.catalog.json, A23-P02.experience-packages.json and A23-P02.script-tests-2.json exit 0; xcodegen generate; A23-P02.app-unit-2.json exit 0 (build for testing and app unit tests on iOS 27.2); A23-P02.verify-27-2.json exit 0 (all 9 scenarios on iOS 27.2; the first run verify-27 failed launch-first-frame with a blank frame, because the runner's 96-point surface sampled the grid at one phase; fixed in 566622de with one-pixel lines and a vignette, ProbeTests reads the frame as the runner does; A23-P02.vpl-ios27-3.json exit 0, 125 core and 28 experience tests)
   - `--name catalog`; `--name experience-packages`; `--name script-tests`;
   - `xcodegen generate --spec project.yml`, then `--name app-unit -- python3 scripts/release_check.py --only
     app-build-for-testing-ios27 app-unit-ios27`;
