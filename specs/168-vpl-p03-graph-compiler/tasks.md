@@ -35,7 +35,7 @@
   (same fragment and parameters), because `FieldPass` sets the full viewport while `FullScreenShaderScene` sets none
   and the host does not reset it, so the inset's viewport would otherwise carry into the next frame; the inset frame
   (`preview`), its message (`preview-message`) and the switch (`preview-toggle`)
-- [ ] T-A23-305 [US1] Write `ExperienceTests/OperatorPixelTests.swift` (SC-A23-301): gradient, mix (0, 0.5, 1) and flat
+- [X] T-A23-305 [US1] Write `ExperienceTests/OperatorPixelTests.swift` (SC-A23-301): gradient, mix (0, 0.5, 1) and flat — Verified 2026-11-18: 2026-11-18: OperatorPixelTests (6, mix over 3 amounts): gradient, mix and a flat colour within 2 of 255 at the read pixel centres, noise deterministic and scale-dependent, blur of a ramp equal to it beyond its radius from the edges, output a copy of its slot; .autonomy/checks/A23-P03.vpl-ios27.json and A23-P03.vpl-ios27-2.json exit 0 (152 core and 46 experience tests on sim-27.2, slowest 0.93 s); written by an agent, retested
   colour within 2 of 255 at the read pixel centres; noise deterministic and scale-dependent; blur of a ramp equal to
   it farther than its radius from the edges; output a copy
 - [ ] T-A23-306 [US2] [US3] Write `ExperienceTests/{PreviewStateTests,BudgetTests}.swift` (SC-A23-302, 303): every
