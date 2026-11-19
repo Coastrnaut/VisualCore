@@ -11,7 +11,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T-A25-001 Create the two starting documents:
+- [X] T-A25-001 Create the two starting documents: — Verified 2026-11-19: 2026-11-19 docs/apps/effects-composer/README.md (manual §1–§2, one-app rules, constitution 2.21.0) and regression-baseline.md (phase start a2d68e21, constitution eec911ea, pin d93edd1); validate_docs passes
   - `docs/apps/effects-composer/README.md`, from the manual §1–§2: a visual effects-chain editor for building,
     previewing and exporting reusable shader looks (a linear chain of five built-in effects, reorder, enable and
     disable, before and after compare, presets, image import through the system picker, still export); offline; no
