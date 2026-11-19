@@ -65,7 +65,7 @@
   - the documented API, the isolation check and the core purity scan.
 - [X] T-A25-212 Contract: G-COMPILER, G-POOL and G-DIAG are closed by "A25-P02", and rows whose gaps are all closed — Verified 2026-11-19: 2026-11-19 G-COMPILER, G-POOL and G-DIAG closed by A25-P02 (M01, M07, M12, M15, M16, M17 available); .autonomy/checks/A25-P02.contract.json exit 0
   become available with evidence (`--name contract`)
-- [ ] T-A25-213 The catalog, app and runner checks, with the packages and script tests:
+- [X] T-A25-213 The catalog, app and runner checks, with the packages and script tests: — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P02.{catalog,experience-packages-2,script-tests,app-unit,verify-27}.json exit 0 (runner on iOS 27.2)
   - `--name catalog`; `--name experience-packages`; `--name script-tests`;
   - `xcodegen generate --spec project.yml`, then `--name app-unit -- python3 scripts/release_check.py --only
     app-build-for-testing-ios27 app-unit-ios27`;
