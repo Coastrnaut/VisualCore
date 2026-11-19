@@ -24,6 +24,50 @@ Canonical overrides:
 - **No VisualCore or ProjectM change; no device run** before ImplementationLock-100: the device plan lists checks that
   need real hardware, each pending. Simulator results are never device evidence. Follow `specs/170-vpl-p05-budget-usability`.
 
+## Clarifications
+
+### Session 2026-11-19
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- **Background:** `ExperienceSession` pauses the render host on a background or inactive scene phase and resumes it
+  on active; the presenter is not told. `RenderHost` sets `FrameInfo.time` to `CACurrentMediaTime()` minus the host's
+  first frame time, never paused, so the first frame after a return carries the whole gap. A24-P02/P03's recorder
+  already ends a run as interrupted when an interval leaves 0…1,000 ms, so a background of a second or more interrupts
+  the run; a shorter inactive moment shows as a dropped frame.
+- **Interface tests:** the app's interface tests launch with `-vcResetData`, `-vcSkipWelcome`, `-vcCandidates` and
+  `-openExperience <id>` (Visual Programming Lab's `VPLSupport`), and XCUITest can send the app to the background with
+  `XCUIDevice.shared.press(.home)` and bring it back with `activate()`.
+
+- Q: What makes a run valid, qualified or invalid? → A: `RunQualification` in the core, from the run alone:
+  - **invalid** when the state is `stopped` (reason `stopped`) or `interrupted` (`interrupted`), or no frame was measured
+    (`no-samples`);
+  - otherwise **qualified** with every reason that applies: `thermal-changed` (start and end differ), `thermal-serious`
+    or `thermal-critical` (either state), `low-power` (on at start or end), `dropped-frames` (the summary's flag),
+    `too-few-for-p99`;
+  - otherwise **valid**. A run without a report (a test fixture) is qualified with `no-report`.
+  Sentences: "Interrupted (for example by leaving the app)", "Stopped before the end", "No frame was measured", "The
+  thermal state changed during the run", "The device was hot (serious)", "The device was hot (critical)", "Low Power
+  Mode was on", "Some frames were dropped", "Too few frames for p99", "No device report".
+- Q: How is the qualification shown and exported? → A: Computed, not stored: the list shows "Valid", "Qualified" or
+  "Invalid"; the opened result lists the sentences; the CSV gains the key rows `qualification` and
+  `qualification_reasons` (codes joined by `;`) after `state` (CSV format version 2), and the JSON stays the run file
+  (version 3) because the qualification is derived from it.
+- Q: How are trials compared? → A: `Repeatability.summarise(_ runs: [BenchmarkRun])` in the core groups by case
+  fingerprint; within the group of the run the person opened, a trial is comparable when its device model, OS version,
+  app build and tier equal the opened run's and it is not invalid; otherwise it is listed with `different-case`,
+  `different-device`, `different-os`, `different-build`, `different-tier` or `invalid`. The summary gives each
+  comparable trial's interval p50 and p95 (by save order), the spread (largest minus smallest) for each when there are
+  at least two, and the GPU p50 spread only when every comparable trial has a GPU distribution. Shown in a
+  `repeatability` block of the opened result.
+- Q: What does "About these numbers" say, and where is it? → A: `GBLExplanation` (the copy in the experience) opened
+  by `explain` from an opened result and from the repeatability block; sections with spoken headings: "What is
+  measured" (frame interval, presenter CPU time, GPU time where a timer exists), "Valid, qualified, invalid", "Why
+  numbers differ" (thermal state, Low Power Mode, display refresh, background work, the case's version), "Simulator
+  numbers" (say nothing about a device), "What the lab does not do" (rank devices, claim precision, send results).
+  The interface tests (`GBLRunUITests` in chunk `f3`) run quads to Finished (18 s), save, open, explain, and a second
+  test sends the app to the background mid-run and expects "Interrupted"; each under 60 s.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - A run says whether it can be trusted (Priority: P1) 🎯
