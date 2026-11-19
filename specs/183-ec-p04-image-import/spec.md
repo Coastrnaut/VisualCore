@@ -23,6 +23,46 @@ Canonical overrides:
   `specs/175-gbl-p03-runner-probe`.
 - **Privacy:** the picker runs out of process; nothing is read without the person's pick; no permission is asked.
 
+## Clarifications
+
+### Session 2026-11-19
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- **Upload today:** `RenderTarget.upload(rgbaFloats:)` takes four floats per pixel (rows bottom-up) for `.rgba8` and
+  `.rgba16f` and refuses `.r8`, a wrong count and a stale or released target; `Texture.upload(rgba:)` takes bytes but
+  fills a `Texture`, which `FieldPass` cannot sample (A25-P00 audit).
+- **Platform:** the app and packages target iOS 26; SwiftUI's `PhotosPicker` (PhotosUI) runs out of process and hands
+  back the picked item's data, needing no usage string; no project check refuses PhotosUI.
+- **Decoding:** ImageIO's `CGImageSourceCreateThumbnailAtIndex` with `kCGImageSourceCreateThumbnailWithTransform`
+  applies the EXIF orientation and `kCGImageSourceThumbnailMaxPixelSize` scales the longer edge; drawing into an sRGB
+  `CGContext` converts any embedded profile to sRGB.
+
+- Q: What does the VisualCore upload look like? → A: `RenderTarget.upload(rgba: [UInt8]) -> Bool` in
+  VisualCoreRendering (gap U-RGBAUPLOAD), rows bottom-up like `upload(rgbaFloats:)`: `.rgba8` stores the bytes as given,
+  `.rgba16f` stores n/255; `.r8`, a count other than width × height × 4 and a stale or released target are refused
+  (false). Tests: bytes into an `.rgba8` target read back equal; into `.rgba16f` within half-float precision of n/255;
+  each refusal. `///` docs, the API baseline (`scripts/check_public_api.py --update`), both READMEs and the reference
+  regression in two chunks.
+- Q: How is a picture decoded, and to what size? → A: `ImageImport.decode(_ data: Data, limit: Int) -> Result<
+  ImportedPicture, ImportRefusal>` in the experience: data above 50 MiB is refused before decoding (`a25.image-too-large`);
+  data ImageIO cannot read is `a25.image-damaged`; a picture under 8 pixels on a side is `a25.image-too-small`. The
+  thumbnail is made with the transform applied and the longer edge at most `limit`, drawn into an 8-bit sRGB context
+  with premultiplied-last alpha and un-premultiplied into straight RGBA bytes top-down; `limit` is the smaller of
+  `ResourceRegistry.maxTextureSize` and 2,048 (the pool cap of A25-P02).
+- Q: How is the regression fixture built? → A: Generated in the tests with ImageIO, never bundled: a 64 × 48 picture with
+  a red marked corner written with each EXIF orientation 1…8 (the marked corner always decodes to the top left, and the
+  decoded size is 64 × 48 or 48 × 64 as the orientation says), and a flat Display P3 colour (1, 0, 0) that decodes to sRGB
+  within 3/255 of the standard conversion's value (red 255, green and blue near 0 after clipping), plus a picture of
+  4,000 × 1,000 pixels that decodes to 2,048 × 512.
+- Q: How does the experience use it? → A: An `import` control (SwiftUI `PhotosPicker`, images only) loads the item's
+  data and hands it to `ComposerPresenter.importPicture(data:)`; the presenter decodes on a background task and, on the
+  main actor, keeps the bytes and makes them the source (uploaded with `upload(rgba:)` after flipping rows) at the next
+  frame; the preview, slots and result take the picture's size. A `test-picture` control returns to the built-in
+  picture. A cancelled pick changes nothing. After `recreateContext` the kept bytes are uploaded again. The imported
+  picture is not in the snapshot. The status reads "Your picture" or the refusal's message ("This picture cannot be
+  read.", "This picture is too large.", "This picture is too small.").
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Use my own picture (Priority: P1) 🎯
