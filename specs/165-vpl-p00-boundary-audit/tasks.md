@@ -43,7 +43,7 @@
 
 - [X] T-A23-004 [US2] Reference chunk 1 (`--name reference-1 -- python3 scripts/release_check.py --only — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A23-P00.reference-1.json exit 0 (3/3: reference-engine-xcframework, reference-build-projectm-ios-sim, reference-clean) on the phase-start tree
   reference-engine-xcframework reference-build-projectm-ios-sim reference-clean`)
-- [ ] T-A23-005 [US2] Reference chunk 2 (`--name reference-2 -- python3 scripts/release_check.py --only
+- [X] T-A23-005 [US2] Reference chunk 2 (`--name reference-2 -- python3 scripts/release_check.py --only — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A23-P00.reference-2.json exit 0 (4/4: reference-test-anglerendering-ios27 and -ios26, projectm-reference-ios27 and -ios26); the 7 steps, commands and results recorded in docs/apps/visual-programming-lab/regression-baseline.md
   reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27
   projectm-reference-ios26`); record the 7 steps, commands and results in
   `docs/apps/visual-programming-lab/regression-baseline.md` (FR-A23-004, SC-A23-003)
