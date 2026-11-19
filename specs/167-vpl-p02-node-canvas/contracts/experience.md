@@ -19,3 +19,7 @@
     path for every node, port and connection (labels from `EditMessages`);
   - the presenter learns the canvas size in points from `pointer`'s `viewSize` and the overlay's report, 1,024 × 768
     until then; test seams also `mirror`, `grid` and `clamp`.
+- **As built (A23-P05, feature 170):** `add-node` and `input-<id>-<index>` are no longer a menu and a picker but
+  inline expanding button lists (`add-node-<kind>`, `input-<id>-<index>-option-<tag>` with tags `none` and
+  `<id>-<output>`), and the Examples menu likewise (`examples`, `example-<id>`), because XCTest never saw the app idle
+  while a system menu was open over the 30-frames-a-second canvas.

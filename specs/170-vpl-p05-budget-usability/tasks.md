@@ -74,7 +74,7 @@
 
 ## Phase 7: Convergence
 
-- [ ] T-A23-512 Record the as-built design in `specs/170-vpl-p05-budget-usability/{data-model.md,contracts/tests.md}` and `specs/167-vpl-p02-node-canvas/contracts/experience.md` (as an A23-P05 note), per SC-A23-501, clarification Q4 and contracts/tests.md (contradicts, unrequested):
+- [X] T-A23-512 Record the as-built design in `specs/170-vpl-p05-budget-usability/{data-model.md,contracts/tests.md}` and `specs/167-vpl-p02-node-canvas/contracts/experience.md` (as an A23-P05 note), per SC-A23-501, clarification Q4 and contracts/tests.md (contradicts, unrequested): — Verified 2026-11-19: 2026-11-19: as-built notes in data-model.md (stress comparison, held/restore), contracts/tests.md (inline lists, ids) and specs/167 contracts/experience.md (A23-P05 note); .autonomy/checks/A23-P05.documented-api-2.json exit 0; validate_docs 186 dossiers 0 problems
   - the stress comparison: the three examples hold 1, 2 and 3 slots, so each cycle's level is compared with the first cycle showing the same example (cycle 49 with cycle 1, cycle 50 with cycle 2), with `leaked` 0 after every cycle; `LabLevel` is in StressCycleTests;
   - the Add node menu, the Examples menu and the list form's pickers became inline expanding button lists (`add-node` with `add-node-<kind>`, `examples` with `example-<id>`, `input-<id>-<index>` with `input-<id>-<index>-option-<tag>`), because XCTest never saw the app idle while a system menu was open over a canvas presenting 30 frames a second;
   - `PreviewPipeline` notes the programs and slots it holds on release and rebuilds them on restore in every state but failed, so a rebuild keeps the level in the invalid and refused states.
