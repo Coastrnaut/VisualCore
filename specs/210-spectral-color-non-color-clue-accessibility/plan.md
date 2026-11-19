@@ -39,9 +39,10 @@ No NEEDS CLARIFICATION remains.
 | II App-neutral API · II-a reference | PASS — generic colour and clue API; `///`; API baseline; reference regression. |
 | III GPU lifecycle | PASS — no new GPU object type; tests draw through `RenderHost` and check zero leaks. |
 | IV Host-testable | PASS — all colour science and validation pure and host-tested. |
-| VIII Accessibility | PASS — non-colour clue per coded state; names read by VoiceOver; colour-vision setting. |
+| VII Native, accessible UI | PASS — non-colour clue per coded state; names read by VoiceOver; colour-vision setting in the native settings form. |
 | IX Bounded input | PASS — finite 0…1 components; ≤ 32 states; names 1…40 characters. |
-| X Persistence compatibility | PASS — old preference files decode with defaults; unknown values become `standard`. |
+| X Licensing and provenance | PASS — OKLab (MIT/public domain) and Machado 2009 constants cited in docs; presets original. |
+| XI Stable identity | PASS — old preference files decode with defaults; unknown values become `standard`; keys unchanged. |
 | XIII Code-only visuals | PASS — shapes and patterns are signed distances; presets constructed in code. |
 
 Post-design re-check: PASS.
