@@ -17,7 +17,7 @@
 
 ## Phase 2: Story 1 — nothing leaves the device without the person's tap (P1) 🎯
 
-- [ ] T-A24-602 [P] [US1] Write `docs/apps/graphics-benchmark-lab/privacy-and-credits.md` and
+- [X] T-A24-602 [P] [US1] Write `docs/apps/graphics-benchmark-lab/privacy-and-credits.md` and — Verified 2026-11-19: 2026-11-19 privacy-and-credits.md and licenses.md name state.json, result-<n>.json, results.json and the export files, their place and removal, nothing sent automatically, no permission, public device facts, the licences; validate_docs PASS
   `docs/apps/graphics-benchmark-lab/licenses.md` (FR-A24-601), after `docs/apps/visual-programming-lab/`:
   - the stored data (the session snapshot; `result-<n>.json`, at most 12; `results.json`; export files in the temporary
     folder `GraphicsBenchmarkLab-Export`), its place and its removal (Remove in the results list; exports when the
