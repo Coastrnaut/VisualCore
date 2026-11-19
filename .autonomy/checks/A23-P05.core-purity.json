@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "sh",
+    "-c",
+    "! grep -rnE \"import (UIKit|SwiftUI|OpenGLES|Network)|URLSession|Date\\(\\)|ContinuousClock|CFAbsoluteTime\" Packages/ExperiencesCreative/VisualProgrammingLab/Core"
+  ],
+  "command": "sh -c '! grep -rnE \"import (UIKit|SwiftUI|OpenGLES|Network)|URLSession|Date\\(\\)|ContinuousClock|CFAbsoluteTime\" Packages/ExperiencesCreative/VisualProgrammingLab/Core'",
+  "elapsed_seconds": 0.01,
+  "exit_code": 0,
+  "finished": "2026-11-19T14:26:15+00:00",
+  "log": ".autonomy/logs/A23-P05.core-purity.log",
+  "log_sha256": "202906709fdda12af75cda59824d720021464c96a6c0aeb46abcf773d92f7887",
+  "name": "core-purity",
+  "stage": "A23-P05",
+  "started": "2026-11-19T14:26:15+00:00",
+  "timed_out": false
+}

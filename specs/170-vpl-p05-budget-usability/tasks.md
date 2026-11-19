@@ -47,7 +47,7 @@
 
 ## Phase 6: Evidence
 
-- [ ] T-A23-508 Review checkpoint: `--name vpl-ios27` (both package test targets on sim-27.2, each under 10 s), the
+- [X] T-A23-508 Review checkpoint: `--name vpl-ios27` (both package test targets on sim-27.2, each under 10 s), the — Verified 2026-11-19: 2026-11-19: review checkpoint: .autonomy/checks/A23-P05.vpl-ios27-2.json exit 0 (162 core and 73 experience tests on sim-27.2, after the inline lists), A23-P05.documented-api.json, A23-P05.isolation.json and A23-P05.core-purity.json exit 0
   documented API, isolation and core purity
 - [ ] T-A23-509 Contract: G-DEVICE closed by "A23-P05" as the plan (its rows stay pending); M31 notes the pending rows
   (`--name contract`)
