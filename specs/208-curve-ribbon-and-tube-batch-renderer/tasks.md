@@ -78,7 +78,7 @@
 - [X] T-R02F08-014 Record in `research.md` and `data-model.md` that on closed curves the frame rotation bound is the bend — Verified 2026-11-19: 2026-11-19 research.md R6 and data-model.md record the closed-curve rotation bound (matches CurveFrameTests)
   plus the closing twist spread per step (|closing angle| × step / length), open curves keep the strict bound, per
   SC-R02F08-002 (partial)
-- [ ] T-R02F08-015 Record the as-built API in `contracts/api.md`: `CurveSamples.init(positions:closed:)`,
+- [X] T-R02F08-015 Record the as-built API in `contracts/api.md`: `CurveSamples.init(positions:closed:)`, — Verified 2026-11-19: 2026-11-19 contracts/api.md As built (names checked by grep in CurveSampler.swift)
   `CubicBezierChain.controlPoints(segment:)`, `CatmullRomSpline.neighbourhood(segment:)` and `alpha`,
   `CurveSampler.maxDepth`, the budget clamp to 2…65,536, `Mesh.merged` refusing mismatched attribute counts, closed
   frames returning count + 1 with a seam frame, and no welding in ribbons and tubes, per contracts/api.md (partial)
