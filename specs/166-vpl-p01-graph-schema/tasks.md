@@ -34,7 +34,7 @@
   sorted keys", the body through `MigrationChain(currentVersion: 1)`, refusal codes `damaged`, `newer-version`,
   `too-large`, `not-finite`, `out-of-range`, and `fingerprint(of:)` with `DigestBuilder(domain: "a23.visual-graph")`
   over the fields of Q3 in their order.
-- [ ] T-A23-105 [P] [US1] Write `Packages/ExperiencesCreative/VisualProgrammingLab/CoreTests/{LibraryTests,GraphModelTests,DocumentTests}.swift`
+- [X] T-A23-105 [P] [US1] Write `Packages/ExperiencesCreative/VisualProgrammingLab/CoreTests/{LibraryTests,GraphModelTests,DocumentTests}.swift` — Verified 2026-11-18: 2026-11-18: LibraryTests (6, five over the 7 kinds), GraphModelTests (8) and DocumentTests (19): every kind's table, byte-identical round trips, every refusal code on reading and writing, each limit at and one past its bound, a stable fingerprint that changes with one value; .autonomy/checks/A23-P01.vpl-core-ios27.json exit 0 (70 tests in 7 suites on sim-27.2, slowest 0.047 s); written by an agent, retested
   (SC-A23-101):
   - every kind declares its ports and parameters, and every default lies in its range (US2 scenario 3);
   - graphs round-trip byte-identical with the same identities, connections and positions; one sample per refusal
