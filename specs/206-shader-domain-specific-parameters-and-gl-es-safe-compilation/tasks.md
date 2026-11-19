@@ -88,3 +88,13 @@
 ## Parallel examples
 
 - **Agent S:** 002, 004. **Agent P:** 003, 005. **Agent G:** 007 after 006. **Lead:** 001, 006, 008–014.
+
+## Phase 7: Convergence
+
+- [ ] T-R02F06-015 Record the as-built API in `specs/206-shader-domain-specific-parameters-and-gl-es-safe-compilation/contracts/api.md`
+  and `data-model.md`: `prewarm(…vertexName:fragmentName:)`, `PrewarmReport.Entry.reasonCode` and counts,
+  `DefineSet.empty/names/lines/validate(name:value:)`, `UniformLayoutError` (duplicate name, undeclarable `.other`),
+  `ParameterUniformBinding.uniformName(_:)`, `ShaderProgram.maxInfoLogBytes`; the reason-code mapping of every
+  `VariantError` (duplicates and empty lists map to `shader.too-many-variants`, the only variant code) and of
+  `.unknownSource` (`shader.unknown-include`); and that the existing `program(...)` now labels link diagnostics
+  `<vertexName>+<fragmentName>` per contracts/api.md, data-model.md (partial)
