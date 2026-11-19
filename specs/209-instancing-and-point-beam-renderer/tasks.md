@@ -30,7 +30,7 @@
   500 `MeshRenderer` draws within 1/255 with depth on; one draw call; above the limit refused with nothing drawn;
   non-finite refused; scrambled translucent orders equal the sorted picture; equal depths keep order; 100 frames keep
   live counts constant; context rebuild gives the same picture)
-- [ ] T-R02F09-004 [US2] [US3] Create `Packages/VisualCoreRendering/Sources/VisualCoreRendering/BeamRenderer.swift`
+- [X] T-R02F09-004 [US2] [US3] Create `Packages/VisualCoreRendering/Sources/VisualCoreRendering/BeamRenderer.swift` — Verified 2026-11-19: lead retest: R02-F09/rendering-27 exit=0 incl. BeamRendererTests (4,096 px vs BeamProfile.coverage, max 0.54/255, tolerance 2/255)
   (`Beam`, `BeamBlend`; strip per clarification Q2 with the end-on fallback; Gaussian falloff; premultiplied sorted by
   midpoint depth or additive unsorted; depth test on, write off, culling off, state restored; limit 65,536; reused
   buffer; internal `drawCallCount`) with `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/BeamRendererTests.swift`
