@@ -11,9 +11,20 @@
 //   - `undo` (`edit.undo`) and `redo` (`edit.redo`);
 //   - `status`: "Ready" or the message of the last refused action; `diagnostics`: the programs that did not build.
 //
+// Feature 182 (A25-P03) T-A25-304, T-A25-305, T-A25-307 (clarifications Q1, Q3, Q5; contracts/presets.md):
+//   - `compare` ("Show original" / "Show result"): `view.compare [on]`; the status then says "Original";
+//   - `presets` (inline, never a menu): the name field `preset-name`, `preset-save` (saves the chain under the typed
+//     name), and per preset `preset-row-<n>` (its name; an unreadable file says so with its code), `preset-open-<n>`
+//     (readable presets only) and `preset-remove-<n>`, `<n>` the file's number; `preset-message`, the library's last
+//     sentence. Without storage the section says that presets are not available;
+//   - each node row `node-<i>` offers the named accessibility actions of ``ComposerLabels/actions(for:in:)`` ("Move
+//     up", "Move down", "Turn off" or "Turn on", "Raise <name>", "Lower <name>"), applied through the presenter as
+//     the matching buttons apply them.
+// The presets section acts through ``ComposerPresetActions`` (the presenter's actions, held weakly).
+//
 // Every edit is a button, so nothing needs dragging (constitution A25 accessibility). Inline buttons, never a `Menu`, a
-// popover or a sheet over the drawing (the A23-P05 lesson). The view stores only references (the port and the mirror),
-// never a closure. Every button is at least 44 points high; the text wraps with Dynamic Type. The spoken labels are
+// popover or a sheet over the drawing (the A23-P05 lesson). The view stores the port, the mirror and the presenter's
+// weakly held actions. Every button is at least 44 points high; the text wraps with Dynamic Type. The spoken labels are
 // the pure static functions of ``ComposerLabels`` so that tests can read them.
 import EffectsComposerCore
 import Foundation
@@ -79,6 +90,58 @@ enum ComposerLabels {
         let next = min(max(parameter.value + (up ? step : -step), range.lowerBound), range.upperBound)
         return ComposerCore.fraction(of: parameter.spec, value: next)
     }
+
+    /// The label of the `compare` toggle: "Show original" while the result is shown, else "Show result".
+    static func compareLabel(_ compare: Bool) -> String {
+        compare ? "Show result" : "Show original"
+    }
+
+    /// The named accessibility actions of the node at `index` of `chain`, in order: "Move up" (absent for the first),
+    /// "Move down" (absent for the last), "Turn off" or "Turn on", then "Raise <name>" and "Lower <name>" for each
+    /// parameter in definition order. Empty for an index with no node.
+    static func actions(for index: Int, in chain: EffectChain) -> [String] {
+        guard chain.nodes.indices.contains(index) else { return [] }
+        let node = chain.nodes[index]
+        var names: [String] = []
+        if index > 0 { names.append("Move up") }
+        if index < chain.nodes.count - 1 { names.append("Move down") }
+        names.append(node.enabled ? "Turn off" : "Turn on")
+        for parameter in node.definition.parameters {
+            names.append("Raise " + parameter.name)
+            names.append("Lower " + parameter.name)
+        }
+        return names
+    }
+
+    /// The core action the named accessibility action `name` of the node at `index` of `chain` applies: a move by one
+    /// place, the enabled flag flipped, or a parameter stepped by a tenth of its range (``stepFraction(_:up:)``); nil
+    /// for a name ``actions(for:in:)`` does not list.
+    static func command(named name: String, for index: Int,
+                        in chain: EffectChain) -> (control: String, values: [Double])? {
+        guard actions(for: index, in: chain).contains(name) else { return nil }
+        let row = NodeRow(node: chain.nodes[index], index: index)
+        switch name {
+        case "Move up": return ("chain.move", [Double(index), Double(index - 1)])
+        case "Move down": return ("chain.move", [Double(index), Double(index + 1)])
+        case "Turn off": return ("chain.enable", [Double(index), 0])
+        case "Turn on": return ("chain.enable", [Double(index), 1])
+        default:
+            for (slot, parameter) in row.parameters.enumerated() {
+                if name == "Raise " + parameter.name {
+                    return ("chain.set", [Double(index), Double(slot), stepFraction(parameter, up: true)])
+                }
+                if name == "Lower " + parameter.name {
+                    return ("chain.set", [Double(index), Double(slot), stepFraction(parameter, up: false)])
+                }
+            }
+            return nil
+        }
+    }
+
+    /// The label of `preset-row-<n>`: the preset's name, or "<name>, unreadable (<code>)".
+    static func presetLabel(_ entry: PresetLibraryEntry) -> String {
+        entry.refusal.map { entry.name + ", unreadable (" + $0 + ")" } ?? entry.name
+    }
 }
 
 /// The native controls of Effects Composer (see the file header).
@@ -87,6 +150,10 @@ struct ECControls: View {
     let port: ExperienceActionPort
     /// What the controls show.
     let mirror: ComposerMirror
+    /// The presenter's library and accessibility actions.
+    let presets: ComposerPresetActions
+    /// The name typed into `preset-name`.
+    @State private var presetName = ""
 
     /// Sends `control` with `values` and shows "Ready" or the refusal's message in the status line.
     @MainActor
@@ -112,10 +179,14 @@ struct ECControls: View {
                     Self.send(port, mirror, "edit.redo")
                 }
             }
-            Text(verbatim: mirror.status)
+            button(ComposerLabels.compareLabel(mirror.compare), label: ComposerLabels.compareLabel(mirror.compare),
+                   name: "compare", enabled: true) {
+                Self.send(port, mirror, "view.compare", [mirror.compare ? 0 : 1])
+            }
+            Text(verbatim: mirror.shownStatus)
                 .font(.body)
                 .fixedSize(horizontal: false, vertical: true)
-                .accessibilityLabel(Text(verbatim: "Status, " + mirror.status))
+                .accessibilityLabel(Text(verbatim: "Status, " + mirror.shownStatus))
                 .accessibilityIdentifier(port.identifier("status"))
             if !mirror.diagnostics.isEmpty {
                 Text(verbatim: mirror.diagnostics)
@@ -124,8 +195,64 @@ struct ECControls: View {
                     .accessibilityLabel(Text(verbatim: "Program problems, " + mirror.diagnostics))
                     .accessibilityIdentifier(port.identifier("diagnostics"))
             }
+            presetsSection
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    /// The inline presets: the name field, the save button, one row per preset and the library's message.
+    private var presetsSection: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(verbatim: "Presets").font(.subheadline).accessibilityAddTraits(.isHeader)
+            if mirror.hasLibrary {
+                HStack(spacing: 12) {
+                    TextField("Preset name", text: $presetName)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                        .frame(minHeight: 44)
+                        .accessibilityLabel(Text(verbatim: "Preset name"))
+                        .accessibilityIdentifier(port.identifier("preset-name"))
+                    button("Save", label: "Save the chain as a preset", name: "preset-save",
+                           enabled: !mirror.presetsReadOnly) {
+                        if case .success = presets.save(presetName) { presetName = "" }
+                    }
+                }
+                ForEach(mirror.presets) { entry in
+                    presetRow(entry)
+                }
+            } else {
+                Text(verbatim: "Presets are not available here.").font(.footnote)
+            }
+            if let message = mirror.libraryMessage {
+                Text(verbatim: message)
+                    .font(.footnote)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityLabel(Text(verbatim: "Presets, " + message))
+                    .accessibilityIdentifier(port.identifier("preset-message"))
+            }
+        }
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier(port.identifier("presets"))
+    }
+
+    /// The row of one preset: its name, `preset-open-<n>` (readable only) and `preset-remove-<n>`.
+    private func presetRow(_ entry: PresetLibraryEntry) -> some View {
+        let n = entry.number
+        return HStack(spacing: 12) {
+            Text(verbatim: ComposerLabels.presetLabel(entry))
+                .font(.footnote)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier(port.identifier("preset-row-\(n)"))
+            if entry.isReadable {
+                button("Open", label: "Open the preset " + entry.name, name: "preset-open-\(n)", enabled: true) {
+                    _ = presets.open(entry.file)
+                }
+            }
+            button("Remove", label: "Remove the preset " + entry.name, name: "preset-remove-\(n)",
+                   enabled: !mirror.presetsReadOnly) {
+                _ = presets.remove(entry.file)
+            }
+        }
     }
 
     /// One `add-<effect>` button per effect.
@@ -155,6 +282,11 @@ struct ECControls: View {
                 .fixedSize(horizontal: false, vertical: true)
                 .accessibilityLabel(Text(verbatim: ComposerLabels.nodeLabel(row, count: count)))
                 .accessibilityIdentifier(port.identifier("node-\(i)"))
+                .accessibilityActions {
+                    ForEach(ComposerLabels.actions(for: i, in: mirror.chain), id: \.self) { name in
+                        Button(name) { presets.perform(name, i) }
+                    }
+                }
             HStack(spacing: 12) {
                 button(row.enabled ? "Turn off" : "Turn on", label: ComposerLabels.enableLabel(row, count: count),
                        name: "enable-\(i)", enabled: true) {

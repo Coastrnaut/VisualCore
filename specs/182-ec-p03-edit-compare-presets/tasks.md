@@ -37,7 +37,7 @@
 - [X] T-A25-306 [US3] Write `Packages/ExperiencesCreative/EffectsComposer/ExperienceTests/AliasingTests.swift` per clarification Q4: `FieldPass.runObserver` over 50 — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P03.ec-ios27.json exit 0 (44 core and 45 experience tests on sim-27.2); AliasingTests: 166 passes over 50 edits, none reads its output or writes the source
   edits of every kind with compare toggled every 5 and a frame after each; no input equals the output and no output is
   the source's texture
-- [ ] T-A25-307 [US4] Add `ComposerLabels.actions(for:)` and the named accessibility actions to `ECControls` per
+- [X] T-A25-307 [US4] Add `ComposerLabels.actions(for:)` and the named accessibility actions to `ECControls` per — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P03.ec-ios27.json exit 0 (44 core and 45 experience tests on sim-27.2); AccessibilityActionTests: action lists for first, middle and last nodes; 21 actions applied, each changes the chain as named
   clarification Q5; write `Packages/ExperiencesCreative/EffectsComposer/ExperienceTests/AccessibilityActionTests.swift`: the actions listed for the first, a middle
   and the last node, and applying each changes the chain as named and redraws
 
