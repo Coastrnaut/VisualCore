@@ -1324,7 +1324,7 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     "AuroraExperience",
                                     # Feature 160 (A22-P02): Shader Studio, integrated at X-A22.
                                     "ShaderStudioExperience",
-                                    # Feature 167 (A23-P02): Visual Programming Lab, a candidate until X-A23.
+                                    # Feature 167 (A23-P02): Visual Programming Lab, integrated at X-A23.
                                     "VisualProgrammingLabExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):

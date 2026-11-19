@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a23.visual-programming-lab",
+    "--runtime",
+    "26"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a23.visual-programming-lab --runtime 26",
+  "elapsed_seconds": 56.392,
+  "exit_code": 0,
+  "finished": "2026-11-19T14:59:59+00:00",
+  "gate": "X-A23",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-A23.sim26.log",
+  "log_sha256": "2efe8c750ff63ff7330f97a9603d960833ef06cb9fb5231bd0c07d2744356252",
+  "name": "sim26",
+  "started": "2026-11-19T14:59:03+00:00",
+  "timed_out": false
+}

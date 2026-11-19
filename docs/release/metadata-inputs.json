@@ -187,9 +187,17 @@
       "name": "Shader Studio",
       "permissions": [],
       "tier": "free"
+    },
+    {
+      "category": "tools",
+      "code": "A23",
+      "id": "a23.visual-programming-lab",
+      "name": "Visual Programming Lab",
+      "permissions": [],
+      "tier": "free"
     }
   ],
-  "ledger_sha256": "6d2b0b741864574c5ee21a3781ba79d9abc1d80eb18cdea2aed6e6581ccd9d8b",
+  "ledger_sha256": "bba2e36f429f7b3ad3c203fddc46d63143bdc8c31708e93f30eb1a64c71dc5eb",
   "privacy_answers": "unproven",
   "schema": 1
 }

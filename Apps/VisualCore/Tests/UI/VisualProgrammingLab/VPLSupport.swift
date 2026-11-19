@@ -1,7 +1,7 @@
 // VPLSupport — feature 170 (A23-P05) T-A23-505 (FR-A23-504, SC-A23-504; clarification Q4; User Story 4;
 // contracts/tests.md "Interface"): helpers of the interface tests of Visual Programming Lab (A23) inside the one app,
 // modelled on `SSSupport`. Every launch carries `-vcCandidates` (DebugLaunch: the candidates' catalog entries become
-// available and are registered). A fresh start erases the data (`-vcResetData`), skips the welcome and opens the
+// available and are registered; harmless since A23 was integrated at X-A23, 2026-11-19). A fresh start erases the data (`-vcResetData`), skips the welcome and opens the
 // experience directly with `-openExperience a23.visual-programming-lab`. A fresh lab opens on the starter graph,
 // Noise 1 → Output 2, whose status reads "Ready".
 //
