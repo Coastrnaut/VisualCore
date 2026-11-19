@@ -21,6 +21,64 @@ Canonical overrides:
 - **Still a candidate:** not available to a person until X-A23. Saving and examples come in A23-P04.
 - **No VisualCore or ProjectM change.** Follow `specs/160-ss-p02-compile-preview` and `specs/167-vpl-p02-node-canvas`.
 
+## Clarifications
+
+### Session 2026-11-18
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- **Passes:** `FieldPass(registry:fragment:inputs:label:library:)` (VisualCoreRendering) compiles a fragment with the
+  full-screen vertex shader (`out vec2 v_uv`, 0…1) inside the host's context and throws `FieldPassError.compile`;
+  `run(output:inputs:uniforms:)` takes `.target(RenderTarget)` or `.framebuffer(name:width:height:)`, sampler inputs
+  by name and `FieldUniform` values (`float`, `vec2`, `vec4`, `int`), refuses an input that is its own output, and sets
+  the viewport to (0, 0, width, height) and leaves it there.
+- **Targets:** `ResourceRegistry.makeRenderTarget(width:height:format:depth:label:)` charges
+  width × height × `TextureFormat.bytesPerPixel` (rgba8 4) against `ResourceBudget` (default total 256 MiB);
+  `ResourceRegistry.stats` gives `liveCount`, `liveBytes`, `totalBytes`, `peakBytes` and `leaked`.
+- **GLSL:** `ShaderBundle.visualCoreIncludes` holds `vc/noise.glsl` (`vc_fbm(vec2 p, int octaves, float lacunarity,
+  float gain)`, `vc_valueNoise`, `vc_gradientNoise`), `vc/color.glsl` and `vc/palette.glsl`.
+
+- Q: How does a graph become passes? → A: `GraphCompiler` in the core (pure) turns an accepted graph into a
+  `PassSchedule` for a preview of 256 × 256 pixels:
+  - texture nodes reaching the Output, in the checker's order, become passes: Noise one (`noise`), Gradient one
+    (`gradient`), Mix one (`mix`), Blur two (`blur-h`, then `blur-v`), Output one (`output`, to the framebuffer);
+  - Time and Constant become values: a connected scalar input takes Constant's `value` (clamped to the input's
+    parameter range), a colour input Constant's red, green and blue, and Noise's time input `time × rate`; an
+    unconnected Noise time uses the frame time; an unconnected colour input of Gradient uses black (start) or white
+    (end); every other unconnected scalar uses its node's parameter;
+  - each pass names its operator, its inputs by slot, its uniform values (resolved per frame for time) and its output
+    slot.
+- Q: How are textures counted and limited? → A: Slots are assigned in pass order: an output takes the lowest free slot,
+  and a slot is freed after the last pass that reads it. The budget is the number of slots × 256 × 256 × 4 bytes
+  (rgba8). The limit is 6 slots (1.5 MiB); a schedule needing more is refused with "This graph needs N textures; the
+  preview allows 6." before any allocation. The presenter allocates exactly the schedule's slots.
+- Q: What is a content key, and when is something compiled? → A: Each node's key is a `DigestBuilder` digest of its
+  kind, its parameters in name order and the keys of the nodes connected to its inputs in input order, so a change
+  marks the node and everything downstream (`GraphCompiler.changed(from:to:)`). The presenter sees the graph's
+  fingerprint change, and at its next `draw` (never from a control) compiles once: it builds the schedule, creates the
+  operator programs it does not yet hold (each operator's program is built once per context), and allocates the slots
+  if their count changed; `compileCount` counts these compiles. A view change never compiles.
+- Q: How is the preview drawn, and how is it checked? → A: Each frame the presenter draws the grid (full screen), then
+  the schedule's passes into the slots, then the `output` pass into the framebuffer at (0, 0) with a square side of a
+  third of the drawable's shorter side (the bottom-left inset); the overlay frames that square and labels it
+  "Preview". The operators are fragment programs in the experience (`Operators.swift`):
+  - noise: `vc_fbm(v_uv × scale + time × speed, octaves, 2, 0.5)` as grey;
+  - gradient: `mix(start, end, clamp(dot(v_uv − 0.5, (cos a, sin a)) + 0.5, 0, 1))`;
+  - mix: `mix(a, b, amount)`;
+  - blur: a normalised Gaussian of `2r + 1` taps along one axis, σ = max(r / 2, 0.5), edges clamped;
+  - output: a copy of its input.
+
+  The experience tests draw at a fixed time off screen and read the inset back: gradient, mix and a flat colour
+  (Constant into both Gradient ends) against CPU references within 2 of 255; noise twice the same and different with
+  another scale; blur of a ramp equal to the ramp away from the edges; output equal to its input.
+- Q: What does the preview show when it cannot draw, and how does it recover? → A: A `PreviewState`:
+  `ready`, `invalid(message)` (the checker's status sentence, such as "Output not connected"), `refused(message)`
+  (the budget) and `failed(message)` (a compile failure on the driver); in every state but `ready` no pass of the
+  graph is drawn and the inset shows the message in the overlay. The canvas keeps working. On teardown the presenter
+  releases every pass and slot; a context rebuild sets them up again from the same schedule; a resize keeps the 256 ×
+  256 slots and moves the inset. The preview is shown or hidden with a native switch (`preview-toggle`), view state
+  that changes neither the graph nor its digest.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - See the picture the graph makes (Priority: P1) 🎯
