@@ -62,12 +62,13 @@
 - [ ] T-A23-008 [US4] Complete the contract, then rerun the checker (`--name contract-2`):
   - **`gaps`:** for every non-available row, the owning module and the phase per research D4: G-MODEL, G-TYPES
     (A23-P01); G-CANVAS (A23-P02); G-COMPILE, G-OPERATORS, G-BUDGET (A23-P03); G-LIBRARY (A23-P04); the device plan
-    (A23-P05); release (A23-P06). All are app-local per clarifications Q1–Q5. No upstream gap.
+    (A23-P05); release (A23-P06). All are app-local per the five clarification answers (session 2026-11-18). No upstream gap.
   - **Risks:** the three manual risks (texture memory from user graphs, touch wiring on small screens, graph-format
     migration) as `negative` entries naming the owner, verification method and release-blocker condition (source
     "manual §13 risk N"); plus the FR-A23-006 negative rules.
-  - **`decision`:** keys `result`, `reasons`, `blockers`. It is "stop" if no full-screen pass can sample another
-    pass's render target in the host's context, or if no versioned migration exists for persisted files.
+  - **`decision`:** keys `result`, `reasons`, `blockers`. It is "stop" (US4 scenario 2) if a chain of passes over
+    render targets in the host's context, sampling one pass's output in the next, or a bounded generated fragment
+    program is missing and cannot be built over the existing renderer; a missing host never permits a second backend.
   (FR-A23-003, FR-A23-006, SC-A23-002)
 
 ## Phase 7: Polish and evidence
