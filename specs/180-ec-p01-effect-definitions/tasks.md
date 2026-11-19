@@ -18,7 +18,7 @@
 
 ## Phase 2: Story 1 — five effects with bounded parameters (P1) 🎯
 
-- [ ] T-A25-103 [P] [US1] Create `Packages/ExperiencesCreative/EffectsComposer/Core/EffectDefinition.swift` per contracts/core.md and clarification Q1: `EffectID`,
+- [X] T-A25-103 [P] [US1] Create `Packages/ExperiencesCreative/EffectsComposer/Core/EffectDefinition.swift` per contracts/core.md and clarification Q1: `EffectID`, — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P01.ec-core-ios27.json exit 0 (35 tests in 8 suites on sim-27.2); five definitions per clarification Q1
   `ParameterSpec` (range closed and finite, default inside, whole), `EffectDefinition` (fingerprint domain
   `a25.effect.v1`), `EffectLibrary.all` (grade, blur, distort, vignette, posterize) and value validation naming the
   effect and parameter
