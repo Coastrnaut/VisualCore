@@ -199,6 +199,8 @@ the same way and the graph, selection and view are unchanged.
 - **A drag between two inputs or two outputs:** refused as the wrong direction.
 - **A node dragged beyond the canvas bounds:** stops at the bound.
 - **Small screens:** every port's touch target is at least 44 points at the default zoom.
+- **An interrupted touch** (a call, the app moving to the background): the drag is dropped; the graph stays as of the
+  last completed move and no rubber wire remains.
 
 ## Requirements *(mandatory)*
 
