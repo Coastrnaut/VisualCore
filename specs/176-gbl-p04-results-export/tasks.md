@@ -11,7 +11,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T-A24-401 Baseline: cite the A24-P03 evidence (`.autonomy/checks/A24-P03.{gbl-ios27,app-unit,verify-27}.json`) on
+- [X] T-A24-401 Baseline: cite the A24-P03 evidence (`.autonomy/checks/A24-P03.{gbl-ios27,app-unit,verify-27}.json`) on — Verified 2026-11-19: 2026-11-19: .autonomy/checks/A24-P03.{gbl-ios27,app-unit,verify-27}.json exit 0 at A24-P03; Packages unchanged since fbaad7d9
   the tree recorded at A24-P03 (`fbaad7d9`), whose Packages are unchanged since (owner ruling of 2026-11-14)
 
 ## Phase 2: Story 1 — settings stored with the run (P1) 🎯
