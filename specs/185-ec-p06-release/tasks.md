@@ -53,7 +53,7 @@
 
 ## Phase 6: Evidence and close
 
-- [ ] T-A25-609 Effects Composer tests on sim-27.2 (`--name ec-ios27`, each under 10 s), the documented API and
+- [X] T-A25-609 Effects Composer tests on sim-27.2 (`--name ec-ios27`, each under 10 s), the documented API and — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P06.{ec-recovery-samples,documented-api,app-ui}.json (exit 0; 95+49 package tests; app unit tests incl. CatalogSearchTests passed)
   CatalogSearchTests through the app unit run
 - [ ] T-A25-610 App: `xcodegen generate --spec project.yml`, then `--name app-ui -- python3 scripts/release_check.py
   --only app-build-for-testing-ios27 app-unit-ios27 app-ui-ios27-h3`; `--name verify-27`; `--name script-tests`
