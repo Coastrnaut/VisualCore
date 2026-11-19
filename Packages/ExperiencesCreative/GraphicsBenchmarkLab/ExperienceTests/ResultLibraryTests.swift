@@ -153,7 +153,7 @@ enum ResultTest {
         let label = ResultsView.rowLabel(entry)
         let expectedLabel = "Shader ALU, Finished, p50 "
             + BenchPresenter.milliseconds(text: run.summary.interval.p50) + ", p95 "
-            + BenchPresenter.milliseconds(text: run.summary.interval.p95) + ", GPU timed"
+            + BenchPresenter.milliseconds(text: run.summary.interval.p95) + ", GPU timed, Qualified"
         #expect(label == expectedLabel)
         #expect(ResultsView.identifierNames(entry) == ["result-row-1", "result-open-1", "result-remove-1"])
 

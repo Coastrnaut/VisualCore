@@ -30,7 +30,7 @@
 - [X] T-A24-505 [US1] [US2] [US3] `Experience/{GBLExplanation,ExplanationView,RepeatabilityView}.swift` and the — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A24-P05.gbl-ios27.json (62 experience tests) and A24-P05.copy-explanation.json, exit 0
   `ResultsView`, `BenchPresenter`, `GBLControls` changes (FR-A24-502, 503, 504; contracts/review.md identifiers): the
   qualification in the list and the opened result, the repeatability block, `explain` from both, spoken headings
-- [ ] T-A24-506 [US1] [US3] `ExperienceTests/{QualificationDisplayTests,ExplanationTests}.swift`: the list and the
+- [X] T-A24-506 [US1] [US3] `ExperienceTests/{QualificationDisplayTests,ExplanationTests}.swift`: the list and the — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A24-P05.gbl-ios27.json: 62 experience tests in 11 suites, exit 0
   opened result show the class and sentences; an interrupted run (an interval over 1,000 ms after a pause) is
   invalid; the explanation names every limit of US3 and is reachable from a result and from repeatability; then
   `--name copy-explanation -- python3 scripts/check_copy_claims.py --config Configs/copy-claims-denylist.json --swift

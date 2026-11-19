@@ -1,0 +1,22 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_copy_claims.py",
+    "--config",
+    "Configs/copy-claims-denylist.json",
+    "--swift",
+    "Packages/ExperiencesCreative/GraphicsBenchmarkLab/Experience/GBLExplanation.swift",
+    "Packages/ExperiencesCreative/GraphicsBenchmarkLab/Experience/ExplanationView.swift",
+    "Packages/ExperiencesCreative/GraphicsBenchmarkLab/Experience/RepeatabilityView.swift"
+  ],
+  "command": "python3 scripts/check_copy_claims.py --config Configs/copy-claims-denylist.json --swift Packages/ExperiencesCreative/GraphicsBenchmarkLab/Experience/GBLExplanation.swift Packages/ExperiencesCreative/GraphicsBenchmarkLab/Experience/ExplanationView.swift Packages/ExperiencesCreative/GraphicsBenchmarkLab/Experience/RepeatabilityView.swift",
+  "elapsed_seconds": 0.027,
+  "exit_code": 0,
+  "finished": "2026-11-19T17:49:33+00:00",
+  "log": ".autonomy/logs/A24-P05.copy-explanation.log",
+  "log_sha256": "14b3c5f94bd6764cfa9e4be7f063d397cfe2fd433847cf8a480148a3addeb463",
+  "name": "copy-explanation",
+  "stage": "A24-P05",
+  "started": "2026-11-19T17:49:33+00:00",
+  "timed_out": false
+}
