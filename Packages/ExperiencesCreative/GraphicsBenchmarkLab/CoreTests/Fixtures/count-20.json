@@ -1,0 +1,195 @@
+{
+  "description": "20 measured intervals 0.5, 1.0, ... 10.0 ms (shuffled), CPU = interval, GPU = interval / 2: the minimum counts p95 20 and p99 100.",
+  "expected": {
+    "coolDownExcluded": 0,
+    "cpu": {
+      "count": 20,
+      "p50": 5.0,
+      "p95": 9.5
+    },
+    "dropped": 0,
+    "flags": [
+      "too-few-for-p99"
+    ],
+    "gpu": {
+      "count": 20,
+      "p50": 2.5,
+      "p95": 4.75
+    },
+    "interval": {
+      "count": 20,
+      "p50": 5.0,
+      "p95": 9.5
+    },
+    "measured": 20,
+    "warmUpExcluded": 1
+  },
+  "samples": [
+    {
+      "cpuMs": 2.0,
+      "dropped": false,
+      "frameIndex": 0,
+      "phase": "warmUp"
+    },
+    {
+      "cpuMs": 9.0,
+      "dropped": false,
+      "frameIndex": 1,
+      "gpuMs": 4.5,
+      "intervalMs": 9.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 8.0,
+      "dropped": false,
+      "frameIndex": 2,
+      "gpuMs": 4.0,
+      "intervalMs": 8.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 0.5,
+      "dropped": false,
+      "frameIndex": 3,
+      "gpuMs": 0.25,
+      "intervalMs": 0.5,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 2.5,
+      "dropped": false,
+      "frameIndex": 4,
+      "gpuMs": 1.25,
+      "intervalMs": 2.5,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 3.0,
+      "dropped": false,
+      "frameIndex": 5,
+      "gpuMs": 1.5,
+      "intervalMs": 3.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 3.5,
+      "dropped": false,
+      "frameIndex": 6,
+      "gpuMs": 1.75,
+      "intervalMs": 3.5,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 9.5,
+      "dropped": false,
+      "frameIndex": 7,
+      "gpuMs": 4.75,
+      "intervalMs": 9.5,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 5.0,
+      "dropped": false,
+      "frameIndex": 8,
+      "gpuMs": 2.5,
+      "intervalMs": 5.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 5.5,
+      "dropped": false,
+      "frameIndex": 9,
+      "gpuMs": 2.75,
+      "intervalMs": 5.5,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 7.0,
+      "dropped": false,
+      "frameIndex": 10,
+      "gpuMs": 3.5,
+      "intervalMs": 7.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 8.5,
+      "dropped": false,
+      "frameIndex": 11,
+      "gpuMs": 4.25,
+      "intervalMs": 8.5,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 2.0,
+      "dropped": false,
+      "frameIndex": 12,
+      "gpuMs": 1.0,
+      "intervalMs": 2.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 4.0,
+      "dropped": false,
+      "frameIndex": 13,
+      "gpuMs": 2.0,
+      "intervalMs": 4.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 1.0,
+      "dropped": false,
+      "frameIndex": 14,
+      "gpuMs": 0.5,
+      "intervalMs": 1.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 1.5,
+      "dropped": false,
+      "frameIndex": 15,
+      "gpuMs": 0.75,
+      "intervalMs": 1.5,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 10.0,
+      "dropped": false,
+      "frameIndex": 16,
+      "gpuMs": 5.0,
+      "intervalMs": 10.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 4.5,
+      "dropped": false,
+      "frameIndex": 17,
+      "gpuMs": 2.25,
+      "intervalMs": 4.5,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 7.5,
+      "dropped": false,
+      "frameIndex": 18,
+      "gpuMs": 3.75,
+      "intervalMs": 7.5,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 6.0,
+      "dropped": false,
+      "frameIndex": 19,
+      "gpuMs": 3.0,
+      "intervalMs": 6.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 6.5,
+      "dropped": false,
+      "frameIndex": 20,
+      "gpuMs": 3.25,
+      "intervalMs": 6.5,
+      "phase": "measure"
+    }
+  ]
+}

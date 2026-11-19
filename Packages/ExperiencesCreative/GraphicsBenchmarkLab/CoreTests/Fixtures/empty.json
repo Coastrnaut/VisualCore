@@ -1,0 +1,19 @@
+{
+  "description": "No samples at all: every distribution is empty and only no-samples is flagged.",
+  "expected": {
+    "coolDownExcluded": 0,
+    "cpu": {
+      "count": 0
+    },
+    "dropped": 0,
+    "flags": [
+      "no-samples"
+    ],
+    "interval": {
+      "count": 0
+    },
+    "measured": 0,
+    "warmUpExcluded": 0
+  },
+  "samples": []
+}

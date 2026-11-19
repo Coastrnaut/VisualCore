@@ -1,0 +1,275 @@
+{
+  "description": "30 measured frames that all take 16.5 ms: every present percentile is 16.5.",
+  "expected": {
+    "coolDownExcluded": 0,
+    "cpu": {
+      "count": 30,
+      "p50": 3.0,
+      "p95": 3.0
+    },
+    "dropped": 0,
+    "flags": [
+      "too-few-for-p99"
+    ],
+    "gpu": {
+      "count": 30,
+      "p50": 2.5,
+      "p95": 2.5
+    },
+    "interval": {
+      "count": 30,
+      "p50": 16.5,
+      "p95": 16.5
+    },
+    "measured": 30,
+    "warmUpExcluded": 1
+  },
+  "samples": [
+    {
+      "cpuMs": 2.0,
+      "dropped": false,
+      "frameIndex": 0,
+      "phase": "warmUp"
+    },
+    {
+      "cpuMs": 3.0,
+      "dropped": false,
+      "frameIndex": 1,
+      "gpuMs": 2.5,
+      "intervalMs": 16.5,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 3.0,
+      "dropped": false,
+      "frameIndex": 2,
+      "gpuMs": 2.5,
+      "intervalMs": 16.5,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 3.0,
+      "dropped": false,
+      "frameIndex": 3,
+      "gpuMs": 2.5,
+      "intervalMs": 16.5,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 3.0,
+      "dropped": false,
+      "frameIndex": 4,
+      "gpuMs": 2.5,
+      "intervalMs": 16.5,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 3.0,
+      "dropped": false,
+      "frameIndex": 5,
+      "gpuMs": 2.5,
+      "intervalMs": 16.5,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 3.0,
+      "dropped": false,
+      "frameIndex": 6,
+      "gpuMs": 2.5,
+      "intervalMs": 16.5,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 3.0,
+      "dropped": false,
+      "frameIndex": 7,
+      "gpuMs": 2.5,
+      "intervalMs": 16.5,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 3.0,
+      "dropped": false,
+      "frameIndex": 8,
+      "gpuMs": 2.5,
+      "intervalMs": 16.5,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 3.0,
+      "dropped": false,
+      "frameIndex": 9,
+      "gpuMs": 2.5,
+      "intervalMs": 16.5,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 3.0,
+      "dropped": false,
+      "frameIndex": 10,
+      "gpuMs": 2.5,
+      "intervalMs": 16.5,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 3.0,
+      "dropped": false,
+      "frameIndex": 11,
+      "gpuMs": 2.5,
+      "intervalMs": 16.5,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 3.0,
+      "dropped": false,
+      "frameIndex": 12,
+      "gpuMs": 2.5,
+      "intervalMs": 16.5,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 3.0,
+      "dropped": false,
+      "frameIndex": 13,
+      "gpuMs": 2.5,
+      "intervalMs": 16.5,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 3.0,
+      "dropped": false,
+      "frameIndex": 14,
+      "gpuMs": 2.5,
+      "intervalMs": 16.5,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 3.0,
+      "dropped": false,
+      "frameIndex": 15,
+      "gpuMs": 2.5,
+      "intervalMs": 16.5,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 3.0,
+      "dropped": false,
+      "frameIndex": 16,
+      "gpuMs": 2.5,
+      "intervalMs": 16.5,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 3.0,
+      "dropped": false,
+      "frameIndex": 17,
+      "gpuMs": 2.5,
+      "intervalMs": 16.5,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 3.0,
+      "dropped": false,
+      "frameIndex": 18,
+      "gpuMs": 2.5,
+      "intervalMs": 16.5,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 3.0,
+      "dropped": false,
+      "frameIndex": 19,
+      "gpuMs": 2.5,
+      "intervalMs": 16.5,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 3.0,
+      "dropped": false,
+      "frameIndex": 20,
+      "gpuMs": 2.5,
+      "intervalMs": 16.5,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 3.0,
+      "dropped": false,
+      "frameIndex": 21,
+      "gpuMs": 2.5,
+      "intervalMs": 16.5,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 3.0,
+      "dropped": false,
+      "frameIndex": 22,
+      "gpuMs": 2.5,
+      "intervalMs": 16.5,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 3.0,
+      "dropped": false,
+      "frameIndex": 23,
+      "gpuMs": 2.5,
+      "intervalMs": 16.5,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 3.0,
+      "dropped": false,
+      "frameIndex": 24,
+      "gpuMs": 2.5,
+      "intervalMs": 16.5,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 3.0,
+      "dropped": false,
+      "frameIndex": 25,
+      "gpuMs": 2.5,
+      "intervalMs": 16.5,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 3.0,
+      "dropped": false,
+      "frameIndex": 26,
+      "gpuMs": 2.5,
+      "intervalMs": 16.5,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 3.0,
+      "dropped": false,
+      "frameIndex": 27,
+      "gpuMs": 2.5,
+      "intervalMs": 16.5,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 3.0,
+      "dropped": false,
+      "frameIndex": 28,
+      "gpuMs": 2.5,
+      "intervalMs": 16.5,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 3.0,
+      "dropped": false,
+      "frameIndex": 29,
+      "gpuMs": 2.5,
+      "intervalMs": 16.5,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 3.0,
+      "dropped": false,
+      "frameIndex": 30,
+      "gpuMs": 2.5,
+      "intervalMs": 16.5,
+      "phase": "measure"
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "description": "One measured frame, the run's first, so it has no interval: the interval distribution is empty, CPU and GPU have p50 only.",
+  "expected": {
+    "coolDownExcluded": 0,
+    "cpu": {
+      "count": 1,
+      "p50": 4.5
+    },
+    "dropped": 0,
+    "flags": [
+      "too-few-for-p95",
+      "too-few-for-p99"
+    ],
+    "gpu": {
+      "count": 1,
+      "p50": 3.25
+    },
+    "interval": {
+      "count": 0
+    },
+    "measured": 1,
+    "warmUpExcluded": 0
+  },
+  "samples": [
+    {
+      "cpuMs": 4.5,
+      "dropped": false,
+      "frameIndex": 0,
+      "gpuMs": 3.25,
+      "phase": "measure"
+    }
+  ]
+}

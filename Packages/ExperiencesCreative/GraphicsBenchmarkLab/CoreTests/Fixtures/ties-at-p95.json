@@ -1,0 +1,171 @@
+{
+  "description": "20 intervals: 1 ... 17 ms and three of 25 ms. p95 rank = (95*20+99)/100 = 19, inside the tie, so 25; p50 rank 10 gives 10.",
+  "expected": {
+    "coolDownExcluded": 0,
+    "cpu": {
+      "count": 20,
+      "p50": 1.0,
+      "p95": 1.0
+    },
+    "dropped": 0,
+    "flags": [
+      "gpu-time-not-available",
+      "too-few-for-p99"
+    ],
+    "interval": {
+      "count": 20,
+      "p50": 10.0,
+      "p95": 25.0
+    },
+    "measured": 20,
+    "warmUpExcluded": 1
+  },
+  "samples": [
+    {
+      "cpuMs": 2.0,
+      "dropped": false,
+      "frameIndex": 0,
+      "phase": "warmUp"
+    },
+    {
+      "cpuMs": 1.0,
+      "dropped": false,
+      "frameIndex": 1,
+      "intervalMs": 13.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 1.0,
+      "dropped": false,
+      "frameIndex": 2,
+      "intervalMs": 14.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 1.0,
+      "dropped": false,
+      "frameIndex": 3,
+      "intervalMs": 25.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 1.0,
+      "dropped": false,
+      "frameIndex": 4,
+      "intervalMs": 12.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 1.0,
+      "dropped": false,
+      "frameIndex": 5,
+      "intervalMs": 7.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 1.0,
+      "dropped": false,
+      "frameIndex": 6,
+      "intervalMs": 8.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 1.0,
+      "dropped": false,
+      "frameIndex": 7,
+      "intervalMs": 10.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 1.0,
+      "dropped": false,
+      "frameIndex": 8,
+      "intervalMs": 4.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 1.0,
+      "dropped": false,
+      "frameIndex": 9,
+      "intervalMs": 16.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 1.0,
+      "dropped": false,
+      "frameIndex": 10,
+      "intervalMs": 17.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 1.0,
+      "dropped": false,
+      "frameIndex": 11,
+      "intervalMs": 1.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 1.0,
+      "dropped": false,
+      "frameIndex": 12,
+      "intervalMs": 2.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 1.0,
+      "dropped": false,
+      "frameIndex": 13,
+      "intervalMs": 5.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 1.0,
+      "dropped": false,
+      "frameIndex": 14,
+      "intervalMs": 9.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 1.0,
+      "dropped": false,
+      "frameIndex": 15,
+      "intervalMs": 6.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 1.0,
+      "dropped": false,
+      "frameIndex": 16,
+      "intervalMs": 25.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 1.0,
+      "dropped": false,
+      "frameIndex": 17,
+      "intervalMs": 15.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 1.0,
+      "dropped": false,
+      "frameIndex": 18,
+      "intervalMs": 25.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 1.0,
+      "dropped": false,
+      "frameIndex": 19,
+      "intervalMs": 3.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 1.0,
+      "dropped": false,
+      "frameIndex": 20,
+      "intervalMs": 11.0,
+      "phase": "measure"
+    }
+  ]
+}

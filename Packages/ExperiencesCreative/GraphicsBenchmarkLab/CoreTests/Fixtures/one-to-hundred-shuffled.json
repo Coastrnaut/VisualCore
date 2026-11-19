@@ -1,0 +1,732 @@
+{
+  "description": "Intervals 1 ... 100 ms in a fixed shuffled order after one warm-up frame without an interval; CPU = interval / 4. Nearest rank: p50 = 50th smallest, p95 = 95th, p99 = 99th.",
+  "expected": {
+    "coolDownExcluded": 0,
+    "cpu": {
+      "count": 100,
+      "p50": 12.5,
+      "p95": 23.75,
+      "p99": 24.75
+    },
+    "dropped": 0,
+    "flags": [
+      "gpu-time-not-available"
+    ],
+    "interval": {
+      "count": 100,
+      "p50": 50.0,
+      "p95": 95.0,
+      "p99": 99.0
+    },
+    "measured": 100,
+    "warmUpExcluded": 1
+  },
+  "samples": [
+    {
+      "cpuMs": 2.0,
+      "dropped": false,
+      "frameIndex": 0,
+      "phase": "warmUp"
+    },
+    {
+      "cpuMs": 9.25,
+      "dropped": false,
+      "frameIndex": 1,
+      "intervalMs": 37.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 21.75,
+      "dropped": false,
+      "frameIndex": 2,
+      "intervalMs": 87.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 8.75,
+      "dropped": false,
+      "frameIndex": 3,
+      "intervalMs": 35.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 16.25,
+      "dropped": false,
+      "frameIndex": 4,
+      "intervalMs": 65.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 17.25,
+      "dropped": false,
+      "frameIndex": 5,
+      "intervalMs": 69.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 1.0,
+      "dropped": false,
+      "frameIndex": 6,
+      "intervalMs": 4.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 0.5,
+      "dropped": false,
+      "frameIndex": 7,
+      "intervalMs": 2.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 12.75,
+      "dropped": false,
+      "frameIndex": 8,
+      "intervalMs": 51.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 9.5,
+      "dropped": false,
+      "frameIndex": 9,
+      "intervalMs": 38.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 12.0,
+      "dropped": false,
+      "frameIndex": 10,
+      "intervalMs": 48.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 3.0,
+      "dropped": false,
+      "frameIndex": 11,
+      "intervalMs": 12.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 20.0,
+      "dropped": false,
+      "frameIndex": 12,
+      "intervalMs": 80.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 14.25,
+      "dropped": false,
+      "frameIndex": 13,
+      "intervalMs": 57.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 4.25,
+      "dropped": false,
+      "frameIndex": 14,
+      "intervalMs": 17.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 14.0,
+      "dropped": false,
+      "frameIndex": 15,
+      "intervalMs": 56.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 16.0,
+      "dropped": false,
+      "frameIndex": 16,
+      "intervalMs": 64.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 6.5,
+      "dropped": false,
+      "frameIndex": 17,
+      "intervalMs": 26.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 24.5,
+      "dropped": false,
+      "frameIndex": 18,
+      "intervalMs": 98.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 0.75,
+      "dropped": false,
+      "frameIndex": 19,
+      "intervalMs": 3.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 21.0,
+      "dropped": false,
+      "frameIndex": 20,
+      "intervalMs": 84.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 18.0,
+      "dropped": false,
+      "frameIndex": 21,
+      "intervalMs": 72.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 2.75,
+      "dropped": false,
+      "frameIndex": 22,
+      "intervalMs": 11.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 13.5,
+      "dropped": false,
+      "frameIndex": 23,
+      "intervalMs": 54.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 17.0,
+      "dropped": false,
+      "frameIndex": 24,
+      "intervalMs": 68.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 5.25,
+      "dropped": false,
+      "frameIndex": 25,
+      "intervalMs": 21.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 8.25,
+      "dropped": false,
+      "frameIndex": 26,
+      "intervalMs": 33.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 15.0,
+      "dropped": false,
+      "frameIndex": 27,
+      "intervalMs": 60.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 11.5,
+      "dropped": false,
+      "frameIndex": 28,
+      "intervalMs": 46.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 15.25,
+      "dropped": false,
+      "frameIndex": 29,
+      "intervalMs": 61.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 25.0,
+      "dropped": false,
+      "frameIndex": 30,
+      "intervalMs": 100.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 17.75,
+      "dropped": false,
+      "frameIndex": 31,
+      "intervalMs": 71.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 9.75,
+      "dropped": false,
+      "frameIndex": 32,
+      "intervalMs": 39.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 23.5,
+      "dropped": false,
+      "frameIndex": 33,
+      "intervalMs": 94.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 7.0,
+      "dropped": false,
+      "frameIndex": 34,
+      "intervalMs": 28.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 2.0,
+      "dropped": false,
+      "frameIndex": 35,
+      "intervalMs": 8.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 5.75,
+      "dropped": false,
+      "frameIndex": 36,
+      "intervalMs": 23.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 1.75,
+      "dropped": false,
+      "frameIndex": 37,
+      "intervalMs": 7.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 13.0,
+      "dropped": false,
+      "frameIndex": 38,
+      "intervalMs": 52.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 15.5,
+      "dropped": false,
+      "frameIndex": 39,
+      "intervalMs": 62.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 3.75,
+      "dropped": false,
+      "frameIndex": 40,
+      "intervalMs": 15.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 24.25,
+      "dropped": false,
+      "frameIndex": 41,
+      "intervalMs": 97.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 24.75,
+      "dropped": false,
+      "frameIndex": 42,
+      "intervalMs": 99.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 13.75,
+      "dropped": false,
+      "frameIndex": 43,
+      "intervalMs": 55.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 1.25,
+      "dropped": false,
+      "frameIndex": 44,
+      "intervalMs": 5.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 19.0,
+      "dropped": false,
+      "frameIndex": 45,
+      "intervalMs": 76.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 23.0,
+      "dropped": false,
+      "frameIndex": 46,
+      "intervalMs": 92.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 22.5,
+      "dropped": false,
+      "frameIndex": 47,
+      "intervalMs": 90.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 24.0,
+      "dropped": false,
+      "frameIndex": 48,
+      "intervalMs": 96.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 6.0,
+      "dropped": false,
+      "frameIndex": 49,
+      "intervalMs": 24.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 8.5,
+      "dropped": false,
+      "frameIndex": 50,
+      "intervalMs": 34.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 23.75,
+      "dropped": false,
+      "frameIndex": 51,
+      "intervalMs": 95.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 6.75,
+      "dropped": false,
+      "frameIndex": 52,
+      "intervalMs": 27.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 4.5,
+      "dropped": false,
+      "frameIndex": 53,
+      "intervalMs": 18.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 10.75,
+      "dropped": false,
+      "frameIndex": 54,
+      "intervalMs": 43.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 3.5,
+      "dropped": false,
+      "frameIndex": 55,
+      "intervalMs": 14.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 17.5,
+      "dropped": false,
+      "frameIndex": 56,
+      "intervalMs": 70.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 11.0,
+      "dropped": false,
+      "frameIndex": 57,
+      "intervalMs": 44.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 20.75,
+      "dropped": false,
+      "frameIndex": 58,
+      "intervalMs": 83.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 19.75,
+      "dropped": false,
+      "frameIndex": 59,
+      "intervalMs": 79.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 2.25,
+      "dropped": false,
+      "frameIndex": 60,
+      "intervalMs": 9.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 1.5,
+      "dropped": false,
+      "frameIndex": 61,
+      "intervalMs": 6.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 7.75,
+      "dropped": false,
+      "frameIndex": 62,
+      "intervalMs": 31.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 7.5,
+      "dropped": false,
+      "frameIndex": 63,
+      "intervalMs": 30.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 5.5,
+      "dropped": false,
+      "frameIndex": 64,
+      "intervalMs": 22.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 19.5,
+      "dropped": false,
+      "frameIndex": 65,
+      "intervalMs": 78.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 16.75,
+      "dropped": false,
+      "frameIndex": 66,
+      "intervalMs": 67.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 12.25,
+      "dropped": false,
+      "frameIndex": 67,
+      "intervalMs": 49.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 9.0,
+      "dropped": false,
+      "frameIndex": 68,
+      "intervalMs": 36.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 4.0,
+      "dropped": false,
+      "frameIndex": 69,
+      "intervalMs": 16.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 10.0,
+      "dropped": false,
+      "frameIndex": 70,
+      "intervalMs": 40.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 20.5,
+      "dropped": false,
+      "frameIndex": 71,
+      "intervalMs": 82.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 18.5,
+      "dropped": false,
+      "frameIndex": 72,
+      "intervalMs": 74.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 3.25,
+      "dropped": false,
+      "frameIndex": 73,
+      "intervalMs": 13.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 12.5,
+      "dropped": false,
+      "frameIndex": 74,
+      "intervalMs": 50.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 10.25,
+      "dropped": false,
+      "frameIndex": 75,
+      "intervalMs": 41.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 4.75,
+      "dropped": false,
+      "frameIndex": 76,
+      "intervalMs": 19.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 21.25,
+      "dropped": false,
+      "frameIndex": 77,
+      "intervalMs": 85.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 22.25,
+      "dropped": false,
+      "frameIndex": 78,
+      "intervalMs": 89.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 18.25,
+      "dropped": false,
+      "frameIndex": 79,
+      "intervalMs": 73.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 18.75,
+      "dropped": false,
+      "frameIndex": 80,
+      "intervalMs": 75.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 2.5,
+      "dropped": false,
+      "frameIndex": 81,
+      "intervalMs": 10.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 6.25,
+      "dropped": false,
+      "frameIndex": 82,
+      "intervalMs": 25.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 7.25,
+      "dropped": false,
+      "frameIndex": 83,
+      "intervalMs": 29.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 20.25,
+      "dropped": false,
+      "frameIndex": 84,
+      "intervalMs": 81.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 14.75,
+      "dropped": false,
+      "frameIndex": 85,
+      "intervalMs": 59.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 22.0,
+      "dropped": false,
+      "frameIndex": 86,
+      "intervalMs": 88.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 14.5,
+      "dropped": false,
+      "frameIndex": 87,
+      "intervalMs": 58.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 5.0,
+      "dropped": false,
+      "frameIndex": 88,
+      "intervalMs": 20.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 22.75,
+      "dropped": false,
+      "frameIndex": 89,
+      "intervalMs": 91.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 11.25,
+      "dropped": false,
+      "frameIndex": 90,
+      "intervalMs": 45.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 0.25,
+      "dropped": false,
+      "frameIndex": 91,
+      "intervalMs": 1.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 13.25,
+      "dropped": false,
+      "frameIndex": 92,
+      "intervalMs": 53.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 8.0,
+      "dropped": false,
+      "frameIndex": 93,
+      "intervalMs": 32.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 11.75,
+      "dropped": false,
+      "frameIndex": 94,
+      "intervalMs": 47.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 19.25,
+      "dropped": false,
+      "frameIndex": 95,
+      "intervalMs": 77.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 16.5,
+      "dropped": false,
+      "frameIndex": 96,
+      "intervalMs": 66.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 23.25,
+      "dropped": false,
+      "frameIndex": 97,
+      "intervalMs": 93.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 21.5,
+      "dropped": false,
+      "frameIndex": 98,
+      "intervalMs": 86.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 15.75,
+      "dropped": false,
+      "frameIndex": 99,
+      "intervalMs": 63.0,
+      "phase": "measure"
+    },
+    {
+      "cpuMs": 10.5,
+      "dropped": false,
+      "frameIndex": 100,
+      "intervalMs": 42.0,
+      "phase": "measure"
+    }
+  ]
+}

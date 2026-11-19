@@ -1,0 +1,89 @@
+{
+  "description": "Ten warm-up frames and nothing measured: ten excluded, no-samples flagged.",
+  "expected": {
+    "coolDownExcluded": 0,
+    "cpu": {
+      "count": 0
+    },
+    "dropped": 0,
+    "flags": [
+      "no-samples"
+    ],
+    "interval": {
+      "count": 0
+    },
+    "measured": 0,
+    "warmUpExcluded": 10
+  },
+  "samples": [
+    {
+      "cpuMs": 3.0,
+      "dropped": false,
+      "frameIndex": 0,
+      "phase": "warmUp"
+    },
+    {
+      "cpuMs": 3.0,
+      "dropped": false,
+      "frameIndex": 1,
+      "intervalMs": 17.0,
+      "phase": "warmUp"
+    },
+    {
+      "cpuMs": 3.0,
+      "dropped": false,
+      "frameIndex": 2,
+      "intervalMs": 18.0,
+      "phase": "warmUp"
+    },
+    {
+      "cpuMs": 3.0,
+      "dropped": false,
+      "frameIndex": 3,
+      "intervalMs": 19.0,
+      "phase": "warmUp"
+    },
+    {
+      "cpuMs": 3.0,
+      "dropped": false,
+      "frameIndex": 4,
+      "intervalMs": 20.0,
+      "phase": "warmUp"
+    },
+    {
+      "cpuMs": 3.0,
+      "dropped": false,
+      "frameIndex": 5,
+      "intervalMs": 21.0,
+      "phase": "warmUp"
+    },
+    {
+      "cpuMs": 3.0,
+      "dropped": false,
+      "frameIndex": 6,
+      "intervalMs": 22.0,
+      "phase": "warmUp"
+    },
+    {
+      "cpuMs": 3.0,
+      "dropped": false,
+      "frameIndex": 7,
+      "intervalMs": 23.0,
+      "phase": "warmUp"
+    },
+    {
+      "cpuMs": 3.0,
+      "dropped": false,
+      "frameIndex": 8,
+      "intervalMs": 24.0,
+      "phase": "warmUp"
+    },
+    {
+      "cpuMs": 3.0,
+      "dropped": false,
+      "frameIndex": 9,
+      "intervalMs": 25.0,
+      "phase": "warmUp"
+    }
+  ]
+}
