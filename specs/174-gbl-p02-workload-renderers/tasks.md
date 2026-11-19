@@ -11,7 +11,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T-A24-201 Baseline: cite the A24-P01 evidence (`.autonomy/checks/A24-P01.{gbl-core-ios27,app-build,experience-packages}.json`)
+- [X] T-A24-201 Baseline: cite the A24-P01 evidence (`.autonomy/checks/A24-P01.{gbl-core-ios27,app-build,experience-packages}.json`) — Verified 2026-11-19: 2026-11-19: .autonomy/checks/A24-P01.{gbl-core-ios27,app-build,experience-packages}.json exit 0 at A24-P01; Packages unchanged since ee5a5f3e
   on the tree recorded at A24-P01 (`ee5a5f3e`), whose Packages are unchanged since (owner ruling of 2026-11-14)
 - [ ] T-A24-202 In `Packages/ExperiencesCreative/Package.swift` (lead): add `VisualCoreMath` and `VisualCoreSimulation`
   to the core and its tests; add `GraphicsBenchmarkLabExperience` (path `GraphicsBenchmarkLab/Experience`) with its
