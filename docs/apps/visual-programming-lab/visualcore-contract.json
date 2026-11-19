@@ -348,7 +348,7 @@
    "id": "M05",
    "capability": "Graph serialization: graphs written as versioned envelopes in the experience's own storage and migrated forward",
    "source": "brainstorm: graph serialization; spec FR-A23-002",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCorePersistence/Migration.swift",
@@ -391,7 +391,7 @@
     "file": "Packages/ExperiencesCreative/ShaderStudio/Experience/ProjectLibrary.swift",
     "symbol": "ProjectLibrary"
    },
-   "notes": "Tested in MigrationChain users (DocumentStoreTests, NamedLibraryTests, ExperienceSnapshotTests) and ExperienceStorageTests. EffectGraphDescription has no migration; NamedLibrary works on a raw directory, not on the experience storage. The graph schema is G-MODEL and the named-graph library after Shader Studio's ProjectLibrary is G-LIBRARY."
+   "notes": "Tested in MigrationChain users (DocumentStoreTests, NamedLibraryTests, ExperienceSnapshotTests) and ExperienceStorageTests. EffectGraphDescription has no migration; NamedLibrary works on a raw directory, not on the experience storage. The graph schema is G-MODEL and the named-graph library after Shader Studio's ProjectLibrary is G-LIBRARY. A23-P04 (feature 169): named, versioned graph files over ExperienceStorage (VisualProgrammingLab/Experience/GraphLibrary.swift, LabLibraryView.swift): save, open by restore, rename and remove, 24 graphs, damaged and newer files listed and kept, the reader through MigrationChain, three examples in code (LabExamples.swift) and diagnostics on the nodes they concern (Core/GraphDiagnostics.swift) (LibraryTests, LibraryRefusalTests, MigrationTests, StoredSampleTests, ExampleTests, DiagnosticsTests, DiagnosticsDisplayTests)."
   },
   {
    "id": "M06",
@@ -600,7 +600,7 @@
    "id": "M11",
    "capability": "Version 0.1 feature 06: versioned graph persistence with migration hooks",
    "source": "manual \u00a72 feature 06; spec FR-A23-002",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCorePersistence/Migration.swift",
@@ -637,7 +637,7 @@
     "file": "Packages/ExperiencesCreative/ShaderStudio/Experience/ProjectLibrary.swift",
     "symbol": "ProjectLibrary"
    },
-   "notes": "Tested in ExperienceStorageTests, DocumentStoreTests and NamedLibraryTests. The graph format and its MigrationChain are G-MODEL; save, open and the refusal of damaged and newer files are G-LIBRARY (manual \u00a713 risk 3)."
+   "notes": "Tested in ExperienceStorageTests, DocumentStoreTests and NamedLibraryTests. The graph format and its MigrationChain are G-MODEL; save, open and the refusal of damaged and newer files are G-LIBRARY (manual \u00a713 risk 3). A23-P04 (feature 169): named, versioned graph files over ExperienceStorage (VisualProgrammingLab/Experience/GraphLibrary.swift, LabLibraryView.swift): save, open by restore, rename and remove, 24 graphs, damaged and newer files listed and kept, the reader through MigrationChain, three examples in code (LabExamples.swift) and diagnostics on the nodes they concern (Core/GraphDiagnostics.swift) (LibraryTests, LibraryRefusalTests, MigrationTests, StoredSampleTests, ExampleTests, DiagnosticsTests, DiagnosticsDisplayTests)."
   },
   {
    "id": "M12",
@@ -914,7 +914,7 @@
    "id": "M19",
    "capability": "Local graph save and open with versioned files and migration; damaged and newer files refused and kept",
    "source": "spec FR-A23-003 area 8; manual \u00a713 risk 3",
-   "status": "requires adaptation",
+   "status": "available",
    "evidence": [
     {
      "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
@@ -951,7 +951,7 @@
     "file": "Packages/ExperiencesCreative/ShaderStudio/Experience/ProjectLibrary.swift",
     "symbol": "ProjectLibrary"
    },
-   "notes": "Tested in ExperienceStorageTests and DocumentStoreTests. Named graphs after Shader Studio's ProjectLibrary (app-local, not copied) are G-LIBRARY."
+   "notes": "Tested in ExperienceStorageTests and DocumentStoreTests. Named graphs after Shader Studio's ProjectLibrary (app-local, not copied) are G-LIBRARY. A23-P04 (feature 169): named, versioned graph files over ExperienceStorage (VisualProgrammingLab/Experience/GraphLibrary.swift, LabLibraryView.swift): save, open by restore, rename and remove, 24 graphs, damaged and newer files listed and kept, the reader through MigrationChain, three examples in code (LabExamples.swift) and diagnostics on the nodes they concern (Core/GraphDiagnostics.swift) (LibraryTests, LibraryRefusalTests, MigrationTests, StoredSampleTests, ExampleTests, DiagnosticsTests, DiagnosticsDisplayTests)."
   },
   {
    "id": "M20",
@@ -1493,7 +1493,7 @@
    "justification": "Named, versioned graph files over ExperienceStorage after Shader Studio's ProjectLibrary pattern (capped count and size, damaged and newer files refused and never deleted automatically), with the session snapshot holding the open graph and examples written in code, are app-local; NamedLibrary works on a raw directory (clarification Q4; manual \u00a713 risk 3).",
    "phase": 4,
    "test": "Experience tests: save, open, rename and remove round-trip; an older graph file migrates; damaged and newer files are refused with a message and still present afterwards; the count and size caps refuse; StorageQuota is never exceeded; diagnostics are shown on their nodes.",
-   "closed": null
+   "closed": "A23-P04"
   },
   {
    "id": "G-DEVICE",

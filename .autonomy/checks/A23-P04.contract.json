@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_app_contract.py",
+    "--app",
+    "visual-programming-lab",
+    "--render"
+  ],
+  "command": "python3 scripts/check_app_contract.py --app visual-programming-lab --render",
+  "elapsed_seconds": 0.057,
+  "exit_code": 0,
+  "finished": "2026-11-19T04:15:22+00:00",
+  "log": ".autonomy/logs/A23-P04.contract.log",
+  "log_sha256": "98e4fdef9ad9fff6e9f9aff8166749c09b08e2ed5fd9d36ce2c6a0043ef66373",
+  "name": "contract",
+  "stage": "A23-P04",
+  "started": "2026-11-19T04:15:21+00:00",
+  "timed_out": false
+}
