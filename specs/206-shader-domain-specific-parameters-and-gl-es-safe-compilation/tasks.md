@@ -91,7 +91,7 @@
 
 ## Phase 7: Convergence
 
-- [ ] T-R02F06-015 Record the as-built API in `specs/206-shader-domain-specific-parameters-and-gl-es-safe-compilation/contracts/api.md`
+- [X] T-R02F06-015 Record the as-built API in `specs/206-shader-domain-specific-parameters-and-gl-es-safe-compilation/contracts/api.md` — Verified 2026-11-19: 2026-11-19 contracts/api.md "As built" and data-model.md record the additions (names checked by grep in the sources) and mappings; validate_docs PASS
   and `data-model.md`: `prewarm(…vertexName:fragmentName:)`, `PrewarmReport.Entry.reasonCode` and counts,
   `DefineSet.empty/names/lines/validate(name:value:)`, `UniformLayoutError` (duplicate name, undeclarable `.other`),
   `ParameterUniformBinding.uniformName(_:)`, `ShaderProgram.maxInfoLogBytes`; the reason-code mapping of every

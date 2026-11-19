@@ -16,3 +16,7 @@
 - **PrewarmReport**: `[(key, outcome: compiled | cached | failed([ShaderDiagnostic]))]` in combination order, valid for
   the registry's current context generation; after a context rebuild the caller prewarms again (the cache is empty).
 - **ParameterUniformBinding**: schema, program, `bound: [name: location]`, `unused: [String]`.
+
+As built (T-R02F06-015): see [contracts/api.md](contracts/api.md) "As built" for the additions
+(`DefineSet` helpers, `UniformLayoutError`, `PrewarmReport` counts and entry reason codes) and the reason-code mapping
+of `VariantError` and `ShaderSourceError.unknownSource`.
