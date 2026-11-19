@@ -8,7 +8,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T-R02F10-001 Baselines: `--name baseline-host -- swift test --package-path Packages/VisualCore` and
+- [X] T-R02F10-001 Baselines: `--name baseline-host -- swift test --package-path Packages/VisualCore` and — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F10.baseline-host.json (exit 0, clean worktree of 19e37dae); rendering baseline = R02-F09.rendering-27-3.json (exit 0, 220 tests) at 9adce491, package sources unchanged since (no baseline rerun on an unchanged commit); the worktree attempt R02-F10.baseline-rendering exit 74 lacked the ANGLE binaries
   `--name baseline-rendering --` the VisualCoreRendering scheme on sim-27.2
 
 ## Phase 2: Foundational (pure colour science)
