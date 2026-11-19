@@ -57,7 +57,7 @@
 - [X] T-A23-410 Contract: G-LIBRARY closed by "A23-P04", rows whose gaps are all closed available (`--name contract`) — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A23-P04.contract.json exit 0 (G-LIBRARY closed by A23-P04; M05, M11 and M19 available with their notes)
 - [X] T-A23-411 The catalog, packages and script tests, `xcodegen generate`, the app build and unit tests (`--name — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A23-P04.catalog.json, A23-P04.experience-packages.json and A23-P04.script-tests.json exit 0; xcodegen generate; A23-P04.app-unit.json exit 0 (build for testing and app unit tests on iOS 27.2); A23-P04.verify-27.json exit 0 (all 9 scenarios on iOS 27.2)
   app-unit`) and the runner (`--name verify-27`)
-- [ ] T-A23-412 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+- [X] T-A23-412 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record — Verified 2026-11-18: 2026-11-18: /speckit-converge round 1 appended T-A23-413 (implemented), round 2 appended nothing (6 FR, 6 SC, 10 acceptance scenarios, 7 edge cases checked; every evidence file exit 0); .autonomy/evidence/A23-P04.json sealed; VERIFIED-GATE A23-P04 (169 of 263); planning index, matrix, distinctiveness, metadata, Auto-Creator, catalog (--check PASS), validate_autocreator and validate_docs PASS; README and docs/automatedtesting.md updated
   A23-P04; update README.md (rule 16) and `docs/automatedtesting.md` (rule 17)
 
 ## Dependencies
