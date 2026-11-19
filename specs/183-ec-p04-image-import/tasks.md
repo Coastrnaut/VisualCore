@@ -56,3 +56,11 @@
 ## Parallel examples
 
 - **Agent V:** 402, 403. **Agent I:** 404, 405. **Agent P:** 406 after V and I. **Lead:** 407–411.
+
+## Phase 5: Convergence
+
+- [ ] T-A25-412 Record the as-built limit that a PNG truncated in its image data is decoded by ImageIO (missing rows
+  come back blank) rather than refused, in `specs/183-ec-p04-image-import/research.md` and
+  `docs/apps/effects-composer/README.md`, and pin it with a test in
+  `Packages/ExperiencesCreative/EffectsComposer/ExperienceTests/ImageImportTests.swift` (a truncated PNG either decodes at
+  its stated size or is refused as damaged; it never crashes) per FR-A25-403, US3/AC2 (partial)
