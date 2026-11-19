@@ -55,7 +55,7 @@
 - [X] T-A23-409 Review checkpoint: `--name vpl-ios27` (both test targets, each test under 10 s, SC-A23-406), the — Verified 2026-11-18: 2026-11-18: review checkpoint: .autonomy/checks/A23-P04.vpl-ios27.json exit 0 (162 core and 63 experience tests on sim-27.2, slowest 1.27 s); A23-P04.documented-api.json, A23-P04.isolation.json and A23-P04.core-purity.json exit 0; the manifest test passes without regeneration
   documented API, isolation and core purity; regenerate `scenario-manifest.json` if the manifest test asks for it
 - [X] T-A23-410 Contract: G-LIBRARY closed by "A23-P04", rows whose gaps are all closed available (`--name contract`) — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A23-P04.contract.json exit 0 (G-LIBRARY closed by A23-P04; M05, M11 and M19 available with their notes)
-- [ ] T-A23-411 The catalog, packages and script tests, `xcodegen generate`, the app build and unit tests (`--name
+- [X] T-A23-411 The catalog, packages and script tests, `xcodegen generate`, the app build and unit tests (`--name — Verified 2026-11-18: 2026-11-18: .autonomy/checks/A23-P04.catalog.json, A23-P04.experience-packages.json and A23-P04.script-tests.json exit 0; xcodegen generate; A23-P04.app-unit.json exit 0 (build for testing and app unit tests on iOS 27.2); A23-P04.verify-27.json exit 0 (all 9 scenarios on iOS 27.2)
   app-unit`) and the runner (`--name verify-27`)
 - [ ] T-A23-412 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
   A23-P04; update README.md (rule 16) and `docs/automatedtesting.md` (rule 17)
