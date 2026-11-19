@@ -202,6 +202,8 @@ module will own each missing piece and in which phase.
   - the run phases (warm-up, measurement, cool-down), a capped duration and an immediate stop;
   - frame-time and CPU submit-time capture from a monotonic clock;
   - a GPU timer only where supported, detected by a capability probe;
+  - the renderer's facts (GL version, renderer string, extension list) reaching the experience without the host or
+    the internal GL shim;
   - the device, OS, build, quality-tier and thermal-context report from public APIs only;
   - local result storage with versioned files, and refusal of damaged or newer files;
   - export as versioned JSON or CSV through a system sheet the person opens;
