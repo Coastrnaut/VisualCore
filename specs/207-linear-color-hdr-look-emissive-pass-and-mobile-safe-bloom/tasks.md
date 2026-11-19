@@ -54,7 +54,7 @@
   "As built" in `docs/catalog/shared-feature-map.json` and `render_autocreator.py`
 - [X] T-R02F07-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F07.reference-1.json (exit 0)
 - [X] T-R02F07-010 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F07.reference-2.json (exit 0)
-- [ ] T-R02F07-011 Script tests (`--name script-tests`)
+- [X] T-R02F07-011 Script tests (`--name script-tests`) — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F07.script-tests.json (exit 0)
 - [ ] T-R02F07-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
   R02-F07; README.md and `docs/automatedtesting.md`
 
