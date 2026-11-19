@@ -76,3 +76,7 @@
 - **Then:** examples (406) and node diagnostics (407, 408).
 - **Review checkpoint:** at 409.
 - **Commits:** one per task.
+
+## Phase 6: Convergence
+
+- [ ] T-A23-413 Record the as-built design in `specs/169-vpl-p04-library-diagnostics/{data-model.md,contracts/library.md}`, per data-model "GraphLibraryFailure" and contracts/library.md (unrequested): the failures `readOnly` (a newer `library.json` is never overwritten) and `graph(code)` (the encoder refuses the graph), an oversized write as `storage(tooLarge)`; `<file>` in identifiers is the file name without `.json`; the extra identifiers `library-done`, `library-rename-name`, `library-rename-confirm`, `library-remove-confirm` (removal asks first), `library-replace-cancel` and `node-diagnostic-row-<id>`; `GraphDiagnostics`' sentence constants; library sentences shown in `library-message` with an accessibility label and not announced (the target does not depend on VisualCoreSimulation's announcements).
