@@ -43,7 +43,7 @@
   (FR-A25-606's four limits), and the a25 summary and capabilities in `Catalog/registrations.json` (built features,
   keeps "shader", ≤ 300 characters); `--name experience-release -- python3 scripts/release_check.py --only
   experience-release-a25 copy-claims-a25`; `python3 scripts/build_catalog.py`
-- [ ] T-A25-607 [US3] Write `specs/185-ec-p06-release/scan-claims-release.sh` with the words of clarification Q2;
+- [X] T-A25-607 [US3] Write `specs/185-ec-p06-release/scan-claims-release.sh` with the words of clarification Q2; — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P06.scan-claims.json (exit 0; 53 proving tests found)
   `--name scan-claims`
 
 ## Phase 5: Story 4 — a first session (P2)
