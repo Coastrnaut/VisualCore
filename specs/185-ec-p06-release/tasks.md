@@ -8,7 +8,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T-A25-601 Baseline: cite the A25-P05 evidence (`.autonomy/checks/A25-P05.{ec-ios27-3,app-unit-2,verify-27-2}.json`)
+- [X] T-A25-601 Baseline: cite the A25-P05 evidence (`.autonomy/checks/A25-P05.{ec-ios27-3,app-unit-2,verify-27-2}.json`) — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P05.{ec-ios27-3,app-unit-2,verify-27-2}.json (exit 0 each)
 
 ## Phase 2: Story 1 — nothing leaves without the person's choice (P1) 🎯
 
