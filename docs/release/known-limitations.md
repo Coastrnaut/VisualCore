@@ -545,6 +545,36 @@ and `VisualCoreRendering` (iOS, GL). ADR-0003 and the package map record this. R
   GBL-D1 to GBL-D6). No frame interval, CPU or GPU time, spread, heat, battery or capability figure from a device is
   stated.
 
+### Effects Composer (A25; features 179–185)
+
+- Five built-in effects only (Color grade, Blur, Distort, Vignette and Posterize, each version 1 with bounded
+  parameters); a chain holds at most eight of them in a line, with an undo and redo history of at most 64 edits that
+  is not stored. There is no other effect, no effect a person writes and no branching chain. The library holds at most
+  24 named looks of at most 69,632 bytes each; a damaged, newer or too-large look file is listed as unreadable with its
+  code and never opened or removed automatically, and an index of a newer version makes the library read only.
+- Pictures and exports are limited to 2,048 pixels on the longer edge (the smaller of the context's maximum texture
+  size and 2,048): a picked picture is scaled down to it when it is decoded, and a larger export is refused as "This
+  picture is too large to export." before anything is drawn. Picked data above 50 MiB and pictures under 8 pixels on a
+  side are refused. A picked picture is held in memory only and never stored, so a restored session shows the test
+  picture.
+- A PNG cut short in its image data is not always refused: ImageIO decodes it at its stated size with the missing rows
+  blank, and Effects Composer uses that picture (`ImageImportTests.truncatedInData`). Data cut before the image data,
+  noise and empty data are refused as damaged. Detecting such a cut would need a second PNG parser; the picture is one
+  the person chose.
+- The system share sheet reports no completion, so an exported file stays in the temporary folder `EffectsComposer`
+  after it was shared, until the next export (which removes the folder first) or the close of the experience; only one
+  export file exists at a time. HEIC is offered only where the device can write it; otherwise the export is refused
+  with "This format cannot be written here.".
+- Intermediate pictures between effects are half-float where the device can draw into it and 8-bit otherwise. Posterize
+  after another effect can land on a different level on half-float intermediates than on 8-bit ones when a value lies
+  exactly at a level boundary; the CPU reference quantises the same way as the drawing path, so the tests compare like
+  with like.
+- Simulator results are not device evidence. Peak memory, the preview's frame time while editing, the export time per
+  format, the written files in Files and Photos (the add-only Photos prompt is answered by the owner), recovery after
+  backgrounding, heat during repeated exports and the system accessibility audits wait for the device campaign
+  ([device-campaign.md](../apps/effects-composer/device-campaign.md), rows EC-D1 to EC-D7). No memory, timing, heat,
+  colour or accessibility figure from a device is stated.
+
 ## Distribution
 
 - No App Store submission, signing or purchase setup is part of this release; those are owner actions.

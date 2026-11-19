@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "experience": "a25.effects-composer",
+  "requiredDocs": [
+    "docs/apps/effects-composer/privacy-and-credits.md",
+    "docs/apps/effects-composer/store-listing.md",
+    "docs/apps/effects-composer/release-checklist.md",
+    "docs/apps/effects-composer/device-campaign.md",
+    "docs/apps/effects-composer/licenses.md",
+    "docs/apps/effects-composer/visualcore-contract.md",
+    "docs/release/build-and-archive.md"
+  ],
+  "checklist": "docs/apps/effects-composer/release-checklist.md",
+  "copyCheck": {
+    "text": [
+      "docs/apps/effects-composer/store-listing.md"
+    ],
+    "swift": [
+      "Packages/ExperiencesCreative/EffectsComposer/Experience/Adapter/ComposerCore.swift",
+      "Packages/ExperiencesCreative/EffectsComposer/Experience/Adapter/ECManifest.swift",
+      "Packages/ExperiencesCreative/EffectsComposer/Experience/ComposerPresenter.swift",
+      "Packages/ExperiencesCreative/EffectsComposer/Experience/ECControls.swift",
+      "Packages/ExperiencesCreative/EffectsComposer/Experience/EffectsComposerExperience.swift",
+      "Packages/ExperiencesCreative/EffectsComposer/Experience/ImageImport.swift",
+      "Packages/ExperiencesCreative/EffectsComposer/Experience/LookLibrary.swift",
+      "Packages/ExperiencesCreative/EffectsComposer/Experience/PreviewRenderer.swift",
+      "Packages/ExperiencesCreative/EffectsComposer/Experience/StillExport.swift"
+    ],
+    "allow": [
+      "share"
+    ]
+  }
+}

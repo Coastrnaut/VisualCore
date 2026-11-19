@@ -854,7 +854,7 @@
       "id": "a25.effects-composer",
       "code": "A25",
       "title": "Effects Composer",
-      "summary": "A chain editor for shader effects: colour grade, blur, distort, vignette and posterize are applied in order to a picture made in code, with a live preview. Effects can be added, moved, switched off, tuned and every edit undone. Offline; nothing is sent.",
+      "summary": "Shader effects in a chain: up to eight of colour grade, blur, distort, vignette and posterize on a picture made in code or a photo you pick, in linear-light colour, with a live preview and undo. Save named looks; export full size as PNG, JPEG or HEIC via the share sheet. Offline; nothing is sent.",
       "kind": "creative",
       "tier": "free",
       "category": "tools",
@@ -874,8 +874,10 @@
         "A chain of five built-in effects",
         "Reorder, switch and tune each effect",
         "Every edit can be undone",
-        "A live preview of the chain",
-        "Pictures made in code"
+        "Your own picture via the photo picker",
+        "Linear-light colour",
+        "Named looks saved on the device",
+        "Full-size PNG, JPEG or HEIC export"
       ],
       "quality_tiers": [
         "level-0"

@@ -35,7 +35,7 @@
 
 ## Phase 4: Story 3 — honest copy and a complete checklist (P1)
 
-- [ ] T-A25-606 [US3] Write `docs/apps/effects-composer/store-listing.md` (claims table naming proving tests; contains
+- [X] T-A25-606 [US3] Write `docs/apps/effects-composer/store-listing.md` (claims table naming proving tests; contains — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P06.experience-release.json (exit 0; 7 documents, 34 rows; copy claims over 10 files); build_catalog --check PASS
   "Nothing is sent"), `docs/apps/effects-composer/release-checklist.md` (one table: `| Item | Status | Evidence |`,
   statuses `verified`, `pending-campaign-ii` for EC-D1 … EC-D7, `owner-action` with `docs/release/build-and-archive.md`; the leftover-export row cites A25-P05's
   `PresenterExport` "one file at a time" test, analyze C2),
