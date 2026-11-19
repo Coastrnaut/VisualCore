@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "sh",
+    "-c",
+    "! grep -rnE \"import (UIKit|SwiftUI|OpenGLES|Network)|URLSession|Date\\(\\)|ContinuousClock|CFAbsoluteTime\" Packages/ExperiencesCreative/GraphicsBenchmarkLab/Core"
+  ],
+  "command": "sh -c '! grep -rnE \"import (UIKit|SwiftUI|OpenGLES|Network)|URLSession|Date\\(\\)|ContinuousClock|CFAbsoluteTime\" Packages/ExperiencesCreative/GraphicsBenchmarkLab/Core'",
+  "elapsed_seconds": 0.008,
+  "exit_code": 0,
+  "finished": "2026-11-19T16:04:44+00:00",
+  "log": ".autonomy/logs/A24-P02.core-purity.log",
+  "log_sha256": "277b6d174930efd2f5e7b4dfa4248b7a49eeb84f41db3a2146b7175b0f4fc818",
+  "name": "core-purity",
+  "stage": "A24-P02",
+  "started": "2026-11-19T16:04:44+00:00",
+  "timed_out": false
+}

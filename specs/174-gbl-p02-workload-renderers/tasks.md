@@ -74,7 +74,7 @@
   frame probe chosen where the opening picture's colour class holds at every time) and
   `ExperienceTests/GBLManifestTests.swift`; generate `scenario-manifest.json` with `UPDATE_SCENARIO_MANIFEST=1
   TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`
-- [ ] T-A24-212 Review checkpoint:
+- [X] T-A24-212 Review checkpoint: — Verified 2026-11-19: 2026-11-19: review checkpoint: .autonomy/checks/A24-P02.{gbl-ios27,documented-api,isolation,core-purity}.json exit 0 (50 core and 33 experience tests, each well under 10 s)
   - `--name gbl-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme
     ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing GraphicsBenchmarkLabCoreTests
     GraphicsBenchmarkLabExperienceTests`, each test under 10 s (SC-A24-206);
