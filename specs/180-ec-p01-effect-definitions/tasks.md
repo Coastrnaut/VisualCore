@@ -12,7 +12,7 @@
 ## Phase 1: Setup
 
 - [X] T-A25-101 Baseline: cite the A25-P00 evidence (`.autonomy/checks/A25-P00.{app-build,no-change,experience-packages}.json`) — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P00.{app-build,no-change,experience-packages}.json exit 0; Packages unchanged since a2d68e21
-- [ ] T-A25-102 Add `EffectsComposerCore` (path `EffectsComposer/Core`; VisualCoreExperience, VisualCorePersistence) and
+- [X] T-A25-102 Add `EffectsComposerCore` (path `EffectsComposer/Core`; VisualCoreExperience, VisualCorePersistence) and — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P01.experience-packages.json exit 0 (pending core EffectsComposerCore and EffectsComposerCoreTests)
   `EffectsComposerCoreTests` (also VisualCoreRendering) to `Packages/ExperiencesCreative/Package.swift` (lead); the
   package check still passes as a pending core
 

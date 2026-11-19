@@ -804,6 +804,19 @@ let package = Package(
                     path: "GraphicsBenchmarkLab/ExperienceTests",
                     // Feature 178 (A24-P06) T-A24-605: the committed stored samples of ReleaseSampleTests.
                     resources: [.copy("Fixtures")]),
+        // A25 Effects Composer (feature 180, A25-P01): a pending core until A25-P02 adds the experience. The core is pure
+        // (the five effects with their CPU references and program text, the chain with its edit history, the chain file
+        // and the test image); its tests compile and draw every program inside a running render host.
+        .target(name: "EffectsComposerCore",
+                dependencies: [.product(name: "VisualCoreExperience", package: visualCore),
+                               .product(name: "VisualCorePersistence", package: visualCore)],
+                path: "EffectsComposer/Core"),
+        .testTarget(name: "EffectsComposerCoreTests",
+                    dependencies: ["EffectsComposerCore",
+                                   .product(name: "VisualCoreExperience", package: visualCore),
+                                   .product(name: "VisualCorePersistence", package: visualCore),
+                                   .product(name: "VisualCoreRendering", package: rendering)],
+                    path: "EffectsComposer/CoreTests"),
         // A21 Aurora (feature 152, A21-P01): a pending core until A21-P02 adds the experience. The core is pure (the
         // sky scene, presets, clock, noise port, reference and shader text); its tests draw the shader off screen.
         .target(name: "AuroraCore",
