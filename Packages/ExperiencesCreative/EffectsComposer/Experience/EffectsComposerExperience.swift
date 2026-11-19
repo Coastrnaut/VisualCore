@@ -5,6 +5,9 @@
 //
 // Feature 182 (A25-P03) T-A25-304 (clarification Q3): `storage` holds the presets (`LookLibrary`); the factory hands
 // the presenter the shell's port and current core, so opening a preset is one undoable edit through the core.
+//
+// Feature 184 (A25-P05) T-A25-512: the factory also tells the presenter when the shell is being left (`isLeaving`),
+// so a teardown on close removes the export folder while a context rebuild keeps the written export.
 import Foundation
 import VisualCoreExperience
 import VisualCoreExperienceHost
@@ -28,6 +31,7 @@ public enum EffectsComposerExperience {
         let shell = ExperienceShell(id: id, presenter: presenter)
         presenter.port = shell.port
         presenter.currentCore = { [weak shell] in shell?.engine.core }
+        presenter.isLeaving = { [weak shell] in shell?.state == .deactivating }
         return shell
     }
 }

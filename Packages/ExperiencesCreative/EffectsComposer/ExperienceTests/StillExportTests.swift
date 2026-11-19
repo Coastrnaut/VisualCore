@@ -448,15 +448,18 @@ struct PresenterExportTests {
     @Test("closing the experience removes the export folder")
     func closingRemovesTheFolder() async throws {
         let session = ExperienceSession()
-        let opened = try await ComposerExport.open(session, test: "close")
-        defer { StillExport.removeFolder(opened.presenter.exportBase) }
-        try await ComposerExport.run(opened, session, .png)
-        let file = try #require(opened.presenter.exportFile)
+        let opened: ExperienceShell<ComposerPresenter>? = try await ComposerExport.open(session, test: "close")
+        let folder = try #require(opened).presenter.exportFolder
+        defer { StillExport.removeFolder(folder.deletingLastPathComponent()) }
+        try await ComposerExport.run(try #require(opened), session, .png)
+        let file = try #require(opened?.presenter.exportFile)
         #expect(file.width == 256 && file.height == 256, "the test picture exports at its size")
         #expect(FileManager.default.fileExists(atPath: file.url.path))
+        // A25-P05 T-A25-512: closing the session leaves the experience, so its teardown removes the folder (a
+        // context rebuild keeps it; RobustnessTests).
         session.close()
-        #expect(!FileManager.default.fileExists(atPath: opened.presenter.exportFolder.path))
-        #expect(opened.presenter.exportFile == nil)
-        #expect(opened.presenter.mirror.exportFile == nil)
+        #expect(opened?.presenter.exportFile == nil)
+        #expect(opened?.presenter.mirror.exportFile == nil)
+        #expect(!FileManager.default.fileExists(atPath: folder.path))
     }
 }

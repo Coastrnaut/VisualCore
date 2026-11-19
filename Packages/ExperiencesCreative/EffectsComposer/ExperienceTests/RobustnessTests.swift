@@ -9,7 +9,9 @@
 //   - presenting into two framebuffer sizes letterboxes the same result (the presented picture equals the result, the
 //     corner is the background) and the result read-back is unchanged, with no new render;
 //   - posting `UIApplication.didReceiveMemoryWarningNotification` on the presenter's centre (a private
-//     `NotificationCenter`) does not raise the registry's live count, and the next preview is byte-identical.
+//     `NotificationCenter`) does not raise the registry's live count, and the next preview is byte-identical;
+//   - T-A25-512 (converge round 1): an export written before a context rebuild is still there afterwards, with its
+//     share item, and the next export replaces it.
 // Short runs; no clock, no sleep.
 import CoreGraphics
 import EffectsComposerCore
@@ -74,6 +76,25 @@ import VisualCoreRendering
         #expect(ComposerExport.files(opened) == ["Look 96x64.png"])
         let preview = try #require(opened.presenter.lastResult)
         #expect(try ComposerExport.decoded(opened).maxChannelDifference(ComposerTest.opaque(preview)) <= 1)
+    }
+
+    @Test func aWrittenExportSurvivesAContextRebuild() async throws {
+        let session = ExperienceSession()
+        var shell: ExperienceShell<ComposerPresenter>?
+        defer { ComposerExport.close(session, shell) }
+        let opened = try await ComposerExport.open(session, test: "rebuild-keep")
+        shell = opened
+        _ = try await ComposerExport.regressionFixture(opened, session)
+        try await ComposerExport.run(opened, session, .png)
+        let file = try #require(opened.presenter.exportFile)
+        let host = try #require(session.renderHost)
+        host.recreateContext()
+        try ComposerTest.draw(session)
+        #expect(opened.presenter.exportFile == file)
+        #expect(opened.presenter.mirror.exportFile == file)
+        #expect(FileManager.default.fileExists(atPath: file.url.path))
+        try await ComposerExport.run(opened, session, .jpeg)
+        #expect(ComposerExport.files(opened) == ["Look 96x64.jpeg"], "the next export replaces it")
     }
 
     @Test func twoFramebufferSizesLetterboxTheSameResult() async throws {

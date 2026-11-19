@@ -89,7 +89,7 @@ MVP is story 1 on top of story 2's colour path: export depends on the final colo
 
 ## Phase 6: Convergence
 
-- [ ] T-A25-512 Keep a written export across a context rebuild in
+- [X] T-A25-512 Keep a written export across a context rebuild in — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P05.ec-ios27-3.json (exit 0, 84+49; aWrittenExportSurvivesAContextRebuild and closingRemovesTheFolder pass; attempt ec-ios27-2 failed: a released-presenter close was not observable, replaced by the shell's deactivating state)
   `Packages/ExperiencesCreative/EffectsComposer/Experience/ComposerPresenter.swift`: `teardown` fails only a request
   not yet drawn (as interrupted) and keeps `exportFile` and its file; a write finishing after a rebuild is kept; the
   export folder is removed before the next export and when the presenter is released (`deinit`, the experience

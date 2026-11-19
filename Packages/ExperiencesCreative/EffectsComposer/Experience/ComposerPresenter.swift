@@ -52,8 +52,12 @@
 //     A call while an export runs is ignored (one file). `exportBase` (the folder that holds `EffectsComposer`,
 //     the temporary folder by default), `formatAvailable` and `exportTextureLimit` are test seams.
 //   - Teardown (closing the experience, and a context rebuild): a request not yet drawn fails as
-//     ``ExportRefusal/interrupted``, a write that finishes after it is removed again, and the export folder is
-//     removed, so no export file outlives the experience and the share item disappears until the next export.
+//     ``ExportRefusal/interrupted``; a written file and its share item are kept, and a write already under way
+//     finishes (T-A25-512). A teardown while the experience is being left (``isLeaving``, the shell's lifecycle in
+//     `.deactivating`, set by the factory) removes the export folder and the share item, and a write finishing after
+//     it is removed again; the folder is also removed before the next export and when the presenter is released
+//     (`isolated deinit`), so no export file outlives the experience. The share sheet reports no completion, so a
+//     shared file stays until then (T-A25-513).
 //   - Memory warning: the presenter observes `UIApplication.didReceiveMemoryWarningNotification` on a notification
 //     centre (`.default`, or the one given to ``observeMemoryWarnings(on:)``) and trims the renderer's idle pooled
 //     targets on the main actor (``PreviewRenderer/trimPools()``); the preview is unchanged.
@@ -193,8 +197,6 @@ final class ComposerPresenter: ExperiencePresenter {
     private(set) var isExporting = false
     /// The export request waiting for the next frame's draw.
     private var pendingExport: AsyncStream<Result<RGBAImage, ExportRefusal>>.Continuation?
-    /// Counts teardowns; a write that finishes after one is removed again.
-    private var exportEpoch = 0
     /// The memory-warning observation.
     private var memoryObservation: MemoryWarningObservation?
 
@@ -205,6 +207,18 @@ final class ComposerPresenter: ExperiencePresenter {
         mirror.hasLibrary = library != nil
         followLibrary()
         observeMemoryWarnings(on: notificationCenter)
+    }
+
+    /// Whether the experience is being left (the shell's lifecycle is `.deactivating`); set by the factory. A
+    /// teardown then removes the export folder; otherwise it is a context rebuild and the export is kept.
+    var isLeaving: () -> Bool = { false }
+    /// Set by a teardown while leaving: a write that finishes later is removed. Cleared by the next `setup`.
+    private var left = false
+
+    /// Removes the export folder when the presenter is released (the experience closing), so no export file
+    /// outlives the experience.
+    isolated deinit {
+        StillExport.removeFolder(exportFolder)
     }
 
     /// The export folder: `exportBase/EffectsComposer`.
@@ -235,6 +249,7 @@ final class ComposerPresenter: ExperiencePresenter {
 
     /// Builds the preview (again after a context loss).
     func setup(_ context: RenderContext) throws {
+        left = false
         try renderer.setup(context)
         followRenderer()
     }
@@ -262,15 +277,18 @@ final class ComposerPresenter: ExperiencePresenter {
         follow(core)
     }
 
-    /// Releases the preview; a waiting export fails as interrupted and the export folder is removed.
+    /// Releases the preview; a waiting export fails as interrupted; a written export is kept across a context
+    /// rebuild and removed when the experience is being left (see the file header).
     func teardown(_ context: RenderContext) {
-        exportEpoch += 1
+        if isLeaving() {
+            left = true
+            removeExport()
+        }
         if let pending = pendingExport {
             pendingExport = nil
             pending.yield(.failure(.interrupted))
             pending.finish()
         }
-        removeExport()
         renderer.release(context)
     }
 
@@ -444,7 +462,6 @@ extension ComposerPresenter {
             bufferingPolicy: .bufferingNewest(1))
         pendingExport = continuation
         let folder = exportFolder
-        let epoch = exportEpoch
         return Task { @MainActor [weak self] in
             var outcome: Result<RGBAImage, ExportRefusal> = .failure(.interrupted)
             for await value in drawn {
@@ -466,18 +483,16 @@ extension ComposerPresenter {
                 if case .success(let file) = written { try? FileManager.default.removeItem(at: file.url) }
                 return
             }
-            self.finishExport(written, epoch: epoch)
+            self.finishExport(written)
         }
     }
 
-    /// Applies the outcome of an export started in `epoch`: a file written after a teardown is removed again and
-    /// counts as interrupted; a file is offered to `share` ("Exported"); a refusal shows its sentence.
-    private func finishExport(_ written: Result<EffectsExportFile, ExportRefusal>, epoch: Int) {
+    /// Applies the outcome of an export: a file is offered to `share` ("Exported"); a refusal shows its sentence.
+    private func finishExport(_ written: Result<EffectsExportFile, ExportRefusal>) {
         setExporting(false)
         switch written {
-        case .success(let file) where epoch != exportEpoch:
+        case .success(let file) where left:
             try? FileManager.default.removeItem(at: file.url)
-            show(ExportRefusal.interrupted.message)
         case .success(let file):
             exportFile = file
             if mirror.exportFile != file { mirror.exportFile = file }
