@@ -31,6 +31,74 @@ Canonical overrides:
   `docs/release/build-and-archive.md`.
 - Follow `specs/171-vpl-p06-release`.
 
+## Clarifications
+
+### Session 2026-11-19
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- **Permissions:** `Catalog/registrations.json` gives `a24.graphics-benchmark-lab` the permissions `[]`; the share sheet
+  needs no usage string.
+- **Copy steps:** `scripts/release_check.py` builds `experience-release-a24` and `copy-claims-a24` from
+  `docs/apps/graphics-benchmark-lab/release.json`. Over every Swift file of the experience, the shared denylist
+  `Configs/copy-claims-denylist.json` finds only the word "share" (four lines of `ResultsView.swift`), a feature the lab
+  has, so `copyCheck.allow` is `["share"]`.
+- **Stored data:**
+  - the session snapshot (`BenchCore`, schema 1, digest domain `a24.graphics-benchmark-lab.v1`: the selected case and
+    the start and stop request counters);
+  - `result-<n>.json` (kind `a24.saved-result`, version 1, at most 2,162,688 bytes, embedding the run file
+    `a24.benchmark-run` version 3);
+  - `results.json` (kind `a24.result-library`, version 1), at most 12 results;
+  - export files in the temporary folder `GraphicsBenchmarkLab-Export`, written only on the Export tap, removed when
+    the session closes and when the experience opens again.
+
+  The refusals are `damaged`, `newer-version`, `too-large` and the run file's codes (`not-finite`, `out-of-range`, …).
+- **Screen and device facts:** the experience never changes the idle timer or the brightness; the report reads the
+  model identifier, OS version, bundle version and thermal state from public APIs only (`ReportSource`), never a vendor
+  or advertising identifier or the device's name.
+- **Drawing failure:** `BenchPresenter.draw` throws to the session; there is no test seam yet.
+- **Interface chunk:** the A24 interface chunk is `f3` (A24-P05).
+
+- Q: Which statuses does the release checklist use? → A: The checker's:
+  - `verified`, with evidence;
+  - `pending-campaign-ii`, for device rows naming GBL-D1 … GBL-D6 of `docs/apps/graphics-benchmark-lab/device-campaign.md`
+    (GPU timing, thermal behaviour and repeatability on hardware among them);
+  - `owner-action`, with the steps of `docs/release/build-and-archive.md`.
+- Q: Which words does the experience's own claims scan refuse? → A: It scans the store text and the interface Swift
+  (controls, results view, repeatability view, presenter and the adapter), whole words, case-insensitively:
+  - rank, ranking, ranked, leaderboard, score, scores, fastest, slowest, faster than, slower than;
+  - scientific, lab-grade, certified, accurate, accuracy, precise, precision;
+  - Geekbench, 3DMark, GFXBench, AnTuTu, Android (no comparison with other tools or platforms);
+  - upload, cloud, sync, account, fps, unlimited, real-time, overclock.
+
+  The explanation (`GBLExplanation`, `ExplanationView`) is not in this scan because it states these limits as
+  negations ("does not rank devices and gives no score"); it stays under the shared copy check and its own tests. The
+  store text must contain the phrase "does not rank devices". Every test named in the claims table must exist.
+- Q: What does the source scan refuse? → A: The A23 list, in `Packages/ExperiencesCreative/GraphicsBenchmarkLab`:
+  - `URLSession`, `import Network`, `CLLocation` and `import CoreLocation`;
+  - `AVCapture`, `AVAudioRecorder`, `inputNode`, `installTap` and `CMMotion`;
+  - `CNContact`, `PHPhotoLibrary`, `import Photos` and `PhotosUI`;
+  - `ASIdentifierManager`, `AppTrackingTransparency`, `identifierForVendor`, `UIDevice.current.name` and
+    `isIdleTimerDisabled`;
+  - any `brightness =` write and `UIPasteboard`;
+  - `ShareLink` everywhere except `Experience/ResultsView.swift`, where it must appear.
+- Q: How are crash recovery and the sample files proved? → A:
+  - **Crash recovery:** a test-only `failNextDraw` seam in the presenter makes the next draw throw once
+    (`BenchDrawError.injected`). A test saves two results, sets the seam and draws, so the session fails with the
+    injected message. Every storage file must be byte-identical, and a new session over the same storage lists and
+    opens both results.
+  - **Sample files:** committed fixtures under `ExperienceTests/Fixtures/`:
+    - `snapshot-v1.json` (current), `snapshot-newer.json` and `snapshot-damaged.json`;
+    - `result-current.json`, `result-newer.json` and `result-damaged.json`;
+    - `results-current.json`, `results-newer.json` and `results-damaged.json`.
+
+    The current samples open. The newer and damaged snapshots are refused. A newer or damaged result file is listed as
+    unreadable with its code. A newer index makes the library read-only; a damaged index still lists the results from
+    their files. Every file stays byte-identical after reading.
+- Q: Which interface journey runs? → A: `GBLReleaseUITests` joins chunk `f3`. A fresh start shows the status "Ready",
+  the quads case selected (`case-quads` has the selected trait), no `qualification`, and, after `results`, the text
+  "No saved results." with no `result-row-1`. The test takes under 60 s.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Nothing leaves the device without the person's tap (Priority: P1) 🎯
