@@ -43,7 +43,7 @@ Packages/VisualCore/Sources/VisualCoreScenes/InstanceOrder.swift        new  Ins
 Packages/VisualCore/Sources/VisualCoreScenes/BeamProfile.swift          new  BeamProfile.falloff, coverage, distanceToSegment
 Packages/VisualCore/Tests/VisualCoreScenesTests/InstanceOrderTests.swift, BeamProfileTests.swift   new
 Packages/VisualCoreRendering/Sources/VisualCoreRendering/InstancedMeshRenderer.swift   new  MeshInstance, InstancedMeshRenderer
-Packages/VisualCoreRendering/Sources/VisualCoreRendering/BeamRenderer.swift            new  Beam, BeamBlend, BeamRenderer
+Packages/VisualCoreRendering/Sources/VisualCoreRendering/BeamRenderer.swift            new  BeamInstance, BeamBlend, BeamRenderer
 Packages/VisualCoreRendering/Sources/VisualCoreRendering/InstancingError.swift         new  InstancingError
 Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/InstancedMeshRendererTests.swift, BeamRendererTests.swift   new
 docs/api/visualcore-public-api.txt, Packages/VisualCoreRendering/README.md, docs/catalog/shared-feature-map.json (lead)

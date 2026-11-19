@@ -23,7 +23,7 @@ import VisualCoreMath
 import VisualCoreScenes
 
 /// One beam from `a` to `b` in world space; a zero-length beam (`a == b`) is a round point.
-public struct Beam: Sendable, Equatable {
+public struct BeamInstance: Sendable, Equatable {
     /// First end point in world space; finite.
     public var a: Vec3
     /// Second end point in world space; finite.
@@ -143,7 +143,7 @@ public final class BeamRenderer {
     /// Checks the list and flattens it to the instance buffer layout.
     /// - Throws: `InstancingError.tooMany` above `maxBeams`; for the first bad beam `.notFinite(index)` (an end point,
     ///   the width or a colour component not finite) or `.badWidth(index)` (a finite width ≤ 0).
-    static func beamFloats(_ beams: [Beam]) throws(InstancingError) -> [Float] {
+    static func beamFloats(_ beams: [BeamInstance]) throws(InstancingError) -> [Float] {
         guard beams.count <= maxBeams else { throw .tooMany(count: beams.count, limit: maxBeams) }
         var data: [Float] = []
         data.reserveCapacity(beams.count * floatsPerBeam)
@@ -161,7 +161,7 @@ public final class BeamRenderer {
 
     /// The drawing order for premultiplied blending: indices by ascending view-space z of each beam's midpoint
     /// (farthest first), ties in submission order (`InstanceOrder.backToFront`).
-    static func backToFront(_ beams: [Beam], view: Mat4) throws -> [Int] {
+    static func backToFront(_ beams: [BeamInstance], view: Mat4) throws -> [Int] {
         try InstanceOrder.backToFront(depths: beams.map { (view * Vec4(($0.a + $0.b) * 0.5, 1)).z })
     }
 
@@ -171,7 +171,7 @@ public final class BeamRenderer {
     /// list draws nothing and issues no GL call.
     /// - Throws: `InstancingError` (more than `maxBeams`, a non-finite value or a width ≤ 0) before any GL call;
     ///   registry errors when the GPU objects must be rebuilt after a context recreation.
-    public func draw(_ beams: [Beam], view: Mat4, projection: Mat4, blend: BeamBlend = .premultiplied) throws {
+    public func draw(_ beams: [BeamInstance], view: Mat4, projection: Mat4, blend: BeamBlend = .premultiplied) throws {
         var data = try Self.beamFloats(beams)   // refuse before any GL call
         guard !beams.isEmpty else { return }
         if blend == .premultiplied {

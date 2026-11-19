@@ -41,7 +41,7 @@
 
 ## Phase 4: Regression, documentation and close
 
-- [ ] T-R02F09-006 No Stage One breakage: `--name experiences --` ExperiencesCreative on sim-27.2
+- [X] T-R02F09-006 No Stage One breakage: `--name experiences --` ExperiencesCreative on sim-27.2 — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F09.experiences-2.json (exit 0) after renaming Beam to BeamInstance (research R6; first attempt R02-F09.experiences exit 65, LightMazeCore.Beam ambiguous); rendering re-run R02-F09.rendering-27-2.json exit 0
 - [ ] T-R02F09-007 API baseline and docs: `check_public_api.py --update`, `--name public-api`, `--name documented-api
   -- python3 scripts/check_documented_api.py --sources Apps/VisualCore`; section in
   `Packages/VisualCoreRendering/README.md`; section 13.4 row R02-F09 "As built" (also correcting the ParticleSystem

@@ -47,7 +47,7 @@ view-space z with an index tie-break; `vcglDrawElementsInstanced` and `vcglVerte
   [MeshInstance], view:projection:fog:translucent:)` — per-instance model matrix (4 vec4 attributes) and colour (vec4) at
   divisor 1, one `vcglDrawElementsInstanced` per call, the shader of `MeshRenderer` with `u_model` replaced by the
   instance matrix (normals by its upper 3 × 3), same `lightDirection`, `ambient` and fog; and `BeamRenderer(registry:)`
-  with `draw(_ beams: [Beam], view:projection:blend:)` — 6 vertices per instance, `vcglDrawArraysInstanced`. Both in
+  with `draw(_ beams: [BeamInstance], view:projection:blend:)` — 6 vertices per instance, `vcglDrawArraysInstanced`. Both in
   VisualCoreRendering, per-instance data in a reused growing buffer like `ParticleRenderer`. Limits: 16,384 mesh
   instances and 65,536 beams per call (refused above). Rationale: same conventions as the existing renderers, generic.
   Impact: SC-R02F09-001 compares against `MeshRenderer` draws.
@@ -148,7 +148,7 @@ Translucent instances and beams are drawn farthest first, so nearer ones cover f
 ### Key Entities
 
 - **Mesh instance**: model transform, colour.
-- **Beam**: two end points, width, colour.
+- **BeamInstance**: two end points, width, colour.
 - **Blend**: premultiplied over or additive.
 
 ## Success Criteria *(mandatory)*

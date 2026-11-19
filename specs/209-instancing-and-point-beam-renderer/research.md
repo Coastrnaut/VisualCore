@@ -9,3 +9,8 @@
   points. Alternative: smoothstep (rejected: flat core, harsher glow).
 - **R4 Ordering.** Decision: stable sort by view-space z, index tie-break, as `DepthMeshPass`. Rationale: one rule
   across the framework.
+- **R6 Beam type name (implementation, 2026-11-19).** Decision: the public beam value is `BeamInstance`, not `Beam`.
+  Rationale: the ExperiencesCreative regression (`--name experiences`) failed to compile because LightMaze's own public
+  `LightMazeCore.Beam` became ambiguous in `MazePresenter.swift` once VisualCoreRendering exported a `Beam`; the name
+  `BeamInstance` matches `MeshInstance` and collides with nothing. Alternatives considered: renaming LightMaze's type
+  (touches a sealed experience) or qualifying it at the use site (leaves a trap for every later experience).

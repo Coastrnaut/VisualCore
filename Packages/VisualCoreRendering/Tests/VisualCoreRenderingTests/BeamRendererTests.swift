@@ -33,7 +33,7 @@ final class BeamRendererTests: XCTestCase {
 
     /// The expected premultiplied colour of pixel (x, y) (bottom-up) for `beam` alone over opaque black (method in the
     /// file header).
-    static func expected(_ beam: Beam, view: Mat4, x: Int, y: Int) -> Vec3 {
+    static func expected(_ beam: BeamInstance, view: Mat4, x: Int, y: Int) -> Vec3 {
         let a = view.applyPoint(beam.a), b = view.applyPoint(beam.b)
         let m = (a + b) * 0.5
         let e = m.length > 0 ? -m.normalized : Vec3(0, 0, 1)
@@ -47,7 +47,7 @@ final class BeamRendererTests: XCTestCase {
 
     /// The largest RGB difference (in 1/255 steps) between `pixels` and the reference, and how many pixels the
     /// reference lights to at least half the centre colour.
-    static func compare(_ pixels: [UInt8], _ beam: Beam, view: Mat4) -> (maxError: Double, bright: Int) {
+    static func compare(_ pixels: [UInt8], _ beam: BeamInstance, view: Mat4) -> (maxError: Double, bright: Int) {
         var worst = 0.0, bright = 0
         guard pixels.count == size * size * 4 else { return (.infinity, 0) }
         for y in 0..<size {
@@ -62,7 +62,7 @@ final class BeamRendererTests: XCTestCase {
     }
 
     /// The pixels of `beams` drawn once by a fresh renderer, and the renderer's draw-call count afterwards.
-    private func draw(_ beams: [Beam], view: Mat4 = .identity, blend: BeamBlend = .premultiplied) throws -> ([UInt8], Int) {
+    private func draw(_ beams: [BeamInstance], view: Mat4 = .identity, blend: BeamBlend = .premultiplied) throws -> ([UInt8], Int) {
         var calls = -1, error = GLenum(1)
         let p = try DrawHarness.pixels(size: Self.size, keep: &host) { ctx in
             let r = try BeamRenderer(registry: ctx.resources)
@@ -79,12 +79,12 @@ final class BeamRendererTests: XCTestCase {
 
     func testCrossSectionAndPointMatchBeamProfile() throws {
         let rotated = Mat4.lookAt(eye: Vec3(0.4, 0.3, 0), target: Vec3(0, 0, -5), up: Vec3(0, 1, 0))
-        let cases: [(String, Beam, Mat4)] = [
-            ("beam in the eye-facing plane", Beam(a: Vec3(-1, 0, -5), b: Vec3(1, 0, -5), width: 1,
+        let cases: [(String, BeamInstance, Mat4)] = [
+            ("beam in the eye-facing plane", BeamInstance(a: Vec3(-1, 0, -5), b: Vec3(1, 0, -5), width: 1,
                                                   color: Vec4(0.9, 0.6, 0.3, 0.9)), .identity),
-            ("zero-length point", Beam(a: Vec3(0.3, -0.2, -5), b: Vec3(0.3, -0.2, -5), width: 1.2,
+            ("zero-length point", BeamInstance(a: Vec3(0.3, -0.2, -5), b: Vec3(0.3, -0.2, -5), width: 1.2,
                                        color: Vec4(0.8, 0.8, 0.4, 0.8)), .identity),
-            ("diagonal beam, rotated camera", Beam(a: Vec3(-0.8, -0.6, -4.5), b: Vec3(0.9, 0.7, -5.8), width: 0.7,
+            ("diagonal beam, rotated camera", BeamInstance(a: Vec3(-0.8, -0.6, -4.5), b: Vec3(0.9, 0.7, -5.8), width: 0.7,
                                                    color: Vec4(0.5, 0.9, 0.7, 1)), rotated),
         ]
         for (name, beam, view) in cases {
@@ -99,8 +99,8 @@ final class BeamRendererTests: XCTestCase {
 
     func testAnObliqueBeamKeepsItsFullWidth() throws {
         let color = Vec4(0.9, 0.6, 0.3, 0.9)
-        let flat = Beam(a: Vec3(-1, 0, -5), b: Vec3(1, 0, -5), width: 1, color: color)
-        let oblique = Beam(a: Vec3(-1, 0, -3.5), b: Vec3(1, 0, -6.5), width: 1, color: color)
+        let flat = BeamInstance(a: Vec3(-1, 0, -5), b: Vec3(1, 0, -5), width: 1, color: color)
+        let oblique = BeamInstance(a: Vec3(-1, 0, -3.5), b: Vec3(1, 0, -6.5), width: 1, color: color)
         let (flatPixels, _) = try draw([flat])
         let (obliquePixels, _) = try draw([oblique])
         XCTAssertLessThanOrEqual(Self.compare(obliquePixels, oblique, view: .identity).maxError, 2)
@@ -114,8 +114,8 @@ final class BeamRendererTests: XCTestCase {
 
     func testAnEndOnBeamIsARoundPoint() throws {
         let color = Vec4(0.7, 0.9, 0.5, 0.9)
-        let endOn = Beam(a: Vec3(0, 0, -4), b: Vec3(0, 0, -6), width: 1, color: color)
-        let point = Beam(a: Vec3(0, 0, -5), b: Vec3(0, 0, -5), width: 1, color: color)
+        let endOn = BeamInstance(a: Vec3(0, 0, -4), b: Vec3(0, 0, -6), width: 1, color: color)
+        let point = BeamInstance(a: Vec3(0, 0, -5), b: Vec3(0, 0, -5), width: 1, color: color)
         let (p, calls) = try draw([endOn])
         XCTAssertEqual(calls, 1)
         let (worst, bright) = Self.compare(p, endOn, view: .identity)
@@ -137,14 +137,14 @@ final class BeamRendererTests: XCTestCase {
     // MARK: Refusals
 
     func testZeroWidthNonFiniteAndTooManyAreRefused() throws {
-        let good = Beam(a: Vec3(-1, 0, -5), b: Vec3(1, 0, -5), width: 1, color: Vec4(1, 1, 1, 1))
+        let good = BeamInstance(a: Vec3(-1, 0, -5), b: Vec3(1, 0, -5), width: 1, color: Vec4(1, 1, 1, 1))
         var nanA = good; nanA.a.y = .nan
         var infB = good; infB.b.z = -.infinity
         var nanWidth = good; nanWidth.width = .nan
         var infColor = good; infColor.color.w = .infinity
         var zero = good; zero.width = 0
         var negative = good; negative.width = -0.5
-        let lists: [([Beam], InstancingError)] = [
+        let lists: [([BeamInstance], InstancingError)] = [
             ([good, zero], .badWidth(index: 1)), ([negative], .badWidth(index: 0)),
             ([good, good, nanA], .notFinite(index: 2)), ([infB], .notFinite(index: 0)),
             ([good, nanWidth], .notFinite(index: 1)), ([infColor], .notFinite(index: 0)),
@@ -176,21 +176,21 @@ final class BeamRendererTests: XCTestCase {
     // MARK: Blending and order
 
     /// Five crossing translucent beams at view depths −8 … −4, listed back to front.
-    static func translucentSorted() -> [Beam] {
+    static func translucentSorted() -> [BeamInstance] {
         let colors = [Vec4(0.5, 0, 0, 0.5), Vec4(0, 0.42, 0, 0.6), Vec4(0, 0, 0.7, 0.7),
                       Vec4(0.3, 0.3, 0, 0.55), Vec4(0, 0.25, 0.25, 0.5)]
         return colors.enumerated().map { i, c in
             let angle = Double(i) * 0.6, z = -8 + Double(i)
             let d = Vec3(cos(angle), sin(angle), 0) * (0.25 * -z)
-            return Beam(a: Vec3(0, 0, z) - d, b: Vec3(0, 0, z) + d, width: 0.08 * -z, color: c)
+            return BeamInstance(a: Vec3(0, 0, z) - d, b: Vec3(0, 0, z) + d, width: 0.08 * -z, color: c)
         }
     }
 
     func testScrambledTranslucentBeamsEqualTheSortedPicture() throws {
         let sorted = Self.translucentSorted()
         XCTAssertEqual(try BeamRenderer.backToFront(sorted, view: .identity), [0, 1, 2, 3, 4])
-        let tie = [Beam(a: Vec3(-1, 0, -5), b: Vec3(1, 0, -5), width: 1, color: Vec4(0.5, 0, 0, 0.5)),
-                   Beam(a: Vec3(0, -1, -5), b: Vec3(0, 1, -5), width: 1, color: Vec4(0, 0, 0.5, 0.5))]
+        let tie = [BeamInstance(a: Vec3(-1, 0, -5), b: Vec3(1, 0, -5), width: 1, color: Vec4(0.5, 0, 0, 0.5)),
+                   BeamInstance(a: Vec3(0, -1, -5), b: Vec3(0, 1, -5), width: 1, color: Vec4(0, 0, 0.5, 0.5))]
         XCTAssertEqual(try BeamRenderer.backToFront(tie, view: .identity), [0, 1], "equal depths keep submission order")
         let orders = [[0, 1, 2, 3, 4], [4, 3, 2, 1, 0], [2, 4, 0, 3, 1], [1, 3, 0, 4, 2]]
         var pictures: [[UInt8]] = []
@@ -286,7 +286,7 @@ final class BeamRendererTests: XCTestCase {
 /// teardown releases its GPU objects (the next setup keeps the object, so its draw rebuilds them).
 @MainActor
 private final class BeamScene: RenderScene {
-    var beams: [Beam] = []
+    var beams: [BeamInstance] = []
     private(set) var renderer: BeamRenderer?
 
     func setup(_ c: RenderContext) throws {

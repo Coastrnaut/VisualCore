@@ -1,7 +1,7 @@
 # Data Model: R02-F09
 
 - **MeshInstance**: `model: Mat4`, `color: Vec4` (straight alpha, as in `MeshRenderer`: the shader multiplies rgb by alpha before premultiplied blending); all finite.
-- **Beam**: `a: Vec3`, `b: Vec3`, `width: Double` (> 0), `color: Vec4` (premultiplied); all finite.
+- **BeamInstance**: `a: Vec3`, `b: Vec3`, `width: Double` (> 0), `color: Vec4` (premultiplied); all finite.
 - **BeamBlend**: `.premultiplied` (sorted back to front) or `.additive` (unsorted).
 - **Limits**: `InstancedMeshRenderer.maxInstances = 16_384`; `BeamRenderer.maxBeams = 65_536`.
 - **InstancingError**: `tooMany(count:limit:)`, `notFinite(index:)`, `badWidth(index:)`.
