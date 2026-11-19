@@ -40,7 +40,7 @@
 
 - [ ] T-A24-507 [P] [US4] `Apps/VisualCore/Tests/UI/GraphicsBenchmarkLab/{GBLSupport,GBLRunUITests}.swift` per
   clarification Q5, and chunk `f3` in `scripts/release_check.py` (lead, serial) (FR-A24-505, SC-A24-504)
-- [ ] T-A24-508 [P] [US5] `docs/apps/graphics-benchmark-lab/device-campaign.md`: GBL-D1 … GBL-D6 × D1, D2, D3
+- [X] T-A24-508 [P] [US5] `docs/apps/graphics-benchmark-lab/device-campaign.md`: GBL-D1 … GBL-D6 × D1, D2, D3 — Verified 2026-11-19: 2026-11-19: docs/apps/graphics-benchmark-lab/device-campaign.md: GBL-D1 … GBL-D6 on D1, D2, D3 (18 rows), all pending, no device number claimed; validate_docs passes
   (repeatability of each case over 5 trials, thermal states over a 10-run series, Low Power Mode, display refresh, GPU
   timer availability and plausibility, the system accessibility audits), steps, expected result, owner actions,
   state `pending`, and "no device number is claimed" (FR-A24-506, SC-A24-505)
