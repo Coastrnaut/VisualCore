@@ -70,7 +70,7 @@
 - [X] T-A23-611 Release build checks, as a review checkpoint: `--name release-checks -- python3 scripts/release_check.py — Verified 2026-11-19: 2026-11-19: .autonomy/checks/A23-P06.release-checks.json exit 0 (app-release-build, symbols, privacy manifest, no tracking, licences, usage descriptions, experience-release-a23, copy-claims-a23: 8/8)
   --only app-release-build app-release-symbols app-privacy-manifest app-no-tracking app-licenses app-usage-descriptions
   experience-release-a23 copy-claims-a23`
-- [ ] T-A23-612 Contract: close G-RELEASE with "A23-P06" (all 9 gaps closed; the iOS 26.x runner half is cited at
+- [X] T-A23-612 Contract: close G-RELEASE with "A23-P06" (all 9 gaps closed; the iOS 26.x runner half is cited at — Verified 2026-11-19: 2026-11-19: G-RELEASE closed by A23-P06 (all 9 gaps closed, M32 available); .autonomy/checks/A23-P06.{contract,catalog,realcatalog,experience-packages,script-tests,verify-27}.json all exit 0 (runner 0 failures on iOS 27.2)
   X-A23) (`--name contract`), and the catalog, packages, script tests and runner (`--name catalog`, `realcatalog`,
   `experience-packages`, `script-tests`, `verify-27`)
 - [ ] T-A23-613 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record

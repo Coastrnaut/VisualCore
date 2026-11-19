@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a23.visual-programming-lab",
+    "--runtime",
+    "27"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a23.visual-programming-lab --runtime 27",
+  "elapsed_seconds": 53.419,
+  "exit_code": 0,
+  "finished": "2026-11-19T14:48:25+00:00",
+  "log": ".autonomy/logs/A23-P06.verify-27.log",
+  "log_sha256": "411c990578baa754b2f8f7e29243b197d61258a7b629e67155fcbcc1d4909e0e",
+  "name": "verify-27",
+  "stage": "A23-P06",
+  "started": "2026-11-19T14:47:32+00:00",
+  "timed_out": false
+}
