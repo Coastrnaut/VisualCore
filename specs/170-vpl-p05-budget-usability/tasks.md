@@ -27,7 +27,7 @@
 
 ## Phase 3: Story 3 — recovery in every state (P2)
 
-- [ ] T-A23-504 [US3] Write `ExperienceTests/RecoveryTests.swift` per clarification Q3 (SC-A23-503): in ready, invalid,
+- [X] T-A23-504 [US3] Write `ExperienceTests/RecoveryTests.swift` per clarification Q3 (SC-A23-503): in ready, invalid, — Verified 2026-11-19: 2026-11-19: RecoveryTests (7): 10 rebuilds each in ready, invalid, refused, failed and hidden give a byte-identical still, the same state, schedule, slots, compile count and level, leaked 0; an edit before a rebuild compiles once after it; defect found and fixed in PreviewPipeline.swift: a rebuild in the invalid or refused state did not rebuild the slots and programs held from the last good schedule (restore only acted in ready) and shrank the program cache, so release now notes what is held and restore rebuilds it; .autonomy/checks/A23-P05.vpl-ios27.json exit 0 (162 core and 73 experience tests on sim-27.2); written by an agent, retested
   refused, failed and hidden, 10 `recreateContext` calls each followed by a frame give a byte-identical still, the same
   state, the same level and `leaked` 0; a compile requested before a rebuild happens once after it; fix anything found
 

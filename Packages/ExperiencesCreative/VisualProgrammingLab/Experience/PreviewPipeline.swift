@@ -18,6 +18,10 @@
 //     the canvas keeps drawing.
 //   - Context: `release(_:)` (teardown) releases every program and slot and keeps the schedule and the state;
 //     `restore(_:)` (setup after a context loss) builds them again from the same schedule without a compile.
+//     Feature 170 (A23-P05) T-A23-504 (SC-A23-503): a rebuild leaves the level as it was in every state, so
+//     `release(_:)` also notes which programs and how many slots were held and `restore(_:)` makes those again: the
+//     programs of earlier schedules (kept, as built once per context) and, in `invalid` or `refused`, the slots the
+//     refusal kept (a refusal frees nothing). In `failed` only the schedule's own rebuild is tried, as before.
 //   - Test seams: ``fragmentOverrides`` (an operator text replaced, for a failing build), ``runCount`` (passes run),
 //     ``slots``, ``schedule`` and ``programs``.
 //
@@ -75,6 +79,9 @@ final class PreviewPipeline {
     private(set) var compileCount = 0
     /// How many passes ran, over every draw (a test seam).
     private(set) var runCount = 0
+    /// The operators whose programs and the number of slots held when the context was last released; made again by
+    /// ``restore(_:)`` (feature 170).
+    private var held: (operators: [PassOperator], slots: Int) = ([], 0)
 
     /// Compiles `graph` into a schedule and makes what it needs (see the file header).
     func compile(_ graph: VisualGraph, context: RenderContext) {
@@ -92,10 +99,29 @@ final class PreviewPipeline {
         }
     }
 
-    /// Builds the programs and slots of the current schedule again after a context loss (no compile).
+    /// Builds the programs and slots of the current schedule again after a context loss (no compile), then the rest of
+    /// what ``release(_:)`` noted (feature 170): the programs of earlier schedules and, in `invalid` or `refused`, the
+    /// slots the refusal kept. Nothing more is made in `failed`; a cached program that does not build is skipped (a
+    /// later compile that needs it reports it).
     func restore(_ context: RenderContext) {
-        guard let schedule, state == .ready else { return }
-        state = prepare(schedule, context: context)
+        let noted = held
+        held = ([], 0)
+        switch state {
+        case .ready:
+            if let schedule { state = prepare(schedule, context: context) }
+        case .invalid, .refused:
+            break
+        case .failed, .hidden:
+            return
+        }
+        if case .failed = state { return }
+        for op in noted.operators where programs[Operators.program(of: op)] == nil {
+            _ = build(op, context: context)
+        }
+        while slots.count < noted.slots {
+            guard let slot = makeSlot(context) else { return }
+            slots.append(slot)
+        }
     }
 
     /// The programs and slots of `schedule` made; `ready`, or `failed` with the first diagnostic.
@@ -103,32 +129,46 @@ final class PreviewPipeline {
         for pass in schedule.passes {
             let name = Operators.program(of: pass.operator)
             if let existing = programs[name], existing.program.generation == context.resources.generation { continue }
-            programs[name]?.release()
-            programs[name] = nil
-            let fragment = fragmentOverrides[name] ?? Operators.fragment(of: pass.operator)
-            do {
-                programs[name] = try FieldPass(registry: context.resources, fragment: fragment,
-                                               inputs: Operators.inputs(of: pass.operator),
-                                               label: Operators.label(of: pass.operator))
-            } catch {
-                if case .compile(let message) = error { return .failed(message) }
-                return .failed("\(error)")
-            }
+            if let failure = build(pass.operator, context: context) { return .failed(failure) }
         }
         while slots.count > schedule.slotCount {
             context.resources.release(slots.removeLast())
         }
         while slots.count < schedule.slotCount {
             do {
-                let label = "vpl-preview-slot-\(slots.count)"
-                let slot = try context.resources.makeRenderTarget(width: Self.slotSide, height: Self.slotSide,
-                                                                  format: .rgba8, label: label)
-                slots.append(slot)
+                slots.append(try newSlot(context))
             } catch {
                 return .failed("\(error)")
             }
         }
         return .ready
+    }
+
+    /// Builds the program of `op` in `context` (releasing one of an earlier context); nil, or the first diagnostic.
+    private func build(_ op: PassOperator, context: RenderContext) -> String? {
+        let name = Operators.program(of: op)
+        programs[name]?.release()
+        programs[name] = nil
+        let fragment = fragmentOverrides[name] ?? Operators.fragment(of: op)
+        do {
+            programs[name] = try FieldPass(registry: context.resources, fragment: fragment,
+                                           inputs: Operators.inputs(of: op), label: Operators.label(of: op))
+            return nil
+        } catch {
+            if case .compile(let message) = error { return message }
+            return "\(error)"
+        }
+    }
+
+    /// A new 256 × 256 rgba8 slot charged to `context`'s registry, labelled by its index.
+    private func newSlot(_ context: RenderContext) throws -> RenderTarget {
+        try context.resources.makeRenderTarget(width: Self.slotSide, height: Self.slotSide, format: .rgba8,
+                                               label: "vpl-preview-slot-\(slots.count)")
+    }
+
+    /// ``newSlot(_:)``, or nil when it cannot be made.
+    private func makeSlot(_ context: RenderContext) -> RenderTarget? {
+        try? newSlot(context)
     }
 
     /// Draws the schedule's passes into the slots and the inset (in `ready` only; see the file header).
@@ -185,6 +225,11 @@ final class PreviewPipeline {
 
     /// Releases every program and slot (teardown); the schedule and the state are kept for ``restore(_:)``.
     func release(_ context: RenderContext) {
+        var seen: Set<String> = []
+        held = (PassOperator.allCases.filter { op in
+            let name = Operators.program(of: op)
+            return programs[name] != nil && seen.insert(name).inserted
+        }, slots.count)
         for pass in programs.values { pass.release() }
         programs = [:]
         for slot in slots { context.resources.release(slot) }
