@@ -11,7 +11,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T-A23-101 Baseline: cite the A23-P00 evidence (`.autonomy/checks/A23-P00.{app-build,no-change,experience-packages}.json`)
+- [X] T-A23-101 Baseline: cite the A23-P00 evidence (`.autonomy/checks/A23-P00.{app-build,no-change,experience-packages}.json`) — Verified 2026-11-18: 2026-11-18: A23-P00 evidence cited: .autonomy/checks/A23-P00.app-build.json, A23-P00.no-change.json and A23-P00.experience-packages.json, all exit 0; no Packages change since the A23-P00 record commit 96d7e526
   on the tree recorded at A23-P00 (`96d7e526`), whose Packages are unchanged since (owner ruling of 2026-11-14)
 - [ ] T-A23-102 Add two targets to `Packages/ExperiencesCreative/Package.swift` (lead); the package check still passes
   (a pending core):
