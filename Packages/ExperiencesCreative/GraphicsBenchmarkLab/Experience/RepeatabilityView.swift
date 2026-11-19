@@ -11,7 +11,8 @@
 //     their frame interval p50 and p95 (two decimals) and GPU p50 when present, the spread lines when present
 //     ("Spread of p50: …", "Spread of p95: …", "Spread of GPU p50: …"), "One trial; run it again to compare." with a
 //     single comparable trial, the trials that are not comparable with their reason ("Another case or case version",
-//     "Another device", "Another OS version", "Another app build", "Another quality tier", "Not valid") and `explain`.
+//     "Another device", "Another OS version", "Another app build", "Another quality tier", "Not valid") and
+//     `repeatability-explain` (T-A24-514; the opened result keeps `explain`).
 //   - The presenter's ``BenchPresenter/repeatability(of:)`` (the library's readable results, the opened one as
 //     `opened`), ``BenchPresenter/showExplanation(from:)`` and ``BenchPresenter/hideExplanation()``.
 //
@@ -26,7 +27,7 @@ import VisualCoreExperienceHost
 enum ExplanationSource: String, Equatable, Sendable {
     /// The `explain` button of the opened result.
     case result
-    /// The `explain` button of the repeatability block.
+    /// The `repeatability-explain` button of the repeatability block.
     case repeatability
 }
 
@@ -165,7 +166,7 @@ struct RepeatabilityView: View {
             }
             .accessibilityLabel(Text(verbatim: "About these numbers"))
             .accessibilityHint(Text(verbatim: "Explains how trials are compared and why they differ"))
-            .accessibilityIdentifier(port.identifier("explain"))
+            .accessibilityIdentifier(port.identifier("repeatability-explain"))
         }
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(port.identifier("repeatability"))
