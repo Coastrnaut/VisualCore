@@ -56,7 +56,7 @@ in code:
 - **Catalog entry:** the registration's summary and capabilities still describe A25-P02 (a picture made in code only);
   they must name import and export truthfully, keep "shader" (CatalogSearchTests) and stay within 300 characters.
 - **Drawing failure:** `ComposerPresenter.draw` throws to the session; there is no test seam yet.
-- **Interface chunk:** no A25 chunk exists; the next free chunk name after `f3` is `g3`.
+- **Interface chunk:** no A25 chunk exists; the next free chunk name after `f3` and `g3` (taken by Generative Art Studio) is `h3`.
 
 - Q: Which statuses does the release checklist use? → A: The checker's: `verified` with evidence;
   `pending-campaign-ii` for device rows naming EC-D1 … EC-D7 of `docs/apps/effects-composer/device-campaign.md`;
@@ -81,7 +81,7 @@ in code:
   `presets-current.json`, `presets-newer.json`, `presets-damaged.json`. Current samples open; the newer and damaged
   snapshots are refused; a newer or damaged look file is listed as unreadable with its code; a newer index makes the
   library read only; a damaged index still lists the looks from their files; every file stays byte-identical.
-- Q: Which interface journey runs? → A: `ECReleaseUITests` in the new chunk `g3` (serial): a fresh start shows the
+- Q: Which interface journey runs? → A: `ECReleaseUITests` in the new chunk `h3` (serial): a fresh start shows the
   status "Ready", no effect row, the buttons `export-png`, `export-jpeg`, `export-heic` and `test-picture`, no `share`,
   and no saved look, and reads the spoken labels "Export as PNG" and "Use the test picture"; it takes under 60 s.
 

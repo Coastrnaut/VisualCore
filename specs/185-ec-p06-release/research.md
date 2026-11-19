@@ -12,5 +12,5 @@
   linear-light effects, export through the share sheet), keep "shader", stay within 300 characters; run
   `CatalogSearchTests` after the change. Rationale: the copy gate covers the catalog entry, and stale text would
   under-describe the experience.
-- **R5 Interface chunk.** Decision: `g3`, serial, like `f3`. Rationale: the live canvas keeps XCTest from idling under
+- **R5 Interface chunk.** Decision: `h3`, serial, like `f3`. Rationale: the live canvas keeps XCTest from idling under
   parallel clones (A08-P06 lesson).

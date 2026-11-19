@@ -12,7 +12,7 @@ This phase closes G-RELEASE with documents, scans, a recovery seam, stored sampl
 - **Recovery:** a test-only `failNextDraw` seam in `ComposerPresenter` and `ComposerRecoveryTests`.
 - **Samples:** committed fixtures in `Packages/ExperiencesCreative/EffectsComposer/ExperienceTests/Fixtures/` and
   `ReleaseSampleTests`.
-- **Interface:** `ECReleaseUITests` in the new chunk `g3`.
+- **Interface:** `ECReleaseUITests` in the new chunk `h3`.
 
 Research: [research.md](research.md). Data: [data-model.md](data-model.md). Contract:
 [contracts/release.md](contracts/release.md). Quickstart: [quickstart.md](quickstart.md).
@@ -25,7 +25,7 @@ Research: [research.md](research.md). Data: [data-model.md](data-model.md). Cont
 - **Verified APIs (read-only audit):** `ExperienceStorage` (`write`, `read`, listing), `ExperienceSession` (fails with
   the presenter's thrown error), `ComposerCore.restore(payload:seed:)` refusals, `LookLibrary` (list, open, read only on
   a newer index), `ChainDocument.decode` refusals, `ExperienceShell`.
-- **Testing:** Effects Composer tests on sim-27.2; the app build, unit tests and chunk `g3`; the release checks; the
+- **Testing:** Effects Composer tests on sim-27.2; the app build, unit tests and chunk `h3`; the release checks; the
   runner; `CatalogSearchTests` after the registration change.
 - **Constraints:** no measurement claimed; no owner action performed.
 
@@ -59,7 +59,7 @@ Packages/ExperiencesCreative/EffectsComposer/ExperienceTests/ReleaseSampleTests.
 Packages/ExperiencesCreative/EffectsComposer/ExperienceTests/Fixtures/*.json                  new     nine samples
 Packages/ExperiencesCreative/Package.swift                                                    modify  test resources (Fixtures), if not yet declared
 Apps/VisualCore/Tests/UI/EffectsComposer/ECReleaseUITests.swift                               new
-scripts/release_check.py                                                                      modify  chunk g3
+scripts/release_check.py                                                                      modify  chunk h3
 docs/apps/effects-composer/visualcore-contract.json                                           modify  G-RELEASE closed
 ```
 
@@ -71,5 +71,5 @@ docs/apps/effects-composer/visualcore-contract.json                             
 - **Agent D:** the four documents, `release.json`, the known-limitations section and the registration text.
 - **Agent S:** the two scan scripts.
 - **Agent R:** the seam, the recovery test, the samples and their tests.
-- **Agent U:** `ECReleaseUITests` (the lead adds chunk `g3`).
+- **Agent U:** `ECReleaseUITests` (the lead adds chunk `h3`).
 - **Lead:** chunk wiring, runs, contract, ticks, commits.

@@ -49,14 +49,14 @@
 ## Phase 5: Story 4 — a first session (P2)
 
 - [ ] T-A25-608 [P] [US4] Write `Apps/VisualCore/Tests/UI/EffectsComposer/ECReleaseUITests.swift` per contracts/release.md
-  and add chunk `"g3": ["ECReleaseUITests"]` to `scripts/release_check.py` (serial, in `SERIAL_CHUNKS`)
+  and add chunk `"h3": ["ECReleaseUITests"]` to `scripts/release_check.py` (serial, in `SERIAL_CHUNKS`)
 
 ## Phase 6: Evidence and close
 
 - [ ] T-A25-609 Effects Composer tests on sim-27.2 (`--name ec-ios27`, each under 10 s), the documented API and
   CatalogSearchTests through the app unit run
 - [ ] T-A25-610 App: `xcodegen generate --spec project.yml`, then `--name app-ui -- python3 scripts/release_check.py
-  --only app-build-for-testing-ios27 app-unit-ios27 app-ui-ios27-g3`; `--name verify-27`; `--name script-tests`
+  --only app-build-for-testing-ios27 app-unit-ios27 app-ui-ios27-h3`; `--name verify-27`; `--name script-tests`
   (the new chunk); `--name catalog`
 - [ ] T-A25-611 Release checks as a review checkpoint: `--name release-checks -- python3 scripts/release_check.py
   --only experience-release-a25 copy-claims-a25`, plus both scans
