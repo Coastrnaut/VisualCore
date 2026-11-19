@@ -195,9 +195,17 @@
       "name": "Visual Programming Lab",
       "permissions": [],
       "tier": "free"
+    },
+    {
+      "category": "tools",
+      "code": "A24",
+      "id": "a24.graphics-benchmark-lab",
+      "name": "Graphics Benchmark Lab",
+      "permissions": [],
+      "tier": "free"
     }
   ],
-  "ledger_sha256": "bba2e36f429f7b3ad3c203fddc46d63143bdc8c31708e93f30eb1a64c71dc5eb",
+  "ledger_sha256": "b6a22e609601cf2fe7845ef0ee28c880244ae2e063a3b305dc94ade54825643f",
   "privacy_answers": "unproven",
   "schema": 1
 }

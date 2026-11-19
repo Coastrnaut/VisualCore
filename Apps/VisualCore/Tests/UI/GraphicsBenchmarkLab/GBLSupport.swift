@@ -1,7 +1,8 @@
 // GBLSupport — feature 177 (A24-P05) T-A24-507 (FR-A24-505, SC-A24-504; clarifications "What does 'About these
 // numbers' say" and the background fact; contracts/review.md "Interface"): helpers of the interface tests of Graphics
 // Benchmark Lab (A24) inside the one app, modelled on Visual Programming Lab's `VPLSupport`. Every launch carries
-// `-vcCandidates` (DebugLaunch: the candidates' catalog entries become available and are registered). A fresh start
+// `-vcCandidates` (DebugLaunch: the candidates' catalog entries become available and are registered; harmless since
+// A24 was integrated at X-A24, 2026-11-19). A fresh start
 // erases the data (`-vcResetData`), skips the welcome and opens the experience directly with
 // `-openExperience a24.graphics-benchmark-lab`. A fresh lab is "Ready".
 //

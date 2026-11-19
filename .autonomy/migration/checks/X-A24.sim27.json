@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a24.graphics-benchmark-lab",
+    "--runtime",
+    "27"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a24.graphics-benchmark-lab --runtime 27",
+  "elapsed_seconds": 50.197,
+  "exit_code": 0,
+  "finished": "2026-11-19T18:31:05+00:00",
+  "gate": "X-A24",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-A24.sim27.log",
+  "log_sha256": "aed69b4d462aada71dcdcb1e208d7ce251850a724e2427f3c46be29b6a07b7d5",
+  "name": "sim27",
+  "started": "2026-11-19T18:30:15+00:00",
+  "timed_out": false
+}

@@ -269,7 +269,8 @@ import Testing
                          "a20.digital-zen-garden",
                          "a21.aurora",
                          "a22.shader-studio",
-                         "a23.visual-programming-lab"])
+                         "a23.visual-programming-lab",
+                         "a24.graphics-benchmark-lab"])
         for search in ["", "aurora"] {
             #expect(LauncherModel.state(manifest: .success(manifest), categories: categories, registered: [],
                                         searchText: search) == .empty, "nothing registered shows nothing")

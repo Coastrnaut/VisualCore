@@ -1,0 +1,65 @@
+{
+  "bundle": null,
+  "commit": "37c9c6fe6f3e4c985f09ac78017a06d76438467a",
+  "device_type": "com.apple.CoreSimulator.SimDeviceType.iPhone-17-Pro",
+  "experience": "a24.graphics-benchmark-lab",
+  "results": [
+    {
+      "commit": "37c9c6fe6f3e4c985f09ac78017a06d76438467a",
+      "record_sha256": "56bed4e46805cc7a66d91670ba8316ee8cd34865fd7c472613c94611d76cc2c8",
+      "result": "pass",
+      "scenario": "launch-first-frame"
+    },
+    {
+      "commit": "37c9c6fe6f3e4c985f09ac78017a06d76438467a",
+      "record_sha256": "08312ef77846d81364a2f139e91fdd26d9ee45bbe493898391aaf621236c51f0",
+      "result": "pass",
+      "scenario": "input-response"
+    },
+    {
+      "commit": "37c9c6fe6f3e4c985f09ac78017a06d76438467a",
+      "record_sha256": "148e10e27cbb24666ed5bceafee37c69b0e4d4035cad058becb42c2706be84f9",
+      "result": "pass",
+      "scenario": "completion"
+    },
+    {
+      "commit": "37c9c6fe6f3e4c985f09ac78017a06d76438467a",
+      "record_sha256": "18e1a766339168be5331a71e23b876377957009f82ca8be6dd29e0f640b66bec",
+      "result": "pass",
+      "scenario": "rejection"
+    },
+    {
+      "commit": "37c9c6fe6f3e4c985f09ac78017a06d76438467a",
+      "record_sha256": "16b0e9f81938cab4169a0e332ed2e02eba5864b37e12791a5b614d1513341ea2",
+      "result": "pass",
+      "scenario": "save-restore"
+    },
+    {
+      "commit": "37c9c6fe6f3e4c985f09ac78017a06d76438467a",
+      "record_sha256": "bb48d08b98889557f9bb5802fe6c796dd5cb773f35599879cb1441c2483d8b3a",
+      "result": "pass",
+      "scenario": "reset"
+    },
+    {
+      "commit": "37c9c6fe6f3e4c985f09ac78017a06d76438467a",
+      "record_sha256": "28ad2a552ed67391a3664199726f954fe75ee3859264527205ff740227824c5d",
+      "result": "pass",
+      "scenario": "suspend-resume"
+    },
+    {
+      "commit": "37c9c6fe6f3e4c985f09ac78017a06d76438467a",
+      "record_sha256": "c7fe52b67c8a4b2e8eb33de25a6dbdd9b327004f0df94a55c8f23a31ee27a8e4",
+      "result": "pass",
+      "scenario": "teardown-reentry"
+    },
+    {
+      "commit": "37c9c6fe6f3e4c985f09ac78017a06d76438467a",
+      "record_sha256": "531bfaa3ca454829f47fea59340718f253609622779052b62e26b2bfdae9afcd",
+      "result": "pass",
+      "scenario": "cancel-prepare"
+    }
+  ],
+  "runtime": "26.5",
+  "runtime_build": "23F77",
+  "schema": 1
+}
