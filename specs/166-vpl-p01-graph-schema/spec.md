@@ -23,6 +23,78 @@ Canonical overrides:
   core in `Packages/ExperiencesCreative/VisualProgrammingLab/Core` until A23-P02 adds the experience.
 - **No VisualCore or ProjectM change.** Follow `specs/159-ss-p01-glsl-diagnostics`.
 
+## Clarifications
+
+### Session 2026-11-18
+
+Answered by the lead under the owner's standing delegation (the recommended option each time). The facts were checked
+in code:
+- **Parameters:** `ParameterDefinition` (VisualCoreParameters, pure) takes a name matching `^[a-zA-Z][a-zA-Z0-9_]{0,31}$`,
+  a finite range with minimum < maximum and a default inside it, and throws `ParameterError` otherwise; it offers
+  `clamped`, `range` and `defaultValue`.
+- **Migration:** `MigrationChain(currentVersion:steps:)` (VisualCorePersistence, pure) migrates a JSON object payload
+  step by step and throws `MigrationError.newerVersion` or `.missingStep`.
+- **Fingerprint:** `DigestBuilder(domain:)` (VisualCoreExperience, pure; no UIKit) adds typed fields (`add(_:)` for
+  Int, String, Bool, Double, which throws `DigestError.nonFinite` for NaN or infinity, and `add(count:)`) and
+  `finish()` gives a `StateDigest` (SHA-256 through `StableHash`).
+- **Host counts:** `RenderHost(scene:)` (VisualCoreRendering) runs a `RenderScene` off screen, and
+  `ResourceRegistry.stats` gives `liveCount` per resource kind and `totalBytes`, as the Shader Studio core tests use.
+- **Package layout:** a pending core is `<Name>Core` with `<Name>CoreTests` and no experience target (the pending-core
+  allowance of `scripts/check_experience_packages.py`). Its tests may depend on VisualCoreRendering, as Shader Studio's
+  did.
+
+- Q: Which value types connect, and which ports does each node kind declare? → A: Four value types (scalar, colour,
+  texture, time); a connection needs the same type on both ends, with no implicit conversion (time does not feed a
+  scalar input). The library, with parameters as `ParameterDefinition`s:
+
+  | Kind | Inputs (type, required?) | Outputs | Parameters (range, default) |
+  |---|---|---|---|
+  | `time` | none | `time` (time) | `rate` 0…4, 1 |
+  | `constant` | none | `value` (scalar), `colour` (colour) | `value` −8…8, 1; `red`, `green`, `blue` 0…1, 1 |
+  | `noise` | `time` (time, optional), `scale` (scalar, optional) | `image` (texture) | `scale` 0.5…32, 4; `octaves` 1…6, 4; `speed` 0…4, 0.5 |
+  | `gradient` | `start` (colour, optional), `end` (colour, optional) | `image` (texture) | `angle` 0…360 degrees, 90 |
+  | `mix` | `a` (texture, required), `b` (texture, required), `amount` (scalar, optional) | `image` (texture) | `amount` 0…1, 0.5 |
+  | `blur` | `image` (texture, required), `radius` (scalar, optional) | `image` (texture) | `radius` 0…16 pixels, 4 |
+  | `output` | `image` (texture, required) | none | none |
+
+  An empty optional scalar input uses the parameter of the same name; an empty gradient colour input uses black
+  (`start`) or white (`end`). The drawing of each kind comes in A23-P03.
+- Q: What are the limits and the identities? → A: `GraphLimits`: at most 32 nodes and 64 connections. A node identity
+  is an integer 1…9,999, unique in the graph. A canvas position is two finite numbers in canvas points, each within
+  −4,096…4,096 (origin top-left, y down). Parameter values are finite and inside their definition's range; on reading
+  a file they are refused, not clamped. A missing parameter takes its default; an undeclared one is refused by the
+  checker.
+- Q: What is the graph file? → A: `GraphDocument`, kind `a23.visual-graph`, schema 1, at most 65,536 bytes encoded,
+  canonical JSON (sorted keys), so a round trip is byte-identical:
+  - **Reading:** the body is parsed as a JSON object, passed through `MigrationChain(currentVersion: 1)` (no steps yet;
+    the chain is the hook for schema 2), then decoded.
+  - **Refusal codes:** `damaged` (not JSON, a wrong kind, a missing field, an unknown node kind, or a version below 1
+    or with a missing step), `newer-version`, `too-large` (the file, or nodes or connections past the limits),
+    `not-finite` and `out-of-range` (a position, an identity or a parameter value).
+  - **Fingerprint:** a `StateDigest` from `DigestBuilder(domain: "a23.visual-graph")` over the version, the output
+    node, the nodes in identity order (identity, kind, parameters in name order, position) and the connections in
+    order (target node, target port, source node, source port).
+- Q: How does the checker order nodes and name a cycle? → A: The checker returns either an accepted result (the
+  order and the set of nodes reaching the output) or every refusal it found, in this order of stages, stopping after
+  a stage that refused:
+  1. limits;
+  2. nodes (duplicate identity, undeclared parameter, value outside its range);
+  3. connections (unknown node or port, from an input or into an output, type mismatch naming both types, an input
+     fed twice, a duplicate connection);
+  4. order: Kahn's algorithm, taking the smallest ready identity first. Any nodes left form at least one cycle. The
+     named loop is found by walking backwards from the smallest remaining identity along its smallest incoming
+     connection (by source identity, then port names) until a node repeats; it is reported in forward order,
+     starting with the connection whose source has the smallest identity in the loop;
+  5. output: `no-output`, `multiple-outputs`, `output-disconnected`, and `input-unconnected(node, port)` for each
+     empty required input.
+
+  The nodes reaching the output are found backwards from the output; the others are kept in the order and marked.
+- Q: How is "checking happens before any graphics work" proved, and is anything drawn in this phase? → A: Nothing is
+  drawn. A core test runs a scene on `RenderHost` that checks every fixture graph inside the scene's `setup` and
+  `render`, with the host's context current, and compares `ResourceRegistry.stats` (`liveCount` for every kind and
+  `totalBytes`) before and after. The core imports only pure products (VisualCoreParameters, VisualCorePersistence,
+  VisualCoreExperience); the isolation check proves it issues no graphics call.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - A graph is a small, bounded document (Priority: P1) 🎯
