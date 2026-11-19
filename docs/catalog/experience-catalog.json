@@ -4724,10 +4724,11 @@
     ]
    },
    "implementation": {
-    "state": "not-started",
-    "legacy_gates_passed": [],
+    "state": "standalone-partial",
+    "legacy_gates_passed": [
+     "A23-P00"
+    ],
     "legacy_gates_pending": [
-     "A23-P00",
      "A23-P01",
      "A23-P02",
      "A23-P03",
