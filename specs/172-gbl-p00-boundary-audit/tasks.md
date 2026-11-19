@@ -11,7 +11,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T-A24-001 Create the two starting documents:
+- [X] T-A24-001 Create the two starting documents: — Verified 2026-11-19: 2026-11-19: docs/apps/graphics-benchmark-lab/README.md (manual §1–§2, one-app rules, constitution 2.20.0) and regression-baseline.md (phase start 7de0f2af, constitution 6c0a7d35, pin d93edd1); validate_docs passes
   - `docs/apps/graphics-benchmark-lab/README.md`, from the manual §1–§2: a transparent, repeatable suite of GPU
     workloads (textured quads, shader ALU stress, particles) with warm-up, measurement and cool-down, percentile
     results with provenance and caveats; offline; no permission; no upload; an experience of the one app; its
