@@ -37,7 +37,8 @@
 - [ ] T-A24-405 [US2] `ExperienceTests/ResultLibraryTests.swift` (SC-A24-401, 402): save and open in a new session
   give equal runs; the 13th save is refused and nothing is removed; damaged, truncated, newer, oversized and
   non-finite files are listed with their reason and stay byte-identical; a full storage refuses with the message;
-  remove deletes only the chosen file; a repeated save of the same run is refused
+  remove deletes only the chosen file; a repeated save of the same run is refused; a saved result of a case version the app does not
+  build in (for example `quads` version 9 with its own settings) opens and shows its stored settings
 
 ## Phase 5: The interface and export action (P1)
 
