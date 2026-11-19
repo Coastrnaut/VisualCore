@@ -3,6 +3,8 @@
 // to the end equals the end; undoing a remove re-inserts the same node with its identifier at its old position; a
 // swap undone gives the original; undo or redo with nothing to do, and redo after a new edit, are refused; a refused
 // edit leaves the chain and the history unchanged; at the depth cap the oldest edit is dropped and counted.
+// Feature 182 (A25-P03) T-A25-304 (clarification Q3): a replace undone returns the earlier chain exactly (same
+// fingerprint) and redone the new one; an invalid replacement is refused without change.
 import Foundation
 import Testing
 import VisualCoreExperience
@@ -134,5 +136,41 @@ import VisualCoreExperience
         // The add was dropped: the oldest kept edit is undone and the node stays.
         #expect(chain == afterAdd)
         #expect(history.undo(chain) == .failure(.nothingToUndo))
+    }
+
+    @Test func replaceUndoesToTheEarlierChainAndRedoesToTheNewOne() throws {
+        var history = EditHistory()
+        var chain = EffectChain.empty
+        chain = try value(history.apply(.add(.grade, at: 0), to: chain))
+        chain = try value(history.apply(.add(.blur, at: 1), to: chain))
+        chain = try value(history.apply(.setValue(at: 0, name: "contrast", value: 1.75), to: chain))
+        chain = try value(history.apply(.setEnabled(at: 1, false), to: chain))
+        let earlier = chain
+        let opened = EffectChain(nodes: [
+            EffectNode(id: 7, effect: .posterize, enabled: true, values: ["levels": 5]),
+            EffectNode(id: 3, effect: .vignette, enabled: false,
+                       values: ["amount": 0.25, "radius": 0.5, "softness": 0.125]),
+        ])
+        chain = try value(history.apply(.replace(opened), to: chain))
+        #expect(chain == opened && chain.fingerprint() == opened.fingerprint())
+        #expect(history.undoCount == 5)
+        chain = try value(history.undo(chain))
+        #expect(chain == earlier && chain.fingerprint() == earlier.fingerprint())
+        chain = try value(history.redo(chain))
+        #expect(chain == opened && chain.fingerprint() == opened.fingerprint())
+        // Undoing past the replace still reaches the start.
+        for _ in 0..<5 { chain = try value(history.undo(chain)) }
+        #expect(chain == .empty)
+        #expect(ChainEdit.replace(opened).applied(to: earlier) == .success(opened))
+    }
+
+    @Test func anInvalidReplacementIsRefusedWithoutChange() throws {
+        var history = EditHistory()
+        let chain = try value(history.apply(.add(.grade, at: 0), to: .empty))
+        let duplicate = EffectChain(nodes: [EffectNode(id: 1, effect: .blur), EffectNode(id: 1, effect: .grade)])
+        #expect(history.apply(.replace(duplicate), to: chain) == .failure(.duplicateNode(1)))
+        let tooMany = EffectChain(nodes: (1...(ChainLimits.maxNodes + 1)).map { EffectNode(id: $0, effect: .grade) })
+        #expect(history.apply(.replace(tooMany), to: chain) == .failure(.tooManyNodes))
+        #expect(history.undoCount == 1 && history.redoCount == 0)
     }
 }

@@ -10,6 +10,9 @@
 // `bad-index` with the offending index); a move to its own position is a valid edit; undo applies the inverse and
 // moves the record to the redo stack, redo applies the forward step and moves it back; a new edit clears the redo
 // stack; past 64 records the oldest is dropped and counted in `droppedCount`. Pure Foundation; no UI, GPU or clock.
+// Feature 182 (A25-P03) T-A25-304 (clarification Q3): `replace(chain)` swaps the whole chain for another (opening a
+// preset) as one edit; its inverse replaces back the chain it replaced, exactly. The new chain is validated as a whole
+// like every other result.
 import Foundation
 
 /// One edit of a chain.
@@ -25,6 +28,8 @@ public enum ChainEdit: Equatable, Sendable {
     case setEnabled(at: Int, Bool)
     /// Sets the named parameter of the node at the position.
     case setValue(at: Int, name: String, value: Double)
+    /// Replaces the whole chain by another (opening a preset); undone by replacing back the earlier chain.
+    case replace(EffectChain)
 
     /// The chain after this edit, or why it was refused; the result is validated as a whole chain.
     public func applied(to chain: EffectChain) -> Result<EffectChain, ChainRefusal> {
@@ -49,6 +54,8 @@ enum ChainStep: Equatable, Sendable {
     case setEnabled(at: Int, Bool)
     /// Sets the named value of the node at the position.
     case setValue(at: Int, name: String, value: Double)
+    /// Replaces the whole chain.
+    case replace(EffectChain)
 
     /// An edit resolved against a chain: the step that applies it and the step that undoes it exactly.
     struct Record: Equatable, Sendable {
@@ -92,6 +99,8 @@ enum ChainStep: Equatable, Sendable {
             }
             return Record(forward: .setValue(at: at, name: name, value: value),
                           inverse: .setValue(at: at, name: name, value: old))
+        case let .replace(next):
+            return Record(forward: .replace(next), inverse: .replace(chain))
         }
     }
 
@@ -119,6 +128,9 @@ enum ChainStep: Equatable, Sendable {
             try Self.check(at, in: nodes.indices)
             guard nodes[at].values[name] != nil else { throw .unknownParameter(nodes[at].definition.field(name)) }
             nodes[at].values[name] = value
+        case let .replace(next):
+            try next.validate()
+            return next
         }
         let result = EffectChain(nodes: nodes)
         try result.validate()

@@ -33,15 +33,16 @@ enum ComposerTest {
 
     /// Opens Effects Composer in `session` through the factory, with `configure` run on the presenter before its first
     /// `setup` (the result is captured unless `configure` turns it off), lays the view out at `size` points, pins the
-    /// quality to level 0 and draws one frame.
+    /// quality to level 0 and draws one frame. With `storage` the presenter has a preset library over it.
     static func open(_ session: ExperienceSession, size: CGSize = CGSize(width: 64, height: 48),
+                     storage: ExperienceStorage? = nil,
                      configure: @escaping (ComposerPresenter) -> Void = { _ in }) async throws
         -> ExperienceShell<ComposerPresenter> {
         let id = self.id
         var made: ExperienceShell<ComposerPresenter>?
         if session.qualityPin == nil { session.qualityPin = 0 }
         let request = ExperienceOpenRequest(id: id, seed: 1, snapshot: nil, refusedSnapshotFails: false) {
-            let shell = EffectsComposerExperience.make(id: id)
+            let shell = EffectsComposerExperience.make(id: id, storage: storage)
             shell.presenter.captureResult = true
             configure(shell.presenter)
             made = shell
@@ -91,6 +92,36 @@ enum ComposerTest {
         var next = core
         let result = next.apply(ExperienceAction(control: control, values: values, step: 0))
         return (next, result)
+    }
+
+    /// The framebuffer as last drawn, top-down, cut to the rectangle the picture was presented in (the letterbox
+    /// left out), and sampled back to the picture's side: pixel (x, y) of the result is the framebuffer pixel the
+    /// present pass drew from texel (x, y). Nil without a frame or a readback.
+    static func presented(_ session: ExperienceSession, side: Int = PreviewRenderer.previewSide,
+                          renderer: PreviewRenderer) -> RGBAImage? {
+        guard let host = session.renderHost, let size = renderer.lastPresentSize,
+              let rect = PreviewRenderer.presentRect(width: size.width, height: size.height, side: side),
+              rect.width >= side,
+              let frame = PreviewRenderer.topDown(host.readPixels(), width: size.width, height: size.height)
+        else { return nil }
+        let scale = rect.width / side
+        let top = size.height - rect.y - rect.height
+        var bytes = [UInt8](repeating: 0, count: side * side * 4)
+        for y in 0..<side {
+            for x in 0..<side {
+                let from = ((top + y * scale) * size.width + rect.x + x * scale) * 4
+                let to = (y * side + x) * 4
+                for c in 0..<4 { bytes[to + c] = frame.bytes[from + c] }
+            }
+        }
+        return RGBAImage(width: side, height: side, bytes: bytes)
+    }
+
+    /// The colour channels of `image` with alpha set to 255 (the present pass writes alpha 1).
+    static func opaque(_ image: RGBAImage) -> RGBAImage {
+        var bytes = image.bytes
+        for i in stride(from: 3, to: bytes.count, by: 4) { bytes[i] = 255 }
+        return RGBAImage(width: image.width, height: image.height, bytes: bytes)
     }
 
     /// The CPU reference of `chain` on the test image.

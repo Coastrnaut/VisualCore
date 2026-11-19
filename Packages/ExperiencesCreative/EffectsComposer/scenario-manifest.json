@@ -6,7 +6,10 @@
     "chain.enable",
     "chain.set",
     "edit.undo",
-    "edit.redo"
+    "edit.redo",
+    "view.compare",
+    "chain.stage",
+    "chain.replace"
   ],
   "experience" : "a25.effects-composer",
   "kind" : "creative",

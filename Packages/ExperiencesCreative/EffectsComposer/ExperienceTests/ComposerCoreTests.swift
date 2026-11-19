@@ -1,5 +1,5 @@
 // ComposerCoreTests — feature 181 (A25-P02) T-A25-207 (FR-A25-203; SC-A25-202; clarifications Q3 and Q5). The core
-// adapter of Effects Composer: the seven controls and their ranges, every action and every refusal (a refused action
+// adapter of Effects Composer: the ten controls and their ranges, every action and every refusal (a refused action
 // changes nothing), the value mapping of `chain.set`, the digest and the snapshot (the chain file's body; a restored
 // core has an empty history), the outcome, and the spoken labels of a node row and a value control.
 import EffectsComposerCore
@@ -32,17 +32,20 @@ private func expectRefused(_ core: ComposerCore, _ control: String, _ values: [D
 }
 
 @Suite struct ComposerCoreTests {
-    @Test func theSevenControlsHaveTheirRanges() {
+    @Test func theTenControlsHaveTheirRanges() {
         let controls = ComposerCore.controls
         #expect(controls.map(\.id) == ComposerCore.actionIDs)
         #expect(controls.map(\.id) == ["chain.add", "chain.remove", "chain.move", "chain.enable", "chain.set",
-                                       "edit.undo", "edit.redo"])
+                                       "edit.undo", "edit.redo", "view.compare", "chain.stage", "chain.replace"])
         #expect(controls[0].ranges == [0...4, 0...8])
         #expect(controls[1].ranges == [0...7])
         #expect(controls[2].ranges == [0...7, 0...7])
         #expect(controls[3].ranges == [0...7, 0...1])
         #expect(controls[4].ranges == [0...7, 0...3, 0...1])
         #expect(controls[5].ranges.isEmpty && controls[6].ranges.isEmpty)
+        #expect(controls[7].ranges == [0...1])
+        #expect(controls[8].ranges == [0...7, 1...65_535, 0...4, 0...1] + Array(repeating: -65_535...65_535, count: 4))
+        #expect(controls[9].ranges == [0...8])
         #expect(ComposerCore.qualityTiers == 1)
         #expect(ComposerCore.migrations.currentVersion == 1)
     }

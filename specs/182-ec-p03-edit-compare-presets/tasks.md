@@ -20,7 +20,7 @@
   change nothing; damaged, newer and oversized files are listed as unreadable and stay byte-identical; a newer index
   makes the library read only; a damaged index is rebuilt only by the next change; a full storage quota refuses a save
   with "There is not enough space to save this preset." and writes nothing
-- [ ] T-A25-304 [US2] Add `ChainEdit.replace` to `Packages/ExperiencesCreative/EffectsComposer/Core/ChainEditing.swift` and its tests to
+- [X] T-A25-304 [US2] Add `ChainEdit.replace` to `Packages/ExperiencesCreative/EffectsComposer/Core/ChainEditing.swift` and its tests to — Verified 2026-11-19: 2026-11-19 .autonomy/checks/A25-P03.ec-ios27.json exit 0 (44 core and 45 experience tests on sim-27.2); ChainEdit.replace with undo and redo; presenter library actions; open then undo returns the chain before opening (PresetPresenterTests); staging actions recorded in contracts/presets.md
   `Packages/ExperiencesCreative/EffectsComposer/CoreTests/HistoryTests.swift` (replace then undo returns the earlier chain exactly), and the presenter's library
   actions (opening a preset through the presenter, then undo, returns the chain before opening) and the inline `presets`
   controls in `Packages/ExperiencesCreative/EffectsComposer/Experience/{ComposerPresenter,ECControls}.swift` per clarification Q3
