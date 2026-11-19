@@ -107,7 +107,7 @@
 
 ## Phase 7: Convergence
 
-- [ ] T-A24-216 In `Experience/RunRecorder.swift`, end the run as interrupted when a frame's interval or CPU time falls
+- [X] T-A24-216 In `Experience/RunRecorder.swift`, end the run as interrupted when a frame's interval or CPU time falls — Verified 2026-11-19: 2026-11-19: .autonomy/checks/A24-P02.gbl-ios27-2.json exit 0 (50 core and 34 experience tests); a 1.2 s gap and a CPU time outside 0…1,000 ms interrupt the run with earlier samples kept, nothing clamped, dropped false
   outside 0…1,000 ms (or is not finite) instead of clamping it, keep `dropped` false until A24-P03's rule, and test it
   in `ExperienceTests/RecorderTests.swift` (a 1.2 s gap interrupts with the earlier samples kept and no clamped value),
   per clarification Q2, the phase's regression gate and constitution A24 provenance (contradicts)

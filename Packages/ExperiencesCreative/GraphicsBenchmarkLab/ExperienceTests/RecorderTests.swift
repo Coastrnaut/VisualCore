@@ -119,7 +119,7 @@ import GraphicsBenchmarkLabCore
         #expect(recorder.state == .interrupted, "a stop outside a run does nothing")
     }
 
-    @Test func framesOutOfOrderAreSkippedAndLongFramesAreCapped() {
+    @Test func framesOutOfOrderAreSkippedAndAStallInterruptsWithoutAClampedValue() {
         let recorder = RunRecorder()
         recorder.start(case: .quads, at: 0)
         recorder.record(frameTime: 0, cpuMs: 1)
@@ -127,10 +127,32 @@ import GraphicsBenchmarkLabCore
         recorder.record(frameTime: 0.25, cpuMs: 1)
         recorder.record(frameTime: .nan, cpuMs: 1)
         #expect(recorder.samples.count == 2, "a frame earlier than the last one and a non-finite time are skipped")
-        recorder.record(frameTime: 2.5, cpuMs: 5_000)
-        let last = recorder.samples.last
-        #expect(last?.intervalMs == SampleLimits.maxDurationMs && last?.dropped == true)
-        #expect(last?.cpuMs == SampleLimits.maxDurationMs)
+        // A 1.2 s gap: the run ends as interrupted, the two earlier samples kept, nothing clamped or marked dropped.
+        recorder.record(frameTime: 1.7, cpuMs: 1)
+        let state = recorder.state
+        #expect(state == .interrupted)
+        let samples = recorder.samples
+        #expect(samples.count == 2)
+        for sample in samples {
+            let interval = sample.intervalMs ?? 0
+            #expect(interval <= 500 && !sample.dropped && sample.cpuMs == 1)
+        }
+    }
+
+    @Test func aCPUTimeOutsideItsRangeInterruptsTheRun() {
+        let recorder = RunRecorder()
+        recorder.start(case: .alu, at: 0)
+        recorder.record(frameTime: 0, cpuMs: 1)
+        recorder.record(frameTime: 0.02, cpuMs: 5_000)
+        let state = recorder.state
+        #expect(state == .interrupted)
+        let count = recorder.samples.count
+        #expect(count == 1)
+        let negative = RunRecorder()
+        negative.start(case: .alu, at: 0)
+        negative.record(frameTime: 0, cpuMs: -1)
+        let negativeState = negative.state
+        #expect(negativeState == .interrupted)
     }
 
     // MARK: Through the presenter

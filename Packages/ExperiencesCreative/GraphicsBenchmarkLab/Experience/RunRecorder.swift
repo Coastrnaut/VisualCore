@@ -10,10 +10,10 @@
 //     frame at or after the timeline's end appends nothing and finishes the run: the summary is `Summary.make` of the
 //     samples and the state `finished`.
 //     Choices recorded here (lead's agent, T-A24-207): a frame whose time is not finite or earlier than the previous
-//     one is skipped (it would break the sample set's order); an interval or a CPU time above the sample cap
-//     (`SampleLimits.maxDurationMs`, 1 s) is stored as the cap, and such an interval marks the frame `dropped` (a
-//     frame that late was dropped, and the summary then says so instead of refusing the set); a negative CPU time is
-//     stored as 0; no sample is appended past `SampleLimits.maxSamples`.
+//     one is skipped (it would break the sample set's order); no sample is appended past `SampleLimits.maxSamples`.
+//     Convergence (T-A24-216): no value is ever clamped. An interval or a CPU time that is not finite or leaves
+//     0…`SampleLimits.maxDurationMs` (1 s) ends the run as `interrupted` with the earlier samples kept, and `dropped`
+//     stays false until the A24-P03 rule decides it.
 //   - `stop()` ends a running run as `stopped`, `interrupt()` as `interrupted` (a context rebuild or the session
 //     closing); both keep the samples and summarise them when the set allows it. Outside a run they do nothing.
 //   - `runRecord()` is the finished, stopped or interrupted run as A24-P01's `BenchmarkRun` (nil without a summary).
@@ -78,17 +78,25 @@ final class RunRecorder {
             return
         }
         guard samples.count < SampleLimits.maxSamples else { return }
+        // Feature 174 T-A24-216: no value is clamped. A frame whose interval or CPU time is not finite or leaves
+        // 0…`SampleLimits.maxDurationMs` (a stall, a background gap) ends the run as interrupted, the earlier samples
+        // kept; `dropped` stays false until the A24-P03 rule decides it.
         let cap = SampleLimits.maxDurationMs
         var interval: Double?
-        var dropped = false
         if let previousTime {
             let raw = (frameTime - previousTime) * 1_000
-            if raw > cap { dropped = true }
-            interval = min(max(raw, 0), cap)
+            guard raw.isFinite, raw >= 0, raw <= cap else {
+                finish(as: .interrupted)
+                return
+            }
+            interval = raw
         }
-        let cpu = cpuMs.isFinite ? min(max(cpuMs, 0), cap) : cap
-        samples.append(FrameSample(frameIndex: samples.count, phase: framePhase, intervalMs: interval, cpuMs: cpu,
-                                   gpuMs: nil, dropped: dropped))
+        guard cpuMs.isFinite, cpuMs >= 0, cpuMs <= cap else {
+            finish(as: .interrupted)
+            return
+        }
+        samples.append(FrameSample(frameIndex: samples.count, phase: framePhase, intervalMs: interval, cpuMs: cpuMs,
+                                   gpuMs: nil, dropped: false))
         previousTime = frameTime
         phase = framePhase
     }
