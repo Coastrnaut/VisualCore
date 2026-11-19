@@ -46,7 +46,7 @@
 
 ## Phase 4: Experience — runner and report (P1, P2)
 
-- [ ] T-A24-308 [US1] [US2] [US4] In `Experience/{RunRecorder,BenchPresenter}.swift` (FR-A24-301, 302, 304, 306): the
+- [X] T-A24-308 [US1] [US2] [US4] In `Experience/{RunRecorder,BenchPresenter}.swift` (FR-A24-301, 302, 304, 306): the — Verified 2026-11-19: 2026-11-19: .autonomy/checks/A24-P03.gbl-ios27.json exit 0 (66 core and 42 experience tests); dropped from DroppedFrameRule, probe from renderCapabilities, GPUFrameTimer unless forced unsupported, gpuMs only for measured frames, GPU summary line only with GPU times
   dropped rule; stop at the next frame; the probe from `context.resources.renderCapabilities.extensions`; a
   `GPUFrameTimer` only when supported (seam `forceTimerUnsupported`), bracketing the workload draw; `gpuMs` filled from
   `poll()` results for measured frames; the summary text's GPU line only when GPU times exist

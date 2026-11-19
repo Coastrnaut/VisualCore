@@ -29,11 +29,32 @@
 //     red at least 51 of 255 above green and blue, so the class is `red` at every n and every noise value. The other
 //     cases declare no probe (the runner reads the frame of the opening state only).
 //
-// Maximum 60 frames per second; one quality tier, `level-0`. No GL call: everything is drawn by the workload.
+// Feature 175 (A24-P03) T-A24-308, T-A24-309 (FR-A24-301, 302, 304, 306, 307; clarifications Q3–Q5):
+//   - Probe and timer: in `setup`, and at a draw on a context of another generation than the timer's, the presenter
+//     decides ``timerSupport`` with `TimerProbe.decide(extensions:)` over `context.resources.renderCapabilities` and,
+//     when supported and the seam ``forceTimerUnsupported`` is off, creates a `GPUFrameTimer`; a timer that cannot be
+//     created makes the support `unsupported`. Turning the seam on releases the timer at the next draw. `teardown`
+//     releases it.
+//   - Timing: while a run is running (any phase) the workload draw is bracketed with `begin(frame:)`/`end()`, keyed by
+//     the presenter's own drawn-frame count; a frame the recorder recorded maps that key to its sample index. Each
+//     draw first polls the timer and passes the results of the current run's frames to
+//     ``RunRecorder/applyGPUTimes(_:)`` (which keeps measured frames only), so results arrive within the ring's four
+//     frames and the frame that ends a run is recorded after the last apply. A new run clears the key map, so a late
+//     result of an earlier run is never applied.
+//   - Report: a run's start records `DeviceConditions.current()`, the context's `RenderCapabilities` and the tier;
+//     when the run ends (finished, stopped or interrupted, in `draw`, `resize` or `teardown`) the report is built by
+//     ``ReportSource`` with the end conditions and the GPU timer named only when a sample has a GPU time, and attached
+//     to the recorder.
+//   - Summary: a "GPU time" line with p50, p95 and p99 only when the summary has a GPU distribution; otherwise the
+//     flag's sentence "GPU time not available on this device."
+//
+// Maximum 60 frames per second; one quality tier, `level-0`. No GL call: everything is drawn by the workload and the
+// VisualCore GPU timer.
 import Foundation
 import GraphicsBenchmarkLabCore
 import Observation
 import SwiftUI
+import VisualCoreDiagnostics
 import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreRendering
@@ -83,6 +104,27 @@ final class BenchPresenter: ExperiencePresenter {
     private var seenRequests: (start: Int, stop: Int)?
     /// The generation and pixel size of the last context drawn into; nil before the first frame.
     private var lastContext: (generation: Int, width: Int, height: Int)?
+    /// Forces the probe to `unsupported` so that no GPU timer is created (a test seam); takes effect at `setup` or the
+    /// next draw.
+    var forceTimerUnsupported = false
+    /// The GPU frame timer of the current context generation; nil when unsupported, forced off or torn down (a test
+    /// seam, read-only).
+    private(set) var timer: GPUFrameTimer?
+    /// The probe's decision for the current context (a test seam, read-only); unsupported before `setup`.
+    private(set) var timerSupport = TimerSupport.unsupported(reason: BenchPresenter.notProbedReason)
+    /// The context generation the timer and ``timerSupport`` belong to; nil before `setup` and after `teardown`.
+    private var timerGeneration: Int?
+    /// The current run's timed frames: the drawn-frame key passed to the timer → the index of the recorded sample.
+    private var timedFrames: [Int: Int] = [:]
+    /// The conditions at the current run's start, waiting for its report; nil when no report is pending.
+    private var runStart: (conditions: DeviceConditions, capabilities: RenderCapabilities, tier: Int)?
+
+    /// The reason of ``timerSupport`` before a context was probed.
+    nonisolated static let notProbedReason = "no render context has been probed"
+    /// The reason of ``timerSupport`` while ``forceTimerUnsupported`` is on.
+    nonisolated static let forcedReason = "the GPU timer is turned off for this test"
+    /// The reason of ``timerSupport`` when the extension is listed but the timer could not be created.
+    nonisolated static let notCreatedReason = "the GPU timer could not be created on this context"
 
     /// A presenter with no workload until `setup`.
     init() {}
@@ -102,7 +144,57 @@ final class BenchPresenter: ExperiencePresenter {
     func setup(_ context: RenderContext) throws {
         workload?.release()
         workload = nil
+        prepareTimer(context)
         workload = try WorkloadRenderer(benchmarkCase: workloadCase, context: context)
+    }
+
+    /// Releases any timer, probes `context` and creates a GPU timer when supported and not forced off (see the file
+    /// header).
+    private func prepareTimer(_ context: RenderContext) {
+        timer?.release()
+        timer = nil
+        timedFrames = [:]
+        timerGeneration = context.generation
+        if forceTimerUnsupported {
+            timerSupport = .unsupported(reason: Self.forcedReason)
+            return
+        }
+        let decided = TimerProbe.decide(extensions: context.resources.renderCapabilities.extensions)
+        guard decided == .supported else {
+            timerSupport = decided
+            return
+        }
+        timer = GPUFrameTimer(context: context)
+        timerSupport = timer == nil ? .unsupported(reason: Self.notCreatedReason) : .supported
+    }
+
+    /// Polls the timer and applies the current run's results to the recorder.
+    private func applyTimerResults() {
+        guard let timer else { return }
+        let results = timer.poll()
+        var mapped: [GPUFrameTime] = []
+        for result in results {
+            guard let index = timedFrames.removeValue(forKey: result.frame) else { continue }
+            mapped.append(GPUFrameTime(frame: index, milliseconds: result.milliseconds))
+        }
+        if !mapped.isEmpty { recorder.applyGPUTimes(mapped) }
+    }
+
+    /// Builds and attaches the report of a run that has ended since its start (see the file header), with the end
+    /// conditions read now.
+    private func attachReportIfEnded() {
+        guard let start = runStart, recorder.state != .running, recorder.state != .idle,
+              let benchmarkCase = recorder.benchmarkCase else { return }
+        var gpuMeasured = false
+        for sample in recorder.samples where sample.gpuMs != nil {
+            gpuMeasured = true
+            break
+        }
+        let report = ReportSource.report(case: benchmarkCase, capabilities: start.capabilities, tier: start.tier,
+                                         start: start.conditions, end: DeviceConditions.current(),
+                                         gpuMeasured: gpuMeasured)
+        recorder.attachReport(report)
+        runStart = nil
     }
 
     /// Passes the new drawable size to the workload.
@@ -110,6 +202,7 @@ final class BenchPresenter: ExperiencePresenter {
         // FR-A24-206: a size change during a run ends it as interrupted (its samples are kept).
         if let lastContext, lastContext.1 != context.pixelWidth || lastContext.2 != context.pixelHeight {
             recorder.interrupt()
+            attachReportIfEnded()
         }
         workload?.resize(context)
     }
@@ -119,7 +212,11 @@ final class BenchPresenter: ExperiencePresenter {
     func draw(_ core: BenchCore, tier: Int, context: RenderContext, frame: FrameInfo) throws {
         let time = feedTime ?? frame.time
         if let lastContext, lastContext.generation != context.generation { recorder.interrupt() }
+        if timerGeneration != context.generation || (forceTimerUnsupported && timer != nil) {
+            prepareTimer(context)
+        }
         lastContext = (context.generation, context.pixelWidth, context.pixelHeight)
+        applyTimerResults()
         if core.selectedCase != drawnCaseIndex, BenchCore.cases.indices.contains(core.selectedCase) {
             recorder.stop()
             workload?.release()
@@ -128,12 +225,19 @@ final class BenchPresenter: ExperiencePresenter {
             workloadFrame = 0
             workload = try WorkloadRenderer(benchmarkCase: workloadCase, context: context)
         }
-        actOnRequests(core, at: time)
+        actOnRequests(core, at: time, tier: tier, context: context)
+        let timing = recorder.state == .running ? timer : nil
+        let key = drawnFrames
+        let index = recorder.nextFrameIndex
+        timing?.begin(frame: key)
         let clock = ContinuousClock()
         let begin = clock.now
         try workload?.draw(frame: workloadFrame, context: context)
         let cpuMs = Self.milliseconds(clock.now - begin)
+        timing?.end()
         recorder.record(frameTime: time, cpuMs: cpuMs)
+        if timing != nil, recorder.samples.count == index + 1 { timedFrames[key] = index }
+        attachReportIfEnded()
         lastDrawnWorkloadFrame = workloadFrame
         workloadFrame += 1
         drawnFrames += 1
@@ -141,23 +245,32 @@ final class BenchPresenter: ExperiencePresenter {
     }
 
     /// Starts or stops the run on a rise of the core's request counters; adopts the first counters seen and any that
-    /// fall.
-    private func actOnRequests(_ core: BenchCore, at time: Double) {
+    /// fall. A start records the conditions of the run's report (the device conditions now, `context`'s capabilities
+    /// and `tier`).
+    private func actOnRequests(_ core: BenchCore, at time: Double, tier: Int, context: RenderContext) {
         guard let seen = seenRequests else {
             seenRequests = (core.startRequests, core.stopRequests)
             return
         }
         if core.stopRequests > seen.stop { recorder.stop() }
         if core.startRequests > seen.start, recorder.state != .running {
+            attachReportIfEnded()
             recorder.start(case: workloadCase, at: time)
             workloadFrame = 0
+            timedFrames = [:]
+            runStart = (DeviceConditions.current(), context.resources.renderCapabilities, tier)
         }
         seenRequests = (core.startRequests, core.stopRequests)
     }
 
-    /// Ends a running run as interrupted and releases the workload.
+    /// Ends a running run as interrupted (attaching its report), releases the GPU timer and the workload.
     func teardown(_ context: RenderContext) {
         recorder.interrupt()
+        attachReportIfEnded()
+        timer?.release()
+        timer = nil
+        timerGeneration = nil
+        timedFrames = [:]
         workload?.release()
         workload = nil
         followRecorder()
@@ -207,13 +320,18 @@ final class BenchPresenter: ExperiencePresenter {
         }
     }
 
-    /// The summary block of `summary`: the interval percentiles, the counts, then one sentence per flag.
+    /// The summary block of `summary`: the interval percentiles, the GPU time percentiles when the summary has a GPU
+    /// distribution, the counts, then one sentence per flag.
     nonisolated static func summaryLines(_ summary: Summary) -> [String] {
         let interval = summary.interval
         var lines = ["Frame interval p50 " + milliseconds(text: interval.p50),
                      "Frame interval p95 " + milliseconds(text: interval.p95),
-                     "Frame interval p99 " + milliseconds(text: interval.p99),
-                     "Measured frames \(summary.measured), warm-up excluded \(summary.warmUpExcluded), "
+                     "Frame interval p99 " + milliseconds(text: interval.p99)]
+        if let gpu = summary.gpu {
+            lines.append("GPU time p50 " + milliseconds(text: gpu.p50) + ", p95 " + milliseconds(text: gpu.p95)
+                             + ", p99 " + milliseconds(text: gpu.p99))
+        }
+        lines += ["Measured frames \(summary.measured), warm-up excluded \(summary.warmUpExcluded), "
                          + "cool-down excluded \(summary.coolDownExcluded), dropped \(summary.dropped)"]
         lines += summary.flags.map(sentence)
         return lines

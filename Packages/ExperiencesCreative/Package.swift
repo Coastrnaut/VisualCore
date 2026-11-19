@@ -786,7 +786,9 @@ let package = Package(
                                .product(name: "VisualCoreScenes", package: visualCore),
                                .product(name: "VisualCoreRendering", package: rendering),
                                .product(name: "VisualCoreExperienceHost", package: rendering),
-                               .product(name: "VisualCoreUI", package: rendering)],
+                               .product(name: "VisualCoreUI", package: rendering),
+                               // Feature 175 (A24-P03): the device conditions of the run report.
+                               .product(name: "VisualCoreDiagnostics", package: visualCore)],
                 path: "GraphicsBenchmarkLab/Experience"),
         .testTarget(name: "GraphicsBenchmarkLabExperienceTests",
                     dependencies: ["GraphicsBenchmarkLabExperience", "GraphicsBenchmarkLabCore",
@@ -797,7 +799,8 @@ let package = Package(
                                .product(name: "VisualCoreScenes", package: visualCore),
                                    .product(name: "VisualCoreRendering", package: rendering),
                                    .product(name: "VisualCoreExperienceHost", package: rendering),
-                                   .product(name: "VisualCoreUI", package: rendering)],
+                                   .product(name: "VisualCoreUI", package: rendering),
+                                   .product(name: "VisualCoreDiagnostics", package: visualCore)],
                     path: "GraphicsBenchmarkLab/ExperienceTests"),
         // A21 Aurora (feature 152, A21-P01): a pending core until A21-P02 adds the experience. The core is pure (the
         // sky scene, presets, clock, noise port, reference and shader text); its tests draw the shader off screen.

@@ -17,9 +17,20 @@
 //   - `stop()` ends a running run as `stopped`, `interrupt()` as `interrupted` (a context rebuild or the session
 //     closing); both keep the samples and summarise them when the set allows it. Outside a run they do nothing.
 //   - `runRecord()` is the finished, stopped or interrupted run as A24-P01's `BenchmarkRun` (nil without a summary).
+// Feature 175 (A24-P03) T-A24-308 (FR-A24-301, 302, 306; clarifications Q3, Q4):
+//   - `dropped` is `DroppedFrameRule.isDropped(intervalMs:)` of each recorded interval (more than 25 ms); the interval
+//     still counts in the summary. The A24-P02 rule that a value outside its range ends the run as interrupted stays.
+//   - `applyGPUTimes(_:)` fills `gpuMs` of the samples whose `frameIndex` equals a result's frame, only for
+//     measurement-phase samples, only while the run is running and only for a finite value within
+//     0…`SampleLimits.maxDurationMs`; any other result is ignored and the sample keeps no GPU time. The presenter
+//     applies the timer's results before the frame that ends the run is recorded, so the summary is computed after
+//     the final apply.
+//   - `attachReport(_:)` stores the ended run's `RunReport` (the presenter builds it); `runRecord()` carries it. A new
+//     run clears it.
 import Foundation
 import GraphicsBenchmarkLabCore
 import VisualCoreExperience
+import VisualCoreRendering
 
 /// Records the frames of one benchmark run (see the file header).
 @MainActor
@@ -53,6 +64,9 @@ final class RunRecorder {
     private(set) var phase: RunPhase?
     /// The time of the last recorded frame, seconds.
     private var previousTime: Double?
+    /// The report of the ended run, attached by the presenter; nil while running, before a run, or before it is
+    /// attached.
+    private(set) var report: RunReport?
 
     /// A recorder with no run.
     init() {}
@@ -63,6 +77,7 @@ final class RunRecorder {
         timeline = RunTimeline(plan: benchmarkCase.plan, start: time)
         samples = []
         summary = nil
+        report = nil
         previousTime = nil
         phase = .warmUp
         state = .running
@@ -80,7 +95,7 @@ final class RunRecorder {
         guard samples.count < SampleLimits.maxSamples else { return }
         // Feature 174 T-A24-216: no value is clamped. A frame whose interval or CPU time is not finite or leaves
         // 0…`SampleLimits.maxDurationMs` (a stall, a background gap) ends the run as interrupted, the earlier samples
-        // kept; `dropped` stays false until the A24-P03 rule decides it.
+        // kept. Feature 175 T-A24-308: `dropped` is the A24-P03 rule's verdict on the interval.
         let cap = SampleLimits.maxDurationMs
         var interval: Double?
         if let previousTime {
@@ -96,9 +111,34 @@ final class RunRecorder {
             return
         }
         samples.append(FrameSample(frameIndex: samples.count, phase: framePhase, intervalMs: interval, cpuMs: cpuMs,
-                                   gpuMs: nil, dropped: false))
+                                   gpuMs: nil, dropped: DroppedFrameRule.isDropped(intervalMs: interval)))
         previousTime = frameTime
         phase = framePhase
+    }
+
+    /// The index of the sample the next recorded frame gets (the count of samples so far).
+    var nextFrameIndex: Int { samples.count }
+
+    /// Fills the GPU time of the measured samples named by `times` (see the file header): a result whose frame is
+    /// the `frameIndex` of a measurement-phase sample and whose value is finite and within
+    /// 0…``SampleLimits/maxDurationMs`` sets that sample's `gpuMs`; every other result is ignored. Does nothing
+    /// outside a run.
+    func applyGPUTimes(_ times: [GPUFrameTime]) {
+        guard state == .running else { return }
+        for time in times {
+            let index = time.frame
+            guard samples.indices.contains(index), samples[index].frameIndex == index,
+                  samples[index].phase == .measure else { continue }
+            let value = time.milliseconds
+            guard value.isFinite, value >= 0, value <= SampleLimits.maxDurationMs else { continue }
+            samples[index].gpuMs = value
+        }
+    }
+
+    /// Stores `report` as the ended run's report. Does nothing while idle or running.
+    func attachReport(_ report: RunReport) {
+        guard state != .idle, state != .running else { return }
+        self.report = report
     }
 
     /// Ends a running run as stopped, keeping its samples.
@@ -124,7 +164,7 @@ final class RunRecorder {
         state = end
     }
 
-    /// The ended run as a `BenchmarkRun` (finished → completed); nil while idle or running, or without a summary or
+    /// The ended run as a `BenchmarkRun` (finished → completed) with its attached report; nil while idle or running, or without a summary or
     /// a case fingerprint.
     func runRecord() -> BenchmarkRun? {
         let runState: RunState
@@ -136,6 +176,7 @@ final class RunRecorder {
         }
         guard let benchmarkCase, let summary, let fingerprint = try? benchmarkCase.fingerprint() else { return nil }
         return BenchmarkRun(caseID: benchmarkCase.id, caseVersion: benchmarkCase.version,
-                            caseFingerprint: fingerprint.hex, samples: samples, summary: summary, state: runState)
+                            caseFingerprint: fingerprint.hex, samples: samples, summary: summary, state: runState,
+                            report: report)
     }
 }
