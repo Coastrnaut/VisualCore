@@ -75,7 +75,7 @@
   tiles beyond 1 (repeat length shorter than the curve) is reported by `Mesh.validate` only as `uvOutOfRange` (the
   validator's 0…1 rule is for atlased meshes) and validates fully when the repeat length is the curve length, per
   data-model "Ribbon mesh" (contradicts)
-- [ ] T-R02F08-014 Record in `research.md` and `data-model.md` that on closed curves the frame rotation bound is the bend
+- [X] T-R02F08-014 Record in `research.md` and `data-model.md` that on closed curves the frame rotation bound is the bend — Verified 2026-11-19: 2026-11-19 research.md R6 and data-model.md record the closed-curve rotation bound (matches CurveFrameTests)
   plus the closing twist spread per step (|closing angle| × step / length), open curves keep the strict bound, per
   SC-R02F08-002 (partial)
 - [ ] T-R02F08-015 Record the as-built API in `contracts/api.md`: `CurveSamples.init(positions:closed:)`,

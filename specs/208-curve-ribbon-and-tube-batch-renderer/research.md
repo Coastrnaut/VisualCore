@@ -11,3 +11,7 @@
   meet. Rationale: constant pattern size, continuous seams.
 - **R5 Batching.** Decision: merge into one mesh; no instancing. Rationale: the existing renderer draws one mesh per
   call, and curve content changes rarely.
+- **R6 As built (T-R02F08-014, 2026-11-19).** Spreading a closed loop's leftover twist linearly by arc length adds
+  rotation about the tangent, so on closed curves consecutive frames may rotate by the bend plus |closing angle| × step /
+  length (measured: trefoil 2.7e-3 rad, Lissajous 1.9e-7 rad above the bend); open curves keep the strict bound. The
+  second reflection is skipped when |t1 − tL|² ≤ 1e-20 so noise cannot flip the normal at a 180° reversal.
