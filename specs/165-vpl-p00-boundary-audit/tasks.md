@@ -59,7 +59,7 @@
 
 ## Phase 6: User Story 4 — Stop/go decision (P2)
 
-- [ ] T-A23-008 [US4] Complete the contract, then rerun the checker (`--name contract-2`):
+- [X] T-A23-008 [US4] Complete the contract, then rerun the checker (`--name contract-2`): — Verified 2026-11-18: 2026-11-18: 9 gaps, all app-local adaptations with phases A23-P01..P06 per research D4 (G-MODEL, G-TYPES; G-CANVAS; G-COMPILE, G-OPERATORS, G-BUDGET; G-LIBRARY; G-DEVICE; G-RELEASE), no upstream gap; 15 negative entries (the FR-A23-006 rules, a no-fork rule and the manual §13 risks 1-3 with owner, verification and release blocker); decision go with reasons (US4 scenario 2 stop condition not met), no blockers; .autonomy/checks/A23-P00.contract-2.json exit 0
   - **`gaps`:** for every non-available row, the owning module and the phase per research D4: G-MODEL, G-TYPES
     (A23-P01); G-CANVAS (A23-P02); G-COMPILE, G-OPERATORS, G-BUDGET (A23-P03); G-LIBRARY (A23-P04); the device plan
     (A23-P05); release (A23-P06). All are app-local per the five clarification answers (session 2026-11-18). No upstream gap.
