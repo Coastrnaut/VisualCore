@@ -119,8 +119,8 @@
   "F12": {
    "disposition": "new",
    "existing": [],
-   "home": "(new) VisualCoreGeometry",
-   "note": "Robust convex clipping and polygon operations, pure and host-tested."
+   "home": "VisualCoreScenes",
+   "note": "As built (feature 212, in VisualCoreScenes beside the meshes; no VisualCoreGeometry module): ConvexSolid (box, planes bounded by a box, or a closed convex Mesh; 4,096 vertices, 1,024 faces, 256 corners), cut(by:) by ClipPlane into kept and removed parts with cap and volumes under ε = 1e-9 × diagonal (edge crossing points shared, slivers reported empty), VolumeLedger balancing within 1e-9, PolygonCleanup, ConvexSolidDocument schema 1, mesh() valid closed."
   },
   "F13": {
    "disposition": "new",

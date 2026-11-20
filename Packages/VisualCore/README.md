@@ -359,6 +359,16 @@ composite, premultiplied over); `composite` mode 2 is premultiplied over; the va
 and out-of-range emissive ones. `RenderState.premultipliedBlended` draws premultiplied layers. Rules:
 [docs/architecture/shaders.md](../../docs/architecture/shaders.md).
 
+## Convex solids and cuts (feature 212, R02-F12)
+
+VisualCoreScenes: `ConvexSolid` holds vertices and outward convex polygon faces (at most 4,096 vertices, 1,024 faces,
+256 corners per face), made from a box, from `ClipPlane`s bounded by a box, or from a closed convex `Mesh`;
+`cut(by:)` returns the kept and removed parts, the cap and both volumes under a tolerance of 1e-9 × the bounding
+diagonal, with no sliver, repeated or zero-area face; `VolumeLedger` records every cut and keeps original = remaining +
+Σ removed within 1e-9; `PolygonCleanup` removes repeated and collinear points and orients a polygon; `ConvexSolidDocument`
+stores a solid and its ledger (schema 1); `mesh()` gives a `Mesh` that validates closed. Refusals are
+`ConvexSolidError` with `r2-f12.*` codes. Rules: [docs/architecture/convex-cutting.md](../../docs/architecture/convex-cutting.md).
+
 ## Signed-distance shapes (feature 211, R02-F11)
 
 VisualCoreScenes: `SDFShape` describes a shape from planes, spheres, boxes, rounded boxes, capsules and tori with
