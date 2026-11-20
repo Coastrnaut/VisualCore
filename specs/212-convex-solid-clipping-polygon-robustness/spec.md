@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-19
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-F12 (migration ledger, shared round feature) · ID namespace FR-R02F12-###, SC-R02F12-###, T-R02F12-###
 
@@ -30,6 +30,43 @@ Canonical overrides:
   (ImplementationLock-100). **Device-only items:** cut time of the largest solid on D1–D3, recorded in the device
   campaign. **Owner-only items:** none.
 
+## Clarifications
+
+### Session 2026-11-19
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time. Facts checked in
+code (read-only audit, 2026-11-19): `Mesh` (positions, normals, uvs, indices; CCW from outside), `MeshBuilder`
+(weld tolerance 1e-9 relative), `Mesh.validate(requireClosed:)` (closedness, winding, `invertedFaces`, signed volume
+Σ p0·(p1×p2)/6), degenerate triangles at area ≤ 1e-12 × squared diagonal, all in VisualCoreScenes; no 3D clipping,
+hull or public signed volume exists; the names `ConvexSolid`, `ClipPlane`, `ConvexCutResult`, `VolumeLedger`,
+`PolygonCleanup`, `ConvexSolidError` are unused.
+
+- Q: Where does the library live and how is a solid represented? → A: in VisualCoreScenes beside the meshes, as
+  `ConvexSolid`: vertices (`[Vec3]`) and faces (`[[Int]]`, each a convex polygon wound counter-clockwise seen from
+  outside, with its outward unit plane). Rationale: the R02-F05/F08/F11 precedent; faces as polygons keep caps and cuts
+  exact without triangle bookkeeping. Impact: FR-R02F12-001, 002, 008.
+- Q: How is a solid made, given that a general point hull is costly? → A: from a box (`box(min:max:)`), from a closed
+  convex mesh (accepted when every vertex lies on or below every face plane within the tolerance), or from a set of
+  planes bounded by a box (the box cut by each plane in turn). Building from an arbitrary point cloud is not in this
+  slice. Rationale: the three games start from blocks and facet them; half-space intersection is what they do.
+  Impact: FR-R02F12-001 (reworded below); excluded scope.
+- Q: What is the tolerance and how are degenerate pieces removed? → A: ε = 1e-9 × L, where L is the solid's bounding-box
+  diagonal; a vertex with |n·p − h| ≤ ε is on the plane; vertices closer than ε are merged; a corner within ε of the line
+  through its neighbours is collinear and removed; a face with fewer than three corners or area ≤ 1e-12 × L² is
+  dropped; a side whose every vertex is within ε of the plane is empty. Rationale: the same relative scale as the mesh
+  validation (1e-9, 1e-12), so a 1e-3 and a 1e3 solid behave alike. Impact: FR-R02F12-003, 004; SC-R02F12-003, 004.
+- Q: What are the limits and the ledger's shape? → A: a solid has at most 4,096 vertices, 1,024 faces and 256 corners per
+  face; a cut whose result would exceed them is refused (`tooComplex`). `VolumeLedger` holds the original volume and one
+  entry per cut (the cut plane, removed volume, remaining volume), at most 65,536 entries; volumes come from the
+  divergence theorem over the faces. The balance |original − remaining − Σ removed| ≤ 1e-9 × original is checked after
+  every cut. Impact: FR-R02F12-005; SC-R02F12-002.
+- Q: What are the stored form and the failure reports? → A: JSON `{"schema":1,"solid":{"vertices":[…],"faces":[…]},
+  "ledger":{…}}`; decoding re-validates; a newer schema or malformed data is refused. `ConvexSolidError` reason codes:
+  `r2-f12.non-finite`, `r2-f12.zero-normal`, `r2-f12.empty`, `r2-f12.not-closed`, `r2-f12.not-convex`,
+  `r2-f12.too-complex`, `r2-f12.degenerate-polygon`, `r2-f12.newer-schema`, `r2-f12.malformed`; the consuming
+  experience adds its id, seed and tick. Conversion to `Mesh` fans each face into triangles with flat normals and passes
+  `validate(requireClosed: true)`. Impact: FR-R02F12-006, 007, 008, 010; SC-R02F12-005.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Cut a solid by a plane (Priority: P1) 🎯
@@ -45,7 +82,7 @@ misses keeps the solid unchanged; a cut that takes everything leaves nothing.
 **Acceptance Scenarios**:
 
 1. **Given** a cube and a plane through its centre, **When** it is cut, **Then** both parts have half the volume within
-   the stated tolerance, both are closed and wound outward, and the cap is a square of the cube's cross-section.
+   1e-12 relative, both are closed and wound outward, and the cap is a square of the cube's cross-section.
 2. **Given** a plane that does not meet the solid, **When** it is cut, **Then** the solid is kept whole (or removed
    whole) and no empty or degenerate face appears.
 3. **Given** a plane through a vertex, an edge or a face of the solid, **When** it is cut, **Then** no sliver face,
@@ -56,13 +93,13 @@ misses keeps the solid unchanged; a cut that takes everything leaves nothing.
 A sequence of cuts records, for each cut, the volume removed and the volume remaining. The original volume always equals
 the remaining volume plus everything removed.
 
-**Independent Test**: 1,000 seeded cuts of a solid keep the balance within the stated tolerance; replaying the same
+**Independent Test**: 1,000 seeded cuts of a solid keep the balance within 1e-9 relative; replaying the same
 cuts gives the same record.
 
 **Acceptance Scenarios**:
 
-1. **Given** any sequence of cuts, **When** the ledger is read, **Then** original = remaining + Σ removed within the
-   stated tolerance after every cut.
+1. **Given** any sequence of cuts, **When** the ledger is read, **Then** original = remaining + Σ removed within 1e-9
+   relative after every cut.
 2. **Given** the same solid and cuts twice, **When** both ledgers are compared, **Then** they are identical.
 
 ### User Story 3 - Clean polygons (Priority: P2)
@@ -88,22 +125,23 @@ positive volume equal to the solid's volume; a newer stored version is refused.
 - **Very large and very small solids:** the tolerance scales with the solid's size, so a 1e-3 and a 1e3 cube behave
   alike.
 - **A cut that leaves a part thinner than the tolerance:** that part is reported as empty, never as a sliver.
-- **Many cuts in a row:** the solid stays convex and valid; face and vertex counts stay within the stated limits.
+- **Many cuts in a row:** the solid stays convex and valid; face and vertex counts stay within 4,096 vertices, 1,024 faces and
+  256 corners per face.
 
 ## Requirements *(mandatory)*
 
 ### Functional Requirements
 
-- **FR-R02F12-001**: A convex solid MUST be made from a box, from a set of points (as their convex hull), or from a closed
-  convex mesh, and MUST be refused with a named reason when it is empty, not closed, not convex or not finite.
+- **FR-R02F12-001**: A convex solid MUST be made from a box, from a set of planes bounded by a box, or from a
+  closed convex mesh, and MUST be refused with a named reason when it is empty, not closed, not convex or not finite.
 - **FR-R02F12-002**: Cutting by a plane MUST give the kept part, the removed part, the cap polygon and both volumes, each
-  part closed, convex, with every face wound outward, and MUST be exact up to the stated tolerance.
-- **FR-R02F12-003**: The tolerance MUST scale with the solid's size; vertices within it of the plane MUST be treated as on
+  part closed, convex, with every face wound outward, and MUST be exact up to the tolerance ε.
+- **FR-R02F12-003**: The tolerance MUST be ε = 1e-9 × the solid's bounding-box diagonal; vertices within it of the plane MUST be treated as on
   the plane, and parts thinner than it MUST be reported as empty.
 - **FR-R02F12-004**: No result MUST contain a face with fewer than three distinct corners, a repeated point, collinear
-  corners or an area below the stated threshold.
+  corners or an area ≤ 1e-12 × the squared diagonal.
 - **FR-R02F12-005**: A volume ledger MUST record each cut's removed and remaining volume and keep original = remaining +
-  Σ removed within the stated tolerance at every step.
+  Σ removed within 1e-9 relative at every step.
 - **FR-R02F12-006**: Polygon cleanup MUST remove repeated and collinear points, orient the polygon to a given normal, and
   report a collapsed polygon.
 - **FR-R02F12-007**: A solid and its ledger MUST have a versioned stored form that round-trips exactly; a newer version or
@@ -158,5 +196,5 @@ positive volume equal to the solid's volume; a newer stored version is refused.
 
 ## Negative Requirements / Excluded scope
 
-- No non-convex boolean operations, no mesh repair of arbitrary input, no GPU code, no new module, no device run before
+- No convex hull of an arbitrary point cloud, no non-convex boolean operations, no mesh repair of arbitrary input, no GPU code, no new module, no device run before
   ImplementationLock-100, no analytics.
