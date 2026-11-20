@@ -50,7 +50,7 @@ tasks; one {device} task. Fixture seed 2_023; tests stay short.
   `docs/catalog/shared-feature-map.json` and `render_autocreator.py`
 - [ ] T-R02F23-008 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02F23-009 Reference regression chunk 2 (`--name reference-2`)
-- [ ] T-R02F23-010 Script tests, run alone (`--name script-tests`)
+- [X] T-R02F23-010 Script tests, run alone (`--name script-tests`) — Verified 2026-11-20: 2026-11-20 script-tests exit 0, run alone (.autonomy/migration/checks/R02-F23.script-tests.json)
 - [ ] T-R02F23-011 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
 
 ## Device campaign (after ImplementationLock-100)
