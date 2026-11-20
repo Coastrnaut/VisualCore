@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "HandlePickerTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter HandlePickerTests",
+  "elapsed_seconds": 2.517,
+  "exit_code": 0,
+  "finished": "2026-11-20T06:40:33+00:00",
+  "gate": "R02-F22",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-F22.host-2-r2.log",
+  "log_sha256": "7ed2d841f2754a53bfa6f17457068b9acc19faf401b462f3243543192388b74b",
+  "name": "host-2-r2",
+  "started": "2026-11-20T06:40:30+00:00",
+  "timed_out": false
+}

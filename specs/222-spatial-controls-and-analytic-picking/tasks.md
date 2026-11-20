@@ -23,7 +23,7 @@ through a fileprivate SplitMix generator; tests stay short.
 
 ## Phase 3: Story 2 — depth-aware picking (P1)
 
-- [ ] T-R02F22-003 [P] [US2] Create `Packages/VisualCore/Sources/VisualCoreScenes/SpatialHandles.swift` (HandleKind; SpatialHandle "position finite; hitRadius
+- [X] T-R02F22-003 [P] [US2] Create `Packages/VisualCore/Sources/VisualCoreScenes/SpatialHandles.swift` (HandleKind; SpatialHandle "position finite; hitRadius — Verified 2026-11-20: 2026-11-20 host-2-r2 exit 0: HandlePickerTests 11/11 (200 seeded sets equal the brute-force rule; ties, behind-camera, radius raising, refusals); host-2 failed only to build (.autonomy/migration/checks/R02-F22.host-2*.json)
   finite ≥ 0"; HandlePicker "≤ 1,024 handles; touch radius raised to ≥ 22 points") with `Packages/VisualCore/Tests/VisualCoreScenesTests/HandlePickerTests.swift`
   (200 seeded handle sets equal a brute-force rule, ties by depth then index; handles behind the camera skipped; no
   candidate gives nil; radius raising; a non-finite touch; refusals (.handleLimit, .viewport) and codes); `--name host-2`
