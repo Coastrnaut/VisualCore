@@ -148,7 +148,8 @@ than stepping and stopping are refused during replay.
 ## Assumptions
 
 - The shared saved-state store (atomic write, quarantine of unreadable files, newer-schema refusal) is reused unchanged.
-- Replay controls in the panel are minimal (start, step, stop); richer playback is polish for later.
+- Replay controls (start for a solved level, step, stop) join the existing scrolling, Dynamic Type panel of R02-G01-06,
+  with labels and values; announcements of each replay step use the shared feedback route.
 - All texts original; no network, no accounts.
 
 ## Traceability
