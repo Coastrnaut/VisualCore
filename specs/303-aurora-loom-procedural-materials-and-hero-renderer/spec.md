@@ -48,9 +48,11 @@ capabilities, quality tier names, palette, scenario manifest, permissions and su
   tolerance the ring and marker brighten. The camera is a fixed authored perspective looking along the loom from above
   (orbit and pan come in R02-G01-04). Rationale: the picture shows the same quantity the kernel judges (phase), so a
   player can read the harmony; nothing in the picture is consulted by the rules. Impact: FR-R02G0103-001, 003, 006.
-- Q: What do the three quality tiers change? → A: tier 0: one layer per ribbon, 32 segments along s, no glow pass;
-  tier 1: three layers per ribbon, 64 segments, one half-resolution glow pass; tier 2: five layers, 128 segments, two
-  glow passes. Every tier draws the same ribbon centre lines, gates and markers at the same coordinates. The tier names in
+- Q: What do the three quality tiers change? → A: `level-2` (the design's "Tier 0, D3-safe minimal layers"): one layer
+  per ribbon, 32 segments along s, no glow pass; `level-1`: three layers per ribbon, 64 segments, one half-resolution glow
+  pass; `level-0` (the design's "Tier 2, dense spectacle"): five layers, 128 segments, two glow passes. The catalog levels
+  are ordered richest first because the shared quality contract requires level 0 to be the best and no budget to rise
+  from one level to the next (implementation, 2026-11-20). Every tier draws the same ribbon centre lines, gates and markers at the same coordinates. The tier names in
   the catalog are `level-0`, `level-1`, `level-2`; the shared quality controller chooses the tier and the experience logs
   the tier and the reason with each change. Impact: FR-R02G0103-004; SC-R02G0103-001.
 - Q: How are rendered frames checked, and within which bounds? → A: a CPU reference in the pure Core computes, from the
@@ -63,7 +65,7 @@ capabilities, quality tier names, palette, scenario manifest, permissions and su
 - Q: What happens on a shader failure, and what does the renderer read? → A: the presenter draws from an immutable
   `AuroraLoomSceneSnapshot` value (steps, level geometry, stage, failure, frame time) made by the adapter after each
   kernel change; it never holds the kernel. If a ribbon or glow program fails to compile or link, the scene draws the
-  tier-0 layer with the shared unlit mesh renderer, logs the program name and the reason once, and keeps running; the
+  minimal (level-2) layer with the shared unlit mesh renderer, logs the program name and the reason once, and keeps running; the
   kernel and its digest are untouched. Reduce Motion freezes t at the last tick's value for the shimmer and wave travel;
   Reduce Flashing caps the glow gain to the shared limit. Impact: FR-R02G0103-003, 007; SC-R02G0103-002.
 - Q: How is the experience registered and what does the minimal control panel do? → A: the candidate registration adds
@@ -119,7 +121,7 @@ shown to players as available, and passes the experience package and registry ch
 
 ### Edge Cases
 
-- **A shader that fails to compile or link:** the scene shows the documented fallback (the tier-0 layer), the failure is
+- **A shader that fails to compile or link:** the scene shows the documented fallback (the minimal level-2 layer, unlit), the failure is
   logged with its name, and the logical state is unchanged.
 - **Zero-size or very small views, rotation and resize:** a zero-size view draws nothing and reports no error; for every
   aspect ratio from 0.4 (tall iPhone) to 2.5 (wide iPad) the camera fits the whole loom (ribbons and gate rings) inside
@@ -183,6 +185,10 @@ shown to players as available, and passes the experience package and registry ch
   polish R02-G01-06; persistence R02-G01-07; golden images R02-G01-08; full app integration R02-G01-09. This feature gives
   the experience a minimal control panel that issues kernel moves so it can be exercised on the simulator.
 - The visual design is the project's own archived design; all geometry and shading are original code.
+- The candidate's scenario manifest has the nine standard scenarios, `full-playthrough`, `hero` and three fixtures; the
+  source's 80 acceptance scenarios (round2.md §6.1.19) and the catalog's `content.levels` are added by the integration
+  features (R02-G01-08, -09) before X-R02-G01, whose content audit (`verify_experiences.py --audits`) requires them
+  (implementation, 2026-11-20).
 
 ## Traceability
 

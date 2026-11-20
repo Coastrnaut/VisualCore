@@ -8,16 +8,16 @@ tests stay short (< 10 s each). Simulator evidence is one pass on the iOS 27.x p
 
 ## Phase 1: Setup
 
-- [ ] T-R02G0103-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test
+- [X] T-R02G0103-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test — Verified 2026-11-20: 2026-11-20 baseline-host, baseline-timing exit 0; baseline-round02 exit 0 (the package's host tests); rendering baseline R02-G02-01 rendering-27/26 exit 0 (.autonomy/migration/checks/R02-G01-03.baseline-*.json)
   --package-path Packages/ExperiencesRound02`; the rendering baseline is R02-G02-01's rendering runs (exit 0)
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G0103-002 Edit `Packages/ExperiencesRound02/Package.swift` (AuroraLoomCore gains VisualCoreScenes and
+- [X] T-R02G0103-002 Edit `Packages/ExperiencesRound02/Package.swift` (AuroraLoomCore gains VisualCoreScenes and — Verified 2026-11-20: 2026-11-20 host exit 0: the kernel's level, play and harmony tests unchanged with the Core's new dependencies; AuroraLoomSceneSnapshot with the palette and the tiers ordered richest first (level-0 = 5 layers) as the shared quality contract requires (.autonomy/migration/checks/R02-G01-03.host.json)
   VisualCoreExperience; new `AuroraLoomExperience` at `AuroraLoom/Experience` and `AuroraLoomExperienceTests` at
   `AuroraLoom/ExperienceTests` with rendering dependencies under `.when(platforms: [.iOS])`; product
   `AuroraLoomExperience`); create `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomSceneSnapshot.swift` (AuroraLoomPalette "night #07121A, teal #1FD1B4,
-  magenta #E0389C, gold #D8E83A", AuroraLoomTier "layers 1/3/5, segments 32/64/128, glow 0/1/2, names level-0 … level-2",
+  magenta #E0389C, gold #D8E83A", AuroraLoomTier "layers 5/3/1, segments 128/64/32, glow 2/1/0, names level-0 … level-2, richest first",
   AuroraLoomSceneSnapshot); `--name host -- swift test --package-path Packages/ExperiencesRound02` (all Core tests
   unchanged)
 
