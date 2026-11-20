@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "NeighbourGridTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter NeighbourGridTests",
+  "elapsed_seconds": 9.054,
+  "exit_code": 0,
+  "finished": "2026-11-20T05:50:46+00:00",
+  "gate": "R02-F20",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-F20.host-2.log",
+  "log_sha256": "2e24bc38b56caa98d53250dc22b44ebf2d286b9ae3b28e382b80a57c5f651240",
+  "name": "host-2",
+  "started": "2026-11-20T05:50:37+00:00",
+  "timed_out": false
+}

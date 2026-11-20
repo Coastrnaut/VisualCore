@@ -19,7 +19,7 @@ its check record (no trailers). No {owner} tasks; one {device} task. Fixture see
 
 ## Phase 3: Story 1 — neighbourhood grid (P1) 🎯
 
-- [ ] T-R02F20-003 [P] [US1] Create `Packages/VisualCore/Sources/VisualCoreSimulation/NeighbourGrid.swift` (clarification Q2, ≤ 65,536 agents) with
+- [X] T-R02F20-003 [P] [US1] Create `Packages/VisualCore/Sources/VisualCoreSimulation/NeighbourGrid.swift` (clarification Q2, ≤ 65,536 agents) with — Verified 2026-11-20: 2026-11-20 host-2 exit 0: NeighbourGridTests 16/16 (50 seeded swarms 10…990 agents + 2,000; ±1e300 agents, radius 1e300; equal to NeighbourSearch) (.autonomy/migration/checks/R02-F20.host-2.json)
   `Packages/VisualCore/Tests/VisualCoreSimulationTests/NeighbourGridTests.swift` (50 seeded swarms of 10 … 1,000 agents and one of 2,000: every list equals
   `NeighbourSearch`, order included, for several radii and limits; non-finite agents and agents at ±1e300; radius larger
   than the cell and a radius of 1e300; refusals); `--name host-2`

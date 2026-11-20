@@ -5,7 +5,8 @@
   include every agent within the radius, so the lists are equal, not merely similar.
 - **R2 Hashed integer cells.** Decision: a dictionary keyed by the integer cell, agents appended in index order.
   Rationale: no bounds needed, agents outside any area still found; order inside a cell does not matter because results
-  are re-sorted. Cell indices are clamped to ±2^40 (no integer overflow for far agents; any agent within r of a clamped
+  are re-sorted. The scanned window is ⌈r/c⌉ + 1 cells around the own cell (implementation, 2026-11-20: the extra ring absorbs the
+  rounding of p / c, so an agent exactly at the radius on a cell edge is never missed). Cell indices are clamped to ±2^40 (no integer overflow for far agents; any agent within r of a clamped
   agent lies in a clamped or nearby cell inside the window), and a window wider than the number of occupied cells falls
   back to scanning every occupied cell, so a huge radius costs at most one pass.
 - **R3 Exact rotation for a uniform field.** Decision: the Lorentz force q v × B with B along z only turns the velocity, so
