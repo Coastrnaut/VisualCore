@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-20
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G01-04 (migration ledger, game feature of experience R02-G01) · ID namespace FR-R02G0104-###,
 SC-R02G0104-###, T-R02G0104-###
@@ -24,6 +24,49 @@ Canonical overrides:
   D1/D2/D3, `{device}` tasks after the lock. **Owner-only items:** none.
 - **Shared features used:** R02-F22 (spatial handles, handle picking, constrained drags, assistive steps), R02-F08
   (geometry), and the kernel, catalog and renderer of R02-G01-01 … 03.
+
+## Clarifications
+
+### Session 2026-11-20
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time. Facts checked in
+code (read-only audit, 2026-11-20): R02-F22 provides `SpatialHandle`, `HandlePicker.pick` (minimum touch radius 22 pt,
+nearest wins, ties by id), `HandleDrag` (axis and plane constraints with grazing holds and `angle(around:)`) and
+`AssistiveStep`; `PointerEvent`, `PointerTracker` and `PinchRecognizer` are in VisualCoreScenes and `ScreenProjection`
+in VisualCoreMath, all host-testable; R02-G01-03's `AuroraLoomSceneGeometry` fits the loom for aspects 0.4 … 2.5 and its
+presenter receives `pointer(_:viewSize:port:)`.
+
+- Q: Where are the anchors and dials, and how do positions become steps? → A: each ribbon's anchor slides on a vertical
+  rail just beyond the loom's right end in its own lane (x = +L/2 + 0.45); its height is H · (2 · wave / 15 − 1), so steps
+  0 … 15 span −H … +H; a drag follows the rail (an axis constraint along y, clamped to −H … +H) and the candidate step is
+  the nearest, round((y / H + 1) · 7.5). Each ribbon's dial is a ring of radius 0.3 standing across the loom just before
+  its left end (x = −L/2 − 0.45) in its lane; its knob sits at angle phase · 22.5°; a drag follows the ring's plane and the
+  candidate step is the start step plus round(turned angle / 22.5°), modulo 16. Rationale: the rail shows the wave as a
+  height and the dial shows the phase as an angle, matching how the picture draws them. Impact: FR-R02G0104-001, 002;
+  SC-R02G0104-001.
+- Q: How are touches arbitrated? → A: a gesture controller in the Core has four states — idle, dragging (one finger
+  picked a handle with R02-F22's picker), orbiting (two fingers) and cancelled (until every finger lifts). One finger down
+  on a handle starts a drag and selects its ribbon; one finger elsewhere does nothing. A second finger cancels a drag
+  (nothing is sent) and starts orbiting; a cancelled touch ends any drag without a move. On release of a drag whose
+  candidate differs from the start, exactly one `ribbon.move` is sent; equal means nothing. Handles respond only while the
+  level is playing. A refused move shows the refusal's text and leaves the state unchanged. Impact: FR-R02G0104-002, 003,
+  006; SC-R02G0104-002.
+- Q: What can the camera do, and is it saved? → A: two fingers orbit: the midpoint's horizontal movement turns the azimuth
+  (90° per view width) within base ± 40°, the vertical movement the elevation (60° per view height) within 10° … 60°; a
+  double tap on empty space or the "Reset view" button returns to the authored pose; the camera distance is refitted so
+  the whole loom stays inside the view with a 5 % margin at every orbit and aspect 0.4 … 2.5. The orbit is presentation
+  only: never in the digest, the snapshot payload or the kernel; it is not saved (saving is R02-G01-07). Impact:
+  FR-R02G0104-004; SC-R02G0104-003.
+- Q: How is the selection shown and announced? → A: the selected ribbon is the one whose handle was last picked or whose
+  stepper was last used (ribbon 1 at the start); the scene draws its anchor and dial with a gold outline ring and brighter
+  knobs, the others dim; the canvas's accessibility value and the experience description say "Ribbon n selected: wave w,
+  phase p" and the drag's candidate while dragging. Impact: FR-R02G0104-005; SC-R02G0104-004.
+- Q: How are gestures tested without a screen? → A: `AuroraLoomGestureController` (Core) takes pointer events with the
+  view size and the drawn camera and returns at most one `AuroraLoomMove` per gesture plus the current preview and
+  selection; tests feed scripted touches (taps, drags along rails, circular drags around dials, second fingers, cancels)
+  at fixed view sizes and compare the result with the step the end point names, computed independently in the test.
+  On the simulator the presenter's wiring is tested by sending the same touches through the experience's pointer entry.
+  Impact: FR-R02G0104-006; SC-R02G0104-001, 002.
 
 ## User Scenarios & Testing *(mandatory)*
 
