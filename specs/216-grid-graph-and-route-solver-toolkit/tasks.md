@@ -32,7 +32,7 @@ tests stay light beside the timed R02-F05 test.
 
 ## Phase 4: Story 2 — route through time (P1)
 
-- [ ] T-R02F16-004 [P] [US2] Create `Packages/VisualCore/Sources/VisualCoreSimulation/TimeExpandedGraph.swift` (TimedOutcome; breadth-first over (cell, t) in time order
+- [X] T-R02F16-004 [P] [US2] Create `Packages/VisualCore/Sources/VisualCoreSimulation/TimeExpandedGraph.swift` (TimedOutcome; breadth-first over (cell, t) in time order — Verified 2026-11-19: lead retest 2026-11-19: R02-F16.host-3.json (exit 0, full suite; R02-F16.host-2.json had failed only the mesh-budget timing beside the full suite, now asserted in R02-F16.timing.json, exit 0); TimeExpandedGraphTests 3 passed (200 seeded schedules equal a reference simulation, waits allowed and forbidden; closed unreachable sets; refusals)
   per research R6; waiting allowed or forbidden) with `Packages/VisualCore/Tests/VisualCoreSimulationTests/TimeExpandedGraphTests.swift` (200 seeded schedules equal a
   step-by-step reference simulation; no closed state on any route; schedule mismatch and closed start refused);
   `--name host-3`
