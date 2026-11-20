@@ -52,7 +52,7 @@ document is `TimelineRunDocument`). Fixture seed 2_014; tests stay light.
   `docs/catalog/shared-feature-map.json` and `render_autocreator.py`; `docs/architecture/determinism.md` note
 - [X] T-R02F14-007 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F14.reference-1.json (exit 0)
 - [X] T-R02F14-008 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F14.reference-2.json (exit 0)
-- [ ] T-R02F14-009 Script tests (`--name script-tests`)
+- [X] T-R02F14-009 Script tests (`--name script-tests`) — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F14.script-tests.json (exit 0)
 - [ ] T-R02F14-010 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
 
 ## Device campaign (after ImplementationLock-100)

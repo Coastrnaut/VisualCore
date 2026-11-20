@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "scripts/test_scripts.py"
+  ],
+  "command": "python3 scripts/test_scripts.py",
+  "elapsed_seconds": 48.504,
+  "exit_code": 0,
+  "finished": "2026-11-20T02:43:43+00:00",
+  "gate": "R02-F14",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-F14.script-tests.log",
+  "log_sha256": "a46090ba772cf97aebd421dc8b7029a289bbba033dffe1c7b3e97811d9d699bb",
+  "name": "script-tests",
+  "started": "2026-11-20T02:42:55+00:00",
+  "timed_out": false
+}
