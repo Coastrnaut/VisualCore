@@ -65,7 +65,7 @@ C (005). Shared files (002, CI, docs) stay with the lead. MVP: Story 1.
 
 ## Phase 7: Convergence
 
-- [ ] T-R02G0101-012 Add the source's named invariant tests for the invariants this feature owns —
+- [X] T-R02G0101-012 Add the source's named invariant tests for the invariants this feature owns — — Verified 2026-11-20: 2026-11-20 host-5 exit 0: AuroraLoomInvariantTests 8/8 (testAuroraLoomTimeBoundary, Inputbudget, Goal, Repeatability, Undo, Failurehonesty, Stability, Save — each a boundary example and a seeded neighbouring check) (.autonomy/migration/checks/R02-G01-01.host-5.json)
   `testAuroraLoomTimeBoundary` (INV-01), `testAuroraLoomInputbudgetBoundary` (INV-02), `testAuroraLoomGoalBoundary`
   (INV-03), `testAuroraLoomRepeatabilityBoundary` (INV-04), `testAuroraLoomUndoBoundary` (INV-05),
   `testAuroraLoomFailurehonestyBoundary` (INV-07), `testAuroraLoomStabilityBoundary` (INV-08) and
