@@ -64,7 +64,7 @@ or {device} tasks (pure logic and host-generated content). Fixture seeds 2_301 a
 - [X] T-R02G0102-007 Docs: `docs/architecture/aurora-loom.md` (generator, solver, witness), `Packages/ExperiencesRound02/README.md`, — Verified 2026-11-20: 2026-11-20 round02-host exit 0 (59 tests); docs/architecture/aurora-loom.md content section; Packages/ExperiencesRound02/README.md; docs/automatedtesting.md witness rule (.autonomy/migration/checks/R02-G01-02.round02-host.json)
   `docs/automatedtesting.md` (witness regeneration); `--name round02-host -- swift test --package-path
   Packages/ExperiencesRound02`
-- [ ] T-R02G0102-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences` and
+- [X] T-R02G0102-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences` and — Verified 2026-11-20: 2026-11-20 rendering-27, rendering-26, experiences (sim-27.2) and host-full exit 0
   `--name host-full`
 - [ ] T-R02G0102-009 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G0102-010 Reference regression chunk 2 (`--name reference-2`)
