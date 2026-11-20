@@ -25,7 +25,7 @@ or {device} tasks (pure logic and host-generated content). Fixture seeds 2_301 a
 
 ## Phase 3: Story 1 — every shipped level can be solved (P1) 🎯
 
-- [ ] T-R02G0102-003 [P] [US1] Implement `AuroraLoomSolver.solve` in
+- [X] T-R02G0102-003 [P] [US1] Implement `AuroraLoomSolver.solve` in — Verified 2026-11-20: 2026-11-20 host-2 exit 0: AuroraLoomSolverTests 5/5 (500 seeded levels: solution wins, replays via AuroraLoomRules and equals an independent exhaustive per-ribbon check with the full win test; determinism; drifting ribbon gives nil; tie rules; work bound) (.autonomy/migration/checks/R02-G01-02.host-2.json)
   `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomSolver.swift` (per-ribbon descent "at most 32 sweeps", then the
   grid of 256 settings per ribbon; shortest = sum of per-ribbon fewest changes; tie rules and move order of clarification
   Q2; method; work = setting evaluations) with `Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomSolverTests.swift`
