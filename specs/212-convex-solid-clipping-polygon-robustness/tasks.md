@@ -71,3 +71,12 @@
 
 001 → 002 → 003 → (004 ∥ 005) → 006 → 007 → 008 → 009 → 010 → 011. Agents: A (002), B (003 after 002), C (004 and 005
 after 003). Shared files stay with the lead. MVP: Stories 1 and 2 (002, 003, 004).
+
+## Phase 6: Convergence
+
+- [ ] T-R02F12-013 Add a test in `Packages/VisualCore/Tests/VisualCoreScenesTests/ConvexSolidCodingTests.swift` that every
+  intermediate solid of 200 seeded sequential cuts (and of the plane fixtures through vertices, edges and faces) encodes
+  and decodes back equal through `ConvexSolidDocument`; if any is refused, make the cut's output satisfy the decoder's
+  checks (re-snap merged corners onto their face planes, or validate the cut's output with the same rules) in
+  `Packages/VisualCore/Sources/VisualCoreScenes/ConvexSolid.swift` per FR-R02F12-007 / SC-R02F12-005 (partial);
+  `--name host-5`
