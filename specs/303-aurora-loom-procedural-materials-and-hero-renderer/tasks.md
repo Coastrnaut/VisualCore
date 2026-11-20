@@ -32,7 +32,7 @@ tests stay short (< 10 s each). Simulator evidence is one pass on the iOS 27.x p
   displacement, bevel from u, interference, palette mix, lit state, glow gain) with
   `Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomShaderSourceTests.swift` (version line, every declared uniform used and listed, no texture sampler);
   `--name host-3`
-- [ ] T-R02G0103-005 [P] [US1] Create `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomExperienceCore.swift` (ExperienceCore adapter: id
+- [X] T-R02G0103-005 [P] [US1] Create `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomExperienceCore.swift` (ExperienceCore adapter: id — Verified 2026-11-20: 2026-11-20 host-4 exit 0: AuroraLoomExperienceCoreTests 9/9 (ExperienceConformance 8/8 checks; actions, refusals, undo/redo, certified solutions win, level.next, snapshot round trip, tiers and time never touch the digest) and AuroraLoomScenariosTests 5/5 (validator, engine replay, committed scenario-manifest.json) (.autonomy/migration/checks/R02-G01-03.host-4.json)
   "r02-g01.aurora-loom", schema 1, three tiers, controls "ribbon.move [0…2, 0…1, 0…15], play.undo, play.redo,
   level.next", prepare level (seed mod 100) + 1, digest of the play fingerprint, snapshot and restore of level number and
   records, `snapshot`) with `Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomExperienceCoreTests.swift` (ExperienceConformance run; actions; refusals; restore;

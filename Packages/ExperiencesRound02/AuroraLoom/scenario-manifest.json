@@ -1,0 +1,674 @@
+{
+  "controls" : [
+    "ribbon.move",
+    "play.undo",
+    "play.redo",
+    "level.next"
+  ],
+  "experience" : "r02-g01.aurora-loom",
+  "kind" : "game",
+  "round" : 2,
+  "scenarios" : [
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+        "initialDigest" : "6ca0f23117f66add7fe0ef978e5ac8206c92d081b6f466cd8cf8daa89584876b"
+      },
+      "name" : "launch-first-frame",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              1,
+              1,
+              13
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1e738e542f41d4c6f8452404b88318ef7cde12740012154e98235f6775ce98bf",
+        "initialDigest" : "6ca0f23117f66add7fe0ef978e5ac8206c92d081b6f466cd8cf8daa89584876b"
+      },
+      "name" : "input-response",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              2,
+              0,
+              15
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              2,
+              1,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "outcome" : "won"
+      },
+      "name" : "completion",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              3,
+              0,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              2,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              -1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0.5,
+              0,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g01.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              2.5
+            ]
+          },
+          "result" : "action.rule.r02-g01.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              15
+            ]
+          },
+          "result" : "action.rule.r02-g01.move",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g01.move",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g01.move",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "loom.spin",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.unknown-control",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6ca0f23117f66add7fe0ef978e5ac8206c92d081b6f466cd8cf8daa89584876b",
+        "initialDigest" : "6ca0f23117f66add7fe0ef978e5ac8206c92d081b6f466cd8cf8daa89584876b"
+      },
+      "name" : "rejection",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              1,
+              1,
+              13
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1e738e542f41d4c6f8452404b88318ef7cde12740012154e98235f6775ce98bf",
+        "initialDigest" : "6ca0f23117f66add7fe0ef978e5ac8206c92d081b6f466cd8cf8daa89584876b"
+      },
+      "name" : "save-restore",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              1,
+              1,
+              13
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "initialDigest" : "6ca0f23117f66add7fe0ef978e5ac8206c92d081b6f466cd8cf8daa89584876b",
+        "resetDigest" : true
+      },
+      "name" : "reset",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "suspend-resume",
+      "seed" : "0"
+    },
+    {
+      "cycles" : 5,
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "teardown-reentry",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "cancel-prepare",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              2,
+              0,
+              15
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              2,
+              1,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              1,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              1,
+              1,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              1,
+              1,
+              9
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f15e691101bd7b87db6817323dd2e045618fb3feb1f8c49f9c5de24dda0d3fd7",
+        "initialDigest" : "6ca0f23117f66add7fe0ef978e5ac8206c92d081b6f466cd8cf8daa89584876b",
+        "outcome" : "won"
+      },
+      "name" : "full-playthrough",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "db8b1e257d31ad6b24ec2c9f99bd3445b919b21e13310a28d2ec1b29e864ec06",
+        "initialDigest" : "6ca0f23117f66add7fe0ef978e5ac8206c92d081b6f466cd8cf8daa89584876b"
+      },
+      "name" : "hero",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              2,
+              0,
+              15
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              2,
+              1,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6cb5e397a9f8b0f145ec1d4a3d0f21e171956ef6fcc3994435c072609f080ca3",
+        "initialDigest" : "6ca0f23117f66add7fe0ef978e5ac8206c92d081b6f466cd8cf8daa89584876b",
+        "outcome" : "won"
+      },
+      "name" : "fixture-level-1-solved",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              15
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              15
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              15
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              15
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e6df3bc1506e6f13f766517af7e044faba10fc240ab5a29ec0c6c301915865b6",
+        "initialDigest" : "6ca0f23117f66add7fe0ef978e5ac8206c92d081b6f466cd8cf8daa89584876b",
+        "outcome" : "failed"
+      },
+      "name" : "fixture-allowance-spent",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1e738e542f41d4c6f8452404b88318ef7cde12740012154e98235f6775ce98bf",
+        "initialDigest" : "6ca0f23117f66add7fe0ef978e5ac8206c92d081b6f466cd8cf8daa89584876b"
+      },
+      "name" : "fixture-undo-redo",
+      "seed" : "0"
+    }
+  ],
+  "schema" : 1
+}
