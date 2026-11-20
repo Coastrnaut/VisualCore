@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-20
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G01-05 (migration ledger, game feature of experience R02-G01) · ID namespace FR-R02G0105-###,
 SC-R02G0105-###, T-R02G0105-###
@@ -24,6 +24,45 @@ Canonical overrides:
   (ImplementationLock-100). **Device-only items:** none. **Owner-only items:** none.
 - **Shared features used:** R02-F24 (catalog and progression rule), the solver and certified catalog of R02-G01-02, the
   kernel, renderer and controls of R02-G01-01 … 04.
+
+## Clarifications
+
+### Session 2026-11-20
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time. Facts checked in
+code (read-only audit, 2026-11-20): `AuroraLoomSolver.solve(_:)` solves each ribbon among its 256 settings from a level's
+start; `AuroraLoomExperienceCore` prepares level (seed mod 100) + 1, accepts `ribbon.move`, `play.undo`, `play.redo` and
+`level.next`, and snapshots `{level, records}` as schema 1; the kernel reports a failure as the worst mismatch (ribbon,
+gate, tick, residual); the core may not read a clock.
+
+- Q: How is a hint computed and what does each level reveal? → A: the solver runs on a level whose start is the current
+  steps (same gates, Ω, tolerance), giving each ribbon's fewest changes and its chosen winning setting. Level 1 names the
+  ribbon with the most changes left (ties: the larger worst residual, then the lower ribbon); level 2 adds the control
+  (wave before phase when both change); level 3 adds the exact step. Following the level-3 hint shortens the remaining
+  shortest solution by one. When the shortest remaining solution exceeds the moves left, the hint says so and offers undo.
+  Hints never change the state, are unlimited and do not affect stars. Impact: FR-R02G0105-002; SC-R02G0105-002.
+- Q: What does the tutorial show, and when does it advance? → A: on tutorial levels (1 … 3) one instruction at a time:
+  (1) "Drag ribbon r's anchor up or down to change its wave" until a wave move is made; (2) "Turn ribbon r's dial to change
+  its phase" until a phase move is made; (3) "Bring every ribbon through the gold markers at all four gates" until the
+  level is won; r is the level-1 hint's ribbon. A dismiss action ends the tutorial for that level; undo never moves the
+  tutorial back. Impact: FR-R02G0105-001; SC-R02G0105-001.
+- Q: What are the progress and star rules? → A: progress holds, per level, the best number of moves that won and the
+  stars: 3 when the moves equal the level's certified shortest solution, 2 within shortest + 2, otherwise 1. Level 1 is
+  open; winning a level in campaign mode opens the next; `level.select [n]` opens any open level and refuses others
+  (`r02-g01.locked`); `level.next` moves to the next open level. Bands are shown as the catalog's bands (20 levels each).
+  Impact: FR-R02G0105-004; SC-R02G0105-004.
+- Q: How do the daily level and practice mode work? → A: the daily level is (days from 2026-01-01 to the given calendar
+  date × 37) mod 100 + 1; the date reaches the core as the action `mode.daily [year, month, day]` from the presenter (the
+  core never reads a clock), so every date in the player's calendar maps to a stable level. Daily play follows campaign
+  rules but does not open levels. `mode.practice` replays the current level with the allowance raised to the kernel's
+  maximum (64); practice results never award stars or open levels; `mode.campaign` returns. Impact: FR-R02G0105-005;
+  SC-R02G0105-004.
+- Q: Where does progress live and how is it versioned? → A: progress, the mode and the tutorial step are part of the
+  experience state: the digest includes them, and the snapshot payload becomes schema 2 (`{level, records, progress, mode,
+  tutorial}`) with a migration from schema 1 (no progress, campaign mode, tutorial at its first step). New refusal codes:
+  `r02-g01.locked`, `r02-g01.date`. Failure explanations read the kernel's worst mismatch: "Ribbon r is furthest off at gate
+  g: x of a turn outside the tolerance after the last move" with undo and retry offered. Impact: FR-R02G0105-003, 007;
+  SC-R02G0105-003.
 
 ## User Scenarios & Testing *(mandatory)*
 
