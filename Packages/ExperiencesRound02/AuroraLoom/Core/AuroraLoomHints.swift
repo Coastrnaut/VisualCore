@@ -103,12 +103,13 @@ public struct AuroraLoomFailureExplanation: Sendable, Equatable {
     }
 
     /// The explanation, ribbons and gates numbered from 1, the distance as ``hundredthsOutside`` written "0.xx":
-    /// "Ribbon 2 is furthest off at gate 3: 0.21 of a turn outside the tolerance after the last move. Undo or retry."
+    /// "Ribbon 2 is furthest off at gate 3, tick 5: 0.21 of a turn outside the tolerance after the last move. Undo or
+    /// retry." (the tick is the kernel's, counted from 0; T-R02G0105-012, FR-R02G0105-003).
     public var text: String {
         let value: Int = hundredthsOutside
         let cents: Int = value % 100
         let amount: String = "\(value / 100)." + (cents < 10 ? "0\(cents)" : "\(cents)")
-        return "Ribbon \(mismatch.ribbon + 1) is furthest off at gate \(mismatch.gate + 1): \(amount) of a turn outside "
-            + "the tolerance after the last move. Undo or retry."
+        return "Ribbon \(mismatch.ribbon + 1) is furthest off at gate \(mismatch.gate + 1), tick \(mismatch.tick): "
+            + "\(amount) of a turn outside the tolerance after the last move. Undo or retry."
     }
 }

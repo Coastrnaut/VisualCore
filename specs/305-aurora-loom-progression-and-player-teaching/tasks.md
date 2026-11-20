@@ -63,3 +63,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks.
 
 001 → {002 (agent B), 003 (agent C)} → 004 (lead) → 005 (lead; agent D writes the simulator tests) → 006 … 011.
 Shared files (adapter, scenarios, presenter, controls, docs) stay with the lead. MVP: Stories 2 and 3.
+
+## Phase 6: Convergence
+
+- [X] T-R02G0105-012 Add the failure's tick to `AuroraLoomFailureExplanation.text` in `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomHints.swift` ("… at gate g, tick t: x of a turn outside the tolerance …") and its format test in `Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomHintsTests.swift`, per FR-R02G0105-003 (partial); `--name host-4 -- swift test --package-path Packages/ExperiencesRound02 --filter 'AuroraLoomHintsTests|AuroraLoomExperienceCoreTests'` — Verified 2026-11-20: 2026-11-20 R02-G01-05.host-4b exit 0 (explanation names the tick; hints and adapter tests)

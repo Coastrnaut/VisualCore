@@ -178,7 +178,7 @@ struct AuroraLoomHintsTests {
             #expect(explanation.hundredthsOutside * 4_096 >= excess * 100)
             #expect((explanation.hundredthsOutside - 1) * 4_096 < max(excess * 100, 1))
             let text: String = explanation.text
-            #expect(text.hasPrefix("Ribbon \(failure.ribbon + 1) is furthest off at gate \(failure.gate + 1): 0."))
+            #expect(text.hasPrefix("Ribbon \(failure.ribbon + 1) is furthest off at gate \(failure.gate + 1), tick \(failure.tick): 0."))
             #expect(text.hasSuffix(" of a turn outside the tolerance after the last move. Undo or retry."))
             try play.handle(.showResult)
             #expect(AuroraLoomFailureExplanation(play: play) == explanation)
@@ -205,7 +205,7 @@ struct AuroraLoomHintsTests {
         let hundredths: Int = explanation.hundredthsOutside
         let cents: String = hundredths % 100 < 10 ? "0\(hundredths % 100)" : "\(hundredths % 100)"
         let expected: String = "Ribbon \(explanation.mismatch.ribbon + 1) is furthest off at gate "
-            + "\(explanation.mismatch.gate + 1): \(hundredths / 100).\(cents) of a turn outside the tolerance after the "
+            + "\(explanation.mismatch.gate + 1), tick \(explanation.mismatch.tick): \(hundredths / 100).\(cents) of a turn outside the tolerance after the "
             + "last move. Undo or retry."
         #expect(explanation.text == expected)
     }

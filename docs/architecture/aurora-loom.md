@@ -110,7 +110,7 @@ catalog's levels.
   exceeds the moves left the hint says so and suggests undo. Hints never change the state, are unlimited and do not
   affect stars.
 - **Failure explanation.** `AuroraLoomFailureExplanation(play:)` reads the kernel's worst mismatch: "Ribbon r is furthest
-  off at gate g: x of a turn outside the tolerance after the last move. Undo or retry." (x in hundredths, rounded up,
+  off at gate g, tick t: x of a turn outside the tolerance after the last move. Undo or retry." (x in hundredths, rounded up,
   at least 0.01). The panel offers Undo and Retry.
 - **Tutorial.** On levels 1 … 3: wave(r) → phase(r) → harmony → done, where r is the level-1 hint's ribbon; a wave move,
   a phase move and the win advance it; undo never moves it back; `tutorial.dismiss` ends it.
