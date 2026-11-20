@@ -153,7 +153,9 @@ stored certificates round-trip; newer and damaged forms are refused.
 - **FR-R02F16-005**: A matcher MUST find placements of a pattern graph inside a graph (and decide isomorphism of equal
   sizes) within a stated budget.
 - **FR-R02F16-006**: Every answer MUST carry a certificate that an independent checker verifies without re-running the
-  solver; tampered certificates MUST be refused.
+  solver (routes with optimality potentials, unreachable regions, timed routes, cuts with matching routes, placements);
+  tampered certificates MUST be refused. Two claims are not independently checkable and are proved by the tests against
+  references instead: that a timed route is the earliest, and an exhaustive "no placement" (recorded with its count).
 - **FR-R02F16-007**: Certificates MUST have a versioned stored form; newer and damaged forms MUST be refused.
 - **FR-R02F16-008**: Invalid requests MUST be refused with a stable reason code naming the feature.
 - **FR-R02F16-009**: Existing experiences and their tests MUST be unchanged; every new public name carries
