@@ -1,0 +1,102 @@
+{
+  "branch": "main",
+  "dirty": false,
+  "dirty_paths": [],
+  "failed_attempts": [
+    {
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 1,
+      "log": ".autonomy/logs/migration/R02-F15.host.log",
+      "log_sha256": "aa224203e2535e356b904536c5d44b32114bfa21603c121bea403c6725c88353",
+      "name": "host",
+      "timed_out": false
+    }
+  ],
+  "gate": "R02-F15",
+  "ledger": "migration",
+  "passing_checks": [
+    {
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "finished": "2026-11-20T02:51:11+00:00",
+      "log": ".autonomy/logs/migration/R02-F15.baseline-host.log",
+      "log_sha256": "e879fe95c4f4f8736269bf93e22f5141d99652545467a11089553dc2fe76c1d7",
+      "name": "baseline-host"
+    },
+    {
+      "command": "python3 scripts/check_documented_api.py --sources Apps/VisualCore",
+      "exit_code": 0,
+      "finished": "2026-11-20T03:10:34+00:00",
+      "log": ".autonomy/logs/migration/R02-F15.documented-api.log",
+      "log_sha256": "9a3cd303767b94ca5b875c76860f1c64374871467c147d33607d82b48d557069",
+      "name": "documented-api"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test",
+      "exit_code": 0,
+      "finished": "2026-11-20T03:10:18+00:00",
+      "log": ".autonomy/logs/migration/R02-F15.experiences.log",
+      "log_sha256": "ccbf9e986d7e53cadafe6160b789b6b73d5e83451bd1f446669ab4ae4da9c880",
+      "name": "experiences"
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "finished": "2026-11-20T02:59:07+00:00",
+      "log": ".autonomy/logs/migration/R02-F15.host-rerun.log",
+      "log_sha256": "fe19ea7845d0900348cced2a3b09bbe4d544d0a3233b9223231f2134e37068a2",
+      "name": "host-rerun"
+    },
+    {
+      "command": "python3 scripts/check_public_api.py",
+      "exit_code": 0,
+      "finished": "2026-11-20T03:10:31+00:00",
+      "log": ".autonomy/logs/migration/R02-F15.public-api.log",
+      "log_sha256": "3c44e30f69067cc2d942a8adb93997b97d81b0198dcaa3443988b1d124aafe5a",
+      "name": "public-api"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean",
+      "exit_code": 0,
+      "finished": "2026-11-20T03:11:13+00:00",
+      "log": ".autonomy/logs/migration/R02-F15.reference-1.log",
+      "log_sha256": "fef4faae70fa938a9801c9783eec44cb68cea626ba3c132dec62cbfaf36568db",
+      "name": "reference-1"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26",
+      "exit_code": 0,
+      "finished": "2026-11-20T03:11:56+00:00",
+      "log": ".autonomy/logs/migration/R02-F15.reference-2.log",
+      "log_sha256": "75e7a7f80db4da8e72cbda7b99e84bf8b1cb7a2439b73cc0fd863aaf98091f8f",
+      "name": "reference-2"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-26.5 --action test",
+      "exit_code": 0,
+      "finished": "2026-11-20T03:01:38+00:00",
+      "log": ".autonomy/logs/migration/R02-F15.rendering-26.log",
+      "log_sha256": "0cc92d8ff01b18bb53a663b1cc50412154001826e4014a3c980b6b6021eb2016",
+      "name": "rendering-26"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test",
+      "exit_code": 0,
+      "finished": "2026-11-20T03:00:37+00:00",
+      "log": ".autonomy/logs/migration/R02-F15.rendering-27.log",
+      "log_sha256": "93760281e32eea38f9e326f88c09475b7e6517aced2f5b1fdcf2ea59505327fb",
+      "name": "rendering-27"
+    },
+    {
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "finished": "2026-11-20T03:13:09+00:00",
+      "log": ".autonomy/logs/migration/R02-F15.script-tests.log",
+      "log_sha256": "1820ff89790472ce7161319688aff2aa340919bd9ebe5e1b2f83be68a8a93a56",
+      "name": "script-tests"
+    }
+  ],
+  "revision": "d705f114ec1caa072b7fa0cb0747aa702c79bfaf",
+  "revision_number": 1,
+  "sealed": "2026-11-20T03:13:40+00:00"
+}

@@ -69,7 +69,7 @@ public names checked against Packages and Apps (`Visibility` is taken). Fixture 
 - [X] T-R02F15-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F15.reference-1.json (exit 0)
 - [X] T-R02F15-010 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F15.reference-2.json (exit 0)
 - [X] T-R02F15-011 Script tests (`--name script-tests`) — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F15.script-tests.json (exit 0)
-- [ ] T-R02F15-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+- [X] T-R02F15-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record — Verified 2026-11-19: converged in 1 round (no task appended); sealed .autonomy/migration/evidence/R02-F15.json (10 passing, 1 failed attempt); recorded pass 2026-11-19; no device task in this slice
 
 ## Dependencies and parallel work
 
