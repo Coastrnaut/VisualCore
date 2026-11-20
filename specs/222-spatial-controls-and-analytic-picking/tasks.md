@@ -8,7 +8,7 @@ through a fileprivate SplitMix generator; tests stay short.
 
 ## Phase 1: Setup
 
-- [ ] T-R02F22-001 Baselines: `--name baseline-host -- swift test --package-path Packages/VisualCore` and the isolated
+- [X] T-R02F22-001 Baselines: `--name baseline-host -- swift test --package-path Packages/VisualCore` and the isolated — Verified 2026-11-20: 2026-11-20 baseline-host exit 0, baseline-timing exit 0 (.autonomy/migration/checks/R02-F22.baseline-*.json); rendering baseline R02-F21 rendering-27/26 exit 0
   timing run; the rendering baseline is R02-F21's rendering runs (exit 0)
 
 ## Phase 2: Foundational — Story 1, a touch becomes a world point (P1) 🎯
