@@ -22,7 +22,7 @@ public names checked against Packages and Apps (`Visibility` is taken). Fixture 
 
 ## Phase 3: Story 1 — bodies on conic paths (P1) 🎯
 
-- [ ] T-R02F15-003 [US1] Create `Packages/VisualCore/Sources/VisualCoreMath/ConicOrbit.swift` (contracts/api.md:
+- [X] T-R02F15-003 [US1] Create `Packages/VisualCore/Sources/VisualCoreMath/ConicOrbit.swift` (contracts/api.md: — Verified 2026-11-19: lead retest 2026-11-19: R02-F15.host-rerun.json (exit 0, full suite; first R02-F15.host.json failed only the timed R02-F05 mesh budget under parallel load, fixed by lightening the overlap oracle to 1,024 intervals); ConicOrbitTests 7 passed (1,000 seeded elliptic cases equal KeplerOrbit to 1e-9; energy and angular momentum per kind; e = 1 ± 1e-4 near the parabola; invalid elements refused)
   `ConicKind`, `OrbitState`, `ConicOrbit` with "all finite; q > 0, e ≥ 0, μ > 0", kind, mean motion, semi-major axis,
   period, energy, angular momentum, `keplerOrbit` adapter, `init(_ orbit: KeplerOrbit, gravitationalParameter:)`,
   `state(at:)` per research R4, non-finite time treated as tₚ) with
