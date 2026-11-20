@@ -46,7 +46,9 @@ excluded) are in VisualCoreSimulation and used by Digital Aquarium; `FieldGrid` 
   array of the swarm so `SteeringAgent` does not change. At most 65,536 agents; grids and rasters at most 1,048,576
   cells. Rationale: Section 13 extension; Digital Aquarium keeps compiling. Impact: FR-R02F20-001, 002, 007.
 - Q: How does the grid guarantee the same neighbours? → A: `NeighbourGrid` buckets finite agents by ⌊position / cell⌋
-  (cell size = the query radius unless given, keyed by integer cell, so no bounds are needed); a query scans the cells
+  (cell size given, finite and > 0, keyed by integer cell, so no bounds are needed; a cell index is clamped to ±2^40, which
+  keeps every agent within the radius of a clamped agent inside the scanned window; when the window would cover more cells
+  than the grid holds, every occupied cell is scanned instead); a query scans the cells
   within ⌈radius / cell⌉ of the agent's cell, measures with the same `distance(to:)`, keeps d ≤ radius, sorts nearest
   first with ties by index and takes the limit — the same rule as `NeighbourSearch`, so the lists are equal. Impact:
   FR-R02F20-001; SC-R02F20-001.
@@ -54,8 +56,11 @@ excluded) are in VisualCoreSimulation and used by Digital Aquarium; `FieldGrid` 
   start-of-step swarm (steering through the grid, plus poles); the velocity becomes v + a · h, is then turned by the
   uniform field's exact rotation angle −q · B · h (so a uniform field never changes speed), and is capped at the speed
   limit (finite, > 0); the position becomes p + v · h; walled edges reflect the position back inside and flip that
-  velocity component, wrapping edges take the position modulo the bounds. Agents with non-finite values are left as they
-  are and take no part. Impact: FR-R02F20-002, 003; SC-R02F20-002, 003.
+  velocity component, wrapping edges take the position modulo the bounds. Inside means minX ≤ x ≤ maxX, minY ≤ y ≤ maxY. Neighbours are
+  found with plain distance (no wrap-around). The swarm refuses agents with non-finite position or velocity
+  (`.parameter("agents")`), because its stored form is JSON, and steering parameters with a neighbour radius that is not
+  finite and > 0, a neighbour limit < 1, or any other value non-finite or negative (`.parameter(name)`); every step then
+  keeps every value finite. The grid and the raster, which take plain agent arrays, skip non-finite agents. Impact: FR-R02F20-002, 003; SC-R02F20-002, 003.
 - Q: What are the magnetic field and the poles exactly? → A: a uniform field B (finite, |B| ≤ 100) acts as above; a pole at
   c of strength s (finite, |s| ≤ 1,000) and softening ε (finite, ε ≥ 1e-6) pulls a charge q (finite, |q| ≤ 100) with
   F = s · q · (c − p) / (|c − p|² + ε²)^{3/2} (positive s q attracts), whose length never exceeds
@@ -126,7 +131,10 @@ forms are refused.
 - **An empty swarm:** steps and rasters to nothing, without error.
 - **Agents stacked at one point:** the existing coincident-agent rule separates them, results stay finite.
 - **An agent exactly on a pole:** the field force is bounded, never infinite.
-- **Agents with non-finite values:** they are left in place and excluded, never spreading non-finite values.
+- **Agents with non-finite values:** the swarm refuses them; the grid and the raster skip them, never spreading
+  non-finite values.
+- **Agents far away or a huge radius:** the grid still returns the exhaustive search's lists (clamped cells, full scan).
+- **A stored swarm whose values break a rule:** refused as damaged (`r2-f20.malformed`), never half-built.
 - **Too many agents or too large a grid:** refused with a named reason.
 
 ## Requirements *(mandatory)*
@@ -157,7 +165,7 @@ forms are refused.
 
 ### Measurable Outcomes
 
-- **SC-R02F20-001**: For 50 seeded swarms of up to 2,000 agents, the grid's neighbour list equals the existing search's
+- **SC-R02F20-001**: For 50 seeded swarms of 10 … 1,000 agents and one of 2,000 agents, the grid's neighbour list equals the existing search's
   for every agent.
 - **SC-R02F20-002**: Two runs of 20 seeded swarms over 500 steps are bit-identical; every agent stays inside the bounds
   with speed at most the limit after every step.

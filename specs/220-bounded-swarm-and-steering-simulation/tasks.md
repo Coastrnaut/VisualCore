@@ -20,8 +20,9 @@ its check record (no trailers). No {owner} tasks; one {device} task. Fixture see
 ## Phase 3: Story 1 — neighbourhood grid (P1) 🎯
 
 - [ ] T-R02F20-003 [P] [US1] Create `Packages/VisualCore/Sources/VisualCoreSimulation/NeighbourGrid.swift` (clarification Q2, ≤ 65,536 agents) with
-  `Packages/VisualCore/Tests/VisualCoreSimulationTests/NeighbourGridTests.swift` (50 seeded swarms up to 2,000 agents: every list equals `NeighbourSearch`, order
-  included, for several radii and limits; non-finite and far-away agents; radius larger than the cell); `--name host-2`
+  `Packages/VisualCore/Tests/VisualCoreSimulationTests/NeighbourGridTests.swift` (50 seeded swarms of 10 … 1,000 agents and one of 2,000: every list equals
+  `NeighbourSearch`, order included, for several radii and limits; non-finite agents and agents at ±1e300; radius larger
+  than the cell and a radius of 1e300; refusals); `--name host-2`
 
 ## Phase 4: Story 4 — density raster (P2)
 
@@ -33,11 +34,12 @@ its check record (no trailers). No {owner} tasks; one {device} task. Fixture see
 ## Phase 5: Stories 2, 3 and 5 — the swarm (P1, P2)
 
 - [ ] T-R02F20-005 [US2] [US3] [US5] Create `Packages/VisualCore/Sources/VisualCoreSimulation/Swarm.swift` (SwarmEdges; Swarm "≤ 65,536 agents; charges count = agents
-  count, each finite with abs(q) ≤ 100; bounds valid; speedLimit finite > 0; JSON schema 1"; step per clarification Q3)
-  with `Packages/VisualCore/Tests/VisualCoreSimulationTests/SwarmTests.swift` (20 seeded swarms × 500 steps twice bit-identical, every agent inside its bounds with speed
+  count, each finite with abs(q) ≤ 100; bounds valid; agents finite; neighbourRadius finite > 0, neighbourLimit ≥ 1, others finite ≥ 0; speedLimit finite > 0; JSON schema 1;
+  decode re-validates"; step per clarification Q3)
+  with `Packages/VisualCore/Tests/VisualCoreSimulationTests/SwarmTests.swift` (20 seeded swarms of 20 … 200 agents × 500 steps twice bit-identical, every agent inside its bounds with speed
   ≤ limit after every step, walled and wrapping; a lone charge in a uniform field keeps its speed within 1e-9 over 1,000
-  steps and closes its orbit within 1e-9 of the radius; an empty swarm steps; non-finite agents left unchanged; round
-  trip byte for byte and bit-identical continuation for 200 steps; newer and damaged forms refused; step and size
+  steps and closes its orbit within 1e-9 of the radius; an empty swarm steps; non-finite agents and invalid parameters refused; round
+  trip byte for byte and bit-identical continuation for 200 steps; newer, damaged and rule-breaking forms refused; step and size
   refusals); `--name host-4`
 
 ## Phase 6: Regression, documentation and close
