@@ -87,7 +87,7 @@
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02F10-010 No Stage One breakage: `--name experiences --` ExperiencesCreative on sim-27.2, and the app's
+- [X] T-R02F10-010 No Stage One breakage: `--name experiences --` ExperiencesCreative on sim-27.2, and the app's — Verified 2026-11-19: 2026-11-19 R02-F10.experiences.json (exit 0) and R02-F10.app-settings-2.json (exit 0)
   settings tests (`--name app-settings -- python3 scripts/release_check.py --only app-build-for-testing-ios27
   app-unit-ios27 app-ui-ios27-b`, as R02-F26)
 - [ ] T-R02F10-011 API baseline and docs: `check_public_api.py --update`, `--name public-api`, `--name documented-api
