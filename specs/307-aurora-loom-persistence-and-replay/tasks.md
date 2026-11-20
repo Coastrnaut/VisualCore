@@ -22,7 +22,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 3: Story 1 — progress survives (P1)
 
-- [ ] T-R02G0107-003 [US1] Edit `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomExperienceCore.swift` (schema 3; migration 2 → 3 "results without
+- [X] T-R02G0107-003 [US1] Edit `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomExperienceCore.swift` (schema 3; migration 2 → 3 "results without — Verified 2026-11-20: 2026-11-20 host-2 exit 0 (schema 3, digest v3, migration 2 to 3, reconciliation on restore with reconciliationDropped, replay.start/step/stop with r02-g01.no-replay, replay-end, replay; replay refusals and fixture-replay in the manifest; reconciliation keeps the saved frontier, clarification Q2 amended because raising it would open levels for honest daily wins)
   a trace, verified false"; traces recorded on campaign and daily wins; reconciliation on restore with
   `reconciliationDropped`; replay mode with `replay.start [1…100]`, `replay.step`, `replay.stop` and codes
   r02-g01.no-replay, r02-g01.replay-end, r02-g01.replay), `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomScenarios.swift` and

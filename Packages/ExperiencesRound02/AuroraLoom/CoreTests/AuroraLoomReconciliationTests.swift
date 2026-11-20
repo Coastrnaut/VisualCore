@@ -2,7 +2,7 @@
 // SC-R02G0107-003). Host checks of the traced results and of reconciliation: a win with its trace is a verified result;
 // fewer moves replace it and ties keep the earlier trace; results encode with their traces and an encoding without them
 // (schema 2) decodes unverified; honest traces are kept; an edited star count, move count or trace step is dropped; a
-// result without a trace is kept unverified; the frontier never falls below one level after the highest kept result.
+// result without a trace is kept unverified; the frontier stays as saved (a daily win may lie beyond it).
 // Edited saves are made by editing the encoded JSON, as a tampered file would be. Short runs, plain loops.
 import Foundation
 import Testing
@@ -107,14 +107,14 @@ import Testing
         #expect(reconciled.progress.solved[4] == progress.solved[4])
     }
 
-    @Test func tracelessResultsAreKeptAndTheFrontierCoversTheHighestKept() throws {
+    @Test func tracelessResultsAreKeptAndTheFrontierStaysAsSaved() throws {
         var progress: AuroraLoomProgress = try Self.honest([7])
         progress.record(level: 3, moves: 12, shortest: 5)
         progress.frontier = 2
         let reconciled = AuroraLoomReconciliation.reconcile(progress)
         #expect(reconciled.dropped == 0)
         #expect(reconciled.progress.solved[3]?.verified == false)
-        #expect(reconciled.progress.frontier == 8)
+        #expect(reconciled.progress.frontier == 2)
         // A verified result without a trace, or on a level out of range, never verifies.
         let empty: AuroraLoomProgress.Result = AuroraLoomProgress.Result(bestMoves: 0, stars: 3, trace: [], verified: true)
         #expect(!AuroraLoomReconciliation.verifies(level: 1, result: empty))

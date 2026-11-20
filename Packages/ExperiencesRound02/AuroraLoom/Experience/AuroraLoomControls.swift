@@ -29,6 +29,7 @@ struct AuroraLoomControls: View {
         case .campaign: "Campaign"
         case .practice: "Practice"
         case .daily: "Daily"
+        case .replay: "Replay"
         }
     }
 

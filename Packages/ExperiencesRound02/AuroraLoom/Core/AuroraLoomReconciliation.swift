@@ -2,8 +2,9 @@
 // "AuroraLoomReconciliation"; contracts/api.md). Restored scores are checked against the rules before they count: each
 // verified result's winning trace is replayed on a fresh play of its certified level, and the result is kept only when
 // that play ends won after exactly `bestMoves` moves with the recorded stars (the stars rule for that count). Results
-// without a trace (written before schema 3) are kept, unverified. The frontier is kept as saved but never below one
-// level after the highest kept result. Pure and deterministic: no clock, no random source.
+// without a trace (written before schema 3) are kept, unverified. The frontier is kept as saved: dropping a result never
+// closes a level, and a daily win never opens one (feature 305), so a kept daily result may lie beyond the frontier and
+// raising it would change an honest save on restore. Pure and deterministic: no clock, no random source.
 import Foundation
 
 /// The check of restored Aurora Loom scores (see the file header).
@@ -30,8 +31,7 @@ public enum AuroraLoomReconciliation {
     }
 
     /// `progress` with every verified result that does not replay (``verifies(level:result:)``) removed, and the
-    /// number removed. Unverified results are kept. The frontier is the saved one, raised to one level after the
-    /// highest kept result (at most 100) when it is lower.
+    /// number removed. Unverified results are kept. The frontier is the saved one (see the file header).
     public static func reconcile(_ progress: AuroraLoomProgress) -> (progress: AuroraLoomProgress, dropped: Int) {
         var kept = progress
         var dropped = 0
@@ -41,9 +41,6 @@ public enum AuroraLoomReconciliation {
                 kept.remove(level: level)
                 dropped += 1
             }
-        }
-        if let highest = kept.solved.keys.max() {
-            kept.frontier = max(kept.frontier, min(highest + 1, AuroraLoomProgress.levelCount))
         }
         return (kept, dropped)
     }

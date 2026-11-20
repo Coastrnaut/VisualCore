@@ -5,13 +5,15 @@
 //   - the 80 acceptance scenarios of the planning catalog (below), each with the seed of its planned level;
 //   - three fixtures: `fixture-level-1-solved` (the certified solution of level 1, outcome `won`),
 //     `fixture-allowance-spent` (the allowance spent on moves that never win, outcome `failed`) and
-//     `fixture-undo-redo` (a move, its undo and its redo).
+//     `fixture-undo-redo` (a move, its undo and its redo), and from feature 307 `fixture-replay` (level 1 solved, then
+//     its stored trace replayed move by move to the win, outcome `won`).
 // Every move is derived from the generated level, so a regenerated catalog cannot leave a stale script. Input-response,
 // save-restore and reset play two moves and an undo; completion plays the certified solution and expects `won`;
 // full-playthrough solves levels 1, 2 and 3 with `level.next` between them; hero plays one move; rejection refuses
 // values out of range, fractional values, wrong value counts, an unknown control, a move to the current step and an
 // undo or redo with nothing to revert, a closed level (`r02-g01.locked`), a level out of range, a date that is not a
-// calendar date (`r02-g01.date`) and a date missing its day (feature 305); never an undeclared control: the content audit
+// calendar date (`r02-g01.date`) and a date missing its day (feature 305), and a replay with no stored trace
+// (`r02-g01.no-replay`: start, step and stop) and of a level out of range (feature 307); never an undeclared control: the content audit
 // forbids one in a manifest.
 // The 80 acceptance scenarios `acceptance-001` … `acceptance-080` follow the rows R2-G01-QA-001 … 080 of the archived
 // acceptance matrix (docs/archive/planning/rounds/round2.md, section 6.1.19, lines 2990–3075): each opens its planned
@@ -116,6 +118,15 @@ extension AuroraLoomExperienceCore {
         return entries
     }
 
+    /// The entries of `fixture-replay` (feature 307): the certified solution of level 1, `replay.start [1]`, then one
+    /// `replay.step` per move of the stored trace.
+    public static var replayEntries: [ScenarioStep] {
+        let completion = completionEntries
+        guard !completion.isEmpty else { return [] }
+        return completion + [acceptedEntry("replay.start", [1])]
+            + Array(repeating: acceptedEntry("replay.step"), count: completion.count)
+    }
+
     /// The entries of `fixture-undo-redo`: the first input move, its undo and its redo.
     public static var undoRedoEntries: [ScenarioStep] {
         Array(inputEntries.prefix(1)) + [acceptedEntry("play.undo"), acceptedEntry("play.redo")]
@@ -143,6 +154,10 @@ extension AuroraLoomExperienceCore {
             refusedEntry("level.select", [101], outOfRange),
             refusedEntry("mode.daily", [2026, 2, 30], "action.rule." + AuroraLoomExperienceRule.date),
             refusedEntry("mode.daily", [2026, 11], "action.wrong-value-count"),
+            refusedEntry("replay.start", [1], "action.rule." + AuroraLoomExperienceRule.noReplay),
+            refusedEntry("replay.start", [101], outOfRange),
+            refusedEntry("replay.step", [], "action.rule." + AuroraLoomExperienceRule.noReplay),
+            refusedEntry("replay.stop", [], "action.rule." + AuroraLoomExperienceRule.noReplay),
         ]
     }
 
@@ -191,7 +206,8 @@ extension AuroraLoomExperienceCore {
     public static var fixtures: [(name: String, entries: [ScenarioStep], outcome: String?)] {
         [("fixture-level-1-solved", completionEntries, wonCode),
          ("fixture-allowance-spent", allowanceEntries, failedCode),
-         ("fixture-undo-redo", undoRedoEntries, nil)]
+         ("fixture-undo-redo", undoRedoEntries, nil),
+         ("fixture-replay", replayEntries, wonCode)]
     }
 
     /// The core prepared with `seed` after playing `entries` as the engine plays them: each entry's steps, then its

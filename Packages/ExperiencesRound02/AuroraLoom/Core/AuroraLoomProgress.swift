@@ -70,6 +70,8 @@ public enum AuroraLoomMode: Sendable, Equatable, Hashable, Codable {
     case practice
     /// The daily level `level` (1 … 100), chosen by ``AuroraLoomProgress/dailyLevel(year:month:day:)``.
     case daily(level: Int)
+    /// The replay of the stored winning trace of `level` (1 … 100) on a fresh play (feature 307); never records.
+    case replay(level: Int)
 }
 
 /// The campaign progress of Aurora Loom: the solved levels with their best results and the open frontier.

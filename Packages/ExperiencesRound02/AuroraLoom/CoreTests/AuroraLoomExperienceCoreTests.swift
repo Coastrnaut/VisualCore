@@ -60,9 +60,9 @@ import VisualCoreExperience
     }
 
     @Test func theControlsTheTiersAndTheProfile() {
-        #expect(Core.experienceID == "r02-g01.aurora-loom" && Core.schemaVersion == 2)
-        #expect(Core.digestDomain == "r02-g01.aurora-loom.v2")
-        #expect(Core.controls.map(\.id) == Core.actionIDs && Core.actionIDs.count == 9)
+        #expect(Core.experienceID == "r02-g01.aurora-loom" && Core.schemaVersion == 3)
+        #expect(Core.digestDomain == "r02-g01.aurora-loom.v3")
+        #expect(Core.controls.map(\.id) == Core.actionIDs && Core.actionIDs.count == 12)
         #expect(Core.controls[0].ranges == [0...2, 0...1, 0...15])
         #expect(Core.controls[4].ranges == [1...100])
         #expect(Core.controls[5].ranges == [1...9999, 1...12, 1...31])
@@ -179,7 +179,8 @@ import VisualCoreExperience
         let certified: AuroraLoomGenerated = try Core.generated(number: 99)
         for move in certified.solution.moves { #expect(core.apply(Self.action(move)) == .accepted) }
         #expect(core.play.stage == .won && core.progress.frontier == 100)
-        #expect(core.progress.solved[99] == AuroraLoomProgress.Result(bestMoves: certified.solution.shortest, stars: 3))
+        #expect(core.progress.solved[99] == AuroraLoomProgress.Result(bestMoves: certified.solution.shortest, stars: 3,
+                                                                      trace: certified.solution.moves, verified: true))
         #expect(core.apply(ExperienceAction(control: "level.next", step: 0)) == .accepted)
         #expect(core.levelNumber == 100)
         #expect(core.apply(ExperienceAction(control: "level.next", step: 0)) == .accepted)
@@ -324,7 +325,78 @@ import VisualCoreExperience
         #expect(restored == expected && restored.mode == .campaign && restored.progress.frontier == 2)
         #expect(restored.tutorial == expected.tutorial && restored.tutorial != .done)
         #expect(throws: AuroraLoomRestoreRefusal.damaged) { try Core.migratedToSchemaTwo(["level": "x"]) }
-        #expect(Core.migrations.currentVersion == 2)
+        #expect(Core.migrations.currentVersion == 3)
+    }
+
+    // Feature 307 (R02-G01-07) T-R02G0107-003: migration 2 → 3, reconciliation on restore and replay.
+
+    @Test func aSchemaTwoPayloadMigratesWithResultsUnverified() async throws {
+        let objectTwo: [String: Any] = [
+            "level": 3, "records": [Any](), "mode": "campaign",
+            "progress": ["frontier": 4, "solved": [["level": 1, "bestMoves": 6, "stars": 2]]],
+        ]
+        let migrated: [String: Any] = try Core.migratedToSchemaThree(objectTwo)
+        let progress: [String: Any] = try #require(migrated["progress"] as? [String: Any])
+        let solved: [[String: Any]] = try #require(progress["solved"] as? [[String: Any]])
+        #expect(solved[0]["verified"] as? Bool == false && (solved[0]["trace"] as? [Any])?.isEmpty == true)
+        var modeObject: [String: Any] = migrated
+        modeObject["mode"] = try JSONSerialization.jsonObject(
+            with: try JSONEncoder().encode(AuroraLoomMode.campaign))
+        let data: Data = try JSONSerialization.data(withJSONObject: modeObject, options: [.sortedKeys])
+        let restored: Core = try Core.restore(payload: data, seed: 2)
+        #expect(restored.progress.solved[1] == AuroraLoomProgress.Result(bestMoves: 6, stars: 2))
+        #expect(restored.progress.frontier == 4 && restored.reconciliationDropped == 0)
+        #expect(throws: AuroraLoomRestoreRefusal.damaged) { try Core.migratedToSchemaThree(["level": 1]) }
+    }
+
+    @Test func anEditedResultIsDroppedOnRestore() async throws {
+        var core: Core = try await Core.prepare(seed: 0)
+        let certified: AuroraLoomGenerated = try Core.generated(number: 1)
+        for move in certified.solution.moves { #expect(core.apply(Self.action(move)) == .accepted) }
+        #expect(core.progress.solved[1]?.verified == true)
+        let honest: Core = try Core.restore(payload: try core.snapshotPayload(), seed: 0)
+        #expect(honest == core && honest.reconciliationDropped == 0)
+        let text: String = try #require(String(data: try core.snapshotPayload(), encoding: .utf8))
+        let tampered: String = text.replacingOccurrences(of: "\"stars\":3", with: "\"stars\":2")
+        #expect(tampered != text)
+        let restored: Core = try Core.restore(payload: Data(tampered.utf8), seed: 0)
+        #expect(restored.progress.solved[1] == nil && restored.reconciliationDropped == 1)
+        #expect(restored.progress.frontier == core.progress.frontier)
+    }
+
+    @Test func replayPlaysTheStoredTraceWithoutChangingProgress() async throws {
+        var core: Core = try await Core.prepare(seed: 0)
+        let rule: (String) -> ActionResult = { code in .rejected(.rule(code: code)) }
+        #expect(core.apply(ExperienceAction(control: "replay.start", values: [1], step: 0))
+            == rule(AuroraLoomExperienceRule.noReplay))
+        #expect(core.apply(ExperienceAction(control: "replay.step", step: 0)) == rule(AuroraLoomExperienceRule.noReplay))
+        #expect(core.apply(ExperienceAction(control: "replay.stop", step: 0)) == rule(AuroraLoomExperienceRule.noReplay))
+        let certified: AuroraLoomGenerated = try Core.generated(number: 1)
+        // A detour (a move and its undo) is not part of the winning trace.
+        #expect(core.apply(ExperienceAction(control: "ribbon.move", values: [0, 0, Double(Self.otherWave(core))],
+                                            step: 0)) == .accepted)
+        #expect(core.apply(ExperienceAction(control: "play.undo", step: 0)) == .accepted)
+        for move in certified.solution.moves { #expect(core.apply(Self.action(move)) == .accepted) }
+        let progress: AuroraLoomProgress = core.progress
+        #expect(progress.solved[1]?.trace == certified.solution.moves)
+        #expect(core.apply(ExperienceAction(control: "replay.start", values: [1], step: 0)) == .accepted)
+        #expect(core.mode == .replay(level: 1) && core.play.spent == 0 && core.tutorial == .done)
+        #expect(core.apply(ExperienceAction(control: "level.next", step: 0)) == rule(AuroraLoomExperienceRule.replay))
+        #expect(core.apply(Self.action(certified.solution.moves[0])) == rule(AuroraLoomExperienceRule.replay))
+        #expect(core.apply(ExperienceAction(control: "tutorial.dismiss", step: 0)) == .accepted)
+        var digests: [StateDigest] = [try Self.digest(core)]
+        for _ in certified.solution.moves {
+            #expect(core.apply(ExperienceAction(control: "replay.step", step: 0)) == .accepted)
+            digests.append(try Self.digest(core))
+        }
+        #expect(Set(digests).count == digests.count)
+        #expect(core.play.stage == .won && core.progress == progress)
+        #expect(core.apply(ExperienceAction(control: "replay.step", step: 0)) == rule(AuroraLoomExperienceRule.replayEnd))
+        // A replay survives a snapshot round trip, then stops back to campaign.
+        let restored: Core = try Core.restore(payload: try core.snapshotPayload(), seed: 0)
+        #expect(restored == core)
+        #expect(core.apply(ExperienceAction(control: "replay.stop", step: 0)) == .accepted)
+        #expect(core.mode == .campaign && core.levelNumber == 1 && core.play.spent == 0 && core.progress == progress)
     }
 
     @Test func theTierAndTheSnapshotTimeNeverTouchTheDigest() async throws {

@@ -34,7 +34,8 @@ private func playScenario(_ spec: ScenarioSpec) async throws
     typealias Core = AuroraLoomExperienceCore
 
     /// The names of the three fixtures.
-    static let fixtureNames: [String] = ["fixture-level-1-solved", "fixture-allowance-spent", "fixture-undo-redo"]
+    static let fixtureNames: [String] = ["fixture-level-1-solved", "fixture-allowance-spent", "fixture-undo-redo",
+                                         "fixture-replay"]
 
     @Test func theManifestIsAValidRoundTwoGame() {
         let manifest: ScenarioManifest = Core.manifest(for: scenarioID)
@@ -121,6 +122,9 @@ private func playScenario(_ spec: ScenarioSpec) async throws
             case "fixture-allowance-spent":
                 #expect(core.play.stage == .failed && core.play.failure != nil)
                 #expect(core.play.spent == level1.level.allowance && core.outcome?.code == Core.failedCode)
+            case "fixture-replay":
+                #expect(core.mode == .replay(level: 1) && core.play.stage == .won, "\(spec.name)")
+                #expect(core.play.spent == level1.solution.moves.count && core.progress.solved[1]?.verified == true)
             case "fixture-undo-redo":
                 #expect(core.play.spent == 1 && core.play.records.count == 3 && !core.play.canRedo)
                 #expect(core.play.records.map(\.kind) == [.move, .undo, .redo])

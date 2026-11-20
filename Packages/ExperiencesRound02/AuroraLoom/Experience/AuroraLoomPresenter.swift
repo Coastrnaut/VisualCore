@@ -230,13 +230,15 @@ final class AuroraLoomPresenter: ExperiencePresenter {
     }
 
     /// The action and values that start the current level again in its mode: `mode.practice` in practice, the daily
-    /// date's `mode.daily` in daily mode, `level.select` of the level in campaign.
+    /// date's `mode.daily` in daily mode, `level.select` of the level in campaign, `replay.start` of the level in
+    /// replay.
     func retryAction(date: DateComponents) -> (control: String, values: [Double]) {
         guard let core = latestCore else { return ("mode.campaign", []) }
         switch core.mode {
         case .practice: return ("mode.practice", [])
         case .daily: return ("mode.daily", Self.dateValues(date))
         case .campaign: return ("level.select", [Double(core.levelNumber)])
+        case .replay(let level): return ("replay.start", [Double(level)])
         }
     }
 
@@ -349,6 +351,7 @@ final class AuroraLoomPresenter: ExperiencePresenter {
         case .campaign: break
         case .practice: text += "Practice. "
         case .daily: text += "Daily level. "
+        case .replay: text += "Replay. "
         }
         if let instruction = mirror.instruction { text += instruction + " " }
         for ribbon in 0..<3 {

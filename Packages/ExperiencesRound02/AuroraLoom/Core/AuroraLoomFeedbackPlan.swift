@@ -96,12 +96,13 @@ public struct AuroraLoomFeedbackPlan: Sendable, Equatable {
         return AuroraLoomFeedbackPlan(text: text, kind: .rejection, haptic: .error)
     }
 
-    /// The name of a mode in a level announcement: "Campaign", "Practice" or "Daily level".
+    /// The name of a mode in a level announcement: "Campaign", "Practice", "Daily level" or "Replay".
     public static func modeName(_ mode: AuroraLoomMode) -> String {
         switch mode {
         case .campaign: "Campaign"
         case .practice: "Practice"
         case .daily: "Daily level"
+        case .replay: "Replay"
         }
     }
 

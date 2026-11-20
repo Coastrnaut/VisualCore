@@ -46,8 +46,9 @@ progress keeps per level the best moves and stars; the kernel's records carry pr
   fresh play replays the trace (each move legal), and the result is kept only if the play ends won after exactly
   `bestMoves` moves and `stars` equals the stars rule for that count; otherwise it is dropped. The adapter exposes the
   number dropped (`reconciliation.dropped`) and the presenter announces it once. Results without a trace (from schema 2)
-  are kept, marked unverified. The frontier is restored as saved but never below one level after the highest kept
-  result. Impact: FR-R02G0107-003; SC-R02G0107-003.
+  are kept, marked unverified. The frontier is restored as saved (amended 2026-11-20 during implement: raising it to
+  one level after the highest kept result would open levels for an honest daily win, which never opens levels, and
+  change an honest save on restore). Impact: FR-R02G0107-003; SC-R02G0107-003.
 - Q: How do migrations work? → A: schema 3 adds the trace and `verified` to each result. 1 → 2 is the existing step;
   2 → 3 copies results with no trace and `verified: false`. A payload of schema 4 or newer is refused by the shared
   store (newer schema); a damaged payload is refused with `damaged` and the opening state is used. Impact:

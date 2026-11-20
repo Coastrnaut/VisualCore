@@ -42,6 +42,19 @@
 // number outside 1 … 100 or a trace the kernel refuses. Migration 1 → 2: a schema-1 `{"level", "records"}` gains campaign
 // mode, progress with the levels up to the saved one open and no tutorial key (restored as the level's first step).
 //
+// Persistence and replay (feature 307, R02-G01-07, T-R02G0107-003; FR-R02G0107-001 … 006; clarifications Q1–Q5): each
+// result also keeps its winning trace (the net moves of the winning play) and `verified`; a campaign or daily win records
+// it. Snapshot schema 3 (the same object; results carry `trace` and `verified`). Migration 2 → 3: results without a
+// trace, `verified` false. Restoring reconciles the progress (`AuroraLoomReconciliation`): a verified result whose trace
+// does not replay is dropped and counted in `reconciliationDropped` (not state: not digested, not in `==`). Replay:
+//   replay.start [1…100]           a fresh play of that certified level in mode `replay(level)` when a verified result
+//                                  with a trace is stored (`r02-g01.no-replay` otherwise); no tutorial;
+//   replay.step                    the next move of the trace (`r02-g01.replay-end` after the last;
+//                                  `r02-g01.no-replay` outside replay);
+//   replay.stop                    back to campaign at that level (the highest open level when it is closed);
+// during replay every other action except `tutorial.dismiss` is refused with `r02-g01.replay`; replay never records.
+// The digest domain is "r02-g01.aurora-loom.v3" (the mode text gains "replay-<level>").
+//
 // Quality: three host tiers, best first as the contract requires (`qualityProfile` level 0 is the best and no budget
 // may rise). Host tier `t` draws `AuroraLoomTier.of(t)`: level-0 = 5 layers, 128 segments, 2 glow passes;
 // level-1 = 3, 64, 1; level-2 = 1, 32, 0. Outcome: `won` or `failed` while the play is in that stage, otherwise nil.
@@ -54,6 +67,12 @@ import VisualCorePersistence
 public enum AuroraLoomExperienceRule {
     /// A value that must be a whole number (ribbon, control, step, level, date) and is not.
     public static let notWhole = "r02-g01.not-whole"
+    /// `replay.start` of a level without a verified trace, or `replay.step` / `replay.stop` outside replay (feature 307).
+    public static let noReplay = "r02-g01.no-replay"
+    /// `replay.step` after the trace's last move (feature 307).
+    public static let replayEnd = "r02-g01.replay-end"
+    /// Any other action during replay except `tutorial.dismiss` (feature 307).
+    public static let replay = "r02-g01.replay"
     /// `level.select` of a level that is not open yet (feature 305).
     public static let locked = "r02-g01.locked"
     /// `mode.daily` with a date that is not a calendar date (feature 305).
@@ -70,17 +89,18 @@ public enum AuroraLoomRestoreRefusal: Error, Equatable, Sendable {
     case kernel(AuroraLoomError)
 }
 
-/// The state of Aurora Loom as an experience (see the file header). Snapshot schema 2.
+/// The state of Aurora Loom as an experience (see the file header). Snapshot schema 3.
 public struct AuroraLoomExperienceCore: ExperienceCore, Equatable {
     /// The experience's id in the catalog.
     public static let experienceID = "r02-g01.aurora-loom"
     /// The snapshot schema this build writes.
-    public static let schemaVersion = 2
-    /// The digest's domain string (schema 2).
-    public static let digestDomain = "r02-g01.aurora-loom.v2"
+    public static let schemaVersion = 3
+    /// The digest's domain string (schema 3).
+    public static let digestDomain = "r02-g01.aurora-loom.v3"
     /// The action ids in declaration order.
     public static let actionIDs = ["ribbon.move", "play.undo", "play.redo", "level.next", "level.select", "mode.daily",
-                                   "mode.practice", "mode.campaign", "tutorial.dismiss"]
+                                   "mode.practice", "mode.campaign", "tutorial.dismiss", "replay.start", "replay.step",
+                                   "replay.stop"]
     /// The level numbers of the catalog.
     public static let levelNumbers: ClosedRange<Int> = 1...100
     /// The move allowance of practice mode: the kernel's maximum (feature 305, research R4).
@@ -109,6 +129,9 @@ public struct AuroraLoomExperienceCore: ExperienceCore, Equatable {
     /// The host quality tier (0 = level-0, the best, … 2, clamped); presentation only — not in the digest, the
     /// snapshot or `==`.
     public private(set) var qualityTier = 0
+    /// The number of verified results the last restore dropped because their traces did not replay (feature 307);
+    /// 0 for a prepared state. Not state: not in the digest, the snapshot or `==`.
+    public private(set) var reconciliationDropped = 0
 
     /// The seed's opening state, kept for `reset()`.
     private struct Opening: Equatable, Sendable {
@@ -249,10 +272,11 @@ public struct AuroraLoomExperienceCore: ExperienceCore, Equatable {
 
     // MARK: Contract
 
-    /// Schema 2 with the step 1 → 2 (``migratedToSchemaTwo(_:)``); a payload that does not decode is refused by its
-    /// step.
+    /// Schema 3 with the steps 1 → 2 (``migratedToSchemaTwo(_:)``) and 2 → 3 (``migratedToSchemaThree(_:)``); a
+    /// payload that does not decode is refused by its step.
     public static var migrations: MigrationChain {
-        MigrationChain(currentVersion: schemaVersion, steps: [1: { payload in try migratedToSchemaTwo(payload) }])
+        MigrationChain(currentVersion: schemaVersion, steps: [1: { payload in try migratedToSchemaTwo(payload) },
+                                                             2: { payload in try migratedToSchemaThree(payload) }])
     }
 
     /// The declared controls, built once.
@@ -266,9 +290,12 @@ public struct AuroraLoomExperienceCore: ExperienceCore, Equatable {
         ExperienceControl(id: "mode.practice"),
         ExperienceControl(id: "mode.campaign"),
         ExperienceControl(id: "tutorial.dismiss"),
+        ExperienceControl(id: "replay.start", ranges: [1...100]),
+        ExperienceControl(id: "replay.step"),
+        ExperienceControl(id: "replay.stop"),
     ]
 
-    /// The nine controls with their declared ranges (see the file header).
+    /// The twelve controls with their declared ranges (see the file header).
     public static var controls: [ExperienceControl] { declaredControls }
 
     /// The opening state of level `seed % 100 + 1`, in stage `playing`; no clock is read.
@@ -298,8 +325,31 @@ public struct AuroraLoomExperienceCore: ExperienceCore, Equatable {
             guard let whole = Self.whole(value) else { return .rejected(.rule(code: AuroraLoomExperienceRule.notWhole)) }
             wholeValues.append(whole)
         }
+        if case .replay = mode, !Self.replayControls.contains(action.control) {
+            return .rejected(.rule(code: AuroraLoomExperienceRule.replay))
+        }
         do throws(AuroraLoomError) {
             switch action.control {
+            case "replay.start":
+                guard let result = progress.solved[wholeValues[0]], result.verified, !result.trace.isEmpty else {
+                    return .rejected(.rule(code: AuroraLoomExperienceRule.noReplay))
+                }
+                try open(number: wholeValues[0], mode: .replay(level: wholeValues[0]))
+                tutorial = .done
+            case "replay.step":
+                guard case .replay(let level) = mode, let result = progress.solved[level], result.verified else {
+                    return .rejected(.rule(code: AuroraLoomExperienceRule.noReplay))
+                }
+                let index = play.records.count
+                guard play.stage == .playing, index < result.trace.count else {
+                    return .rejected(.rule(code: AuroraLoomExperienceRule.replayEnd))
+                }
+                try play.apply(result.trace[index], expecting: play.fingerprint)
+            case "replay.stop":
+                guard case .replay(let level) = mode else {
+                    return .rejected(.rule(code: AuroraLoomExperienceRule.noReplay))
+                }
+                try open(number: progress.isOpen(level) ? level : progress.frontier, mode: .campaign)
             case "ribbon.move":
                 let move = AuroraLoomMove(ribbon: wholeValues[0], control: wholeValues[1] == 0 ? .wave : .phase,
                                           step: wholeValues[2])
@@ -345,6 +395,14 @@ public struct AuroraLoomExperienceCore: ExperienceCore, Equatable {
         return .accepted
     }
 
+    /// The controls accepted during replay.
+    static let replayControls: Set<String> = ["replay.start", "replay.step", "replay.stop", "tutorial.dismiss"]
+
+    /// The winning trace of the current play: the net moves on its undo stack, in order (one per move spent).
+    var winningTrace: [AuroraLoomMove] {
+        play.undoStack.map { change in AuroraLoomMove(ribbon: change.ribbon, control: change.control, step: change.to) }
+    }
+
     /// A fresh play of manifest number `number` in `mode` (the practice copy in practice mode), with the level's first
     /// tutorial step; changes nothing when the kernel refuses.
     private mutating func open(number: Int, mode: AuroraLoomMode) throws(AuroraLoomError) {
@@ -368,12 +426,12 @@ public struct AuroraLoomExperienceCore: ExperienceCore, Equatable {
         guard play.stage == .won else { return }
         switch mode {
         case .campaign:
-            progress.record(level: levelNumber, moves: play.spent, shortest: certifiedShortest)
+            progress.record(level: levelNumber, moves: play.spent, shortest: certifiedShortest, trace: winningTrace)
         case .daily:
             let frontier = progress.frontier
-            progress.record(level: levelNumber, moves: play.spent, shortest: certifiedShortest)
+            progress.record(level: levelNumber, moves: play.spent, shortest: certifiedShortest, trace: winningTrace)
             progress.frontier = frontier
-        case .practice:
+        case .practice, .replay:
             break
         }
     }
@@ -403,16 +461,17 @@ public struct AuroraLoomExperienceCore: ExperienceCore, Equatable {
         }
     }
 
-    /// The digest form of a mode: "campaign", "practice" or "daily-<level>".
+    /// The digest form of a mode: "campaign", "practice", "daily-<level>" or "replay-<level>".
     static func digestText(_ mode: AuroraLoomMode) -> String {
         switch mode {
         case .campaign: "campaign"
         case .practice: "practice"
         case .daily(let level): "daily-\(level)"
+        case .replay(let level): "replay-\(level)"
         }
     }
 
-    /// "r02-g01.aurora-loom.v2", then the level number, the play's fingerprint, the mode, the frontier and each solved
+    /// "r02-g01.aurora-loom.v3", then the level number, the play's fingerprint, the mode, the frontier and each solved
     /// level in order with its best moves and stars (not the tutorial step; see the file header).
     public func writeDigest(into builder: inout DigestBuilder) throws(DigestError) {
         builder.add(Self.digestDomain)
@@ -434,7 +493,8 @@ public struct AuroraLoomExperienceCore: ExperienceCore, Equatable {
 
     // MARK: Snapshot
 
-    /// The schema-2 payload's JSON form; a missing tutorial is the level's first step.
+    /// The schema-3 payload's JSON form (schema 2's with traced results); a missing tutorial is the level's first
+    /// step.
     private struct Payload: Codable {
         var level: Int
         var records: [AuroraLoomRecord]
@@ -466,6 +526,27 @@ public struct AuroraLoomExperienceCore: ExperienceCore, Equatable {
         return migrated
     }
 
+    /// The schema-3 object of a schema-2 object: every solved result gains an empty `trace` and `verified` false (a
+    /// result that already has them keeps them).
+    ///
+    /// - Throws: ``AuroraLoomRestoreRefusal/damaged`` when `object` has no progress object with a solved array.
+    public static func migratedToSchemaThree(_ object: [String: Any]) throws -> [String: Any] {
+        guard var progress = object["progress"] as? [String: Any],
+              let solved = progress["solved"] as? [[String: Any]] else {
+            throw AuroraLoomRestoreRefusal.damaged
+        }
+        var entries: [[String: Any]] = []
+        for var entry in solved {
+            if entry["trace"] == nil { entry["trace"] = [Any]() }
+            if entry["verified"] == nil { entry["verified"] = false }
+            entries.append(entry)
+        }
+        progress["solved"] = entries
+        var migrated = object
+        migrated["progress"] = progress
+        return migrated
+    }
+
     /// The JSON object `{"level", "mode", "progress", "records", "tutorial"}` with sorted keys and unescaped slashes.
     public func snapshotPayload() throws -> Data {
         try Self.payloadEncoder().encode(Payload(level: levelNumber, records: play.records, progress: progress,
@@ -473,7 +554,8 @@ public struct AuroraLoomExperienceCore: ExperienceCore, Equatable {
     }
 
     /// The core of `payload`: the records replayed on a fresh play of the saved level (its practice copy in practice
-    /// mode) with the saved progress, mode and tutorial step; a reset returns to the opening state `seed` chooses.
+    /// mode) with the saved progress reconciled (``AuroraLoomReconciliation``; the dropped count in
+    /// ``reconciliationDropped``), mode and tutorial step; a reset returns to the opening state `seed` chooses.
     ///
     /// - Throws: ``AuroraLoomRestoreRefusal`` for a damaged payload, a level number outside 1 … 100 or a level or
     ///   trace the kernel refuses.
@@ -495,9 +577,12 @@ public struct AuroraLoomExperienceCore: ExperienceCore, Equatable {
                 tutorial = firstTutorialStep(number: decoded.level, play: try freshPlay(of: level))
             }
             let start = try opening(number: levelNumber(forSeed: seed))
-            return AuroraLoomExperienceCore(levelNumber: decoded.level, play: play, progress: decoded.progress,
-                                            mode: decoded.mode, tutorial: tutorial,
-                                            certifiedShortest: certified.solution.shortest, opening: start.opening)
+            let reconciled = AuroraLoomReconciliation.reconcile(decoded.progress)
+            var core = AuroraLoomExperienceCore(levelNumber: decoded.level, play: play, progress: reconciled.progress,
+                                                mode: decoded.mode, tutorial: tutorial,
+                                                certifiedShortest: certified.solution.shortest, opening: start.opening)
+            core.reconciliationDropped = reconciled.dropped
+            return core
         } catch {
             throw AuroraLoomRestoreRefusal.kernel(error)
         }
