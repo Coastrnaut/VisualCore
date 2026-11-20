@@ -8,7 +8,7 @@ campaign). Fixture seed 2_017; grids ≤ 64 × 64 so tests stay light.
 
 ## Phase 1: Setup
 
-- [ ] T-R02F17-001 Baselines: `--name baseline-host -- swift test --package-path Packages/VisualCore`; the rendering
+- [X] T-R02F17-001 Baselines: `--name baseline-host -- swift test --package-path Packages/VisualCore`; the rendering — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F17.baseline-host.json and R02-F17.baseline-timing.json (exit 0; mesh bound 2.87 s in the isolated run); rendering baseline = R02-F16.rendering-27.json and rendering-26.json (exit 0)
   baseline is R02-F16's rendering runs (exit 0); timing values in the isolated `VC_TIMING_ASSERTS=1` run
 
 ## Phase 2: Foundational
