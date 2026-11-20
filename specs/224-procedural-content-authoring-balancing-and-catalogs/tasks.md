@@ -23,7 +23,7 @@ tasks; one {device} task. Fixture seed 2_024; tests stay short.
 ## Phase 3: Stories 1 and 2 — catalogs and progression (P1) 🎯
 
 - [ ] T-R02F24-003 [P] [US1] [US2] Create `Packages/VisualCore/Sources/VisualCoreSimulation/PuzzleCatalog.swift` (PuzzleCatalogEntry, PuzzleCatalog "digest =
-  SHA-256 hex of '<id>\\n' + identities each followed by '\\n'; schema 1", PuzzleCatalogBuilder per clarifications Q1, Q2)
+  SHA-256 hex of '<id>\n' + identities each followed by '\n'; schema 1", PuzzleCatalogBuilder per clarifications Q1, Q2)
   with `Packages/VisualCore/Tests/VisualCoreSimulationTests/PuzzleCatalogTests.swift` (a 3-stage, 30-level lights-out plan builds twice identically with a pinned
   digest; every level certifies; stages ordered by difficulty; progression holds; unfillable plans fail with stage and
   calls; a progression breach fails with its position; round trip byte for byte; newer, damaged and edited forms refused);
