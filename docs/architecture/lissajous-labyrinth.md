@@ -41,10 +41,40 @@ schema, the level fingerprint, the four dials, the actions spent and the stage.
 every rule. `LissajousLabyrinthRules` expresses the rules as an R02-F23 `PuzzleRules` over the four dials (at most
 9 × 9 × 16 × 16 states), so R02-G02-02 can generate and certify the catalog.
 
+## Content: generator, solver and witnesses (R02-G02-02)
+
+- **Manifest.** `LissajousLabyrinthManifest` holds the 100 planned levels of the archived design (number, seed, band,
+  move budget 8 … 19), 20 per band.
+- **Solver.** `LissajousLabyrinthSolver` decides all 14,080 legal settings (55 coprime frequency pairs × 256 phase
+  pairs). x depends on (a, φ), y on b, z on ψ, so per checkpoint and obstacle it builds bit sets of the 4,096 ticks per
+  axis value (the phases are bit rotations of phase 0). Sound prefilters drop settings that cannot visit the checkpoints
+  in order or that start a segment inside an obstacle's inner cube; every other setting gets an exact fast decision that
+  equals the kernel's `verdict == .won`: contact is tested with `segmentTouches` only on ticks whose segment's axis box
+  meets the obstacle's box, and checkpoints are scanned in order over their box-hit ticks with `contains`. The tests
+  check the decision against the kernel's verdict. The shortest solution is a breadth-first search over legal states
+  (single-dial changes keeping the frequencies coprime) to the nearest winning setting, ties by (a, b, φ, ψ); work is the
+  number of exact decisions.
+- **Generator.** Candidate k of an entry draws from `SeededRandom(seed: SeedDerivation.derive(seed, index: k))`:
+  amplitudes 2 … 4, frequency c, a target winning setting, checkpoints on its path at spread ticks, obstacles on other
+  settings' paths that the target lap clears, and a start with up to the band's shortest number of dials changed. Bands
+  1 … 5: 2/3/4/5/6 checkpoints of radius 512/448/384/320/256, 2/3/4/6/8 obstacles of radius 256 … 512, shortest 1–2, 2,
+  2–3, 3, 3–4 actions. At most 64 candidates (`r02-g02.generation` otherwise); the allowance is the budget.
+- **Difficulty.** Shortest, winning settings, clearance (smallest squared distance minus squared radius between the
+  witness path's samples and any obstacle) and work. Band means: shortest 1.25, 2, 2.95, 3, 4; winning settings 785, 55,
+  3.5, 1.5, 1. The catalog keeps the shared progression rule; its digest is pinned in `LissajousLabyrinthCatalogTests`.
+- **Witnesses.** `docs/games/lissajous-labyrinth/levels/NNN.witness.json` (schema 1, sorted keys): the level, the
+  actions, play fingerprints, the terminal visit ticks and clearance, the near miss (the smallest single legal dial change
+  that loses, with its verdict) and the non-coprime counterexample refused by the rules. Decoding re-verifies everything
+  and refuses newer, damaged or edited files (`r02-g02.witness`). Regenerate after an intended rule change:
+
+```bash
+LISSAJOUS_LABYRINTH_WRITE_WITNESSES=1 swift test --package-path Packages/ExperiencesRound02 --filter LissajousLabyrinthCatalogTests
+```
+
 ## Failures
 
 `LissajousLabyrinthError` reason codes: `r02-g02.level`, `r02-g02.move`, `r02-g02.stage`, `r02-g02.stale`,
-`r02-g02.allowance`, `r02-g02.newer-schema`, `r02-g02.malformed`.
+`r02-g02.allowance`, `r02-g02.newer-schema`, `r02-g02.malformed`, `r02-g02.generation`, `r02-g02.witness`.
 
 ## Sources
 

@@ -57,3 +57,13 @@ level picker and the three modes.
 `LissajousLabyrinthEvent`, `LissajousLabyrinthAction` and append-only `LissajousLabyrinthRecord`s, and
 `LissajousLabyrinthRules` for the R02-F23 puzzle contract. Refusals are `LissajousLabyrinthError` with `r02-g02.*` codes.
 Rules: [docs/architecture/lissajous-labyrinth.md](../../docs/architecture/lissajous-labyrinth.md).
+
+Feature 312 (R02-G02-02) adds the content pipeline: `LissajousLabyrinthManifest` (the 100 planned levels),
+`LissajousLabyrinthSolver` (every legal setting decided exactly, shortest path by breadth-first search),
+`LissajousLabyrinthDifficulty`, `LissajousLabyrinthGenerator` (`LissajousLabyrinthBandProfile`, the pinned catalog
+digest) and `LissajousLabyrinthWitness`, whose 100 files live in
+[docs/games/lissajous-labyrinth/levels/](../../docs/games/lissajous-labyrinth/levels/). After an intended rule change:
+
+```bash
+LISSAJOUS_LABYRINTH_WRITE_WITNESSES=1 swift test --package-path Packages/ExperiencesRound02 --filter LissajousLabyrinthCatalogTests
+```
