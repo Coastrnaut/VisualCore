@@ -169,13 +169,15 @@
    "note": "As built (feature 217): Heightfield (terrain, water, sediment and dye as Int64 quanta, virtual-pipe flow in bounded sub-steps, proportional dye and sediment carriage, optional erosion, exact HeightfieldLedger, Codable schema 1) in VisualCoreSimulation beside the unchanged FieldGrid; fieldGrid() and dyeField() hand heights to the existing field passes, which are unchanged."
   },
   "F18": {
-   "disposition": "new",
+   "disposition": "extend",
    "existing": [
+    "HeightField",
+    "GradientNoise2D",
     "Mesh",
     "MeshRenderer"
    ],
-   "home": "(new) VisualCoreGeometry, VisualCoreRendering",
-   "note": "Procedural terrain meshes and a sky dome."
+   "home": "VisualCoreScenes, VisualCoreRendering",
+   "note": "As built (feature 218): TerrainSettings, TerrainLOD (levels by distance, one-level neighbours, budget, crack-free edges on the unchanged HeightField) and ErosionMask (steepness, D8 flow, wear) in VisualCoreScenes; SkyParameters and SkyModel (CPU reference) with vc/sky.glsl and SkyRenderer (far-plane full-screen pass) in VisualCoreRendering; no image, no new module."
   },
   "F19": {
    "disposition": "new",

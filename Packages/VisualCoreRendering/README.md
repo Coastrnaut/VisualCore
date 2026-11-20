@@ -412,6 +412,14 @@ output size (half-float where supported), with exposure and tone mapping in line
 flash limiter measure linear light for graphs that contain it. Rules:
 [docs/architecture/shaders.md](../../docs/architecture/shaders.md).
 
+## Procedural sky (feature 218, R02-F18)
+
+`vc/sky.glsl` (`vc_sky(d, s, zenith, horizon, ground, dusk, night, sunColour, sunShape)`) computes the analytic sky colour
+of a view direction under a sun, the same expression as `SkyModel.colour` in VisualCoreScenes (within 2 of 255 on the
+simulators). `SkyRenderer(registry:)` draws it behind a scene with one far-plane triangle (`draw(inverseViewProjection:sun:parameters:)`,
+depth test LEQUAL, no depth write), restores the state it changes and frees its program in `release()`. No image is used.
+Rules: [docs/architecture/terrain-and-sky.md](../../docs/architecture/terrain-and-sky.md).
+
 ## Planar shadows (feature 213, R02-F13)
 
 `PlanarShadowRenderer` draws a mesh's shadow on a plane with the projection of `ShadowProjector.matrix(light:onto:)`:

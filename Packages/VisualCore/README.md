@@ -359,6 +359,16 @@ composite, premultiplied over); `composite` mode 2 is premultiplied over; the va
 and out-of-range emissive ones. `RenderState.premultipliedBlended` draws premultiplied layers. Rules:
 [docs/architecture/shaders.md](../../docs/architecture/shaders.md).
 
+## Terrain levels of detail, masks and sky (feature 218, R02-F18)
+
+VisualCoreScenes splits a large terrain into pieces: `TerrainSettings` (P × P pieces of C × C cells, L levels, a
+distance per level, a vertex budget; `Codable` schema 1) and `TerrainLOD.select` (levels by distance, neighbours within
+one level, farthest pieces coarsened first to fit the budget) choose `TerrainPiece`s, and `TerrainLOD.mesh(for:height:)`
+samples each through `HeightField` with crack-free edges towards coarser neighbours. `ErosionMask.masks(of:)` gives
+steepness, D8 flow and wear as a `FieldGrid`. `SkyParameters` and `SkyModel.colour` are the CPU reference of the analytic
+sky drawn by `vc/sky.glsl` and `SkyRenderer` in VisualCoreRendering. Refusals are `TerrainError` and `SkyError` with
+`r2-f18.*` codes. Rules: [docs/architecture/terrain-and-sky.md](../../docs/architecture/terrain-and-sky.md).
+
 ## Heightfield transport (feature 217, R02-F17)
 
 VisualCoreSimulation moves water, dye and rock over terrain without gaining or losing a quantum: `Heightfield` keeps

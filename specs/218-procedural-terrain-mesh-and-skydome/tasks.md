@@ -49,7 +49,7 @@ Covered by T-R02F18-002 (both settings types round-trip; newer and damaged refus
 ## Phase 7: Regression, documentation and close
 
 - [X] T-R02F18-006 No Stage One breakage: `--name rendering-26` and `--name experiences` — Verified 2026-11-20: 2026-11-20 R02-F18.rendering-26.json and experiences.json (exit 0 each, TEST SUCCEEDED; the sky shader and renderer tests also pass on iOS 26.5)
-- [ ] T-R02F18-007 API baseline and docs: `check_public_api.py --update`, `--name public-api`, `--name documented-api
+- [X] T-R02F18-007 API baseline and docs: `check_public_api.py --update`, `--name public-api`, `--name documented-api — Verified 2026-11-20: 2026-11-20 R02-F18.public-api.json and R02-F18.documented-api.json (exit 0; 3760 baseline lines incl. SkyRenderer, 0 undocumented); docs/architecture/terrain-and-sky.md; sections in both package READMEs; section 13.4 row rendered; validate_autocreator PASS
   -- python3 scripts/check_documented_api.py --sources Apps/VisualCore`; new `docs/architecture/terrain-and-sky.md`;
   sections in `Packages/VisualCore/README.md` and `Packages/VisualCoreRendering/README.md`; section 13.4 row R02-F18
   "As built" in `docs/catalog/shared-feature-map.json` and `render_autocreator.py`
