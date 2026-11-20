@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "PuzzleCatalogCheckerTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter PuzzleCatalogCheckerTests",
+  "elapsed_seconds": 4.712,
+  "exit_code": 0,
+  "finished": "2026-11-20T15:56:38+00:00",
+  "gate": "R02-F24",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-F24.host-3.log",
+  "log_sha256": "2518d21f191f80e954435b765bbf8af4751802bef8153679fe74eecbc9560a43",
+  "name": "host-3",
+  "started": "2026-11-20T15:56:33+00:00",
+  "timed_out": false
+}

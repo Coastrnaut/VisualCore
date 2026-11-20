@@ -31,7 +31,7 @@ tasks; one {device} task. Fixture seed 2_024; tests stay short.
 
 ## Phase 4: Story 4 — deterministic checks (P2)
 
-- [ ] T-R02F24-004 [P] [US4] Create `Packages/VisualCore/Sources/VisualCoreSimulation/PuzzleCatalogChecker.swift` (PuzzleCatalogIssue, PuzzleCatalogReport,
+- [X] T-R02F24-004 [P] [US4] Create `Packages/VisualCore/Sources/VisualCoreSimulation/PuzzleCatalogChecker.swift` (PuzzleCatalogIssue, PuzzleCatalogReport, — Verified 2026-11-20: 2026-11-20 host-3 exit 0: PuzzleCatalogCheckerTests 4/4 (50 sound catalogs pass; 100 planted faults give exactly their issue; every breach listed; issue order) (.autonomy/migration/checks/R02-F24.host-3.json)
   PuzzleCatalogChecker per clarification Q3) with `Packages/VisualCore/Tests/VisualCoreSimulationTests/PuzzleCatalogCheckerTests.swift` (100 seeded catalogs with one
   planted fault each — uncertified level, duplicate, difficulty mismatch, drop, jump, digest mismatch — report exactly
   that issue and position; sound catalogs pass; reports repeat); `--name host-3`
