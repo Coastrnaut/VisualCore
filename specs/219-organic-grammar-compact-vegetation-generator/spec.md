@@ -166,8 +166,8 @@ refused.
 
 ### Measurable Outcomes
 
-- **SC-R02F19-001**: Three hand-derived grammars give their exact words and branch counts; 100 seeded grammars grow
-  identically twice and differ for different seeds in at least 95 of 100 cases.
+- **SC-R02F19-001**: Three hand-derived grammars give their exact words and branch counts; 100 seeded grammars with weighted
+  rules grow identically twice and differ for different seeds in at least 95 of 100 cases.
 - **SC-R02F19-002**: Every petal, cap and stem over 200 seeded parameter sets validates, stays within budget and has its
   stated length, radius or height within 1e-9.
 - **SC-R02F19-003**: Plant meshes from 50 seeded grammars validate, stay within budget, and have each part at its marker
