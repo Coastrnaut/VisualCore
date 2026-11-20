@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "NutrientCodingTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter NutrientCodingTests",
+  "elapsed_seconds": 2.358,
+  "exit_code": 0,
+  "finished": "2026-11-20T06:19:24+00:00",
+  "gate": "R02-F21",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-F21.host-4.log",
+  "log_sha256": "963b85943fff99615e6cc1b39f687b71b30a39d8532a841a093998245f187117",
+  "name": "host-4",
+  "started": "2026-11-20T06:19:22+00:00",
+  "timed_out": false
+}

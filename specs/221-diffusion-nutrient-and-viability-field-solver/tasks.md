@@ -42,7 +42,7 @@ its check record (no trailers). No {owner} tasks; one {device} task. Fixture see
 
 ## Phase 5: Story 5 — stored form (P2)
 
-- [ ] T-R02F21-005 [P] [US5] Create `Packages/VisualCore/Sources/VisualCoreSimulation/NutrientField+Coding.swift` (Codable JSON schema 1, sorted keys,
+- [X] T-R02F21-005 [P] [US5] Create `Packages/VisualCore/Sources/VisualCoreSimulation/NutrientField+Coding.swift` (Codable JSON schema 1, sorted keys, — Verified 2026-11-20: 2026-11-20 host-4 exit 0: NutrientCodingTests 9/9 (round trip byte for byte, 200 frames continued identically with growth; newer schema; damaged, rule-breaking and unbalanced forms refused) (.autonomy/migration/checks/R02-F21.host-4.json)
   `encoded()`, `decode(_:)` re-validating every rule and the ledger) with `Packages/VisualCore/Tests/VisualCoreSimulationTests/NutrientCodingTests.swift` (round
   trip byte for byte and bit-identical continuation for 200 frames with sources, decay and growth; newer schema;
   damaged, rule-breaking and unbalanced forms refused); `--name host-4`
