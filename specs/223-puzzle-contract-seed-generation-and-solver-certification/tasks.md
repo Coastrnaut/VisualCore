@@ -28,7 +28,7 @@ tasks; one {device} task. Fixture seed 2_023; tests stay short.
 
 ## Phase 4: Stories 2 and 4 — certification and fairness (P1, P2)
 
-- [ ] T-R02F23-004 [P] [US2] [US4] Create `Packages/VisualCore/Sources/VisualCoreSimulation/PuzzleValidator.swift` (certify per clarification Q3) with
+- [X] T-R02F23-004 [P] [US2] [US4] Create `Packages/VisualCore/Sources/VisualCoreSimulation/PuzzleValidator.swift` (certify per clarification Q3) with — Verified 2026-11-20: 2026-11-20 host-3 exit 0: PuzzleValidatorTests 5/5 (200 planted faults give exactly their verdict, all 8 kinds; 50 sound levels pass; repeat certificates equal; already-solved start) (.autonomy/migration/checks/R02-F23.host-3.json)
   `Packages/VisualCore/Tests/VisualCoreSimulationTests/PuzzleValidatorTests.swift` (200 seeded levels with one planted fault each — wrong rules, illegal move, short
   solution, second solution for goal and solution promises, too long, too short, too branching, budget exceeded — fail
   with exactly the planted verdict; sound levels pass; certificates repeat; an already-solved start); `--name host-3`
