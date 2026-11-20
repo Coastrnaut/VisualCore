@@ -13,7 +13,7 @@ tasks; one {device} task. Fixture seed 2_023; tests stay short.
 
 ## Phase 2: Foundational
 
-- [ ] T-R02F23-002 Create `Packages/VisualCore/Sources/VisualCoreSimulation/PuzzleError.swift` and `Packages/VisualCore/Sources/VisualCoreSimulation/PuzzleRules.swift` (PuzzleRules "rulesID lowercase slug ≤ 64;
+- [X] T-R02F23-002 Create `Packages/VisualCore/Sources/VisualCoreSimulation/PuzzleError.swift` and `Packages/VisualCore/Sources/VisualCoreSimulation/PuzzleRules.swift` (PuzzleRules "rulesID lowercase slug ≤ 64; — Verified 2026-11-20: 2026-11-20 host exit 0: PuzzleRulesTests 3/3 (budget refusals and codes; verdict names; slug rule; fixture rules pure over all 512 lights-out states) (.autonomy/migration/checks/R02-F23.host.json)
   pure", PuzzleUniqueness, FairnessBudget "0 ≤ min ≤ max ≤ 4,096; branching 1 … 1,024; nodes 1 … 1,000,000",
   PuzzleVerdict with names, PuzzleCertificate) with `Packages/VisualCore/Tests/VisualCoreSimulationTests/PuzzleFixtures.swift` (3 × 3 lights-out and a sliding-row test
   puzzle, both with at most 512 states) and `Packages/VisualCore/Tests/VisualCoreSimulationTests/PuzzleRulesTests.swift` (budget refusals and codes; verdict names;
