@@ -23,7 +23,7 @@ ImplementationLock-100 and are not tasks here. No {owner} tasks.
 
 ## Phase 3: Story 2 — comfort settings (P1)
 
-- [ ] T-R02G0106-004 [P] [US2] Create `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomLights.swift` ("12 crossing levels 0…1, win glow 0…1; 0.15 s,
+- [X] T-R02G0106-004 [P] [US2] Create `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomLights.swift` ("12 crossing levels 0…1, win glow 0…1; 0.15 s, — Verified 2026-11-20: 2026-11-20 host-3 exit 0 (lights, 6 tests: ≤ 3 crossings/s and ≥ 0.4 s fades under Reduce Flashing incl. adversarial flicker)
   0.45 s under Reduce Flashing"; `maxHalfRangeCrossingsPerSecond`) with `Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomLightsTests.swift`
   (a scripted win sampled at 60 Hz stays ≤ 3 half-range crossings per second under Reduce Flashing; every half-range
   change takes ≥ 0.4 s; targets reached); `--name host-3`
