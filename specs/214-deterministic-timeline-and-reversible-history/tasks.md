@@ -50,7 +50,7 @@ document is `TimelineRunDocument`). Fixture seed 2_014; tests stay light.
   -- python3 scripts/check_documented_api.py --sources Apps/VisualCore`; new `docs/architecture/reversible-timeline.md`;
   section in `Packages/VisualCore/README.md`; section 13.4 row R02-F14 "As built" in
   `docs/catalog/shared-feature-map.json` and `render_autocreator.py`; `docs/architecture/determinism.md` note
-- [ ] T-R02F14-007 Reference regression chunk 1 (`--name reference-1`)
+- [X] T-R02F14-007 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F14.reference-1.json (exit 0)
 - [ ] T-R02F14-008 Reference regression chunk 2 (`--name reference-2`)
 - [ ] T-R02F14-009 Script tests (`--name script-tests`)
 - [ ] T-R02F14-010 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
