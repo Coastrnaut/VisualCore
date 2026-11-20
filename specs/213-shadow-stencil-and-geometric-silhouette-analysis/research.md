@@ -23,3 +23,9 @@
   error at every refinement: over 10 seeded polygons the mean error went 0.00412 → 0.00258 (ratio 0.63) by edge luck;
   over 100 seeded polygons it went 0.003877 → 0.001116 (ratio 0.29), and the worst single error at 256² was 0.26% (limit
   1%). SC-R02F13-002 states the halving for the mean over 100 polygons. The subscript is `mask[x, y]` (no labels).
+- **R8 Renderer as built (implementation, 2026-11-19).** The planar projection matrix is divided by its scale P · l
+  (trace / 3) before drawing: for a directional light P · l = n · d < 0, so the unscaled matrix gives a negative w and
+  the shadow is clipped away; the projected point is unchanged. The renderer exposes `public let mesh` like
+  `MeshRenderer`. A coverage target that cannot be made (tested with a 0 × 0 viewport) throws, draws nothing and leaves
+  the previous framebuffer bound. Measured on iOS 27.2: 3,708 compared pixels, 195 covered, 0 mismatches against the
+  CPU coverage; 440 overlapping-shadow pixels all at the single-shadow value (0/255).

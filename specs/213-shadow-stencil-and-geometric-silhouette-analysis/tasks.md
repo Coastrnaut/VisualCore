@@ -38,7 +38,7 @@ Tests stay light (≤ 512 × 512 masks) so the timed R02-F05 budget test beside 
 
 ## Phase 4: Story 3 — drawing (P2)
 
-- [ ] T-R02F13-004 [US3] Create `Packages/VisualCoreRendering/Sources/VisualCoreRendering/PlanarShadowRenderer.swift` (contracts/api.md; coverage
+- [X] T-R02F13-004 [US3] Create `Packages/VisualCoreRendering/Sources/VisualCoreRendering/PlanarShadowRenderer.swift` (contracts/api.md; coverage — Verified 2026-11-19: lead retest 2026-11-19: R02-F13.rendering-27.json and rendering-26.json (exit 0, 233 tests each) incl. PlanarShadowRendererTests 5 passed (0 mismatches vs CPU coverage, single darkening 0/255, parallel light and failed target draw nothing, zero leaks, context rebuild identical); research R8
   pass into a pooled target with `ShadowProjector.matrix`, no blending, then one full-screen composite with darkness
   and premultiplied blending; GL state restored; rebuild after context loss; target creation failure throws and draws
   nothing) with `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/PlanarShadowRendererTests.swift` (a cube and a self-overlapping
