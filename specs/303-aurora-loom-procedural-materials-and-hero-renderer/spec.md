@@ -121,7 +121,9 @@ shown to players as available, and passes the experience package and registry ch
 
 - **A shader that fails to compile or link:** the scene shows the documented fallback (the tier-0 layer), the failure is
   logged with its name, and the logical state is unchanged.
-- **Zero-size or very small views, rotation and resize:** rendering adapts without errors; the scene keeps its framing.
+- **Zero-size or very small views, rotation and resize:** a zero-size view draws nothing and reports no error; for every
+  aspect ratio from 0.4 (tall iPhone) to 2.5 (wide iPad) the camera fits the whole loom (ribbons and gate rings) inside
+  the view with a margin of at least 5 % on each side.
 - **Extreme controls** (all ribbons at step 0 or 15) and the largest Ω: geometry and uniforms stay finite and bounded.
 - **Memory warning:** caches are released and rebuilt on the next frame.
 - **Reduce Motion:** the animated shimmer and wave travel are slowed to a still or near-still image; Reduce Flashing keeps
