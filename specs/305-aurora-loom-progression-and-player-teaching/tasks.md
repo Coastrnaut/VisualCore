@@ -23,7 +23,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks.
 
 ## Phase 3: Stories 1 and 4 — tutorial, progress, daily, practice (P1, P2)
 
-- [ ] T-R02G0105-003 [P] [US1] [US4] Create `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomProgress.swift` (AuroraLoomTutorialStep "wave(r) → phase(r) →
+- [X] T-R02G0105-003 [P] [US1] [US4] Create `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomProgress.swift` (AuroraLoomTutorialStep "wave(r) → phase(r) → — Verified 2026-11-20: 2026-11-20 R02-G01-05.host-2 exit 0 (progress 11 tests)
   harmony → done"; AuroraLoomMode "campaign, practice, daily(level)"; AuroraLoomProgress "level 1 open; win in campaign opens
   the next; stars 3 at shortest, 2 within shortest + 2, else 1"; dailyLevel "(days from 2026-01-01 × 37) mod 100 + 1")
   with `Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomProgressTests.swift` (tutorial scripts on levels 1 … 3 win following each instruction; scripted

@@ -8,7 +8,8 @@ public enum AuroraLoomHints { public static func hint(level: Int, play: AuroraLo
 public struct AuroraLoomFailureExplanation: Sendable, Equatable { public let mismatch: AuroraLoomMismatch; public let tolerance: Int; public var text: String
     public init?(play: AuroraLoomPlay) }
 public enum AuroraLoomTutorialStep: Sendable, Equatable, Codable { case wave(ribbon: Int), phase(ribbon: Int), harmony, done
-    public var text: String; public func advanced(by record: AuroraLoomRecord, play: AuroraLoomPlay) -> AuroraLoomTutorialStep }
+    public var text: String; public static func first(ribbon: Int) -> Self
+    public func advanced(by record: AuroraLoomRecord, stage: AuroraLoomStage, hintRibbon: Int) -> Self }
 public enum AuroraLoomMode: Sendable, Equatable, Codable { case campaign, practice, daily(level: Int) }
 public struct AuroraLoomProgress: Sendable, Equatable, Codable {
     public struct Result: Sendable, Equatable, Codable { public let bestMoves: Int; public let stars: Int }
