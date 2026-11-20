@@ -51,7 +51,7 @@ through a fileprivate SplitMix generator; tests stay short.
 
 ## Phase 7: Regression, documentation and close
 
-- [ ] T-R02F22-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences` and
+- [X] T-R02F22-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences` and — Verified 2026-11-20: 2026-11-20 rendering-27, rendering-26, experiences (sim-27.2, Effects Composer) and host-full exit 0
   `--name host-full`
 - [X] T-R02F22-008 API baseline and docs: `check_public_api.py --update`, `--name public-api`, `--name documented-api — Verified 2026-11-20: 2026-11-20 public-api exit 0 (4,006 declarations), documented-api exit 0, docs/architecture/spatial-controls.md, README section, map F22 as built, render_autocreator + validate_autocreator PASS
   -- python3 scripts/check_documented_api.py --sources Apps/VisualCore`; new `docs/architecture/spatial-controls.md`;
