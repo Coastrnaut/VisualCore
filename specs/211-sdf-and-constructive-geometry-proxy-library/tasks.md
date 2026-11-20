@@ -70,7 +70,7 @@ seed 2_011.
   codes); sections in `Packages/VisualCore/README.md` and `Packages/VisualCoreRendering/README.md`; section 13.4 row
   R02-F11 "As built" (home: VisualCoreScenes and the shader library, not a new VisualCoreGeometry) in
   `docs/catalog/shared-feature-map.json` and `render_autocreator.py`
-- [ ] T-R02F11-010 Reference regression chunk 1 (`--name reference-1`)
+- [X] T-R02F11-010 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F11.reference-1.json (exit 0)
 - [ ] T-R02F11-011 Reference regression chunk 2 (`--name reference-2`)
 - [ ] T-R02F11-012 Script tests (`--name script-tests`)
 - [ ] T-R02F11-013 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
