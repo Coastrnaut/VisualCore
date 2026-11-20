@@ -127,6 +127,25 @@ catalog's levels.
   `{level, mode, progress, records, tutorial}`; undo after a failure rewinds the failing move; schema-1 payloads migrate (campaign, levels up to the saved one open,
   the level's first tutorial step). Saving to disk comes with R02-G01-07.
 
+## Polish and accessibility (R02-G01-06)
+
+- **Announcements and haptics.** After every described change the presenter routes `AuroraLoomFeedbackPlan.after(old:new:)`
+  through the shared feedback route: a move, undo or redo is a `state` announcement ("Ribbon 2 wave 7. 8 of 12 gate
+  crossings in harmony. Moves 3 of 11.", "Undone: …", "Redone: …") with a `selection` haptic; a win an `outcome` ("Harmony.
+  Level won in m moves, k of 3 stars.") with `success`; a failure the failure explanation with `warning`; a level or mode
+  change a `level` announcement; a refusal a `rejection` in words with `error`. The shared planners' rate limits apply;
+  announcements only while VoiceOver runs; haptics follow the person's switch. Nothing here touches state.
+- **Controls.** Every control has a label and value; the steppers and their accessibility increments use one operation,
+  `adjust(ribbon:control:by:port:)`; the panel scrolls, uses Dynamic Type text styles, wraps button rows and keeps a
+  520-point width on iPad; a Sound toggle (off by default).
+- **Lights.** `AuroraLoomLights` eases the 12 gate crossings and the win glow: 0.15 s normally, 0.45 s under Reduce
+  Flashing, where a started fade finishes before it may turn back — at most 3 half-range crossings per second and every
+  complete fade at least 0.4 s. The scene draws gates, markers, ribbons and the win glow from these levels; Reduce Motion
+  still holds the loom still.
+- **Sound.** `AuroraLoomSoundRecipe` maps each ribbon's wave step to a major-pentatonic partial from 110 Hz (a fifth
+  added when won, quieter when failed); `AuroraLoomSound` plays it only while the choice is on, the controls are on screen
+  and the scene is active, and rebuilds the loop only at a level opening, a play's end or the toggle turning on.
+
 ## Failures
 
 `AuroraLoomError` reason codes: `r02-g01.level`, `r02-g01.move`, `r02-g01.stage`, `r02-g01.stale`,

@@ -48,6 +48,11 @@ Feature 305 (R02-G01-05) adds teaching and progression: `AuroraLoomSolver.solve(
 with a migration from schema 1; the panel shows the instruction, hints, the failure explanation with Undo and Retry, a
 level picker and the three modes.
 
+Feature 306 (R02-G01-06) adds polish and accessibility: `AuroraLoomFeedbackPlan` (announcements and haptics through the
+shared feedback route), `AuroraLoomLights` (eased gate and win lights, slow fades under Reduce Flashing) and
+`AuroraLoomSoundRecipe` in the Core; in the experience, `AuroraLoomSound` (the ambient loop), a scrolling Dynamic Type
+panel with labels and values for every control and a Sound toggle.
+
 ## Lissajous Labyrinth (R02-G02, `r02-g02.lissajous-labyrinth`, free)
 
 `LissajousLabyrinthCore` (feature 311, R02-G02-01) is the playable rule kernel: the integer `LissajousLabyrinthSine`,
