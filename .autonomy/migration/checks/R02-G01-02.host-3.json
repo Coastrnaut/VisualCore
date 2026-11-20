@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "AuroraLoomGeneratorTests"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter AuroraLoomGeneratorTests",
+  "elapsed_seconds": 0.996,
+  "exit_code": 0,
+  "finished": "2026-11-20T16:55:34+00:00",
+  "gate": "R02-G01-02",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G01-02.host-3.log",
+  "log_sha256": "8627f1f058be2473460c90fc7aadbdb4152967abd54b118f447f22bd8b3ee758",
+  "name": "host-3",
+  "started": "2026-11-20T16:55:33+00:00",
+  "timed_out": false
+}

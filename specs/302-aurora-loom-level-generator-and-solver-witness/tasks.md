@@ -35,7 +35,7 @@ or {device} tasks (pure logic and host-generated content). Fixture seeds 2_301 a
 
 ## Phase 4: Story 2 — levels come from their planned seeds (P1)
 
-- [ ] T-R02G0102-004 [US2] Create `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomGenerator.swift`
+- [X] T-R02G0102-004 [US2] Create `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomGenerator.swift` — Verified 2026-11-20: 2026-11-20 host-3 exit 0: AuroraLoomGeneratorTests 4/4 (band profiles; ids; 40 seeded entries deterministic within band and budget with skipped candidates re-checked; generation refusals incl. a range beyond six controls, which first hung the scramble loop and is now capped at six) (.autonomy/migration/checks/R02-G01-02.host-3.json)
   (AuroraLoomBandProfile "Ω 16, 32, 64, 128, 256; tolerance 160, 96, 64, 40, 24; shortest 1–2 … 5–6", AuroraLoomGenerated,
   `generate` with candidates k = 0 … 63 from `SeedDerivation.derive(seed, index: k)`, id `aurora-loom-NNN`, allowance =
   budget, tutorial for 1 … 3, `.generation(number)` beyond 64; `catalog()`; `catalogDigest`) with
