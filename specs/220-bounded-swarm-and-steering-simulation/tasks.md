@@ -12,7 +12,7 @@ its check record (no trailers). No {owner} tasks; one {device} task. Fixture see
 
 ## Phase 2: Foundational
 
-- [ ] T-R02F20-002 Create `Packages/VisualCore/Sources/VisualCoreSimulation/SwarmError.swift` and `Packages/VisualCore/Sources/VisualCoreSimulation/MagneticField.swift` (MagneticPole "finite; abs(s) ≤ 1,000;
+- [X] T-R02F20-002 Create `Packages/VisualCore/Sources/VisualCoreSimulation/SwarmError.swift` and `Packages/VisualCore/Sources/VisualCoreSimulation/MagneticField.swift` (MagneticPole "finite; abs(s) ≤ 1,000; — Verified 2026-11-20: 2026-11-20 host exit 0: MagneticFieldTests 5/5 (largest pole force/bound 0.99977; turn length within 1e-12) (.autonomy/migration/checks/R02-F20.host.json)
   ε ≥ 1e-6", MagneticField "finite; abs(B) ≤ 100; ≤ 64 poles", poleForce, poleForceBound, exact turned(_:charge:step:))
   with `Packages/VisualCore/Tests/VisualCoreSimulationTests/MagneticFieldTests.swift` (refusals and codes; 1,000 seeded positions including the pole within the bound;
   an attracting pole pulls inward; turning keeps length within 1e-12); `--name host`
