@@ -169,6 +169,25 @@ class CheckExperiencePackagesTests(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertIn("EMPTY_PACKAGE Packages/ExperiencesRound02/Package.swift", out)
 
+    def test_package_of_only_pending_cores_passes(self) -> None:
+        # Feature 301 (R02-G01-01): the core-first phase of an unregistered catalog experience.
+        self.fx.registrations(["a01.generative-art-studio"])
+        self.fx.write("Packages/ExperiencesRound02/Package.swift",
+                      package_swift(["AuroraLoom"], skip=("AuroraLoomExperience", "AuroraLoomExperienceTests")))
+        self.fx.write("project.yml", project_yml([("ExperiencesCreative", "GenerativeArtStudioExperience")]))
+        code, out = self.run_tool()
+        self.assertEqual(code, 0, out)
+
+    def test_pending_core_package_with_a_stray_target_is_empty(self) -> None:
+        self.fx.registrations(["a01.generative-art-studio"])
+        self.fx.write("Packages/ExperiencesRound02/Package.swift",
+                      package_swift(["AuroraLoom"], extra_targets=("StrayCore",),
+                                    skip=("AuroraLoomExperience", "AuroraLoomExperienceTests")))
+        self.fx.write("project.yml", project_yml([("ExperiencesCreative", "GenerativeArtStudioExperience")]))
+        code, out = self.run_tool()
+        self.assertEqual(code, 1)
+        self.assertIn("EMPTY_PACKAGE Packages/ExperiencesRound02/Package.swift", out)
+
     def test_absent_package_without_experiences_passes(self) -> None:
         self.fx.registrations(["a01.generative-art-studio"])
         (self.fx.root / "Packages/ExperiencesRound02/Package.swift").unlink()

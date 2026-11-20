@@ -23,7 +23,8 @@ Rules (one finding line `RULE location: detail` each):
                    <Name>CoreTests of a catalog experience of that package that is not registered yet, with no
                    <Name>Experience or <Name>ExperienceTests target, are the core-first phase of its feature
   EXTRA_LINK       an <X>Experience product linked by the VisualCore target belongs to no registered experience
-  EMPTY_PACKAGE    an Experiences* package exists although no registered experience belongs to it
+  EMPTY_PACKAGE    an Experiences* package exists although no registered experience belongs to it and it holds
+                   more than pending cores (feature 301: a package of only pending cores is the core-first phase)
 
 A package of a round without a registered experience may be absent. Package.swift and project.yml are read
 textually (no Swift toolchain, no YAML library).
@@ -219,7 +220,14 @@ def check(root: Path) -> tuple[list[str], int, int]:
         location = f"Packages/{package}/Package.swift"
         names = names_by_package.get(package, set())
         if not names:
-            findings.append(f"EMPTY_PACKAGE {location}: no registered experience belongs to {package}")
+            # A package that holds only pending cores (the core-first phase of catalog experiences not registered yet,
+            # feature 301 R02-G01-01) is not empty; any other target makes it one.
+            pending = catalog_names.get(package, set())
+            def pending_core(target: str) -> bool:
+                base = next((target[: -len(s)] for s in SUFFIXES if target.endswith(s) and len(target) > len(s)), None)
+                return is_pending_core(target, base, targets, pending)
+            if not targets or not all(pending_core(target) for target in targets):
+                findings.append(f"EMPTY_PACKAGE {location}: no registered experience belongs to {package}")
             continue
         for target in sorted(targets):
             base = next((target[: -len(s)] for s in SUFFIXES if target.endswith(s) and len(target) > len(s)), None)

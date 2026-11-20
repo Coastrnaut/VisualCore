@@ -490,8 +490,8 @@
    "to": "Packages/ExperiencesRound02",
    "action": "new",
    "by": "UA-F10",
-   "state": "pending",
-   "note": "R02-G01 … R02-G25."
+   "state": "done",
+   "note": "R02-G01 … R02-G25. Created by feature 301 (R02-G01-01) with Aurora Loom's pure Core; each game adds its targets."
   },
   {
    "from": null,
