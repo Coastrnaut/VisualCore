@@ -21,7 +21,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 - [X] T-R02G0203-003 [P] [US1] Create `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthShaders.swift` (thread, solid sources; uniform names) with — Verified 2026-11-20: 2026-11-20 host-2 exit 0 (shader sources, 11 tests)
   `Packages/ExperiencesRound02/LissajousLabyrinth/CoreTests/LissajousLabyrinthShaderSourceTests.swift` (version line, declared uniforms, no texture samplers,
   bounded loops); `--name host-2`
-- [ ] T-R02G0203-004 [P] [US1] Create `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthSceneGeometry.swift` (path at a tier's stride, thread mesh
+- [X] T-R02G0203-004 [P] [US1] Create `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthSceneGeometry.swift` (path at a tier's stride, thread mesh — Verified 2026-11-20: 2026-11-20 host-3 exit 0 (geometry, camera, CPU reference; 6 tests)
   with tangent-space width, rings, icospheres, head, camera fitted for aspect 0.4 … 2.5 with a 5 % margin, `project`)
   with `Packages/ExperiencesRound02/LissajousLabyrinth/CoreTests/LissajousLabyrinthSceneGeometryTests.swift` (finite and bounded for extreme settings; projections of
   every element inside the view with margin at 7 aspects; tier samples are exact kernel samples); `--name host-3`
