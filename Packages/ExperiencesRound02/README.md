@@ -53,6 +53,11 @@ shared feedback route), `AuroraLoomLights` (eased gate and win lights, slow fade
 `AuroraLoomSoundRecipe` in the Core; in the experience, `AuroraLoomSound` (the ambient loop), a scrolling Dynamic Type
 panel with labels and values for every control and a Sound toggle.
 
+Feature 307 (R02-G01-07) adds persistence and replay: each result keeps its winning trace and `verified`
+(`AuroraLoomProgress.record(level:moves:shortest:trace:)`), `AuroraLoomReconciliation` drops restored results whose
+traces do not replay, the adapter writes snapshot schema 3 (migrations 1 → 2 → 3) and offers `replay.start`,
+`replay.step` and `replay.stop`; the panel shows Replay, Step and Stop and the presenter announces dropped results once.
+
 ## Lissajous Labyrinth (R02-G02, `r02-g02.lissajous-labyrinth`, free)
 
 `LissajousLabyrinthCore` (feature 311, R02-G02-01) is the playable rule kernel: the integer `LissajousLabyrinthSine`,

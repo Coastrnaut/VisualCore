@@ -146,6 +146,23 @@ catalog's levels.
   added when won, quieter when failed); `AuroraLoomSound` plays it only while the choice is on, the controls are on screen
   and the scene is active, and rebuilds the loop only at a level opening, a play's end or the toggle turning on.
 
+## Persistence and replay (R02-G01-07)
+
+- **Saved state.** The shared `SavedStateStore` keeps one `state.json` per experience (atomic writes, unreadable files
+  moved aside, newer schemas refused). Aurora Loom's snapshot schema 3 is `{level, mode, progress, records, tutorial}`;
+  each solved result holds its best moves, stars, winning `trace` (the net moves of the winning play, undone detours
+  left out) and `verified`. A later win replaces a result only with fewer moves; ties keep the earlier trace.
+- **Migrations.** 1 → 2 adds campaign mode and progress; 2 → 3 gives every result an empty trace and `verified: false`.
+- **Reconciliation.** On restore every verified result is replayed on a fresh play of its certified level and kept only
+  when it wins after exactly its best moves with the recorded stars; results without a trace stay, unverified. The
+  dropped count (`reconciliationDropped`, not state) is announced once. The frontier stays as saved, since a daily win
+  never opens levels.
+- **Replay.** `replay.start [level]` opens a fresh play of a level with a stored verified trace in mode `replay(level)`;
+  `replay.step` plays the next move (`r02-g01.replay-end` after the last); `replay.stop` returns to campaign. During a
+  replay other actions are refused (`r02-g01.replay`, `tutorial.dismiss` excepted) and progress never changes. The
+  digest domain is `r02-g01.aurora-loom.v3`. The state reads no clock and no random source: seed, certified catalog,
+  the given calendar date and the recorded actions determine it.
+
 ## Failures
 
 `AuroraLoomError` reason codes: `r02-g01.level`, `r02-g01.move`, `r02-g01.stage`, `r02-g01.stale`,
