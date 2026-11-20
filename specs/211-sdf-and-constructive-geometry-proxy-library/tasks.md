@@ -63,7 +63,7 @@ seed 2_011.
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02F11-008 No Stage One breakage: `--name experiences --` ExperiencesCreative on sim-27.2
+- [X] T-R02F11-008 No Stage One breakage: `--name experiences --` ExperiencesCreative on sim-27.2 — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F11.experiences.json (exit 0)
 - [ ] T-R02F11-009 API baseline and docs: `check_public_api.py --update`, `--name public-api`, `--name documented-api
   -- python3 scripts/check_documented_api.py --sources Apps/VisualCore`; new `docs/architecture/sdf-proxies.md`
   (formulas and sources with licences, the distance-bound rule, march constants, volume sampling, stored form, reason
