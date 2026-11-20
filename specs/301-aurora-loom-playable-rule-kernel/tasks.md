@@ -40,7 +40,7 @@ or {device} tasks (pure logic). Fixture seed 2_301; tests stay short.
 
 ## Phase 5: Solver-ready rules (P2)
 
-- [ ] T-R02G0101-005 [P] [US1] Create `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomRules.swift` (PuzzleRules conformance, rules id
+- [X] T-R02G0101-005 [P] [US1] Create `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomRules.swift` (PuzzleRules conformance, rules id — Verified 2026-11-20: 2026-11-20 host-4 exit 0: AuroraLoomRulesTests 6/6 (90 moves in order; apply refusals; isSolved equals wins; R02-F23 PuzzleValidator certifies a level with goal and none promises, notUnique for the solution promise, wrongRules, illegalMove(0)) (.autonomy/migration/checks/R02-G01-01.host-4.json)
   "r02-g01-aurora-loom") with `Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomRulesTests.swift` (moves in order; apply refuses out-of-range and no-change;
   isSolved equals the win test; R02-F23's PuzzleValidator certifies a small seeded level and its uniqueness); `--name
   host-4`
