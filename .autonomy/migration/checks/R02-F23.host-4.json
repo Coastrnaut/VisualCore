@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "PuzzleGeneratorTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter PuzzleGeneratorTests",
+  "elapsed_seconds": 2.838,
+  "exit_code": 0,
+  "finished": "2026-11-20T07:02:58+00:00",
+  "gate": "R02-F23",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-F23.host-4.log",
+  "log_sha256": "7c249db2c1c538a6c0baaedc89adb6ff1c274f5c47620b516ac5f3ef44c01123",
+  "name": "host-4",
+  "started": "2026-11-20T07:02:55+00:00",
+  "timed_out": false
+}
