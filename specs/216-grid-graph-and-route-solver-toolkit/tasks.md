@@ -39,7 +39,7 @@ tests stay light beside the timed R02-F05 test.
 
 ## Phase 5: Story 3 — cut sets (P2)
 
-- [ ] T-R02F16-005 [P] [US3] Create `Packages/VisualCore/Sources/VisualCoreSimulation/MinimumCut.swift` (CutResult; Edmonds–Karp on unit capacities per research R7;
+- [X] T-R02F16-005 [P] [US3] Create `Packages/VisualCore/Sources/VisualCoreSimulation/MinimumCut.swift` (CutResult; Edmonds–Karp on unit capacities per research R7; — Verified 2026-11-19: lead retest 2026-11-19: R02-F16.host-3.json (exit 0, full suite; R02-F16.host-2.json had failed only the mesh-budget timing beside the full suite, now asserted in R02-F16.timing.json, exit 0); MinimumCutTests 3 passed (200 seeded graphs: cut = edge-disjoint routes, separates, equals brute force on ≤ 12 edges; parallel edges; refusals)
   cut edges sorted; edge-disjoint routes) with `Packages/VisualCore/Tests/VisualCoreSimulationTests/MinimumCutTests.swift` (200 seeded graphs: cut size equals the
   route count, routes pairwise edge-disjoint, removing the cut separates, size equals a brute-force minimum on graphs
   of ≤ 12 edges; source = sink refused); `--name host-4`
