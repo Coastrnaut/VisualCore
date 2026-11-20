@@ -95,8 +95,8 @@ negative, and a peak only flattens.
 
 1. **Given** a seeded field, **When** it diffuses with frame times from tiny to very long, **Then** each channel's total
    is unchanged to the quantum and no cell becomes negative.
-2. **Given** one concentrated spot, **When** it diffuses, **Then** its peak only falls and its spread grows the way
-   diffusion should.
+2. **Given** one concentrated spot, **When** it diffuses, **Then** its peak never rises and its spread (the amount-weighted
+   mean squared distance from the spot) never shrinks while it is away from the walls.
 
 ### User Story 2 - Sources, sinks and decay (Priority: P1)
 
@@ -133,7 +133,8 @@ identically; newer and damaged forms are refused.
 - **An empty or all-zero field:** steps without error and stays zero.
 - **A very long frame time:** split into at most 256 stable sub-steps of a frame cut to 0.25 s; time beyond is reported
   as dropped, not run.
-- **A source on a full cell or a total near its limit:** refused or capped and reported, never overflowing.
+- **A source on a full cell or a total near its limit:** capped at the limit, the rest reported as capped, never
+  overflowing.
 - **A sink asking more than a cell holds:** removes only what is there, and the report says so.
 - **Growth with nowhere viable to go:** stops quietly; the report shows zero growth.
 - **Too large a grid, too many sources or channels, or invalid rates:** refused with a named reason.
@@ -171,7 +172,8 @@ identically; newer and damaged forms are refused.
 
 - **SC-R02F21-001**: For 20 seeded fields over 300 frames of seeded lengths, every channel's total equals its account
   after every frame, exactly, and no cell is ever negative.
-- **SC-R02F21-002**: A single spot's peak never rises and its spread grows monotonically; a long frame gives the same
+- **SC-R02F21-002**: A single spot's peak never rises and its spread (amount-weighted mean squared distance from the
+  spot, on a 64 × 64 grid over 60 frames) never shrinks; a long frame gives the same
   totals as the same time in short frames.
 - **SC-R02F21-003**: With constant sources, sinks and decay, a field settles: its total changes by less than 0.1 % over
   the last tenth of a seeded run (a 16 × 16 grid with decay 1 per second over 600 frames of 1/60 s).
