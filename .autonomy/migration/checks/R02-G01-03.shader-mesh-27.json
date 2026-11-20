@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "VisualCoreRenderingTests/ShaderMeshRendererTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --only-testing VisualCoreRenderingTests/ShaderMeshRendererTests",
+  "elapsed_seconds": 2.923,
+  "exit_code": 0,
+  "finished": "2026-11-20T17:43:38+00:00",
+  "gate": "R02-G01-03",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G01-03.shader-mesh-27.log",
+  "log_sha256": "8cfc29a02fb0751735fa14dce6a3f725a5dc451520c51773e783b53103901ea3",
+  "name": "shader-mesh-27",
+  "started": "2026-11-20T17:43:35+00:00",
+  "timed_out": false
+}

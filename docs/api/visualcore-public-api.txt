@@ -2039,6 +2039,7 @@ VisualCoreRendering | class | public final class RenderHost
 VisualCoreRendering | class | public final class RenderTarget: GPUResource
 VisualCoreRendering | class | public final class ResourceRegistry
 VisualCoreRendering | class | public final class ShaderBundle: Sendable
+VisualCoreRendering | class | public final class ShaderMeshRenderer
 VisualCoreRendering | class | public final class ShaderProgram
 VisualCoreRendering | class | public final class SkyRenderer
 VisualCoreRendering | class | public final class StillCapture
@@ -2059,6 +2060,7 @@ VisualCoreRendering | enum | public enum RenderHostError: Error, Equatable, Send
 VisualCoreRendering | enum | public enum RenderingInfo
 VisualCoreRendering | enum | public enum ResourceError: Error, Equatable, Sendable
 VisualCoreRendering | enum | public enum ShaderError: Error, Equatable, Sendable
+VisualCoreRendering | enum | public enum ShaderMeshBlend: Sendable, Equatable
 VisualCoreRendering | enum | public enum State: Equatable, Sendable
 VisualCoreRendering | enum | public enum StillImageEncoder
 VisualCoreRendering | enum | public enum StillImageFormat: String, CaseIterable, Sendable
@@ -2087,6 +2089,7 @@ VisualCoreRendering | func | public func draw(_ opaque: [Item], translucent: [It
 VisualCoreRendering | func | public func draw(_ opaque: [Item], translucent: [Item], view: Mat4, projection: Mat4, fog: MeshFog?,
 VisualCoreRendering | func | public func draw(_ particles: [ParticleInstance], camera: Camera2D, metrics: ViewMetrics, blend: ParticleBlend = .normal) throws
 VisualCoreRendering | func | public func draw(_ root: SceneNode, camera: Camera2D, metrics: ViewMetrics) throws
+VisualCoreRendering | func | public func draw(blend: ShaderMeshBlend = .opaque, cullBackFaces: Bool = false, depthTest: Bool = false,
 VisualCoreRendering | func | public func draw(inverseViewProjection: Mat4, sun: Vec3, parameters: SkyParameters) throws
 VisualCoreRendering | func | public func draw(model: Mat4 = .identity, camera: OrbitCamera, aspect: Double, color: Vec4) throws
 VisualCoreRendering | func | public func draw(model: Mat4, light: ShadowLight, plane: ProjectionPlane, view: Mat4, projection: Mat4,
@@ -2179,6 +2182,7 @@ VisualCoreRendering | init | public init(from: any RenderScene, to: any RenderSc
 VisualCoreRendering | init | public init(index: Int, time: Double, targetTime: Double)
 VisualCoreRendering | init | public init(key: String, outcome: Outcome, reasonCode: ShaderReasonCode? = nil)
 VisualCoreRendering | init | public init(mesh: Mesh, registry: ResourceRegistry) throws
+VisualCoreRendering | init | public init(mesh: Mesh, vertex: String, fragment: String, registry: ResourceRegistry,
 VisualCoreRendering | init | public init(model: Mat4, color: Vec4)
 VisualCoreRendering | init | public init(name: String, minimum: Int, reported: Int)
 VisualCoreRendering | init | public init(program: ShaderProgram, state: RenderState)

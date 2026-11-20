@@ -8,6 +8,7 @@
 import PackageDescription
 
 let visualCore = "VisualCore"
+let rendering = "VisualCoreRendering"
 
 let package = Package(
     name: "ExperiencesRound02",
@@ -15,22 +16,51 @@ let package = Package(
     products: [
         // Feature 301 (R02-G01-01): Aurora Loom's rule kernel, a candidate until X-R02-G01.
         .library(name: "AuroraLoomCore", targets: ["AuroraLoomCore"]),
+        // Feature 303 (R02-G01-03): Aurora Loom's experience (iOS only; a registered candidate until X-R02-G01).
+        .library(name: "AuroraLoomExperience", targets: ["AuroraLoomExperience"]),
         // Feature 311 (R02-G02-01): Lissajous Labyrinth's rule kernel, a candidate until X-R02-G02.
         .library(name: "LissajousLabyrinthCore", targets: ["LissajousLabyrinthCore"]),
     ],
     dependencies: [
         .package(name: visualCore, path: "../VisualCore"),
+        .package(name: rendering, path: "../VisualCoreRendering"),
     ],
     targets: [
         .target(name: "AuroraLoomCore",
                 dependencies: [.product(name: "VisualCoreSimulation", package: visualCore),
-                               .product(name: "VisualCoreMath", package: visualCore)],
+                               .product(name: "VisualCoreMath", package: visualCore),
+                               // Feature 303 (R02-G01-03): ribbon meshes and the experience adapter, host-testable.
+                               .product(name: "VisualCoreScenes", package: visualCore),
+                               .product(name: "VisualCoreExperience", package: visualCore),
+                               .product(name: "VisualCoreDiagnostics", package: visualCore),
+                               .product(name: "VisualCorePersistence", package: visualCore)],
                 path: "AuroraLoom/Core"),
         .testTarget(name: "AuroraLoomCoreTests",
                     dependencies: ["AuroraLoomCore",
                                    .product(name: "VisualCoreSimulation", package: visualCore),
-                                   .product(name: "VisualCoreMath", package: visualCore)],
+                                   .product(name: "VisualCoreMath", package: visualCore),
+                                   .product(name: "VisualCoreScenes", package: visualCore),
+                                   .product(name: "VisualCoreExperience", package: visualCore),
+                                   .product(name: "VisualCoreDiagnostics", package: visualCore)],
                     path: "AuroraLoom/CoreTests"),
+        // The Experience targets build for iOS only: their rendering dependencies are conditional and their sources sit in
+        // `#if os(iOS)`, so `swift test` on the macOS host still builds and runs the Cores (feature 303, research R1).
+        .target(name: "AuroraLoomExperience",
+                dependencies: ["AuroraLoomCore",
+                               .product(name: "VisualCoreMath", package: visualCore),
+                               .product(name: "VisualCoreScenes", package: visualCore),
+                               .product(name: "VisualCoreExperience", package: visualCore),
+                               .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
+                               .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS]))],
+                path: "AuroraLoom/Experience"),
+        .testTarget(name: "AuroraLoomExperienceTests",
+                    dependencies: ["AuroraLoomExperience", "AuroraLoomCore",
+                                   .product(name: "VisualCoreMath", package: visualCore),
+                                   .product(name: "VisualCoreScenes", package: visualCore),
+                                   .product(name: "VisualCoreExperience", package: visualCore),
+                                   .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
+                                   .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS]))],
+                    path: "AuroraLoom/ExperienceTests"),
         .target(name: "LissajousLabyrinthCore",
                 dependencies: [.product(name: "VisualCoreSimulation", package: visualCore),
                                .product(name: "VisualCoreMath", package: visualCore)],
