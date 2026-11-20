@@ -67,7 +67,7 @@ or {device} tasks (pure logic and host-generated content). Fixture seeds 2_301 a
 - [X] T-R02G0102-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences` and — Verified 2026-11-20: 2026-11-20 rendering-27, rendering-26, experiences (sim-27.2) and host-full exit 0
   `--name host-full`
 - [X] T-R02G0102-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-20: 2026-11-20 reference-1 exit 0
-- [ ] T-R02G0102-010 Reference regression chunk 2 (`--name reference-2`)
+- [X] T-R02G0102-010 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-20: 2026-11-20 reference-2 exit 0: 7 of 7 with chunk 1
 - [ ] T-R02G0102-011 Script tests, run alone (`--name script-tests`)
 - [ ] T-R02G0102-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
 
