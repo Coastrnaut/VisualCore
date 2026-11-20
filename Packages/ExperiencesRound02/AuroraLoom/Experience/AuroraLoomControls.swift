@@ -1,7 +1,8 @@
 // AuroraLoomControls — feature 303 (R02-G01-03) T-R02G0103-006 (FR-R02G0103-005; clarification Q5). The minimal control
 // panel: one row per ribbon with a wave and a phase stepper (0 … 15) and undo and redo, each with an accessibility label;
 // every change is a kernel move sent through the action port. Gestures, dials, anchors and the camera come in
-// R02-G01-04; full accessibility in R02-G01-06.
+// R02-G01-04; full accessibility in R02-G01-06. Feature 304 (R02-G01-04) T-R02G0104-004: a stepper selects its ribbon,
+// "Reset view" returns the camera to the authored pose, the selection is announced and a refused move is shown.
 #if os(iOS)
 import AuroraLoomCore
 import SwiftUI
@@ -11,11 +12,20 @@ import VisualCoreExperienceHost
 struct AuroraLoomControls: View {
     let port: ExperienceActionPort
     let mirror: AuroraLoomMirror
+    /// Returns the camera to the authored pose.
+    let resetView: () -> Void
+    /// Selects a ribbon.
+    let select: (Int) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Level \(mirror.levelNumber) · moves \(mirror.spent) of \(mirror.allowance)")
                 .font(.headline)
+            Text("Ribbon \(mirror.selectedRibbon + 1) selected")
+                .accessibilityLabel("Ribbon \(mirror.selectedRibbon + 1) selected")
+            if let message = mirror.message {
+                Text(message).font(.footnote)
+            }
             if let steps = mirror.steps {
                 ForEach(0..<3, id: \.self) { ribbon in
                     HStack(spacing: 12) {
@@ -40,6 +50,8 @@ struct AuroraLoomControls: View {
                     .accessibilityLabel("Redo the move")
                 Button("Next level") { _ = port.send("level.next") }
                     .accessibilityLabel("Go to the next level")
+                Button("Reset view") { resetView() }
+                    .accessibilityLabel("Reset the camera view")
             }
         }
         .padding()
@@ -47,6 +59,7 @@ struct AuroraLoomControls: View {
 
     /// Sends a move of `ribbon`'s control to `step`, wrapping 0 … 15.
     private func move(_ ribbon: Int, control: Int, to step: Int) {
+        select(ribbon)
         let wrapped = (step % 16 + 16) % 16
         _ = port.send("ribbon.move", [Double(ribbon), Double(control), Double(wrapped)])
     }

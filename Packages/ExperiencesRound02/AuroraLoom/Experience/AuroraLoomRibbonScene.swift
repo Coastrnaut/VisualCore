@@ -5,7 +5,9 @@
 // and the target markers last as camera-facing discs (gold, dim or lit). Geometry is rebuilt only when the snapshot's
 // steps, level, tick or the tier change. If a ribbon or gate program fails, the scene falls back to the minimal layer
 // drawn with the shared unlit `MeshRenderer` in the palette colours and keeps the reason; nothing here can reach the
-// kernel.
+// kernel. Feature 304 (R02-G01-04) T-R02G0104-004 adds the touch controls' picture: each ribbon's rail with its anchor
+// and its dial with its knob (teal; the selected ribbon's in gold with an outline disc), the drag preview shown at the
+// candidate step, and the camera orbit (presentation only).
 #if os(iOS)
 import AuroraLoomCore
 import Foundation
@@ -35,6 +37,17 @@ final class AuroraLoomRibbonScene {
     private var fallbackRenderers: [MeshRenderer] = []
     private var geometryKey: Int?
     private var aspect = 1.0
+    private var controlRenderers: [(renderer: ShaderMeshRenderer, ribbon: Int, outline: Bool)] = []
+    /// The camera orbit (presentation only).
+    var orbit = AuroraLoomOrbit.authored
+    /// The selected ribbon, outlined in gold.
+    var selectedRibbon = 0
+    /// The drag preview: the anchor or knob is drawn at this step while dragging.
+    var preview: AuroraLoomMove?
+    /// The outline disc's radius around a selected handle.
+    static let outlineRadius = 0.13
+    /// A handle disc's radius.
+    static let handleRadius = 0.08
 
     /// Records the registry and the view's aspect.
     func setup(_ context: RenderContext) {
@@ -54,7 +67,8 @@ final class AuroraLoomRibbonScene {
         for r in gateRenderers { r.release() }
         for r in markerRenderers { r.release() }
         for r in fallbackRenderers { r.release() }
-        ribbonRenderers = []; gateRenderers = []; markerRenderers = []; fallbackRenderers = []
+        for c in controlRenderers { c.renderer.release() }
+        ribbonRenderers = []; gateRenderers = []; markerRenderers = []; fallbackRenderers = []; controlRenderers = []
         geometryKey = nil
     }
 
@@ -68,9 +82,15 @@ final class AuroraLoomRibbonScene {
         try clear.render(context, frame: frame)
         guard context.pixelWidth > 0, context.pixelHeight > 0 else { return }
         aspect = Double(context.pixelWidth) / Double(context.pixelHeight)
-        let camera = AuroraLoomSceneGeometry.camera(aspect: aspect)
+        let camera = AuroraLoomSceneGeometry.camera(aspect: aspect, orbit: orbit)
         let viewProjection = camera.projection * camera.view
-        let key = Self.key(snapshot, tier: tier, aspect: aspect, fallback: fallbackReason != nil)
+        var hasher = Hasher()
+        hasher.combine(Self.key(snapshot, tier: tier, aspect: aspect, fallback: fallbackReason != nil))
+        hasher.combine(orbit.azimuthOffset)
+        hasher.combine(orbit.elevation)
+        hasher.combine(selectedRibbon)
+        hasher.combine(preview)
+        let key = hasher.finalize()
         if key != geometryKey { try rebuild(snapshot, tier: tier, camera: camera) }
         geometryKey = key
         if fallbackReason != nil {
@@ -79,6 +99,7 @@ final class AuroraLoomRibbonScene {
         }
         try drawGates(snapshot, viewProjection: viewProjection)
         try drawRibbons(snapshot, tier: tier, viewProjection: viewProjection, animate: animate)
+        try drawControls(viewProjection: viewProjection)
         try drawMarkers(snapshot, viewProjection: viewProjection)
     }
 
@@ -115,6 +136,7 @@ final class AuroraLoomRibbonScene {
                                          view: camera.view, radius: Self.markerRadius)
                     markerRenderers.append(try Self.gateRenderer(disc, registry: registry))
                 }
+                try buildControls(snapshot, view: camera.view, registry: registry)
                 return
             } catch {
                 fallbackReason = "aurora-loom shader: \(error)"
@@ -126,6 +148,57 @@ final class AuroraLoomRibbonScene {
         let minimal = AuroraLoomTier.of(AuroraLoomTier.all.count - 1)
         for mesh in try AuroraLoomSceneGeometry.ribbonMeshes(snapshot: snapshot, tier: minimal) {
             fallbackRenderers.append(try MeshRenderer(mesh: mesh, registry: registry))
+        }
+    }
+
+    /// The rails, anchors, dials and knobs, with the selected ribbon's outline discs.
+    private func buildControls(_ snapshot: AuroraLoomSceneSnapshot, view: Mat4, registry: ResourceRegistry) throws {
+        for ribbon in 0..<3 {
+            var wave = snapshot.steps.wave[ribbon]
+            var phase = snapshot.steps.phase[ribbon]
+            if let preview, preview.ribbon == ribbon {
+                if preview.control == .wave { wave = preview.step } else { phase = preview.step }
+            }
+            let bounds = AuroraLoomHandles.railBounds(ribbon: ribbon)
+            let rail = try Mesh.tube(path: [bounds.min, bounds.max], radius: 0.015, sides: 6, caps: true, closed: false)
+            controlRenderers.append((try Self.gateRenderer(rail, registry: registry), ribbon, false))
+            var circle: [Vec3] = []
+            let centre = AuroraLoomHandles.dialCentre(ribbon: ribbon)
+            for i in 0..<32 {
+                let a = 2 * Double.pi * Double(i) / 32
+                circle.append(centre + Vec3(0, AuroraLoomHandles.dialRadius * Foundation.cos(a),
+                                            AuroraLoomHandles.dialRadius * Foundation.sin(a)))
+            }
+            let dial = try Mesh.tube(path: circle, radius: 0.015, sides: 6, caps: false, closed: true)
+            controlRenderers.append((try Self.gateRenderer(dial, registry: registry), ribbon, false))
+            let anchor = AuroraLoomHandles.anchorPosition(ribbon: ribbon, wave: wave)
+            let knob = AuroraLoomHandles.dialKnob(ribbon: ribbon, phase: phase)
+            if ribbon == selectedRibbon {
+                for point in [anchor, knob] {
+                    let outline = try Self.disc(at: point, view: view, radius: Self.outlineRadius)
+                    controlRenderers.append((try Self.gateRenderer(outline, registry: registry), ribbon, true))
+                }
+            }
+            for point in [anchor, knob] {
+                let disc = try Self.disc(at: point, view: view, radius: Self.handleRadius)
+                controlRenderers.append((try Self.gateRenderer(disc, registry: registry), ribbon, false))
+            }
+        }
+    }
+
+    private func drawControls(viewProjection: Mat4) throws {
+        let teal = AuroraLoomPalette.teal
+        let gold = AuroraLoomPalette.gold
+        for item in controlRenderers {
+            let selected = item.ribbon == selectedRibbon
+            let colour = item.outline ? gold : teal
+            try item.renderer.draw(blend: .opaque) { p in
+                p.set("u_mvp", matrix4: viewProjection.floats)
+                p.set("u_pointSize", Float(1))
+                p.set("u_color", SIMD3<Float>(Float(colour.x), Float(colour.y), Float(colour.z)))
+                p.set("u_lit", Float(selected ? 1 : 0))
+                p.set("u_opacity", Float(1))
+            }
         }
     }
 

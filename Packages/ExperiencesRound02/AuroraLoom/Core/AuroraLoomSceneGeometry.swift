@@ -165,7 +165,7 @@ public enum AuroraLoomSceneGeometry {
     /// Each sheet follows a centripetal `CatmullRomSpline` through the ribbon's centre line at `tier.segments`
     /// segments, evaluated at two parameters per span (2 · segments + 1 samples), shifted in depth by the layer's
     /// offset, framed by `CurveFrames.parallelTransport` with the initial normal +z (so the sheet stands as a curtain in
-    /// its lane, its across direction in the x–y plane) and built by `Mesh.ribbon` with a width that tapers to 40 % at
+    /// its lane, its across direction in the x–y plane) and built by `Mesh.ribbon` with a width that tapers to 70 % at
     /// the loom ends. Texture u runs across the sheet (bevel), v along it in world units.
     ///
     /// - Throws: `MeshError` from the shared builders (`.budget` beyond `MeshBudget.default`); not expected for any
@@ -196,7 +196,7 @@ public enum AuroraLoomSceneGeometry {
                 sampleWidths.reserveCapacity(count)
                 for i in 0..<count {
                     let u = count > 1 ? Double(i) / Double(count - 1) : 0.5
-                    sampleWidths.append(widths[k] * (0.4 + 0.6 * sin(Double.pi * u)))
+                    sampleWidths.append(widths[k] * (0.7 + 0.3 * sin(Double.pi * u)))
                 }
                 meshes.append(try Mesh.ribbon(samples, width: .perSample(sampleWidths),
                                               initialNormal: Vec3(0, 0, 1), budget: .default))

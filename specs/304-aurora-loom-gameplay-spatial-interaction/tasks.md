@@ -31,7 +31,7 @@ tests stay short (< 10 s each).
   independent computation of the end step; 1,000 seeded arbitration scripts; two handles under one touch pick the
   nearest, ties by the lower id; orbit limits; selection; determinism);
   `--name host-2`
-- [ ] T-R02G0104-004 [US1] [US2] [US3] [US4] Wire the experience: `Packages/ExperiencesRound02/AuroraLoom/Experience/AuroraLoomPresenter.swift` (pointer events →
+- [X] T-R02G0104-004 [US1] [US2] [US3] [US4] Wire the experience: `Packages/ExperiencesRound02/AuroraLoom/Experience/AuroraLoomPresenter.swift` (pointer events → — Verified 2026-11-20: 2026-11-20 round02-build exit 0 (presenter routes touches through the controller and sends ribbon.move; scene draws rails, anchors, dials, knobs, the selected ribbon's gold outline and the drag preview with the orbited camera; controls gain Reset view and the selection; ribbon ends taper to 70 % so the end samples stay visible with the larger content box — AuroraLoomExperienceTests 14/14 and AuroraLoomSceneGeometryTests 16/16 rerun) (.autonomy/migration/checks/R02-G01-04.round02-build.json)
   controller → `ribbon.move` through the port; refusal text; orbit into the camera; selection and candidate in the
   description and mirror), `Packages/ExperiencesRound02/AuroraLoom/Experience/AuroraLoomRibbonScene.swift` (rails, anchors, dials with knobs, the selected ribbon's
   gold outline, the drag preview; camera with the orbit), `Packages/ExperiencesRound02/AuroraLoom/Experience/AuroraLoomControls.swift` ("Reset view"; steppers select
