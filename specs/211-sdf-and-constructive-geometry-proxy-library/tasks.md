@@ -72,7 +72,7 @@ seed 2_011.
   `docs/catalog/shared-feature-map.json` and `render_autocreator.py`
 - [X] T-R02F11-010 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F11.reference-1.json (exit 0)
 - [X] T-R02F11-011 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F11.reference-2.json (exit 0)
-- [ ] T-R02F11-012 Script tests (`--name script-tests`)
+- [X] T-R02F11-012 Script tests (`--name script-tests`) — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F11.script-tests.json (exit 0)
 - [ ] T-R02F11-013 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
 
 ## Device campaign (after ImplementationLock-100)
