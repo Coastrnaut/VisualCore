@@ -127,4 +127,57 @@ import VisualCoreMath
         }
         #expect(Self.refusal(zero)?.reasonCode == "r2-f12.malformed")
     }
+
+    /// T-R02F12-013 (FR-R02F12-007, SC-R02F12-005): every solid a cut produces reads back equal — the 200 sequential
+    /// seeded cuts of the repeated-cut test and both parts of 100 seeded plane cuts of the unit cube.
+    @Test func everyCutSolidRoundTrips() throws {
+        var failures: [String] = []
+        func roundTrip(_ solid: ConvexSolid, _ label: String) {
+            do {
+                let back = try ConvexSolidDocument.decode(try ConvexSolidDocument(solid: solid).encoded())
+                if back.solid != solid { failures.append("\(label): not equal") }
+            } catch {
+                failures.append("\(label): \(error)")
+            }
+        }
+        var solid = try ConvexSolid.box(min: Vec3(0, 0, 0), max: Vec3(1, 1, 1))
+        var random = SDFTestRandom(seed: 2_012)
+        for step in 0..<200 {
+            var n = random.point(1)
+            while n.length < 1e-3 { n = random.point(1) }
+            n = n.normalized
+            var centre = Vec3.zero
+            for v in solid.vertices { centre += v }
+            centre = centre / Double(solid.vertices.count)
+            var top = -Double.infinity
+            for v in solid.vertices { top = max(top, n.dot(v)) }
+            let h = n.dot(centre) + (0.5 + 0.45 * random.next()) * (top - n.dot(centre))
+            let r = try solid.cut(by: try ClipPlane(normal: n, offset: h))
+            if let removed = r.removed { roundTrip(removed, "sequential \(step) removed") }
+            guard let kept = r.kept else { break }
+            roundTrip(kept, "sequential \(step) kept")
+            solid = kept
+        }
+        let cube = try ConvexSolid.box(min: Vec3(0, 0, 0), max: Vec3(1, 1, 1))
+        var planes = SDFTestRandom(seed: 2_013)
+        for k in 0..<100 {
+            let r = try cube.cut(by: try ConvexCutTests.seededPlane(&planes))
+            if let kept = r.kept { roundTrip(kept, "plane \(k) kept") }
+            if let removed = r.removed { roundTrip(removed, "plane \(k) removed") }
+        }
+        // Planes through a vertex, along an edge and containing a face of the unit cube, and those shifted by half the
+        // tolerance either way.
+        let eps = cube.tolerance
+        let fixtures: [(Vec3, Double)] = [(Vec3(1, 1, 1), 2), (Vec3(1, 1, 0), 1), (Vec3(1, 0, 0), 1), (Vec3(1, -1, 0), 0),
+                                          (Vec3(1, 1, 1), 1), (Vec3(0, 0, 1), 0.5)]
+        for (index, fixture) in fixtures.enumerated() {
+            for shift in [-0.5 * eps, 0, 0.5 * eps] {
+                let plane = try ClipPlane(normal: fixture.0, offset: fixture.1 / fixture.0.length + shift)
+                let r = try cube.cut(by: plane)
+                if let kept = r.kept { roundTrip(kept, "fixture \(index) \(shift) kept") }
+                if let removed = r.removed { roundTrip(removed, "fixture \(index) \(shift) removed") }
+            }
+        }
+        #expect(failures.isEmpty, "\(failures.prefix(5))")
+    }
 }

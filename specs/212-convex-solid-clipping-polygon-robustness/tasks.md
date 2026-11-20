@@ -74,7 +74,7 @@ after 003). Shared files stay with the lead. MVP: Stories 1 and 2 (002, 003, 004
 
 ## Phase 6: Convergence
 
-- [ ] T-R02F12-013 Add a test in `Packages/VisualCore/Tests/VisualCoreScenesTests/ConvexSolidCodingTests.swift` that every
+- [X] T-R02F12-013 Add a test in `Packages/VisualCore/Tests/VisualCoreScenesTests/ConvexSolidCodingTests.swift` that every — Verified 2026-11-19: 2026-11-19 R02-F12.host-5.json (exit 0, 0 failures; everyCutSolidRoundTrips passed: 200 sequential cuts, 100 seeded planes and 18 vertex/edge/face fixtures ±ε/2 all read back equal; no code change needed)
   intermediate solid of 200 seeded sequential cuts (and of the plane fixtures through vertices, edges and faces) encodes
   and decodes back equal through `ConvexSolidDocument`; if any is refused, make the cut's output satisfy the decoder's
   checks (re-snap merged corners onto their face planes, or validate the cut's output with the same rules) in
