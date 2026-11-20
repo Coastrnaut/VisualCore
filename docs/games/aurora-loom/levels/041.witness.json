@@ -1,0 +1,108 @@
+{
+  "actions" : [
+    {
+      "control" : "wave",
+      "ribbon" : 1,
+      "step" : 1
+    },
+    {
+      "control" : "wave",
+      "ribbon" : 2,
+      "step" : 1
+    },
+    {
+      "control" : "phase",
+      "ribbon" : 2,
+      "step" : 6
+    }
+  ],
+  "counterexample" : {
+    "mismatch" : {
+      "gate" : 2,
+      "residual" : 283,
+      "ribbon" : 0,
+      "tick" : 0
+    },
+    "setting" : {
+      "phase" : [
+        7,
+        6,
+        6
+      ],
+      "wave" : [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  "difficulty" : {
+    "omega" : 64,
+    "shortest" : 3,
+    "tolerance" : 64,
+    "winningSettings" : 3,
+    "work" : 928
+  },
+  "fingerprints" : [
+    "4319994d136394b1bb6f6281bff251cc90fdb30cfbd27cc00343566523aa88e0",
+    "3b9a6ec362e3e88c846f640e30852b5f3c22d0f8e9db2bc6d26c702221c1896a",
+    "761e9e395856552a74db501c765a436cb0d4d2f3cac304512cd70cc2cf95e8d4",
+    "b0177c8f76a2de7be746f78d55351d7572b1c504691a8f94078a0734a9fdaff5"
+  ],
+  "level" : {
+    "allowance" : 13,
+    "band" : 3,
+    "fingerprint" : "a679635a6a8621122b0998542b448f98abcf33a644c95ab2883b1f79b2bb807f",
+    "gates" : [
+      {
+        "position" : 3,
+        "target" : 1579
+      },
+      {
+        "position" : 7,
+        "target" : 1624
+      },
+      {
+        "position" : 13,
+        "target" : 1717
+      },
+      {
+        "position" : 5,
+        "target" : 1615
+      }
+    ],
+    "id" : "aurora-loom-041",
+    "omega" : 64,
+    "ribbons" : [
+      {
+        "omega" : 64,
+        "phase" : 6,
+        "wave" : 1
+      },
+      {
+        "omega" : 64,
+        "phase" : 6,
+        "wave" : 15
+      },
+      {
+        "omega" : 64,
+        "phase" : 3,
+        "wave" : 10
+      }
+    ],
+    "schema" : 1,
+    "seed" : 3509701421639168498,
+    "tolerance" : 64,
+    "tutorial" : false
+  },
+  "method" : "grid",
+  "number" : 41,
+  "schema" : 1,
+  "skipped" : 0,
+  "terminal" : {
+    "gate" : 2,
+    "residual" : 27,
+    "ribbon" : 0,
+    "tick" : 0
+  }
+}

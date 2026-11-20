@@ -1,0 +1,114 @@
+{
+  "actions" : [
+    {
+      "control" : "phase",
+      "ribbon" : 0,
+      "step" : 2
+    },
+    {
+      "control" : "wave",
+      "ribbon" : 1,
+      "step" : 0
+    },
+    {
+      "control" : "phase",
+      "ribbon" : 1,
+      "step" : 2
+    },
+    {
+      "control" : "phase",
+      "ribbon" : 2,
+      "step" : 2
+    }
+  ],
+  "counterexample" : {
+    "mismatch" : {
+      "gate" : 3,
+      "residual" : 270,
+      "ribbon" : 0,
+      "tick" : 0
+    },
+    "setting" : {
+      "phase" : [
+        3,
+        2,
+        2
+      ],
+      "wave" : [
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "difficulty" : {
+    "omega" : 128,
+    "shortest" : 4,
+    "tolerance" : 40,
+    "winningSettings" : 3,
+    "work" : 960
+  },
+  "fingerprints" : [
+    "0244218fde4901a310f7ab3aedd42995d0389672f741950bfdb60635c2813ce0",
+    "275591301f943f6e5c361a627092b698e0eca20c4521eec06f292e37e604b890",
+    "89ddd69acef3dfea047a3a95a6bd72df5dc3c8ea4db167fa78ab29f858d6623d",
+    "3eca42a9242dc78d9c505a3aa60fdb4ca38d723d74b02cacb7974bd7a0cb66ea",
+    "094291f32fc2207b3095a7a7757fa62eb64d9a27a92356cb47144b1ca62842f5"
+  ],
+  "level" : {
+    "allowance" : 15,
+    "band" : 4,
+    "fingerprint" : "35491d1148ed77390ec1d5ea0a1e033b7ec5dedfb9bb0552540fff973f251582",
+    "gates" : [
+      {
+        "position" : 2,
+        "target" : 505
+      },
+      {
+        "position" : 14,
+        "target" : 509
+      },
+      {
+        "position" : 8,
+        "target" : 516
+      },
+      {
+        "position" : 4,
+        "target" : 498
+      }
+    ],
+    "id" : "aurora-loom-073",
+    "omega" : 128,
+    "ribbons" : [
+      {
+        "omega" : 128,
+        "phase" : 8,
+        "wave" : 0
+      },
+      {
+        "omega" : 128,
+        "phase" : 9,
+        "wave" : 9
+      },
+      {
+        "omega" : 128,
+        "phase" : 4,
+        "wave" : 0
+      }
+    ],
+    "schema" : 1,
+    "seed" : 12436462861182154099,
+    "tolerance" : 40,
+    "tutorial" : false
+  },
+  "method" : "descent",
+  "number" : 73,
+  "schema" : 1,
+  "skipped" : 0,
+  "terminal" : {
+    "gate" : 3,
+    "residual" : 14,
+    "ribbon" : 0,
+    "tick" : 0
+  }
+}

@@ -52,7 +52,7 @@ or {device} tasks (pure logic and host-generated content). Fixture seeds 2_301 a
   action, fingerprint, level and difficulty refused; newer schema and damaged JSON refused; counterexample loses with a named
   ribbon, gate and tick; `.witness("counterexample")` when the near-miss would not lose, `.witness("replay")` when the
   actions do not win); `--name host-4`
-- [ ] T-R02G0102-006 [US2] [US3] [US4] Create `Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomCatalogTests.swift`
+- [X] T-R02G0102-006 [US2] [US3] [US4] Create `Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomCatalogTests.swift` — Verified 2026-11-20: 2026-11-20 host-5 exit 0: AuroraLoomCatalogTests 5/5 (100 entries, 20 per band; catalog generated twice identical; pinned digest dc82c050…91d6; ProgressionRule.standard holds; band means shortest 1.7/2.4/3.55/4.35/5.6, work 917/936/952/960/978; 100 witness files byte for byte; testAuroraLoomContentBoundary INV-06) (.autonomy/migration/checks/R02-G01-02.host-5.json)
   (100 entries, 20 per band; the catalog generated twice is identical; pinned digest; `ProgressionRule.standard` holds on
   shortest; band means of shortest and work do not fall; each witness equals
   `docs/games/aurora-loom/levels/NNN.witness.json` byte for byte, written only with `AURORA_LOOM_WRITE_WITNESSES=1`;

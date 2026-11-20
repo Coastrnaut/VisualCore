@@ -1,0 +1,102 @@
+{
+  "actions" : [
+    {
+      "control" : "wave",
+      "ribbon" : 0,
+      "step" : 4
+    },
+    {
+      "control" : "phase",
+      "ribbon" : 2,
+      "step" : 9
+    }
+  ],
+  "counterexample" : {
+    "mismatch" : {
+      "gate" : 3,
+      "residual" : 290,
+      "ribbon" : 0,
+      "tick" : 0
+    },
+    "setting" : {
+      "phase" : [
+        10,
+        9,
+        9
+      ],
+      "wave" : [
+        4,
+        4,
+        4
+      ]
+    }
+  },
+  "difficulty" : {
+    "omega" : 32,
+    "shortest" : 2,
+    "tolerance" : 96,
+    "winningSettings" : 3,
+    "work" : 928
+  },
+  "fingerprints" : [
+    "33b1230e654151cf559d042852acf0f892177149186fa95f263deaa88a44b997",
+    "19b692f854372bba6339af9ac58584ea087bba42889f58e7b996ff4d71d90ea9",
+    "c956f18c52d90d52d538725665f55c11098d444179398ae4bba7a3b6a8a9646e"
+  ],
+  "level" : {
+    "allowance" : 11,
+    "band" : 2,
+    "fingerprint" : "81e6725480f9a1997e9ccc24343dc0c028624e0bfa069187b9179c382d6afb39",
+    "gates" : [
+      {
+        "position" : 3,
+        "target" : 2484
+      },
+      {
+        "position" : 10,
+        "target" : 2942
+      },
+      {
+        "position" : 12,
+        "target" : 3051
+      },
+      {
+        "position" : 13,
+        "target" : 3102
+      }
+    ],
+    "id" : "aurora-loom-025",
+    "omega" : 32,
+    "ribbons" : [
+      {
+        "omega" : 32,
+        "phase" : 9,
+        "wave" : 1
+      },
+      {
+        "omega" : 32,
+        "phase" : 9,
+        "wave" : 4
+      },
+      {
+        "omega" : 32,
+        "phase" : 11,
+        "wave" : 4
+      }
+    ],
+    "schema" : 1,
+    "seed" : 16475327485643117504,
+    "tolerance" : 96,
+    "tutorial" : false
+  },
+  "method" : "grid",
+  "number" : 25,
+  "schema" : 1,
+  "skipped" : 0,
+  "terminal" : {
+    "gate" : 3,
+    "residual" : 34,
+    "ribbon" : 0,
+    "tick" : 0
+  }
+}

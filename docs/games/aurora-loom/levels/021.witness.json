@@ -1,0 +1,108 @@
+{
+  "actions" : [
+    {
+      "control" : "wave",
+      "ribbon" : 0,
+      "step" : 13
+    },
+    {
+      "control" : "wave",
+      "ribbon" : 1,
+      "step" : 11
+    },
+    {
+      "control" : "phase",
+      "ribbon" : 1,
+      "step" : 2
+    }
+  ],
+  "counterexample" : {
+    "mismatch" : {
+      "gate" : 2,
+      "residual" : 298,
+      "ribbon" : 0,
+      "tick" : 0
+    },
+    "setting" : {
+      "phase" : [
+        2,
+        2,
+        1
+      ],
+      "wave" : [
+        13,
+        11,
+        13
+      ]
+    }
+  },
+  "difficulty" : {
+    "omega" : 32,
+    "shortest" : 3,
+    "tolerance" : 96,
+    "winningSettings" : 6,
+    "work" : 960
+  },
+  "fingerprints" : [
+    "4a4ac56bc2197953edf31464aeee080dbcd826041e6859b8af4572e3b593a162",
+    "4655456f5ce3fb32a788b035cc9c0726d77ce03e8bf73fcb215d024c8ce48415",
+    "7b5ec75b622640f5c019912a1f0f6e19072c8109634950d1621eee878b29b8bb",
+    "3a59109342646bcb8d2cdee44727413f0f4b0e7819b0d7e6bdc5ea60976fdd82"
+  ],
+  "level" : {
+    "allowance" : 11,
+    "band" : 2,
+    "fingerprint" : "bf0bba70824ebff7ca34d864027ea3a6d7cb3c6b7ab46dae3438c80da22f19dc",
+    "gates" : [
+      {
+        "position" : 6,
+        "target" : 1547
+      },
+      {
+        "position" : 10,
+        "target" : 2307
+      },
+      {
+        "position" : 11,
+        "target" : 2502
+      },
+      {
+        "position" : 5,
+        "target" : 1297
+      }
+    ],
+    "id" : "aurora-loom-021",
+    "omega" : 32,
+    "ribbons" : [
+      {
+        "omega" : 32,
+        "phase" : 1,
+        "wave" : 10
+      },
+      {
+        "omega" : 32,
+        "phase" : 9,
+        "wave" : 15
+      },
+      {
+        "omega" : 32,
+        "phase" : 1,
+        "wave" : 13
+      }
+    ],
+    "schema" : 1,
+    "seed" : 15971191641745209244,
+    "tolerance" : 96,
+    "tutorial" : false
+  },
+  "method" : "grid",
+  "number" : 21,
+  "schema" : 1,
+  "skipped" : 0,
+  "terminal" : {
+    "gate" : 3,
+    "residual" : 95,
+    "ribbon" : 1,
+    "tick" : 0
+  }
+}

@@ -1,0 +1,120 @@
+{
+  "actions" : [
+    {
+      "control" : "wave",
+      "ribbon" : 0,
+      "step" : 2
+    },
+    {
+      "control" : "phase",
+      "ribbon" : 0,
+      "step" : 2
+    },
+    {
+      "control" : "wave",
+      "ribbon" : 1,
+      "step" : 2
+    },
+    {
+      "control" : "phase",
+      "ribbon" : 1,
+      "step" : 2
+    },
+    {
+      "control" : "phase",
+      "ribbon" : 2,
+      "step" : 2
+    }
+  ],
+  "counterexample" : {
+    "mismatch" : {
+      "gate" : 1,
+      "residual" : 262,
+      "ribbon" : 0,
+      "tick" : 0
+    },
+    "setting" : {
+      "phase" : [
+        3,
+        2,
+        2
+      ],
+      "wave" : [
+        2,
+        2,
+        2
+      ]
+    }
+  },
+  "difficulty" : {
+    "omega" : 256,
+    "shortest" : 5,
+    "tolerance" : 24,
+    "winningSettings" : 3,
+    "work" : 960
+  },
+  "fingerprints" : [
+    "6e1c78d2e792e5bda5aa233c481eee4081bb653776c4621525b760b1fed95500",
+    "149f52fb3f4d268f8e3eb7d467d5e751598786013047a6a19cd3b4c3136dd188",
+    "6b7db468e4fc641c7deb7e13396ff3349852790c886e2590411edd7740dd8dcb",
+    "be5c1d0de26e6070be5e14fcf17f29faa4508ea5f42655ea87c825eba60628f8",
+    "d1ed694c622e942be79bba20daff8e5672328087d68f87c40a0620dabb05245d",
+    "78cad362356c179dd5b3a259ad33326a1dc97728a0c0bf6cff5656931e1aadbc"
+  ],
+  "level" : {
+    "allowance" : 19,
+    "band" : 5,
+    "fingerprint" : "3b8eac84a570c2a7e81fe1183e317b4860f37fc0531575023642ef2cbf124bfa",
+    "gates" : [
+      {
+        "position" : 5,
+        "target" : 669
+      },
+      {
+        "position" : 8,
+        "target" : 762
+      },
+      {
+        "position" : 12,
+        "target" : 892
+      },
+      {
+        "position" : 13,
+        "target" : 928
+      }
+    ],
+    "id" : "aurora-loom-087",
+    "omega" : 256,
+    "ribbons" : [
+      {
+        "omega" : 256,
+        "phase" : 6,
+        "wave" : 3
+      },
+      {
+        "omega" : 256,
+        "phase" : 7,
+        "wave" : 10
+      },
+      {
+        "omega" : 256,
+        "phase" : 8,
+        "wave" : 2
+      }
+    ],
+    "schema" : 1,
+    "seed" : 10890009830383132214,
+    "tolerance" : 24,
+    "tutorial" : false
+  },
+  "method" : "grid",
+  "number" : 87,
+  "schema" : 1,
+  "skipped" : 0,
+  "terminal" : {
+    "gate" : 1,
+    "residual" : 6,
+    "ribbon" : 0,
+    "tick" : 0
+  }
+}

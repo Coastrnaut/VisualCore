@@ -1,0 +1,114 @@
+{
+  "actions" : [
+    {
+      "control" : "wave",
+      "ribbon" : 0,
+      "step" : 2
+    },
+    {
+      "control" : "wave",
+      "ribbon" : 1,
+      "step" : 2
+    },
+    {
+      "control" : "wave",
+      "ribbon" : 2,
+      "step" : 2
+    },
+    {
+      "control" : "phase",
+      "ribbon" : 2,
+      "step" : 4
+    }
+  ],
+  "counterexample" : {
+    "mismatch" : {
+      "gate" : 2,
+      "residual" : 276,
+      "ribbon" : 0,
+      "tick" : 0
+    },
+    "setting" : {
+      "phase" : [
+        5,
+        4,
+        4
+      ],
+      "wave" : [
+        2,
+        2,
+        2
+      ]
+    }
+  },
+  "difficulty" : {
+    "omega" : 64,
+    "shortest" : 4,
+    "tolerance" : 64,
+    "winningSettings" : 3,
+    "work" : 992
+  },
+  "fingerprints" : [
+    "c42ad5f8c8771d029930b2bc65d4d0b9e34ab49b9cb8b6c8fdf0191f8e81d1fd",
+    "3a15fc0481f67d9e607ee3e0e63f47b46baea2277464dbc67e73d34ce9a94321",
+    "dfd3e82dc9a4540404c354d70e2c4fb02a880da46342bea54f9fd479531fa8e3",
+    "3179fb278f266fb80373d6c0529ff5676d96b9fbd4e7b6bca65107c5cbd2278b",
+    "0bd49ab65216039cdf447a79d597dbbb4a45fdfc7977885c22ef8c50850892b0"
+  ],
+  "level" : {
+    "allowance" : 15,
+    "band" : 3,
+    "fingerprint" : "9d3dbca1580a5cd98bbd175b0415c38544f3ce8541137c4959c4719a5e7ae66e",
+    "gates" : [
+      {
+        "position" : 14,
+        "target" : 1466
+      },
+      {
+        "position" : 5,
+        "target" : 1211
+      },
+      {
+        "position" : 3,
+        "target" : 1100
+      },
+      {
+        "position" : 2,
+        "target" : 1087
+      }
+    ],
+    "id" : "aurora-loom-043",
+    "omega" : 64,
+    "ribbons" : [
+      {
+        "omega" : 64,
+        "phase" : 4,
+        "wave" : 15
+      },
+      {
+        "omega" : 64,
+        "phase" : 4,
+        "wave" : 5
+      },
+      {
+        "omega" : 64,
+        "phase" : 13,
+        "wave" : 11
+      }
+    ],
+    "schema" : 1,
+    "seed" : 939694336576751433,
+    "tolerance" : 64,
+    "tutorial" : false
+  },
+  "method" : "descent",
+  "number" : 43,
+  "schema" : 1,
+  "skipped" : 0,
+  "terminal" : {
+    "gate" : 1,
+    "residual" : -27,
+    "ribbon" : 0,
+    "tick" : 0
+  }
+}

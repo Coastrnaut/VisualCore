@@ -1,0 +1,114 @@
+{
+  "actions" : [
+    {
+      "control" : "phase",
+      "ribbon" : 0,
+      "step" : 14
+    },
+    {
+      "control" : "wave",
+      "ribbon" : 1,
+      "step" : 12
+    },
+    {
+      "control" : "phase",
+      "ribbon" : 1,
+      "step" : 14
+    },
+    {
+      "control" : "phase",
+      "ribbon" : 2,
+      "step" : 14
+    }
+  ],
+  "counterexample" : {
+    "mismatch" : {
+      "gate" : 0,
+      "residual" : 272,
+      "ribbon" : 0,
+      "tick" : 0
+    },
+    "setting" : {
+      "phase" : [
+        15,
+        14,
+        14
+      ],
+      "wave" : [
+        12,
+        12,
+        12
+      ]
+    }
+  },
+  "difficulty" : {
+    "omega" : 128,
+    "shortest" : 4,
+    "tolerance" : 40,
+    "winningSettings" : 3,
+    "work" : 928
+  },
+  "fingerprints" : [
+    "2b433e9b3180e812e89496848c83f5538a38b3ef952405fd84b3778c07dc2bcf",
+    "6912e9e383b7fad1234cf32c127d8c00632a5f0b397d72d7a2d4e4aae3d95798",
+    "6045bdd041fb80f06fb48be5b176263975cf3c44240e4aa568f3274ec5e8d018",
+    "ce0e68726777e3d6c5ea1a327bb3514166c10ce2d62d456ece22ef972edefb0e",
+    "efe0fa72e3d39067eaa0974501bcf1d87af2d5244b81ecb171b80f96f0819584"
+  ],
+  "level" : {
+    "allowance" : 15,
+    "band" : 4,
+    "fingerprint" : "fc56817badbd3867866857bb62de0b5d2b547e571c84c64df4643452f81a6bec",
+    "gates" : [
+      {
+        "position" : 5,
+        "target" : 432
+      },
+      {
+        "position" : 12,
+        "target" : 1776
+      },
+      {
+        "position" : 14,
+        "target" : 2176
+      },
+      {
+        "position" : 13,
+        "target" : 1990
+      }
+    ],
+    "id" : "aurora-loom-077",
+    "omega" : 128,
+    "ribbons" : [
+      {
+        "omega" : 128,
+        "phase" : 4,
+        "wave" : 12
+      },
+      {
+        "omega" : 128,
+        "phase" : 12,
+        "wave" : 15
+      },
+      {
+        "omega" : 128,
+        "phase" : 2,
+        "wave" : 12
+      }
+    ],
+    "schema" : 1,
+    "seed" : 10513750505894645975,
+    "tolerance" : 40,
+    "tutorial" : false
+  },
+  "method" : "grid",
+  "number" : 77,
+  "schema" : 1,
+  "skipped" : 0,
+  "terminal" : {
+    "gate" : 0,
+    "residual" : 16,
+    "ribbon" : 0,
+    "tick" : 0
+  }
+}

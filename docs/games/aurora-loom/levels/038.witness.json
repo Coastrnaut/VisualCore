@@ -1,0 +1,108 @@
+{
+  "actions" : [
+    {
+      "control" : "phase",
+      "ribbon" : 0,
+      "step" : 11
+    },
+    {
+      "control" : "wave",
+      "ribbon" : 2,
+      "step" : 11
+    },
+    {
+      "control" : "phase",
+      "ribbon" : 2,
+      "step" : 11
+    }
+  ],
+  "counterexample" : {
+    "mismatch" : {
+      "gate" : 2,
+      "residual" : 287,
+      "ribbon" : 0,
+      "tick" : 0
+    },
+    "setting" : {
+      "phase" : [
+        12,
+        11,
+        11
+      ],
+      "wave" : [
+        11,
+        11,
+        11
+      ]
+    }
+  },
+  "difficulty" : {
+    "omega" : 32,
+    "shortest" : 3,
+    "tolerance" : 96,
+    "winningSettings" : 3,
+    "work" : 928
+  },
+  "fingerprints" : [
+    "aeaaef0bd7f45c53e10f235cb45bdf695fde4efecb86e0a1e4f82ca2c9ef4bce",
+    "43d24a70576a5fc8c63788f2e00b2e8687a0aeebfd171ff656c16271b4481fee",
+    "9107d57faea23d4d3ef8715104fe87c08aa1a8d2051dfad1d79251b9dada469c",
+    "a64ed4f3ab2fc1b2dfa0925d95fc62ccb717bd3f43141429cb3864cd384b7634"
+  ],
+  "level" : {
+    "allowance" : 12,
+    "band" : 2,
+    "fingerprint" : "04d15a79ca12cbc72fd0ab8a24ad9ca53f2e7d8eef6e63c26e66a9dd83241972",
+    "gates" : [
+      {
+        "position" : 9,
+        "target" : 303
+      },
+      {
+        "position" : 1,
+        "target" : 3023
+      },
+      {
+        "position" : 14,
+        "target" : 1153
+      },
+      {
+        "position" : 6,
+        "target" : 3889
+      }
+    ],
+    "id" : "aurora-loom-038",
+    "omega" : 32,
+    "ribbons" : [
+      {
+        "omega" : 32,
+        "phase" : 7,
+        "wave" : 11
+      },
+      {
+        "omega" : 32,
+        "phase" : 11,
+        "wave" : 11
+      },
+      {
+        "omega" : 32,
+        "phase" : 10,
+        "wave" : 15
+      }
+    ],
+    "schema" : 1,
+    "seed" : 12320403702659283196,
+    "tolerance" : 96,
+    "tutorial" : false
+  },
+  "method" : "grid",
+  "number" : 38,
+  "schema" : 1,
+  "skipped" : 0,
+  "terminal" : {
+    "gate" : 1,
+    "residual" : -31,
+    "ribbon" : 0,
+    "tick" : 0
+  }
+}
