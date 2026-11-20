@@ -51,7 +51,7 @@ or {device} tasks (pure logic). Fixture seed 2_301; tests stay short.
   `.github/workflows/ci.yml` beside the VisualCore host tests (and its cache path); new
   `docs/architecture/aurora-loom.md`; `Packages/ExperiencesRound02/README.md`; `docs/automatedtesting.md`; `--name
   round02-host -- swift test --package-path Packages/ExperiencesRound02`
-- [ ] T-R02G0101-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences` and
+- [X] T-R02G0101-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences` and — Verified 2026-11-20: 2026-11-20 rendering-27, rendering-26, experiences (sim-27.2) and host-full exit 0
   `--name host-full`
 - [ ] T-R02G0101-008 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G0101-009 Reference regression chunk 2 (`--name reference-2`)
