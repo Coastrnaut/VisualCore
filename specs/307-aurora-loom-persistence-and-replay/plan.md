@@ -35,7 +35,7 @@ No NEEDS CLARIFICATION remains.
 | II App-neutral API | PASS — game code stays in ExperiencesRound02; the shared store is reused. |
 | IV Host-testable | PASS — traces, reconciliation, migration and replay in the Core with host tests. |
 | V Implementation before devices | PASS — termination on hardware is a D1–D3 observation. |
-| VII Persistence and migration | PASS — versioned schema 3 with tested 1 → 2 → 3 migrations; damaged and newer payloads refused. |
+| XI One App and Stable Experience Identity | PASS — the id is unchanged; saved states migrate 1 → 2 → 3; damaged and newer payloads refused. |
 | IX Bounded input | PASS — traces bounded by the allowance (≤ 64); 100 results at most. |
 | XII One purchase, no advertising | PASS — free; no store code. |
 

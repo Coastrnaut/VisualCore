@@ -41,7 +41,8 @@ No NEEDS CLARIFICATION remains.
 | II App-neutral API | PASS — game code stays in ExperiencesRound02; shared routes reused, not changed. |
 | IV Host-testable | PASS — plans, lights and recipe are pure Core types with host tests. |
 | V Implementation before devices | PASS — sound, haptics and VoiceOver on hardware wait for D1–D3. |
-| VI Accessibility | PASS — labels, values, adjustable steppers, announcements, Dynamic Type, contrast, reduced motion and flashing. |
+| VI Evidence Over Assertion | PASS — announcements, haptics and fades proven by recorded sinks and measured frames. |
+| VII Native, Accessible UI | PASS — labels, values, adjustable steppers, announcements, Dynamic Type, contrast, reduced motion and flashing. |
 | IX Bounded input | PASS — rate limits from the shared planners; no unbounded queue. |
 | X Licensing and provenance | PASS — all text original; sound synthesized. |
 | XII One purchase, no advertising | PASS — free; no store code. |
