@@ -30,7 +30,7 @@ ImplementationLock-100 and are not tasks here. No {owner} tasks.
 
 ## Phase 4: Story 3 — sound and haptics (P2)
 
-- [ ] T-R02G0106-005 [P] [US3] Create `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomSoundRecipe.swift` (pure recipe from steps and stage; won adds a
+- [X] T-R02G0106-005 [P] [US3] Create `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomSoundRecipe.swift` (pure recipe from steps and stage; won adds a — Verified 2026-11-20: 2026-11-20 host-4 exit 0 (sound recipe, 6 tests, 12,288 valid recipes)
   fifth; failed is quieter) with `Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomSoundRecipeTests.swift` (purity; differs per wave step and
   stage; partials within the recipe type's limits); `--name host-4`
 
