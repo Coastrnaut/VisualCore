@@ -19,7 +19,7 @@ its check record (no trailers). No {owner} tasks; one {device} task. Fixture see
 
 ## Phase 3: Story 1 — grow branches (P1) 🎯
 
-- [ ] T-R02F19-003 [P] [US1] Create `Packages/VisualCore/Sources/VisualCoreScenes/PlantTurtle.swift` (LSystem.derive per clarifications Q1–Q2, word ≤ 1,048,576;
+- [X] T-R02F19-003 [P] [US1] Create `Packages/VisualCore/Sources/VisualCoreScenes/PlantTurtle.swift` (LSystem.derive per clarifications Q1–Q2, word ≤ 1,048,576; — Verified 2026-11-20: lead retest 2026-11-20: R02-F19.host-3.json (exit 0, full suite; host-2 also passed before test fixtures were made lighter); PlantTurtleTests 14 passed (three hand-derived words and branch counts; turtle geometry within 1e-12; orthonormal frames; 100 seeded weighted grammars repeat and differ by seed; reopened grammar grows the same skeleton; bracket, word and branch limits)
   PlantBranch, PlantPart, PlantMarker, PlantSkeleton; PlantTurtle.interpret and grow; branches ≤ 65,536; unbalanced
   brackets refused) with `Packages/VisualCore/Tests/VisualCoreScenesTests/PlantTurtleTests.swift` (three hand-derived grammars give their exact words and branch
   counts; 100 seeded weighted grammars repeat and differ by seed in ≥ 95 of 100; frames orthonormal; known turtle
@@ -40,8 +40,8 @@ its check record (no trailers). No {owner} tasks; one {device} task. Fixture see
 
 ## Phase 6: Story 3 — plant meshes (P2)
 
-- [ ] T-R02F19-006 [US3] Create `Packages/VisualCore/Sources/VisualCoreScenes/PlantMesh.swift` (branches through `CurveMeshes.tube`, parts at markers, merged with
-  `CurveMeshes.merged`) with `Packages/VisualCore/Tests/VisualCoreScenesTests/PlantMeshTests.swift` (50 seeded grammars: valid, within budget, vertex count equals the
+- [ ] T-R02F19-006 [US3] Create `Packages/VisualCore/Sources/VisualCoreScenes/PlantMesh.swift` (branches through `Mesh.tube`, parts at markers, merged with
+  `Mesh.merged`) with `Packages/VisualCore/Tests/VisualCoreScenesTests/PlantMeshTests.swift` (50 seeded grammars: valid, within budget, vertex count equals the
   sum of parts, each part's origin at its marker within 1e-9); `--name host-5`
 
 ## Phase 7: Regression, documentation and close
