@@ -609,4 +609,43 @@ import Testing
             #expect(direct.stage == .playing)
         }
     }
+
+    // T-R02G0301-013 (edge case "a move through a crossing gate", FR-R02G0301-002): a bow tie whose strand P0–P1 passes
+    // over P4–P5 at (2, 2). Pushing P1 down one step makes the swept triangle touch P4–P5 at (2, 2, 0): refused as a
+    // crossing without a gate; inside a gate holding both ends the move is accepted (the projection is degenerate while
+    // the strands meet at equal z), and the next step passes the strand under, flipping the crossing's sign — the count
+    // stays 1, as passing one strand through another can only swap over and under — which wins the level whose target is
+    // the opposite writhe.
+    @Test func aCrossingGateLetsAStrandPassThroughAndFlipTheCrossing() throws {
+        typealias Point = WaveKnotKeeperPoint
+        let rope: [Point] = [Point(x: 0, y: 0, z: 0), Point(x: 4, y: 4, z: 1), Point(x: 6, y: 4, z: 2),
+                             Point(x: 6, y: 0, z: 0), Point(x: 4, y: 0, z: 0), Point(x: 0, y: 4, z: 0)]
+        let start: WaveKnotKeeperSummary = WaveKnotKeeperGeometry.summary(rope)
+        #expect(start.crossings == 1 && !start.degenerate && abs(start.writhe) == 1)
+        let target: WaveKnotKeeperTarget = try WaveKnotKeeperTarget(crossings: 1, writhe: -start.writhe)
+        let gate: WaveKnotKeeperGate = try WaveKnotKeeperGate(min: Point(x: 4, y: 4, z: -1), max: Point(x: 4, y: 4, z: 1))
+        let down: WaveKnotKeeperMove = WaveKnotKeeperMove(point: 1, direction: .minusZ)
+        // Without the gate the step is refused and nothing changes.
+        let open: WaveKnotKeeperLevel = try WaveKnotKeeperLevel(id: "no-gate", seed: 2_321, band: 1, points: rope,
+                                                                gates: [], target: target, tensionBound: 1_000,
+                                                                allowance: 4)
+        var blocked: WaveKnotKeeperPlay = try WaveKnotKeeperFixtures.playing(open)
+        let before: WaveKnotKeeperPlay = blocked
+        #expect(!WaveKnotKeeperGeometry.sweepIsClear(rope, moving: 1, to: Point(x: 4, y: 4, z: 0)))
+        #expect(throws: WaveKnotKeeperError.move("crossing")) { try blocked.apply(down, expecting: blocked.fingerprint) }
+        #expect(blocked == before)
+        // With the gate the strand passes through.
+        let gated: WaveKnotKeeperLevel = try WaveKnotKeeperLevel(id: "gate", seed: 2_321, band: 1, points: rope,
+                                                                 gates: [gate], target: target, tensionBound: 1_000,
+                                                                 allowance: 4)
+        var play: WaveKnotKeeperPlay = try WaveKnotKeeperFixtures.playing(gated)
+        try play.apply(down, expecting: play.fingerprint)
+        #expect(play.stage == .playing && play.summary.degenerate)
+        try play.apply(down, expecting: play.fingerprint)
+        let after: WaveKnotKeeperSummary = play.summary
+        #expect(after.crossings == 1 && !after.degenerate && after.writhe == -start.writhe)
+        #expect(play.stage == .won && play.spent == 2)
+        // A step leaving the gate is checked again: from z = −1 down to z = −2 nothing is in the way, so it is clear.
+        #expect(WaveKnotKeeperPlay.refusal(of: down, points: play.points, level: gated) == nil)
+    }
 }
