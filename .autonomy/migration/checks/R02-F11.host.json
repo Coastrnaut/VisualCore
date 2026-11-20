@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "SDFShapeTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter SDFShapeTests",
+  "elapsed_seconds": 4.888,
+  "exit_code": 0,
+  "finished": "2026-11-20T00:44:48+00:00",
+  "gate": "R02-F11",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-F11.host.log",
+  "log_sha256": "48e284e8ad8f536fb8df2ffbb778db3ee8af4e78f852b08245a2de62035c931c",
+  "name": "host",
+  "started": "2026-11-20T00:44:43+00:00",
+  "timed_out": false
+}

@@ -25,3 +25,7 @@
   library pure (constitution IV). Alternatives: passing host context into geometry functions.
 - **R9 Default options.** Decision: `SDFMarchOptions.standard` holds the validated defaults, because a throwing
   initialiser cannot be a default argument (analyze finding U1).
+- **R10 Struct with a node tree (implementation, 2026-11-19).** Decision: `SDFShape` is a struct holding the read-only
+  indirect enum `SDFShape.Node`, built only through validating static makers (`sphere(radius:)` …) and
+  `validated(_:)`. Rationale: a Swift enum cannot declare a case and a throwing static function of the same name, and a
+  private initialiser keeps every description validated. The contract's call sites are unchanged.

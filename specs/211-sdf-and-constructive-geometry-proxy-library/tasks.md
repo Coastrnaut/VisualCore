@@ -13,7 +13,7 @@ seed 2_011.
 
 ## Phase 2: Foundational — the description (P1) 🎯
 
-- [ ] T-R02F11-002 [US1] Create `Packages/VisualCore/Sources/VisualCoreScenes/SDFError.swift` (`nonFinite(String)`,
+- [X] T-R02F11-002 [US1] Create `Packages/VisualCore/Sources/VisualCoreScenes/SDFError.swift` (`nonFinite(String)`, — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F11.host.json (exit 0; swift test --filter SDFShapeTests: 7 tests passed — closed forms at 1,000 points within 1e-12, set operations, transforms, normals, refusals, node and depth limits, finite at |p| ≤ 1e6)
   `nonPositive(String)`, `zeroDirection(String)`, `notUnitRotation`, `tooManyNodes(Int)`, `tooDeep(Int)`,
   `unknownKind(String)`, `newerSchema(Int)`, `malformed(String)`; `reasonCode` `r2-f11.*` as in the spec) and
   `SDFShape.swift` (the indirect enum of data-model.md; validating makers that throw `SDFError` — sizes and radii
