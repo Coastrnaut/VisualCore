@@ -22,7 +22,7 @@ Canonical overrides:
   tutorial contract. This feature adds them; the catalog is built from a plan and a seed by code and pinned by its
   digest in tests, so the "build-time" catalog is reproduced and checked on every test run rather than written by a
   separate tool. Existing types stay unchanged.
-- **Who the users are:** every player of a level-based experience, who meets a gentle first level, a tutorial that
+- **Who the users are:** every player of a level-based experience, who meets as first level the easiest level of the first stage, a tutorial that
   teaches one idea at a time and only moves on when the idea was used, and levels that get harder steadily, never in a
   sudden jump and never easier again by much; the engineer, who needs a catalog that is the same on every build and
   device, with every level certified.
