@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "LissajousLabyrinthExperienceCoreTests|LissajousLabyrinthRendererPurityTests"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter 'LissajousLabyrinthExperienceCoreTests|LissajousLabyrinthRendererPurityTests'",
+  "elapsed_seconds": 5.921,
+  "exit_code": 0,
+  "finished": "2026-11-20T21:11:55+00:00",
+  "gate": "R02-G02-03",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G02-03.host-4.log",
+  "log_sha256": "8a9adc715416258f9267deddfa1e4de288dc57c03288a18caca57436aa31ad2f",
+  "name": "host-4",
+  "started": "2026-11-20T21:11:49+00:00",
+  "timed_out": false
+}

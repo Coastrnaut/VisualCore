@@ -25,7 +25,7 @@ tests stay short (< 10 s each). No {owner} tasks.
   with tangent-space width, rings, icospheres, head, camera fitted for aspect 0.4 … 2.5 with a 5 % margin, `project`)
   with `Packages/ExperiencesRound02/LissajousLabyrinth/CoreTests/LissajousLabyrinthSceneGeometryTests.swift` (finite and bounded for extreme settings; projections of
   every element inside the view with margin at 7 aspects; tier samples are exact kernel samples); `--name host-3`
-- [ ] T-R02G0203-005 [P] [US2] Create `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthExperienceCore.swift` (controls "dial.set [0…3, 0…15],
+- [X] T-R02G0203-005 [P] [US2] Create `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthExperienceCore.swift` (controls "dial.set [0…3, 0…15], — Verified 2026-11-20: 2026-11-20 host-4 exit 0 (adapter conformance and contract, renderer purity over 200 snapshots; 11 tests)
   play.undo, play.redo, level.next"; digest "level number and play fingerprint"; schema 1 `{level, records}`; quality
   profile of three levels) with `Packages/ExperiencesRound02/LissajousLabyrinth/CoreTests/LissajousLabyrinthExperienceCoreTests.swift` (conformance; undo restores the
   digest; snapshot round trip and refusals) and `Packages/ExperiencesRound02/LissajousLabyrinth/CoreTests/LissajousLabyrinthRendererPurityTests.swift` (200 seeded
