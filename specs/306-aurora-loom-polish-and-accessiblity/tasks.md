@@ -36,7 +36,7 @@ ImplementationLock-100 and are not tasks here. No {owner} tasks.
 
 ## Phase 5: Wiring (presenter, panel, scene, sound)
 
-- [ ] T-R02G0106-006 Edit `Packages/ExperiencesRound02/AuroraLoom/Experience/AuroraLoomPresenter.swift` (injectable `feedback` route; plans routed through the
+- [ ] T-R02G0106-006 Edit `Packages/ExperiencesRound02/AuroraLoom/Experience/AuroraLoomPresenter.swift` (injectable `feedback` route; `adjust(ribbon:control:by:port:)` used by the steppers and their accessibility actions; plans routed through the
   port after `describe` and on refusals; feedback log; eased lights stepped each frame), `Packages/ExperiencesRound02/AuroraLoom/Experience/AuroraLoomControls.swift`
   (ScrollView, Dynamic Type text styles, labels and values for every control, Sound toggle, iPad width ≤ 520 points,
   refusals through the presenter), `Packages/ExperiencesRound02/AuroraLoom/Experience/AuroraLoomRibbonScene.swift` (gate and win brightness from the
