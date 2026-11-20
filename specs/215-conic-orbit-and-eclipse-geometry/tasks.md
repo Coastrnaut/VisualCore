@@ -53,7 +53,7 @@ public names checked against Packages and Apps (`Visibility` is taken). Fixture 
 
 ## Phase 6: Story 4 — save and open (P2)
 
-- [ ] T-R02F15-006 [US4] Add schema-1 `Codable` to `Packages/VisualCore/Sources/VisualCoreMath/ConicOrbit.swift`
+- [X] T-R02F15-006 [US4] Add schema-1 `Codable` to `Packages/VisualCore/Sources/VisualCoreMath/ConicOrbit.swift` — Verified 2026-11-19: lead retest 2026-11-19: R02-F15.host-rerun.json (exit 0, full suite; first R02-F15.host.json failed only the timed R02-F05 mesh budget under parallel load, fixed by lightening the overlap oracle to 1,024 intervals); ConicOrbitCodingTests 4 passed (byte-identical round trip of three kinds; schema 2 newerSchema; missing, truncated and empty JSON malformed; q = 0 invalidElements)
   (sorted keys; `encoded()`, `decode(_:)`; schema above 1 → `r2-f15.newer-schema`; missing or invalid →
   `r2-f15.malformed` or `r2-f15.invalid-elements`) with
   `Packages/VisualCore/Tests/VisualCoreMathTests/ConicOrbitCodingTests.swift` (byte-identical round trip of three kinds;
