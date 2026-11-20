@@ -24,7 +24,7 @@ document is `TimelineRunDocument`). Fixture seed 2_014; tests stay light.
 
 ## Phase 3: Stories 1–3 — rewind, edit, prove (P1) 🎯
 
-- [ ] T-R02F14-003 [US1] [US2] [US3] Create `Packages/VisualCore/Sources/VisualCoreSimulation/ReversibleTimeline.swift` (contracts/api.md; commands at step s applied in
+- [X] T-R02F14-003 [US1] [US2] [US3] Create `Packages/VisualCore/Sources/VisualCoreSimulation/ReversibleTimeline.swift` (contracts/api.md; commands at step s applied in — Verified 2026-11-19: lead retest 2026-11-19: R02-F14.host.json (exit 0; ReversibleTimelineTests 9 passed: 200 seeks = fresh run, 50 edits = fresh edited run, 100/100 command changes alter the hash, ring of 4 exact with ≤ 63 replayed steps, non-determinism caught; research R6)
   insertion order before s → s + 1; snapshot every `interval` steps with its hash; `seek(to:)` per clarification Q3;
   edits per research R4; refusals) with `Packages/VisualCore/Tests/VisualCoreSimulationTests/ReversibleTimelineTests.swift` (a small value-type test simulation (a
   seeded particle-like state with a deterministic checksum) run to 1,000 steps with 100 seeded commands: 200 seeded

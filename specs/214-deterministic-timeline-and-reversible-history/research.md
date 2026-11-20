@@ -14,3 +14,11 @@
 - **R5 Stored form.** Decision: `TimelineRunDocument` (JSON, sorted keys, schema 1) with a `MigrationChain` step from a
   schema-0 form (log as [step, command] pairs); opening replays to the stored step and compares the hash. Rationale:
   reuse of the existing migration machinery; a damaged run is detected, not trusted.
+- **R6 As built (implementation, 2026-11-19).** Snapshots are stored at positive multiples of `interval` only when the
+  step lies beyond the ring's newest snapshot, so backward replays never add or evict; a replay that reaches a kept
+  snapshot's step compares hashes. A backward seek restores the latest snapshot ≤ k and so never replays through a kept
+  one: the restored snapshot's (and the start's) `checksum()` is therefore compared with the recorded value, and a
+  difference throws `hashMismatch` — this is how a non-deterministic simulation is caught on backward seeks. Extras:
+  `EventLog.steps`, `ReversibleTimeline.hash(at:)` (seeks a copy). Measured: 15 snapshots after 1,000 steps (64…960),
+  capacity 4 keeps 768…960; replays from a kept snapshot ≤ 63 steps; 100/100 single-command changes alter the hash; the
+  3-step known-answer hash is pinned in the tests and cross-checked independently.
