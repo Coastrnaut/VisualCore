@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-19
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-F14 (migration ledger, shared round feature) · ID namespace FR-R02F14-###, SC-R02F14-###, T-R02F14-###
 
@@ -30,6 +30,44 @@ Canonical overrides:
   (ImplementationLock-100). **Device-only items:** rewind time of a long run on D1–D3, recorded in the device campaign.
   **Owner-only items:** none.
 
+## Clarifications
+
+### Session 2026-11-19
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time. Facts checked in
+code (read-only audit, 2026-11-19): `FixedStepSimulation` (mutating `step(_ dt:)`, `checksum() -> UInt64`),
+`ControlStream` (immutable entries) and `FixedStepRunner` (forward only) are in VisualCoreSimulation, which depends on
+VisualCoreMath only; `StableHash.sha256(_:)` is in VisualCoreMath; `MigrationChain` (VisualCorePersistence) and
+`ExperienceSnapshot`, `StateDigest` (VisualCoreExperience, which depends on Simulation and Persistence) exist; `RunDocument`
+is taken (GraphicsBenchmarkLab) and `Checkpoint` is nested in DigitalZenGarden; the names `EventLog`, `SnapshotRing`,
+`ReversibleTimeline`, `ReplayHash`, `TimelineError` are free.
+
+- Q: Where do the parts live? → A: `EventLog`, `SnapshotRing`, `ReplayHash`, `ReversibleTimeline` and `TimelineError` in
+  VisualCoreSimulation beside the runner (the simulation is any value type conforming to `FixedStepSimulation`); the
+  stored form `TimelineRunDocument` and its migration in VisualCoreExperience, which already reaches `MigrationChain`, so
+  no module dependency changes. Rationale: Section 13's home; Simulation stays pure. Impact: FR-R02F14-001…006.
+- Q: When are a step's commands applied and in what order? → A: the commands at step s are applied, in insertion order,
+  just before the simulation advances from step s to s + 1, with the fixed step duration of the timeline (default
+  1/120 s, as `FixedStepClock`). Steps run 0 … 10,000,000; the log holds at most 1,048,576 commands. Insert appends at
+  the end of its step; remove and replace address (step, index within step). Impact: FR-R02F14-001, 002; edge cases.
+- Q: How are snapshots kept and how does a seek work? → A: a snapshot is taken every `interval` steps (default 64,
+  1…65,536) into a ring of `capacity` snapshots (default 32, 1…1,024); when full, the oldest is dropped. Seek to k:
+  k < 0 or k > 10,000,000 is refused; otherwise restore the newest snapshot with step ≤ k (or the start) and replay to k.
+  A seek therefore replays at most interval − 1 steps when the snapshot is kept, or from the start when it was dropped.
+  Impact: FR-R02F14-002, 003; SC-R02F14-004 (reworded below).
+- Q: What exactly is the replay hash, and what does an edit do? → A: h₀ = SHA-256("vc.replay.v1" ‖ checksum₀ as 8 bytes
+  little-endian); hₙ = SHA-256(hₙ₋₁ ‖ n as 8 bytes LE ‖ checksumₙ as 8 bytes LE), where checksumₙ is the state's
+  checksum after n steps; snapshots also keep their hash. An edit at step s drops snapshots and hashes after s and, if the
+  timeline is past s, re-seeks to its current step so its state and hash are those of the edited log at once.
+  Impact: FR-R02F14-004, 005; SC-R02F14-002, 003.
+- Q: What is stored, how are old versions migrated, and what are the failure codes? → A: `TimelineRunDocument` is JSON
+  `{"schema":1,"start":<state>,"log":[{"step","command"}…],"step":n,"hash":"<hex>"}` (State and Command `Codable`,
+  sorted keys); opening replays to `step` and compares the hash, refusing a mismatch. Schema 0, an earlier form whose log
+  is a list of `[step, command]` pairs, is migrated by a `MigrationChain` step; schema above 1 is refused. Reason codes:
+  `r2-f14.negative-step`, `r2-f14.step-limit`, `r2-f14.log-limit`, `r2-f14.no-such-command`, `r2-f14.ring-size`,
+  `r2-f14.interval`, `r2-f14.hash-mismatch`, `r2-f14.newer-schema`, `r2-f14.malformed`; the experience adds its id,
+  seed and tick. Impact: FR-R02F14-006, 007; SC-R02F14-005.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Go back in time and come forward again (Priority: P1) 🎯
@@ -46,8 +84,7 @@ to k gives; seeking forward again gives the original checksum at N.
 
 1. **Given** a run of N steps, **When** it seeks to step k, **Then** its state's checksum equals a fresh run's at k.
 2. **Given** a seek to k, **When** it steps forward to N, **Then** the checksum at N equals the original.
-3. **Given** a seek beyond the recorded end, **When** asked, **Then** it runs forward to that step (or is refused past a
-   stated limit).
+3. **Given** a seek beyond the recorded end, **When** asked, **Then** it runs forward to that step, or is refused past step 10,000,000.
 
 ### User Story 2 - Change the past (Priority: P1)
 
@@ -79,7 +116,7 @@ damaged forms are refused with a named reason.
 - **An edit at a step before the first snapshot kept:** recomputed from the start.
 - **Snapshot storage full:** the oldest snapshots are dropped and seeking still lands exactly (it replays from the start
   or the nearest kept snapshot).
-- **Many commands at one step:** applied in a stated, stable order.
+- **Many commands at one step:** applied in insertion order just before that step advances.
 - **A simulation whose checksum is not deterministic:** detected by the replay check and reported.
 - **An empty log:** the run is the simulation's own stepping.
 
@@ -87,10 +124,11 @@ damaged forms are refused with a named reason.
 
 ### Functional Requirements
 
-- **FR-R02F14-001**: An event log MUST hold commands by step in a stable order (step, then insertion order), and MUST
-  allow inserting, removing and replacing a command at a step; it MUST be bounded by stated limits.
+- **FR-R02F14-001**: An event log MUST hold commands by step in a stable order (step, then insertion order), and MUST allow inserting, removing and replacing a command at a step;
+  it holds at most 1,048,576 commands at steps 0…10,000,000.
 - **FR-R02F14-002**: A reversible timeline MUST run a deterministic simulation forward one step at a time, applying the
-  log's commands at each step, and MUST keep snapshots of the state every stated interval in a bounded ring.
+  log's commands at each step, and MUST keep snapshots of the state every `interval` steps (1…65,536, default 64) in a ring of `capacity`
+  (1…1,024, default 32).
 - **FR-R02F14-003**: Seeking to any step MUST restore the nearest kept snapshot at or before it and replay the log
   forward, landing on exactly the state of a fresh run at that step.
 - **FR-R02F14-004**: Editing the log at step s MUST discard snapshots after s and recompute later steps on demand, with
@@ -121,8 +159,8 @@ damaged forms are refused with a named reason.
 - **SC-R02F14-002**: After 50 seeded edits, the checksum at every later step equals a fresh run of the edited log.
 - **SC-R02F14-003**: Identical runs give identical hashes; changing any one of 100 commands changes the hash in 100 of
   100 cases; a rewind-and-replay gives the straight-run hash.
-- **SC-R02F14-004**: With a ring of 4 snapshots and 1,000 steps, every seek is still exact, and a seek replays at most
-  the stated interval times (dropped snapshots + 1) steps.
+- **SC-R02F14-004**: With a ring of 4 snapshots and 1,000 steps, every seek is still exact, and a seek replays at most `interval` − 1 steps from a kept snapshot, or from the start when its
+  snapshot was dropped.
 - **SC-R02F14-005**: At least five positive, negative and boundary fixtures for logs, seeks and stored runs give their
   stated verdicts; a stored run round-trips byte for byte and an older-version example migrates to the same hash.
 - **SC-R02F14-006**: Existing tests pass unchanged; the reference regression passes 7 of 7; each unit test finishes in
