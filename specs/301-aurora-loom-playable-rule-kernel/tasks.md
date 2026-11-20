@@ -62,3 +62,13 @@ or {device} tasks (pure logic). Fixture seed 2_301; tests stay short.
 
 001 → 002 → {003, 004, 005} in parallel → 006 → … → 011. Agents: A (003), B (004),
 C (005). Shared files (002, CI, docs) stay with the lead. MVP: Story 1.
+
+## Phase 7: Convergence
+
+- [ ] T-R02G0101-012 Add the source's named invariant tests for the invariants this feature owns —
+  `testAuroraLoomTimeBoundary` (INV-01), `testAuroraLoomInputbudgetBoundary` (INV-02), `testAuroraLoomGoalBoundary`
+  (INV-03), `testAuroraLoomRepeatabilityBoundary` (INV-04), `testAuroraLoomUndoBoundary` (INV-05),
+  `testAuroraLoomFailurehonestyBoundary` (INV-07), `testAuroraLoomStabilityBoundary` (INV-08) and
+  `testAuroraLoomSaveBoundary` (INV-09), each a direct boundary example plus a seeded neighbouring-input check — in
+  `Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomInvariantTests.swift`; `--name host-5` per spec
+  Traceability (partial)
