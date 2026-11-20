@@ -33,7 +33,7 @@ recorded only after every agent has reported). Commit after every task with its 
 
 ## Phase 4: Stories 2 and 3 — fail, undo, redo, replay (P1)
 
-- [ ] T-R02G0301-004 [P] [US2] [US3] Create `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperPlay.swift` (stages "loading, tutorial, playing,
+- [X] T-R02G0301-004 [P] [US2] [US3] Create `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperPlay.swift` (stages "loading, tutorial, playing, — Verified 2026-11-20: 2026-11-20 host-3 exit 0 (play, 19 tests: 500 fixtures won by known solutions with every single move refused exactly as an independent oracle names it, every reason reachable; 500 seeded traces replay with undo and redo exact; allowance and tension failures named; full stage table). The .allowance refusal is a defensive guard: a playing play always has spent < allowance
   paused, won, failed, result"; moves validated for range, bounds, coincidence, sweep, gates, tension, stage, previous
   fingerprint, allowance; records with previous and next fingerprints; undo, redo; replay) with
   `Packages/ExperiencesRound02/WaveKnotKeeper/CoreTests/WaveKnotKeeperPlayTests.swift` (known solutions win; 500 seeded traces replay; undo restores exact
