@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-20
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-F19 (migration ledger, shared round feature) · ID namespace FR-R02F19-###, SC-R02F19-###, T-R02F19-###
 
@@ -29,6 +29,52 @@ Canonical overrides:
 - **Superseded parts of the source prompt:** the USD 1.99–4.99 purchase model (ADR-0009); the Round 2 lock
   (ImplementationLock-100). **Device-only items:** the frame cost of a dense instanced garden on D1–D3, recorded in the
   device campaign. **Owner-only items:** none.
+
+## Clarifications
+
+### Session 2026-11-20
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time. Facts checked in
+code (read-only audit, 2026-11-20): VisualCoreScenes depends on VisualCoreSimulation (`SeededRandom`) and VisualCoreMath
+(`Vec3`, `Mat4`); `CurveMeshes.tube(samples:radius:sides:caps:)` draws a constant-radius tube along `CurveSamples` and
+`CurveMeshes.merged(_:budget:)` joins meshes; `MeshInstance(model:color:)` and `InstancedMeshRenderer` are in
+VisualCoreRendering; no grammar, turtle or plant code exists; the names `LSystem`, `PlantGrammar`, `PlantTurtle`,
+`PlantSkeleton`, `PetalShape`, `CapShape`, `StemShape`, `PlantMesh`, `PlantScatter`, `PlantInstance` and `PlantError`
+are free.
+
+- Q: Where do the parts live, and what are the symbols and limits? → A: all in VisualCoreScenes (pure, host-tested).
+  Symbols are single characters; the turtle reads F (draw a segment of the current step), f (move without drawing),
+  + and − (turn about up by ±δ), & and ^ (pitch about left by ±δ), \ and / (roll about heading by ±δ), | (turn 180°),
+  [ and ] (push and pop the state), ! (radius × radius factor), P (petal), C (cap), L (leaf); every other character
+  only rewrites. Limits: generations 0 … 12, word length ≤ 1,048,576, at most 64 rules of up to 8 successors of up to
+  256 symbols, branches ≤ 65,536. Impact: FR-R02F19-001, 002; Edge Cases.
+- Q: How is chance made deterministic, and how does the turtle keep its frame? → A: one `SeededRandom` stream seeded with
+  the grammar's seed; in each generation the word is read left to right and every symbol with a weighted rule draws one
+  `double()` to pick a successor by cumulative weight (weights finite and > 0; a symbol with one successor draws
+  nothing). The turtle starts at the origin with heading +y, left −x, up +z (Prusinkiewicz and Lindenmayer 1990
+  conventions), re-orthonormalises its frame after every rotation, and records branches (start, end, radius, bracket
+  depth) and markers (kind, position, heading, left, up, size = current step) in word order. Impact: FR-R02F19-001,
+  002; SC-R02F19-001.
+- Q: What are the petal, cap and stem shapes exactly? → A: a petal is an open two-sided surface along a spine of length ℓ
+  (0 < ℓ ≤ 100) bent in its plane by a total curl c (|c| ≤ π), with half-width w · sin(π t) (0 < w ≤ ℓ) at spine fraction
+  t, n segments (2 … 64) and 3 points across; a cap is a closed surface of revolution of radius R (0 < R ≤ 100) and height
+  h (0 < h ≤ 100), z = h · √(1 − (r/R)²) above a flat underside with a rim of depth d (0 ≤ d < h), with s sides
+  (8 … 128) and k rings (2 … 64); a stem is a closed tapered tube of length L (0 < L ≤ 100), radii r₀ ≥ r₁ > 0, a bend b
+  (|b| ≤ π) and s sides (3 … 64), m segments (1 … 64). The plant mesh draws each branch with `CurveMeshes.tube` (two
+  samples, the branch radius, 6 sides, caps) and places petals, caps and leaves (leaf = petal of half width) at markers in
+  their frames, then `CurveMeshes.merged`. Impact: FR-R02F19-003, 004; SC-R02F19-002, 003.
+- Q: How does scattering work? → A: dart throwing over a rectangle x₀ < x₁, z₀ < z₁ (finite) with spacing d > 0: up to
+  30 · maxCount seeded candidates (maxCount 1 … 65,536), each accepted when no accepted instance is closer than d
+  (checked through a grid of cell size d/√2), stopping at maxCount; each accepted instance draws its scale in
+  [s_min, s_max] (0 < s_min ≤ s_max ≤ 100), yaw in [0, 2π) and variant in 0 ..< variants (1 … 64), in that order. A
+  `PlantInstance` holds position (y = 0), scale, yaw, variant and the model matrix T · R_y · S, ready for `MeshInstance`.
+  Impact: FR-R02F19-005; SC-R02F19-004.
+- Q: What is stored, and what are the failure codes? → A: `PlantGrammar` is `Codable` JSON schema 1 with sorted keys (start
+  word, rules as predecessor and weighted successors, generations, angle, step, radius, radius factor, seed); schema 1 is
+  the first stored form, a newer one refused. Reason codes (`PlantError`): `r2-f19.generations`, `r2-f19.word-limit`,
+  `r2-f19.rule`, `r2-f19.weight`, `r2-f19.brackets`, `r2-f19.turtle-parameter`, `r2-f19.shape-parameter`,
+  `r2-f19.branch-limit`, `r2-f19.scatter-area`, `r2-f19.scatter-parameter`, `r2-f19.newer-schema`, `r2-f19.malformed`;
+  the experience adds its id, seed and tick. Impact: FR-R02F19-006, 007; SC-R02F19-005.
 
 ## User Scenarios & Testing *(mandatory)*
 
