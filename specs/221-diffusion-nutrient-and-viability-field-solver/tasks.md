@@ -34,7 +34,7 @@ its check record (no trailers). No {owner} tasks; one {device} task. Fixture see
 
 ## Phase 4: Story 4 — bounded growth (P2)
 
-- [ ] T-R02F21-004 [P] [US3] [US4] Create `Packages/VisualCore/Sources/VisualCoreSimulation/NutrientField+Growth.swift` (growth phase per clarification Q4 and
+- [X] T-R02F21-004 [P] [US3] [US4] Create `Packages/VisualCore/Sources/VisualCoreSimulation/NutrientField+Growth.swift` (growth phase per clarification Q4 and — Verified 2026-11-20: 2026-11-20 host-3 exit 0: GrowthNetworkTests 11/11 (two seeded runs identical over 50 frames; limits, ranking, parents, eaten = cost × grown; breadthFirst routes all 4,005 pairs of a 90-cell network; growth only for t > 0) (.autonomy/migration/checks/R02-F21.host-3.json)
   `networkGraph()`) with `Packages/VisualCore/Tests/VisualCoreSimulationTests/GrowthNetworkTests.swift` (two seeded runs identical; never past limit or per-frame
   limit; every new cell viable, holding at least the cost and next to the network; eaten amounts in the ledger; nowhere
   to go gives zero growth; seed refusals (no network, outside, on the network, at the limit); growth only with t > 0; the network routes through `RouteSearch` between any two of its cells; refusals);

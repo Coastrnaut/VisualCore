@@ -68,7 +68,7 @@ and `GridGraph` (cell index y · width + x) are in VisualCoreSimulation; no diff
   (most first), then cell index, and up to the per-frame limit (1 … 1,024) are taken in that order while the network
   stays within its size limit (1 … 65,536 cells); each new cell links to its lowest-index network neighbour and eats the
   cost from its own cell (counted as eaten). Growth runs once per `step(by:)` call with t > 0. Seeds are placed by the caller and count toward the limit; a seed is
-  refused without a network, outside the grid, on a network cell or at the limit (`.growth(name)` or `.cellRange`). `graph()` gives
+  refused without a network, outside the grid, on a network cell or at the limit (`.growth(name)` or `.cellRange`). `networkGraph()` gives
   a `RouteGraph` over all grid cells with an undirected edge of cost 1 per link, for the existing route solvers.
   Impact: FR-R02F21-004, 005; SC-R02F21-004, 005.
 - Q: What does a step report, how is the field stored and how are errors named? → A: `step(by:)` returns a
