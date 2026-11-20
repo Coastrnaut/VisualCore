@@ -17,6 +17,10 @@
 - **R6 Frontier growth.** Decision: rank 4-neighbour candidates by (food descending, index ascending), attach to the
   lowest-index network neighbour, eat a fixed cost from the new cell. Rationale: deterministic, bounded per frame, and a
   tree, so the `RouteGraph` with one undirected edge per link connects every network cell.
+- **R8 Spread as a correctness proof.** Decision: on a lattice with unit spacing, exact explicit diffusion raises the
+  amount-weighted second moment by exactly 4 · D · h · mass per step away from walls; with a mass of 2³⁰ quanta the
+  rounding of ⌊r (a − b)⌋ stays far inside 1 %. Rationale: a measurable check that the scheme is diffusion, not only
+  stable.
 - **R7 Hand-offs.** Decision: `fieldGrid(channel:)`, `viabilityGrid()` as one-channel `FieldGrid`s in `FieldGrid`'s order
   (y · width + x, row 0 at the bottom); `networkGraph()` as a `RouteGraph` over every grid cell (index y · width + x, as
   `GridGraph`). Rationale: existing passes and route solvers take them unchanged.

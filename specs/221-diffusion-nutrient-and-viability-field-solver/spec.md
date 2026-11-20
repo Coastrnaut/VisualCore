@@ -67,7 +67,8 @@ and `GridGraph` (cell index y · width + x) are in VisualCoreSimulation; no diff
   threshold (0 < threshold ≤ 1) and whose food channel holds at least the cost; they are ranked by food amount
   (most first), then cell index, and up to the per-frame limit (1 … 1,024) are taken in that order while the network
   stays within its size limit (1 … 65,536 cells); each new cell links to its lowest-index network neighbour and eats the
-  cost from its own cell (counted as eaten). Seeds are placed by the caller and count toward the limit. `graph()` gives
+  cost from its own cell (counted as eaten). Growth runs once per `step(by:)` call with t > 0. Seeds are placed by the caller and count toward the limit; a seed is
+  refused without a network, outside the grid, on a network cell or at the limit (`.growth(name)` or `.cellRange`). `graph()` gives
   a `RouteGraph` over all grid cells with an undirected edge of cost 1 per link, for the existing route solvers.
   Impact: FR-R02F21-004, 005; SC-R02F21-004, 005.
 - Q: What does a step report, how is the field stored and how are errors named? → A: `step(by:)` returns a
@@ -96,7 +97,7 @@ negative, and a peak only flattens.
 1. **Given** a seeded field, **When** it diffuses with frame times from tiny to very long, **Then** each channel's total
    is unchanged to the quantum and no cell becomes negative.
 2. **Given** one concentrated spot, **When** it diffuses, **Then** its peak never rises and its spread (the amount-weighted
-   mean squared distance from the spot) never shrinks while it is away from the walls.
+   mean squared distance from the spot) rises at the rate 4 · D per unit time while it is away from the walls.
 
 ### User Story 2 - Sources, sinks and decay (Priority: P1)
 
@@ -173,7 +174,8 @@ identically; newer and damaged forms are refused.
 - **SC-R02F21-001**: For 20 seeded fields over 300 frames of seeded lengths, every channel's total equals its account
   after every frame, exactly, and no cell is ever negative.
 - **SC-R02F21-002**: A single spot's peak never rises and its spread (amount-weighted mean squared distance from the
-  spot, on a 64 × 64 grid over 60 frames) never shrinks; a long frame gives the same
+  spot, in cells², on a 64 × 64 grid over 60 frames while the spot stays away from the walls) rises every frame and its
+  growth matches 4 · D · elapsed within 1 %; a long frame gives the same
   totals as the same time in short frames.
 - **SC-R02F21-003**: With constant sources, sinks and decay, a field settles: its total changes by less than 0.1 % over
   the last tenth of a seeded run (a 16 × 16 grid with decay 1 per second over 600 frames of 1/60 s).

@@ -27,8 +27,8 @@ its check record (no trailers). No {owner} tasks; one {device} task. Fixture see
   ⌈8 · t · Dmax⌉) ≤ 256 sub-steps, dropped time reported; per sub-step sources, sinks, diffusion ⌊r · (a − b)⌋ on
   4-neighbour edges from the sub-step's start, decay ⌊a · (1 − e^(−λh))⌋; ledger and report; growth hook called once per
   frame) with `Packages/VisualCore/Tests/VisualCoreSimulationTests/NutrientDiffusionTests.swift` (20 seeded fields × 300 frames of seeded lengths: every channel
-  balanced exactly and no cell negative after every frame; a spot on 64 × 64 over 60 frames: peak never rises, spread
-  never shrinks; max never rises and min never falls; long frames dropped and reported; sources capped at the limit,
+  balanced exactly and no cell negative after every frame; a spot of 2³⁰ quanta on 64 × 64 over 60 frames: peak never rises, spread
+  rises every frame and matches 4 · D · elapsed within 1 %; max never rises and min never falls; long frames dropped and reported; sources capped at the limit,
   sinks short; settle within 0.1 % over the last tenth (16 × 16, λ = 1, 600 frames of 1/60 s); an all-zero field;
   time refusals); `--name host-2`
 
@@ -37,7 +37,7 @@ its check record (no trailers). No {owner} tasks; one {device} task. Fixture see
 - [ ] T-R02F21-004 [P] [US3] [US4] Create `Packages/VisualCore/Sources/VisualCoreSimulation/NutrientField+Growth.swift` (growth phase per clarification Q4 and
   `networkGraph()`) with `Packages/VisualCore/Tests/VisualCoreSimulationTests/GrowthNetworkTests.swift` (two seeded runs identical; never past limit or per-frame
   limit; every new cell viable, holding at least the cost and next to the network; eaten amounts in the ledger; nowhere
-  to go gives zero growth; the network routes through `RouteSearch` between any two of its cells; refusals);
+  to go gives zero growth; seed refusals (no network, outside, on the network, at the limit); growth only with t > 0; the network routes through `RouteSearch` between any two of its cells; refusals);
   `--name host-3`
 
 ## Phase 5: Story 5 — stored form (P2)
