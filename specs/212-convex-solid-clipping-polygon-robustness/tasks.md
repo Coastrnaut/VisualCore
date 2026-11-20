@@ -37,8 +37,8 @@
   `tooComplex`); `--name host-2`
 - [ ] T-R02F12-004 [US2] Create `Packages/VisualCore/Sources/VisualCoreScenes/VolumeLedger.swift` (data-model.md; "≤ 65,536 entries", refuse the next cut beyond
   and stay unchanged; `imbalance`, `isBalanced` at 1e-9) with `Packages/VisualCore/Tests/VisualCoreScenesTests/VolumeLedgerTests.swift` (1,000 seeded cuts
-  balanced at every step; two runs identical; a cut that misses records 0 removed; the entry limit, tested with a
-  small internal limit hook rather than 65,536 cuts); `--name host-3`
+  balanced at every step; two runs identical; a cut that misses records 0 removed; the entry limit, tested through an
+  internal `init(solid:maxEntries:)` used only by `@testable` tests, with 3 entries, rather than 65,536 cuts); `--name host-3`
 
 ## Phase 4: Stories 3 and 4 — stored form (P2)
 
@@ -50,8 +50,8 @@
 
 ## Phase 5: Regression, documentation and close
 
-- [ ] T-R02F12-006 Simulator regression: `--name rendering-27` and `--name experiences` on sim-27.2 (no rendering change;
-  iOS 26 at the next X gate)
+- [ ] T-R02F12-006 Simulator regression (no rendering change): `--name rendering-27` and `--name rendering-26`, and
+  `--name experiences` on sim-27.2
 - [ ] T-R02F12-007 API baseline and docs: `check_public_api.py --update`, `--name public-api`, `--name documented-api
   -- python3 scripts/check_documented_api.py --sources Apps/VisualCore`; new `docs/architecture/convex-cutting.md`
   (representation, tolerance, cut, ledger, degeneracy rules, stored form, reason codes, sources); section in
