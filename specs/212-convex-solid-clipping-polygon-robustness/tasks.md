@@ -42,7 +42,7 @@
 
 ## Phase 4: Stories 3 and 4 — stored form (P2)
 
-- [ ] T-R02F12-005 [US4] Create `Packages/VisualCore/Sources/VisualCoreScenes/ConvexSolidCoding.swift` (`ConvexSolidDocument`, schema 1 JSON with sorted keys;
+- [X] T-R02F12-005 [US4] Create `Packages/VisualCore/Sources/VisualCoreScenes/ConvexSolidCoding.swift` (`ConvexSolidDocument`, schema 1 JSON with sorted keys; — Verified 2026-11-19: lead retest 2026-11-19: R02-F12.host-4.json (exit 0; ConvexSolidCodingTests 7 passed: byte-identical round trip, newer schema, truncated, not convex, index out of range, not closed, negative ledger volume)
   decode re-validates; `newerSchema`, `malformed`) with `Packages/VisualCore/Tests/VisualCoreScenesTests/ConvexSolidCodingTests.swift` (at least five fixtures: a
   cut solid with its ledger round-trips byte for byte; schema 2 refused; truncated JSON refused; a non-convex stored
   solid refused `notConvex`; a face with an index out of range refused `malformed`; an open stored solid refused
