@@ -52,7 +52,8 @@ tests stay short (< 10 s each). Simulator evidence is one pass on the iOS 27.x p
 - [ ] T-R02G0103-008 [US1] [US3] Create `Packages/ExperiencesRound02/AuroraLoom/ExperienceTests/AuroraLoomTestSupport.swift`, `Packages/ExperiencesRound02/AuroraLoom/ExperienceTests/AuroraLoomRenderTests.swift` (levels 1,
   21, 41, 61, 81 at each tier, 96 × 64 offscreen: ribbon samples within 2 px of lit pixels, marker colours within 0.12,
   background within 0.05), `Packages/ExperiencesRound02/AuroraLoom/ExperienceTests/AuroraLoomTierTests.swift` (same positions across tiers; tier log) and
-  `Packages/ExperiencesRound02/AuroraLoom/ExperienceTests/AuroraLoomFallbackTests.swift` (broken program draws the fallback and logs; zero-size view; resize; Reduce Motion);
+  `Packages/ExperiencesRound02/AuroraLoom/ExperienceTests/AuroraLoomFallbackTests.swift` (broken program draws the fallback and logs; zero-size view; resize; Reduce Motion holds the picture still; Reduce
+  Flashing caps the glow gain; a memory warning releases caches and the next frame rebuilds them);
   `--name sim-27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme
   ExperiencesRound02-Package --destination sim-27.2 --action test`
 
@@ -68,8 +69,9 @@ tests stay short (< 10 s each). Simulator evidence is one pass on the iOS 27.x p
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02G0103-010 CI and docs: a simulator step for ExperiencesRound02 in `.github/workflows/ci.yml` beside the
-  ExperiencesCreative step (or the existing simulator job's package list); `docs/architecture/aurora-loom.md` (renderer);
+- [ ] T-R02G0103-010 CI and docs: no new CI simulator step (experience simulator tests need the locally built ANGLE
+  frameworks and run locally, as ExperiencesCreative's do; CI keeps the host step and builds the app, which now links
+  the candidate); `docs/architecture/aurora-loom.md` (renderer);
   `Packages/ExperiencesRound02/README.md`; `docs/automatedtesting.md`; `docs/migration/path-map.json` if it names the
   experience path; `--name round02-host -- swift test --package-path Packages/ExperiencesRound02`
 - [ ] T-R02G0103-011 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
@@ -77,8 +79,8 @@ tests stay short (< 10 s each). Simulator evidence is one pass on the iOS 27.x p
 - [ ] T-R02G0103-012 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G0103-013 Reference regression chunk 2 (`--name reference-2`)
 - [ ] T-R02G0103-014 Script tests, run alone (`--name script-tests`)
-- [ ] T-R02G0103-015 {device} After ImplementationLock-100: record frame time per tier on D1/D2/D3 (SC-R02G0103-006); not
-  run in this campaign, carried to the device gates
+- [ ] T-R02G0103-015 {device} After ImplementationLock-100, on D1, D2 and D3: record the frame time at each tier
+  (SC-R02G0103-006). Not run before the lock; stays open and is carried to the device campaign.
 - [ ] T-R02G0103-016 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
 
 ## Dependencies and parallel work
