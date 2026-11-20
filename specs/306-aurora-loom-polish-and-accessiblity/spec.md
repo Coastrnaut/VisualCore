@@ -128,6 +128,21 @@ pure function of the steps and stage; the loop plays only while wanted, on scree
 - Real-hardware observation of sound, haptics and VoiceOver happens in D1–D3 after ImplementationLock-100.
 - All text is original; no third-party sounds or images; the sound is synthesized.
 
+- Schema migration: none; this feature adds no stored state (snapshot schema 2 of R02-G01-05 is unchanged), and sound and
+  haptic choices are the app's shared settings. Observability: the presenter keeps a feedback log (announcements and
+  haptic kinds with their trigger) for tests and diagnostics, alongside the existing tier log.
+
+## Traceability
+
+| Source deliverable | Requirement |
+|---|---|
+| Clear native overlays | FR-R02G0106-001, 005 |
+| Accessibility | FR-R02G0106-001, 002, 005 |
+| Reduce flashing | FR-R02G0106-004 |
+| Audio | FR-R02G0106-006 |
+| Haptics | FR-R02G0106-003 |
+| No Stage One breakage | FR-R02G0106-007 |
+
 ## Negative Requirements / Excluded scope
 
 - No saving of progress to disk (R02-G01-07); no new levels; no purchases, ads or tracking; no recorded audio; no device
