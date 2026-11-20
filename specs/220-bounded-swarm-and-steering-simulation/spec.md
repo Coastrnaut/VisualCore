@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-20
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-F20 (migration ledger, shared round feature) · ID namespace FR-R02F20-###, SC-R02F20-###, T-R02F20-###
 
@@ -29,6 +29,47 @@ Canonical overrides:
 - **Superseded parts of the source prompt:** the USD 1.99–4.99 purchase model (ADR-0009); the Round 2 lock
   (ImplementationLock-100). **Device-only items:** the frame cost of a large swarm on D1–D3, recorded in the device
   campaign. **Owner-only items:** none.
+
+## Clarifications
+
+### Session 2026-11-20
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time. Facts checked in
+code (read-only audit, 2026-11-20): `SteeringAgent` (position, velocity, group; `Sendable`, `Equatable`, not `Codable`),
+`SteeringBounds`, `SteeringParameters` (neighbour radius and limit, weights, margin, `maxForce`), `Steering.force` and
+`NeighbourSearch.neighbours(of:in:radius:limit:)` (within radius, nearest first, ties by index, non-finite agents
+excluded) are in VisualCoreSimulation and used by Digital Aquarium; `FieldGrid` holds `Float` channels; the names
+`Swarm`, `SwarmParameters`, `SwarmError`, `NeighbourGrid`, `MagneticField`, `MagneticPole` and `DensityRaster` are free.
+
+- Q: Where does the swarm live, and how big may it be? → A: in VisualCoreSimulation beside `Steering`, reusing
+  `SteeringAgent`, `SteeringBounds`, `SteeringParameters` and `Steering.force` unchanged; charges are kept in a parallel
+  array of the swarm so `SteeringAgent` does not change. At most 65,536 agents; grids and rasters at most 1,048,576
+  cells. Rationale: Section 13 extension; Digital Aquarium keeps compiling. Impact: FR-R02F20-001, 002, 007.
+- Q: How does the grid guarantee the same neighbours? → A: `NeighbourGrid` buckets finite agents by ⌊position / cell⌋
+  (cell size = the query radius unless given, keyed by integer cell, so no bounds are needed); a query scans the cells
+  within ⌈radius / cell⌉ of the agent's cell, measures with the same `distance(to:)`, keeps d ≤ radius, sorts nearest
+  first with ties by index and takes the limit — the same rule as `NeighbourSearch`, so the lists are equal. Impact:
+  FR-R02F20-001; SC-R02F20-001.
+- Q: How is a step integrated and bounded? → A: per step h (finite, 0 < h ≤ 0.1) all forces are computed from the
+  start-of-step swarm (steering through the grid, plus poles); the velocity becomes v + a · h, is then turned by the
+  uniform field's exact rotation angle −q · B · h (so a uniform field never changes speed), and is capped at the speed
+  limit (finite, > 0); the position becomes p + v · h; walled edges reflect the position back inside and flip that
+  velocity component, wrapping edges take the position modulo the bounds. Agents with non-finite values are left as they
+  are and take no part. Impact: FR-R02F20-002, 003; SC-R02F20-002, 003.
+- Q: What are the magnetic field and the poles exactly? → A: a uniform field B (finite, |B| ≤ 100) acts as above; a pole at
+  c of strength s (finite, |s| ≤ 1,000) and softening ε (finite, ε ≥ 1e-6) pulls a charge q (finite, |q| ≤ 100) with
+  F = s · q · (c − p) / (|c − p|² + ε²)^{3/2} (positive s q attracts), whose length never exceeds
+  |s · q| · 2 / (3√3 · ε²); at most 64 poles. Impact: FR-R02F20-003; SC-R02F20-003 (a lone charge with steering weights 0
+  in a uniform field keeps its speed within 1e-9 relative over 1,000 steps and returns to its start within 1e-9 of the
+  circle's radius after 2π / (|q B| h) steps when that is a whole number).
+- Q: How is density rastered, and what is stored? → A: `DensityRaster` (width × height 1 … 1,024 each, at most 1,048,576
+  cells, over a rectangle) keeps `Double` cells; each finite agent inside the rectangle spreads weight 1 bilinearly over
+  the four cells around it (cell centres at (i + ½, j + ½)), weights past the grid's edge folded onto the edge cells, so the
+  total equals the in-area count; `fieldGrid()` hands a one-channel `FieldGrid` to the existing passes. `Swarm` is
+  `Codable` JSON schema 1 with sorted keys (agents, charges, bounds, edges, parameters, speed limit, field); a newer schema
+  is refused. Reason codes (`SwarmError`): `r2-f20.agent-limit`, `r2-f20.bounds`, `r2-f20.step`, `r2-f20.parameter`,
+  `r2-f20.field`, `r2-f20.raster-size`, `r2-f20.newer-schema`, `r2-f20.malformed`. Impact: FR-R02F20-004, 005, 006;
+  SC-R02F20-004, 005.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -121,7 +162,8 @@ forms are refused.
 - **SC-R02F20-002**: Two runs of 20 seeded swarms over 500 steps are bit-identical; every agent stays inside the bounds
   with speed at most the limit after every step.
 - **SC-R02F20-003**: A charged agent in a uniform field keeps its speed within 1e-9 relative over 1,000 steps and returns
-  near its start after one period; pole forces never exceed their stated bound.
+  to its start within 1e-9 of its circle's radius after one whole-step period; pole forces never exceed
+  |s · q| · 2 / (3√3 · ε²) over 1,000 seeded positions, including on the pole.
 - **SC-R02F20-004**: The density total equals the in-area agent count within 1e-9 relative for 50 seeded swarms; a
   cell-centre agent lands in one cell.
 - **SC-R02F20-005**: Swarms round-trip byte for byte and continue bit-identically for 200 steps; newer and damaged forms are
