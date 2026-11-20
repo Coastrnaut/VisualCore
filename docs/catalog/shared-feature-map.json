@@ -165,8 +165,8 @@
     "PingPongTarget",
     "FieldUniform"
    ],
-   "home": "VisualCoreSimulation, VisualCoreRendering",
-   "note": "Height-field transport with conservation checks on the existing field passes."
+   "home": "VisualCoreSimulation",
+   "note": "As built (feature 217): Heightfield (terrain, water, sediment and dye as Int64 quanta, virtual-pipe flow in bounded sub-steps, proportional dye and sediment carriage, optional erosion, exact HeightfieldLedger, Codable schema 1) in VisualCoreSimulation beside the unchanged FieldGrid; fieldGrid() and dyeField() hand heights to the existing field passes, which are unchanged."
   },
   "F18": {
    "disposition": "new",

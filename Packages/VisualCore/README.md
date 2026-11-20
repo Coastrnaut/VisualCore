@@ -359,6 +359,15 @@ composite, premultiplied over); `composite` mode 2 is premultiplied over; the va
 and out-of-range emissive ones. `RenderState.premultipliedBlended` draws premultiplied layers. Rules:
 [docs/architecture/shaders.md](../../docs/architecture/shaders.md).
 
+## Heightfield transport (feature 217, R02-F17)
+
+VisualCoreSimulation moves water, dye and rock over terrain without gaining or losing a quantum: `Heightfield` keeps
+every amount as `Int64` quanta (65,536 per height unit) and steps the virtual-pipe shallow-water law in bounded
+sub-steps (stability limit, at most 64 per frame, dropped time in a `HeightfieldStepReport`); dye and sediment travel in
+proportion to the water, open borders drain into a `HeightfieldLedger`, and optional erosion exchanges rock and
+sediment within cells. `fieldGrid()` and `dyeField()` hand the heights to the existing field passes; the state is
+`Codable` (schema 1). Refusals are `HeightfieldError` with `r2-f17.*` codes. Rules: [docs/architecture/heightfield-transport.md](../../docs/architecture/heightfield-transport.md).
+
 ## Route solvers (feature 216, R02-F16)
 
 VisualCoreSimulation solves and proves routing puzzles with integer costs: `RouteGraph` (directed, costs 0…1,000,000)
