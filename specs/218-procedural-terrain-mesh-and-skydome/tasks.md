@@ -28,7 +28,7 @@ its check record (no trailers). No {owner} tasks; one {device} task. Fixture see
 
 ## Phase 4: Story 2 — erosion masks (P2)
 
-- [ ] T-R02F18-004 [P] [US2] Create `Packages/VisualCore/Sources/VisualCoreScenes/ErosionMask.swift` (clarification Q3) with `Packages/VisualCore/Tests/VisualCoreScenesTests/ErosionMaskTests.swift` (flat, tilted
+- [X] T-R02F18-004 [P] [US2] Create `Packages/VisualCore/Sources/VisualCoreScenes/ErosionMask.swift` (clarification Q3) with `Packages/VisualCore/Tests/VisualCoreScenesTests/ErosionMaskTests.swift` (flat, tilted — Verified 2026-11-19: lead retest 2026-11-19: R02-F18.host.json (exit 0, full suite); ErosionMaskTests 6 passed (flat, tilted plane, V-valley and pit fixtures with their stated values; 20 seeded terrains bit-identical; every value in 0 … 1)
   plane, V-valley and pit fixtures with their stated values; 20 seeded terrains bit-identical across runs; every value in
   0 … 1); `--name host-3`
 
