@@ -33,7 +33,7 @@ seed 2_011.
 
 ## Phase 3: Story 2 — the march (P1)
 
-- [ ] T-R02F11-004 [P] [US2] Create `Packages/VisualCore/Sources/VisualCoreScenes/SDFMarch.swift` (`SDFMarchOptions`
+- [X] T-R02F11-004 [P] [US2] Create `Packages/VisualCore/Sources/VisualCoreScenes/SDFMarch.swift` (`SDFMarchOptions` — Verified 2026-11-19: lead retest 2026-11-19: R02-F11.host-2.json (exit 0; SDFMarchTests 8 passed: sphere/box hits vs Ray3, thin shell hit by both modes while no-fallback skips 100/100, budget, miss, inside, options; research R11)
   "maxSteps 1…4,096 (128), maxDistance > 0 (100), tolerance > 0 (1e-7)" and `static let standard` (the defaults), `mode` conservative ω = 1 or fast ω = 1.6
   with the Keinert overlap fallback; hit when d < tolerance·max(1, t); origin inside → hit at 0 with `startedInside`;
   outcomes hit, miss, budgetExhausted) with `SDFMarchTests.swift` (1,000 seeded rays against a sphere and a box equal

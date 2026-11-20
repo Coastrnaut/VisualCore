@@ -29,3 +29,12 @@
   indirect enum `SDFShape.Node`, built only through validating static makers (`sphere(radius:)` …) and
   `validated(_:)`. Rationale: a Swift enum cannot declare a case and a throwing static function of the same name, and a
   private initialiser keeps every description validated. The contract's call sites are unchanged.
+- **R11 Measured march and volume behaviour (implementation, 2026-11-19).** (a) The fast mode re-tries ω = 1.6 after
+  each fallback step instead of keeping ω = 1 for the rest of the march: from outside, the first relaxed step always
+  fails the overlap test (it passes only at incidence cos θ ≤ (2 − ω)/ω = 0.25), so the fixed fallback made fast mode
+  exactly as slow as conservative + 1; per-step reset still never skips a surface (a relaxed step is kept only when
+  d(t₁) ≥ 0 and r₀ + d(t₁) ≥ s) and saves 26% of steps on 1,000 grazing rays (52,394 vs 70,979). (b) At the default
+  tolerance 1e-7 the hit error along a ray is bounded by tolerance · t / cos θ; 4 of 1,000 box rays at cos θ ≈ 0.32
+  reached 1.19e-6, so SC-R02F11-002 checks boxes at tolerance 1e-8. (c) An axis-aligned box (0.7, 0.5, 0.3) in ±1 aliases
+  with the cell grid (+2.31% at both 32³ and 64³); the same box turned 0.7 rad about (1, 2, 3) gives −0.077% and
+  −0.011%; the sphere −0.268% and −0.027%; SC-R02F11-004 names a generic orientation.

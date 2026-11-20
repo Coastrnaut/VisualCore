@@ -182,14 +182,16 @@ or one beyond the limits is refused with a named reason.
 
 - **SC-R02F11-001**: Primitive and combination distances equal their closed forms within 1e-12 at 1,000 seeded points
   each.
-- **SC-R02F11-002**: Marched hits on spheres and boxes equal the analytic ray hits within 1e-6 over 1,000 seeded rays;
+- **SC-R02F11-002**: Marched hits on spheres and boxes equal the analytic ray hits within 1e-6 over 1,000 seeded rays
+  (spheres at the default tolerance; boxes at tolerance 1e-8, and within tolerance · t / cos θ at the default);
   a shell 1e-3 thick is hit by both options on every one of 100 seeded rays, while a test-only over-relaxed march
   without fallback skips it on at least one.
 - **SC-R02F11-003**: Shader and CPU distances agree within 2/255 of the encoded range at every sampled pixel, on iOS 27.2
   and 26.5 simulators; the shader's hit mask equals the CPU's at every pixel away from silhouette edges; every parity
   draw leaves zero live GPU objects after the host is destroyed.
-- **SC-R02F11-004**: Volume estimates of a sphere and a box are within 2% of the analytic value at 64³ samples and the
-  error at least halves from 32³ to 64³; repeated sampling gives the same digest.
+- **SC-R02F11-004**: Volume estimates of a sphere and of a box in a generic orientation are within 2% of the analytic
+  value at 64³ samples and the error at least halves from 32³ to 64³ (an axis-aligned box aligned with the grid keeps a
+  constant aliasing error and is recorded as such); repeated sampling gives the same digest.
 - **SC-R02F11-005**: At least five positive, negative and boundary fixtures for descriptions give their stated verdicts
   and reasons; a stored description round-trips byte for byte.
 - **SC-R02F11-006**: Existing shader library, ray and mesh tests pass unchanged; the reference regression passes 7 of 7;
