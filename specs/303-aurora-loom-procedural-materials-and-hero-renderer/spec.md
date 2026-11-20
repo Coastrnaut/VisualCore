@@ -65,8 +65,10 @@ capabilities, quality tier names, palette, scenario manifest, permissions and su
 - Q: What happens on a shader failure, and what does the renderer read? → A: the presenter draws from an immutable
   `AuroraLoomSceneSnapshot` value (steps, level geometry, stage, failure, frame time) made by the adapter after each
   kernel change; it never holds the kernel. If a ribbon or glow program fails to compile or link, the scene draws the
-  minimal (level-2) layer with the shared unlit mesh renderer, logs the program name and the reason once, and keeps running; the
-  kernel and its digest are untouched. Reduce Motion freezes t at the last tick's value for the shimmer and wave travel;
+  minimal (level-2) layer with the shared unlit mesh renderer, keeps the program name and the reason in the presenter's
+  record (`fallbackReason`; tier changes go to its `tierLog`, since the app has no logging facility for experiences) and
+  keeps running; the kernel and its digest are untouched. Reduce Motion holds the picture at tick 0 (deterministic) and
+  stops the shimmer and wave travel;
   Reduce Flashing caps the glow gain to the shared limit. Impact: FR-R02G0103-003, 007; SC-R02G0103-002.
 - Q: How is the experience registered and what does the minimal control panel do? → A: the candidate registration adds
   `r02-g01.aurora-loom` to `Catalog/registrations.json` (capabilities, quality tiers `level-0` … `level-2`, the palette
