@@ -15,6 +15,13 @@
   kernel's verdict costs 1–2 ms per lap in a debug build and levels have up to about a thousand winners; the decision is
   cross-checked against the kernel verdict in tests. Alternatives: optimise the kernel's verdict (changes R02-G02-01 code,
   which must stay additive); build the Core optimised (unsafe flags in a package).
+- **R2c Obstacle inner-cube prefilter.** Decision: before the exact decision, a setting whose sample at some tick lies
+  inside an obstacle's inner cube (half side h, the largest h with 3h² < r²) is a contact and loses: such a sample is
+  strictly inside the ball, and the segment starting there touches it in every branch of the kernel's `segmentTouches`.
+  The cube test is three axis bit sets per obstacle, like the checkpoint boxes. Rationale: cheap and sound; it removes
+  about 10 % of exact decisions on the test levels. Tested: `innerHalf` over radii 64 … 1,024 (3h² < r² ≤ 3(h+1)²), and
+  the exact decision (with the prefilter) equals the kernel verdict exhaustively on one level and on samples of 20 more.
+  Alternatives: box filter only (correct, slightly slower).
 - **R3 Shortest path.** Decision: breadth-first search over legal states using `LissajousLabyrinthRules.moves` (single-dial
   changes keeping coprime frequencies) from the start until the first depth containing a winning setting; ties by the
   winning setting (a, b, φ, ψ) ascending; the action list from parent pointers recorded in the rules' move order.

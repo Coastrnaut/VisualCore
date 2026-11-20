@@ -77,3 +77,7 @@ or {device} tasks (pure logic and host-generated content). Fixture seed 2_312; t
 001 → 002 → {003 (agent A), 005 (agent B, against the contract; replays tested with a hand-built fixture)} → 004 (needs
 003) → 006 (needs 004, 005) → 007 … 012. Shared files (error, manifest, difficulty, generator, catalog tests, witness
 files, docs) stay with the lead. MVP: Story 1.
+
+## Phase 7: Convergence
+
+- [X] T-R02G0202-013 Record the solver's obstacle inner-cube prefilter (a sample inside the cube of half side h with 3h² < r² is strictly inside the obstacle, so that lap is a contact) as a research decision in `specs/312-lissajous-labyrinth-level-generator-and-solver-witness/research.md`, with its soundness argument and its test (`innerHalf` over radii 64 … 1,024), per plan: solver decisions (unrequested); `--name host-6 -- swift test --package-path Packages/ExperiencesRound02 --filter LissajousLabyrinthSolverTests` — Verified 2026-11-20: 2026-11-20 research R2c recorded; host-6 exit 0 (solver tests incl. innerHalf and the exhaustive kernel cross-check)

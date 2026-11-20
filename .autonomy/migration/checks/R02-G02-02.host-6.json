@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "LissajousLabyrinthSolverTests"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter LissajousLabyrinthSolverTests",
+  "elapsed_seconds": 10.719,
+  "exit_code": 0,
+  "finished": "2026-11-20T20:34:00+00:00",
+  "gate": "R02-G02-02",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G02-02.host-6.log",
+  "log_sha256": "a59e2bba70c0f2a6fffcc84d4bed19c0fcff42ded2cc99e43b2ea1feb66fd48b",
+  "name": "host-6",
+  "started": "2026-11-20T20:33:49+00:00",
+  "timed_out": false
+}
