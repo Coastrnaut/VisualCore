@@ -62,3 +62,7 @@ recorded only after every agent has reported). Commit after every task with its 
 
 001 → 002 (lead) → {003 (agent A), 004 (agent B), 005 (agent C), 006 (agent D)} → 007 … 012. Agents B, C and D code
 against the geometry contract; shared files (package, error, level, fixtures, docs) stay with the lead. MVP: Story 1.
+
+## Phase 7: Convergence
+
+- [ ] T-R02G0301-013 Add a constructed gate test to `Packages/ExperiencesRound02/WaveKnotKeeper/CoreTests/WaveKnotKeeperPlayTests.swift`: a rope and a move that `sweepIsClear` refuses (`move("crossing")` on a level without gates) is accepted on the same level with a gate holding both ends of the move, and the accepted move changes the projected crossing count, per edge case "A move through a crossing gate" / FR-R02G0301-002 (partial); `--name host-6 -- swift test --package-path Packages/ExperiencesRound02 --filter WaveKnotKeeperPlayTests`
