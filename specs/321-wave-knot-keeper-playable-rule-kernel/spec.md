@@ -41,8 +41,9 @@ fingerprints, `r02-gNN.*` reason codes); no `WaveKnotKeeper*` name exists.
   Impact: FR-R02G0301-001; SC-R02G0301-003.
 - Q: When is a move legal? → A: a move shifts one control point P by one unit along ±x, ±y or ±z to P′, inside the
   bounds and not onto another point. With neighbours A and B, the move sweeps the triangles A-P-P′ and P-P′-B; it is
-  refused (`r02-g03.move("crossing")`) when either triangle intersects any segment not adjacent to P (decided exactly in
-  integers: segment-triangle intersection with orientation tests), unless both P and P′ lie inside one crossing gate (an
+  refused (`r02-g03.move("crossing")`) when either triangle meets any segment not adjacent to P anywhere other than at
+  a vertex the two share (the segments ending at A or B always touch their triangle at A or B; that contact is allowed),
+  decided exactly in integers with orientation tests, unless both P and P′ lie inside one crossing gate (an
   axis-aligned integer box), where strands may pass. Impact: FR-R02G0301-002; SC-R02G0301-001.
 - Q: What decides a win, and what is the knot signature? → A: the rope is projected onto the xy-plane. For every pair of
   non-adjacent segments whose projections cross at a single interior point, a crossing is counted with sign +1 or −1 by
