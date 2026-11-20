@@ -191,13 +191,17 @@
    "note": "As built (feature 219): PlantGrammar, LSystem, PlantTurtle (bracketed turtle to branches and part markers), PetalShape, CapShape, StemShape, PlantMesh (Mesh.tube and Mesh.merged) and PlantScatter (seeded dart throwing into PlantInstances for MeshInstance) in VisualCoreScenes, no new module; existing mesh, curve and instancing types unchanged."
   },
   "F20": {
-   "disposition": "new",
+   "disposition": "extend",
    "existing": [
-    "ParticleSystem",
-    "FixedStepRunner"
+    "SteeringAgent",
+    "SteeringBounds",
+    "SteeringParameters",
+    "Steering",
+    "NeighbourSearch",
+    "FieldGrid"
    ],
    "home": "VisualCoreSimulation",
-   "note": "Bounded swarm and steering simulation."
+   "note": "As built (feature 220): NeighbourGrid (hashed cells; exactly NeighbourSearch's lists), MagneticField and MagneticPole (exact uniform turn, softened bounded poles), Swarm with SwarmEdges (bounded fixed steps, speed limit, walled or wrapping, Codable schema 1) and DensityRaster (bilinear splat to a FieldGrid) in VisualCoreSimulation, no new module; existing steering types and Digital Aquarium unchanged."
   },
   "F21": {
    "disposition": "new",

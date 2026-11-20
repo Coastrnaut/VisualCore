@@ -3166,6 +3166,8 @@ VisualCoreSimulation | enum | public enum Springs2D
 VisualCoreSimulation | enum | public enum Steering
 VisualCoreSimulation | enum | public enum StoragePrecision: String, Sendable, Codable, CaseIterable
 VisualCoreSimulation | enum | public enum SubgraphMatcher
+VisualCoreSimulation | enum | public enum SwarmEdges: String, Sendable, Codable, CaseIterable
+VisualCoreSimulation | enum | public enum SwarmError: Error, Equatable, Sendable
 VisualCoreSimulation | enum | public enum TimeExpandedGraph
 VisualCoreSimulation | enum | public enum TimedOutcome: Sendable, Equatable
 VisualCoreSimulation | enum | public enum TimelineError: Error, Equatable, Sendable
@@ -3196,6 +3198,8 @@ VisualCoreSimulation | func | public func encoded() -> Data
 VisualCoreSimulation | func | public func estimate(to goal: Int) -> @Sendable (Int) -> Int
 VisualCoreSimulation | func | public func fieldGrid() -> FieldGrid
 VisualCoreSimulation | func | public func flux(at cell: Int) -> [Double]
+VisualCoreSimulation | func | public func force(at position: Vec2, charge: Double) -> Vec2
+VisualCoreSimulation | func | public func forceBound(charge: Double) -> Double
 VisualCoreSimulation | func | public func graph() -> RouteGraph
 VisualCoreSimulation | func | public func hasEdge(from: Int, to: Int) -> Bool
 VisualCoreSimulation | func | public func hash(at step: Int) throws(TimelineError) -> ReplayHash
@@ -3206,10 +3210,13 @@ VisualCoreSimulation | func | public func isOpen(_ node: Int) -> Bool
 VisualCoreSimulation | func | public func latest(atOrBefore step: Int) -> Snapshot?
 VisualCoreSimulation | func | public func liveCount(source index: Int) -> Int
 VisualCoreSimulation | func | public func maxAbsDifference(_ other: FieldGrid) -> Float?
+VisualCoreSimulation | func | public func neighbours(of index: Int, radius: Double, limit: Int) -> [Int]
 VisualCoreSimulation | func | public func next(step: Int, checksum: UInt64) -> ReplayHash
 VisualCoreSimulation | func | public func node(x: Int, y: Int) -> Int
 VisualCoreSimulation | func | public func overlaps(_ other: AABB2D) -> Bool
 VisualCoreSimulation | func | public func padded(toChannels count: Int, fill: Float = 0) -> FieldGrid
+VisualCoreSimulation | func | public func poleForce(at position: Vec2, charge: Double) -> Vec2
+VisualCoreSimulation | func | public func poleForceBound(charge: Double) -> Double
 VisualCoreSimulation | func | public func resolve(_ system: SystemAccessibility) -> EffectiveAccessibility
 VisualCoreSimulation | func | public func round(_ x: Float) -> Float
 VisualCoreSimulation | func | public func rounded(to precision: StoragePrecision) -> FieldGrid
@@ -3224,6 +3231,7 @@ VisualCoreSimulation | func | public func toLocal(_ world: Vec2) -> Vec2
 VisualCoreSimulation | func | public func toWorld(_ local: Vec2) -> Vec2
 VisualCoreSimulation | func | public func totalDye(_ channel: Int) -> Int64
 VisualCoreSimulation | func | public func transitionDuration(_ duration: Double, reduceMotion: Bool) -> Double
+VisualCoreSimulation | func | public func turned(_ velocity: Vec2, charge: Double, step: Double) -> Vec2
 VisualCoreSimulation | func | public func validated() throws(HeightfieldError) -> HeightfieldParameters
 VisualCoreSimulation | func | public func value(at t: Double) -> Double
 VisualCoreSimulation | func | public func value(of name: String) -> Double?
@@ -3241,6 +3249,7 @@ VisualCoreSimulation | func | public mutating func advance(frame dt: Double) -> 
 VisualCoreSimulation | func | public mutating func advance(steps: Int = 1) throws(TimelineError)
 VisualCoreSimulation | func | public mutating func burst(_ count: Int, from index: Int = 0)
 VisualCoreSimulation | func | public mutating func clamp(_ delta: Double) -> Double
+VisualCoreSimulation | func | public mutating func clear()
 VisualCoreSimulation | func | public mutating func double() -> Double
 VisualCoreSimulation | func | public mutating func drop(after step: Int)
 VisualCoreSimulation | func | public mutating func enterBackground()
@@ -3271,7 +3280,9 @@ VisualCoreSimulation | func | public mutating func seek(to step: Int) throws(Tim
 VisualCoreSimulation | func | public mutating func seek(to t: Double)
 VisualCoreSimulation | func | public mutating func shuffle<T>(_ items: inout [T])
 VisualCoreSimulation | func | public mutating func shuffled<T>(_ items: [T]) -> [T]
+VisualCoreSimulation | func | public mutating func splat(_ agents: [SteeringAgent])
 VisualCoreSimulation | func | public mutating func step(_ dt: Double)
+VisualCoreSimulation | func | public mutating func step(by h: Double) throws(SwarmError)
 VisualCoreSimulation | func | public mutating func step(by time: Double) throws(HeightfieldError) -> HeightfieldStepReport
 VisualCoreSimulation | func | public mutating func stepOnce()
 VisualCoreSimulation | func | public mutating func store(_ s: Snapshot)
@@ -3291,6 +3302,7 @@ VisualCoreSimulation | func | public static func collide(_ a: Shape2D, _ poseA: 
 VisualCoreSimulation | func | public static func colorVisionKey(prefix: String) -> String
 VisualCoreSimulation | func | public static func decode(_ data: Data) throws(HeightfieldError) -> Heightfield
 VisualCoreSimulation | func | public static func decode(_ data: Data) throws(RouteError) -> SolverCertificate
+VisualCoreSimulation | func | public static func decode(_ data: Data) throws(SwarmError) -> Swarm
 VisualCoreSimulation | func | public static func derive(_ seed: UInt64, index: UInt64) -> UInt64
 VisualCoreSimulation | func | public static func derive(_ seed: UInt64, label: String) -> UInt64
 VisualCoreSimulation | func | public static func earliestArrival(in graph: RouteGraph, schedule: RouteSchedule, from: Int, to: Int,
@@ -3302,6 +3314,8 @@ VisualCoreSimulation | func | public static func keys(prefix: String) -> (reduce
 VisualCoreSimulation | func | public static func load(from defaults: UserDefaults, keyPrefix prefix: String) -> AccessibilityPreferences
 VisualCoreSimulation | func | public static func mix(_ z: UInt64) -> UInt64
 VisualCoreSimulation | func | public static func neighbours(of index: Int, in agents: [SteeringAgent], radius: Double, limit: Int) -> [Int]
+VisualCoreSimulation | func | public static func of(_ agents: [SteeringAgent], bounds: SteeringBounds, width: Int,
+VisualCoreSimulation | func | public static func of(_ swarm: Swarm, width: Int, height: Int) throws(SwarmError) -> DensityRaster
 VisualCoreSimulation | func | public static func overlaps(_ a: CollisionCircle, _ b: CollisionCircle) -> Bool
 VisualCoreSimulation | func | public static func overlaps(_ circle: CollisionCircle, _ capsule: CollisionCapsule) -> Bool
 VisualCoreSimulation | func | public static func pairs(_ boxes: [AABB2D]) -> [BroadPhasePair2D]
@@ -3325,6 +3339,8 @@ VisualCoreSimulation | init | public init(a: Int, b: Int, manifold: ContactManif
 VisualCoreSimulation | init | public init(a: Int, b: Int, manifold: ContactManifold2D, normalImpulses: [Double], tangentImpulses: [Double])
 VisualCoreSimulation | init | public init(a: SpringAnchor2D, b: SpringAnchor2D, restLength: Double, stiffness: Double,
 VisualCoreSimulation | init | public init(a: Vec2, b: Vec2, radius: Double)
+VisualCoreSimulation | init | public init(agents: [SteeringAgent], cellSize: Double) throws(SwarmError)
+VisualCoreSimulation | init | public init(agents: [SteeringAgent], charges: [Double]? = nil, bounds: SteeringBounds, edges: SwarmEdges = .walled,
 VisualCoreSimulation | init | public init(capacity: Int = 32, interval: Int = 64) throws(TimelineError)
 VisualCoreSimulation | init | public init(capacity: Int = ParticleSystem.defaultCapacity, seed: UInt64 = 0)
 VisualCoreSimulation | init | public init(cellCount: Int, steps: Int, isOpen: (_ cell: Int, _ time: Int) -> Bool) throws(RouteError)
@@ -3352,6 +3368,7 @@ VisualCoreSimulation | init | public init(position: Vec2 = .zero, rate: Double =
 VisualCoreSimulation | init | public init(position: Vec2, angle: Double = 0)
 VisualCoreSimulation | init | public init(position: Vec2, angle: Double, velocity: Vec2, angularVelocity: Double, inverseMass: Double,
 VisualCoreSimulation | init | public init(position: Vec2, size: Double, color: Vec4)
+VisualCoreSimulation | init | public init(position: Vec2, strength: Double, softening: Double = 0.1) throws(SwarmError)
 VisualCoreSimulation | init | public init(position: Vec2, velocity: Vec2, group: Int)
 VisualCoreSimulation | init | public init(reduceMotion: AccessibilityChoice = .system, reduceFlashing: AccessibilityChoice = .system,
 VisualCoreSimulation | init | public init(reduceMotion: Bool = false, dimFlashingLights: Bool = false)
@@ -3368,16 +3385,20 @@ VisualCoreSimulation | init | public init(step: Int, command: Command)
 VisualCoreSimulation | init | public init(step: Int, state: State, hash: ReplayHash)
 VisualCoreSimulation | init | public init(storedValue: String?)
 VisualCoreSimulation | init | public init(text: String, kind: AnnouncementKind, time: Double)
+VisualCoreSimulation | init | public init(uniform: Double = 0, poles: [MagneticPole] = []) throws(SwarmError)
 VisualCoreSimulation | init | public init(version: Int, seed: String, words: [String])
+VisualCoreSimulation | init | public init(width: Int, height: Int, bounds: SteeringBounds) throws(SwarmError)
 VisualCoreSimulation | init | public init(width: Int, height: Int, channels: Int, fill: Float = 0)
 VisualCoreSimulation | init | public init(width: Int, height: Int, dyeChannels: Int = 0, edges: HeightfieldEdges = .walled,
 VisualCoreSimulation | init | public init(width: Int, height: Int, neighbourhood: GridNeighbourhood = .four,
 VisualCoreSimulation | init | public init?(hex: String)
 VisualCoreSimulation | init | public init?(range: Float, center: Float = 0.5)
 VisualCoreSimulation | init | public init?(width: Int, height: Int, channels: Int, values: [Float])
+VisualCoreSimulation | let | public let bounds: SteeringBounds
 VisualCoreSimulation | let | public let bytes: [UInt8]
 VisualCoreSimulation | let | public let capacity: Int
 VisualCoreSimulation | let | public let cellCount: Int
+VisualCoreSimulation | let | public let cellSize: Double
 VisualCoreSimulation | let | public let center: Float
 VisualCoreSimulation | let | public let certificate: SolverCertificate
 VisualCoreSimulation | let | public let certificates: [SolverCertificate]
@@ -3390,9 +3411,11 @@ VisualCoreSimulation | let | public let dt: Double
 VisualCoreSimulation | let | public let duration: Double
 VisualCoreSimulation | let | public let dyeChannels: Int
 VisualCoreSimulation | let | public let edges: HeightfieldEdges
+VisualCoreSimulation | let | public let edges: SwarmEdges
 VisualCoreSimulation | let | public let edges: [CutEdge]
 VisualCoreSimulation | let | public let entries: [Entry]
 VisualCoreSimulation | let | public let examined: Int
+VisualCoreSimulation | let | public let field: MagneticField
 VisualCoreSimulation | let | public let fluxClamped: Bool
 VisualCoreSimulation | let | public let from: Int
 VisualCoreSimulation | let | public let hash: ReplayHash
@@ -3407,23 +3430,30 @@ VisualCoreSimulation | let | public let node: Int
 VisualCoreSimulation | let | public let nodeCount: Int
 VisualCoreSimulation | let | public let nodes: [Int]
 VisualCoreSimulation | let | public let parameters: HeightfieldParameters
+VisualCoreSimulation | let | public let parameters: SteeringParameters
 VisualCoreSimulation | let | public let placements: [[Int]]
+VisualCoreSimulation | let | public let poles: [MagneticPole]
+VisualCoreSimulation | let | public let position: Vec2
 VisualCoreSimulation | let | public let range: Float
 VisualCoreSimulation | let | public let reduceFlashing: Bool
 VisualCoreSimulation | let | public let reduceMotion: Bool
 VisualCoreSimulation | let | public let routes: [RoutePath]
 VisualCoreSimulation | let | public let seed: String
 VisualCoreSimulation | let | public let seed: UInt64
+VisualCoreSimulation | let | public let softening: Double
+VisualCoreSimulation | let | public let speedLimit: Double
 VisualCoreSimulation | let | public let start: Simulation
 VisualCoreSimulation | let | public let state: State
 VisualCoreSimulation | let | public let step: Double
 VisualCoreSimulation | let | public let step: Int
 VisualCoreSimulation | let | public let steps: Int
 VisualCoreSimulation | let | public let stream: ControlStream<Command>
+VisualCoreSimulation | let | public let strength: Double
 VisualCoreSimulation | let | public let substepDuration: Double
 VisualCoreSimulation | let | public let substeps: Int
 VisualCoreSimulation | let | public let time: Int
 VisualCoreSimulation | let | public let to: Int
+VisualCoreSimulation | let | public let uniform: Double
 VisualCoreSimulation | let | public let version: Int
 VisualCoreSimulation | let | public let width: Int
 VisualCoreSimulation | let | public let words: [String]
@@ -3435,10 +3465,12 @@ VisualCoreSimulation | let | public static let gravityWellStrengthLimit
 VisualCoreSimulation | let | public static let intervalRange: ClosedRange<Double>
 VisualCoreSimulation | let | public static let legacyLimit
 VisualCoreSimulation | let | public static let lifetimeRange: ClosedRange<Double>
+VisualCoreSimulation | let | public static let maxAgents
 VisualCoreSimulation | let | public static let maxAmount: Int64
 VisualCoreSimulation | let | public static let maxBudget
 VisualCoreSimulation | let | public static let maxCapacity
 VisualCoreSimulation | let | public static let maxCells
+VisualCoreSimulation | let | public static let maxCharge
 VisualCoreSimulation | let | public static let maxCoordinate
 VisualCoreSimulation | let | public static let maxCost
 VisualCoreSimulation | let | public static let maxDelta
@@ -3448,12 +3480,18 @@ VisualCoreSimulation | let | public static let maxFlux
 VisualCoreSimulation | let | public static let maxNodes
 VisualCoreSimulation | let | public static let maxPatternNodes
 VisualCoreSimulation | let | public static let maxPlacements
+VisualCoreSimulation | let | public static let maxPoles
 VisualCoreSimulation | let | public static let maxSide
 VisualCoreSimulation | let | public static let maxStates
+VisualCoreSimulation | let | public static let maxStep
 VisualCoreSimulation | let | public static let maxSteps
+VisualCoreSimulation | let | public static let maxStrength
+VisualCoreSimulation | let | public static let maxUniform
 VisualCoreSimulation | let | public static let maxWindSpeed
 VisualCoreSimulation | let | public static let minSide
+VisualCoreSimulation | let | public static let minSoftening
 VisualCoreSimulation | let | public static let minimumLength: Double
+VisualCoreSimulation | let | public static let none
 VisualCoreSimulation | let | public static let quantaPerUnit: Int64
 VisualCoreSimulation | let | public static let radiusRange: ClosedRange<Double>
 VisualCoreSimulation | let | public static let rateRange: ClosedRange<Double>
@@ -3482,6 +3520,7 @@ VisualCoreSimulation | struct | public struct ContactManifold2D: Sendable, Equat
 VisualCoreSimulation | struct | public struct ControlStream<Command>
 VisualCoreSimulation | struct | public struct CutEdge: Sendable, Equatable, Hashable, Codable, Comparable
 VisualCoreSimulation | struct | public struct CutResult: Sendable, Equatable
+VisualCoreSimulation | struct | public struct DensityRaster: Sendable, Equatable
 VisualCoreSimulation | struct | public struct EffectiveAccessibility: Sendable, Equatable
 VisualCoreSimulation | struct | public struct Emitter: Sendable, Equatable
 VisualCoreSimulation | struct | public struct EmitterBurst: Sendable, Equatable, Codable
@@ -3498,7 +3537,10 @@ VisualCoreSimulation | struct | public struct Heightfield: Sendable, Equatable
 VisualCoreSimulation | struct | public struct HeightfieldLedger: Sendable, Equatable, Codable
 VisualCoreSimulation | struct | public struct HeightfieldParameters: Sendable, Equatable, Codable
 VisualCoreSimulation | struct | public struct HeightfieldStepReport: Sendable, Equatable
+VisualCoreSimulation | struct | public struct MagneticField: Sendable, Equatable, Codable
+VisualCoreSimulation | struct | public struct MagneticPole: Sendable, Equatable, Codable
 VisualCoreSimulation | struct | public struct MatchOutcome: Sendable, Equatable
+VisualCoreSimulation | struct | public struct NeighbourGrid: Sendable
 VisualCoreSimulation | struct | public struct ParticleInstance: Sendable, Equatable
 VisualCoreSimulation | struct | public struct ParticleSystem: Sendable
 VisualCoreSimulation | struct | public struct PlaybackState: Sendable, Equatable
@@ -3523,6 +3565,7 @@ VisualCoreSimulation | struct | public struct StateSign: Sendable, Equatable
 VisualCoreSimulation | struct | public struct SteeringAgent: Sendable, Equatable
 VisualCoreSimulation | struct | public struct SteeringBounds: Sendable, Equatable
 VisualCoreSimulation | struct | public struct SteeringParameters: Sendable, Equatable
+VisualCoreSimulation | struct | public struct Swarm: Sendable, Equatable, Codable
 VisualCoreSimulation | struct | public struct SystemAccessibility: Sendable, Equatable
 VisualCoreSimulation | struct | public struct TimeStepPolicy: Sendable, Equatable
 VisualCoreSimulation | struct | public struct TimedState: Sendable, Equatable, Hashable, Codable
@@ -3537,7 +3580,10 @@ VisualCoreSimulation | var | public internal(set) var removed: Int64
 VisualCoreSimulation | var | public internal(set) var rock
 VisualCoreSimulation | var | public internal(set) var water
 VisualCoreSimulation | var | public private(set) var accumulator
+VisualCoreSimulation | var | public private(set) var agents: [SteeringAgent]
 VisualCoreSimulation | var | public private(set) var aliveCount
+VisualCoreSimulation | var | public private(set) var cells: [Double]
+VisualCoreSimulation | var | public private(set) var charges: [Double]
 VisualCoreSimulation | var | public private(set) var clampedCount
 VisualCoreSimulation | var | public private(set) var clock: FixedStepClock
 VisualCoreSimulation | var | public private(set) var droppedCount
@@ -3683,6 +3729,7 @@ VisualCoreSimulation | var | public var time: Double
 VisualCoreSimulation | var | public var title: String
 VisualCoreSimulation | var | public var to: Double
 VisualCoreSimulation | var | public var tolerance: Float
+VisualCoreSimulation | var | public var total: Double
 VisualCoreSimulation | var | public var totalDuration: Double?
 VisualCoreSimulation | var | public var totalRock: Int64
 VisualCoreSimulation | var | public var totalWater: Int64

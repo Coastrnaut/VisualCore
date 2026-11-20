@@ -359,6 +359,14 @@ composite, premultiplied over); `composite` mode 2 is premultiplied over; the va
 and out-of-range emissive ones. `RenderState.premultipliedBlended` draws premultiplied layers. Rules:
 [docs/architecture/shaders.md](../../docs/architecture/shaders.md).
 
+## Bounded swarms (feature 220, R02-F20)
+
+VisualCoreSimulation steps swarms on top of the unchanged steering: `NeighbourGrid` (hashed integer cells; exactly the
+lists of `NeighbourSearch`), `MagneticField` and `MagneticPole` (an exact uniform-field turn and softened, bounded pole
+forces), `Swarm` with `SwarmEdges` (fixed steps with a speed limit, walled or wrapping bounds, parallel charges; `Codable`
+schema 1) and `DensityRaster` (bilinear splatting whose total is the in-area count, handed on as a `FieldGrid`).
+Refusals are `SwarmError` with `r2-f20.*` codes. Rules: [docs/architecture/swarms.md](../../docs/architecture/swarms.md).
+
 ## Grammar-grown vegetation (feature 219, R02-F19)
 
 VisualCoreScenes grows plants from code: `PlantGrammar` (start word, weighted rules, generations, turtle settings, seed;

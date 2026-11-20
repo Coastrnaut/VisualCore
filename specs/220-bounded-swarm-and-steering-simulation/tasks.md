@@ -45,7 +45,7 @@ its check record (no trailers). No {owner} tasks; one {device} task. Fixture see
 ## Phase 6: Regression, documentation and close
 
 - [ ] T-R02F20-006 No Stage One breakage: `--name rendering-27`, `--name rendering-26` and `--name experiences`
-- [ ] T-R02F20-007 API baseline and docs: `check_public_api.py --update`, `--name public-api`, `--name documented-api
+- [X] T-R02F20-007 API baseline and docs: `check_public_api.py --update`, `--name public-api`, `--name documented-api — Verified 2026-11-20: 2026-11-20 public-api exit 0 (3,877 declarations, 0 undocumented; +47 lines), documented-api exit 0, no name collisions, docs/architecture/swarms.md, README section, map F20 extend as built, render_autocreator + validate_autocreator PASS
   -- python3 scripts/check_documented_api.py --sources Apps/VisualCore`; new `docs/architecture/swarms.md`; section in
   `Packages/VisualCore/README.md`; section 13.4 row R02-F20 "As built" in `docs/catalog/shared-feature-map.json` and
   `render_autocreator.py`
