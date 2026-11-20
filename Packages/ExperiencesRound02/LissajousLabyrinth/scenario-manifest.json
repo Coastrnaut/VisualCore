@@ -1,0 +1,3169 @@
+{
+  "controls" : [
+    "dial.set",
+    "play.undo",
+    "play.redo",
+    "level.next"
+  ],
+  "experience" : "r02-g02.lissajous-labyrinth",
+  "kind" : "game",
+  "round" : 2,
+  "scenarios" : [
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+        "initialDigest" : "45988234c2d36811b8cb545853412d66243d3a6860600def4b44af43e891da4c"
+      },
+      "name" : "launch-first-frame",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              2,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              3,
+              13
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d799c077c0084d1ab690ec6913f6b13738029964f481afa01462ac5cc9db7516",
+        "initialDigest" : "45988234c2d36811b8cb545853412d66243d3a6860600def4b44af43e891da4c"
+      },
+      "name" : "input-response",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              3,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "outcome" : "won"
+      },
+      "name" : "completion",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              4,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              -1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0.5,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g02.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              2,
+              2.5
+            ]
+          },
+          "result" : "action.rule.r02-g02.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              10
+            ]
+          },
+          "result" : "action.rule.r02-g02.move",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              2,
+              5
+            ]
+          },
+          "result" : "action.rule.r02-g02.move",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g02.move",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g02.move",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "45988234c2d36811b8cb545853412d66243d3a6860600def4b44af43e891da4c",
+        "initialDigest" : "45988234c2d36811b8cb545853412d66243d3a6860600def4b44af43e891da4c"
+      },
+      "name" : "rejection",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              2,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              3,
+              13
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d799c077c0084d1ab690ec6913f6b13738029964f481afa01462ac5cc9db7516",
+        "initialDigest" : "45988234c2d36811b8cb545853412d66243d3a6860600def4b44af43e891da4c"
+      },
+      "name" : "save-restore",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              2,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              3,
+              13
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "initialDigest" : "45988234c2d36811b8cb545853412d66243d3a6860600def4b44af43e891da4c",
+        "resetDigest" : true
+      },
+      "name" : "reset",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "suspend-resume",
+      "seed" : "0"
+    },
+    {
+      "cycles" : 5,
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "teardown-reentry",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "cancel-prepare",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              3,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              2,
+              13
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "796cd69b9c010d442d6b77a8bec775ec0f23ef63c09adc2ad364c40b84c3579b",
+        "initialDigest" : "45988234c2d36811b8cb545853412d66243d3a6860600def4b44af43e891da4c",
+        "outcome" : "won"
+      },
+      "name" : "full-playthrough",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              2,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d799c077c0084d1ab690ec6913f6b13738029964f481afa01462ac5cc9db7516",
+        "initialDigest" : "45988234c2d36811b8cb545853412d66243d3a6860600def4b44af43e891da4c"
+      },
+      "name" : "hero",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "71aad7dcfeeb9822b64d2edcb86122d24a452b311e64c5052748da690c62a282",
+        "initialDigest" : "bcc1267be6ef6eda8014880bc0e16bd68603d356567b8b4b86cad5d52119d5f9",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-001",
+      "seed" : "13"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              8
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              8
+            ]
+          },
+          "result" : "action.rule.r02-g02.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1960c61a966428e45bd961cf17bc179eda7e80ef0dc5293c7cca63343eecffb0",
+        "initialDigest" : "fee22fc732d31a5b8ae2faf743bab1b712c3f97900c8fa213aa6a41e939fdcf0"
+      },
+      "name" : "acceptance-002",
+      "seed" : "20"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              2,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              2,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "70f01c997211e07277dcbea23126fd7a593f5979642373344c232c8680fa3f35",
+        "initialDigest" : "e511c894266b315e0ba17ac6137a446b03774e605fed0064c1949df0c427755d"
+      },
+      "name" : "acceptance-003",
+      "seed" : "27"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              2,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              2,
+              3
+            ]
+          },
+          "result" : "action.rule.r02-g02.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7fdb82246aed07ca148de4de32076a9249db6803ff871ea01c77d3b0719a209b",
+        "initialDigest" : "0a24072805a8ea7cddd7c25413f48ef97c665ea6d541a10f93cd16978848cbc0"
+      },
+      "name" : "acceptance-004",
+      "seed" : "34"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              8
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "26503c9608dcbfcc708d53ee9ff21f209628255c183b389b750c14da1fc635bc",
+        "initialDigest" : "e54eb03115d0625dc721a0d5f99cafd36c9c243760f2019d0ce41cb08dd0a398"
+      },
+      "name" : "acceptance-005",
+      "seed" : "41"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g02.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "3082510c590514f1de2b3f5ce1d7e083d49165b896144f370f9cf065086b6fb8",
+        "initialDigest" : "01c17ca47619de80cc6e18c3f60fdb014665fda79c17f37d87c3b32b205d51ea"
+      },
+      "name" : "acceptance-006",
+      "seed" : "48"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "0ffafcdadbf0da4759b24535c6e97e4fd1c608788606b4f13ae5ea65dd6e26eb",
+        "initialDigest" : "3848a0189c3f9860a125e8d83fbe33672006d778c17a03cbec3aae32bc9dc59e"
+      },
+      "name" : "acceptance-007",
+      "seed" : "55"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              2
+            ]
+          },
+          "result" : "action.rule.r02-g02.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "bccae0dc2414e37603fa6e0dbd2414bfd3e586351601f033f066030ab1c19901",
+        "initialDigest" : "5f893c18481c4724b0e2fab484f8c5357f1ae0ac4e05161adf49e96b0a7d76b7"
+      },
+      "name" : "acceptance-008",
+      "seed" : "62"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "4484e71164db356fef9e11b66a45e49a6d17ea75f708fe4f60620c91fc7fa434",
+        "initialDigest" : "72aa0ed1991d84a8a117be9d9f7347bd2ac5ee3c1900babdc547534334039dfb"
+      },
+      "name" : "acceptance-009",
+      "seed" : "69"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              5
+            ]
+          },
+          "result" : "action.rule.r02-g02.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d27a7e6d11be938e5daf19db2e0a6879253c11f07b2c6cd0b1ede0d62d3205d6",
+        "initialDigest" : "458fc1398c9884015d6a2f6b3fbcff86f97260f87023905cd7755a0db29f65a4"
+      },
+      "name" : "acceptance-010",
+      "seed" : "76"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              9
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "3edadc43f55206b1cb345be75b70a574de072ecacc776d05d1a8c606007c3b59",
+        "initialDigest" : "cef887e17053d93399af36055edc068a1b07001afe93b50586415faf6cf73539"
+      },
+      "name" : "acceptance-011",
+      "seed" : "83"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              2
+            ]
+          },
+          "result" : "action.rule.r02-g02.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f55b221cd2c9610629e74e7e8284048534b0b48e687c06129307f86cf7ade823",
+        "initialDigest" : "2bf4ce6537902ddccb9f4c0649066d4431cbfaadae0c6256d985adfb6f085e0f"
+      },
+      "name" : "acceptance-012",
+      "seed" : "90"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "54462e4412f63ea762f9265f2a848c0e52bcb7f6dde83c52ba90321f7fd4f13b",
+        "initialDigest" : "acc77440cfa934e27bbf2acbcba7fc4f8cccd825d24915452391ccb236b32e37"
+      },
+      "name" : "acceptance-013",
+      "seed" : "97"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              3,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              3,
+              2
+            ]
+          },
+          "result" : "action.rule.r02-g02.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "05e26f6807dda5050ec04cc2d736776bb2a6e4cf68bebfab843362885b23fd48",
+        "initialDigest" : "62bea6cf43de033aaf672aa4eeddaee38bef1ccff683002d32c7e986d8090afd",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-014",
+      "seed" : "4"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              2,
+              13
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              2,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d08f461b96df1ce5a3089d26ad0b9453111407bb045124e49b2a905ab4104dac",
+        "initialDigest" : "3f20df1bda7ce9808c352616f2de5a0393a46e20e5130945e3fe759affcf6218",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-015",
+      "seed" : "11"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              4
+            ]
+          },
+          "result" : "action.rule.r02-g02.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "cf1ee57babd724899a15ecd9554dff33ad85394909035a666ce66853f50c64fd",
+        "initialDigest" : "1af8cd063dacbe133116cc76c396a8282c9948151517fdb768492e9c7248009d",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-016",
+      "seed" : "18"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              2,
+              8
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              2,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "39c1f3cd8d4286dd57d4908321d7fdea32537dbebd6805b33c4bbb2730a4718c",
+        "initialDigest" : "e5c7adb1d662084b2c6928c52703e2a9b0d3db85937a11ecfb289ed600399bf4"
+      },
+      "name" : "acceptance-017",
+      "seed" : "25"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              4
+            ]
+          },
+          "result" : "action.rule.r02-g02.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "fa5de2a12b296fdcaf44a7be58a89aa8e558a0f994a655d9ce736f283d9abcd4",
+        "initialDigest" : "b1f83277ad7ae1531268d98158af49b9121c769daa048b50e2ea2f004305ba10"
+      },
+      "name" : "acceptance-018",
+      "seed" : "32"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "0a49133817cc16181180140167555f6e49e1ce0b146b341fd123e2c26779a3a7",
+        "initialDigest" : "dc0d6909fd892fbce5236fbc4b01752dc24990d7ba5b3d429ac71ec674a7599e"
+      },
+      "name" : "acceptance-019",
+      "seed" : "39"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              5
+            ]
+          },
+          "result" : "action.rule.r02-g02.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "04b92dab4c315ca685ff98a3b54bf4f32cc9e00e6c48996ab116a3fcc455bb6c",
+        "initialDigest" : "46ab3a517335a077f77581567bc81dba483efb53da716ce5cca7b82870d08ad1"
+      },
+      "name" : "acceptance-020",
+      "seed" : "46"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b67f1b6dbcfad0a16e35551f1879a75ea2125af2ef28258bfe1a8b715a2a122c",
+        "initialDigest" : "1b54a5a0b343953a8b17c67803522622ecbc2aea0058b4ab14499324e2ae378d"
+      },
+      "name" : "acceptance-021",
+      "seed" : "53"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g02.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8884b9769084be3a00d94ca9c0875fe17e926d88fb9f00a492790165473a3fbe",
+        "initialDigest" : "dc6fc668f4b082551d9e7c602f1a6227720b53038cd3cbf35c40dba98408774d"
+      },
+      "name" : "acceptance-022",
+      "seed" : "60"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f811dba303fa068a03d4d70ff96bd0fc9c4ff0ecd36c2bce3f403056e13a19b3",
+        "initialDigest" : "dab47a9f072dd44e9ebd4fd2cf3427a5267b686d3fada109a423fc64b1507584"
+      },
+      "name" : "acceptance-023",
+      "seed" : "67"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              5
+            ]
+          },
+          "result" : "action.rule.r02-g02.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6946f1b3f826f006a851e19c142795508bdea895a074c2d674025e76474814ca",
+        "initialDigest" : "ef5ddf1e141a121086f210dbd96eb338575066983911c86819fae5106b897c75"
+      },
+      "name" : "acceptance-024",
+      "seed" : "74"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "069bd085b135a85c4d1f9a66a596015ef34ad11cc38ca9d08c87a66ff8840d5f",
+        "initialDigest" : "d2db0cce5d062ee4f5b3006d5acfef1484283c4463e553ee737d62f6bda07b9d"
+      },
+      "name" : "acceptance-025",
+      "seed" : "81"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              2
+            ]
+          },
+          "result" : "action.rule.r02-g02.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "02b59387b2575b33c7688f97d5f1f3d231fe81a0e75f5df8e84db4f578efdb54",
+        "initialDigest" : "6aff6ec755ccded96cf32d9a8b6f32fad2f80ab40ae0aa6cc2c98cfa05ad6aab"
+      },
+      "name" : "acceptance-026",
+      "seed" : "88"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "eac56f5431f8720b085c8d105674310cb311586a592d83117cc44f654e9c760b",
+        "initialDigest" : "f82a8f72512a193468e6f59647e58dc5cf827f477299b8dbf9a086ff6e244523"
+      },
+      "name" : "acceptance-027",
+      "seed" : "95"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g02.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "94311251539730bed148887c5e5273c7ed5f7a9edff691117bad6ae0e487e60e",
+        "initialDigest" : "b377257e7cf8baa39936d3bc9b2ef60732650b0157fe796523459aaa81117464"
+      },
+      "name" : "acceptance-028",
+      "seed" : "2"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d7a74647350b01ab1a5a9f7df9ce35f6d3419e0e4d64997d61f4c62bb9150464",
+        "initialDigest" : "1c60bcb047220855e8bfc8048c5cac76dfbb4514e94032308c8ef63507395736",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-029",
+      "seed" : "9"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              3,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              3,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g02.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "4904f1d96a48aae9de092a00925732cd42b661e2d9873b6abc1459f9a1a01a70",
+        "initialDigest" : "f9e0928d6f5d87efbdea028e0dca1ba900a12a0c59e3c06c5b3e186368d409fc",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-030",
+      "seed" : "16"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              2,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              2,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "fb16184be257f5b3bafc796a8f9930d0964dbe943e3bec39ae0c92226cccbf01",
+        "initialDigest" : "5b4cba6e797f420b9e0a03c3e1f85f45518697841b4053fc2ab82a86f4684f9c"
+      },
+      "name" : "acceptance-031",
+      "seed" : "23"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              5
+            ]
+          },
+          "result" : "action.rule.r02-g02.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b1e54feb85b628212abf8722e6c9836cecc608eada6d3501435156752f6baf9f",
+        "initialDigest" : "d787a01737f8042c6a667610e68467ab4ce562b62e030b7d95fab66b44b52ba8"
+      },
+      "name" : "acceptance-032",
+      "seed" : "30"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              8
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a73a24e12bc273d6c01d473390542f81b3581dec407dbc2df2034b08697f65d3",
+        "initialDigest" : "fe025deef1d5f6459a05e1fd9f9ddb4cf404001b1c7d99ffbe56b693ebd1c3d1"
+      },
+      "name" : "acceptance-033",
+      "seed" : "37"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              5
+            ]
+          },
+          "result" : "action.rule.r02-g02.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "50f1842198589ffbe4b84da919ed6abe39c7d3deb950eeb33b5c5067e687ec2c",
+        "initialDigest" : "69803faf7e71ef7631e1edc1596e35d85ddac335fd420274c7965dff9d5ecefd"
+      },
+      "name" : "acceptance-034",
+      "seed" : "44"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "19b1cc10f13dd6de0ad10722e222aa9a6218e658ce093c2f8f664def1882dfbe",
+        "initialDigest" : "3150057095156c4119e8aaf90c3b5254ac1fe8ff3a4baa753114f5a4c2742ae8"
+      },
+      "name" : "acceptance-035",
+      "seed" : "51"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              7
+            ]
+          },
+          "result" : "action.rule.r02-g02.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ef5ec474b466ccfbdfa91f8043d1c63d8910cab8075e15309414a3429b6649cc",
+        "initialDigest" : "bb160052fb5cb7a3a88c90a11a58023187f7782786bd0fc3a23c372792f32ed4"
+      },
+      "name" : "acceptance-036",
+      "seed" : "58"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9fb2557cbd488677bd5c8020912958bdab59f24f11451263ba45dddc91090b8f",
+        "initialDigest" : "a66b7bd76116eed26085c51b19bcae7335e2dbc482de85f50a665cbc55a32d81"
+      },
+      "name" : "acceptance-037",
+      "seed" : "65"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              2
+            ]
+          },
+          "result" : "action.rule.r02-g02.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e60eb08de6c47cdfc2264915e86c48f0a6a3261d418c88c97099d05ff4002e28",
+        "initialDigest" : "6c12facb9def4e449eeec203bddbcd2a60be8978995b4bbb4933b8398fb9461e"
+      },
+      "name" : "acceptance-038",
+      "seed" : "72"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e1dac828fba9b9fc78ce7d34935e9a3232088e9d1739768596fb6624c0ebe721",
+        "initialDigest" : "905dd586a18acc875060f60f4686363bf3299383ccded4621e72185717512349"
+      },
+      "name" : "acceptance-039",
+      "seed" : "79"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              3
+            ]
+          },
+          "result" : "action.rule.r02-g02.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "79fd4e10b2e5c9235ed2f37d75fd315f81833a739461e4f1084dcba6c86eb65e",
+        "initialDigest" : "18eaba785abd45e90d232b2940fe21dd82bc5cb065e83af224e65942d631bf78"
+      },
+      "name" : "acceptance-040",
+      "seed" : "86"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ff8523357e638b9a6ed24e1ccaff63a8b533deaee81452122e303a59dd48bb7b",
+        "initialDigest" : "e0daffe617ddeaa579cd5648f0e616d1e7fcd2fd5f9912fd4e49f928631da3ec"
+      },
+      "name" : "acceptance-041",
+      "seed" : "93"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              3,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              3,
+              3
+            ]
+          },
+          "result" : "action.rule.r02-g02.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "87886c0bfda21490961a4db2e1c14f9a9bc685316f119428fc3f822244917941",
+        "initialDigest" : "45988234c2d36811b8cb545853412d66243d3a6860600def4b44af43e891da4c",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-042",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "2f9200bf970033aa2cd5a72bbfe512b847e01acf7e4a7e5c0eac19627b6645e9",
+        "initialDigest" : "36422bbd185a40c95f7e21f8dd3ebae2a102c52cb55331b7665bd844661134da"
+      },
+      "name" : "acceptance-043",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g02.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "95397729d8520a9db5f2a912741d9dd09ba386386def75caf41f4686ab33f981",
+        "initialDigest" : "ef9352faa61b92dbbc5a32dba14118397d028bfdde65533dd2423c079471a634",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-044",
+      "seed" : "14"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              8
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f6428f61393d45956ee87cb22caf3f3bc7f61936ea6a8d8bac29c6229036e22a",
+        "initialDigest" : "999fdb49c9a85791d6416bb38ec5d53de4aa8a2c236db909829fc5596ba6e9aa"
+      },
+      "name" : "acceptance-045",
+      "seed" : "21"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              3
+            ]
+          },
+          "result" : "action.rule.r02-g02.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d5f3c54a321ff4d1491db755f1a3e51b86ef2d1a6402be12f5b85d9d42b9808d",
+        "initialDigest" : "55907ed065d9c0bc26fb7f570c0ff77ea6227def2a6cf16c866148be54e3e163"
+      },
+      "name" : "acceptance-046",
+      "seed" : "28"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              2,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              2,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "54d7dce8844b519745a858d7dce28ec03453b3398dbe028df2410cee7d2fa2e3",
+        "initialDigest" : "01be9b1e2fbdd52b93a403827c7a999226bb0b10f2ea3539488d2aec097dfd1a"
+      },
+      "name" : "acceptance-047",
+      "seed" : "35"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              8
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              8
+            ]
+          },
+          "result" : "action.rule.r02-g02.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ed169a53ba8a886712c495d572738b057cdaf7064f52faa457f8040242186a0d",
+        "initialDigest" : "a89a141788fab41a4dd1d6b2cc41fd462b4dd6303633656d44775113f687ac30"
+      },
+      "name" : "acceptance-048",
+      "seed" : "42"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              2,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "293befea6c9d3b5ea450199881821abfa7b25b11001f7cdd3d036a1e577cea83",
+        "initialDigest" : "61c55b7659b9e5f5f226178788b392d38d14d456957df0a8a73f8506985baac3"
+      },
+      "name" : "acceptance-049",
+      "seed" : "49"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              2
+            ]
+          },
+          "result" : "action.rule.r02-g02.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "edba03eaaf44d7ccc034b0041117487725568780ca1e48179863bd9f95b40f6f",
+        "initialDigest" : "fa790910c7fb3bb6ca272c6177327ebfff1c9376f8f6cd44450de67a37defa18"
+      },
+      "name" : "acceptance-050",
+      "seed" : "56"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "10bd9518f11bef94c8e1a14e3caaa6f89c1482476cd54545d571f5bac8bc8db4",
+        "initialDigest" : "c53ac7d35f452c329e1170ab553f161467d4da6564a775a627308fb4f298dafa"
+      },
+      "name" : "acceptance-051",
+      "seed" : "63"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              5
+            ]
+          },
+          "result" : "action.rule.r02-g02.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f17e0792c2245bbd8201f2e8eb16baa51d36bdadbaac3b205d60bed62be1e280",
+        "initialDigest" : "1eeb1674956cc45bf452c6d5d9f8f16b3bf2401e778d35ea5591b3c84d17790c"
+      },
+      "name" : "acceptance-052",
+      "seed" : "70"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "c22ea555902889b173c3b6d8a3f4b030f983a6bc1bbd2c7c659e7213de44bbb6",
+        "initialDigest" : "b9d74270455735ae94feefe2bca575d42a29c66c599e7dedb615d12c1c117e3d"
+      },
+      "name" : "acceptance-053",
+      "seed" : "77"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              5
+            ]
+          },
+          "result" : "action.rule.r02-g02.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "71ad243f40bb3b77f94fa6124f8c2333c0e3386e8f47292bdea054867b32060f",
+        "initialDigest" : "cb7e7db9175bb78ecfabe2d52b3518cb249e22bdee679013ad5e6270c7c8928c"
+      },
+      "name" : "acceptance-054",
+      "seed" : "84"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "aa426270f4618ca39f9049c1916a9e195e88b36d798ed05f58717b4fca42b61e",
+        "initialDigest" : "96a6317551f46cf9f7367d1054024fcf9383cc880aebb857657ee72ea9c5aa8f"
+      },
+      "name" : "acceptance-055",
+      "seed" : "91"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              7
+            ]
+          },
+          "result" : "action.rule.r02-g02.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "da9c86b3bf31a2e053da04ffa0d00de749593971d11cdbc7e1d2136f2f0ed74f",
+        "initialDigest" : "3e015806d3166f307179308f22f39b571a4aeca996f80fc9be313e06437d157c"
+      },
+      "name" : "acceptance-056",
+      "seed" : "98"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              3,
+              11
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              3,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "95c8b2143e03059597b19d8ad0ea4f71e35b2c9b146b775cb0615a6807630503",
+        "initialDigest" : "336aaa12a621ae32d119d9bfc8b008ea891c4aae85e7c231fbf1f42539793280",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-057",
+      "seed" : "5"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g02.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "42bbfaa89bc56a363059d89ef3c686b6fee1d8665b9560eb8f5d4e3ada3471e8",
+        "initialDigest" : "25979912309250416a052e220aa8d59783af0b8815c7bb045c9a2727d5949acd"
+      },
+      "name" : "acceptance-058",
+      "seed" : "12"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d47cec81402f3e6f6515e51e9ab7ca62063618a5ada032bebf2805c137b215fc",
+        "initialDigest" : "f57a35eb57619642576b97a4797de219cf4fa937ab0fbd88e5acbaac1315b2ad",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-059",
+      "seed" : "19"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g02.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "82771d68105856aad6812657312ad538a7738cb5897d44516047dc63273ce7d5",
+        "initialDigest" : "a7be03d7405d289310c071777111c227e69d555af79af73b3afb454109e1465d"
+      },
+      "name" : "acceptance-060",
+      "seed" : "26"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "735128ca08ac459ddfbd6c7a78559379885dccfd9cd0bfc357cfdfb6ef6fad85",
+        "initialDigest" : "c48d240e2285fa347146487135b3dad42fa08c8424167e0dc4313b4178636789"
+      },
+      "name" : "acceptance-061",
+      "seed" : "33"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              3
+            ]
+          },
+          "result" : "action.rule.r02-g02.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "bd59f1b041dc0f1afbb8da6076f2129201ef12a7f9a40f9df079357c2bfb9ae8",
+        "initialDigest" : "6fb5074f348f9e5144bde825fc1f47ef8770274e7c9e9c33323a3f2080d57e52"
+      },
+      "name" : "acceptance-062",
+      "seed" : "40"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f6303ec6e9de41e4cca979b93e73001f7947c0392be901f465660ff27ab55b54",
+        "initialDigest" : "f3d9c48c8ef2ac134d75481fc4b214b8d81182004e1884c832fdc6a5d122f3e2"
+      },
+      "name" : "acceptance-063",
+      "seed" : "47"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              7
+            ]
+          },
+          "result" : "action.rule.r02-g02.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5008048752a4ad26b4d12fe5766ca98d0173ebf97fc6e91f0788894c26b32ce2",
+        "initialDigest" : "17923041e547babc48f2b38dab1e307afd69a8041f7a4e4ca61fd2ea1ab7c02f"
+      },
+      "name" : "acceptance-064",
+      "seed" : "54"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "03e5a86f8f1bb4334de680f3d5a776d80c14e60a907f57c1fbf7d12c5cba1401",
+        "initialDigest" : "ac92adfbb95ec2a3cd5af8c3ebb8dbf6afc430848527f49538db577b50bf900c"
+      },
+      "name" : "acceptance-065",
+      "seed" : "61"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              2
+            ]
+          },
+          "result" : "action.rule.r02-g02.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1fa79493ab63c3be630b3cdfbb2cb2033150b8eda7c1107c817532eb4dad5abf",
+        "initialDigest" : "26b16757f2c18df8f0ab5a07707bdf3f0b402cf32e63235cf7dfd14fe191ba99"
+      },
+      "name" : "acceptance-066",
+      "seed" : "68"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              8
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1922746b9eac5c83af35eaf8d8069fae3d9c9e65cd2663b3490b69839bef7af9",
+        "initialDigest" : "a0dc65eec29bb751ccdb4b8e1af922b71d265de3d2297a8b12778152591cb322"
+      },
+      "name" : "acceptance-067",
+      "seed" : "75"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              5
+            ]
+          },
+          "result" : "action.rule.r02-g02.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6be95848632eaaab4c5e3bb440514a2bdb1cfdcfac1bcaad44af689388809294",
+        "initialDigest" : "18e5db76a467d5fbf49822a5ee10d450abf221dad7775a4e39f24e8fd34fcddc"
+      },
+      "name" : "acceptance-068",
+      "seed" : "82"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "09f0407d3fd77c5bfa37c88129189234fa214a4b58a8bd9e2806c7cd9c409ee0",
+        "initialDigest" : "daf547a30b6d9179d839e80a5f15b334672f0fda7da3eea8016d36f510184294"
+      },
+      "name" : "acceptance-069",
+      "seed" : "89"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              3
+            ]
+          },
+          "result" : "action.rule.r02-g02.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e56c99c953990ce2a4b47f5fb004c0e0aa31a824e7dbb69aa5d2f5b46e1ff8b4",
+        "initialDigest" : "3de2ef4e452c56a4367dc891f31580d56062dfcda801ee9c8b352e1b71ddcdf0"
+      },
+      "name" : "acceptance-070",
+      "seed" : "96"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              2,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9f19510484579f9dcafb11fdd2d3fcb7ce0bba58c38ad5db6774f70205116d38",
+        "initialDigest" : "30aeaf018b13b181c3ee9738633180de32f3c04bf92c28ae1252c5dfa8bfe6e1",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-071",
+      "seed" : "3"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              7
+            ]
+          },
+          "result" : "action.rule.r02-g02.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "4cf774dab16490bf78cf089b4994f9ae75ab8b0ef4b45d82e263fd1f55b8bb8d",
+        "initialDigest" : "8ec9191c51fa4cf06a4dd96777818a544019289a7e3cc35df0114f04bf887c4b",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-072",
+      "seed" : "10"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "2b3e053184e7a39596dbfc0d7e256a3fa63d399e4e545302b030bea556658a30",
+        "initialDigest" : "6d07e57f74cc80a9503c0db9aa204752aaae0ef04a932bd173ef3a59c0d31efb"
+      },
+      "name" : "acceptance-073",
+      "seed" : "17"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              2
+            ]
+          },
+          "result" : "action.rule.r02-g02.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "500bf49ca6200483fee2fd7d920fc4b296073bdeb766cda99cb3095443af82b0",
+        "initialDigest" : "1f1d0057a0fed349a757ef46d7d248aa52829cf7aca240dd4920362becfcc185"
+      },
+      "name" : "acceptance-074",
+      "seed" : "24"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              2,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              2,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "adc6f0c8dab9788a7443eb784ef27c9805e840f31e9f8e8131cbc7de5dbd6e99",
+        "initialDigest" : "a24465613631e3e1fbaf0ed3dcea2c7187a903b16c47f767b9dfde6a1bbf3934"
+      },
+      "name" : "acceptance-075",
+      "seed" : "31"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g02.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e47bb84e26688154c5be8adefe8211b153a1afc7329cdc1a44c697ad10de5ed5",
+        "initialDigest" : "f847a3566578254fac9dfd1c769cb0f557df5241f70fd0403aa232b232dbf279"
+      },
+      "name" : "acceptance-076",
+      "seed" : "38"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              8
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e7bec9627ba7db4984245269fdcac96f7f9c845f53236e590fcdccf79848ab7b",
+        "initialDigest" : "d183f1c503f51f9d77c555bff14116f766015c1ebcdd5b75ccc472adc5ac8195"
+      },
+      "name" : "acceptance-077",
+      "seed" : "45"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              8
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              1,
+              8
+            ]
+          },
+          "result" : "action.rule.r02-g02.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f3c9c6159877ed45c6abeffb4706669efdf3a5cde1a82806e73b20db82f4adf6",
+        "initialDigest" : "7a016843e4ab2e5a552e65e5f82439267974355e9f65ae26d10ec80224cef008"
+      },
+      "name" : "acceptance-078",
+      "seed" : "52"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ff0c41a6e3e5307c6637e2cd1691a15e2a4c1c978689647e009b98e269412a63",
+        "initialDigest" : "9cc869a007634600018803557034e467971f126a32a49fd77b1a05e51a40bf0e"
+      },
+      "name" : "acceptance-079",
+      "seed" : "59"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              8
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              0,
+              8
+            ]
+          },
+          "result" : "action.rule.r02-g02.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d0d694358a27b7d9299039623cdc2a433fb0dc6fe0c21f4ad0d22c31ff3cdb0d",
+        "initialDigest" : "0c4d63cda7f0cf4a1a57025fc291a01d06f9916c53744fef124eca5d354b5205"
+      },
+      "name" : "acceptance-080",
+      "seed" : "66"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              3,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "87886c0bfda21490961a4db2e1c14f9a9bc685316f119428fc3f822244917941",
+        "initialDigest" : "45988234c2d36811b8cb545853412d66243d3a6860600def4b44af43e891da4c",
+        "outcome" : "won"
+      },
+      "name" : "fixture-level-1-solved",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              2,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              2,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              2,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              2,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              2,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              2,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              2,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              2,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              2,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "fd1916a662fafffe1864e973117bc73ed798e5ef4d902ff36fb1127aeec04bc7",
+        "initialDigest" : "45988234c2d36811b8cb545853412d66243d3a6860600def4b44af43e891da4c",
+        "outcome" : "failed"
+      },
+      "name" : "fixture-allowance-spent",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dial.set",
+            "values" : [
+              2,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d799c077c0084d1ab690ec6913f6b13738029964f481afa01462ac5cc9db7516",
+        "initialDigest" : "45988234c2d36811b8cb545853412d66243d3a6860600def4b44af43e891da4c"
+      },
+      "name" : "fixture-undo-redo",
+      "seed" : "0"
+    }
+  ],
+  "schema" : 1
+}

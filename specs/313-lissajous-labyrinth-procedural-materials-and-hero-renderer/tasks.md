@@ -33,7 +33,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 3: Experience, registration and frames
 
-- [ ] T-R02G0203-006 Create `Packages/ExperiencesRound02/LissajousLabyrinth/Experience/LissajousLabyrinthExperience.swift`, `…Presenter.swift`, `…ThreadScene.swift` (GL
+- [X] T-R02G0203-006 Create `Packages/ExperiencesRound02/LissajousLabyrinth/Experience/LissajousLabyrinthExperience.swift`, `…Presenter.swift`, `…ThreadScene.swift` (GL — Verified 2026-11-20: 2026-11-20 sim-27 exit 0 (18 new simulator tests: frames vs CPU reference at 768x512 on levels 1/21/41/61/81 at three tiers, ring states, tier log, fallback, zero size, aspects, memory warning, Reduce Motion; round-two package incl. scenarios); packages, catalog-search exit 0; candidate registered
   scene with `ShaderMeshRenderer`; fallback; tier log; Reduce Motion and Reduce Flashing), `…Controls.swift` (four
   labelled steppers, undo, redo, next level), `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthScenarios.swift` (standard scenarios,
   full-playthrough, hero, fixtures, 80 acceptance scenarios R2-G02-QA-001 … 080) and `Packages/ExperiencesRound02/LissajousLabyrinth/scenario-manifest.json`; register

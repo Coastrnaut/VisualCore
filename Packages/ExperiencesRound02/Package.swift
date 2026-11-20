@@ -107,6 +107,7 @@ let package = Package(
                                    .product(name: "VisualCoreScenes", package: visualCore),
                                    .product(name: "VisualCoreExperience", package: visualCore),
                                    .product(name: "VisualCoreSimulation", package: visualCore),
+                                   .product(name: "VisualCoreDiagnostics", package: visualCore),
                                    .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
                                    .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
                                    .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS]))],

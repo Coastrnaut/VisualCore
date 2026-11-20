@@ -28,6 +28,8 @@ import GraphicsBenchmarkLabExperience
 import EffectsComposerExperience
 import AuroraLoomCore
 import AuroraLoomExperience
+import LissajousLabyrinthCore
+import LissajousLabyrinthExperience
 import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreUI
@@ -97,7 +99,7 @@ enum ExperienceRegistry {
     /// each carries its scenario manifest, so that the verification runner can open it, but it stays unavailable
     /// in the catalog and outside `all`. Debug builds show them with `-vcCandidates`. Recording an experience's X
     /// gate moves its registration from here to `all`.
-    static let candidates: [ExperienceRegistration] = [auroraLoom].compactMap { $0 }
+    static let candidates: [ExperienceRegistration] = [auroraLoom, lissajousLabyrinth].compactMap { $0 }
 
     /// A01 Generative Art Studio (feature 193, US1).
     private static var generativeArtStudio: ExperienceRegistration? {
@@ -535,6 +537,23 @@ extension ExperienceRegistry {
         }
         #if DEBUG || VISUALCORE_AUTOMATION
         registration.scenarioManifest = AuroraLoomExperienceCore.manifest(for: id)
+        #endif
+        return registration
+    }
+
+    /// R02-G02 Lissajous Labyrinth (feature 313, R02-G02-03): a candidate until X-R02-G02. Snapshot schema 1, so no
+    /// earlier example is stored yet.
+    fileprivate static var lissajousLabyrinth: ExperienceRegistration? {
+        guard let id = LissajousLabyrinthExperience.id else { return nil }
+        var registration = ExperienceRegistration(id: id, core: LissajousLabyrinthExperienceCore.self) { launch in
+            let system = SystemAccessibilityObserver.systemValues()
+            return LissajousLabyrinthExperience.make(
+                id: id, storage: launch.storage,
+                reduceMotion: launch.reduceMotion.resolved(system: system.reduceMotion),
+                reduceFlashing: launch.reduceFlashing.resolved(system: system.dimFlashingLights))
+        }
+        #if DEBUG || VISUALCORE_AUTOMATION
+        registration.scenarioManifest = LissajousLabyrinthExperienceCore.manifest(for: id)
         #endif
         return registration
     }

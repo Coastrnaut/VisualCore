@@ -1332,7 +1332,9 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     "EffectsComposerExperience",
                                     # Feature 303 (R02-G01-03): Aurora Loom, a candidate until X-R02-G01 (its
                                     # adapter core lives in the pure AuroraLoomCore, which the registry names).
-                                    "AuroraLoomCore", "AuroraLoomExperience"])
+                                    "AuroraLoomCore", "AuroraLoomExperience",
+                                    # Feature 313 (R02-G02-03): Lissajous Labyrinth, a candidate until X-R02-G02.
+                                    "LissajousLabyrinthCore", "LissajousLabyrinthExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):
         listing = subprocess.run([sys.executable, str(HERE / "release_check.py"), "--list"],

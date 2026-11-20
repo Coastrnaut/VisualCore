@@ -58,7 +58,8 @@ registration with content facts, and the public `ShaderMeshRenderer`; the Lissaj
   presenter logs each tier change with its reason. Impact: FR-R02G0203-004; SC-R02G0203-001.
 - Q: How are rendered frames checked, and within which bounds? → A: the Core's CPU reference projects the drawn path
   samples, checkpoint centres and obstacle centres through the same camera and gives the palette. Simulator tests render
-  offscreen at 96 × 64 and check that each projected path sample (at the tier's stride, those not hidden behind an
+  offscreen at 768 × 512 (aspect 1.5; at 96 × 64 the thin thread and ring bands cover less than a pixel and cannot be
+  sampled, measured 2026-11-20) and check that each projected path sample (at the tier's stride, those not hidden behind an
   obstacle) lies within 2 pixels of a pixel brighter than the background by at least 0.15 in luminance, that each
   checkpoint centre's pixel is within 0.12 per channel of its expected colour, and that the background matches the
   palette's night within 0.05 away from geometry. Palette: night #070B1E, cobalt #2F5BD8, violet #8A4FE0, copper

@@ -132,7 +132,9 @@ enum CatalogFixture {
                                // Feature 181 (A25-P02); integrated at X-A25.
                                "a25.effects-composer",
                                // Feature 303 (R02-G01-03); a candidate until X-R02-G01.
-                               "r02-g01.aurora-loom"],
+                               "r02-g01.aurora-loom",
+                               // Feature 313 (R02-G02-03): Lissajous Labyrinth, a candidate until X-R02-G02.
+                               "r02-g02.lissajous-labyrinth"],
                 "the registrations of Catalog/registrations.json")
     }
 

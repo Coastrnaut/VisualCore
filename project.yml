@@ -223,6 +223,10 @@ targets:
         product: AuroraLoomCore
       - package: ExperiencesRound02
         product: AuroraLoomExperience
+      - package: ExperiencesRound02
+        product: LissajousLabyrinthCore
+      - package: ExperiencesRound02
+        product: LissajousLabyrinthExperience
     postBuildScripts:
       - name: Bundle licenses (UA-F04)
         basedOnDependencyAnalysis: false

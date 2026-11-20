@@ -637,6 +637,33 @@
       "manifest": "Packages/ExperiencesRound02/AuroraLoom/scenario-manifest.json",
       "permissions": [],
       "summary": "Weave three luminous ribbons of auroral silk into one harmony: turn each ribbon's wave and phase until it meets the target marker at all four gates for two whole turns, within a move allowance. 100 certified levels with hints, stars, a daily level and practice; undo and redo. Drawn in code; offline."
+    },
+    "r02-g02.lissajous-labyrinth": {
+      "capabilities": [
+        "Tune two frequencies and two phases",
+        "A slow luminous ink-thread flower",
+        "100 solver-certified levels",
+        "Every change can be undone and redone",
+        "Three quality levels, same rules"
+      ],
+      "quality_tiers": [
+        "level-0",
+        "level-1",
+        "level-2"
+      ],
+      "palette": [
+        "#070B1E",
+        "#2F5BD8",
+        "#8A4FE0",
+        "#D9824A"
+      ],
+      "content": {
+        "catalog_sha256": "9c1d5652c1dc2badac0568fc25a79ef3a0a4683d2db290e1b1699b120430e96e",
+        "levels": 100
+      },
+      "manifest": "Packages/ExperiencesRound02/LissajousLabyrinth/scenario-manifest.json",
+      "permissions": [],
+      "summary": "Tune two coupled frequencies and two phases so a slowly moving point traces a closed three-dimensional flower that passes every checkpoint in order and touches no obstacle, within an action allowance. 100 certified levels; undo and redo. Drawn in code; offline."
     }
   }
 }
