@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-20
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-F23 (migration ledger, shared round feature) · ID namespace FR-R02F23-###, SC-R02F23-###, T-R02F23-###
 
@@ -30,6 +30,47 @@ Canonical overrides:
 - **Superseded parts of the source prompt:** the USD 1.99–4.99 purchase model (ADR-0009); the Round 2 lock
   (ImplementationLock-100). **Device-only items:** generation time of a batch of levels on D1–D3, recorded in the device
   campaign. **Owner-only items:** none.
+
+## Clarifications
+
+### Session 2026-11-20
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time. Facts checked in
+code (read-only audit, 2026-11-20): `StableHash.sha256Hex` (VisualCoreMath), `SeededRandom` and
+`SeedDerivation.derive(_:index:)` (VisualCoreSimulation), and the R02-F16 solvers and `SolverCertificate` are present; no
+puzzle contract exists; the names `PuzzleRules`, `PuzzleLevel`, `PuzzleUniqueness`, `FairnessBudget`, `PuzzleValidator`,
+`PuzzleCertificate`, `PuzzleVerdict`, `PuzzleGenerator`, `PuzzleGeneration` and `PuzzleError` are free.
+
+- Q: What do a puzzle's rules provide, and where does the contract live? → A: in VisualCoreSimulation, a protocol
+  `PuzzleRules` with a `rulesID` (lowercase slug of at most 64 characters), a `State` and a `Move` (both `Hashable`,
+  `Codable`, `Sendable`), `moves(in:)` returning the legal moves in a fixed order, `apply(_:to:)` returning the next
+  state or nil for an illegal move, and `isSolved(_:)`. Rules must be pure: the same state always gives the same moves
+  and results. Impact: FR-R02F23-002, 003; SC-R02F23-002.
+- Q: What is a level and how is its identity formed? → A: `PuzzleLevel<Rules>` is immutable: rules id, schema 1, start,
+  solution (at most 4,096 moves), uniqueness promise (`PuzzleUniqueness`: `.none`, `.goal` — exactly one solved state is
+  reachable within the length bound — or `.solution` — the given solution is the only shortest one), a `FairnessBudget`
+  and an optional generator seed; its `identity` is the SHA-256 hex (`StableHash`) of its canonical JSON (sorted keys,
+  identity excluded). Decoding recomputes the identity and refuses a mismatch (`.edited`); a newer schema is refused.
+  Impact: FR-R02F23-001, 007; SC-R02F23-001.
+- Q: What does validation check, in what order, and what does it report? → A: `PuzzleValidator.certify(_:rules:)` checks
+  in this order and stops at the first failure: the rules id matches; every solution move is legal (`illegalMove(index)`);
+  the solution ends solved (`notSolved`); its length lies in the budget's bounds (`tooShort`, `tooLong`); then a
+  breadth-first search from the start to the maximum length explores at most the node budget (`unproven` when exceeded),
+  refuses any reached state with more moves than the branching bound (`tooBranching(count)`), refuses a shortest solution
+  below the minimum length (`tooShort`), and checks the uniqueness promise (`notUnique`) by counting solved states (goal)
+  or shortest paths capped at 2 (solution). The `PuzzleCertificate` holds the verdict, the states explored, the shortest
+  solution length, the solved states found (capped at 2) and the largest branching seen; it is `Equatable` and the same on
+  every run. Impact: FR-R02F23-002…004, 006; SC-R02F23-002, 003.
+- Q: What are the fairness budget's bounds, and how does the generator search? → A: `FairnessBudget` holds the minimum and
+  maximum solution length (0 ≤ min ≤ max ≤ 4,096), the branching bound (1 … 1,024) and the node budget (1 … 1,000,000).
+  `PuzzleGenerator.generate` takes a seed, an attempt budget (1 … 10,000), the rules, the budget, the promise and a
+  candidate maker that turns a `SeededRandom` into a start and a solution (or nil); attempt i uses
+  `SeededRandom(seed: SeedDerivation.derive(seed, index: i))`, and the first candidate that certifies becomes the level
+  (with the seed recorded). The `PuzzleGeneration` reports the attempts used and the count of each rejection verdict;
+  when every attempt fails it throws `.generationFailed(attempts)`. Impact: FR-R02F23-004, 005; SC-R02F23-004.
+- Q: How are refusals named? → A: `PuzzleError` with codes `r2-f23.rules-id`, `r2-f23.solution-length`,
+  `r2-f23.budget`, `r2-f23.attempts`, `r2-f23.generation-failed`, `r2-f23.newer-schema`, `r2-f23.malformed` and
+  `r2-f23.edited`; verdicts are not errors but the certificate's answer. Impact: FR-R02F23-008.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -75,7 +116,7 @@ player can reach offers a bounded number of moves, and the search that proves it
 
 ### Edge Cases
 
-- **A level already solved at the start:** refused unless the fairness floor allows a zero-move solution.
+- **A level already solved at the start:** its solution is empty, refused as too short unless the minimum length is 0.
 - **A solution with a move the rules do not allow:** refused at that move's index.
 - **A uniqueness search that runs out of budget:** refused as unproven, never as unique.
 - **A generator that never finds a level:** reports failure with the attempts made.
