@@ -16,6 +16,9 @@
 // `refused(code:)` where it sends an action, keeps a feedback log, eases the scene's lights (`AuroraLoomLights`, 0.45 s
 // fades under Reduce Flashing), offers the ambient recipe to `AuroraLoomSound` at level openings and play ends, and
 // exposes `adjust(ribbon:control:by:port:)`, the one operation the steppers and their accessibility actions use.
+// Feature 307 (R02-G01-07) T-R02G0107-005 (FR-R02G0107-003, 004): the mirror carries whether a replay is available or
+// running with its position; `startReplay`, `stepReplay` and `stopReplay` send the replay actions; the first described
+// core whose restore dropped results announces them once (`AuroraLoomFeedbackPlan.dropped(count:)`).
 #if os(iOS)
 import AuroraLoomCore
 import Foundation
@@ -63,6 +66,14 @@ final class AuroraLoomMirror {
     var band = 1
     /// Whether the person turned the ambient sound on (off by default; feature 306).
     var soundOn = false
+    /// Whether the level has a stored verified winning trace to replay and no replay is running (feature 307).
+    var replayAvailable = false
+    /// Whether a replay is running (feature 307).
+    var replaying = false
+    /// The replay moves played so far (feature 307).
+    var replayPosition = 0
+    /// The moves of the stored trace of the level (feature 307); 0 when none is stored.
+    var replayLength = 0
 }
 
 /// One entry of the feedback log (feature 306): the announcement and haptic planned for a change or refusal.
@@ -111,6 +122,8 @@ final class AuroraLoomPresenter: ExperiencePresenter {
     private var lastFrameTime: Double?
     /// The ambient loop's policy (feature 306).
     let sound: AuroraLoomSound
+    /// Whether the dropped-results announcement was made (once per presenter; feature 307).
+    private(set) var droppedAnnounced = false
 
     init(reduceMotion: Bool, reduceFlashing: Bool) {
         self.reduceMotion = reduceMotion
@@ -286,6 +299,24 @@ final class AuroraLoomPresenter: ExperiencePresenter {
         return send("ribbon.move", [Double(ribbon), Double(control), Double(step)], port: port)
     }
 
+    /// Starts the replay of the current level's stored winning moves (`replay.start`; feature 307).
+    @discardableResult
+    func startReplay(port: ExperienceActionPort) -> ActionResult {
+        send("replay.start", [Double(mirror.levelNumber)], port: port)
+    }
+
+    /// Plays the next move of the running replay (`replay.step`).
+    @discardableResult
+    func stepReplay(port: ExperienceActionPort) -> ActionResult {
+        send("replay.step", port: port)
+    }
+
+    /// Stops the running replay and returns to the campaign (`replay.stop`).
+    @discardableResult
+    func stopReplay(port: ExperienceActionPort) -> ActionResult {
+        send("replay.stop", port: port)
+    }
+
     /// Plays `plan` through the feedback route and logs it; an empty plan does nothing.
     func route(_ plan: AuroraLoomFeedbackPlan) {
         guard plan != .none else { return }
@@ -314,6 +345,10 @@ final class AuroraLoomPresenter: ExperiencePresenter {
 
     func describe(_ core: AuroraLoomExperienceCore) -> String {
         let play = core.play
+        if !droppedAnnounced && core.reconciliationDropped > 0 {
+            droppedAnnounced = true
+            route(AuroraLoomFeedbackPlan.dropped(count: core.reconciliationDropped))
+        }
         if let previous = previousCore {
             route(AuroraLoomFeedbackPlan.after(old: previous, new: core))
             let opened = previous.levelNumber != core.levelNumber || previous.mode != core.mode
@@ -338,6 +373,18 @@ final class AuroraLoomPresenter: ExperiencePresenter {
         mirror.shortest = core.certifiedShortest
         mirror.stars = core.progress.solved[core.levelNumber]?.stars
         mirror.band = AuroraLoomProgress.band(of: core.levelNumber)
+        var replayLevel = core.levelNumber
+        if case .replay(let level) = core.mode {
+            replayLevel = level
+            mirror.replaying = true
+        } else {
+            mirror.replaying = false
+        }
+        let stored = core.progress.solved[replayLevel]
+        let traced = stored?.verified == true && !(stored?.trace.isEmpty ?? true)
+        mirror.replayLength = traced ? (stored?.trace.count ?? 0) : 0
+        mirror.replayPosition = mirror.replaying ? play.spent : 0
+        mirror.replayAvailable = traced && !mirror.replaying
         if hintKey != Self.hintKey(core) || play.stage != .playing {
             hintKey = nil
             mirror.hintLevel = 0
@@ -351,7 +398,7 @@ final class AuroraLoomPresenter: ExperiencePresenter {
         case .campaign: break
         case .practice: text += "Practice. "
         case .daily: text += "Daily level. "
-        case .replay: text += "Replay. "
+        case .replay: text += "Replay, move \(mirror.replayPosition) of \(mirror.replayLength). "
         }
         if let instruction = mirror.instruction { text += instruction + " " }
         for ribbon in 0..<3 {

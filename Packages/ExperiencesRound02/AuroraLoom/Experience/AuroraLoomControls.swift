@@ -92,6 +92,12 @@ struct AuroraLoomControls: View {
                     HStack(spacing: 16) { modeButtons }
                     VStack(alignment: .leading, spacing: 8) { modeButtons }
                 }
+                if mirror.replaying || mirror.replayAvailable {
+                    ViewThatFits(in: .horizontal) {
+                        HStack(spacing: 16) { replayButtons }
+                        VStack(alignment: .leading, spacing: 8) { replayButtons }
+                    }
+                }
                 Toggle("Sound", isOn: Binding(get: { mirror.soundOn }, set: { presenter.setSound(on: $0) }))
                     .accessibilityLabel("Ambient sound")
                     .accessibilityValue(mirror.soundOn ? "On" : "Off")
@@ -102,6 +108,22 @@ struct AuroraLoomControls: View {
         .onAppear { presenter.controlsAppeared() }
         .onDisappear { presenter.controlsDisappeared() }
         .onChange(of: scenePhase) { _, phase in presenter.sceneActive(phase == .active) }
+    }
+
+    /// Replay of the level's stored winning moves (feature 307): Replay when one is stored; Step and Stop while
+    /// replaying, with the position as the value.
+    @ViewBuilder private var replayButtons: some View {
+        if mirror.replaying {
+            Button("Step") { presenter.stepReplay(port: port) }
+                .accessibilityLabel("Play the next replay move")
+                .accessibilityValue("Move \(mirror.replayPosition) of \(mirror.replayLength)")
+            Button("Stop") { presenter.stopReplay(port: port) }
+                .accessibilityLabel("Stop the replay")
+        } else {
+            Button("Replay") { presenter.startReplay(port: port) }
+                .accessibilityLabel("Replay your best solution of this level")
+                .accessibilityValue("\(mirror.replayLength) moves")
+        }
     }
 
     /// The panel's readable width on iPad (clarification Q5).

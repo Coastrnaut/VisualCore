@@ -34,7 +34,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 4: Story 3 — replay in the experience (P2)
 
-- [ ] T-R02G0107-005 [US3] Edit `Packages/ExperiencesRound02/AuroraLoom/Experience/AuroraLoomPresenter.swift` and `Packages/ExperiencesRound02/AuroraLoom/Experience/AuroraLoomControls.swift`
+- [X] T-R02G0107-005 [US3] Edit `Packages/ExperiencesRound02/AuroraLoom/Experience/AuroraLoomPresenter.swift` and `Packages/ExperiencesRound02/AuroraLoom/Experience/AuroraLoomControls.swift` — Verified 2026-11-20: 2026-11-20 sim-27 exit 0 (round-two simulator suite incl. AuroraLoomReplayTests: replay through presenter and port with announcements, refusals during replay, dropped results announced once; replay texts in AuroraLoomFeedbackPlanTests on the host)
   (Replay for a solved level, Step, Stop in the scrolling panel with labels and values; a one-time announcement of
   dropped results; replay steps announced) with `Packages/ExperiencesRound02/AuroraLoom/ExperienceTests/AuroraLoomReplayTests.swift` (agent C: replay through
   the port and presenter; refusals during replay; dropped-results announcement); `--name sim-27 -- python3

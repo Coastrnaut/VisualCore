@@ -20,6 +20,8 @@
 //      otherwise: `state`, "<prefix>Ribbon r wave s. g of 12 gate crossings in harmony. Moves m of n." (phase
 //           likewise), r numbered from 1, s the control's current step (after an undo, the restored one), g the lit
 //           crossings of `snapshot(time: 0)`, m the moves spent, n the allowance; haptic `selection`;
+//      replay (feature 307): the prefix is "Replay move k of n: " (k moves played of the trace's n) and a win reads
+//           "Replay complete in m moves." (haptic `success`);
 //   3. only the tutorial changed and is now done (`tutorial.dismiss`) → `state`, "Tutorial skipped."; no haptic;
 //   4. otherwise ``AuroraLoomFeedbackPlan/none``.
 import Foundation
@@ -81,10 +83,18 @@ public struct AuroraLoomFeedbackPlan: Sendable, Equatable {
 
     /// The plan of a refused action with reason code `code`: kind `rejection`, haptic `error`, and the text
     /// "That level is not open yet." (a code containing `r02-g01.locked`), "That date is not a calendar date."
-    /// (`r02-g01.date`), "No moves are left." (`r02-g01.allowance`), otherwise "That move was refused.".
+    /// (`r02-g01.date`), "No moves are left." (`r02-g01.allowance`), "No replay is stored for that level."
+    /// (`r02-g01.no-replay`), "The replay is over." (`r02-g01.replay-end`), "Stop the replay first."
+    /// (`r02-g01.replay`, feature 307), otherwise "That move was refused.".
     public static func refused(code: String) -> AuroraLoomFeedbackPlan {
         let text: String
-        if code.contains(AuroraLoomExperienceRule.locked) {
+        if code.contains(AuroraLoomExperienceRule.noReplay) {
+            text = "No replay is stored for that level."
+        } else if code.contains(AuroraLoomExperienceRule.replayEnd) {
+            text = "The replay is over."
+        } else if code.contains(AuroraLoomExperienceRule.replay) {
+            text = "Stop the replay first."
+        } else if code.contains(AuroraLoomExperienceRule.locked) {
             text = "That level is not open yet."
         } else if code.contains(AuroraLoomExperienceRule.date) {
             text = "That date is not a calendar date."
@@ -118,6 +128,16 @@ public struct AuroraLoomFeedbackPlan: Sendable, Equatable {
         return lit
     }
 
+    /// The one-time announcement of results a restore dropped (feature 307): kind `state`, no haptic, "1 saved result
+    /// could not be verified and was removed." or "n saved results could not be verified and were removed."; ``none``
+    /// for 0 or fewer.
+    public static func dropped(count: Int) -> AuroraLoomFeedbackPlan {
+        guard count > 0 else { return .none }
+        let text: String = count == 1 ? "1 saved result could not be verified and was removed."
+            : "\(count) saved results could not be verified and were removed."
+        return AuroraLoomFeedbackPlan(text: text, kind: .state, haptic: nil)
+    }
+
     /// The `level` plan of `core`: "Level n, band b, <mode>." and the tutorial instruction while it is shown.
     static func levelPlan(_ core: AuroraLoomExperienceCore) -> AuroraLoomFeedbackPlan {
         let number: Int = core.levelNumber
@@ -133,7 +153,9 @@ public struct AuroraLoomFeedbackPlan: Sendable, Equatable {
         switch core.play.stage {
         case .won:
             let text: String
-            if core.mode == .practice {
+            if case .replay = core.mode {
+                text = "Replay complete in \(spent) moves."
+            } else if core.mode == .practice {
                 text = "Harmony. Practice won in \(spent) moves."
             } else {
                 let stars: Int = AuroraLoomProgress.stars(moves: spent, shortest: core.certifiedShortest)
@@ -144,11 +166,15 @@ public struct AuroraLoomFeedbackPlan: Sendable, Equatable {
             let text: String = core.failureExplanation?.text ?? "The moves are spent without harmony. Undo or retry."
             return AuroraLoomFeedbackPlan(text: text, kind: .outcome, haptic: .warning)
         default:
-            let prefix: String
+            var prefix: String
             switch kind {
             case .move: prefix = ""
             case .undo: prefix = "Undone: "
             case .redo: prefix = "Redone: "
+            }
+            if case .replay(let level) = core.mode {
+                let length: Int = core.progress.solved[level]?.trace.count ?? spent
+                prefix = "Replay move \(spent) of \(length): "
             }
             let step: Int = control == .wave ? core.play.steps.wave[ribbon] : core.play.steps.phase[ribbon]
             let text: String = "\(prefix)Ribbon \(ribbon + 1) \(control.rawValue) \(step). "

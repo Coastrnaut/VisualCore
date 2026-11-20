@@ -2,7 +2,8 @@
 // clarifications Q1, Q2). The exact announcement texts, kinds and haptics of `AuroraLoomFeedbackPlan` for a move of the
 // wave and of the phase, undo, redo, a campaign win and a practice win, a failure and the undo that rewinds it,
 // `level.next`, `level.select`, `mode.daily`, `mode.practice`, the tutorial dismissal on level 1, no change, and the
-// refusal codes. Seed 2_306 (level 7: start wave [9, 15, 9], phase [8, 4, 4], allowance 11, certified shortest 2).
+// refusal codes; from feature 307 the replay texts (start, each move, the win), the replay refusals and the dropped-results
+// announcement. Seed 2_306 (level 7: start wave [9, 15, 9], phase [8, 4, 4], allowance 11, certified shortest 2).
 // Explicit types, plain loops, short runs.
 import Foundation
 import Testing
@@ -146,5 +147,40 @@ import VisualCoreSimulation
             #expect(Plan.refused(code: codes[index]) == Plan(text: texts[index], kind: .rejection, haptic: .error))
         }
         #expect(Plan.none == Plan(text: nil, kind: nil, haptic: nil))
+        let replayCodes: [String] = ["action.rule.r02-g01.no-replay", "action.rule.r02-g01.replay-end",
+                                     "action.rule.r02-g01.replay"]
+        let replayTexts: [String] = ["No replay is stored for that level.", "The replay is over.",
+                                     "Stop the replay first."]
+        for index in replayCodes.indices {
+            #expect(Plan.refused(code: replayCodes[index])
+                == Plan(text: replayTexts[index], kind: .rejection, haptic: .error))
+        }
+    }
+
+    @Test func droppedResultsAreAnnouncedOnce() {
+        #expect(Plan.dropped(count: 0) == .none)
+        #expect(Plan.dropped(count: 1) == Plan(text: "1 saved result could not be verified and was removed.",
+                                               kind: .state, haptic: nil))
+        #expect(Plan.dropped(count: 3) == Plan(text: "3 saved results could not be verified and were removed.",
+                                               kind: .state, haptic: nil))
+    }
+
+    @Test func replayStartEachMoveAndTheWin() async throws {
+        var core: Core = try await Core.prepare(seed: Self.seed)
+        let certified: AuroraLoomGenerated = try Core.generated(number: core.levelNumber)
+        for move in certified.solution.moves { _ = Self.step(&core, Self.action(move)) }
+        let level: Int = core.levelNumber
+        let start: Plan = Self.step(&core, Self.bare("replay.start", [Double(level)]))
+        #expect(start == Plan(text: "Level \(level), band 1, Replay.", kind: .level, haptic: nil))
+        let count: Int = certified.solution.moves.count
+        for index in 0..<count {
+            let plan: Plan = Self.step(&core, Self.bare("replay.step"))
+            if index == count - 1 {
+                #expect(plan == Plan(text: "Replay complete in \(count) moves.", kind: .outcome, haptic: .success))
+            } else {
+                #expect(plan.text?.hasPrefix("Replay move \(index + 1) of \(count): Ribbon ") == true)
+                #expect(plan.kind == .state && plan.haptic == .selection)
+            }
+        }
     }
 }
