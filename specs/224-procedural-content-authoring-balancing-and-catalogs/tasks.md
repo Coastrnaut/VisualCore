@@ -14,7 +14,7 @@ tasks; one {device} task. Fixture seed 2_024; tests stay short.
 
 ## Phase 2: Foundational
 
-- [ ] T-R02F24-002 Create `Packages/VisualCore/Sources/VisualCoreSimulation/ContentError.swift` and `Packages/VisualCore/Sources/VisualCoreSimulation/PuzzleCatalogPlan.swift` (PuzzleCatalogStage "count 1 … 500;
+- [X] T-R02F24-002 Create `Packages/VisualCore/Sources/VisualCoreSimulation/ContentError.swift` and `Packages/VisualCore/Sources/VisualCoreSimulation/PuzzleCatalogPlan.swift` (PuzzleCatalogStage "count 1 … 500; — Verified 2026-11-20: 2026-11-20 host exit 0: ProgressionRuleTests 4/4 (refusals and codes; breach positions; difficulty order and certificate initialiser; coding re-validates) (.autonomy/migration/checks/R02-F24.host.json)
   attempts 1 … 10,000", PuzzleCatalogPlan "id slug; 1 … 16 stages; ≤ 1,000 levels", PuzzleDifficulty ordered by shortest
   then explored, ProgressionRule "each 0 … 64 (defaults 1, 3)" with `standard` and `breach`) with
   `Packages/VisualCore/Tests/VisualCoreSimulationTests/ProgressionRuleTests.swift` (refusals and codes; breach positions for drops and jumps; difficulty order and the

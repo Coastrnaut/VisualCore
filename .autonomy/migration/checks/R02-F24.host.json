@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "ProgressionRuleTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter ProgressionRuleTests",
+  "elapsed_seconds": 10.362,
+  "exit_code": 0,
+  "finished": "2026-11-20T15:49:35+00:00",
+  "gate": "R02-F24",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-F24.host.log",
+  "log_sha256": "ead33278e147dc2869895b62e83050a559643762da5177cf1d373875d0d87ef7",
+  "name": "host",
+  "started": "2026-11-20T15:49:25+00:00",
+  "timed_out": false
+}
