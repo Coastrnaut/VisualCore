@@ -88,6 +88,6 @@ lead. MVP: Stories 1 and 2 (002, 004, 006).
 
 ## Phase 7: Convergence
 
-- [ ] T-R02F11-015 Add the rounded box (half extents (1, 0.6, 0.8), radius 0.2) to the 1,000-point closed-form loop of
+- [X] T-R02F11-015 Add the rounded box (half extents (1, 0.6, 0.8), radius 0.2) to the 1,000-point closed-form loop of — Verified 2026-11-19: 2026-11-19 R02-F11.host-3.json (exit 0; primitivesMatchTheirClosedForms with the rounded box at 1,000 points passed, 0 failures)
   `Packages/VisualCore/Tests/VisualCoreScenesTests/SDFShapeTests.swift` (expected: the box distance of p with half
   extents reduced by r, minus r, within 1e-12) per SC-R02F11-001 (partial); `--name host-3`

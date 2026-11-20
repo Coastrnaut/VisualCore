@@ -35,7 +35,11 @@ struct SDFTestRandom {
         let plane = try SDFShape.plane(normal: Vec3(0, 2, 0), offset: 0.5)
         let capsule = try SDFShape.capsule(a: Vec3(-1, 0, 0), b: Vec3(1, 0, 0), radius: 0.3)
         let torus = try SDFShape.torus(major: 1.5, minor: 0.25)
+        let roundedBox = try SDFShape.roundedBox(halfExtents: Vec3(1, 0.6, 0.8), radius: 0.2)   // T-R02F11-015
         for p in Self.points() {
+            let r = Vec3(abs(p.x) - 0.8, abs(p.y) - 0.4, abs(p.z) - 0.6)
+            let roundedD = Vec3(max(r.x, 0), max(r.y, 0), max(r.z, 0)).length + min(max(r.x, max(r.y, r.z)), 0) - 0.2
+            #expect(abs(roundedBox.distance(at: p) - roundedD) < 1e-12)
             #expect(abs(sphere.distance(at: p) - (p.length - 1.25)) < 1e-12)
             #expect(abs(plane.distance(at: p) - (p.y - 0.5)) < 1e-12)
             let q = Vec3(abs(p.x) - 1, abs(p.y) - 0.5, abs(p.z) - 2)
