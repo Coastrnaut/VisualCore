@@ -21,7 +21,7 @@ tasks; one {device} task. Fixture seed 2_023; tests stay short.
 
 ## Phase 3: Story 1 — levels that are what they say (P1) 🎯
 
-- [ ] T-R02F23-003 [P] [US1] Create `Packages/VisualCore/Sources/VisualCoreSimulation/PuzzleLevel.swift` ("solution ≤ 4,096 moves; identity = SHA-256 hex of canonical
+- [X] T-R02F23-003 [P] [US1] Create `Packages/VisualCore/Sources/VisualCoreSimulation/PuzzleLevel.swift` ("solution ≤ 4,096 moves; identity = SHA-256 hex of canonical — Verified 2026-11-20: 2026-11-20 host-2 exit 0: PuzzleLevelTests 8/8 (200 seeded round trips with identical identity and bytes; 17 one-value changes give distinct identities; golden identity pinned; edited, newer and damaged forms refused) (.autonomy/migration/checks/R02-F23.host-2.json)
   JSON; schema 1") with `Packages/VisualCore/Tests/VisualCoreSimulationTests/PuzzleLevelTests.swift` (200 seeded levels round-trip with identical identities; any one
   changed value changes the identity; edited, newer and damaged forms refused; rules-id and length refusals);
   `--name host-2`
