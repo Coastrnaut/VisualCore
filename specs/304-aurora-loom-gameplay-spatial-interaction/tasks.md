@@ -28,7 +28,8 @@ tests stay short (< 10 s each).
   orbiting, cancelled; picking via HandlePicker; drags via HandleDrag; one move on release when changed; second finger
   cancels; cancelled touches; playing-only; orbit from two-finger midpoint "90° per width, 60° per height", clamped;
   resetOrbit; selection) with `Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomGestureControllerTests.swift` (500 seeded scripted drags agree with an
-  independent computation of the end step; 1,000 seeded arbitration scripts; orbit limits; selection; determinism);
+  independent computation of the end step; 1,000 seeded arbitration scripts; two handles under one touch pick the
+  nearest, ties by the lower id; orbit limits; selection; determinism);
   `--name host-2`
 - [ ] T-R02G0104-004 [US1] [US2] [US3] [US4] Wire the experience: `Packages/ExperiencesRound02/AuroraLoom/Experience/AuroraLoomPresenter.swift` (pointer events →
   controller → `ribbon.move` through the port; refusal text; orbit into the camera; selection and candidate in the
@@ -40,7 +41,8 @@ tests stay short (< 10 s each).
 ## Phase 4: Story 4 and simulator proof (P2)
 
 - [ ] T-R02G0104-005 [US4] Create `Packages/ExperiencesRound02/AuroraLoom/ExperienceTests/AuroraLoomGestureWiringTests.swift` (scripted touches through the presenter's
-  pointer entry move the kernel by exactly the named step; a second finger and a cancel send nothing; the selection
+  pointer entry move the kernel by exactly the named step; a second finger and a cancel send nothing; gestures while
+  paused or after the level ends send nothing and a refused move shows its text with the state unchanged; the selection
   outline is drawn; the description names the selection; undo after a gesture restores the digest; frame checks hold at
   the orbit limits; Reset view returns the authored pose); `--name sim-27 -- python3 scripts/xcodebuild_package.py
   --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package --destination sim-27.2 --action test`
