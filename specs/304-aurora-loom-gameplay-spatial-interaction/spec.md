@@ -125,7 +125,7 @@ the exact previous digest.
 ### Functional Requirements
 
 - **FR-R02G0104-001**: Each ribbon MUST have an anchor (wave) and a dial (phase) drawn in the scene and pickable by touch
-  with at least the platform's minimum touch target.
+  with at least the platform's minimum touch target (a 44-point target: R02-F22's 22-point minimum pick radius).
 - **FR-R02G0104-002**: Dragging an anchor MUST map the finger's position to a wave step 0 … 15 and turning a dial MUST map
   the angle to a phase step modulo 16; while dragging, the candidate step is previewed; on release a changed step MUST be
   sent as exactly one kernel move.
