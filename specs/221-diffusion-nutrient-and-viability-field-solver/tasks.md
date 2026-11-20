@@ -57,7 +57,7 @@ its check record (no trailers). No {owner} tasks; one {device} task. Fixture see
   `docs/catalog/shared-feature-map.json` and `render_autocreator.py`
 - [ ] T-R02F21-008 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02F21-009 Reference regression chunk 2 (`--name reference-2`)
-- [ ] T-R02F21-010 Script tests, run alone (`--name script-tests`)
+- [X] T-R02F21-010 Script tests, run alone (`--name script-tests`) — Verified 2026-11-20: 2026-11-20 script-tests exit 0, run alone (.autonomy/migration/checks/R02-F21.script-tests.json)
 - [ ] T-R02F21-011 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
 
 ## Device campaign (after ImplementationLock-100)
