@@ -5,6 +5,10 @@
 // shortest + 2, otherwise 1), and the open frontier (level 1 open; a recorded win opens the next level, up to 100). The
 // daily level is a clock-free function of a calendar date: (days from 2026-01-01 × 37) mod 100 + 1, in integer
 // arithmetic on the proleptic Gregorian calendar. Progress alone opens every level (FR-R02G0105-006: no other gate).
+// Feature 307 (R02-G01-07) T-R02G0107-002 (FR-R02G0107-001, 003; clarifications Q1, Q2): each result also keeps its
+// winning trace (the ordered moves of the play that earned it) and whether it is `verified`; a later win replaces the
+// result only with fewer moves (ties keep the earlier trace). Encoded results carry `trace` and `verified`; an encoding
+// without them (schema 2) decodes as an unverified result without a trace.
 import Foundation
 
 /// The step of the Aurora Loom tutorial.
@@ -76,11 +80,18 @@ public struct AuroraLoomProgress: Sendable, Equatable, Hashable, Codable {
         public let bestMoves: Int
         /// The stars of that best result, 1 … 3.
         public let stars: Int
+        /// The winning moves of the play that earned the result, in order (empty for a result without a trace).
+        public let trace: [AuroraLoomMove]
+        /// Whether the result carries a trace that reconciliation replays (``AuroraLoomReconciliation``); false for a
+        /// result restored from a save without traces.
+        public let verified: Bool
 
-        /// A result of the given values (not checked).
-        public init(bestMoves: Int, stars: Int) {
+        /// A result of the given values (not checked); by default without a trace and unverified.
+        public init(bestMoves: Int, stars: Int, trace: [AuroraLoomMove] = [], verified: Bool = false) {
             self.bestMoves = bestMoves
             self.stars = stars
+            self.trace = trace
+            self.verified = verified
         }
     }
 
@@ -115,18 +126,36 @@ public struct AuroraLoomProgress: Sendable, Equatable, Hashable, Codable {
         return 1
     }
 
-    /// Records a campaign win of `level` in `moves` moves (certified shortest `shortest`): keeps the fewer best moves
-    /// and the more stars of the old and new result, and opens `level + 1` (at most 100). A level outside 1 … 100 is
-    /// ignored. The caller records only campaign wins of open levels (practice never records).
+    /// Records a win of `level` in `moves` moves (certified shortest `shortest`) without a trace: an unverified
+    /// result, under the same rule as ``record(level:moves:shortest:trace:)``.
     public mutating func record(level: Int, moves: Int, shortest: Int) {
+        store(level: level, result: Result(bestMoves: moves, stars: Self.stars(moves: moves, shortest: shortest)))
+    }
+
+    /// Records a win of `level` in `moves` moves (certified shortest `shortest`) with its winning `trace`: a verified
+    /// result. The new result replaces a stored one only with fewer moves (ties keep the earlier trace), and
+    /// `level + 1` opens (at most 100). A level outside 1 … 100 is ignored. The caller records only wins in campaign or
+    /// daily mode (practice and replay never record).
+    public mutating func record(level: Int, moves: Int, shortest: Int, trace: [AuroraLoomMove]) {
+        store(level: level, result: Result(bestMoves: moves, stars: Self.stars(moves: moves, shortest: shortest),
+                                           trace: trace, verified: true))
+    }
+
+    /// Stores `result` for `level` when it has fewer moves than the stored one (or none is stored) and opens the next
+    /// level; a level outside 1 … 100 is ignored.
+    private mutating func store(level: Int, result: Result) {
         guard level >= 1 && level <= Self.levelCount else { return }
-        let stars: Int = Self.stars(moves: moves, shortest: shortest)
-        if let old = solved[level] {
-            solved[level] = Result(bestMoves: min(old.bestMoves, moves), stars: max(old.stars, stars))
+        if let old = solved[level], old.bestMoves <= result.bestMoves {
+            // Ties keep the earlier trace.
         } else {
-            solved[level] = Result(bestMoves: moves, stars: stars)
+            solved[level] = result
         }
         frontier = max(frontier, min(level + 1, Self.levelCount))
+    }
+
+    /// Removes the result of `level` (reconciliation drops a result that does not replay); the frontier is kept.
+    mutating func remove(level: Int) {
+        solved[level] = nil
     }
 
     /// The band (1 … 5) of `level`; a level outside 1 … 100 is clamped into that range first.
@@ -191,11 +220,13 @@ public struct AuroraLoomProgress: Sendable, Equatable, Hashable, Codable {
         return try encoder.encode(self)
     }
 
-    /// One solved level as encoded.
+    /// One solved level as encoded; `trace` and `verified` are absent in schema-2 encodings.
     private struct Entry: Codable {
         let level: Int
         let bestMoves: Int
         let stars: Int
+        let trace: [AuroraLoomMove]?
+        let verified: Bool?
     }
 
     private enum CodingKeys: String, CodingKey {
@@ -203,7 +234,8 @@ public struct AuroraLoomProgress: Sendable, Equatable, Hashable, Codable {
         case frontier
     }
 
-    /// Decodes progress; the solved levels are an array of `{level, bestMoves, stars}`.
+    /// Decodes progress; the solved levels are an array of `{level, bestMoves, stars, trace, verified}` (a missing
+    /// trace is empty, a missing `verified` false).
     ///
     /// - Throws: `DecodingError.dataCorrupted` for a frontier outside 1 … 100, a level outside 1 … 100 or repeated,
     ///   stars outside 1 … 3 or negative best moves.
@@ -222,20 +254,22 @@ public struct AuroraLoomProgress: Sendable, Equatable, Hashable, Codable {
                 throw DecodingError.dataCorruptedError(forKey: .solved, in: container,
                                                        debugDescription: "invalid solved level \(entry.level)")
             }
-            solved[entry.level] = Result(bestMoves: entry.bestMoves, stars: entry.stars)
+            solved[entry.level] = Result(bestMoves: entry.bestMoves, stars: entry.stars, trace: entry.trace ?? [],
+                                         verified: entry.verified ?? false)
         }
         self.solved = solved
         self.frontier = frontier
     }
 
-    /// Encodes the frontier and the solved levels as an array sorted by level.
+    /// Encodes the frontier and the solved levels as an array sorted by level, each with its trace and `verified`.
     public func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(frontier, forKey: .frontier)
         var entries: [Entry] = []
         for level in solved.keys.sorted() {
             guard let result = solved[level] else { continue }
-            entries.append(Entry(level: level, bestMoves: result.bestMoves, stars: result.stars))
+            entries.append(Entry(level: level, bestMoves: result.bestMoves, stars: result.stars, trace: result.trace,
+                                 verified: result.verified))
         }
         try container.encode(entries, forKey: .solved)
     }

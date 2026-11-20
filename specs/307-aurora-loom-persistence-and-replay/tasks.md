@@ -13,7 +13,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 2: Story 2 — reconcilable scores (P1) 🎯
 
-- [ ] T-R02G0107-002 [US2] Edit `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomProgress.swift` (Result gains "trace: [AuroraLoomMove], verified:
+- [X] T-R02G0107-002 [US2] Edit `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomProgress.swift` (Result gains "trace: [AuroraLoomMove], verified: — Verified 2026-11-20: 2026-11-20 host exit 0 (traced results, fewer-moves rule with ties keeping the earlier trace, schema-2 encodings decode unverified, reconciliation keeps honest traces and drops edited stars, moves and steps; 5 tests)
   Bool"; `record(level:moves:shortest:trace:)` keeps the fewer moves, ties keep the earlier trace; Codable with traces,
   deterministic encoding) and create `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomReconciliation.swift` ("replay each verified trace on a fresh
   play of its certified level; keep only when won in exactly bestMoves with the recorded stars"; dropped count;
