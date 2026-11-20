@@ -55,7 +55,7 @@ its check record (no trailers). No {owner} tasks; one {device} task. Fixture see
   -- python3 scripts/check_documented_api.py --sources Apps/VisualCore`; new `docs/architecture/nutrient-fields.md`;
   section in `Packages/VisualCore/README.md`; section 13.4 row R02-F21 "As built" in
   `docs/catalog/shared-feature-map.json` and `render_autocreator.py`
-- [ ] T-R02F21-008 Reference regression chunk 1 (`--name reference-1`)
+- [X] T-R02F21-008 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-20: 2026-11-20 reference-1 exit 0
 - [ ] T-R02F21-009 Reference regression chunk 2 (`--name reference-2`)
 - [X] T-R02F21-010 Script tests, run alone (`--name script-tests`) — Verified 2026-11-20: 2026-11-20 script-tests exit 0, run alone (.autonomy/migration/checks/R02-F21.script-tests.json)
 - [ ] T-R02F21-011 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
