@@ -13,7 +13,7 @@ recorded only after every agent has reported). Commit after every task with its 
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G0301-002 Edit `Packages/ExperiencesRound02/Package.swift` (+ `WaveKnotKeeperCore`, tests, product); create
+- [X] T-R02G0301-002 Edit `Packages/ExperiencesRound02/Package.swift` (+ `WaveKnotKeeperCore`, tests, product); create — Verified 2026-11-20: 2026-11-20 host exit 0 (package targets; error codes; level with point, gate, target, direction, move; start simple, not won, tension within bound, which needed the geometry, so the lead wrote WaveKnotKeeperGeometry and WaveKnotKeeperPlay with it; fixtures with known solutions, 100 verified to win; 6 level tests)
   `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperError.swift` (codes "r02-g03.level, .move, .stage, .stale, .allowance, .newer-schema,
   .malformed"), `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperLevel.swift` (Point "−16 … 16", Gate "inclusive box inside bounds", Target
   "crossings 0 … 32, writhe −32 … 32", Level "points 6 … 16 distinct, gates 0 … 4, allowance 1 … 64, band 1 … 5";

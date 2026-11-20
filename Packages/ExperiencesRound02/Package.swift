@@ -22,6 +22,8 @@ let package = Package(
         .library(name: "LissajousLabyrinthCore", targets: ["LissajousLabyrinthCore"]),
         // Feature 313 (R02-G02-03): Lissajous Labyrinth's experience (iOS only; a registered candidate until X-R02-G02).
         .library(name: "LissajousLabyrinthExperience", targets: ["LissajousLabyrinthExperience"]),
+        // Feature 321 (R02-G03-01): Wave Knot Keeper's rule kernel, a candidate until X-R02-G03.
+        .library(name: "WaveKnotKeeperCore", targets: ["WaveKnotKeeperCore"]),
     ],
     dependencies: [
         .package(name: visualCore, path: "../VisualCore"),
@@ -112,5 +114,14 @@ let package = Package(
                                    .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
                                    .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS]))],
                     path: "LissajousLabyrinth/ExperienceTests"),
+        .target(name: "WaveKnotKeeperCore",
+                dependencies: [.product(name: "VisualCoreSimulation", package: visualCore),
+                               .product(name: "VisualCoreMath", package: visualCore)],
+                path: "WaveKnotKeeper/Core"),
+        .testTarget(name: "WaveKnotKeeperCoreTests",
+                    dependencies: ["WaveKnotKeeperCore",
+                                   .product(name: "VisualCoreSimulation", package: visualCore),
+                                   .product(name: "VisualCoreMath", package: visualCore)],
+                    path: "WaveKnotKeeper/CoreTests"),
     ]
 )
