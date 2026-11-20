@@ -28,7 +28,10 @@ VisualCoreRendering on sim-27.2 and sim-26.5, ExperiencesCreative on sim-27.2, t
 regression in two chunks, script tests (alone).
 **Performance**: x depends only on (a, φ), y on b, z on ψ (c is the level's). Per checkpoint the prefilter builds 144 + 9
 + 16 axis bit sets of 4,096 ticks (64 words each) and ANDs three per setting: ≤ 14,080 × 6 × 3 × 64 ≈ 16 M word operations
-per level. Survivors get the exact verdict (≤ 4,096 samples × 8 obstacles, early exit on the first contact). Breadth-first
+per level. Survivors get an exact fast decision equal to the kernel's verdict (research R2b): obstacle contact is tested
+exactly only on ticks whose segment's axis box meets the obstacle's box (bit sets per axis), and the in-order checkpoint
+scan runs only over each checkpoint's box-hit ticks; the kernel's own verdict (about 1–2 ms per lap in debug) is used by
+the tests as the independent judge. Breadth-first
 search: 14,080 states × ≤ 46 moves. Target: a level's solve under 0.2 s on a debug host build; the catalog tests are split
 by band (20 levels each) so each stays under 10 s; CI timings are measured, never asserted.
 **Constraints**: additive to R02-G02-01's public API; levels' allowance = the manifest move budget (8 … 19); every value an

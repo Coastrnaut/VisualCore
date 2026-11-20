@@ -7,5 +7,5 @@
 | `LissajousLabyrinthSolution` | shortest, actions, winning setting, winningSettings, work | actions replay from the start through legal states to a win |
 | `LissajousLabyrinthDifficulty` | shortest, winningSettings, clearance, work | clearance > 0 (no sample inside an obstacle) |
 | `LissajousLabyrinthGenerated` | entry, level, solution, difficulty, skipped | skipped 0 … 63 |
-| `LissajousLabyrinthWitness` | schema 1, number, level, actions, fingerprints, visits, clearance, nearMiss, nonCoprime, difficulty, skipped | sorted-key JSON; byte-exact |
+| `LissajousLabyrinthWitness` | schema 1, number, level, actions, fingerprints, terminal {visits, clearance}, nearMiss, nonCoprime, difficulty, skipped | sorted-key JSON; byte-exact |
 | Catalog | 100 generated levels in manifest order, digest | progression rule holds |

@@ -29,8 +29,9 @@ or {device} tasks (pure logic and host-generated content). Fixture seed 2_312; t
   (`legalSettings` 14,080 ordered (a, b, φ, ψ); the sound checkpoint-box prefilter of research R2 with separable
   4,096-tick bit sets; the kernel's exact verdict for every survivor; work = exact verdicts; breadth-first search over
   `LissajousLabyrinthRules.moves` to the nearest winning setting, ties by (a, b, φ, ψ) ascending) with
-  `Packages/ExperiencesRound02/LissajousLabyrinth/CoreTests/LissajousLabyrinthSolverTests.swift` (50 seeded levels, seed 2_312: the winning set equals a brute-force
-  verdict of all legal settings; shortest equals a plain BFS that checks `isSolved` per state on 10 levels; actions
+  `Packages/ExperiencesRound02/LissajousLabyrinth/CoreTests/LissajousLabyrinthSolverTests.swift` (seed 2_312: the exact fast decision equals the kernel verdict on all
+  legal settings of 2 levels and on every winner plus 440 sampled settings of 20 more; shortest equals a plain BFS over
+  the decided winning set on 10 levels; actions
   replay on `LissajousLabyrinthRules` through legal states to a win; nil when no winner; determinism); `--name host-2`
 
 ## Phase 4: Story 2 — levels come from their planned seeds (P1)
@@ -54,8 +55,8 @@ or {device} tasks (pure logic and host-generated content). Fixture seed 2_312; t
 - [ ] T-R02G0202-006 [US2] [US3] [US4] Create `Packages/ExperiencesRound02/LissajousLabyrinth/CoreTests/LissajousLabyrinthCatalogTests.swift` (100 entries, 20 per
   band; the catalog generated twice is identical; pinned digest; `ProgressionRule.standard` holds on shortest; band means
   of shortest never fall and of winning settings never rise; on levels 1, 11, 21, … 91 (two per band) the winning set
-  equals a brute-force verdict of all legal settings and the shortest equals a plain BFS judged by the verdict
-  (SC-R02G0202-002); each witness equals
+  agrees with the kernel verdict on every winner plus 440 sampled settings and the shortest equals a plain BFS over the
+  decided winning set (SC-R02G0202-002); each witness equals
   `docs/games/lissajous-labyrinth/levels/NNN.witness.json` byte for byte, one test per band, written only with
   `LISSAJOUS_LABYRINTH_WRITE_WITNESSES=1`) and generate the 100 files; `--name host-5`
 

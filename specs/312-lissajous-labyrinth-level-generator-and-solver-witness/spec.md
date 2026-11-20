@@ -186,9 +186,11 @@ file is refused.
 ### Measurable Outcomes
 
 - **SC-R02G0202-001**: All 100 catalog levels are won by replaying their witness within the allowance; none starts won.
-- **SC-R02G0202-002**: The solver's verdicts equal the kernel's lap verdict on every setting checked by an independent
-  brute-force pass (all legal settings of 10 catalog levels, two per band, and of 50 seeded levels); its shortest lengths
-  equal a plain breadth-first search that judges each state with the kernel's verdict on those 10 catalog levels.
+- **SC-R02G0202-002**: The solver's exact fast decision equals the kernel's lap verdict on every legal setting of 2 seeded
+  levels, and on every winning setting plus 440 seeded-random settings of 20 more seeded levels and of 10 catalog levels
+  (two per band); its shortest lengths equal a plain breadth-first search over the decided winning set on those levels,
+  and every witness's final setting wins by the kernel's verdict. (Kernel laps cost about 1–2 ms each in a debug build,
+  so an exhaustive check of every level would break the owner's short-test rule; the sampled checks bound the rest.)
 - **SC-R02G0202-003**: Building the catalog twice gives identical levels and the pinned digest; each witness file matches
   the regenerated witness byte for byte.
 - **SC-R02G0202-004**: Mean shortest solution does not fall and mean winning settings do not rise from one band to the

@@ -9,6 +9,12 @@
   are ANDed per setting; an empty result for any checkpoint proves a loss. Rationale: exact (never discards a winner),
   cheap, and leaves the full verdict as the only judge. Alternatives: no prefilter (≈ 14,080 full laps per level, too slow
   in debug tests); a bounding-sphere filter (weaker).
+- **R2b Exact fast decision.** Decision: the same separable bit sets decide survivors exactly: a segment can touch an
+  obstacle only if its axis interval meets the obstacle's box on all three axes, so only those ticks get the exact
+  segment test; checkpoints are scanned in order only over their box-hit ticks with exact containment. Rationale: the
+  kernel's verdict costs 1–2 ms per lap in a debug build and levels have up to about a thousand winners; the decision is
+  cross-checked against the kernel verdict in tests. Alternatives: optimise the kernel's verdict (changes R02-G02-01 code,
+  which must stay additive); build the Core optimised (unsafe flags in a package).
 - **R3 Shortest path.** Decision: breadth-first search over legal states using `LissajousLabyrinthRules.moves` (single-dial
   changes keeping coprime frequencies) from the start until the first depth containing a winning setting; ties by the
   winning setting (a, b, φ, ψ) ascending; the action list from parent pointers recorded in the rules' move order.
