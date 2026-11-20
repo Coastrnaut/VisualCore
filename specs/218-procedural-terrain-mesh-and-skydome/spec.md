@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-19
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-F18 (migration ledger, shared round feature) · ID namespace FR-R02F18-###, SC-R02F18-###, T-R02F18-###
 
@@ -29,6 +29,56 @@ Canonical overrides:
 - **Superseded parts of the source prompt:** the USD 1.99–4.99 purchase model (ADR-0009); the Round 2 lock
   (ImplementationLock-100). **Device-only items:** the frame cost of a full terrain and sky on D1–D3, recorded in the
   device campaign. **Owner-only items:** none.
+
+## Clarifications
+
+### Session 2026-11-19
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time. Facts checked in
+code (read-only audit, 2026-11-19): `HeightField` (VisualCoreScenes) samples `height(x, z)` at x = originX + i · cellSize
+(columns and rows 1 … 512, one extra ring), gives normals by central differences and builds a mesh with y up; `MeshBuilder`
+and `MeshBudget.default` (262,144 vertices) are in VisualCoreScenes; `Mat4` and `Vec3` are in VisualCoreMath;
+`FullScreenShaderScene`, `ShaderBundle` and the `vc/*.glsl` includes (each compiled alone by ShaderBundleTests) are in
+VisualCoreRendering; `PlanarShadowRenderer` is the pattern for a state-restoring renderer; the names `TerrainLOD`,
+`TerrainPiece`, `TerrainSettings`, `TerrainError`, `ErosionMask`, `SkyModel`, `SkyParameters`, `SkyError` and
+`SkyRenderer` are free.
+
+- Q: Where do the parts live and how is the terrain divided? → A: terrain selection, piece meshes, masks, sky reference
+  and settings in VisualCoreScenes; `vc/sky.glsl` and `SkyRenderer` in VisualCoreRendering. The terrain is a square of
+  P × P pieces (P 1 … 64), each of C × C base cells (C a power of two, 4 … 128) of size s (finite, > 0); a piece at
+  level ℓ (0 … L − 1, L 1 … log₂C) samples every 2^ℓ base cells through `HeightField` (cell size s · 2^ℓ, so its even
+  points fall on the same coordinates as the finer level's, bit for bit). Its level is
+  clamp(⌊log₂(max(d, 1e-9) / D)⌋ + 1, 0, L − 1) for d < D giving 0, d the horizontal distance from the viewpoint to the
+  piece's square and D the distance per level (finite, > 0); then levels are lowered (refined) until neighbours differ by
+  at most one, visiting pieces row by row until nothing changes. Impact: FR-R02F18-001, 003; SC-R02F18-001.
+- Q: How are cracks avoided and the budget kept? → A: on each edge facing a neighbour one level coarser, every odd point
+  of the finer piece takes the height (h_left + h_right) / 2 of its two even neighbours along that edge, which is the
+  point of the coarser piece's straight edge; even points coincide exactly. The total vertex count Σ (C / 2^ℓ + 1)² must
+  not exceed the vertex budget (1 … 4,194,304, default 262,144): when it does, the farthest piece (ties: higher row, then
+  higher column) that can be coarsened without breaking the one-level rule is coarsened by one level, repeatedly; a
+  budget the all-coarsest tiling still exceeds is refused. Impact: FR-R02F18-002; SC-R02F18-001, 002.
+- Q: How are the erosion masks defined? → A: on the grid points of a `HeightField`: steepness = |∇h| / √(1 + |∇h|²)
+  from central differences (the field's own normal), in 0 … 1; flow = log(1 + a) / log(1 + N) with a the D8 flow
+  accumulation (each point passes 1 + its inflow to the neighbour of steepest descent, drop over distance, ties in the
+  order N, NE, E, SE, S, SW, W, NW; points visited from highest to lowest, ties by index; a point with no lower
+  neighbour keeps its flow), N the number of points; wear = steepness · flow. Returned as a three-channel `FieldGrid`.
+  Impact: FR-R02F18-004; SC-R02F18-003: a flat field gives steepness 0 everywhere, a tilted plane gives the same
+  steepness everywhere and flow growing downhill, a V-shaped valley gathers its greatest flow on its floor.
+- Q: What is the sky formula? → A: with d the unit view direction, s the unit sun direction and e = d.y: the day colour is
+  mix(horizon, zenith, √max(e, 0)) above the horizon and mix(horizon, ground, smoothstep(0, 0.1, −e)) below it; a dusk
+  tint adds dusk · w · max(d·s, 0)⁴ · (1 − max(e, 0)) with w = clamp(1 − |s.y| / 0.25, 0, 1); the day factor
+  f = smoothstep(−0.15, 0.05, s.y) scales the colour by mix(night, 1, f); the sun adds sunColour · f ·
+  (smoothstep(cos(r + 0.004), cos r, d·s) + g · max(d·s, 0)^k) for e ≥ −r, r the disc's angular radius, g and k the glow
+  strength and exponent; the result is clamped to 0 … 1 (linear). `vc/sky.glsl` (`vc_sky`) and `SkyModel` compute the
+  same expression in the same order. `SkyRenderer` draws one full-screen triangle at the far plane (depth test LEQUAL,
+  no depth write), finding d from the inverse view-projection, and restores what it changes. Impact: FR-R02F18-005, 006;
+  SC-R02F18-004.
+- Q: What is stored, and what are the failure codes? → A: `TerrainSettings` and `SkyParameters` are each `Codable` JSON
+  schema 1 with sorted keys; schema 1 is the first stored form, a newer schema is refused. Reason codes: `TerrainError`
+  `r2-f18.terrain-size`, `r2-f18.piece-size`, `r2-f18.level-count`, `r2-f18.level-distance`, `r2-f18.budget`,
+  `r2-f18.viewpoint`, `r2-f18.newer-schema`, `r2-f18.malformed`; `SkyError` `r2-f18.sky-parameter`, `r2-f18.direction`,
+  `r2-f18.newer-schema`, `r2-f18.malformed`; the experience adds its id, seed and tick. Impact: FR-R02F18-007, 008;
+  SC-R02F18-005.
 
 ## User Scenarios & Testing *(mandatory)*
 
