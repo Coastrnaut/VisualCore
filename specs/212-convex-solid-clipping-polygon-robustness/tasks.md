@@ -13,7 +13,7 @@
 
 ## Phase 2: Foundational
 
-- [ ] T-R02F12-002 [P] Create `Packages/VisualCore/Sources/VisualCoreScenes/ConvexSolidError.swift` (cases and `r2-f12.*` reason codes of the spec), `Packages/VisualCore/Sources/VisualCoreScenes/ClipPlane.swift`
+- [X] T-R02F12-002 [P] Create `Packages/VisualCore/Sources/VisualCoreScenes/ConvexSolidError.swift` (cases and `r2-f12.*` reason codes of the spec), `Packages/VisualCore/Sources/VisualCoreScenes/ClipPlane.swift` — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F12.host.json (exit 0; PolygonCleanupTests 4 passed: repeated/collinear removal, orientation, degenerate refusals, plane validation and nine reason codes)
   (normal "unit, from a finite non-zero input", kept unchanged when already unit within 1e-12; offset finite;
   `distance(to:)`; Codable) and `Packages/VisualCore/Sources/VisualCoreScenes/PolygonCleanup.swift` (merge points within tolerance, remove collinear corners
   within tolerance of the line through their neighbours, orient CCW about the normal, `.degeneratePolygon` below three

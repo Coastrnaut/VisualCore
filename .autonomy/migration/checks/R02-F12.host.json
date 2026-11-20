@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "PolygonCleanupTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter PolygonCleanupTests",
+  "elapsed_seconds": 5.125,
+  "exit_code": 0,
+  "finished": "2026-11-20T01:13:29+00:00",
+  "gate": "R02-F12",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-F12.host.log",
+  "log_sha256": "e3a9983cb6175c8122ed1f7c93bff7c32d9bbd79c98e91890dc10499f51fdade",
+  "name": "host",
+  "started": "2026-11-20T01:13:24+00:00",
+  "timed_out": false
+}
