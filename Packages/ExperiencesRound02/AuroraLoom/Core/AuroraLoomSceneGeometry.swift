@@ -6,9 +6,45 @@
 // 5 % margin for every aspect 0.4 … 2.5, and the CPU reference of the projection (pixel positions of the centre-line
 // samples and markers) that the simulator tests compare with rendered frames. Doubles are used for drawing only; nothing
 // here is consulted by the rules.
+// Feature 304 (R02-G01-04) T-R02G0104-002 (FR-R02G0104-001, 004; clarifications Q1, Q3; research R4): the content box
+// now also holds the anchor rails and phase dials of `AuroraLoomHandles`, and the camera can orbit
+// (`AuroraLoomOrbit`: azimuth 18° + offset −40° … 40°, elevation 10° … 60°) with the distance refitted per orbit and
+// aspect by the same bisection, so the 5 % framing guarantee holds at every orbit. The orbit is presentation only.
 import Foundation
 import VisualCoreMath
 import VisualCoreScenes
+
+/// The presentation-only orbit of the Aurora Loom camera (feature 304, FR-R02G0104-004): an azimuth offset added to the
+/// authored azimuth (18°) and an absolute elevation above the loom plane, both in radians. Never part of the digest,
+/// the snapshot payload or the kernel, and not saved.
+public struct AuroraLoomOrbit: Sendable, Equatable {
+    /// The azimuth offset in radians, added to `AuroraLoomSceneGeometry.azimuth`; allowed −40° … 40°.
+    public var azimuthOffset: Double
+    /// The elevation above the loom plane in radians; allowed 10° … 60°.
+    public var elevation: Double
+
+    /// An orbit of the given values (not clamped; see ``clamped()``).
+    public init(azimuthOffset: Double, elevation: Double) {
+        self.azimuthOffset = azimuthOffset
+        self.elevation = elevation
+    }
+
+    /// The authored pose: offset 0, elevation 28° (`AuroraLoomSceneGeometry.elevation`).
+    public static let authored = AuroraLoomOrbit(azimuthOffset: 0, elevation: AuroraLoomSceneGeometry.elevation)
+    /// The allowed azimuth offsets in radians, −40° … 40°.
+    public static let azimuthRange: ClosedRange<Double> = (-40.0 * Double.pi / 180)...(40.0 * Double.pi / 180)
+    /// The allowed elevations in radians, 10° … 60°.
+    public static let elevationRange: ClosedRange<Double> = (10.0 * Double.pi / 180)...(60.0 * Double.pi / 180)
+
+    /// This orbit with each value clamped to its range; a non-finite value becomes the authored value.
+    public func clamped() -> AuroraLoomOrbit {
+        let a: Double = azimuthOffset.isFinite ? azimuthOffset : Self.authored.azimuthOffset
+        let e: Double = elevation.isFinite ? elevation : Self.authored.elevation
+        return AuroraLoomOrbit(
+            azimuthOffset: min(max(a, Self.azimuthRange.lowerBound), Self.azimuthRange.upperBound),
+            elevation: min(max(e, Self.elevationRange.lowerBound), Self.elevationRange.upperBound))
+    }
+}
 
 /// The geometry of the Aurora Loom scene: centre lines, ribbon sheets, gate rings, markers, camera and projection.
 ///
@@ -45,9 +81,14 @@ public enum AuroraLoomSceneGeometry {
     /// The near clipping distance of the camera.
     public static let nearPlane = 0.1
 
+    /// The extra half extent along x beyond the rails and dials (`AuroraLoomHandles.railOffset` + dial radius) that
+    /// leaves room for the drawn anchor and knob markers, 0.05.
+    public static let handleMargin = 0.05
+
     /// The half extents of the box around the origin that holds every piece of scene geometry (ribbon sheets at any
-    /// setting and time, gate rings and markers): x = L/2 + 0.25, y = z = R.
-    public static let contentHalfExtents = Vec3(length / 2 + 0.25, ringRadius, ringRadius)
+    /// setting and time, gate rings, markers, and since feature 304 the anchor rails and phase dials):
+    /// x = L/2 + 0.45 + 0.3 + 0.05 = 4.8, y = z = R (rails span ±H, dials ±0.3 around lanes ±D, both inside R).
+    public static let contentHalfExtents = Vec3(length / 2 + 0.45 + 0.3 + handleMargin, ringRadius, ringRadius)
 
     /// The largest |coordinate| of any scene vertex, ring point or marker (the largest content half extent).
     public static let sceneBounds = max(contentHalfExtents.x, contentHalfExtents.y, contentHalfExtents.z)
@@ -203,10 +244,16 @@ public enum AuroraLoomSceneGeometry {
         return min(max(aspect, 0.1), 10)
     }
 
-    /// The unit direction from the loom centre to the eye (elevation and azimuth).
-    static var eyeDirection: Vec3 {
-        Vec3(cos(elevation) * sin(azimuth), sin(elevation), cos(elevation) * cos(azimuth))
+    /// The unit direction from the loom centre to the eye for `orbit` (clamped): elevation e and azimuth
+    /// a = `azimuth` + offset, (cos e · sin a, sin e, cos e · cos a).
+    static func eyeDirection(orbit: AuroraLoomOrbit) -> Vec3 {
+        let o: AuroraLoomOrbit = orbit.clamped()
+        let a: Double = azimuth + o.azimuthOffset
+        return Vec3(cos(o.elevation) * sin(a), sin(o.elevation), cos(o.elevation) * cos(a))
     }
+
+    /// The unit direction from the loom centre to the eye at the authored pose (elevation and azimuth).
+    static var eyeDirection: Vec3 { eyeDirection(orbit: .authored) }
 
     /// The eight corners of the content box.
     static var contentCorners: [Vec3] {
@@ -220,17 +267,18 @@ public enum AuroraLoomSceneGeometry {
         return corners
     }
 
-    /// The view and projection for an eye at `distance` from the loom centre.
-    static func matrices(distance: Double, aspect: Double) -> (view: Mat4, projection: Mat4) {
-        let view = Mat4.lookAt(eye: eyeDirection * distance, target: .zero, up: Vec3(0, 1, 0))
+    /// The view and projection for an eye at `distance` from the loom centre at `orbit`.
+    static func matrices(distance: Double, aspect: Double,
+                         orbit: AuroraLoomOrbit = .authored) -> (view: Mat4, projection: Mat4) {
+        let view = Mat4.lookAt(eye: eyeDirection(orbit: orbit) * distance, target: .zero, up: Vec3(0, 1, 0))
         let far = distance + 4 * sceneBounds
         let projection = Mat4.perspective(fovY: fieldOfView, aspect: aspect, near: nearPlane, far: far)
         return (view, projection)
     }
 
     /// Whether every content corner lies in front of the camera and inside NDC ±(1 − 2 · margin).
-    static func fits(distance: Double, aspect: Double, margin: Double) -> Bool {
-        let m = matrices(distance: distance, aspect: aspect)
+    static func fits(distance: Double, aspect: Double, margin: Double, orbit: AuroraLoomOrbit = .authored) -> Bool {
+        let m = matrices(distance: distance, aspect: aspect, orbit: orbit)
         let viewProjection = m.projection * m.view
         let limit = 1 - 2 * margin
         for corner in contentCorners {
@@ -241,15 +289,22 @@ public enum AuroraLoomSceneGeometry {
         return true
     }
 
-    /// The eye distance from the loom centre for `aspect`: the smallest distance (bisection, 60 halvings) at which every
-    /// corner of the content box projects inside the viewport with `fitMargin` on every side. Every scene point lies in
-    /// the content box and the box is convex, so the whole scene fits.
+    /// The eye distance from the loom centre for `aspect` at the authored pose; equal to
+    /// `cameraDistance(aspect:orbit: .authored)`.
     public static func cameraDistance(aspect: Double) -> Double {
+        cameraDistance(aspect: aspect, orbit: .authored)
+    }
+
+    /// The eye distance from the loom centre for `aspect` and `orbit` (clamped): the smallest distance (bisection, 60
+    /// halvings) at which every corner of the content box projects inside the viewport with `fitMargin` on every side.
+    /// Every scene point lies in the content box and the box is convex, so the whole scene fits.
+    public static func cameraDistance(aspect: Double, orbit: AuroraLoomOrbit) -> Double {
         let a = usableAspect(aspect)
+        let o = orbit.clamped()
         var low = 0.0, high = 1_000.0
         for _ in 0..<60 {
             let middle = (low + high) / 2
-            if fits(distance: middle, aspect: a, margin: fitMargin) { high = middle } else { low = middle }
+            if fits(distance: middle, aspect: a, margin: fitMargin, orbit: o) { high = middle } else { low = middle }
         }
         return high
     }
@@ -257,10 +312,20 @@ public enum AuroraLoomSceneGeometry {
     /// The fixed authored camera for `aspect` (width / height): an eye above and in front of the loom (elevation 28°,
     /// azimuth 18°) looking at the loom centre with +y up, a 45° vertical field of view and the distance of
     /// `cameraDistance(aspect:)`, so the whole loom fits with at least 5 % margin on every side for aspects 0.4 … 2.5.
-    /// Right-handed, GL depth range (`Mat4.perspective`, `Mat4.lookAt`).
+    /// Right-handed, GL depth range (`Mat4.perspective`, `Mat4.lookAt`). Identical to
+    /// `camera(aspect:orbit: .authored)`.
     public static func camera(aspect: Double) -> (view: Mat4, projection: Mat4) {
+        camera(aspect: aspect, orbit: .authored)
+    }
+
+    /// The camera for `aspect` and `orbit` (clamped; feature 304, FR-R02G0104-004): the eye at elevation
+    /// `orbit.elevation` and azimuth 18° + `orbit.azimuthOffset`, looking at the loom centre with +y up, a 45° vertical
+    /// field of view and the distance of `cameraDistance(aspect:orbit:)`, so the whole loom including rails and dials
+    /// fits with at least 5 % margin for aspects 0.4 … 2.5 at every allowed orbit.
+    public static func camera(aspect: Double, orbit: AuroraLoomOrbit) -> (view: Mat4, projection: Mat4) {
         let a = usableAspect(aspect)
-        return matrices(distance: cameraDistance(aspect: a), aspect: a)
+        let o = orbit.clamped()
+        return matrices(distance: cameraDistance(aspect: a, orbit: o), aspect: a, orbit: o)
     }
 
     /// The pixel position of `point` in a `width` × `height` viewport (origin top left, y down; pixel centres at
@@ -268,8 +333,14 @@ public enum AuroraLoomSceneGeometry {
     /// x = (ndc.x + 1)/2 · width, y = (1 − ndc.y)/2 · height. Nil behind the camera, for a non-positive size or for
     /// non-finite input. The point may lie outside the viewport.
     public static func project(_ point: Vec3, aspect: Double, width: Int, height: Int) -> (x: Double, y: Double)? {
+        project(point, aspect: aspect, orbit: .authored, width: width, height: height)
+    }
+
+    /// The pixel position of `point` as `project(_:aspect:width:height:)` but through `camera(aspect:orbit:)`.
+    public static func project(_ point: Vec3, aspect: Double, orbit: AuroraLoomOrbit, width: Int,
+                               height: Int) -> (x: Double, y: Double)? {
         guard width > 0, height > 0 else { return nil }
-        let m = camera(aspect: aspect)
+        let m = camera(aspect: aspect, orbit: orbit)
         return project(point, viewProjection: m.projection * m.view, width: width, height: height)
     }
 

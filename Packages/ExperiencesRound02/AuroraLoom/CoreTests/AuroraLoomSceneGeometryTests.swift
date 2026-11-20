@@ -4,6 +4,9 @@
 // frames the content box with at least 5 % margin for aspects 0.4 … 2.5 and puts the loom centre at the view centre;
 // `project` matches the GL clip → NDC → viewport chain; centre-line and marker heights follow the phase formulas; the
 // gate rings enclose every sheet; the same snapshot gives identical geometry.
+// Feature 304 (R02-G01-04) T-R02G0104-002 (FR-R02G0104-001, 004; clarification Q3; research R4): the content box holds
+// the rails and dials; the orbit clamps to its ranges; camera(aspect:) equals camera(aspect:orbit: .authored); and the
+// content box, rails and dials stay inside the 5 % margin at the orbit corners × aspects 0.4 … 2.5.
 // Test data uses explicit types and plain loops (CI type-check rule).
 import Foundation
 import Testing
@@ -319,6 +322,109 @@ import VisualCoreScenes
         for aspect in [0.0, -1.0, Double.nan, Double.infinity, 100.0] {
             let m: (view: Mat4, projection: Mat4) = Geometry.camera(aspect: aspect)
             for v in m.view.floats + m.projection.floats { #expect(v.isFinite) }
+        }
+    }
+
+    // MARK: Feature 304 — rails, dials and orbit
+
+    /// The orbits the framing is checked at: the four corners of the allowed ranges, the edge midpoints and the authored
+    /// pose.
+    static var orbits: [AuroraLoomOrbit] {
+        let azimuths: [Double] = [AuroraLoomOrbit.azimuthRange.lowerBound, 0, AuroraLoomOrbit.azimuthRange.upperBound]
+        let elevations: [Double] = [AuroraLoomOrbit.elevationRange.lowerBound, AuroraLoomOrbit.authored.elevation,
+                                    AuroraLoomOrbit.elevationRange.upperBound]
+        var result: [AuroraLoomOrbit] = []
+        for a in azimuths {
+            for e in elevations { result.append(AuroraLoomOrbit(azimuthOffset: a, elevation: e)) }
+        }
+        return result
+    }
+
+    @Test func contentBoxHoldsRailsAndDials() {
+        let h: Vec3 = Geometry.contentHalfExtents
+        #expect(abs(h.x - (Geometry.length / 2 + 0.45 + 0.3 + 0.05)) < 1e-12)
+        #expect(Geometry.sceneBounds == h.x)
+        for r in 0..<3 {
+            for step in 0...15 {
+                #expect(Self.inside(AuroraLoomHandles.anchorPosition(ribbon: r, wave: step)))
+                #expect(Self.inside(AuroraLoomHandles.dialKnob(ribbon: r, phase: step)))
+            }
+            #expect(Self.inside(AuroraLoomHandles.dialCentre(ribbon: r)))
+        }
+    }
+
+    @Test func orbitConstantsAndClamping() {
+        let degree: Double = Double.pi / 180
+        #expect(AuroraLoomOrbit.authored == AuroraLoomOrbit(azimuthOffset: 0, elevation: Geometry.elevation))
+        #expect(abs(AuroraLoomOrbit.authored.elevation - 28 * degree) < 1e-15)
+        #expect(abs(AuroraLoomOrbit.azimuthRange.lowerBound + 40 * degree) < 1e-15)
+        #expect(abs(AuroraLoomOrbit.azimuthRange.upperBound - 40 * degree) < 1e-15)
+        #expect(abs(AuroraLoomOrbit.elevationRange.lowerBound - 10 * degree) < 1e-15)
+        #expect(abs(AuroraLoomOrbit.elevationRange.upperBound - 60 * degree) < 1e-15)
+        #expect(AuroraLoomOrbit.authored.clamped() == AuroraLoomOrbit.authored)
+        let wide: AuroraLoomOrbit = AuroraLoomOrbit(azimuthOffset: 2, elevation: 3).clamped()
+        #expect(wide == AuroraLoomOrbit(azimuthOffset: AuroraLoomOrbit.azimuthRange.upperBound,
+                                        elevation: AuroraLoomOrbit.elevationRange.upperBound))
+        let low: AuroraLoomOrbit = AuroraLoomOrbit(azimuthOffset: -2, elevation: -1).clamped()
+        #expect(low == AuroraLoomOrbit(azimuthOffset: AuroraLoomOrbit.azimuthRange.lowerBound,
+                                       elevation: AuroraLoomOrbit.elevationRange.lowerBound))
+        let broken: AuroraLoomOrbit = AuroraLoomOrbit(azimuthOffset: Double.nan, elevation: Double.infinity).clamped()
+        #expect(broken == AuroraLoomOrbit.authored)
+        let inside: AuroraLoomOrbit = AuroraLoomOrbit(azimuthOffset: 0.1, elevation: 0.5)
+        #expect(inside.clamped() == inside)
+    }
+
+    @Test func authoredCameraEqualsTheAuthoredOrbit() {
+        for aspect in Self.aspects + [0.0, Double.nan, 100.0] {
+            let a: (view: Mat4, projection: Mat4) = Geometry.camera(aspect: aspect)
+            let b: (view: Mat4, projection: Mat4) = Geometry.camera(aspect: aspect, orbit: .authored)
+            #expect(a.view == b.view && a.projection == b.projection)
+            #expect(Geometry.cameraDistance(aspect: aspect) == Geometry.cameraDistance(aspect: aspect, orbit: .authored))
+        }
+        // An out-of-range orbit gives the camera of its clamped orbit; a changed orbit gives another camera.
+        let far: AuroraLoomOrbit = AuroraLoomOrbit(azimuthOffset: 5, elevation: -5)
+        let clampedCamera: (view: Mat4, projection: Mat4) = Geometry.camera(aspect: 1.5, orbit: far.clamped())
+        let farCamera: (view: Mat4, projection: Mat4) = Geometry.camera(aspect: 1.5, orbit: far)
+        #expect(farCamera.view == clampedCamera.view && farCamera.projection == clampedCamera.projection)
+        #expect(farCamera.view != Geometry.camera(aspect: 1.5).view)
+        let pixel: (x: Double, y: Double)? = Geometry.project(Vec3(1, 0.5, 0.2), aspect: 1.5, width: 96, height: 64)
+        let orbitPixel: (x: Double, y: Double)? = Geometry.project(Vec3(1, 0.5, 0.2), aspect: 1.5, orbit: .authored,
+                                                                    width: 96, height: 64)
+        #expect(pixel != nil && orbitPixel != nil)
+        if let pixel, let orbitPixel { #expect(pixel.x == orbitPixel.x && pixel.y == orbitPixel.y) }
+    }
+
+    @Test func framingKeepsFivePercentMarginAtEveryOrbitAndAspect() {
+        let aspects: [Double] = [0.4, 0.75, 1, 1.5, 2.5]
+        var points: [Vec3] = Geometry.contentCorners
+        for r in 0..<3 {
+            points.append(AuroraLoomHandles.anchorPosition(ribbon: r, wave: 0))
+            points.append(AuroraLoomHandles.anchorPosition(ribbon: r, wave: 15))
+            for p in 0..<16 { points.append(AuroraLoomHandles.dialKnob(ribbon: r, phase: p)) }
+        }
+        for orbit in Self.orbits {
+            for aspect in aspects {
+                let height: Int = 1_000
+                let width: Int = Int((aspect * Double(height)).rounded())
+                let w: Double = Double(width)
+                let h: Double = Double(height)
+                let m: (view: Mat4, projection: Mat4) = Geometry.camera(aspect: w / h, orbit: orbit)
+                let viewProjection: Mat4 = m.projection * m.view
+                for v in m.view.floats + m.projection.floats { #expect(v.isFinite) }
+                for point in points {
+                    let pixel: (x: Double, y: Double)? = Geometry.project(point, viewProjection: viewProjection,
+                                                                           width: width, height: height)
+                    #expect(pixel != nil)
+                    guard let p = pixel else { continue }
+                    #expect(p.x >= 0.05 * w && p.x <= 0.95 * w, "orbit \(orbit) aspect \(aspect) point \(point) x \(p.x)")
+                    #expect(p.y >= 0.05 * h && p.y <= 0.95 * h, "orbit \(orbit) aspect \(aspect) point \(point) y \(p.y)")
+                }
+                // The loom centre stays at the view centre.
+                let centre: (x: Double, y: Double)? = Geometry.project(.zero, aspect: w / h, orbit: orbit,
+                                                                        width: width, height: height)
+                #expect(centre != nil)
+                if let c = centre { #expect(abs(c.x - w / 2) < 1e-6 * w && abs(c.y - h / 2) < 1e-6 * h) }
+            }
         }
     }
 }

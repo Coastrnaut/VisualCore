@@ -13,7 +13,7 @@ tests stay short (< 10 s each).
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G0104-002 [P] Create `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomHandles.swift` (AuroraLoomHandleID "id = ribbon · 2 + control",
+- [X] T-R02G0104-002 [P] Create `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomHandles.swift` (AuroraLoomHandleID "id = ribbon · 2 + control", — Verified 2026-11-20: 2026-11-20 host exit 0: AuroraLoomHandlesTests 10/10 (every step round-trips through rail heights and dial knobs; rounding, clamping, wrapping; six handles; HandlePicker picks each projected handle; screen-ray drags land on target steps) and AuroraLoomSceneGeometryTests 16/16 (orbit clamping; camera(aspect:) equals the authored orbit; loom, rails and dials inside 5 % for 9 orbits × 5 aspects) (.autonomy/migration/checks/R02-G01-04.host.json)
   anchor rail "x = +L/2 + 0.45, y = H · (2w/15 − 1)", dial "centre x = −L/2 − 0.45, radius 0.3, knob at p · 22.5°",
   waveStep "round((y/H + 1) · 7.5) clamped 0 … 15", phaseStep "start + round(angle / 22.5°) mod 16", six SpatialHandles)
   and edit `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomSceneGeometry.swift` (AuroraLoomOrbit "azimuth offset −40° … 40°, elevation 10° … 60°",

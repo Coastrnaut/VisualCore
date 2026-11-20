@@ -1,7 +1,7 @@
 # Research: R02-G01-04
 
 - **R1 Handle kinds.** Decision: anchors are R02-F22 axis handles (`HandleKind` along y) dragged with
-  `HandleDrag(.axis(y))` clamped to −H … +H; dials are plane handles (normal x) dragged with `HandleDrag(.plane(x))` and
+  `HandleDrag(.axis(y))` clamped to −H … +H; dials are turn handles (`HandleKind.rotation` about x) dragged with `HandleDrag(.plane(x))` and
   read with `angle(around: centre)`. Rationale: the shared spatial controls already handle grazing angles, clamping and
   picking; the game adds only the step mappings.
 - **R2 One move per gesture.** Decision: the candidate step is previewed during the drag and one `ribbon.move` is sent on
