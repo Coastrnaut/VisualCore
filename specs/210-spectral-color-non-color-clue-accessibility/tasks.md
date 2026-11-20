@@ -99,7 +99,7 @@
 - [X] T-R02F10-012 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F10.reference-1.json (exit 0)
 - [X] T-R02F10-013 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F10.reference-2.json (exit 0)
 - [X] T-R02F10-014 Script tests (`--name script-tests`) — Verified 2026-11-19: 2026-11-19 R02-F10.script-tests-2.json (exit 0) after the module-import check learned scoped imports (first attempt R02-F10.script-tests exit 1: ShellModel's import enum VisualCoreSimulation.ColorVisionChoice read as module enum)
-- [ ] T-R02F10-015 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+- [X] T-R02F10-015 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record — Verified 2026-11-19: converged in 2 rounds (round 1 appended T-R02F10-017, round 2 clean); sealed .autonomy/migration/evidence/R02-F10.json (17 passing); recorded pass 2026-11-19; T-R02F10-016 {device} waits for the device campaign
 
 ## Device campaign (after ImplementationLock-100)
 
