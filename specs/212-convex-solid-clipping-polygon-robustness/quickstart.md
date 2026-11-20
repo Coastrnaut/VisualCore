@@ -11,5 +11,5 @@ python3 scripts/release_check.py --only reference-test-anglerendering-ios27 refe
 python3 scripts/test_scripts.py
 ```
 
-Expected: all PASS; SC-R02F11-001…006 by ConvexSolidTests, ConvexCutTests, PolygonCleanupTests, VolumeLedgerTests and
+Expected: all PASS; SC-R02F12-001…006 by ConvexSolidTests, ConvexCutTests, PolygonCleanupTests, VolumeLedgerTests and
 ConvexSolidCodingTests.
