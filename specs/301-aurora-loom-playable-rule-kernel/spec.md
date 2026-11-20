@@ -160,8 +160,8 @@ A level is stored with a schema version and a fingerprint; damaged or newer reco
 
 ### Measurable Outcomes
 
-- **SC-R02G0101-001**: For 1,000 seeded levels, a constructed winning control setting wins and every setting one step away
-  at any single control that breaks a gate does not; boundary samples at exactly the tolerance are inside, one unit
+- **SC-R02G0101-001**: For 1,000 seeded levels, a constructed winning control setting wins, and for every single-control
+  change from it the win test agrees with an independent reference evaluation written in the test; boundary samples at exactly the tolerance are inside, one unit
   beyond outside.
 - **SC-R02G0101-002**: For 500 seeded move traces, replay reproduces every fingerprint and the outcome; undo of every move
   restores the exact earlier state and fingerprint.

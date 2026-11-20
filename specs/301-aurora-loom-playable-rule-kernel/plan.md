@@ -51,7 +51,7 @@ Post-design re-check: PASS.
 Packages/ExperiencesRound02/Package.swift                                  new  package, AuroraLoomCore + tests (lead)
 Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomError.swift          new  AuroraLoomError (lead)
 Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomLevel.swift          new  AuroraLoomRibbon, AuroraLoomGate, AuroraLoomLevel, stored form (lead)
-Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomHarmony.swift        new  phase model, residuals, win test, worst mismatch (agent A)
+Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomHarmony.swift        new  phase model, residuals, win test, worst mismatch (lead; the level's start check needs it)
 Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomPlay.swift           new  stages, moves, records, undo, redo, fingerprints (agent B)
 Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomRules.swift          new  PuzzleRules conformance (agent C)
 Packages/ExperiencesRound02/AuroraLoom/CoreTests/{AuroraLoomLevelTests (lead), AuroraLoomHarmonyTests (A), AuroraLoomPlayTests (B), AuroraLoomRulesTests (C)}.swift   new
@@ -62,6 +62,6 @@ Packages/ExperiencesRound02/AuroraLoom/CoreTests/{AuroraLoomLevelTests (lead), A
 
 ## Parallel work
 
-Lead writes the package, error and level with their test; agents A, B and C write the harmony, play and rules files in
-parallel against the contract (B and C use A's evaluation; they build once it lands). Lead: docs, CI step, runs, commits;
+Lead writes the package, error, level and harmony evaluation with the level test; agents A, B and C then write the
+harmony tests, the play file and the rules file in parallel against the contract. Lead: docs, CI step, runs, commits;
 checks recorded only after every agent has reported.

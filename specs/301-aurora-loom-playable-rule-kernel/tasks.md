@@ -15,20 +15,20 @@ or {device} tasks (pure logic). Fixture seed 2_301; tests stay short.
 
 - [ ] T-R02G0101-002 Create `Packages/ExperiencesRound02/Package.swift` (platforms iOS 26 and macOS 15; target
   `AuroraLoomCore` at `AuroraLoom/Core` depending on VisualCoreSimulation and VisualCoreMath; test target
-  `AuroraLoomCoreTests` at `AuroraLoom/CoreTests`), `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomError.swift` and `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomLevel.swift`
+  `AuroraLoomCoreTests` at `AuroraLoom/CoreTests`), `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomError.swift`, `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomHarmony.swift` (phase, residual, wins over n = 0 … 2P − 1, worst
+  mismatch with ties by ribbon, gate, tick) and `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomLevel.swift`
   (AuroraLoomRibbon "steps 0 … 15; omega 0 … 256", AuroraLoomGate "position 1 … 15; Θ 0 … 4,095", AuroraLoomLevel "id slug;
   band 1 … 5; 3 ribbons; 4 gates with distinct positions; Ω power of two 1 … 256; tolerance 1 … 512; allowance 1 … 64;
   start must not win; schema 1", fingerprint, stored form) with `Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomLevelTests.swift` (refusals and codes;
-  round trip; damaged, newer and edited forms refused; period); the start-must-not-win check uses the harmony evaluation
-  of T-003 and is completed there; `--name host -- swift test --package-path Packages/ExperiencesRound02 --filter
+  round trip; damaged, newer and edited forms refused; period);  `--name host -- swift test --package-path Packages/ExperiencesRound02 --filter
   AuroraLoomLevelTests`
 
 ## Phase 3: Story 1 — make three ribbons agree (P1) 🎯
 
-- [ ] T-R02G0101-003 [P] [US1] Create `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomHarmony.swift` (phase, residual, wins over n = 0 … 2P − 1, worst
-  mismatch with ties by ribbon, gate, tick) with `Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomHarmonyTests.swift` (1,000 seeded levels: the constructed
-  setting wins, every single-control breaking step does not; boundary at exactly the tolerance inside, one unit beyond
-  outside; worst mismatch and tie order; a drifting ribbon (ω ≠ Ω) is judged over the two periods); `--name host-2`
+- [ ] T-R02G0101-003 [P] [US1] Create `Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomHarmonyTests.swift` (1,000 seeded levels: the
+  constructed setting wins; for every single-control change the win test agrees with an independent reference written in
+  the test; boundary at exactly the tolerance inside, one unit beyond outside; worst mismatch and tie order; a drifting
+  ribbon (ω ≠ Ω) is judged over the two periods); `--name host-2`
 
 ## Phase 4: Stories 2, 3 and 4 — allowance, undo, replay and life stages (P1, P2)
 
@@ -60,5 +60,5 @@ or {device} tasks (pure logic). Fixture seed 2_301; tests stay short.
 
 ## Dependencies and parallel work
 
-001 → 002 → {003, 004, 005} in parallel (004 and 005 build once 003 lands) → 006 → … → 011. Agents: A (003), B (004),
+001 → 002 → {003, 004, 005} in parallel → 006 → … → 011. Agents: A (003), B (004),
 C (005). Shared files (002, CI, docs) stay with the lead. MVP: Story 1.
