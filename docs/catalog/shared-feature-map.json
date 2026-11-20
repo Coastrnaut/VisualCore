@@ -183,8 +183,8 @@
    "disposition": "new",
    "existing": [
     "SeededRandom",
-    "Mesh.tube",
-    "Mesh.merged",
+    "Mesh",
+    "CurveSamples",
     "MeshInstance"
    ],
    "home": "VisualCoreScenes",
