@@ -199,6 +199,8 @@ Levels have a versioned stored form with a fingerprint, so later features can sh
 - The 100 catalog levels and their witnesses are generated in R02-G02-02; this feature proves the rules on seeded levels
   built in tests.
 - Visuals are code only, no network; the design is the project's own archived round-two design.
+- Layout on iPhone and iPad, VoiceOver and the accessible stepper controls for the four dials belong to R02-G02-04 and
+  -06, which drive the kernel through the same actions; the sine table is computed by the project, not copied.
 
 ## Traceability
 
