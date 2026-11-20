@@ -42,7 +42,7 @@ public names checked against Packages and Apps (`Visibility` is taken). Fixture 
 
 ## Phase 5: Story 3 — eclipses and transits (P1)
 
-- [ ] T-R02F15-005 [P] [US3] Create `Packages/VisualCore/Sources/VisualCoreMath/DiskOverlap.swift` (research R7) and
+- [X] T-R02F15-005 [P] [US3] Create `Packages/VisualCore/Sources/VisualCoreMath/DiskOverlap.swift` (research R7) and — Verified 2026-11-19: lead retest 2026-11-19: R02-F15.host-rerun.json (exit 0, full suite; first R02-F15.host.json failed only the timed R02-F05 mesh budget under parallel load, fixed by lightening the overlap oracle to 1,024 intervals); DiskOverlapTests 3 and EclipseGeometryTests 9 passed (1,000 seeded pairs equal the chord-integration oracle to 1e-6; at least five fixtures per class; observer-inside and invalid-disk refusals)
   `Packages/VisualCore/Sources/VisualCoreMath/EclipseGeometry.swift` (`EclipseBody` "radius finite > 0",
   `EclipseClass`, `EclipseVerdict` "fraction in [0, 1]; hidden reports 1", `EclipseGeometry.classify` per clarification
   Q4 and research R8) with `Packages/VisualCore/Tests/VisualCoreMathTests/DiskOverlapTests.swift` (1,000 seeded pairs
