@@ -36,7 +36,7 @@ or {device} tasks (pure logic and host-generated content). Fixture seed 2_312; t
 
 ## Phase 4: Story 2 — levels come from their planned seeds (P1)
 
-- [ ] T-R02G0202-004 [US2] Create `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthGenerator.swift` (LissajousLabyrinthBandProfile
+- [X] T-R02G0202-004 [US2] Create `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthGenerator.swift` (LissajousLabyrinthBandProfile — Verified 2026-11-20: 2026-11-20 host-3 exit 0 (3 generator tests, 1.4 s)
   "checkpoints 2, 3, 4, 5, 6 of radius 512, 448, 384, 320, 256; obstacles 2, 3, 4, 6, 8; shortest 1–2, 2, 2–3, 3, 3–4",
   LissajousLabyrinthGenerated, `generate` with candidates k = 0 … 63 from `SeedDerivation.derive(seed, index: k)`, id
   `lissajous-labyrinth-NNN`, allowance = budget, tutorial for 1 … 3, `.generation(number)` beyond 64; `catalogDigest`)
