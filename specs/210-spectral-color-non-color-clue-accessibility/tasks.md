@@ -111,3 +111,13 @@
 001 → (002 ∥ 003 ∥ 007) → 004 → (005 ∥ 006) → 008 → 009 → 010 → 011 → 012 → 013 → 014 → 015. Agents: C (002, 003), P
 (007), S (004 after 002), G (005, 006 after 003 and 004), U (008 after 004 and 007). Shared files (READMEs, API
 baseline, `ShaderBundleTests.swift` list, feature map) stay with the lead. MVP: Story 1 (002, 004, 005).
+
+## Phase 8: Convergence
+
+- [ ] T-R02F10-017 Make the clue outline meet 3:1 against both the state colour and the background per FR-R02F10-013
+  (partial): add `PerceptualColor.outlineRings(for:on:) -> (inner: SIMD3<Double>, outer: SIMD3<Double>?)` in
+  `Packages/VisualCore/Sources/VisualCoreParameters/PerceptualColor.swift` (inner = black or white with the larger
+  contrast to the colour, always ≥ √21 ≈ 4.58; outer = the opposite of the background when inner < 3:1 against it, else
+  nil), draw both rings in `Packages/VisualCoreRendering/Sources/VisualCoreUI/ClueBadge.swift`, and test in
+  `PerceptualColorTests.swift` over a 9 × 9 × 9 sRGB sweep on black and white backgrounds that the inner ring is ≥ 3:1
+  to the colour and the outermost ring ≥ 3:1 to the background; `--name host-3` and `--name rendering-27-2`
