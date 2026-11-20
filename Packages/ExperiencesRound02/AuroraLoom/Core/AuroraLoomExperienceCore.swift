@@ -16,7 +16,8 @@
 // A kernel refusal (`AuroraLoomError`) becomes `.rule(code: error.reasonCode)`, for example `r02-g01.move` or
 // `r02-g01.stage`. A refused action changes nothing.
 //
-// Digest ("r02-g01.aurora-loom.v1"): the level number, the play's fingerprint and the number of its records; never the
+// Digest ("r02-g01.aurora-loom.v1"): the level number and the play's fingerprint (not its record history, so undo restores
+// the earlier digest; feature 304); never the
 // quality tier or a time. Snapshot schema 1: the JSON object `{"level", "records"}` with sorted keys; restoring
 // replays the records on a fresh play of that level (`AuroraLoomPlay.replay`) and throws
 // `AuroraLoomRestoreRefusal` for a damaged payload, a level number outside 1 … 100 or a trace the kernel refuses.
@@ -233,13 +234,13 @@ public struct AuroraLoomExperienceCore: ExperienceCore, Equatable {
         }
     }
 
-    /// "r02-g01.aurora-loom.v1", then the level number, the play's fingerprint (level, steps, moves spent, stage) and
-    /// the number of its records.
+    /// "r02-g01.aurora-loom.v1", then the level number and the play's fingerprint (level, steps, moves spent, stage).
     public func writeDigest(into builder: inout DigestBuilder) throws(DigestError) {
         builder.add(Self.digestDomain)
         builder.add(levelNumber)
+        // The play's fingerprint (steps, moves spent, stage) and not its record history, so undo restores the earlier
+        // digest exactly (R2-G01-INV-05; feature 304 T-R02G0104-005).
         builder.add(play.fingerprint)
-        builder.add(play.records.count)
     }
 
     // MARK: Snapshot

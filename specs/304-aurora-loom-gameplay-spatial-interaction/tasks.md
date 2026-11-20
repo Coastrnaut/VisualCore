@@ -40,7 +40,7 @@ tests stay short (< 10 s each).
 
 ## Phase 4: Story 4 and simulator proof (P2)
 
-- [ ] T-R02G0104-005 [US4] Create `Packages/ExperiencesRound02/AuroraLoom/ExperienceTests/AuroraLoomGestureWiringTests.swift` (scripted touches through the presenter's
+- [X] T-R02G0104-005 [US4] Create `Packages/ExperiencesRound02/AuroraLoom/ExperienceTests/AuroraLoomGestureWiringTests.swift` (scripted touches through the presenter's — Verified 2026-11-20: 2026-11-20 sim-27 exit 0 on sim-27.2: AuroraLoomGestureWiringTests 9/9 (anchor drag and dial quarter turn move the kernel by the named step through the shell's pointer entry; second finger and cancel send nothing; paused and won levels ignore gestures; a refused move shows its text; selection described and outlined in gold; undo after a gesture restores the digest; orbit limits keep the frame check, Reset view returns the authored pose) with the R02-G01-03 tests (23 in all). The first run found that the adapter digest counted records, so undo could never restore it (INV-05); the digest is now the level and the play fingerprint, and the scenario manifest was regenerated (.autonomy/migration/checks/R02-G01-04.sim-27.json)
   pointer entry move the kernel by exactly the named step; a second finger and a cancel send nothing; gestures while
   paused or after the level ends send nothing and a refused move shows its text with the state unchanged; the selection
   outline is drawn; the description names the selection; undo after a gesture restores the digest; frame checks hold at
