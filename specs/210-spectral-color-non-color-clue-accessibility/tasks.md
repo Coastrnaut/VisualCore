@@ -54,7 +54,7 @@
 
 ## Phase 4: Story 2 — colours stay apart (P1)
 
-- [ ] T-R02F10-006 [US2] [US3] Create `Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/spectral.glsl`
+- [X] T-R02F10-006 [US2] [US3] Create `Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/spectral.glsl` — Verified 2026-11-19: lead retest 2026-11-19: R02-F10/rendering-27 exit=0 incl. SpectralShaderTests 3 passed (OKLab forward 1/255, round trip, hue 0/π/2/2π and all five conditions 0/255)
   (`vc_linearToOklab`, `vc_oklabToLinear`, `vc_hueRotate`, `vc_simulateCVD(vec3, int)`) with
   `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/SpectralShaderTests.swift` (a 64 × 64 ramp through each
   function equals the CPU reference within 2/255 per channel; every condition; hue rotations 0, 90°, 360°; zero leaks);
