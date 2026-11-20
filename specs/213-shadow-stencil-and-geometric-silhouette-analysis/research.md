@@ -13,7 +13,7 @@
 - **R4 Rasteriser.** Decision: scanline at each row centre; crossings of each polygon's edges with the half-open rule;
   cells whose centre x lies inside an odd span are set; union by OR. Rationale: exact cell-centre coverage, no double
   counting at shared edges, O(rows × edges). Alternatives: per-cell point-in-polygon (O(cells × edges)).
-- **R5 Single darkening.** Decision: coverage pass writes 1 into an R8 (or RGBA8) target without blending, then one
+- **R5 Single darkening.** Decision: coverage pass writes 1 into a pooled `.rgba8` target (the registry default; R8 is not guaranteed renderable) without blending, then one
   full-screen composite multiplies by (1 − darkness × coverage) with premultiplied blending. Rationale: overlaps are
   idempotent, exactly what a stencil test gives. Alternatives: GL_MAX blending directly onto the scene (changes colour
   semantics of other draws).
