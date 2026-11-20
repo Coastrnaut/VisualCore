@@ -359,6 +359,17 @@ composite, premultiplied over); `composite` mode 2 is premultiplied over; the va
 and out-of-range emissive ones. `RenderState.premultipliedBlended` draws premultiplied layers. Rules:
 [docs/architecture/shaders.md](../../docs/architecture/shaders.md).
 
+## Conic orbits and eclipses (feature 215, R02-F15)
+
+VisualCoreMath moves bodies on two-body conics and decides eclipses: `KeplerSolver` solves the elliptic (reusing
+`KeplerOrbit.eccentricAnomaly`), hyperbolic and parabolic (Barker) forms of Kepler's equation, always finite;
+`ConicOrbit` (periapsis distance, eccentricity, orientation, time of periapsis, μ; `Codable` schema 1) gives an
+`OrbitState` (position, velocity, true anomaly) and equals `KeplerOrbit` for e < 1; `PhaseStepper` keeps drift-free
+time t₀ + k·Δt (ticks 0…1,000,000,000) with phases and periapsis/apoapsis `Passage`s in half-open spans;
+`DiskOverlap` gives the exact lens area; `EclipseGeometry.classify` returns an `EclipseVerdict` (angular radii,
+separation, covered fraction) with an `EclipseClass` (none, partial, annular, total, hidden).
+Refusals are `OrbitError` with `r2-f15.*` codes. Rules: [docs/architecture/conic-orbits.md](../../docs/architecture/conic-orbits.md).
+
 ## Reversible timeline (feature 214, R02-F14)
 
 VisualCoreSimulation scrubs any deterministic `FixedStepSimulation` value type: `EventLog` holds commands by step

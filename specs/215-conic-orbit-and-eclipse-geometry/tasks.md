@@ -62,7 +62,7 @@ public names checked against Packages and Apps (`Visibility` is taken). Fixture 
 ## Phase 7: Regression, documentation and close
 
 - [X] T-R02F15-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26` and `--name experiences` — Verified 2026-11-19: 2026-11-19 R02-F15.rendering-27.json, rendering-26.json and experiences.json (exit 0 each, TEST SUCCEEDED)
-- [ ] T-R02F15-008 API baseline and docs: `check_public_api.py --update`, `--name public-api`, `--name documented-api
+- [X] T-R02F15-008 API baseline and docs: `check_public_api.py --update`, `--name public-api`, `--name documented-api — Verified 2026-11-19: 2026-11-19 R02-F15.public-api.json and R02-F15.documented-api.json (exit 0; 3578 declarations, 0 undocumented); docs/architecture/conic-orbits.md; README section and section 13.4 row rendered; validate_autocreator PASS
   -- python3 scripts/check_documented_api.py --sources Apps/VisualCore`; new `docs/architecture/conic-orbits.md`; section
   in `Packages/VisualCore/README.md`; section 13.4 row R02-F15 "As built" in `docs/catalog/shared-feature-map.json` and
   `render_autocreator.py`

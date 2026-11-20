@@ -143,12 +143,13 @@
    "note": "As built (feature 214): EventLog, SnapshotRing, ReplayHash (SHA-256 chain over step checksums) and ReversibleTimeline (snapshot-and-replay seeks, recompute after edits, non-determinism refused) in VisualCoreSimulation beside FixedStepRunner and ControlStream, which are unchanged; TimelineRunDocument (schema 1, MigrationChain from schema 0, verified by replay) in VisualCoreExperience."
   },
   "F15": {
-   "disposition": "new",
+   "disposition": "extend",
    "existing": [
+    "KeplerOrbit",
     "OrbitCamera"
    ],
    "home": "VisualCoreMath",
-   "note": "Conic orbits and eclipse geometry, pure and host-tested."
+   "note": "As built (feature 215): KeplerSolver (elliptic via the unchanged KeplerOrbit.eccentricAnomaly, hyperbolic Newton, parabolic Barker closed form), ConicOrbit (all conics, OrbitState with velocity and true anomaly, equal to KeplerOrbit for e < 1, Codable schema 1), drift-free PhaseStepper with phases and apsis passages, DiskOverlap (exact lens area) and EclipseGeometry (none, partial, annular, total, hidden) in VisualCoreMath."
   },
   "F16": {
    "disposition": "new",
