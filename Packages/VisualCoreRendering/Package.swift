@@ -8,7 +8,9 @@ import PackageDescription
 let package = Package(
     name: "VisualCoreRendering",
     defaultLocalization: "en",
-    platforms: [.iOS("26.0")],
+    // macOS 15 matches VisualCore's floor so a macOS host can resolve a package that depends on this one with an
+    // iOS-only condition (ExperiencesRound02 host tests; Swift 6.3 enforces the floor); nothing here builds for macOS.
+    platforms: [.iOS("26.0"), .macOS("15.0")],
     products: [
         .library(name: "VisualCoreRendering", targets: ["VisualCoreRendering"]),
         .library(name: "VisualCoreEffects", targets: ["VisualCoreEffects"]),
