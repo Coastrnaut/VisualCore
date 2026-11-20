@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_documented_api.py",
+    "--sources",
+    "Apps/VisualCore"
+  ],
+  "command": "python3 scripts/check_documented_api.py --sources Apps/VisualCore",
+  "elapsed_seconds": 2.399,
+  "exit_code": 0,
+  "finished": "2026-11-20T00:28:13+00:00",
+  "gate": "R02-F10",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-F10.documented-api.log",
+  "log_sha256": "4c123169ae6fc7443fad138be78c9a939aefbda3629d6e2ecb72e2e7dae8e1fe",
+  "name": "documented-api",
+  "started": "2026-11-20T00:28:10+00:00",
+  "timed_out": false
+}

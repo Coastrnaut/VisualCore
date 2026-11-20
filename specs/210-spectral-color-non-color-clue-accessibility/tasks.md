@@ -90,7 +90,7 @@
 - [X] T-R02F10-010 No Stage One breakage: `--name experiences --` ExperiencesCreative on sim-27.2, and the app's — Verified 2026-11-19: 2026-11-19 R02-F10.experiences.json (exit 0) and R02-F10.app-settings-2.json (exit 0)
   settings tests (`--name app-settings -- python3 scripts/release_check.py --only app-build-for-testing-ios27
   app-unit-ios27 app-ui-ios27-b`, as R02-F26)
-- [ ] T-R02F10-011 API baseline and docs: `check_public_api.py --update`, `--name public-api`, `--name documented-api
+- [X] T-R02F10-011 API baseline and docs: `check_public_api.py --update`, `--name public-api`, `--name documented-api — Verified 2026-11-19: 2026-11-19 R02-F10.public-api.json and R02-F10.documented-api.json (exit 0; 3295 declarations, 0 undocumented); docs/architecture/color-accessibility.md with sources and licences; READMEs and section 13.4 note rendered; validate_autocreator PASS; no image/font/icon file in the feature's diff
   -- python3 scripts/check_documented_api.py --sources Apps/VisualCore`; new `docs/architecture/color-accessibility.md`
   (OKLab and Machado sources with licences, threshold, presets, clue set, reason codes); sections in
   `Packages/VisualCore/README.md` and `Packages/VisualCoreRendering/README.md`; section 13.4 row R02-F10 "As built"

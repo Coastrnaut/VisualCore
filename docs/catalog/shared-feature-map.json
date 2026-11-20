@@ -107,8 +107,8 @@
     "AccessibleColors",
     "AccessibilityPreferences"
    ],
-   "home": "VisualCoreParameters, VisualCoreUI",
-   "note": "Spectral palettes plus non-colour clues (shape, pattern, label) for every colour-coded rule."
+   "home": "VisualCoreParameters, VisualCoreSimulation, VisualCoreRendering, VisualCoreUI",
+   "note": "As built (feature 210): PerceptualColor (OKLab/OKLCh, luminance, WCAG contrast, hue rotation with gamut bisection), ColorVisionCondition (Machado 2009 + achromatopsia), PaletteSeparation (ΔE_OK ≥ 0.08) and three original ColorVisionPresets, coded states with shape × pattern clues and r2-f10.* refusals in VisualCoreParameters; ColorVisionChoice in AccessibilityPreferences (VisualCoreSimulation, not VisualCoreParameters) and the shell preferences; vc/spectral.glsl and vc/clue.glsl; ClueBadge and the colour-vision picker in VisualCoreUI."
   },
   "F11": {
    "disposition": "new",

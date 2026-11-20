@@ -412,6 +412,14 @@ output size (half-float where supported), with exposure and tone mapping in line
 flash limiter measure linear light for graphs that contain it. Rules:
 [docs/architecture/shaders.md](../../docs/architecture/shaders.md).
 
+## Colour accessibility (feature 210, R02-F10)
+
+Shader includes `vc/spectral.glsl` (`vc_linearToOklab`, `vc_oklabToLinear`, `vc_hueRotate`, `vc_simulateCVD`) and
+`vc/clue.glsl` (`vc_clueShape`, `vc_cluePattern`, `vc_clueCoverage`, `vc_clueOutline`) match the CPU references within
+2/255. VisualCoreUI: `ClueBadge` draws a coded state's shape, pattern, outline and name at Dynamic Type sizes and speaks
+its name; `AccessibilitySettingsSection` adds the colour-vision picker; `AccessibleColors.contrastRatio` uses
+`PerceptualColor.contrastRatio`. Rules: [docs/architecture/color-accessibility.md](../../docs/architecture/color-accessibility.md).
+
 ## Instancing and beams (feature 209, R02-F09)
 
 `InstancedMeshRenderer` draws up to 16,384 copies of one `Mesh` (`MeshInstance`: model matrix and colour) in one

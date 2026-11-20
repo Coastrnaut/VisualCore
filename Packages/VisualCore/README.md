@@ -359,6 +359,17 @@ composite, premultiplied over); `composite` mode 2 is premultiplied over; the va
 and out-of-range emissive ones. `RenderState.premultipliedBlended` draws premultiplied layers. Rules:
 [docs/architecture/shaders.md](../../docs/architecture/shaders.md).
 
+## Colour accessibility (feature 210, R02-F10)
+
+VisualCoreParameters: `PerceptualColor` (sRGB ↔ linear ↔ OKLab ↔ OKLCh, relative luminance, WCAG `contrastRatio`, ΔE_OK
+`difference`, `rotateHue` keeping lightness with a 24-step chroma bisection back into gamut, `outline(for:on:)`),
+`ColorVisionCondition` (Machado 2009 protanopia, deuteranopia, tritanopia; achromatopsia), `PaletteSeparation` (pairs
+closer than ΔE_OK 0.08 under any condition), `ColorVisionPresets` (three original six-colour palettes that pass it), and
+coded states with a non-colour clue: `ClueShape` × `CluePattern` (8 × 4), `CodedState`, `CodedStateSet` (refusals with
+`ColorAccessError` and `r2-f10.*` reason codes) and the CPU drawing reference `ClueReference`. VisualCoreSimulation:
+`ColorVisionChoice` and `AccessibilityPreferences.colorVision` (older data decodes as `standard`). Rules:
+[docs/architecture/color-accessibility.md](../../docs/architecture/color-accessibility.md).
+
 ## Instance order and beam profile (feature 209, R02-F09)
 
 `InstanceOrder.backToFront(depths:)` (VisualCoreScenes) orders translucent instances by view-space z, farthest first,

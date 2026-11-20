@@ -1157,6 +1157,7 @@ VisualCoreExperience | var | public var catalogSHA256: String?
 VisualCoreExperience | var | public var closes: Int
 VisualCoreExperience | var | public var code: ExperienceCode
 VisualCoreExperience | var | public var code: String
+VisualCoreExperience | var | public var colorVision: ColorVisionChoice?
 VisualCoreExperience | var | public var commit: String?
 VisualCoreExperience | var | public var configuration: Configuration
 VisualCoreExperience | var | public var contextRecreations: Int
@@ -1758,10 +1759,18 @@ VisualCoreMath | var | public var xyz: Vec3
 VisualCoreMath | var | public var yaw: Double
 VisualCoreMath | var | public var zoom: Double
 VisualCoreMath | var | public var zoomRange: ClosedRange<Double>
+VisualCoreParameters | enum | public enum CluePattern: Int, CaseIterable, Sendable, Codable
+VisualCoreParameters | enum | public enum ClueReference
+VisualCoreParameters | enum | public enum ClueShape: Int, CaseIterable, Sendable, Codable
+VisualCoreParameters | enum | public enum ColorAccessError: Error, Equatable, Sendable
+VisualCoreParameters | enum | public enum ColorVisionCondition: String, CaseIterable, Sendable, Codable
+VisualCoreParameters | enum | public enum ColorVisionPresets
+VisualCoreParameters | enum | public enum PaletteSeparation
 VisualCoreParameters | enum | public enum ParameterError: Error, Equatable, Sendable
 VisualCoreParameters | enum | public enum ParameterHash
 VisualCoreParameters | enum | public enum ParameterTransform: String, Codable, Sendable, CaseIterable
 VisualCoreParameters | enum | public enum ParametersInfo
+VisualCoreParameters | enum | public enum PerceptualColor
 VisualCoreParameters | func | public func clamped(_ value: Double) -> Double
 VisualCoreParameters | func | public func definition(_ name: String) -> ParameterDefinition?
 VisualCoreParameters | func | public func encode(to encoder: Encoder) throws
@@ -1771,6 +1780,7 @@ VisualCoreParameters | func | public func normalized(_ name: String) -> Double
 VisualCoreParameters | func | public func normalized(_ value: Double) -> Double
 VisualCoreParameters | func | public func resolve(_ supplied: [String: Double]) throws(ParameterError) -> ResolvedParameters
 VisualCoreParameters | func | public func sample(_ t: Double) -> SIMD3<Double>
+VisualCoreParameters | func | public func simulate(sRGB c: SIMD3<Double>) -> SIMD3<Double>
 VisualCoreParameters | func | public func value(normalized t: Double) -> Double
 VisualCoreParameters | func | public mutating func rebase(_ values: [String: Double]) throws(ParameterError)
 VisualCoreParameters | func | public mutating func reset(_ name: String)
@@ -1779,34 +1789,71 @@ VisualCoreParameters | func | public mutating func set(_ name: String, normalize
 VisualCoreParameters | func | public mutating func set(_ name: String, to value: Double) -> Bool
 VisualCoreParameters | func | public static func builtIn(_ id: String) -> Palette?
 VisualCoreParameters | func | public static func canonical(scope: String, seed: UInt64, paletteID: String, values: [String: Double]) -> String
+VisualCoreParameters | func | public static func contrastRatio(_ a: SIMD3<Double>, _ b: SIMD3<Double>) -> Double
+VisualCoreParameters | func | public static func coverage(shape: ClueShape, pattern: CluePattern, at p: SIMD2<Double>, antialias: Double) -> Double
+VisualCoreParameters | func | public static func difference(_ a: SIMD3<Double>, _ b: SIMD3<Double>) -> Double
+VisualCoreParameters | func | public static func distance(shape: ClueShape, at p: SIMD2<Double>) -> Double
+VisualCoreParameters | func | public static func intoGamut(oklch c: SIMD3<Double>) -> SIMD3<Double>
+VisualCoreParameters | func | public static func issues(_ colors: [SIMD3<Double>]) -> [PaletteSeparationIssue]
+VisualCoreParameters | func | public static func lightness(sRGB c: SIMD3<Double>) -> Double
+VisualCoreParameters | func | public static func linear(fromOklab c: SIMD3<Double>) -> SIMD3<Double>
 VisualCoreParameters | func | public static func linear(fromSRGB c: Double) -> Double
+VisualCoreParameters | func | public static func linear(fromSRGB c: SIMD3<Double>) -> SIMD3<Double>
 VisualCoreParameters | func | public static func of(scope: String, seed: UInt64, paletteID: String, values: [String: Double]) -> String
+VisualCoreParameters | func | public static func oklab(fromLinear c: SIMD3<Double>) -> SIMD3<Double>
+VisualCoreParameters | func | public static func oklab(fromOklch c: SIMD3<Double>) -> SIMD3<Double>
+VisualCoreParameters | func | public static func oklch(fromOklab c: SIMD3<Double>) -> SIMD3<Double>
+VisualCoreParameters | func | public static func outline(for color: SIMD3<Double>, on background: SIMD3<Double>) -> SIMD3<Double>
+VisualCoreParameters | func | public static func outline(shape: ClueShape, at p: SIMD2<Double>, width: Double, antialias: Double) -> Double
+VisualCoreParameters | func | public static func pattern(_ pattern: CluePattern, at p: SIMD2<Double>) -> Double
+VisualCoreParameters | func | public static func relativeLuminance(sRGB c: SIMD3<Double>) -> Double
+VisualCoreParameters | func | public static func rotateHue(sRGB c: SIMD3<Double>, by radians: Double) throws(ColorAccessError) -> SIMD3<Double>
 VisualCoreParameters | func | public static func sRGB(fromLinear c: Double) -> Double
+VisualCoreParameters | func | public static func sRGB(fromLinear c: SIMD3<Double>) -> SIMD3<Double>
+VisualCoreParameters | func | public static func smoothstep(_ e0: Double, _ e1: Double, _ x: Double) -> Double
 VisualCoreParameters | init | public init(_ definitions: [ParameterDefinition]) throws(ParameterError)
+VisualCoreParameters | init | public init(_ states: [CodedState]) throws(ColorAccessError)
+VisualCoreParameters | init | public init(first: Int, second: Int, condition: ColorVisionCondition, distance: Double)
 VisualCoreParameters | init | public init(from decoder: Decoder) throws
+VisualCoreParameters | init | public init(id: String, color: SIMD3<Double>, shape: ClueShape, pattern: CluePattern, name: String)
 VisualCoreParameters | init | public init(id: String, name: String, stops: [SIMD3<Double>]) throws(ParameterError)
 VisualCoreParameters | init | public init(id: String, title: String, seed: UInt64, paletteID: String, values: [String: Double])
 VisualCoreParameters | init | public init(name: String, title: String, unit: String = "", range: ClosedRange<Double>, defaultValue: Double,
 VisualCoreParameters | init | public init(schema: ParameterSchema, values: [String: Double] = [:]) throws(ParameterError)
+VisualCoreParameters | let | public let condition: ColorVisionCondition
 VisualCoreParameters | let | public let defaultValue: Double
 VisualCoreParameters | let | public let definitions: [ParameterDefinition]
+VisualCoreParameters | let | public let distance: Double
+VisualCoreParameters | let | public let first: Int
 VisualCoreParameters | let | public let id: String
 VisualCoreParameters | let | public let maximum: Double
 VisualCoreParameters | let | public let minimum: Double
 VisualCoreParameters | let | public let name: String
 VisualCoreParameters | let | public let paletteID: String
 VisualCoreParameters | let | public let schema: ParameterSchema
+VisualCoreParameters | let | public let second: Int
 VisualCoreParameters | let | public let seed: UInt64
+VisualCoreParameters | let | public let states: [CodedState]
 VisualCoreParameters | let | public let stops: [SIMD3<Double>]
 VisualCoreParameters | let | public let title: String
 VisualCoreParameters | let | public let transform: ParameterTransform
 VisualCoreParameters | let | public let unit: String
 VisualCoreParameters | let | public let values: [String: Double]
 VisualCoreParameters | let | public let warnings: [String]
+VisualCoreParameters | let | public static let all: [Palette]
 VisualCoreParameters | let | public static let builtIns: [Palette]
+VisualCoreParameters | let | public static let lightness: Palette
+VisualCoreParameters | let | public static let maxNameLength
 VisualCoreParameters | let | public static let maxParameters
+VisualCoreParameters | let | public static let maxStates
+VisualCoreParameters | let | public static let redCyan: Palette
+VisualCoreParameters | let | public static let threshold
 VisualCoreParameters | let | public static let version
+VisualCoreParameters | let | public static let warmCool: Palette
+VisualCoreParameters | struct | public struct CodedState: Sendable, Equatable, Codable
+VisualCoreParameters | struct | public struct CodedStateSet: Sendable, Equatable
 VisualCoreParameters | struct | public struct Palette: Codable, Equatable, Sendable, Identifiable
+VisualCoreParameters | struct | public struct PaletteSeparationIssue: Sendable, Equatable
 VisualCoreParameters | struct | public struct ParameterDefinition: Codable, Equatable, Sendable
 VisualCoreParameters | struct | public struct ParameterEditor: Sendable, Equatable
 VisualCoreParameters | struct | public struct ParameterSchema: Sendable, Equatable
@@ -1814,10 +1861,18 @@ VisualCoreParameters | struct | public struct Preset: Codable, Equatable, Sendab
 VisualCoreParameters | struct | public struct ResolvedParameters: Sendable, Equatable
 VisualCoreParameters | var | public private(set) var baseline: [String: Double]
 VisualCoreParameters | var | public private(set) var values: [String: Double]
+VisualCoreParameters | var | public var color: SIMD3<Double>
 VisualCoreParameters | var | public var defaults: [String: Double]
+VisualCoreParameters | var | public var id: String
 VisualCoreParameters | var | public var linearStops: [SIMD3<Double>]
+VisualCoreParameters | var | public var matrix: [SIMD3<Double>]
 VisualCoreParameters | var | public var modifiedNames: [String]
+VisualCoreParameters | var | public var name: String
+VisualCoreParameters | var | public var pattern: CluePattern
 VisualCoreParameters | var | public var range: ClosedRange<Double>
+VisualCoreParameters | var | public var reasonCode: String
+VisualCoreParameters | var | public var separationIssues: [PaletteSeparationIssue]
+VisualCoreParameters | var | public var shape: ClueShape
 VisualCorePersistence | enum | public enum MigrationError: Error, Equatable, Sendable
 VisualCorePersistence | enum | public enum PersistenceInfo
 VisualCorePersistence | enum | public enum StoreProblem: Error, Equatable, Sendable
@@ -2732,6 +2787,7 @@ VisualCoreSimulation | enum | public enum AccessibilityChoice: String, Sendable,
 VisualCoreSimulation | enum | public enum AnnouncementKind: String, Sendable, Equatable, CaseIterable
 VisualCoreSimulation | enum | public enum BroadPhase2D
 VisualCoreSimulation | enum | public enum Collision2D
+VisualCoreSimulation | enum | public enum ColorVisionChoice: String, Sendable, Codable, CaseIterable, Identifiable
 VisualCoreSimulation | enum | public enum Contacts2D
 VisualCoreSimulation | enum | public enum EmitterShape: Sendable, Equatable, Codable
 VisualCoreSimulation | enum | public enum HapticKind: String, Sendable, Equatable, CaseIterable
@@ -2760,6 +2816,7 @@ VisualCoreSimulation | func | public func clamped() -> ParticleForce
 VisualCoreSimulation | func | public func commands(at step: Int) -> [Command]
 VisualCoreSimulation | func | public func decode(_ u: Float) -> Float
 VisualCoreSimulation | func | public func encode(_ v: Float) -> Float
+VisualCoreSimulation | func | public func encode(to encoder: Encoder) throws
 VisualCoreSimulation | func | public func inertia(mass: Double) -> Double
 VisualCoreSimulation | func | public func instances() -> [ParticleInstance]
 VisualCoreSimulation | func | public func liveCount(source index: Int) -> Int
@@ -2817,6 +2874,7 @@ VisualCoreSimulation | func | public static func capped(_ v: Vec2, to limit: Dou
 VisualCoreSimulation | func | public static func clampedStrength(_ strength: Double) -> Double
 VisualCoreSimulation | func | public static func closestPoint(on capsule: CollisionCapsule, to point: Vec2) -> Vec2
 VisualCoreSimulation | func | public static func collide(_ a: Shape2D, _ poseA: Pose2D, _ b: Shape2D, _ poseB: Pose2D) -> ContactManifold2D?
+VisualCoreSimulation | func | public static func colorVisionKey(prefix: String) -> String
 VisualCoreSimulation | func | public static func derive(_ seed: UInt64, index: UInt64) -> UInt64
 VisualCoreSimulation | func | public static func derive(_ seed: UInt64, label: String) -> UInt64
 VisualCoreSimulation | func | public static func factor(strength: Double, delta: Double) -> Double
@@ -2865,7 +2923,7 @@ VisualCoreSimulation | init | public init(position: Vec2, angle: Double = 0)
 VisualCoreSimulation | init | public init(position: Vec2, angle: Double, velocity: Vec2, angularVelocity: Double, inverseMass: Double,
 VisualCoreSimulation | init | public init(position: Vec2, size: Double, color: Vec4)
 VisualCoreSimulation | init | public init(position: Vec2, velocity: Vec2, group: Int)
-VisualCoreSimulation | init | public init(reduceMotion: AccessibilityChoice = .system, reduceFlashing: AccessibilityChoice = .system)
+VisualCoreSimulation | init | public init(reduceMotion: AccessibilityChoice = .system, reduceFlashing: AccessibilityChoice = .system,
 VisualCoreSimulation | init | public init(reduceMotion: Bool = false, dimFlashingLights: Bool = false)
 VisualCoreSimulation | init | public init(reduceMotion: Bool, autoplay: Bool = true)
 VisualCoreSimulation | init | public init(reduceMotion: Bool, reduceFlashing: Bool)
@@ -3012,6 +3070,7 @@ VisualCoreSimulation | var | public var center: Vec2
 VisualCoreSimulation | var | public var cohesionWeight: Double
 VisualCoreSimulation | var | public var color: Vec4
 VisualCoreSimulation | var | public var colorHex: String
+VisualCoreSimulation | var | public var colorVision: ColorVisionChoice
 VisualCoreSimulation | var | public var correction: Double
 VisualCoreSimulation | var | public var count: Int
 VisualCoreSimulation | var | public var curve: EasingCurve
@@ -3184,9 +3243,12 @@ VisualCoreUI | func | public func reset()
 VisualCoreUI | func | public func text(for entry: Entry) -> String
 VisualCoreUI | func | public func updateUIView(_ uiView: UIView, context: Context)
 VisualCoreUI | func | public static func adjust(_ editor: inout ParameterEditor, _ name: String, up: Bool)
+VisualCoreUI | func | public static func background(for scheme: ColorScheme) -> SIMD3<Double>
 VisualCoreUI | func | public static func contrastRatio(_ a: UIColor, _ b: UIColor) -> Double
 VisualCoreUI | func | public static func explanation(system: SystemAccessibility) -> String
+VisualCoreUI | func | public static func outlineWidth(side: CGFloat) -> CGFloat
 VisualCoreUI | func | public static func rows(_ editor: ParameterEditor) -> [ParameterRow]
+VisualCoreUI | func | public static func spokenLabel(for state: CodedState) -> String
 VisualCoreUI | func | public static func systemValues() -> SystemAccessibility
 VisualCoreUI | init | public init()
 VisualCoreUI | init | public init(editor: Binding<ParameterEditor>)
@@ -3194,6 +3256,7 @@ VisualCoreUI | init | public init(host: RenderHost, accessibilityLabel: String, 
 VisualCoreUI | init | public init(inventory: LicenseInventory? = LicenseInventory(), identifierPrefix: String = "vc.acknowledgements")
 VisualCoreUI | init | public init(preferences: Binding<AccessibilityPreferences>, system: SystemAccessibility, identifierPrefix: String)
 VisualCoreUI | init | public init(source: @escaping @MainActor () -> SystemAccessibility = SystemAccessibilityObserver.systemValues)
+VisualCoreUI | init | public init(state: CodedState, size: CGFloat = 28)
 VisualCoreUI | init | public init?(bundle: Bundle = .main)
 VisualCoreUI | init | public init?(folder: URL)
 VisualCoreUI | let | public let accessibilityHint: String?
@@ -3213,11 +3276,14 @@ VisualCoreUI | let | public static let accent
 VisualCoreUI | let | public static let accentUIColor
 VisualCoreUI | let | public static let adjustStep
 VisualCoreUI | let | public static let changeNotifications: [Notification.Name]
+VisualCoreUI | let | public static let colorVisionExplanation
+VisualCoreUI | let | public static let minimumOutlineWidth: CGFloat
 VisualCoreUI | let | public static let version
 VisualCoreUI | protocol | public protocol AnnouncementSink
 VisualCoreUI | protocol | public protocol HapticSink
 VisualCoreUI | struct | public struct AccessibilitySettingsSection: View
 VisualCoreUI | struct | public struct AcknowledgementsView: View
+VisualCoreUI | struct | public struct ClueBadge: View
 VisualCoreUI | struct | public struct Entry: Codable, Sendable, Equatable, Identifiable
 VisualCoreUI | struct | public struct LicenseInventory: Sendable, Equatable
 VisualCoreUI | struct | public struct ParameterPanel: View
@@ -3227,3 +3293,4 @@ VisualCoreUI | var | public private(set) var announced: [String]
 VisualCoreUI | var | public private(set) var current: SystemAccessibility
 VisualCoreUI | var | public private(set) var played: [HapticKind]
 VisualCoreUI | var | public var body: some View
+VisualCoreUI | var | public var palette: Palette?
