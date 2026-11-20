@@ -14,7 +14,7 @@ or {device} tasks (pure logic). Fixture seed 2_311; tests stay short (< 10 s eac
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G0201-002 Add product and targets `LissajousLabyrinthCore` (`LissajousLabyrinth/Core`, depending on
+- [X] T-R02G0201-002 Add product and targets `LissajousLabyrinthCore` (`LissajousLabyrinth/Core`, depending on — Verified 2026-11-20: 2026-11-20 host exit 0: LissajousLabyrinthLevelTests 4/4 (sine table pinned aa21b9ef…8c79 and within half a unit of sin; refusals and codes; 200 fixtures won by their safe setting and not at the start; round trip byte for byte; newer, edited, invalid, truncated, old forms refused) (.autonomy/migration/checks/R02-G02-01.host.json)
   VisualCoreSimulation and VisualCoreMath) and `LissajousLabyrinthCoreTests` (`LissajousLabyrinth/CoreTests`) to
   `Packages/ExperiencesRound02/Package.swift`; create `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthError.swift`,
   `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthSine.swift` (4,096 entries "round(1,024 · sin(2πk/4,096))", `sin`, `cos`,

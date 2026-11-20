@@ -15,6 +15,8 @@ let package = Package(
     products: [
         // Feature 301 (R02-G01-01): Aurora Loom's rule kernel, a candidate until X-R02-G01.
         .library(name: "AuroraLoomCore", targets: ["AuroraLoomCore"]),
+        // Feature 311 (R02-G02-01): Lissajous Labyrinth's rule kernel, a candidate until X-R02-G02.
+        .library(name: "LissajousLabyrinthCore", targets: ["LissajousLabyrinthCore"]),
     ],
     dependencies: [
         .package(name: visualCore, path: "../VisualCore"),
@@ -29,5 +31,14 @@ let package = Package(
                                    .product(name: "VisualCoreSimulation", package: visualCore),
                                    .product(name: "VisualCoreMath", package: visualCore)],
                     path: "AuroraLoom/CoreTests"),
+        .target(name: "LissajousLabyrinthCore",
+                dependencies: [.product(name: "VisualCoreSimulation", package: visualCore),
+                               .product(name: "VisualCoreMath", package: visualCore)],
+                path: "LissajousLabyrinth/Core"),
+        .testTarget(name: "LissajousLabyrinthCoreTests",
+                    dependencies: ["LissajousLabyrinthCore",
+                                   .product(name: "VisualCoreSimulation", package: visualCore),
+                                   .product(name: "VisualCoreMath", package: visualCore)],
+                    path: "LissajousLabyrinth/CoreTests"),
     ]
 )

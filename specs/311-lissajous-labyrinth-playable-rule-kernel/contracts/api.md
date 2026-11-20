@@ -27,11 +27,15 @@ public struct LissajousLabyrinthLevel: Sendable, Equatable, Codable {
     public init(id:seed:band:amplitudes:frequencyC:start:checkpoints:obstacles:allowance:tutorial:) throws(LissajousLabyrinthError)
     public func encoded() -> Data; public static func decode(_ data: Data) throws(LissajousLabyrinthError) -> LissajousLabyrinthLevel
 }
+public struct LissajousLabyrinthPoint: Sendable, Equatable, Hashable, Codable { public let x, y, z: Int }
 public enum LissajousLabyrinthVerdict: Sendable, Equatable, Hashable { case won, contact(obstacle: Int, tick: Int), missed(checkpoint: Int) }
 public enum LissajousLabyrinthLap {
     public static let ticks = 4_096
-    public static func position(tick: Int, dials: LissajousLabyrinthDials, level: LissajousLabyrinthLevel) -> (x: Int, y: Int, z: Int)
-    public static func segmentTouches(_ p: (x: Int, y: Int, z: Int), _ q: (x: Int, y: Int, z: Int), ball: LissajousLabyrinthBall) -> Bool
+    public static let secondsPerTick: Double; public static let phaseStep = 256
+    public static func position(tick: Int, dials: LissajousLabyrinthDials, level: LissajousLabyrinthLevel) -> LissajousLabyrinthPoint
+    public static func samples(_ dials: LissajousLabyrinthDials, level: LissajousLabyrinthLevel) -> [LissajousLabyrinthPoint]
+    public static func contains(_ ball: LissajousLabyrinthBall, _ point: LissajousLabyrinthPoint) -> Bool
+    public static func segmentTouches(_ p: LissajousLabyrinthPoint, _ q: LissajousLabyrinthPoint, ball: LissajousLabyrinthBall) -> Bool
     public static func verdict(_ dials: LissajousLabyrinthDials, level: LissajousLabyrinthLevel) -> LissajousLabyrinthVerdict
 }
 public struct LissajousLabyrinthAction: Sendable, Equatable, Hashable, Codable { public var dial: LissajousLabyrinthDial; public var value: Int }
