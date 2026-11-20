@@ -135,7 +135,9 @@ stored certificates round-trip; newer and damaged forms are refused.
 - **Start or goal blocked or outside the graph:** refused with a named reason.
 - **Negative costs or costs above 1,000,000:** refused with `r2-f16.negative-cost`.
 - **An estimate that overestimates:** the route may be costlier than optimal and its certificate is then refused.
-- **Search budget exceeded:** the answer is "gave up", never a wrong "unreachable".
+- **Search budget exceeded:** the answer is "gave up", never a wrong "unreachable" (route search and matching take a budget;
+  the time-expanded search is bounded by its schedule's ≤ 16,777,216 states and the cut search by k·E for a cut of
+  size k, so neither needs one).
 - **A pattern larger than the graph:** no placement.
 - **Empty graph or schedule of length 0:** refused or trivial, with a named reason.
 
