@@ -49,7 +49,7 @@ its check record (no trailers). No {owner} tasks; one {device} task. Fixture see
   -- python3 scripts/check_documented_api.py --sources Apps/VisualCore`; new `docs/architecture/swarms.md`; section in
   `Packages/VisualCore/README.md`; section 13.4 row R02-F20 "As built" in `docs/catalog/shared-feature-map.json` and
   `render_autocreator.py`
-- [ ] T-R02F20-008 Reference regression chunk 1 (`--name reference-1`)
+- [X] T-R02F20-008 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-20: 2026-11-20 reference-1 exit 0 (engine xcframework, projectM iOS sim build, clean)
 - [ ] T-R02F20-009 Reference regression chunk 2 (`--name reference-2`)
 - [X] T-R02F20-010 Script tests (`--name script-tests`) — Verified 2026-11-20: 2026-11-20 script-tests-2 exit 0 (543 tests OK); the first run (exit 1) failed only the ledger-unchanged guard because the concurrent rendering run wrote check files (.autonomy/migration/checks/R02-F20.script-tests*.json)
 - [ ] T-R02F20-011 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
