@@ -101,10 +101,37 @@ catalog's levels.
 - **Selection.** The ribbon whose handle was last picked (or whose stepper was last used) is outlined in gold and named in
   the description; the steppers remain an equal way to play.
 
+## Teaching and progression (R02-G01-05)
+
+- **Hints.** `AuroraLoomHints.hint(level:play:)` solves from the current steps (`AuroraLoomSolver.solve(_:from:)`) while
+  the play is `playing`. Level 1 names the ribbon whose winning setting needs the most changes (ties: the larger worst
+  residual, then the lower ribbon), level 2 adds the control (wave when the wave changes), level 3 the exact step.
+  Following the level-3 hint shortens the remaining shortest solution by exactly one. When the remaining shortest
+  exceeds the moves left the hint says so and suggests undo. Hints never change the state, are unlimited and do not
+  affect stars.
+- **Failure explanation.** `AuroraLoomFailureExplanation(play:)` reads the kernel's worst mismatch: "Ribbon r is furthest
+  off at gate g: x of a turn outside the tolerance after the last move. Undo or retry." (x in hundredths, rounded up,
+  at least 0.01). The panel offers Undo and Retry.
+- **Tutorial.** On levels 1 … 3: wave(r) → phase(r) → harmony → done, where r is the level-1 hint's ribbon; a wave move,
+  a phase move and the win advance it; undo never moves it back; `tutorial.dismiss` ends it.
+- **Progress.** Level 1 is open (a session prepared with a seed also opens the levels up to the seed's level); a win in
+  campaign mode records the best moves and stars (3 at the certified shortest, 2 within shortest + 2, else 1) and opens
+  the next level. `level.select` refuses a closed level (`r02-g01.locked`); `level.next` goes to the next open level in
+  cyclic order. Bands are 20 levels each.
+- **Daily and practice.** The daily level of a calendar date is (days from 2026-01-01 × 37) mod 100 + 1 for every valid
+  date of years 1 … 9999; the presenter sends the local date in `mode.daily` (an invalid date: `r02-g01.date`). A daily
+  win records stars without opening levels. Practice plays a copy of the level with the allowance 64 and never changes
+  progress.
+- **State.** Progress and mode are in the digest (domain `r02-g01.aurora-loom.v2`); the tutorial step is not (it never
+  moves back, so undo still restores the earlier digest, R2-G01-INV-05). All three are in snapshot schema 2
+  `{level, mode, progress, records, tutorial}`; undo after a failure rewinds the failing move; schema-1 payloads migrate (campaign, levels up to the saved one open,
+  the level's first tutorial step). Saving to disk comes with R02-G01-07.
+
 ## Failures
 
 `AuroraLoomError` reason codes: `r02-g01.level`, `r02-g01.move`, `r02-g01.stage`, `r02-g01.stale`,
-`r02-g01.allowance`, `r02-g01.newer-schema`, `r02-g01.malformed`, `r02-g01.generation`, `r02-g01.witness`.
+`r02-g01.allowance`, `r02-g01.newer-schema`, `r02-g01.malformed`, `r02-g01.generation`, `r02-g01.witness`. Adapter
+rules: `r02-g01.not-whole`, `r02-g01.locked`, `r02-g01.date`.
 
 ## Sources
 

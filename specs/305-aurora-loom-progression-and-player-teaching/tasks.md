@@ -34,13 +34,13 @@ tests stay short (< 10 s each). No {owner} or {device} tasks.
 ## Phase 4: Adapter, scenarios and panel
 
 - [X] T-R02G0105-004 Edit `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomExperienceCore.swift` (controls "level.select [1…100], mode.daily [year, month, — Verified 2026-11-20: 2026-11-20 R02-G01-05.host-3 exit 0 (adapter 12 tests incl. conformance and migration; scenarios regenerated); catalog search 15 tests pass
-  day], mode.practice, mode.campaign, tutorial.dismiss"; practice allowance 64; progress, mode and tutorial in the digest;
+  day], mode.practice, mode.campaign, tutorial.dismiss"; practice allowance 64; progress and mode in the digest (the tutorial step in the snapshot only, INV-05);
   snapshot schema 2 with a 1 → 2 migration; codes r02-g01.locked, r02-g01.date), `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomScenarios.swift` and the
   regenerated `Packages/ExperiencesRound02/AuroraLoom/scenario-manifest.json`, with
   `Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomExperienceCoreTests.swift` updates (conformance; actions; migration of a schema-1 payload);
   `--name host-3 -- swift test --package-path Packages/ExperiencesRound02 --filter
   'AuroraLoomExperienceCoreTests|AuroraLoomScenarios'`
-- [ ] T-R02G0105-005 Edit `Packages/ExperiencesRound02/AuroraLoom/Experience/AuroraLoomPresenter.swift` and `Packages/ExperiencesRound02/AuroraLoom/Experience/AuroraLoomControls.swift` (instruction line, Hint button
+- [X] T-R02G0105-005 Edit `Packages/ExperiencesRound02/AuroraLoom/Experience/AuroraLoomPresenter.swift` and `Packages/ExperiencesRound02/AuroraLoom/Experience/AuroraLoomControls.swift` (instruction line, Hint button — Verified 2026-11-20: 2026-11-20 R02-G01-05.sim-27-3 exit 0 (round-two sim suite incl. AuroraLoomTeachingTests 7 and gesture undo-digest; sim-27 compile error and sim-27-2 INV-05 failure fixed: tutorial step out of the digest, undo after failure rewinds)
   revealing the next hint level, failure explanation with undo and retry, level picker of open levels, Daily (local
   calendar date) / Practice / Campaign) and create `Packages/ExperiencesRound02/AuroraLoom/ExperienceTests/AuroraLoomTeachingTests.swift` (agent D: hint levels through the
   presenter, failure text, picker refusals, daily and practice through the port); `--name sim-27 -- python3
@@ -49,7 +49,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks.
 
 ## Phase 5: Regression, documentation and close
 
-- [ ] T-R02G0105-006 Docs: `docs/architecture/aurora-loom.md` (teaching and progress), `Packages/ExperiencesRound02/README.md`,
+- [X] T-R02G0105-006 Docs: `docs/architecture/aurora-loom.md` (teaching and progress), `Packages/ExperiencesRound02/README.md`, — Verified 2026-11-20: 2026-11-20 R02-G01-05.round02-host exit 0, audits exit 0
   `docs/automatedtesting.md`; `--name round02-host`; `--name audits -- python3 scripts/verify_experiences.py --audits
   --only r02-g01.aurora-loom`
 - [ ] T-R02G0105-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,

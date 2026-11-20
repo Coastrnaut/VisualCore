@@ -41,6 +41,13 @@ position mappings, R02-F22 spatial handles), `AuroraLoomOrbit` with the orbit-aw
 `AuroraLoomGestureController` (one move per gesture, two-finger orbit, selection); the presenter routes canvas touches
 through it and the scene draws the rails, dials and the selected ribbon's outline.
 
+Feature 305 (R02-G01-05) adds teaching and progression: `AuroraLoomSolver.solve(_:from:)`, `AuroraLoomHints`
+(`AuroraLoomHint` in three levels: ribbon, control, exact step; `AuroraLoomFailureExplanation`), and in
+`AuroraLoomProgress.swift` the `AuroraLoomTutorialStep`, `AuroraLoomMode` (campaign, practice, daily) and
+`AuroraLoomProgress` (open levels, best moves, stars, the clock-free daily level). The adapter writes snapshot schema 2
+with a migration from schema 1; the panel shows the instruction, hints, the failure explanation with Undo and Retry, a
+level picker and the three modes.
+
 ## Lissajous Labyrinth (R02-G02, `r02-g02.lissajous-labyrinth`, free)
 
 `LissajousLabyrinthCore` (feature 311, R02-G02-01) is the playable rule kernel: the integer `LissajousLabyrinthSine`,
