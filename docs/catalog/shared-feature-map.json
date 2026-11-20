@@ -113,8 +113,8 @@
   "F11": {
    "disposition": "new",
    "existing": [],
-   "home": "(new) VisualCoreGeometry, VisualCoreShaderSource",
-   "note": "Signed-distance and constructive-geometry library with CPU proxies that decide outcomes."
+   "home": "VisualCoreScenes, VisualCoreRendering (shader library)",
+   "note": "As built (feature 211, in VisualCoreScenes beside the meshes; no VisualCoreGeometry module): SDFShape (plane, sphere, box, rounded box, capsule, torus; union, intersection, subtraction, smooth union; translation, unit-quaternion rotation, uniform scale; 256 nodes, depth 32) with CPU distance, normal and containment as the proxy that decides outcomes; SDFMarch (conservative and fast over-relaxed sphere tracing, never skipping a surface); SDFVolume (n³ cell-centre sampling with an FNV-1a digest); SDFDocument (schema-1 JSON); glslFunction(name:) and vc/sdfshape.glsl, matching the CPU on the simulator."
   },
   "F12": {
    "disposition": "new",

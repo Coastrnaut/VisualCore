@@ -412,6 +412,13 @@ output size (half-float where supported), with exposure and tone mapping in line
 flash limiter measure linear light for graphs that contain it. Rules:
 [docs/architecture/shaders.md](../../docs/architecture/shaders.md).
 
+## Signed-distance shapes (feature 211, R02-F11)
+
+Shader include `vc/sdfshape.glsl` (`vc_sdPlane`, `vc_sdRoundBox`, `vc_sdCapsule`, `vc_opUnion`, `vc_opIntersect`,
+`vc_opSubtract`, `vc_opSmoothUnion`; includes `vc/sdf.glsl`) runs the functions that `SDFShape.glslFunction(name:)`
+emits; the generated distance matches the CPU within 0/255 and the marched hit mask matches `SDFMarch` away from
+silhouettes. Rules: [docs/architecture/sdf-proxies.md](../../docs/architecture/sdf-proxies.md).
+
 ## Colour accessibility (feature 210, R02-F10)
 
 Shader includes `vc/spectral.glsl` (`vc_linearToOklab`, `vc_oklabToLinear`, `vc_hueRotate`, `vc_simulateCVD`) and

@@ -359,6 +359,16 @@ composite, premultiplied over); `composite` mode 2 is premultiplied over; the va
 and out-of-range emissive ones. `RenderState.premultipliedBlended` draws premultiplied layers. Rules:
 [docs/architecture/shaders.md](../../docs/architecture/shaders.md).
 
+## Signed-distance shapes (feature 211, R02-F11)
+
+VisualCoreScenes: `SDFShape` describes a shape from planes, spheres, boxes, rounded boxes, capsules and tori with
+union, intersection, subtraction, smooth union, translation, rotation and uniform scale (validating makers, at most 256
+nodes and depth 32, refusals as `SDFError` with `r2-f11.*` codes); it gives the signed distance, the normal and
+containment on the CPU — the proxy that decides outcomes — and `glslFunction(name:)` emits the same description for
+the shader. `SDFMarch` sphere-traces a `Ray3` (conservative or fast, neither skips a surface), `SDFVolume` samples an
+n³ grid with a replayable digest, `SDFDocument` stores a description (schema 1). Rules:
+[docs/architecture/sdf-proxies.md](../../docs/architecture/sdf-proxies.md).
+
 ## Colour accessibility (feature 210, R02-F10)
 
 VisualCoreParameters: `PerceptualColor` (sRGB ↔ linear ↔ OKLab ↔ OKLCh, relative luminance, WCAG `contrastRatio`, ΔE_OK
