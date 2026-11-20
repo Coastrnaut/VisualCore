@@ -24,7 +24,7 @@ tests stay light beside the timed R02-F05 test.
 
 ## Phase 3: Story 1 — find a route (P1) 🎯
 
-- [ ] T-R02F16-003 [P] [US1] Create `Packages/VisualCore/Sources/VisualCoreSimulation/RouteSearch.swift` (RouteOutcome; breadth-first in edge insertion order;
+- [X] T-R02F16-003 [P] [US1] Create `Packages/VisualCore/Sources/VisualCoreSimulation/RouteSearch.swift` (RouteOutcome; breadth-first in edge insertion order; — Verified 2026-11-19: lead retest 2026-11-19: R02-F16.host-3.json (exit 0, full suite; R02-F16.host-2.json had failed only the mesh-budget timing beside the full suite, now asserted in R02-F16.timing.json, exit 0); RouteSearchTests 8 passed (500 seeded grids and 500 costed graphs equal reference optima and repeat; potentials hold; gaveUp; estimate refusal; estimates clamped against overflow)
   best-first by (g + h, h, node id) on an internal binary heap; budget "1 … 16,777,216, default n", gaveUp; potentials per
   research R4 and the "estimate" refusal; unreachable closed set) with `Packages/VisualCore/Tests/VisualCoreSimulationTests/RouteSearchTests.swift` (500 seeded grids and
   500 seeded costed graphs equal a reference Bellman–Ford or exhaustive optimum and repeat identically; start = goal;
