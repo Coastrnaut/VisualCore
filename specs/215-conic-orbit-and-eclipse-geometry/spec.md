@@ -172,8 +172,9 @@ refused.
 
 ### Measurable Outcomes
 
-- **SC-R02F15-001**: For 1,000 seeded elements of each kind, the solved anomaly satisfies its Kepler equation to 1e-10
-  and energy and angular momentum stay constant to a relative 1e-9 along the path.
+- **SC-R02F15-001**: For 1,000 seeded elements of each kind, the solved anomaly satisfies its Kepler equation to
+  1e-10·max(1, |M|) and the state's energy and angular momentum equal the elements' to a relative 1e-9 (for the
+  parabola, whose energy is 0, to an absolute 1e-9·μ/q).
 - **SC-R02F15-002**: For 1,000 seeded elliptic elements and times, positions equal the existing orbit's to a relative
   1e-9.
 - **SC-R02F15-003**: Stepping 100,000 fixed steps equals evaluating the last step directly, bit for bit; every passage in

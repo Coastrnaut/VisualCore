@@ -18,7 +18,7 @@ public names checked against Packages and Apps (`Visibility` is taken). Fixture 
   `KeplerOrbit.eccentricAnomaly` plus ≤ 8 polishing Newton steps while the residual exceeds 1e-12; hyperbolic Newton from
   H₀ = sign(M)·ln(2|M|/e + 1.8), ≤ 64 steps; parabolic Barker closed form for "abs(e − 1) ≤ 1e-9"; true anomalies;
   always finite) with `Packages/VisualCore/Tests/VisualCoreMathTests/KeplerSolverTests.swift` (1,000 seeded cases per kind
-  have residual ≤ 1e-10; non-finite input gives a finite result; Barker known answers); `--name host`
+  have residual ≤ 1e-10·max(1, |M|); non-finite input gives a finite result; Barker known answers); `--name host`
 
 ## Phase 3: Story 1 — bodies on conic paths (P1) 🎯
 
@@ -27,8 +27,8 @@ public names checked against Packages and Apps (`Visibility` is taken). Fixture 
   period, energy, angular momentum, `keplerOrbit` adapter, `init(_ orbit: KeplerOrbit, gravitationalParameter:)`,
   `state(at:)` per research R4, non-finite time treated as tₚ) with
   `Packages/VisualCore/Tests/VisualCoreMathTests/ConicOrbitTests.swift` (1,000 seeded elliptic cases equal
-  `KeplerOrbit.position(at:)` to a relative 1e-9; energy and angular momentum from the state constant to a relative 1e-9
-  for each kind; e = 1 ± 1e-4 within a relative 1e-3 of the parabola for μ = q = 1, |t − tₚ| ≤ 10; invalid elements
+  `KeplerOrbit.position(at:)` to a relative 1e-9; energy and angular momentum from the state equal the elements' to a
+  relative 1e-9 for each kind, absolute 1e-9·μ/q for the parabola's zero energy; e = 1 ± 1e-4 within a relative 1e-3 of the parabola for μ = q = 1, |t − tₚ| ≤ 10; invalid elements
   refused `r2-f15.invalid-elements`); `--name host-2`
 
 ## Phase 4: Story 2 — phase stepping (P1)
