@@ -53,7 +53,9 @@ or {device} tasks (pure logic and host-generated content). Fixture seed 2_312; t
   verdict; the non-coprime counterexample is refused by the rules; frequencies 1 handled); `--name host-4`
 - [ ] T-R02G0202-006 [US2] [US3] [US4] Create `Packages/ExperiencesRound02/LissajousLabyrinth/CoreTests/LissajousLabyrinthCatalogTests.swift` (100 entries, 20 per
   band; the catalog generated twice is identical; pinned digest; `ProgressionRule.standard` holds on shortest; band means
-  of shortest never fall and of winning settings never rise; each witness equals
+  of shortest never fall and of winning settings never rise; on levels 1, 11, 21, … 91 (two per band) the winning set
+  equals a brute-force verdict of all legal settings and the shortest equals a plain BFS judged by the verdict
+  (SC-R02G0202-002); each witness equals
   `docs/games/lissajous-labyrinth/levels/NNN.witness.json` byte for byte, one test per band, written only with
   `LISSAJOUS_LABYRINTH_WRITE_WITNESSES=1`) and generate the 100 files; `--name host-5`
 
