@@ -98,7 +98,7 @@
   `render_autocreator.py`; copyright scan: no image, font or icon file added (`git diff --stat` of the feature)
 - [X] T-R02F10-012 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F10.reference-1.json (exit 0)
 - [X] T-R02F10-013 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F10.reference-2.json (exit 0)
-- [ ] T-R02F10-014 Script tests (`--name script-tests`)
+- [X] T-R02F10-014 Script tests (`--name script-tests`) — Verified 2026-11-19: 2026-11-19 R02-F10.script-tests-2.json (exit 0) after the module-import check learned scoped imports (first attempt R02-F10.script-tests exit 1: ShellModel's import enum VisualCoreSimulation.ColorVisionChoice read as module enum)
 - [ ] T-R02F10-015 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
 
 ## Device campaign (after ImplementationLock-100)

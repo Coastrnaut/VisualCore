@@ -3630,7 +3630,9 @@ class ExperienceModuleTests(unittest.TestCase):
                 if word in self.STORAGE_FILES.get(path.name, ()) or word in self.CLOCK_FILES.get(path.name, ()):
                     continue
                 self.assertNotIn(word, code, f"{path.name} names {word}")
-            imports = set(re.findall(r"^import\s+(\w+)", text, re.M))
+            # A scoped import (`import enum Module.Name`, feature 210) names its module after the kind keyword.
+            imports = set(re.findall(r"^import\s+(?:(?:typealias|struct|class|enum|protocol|let|var|func)\s+)?(\w+)",
+                                     text, re.M))
             # UA-F02 adds the pure modules the experience contract adapts; nothing else may be imported.
             # UA-F06 adds the diagnostics module: an experience declares its quality profile with it.
             allowed = {"Foundation", "VisualCoreMath", "VisualCoreSimulation", "VisualCorePersistence",
