@@ -171,6 +171,8 @@ player can reach offers a bounded number of moves, and the search that proves it
 - Each puzzle experience supplies its own rules; this slice ships the contract, validation, uniqueness search, fairness
   checks, generator and stored form, proved on small puzzles written in the tests.
 - No user interface: level select, hints, colours and layout belong to the consuming experiences.
+- A candidate maker draws only from the generator it is given and keeps no state of its own, so a seed fully
+  determines the candidates; levels are drawn in code by the consuming experiences on iPhone and iPad alike.
 
 ## Traceability
 
