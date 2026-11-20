@@ -1,0 +1,63 @@
+# Tasks: R02-G01-06 — Aurora Loom: polish and accessibility
+
+**Input**: [spec.md](spec.md), [plan.md](plan.md), [research.md](research.md), [data-model.md](data-model.md),
+[contracts/api.md](contracts/api.md), [quickstart.md](quickstart.md). Gate R02-G01-06 (migration ledger). Evidence:
+`python3 scripts/migration_ledger.py run-check --gate R02-G01-06 --name <check> -- <command>` (never a scratchpad path;
+recorded only after every agent has reported). Commit after every task with its check record (no trailers). Seed 2_306;
+tests stay short (< 10 s each). {device} items (hearing, feeling, VoiceOver on hardware) are D1–D3 observations after
+ImplementationLock-100 and are not tasks here. No {owner} tasks.
+
+## Phase 1: Setup
+
+- [ ] T-R02G0106-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test
+  --package-path Packages/ExperiencesRound02`; the rendering baseline is R02-G02-02's rendering runs (exit 0)
+- [ ] T-R02G0106-002 Add the `VisualCoreAudioDSP` product to `AuroraLoomCore` in `Packages/ExperiencesRound02/Package.swift`
+  (no other change); `--name host -- swift test --package-path Packages/ExperiencesRound02`
+
+## Phase 2: Story 1 — VoiceOver play (P1) 🎯
+
+- [ ] T-R02G0106-003 [P] [US1] Create `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomFeedbackPlan.swift` (announcement "text and kind" and haptic
+  per clarifications Q1, Q2; "outcome replaces the move's selection"; `refused(code:)` → rejection + error) with
+  `Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomFeedbackPlanTests.swift` (exact texts for move, undo, redo, win, failure, level, mode,
+  refusal; no plan for an unchanged core); `--name host-2`
+
+## Phase 3: Story 2 — comfort settings (P1)
+
+- [ ] T-R02G0106-004 [P] [US2] Create `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomLights.swift` ("12 crossing levels 0…1, win glow 0…1; 0.15 s,
+  0.45 s under Reduce Flashing"; `maxHalfRangeCrossingsPerSecond`) with `Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomLightsTests.swift`
+  (a scripted win sampled at 60 Hz stays ≤ 3 half-range crossings per second under Reduce Flashing; every half-range
+  change takes ≥ 0.4 s; targets reached); `--name host-3`
+
+## Phase 4: Story 3 — sound and haptics (P2)
+
+- [ ] T-R02G0106-005 [P] [US3] Create `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomSoundRecipe.swift` (pure recipe from steps and stage; won adds a
+  fifth; failed is quieter) with `Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomSoundRecipeTests.swift` (purity; differs per wave step and
+  stage; partials within the recipe type's limits); `--name host-4`
+
+## Phase 5: Wiring (presenter, panel, scene, sound)
+
+- [ ] T-R02G0106-006 Edit `Packages/ExperiencesRound02/AuroraLoom/Experience/AuroraLoomPresenter.swift` (injectable `feedback` route; plans routed through the
+  port after `describe` and on refusals; feedback log; eased lights stepped each frame), `Packages/ExperiencesRound02/AuroraLoom/Experience/AuroraLoomControls.swift`
+  (ScrollView, Dynamic Type text styles, labels and values for every control, Sound toggle, iPad width ≤ 520 points,
+  refusals through the presenter), `Packages/ExperiencesRound02/AuroraLoom/Experience/AuroraLoomRibbonScene.swift` (gate and win brightness from the
+  presenter's lights) and create `Packages/ExperiencesRound02/AuroraLoom/Experience/AuroraLoomSound.swift` (A21 rule; rebuild at level open, play end, toggle
+  on); with `Packages/ExperiencesRound02/AuroraLoom/ExperienceTests/AuroraLoomAccessibilityTests.swift` (agent C: recorded announcements and haptics through
+  the port for scripted sequences; labels and values; panel at the largest text size; sound state table; Reduce Motion
+  frames identical); `--name sim-27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02
+  --scheme ExperiencesRound02-Package --destination sim-27.2 --action test`
+
+## Phase 6: Regression, documentation and close
+
+- [ ] T-R02G0106-007 Docs: `docs/architecture/aurora-loom.md` (polish and accessibility), `Packages/ExperiencesRound02/README.md`,
+  `docs/automatedtesting.md`; `--name round02-host`
+- [ ] T-R02G0106-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+  `--name host-full`, `--name app-unit`
+- [ ] T-R02G0106-009 Reference regression chunk 1 (`--name reference-1`)
+- [ ] T-R02G0106-010 Reference regression chunk 2 (`--name reference-2`)
+- [ ] T-R02G0106-011 Script tests, run alone (`--name script-tests`)
+- [ ] T-R02G0106-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+
+## Dependencies and parallel work
+
+001 → 002 → {003 (agent A), 004 and 005 (agent B)} → 006 (lead; agent C writes the simulator tests) → 007 … 012.
+Shared files (Package.swift, presenter, controls, scene, sound, docs) stay with the lead. MVP: Story 1.
