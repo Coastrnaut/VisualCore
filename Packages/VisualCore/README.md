@@ -359,6 +359,15 @@ composite, premultiplied over); `composite` mode 2 is premultiplied over; the va
 and out-of-range emissive ones. `RenderState.premultipliedBlended` draws premultiplied layers. Rules:
 [docs/architecture/shaders.md](../../docs/architecture/shaders.md).
 
+## Shadows and silhouettes (feature 213, R02-F13)
+
+VisualCoreScenes decides shadow puzzles on the CPU: `ShadowProjector` projects points, triangles, meshes and convex
+solids onto a `ProjectionPlane` (a `ClipPlane` with a fixed u, v basis) from a point or directional `ShadowLight`,
+clipped to the slab where shadows are cast, and gives the same projection as a matrix; `ConvexHull2D` gives a solid's
+outline; `CoverageMask` rasterises polygons by cell centres (1…2,048 cells a side, half-open edges, packed bits, digest,
+`CoverageMaskDocument` schema 1); `MaskComparison` gives intersection, union and IoU. Refusals are `ShadowError` with
+`r2-f13.*` codes. Rules: [docs/architecture/shadow-silhouettes.md](../../docs/architecture/shadow-silhouettes.md).
+
 ## Convex solids and cuts (feature 212, R02-F12)
 
 VisualCoreScenes: `ConvexSolid` holds vertices and outward convex polygon faces (at most 4,096 vertices, 1,024 faces,

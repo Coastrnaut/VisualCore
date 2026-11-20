@@ -127,8 +127,8 @@
    "existing": [
     "MeshRenderer"
    ],
-   "home": "(new) VisualCoreGeometry, VisualCoreRendering",
-   "note": "Shadow volumes or stencils and silhouette analysis; CPU decides, GPU portrays."
+   "home": "VisualCoreScenes, VisualCoreRendering",
+   "note": "As built (feature 213; no VisualCoreGeometry module): ShadowLight, ProjectionPlane, ShadowProjector (slab-clipped projection of points, triangles, meshes and convex solids, and the matching planar matrix), ConvexHull2D, CoverageMask (cell-centre rasteriser, packed bits, digest, schema-1 document) and MaskComparison (IoU) in VisualCoreScenes decide; PlanarShadowRenderer in VisualCoreRendering portrays with single darkening and no readback for logic."
   },
   "F14": {
    "disposition": "extend",

@@ -412,6 +412,14 @@ output size (half-float where supported), with exposure and tone mapping in line
 flash limiter measure linear light for graphs that contain it. Rules:
 [docs/architecture/shaders.md](../../docs/architecture/shaders.md).
 
+## Planar shadows (feature 213, R02-F13)
+
+`PlanarShadowRenderer` draws a mesh's shadow on a plane with the projection of `ShadowProjector.matrix(light:onto:)`:
+a coverage pass into a pooled `.rgba8` target, then one composite of a constant `darkness`, so every covered pixel
+darkens once (no stencil buffer needed); GL state is restored and GPU objects are rebuilt after a context recreation.
+It only portrays: decisions come from the CPU mask. Rules:
+[docs/architecture/shadow-silhouettes.md](../../docs/architecture/shadow-silhouettes.md).
+
 ## Signed-distance shapes (feature 211, R02-F11)
 
 Shader include `vc/sdfshape.glsl` (`vc_sdPlane`, `vc_sdRoundBox`, `vc_sdCapsule`, `vc_opUnion`, `vc_opIntersect`,
