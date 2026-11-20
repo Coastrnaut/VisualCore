@@ -2,8 +2,8 @@
 
 ```swift
 public struct AuroraLoomFeedbackPlan: Sendable, Equatable {
-    public let announcement: (text: String, kind: AnnouncementKind)?   // as Equatable fields: text: String?, kind: AnnouncementKind?
-    public let haptic: HapticKind?
+    public let text: String?; public let kind: AnnouncementKind?; public let haptic: HapticKind?
+    public init(text: String?, kind: AnnouncementKind?, haptic: HapticKind?); public static let none
     public static func after(old: AuroraLoomExperienceCore, new: AuroraLoomExperienceCore) -> AuroraLoomFeedbackPlan
     public static func refused(code: String) -> AuroraLoomFeedbackPlan        // rejection + error
 }

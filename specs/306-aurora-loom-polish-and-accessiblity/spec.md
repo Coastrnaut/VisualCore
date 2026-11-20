@@ -51,9 +51,10 @@ creation; Aurora (A21) holds its sound choice in the presenter, off by default; 
   instead of the move's selection when one action causes both. Impact: FR-R02G0106-003; SC-R02G0106-002.
 - Q: How are fades done and measured under Reduce Flashing? → A: the presenter keeps a per-gate and per-ribbon light
   level that eases toward its target in presentation time (0.15 s normally, 0.45 s under Reduce Flashing, linear), plus
-  the win glow ramp; the state and digest never see it. The measure: sampling the drawn light levels every 1/60 s
-  through a scripted win, no element crosses half its range more than 3 times per second, and every change of more than
-  half the range takes at least 0.4 s under Reduce Flashing. Impact: FR-R02G0106-004; SC-R02G0106-003.
+  the win glow ramp; under Reduce Flashing a fade that has started finishes before it may turn back, so a flickering
+  target cannot hold a level around half; the state and digest never see it. The measure: sampling the drawn light
+  levels every 1/60 s through a scripted win and adversarial flicker, no element crosses half its range more than 3 times
+  per second, and every complete one-way fade of more than half the range takes at least 0.4 s under Reduce Flashing. Impact: FR-R02G0106-004; SC-R02G0106-003.
 - Q: Where does the sound choice live, and when does the ambient recipe change? → A: a Sound toggle in the panel, off by
   default, held by the presenter (presentation only, not state; saving it is R02-G01-07). The recipe is a pure function
   of the three ribbons' current steps and the stage (partials at a pentatonic mapping of each wave step, a brighter
