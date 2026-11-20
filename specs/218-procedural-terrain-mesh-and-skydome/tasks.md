@@ -34,7 +34,7 @@ its check record (no trailers). No {owner} tasks; one {device} task. Fixture see
 
 ## Phase 5: Story 3 — procedural sky (P1)
 
-- [ ] T-R02F18-005 [P] [US3] Create `Packages/VisualCore/Sources/VisualCoreScenes/SkyModel.swift` (clarification Q4) with `Packages/VisualCore/Tests/VisualCoreScenesTests/SkyModelTests.swift` (zenith, horizon and
+- [X] T-R02F18-005 [P] [US3] Create `Packages/VisualCore/Sources/VisualCoreScenes/SkyModel.swift` (clarification Q4) with `Packages/VisualCore/Tests/VisualCoreScenesTests/SkyModelTests.swift` (zenith, horizon and — Verified 2026-11-19: lead retest 2026-11-19: R02-F18.host.json (exit 0; SkyModelTests 8 passed) and R02-F18.rendering-27.json (exit 0, full VisualCoreRendering suite on iOS 27.2: SkyShaderTests worst 1/255 over a 64 × 64 grid for 9 sun positions, SkyRendererTests 5 passed (worst 1/255, sky only at far depth, GL state restored, no leak), ShaderBundleTests compiles vc/sky.glsl alone)
   ground colours at their directions; no disc below −r; night darker than day; finite for the sun below, at and above the
   horizon; direction refusals), `Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/sky.glsl` (`vc_sky`) with `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/SkyShaderTests.swift` (a full grid of
   directions for at least 8 sun positions within 2 of 255 of `SkyModel`; no leak) and `Packages/VisualCoreRendering/Sources/VisualCoreRendering/SkyRenderer.swift` with
