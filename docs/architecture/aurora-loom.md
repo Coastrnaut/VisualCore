@@ -33,10 +33,38 @@ hex of the schema, the level fingerprint, the six steps, the moves spent and the
 refused. `AuroraLoomRules` expresses the rules as an R02-F23 `PuzzleRules`, so R02-G01-02 can generate and certify the
 catalog's levels.
 
+## Content: generator, solver and witnesses (R02-G01-02)
+
+- **Manifest.** `AuroraLoomManifest.entries` holds the 100 planned levels of the archived design (number, planned seed,
+  band, move budget; 20 per band). The move budget becomes the level's allowance.
+- **Generator.** `AuroraLoomGenerator.generate` draws candidate k of an entry from
+  `SeededRandom(seed: SeedDerivation.derive(seed, index: k))`: a winning (wave, phase) shared by the three ribbons, four
+  distinct gate positions, target offsets of at most half the tolerance and a scramble of 1 … 6 controls. Every ribbon
+  turns with Ω. `AuroraLoomBandProfile` sets Ω (16, 32, 64, 128, 256), the tolerance (160, 96, 64, 40, 24) and the shortest
+  solution accepted (1–2 … 5–6) for bands 1 … 5. The first candidate the solver proves inside the band and the budget is
+  kept (at most 64; otherwise `r02-g01.generation`). Ids are `aurora-loom-NNN`; levels 1 … 3 have a tutorial.
+- **Solver.** Ribbons do not interact, so `AuroraLoomSolver.solve` solves each among its 256 settings: coordinate descent
+  (wave, then phase, each the value with the smallest largest |residual|, at most 32 sweeps), then the exact grid, which
+  proves the fewest changes (0, 1 or 2). The shortest solution is their sum; the witness moves go by ribbon, wave before
+  phase; ties go to the lower (wave, phase). A ribbon turning with Ω has the same residual at every tick, so its score is
+  read at tick 0 (exact). The method is `descent` when descent alone reached the optimum on every ribbon, else `grid`; the
+  work is the number of settings evaluated.
+- **Difficulty.** `AuroraLoomDifficulty` keeps the shortest solution, the work, the winning settings, the tolerance and Ω;
+  `puzzleDifficulty` feeds R02-F24's `ProgressionRule.standard`, which the catalog keeps; band means of shortest and work
+  do not fall.
+- **Witnesses.** `AuroraLoomWitness` (schema 1) replays the solution on a play and stores the level, the actions, the
+  fingerprint after `begin` (and the tutorial) and after each action, the terminal worst mismatch, a counterexample (ribbon
+  0's phase one step on, which always loses because every tolerance is below one phase step of 256 units), the difficulty,
+  the method and the skipped candidates. The 100 files are `docs/games/aurora-loom/levels/NNN.witness.json`; the catalog
+  test compares them byte for byte and writes them only with `AURORA_LOOM_WRITE_WITNESSES=1`. Decoding replays the actions
+  and refuses newer (`r02-g01.newer-schema`), damaged (`r02-g01.malformed`) and edited witnesses (`r02-g01.witness`).
+- **Catalog digest.** `AuroraLoomGenerator.catalogDigest` is `PuzzleCatalog<AuroraLoomRules>.digest(id: "aurora-loom",
+  identities:)` over the level fingerprints in manifest order, pinned in `AuroraLoomCatalogTests`.
+
 ## Failures
 
 `AuroraLoomError` reason codes: `r02-g01.level`, `r02-g01.move`, `r02-g01.stage`, `r02-g01.stale`,
-`r02-g01.allowance`, `r02-g01.newer-schema`, `r02-g01.malformed`.
+`r02-g01.allowance`, `r02-g01.newer-schema`, `r02-g01.malformed`, `r02-g01.generation`, `r02-g01.witness`.
 
 ## Sources
 
