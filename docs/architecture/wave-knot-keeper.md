@@ -1,0 +1,63 @@
+# Wave Knot Keeper (R02-G03) — rules
+
+Experience `r02-g03.wave-knot-keeper` (free) of the one VisualCore app; package `Packages/ExperiencesRound02`, target
+`WaveKnotKeeperCore` (feature 321, R02-G03-01). The player reshapes a closed glowing rope one lattice step at a time,
+never passing it through itself except inside the level's crossing gates, until its projected crossings and knot
+signature match the target. Everything here is pure, exact integer logic; drawing, controls and sound come in later
+features of R02-G03.
+
+## Rope
+
+- **Control points.** A level's rope is a closed polygon of 6 … 16 distinct control points with integer coordinates in
+  −16 … 16 on each axis; segment i joins point i to point i + 1, the last to the first. The drawn spline of later
+  features passes through these points; every rule uses the polygon.
+- **Simple.** No two non-adjacent segments meet and no two adjacent segments fold back over each other. A level's start
+  must be simple; legal moves keep the rope simple.
+- **Tension.** The sum over the segments of the squared length, an integer. A move that would raise it above the level's
+  bound is refused (`r02-g03.move("tension")`).
+
+## Moves
+
+A move steps one control point P one unit along ±x, ±y or ±z to P′. It must stay in bounds and not land on another point.
+With neighbours A and B, it sweeps the triangles A-P-P′ and P-P′-B; it is refused (`r02-g03.move("crossing")`) when a
+segment that does not end at P meets either triangle, except that the segment ending at A may touch A-P-P′ at A alone and
+the segment starting at B may touch P-P′-B at B alone. Inside a crossing gate (an inclusive integer box holding both P and
+P′) strands may pass. All of it is decided with integer orientation determinants (`WaveKnotKeeperGeometry`); two
+coplanar figures meet exactly when their projections onto all three coordinate planes meet.
+
+## Verdict
+
+The rope is projected onto the xy-plane. Every pair of non-adjacent segments whose projections cross at one point
+interior to both counts one crossing, signed by the right-hand rule: +1 when the cross product of the over-strand's and
+the under-strand's xy directions is positive (the over-strand has the larger z at the crossing), −1 otherwise. The
+summary is the crossing count and the writhe (the sum of signs). A projection is degenerate when a non-adjacent pair
+touches at an endpoint, overlaps collinearly or crosses at equal z; a degenerate projection never wins. The level is won
+exactly when the projection is not degenerate and the summary equals the target. A level whose start already wins is
+refused.
+
+## Play
+
+`WaveKnotKeeperPlay` moves through loading, tutorial, playing, paused, won or failed and result. A move is checked in
+order: stage, previous fingerprint, point index, bounds, coincidence, sweep, tension, allowance; a refused move changes
+nothing. The verdict follows every accepted move, undo and redo; spending the last move without a win fails the level with
+the final summary as its explanation. Undo steps the point back and refunds the move, redo re-applies it, a new move
+clears redo. Every accepted action appends a `WaveKnotKeeperRecord` with the previous and next fingerprint, so a trace
+replays to the same states everywhere. The fingerprint is the SHA-256 hex of the schema, the level fingerprint, the
+points, the moves spent and the stage.
+
+## Levels and puzzle contract
+
+`WaveKnotKeeperLevel` is immutable and fingerprinted (SHA-256 of its canonical JSON with sorted keys, schema 1): id,
+seed, band 1 … 5, points, 0 … 4 gates, target (crossings 0 … 32, writhe −32 … 32 of matching parity), tension bound,
+allowance 1 … 64 and tutorial. Decoding re-checks every rule and the fingerprint; damaged, edited and newer forms are
+refused. `WaveKnotKeeperRules` expresses the game as the R02-F23 `PuzzleRules` contract: a state is the rope, the legal
+moves are listed point by point and direction by direction, and a state is solved when it wins the level.
+
+## Failures
+
+`WaveKnotKeeperError` reason codes: `r02-g03.level`, `r02-g03.move`, `r02-g03.stage`, `r02-g03.stale`,
+`r02-g03.allowance`, `r02-g03.newer-schema`, `r02-g03.malformed`.
+
+## Sources
+
+The game design is VisualCore's own (archived round-two design); the code is original. Nothing here draws.

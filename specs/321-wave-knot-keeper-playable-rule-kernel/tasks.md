@@ -49,7 +49,7 @@ recorded only after every agent has reported). Commit after every task with its 
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02G0301-007 Docs: `docs/architecture/wave-knot-keeper.md` (rules), `Packages/ExperiencesRound02/README.md`,
+- [X] T-R02G0301-007 Docs: `docs/architecture/wave-knot-keeper.md` (rules), `Packages/ExperiencesRound02/README.md`, — Verified 2026-11-20: 2026-11-20 round02-host exit 0; docs/architecture/wave-knot-keeper.md, Packages/ExperiencesRound02/README.md, docs/automatedtesting.md
   `docs/automatedtesting.md`; `--name round02-host`
 - [ ] T-R02G0301-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
   `--name host-full`

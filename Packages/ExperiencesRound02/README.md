@@ -83,3 +83,13 @@ immutable `LissajousLabyrinthSceneSnapshot` with `LissajousLabyrinthPalette` and
 and CPU reference `LissajousLabyrinthSceneGeometry`, the GLSL sources `LissajousLabyrinthShaders` and the scenarios; in
 the iOS-only target `LissajousLabyrinthExperience` the presenter, the GL thread scene and a minimal control panel. It is
 a registered candidate of the one app until X-R02-G02.
+
+## Wave Knot Keeper (R02-G03, `r02-g03.wave-knot-keeper`, free)
+
+`WaveKnotKeeperCore` (feature 321, R02-G03-01) is the playable rule kernel: `WaveKnotKeeperLevel` with
+`WaveKnotKeeperPoint`, `WaveKnotKeeperGate` and `WaveKnotKeeperTarget` (immutable, fingerprinted, JSON schema 1), the
+exact integer geometry `WaveKnotKeeperGeometry` (sweep test, xy-projection crossings and writhe, simplicity, tension)
+with `WaveKnotKeeperSummary`, the play state `WaveKnotKeeperPlay` with `WaveKnotKeeperStage`, `WaveKnotKeeperEvent`,
+`WaveKnotKeeperMove`, `WaveKnotKeeperDirection` and append-only `WaveKnotKeeperRecord`s, and `WaveKnotKeeperRules` for
+the R02-F23 puzzle contract. Refusals are `WaveKnotKeeperError` with `r02-g03.*` codes. Rules:
+[docs/architecture/wave-knot-keeper.md](../../docs/architecture/wave-knot-keeper.md).
