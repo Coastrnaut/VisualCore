@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-20
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G01-03 (migration ledger, game feature of experience R02-G01) · ID namespace FR-R02G0103-###,
 SC-R02G0103-###, T-R02G0103-###
@@ -27,6 +27,52 @@ Canonical overrides:
 - **Shared features used:** R02-F05 (generated meshes), R02-F07 (emissive and bloom passes), R02-F08 (curve sampling,
   parallel-transport frames and ribbon meshes) and R02-F10 (quality tiers) through the existing VisualCore packages; the
   rule kernel and certified levels of R02-G01-01 and -02.
+
+## Clarifications
+
+### Session 2026-11-20
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time. Facts checked in
+code (read-only audit, 2026-11-20): experience targets follow `Packages/ExperiencesCreative/Aurora` (A21: an
+`ExperienceCore` adapter, an `ExperiencePresenter` with `RenderScene`s, SwiftUI controls, a scenario manifest);
+R02-F08 provides `CurveSampler`, `CurveFrames.parallelTransport` and `Mesh.ribbon`; R02-F07 provides the emissive and
+bloom passes; `Catalog/experiences.json` already lists `r02-g01.aurora-loom` with `available: false`; registrations carry
+capabilities, quality tier names, palette, scenario manifest, permissions and summary; the A21 experience is named
+"Aurora", so every new type keeps the `AuroraLoom` prefix.
+
+- Q: What exactly does the scene show, and how does it map the rules to space? → A: each ribbon r is a curve along the
+  loom: at s sixteenths (s from 0 to 16, sampled continuously) its height is H · sin(2π · θ_r(s, t) / 4,096) with
+  θ_r = wave · s · 16 + phase · 256 + ω · t (t in ticks, continuous between ticks), its depth is the ribbon's lane
+  (−1, 0, +1 times the lane spacing). Each gate is a ring standing across the loom at its position; a small marker on the
+  ring shows the target height H · sin(2π · (Θ_g + Ω · t) / 4,096). When a ribbon's residual at a gate is within the
+  tolerance the ring and marker brighten. The camera is a fixed authored perspective looking along the loom from above
+  (orbit and pan come in R02-G01-04). Rationale: the picture shows the same quantity the kernel judges (phase), so a
+  player can read the harmony; nothing in the picture is consulted by the rules. Impact: FR-R02G0103-001, 003, 006.
+- Q: What do the three quality tiers change? → A: tier 0: one layer per ribbon, 32 segments along s, no glow pass;
+  tier 1: three layers per ribbon, 64 segments, one half-resolution glow pass; tier 2: five layers, 128 segments, two
+  glow passes. Every tier draws the same ribbon centre lines, gates and markers at the same coordinates. The tier names in
+  the catalog are `level-0`, `level-1`, `level-2`; the shared quality controller chooses the tier and the experience logs
+  the tier and the reason with each change. Impact: FR-R02G0103-004; SC-R02G0103-001.
+- Q: How are rendered frames checked, and within which bounds? → A: a CPU reference in the pure Core computes, from the
+  same snapshot, the projected screen positions of the ribbon centre-line samples and the gate markers and the palette
+  colours. Simulator tests render offscreen at 96 × 64 pixels and check that each projected ribbon sample lies within
+  2 pixels of a pixel brighter than the background by at least 0.15 in luminance, that each gate marker's pixel is within
+  0.12 (per channel, 0 … 1) of its expected colour (dim or lit), and that the background matches the palette's night
+  colour within 0.05 away from ribbons. Palette: night #07121A, polar teal #1FD1B4, magenta #E0389C, acid gold #D8E83A.
+  Impact: FR-R02G0103-006; SC-R02G0103-001.
+- Q: What happens on a shader failure, and what does the renderer read? → A: the presenter draws from an immutable
+  `AuroraLoomSceneSnapshot` value (steps, level geometry, stage, failure, frame time) made by the adapter after each
+  kernel change; it never holds the kernel. If a ribbon or glow program fails to compile or link, the scene draws the
+  tier-0 layer with the shared unlit mesh renderer, logs the program name and the reason once, and keeps running; the
+  kernel and its digest are untouched. Reduce Motion freezes t at the last tick's value for the shimmer and wave travel;
+  Reduce Flashing caps the glow gain to the shared limit. Impact: FR-R02G0103-003, 007; SC-R02G0103-002.
+- Q: How is the experience registered and what does the minimal control panel do? → A: the candidate registration adds
+  `r02-g01.aurora-loom` to `Catalog/registrations.json` (capabilities, quality tiers `level-0` … `level-2`, the palette
+  above, a scenario manifest, no permissions, a summary of at most 300 characters), links the `AuroraLoomExperience`
+  product into the one app's registry and `project.yml`, and keeps `available: false` in the catalog until X-R02-G01. The
+  adapter prepares the certified level chosen by the seed (seed modulo 100, plus one) and accepts the actions `move`
+  (ribbon, control, step), `undo`, `redo` and `next-level`; the minimal panel shows one row per ribbon with two steppers
+  (wave, phase) and undo, redo buttons, each with an accessibility label. Impact: FR-R02G0103-005, 008; SC-R02G0103-004.
 
 ## User Scenarios & Testing *(mandatory)*
 
