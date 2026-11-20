@@ -64,7 +64,7 @@ or {device} tasks (pure logic). Fixture seed 2_311; tests stay short (< 10 s eac
   `--name host-full`
 - [X] T-R02G0201-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-20: 2026-11-20 reference-1 exit 0
 - [X] T-R02G0201-010 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-20: 2026-11-20 reference-2 exit 0: 7 of 7 with chunk 1
-- [ ] T-R02G0201-011 Script tests, run alone (`--name script-tests`)
+- [X] T-R02G0201-011 Script tests, run alone (`--name script-tests`) — Verified 2026-11-20: 2026-11-20 script-tests exit 0, run alone (.autonomy/migration/checks/R02-G02-01.script-tests.json)
 - [ ] T-R02G0201-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
 
 ## Dependencies and parallel work
