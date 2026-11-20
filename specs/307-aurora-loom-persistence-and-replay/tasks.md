@@ -49,7 +49,7 @@ tests stay short (< 10 s each). No {owner} tasks.
   `--name host-full`, `--name app-unit`
 - [X] T-R02G0107-008 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-20: 2026-11-20 reference-1 exit 0
 - [X] T-R02G0107-009 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-20: 2026-11-20 reference-2 exit 0: 7 of 7 with chunk 1
-- [ ] T-R02G0107-010 Script tests, run alone (`--name script-tests`)
+- [X] T-R02G0107-010 Script tests, run alone (`--name script-tests`) — Verified 2026-11-20: 2026-11-20 script-tests exit 0, run alone
 - [ ] T-R02G0107-011 {device} After ImplementationLock-100: progress survives a real termination on D1/D2/D3
 - [ ] T-R02G0107-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
 
