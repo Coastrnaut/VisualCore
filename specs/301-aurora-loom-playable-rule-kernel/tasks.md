@@ -53,7 +53,7 @@ or {device} tasks (pure logic). Fixture seed 2_301; tests stay short.
   round02-host -- swift test --package-path Packages/ExperiencesRound02`
 - [X] T-R02G0101-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences` and — Verified 2026-11-20: 2026-11-20 rendering-27, rendering-26, experiences (sim-27.2) and host-full exit 0
   `--name host-full`
-- [ ] T-R02G0101-008 Reference regression chunk 1 (`--name reference-1`)
+- [X] T-R02G0101-008 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-20: 2026-11-20 reference-1 exit 0
 - [ ] T-R02G0101-009 Reference regression chunk 2 (`--name reference-2`)
 - [X] T-R02G0101-010 Script tests, run alone (`--name script-tests`) — Verified 2026-11-20: 2026-11-20 script-tests-2 exit 0, run alone; the first attempt failed on two real findings fixed here: check_experience_packages.py now accepts a package of only pending cores (two new script tests), and the path-map entry for Packages/ExperiencesRound02 is done (.autonomy/migration/checks/R02-G01-01.script-tests*.json)
 - [ ] T-R02G0101-011 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
