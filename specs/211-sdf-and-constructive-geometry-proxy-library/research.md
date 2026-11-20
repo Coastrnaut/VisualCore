@@ -20,3 +20,8 @@
   `vc/sdfshape.glsl`; transforms become an inverse rotation matrix literal, a translation and a scale. Parity draws a
   slice (distance image, encoding 0.5 + d/8) and a marched view (hit mask). Alternatives: a uniform-buffer interpreter
   (loops over nodes; slower, more GLSL ES risk).
+- **R8 Observability.** Decision: every refusal carries an `r2-f11.*` reason code and the offending field; the pure
+  library has no app id, seed, tick or tier, so the consuming experience adds them when it reports. Rationale: keeps the
+  library pure (constitution IV). Alternatives: passing host context into geometry functions.
+- **R9 Default options.** Decision: `SDFMarchOptions.standard` holds the validated defaults, because a throwing
+  initialiser cannot be a default argument (analyze finding U1).
