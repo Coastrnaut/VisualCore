@@ -68,7 +68,7 @@ or {device} tasks (pure logic and host-generated content). Fixture seed 2_312; t
 - [X] T-R02G0202-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-20: 2026-11-20 rendering-27, rendering-26 (with the VisualCoreRendering macOS floor), experiences, host-full, app-unit exit 0
   `--name host-full` and `--name app-unit`
 - [X] T-R02G0202-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-20: 2026-11-20 reference-1 exit 0
-- [ ] T-R02G0202-010 Reference regression chunk 2 (`--name reference-2`)
+- [X] T-R02G0202-010 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-20: 2026-11-20 reference-2 exit 0: 7 of 7 with chunk 1
 - [ ] T-R02G0202-011 Script tests, run alone (`--name script-tests`)
 - [ ] T-R02G0202-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
 
