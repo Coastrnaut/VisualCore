@@ -9,7 +9,7 @@ tests stay light beside the timed R02-F05 test.
 
 ## Phase 1: Setup
 
-- [ ] T-R02F16-001 Baselines: `--name baseline-host -- swift test --package-path Packages/VisualCore`; the rendering
+- [X] T-R02F16-001 Baselines: `--name baseline-host -- swift test --package-path Packages/VisualCore`; the rendering — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F16.baseline-host-5.json (exit 0; attempts 1–4 failed only the timed R02-F05 mesh-budget and audio-analysis asserts at load average 40–95 on 18 cores from another session, fixed in the test commit before it); rendering baseline = R02-F15.rendering-27.json and rendering-26.json (exit 0)
   baseline is R02-F15's rendering runs (exit 0)
 
 ## Phase 2: Foundational
