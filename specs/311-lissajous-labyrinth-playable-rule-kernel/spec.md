@@ -167,7 +167,7 @@ Levels have a versioned stored form with a fingerprint, so later features can sh
 
 ### Key Entities
 
-- **Level**: id, seed, band, amplitudes, third-axis frequency and phase, start dials, checkpoints (centre, radius) in
+- **Level**: id, seed, band, amplitudes, third-axis frequency, start dials, checkpoints (centre, radius) in
   order, obstacles (centre, radius), action allowance, tutorial flag, fingerprint.
 - **Dials**: two frequencies and two phases.
 - **Action**: which dial and its new value.
