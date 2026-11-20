@@ -8,7 +8,7 @@ or {device} tasks (pure logic and host-generated content). Fixture seed 2_312; t
 
 ## Phase 1: Setup
 
-- [ ] T-R02G0202-001 Baselines: `--name baseline-host -- swift test --package-path Packages/VisualCore`, the isolated
+- [X] T-R02G0202-001 Baselines: `--name baseline-host -- swift test --package-path Packages/VisualCore`, the isolated — Verified 2026-11-20: 2026-11-20 R02-G02-02.baseline-host/timing/round02 exit 0
   timing run (`--name baseline-timing`) and `--name baseline-round02 -- swift test --package-path Packages/ExperiencesRound02`;
   the rendering baseline is R02-G01-05's rendering runs (exit 0)
 
