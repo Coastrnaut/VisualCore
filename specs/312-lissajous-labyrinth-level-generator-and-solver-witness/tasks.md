@@ -25,7 +25,7 @@ or {device} tasks (pure logic and host-generated content). Fixture seed 2_312; t
 
 ## Phase 3: Story 1 — every shipped level can be solved (P1) 🎯
 
-- [ ] T-R02G0202-003 [P] [US1] Implement `LissajousLabyrinthSolver` in `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthSolver.swift`
+- [X] T-R02G0202-003 [P] [US1] Implement `LissajousLabyrinthSolver` in `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthSolver.swift` — Verified 2026-11-20: 2026-11-20 host-2 exit 0 (9 solver tests, 8.8 s: exact fast decision equals the kernel verdict on all 14,080 settings of one level and on winners plus 440 samples of 20 more; shortest equals a plain BFS on 10 levels)
   (`legalSettings` 14,080 ordered (a, b, φ, ψ); the sound checkpoint-box prefilter of research R2 with separable
   4,096-tick bit sets; the kernel's exact verdict for every survivor; work = exact verdicts; breadth-first search over
   `LissajousLabyrinthRules.moves` to the nearest winning setting, ties by (a, b, φ, ψ) ascending) with
