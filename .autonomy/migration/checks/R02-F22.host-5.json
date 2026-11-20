@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "AssistiveStepTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter AssistiveStepTests",
+  "elapsed_seconds": 2.367,
+  "exit_code": 1,
+  "finished": "2026-11-20T06:40:02+00:00",
+  "gate": "R02-F22",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-F22.host-5.log",
+  "log_sha256": "945e34a6925074e1fd2ef7100309dd910b7d5d00779b40a449494486a631baad",
+  "name": "host-5",
+  "started": "2026-11-20T06:40:00+00:00",
+  "timed_out": false
+}

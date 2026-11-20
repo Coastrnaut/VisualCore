@@ -44,7 +44,7 @@ through a fileprivate SplitMix generator; tests stay short.
 
 ## Phase 6: Story 5 — assistive controls (P2)
 
-- [ ] T-R02F22-006 [P] [US5] Create `Packages/VisualCore/Sources/VisualCoreScenes/AssistiveStep.swift` ("step finite > 0; range finite, min ≤ max ≤ min + 1e9 · step;
+- [X] T-R02F22-006 [P] [US5] Create `Packages/VisualCore/Sources/VisualCoreScenes/AssistiveStep.swift` ("step finite > 0; range finite, min ≤ max ≤ min + 1e9 · step; — Verified 2026-11-20: 2026-11-20 host-5-r2 exit 0: AssistiveStepTests 8/8 (100 seeded cases return bitwise; limits; descriptions; steps recorded in ControlHistory); host-5 failed to build on the lead's own test (mutating call inside #require), fixed (.autonomy/migration/checks/R02-F22.host-5*.json)
   start inside") with `Packages/VisualCore/Tests/VisualCoreScenesTests/AssistiveStepTests.swift` (100 seeded cases: n up then n down within range return exactly;
   limits do nothing and return nil; descriptions non-empty, locale-independent, decimals from the step; pairs usable in
   `ControlHistory`); `--name host-5`
