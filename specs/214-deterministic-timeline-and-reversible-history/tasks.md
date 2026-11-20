@@ -13,7 +13,7 @@ document is `TimelineRunDocument`). Fixture seed 2_014; tests stay light.
 
 ## Phase 2: Foundational
 
-- [ ] T-R02F14-002 [P] Create `Packages/VisualCore/Sources/VisualCoreSimulation/TimelineError.swift` (cases and `r2-f14.*` codes of clarification Q5), `Packages/VisualCore/Sources/VisualCoreSimulation/EventLog.swift`
+- [X] T-R02F14-002 [P] Create `Packages/VisualCore/Sources/VisualCoreSimulation/TimelineError.swift` (cases and `r2-f14.*` codes of clarification Q5), `Packages/VisualCore/Sources/VisualCoreSimulation/EventLog.swift` — Verified 2026-11-19: lead retest 2026-11-19: R02-F14.host.json (exit 0, 0 failures; VisualCoreSimulation 216 tests incl. EventLog 5, SnapshotRing 4, ReplayHash 3 with a pinned known-answer)
   ("steps 0 … 10,000,000", "at most 1,048,576" commands; insert appends at its step; remove/replace by (step, index);
   stable order), `Packages/VisualCore/Sources/VisualCoreSimulation/SnapshotRing.swift` ("capacity 1…1,024, default 32", "interval 1…65,536, default 64", oldest
   dropped first, `latest(atOrBefore:)`, `drop(after:)`) and `Packages/VisualCore/Sources/VisualCoreSimulation/ReplayHash.swift` (research R3: SHA-256 of
