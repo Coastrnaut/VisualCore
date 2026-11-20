@@ -26,14 +26,14 @@ through a fileprivate SplitMix generator; tests stay short.
 - [ ] T-R02F22-003 [P] [US2] Create `Packages/VisualCore/Sources/VisualCoreScenes/SpatialHandles.swift` (HandleKind; SpatialHandle "position finite; hitRadius
   finite ≥ 0"; HandlePicker "≤ 1,024 handles; touch radius raised to ≥ 22 points") with `Packages/VisualCore/Tests/VisualCoreScenesTests/HandlePickerTests.swift`
   (200 seeded handle sets equal a brute-force rule, ties by depth then index; handles behind the camera skipped; no
-  candidate gives nil; radius raising; refusals and codes); `--name host-2`
+  candidate gives nil; radius raising; a non-finite touch; refusals (.handleLimit, .viewport) and codes); `--name host-2`
 
 ## Phase 4: Story 3 — drags (P2)
 
 - [ ] T-R02F22-004 [P] [US3] Create `Packages/VisualCore/Sources/VisualCoreScenes/HandleDrag.swift` (DragConstraint; HandleDrag "grazing: plane abs(d · n) < 0.1,
   axis abs(d · a) > 0.995"; optional bounds) with `Packages/VisualCore/Tests/VisualCoreScenesTests/HandleDragTests.swift` (seeded drags returning to the start ray
   give the start exactly; plane and axis drags follow the hit; grazing rays hold the last position; a grazing start is
-  refused; bounds clamp); `--name host-3`
+  refused; bounds clamp; rotation angle about the axis for seeded quarter and half turns); `--name host-3`
 
 ## Phase 5: Story 4 — undo and redo (P2)
 

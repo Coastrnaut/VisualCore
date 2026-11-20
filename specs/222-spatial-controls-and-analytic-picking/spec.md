@@ -54,14 +54,17 @@ VisualCoreScenes; Effects Composer has its own `EditHistory` (experience-local, 
   (id, position, kind, hit radius in points ≥ 0); handles behind the camera or outside the depth range −1 … 1 are
   skipped; a handle is a candidate when its screen distance to the touch is at most max(touch radius, its hit radius),
   the touch radius being at least 22 points (half the 44-point minimum target; smaller values are raised); candidates
-  rank by screen distance, then NDC depth (nearer first), then index. At most 1,024 handles (`.handleLimit` beyond).
+  rank by screen distance, then NDC depth (nearer first), then index. At most 1,024 handles (`.handleLimit` beyond); a viewport that is not finite and positive is `.viewport`; a
+  non-finite touch picks nothing.
   Impact: FR-R02F22-002; SC-R02F22-002.
 - Q: How does a drag follow the finger without jumps or flings? → A: `HandleDrag` starts from a handle position p₀, a
   ray and a `DragConstraint` (`.axis(direction)` or `.plane(normal)`, unit vectors) and stores the start hit h₀; each
   update returns p₀ + (h − h₀), so the start ray returns exactly p₀. The hit h is the ray-plane hit for a plane, and for
   an axis the point of the axis line closest to the ray. The constraint is grazing — and the drag holds its last
   position — when |d · n| < 0.1 for a plane or |d · a| > 0.995 for an axis; a drag that would start grazing is refused
-  (nil). An optional box clamps the result. Impact: FR-R02F22-003; SC-R02F22-003.
+  (nil). An optional box clamps the result. A rotation handle is dragged with `.plane(axis)`, and
+  `angle(around:)` gives the signed angle in radians about the axis from the start hit to the current hit (0 when either
+  lies on the axis). Impact: FR-R02F22-003; SC-R02F22-003.
 - Q: What does the history store and how are drags coalesced? → A: `ControlHistory<Value>` (Value `Sendable`,
   `Equatable`, `Codable`) stores entries of (label, before, after, coalescing key); `record` ignores before == after,
   merges into the newest entry when both carry the same non-nil key (keeping the first before and the latest after),
