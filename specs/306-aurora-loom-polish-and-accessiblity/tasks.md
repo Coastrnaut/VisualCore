@@ -16,7 +16,7 @@ ImplementationLock-100 and are not tasks here. No {owner} tasks.
 
 ## Phase 2: Story 1 — VoiceOver play (P1) 🎯
 
-- [ ] T-R02G0106-003 [P] [US1] Create `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomFeedbackPlan.swift` (announcement "text and kind" and haptic
+- [X] T-R02G0106-003 [P] [US1] Create `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomFeedbackPlan.swift` (announcement "text and kind" and haptic — Verified 2026-11-20: 2026-11-20 host-2 exit 0 (feedback plan, 5 tests, exact texts)
   per clarifications Q1, Q2; "outcome replaces the move's selection"; `refused(code:)` → rejection + error) with
   `Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomFeedbackPlanTests.swift` (exact texts for move, undo, redo, win, failure, level, mode,
   refusal; no plan for an unchanged core); `--name host-2`
