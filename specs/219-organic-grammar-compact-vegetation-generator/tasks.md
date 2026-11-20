@@ -27,7 +27,7 @@ its check record (no trailers). No {owner} tasks; one {device} task. Fixture see
 
 ## Phase 4: Story 2 — parametric parts (P1)
 
-- [ ] T-R02F19-004 [P] [US2] Create `Packages/VisualCore/Sources/VisualCoreScenes/PlantShapes.swift` (PetalShape "0 < ℓ ≤ 100; 0 < w ≤ ℓ; abs(c) ≤ π; n 2 … 64",
+- [X] T-R02F19-004 [P] [US2] Create `Packages/VisualCore/Sources/VisualCoreScenes/PlantShapes.swift` (PetalShape "0 < ℓ ≤ 100; 0 < w ≤ ℓ; abs(c) ≤ π; n 2 … 64", — Verified 2026-11-20: lead retest 2026-11-20: R02-F19.host-3.json (exit 0, full suite; host-2 also passed before test fixtures were made lighter); PlantShapesTests 6 passed (200 seeded petals, caps and stems valid and closed within budget, stated dimensions within 1e-9, unit normals; every refusal by name; the petal is a thin closed lens because an open two-sided sheet cannot validate)
   CapShape "0 < R ≤ 100; 0 < h ≤ 100; 0 ≤ d < h; s 8 … 128; k 2 … 64", StemShape "0 < L ≤ 100; r₀ ≥ r₁ > 0; abs(b) ≤ π;
   s 3 … 64; m 1 … 64") with `Packages/VisualCore/Tests/VisualCoreScenesTests/PlantShapesTests.swift` (200 seeded parameter sets: valid, within budget, stated length,
   radius or height within 1e-9; caps and stems closed; refusals); `--name host-3`

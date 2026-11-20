@@ -36,8 +36,8 @@ Canonical overrides:
 
 Answered autonomously under the owner's standing delegation, safest well-supported option each time. Facts checked in
 code (read-only audit, 2026-11-20): VisualCoreScenes depends on VisualCoreSimulation (`SeededRandom`) and VisualCoreMath
-(`Vec3`, `Mat4`); `CurveMeshes.tube(samples:radius:sides:caps:)` draws a constant-radius tube along `CurveSamples` and
-`CurveMeshes.merged(_:budget:)` joins meshes; `MeshInstance(model:color:)` and `InstancedMeshRenderer` are in
+(`Vec3`, `Mat4`); `Mesh.tube(samples:radius:sides:caps:)` draws a constant-radius tube along `CurveSamples` and
+`Mesh.merged(_:budget:)` joins meshes; `MeshInstance(model:color:)` and `InstancedMeshRenderer` are in
 VisualCoreRendering; no grammar, turtle or plant code exists; the names `LSystem`, `PlantGrammar`, `PlantTurtle`,
 `PlantSkeleton`, `PetalShape`, `CapShape`, `StemShape`, `PlantMesh`, `PlantScatter`, `PlantInstance` and `PlantError`
 are free.
@@ -55,14 +55,15 @@ are free.
   conventions), re-orthonormalises its frame after every rotation, and records branches (start, end, radius, bracket
   depth) and markers (kind, position, heading, left, up, size = current step) in word order. Impact: FR-R02F19-001,
   002; SC-R02F19-001.
-- Q: What are the petal, cap and stem shapes exactly? → A: a petal is an open two-sided surface along a spine of length ℓ
+- Q: What are the petal, cap and stem shapes exactly? → A: a petal is a thin closed lens (front and back faces meeting at the rims; implementation, 2026-11-20: an open
+  two-sided sheet cannot validate because welding by position makes every inner edge non-manifold) along a spine of length ℓ
   (0 < ℓ ≤ 100) bent in its plane by a total curl c (|c| ≤ π), with half-width w · sin(π t) (0 < w ≤ ℓ) at spine fraction
   t, n segments (2 … 64) and 3 points across; a cap is a closed surface of revolution of radius R (0 < R ≤ 100) and height
   h (0 < h ≤ 100), z = h · √(1 − (r/R)²) above a flat underside with a rim of depth d (0 ≤ d < h), with s sides
   (8 … 128) and k rings (2 … 64); a stem is a closed tapered tube of length L (0 < L ≤ 100), radii r₀ ≥ r₁ > 0, a bend b
-  (|b| ≤ π) and s sides (3 … 64), m segments (1 … 64). The plant mesh draws each branch with `CurveMeshes.tube` (two
+  (|b| ≤ π) and s sides (3 … 64), m segments (1 … 64). The plant mesh draws each branch with `Mesh.tube` (two
   samples, the branch radius, 6 sides, caps) and places petals, caps and leaves (leaf = petal of half width) at markers in
-  their frames, then `CurveMeshes.merged`. Impact: FR-R02F19-003, 004; SC-R02F19-002, 003.
+  their frames, then `Mesh.merged`. Impact: FR-R02F19-003, 004; SC-R02F19-002, 003.
 - Q: How does scattering work? → A: dart throwing over a rectangle x₀ < x₁, z₀ < z₁ (finite) with spacing d > 0: up to
   30 · maxCount seeded candidates (maxCount 1 … 65,536), each accepted when no accepted instance is closer than d
   (checked through a grid of cell size d/√2), stopping at maxCount; each accepted instance draws its scale in
@@ -170,8 +171,10 @@ refused.
   rules grow identically twice and differ for different seeds in at least 95 of 100 cases.
 - **SC-R02F19-002**: Every petal, cap and stem over 200 seeded parameter sets validates, stays within budget and has its
   stated length, radius or height within 1e-9.
-- **SC-R02F19-003**: Plant meshes from 50 seeded grammars validate, stay within budget, and have each part at its marker
-  within 1e-9.
+- **SC-R02F19-003**: Plant meshes from 50 seeded grammars stay within budget, have every part (branch tube, petal,
+  cap, leaf) valid as a closed mesh on its own, in-range indices, finite positions and unit normals, and each part at its
+  marker within 1e-9 (implementation, 2026-11-20: touching parts share positions, so the merged mesh is not one
+  manifold).
 - **SC-R02F19-004**: 100 seeded scatters keep every pair at least the spacing apart, every instance in its area, and repeat
   identically.
 - **SC-R02F19-005**: Grammars round-trip byte for byte and grow to the same plant; newer and damaged forms are refused.
