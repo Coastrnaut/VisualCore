@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-20
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-F24 (migration ledger, shared round feature) · ID namespace FR-R02F24-###, SC-R02F24-###, T-R02F24-###
 
@@ -30,6 +30,52 @@ Canonical overrides:
 - **Superseded parts of the source prompt:** the USD 1.99–4.99 purchase model (ADR-0009); the Round 2 lock
   (ImplementationLock-100). **Device-only items:** building a full catalog on D1–D3 is not needed (catalogs are built on
   the host); tutorial use with VoiceOver on D1–D3 is recorded in the device campaign. **Owner-only items:** none.
+
+## Clarifications
+
+### Session 2026-11-20
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time. Facts checked in
+code (read-only audit, 2026-11-20): R02-F23's `PuzzleLevel`, `PuzzleValidator`, `PuzzleCertificate` and
+`PuzzleGenerator`, `SeedDerivation` and `StableHash` are present. The names `LevelCatalog` (Light Maze), `Tutorial`,
+`TutorialStep`, `TutorialProgress` (Physics Playground) and `CatalogError` (VisualCoreExperience and two experiences) are
+taken, so this feature uses `PuzzleCatalog`, `PuzzleCatalogPlan`, `PuzzleCatalogStage`, `PuzzleCatalogEntry`,
+`PuzzleCatalogBuilder`, `PuzzleCatalogChecker`, `PuzzleCatalogReport`, `PuzzleCatalogIssue`, `PuzzleDifficulty`,
+`ProgressionRule`, `TutorialContract`, `TutorialContractStep`, `TutorialCondition`, `TutorialEvent`,
+`TutorialContractProgress` and `ContentError`, all free.
+
+- Q: How is a catalog planned, built and identified? → A: a `PuzzleCatalogPlan` has a catalog id (lowercase slug), a seed
+  and 1 … 16 ordered `PuzzleCatalogStage`s (count 1 … 500, a `FairnessBudget`, a uniqueness promise, an attempt budget per
+  level 1 … 10,000), at most 1,000 levels in all. `PuzzleCatalogBuilder.build` walks a global index n = 0, 1, …; level
+  candidates come from `PuzzleGenerator.generate(seed: SeedDerivation.derive(seed, index: n), …)`; a level whose identity
+  is already in the catalog is skipped; a stage that cannot be filled within count × attempts generator calls fails with
+  `.planFailed(stage, calls)`. Each stage's levels are ordered by difficulty, then identity. The `PuzzleCatalog` holds
+  the id, schema 1, the `PuzzleCatalogEntry`s (level and difficulty) and a digest: the SHA-256 hex of "<id>\n" followed by
+  each identity and "\n". Impact: FR-R02F24-001; SC-R02F24-001.
+- Q: How is difficulty measured and when does progression fail? → A: `PuzzleDifficulty` is the certificate's shortest
+  solution length and states explored, ordered by length then states. A `ProgressionRule` (maximum drop 0 … 64, maximum
+  jump 0 … 64; defaults 1 and 3) compares neighbours' shortest lengths: the next may be at most `maxDrop` shorter and at
+  most `maxJump` longer. The builder applies it to the finished catalog and fails with `.progression(position)` at the
+  first breach. Impact: FR-R02F24-002; SC-R02F24-002.
+- Q: What does the checker report? → A: `PuzzleCatalogChecker.check(_:rules:rule:)` re-certifies every level and returns a
+  `PuzzleCatalogReport` listing every `PuzzleCatalogIssue` in position order: `uncertified(index, verdict)`,
+  `duplicate(index, first)`, `difficultyMismatch(index)` (stored difficulty differs from the certificate),
+  `drop(index)`, `jump(index)` and `digestMismatch`; a report without issues passes. The same catalog always gives the
+  same report. Impact: FR-R02F24-003; SC-R02F24-002.
+- Q: What is a tutorial contract, and how does it advance? → A: a `TutorialContract` has an id (slug) and 1 … 64
+  `TutorialContractStep`s (id slug, unique; a text key of 1 … 128 characters; a `TutorialCondition`: `.move` — any move;
+  `.moves(n)` — n moves since the step began, 1 … 1,000; `.solve` — any level solved; `.solveLevel(identity)`; or
+  `.acknowledge`). `TutorialContractProgress` holds the contract id, the current step index, the moves counted in the
+  step, the completed and the skipped step ids and whether it is finished; `apply(_ event: TutorialEvent)` (`.moved`,
+  `.solved(identity)`, `.acknowledged`) advances exactly when the current condition is met and ignores other events and
+  events after the end; `skip()` marks the current step skipped and advances; `restart()` returns to the start.
+  Impact: FR-R02F24-004; SC-R02F24-003.
+- Q: How are stored forms checked and refusals named? → A: `PuzzleCatalog` and `TutorialContractProgress` are JSON schema
+  1 with sorted keys; decoding a catalog decodes each level (whose identity is checked) and recomputes the digest
+  (`.edited` on mismatch); progress is decoded against its contract (`decode(_:for:)`: contract id, step range and step
+  ids must match). Refusals are `ContentError` with codes `r2-f24.plan`, `r2-f24.plan-failed`, `r2-f24.progression`,
+  `r2-f24.tutorial`, `r2-f24.newer-schema`, `r2-f24.malformed` and `r2-f24.edited`. Impact: FR-R02F24-005, 006;
+  SC-R02F24-003, 004.
 
 ## User Scenarios & Testing *(mandatory)*
 
