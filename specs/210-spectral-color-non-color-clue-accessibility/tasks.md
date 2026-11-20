@@ -112,7 +112,7 @@
 (007), S (004 after 002), G (005, 006 after 003 and 004), U (008 after 004 and 007). Shared files (READMEs, API
 baseline, `ShaderBundleTests.swift` list, feature map) stay with the lead. MVP: Story 1 (002, 004, 005).
 
-## Phase 8: Convergence
+## Phase 7: Convergence
 
 - [ ] T-R02F10-017 Make the clue outline meet 3:1 against both the state colour and the background per FR-R02F10-013
   (partial): add `PerceptualColor.outlineRings(for:on:) -> (inner: SIMD3<Double>, outer: SIMD3<Double>?)` in
