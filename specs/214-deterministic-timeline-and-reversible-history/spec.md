@@ -117,7 +117,9 @@ damaged forms are refused with a named reason.
 - **Snapshot storage full:** the oldest snapshots are dropped and seeking still lands exactly (it replays from the start
   or the nearest kept snapshot).
 - **Many commands at one step:** applied in insertion order just before that step advances.
-- **A simulation whose checksum is not deterministic:** detected by the replay check and reported.
+- **A simulation whose checksum is not deterministic:** detected when a seek replays to a kept snapshot's step and the
+  hash differs from the snapshot's, or when an opened run's replay does not reach its stored hash; reported as
+  `r2-f14.hash-mismatch` and the timeline is left unchanged.
 - **An empty log:** the run is the simulation's own stepping.
 
 ## Requirements *(mandatory)*
