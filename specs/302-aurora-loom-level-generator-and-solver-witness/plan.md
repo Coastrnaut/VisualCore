@@ -1,0 +1,77 @@
+# Implementation Plan: R02-G01-02 — Aurora Loom: level generator and solver witness
+
+**Branch**: `302-aurora-loom-level-generator-and-solver-witness` (spec directory only; work on `main`) | **Date**:
+2026-11-20 | **Spec**: [spec.md](spec.md)
+
+## Summary
+
+Extend `AuroraLoomCore` (R02-G01-01) with the content pipeline of Aurora Loom: the 100-entry manifest
+(`AuroraLoomManifest`), the solver (`AuroraLoomSolver`: bounded per-ribbon coordinate descent, then the exact grid of 256
+settings per ribbon), difficulty metrics (`AuroraLoomDifficulty`), the seeded generator (`AuroraLoomGenerator`) that
+draws candidates from each entry's planned seed until one is proven within its band, and versioned witness files
+(`AuroraLoomWitness`, schema 1) for every level under `docs/games/aurora-loom/levels/`. The catalog digest is R02-F24's
+`PuzzleCatalog<AuroraLoomRules>.digest(id:identities:)`, pinned. Research: [research.md](research.md). Data:
+[data-model.md](data-model.md). API: [contracts/api.md](contracts/api.md). Quickstart: [quickstart.md](quickstart.md).
+
+## Technical Context
+
+**Language/Version**: Swift 6. **Primary dependencies**: AuroraLoomCore's own types; VisualCoreSimulation
+(`SeededRandom`, `SeedDerivation`, `PuzzleCatalog.digest`, `PuzzleDifficulty`, `ProgressionRule`); VisualCoreMath
+(`StableHash`). No GPU, GLSL, Objective-C++ or UIKit code (the renderer is R02-G01-03); no new package or target.
+**Seeds**: level n uses its manifest seed; candidate k draws from `SeededRandom(seed: SeedDerivation.derive(seed,
+index: k))`, k = 0 … 63. Test fixtures keep `SeededRandom(seed: 2_301)`; the 500 seeded solver checks use
+`SeededRandom(seed: 2_302)`.
+**Testing**: `swift test --package-path Packages/ExperiencesRound02` (CI step exists); regression: VisualCore host tests,
+VisualCoreRendering on sim-27.2 and sim-26.5, ExperiencesCreative on sim-27.2, the reference regression in two chunks,
+script tests (alone).
+**Performance**: every generated level has all ribbons turning with Ω, so a residual does not depend on the tick within
+one evaluation's cost bound (R02-G01-01: ≤ 3 × 4 × 2P samples). One ribbon's grid is 256 settings × 4 gates × 2P
+samples ≤ 256 × 4 × 512 = 524,288 integer steps at Ω = 16; a level's solve stays well under 0.1 s; the whole catalog
+(≤ 64 candidates per level, typically 1–3) is bounded below 10 s per test.
+**Constraints**: additive to R02-G01-01's public API; levels' allowance = the manifest move budget (8 … 19); every value an
+exact integer; no network, no art; witness files written only with `AURORA_LOOM_WRITE_WITNESSES=1`.
+
+No NEEDS CLARIFICATION remains.
+
+## Constitution Check
+
+| Principle | Result |
+|---|---|
+| I Proven renderer only | PASS — no rendering in this feature. |
+| II App-neutral API | PASS — game code stays in ExperiencesRound02; VisualCore API unchanged. |
+| IV Host-testable | PASS — pure Core with host tests; witness files checked byte for byte on the host. |
+| V Implementation before devices | PASS — no device work. |
+| IX Bounded input | PASS — candidate count (64), descent sweeps (32), grid (256 per ribbon) and witness decoding bounded. |
+| X Licensing and provenance | PASS — the manifest is copied from the archived design (round2.md) with its provenance; generated content is original. |
+| XI One app and stable identity | PASS — experience R02-G01; level and catalog fingerprints pinned. |
+| XII One purchase, no advertising | PASS — free tier; no store code. |
+| XIII Code-driven visuals | PASS — nothing drawn here. |
+
+Post-design re-check: PASS.
+
+## Project Structure
+
+```text
+Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomError.swift          edit  + generation(Int), witness(String) (lead)
+Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomManifest.swift       new   AuroraLoomManifestEntry, AuroraLoomManifest (100 entries) (lead)
+Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomSolver.swift         new   AuroraLoomSolveMethod, AuroraLoomSolution, AuroraLoomSolver (agent A)
+Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomDifficulty.swift     new   AuroraLoomDifficulty (lead)
+Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomGenerator.swift      new   AuroraLoomBandProfile, AuroraLoomGenerated, AuroraLoomGenerator, catalog digest (lead)
+Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomWitness.swift        new   AuroraLoomCounterexample, AuroraLoomWitness (agent B)
+Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomSolverTests.swift     new  (agent A)
+Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomWitnessTests.swift    new  (agent B)
+Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomGeneratorTests.swift  new  (lead)
+Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomCatalogTests.swift    new  manifest, digest pin, progression, 100 witness files (lead)
+docs/games/aurora-loom/levels/001.witness.json … 100.witness.json                new  generated by the catalog test (lead)
+docs/architecture/aurora-loom.md, Packages/ExperiencesRound02/README.md, docs/automatedtesting.md                edit (lead)
+```
+
+**Migration**: none (no stored data changes; witness schema 1 is new). **Rollback**: revert the commits; R02-G01-01's
+types are unchanged, so nothing else depends on the new files.
+
+## Parallel work
+
+Lead first adds the error cases, the manifest, `AuroraLoomSolution`'s contract (in contracts/api.md) and the difficulty
+type; agents A (solver and its tests) and B (witness and its tests) then work in parallel against the contract; the lead
+writes the generator, the catalog test and the witness files once A's solver is in, retests every agent result and
+records checks only after every agent has reported.
