@@ -13,7 +13,7 @@ Tests stay light (≤ 512 × 512 masks) so the timed R02-F05 budget test beside 
 
 ## Phase 2: Story 1 — projection (P1) 🎯
 
-- [ ] T-R02F13-002 [P] [US1] Create `Packages/VisualCore/Sources/VisualCoreScenes/ShadowError.swift` (cases and `r2-f13.*` codes of clarification Q5),
+- [X] T-R02F13-002 [P] [US1] Create `Packages/VisualCore/Sources/VisualCoreScenes/ShadowError.swift` (cases and `r2-f13.*` codes of clarification Q5), — Verified 2026-11-19: lead retest 2026-11-19: R02-F13.host.json (exit 0, 0 failures; VisualCoreScenes run 295 tests incl. ShadowProjectionTests 8 and ConvexHull2DTests 4; cube-down area error 2.2e-16, matrix vs project 4.9e-16)
   `Packages/VisualCore/Sources/VisualCoreScenes/ShadowProjection.swift` (`ShadowLight`, `ProjectionPlane` with the basis of Q1, `ShadowProjector` per Q2 and
   research R1–R2: point, triangle with slab clipping, mesh "≤ 1,048,576 triangles", solid outline as the hull of its
   projected vertices, `matrix(light:onto:)` equal to the CPU projection) and `Packages/VisualCore/Sources/VisualCoreScenes/ConvexHull2D.swift` (Andrew's chain,
