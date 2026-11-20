@@ -359,6 +359,15 @@ composite, premultiplied over); `composite` mode 2 is premultiplied over; the va
 and out-of-range emissive ones. `RenderState.premultipliedBlended` draws premultiplied layers. Rules:
 [docs/architecture/shaders.md](../../docs/architecture/shaders.md).
 
+## Puzzle contract (feature 223, R02-F23)
+
+VisualCoreSimulation certifies puzzle levels: `PuzzleRules` (the pure rules an experience supplies), `PuzzleLevel`
+(immutable, with a content-derived `StableHash` identity; JSON schema 1, edited forms refused), `PuzzleUniqueness`,
+`FairnessBudget`, `PuzzleValidator` with `PuzzleCertificate` and `PuzzleVerdict` (replay, length bounds, bounded
+breadth-first proof of branching, shortest length and uniqueness) and `PuzzleGenerator` with `PuzzleGeneration`
+(seeded attempts that hand out only certified levels). Refusals are `PuzzleError` with `r2-f23.*` codes. Rules:
+[docs/architecture/puzzle-contract.md](../../docs/architecture/puzzle-contract.md).
+
 ## Spatial controls (feature 222, R02-F22)
 
 VisualCoreMath adds `Plane3`, `Ray3.intersect(plane:)` and `ScreenProjection` (screen point to world ray and back for any

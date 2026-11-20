@@ -44,7 +44,7 @@ tasks; one {device} task. Fixture seed 2_023; tests stay short.
 
 - [ ] T-R02F23-006 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences` and
   `--name host-full`
-- [ ] T-R02F23-007 API baseline and docs: `check_public_api.py --update`, `--name public-api`, `--name documented-api
+- [X] T-R02F23-007 API baseline and docs: `check_public_api.py --update`, `--name public-api`, `--name documented-api — Verified 2026-11-20: 2026-11-20 public-api exit 0 (4,047 declarations), documented-api exit 0, docs/architecture/puzzle-contract.md, README section, map F23 as built (home VisualCoreSimulation), path-map module entry done with note, render_autocreator + validate_autocreator PASS
   -- python3 scripts/check_documented_api.py --sources Apps/VisualCore`; new `docs/architecture/puzzle-contract.md`;
   section in `Packages/VisualCore/README.md`; section 13.4 row R02-F23 "As built" in
   `docs/catalog/shared-feature-map.json` and `render_autocreator.py`

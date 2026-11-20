@@ -3207,6 +3207,11 @@ VisualCoreSimulation | enum | public enum NeighbourSearch
 VisualCoreSimulation | enum | public enum NutrientError: Error, Equatable, Sendable
 VisualCoreSimulation | enum | public enum NutrientSourceKind: String, Sendable, Codable, CaseIterable
 VisualCoreSimulation | enum | public enum ParticleForce: Sendable, Equatable
+VisualCoreSimulation | enum | public enum PuzzleError: Error, Equatable, Sendable
+VisualCoreSimulation | enum | public enum PuzzleGenerator
+VisualCoreSimulation | enum | public enum PuzzleUniqueness: String, Sendable, Codable, CaseIterable
+VisualCoreSimulation | enum | public enum PuzzleValidator
+VisualCoreSimulation | enum | public enum PuzzleVerdict: Sendable, Equatable, Hashable, Codable
 VisualCoreSimulation | enum | public enum RandomChoiceError: Error, Equatable, Sendable
 VisualCoreSimulation | enum | public enum RandomStateError: Error, Equatable, Sendable
 VisualCoreSimulation | enum | public enum RouteError: Error, Equatable, Sendable
@@ -3367,12 +3372,14 @@ VisualCoreSimulation | func | public static func bestFirst(in graph: RouteGraph,
 VisualCoreSimulation | func | public static func between(_ source: Int, and sink: Int, in graph: RouteGraph) throws(RouteError) -> CutResult
 VisualCoreSimulation | func | public static func breadthFirst(in graph: RouteGraph, from: Int, to: Int,
 VisualCoreSimulation | func | public static func capped(_ v: Vec2, to limit: Double) -> Vec2
+VisualCoreSimulation | func | public static func certify<R: PuzzleRules>(_ level: PuzzleLevel<R>, rules: R) -> PuzzleCertificate
 VisualCoreSimulation | func | public static func clampedStrength(_ strength: Double) -> Double
 VisualCoreSimulation | func | public static func closestPoint(on capsule: CollisionCapsule, to point: Vec2) -> Vec2
 VisualCoreSimulation | func | public static func collide(_ a: Shape2D, _ poseA: Pose2D, _ b: Shape2D, _ poseB: Pose2D) -> ContactManifold2D?
 VisualCoreSimulation | func | public static func colorVisionKey(prefix: String) -> String
 VisualCoreSimulation | func | public static func decode(_ data: Data) throws(HeightfieldError) -> Heightfield
 VisualCoreSimulation | func | public static func decode(_ data: Data) throws(NutrientError) -> NutrientField
+VisualCoreSimulation | func | public static func decode(_ data: Data) throws(PuzzleError) -> PuzzleLevel
 VisualCoreSimulation | func | public static func decode(_ data: Data) throws(RouteError) -> SolverCertificate
 VisualCoreSimulation | func | public static func decode(_ data: Data) throws(SwarmError) -> Swarm
 VisualCoreSimulation | func | public static func derive(_ seed: UInt64, index: UInt64) -> UInt64
@@ -3381,6 +3388,7 @@ VisualCoreSimulation | func | public static func earliestArrival(in graph: Route
 VisualCoreSimulation | func | public static func factor(strength: Double, delta: Double) -> Double
 VisualCoreSimulation | func | public static func fnv1a64(_ label: String) -> UInt64
 VisualCoreSimulation | func | public static func force(for index: Int, agents: [SteeringAgent], neighbours: [Int],
+VisualCoreSimulation | func | public static func generate<R: PuzzleRules>(
 VisualCoreSimulation | func | public static func isomorphic(_ a: RouteGraph, _ b: RouteGraph, budget: Int = maxSteps) throws(RouteError) -> Bool?
 VisualCoreSimulation | func | public static func keys(prefix: String) -> (reduceMotion: String, reduceFlashing: String)
 VisualCoreSimulation | func | public static func load(from defaults: UserDefaults, keyPrefix prefix: String) -> AccessibilityPreferences
@@ -3429,9 +3437,11 @@ VisualCoreSimulation | init | public init(from: Int, to: Int)
 VisualCoreSimulation | init | public init(id: String, colorHex: String, sign: String)
 VisualCoreSimulation | init | public init(iterations: Int = 10, restitutionThreshold: Double = 0.5, slop: Double = 0.005,
 VisualCoreSimulation | init | public init(kind: HapticKind, time: Double)
+VisualCoreSimulation | init | public init(level: PuzzleLevel<Rules>, certificate: PuzzleCertificate, attempts: Int, rejections: [String: Int])
 VisualCoreSimulation | init | public init(limit: Int, perFrame: Int, threshold: Double, foodChannel: Int, cost: Int64) throws(NutrientError)
 VisualCoreSimulation | init | public init(low: Double, high: Double, ramp: Double = 0) throws(NutrientError)
 VisualCoreSimulation | init | public init(min: Vec2, max: Vec2)
+VisualCoreSimulation | init | public init(minLength: Int = 1, maxLength: Int, maxBranching: Int = 64,
 VisualCoreSimulation | init | public init(minStep: Double = 1.0 / 240, maxStep: Double = 1.0 / 30)
 VisualCoreSimulation | init | public init(minX: Double, maxX: Double, minY: Double, maxY: Double)
 VisualCoreSimulation | init | public init(minimumInterval: Double = 0.05)
@@ -3452,6 +3462,7 @@ VisualCoreSimulation | init | public init(reduceMotion: Bool = false, dimFlashin
 VisualCoreSimulation | init | public init(reduceMotion: Bool, autoplay: Bool = true)
 VisualCoreSimulation | init | public init(reduceMotion: Bool, reduceFlashing: Bool)
 VisualCoreSimulation | init | public init(restoring state: State) throws(RandomStateError)
+VisualCoreSimulation | init | public init(rulesID: String, start: Rules.State, solution: [Rules.Move], uniqueness: PuzzleUniqueness = .none,
 VisualCoreSimulation | init | public init(seed: UInt64)
 VisualCoreSimulation | init | public init(seed: UInt64, index: UInt64)
 VisualCoreSimulation | init | public init(seed: UInt64, label: String)
@@ -3464,6 +3475,7 @@ VisualCoreSimulation | init | public init(storedValue: String?)
 VisualCoreSimulation | init | public init(substeps: Int, simulated: Double, dropped: Double, added: [Int64], removed: [Int64], faded: [Int64],
 VisualCoreSimulation | init | public init(text: String, kind: AnnouncementKind, time: Double)
 VisualCoreSimulation | init | public init(uniform: Double = 0, poles: [MagneticPole] = []) throws(SwarmError)
+VisualCoreSimulation | init | public init(verdict: PuzzleVerdict, explored: Int = 0, shortest: Int? = nil, solvedStates: Int = 0,
 VisualCoreSimulation | init | public init(version: Int, seed: String, words: [String])
 VisualCoreSimulation | init | public init(width: Int, height: Int, bounds: SteeringBounds) throws(SwarmError)
 VisualCoreSimulation | init | public init(width: Int, height: Int, channels: Int = 1, diffusion: [Double],
@@ -3474,7 +3486,9 @@ VisualCoreSimulation | init | public init?(hex: String)
 VisualCoreSimulation | init | public init?(range: Float, center: Float = 0.5)
 VisualCoreSimulation | init | public init?(width: Int, height: Int, channels: Int, values: [Float])
 VisualCoreSimulation | let | public let added: [Int64]
+VisualCoreSimulation | let | public let attempts: Int
 VisualCoreSimulation | let | public let bounds: SteeringBounds
+VisualCoreSimulation | let | public let budget: FairnessBudget
 VisualCoreSimulation | let | public let bytes: [UInt8]
 VisualCoreSimulation | let | public let capacity: Int
 VisualCoreSimulation | let | public let capped: Int64
@@ -3482,6 +3496,7 @@ VisualCoreSimulation | let | public let cell: Int
 VisualCoreSimulation | let | public let cellCount: Int
 VisualCoreSimulation | let | public let cellSize: Double
 VisualCoreSimulation | let | public let center: Float
+VisualCoreSimulation | let | public let certificate: PuzzleCertificate
 VisualCoreSimulation | let | public let certificate: SolverCertificate
 VisualCoreSimulation | let | public let certificates: [SolverCertificate]
 VisualCoreSimulation | let | public let channel: Int
@@ -3503,6 +3518,7 @@ VisualCoreSimulation | let | public let edges: SwarmEdges
 VisualCoreSimulation | let | public let edges: [CutEdge]
 VisualCoreSimulation | let | public let entries: [Entry]
 VisualCoreSimulation | let | public let examined: Int
+VisualCoreSimulation | let | public let explored: Int
 VisualCoreSimulation | let | public let faded: [Int64]
 VisualCoreSimulation | let | public let field: MagneticField
 VisualCoreSimulation | let | public let fluxClamped: Bool
@@ -3512,16 +3528,22 @@ VisualCoreSimulation | let | public let grown: Int
 VisualCoreSimulation | let | public let hash: ReplayHash
 VisualCoreSimulation | let | public let height: Int
 VisualCoreSimulation | let | public let high: Double
+VisualCoreSimulation | let | public let identity: String
 VisualCoreSimulation | let | public let interval: Int
 VisualCoreSimulation | let | public let kind: NutrientSourceKind
+VisualCoreSimulation | let | public let level: PuzzleLevel<Rules>
 VisualCoreSimulation | let | public let limit: Int
 VisualCoreSimulation | let | public let low: Double
+VisualCoreSimulation | let | public let maxBranching: Int
+VisualCoreSimulation | let | public let maxLength: Int
 VisualCoreSimulation | let | public let maxStep: Double
 VisualCoreSimulation | let | public let maxSteps: Int
+VisualCoreSimulation | let | public let minLength: Int
 VisualCoreSimulation | let | public let minStep: Double
 VisualCoreSimulation | let | public let minimumInterval: Double
 VisualCoreSimulation | let | public let neighbourhood: GridNeighbourhood
 VisualCoreSimulation | let | public let node: Int
+VisualCoreSimulation | let | public let nodeBudget: Int
 VisualCoreSimulation | let | public let nodeCount: Int
 VisualCoreSimulation | let | public let nodes: [Int]
 VisualCoreSimulation | let | public let parameters: HeightfieldParameters
@@ -3535,14 +3557,22 @@ VisualCoreSimulation | let | public let range: Float
 VisualCoreSimulation | let | public let rate: Double
 VisualCoreSimulation | let | public let reduceFlashing: Bool
 VisualCoreSimulation | let | public let reduceMotion: Bool
+VisualCoreSimulation | let | public let rejections: [String: Int]
 VisualCoreSimulation | let | public let removed: [Int64]
 VisualCoreSimulation | let | public let routes: [RoutePath]
+VisualCoreSimulation | let | public let rulesID: String
 VisualCoreSimulation | let | public let seed: String
 VisualCoreSimulation | let | public let seed: UInt64
+VisualCoreSimulation | let | public let seed: UInt64?
 VisualCoreSimulation | let | public let short: Int64
+VisualCoreSimulation | let | public let shortest: Int?
+VisualCoreSimulation | let | public let shortestPaths: Int
 VisualCoreSimulation | let | public let simulated: Double
 VisualCoreSimulation | let | public let softening: Double
+VisualCoreSimulation | let | public let solution: [Rules.Move]
+VisualCoreSimulation | let | public let solvedStates: Int
 VisualCoreSimulation | let | public let speedLimit: Double
+VisualCoreSimulation | let | public let start: Rules.State
 VisualCoreSimulation | let | public let start: Simulation
 VisualCoreSimulation | let | public let state: State
 VisualCoreSimulation | let | public let step: Double
@@ -3556,6 +3586,8 @@ VisualCoreSimulation | let | public let threshold: Double
 VisualCoreSimulation | let | public let time: Int
 VisualCoreSimulation | let | public let to: Int
 VisualCoreSimulation | let | public let uniform: Double
+VisualCoreSimulation | let | public let uniqueness: PuzzleUniqueness
+VisualCoreSimulation | let | public let verdict: PuzzleVerdict
 VisualCoreSimulation | let | public let version: Int
 VisualCoreSimulation | let | public let width: Int
 VisualCoreSimulation | let | public let words: [String]
@@ -3569,6 +3601,8 @@ VisualCoreSimulation | let | public static let legacyLimit
 VisualCoreSimulation | let | public static let lifetimeRange: ClosedRange<Double>
 VisualCoreSimulation | let | public static let maxAgents
 VisualCoreSimulation | let | public static let maxAmount: Int64
+VisualCoreSimulation | let | public static let maxAttempts
+VisualCoreSimulation | let | public static let maxBranching
 VisualCoreSimulation | let | public static let maxBudget
 VisualCoreSimulation | let | public static let maxCapacity
 VisualCoreSimulation | let | public static let maxCells
@@ -3583,6 +3617,7 @@ VisualCoreSimulation | let | public static let maxDyeChannels
 VisualCoreSimulation | let | public static let maxEdges
 VisualCoreSimulation | let | public static let maxFlux
 VisualCoreSimulation | let | public static let maxFrame
+VisualCoreSimulation | let | public static let maxLength
 VisualCoreSimulation | let | public static let maxNodes
 VisualCoreSimulation | let | public static let maxPatternNodes
 VisualCoreSimulation | let | public static let maxPerFrame
@@ -3617,6 +3652,7 @@ VisualCoreSimulation | let | public static let strengthRange: ClosedRange<Double
 VisualCoreSimulation | let | public static let tolerance: Double
 VisualCoreSimulation | let | public static let version
 VisualCoreSimulation | protocol | public protocol FixedStepSimulation
+VisualCoreSimulation | protocol | public protocol PuzzleRules: Sendable
 VisualCoreSimulation | struct | public struct AABB2D: Sendable, Equatable
 VisualCoreSimulation | struct | public struct AccessibilityPreferences: Sendable, Equatable, Codable
 VisualCoreSimulation | struct | public struct Account: Sendable, Equatable, Codable
@@ -3637,6 +3673,7 @@ VisualCoreSimulation | struct | public struct EmitterBurst: Sendable, Equatable,
 VisualCoreSimulation | struct | public struct Entry
 VisualCoreSimulation | struct | public struct Entry: Sendable, Equatable
 VisualCoreSimulation | struct | public struct EventLog<Command: Sendable & Equatable>: Sendable, Equatable
+VisualCoreSimulation | struct | public struct FairnessBudget: Sendable, Equatable, Codable
 VisualCoreSimulation | struct | public struct FieldGrid: Sendable, Equatable
 VisualCoreSimulation | struct | public struct FixedStepClock: Sendable, Equatable
 VisualCoreSimulation | struct | public struct FixedStepRunner<Simulation: FixedStepSimulation, Command>
@@ -3661,6 +3698,9 @@ VisualCoreSimulation | struct | public struct ParticleInstance: Sendable, Equata
 VisualCoreSimulation | struct | public struct ParticleSystem: Sendable
 VisualCoreSimulation | struct | public struct PlaybackState: Sendable, Equatable
 VisualCoreSimulation | struct | public struct Pose2D: Sendable, Equatable
+VisualCoreSimulation | struct | public struct PuzzleCertificate: Sendable, Equatable, Codable
+VisualCoreSimulation | struct | public struct PuzzleGeneration<Rules: PuzzleRules>: Sendable
+VisualCoreSimulation | struct | public struct PuzzleLevel<Rules: PuzzleRules>: Sendable, Equatable
 VisualCoreSimulation | struct | public struct ReplayHash: Sendable, Equatable, Hashable, Codable
 VisualCoreSimulation | struct | public struct ReversibleTimeline<Simulation: FixedStepSimulation & Sendable, Command: Sendable & Equatable>
 VisualCoreSimulation | struct | public struct RigidBodyState2D: Sendable, Equatable
@@ -3737,6 +3777,7 @@ VisualCoreSimulation | var | public private(set) var totalSteps
 VisualCoreSimulation | var | public private(set) var wantsToPlay: Bool
 VisualCoreSimulation | var | public static var maxEntries: Int
 VisualCoreSimulation | var | public static var maxStep: Int
+VisualCoreSimulation | var | public static var schema: Int
 VisualCoreSimulation | var | public var a: Int
 VisualCoreSimulation | var | public var a: SpringAnchor2D
 VisualCoreSimulation | var | public var a: Vec2

@@ -298,8 +298,8 @@
    "to": "Packages/VisualCore",
    "action": "modify",
    "by": "UA-F01, UA-F02, R02-F05, R02-F23",
-   "state": "pending",
-   "note": "Adds the pure modules VisualCoreExperience, VisualCoreGeometry and VisualCorePuzzle; existing modules keep their names and API. Done so far: VisualCoreExperience (UA-F01, UA-F02) and the public StableHash in VisualCoreMath (UA-F02); the entry stays pending for R02-F05 and R02-F23."
+   "state": "done",
+   "note": "Adds the pure module VisualCoreExperience (UA-F01, UA-F02) and the public StableHash in VisualCoreMath (UA-F02); existing modules keep their names and API. The proposed VisualCoreGeometry and VisualCorePuzzle were not created: R02-F05 placed the mesh compiler in VisualCoreScenes and R02-F16 and R02-F23 placed the solvers and the puzzle contract in VisualCoreSimulation (section 13.2: fewer logical modules)."
   },
   {
    "from": "Packages/VisualCoreRendering",

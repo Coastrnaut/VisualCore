@@ -234,11 +234,13 @@
   "F23": {
    "disposition": "new",
    "existing": [
-    "FixedStepSimulation",
-    "ParameterHash"
+    "StableHash",
+    "SeededRandom",
+    "SeedDerivation",
+    "SolverCertificate"
    ],
-   "home": "(new) VisualCorePuzzle",
-   "note": "Puzzle contract, seeded generation and solver certification; the lifecycle and digest parts are delivered by UA-F02."
+   "home": "VisualCoreSimulation",
+   "note": "As built (feature 223): PuzzleRules, PuzzleLevel (content-derived identity), PuzzleUniqueness, FairnessBudget, PuzzleValidator with PuzzleCertificate and PuzzleVerdict, and PuzzleGenerator with PuzzleGeneration in VisualCoreSimulation rather than a new module (the R02-F16 precedent); lifecycle and digest from UA-F02 reused; route solvers unchanged."
   },
   "F24": {
    "disposition": "new",
