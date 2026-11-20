@@ -2,7 +2,10 @@
 // adapter core: the shared conformance checks pass; the seed picks level `seed % 100 + 1` deterministically in stage
 // `playing`; a legal move changes the digest and an illegal one is refused with the state unchanged; undo, redo and
 // the certified solution (outcome `won`); `level.next` wraps 100 to 1; the snapshot round trip and refused payloads;
-// the quality tier and the presenter's snapshot time never touch the digest. Explicit types, plain loops, short runs.
+// the quality tier and the presenter's snapshot time never touch the digest. Feature 305 (R02-G01-05) T-R02G0105-004:
+// schema 2 (progress, mode, tutorial), the migration of a schema-1 payload, `level.next` to the next open level,
+// `level.select` of open levels only, daily and practice modes, the tutorial and stars through the port. Explicit types,
+// plain loops, short runs.
 import Foundation
 import Testing
 @testable import AuroraLoomCore
@@ -37,12 +40,18 @@ import VisualCoreExperience
                                          ScriptedAction("ribbon.move", [2, 0, 3]),
                                          ScriptedAction("play.undo"), ScriptedAction("play.redo"),
                                          ScriptedAction("play.undo"), ScriptedAction("level.next"),
-                                         ScriptedAction("ribbon.move", [0, 0, 9])]
+                                         ScriptedAction("ribbon.move", [0, 0, 9]), ScriptedAction("tutorial.dismiss"),
+                                         ScriptedAction("mode.practice"), ScriptedAction("ribbon.move", [1, 1, 4]),
+                                         ScriptedAction("mode.daily", [2026, 11, 20]), ScriptedAction("mode.campaign"),
+                                         ScriptedAction("level.select", [1])]
         let rejected: [ScriptedAction] = [ScriptedAction("ribbon.move", [0, 0, 0.5]),
                                           ScriptedAction("ribbon.move", [0.5, 1, 2]),
                                           ScriptedAction("ribbon.move", [3, 0, 1]),
                                           ScriptedAction("play.undo"), ScriptedAction("play.redo"),
-                                          ScriptedAction("level.next", [1]), ScriptedAction("bogus")]
+                                          ScriptedAction("level.next", [1]), ScriptedAction("bogus"),
+                                          ScriptedAction("level.select", [0]), ScriptedAction("level.select", [2.5]),
+                                          ScriptedAction("mode.daily", [2026, 2, 30]),
+                                          ScriptedAction("mode.daily", [2026, 13, 1])]
         let plan = ConformancePlan(seeds: [0, 41, 99, 1_000_003], stepsPerSegment: 2, actions: actions,
                                    rejected: rejected)
         let report: ConformanceReport = await ExperienceConformance.run(Core.self, id: id, plan: plan)
@@ -51,11 +60,14 @@ import VisualCoreExperience
     }
 
     @Test func theControlsTheTiersAndTheProfile() {
-        #expect(Core.experienceID == "r02-g01.aurora-loom" && Core.schemaVersion == 1)
-        #expect(Core.digestDomain == "r02-g01.aurora-loom.v1")
-        #expect(Core.controls.map(\.id) == Core.actionIDs)
+        #expect(Core.experienceID == "r02-g01.aurora-loom" && Core.schemaVersion == 2)
+        #expect(Core.digestDomain == "r02-g01.aurora-loom.v2")
+        #expect(Core.controls.map(\.id) == Core.actionIDs && Core.actionIDs.count == 9)
         #expect(Core.controls[0].ranges == [0...2, 0...1, 0...15])
-        for index in 1..<4 { #expect(Core.controls[index].ranges.isEmpty) }
+        #expect(Core.controls[4].ranges == [1...100])
+        #expect(Core.controls[5].ranges == [1...9999, 1...12, 1...31])
+        let bare: [Int] = [1, 2, 3, 6, 7, 8]
+        for index in bare { #expect(Core.controls[index].ranges.isEmpty) }
         #expect(Core.stepDuration == 1.0 / 120)
         #expect(Core.qualityTiers == 3)
         let profile: QualityProfile = Core.qualityProfile
@@ -148,22 +160,113 @@ import VisualCoreExperience
         }
     }
 
-    @Test func nextLevelWrapsAndResetReturnsToTheSeedsLevel() async throws {
+    @Test func nextLevelGoesToTheNextOpenLevelAndResetReturnsToTheSeedsLevel() async throws {
         var core: Core = try await Core.prepare(seed: 98)
-        #expect(core.levelNumber == 99)
+        #expect(core.levelNumber == 99 && core.progress.frontier == 99 && core.mode == .campaign)
         #expect(core.apply(ExperienceAction(control: "ribbon.move", values: [0, 0, Double(Self.otherWave(core))],
                                             step: 0)) == .accepted)
+        // Level 100 is not open yet: the next open level after 99, in cyclic order, is 1.
         #expect(core.apply(ExperienceAction(control: "level.next", step: 0)) == .accepted)
-        #expect(core.levelNumber == 100 && core.play.records.isEmpty && core.play.stage == .playing)
+        #expect(core.levelNumber == 1 && core.play.records.isEmpty && core.play.stage == .playing)
         #expect(core.apply(ExperienceAction(control: "level.next", step: 0)) == .accepted)
-        #expect(core.levelNumber == 1 && core.play.stage == .playing)
-        let first: Core = try await Core.prepare(seed: 0)
-        #expect(core == first)
+        #expect(core.levelNumber == 2)
         core.reset()
         let fresh: Core = try await Core.prepare(seed: 98)
         let resetDigest: StateDigest = try Self.digest(core)
         let freshDigest: StateDigest = try Self.digest(fresh)
         #expect(core == fresh && resetDigest == freshDigest)
+        // Winning 99 in campaign opens 100; level.next then goes there, and from 100 wraps to 1.
+        let certified: AuroraLoomGenerated = try Core.generated(number: 99)
+        for move in certified.solution.moves { #expect(core.apply(Self.action(move)) == .accepted) }
+        #expect(core.play.stage == .won && core.progress.frontier == 100)
+        #expect(core.progress.solved[99] == AuroraLoomProgress.Result(bestMoves: certified.solution.shortest, stars: 3))
+        #expect(core.apply(ExperienceAction(control: "level.next", step: 0)) == .accepted)
+        #expect(core.levelNumber == 100)
+        #expect(core.apply(ExperienceAction(control: "level.next", step: 0)) == .accepted)
+        #expect(core.levelNumber == 1)
+    }
+
+    @Test func selectDailyPracticeAndCampaign() async throws {
+        var core: Core = try await Core.prepare(seed: 4)
+        #expect(core.levelNumber == 5 && core.tutorial == .done)
+        let before: Core = core
+        #expect(core.apply(ExperienceAction(control: "level.select", values: [6], step: 0))
+            == .rejected(.rule(code: AuroraLoomExperienceRule.locked)))
+        #expect(core == before)
+        #expect(core.apply(ExperienceAction(control: "level.select", values: [2], step: 0)) == .accepted)
+        #expect(core.levelNumber == 2 && core.mode == .campaign && core.tutorial != .done)
+        // Daily: 2026-01-02 is level 38, closed but playable; a win records stars without opening levels.
+        #expect(core.apply(ExperienceAction(control: "mode.daily", values: [2026, 1, 2], step: 0)) == .accepted)
+        #expect(core.levelNumber == 38 && core.mode == .daily(level: 38))
+        let daily: AuroraLoomGenerated = try Core.generated(number: 38)
+        for move in daily.solution.moves { #expect(core.apply(Self.action(move)) == .accepted) }
+        #expect(core.play.stage == .won && core.progress.frontier == 5 && core.progress.solved[38]?.stars == 3)
+        let dated: Core = core
+        #expect(core.apply(ExperienceAction(control: "mode.daily", values: [2026, 2, 29], step: 0))
+            == .rejected(.rule(code: AuroraLoomExperienceRule.date)))
+        #expect(core == dated)
+        // Campaign from a closed daily level returns to the highest open level.
+        #expect(core.apply(ExperienceAction(control: "mode.campaign", step: 0)) == .accepted)
+        #expect(core.levelNumber == 5 && core.mode == .campaign)
+        // Practice: the allowance is 64 and a win changes no progress.
+        #expect(core.apply(ExperienceAction(control: "mode.practice", step: 0)) == .accepted)
+        #expect(core.mode == .practice && core.play.level.allowance == Core.practiceAllowance)
+        let progress: AuroraLoomProgress = core.progress
+        let practice: AuroraLoomGenerated = try Core.generated(number: 5)
+        #expect(core.apply(ExperienceAction(control: "ribbon.move", values: [0, 0, Double(Self.otherWave(core))],
+                                            step: 0)) == .accepted)
+        #expect(core.apply(ExperienceAction(control: "play.undo", step: 0)) == .accepted)
+        for move in practice.solution.moves { #expect(core.apply(Self.action(move)) == .accepted) }
+        #expect(core.play.stage == .won && core.progress == progress)
+        // The practice state survives a snapshot round trip.
+        let restored: Core = try Core.restore(payload: try core.snapshotPayload(), seed: 4)
+        #expect(restored == core && restored.play.level.allowance == Core.practiceAllowance)
+    }
+
+    @Test func tutorialFollowsThePlayerAndCanBeDismissed() async throws {
+        var core: Core = try await Core.prepare(seed: 0)
+        let hint: AuroraLoomHint = try #require(core.hint(level: 1))
+        #expect(core.tutorial == .wave(ribbon: hint.ribbon))
+        let wave: Int = (core.play.steps.wave[hint.ribbon] + 1) % 16
+        #expect(core.apply(ExperienceAction(control: "ribbon.move", values: [Double(hint.ribbon), 0, Double(wave)],
+                                            step: 0)) == .accepted)
+        guard case .phase = core.tutorial else {
+            Issue.record("expected the phase step, got \(core.tutorial)")
+            return
+        }
+        #expect(core.apply(ExperienceAction(control: "play.undo", step: 0)) == .accepted)
+        guard case .phase = core.tutorial else {
+            Issue.record("undo moved the tutorial back: \(core.tutorial)")
+            return
+        }
+        let digest: StateDigest = try Self.digest(core)
+        #expect(core.apply(ExperienceAction(control: "tutorial.dismiss", step: 0)) == .accepted)
+        let dismissed: StateDigest = try Self.digest(core)
+        #expect(core.tutorial == .done && dismissed != digest)
+        #expect(core.apply(ExperienceAction(control: "tutorial.dismiss", step: 0)) == .accepted)
+        #expect(core.tutorial == .done)
+        // A failure is explained; no hint is given then.
+        var failing: Core = try await Core.prepare(seed: 20)
+        while failing.play.stage == .playing {
+            let ribbon: Int = failing.play.spent % 3
+            let current: Int = failing.play.steps.phase[ribbon]
+            var next: Int = (current + 1) % 16
+            while next != current {
+                var trial: Core = failing
+                if trial.apply(ExperienceAction(control: "ribbon.move", values: [Double(ribbon), 1, Double(next)],
+                                                step: 0)) == .accepted, trial.play.stage != .won {
+                    failing = trial
+                    break
+                }
+                next = (next + 1) % 16
+            }
+            if next == current { break }
+        }
+        if failing.play.stage == .failed {
+            let explanation: AuroraLoomFailureExplanation = try #require(failing.failureExplanation)
+            #expect(explanation.mismatch == failing.play.failure && failing.hint(level: 3) == nil)
+            #expect(failing.outcome?.code == Core.failedCode)
+        }
     }
 
     @Test func snapshotRestoreRoundTripAndRefusals() async throws {
@@ -190,16 +293,32 @@ import VisualCoreExperience
 
         #expect(throws: AuroraLoomRestoreRefusal.damaged) { try Core.restore(payload: Data("{}".utf8), seed: 31) }
         #expect(throws: AuroraLoomRestoreRefusal.damaged) { try Core.restore(payload: Data("nope".utf8), seed: 31) }
+        #expect(throws: AuroraLoomRestoreRefusal.damaged) {
+            try Core.restore(payload: Data("{\"level\":3,\"records\":[]}".utf8), seed: 31)
+        }
+        let rest: String = ",\"mode\":{\"campaign\":{}},\"progress\":{\"frontier\":1,\"solved\":[]},\"records\":[]}"
         #expect(throws: AuroraLoomRestoreRefusal.levelNumber(0)) {
-            try Core.restore(payload: Data("{\"level\":0,\"records\":[]}".utf8), seed: 31)
+            try Core.restore(payload: Data(("{\"level\":0" + rest).utf8), seed: 31)
         }
         #expect(throws: AuroraLoomRestoreRefusal.levelNumber(101)) {
-            try Core.restore(payload: Data("{\"level\":101,\"records\":[]}".utf8), seed: 31)
+            try Core.restore(payload: Data(("{\"level\":101" + rest).utf8), seed: 31)
         }
         let text: String = try #require(String(data: payload, encoding: .utf8))
         let wrongLevel: Data = Data(text.replacingOccurrences(of: "\"level\":32", with: "\"level\":33").utf8)
         #expect(wrongLevel != payload)
         #expect(throws: AuroraLoomRestoreRefusal.self) { try Core.restore(payload: wrongLevel, seed: 31) }
+    }
+
+    @Test func aSchemaOnePayloadMigrates() async throws {
+        let objectOne: [String: Any] = ["level": 2, "records": [Any]()]
+        let migrated: [String: Any] = try Core.migratedToSchemaTwo(objectOne)
+        let data: Data = try JSONSerialization.data(withJSONObject: migrated, options: [.sortedKeys])
+        let restored: Core = try Core.restore(payload: data, seed: 1)
+        let expected: Core = try await Core.prepare(seed: 1)
+        #expect(restored == expected && restored.mode == .campaign && restored.progress.frontier == 2)
+        #expect(restored.tutorial == expected.tutorial && restored.tutorial != .done)
+        #expect(throws: AuroraLoomRestoreRefusal.damaged) { try Core.migratedToSchemaTwo(["level": "x"]) }
+        #expect(Core.migrations.currentVersion == 2)
     }
 
     @Test func theTierAndTheSnapshotTimeNeverTouchTheDigest() async throws {

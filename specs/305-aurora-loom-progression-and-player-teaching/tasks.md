@@ -33,7 +33,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks.
 
 ## Phase 4: Adapter, scenarios and panel
 
-- [ ] T-R02G0105-004 Edit `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomExperienceCore.swift` (controls "level.select [1…100], mode.daily [year, month,
+- [X] T-R02G0105-004 Edit `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomExperienceCore.swift` (controls "level.select [1…100], mode.daily [year, month, — Verified 2026-11-20: 2026-11-20 R02-G01-05.host-3 exit 0 (adapter 12 tests incl. conformance and migration; scenarios regenerated); catalog search 15 tests pass
   day], mode.practice, mode.campaign, tutorial.dismiss"; practice allowance 64; progress, mode and tutorial in the digest;
   snapshot schema 2 with a 1 → 2 migration; codes r02-g01.locked, r02-g01.date), `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomScenarios.swift` and the
   regenerated `Packages/ExperiencesRound02/AuroraLoom/scenario-manifest.json`, with

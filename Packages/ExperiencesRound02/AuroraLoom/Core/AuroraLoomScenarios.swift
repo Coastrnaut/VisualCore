@@ -10,7 +10,9 @@
 // save-restore and reset play two moves and an undo; completion plays the certified solution and expects `won`;
 // full-playthrough solves levels 1, 2 and 3 with `level.next` between them; hero plays one move; rejection refuses
 // values out of range, fractional values, wrong value counts, an unknown control, a move to the current step and an
-// undo or redo with nothing to revert (never an undeclared control: the content audit forbids one in a manifest).
+// undo or redo with nothing to revert, a closed level (`r02-g01.locked`), a level out of range, a date that is not a
+// calendar date (`r02-g01.date`) and a date missing its day (feature 305); never an undeclared control: the content audit
+// forbids one in a manifest.
 // The 80 acceptance scenarios `acceptance-001` … `acceptance-080` follow the rows R2-G01-QA-001 … 080 of the archived
 // acceptance matrix (docs/archive/planning/rounds/round2.md, section 6.1.19, lines 2990–3075): each opens its planned
 // level with seed `level − 1`, issues one legal `ribbon.move` (the first move of that level's certified solution) and
@@ -137,6 +139,10 @@ extension AuroraLoomExperienceCore {
             refusedEntry("play.redo", [], kernelMove),
             refusedEntry("ribbon.move", [0, 0], "action.wrong-value-count"),
             refusedEntry("level.next", [1], "action.wrong-value-count"),
+            refusedEntry("level.select", [2], "action.rule." + AuroraLoomExperienceRule.locked),
+            refusedEntry("level.select", [101], outOfRange),
+            refusedEntry("mode.daily", [2026, 2, 30], "action.rule." + AuroraLoomExperienceRule.date),
+            refusedEntry("mode.daily", [2026, 11], "action.wrong-value-count"),
         ]
     }
 

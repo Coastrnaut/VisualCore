@@ -889,7 +889,7 @@
       "id": "r02-g01.aurora-loom",
       "code": "R02-G01",
       "title": "Aurora Loom",
-      "summary": "Weave three luminous ribbons of auroral silk into one harmony: turn each ribbon's wave and phase until its height meets the target marker at all four gates for two whole turns, within a move allowance. 100 certified levels; undo and redo. Drawn in code; offline.",
+      "summary": "Weave three luminous ribbons of auroral silk into one harmony: turn each ribbon's wave and phase until it meets the target marker at all four gates for two whole turns, within a move allowance. 100 certified levels with hints, stars, a daily level and practice; undo and redo. Drawn in code; offline.",
       "kind": "game",
       "tier": "free",
       "category": "puzzle",
@@ -910,6 +910,7 @@
         "Four gates that light up in harmony",
         "100 solver-certified levels",
         "Every move can be undone and redone",
+        "Hints, stars, daily and practice modes",
         "Three quality levels, same rules"
       ],
       "quality_tiers": [
