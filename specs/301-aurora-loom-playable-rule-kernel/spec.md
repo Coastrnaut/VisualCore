@@ -179,7 +179,8 @@ A level is stored with a schema version and a fingerprint; damaged or newer reco
   game, which consume the kernel's immutable snapshots.
 - The 100 catalog levels and their solver witnesses are generated in R02-G01-02; this feature proves the rules on seeded
   levels built in tests.
-- Visuals are code only and the game makes no network request; nothing here draws.
+- Visuals are code only and the game makes no network request; nothing here draws. Layout on iPhone and iPad, VoiceOver and
+  the accessible stepper controls belong to R02-G01-04 and -06, which drive the kernel through the same moves.
 
 ## Traceability
 
@@ -192,6 +193,8 @@ A level is stored with a schema version and a fingerprint; damaged or newer reco
 | Schema migration | FR-R02G0101-007 |
 | Solver-ready rules | FR-R02G0101-008 |
 | Invariants INV-01 … INV-05, INV-07 … INV-09 | FR-R02G0101-001 … 007 |
+| INV-06 content witnesses, INV-10 renderer purity, INV-12 novelty | later features R02-G01-02, -03 and the gate X-R02-G01 |
+| INV-11 monetization | superseded: the experience is free (ADR-0009) |
 | No Stage One breakage | FR-R02G0101-009 |
 
 ## Negative Requirements / Excluded scope
