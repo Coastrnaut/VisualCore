@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-19
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-F16 (migration ledger, shared round feature) · ID namespace FR-R02F16-###, SC-R02F16-###, T-R02F16-###
 
@@ -29,6 +29,54 @@ Canonical overrides:
 - **Superseded parts of the source prompt:** the USD 1.99–4.99 purchase model (ADR-0009); the Round 2 lock
   (ImplementationLock-100). **Device-only items:** none; the consumers measure solve times on D1–D3 in the device
   campaign. **Owner-only items:** none.
+
+## Clarifications
+
+### Session 2026-11-19
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time. Facts checked in
+code (read-only audit, 2026-11-19): VisualCoreSimulation (depends on VisualCoreMath only) holds `FieldGrid`,
+`SeededRandom` and the fixed-step runner; no shared graph, heap, flow or matching type exists in Packages or Apps;
+LightMaze's `Solver` and Visual Programming Lab's `VisualGraph` are experience-local; the names `GridGraph`,
+`RouteGraph`, `RouteSearch`, `RoutePath`, `TimeExpandedGraph`, `MinimumCut`, `SubgraphMatcher`, `SolverCertificate`,
+`CertificateChecker` and `RouteError` are free.
+
+- Q: Where does the toolkit live and what are its sizes and units? → A: in VisualCoreSimulation (pure, host-tested,
+  seeded fixtures through `SeededRandom`), no new module. Nodes are `Int` ids 0 ..< n with n ≤ 1,048,576 and at most
+  4,194,304 directed edges; edge costs are `Int` 0 … 1,000,000 (totals cannot overflow). A `GridGraph` is width × height
+  (each 1 … 4,096, at most 1,048,576 cells), node id y·width + x, neighbourhood four or eight, unit costs; a diagonal
+  move is allowed only when both orthogonal cells beside it are open (no corner cutting). Rationale: integer costs make
+  every answer exact and identical on every device. Impact: FR-R02F16-001, 002; SC-R02F16-001.
+- Q: How are searches ordered, budgeted and proved optimal? → A: breadth-first search expands each node's edges in
+  insertion order and returns the first route found; best-first search pops the smallest (g + h, h, node id) and the
+  estimate h is a caller function that must never overestimate (an overestimate gives a valid but possibly costlier
+  route, which the optimality check below then refuses). Each search takes a budget of node expansions (1 … 16,777,216,
+  default n); running out returns "gave up", never "unreachable". A found route's certificate carries node potentials
+  π (π(start) = 0, π(v) ≤ π(u) + c(u, v) for every edge, π(goal) = the route's cost), computed by a truncated
+  cheapest-first pass, which proves no cheaper route exists; "unreachable" carries the set of reachable nodes, which
+  contains the start, not the goal, and is closed under edges. Impact: FR-R02F16-002, 006; SC-R02F16-001, 005.
+- Q: How are schedules and time-expanded searches defined? → A: a schedule says for each step t in 0 ..< T
+  (T 1 … 4,096, cells × T ≤ 16,777,216) whether each cell is open; a move or a wait takes one step; a state (cell, t)
+  must be open; waiting can be forbidden. The answer is the earliest arrival time with its timed route, found
+  breadth-first over (cell, t) in time order; its certificate proves the route is feasible (every state open, every move
+  an edge or a permitted wait), earliest-ness being proved by the tests against a reference simulation; "unreachable
+  within T" carries the closed set of reachable states. Impact: FR-R02F16-003; SC-R02F16-002.
+- Q: What do cuts and pattern matches mean exactly? → A: a cut is a minimum set of directed edges whose removal leaves no
+  route from s to t, found by shortest augmenting routes on unit capacities; its certificate lists the cut edges and as
+  many pairwise edge-disjoint s–t routes, and the checker confirms both counts, the disjointness and the separation (a
+  closed reachable set after removal). Matching works on undirected simple graphs: a placement is an injective map from
+  pattern nodes (at most 32) to graph nodes taking every pattern edge to a graph edge (not necessarily induced);
+  placements are listed in lexicographic order of the map, at most 100,000, within a budget of 10,000,000 extension
+  steps ("gave up" past it); two graphs with equal node and edge counts are isomorphic exactly when a placement exists.
+  A placement certificate is checked edge by edge; "no placement" records the exhaustive count and is not independently
+  checkable. Impact: FR-R02F16-004, 005; SC-R02F16-003, 004.
+- Q: What is stored, and what are the failure codes? → A: `SolverCertificate` is `Codable` JSON schema 1 with sorted keys
+  (`{"schema":1,"kind":…}` and the kind's fields: route, unreachable, timedRoute, timedUnreachable, cut, placement,
+  exhausted); schema 1 is the first stored form, schema above 1 is refused. Reason codes (`RouteError`):
+  `r2-f16.empty-graph`, `r2-f16.graph-limit`, `r2-f16.node-range`, `r2-f16.negative-cost`, `r2-f16.blocked-endpoint`,
+  `r2-f16.schedule-limit`, `r2-f16.pattern-limit`, `r2-f16.budget`, `r2-f16.certificate-rejected` (with the failed rule),
+  `r2-f16.newer-schema`, `r2-f16.malformed`; "gave up" is a result, not an error; the experience adds its id, seed and
+  tick. Impact: FR-R02F16-006, 007, 008; SC-R02F16-005.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -85,7 +133,8 @@ stored certificates round-trip; newer and damaged forms are refused.
 
 - **Start equals goal:** a route of zero steps.
 - **Start or goal blocked or outside the graph:** refused with a named reason.
-- **Negative costs:** refused.
+- **Negative costs or costs above 1,000,000:** refused with `r2-f16.negative-cost`.
+- **An estimate that overestimates:** the route may be costlier than optimal and its certificate is then refused.
 - **Search budget exceeded:** the answer is "gave up", never a wrong "unreachable".
 - **A pattern larger than the graph:** no placement.
 - **Empty graph or schedule of length 0:** refused or trivial, with a named reason.
