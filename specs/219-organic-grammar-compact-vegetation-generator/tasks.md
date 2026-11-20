@@ -53,7 +53,7 @@ its check record (no trailers). No {owner} tasks; one {device} task. Fixture see
   `render_autocreator.py`
 - [X] T-R02F19-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-20: 2026-11-20 .autonomy/migration/checks/R02-F19.reference-1.json (exit 0)
 - [X] T-R02F19-010 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-20: 2026-11-20 .autonomy/migration/checks/R02-F19.reference-2.json (exit 0)
-- [ ] T-R02F19-011 Script tests (`--name script-tests`)
+- [X] T-R02F19-011 Script tests (`--name script-tests`) — Verified 2026-11-20: 2026-11-20 .autonomy/migration/checks/R02-F19.script-tests.json (exit 0)
 - [ ] T-R02F19-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
 
 ## Device campaign (after ImplementationLock-100)
