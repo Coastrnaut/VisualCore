@@ -32,7 +32,7 @@ or {device} tasks (pure logic). Fixture seed 2_301; tests stay short.
 
 ## Phase 4: Stories 2, 3 and 4 — allowance, undo, replay and life stages (P1, P2)
 
-- [ ] T-R02G0101-004 [P] [US2] [US3] [US4] Create `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomPlay.swift` (stages and events, moves with validation and
+- [X] T-R02G0101-004 [P] [US2] [US3] [US4] Create `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomPlay.swift` (stages and events, moves with validation and — Verified 2026-11-20: 2026-11-20 host-3 exit 0: AuroraLoomPlayTests 11/11 (500 traces replay exactly; undo restores every earlier state; 1,000 refused attempts change nothing; winning and failing with the worst mismatch; full stage table) (.autonomy/migration/checks/R02-G01-01.host-3.json)
   records, undo with refund, redo, replay, fingerprints) with `Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomPlayTests.swift` (500 seeded traces replay to
   identical fingerprints and outcome; undo of every move restores the exact state; 1,000 seeded refused moves leave state
   and fingerprint unchanged; spending the allowance fails with the worst mismatch named; stage machine table; no move
