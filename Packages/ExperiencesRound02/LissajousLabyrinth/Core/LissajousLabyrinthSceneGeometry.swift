@@ -128,6 +128,14 @@ public enum LissajousLabyrinthSceneGeometry {
         return (b.centre + eyeDirection * d, b.centre, fieldOfView)
     }
 
+    /// The eye distances of the bounding sphere's front and back for `aspect` (the fitted distance minus and plus the
+    /// radius, the front at least 0.001): the `u_fadeNear` and `u_fadeFar` of the thread's depth fading.
+    public static func depthRange(aspect: Double, snapshot: LissajousLabyrinthSceneSnapshot) -> (near: Double, far: Double) {
+        let b = bounds(snapshot)
+        let d = distance(radius: b.radius, aspect: usableAspect(aspect))
+        return (max(d - b.radius, 1e-3), d + b.radius)
+    }
+
     /// The view-projection of ``camera(aspect:snapshot:)``: `Mat4.perspective` (GL depth range, near half the gap to
     /// the bounding sphere, far beyond it) times `Mat4.lookAt` with +y up.
     public static func viewProjection(aspect: Double, snapshot: LissajousLabyrinthSceneSnapshot) -> Mat4 {

@@ -79,7 +79,7 @@ final class LissajousLabyrinthThreadScene {
         }
         try drawSpheres(snapshot, viewProjection: viewProjection)
         try drawRings(snapshot, viewProjection: viewProjection)
-        try drawThread(snapshot, tier: tier, viewProjection: viewProjection, animate: animate)
+        try drawThread(snapshot, tier: tier, viewProjection: viewProjection, aspect: aspect, animate: animate)
         try drawHead(snapshot, viewProjection: viewProjection)
     }
 
@@ -171,14 +171,17 @@ final class LissajousLabyrinthThreadScene {
     }
 
     private func drawThread(_ snapshot: LissajousLabyrinthSceneSnapshot, tier: LissajousLabyrinthTier,
-                            viewProjection: Mat4, animate: Bool) throws {
+                            viewProjection: Mat4, aspect: Double, animate: Bool) throws {
         guard let threadRenderer else { return }
+        let fade = LissajousLabyrinthSceneGeometry.depthRange(aspect: aspect, snapshot: snapshot)
         let head = Float(LissajousLabyrinthShaders.headFraction(tick: snapshot.headTick))
         let trail = Float(LissajousLabyrinthShaders.trailFraction(tier))
         let time = animate ? Float(snapshot.time.truncatingRemainder(dividingBy: 1_000)) : 0
         let gain = reducedFlash ? Self.reducedGlowGain : Self.glowGain
         let setCommon: (ShaderProgram) -> Void = { p in
             p.set("u_mvp", matrix4: viewProjection.floats)
+            p.set("u_fadeNear", Float(fade.near))
+            p.set("u_fadeFar", Float(fade.far))
             p.set("u_head", head)
             p.set("u_trail", trail)
             p.set("u_time", time)

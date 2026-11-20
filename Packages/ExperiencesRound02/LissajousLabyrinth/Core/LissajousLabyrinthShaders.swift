@@ -6,7 +6,7 @@
 // Thread program: the luminous harmonic curve, drawn from the camera-facing strip of research R1. Each vertex carries its
 // lap fraction (0 ... 1, the sample's tick / 4,096) in `a_uv.x` and its side of the strip (-1 or +1) in `a_uv.y`. The
 // fragment stage mixes cobalt toward violet around the lap (seamless at the lap's wrap), softens the edges from |side|
-// like an ink line, adds a small interference shimmer sin(lap * k + time) (time held at 0 for Reduce Motion), brightens
+// like an ink line, fades with depth (the front of the scene is up to 15 % brighter than the back), adds a small interference shimmer sin(lap * k + time) (time held at 0 for Reduce Motion), brightens
 // the trail behind the tracer head (wrap-around distance, uniforms only, no rebuild) with a copper tint near the head and,
 // in a glow pass (`u_glow` > 0, additive), writes a wide soft falloff instead of the crisp core. Solid program: checkpoint
 // rings, obstacle icospheres and the head disc in one colour, dimmed unless lit, with a rim term from the facing between
@@ -37,10 +37,26 @@ public enum LissajousLabyrinthShaders {
     /// The upper bound the thread shader applies to `u_glow` (Reduce Flashing caps it lower on the CPU).
     public static let maxGlow = 4.0
 
+    /// The extra brightness of the thread at the front of the scene (depth fading, FR-R02G0203-002): the front of the
+    /// bounding sphere is drawn at 1 + ``depthFadeGain`` of the colour, the back at 1, linearly in eye distance between
+    /// them, so the back never drops below the colour the frame checks expect.
+    public static let depthFadeGain = 0.15
+
+    /// The thread's depth fade factor, as the thread vertex shader computes it: 1 + ``depthFadeGain`` at `near` or
+    /// nearer, 1 at `far` or farther, linear between (a span under 0.0001 counts as 0.0001). Non-finite input gives 1.
+    public static func depthFade(eyeDistance: Double, near: Double, far: Double) -> Double {
+        guard eyeDistance.isFinite, near.isFinite, far.isFinite else { return 1 }
+        let depth = min(max((eyeDistance - near) / max(far - near, 0.0001), 0), 1)
+        return 1 + depthFadeGain * (1 - depth)
+    }
+
     /// The share of its colour an unlit solid keeps (the solid shader's `mix(0.5, 1.0, u_lit)`).
     public static let solidDimShare = 0.5
 
-    /// The thread vertex shader. Uniform: `u_mvp` (model-view-projection). Passes the lap fraction and the side.
+    /// The thread vertex shader. Uniforms: `u_mvp` (model-view-projection), `u_fadeNear` and `u_fadeFar` (the eye
+    /// distances of the bounding sphere's front and back, ``SceneGeometry.depthRange(aspect:snapshot:)``). Passes the lap
+    /// fraction, the side and the depth fade of ``depthFade(eyeDistance:near:far:)`` (the eye distance is the clip w of a
+    /// perspective projection).
     public static let threadVertex = """
     #version 300 es
     precision highp float;
@@ -48,12 +64,18 @@ public enum LissajousLabyrinthShaders {
     layout(location = 1) in vec3 a_normal;
     layout(location = 2) in vec2 a_uv;
     uniform mat4 u_mvp;
+    uniform float u_fadeNear;
+    uniform float u_fadeFar;
     out float v_lap;
     out float v_side;
+    out float v_fade;
     void main() {
         v_lap = a_uv.x;
         v_side = a_uv.y;
         gl_Position = u_mvp * vec4(a_position, 1.0);
+        float span = max(u_fadeFar - u_fadeNear, 0.0001);
+        float depth = clamp((gl_Position.w - u_fadeNear) / span, 0.0, 1.0);
+        v_fade = mix(1.15, 1.0, depth);
     }
     """
 
@@ -66,6 +88,7 @@ public enum LissajousLabyrinthShaders {
     precision highp float;
     in float v_lap;
     in float v_side;
+    in float v_fade;
     uniform float u_head;
     uniform float u_trail;
     uniform float u_glow;
@@ -86,7 +109,7 @@ public enum LissajousLabyrinthShaders {
         float nearHead = 1.0 - smoothstep(0.0, trail * 0.15 + 0.002, behind);
         float shimmer = 0.06 * sin(lap * 6.2831853 * 24.0 + u_time * 1.5);
         vec3 lit = mix(base, u_copper, 0.75 * nearHead) * (0.8 + 0.35 * inTrail + shimmer);
-        vec3 rgb = clamp(lit + u_violet * (0.15 * inTrail), 0.0, 1.0);
+        vec3 rgb = clamp((lit + u_violet * (0.15 * inTrail)) * clamp(v_fade, 1.0, 1.15), 0.0, 1.0);
         float glow = clamp(u_glow, 0.0, 4.0);
         float isGlow = step(0.0001, glow);
         float coreAlpha = 1.0 - smoothstep(0.55, 1.0, side);
@@ -141,7 +164,7 @@ public enum LissajousLabyrinthShaders {
 
     /// Every uniform the thread program declares, exactly as declared (vertex stage first).
     public static let threadUniforms: [String] = [
-        "u_mvp", "u_head", "u_trail", "u_glow", "u_opacity", "u_time", "u_cobalt", "u_violet", "u_copper",
+        "u_mvp", "u_fadeNear", "u_fadeFar", "u_head", "u_trail", "u_glow", "u_opacity", "u_time", "u_cobalt", "u_violet", "u_copper",
     ]
 
     /// Every uniform the solid program declares, exactly as declared (vertex stage first).

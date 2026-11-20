@@ -2,13 +2,14 @@
 // research R1, R3). Host checks of the GLSL ES 3.00 sources: the version line and one precision statement, every declared
 // uniform listed, used and declared once per program, no texture sampler and no loops, vertex outputs matching fragment
 // inputs, balanced braces, the `ShaderMeshRenderer` attribute names and locations, ASCII only, and the CPU references
-// (head and trail fractions, solid colour). The real compile happens on the simulator.
+// (head and trail fractions, solid colour, the thread's depth fade and its range, T-R02G0203-014). The real compile happens on the simulator.
 // The version literal "#version 300 es" is VisualCoreShaderSource's `ShaderLibrary.versionLine`; the attributes
 // `a_position` at 0, `a_normal` at 1 and `a_uv` at 2 are VisualCoreRendering's `ShaderMeshRenderer` streams (neither is a
 // dependency of this target). Test data uses explicit types and plain loops (CI type-check rule).
 import Foundation
 import Testing
 @testable import LissajousLabyrinthCore
+import VisualCoreMath
 
 @Suite struct LissajousLabyrinthShaderSourceTests {
     struct Program {
@@ -184,7 +185,7 @@ import Testing
             #expect(program.fragment.contains("color = vec4(rgb * alpha, alpha);"), "\(program.name) premultiplied")
         }
         #expect(Self.interface("out", in: LissajousLabyrinthShaders.threadVertex)
-                == ["v_lap": "float", "v_side": "float"])
+                == ["v_lap": "float", "v_side": "float", "v_fade": "float"])
         #expect(Self.interface("out", in: LissajousLabyrinthShaders.solidVertex) == ["v_normal": "vec3"])
     }
 
@@ -239,5 +240,41 @@ import Testing
         #expect(LissajousLabyrinthShaders.solidColour(copper, lit: false) == copper * 0.5)
         let over: SIMD3<Double> = SIMD3<Double>(1.5, -0.2, 0.5)
         #expect(LissajousLabyrinthShaders.solidColour(over, lit: true) == SIMD3<Double>(1, 0, 0.5))
+    }
+
+    @Test func depthFadeBrightensTheFrontAndKeepsTheBack() {
+        let gain: Double = LissajousLabyrinthShaders.depthFadeGain
+        #expect(gain == 0.15)
+        #expect(abs(LissajousLabyrinthShaders.depthFade(eyeDistance: 2, near: 2, far: 4) - 1.15) < 1e-12)
+        #expect(abs(LissajousLabyrinthShaders.depthFade(eyeDistance: 1, near: 2, far: 4) - 1.15) < 1e-12)
+        #expect(LissajousLabyrinthShaders.depthFade(eyeDistance: 4, near: 2, far: 4) == 1)
+        #expect(LissajousLabyrinthShaders.depthFade(eyeDistance: 9, near: 2, far: 4) == 1)
+        #expect(abs(LissajousLabyrinthShaders.depthFade(eyeDistance: 3, near: 2, far: 4) - 1.075) < 1e-12)
+        #expect(LissajousLabyrinthShaders.depthFade(eyeDistance: .nan, near: 2, far: 4) == 1)
+        var previous: Double = 1 + gain
+        for step in 0...40 {
+            let fade: Double = LissajousLabyrinthShaders.depthFade(eyeDistance: 2 + Double(step) * 0.05, near: 2, far: 4)
+            #expect(fade <= previous && fade >= 1)
+            previous = fade
+        }
+        #expect(LissajousLabyrinthShaders.threadVertex.contains("mix(1.15, 1.0, depth)"))
+        #expect(LissajousLabyrinthShaders.threadFragment.contains("clamp(v_fade, 1.0, 1.15)"))
+    }
+
+    @Test func depthRangeBracketsTheFigureAtEveryAspect() throws {
+        let generated: LissajousLabyrinthGenerated = try LissajousLabyrinthGenerator.generate(
+            LissajousLabyrinthManifest.entries[0])
+        let snapshot: LissajousLabyrinthSceneSnapshot = LissajousLabyrinthSceneSnapshot(
+            play: LissajousLabyrinthPlay(level: generated.level), time: 0)
+        let b = LissajousLabyrinthSceneGeometry.bounds(snapshot)
+        let aspects: [Double] = [0.4, 0.75, 1, 1.5, 2.5, 0, .nan]
+        for aspect in aspects {
+            let range = LissajousLabyrinthSceneGeometry.depthRange(aspect: aspect, snapshot: snapshot)
+            let eye = LissajousLabyrinthSceneGeometry.camera(aspect: aspect, snapshot: snapshot).eye
+            #expect(range.near > 0 && range.far > range.near)
+            #expect(abs((range.far - range.near) - 2 * b.radius) < 1e-9)
+            let front: Double = (b.centre - eye).length - b.radius
+            #expect(abs(front - range.near) < 1e-9 || range.near == 1e-3)
+        }
     }
 }

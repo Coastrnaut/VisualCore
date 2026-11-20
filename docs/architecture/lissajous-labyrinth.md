@@ -81,7 +81,8 @@ LISSAJOUS_LABYRINTH_WRITE_WITNESSES=1 swift test --package-path Packages/Experie
 - **Snapshot.** `LissajousLabyrinthSceneSnapshot` copies the level, dials, stage, the lap's verdict and the checkpoints'
   visit ticks with a presentation time; the tracer head advances 60 ticks per second (0 under Reduce Motion).
 - **Scene.** The lap's samples scaled by 1/1,024 form a camera-facing thread (tangent-space width 0.035) shaded cobalt
-  to violet with a brighter trail behind the copper head; checkpoints are copper rings (dim, next, visited in order);
+  to violet with a brighter trail behind the copper head, a small interference shimmer and depth fading (the front of
+  the bounding sphere is up to 15 % brighter than the back, `LissajousLabyrinthShaders.depthFade`); checkpoints are copper rings (dim, next, visited in order);
   obstacles violet translucent icospheres with a rim, copper when the lap touches them; the camera fits the figure's
   bounding sphere for aspects 0.4 … 2.5 with a 5 % margin. Palette: night #070B1E, cobalt #2F5BD8, violet #8A4FE0,
   copper #D9824A. GLSL ES 3.00 in `LissajousLabyrinthShaders`, drawn with the shared `ShaderMeshRenderer`.
