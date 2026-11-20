@@ -23,7 +23,7 @@ tests stay short (< 10 s each). Simulator evidence is one pass on the iOS 27.x p
 
 ## Phase 3: Story 1 — see the auroral silk (P1) 🎯
 
-- [ ] T-R02G0103-003 [P] [US1] Create `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomSceneGeometry.swift` (centre lines "height H · sin(2πθ/4,096), lanes
+- [X] T-R02G0103-003 [P] [US1] Create `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomSceneGeometry.swift` (centre lines "height H · sin(2πθ/4,096), lanes — Verified 2026-11-20: 2026-11-20 host-2 exit 0: AuroraLoomSceneGeometryTests 12/12 (finite and bounded for extreme settings, every Ω and large times; layers per tier; certified levels; 5 % framing for aspects 0.4 … 2.5; projection follows the GL chain; phase and marker formulas; determinism) (.autonomy/migration/checks/R02-G01-03.host-2.json)
   −1/0/+1", ribbon meshes via CatmullRomSpline, CurveFrames.parallelTransport and Mesh.ribbon per layer, gate rings,
   markers, camera fitting aspect 0.4 … 2.5 with a 5 % margin, projection) with `Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomSceneGeometryTests.swift`
   (finite and bounded for every extreme setting and Ω; layers per tier; fit for aspects 0.4 … 2.5; projection round
