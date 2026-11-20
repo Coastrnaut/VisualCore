@@ -30,7 +30,7 @@ or {device} tasks (pure logic). Fixture seed 2_311; tests stay short (< 10 s eac
 
 ## Phase 3: Story 1 — tune the tracer through every checkpoint (P1) 🎯
 
-- [ ] T-R02G0201-003 [P] [US1] Create `Packages/ExperiencesRound02/LissajousLabyrinth/CoreTests/LissajousLabyrinthLapTests.swift` (500 seeded levels: the safe setting
+- [X] T-R02G0201-003 [P] [US1] Create `Packages/ExperiencesRound02/LissajousLabyrinth/CoreTests/LissajousLabyrinthLapTests.swift` (500 seeded levels: the safe setting — Verified 2026-11-20: 2026-11-20 host-2 exit 0: LissajousLabyrinthLapTests 8/8 (500 safe settings win; every valid single-dial change on 50 levels agrees with an independent exact reference; surface boundaries for checkpoints and segments; closing segment 4095; order; ties; period) (.autonomy/migration/checks/R02-G02-01.host-2.json)
   wins; every single-dial change on the first 50 agrees with an independent reference written in the test; checkpoint
   boundary inclusive and obstacle boundary exclusive at the surface and one unit either side; the closing segment;
   out-of-order and missed checkpoints; tie order of contacts; the path closes after 4,096 ticks); `--name host-2`
