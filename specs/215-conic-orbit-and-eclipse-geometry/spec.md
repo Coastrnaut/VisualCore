@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-19
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-F15 (migration ledger, shared round feature) · ID namespace FR-R02F15-###, SC-R02F15-###, T-R02F15-###
 
@@ -28,6 +28,51 @@ Canonical overrides:
 - **Superseded parts of the source prompt:** the USD 1.99–4.99 purchase model (ADR-0009); the Round 2 lock
   (ImplementationLock-100). **Device-only items:** none beyond the regression; the consuming experiences measure frame
   time on D1–D3 in the device campaign. **Owner-only items:** none.
+
+## Clarifications
+
+### Session 2026-11-19
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time. Facts checked in
+code (read-only audit, 2026-11-19): `KeplerOrbit` (VisualCoreMath; semi-major axis, 0 ≤ e < 1, i, Ω, ω, M₀, n;
+`eccentricAnomaly(meanAnomaly:eccentricity:)` by Newton, 32 steps, step tolerance 1e-12; `position(at:)`) is used by
+tests only in the framework; Solar System Explorer has its own `OrbitElements`; `Vec2`, `Vec3` are in VisualCoreMath,
+which depends on nothing; the names `ConicOrbit`, `KeplerSolver`, `OrbitState`, `PhaseStepper`, `DiskOverlap`,
+`EclipseGeometry`, `EclipseClass`, `OrbitError` are free (`Visibility` is taken).
+
+- Q: Where do the parts live and how are elements given? → A: all in VisualCoreMath. `ConicOrbit` takes periapsis
+  distance q > 0, eccentricity e ≥ 0, inclination, ascending node, argument of periapsis (radians, the frame of
+  `KeplerOrbit`), time of periapsis tₚ and gravitational parameter μ > 0, all finite (Double). Mean motion
+  n = √(μ/|a|³) with a = q/(1 − e) for e ≠ 1, and n = √(μ/(2q³)) for the parabola. For e < 1 an adapter gives the
+  equal `KeplerOrbit` (a, e, i, Ω, ω, M₀ = −n·tₚ, n). Rationale: Section 13's home; periapsis distance stays finite for
+  every conic. Impact: FR-R02F15-001, 003; SC-R02F15-002.
+- Q: How is each Kepler equation solved, and where is the parabolic band? → A: elliptic: `KeplerOrbit.eccentricAnomaly`,
+  then at most 8 further Newton steps while the residual |E − e·sin E − M| exceeds 1e-12; hyperbolic
+  (e·sinh H − H = M): Newton from H₀ = sign(M)·ln(2|M|/e + 1.8), at most 64 steps, stop when the step is below
+  1e-12·max(1, |H|); parabolic (|e − 1| ≤ 1e-9, Barker's equation): closed form s = y − 1/y, y = ∛(W + √(W² + 1)),
+  W = (3/2)·n·(t − tₚ), true anomaly ν = 2·atan(s). Results are always finite. Rationale: reuse the existing solver,
+  closed form where Newton is weakest. Impact: FR-R02F15-002; SC-R02F15-001; the near-parabolic edge case: for
+  μ = q = 1 and |t − tₚ| ≤ 10, positions at e = 1 ± 1e-4 differ from the parabola's by a relative ≤ 1e-3.
+- Q: How does phase stepping avoid drift, and how are passages counted? → A: `PhaseStepper` has a start time t₀, a step
+  Δt > 0 and a tick k in 0 … 1,000,000,000; time(k) = t₀ + Double(k)·Δt is computed directly, never accumulated, so
+  stepping and jumping agree bit for bit. Phase of a closed orbit = ((t − tₚ)/P) mod 1 in [0, 1); open orbits have no
+  phase (nil). Passages in the half-open span [tₐ, t_b) are listed in time order, periapsis at tₚ + jP and apoapsis at
+  tₚ + (j + ½)P; an open orbit has one periapsis passage at tₚ. Rationale: half-open spans report each passage once.
+  Impact: FR-R02F15-004; SC-R02F15-003.
+- Q: How are eclipses projected and classified? → A: from an observer, angular radii αₛ = asin(Rₛ/dₛ),
+  αₒ = asin(Rₒ/dₒ) and separation θ (angle between the two directions) feed the planar disk overlap of radii αₛ, αₒ at
+  distance θ (exact for the disk model, the usual small-angle approximation of the sky). Classes: **hidden** when an
+  optional ground sphere (the observer's own body) puts the whole source disk below the horizon; otherwise **none** when
+  the occluder is not nearer than the source (dₒ ≥ dₛ) or θ ≥ αₛ + αₒ (touching gives none); **total** when αₒ ≥ αₛ and
+  θ ≤ αₒ − αₛ; **annular** when αₒ < αₛ and θ ≤ αₛ − αₒ; else **partial**. The verdict reports αₛ, αₒ, θ, covered
+  fraction and class. Impact: FR-R02F15-005, 006; SC-R02F15-004, 005.
+- Q: What is stored, and what are the failure codes? → A: `ConicOrbit` is `Codable` as JSON with sorted keys
+  `{"schema":1,"periapsisDistance","eccentricity","inclination","ascendingNode","argumentOfPeriapsis",
+  "timeOfPeriapsis","gravitationalParameter"}`; schema 1 is the first stored form (no earlier form exists, so nothing
+  migrates yet; a later schema adds a step to the consumer's `MigrationChain`); schema above 1 is refused. Reason codes
+  (`OrbitError`): `r2-f15.invalid-elements`, `r2-f15.invalid-step`, `r2-f15.tick-limit`, `r2-f15.invalid-disk`,
+  `r2-f15.observer-inside`, `r2-f15.newer-schema`, `r2-f15.malformed`; the experience adds its id, seed and tick.
+  Impact: FR-R02F15-007, 008; SC-R02F15-005.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -79,15 +124,16 @@ refused.
 
 ### Edge Cases
 
-- **Eccentricity exactly 1, or within a hair of it:** the parabolic solution is used near the boundary so results stay
-  finite and continuous.
+- **Eccentricity exactly 1, or within 1e-9 of it:** the parabolic closed form is used, so results stay finite; at
+  e = 1 ± 1e-4 positions differ from the parabola's by a relative ≤ 1e-3 (μ = q = 1, |t − tₚ| ≤ 10).
 - **Hyperbolic time far from periapsis:** the solver stays finite (bounded steps), and the true anomaly stays inside the
   asymptote limits.
 - **Disks that just touch, that are equal, or where one is inside the other:** overlap is 0, exact, or the smaller
   disk's full area.
-- **An occluder behind the observer or behind the source:** no eclipse is reported.
+- **An occluder behind the observer or behind the source:** no eclipse is reported (dₒ ≥ dₛ, or θ ≥ αₛ + αₒ).
+- **An observer inside the source, the occluder or the ground:** refused with `r2-f15.observer-inside`.
 - **Zero-size or non-finite radii and positions:** refused with a named reason.
-- **A step count beyond the stated limit:** refused.
+- **A tick beyond 1,000,000,000 or a step that is not finite and positive:** refused with a named reason.
 
 ## Requirements *(mandatory)*
 
