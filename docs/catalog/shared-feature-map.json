@@ -248,8 +248,8 @@
     "Preset",
     "NamedLibrary"
    ],
-   "home": "(new) VisualCorePuzzle, scripts/",
-   "note": "Content authoring, balancing and level catalogs generated and validated by tools."
+   "home": "VisualCoreSimulation",
+   "note": "As built (feature 224): PuzzleCatalogPlan, PuzzleCatalogStage, PuzzleDifficulty, ProgressionRule, PuzzleCatalogBuilder, PuzzleCatalog with a pinned digest, PuzzleCatalogChecker and tutorial contracts (TutorialContract, TutorialContractProgress) in VisualCoreSimulation rather than a new module or a script; catalogs are built and checked by code and pinned in tests; Preset and NamedLibrary unchanged."
   },
   "F25": {
    "disposition": "superseded",

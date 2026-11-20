@@ -359,6 +359,14 @@ composite, premultiplied over); `composite` mode 2 is premultiplied over; the va
 and out-of-range emissive ones. `RenderState.premultipliedBlended` draws premultiplied layers. Rules:
 [docs/architecture/shaders.md](../../docs/architecture/shaders.md).
 
+## Content catalogs and tutorials (feature 224, R02-F24)
+
+VisualCoreSimulation builds level catalogs from code: `PuzzleCatalogPlan` and `PuzzleCatalogStage`, `PuzzleDifficulty`
+and `ProgressionRule`, `PuzzleCatalogBuilder` into a `PuzzleCatalog` of `PuzzleCatalogEntry`s with a pinned digest
+(JSON schema 1), `PuzzleCatalogChecker` with `PuzzleCatalogReport` and `PuzzleCatalogIssue`, and tutorial contracts
+(`TutorialContract`, `TutorialContractStep`, `TutorialCondition`, `TutorialEvent`, `TutorialContractProgress`). Refusals
+are `ContentError` with `r2-f24.*` codes. Rules: [docs/architecture/content-catalogs.md](../../docs/architecture/content-catalogs.md).
+
 ## Puzzle contract (feature 223, R02-F23)
 
 VisualCoreSimulation certifies puzzle levels: `PuzzleRules` (the pure rules an experience supplies), `PuzzleLevel`
