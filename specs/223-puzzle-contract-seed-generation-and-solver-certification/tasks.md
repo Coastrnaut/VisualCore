@@ -48,7 +48,7 @@ tasks; one {device} task. Fixture seed 2_023; tests stay short.
   -- python3 scripts/check_documented_api.py --sources Apps/VisualCore`; new `docs/architecture/puzzle-contract.md`;
   section in `Packages/VisualCore/README.md`; section 13.4 row R02-F23 "As built" in
   `docs/catalog/shared-feature-map.json` and `render_autocreator.py`
-- [ ] T-R02F23-008 Reference regression chunk 1 (`--name reference-1`)
+- [X] T-R02F23-008 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-20: 2026-11-20 reference-1 exit 0
 - [ ] T-R02F23-009 Reference regression chunk 2 (`--name reference-2`)
 - [X] T-R02F23-010 Script tests, run alone (`--name script-tests`) — Verified 2026-11-20: 2026-11-20 script-tests exit 0, run alone (.autonomy/migration/checks/R02-F23.script-tests.json)
 - [ ] T-R02F23-011 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
