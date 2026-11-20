@@ -49,7 +49,7 @@ or {device} tasks (pure logic). Fixture seed 2_311; tests stay short (< 10 s eac
   "r02-g02-lissajous-labyrinth") with `Packages/ExperiencesRound02/LissajousLabyrinth/CoreTests/LissajousLabyrinthRulesTests.swift` (moves in dial order, values
   ascending, skipping current and non-coprime; apply refusals; isSolved equals the verdict; R02-F23's PuzzleValidator
   certifies a seeded level); `--name host-4`
-- [ ] T-R02G0201-006 [P] Create `Packages/ExperiencesRound02/LissajousLabyrinth/CoreTests/LissajousLabyrinthInvariantTests.swift` with
+- [X] T-R02G0201-006 [P] Create `Packages/ExperiencesRound02/LissajousLabyrinth/CoreTests/LissajousLabyrinthInvariantTests.swift` with — Verified 2026-11-20: 2026-11-20 host-5 exit 0: LissajousLabyrinthInvariantTests 8/8 (Time, Inputbudget, Goal, Repeatability, Undo, Failurehonesty, Stability, Save — each a boundary example and a seeded neighbouring check) (.autonomy/migration/checks/R02-G02-01.host-5.json)
   `testLissajousLabyrinthTimeBoundary` (INV-01), `testLissajousLabyrinthInputbudgetBoundary` (INV-02),
   `testLissajousLabyrinthGoalBoundary` (INV-03), `testLissajousLabyrinthRepeatabilityBoundary` (INV-04),
   `testLissajousLabyrinthUndoBoundary` (INV-05), `testLissajousLabyrinthFailurehonestyBoundary` (INV-07),
