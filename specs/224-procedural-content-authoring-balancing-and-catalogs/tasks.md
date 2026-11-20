@@ -66,3 +66,10 @@ tasks; one {device} task. Fixture seed 2_024; tests stay short.
 
 001 → 002 → {003, 004, 005} in parallel → 006 → … → 011. Agents: A (003), B (004; builds catalogs by hand until A's
 builder exists), C (005). Shared files (002, docs) stay with the lead. MVP: Stories 1 and 2.
+
+## Phase 7: Convergence
+
+- [ ] T-R02F24-013 Add a checker test where two levels have the same content but different seeds (different identities)
+  and are reported as `.duplicate`, while two levels with different content are not, in
+  `Packages/VisualCore/Tests/VisualCoreSimulationTests/PuzzleCatalogCheckerTests.swift`; `--name host-5` per spec
+  Clarifications Q1, Q3 (partial)
