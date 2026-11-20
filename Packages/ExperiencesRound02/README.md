@@ -25,3 +25,13 @@ AURORA_LOOM_WRITE_WITNESSES=1 swift test --package-path Packages/ExperiencesRoun
 ```bash
 swift test --package-path Packages/ExperiencesRound02
 ```
+
+## Lissajous Labyrinth (R02-G02, `r02-g02.lissajous-labyrinth`, free)
+
+`LissajousLabyrinthCore` (feature 311, R02-G02-01) is the playable rule kernel: the integer `LissajousLabyrinthSine`,
+`LissajousLabyrinthLevel` with `LissajousLabyrinthBall`, `LissajousLabyrinthDials` and `LissajousLabyrinthDial`
+(immutable, fingerprinted, JSON schema 1), the exact lap `LissajousLabyrinthLap` with `LissajousLabyrinthPoint` and
+`LissajousLabyrinthVerdict`, the play state `LissajousLabyrinthPlay` with `LissajousLabyrinthStage`,
+`LissajousLabyrinthEvent`, `LissajousLabyrinthAction` and append-only `LissajousLabyrinthRecord`s, and
+`LissajousLabyrinthRules` for the R02-F23 puzzle contract. Refusals are `LissajousLabyrinthError` with `r02-g02.*` codes.
+Rules: [docs/architecture/lissajous-labyrinth.md](../../docs/architecture/lissajous-labyrinth.md).
