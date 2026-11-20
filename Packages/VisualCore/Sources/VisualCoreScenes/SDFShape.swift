@@ -85,12 +85,13 @@ public struct SDFShape: Sendable, Equatable {
     // MARK: Primitives
 
     /// The half-space below the plane through `normal · p = offset`; `normal` must be finite and non-zero and is
-    /// normalised.
+    /// normalised, unless it already has unit length within 1e-12 (so a stored description reads back bit for bit).
     public static func plane(normal: Vec3, offset: Double) throws(SDFError) -> SDFShape {
         try check(normal, "normal")
         try check(offset, "offset")
-        guard normal.length > 0 else { throw .zeroDirection("normal") }
-        return try leaf(.plane(normal: normal.normalized, offset: offset))
+        let length = normal.length
+        guard length > 0 else { throw .zeroDirection("normal") }
+        return try leaf(.plane(normal: abs(length - 1) <= 1e-12 ? normal : normal.normalized, offset: offset))
     }
 
     /// A sphere of `radius` > 0 at the origin.

@@ -25,7 +25,7 @@ seed 2_011.
   smooth union ≤ hard union and equal at k = 0; transforms: translated sphere, rotated box, scaled sphere distance
   scaling; normals of a sphere and a plane within 1e-6; every refusal with its reason code; |p| ≤ 1e6 and sizes ≥ 1e-6
   give finite results; the fallback normal at a zero gradient); `--name host`
-- [ ] T-R02F11-003 [P] [US4] Create `Packages/VisualCore/Sources/VisualCoreScenes/SDFCoding.swift` (`SDFDocument`,
+- [X] T-R02F11-003 [P] [US4] Create `Packages/VisualCore/Sources/VisualCoreScenes/SDFCoding.swift` (`SDFDocument`, — Verified 2026-11-19: lead retest 2026-11-19: R02-F11.host-2.json (exit 0, 0 failures; SDFCoding 11 tests incl. aSlantedPlaneRoundTripsBitForBit after the plane maker kept unit normals)
   schema 1 JSON `{"schema":1,"shape":{…}}` with `kind` tags; decode re-validates through the makers; refusals
   `unknownKind`, `newerSchema`, `malformed`) with `SDFCodingTests.swift` (at least five fixtures: a valid nested shape
   round-trips byte for byte; schema 2 refused; unknown kind refused; negative radius in the data refused with
