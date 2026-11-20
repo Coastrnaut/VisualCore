@@ -1,0 +1,93 @@
+{
+  "branch": "main",
+  "dirty": false,
+  "dirty_paths": [],
+  "failed_attempts": [],
+  "gate": "R02-F13",
+  "ledger": "migration",
+  "passing_checks": [
+    {
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "finished": "2026-11-20T01:54:26+00:00",
+      "log": ".autonomy/logs/migration/R02-F13.baseline-host.log",
+      "log_sha256": "318b9c1cdb6c08f005df31d6bb9a5ad382ea785ebd315291d71d79c54b4888a5",
+      "name": "baseline-host"
+    },
+    {
+      "command": "python3 scripts/check_documented_api.py --sources Apps/VisualCore",
+      "exit_code": 0,
+      "finished": "2026-11-20T02:13:15+00:00",
+      "log": ".autonomy/logs/migration/R02-F13.documented-api.log",
+      "log_sha256": "200aea8b4b6c169a7f1c38d84fc2a33f45d4ead2ef749ed87d7679197f8a98d4",
+      "name": "documented-api"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test",
+      "exit_code": 0,
+      "finished": "2026-11-20T02:12:56+00:00",
+      "log": ".autonomy/logs/migration/R02-F13.experiences.log",
+      "log_sha256": "11d9c97866571b3964a711b1d0f12f44d8be564ce513186fe0ceea712dfd091f",
+      "name": "experiences"
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "finished": "2026-11-20T01:59:36+00:00",
+      "log": ".autonomy/logs/migration/R02-F13.host.log",
+      "log_sha256": "beacb95a601cf9e3db18895c34924d20ff8913dcbf4ba525045dcbc15d3555dd",
+      "name": "host"
+    },
+    {
+      "command": "python3 scripts/check_public_api.py",
+      "exit_code": 0,
+      "finished": "2026-11-20T02:13:12+00:00",
+      "log": ".autonomy/logs/migration/R02-F13.public-api.log",
+      "log_sha256": "baad0ba0e494892200a274b06b3b48e9afb1386ae7a42235ec351c5fa6d7cde8",
+      "name": "public-api"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean",
+      "exit_code": 0,
+      "finished": "2026-11-20T02:13:53+00:00",
+      "log": ".autonomy/logs/migration/R02-F13.reference-1.log",
+      "log_sha256": "c0af36d88c60789cf42d6a5b9c283fb9be3f372601545e3cd5d90bdf66cac088",
+      "name": "reference-1"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26",
+      "exit_code": 0,
+      "finished": "2026-11-20T02:14:29+00:00",
+      "log": ".autonomy/logs/migration/R02-F13.reference-2.log",
+      "log_sha256": "11fe8b6c985e0489fd86dfeb5cc07e1f7d913e9fd461dcd4fc6c543c853a592e",
+      "name": "reference-2"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-26.5 --action test",
+      "exit_code": 0,
+      "finished": "2026-11-20T02:06:07+00:00",
+      "log": ".autonomy/logs/migration/R02-F13.rendering-26.log",
+      "log_sha256": "06def24426eaabcecad964b56a96a8d61d8997766320b3ffc112ab60cc040865",
+      "name": "rendering-26"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test",
+      "exit_code": 0,
+      "finished": "2026-11-20T02:05:13+00:00",
+      "log": ".autonomy/logs/migration/R02-F13.rendering-27.log",
+      "log_sha256": "ba8eced5eb8fd952b97e984e56168633cdbd4b6a1c8ad1b563c3127fc9f65ded",
+      "name": "rendering-27"
+    },
+    {
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "finished": "2026-11-20T02:15:24+00:00",
+      "log": ".autonomy/logs/migration/R02-F13.script-tests.log",
+      "log_sha256": "e4e2915d6303e1858e47c56a7ab57a18ea51e6790837fcd76c11bd8a90523b65",
+      "name": "script-tests"
+    }
+  ],
+  "revision": "57be462c0726301c59d78bfa066accce8a52f19b",
+  "revision_number": 1,
+  "sealed": "2026-11-20T02:15:49+00:00"
+}

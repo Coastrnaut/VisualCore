@@ -56,7 +56,7 @@ Tests stay light (≤ 512 × 512 masks) so the timed R02-F05 budget test beside 
 - [X] T-R02F13-007 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F13.reference-1.json (exit 0)
 - [X] T-R02F13-008 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F13.reference-2.json (exit 0)
 - [X] T-R02F13-009 Script tests (`--name script-tests`) — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F13.script-tests.json (exit 0)
-- [ ] T-R02F13-010 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+- [X] T-R02F13-010 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record — Verified 2026-11-19: converged in 1 round (no task appended); sealed .autonomy/migration/evidence/R02-F13.json (10 passing); recorded pass 2026-11-19; T-R02F13-011 {device} waits for the device campaign
 
 ## Device campaign (after ImplementationLock-100)
 
