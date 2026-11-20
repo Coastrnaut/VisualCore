@@ -2,7 +2,7 @@
  "schema": 1,
  "name": "VisualCore unified-app migration ledger (ADR-0009)",
  "created": "2026-11-12T02:54:10+00:00",
- "updated": "2026-11-20T17:06:44+00:00",
+ "updated": "2026-11-20T17:24:28+00:00",
  "rules": [
   "Only scripts/migration_ledger.py writes this file.",
   "The legacy ledger .autonomy/state.json is never reset or rewritten by the migration; its passed gates stay passed.",
@@ -161,7 +161,7 @@
   {"id":"R02-G01-09","kind":"game-feature","title":"Aurora Loom: Simulator integration and full app lock","depends":["R02-G01-08"],"status":"pending","attempts":[],"experience":"R02-G01","spec_dir":"specs/309-aurora-loom-simulator-integration-and-full-app-lock"},
   {"id":"R02-G01-10","kind":"game-feature","title":"Aurora Loom: Device automation preparation","depends":["R02-G01-09"],"status":"pending","attempts":[],"experience":"R02-G01","spec_dir":"specs/310-aurora-loom-device-automation-preparation"},
   {"id":"X-R02-G01","kind":"experience","title":"Aurora Loom complete in the unified app (simulator-verified)","depends":["R02-G01-10","UA-F05","UA-F06","UA-F09"],"status":"pending","attempts":[],"experience":"r02-g01.aurora-loom","tier":"free"},
-  {"id":"R02-G02-01","kind":"game-feature","title":"Lissajous Labyrinth: Playable rule kernel","depends":["UA-F03","R02-F02","R02-F03","R02-F04","R02-F05","R02-F06","R02-F07","R02-F08","R02-F22","R02-F23","R02-F24","R02-F26"],"status":"pending","attempts":[],"experience":"R02-G02","spec_dir":"specs/311-lissajous-labyrinth-playable-rule-kernel"},
+  {"id":"R02-G02-01","kind":"game-feature","title":"Lissajous Labyrinth: Playable rule kernel","depends":["UA-F03","R02-F02","R02-F03","R02-F04","R02-F05","R02-F06","R02-F07","R02-F08","R02-F22","R02-F23","R02-F24","R02-F26"],"status":"pass","attempts":[{"at":"2026-11-20T17:24:28+00:00","result":"pass","evidence":".autonomy/migration/evidence/R02-G02-01.json","evidence_sha256":"697149216b47d09e1f9fe6f5adace5e179b3c0564d1bec3da7a707d1be9e951d","revision":"76d8c795549ccdf8082cd5f6034a8acfa449c515","note":"Lissajous Labyrinth playable rule kernel: integer sine table pinned, exact lap with segment-swept contact and ordered checkpoints, play with records, undo, redo and replay, PuzzleRules conformance, eight invariant tests; converged in round 1"}],"experience":"R02-G02","spec_dir":"specs/311-lissajous-labyrinth-playable-rule-kernel"},
   {"id":"R02-G02-02","kind":"game-feature","title":"Lissajous Labyrinth: Level generator and solver witness","depends":["R02-G02-01"],"status":"pending","attempts":[],"experience":"R02-G02","spec_dir":"specs/312-lissajous-labyrinth-level-generator-and-solver-witness"},
   {"id":"R02-G02-03","kind":"game-feature","title":"Lissajous Labyrinth: Procedural materials and hero renderer","depends":["R02-G02-02"],"status":"pending","attempts":[],"experience":"R02-G02","spec_dir":"specs/313-lissajous-labyrinth-procedural-materials-and-hero-renderer"},
   {"id":"R02-G02-04","kind":"game-feature","title":"Lissajous Labyrinth: Gameplay spatial interaction","depends":["R02-G02-03"],"status":"pending","attempts":[],"experience":"R02-G02","spec_dir":"specs/314-lissajous-labyrinth-gameplay-spatial-interaction"},
