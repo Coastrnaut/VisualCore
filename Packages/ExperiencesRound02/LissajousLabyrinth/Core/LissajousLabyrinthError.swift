@@ -18,6 +18,10 @@ public enum LissajousLabyrinthError: Error, Equatable, Sendable {
     case newerSchema(Int)
     /// A stored level or trace is damaged or breaks a rule; the payload describes the damage.
     case malformed(String)
+    /// No candidate of the manifest level (the payload is its number) met its band within 64 candidates (feature 312).
+    case generation(Int)
+    /// A witness is damaged, edited or no longer replays; the payload names the part (feature 312).
+    case witness(String)
 
     /// The stable reason code, `r02-g02.<kebab-case>`.
     public var reasonCode: String {
@@ -29,6 +33,8 @@ public enum LissajousLabyrinthError: Error, Equatable, Sendable {
         case .allowance: "r02-g02.allowance"
         case .newerSchema: "r02-g02.newer-schema"
         case .malformed: "r02-g02.malformed"
+        case .generation: "r02-g02.generation"
+        case .witness: "r02-g02.witness"
         }
     }
 }

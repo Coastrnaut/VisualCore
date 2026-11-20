@@ -14,7 +14,7 @@ or {device} tasks (pure logic and host-generated content). Fixture seed 2_312; t
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G0202-002 Add `generation(Int)` ("r02-g02.generation") and `witness(String)` ("r02-g02.witness") to
+- [X] T-R02G0202-002 Add `generation(Int)` ("r02-g02.generation") and `witness(String)` ("r02-g02.witness") to — Verified 2026-11-20: 2026-11-20 host-1b exit 0 (whole round-two package; 'host' attempt failed only on the then-missing witness files and unpinned digest)
   `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthError.swift`; create `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthManifest.swift`
   (LissajousLabyrinthManifestEntry "number 1 … 100, seed UInt64, band 1 … 5, budget 8 … 19", the 100 entries copied from
   `python3 scripts/planning_index.py levels --experience R02-G02` with the source line) and
@@ -30,7 +30,7 @@ or {device} tasks (pure logic and host-generated content). Fixture seed 2_312; t
   4,096-tick bit sets; the kernel's exact verdict for every survivor; work = exact verdicts; breadth-first search over
   `LissajousLabyrinthRules.moves` to the nearest winning setting, ties by (a, b, φ, ψ) ascending) with
   `Packages/ExperiencesRound02/LissajousLabyrinth/CoreTests/LissajousLabyrinthSolverTests.swift` (seed 2_312: the exact fast decision equals the kernel verdict on all
-  legal settings of 2 levels and on every winner plus 440 sampled settings of 20 more; shortest equals a plain BFS over
+  legal settings of 1 level (3 obstacles, > 1,000 winners) and on every winner plus 440 sampled settings of 20 more; shortest equals a plain BFS over
   the decided winning set on 10 levels; actions
   replay on `LissajousLabyrinthRules` through legal states to a win; nil when no winner; determinism); `--name host-2`
 
