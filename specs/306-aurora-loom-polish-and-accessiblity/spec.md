@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-20
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G01-06 (migration ledger, game feature of experience R02-G01) · ID namespace FR-R02G0106-###,
 SC-R02G0106-###, T-R02G0106-###
@@ -25,6 +25,47 @@ Canonical overrides:
 - **Shared features used:** R02-F26 (the shared feedback route: haptics and VoiceOver announcements through the action
   port, the person's haptics switch, rate limits), the procedural ambient loop of VisualCoreAudio/VisualCoreAudioDSP, the
   shared quality, Reduce Motion and Reduce Flashing contract of the experience host, and R02-G01-01 … 05.
+
+## Clarifications
+
+### Session 2026-11-20
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time. Facts checked in
+code (read-only audit, 2026-11-20): `ExperienceActionPort.haptic(_:)` and `.announce(_:kind:)` route through
+`ExperienceFeedback.shared` (the person's haptics switch; `HapticPlanner` drops extras within its interval;
+`AnnouncementPlanner` holds a burst and posts its newest after 0.5 s; announcements only while VoiceOver runs);
+`AnnouncementKind` has `rejection`, `outcome`, `level`, `state`; `HapticKind` has `selection`, `success`, `warning`,
+`error` and impacts; `AmbientLoopPlayer` (VisualCoreAudio, `.ambient` session) plays a fixed `AmbientLoopRecipe` made at
+creation; Aurora (A21) holds its sound choice in the presenter, off by default; Aurora Loom's scene caps its glow gain at
+0.8 under Reduce Flashing and its gate lights switch at once.
+
+- Q: What exactly is announced, and with which kind? → A: after an accepted move, undo or redo (`state`): "Ribbon r wave
+  s. g of 12 gate crossings in harmony. Moves m of n." (phase likewise; undo/redo prefixed "Undone:"/"Redone:"); a win
+  (`outcome`): "Harmony. Level won in m moves, k of 3 stars."; a failure (`outcome`): the failure explanation; a level or
+  mode change (`level`): "Level n, band b, mode." with the tutorial instruction when shown; a refusal (`rejection`): the
+  refusal in words ("That level is not open yet.", "That move was refused: …"). Texts are plain English built by a pure
+  function of the old and new core, so tests compare them exactly. Impact: FR-R02G0106-002; SC-R02G0106-002.
+- Q: Which haptics play, and how are bursts handled? → A: `selection` for an accepted move, undo or redo; `success` for
+  a win; `warning` for a failure; `error` for a refusal; level changes play none. The shared planners' default
+  intervals apply (extras dropped); outcomes are never dropped behind a selection because the win or failure is planned
+  instead of the move's selection when one action causes both. Impact: FR-R02G0106-003; SC-R02G0106-002.
+- Q: How are fades done and measured under Reduce Flashing? → A: the presenter keeps a per-gate and per-ribbon light
+  level that eases toward its target in presentation time (0.15 s normally, 0.45 s under Reduce Flashing, linear), plus
+  the win glow ramp; the state and digest never see it. The measure: sampling the drawn light levels every 1/60 s
+  through a scripted win, no element crosses half its range more than 3 times per second, and every change of more than
+  half the range takes at least 0.4 s under Reduce Flashing. Impact: FR-R02G0106-004; SC-R02G0106-003.
+- Q: Where does the sound choice live, and when does the ambient recipe change? → A: a Sound toggle in the panel, off by
+  default, held by the presenter (presentation only, not state; saving it is R02-G01-07). The recipe is a pure function
+  of the three ribbons' current steps and the stage (partials at a pentatonic mapping of each wave step, a brighter
+  chord when won, quieter when failed); because the player's recipe is fixed at creation, the presenter rebuilds the loop
+  only when the level opens, the play ends or the toggle turns on — not on every move. The loop plays exactly while the
+  choice is on, the controls are on screen and the scene is active (the A21 rule). Impact: FR-R02G0106-006;
+  SC-R02G0106-004.
+- Q: What do Larger Text and Increase Contrast require of the panel? → A: the panel scrolls vertically, uses system text
+  styles that grow with Dynamic Type up to the largest accessibility size, wraps rather than truncates labels, and uses
+  system colours, so Increase Contrast applies; the steppers become accessibility-adjustable elements labelled "Ribbon r
+  wave" or "phase" with the step as value. On iPad the panel keeps a readable width (at most 520 points); the loom view
+  is unchanged. Impact: FR-R02G0106-001, 005; SC-R02G0106-001.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -117,8 +158,9 @@ pure function of the steps and stage; the loop plays only while wanted, on scree
   and haptics equal the plan exactly (kinds and texts).
 - **SC-R02G0106-003**: With Reduce Flashing, the maximum brightness change rate of any drawn element measured over a
   scripted win is at most 3 per second; with Reduce Motion, two frames at different times are identical.
-- **SC-R02G0106-004**: The ambient recipe is identical for equal steps and stage and changes when a step changes; the
-  loop plays exactly while wanted, on screen and active (state-table test).
+- **SC-R02G0106-004**: The ambient recipe is identical for equal steps and stage and differs when a wave step or the
+  stage differs; the loop is rebuilt only when the level opens, the play ends or the toggle turns on, and plays exactly
+  while wanted, on screen and active (state-table test).
 - **SC-R02G0106-005**: Existing tests pass unchanged except where this feature adds wiring; each test under 10 s; the
   reference regression passes 7 of 7.
 
