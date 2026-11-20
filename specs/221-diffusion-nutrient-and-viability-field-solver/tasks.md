@@ -49,7 +49,7 @@ its check record (no trailers). No {owner} tasks; one {device} task. Fixture see
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02F21-006 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences` and
+- [X] T-R02F21-006 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences` and — Verified 2026-11-20: 2026-11-20 rendering-27, rendering-26, experiences (sim-27.2) and host-full exit 0
   `--name host-full`
 - [X] T-R02F21-007 API baseline and docs: `check_public_api.py --update`, `--name public-api`, `--name documented-api — Verified 2026-11-20: 2026-11-20 public-api exit 0 (3,953 declarations, 0 undocumented), documented-api exit 0, 9 new type names unique, docs/architecture/nutrient-fields.md, README section, map F21 as built, render_autocreator + validate_autocreator PASS
   -- python3 scripts/check_documented_api.py --sources Apps/VisualCore`; new `docs/architecture/nutrient-fields.md`;
