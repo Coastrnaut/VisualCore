@@ -53,7 +53,7 @@ Tests stay light (≤ 512 × 512 masks) so the timed R02-F05 budget test beside 
   -- python3 scripts/check_documented_api.py --sources Apps/VisualCore`; new `docs/architecture/shadow-silhouettes.md`;
   sections in both package READMEs; section 13.4 row R02-F13 "As built" in `docs/catalog/shared-feature-map.json` and
   `render_autocreator.py`
-- [ ] T-R02F13-007 Reference regression chunk 1 (`--name reference-1`)
+- [X] T-R02F13-007 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F13.reference-1.json (exit 0)
 - [ ] T-R02F13-008 Reference regression chunk 2 (`--name reference-2`)
 - [ ] T-R02F13-009 Script tests (`--name script-tests`)
 - [ ] T-R02F13-010 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
