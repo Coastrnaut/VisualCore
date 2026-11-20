@@ -22,6 +22,9 @@ packages:
   # The creative experiences adopted from the standalone apps (feature 193, UA-F07; migration-plan.md section 2.1).
   ExperiencesCreative:
     path: Packages/ExperiencesCreative
+  # The round-two game experiences (feature 301, R02-G01-01; Auto-Creator.md section 16).
+  ExperiencesRound02:
+    path: Packages/ExperiencesRound02
 settings:
   base:
     SWIFT_VERSION: "6.0"
@@ -216,6 +219,10 @@ targets:
         product: GraphicsBenchmarkLabExperience
       - package: ExperiencesCreative
         product: EffectsComposerExperience
+      - package: ExperiencesRound02
+        product: AuroraLoomCore
+      - package: ExperiencesRound02
+        product: AuroraLoomExperience
     postBuildScripts:
       - name: Bundle licenses (UA-F04)
         basedOnDependencyAnalysis: false

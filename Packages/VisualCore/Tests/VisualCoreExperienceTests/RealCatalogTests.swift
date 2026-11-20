@@ -130,7 +130,9 @@ enum CatalogFixture {
                                // Feature 174 (A24-P02); integrated at X-A24.
                                "a24.graphics-benchmark-lab",
                                // Feature 181 (A25-P02); integrated at X-A25.
-                               "a25.effects-composer"],
+                               "a25.effects-composer",
+                               // Feature 303 (R02-G01-03); a candidate until X-R02-G01.
+                               "r02-g01.aurora-loom"],
                 "the registrations of Catalog/registrations.json")
     }
 

@@ -59,7 +59,7 @@ tests stay short (< 10 s each). Simulator evidence is one pass on the iOS 27.x p
 
 ## Phase 5: Story 4 — a registered candidate (P2)
 
-- [ ] T-R02G0103-009 [US4] Candidate registration: `Catalog/registrations.json` and `Catalog/experiences.json` (palette,
+- [X] T-R02G0103-009 [US4] Candidate registration: `Catalog/registrations.json` and `Catalog/experiences.json` (palette, — Verified 2026-11-20: 2026-11-20 experience-packages exit 0 (26 experiences in 2 packages); catalog-search exit 0 (15 tests); app-unit exit 1 (the generated Xcode project was stale and the app did not link AuroraLoomCore; fixed: AuroraLoomCore added to project.yml, xcodegen generate); app-unit-2 exit 0; documented-api exit 0. r02-g01.aurora-loom registered as a candidate (available false) with tiers level-0 … level-2, the palette, the scenario manifest and a 262-character summary (.autonomy/migration/checks/R02-G01-03.experience-packages.json, .autonomy/migration/checks/R02-G01-03.catalog-search.json, .autonomy/migration/checks/R02-G01-03.app-unit*.json, .autonomy/migration/checks/R02-G01-03.documented-api.json)
   capabilities, quality tiers level-0 … level-2, summary ≤ 300 characters, scenario manifest
   `Packages/ExperiencesRound02/AuroraLoom/scenario-manifest.json`; available false), `Apps/VisualCore/App/ExperienceRegistry.swift`,
   `project.yml`, the app test fixtures and `scripts/test_scripts.py` as the A25-P02 registration; `--name

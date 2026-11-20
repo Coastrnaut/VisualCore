@@ -889,7 +889,7 @@
       "id": "r02-g01.aurora-loom",
       "code": "R02-G01",
       "title": "Aurora Loom",
-      "summary": "Weave and phase-shift 3D luminous ribbons into target harmonies",
+      "summary": "Weave three luminous ribbons of auroral silk into one harmony: turn each ribbon's wave and phase until its height meets the target marker at all four gates for two whole turns, within a move allowance. 100 certified levels; undo and redo. Drawn in code; offline.",
       "kind": "game",
       "tier": "free",
       "category": "puzzle",
@@ -898,10 +898,25 @@
         "light-and-color"
       ],
       "order": 26,
-      "palette": [],
+      "palette": [
+        "#07121A",
+        "#1FD1B4",
+        "#E0389C",
+        "#D8E83A"
+      ],
       "tile_seed": 336522925,
-      "capabilities": [],
-      "quality_tiers": [],
+      "capabilities": [
+        "Three ribbons to bring into harmony",
+        "Four gates that light up in harmony",
+        "100 solver-certified levels",
+        "Every move can be undone and redone",
+        "Three quality levels, same rules"
+      ],
+      "quality_tiers": [
+        "level-0",
+        "level-1",
+        "level-2"
+      ],
       "content": null,
       "available": false
     },

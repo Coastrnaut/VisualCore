@@ -1329,7 +1329,10 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     # Feature 174 (A24-P02): Graphics Benchmark Lab, integrated at X-A24.
                                     "GraphicsBenchmarkLabExperience",
                                     # Feature 181 (A25-P02): Effects Composer, integrated at X-A25.
-                                    "EffectsComposerExperience"])
+                                    "EffectsComposerExperience",
+                                    # Feature 303 (R02-G01-03): Aurora Loom, a candidate until X-R02-G01 (its
+                                    # adapter core lives in the pure AuroraLoomCore, which the registry names).
+                                    "AuroraLoomCore", "AuroraLoomExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):
         listing = subprocess.run([sys.executable, str(HERE / "release_check.py"), "--list"],
