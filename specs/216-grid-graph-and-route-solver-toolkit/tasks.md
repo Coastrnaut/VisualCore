@@ -46,7 +46,7 @@ tests stay light beside the timed R02-F05 test.
 
 ## Phase 6: Story 4 — patterns (P2)
 
-- [ ] T-R02F16-006 [P] [US4] Create `Packages/VisualCore/Sources/VisualCoreSimulation/SubgraphMatcher.swift` (MatchOutcome; pattern "at most 32" nodes; placements in
+- [X] T-R02F16-006 [P] [US4] Create `Packages/VisualCore/Sources/VisualCoreSimulation/SubgraphMatcher.swift` (MatchOutcome; pattern "at most 32" nodes; placements in — Verified 2026-11-19: lead retest 2026-11-19: R02-F16.host-3.json (exit 0, full suite; R02-F16.host-2.json had failed only the mesh-budget timing beside the full suite, now asserted in R02-F16.timing.json, exit 0); SubgraphMatcherTests 6 passed (200 seeded cases equal brute-force placement lists; isomorphism of 50 relabellings; P4 vs K1,3 and C6 vs 2·K3; limits and budgets)
   lexicographic order per research R8, "at most 100,000", budget 10,000,000 steps; isomorphism) with
   `Packages/VisualCore/Tests/VisualCoreSimulationTests/SubgraphMatcherTests.swift` (200 seeded cases equal an exhaustive permutation count; isomorphic relabellings
   recognised, non-isomorphic equal-size graphs not; pattern larger than graph gives none; limits refused; budget gives
