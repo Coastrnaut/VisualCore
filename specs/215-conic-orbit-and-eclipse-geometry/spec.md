@@ -71,7 +71,8 @@ which depends on nothing; the names `ConicOrbit`, `KeplerSolver`, `OrbitState`, 
   "timeOfPeriapsis","gravitationalParameter"}`; schema 1 is the first stored form (no earlier form exists, so nothing
   migrates yet; a later schema adds a step to the consumer's `MigrationChain`); schema above 1 is refused. Reason codes
   (`OrbitError`): `r2-f15.invalid-elements`, `r2-f15.invalid-step`, `r2-f15.tick-limit`, `r2-f15.invalid-disk`,
-  `r2-f15.observer-inside`, `r2-f15.newer-schema`, `r2-f15.malformed`; the experience adds its id, seed and tick.
+  `r2-f15.observer-inside`, `r2-f15.span-limit` (a passage span listing more than 1,000,000 passages),
+  `r2-f15.newer-schema`, `r2-f15.malformed`; the experience adds its id, seed and tick.
   Impact: FR-R02F15-007, 008; SC-R02F15-005.
 
 ## User Scenarios & Testing *(mandatory)*
