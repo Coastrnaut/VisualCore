@@ -48,7 +48,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 4: Regression, documentation and close
 
-- [ ] T-R02G0203-007 Docs: `docs/architecture/lissajous-labyrinth.md` (renderer and experience),
+- [X] T-R02G0203-007 Docs: `docs/architecture/lissajous-labyrinth.md` (renderer and experience), — Verified 2026-11-20: 2026-11-20 round02-host exit 0; docs/architecture/lissajous-labyrinth.md renderer section, Packages/ExperiencesRound02/README.md, docs/automatedtesting.md
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
 - [ ] T-R02G0203-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
   `--name host-full`, `--name app-unit`

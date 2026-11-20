@@ -72,3 +72,9 @@ digest) and `LissajousLabyrinthWitness`, whose 100 files live in
 ```bash
 LISSAJOUS_LABYRINTH_WRITE_WITNESSES=1 swift test --package-path Packages/ExperiencesRound02 --filter LissajousLabyrinthCatalogTests
 ```
+
+Feature 313 (R02-G02-03) adds the experience: in the Core the adapter `LissajousLabyrinthExperienceCore`, the
+immutable `LissajousLabyrinthSceneSnapshot` with `LissajousLabyrinthPalette` and `LissajousLabyrinthTier`, the geometry
+and CPU reference `LissajousLabyrinthSceneGeometry`, the GLSL sources `LissajousLabyrinthShaders` and the scenarios; in
+the iOS-only target `LissajousLabyrinthExperience` the presenter, the GL thread scene and a minimal control panel. It is
+a registered candidate of the one app until X-R02-G02.

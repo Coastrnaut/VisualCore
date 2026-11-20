@@ -71,6 +71,28 @@ every rule. `LissajousLabyrinthRules` expresses the rules as an R02-F23 `PuzzleR
 LISSAJOUS_LABYRINTH_WRITE_WITNESSES=1 swift test --package-path Packages/ExperiencesRound02 --filter LissajousLabyrinthCatalogTests
 ```
 
+## Renderer and experience (R02-G02-03)
+
+- **Adapter.** `LissajousLabyrinthExperienceCore` adapts the kernel to the shared contract: the seed opens certified
+  level (seed mod 100) + 1; actions `dial.set [dial 0 … 3, value 0 … 15]` (frequency A, frequency B, phase A, phase C;
+  the kernel refuses values outside a dial's own range, unchanged values and non-coprime frequencies), `play.undo`,
+  `play.redo`, `level.next`; the digest is the level number and the play's fingerprint; snapshot schema 1 `{level,
+  records}`. Certified levels are generated once per process (about 0.1 s each in a debug build).
+- **Snapshot.** `LissajousLabyrinthSceneSnapshot` copies the level, dials, stage, the lap's verdict and the checkpoints'
+  visit ticks with a presentation time; the tracer head advances 60 ticks per second (0 under Reduce Motion).
+- **Scene.** The lap's samples scaled by 1/1,024 form a camera-facing thread (tangent-space width 0.035) shaded cobalt
+  to violet with a brighter trail behind the copper head; checkpoints are copper rings (dim, next, visited in order);
+  obstacles violet translucent icospheres with a rim, copper when the lap touches them; the camera fits the figure's
+  bounding sphere for aspects 0.4 … 2.5 with a 5 % margin. Palette: night #070B1E, cobalt #2F5BD8, violet #8A4FE0,
+  copper #D9824A. GLSL ES 3.00 in `LissajousLabyrinthShaders`, drawn with the shared `ShaderMeshRenderer`.
+- **Tiers.** level-0: every sample, 2 glow passes, trail 512; level-1: every 2nd, 1, 256; level-2: every 4th, 0, 128.
+  Drawn samples are exact kernel samples at every tier; the presenter logs tier changes with their reason.
+- **Fallback and purity.** A failing program falls back to the minimal thread drawn unlit; the renderer reads only the
+  snapshot, so no tier, time or failure changes the digest or verdict.
+- **Candidate.** Registered in `Catalog/registrations.json` (content facts: 100 levels, the pinned digest) with a
+  scenario manifest of the standard scenarios, `full-playthrough`, `hero`, three fixtures and the 80 acceptance rows
+  R2-G02-QA-001 … 080; linked into the one app, not available until X-R02-G02.
+
 ## Failures
 
 `LissajousLabyrinthError` reason codes: `r02-g02.level`, `r02-g02.move`, `r02-g02.stage`, `r02-g02.stale`,
