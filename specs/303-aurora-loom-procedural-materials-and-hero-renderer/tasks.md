@@ -77,7 +77,7 @@ tests stay short (< 10 s each). Simulator evidence is one pass on the iOS 27.x p
 - [X] T-R02G0103-011 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-20: 2026-11-20 rendering-27 (incl. ShaderMeshRendererTests), rendering-26, experiences (sim-27.2), host-full exit 0; public-api and documented-api exit 0 (recorded at T-006, T-009)
   `--name host-full`, `--name public-api` / `--name documented-api` if the app sources changed
 - [X] T-R02G0103-012 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-20: 2026-11-20 reference-1 exit 0
-- [ ] T-R02G0103-013 Reference regression chunk 2 (`--name reference-2`)
+- [X] T-R02G0103-013 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-20: 2026-11-20 reference-2 exit 0: 7 of 7 with chunk 1
 - [ ] T-R02G0103-014 Script tests, run alone (`--name script-tests`)
 - [ ] T-R02G0103-015 {device} After ImplementationLock-100, on D1, D2 and D3: record the frame time at each tier
   (SC-R02G0103-006). Not run before the lock; stays open and is carried to the device campaign.
