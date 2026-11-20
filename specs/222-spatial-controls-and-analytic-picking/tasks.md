@@ -13,7 +13,7 @@ through a fileprivate SplitMix generator; tests stay short.
 
 ## Phase 2: Foundational — Story 1, a touch becomes a world point (P1) 🎯
 
-- [ ] T-R02F22-002 [US1] Create `Packages/VisualCore/Sources/VisualCoreMath/Plane3.swift` (Plane3 "finite; normal not zero", normalised; signedDistance;
+- [X] T-R02F22-002 [US1] Create `Packages/VisualCore/Sources/VisualCoreMath/Plane3.swift` (Plane3 "finite; normal not zero", normalised; signedDistance; — Verified 2026-11-20: 2026-11-20 host-r2 exit 0: ScreenProjectionTests 4/4 (959 seeded points, worst distance / camera distance 8.0e-14; plane hits on the plane); the first attempts host and host-rerun failed only to build while agent files were mid-edit (.autonomy/migration/checks/R02-F22.host*.json)
   `Ray3.intersect(plane:)` per clarification Q1), `Packages/VisualCore/Sources/VisualCoreMath/ScreenProjection.swift` (ray(through:viewport:inverseViewProjection:)
   "viewport finite > 0; point inside 0 … w, 0 … h"; project(_:viewProjection:viewport:)) and
   `Packages/VisualCore/Sources/VisualCoreScenes/SpatialControlError.swift` with `Packages/VisualCore/Tests/VisualCoreMathTests/ScreenProjectionTests.swift` (1,000 seeded OrbitCamera views and world

@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "ScreenProjectionTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter ScreenProjectionTests",
+  "elapsed_seconds": 3.308,
+  "exit_code": 1,
+  "finished": "2026-11-20T06:37:13+00:00",
+  "gate": "R02-F22",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-F22.host.log",
+  "log_sha256": "dc2b67331a4feabe65362dbde07fdb0236954fb1d330905ab4162bc5cf25d94b",
+  "name": "host",
+  "started": "2026-11-20T06:37:10+00:00",
+  "timed_out": false
+}
