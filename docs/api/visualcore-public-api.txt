@@ -3028,46 +3028,68 @@ VisualCoreShaderSource | var | public var statement: String
 VisualCoreSimulation | enum | public enum AccessibilityChoice: String, Sendable, Codable, CaseIterable, Identifiable
 VisualCoreSimulation | enum | public enum AnnouncementKind: String, Sendable, Equatable, CaseIterable
 VisualCoreSimulation | enum | public enum BroadPhase2D
+VisualCoreSimulation | enum | public enum CertificateChecker
 VisualCoreSimulation | enum | public enum Collision2D
 VisualCoreSimulation | enum | public enum ColorVisionChoice: String, Sendable, Codable, CaseIterable, Identifiable
 VisualCoreSimulation | enum | public enum Contacts2D
 VisualCoreSimulation | enum | public enum EmitterShape: Sendable, Equatable, Codable
+VisualCoreSimulation | enum | public enum GridNeighbourhood: String, Sendable, Codable, CaseIterable
 VisualCoreSimulation | enum | public enum HapticKind: String, Sendable, Equatable, CaseIterable
 VisualCoreSimulation | enum | public enum ImpulseSolver2D
+VisualCoreSimulation | enum | public enum MinimumCut
 VisualCoreSimulation | enum | public enum NeighbourSearch
 VisualCoreSimulation | enum | public enum ParticleForce: Sendable, Equatable
 VisualCoreSimulation | enum | public enum RandomChoiceError: Error, Equatable, Sendable
 VisualCoreSimulation | enum | public enum RandomStateError: Error, Equatable, Sendable
+VisualCoreSimulation | enum | public enum RouteError: Error, Equatable, Sendable
+VisualCoreSimulation | enum | public enum RouteOutcome: Sendable, Equatable
+VisualCoreSimulation | enum | public enum RouteSearch
 VisualCoreSimulation | enum | public enum SeedDerivation
 VisualCoreSimulation | enum | public enum Shape2D: Sendable, Equatable, Codable
 VisualCoreSimulation | enum | public enum SimulationInfo
+VisualCoreSimulation | enum | public enum SolverCertificate: Sendable, Equatable
 VisualCoreSimulation | enum | public enum SpringAnchor2D: Sendable, Equatable
 VisualCoreSimulation | enum | public enum Springs2D
 VisualCoreSimulation | enum | public enum Steering
 VisualCoreSimulation | enum | public enum StoragePrecision: String, Sendable, Codable, CaseIterable
+VisualCoreSimulation | enum | public enum SubgraphMatcher
+VisualCoreSimulation | enum | public enum TimeExpandedGraph
+VisualCoreSimulation | enum | public enum TimedOutcome: Sendable, Equatable
 VisualCoreSimulation | enum | public enum TimelineError: Error, Equatable, Sendable
 VisualCoreSimulation | enum | public enum TimelineEvent: Sendable, Equatable
 VisualCoreSimulation | enum | public enum TrailDecay
 VisualCoreSimulation | func | public func acceleration(at position: Vec2, velocity: Vec2) -> Vec2
+VisualCoreSimulation | func | public func adjacent(_ a: Int, _ b: Int) -> Bool
 VisualCoreSimulation | func | public func bound(speed: Double = 0) -> Double
 VisualCoreSimulation | func | public func bounds(at pose: Pose2D) -> AABB2D
+VisualCoreSimulation | func | public func cell(of node: Int) -> (x: Int, y: Int)
+VisualCoreSimulation | func | public func cheapestCost(from: Int, to: Int) -> Int?
 VisualCoreSimulation | func | public func checksum() -> UInt64
 VisualCoreSimulation | func | public func clamped() -> Emitter
 VisualCoreSimulation | func | public func clamped() -> EmitterBurst
 VisualCoreSimulation | func | public func clamped() -> EmitterShape
 VisualCoreSimulation | func | public func clamped() -> ParticleForce
 VisualCoreSimulation | func | public func commands(at step: Int) -> [Command]
+VisualCoreSimulation | func | public func contains(_ node: Int) -> Bool
 VisualCoreSimulation | func | public func decode(_ u: Float) -> Float
+VisualCoreSimulation | func | public func edges(from: Int) -> [RouteEdge]
 VisualCoreSimulation | func | public func encode(_ v: Float) -> Float
 VisualCoreSimulation | func | public func encode(to encoder: Encoder) throws
 VisualCoreSimulation | func | public func encode(to encoder: any Encoder) throws
+VisualCoreSimulation | func | public func encoded() -> Data
+VisualCoreSimulation | func | public func estimate(to goal: Int) -> @Sendable (Int) -> Int
+VisualCoreSimulation | func | public func graph() -> RouteGraph
+VisualCoreSimulation | func | public func hasEdge(from: Int, to: Int) -> Bool
 VisualCoreSimulation | func | public func hash(at step: Int) throws(TimelineError) -> ReplayHash
 VisualCoreSimulation | func | public func inertia(mass: Double) -> Double
 VisualCoreSimulation | func | public func instances() -> [ParticleInstance]
+VisualCoreSimulation | func | public func isOpen(_ cell: Int, at time: Int) -> Bool
+VisualCoreSimulation | func | public func isOpen(_ node: Int) -> Bool
 VisualCoreSimulation | func | public func latest(atOrBefore step: Int) -> Snapshot?
 VisualCoreSimulation | func | public func liveCount(source index: Int) -> Int
 VisualCoreSimulation | func | public func maxAbsDifference(_ other: FieldGrid) -> Float?
 VisualCoreSimulation | func | public func next(step: Int, checksum: UInt64) -> ReplayHash
+VisualCoreSimulation | func | public func node(x: Int, y: Int) -> Int
 VisualCoreSimulation | func | public func overlaps(_ other: AABB2D) -> Bool
 VisualCoreSimulation | func | public func padded(toChannels count: Int, fill: Float = 0) -> FieldGrid
 VisualCoreSimulation | func | public func resolve(_ system: SystemAccessibility) -> EffectiveAccessibility
@@ -3083,6 +3105,8 @@ VisualCoreSimulation | func | public func transitionDuration(_ duration: Double,
 VisualCoreSimulation | func | public func value(at t: Double) -> Double
 VisualCoreSimulation | func | public func value(of name: String) -> Double?
 VisualCoreSimulation | func | public mutating func add(_ tween: Tween, at offset: Double = 0, name: String)
+VisualCoreSimulation | func | public mutating func addEdge(from: Int, to: Int, cost: Int = 1) throws(RouteError)
+VisualCoreSimulation | func | public mutating func addUndirectedEdge(_ a: Int, _ b: Int, cost: Int = 1) throws(RouteError)
 VisualCoreSimulation | func | public mutating func advance(by delta: Double)
 VisualCoreSimulation | func | public mutating func advance(by dt: Double) -> Int
 VisualCoreSimulation | func | public mutating func advance(by dt: Double) -> [TimelineEvent]
@@ -3124,17 +3148,24 @@ VisualCoreSimulation | func | public mutating func submit(_ announcement: Announ
 VisualCoreSimulation | func | public mutating func submit(_ event: HapticEvent) -> HapticEvent?
 VisualCoreSimulation | func | public mutating func toggle()
 VisualCoreSimulation | func | public mutating func weightedIndex(_ weights: [Double]) throws(RandomChoiceError) -> Int
+VisualCoreSimulation | func | public static func < (a: CutEdge, b: CutEdge) -> Bool
 VisualCoreSimulation | func | public static func apply(_ bodies: inout [RigidBodyState2D], springs: [Spring2D], dt: Double)
+VisualCoreSimulation | func | public static func bestFirst(in graph: RouteGraph, from: Int, to: Int, estimate: (Int) -> Int =
+VisualCoreSimulation | func | public static func between(_ source: Int, and sink: Int, in graph: RouteGraph) throws(RouteError) -> CutResult
+VisualCoreSimulation | func | public static func breadthFirst(in graph: RouteGraph, from: Int, to: Int,
 VisualCoreSimulation | func | public static func capped(_ v: Vec2, to limit: Double) -> Vec2
 VisualCoreSimulation | func | public static func clampedStrength(_ strength: Double) -> Double
 VisualCoreSimulation | func | public static func closestPoint(on capsule: CollisionCapsule, to point: Vec2) -> Vec2
 VisualCoreSimulation | func | public static func collide(_ a: Shape2D, _ poseA: Pose2D, _ b: Shape2D, _ poseB: Pose2D) -> ContactManifold2D?
 VisualCoreSimulation | func | public static func colorVisionKey(prefix: String) -> String
+VisualCoreSimulation | func | public static func decode(_ data: Data) throws(RouteError) -> SolverCertificate
 VisualCoreSimulation | func | public static func derive(_ seed: UInt64, index: UInt64) -> UInt64
 VisualCoreSimulation | func | public static func derive(_ seed: UInt64, label: String) -> UInt64
+VisualCoreSimulation | func | public static func earliestArrival(in graph: RouteGraph, schedule: RouteSchedule, from: Int, to: Int,
 VisualCoreSimulation | func | public static func factor(strength: Double, delta: Double) -> Double
 VisualCoreSimulation | func | public static func fnv1a64(_ label: String) -> UInt64
 VisualCoreSimulation | func | public static func force(for index: Int, agents: [SteeringAgent], neighbours: [Int],
+VisualCoreSimulation | func | public static func isomorphic(_ a: RouteGraph, _ b: RouteGraph, budget: Int = maxSteps) throws(RouteError) -> Bool?
 VisualCoreSimulation | func | public static func keys(prefix: String) -> (reduceMotion: String, reduceFlashing: String)
 VisualCoreSimulation | func | public static func load(from defaults: UserDefaults, keyPrefix prefix: String) -> AccessibilityPreferences
 VisualCoreSimulation | func | public static func mix(_ z: UInt64) -> UInt64
@@ -3142,6 +3173,7 @@ VisualCoreSimulation | func | public static func neighbours(of index: Int, in ag
 VisualCoreSimulation | func | public static func overlaps(_ a: CollisionCircle, _ b: CollisionCircle) -> Bool
 VisualCoreSimulation | func | public static func overlaps(_ circle: CollisionCircle, _ capsule: CollisionCapsule) -> Bool
 VisualCoreSimulation | func | public static func pairs(_ boxes: [AABB2D]) -> [BroadPhasePair2D]
+VisualCoreSimulation | func | public static func placements(of pattern: RouteGraph, in graph: RouteGraph, limit: Int = maxPlacements,
 VisualCoreSimulation | func | public static func solve(_ bodies: inout [RigidBodyState2D], contacts: [Contact2D],
 VisualCoreSimulation | func | public static func solve(_ bodies: inout [RigidBodyState2D], contacts: inout [Contact2D],
 VisualCoreSimulation | func | public static func stableDamping(effectiveMass m: Double, dt: Double) -> Double
@@ -3151,6 +3183,9 @@ VisualCoreSimulation | func | public static func step8(_ value: UInt8, factor: D
 VisualCoreSimulation | func | public static func subtraction(delta: Double) -> Double
 VisualCoreSimulation | func | public static func sweep(_ a: CollisionCircle, moving da: Vec2, _ b: CollisionCircle, moving db: Vec2) -> Double?
 VisualCoreSimulation | func | public static func unorm8(range: Float) -> SignedRangeEncoding?
+VisualCoreSimulation | func | public static func verify(_ certificate: SolverCertificate, in graph: RouteGraph) throws(RouteError)
+VisualCoreSimulation | func | public static func verify(_ certificate: SolverCertificate, in graph: RouteGraph,
+VisualCoreSimulation | func | public static func verify(_ certificate: SolverCertificate, pattern: RouteGraph,
 VisualCoreSimulation | init | public init()
 VisualCoreSimulation | init | public init(_ entries: [(step: Int, command: Command)] = [])
 VisualCoreSimulation | init | public init(a: Int, b: Int)
@@ -3160,12 +3195,14 @@ VisualCoreSimulation | init | public init(a: SpringAnchor2D, b: SpringAnchor2D, 
 VisualCoreSimulation | init | public init(a: Vec2, b: Vec2, radius: Double)
 VisualCoreSimulation | init | public init(capacity: Int = 32, interval: Int = 64) throws(TimelineError)
 VisualCoreSimulation | init | public init(capacity: Int = ParticleSystem.defaultCapacity, seed: UInt64 = 0)
+VisualCoreSimulation | init | public init(cellCount: Int, steps: Int, isOpen: (_ cell: Int, _ time: Int) -> Bool) throws(RouteError)
 VisualCoreSimulation | init | public init(center: Vec2, radius: Double)
 VisualCoreSimulation | init | public init(count: Int, interval: Double)
 VisualCoreSimulation | init | public init(duration: Double = 120, speed: Double = 1, isPlaying: Bool = true)
 VisualCoreSimulation | init | public init(from decoder: Decoder) throws
 VisualCoreSimulation | init | public init(from decoder: any Decoder) throws
 VisualCoreSimulation | init | public init(from: Double, to: Double, duration: Double, curve: EasingCurve = .linear, mode: EasingMode = .inOut,
+VisualCoreSimulation | init | public init(from: Int, to: Int)
 VisualCoreSimulation | init | public init(id: String, colorHex: String, sign: String)
 VisualCoreSimulation | init | public init(iterations: Int = 10, restitutionThreshold: Double = 0.5, slop: Double = 0.005,
 VisualCoreSimulation | init | public init(kind: HapticKind, time: Double)
@@ -3175,6 +3212,9 @@ VisualCoreSimulation | init | public init(minX: Double, maxX: Double, minY: Doub
 VisualCoreSimulation | init | public init(minimumInterval: Double = 0.05)
 VisualCoreSimulation | init | public init(minimumInterval: Double = 0.5)
 VisualCoreSimulation | init | public init(neighbourRadius: Double = 2.5, neighbourLimit: Int = 6, separationRadius: Double = 1,
+VisualCoreSimulation | init | public init(node: Int, time: Int)
+VisualCoreSimulation | init | public init(nodeCount: Int) throws(RouteError)
+VisualCoreSimulation | init | public init(nodes: [Int], cost: Int)
 VisualCoreSimulation | init | public init(normal: Vec2, depth: Double, points: [Vec2])
 VisualCoreSimulation | init | public init(position: Vec2 = .zero, rate: Double = 100, lifetime: ClosedRange<Double> = 1...1,
 VisualCoreSimulation | init | public init(position: Vec2, angle: Double = 0)
@@ -3198,17 +3238,26 @@ VisualCoreSimulation | init | public init(storedValue: String?)
 VisualCoreSimulation | init | public init(text: String, kind: AnnouncementKind, time: Double)
 VisualCoreSimulation | init | public init(version: Int, seed: String, words: [String])
 VisualCoreSimulation | init | public init(width: Int, height: Int, channels: Int, fill: Float = 0)
+VisualCoreSimulation | init | public init(width: Int, height: Int, neighbourhood: GridNeighbourhood = .four,
 VisualCoreSimulation | init | public init?(hex: String)
 VisualCoreSimulation | init | public init?(range: Float, center: Float = 0.5)
 VisualCoreSimulation | init | public init?(width: Int, height: Int, channels: Int, values: [Float])
 VisualCoreSimulation | let | public let bytes: [UInt8]
 VisualCoreSimulation | let | public let capacity: Int
+VisualCoreSimulation | let | public let cellCount: Int
 VisualCoreSimulation | let | public let center: Float
+VisualCoreSimulation | let | public let certificate: SolverCertificate
+VisualCoreSimulation | let | public let certificates: [SolverCertificate]
 VisualCoreSimulation | let | public let channels: Int
 VisualCoreSimulation | let | public let command: Command
+VisualCoreSimulation | let | public let complete: Bool
+VisualCoreSimulation | let | public let cost: Int
 VisualCoreSimulation | let | public let dt: Double
 VisualCoreSimulation | let | public let duration: Double
+VisualCoreSimulation | let | public let edges: [CutEdge]
 VisualCoreSimulation | let | public let entries: [Entry]
+VisualCoreSimulation | let | public let examined: Int
+VisualCoreSimulation | let | public let from: Int
 VisualCoreSimulation | let | public let hash: ReplayHash
 VisualCoreSimulation | let | public let height: Int
 VisualCoreSimulation | let | public let interval: Int
@@ -3216,16 +3265,25 @@ VisualCoreSimulation | let | public let maxStep: Double
 VisualCoreSimulation | let | public let maxSteps: Int
 VisualCoreSimulation | let | public let minStep: Double
 VisualCoreSimulation | let | public let minimumInterval: Double
+VisualCoreSimulation | let | public let neighbourhood: GridNeighbourhood
+VisualCoreSimulation | let | public let node: Int
+VisualCoreSimulation | let | public let nodeCount: Int
+VisualCoreSimulation | let | public let nodes: [Int]
+VisualCoreSimulation | let | public let placements: [[Int]]
 VisualCoreSimulation | let | public let range: Float
 VisualCoreSimulation | let | public let reduceFlashing: Bool
 VisualCoreSimulation | let | public let reduceMotion: Bool
+VisualCoreSimulation | let | public let routes: [RoutePath]
 VisualCoreSimulation | let | public let seed: String
 VisualCoreSimulation | let | public let seed: UInt64
 VisualCoreSimulation | let | public let start: Simulation
 VisualCoreSimulation | let | public let state: State
 VisualCoreSimulation | let | public let step: Double
 VisualCoreSimulation | let | public let step: Int
+VisualCoreSimulation | let | public let steps: Int
 VisualCoreSimulation | let | public let stream: ControlStream<Command>
+VisualCoreSimulation | let | public let time: Int
+VisualCoreSimulation | let | public let to: Int
 VisualCoreSimulation | let | public let version: Int
 VisualCoreSimulation | let | public let width: Int
 VisualCoreSimulation | let | public let words: [String]
@@ -3237,14 +3295,25 @@ VisualCoreSimulation | let | public static let gravityWellStrengthLimit
 VisualCoreSimulation | let | public static let intervalRange: ClosedRange<Double>
 VisualCoreSimulation | let | public static let legacyLimit
 VisualCoreSimulation | let | public static let lifetimeRange: ClosedRange<Double>
+VisualCoreSimulation | let | public static let maxBudget
 VisualCoreSimulation | let | public static let maxCapacity
+VisualCoreSimulation | let | public static let maxCells
 VisualCoreSimulation | let | public static let maxCoordinate
+VisualCoreSimulation | let | public static let maxCost
 VisualCoreSimulation | let | public static let maxDelta
+VisualCoreSimulation | let | public static let maxEdges
+VisualCoreSimulation | let | public static let maxNodes
+VisualCoreSimulation | let | public static let maxPatternNodes
+VisualCoreSimulation | let | public static let maxPlacements
+VisualCoreSimulation | let | public static let maxSide
+VisualCoreSimulation | let | public static let maxStates
+VisualCoreSimulation | let | public static let maxSteps
 VisualCoreSimulation | let | public static let maxWindSpeed
 VisualCoreSimulation | let | public static let minimumLength: Double
 VisualCoreSimulation | let | public static let radiusRange: ClosedRange<Double>
 VisualCoreSimulation | let | public static let rateRange: ClosedRange<Double>
 VisualCoreSimulation | let | public static let reducedMotionFactor
+VisualCoreSimulation | let | public static let schema
 VisualCoreSimulation | let | public static let sizeRange: ClosedRange<Double>
 VisualCoreSimulation | let | public static let softeningRange: ClosedRange<Double>
 VisualCoreSimulation | let | public static let speedRange
@@ -3265,6 +3334,8 @@ VisualCoreSimulation | struct | public struct CollisionCircle: Sendable, Equatab
 VisualCoreSimulation | struct | public struct Contact2D: Sendable, Equatable
 VisualCoreSimulation | struct | public struct ContactManifold2D: Sendable, Equatable
 VisualCoreSimulation | struct | public struct ControlStream<Command>
+VisualCoreSimulation | struct | public struct CutEdge: Sendable, Equatable, Hashable, Codable, Comparable
+VisualCoreSimulation | struct | public struct CutResult: Sendable, Equatable
 VisualCoreSimulation | struct | public struct EffectiveAccessibility: Sendable, Equatable
 VisualCoreSimulation | struct | public struct Emitter: Sendable, Equatable
 VisualCoreSimulation | struct | public struct EmitterBurst: Sendable, Equatable, Codable
@@ -3274,8 +3345,10 @@ VisualCoreSimulation | struct | public struct EventLog<Command: Sendable & Equat
 VisualCoreSimulation | struct | public struct FieldGrid: Sendable, Equatable
 VisualCoreSimulation | struct | public struct FixedStepClock: Sendable, Equatable
 VisualCoreSimulation | struct | public struct FixedStepRunner<Simulation: FixedStepSimulation, Command>
+VisualCoreSimulation | struct | public struct GridGraph: Sendable, Equatable
 VisualCoreSimulation | struct | public struct HapticEvent: Sendable, Equatable
 VisualCoreSimulation | struct | public struct HapticPlanner: Sendable, Equatable
+VisualCoreSimulation | struct | public struct MatchOutcome: Sendable, Equatable
 VisualCoreSimulation | struct | public struct ParticleInstance: Sendable, Equatable
 VisualCoreSimulation | struct | public struct ParticleSystem: Sendable
 VisualCoreSimulation | struct | public struct PlaybackState: Sendable, Equatable
@@ -3283,6 +3356,10 @@ VisualCoreSimulation | struct | public struct Pose2D: Sendable, Equatable
 VisualCoreSimulation | struct | public struct ReplayHash: Sendable, Equatable, Hashable, Codable
 VisualCoreSimulation | struct | public struct ReversibleTimeline<Simulation: FixedStepSimulation & Sendable, Command: Sendable & Equatable>
 VisualCoreSimulation | struct | public struct RigidBodyState2D: Sendable, Equatable
+VisualCoreSimulation | struct | public struct RouteEdge: Sendable, Equatable, Hashable
+VisualCoreSimulation | struct | public struct RouteGraph: Sendable, Equatable
+VisualCoreSimulation | struct | public struct RoutePath: Sendable, Equatable, Codable
+VisualCoreSimulation | struct | public struct RouteSchedule: Sendable, Equatable
 VisualCoreSimulation | struct | public struct SceneClock: Sendable, Equatable
 VisualCoreSimulation | struct | public struct SeededRandom: RandomNumberGenerator, Sendable, Equatable
 VisualCoreSimulation | struct | public struct Settings: Sendable, Equatable
@@ -3298,6 +3375,7 @@ VisualCoreSimulation | struct | public struct SteeringBounds: Sendable, Equatabl
 VisualCoreSimulation | struct | public struct SteeringParameters: Sendable, Equatable
 VisualCoreSimulation | struct | public struct SystemAccessibility: Sendable, Equatable
 VisualCoreSimulation | struct | public struct TimeStepPolicy: Sendable, Equatable
+VisualCoreSimulation | struct | public struct TimedState: Sendable, Equatable, Hashable, Codable
 VisualCoreSimulation | struct | public struct Timeline: Sendable
 VisualCoreSimulation | struct | public struct Tween: Sendable, Equatable
 VisualCoreSimulation | subscript | public subscript(x: Int, y: Int, c: Int) -> Float
@@ -3307,6 +3385,7 @@ VisualCoreSimulation | var | public private(set) var clampedCount
 VisualCoreSimulation | var | public private(set) var clock: FixedStepClock
 VisualCoreSimulation | var | public private(set) var droppedCount
 VisualCoreSimulation | var | public private(set) var droppedTime
+VisualCoreSimulation | var | public private(set) var edgeCount: Int
 VisualCoreSimulation | var | public private(set) var entries: [Entry]
 VisualCoreSimulation | var | public private(set) var hash: ReplayHash
 VisualCoreSimulation | var | public private(set) var invalidCount
@@ -3380,6 +3459,7 @@ VisualCoreSimulation | var | public var isValid: Bool
 VisualCoreSimulation | var | public var iterations: Int
 VisualCoreSimulation | var | public var kind: AnnouncementKind
 VisualCoreSimulation | var | public var kind: HapticKind
+VisualCoreSimulation | var | public var kind: String
 VisualCoreSimulation | var | public var lifetime: ClosedRange<Double>
 VisualCoreSimulation | var | public var liveLimit: Int
 VisualCoreSimulation | var | public var manifold: ContactManifold2D
@@ -3425,6 +3505,7 @@ VisualCoreSimulation | var | public var spread: Double
 VisualCoreSimulation | var | public var startColor: Vec4, endColor: Vec4
 VisualCoreSimulation | var | public var startSize: Double, endSize: Double
 VisualCoreSimulation | var | public var state: State
+VisualCoreSimulation | var | public var steps: Int
 VisualCoreSimulation | var | public var steps: [Int]
 VisualCoreSimulation | var | public var stiffness: Double
 VisualCoreSimulation | var | public var tangentImpulses: [Double]

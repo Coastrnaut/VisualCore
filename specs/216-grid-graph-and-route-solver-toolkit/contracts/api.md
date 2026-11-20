@@ -20,3 +20,21 @@ VisualCoreSimulation (pure). All throwing members use `throws(RouteError)`.
 - `public struct MatchOutcome: Sendable, Equatable { public let placements: [[Int]]; public let complete: Bool; public let examined: Int; public let certificates: [SolverCertificate] /* one .placement per placement, or [.exhausted] when complete and none */ }`
 - `public enum SubgraphMatcher { public static let maxPatternNodes = 32; public static let maxPlacements = 100_000; public static let maxSteps = 10_000_000; public static func placements(of pattern: RouteGraph, in graph: RouteGraph, limit: Int = maxPlacements, budget: Int = maxSteps) throws -> MatchOutcome; public static func isomorphic(_ a: RouteGraph, _ b: RouteGraph, budget: Int = maxSteps) throws -> Bool? /* nil when the budget ran out */ }` — matching uses the undirected view (`adjacent`), ignoring self-loops and costs.
 - `public enum CertificateChecker { public static func verify(_ certificate: SolverCertificate, in graph: RouteGraph) throws; public static func verify(_ certificate: SolverCertificate, in graph: RouteGraph, schedule: RouteSchedule) throws; public static func verify(_ certificate: SolverCertificate, pattern: RouteGraph, in graph: RouteGraph) throws }` — a failed rule throws `certificateRejected(<rule>)`; `.exhausted` is refused with `certificateRejected("not-checkable")`.
+
+As built (2026-11-19), where the contract above left a choice open:
+- `RouteSearch.bestFirst` clamps the estimate to 0 … maxEdges · maxCost so no priority overflows; `breadthFirst` ignores
+  edge costs and its `RoutePath.cost` and potentials count steps, which the checker accepts as a fewest-steps
+  certificate when `cost == steps`.
+- `MinimumCut.between` checks the node range before source = sink and returns the source-side cut (duplicates kept
+  for parallel edges).
+- `TimeExpandedGraph.earliestArrival` checks schedule size, then endpoints, then the start time, then the start
+  state; a goal that is never open comes back unreachable.
+- `SubgraphMatcher.isomorphic` rules out differing degree sequences first and refuses graphs above 32 nodes with
+  `patternLimit`; a search stopped by its limit or budget with nothing found returns no certificate.
+- `CertificateChecker` rule names: route `empty-route`, `node-range`, `missing-edge`, `cost-mismatch`,
+  `potentials-size`, `potential-start`, `potential-edge`, `potential-goal`; unreachable `node-range`, `unsorted`,
+  `start-missing`, `goal-present`, `not-closed`; timedRoute `empty-route`, `node-range`, `closed-state`, `time-step`,
+  `missing-edge`, `wait-forbidden`; timedUnreachable `node-range`, `unsorted`, `start-missing`, `goal-present`,
+  `not-closed`; cut `node-range`, `unsorted`, `count-mismatch`, `route-invalid`, `not-disjoint`, `edge-missing`,
+  `not-separating`; placement `size-mismatch`, `node-range`, `not-injective`, `missing-edge`; any overload
+  `not-checkable`, `needs-schedule`, `needs-pattern`.

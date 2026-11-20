@@ -154,8 +154,8 @@
   "F16": {
    "disposition": "new",
    "existing": [],
-   "home": "(new) VisualCorePuzzle",
-   "note": "Grid, graph and route solvers used by solvability certification."
+   "home": "VisualCoreSimulation",
+   "note": "As built (feature 216): RouteGraph, GridGraph, RouteSearch (breadth-first and best-first with fixed ties and budgets), TimeExpandedGraph over a RouteSchedule, MinimumCut with edge-disjoint routes, SubgraphMatcher (placements and isomorphism) and SolverCertificate (schema 1) checked by CertificateChecker, in VisualCoreSimulation rather than a new module; LightMaze and Visual Programming Lab unchanged."
   },
   "F17": {
    "disposition": "extend",

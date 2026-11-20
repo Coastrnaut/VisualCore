@@ -359,6 +359,15 @@ composite, premultiplied over); `composite` mode 2 is premultiplied over; the va
 and out-of-range emissive ones. `RenderState.premultipliedBlended` draws premultiplied layers. Rules:
 [docs/architecture/shaders.md](../../docs/architecture/shaders.md).
 
+## Route solvers (feature 216, R02-F16)
+
+VisualCoreSimulation solves and proves routing puzzles with integer costs: `RouteGraph` (directed, costs 0…1,000,000)
+and `GridGraph` (four or eight neighbours, no corner cutting); `RouteSearch.breadthFirst` and `.bestFirst` (ties by
+(g + h, h, node id), a budget, "gave up" never "unreachable"); `TimeExpandedGraph.earliestArrival` over a
+`RouteSchedule`; `MinimumCut.between` with edge-disjoint routes; `SubgraphMatcher` placements and isomorphism. Every
+answer carries a `SolverCertificate` (JSON schema 1) that `CertificateChecker` verifies without the solvers.
+Refusals are `RouteError` with `r2-f16.*` codes. Rules: [docs/architecture/route-solvers.md](../../docs/architecture/route-solvers.md).
+
 ## Conic orbits and eclipses (feature 215, R02-F15)
 
 VisualCoreMath moves bodies on two-body conics and decides eclipses: `KeplerSolver` solves the elliptic (reusing
