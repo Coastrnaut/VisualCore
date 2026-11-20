@@ -8,7 +8,7 @@ tests stay short (< 10 s each).
 
 ## Phase 1: Setup
 
-- [ ] T-R02G0104-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test
+- [X] T-R02G0104-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test — Verified 2026-11-20: 2026-11-20 baseline-host, baseline-timing, baseline-round02 exit 0; rendering baseline R02-G01-03 rendering-27/26 exit 0 (.autonomy/migration/checks/R02-G01-04.baseline-*.json)
   --package-path Packages/ExperiencesRound02`; the rendering baseline is R02-G01-03's rendering runs (exit 0)
 
 ## Phase 2: Foundational
