@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--audits",
+    "--only",
+    "r02-g01.aurora-loom"
+  ],
+  "command": "python3 scripts/verify_experiences.py --audits --only r02-g01.aurora-loom",
+  "elapsed_seconds": 2.221,
+  "exit_code": 0,
+  "finished": "2026-11-20T18:24:33+00:00",
+  "gate": "R02-G01-04",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G01-04.audits.log",
+  "log_sha256": "893bde183b538fe12f8682c2f488fbbd8b8bf26b8eff73f6f8f1ed60593f2f96",
+  "name": "audits",
+  "started": "2026-11-20T18:24:31+00:00",
+  "timed_out": false
+}

@@ -36,6 +36,11 @@ iOS and their sources sit in `#if os(iOS)`, so `swift test` still runs the Cores
 python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package --destination sim-27.2 --action test
 ```
 
+Feature 304 (R02-G01-04) adds the touch controls: `AuroraLoomHandles` (an anchor rail and a dial per ribbon, step ↔
+position mappings, R02-F22 spatial handles), `AuroraLoomOrbit` with the orbit-aware camera, and the host-tested
+`AuroraLoomGestureController` (one move per gesture, two-finger orbit, selection); the presenter routes canvas touches
+through it and the scene draws the rails, dials and the selected ribbon's outline.
+
 ## Lissajous Labyrinth (R02-G02, `r02-g02.lissajous-labyrinth`, free)
 
 `LissajousLabyrinthCore` (feature 311, R02-G02-01) is the playable rule kernel: the integer `LissajousLabyrinthSine`,

@@ -49,7 +49,7 @@ tests stay short (< 10 s each).
 
 ## Phase 5: Regression, documentation and close
 
-- [ ] T-R02G0104-006 Docs: `docs/architecture/aurora-loom.md` (controls), `Packages/ExperiencesRound02/README.md`,
+- [X] T-R02G0104-006 Docs: `docs/architecture/aurora-loom.md` (controls), `Packages/ExperiencesRound02/README.md`, — Verified 2026-11-20: 2026-11-20 round02-host exit 0 (122 Aurora Loom and 37 Lissajous host tests); audits exit 0 (content audit of r02-g01.aurora-loom); docs/architecture/aurora-loom.md touch controls; package README; docs/automatedtesting.md (gestures scripted on the host, cached cameras) (.autonomy/migration/checks/R02-G01-04.round02-host.json, .autonomy/migration/checks/R02-G01-04.audits.json)
   `docs/automatedtesting.md`; `--name round02-host -- swift test --package-path Packages/ExperiencesRound02`; the
   content audit `--name audits -- python3 scripts/verify_experiences.py --audits --only r02-g01.aurora-loom`
 - [ ] T-R02G0104-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,

@@ -59,6 +59,11 @@ are never device evidence; device runs wait for `ImplementationLock-100`.
   `VisualCore.xcodeproj` as it is; after a new package or product in `project.yml`, run `xcodegen generate` first, or the
   app build fails with "Unable to resolve module dependency". The app links every module its registry imports (a game's
   adapter core lives in `<Name>Core`, so the app links `<Name>Core` and `<Name>Experience`).
+- **Gestures are scripted on the host.** A game's gesture logic lives in its Core as a controller that takes
+  `PointerEvent`s and a view size and returns moves (Aurora Loom: `AuroraLoomGestureController`); host tests script
+  touches at the projected handle positions and compare with an independently computed result, and one simulator test
+  drives the same touches through the presenter's `pointer(_:viewSize:port:)`. Cache fitted cameras per view size and
+  orbit: a 60-step bisection per event made the suite ten times slower.
 - **Content witnesses are files compared byte for byte.** A game's generated levels carry witness files (Aurora Loom:
   `docs/games/aurora-loom/levels/NNN.witness.json`); the catalog test regenerates every witness and compares bytes, and
   writes the files only when asked (`AURORA_LOOM_WRITE_WITNESSES=1 swift test --package-path Packages/ExperiencesRound02

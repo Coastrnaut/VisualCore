@@ -85,6 +85,22 @@ catalog's levels.
   candidate; it stays unavailable until X-R02-G01. A minimal panel (wave and phase steppers per ribbon, undo, redo, next
   level) drives the kernel until the gestures of R02-G01-04.
 
+## Touch controls (R02-G01-04)
+
+- **Handles.** Each ribbon has an anchor on a vertical rail just beyond the loom's right end and a dial just before its
+  left end, both in the ribbon's lane (`AuroraLoomHandles`). The anchor's height is H · (2 · wave / 15 − 1); the dial's
+  knob sits at phase · 22.5°. They are R02-F22 spatial handles, picked with a 44-point target.
+- **Gestures.** `AuroraLoomGestureController` (pure, host-tested) turns pointer events into at most one move per gesture:
+  a one-finger drag on an anchor follows the rail (the nearest step is previewed), a drag on a dial follows its plane (the
+  turned angle in 22.5° steps), and lifting the finger sends one `ribbon.move` when the step changed. A second finger
+  cancels a drag and orbits the camera; cancelled touches send nothing; handles respond only while the level is playing.
+- **Camera.** Two fingers orbit within ± 40° of the authored azimuth (dragging right turns it) and 10° … 60° of elevation
+  (dragging down raises the eye); a double tap on empty space
+  or "Reset view" restores the authored pose; the camera is refitted so the loom, rails and dials stay inside the view.
+  The orbit is presentation only: never in the digest or the saved state.
+- **Selection.** The ribbon whose handle was last picked (or whose stepper was last used) is outlined in gold and named in
+  the description; the steppers remain an equal way to play.
+
 ## Failures
 
 `AuroraLoomError` reason codes: `r02-g01.level`, `r02-g01.move`, `r02-g01.stage`, `r02-g01.stale`,
