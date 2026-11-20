@@ -8,7 +8,7 @@ seed 2_011.
 
 ## Phase 1: Setup
 
-- [ ] T-R02F11-001 Baselines: `--name baseline-host -- swift test --package-path Packages/VisualCore`; the rendering
+- [X] T-R02F11-001 Baselines: `--name baseline-host -- swift test --package-path Packages/VisualCore`; the rendering — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F11.baseline-host.json (exit 0); rendering baseline = R02-F10.rendering-27-2.json and rendering-26-2.json (exit 0) at 71b90e4f, package sources unchanged since
   baseline is R02-F10's last rendering run when package sources are unchanged since it (no rerun on an unchanged commit)
 
 ## Phase 2: Foundational — the description (P1) 🎯
