@@ -83,7 +83,7 @@
   `Packages/VisualCoreRendering/Tests/VisualCoreUITests/ClueBadgeTests.swift` (label equals name; renders at the
   largest accessibility size in compact and regular widths without truncation via `ImageRenderer` size checks;
   `contrastRatio` gives the same values as before for the existing pairs; picker present)
-- [ ] T-R02F10-009 Simulator runs: `--name rendering-27` and `--name rendering-26`
+- [X] T-R02F10-009 Simulator runs: `--name rendering-27` and `--name rendering-26` — Verified 2026-11-19: 2026-11-19 R02-F10.rendering-27.json and R02-F10.rendering-26.json (exit 0, 225 tests, 0 failures each)
 
 ## Phase 6: Regression, documentation and close
 
