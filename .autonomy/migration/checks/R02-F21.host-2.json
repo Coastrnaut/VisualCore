@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "NutrientDiffusionTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter NutrientDiffusionTests",
+  "elapsed_seconds": 13.612,
+  "exit_code": 0,
+  "finished": "2026-11-20T06:19:19+00:00",
+  "gate": "R02-F21",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-F21.host-2.log",
+  "log_sha256": "fc6d90ed1899a69c84c3fd540cf0366d6a49a65a3d7fd78d077b727ae253de0b",
+  "name": "host-2",
+  "started": "2026-11-20T06:19:05+00:00",
+  "timed_out": false
+}

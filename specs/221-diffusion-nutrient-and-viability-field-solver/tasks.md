@@ -23,7 +23,7 @@ its check record (no trailers). No {owner} tasks; one {device} task. Fixture see
 
 ## Phase 3: Stories 1 and 2 — stable diffusion, sources, sinks and decay (P1) 🎯
 
-- [ ] T-R02F21-003 [P] [US1] [US2] Create `Packages/VisualCore/Sources/VisualCoreSimulation/NutrientField+Step.swift` (`step(by:)`: frame cut to 0.25 s, n = max(1,
+- [X] T-R02F21-003 [P] [US1] [US2] Create `Packages/VisualCore/Sources/VisualCoreSimulation/NutrientField+Step.swift` (`step(by:)`: frame cut to 0.25 s, n = max(1, — Verified 2026-11-20: 2026-11-20 host-2 exit 0: NutrientDiffusionTests 8/8 (20 fields × 300 frames, 305,557 sub-steps, 0 failures; spread ΔS 7.99988 vs 4·D·t 8.0, error 0.0016 %; settle change 0.0125 %; long frame 256 sub-steps, 2.968 s dropped) (.autonomy/migration/checks/R02-F21.host-2.json)
   ⌈8 · t · Dmax⌉) ≤ 256 sub-steps, dropped time reported; per sub-step sources, sinks, diffusion ⌊r · (a − b)⌋ on
   4-neighbour edges from the sub-step's start, decay ⌊a · (1 − e^(−λh))⌋; ledger and report; growth hook called once per
   frame) with `Packages/VisualCore/Tests/VisualCoreSimulationTests/NutrientDiffusionTests.swift` (20 seeded fields × 300 frames of seeded lengths: every channel
