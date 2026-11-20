@@ -51,7 +51,7 @@ its check record (no trailers). No {owner} tasks; one {device} task. Fixture see
   `render_autocreator.py`
 - [ ] T-R02F20-008 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02F20-009 Reference regression chunk 2 (`--name reference-2`)
-- [ ] T-R02F20-010 Script tests (`--name script-tests`)
+- [X] T-R02F20-010 Script tests (`--name script-tests`) — Verified 2026-11-20: 2026-11-20 script-tests-2 exit 0 (543 tests OK); the first run (exit 1) failed only the ledger-unchanged guard because the concurrent rendering run wrote check files (.autonomy/migration/checks/R02-F20.script-tests*.json)
 - [ ] T-R02F20-011 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
 
 ## Device campaign (after ImplementationLock-100)
