@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "AuroraLoomShaderSourceTests"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter AuroraLoomShaderSourceTests",
+  "elapsed_seconds": 1.365,
+  "exit_code": 0,
+  "finished": "2026-11-20T17:43:06+00:00",
+  "gate": "R02-G01-03",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G01-03.host-3.log",
+  "log_sha256": "3ebce9a74fb37cad5ab3222207c0e41ee3c4dff98f71758a0e3866f9e6d2e754",
+  "name": "host-3",
+  "started": "2026-11-20T17:43:05+00:00",
+  "timed_out": false
+}

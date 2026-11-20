@@ -28,7 +28,7 @@ tests stay short (< 10 s each). Simulator evidence is one pass on the iOS 27.x p
   markers, camera fitting aspect 0.4 … 2.5 with a 5 % margin, projection) with `Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomSceneGeometryTests.swift`
   (finite and bounded for every extreme setting and Ω; layers per tier; fit for aspects 0.4 … 2.5; projection round
   trip); `--name host-2`
-- [ ] T-R02G0103-004 [P] [US1] Create `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomShaders.swift` (ribbon and gate programs, GLSL ES 3.00; wave
+- [X] T-R02G0103-004 [P] [US1] Create `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomShaders.swift` (ribbon and gate programs, GLSL ES 3.00; wave — Verified 2026-11-20: 2026-11-20 host-3 exit 0: AuroraLoomShaderSourceTests 7/7 (version line, uniforms declared once and used, no samplers or loops, varyings match, attribute layout 0/1/2, ASCII, fallback and gate colours) (.autonomy/migration/checks/R02-G01-03.host-3.json)
   displacement, bevel from u, interference, palette mix, lit state, glow gain) with
   `Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomShaderSourceTests.swift` (version line, every declared uniform used and listed, no texture sampler);
   `--name host-3`
