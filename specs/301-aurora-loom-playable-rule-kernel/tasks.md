@@ -13,7 +13,7 @@ or {device} tasks (pure logic). Fixture seed 2_301; tests stay short.
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G0101-002 Create `Packages/ExperiencesRound02/Package.swift` (platforms iOS 26 and macOS 15; target
+- [X] T-R02G0101-002 Create `Packages/ExperiencesRound02/Package.swift` (platforms iOS 26 and macOS 15; target — Verified 2026-11-20: 2026-11-20 host exit 0: AuroraLoomLevelTests 4/4 (refusals and codes; an already-winning start refused; periods; 200 seeded fixtures win with their setting and not at the start; round trip byte for byte; newer, damaged, edited forms refused) (.autonomy/migration/checks/R02-G01-01.host.json)
   `AuroraLoomCore` at `AuroraLoom/Core` depending on VisualCoreSimulation and VisualCoreMath; test target
   `AuroraLoomCoreTests` at `AuroraLoom/CoreTests`), `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomError.swift`, `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomHarmony.swift` (phase, residual, wins over n = 0 … 2P − 1, worst
   mismatch with ties by ribbon, gate, tick) and `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomLevel.swift`
