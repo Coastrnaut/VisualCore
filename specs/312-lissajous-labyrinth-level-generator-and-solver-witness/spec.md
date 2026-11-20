@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-20
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G02-02 (migration ledger, game feature of experience R02-G02) · ID namespace FR-R02G0202-###,
 SC-R02G0202-###, T-R02G0202-###
@@ -27,6 +27,57 @@ Canonical overrides:
   items:** none (generation and certification run on the host). **Owner-only items:** none.
 - **Shared features used:** R02-F23 (puzzle contract: `LissajousLabyrinthRules` from R02-G02-01) and R02-F24 (catalog
   digest, difficulty and progression rule); R02-F03 numbers.
+
+## Clarifications
+
+### Session 2026-11-20
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time. Facts checked in
+code (read-only audit, 2026-11-20): R02-G02-01's `LissajousLabyrinthLevel` (amplitudes 1 … 4, frequency c 1 … 9, 1 … 6
+checkpoints, 0 … 8 obstacles, allowance 1 … 64, refused when the start already wins), `LissajousLabyrinthLap.verdict`
+(4,096 ticks, exact integer segment test), `LissajousLabyrinthRules.moves` (every single-dial change whose frequencies stay
+coprime: an action sets one dial to any value of its range), `LissajousLabyrinthError` (`r02-g02.*`); R02-F24's
+`PuzzleCatalog.digest(id:identities:)`, `PuzzleDifficulty`, `ProgressionRule`; `SeedDerivation.derive(_:index:)`. The
+legal setting space is 55 coprime frequency pairs × 256 phase pairs = 14,080 settings.
+
+- Q: How is a level built from its manifest entry? → A: the 100 entries (number, planned seed, band, move budget) are a
+  table in `LissajousLabyrinthManifest` copied from the archived design with its provenance. Candidate k of entry n draws
+  from `SeededRandom(seed: SeedDerivation.derive(plannedSeed, index: k))`: amplitudes and frequency c; a target winning
+  setting (coprime a, b; phases); checkpoints placed on the target's path at increasing, well-spread ticks (bands 1 … 5:
+  2, 3, 4, 5, 6 checkpoints of radius 512, 448, 384, 320, 256); obstacles (bands: 2, 3, 4, 6, 8 of radius 256 … 512) placed
+  on the paths of other legal settings and kept only when the target path clears them; a start that changes `scramble`
+  dials of the target. A candidate is kept when the level is valid, its start does not win, its shortest solution lies in
+  its band's range (bands 1 … 5: 1–2, 2, 2–3, 3, 3–4 actions) and does not exceed the move budget (the allowance is the
+  budget); otherwise k grows, at most 64 candidates, then `generation(n)`. Ids `lissajous-labyrinth-NNN`; tutorial flag on
+  levels 1 … 3. Impact: FR-R02G0202-001; SC-R02G0202-001, 003.
+- Q: How does the solver decide every setting and the shortest path? → A: `LissajousLabyrinthSolver` decides all 14,080
+  legal settings: a sound prefilter (a sample inside a checkpoint ball is inside its axis box; the per-axis box hits of
+  x(a, φ), y(b) and z(ψ) are separable tables combined as bit sets of 4,096 ticks, so a setting with an empty box set for
+  any checkpoint cannot win) and the kernel's exact `verdict` for every survivor. The shortest solution is a
+  breadth-first search from the start over legal states (single-dial changes keeping the frequencies coprime) to the
+  nearest winning setting; ties by the winning setting's (a, b, φ, ψ) ascending, actions in dial order, values ascending.
+  The work is the number of exact verdicts. Impact: FR-R02G0202-002; SC-R02G0202-002.
+- Q: What difficulty metrics are stored and what progression is required? → A: `LissajousLabyrinthDifficulty` holds the
+  shortest solution, the number of winning settings, the minimum clearance of the witness path (the smallest
+  squared distance minus squared radius between any sample and any obstacle, an integer) and the work. The catalog in
+  manifest order keeps R02-F24's standard `ProgressionRule` (drop at most 1, jump at most 3) on shortest solutions; band
+  means of shortest never fall and band means of winning settings never rise. Impact: FR-R02G0202-003, 005;
+  SC-R02G0202-004.
+- Q: What is in a witness file and how is it checked? → A: `docs/games/lissajous-labyrinth/levels/NNN.witness.json`,
+  JSON schema 1 with sorted keys: number, the level's stored form, the actions, the play fingerprints after `begin` (and
+  the tutorial) and after each action, the terminal measure (checkpoint visit ticks in order, minimum clearance), the
+  near miss (from the winning setting, the single legal dial change with the smallest value distance that loses, ties in
+  dial order then lower value, with its verdict), the non-coprime counterexample (frequency b set to the smallest other
+  value sharing a factor with a; when a is 1, frequency a set to the smallest other value sharing a factor with b; when both
+  are 1, both set to 2) refused by the rules with `r02-g02.move`, the difficulty and the candidates skipped. A test
+  rebuilds every witness and compares bytes; it writes the files only with `LISSAJOUS_LABYRINTH_WRITE_WITNESSES=1`.
+  Decoding refuses newer schemas, damaged files and witnesses that no longer replay. Impact: FR-R02G0202-004;
+  SC-R02G0202-003, 005.
+- Q: How is the catalog identified, how long may certification take and how are refusals named? → A: the digest is
+  `PuzzleCatalog<LissajousLabyrinthRules>.digest(id: "lissajous-labyrinth", identities:)` over the 100 level
+  fingerprints in manifest order, pinned in a test. Certification tests are split so each runs under 10 seconds on a debug
+  host build (CI measured, not asserted). New refusals: `generation(Int)` (`r02-g02.generation`) and `witness(String)`
+  (`r02-g02.witness`). Impact: FR-R02G0202-005, 006; SC-R02G0202-006.
 
 ## User Scenarios & Testing *(mandatory)*
 
