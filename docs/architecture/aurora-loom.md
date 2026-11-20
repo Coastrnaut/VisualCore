@@ -61,6 +61,30 @@ catalog's levels.
 - **Catalog digest.** `AuroraLoomGenerator.catalogDigest` is `PuzzleCatalog<AuroraLoomRules>.digest(id: "aurora-loom",
   identities:)` over the level fingerprints in manifest order, pinned in `AuroraLoomCatalogTests`.
 
+## Renderer and experience (R02-G01-03)
+
+- **Snapshot.** `AuroraLoomSceneSnapshot` is the only thing the renderer reads: the level, the six steps, the stage, the
+  failure and the frame time in ticks. The adapter `AuroraLoomExperienceCore` (the shared `ExperienceCore`) makes it; no
+  drawing result, tier or time reaches the kernel or the digest (renderer purity, R2-G01-INV-10).
+- **Picture.** Each ribbon is drawn along the loom (x from −4 to +4 for s = 0 … 16) at height
+  H · sin(2π θ / 4,096), θ = wave · s · 16 + phase · 256 + ω t, in its own lane in depth; the gates are rings across the
+  loom and a gold marker on each ring shows the target's height. A ring and its marker brighten when all three ribbons
+  meet that gate within the tolerance. The geometry (`AuroraLoomSceneGeometry`) uses R02-F08's Catmull-Rom curves,
+  parallel-transport frames and ribbon meshes; the camera fits the whole loom for aspects 0.4 … 2.5 with a 6 % margin.
+- **Materials.** `AuroraLoomShaders` (GLSL ES 3.00): wave displacement along the normal, bevel shading across the
+  ribbon, interference shimmer along it, the palette (night #07121A, teal #1FD1B4, magenta #E0389C, acid gold #D8E83A)
+  and an emissive glow drawn as additive halo passes. They are drawn by VisualCoreRendering's `ShaderMeshRenderer`, which
+  draws a generated mesh with a caller-supplied program.
+- **Tiers.** `level-0` (five layers, 128 segments, two glow passes), `level-1` (three, 64, one) and `level-2` (one, 32,
+  none), richest first as the shared quality contract requires; every tier draws the same centre lines, gates and
+  markers. The presenter logs each tier change with its reason.
+- **Failures and settings.** A program that does not compile makes the scene draw the minimal layer with the shared unlit
+  renderer and keep the reason; Reduce Motion holds the silk still; Reduce Flashing caps the glow gain; a memory warning
+  releases the GPU objects, which the next frame rebuilds.
+- **Candidate.** `r02-g01.aurora-loom` is registered in `Catalog/registrations.json` and linked into the one app as a
+  candidate; it stays unavailable until X-R02-G01. A minimal panel (wave and phase steppers per ribbon, undo, redo, next
+  level) drives the kernel until the gestures of R02-G01-04.
+
 ## Failures
 
 `AuroraLoomError` reason codes: `r02-g01.level`, `r02-g01.move`, `r02-g01.stage`, `r02-g01.stale`,

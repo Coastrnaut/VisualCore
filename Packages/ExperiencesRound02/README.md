@@ -26,6 +26,16 @@ AURORA_LOOM_WRITE_WITNESSES=1 swift test --package-path Packages/ExperiencesRoun
 swift test --package-path Packages/ExperiencesRound02
 ```
 
+Feature 303 (R02-G01-03) adds the experience: in the Core the adapter `AuroraLoomExperienceCore`, the immutable
+`AuroraLoomSceneSnapshot` with `AuroraLoomPalette` and `AuroraLoomTier`, the geometry and CPU reference
+`AuroraLoomSceneGeometry` and the GLSL sources `AuroraLoomShaders`; in the iOS-only target `AuroraLoomExperience` the
+presenter, the GL scene and a minimal control panel. The Experience targets' rendering dependencies are conditional on
+iOS and their sources sit in `#if os(iOS)`, so `swift test` still runs the Cores on the macOS host; the simulator tests:
+
+```bash
+python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package --destination sim-27.2 --action test
+```
+
 ## Lissajous Labyrinth (R02-G02, `r02-g02.lissajous-labyrinth`, free)
 
 `LissajousLabyrinthCore` (feature 311, R02-G02-01) is the playable rule kernel: the integer `LissajousLabyrinthSine`,

@@ -69,7 +69,7 @@ tests stay short (< 10 s each). Simulator evidence is one pass on the iOS 27.x p
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02G0103-010 CI and docs: no new CI simulator step (experience simulator tests need the locally built ANGLE
+- [X] T-R02G0103-010 CI and docs: no new CI simulator step (experience simulator tests need the locally built ANGLE — Verified 2026-11-20: 2026-11-20 round02-host exit 0; no CI simulator step (as decided in analyze); docs/architecture/aurora-loom.md renderer section; package README; docs/automatedtesting.md (Experience targets in a host-tested package; regenerate the project after project.yml changes) (.autonomy/migration/checks/R02-G01-03.round02-host.json)
   frameworks and run locally, as ExperiencesCreative's do; CI keeps the host step and builds the app, which now links
   the candidate); `docs/architecture/aurora-loom.md` (renderer);
   `Packages/ExperiencesRound02/README.md`; `docs/automatedtesting.md`; `docs/migration/path-map.json` if it names the

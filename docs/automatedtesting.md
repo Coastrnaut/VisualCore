@@ -51,6 +51,14 @@ are never device evidence; device runs wait for `ImplementationLock-100`.
 - **Hot loops read shared tables through one buffer.** Parallel test runs that index a shared global array per sample
   contend on its reference count (Lissajous Labyrinth's lap went from about 35 s of tests to 5 s once the sine table was
   read through `withUnsafeBufferPointer` once per lap).
+- **Experience targets in a host-tested package.** `Packages/ExperiencesRound02` keeps its Cores host-testable: an
+  `<Name>Experience` target's rendering dependencies carry `.when(platforms: [.iOS])` and its sources are wrapped in
+  `#if os(iOS)`, so `swift test` builds them empty on macOS; their simulator tests run with `xcodebuild_package.py
+  --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package --destination sim-27.2`.
+- **Regenerate the project after `project.yml` changes.** `xcodebuild_app.py` builds the generated
+  `VisualCore.xcodeproj` as it is; after a new package or product in `project.yml`, run `xcodegen generate` first, or the
+  app build fails with "Unable to resolve module dependency". The app links every module its registry imports (a game's
+  adapter core lives in `<Name>Core`, so the app links `<Name>Core` and `<Name>Experience`).
 - **Content witnesses are files compared byte for byte.** A game's generated levels carry witness files (Aurora Loom:
   `docs/games/aurora-loom/levels/NNN.witness.json`); the catalog test regenerates every witness and compares bytes, and
   writes the files only when asked (`AURORA_LOOM_WRITE_WITNESSES=1 swift test --package-path Packages/ExperiencesRound02
