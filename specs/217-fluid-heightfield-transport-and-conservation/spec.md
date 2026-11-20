@@ -142,7 +142,8 @@ refused.
 - **FR-R02F17-004**: Dye MUST move with the water and each dye's total MUST be exactly conserved apart from what drains.
 - **FR-R02F17-005**: Erosion MUST exchange terrain and sediment and carry sediment with the water so that terrain plus
   sediment is exactly conserved apart from what drains, never cutting below the floor.
-- **FR-R02F17-006**: Water, dye and sediment MAY be added or removed only through explicit, ledgered operations.
+- **FR-R02F17-006**: Terrain, water and dye MUST change only by flow, erosion or explicit ledgered add and remove
+  operations; sediment changes only by erosion and flow.
 - **FR-R02F17-007**: The state MUST have a versioned stored form that continues identically; newer and damaged forms MUST
   be refused.
 - **FR-R02F17-008**: The heights MUST be handed to the existing field grid for drawing without changing it.

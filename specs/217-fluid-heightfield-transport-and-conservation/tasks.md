@@ -16,7 +16,7 @@ campaign). Fixture seed 2_017; grids ≤ 64 × 64 so tests stay light.
 - [ ] T-R02F17-002 Create `Packages/VisualCore/Sources/VisualCoreSimulation/HeightfieldError.swift`, `Packages/VisualCore/Sources/VisualCoreSimulation/HeightfieldParameters.swift` (HeightfieldEdges,
   HeightfieldParameters "gravity 0 < g ≤ 100; pipeArea 0 < A ≤ 10; damping 0 … 1; maxSubstep 0 < h ≤ 0.1; maxSubsteps
   1 … 64; rates 0 … 10; all finite", HeightfieldLedger, HeightfieldStepReport) and `Packages/VisualCore/Sources/VisualCoreSimulation/Heightfield.swift` (state "sides
-  4 … 1,024, ≤ 262,144 cells; 0 … 4 dye channels; amounts 0 … 2⁴⁰", ledgered add and remove, totals, `isBalanced`,
+  4 … 1,024, ≤ 262,144 cells; 0 … 4 dye channels; amounts 0 … 2⁴⁰", ledgered add and remove of terrain, water and dye (no sediment edit), totals, `isBalanced`,
   `surface(at:)`, `fieldGrid()`) with `Packages/VisualCore/Tests/VisualCoreSimulationTests/HeightfieldStateTests.swift` (limits and refusals, ledger after edits, field
   handoff values); `--name host`
 
