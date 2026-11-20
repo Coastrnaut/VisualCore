@@ -1,14 +1,18 @@
 // AccessibilitySettingsSection.swift — the shared Reduce Motion / Reduce Flashing settings for animated apps, plus an
 // increased-contrast accent (feature 016 T-A01-510; constitution II; FR-A01-501, FR-A01-504). Built to pass the
 // accessibility audit: prominent primary-colored header, plain picker values that are never clipped, and the
-// explanation in a full-contrast row instead of a secondary-colored footer.
+// explanation in a full-contrast row instead of a secondary-colored footer. Feature 210 (R02-F10) T-R02F10-008
+// (FR-R02F10-010, research R8): a colour-vision picker after the two rows, and `AccessibleColors.contrastRatio`
+// computed by `PerceptualColor.contrastRatio`, the one WCAG formula of the package.
 import SwiftUI
 import UIKit
+import VisualCoreParameters
 import VisualCoreSimulation
 
-/// A form section with System/On/Off pickers for Reduce Motion and Reduce Flashing, and a row that explains the
-/// choices and shows the current device setting. Identifiers: `<prefix>.reduceMotion`, `<prefix>.reduceFlashing`
-/// and `<prefix>.footer`; each picker's accessibility value is the choice title.
+/// A form section with System/On/Off pickers for Reduce Motion and Reduce Flashing, a row that explains the
+/// choices and shows the current device setting, and a colour-vision picker with its own explanation row.
+/// Identifiers: `<prefix>.reduceMotion`, `<prefix>.reduceFlashing`, `<prefix>.footer`, `<prefix>.colorVision` and
+/// `<prefix>.colorVisionFooter`; each picker's accessibility value is the choice title.
 public struct AccessibilitySettingsSection: View {
     @Binding var preferences: AccessibilityPreferences
     let system: SystemAccessibility
@@ -29,7 +33,12 @@ public struct AccessibilitySettingsSection: View {
             + "Dim Flashing Lights \(system.dimFlashingLights ? "on" : "off")."
     }
 
-    /// The section: two pickers and the explanation row, with a prominent header.
+    /// The one-sentence explanation of the colour-vision picker (also used by tests).
+    public static let colorVisionExplanation = "Colours replaces the colours of colour-coded states with a preset that "
+        + "stays distinct with colour blindness; each state also keeps its shape, pattern and name."
+
+    /// The section: two pickers and the explanation row, then the colour-vision picker and its sentence, with a
+    /// prominent header.
     public var body: some View {
         Section("Motion and flashing") {
             picker("Reduce Motion", choice: $preferences.reduceMotion, id: "\(identifierPrefix).reduceMotion")
@@ -37,6 +46,15 @@ public struct AccessibilitySettingsSection: View {
             Text(Self.explanation(system: system))
                 .font(.footnote)
                 .accessibilityIdentifier("\(identifierPrefix).footer")
+            Picker("Colours", selection: $preferences.colorVision) {
+                ForEach(ColorVisionChoice.allCases) { Text($0.title).tag($0) }
+            }
+            .accessibilityIdentifier("\(identifierPrefix).colorVision")
+            .accessibilityValue(Text(preferences.colorVision.title))
+            Text(Self.colorVisionExplanation)
+                .font(.footnote)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier("\(identifierPrefix).colorVisionFooter")
         }
         .headerProminence(.increased)
     }
@@ -61,15 +79,16 @@ public enum AccessibleColors {
     /// SwiftUI form of `accentUIColor`, for `.tint(_:)`.
     public static let accent = Color(uiColor: accentUIColor)
 
-    /// WCAG contrast ratio between two opaque sRGB colors (1…21).
+    /// WCAG contrast ratio between two opaque sRGB colors (1…21): both are read as sRGB components and passed to
+    /// `PerceptualColor.contrastRatio` (feature 210 T-R02F10-008, research R8).
     public static func contrastRatio(_ a: UIColor, _ b: UIColor) -> Double {
-        func luminance(_ c: UIColor) -> Double {
-            var r: CGFloat = 0, g: CGFloat = 0, bl: CGFloat = 0, al: CGFloat = 0
-            c.getRed(&r, green: &g, blue: &bl, alpha: &al)
-            func lin(_ v: CGFloat) -> Double { let v = Double(v); return v <= 0.04045 ? v / 12.92 : pow((v + 0.055) / 1.055, 2.4) }
-            return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(bl)
-        }
-        let (l1, l2) = (luminance(a), luminance(b))
-        return (max(l1, l2) + 0.05) / (min(l1, l2) + 0.05)
+        PerceptualColor.contrastRatio(sRGB(a), sRGB(b))
+    }
+
+    /// The sRGB components of `color` as `UIColor.getRed` gives them (extended sRGB).
+    static func sRGB(_ color: UIColor) -> SIMD3<Double> {
+        var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+        color.getRed(&r, green: &g, blue: &b, alpha: &a)
+        return SIMD3(Double(r), Double(g), Double(b))
     }
 }

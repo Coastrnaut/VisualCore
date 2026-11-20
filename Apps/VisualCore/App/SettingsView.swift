@@ -109,14 +109,17 @@ struct SettingsView: View {
 
     // MARK: Accessibility choices
 
-    /// The two stored choices as the value the shared section edits.
+    /// The three stored choices as the value the shared section edits (colour vision: feature 210 T-R02F10-008;
+    /// nil is stored as never chosen and shown as `standard`).
     private var accessibility: Binding<AccessibilityPreferences> {
         Binding(get: {
             AccessibilityPreferences(reduceMotion: Self.shared(model.preferences.reduceMotion),
-                                     reduceFlashing: Self.shared(model.preferences.reduceFlashing))
+                                     reduceFlashing: Self.shared(model.preferences.reduceFlashing),
+                                     colorVision: model.preferences.colorVision ?? .standard)
         }, set: { value in
             model.setAccessibility(reduceMotion: Self.stored(value.reduceMotion),
-                                   reduceFlashing: Self.stored(value.reduceFlashing))
+                                   reduceFlashing: Self.stored(value.reduceFlashing),
+                                   colorVision: value.colorVision)
         })
     }
 

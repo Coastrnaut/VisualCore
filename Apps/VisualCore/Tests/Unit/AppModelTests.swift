@@ -255,7 +255,7 @@ final class AppModelTests: XCTestCase {
         let storage = try TestStorage(self)
         let model = fixtureModel(storage)
         model.go(.settings)
-        model.setAccessibility(reduceMotion: .on, reduceFlashing: .off)
+        model.setAccessibility(reduceMotion: .on, reduceFlashing: .off, colorVision: .standard)
         XCTAssertEqual(model.route, .settings)
         let stored = PreferencesStore(defaults: storage.defaults).load().preferences
         XCTAssertEqual(stored.lastRoute, .settings)
@@ -300,7 +300,7 @@ final class AppModelTests: XCTestCase {
         XCTAssertEqual(received.values.map(\.storage.id), [id], "the factory receives the handle of its own id")
         model.closeExperience()
 
-        model.setAccessibility(reduceMotion: .on, reduceFlashing: .off)
+        model.setAccessibility(reduceMotion: .on, reduceFlashing: .off, colorVision: .standard)
         let second = await model.open(id)
         XCTAssertTrue(second)
         XCTAssertEqual(received.values.last?.reduceMotion, .on)

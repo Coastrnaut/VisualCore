@@ -3,6 +3,7 @@
 // the launcher's state, the startup decision and the reset plan. Nothing here reads a clock, a file, a language
 // setting or a network; the app renders these values and stores the preferences.
 import Foundation
+import enum VisualCoreSimulation.ColorVisionChoice
 
 // MARK: - Routes
 
@@ -117,6 +118,10 @@ public struct ShellPreferences: Sendable, Equatable, Codable {
     public var haptics: Bool?
     /// Whether haptic feedback is on (the stored switch, on when never set).
     public var hapticsOn: Bool { haptics ?? true }
+    /// The colour-vision choice (feature 210, R02-F10, T-R02F10-008, FR-R02F10-010): nil means `standard`. Optional
+    /// so that preferences written before it decode unchanged; an unknown stored value reads as `standard`; the schema
+    /// stays 1.
+    public var colorVision: ColorVisionChoice?
 
     /// The defaults: welcome not seen, the catalog, no search, automatic quality, both choices `system`.
     public init() {}
@@ -131,7 +136,7 @@ public struct ShellPreferences: Sendable, Equatable, Codable {
     }
 
     private enum CodingKeys: String, CodingKey {
-        case schema, welcomeSeen, lastRoute, searchText, qualityOverride, reduceMotion, reduceFlashing, haptics
+        case schema, welcomeSeen, lastRoute, searchText, qualityOverride, reduceMotion, reduceFlashing, haptics, colorVision
     }
 
     private struct SchemaProbe: Decodable {
@@ -153,6 +158,7 @@ public struct ShellPreferences: Sendable, Equatable, Codable {
         reduceMotion = try container.decodeIfPresent(AccessibilityChoice.self, forKey: .reduceMotion) ?? .system
         reduceFlashing = try container.decodeIfPresent(AccessibilityChoice.self, forKey: .reduceFlashing) ?? .system
         haptics = try container.decodeIfPresent(Bool.self, forKey: .haptics)
+        colorVision = try container.decodeIfPresent(ColorVisionChoice.self, forKey: .colorVision)
     }
 
     /// Encodes schema 1 with the keys of data-model section 1; an automatic quality writes no key.
@@ -166,6 +172,7 @@ public struct ShellPreferences: Sendable, Equatable, Codable {
         try container.encode(reduceMotion, forKey: .reduceMotion)
         try container.encode(reduceFlashing, forKey: .reduceFlashing)
         try container.encodeIfPresent(haptics, forKey: .haptics)
+        try container.encodeIfPresent(colorVision, forKey: .colorVision)
     }
 
     /// Reads stored preferences. It never throws and never traps.

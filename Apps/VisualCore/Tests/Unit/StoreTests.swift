@@ -163,7 +163,7 @@ final class StoreTests: XCTestCase {
         let model = fixtureModel(storage)
         await model.finishWelcome(openFirst: false)
         model.setQualityOverride(2)
-        model.setAccessibility(reduceMotion: .on, reduceFlashing: .off)
+        model.setAccessibility(reduceMotion: .on, reduceFlashing: .off, colorVision: .standard)
         model.go(.settings)
         XCTAssertNotEqual(PreferencesStore(defaults: storage.defaults).load().preferences, ShellPreferences())
         let ids = model.shown.map(\.id)

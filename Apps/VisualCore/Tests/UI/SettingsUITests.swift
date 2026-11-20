@@ -45,6 +45,26 @@ final class SettingsUITests: XCTestCase {
     }
 
     @MainActor
+    /// Feature 210 (R02-F10, FR-R02F10-010; T-R02F10-010): the colour-vision picker shows "Standard colours" by default
+    /// and keeps a chosen preset across a relaunch, so the shell preferences carry it (research R12).
+    func testTheColourVisionChoiceIsStandardByDefaultAndSurvivesARelaunch() {
+        let app = launchApp(arguments: Self.fresh)
+        waitFor(element(app, "vc.route.catalog"))
+        openSettings(app)
+        let picker = element(app, "vc.settings.colorVision")
+        waitFor(picker, timeout: VC.wait)
+        XCTAssertEqual(picker.value as? String, "Standard colours")
+        choose(app, picker, option: NSPredicate(format: "label BEGINSWITH %@", "Red and cyan"))
+        XCTAssertEqual(picker.value as? String, "Red and cyan")
+
+        let second = relaunch(app, arguments: [VC.fixture, VC.skipWelcome])
+        if !element(second, "vc.route.settings").waitForExistence(timeout: VC.firstWait) { openSettings(second) }
+        let again = element(second, "vc.settings.colorVision")
+        waitFor(again, timeout: VC.wait)
+        XCTAssertEqual(again.value as? String, "Red and cyan", "the choice was stored")
+    }
+
+    @MainActor
     func testTheThreeSettingsSurviveARelaunch() {
         let app = launchApp(arguments: Self.fresh)
         waitFor(element(app, "vc.route.catalog"))
@@ -54,16 +74,18 @@ final class SettingsUITests: XCTestCase {
         let quality = element(app, "vc.settings.quality")
         waitFor(motion, timeout: VC.wait)
         waitFor(flashing, timeout: VC.wait)
-        waitFor(quality, timeout: VC.wait)
         XCTAssertEqual(motion.value as? String, "System")
         XCTAssertEqual(flashing.value as? String, "System")
-        let automatic = quality.value as? String
-
         choose(app, motion, option: NSPredicate(format: "label BEGINSWITH %@", "On"))
         choose(app, flashing, option: NSPredicate(format: "label BEGINSWITH %@", "Off"))
-        choose(app, quality, option: NSPredicate(format: "label CONTAINS %@", "3"))
         XCTAssertEqual(motion.value as? String, "On")
         XCTAssertEqual(flashing.value as? String, "Off")
+
+        // Feature 210 (R02-F10): the colour-vision row sits between the accessibility choices and the quality row,
+        // so on a small phone the quality row exists only after scrolling.
+        scrollRoute(app, "vc.route.settings", to: quality)
+        let automatic = quality.value as? String
+        choose(app, quality, option: NSPredicate(format: "label CONTAINS %@", "3"))
         let chosen = quality.value as? String
         XCTAssertNotNil(chosen)
         XCTAssertNotEqual(chosen, automatic, "the quality override changed from automatic")
@@ -75,7 +97,9 @@ final class SettingsUITests: XCTestCase {
         waitFor(element(second, "vc.settings.reduceMotion"), timeout: VC.wait)
         XCTAssertEqual(element(second, "vc.settings.reduceMotion").value as? String, "On")
         XCTAssertEqual(element(second, "vc.settings.reduceFlashing").value as? String, "Off")
-        XCTAssertEqual(element(second, "vc.settings.quality").value as? String, chosen)
+        let qualityAgain = element(second, "vc.settings.quality")
+        scrollRoute(second, "vc.route.settings", to: qualityAgain)
+        XCTAssertEqual(qualityAgain.value as? String, chosen)
     }
 
     @MainActor

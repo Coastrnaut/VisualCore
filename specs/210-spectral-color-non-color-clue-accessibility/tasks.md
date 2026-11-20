@@ -70,7 +70,7 @@
   `Packages/VisualCore/Tests/VisualCoreSimulationTests/ColorVisionPreferenceTests.swift` (JSON from before the feature
   decodes with old choices kept and `.standard`; unknown raw value → `.standard`; storage round trip; the existing
   `AccessibilityPreferencesTests` unchanged and passing; SC-R02F10-005); `--name host`
-- [ ] T-R02F10-008 [US3] [US4] Create `Packages/VisualCoreRendering/Sources/VisualCoreUI/ClueBadge.swift` (`ClueBadge`
+- [X] T-R02F10-008 [US3] [US4] Create `Packages/VisualCoreRendering/Sources/VisualCoreUI/ClueBadge.swift` (`ClueBadge` — Verified 2026-11-19: lead retest 2026-11-19: R02-F10/rendering-27 and rendering-26 exit=0 incl. ClueBadgeTests 6 passed and AccessibilitySettingsSectionTests; host-2 exit=0 incl. ShellColorVisionTests; app-settings-2 exit=0 (app build, unit, UI chunk b incl. the new colour-vision relaunch test; first attempt app-settings exit 1: the quality row moved below the fold on iPhone 13 mini, fixed by scrolling)
   drawing the shape, pattern and outline with SwiftUI `Path`/`Canvas` from `ClueReference`, `@ScaledMetric` size,
   wrapping name, accessibility label = name; `ColorVisionChoice.palette`) and edit `AccessibilitySettingsSection.swift`
   (a colour-vision picker with identifier `<prefix>.colorVision`; `AccessibleColors.contrastRatio` delegates to

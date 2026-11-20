@@ -11,6 +11,7 @@ import Observation
 import VisualCoreDiagnostics
 import VisualCoreExperience
 import VisualCoreExperienceHost
+import enum VisualCoreSimulation.ColorVisionChoice
 
 /// What the app knows about its own start and its last reset (data-model section 5).
 struct AppDiagnostics: Equatable {
@@ -337,7 +338,8 @@ final class AppModel {
         }
         let launch = ExperienceLaunch(storage: ExperienceStorage(id: id, root: dataRoot, defaults: defaults),
                                       reduceMotion: preferences.reduceMotion,
-                                      reduceFlashing: preferences.reduceFlashing)
+                                      reduceFlashing: preferences.reduceFlashing,
+                                      colorVision: preferences.colorVision ?? .standard)
         let request = ExperienceOpenRequest(id: id, seed: Self.seed(for: id), snapshot: stored,
                                             refusedSnapshotFails: true) { registration.make(launch) }
         switch await session.open(request) {
@@ -510,11 +512,13 @@ final class AppModel {
         session.qualityPin = preferences.qualityOverride
     }
 
-    /// Stores the reduce-motion and the reduce-flashing choice.
+    /// Stores the reduce-motion, the reduce-flashing and the colour-vision choice (feature 210 T-R02F10-008).
     func setAccessibility(reduceMotion: VisualCoreExperience.AccessibilityChoice,
-                          reduceFlashing: VisualCoreExperience.AccessibilityChoice) {
+                          reduceFlashing: VisualCoreExperience.AccessibilityChoice,
+                          colorVision: ColorVisionChoice) {
         preferences.reduceMotion = reduceMotion
         preferences.reduceFlashing = reduceFlashing
+        preferences.colorVision = colorVision
         store.save(preferences)
     }
 

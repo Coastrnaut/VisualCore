@@ -29,6 +29,7 @@ import EffectsComposerExperience
 import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreUI
+import enum VisualCoreSimulation.ColorVisionChoice
 
 /// What the shell hands to an experience when it opens it (US5, acceptance scenario 1): the person's stored
 /// accessibility choices and the experience's own storage. `.system` means "follow the device setting"; the
@@ -42,6 +43,9 @@ struct ExperienceLaunch: Sendable {
     var reduceMotion: AccessibilityChoice = .system
     /// The stored reduce-flashing choice.
     var reduceFlashing: AccessibilityChoice = .system
+    /// The stored colour-vision choice (feature 210 T-R02F10-008); `.standard` keeps the experience's own colours,
+    /// another choice asks it to draw colour-coded content with that preset (`ColorVisionChoice.palette`).
+    var colorVision: ColorVisionChoice = .standard
 }
 
 /// One registered experience: its id, the factory the session calls on the main actor, and the check of its
