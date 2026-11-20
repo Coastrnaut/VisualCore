@@ -44,7 +44,7 @@ or {device} tasks (pure logic and host-generated content). Fixture seeds 2_301 a
 
 ## Phase 5: Stories 3 and 4 — difficulty and honest witness files (P2)
 
-- [ ] T-R02G0102-005 [P] [US4] Create `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomWitness.swift`
+- [X] T-R02G0102-005 [P] [US4] Create `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomWitness.swift` — Verified 2026-11-20: 2026-11-20 host-4 exit 0: AuroraLoomWitnessTests 5/5 (50 round trips byte for byte; terminal holds, counterexample loses with ribbon, gate, tick; newer, damaged, edited action, fingerprint, terminal, counterexample, difficulty refused; non-winning solution refused) (.autonomy/migration/checks/R02-G01-02.host-4.json)
   (AuroraLoomCounterexample; AuroraLoomWitness "schema 1", built by replaying the solution on an `AuroraLoomPlay`,
   fingerprints after begin/tutorial and each action, terminal worst mismatch, counterexample "ribbon 0's phase + 1 step mod
   16", sorted-key pretty JSON with a trailing newline; `decode` refuses newer, damaged and non-replaying witnesses) with
