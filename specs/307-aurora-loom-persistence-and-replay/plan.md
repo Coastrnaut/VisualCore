@@ -23,6 +23,8 @@ No new package, target, VisualCore API or app change.
 **Testing**: host `swift test --package-path Packages/ExperiencesRound02`; simulator round-two suite; regression as in 306.
 **Performance**: reconciliation replays at most 100 traces of at most 64 moves (≤ 6,400 kernel moves plus 100 level
 generations) on restore; measured on the host, well under a second outside debug builds.
+**Size**: at most 100 traces × 64 moves of about 40 bytes of JSON each, about 256 KB, well inside the shared store's
+16 MiB bound; reconciliation runs once per restore.
 **Constraints**: additive; snapshot schema 3; scenario manifest regenerated; existing tests updated where they pin
 schema 2.
 
