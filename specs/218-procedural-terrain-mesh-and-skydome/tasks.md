@@ -20,7 +20,7 @@ its check record (no trailers). No {owner} tasks; one {device} task. Fixture see
 
 ## Phase 3: Story 1 — terrain levels of detail (P1) 🎯
 
-- [ ] T-R02F18-003 [P] [US1] Create `Packages/VisualCore/Sources/VisualCoreScenes/TerrainLOD.swift` (TerrainPiece; `select` per clarifications Q1–Q2; `mesh(for:height:)`
+- [X] T-R02F18-003 [P] [US1] Create `Packages/VisualCore/Sources/VisualCoreScenes/TerrainLOD.swift` (TerrainPiece; `select` per clarifications Q1–Q2; `mesh(for:height:)` — Verified 2026-11-19: lead retest 2026-11-19: R02-F18.host.json (exit 0, full suite); TerrainLODTests 9 passed (200 seeded viewpoints: one-level neighbours, budget kept, identical twice, no inversion with the default budget and none unexplained by the one-level rule under tight budgets after the budget rule became quarter-octave distance shrinking; 50 selections at cell size 0.1 crack-free bit for bit after coordinates moved to the global grid index; HeightField heights; edge cases)
   from `HeightField` sampling with stitched coarser-facing edges) with `Packages/VisualCore/Tests/VisualCoreScenesTests/TerrainLODTests.swift` (200 seeded viewpoints:
   neighbours within one level, detail never rising with distance, budget kept, selections identical; 50 seeded selections:
   every shared edge matches bit for bit; one-piece terrain; far viewpoint; budget refusal; heights equal a `HeightField`

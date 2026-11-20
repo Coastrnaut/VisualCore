@@ -6,10 +6,13 @@
   spacing) and the odd points lie on the coarse edge. Alternatives: skirts (hide cracks instead of removing them),
   geomorphing (needs a time parameter), ROAM or CLOD (heavier, order-dependent).
 - **R2 Reusing `HeightField`.** Decision: each piece samples through `HeightField(columns:rows:cellSize:originX:originZ:height:)`
-  so heights and normals come from the existing type; x = origin + i · s · 2^ℓ is the same double for equal points of
-  neighbouring levels because doubling is exact.
-- **R3 Budget.** Decision: coarsen the farthest coarsenable piece first until within budget; refuse when even the
-  coarsest tiling exceeds it. Rationale: detail is lost where it matters least, deterministically.
+  so heights and normals come from the existing type; every point is sampled and placed at (global grid index) · s, so equal points of
+  neighbouring pieces are the same doubles for any s (origin + i · cellSize was not, for s = 0.1).
+- **R3 Budget.** Decision: shrink the distance per level in quarter-octave steps, D · 2^(−t/4), until the balanced
+  selection fits; refuse when even the coarsest tiling exceeds it. Rationale: each step is an ordinary distance-based
+  selection, so detail falls with distance (apart from the one-level refinement) and the result is deterministic.
+  Rejected in implementation: coarsening the farthest coarsenable piece first, which left farther pieces finer than
+  nearer ones when the budget bound.
 - **R4 D8 flow accumulation.** Decision: O'Callaghan and Mark (1984) D8, visiting points from highest to lowest so every
   point's inflow is complete before it passes on; ties fixed by order. Rationale: deterministic, single pass after a sort.
   Log scaling keeps the mask readable across orders of magnitude.

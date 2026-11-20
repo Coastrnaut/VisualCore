@@ -54,9 +54,10 @@ VisualCoreRendering; `PlanarShadowRenderer` is the pattern for a state-restoring
 - Q: How are cracks avoided and the budget kept? → A: on each edge facing a neighbour one level coarser, every odd point
   of the finer piece takes the height (h_left + h_right) / 2 of its two even neighbours along that edge, which is the
   point of the coarser piece's straight edge; even points coincide exactly. The total vertex count Σ (C / 2^ℓ + 1)² must
-  not exceed the vertex budget (1 … 4,194,304, default 262,144): when it does, the farthest piece (ties: higher row, then
-  higher column) that can be coarsened without breaking the one-level rule is coarsened by one level, repeatedly; a
-  budget the all-coarsest tiling still exceeds is refused. Impact: FR-R02F18-002; SC-R02F18-001, 002.
+  not exceed the vertex budget (1 … 4,194,304, default 262,144): when it does, the distance per level is shrunk to D · 2^(−t/4) for
+  t = 1, 2, … and the first balanced selection that fits is used (implementation, 2026-11-19: coarsening the farthest
+  coarsenable piece first left farther pieces finer than nearer ones); a budget the all-coarsest tiling still exceeds
+  is refused. Every coordinate is (global grid index) · s, so shared points are bit-identical for any s. Impact: FR-R02F18-002; SC-R02F18-001, 002.
 - Q: How are the erosion masks defined? → A: on the grid points of a `HeightField`: steepness = |∇h| / √(1 + |∇h|²)
   from central differences (the field's own normal), in 0 … 1; flow = log(1 + a) / log(1 + N) with a the D8 flow
   accumulation (each point passes 1 + its inflow to the neighbour of steepest descent, drop over distance, ties in the
@@ -95,7 +96,8 @@ identical vertex positions on both sides, and the total stays within budget.
 
 **Acceptance Scenarios**:
 
-1. **Given** a viewpoint, **When** pieces are chosen, **Then** nearer pieces are at least as detailed as farther ones.
+1. **Given** a viewpoint, **When** pieces are chosen, **Then** nearer pieces are at least as detailed as farther ones,
+   except where a farther piece is refined to stay within one level of a finer neighbour.
 2. **Given** two neighbouring pieces of different detail, **When** their edges are compared, **Then** the coarse edge's
    positions equal the fine edge's positions everywhere along it.
 3. **Given** the same inputs, **When** chosen twice, **Then** the pieces and meshes are identical.
@@ -165,7 +167,8 @@ Terrain and sky settings are saved with a schema version and reopened later; new
 ### Measurable Outcomes
 
 - **SC-R02F18-001**: For 200 seeded viewpoints, neighbouring pieces differ by at most one level, detail never increases
-  with distance, the total vertex count stays within budget, and two selections are identical.
+  with distance except where the one-level rule refines a farther piece below its own distance level (with the default
+  budget, never at all), the total vertex count stays within budget, and two selections are identical.
 - **SC-R02F18-002**: For every pair of neighbouring pieces in 50 seeded selections, every vertex on the shared edge of the
   finer piece lies exactly (bit for bit) on the coarser piece's edge.
 - **SC-R02F18-003**: Masks on stated hand-made terrains have their stated values, and masks of 20 seeded terrains are
