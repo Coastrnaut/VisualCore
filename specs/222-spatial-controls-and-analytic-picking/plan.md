@@ -38,7 +38,7 @@ No NEEDS CLARIFICATION remains.
 | II App-neutral API · II-a reference | PASS — generic controls; `///`; API baseline; reference regression. |
 | III GPU lifecycle | PASS — none. |
 | IV Host-testable | PASS — pure, host-tested. |
-| VI Accessibility | PASS — 44-point minimum target; assistive steps with spoken values as an alternative to every drag. |
+| VII Native, accessible UI | PASS — 44-point minimum target; assistive steps with spoken values as an alternative to every drag. |
 | IX Bounded input | PASS — handles, history depth, step ranges and viewports refused or bounded by code. |
 | X Licensing and provenance | PASS — ray-plane and line-line closest points, unprojection and undo stacks are textbook; original code. |
 | XI Stable identity | PASS — schema 1 stored history; newer refused. |
