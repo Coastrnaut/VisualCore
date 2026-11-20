@@ -45,7 +45,7 @@
   state, 32 distinct accepted; 33 refused; shared clue refused naming both; duplicate name and id refused; whitespace
   name refused; NaN colour refused; Codable round trip; shape distances negative at the centre and positive outside);
   `--name host`
-- [ ] T-R02F10-005 [US1] Create `Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/clue.glsl`
+- [X] T-R02F10-005 [US1] Create `Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/clue.glsl` — Verified 2026-11-19: lead retest 2026-11-19: R02-F10/rendering-27 exit=0 (225 tests) incl. ClueShaderTests 2 passed (32 shape x pattern and 8 outlines, max 0/255); ShaderBundleTests with vc/clue.glsl passed
   (`vc_clueShape`, `vc_cluePattern`, `vc_clueCoverage`, `vc_clueOutline`, built on `vc/sdf.glsl`) with
   `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/ClueShaderTests.swift` (every shape × pattern drawn to a
   64 × 64 target through `FullScreenShaderScene` matches `ClueReference.coverage` within 2/255 at every pixel; compiles
