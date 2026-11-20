@@ -1,0 +1,190 @@
+{
+  "branch": "main",
+  "dirty": false,
+  "dirty_paths": [],
+  "failed_attempts": [
+    {
+      "command": "swift test --package-path Packages/VisualCore --filter HandlePickerTests",
+      "exit_code": 1,
+      "log": ".autonomy/logs/migration/R02-F22.host-2.log",
+      "log_sha256": "0b2ee62802eea2249dc9df713a0d7ec5d91f6d47a167e9ba409aac141a41bf98",
+      "name": "host-2",
+      "timed_out": false
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore --filter HandleDragTests",
+      "exit_code": 1,
+      "log": ".autonomy/logs/migration/R02-F22.host-3.log",
+      "log_sha256": "84e4ca9bcf35e9331c4f9302834bc6a92b80be7a0c2a3ba9954ff6943f4f79a4",
+      "name": "host-3",
+      "timed_out": false
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore --filter ControlHistoryTests",
+      "exit_code": 1,
+      "log": ".autonomy/logs/migration/R02-F22.host-4.log",
+      "log_sha256": "b997f600b61f1b0e6db8866ae1fd2dd67dd257be80c63c984aaa4d48ea409d0b",
+      "name": "host-4",
+      "timed_out": false
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore --filter AssistiveStepTests",
+      "exit_code": 1,
+      "log": ".autonomy/logs/migration/R02-F22.host-5.log",
+      "log_sha256": "945e34a6925074e1fd2ef7100309dd910b7d5d00779b40a449494486a631baad",
+      "name": "host-5",
+      "timed_out": false
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore --filter ScreenProjectionTests",
+      "exit_code": 1,
+      "log": ".autonomy/logs/migration/R02-F22.host-rerun.log",
+      "log_sha256": "fc9d6a8c74d6dd87af3bb86294972dd27f119e2f18107af0fd10fd8990a5999b",
+      "name": "host-rerun",
+      "timed_out": false
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore --filter ScreenProjectionTests",
+      "exit_code": 1,
+      "log": ".autonomy/logs/migration/R02-F22.host.log",
+      "log_sha256": "dc2b67331a4feabe65362dbde07fdb0236954fb1d330905ab4162bc5cf25d94b",
+      "name": "host",
+      "timed_out": false
+    }
+  ],
+  "gate": "R02-F22",
+  "ledger": "migration",
+  "passing_checks": [
+    {
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "finished": "2026-11-20T06:34:39+00:00",
+      "log": ".autonomy/logs/migration/R02-F22.baseline-host.log",
+      "log_sha256": "60ad9c579ceca96508967d2314e6803edebf127ed19dbb388c3c9e5df4a4bcd7",
+      "name": "baseline-host"
+    },
+    {
+      "command": "env VC_TIMING_ASSERTS=1 swift test --package-path Packages/VisualCore --filter 'aMeshAtTheBudgetBuildsAndValidates|analysisTimingLevelZeroMeanBelowBudget|wholeRunForTheSampleTakesLessThanTenSeconds'",
+      "exit_code": 0,
+      "finished": "2026-11-20T06:34:43+00:00",
+      "log": ".autonomy/logs/migration/R02-F22.baseline-timing.log",
+      "log_sha256": "430912f996450d1a8c3b179a8e2ab9f18d8c74d5d83538ba343344dc9c47cab9",
+      "name": "baseline-timing"
+    },
+    {
+      "command": "python3 scripts/check_documented_api.py --sources Apps/VisualCore",
+      "exit_code": 0,
+      "finished": "2026-11-20T06:41:17+00:00",
+      "log": ".autonomy/logs/migration/R02-F22.documented-api.log",
+      "log_sha256": "754f0d112020bc4a5f167308461f05bc90d25ba8a95c8f6a1cc1dcf776cf2cac",
+      "name": "documented-api"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test",
+      "exit_code": 0,
+      "finished": "2026-11-20T06:51:01+00:00",
+      "log": ".autonomy/logs/migration/R02-F22.experiences.log",
+      "log_sha256": "3d35703c73c0b956c8c7f336e7180fd5cb94c4526b0e6aba06d80d3e67063d6c",
+      "name": "experiences"
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore --filter HandlePickerTests",
+      "exit_code": 0,
+      "finished": "2026-11-20T06:40:33+00:00",
+      "log": ".autonomy/logs/migration/R02-F22.host-2-r2.log",
+      "log_sha256": "7ed2d841f2754a53bfa6f17457068b9acc19faf401b462f3243543192388b74b",
+      "name": "host-2-r2"
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore --filter HandleDragTests",
+      "exit_code": 0,
+      "finished": "2026-11-20T06:40:35+00:00",
+      "log": ".autonomy/logs/migration/R02-F22.host-3-r2.log",
+      "log_sha256": "04b11abe4204ea38ea477fa4fb0ac1c2c5e0b512eb50b71a01b1f8f3f1b5a52d",
+      "name": "host-3-r2"
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore --filter ControlHistoryTests",
+      "exit_code": 0,
+      "finished": "2026-11-20T06:40:37+00:00",
+      "log": ".autonomy/logs/migration/R02-F22.host-4-r2.log",
+      "log_sha256": "1a4c388e68bcc0fb33551768b8456c108269acbb0761b559cb6a55d677f8c566",
+      "name": "host-4-r2"
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore --filter AssistiveStepTests",
+      "exit_code": 0,
+      "finished": "2026-11-20T06:40:40+00:00",
+      "log": ".autonomy/logs/migration/R02-F22.host-5-r2.log",
+      "log_sha256": "e4533a25e15b61380b38253c0bd1b93faf3a93d003da5285afe424207b64341e",
+      "name": "host-5-r2"
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "finished": "2026-11-20T06:43:05+00:00",
+      "log": ".autonomy/logs/migration/R02-F22.host-full.log",
+      "log_sha256": "20ab1ec149e00ceed2227a29131858a8e7e065827dc0e5a83c6c0c4de23723fd",
+      "name": "host-full"
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore --filter ScreenProjectionTests",
+      "exit_code": 0,
+      "finished": "2026-11-20T06:40:30+00:00",
+      "log": ".autonomy/logs/migration/R02-F22.host-r2.log",
+      "log_sha256": "ba034fd9956d5bf0854af81026c7d7d409b5ad850fef47ac9a035b5af8865aee",
+      "name": "host-r2"
+    },
+    {
+      "command": "python3 scripts/check_public_api.py",
+      "exit_code": 0,
+      "finished": "2026-11-20T06:41:14+00:00",
+      "log": ".autonomy/logs/migration/R02-F22.public-api.log",
+      "log_sha256": "df638dcb3f4dfee6b2858efd6207a5823bcd44bc9fec1bfa33cbf86743477013",
+      "name": "public-api"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean",
+      "exit_code": 0,
+      "finished": "2026-11-20T06:51:26+00:00",
+      "log": ".autonomy/logs/migration/R02-F22.reference-1.log",
+      "log_sha256": "09a4fbcc1dc41c55d4e2660287c468f45eaed54b559f01d6c9f144c29741243f",
+      "name": "reference-1"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26",
+      "exit_code": 0,
+      "finished": "2026-11-20T06:51:53+00:00",
+      "log": ".autonomy/logs/migration/R02-F22.reference-2.log",
+      "log_sha256": "3ebdae1177141a5b3ffee4ea7a9eb194cf6ad58a52c28434b7fa0d8a6152f279",
+      "name": "reference-2"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-26.5 --action test",
+      "exit_code": 0,
+      "finished": "2026-11-20T06:44:10+00:00",
+      "log": ".autonomy/logs/migration/R02-F22.rendering-26.log",
+      "log_sha256": "f6ba57eb336b048c0e8113d093498d6baa86234ba3898d7e872de626bd038a2d",
+      "name": "rendering-26"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test",
+      "exit_code": 0,
+      "finished": "2026-11-20T06:43:19+00:00",
+      "log": ".autonomy/logs/migration/R02-F22.rendering-27.log",
+      "log_sha256": "7dd31014409f4103f0b35f42dc7266de15868cba7ec55640cc5a9e0f474d60cb",
+      "name": "rendering-27"
+    },
+    {
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "finished": "2026-11-20T06:42:14+00:00",
+      "log": ".autonomy/logs/migration/R02-F22.script-tests.log",
+      "log_sha256": "fd9a0b3eb53edee2d72fdf306f62e29ce373712cb1cae1ac343b34266d0cd56f",
+      "name": "script-tests"
+    }
+  ],
+  "revision": "eef815e6d4571570d823dc1a1bbcdedefee86823",
+  "revision_number": 1,
+  "sealed": "2026-11-20T06:52:11+00:00"
+}

@@ -80,7 +80,7 @@ evidence**: no physical-device test of the unified app has been run.
 
 Ledger totals today: the legacy ledger records **185 of 263** gates as passed (F00–F09 and the app phases
 A01-P00 … A19-P06, A20-P00 … A20-P06, A21-P00 … A21-P06, A22-P00 … A22-P06, A23-P00 … A23-P06, A24-P00 … A24-P06, A25-P00 … A25-P06); the unified-app ledger has 1,233 gates, with 25 experience gates (X-A01 … X-A25), 11 unified-app features,
-21 shared round features and both governance milestones passed.
+22 shared round features and both governance milestones passed.
 
 ```bash
 python3 Tools/python/desktop_runbook.py status   # legacy gates: framework and app phases
