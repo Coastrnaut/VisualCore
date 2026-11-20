@@ -45,7 +45,7 @@ or {device} tasks (pure logic). Fixture seed 2_311; tests stay short (< 10 s eac
 
 ## Phase 5: Solver-ready rules (P2)
 
-- [ ] T-R02G0201-005 [P] [US1] Create `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthRules.swift` (PuzzleRules, rules id
+- [X] T-R02G0201-005 [P] [US1] Create `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthRules.swift` (PuzzleRules, rules id — Verified 2026-11-20: 2026-11-20 host-4 exit 0: LissajousLabyrinthRulesTests 6/6 (move order vs brute force; apply refusals; isSolved equals the verdict on 100 fixtures; R02-F23 PuzzleValidator certifies a seeded level, notUnique for the solution promise; wrongRules, illegalMove) (.autonomy/migration/checks/R02-G02-01.host-4.json)
   "r02-g02-lissajous-labyrinth") with `Packages/ExperiencesRound02/LissajousLabyrinth/CoreTests/LissajousLabyrinthRulesTests.swift` (moves in dial order, values
   ascending, skipping current and non-coprime; apply refusals; isSolved equals the verdict; R02-F23's PuzzleValidator
   certifies a seeded level); `--name host-4`
