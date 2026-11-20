@@ -37,7 +37,7 @@ or {device} tasks (pure logic). Fixture seed 2_311; tests stay short (< 10 s eac
 
 ## Phase 4: Stories 2, 3 and 4 — allowance, undo, replay and life stages (P1, P2)
 
-- [ ] T-R02G0201-004 [P] [US2] [US3] [US4] Create `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthPlay.swift` (stages and events, actions with
+- [X] T-R02G0201-004 [P] [US2] [US3] [US4] Create `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthPlay.swift` (stages and events, actions with — Verified 2026-11-20: 2026-11-20 host-3 exit 0: LissajousLabyrinthPlayTests 11/11 (500 traces replay; undo restores every earlier state; 1,000 refused attempts change nothing; safe dials win; spending the allowance fails with the verdict; stage table; tutorial) (.autonomy/migration/checks/R02-G02-01.host-3.json)
   validation "range, no-change, not-coprime", records, undo with refund, redo, replay, fingerprints) with
   `Packages/ExperiencesRound02/LissajousLabyrinth/CoreTests/LissajousLabyrinthPlayTests.swift` (500 seeded traces replay to identical fingerprints and outcome; undo of
   every action restores the exact state; 1,000 seeded refused actions leave state and fingerprint unchanged; spending the
