@@ -43,7 +43,7 @@ seed 2_011.
 
 ## Phase 4: Story 3 — volume (P2)
 
-- [ ] T-R02F11-005 [P] [US3] Create `Packages/VisualCore/Sources/VisualCoreScenes/SDFVolume.swift` (`SDFVolumeSample`;
+- [X] T-R02F11-005 [P] [US3] Create `Packages/VisualCore/Sources/VisualCoreScenes/SDFVolume.swift` (`SDFVolumeSample`; — Verified 2026-11-19: lead retest 2026-11-19: R02-F11.host-2.json (exit 0; SDFVolumeTests 4 passed: sphere -0.027% and turned box -0.011% at 64³, error halves, digest replay, refusals)
   `sample(_:boundsMin:boundsMax:resolution:)` with "1 ≤ n ≤ 256" and min < max per axis, cell centres, volume = count ×
   cell volume, FNV-1a 64 digest of the packed inside bits in x, y, z order) with `SDFVolumeTests.swift` (sphere and box
   within 2% at 64³; error at 64³ at most half the error at 32³; same digest twice; resolution 0 and 257 and inverted
