@@ -85,3 +85,9 @@ seed 2_011.
 001 → 002 → (003 ∥ 004 ∥ 005) → 006 → 007 → 008 → 009 → 010 → 011 → 012 → 013. Agents: A (002 then 003), B (004, 005
 after 002), G (006 after 002). Shared files (READMEs, API baseline, `ShaderBundleTests.swift`, feature map) stay with the
 lead. MVP: Stories 1 and 2 (002, 004, 006).
+
+## Phase 7: Convergence
+
+- [ ] T-R02F11-015 Add the rounded box (half extents (1, 0.6, 0.8), radius 0.2) to the 1,000-point closed-form loop of
+  `Packages/VisualCore/Tests/VisualCoreScenesTests/SDFShapeTests.swift` (expected: the box distance of p with half
+  extents reduced by r, minus r, within 1e-12) per SC-R02F11-001 (partial); `--name host-3`
