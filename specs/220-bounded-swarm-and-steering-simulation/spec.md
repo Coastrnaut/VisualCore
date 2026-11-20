@@ -87,8 +87,8 @@ order included.
 
 1. **Given** a seeded swarm, **When** neighbours are found through the grid, **Then** they equal the exhaustive search for
    every agent.
-2. **Given** agents at non-finite positions or outside the grid's bounds, **When** neighbours are found, **Then** the
-   result still equals the exhaustive search.
+2. **Given** agents at non-finite positions or far outside the swarm's bounds, **When** neighbours are found,
+   **Then** the result still equals the exhaustive search (the grid has no bounds of its own).
 
 ### User Story 2 - Step a bounded swarm deterministically (Priority: P1)
 
