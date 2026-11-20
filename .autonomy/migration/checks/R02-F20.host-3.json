@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "DensityRasterTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter DensityRasterTests",
+  "elapsed_seconds": 2.457,
+  "exit_code": 0,
+  "finished": "2026-11-20T05:50:48+00:00",
+  "gate": "R02-F20",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-F20.host-3.log",
+  "log_sha256": "e2270604a20956a7b9d2d344c045c666301c54c2f16309d28f5b9e48d8117d0f",
+  "name": "host-3",
+  "started": "2026-11-20T05:50:46+00:00",
+  "timed_out": false
+}

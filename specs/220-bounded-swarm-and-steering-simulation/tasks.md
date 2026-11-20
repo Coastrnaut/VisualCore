@@ -26,7 +26,7 @@ its check record (no trailers). No {owner} tasks; one {device} task. Fixture see
 
 ## Phase 4: Story 4 — density raster (P2)
 
-- [ ] T-R02F20-004 [P] [US4] Create `Packages/VisualCore/Sources/VisualCoreSimulation/DensityRaster.swift` ("width, height 1 … 1,024; ≤ 1,048,576 cells; bounds
+- [X] T-R02F20-004 [P] [US4] Create `Packages/VisualCore/Sources/VisualCoreSimulation/DensityRaster.swift` ("width, height 1 … 1,024; ≤ 1,048,576 cells; bounds — Verified 2026-11-20: 2026-11-20 host-3 exit 0: DensityRasterTests 8/8 (50 seeded swarms total = in-area count within 1e-9; cell centre one cell; folding; FieldGrid handoff; swarm overload) (.autonomy/migration/checks/R02-F20.host-3.json)
   valid") with `Packages/VisualCore/Tests/VisualCoreSimulationTests/DensityRasterTests.swift` (50 seeded swarms: total equals the in-area count within 1e-9 relative; a
   cell-centre agent lands in one cell; edge folding; non-finite and outside agents excluded; field grid handoff;
   refusals); `--name host-3`
