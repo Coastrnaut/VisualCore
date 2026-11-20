@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-20
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G01-07 (migration ledger, game feature of experience R02-G01) · ID namespace FR-R02G0107-###,
 SC-R02G0107-###, T-R02G0107-###
@@ -25,6 +25,41 @@ Canonical overrides:
   observation after ImplementationLock-100. **Owner-only items:** none.
 - **Shared features used:** the saved-state store and migration chain of the experience contract (UA-F05), R02-F24
   progression, and R02-G01-01 … 06.
+
+## Clarifications
+
+### Session 2026-11-20
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time. Facts checked in
+code (read-only audit, 2026-11-20): the app's `SavedStateStore` keeps one `state.json` per experience holding the
+encoded `ExperienceSnapshot` (schema version and payload), writes it atomically, moves an unreadable file aside (at most
+three copies) and refuses a newer schema; the engine applies the experience's `MigrationChain` to older payloads;
+Aurora Loom's adapter writes snapshot schema 2 `{level, records, progress, mode, tutorial}` with a 1 → 2 step; its
+progress keeps per level the best moves and stars; the kernel's records carry previous and next fingerprints.
+
+- Q: What is stored for each result, and when is it written? → A: each result keeps its best moves, stars and the
+  winning trace — the ordered moves (ribbon, control, step) of the play that earned it — plus `verified`. A win in
+  campaign or daily mode replaces the stored result only when it has fewer moves (ties keep the earlier trace). The
+  shared store writes the snapshot at the app's save points (leaving the experience, backgrounding); this feature does
+  not change when. Impact: FR-R02G0107-001, 003; SC-R02G0107-001.
+- Q: How are scores reconciled on restore? → A: for every result with a trace: the certified level is generated, a
+  fresh play replays the trace (each move legal), and the result is kept only if the play ends won after exactly
+  `bestMoves` moves and `stars` equals the stars rule for that count; otherwise it is dropped. The adapter exposes the
+  number dropped (`reconciliation.dropped`) and the presenter announces it once. Results without a trace (from schema 2)
+  are kept, marked unverified. The frontier is restored as saved but never below one level after the highest kept
+  result. Impact: FR-R02G0107-003; SC-R02G0107-003.
+- Q: How do migrations work? → A: schema 3 adds the trace and `verified` to each result. 1 → 2 is the existing step;
+  2 → 3 copies results with no trace and `verified: false`. A payload of schema 4 or newer is refused by the shared
+  store (newer schema); a damaged payload is refused with `damaged` and the opening state is used. Impact:
+  FR-R02G0107-002; SC-R02G0107-002.
+- Q: How does replay work? → A: the action `replay.start [level]` opens mode `replay(level)` with a fresh play of that
+  level when a verified result with a trace exists (`r02-g01.no-replay` otherwise); `replay.step` applies the next move
+  of the trace (`r02-g01.replay-end` after the last); `replay.stop` returns to campaign at that level. During replay
+  every other play action is refused with `r02-g01.replay`; replay never changes progress. Impact: FR-R02G0107-004;
+  SC-R02G0107-004.
+- Q: Which inputs make the state deterministic? → A: the seed (opening level), the certified catalog (fixed planned
+  seeds), the calendar date given to `mode.daily` and the recorded actions; the state reads no clock and no random
+  source, so a save restores and replays identically on every device. Impact: FR-R02G0107-005.
 
 ## User Scenarios & Testing *(mandatory)*
 
