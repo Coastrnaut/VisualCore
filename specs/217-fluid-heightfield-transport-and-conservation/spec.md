@@ -165,8 +165,11 @@ refused.
   every step, and no cell holds a negative amount.
 - **SC-R02F17-002**: A 32 × 32 closed basin filled unevenly settles so that its highest and lowest wet water surfaces
   differ by at most 0.05 height units within 4,000 sub-steps.
-- **SC-R02F17-003**: Extreme inputs stay finite and within their clamps in every one of 100 seeded cases.
-- **SC-R02F17-004**: A seeded slope loses terrain at its top and gains it at its foot.
+- **SC-R02F17-003**: In 100 seeded extreme cases (water columns up to the per-cell limit, cliffs of the full terrain
+  range, frame times up to 10 s), every amount stays within 0 … 2⁴⁰, every flux finite within its clamp, the ledger
+  balances, and a frame step longer than 64 stable sub-steps reports the dropped time.
+- **SC-R02F17-004**: On a 32 × 16 slope with erosion enabled and water poured at its top for 2,000 sub-steps, the
+  upper third's terrain decreases, the lower third's terrain increases, and terrain plus sediment balances exactly.
 - **SC-R02F17-005**: A saved state round-trips byte for byte and continues to the bit-identical result; newer and damaged
   forms are refused; two runs from one state are identical.
 - **SC-R02F17-006**: Existing tests pass unchanged; the reference regression passes 7 of 7; each unit test finishes in
