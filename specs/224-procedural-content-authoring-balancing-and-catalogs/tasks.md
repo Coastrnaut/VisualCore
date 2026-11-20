@@ -22,7 +22,7 @@ tasks; one {device} task. Fixture seed 2_024; tests stay short.
 
 ## Phase 3: Stories 1 and 2 — catalogs and progression (P1) 🎯
 
-- [ ] T-R02F24-003 [P] [US1] [US2] Create `Packages/VisualCore/Sources/VisualCoreSimulation/PuzzleCatalog.swift` (PuzzleCatalogEntry, PuzzleCatalog "digest =
+- [X] T-R02F24-003 [P] [US1] [US2] Create `Packages/VisualCore/Sources/VisualCoreSimulation/PuzzleCatalog.swift` (PuzzleCatalogEntry, PuzzleCatalog "digest = — Verified 2026-11-20: 2026-11-20 host-2 exit 0: PuzzleCatalogTests 13/13 (30-level plan builds twice with pinned digest 678aafc0…; every level certifies; stages ordered; progression holds; planFailed for a nil maker (1 call) and for too few distinct boards (40 calls, duplicates judged on seed-free content); progression(4); round trip; newer, damaged, edited refused) (.autonomy/migration/checks/R02-F24.host-2.json)
   SHA-256 hex of '<id>\n' + identities each followed by '\n'; schema 1", PuzzleCatalogBuilder per clarifications Q1, Q2)
   with `Packages/VisualCore/Tests/VisualCoreSimulationTests/PuzzleCatalogTests.swift` (a 3-stage, 30-level lights-out plan builds twice identically with a pinned
   digest; every level certifies; stages ordered by difficulty; progression holds; unfillable plans fail with stage and

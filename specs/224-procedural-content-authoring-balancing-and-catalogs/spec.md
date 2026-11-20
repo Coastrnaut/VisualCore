@@ -48,7 +48,8 @@ taken, so this feature uses `PuzzleCatalog`, `PuzzleCatalogPlan`, `PuzzleCatalog
   and 1 … 16 ordered `PuzzleCatalogStage`s (count 1 … 500, a `FairnessBudget`, a uniqueness promise, an attempt budget per
   level 1 … 10,000), at most 1,000 levels in all. `PuzzleCatalogBuilder.build` walks a global index n = 0, 1, …; level
   candidates come from `PuzzleGenerator.generate(seed: SeedDerivation.derive(seed, index: n), …)`; each call uses the stage's attempt
-  budget and advances n by one; a level whose identity is already in the catalog is skipped; a stage fails with
+  budget and advances n by one; a level whose content is already in the catalog is skipped (content = the identity of
+  the level without its generator seed, since the identity includes the seed — implementation, 2026-11-20); a stage fails with
   `.planFailed(stage, calls)` as soon as a call finds no certified level, or when 4 × count calls have not filled it.
   `PuzzleCatalog(id:entries:)` refuses a bad id (`.plan("id")`) and 0 or more than 1,000 entries (`.plan("entries")`)
   but accepts duplicates and uncertified levels, which only the checker judges; the builder never produces them. Each stage's levels are ordered by difficulty, then identity. The `PuzzleCatalog` holds
@@ -61,7 +62,7 @@ taken, so this feature uses `PuzzleCatalog`, `PuzzleCatalogPlan`, `PuzzleCatalog
   first breach. Impact: FR-R02F24-002; SC-R02F24-002.
 - Q: What does the checker report? → A: `PuzzleCatalogChecker.check(_:rules:rule:)` re-certifies every level and returns a
   `PuzzleCatalogReport` listing every `PuzzleCatalogIssue` in position order: `uncertified(index, verdict)`,
-  `duplicate(index, first)`, `difficultyMismatch(index)` (stored difficulty differs from the certificate),
+  `duplicate(index, first)` (same content without the seed), `difficultyMismatch(index)` (stored difficulty differs from the certificate),
   `drop(index)`, `jump(index)` and `digestMismatch` (a stored digest that
   differs from the entries, possible only for values made outside the public initialiser); a report without issues passes. The same catalog always gives the
   same report. Impact: FR-R02F24-003; SC-R02F24-002.
