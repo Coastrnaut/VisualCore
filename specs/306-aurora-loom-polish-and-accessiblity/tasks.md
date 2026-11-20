@@ -9,7 +9,7 @@ ImplementationLock-100 and are not tasks here. No {owner} tasks.
 
 ## Phase 1: Setup
 
-- [ ] T-R02G0106-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test
+- [X] T-R02G0106-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test — Verified 2026-11-20: 2026-11-20 R02-G01-06.baseline-host/timing/round02 exit 0
   --package-path Packages/ExperiencesRound02`; the rendering baseline is R02-G02-02's rendering runs (exit 0)
 - [ ] T-R02G0106-002 Add the `VisualCoreAudioDSP` product to `AuroraLoomCore` in `Packages/ExperiencesRound02/Package.swift`
   (no other change); `--name host -- swift test --package-path Packages/ExperiencesRound02`
