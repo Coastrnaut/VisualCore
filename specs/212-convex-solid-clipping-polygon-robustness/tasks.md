@@ -50,7 +50,7 @@
 
 ## Phase 5: Regression, documentation and close
 
-- [ ] T-R02F12-006 Simulator regression (no rendering change): `--name rendering-27` and `--name rendering-26`, and
+- [X] T-R02F12-006 Simulator regression (no rendering change): `--name rendering-27` and `--name rendering-26`, and — Verified 2026-11-19: 2026-11-19 R02-F12.rendering-27.json, R02-F12.rendering-26.json and R02-F12.experiences.json (exit 0 each)
   `--name experiences` on sim-27.2
 - [ ] T-R02F12-007 API baseline and docs: `check_public_api.py --update`, `--name public-api`, `--name documented-api
   -- python3 scripts/check_documented_api.py --sources Apps/VisualCore`; new `docs/architecture/convex-cutting.md`
