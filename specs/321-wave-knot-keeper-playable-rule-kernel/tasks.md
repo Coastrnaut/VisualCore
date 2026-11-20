@@ -24,7 +24,7 @@ recorded only after every agent has reported). Commit after every task with its 
 
 ## Phase 3: Story 1 — untie the knot (P1) 🎯
 
-- [ ] T-R02G0301-003 [P] [US1] Create `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperGeometry.swift` (orientation determinants; exact
+- [X] T-R02G0301-003 [P] [US1] Create `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperGeometry.swift` (orientation determinants; exact — Verified 2026-11-20: 2026-11-20 host-2 exit 0 (geometry, 11 tests: 500 seeded ropes match an independent brute-force projection count, translation, rotation and reversal invariant; one-crossing and 7-stick trefoil diagrams; degenerate cases; 2,000 random primitive cases vs an independent exact method; sweep refusals; simplicity; tension). Level start checks landed with T-002
   segment-triangle intersection with contact only at a shared vertex allowed; `sweepIsClear`; xy-projection crossings
   with signs, writhe and degeneracy; tension Σ|segment|²) with `Packages/ExperiencesRound02/WaveKnotKeeper/CoreTests/WaveKnotKeeperGeometryTests.swift`
   (500 seeded ropes: summary equals an independent brute-force projection count and is translation-invariant; known knots
