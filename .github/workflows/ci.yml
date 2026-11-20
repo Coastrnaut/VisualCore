@@ -90,12 +90,16 @@ jobs:
           path: |
             Packages/VisualCore/.build
             Harnesses/SecondConsumer/GardenKit/.build
-          key: spm-host-${{ steps.toolchain.outputs.xcode }}-${{ hashFiles('Packages/VisualCore/**/*.swift', 'Harnesses/SecondConsumer/GardenKit/**/*.swift') }}
+            Packages/ExperiencesRound02/.build
+          key: spm-host-${{ steps.toolchain.outputs.xcode }}-${{ hashFiles('Packages/VisualCore/**/*.swift', 'Harnesses/SecondConsumer/GardenKit/**/*.swift', 'Packages/ExperiencesRound02/**/*.swift') }}
           restore-keys: spm-host-${{ steps.toolchain.outputs.xcode }}-
       - name: VisualCore host tests
         run: swift test --package-path Packages/VisualCore
       - name: GardenKit host tests
         run: swift test --package-path Harnesses/SecondConsumer/GardenKit
+      # Feature 301 (R02-G01-01): the round-two game Cores are pure and run on the host.
+      - name: ExperiencesRound02 host tests
+        run: swift test --package-path Packages/ExperiencesRound02
 
   simulator-build:
     # US5/AC1: an iOS Simulator build of the pure VisualCore package (no ANGLE frameworks needed). Rendering, Showcase

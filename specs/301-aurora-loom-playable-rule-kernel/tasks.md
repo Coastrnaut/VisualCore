@@ -47,7 +47,7 @@ or {device} tasks (pure logic). Fixture seed 2_301; tests stay short.
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02G0101-006 CI and docs: a step `swift test --package-path Packages/ExperiencesRound02` in
+- [X] T-R02G0101-006 CI and docs: a step `swift test --package-path Packages/ExperiencesRound02` in — Verified 2026-11-20: 2026-11-20 round02-host exit 0 (all 32 AuroraLoomCore tests); CI step 'ExperiencesRound02 host tests' with cache path; Packages/ExperiencesRound02/README.md; docs/architecture/aurora-loom.md; docs/automatedtesting.md (.autonomy/migration/checks/R02-G01-01.round02-host.json)
   `.github/workflows/ci.yml` beside the VisualCore host tests (and its cache path); new
   `docs/architecture/aurora-loom.md`; `Packages/ExperiencesRound02/README.md`; `docs/automatedtesting.md`; `--name
   round02-host -- swift test --package-path Packages/ExperiencesRound02`

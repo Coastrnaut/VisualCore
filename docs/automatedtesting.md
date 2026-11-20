@@ -45,6 +45,9 @@ are never device evidence; device runs wait for `ImplementationLock-100`.
   short run and bound the rest by arithmetic; long-duration measurements belong to the device campaign.
 - **No wall-clock assertions.** CI runners are about three times slower than the reference Mac. Anything timed takes an
   injected clock (for example an announcement limiter) or is asserted only by count and arithmetic.
+- **Game Cores run on the host.** `swift test --package-path Packages/ExperiencesRound02` runs the round-two games'
+  pure Cores (rules, levels, solvers) on macOS in seconds, locally and on CI; their Experience targets (UIKit, GL) are
+  tested on the simulator from each game's renderer feature on.
 - **Timing values are asserted only in the isolated timing run.** The full suite prints the package timings (the
   R02-F05 mesh-budget bound, the audio analysis mean, the UA-F02 conformance run and the experience engine's timeout and
   cancellation); `VC_TIMING_ASSERTS=1 swift test --package-path
