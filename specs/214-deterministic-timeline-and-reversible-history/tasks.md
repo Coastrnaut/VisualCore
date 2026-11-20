@@ -46,7 +46,7 @@ document is `TimelineRunDocument`). Fixture seed 2_014; tests stay light.
 ## Phase 5: Regression, documentation and close
 
 - [X] T-R02F14-005 No Stage One breakage: `--name rendering-27`, `--name rendering-26` and `--name experiences` — Verified 2026-11-19: 2026-11-19 R02-F14.rendering-27.json, rendering-26.json and experiences.json (exit 0 each)
-- [ ] T-R02F14-006 API baseline and docs: `check_public_api.py --update`, `--name public-api`, `--name documented-api
+- [X] T-R02F14-006 API baseline and docs: `check_public_api.py --update`, `--name public-api`, `--name documented-api — Verified 2026-11-19: 2026-11-19 R02-F14.public-api.json and R02-F14.documented-api.json (exit 0; 3513 declarations, 0 undocumented); docs/architecture/reversible-timeline.md and determinism.md §11; README section and section 13.4 note rendered; validate_autocreator PASS
   -- python3 scripts/check_documented_api.py --sources Apps/VisualCore`; new `docs/architecture/reversible-timeline.md`;
   section in `Packages/VisualCore/README.md`; section 13.4 row R02-F14 "As built" in
   `docs/catalog/shared-feature-map.json` and `render_autocreator.py`; `docs/architecture/determinism.md` note

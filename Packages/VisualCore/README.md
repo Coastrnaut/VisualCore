@@ -359,6 +359,16 @@ composite, premultiplied over); `composite` mode 2 is premultiplied over; the va
 and out-of-range emissive ones. `RenderState.premultipliedBlended` draws premultiplied layers. Rules:
 [docs/architecture/shaders.md](../../docs/architecture/shaders.md).
 
+## Reversible timeline (feature 214, R02-F14)
+
+VisualCoreSimulation scrubs any deterministic `FixedStepSimulation` value type: `EventLog` holds commands by step
+(steps 0…10,000,000, at most 1,048,576 commands, applied in insertion order just before their step advances);
+`SnapshotRing` keeps (step, state, hash) every `interval` steps (default 64, at most 32 kept); `ReplayHash` chains
+SHA-256 over every step's checksum; `ReversibleTimeline` seeks back by restoring the latest kept snapshot and replaying,
+recomputes after `insert`/`remove`/`replace` edits, and refuses a non-deterministic simulation (`hashMismatch`).
+VisualCoreExperience stores a run as `TimelineRunDocument` (schema 1, migrated from schema 0, verified by replay).
+Refusals are `TimelineError` with `r2-f14.*` codes. Rules: [docs/architecture/reversible-timeline.md](../../docs/architecture/reversible-timeline.md).
+
 ## Shadows and silhouettes (feature 213, R02-F13)
 
 VisualCoreScenes decides shadow puzzles on the CPU: `ShadowProjector` projects points, triangles, meshes and convex

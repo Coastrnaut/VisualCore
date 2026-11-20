@@ -139,8 +139,8 @@
     "ControlStream",
     "PlaybackState"
    ],
-   "home": "VisualCoreSimulation",
-   "note": "Reversible history and scrubbing on the existing timeline and replay stream."
+   "home": "VisualCoreSimulation, VisualCoreExperience",
+   "note": "As built (feature 214): EventLog, SnapshotRing, ReplayHash (SHA-256 chain over step checksums) and ReversibleTimeline (snapshot-and-replay seeks, recompute after edits, non-determinism refused) in VisualCoreSimulation beside FixedStepRunner and ControlStream, which are unchanged; TimelineRunDocument (schema 1, MigrationChain from schema 0, verified by replay) in VisualCoreExperience."
   },
   "F15": {
    "disposition": "new",

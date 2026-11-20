@@ -718,6 +718,7 @@ VisualCoreExperience | func | public static func < (lhs: ExperienceID, rhs: Expe
 VisualCoreExperience | func | public static func classify(r: UInt8, g: UInt8, b: UInt8) -> FrameColorClass
 VisualCoreExperience | func | public static func code(of error: CatalogError) -> String
 VisualCoreExperience | func | public static func decide(preferences: ShellPreferences, shown: [ExperienceDescriptor]) -> ShellStartup
+VisualCoreExperience | func | public static func decode(_ data: Data, apply: @escaping @Sendable (inout State, Command) -> Void)
 VisualCoreExperience | func | public static func decode(_ data: Data?) -> (preferences: ShellPreferences, note: String?)
 VisualCoreExperience | func | public static func defaultsPrefix(for id: ExperienceID) -> String
 VisualCoreExperience | func | public static func failures(_ spec: ScenarioSpec, _ observation: ScenarioObservation) -> [String]
@@ -818,6 +819,7 @@ VisualCoreExperience | init | public init(seeds: [UInt64], stepsPerSegment: Int,
 VisualCoreExperience | init | public init(state: SessionState, experience: ExperienceID?, experienceDiagnostics: ExperienceDiagnostics?,
 VisualCoreExperience | init | public init(steps: Int, action: ScriptedAction? = nil)
 VisualCoreExperience | init | public init(steps: Int, action: ScriptedAction? = nil, result: String? = nil, digest: String? = nil)
+VisualCoreExperience | init | public init(timeline: ReversibleTimeline<State, Command>)
 VisualCoreExperience | init | public init(version: Int, snapshot: Data, expectedDigest: String)
 VisualCoreExperience | init | public init(width: Int, height: Int, sha256: String, nonBlank: Bool, probes: [String: String] = [:])
 VisualCoreExperience | init | public init?(code: String)
@@ -836,6 +838,7 @@ VisualCoreExperience | let | public let afterReset: String?
 VisualCoreExperience | let | public let afterRestore: String?
 VisualCoreExperience | let | public let bytes: Int
 VisualCoreExperience | let | public let capabilities: [String]
+VisualCoreExperience | let | public let capacity: Int
 VisualCoreExperience | let | public let catalogSHA256: String
 VisualCoreExperience | let | public let categories: [Entry]
 VisualCoreExperience | let | public let category: ExperienceCategory
@@ -855,6 +858,7 @@ VisualCoreExperience | let | public let digest: StateDigest?
 VisualCoreExperience | let | public let digest: String?
 VisualCoreExperience | let | public let digests: ObservedDigests
 VisualCoreExperience | let | public let droppedTime: Double
+VisualCoreExperience | let | public let dt: Double
 VisualCoreExperience | let | public let duplicates: [ExperienceID]
 VisualCoreExperience | let | public let entries: [Entry]
 VisualCoreExperience | let | public let entries: [ScenarioStep]
@@ -882,6 +886,7 @@ VisualCoreExperience | let | public let gate: String
 VisualCoreExperience | let | public let generation: Int
 VisualCoreExperience | let | public let gpu: GPUResourceCounts?
 VisualCoreExperience | let | public let gpuBytes: Int
+VisualCoreExperience | let | public let hash: ReplayHash
 VisualCoreExperience | let | public let height: Int
 VisualCoreExperience | let | public let hex: String
 VisualCoreExperience | let | public let historyLimit: Int
@@ -890,6 +895,7 @@ VisualCoreExperience | let | public let id: ExperienceID
 VisualCoreExperience | let | public let id: String
 VisualCoreExperience | let | public let initial: String?
 VisualCoreExperience | let | public let initialDigest: String?
+VisualCoreExperience | let | public let interval: Int
 VisualCoreExperience | let | public let invalidFrames: Int
 VisualCoreExperience | let | public let isAvailable: Bool
 VisualCoreExperience | let | public let isPremium: Bool
@@ -899,6 +905,7 @@ VisualCoreExperience | let | public let lastError: ExperienceFailure?
 VisualCoreExperience | let | public let leaked: Int
 VisualCoreExperience | let | public let levels: Int
 VisualCoreExperience | let | public let live: Int
+VisualCoreExperience | let | public let log: EventLog<Command>
 VisualCoreExperience | let | public let maxX: Int
 VisualCoreExperience | let | public let maxY: Int
 VisualCoreExperience | let | public let message: String
@@ -955,6 +962,7 @@ VisualCoreExperience | let | public let showWelcome: Bool
 VisualCoreExperience | let | public let slug: String
 VisualCoreExperience | let | public let snapshot: Data
 VisualCoreExperience | let | public let stage: SessionStage
+VisualCoreExperience | let | public let start: State
 VisualCoreExperience | let | public let state: ExperienceLifecycleState
 VisualCoreExperience | let | public let step: Int
 VisualCoreExperience | let | public let stepIndex: Int
@@ -1113,6 +1121,7 @@ VisualCoreExperience | struct | public struct StateDigest: Hashable, Sendable, C
 VisualCoreExperience | struct | public struct Step: Sendable, Equatable, Codable
 VisualCoreExperience | struct | public struct StepObservation: Sendable, Equatable, Codable
 VisualCoreExperience | struct | public struct SystemClock: ClockSource
+VisualCoreExperience | struct | public struct TimelineRunDocument<State: Codable & FixedStepSimulation & Sendable,
 VisualCoreExperience | struct | public struct Timing: Sendable, Equatable, Codable
 VisualCoreExperience | var | public private(set) var acceptedActions
 VisualCoreExperience | var | public private(set) var clock: FixedStepClock
@@ -1134,9 +1143,11 @@ VisualCoreExperience | var | public private(set) var stepIndex
 VisualCoreExperience | var | public static var automationCompiled: Bool
 VisualCoreExperience | var | public static var environmentKind: String
 VisualCoreExperience | var | public static var migratedVersions: [Int]
+VisualCoreExperience | var | public static var migrations: MigrationChain
 VisualCoreExperience | var | public static var preparationFailedCode: String
 VisualCoreExperience | var | public static var qualityProfile: QualityProfile
 VisualCoreExperience | var | public static var qualityTiers: Int
+VisualCoreExperience | var | public static var schema: Int
 VisualCoreExperience | var | public static var schemaVersion: Int
 VisualCoreExperience | var | public static var stepDuration: Double
 VisualCoreExperience | var | public var `final`: StateDigest?
@@ -2969,6 +2980,7 @@ VisualCoreSimulation | enum | public enum SpringAnchor2D: Sendable, Equatable
 VisualCoreSimulation | enum | public enum Springs2D
 VisualCoreSimulation | enum | public enum Steering
 VisualCoreSimulation | enum | public enum StoragePrecision: String, Sendable, Codable, CaseIterable
+VisualCoreSimulation | enum | public enum TimelineError: Error, Equatable, Sendable
 VisualCoreSimulation | enum | public enum TimelineEvent: Sendable, Equatable
 VisualCoreSimulation | enum | public enum TrailDecay
 VisualCoreSimulation | func | public func acceleration(at position: Vec2, velocity: Vec2) -> Vec2
@@ -2983,10 +2995,14 @@ VisualCoreSimulation | func | public func commands(at step: Int) -> [Command]
 VisualCoreSimulation | func | public func decode(_ u: Float) -> Float
 VisualCoreSimulation | func | public func encode(_ v: Float) -> Float
 VisualCoreSimulation | func | public func encode(to encoder: Encoder) throws
+VisualCoreSimulation | func | public func encode(to encoder: any Encoder) throws
+VisualCoreSimulation | func | public func hash(at step: Int) throws(TimelineError) -> ReplayHash
 VisualCoreSimulation | func | public func inertia(mass: Double) -> Double
 VisualCoreSimulation | func | public func instances() -> [ParticleInstance]
+VisualCoreSimulation | func | public func latest(atOrBefore step: Int) -> Snapshot?
 VisualCoreSimulation | func | public func liveCount(source index: Int) -> Int
 VisualCoreSimulation | func | public func maxAbsDifference(_ other: FieldGrid) -> Float?
+VisualCoreSimulation | func | public func next(step: Int, checksum: UInt64) -> ReplayHash
 VisualCoreSimulation | func | public func overlaps(_ other: AABB2D) -> Bool
 VisualCoreSimulation | func | public func padded(toChannels count: Int, fill: Float = 0) -> FieldGrid
 VisualCoreSimulation | func | public func resolve(_ system: SystemAccessibility) -> EffectiveAccessibility
@@ -3006,14 +3022,17 @@ VisualCoreSimulation | func | public mutating func advance(by delta: Double)
 VisualCoreSimulation | func | public mutating func advance(by dt: Double) -> Int
 VisualCoreSimulation | func | public mutating func advance(by dt: Double) -> [TimelineEvent]
 VisualCoreSimulation | func | public mutating func advance(frame dt: Double) -> Int
+VisualCoreSimulation | func | public mutating func advance(steps: Int = 1) throws(TimelineError)
 VisualCoreSimulation | func | public mutating func burst(_ count: Int, from index: Int = 0)
 VisualCoreSimulation | func | public mutating func clamp(_ delta: Double) -> Double
 VisualCoreSimulation | func | public mutating func double() -> Double
+VisualCoreSimulation | func | public mutating func drop(after step: Int)
 VisualCoreSimulation | func | public mutating func enterBackground()
 VisualCoreSimulation | func | public mutating func enterForeground()
 VisualCoreSimulation | func | public mutating func float() -> Float
 VisualCoreSimulation | func | public mutating func flush(now: Double) -> Announcement?
 VisualCoreSimulation | func | public mutating func index(below n: Int) -> Int
+VisualCoreSimulation | func | public mutating func insert(_ command: Command, at step: Int) throws(TimelineError)
 VisualCoreSimulation | func | public mutating func int(_ r: ClosedRange<Int>) -> Int
 VisualCoreSimulation | func | public mutating func mutate(_ body: (inout Simulation) -> Void)
 VisualCoreSimulation | func | public mutating func next() -> UInt64
@@ -3022,15 +3041,20 @@ VisualCoreSimulation | func | public mutating func pause()
 VisualCoreSimulation | func | public mutating func pick<T>(_ items: [T]) throws(RandomChoiceError) -> T
 VisualCoreSimulation | func | public mutating func play()
 VisualCoreSimulation | func | public mutating func range(_ r: ClosedRange<Double>) -> Double
+VisualCoreSimulation | func | public mutating func remove(at step: Int, index: Int) throws(TimelineError)
+VisualCoreSimulation | func | public mutating func remove(at step: Int, index: Int) throws(TimelineError) -> Command
+VisualCoreSimulation | func | public mutating func replace(at step: Int, index: Int, with command: Command) throws(TimelineError)
 VisualCoreSimulation | func | public mutating func resetAccumulator()
 VisualCoreSimulation | func | public mutating func resume()
 VisualCoreSimulation | func | public mutating func run(steps: Int)
 VisualCoreSimulation | func | public mutating func scrub(to newTime: Double)
+VisualCoreSimulation | func | public mutating func seek(to step: Int) throws(TimelineError)
 VisualCoreSimulation | func | public mutating func seek(to t: Double)
 VisualCoreSimulation | func | public mutating func shuffle<T>(_ items: inout [T])
 VisualCoreSimulation | func | public mutating func shuffled<T>(_ items: [T]) -> [T]
 VisualCoreSimulation | func | public mutating func step(_ dt: Double)
 VisualCoreSimulation | func | public mutating func stepOnce()
+VisualCoreSimulation | func | public mutating func store(_ s: Snapshot)
 VisualCoreSimulation | func | public mutating func submit(_ announcement: Announcement) -> Announcement?
 VisualCoreSimulation | func | public mutating func submit(_ event: HapticEvent) -> HapticEvent?
 VisualCoreSimulation | func | public mutating func toggle()
@@ -3057,6 +3081,7 @@ VisualCoreSimulation | func | public static func solve(_ bodies: inout [RigidBod
 VisualCoreSimulation | func | public static func solve(_ bodies: inout [RigidBodyState2D], contacts: inout [Contact2D],
 VisualCoreSimulation | func | public static func stableDamping(effectiveMass m: Double, dt: Double) -> Double
 VisualCoreSimulation | func | public static func stableStiffness(effectiveMass m: Double, dt: Double) -> Double
+VisualCoreSimulation | func | public static func start(checksum: UInt64) -> ReplayHash
 VisualCoreSimulation | func | public static func step8(_ value: UInt8, factor: Double, subtract: Double = 1) -> UInt8
 VisualCoreSimulation | func | public static func subtraction(delta: Double) -> Double
 VisualCoreSimulation | func | public static func sweep(_ a: CollisionCircle, moving da: Vec2, _ b: CollisionCircle, moving db: Vec2) -> Double?
@@ -3068,11 +3093,13 @@ VisualCoreSimulation | init | public init(a: Int, b: Int, manifold: ContactManif
 VisualCoreSimulation | init | public init(a: Int, b: Int, manifold: ContactManifold2D, normalImpulses: [Double], tangentImpulses: [Double])
 VisualCoreSimulation | init | public init(a: SpringAnchor2D, b: SpringAnchor2D, restLength: Double, stiffness: Double,
 VisualCoreSimulation | init | public init(a: Vec2, b: Vec2, radius: Double)
+VisualCoreSimulation | init | public init(capacity: Int = 32, interval: Int = 64) throws(TimelineError)
 VisualCoreSimulation | init | public init(capacity: Int = ParticleSystem.defaultCapacity, seed: UInt64 = 0)
 VisualCoreSimulation | init | public init(center: Vec2, radius: Double)
 VisualCoreSimulation | init | public init(count: Int, interval: Double)
 VisualCoreSimulation | init | public init(duration: Double = 120, speed: Double = 1, isPlaying: Bool = true)
 VisualCoreSimulation | init | public init(from decoder: Decoder) throws
+VisualCoreSimulation | init | public init(from decoder: any Decoder) throws
 VisualCoreSimulation | init | public init(from: Double, to: Double, duration: Double, curve: EasingCurve = .linear, mode: EasingMode = .inOut,
 VisualCoreSimulation | init | public init(id: String, colorHex: String, sign: String)
 VisualCoreSimulation | init | public init(iterations: Int = 10, restitutionThreshold: Double = 0.5, slop: Double = 0.005,
@@ -3098,21 +3125,28 @@ VisualCoreSimulation | init | public init(seed: UInt64)
 VisualCoreSimulation | init | public init(seed: UInt64, index: UInt64)
 VisualCoreSimulation | init | public init(seed: UInt64, label: String)
 VisualCoreSimulation | init | public init(simulation: Simulation, clock: FixedStepClock = FixedStepClock(), stream: ControlStream<Command> = ControlStream(),
+VisualCoreSimulation | init | public init(start: Simulation, dt: Double = 1.0 / 120, interval: Int = 64, capacity: Int = 32,
 VisualCoreSimulation | init | public init(step: Double = 1.0 / 120, maxSteps: Int = 8)
 VisualCoreSimulation | init | public init(step: Int, command: Command)
+VisualCoreSimulation | init | public init(step: Int, state: State, hash: ReplayHash)
 VisualCoreSimulation | init | public init(storedValue: String?)
 VisualCoreSimulation | init | public init(text: String, kind: AnnouncementKind, time: Double)
 VisualCoreSimulation | init | public init(version: Int, seed: String, words: [String])
 VisualCoreSimulation | init | public init(width: Int, height: Int, channels: Int, fill: Float = 0)
+VisualCoreSimulation | init | public init?(hex: String)
 VisualCoreSimulation | init | public init?(range: Float, center: Float = 0.5)
 VisualCoreSimulation | init | public init?(width: Int, height: Int, channels: Int, values: [Float])
+VisualCoreSimulation | let | public let bytes: [UInt8]
 VisualCoreSimulation | let | public let capacity: Int
 VisualCoreSimulation | let | public let center: Float
 VisualCoreSimulation | let | public let channels: Int
 VisualCoreSimulation | let | public let command: Command
+VisualCoreSimulation | let | public let dt: Double
 VisualCoreSimulation | let | public let duration: Double
 VisualCoreSimulation | let | public let entries: [Entry]
+VisualCoreSimulation | let | public let hash: ReplayHash
 VisualCoreSimulation | let | public let height: Int
+VisualCoreSimulation | let | public let interval: Int
 VisualCoreSimulation | let | public let maxStep: Double
 VisualCoreSimulation | let | public let maxSteps: Int
 VisualCoreSimulation | let | public let minStep: Double
@@ -3122,6 +3156,8 @@ VisualCoreSimulation | let | public let reduceFlashing: Bool
 VisualCoreSimulation | let | public let reduceMotion: Bool
 VisualCoreSimulation | let | public let seed: String
 VisualCoreSimulation | let | public let seed: UInt64
+VisualCoreSimulation | let | public let start: Simulation
+VisualCoreSimulation | let | public let state: State
 VisualCoreSimulation | let | public let step: Double
 VisualCoreSimulation | let | public let step: Int
 VisualCoreSimulation | let | public let stream: ControlStream<Command>
@@ -3169,6 +3205,7 @@ VisualCoreSimulation | struct | public struct Emitter: Sendable, Equatable
 VisualCoreSimulation | struct | public struct EmitterBurst: Sendable, Equatable, Codable
 VisualCoreSimulation | struct | public struct Entry
 VisualCoreSimulation | struct | public struct Entry: Sendable, Equatable
+VisualCoreSimulation | struct | public struct EventLog<Command: Sendable & Equatable>: Sendable, Equatable
 VisualCoreSimulation | struct | public struct FieldGrid: Sendable, Equatable
 VisualCoreSimulation | struct | public struct FixedStepClock: Sendable, Equatable
 VisualCoreSimulation | struct | public struct FixedStepRunner<Simulation: FixedStepSimulation, Command>
@@ -3178,11 +3215,15 @@ VisualCoreSimulation | struct | public struct ParticleInstance: Sendable, Equata
 VisualCoreSimulation | struct | public struct ParticleSystem: Sendable
 VisualCoreSimulation | struct | public struct PlaybackState: Sendable, Equatable
 VisualCoreSimulation | struct | public struct Pose2D: Sendable, Equatable
+VisualCoreSimulation | struct | public struct ReplayHash: Sendable, Equatable, Hashable, Codable
+VisualCoreSimulation | struct | public struct ReversibleTimeline<Simulation: FixedStepSimulation & Sendable, Command: Sendable & Equatable>
 VisualCoreSimulation | struct | public struct RigidBodyState2D: Sendable, Equatable
 VisualCoreSimulation | struct | public struct SceneClock: Sendable, Equatable
 VisualCoreSimulation | struct | public struct SeededRandom: RandomNumberGenerator, Sendable, Equatable
 VisualCoreSimulation | struct | public struct Settings: Sendable, Equatable
 VisualCoreSimulation | struct | public struct SignedRangeEncoding: Sendable, Equatable
+VisualCoreSimulation | struct | public struct Snapshot: Sendable
+VisualCoreSimulation | struct | public struct SnapshotRing<State: Sendable>: Sendable
 VisualCoreSimulation | struct | public struct SplitMix64: RandomNumberGenerator, Sendable
 VisualCoreSimulation | struct | public struct Spring2D: Sendable, Equatable
 VisualCoreSimulation | struct | public struct State: Codable, Sendable, Equatable
@@ -3202,21 +3243,29 @@ VisualCoreSimulation | var | public private(set) var clock: FixedStepClock
 VisualCoreSimulation | var | public private(set) var droppedCount
 VisualCoreSimulation | var | public private(set) var droppedTime
 VisualCoreSimulation | var | public private(set) var entries: [Entry]
+VisualCoreSimulation | var | public private(set) var hash: ReplayHash
 VisualCoreSimulation | var | public private(set) var invalidCount
 VisualCoreSimulation | var | public private(set) var invalidDeltas
 VisualCoreSimulation | var | public private(set) var isInBackground
 VisualCoreSimulation | var | public private(set) var isPaused
 VisualCoreSimulation | var | public private(set) var isPlaying: Bool
+VisualCoreSimulation | var | public private(set) var log: EventLog<Command>
 VisualCoreSimulation | var | public private(set) var nanRemoved
 VisualCoreSimulation | var | public private(set) var pending: Announcement?
 VisualCoreSimulation | var | public private(set) var random: SeededRandom
+VisualCoreSimulation | var | public private(set) var ring: SnapshotRing<Simulation>
 VisualCoreSimulation | var | public private(set) var simulation: Simulation
+VisualCoreSimulation | var | public private(set) var snapshots: [Snapshot]
+VisualCoreSimulation | var | public private(set) var state: Simulation
 VisualCoreSimulation | var | public private(set) var state: UInt64
+VisualCoreSimulation | var | public private(set) var step: Int
 VisualCoreSimulation | var | public private(set) var stepIndex
 VisualCoreSimulation | var | public private(set) var time
 VisualCoreSimulation | var | public private(set) var time: Double
 VisualCoreSimulation | var | public private(set) var totalSteps
 VisualCoreSimulation | var | public private(set) var wantsToPlay: Bool
+VisualCoreSimulation | var | public static var maxEntries: Int
+VisualCoreSimulation | var | public static var maxStep: Int
 VisualCoreSimulation | var | public var a: Int
 VisualCoreSimulation | var | public var a: SpringAnchor2D
 VisualCoreSimulation | var | public var a: Vec2
@@ -3252,6 +3301,7 @@ VisualCoreSimulation | var | public var forces: [ParticleForce]
 VisualCoreSimulation | var | public var friction: Double
 VisualCoreSimulation | var | public var from: Double
 VisualCoreSimulation | var | public var group: Int
+VisualCoreSimulation | var | public var hex: String
 VisualCoreSimulation | var | public var id: String
 VisualCoreSimulation | var | public var interval: Double
 VisualCoreSimulation | var | public var inverseInertia: Double
@@ -3287,6 +3337,7 @@ VisualCoreSimulation | var | public var radial: Bool
 VisualCoreSimulation | var | public var radius: Double
 VisualCoreSimulation | var | public var rate
 VisualCoreSimulation | var | public var rate: Double
+VisualCoreSimulation | var | public var reasonCode: String
 VisualCoreSimulation | var | public var reduceFlashing: AccessibilityChoice
 VisualCoreSimulation | var | public var reduceMotion
 VisualCoreSimulation | var | public var reduceMotion: AccessibilityChoice
@@ -3309,6 +3360,7 @@ VisualCoreSimulation | var | public var spread: Double
 VisualCoreSimulation | var | public var startColor: Vec4, endColor: Vec4
 VisualCoreSimulation | var | public var startSize: Double, endSize: Double
 VisualCoreSimulation | var | public var state: State
+VisualCoreSimulation | var | public var steps: [Int]
 VisualCoreSimulation | var | public var stiffness: Double
 VisualCoreSimulation | var | public var tangentImpulses: [Double]
 VisualCoreSimulation | var | public var text: String

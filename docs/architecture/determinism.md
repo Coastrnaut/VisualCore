@@ -129,3 +129,11 @@ samples, frames and meshes, byte for byte. Sampling splits recursively to a fixe
 samples are dropped with a scale-aware threshold (1e-9 × (1 + largest coordinate magnitude)); the first normal is the
 caller's or the world axis least parallel to the first tangent; a closed loop's leftover twist is spread linearly by
 arc length.
+
+## 11. Reversible runs (feature 214, R02-F14)
+
+A deterministic `FixedStepSimulation` run can be scrubbed and edited: `ReversibleTimeline` (VisualCoreSimulation)
+restores the latest kept snapshot at or before a step and replays the `EventLog`, so every seek lands on exactly a
+fresh run's state; `ReplayHash` chains SHA-256 over every step's checksum, so identical runs agree on every device and
+any changed command changes the hash. A replay that disagrees with a kept snapshot or a stored hash is refused as
+`r2-f14.hash-mismatch`. Details: [reversible-timeline.md](reversible-timeline.md).
