@@ -17,7 +17,7 @@
   computed value falls in exactly one.
 - **R7 Lens area.** Decision: A = r₁²·acos(c₁) + r₂²·acos(c₂) − ½√((−d+r₁+r₂)(d+r₁−r₂)(d−r₁+r₂)(d+r₁+r₂)) with
   cosines clamped to [−1, 1]; 0 when d ≥ r₁ + r₂; π·min(r)² when d ≤ |r₁ − r₂|. Test oracle: integration of the
-  chord length over the smaller disk with x = r·cos φ (smooth), 4,096 intervals.
+  chord length over the smaller disk with x = r·cos φ (smooth), 1,024 intervals (Simpson on smooth pieces; kept light beside the timed R02-F05 test).
 - **R8 Sky projection.** Decision: angular radius asin(R/d); separation atan2(|a × b|, a · b) (accurate at small
   angles); overlap of disks with those radii at that distance; the horizon dip acos(R_g/h) for the ground sphere.
   Rationale: the disk model the consumers draw; standard small-angle sky approximation.

@@ -13,7 +13,7 @@ public names checked against Packages and Apps (`Visibility` is taken). Fixture 
 
 ## Phase 2: Foundational
 
-- [ ] T-R02F15-002 [P] Create `Packages/VisualCore/Sources/VisualCoreMath/OrbitError.swift` (cases and `r2-f15.*` codes
+- [X] T-R02F15-002 [P] Create `Packages/VisualCore/Sources/VisualCoreMath/OrbitError.swift` (cases and `r2-f15.*` codes — Verified 2026-11-19: lead retest 2026-11-19: R02-F15.host-rerun.json (exit 0, full suite; first R02-F15.host.json failed only the timed R02-F05 mesh budget under parallel load, fixed by lightening the overlap oracle to 1,024 intervals); KeplerSolverTests 7 passed (1,000 seeded cases per kind, residual ≤ 1e-10·max(1,|M|); Barker known answers; finite fallbacks)
   of clarification Q5) and `Packages/VisualCore/Sources/VisualCoreMath/KeplerSolver.swift` (research R1–R3: elliptic via
   `KeplerOrbit.eccentricAnomaly` plus ≤ 8 polishing Newton steps while the residual exceeds 1e-12; hyperbolic Newton from
   H₀ = sign(M)·ln(2|M|/e + 1.8), ≤ 64 steps; parabolic Barker closed form for "abs(e − 1) ≤ 1e-9"; true anomalies;
@@ -46,7 +46,7 @@ public names checked against Packages and Apps (`Visibility` is taken). Fixture 
   `Packages/VisualCore/Sources/VisualCoreMath/EclipseGeometry.swift` (`EclipseBody` "radius finite > 0",
   `EclipseClass`, `EclipseVerdict` "fraction in [0, 1]; hidden reports 1", `EclipseGeometry.classify` per clarification
   Q4 and research R8) with `Packages/VisualCore/Tests/VisualCoreMathTests/DiskOverlapTests.swift` (1,000 seeded pairs
-  equal the smooth chord integration to 1e-6 of the smaller area; touching 0, equal centred πr², nested π·min²) and
+  equal the smooth chord integration (1,024 Simpson intervals) to 1e-6 of the smaller area; touching 0, equal centred πr², nested π·min²) and
   `Packages/VisualCore/Tests/VisualCoreMathTests/EclipseGeometryTests.swift` (at least five fixtures per class none,
   partial, annular, total, hidden; observer inside refused `r2-f15.observer-inside`; bad radius `r2-f15.invalid-disk`);
   `--name host-4`
