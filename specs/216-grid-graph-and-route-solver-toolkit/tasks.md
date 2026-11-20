@@ -54,7 +54,7 @@ tests stay light beside the timed R02-F05 test.
 
 ## Phase 7: Story 5 — certify (P1)
 
-- [ ] T-R02F16-007 [US5] Create `Packages/VisualCore/Sources/VisualCoreSimulation/CertificateChecker.swift` (three verify overloads; rule names in
+- [X] T-R02F16-007 [US5] Create `Packages/VisualCore/Sources/VisualCoreSimulation/CertificateChecker.swift` (three verify overloads; rule names in — Verified 2026-11-19: lead retest 2026-11-19: R02-F16.host-3.json (exit 0, full suite; R02-F16.host-2.json had failed only the mesh-budget timing beside the full suite, now asserted in R02-F16.timing.json, exit 0); CertificateCheckerTests 10 passed (every kind accepted; ≥ 413 seeded tampered certificates refused with their exact rule) and CertificateIntegrationTests 3 passed (300 route, 50 timed and 50 cut certificates from the solvers accepted; placements accepted; certificates refused on a changed graph)
   `certificate-rejected`; exhausted refused "not-checkable") with `Packages/VisualCore/Tests/VisualCoreSimulationTests/CertificateCheckerTests.swift` (every certificate
   from seeded runs of all solvers accepted; at least 100 seeded tampered certificates refused: wrong edge, wrong cost,
   broken potentials, open reachable set, closed timed state, overlapping cut routes, cut that does not separate,
