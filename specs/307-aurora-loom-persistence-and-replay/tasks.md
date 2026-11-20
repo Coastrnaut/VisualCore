@@ -45,7 +45,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 - [X] T-R02G0107-006 Docs: `docs/architecture/aurora-loom.md` (persistence and replay), `Packages/ExperiencesRound02/README.md`, — Verified 2026-11-20: 2026-11-20 round02-host exit 0; docs/architecture/aurora-loom.md persistence and replay section, Packages/ExperiencesRound02/README.md, docs/automatedtesting.md
   `docs/automatedtesting.md`; `--name round02-host`
-- [ ] T-R02G0107-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G0107-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-20: 2026-11-20 rendering-27, rendering-26, experiences, host-full, app-unit exit 0
   `--name host-full`, `--name app-unit`
 - [ ] T-R02G0107-008 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G0107-009 Reference regression chunk 2 (`--name reference-2`)
