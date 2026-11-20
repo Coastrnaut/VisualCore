@@ -12,7 +12,7 @@ its check record (no trailers). No {owner} tasks; one {device} task. Fixture see
 
 ## Phase 2: Foundational
 
-- [ ] T-R02F19-002 Create `Packages/VisualCore/Sources/VisualCoreScenes/PlantError.swift` and `Packages/VisualCore/Sources/VisualCoreScenes/PlantGrammar.swift` (PlantRule "1 … 8 successors, each ≤ 256
+- [X] T-R02F19-002 Create `Packages/VisualCore/Sources/VisualCoreScenes/PlantError.swift` and `Packages/VisualCore/Sources/VisualCoreScenes/PlantGrammar.swift` (PlantRule "1 … 8 successors, each ≤ 256 — Verified 2026-11-20: lead 2026-11-20: R02-F19.host.json (exit 0, full suite; PlantGrammarTests 4 passed: every rule and grammar refusal with its code, byte-identical round trip, newer, out-of-range and damaged forms refused)
   symbols; weights finite > 0"; PlantGrammar "≤ 64 rules, unique predecessors; generations 0 … 12; δ finite 0 … π; step
   and radius finite > 0; radiusFactor 0 < k ≤ 1; JSON schema 1") with `Packages/VisualCore/Tests/VisualCoreScenesTests/PlantGrammarTests.swift` (every refusal and
   code; round trip byte for byte; schema 2 and damaged JSON refused); `--name host`
