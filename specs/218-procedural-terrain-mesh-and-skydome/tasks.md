@@ -48,7 +48,7 @@ Covered by T-R02F18-002 (both settings types round-trip; newer and damaged refus
 
 ## Phase 7: Regression, documentation and close
 
-- [ ] T-R02F18-006 No Stage One breakage: `--name rendering-26` and `--name experiences`
+- [X] T-R02F18-006 No Stage One breakage: `--name rendering-26` and `--name experiences` — Verified 2026-11-20: 2026-11-20 R02-F18.rendering-26.json and experiences.json (exit 0 each, TEST SUCCEEDED; the sky shader and renderer tests also pass on iOS 26.5)
 - [ ] T-R02F18-007 API baseline and docs: `check_public_api.py --update`, `--name public-api`, `--name documented-api
   -- python3 scripts/check_documented_api.py --sources Apps/VisualCore`; new `docs/architecture/terrain-and-sky.md`;
   sections in `Packages/VisualCore/README.md` and `Packages/VisualCoreRendering/README.md`; section 13.4 row R02-F18
