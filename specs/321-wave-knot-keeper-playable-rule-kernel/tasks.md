@@ -41,7 +41,7 @@ recorded only after every agent has reported). Commit after every task with its 
 
 ## Phase 5: Stories 4 — contract and invariants (P2)
 
-- [ ] T-R02G0301-005 [P] [US4] Create `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperRules.swift` (`PuzzleRules`: State = points, Move =
+- [X] T-R02G0301-005 [P] [US4] Create `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperRules.swift` (`PuzzleRules`: State = points, Move = — Verified 2026-11-20: 2026-11-20 host-4 exit 0 (WaveKnotKeeperRules as PuzzleRules; 8 tests incl. agreement with the play on 200 walks and PuzzleValidator certification)
   WaveKnotKeeperMove, legal moves in a fixed order) with `Packages/ExperiencesRound02/WaveKnotKeeper/CoreTests/WaveKnotKeeperRulesTests.swift`; `--name host-4`
 - [ ] T-R02G0301-006 [P] Create `Packages/ExperiencesRound02/WaveKnotKeeper/CoreTests/WaveKnotKeeperInvariantTests.swift` (`testWaveKnotKeeperTimeBoundary`,
   `…InputbudgetBoundary`, `…GoalBoundary`, `…RepeatabilityBoundary`, `…UndoBoundary`, `…FailurehonestyBoundary`,
