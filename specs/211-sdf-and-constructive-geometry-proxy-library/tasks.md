@@ -51,7 +51,7 @@ seed 2_011.
 
 ## Phase 5: Story 1 — the shader (P1)
 
-- [ ] T-R02F11-006 [US1] Create `Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/sdfshape.glsl`
+- [X] T-R02F11-006 [US1] Create `Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/sdfshape.glsl` — Verified 2026-11-19: lead retest 2026-11-19: R02-F11.rendering-27-2.json (exit 0, 228 tests) incl. SDFShaderParityTests 3 passed (slice 0/255 over 3 descriptions, 10,816 mask cells 0 mismatched, generated source compiles); ShaderBundleTests with vc/sdfshape.glsl passed after it includes vc/sdf.glsl (first attempt rendering-27 exit 65)
   (`vc_sdPlane`, `vc_sdRoundBox`, `vc_sdCapsule`, `vc_opUnion`, `vc_opIntersect`, `vc_opSubtract`, `vc_opSmoothUnion`,
   include guard) and `Packages/VisualCore/Sources/VisualCoreScenes/SDFShaderSource.swift` (`glslFunction(name:)` per
   research R7) with `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/SDFShaderParityTests.swift` (a slice
