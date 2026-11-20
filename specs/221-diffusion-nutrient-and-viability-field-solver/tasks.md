@@ -12,7 +12,7 @@ its check record (no trailers). No {owner} tasks; one {device} task. Fixture see
 
 ## Phase 2: Foundational
 
-- [ ] T-R02F21-002 Create `Packages/VisualCore/Sources/VisualCoreSimulation/NutrientError.swift`, `Packages/VisualCore/Sources/VisualCoreSimulation/NutrientTypes.swift` (NutrientSourceKind, NutrientSource "rate
+- [X] T-R02F21-002 Create `Packages/VisualCore/Sources/VisualCoreSimulation/NutrientError.swift`, `Packages/VisualCore/Sources/VisualCoreSimulation/NutrientTypes.swift` (NutrientSourceKind, NutrientSource "rate — Verified 2026-11-20: 2026-11-20 host exit 0: NutrientFieldTests 5/5 (1,000 seeded cells: inside 61, outside 801, ramp 138, each equal to the band rule) (.autonomy/migration/checks/R02-F21.host.json)
   finite, 0 < rate ≤ 1,000 units/s", ViabilityBand "finite; low ≤ high; ramp ≥ 0" with membership, NutrientAccount,
   NutrientLedger, NutrientStepReport), `Packages/VisualCore/Sources/VisualCoreSimulation/GrowthNetwork.swift` ("limit 1 … 65,536; perFrame 1 … 1,024; threshold finite,
   0 < t ≤ 1; cost 0 … 2⁴⁰ quanta") and `Packages/VisualCore/Sources/VisualCoreSimulation/NutrientField.swift` (storage "sides 2 … 512; ≤ 262,144 cells; channels

@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--scratch-path",
+    "/private/tmp/claude-501/-Users-coast-Documents-GIT-VisualCore/6ae79f68-9b3e-404c-8bcb-11c9e268df91/scratchpad/build-L",
+    "--filter",
+    "NutrientFieldTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --scratch-path /private/tmp/claude-501/-Users-coast-Documents-GIT-VisualCore/6ae79f68-9b3e-404c-8bcb-11c9e268df91/scratchpad/build-L --filter NutrientFieldTests",
+  "elapsed_seconds": 13.073,
+  "exit_code": 0,
+  "finished": "2026-11-20T06:15:15+00:00",
+  "gate": "R02-F21",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-F21.host.log",
+  "log_sha256": "91ce7f2d82f21ac12dc8e1e792629e42c23488d1932625d317cbecf3c7d73777",
+  "name": "host",
+  "started": "2026-11-20T06:15:02+00:00",
+  "timed_out": false
+}
