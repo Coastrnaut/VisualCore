@@ -7,7 +7,8 @@
 // drawn with the shared unlit `MeshRenderer` in the palette colours and keeps the reason; nothing here can reach the
 // kernel. Feature 304 (R02-G01-04) T-R02G0104-004 adds the touch controls' picture: each ribbon's rail with its anchor
 // and its dial with its knob (teal; the selected ribbon's in gold with an outline disc), the drag preview shown at the
-// candidate step, and the camera orbit (presentation only).
+// candidate step, and the camera orbit (presentation only). Feature 306 (R02-G01-06) T-R02G0106-006: the gate, marker
+// and ribbon brightness and the win glow come from the presenter's eased `AuroraLoomLights` (fades, not flashes).
 #if os(iOS)
 import AuroraLoomCore
 import Foundation
@@ -24,6 +25,8 @@ final class AuroraLoomRibbonScene {
     var ribbonFragment = AuroraLoomShaders.ribbonFragment
     /// Whether the glow gain is capped (Reduce Flashing).
     var reducedFlash = false
+    /// The eased light levels from the presenter (feature 306); nil draws the snapshot's lit state at once.
+    var lights: AuroraLoomLights?
     /// The glow gain without and with the cap.
     static let glowGain = 2.5
     static let reducedGlowGain = 0.8
@@ -233,15 +236,38 @@ final class AuroraLoomRibbonScene {
         return builder.build()
     }
 
+    /// A gate's light, 0 … 1: the least of its three crossings (eased when the presenter supplies lights).
+    func gateLight(_ snapshot: AuroraLoomSceneSnapshot, gate: Int) -> Float {
+        if let lights {
+            var least = 1.0
+            for ribbon in 0..<3 { least = min(least, lights.crossings[ribbon * 4 + gate]) }
+            return Float(least)
+        }
+        return (0..<3).allSatisfy { snapshot.lit(ribbon: $0, gate: gate) } ? 1 : 0
+    }
+
+    /// A ribbon's light, 0 … 1: the mean of its four crossings (eased when the presenter supplies lights).
+    func ribbonLight(_ snapshot: AuroraLoomSceneSnapshot, ribbon: Int) -> Float {
+        var total = 0.0
+        for gate in 0..<4 {
+            if let lights {
+                total += lights.crossings[ribbon * 4 + gate]
+            } else if snapshot.lit(ribbon: ribbon, gate: gate) {
+                total += 1
+            }
+        }
+        return Float(total / 4)
+    }
+
     private func drawGates(_ snapshot: AuroraLoomSceneSnapshot, viewProjection: Mat4) throws {
         let teal = AuroraLoomPalette.teal
         for (gate, renderer) in gateRenderers.enumerated() {
-            let lit = (0..<3).allSatisfy { snapshot.lit(ribbon: $0, gate: gate) }
+            let lit = gateLight(snapshot, gate: gate)
             try renderer.draw(blend: .opaque) { p in
                 p.set("u_mvp", matrix4: viewProjection.floats)
                 p.set("u_pointSize", Float(1))
                 p.set("u_color", SIMD3<Float>(Float(teal.x), Float(teal.y), Float(teal.z)))
-                p.set("u_lit", Float(lit ? 1 : 0))
+                p.set("u_lit", lit)
                 p.set("u_opacity", Float(1))
             }
         }
@@ -250,12 +276,12 @@ final class AuroraLoomRibbonScene {
     private func drawMarkers(_ snapshot: AuroraLoomSceneSnapshot, viewProjection: Mat4) throws {
         let gold = AuroraLoomPalette.gold
         for (gate, renderer) in markerRenderers.enumerated() {
-            let lit = (0..<3).allSatisfy { snapshot.lit(ribbon: $0, gate: gate) }
+            let lit = gateLight(snapshot, gate: gate)
             try renderer.draw(blend: .opaque) { p in
                 p.set("u_mvp", matrix4: viewProjection.floats)
                 p.set("u_pointSize", Float(1))
                 p.set("u_color", SIMD3<Float>(Float(gold.x), Float(gold.y), Float(gold.z)))
-                p.set("u_lit", Float(lit ? 1 : 0))
+                p.set("u_lit", lit)
                 p.set("u_opacity", Float(1))
             }
         }
@@ -265,14 +291,14 @@ final class AuroraLoomRibbonScene {
                              animate: Bool) throws {
         let layers = tier.layers
         let phase = animate ? snapshot.time / 60 : 0
-        let gain = reducedFlash ? Self.reducedGlowGain : Self.glowGain
+        // The win glow (eased by the presenter's lights) lifts the glow by up to a fifth, never past the cap.
+        let winGlow = lights?.glow ?? (snapshot.stage == .won ? 1 : 0)
+        let gain = reducedFlash ? Self.reducedGlowGain : Self.glowGain * (1 + 0.2 * winGlow)
         // Lanes back to front: ribbon 2 (z = +D) is nearest the camera, so draw 0, 1, 2.
         for ribbon in 0..<3 {
             let base = AuroraLoomPalette.ribbons[ribbon]
             let highlight = AuroraLoomPalette.ribbons[(ribbon + 1) % 3]
-            var litGates = 0
-            for gate in 0..<4 where snapshot.lit(ribbon: ribbon, gate: gate) { litGates += 1 }
-            let lit = Float(litGates) / 4
+            let lit = ribbonLight(snapshot, ribbon: ribbon)
             for layer in 0..<layers {
                 let index = ribbon * layers + layer
                 guard index < ribbonRenderers.count else { continue }

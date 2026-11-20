@@ -10,7 +10,12 @@
 // carries the tutorial instruction, the hint revealed so far (`showHint()` reveals the next of three levels for the
 // current play; a change of the play hides it), the failure explanation with undo and retry, the mode, the open levels,
 // the goal (allowance and certified shortest) and the stars; the daily level is chosen from the local calendar date read
-// here (`playDaily(port:date:)`), never in the core.
+// here (`playDaily(port:date:)`), never in the core. Feature 306 (R02-G01-06) T-R02G0106-006 (FR-R02G0106-001 … 006):
+// after each described change the presenter routes `AuroraLoomFeedbackPlan.after(old:new:)` (an announcement and a
+// haptic) through its feedback route (`ExperienceFeedback.shared` unless a test injects one), plans refusals with
+// `refused(code:)` where it sends an action, keeps a feedback log, eases the scene's lights (`AuroraLoomLights`, 0.45 s
+// fades under Reduce Flashing), offers the ambient recipe to `AuroraLoomSound` at level openings and play ends, and
+// exposes `adjust(ribbon:control:by:port:)`, the one operation the steppers and their accessibility actions use.
 #if os(iOS)
 import AuroraLoomCore
 import Foundation
@@ -20,6 +25,7 @@ import VisualCoreExperienceHost
 import VisualCoreMath
 import VisualCoreRendering
 import VisualCoreScenes
+import VisualCoreSimulation
 
 /// What the controls show: the latest snapshot the presenter saw.
 @MainActor
@@ -55,6 +61,15 @@ final class AuroraLoomMirror {
     var stars: Int?
     /// The band of the level (1 … 5, 20 levels each).
     var band = 1
+    /// Whether the person turned the ambient sound on (off by default; feature 306).
+    var soundOn = false
+}
+
+/// One entry of the feedback log (feature 306): the announcement and haptic planned for a change or refusal.
+struct AuroraLoomFeedbackEntry: Equatable {
+    let text: String?
+    let kind: AnnouncementKind?
+    let haptic: HapticKind?
 }
 
 /// One entry of the tier log: the tier drawn and why it changed.
@@ -84,11 +99,26 @@ final class AuroraLoomPresenter: ExperiencePresenter {
     private(set) var latestCore: AuroraLoomExperienceCore?
     /// The level and play fingerprint the revealed hint belongs to; a different play hides the hint.
     private var hintKey: String?
+    /// The route haptics and announcements go through (tests inject recording sinks; feature 306).
+    var feedback: ExperienceFeedback = .shared
+    /// Every feedback plan routed, oldest first (feature 306; tests and diagnostics).
+    private(set) var feedbackLog: [AuroraLoomFeedbackEntry] = []
+    /// The core described before the latest one (feature 306).
+    private var previousCore: AuroraLoomExperienceCore?
+    /// The eased light levels drawn by the scene (feature 306).
+    private(set) var lights: AuroraLoomLights
+    /// The frame time of the last drawn frame; nil before the first.
+    private var lastFrameTime: Double?
+    /// The ambient loop's policy (feature 306).
+    let sound: AuroraLoomSound
 
     init(reduceMotion: Bool, reduceFlashing: Bool) {
         self.reduceMotion = reduceMotion
         self.reduceFlashing = reduceFlashing
         scene.reducedFlash = reduceFlashing
+        lights = AuroraLoomLights(reducedFlash: reduceFlashing)
+        sound = AuroraLoomSound(recipe: AuroraLoomSoundRecipe.recipe(
+            steps: AuroraLoomSteps(wave: [0, 0, 0], phase: [0, 0, 0]), stage: .playing))
     }
 
     /// The tests' seam: before `setup`, replaces the ribbon program's fragment source with one that does not compile.
@@ -116,6 +146,13 @@ final class AuroraLoomPresenter: ExperiencePresenter {
         let ticks = reduceMotion ? 0 : frame.time * 120
         let snapshot = core.snapshot(time: ticks)
         lastSnapshot = snapshot
+        if let last = lastFrameTime {
+            lights.step(toward: snapshot, elapsed: frame.time - last)
+        } else {
+            lights.settle(to: snapshot)
+        }
+        lastFrameTime = frame.time
+        scene.lights = lights
         latest = (core.play.steps, core.play.stage == .playing)
         scene.orbit = gestures.orbit
         scene.selectedRibbon = gestures.selectedRibbon
@@ -147,7 +184,7 @@ final class AuroraLoomPresenter: ExperiencePresenter {
         mirror.preview = gestures.preview
         guard let move else { return }
         let control: Double = move.control == .wave ? 0 : 1
-        let result = port.send("ribbon.move", [Double(move.ribbon), control, Double(move.step)])
+        let result = send("ribbon.move", [Double(move.ribbon), control, Double(move.step)], port: port)
         mirror.message = result.isAccepted ? nil : "That move was refused: \(result.code)"
     }
 
@@ -207,13 +244,13 @@ final class AuroraLoomPresenter: ExperiencePresenter {
     @discardableResult
     func retry(port: ExperienceActionPort, date: DateComponents = AuroraLoomPresenter.today()) -> ActionResult {
         let action = retryAction(date: date)
-        return port.send(action.control, action.values)
+        return send(action.control, action.values, port: port)
     }
 
     /// Plays the daily level of `date` (the local calendar date by default; the core never reads a clock).
     @discardableResult
     func playDaily(port: ExperienceActionPort, date: DateComponents = AuroraLoomPresenter.today()) -> ActionResult {
-        port.send("mode.daily", Self.dateValues(date))
+        send("mode.daily", Self.dateValues(date), port: port)
     }
 
     /// The local calendar date now, in the user's calendar converted to Gregorian year, month and day.
@@ -226,8 +263,66 @@ final class AuroraLoomPresenter: ExperiencePresenter {
         [Double(date.year ?? 0), Double(date.month ?? 0), Double(date.day ?? 0)]
     }
 
+    // MARK: Feedback, sound and adjustment (feature 306)
+
+    /// Sends `control` with `values` through `port`; a refusal is announced and felt (`AuroraLoomFeedbackPlan.refused`).
+    @discardableResult
+    func send(_ control: String, _ values: [Double] = [], port: ExperienceActionPort) -> ActionResult {
+        let result = port.send(control, values)
+        if !result.isAccepted { route(AuroraLoomFeedbackPlan.refused(code: result.code)) }
+        return result
+    }
+
+    /// Changes `ribbon`'s `control` (0 = wave, 1 = phase) by `delta` steps, wrapping 0 … 15, as one kernel move — the
+    /// one operation the steppers and their accessibility increment and decrement use.
+    @discardableResult
+    func adjust(ribbon: Int, control: Int, by delta: Int, port: ExperienceActionPort) -> ActionResult? {
+        guard let core = latestCore, (0..<3).contains(ribbon) else { return nil }
+        select(ribbon: ribbon)
+        let current = control == 0 ? core.play.steps.wave[ribbon] : core.play.steps.phase[ribbon]
+        let step = ((current + delta) % 16 + 16) % 16
+        return send("ribbon.move", [Double(ribbon), Double(control), Double(step)], port: port)
+    }
+
+    /// Plays `plan` through the feedback route and logs it; an empty plan does nothing.
+    func route(_ plan: AuroraLoomFeedbackPlan) {
+        guard plan != .none else { return }
+        if let haptic = plan.haptic { feedback.haptic(haptic) }
+        if let text = plan.text, let kind = plan.kind { feedback.announce(text, kind: kind) }
+        feedbackLog.append(AuroraLoomFeedbackEntry(text: plan.text, kind: plan.kind, haptic: plan.haptic))
+    }
+
+    /// Turns the ambient sound on or off; turning it on plays the recipe of the current steps and stage.
+    func setSound(on: Bool) {
+        if on, let core = latestCore {
+            sound.offer(AuroraLoomSoundRecipe.recipe(steps: core.play.steps, stage: core.play.stage))
+        }
+        sound.setWanted(on)
+        mirror.soundOn = on
+    }
+
+    /// The controls view appeared (the loop may play).
+    func controlsAppeared() { sound.setOnScreen(true) }
+
+    /// The controls view disappeared (the loop stops).
+    func controlsDisappeared() { sound.setOnScreen(false) }
+
+    /// The scene became active or inactive.
+    func sceneActive(_ active: Bool) { sound.setActive(active) }
+
     func describe(_ core: AuroraLoomExperienceCore) -> String {
         let play = core.play
+        if let previous = previousCore {
+            route(AuroraLoomFeedbackPlan.after(old: previous, new: core))
+            let opened = previous.levelNumber != core.levelNumber || previous.mode != core.mode
+            let ended = previous.play.stage != core.play.stage && (core.play.stage == .won || core.play.stage == .failed)
+            if opened || ended {
+                sound.offer(AuroraLoomSoundRecipe.recipe(steps: play.steps, stage: play.stage))
+            }
+        } else {
+            sound.offer(AuroraLoomSoundRecipe.recipe(steps: play.steps, stage: play.stage))
+        }
+        previousCore = core
         latestCore = core
         mirror.steps = play.steps
         mirror.stage = play.stage
@@ -279,11 +374,7 @@ final class AuroraLoomPresenter: ExperiencePresenter {
     }
 
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
-        AnyView(AuroraLoomControls(port: port, mirror: mirror, resetView: { [weak self] in self?.resetView() },
-                                   select: { [weak self] ribbon in self?.select(ribbon: ribbon) },
-                                   showHint: { [weak self] in self?.showHint() },
-                                   retry: { [weak self] in self?.retry(port: port) },
-                                   playDaily: { [weak self] in self?.playDaily(port: port) }))
+        AnyView(AuroraLoomControls(port: port, mirror: mirror, presenter: self))
     }
 }
 #endif
