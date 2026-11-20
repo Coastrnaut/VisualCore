@@ -8,7 +8,7 @@ Tests stay light (≤ 512 × 512 masks) so the timed R02-F05 budget test beside 
 
 ## Phase 1: Setup
 
-- [ ] T-R02F13-001 Baselines: `--name baseline-host -- swift test --package-path Packages/VisualCore`; the rendering
+- [X] T-R02F13-001 Baselines: `--name baseline-host -- swift test --package-path Packages/VisualCore`; the rendering — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F13.baseline-host.json (exit 0); rendering baseline = R02-F12.rendering-27.json and rendering-26.json (exit 0), package sources unchanged since R02-F12's last source commit
   baseline is R02-F12's last rendering runs when package sources are unchanged since them
 
 ## Phase 2: Story 1 — projection (P1) 🎯
