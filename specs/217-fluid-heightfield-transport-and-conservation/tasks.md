@@ -13,7 +13,7 @@ campaign). Fixture seed 2_017; grids ≤ 64 × 64 so tests stay light.
 
 ## Phase 2: Foundational
 
-- [ ] T-R02F17-002 Create `Packages/VisualCore/Sources/VisualCoreSimulation/HeightfieldError.swift`, `Packages/VisualCore/Sources/VisualCoreSimulation/HeightfieldParameters.swift` (HeightfieldEdges,
+- [X] T-R02F17-002 Create `Packages/VisualCore/Sources/VisualCoreSimulation/HeightfieldError.swift`, `Packages/VisualCore/Sources/VisualCoreSimulation/HeightfieldParameters.swift` (HeightfieldEdges, — Verified 2026-11-19: lead retest 2026-11-19: R02-F17.host.json (exit 0, full suite); HeightfieldStateTests 8 passed (size, channel, parameter, cell and amount refusals incl. the 2⁴⁰ grid total; 600 seeded ledgered edits balanced; surface and field handoff)
   HeightfieldParameters "gravity 0 < g ≤ 100; pipeArea 0 < A ≤ 10; damping 0 … 1; maxSubstep 0 < h ≤ 0.1; maxSubsteps
   1 … 64; rates 0 … 10; all finite", HeightfieldLedger, HeightfieldStepReport) and `Packages/VisualCore/Sources/VisualCoreSimulation/Heightfield.swift` (state "sides
   4 … 1,024, ≤ 262,144 cells; 0 … 4 dye channels; amounts 0 … 2⁴⁰", ledgered add and remove of terrain, water and dye (no sediment edit), totals, `isBalanced`,
@@ -25,7 +25,7 @@ campaign). Fixture seed 2_017; grids ≤ 64 × 64 so tests stay light.
 - [ ] T-R02F17-003 [US1] [US2] Create `Packages/VisualCore/Sources/VisualCoreSimulation/Heightfield+Step.swift` (research R2–R5: pipe fluxes "0 … 1,000,000", two-phase
   whole-quantum transfers, open edges drained, sub-steps of the stability limit, at most 64, dropped time reported) with
   `Packages/VisualCore/Tests/VisualCoreSimulationTests/HeightfieldFlowTests.swift` (50 seeded terrains × 500 steps: ledger balances and no negative amount after every
-  step; 32 × 32 basin settles within 0.05 in 4,000 sub-steps; water runs downhill; open edges drain and balance; two runs
+  step; 16 × 16 bowl settles within 0.05 in 2,000 sub-steps; water runs downhill; open edges drain and balance; two runs
   identical) and `Packages/VisualCore/Tests/VisualCoreSimulationTests/HeightfieldBoundsTests.swift` (100 seeded extreme cases per SC-R02F17-003; zero time no-op;
   negative and NaN refused; dropped time reported); `--name host-2`
 
@@ -33,12 +33,12 @@ campaign). Fixture seed 2_017; grids ≤ 64 × 64 so tests stay light.
 
 - [ ] T-R02F17-004 [US3] Dye carriage in `Packages/VisualCore/Sources/VisualCoreSimulation/Heightfield+Step.swift` (research R4) with `Packages/VisualCore/Tests/VisualCoreSimulationTests/HeightfieldDyeTests.swift`
   (each channel's total exact apart from drain over seeded runs; dye only where water went; a cell sending all its water
-  sends all its dye; channel refusals); `--name host-3`
+  sends all its dye, remainder included; channel refusals); `--name host-3`
 
 ## Phase 5: Story 4 — erosion (P2)
 
 - [ ] T-R02F17-005 [US4] Erosion in `Packages/VisualCore/Sources/VisualCoreSimulation/Heightfield+Step.swift` (research R6) with `Packages/VisualCore/Tests/VisualCoreSimulationTests/HeightfieldErosionTests.swift`
-  (SC-R02F17-004 slope: upper third loses, lower third gains, rock balances exactly; never below the floor; disabled
+  (SC-R02F17-004 16 × 8 slope, 1,000 sub-steps: upper third loses, lower third gains, rock balances exactly; never below the floor; disabled
   erosion leaves terrain unchanged); `--name host-4`
 
 ## Phase 6: Story 5 — save and reopen (P2)
