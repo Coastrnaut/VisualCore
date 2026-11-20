@@ -37,7 +37,7 @@ through a fileprivate SplitMix generator; tests stay short.
 
 ## Phase 5: Story 4 — undo and redo (P2)
 
-- [ ] T-R02F22-005 [P] [US4] Create `Packages/VisualCore/Sources/VisualCoreScenes/ControlHistory.swift` ("depth 1 … 1,000 (default 100); JSON schema 1") with
+- [X] T-R02F22-005 [P] [US4] Create `Packages/VisualCore/Sources/VisualCoreScenes/ControlHistory.swift` ("depth 1 … 1,000 (default 100); JSON schema 1") with — Verified 2026-11-20: 2026-11-20 host-4-r2 exit 0: ControlHistoryTests 15/15 (50 seeded sequences undo/redo exactly; a 500-event drag is one step; depth bound; round trip; refusals); host-4 failed only to build (.autonomy/migration/checks/R02-F22.host-4*.json)
   `Packages/VisualCore/Tests/VisualCoreScenesTests/ControlHistoryTests.swift` (seeded edit sequences undone fully give the exact start and redone the exact end;
   a 500-event drag is one step; redo cleared by a new edit; depth bound with dropped count; empty undo and redo give nil;
   round trip byte for byte; newer and damaged forms refused); `--name host-4`
