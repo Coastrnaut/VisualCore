@@ -129,7 +129,9 @@ Levels have a versioned stored form with a fingerprint, so later features can sh
 ### Edge Cases
 
 - **A dial set out of range, to its current value, or to a frequency pair that is not coprime:** refused, state unchanged.
-- **An action after the allowance is spent or after the end:** refused.
+- **An action after the allowance is spent or after the end:** refused. Spending the last action always ends the level
+  (won or failed), so a further action is refused as `stage`; the `allowance` code remains as a guard (implementation,
+  2026-11-20).
 - **A stale action** (its claimed previous fingerprint is not the current one): refused.
 - **A level already won at the start:** refused as a level.
 - **A tracer exactly on a checkpoint's or obstacle's boundary:** a sample on a checkpoint's surface visits it; a segment
