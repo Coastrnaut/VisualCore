@@ -60,7 +60,7 @@ or {device} tasks (pure logic). Fixture seed 2_311; tests stay short (< 10 s eac
 
 - [X] T-R02G0201-007 Docs: new `docs/architecture/lissajous-labyrinth.md`; `Packages/ExperiencesRound02/README.md`; — Verified 2026-11-20: 2026-11-20 round02-host exit 0 (96 tests; the lap reads the sine table through one buffer per lap, which took the whole package from about 35 s to 5 s); docs/architecture/lissajous-labyrinth.md; package README section (.autonomy/migration/checks/R02-G02-01.round02-host.json)
   `docs/automatedtesting.md`; `--name round02-host -- swift test --package-path Packages/ExperiencesRound02`
-- [ ] T-R02G0201-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences` and
+- [X] T-R02G0201-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences` and — Verified 2026-11-20: 2026-11-20 rendering-27, rendering-26, experiences (sim-27.2) and host-full exit 0
   `--name host-full`
 - [ ] T-R02G0201-009 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G0201-010 Reference regression chunk 2 (`--name reference-2`)
