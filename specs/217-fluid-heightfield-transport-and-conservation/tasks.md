@@ -31,7 +31,7 @@ campaign). Fixture seed 2_017; grids ≤ 64 × 64 so tests stay light.
 
 ## Phase 4: Story 3 — dye (P2)
 
-- [ ] T-R02F17-004 [US3] Dye carriage in `Packages/VisualCore/Sources/VisualCoreSimulation/Heightfield+Step.swift` (research R4) with `Packages/VisualCore/Tests/VisualCoreSimulationTests/HeightfieldDyeTests.swift`
+- [X] T-R02F17-004 [US3] Dye carriage in `Packages/VisualCore/Sources/VisualCoreSimulation/Heightfield+Step.swift` (research R4) with `Packages/VisualCore/Tests/VisualCoreSimulationTests/HeightfieldDyeTests.swift` — Verified 2026-11-19: lead retest 2026-11-19: R02-F17.host.json (exit 0, full suite); HeightfieldDyeTests 5 passed (20 seeded runs: every channel exact after every step, no dry cell holds dye after the remainder fix; dry plateau never dyed; an emptying cell sends all its dye; drained dye counted; refusals)
   (each channel's total exact apart from drain over seeded runs; dye only where water went; a cell sending all its water
   sends all its dye, remainder included; channel refusals); `--name host-3`
 
