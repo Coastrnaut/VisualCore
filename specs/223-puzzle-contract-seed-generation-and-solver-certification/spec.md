@@ -58,15 +58,18 @@ puzzle contract exists; the names `PuzzleRules`, `PuzzleLevel`, `PuzzleUniquenes
   breadth-first search from the start to the maximum length explores at most the node budget (`unproven` when exceeded),
   refuses any reached state with more moves than the branching bound (`tooBranching(count)`), refuses a shortest solution
   below the minimum length (`tooShort`), and checks the uniqueness promise (`notUnique`) by counting solved states (goal)
-  or shortest paths capped at 2 (solution). The `PuzzleCertificate` holds the verdict, the states explored, the shortest
+  or shortest paths capped at 2 (solution; the given solution must also
+  be as short as the shortest, otherwise it is not the only shortest solution and the verdict is `notUnique`). States are
+  counted as discovered, the start included. The `PuzzleCertificate` holds the verdict, the states explored, the shortest
   solution length, the solved states found (capped at 2) and the largest branching seen; it is `Equatable` and the same on
   every run. Impact: FR-R02F23-002…004, 006; SC-R02F23-002, 003.
 - Q: What are the fairness budget's bounds, and how does the generator search? → A: `FairnessBudget` holds the minimum and
   maximum solution length (0 ≤ min ≤ max ≤ 4,096), the branching bound (1 … 1,024) and the node budget (1 … 1,000,000).
   `PuzzleGenerator.generate` takes a seed, an attempt budget (1 … 10,000), the rules, the budget, the promise and a
   candidate maker that turns a `SeededRandom` into a start and a solution (or nil); attempt i uses
-  `SeededRandom(seed: SeedDerivation.derive(seed, index: i))`, and the first candidate that certifies becomes the level
-  (with the seed recorded). The `PuzzleGeneration` reports the attempts used and the count of each rejection verdict;
+  `SeededRandom(seed: SeedDerivation.derive(seed, index: i))`, and the first candidate that certifies becomes the level,
+  whose `seed` is that attempt's derived seed, so the maker given `SeededRandom(seed: level.seed)` makes the same
+  candidate again. The `PuzzleGeneration` reports the attempts used and the count of each rejection verdict;
   when every attempt fails it throws `.generationFailed(attempts)`. Impact: FR-R02F23-004, 005; SC-R02F23-004.
 - Q: How are refusals named? → A: `PuzzleError` with codes `r2-f23.rules-id`, `r2-f23.solution-length`,
   `r2-f23.budget`, `r2-f23.attempts`, `r2-f23.generation-failed`, `r2-f23.newer-schema`, `r2-f23.malformed` and

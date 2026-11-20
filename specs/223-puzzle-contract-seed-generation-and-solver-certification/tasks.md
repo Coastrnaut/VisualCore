@@ -36,8 +36,8 @@ tasks; one {device} task. Fixture seed 2_023; tests stay short.
 ## Phase 5: Story 3 — generation (P2)
 
 - [ ] T-R02F23-005 [P] [US3] Create `Packages/VisualCore/Sources/VisualCoreSimulation/PuzzleGenerator.swift` ("attempts 1 … 10,000"; derived seeds per attempt) with
-  `Packages/VisualCore/Tests/VisualCoreSimulationTests/PuzzleGeneratorTests.swift` (100 seeds generate identical levels twice and each certifies; the seed is recorded
-  and regenerates the level; rejection counts; an impossible request fails after exactly its attempt budget; attempt
+  `Packages/VisualCore/Tests/VisualCoreSimulationTests/PuzzleGeneratorTests.swift` (100 seeds generate identical levels twice and each certifies; the level's seed is the
+  successful attempt's derived seed and regenerates the same candidate; rejection counts; an impossible request fails after exactly its attempt budget; attempt
   refusals); `--name host-4`
 
 ## Phase 6: Regression, documentation and close

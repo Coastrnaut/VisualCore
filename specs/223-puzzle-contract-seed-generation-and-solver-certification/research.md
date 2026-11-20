@@ -12,4 +12,4 @@
 - **R4 Unproven is not unique.** Decision: a search that hits its node budget makes the verdict `unproven`. Rationale:
   a level must never be called unique without proof.
 - **R5 Derived attempt seeds.** Decision: attempt i uses `SeedDerivation.derive(seed, index: i)`. Rationale: attempts are
-  independent and reproducible; the recorded seed regenerates the level.
+  independent and reproducible; the level records the winning attempt's derived seed, which regenerates its candidate.
