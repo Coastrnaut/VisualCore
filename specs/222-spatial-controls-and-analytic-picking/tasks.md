@@ -57,7 +57,7 @@ through a fileprivate SplitMix generator; tests stay short.
   -- python3 scripts/check_documented_api.py --sources Apps/VisualCore`; new `docs/architecture/spatial-controls.md`;
   section in `Packages/VisualCore/README.md`; section 13.4 row R02-F22 "As built" in
   `docs/catalog/shared-feature-map.json` and `render_autocreator.py`
-- [ ] T-R02F22-009 Reference regression chunk 1 (`--name reference-1`)
+- [X] T-R02F22-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-20: 2026-11-20 reference-1 exit 0
 - [ ] T-R02F22-010 Reference regression chunk 2 (`--name reference-2`)
 - [X] T-R02F22-011 Script tests, run alone (`--name script-tests`) — Verified 2026-11-20: 2026-11-20 script-tests exit 0, run alone (.autonomy/migration/checks/R02-F22.script-tests.json)
 - [ ] T-R02F22-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
