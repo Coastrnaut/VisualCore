@@ -192,6 +192,10 @@ value; steps respect the same limits as drags.
 - The consumer experiences decide what a handle edits and how it looks; this slice ships the geometry, the choice, the
   drag, the history and the assistive steps with their proofs.
 - Visual design of handles, colours and layout belongs to the consuming experiences, drawn in code.
+- Choosing a handle without touch (VoiceOver, Switch Control, a keyboard) is done by the consuming experience, which
+  exposes each handle as an accessibility element by its id; this slice supplies what is done once one is chosen
+  (assistive steps recorded in the history). Layout follows the viewport in points, the same on iPhone and iPad in
+  either orientation.
 
 ## Traceability
 
