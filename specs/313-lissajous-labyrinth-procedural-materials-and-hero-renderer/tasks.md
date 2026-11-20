@@ -40,7 +40,9 @@ tests stay short (< 10 s each). No {owner} tasks.
   the candidate (`Catalog/registrations.json` with content facts, `build_catalog.py`, `Apps/VisualCore/App/ExperienceRegistry.swift`,
   `project.yml` + `xcodegen generate`, `Apps/VisualCore/Tests/Unit/AppModelTests.swift` example → `r02-g03.wave-knot-keeper`,
   `scripts/test_scripts.py`); agent D writes `Packages/ExperiencesRound02/LissajousLabyrinth/ExperienceTests/` (render vs CPU reference at three tiers on 5 levels;
-  tier coordinates; fallback; resize and zero size; Reduce Motion; identity); `--name sim-27 -- python3
+  checkpoint colours for unvisited, visited and next and the obstacle contact colour (FR-R02G0203-002); tier coordinates;
+  fallback; resize and zero size; memory warning releases and the next frame rebuilds (FR-R02G0203-007); Reduce Motion;
+  identity); `--name sim-27 -- python3
   scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package --destination
   sim-27.2 --action test`; `--name packages -- python3 scripts/check_experience_packages.py`; `--name catalog-search`
 
