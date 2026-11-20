@@ -12,7 +12,7 @@ its check record (no trailers). No {owner} tasks; one {device} task. Fixture see
 
 ## Phase 2: Foundational
 
-- [ ] T-R02F18-002 Create `Packages/VisualCore/Sources/VisualCoreScenes/TerrainError.swift`, `Packages/VisualCore/Sources/VisualCoreScenes/TerrainSettings.swift` ("P 1 … 64; C power of two 4 … 128; s finite
+- [X] T-R02F18-002 Create `Packages/VisualCore/Sources/VisualCoreScenes/TerrainError.swift`, `Packages/VisualCore/Sources/VisualCoreScenes/TerrainSettings.swift` ("P 1 … 64; C power of two 4 … 128; s finite — Verified 2026-11-19: lead retest 2026-11-19: R02-F18.host.json (exit 0, full suite); TerrainSettingsTests 4 passed (every terrain and sky refusal with its code; both stored forms round-trip byte for byte; newer, damaged and out-of-range forms refused)
   > 0; L 1 … log₂C; D finite > 0; budget 1 … 4,194,304 (default 262,144); JSON schema 1") and `Packages/VisualCore/Sources/VisualCoreScenes/SkyParameters.swift`
   (SkyError; SkyParameters "sunRadius 0.001 … 0.2 rad; glowStrength 0 … 4; glowExponent 1 … 4,096; all finite; JSON schema
   1", defaults of data-model.md) with `Packages/VisualCore/Tests/VisualCoreScenesTests/TerrainSettingsTests.swift` (every refusal and reason code; both round-trip byte
