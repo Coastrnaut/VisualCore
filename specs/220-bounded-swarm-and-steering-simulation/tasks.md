@@ -33,7 +33,7 @@ its check record (no trailers). No {owner} tasks; one {device} task. Fixture see
 
 ## Phase 5: Stories 2, 3 and 5 — the swarm (P1, P2)
 
-- [ ] T-R02F20-005 [US2] [US3] [US5] Create `Packages/VisualCore/Sources/VisualCoreSimulation/Swarm.swift` (SwarmEdges; Swarm "≤ 65,536 agents; charges count = agents
+- [X] T-R02F20-005 [US2] [US3] [US5] Create `Packages/VisualCore/Sources/VisualCoreSimulation/Swarm.swift` (SwarmEdges; Swarm "≤ 65,536 agents; charges count = agents — Verified 2026-11-20: 2026-11-20 host-4 exit 0: SwarmTests 7 tests/26 cases (20 swarms × 500 steps bit-identical, 0 bound/speed violations; orbit speed 4.0e-14, closure 6.3e-15 of radius; round trip 13,410 bytes; 16 malformed forms refused) (.autonomy/migration/checks/R02-F20.host-4.json)
   count, each finite with abs(q) ≤ 100; bounds valid; agents finite; neighbourRadius finite > 0, neighbourLimit ≥ 1, others finite ≥ 0; speedLimit finite > 0; JSON schema 1;
   decode re-validates"; step per clarification Q3)
   with `Packages/VisualCore/Tests/VisualCoreSimulationTests/SwarmTests.swift` (20 seeded swarms of 20 … 200 agents × 500 steps twice bit-identical, every agent inside its bounds with speed
