@@ -63,3 +63,10 @@ its check record (no trailers). No {owner} tasks; one {device} task. Fixture see
 
 001 → 002 → {003, 004} in parallel → 005 (needs 003) → 006 → … → 011. Agents: A (003), B (004), C (005 after 003).
 Shared files (002, docs) stay with the lead. MVP: Stories 1 and 2.
+
+## Phase 7: Convergence
+
+- [ ] T-R02F20-013 Add a swarm test for agents stacked at one point and an agent starting exactly on a strong pole
+  (s = 1,000, q = 100, ε = 1e-6): 200 steps stay finite, inside the bounds and within the speed limit, and the stacked
+  agents separate, in `Packages/VisualCore/Tests/VisualCoreSimulationTests/SwarmTests.swift`; `--name host-5` per spec
+  Edge Cases (partial)
