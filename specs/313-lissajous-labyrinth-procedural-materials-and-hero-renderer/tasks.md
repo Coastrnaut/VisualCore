@@ -18,7 +18,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 2: Story 1 and 2 — the scene and renderer purity (P1) 🎯
 
-- [ ] T-R02G0203-003 [P] [US1] Create `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthShaders.swift` (thread, solid sources; uniform names) with
+- [X] T-R02G0203-003 [P] [US1] Create `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthShaders.swift` (thread, solid sources; uniform names) with — Verified 2026-11-20: 2026-11-20 host-2 exit 0 (shader sources, 11 tests)
   `Packages/ExperiencesRound02/LissajousLabyrinth/CoreTests/LissajousLabyrinthShaderSourceTests.swift` (version line, declared uniforms, no texture samplers,
   bounded loops); `--name host-2`
 - [ ] T-R02G0203-004 [P] [US1] Create `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthSceneGeometry.swift` (path at a tier's stride, thread mesh
