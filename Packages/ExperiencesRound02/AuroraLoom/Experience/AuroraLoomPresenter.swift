@@ -6,7 +6,11 @@
 // no drawing result reaches the kernel (renderer purity, R2-G01-INV-10). Feature 304 (R02-G01-04) T-R02G0104-004 routes
 // canvas touches through `AuroraLoomGestureController`: one finger drags an anchor or a dial and sends one `ribbon.move` on
 // release, two fingers orbit the camera (presentation only), and the selection and the drag preview are mirrored for the
-// scene, the description and the controls.
+// scene, the description and the controls. Feature 305 (R02-G01-05) T-R02G0105-005 (FR-R02G0105-001 … 005): the mirror
+// carries the tutorial instruction, the hint revealed so far (`showHint()` reveals the next of three levels for the
+// current play; a change of the play hides it), the failure explanation with undo and retry, the mode, the open levels,
+// the goal (allowance and certified shortest) and the stars; the daily level is chosen from the local calendar date read
+// here (`playDaily(port:date:)`), never in the core.
 #if os(iOS)
 import AuroraLoomCore
 import Foundation
@@ -33,6 +37,24 @@ final class AuroraLoomMirror {
     var preview: AuroraLoomMove?
     /// The text of the last refused move, if any.
     var message: String?
+    /// The tutorial instruction for the current step; nil when the tutorial is done (feature 305).
+    var instruction: String?
+    /// The hint level revealed for the current play (0 = none, 1 … 3).
+    var hintLevel = 0
+    /// The text of the revealed hint; nil when none is revealed or the play has ended.
+    var hintText: String?
+    /// The failure explanation while the play has failed; nil otherwise.
+    var failureText: String?
+    /// The mode: campaign, practice or the daily level.
+    var mode: AuroraLoomMode = .campaign
+    /// The highest open level (levels 1 … frontier are open).
+    var frontier = 1
+    /// The certified shortest solution of the level (the best possible).
+    var shortest = 0
+    /// The stars earned on this level so far; nil when it is not solved yet.
+    var stars: Int?
+    /// The band of the level (1 … 5, 20 levels each).
+    var band = 1
 }
 
 /// One entry of the tier log: the tier drawn and why it changed.
@@ -58,6 +80,10 @@ final class AuroraLoomPresenter: ExperiencePresenter {
     private(set) var gestures = AuroraLoomGestureController()
     /// The steps and whether the level is playing, from the latest core the presenter saw.
     private var latest: (steps: AuroraLoomSteps, playing: Bool)?
+    /// The latest core the presenter described (hints are computed from it).
+    private(set) var latestCore: AuroraLoomExperienceCore?
+    /// The level and play fingerprint the revealed hint belongs to; a different play hides the hint.
+    private var hintKey: String?
 
     init(reduceMotion: Bool, reduceFlashing: Bool) {
         self.reduceMotion = reduceMotion
@@ -111,7 +137,7 @@ final class AuroraLoomPresenter: ExperiencePresenter {
     var gestureActions: Set<String> { ["ribbon.move"] }
 
     /// The native controls send every action a gesture can, and more.
-    var nativeActions: Set<String> { ["ribbon.move", "play.undo", "play.redo", "level.next"] }
+    var nativeActions: Set<String> { Set(AuroraLoomExperienceCore.actionIDs) }
 
     /// Routes a touch through the gesture controller; a finished drag that changed a step sends one `ribbon.move`.
     func pointer(_ event: PointerEvent, viewSize: Vec2, port: ExperienceActionPort) {
@@ -142,29 +168,111 @@ final class AuroraLoomPresenter: ExperiencePresenter {
         mirror.selectedRibbon = gestures.selectedRibbon
     }
 
+    // MARK: Teaching (feature 305)
+
+    /// The key of a play for the revealed hint: the level number and the play's fingerprint.
+    private static func hintKey(_ core: AuroraLoomExperienceCore) -> String {
+        "\(core.levelNumber)/\(core.play.fingerprint)"
+    }
+
+    /// Reveals the next hint level (up to 3) for the current play; nothing when the play has ended. Never changes
+    /// the state.
+    func showHint() {
+        guard let core = latestCore else { return }
+        let key = Self.hintKey(core)
+        let next = hintKey == key ? min(mirror.hintLevel + 1, 3) : 1
+        guard let hint = core.hint(level: next) else {
+            hintKey = nil
+            mirror.hintLevel = 0
+            mirror.hintText = nil
+            return
+        }
+        hintKey = key
+        mirror.hintLevel = next
+        mirror.hintText = hint.text
+    }
+
+    /// The action and values that start the current level again in its mode: `mode.practice` in practice, the daily
+    /// date's `mode.daily` in daily mode, `level.select` of the level in campaign.
+    func retryAction(date: DateComponents) -> (control: String, values: [Double]) {
+        guard let core = latestCore else { return ("mode.campaign", []) }
+        switch core.mode {
+        case .practice: return ("mode.practice", [])
+        case .daily: return ("mode.daily", Self.dateValues(date))
+        case .campaign: return ("level.select", [Double(core.levelNumber)])
+        }
+    }
+
+    /// Starts the current level again in its mode (see ``retryAction(date:)``), with today's local date in daily mode.
+    @discardableResult
+    func retry(port: ExperienceActionPort, date: DateComponents = AuroraLoomPresenter.today()) -> ActionResult {
+        let action = retryAction(date: date)
+        return port.send(action.control, action.values)
+    }
+
+    /// Plays the daily level of `date` (the local calendar date by default; the core never reads a clock).
+    @discardableResult
+    func playDaily(port: ExperienceActionPort, date: DateComponents = AuroraLoomPresenter.today()) -> ActionResult {
+        port.send("mode.daily", Self.dateValues(date))
+    }
+
+    /// The local calendar date now, in the user's calendar converted to Gregorian year, month and day.
+    static func today() -> DateComponents {
+        Calendar(identifier: .gregorian).dateComponents(in: .current, from: Date())
+    }
+
+    /// The values of `mode.daily` for `date`: year, month, day (0 for a missing part, which the core refuses).
+    static func dateValues(_ date: DateComponents) -> [Double] {
+        [Double(date.year ?? 0), Double(date.month ?? 0), Double(date.day ?? 0)]
+    }
+
     func describe(_ core: AuroraLoomExperienceCore) -> String {
         let play = core.play
+        latestCore = core
         mirror.steps = play.steps
         mirror.stage = play.stage
         mirror.levelNumber = core.levelNumber
         mirror.spent = play.spent
         mirror.allowance = play.level.allowance
+        mirror.instruction = core.tutorial == .done ? nil : core.tutorial.text
+        mirror.failureText = core.failureExplanation?.text
+        mirror.mode = core.mode
+        mirror.frontier = core.progress.frontier
+        mirror.shortest = core.certifiedShortest
+        mirror.stars = core.progress.solved[core.levelNumber]?.stars
+        mirror.band = AuroraLoomProgress.band(of: core.levelNumber)
+        if hintKey != Self.hintKey(core) || play.stage != .playing {
+            hintKey = nil
+            mirror.hintLevel = 0
+            mirror.hintText = nil
+        }
         let snapshot = core.snapshot(time: 0)
         var met = 0
         for ribbon in 0..<3 { for gate in 0..<4 where snapshot.lit(ribbon: ribbon, gate: gate) { met += 1 } }
-        var text = "Aurora Loom level \(core.levelNumber). "
+        var text = "Aurora Loom level \(core.levelNumber), band \(mirror.band). "
+        switch core.mode {
+        case .campaign: break
+        case .practice: text += "Practice. "
+        case .daily: text += "Daily level. "
+        }
+        if let instruction = mirror.instruction { text += instruction + " " }
         for ribbon in 0..<3 {
             text += "Ribbon \(ribbon + 1): wave \(play.steps.wave[ribbon]), phase \(play.steps.phase[ribbon]). "
         }
-        text += "\(met) of 12 gate crossings in harmony. Moves \(play.spent) of \(play.level.allowance). "
+        text += "\(met) of 12 gate crossings in harmony. Moves \(play.spent) of \(play.level.allowance); "
+        text += "best possible \(core.certifiedShortest). "
         let selected = gestures.selectedRibbon
         text += "Ribbon \(selected + 1) selected: wave \(play.steps.wave[selected]), phase \(play.steps.phase[selected]). "
         if let preview = gestures.preview {
             text += "Dragging ribbon \(preview.ribbon + 1) \(preview.control == .wave ? "wave" : "phase") to \(preview.step). "
         }
+        if let hint = mirror.hintText { text += "Hint: \(hint) " }
         switch play.stage {
-        case .won: text += "The loom is in harmony."
-        case .failed: text += "Out of moves."
+        case .won:
+            text += "The loom is in harmony."
+            if let stars = mirror.stars { text += " \(stars) of 3 stars." }
+        case .failed:
+            text += "Out of moves. " + (mirror.failureText ?? "")
         default: break
         }
         return text
@@ -172,7 +280,10 @@ final class AuroraLoomPresenter: ExperiencePresenter {
 
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
         AnyView(AuroraLoomControls(port: port, mirror: mirror, resetView: { [weak self] in self?.resetView() },
-                                   select: { [weak self] ribbon in self?.select(ribbon: ribbon) }))
+                                   select: { [weak self] ribbon in self?.select(ribbon: ribbon) },
+                                   showHint: { [weak self] in self?.showHint() },
+                                   retry: { [weak self] in self?.retry(port: port) },
+                                   playDaily: { [weak self] in self?.playDaily(port: port) }))
     }
 }
 #endif

@@ -4,8 +4,8 @@
   starting from given steps) and derive hints from its solution. Rationale: the solver already proves the fewest changes
   per ribbon; solving from the current steps makes every hint optimal and honest. Alternatives: a precomputed hint table
   per level (wrong after the first deviation).
-- **R2 Progress as state.** Decision: progress, mode and tutorial step live in the experience core, digested and
-  snapshotted (schema 2) with a schema-1 migration. Rationale: the shared contract restores whole sessions; R02-G01-07 then
+- **R2 Progress as state.** Decision: progress, mode and tutorial step live in the experience core, snapshotted (schema 2;
+  the tutorial step is not digested, so undo restores the earlier digest) with a schema-1 migration. Rationale: the shared contract restores whole sessions; R02-G01-07 then
   only adds the disk store.
 - **R3 Clock-free daily.** Decision: the presenter reads the local calendar date and sends it in `mode.daily`; the core maps
   it with a fixed formula. Rationale: the core stays deterministic and testable for every date.

@@ -242,7 +242,8 @@ import VisualCoreExperience
         let digest: StateDigest = try Self.digest(core)
         #expect(core.apply(ExperienceAction(control: "tutorial.dismiss", step: 0)) == .accepted)
         let dismissed: StateDigest = try Self.digest(core)
-        #expect(core.tutorial == .done && dismissed != digest)
+        // The tutorial step is not in the digest: undo must restore the earlier digest exactly (R2-G01-INV-05).
+        #expect(core.tutorial == .done && dismissed == digest)
         #expect(core.apply(ExperienceAction(control: "tutorial.dismiss", step: 0)) == .accepted)
         #expect(core.tutorial == .done)
         // A failure is explained; no hint is given then.
@@ -262,10 +263,15 @@ import VisualCoreExperience
             }
             if next == current { break }
         }
+        #expect(failing.play.stage == .failed)
         if failing.play.stage == .failed {
             let explanation: AuroraLoomFailureExplanation = try #require(failing.failureExplanation)
             #expect(explanation.mismatch == failing.play.failure && failing.hint(level: 3) == nil)
             #expect(failing.outcome?.code == Core.failedCode)
+            var rewound: Core = failing
+            #expect(rewound.apply(ExperienceAction(control: "play.undo", step: 0)) == .accepted)
+            #expect(rewound.play.stage == .playing && rewound.play.spent == failing.play.spent - 1)
+            #expect(rewound.failureExplanation == nil && rewound.outcome == nil)
         }
     }
 

@@ -18,7 +18,8 @@
 //                                  tutorial advances (`AuroraLoomTutorialStep.advanced`); a win in campaign or daily
 //                                  mode records the result (stars against the certified shortest); only campaign opens
 //                                  the next level;
-//   play.undo, play.redo           no values; the kernel's undo and redo (the tutorial never moves back);
+//   play.undo, play.redo           no values; the kernel's undo and redo (the tutorial never moves back); after a
+//                                  failure, undo rewinds the failing move (the earlier records replayed);
 //   level.next                     no values; the next open level after the current one, in cyclic order (level 1 is
 //                                  always open), in campaign mode with a fresh play;
 //   level.select [1…100]           an open level in campaign mode with a fresh play; `r02-g01.locked` for a closed one;
@@ -33,8 +34,9 @@
 // `r02-g01.stage`. A refused action changes nothing.
 //
 // Digest ("r02-g01.aurora-loom.v2"): the level number, the play's fingerprint (not its record history, so undo restores
-// the earlier digest; feature 304), the mode, the tutorial step and the progress (frontier, then each solved level in
-// order with its best moves and stars); never the quality tier or a time. Snapshot schema 2: the JSON object
+// the earlier digest; feature 304), the mode and the progress (frontier, then each solved level in order with its best
+// moves and stars); never the tutorial step (it never moves back, so with it undo could not restore the earlier digest,
+// R2-G01-INV-05; it is kept in the snapshot), the quality tier or a time. Snapshot schema 2: the JSON object
 // `{"level", "mode", "progress", "records", "tutorial"}` with sorted keys; restoring replays the records on a fresh play
 // of that level (the practice copy in practice mode) and throws `AuroraLoomRestoreRefusal` for a damaged payload, a level
 // number outside 1 … 100 or a trace the kernel refuses. Migration 1 → 2: a schema-1 `{"level", "records"}` gains campaign
@@ -96,7 +98,8 @@ public struct AuroraLoomExperienceCore: ExperienceCore, Equatable {
     public private(set) var progress: AuroraLoomProgress
     /// The mode: campaign, practice or the daily level.
     public private(set) var mode: AuroraLoomMode
-    /// The tutorial step shown on this level (`done` when none is shown).
+    /// The tutorial step shown on this level (`done` when none is shown); in the snapshot, not in the digest or `==`
+    /// (it never moves back on undo, R2-G01-INV-05).
     public private(set) var tutorial: AuroraLoomTutorialStep
     /// The certified shortest solution of the level, the goal shown with the allowance and the measure of stars.
     /// Derived from the level number, so not in the digest or `==`.
@@ -237,11 +240,11 @@ public struct AuroraLoomExperienceCore: ExperienceCore, Equatable {
         qualityTier = min(max(tier, 0), Self.qualityTiers - 1)
     }
 
-    /// Equal states: the level number, the play, the progress, the mode and the tutorial step (not the quality tier
+    /// Equal states: the level number, the play, the progress and the mode (not the tutorial step, the quality tier
     /// or the opening state).
     public static func == (lhs: AuroraLoomExperienceCore, rhs: AuroraLoomExperienceCore) -> Bool {
         lhs.levelNumber == rhs.levelNumber && lhs.play == rhs.play && lhs.progress == rhs.progress
-            && lhs.mode == rhs.mode && lhs.tutorial == rhs.tutorial
+            && lhs.mode == rhs.mode
     }
 
     // MARK: Contract
@@ -303,8 +306,14 @@ public struct AuroraLoomExperienceCore: ExperienceCore, Equatable {
                 try play.apply(move, expecting: play.fingerprint)
                 afterAcceptedPlay()
             case "play.undo":
-                try play.undo()
-                afterAcceptedPlay()
+                if play.stage == .failed, !play.records.isEmpty {
+                    // The kernel undoes only while playing; after a failure, undo rewinds the failing move by
+                    // replaying every earlier record (feature 305, FR-R02G0105-003: "undo or retry").
+                    play = try AuroraLoomPlay.replay(level: play.level, records: Array(play.records.dropLast()))
+                } else {
+                    try play.undo()
+                    afterAcceptedPlay()
+                }
             case "play.redo":
                 try play.redo()
                 afterAcceptedPlay()
@@ -403,18 +412,8 @@ public struct AuroraLoomExperienceCore: ExperienceCore, Equatable {
         }
     }
 
-    /// The digest form of a tutorial step: "wave-<r>", "phase-<r>", "harmony" or "done".
-    static func digestText(_ step: AuroraLoomTutorialStep) -> String {
-        switch step {
-        case .wave(let ribbon): "wave-\(ribbon)"
-        case .phase(let ribbon): "phase-\(ribbon)"
-        case .harmony: "harmony"
-        case .done: "done"
-        }
-    }
-
-    /// "r02-g01.aurora-loom.v2", then the level number, the play's fingerprint, the mode, the tutorial step, the
-    /// frontier and each solved level in order with its best moves and stars.
+    /// "r02-g01.aurora-loom.v2", then the level number, the play's fingerprint, the mode, the frontier and each solved
+    /// level in order with its best moves and stars (not the tutorial step; see the file header).
     public func writeDigest(into builder: inout DigestBuilder) throws(DigestError) {
         builder.add(Self.digestDomain)
         builder.add(levelNumber)
@@ -422,7 +421,6 @@ public struct AuroraLoomExperienceCore: ExperienceCore, Equatable {
         // digest exactly (R2-G01-INV-05; feature 304 T-R02G0104-005).
         builder.add(play.fingerprint)
         builder.add(Self.digestText(mode))
-        builder.add(Self.digestText(tutorial))
         builder.add(progress.frontier)
         let solved = progress.solved.keys.sorted()
         builder.add(count: solved.count)

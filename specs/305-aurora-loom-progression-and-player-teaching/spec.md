@@ -57,8 +57,9 @@ gate, tick, residual); the core may not read a clock.
   rules but does not open levels. `mode.practice` replays the current level with the allowance raised to the kernel's
   maximum (64); practice results never award stars or open levels; `mode.campaign` returns. Impact: FR-R02G0105-005;
   SC-R02G0105-004.
-- Q: Where does progress live and how is it versioned? → A: progress, the mode and the tutorial step are part of the
-  experience state: the digest includes them, and the snapshot payload becomes schema 2 (`{level, records, progress, mode,
+- Q: Where does progress live and how is it versioned? → A: progress and the mode are part of the experience
+  state and its digest; the tutorial step is snapshotted but not digested (it never moves back, so undo must still
+  restore the earlier digest, R2-G01-INV-05); and the snapshot payload becomes schema 2 (`{level, records, progress, mode,
   tutorial}`) with a migration from schema 1 (no progress, campaign mode, tutorial at its first step). New refusal codes:
   `r02-g01.locked`, `r02-g01.date`. Failure explanations read the kernel's worst mismatch: "Ribbon r is furthest off at gate
   g: x of a turn outside the tolerance after the last move" with undo and retry offered. Impact: FR-R02G0105-003, 007;

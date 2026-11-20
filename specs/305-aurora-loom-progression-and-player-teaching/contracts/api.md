@@ -20,5 +20,5 @@ public struct AuroraLoomProgress: Sendable, Equatable, Codable {
     public static func dailyLevel(year: Int, month: Int, day: Int) -> Int?
 }
 // AuroraLoomExperienceCore: controls + "level.select" [1…100], "mode.daily" [year, month, day], "mode.practice", "mode.campaign",
-// "tutorial.dismiss"; schemaVersion 2; migrations 1 → 2; progress, mode, tutorial in digest and payload; codes r02-g01.locked, r02-g01.date.
+// "tutorial.dismiss"; schemaVersion 2; migrations 1 → 2; progress and mode in digest and payload; tutorial in payload only (INV-05); codes r02-g01.locked, r02-g01.date.
 ```
