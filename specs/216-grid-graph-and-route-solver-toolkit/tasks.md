@@ -14,7 +14,7 @@ tests stay light beside the timed R02-F05 test.
 
 ## Phase 2: Foundational
 
-- [ ] T-R02F16-002 Create `Packages/VisualCore/Sources/VisualCoreSimulation/RouteError.swift`, `Packages/VisualCore/Sources/VisualCoreSimulation/RouteGraph.swift` (RouteEdge, RouteGraph "1 ≤ n ≤ 1,048,576;
+- [X] T-R02F16-002 Create `Packages/VisualCore/Sources/VisualCoreSimulation/RouteError.swift`, `Packages/VisualCore/Sources/VisualCoreSimulation/RouteGraph.swift` (RouteEdge, RouteGraph "1 ≤ n ≤ 1,048,576; — Verified 2026-11-19: lead 2026-11-19: R02-F16.host.json (exit 0, full suite; GraphFoundationTests 5 passed: limits and refusals, grid without corner cutting, schedule bounds, seven kinds round-trip byte for byte, newer and damaged refused)
   ≤ 4,194,304 edges; cost 0 … 1,000,000", RoutePath), `Packages/VisualCore/Sources/VisualCoreSimulation/GridGraph.swift` ("width, height 1 … 4,096; ≤ 1,048,576
   cells; node y·width + x; no corner cutting", offset order of contracts/api.md, Manhattan/Chebyshev estimates),
   `Packages/VisualCore/Sources/VisualCoreSimulation/RouteSchedule.swift` ("T 1 … 4,096; cellCount × T ≤ 16,777,216", TimedState) and `Packages/VisualCore/Sources/VisualCoreSimulation/SolverCertificate.swift`
