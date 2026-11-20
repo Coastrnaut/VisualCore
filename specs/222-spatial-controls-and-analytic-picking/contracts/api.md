@@ -1,0 +1,16 @@
+# Contract: public API (R02-F22)
+
+VisualCoreMath (pure, optionals instead of errors):
+- `public struct Plane3: Sendable, Equatable, Codable { public let point: Vec3; public let normal: Vec3; public init?(point: Vec3, normal: Vec3) /* normalises */; public func signedDistance(_ p: Vec3) -> Double }`
+- `extension Ray3 { public func intersect(plane: Plane3) -> RayHit3? }`
+- `public enum ScreenProjection { public static func ray(through point: Vec2, viewport: Vec2, inverseViewProjection: Mat4) -> Ray3?; public static func project(_ world: Vec3, viewProjection: Mat4, viewport: Vec2) -> (point: Vec2, depth: Double)? }`
+
+VisualCoreScenes (throwing members use `throws(SpatialControlError)`):
+- `public enum SpatialControlError: Error, Equatable, Sendable { case viewport, handleLimit, parameter(String), historyDepth, newerSchema(Int), malformed(String); public var reasonCode: String }`
+- `public enum HandleKind: Sendable, Equatable, Codable { case point, axis(Vec3), plane(Vec3), rotation(Vec3) }`
+- `public struct SpatialHandle: Sendable, Equatable, Codable { public let id: Int; public let position: Vec3; public let kind: HandleKind; public let hitRadius: Double; public init(id: Int, position: Vec3, kind: HandleKind = .point, hitRadius: Double = 0) throws }`
+- `public enum HandlePicker { public static let maxHandles = 1_024; public static let minimumTouchRadius = 22.0; public static func pick(_ handles: [SpatialHandle], at touch: Vec2, viewProjection: Mat4, viewport: Vec2, touchRadius: Double = minimumTouchRadius) throws -> Int? /* index */ }`
+- `public enum DragConstraint: Sendable, Equatable { case axis(Vec3), plane(Vec3) }`
+- `public struct HandleDrag: Sendable, Equatable { public static let planeGrazing = 0.1; public static let axisGrazing = 0.995; public let start: Vec3; public let constraint: DragConstraint; public private(set) var position: Vec3; public private(set) var isHeld: Bool; public init?(start: Vec3, ray: Ray3, constraint: DragConstraint, bounds: (min: Vec3, max: Vec3)? = nil); public mutating func update(ray: Ray3) -> Vec3 }`
+- `public struct ControlHistory<Value: Sendable & Equatable & Codable>: Sendable, Equatable, Codable { public static var schema: Int { 1 }; public static var maxDepth: Int { 1_000 }; public let depth: Int; public private(set) var dropped: Int; public var canUndo: Bool; public var canRedo: Bool; public var undoCount: Int; public var redoCount: Int; public init(depth: Int = 100) throws; public mutating func record(_ label: String, before: Value, after: Value, coalescing key: String? = nil); public mutating func undo() -> Value?; public mutating func redo() -> Value?; public func encoded() -> Data; public static func decode(_ data: Data) throws -> ControlHistory }`
+- `public struct AssistiveStep: Sendable, Equatable { public let name: String; public let start: Double; public let step: Double; public let range: ClosedRange<Double>; public private(set) var index: Int; public var value: Double; public var description: String; public init(name: String, start: Double, step: Double, range: ClosedRange<Double>) throws; public mutating func increment() -> (before: Double, after: Double)? /* nil at the limit */; public mutating func decrement() -> (before: Double, after: Double)? }`
