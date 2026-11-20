@@ -27,7 +27,7 @@ tests stay short (< 10 s each). No {owner} tasks.
   `reconciliationDropped`; replay mode with `replay.start [1…100]`, `replay.step`, `replay.stop` and codes
   r02-g01.no-replay, r02-g01.replay-end, r02-g01.replay), `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomScenarios.swift` and
   `Packages/ExperiencesRound02/AuroraLoom/scenario-manifest.json`, with `Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomExperienceCoreTests.swift` updates; `--name host-2`
-- [ ] T-R02G0107-004 [P] [US1] Create `Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomPersistenceTests.swift` (agent B: 500 seeded reachable
+- [X] T-R02G0107-004 [P] [US1] Create `Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomPersistenceTests.swift` (agent B: 500 seeded reachable — Verified 2026-11-20: 2026-11-20 host-3 exit 0 (18 tests: 500 round trips, 100 schema-1 and 100 schema-2 migrations, 200 reconciled saves, all 100 certified traces replay with recorded fingerprints, replay never changes progress; each under 5 s)
   states round-trip with equal digests; 100 schema-1 and schema-2 payloads migrate with progress kept; 200 seeded saves
   with honest and edited results reconcile exactly; every certified level's stored trace replays with the recorded
   fingerprints; replay never changes progress); `--name host-3`
