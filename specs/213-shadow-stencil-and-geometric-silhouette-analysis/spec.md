@@ -131,6 +131,9 @@ A target mask is stored with a puzzle and compared later, by a later version of 
 - **A degenerate projection (a face seen edge-on):** contributes nothing; no zero-area polygon is returned.
 - **A polygon larger than the mask region:** clipped to the region.
 - **A mask of zero size or beyond the size limit:** refused.
+- **The coverage target cannot be made (memory or a missing format):** the drawing throws and draws nothing; every
+  decision (projection, mask, score) is unaffected because none depends on the GPU.
+- **A context rebuild:** the renderer makes its program and target again on the next draw.
 - **Self-intersecting or non-convex projected polygons from a mesh:** covered by the union of their triangles.
 
 ## Requirements *(mandatory)*
