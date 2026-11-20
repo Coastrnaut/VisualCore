@@ -48,6 +48,9 @@ are never device evidence; device runs wait for `ImplementationLock-100`.
 - **Game Cores run on the host.** `swift test --package-path Packages/ExperiencesRound02` runs the round-two games'
   pure Cores (rules, levels, solvers) on macOS in seconds, locally and on CI; their Experience targets (UIKit, GL) are
   tested on the simulator from each game's renderer feature on.
+- **Hot loops read shared tables through one buffer.** Parallel test runs that index a shared global array per sample
+  contend on its reference count (Lissajous Labyrinth's lap went from about 35 s of tests to 5 s once the sine table was
+  read through `withUnsafeBufferPointer` once per lap).
 - **Content witnesses are files compared byte for byte.** A game's generated levels carry witness files (Aurora Loom:
   `docs/games/aurora-loom/levels/NNN.witness.json`); the catalog test regenerates every witness and compares bytes, and
   writes the files only when asked (`AURORA_LOOM_WRITE_WITNESSES=1 swift test --package-path Packages/ExperiencesRound02
