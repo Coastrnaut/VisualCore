@@ -2415,11 +2415,17 @@ VisualCoreScenes | enum | public enum GestureKind: String, Sendable, Equatable, 
 VisualCoreScenes | enum | public enum GestureState: String, Sendable, Equatable
 VisualCoreScenes | enum | public enum InstanceOrder
 VisualCoreScenes | enum | public enum Kind: String, Sendable, Codable, CaseIterable
+VisualCoreScenes | enum | public enum LSystem
 VisualCoreScenes | enum | public enum MeshBounds: Sendable, Equatable
 VisualCoreScenes | enum | public enum MeshError: Error, Sendable, Equatable
 VisualCoreScenes | enum | public enum Mode: String, Sendable, Codable
 VisualCoreScenes | enum | public enum Outcome: String, Sendable
 VisualCoreScenes | enum | public enum Phase: String, Sendable, Equatable, Codable
+VisualCoreScenes | enum | public enum PlantError: Error, Equatable, Sendable
+VisualCoreScenes | enum | public enum PlantMesh
+VisualCoreScenes | enum | public enum PlantPart: String, Sendable, Codable, CaseIterable
+VisualCoreScenes | enum | public enum PlantScatter
+VisualCoreScenes | enum | public enum PlantTurtle
 VisualCoreScenes | enum | public enum PointerPhase: String, Sendable, Codable
 VisualCoreScenes | enum | public enum PolygonCleanup
 VisualCoreScenes | enum | public enum Primitive: Sendable, Equatable
@@ -2468,6 +2474,7 @@ VisualCoreScenes | func | public func hitTest(_ world: Vec2) -> SceneNode?
 VisualCoreScenes | func | public func interleavedPositionNormal() -> [Float]
 VisualCoreScenes | func | public func level(_ index: Int) -> StreamingLevel
 VisualCoreScenes | func | public func mesh() -> Mesh
+VisualCoreScenes | func | public func mesh() throws(MeshError) -> Mesh
 VisualCoreScenes | func | public func mesh(budget: MeshBudget = .default) throws(MeshError) -> Mesh
 VisualCoreScenes | func | public func mesh(for key: UInt64, build: () throws -> Mesh) rethrows -> Mesh
 VisualCoreScenes | func | public func neighbourhood(segment: Int) -> (Vec3, Vec3, Vec3, Vec3)
@@ -2478,6 +2485,7 @@ VisualCoreScenes | func | public func position(segment: Int, t: Double) -> Vec3
 VisualCoreScenes | func | public func removeAll()
 VisualCoreScenes | func | public func removeFromParent()
 VisualCoreScenes | func | public func rotated(by rotation: Quat) throws(SDFError) -> SDFShape
+VisualCoreScenes | func | public func rule(for symbol: Character) -> PlantRule?
 VisualCoreScenes | func | public func scaled(by factor: Double) throws(SDFError) -> SDFShape
 VisualCoreScenes | func | public func size(longEdge: Int, aspect: ExportAspect) -> ExportSize
 VisualCoreScenes | func | public func toCamera(_ p: Vec2) -> Vec2?
@@ -2509,6 +2517,7 @@ VisualCoreScenes | func | public mutating func tick(now: Double)
 VisualCoreScenes | func | public mutating func tick(now: Double) -> [GestureOutcome]
 VisualCoreScenes | func | public mutating func triangle(_ a: UInt32, _ b: UInt32, _ c: UInt32) throws(MeshError)
 VisualCoreScenes | func | public mutating func vertex(_ position: Vec3, normal: Vec3, uv: Vec2) throws(MeshError) -> UInt32
+VisualCoreScenes | func | public static func == (a: PlantRule, b: PlantRule) -> Bool
 VisualCoreScenes | func | public static func area(_ polygon: [Vec2]) -> Double
 VisualCoreScenes | func | public static func areaVector(_ corners: [Vec3]) -> Vec3
 VisualCoreScenes | func | public static func backToFront(depths: [Double]) throws(MeshError) -> [Int]
@@ -2516,21 +2525,26 @@ VisualCoreScenes | func | public static func bevelledBox(size: Vec3, radius: Dou
 VisualCoreScenes | func | public static func bounded(by planes: [ClipPlane], min: Vec3, max: Vec3) throws(ConvexSolidError) -> ConvexSolid
 VisualCoreScenes | func | public static func box(halfExtents: Vec3) throws(SDFError) -> SDFShape
 VisualCoreScenes | func | public static func box(min: Vec3, max: Vec3) throws(ConvexSolidError) -> ConvexSolid
+VisualCoreScenes | func | public static func build(_ skeleton: PlantSkeleton, petal: PetalShape, cap: CapShape,
 VisualCoreScenes | func | public static func capsule(a: Vec3, b: Vec3, radius: Double) throws(SDFError) -> SDFShape
 VisualCoreScenes | func | public static func clean(_ points: [Vec3], normal: Vec3, tolerance: Double) throws(ConvexSolidError) -> [Vec3]
 VisualCoreScenes | func | public static func colour(direction: Vec3, sun: Vec3, parameters: SkyParameters) throws(SkyError) -> Vec3
 VisualCoreScenes | func | public static func coverage(point: Vec3, a: Vec3, b: Vec3, width: Double) -> Double
 VisualCoreScenes | func | public static func cube() -> Mesh
 VisualCoreScenes | func | public static func decode(_ data: Data) throws(ConvexSolidError) -> ConvexSolidDocument
+VisualCoreScenes | func | public static func decode(_ data: Data) throws(PlantError) -> PlantGrammar
 VisualCoreScenes | func | public static func decode(_ data: Data) throws(SDFError) -> SDFDocument
 VisualCoreScenes | func | public static func decode(_ data: Data) throws(ShadowError) -> CoverageMaskDocument
 VisualCoreScenes | func | public static func decode(_ data: Data) throws(SkyError) -> SkyParameters
 VisualCoreScenes | func | public static func decode(_ data: Data) throws(TerrainError) -> TerrainSettings
+VisualCoreScenes | func | public static func derive(_ grammar: PlantGrammar) throws(PlantError) -> String
 VisualCoreScenes | func | public static func directional(towards d: Vec3) throws(ShadowError) -> ShadowLight
 VisualCoreScenes | func | public static func distanceToSegment(point: Vec3, a: Vec3, b: Vec3) -> Double
 VisualCoreScenes | func | public static func extrusion(outline: [Vec2], depth: Double, caps: Bool,
 VisualCoreScenes | func | public static func falloff(_ r: Double) -> Double
+VisualCoreScenes | func | public static func grow(_ grammar: PlantGrammar) throws(PlantError) -> PlantSkeleton
 VisualCoreScenes | func | public static func hull(_ points: [Vec2]) -> [Vec2]
+VisualCoreScenes | func | public static func interpret(_ word: String, grammar: PlantGrammar) throws(PlantError) -> PlantSkeleton
 VisualCoreScenes | func | public static func intersection(_ shapes: [SDFShape]) throws(SDFError) -> SDFShape
 VisualCoreScenes | func | public static func march(_ shape: SDFShape, ray: Ray3, options: SDFMarchOptions = .standard) -> SDFMarchResult
 VisualCoreScenes | func | public static func masks(of field: HeightField) -> FieldGrid
@@ -2550,6 +2564,7 @@ VisualCoreScenes | func | public static func ribbon(_ samples: CurveSamples, wid
 VisualCoreScenes | func | public static func roundedBox(halfExtents: Vec3, radius: Double) throws(SDFError) -> SDFShape
 VisualCoreScenes | func | public static func sample(_ curve: some ParametricCurve, tolerance: Double,
 VisualCoreScenes | func | public static func sample(_ shape: SDFShape, boundsMin: Vec3, boundsMax: Vec3,
+VisualCoreScenes | func | public static func scatter(minX: Double, maxX: Double, minZ: Double, maxZ: Double, spacing: Double, maxCount: Int,
 VisualCoreScenes | func | public static func select(_ settings: TerrainSettings, viewpoint: Vec3) throws(TerrainError) -> [TerrainPiece]
 VisualCoreScenes | func | public static func smoothMin(_ a: Double, _ b: Double, _ k: Double) -> Double
 VisualCoreScenes | func | public static func smoothUnion(_ a: SDFShape, _ b: SDFShape, radius: Double) throws(SDFError) -> SDFShape
@@ -2565,6 +2580,8 @@ VisualCoreScenes | func | public static func validated(_ node: Node) throws(SDFE
 VisualCoreScenes | init | public init()
 VisualCoreScenes | init | public init(_ a: CoverageMask, _ b: CoverageMask) throws(ShadowError)
 VisualCoreScenes | init | public init(_ declarations: [GestureDeclaration])
+VisualCoreScenes | init | public init(_ predecessor: Character, _ word: String) throws(PlantError)
+VisualCoreScenes | init | public init(_ predecessor: Character, weighted: [(String, Double)]) throws(PlantError)
 VisualCoreScenes | init | public init(behind: Int, ahead: Int, drawDistance: Double, elementShare: Double)
 VisualCoreScenes | init | public init(boundsMin: Vec3, boundsMax: Vec3, resolution: Int, insideCount: Int, volume: Double, digest: UInt64)
 VisualCoreScenes | init | public init(budget: MeshBudget = .default, weldTolerance: Double = 1e-9, weldPositionsOnly: Bool = false)
@@ -2578,6 +2595,8 @@ VisualCoreScenes | init | public init(id: String = "", position: Vec2 = .zero, r
 VisualCoreScenes | init | public init(id: String, kind: GestureKind, priority: Int, pointers: Int)
 VisualCoreScenes | init | public init(kept: ConvexSolid?, removed: ConvexSolid?, cap: [Vec3], keptVolume: Double, removedVolume: Double)
 VisualCoreScenes | init | public init(kind: Kind, triangle: Int? = nil, vertex: Int? = nil, edge: [UInt32]? = nil)
+VisualCoreScenes | init | public init(length: Double, baseRadius: Double, tipRadius: Double, bend: Double, sides: Int,
+VisualCoreScenes | init | public init(length: Double, width: Double, curl: Double, segments: Int) throws(PlantError)
 VisualCoreScenes | init | public init(mask: CoverageMask)
 VisualCoreScenes | init | public init(maxDistance: Double = 10, maxDuration: Double = 0.3)
 VisualCoreScenes | init | public init(maxEdge: Int, maxPixels: Int = ExportGeometry.defaultMaxPixels)
@@ -2600,6 +2619,7 @@ VisualCoreScenes | init | public init(points: [Vec3], closed: Bool) throws(MeshE
 VisualCoreScenes | init | public init(position: Vec3, tangent: Vec3, normal: Vec3, binormal: Vec3)
 VisualCoreScenes | init | public init(positions: [Vec3], closed: Bool) throws(MeshError)
 VisualCoreScenes | init | public init(problems: [MeshProblem], moreProblems: Int, summary: MeshSummary)
+VisualCoreScenes | init | public init(radius: Double, height: Double, rim: Double, sides: Int, rings: Int) throws(PlantError)
 VisualCoreScenes | init | public init(seed: UInt64)
 VisualCoreScenes | init | public init(seed: UInt64, pointerCount: Int = 1, strokeSamples: Int = 30, speed: Double = 600,
 VisualCoreScenes | init | public init(shape: SDFShape)
@@ -2607,6 +2627,7 @@ VisualCoreScenes | init | public init(size: Vec2, scale: Double)
 VisualCoreScenes | init | public init(solid: ConvexSolid)
 VisualCoreScenes | init | public init(solid: ConvexSolid, ledger: VolumeLedger? = nil)
 VisualCoreScenes | init | public init(spacing: Double, maxSamplesPerUpdate: Int = 16, smoothing: Double = 0.5)
+VisualCoreScenes | init | public init(start: String, rules: [PlantRule], generations: Int, angle: Double, step: Double, radius: Double = 0.05,
 VisualCoreScenes | init | public init(toBuild: [Int], toRetire: [Int])
 VisualCoreScenes | init | public init(vertices: Int, triangles: Int, boundaryEdges: Int, isClosed: Bool,
 VisualCoreScenes | init | public init(width: Int, height: Int)
@@ -2615,10 +2636,14 @@ VisualCoreScenes | init | public init?(id: String, title: String, width: Int, he
 VisualCoreScenes | init | public init?(levels: [StreamingLevel], pieceLength: Double)
 VisualCoreScenes | init | public init?(seed: UInt64, octaves: Int, frequency: Double, lacunarity: Double = 2, gain: Double = 0.5)
 VisualCoreScenes | let | public let ahead: Int
+VisualCoreScenes | let | public let angle: Double
 VisualCoreScenes | let | public let arcLengths: [Double]
+VisualCoreScenes | let | public let baseRadius: Double
 VisualCoreScenes | let | public let behind: Int
+VisualCoreScenes | let | public let bend: Double
 VisualCoreScenes | let | public let boundsMax: Vec3
 VisualCoreScenes | let | public let boundsMin: Vec3
+VisualCoreScenes | let | public let branches: [PlantBranch]
 VisualCoreScenes | let | public let budget: MeshBudget
 VisualCoreScenes | let | public let cap: [Vec3]
 VisualCoreScenes | let | public let capacity: Int
@@ -2627,16 +2652,21 @@ VisualCoreScenes | let | public let cells: Int
 VisualCoreScenes | let | public let coarserNeighbours: [Bool]
 VisualCoreScenes | let | public let column: Int
 VisualCoreScenes | let | public let columns: Int
+VisualCoreScenes | let | public let curl: Double
 VisualCoreScenes | let | public let declarations: [GestureDeclaration]
 VisualCoreScenes | let | public let depth: Int
 VisualCoreScenes | let | public let digest: UInt64
 VisualCoreScenes | let | public let distance: Double
 VisualCoreScenes | let | public let drawDistance: Double
 VisualCoreScenes | let | public let elementShare: Double
+VisualCoreScenes | let | public let end: Vec3
 VisualCoreScenes | let | public let faces: [[Int]]
 VisualCoreScenes | let | public let frameInterval: Double
 VisualCoreScenes | let | public let frequency: Double
 VisualCoreScenes | let | public let gain: Double
+VisualCoreScenes | let | public let generations: Int
+VisualCoreScenes | let | public let heading: Vec3
+VisualCoreScenes | let | public let height: Double
 VisualCoreScenes | let | public let height: Int
 VisualCoreScenes | let | public let id: Int
 VisualCoreScenes | let | public let id: String
@@ -2645,12 +2675,16 @@ VisualCoreScenes | let | public let intersection: Int
 VisualCoreScenes | let | public let isClosed: Bool
 VisualCoreScenes | let | public let kept: ConvexSolid?
 VisualCoreScenes | let | public let keptVolume: Double
+VisualCoreScenes | let | public let kind: PlantPart
 VisualCoreScenes | let | public let lacunarity: Double
 VisualCoreScenes | let | public let ledger: VolumeLedger?
+VisualCoreScenes | let | public let left: Vec3
+VisualCoreScenes | let | public let length: Double
 VisualCoreScenes | let | public let level: Int
 VisualCoreScenes | let | public let levelDistance: Double
 VisualCoreScenes | let | public let levels: Int
 VisualCoreScenes | let | public let levels: [StreamingLevel]
+VisualCoreScenes | let | public let markers: [PlantMarker]
 VisualCoreScenes | let | public let mask: CoverageMask
 VisualCoreScenes | let | public let max: Vec2
 VisualCoreScenes | let | public let maxBytes: Int
@@ -2682,32 +2716,50 @@ VisualCoreScenes | let | public let point: Vec3
 VisualCoreScenes | let | public let pointerCount: Int
 VisualCoreScenes | let | public let points: [Vec3]
 VisualCoreScenes | let | public let position: Vec2
+VisualCoreScenes | let | public let position: Vec3
 VisualCoreScenes | let | public let positions: [Vec3]
+VisualCoreScenes | let | public let predecessor: Character
+VisualCoreScenes | let | public let radius: Double
+VisualCoreScenes | let | public let radiusFactor: Double
 VisualCoreScenes | let | public let remaining: Double
 VisualCoreScenes | let | public let removed: ConvexSolid?
 VisualCoreScenes | let | public let removed: Double
 VisualCoreScenes | let | public let removedVolume: Double
 VisualCoreScenes | let | public let resolution: Int
+VisualCoreScenes | let | public let rim: Double
+VisualCoreScenes | let | public let rings: Int
 VisualCoreScenes | let | public let row: Int
 VisualCoreScenes | let | public let rows: Int
+VisualCoreScenes | let | public let rules: [PlantRule]
+VisualCoreScenes | let | public let scale: Double
 VisualCoreScenes | let | public let seed: UInt64
+VisualCoreScenes | let | public let segments: Int
 VisualCoreScenes | let | public let shape: SDFShape
+VisualCoreScenes | let | public let sides: Int
+VisualCoreScenes | let | public let size: Double
 VisualCoreScenes | let | public let smoothing: Double
 VisualCoreScenes | let | public let solid: ConvexSolid
 VisualCoreScenes | let | public let spacing: Double
 VisualCoreScenes | let | public let speed: Double
+VisualCoreScenes | let | public let start: String
+VisualCoreScenes | let | public let start: Vec3
 VisualCoreScenes | let | public let startedInside: Bool
+VisualCoreScenes | let | public let step: Double
 VisualCoreScenes | let | public let steps: Int
 VisualCoreScenes | let | public let strokeSamples: Int
+VisualCoreScenes | let | public let successors: [(word: String, weight: Double)]
 VisualCoreScenes | let | public let tangents: [Vec3]
 VisualCoreScenes | let | public let timestamp: Double
+VisualCoreScenes | let | public let tipRadius: Double
 VisualCoreScenes | let | public let title: String
 VisualCoreScenes | let | public let toBuild: [Int]
 VisualCoreScenes | let | public let toRetire: [Int]
 VisualCoreScenes | let | public let tolerance: Double
 VisualCoreScenes | let | public let u: Vec3
 VisualCoreScenes | let | public let union: Int
+VisualCoreScenes | let | public let up: Vec3
 VisualCoreScenes | let | public let v: Vec3
+VisualCoreScenes | let | public let variant: Int
 VisualCoreScenes | let | public let velocity: Vec2
 VisualCoreScenes | let | public let vertexBudget: Int
 VisualCoreScenes | let | public let vertices: [Vec3]
@@ -2715,7 +2767,9 @@ VisualCoreScenes | let | public let viewSize: Vec2
 VisualCoreScenes | let | public let volume: Double
 VisualCoreScenes | let | public let weldPositionsOnly: Bool
 VisualCoreScenes | let | public let weldTolerance: Double
+VisualCoreScenes | let | public let width: Double
 VisualCoreScenes | let | public let width: Int
+VisualCoreScenes | let | public let yaw: Double
 VisualCoreScenes | let | public static let `default`
 VisualCoreScenes | let | public static let alpha
 VisualCoreScenes | let | public static let balanceTolerance
@@ -2728,22 +2782,29 @@ VisualCoreScenes | let | public static let defaultVertexBudget
 VisualCoreScenes | let | public static let fastRelaxation
 VisualCoreScenes | let | public static let hardMaxEdge
 VisualCoreScenes | let | public static let landscape
+VisualCoreScenes | let | public static let maxBranches
 VisualCoreScenes | let | public static let maxBuildsPerStep
 VisualCoreScenes | let | public static let maxChildren
 VisualCoreScenes | let | public static let maxCorners
+VisualCoreScenes | let | public static let maxCount
 VisualCoreScenes | let | public static let maxDepth
 VisualCoreScenes | let | public static let maxEntries
 VisualCoreScenes | let | public static let maxFaces
+VisualCoreScenes | let | public static let maxGenerations
 VisualCoreScenes | let | public static let maxLevels
 VisualCoreScenes | let | public static let maxNodes
 VisualCoreScenes | let | public static let maxPointers
 VisualCoreScenes | let | public static let maxPolygonPoints
 VisualCoreScenes | let | public static let maxPolylinePoints
 VisualCoreScenes | let | public static let maxResolution
+VisualCoreScenes | let | public static let maxRules
 VisualCoreScenes | let | public static let maxSamples
 VisualCoreScenes | let | public static let maxSide
+VisualCoreScenes | let | public static let maxSuccessors
 VisualCoreScenes | let | public static let maxTriangles
 VisualCoreScenes | let | public static let maxVertices
+VisualCoreScenes | let | public static let maxWord
+VisualCoreScenes | let | public static let maxWordLength
 VisualCoreScenes | let | public static let minimumInterval
 VisualCoreScenes | let | public static let portrait
 VisualCoreScenes | let | public static let problemLimit
@@ -2757,6 +2818,7 @@ VisualCoreScenes | let | public static let subdivisionRange
 VisualCoreScenes | let | public static let version
 VisualCoreScenes | protocol | public protocol GestureRecognizer: Sendable
 VisualCoreScenes | protocol | public protocol ParametricCurve: Sendable
+VisualCoreScenes | struct | public struct CapShape: Sendable, Equatable
 VisualCoreScenes | struct | public struct CatmullRomSpline: ParametricCurve, Equatable
 VisualCoreScenes | struct | public struct ClipPlane: Sendable, Equatable, Codable
 VisualCoreScenes | struct | public struct ConvexCutResult: Sendable, Equatable
@@ -2787,7 +2849,14 @@ VisualCoreScenes | struct | public struct MeshBuilder: Sendable
 VisualCoreScenes | struct | public struct MeshProblem: Sendable, Equatable, Codable
 VisualCoreScenes | struct | public struct MeshReport: Sendable, Equatable, Codable, CustomStringConvertible
 VisualCoreScenes | struct | public struct MeshSummary: Sendable, Equatable, Codable
+VisualCoreScenes | struct | public struct PetalShape: Sendable, Equatable
 VisualCoreScenes | struct | public struct PinchRecognizer: GestureRecognizer
+VisualCoreScenes | struct | public struct PlantBranch: Sendable, Equatable
+VisualCoreScenes | struct | public struct PlantGrammar: Sendable, Equatable
+VisualCoreScenes | struct | public struct PlantInstance: Sendable, Equatable
+VisualCoreScenes | struct | public struct PlantMarker: Sendable, Equatable
+VisualCoreScenes | struct | public struct PlantRule: Sendable, Equatable
+VisualCoreScenes | struct | public struct PlantSkeleton: Sendable, Equatable
 VisualCoreScenes | struct | public struct PointerEvent: Sendable, Equatable
 VisualCoreScenes | struct | public struct PointerTracker: Sendable
 VisualCoreScenes | struct | public struct PointerVelocityTracker: Sendable
@@ -2803,6 +2872,7 @@ VisualCoreScenes | struct | public struct SegmentWindow: Sendable, Equatable
 VisualCoreScenes | struct | public struct SegmentWindowStep: Sendable, Equatable
 VisualCoreScenes | struct | public struct SkyParameters: Sendable, Equatable
 VisualCoreScenes | struct | public struct SlotPool<Element: Sendable>: Sendable
+VisualCoreScenes | struct | public struct StemShape: Sendable, Equatable
 VisualCoreScenes | struct | public struct StreamingBudget: Sendable, Equatable
 VisualCoreScenes | struct | public struct StreamingLevel: Sendable, Equatable
 VisualCoreScenes | struct | public struct SyntheticGestureScript: Sendable, Equatable
@@ -2899,6 +2969,7 @@ VisualCoreScenes | var | public var minAngle
 VisualCoreScenes | var | public var minChange
 VisualCoreScenes | var | public var minDistance
 VisualCoreScenes | var | public var minDuration
+VisualCoreScenes | var | public var model: Mat4
 VisualCoreScenes | var | public var moreProblems: Int
 VisualCoreScenes | var | public var night
 VisualCoreScenes | var | public var normal: Vec3

@@ -359,6 +359,15 @@ composite, premultiplied over); `composite` mode 2 is premultiplied over; the va
 and out-of-range emissive ones. `RenderState.premultipliedBlended` draws premultiplied layers. Rules:
 [docs/architecture/shaders.md](../../docs/architecture/shaders.md).
 
+## Grammar-grown vegetation (feature 219, R02-F19)
+
+VisualCoreScenes grows plants from code: `PlantGrammar` (start word, weighted rules, generations, turtle settings, seed;
+`Codable` schema 1), `LSystem.derive` (seeded rewriting), `PlantTurtle.interpret` and `grow` (bracketed turtle to
+`PlantBranch`es and petal, cap and leaf `PlantMarker`s), `PetalShape`, `CapShape` and `StemShape` (parametric part
+meshes), `PlantMesh.build` (branches through `Mesh.tube`, parts at markers, merged) and `PlantScatter.scatter`
+(seeded dart throwing with a minimum spacing into `PlantInstance`s with model matrices for instanced drawing).
+Refusals are `PlantError` with `r2-f19.*` codes. Rules: [docs/architecture/vegetation.md](../../docs/architecture/vegetation.md).
+
 ## Terrain levels of detail, masks and sky (feature 218, R02-F18)
 
 VisualCoreScenes splits a large terrain into pieces: `TerrainSettings` (P × P pieces of C × C cells, L levels, a

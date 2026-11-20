@@ -182,10 +182,13 @@
   "F19": {
    "disposition": "new",
    "existing": [
-    "SeededRandom"
+    "SeededRandom",
+    "Mesh.tube",
+    "Mesh.merged",
+    "MeshInstance"
    ],
-   "home": "(new) VisualCoreGeometry",
-   "note": "Compact grammar-based vegetation generator."
+   "home": "VisualCoreScenes",
+   "note": "As built (feature 219): PlantGrammar, LSystem, PlantTurtle (bracketed turtle to branches and part markers), PetalShape, CapShape, StemShape, PlantMesh (Mesh.tube and Mesh.merged) and PlantScatter (seeded dart throwing into PlantInstances for MeshInstance) in VisualCoreScenes, no new module; existing mesh, curve and instancing types unchanged."
   },
   "F20": {
    "disposition": "new",
