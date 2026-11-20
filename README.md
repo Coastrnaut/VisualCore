@@ -39,7 +39,7 @@ with every gate that changes what it says (see [Keeping this README current](#ke
 
 ## Status
 
-State on **2026-11-19**. VisualCore 1.0 (22 free experiences, build 1.0.0 (1)) was submitted to the App Store on 2026-11-18 and is waiting for review ([record](docs/release/name-reservation.md)). Progress lives in two ledgers, never in prose; the commands below print the live state. A
+State on **2026-11-20**. VisualCore 1.0 (22 free experiences, build 1.0.0 (1)) was submitted to the App Store on 2026-11-18 and is waiting for review ([record](docs/release/name-reservation.md)). Progress lives in two ledgers, never in prose; the commands below print the live state. A
 gate is "pass" when its host and simulator checks passed and its evidence is recorded. **Pass is never device
 evidence**: no physical-device test of the unified app has been run.
 
@@ -80,7 +80,7 @@ evidence**: no physical-device test of the unified app has been run.
 
 Ledger totals today: the legacy ledger records **185 of 263** gates as passed (F00–F09 and the app phases
 A01-P00 … A19-P06, A20-P00 … A20-P06, A21-P00 … A21-P06, A22-P00 … A22-P06, A23-P00 … A23-P06, A24-P00 … A24-P06, A25-P00 … A25-P06); the unified-app ledger has 1,233 gates, with 25 experience gates (X-A01 … X-A25), 11 unified-app features,
-19 shared round features and both governance milestones passed.
+20 shared round features and both governance milestones passed.
 
 ```bash
 python3 Tools/python/desktop_runbook.py status   # legacy gates: framework and app phases

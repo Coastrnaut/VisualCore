@@ -52,7 +52,7 @@ its check record (no trailers). No {owner} tasks; one {device} task. Fixture see
 - [X] T-R02F20-008 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-20: 2026-11-20 reference-1 exit 0 (engine xcframework, projectM iOS sim build, clean)
 - [X] T-R02F20-009 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-20: 2026-11-20 reference-2 exit 0 (ANGLE rendering iOS 27/26, projectM reference iOS 27/26): 7 of 7 with chunk 1
 - [X] T-R02F20-010 Script tests (`--name script-tests`) — Verified 2026-11-20: 2026-11-20 script-tests-2 exit 0 (543 tests OK); the first run (exit 1) failed only the ledger-unchanged guard because the concurrent rendering run wrote check files (.autonomy/migration/checks/R02-F20.script-tests*.json)
-- [ ] T-R02F20-011 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+- [X] T-R02F20-011 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record — Verified 2026-11-20: 2026-11-20 converge round 1 appended T-R02F20-013 (done, host-5 exit 0); round 2 converged; sealed 16 passing checks; recorded R02-F20 pass (.autonomy/migration/evidence/R02-F20.json); validators PASS
 
 ## Device campaign (after ImplementationLock-100)
 
