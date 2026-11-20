@@ -7,7 +7,7 @@ its check record (no trailers). No {owner} tasks; one {device} task. Fixture see
 
 ## Phase 1: Setup
 
-- [ ] T-R02F19-001 Baselines: `--name baseline-host -- swift test --package-path Packages/VisualCore` and the isolated
+- [X] T-R02F19-001 Baselines: `--name baseline-host -- swift test --package-path Packages/VisualCore` and the isolated — Verified 2026-11-20: 2026-11-20 .autonomy/migration/checks/R02-F19.baseline-host.json and R02-F19.baseline-timing.json (exit 0); rendering baseline = R02-F18.rendering-27.json and rendering-26.json (exit 0)
   timing run; the rendering baseline is R02-F18's rendering runs (exit 0)
 
 ## Phase 2: Foundational
