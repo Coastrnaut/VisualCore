@@ -55,7 +55,7 @@ tests stay short (< 10 s each).
 - [X] T-R02G0104-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-20: 2026-11-20 rendering-27, rendering-26, experiences (sim-27.2), host-full and app-unit exit 0
   `--name host-full`, `--name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27
   app-unit-ios27`
-- [ ] T-R02G0104-008 Reference regression chunk 1 (`--name reference-1`)
+- [X] T-R02G0104-008 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-20: 2026-11-20 reference-1 exit 0
 - [ ] T-R02G0104-009 Reference regression chunk 2 (`--name reference-2`)
 - [ ] T-R02G0104-010 Script tests, run alone (`--name script-tests`)
 - [ ] T-R02G0104-011 {device} After ImplementationLock-100, on D1, D2 and D3: record gesture feel and touch-to-frame
