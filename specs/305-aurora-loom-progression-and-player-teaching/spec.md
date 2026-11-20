@@ -157,7 +157,9 @@ mode allows unlimited undo and hints without spending moves.
 
 ## Assumptions
 
-- Saving progress to disk, the gallery and replay are R02-G01-07; full accessibility polish R02-G01-06.
+- Saving progress to disk, the gallery and replay are R02-G01-07; full accessibility polish R02-G01-06, including the
+  panel's layout at large text sizes on iPhone and iPad; in this feature every instruction, hint and failure text is plain
+  text in the panel, read by VoiceOver.
 - The teaching text is original; the design is the project's own.
 
 ## Traceability
