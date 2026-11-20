@@ -359,6 +359,15 @@ composite, premultiplied over); `composite` mode 2 is premultiplied over; the va
 and out-of-range emissive ones. `RenderState.premultipliedBlended` draws premultiplied layers. Rules:
 [docs/architecture/shaders.md](../../docs/architecture/shaders.md).
 
+## Spatial controls (feature 222, R02-F22)
+
+VisualCoreMath adds `Plane3`, `Ray3.intersect(plane:)` and `ScreenProjection` (screen point to world ray and back for any
+camera). VisualCoreScenes adds `SpatialHandle` and `HandleKind` with `HandlePicker` (depth-aware picking within a 44-point
+target), `DragConstraint` and `HandleDrag` (exact, grazing-safe drags along an axis or across a plane), `ControlHistory`
+(bounded, coalescing undo and redo of any `Codable` value; schema 1) and `AssistiveStep` (exact discrete steps with a
+spoken value). Refusals are `SpatialControlError` with `r2-f22.*` codes. Rules:
+[docs/architecture/spatial-controls.md](../../docs/architecture/spatial-controls.md).
+
 ## Nutrient fields (feature 221, R02-F21)
 
 VisualCoreSimulation spreads nutrients exactly: `NutrientField` (walled grid, 1 … 4 channels of integer quanta, stable

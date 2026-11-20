@@ -53,7 +53,7 @@ through a fileprivate SplitMix generator; tests stay short.
 
 - [ ] T-R02F22-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences` and
   `--name host-full`
-- [ ] T-R02F22-008 API baseline and docs: `check_public_api.py --update`, `--name public-api`, `--name documented-api
+- [X] T-R02F22-008 API baseline and docs: `check_public_api.py --update`, `--name public-api`, `--name documented-api — Verified 2026-11-20: 2026-11-20 public-api exit 0 (4,006 declarations), documented-api exit 0, docs/architecture/spatial-controls.md, README section, map F22 as built, render_autocreator + validate_autocreator PASS
   -- python3 scripts/check_documented_api.py --sources Apps/VisualCore`; new `docs/architecture/spatial-controls.md`;
   section in `Packages/VisualCore/README.md`; section 13.4 row R02-F22 "As built" in
   `docs/catalog/shared-feature-map.json` and `render_autocreator.py`

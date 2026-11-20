@@ -224,10 +224,12 @@
     "DoubleTapRecognizer",
     "PointerTracker",
     "OrbitCamera",
-    "Camera2D"
+    "Camera2D",
+    "Ray3",
+    "Mat4"
    ],
    "home": "VisualCoreScenes, VisualCoreMath",
-   "note": "Gesture recognizers and cameras exist; add analytic picking and world-space controls."
+   "note": "As built (feature 222): Plane3, Ray3.intersect(plane:) and ScreenProjection in VisualCoreMath; SpatialHandle, HandleKind, HandlePicker, DragConstraint, HandleDrag, ControlHistory and AssistiveStep in VisualCoreScenes, no new module; gesture recognizers, cameras and Ray3's existing hits unchanged."
   },
   "F23": {
    "disposition": "new",
