@@ -33,7 +33,7 @@ public names checked against Packages and Apps (`Visibility` is taken). Fixture 
 
 ## Phase 4: Story 2 — phase stepping (P1)
 
-- [ ] T-R02F15-004 [US2] Create `Packages/VisualCore/Sources/VisualCoreMath/PhaseStepper.swift` (`PhaseStepper`, "Δt
+- [X] T-R02F15-004 [US2] Create `Packages/VisualCore/Sources/VisualCoreMath/PhaseStepper.swift` (`PhaseStepper`, "Δt — Verified 2026-11-19: lead retest 2026-11-19: R02-F15.host-rerun.json (exit 0, full suite; first R02-F15.host.json failed only the timed R02-F05 mesh budget under parallel load, fixed by lightening the overlap oracle to 1,024 intervals); PhaseStepperTests 5 passed (100,000 steps equal a jump bit for bit; 37 adjacent spans equal one listing over 100 periods; open orbit one passage; refusals)
   finite > 0; 0 ≤ k ≤ 1,000,000,000", time(k) = t₀ + Double(k)·Δt; `phase(of:at:)` in [0, 1) for closed orbits and nil
   for open; `Passage` listing in [tₐ, t_b), time order, "≤ 1,000,000" per research R6) with
   `Packages/VisualCore/Tests/VisualCoreMathTests/PhaseStepperTests.swift` (100,000 advances equal `jump(to:)` bit for bit;
