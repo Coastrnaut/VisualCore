@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-20
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-F22 (migration ledger, shared round feature) · ID namespace FR-R02F22-###, SC-R02F22-###, T-R02F22-###
 
@@ -30,6 +30,53 @@ Canonical overrides:
 - **Superseded parts of the source prompt:** the USD 1.99–4.99 purchase model (ADR-0009); the Round 2 lock
   (ImplementationLock-100). **Device-only items:** touch accuracy and VoiceOver use on D1–D3, recorded in the device
   campaign. **Owner-only items:** none.
+
+## Clarifications
+
+### Session 2026-11-20
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time. Facts checked in
+code (read-only audit, 2026-11-20): `Ray3` (`init?` normalises, box, sphere and triangle hits returning `RayHit3`, tolerance
+1e-12), `Mat4` (column vectors, `applyPoint` divides by w, `inverse`, `perspective` with GL clip depth −1 … 1),
+`OrbitCamera.ray(ndc:aspect:)` and `viewProjection(aspect:)` are in VisualCoreMath; the gesture recognizers are in
+VisualCoreScenes; Effects Composer has its own `EditHistory` (experience-local, unchanged); the names `Plane3`,
+`ScreenProjection`, `SpatialHandle`, `HandleKind`, `HandlePicker`, `HandleDrag`, `DragConstraint`, `ControlHistory`,
+`AssistiveStep` and `SpatialControlError` are free.
+
+- Q: How does a screen point become a ray, and how is a plane hit? → A: in VisualCoreMath, `ScreenProjection.ray` maps a
+  point (x, y) in points, origin top left, inside a viewport w × h (finite, > 0) to NDC (2x / w − 1, 1 − 2y / h), unprojects
+  it at clip depths −1 and +1 through the inverse view-projection and returns the `Ray3` between them; nil outside the
+  viewport (edges included inside), for non-finite input or a degenerate unprojection. `ScreenProjection.project` is
+  the reverse (screen point and NDC depth; nil when clip w ≤ 0, behind the camera). A `Plane3` is a point and a unit
+  normal (nil for a non-finite or zero normal); `Ray3.intersect(plane:)` gives t = (p₀ − o) · n / (d · n), no hit when
+  |d · n| < 1e-12 or t < 0, the normal turned to face the ray. Impact: FR-R02F22-001; SC-R02F22-001.
+- Q: Which handle does a touch pick? → A: `HandlePicker.pick` (VisualCoreScenes) projects each `SpatialHandle`
+  (id, position, kind, hit radius in points ≥ 0); handles behind the camera or outside the depth range −1 … 1 are
+  skipped; a handle is a candidate when its screen distance to the touch is at most max(touch radius, its hit radius),
+  the touch radius being at least 22 points (half the 44-point minimum target; smaller values are raised); candidates
+  rank by screen distance, then NDC depth (nearer first), then index. At most 1,024 handles (`.handleLimit` beyond).
+  Impact: FR-R02F22-002; SC-R02F22-002.
+- Q: How does a drag follow the finger without jumps or flings? → A: `HandleDrag` starts from a handle position p₀, a
+  ray and a `DragConstraint` (`.axis(direction)` or `.plane(normal)`, unit vectors) and stores the start hit h₀; each
+  update returns p₀ + (h − h₀), so the start ray returns exactly p₀. The hit h is the ray-plane hit for a plane, and for
+  an axis the point of the axis line closest to the ray. The constraint is grazing — and the drag holds its last
+  position — when |d · n| < 0.1 for a plane or |d · a| > 0.995 for an axis; a drag that would start grazing is refused
+  (nil). An optional box clamps the result. Impact: FR-R02F22-003; SC-R02F22-003.
+- Q: What does the history store and how are drags coalesced? → A: `ControlHistory<Value>` (Value `Sendable`,
+  `Equatable`, `Codable`) stores entries of (label, before, after, coalescing key); `record` ignores before == after,
+  merges into the newest entry when both carry the same non-nil key (keeping the first before and the latest after),
+  clears redo, and past the depth (1 … 1,000, default 100) drops the oldest entry and counts it. `undo()` returns the
+  value to restore (the newest entry's before) and moves the entry to redo; `redo()` returns its after; both return nil
+  with nothing to do and leave the history unchanged. JSON schema 1 with sorted keys; `decode` refuses newer schemas and
+  damaged forms. Impact: FR-R02F22-004, 006; SC-R02F22-004, 006.
+- Q: What are assistive controls exactly, and what do they say? → A: `AssistiveStep` holds a name, a start value, a step
+  (finite > 0) and a range (finite, min ≤ max ≤ min + 1e9 · step, the start inside); its value is start + k · step for an
+  integer k kept so the value stays in the range (a step past a limit does nothing and reports so), so n steps up then n
+  down return exactly when they stay in range. `description` is "<name>, <value>" with the value printed with as many
+  decimals as the step needs (at most 6), locale-independent, for VoiceOver's adjustable value; each step returns the
+  (before, after) pair for `ControlHistory`. Errors (`SpatialControlError`): `r2-f22.viewport`, `r2-f22.handle-limit`,
+  `r2-f22.parameter`, `r2-f22.history-depth`, `r2-f22.newer-schema`, `r2-f22.malformed`. Impact: FR-R02F22-005, 007;
+  SC-R02F22-005.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -131,7 +178,8 @@ value; steps respect the same limits as drags.
   constraint is seen at a grazing angle the handle holds its last position.
 - **SC-R02F22-004**: Seeded edit sequences undone fully return the exact start value and redone return the exact end;
   a 500-event drag is one undo step; the history never exceeds its bound.
-- **SC-R02F22-005**: Assistive steps up n times then down n times return exactly to the start for 100 seeded cases, and
+- **SC-R02F22-005**: Assistive steps up n times then down n times (staying in range) return exactly to the start for 100
+  seeded cases, and
   every step has a non-empty description.
 - **SC-R02F22-006**: Histories round-trip byte for byte; newer and damaged forms are refused.
 - **SC-R02F22-007**: Existing tests pass unchanged; the reference regression passes 7 of 7; each unit test finishes in
