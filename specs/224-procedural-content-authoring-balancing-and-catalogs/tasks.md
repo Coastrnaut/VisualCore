@@ -69,7 +69,7 @@ builder exists), C (005). Shared files (002, docs) stay with the lead. MVP: Stor
 
 ## Phase 7: Convergence
 
-- [ ] T-R02F24-013 Add a checker test where two levels have the same content but different seeds (different identities)
+- [X] T-R02F24-013 Add a checker test where two levels have the same content but different seeds (different identities) — Verified 2026-11-20: 2026-11-20 host-5 exit 0: PuzzleCatalogCheckerTests 5/5 incl. duplicatesIgnoreTheSeed (same content, seeds 11 and 12, distinct identities → duplicate(1, first: 0); different content passes) (.autonomy/migration/checks/R02-F24.host-5.json)
   and are reported as `.duplicate`, while two levels with different content are not, in
   `Packages/VisualCore/Tests/VisualCoreSimulationTests/PuzzleCatalogCheckerTests.swift`; `--name host-5` per spec
   Clarifications Q1, Q3 (partial)

@@ -171,4 +171,22 @@ struct PuzzleCatalogCheckerTests {
         #expect(report.issues == expected)
         #expect(PuzzleCatalogChecker.check(catalog, rules: lightsOut, rule: .standard) == report)
     }
+    /// T-R02F24-013: duplicates are judged on content without the generator seed.
+    @Test("same content with different seeds is a duplicate; different content is not")
+    func duplicatesIgnoreTheSeed() throws {
+        let plain: PuzzleLevel<LightsOutRules> = try level([4])
+        let seededA = try PuzzleLevel<LightsOutRules>(rulesID: plain.rulesID, start: plain.start, solution: plain.solution,
+                                                      budget: plain.budget, seed: 11)
+        let seededB = try PuzzleLevel<LightsOutRules>(rulesID: plain.rulesID, start: plain.start, solution: plain.solution,
+                                                      budget: plain.budget, seed: 12)
+        #expect(seededA.identity != seededB.identity)
+        let same = try PuzzleCatalog<LightsOutRules>(id: "seeds", entries: [entry(seededA), entry(seededB)])
+        let report = PuzzleCatalogChecker.check(same, rules: lightsOut, rule: .standard)
+        #expect(report.issues == [PuzzleCatalogIssue.duplicate(index: 1, first: 0)])
+        let other = try PuzzleCatalog<LightsOutRules>(id: "seeds", entries: [entry(seededA), entry(level([0]))])
+        #expect(PuzzleCatalogChecker.check(other, rules: lightsOut, rule: .standard).passes)
+        let unseeded = try PuzzleCatalog<LightsOutRules>(id: "seeds", entries: [entry(plain), entry(seededB)])
+        #expect(PuzzleCatalogChecker.check(unseeded, rules: lightsOut, rule: .standard).issues
+                == [PuzzleCatalogIssue.duplicate(index: 1, first: 0)])
+    }
 }
