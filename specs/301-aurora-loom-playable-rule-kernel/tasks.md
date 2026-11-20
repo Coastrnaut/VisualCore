@@ -25,7 +25,7 @@ or {device} tasks (pure logic). Fixture seed 2_301; tests stay short.
 
 ## Phase 3: Story 1 — make three ribbons agree (P1) 🎯
 
-- [ ] T-R02G0101-003 [P] [US1] Create `Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomHarmonyTests.swift` (1,000 seeded levels: the
+- [X] T-R02G0101-003 [P] [US1] Create `Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomHarmonyTests.swift` (1,000 seeded levels: the — Verified 2026-11-20: 2026-11-20 host-2 exit 0: AuroraLoomHarmonyTests 11/11 (1,000 seeded levels win with their setting; 13,500 single-control changes agree with an independent reference; boundaries at ±tolerance and the ±2,048 wrap; tie order; drift over two periods) (.autonomy/migration/checks/R02-G01-01.host-2.json)
   constructed setting wins; for every single-control change the win test agrees with an independent reference written in
   the test; boundary at exactly the tolerance inside, one unit beyond outside; worst mismatch and tie order; a drifting
   ribbon (ω ≠ Ω) is judged over the two periods); `--name host-2`
