@@ -38,7 +38,7 @@ tasks; one {device} task. Fixture seed 2_024; tests stay short.
 
 ## Phase 5: Story 3 — tutorial contracts (P2)
 
-- [ ] T-R02F24-005 [P] [US3] Create `Packages/VisualCore/Sources/VisualCoreSimulation/TutorialContract.swift` (TutorialCondition "n 1 … 1,000", TutorialContractStep
+- [X] T-R02F24-005 [P] [US3] Create `Packages/VisualCore/Sources/VisualCoreSimulation/TutorialContract.swift` (TutorialCondition "n 1 … 1,000", TutorialContractStep — Verified 2026-11-20: 2026-11-20 host-4 exit 0: TutorialContractTests 7/7 (100 seeded scripts match a reference model; unmatched, late and foreign events ignored; skip, resume, restart; round trip; stored-form and init refusals) (.autonomy/migration/checks/R02-F24.host-4.json)
   "id slug, unique; key 1 … 128 characters", TutorialContract "id slug; 1 … 64 steps", TutorialEvent,
   TutorialContractProgress "schema 1; decoded against its contract") with `Packages/VisualCore/Tests/VisualCoreSimulationTests/TutorialContractTests.swift` (100 seeded
   event scripts advance exactly at the conditions; unmatched and late events ignored; skip and restart; round trip byte

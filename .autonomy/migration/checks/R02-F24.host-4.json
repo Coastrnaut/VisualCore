@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "TutorialContractTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter TutorialContractTests",
+  "elapsed_seconds": 2.425,
+  "exit_code": 0,
+  "finished": "2026-11-20T15:56:40+00:00",
+  "gate": "R02-F24",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-F24.host-4.log",
+  "log_sha256": "033ed7517f9d89b8bd61348b82c86a1ca1bc11e7a7451d009bb66b973fc0072a",
+  "name": "host-4",
+  "started": "2026-11-20T15:56:38+00:00",
+  "timed_out": false
+}
