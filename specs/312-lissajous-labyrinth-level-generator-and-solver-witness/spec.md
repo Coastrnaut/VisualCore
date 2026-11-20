@@ -160,7 +160,8 @@ file is refused.
   and move budget; only levels the solver proves solvable within the allowance MAY be emitted, and none starts won.
 - **FR-R02G0202-002**: A solver MUST decide every legal setting of a level (all coprime frequency pairs 1 … 9 and all 16 ×
   16 phase offsets) with the exact segment-swept collision test of R02-G02-01, and find the shortest action sequence from
-  the start to a winning setting through legal states only; its work is bounded by the size of that setting space.
+  the start to a winning setting through legal states only; its work is bounded by the 14,080 legal settings (at most one
+  exact verdict each) and a search over at most 14,080 states.
 - **FR-R02G0202-003**: Each level MUST carry difficulty metrics (shortest solution, winning settings, minimum clearance of
   the witness path, solver work) derived from the solver.
 - **FR-R02G0202-004**: Each level MUST have a versioned witness record (level, action witness, per-action fingerprints,
@@ -205,8 +206,8 @@ file is refused.
 - Levels are presented, hinted and played through later features (R02-G02-03 … 07); this feature draws nothing.
 - The manifest's numbers, seeds, bands and move budgets are copied from the project's own archived design
   (`docs/archive/planning/rounds/round2.md`); no third-party content is used.
-- Accessibility (VoiceOver, controls) is owned by later features; the witness and difficulty data are plain text and
-  numbers usable by them. Observability: generation reports skipped candidates and solver work per level.
+- Layout on iPad and iPhone, the dials and gestures are owned by R02-G02-04, hints by R02-G02-05 and accessibility
+  (VoiceOver, controls) by R02-G02-06; the witness and difficulty data are plain text and numbers usable by them. Observability: generation reports skipped candidates and solver work per level.
 
 ## Traceability
 
