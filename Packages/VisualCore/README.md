@@ -359,6 +359,15 @@ composite, premultiplied over); `composite` mode 2 is premultiplied over; the va
 and out-of-range emissive ones. `RenderState.premultipliedBlended` draws premultiplied layers. Rules:
 [docs/architecture/shaders.md](../../docs/architecture/shaders.md).
 
+## Nutrient fields (feature 221, R02-F21)
+
+VisualCoreSimulation spreads nutrients exactly: `NutrientField` (walled grid, 1 … 4 channels of integer quanta, stable
+explicit diffusion in bounded sub-steps, decay), `NutrientSource` (sources and sinks with exact long-run rates),
+`ViabilityBand` (where life thrives), `GrowthNetwork` (deterministic bounded growth into viable cells, handed on as a
+`RouteGraph`), `NutrientLedger` and `NutrientAccount` (exact conservation) and `NutrientStepReport` (what a frame did);
+`Codable` schema 1; fields and viability as `FieldGrid`s. Refusals are `NutrientError` with `r2-f21.*` codes. Rules:
+[docs/architecture/nutrient-fields.md](../../docs/architecture/nutrient-fields.md).
+
 ## Bounded swarms (feature 220, R02-F20)
 
 VisualCoreSimulation steps swarms on top of the unchanged steering: `NeighbourGrid` (hashed integer cells; exactly the

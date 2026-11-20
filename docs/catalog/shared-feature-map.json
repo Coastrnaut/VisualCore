@@ -206,10 +206,12 @@
   "F21": {
    "disposition": "new",
    "existing": [
-    "FieldGrid"
+    "FieldGrid",
+    "RouteGraph",
+    "RouteSearch"
    ],
    "home": "VisualCoreSimulation",
-   "note": "Diffusion, nutrient and viability field solver."
+   "note": "As built (feature 221): NutrientField (integer quanta, stable explicit diffusion in bounded sub-steps, decay), NutrientSource, ViabilityBand, GrowthNetwork (bounded growth handed on as a RouteGraph), NutrientLedger, NutrientAccount and NutrientStepReport in VisualCoreSimulation, no new module; FieldGrid, the heightfield and the route solvers unchanged."
   },
   "F22": {
    "disposition": "extend",
