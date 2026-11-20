@@ -53,6 +53,16 @@ public enum AuroraLoomSolver {
     /// ascending; moves are ordered by ribbon, then wave before phase. The method is `descent` when descent alone reached a
     /// winning setting at the optimal number of changes on every ribbon, `grid` otherwise.
     public static func solve(_ level: AuroraLoomLevel) -> AuroraLoomSolution? {
+        solve(level, from: level.startSteps)
+    }
+
+    /// A proven shortest solution of `level` starting from `steps` instead of the level's start steps, or nil when some
+    /// ribbon has no winning setting (feature 305, R02-G01-05, T-R02G0105-002; FR-R02G0105-002; research R1).
+    ///
+    /// The same per-ribbon descent and grid as ``solve(_:)`` with the same tie rules, the start of every ribbon taken
+    /// from `steps`; `solve(level)` is exactly `solve(level, from: level.startSteps)`. When `steps` already wins,
+    /// `shortest` is 0 and `moves` is empty. `steps` must hold three wave and three phase steps.
+    public static func solve(_ level: AuroraLoomLevel, from steps: AuroraLoomSteps) -> AuroraLoomSolution? {
         var work: Int = 0
         var bestWave: [Int] = [0, 0, 0]
         var bestPhase: [Int] = [0, 0, 0]
@@ -62,8 +72,8 @@ public enum AuroraLoomSolver {
         var moves: [AuroraLoomMove] = []
         for ribbon in 0..<3 {
             let scorer: Scorer = Scorer(level: level, ribbon: ribbon)
-            let w0: Int = level.ribbons[ribbon].wave
-            let p0: Int = level.ribbons[ribbon].phase
+            let w0: Int = steps.wave[ribbon]
+            let p0: Int = steps.phase[ribbon]
 
             // Bounded coordinate descent.
             var w: Int = w0

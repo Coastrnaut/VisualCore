@@ -13,7 +13,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks.
 
 ## Phase 2: Stories 2 and 3 — hints and failure coaching (P1) 🎯
 
-- [ ] T-R02G0105-002 [P] [US2] [US3] Add `AuroraLoomSolver.solve(_:from:)` to `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomSolver.swift` and create
+- [X] T-R02G0105-002 [P] [US2] [US3] Add `AuroraLoomSolver.solve(_:from:)` to `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomSolver.swift` and create — Verified 2026-11-20: 2026-11-20 R02-G01-05.host exit 0 (hints 5 tests incl. 2,000 states, solver/catalog/witness unchanged)
   `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomHints.swift` (AuroraLoomHint "levels 1 … 3: ribbon, + control, + step"; ties "most changes, then larger
   worst residual, then lower ribbon"; "no solution within the moves left" reported; AuroraLoomFailureExplanation from the
   kernel's failure) with `Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomHintsTests.swift` (2,000 seeded reachable states over all 100 levels: following
