@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "HandleDragTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter HandleDragTests",
+  "elapsed_seconds": 2.459,
+  "exit_code": 1,
+  "finished": "2026-11-20T06:39:57+00:00",
+  "gate": "R02-F22",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-F22.host-3.log",
+  "log_sha256": "84e4ca9bcf35e9331c4f9302834bc6a92b80be7a0c2a3ba9954ff6943f4f79a4",
+  "name": "host-3",
+  "started": "2026-11-20T06:39:55+00:00",
+  "timed_out": false
+}

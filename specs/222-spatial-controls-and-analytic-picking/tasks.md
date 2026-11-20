@@ -30,7 +30,7 @@ through a fileprivate SplitMix generator; tests stay short.
 
 ## Phase 4: Story 3 — drags (P2)
 
-- [ ] T-R02F22-004 [P] [US3] Create `Packages/VisualCore/Sources/VisualCoreScenes/HandleDrag.swift` (DragConstraint; HandleDrag "grazing: plane abs(d · n) < 0.1,
+- [X] T-R02F22-004 [P] [US3] Create `Packages/VisualCore/Sources/VisualCoreScenes/HandleDrag.swift` (DragConstraint; HandleDrag "grazing: plane abs(d · n) < 0.1, — Verified 2026-11-20: 2026-11-20 host-3-r2 exit 0: HandleDragTests 10/10 (400 seeded drags return exactly; grazing holds; bounds; quarter and half turns within 1e-12); host-3 failed only to build (.autonomy/migration/checks/R02-F22.host-3*.json)
   axis abs(d · a) > 0.995"; optional bounds) with `Packages/VisualCore/Tests/VisualCoreScenesTests/HandleDragTests.swift` (seeded drags returning to the start ray
   give the start exactly; plane and axis drags follow the hit; grazing rays hold the last position; a grazing start is
   refused; bounds clamp; rotation angle about the axis for seeded quarter and half turns); `--name host-3`
