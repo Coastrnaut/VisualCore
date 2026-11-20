@@ -23,7 +23,7 @@ its check record (no trailers). No {owner} tasks; one {device} task. Fixture see
   PlantBranch, PlantPart, PlantMarker, PlantSkeleton; PlantTurtle.interpret and grow; branches ≤ 65,536; unbalanced
   brackets refused) with `Packages/VisualCore/Tests/VisualCoreScenesTests/PlantTurtleTests.swift` (three hand-derived grammars give their exact words and branch
   counts; 100 seeded weighted grammars repeat and differ by seed in ≥ 95 of 100; frames orthonormal; known turtle
-  positions; limits refused); `--name host-2`
+  positions; a grammar reopened from its stored form grows the identical skeleton; limits refused); `--name host-2`
 
 ## Phase 4: Story 2 — parametric parts (P1)
 
