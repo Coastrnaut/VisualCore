@@ -16,8 +16,9 @@ recorded only after every agent has reported). Commit after every task with its 
 - [ ] T-R02G0301-002 Edit `Packages/ExperiencesRound02/Package.swift` (+ `WaveKnotKeeperCore`, tests, product); create
   `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperError.swift` (codes "r02-g03.level, .move, .stage, .stale, .allowance, .newer-schema,
   .malformed"), `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperLevel.swift` (Point "−16 … 16", Gate "inclusive box inside bounds", Target
-  "crossings 0 … 32, writhe −32 … 32", Level "points 6 … 16 distinct, gates 0 … 4, allowance 1 … 64, band 1 … 5, start
-  not won, start tension ≤ bound"; JSON schema 1 with sorted keys and fingerprint; decode re-checks) and
+  "crossings 0 … 32, writhe −32 … 32", Level "points 6 … 16 distinct, gates 0 … 4, allowance 1 … 64, band 1 … 5";
+  JSON schema 1 with sorted keys and fingerprint; decode re-checks; the "start not won" and "start tension ≤ bound"
+  checks need the geometry and are added by the lead once T-R02G0301-003 lands) and
   `Packages/ExperiencesRound02/WaveKnotKeeper/CoreTests/WaveKnotKeeperFixtures.swift` (seeded levels with a known solution) with
   `Packages/ExperiencesRound02/WaveKnotKeeper/CoreTests/WaveKnotKeeperLevelTests.swift`; `--name host`
 
@@ -27,7 +28,8 @@ recorded only after every agent has reported). Commit after every task with its 
   segment-triangle intersection with contact only at a shared vertex allowed; `sweepIsClear`; xy-projection crossings
   with signs, writhe and degeneracy; tension Σ|segment|²) with `Packages/ExperiencesRound02/WaveKnotKeeper/CoreTests/WaveKnotKeeperGeometryTests.swift`
   (500 seeded ropes: summary equals an independent brute-force projection count and is translation-invariant; known knots
-  (trefoil-like lattice ropes) give their crossing counts; sweep refusals on constructed cases); `--name host-2`
+  (trefoil-like lattice ropes) give their crossing counts; sweep refusals on constructed cases); then the lead adds the level's "start not won" and "start tension ≤ bound"
+  checks with their tests; `--name host-2`
 
 ## Phase 4: Stories 2 and 3 — fail, undo, redo, replay (P1)
 

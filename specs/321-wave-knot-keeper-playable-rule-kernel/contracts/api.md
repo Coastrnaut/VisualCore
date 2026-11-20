@@ -13,6 +13,7 @@ public enum WaveKnotKeeperGeometry {
     public static func summary(_ points: [WaveKnotKeeperPoint]) -> WaveKnotKeeperSummary
     public static func tension(_ points: [WaveKnotKeeperPoint]) -> Int
     public static func sweepIsClear(_ points: [WaveKnotKeeperPoint], moving index: Int, to: WaveKnotKeeperPoint) -> Bool
+        // pure geometry: ignores gates; the play applies the gate exemption (both P and P′ inside one gate)
     public static func segmentIntersectsTriangle(_ p: WaveKnotKeeperPoint, _ q: WaveKnotKeeperPoint,
         _ a: WaveKnotKeeperPoint, _ b: WaveKnotKeeperPoint, _ c: WaveKnotKeeperPoint) -> Bool
 }
