@@ -8,7 +8,7 @@ or {device} tasks (pure logic). Fixture seed 2_301; tests stay short.
 
 ## Phase 1: Setup
 
-- [ ] T-R02G0101-001 Baselines: `--name baseline-host -- swift test --package-path Packages/VisualCore` and the isolated
+- [X] T-R02G0101-001 Baselines: `--name baseline-host -- swift test --package-path Packages/VisualCore` and the isolated — Verified 2026-11-20: 2026-11-20 baseline-host exit 0, baseline-timing exit 0 (.autonomy/migration/checks/R02-G01-01.baseline-*.json); rendering baseline R02-F24 rendering-27/26 exit 0
   timing run; the rendering baseline is R02-F24's rendering runs (exit 0)
 
 ## Phase 2: Foundational
