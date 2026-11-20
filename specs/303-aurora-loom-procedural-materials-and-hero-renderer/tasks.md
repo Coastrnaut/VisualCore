@@ -88,3 +88,7 @@ tests stay short (< 10 s each). Simulator evidence is one pass on the iOS 27.x p
 001 → 002 → {003 (agent B), 004 (agent A), 005 (agent C)} → 006 (lead, with A for the scene) → {007 (lead), 008 (agent D)}
 → 009 (lead) → 010 … 014, 016. 015 is a {device} task outside this campaign. Shared files (Package.swift, snapshot,
 registration, app, CI, docs) stay with the lead. MVP: Story 1.
+
+## Phase 7: Convergence
+
+- [ ] T-R02G0103-017 Reconcile clarification Q4 in `specs/303-aurora-loom-procedural-materials-and-hero-renderer/spec.md` with the built, tested behaviour: Reduce Motion holds the picture at tick 0 (deterministic, as `AuroraLoomPresenter.draw` and `AuroraLoomFallbackTests` do), and the tier changes and the fallback reason are logged in the presenter's in-memory record (`tierLog`, `fallbackReason`), as the app has no logging facility for experiences, per Clarifications Q4 (contradicts)
