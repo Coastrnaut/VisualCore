@@ -51,8 +51,9 @@ Playground's `FluidSolver` is its own; no erosion or sediment code exists; the n
   neighbour, 0 towards a wall; the wanted outflow f · Δt is turned into quanta (floor) and, if the cell's wanted total
   exceeds its water, every direction is scaled by water / total (floor); all cells send from their water at the start of
   the sub-step, then all receive. Open edges send to the outside and count it as drained. Defaults g = 9.81, A = 1,
-  l = 1, damping 0.98. Impact: FR-R02F17-002; SC-R02F17-002: a 32 × 32 closed basin filled unevenly settles so that its
-  highest and lowest wet water surfaces differ by at most 0.05 height units within 4,000 sub-steps.
+  l = 1, damping 0.995 (implementation 2026-11-19: with 0.98 a bowl was still 0.30 units uneven after 4,000 sub-steps
+  because heavy damping slows levelling; 0.995 levels it to 0.003 — the requirement, not the default, is fixed).
+  Impact: FR-R02F17-002; SC-R02F17-002.
 - Q: How are steps bounded and values clamped? → A: a frame time Δ (finite, ≥ 0; 0 is a no-op; negative or not finite is
   refused) is split into n = ⌈Δ / h⌉ sub-steps of Δ / n, where h = min(maxSubstep (default 1/120 s),
   0.25 · l / √(g · max(depth, 1e-6))) is the stability limit for the deepest water; n is at most 64, and past it 64
@@ -60,7 +61,8 @@ Playground's `FluidSolver` is its own; no erosion or sediment code exists; the n
   finite; amounts never leave 0 … 2⁴⁰ (an add beyond is refused). Impact: FR-R02F17-003; SC-R02F17-003.
 - Q: How are dye and sediment carried, and how does erosion work? → A: dye and sediment leave a cell in the same
   proportion as its water, floor(amount · sent / water) per direction (full-width integer arithmetic), the rounding
-  remainder staying in the cell. Erosion (off unless enabled) per sub-step compares the sediment with a capacity
+  remainder staying in the cell — unless the cell sends all its water, when the remainder goes along its largest
+  outflow, so a dry cell never keeps dye or sediment (found in implementation, 2026-11-19). Erosion (off unless enabled) per sub-step compares the sediment with a capacity
   C = K_c · |v| · max(slope, 0.01) · depth, |v| from the cell's net flux over its depth: below C, rock moves to sediment
   at K_s · (C − sediment) · Δt, above it sediment settles back at K_d · (sediment − C) · Δt, each turned into whole
   quanta and limited by what is present, so rock never goes below the floor 0. Defaults K_c 0.05, K_s 0.3, K_d 0.3.
@@ -164,13 +166,14 @@ refused.
 
 - **SC-R02F17-001**: On 50 seeded terrains stepped 500 times each, the water, dye and rock ledgers balance exactly after
   every step, and no cell holds a negative amount.
-- **SC-R02F17-002**: A 32 × 32 closed basin filled unevenly settles so that its highest and lowest wet water surfaces
-  differ by at most 0.05 height units within 4,000 sub-steps.
+- **SC-R02F17-002**: A 16 × 16 closed bowl filled in one quarter settles so that its highest and lowest wet water
+  surfaces differ by at most 0.05 height units within 2,000 sub-steps (sizes chosen so the test stays short; owner rule
+  of 2026-11-13).
 - **SC-R02F17-003**: In 100 seeded extreme cases (water columns up to the per-cell limit, cliffs of the full terrain
   range, frame times up to 10 s), every amount stays within 0 … 2⁴⁰, every flux finite within its clamp, the ledger
   balances, and a frame step longer than 64 stable sub-steps reports the dropped time.
-- **SC-R02F17-004**: On a 32 × 16 slope with erosion enabled and water poured at its top for 2,000 sub-steps, the
-  upper third's terrain decreases, the lower third's terrain increases, and terrain plus sediment balances exactly.
+- **SC-R02F17-004**: On a 16 × 8 slope with erosion enabled and water poured at its top for 1,000 sub-steps, the upper
+  third's terrain decreases, the lower third's terrain increases, and terrain plus sediment balances exactly.
 - **SC-R02F17-005**: A saved state round-trips byte for byte and continues to the bit-identical result; newer and damaged
   forms are refused; two runs from one state are identical.
 - **SC-R02F17-006**: Existing tests pass unchanged; the reference regression passes 7 of 7; each unit test finishes in

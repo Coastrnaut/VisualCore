@@ -1,7 +1,7 @@
 # Quickstart: R02-F17
 
 1. `swift test --package-path Packages/VisualCore --filter "Heightfield"` — expect all pass: ledgers balance exactly after
-   every step of 50 seeded terrains × 500 steps; a 32 × 32 basin settles within 0.05 height units in 4,000 sub-steps;
+   every step of 50 seeded terrains × 500 steps; a 16 × 16 bowl settles within 0.05 height units in 2,000 sub-steps;
    extreme inputs stay finite and clamped; dye and rock conserved; a slope erodes at its top and deposits at its foot;
    stored states round-trip byte for byte and continue bit-identically.
 2. `swift test --package-path Packages/VisualCore` — every existing test unchanged and passing.

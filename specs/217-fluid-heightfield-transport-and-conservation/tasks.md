@@ -22,7 +22,7 @@ campaign). Fixture seed 2_017; grids ≤ 64 × 64 so tests stay light.
 
 ## Phase 3: Stories 1–2 — conservative, bounded flow (P1) 🎯
 
-- [ ] T-R02F17-003 [US1] [US2] Create `Packages/VisualCore/Sources/VisualCoreSimulation/Heightfield+Step.swift` (research R2–R5: pipe fluxes "0 … 1,000,000", two-phase
+- [X] T-R02F17-003 [US1] [US2] Create `Packages/VisualCore/Sources/VisualCoreSimulation/Heightfield+Step.swift` (research R2–R5: pipe fluxes "0 … 1,000,000", two-phase — Verified 2026-11-19: lead retest 2026-11-19: R02-F17.host.json (exit 0, full suite); HeightfieldFlowTests 5 and HeightfieldBoundsTests 4 passed (50 seeded terrains × 500 steps balanced, never negative; 16 × 16 bowl spread 0.0012 in 2,000 sub-steps after the default damping became 0.995; drain; determinism; 100 extreme cases bounded, 64 sub-steps and dropped time reported; invalid times refused)
   whole-quantum transfers, open edges drained, sub-steps of the stability limit, at most 64, dropped time reported) with
   `Packages/VisualCore/Tests/VisualCoreSimulationTests/HeightfieldFlowTests.swift` (50 seeded terrains × 500 steps: ledger balances and no negative amount after every
   step; 16 × 16 bowl settles within 0.05 in 2,000 sub-steps; water runs downhill; open edges drain and balance; two runs
