@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-19
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-F13 (migration ledger, shared round feature) · ID namespace FR-R02F13-###, SC-R02F13-###, T-R02F13-###
 
@@ -30,6 +30,49 @@ Canonical overrides:
   (ImplementationLock-100). **Device-only items:** shadow drawing cost on D1–D3, recorded in the device campaign.
   **Owner-only items:** none.
 
+## Clarifications
+
+### Session 2026-11-19
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time. Facts checked in
+code (read-only audit, 2026-11-19): `ClipPlane`, `ConvexSolid`, `Mesh` and `PolygonCleanup` are in VisualCoreScenes;
+`Mat4(c0:c1:c2:c3:)` is column-major with `applyPoint` dividing by w; `vcglBlendEquation` exists; `makeRenderTarget`
+offers a depth attachment and no stencil; `Primitive.contains` is the only public point-in-polygon; no polygon area,
+2D hull, mask or IoU exists; the names `ShadowLight`, `ProjectionPlane`, `ShadowProjector`, `ConvexHull2D`,
+`CoverageMask`, `MaskComparison`, `ShadowError`, `PlanarShadowRenderer` are unused.
+
+- Q: Where do the parts live and how is the plane's 2D basis fixed? → A: the CPU side (`ShadowLight`, `ProjectionPlane`,
+  `ShadowProjector`, `ConvexHull2D`, `CoverageMask`, `MaskComparison`, `ShadowError`) in VisualCoreScenes beside the
+  geometry; the drawing (`PlanarShadowRenderer`) in VisualCoreRendering. A `ProjectionPlane` wraps a `ClipPlane` with
+  origin n · offset and axes u = normalised(n × e) and v = n × u, where e is the world axis least
+  aligned with n (ties to x, then y), so the basis is deterministic and right-handed (u × v = n). Impact:
+  FR-R02F13-001; data model.
+- Q: What exactly does projection do near the light and below the plane? → A: a directional light (unit direction d,
+  pointing from the light into the scene) maps p to p − d (n · p − h)/(n · d), refused when |n · d| < 1e-9
+  (`parallelLight`) or when d points away from the plane (n · d ≥ 0, `lightBelowPlane`); a point light L must be above
+  the plane (n · L − h > 1e-9 × scale, else `lightOnPlane`/`lightBelowPlane`) and maps p to L + (p − L)(h − n · L)/(n ·
+  (p − L)). Before projecting, geometry is clipped to the slab between the plane and, for a point light, a plane through
+  L parallel to the ground lowered by 1e-9 × scale; geometry under the ground or above the light casts nothing.
+  Projected triangles with area ≤ 1e-12 × (scale)² are dropped. Impact: FR-R02F13-001, 006; edge cases.
+- Q: How is a mask rasterised and stored? → A: a `CoverageMask` covers a rectangle [min, max] of the plane basis with
+  width × height cells (1…2,048 each, `maskSize` beyond); a cell is covered when its centre lies inside any polygon
+  (even–odd per polygon, union across polygons), computed row by row from edge crossings at the row centre (half-open
+  rule: an edge counts when its lower end is ≤ y < its upper end, so shared edges are never counted twice); bits are
+  packed in UInt64 words row by row; digest = FNV-1a 64 over the words little-endian. Stored as JSON schema 1 with the
+  region, width, height and the words as base64. Impact: FR-R02F13-003, 007, 008.
+- Q: How is IoU defined at the boundaries? → A: IoU = |A ∩ B| / |A ∪ B| from cell counts; two empty masks give 1; masks of
+  different region or size are refused (`mismatchedMasks`). The comparison also returns both counts so a game can show
+  the overlap. Impact: FR-R02F13-004; SC-R02F13-002.
+- Q: How is the shadow drawn so each pixel darkens once, and what are the limits and codes? → A: `PlanarShadowRenderer`
+  draws the mesh flattened by the planar projection matrix (`ShadowProjector.matrix(light:plane:)`, the same projection
+  as the CPU) into a pooled coverage target (writing 1 without blending, so overlaps are idempotent), then composites
+  the target onto the current framebuffer as a constant darkness with premultiplied blending — the single-darkening
+  that a stencil gives, without a stencil buffer the host does not have. Limits: meshes within the default mesh budget;
+  1,048,576 projected triangles per call. Reason codes: `r2-f13.non-finite`, `r2-f13.zero-direction`,
+  `r2-f13.parallel-light`, `r2-f13.light-on-plane`, `r2-f13.light-below-plane`, `r2-f13.mask-size`,
+  `r2-f13.mismatched-masks`, `r2-f13.too-many-triangles`, `r2-f13.newer-schema`, `r2-f13.malformed`. Impact:
+  FR-R02F13-005, 006; SC-R02F13-003.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Project a shape onto the ground (Priority: P1) 🎯
@@ -44,8 +87,7 @@ square scaled by the similar-triangle ratio; a solid behind the light casts noth
 
 **Acceptance Scenarios**:
 
-1. **Given** a cube and a directional light straight down onto the ground, **When** it is projected, **Then** the
-   outline is the unit square within the stated tolerance.
+1. **Given** a cube and a directional light straight down onto the ground, **When** it is projected, **Then** the outline is the unit square within 1e-12.
 2. **Given** a point light at height h above a square at height s, **When** it is projected, **Then** the shadow is the
    square scaled by h / (h − s) about the light's foot.
 3. **Given** geometry on the far side of the light or crossing the light's horizon, **When** it is projected, **Then**
@@ -65,8 +107,8 @@ converges to the exact polygon area as the grid is refined.
    score 1 by definition.
 2. **Given** masks of different sizes or regions, **When** compared, **Then** the comparison is refused with a named
    reason.
-3. **Given** a polygon and a grid, **When** rasterised, **Then** the covered area is within the stated error of the
-   exact area.
+3. **Given** a polygon and a grid, **When** rasterised, **Then** the covered area is within 1% of the exact area at
+   256 × 256 cells.
 
 ### User Story 3 - Draw the same shadow (Priority: P2)
 
@@ -96,10 +138,11 @@ A target mask is stored with a puzzle and compared later, by a later version of 
 ### Functional Requirements
 
 - **FR-R02F13-001**: The CPU MUST project points, triangles, meshes and convex solids onto a plane from a point light or a
-  directional light, giving polygons in a stated 2D basis of the plane, and MUST drop or clip what lies beyond the light.
+  directional light, giving polygons in the plane's deterministic 2D basis
+  (u, v with u × v = n), and MUST drop or clip what lies beyond the light.
 - **FR-R02F13-002**: The shadow outline of a convex solid MUST be one convex polygon (the convex hull of its projected
   vertices), wound counter-clockwise in the plane basis.
-- **FR-R02F13-003**: A coverage mask MUST rasterise polygons over a stated rectangular region at a stated resolution by
+- **FR-R02F13-003**: A coverage mask MUST rasterise polygons over a rectangle of the plane basis at 1…2,048 × 1…2,048 cells by
   cell-centre sampling, support union of many polygons, and give its covered count, area and a digest.
 - **FR-R02F13-004**: Intersection over union of two masks of the same region and resolution MUST be computed exactly from
   their cells; masks that do not match MUST be refused with a named reason.
