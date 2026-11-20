@@ -47,9 +47,11 @@ taken, so this feature uses `PuzzleCatalog`, `PuzzleCatalogPlan`, `PuzzleCatalog
 - Q: How is a catalog planned, built and identified? → A: a `PuzzleCatalogPlan` has a catalog id (lowercase slug), a seed
   and 1 … 16 ordered `PuzzleCatalogStage`s (count 1 … 500, a `FairnessBudget`, a uniqueness promise, an attempt budget per
   level 1 … 10,000), at most 1,000 levels in all. `PuzzleCatalogBuilder.build` walks a global index n = 0, 1, …; level
-  candidates come from `PuzzleGenerator.generate(seed: SeedDerivation.derive(seed, index: n), …)`; a level whose identity
-  is already in the catalog is skipped; a stage that cannot be filled within count × attempts generator calls fails with
-  `.planFailed(stage, calls)`. Each stage's levels are ordered by difficulty, then identity. The `PuzzleCatalog` holds
+  candidates come from `PuzzleGenerator.generate(seed: SeedDerivation.derive(seed, index: n), …)`; each call uses the stage's attempt
+  budget and advances n by one; a level whose identity is already in the catalog is skipped; a stage fails with
+  `.planFailed(stage, calls)` as soon as a call finds no certified level, or when 4 × count calls have not filled it.
+  `PuzzleCatalog(id:entries:)` refuses a bad id (`.plan("id")`) and 0 or more than 1,000 entries (`.plan("entries")`)
+  but accepts duplicates and uncertified levels, which only the checker judges; the builder never produces them. Each stage's levels are ordered by difficulty, then identity. The `PuzzleCatalog` holds
   the id, schema 1, the `PuzzleCatalogEntry`s (level and difficulty) and a digest: the SHA-256 hex of "<id>\n" followed by
   each identity and "\n". Impact: FR-R02F24-001; SC-R02F24-001.
 - Q: How is difficulty measured and when does progression fail? → A: `PuzzleDifficulty` is the certificate's shortest
@@ -60,7 +62,8 @@ taken, so this feature uses `PuzzleCatalog`, `PuzzleCatalogPlan`, `PuzzleCatalog
 - Q: What does the checker report? → A: `PuzzleCatalogChecker.check(_:rules:rule:)` re-certifies every level and returns a
   `PuzzleCatalogReport` listing every `PuzzleCatalogIssue` in position order: `uncertified(index, verdict)`,
   `duplicate(index, first)`, `difficultyMismatch(index)` (stored difficulty differs from the certificate),
-  `drop(index)`, `jump(index)` and `digestMismatch`; a report without issues passes. The same catalog always gives the
+  `drop(index)`, `jump(index)` and `digestMismatch` (a stored digest that
+  differs from the entries, possible only for values made outside the public initialiser); a report without issues passes. The same catalog always gives the
   same report. Impact: FR-R02F24-003; SC-R02F24-002.
 - Q: What is a tutorial contract, and how does it advance? → A: a `TutorialContract` has an id (slug) and 1 … 64
   `TutorialContractStep`s (id slug, unique; a text key of 1 … 128 characters; a `TutorialCondition`: `.move` — any move;
@@ -122,7 +125,7 @@ reported with their position; a sound catalog passes.
 
 - **A plan the generator cannot fill:** reported with the stage and the attempts made, never a short catalog.
 - **An empty plan or zero levels:** refused.
-- **Two identical levels:** refused as duplicates.
+- **Two identical levels:** reported by the checker as a duplicate; the builder never produces them.
 - **A tutorial event that matches no step, or comes after the end:** ignored, the position unchanged.
 - **Damaged, newer or edited stored catalogs and progress:** refused with a named reason.
 

@@ -26,7 +26,7 @@ tasks; one {device} task. Fixture seed 2_024; tests stay short.
   SHA-256 hex of '<id>\n' + identities each followed by '\n'; schema 1", PuzzleCatalogBuilder per clarifications Q1, Q2)
   with `Packages/VisualCore/Tests/VisualCoreSimulationTests/PuzzleCatalogTests.swift` (a 3-stage, 30-level lights-out plan builds twice identically with a pinned
   digest; every level certifies; stages ordered by difficulty; progression holds; unfillable plans fail with stage and
-  calls; a progression breach fails with its position; round trip byte for byte; newer, damaged and edited forms refused);
+  calls (a failing call, and too many duplicates); a progression breach fails with its position; round trip byte for byte; newer, damaged and edited forms refused);
   `--name host-2`
 
 ## Phase 4: Story 4 — deterministic checks (P2)
