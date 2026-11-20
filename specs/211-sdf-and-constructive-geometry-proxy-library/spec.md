@@ -136,7 +136,8 @@ or one beyond the limits is refused with a named reason.
 - **A description deeper or larger than the limits:** refused.
 - **A ray starting inside a shape:** reports a hit at distance 0 with the inside flagged.
 - **A point exactly on a surface:** distance 0; the normal is still defined.
-- **Very large or very small coordinates:** no non-finite result; distances stay finite.
+- **Very large or very small coordinates:** for points with |p| ≤ 1e6 and sizes ≥ 1e-6 every distance, normal and march
+  result is finite (no NaN or infinity), and a point at the origin of a zero-size gradient gets the fallback normal.
 - **A smooth union with zero smoothing:** equals the hard union.
 - **A non-uniform scale:** not representable (it would break the distance bound).
 
@@ -185,7 +186,8 @@ or one beyond the limits is refused with a named reason.
   a shell 1e-3 thick is hit by both options on every one of 100 seeded rays, while a test-only over-relaxed march
   without fallback skips it on at least one.
 - **SC-R02F11-003**: Shader and CPU distances agree within 2/255 of the encoded range at every sampled pixel, on iOS 27.2
-  and 26.5 simulators; the shader's hit mask equals the CPU's at every pixel away from silhouette edges.
+  and 26.5 simulators; the shader's hit mask equals the CPU's at every pixel away from silhouette edges; every parity
+  draw leaves zero live GPU objects after the host is destroyed.
 - **SC-R02F11-004**: Volume estimates of a sphere and a box are within 2% of the analytic value at 64³ samples and the
   error at least halves from 32³ to 64³; repeated sampling gives the same digest.
 - **SC-R02F11-005**: At least five positive, negative and boundary fixtures for descriptions give their stated verdicts
@@ -213,5 +215,7 @@ or one beyond the limits is refused with a named reason.
 
 ## Negative Requirements / Excluded scope
 
+- No user interface: the library has no screens, so iPad/iPhone layout, Dynamic Type and VoiceOver do not apply here;
+  the consuming experiences carry them (and R02-F10's non-colour clues) when they draw a decision.
 - No new module, renderer or context; no mesh generation from distance fields (marching cubes) in this slice; no
   texture-based distance fields; no game; no device run before ImplementationLock-100; no analytics.
