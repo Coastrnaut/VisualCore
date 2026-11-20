@@ -52,7 +52,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks.
 - [X] T-R02G0105-006 Docs: `docs/architecture/aurora-loom.md` (teaching and progress), `Packages/ExperiencesRound02/README.md`, — Verified 2026-11-20: 2026-11-20 R02-G01-05.round02-host exit 0, audits exit 0
   `docs/automatedtesting.md`; `--name round02-host`; `--name audits -- python3 scripts/verify_experiences.py --audits
   --only r02-g01.aurora-loom`
-- [ ] T-R02G0105-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G0105-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-20: 2026-11-20 rendering-27, rendering-26, experiences (sim-27.2), host-full, app-unit exit 0
   `--name host-full`, `--name app-unit`
 - [ ] T-R02G0105-008 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G0105-009 Reference regression chunk 2 (`--name reference-2`)
