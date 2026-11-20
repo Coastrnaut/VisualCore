@@ -134,6 +134,8 @@ refused.
 - **An occluder behind the observer or behind the source:** no eclipse is reported (dₒ ≥ dₛ, or θ ≥ αₛ + αₒ).
 - **An observer inside the source, the occluder or the ground:** refused with `r2-f15.observer-inside`.
 - **Zero-size or non-finite radii and positions:** refused with a named reason.
+- **A passage span that would list more than 1,000,000 passages, or whose ends are not finite or reversed:** refused
+  with `r2-f15.span-limit` (reversed or non-finite ends: `r2-f15.invalid-step`).
 - **A tick beyond 1,000,000,000 or a step that is not finite and positive:** refused with a named reason.
 
 ## Requirements *(mandatory)*
