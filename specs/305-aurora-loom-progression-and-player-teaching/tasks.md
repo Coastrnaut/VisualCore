@@ -27,7 +27,8 @@ tests stay short (< 10 s each). No {owner} or {device} tasks.
   harmony → done"; AuroraLoomMode "campaign, practice, daily(level)"; AuroraLoomProgress "level 1 open; win in campaign opens
   the next; stars 3 at shortest, 2 within shortest + 2, else 1"; dailyLevel "(days from 2026-01-01 × 37) mod 100 + 1")
   with `Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomProgressTests.swift` (tutorial scripts on levels 1 … 3 win following each instruction; scripted
-  progress through 100 levels; stars; every date 2026-01-01 … 2036-12-31 maps to 1 … 100; invalid dates refused);
+  progress through 100 levels; stars; every date 2026-01-01 … 2036-12-31 maps to 1 … 100; invalid dates refused; all 100 levels reachable by
+  progress alone, with no purchase or other gate, FR-R02G0105-006);
   `--name host-2`
 
 ## Phase 4: Adapter, scenarios and panel
