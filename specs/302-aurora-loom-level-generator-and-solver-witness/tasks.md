@@ -15,7 +15,7 @@ or {device} tasks (pure logic and host-generated content). Fixture seeds 2_301 a
 ## Phase 2: Foundational
 
 - [ ] T-R02G0102-002 Add `generation(Int)` ("r02-g01.generation") and `witness(String)` ("r02-g01.witness") to
-  `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomError.swift`; create
+  `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomError.swift` (with their `reasonCode` cases); create
   `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomManifest.swift` (AuroraLoomManifestEntry "number 1 … 100, seed
   UInt64, band 1 … 5, budget 8 … 19", the 100 entries copied from `python3 scripts/planning_index.py levels --experience
   R02-G01` with the source line) and `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomDifficulty.swift`
@@ -50,7 +50,8 @@ or {device} tasks (pure logic and host-generated content). Fixture seeds 2_301 a
   16", sorted-key pretty JSON with a trailing newline; `decode` refuses newer, damaged and non-replaying witnesses) with
   `Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomWitnessTests.swift` (round trip byte for byte; edited
   action, fingerprint, level and difficulty refused; newer schema and damaged JSON refused; counterexample loses with a named
-  ribbon, gate and tick); `--name host-4`
+  ribbon, gate and tick; `.witness("counterexample")` when the near-miss would not lose, `.witness("replay")` when the
+  actions do not win); `--name host-4`
 - [ ] T-R02G0102-006 [US2] [US3] [US4] Create `Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomCatalogTests.swift`
   (100 entries, 20 per band; the catalog generated twice is identical; pinned digest; `ProgressionRule.standard` holds on
   shortest; band means of shortest and work do not fall; each witness equals

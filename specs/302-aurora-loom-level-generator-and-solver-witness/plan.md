@@ -24,8 +24,8 @@ index: k))`, k = 0 … 63. Test fixtures keep `SeededRandom(seed: 2_301)`; the 5
 **Testing**: `swift test --package-path Packages/ExperiencesRound02` (CI step exists); regression: VisualCore host tests,
 VisualCoreRendering on sim-27.2 and sim-26.5, ExperiencesCreative on sim-27.2, the reference regression in two chunks,
 script tests (alone).
-**Performance**: every generated level has all ribbons turning with Ω, so a residual does not depend on the tick within
-one evaluation's cost bound (R02-G01-01: ≤ 3 × 4 × 2P samples). One ribbon's grid is 256 settings × 4 gates × 2P
+**Performance**: every generated level has all ribbons turning with Ω, so each residual is the same at every tick; the
+win test still samples all 2P ticks (R02-G01-01: ≤ 3 × 4 × 2P samples per evaluation). One ribbon's grid is 256 settings × 4 gates × 2P
 samples ≤ 256 × 4 × 512 = 524,288 integer steps at Ω = 16; a level's solve stays well under 0.1 s; the whole catalog
 (≤ 64 candidates per level, typically 1–3) is bounded below 10 s per test.
 **Constraints**: additive to R02-G01-01's public API; levels' allowance = the manifest move budget (8 … 19); every value an
