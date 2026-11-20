@@ -1,0 +1,188 @@
+{
+  "actions" : [
+    {
+      "dial" : "frequencyA",
+      "value" : 2
+    },
+    {
+      "dial" : "frequencyB",
+      "value" : 1
+    },
+    {
+      "dial" : "phaseA",
+      "value" : 15
+    },
+    {
+      "dial" : "phaseC",
+      "value" : 11
+    }
+  ],
+  "difficulty" : {
+    "clearance" : 238880,
+    "shortest" : 4,
+    "winningSettings" : 1,
+    "work" : 2
+  },
+  "fingerprints" : [
+    "e37f6a1e852db5b841c670593025961757667b92d743f0aac7a719cc7bd6d5e3",
+    "b16cea2b5b1b717da2e2bae592775d4e4346d01f014b56725c1cce2a625897e6",
+    "54dacb27df43c7ecd1447519d2efd9468c8e017950746998e61e1455e1ad18ec",
+    "8c3cbe3c8d199d7b7c82614879ae6bf2e5af213b6f309dd895e6c451562ea210",
+    "03ba1ac484f5f8717f76ef8525aaecd79f7515591e23c87871fb529fa0222dab"
+  ],
+  "level" : {
+    "allowance" : 17,
+    "amplitudes" : [
+      3,
+      3,
+      2
+    ],
+    "band" : 5,
+    "checkpoints" : [
+      {
+        "radius" : 256,
+        "x" : 2757,
+        "y" : 2100,
+        "z" : -470
+      },
+      {
+        "radius" : 256,
+        "x" : 1506,
+        "y" : 3066,
+        "z" : 1578
+      },
+      {
+        "radius" : 256,
+        "x" : -2772,
+        "y" : 1101,
+        "z" : 1624
+      },
+      {
+        "radius" : 256,
+        "x" : 720,
+        "y" : -951,
+        "z" : -1894
+      },
+      {
+        "radius" : 256,
+        "x" : 2028,
+        "y" : -3030,
+        "z" : -716
+      },
+      {
+        "radius" : 256,
+        "x" : -2946,
+        "y" : -1323,
+        "z" : -1026
+      }
+    ],
+    "fingerprint" : "2a144998bc2c904ea144e3fcea19e134e5ac08ba48f0066f6f94b44fe6afc467",
+    "frequencyC" : 5,
+    "id" : "lissajous-labyrinth-089",
+    "obstacles" : [
+      {
+        "radius" : 264,
+        "x" : 1971,
+        "y" : 207,
+        "z" : 344
+      },
+      {
+        "radius" : 338,
+        "x" : 2481,
+        "y" : 3069,
+        "z" : -1998
+      },
+      {
+        "radius" : 262,
+        "x" : -3030,
+        "y" : -2961,
+        "z" : -1130
+      },
+      {
+        "radius" : 341,
+        "x" : 2577,
+        "y" : -3054,
+        "z" : -2030
+      },
+      {
+        "radius" : 324,
+        "x" : -1314,
+        "y" : -747,
+        "z" : -1220
+      },
+      {
+        "radius" : 274,
+        "x" : 942,
+        "y" : -3063,
+        "z" : 1896
+      },
+      {
+        "radius" : 495,
+        "x" : -3036,
+        "y" : -414,
+        "z" : -1566
+      },
+      {
+        "radius" : 442,
+        "x" : -339,
+        "y" : 384,
+        "z" : -1656
+      }
+    ],
+    "schema" : 1,
+    "seed" : 2854064665088546785,
+    "start" : {
+      "frequencyA" : 8,
+      "frequencyB" : 3,
+      "phaseA" : 11,
+      "phaseC" : 14
+    },
+    "tutorial" : false
+  },
+  "nearMiss" : {
+    "action" : {
+      "dial" : "frequencyA",
+      "value" : 1
+    },
+    "dials" : {
+      "frequencyA" : 1,
+      "frequencyB" : 1,
+      "phaseA" : 15,
+      "phaseC" : 11
+    },
+    "verdict" : {
+      "kind" : "contact",
+      "obstacle" : 2,
+      "tick" : 3230
+    }
+  },
+  "nonCoprime" : {
+    "actions" : [
+      {
+        "dial" : "frequencyB",
+        "value" : 2
+      }
+    ],
+    "dials" : {
+      "frequencyA" : 2,
+      "frequencyB" : 2,
+      "phaseA" : 15,
+      "phaseC" : 11
+    },
+    "reason" : "r02-g02.move"
+  },
+  "number" : 89,
+  "schema" : 1,
+  "skipped" : 0,
+  "terminal" : {
+    "clearance" : 238880,
+    "visits" : [
+      476,
+      967,
+      1788,
+      2233,
+      2950,
+      3789
+    ]
+  }
+}

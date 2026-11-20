@@ -1,0 +1,109 @@
+{
+  "actions" : [
+    {
+      "dial" : "frequencyA",
+      "value" : 2
+    }
+  ],
+  "difficulty" : {
+    "clearance" : 172044,
+    "shortest" : 1,
+    "winningSettings" : 469,
+    "work" : 854
+  },
+  "fingerprints" : [
+    "46e96f148cc9d7595d8d254318221be5a663c03728f6f98c8f5cf58bc6bb7302",
+    "d9af9ace691960f08b75fa1b72974299aaee5289e46260a6a56205dda560e495"
+  ],
+  "level" : {
+    "allowance" : 8,
+    "amplitudes" : [
+      4,
+      4,
+      3
+    ],
+    "band" : 1,
+    "checkpoints" : [
+      {
+        "radius" : 512,
+        "x" : -3528,
+        "y" : -3880,
+        "z" : 1497
+      },
+      {
+        "radius" : 512,
+        "x" : -3932,
+        "y" : 3912,
+        "z" : -1461
+      }
+    ],
+    "fingerprint" : "ec6bde2aef5f1f6405440c31f30085daae1f7f778824cd7d082f754c9c33e0a3",
+    "frequencyC" : 3,
+    "id" : "lissajous-labyrinth-020",
+    "obstacles" : [
+      {
+        "radius" : 287,
+        "x" : 2128,
+        "y" : -36,
+        "z" : -498
+      },
+      {
+        "radius" : 286,
+        "x" : 3996,
+        "y" : -800,
+        "z" : 2916
+      }
+    ],
+    "schema" : 1,
+    "seed" : 17599513723540318991,
+    "start" : {
+      "frequencyA" : 8,
+      "frequencyB" : 5,
+      "phaseA" : 2,
+      "phaseC" : 12
+    },
+    "tutorial" : false
+  },
+  "nearMiss" : {
+    "action" : {
+      "dial" : "frequencyA",
+      "value" : 1
+    },
+    "dials" : {
+      "frequencyA" : 1,
+      "frequencyB" : 5,
+      "phaseA" : 2,
+      "phaseC" : 12
+    },
+    "verdict" : {
+      "kind" : "contact",
+      "obstacle" : 1,
+      "tick" : 426
+    }
+  },
+  "nonCoprime" : {
+    "actions" : [
+      {
+        "dial" : "frequencyB",
+        "value" : 2
+      }
+    ],
+    "dials" : {
+      "frequencyA" : 2,
+      "frequencyB" : 2,
+      "phaseA" : 2,
+      "phaseC" : 12
+    },
+    "reason" : "r02-g02.move"
+  },
+  "number" : 20,
+  "schema" : 1,
+  "skipped" : 0,
+  "terminal" : {
+    "clearance" : 172044,
+    "visits" : [
+      1441,
+      3497
+    ]
+  }
+}

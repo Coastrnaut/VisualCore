@@ -1,0 +1,109 @@
+{
+  "actions" : [
+    {
+      "dial" : "frequencyA",
+      "value" : 1
+    }
+  ],
+  "difficulty" : {
+    "clearance" : 259448,
+    "shortest" : 1,
+    "winningSettings" : 1794,
+    "work" : 3235
+  },
+  "fingerprints" : [
+    "ed4ac68cb0c076e1b99beaa27bf7a92a7eee7c68c69051fd220973ef74d9fb93",
+    "5fc12386df861b79d0375c18c20afd83e14deec96cd5a9d039661e0c2dbd13ed"
+  ],
+  "level" : {
+    "allowance" : 10,
+    "amplitudes" : [
+      2,
+      4,
+      2
+    ],
+    "band" : 1,
+    "checkpoints" : [
+      {
+        "radius" : 512,
+        "x" : 1988,
+        "y" : 4072,
+        "z" : -2032
+      },
+      {
+        "radius" : 512,
+        "x" : -2042,
+        "y" : -3988,
+        "z" : -1970
+      }
+    ],
+    "fingerprint" : "38e63c31554856bc7bcc8e09491faaf9514573b89611d8c6e3987d03be951099",
+    "frequencyC" : 6,
+    "id" : "lissajous-labyrinth-014",
+    "obstacles" : [
+      {
+        "radius" : 284,
+        "x" : 766,
+        "y" : 564,
+        "z" : 1440
+      },
+      {
+        "radius" : 462,
+        "x" : 354,
+        "y" : 2844,
+        "z" : -56
+      }
+    ],
+    "schema" : 1,
+    "seed" : 13466436957341768205,
+    "start" : {
+      "frequencyA" : 7,
+      "frequencyB" : 5,
+      "phaseA" : 14,
+      "phaseC" : 13
+    },
+    "tutorial" : false
+  },
+  "nearMiss" : {
+    "action" : {
+      "dial" : "frequencyA",
+      "value" : 2
+    },
+    "dials" : {
+      "frequencyA" : 2,
+      "frequencyB" : 5,
+      "phaseA" : 14,
+      "phaseC" : 13
+    },
+    "verdict" : {
+      "kind" : "contact",
+      "obstacle" : 1,
+      "tick" : 290
+    }
+  },
+  "nonCoprime" : {
+    "actions" : [
+      {
+        "dial" : "frequencyA",
+        "value" : 5
+      }
+    ],
+    "dials" : {
+      "frequencyA" : 5,
+      "frequencyB" : 5,
+      "phaseA" : 14,
+      "phaseC" : 13
+    },
+    "reason" : "r02-g02.move"
+  },
+  "number" : 14,
+  "schema" : 1,
+  "skipped" : 0,
+  "terminal" : {
+    "clearance" : 259448,
+    "visits" : [
+      1781,
+      3823
+    ]
+  }
+}

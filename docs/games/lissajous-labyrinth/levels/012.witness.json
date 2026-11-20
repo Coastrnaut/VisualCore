@@ -1,0 +1,108 @@
+{
+  "actions" : [
+    {
+      "dial" : "phaseA",
+      "value" : 13
+    }
+  ],
+  "difficulty" : {
+    "clearance" : 337415,
+    "shortest" : 1,
+    "winningSettings" : 658,
+    "work" : 1534
+  },
+  "fingerprints" : [
+    "67915c21850c04fbe21739d28447fb0d293c00b1e22f90e8f7c51ce8448a1b9d",
+    "6b759204b62edb9f3d2159562fc772250dcfc2e4ecc274bf521570179bf1c993"
+  ],
+  "level" : {
+    "allowance" : 8,
+    "amplitudes" : [
+      4,
+      2,
+      2
+    ],
+    "band" : 1,
+    "checkpoints" : [
+      {
+        "radius" : 512,
+        "x" : -1380,
+        "y" : -1834,
+        "z" : 38
+      },
+      {
+        "radius" : 512,
+        "x" : -3904,
+        "y" : -1272,
+        "z" : 390
+      }
+    ],
+    "fingerprint" : "0fe436bfdbf8d3d18a03a5a1002faf49edc1bac46f85472e3143ecb9c10d9fb5",
+    "frequencyC" : 5,
+    "id" : "lissajous-labyrinth-012",
+    "obstacles" : [
+      {
+        "radius" : 327,
+        "x" : -1164,
+        "y" : -1986,
+        "z" : -702
+      },
+      {
+        "radius" : 380,
+        "x" : -3984,
+        "y" : 2038,
+        "z" : -276
+      }
+    ],
+    "schema" : 1,
+    "seed" : 2453424012036099991,
+    "start" : {
+      "frequencyA" : 2,
+      "frequencyB" : 3,
+      "phaseA" : 12,
+      "phaseC" : 15
+    },
+    "tutorial" : false
+  },
+  "nearMiss" : {
+    "action" : {
+      "dial" : "frequencyA",
+      "value" : 1
+    },
+    "dials" : {
+      "frequencyA" : 1,
+      "frequencyB" : 3,
+      "phaseA" : 13,
+      "phaseC" : 15
+    },
+    "verdict" : {
+      "checkpoint" : 0,
+      "kind" : "missed"
+    }
+  },
+  "nonCoprime" : {
+    "actions" : [
+      {
+        "dial" : "frequencyB",
+        "value" : 2
+      }
+    ],
+    "dials" : {
+      "frequencyA" : 2,
+      "frequencyB" : 2,
+      "phaseA" : 13,
+      "phaseC" : 15
+    },
+    "reason" : "r02-g02.move"
+  },
+  "number" : 12,
+  "schema" : 1,
+  "skipped" : 0,
+  "terminal" : {
+    "clearance" : 337415,
+    "visits" : [
+      2286,
+      3938
+    ]
+  }
+}

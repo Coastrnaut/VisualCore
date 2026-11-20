@@ -1,0 +1,109 @@
+{
+  "actions" : [
+    {
+      "dial" : "phaseA",
+      "value" : 0
+    }
+  ],
+  "difficulty" : {
+    "clearance" : 431312,
+    "shortest" : 1,
+    "winningSettings" : 629,
+    "work" : 1359
+  },
+  "fingerprints" : [
+    "fdbe87d9dd1cf2244a2305bc7134df4d57b9f9a10621b6235fd9b399a7a71724",
+    "0d52e4385499f28e3cd6b1ca0ceccc3fee5cd9e6503abc088523c43c56fdcc9b"
+  ],
+  "level" : {
+    "allowance" : 8,
+    "amplitudes" : [
+      4,
+      4,
+      3
+    ],
+    "band" : 1,
+    "checkpoints" : [
+      {
+        "radius" : 512,
+        "x" : -2464,
+        "y" : -3632,
+        "z" : 2688
+      },
+      {
+        "radius" : 512,
+        "x" : 2400,
+        "y" : 3804,
+        "z" : 2745
+      }
+    ],
+    "fingerprint" : "f73236380850fc7bac50cbce50358b9a60fa7c41a9f6b7f9c2ecc6bb989ce7e1",
+    "frequencyC" : 2,
+    "id" : "lissajous-labyrinth-004",
+    "obstacles" : [
+      {
+        "radius" : 294,
+        "x" : -3996,
+        "y" : -640,
+        "z" : 2457
+      },
+      {
+        "radius" : 400,
+        "x" : -4072,
+        "y" : 3792,
+        "z" : -2550
+      }
+    ],
+    "schema" : 1,
+    "seed" : 8623855809990064461,
+    "start" : {
+      "frequencyA" : 6,
+      "frequencyB" : 7,
+      "phaseA" : 7,
+      "phaseC" : 12
+    },
+    "tutorial" : false
+  },
+  "nearMiss" : {
+    "action" : {
+      "dial" : "phaseC",
+      "value" : 11
+    },
+    "dials" : {
+      "frequencyA" : 6,
+      "frequencyB" : 7,
+      "phaseA" : 0,
+      "phaseC" : 11
+    },
+    "verdict" : {
+      "kind" : "contact",
+      "obstacle" : 1,
+      "tick" : 1847
+    }
+  },
+  "nonCoprime" : {
+    "actions" : [
+      {
+        "dial" : "frequencyB",
+        "value" : 2
+      }
+    ],
+    "dials" : {
+      "frequencyA" : 6,
+      "frequencyB" : 2,
+      "phaseA" : 0,
+      "phaseC" : 12
+    },
+    "reason" : "r02-g02.move"
+  },
+  "number" : 4,
+  "schema" : 1,
+  "skipped" : 0,
+  "terminal" : {
+    "clearance" : 431312,
+    "visits" : [
+      397,
+      747
+    ]
+  }
+}

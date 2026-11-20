@@ -1,0 +1,109 @@
+{
+  "actions" : [
+    {
+      "dial" : "frequencyA",
+      "value" : 1
+    }
+  ],
+  "difficulty" : {
+    "clearance" : 76900,
+    "shortest" : 1,
+    "winningSettings" : 648,
+    "work" : 2067
+  },
+  "fingerprints" : [
+    "bdf0cc9ac741c8bbac2b70fcf7f49875de007f5f2ef1f33b0feceb29057e36bb",
+    "2322d4b92fec6f8b5883bae86f4ed4ffd39b271beccb746613b9ac83350f0ebe"
+  ],
+  "level" : {
+    "allowance" : 10,
+    "amplitudes" : [
+      4,
+      2,
+      3
+    ],
+    "band" : 1,
+    "checkpoints" : [
+      {
+        "radius" : 512,
+        "x" : 4096,
+        "y" : 1714,
+        "z" : 2406
+      },
+      {
+        "radius" : 512,
+        "x" : -3908,
+        "y" : 754,
+        "z" : -2283
+      }
+    ],
+    "fingerprint" : "0c5fd44cd47c86cbf54fb85605dd440b6e854da7ba38c41c474e68e13c160c0a",
+    "frequencyC" : 5,
+    "id" : "lissajous-labyrinth-010",
+    "obstacles" : [
+      {
+        "radius" : 502,
+        "x" : -3136,
+        "y" : 1228,
+        "z" : -1842
+      },
+      {
+        "radius" : 319,
+        "x" : 4056,
+        "y" : 1648,
+        "z" : 1551
+      }
+    ],
+    "schema" : 1,
+    "seed" : 1757246366715382421,
+    "start" : {
+      "frequencyA" : 8,
+      "frequencyB" : 7,
+      "phaseA" : 14,
+      "phaseC" : 4
+    },
+    "tutorial" : false
+  },
+  "nearMiss" : {
+    "action" : {
+      "dial" : "frequencyA",
+      "value" : 2
+    },
+    "dials" : {
+      "frequencyA" : 2,
+      "frequencyB" : 7,
+      "phaseA" : 14,
+      "phaseC" : 4
+    },
+    "verdict" : {
+      "kind" : "contact",
+      "obstacle" : 0,
+      "tick" : 1967
+    }
+  },
+  "nonCoprime" : {
+    "actions" : [
+      {
+        "dial" : "frequencyA",
+        "value" : 7
+      }
+    ],
+    "dials" : {
+      "frequencyA" : 7,
+      "frequencyB" : 7,
+      "phaseA" : 14,
+      "phaseC" : 4
+    },
+    "reason" : "r02-g02.move"
+  },
+  "number" : 10,
+  "schema" : 1,
+  "skipped" : 0,
+  "terminal" : {
+    "clearance" : 76900,
+    "visits" : [
+      1326,
+      3542
+    ]
+  }
+}

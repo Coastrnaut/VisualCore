@@ -1,0 +1,163 @@
+{
+  "actions" : [
+    {
+      "dial" : "frequencyA",
+      "value" : 5
+    },
+    {
+      "dial" : "frequencyB",
+      "value" : 3
+    },
+    {
+      "dial" : "phaseA",
+      "value" : 15
+    }
+  ],
+  "difficulty" : {
+    "clearance" : 148660,
+    "shortest" : 3,
+    "winningSettings" : 1,
+    "work" : 1
+  },
+  "fingerprints" : [
+    "c232b043a78af48b9d2b8c51033df42efcb0475eb9af5aa594d8759e4f348430",
+    "045001e5ca6da72fd2001f5acf62a779b0695a31d4d11fdde624cf303dab7a3c",
+    "1a7acd7b31fd543e3e00dc60ee166a237a9dfc629eab3bcfa2ff7da9ca657594",
+    "8572c369e23b9372a82adae0b672ab551d6c72cc105c79e510013d9e379dc5cf"
+  ],
+  "level" : {
+    "allowance" : 15,
+    "amplitudes" : [
+      2,
+      4,
+      3
+    ],
+    "band" : 4,
+    "checkpoints" : [
+      {
+        "radius" : 320,
+        "x" : 892,
+        "y" : 3936,
+        "z" : -1491
+      },
+      {
+        "radius" : 320,
+        "x" : 1422,
+        "y" : -3084,
+        "z" : 207
+      },
+      {
+        "radius" : 320,
+        "x" : 940,
+        "y" : 208,
+        "z" : 2061
+      },
+      {
+        "radius" : 320,
+        "x" : -612,
+        "y" : 3544,
+        "z" : -2967
+      },
+      {
+        "radius" : 320,
+        "x" : -366,
+        "y" : -4096,
+        "z" : 2109
+      }
+    ],
+    "fingerprint" : "051739dd7a9406a3c61ea0b6dc965626a95974064f4d2b3c6540e5df3d61cf42",
+    "frequencyC" : 3,
+    "id" : "lissajous-labyrinth-077",
+    "obstacles" : [
+      {
+        "radius" : 259,
+        "x" : 1786,
+        "y" : -4096,
+        "z" : 3072
+      },
+      {
+        "radius" : 456,
+        "x" : 1510,
+        "y" : -2328,
+        "z" : 66
+      },
+      {
+        "radius" : 347,
+        "x" : 2046,
+        "y" : -2024,
+        "z" : 492
+      },
+      {
+        "radius" : 392,
+        "x" : 1066,
+        "y" : -4004,
+        "z" : 723
+      },
+      {
+        "radius" : 453,
+        "x" : -1338,
+        "y" : -2676,
+        "z" : -525
+      },
+      {
+        "radius" : 330,
+        "x" : 1984,
+        "y" : 3496,
+        "z" : 3042
+      }
+    ],
+    "schema" : 1,
+    "seed" : 8199843428215310992,
+    "start" : {
+      "frequencyA" : 1,
+      "frequencyB" : 2,
+      "phaseA" : 5,
+      "phaseC" : 6
+    },
+    "tutorial" : false
+  },
+  "nearMiss" : {
+    "action" : {
+      "dial" : "frequencyA",
+      "value" : 4
+    },
+    "dials" : {
+      "frequencyA" : 4,
+      "frequencyB" : 3,
+      "phaseA" : 15,
+      "phaseC" : 6
+    },
+    "verdict" : {
+      "checkpoint" : 0,
+      "kind" : "missed"
+    }
+  },
+  "nonCoprime" : {
+    "actions" : [
+      {
+        "dial" : "frequencyB",
+        "value" : 5
+      }
+    ],
+    "dials" : {
+      "frequencyA" : 5,
+      "frequencyB" : 5,
+      "phaseA" : 15,
+      "phaseC" : 6
+    },
+    "reason" : "r02-g02.move"
+  },
+  "number" : 77,
+  "schema" : 1,
+  "skipped" : 0,
+  "terminal" : {
+    "clearance" : 148660,
+    "visits" : [
+      385,
+      1165,
+      2025,
+      2941,
+      3744
+    ]
+  }
+}

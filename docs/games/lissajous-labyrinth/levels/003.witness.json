@@ -1,0 +1,114 @@
+{
+  "actions" : [
+    {
+      "dial" : "frequencyA",
+      "value" : 1
+    },
+    {
+      "dial" : "phaseA",
+      "value" : 13
+    }
+  ],
+  "difficulty" : {
+    "clearance" : 152477,
+    "shortest" : 2,
+    "winningSettings" : 198,
+    "work" : 798
+  },
+  "fingerprints" : [
+    "1884159c9f6d383d46b530ba1b6517cb48c52f0c623996d58d1eba1124e3d987",
+    "648ba32d03194b1738ee9e9402d37a70e710e3f5abbdef80e92f4ef803569643",
+    "7ae0ae529bca1f88903f7fcce10da2148d50f018daac031c81d38a08a2cc90c4"
+  ],
+  "level" : {
+    "allowance" : 11,
+    "amplitudes" : [
+      3,
+      3,
+      3
+    ],
+    "band" : 1,
+    "checkpoints" : [
+      {
+        "radius" : 512,
+        "x" : 1884,
+        "y" : 2865,
+        "z" : -2043
+      },
+      {
+        "radius" : 512,
+        "x" : -132,
+        "y" : 150,
+        "z" : 2133
+      }
+    ],
+    "fingerprint" : "2be1a2108d634c5d26b3d52ad268e404627cf6143e643d3caf12eb5ff76054f2",
+    "frequencyC" : 3,
+    "id" : "lissajous-labyrinth-003",
+    "obstacles" : [
+      {
+        "radius" : 505,
+        "x" : 2205,
+        "y" : -2988,
+        "z" : 2517
+      },
+      {
+        "radius" : 389,
+        "x" : 1530,
+        "y" : -1329,
+        "z" : -2337
+      }
+    ],
+    "schema" : 1,
+    "seed" : 16467784988190491260,
+    "start" : {
+      "frequencyA" : 9,
+      "frequencyB" : 8,
+      "phaseA" : 5,
+      "phaseC" : 13
+    },
+    "tutorial" : true
+  },
+  "nearMiss" : {
+    "action" : {
+      "dial" : "frequencyB",
+      "value" : 7
+    },
+    "dials" : {
+      "frequencyA" : 1,
+      "frequencyB" : 7,
+      "phaseA" : 13,
+      "phaseC" : 13
+    },
+    "verdict" : {
+      "kind" : "contact",
+      "obstacle" : 1,
+      "tick" : 1118
+    }
+  },
+  "nonCoprime" : {
+    "actions" : [
+      {
+        "dial" : "frequencyA",
+        "value" : 2
+      }
+    ],
+    "dials" : {
+      "frequencyA" : 2,
+      "frequencyB" : 8,
+      "phaseA" : 13,
+      "phaseC" : 13
+    },
+    "reason" : "r02-g02.move"
+  },
+  "number" : 3,
+  "schema" : 1,
+  "skipped" : 0,
+  "terminal" : {
+    "clearance" : 152477,
+    "visits" : [
+      1105,
+      2800
+    ]
+  }
+}

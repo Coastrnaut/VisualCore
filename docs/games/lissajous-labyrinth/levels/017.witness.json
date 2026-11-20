@@ -1,0 +1,108 @@
+{
+  "actions" : [
+    {
+      "dial" : "phaseC",
+      "value" : 1
+    }
+  ],
+  "difficulty" : {
+    "clearance" : 239585,
+    "shortest" : 1,
+    "winningSettings" : 386,
+    "work" : 1165
+  },
+  "fingerprints" : [
+    "9b9acb152c968b6d1d1db4b32ef4dfb4eb936ed770574a0f573092140125ec3f",
+    "78b1b67b279daef74bb869e7d1e6aee71faaea137403f6befe2982c8adcb7dab"
+  ],
+  "level" : {
+    "allowance" : 9,
+    "amplitudes" : [
+      3,
+      3,
+      2
+    ],
+    "band" : 1,
+    "checkpoints" : [
+      {
+        "radius" : 512,
+        "x" : -2973,
+        "y" : -1407,
+        "z" : 2028
+      },
+      {
+        "radius" : 512,
+        "x" : -483,
+        "y" : -669,
+        "z" : -476
+      }
+    ],
+    "fingerprint" : "dab0ca43ccaf8aca0aa0c1436e80963a34db0841e278db9c833fd2eaff42e8d9",
+    "frequencyC" : 5,
+    "id" : "lissajous-labyrinth-017",
+    "obstacles" : [
+      {
+        "radius" : 448,
+        "x" : -636,
+        "y" : -2007,
+        "z" : 424
+      },
+      {
+        "radius" : 340,
+        "x" : 3042,
+        "y" : -2937,
+        "z" : -704
+      }
+    ],
+    "schema" : 1,
+    "seed" : 9644374962859508518,
+    "start" : {
+      "frequencyA" : 5,
+      "frequencyB" : 3,
+      "phaseA" : 14,
+      "phaseC" : 10
+    },
+    "tutorial" : false
+  },
+  "nearMiss" : {
+    "action" : {
+      "dial" : "frequencyA",
+      "value" : 4
+    },
+    "dials" : {
+      "frequencyA" : 4,
+      "frequencyB" : 3,
+      "phaseA" : 14,
+      "phaseC" : 1
+    },
+    "verdict" : {
+      "checkpoint" : 1,
+      "kind" : "missed"
+    }
+  },
+  "nonCoprime" : {
+    "actions" : [
+      {
+        "dial" : "frequencyB",
+        "value" : 5
+      }
+    ],
+    "dials" : {
+      "frequencyA" : 5,
+      "frequencyB" : 5,
+      "phaseA" : 14,
+      "phaseC" : 1
+    },
+    "reason" : "r02-g02.move"
+  },
+  "number" : 17,
+  "schema" : 1,
+  "skipped" : 0,
+  "terminal" : {
+    "clearance" : 239585,
+    "visits" : [
+      747,
+      1336
+    ]
+  }
+}

@@ -1,0 +1,108 @@
+{
+  "actions" : [
+    {
+      "dial" : "phaseC",
+      "value" : 3
+    }
+  ],
+  "difficulty" : {
+    "clearance" : 39164,
+    "shortest" : 1,
+    "winningSettings" : 1317,
+    "work" : 3253
+  },
+  "fingerprints" : [
+    "4cc156b0d9698701e1d03f69fa95851e4dc828d820888cdebe37ee665e9c67e5",
+    "f05ea12f50559b90a986a61631b9eea660b14e42be62ef02ebde44a0ee17adaa"
+  ],
+  "level" : {
+    "allowance" : 9,
+    "amplitudes" : [
+      2,
+      4,
+      2
+    ],
+    "band" : 1,
+    "checkpoints" : [
+      {
+        "radius" : 512,
+        "x" : 2040,
+        "y" : 3984,
+        "z" : 332
+      },
+      {
+        "radius" : 512,
+        "x" : -2048,
+        "y" : -3200,
+        "z" : 2018
+      }
+    ],
+    "fingerprint" : "6f5857b290f449b7edd1d443f2dd3b21e7909c1d09e246c03d340f47d69b8244",
+    "frequencyC" : 9,
+    "id" : "lissajous-labyrinth-001",
+    "obstacles" : [
+      {
+        "radius" : 388,
+        "x" : 350,
+        "y" : -1624,
+        "z" : 1926
+      },
+      {
+        "radius" : 374,
+        "x" : -816,
+        "y" : -3484,
+        "z" : -1574
+      }
+    ],
+    "schema" : 1,
+    "seed" : 9619702936664344887,
+    "start" : {
+      "frequencyA" : 7,
+      "frequencyB" : 1,
+      "phaseA" : 5,
+      "phaseC" : 12
+    },
+    "tutorial" : true
+  },
+  "nearMiss" : {
+    "action" : {
+      "dial" : "frequencyA",
+      "value" : 6
+    },
+    "dials" : {
+      "frequencyA" : 6,
+      "frequencyB" : 1,
+      "phaseA" : 5,
+      "phaseC" : 3
+    },
+    "verdict" : {
+      "checkpoint" : 0,
+      "kind" : "missed"
+    }
+  },
+  "nonCoprime" : {
+    "actions" : [
+      {
+        "dial" : "frequencyB",
+        "value" : 7
+      }
+    ],
+    "dials" : {
+      "frequencyA" : 7,
+      "frequencyB" : 7,
+      "phaseA" : 5,
+      "phaseC" : 3
+    },
+    "reason" : "r02-g02.move"
+  },
+  "number" : 1,
+  "schema" : 1,
+  "skipped" : 0,
+  "terminal" : {
+    "clearance" : 39164,
+    "visits" : [
+      1161,
+      2593
+    ]
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "actions" : [
+    {
+      "dial" : "phaseC",
+      "value" : 2
+    }
+  ],
+  "difficulty" : {
+    "clearance" : 37034,
+    "shortest" : 1,
+    "winningSettings" : 1177,
+    "work" : 2882
+  },
+  "fingerprints" : [
+    "82103fe3fb218a1eb8e4379f3a18d079d6d00e83b723bddd582dc14560c9c76d",
+    "eaba86491e4d72bd0a3874363c6fe42ec57d17e4d97786f09e2b5d33242fd4a1"
+  ],
+  "level" : {
+    "allowance" : 9,
+    "amplitudes" : [
+      2,
+      3,
+      3
+    ],
+    "band" : 1,
+    "checkpoints" : [
+      {
+        "radius" : 512,
+        "x" : -1386,
+        "y" : 2958,
+        "z" : 2556
+      },
+      {
+        "radius" : 512,
+        "x" : -1260,
+        "y" : -2325,
+        "z" : 2865
+      }
+    ],
+    "fingerprint" : "42853dd247eab888cc4a50dbf6e6cdc51df2d8fb07c03a0091d6927af08622ae",
+    "frequencyC" : 5,
+    "id" : "lissajous-labyrinth-005",
+    "obstacles" : [
+      {
+        "radius" : 404,
+        "x" : 1184,
+        "y" : 2808,
+        "z" : 2307
+      },
+      {
+        "radius" : 435,
+        "x" : -178,
+        "y" : -267,
+        "z" : 3069
+      }
+    ],
+    "schema" : 1,
+    "seed" : 10400729320312559495,
+    "start" : {
+      "frequencyA" : 7,
+      "frequencyB" : 3,
+      "phaseA" : 3,
+      "phaseC" : 10
+    },
+    "tutorial" : false
+  },
+  "nearMiss" : {
+    "action" : {
+      "dial" : "frequencyA",
+      "value" : 8
+    },
+    "dials" : {
+      "frequencyA" : 8,
+      "frequencyB" : 3,
+      "phaseA" : 3,
+      "phaseC" : 2
+    },
+    "verdict" : {
+      "kind" : "contact",
+      "obstacle" : 1,
+      "tick" : 674
+    }
+  },
+  "nonCoprime" : {
+    "actions" : [
+      {
+        "dial" : "frequencyB",
+        "value" : 7
+      }
+    ],
+    "dials" : {
+      "frequencyA" : 7,
+      "frequencyB" : 7,
+      "phaseA" : 3,
+      "phaseC" : 2
+    },
+    "reason" : "r02-g02.move"
+  },
+  "number" : 5,
+  "schema" : 1,
+  "skipped" : 0,
+  "terminal" : {
+    "clearance" : 37034,
+    "visits" : [
+      1582,
+      3908
+    ]
+  }
+}

@@ -52,7 +52,7 @@ or {device} tasks (pure logic and host-generated content). Fixture seed 2_312; t
   `Packages/ExperiencesRound02/LissajousLabyrinth/CoreTests/LissajousLabyrinthWitnessTests.swift` (round trip byte for byte; edited action, fingerprint, level,
   terminal, counterexample and difficulty refused; newer schema and damaged JSON refused; the near miss loses with a named
   verdict; the non-coprime counterexample is refused by the rules; frequencies 1 handled); `--name host-4`
-- [ ] T-R02G0202-006 [US2] [US3] [US4] Create `Packages/ExperiencesRound02/LissajousLabyrinth/CoreTests/LissajousLabyrinthCatalogTests.swift` (100 entries, 20 per
+- [X] T-R02G0202-006 [US2] [US3] [US4] Create `Packages/ExperiencesRound02/LissajousLabyrinth/CoreTests/LissajousLabyrinthCatalogTests.swift` (100 entries, 20 per — Verified 2026-11-20: 2026-11-20 host-5 exit 0 (catalog: pinned digest 9c1d5652…e96e, progression, band means shortest 1.25/2/2.95/3/4 and winners 785/55/3.5/1.5/1, kernel cross-check on levels 1, 11 … 91, 100 witness files byte for byte, INV-06)
   band; the catalog generated twice is identical; pinned digest; `ProgressionRule.standard` holds on shortest; band means
   of shortest never fall and of winning settings never rise; on levels 1, 11, 21, … 91 (two per band) the winning set
   agrees with the kernel verdict on every winner plus 440 sampled settings and the shortest equals a plain BFS over the

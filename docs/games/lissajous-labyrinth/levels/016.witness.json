@@ -1,0 +1,108 @@
+{
+  "actions" : [
+    {
+      "dial" : "frequencyA",
+      "value" : 1
+    }
+  ],
+  "difficulty" : {
+    "clearance" : 1396838,
+    "shortest" : 1,
+    "winningSettings" : 344,
+    "work" : 813
+  },
+  "fingerprints" : [
+    "645ecc2f62bde127a4010ed4639522804f87956e674896e8b23b54cb4d3044b7",
+    "5cab7d78d75a931d36cb151cded8e800446b8cee0cbd3a23e7c44cca08adf2b0"
+  ],
+  "level" : {
+    "allowance" : 8,
+    "amplitudes" : [
+      4,
+      3,
+      3
+    ],
+    "band" : 1,
+    "checkpoints" : [
+      {
+        "radius" : 512,
+        "x" : -3992,
+        "y" : -2868,
+        "z" : -768
+      },
+      {
+        "radius" : 512,
+        "x" : -4044,
+        "y" : 2406,
+        "z" : 1065
+      }
+    ],
+    "fingerprint" : "d97671f8aadc4c63d9253b52ac24f37283e7e6b64c0f70e7b78916d2ab9a6c4f",
+    "frequencyC" : 3,
+    "id" : "lissajous-labyrinth-016",
+    "obstacles" : [
+      {
+        "radius" : 312,
+        "x" : 1568,
+        "y" : -2838,
+        "z" : 2172
+      },
+      {
+        "radius" : 410,
+        "x" : -3496,
+        "y" : -3069,
+        "z" : 1743
+      }
+    ],
+    "schema" : 1,
+    "seed" : 14790525413290847222,
+    "start" : {
+      "frequencyA" : 2,
+      "frequencyB" : 9,
+      "phaseA" : 10,
+      "phaseC" : 7
+    },
+    "tutorial" : false
+  },
+  "nearMiss" : {
+    "action" : {
+      "dial" : "frequencyA",
+      "value" : 2
+    },
+    "dials" : {
+      "frequencyA" : 2,
+      "frequencyB" : 9,
+      "phaseA" : 10,
+      "phaseC" : 7
+    },
+    "verdict" : {
+      "checkpoint" : 1,
+      "kind" : "missed"
+    }
+  },
+  "nonCoprime" : {
+    "actions" : [
+      {
+        "dial" : "frequencyA",
+        "value" : 3
+      }
+    ],
+    "dials" : {
+      "frequencyA" : 3,
+      "frequencyB" : 9,
+      "phaseA" : 10,
+      "phaseC" : 7
+    },
+    "reason" : "r02-g02.move"
+  },
+  "number" : 16,
+  "schema" : 1,
+  "skipped" : 0,
+  "terminal" : {
+    "clearance" : 1396838,
+    "visits" : [
+      337,
+      504
+    ]
+  }
+}

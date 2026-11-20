@@ -1,0 +1,108 @@
+{
+  "actions" : [
+    {
+      "dial" : "frequencyA",
+      "value" : 7
+    }
+  ],
+  "difficulty" : {
+    "clearance" : 87061,
+    "shortest" : 1,
+    "winningSettings" : 823,
+    "work" : 1987
+  },
+  "fingerprints" : [
+    "0a53b5d5577690f0eccc28eef477b6b02abc70eba0a5c6378e92a860c28fe7ea",
+    "8b001d4a517c7739e6f9ee70f230b459662a9dbb74ae2f26d98635d62e146ea0"
+  ],
+  "level" : {
+    "allowance" : 11,
+    "amplitudes" : [
+      3,
+      4,
+      2
+    ],
+    "band" : 1,
+    "checkpoints" : [
+      {
+        "radius" : 512,
+        "x" : -2832,
+        "y" : 4080,
+        "z" : -2040
+      },
+      {
+        "radius" : 512,
+        "x" : 2619,
+        "y" : -1532,
+        "z" : 766
+      }
+    ],
+    "fingerprint" : "17bce0240a81e23eeed4b10bd6fa2f3f836b9ba66146a98503fa3dc3ccdaef92",
+    "frequencyC" : 7,
+    "id" : "lissajous-labyrinth-011",
+    "obstacles" : [
+      {
+        "radius" : 428,
+        "x" : 2925,
+        "y" : 1832,
+        "z" : -244
+      },
+      {
+        "radius" : 424,
+        "x" : -2127,
+        "y" : -4040,
+        "z" : -622
+      }
+    ],
+    "schema" : 1,
+    "seed" : 10664749196354857570,
+    "start" : {
+      "frequencyA" : 9,
+      "frequencyB" : 8,
+      "phaseA" : 3,
+      "phaseC" : 13
+    },
+    "tutorial" : false
+  },
+  "nearMiss" : {
+    "action" : {
+      "dial" : "frequencyB",
+      "value" : 9
+    },
+    "dials" : {
+      "frequencyA" : 7,
+      "frequencyB" : 9,
+      "phaseA" : 3,
+      "phaseC" : 13
+    },
+    "verdict" : {
+      "checkpoint" : 1,
+      "kind" : "missed"
+    }
+  },
+  "nonCoprime" : {
+    "actions" : [
+      {
+        "dial" : "frequencyB",
+        "value" : 7
+      }
+    ],
+    "dials" : {
+      "frequencyA" : 7,
+      "frequencyB" : 7,
+      "phaseA" : 3,
+      "phaseC" : 13
+    },
+    "reason" : "r02-g02.move"
+  },
+  "number" : 11,
+  "schema" : 1,
+  "skipped" : 0,
+  "terminal" : {
+    "clearance" : 87061,
+    "visits" : [
+      2137,
+      2327
+    ]
+  }
+}

@@ -1,0 +1,126 @@
+{
+  "actions" : [
+    {
+      "dial" : "frequencyA",
+      "value" : 1
+    },
+    {
+      "dial" : "frequencyB",
+      "value" : 8
+    }
+  ],
+  "difficulty" : {
+    "clearance" : 580280,
+    "shortest" : 2,
+    "winningSettings" : 61,
+    "work" : 207
+  },
+  "fingerprints" : [
+    "2f95188ae55ac6d85bc0b0194cb36db2b468b5ab23cb25ea7772253169f7c853",
+    "8bf4ae2b18f5e69b7ce53906471f3e6e7d5904bae24238cee7bbde87db9a4b6f",
+    "f7dbe89f3b8720be360e9ba1d98ad0e191abebc13e0a8a300c08fcce800e6fd2"
+  ],
+  "level" : {
+    "allowance" : 12,
+    "amplitudes" : [
+      4,
+      2,
+      3
+    ],
+    "band" : 2,
+    "checkpoints" : [
+      {
+        "radius" : 448,
+        "x" : -3764,
+        "y" : 226,
+        "z" : 2712
+      },
+      {
+        "radius" : 448,
+        "x" : 644,
+        "y" : 1952,
+        "z" : -969
+      },
+      {
+        "radius" : 448,
+        "x" : 3844,
+        "y" : 642,
+        "z" : -348
+      }
+    ],
+    "fingerprint" : "3f35d1de9bb124f1e4bfe343db6de4ee76a7a9004ce8f692ccb14dc55b28061d",
+    "frequencyC" : 7,
+    "id" : "lissajous-labyrinth-030",
+    "obstacles" : [
+      {
+        "radius" : 331,
+        "x" : 2984,
+        "y" : -26,
+        "z" : -3069
+      },
+      {
+        "radius" : 378,
+        "x" : -1384,
+        "y" : -1970,
+        "z" : -915
+      },
+      {
+        "radius" : 448,
+        "x" : 264,
+        "y" : -1950,
+        "z" : -198
+      }
+    ],
+    "schema" : 1,
+    "seed" : 7917354339892393243,
+    "start" : {
+      "frequencyA" : 5,
+      "frequencyB" : 6,
+      "phaseA" : 8,
+      "phaseC" : 10
+    },
+    "tutorial" : false
+  },
+  "nearMiss" : {
+    "action" : {
+      "dial" : "frequencyB",
+      "value" : 7
+    },
+    "dials" : {
+      "frequencyA" : 1,
+      "frequencyB" : 7,
+      "phaseA" : 8,
+      "phaseC" : 10
+    },
+    "verdict" : {
+      "checkpoint" : 1,
+      "kind" : "missed"
+    }
+  },
+  "nonCoprime" : {
+    "actions" : [
+      {
+        "dial" : "frequencyA",
+        "value" : 2
+      }
+    ],
+    "dials" : {
+      "frequencyA" : 2,
+      "frequencyB" : 8,
+      "phaseA" : 8,
+      "phaseC" : 10
+    },
+    "reason" : "r02-g02.move"
+  },
+  "number" : 30,
+  "schema" : 1,
+  "skipped" : 2,
+  "terminal" : {
+    "clearance" : 580280,
+    "visits" : [
+      745,
+      2138,
+      3291
+    ]
+  }
+}

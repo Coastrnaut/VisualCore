@@ -1,0 +1,108 @@
+{
+  "actions" : [
+    {
+      "dial" : "frequencyA",
+      "value" : 4
+    }
+  ],
+  "difficulty" : {
+    "clearance" : 556605,
+    "shortest" : 1,
+    "winningSettings" : 572,
+    "work" : 1664
+  },
+  "fingerprints" : [
+    "63954cbee06d3773b04dd8a1aa61f72c925c19a053fceea1d41c8d9158111e58",
+    "80057408e7b62d0a459af1b4e362b4ce7994d5ba7e618c4d2e1b3ffde82260c2"
+  ],
+  "level" : {
+    "allowance" : 11,
+    "amplitudes" : [
+      2,
+      3,
+      4
+    ],
+    "band" : 1,
+    "checkpoints" : [
+      {
+        "radius" : 512,
+        "x" : 1636,
+        "y" : -2808,
+        "z" : 4012
+      },
+      {
+        "radius" : 512,
+        "x" : -1130,
+        "y" : 2529,
+        "z" : 3476
+      }
+    ],
+    "fingerprint" : "7ef2740185548d283bc00faa69bbb23492f7782b203e0282071ee19b108dad38",
+    "frequencyC" : 7,
+    "id" : "lissajous-labyrinth-019",
+    "obstacles" : [
+      {
+        "radius" : 434,
+        "x" : 1960,
+        "y" : -855,
+        "z" : 1976
+      },
+      {
+        "radius" : 443,
+        "x" : -624,
+        "y" : -2790,
+        "z" : 3384
+      }
+    ],
+    "schema" : 1,
+    "seed" : 10348912619363778676,
+    "start" : {
+      "frequencyA" : 5,
+      "frequencyB" : 3,
+      "phaseA" : 8,
+      "phaseC" : 7
+    },
+    "tutorial" : false
+  },
+  "nearMiss" : {
+    "action" : {
+      "dial" : "frequencyA",
+      "value" : 5
+    },
+    "dials" : {
+      "frequencyA" : 5,
+      "frequencyB" : 3,
+      "phaseA" : 8,
+      "phaseC" : 7
+    },
+    "verdict" : {
+      "checkpoint" : 1,
+      "kind" : "missed"
+    }
+  },
+  "nonCoprime" : {
+    "actions" : [
+      {
+        "dial" : "frequencyB",
+        "value" : 2
+      }
+    ],
+    "dials" : {
+      "frequencyA" : 4,
+      "frequencyB" : 2,
+      "phaseA" : 8,
+      "phaseC" : 7
+    },
+    "reason" : "r02-g02.move"
+  },
+  "number" : 19,
+  "schema" : 1,
+  "skipped" : 0,
+  "terminal" : {
+    "clearance" : 556605,
+    "visits" : [
+      875,
+      3186
+    ]
+  }
+}

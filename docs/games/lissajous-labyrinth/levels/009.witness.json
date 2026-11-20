@@ -1,0 +1,109 @@
+{
+  "actions" : [
+    {
+      "dial" : "phaseA",
+      "value" : 0
+    }
+  ],
+  "difficulty" : {
+    "clearance" : 168244,
+    "shortest" : 1,
+    "winningSettings" : 1235,
+    "work" : 3558
+  },
+  "fingerprints" : [
+    "5ac0b42336588fc1826bb799411c0239631cb41ef15a7f89603ef8b41245abea",
+    "16af3eee6e3db41653016d63d235c36e9d85473a458ddff73526dc61aa1d5da1"
+  ],
+  "level" : {
+    "allowance" : 9,
+    "amplitudes" : [
+      2,
+      4,
+      2
+    ],
+    "band" : 1,
+    "checkpoints" : [
+      {
+        "radius" : 512,
+        "x" : 300,
+        "y" : 4032,
+        "z" : -2000
+      },
+      {
+        "radius" : 512,
+        "x" : -1534,
+        "y" : -3156,
+        "z" : 958
+      }
+    ],
+    "fingerprint" : "e55100f2540288062017b80a4a6a9e20fe2ac01945cffd3d8076dab7667546b0",
+    "frequencyC" : 7,
+    "id" : "lissajous-labyrinth-009",
+    "obstacles" : [
+      {
+        "radius" : 271,
+        "x" : -1328,
+        "y" : -4084,
+        "z" : -316
+      },
+      {
+        "radius" : 502,
+        "x" : 448,
+        "y" : 788,
+        "z" : -1706
+      }
+    ],
+    "schema" : 1,
+    "seed" : 10366468086369724800,
+    "start" : {
+      "frequencyA" : 1,
+      "frequencyB" : 7,
+      "phaseA" : 9,
+      "phaseC" : 5
+    },
+    "tutorial" : false
+  },
+  "nearMiss" : {
+    "action" : {
+      "dial" : "frequencyB",
+      "value" : 6
+    },
+    "dials" : {
+      "frequencyA" : 1,
+      "frequencyB" : 6,
+      "phaseA" : 0,
+      "phaseC" : 5
+    },
+    "verdict" : {
+      "kind" : "contact",
+      "obstacle" : 0,
+      "tick" : 2571
+    }
+  },
+  "nonCoprime" : {
+    "actions" : [
+      {
+        "dial" : "frequencyA",
+        "value" : 7
+      }
+    ],
+    "dials" : {
+      "frequencyA" : 7,
+      "frequencyB" : 7,
+      "phaseA" : 0,
+      "phaseC" : 5
+    },
+    "reason" : "r02-g02.move"
+  },
+  "number" : 9,
+  "schema" : 1,
+  "skipped" : 0,
+  "terminal" : {
+    "clearance" : 168244,
+    "visits" : [
+      97,
+      2834
+    ]
+  }
+}

@@ -1,0 +1,108 @@
+{
+  "actions" : [
+    {
+      "dial" : "frequencyA",
+      "value" : 1
+    }
+  ],
+  "difficulty" : {
+    "clearance" : 338417,
+    "shortest" : 1,
+    "winningSettings" : 512,
+    "work" : 1564
+  },
+  "fingerprints" : [
+    "4d964255ae09d740adcfbd302419b6010a980c462e5057617aff63d29c2bb23e",
+    "d97ee8ce45994e8b23734d2c8bb501d394599d731c76f8552710cdd46cfc7a84"
+  ],
+  "level" : {
+    "allowance" : 11,
+    "amplitudes" : [
+      3,
+      4,
+      3
+    ],
+    "band" : 1,
+    "checkpoints" : [
+      {
+        "radius" : 512,
+        "x" : 1368,
+        "y" : -4096,
+        "z" : -1044
+      },
+      {
+        "radius" : 512,
+        "x" : -3045,
+        "y" : -3420,
+        "z" : 1422
+      }
+    ],
+    "fingerprint" : "b11224e02fe2ffd26d3b1fd916505f68e3082f31a181208aba27ae507ff42548",
+    "frequencyC" : 6,
+    "id" : "lissajous-labyrinth-015",
+    "obstacles" : [
+      {
+        "radius" : 307,
+        "x" : 2979,
+        "y" : 2480,
+        "z" : 672
+      },
+      {
+        "radius" : 418,
+        "x" : 390,
+        "y" : -12,
+        "z" : 2178
+      }
+    ],
+    "schema" : 1,
+    "seed" : 8136826745579290131,
+    "start" : {
+      "frequencyA" : 3,
+      "frequencyB" : 4,
+      "phaseA" : 0,
+      "phaseC" : 3
+    },
+    "tutorial" : false
+  },
+  "nearMiss" : {
+    "action" : {
+      "dial" : "frequencyB",
+      "value" : 3
+    },
+    "dials" : {
+      "frequencyA" : 1,
+      "frequencyB" : 3,
+      "phaseA" : 0,
+      "phaseC" : 3
+    },
+    "verdict" : {
+      "checkpoint" : 0,
+      "kind" : "missed"
+    }
+  },
+  "nonCoprime" : {
+    "actions" : [
+      {
+        "dial" : "frequencyA",
+        "value" : 2
+      }
+    ],
+    "dials" : {
+      "frequencyA" : 2,
+      "frequencyB" : 4,
+      "phaseA" : 0,
+      "phaseC" : 3
+    },
+    "reason" : "r02-g02.move"
+  },
+  "number" : 15,
+  "schema" : 1,
+  "skipped" : 0,
+  "terminal" : {
+    "clearance" : 338417,
+    "visits" : [
+      1712,
+      2712
+    ]
+  }
+}

@@ -1,0 +1,113 @@
+{
+  "actions" : [
+    {
+      "dial" : "frequencyA",
+      "value" : 1
+    },
+    {
+      "dial" : "frequencyB",
+      "value" : 3
+    }
+  ],
+  "difficulty" : {
+    "clearance" : 260420,
+    "shortest" : 2,
+    "winningSettings" : 862,
+    "work" : 2904
+  },
+  "fingerprints" : [
+    "bfe80f43ace049fd4493e03630ef97ba0e5a7dcbd678ae1f80096d89f998c064",
+    "71dbb354579791a3e165d2846992ffbf75b4c01b26d7b9d5f573ed164506edbe",
+    "d12b80a5c4c60b44da219b117ede23ee44fa5b922f6c8fa8fbe5a26c33cd1d17"
+  ],
+  "level" : {
+    "allowance" : 11,
+    "amplitudes" : [
+      3,
+      3,
+      3
+    ],
+    "band" : 1,
+    "checkpoints" : [
+      {
+        "radius" : 512,
+        "x" : 2649,
+        "y" : 66,
+        "z" : 3066
+      },
+      {
+        "radius" : 512,
+        "x" : -2175,
+        "y" : -2163,
+        "z" : 2142
+      }
+    ],
+    "fingerprint" : "f43f34e91d45f02a1dd4d6faa73632bf8799bb7a5297a49fec221094ccf17b8d",
+    "frequencyC" : 9,
+    "id" : "lissajous-labyrinth-007",
+    "obstacles" : [
+      {
+        "radius" : 290,
+        "x" : 2523,
+        "y" : -2118,
+        "z" : 2976
+      },
+      {
+        "radius" : 299,
+        "x" : -747,
+        "y" : 2778,
+        "z" : 1830
+      }
+    ],
+    "schema" : 1,
+    "seed" : 11986109196935000530,
+    "start" : {
+      "frequencyA" : 9,
+      "frequencyB" : 1,
+      "phaseA" : 0,
+      "phaseC" : 8
+    },
+    "tutorial" : false
+  },
+  "nearMiss" : {
+    "action" : {
+      "dial" : "frequencyA",
+      "value" : 2
+    },
+    "dials" : {
+      "frequencyA" : 2,
+      "frequencyB" : 3,
+      "phaseA" : 0,
+      "phaseC" : 8
+    },
+    "verdict" : {
+      "checkpoint" : 1,
+      "kind" : "missed"
+    }
+  },
+  "nonCoprime" : {
+    "actions" : [
+      {
+        "dial" : "frequencyA",
+        "value" : 3
+      }
+    ],
+    "dials" : {
+      "frequencyA" : 3,
+      "frequencyB" : 3,
+      "phaseA" : 0,
+      "phaseC" : 8
+    },
+    "reason" : "r02-g02.move"
+  },
+  "number" : 7,
+  "schema" : 1,
+  "skipped" : 0,
+  "terminal" : {
+    "clearance" : 260420,
+    "visits" : [
+      650,
+      2543
+    ]
+  }
+}
