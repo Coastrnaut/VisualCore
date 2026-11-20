@@ -43,7 +43,7 @@ campaign). Fixture seed 2_017; grids ≤ 64 × 64 so tests stay light.
 
 ## Phase 6: Story 5 — save and reopen (P2)
 
-- [ ] T-R02F17-006 [US5] Create `Packages/VisualCore/Sources/VisualCoreSimulation/Heightfield+Coding.swift` (schema 1, sorted keys, newer refused, damaged and
+- [X] T-R02F17-006 [US5] Create `Packages/VisualCore/Sources/VisualCoreSimulation/Heightfield+Coding.swift` (schema 1, sorted keys, newer refused, damaged and — Verified 2026-11-19: lead retest 2026-11-19: R02-F17.host.json (exit 0, full suite); HeightfieldCodingTests 5 passed (byte-identical round trip; reopened state continues bit-identically for 200 steps; schema 2 refused; damaged, wrong-size, out-of-range and unbalanced forms malformed)
   wrong-size arrays malformed) with `Packages/VisualCore/Tests/VisualCoreSimulationTests/HeightfieldCodingTests.swift` (byte-identical round trip; a reopened state
   continues bit-identically for 200 steps; schema 2, truncated JSON and wrong array sizes refused); `--name host-5`
 
