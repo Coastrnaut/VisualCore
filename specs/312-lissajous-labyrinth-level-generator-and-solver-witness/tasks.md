@@ -45,7 +45,7 @@ or {device} tasks (pure logic and host-generated content). Fixture seed 2_312; t
 
 ## Phase 5: Stories 3 and 4 — difficulty and honest witness files (P2)
 
-- [ ] T-R02G0202-005 [P] [US4] Create `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthWitness.swift` (schema 1; built by replaying the
+- [X] T-R02G0202-005 [P] [US4] Create `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthWitness.swift` (schema 1; built by replaying the — Verified 2026-11-20: 2026-11-20 host-4 exit 0 (11 witness tests)
   solution on a `LissajousLabyrinthPlay`: fingerprints after begin/tutorial and each action; terminal visit ticks and
   clearance; near miss and non-coprime counterexample per clarification Q4; sorted-key pretty JSON with a trailing
   newline; `decode` refuses newer, damaged and non-replaying witnesses) with
