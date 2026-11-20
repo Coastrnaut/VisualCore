@@ -1,0 +1,159 @@
+# Feature Specification: R02-G01-01 — Aurora Loom: playable rule kernel
+
+**Feature Branch**: `301-aurora-loom-playable-rule-kernel` (spec directory only; work on `main`)
+
+**Created**: 2026-11-20
+
+**Status**: Draft
+
+**Ledger gate**: R02-G01-01 (migration ledger, game feature of experience R02-G01) · ID namespace FR-R02G0101-###,
+SC-R02G0101-###, T-R02G0101-###
+
+**Input**: User description: the archived R02-G01-01 `/speckit-specify` prompt (round2.md line 2296), verbatim in the
+invocation: "Implement deterministic state transition and exact win/failure evaluation" for Aurora Loom, with the
+canonical overrides of ADR-0009 and Auto-Creator.md sections 19 and 21.
+
+Canonical overrides:
+- **Feature directory and ids:** `specs/301-aurora-loom-playable-rule-kernel`; FR-R02G0101-###, SC-R02G0101-###,
+  T-R02G0101-###.
+- **Packaging (ADR-0009):** Aurora Loom is experience R02-G01 (`r02-g01.aurora-loom`, free) inside the single VisualCore
+  app. No app target, bundle identifier, scheme or store listing. The source's `Apps/AuroraLoom` and
+  `Packages/GameModules/AuroraLoomCore` become the experience module `Packages/ExperiencesRound02/AuroraLoom` (section 16);
+  this feature creates the package and its pure Core with tests. Registration in the catalog, the experience adapter and
+  the renderer come in later features of R02-G01 (02–09) and its integration gate X-R02-G01.
+- **Superseded parts of the source prompt:** the USD 2.99 upfront price and "no IAP" (the experience is free under the
+  shared purchase controller); the Round 2 lock and per-round device campaign (ImplementationLock-100). **Device-only
+  items:** none in this feature (the kernel is pure logic). **Owner-only items:** none.
+- **Shared features used:** R02-F03 (numbers), R02-F23 (puzzle contract: the kernel's rules are a `PuzzleRules`, so the
+  generator and solver of R02-G01-02 can certify levels); the other prerequisites listed by the source are delivered by
+  unified-app features or concern later features of this game.
+
+## User Scenarios & Testing *(mandatory)*
+
+### User Story 1 - Make three ribbons agree (Priority: P1) 🎯
+
+A player turns ribbons' wave and phase controls, each in sixteen steady steps; the game tells, exactly and the same way
+every time, whether all three ribbons now meet the target harmony at all four gates for two full periods, and declares
+the level won the moment they do.
+
+**Why this priority**: it is the game.
+
+**Independent Test**: from a level's start, a known winning sequence of control changes wins, and a sequence that leaves
+one gate off target does not.
+
+**Acceptance Scenarios**:
+
+1. **Given** a level, **When** the controls are set so every gate sample stays within tolerance for two periods, **Then**
+   the level is won.
+2. **Given** a level, **When** one ribbon is one step off at one gate beyond tolerance, **Then** the level is not won.
+
+### User Story 2 - Run out of moves (Priority: P1)
+
+A player who uses the whole move allowance without reaching the harmony sees the level fail, with an explanation of which
+gate and ribbon were furthest off — never a hidden automatic solution.
+
+**Independent Test**: spending the allowance without a win fails the level and reports the largest mismatch.
+
+### User Story 3 - Undo, redo and replay (Priority: P1)
+
+A player undoes and redoes moves freely before the level ends; a recorded sequence of moves replays to exactly the same
+states, outcome and fingerprints on every device.
+
+**Independent Test**: undo restores the exact previous state and fingerprint; replaying a recorded trace reproduces every
+fingerprint.
+
+### User Story 4 - Pause and the life of a level (Priority: P2)
+
+The level moves through loading, tutorial, playing, paused, won or failed and result; moves made while paused or after the
+end are refused, and the game never changes the outcome by itself.
+
+**Independent Test**: every move in a state that forbids it is refused with a reason, and the state is unchanged.
+
+### User Story 5 - Levels that can be stored (Priority: P2)
+
+A level is stored with a schema version and a fingerprint; damaged or newer records are refused, never half-loaded.
+
+**Independent Test**: levels round-trip exactly; damaged and newer records are refused.
+
+### Edge Cases
+
+- **A move out of range** (no such ribbon, a step outside 0 … 15): refused, state unchanged.
+- **A move after the allowance is spent or after the end:** refused.
+- **A stale move** (its claimed previous fingerprint does not match): refused.
+- **A level already in harmony at the start:** refused as a level, so no level can be won without a move.
+- **Gate samples exactly on the tolerance boundary:** inside (won); one unit beyond: outside.
+- **Damaged, newer or inconsistent stored levels:** refused with a named reason.
+
+## Requirements *(mandatory)*
+
+### Functional Requirements
+
+- **FR-R02G0101-001**: A level MUST define three ribbons with sixteen-step wave and phase controls, four gates, a target
+  harmony, a tolerance, a move allowance and a start, and MUST be refused when invalid.
+- **FR-R02G0101-002**: Ribbon phases at the gates MUST be evaluated exactly (the same on every device) over two complete
+  periods sampled at the fixed step of 1/120 second.
+- **FR-R02G0101-003**: The level MUST be won exactly when every gate sample of every ribbon stays within tolerance for the
+  two periods, and failed exactly when the allowance is spent without that; the failure MUST name the furthest-off gate
+  and ribbon.
+- **FR-R02G0101-004**: Every move MUST be validated (range, allowance, state, previous fingerprint) and recorded as an
+  append-only record with the previous and next state fingerprints; invalid moves MUST be refused without change.
+- **FR-R02G0101-005**: Undo and redo MUST restore exact states and fingerprints; replaying a record trace MUST reproduce
+  every fingerprint and the outcome.
+- **FR-R02G0101-006**: The level's life MUST follow a defined state machine (loading, tutorial, playing, paused, won,
+  failed, result), refusing moves where the machine forbids them.
+- **FR-R02G0101-007**: Levels MUST have a versioned stored form with a fingerprint; damaged and newer forms MUST be refused.
+- **FR-R02G0101-008**: The rules MUST be expressible as a puzzle contract (R02-F23) so later features can certify levels.
+- **FR-R02G0101-009**: Invalid requests MUST be refused with stable reason codes naming the experience; existing modules
+  and experiences MUST be unchanged; every new public name carries documentation; the reference regression passes.
+
+### Key Entities
+
+- **Level**: id, seed, band, three ribbons' start controls and angular speed, four gate positions, target harmony per
+  gate, tolerance, move allowance.
+- **Ribbon controls**: wave step and phase step, each 0 … 15.
+- **Move**: ribbon, control (wave or phase), new step.
+- **Move record**: schema, level seed, tick, ribbon, control, step, previous and next fingerprints.
+- **Play state**: life stage, controls, moves spent, records, undo and redo stacks, outcome and its explanation.
+
+## Success Criteria *(mandatory)*
+
+### Measurable Outcomes
+
+- **SC-R02G0101-001**: For 1,000 seeded levels, a constructed winning control setting wins and every setting one step away
+  at any single control that breaks a gate does not; boundary samples at exactly the tolerance are inside, one unit
+  beyond outside.
+- **SC-R02G0101-002**: For 500 seeded move traces, replay reproduces every fingerprint and the outcome; undo of every move
+  restores the exact earlier state and fingerprint.
+- **SC-R02G0101-003**: Every refused move (out of range, over allowance, wrong state, stale fingerprint) leaves the state
+  and fingerprint unchanged, for 1,000 seeded attempts.
+- **SC-R02G0101-004**: Spending the allowance without winning fails with the furthest-off gate and ribbon named, in every
+  seeded case.
+- **SC-R02G0101-005**: Levels round-trip exactly; damaged and newer forms are refused.
+- **SC-R02G0101-006**: Existing tests pass unchanged; the reference regression passes 7 of 7; each unit test finishes in
+  under 10 seconds.
+
+## Assumptions
+
+- The kernel is pure logic; drawing, gestures, camera, sound and VoiceOver presentation come in later features of this
+  game, which consume the kernel's immutable snapshots.
+- The 100 catalog levels and their solver witnesses are generated in R02-G01-02; this feature proves the rules on seeded
+  levels built in tests.
+- Visuals are code only and the game makes no network request; nothing here draws.
+
+## Traceability
+
+| Source deliverable | Requirement |
+|---|---|
+| Deterministic state transition | FR-R02G0101-004, 005, 006 |
+| Exact win evaluation (two periods, four gates) | FR-R02G0101-002, 003 |
+| Exact failure evaluation (move allowance) | FR-R02G0101-003 |
+| Sixteen-step controls | FR-R02G0101-001 |
+| Schema migration | FR-R02G0101-007 |
+| Solver-ready rules | FR-R02G0101-008 |
+| Invariants INV-01 … INV-05, INV-07 … INV-09 | FR-R02G0101-001 … 007 |
+| No Stage One breakage | FR-R02G0101-009 |
+
+## Negative Requirements / Excluded scope
+
+- No app target or scheme, no catalog registration yet, no rendering, gestures, audio, persistence of progress, level
+  generator or solver (later features), no device run before ImplementationLock-100, no analytics, no network.
