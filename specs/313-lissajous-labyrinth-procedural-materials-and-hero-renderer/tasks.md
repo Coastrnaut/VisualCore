@@ -10,7 +10,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 - [X] T-R02G0203-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test — Verified 2026-11-20: 2026-11-20 R02-G02-03.baseline-host/timing/round02 exit 0
   --package-path Packages/ExperiencesRound02`; the rendering baseline is R02-G01-06's rendering runs (exit 0)
-- [ ] T-R02G0203-002 Edit `Packages/ExperiencesRound02/Package.swift` (Core dependencies; `LissajousLabyrinthExperience`
+- [X] T-R02G0203-002 Edit `Packages/ExperiencesRound02/Package.swift` (Core dependencies; `LissajousLabyrinthExperience` — Verified 2026-11-20: 2026-11-20 host exit 0 (package: Lissajous Core dependencies, experience target and tests; snapshot, palette, tiers)
   and its tests with iOS-conditioned rendering dependencies; the product) and create
   `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthSceneSnapshot.swift` (snapshot, `LissajousLabyrinthTier` "stride 1/2/4, glow 2/1/0, trail
   512/256/128, richest first", `LissajousLabyrinthPalette` "night #070B1E, cobalt #2F5BD8, violet #8A4FE0, copper #D9824A");
