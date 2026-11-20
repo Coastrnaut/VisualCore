@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-20
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G01-02 (migration ledger, game feature of experience R02-G01) · ID namespace FR-R02G0102-###,
 SC-R02G0102-###, T-R02G0102-###
@@ -18,13 +18,55 @@ Canonical overrides:
   SC-R02G0102-###, T-R02G0102-###.
 - **Packaging (ADR-0009):** experience R02-G01 (`r02-g01.aurora-loom`, free) in `Packages/ExperiencesRound02/AuroraLoom`;
   this feature extends `AuroraLoomCore` (R02-G01-01) with the generator, the solver and the witness files.
-- **Content count:** the canonical catalog is the 100-level manifest of Auto-Creator.md section 7 (`python3
-  scripts/planning_index.py levels --experience R02-G01`, 20 levels in each of bands 1 … 5, each with its planned seed and
+- **Content count:** the canonical catalog is the 100-level manifest named in Auto-Creator.md's R02-G01 entry
+  (`python3 scripts/planning_index.py levels --experience R02-G01`, 20 levels in each of bands 1 … 5, each with its planned seed and
   move budget); the source's "80 stages" is a milestone only.
 - **Superseded parts of the source prompt:** price, "no IAP" and the Round 2 lock (as in R02-G01-01). **Device-only
   items:** none (generation and certification run on the host). **Owner-only items:** none.
 - **Shared features used:** R02-F23 (puzzle contract: the rules from R02-G01-01) and R02-F24 (catalog digest and
   progression rule); R02-F03 numbers.
+
+## Clarifications
+
+### Session 2026-11-20
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time. Facts checked in
+code (read-only audit, 2026-11-20): R02-G01-01's `AuroraLoomLevel`, `AuroraLoomHarmony`, `AuroraLoomPlay` and
+`AuroraLoomRules`; R02-F24's `PuzzleCatalog.digest(id:identities:)`, `PuzzleDifficulty` and `ProgressionRule`;
+`SeedDerivation` and `StableHash`. A property of the rules decides the solver's shape: for one ribbon to meet a target at
+four distinct gate positions its wave step is fixed modulo 16, so all three ribbons share one exact winning (wave, phase)
+and each ribbon is solved on its own among 256 settings.
+
+- Q: How is a level built from its manifest entry? → A: the 100 manifest entries (number, planned seed, band, move budget)
+  are a table in `AuroraLoomManifest`, copied from the archived design with its provenance. Candidate k of entry n draws
+  from `SeededRandom(seed: SeedDerivation.derive(plannedSeed, index: k))`: the winning steps (shared by the three
+  ribbons), four distinct gate positions, per-gate target offsets of at most half the tolerance, and a start that changes
+  `scramble` of the six controls. Bands set Ω (16, 32, 64, 128, 256), the tolerance (160, 96, 64, 40, 24 units) and the
+  shortest solution sought (1–2, 2–3, 3–4, 4–5, 5–6 moves). A candidate is kept when it is a valid level, its shortest
+  solution lies in its band's range and does not exceed the move budget; otherwise k grows, at most 64 candidates. The
+  level's id is `aurora-loom-NNN`, its tutorial flag is set for levels 1 … 3. Impact: FR-R02G0102-001; SC-R02G0102-001, 003.
+- Q: How does the solver work and how is optimality proved? → A: `AuroraLoomSolver` first runs bounded coordinate descent
+  per ribbon (alternating wave and phase, each step taking the value that most lowers the ribbon's largest |residual|, at
+  most 32 sweeps), then the exact grid search over all 256 settings of each ribbon, which yields the ribbon's winning
+  settings and the fewest changes to reach one (0, 1 or 2). The shortest solution is the sum over ribbons; the witness
+  picks, per ribbon, the winning setting with the fewest changes, ties by (wave, phase) ascending, and orders moves
+  by ribbon, then wave before phase. The method is `descent` when descent alone reached a setting of the optimal cost,
+  `grid` otherwise; the work is the number of setting evaluations. Impact: FR-R02G0102-002, 003; SC-R02G0102-002.
+- Q: What difficulty metrics are stored and what progression is required? → A: `AuroraLoomDifficulty` holds the shortest
+  solution, the solver work, the number of winning settings over the three ribbons, the tolerance and Ω. The catalog in
+  manifest order keeps R02-F24's standard `ProgressionRule` (drop at most 1, jump at most 3) on shortest solutions, and
+  each band's mean shortest and mean work are not below the previous band's. Impact: FR-R02G0102-003, 005; SC-R02G0102-004.
+- Q: What is in a witness file and how is it checked? → A: `docs/games/aurora-loom/levels/NNN.witness.json`, JSON schema 1
+  with sorted keys: number, the level's stored form, the actions, the play fingerprints after `begin` (and the tutorial)
+  and after each action, the terminal worst mismatch, the counterexample (the end setting with ribbon 0's phase moved by
+  the smallest step that loses, with its worst mismatch), the difficulty, the method and the candidates skipped. The test
+  rebuilds every witness and compares bytes; it writes the files only when the environment variable
+  `AURORA_LOOM_WRITE_WITNESSES=1` is set. Decoding refuses newer schemas, damaged files and witnesses that no longer
+  replay. Impact: FR-R02G0102-004; SC-R02G0102-003, 005.
+- Q: How is the catalog identified and how are refusals named? → A: the catalog digest is
+  `PuzzleCatalog<AuroraLoomRules>.digest(id: "aurora-loom", identities:)` over the 100 level fingerprints in manifest
+  order, pinned in a test. New refusals in `AuroraLoomError`: `generation(Int)` (no candidate of that level within 64,
+  `r02-g01.generation`) and `witness(String)` (`r02-g01.witness`). Impact: FR-R02G0102-005, 006.
 
 ## User Scenarios & Testing *(mandatory)*
 
