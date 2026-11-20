@@ -18,5 +18,5 @@
 - **R6 Erosion.** Decision: capacity C = K_c · |v| · max(slope, 0.01) · depth, dissolve and settle at rates K_s, K_d
   (Mei et al. 2007), turned into whole quanta and limited by what is present. Rationale: standard, local and exactly
   conserving when expressed as an in-cell exchange.
-- **R7 Drawing.** Decision: `fieldGrid()` returns a `FieldGrid` (terrain, water depth, sediment, then dye, in height
-  units). Rationale: the existing passes upload and draw `FieldGrid`s; no rendering change is needed.
+- **R7 Drawing.** Decision: `fieldGrid()` returns a four-channel `FieldGrid` (terrain, water depth, sediment, total
+  dye, in height units) and `dyeField()` one channel per dye, because `FieldGrid` holds at most four channels. Rationale: the existing passes upload and draw `FieldGrid`s; no rendering change is needed.
