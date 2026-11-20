@@ -23,7 +23,7 @@
 
 ## Phase 3: Stories 1 and 2 — cut and ledger (P1) 🎯
 
-- [ ] T-R02F12-003 [US1] Create `Packages/VisualCore/Sources/VisualCoreScenes/ConvexSolid.swift` (data-model.md: "≤ 4,096 vertices", "≤ 1,024 faces", "3…256 distinct
+- [X] T-R02F12-003 [US1] Create `Packages/VisualCore/Sources/VisualCoreScenes/ConvexSolid.swift` (data-model.md: "≤ 4,096 vertices", "≤ 1,024 faces", "3…256 distinct — Verified 2026-11-19: lead retest 2026-11-19: R02-F12.host-3.json (exit 0, 0 failures; ConvexSolidTests 6 and ConvexCutTests 8 passed; first full run R02-F12.host-2 exit 1: the 1,024-plane limit fixture slowed the timed R02-F05 budget test, replaced by a direct bipyramid, research R7f)
   indices" per face, convex, CCW from outside; `box(min:max:)` with min < max; `bounded(by:min:max:)`; `init(mesh:)`
   accepting closed convex meshes per research R4; `diagonal`, `tolerance` = 1e-9 × diagonal, `volume` per research
   R3; `contains(_:)`; `cut(by:)` per research R2 returning `ConvexCutResult`; `mesh()` fanning faces with flat
