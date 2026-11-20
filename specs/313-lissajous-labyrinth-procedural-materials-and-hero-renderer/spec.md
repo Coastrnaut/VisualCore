@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-20
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G02-03 (migration ledger, game feature of experience R02-G02) · ID namespace FR-R02G0203-###,
 SC-R02G0203-###, T-R02G0203-###
@@ -28,6 +28,57 @@ Canonical overrides:
 - **Shared features used:** R02-F05 (generated meshes), R02-F07 (emissive and glow passes), R02-F08 (curve sampling,
   frames and ribbon meshes), R02-F10 (quality tiers) and the shared custom-shader mesh renderer added at R02-G01-03,
   through the existing VisualCore packages; the kernel and certified levels of R02-G02-01 and -02.
+
+## Clarifications
+
+### Session 2026-11-20
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time. Facts checked in
+code (read-only audit, 2026-11-20): Aurora Loom's experience (R02-G01-03 … 06) is the pattern in this package — a Core
+adapter (`AuroraLoomExperienceCore`), an immutable scene snapshot, a CPU projection reference, GLSL sources in the Core,
+an iOS-only experience target with presenter, scene and controls, a scenario manifest with 80 acceptance scenarios, a
+registration with content facts, and the public `ShaderMeshRenderer`; the Lissajous kernel provides
+`LissajousLabyrinthLap.samples/verdict`, the Play, the Rules and the certified catalog with its pinned digest
+(9c1d5652…e96e); `AppModelTests` uses `r02-g02.lissajous-labyrinth` as its example of an unregistered candidate.
+
+- Q: What exactly does the scene show, and how does it map the rules to space? → A: the lap's 4,096 samples (kernel
+  units, ±4,096) scaled by 1/1,024 into world units give the closed path; it is drawn as a camera-facing thread of
+  constant width (tangent-space width: each sample offset along the cross product of the tangent and the view direction),
+  coloured from cobalt to violet along the lap and fading with depth. The tracer head is a bright copper point at the
+  sample of the current tick, advancing slowly: 60 ticks per second of presentation time (a lap in about 68 s), with a
+  trail of the last N ticks brighter. Checkpoints are copper rings (dim when not visited in order by the lap, bright when
+  visited; the first not visited is outlined); obstacles are violet translucent spheres (generated icospheres) with a
+  brighter rim, red-copper where the lap touches them (the verdict's contact). The camera is a fixed authored perspective
+  fitting the figure's bounding sphere (orbit comes in R02-G02-04). Nothing drawn is consulted by the rules. Impact:
+  FR-R02G0203-001, 002, 006.
+- Q: What do the three quality tiers change? → A: `level-0` (richest): every one of the 4,096 samples, 2 glow passes,
+  trail 512 ticks; `level-1`: every 2nd sample, 1 glow pass, trail 256; `level-2` (the design's "Tier 0, D3-safe"):
+  every 4th sample, no glow, trail 128. Drawn samples are exact kernel samples at every tier; checkpoints, obstacles and
+  the head sit at the same coordinates. Levels are ordered richest first, as the shared quality contract requires. The
+  presenter logs each tier change with its reason. Impact: FR-R02G0203-004; SC-R02G0203-001.
+- Q: How are rendered frames checked, and within which bounds? → A: the Core's CPU reference projects the drawn path
+  samples, checkpoint centres and obstacle centres through the same camera and gives the palette. Simulator tests render
+  offscreen at 96 × 64 and check that each projected path sample (at the tier's stride, those not hidden behind an
+  obstacle) lies within 2 pixels of a pixel brighter than the background by at least 0.15 in luminance, that each
+  checkpoint centre's pixel is within 0.12 per channel of its expected colour, and that the background matches the
+  palette's night within 0.05 away from geometry. Palette: night #070B1E, cobalt #2F5BD8, violet #8A4FE0, copper
+  #D9824A. Impact: FR-R02G0203-006; SC-R02G0203-001.
+- Q: What happens on a shader failure, and what does the renderer read? → A: the presenter draws from an immutable
+  `LissajousLabyrinthSceneSnapshot` (dials, level geometry, stage, verdict, visit ticks, frame time) made from the
+  adapter; it never holds the kernel. If a program fails to compile or link, the scene draws the level-2 thread unlit with
+  the shared unlit mesh renderer, keeps `fallbackReason` and keeps running; tier changes go to its `tierLog`. Reduce
+  Motion holds the head at tick 0 and stops the shimmer; Reduce Flashing caps the glow gain. Impact: FR-R02G0203-003, 007;
+  SC-R02G0203-002.
+- Q: How is the experience registered and what does the adapter accept? → A: `Catalog/registrations.json` gains
+  `r02-g02.lissajous-labyrinth` (capabilities of at most 40 characters, tiers `level-0` … `level-2`, the palette above, the
+  scenario manifest, no permissions, a summary of at most 300 characters, content facts: 100 levels and the pinned
+  catalog digest); `project.yml` and the app's experience registry link `LissajousLabyrinthExperience` as a candidate
+  (`available: false` until X-R02-G02); `AppModelTests` switches its unregistered example to the next round-two game
+  (`r02-g03.wave-knot-keeper`). The adapter (`LissajousLabyrinthExperienceCore`) prepares certified level (seed mod 100) +
+  1 and accepts `dial.set [dial 0…3, value]` (whole numbers; the kernel refuses out-of-range, unchanged and non-coprime
+  values), `play.undo`, `play.redo` and `level.next`; its digest is the level number and the play's fingerprint (never
+  the record history, so undo restores the earlier digest); snapshot schema 1 `{level, records}`. Impact:
+  FR-R02G0203-005, 008, 009; SC-R02G0203-004.
 
 ## User Scenarios & Testing *(mandatory)*
 
