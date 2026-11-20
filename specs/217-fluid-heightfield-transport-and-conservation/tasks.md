@@ -37,7 +37,7 @@ campaign). Fixture seed 2_017; grids ≤ 64 × 64 so tests stay light.
 
 ## Phase 5: Story 4 — erosion (P2)
 
-- [ ] T-R02F17-005 [US4] Erosion in `Packages/VisualCore/Sources/VisualCoreSimulation/Heightfield+Step.swift` (research R6) with `Packages/VisualCore/Tests/VisualCoreSimulationTests/HeightfieldErosionTests.swift`
+- [X] T-R02F17-005 [US4] Erosion in `Packages/VisualCore/Sources/VisualCoreSimulation/Heightfield+Step.swift` (research R6) with `Packages/VisualCore/Tests/VisualCoreSimulationTests/HeightfieldErosionTests.swift` — Verified 2026-11-19: lead retest 2026-11-19: R02-F17.host.json (exit 0, full suite); HeightfieldErosionTests 4 passed (16 × 8 slope over 1,000 sub-steps: upper third −134,080 quanta, lower third +100,944, rock exact after every step; disabled erosion leaves terrain unchanged; floor never crossed; open edges drain sediment)
   (SC-R02F17-004 16 × 8 slope, 1,000 sub-steps: upper third loses, lower third gains, rock balances exactly; never below the floor; disabled
   erosion leaves terrain unchanged); `--name host-4`
 
