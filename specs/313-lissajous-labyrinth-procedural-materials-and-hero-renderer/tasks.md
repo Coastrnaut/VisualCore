@@ -63,3 +63,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 001 → 002 → {003 (agent A), 004 (agent B), 005 (agent C)} → 006 (lead; agent D writes the simulator tests) → 007 … 011,
 013. 012 stays open until device testing. Shared files (Package.swift, snapshot, presenter, scene, controls, scenarios,
 registration, docs) stay with the lead. MVP: Stories 1 and 2.
+
+## Phase 5: Convergence
+
+- [ ] T-R02G0203-014 Add depth fading to the thread material in `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthShaders.swift` (the vertex stage passes the normalised clip depth; the fragment keeps between `depthFadeFloor` and 1 of its colour, nearer brighter; a CPU reference `depthFade(_:)` with tests in `LissajousLabyrinthShaderSourceTests.swift`; frame checks unchanged within their tolerance), per FR-R02G0203-002 (partial); `--name host-5 -- swift test --package-path Packages/ExperiencesRound02 --filter LissajousLabyrinthShaderSourceTests`, `--name sim-27-2`
