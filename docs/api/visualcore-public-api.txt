@@ -1805,6 +1805,7 @@ VisualCoreParameters | func | public static func oklab(fromOklch c: SIMD3<Double
 VisualCoreParameters | func | public static func oklch(fromOklab c: SIMD3<Double>) -> SIMD3<Double>
 VisualCoreParameters | func | public static func outline(for color: SIMD3<Double>, on background: SIMD3<Double>) -> SIMD3<Double>
 VisualCoreParameters | func | public static func outline(shape: ClueShape, at p: SIMD2<Double>, width: Double, antialias: Double) -> Double
+VisualCoreParameters | func | public static func outlineRings(for color: SIMD3<Double>, on background: SIMD3<Double>)
 VisualCoreParameters | func | public static func pattern(_ pattern: CluePattern, at p: SIMD2<Double>) -> Double
 VisualCoreParameters | func | public static func relativeLuminance(sRGB c: SIMD3<Double>) -> Double
 VisualCoreParameters | func | public static func rotateHue(sRGB c: SIMD3<Double>, by radians: Double) throws(ColorAccessError) -> SIMD3<Double>

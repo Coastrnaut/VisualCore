@@ -8,7 +8,9 @@
 // therefore the same drawing as `vc/clue.glsl`, pixel for pixel, with no second set of shape formulas. The antialias
 // half width is one device pixel; the outline is `max(1.5 pt, side / 16)` wide.
 //
-// Outline colour: `PerceptualColor.outline(for:on:)` against the background the badge stands on, approximated by the
+// Outline colours: `PerceptualColor.outlineRings(for:on:)` (T-R02F10-017) — an inner ring contrasting the state colour
+// and, where that ring is below 3:1 against the background, an outer ring contrasting the background — against the
+// background the badge stands on, approximated by the
 // colour scheme: black (0, 0, 0) in dark appearance, white (1, 1, 1) in light appearance. Both are the extremes of the
 // system backgrounds, so the chosen outline keeps at least the computed contrast on the real background too.
 import CoreGraphics
@@ -47,8 +49,8 @@ public struct ClueBadge: View {
 
     /// The badge: the clue and the wrapping name.
     public var body: some View {
-        let outline = PerceptualColor.outline(for: state.color, on: Self.background(for: colorScheme))
-        let image = Self.render(state: state, outline: outline, side: side, scale: displayScale)
+        let rings = PerceptualColor.outlineRings(for: state.color, on: Self.background(for: colorScheme))
+        let image = Self.render(state: state, outline: rings.inner, outer: rings.outer, side: side, scale: displayScale)
         HStack(alignment: .center, spacing: 8) {
             Canvas { context, size in
                 if let image {
@@ -69,7 +71,10 @@ public struct ClueBadge: View {
 
     /// The clue as a premultiplied RGBA bitmap of `side × scale` pixels (see the file header); nil only when the
     /// bitmap context cannot be made.
-    static func render(state: CodedState, outline: SIMD3<Double>, side: CGFloat, scale: CGFloat) -> CGImage? {
+    /// `outer`, when given, is a second ring of the same width just outside the outline (T-R02F10-017), so that the
+    /// outermost ring reaches 3:1 against the background.
+    static func render(state: CodedState, outline: SIMD3<Double>, outer: SIMD3<Double>? = nil, side: CGFloat,
+                       scale: CGFloat) -> CGImage? {
         let n = max(1, Int((side * scale).rounded()))
         let cellPerPixel = 2.0 / Double(n)
         let width = Double(outlineWidth(side: side)) * 2.0 / Double(side)
@@ -80,9 +85,16 @@ public struct ClueBadge: View {
                 let fill = ClueReference.coverage(shape: state.shape, pattern: state.pattern, at: p,
                                                   antialias: cellPerPixel)
                 let band = ClueReference.outline(shape: state.shape, at: p, width: width, antialias: cellPerPixel)
-                // Outline over fill, premultiplied: c = o·band + f·fill·(1 − band), α = band + fill·(1 − band).
-                let color = outline * band + state.color * fill * (1 - band)
-                let alpha = band + fill * (1 - band)
+                // Outline over fill, premultiplied: c = o·band + f·fill·(1 − band), α = band + fill·(1 − band); the
+                // outer ring, when present, lies under both: the band of width `width` centred at distance `width`.
+                var color = outline * band + state.color * fill * (1 - band)
+                var alpha = band + fill * (1 - band)
+                if let outer {
+                    let d = ClueReference.distance(shape: state.shape, at: p)
+                    let ring = 1 - ClueReference.smoothstep(-cellPerPixel, cellPerPixel, abs(d - width) - width / 2)
+                    color = color + outer * ring * (1 - alpha)
+                    alpha = alpha + ring * (1 - alpha)
+                }
                 let i = (row * n + column) * 4
                 bytes[i] = byte(color.x)
                 bytes[i + 1] = byte(color.y)

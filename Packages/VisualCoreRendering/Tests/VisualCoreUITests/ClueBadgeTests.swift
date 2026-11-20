@@ -55,6 +55,35 @@ final class ClueBadgeTests: XCTestCase {
         XCTAssertGreaterThanOrEqual(longCompact.height, longRegular.height, "a wider frame needs no more lines")
     }
 
+    /// T-R02F10-017 (FR-R02F10-013): a light colour on the dark background gets a black inner ring and a white outer
+    /// ring; the outer ring adds opaque white pixels just outside the shape and nowhere inside it.
+    func testALightColourOnDarkGetsAnOuterRing() throws {
+        let s = CodedState(id: "y", color: SIMD3(1, 1, 0), shape: .square, pattern: .solid, name: "Yellow")
+        let rings = PerceptualColor.outlineRings(for: s.color, on: ClueBadge.background(for: .dark))
+        let outer = try XCTUnwrap(rings.outer)
+        let one = try XCTUnwrap(ClueBadge.render(state: s, outline: rings.inner, side: 28, scale: 2))
+        let two = try XCTUnwrap(ClueBadge.render(state: s, outline: rings.inner, outer: outer, side: 28, scale: 2))
+        func bytes(_ image: CGImage) -> [UInt8] {
+            guard let data = image.dataProvider?.data as Data? else { return [] }
+            return [UInt8](data)
+        }
+        let a = bytes(one), b = bytes(two)
+        XCTAssertEqual(a.count, b.count)
+        XCTAssertFalse(a.isEmpty)
+        let n = two.width
+        var added = 0, centreChanged = false
+        for row in 0..<n {
+            for column in 0..<n {
+                let i = (row * n + column) * 4
+                if b[i + 3] > a[i + 3] { added += 1 }
+                if abs(row - n / 2) < 4, abs(column - n / 2) < 4, a[i] != b[i] { centreChanged = true }
+            }
+        }
+        XCTAssertGreaterThan(added, 0, "the outer ring adds coverage outside the shape")
+        XCTAssertFalse(centreChanged, "the inside of the clue is unchanged")
+        XCTAssertNil(PerceptualColor.outlineRings(for: s.color, on: ClueBadge.background(for: .light)).outer)
+    }
+
     func testTheBitmapFollowsTheReference() throws {
         let s = CodedState(id: "s", color: SIMD3(1, 0, 0), shape: .square, pattern: .solid, name: "Red")
         let image = try XCTUnwrap(ClueBadge.render(state: s, outline: SIMD3(0, 0, 0), side: 28, scale: 2))

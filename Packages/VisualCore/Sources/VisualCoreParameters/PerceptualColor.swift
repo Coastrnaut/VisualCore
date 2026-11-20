@@ -154,4 +154,15 @@ public enum PerceptualColor {
         let onWhite = min(contrastRatio(white, color), contrastRatio(white, background))
         return onWhite > onBlack ? white : black
     }
+
+    /// The two-ring outline of a clue (FR-R02F10-013; T-R02F10-017): `inner` is black or white, whichever contrasts
+    /// more with `color` (always at least √21 ≈ 4.58:1); `outer` is the opposite of `inner`, drawn around it only when
+    /// `inner` is below 3:1 against `background`, so the outermost ring always reaches 3:1 against the background.
+    public static func outlineRings(for color: SIMD3<Double>, on background: SIMD3<Double>)
+        -> (inner: SIMD3<Double>, outer: SIMD3<Double>?) {
+        let black = SIMD3<Double>(0, 0, 0), white = SIMD3<Double>(1, 1, 1)
+        let inner = contrastRatio(white, color) > contrastRatio(black, color) ? white : black
+        guard contrastRatio(inner, background) < 3 else { return (inner, nil) }
+        return (inner, inner == white ? black : white)
+    }
 }

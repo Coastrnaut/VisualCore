@@ -127,3 +127,27 @@ private func hueDistance(_ a: Double, _ b: Double) -> Double {
     #expect(ColorAccessError.nonFinite(index: 0).reasonCode == "r2-f10.non-finite")
     #expect(ColorAccessError.outOfRange(index: 0).reasonCode == "r2-f10.out-of-range")
 }
+
+/// T-R02F10-017 (FR-R02F10-013): over a 9 × 9 × 9 sRGB sweep on black and white backgrounds, the inner ring is at least
+/// 3:1 against the colour and the outermost ring at least 3:1 against the background.
+@Test func outlineRingsReachThreeToOneEverywhere() {
+    var worstInner = Double.infinity, worstOuter = Double.infinity
+    for background in [SIMD3<Double>(0, 0, 0), SIMD3<Double>(1, 1, 1)] {
+        for r in 0...8 {
+            for g in 0...8 {
+                for b in 0...8 {
+                    let color = SIMD3(Double(r) / 8, Double(g) / 8, Double(b) / 8)
+                    let rings = PerceptualColor.outlineRings(for: color, on: background)
+                    worstInner = min(worstInner, PerceptualColor.contrastRatio(rings.inner, color))
+                    worstOuter = min(worstOuter, PerceptualColor.contrastRatio(rings.outer ?? rings.inner, background))
+                }
+            }
+        }
+    }
+    print("R02-F10 outline rings: worst inner \(worstInner), worst outermost \(worstOuter)")
+    #expect(worstInner >= 3)
+    #expect(worstOuter >= 3)
+    let yellowOnBlack = PerceptualColor.outlineRings(for: SIMD3(1, 1, 0), on: SIMD3(0, 0, 0))
+    #expect(yellowOnBlack.inner == SIMD3(0, 0, 0) && yellowOnBlack.outer == SIMD3(1, 1, 1))
+    #expect(PerceptualColor.outlineRings(for: SIMD3(1, 1, 0), on: SIMD3(1, 1, 1)).outer == nil)
+}

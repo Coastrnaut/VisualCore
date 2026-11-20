@@ -114,7 +114,7 @@ baseline, `ShaderBundleTests.swift` list, feature map) stay with the lead. MVP: 
 
 ## Phase 7: Convergence
 
-- [ ] T-R02F10-017 Make the clue outline meet 3:1 against both the state colour and the background per FR-R02F10-013
+- [X] T-R02F10-017 Make the clue outline meet 3:1 against both the state colour and the background per FR-R02F10-013 — Verified 2026-11-19: 2026-11-19 R02-F10.host-3.json (exit 0; outlineRingsReachThreeToOneEverywhere: worst inner 4.587, worst outermost 21.0 over 729 colours x 2 backgrounds) and R02-F10.rendering-27-2.json (exit 0; ClueBadgeTests.testALightColourOnDarkGetsAnOuterRing passed); public-api-2 and documented-api-2 exit 0
   (partial): add `PerceptualColor.outlineRings(for:on:) -> (inner: SIMD3<Double>, outer: SIMD3<Double>?)` in
   `Packages/VisualCore/Sources/VisualCoreParameters/PerceptualColor.swift` (inner = black or white with the larger
   contrast to the colour, always ≥ √21 ≈ 4.58; outer = the opposite of the background when inner < 3:1 against it, else

@@ -15,8 +15,9 @@ in 0…1, or there are more than 32 states (8 shapes × 4 patterns). The name is
 (ΔE_OK). Hue rotation keeps lightness and chroma and turns only the hue; greys are unchanged. A result outside the sRGB
 gamut is brought back by bisecting chroma for 24 steps at constant lightness and hue, never by clipping channels.
 `relativeLuminance` and `contrastRatio` follow WCAG 2.x; `AccessibleColors.contrastRatio` (VisualCoreUI) uses the same
-formula. `outline(for:on:)` picks a black or white outline for a clue, whichever has the larger minimum contrast against
-the state colour and the background (WCAG 1.4.11 asks for 3:1).
+formula. `outlineRings(for:on:)` gives a clue an inner black or white ring that contrasts with the state colour (at least
+4.58:1) and, where that ring is below 3:1 against the background, an outer ring of the opposite colour, so the outermost
+ring always reaches 3:1 (WCAG 1.4.11); `outline(for:on:)` keeps the single best outline.
 
 ## Colour vision
 
