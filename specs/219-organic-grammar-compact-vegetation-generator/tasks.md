@@ -46,7 +46,7 @@ its check record (no trailers). No {owner} tasks; one {device} task. Fixture see
 
 ## Phase 7: Regression, documentation and close
 
-- [ ] T-R02F19-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26` and `--name experiences`
+- [X] T-R02F19-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26` and `--name experiences` — Verified 2026-11-20: 2026-11-20 R02-F19.rendering-27.json, rendering-26.json and experiences.json (exit 0 each, TEST SUCCEEDED)
 - [ ] T-R02F19-008 API baseline and docs: `check_public_api.py --update`, `--name public-api`, `--name documented-api
   -- python3 scripts/check_documented_api.py --sources Apps/VisualCore`; new `docs/architecture/vegetation.md`; section
   in `Packages/VisualCore/README.md`; section 13.4 row R02-F19 "As built" in `docs/catalog/shared-feature-map.json` and
