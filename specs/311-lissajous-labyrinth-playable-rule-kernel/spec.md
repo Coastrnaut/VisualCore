@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-20
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G02-01 (migration ledger, game feature of experience R02-G02) · ID namespace FR-R02G0201-###,
 SC-R02G0201-###, T-R02G0201-###
@@ -29,6 +29,56 @@ Canonical overrides:
 - **Shared features used:** R02-F03 (numbers) and R02-F23 (puzzle contract: the kernel's rules are a `PuzzleRules`, so
   R02-G02-02 can certify levels); the other listed prerequisites are delivered by unified-app features or concern later
   features of this game.
+
+## Clarifications
+
+### Session 2026-11-20
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time. Facts checked in
+code (read-only audit, 2026-11-20): `Packages/ExperiencesRound02` exists with Aurora Loom's Core (R02-G01-01) as the
+pattern; no `LissajousLabyrinth*` name exists (the word "Lissajous" appears only in comments of OscilloscopeStudio and
+curve tests); R02-F23's `PuzzleRules` and `StableHash` are available.
+
+- Q: How is the tracer's path computed so the verdict is exact on every device? → A: integers. An angle is a count of
+  1/4,096 of a turn; sine comes from a fixed table of 4,096 integers scaled to 1,024 (rounded 1,024 · sin(2πk/4,096),
+  stored as source and pinned by a hash test), cosine is the sine a quarter turn later. One lap is 4,096 ticks of 1/240 s
+  (the source's 0.004167 s). At tick n the tracer is x = A · S(a·n + 256·φ), y = B · S(b·n), z = C · S(c·n + 256·ψ +
+  1,024), all angles modulo 4,096, with amplitudes A, B, C of 1 … 4, player frequencies a, b of 1 … 9 that must be
+  coprime (ratios 1:1 … 9:8 and beyond), a level-fixed third frequency c of 1 … 9 and phases φ, ψ of 0 … 15 (sixteenths
+  of a turn). With gcd(a, b) = 1 the path closes after exactly 4,096 ticks, the fundamental period. Rationale: the source
+  asks for canonical quantized state; integers make every device agree bit for bit. Impact: FR-R02G0201-001, 002;
+  SC-R02G0201-001.
+- Q: When exactly is a lap won, and what counts as contact? → A: checkpoints (1 … 6, in order) and obstacles (0 … 8) are
+  balls with integer centres (each coordinate −5,000 … 5,000) and radii 64 … 1,024. Scanning ticks 0 … 4,095, the next
+  checkpoint is visited at the first tick whose sample lies inside or on it (squared distance ≤ r²); at most one checkpoint
+  advances per tick. Contact is tested on every segment from sample n to sample n + 1 (the last segment closes the lap back
+  to sample 0): the segment touches an obstacle when its closest point is strictly inside (squared distance < r²),
+  computed exactly in integers. The lap is won when every checkpoint was visited in order and no segment touches an
+  obstacle. Otherwise the verdict names the first contact (lowest tick, then lowest obstacle) or, without contact, the
+  first checkpoint not reached. A level whose start already wins is refused. Impact: FR-R02G0201-002, 003; SC-R02G0201-001,
+  004.
+- Q: What is an action, and how do undo, redo and the allowance work? → A: an action sets one of four dials (`frequencyA`
+  1 … 9, `frequencyB` 1 … 9, `phaseA` = φ 0 … 15, `phaseC` = ψ 0 … 15) to a new value; setting the current value is
+  refused (`no-change`), a value out of range (`range`) and a frequency pair that is not coprime (`not-coprime`). The lap
+  is evaluated after every accepted action, undo or redo. Each accepted action spends one of the level's allowance
+  (1 … 64); spending the last one without a win fails the level with the verdict as its explanation. Undo restores the
+  previous dials and refunds the action; redo re-applies it; a new action clears the redo stack. Every accepted action,
+  undo and redo appends a record (schema, level seed, tick = record index, kind, dial, value, previous and next
+  fingerprint); an action must name the current fingerprint as its previous one, else it is refused as `stale`.
+  Impact: FR-R02G0201-004, 005; SC-R02G0201-002, 003.
+- Q: What are the life stages, and what is a state's fingerprint? → A: `loading` → (`tutorial` when the level asks for
+  one) → `playing` ↔ `paused` → `won` or `failed` → `result`, moved by `begin`, `dismissTutorial`, `pause`, `resume` and
+  `showResult`; any other event in a stage is refused (`stage`). Actions, undo and redo are accepted only while
+  `playing`. The fingerprint of a state is the SHA-256 hex (`StableHash`) of a fixed byte layout: schema, the level
+  fingerprint, the four dials, the actions spent and the stage. Impact: FR-R02G0201-004, 006; SC-R02G0201-003.
+- Q: How are levels stored and refusals named, and how do the rules meet the puzzle contract? → A:
+  `LissajousLabyrinthLevel` is `Codable` JSON schema 1 with sorted keys and a fingerprint (SHA-256 hex of its canonical
+  JSON); decoding re-checks every rule and the fingerprint; newer schemas are refused. `LissajousLabyrinthRules` conforms
+  to `PuzzleRules` (state: the four dials; moves: every single-dial change in dial order, values ascending, skipping the
+  current value and non-coprime pairs; solved: the lap verdict is won). Reason codes (`LissajousLabyrinthError`):
+  `r02-g02.level`, `r02-g02.move`, `r02-g02.stage`, `r02-g02.stale`, `r02-g02.allowance`, `r02-g02.newer-schema`,
+  `r02-g02.malformed`. Every type carries the `LissajousLabyrinth` prefix. Impact: FR-R02G0201-007, 008, 009;
+  SC-R02G0201-005.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -82,8 +132,9 @@ Levels have a versioned stored form with a fingerprint, so later features can sh
 - **An action after the allowance is spent or after the end:** refused.
 - **A stale action** (its claimed previous fingerprint is not the current one): refused.
 - **A level already won at the start:** refused as a level.
-- **A tracer exactly on a checkpoint's or obstacle's boundary:** defined inclusively for checkpoints (visited) and
-  exclusively for obstacles (contact only strictly inside), and tested at the boundary and one unit either side.
+- **A tracer exactly on a checkpoint's or obstacle's boundary:** a sample on a checkpoint's surface visits it; a segment
+  whose closest point lies exactly on an obstacle's surface does not touch it; both are tested at the boundary and one
+  unit either side.
 - **The lap's closing segment** (last sample back to the first): checked for contact like every other segment.
 - **Damaged, newer or inconsistent stored levels:** refused with a named reason.
 
