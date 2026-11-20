@@ -42,8 +42,9 @@ ImplementationLock-100 and are not tasks here. No {owner} tasks.
   refusals through the presenter), `Packages/ExperiencesRound02/AuroraLoom/Experience/AuroraLoomRibbonScene.swift` (gate and win brightness from the
   presenter's lights) and create `Packages/ExperiencesRound02/AuroraLoom/Experience/AuroraLoomSound.swift` (A21 rule; rebuild at level open, play end, toggle
   on); with `Packages/ExperiencesRound02/AuroraLoom/ExperienceTests/AuroraLoomAccessibilityTests.swift` (agent C: recorded announcements and haptics through
-  the port for scripted sequences; labels and values; panel at the largest text size; sound state table; Reduce Motion
-  frames identical); `--name sim-27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02
+  the port for scripted sequences with \`RecordingHapticSink\` and \`RecordingAnnouncementSink\`; labels and values; level
+  1 completed through the presenter's adjust operation alone (SC-R02G0106-001); panel at the largest text size; sound
+  state table including a \`play()\` that fails; Reduce Motion frames identical); `--name sim-27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02
   --scheme ExperiencesRound02-Package --destination sim-27.2 --action test`
 
 ## Phase 6: Regression, documentation and close

@@ -152,8 +152,9 @@ pure function of the steps and stage; the loop plays only while wanted, on scree
 
 ### Measurable Outcomes
 
-- **SC-R02G0106-001**: 100 % of native controls expose a label and value; a scripted VoiceOver session completes level 1
-  through accessibility actions alone.
+- **SC-R02G0106-001**: 100 % of native controls expose a label and value; level 1 is completed using only the operations
+  the accessibility actions perform (the steppers' increment and decrement, routed through the presenter's adjust
+  operation), with every step announced.
 - **SC-R02G0106-002**: For scripted sequences of moves, undos, refusals, wins and failures, the recorded announcements
   and haptics equal the plan exactly (kinds and texts).
 - **SC-R02G0106-003**: With Reduce Flashing, the maximum brightness change rate of any drawn element measured over a
