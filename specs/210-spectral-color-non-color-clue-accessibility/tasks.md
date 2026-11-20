@@ -96,7 +96,7 @@
   `Packages/VisualCore/README.md` and `Packages/VisualCoreRendering/README.md`; section 13.4 row R02-F10 "As built"
   (home corrected: `AccessibilityPreferences` is in VisualCoreSimulation) in `docs/catalog/shared-feature-map.json` and
   `render_autocreator.py`; copyright scan: no image, font or icon file added (`git diff --stat` of the feature)
-- [ ] T-R02F10-012 Reference regression chunk 1 (`--name reference-1`)
+- [X] T-R02F10-012 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F10.reference-1.json (exit 0)
 - [ ] T-R02F10-013 Reference regression chunk 2 (`--name reference-2`)
 - [ ] T-R02F10-014 Script tests (`--name script-tests`)
 - [ ] T-R02F10-015 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
