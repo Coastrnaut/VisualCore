@@ -20,7 +20,8 @@ API: [contracts/api.md](contracts/api.md). Quickstart: [quickstart.md](quickstar
 VisualCoreSimulation, VisualCoreMath, VisualCoreScenes (`CurveSampler`, `CatmullRomSpline`, `CurveFrames`, `Mesh.ribbon`),
 VisualCoreExperience (`ExperienceCore`, `QualityProfile`, `ExperienceConformance`) in the Core; VisualCoreRendering,
 VisualCoreExperienceHost, VisualCoreEffects (emissive and bloom) and VisualCoreUI in the Experience. No Objective-C++
-bridge (the existing GL wrappers are used); no second renderer.
+bridge (the existing GL wrappers are used); no second renderer. One additive VisualCoreRendering type,
+`ShaderMeshRenderer` (research R8), draws a generated mesh with a caller-supplied program on the same GL path.
 **Package**: `Packages/ExperiencesRound02/Package.swift` gains `AuroraLoomExperience` (path `AuroraLoom/Experience`) and
 `AuroraLoomExperienceTests` (path `AuroraLoom/ExperienceTests`) and the product `AuroraLoomExperience`; their rendering
 dependencies carry `condition: .when(platforms: [.iOS])` and their sources are wrapped in `#if os(iOS)`, so `swift test`
@@ -74,6 +75,9 @@ Packages/ExperiencesRound02/AuroraLoom/Experience/{AuroraLoomExperience, AuroraL
 Packages/ExperiencesRound02/AuroraLoom/ExperienceTests/{AuroraLoomTestSupport, AuroraLoomRenderTests, AuroraLoomTierTests,
   AuroraLoomFallbackTests}.swift                                                  new   (agent D)
 Packages/ExperiencesRound02/AuroraLoom/scenario-manifest.json                     new   (lead)
+Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderMeshRenderer.swift   new   custom-program mesh draw (lead; research R8)
+Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/ShaderMeshRendererTests.swift new (lead)
+docs/api/visualcore-public-api.txt                                                 edit  baseline update (lead)
 Catalog/registrations.json, Catalog/experiences.json, Apps/VisualCore/App/ExperienceRegistry.swift, project.yml,
   app test fixtures, scripts/test_scripts.py, docs/migration/path-map.json                                     edit (lead)
 .github/workflows/ci.yml (simulator step for ExperiencesRound02), docs/architecture/aurora-loom.md, package README,

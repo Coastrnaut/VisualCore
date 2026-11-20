@@ -22,3 +22,11 @@
   stable on the simulator; exact pixels are not compared (golden images come in R02-G01-08).
 - **R7 Registration.** Decision: follow the A25-P02 candidate registration. Rationale: `check_experience_packages.py`
   exempts a Core only while no Experience target exists; registration keeps every script check green.
+- **R8 Custom-program mesh draws (implementation, 2026-11-20).** Decision: add the public `ShaderMeshRenderer` to
+  VisualCoreRendering (position and normal interleaved, uv in its own stream, caller-set uniforms, opaque, premultiplied
+  or additive blending), tested on the simulator; glow is drawn as additive halo passes of the ribbon program
+  (`u_glowGain`), one per glow pass of the tier, instead of the post-process bloom graph. Rationale: `MeshRenderer`
+  shades with a fixed Lambert model and the GL attribute helpers are internal, so no public type could draw the
+  shader-computed materials FR-R02G0103-002 requires; the addition is small, generic and reusable by later games.
+  Alternatives: per-vertex colours through `MeshRenderer` (loses fragment interference and bevel), the bloom effect graph
+  (an effect-graph scene per frame for three ribbons is disproportionate).
