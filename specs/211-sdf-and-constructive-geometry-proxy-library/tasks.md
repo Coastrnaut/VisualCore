@@ -59,7 +59,7 @@ seed 2_011.
   equals `SDFMarch` at every pixel whose 3 × 3 CPU neighbourhood is uniform; the generated source compiles through
   `ResourceRegistry.program` on the real context; zero leaks after destroy); the lead adds `vc/sdfshape.glsl` to the
   include list of `ShaderBundleTests.swift`
-- [ ] T-R02F11-007 Simulator runs: `--name rendering-27` and `--name rendering-26`
+- [X] T-R02F11-007 Simulator runs: `--name rendering-27` and `--name rendering-26` — Verified 2026-11-19: 2026-11-19 R02-F11.rendering-27-2.json and R02-F11.rendering-26.json (exit 0, 228 tests, 0 failures each)
 
 ## Phase 6: Regression, documentation and close
 
