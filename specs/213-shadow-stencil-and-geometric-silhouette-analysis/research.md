@@ -19,3 +19,7 @@
   semantics of other draws).
 - **R6 Stored mask.** Decision: JSON schema 1 with region, width, height and base64 of the little-endian words; decoding
   checks the word count and zero padding bits. Rationale: compact and deterministic.
+- **R7 Measured mask convergence (implementation, 2026-11-19).** Cell-centre sampling of one polygon does not halve its
+  error at every refinement: over 10 seeded polygons the mean error went 0.00412 → 0.00258 (ratio 0.63) by edge luck;
+  over 100 seeded polygons it went 0.003877 → 0.001116 (ratio 0.29), and the worst single error at 256² was 0.26% (limit
+  1%). SC-R02F13-002 states the halving for the mean over 100 polygons. The subscript is `mask[x, y]` (no labels).

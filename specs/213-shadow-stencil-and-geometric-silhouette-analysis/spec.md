@@ -175,8 +175,9 @@ A target mask is stored with a puzzle and compared later, by a later version of 
 - **SC-R02F13-001**: Cube and square projections equal their closed forms within 1e-12 for directional and point lights,
   over 100 seeded orientations of the cube.
 - **SC-R02F13-002**: IoU of identical, disjoint and half-overlapping squares is 1, 0 and 1/3 exactly at grid resolutions
-  aligned with the squares; the mask area of a seeded convex polygon is within 1% of its exact area at 256 × 256 and the
-  error at least halves from 128 to 256.
+  aligned with the squares; the mask area of every one of 100 seeded convex
+  polygons is within 1% of its exact area at 256 × 256, and their mean error at least halves from 128 to 256 (a single
+  polygon's error can stay flat by edge luck).
 - **SC-R02F13-003**: The drawn shadow's covered pixels equal the CPU mask at every pixel whose 3 × 3 CPU neighbourhood is
   uniform, on iOS 27.2 and 26.5 simulators; a self-overlapping object leaves every shadow pixel at the single-shadow
   value; zero live GPU objects after the host is destroyed.

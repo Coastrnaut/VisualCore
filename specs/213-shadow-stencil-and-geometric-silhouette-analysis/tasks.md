@@ -27,7 +27,7 @@ Tests stay light (≤ 512 × 512 masks) so the timed R02-F05 budget test beside 
 
 ## Phase 3: Story 2 — masks and IoU (P1)
 
-- [ ] T-R02F13-003 [P] [US2] Create `Packages/VisualCore/Sources/VisualCoreScenes/CoverageMask.swift` (`CoverageMask` per data-model.md: "1…2,048" per side, min <
+- [X] T-R02F13-003 [P] [US2] Create `Packages/VisualCore/Sources/VisualCoreScenes/CoverageMask.swift` (`CoverageMask` per data-model.md: "1…2,048" per side, min < — Verified 2026-11-19: lead retest 2026-11-19: R02-F13.host.json (exit 0; CoverageMaskTests 8 passed: exact IoU 1/0/1/3, shared edges once, 100-polygon mean error 0.0039→0.0011 and worst 0.26% at 256², determinism, stored form; research R7)
   max, packed UInt64 rows with zero padding, `fill` by row-centre crossings with the half-open rule of research R4,
   `count`, `area`, `digest` FNV-1a 64, `cellCentre(x:y:)`; `MaskComparison` with IoU, both empty → 1, mismatch refused;
   `CoverageMaskDocument` schema 1 with base64 words) with `Packages/VisualCore/Tests/VisualCoreScenesTests/CoverageMaskTests.swift` (identical, disjoint and
