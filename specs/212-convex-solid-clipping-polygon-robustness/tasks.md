@@ -35,7 +35,7 @@
   degenerate face in 100 fixtures; a sliver side is empty; a 1e-3 and a 1e3 cube give equal counts and rescaled
   vertices within 1e-12 relative; cutting repeatedly keeps the solid valid; a cut past the limits is refused
   `tooComplex`); `--name host-2`
-- [ ] T-R02F12-004 [US2] Create `Packages/VisualCore/Sources/VisualCoreScenes/VolumeLedger.swift` (data-model.md; "≤ 65,536 entries", refuse the next cut beyond
+- [X] T-R02F12-004 [US2] Create `Packages/VisualCore/Sources/VisualCoreScenes/VolumeLedger.swift` (data-model.md; "≤ 65,536 entries", refuse the next cut beyond — Verified 2026-11-19: lead retest 2026-11-19: R02-F12.host-4.json (exit 0, 0 failures; VolumeLedgerTests 4 passed: 1,000 seeded cuts balanced at every step and identical twice, miss and empty records, limit 3 refuses the 4th unchanged)
   and stay unchanged; `imbalance`, `isBalanced` at 1e-9) with `Packages/VisualCore/Tests/VisualCoreScenesTests/VolumeLedgerTests.swift` (1,000 seeded cuts
   balanced at every step; two runs identical; a cut that misses records 0 removed; the entry limit, tested through an
   internal `init(solid:maxEntries:)` used only by `@testable` tests, with 3 entries, rather than 65,536 cuts); `--name host-3`
