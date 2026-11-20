@@ -58,7 +58,7 @@
   `Packages/VisualCore/README.md`; section 13.4 row R02-F12 "As built" in `docs/catalog/shared-feature-map.json` and
   `render_autocreator.py`
 - [X] T-R02F12-008 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F12.reference-1.json (exit 0)
-- [ ] T-R02F12-009 Reference regression chunk 2 (`--name reference-2`)
+- [X] T-R02F12-009 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F12.reference-2.json (exit 0)
 - [ ] T-R02F12-010 Script tests (`--name script-tests`)
 - [ ] T-R02F12-011 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
 
