@@ -8,7 +8,7 @@ tasks; one {device} task. Fixture seed 2_024; tests stay short.
 
 ## Phase 1: Setup
 
-- [ ] T-R02F24-001 Baselines: `--name baseline-host -- swift test --package-path Packages/VisualCore` and the isolated
+- [X] T-R02F24-001 Baselines: `--name baseline-host -- swift test --package-path Packages/VisualCore` and the isolated — Verified 2026-11-20: 2026-11-20 baseline-host exit 0, baseline-timing exit 0 incl. engine timeout bounds (.autonomy/migration/checks/R02-F24.baseline-*.json); rendering baseline R02-F23 rendering-27/26 exit 0
   timing run (now including the experience engine's timeout and cancellation bounds); the rendering baseline is R02-F23's
   rendering runs (exit 0)
 
