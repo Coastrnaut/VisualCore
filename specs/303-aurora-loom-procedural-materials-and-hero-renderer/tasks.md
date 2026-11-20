@@ -1,0 +1,88 @@
+# Tasks: R02-G01-03 — Aurora Loom: procedural materials and hero renderer
+
+**Input**: [spec.md](spec.md), [plan.md](plan.md), [research.md](research.md), [data-model.md](data-model.md),
+[contracts/api.md](contracts/api.md), [quickstart.md](quickstart.md). Gate R02-G01-03 (migration ledger). Evidence:
+`python3 scripts/migration_ledger.py run-check --gate R02-G01-03 --name <check> -- <command>` (never a scratchpad path;
+recorded only after every agent has reported). Commit after every task with its check record (no trailers). Seed 2_303;
+tests stay short (< 10 s each). Simulator evidence is one pass on the iOS 27.x phone (sim-27.2).
+
+## Phase 1: Setup
+
+- [ ] T-R02G0103-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test
+  --package-path Packages/ExperiencesRound02`; the rendering baseline is R02-G02-01's rendering runs (exit 0)
+
+## Phase 2: Foundational
+
+- [ ] T-R02G0103-002 Edit `Packages/ExperiencesRound02/Package.swift` (AuroraLoomCore gains VisualCoreScenes and
+  VisualCoreExperience; new `AuroraLoomExperience` at `AuroraLoom/Experience` and `AuroraLoomExperienceTests` at
+  `AuroraLoom/ExperienceTests` with rendering dependencies under `.when(platforms: [.iOS])`; product
+  `AuroraLoomExperience`); create `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomSceneSnapshot.swift` (AuroraLoomPalette "night #07121A, teal #1FD1B4,
+  magenta #E0389C, gold #D8E83A", AuroraLoomTier "layers 1/3/5, segments 32/64/128, glow 0/1/2, names level-0 … level-2",
+  AuroraLoomSceneSnapshot); `--name host -- swift test --package-path Packages/ExperiencesRound02` (all Core tests
+  unchanged)
+
+## Phase 3: Story 1 — see the auroral silk (P1) 🎯
+
+- [ ] T-R02G0103-003 [P] [US1] Create `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomSceneGeometry.swift` (centre lines "height H · sin(2πθ/4,096), lanes
+  −1/0/+1", ribbon meshes via CatmullRomSpline, CurveFrames.parallelTransport and Mesh.ribbon per layer, gate rings,
+  markers, camera fitting aspect 0.4 … 2.5 with a 5 % margin, projection) with `Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomSceneGeometryTests.swift`
+  (finite and bounded for every extreme setting and Ω; layers per tier; fit for aspects 0.4 … 2.5; projection round
+  trip); `--name host-2`
+- [ ] T-R02G0103-004 [P] [US1] Create `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomShaders.swift` (ribbon and gate programs, GLSL ES 3.00; wave
+  displacement, bevel from u, interference, palette mix, lit state, glow gain) with
+  `Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomShaderSourceTests.swift` (version line, every declared uniform used and listed, no texture sampler);
+  `--name host-3`
+- [ ] T-R02G0103-005 [P] [US1] Create `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomExperienceCore.swift` (ExperienceCore adapter: id
+  "r02-g01.aurora-loom", schema 1, three tiers, controls "ribbon.move [0…2, 0…1, 0…15], play.undo, play.redo,
+  level.next", prepare level (seed mod 100) + 1, digest of the play fingerprint, snapshot and restore of level number and
+  records, `snapshot`) with `Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomExperienceCoreTests.swift` (ExperienceConformance run; actions; refusals; restore;
+  tiers keep the digest); `--name host-4`
+- [ ] T-R02G0103-006 [US1] Create `Packages/ExperiencesRound02/AuroraLoom/Experience/AuroraLoomExperience.swift`, `Packages/ExperiencesRound02/AuroraLoom/Experience/AuroraLoomPresenter.swift`,
+  `Packages/ExperiencesRound02/AuroraLoom/Experience/AuroraLoomRibbonScene.swift` (GL scene from snapshots: ribbon layers, gate rings, emissive and bloom passes per tier,
+  fallback to the shared unlit renderer with a logged reason, Reduce Motion, Reduce Flashing, memory warning) and
+  `Packages/ExperiencesRound02/AuroraLoom/Experience/AuroraLoomControls.swift` (minimal panel: per ribbon wave and phase steppers, undo, redo; accessibility labels), all
+  under `#if os(iOS)`; `--name round02-build -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02
+  --scheme ExperiencesRound02-Package --destination sim-27.2 --action build`
+
+## Phase 4: Stories 1–3 — frames, purity and tiers on the simulator (P1, P2)
+
+- [ ] T-R02G0103-007 [P] [US2] Create `Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomRendererPurityTests.swift` (200 seeded snapshots: tier changes, time
+  steps and forced failures never change the adapter digest or the kernel verdict; testAuroraLoomRendererpurityBoundary
+  for R2-G01-INV-10); `--name host-5`
+- [ ] T-R02G0103-008 [US1] [US3] Create `Packages/ExperiencesRound02/AuroraLoom/ExperienceTests/AuroraLoomTestSupport.swift`, `Packages/ExperiencesRound02/AuroraLoom/ExperienceTests/AuroraLoomRenderTests.swift` (levels 1,
+  21, 41, 61, 81 at each tier, 96 × 64 offscreen: ribbon samples within 2 px of lit pixels, marker colours within 0.12,
+  background within 0.05), `Packages/ExperiencesRound02/AuroraLoom/ExperienceTests/AuroraLoomTierTests.swift` (same positions across tiers; tier log) and
+  `Packages/ExperiencesRound02/AuroraLoom/ExperienceTests/AuroraLoomFallbackTests.swift` (broken program draws the fallback and logs; zero-size view; resize; Reduce Motion);
+  `--name sim-27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme
+  ExperiencesRound02-Package --destination sim-27.2 --action test`
+
+## Phase 5: Story 4 — a registered candidate (P2)
+
+- [ ] T-R02G0103-009 [US4] Candidate registration: `Catalog/registrations.json` and `Catalog/experiences.json` (palette,
+  capabilities, quality tiers level-0 … level-2, summary ≤ 300 characters, scenario manifest
+  `Packages/ExperiencesRound02/AuroraLoom/scenario-manifest.json`; available false), `Apps/VisualCore/App/ExperienceRegistry.swift`,
+  `project.yml`, the app test fixtures and `scripts/test_scripts.py` as the A25-P02 registration; `--name
+  experience-packages -- python3 scripts/check_experience_packages.py`, `--name catalog-search -- swift test
+  --package-path Packages/VisualCore --filter 'CatalogSearchTests|RealCatalogTests|RegistryReportTests'`, `--name
+  app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`
+
+## Phase 6: Regression, documentation and close
+
+- [ ] T-R02G0103-010 CI and docs: a simulator step for ExperiencesRound02 in `.github/workflows/ci.yml` beside the
+  ExperiencesCreative step (or the existing simulator job's package list); `docs/architecture/aurora-loom.md` (renderer);
+  `Packages/ExperiencesRound02/README.md`; `docs/automatedtesting.md`; `docs/migration/path-map.json` if it names the
+  experience path; `--name round02-host -- swift test --package-path Packages/ExperiencesRound02`
+- [ ] T-R02G0103-011 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+  `--name host-full`, `--name public-api` / `--name documented-api` if the app sources changed
+- [ ] T-R02G0103-012 Reference regression chunk 1 (`--name reference-1`)
+- [ ] T-R02G0103-013 Reference regression chunk 2 (`--name reference-2`)
+- [ ] T-R02G0103-014 Script tests, run alone (`--name script-tests`)
+- [ ] T-R02G0103-015 {device} After ImplementationLock-100: record frame time per tier on D1/D2/D3 (SC-R02G0103-006); not
+  run in this campaign, carried to the device gates
+- [ ] T-R02G0103-016 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+
+## Dependencies and parallel work
+
+001 → 002 → {003 (agent B), 004 (agent A), 005 (agent C)} → 006 (lead, with A for the scene) → {007 (lead), 008 (agent D)}
+→ 009 (lead) → 010 … 014, 016. 015 is a {device} task outside this campaign. Shared files (Package.swift, snapshot,
+registration, app, CI, docs) stay with the lead. MVP: Story 1.
