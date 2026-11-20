@@ -1,0 +1,126 @@
+{
+  "branch": "main",
+  "dirty": false,
+  "dirty_paths": [],
+  "failed_attempts": [
+    {
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 1,
+      "log": ".autonomy/logs/migration/R02-F12.host-2.log",
+      "log_sha256": "5d8c15b0308a152a43051131dde2d54c82c0add32b29d2e3ac8f060cb0fac737",
+      "name": "host-2",
+      "timed_out": false
+    }
+  ],
+  "gate": "R02-F12",
+  "ledger": "migration",
+  "passing_checks": [
+    {
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "finished": "2026-11-20T01:12:46+00:00",
+      "log": ".autonomy/logs/migration/R02-F12.baseline-host.log",
+      "log_sha256": "4ba93aa102005afa622ec2d88c528c5fef23cbea47e29aac0998948d4f2b3f34",
+      "name": "baseline-host"
+    },
+    {
+      "command": "python3 scripts/check_documented_api.py --sources Apps/VisualCore",
+      "exit_code": 0,
+      "finished": "2026-11-20T01:43:50+00:00",
+      "log": ".autonomy/logs/migration/R02-F12.documented-api.log",
+      "log_sha256": "a8fc9049556314f7747feb714d0a37bd0bfffdcf73dbef5cfcda7ed44ad15c16",
+      "name": "documented-api"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test",
+      "exit_code": 0,
+      "finished": "2026-11-20T01:43:33+00:00",
+      "log": ".autonomy/logs/migration/R02-F12.experiences.log",
+      "log_sha256": "ce4bb011861c38489cc47ce64e4244ae8b7b231f6e1b1559b0fc50f9d04b7d4e",
+      "name": "experiences"
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "finished": "2026-11-20T01:30:28+00:00",
+      "log": ".autonomy/logs/migration/R02-F12.host-3.log",
+      "log_sha256": "d7f313be8397e98edadf2e567c5b4587da732ce2a70f9f74deeced670c4ffd2a",
+      "name": "host-3"
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "finished": "2026-11-20T01:35:03+00:00",
+      "log": ".autonomy/logs/migration/R02-F12.host-4.log",
+      "log_sha256": "59a98bb78502f1e44743145ac24c7c10729f4138000fb348ca51884208c7d761",
+      "name": "host-4"
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "finished": "2026-11-20T01:47:13+00:00",
+      "log": ".autonomy/logs/migration/R02-F12.host-5.log",
+      "log_sha256": "12f7312355f25be467bf1386738ef103d628ccc15a052bb8f28d6a1fa0371fde",
+      "name": "host-5"
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore --filter PolygonCleanupTests",
+      "exit_code": 0,
+      "finished": "2026-11-20T01:13:29+00:00",
+      "log": ".autonomy/logs/migration/R02-F12.host.log",
+      "log_sha256": "e3a9983cb6175c8122ed1f7c93bff7c32d9bbd79c98e91890dc10499f51fdade",
+      "name": "host"
+    },
+    {
+      "command": "python3 scripts/check_public_api.py",
+      "exit_code": 0,
+      "finished": "2026-11-20T01:43:48+00:00",
+      "log": ".autonomy/logs/migration/R02-F12.public-api.log",
+      "log_sha256": "8a537d5550867dce7bc145d2566d777e8f1284317545db304369f2b3dbf6b2bd",
+      "name": "public-api"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean",
+      "exit_code": 0,
+      "finished": "2026-11-20T01:44:24+00:00",
+      "log": ".autonomy/logs/migration/R02-F12.reference-1.log",
+      "log_sha256": "3896e0f79d7047b66c15dce323eccd3fcc50049fd03c27574d49354e2e8fb477",
+      "name": "reference-1"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26",
+      "exit_code": 0,
+      "finished": "2026-11-20T01:44:56+00:00",
+      "log": ".autonomy/logs/migration/R02-F12.reference-2.log",
+      "log_sha256": "9ff8e46c889aab5436b4d4616d132a159042d73a26b3e35a10f8d0ffadaa0a99",
+      "name": "reference-2"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-26.5 --action test",
+      "exit_code": 0,
+      "finished": "2026-11-20T01:36:56+00:00",
+      "log": ".autonomy/logs/migration/R02-F12.rendering-26.log",
+      "log_sha256": "de6740c1f4ebe6847ea04d907160347d6750eedbc80dce940ca0682b7db20c10",
+      "name": "rendering-26"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test",
+      "exit_code": 0,
+      "finished": "2026-11-20T01:36:03+00:00",
+      "log": ".autonomy/logs/migration/R02-F12.rendering-27.log",
+      "log_sha256": "5800c8b95c7b1ebf836827f2646e223532f3f4b1fbdfd70c0dc044085692b6a3",
+      "name": "rendering-27"
+    },
+    {
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "finished": "2026-11-20T01:45:52+00:00",
+      "log": ".autonomy/logs/migration/R02-F12.script-tests.log",
+      "log_sha256": "40b9730e8f44f9b74e9df1a3015507f1f2bf3e92b204a771aec0f1210ad1e6ac",
+      "name": "script-tests"
+    }
+  ],
+  "revision": "ca2fc1c78ba990564e6ec41e9408cab14c4d0115",
+  "revision_number": 1,
+  "sealed": "2026-11-20T01:47:33+00:00"
+}

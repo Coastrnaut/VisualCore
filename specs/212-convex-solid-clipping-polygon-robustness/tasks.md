@@ -60,7 +60,7 @@
 - [X] T-R02F12-008 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F12.reference-1.json (exit 0)
 - [X] T-R02F12-009 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F12.reference-2.json (exit 0)
 - [X] T-R02F12-010 Script tests (`--name script-tests`) — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F12.script-tests.json (exit 0)
-- [ ] T-R02F12-011 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+- [X] T-R02F12-011 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record — Verified 2026-11-19: converged in 2 rounds (round 1 appended T-R02F12-013, round 2 clean); sealed .autonomy/migration/evidence/R02-F12.json (13 passing); recorded pass 2026-11-19; T-R02F12-012 {device} waits for the device campaign
 
 ## Device campaign (after ImplementationLock-100)
 
