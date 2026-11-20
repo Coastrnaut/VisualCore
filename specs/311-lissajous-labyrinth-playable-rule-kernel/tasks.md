@@ -8,7 +8,7 @@ or {device} tasks (pure logic). Fixture seed 2_311; tests stay short (< 10 s eac
 
 ## Phase 1: Setup
 
-- [ ] T-R02G0201-001 Baselines: `--name baseline-host -- swift test --package-path Packages/VisualCore`, the isolated
+- [X] T-R02G0201-001 Baselines: `--name baseline-host -- swift test --package-path Packages/VisualCore`, the isolated — Verified 2026-11-20: 2026-11-20 baseline-host, baseline-timing exit 0; baseline-round02 exit 0 (Aurora Loom's 59 tests unchanged); rendering baseline R02-G01-02 rendering-27/26 exit 0 (.autonomy/migration/checks/R02-G02-01.baseline-*.json)
   timing run (`--name baseline-timing`) and `--name baseline-round02 -- swift test --package-path
   Packages/ExperiencesRound02`; the rendering baseline is R02-G01-02's rendering runs (exit 0)
 
