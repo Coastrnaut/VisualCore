@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-20
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G01-01 (migration ledger, game feature of experience R02-G01) · ID namespace FR-R02G0101-###,
 SC-R02G0101-###, T-R02G0101-###
@@ -27,6 +27,47 @@ Canonical overrides:
 - **Shared features used:** R02-F03 (numbers), R02-F23 (puzzle contract: the kernel's rules are a `PuzzleRules`, so the
   generator and solver of R02-G01-02 can certify levels); the other prerequisites listed by the source are delivered by
   unified-app features or concern later features of this game.
+
+## Clarifications
+
+### Session 2026-11-20
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time. Facts checked in
+code (read-only audit, 2026-11-20): no `Packages/ExperiencesRound02` exists yet; experience modules follow the
+`<Name>/Core`, `CoreTests`, `Experience`, `ExperienceTests` layout of `Packages/ExperiencesCreative`; the existing A18
+experience is named "Aurora" (`AuroraExperience`), so every Aurora Loom type carries the `AuroraLoom` prefix; R02-F23's
+`PuzzleRules` and `StableHash` are available; no `AuroraLoom*` name exists.
+
+- Q: How are phases represented so evaluation is exact on every device? → A: integers. A phase is a count of 1/4,096 of a
+  turn, taken modulo 4,096. Gate positions are sixteenths of the ribbon (1 … 15, four distinct). Wave step i (0 … 15)
+  adds i · s · 16 units at a gate at s sixteenths; phase step j (0 … 15) adds j · 256 units; a ribbon turns ω units per
+  tick (0 … 256) and the target harmony at gate g is Θ_g + Ω · n at tick n (Θ_g 0 … 4,095; Ω a power of two 1 … 256, so
+  one period is P = 4,096 / Ω ticks of 1/120 s). The residual is the signed wrap of (ribbon phase − target) into
+  −2,048 … 2,047; tolerance is 1 … 512 units. Rationale: the source asks for canonical quantized state; integers make
+  every device agree bit for bit. Impact: FR-R02G0101-001, 002; SC-R02G0101-001.
+- Q: When exactly is a level won or failed? → A: after every accepted move, undo or redo the kernel evaluates ticks
+  n = 0 … 2P − 1 for all three ribbons and four gates; the level is won when every |residual| ≤ tolerance (inclusive).
+  It fails when a move spends the last of the allowance (1 … 64 moves) and the level is not won; the failure names the
+  ribbon, gate and tick with the largest |residual| (ties: lowest ribbon, then gate, then tick). A level whose start
+  already wins is refused. Impact: FR-R02G0101-002, 003; SC-R02G0101-001, 004.
+- Q: What is a move, and how do undo and redo count against the allowance? → A: a move sets one control of one ribbon
+  to a new step (`wave` or `phase`, 0 … 15); setting the current value is refused (`no-change`). Every accepted move,
+  undo and redo appends a record (schema, level seed, tick = record index, kind, ribbon, control, step, previous and
+  next fingerprint). Undo restores the previous controls and refunds the move; redo re-applies it; a new move clears the
+  redo stack. A move must name the current fingerprint as its previous one, else it is refused as `stale`. Impact:
+  FR-R02G0101-004, 005; SC-R02G0101-002, 003.
+- Q: What are the life stages and which actions does each allow? → A: `loading` → (`tutorial` when the level asks for
+  one) → `playing` ↔ `paused` → `won` or `failed` → `result`; events `begin`, `dismissTutorial`, `pause`, `resume` and
+  `showResult` move between them, any other event in a stage is refused (`stage`). Moves, undo and redo are accepted only
+  while `playing`; the kernel never changes the outcome by itself. The fingerprint of a state is the SHA-256 hex
+  (`StableHash`) of a fixed byte layout: schema, the level fingerprint, the six control steps, the moves spent and the
+  stage. Impact: FR-R02G0101-004, 006; SC-R02G0101-003.
+- Q: How are levels stored and refusals named, and how do the rules meet the puzzle contract? → A: `AuroraLoomLevel` is
+  `Codable` JSON schema 1 with sorted keys and a fingerprint (SHA-256 hex of its canonical JSON); decoding re-checks every
+  rule and the fingerprint; newer schemas are refused. `AuroraLoomRules` conforms to `PuzzleRules` (state: the six control
+  steps; moves: every single-control change, in ribbon, control, step order; solved: the win test). Reason codes
+  (`AuroraLoomError`): `r02-g01.level`, `r02-g01.move`, `r02-g01.stage`, `r02-g01.stale`, `r02-g01.allowance`,
+  `r02-g01.newer-schema`, `r02-g01.malformed`. Impact: FR-R02G0101-007, 008, 009; SC-R02G0101-005.
 
 ## User Scenarios & Testing *(mandatory)*
 
