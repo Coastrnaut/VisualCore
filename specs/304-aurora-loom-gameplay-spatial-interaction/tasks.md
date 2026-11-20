@@ -24,7 +24,7 @@ tests stay short (< 10 s each).
 
 ## Phase 3: Stories 1–3 — anchors, dials and camera (P1) 🎯
 
-- [ ] T-R02G0104-003 [P] [US1] [US2] [US3] Create `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomGestureController.swift` (states idle, dragging,
+- [X] T-R02G0104-003 [P] [US1] [US2] [US3] Create `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomGestureController.swift` (states idle, dragging, — Verified 2026-11-20: 2026-11-20 host-2 exit 0: AuroraLoomGestureControllerTests 12/12 (500 seeded drags end in the independently computed step at 390×844, 96×64 and 1024×768; preview; quarter dial turn = 4 steps; 1,000 seeded arbitration scripts send nothing; picking follows R02-F22's rule; orbit clamps and double tap; selection; determinism) (.autonomy/migration/checks/R02-G01-04.host-2.json)
   orbiting, cancelled; picking via HandlePicker; drags via HandleDrag; one move on release when changed; second finger
   cancels; cancelled touches; playing-only; orbit from two-finger midpoint "90° per width, 60° per height", clamped;
   resetOrbit; selection) with `Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomGestureControllerTests.swift` (500 seeded scripted drags agree with an

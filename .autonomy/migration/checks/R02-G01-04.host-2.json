@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "AuroraLoomGestureControllerTests"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter AuroraLoomGestureControllerTests",
+  "elapsed_seconds": 4.428,
+  "exit_code": 0,
+  "finished": "2026-11-20T18:14:14+00:00",
+  "gate": "R02-G01-04",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G01-04.host-2.log",
+  "log_sha256": "c3759ede3f1d6e875a593f039c44e85c1192ffea2bffa5d97acd4a990bec6426",
+  "name": "host-2",
+  "started": "2026-11-20T18:14:10+00:00",
+  "timed_out": false
+}
