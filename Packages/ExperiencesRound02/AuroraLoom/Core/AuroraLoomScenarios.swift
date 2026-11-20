@@ -2,6 +2,7 @@
 // The scenarios the verification runner plays for Aurora Loom, a round-two game, all short (owner rule of 2026-11-13):
 //   - the nine standard scenarios and the two a game needs (`full-playthrough`, `hero`), prepared with seed 0, which
 //     opens certified level 1 (`seed % 100 + 1`);
+//   - the 80 acceptance scenarios of the planning catalog (below), each with the seed of its planned level;
 //   - three fixtures: `fixture-level-1-solved` (the certified solution of level 1, outcome `won`),
 //     `fixture-allowance-spent` (the allowance spent on moves that never win, outcome `failed`) and
 //     `fixture-undo-redo` (a move, its undo and its redo).
@@ -9,10 +10,13 @@
 // save-restore and reset play two moves and an undo; completion plays the certified solution and expects `won`;
 // full-playthrough solves levels 1, 2 and 3 with `level.next` between them; hero plays one move; rejection refuses
 // values out of range, fractional values, wrong value counts, an unknown control, a move to the current step and an
-// undo or redo with nothing to revert. The expected digests are derived by playing the entries on a core exactly as the
-// engine plays them (the steps of an entry, then its action) and digesting it with the experience id as domain.
-// The 80 `acceptance-…` scenarios of the planning catalog belong to a later feature of R02-G01; the validator's
-// content requirement for them is the caller's.
+// undo or redo with nothing to revert (never an undeclared control: the content audit forbids one in a manifest).
+// The 80 acceptance scenarios `acceptance-001` … `acceptance-080` follow the rows R2-G01-QA-001 … 080 of the archived
+// acceptance matrix (docs/archive/planning/rounds/round2.md, section 6.1.19, lines 2990–3075): each opens its planned
+// level with seed `level − 1`, issues one legal `ribbon.move` (the first move of that level's certified solution) and
+// then one illegal action — step 16, refused as out of range, on odd rows; the step just set, refused by the kernel, on
+// even rows. The expected digests are derived by playing the entries on a core exactly as the engine plays them (the
+// steps of an entry, then its action) and digesting it with the experience id as domain.
 #if DEBUG || VISUALCORE_AUTOMATION
 import VisualCoreExperience
 
@@ -133,8 +137,48 @@ extension AuroraLoomExperienceCore {
             refusedEntry("play.redo", [], kernelMove),
             refusedEntry("ribbon.move", [0, 0], "action.wrong-value-count"),
             refusedEntry("level.next", [1], "action.wrong-value-count"),
-            refusedEntry("loom.spin", [], "action.unknown-control"),
         ]
+    }
+
+    /// The planned level of each acceptance row R2-G01-QA-001 … 080, in row order. Rows 001 … 020 name their level in
+    /// the archived matrix (round2.md lines 2990–3075: "Load planned level 011", … "For level 044"); rows 021 … 080 name
+    /// none, so they continue the same progression (level = (10 + 7 × (row − 1)) mod 100 + 1), which visits all 80
+    /// rows on distinct levels.
+    public static let acceptanceLevels: [Int] = [
+        11, 18, 25, 32, 39, 46, 53, 60, 67, 74, 81, 88, 95, 2, 9, 16, 23, 30, 37, 44, 51, 58, 65, 72, 79,
+        86, 93, 100, 7, 14, 21, 28, 35, 42, 49, 56, 63, 70, 77, 84, 91, 98, 5, 12, 19, 26, 33, 40, 47, 54,
+        61, 68, 75, 82, 89, 96, 3, 10, 17, 24, 31, 38, 45, 52, 59, 66, 73, 80, 87, 94, 1, 8, 15, 22, 29, 36,
+        43, 50, 57, 64,
+    ]
+
+    /// The name of acceptance row `row` (1 … 80): `acceptance-001` … `acceptance-080`.
+    public static func acceptanceName(_ row: Int) -> String {
+        let digits = String(row)
+        return "acceptance-" + String(repeating: "0", count: max(0, 3 - digits.count)) + digits
+    }
+
+    /// The seed that opens level `number`: `number − 1` (``levelNumber(forSeed:)`` gives `seed % 100 + 1`).
+    public static func seed(forLevel number: Int) -> UInt64 { UInt64(max(number - 1, 0)) }
+
+    /// The acceptance scenarios, one per row: its name, seed and entries — the first move of the planned level's
+    /// certified solution (accepted), then one illegal action whose expected result is the one the core gives after
+    /// the legal move (step 16 on odd rows, the step just set on even rows). Empty when a level cannot be generated.
+    public static var acceptanceScenarios: [(name: String, seed: UInt64, entries: [ScenarioStep])] {
+        var list: [(name: String, seed: UInt64, entries: [ScenarioStep])] = []
+        for (index, number) in acceptanceLevels.enumerated() {
+            let row = index + 1
+            guard let generated = certified(number), let move = generated.solution.moves.first,
+                  var core = try? opening(number: number) else { return [] }
+            let legal = moveEntry(move)
+            let control: Double = move.control == .wave ? 0 : 1
+            _ = core.apply(ExperienceAction(control: "ribbon.move", values: legal.action?.values ?? [], step: 1))
+            let illegalStep: Double = row % 2 == 1 ? 16 : Double(move.step)
+            let values: [Double] = [Double(move.ribbon), control, illegalStep]
+            let result = core.apply(ExperienceAction(control: "ribbon.move", values: values, step: 2)).code
+            let illegal = ScenarioStep(steps: 1, action: ScriptedAction("ribbon.move", values), result: result)
+            list.append((acceptanceName(row), seed(forLevel: number), [legal, illegal]))
+        }
+        return list
     }
 
     /// The fixtures: a name, the entries from the opening state and the outcome expected after them (nil: none).
@@ -209,6 +253,15 @@ extension AuroraLoomExperienceCore {
                                                       finalDigest: expectedDigest(for: id, seed: seed,
                                                                                   entries: hero))),
         ]
+        for acceptance in acceptanceScenarios {
+            let end = played(seed: acceptance.seed, entries: acceptance.entries)
+            specs.append(ScenarioSpec(name: acceptance.name, seed: acceptance.seed, entries: acceptance.entries,
+                                      expect: ScenarioExpectations(
+                                          initialDigest: expectedDigest(for: id, seed: acceptance.seed, entries: []),
+                                          finalDigest: expectedDigest(for: id, seed: acceptance.seed,
+                                                                      entries: acceptance.entries),
+                                          outcome: end?.outcome?.code)))
+        }
         for fixture in fixtures {
             specs.append(ScenarioSpec(name: fixture.name, seed: seed, entries: fixture.entries,
                                       expect: ScenarioExpectations(initialDigest: initial,

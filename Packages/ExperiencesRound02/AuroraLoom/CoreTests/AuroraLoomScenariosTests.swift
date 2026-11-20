@@ -38,16 +38,31 @@ private func playScenario(_ spec: ScenarioSpec) async throws
 
     @Test func theManifestIsAValidRoundTwoGame() {
         let manifest: ScenarioManifest = Core.manifest(for: scenarioID)
-        let problems: [String] = ScenarioManifestValidator.problems(manifest, controls: Core.controls,
-                                                                    content: ContentRequirement(fixtures: 3))
+        let problems: [String] = ScenarioManifestValidator.problems(
+            manifest, controls: Core.controls, content: ContentRequirement(fixtures: 3, acceptance: 80, levels: 100))
         #expect(problems.isEmpty, "\(problems)")
+        var acceptanceNames: [String] = []
+        for row in 1...80 { acceptanceNames.append(Core.acceptanceName(row)) }
+        #expect(acceptanceNames[0] == "acceptance-001" && acceptanceNames[79] == "acceptance-080")
         let names: [String] = manifest.scenarios.map(\.name)
-        #expect(names == ScenarioManifest.standardNames + ["full-playthrough", "hero"] + Self.fixtureNames)
+        #expect(names == ScenarioManifest.standardNames + ["full-playthrough", "hero"] + acceptanceNames
+            + Self.fixtureNames)
         #expect(manifest.kind == .game && manifest.round == 2 && manifest.experience == scenarioID)
+        let declared: Set<String> = Set(Core.controls.map(\.id))
         for spec in manifest.scenarios {
-            #expect(spec.seed == Core.manifestSeed, "\(spec.name)")
+            if spec.name.hasPrefix("acceptance-") {
+                #expect(spec.entries.count == 2, "\(spec.name)")
+            } else {
+                #expect(spec.seed == Core.manifestSeed, "\(spec.name)")
+            }
             #expect(spec.entries.count <= 64, "\(spec.name) is short")
+            for entry in spec.entries {
+                if let action = entry.action { #expect(declared.contains(action.control), "\(spec.name)") }
+            }
         }
+        #expect(Core.acceptanceLevels.count == 80 && Set(Core.acceptanceLevels).count == 80)
+        let archived: [Int] = [11, 18, 25, 32, 39, 46, 53, 60, 67, 74, 81, 88, 95, 2, 9, 16, 23, 30, 37, 44]
+        #expect(Array(Core.acceptanceLevels.prefix(20)) == archived)
         #expect(!Core.inputEntries.isEmpty && !Core.completionEntries.isEmpty && !Core.allowanceEntries.isEmpty)
     }
 
@@ -85,7 +100,7 @@ private func playScenario(_ spec: ScenarioSpec) async throws
     @Test func everyGameScenarioAndFixtureEndsInTheStateItsActionsDescribe() async throws {
         let manifest: ScenarioManifest = Core.manifest(for: scenarioID)
         let level1: AuroraLoomGenerated = try AuroraLoomGenerator.generate(AuroraLoomManifest.entries[0])
-        for spec in manifest.scenarios {
+        for spec in manifest.scenarios where !spec.name.hasPrefix("acceptance-") {
             let played = try await playScenario(spec)
             let core: Core = try #require(played.core, "\(spec.name)")
             switch spec.name {
@@ -112,6 +127,29 @@ private func playScenario(_ spec: ScenarioSpec) async throws
             default:
                 Issue.record("unexpected scenario \(spec.name)")
             }
+        }
+    }
+
+    @Test func everyAcceptanceScenarioOpensItsPlannedLevelAndRefusesItsIllegalAction() async throws {
+        let manifest: ScenarioManifest = Core.manifest(for: scenarioID)
+        for (index, level) in Core.acceptanceLevels.enumerated() {
+            let name: String = Core.acceptanceName(index + 1)
+            let spec: ScenarioSpec = try #require(manifest.scenarios.first { $0.name == name })
+            #expect(spec.seed == UInt64(level - 1), "\(name)")
+            let played = try await playScenario(spec)
+            let core: Core = try #require(played.core, "\(name)")
+            #expect(core.levelNumber == level && core.play.spent == 1 && core.play.records.count == 1, "\(name)")
+            #expect(played.results.count == 2 && played.results[0] == "accepted", "\(name)")
+            let illegal: String = played.results[1]
+            if index % 2 == 0 {
+                #expect(illegal == "action.out-of-range", "\(name)")
+            } else {
+                let kernel: Set<String> = ["action.rule.r02-g01.move", "action.rule.r02-g01.stage"]
+                #expect(kernel.contains(illegal), "\(name): \(illegal)")
+            }
+            let first: AuroraLoomMove = try #require(
+                AuroraLoomGenerator.generate(AuroraLoomManifest.entries[level - 1]).solution.moves.first)
+            #expect(core.play.records[0].ribbon == first.ribbon && core.play.records[0].step == first.step, "\(name)")
         }
     }
 

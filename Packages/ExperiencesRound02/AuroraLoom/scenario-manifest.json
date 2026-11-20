@@ -222,16 +222,6 @@
           },
           "result" : "action.wrong-value-count",
           "steps" : 0
-        },
-        {
-          "action" : {
-            "control" : "loom.spin",
-            "values" : [
-
-            ]
-          },
-          "result" : "action.unknown-control",
-          "steps" : 0
         }
       ],
       "expect" : {
@@ -472,6 +462,2732 @@
       },
       "name" : "hero",
       "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              11
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8c54d2a76538291fcd62a907d3f75829743cb377e267dc0d3f804ef7b565b3bf",
+        "initialDigest" : "d7670a8ea350cc7a8d95f9523d69a88ba6a3bb3da924085e0cda53517c12e56a"
+      },
+      "name" : "acceptance-001",
+      "seed" : "10"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              2,
+              1,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              2,
+              1,
+              2
+            ]
+          },
+          "result" : "action.rule.r02-g01.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "4682636b4c64385ce7d34c946e8a0b353296a81ee050b07ac16f54cb27385ad9",
+        "initialDigest" : "0d52ef520773b7cf227f5f66e0013dcba2f93ef6b736f09af93af5bc9d5873ee",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-002",
+      "seed" : "17"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "86248b535f6bb5add6f54757aa493d61ec10a404ecff398db3d8495bdeb6860a",
+        "initialDigest" : "9d3bf5bdebb2ba6e96831b884bcd6754b977cd7fb4a6e20cfe6ecdcb4d6aef13"
+      },
+      "name" : "acceptance-003",
+      "seed" : "24"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              11
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              11
+            ]
+          },
+          "result" : "action.rule.r02-g01.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d69291374a19b90f3adb372533234fa8dfe35039072838be24a5905745548a3b",
+        "initialDigest" : "36f0b3c06b429f0adbe72d7aa521ae9f12079893d5518ad87a90e49dfc2ae8db"
+      },
+      "name" : "acceptance-004",
+      "seed" : "31"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              1,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7e7fd5ef0c43fe58a42c225f3b9036563cca89f75d1f09882f3afd0a00d7e113",
+        "initialDigest" : "beae3cd8ad5b9898a6ae92f2e6ef2d3496d1a656b55c12fc78816f018d9190e1"
+      },
+      "name" : "acceptance-005",
+      "seed" : "38"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              10
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              10
+            ]
+          },
+          "result" : "action.rule.r02-g01.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "24554edc9e2da7c10d9be241dee7f92b6f35382dce0f5073b1c24f3820683654",
+        "initialDigest" : "bac56cf45a029a68273f8280b0eccffc11963f148d97fa97e080b3078dad5bc5"
+      },
+      "name" : "acceptance-006",
+      "seed" : "45"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              1,
+              14
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              1,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "adf03e9436bb2a1f4f192af9781c453bc68303d544bd8b588f6105d5eeefed8a",
+        "initialDigest" : "a0cc1dddf68b492cc647df75ce2013bc2ac53b96f97789a9a6e852cf9ac64363"
+      },
+      "name" : "acceptance-007",
+      "seed" : "52"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              5
+            ]
+          },
+          "result" : "action.rule.r02-g01.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "66bf4d7cb9d899a166f9948c2cae3226329a988b6393a67a9fe20ccea5ff7672",
+        "initialDigest" : "c435af5fa5247843d6dd818d243fe0f8fd816eaf46e7d3d632907b8e664dbb6a"
+      },
+      "name" : "acceptance-008",
+      "seed" : "59"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              1,
+              15
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              1,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8871756a43b530e6dce2d1efa486ccc98b08c64de32919ecabd3e157fe2e01db",
+        "initialDigest" : "187d7723bd53512e5119f947a24916e267733ff45f378676c631f66fd7e06539"
+      },
+      "name" : "acceptance-009",
+      "seed" : "66"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              1,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              1,
+              4
+            ]
+          },
+          "result" : "action.rule.r02-g01.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "bfdf37e4859b8d723ef0302288af583473269127b648067cbbde97a301e288ca",
+        "initialDigest" : "568dd4fd14778a60f87a779f5851652dad4132c0e66e7b6d1f1fe43031ae0053"
+      },
+      "name" : "acceptance-010",
+      "seed" : "73"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "2441346b57ffa60bc6560a3bde71af61ab667eeae381230a2abac0d5bf204fb0",
+        "initialDigest" : "ceee8ad612a3c08be11b31df828af2a1793ca6e78dc017a00c8739ed0ec143a0"
+      },
+      "name" : "acceptance-011",
+      "seed" : "80"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g01.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "dcbfb94110dbd720722dead94d45699f718525ba63a147296f2e5b67cf3f24d5",
+        "initialDigest" : "c2df3b2151dbb845b76170cbdf47a1336f584330788cdaa3f17ff674edb9a11b"
+      },
+      "name" : "acceptance-012",
+      "seed" : "87"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "84b637132bdd64e5c1122ddba4734605169f9ce7b90d6e21d7e7cce3964d5bdf",
+        "initialDigest" : "a1bec8ef619fcd189ed024bffc30746062d3ca459cff0289e436bdee255027a6"
+      },
+      "name" : "acceptance-013",
+      "seed" : "94"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              1,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              1,
+              2
+            ]
+          },
+          "result" : "action.rule.r02-g01.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ead350e8b3416f9c8c5cdf1e14371ece5a24ee058099ecaa70b7dbdb51d8c728",
+        "initialDigest" : "ddbe331a9a850e9e0f0f9306d819297cfdea08057343b03fce2ca3e930402880"
+      },
+      "name" : "acceptance-014",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              1,
+              1,
+              13
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              1,
+              1,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "166b005c7269a26328793e3f96e365cc2623bd279509860be202d0ea55fb21a1",
+        "initialDigest" : "fe1fc48f9ab4723fe7efa71964ab0ed05e83752639a1ba95b3ffe49cc8cec41c",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-015",
+      "seed" : "8"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              1,
+              11
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              1,
+              11
+            ]
+          },
+          "result" : "action.rule.r02-g01.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "99797f24b9148ff60ce0cf59bf357aecc112c778e612ed1756defc15b17ebc6d",
+        "initialDigest" : "2e09aced35f9c630a07d18cbfea6a45f50ec4b1d189fe9c97398a446f9a8b652"
+      },
+      "name" : "acceptance-016",
+      "seed" : "15"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              13
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7c6a19535bc1867d028e3f87264c3efb95286b0df68ed7de5e033c2dc7d5eff6",
+        "initialDigest" : "0a2faec5761304a522662ff4e649db743c0c1bd2e1629c53b53b4d2b27a87748"
+      },
+      "name" : "acceptance-017",
+      "seed" : "22"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              11
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              11
+            ]
+          },
+          "result" : "action.rule.r02-g01.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "c0a78450b3eeac53a6adaa07d902e1a2db2065b26c63ec6183ddec6afe1c9d2f",
+        "initialDigest" : "9c002fac2325ce6d27b297b50ecc5dd68cd9a8b4dcd321a615388c935cd47087"
+      },
+      "name" : "acceptance-018",
+      "seed" : "29"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              1,
+              0,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              1,
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8be0c34efa76b64a1ebc2a91688acf1d8827823110b26bc05ba3828f2a85ba5c",
+        "initialDigest" : "d19486043b5c12831ba9c11fc1c2a2fcf90e666b2d5748d7d04cf2763099ed8e"
+      },
+      "name" : "acceptance-019",
+      "seed" : "36"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              7
+            ]
+          },
+          "result" : "action.rule.r02-g01.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e42fc0eb9a8dbe08e9e5adb19d0a649c994cc3dc25195bb4438c39127652dbcb",
+        "initialDigest" : "756c0003a38e4c2a231a7cda3ed3f7be6a17a00e7c106e4a6ac368d02d7ca9ed"
+      },
+      "name" : "acceptance-020",
+      "seed" : "43"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "932eee119e97fa5e195db714a48d4c6c9f775265dc579be168e70da2640c517d",
+        "initialDigest" : "45a13826ef057c7c207e10d2022f7b5172d3965fae9355dfb91aa55e673f671d"
+      },
+      "name" : "acceptance-021",
+      "seed" : "50"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              10
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              10
+            ]
+          },
+          "result" : "action.rule.r02-g01.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "87cb3fb07f474f7c5597ddd60d42e01b415624873a09993d13fc1bd4c0c1c138",
+        "initialDigest" : "286bfe2600895bc5f7f3a17466a2244a6b897d57a2e7f80588e60d12aeabbad7"
+      },
+      "name" : "acceptance-022",
+      "seed" : "57"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "845e773b7a73e5f376faa872eabf3f86757484f11fff38759d74de7bf7dc50bb",
+        "initialDigest" : "46f01f857e9544ff4dbcf56df89918bf76dca9d420a3947b42e027720718ca02"
+      },
+      "name" : "acceptance-023",
+      "seed" : "64"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              2
+            ]
+          },
+          "result" : "action.rule.r02-g01.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5fdcb31711d00c4d9c244c43742acd9232c24a0f48381719c0b471d1f1c388b6",
+        "initialDigest" : "2dc91db95dee671fb0fa6f70b42f40199ead769882d627d1d21e36541785590b"
+      },
+      "name" : "acceptance-024",
+      "seed" : "71"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "2f68b6277aa3902850cab1700f92a8f43e5f5676f32487c716907f1982969939",
+        "initialDigest" : "b25aa10c97fddd26c1aa848b7cac721febeb292deb17b61d8a750293a3c92839"
+      },
+      "name" : "acceptance-025",
+      "seed" : "78"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              2
+            ]
+          },
+          "result" : "action.rule.r02-g01.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "24515882f9b770b79e22f7f4c52324854dce882dc198037935ed186832e19629",
+        "initialDigest" : "54db36a16ff1b1a9bdba559709acb5425745d243f3990a4c3636ef57ed931ba1"
+      },
+      "name" : "acceptance-026",
+      "seed" : "85"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              13
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9cad36e2714eafca391eeecdc82de8bebf4151b03ee1a3aea59742dc7ec866a5",
+        "initialDigest" : "0835d0774ee588f3d6985a4b36eba54a4a431266af428a8869d837470d9772de"
+      },
+      "name" : "acceptance-027",
+      "seed" : "92"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              3
+            ]
+          },
+          "result" : "action.rule.r02-g01.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "2a03186b27fe9cb8727621804c6c2e4638f90ceca65d8c393e50608efa31fa74",
+        "initialDigest" : "cb077302cb27af100acd579cfbdeba89cbb503771708ff1bc3316fc931df7465"
+      },
+      "name" : "acceptance-028",
+      "seed" : "99"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              1,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              1,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "db9f76809afd0fea3f75e58d78ecc74794b9af5796c830e4b0767723fa402d33",
+        "initialDigest" : "27f589bfce558ccbf9b229f46ceaec20867bad3263887effb199597035a9f0e5"
+      },
+      "name" : "acceptance-029",
+      "seed" : "6"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              1,
+              1,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              1,
+              1,
+              12
+            ]
+          },
+          "result" : "action.rule.r02-g01.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "49c3b34f5f09985379e10023d36c5049913108291f26f6fde638105db94e9455",
+        "initialDigest" : "1511c0c4f153e56f3d35cb2aac6229a23d7705a493c91dfd139081b906db1a62",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-030",
+      "seed" : "13"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              13
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9ab1cb5f0a7226ef3593ac8f1ccd9624048dd9fd80ccb3c077e7d665c8f54307",
+        "initialDigest" : "f95ef1f0a35b800bdde2cfc22ae0247705699a8d9b9fc7f2abc2101790fbf618"
+      },
+      "name" : "acceptance-031",
+      "seed" : "20"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              13
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              13
+            ]
+          },
+          "result" : "action.rule.r02-g01.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "c87208c2c3c224ffc21104eeb89e6dd47900da26b992da8065a318d95b0dc887",
+        "initialDigest" : "f8351402644f6f667e34f012e7c22a03f8493cb109785778e34c3d510a179951"
+      },
+      "name" : "acceptance-032",
+      "seed" : "27"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              1,
+              1,
+              15
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              1,
+              1,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "df0248a0ef385293737edf9c060c84b64c12052b73b23d4fae890d1c32721660",
+        "initialDigest" : "0bffcc7f8d9744ff863c89f47bdd0d842ec0ac3f48ed45e338ce433123a4a46d"
+      },
+      "name" : "acceptance-033",
+      "seed" : "34"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              7
+            ]
+          },
+          "result" : "action.rule.r02-g01.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "3e9e36ec1518711d73716e2511ad3d426655d2ca9d3ccf0111bf7b80ae70e514",
+        "initialDigest" : "8fbf6fb02508f17f4ad5d211e1651a6702800c4c5109eb4459fd155dd8a0fd1a"
+      },
+      "name" : "acceptance-034",
+      "seed" : "41"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              9
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "90c4f00ed85cbeab6f3c0c1f7dfb3553f1ef75b9e2b7f80834e784d464d23a12",
+        "initialDigest" : "3be650098266db36682b82d770c0cecdf64c3453fd929e0e755e296cc52b9019"
+      },
+      "name" : "acceptance-035",
+      "seed" : "48"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              5
+            ]
+          },
+          "result" : "action.rule.r02-g01.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "34205990d378b05ba2be78958bcd511556f856892221d66e81f162b75e903c5b",
+        "initialDigest" : "1ef79e0060f02b11940b3ca7e1bdec2468487ac7ef20784b14c4a84be4a8acc5"
+      },
+      "name" : "acceptance-036",
+      "seed" : "55"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              15
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e076d7c338111927f6cbea6d2cfeb791cdb5e5652e5d7d2aa30ec5f44055e447",
+        "initialDigest" : "062e48ec877c24882df91c84b0334f2fb4c1c7e823722aed496aa5f5423436b7"
+      },
+      "name" : "acceptance-037",
+      "seed" : "62"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              1,
+              15
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              1,
+              15
+            ]
+          },
+          "result" : "action.rule.r02-g01.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "30d9cfb7822d036e5770f9a4e4e687262f6231cea4acf4135125650321ed900e",
+        "initialDigest" : "0f37341dc0bcefef1e3f076f3500de5a795f80a02adde7ad5f96b1dcea6d40a4"
+      },
+      "name" : "acceptance-038",
+      "seed" : "69"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              1,
+              14
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              1,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1f936e2d96095f0b281e318db0a26674e035fc35478f6de177107938480b2663",
+        "initialDigest" : "815db0706bcc3c26342c68af621b18b4867f97025156e00ff62b838100755e49"
+      },
+      "name" : "acceptance-039",
+      "seed" : "76"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              9
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              9
+            ]
+          },
+          "result" : "action.rule.r02-g01.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5ea289ddf52ede3aef9df99671c47c42cb324a37eb234e90292e7e5a4ef33228",
+        "initialDigest" : "38e8813f4fe90758059571a9d212ab30093d900b14dd171c61c77f6f5ee7c396"
+      },
+      "name" : "acceptance-040",
+      "seed" : "83"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f59f6a8feb6acb6cbd25bfba8f67ca973a04b382c2ce800d71fa439951378b38",
+        "initialDigest" : "632106e8489758ca5740f556983f84ad3feb19d3764646eb03b3406c1a2e3d60"
+      },
+      "name" : "acceptance-041",
+      "seed" : "90"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g01.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "cf5939b694099d814d11afa0decb9f6027ff1ebc7de2acd2aeecbae3b4b3028d",
+        "initialDigest" : "f02697e547110c68eef711ae64313dff9271834f2b10eccbd79c8668204cc668"
+      },
+      "name" : "acceptance-042",
+      "seed" : "97"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              2,
+              0,
+              15
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              2,
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "27696a0734df21726cf6be130c356530e70845ba36de0032be01829ffdcd8c18",
+        "initialDigest" : "e9cedd497f1e6071cbaff36a40f01ad0c9408d865f91071e4655cd5e82be1d62",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-043",
+      "seed" : "4"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              2,
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              2,
+              0,
+              12
+            ]
+          },
+          "result" : "action.rule.r02-g01.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f266fa5ecfb55f4385ea99a16d4598ea93d53a3a180d10cac508b324d7058fb2",
+        "initialDigest" : "8b77ce2b687e024816270f7f7f0feee24e157f2e63e184546be8a03dbb28c92f"
+      },
+      "name" : "acceptance-044",
+      "seed" : "11"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              1,
+              1,
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              1,
+              1,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7be939ad7c2a2a64351ea6194f20843529f7ddc50eb2c66ea743203c69543575",
+        "initialDigest" : "f695cf037c8798e82c8bcd0664472beac06bb12dc21a666300bd9122db1a0424",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-045",
+      "seed" : "18"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              1,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              1,
+              4
+            ]
+          },
+          "result" : "action.rule.r02-g01.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5839d5994c56e51e86196b5db0fc394d588e56a777eab51a5b1c4adf1c09526a",
+        "initialDigest" : "11a1a260af141d3cf3593591eaf2d68a9048eaebfcc260695719e75915265d41"
+      },
+      "name" : "acceptance-046",
+      "seed" : "25"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              8
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5c30edf5b869afc2d9e1a71c060da9a509fd89bd3c26fcb3a13b312b5a3f6e10",
+        "initialDigest" : "17e79543b66e7da8d200bc013c121e72e605d8ac8f716990117e588014890a25"
+      },
+      "name" : "acceptance-047",
+      "seed" : "32"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              15
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              15
+            ]
+          },
+          "result" : "action.rule.r02-g01.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "c254302d7ced36382f74cbe3f140e227ab688f2137ada60ccc9e739c6a73f4fa",
+        "initialDigest" : "c45ded3f66e7987b754d4cdc09004390e9defd718afb25e04a932ef356f46cb8"
+      },
+      "name" : "acceptance-048",
+      "seed" : "39"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              1,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              1,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9530f6cbfe4cbcbf00042aafb3817c345fbe9f0b8f1fd18788e409c52a830d40",
+        "initialDigest" : "867bf1c43c0037f566753bbd636b0d5931b1a14680eb9e17b5b588971a3613ef"
+      },
+      "name" : "acceptance-049",
+      "seed" : "46"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              1,
+              0,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              1,
+              0,
+              3
+            ]
+          },
+          "result" : "action.rule.r02-g01.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "26e64e2d23bfb2525db454797353b85c0e3f439e1ff3913b24369727011c13d5",
+        "initialDigest" : "08a9772b717f40f04ed453ebd2e7d783ad8fcc38525d5d66bf24b6725f68b40a"
+      },
+      "name" : "acceptance-050",
+      "seed" : "53"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e467ba5f32d873f1008df024292c53768071c26c0e51fb061b045805a8fa9138",
+        "initialDigest" : "32010ebeebc845df149e30174a6c23b803076a8634c79acb2db746d18a733b7b"
+      },
+      "name" : "acceptance-051",
+      "seed" : "60"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              15
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              15
+            ]
+          },
+          "result" : "action.rule.r02-g01.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1426d745bd7b4ed50bd38bc8d602ffa47e89bc5a73e8d2a2b538c777eaf75c74",
+        "initialDigest" : "d66268d7df5f9a4dbb35e45ed8b95d384130aca9ef10530be6fe74e6643625c1"
+      },
+      "name" : "acceptance-052",
+      "seed" : "67"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "eb7422fe6ef5c1d6202e6f4b0e7792b1235188dbf280b246f9cef6c4410df619",
+        "initialDigest" : "b8f6376dc6424c5d70fc18b63da170ef6bd40c986d4709f6bf133b6095a4f172"
+      },
+      "name" : "acceptance-053",
+      "seed" : "74"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              9
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              9
+            ]
+          },
+          "result" : "action.rule.r02-g01.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "4e9e6985b7005ab5aea9fd7a2366410bc85ac1871b90970a3cab61a0911f8751",
+        "initialDigest" : "f85108bfe5f4960dde79aee16933fa6ec1ff01ce9cd840263fd608f723aa78f0"
+      },
+      "name" : "acceptance-054",
+      "seed" : "81"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "fd1b65e636fdcb45be264cf2a8156f8c8f23917fb12ac8ce93ccb5f633c4cdf1",
+        "initialDigest" : "48e04d4d70d0aa5188d6e3000ba8b2fa4428cff9dde468e9a248512b49058a5d"
+      },
+      "name" : "acceptance-055",
+      "seed" : "88"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              15
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              15
+            ]
+          },
+          "result" : "action.rule.r02-g01.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "487018dd79af70c4f502ee4a71450cbc32deda778cab8f68535f651078ff2c7a",
+        "initialDigest" : "ed1e69d8961d2560c0747858f03d93e6f75ea9aba4e6ba8ca8febd75b60d056f"
+      },
+      "name" : "acceptance-056",
+      "seed" : "95"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              1,
+              1,
+              9
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              1,
+              1,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f15e691101bd7b87db6817323dd2e045618fb3feb1f8c49f9c5de24dda0d3fd7",
+        "initialDigest" : "c92d117fbf769a42a2fe2ac7133ef69af6507f73b9658c637c739e23f66646f1",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-057",
+      "seed" : "2"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              1,
+              0,
+              14
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              1,
+              0,
+              14
+            ]
+          },
+          "result" : "action.rule.r02-g01.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "66c5541ae7ada298f6d401cecf6c8705e36f2694b9c09bb11c6c562590020bc1",
+        "initialDigest" : "7665f4207386477433a943039d9992f396b43d5d930094a57b7d9ca4683388c4"
+      },
+      "name" : "acceptance-058",
+      "seed" : "9"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              1,
+              1,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              1,
+              1,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8796d9599051e604fb0a47584f6c196cbc2da3c7a4ce2cc0c72f610a40d75f99",
+        "initialDigest" : "8500337d0fa39413ddb584a03ce16a0907ff380c1bfc04fd6ee0e6481d49c7b8"
+      },
+      "name" : "acceptance-059",
+      "seed" : "16"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              1,
+              0,
+              13
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              1,
+              0,
+              13
+            ]
+          },
+          "result" : "action.rule.r02-g01.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "acea16a5d2e081cfb15b2c6246d8e0a6aefcf8fe1f740d37cc1510fc4821463d",
+        "initialDigest" : "28267a1b09ec8a77e381b4c27a70ed6842e2cff412ad5f79158c88a6b2f59090"
+      },
+      "name" : "acceptance-060",
+      "seed" : "23"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e37d79a5d93d67723287c36ead8b6ca9792fa56594cf7492d674ad0f6b6f3f98",
+        "initialDigest" : "820afca4b85daaec46fbe1cce840a6a5b9b33b9901f122b40a4c21030f80736b"
+      },
+      "name" : "acceptance-061",
+      "seed" : "30"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              1,
+              11
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              1,
+              11
+            ]
+          },
+          "result" : "action.rule.r02-g01.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6680562e3cb7d4e4c4b9e6da1e41c6febf08be46d35c2d0969a5a6a9c9ec9a42",
+        "initialDigest" : "9ec6519ebb0d12edb747a9b79f45e5602ad1e50a49c8f8ef3824e88f3b532045"
+      },
+      "name" : "acceptance-062",
+      "seed" : "37"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              15
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "823d9273c4a94b9c052843d7a8a1184fa9bc9ccbd1c3a6174669771f58d2f023",
+        "initialDigest" : "c83825835936a2f2ca6873f045692188aacdd3c4dc90a00afb1b3f43b2628bc1"
+      },
+      "name" : "acceptance-063",
+      "seed" : "44"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              1,
+              0,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              1,
+              0,
+              4
+            ]
+          },
+          "result" : "action.rule.r02-g01.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5c8fd5291cdea2f8bea88a41fcbbfd4060e911129a9ddfb7215beb841a6b65a2",
+        "initialDigest" : "f6bf87c5f150d3f3a4ce889e3d5bdbe137303a9e72a95728049d4785fb7c6e8d"
+      },
+      "name" : "acceptance-064",
+      "seed" : "51"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              9
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e9132e218e3bd59390b0b33f611846182b8101878da379a09a6633da61e37709",
+        "initialDigest" : "0c101ac1c8cc98d0b29d998f1ba82b834d2dc6dd25d084062b4db1e80d78f4d2"
+      },
+      "name" : "acceptance-065",
+      "seed" : "58"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              1,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              1,
+              12
+            ]
+          },
+          "result" : "action.rule.r02-g01.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d698e9ec3807685556d27ef5531c4bdca29e5fec2562ad7fd34068d1f71fbedc",
+        "initialDigest" : "262ade0e6f78d578bd3e83d9c11959758b0166b6323f550366a8c25cc908f94d"
+      },
+      "name" : "acceptance-066",
+      "seed" : "65"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              1,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              1,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "15f4343f215355161f5f749c4e2875966da614c7363c9afa84b64b6c5fddf57e",
+        "initialDigest" : "a3de780c7e36058f2fc7e03689f5cd0c0e123c5be9fdd69311ed562b53e836c9"
+      },
+      "name" : "acceptance-067",
+      "seed" : "72"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              11
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              11
+            ]
+          },
+          "result" : "action.rule.r02-g01.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1918b90959752cb76f9c45b3268db4a51e0b67ff14f2cdd8862ac7f7ab744c41",
+        "initialDigest" : "61a65084937aec70b050349c0a08e12c1db2025637a548f2309fdd627c1caff3"
+      },
+      "name" : "acceptance-068",
+      "seed" : "79"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a632f52bfa7c5a8570d94486f5dc6f51f62acfe33e15610c319f29e0e618648a",
+        "initialDigest" : "6c92360863e245aa550ca149ae4c368c4550e2d5a22d135422a5dc9aad4f06ad"
+      },
+      "name" : "acceptance-069",
+      "seed" : "86"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              10
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              10
+            ]
+          },
+          "result" : "action.rule.r02-g01.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "eab467b3227ac0177959019b151ed863e89efc506949ad3e3568043d384e806f",
+        "initialDigest" : "76d6dd74b8b5bfb9b4326075124c5df2489a91670a17aae007d9995b70e83d4f"
+      },
+      "name" : "acceptance-070",
+      "seed" : "93"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              2,
+              0,
+              15
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              2,
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e7b5f7ead14f4bc3ab2a93302558c5a6e02542a4898aaf63fe97ea4fba8d4fdb",
+        "initialDigest" : "6ca0f23117f66add7fe0ef978e5ac8206c92d081b6f466cd8cf8daa89584876b"
+      },
+      "name" : "acceptance-071",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              1,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              1,
+              5
+            ]
+          },
+          "result" : "action.rule.r02-g01.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d626346675dcdfe0e4a0d0fc7945a1e6975458c31d8bb034256a36b2c02e6043",
+        "initialDigest" : "122061cc9a5f2e4341a46e707450294cde4577cb4f97196739872995a974d4ca"
+      },
+      "name" : "acceptance-072",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              15
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ee53e0d7cf877a03b623d789c43d8e5e6100a54d0613919402a25fc6a6f665ca",
+        "initialDigest" : "3fe2e56e797217b99e37fc24cff26800bd8a33b9082129d7a8da31dbb66f52ad"
+      },
+      "name" : "acceptance-073",
+      "seed" : "14"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              1,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g01.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d3254aaac85340932d708335767fffc60b071cef3976ad77f69fa45d1d24c716",
+        "initialDigest" : "5ffd76c95d1496a199284e077c89f987fdbe505d7d5d22d422c57fdbe173029a"
+      },
+      "name" : "acceptance-074",
+      "seed" : "21"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "bec8dccb0b8a8301978bec1643fb4790065eb5623c8f94bdd76580b7c3b7ee3c",
+        "initialDigest" : "9fb12a7ab4ae015ca02cccd3e425991ccf4d6c0a159387e8d68d3d95edcd57cd"
+      },
+      "name" : "acceptance-075",
+      "seed" : "28"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              8
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              8
+            ]
+          },
+          "result" : "action.rule.r02-g01.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e84f00466167b6ab0b2070b821672403a03031ca355f837db581deb4a0a86cdf",
+        "initialDigest" : "fb98fec030681b460fd773fb18e096c629595bcd44826b7395d85c2a68c8d155"
+      },
+      "name" : "acceptance-076",
+      "seed" : "35"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d4b37267bc6089d8efd92ebedcd21bd6a7d9ac6a6f15e480343f66720dfc15c6",
+        "initialDigest" : "a3fab10da41655fdd4dda8fb4a89691f4ecfae07c70e3b015026301aa746d682"
+      },
+      "name" : "acceptance-077",
+      "seed" : "42"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              3
+            ]
+          },
+          "result" : "action.rule.r02-g01.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7c1ba862c9b71ba2228029702fbd7cc72a61b415d1d0fd02844896f6520427ae",
+        "initialDigest" : "ad9d1265f5903557881fe83aa979322864b18aacfa6042fba753c4033d4ec726"
+      },
+      "name" : "acceptance-078",
+      "seed" : "49"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d047a064c48fc6b07631a739f76513e720c4aecd1c3ed37c470111ebd0dc49c6",
+        "initialDigest" : "20db5fbe14e604486a403a1397ba8e0db4939d1d549e5ad0542657246443300f"
+      },
+      "name" : "acceptance-079",
+      "seed" : "56"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              11
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "ribbon.move",
+            "values" : [
+              0,
+              0,
+              11
+            ]
+          },
+          "result" : "action.rule.r02-g01.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e8607b34fbdff17196fbc136c787848082fc67f7774764658408cacd28a60eb4",
+        "initialDigest" : "d2c8ad9cf778b83ea735b63e867cd81e0b4b96a4f361dfcaf027424e33d53645"
+      },
+      "name" : "acceptance-080",
+      "seed" : "63"
     },
     {
       "entries" : [

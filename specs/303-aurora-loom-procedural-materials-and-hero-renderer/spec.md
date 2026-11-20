@@ -187,9 +187,10 @@ shown to players as available, and passes the experience package and registry ch
   polish R02-G01-06; persistence R02-G01-07; golden images R02-G01-08; full app integration R02-G01-09. This feature gives
   the experience a minimal control panel that issues kernel moves so it can be exercised on the simulator.
 - The visual design is the project's own archived design; all geometry and shading are original code.
-- The candidate's scenario manifest has the nine standard scenarios, `full-playthrough`, `hero` and three fixtures; the
-  source's 80 acceptance scenarios (round2.md §6.1.19) and the catalog's `content.levels` are added by the integration
-  features (R02-G01-08, -09) before X-R02-G01, whose content audit (`verify_experiences.py --audits`) requires them
+- The candidate's scenario manifest has the nine standard scenarios, `full-playthrough`, `hero`, three fixtures and the
+  source's 80 acceptance scenarios (round2.md §6.1.19, one per row: the planned level, a legal move, a refused move), and
+  its registration carries the content facts (100 levels and the pinned catalog digest), because the repository's content
+  audit (`verify_experiences.py --audits`) applies to every registered experience, candidates included
   (implementation, 2026-11-20).
 
 ## Traceability

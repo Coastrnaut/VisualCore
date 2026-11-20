@@ -222,7 +222,7 @@ class CheckExperiencePackagesTests(unittest.TestCase):
     def test_real_repository(self) -> None:
         code, out = self.run_tool(REPO)
         self.assertEqual(code, 0, out)
-        self.assertRegex(out, r"PASS: ([4-9]|[1-9][0-9]+) experiences in 1 packages")  # grows as experiences are registered
+        self.assertRegex(out, r"PASS: ([4-9]|[1-9][0-9]+) experiences in [1-9] packages")  # grows as experiences and packages are registered
 
 
 if __name__ == "__main__":

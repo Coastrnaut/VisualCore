@@ -629,7 +629,10 @@
         "#E0389C",
         "#D8E83A"
       ],
-      "content": null,
+      "content": {
+        "catalog_sha256": "dc82c050cf90127a0c198f08433eecdd9c84c5d3e49ac9b45b9810f6ee5891d6",
+        "levels": 100
+      },
       "manifest": "Packages/ExperiencesRound02/AuroraLoom/scenario-manifest.json",
       "permissions": [],
       "summary": "Weave three luminous ribbons of auroral silk into one harmony: turn each ribbon's wave and phase until its height meets the target marker at all four gates for two whole turns, within a move allowance. 100 certified levels; undo and redo. Drawn in code; offline."

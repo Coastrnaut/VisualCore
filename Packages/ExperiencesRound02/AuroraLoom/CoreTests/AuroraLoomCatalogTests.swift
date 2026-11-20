@@ -91,6 +91,20 @@ private let witnessDirectory: URL = URL(fileURLWithPath: #filePath)
         #expect(names.count == 100)
     }
 
+    /// The runtime catalog's content facts (feature 303, R02-G01-03): `Catalog/experiences.json` lists Aurora Loom with
+    /// 100 levels and this catalog's pinned digest, so the two cannot drift apart.
+    @Test func theRuntimeCatalogNamesTheseLevels() throws {
+        let catalogURL: URL = witnessDirectory.deletingLastPathComponent().deletingLastPathComponent()
+            .deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("Catalog/experiences.json")
+        let object = try #require(try JSONSerialization.jsonObject(with: Data(contentsOf: catalogURL)) as? [String: Any])
+        let entries = try #require(object["experiences"] as? [[String: Any]])
+        var content: [String: Any]? = nil
+        for entry in entries where entry["id"] as? String == "r02-g01.aurora-loom" { content = entry["content"] as? [String: Any] }
+        let facts = try #require(content)
+        #expect(facts["levels"] as? Int == AuroraLoomManifest.entries.count)
+        #expect(facts["catalog_sha256"] as? String == Self.pinnedDigest)
+    }
+
     /// R2-G01-INV-06 (content): every generated stage has a witness from the solver and its difficulty reflects the
     /// solver's actual work; a direct example plus seeded neighbouring entries, whose edited difficulty is refused.
     @Test func testAuroraLoomContentBoundary() throws {
