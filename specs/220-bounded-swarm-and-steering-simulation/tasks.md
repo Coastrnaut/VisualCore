@@ -66,7 +66,7 @@ Shared files (002, docs) stay with the lead. MVP: Stories 1 and 2.
 
 ## Phase 7: Convergence
 
-- [ ] T-R02F20-013 Add a swarm test for agents stacked at one point and an agent starting exactly on a strong pole
+- [X] T-R02F20-013 Add a swarm test for agents stacked at one point and an agent starting exactly on a strong pole — Verified 2026-11-20: 2026-11-20 host-5 exit 0: SwarmTests incl. stackedAgentsAndAnAgentOnAPoleStayBounded (0 violations over 200 steps; 8 stacked agents separate, closest pair 0.370) (.autonomy/migration/checks/R02-F20.host-5.json)
   (s = 1,000, q = 100, ε = 1e-6): 200 steps stay finite, inside the bounds and within the speed limit, and the stacked
   agents separate, in `Packages/VisualCore/Tests/VisualCoreSimulationTests/SwarmTests.swift`; `--name host-5` per spec
   Edge Cases (partial)

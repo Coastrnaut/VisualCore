@@ -144,6 +144,38 @@ import VisualCoreMath
         print("SwarmTests pole: distance 5 -> \(distance) after 10 steps")
     }
 
+    /// T-R02F20-013 (spec Edge Cases): eight agents stacked at one point and one agent on a strong pole stay finite,
+    /// inside and within the speed limit for 200 steps, and the stacked agents separate.
+    @Test func stackedAgentsAndAnAgentOnAPoleStayBounded() throws {
+        let bounds = SteeringBounds(minX: -5, maxX: 5, minY: -5, maxY: 5)
+        let pole = try MagneticPole(position: Vec2(2, 2), strength: 1_000, softening: 1e-6)
+        var agents: [SteeringAgent] = []
+        var charges: [Double] = []
+        for _ in 0..<8 {
+            agents.append(SteeringAgent(position: Vec2(-1, -1), velocity: .zero, group: 0))
+            charges.append(0)
+        }
+        agents.append(SteeringAgent(position: Vec2(2, 2), velocity: .zero, group: 1))
+        charges.append(100)
+        var swarm = try Swarm(agents: agents, charges: charges, bounds: bounds, edges: .walled,
+                              speedLimit: 3, field: MagneticField(uniform: 5, poles: [pole]))
+        var violations: Int = 0
+        for _ in 0..<200 {
+            try swarm.step(by: 0.02)
+            violations += Self.violations(swarm)
+        }
+        #expect(violations == 0)
+        var distinct: Set<Vec2> = []
+        for i in 0..<8 { distinct.insert(swarm.agents[i].position) }
+        var closest: Double = .infinity
+        for i in 0..<8 {
+            for j in (i + 1)..<8 { closest = min(closest, swarm.agents[i].position.distance(to: swarm.agents[j].position)) }
+        }
+        print("SwarmTests stacked: \(distinct.count) distinct positions, closest pair \(closest)")
+        #expect(distinct.count == 8)
+        #expect(closest > 0)
+    }
+
     @Test func emptySwarmSteps() throws {
         var swarm = try Swarm(agents: [], bounds: SteeringBounds(minX: 0, maxX: 1, minY: 0, maxY: 1), edges: .wrapping)
         for _ in 0..<10 { try swarm.step(by: 0.1) }

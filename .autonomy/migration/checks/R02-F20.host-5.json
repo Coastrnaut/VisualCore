@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "SwarmTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter SwarmTests",
+  "elapsed_seconds": 13.437,
+  "exit_code": 0,
+  "finished": "2026-11-20T06:04:52+00:00",
+  "gate": "R02-F20",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-F20.host-5.log",
+  "log_sha256": "b0611325659e227a374680266e789ae96145b800a241aac69d14ef8da395e138",
+  "name": "host-5",
+  "started": "2026-11-20T06:04:39+00:00",
+  "timed_out": false
+}
