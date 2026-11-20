@@ -1,0 +1,73 @@
+# Tasks: R02-G02-01 — Lissajous Labyrinth: playable rule kernel
+
+**Input**: [spec.md](spec.md), [plan.md](plan.md), [research.md](research.md), [data-model.md](data-model.md),
+[contracts/api.md](contracts/api.md), [quickstart.md](quickstart.md). Gate R02-G02-01 (migration ledger). Evidence:
+`python3 scripts/migration_ledger.py run-check --gate R02-G02-01 --name <check> -- <command>` (never a scratchpad path;
+recorded only after every agent has reported). Commit after every task with its check record (no trailers). No {owner}
+or {device} tasks (pure logic). Fixture seed 2_311; tests stay short (< 10 s each).
+
+## Phase 1: Setup
+
+- [ ] T-R02G0201-001 Baselines: `--name baseline-host -- swift test --package-path Packages/VisualCore`, the isolated
+  timing run (`--name baseline-timing`) and `--name baseline-round02 -- swift test --package-path
+  Packages/ExperiencesRound02`; the rendering baseline is R02-G01-02's rendering runs (exit 0)
+
+## Phase 2: Foundational
+
+- [ ] T-R02G0201-002 Add product and targets `LissajousLabyrinthCore` (`LissajousLabyrinth/Core`, depending on
+  VisualCoreSimulation and VisualCoreMath) and `LissajousLabyrinthCoreTests` (`LissajousLabyrinth/CoreTests`) to
+  `Packages/ExperiencesRound02/Package.swift`; create `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthError.swift`,
+  `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthSine.swift` (4,096 entries "round(1,024 · sin(2πk/4,096))", `sin`, `cos`,
+  `tableDigest`), `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthLevel.swift` (LissajousLabyrinthBall "each coordinate −5,000 … 5,000;
+  radius 64 … 1,024", LissajousLabyrinthDial, LissajousLabyrinthDials "frequencies 1 … 9 coprime; phases 0 … 15",
+  LissajousLabyrinthLevel "id slug; band 1 … 5; amplitudes 3 × 1 … 4; frequencyC 1 … 9; checkpoints 1 … 6; obstacles
+  0 … 8; allowance 1 … 64; start valid and not winning; schema 1", fingerprint, stored form),
+  `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthLap.swift` (position, exact segment contact, verdict with ties by tick then obstacle),
+  `Packages/ExperiencesRound02/LissajousLabyrinth/CoreTests/LissajousLabyrinthFixtures.swift` (seeded levels with a known safe setting) and
+  `Packages/ExperiencesRound02/LissajousLabyrinth/CoreTests/LissajousLabyrinthLevelTests.swift` (table digest pinned and within one unit of sin; refusals and codes;
+  round trip; damaged, edited and newer forms refused; 200 fixtures won by their safe setting and not at the start);
+  `--name host -- swift test --package-path Packages/ExperiencesRound02 --filter LissajousLabyrinthLevelTests`
+
+## Phase 3: Story 1 — tune the tracer through every checkpoint (P1) 🎯
+
+- [ ] T-R02G0201-003 [P] [US1] Create `Packages/ExperiencesRound02/LissajousLabyrinth/CoreTests/LissajousLabyrinthLapTests.swift` (500 seeded levels: the safe setting
+  wins; every single-dial change on the first 50 agrees with an independent reference written in the test; checkpoint
+  boundary inclusive and obstacle boundary exclusive at the surface and one unit either side; the closing segment;
+  out-of-order and missed checkpoints; tie order of contacts; the path closes after 4,096 ticks); `--name host-2`
+
+## Phase 4: Stories 2, 3 and 4 — allowance, undo, replay and life stages (P1, P2)
+
+- [ ] T-R02G0201-004 [P] [US2] [US3] [US4] Create `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthPlay.swift` (stages and events, actions with
+  validation "range, no-change, not-coprime", records, undo with refund, redo, replay, fingerprints) with
+  `Packages/ExperiencesRound02/LissajousLabyrinth/CoreTests/LissajousLabyrinthPlayTests.swift` (500 seeded traces replay to identical fingerprints and outcome; undo of
+  every action restores the exact state; 1,000 seeded refused actions leave state and fingerprint unchanged; spending the
+  allowance fails with the verdict named; stage table; no action after the end); `--name host-3`
+
+## Phase 5: Solver-ready rules (P2)
+
+- [ ] T-R02G0201-005 [P] [US1] Create `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthRules.swift` (PuzzleRules, rules id
+  "r02-g02-lissajous-labyrinth") with `Packages/ExperiencesRound02/LissajousLabyrinth/CoreTests/LissajousLabyrinthRulesTests.swift` (moves in dial order, values
+  ascending, skipping current and non-coprime; apply refusals; isSolved equals the verdict; R02-F23's PuzzleValidator
+  certifies a seeded level); `--name host-4`
+- [ ] T-R02G0201-006 [P] Create `Packages/ExperiencesRound02/LissajousLabyrinth/CoreTests/LissajousLabyrinthInvariantTests.swift` with
+  `testLissajousLabyrinthTimeBoundary` (INV-01), `testLissajousLabyrinthInputbudgetBoundary` (INV-02),
+  `testLissajousLabyrinthGoalBoundary` (INV-03), `testLissajousLabyrinthRepeatabilityBoundary` (INV-04),
+  `testLissajousLabyrinthUndoBoundary` (INV-05), `testLissajousLabyrinthFailurehonestyBoundary` (INV-07),
+  `testLissajousLabyrinthStabilityBoundary` (INV-08) and `testLissajousLabyrinthSaveBoundary` (INV-09), each a direct
+  boundary example plus a seeded neighbouring-input check (FR-R02G0201-010); `--name host-5`
+
+## Phase 6: Regression, documentation and close
+
+- [ ] T-R02G0201-007 Docs: new `docs/architecture/lissajous-labyrinth.md`; `Packages/ExperiencesRound02/README.md`;
+  `docs/automatedtesting.md`; `--name round02-host -- swift test --package-path Packages/ExperiencesRound02`
+- [ ] T-R02G0201-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences` and
+  `--name host-full`
+- [ ] T-R02G0201-009 Reference regression chunk 1 (`--name reference-1`)
+- [ ] T-R02G0201-010 Reference regression chunk 2 (`--name reference-2`)
+- [ ] T-R02G0201-011 Script tests, run alone (`--name script-tests`)
+- [ ] T-R02G0201-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+
+## Dependencies and parallel work
+
+001 → 002 → {003 (agent A), 004 (agent B), 005 (agent C), 006 (agent D)} in parallel → 007 … 012. Shared files
+(Package.swift, error, sine, level, lap, fixtures, docs) stay with the lead. MVP: Story 1.
