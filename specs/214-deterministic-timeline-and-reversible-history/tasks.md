@@ -37,7 +37,7 @@ document is `TimelineRunDocument`). Fixture seed 2_014; tests stay light.
 
 ## Phase 4: Story 4 — save and migrate (P2)
 
-- [ ] T-R02F14-004 [US4] Create `Packages/VisualCore/Sources/VisualCoreExperience/TimelineRunDocument.swift` (schema 1 JSON,
+- [X] T-R02F14-004 [US4] Create `Packages/VisualCore/Sources/VisualCoreExperience/TimelineRunDocument.swift` (schema 1 JSON, — Verified 2026-11-19: lead retest 2026-11-19: R02-F14.host-2.json (exit 0, 0 failures; TimelineRunDocumentTests 8 passed: byte-identical round trip, schema 0 migrates to the same hash, schema 2, tampered command hashMismatch, truncated, missing schema, log over limit, step beyond limit)
   sorted keys; `MigrationChain` step from schema 0 (log as [step, command] pairs); decode replays and verifies the hash;
   refusals) with `Packages/VisualCore/Tests/VisualCoreExperienceTests/TimelineRunDocumentTests.swift` (at least five
   fixtures: round trip byte for byte; a schema-0 example migrates to the same hash; schema 2 refused; a tampered command
