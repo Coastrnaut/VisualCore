@@ -125,6 +125,7 @@ positive volume equal to the solid's volume; a newer stored version is refused.
 - **Very large and very small solids:** the tolerance scales with the solid's size, so a 1e-3 and a 1e3 cube behave
   alike.
 - **A cut that leaves a part thinner than the tolerance:** that part is reported as empty, never as a sliver.
+- **A ledger past 65,536 entries:** the next cut is refused (`tooComplex`) and the ledger is unchanged.
 - **Many cuts in a row:** the solid stays convex and valid; face and vertex counts stay within 4,096 vertices, 1,024 faces and
   256 corners per face.
 
@@ -170,7 +171,8 @@ positive volume equal to the solid's volume; a newer stored version is refused.
   identical ledgers and digests.
 - **SC-R02F12-003**: Planes through vertices, edges and faces, and planes within the tolerance of them, produce no face
   that fails the degeneracy rules in 100 of 100 fixtures.
-- **SC-R02F12-004**: A 1e-3 and a 1e3 cube cut by the same scaled planes give results identical up to the scale.
+- **SC-R02F12-004**: A 1e-3 and a 1e3 cube cut by the same 100 scaled planes give the same face and vertex counts and
+  vertices equal after rescaling within 1e-12 relative.
 - **SC-R02F12-005**: At least five positive, negative and boundary fixtures for making and storing solids give their
   stated verdicts; a stored solid round-trips byte for byte.
 - **SC-R02F12-006**: Existing mesh tests pass unchanged; the reference regression passes 7 of 7; each unit test finishes
