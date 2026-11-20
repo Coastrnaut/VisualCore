@@ -14,7 +14,7 @@ or {device} tasks (pure logic and host-generated content). Fixture seeds 2_301 a
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G0102-002 Add `generation(Int)` ("r02-g01.generation") and `witness(String)` ("r02-g01.witness") to
+- [X] T-R02G0102-002 Add `generation(Int)` ("r02-g01.generation") and `witness(String)` ("r02-g01.witness") to — Verified 2026-11-20: 2026-11-20 host exit 0: all 59 AuroraLoomCore tests incl. the 32 of R02-G01-01 unchanged; generation and witness reason codes; manifest of 100 entries; difficulty; solution types (.autonomy/migration/checks/R02-G01-02.host.json)
   `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomError.swift` (with their `reasonCode` cases); create
   `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomManifest.swift` (AuroraLoomManifestEntry "number 1 … 100, seed
   UInt64, band 1 … 5, budget 8 … 19", the 100 entries copied from `python3 scripts/planning_index.py levels --experience
