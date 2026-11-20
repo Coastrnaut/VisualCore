@@ -9,8 +9,8 @@
 - **R3 Shapes.** Decision: closed-form parametric surfaces built with `MeshBuilder`: a curled petal spine with a sine
   half-width, an elliptic cap of revolution with a rim and underside, a tapered bent tube. Rationale: exact dimensions
   for tests, valid meshes, no assets.
-- **R4 Reuse for branches.** Decision: each branch is `CurveMeshes.tube` over two `CurveSamples` points, the whole plant
-  joined with `CurveMeshes.merged`. Rationale: the existing, tested tube and merge.
+- **R4 Reuse for branches.** Decision: each branch is `Mesh.tube` over two `CurveSamples` points, the whole plant
+  joined with `Mesh.merged`. Rationale: the existing, tested tube and merge.
 - **R5 Dart throwing.** Decision: seeded candidates accepted against a background grid of cell d/√2 (at most one point per
   cell), capped at 30 · maxCount draws. Rationale: deterministic, exactly enforces the spacing, bounded work;
   Bridson's active list gives denser packing but its order depends on list handling.

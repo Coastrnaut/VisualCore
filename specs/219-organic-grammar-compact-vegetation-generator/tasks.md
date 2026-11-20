@@ -40,7 +40,7 @@ its check record (no trailers). No {owner} tasks; one {device} task. Fixture see
 
 ## Phase 6: Story 3 — plant meshes (P2)
 
-- [ ] T-R02F19-006 [US3] Create `Packages/VisualCore/Sources/VisualCoreScenes/PlantMesh.swift` (branches through `Mesh.tube`, parts at markers, merged with
+- [X] T-R02F19-006 [US3] Create `Packages/VisualCore/Sources/VisualCoreScenes/PlantMesh.swift` (branches through `Mesh.tube`, parts at markers, merged with — Verified 2026-11-20: lead retest 2026-11-20: R02-F19.host-3.json (exit 0, full suite; host-2 also passed before test fixtures were made lighter); PlantMeshTests 3 passed (50 seeded plants within budget, vertex count = sum of parts, every part valid and closed alone, finite positions and unit normals, every part at its marker within 1e-9; empty skeleton and tiny budget refused)
   `Mesh.merged`) with `Packages/VisualCore/Tests/VisualCoreScenesTests/PlantMeshTests.swift` (50 seeded grammars: valid, within budget, vertex count equals the
   sum of parts, each part's origin at its marker within 1e-9); `--name host-5`
 

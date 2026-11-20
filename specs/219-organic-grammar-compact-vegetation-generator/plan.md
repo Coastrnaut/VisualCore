@@ -8,7 +8,7 @@
 In VisualCoreScenes: `PlantGrammar` (start word, weighted rules, turtle settings, seed; `Codable` schema 1) and
 `LSystem.derive` (seeded rewriting); `PlantTurtle.interpret` turns a word into a `PlantSkeleton` of `PlantBranch`es and
 `PlantMarker`s; `PetalShape`, `CapShape` and `StemShape` build part meshes; `PlantMesh.build` draws branches with
-`CurveMeshes.tube` and places parts at markers, merged with `CurveMeshes.merged`; `PlantScatter.scatter` places
+`Mesh.tube` and places parts at markers, merged with `Mesh.merged`; `PlantScatter.scatter` places
 `PlantInstance`s with a minimum spacing, ready for `MeshInstance`. Failures are `PlantError` with `r2-f19.*` codes.
 Research: [research.md](research.md). Data: [data-model.md](data-model.md). API: [contracts/api.md](contracts/api.md).
 Quickstart: [quickstart.md](quickstart.md).
