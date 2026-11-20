@@ -8,7 +8,7 @@ public names checked against Packages and Apps (`Visibility` is taken). Fixture 
 
 ## Phase 1: Setup
 
-- [ ] T-R02F15-001 Baselines: `--name baseline-host -- swift test --package-path Packages/VisualCore`; the rendering
+- [X] T-R02F15-001 Baselines: `--name baseline-host -- swift test --package-path Packages/VisualCore`; the rendering — Verified 2026-11-19: 2026-11-19 .autonomy/migration/checks/R02-F15.baseline-host.json (exit 0); rendering baseline = R02-F14.rendering-27.json and rendering-26.json (exit 0), package sources unchanged since
   baseline is R02-F14's last rendering runs when package sources are unchanged since them
 
 ## Phase 2: Foundational
