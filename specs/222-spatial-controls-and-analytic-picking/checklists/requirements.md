@@ -31,5 +31,5 @@
 
 ## Notes
 
-- Existing type names (`Ray3`, `OrbitCamera`, the gesture recognizers) appear only in the section 13 audit and the unchanged-types rule, as in
-  earlier shared features; the requirements themselves stay behavioural.
+- Existing type names (`Ray3`, `OrbitCamera`, the gesture recognizers) appear only in the section 13 audit and the
+  unchanged-types rule, as in earlier shared features; the requirements themselves stay behavioural.

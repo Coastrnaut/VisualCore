@@ -127,8 +127,8 @@ value; steps respect the same limits as drags.
   within 1e-9 (relative to the scene size) of it; plane hits lie on their plane within 1e-12.
 - **SC-R02F22-002**: For 200 seeded handle sets, the picked handle always equals the rule's choice, including ties and
   handles behind the camera.
-- **SC-R02F22-003**: A drag that returns its finger to the start returns the handle to its start exactly; at grazing
-  angles the handle never moves more than the clamp allows.
+- **SC-R02F22-003**: A drag that returns its finger to the start returns the handle to its start exactly; when the
+  constraint is seen at a grazing angle the handle holds its last position.
 - **SC-R02F22-004**: Seeded edit sequences undone fully return the exact start value and redone return the exact end;
   a 500-event drag is one undo step; the history never exceeds its bound.
 - **SC-R02F22-005**: Assistive steps up n times then down n times return exactly to the start for 100 seeded cases, and
