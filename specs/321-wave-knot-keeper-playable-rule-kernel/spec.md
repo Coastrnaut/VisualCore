@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-20
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G03-01 (migration ledger, game feature of experience R02-G03) · ID namespace FR-R02G0301-###,
 SC-R02G0301-###, T-R02G0301-###
@@ -25,6 +25,41 @@ Canonical overrides:
   the 100-level manifest, generated in R02-G03-02). **Device-only items:** none (pure logic). **Owner-only items:** none.
 - **Shared features used:** R02-F03 (numbers) and R02-F23 (puzzle contract: the kernel's rules are a `PuzzleRules`, so
   R02-G03-02 can certify levels).
+
+## Clarifications
+
+### Session 2026-11-20
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time. Facts checked in
+code (read-only audit, 2026-11-20): `Packages/ExperiencesRound02` holds Aurora Loom and Lissajous Labyrinth as the
+pattern (Core with level, play, records with previous and next fingerprints, rules as R02-F23 `PuzzleRules`, `StableHash`
+fingerprints, `r02-gNN.*` reason codes); no `WaveKnotKeeper*` name exists.
+
+- Q: How is the rope represented exactly? → A: a closed polygon of 6 … 16 control points with integer coordinates in
+  −16 … 16 on each axis; segment i joins point i to point i + 1 (the last to the first). No two control points coincide.
+  The drawn spline (later features) passes through these points; all rules use the polygon, in exact integers.
+  Impact: FR-R02G0301-001; SC-R02G0301-003.
+- Q: When is a move legal? → A: a move shifts one control point P by one unit along ±x, ±y or ±z to P′, inside the
+  bounds and not onto another point. With neighbours A and B, the move sweeps the triangles A-P-P′ and P-P′-B; it is
+  refused (`r02-g03.move("crossing")`) when either triangle intersects any segment not adjacent to P (decided exactly in
+  integers: segment-triangle intersection with orientation tests), unless both P and P′ lie inside one crossing gate (an
+  axis-aligned integer box), where strands may pass. Impact: FR-R02G0301-002; SC-R02G0301-001.
+- Q: What decides a win, and what is the knot signature? → A: the rope is projected onto the xy-plane. For every pair of
+  non-adjacent segments whose projections cross at a single interior point, a crossing is counted with sign +1 or −1 by
+  the right-hand rule of the over-strand (larger z at the crossing) and under-strand directions. The summary is the
+  crossing count and the writhe (sum of signs); the signature is the crossing count and writhe together. A projection is
+  degenerate when two non-adjacent projected segments overlap collinearly, touch at an endpoint, or have equal z at a
+  crossing; a degenerate projection never wins. The level is won exactly when the projection is not degenerate and the
+  summary equals the target (crossing count, writhe). Impact: FR-R02G0301-003; SC-R02G0301-003.
+- Q: What is the tension bound and how is failure decided? → A: the tension is the sum over segments of the squared
+  length (an integer). A move that would make it exceed the level's bound is refused (`r02-g03.move("tension")`); the
+  level fails when the allowance is spent without a win, with the final summary as the explanation. Impact:
+  FR-R02G0301-003; SC-R02G0301-004.
+- Q: How are records, fingerprints and stored forms defined? → A: as in R02-G02-01: every accepted move, undo and redo
+  appends a record (schema, level seed, tick, kind, point, direction, previous and next fingerprints); the play
+  fingerprint is the SHA-256 of the schema, level fingerprint, points, moves spent and stage; levels are JSON schema 1
+  with sorted keys and a fingerprint, re-checked on decode; reason codes `r02-g03.level`, `.move`, `.stage`, `.stale`,
+  `.allowance`, `.newer-schema`, `.malformed`. Impact: FR-R02G0301-004 … 009; SC-R02G0301-002, 005.
 
 ## User Scenarios & Testing *(mandatory)*
 
