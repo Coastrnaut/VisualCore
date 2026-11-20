@@ -62,7 +62,7 @@ or {device} tasks (pure logic). Fixture seed 2_311; tests stay short (< 10 s eac
   `docs/automatedtesting.md`; `--name round02-host -- swift test --package-path Packages/ExperiencesRound02`
 - [X] T-R02G0201-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences` and — Verified 2026-11-20: 2026-11-20 rendering-27, rendering-26, experiences (sim-27.2) and host-full exit 0
   `--name host-full`
-- [ ] T-R02G0201-009 Reference regression chunk 1 (`--name reference-1`)
+- [X] T-R02G0201-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-20: 2026-11-20 reference-1 exit 0
 - [ ] T-R02G0201-010 Reference regression chunk 2 (`--name reference-2`)
 - [ ] T-R02G0201-011 Script tests, run alone (`--name script-tests`)
 - [ ] T-R02G0201-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
