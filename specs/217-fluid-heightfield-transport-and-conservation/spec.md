@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-19
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-F17 (migration ledger, shared round feature) · ID namespace FR-R02F17-###, SC-R02F17-###, T-R02F17-###
 
@@ -28,6 +28,50 @@ Canonical overrides:
 - **Superseded parts of the source prompt:** the USD 1.99–4.99 purchase model (ADR-0009); the Round 2 lock
   (ImplementationLock-100). **Device-only items:** none in this slice; the consumers measure frame cost on D1–D3 in the
   device campaign. **Owner-only items:** none.
+
+## Clarifications
+
+### Session 2026-11-19
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time. Facts checked in
+code (read-only audit, 2026-11-19): `FieldGrid` (VisualCoreSimulation) holds `Float` channels with a public `values`
+array and `StoragePrecision` rounding; `FieldPass` and `PingPongTarget` are in VisualCoreRendering; Fluid Art
+Playground's `FluidSolver` is its own; no erosion or sediment code exists; the names `Heightfield`,
+`HeightfieldParameters`, `HeightfieldLedger`, `HeightfieldError` and `HeightfieldEdges` are free.
+
+- Q: Where does the model live and how are amounts represented? → A: in VisualCoreSimulation beside `FieldGrid`, pure and
+  host-tested; drawing hands a `FieldGrid` to the existing passes (VisualCoreRendering unchanged). Every amount (terrain,
+  water, sediment, each of 0 … 4 dye channels) is an `Int64` count of quanta, 1 quantum = 1/65,536 height unit (cell
+  size 1), 0 … 2⁴⁰ per cell; all transfers move whole quanta between cells, so every total is conserved exactly and
+  identically on every device. Grids are 4 … 1,024 on a side, at most 262,144 cells. Rationale: floating-point sums
+  cannot conserve exactly; integers can. Impact: FR-R02F17-001, 002, 004, 005; SC-R02F17-001.
+- Q: What is the flow law? → A: the virtual-pipe shallow-water model (O'Brien and Hodgins 1995; Mei, Decaudin and Hu
+  2007): each cell keeps four outflow fluxes (`Double`, per edge); per sub-step Δt each becomes
+  max(0, damping · f + Δt · A · g · Δs / l) with Δs the drop of surface (terrain + water, in height units) to that
+  neighbour, 0 towards a wall; the wanted outflow f · Δt is turned into quanta (floor) and, if the cell's wanted total
+  exceeds its water, every direction is scaled by water / total (floor); all cells send from their water at the start of
+  the sub-step, then all receive. Open edges send to the outside and count it as drained. Defaults g = 9.81, A = 1,
+  l = 1, damping 0.98. Impact: FR-R02F17-002; SC-R02F17-002: a 32 × 32 closed basin filled unevenly settles so that its
+  highest and lowest wet water surfaces differ by at most 0.05 height units within 4,000 sub-steps.
+- Q: How are steps bounded and values clamped? → A: a frame time Δ (finite, ≥ 0; 0 is a no-op; negative or not finite is
+  refused) is split into n = ⌈Δ / h⌉ sub-steps of Δ / n, where h = min(maxSubstep (default 1/120 s),
+  0.25 · l / √(g · max(depth, 1e-6))) is the stability limit for the deepest water; n is at most 64, and past it 64
+  sub-steps of h run, the rest of Δ is dropped and the step report says so. Fluxes are clamped to 0 … 1,000,000 and stay
+  finite; amounts never leave 0 … 2⁴⁰ (an add beyond is refused). Impact: FR-R02F17-003; SC-R02F17-003.
+- Q: How are dye and sediment carried, and how does erosion work? → A: dye and sediment leave a cell in the same
+  proportion as its water, floor(amount · sent / water) per direction (full-width integer arithmetic), the rounding
+  remainder staying in the cell. Erosion (off unless enabled) per sub-step compares the sediment with a capacity
+  C = K_c · |v| · max(slope, 0.01) · depth, |v| from the cell's net flux over its depth: below C, rock moves to sediment
+  at K_s · (C − sediment) · Δt, above it sediment settles back at K_d · (sediment − C) · Δt, each turned into whole
+  quanta and limited by what is present, so rock never goes below the floor 0. Defaults K_c 0.05, K_s 0.3, K_d 0.3.
+  Impact: FR-R02F17-004, 005; SC-R02F17-001, 004.
+- Q: What is stored, and what are the failure codes? → A: `Heightfield` is `Codable` JSON schema 1 with sorted keys (size,
+  edges, parameters, every quantity, fluxes and the ledger); it reopens and continues bit-identically; schema 1 is the
+  first stored form (a later one adds a `MigrationChain` step in the consumer); a newer schema is refused. Reason codes
+  (`HeightfieldError`): `r2-f17.grid-size`, `r2-f17.cell-range`, `r2-f17.amount-limit`, `r2-f17.invalid-time`,
+  `r2-f17.invalid-parameter`, `r2-f17.dye-channel`, `r2-f17.newer-schema`, `r2-f17.malformed`; a step report (sub-steps
+  run, time dropped, clamps) is returned, not thrown; the experience adds its id, seed and tick. Impact: FR-R02F17-007,
+  009; SC-R02F17-005.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -119,8 +163,8 @@ refused.
 
 - **SC-R02F17-001**: On 50 seeded terrains stepped 500 times each, the water, dye and rock ledgers balance exactly after
   every step, and no cell holds a negative amount.
-- **SC-R02F17-002**: A closed basin filled unevenly settles to a surface whose highest and lowest wet water levels differ
-  by at most a stated tolerance within a stated number of steps.
+- **SC-R02F17-002**: A 32 × 32 closed basin filled unevenly settles so that its highest and lowest wet water surfaces
+  differ by at most 0.05 height units within 4,000 sub-steps.
 - **SC-R02F17-003**: Extreme inputs stay finite and within their clamps in every one of 100 seeded cases.
 - **SC-R02F17-004**: A seeded slope loses terrain at its top and gains it at its foot.
 - **SC-R02F17-005**: A saved state round-trips byte for byte and continues to the bit-identical result; newer and damaged
