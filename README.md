@@ -80,7 +80,7 @@ evidence**: no physical-device test of the unified app has been run.
 
 Ledger totals today: the legacy ledger records **185 of 263** gates as passed (F00–F09 and the app phases
 A01-P00 … A19-P06, A20-P00 … A20-P06, A21-P00 … A21-P06, A22-P00 … A22-P06, A23-P00 … A23-P06, A24-P00 … A24-P06, A25-P00 … A25-P06); the unified-app ledger has 1,233 gates, with 25 experience gates (X-A01 … X-A25), 11 unified-app features,
-24 shared round features and both governance milestones passed.
+24 shared round features, both governance milestones and the first round-two game feature (R02-G01-01) passed.
 
 ```bash
 python3 Tools/python/desktop_runbook.py status   # legacy gates: framework and app phases
@@ -188,6 +188,7 @@ still candidates (A14 Solar System Explorer today) with the launch argument `-vc
 
 ```bash
 swift test --package-path Packages/VisualCore                                   # pure modules on the macOS host
+swift test --package-path Packages/ExperiencesRound02                           # round-two game Cores on the host
 python3 scripts/release_check.py --list                                          # every release check and its command
 python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27
 python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test
@@ -219,7 +220,8 @@ team ids, secrets) over the commits of every push and pull request; it is never 
 | `Packages/VisualCore/` | pure Swift modules without GPU or UIKit code; tested on the macOS host |
 | `Packages/VisualCoreRendering/` | iOS modules over ANGLE: render host, experience host, resources, shaders, effects, UI, audio, automation |
 | `Packages/ExperiencesCreative/` | the creative experiences, one folder each with `Core`, `CoreTests`, `Experience`, `ExperienceTests` and a `scenario-manifest.json`: `GenerativeArtStudio`, `FluidArtPlayground`, `FractalExplorer`, `ParticleUniverse`, `InfiniteGeometry`, `VisualCoreMusicLab`, `AudioOdyssey`, `OscilloscopeStudio`, `DigitalAquarium` |
-| `Packages/ExperiencesRound02` … `Round04` | **planned** packages for the games (ADR-0009, D-06); none exists yet |
+| `Packages/ExperiencesRound02` | the round-two games, one folder each; today Aurora Loom's pure `AuroraLoomCore` and its tests (feature 301), tested on the host |
+| `Packages/ExperiencesRound03` … `Round04` | **planned** packages for the premium games (ADR-0009, D-06) |
 | `Showcase/` | developer Showcase app; not an App Store product |
 | `Harnesses/` | non-shipping test hosts: `InteractiveDemo/`, `SecondConsumer/` (Lumen Garden, a small sample game), `ProjectMReference/` |
 | `External/projectm-ios/` | pinned, read-only Git submodule: reference app, reference regression and source of the ANGLE build |
