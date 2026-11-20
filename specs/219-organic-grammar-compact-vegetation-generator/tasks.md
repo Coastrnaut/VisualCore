@@ -34,7 +34,7 @@ its check record (no trailers). No {owner} tasks; one {device} task. Fixture see
 
 ## Phase 5: Story 4 — scatter (P1)
 
-- [ ] T-R02F19-005 [P] [US4] Create `Packages/VisualCore/Sources/VisualCoreScenes/PlantScatter.swift` (PlantInstance, PlantScatter per clarification Q4) with
+- [X] T-R02F19-005 [P] [US4] Create `Packages/VisualCore/Sources/VisualCoreScenes/PlantScatter.swift` (PlantInstance, PlantScatter per clarification Q4) with — Verified 2026-11-20: lead retest 2026-11-20: R02-F19.host-3.json (exit 0, full suite; host-2 also passed before test fixtures were made lighter); PlantScatterTests 8 passed (100 seeded scatters keep the spacing by brute force, stay in the area, repeat, model = T·R_y·S within 1e-12; sparse grid case; refusals)
   `Packages/VisualCore/Tests/VisualCoreScenesTests/PlantScatterTests.swift` (100 seeded scatters: spacing kept, inside the area, count ≤ maxCount, identical twice,
   model = T · R_y · S; empty area and bad parameters refused); `--name host-4`
 
