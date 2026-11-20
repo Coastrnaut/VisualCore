@@ -46,7 +46,7 @@ tests stay short (< 10 s each). Simulator evidence is one pass on the iOS 27.x p
 
 ## Phase 4: Stories 1–3 — frames, purity and tiers on the simulator (P1, P2)
 
-- [ ] T-R02G0103-007 [P] [US2] Create `Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomRendererPurityTests.swift` (200 seeded snapshots: tier changes, time
+- [X] T-R02G0103-007 [P] [US2] Create `Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomRendererPurityTests.swift` (200 seeded snapshots: tier changes, time — Verified 2026-11-20: 2026-11-20 host-5 exit 0: AuroraLoomRendererPurityTests 2/2 (testAuroraLoomRendererpurityBoundary; 200 seeded snapshots never change the digest, the state or the verdict) (.autonomy/migration/checks/R02-G01-03.host-5.json)
   steps and forced failures never change the adapter digest or the kernel verdict; testAuroraLoomRendererpurityBoundary
   for R2-G01-INV-10); `--name host-5`
 - [ ] T-R02G0103-008 [US1] [US3] Create `Packages/ExperiencesRound02/AuroraLoom/ExperienceTests/AuroraLoomTestSupport.swift`, `Packages/ExperiencesRound02/AuroraLoom/ExperienceTests/AuroraLoomRenderTests.swift` (levels 1,
