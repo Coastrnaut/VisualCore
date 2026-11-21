@@ -189,7 +189,7 @@ enum HueCompassAccess {
     static func turnText(_ core: HueCompassExperienceCore, prefix: String = "") -> String {
         let play: HueCompassPlay = core.play
         let band: Int = play.level.band(of: play.bearing) + 1
-        return "\(prefix)Bearing \(play.bearing) of 96, band \(band). Units \(play.spent) of \(play.level.allowance)."
+        return "\(prefix)Bearing \(play.bearing) of 96, band \(band). Units left \(play.level.allowance - play.spent) of \(play.level.allowance)."
     }
 
     /// The probe announcement of `core` (its last clue), written out from clarification Q1.
@@ -197,7 +197,7 @@ enum HueCompassAccess {
         let play: HueCompassPlay = core.play
         let clue: HueCompassClue = try #require(play.clues.last)
         return "Probe at bearing \(clue.bearing): hue gap \(bandsText(clue.hueGap)), fog depth \(clue.depth). "
-            + "Units \(play.spent) of \(play.level.allowance)."
+            + "Units left \(play.level.allowance - play.spent) of \(play.level.allowance)."
     }
 
     /// The win announcement of `core` in campaign, written out from clarification Q1.
@@ -986,7 +986,7 @@ enum HueCompassAccess {
         #expect(mirror.bearing == core.play.bearing)
         #expect(mirror.bandUnderNeedle + 1 == band)
         #expect(mirror.summary == Plan.summaryText(core: core))
-        #expect(mirror.summary == "Bearing \(core.play.bearing), band \(band). Units 0 of \(allowance). No clues yet.",
+        #expect(mirror.summary == "Bearing \(core.play.bearing), band \(band). Units left \(allowance) of \(allowance). No clues yet.",
                 "\(mirror.summary)")
         #expect(HueCompassControls.progressValue(mirror) == "Level 1, units 0 of \(allowance)")
         #expect(HueCompassControls.goal(mirror)
@@ -997,7 +997,7 @@ enum HueCompassAccess {
         let probed: HueCompassExperienceCore = try Access.core(shell)
         let clue: HueCompassClue = try #require(probed.play.clues.last)
         let probedBand: Int = probed.play.level.band(of: probed.play.bearing) + 1
-        let wantSummary: String = "Bearing \(probed.play.bearing), band \(probedBand). Units 1 of \(allowance). "
+        let wantSummary: String = "Bearing \(probed.play.bearing), band \(probedBand). Units left \(allowance - 1) of \(allowance). "
             + "Last clue: hue gap \(Access.bandsText(clue.hueGap)), fog depth \(clue.depth)."
         #expect(presenter.mirror.summary == wantSummary, "\(presenter.mirror.summary)")
         #expect(HueCompassControls.progressValue(presenter.mirror) == "Level 1, units 1 of \(allowance)")

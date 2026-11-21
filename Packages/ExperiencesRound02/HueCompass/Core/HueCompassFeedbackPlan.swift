@@ -5,8 +5,8 @@
 // planners' rate limits); a plan never changes state. Modelled on feature 326's WaveKnotKeeperFeedbackPlan.
 //
 // Numbers: b is the bearing 0 … 95 as the kernel holds it; h is the hue band of that bearing as shown, 1 … 24 (the
-// kernel's band 0 … 23 plus one); s is the units SPENT by probes and the selection (`HueCompassPlay.spent`) and a the
-// level's allowance, exactly as Wave Knot Keeper's "Moves s of a." reads the moves spent of the allowance.
+// kernel's band 0 … 23 plus one); L is the units LEFT (the allowance a minus `HueCompassPlay.spent`, the units spent by
+// probes and the selection), as FR-R02G0406-002 asks (convergence task T-R02G0406-015); the win names the units spent.
 //
 // Classification of `after(old:new:)`, first match wins:
 //   1. a level or mode change: the level number or the mode differs, or the play was replaced by a fresh one
@@ -19,14 +19,14 @@
 //           of this win against the certified smallest probe count;
 //      failed: `outcome`, the failure explanation of feature 335, haptic `warning`. A selection, or a probe that spent
 //           the last unit, plans only the outcome (Q2: the outcome is never dropped behind a selection haptic);
-//      a probe: `state`, "Probe at bearing b: hue gap g bands, fog depth d. Units s of a.", haptic `selection`;
-//      a turn, undo or redo: `state`, "<prefix>Bearing b of 96, band h. Units s of a." with the prefix "", "Undone: "
+//      a probe: `state`, "Probe at bearing b: hue gap g bands, fog depth d. Units left L of a.", haptic `selection`;
+//      a turn, undo or redo: `state`, "<prefix>Bearing b of 96, band h. Units left L of a." with the prefix "", "Undone: "
 //           or "Redone: ", haptic `selection`; b and h are the bearing after the action;
 //   3. the same untouched play reopened with its tutorial shown again (for example `mode.campaign` on a tutorial level
 //      after a dismissal) → the `level` plan of case 1;
 //   4. otherwise (nothing changed, or only the tutorial step moved: `tutorial.dismiss`) →
 //      ``HueCompassFeedbackPlan/none``.
-// A count of 1 takes the singular noun ("hue gap 1 band", "Level won with 1 unit"); "Units s of a." is kept as it is.
+// A count of 1 takes the singular noun ("hue gap 1 band", "Level won with 1 unit"); "Units left L of a." is kept as it is.
 import Foundation
 import VisualCoreSimulation
 
@@ -97,13 +97,13 @@ public struct HueCompassFeedbackPlan: Sendable, Equatable {
         return "That change was refused."
     }
 
-    /// The words of the panel's summary element (clarification Q5): "Bearing b, band h. Units s of a. Last clue: hue
-    /// gap g bands, fog depth d." with the latest clue, or "Bearing b, band h. Units s of a. No clues yet." before any
-    /// probe (b the bearing 0 … 95, h its band shown 1 … 24, s the units spent of the allowance a; "1 band" for g = 1).
+    /// The words of the panel's summary element (clarification Q5): "Bearing b, band h. Units left L of a. Last clue: hue
+    /// gap g bands, fog depth d." with the latest clue, or "Bearing b, band h. Units left L of a. No clues yet." before any
+    /// probe (b the bearing 0 … 95, h its band shown 1 … 24, L the units left of the allowance a; "1 band" for g = 1).
     public static func summaryText(core: HueCompassExperienceCore) -> String {
         let play: HueCompassPlay = core.play
         var text: String = "Bearing \(play.bearing), band \(play.level.band(of: play.bearing) + 1). "
-            + "Units \(play.spent) of \(play.level.allowance)."
+            + "Units left \(play.level.allowance - play.spent) of \(play.level.allowance)."
         if let clue = play.clues.last {
             text += " Last clue: hue gap \(bands(clue.hueGap)), fog depth \(clue.depth)."
         } else {
@@ -127,11 +127,11 @@ public struct HueCompassFeedbackPlan: Sendable, Equatable {
     /// "1 unit" or "s units".
     public static func units(_ count: Int) -> String { count == 1 ? "1 unit" : "\(count) units" }
 
-    /// The turn text of `core`'s play: "Bearing b of 96, band h. Units s of a."
+    /// The turn text of `core`'s play: "Bearing b of 96, band h. Units left L of a."
     public static func turnText(_ core: HueCompassExperienceCore) -> String {
         let play: HueCompassPlay = core.play
         return "Bearing \(play.bearing) of \(HueCompassWheel.bearings), "
-            + "band \(play.level.band(of: play.bearing) + 1). Units \(play.spent) of \(play.level.allowance)."
+            + "band \(play.level.band(of: play.bearing) + 1). Units left \(play.level.allowance - play.spent) of \(play.level.allowance)."
     }
 
     /// The `level` plan of `core`: "Level n, band b, <mode>." and the tutorial instruction while it is not done.
@@ -162,7 +162,7 @@ public struct HueCompassFeedbackPlan: Sendable, Equatable {
             case .probe:
                 if let clue = play.clues.last {
                     text = "Probe at bearing \(clue.bearing): hue gap \(bands(clue.hueGap)), fog depth \(clue.depth). "
-                        + "Units \(spent) of \(play.level.allowance)."
+                        + "Units left \(play.level.allowance - spent) of \(play.level.allowance)."
                 } else {
                     text = turnText(core)
                 }
