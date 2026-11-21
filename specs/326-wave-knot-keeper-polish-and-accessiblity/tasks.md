@@ -70,7 +70,7 @@ ImplementationLock-100.
   scripts/verify_experiences.py --audits --only r02-g03.wave-knot-keeper`
 - [X] T-R02G0306-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-21: 2026-11-21 rendering-27, rendering-26, experiences, host-full, app-unit exit 0
   `--name host-full`, `--name app-unit`
-- [ ] T-R02G0306-009 Reference regression chunk 1 (`--name reference-1`)
+- [X] T-R02G0306-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-21: 2026-11-21 reference-1 exit 0
 - [ ] T-R02G0306-010 Reference regression chunk 2 (`--name reference-2`)
 - [ ] T-R02G0306-011 Script tests, run alone (`--name script-tests`)
 - [ ] T-R02G0306-012 {device} After ImplementationLock-100, on D1, D2 and D3: hear the ambient sound, feel the haptics,
