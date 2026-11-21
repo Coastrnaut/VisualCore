@@ -781,5 +781,47 @@ enum ColorfallCanyonsAccess {
         #expect(presenter.mirror.summary == Access.summaryText(flowing), "\(presenter.mirror.summary)")
         #expect(presenter.mirror.summary.hasPrefix("Tick \(flowing.play.fluid.tick) of "))
     }
+
+    // MARK: Labels and values (T-R02G0506-014; FR-R02G0506-001, SC-R02G0506-001)
+
+    /// The label and value strings built outside the view body and the mirror values the modifiers read: the play
+    /// value, the readable width, the mode names, the valve states and the cell picker's value; every action covered
+    /// by the native controls; the sound off by default; the summary following a carve.
+    @Test func labelsValuesAndActionCoverage() async throws {
+        #expect(ColorfallCanyonsControls.readableWidth == 520)
+        #expect(ColorfallCanyonsControls.modeName(.campaign) == "campaign")
+        #expect(ColorfallCanyonsControls.modeName(.practice) == "practice")
+        #expect(ColorfallCanyonsControls.modeName(.daily(level: 3)) == "daily")
+        let session = ExperienceSession()
+        defer { session.close() }
+        let shell = try await ColorfallCanyonsAccess.open(session)
+        ColorfallCanyonsAccess.quiet(shell)
+        let presenter: ColorfallCanyonsPresenter = shell.presenter
+        let core: ColorfallCanyonsExperienceCore = try ColorfallCanyonsTest.core(shell)
+        #expect(presenter.nativeActions == Set(ColorfallCanyonsExperienceCore.actionIDs))
+        #expect(presenter.gestureActions.isSubset(of: presenter.nativeActions))
+        #expect(presenter.mirror.soundOn == false && !presenter.sound.wanted)
+        let mirror: ColorfallCanyonsMirror = presenter.mirror
+        let left: Int = core.play.remaining
+        #expect(ColorfallCanyonsControls.progressValue(mirror)
+            == "Level 1, tick 0 of \(core.play.level.tickLimit), \(left) actions left")
+        let snapshot: ColorfallCanyonsSceneSnapshot = core.snapshot(time: 0)
+        #expect(mirror.springNames.count == snapshot.springs.count)
+        for index in snapshot.springs.indices {
+            let spring: ColorfallCanyonsSceneSnapshot.Spring = snapshot.springs[index]
+            let want: String = spring.supplyLeft == 0 ? "dry"
+                : (spring.open ? "open, \(spring.supplyLeft) units left" : "closed")
+            #expect(mirror.springStates[index] == want, "\(mirror.springStates[index])")
+        }
+        let cell: Int = try #require(mirror.pickedCell, "a carvable cell to pick")
+        let columns: Int = core.play.level.columns
+        #expect(mirror.pickedCellLabel == "row \(cell / columns + 1), column \(cell % columns + 1)")
+        #expect(presenter.send("canyon.carve", [Double(cell)], port: shell.port) == .accepted)
+        let carved: ColorfallCanyonsExperienceCore = try ColorfallCanyonsTest.core(shell)
+        _ = presenter.describe(carved)
+        #expect(presenter.mirror.summary == ColorfallCanyonsFeedbackPlan.summaryText(core: carved))
+        #expect(ColorfallCanyonsControls.progressValue(presenter.mirror)
+            == "Level 1, tick 0 of \(core.play.level.tickLimit), \(left - 1) actions left")
+    }
 }
 #endif
