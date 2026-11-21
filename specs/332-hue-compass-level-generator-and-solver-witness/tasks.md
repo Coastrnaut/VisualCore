@@ -55,7 +55,8 @@ or {device} tasks (pure logic and host-generated content). Fixture seed 2_332; t
 - [ ] T-R02G0402-006 [US2] [US3] [US4] Create `Packages/ExperiencesRound02/HueCompass/CoreTests/HueCompassCatalogTests.swift` (100 entries, 20 per band; the
   catalog generated twice is identical; pinned digest; `ProgressionRule.standard` holds on the smallest count; band means
   of the smallest count never fall and tolerances never loosen; on levels 1, 11, 21, … 91 the smallest count equals the
-  brute force (SC-R02G0402-002); each witness equals `docs/games/hue-compass/levels/NNN.witness.json` byte for byte, one
+  brute force (SC-R02G0402-002); for all 100 levels every class after the witness
+  probes is accepted by its selection (soundness, SC-R02G0402-001); each witness equals `docs/games/hue-compass/levels/NNN.witness.json` byte for byte, one
   test per band, written only with `HUE_COMPASS_WRITE_WITNESSES=1`) and generate the 100 files; `--name host-5`
 
 ## Phase 6: Regression, documentation and close
