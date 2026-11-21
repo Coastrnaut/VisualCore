@@ -131,7 +131,15 @@ mode allows more actions without affecting progress.
 - **A level picked that is not yet open:** refused with the reason; the open level stays.
 - **The local date at midnight, time zone changes, a date before 2026:** the daily level is a fixed function of the
   calendar date in the player's calendar; any date maps to a level 1 … 100.
-- **Practice mode:** results in practice never award stars or open levels.
+- **Practice mode:** results in practice never award stars or open levels; `mode.campaign` returns to a fresh campaign
+  play of the same level, and choosing daily or practice drops the current play's records (undo history) of the level
+  left.
+- **Daily results:** a daily win records the level's result (best actions and stars) but never opens a level; the daily
+  level may lie beyond the frontier.
+- **A changed mode or level and the tutorial:** the tutorial appears only on levels 1 … 3 in campaign mode, once per
+  opening of the level; dismissing it ends it for that opening.
+- **A schema-1 or damaged payload:** a schema-1 payload migrates; a damaged or newer payload is refused with the existing
+  restore refusals and the experience opens fresh.
 - **Pending panel values and hints:** a hint describes the play's dials, not the pending values; pending values are
   dropped by the same outside changes as in feature 314.
 
