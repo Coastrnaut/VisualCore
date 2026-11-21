@@ -2,7 +2,8 @@
 // control panel: a cell picker (previous and next carvable cell) with carve, one valve button per spring, time steps of 1
 // and 10 ticks, run to the end (a step of the ticks left, at most 600), undo, redo and next level, each with an
 // accessibility label and value; every change is a kernel action sent through the action port. Dragging sluice edits,
-// tapping valves and orbit come in R02-G05-04; full accessibility in R02-G05-06.
+// tapping valves and orbit come in R02-G05-04; full accessibility in R02-G05-06. Feature 344 (R02-G05-04) T-R02G0504-005
+// (FR-R02G0504-006): the panel gains "Reset view", which returns the camera to the authored view.
 #if os(iOS)
 import ColorfallCanyonsCore
 import SwiftUI
@@ -12,6 +13,8 @@ import VisualCoreExperienceHost
 struct ColorfallCanyonsControls: View {
     let port: ExperienceActionPort
     let mirror: ColorfallCanyonsMirror
+    /// Returns the camera to the authored view (the presenter's `resetView()`).
+    let resetView: () -> Void
 
     var body: some View {
         ScrollView(.vertical) {
@@ -85,6 +88,8 @@ struct ColorfallCanyonsControls: View {
                 .accessibilityLabel("Redo the action")
             Button("Next level") { send("level.next") }
                 .accessibilityLabel("Go to the next level")
+            Button("Reset view") { resetView() }
+                .accessibilityLabel("Return the camera to the starting view")
         }
     }
 

@@ -4,6 +4,12 @@
 // still under Reduce Motion (the snapshot time stays at 0) and caps the glow under Reduce Flashing. A memory warning
 // releases the GPU objects; the next frame rebuilds them. The presenter only reads `core.snapshot`: no drawing result
 // reaches the kernel (renderer purity). Its probes (two night corners) let the verification runner check a frame.
+// Feature 344 (R02-G05-04) T-R02G0504-005 (FR-R02G0504-001 … 006): canvas touches go through
+// `ColorfallCanyonsGestureController` with the drawn view size and the last drawn snapshot: a released drag from a
+// carvable cell sends one `canyon.carve [cell]`, a tap on a spring one `canyon.valve [spring]`; two fingers orbit the
+// camera and a double tap on empty space or `resetView()` ("Reset view") returns to the authored view (presentation
+// only: never in the digest, the snapshot or the kernel). While a drag is in progress the picked cell is outlined in
+// pearl and the description begins "Carving row r, column c".
 #if os(iOS)
 import ColorfallCanyonsCore
 import Foundation
@@ -12,6 +18,7 @@ import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreMath
 import VisualCoreRendering
+import VisualCoreScenes
 
 /// What the controls show: the latest state the presenter described.
 @MainActor
@@ -74,6 +81,8 @@ final class ColorfallCanyonsPresenter: ExperiencePresenter {
     private(set) var tierLog: [ColorfallCanyonsTierChange] = []
     /// The last snapshot drawn (tests and the description).
     private(set) var lastSnapshot: ColorfallCanyonsSceneSnapshot?
+    /// The gesture controller (feature 344): drags, valve taps, orbit and the drag highlight.
+    private(set) var gestures = ColorfallCanyonsGestureController()
 
     init(reduceMotion: Bool, reduceFlashing: Bool) {
         self.reduceMotion = reduceMotion
@@ -106,6 +115,8 @@ final class ColorfallCanyonsPresenter: ExperiencePresenter {
         let time = reduceMotion ? 0 : frame.time
         let snapshot = core.snapshot(time: time)
         lastSnapshot = snapshot
+        scene.orbit = gestures.orbit
+        scene.highlightedCell = gestures.highlightedCell
         try scene.render(snapshot, tier: drawn, context: context, frame: frame, animate: !reduceMotion)
     }
 
@@ -115,6 +126,50 @@ final class ColorfallCanyonsPresenter: ExperiencePresenter {
 
     func shedCaches() {
         scene.release()
+    }
+
+    // MARK: Touch controls (feature 344)
+
+    /// The canvas gestures send carves and valve toggles only.
+    var gestureActions: Set<String> { ["canyon.carve", "canyon.valve"] }
+
+    /// The native controls send every action a gesture can, and more.
+    var nativeActions: Set<String> { Set(ColorfallCanyonsExperienceCore.actionIDs) }
+
+    /// Routes a canvas touch through the gesture controller; a released carve drag or a spring tap sends its one
+    /// action.
+    func pointer(_ event: PointerEvent, viewSize: Vec2, port: ExperienceActionPort) {
+        guard let snapshot = lastSnapshot else { return }
+        let actions: [ColorfallCanyonsGestureAction] = gestures.handle(event, viewSize: viewSize, snapshot: snapshot)
+        for action in actions {
+            switch action {
+            case .carve(let cell):
+                send("canyon.carve", [Double(cell)], port: port)
+            case .valve(let spring):
+                send("canyon.valve", [Double(spring)], port: port)
+            case .resetView:
+                break   // the controller has already returned to the authored orbit; the next frame draws it
+            }
+        }
+    }
+
+    /// Drops a touch in progress (the shell suspends the experience): a gesture under way is abandoned without an
+    /// action; the orbit is presentation only and returns to the authored view.
+    func cancelPointers() {
+        gestures.cancel()
+    }
+
+    /// Returns the camera to the authored view ("Reset view").
+    func resetView() {
+        gestures.resetView()
+    }
+
+    /// Sends `control` with `values` and shows a refusal.
+    @discardableResult
+    func send(_ control: String, _ values: [Double], port: ExperienceActionPort) -> ActionResult {
+        let result = port.send(control, values)
+        mirror.message = result.isAccepted ? nil : "That change was refused: \(result.code)"
+        return result
     }
 
     /// The frame probes of the frame last drawn: the top-left and bottom-right background corners, outside the terrain
@@ -141,7 +196,11 @@ final class ColorfallCanyonsPresenter: ExperiencePresenter {
         mirror.springStates = snapshot.springs.map { spring in
             spring.supplyLeft == 0 ? "dry" : (spring.open ? "open, \(spring.supplyLeft) units left" : "closed")
         }
-        var text = "Colorfall Canyons level \(core.levelNumber). "
+        var text = ""
+        if let cell = gestures.highlightedCell, play.stage == .playing, cell < level.cellCount {
+            text += "Carving row \(cell / max(level.columns, 1) + 1), column \(cell % max(level.columns, 1) + 1). "
+        }
+        text += "Colorfall Canyons level \(core.levelNumber). "
         text += "Tick \(snapshot.tick) of \(snapshot.tickLimit); \(play.remaining) actions left. "
         for (index, spring) in snapshot.springs.enumerated() {
             text += "Spring \(index + 1), \(spring.color.name): \(mirror.springStates[index]). "
@@ -171,7 +230,7 @@ final class ColorfallCanyonsPresenter: ExperiencePresenter {
     }
 
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
-        AnyView(ColorfallCanyonsControls(port: port, mirror: mirror))
+        AnyView(ColorfallCanyonsControls(port: port, mirror: mirror, resetView: { [weak self] in self?.resetView() }))
     }
 }
 #endif

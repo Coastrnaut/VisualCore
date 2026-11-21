@@ -10,7 +10,10 @@
 // when the level, heights, fluid, valves, stage, tier or mode change; the bands move by a uniform. Reduce Flashing passes
 // `ColorfallCanyonsShaders.glowLimit(reduceFlashing:)` as `u_glowLimit`. If a program fails, the scene falls back to the
 // level-2 geometry drawn unlit with the shared `MeshRenderer` (ambient 1, per-vertex colours) and keeps the reason;
-// nothing here can reach the kernel.
+// nothing here can reach the kernel. Feature 344 (R02-G05-04) T-R02G0504-005 (FR-R02G0504-004, 005; research R5): the
+// camera follows the gesture controller's orbit (`ColorfallCanyonsSceneGeometry.camera(_:aspect:orbit:)`), and the cell a
+// drag would carve gets a pearl ring (`ColorfallCanyonsSceneGeometry.highlightPart(_:_:)`) drawn last with the terrain
+// program (or, in the fallback, unlit with its per-vertex colour), so it stays visible over the fluid.
 #if os(iOS)
 import ColorfallCanyonsCore
 import Foundation
@@ -27,6 +30,10 @@ final class ColorfallCanyonsCanyonScene {
     var fluidFragment = ColorfallCanyonsShaders.fluidFragment
     /// Whether the glow gain is capped (Reduce Flashing).
     var reducedFlash = false
+    /// The camera orbit (presentation only), set by the presenter before each frame.
+    var orbit: ColorfallCanyonsOrbit = .authored
+    /// The cell a drag in progress would carve, outlined in pearl; nil when no drag is in progress.
+    var highlightedCell: Int?
     /// The light direction of the terrain (towards the light, from the upper left front).
     static let lightDirection = SIMD3<Float>(-0.4, 0.8, 0.45)
 
@@ -47,6 +54,10 @@ final class ColorfallCanyonsCanyonScene {
     private var featureRenderer: ShaderMeshRenderer?
     private var fluidRenderer: ShaderMeshRenderer?
     private var fallbackRenderers: [MeshRenderer] = []
+    private var highlightRenderer: ShaderMeshRenderer?
+    private var highlightFallback: MeshRenderer?
+    /// What the highlight ring was built for: the cell, the level and the heights (the ring sits on the block top).
+    private var highlightKey: [Int]?
     private var geometryKey: GeometryKey?
     private var aspect = 1.0
 
@@ -68,11 +79,20 @@ final class ColorfallCanyonsCanyonScene {
         featureRenderer?.release()
         fluidRenderer?.release()
         for renderer in fallbackRenderers { renderer.release() }
+        releaseHighlight()
         terrainRenderer = nil
         featureRenderer = nil
         fluidRenderer = nil
         fallbackRenderers = []
         geometryKey = nil
+    }
+
+    private func releaseHighlight() {
+        highlightRenderer?.release()
+        highlightFallback?.release()
+        highlightRenderer = nil
+        highlightFallback = nil
+        highlightKey = nil
     }
 
     /// The glow limit passed as `u_glowLimit`.
@@ -88,12 +108,13 @@ final class ColorfallCanyonsCanyonScene {
         try clear.render(context, frame: frame)
         guard context.pixelWidth > 0, context.pixelHeight > 0 else { return }
         aspect = Double(context.pixelWidth) / Double(context.pixelHeight)
-        let camera = ColorfallCanyonsSceneGeometry.camera(snapshot, aspect: aspect)
+        let camera = ColorfallCanyonsSceneGeometry.camera(snapshot, aspect: aspect, orbit: orbit)
         let key = Self.key(snapshot, tier: tier, fallback: fallbackReason != nil)
         if key != geometryKey { try rebuild(snapshot, tier: tier) }
         geometryKey = Self.key(snapshot, tier: tier, fallback: fallbackReason != nil)
         if fallbackReason != nil {
             try drawFallback(camera)
+            try drawHighlight(snapshot, camera: camera)
             return
         }
         let time = Float(animate ? snapshot.time : 0)
@@ -104,10 +125,50 @@ final class ColorfallCanyonsCanyonScene {
         try drawFluid(fluidRenderer, camera: camera, cell: cell, time: time, bands: tier.flowBands,
                       gain: ColorfallCanyonsShaders.standardGlowGain, shell: false)
         let gain = ColorfallCanyonsShaders.glowGain(for: tier)
-        guard tier.glowShells > 0, gain > 0 else { return }
-        for _ in 0..<tier.glowShells {
-            try drawFluid(fluidRenderer, camera: camera, cell: cell, time: time, bands: tier.flowBands, gain: gain,
-                          shell: true)
+        if tier.glowShells > 0, gain > 0 {
+            for _ in 0..<tier.glowShells {
+                try drawFluid(fluidRenderer, camera: camera, cell: cell, time: time, bands: tier.flowBands, gain: gain,
+                              shell: true)
+            }
+        }
+        try drawHighlight(snapshot, camera: camera)
+    }
+
+    /// Draws the pearl ring of ``highlightedCell`` last, rebuilding it when the cell, level or heights change.
+    private func drawHighlight(_ snapshot: ColorfallCanyonsSceneSnapshot, camera: ColorfallCanyonsCamera) throws {
+        guard let cell = highlightedCell, (0..<snapshot.cellCount).contains(cell), let registry else {
+            if highlightKey != nil { releaseHighlight() }
+            return
+        }
+        let key = [cell, snapshot.levelNumber, fallbackReason == nil ? 0 : 1] + snapshot.heights
+        if key != highlightKey {
+            releaseHighlight()
+            let part = try ColorfallCanyonsSceneGeometry.highlightPart(cell, snapshot)
+            if fallbackReason == nil {
+                highlightRenderer = try Self.renderer(part.mesh, vertex: ColorfallCanyonsShaders.terrainVertex,
+                                                      fragment: ColorfallCanyonsShaders.terrainFragment,
+                                                      name: "colorfall-canyons-terrain", registry: registry)
+            } else {
+                let renderer = try MeshRenderer(mesh: part.mesh, colors: part.colours, registry: registry)
+                renderer.ambient = 1
+                highlightFallback = renderer
+            }
+            highlightKey = key
+        }
+        if let highlightRenderer {
+            let mvp = camera.viewProjection
+            let eye = Self.float3(camera.eye)
+            let unit = Float(ColorfallCanyonsSceneGeometry.cellSize(snapshot) * ColorfallCanyonsSceneGeometry.heightStep)
+            try highlightRenderer.draw(blend: .opaque, cullBackFaces: true) { p in
+                p.set(ColorfallCanyonsShaders.mvpUniform, matrix4: mvp.floats)
+                p.set(ColorfallCanyonsShaders.modelUniform, matrix4: Mat4.identity.floats)
+                p.set(ColorfallCanyonsShaders.eyeUniform, eye)
+                p.set(ColorfallCanyonsShaders.unitUniform, unit)
+                p.set(ColorfallCanyonsShaders.lightDirectionUniform, Self.lightDirection)
+            }
+        } else if let highlightFallback {
+            try highlightFallback.draw(model: .identity, view: .identity, projection: camera.viewProjection,
+                                       color: Vec4(1, 1, 1, 1), fog: nil)
         }
     }
 

@@ -41,7 +41,7 @@ existing programs).
 
 ## Phase 5: Story 3 and wiring — orbit, reset, presenter
 
-- [ ] T-R02G0504-005 [US3] Wire `Packages/ExperiencesRound02/ColorfallCanyons/Experience/ColorfallCanyonsPresenter.swift` (`pointer(_:viewSize:port:)` routing through
+- [X] T-R02G0504-005 [US3] Wire `Packages/ExperiencesRound02/ColorfallCanyons/Experience/ColorfallCanyonsPresenter.swift` (`pointer(_:viewSize:port:)` routing through — Verified 2026-11-21: 2026-11-21 sim-27 exit 0: ColorfallCanyonsExperienceTests 29 tests in 5 suites on sim-27.2 incl. 4 gesture wiring tests (drag carve, spring valve, orbit/double tap/reset send nothing, cancel mid-drag) (.autonomy/migration/checks/R02-G05-04.sim-27.json); lead run
   the gesture controller, `resetView()`, gesture and native action sets, the description "Carving row r, column c" while
   dragging), `Packages/ExperiencesRound02/ColorfallCanyons/Experience/ColorfallCanyonsCanyonScene.swift` (the orbit's camera; the pearl rim ring of the highlighted
   cell, research R5, through the terrain program) and `Packages/ExperiencesRound02/ColorfallCanyons/Experience/ColorfallCanyonsControls.swift` ("Reset view"); agent E writes
