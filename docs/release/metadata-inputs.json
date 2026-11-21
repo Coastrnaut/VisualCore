@@ -213,9 +213,17 @@
         "photo-library-add"
       ],
       "tier": "free"
+    },
+    {
+      "category": "puzzle",
+      "code": "R02-G01",
+      "id": "r02-g01.aurora-loom",
+      "name": "Aurora Loom",
+      "permissions": [],
+      "tier": "free"
     }
   ],
-  "ledger_sha256": "b69401ca1af43c09de2d2b5ab707c3a428e03cc657f3737f64758ad74dd0a399",
+  "ledger_sha256": "2359667e84862574f6af39788165627a0554c1505843bd0ac42ae254c0958446",
   "privacy_answers": "unproven",
   "schema": 1
 }

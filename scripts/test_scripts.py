@@ -1347,7 +1347,7 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     "GraphicsBenchmarkLabExperience",
                                     # Feature 181 (A25-P02): Effects Composer, integrated at X-A25.
                                     "EffectsComposerExperience",
-                                    # Feature 303 (R02-G01-03): Aurora Loom, a candidate until X-R02-G01 (its
+                                    # Feature 303 (R02-G01-03): Aurora Loom, integrated at X-R02-G01 (its
                                     # adapter core lives in the pure AuroraLoomCore, which the registry names).
                                     "AuroraLoomCore", "AuroraLoomExperience",
                                     # Feature 313 (R02-G02-03): Lissajous Labyrinth, a candidate until X-R02-G02.

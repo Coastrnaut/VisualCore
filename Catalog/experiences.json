@@ -922,7 +922,7 @@
         "catalog_sha256": "dc82c050cf90127a0c198f08433eecdd9c84c5d3e49ac9b45b9810f6ee5891d6",
         "levels": 100
       },
-      "available": false
+      "available": true
     },
     {
       "id": "r02-g02.lissajous-labyrinth",

@@ -38,7 +38,7 @@ final class AppModelTests: XCTestCase {
         let report = manifest.registryReport(registered: registered)
         XCTAssertTrue(report.isMatch, "missing \(report.missingRegistrations), unexpected "
             + "\(report.unexpectedRegistrations), duplicates \(report.duplicates)")
-        // A01–A25 are integrated (X-A01 to X-A25 pass): registered and available, nothing else.
+        // A01–A25 and R02-G01 are integrated (X-A01 to X-A25 and X-R02-G01 pass): registered and available, nothing else.
         XCTAssertEqual(registered.count, manifest.available.count)
         XCTAssertEqual(registered.map(\.rawValue), ["a01.generative-art-studio", "a02.fluid-art-playground",
                                                      "a03.fractal-explorer", "a04.particle-universe",
@@ -52,7 +52,7 @@ final class AppModelTests: XCTestCase {
                                                      "a19.living-wallpapers", "a20.digital-zen-garden",
                                                      "a21.aurora", "a22.shader-studio",
                                                      "a23.visual-programming-lab", "a24.graphics-benchmark-lab",
-                                                     "a25.effects-composer"])
+                                                     "a25.effects-composer", "r02-g01.aurora-loom"])
         XCTAssertEqual(manifest.available.map(\.id), registered)
     }
 
@@ -78,7 +78,7 @@ final class AppModelTests: XCTestCase {
         let storage = try TestStorage(self)
         let integrated = ExperienceRegistry.all.map(\.id)
         // Any catalog experience before its X gate works as a candidate; R02-G03 is one (unavailable, not in `all`, not yet
-        // registered; R02-G01 and R02-G02 are real candidates since their -03 features). The synthetic debug registration
+        // registered; R02-G02 is a real candidate since R02-G02-03, R02-G01 was one until X-R02-G01). The synthetic debug registration
         // stands in for one.
         let id = try XCTUnwrap(ExperienceID(rawValue: "r02-g03.wave-knot-keeper"))
         XCTAssertFalse(integrated.contains(id), "the synthetic candidate is not integrated")
@@ -110,7 +110,7 @@ final class AppModelTests: XCTestCase {
         XCTAssertEqual(Set(ScenarioLaunch.targets().keys), all)
     }
 
-    /// The real catalog with the real registry shows the integrated experiences (A01–A25 since their X gates).
+    /// The real catalog with the real registry shows the integrated experiences (A01–A25 and R02-G01 since their X gates).
     func testTheRealCatalogShowsTheIntegratedExperiences() throws {
         let storage = try TestStorage(self)
         let model = AppModel(environment: storage.environment(catalog: try bundled("experiences"),
@@ -477,7 +477,7 @@ final class AppModelTests: XCTestCase {
             XCTAssertEqual(QualityDeclaration.problems(profile: profile, tierCount: profile.count,
                                                        catalogNames: names), [], "\(registration.id)")
         }
-        XCTAssertEqual(ExperienceRegistry.all.count, 25, "A01–A25 are integrated")
+        XCTAssertEqual(ExperienceRegistry.all.count, 26, "A01–A25 and R02-G01 are integrated")
     }
 
     /// FR-U06-013: a pinned level is in force when the first frame is drawn, and the record says so.
@@ -1136,10 +1136,10 @@ final class AppModelTests: XCTestCase {
 
     // MARK: Aurora Loom in the app (feature 309, R02-G01-09; T-R02G0109-005, FR-R02G0109-003, FR-R02G0109-006)
 
-    /// The Aurora Loom candidate's registration.
+    /// Aurora Loom's registration (a candidate until X-R02-G01, integrated since 2026-11-21).
     private func auroraLoomRegistration() throws -> ExperienceRegistration {
         let id = try ExperienceID(AuroraLoomExperienceCore.experienceID)
-        return try XCTUnwrap(ExperienceRegistry.candidates.first { $0.id == id }, "Aurora Loom is a candidate")
+        return try XCTUnwrap(ExperienceRegistry.all.first { $0.id == id }, "Aurora Loom is integrated")
     }
 
     /// Clarification Q3: the stored schema-1 and schema-2 examples restore to their digests through the migrations.
@@ -1154,24 +1154,24 @@ final class AppModelTests: XCTestCase {
         XCTAssertEqual(problems, [], "\(registration.id)")
     }
 
-    /// Without `-vcCandidates` Aurora Loom is a candidate only: outside `all`, unavailable and not opened.
-    func testAuroraLoomIsACandidateAndUnavailableWithoutTheCandidatesArgument() async throws {
+    /// X-R02-G01 (2026-11-21): Aurora Loom is integrated: in `all`, not a candidate, available in the bundled catalog,
+    /// shown and opened without `-vcCandidates`.
+    func testAuroraLoomIsIntegratedAndAvailableWithoutTheCandidatesArgument() async throws {
         let id = try ExperienceID(AuroraLoomExperienceCore.experienceID)
         XCTAssertEqual(id.rawValue, "r02-g01.aurora-loom")
-        XCTAssertTrue(ExperienceRegistry.candidates.map(\.id).contains(id))
-        XCTAssertFalse(ExperienceRegistry.all.map(\.id).contains(id))
+        XCTAssertFalse(ExperienceRegistry.candidates.map(\.id).contains(id))
+        XCTAssertTrue(ExperienceRegistry.all.map(\.id).contains(id))
         let categories = try CategoryList(data: bundled("categories"))
         let manifest = try CatalogManifest(data: bundled("experiences"), categories: categories)
-        XCTAssertTrue(manifest.experiences.contains { $0.id == id }, "a catalog id")
-        XCTAssertFalse(manifest.available.contains { $0.id == id }, "not available")
+        XCTAssertTrue(manifest.available.contains { $0.id == id }, "available")
         let storage = try TestStorage(self)
         let model = AppModel(environment: storage.environment(catalog: try bundled("experiences"),
                                                               categories: try bundled("categories"),
                                                               registry: ExperienceRegistry.all))
-        XCTAssertFalse(model.shown.map(\.id).contains(id), "no tile")
+        XCTAssertTrue(model.shown.map(\.id).contains(id), "a tile")
         let opened = await model.open(id)
-        XCTAssertFalse(opened)
-        XCTAssertNil(model.session.experience)
+        XCTAssertTrue(opened)
+        XCTAssertNotNil(model.session.experience)
     }
 
     /// With the candidates registered Aurora Loom is shown, opens through the registry and engine, and level 1 is
@@ -1211,7 +1211,9 @@ final class AppModelTests: XCTestCase {
         let lissajous = try ExperienceID("r02-g02.lissajous-labyrinth")
         let registration = try XCTUnwrap(ExperienceRegistry.candidates.first { $0.id == lissajous })
         XCTAssertEqual(registration.openingSeed, 0)
-        for other in ExperienceRegistry.all { XCTAssertNil(other.openingSeed, "\(other.id.rawValue) keeps its stable seed") }
+        for other in ExperienceRegistry.all where other.id.rawValue != AuroraLoomExperienceCore.experienceID {
+            XCTAssertNil(other.openingSeed, "\(other.id.rawValue) keeps its stable seed")
+        }
     }
 
     func testAuroraLoomLevelOneTargetStepsEqualTheCore() throws {

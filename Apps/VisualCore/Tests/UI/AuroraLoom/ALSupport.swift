@@ -1,6 +1,6 @@
 // ALSupport — feature 309 (R02-G01-09) T-R02G0109-004 (FR-R02G0109-001, 002, 008; clarifications Q1, Q2 and the
 // amendment of 2026-11-20): helpers of the interface tests of Aurora Loom (R02-G01) inside the one app, modelled on
-// `AUSupport`. Aurora Loom is a candidate; every launch carries `-vcCandidates` (DebugLaunch: the candidates' catalog
+// `AUSupport`. Aurora Loom was a candidate until X-R02-G01 (2026-11-21); every launch still carries `-vcCandidates` (DebugLaunch: the candidates' catalog
 // entries become available and are registered). A fresh start erases the data (`-vcResetData`, so no level is solved),
 // skips the welcome and opens the experience directly with `-openExperience r02-g01.aurora-loom`; a relaunch
 // (`AL.reopen`) is the same start without the reset, so the stored progress (solved levels, stars, open levels) survives.

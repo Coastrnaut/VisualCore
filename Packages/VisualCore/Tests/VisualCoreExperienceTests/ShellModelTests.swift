@@ -271,7 +271,8 @@ import Testing
                          "a22.shader-studio",
                          "a23.visual-programming-lab",
                          "a24.graphics-benchmark-lab",
-                         "a25.effects-composer"])
+                         "a25.effects-composer",
+                         "r02-g01.aurora-loom"])
         for search in ["", "aurora"] {
             #expect(LauncherModel.state(manifest: .success(manifest), categories: categories, registered: [],
                                         searchText: search) == .empty, "nothing registered shows nothing")

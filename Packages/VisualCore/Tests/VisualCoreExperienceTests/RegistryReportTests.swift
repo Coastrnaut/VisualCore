@@ -57,7 +57,8 @@ import Testing
                          "a22.shader-studio",
                          "a23.visual-programming-lab",
                          "a24.graphics-benchmark-lab",
-                         "a25.effects-composer"].compactMap(ExperienceID.init(rawValue:))
+                         "a25.effects-composer",
+                         "r02-g01.aurora-loom"].compactMap(ExperienceID.init(rawValue:))
         #expect(manifest.registryReport(registered: integrated).isMatch)
         #expect(manifest.registryReport(registered: []).missingRegistrations == integrated)
     }
