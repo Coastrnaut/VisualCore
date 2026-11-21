@@ -6,8 +6,10 @@
 - **R2 Outcome over selection.** Decision: one plan per change; an action that ends the play (a step that wins or fails)
   plans the outcome only. Rationale: the shared haptic planner drops extras within its interval, so a selection haptic
   before an outcome could swallow the outcome.
-- **R3 Eased lights with fade completion.** Decision: per-element levels eased linearly toward their targets (0.15 s, or
-  0.45 s under Reduce Flashing); under Reduce Flashing a started fade completes before reversing. Rationale: bounded
+- **R3 Eased lights with fade completion.** Decision: per-element levels eased linearly toward their targets, each fade
+  taking exactly 0.15 s (0.45 s under Reduce Flashing) from where it starts, whatever its size; under Reduce Flashing a
+  started fade completes before reversing. A fixed rate per unit of range (Hue Compass's rule) is not enough here: sheet
+  targets lie anywhere in 0.35 … 1, so a short change would finish in under 0.4 s. Rationale: bounded
   brightness change rate by construction, measured by `maxHalfRangeCrossingsPerSecond`; features 316, 326 and 336.
 - **R4 Sheets keyed by cell.** Decision: a sheet's light is keyed by its cell and holds the brightness target of
   feature 343 (0.35 + 0.65 · min(volume, 24) / 24, 0 when empty) and the last colour weights it was drawn with, so a cell

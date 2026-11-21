@@ -30,7 +30,7 @@ observations after ImplementationLock-100.
 
 ## Phase 3: Story 2 — comfort settings (P1)
 
-- [ ] T-R02G0506-003 [P] [US2] Create `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsLights.swift` ("sheets keyed by cell: target
+- [X] T-R02G0506-003 [P] [US2] Create `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsLights.swift` ("sheets keyed by cell: target — Verified 2026-11-21: 2026-11-21 host-2 exit 0: 7 lights tests (scripted win and adversarial flicker at 60 Hz under Reduce Flashing: <= 3 half-range crossings per second, one-way fades >= 0.4 s; normal 0.15 s; settle; emptied sheet keeps weights) (.autonomy/migration/checks/R02-G05-06.host-2.json); fade rule: each fade takes its full duration (research R3); lead retest
   0.35 + 0.65 · min(volume, 24) / 24, 0 when empty, with the last colour weights; emitters 1 flowing, 0.3 not; glow 1
   when won; linear 0.15 s, or 0.45 s under Reduce Flashing where a started fade completes before turning back; a sheet
   at 0 with target 0 is dropped"; settle; step; isSettled; maxHalfRangeCrossingsPerSecond) with
