@@ -14,7 +14,7 @@
 // and a value, a summary element reads the bearing, band, units and last clue, the band stepper announces its pick,
 // button rows become columns at accessibility text sizes, texts wrap rather than truncate, the panel keeps a readable
 // width of at most 520 points (padding included), a Sound toggle (off by default) drives the ambient loop, refusals show
-// in words, and the panel tells the presenter when it is on screen.
+// in words, and the panel tells the presenter when it is on screen and when the app's scene is active.
 #if os(iOS)
 import HueCompassCore
 import SwiftUI
@@ -33,6 +33,8 @@ struct HueCompassControls: View {
     static let turnTitles: [String] = ["−4", "−1", "+1", "+4"]
 
     @Environment(\.dynamicTypeSize) private var typeSize
+    /// Whether the app's scene is active (convergence task T-R02G0406-014): the ambient loop plays only while it is.
+    @Environment(\.scenePhase) private var scenePhase
 
     /// The widest the panel's content grows, padding included (clarification Q5).
     static let readableWidth: CGFloat = 520
@@ -65,6 +67,7 @@ struct HueCompassControls: View {
         }
         .onAppear { presenter.controlsAppeared() }
         .onDisappear { presenter.controlsDisappeared() }
+        .onChange(of: scenePhase) { _, phase in presenter.sceneActive(phase == .active) }
     }
 
     /// A row of controls that becomes a column at accessibility text sizes (feature 336).

@@ -86,5 +86,5 @@ docs) stay with the lead. MVP: Story 1.
 
 ## Phase 7: Convergence
 
-- [ ] T-R02G0406-014 Report the scene phase from `Packages/ExperiencesRound02/HueCompass/Experience/HueCompassControls.swift` (`@Environment(\.scenePhase)`, `.onChange` → `presenter.sceneActive(phase == .active)`, as Aurora Loom's panel does) so the ambient loop stops while the app is inactive per FR-R02G0406-006 (partial)
+- [X] T-R02G0406-014 Report the scene phase from `Packages/ExperiencesRound02/HueCompass/Experience/HueCompassControls.swift` (`@Environment(\.scenePhase)`, `.onChange` → `presenter.sceneActive(phase == .active)`, as Aurora Loom's panel does) so the ambient loop stops while the app is inactive per FR-R02G0406-006 (partial) — Verified 2026-11-21: 2026-11-21 sim-27-3 exit 0 (Hue Compass experience tests on sim-27.2 with the panel reporting scenePhase to presenter.sceneActive; the sound state table covers the active input)
 - [ ] T-R02G0406-015 Announce the units left ("Units L of a." with L = allowance − spent) in the turn, probe and summary texts of `Packages/ExperiencesRound02/HueCompass/Core/HueCompassFeedbackPlan.swift` (the win keeps the units spent), updating `HueCompassFeedbackPlanTests`, `HueCompassAccessibilityTests` and `docs/architecture/hue-compass.md`, per FR-R02G0406-002 and US1/AC1 (partial)
