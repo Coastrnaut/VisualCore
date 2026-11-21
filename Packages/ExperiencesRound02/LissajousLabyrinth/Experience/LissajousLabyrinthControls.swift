@@ -7,7 +7,10 @@
 // Feature 315 (R02-G02-05) T-R02G0205-005 (FR-R02G0205-001 … 005): the tutorial instruction with Dismiss, a Hint button
 // that reveals the next hint level, the failure explanation with Undo and Retry, the goal (actions allowed, best
 // possible), the mode (Campaign, Daily, Practice) and a level picker of the open levels by band with their stars. Every
-// text is plain panel text read by VoiceOver; full accessibility comes in R02-G02-06.
+// text is plain panel text read by VoiceOver. Feature 316 (R02-G02-06) T-R02G0206-005 (FR-R02G0206-001, 005, 006;
+// clarification Q5): every control carries a label and a value, button rows become columns at accessibility text sizes,
+// the panel keeps a readable width of at most 520 points, a Sound toggle (off by default) drives the ambient loop, and
+// the panel tells the presenter when it is on screen.
 #if os(iOS)
 import LissajousLabyrinthCore
 import SwiftUI
@@ -18,30 +21,47 @@ struct LissajousLabyrinthControls: View {
     let port: ExperienceActionPort
     let mirror: LissajousLabyrinthMirror
     let presenter: LissajousLabyrinthPresenter
+    @Environment(\.dynamicTypeSize) private var typeSize
+
+    /// The widest the panel's content grows (clarification Q5).
+    static let readableWidth: CGFloat = 520
+
+    /// A row of buttons that becomes a column at accessibility text sizes.
+    @ViewBuilder private func row(@ViewBuilder _ content: () -> some View) -> some View {
+        if typeSize.isAccessibilitySize {
+            VStack(alignment: .leading, spacing: 8) { content() }
+        } else {
+            HStack(spacing: 16) { content() }
+        }
+    }
 
     var body: some View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 8) {
                 Text("Level \(mirror.levelNumber) · actions \(mirror.spent) of \(mirror.allowance)")
                     .font(.headline)
+                    .fixedSize(horizontal: false, vertical: true)
                 Text(Self.goal(mirror)).font(.subheadline)
                 if let instruction = mirror.instruction {
                     HStack(alignment: .firstTextBaseline, spacing: 12) {
                         Text(instruction).font(.callout)
                         Button("Dismiss") { presenter.dismissTutorial(port: port) }
                             .accessibilityLabel("Dismiss the tutorial")
+                            .accessibilityValue("Tutorial shown")
                     }
                 }
                 if let failure = mirror.failureText {
                     Text(failure).font(.callout)
-                    HStack(spacing: 16) {
+                    row {
                         Button("Undo") { presenter.send("play.undo", port: port) }
                             .accessibilityLabel("Undo the last change")
+                            .accessibilityValue(Self.progressValue(mirror))
                         Button("Retry") { presenter.retry(port: port) }
                             .accessibilityLabel("Retry the level")
+                            .accessibilityValue(Self.modeName(mirror.mode))
                     }
                 }
-                HStack(spacing: 12) {
+                row {
                     Button("Hint") { presenter.showHint(port: port) }
                         .accessibilityLabel("Show a hint")
                         .accessibilityValue(mirror.hintLevel == 0 ? "none shown" : "level \(mirror.hintLevel) of 3")
@@ -62,33 +82,42 @@ struct LissajousLabyrinthControls: View {
                             .accessibilityValue(shown == current ? "\(shown)" : "\(shown), pending; now \(current)")
                     }
                     if !mirror.pending.isEmpty {
-                        HStack(spacing: 16) {
+                        row {
                             Button("Apply") { presenter.applyPending(port: port) }
                                 .accessibilityLabel("Apply the pending dial values")
+                                .accessibilityValue("\(mirror.pending.values.count) pending")
                             Button("Clear") { presenter.clearPending() }
                                 .accessibilityLabel("Clear the pending dial values")
+                                .accessibilityValue("\(mirror.pending.values.count) pending")
                         }
                     }
                 }
-                HStack(spacing: 16) {
+                row {
                     Button("Undo") { presenter.send("play.undo", port: port) }
                         .accessibilityLabel("Undo the last change")
+                        .accessibilityValue(Self.progressValue(mirror))
                     Button("Redo") { presenter.send("play.redo", port: port) }
                         .accessibilityLabel("Redo the change")
+                        .accessibilityValue("Level \(mirror.levelNumber)")
                     Button("Next level") { presenter.send("level.next", port: port) }
                         .accessibilityLabel("Go to the next level")
+                        .accessibilityValue("Level \(mirror.levelNumber) now")
                     Button("Reset view") { presenter.resetView() }
                         .accessibilityLabel("Return the camera to the authored view")
+                        .accessibilityValue("Camera")
                 }
-                HStack(spacing: 16) {
+                row {
                     Button("Campaign") { presenter.send("mode.campaign", port: port) }
                         .accessibilityLabel("Play the campaign")
+                        .accessibilityValue(mirror.mode == .campaign ? "Selected" : "Not selected")
                         .accessibilityAddTraits(mirror.mode == .campaign ? .isSelected : [])
                     Button("Daily") { presenter.playDaily(port: port) }
                         .accessibilityLabel("Play today's daily level")
+                        .accessibilityValue(Self.isDaily(mirror.mode) ? "Selected" : "Not selected")
                         .accessibilityAddTraits(Self.isDaily(mirror.mode) ? .isSelected : [])
                     Button("Practice") { presenter.send("mode.practice", port: port) }
                         .accessibilityLabel("Practise this level with more actions")
+                        .accessibilityValue(mirror.mode == .practice ? "Selected" : "Not selected")
                         .accessibilityAddTraits(mirror.mode == .practice ? .isSelected : [])
                 }
                 Menu("Levels") {
@@ -105,9 +134,16 @@ struct LissajousLabyrinthControls: View {
                     }
                 }
                 .accessibilityLabel("Choose an open level")
+                .accessibilityValue("Levels 1 to \(mirror.frontier) open")
+                Toggle("Sound", isOn: Binding(get: { mirror.soundOn }, set: { presenter.setSound(on: $0) }))
+                    .accessibilityLabel("Ambient sound")
+                    .accessibilityValue(mirror.soundOn ? "on" : "off")
             }
             .padding()
+            .frame(maxWidth: Self.readableWidth, alignment: .leading)
         }
+        .onAppear { presenter.controlsAppeared() }
+        .onDisappear { presenter.controlsDisappeared() }
     }
 
     /// The goal line: actions allowed, the best possible and the mode.
@@ -119,6 +155,20 @@ struct LissajousLabyrinthControls: View {
         case .daily: mode = "Daily level"
         }
         return "\(mode) · goal: \(mirror.allowance) actions allowed, best possible \(mirror.shortest)"
+    }
+
+    /// The value of the undo buttons: the level and the actions spent.
+    static func progressValue(_ mirror: LissajousLabyrinthMirror) -> String {
+        "Level \(mirror.levelNumber), actions \(mirror.spent) of \(mirror.allowance)"
+    }
+
+    /// The mode's name: "Campaign", "Daily level" or "Practice".
+    static func modeName(_ mode: LissajousLabyrinthMode) -> String {
+        switch mode {
+        case .campaign: "Campaign"
+        case .practice: "Practice"
+        case .daily: "Daily level"
+        }
     }
 
     /// Whether `mode` is daily.

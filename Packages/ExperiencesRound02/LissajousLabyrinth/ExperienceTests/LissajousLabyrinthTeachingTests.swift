@@ -9,7 +9,7 @@
 // instruction, a hint to the hints instruction, undo never moves it back, and the win clears it. Failure: level 1
 // driven to `failed` through the port shows the core's explanation (checked against the kernel's verdict with
 // ⌊100 · tick / 4,096⌋ written out here), no hint is offered, Undo returns to playing and Retry restarts the level in
-// campaign. Picker: a locked level is refused ("That change was refused: …r02-g02.locked") and changes nothing; a
+// campaign. Picker: a locked level is refused ("That level is not open yet.", feature 316) and changes nothing; a
 // certified win of level 1 opens level 2 with 3 stars, described as "3 of 3 stars.". Modes: the daily level of
 // 2026-01-02 is 42 (days 1 × 41 mod 100 + 1), a daily win records stars without opening levels, 2026-02-30 is refused
 // with `r02-g02.date`, practice raises the allowance to 64 and records nothing, campaign returns to an open level;
@@ -346,9 +346,9 @@ enum LissajousLabyrinthTeaching {
         let locked: ActionResult = presenter.send("level.select", [2], port: shell.port)
         #expect(locked == .rejected(.rule(code: LissajousLabyrinthExperienceRule.locked)), "\(locked.code)")
         let message: String = try #require(presenter.mirror.message, "the refusal is shown")
-        #expect(message == "That change was refused: \(locked.code)")
-        #expect(message.hasPrefix("That change was refused: "))
-        #expect(message.contains("r02-g02.locked"), "\(message)")
+        // Feature 316: refusals are announced in words (LissajousLabyrinthFeedbackPlan.refused).
+        #expect(locked.code.contains("r02-g02.locked"))
+        #expect(message == "That level is not open yet.", "\(message)")
         #expect(presenter.announcements.last == message, "the refusal is announced")
         #expect(try LissajousLabyrinthTest.digest(shell) == digest, "a refused pick changes nothing")
         #expect(try Teaching.core(shell).levelNumber == 1)
@@ -426,7 +426,7 @@ enum LissajousLabyrinthTeaching {
                                                         date: DateComponents(year: 2026, month: 2, day: 30))
         #expect(refused == .rejected(.rule(code: LissajousLabyrinthExperienceRule.date)), "\(refused.code)")
         #expect(refused.code.contains("r02-g02.date"))
-        #expect(presenter.mirror.message?.contains("r02-g02.date") == true)
+        #expect(presenter.mirror.message == "That date cannot be used.")
         #expect(try LissajousLabyrinthTest.digest(shell) == digest, "a refused date changes nothing")
         #expect(presenter.mirror.mode == .daily(level: dailyNumber))
 

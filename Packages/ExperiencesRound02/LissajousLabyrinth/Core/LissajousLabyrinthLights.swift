@@ -114,8 +114,8 @@ public struct LissajousLabyrinthLights: Sendable, Equatable {
 
     /// The largest number of times any one element crosses half its range (0.5) within a one-second window.
     ///
-    /// `samples` holds one vector of levels per frame, taken every `1 / frameRate` seconds. A crossing is a step from
-    /// one frame to the next where the level goes from below 0.5 to 0.5 or above, or back. For each element the
+    /// `samples` holds one vector of levels per frame, taken every `1 / frameRate` seconds. A crossing is a strict pass
+    /// through 0.5: the level's side (below or above 0.5) changes, a level of exactly 0.5 keeping the side it came from. For each element the
     /// crossings are counted in every window of `frameRate` (rounded, at least 1) consecutive steps — the whole run when
     /// it is shorter — and the largest count over elements and windows is returned. Fewer than two samples give 0;
     /// only the elements present in every sample are measured.
@@ -125,12 +125,17 @@ public struct LissajousLabyrinthLights: Sendable, Equatable {
         let width: Int = samples.map(\.count).min() ?? 0
         var best: Int = 0
         for element in 0..<width {
+            // A crossing is a strict pass through half the range: the side (below or above 0.5) changes, where a level
+            // of exactly 0.5 keeps the side it came from. A light that only reaches 0.5 (a checkpoint toggling between
+            // dim 0 and next 0.5) never crosses half its range (feature 316).
             var flags: [Int] = []
             flags.reserveCapacity(samples.count - 1)
+            var side: Int = samples[0][element] > 0.5 ? 1 : (samples[0][element] < 0.5 ? -1 : 0)
             for frame in 1..<samples.count {
-                let before: Bool = samples[frame - 1][element] >= 0.5
-                let after: Bool = samples[frame][element] >= 0.5
-                flags.append(before != after ? 1 : 0)
+                let value: Double = samples[frame][element]
+                let now: Int = value > 0.5 ? 1 : (value < 0.5 ? -1 : side)
+                flags.append(side != 0 && now != side ? 1 : 0)
+                if now != 0 { side = now }
             }
             var count: Int = 0
             for index in 0..<flags.count {

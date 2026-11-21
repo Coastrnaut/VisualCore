@@ -17,6 +17,11 @@
 // was shown; any change of the play hides it), the failure explanation, the mode, the open levels with their stars, the
 // goal (allowance and certified shortest); `retry` starts the level again in its mode, and the daily level is chosen
 // from the local calendar date read here (`playDaily(port:date:)`), never in the core.
+// Feature 316 (R02-G02-06) T-R02G0206-005 (FR-R02G0206-002 … 004, 006): after each described change the presenter
+// routes `LissajousLabyrinthFeedbackPlan.after(old:new:)` (an announcement and a haptic) through its feedback route and
+// plans refusals with `refused(code:)`; it keeps a feedback log, eases the scene's lights (`LissajousLabyrinthLights`,
+// 0.45 s fades under Reduce Flashing) and offers the ambient recipe to `LissajousLabyrinthSound` at level openings and
+// play ends.
 #if os(iOS)
 import Foundation
 import LissajousLabyrinthCore
@@ -64,6 +69,8 @@ final class LissajousLabyrinthMirror {
     var stars: [Int: Int] = [:]
     /// The certified shortest solution length of the current level (feature 315).
     var shortest = 0
+    /// Whether the ambient sound is on (feature 316; off by default).
+    var soundOn = false
 }
 
 /// One entry of the tier log: the tier drawn and why it changed.
@@ -89,6 +96,8 @@ final class LissajousLabyrinthPresenter: ExperiencePresenter {
     private(set) var gestures = LissajousLabyrinthGestureController()
     /// The last described core (pending values, adjustments and the outside-change check).
     private(set) var latestCore: LissajousLabyrinthExperienceCore?
+    /// The haptic held while Apply sends its actions; played once when Apply ends (feature 316).
+    private var heldHaptic: HapticKind?
     /// True while `applyPending` sends its actions, so the described changes do not count as outside changes.
     private var applying = false
     /// The play the shown hint belongs to (level, mode and fingerprint); nil when no hint is shown (feature 315).
@@ -99,11 +108,24 @@ final class LissajousLabyrinthPresenter: ExperiencePresenter {
     var feedback: ExperienceFeedback = .shared
     /// Every announcement made, oldest first (tests and diagnostics).
     private(set) var announcements: [String] = []
+    /// Every routed feedback plan, oldest first (feature 316; tests and diagnostics).
+    private(set) var feedbackLog: [LissajousLabyrinthFeedbackPlan] = []
+    /// The eased light levels drawn by the scene (feature 316).
+    private(set) var lights: LissajousLabyrinthLights
+    /// The frame time of the last draw, for easing the lights.
+    private var lastFrameTime: Double?
+    /// The fingerprint of the level the lights belong to.
+    private var lightsLevel: String?
+    /// The ambient sound (feature 316).
+    let sound: LissajousLabyrinthSound
 
     init(reduceMotion: Bool, reduceFlashing: Bool) {
         self.reduceMotion = reduceMotion
         self.reduceFlashing = reduceFlashing
         scene.reducedFlash = reduceFlashing
+        lights = LissajousLabyrinthLights(reducedFlash: reduceFlashing)
+        sound = LissajousLabyrinthSound(recipe: LissajousLabyrinthSoundRecipe.recipe(
+            dials: LissajousLabyrinthDials(frequencyA: 1, frequencyB: 2, phaseA: 0, phaseC: 0), stage: .playing))
     }
 
     /// The tests' seam: before `setup`, replaces the thread program's fragment source with one that does not compile.
@@ -131,6 +153,16 @@ final class LissajousLabyrinthPresenter: ExperiencePresenter {
         let time = reduceMotion ? 0 : frame.time
         let snapshot = core.snapshot(time: time)
         lastSnapshot = snapshot
+        // A new level (or mode) starts from its own lights: they settle at once, only changes within a play fade. A
+        // frame time that goes back (an off-screen still drawn at its own time) is a separate picture: it settles too.
+        if let last = lastFrameTime, lightsLevel == snapshot.level.fingerprint, frame.time >= last {
+            lights.step(toward: snapshot, elapsed: frame.time - last)
+        } else {
+            lights.settle(to: snapshot)
+        }
+        lightsLevel = snapshot.level.fingerprint
+        lastFrameTime = frame.time
+        scene.lights = lights
         playing = core.play.stage == .playing
         scene.orbit = gestures.orbit
         scene.selectedDial = gestures.selectedDial
@@ -197,9 +229,9 @@ final class LissajousLabyrinthPresenter: ExperiencePresenter {
         if result.isAccepted {
             mirror.message = nil
         } else {
-            let text = "That change was refused: \(result.code)"
-            mirror.message = text
-            announce(text, kind: .rejection)
+            let plan = LissajousLabyrinthFeedbackPlan.refused(code: result.code)
+            mirror.message = plan.text
+            route(plan)
         }
         return result
     }
@@ -222,14 +254,17 @@ final class LissajousLabyrinthPresenter: ExperiencePresenter {
         guard let core = latestCore, !mirror.pending.isEmpty else { return [] }
         let actions = mirror.pending.actions(from: core.play.dials)
         applying = true
+        heldHaptic = nil
         defer {
             applying = false
             mirror.pending.clear()
+            if let haptic = heldHaptic { feedback.haptic(haptic) }
+            heldHaptic = nil
         }
         var results: [ActionResult] = []
         for action in actions {
             if let now = latestCore, now.play.stage != .playing {
-                announce(now.play.stage == .won ? "The path is safe." : "Out of actions.", kind: .outcome)
+                // The outcome was already announced by the feedback plan of the action that ended the play (316).
                 break
             }
             let result = send(action, port: port)
@@ -313,6 +348,43 @@ final class LissajousLabyrinthPresenter: ExperiencePresenter {
         mirror.pending.clear()
     }
 
+    /// Plays `plan` through the feedback route (its haptic and its announcement) and logs it; `.none` does nothing.
+    func route(_ plan: LissajousLabyrinthFeedbackPlan) {
+        guard plan != .none else { return }
+        if let haptic = plan.haptic {
+            if applying {
+                // During Apply the actions come in one instant and the shared planner keeps only the first haptic, so
+                // the most important one is held and played once when Apply ends (an outcome over a selection).
+                if heldHaptic == nil || haptic != .selection { heldHaptic = haptic }
+            } else {
+                feedback.haptic(haptic)
+            }
+        }
+        if let text = plan.text, let kind = plan.kind {
+            feedback.announce(text, kind: kind)
+            announcements.append(text)
+        }
+        feedbackLog.append(plan)
+    }
+
+    /// Turns the ambient sound on or off; turning it on plays the recipe of the current dials and stage.
+    func setSound(on: Bool) {
+        if on, let core = latestCore {
+            sound.offer(LissajousLabyrinthSoundRecipe.recipe(dials: core.play.dials, stage: core.play.stage))
+        }
+        sound.setWanted(on)
+        mirror.soundOn = on
+    }
+
+    /// The controls view appeared (the loop may play).
+    func controlsAppeared() { sound.setOnScreen(true) }
+
+    /// The controls view disappeared (the loop stops).
+    func controlsDisappeared() { sound.setOnScreen(false) }
+
+    /// The scene became active or inactive.
+    func sceneActive(_ active: Bool) { sound.setActive(active) }
+
     /// Announces `text` through the feedback route and logs it.
     func announce(_ text: String, kind: AnnouncementKind) {
         feedback.announce(text, kind: kind)
@@ -334,6 +406,20 @@ final class LissajousLabyrinthPresenter: ExperiencePresenter {
            previous.levelNumber != core.levelNumber || previous.play.records != core.play.records
             || previous.play.dials != core.play.dials {
             mirror.pending.clear()
+        }
+        if latestCore == nil {
+            // The first described state offers its recipe, so the sound never holds a placeholder.
+            sound.offer(LissajousLabyrinthSoundRecipe.recipe(dials: core.play.dials, stage: core.play.stage))
+        }
+        if let previous = latestCore {
+            route(LissajousLabyrinthFeedbackPlan.after(old: previous, new: core))
+            let opened = previous.levelNumber != core.levelNumber || previous.mode != core.mode
+            let ended = previous.play.stage != core.play.stage && (core.play.stage == .won || core.play.stage == .failed)
+            // A fresh play of the same level (Retry, level.select) after an ended one starts its own recipe again.
+            let restarted = previous.play.stage != core.play.stage && core.play.stage == .playing
+            if opened || ended || restarted {
+                sound.offer(LissajousLabyrinthSoundRecipe.recipe(dials: core.play.dials, stage: core.play.stage))
+            }
         }
         latestCore = core
         if let key = hintKey, key != Self.hintKey(core) {

@@ -8,7 +8,7 @@
 // by exactly the named value with one `dial.set` (a frequency and a phase, checked against the kernel); a turn out and
 // back, a second finger mid-turn, a cancelled touch and a touch on empty space send nothing; while paused (scene
 // inactive), after a win and after the allowance is spent turns send nothing (orbit still works); a frequency turned to a
-// value not coprime with the other frequency is refused, shown as "That change was refused: …", announced, and leaves the
+// value not coprime with the other frequency is refused, shown in words (feature 316), announced, and leaves the
 // state unchanged; touching a ring selects its dial, the description says "Dial <Title> selected: <value>." and the
 // drawn still shows lit copper (`LissajousLabyrinthShaders.solidColour(copper, lit: true)`, the outline's u_lit 1) on
 // the selected dial's outline circle (0.6 ring radii, inside the ring) and not on the others'; undo after a gesture restores the digest,
@@ -20,7 +20,7 @@
 // both directions and the wrap are used), each announced as "<Title> <value> pending. Apply to change.", and one
 // `applyPending` wins in exactly the certified shortest number of actions with no refusal; Clear drops the pending
 // values; an outside change (undo, redo, level.next through the port) drops them; an Apply whose earlier actions already
-// win stops, drops the rest and announces "The path is safe.".
+// win stops, drops the rest and announces the win ("The path is safe. Level won in …", feature 316).
 // Adapted bound (documented): `LissajousLabyrinthTest.checkFrame` computes its reference through the authored camera
 // only (and the thread strip faces the authored eye, so at an orbit limit parts of it are seen edge-on and may cover no
 // pixel centre), so at the orbit limits the frame is checked by projection through the orbited camera plus the night
@@ -585,8 +585,9 @@ enum LissajousLabyrinthGestureScript {
         try Script.turn(shell, refused.dial, through: Script.values(refused.dial, from: start,
                                                                     steps: refused.target - start), time: &time)
         let message: String = try #require(shell.presenter.mirror.message, "the refusal is shown")
-        #expect(message.hasPrefix("That change was refused: "), "\(message)")
-        #expect(message.contains("r02-g02.move"), "\(message)")
+        // Feature 316: refusals are announced in words (LissajousLabyrinthFeedbackPlan.refused).
+        #expect(message == "That change is not allowed: the frequencies must share no factor, and a dial must change.",
+                "\(message)")
         #expect(shell.presenter.announcements.last == message, "the refusal is announced")
         #expect(try LissajousLabyrinthTest.digest(shell) == digest, "a refused action leaves the state unchanged")
         #expect(try Script.core(shell).play.dials == before.dials)
@@ -887,7 +888,8 @@ enum LissajousLabyrinthGestureScript {
         #expect(won.stage == .won)
         #expect(won.spent == generated.solution.shortest)
         #expect(won.dials.phaseC == start.phaseC, "the phase C change after the win is dropped")
-        #expect(presenter.announcements.last == "The path is safe.")
+        // Feature 316: the win is announced once, by the feedback plan, with the actions and stars.
+        #expect(presenter.announcements.last?.hasPrefix("The path is safe. Level won in") == true)
         #expect(presenter.mirror.pending.isEmpty)
         #expect(presenter.mirror.message == nil)
 

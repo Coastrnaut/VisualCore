@@ -10,6 +10,9 @@
 // four dial rings beside the stage (`LissajousLabyrinthHandles`) are cobalt annuli facing the authored eye with a copper
 // knob at each dial's value; the selected dial gets a copper outline and a brighter knob, and a running turn's candidate
 // is shown as a violet knob. Rings are rebuilt with the level; knobs, outline and preview are small per-frame meshes.
+// Feature 316 (R02-G02-06) T-R02G0206-005 (FR-R02G0206-004): when the presenter supplies eased `lights`, the checkpoint
+// rings' brightness, the obstacles' copper blend and the glow follow them (fades of 0.45 s under Reduce Flashing) instead
+// of switching at once; without lights the snapshot's states are drawn directly.
 #if os(iOS)
 import Foundation
 import LissajousLabyrinthCore
@@ -29,6 +32,8 @@ final class LissajousLabyrinthThreadScene {
     /// The glow gain without and with the cap.
     static let glowGain = 2.0
     static let reducedGlowGain = 0.6
+    /// The eased light levels from the presenter; nil draws the snapshot's states directly (feature 316).
+    var lights: LissajousLabyrinthLights?
     /// The camera orbit (presentation only; feature 314).
     var orbit: LissajousLabyrinthOrbit = .authored
     /// The selected dial, outlined (feature 314).
@@ -169,12 +174,18 @@ final class LissajousLabyrinthThreadScene {
     private func drawSpheres(_ snapshot: LissajousLabyrinthSceneSnapshot, viewProjection: Mat4) throws {
         let view = LissajousLabyrinthSceneGeometry.viewDirection
         for (index, renderer) in sphereRenderers.enumerated() {
-            let touched = snapshot.contactObstacle == index
-            let colour = touched ? LissajousLabyrinthPalette.copper : LissajousLabyrinthPalette.violet
+            let level: Double
+            if let lights, index < lights.obstacles.count {
+                level = lights.obstacles[index]
+            } else {
+                level = snapshot.contactObstacle == index ? 1 : 0
+            }
+            let colour = LissajousLabyrinthPalette.violet
+                + (LissajousLabyrinthPalette.copper - LissajousLabyrinthPalette.violet) * level
             try renderer.draw(blend: .premultipliedAlpha) { p in
                 p.set("u_mvp", matrix4: viewProjection.floats)
                 p.set("u_color", Self.float3(colour))
-                p.set("u_lit", Float(touched ? 1 : 0))
+                p.set("u_lit", Float(level))
                 p.set("u_opacity", Float(0.45))
                 p.set("u_rim", Float(1))
                 p.set("u_viewDir", SIMD3<Float>(Float(view.x), Float(view.y), Float(view.z)))
@@ -185,7 +196,12 @@ final class LissajousLabyrinthThreadScene {
     private func drawRings(_ snapshot: LissajousLabyrinthSceneSnapshot, viewProjection: Mat4) throws {
         let view = LissajousLabyrinthSceneGeometry.viewDirection
         for (index, renderer) in ringRenderers.enumerated() {
-            let lit: Float = snapshot.visited(index) ? 1 : (snapshot.nextCheckpoint == index ? 0.5 : 0)
+            let lit: Float
+            if let lights, index < lights.checkpoints.count {
+                lit = Float(lights.checkpoints[index])
+            } else {
+                lit = snapshot.visited(index) ? 1 : (snapshot.nextCheckpoint == index ? 0.5 : 0)
+            }
             try renderer.draw(blend: .opaque) { p in
                 p.set("u_mvp", matrix4: viewProjection.floats)
                 p.set("u_color", Self.float3(LissajousLabyrinthPalette.copper))
@@ -204,7 +220,9 @@ final class LissajousLabyrinthThreadScene {
         let head = Float(LissajousLabyrinthShaders.headFraction(tick: snapshot.headTick))
         let trail = Float(LissajousLabyrinthShaders.trailFraction(tier))
         let time = animate ? Float(snapshot.time.truncatingRemainder(dividingBy: 1_000)) : 0
-        let gain = reducedFlash ? Self.reducedGlowGain : Self.glowGain
+        // The win glow (feature 316) raises the glow gain by up to a quarter, eased by the presenter's lights.
+        let winBoost = 1 + 0.25 * (lights?.glow ?? (snapshot.stage == .won ? 1 : 0))
+        let gain = (reducedFlash ? Self.reducedGlowGain : Self.glowGain) * winBoost
         let setCommon: (ShaderProgram) -> Void = { p in
             p.set("u_mvp", matrix4: viewProjection.floats)
             p.set("u_fadeNear", Float(fade.near))

@@ -42,7 +42,7 @@ ImplementationLock-100.
 
 ## Phase 5: Wiring (presenter, panel, scene, sound)
 
-- [ ] T-R02G0206-005 [US1] [US2] [US3] Create `Packages/ExperiencesRound02/LissajousLabyrinth/Experience/LissajousLabyrinthSound.swift` (wanted, on screen, active;
+- [X] T-R02G0206-005 [US1] [US2] [US3] Create `Packages/ExperiencesRound02/LissajousLabyrinth/Experience/LissajousLabyrinthSound.swift` (wanted, on screen, active; — Verified 2026-11-21: 2026-11-21 sim-27 exit 0 on sim-27.2: LissajousLabyrinthAccessibilityTests (recorded announcements and haptics equal the plans; level 1 won with the steppers and Apply, every step announced; a gesture preview is not announced; sound state table, rebuilds only at openings, ends and restarts, a failed play() keeps the choice; drawn lights under Reduce Flashing over a win and undo/redo flicker; Reduce Motion stills identical; labels, values, layout at the largest text size) and all 46 Lissajous experience tests. Fixed on the way: lights settle on a new level and on an off-screen still; the crossing measure counts strict passes through half the range; a fresh play after an ended one offers its recipe; the first state offers its recipe; Apply holds the haptic and plays the most important one at its end; the panel's 520-point width includes padding; buttons carry values; refusals are announced in words; VisualCoreAudio added to the experience target
   injected player for tests; recipe offered at level openings, play ends and when turned on) and edit
   `Packages/ExperiencesRound02/LissajousLabyrinth/Experience/LissajousLabyrinthPresenter.swift` (route `LissajousLabyrinthFeedbackPlan` after each described change
   and for refusals through `feedback`, a feedback log, the eased lights stepped per frame into the scene, the sound),
