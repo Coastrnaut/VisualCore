@@ -37,7 +37,7 @@ tests stay short (< 10 s each; interface tests < 90 s, SC-R02G0409-001). No {own
 
 ## Phase 4: Story 2 — the app's logic accepts the game (P1)
 
-- [ ] T-R02G0409-005 [US2] Edit `Apps/VisualCore/Tests/Unit/AppModelTests.swift` (agent B: both examples restore through
+- [X] T-R02G0409-005 [US2] Edit `Apps/VisualCore/Tests/Unit/AppModelTests.swift` (agent B: both examples restore through — Verified 2026-11-21: 2026-11-21 app-unit exit 0: the registration restores both stored examples; Hue Compass is a candidate (not in all, not available or openable without -vcCandidates); it opens through the registry and engine and level 1 is won by its certified witness; HC's pinned level 1 constants equal the Core
   the app's migration check; the candidate opens through the registry and engine and plays level 1 to a win; without
   `-vcCandidates` it is not available and not openable; `HC`'s pinned level 1 start bearing, target, band, allowance and witness actions (the convergence lesson of feature 319)
   equal the Core's); `--name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`

@@ -4,6 +4,7 @@
 // is applied when an experience opens. The storage helper `TestStorage` is in StoreTests.swift.
 import AuroraLoomCore
 import Foundation
+import HueCompassCore
 import LissajousLabyrinthCore
 import SwiftUI
 import VisualCoreDiagnostics
@@ -1417,6 +1418,129 @@ final class AppModelTests: XCTestCase {
         XCTAssertEqual(WaveKnotKeeperExperienceCore.directionOrder,
                        [.plusX, .minusX, .plusY, .minusY, .plusZ, .minusZ], "WK.directions")
         XCTAssertEqual(WaveKnotKeeperExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
+    }
+
+    // MARK: Hue Compass in the app (feature 339, R02-G04-09; T-R02G0409-005, FR-R02G0409-003,
+    // FR-R02G0409-006; clarifications Q2, Q3, Q5)
+
+    /// Hue Compass's registration: a candidate until X-R02-G04.
+    private func hueCompassRegistration() throws -> ExperienceRegistration {
+        let id = try ExperienceID(HueCompassExperienceCore.experienceID)
+        return try XCTUnwrap(ExperienceRegistry.candidates.first { $0.id == id }, "Hue Compass is a candidate")
+    }
+
+    /// Clarification Q3: the snapshot is schema 3 and the stored schema-1 and schema-2 examples restore to their
+    /// digests through the migrations (the app's migration check).
+    func testTheHueCompassRegistrationRestoresItsStoredExamples() async throws {
+        let registration = try hueCompassRegistration()
+        XCTAssertEqual(HueCompassExperienceCore.schemaVersion, 3)
+        let one = try XCTUnwrap(HueCompassExperienceCore.schemaOneExample(), "schema-1 example")
+        let two = try XCTUnwrap(HueCompassExperienceCore.schemaTwoExample(), "schema-2 example")
+        XCTAssertEqual(one.version, 1)
+        XCTAssertEqual(two.version, 2)
+        XCTAssertNotEqual(one.expectedDigest, two.expectedDigest)
+        let problems: [String] = await registration.migrationProblems()
+        XCTAssertEqual(problems, [], "\(registration.id)")
+    }
+
+    /// FR-R02G0409-006, clarification Q5: without `-vcCandidates` Hue Compass is a candidate only: outside `all`,
+    /// listed in the bundled catalog as not available, without a tile and not opened.
+    func testHueCompassIsACandidateAndUnavailableWithoutTheCandidatesArgument() async throws {
+        let id = try ExperienceID(HueCompassExperienceCore.experienceID)
+        XCTAssertEqual(id.rawValue, "r02-g04.hue-compass")
+        XCTAssertTrue(ExperienceRegistry.candidates.map(\.id).contains(id))
+        XCTAssertFalse(ExperienceRegistry.all.map(\.id).contains(id))
+        let categories = try CategoryList(data: bundled("categories"))
+        let manifest = try CatalogManifest(data: bundled("experiences"), categories: categories)
+        XCTAssertTrue(manifest.experiences.contains { $0.id == id }, "a catalog id")
+        XCTAssertFalse(manifest.available.contains { $0.id == id }, "not available")
+        let storage = try TestStorage(self)
+        let model = AppModel(environment: storage.environment(catalog: try bundled("experiences"),
+                                                              categories: try bundled("categories"),
+                                                              registry: ExperienceRegistry.all))
+        XCTAssertFalse(model.shown.map(\.id).contains(id), "no tile")
+        let opened = await model.open(id)
+        XCTAssertFalse(opened)
+        XCTAssertNil(model.session.experience)
+    }
+
+    /// FR-R02G0409-003, clarification Q2: with the candidates registered Hue Compass is shown, opens through the
+    /// registry and engine with seed 0 (level 1), and level 1 is won by its certified witness actions
+    /// (`HueCompassWitness.actions(for:level:)`) sent as `compass.turn [steps]`, `compass.probe` and
+    /// `compass.select [bearing, band]`.
+    func testHueCompassOpensAsACandidateAndLevelOneIsWonByItsCertifiedWitness() async throws {
+        let registration = try hueCompassRegistration()
+        let id = registration.id
+        let storage = try TestStorage(self)
+        let base = try storage.environment(catalog: bundled("experiences"), categories: bundled("categories"),
+                                           registry: ExperienceRegistry.all,
+                                           arguments: [DebugLaunch.candidatesArgument])
+        let environment = DebugLaunch.environment(base: base, candidates: [registration])
+        XCTAssertTrue(environment.registry.map(\.id).contains(id))
+        XCTAssertEqual(environment.registry.filter { $0.id == id }.count, 1, "registered once")
+        let categories = try CategoryList(data: try XCTUnwrap(environment.categoriesData))
+        let manifest = try CatalogManifest(data: try XCTUnwrap(environment.catalogData), categories: categories)
+        XCTAssertTrue(manifest.available.contains { $0.id == id }, "available with the candidates argument")
+        let model = AppModel(environment: environment)
+        XCTAssertTrue(model.shown.map(\.id).contains(id), "the launcher shows the candidate")
+        let controls = registration.controls.map(\.id)
+        for control in ["compass.turn", "compass.probe", "compass.select"] {
+            XCTAssertTrue(controls.contains(control), control)
+        }
+        XCTAssertEqual(registration.openingSeed, 0)
+        XCTAssertEqual(HueCompassExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
+
+        var engine = ExperienceEngine<HueCompassExperienceCore>(id: id)
+        try await engine.prepare(seed: 0)
+        try engine.activate()
+        XCTAssertNil(engine.outcome)
+        let certified = try HueCompassExperienceCore.generated(number: 1)
+        let actions = HueCompassWitness.actions(for: certified.solution, level: certified.level)
+        XCTAssertFalse(actions.isEmpty)
+        for action in actions {
+            let control: String
+            let values: [Double]
+            switch action {
+            case .turn(let steps):
+                control = "compass.turn"
+                values = [Double(steps)]
+            case .probe:
+                control = "compass.probe"
+                values = []
+            case .select(let bearing, let band):
+                control = "compass.select"
+                values = [Double(bearing), Double(band)]
+            }
+            XCTAssertEqual(engine.handle(control: control, values: values), .accepted, "\(control) \(values)")
+        }
+        XCTAssertEqual(engine.outcome?.code, HueCompassExperienceCore.wonCode)
+        XCTAssertEqual(HueCompassExperienceCore.wonCode, "won")
+    }
+
+    /// Clarification Q2 (the convergence lesson of feature 319): the interface tests pin level 1 in their `HC`
+    /// namespace (Tests/UI/HueCompass/HCSupport.swift, which this target cannot import); the same literals equal the
+    /// Core's certified level 1 (docs/games/hue-compass/levels/001.witness.json): start bearing 35, target bearing 88
+    /// in band 12, bearing tolerance 4, band tolerance 2, allowance 9, certified smallest 1 probe (at bearing 8),
+    /// witness actions turn −27, probe, select bearing 84 band 10. Seed 0 opens level 1.
+    func testHueCompassLevelOneEqualsTheCore() throws {
+        let certified = try HueCompassExperienceCore.generated(number: 1)
+        let level = certified.level
+        XCTAssertEqual(level.start, 35, "HC.levelOneStart")
+        XCTAssertEqual(level.target, 88, "HC.levelOneTarget")
+        XCTAssertEqual(level.targetBand, 12, "HC.levelOneTargetBand")
+        XCTAssertEqual(level.bearingTolerance, 4, "HC.levelOneBearingTolerance")
+        XCTAssertEqual(level.bandTolerance, 2, "HC.levelOneBandTolerance")
+        XCTAssertEqual(level.allowance, 9, "HC.levelOneAllowance")
+        XCTAssertTrue(level.tutorial, "level 1 shows the tutorial")
+        XCTAssertEqual(certified.solution.smallest, 1, "HC.levelOneSmallest")
+        XCTAssertEqual(certified.solution.probes, [8], "HC.levelOneProbes")
+        let witness: [HueCompassAction] = [.turn(-27), .probe, .select(bearing: 84, band: 10)]
+        XCTAssertEqual(HueCompassWitness.actions(for: certified.solution, level: level), witness,
+                       "HC.levelOneWitnessActions")
+        XCTAssertTrue(level.accepts(bearing: 84, band: 10), "the witness selection is accepted")
+        XCTAssertEqual(HueCompassProgress.stars(units: 2, smallest: certified.solution.smallest), 3,
+                       "a probe and the selection earn 3 of 3 stars")
+        XCTAssertEqual(HueCompassExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
     }
     #endif
 }
