@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_device_rows.py",
+    "--experience",
+    "r02-g04.hue-compass"
+  ],
+  "command": "python3 scripts/check_device_rows.py --experience r02-g04.hue-compass",
+  "elapsed_seconds": 0.029,
+  "exit_code": 0,
+  "finished": "2026-11-21T18:53:13+00:00",
+  "gate": "R02-G04-10",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G04-10.device-rows.log",
+  "log_sha256": "fbacf4cc91012f47397530059a6dd1a695452dac617d673c85a91d9d98432709",
+  "name": "device-rows",
+  "started": "2026-11-21T18:53:13+00:00",
+  "timed_out": false
+}
