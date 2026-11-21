@@ -28,7 +28,8 @@
   lists one action per changed dial in the order frequencyA, frequencyB, phaseA, phaseC, except that when both
   frequencies change and (a′, b) is not coprime but (a, b′) is, frequencyB goes first; when neither order keeps the
   pair coprime, the list starts with the refused action so Apply stops with the reason. Tests check that for all 100
-  certified levels setting the certified solution's final dials as pending and applying wins in at most the certified
-  shortest number of actions. Rationale: the lesson of R02-G01-09 (a panel-only player must be able to win).
+  certified levels setting the certified solution's final dials as pending and applying wins in exactly the certified
+  shortest number of actions (verified 2026-11-21: no certified solution changes a dial twice, and every level with both
+  frequencies changed has a coprime order). Rationale: the lesson of R02-G01-09 (a panel-only player must be able to win).
 - **R8 Selection.** Decision: the controller owns the selected dial (picked ring or a stepper); the presenter mirrors it
   for the outline and the description. Rationale: one source of truth, host-tested.

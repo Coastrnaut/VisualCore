@@ -134,11 +134,14 @@ The selected dial is outlined and described; undo and redo revert and repeat the
 - **FR-R02G0204-003**: Gestures MUST be arbitrated: one finger on a handle turns it; two fingers orbit; a second finger
   cancels a drag; empty space and paused or ended play send nothing.
 - **FR-R02G0204-004**: The camera MUST orbit within stated limits, reset on request and never change the kernel's state
-  or digest; the figure MUST stay inside the view at every orbit for aspects 0.4 … 2.5.
+  or digest; the figure and the dial rings MUST stay inside the view with a 5 % margin at every orbit for aspects
+  0.4 … 2.5.
 - **FR-R02G0204-005**: The selected dial MUST be outlined and described; undo and redo MUST be reachable from the panel.
 - **FR-R02G0204-006**: The panel's steppers MUST set pending values without sending actions; Apply MUST commit each
   changed dial as one action in the order frequencyA, frequencyB, phaseA, phaseC (the two frequencies swapped when only
-  that keeps every intermediate pair coprime), stop at the first refusal and drop the rest; Clear MUST drop them; an outside change MUST drop them; pending values MUST be announced.
+  that keeps every intermediate pair coprime), stop at the first refusal (announced with its reason) and drop the rest;
+  Clear MUST drop them; an outside change (an action, undo, redo, next level, restore) MUST drop them; each pending value
+  MUST be announced, and Apply and Clear MUST carry accessibility labels and be shown only while something is pending.
 - **FR-R02G0204-007**: Gesture logic MUST be deterministic and testable without a screen.
 - **FR-R02G0204-008**: Existing tests MUST pass unchanged except where they drove the steppers; new public names are
   documented; the reference regression passes.
@@ -148,7 +151,8 @@ The selected dial is outlined and described; undo and redo revert and repeat the
 - **Dial handle**: the dial, its ring centre and radius in the scene, its value range.
 - **Gesture controller state**: idle, turning (dial, preview value), orbiting, with the selection.
 - **Orbit**: azimuth and elevation within limits; reset to authored.
-- **Pending values**: the four dial values set by the steppers and not yet applied.
+- **Pending values**: the dial values set by the steppers and not yet applied (only dials that differ from the current
+  value); presentation only, never saved.
 
 ## Success Criteria *(mandatory)*
 
@@ -158,8 +162,8 @@ The selected dial is outlined and described; undo and redo revert and repeat the
   (or none).
 - **SC-R02G0204-002**: Every arbitration case (second finger, cancel, empty space, paused, won, failed, refused action)
   ends with the stated outcome.
-- **SC-R02G0204-003**: Orbiting to every limit and resetting changes no digest; the figure stays inside the view with a
-  5 % margin at 7 aspects.
+- **SC-R02G0204-003**: Orbiting to every limit and resetting changes no digest; the figure and the dial rings stay inside
+  the view with a 5 % margin at 7 aspects from 0.4 to 2.5 (0.4, 0.5, 0.75, 1, 1.5, 2, 2.5).
 - **SC-R02G0204-004**: All 100 certified levels are won through pending values and one Apply in exactly their certified
   shortest number of actions.
 - **SC-R02G0204-005**: On the simulator, the selected dial's outline is drawn and its description matches the state.
@@ -169,8 +173,10 @@ The selected dial is outlined and described; undo and redo revert and repeat the
 
 ## Assumptions
 
-- Dial handles sit on rings beside the figure's bounding box, in the scene's world space, as Aurora Loom's anchors and
-  dials do; the exact placement is a plan decision.
+- Dial handles sit on rings beside the figure, in the scene's world space, as Aurora Loom's dials do; the placement is
+  fixed by clarification Q1 and plan research R1–R2 (against a stage that does not depend on the dials).
+- Full accessibility (VoiceOver rotor, Dynamic Type, Switch Control, sound) is R02-G02-06; this feature gives the panel's
+  new controls labels and announcements only.
 - Lissajous Labyrinth has no stars yet (progression is R02-G02-05); "certified shortest" is the solver's shortest.
 
 ## Traceability

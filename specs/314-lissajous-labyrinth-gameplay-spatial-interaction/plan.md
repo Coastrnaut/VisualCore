@@ -24,8 +24,8 @@ values with Apply and Clear, gain "Reset view" and announce the selection. Resea
 `Vec3`), VisualCoreExperience (actions); the Experience's existing rendering dependencies. No new package; rings, knobs
 and outlines reuse the existing ring and sphere programs and `MeshBuilder`. No VisualCore change.
 **Testing**: host: `swift test --package-path Packages/ExperiencesRound02` (ring mappings round trip, orbit framing at
-every limit and aspect 0.4 … 2.5, 400 scripted turns, 1,000 arbitration scripts, the pending planner over all 100
-certified levels); simulator: `xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme
+every limit and aspect 0.4 … 2.5, 500 scripted turns, 1,000 arbitration scripts, the pending planner over all 100
+certified levels in exactly their certified shortest number of actions); simulator: `xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme
 ExperiencesRound02-Package --destination sim-27.2 --action test` (pointer wiring end to end, selection outline, undo after
 a gesture, pending Apply wins all 100 levels through the presenter, frame checks at orbit limits); app unit tests
 (candidate); regression as R02-G02-03; script tests (alone).
