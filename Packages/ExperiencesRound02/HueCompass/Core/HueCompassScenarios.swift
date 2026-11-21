@@ -18,6 +18,8 @@
 // `level − 1`, issues one legal action (the first of that level's certified witness actions) and then one illegal
 // action — a turn of 49, refused as out of range, on odd rows; a turn of 0, which the kernel refuses, on even rows. The
 // expected digests are derived by playing the entries on a core exactly as the engine plays them.
+// Feature 335 (R02-G04-05): rejection also refuses a locked `level.select`, a level beyond 100, an impossible
+// `mode.daily` date, `level.next` with no next open level and wrong value counts of `mode.daily` and `mode.practice`.
 #if DEBUG || VISUALCORE_AUTOMATION
 import Foundation
 import VisualCoreExperience
@@ -137,6 +139,13 @@ extension HueCompassExperienceCore {
             refusedEntry("compass.probe", [1], wrongCount),
             refusedEntry("compass.select", [0], wrongCount),
             refusedEntry("level.next", [1], wrongCount),
+            // Feature 335: a locked level, an impossible date, no next open level and wrong value counts.
+            refusedEntry("level.select", [2], "action.rule." + HueCompassExperienceRule.locked),
+            refusedEntry("level.select", [101], outOfRange),
+            refusedEntry("mode.daily", [2026, 2, 30], "action.rule." + HueCompassExperienceRule.date),
+            refusedEntry("level.next", [], "action.rule." + HueCompassExperienceRule.locked),
+            refusedEntry("mode.daily", [2026, 11], wrongCount),
+            refusedEntry("mode.practice", [1], wrongCount),
         ]
     }
 

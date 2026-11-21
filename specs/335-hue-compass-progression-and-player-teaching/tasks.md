@@ -36,7 +36,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks.
 
 ## Phase 4: Adapter, scenarios and panel
 
-- [ ] T-R02G0405-004 [US1] [US2] [US3] [US4] Edit `Packages/ExperiencesRound02/HueCompass/Core/HueCompassExperienceCore.swift` (controls "level.select
+- [X] T-R02G0405-004 [US1] [US2] [US3] [US4] Edit `Packages/ExperiencesRound02/HueCompass/Core/HueCompassExperienceCore.swift` (controls "level.select — Verified 2026-11-21: 2026-11-21 host-3 exit 0 (agent F: adapter with level.select, mode.daily, mode.practice (allowance 24), mode.campaign, tutorial.dismiss; level.next to the next open level; locked daily playable without opening; wins record units and stars; digest v2 with progress and mode, tutorial in the snapshot only; schema 2 with a 1 -> 2 migration; scenarios gain 6 rejection entries and the manifest is regenerated; 31 tests incl. migration, tutorial with undo, hint and failure accessors)
   [1 … 100], mode.daily [year, month, day], mode.practice, mode.campaign, tutorial.dismiss"; practice
   allowance 24; daily wins record results without opening levels and a locked daily level is playable; choosing daily
   or practice drops the left level's records, mode.campaign returns to a fresh campaign play of the same level; the

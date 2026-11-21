@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "HueCompassExperienceCoreTests|HueCompassScenarios|HueCompassRendererPurity|HueCompassPanelWin"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter 'HueCompassExperienceCoreTests|HueCompassScenarios|HueCompassRendererPurity|HueCompassPanelWin'",
+  "elapsed_seconds": 10.228,
+  "exit_code": 0,
+  "finished": "2026-11-21T16:56:32+00:00",
+  "gate": "R02-G04-05",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G04-05.host-3.log",
+  "log_sha256": "2179b2837ebdb3eba14fc16e769e8365111bcd410289aa0839416040c4a27f2b",
+  "name": "host-3",
+  "started": "2026-11-21T16:56:22+00:00",
+  "timed_out": false
+}
