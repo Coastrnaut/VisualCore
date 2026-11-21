@@ -30,7 +30,8 @@ tests stay short (< 10 s each). {device} items are D1–D3 observations after Im
   `reconciliationDropped` (not digested); actions "replay.start [1…100]" (`r02-g05.no-replay` without a verified
   traced result), "replay.step" (`r02-g05.replay-end` after the last or once ended), "replay.stop" (campaign at that
   level, the frontier when it is not open); every other play action in replay refused with `r02-g05.replay` except
-  `tutorial.dismiss`; replay never records; the tutorial is done in replay), `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsScenarios.swift` and the
+  `tutorial.dismiss`; replay never records; the tutorial is done in replay; FR-R02G0507-007: "settings.sound [0 … 1]" sets `soundOn`,
+  snapshotted in schema 3 and not digested, off after migration), `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsScenarios.swift` and the
   regenerated `Packages/ExperiencesRound02/ColorfallCanyons/scenario-manifest.json`, `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsFeedbackPlan.swift` (refusal words "There is no saved
   solution to replay for this level.", "The replay is over.", "Stop the replay first."; a replayed win claims no stars),
   with `Packages/ExperiencesRound02/ColorfallCanyons/CoreTests/ColorfallCanyonsExperienceCoreTests.swift` updates (schema 3, migrations 1 → 3 and 2 → 3, recording,
@@ -43,7 +44,8 @@ tests stay short (< 10 s each). {device} items are D1–D3 observations after Im
 ## Phase 4: Panel and simulator proof
 
 - [ ] T-R02G0507-005 [US3] Edit `Packages/ExperiencesRound02/ColorfallCanyons/Experience/ColorfallCanyonsPresenter.swift` and `Packages/ExperiencesRound02/ColorfallCanyons/Experience/ColorfallCanyonsControls.swift`
-  (Replay for a verified solved level, Step and Stop with labels and values, the replay position; the dropped results
+  (Replay for a verified solved level, Step and Stop with labels and values, the replay position; the Sound toggle sends
+  `settings.sound` and the presenter applies the restored `soundOn` when the experience opens; the dropped results
   announced once: "n saved results could not be checked and were removed.") and create
   `Packages/ExperiencesRound02/ColorfallCanyons/ExperienceTests/ColorfallCanyonsReplayTests.swift` (agent C: replay through the port reproduces the fingerprints action
   by action and ends won; other actions refused during replay; progress unchanged; the dropped announcement once); the

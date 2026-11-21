@@ -134,13 +134,16 @@ other than stepping and stopping are refused during replay.
   refusing other play actions with a named reason.
 - **FR-R02G0507-005**: All randomness MUST derive from fixed seeds or the given calendar date; no clock or random source
   is read by the state.
+- **FR-R02G0507-007**: The player's settings MUST persist: the sound choice (the game's only setting of its own; Reduce
+  Motion, Reduce Flashing, text size and contrast are system settings) is part of the snapshot (not the digest), changed
+  by the action `settings.sound [0 … 1]` and applied when the experience opens; migrated saves default it to off.
 - **FR-R02G0507-006**: Invalid requests MUST be refused with stable reason codes; existing tests pass; new public names
   documented; the reference regression passes.
 
 ### Key Entities
 
 - **Result**: level, fewest actions spent, stars, the winning actions (trace), verified or not.
-- **Snapshot schema 3**: level, records, progress (results with traces), mode, tutorial step.
+- **Snapshot schema 3**: level, records, progress (results with traces), mode, tutorial step, sound choice.
 - **Replay**: the level, the trace and the position in it.
 
 ## Success Criteria *(mandatory)*
@@ -171,6 +174,7 @@ other than stepping and stopping are refused during replay.
 | Migration | FR-R02G0507-002 |
 | Reconcilable scores | FR-R02G0507-003 |
 | Replay | FR-R02G0507-004 |
+| Settings | FR-R02G0507-007 |
 | No Stage One breakage | FR-R02G0507-006 |
 
 ## Negative Requirements / Excluded scope

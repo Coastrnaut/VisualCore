@@ -14,5 +14,5 @@ public enum ColorfallCanyonsReconciliation {
 }
 // ColorfallCanyonsExperienceCore: schemaVersion 3; migrations 1 → 2 → 3; actions + "replay.start" [1…100], "replay.step",
 // "replay.stop"; codes r02-g05.no-replay, r02-g05.replay-end, r02-g05.replay; public var reconciliationDropped: Int
-// (not digested). ColorfallCanyonsFeedbackPlan: refusal words for the three codes; a replay step announced like the action.
+// (not digested); "settings.sound" [0…1] sets `public var soundOn: Bool` (snapshotted, not digested). ColorfallCanyonsFeedbackPlan: refusal words for the three codes; a replay step announced like the action.
 ```
