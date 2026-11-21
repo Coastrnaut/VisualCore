@@ -7,6 +7,10 @@
 // that reveals the next hint level, the failure explanation with Undo and Retry, the goal (moves allowed, best
 // possible), the mode (Campaign, Daily, Practice) and a level picker of the open levels by band with their stars. The
 // body is split into small sections so the type checker stays fast. Every text is plain panel text read by VoiceOver.
+// Feature 326 (R02-G03-06) T-R02G0306-006 (FR-R02G0306-001, 005, 006; clarification Q5): every control carries a label
+// and a value, button rows become columns at accessibility text sizes, the panel keeps a readable width of at most 520
+// points (padding included), a Sound toggle (off by default) drives the ambient loop, refusals show in words, and the
+// panel tells the presenter when it is on screen.
 #if os(iOS)
 import SwiftUI
 import VisualCoreExperienceHost
@@ -23,6 +27,11 @@ struct WaveKnotKeeperControls: View {
     static let titles: [String] = ["+x", "−x", "+y", "−y", "Over", "Under"]
     static let spoken: [String] = ["right", "left", "up", "down", "towards you (over)", "away from you (under)"]
 
+    @Environment(\.dynamicTypeSize) private var typeSize
+
+    /// The widest the panel's content grows, padding included (clarification Q5).
+    static let readableWidth: CGFloat = 520
+
     var body: some View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 8) {
@@ -35,8 +44,42 @@ struct WaveKnotKeeperControls: View {
                 playRow
                 modeRow
                 levelMenu
+                soundToggle
             }
             .padding()
+            .frame(maxWidth: Self.readableWidth, alignment: .leading)
+        }
+        .onAppear { presenter.controlsAppeared() }
+        .onDisappear { presenter.controlsDisappeared() }
+    }
+
+    /// A row of controls that becomes a column at accessibility text sizes (feature 326).
+    @ViewBuilder private func row(@ViewBuilder _ content: () -> some View) -> some View {
+        if typeSize.isAccessibilitySize {
+            VStack(alignment: .leading, spacing: 8) { content() }
+        } else {
+            HStack(spacing: 16) { content() }
+        }
+    }
+
+    /// The Sound toggle (feature 326; off by default).
+    @ViewBuilder private var soundToggle: some View {
+        Toggle("Sound", isOn: Binding(get: { mirror.soundOn }, set: { presenter.setSound(on: $0) }))
+            .accessibilityLabel("Ambient sound")
+            .accessibilityValue(mirror.soundOn ? "on" : "off")
+    }
+
+    /// The value of the play buttons: the level and the moves spent.
+    static func progressValue(_ mirror: WaveKnotKeeperMirror) -> String {
+        "Level \(mirror.levelNumber), moves \(mirror.spent) of \(mirror.allowance)"
+    }
+
+    /// The mode's name: "Campaign", "Daily level" or "Practice".
+    static func modeName(_ mode: WaveKnotKeeperMode) -> String {
+        switch mode {
+        case .campaign: "Campaign"
+        case .practice: "Practice"
+        case .daily: "Daily level"
         }
     }
 
@@ -44,21 +87,24 @@ struct WaveKnotKeeperControls: View {
     @ViewBuilder private var header: some View {
         Text("Level \(mirror.levelNumber) · moves \(mirror.spent) of \(mirror.allowance)")
             .font(.headline)
+            .fixedSize(horizontal: false, vertical: true)
         Text("Crossings \(mirror.crossings), writhe \(mirror.writhe) · target \(mirror.targetCrossings), \(mirror.targetWrithe)")
             .font(.subheadline)
+            .fixedSize(horizontal: false, vertical: true)
         if let message = mirror.message {
-            Text(message).font(.footnote)
+            Text(message).font(.footnote).fixedSize(horizontal: false, vertical: true)
         }
     }
 
     /// The goal line and the tutorial instruction with Dismiss (feature 325).
     @ViewBuilder private var teachingSection: some View {
-        Text(Self.goal(mirror)).font(.subheadline)
+        Text(Self.goal(mirror)).font(.subheadline).fixedSize(horizontal: false, vertical: true)
         if let instruction = mirror.instruction {
-            HStack(alignment: .firstTextBaseline, spacing: 12) {
-                Text(instruction).font(.callout)
+            row {
+                Text(instruction).font(.callout).fixedSize(horizontal: false, vertical: true)
                 Button("Dismiss") { presenter.dismissTutorial(port: port) }
                     .accessibilityLabel("Dismiss the tutorial")
+                    .accessibilityValue("Tutorial shown")
             }
         }
     }
@@ -66,37 +112,42 @@ struct WaveKnotKeeperControls: View {
     /// The failure explanation with Undo and Retry (feature 325).
     @ViewBuilder private var failureSection: some View {
         if let failure = mirror.failureText {
-            Text(failure).font(.callout)
-            HStack(spacing: 16) {
+            Text(failure).font(.callout).fixedSize(horizontal: false, vertical: true)
+            row {
                 Button("Undo") { send("play.undo") }
                     .accessibilityLabel("Undo the last move")
+                    .accessibilityValue(Self.progressValue(mirror))
                 Button("Retry") { presenter.retry(port: port) }
                     .accessibilityLabel("Retry the level")
+                    .accessibilityValue(Self.modeName(mirror.mode))
             }
         }
     }
 
     /// The Hint button and the hint revealed so far (feature 325).
     @ViewBuilder private var hintRow: some View {
-        HStack(spacing: 12) {
+        row {
             Button("Hint") { presenter.showHint(port: port) }
                 .accessibilityLabel("Show a hint")
                 .accessibilityValue(mirror.hintLevel == 0 ? "none shown" : "level \(mirror.hintLevel) of 3")
-            if let hint = mirror.hintText { Text(hint).font(.callout) }
+            if let hint = mirror.hintText { Text(hint).font(.callout).fixedSize(horizontal: false, vertical: true) }
         }
     }
 
     /// Campaign, Daily and Practice (feature 325).
     @ViewBuilder private var modeRow: some View {
-        HStack(spacing: 16) {
+        row {
             Button("Campaign") { send("mode.campaign") }
                 .accessibilityLabel("Play the campaign")
+                .accessibilityValue(mirror.mode == .campaign ? "Selected" : "Not selected")
                 .accessibilityAddTraits(mirror.mode == .campaign ? .isSelected : [])
             Button("Daily") { presenter.playDaily(port: port) }
                 .accessibilityLabel("Play today's daily level")
+                .accessibilityValue(Self.isDaily(mirror.mode) ? "Selected" : "Not selected")
                 .accessibilityAddTraits(Self.isDaily(mirror.mode) ? .isSelected : [])
             Button("Practice") { send("mode.practice") }
                 .accessibilityLabel("Practise this level with more moves")
+                .accessibilityValue(mirror.mode == .practice ? "Selected" : "Not selected")
                 .accessibilityAddTraits(mirror.mode == .practice ? .isSelected : [])
         }
     }
@@ -117,6 +168,7 @@ struct WaveKnotKeeperControls: View {
             }
         }
         .accessibilityLabel("Choose an open level")
+        .accessibilityValue("Levels 1 to \(mirror.frontier) open")
     }
 
     /// The goal line: moves allowed, the best possible and the mode.
@@ -155,7 +207,7 @@ struct WaveKnotKeeperControls: View {
 
     /// One button per direction, moving the selected point one step.
     @ViewBuilder private var directionRow: some View {
-        HStack(spacing: 12) {
+        row {
             ForEach(0..<WaveKnotKeeperDirection.allCases.count, id: \.self) { index in
                 Button(Self.titles[index]) { send("point.move", [Double(mirror.selected), Double(index)]) }
                     .accessibilityLabel("Move the selected point \(Self.spoken[index])")
@@ -166,15 +218,19 @@ struct WaveKnotKeeperControls: View {
 
     /// Undo, redo and next level.
     @ViewBuilder private var playRow: some View {
-        HStack(spacing: 16) {
+        row {
             Button("Undo") { send("play.undo") }
                 .accessibilityLabel("Undo the last move")
+                .accessibilityValue(Self.progressValue(mirror))
             Button("Redo") { send("play.redo") }
                 .accessibilityLabel("Redo the move")
+                .accessibilityValue(Self.progressValue(mirror))
             Button("Next level") { send("level.next") }
                 .accessibilityLabel("Go to the next level")
+                .accessibilityValue("Level \(mirror.levelNumber) now")
             Button("Reset view") { presenter.resetView() }
                 .accessibilityLabel("Return the camera to the authored view")
+                .accessibilityValue("Camera")
         }
     }
 

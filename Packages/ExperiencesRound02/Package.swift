@@ -151,7 +151,10 @@ let package = Package(
                                .product(name: "VisualCoreSimulation", package: visualCore),
                                .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
                                .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
-                               .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS]))],
+                               .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS])),
+                               // Feature 326 (R02-G03-06): the ambient loop.
+                               .product(name: "VisualCoreAudioDSP", package: visualCore),
+                               .product(name: "VisualCoreAudio", package: rendering, condition: .when(platforms: [.iOS]))],
                 path: "WaveKnotKeeper/Experience"),
         .testTarget(name: "WaveKnotKeeperExperienceTests",
                     dependencies: ["WaveKnotKeeperExperience", "WaveKnotKeeperCore",
@@ -161,7 +164,8 @@ let package = Package(
                                    .product(name: "VisualCoreSimulation", package: visualCore),
                                    .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
                                    .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
-                                   .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS]))],
+                                   .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS])),
+                                   .product(name: "VisualCoreAudioDSP", package: visualCore)],
                     path: "WaveKnotKeeper/ExperienceTests"),
     ]
 )

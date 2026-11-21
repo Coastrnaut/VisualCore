@@ -14,9 +14,15 @@
 // was shown; any change of the play hides it), the failure explanation, the mode, the open levels with their stars and
 // the goal (allowance and certified shortest); `retry` starts the level again in its mode, and the daily level is
 // chosen from the local calendar date read here (`playDaily(port:date:)`), never in the core.
+// Feature 326 (R02-G03-06) T-R02G0306-006 (FR-R02G0306-002 … 004, 006): after each described change the presenter
+// routes `WaveKnotKeeperFeedbackPlan.after(old:new:)` (an announcement and a haptic) through its feedback route
+// (`feedback`, `.shared` unless a test injects one) and plans refusals with `refused(code:)`, showing the same words in
+// the panel; it keeps a feedback log, eases the scene's lights (`WaveKnotKeeperLights`, 0.45 s fades under Reduce
+// Flashing) and offers the ambient recipe to `WaveKnotKeeperSound` at level openings, summary changes and play ends.
 #if os(iOS)
 import Foundation
 import SwiftUI
+import VisualCoreAudioDSP
 import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreMath
@@ -62,6 +68,8 @@ final class WaveKnotKeeperMirror {
     var stars: [Int: Int] = [:]
     /// The certified shortest solution length of the current level (feature 325).
     var shortest = 0
+    /// Whether the ambient sound is on (feature 326; off by default).
+    var soundOn = false
 }
 
 /// One entry of the tier log: the tier drawn and why it changed.
@@ -91,11 +99,27 @@ final class WaveKnotKeeperPresenter: ExperiencePresenter {
     private var hintKey: String?
     /// The date whose daily level is being played, so Retry restarts that level after midnight too (feature 325).
     private(set) var dailyDate: DateComponents?
+    /// The feedback route of announcements and haptics (feature 326; tests inject their own).
+    var feedback: ExperienceFeedback = .shared
+    /// Every announced text, oldest first (feature 326; tests and diagnostics).
+    private(set) var announcements: [String] = []
+    /// Every routed feedback plan, oldest first (feature 326; tests and diagnostics).
+    private(set) var feedbackLog: [WaveKnotKeeperFeedbackPlan] = []
+    /// The eased light levels drawn by the scene (feature 326).
+    private(set) var lights: WaveKnotKeeperLights
+    /// The frame time of the last draw, for easing the lights.
+    private var lastFrameTime: Double?
+    /// The fingerprint of the level (and mode copy) the lights belong to.
+    private var lightsLevel: String?
+    /// The ambient sound (feature 326).
+    let sound: WaveKnotKeeperSound
 
     init(reduceMotion: Bool, reduceFlashing: Bool) {
         self.reduceMotion = reduceMotion
         self.reduceFlashing = reduceFlashing
         scene.reducedFlash = reduceFlashing
+        lights = WaveKnotKeeperLights(reducedFlash: reduceFlashing)
+        sound = WaveKnotKeeperSound(recipe: WaveKnotKeeperSoundRecipe.quiet)
     }
 
     /// The tests' seam: before `setup`, replaces the rope program's fragment source with one that does not compile.
@@ -123,6 +147,17 @@ final class WaveKnotKeeperPresenter: ExperiencePresenter {
         let time = reduceMotion ? 0 : frame.time
         let snapshot = core.snapshot(time: time)
         lastSnapshot = snapshot
+        // A new level (or mode) starts from its own lights: they settle at once, only changes within a play fade. A
+        // frame time that goes back (an off-screen still drawn at its own time) is a separate picture: it settles too.
+        let level = core.play.level.fingerprint
+        if let last = lastFrameTime, lightsLevel == level, frame.time >= last {
+            lights.step(toward: snapshot, elapsed: frame.time - last)
+        } else {
+            lights.settle(to: snapshot)
+        }
+        lightsLevel = level
+        lastFrameTime = frame.time
+        scene.lights = lights
         scene.orbit = gestures.orbit
         scene.preview = gestures.preview.flatMap { Self.ghost($0, snapshot: snapshot) }
         try scene.render(snapshot, tier: drawn, context: context, frame: frame, animate: !reduceMotion)
@@ -166,9 +201,50 @@ final class WaveKnotKeeperPresenter: ExperiencePresenter {
     @discardableResult
     func send(_ control: String, _ values: [Double], port: ExperienceActionPort) -> ActionResult {
         let result = port.send(control, values)
-        mirror.message = result.isAccepted ? nil : "That change was refused: \(result.code)"
+        if result.isAccepted {
+            mirror.message = nil
+        } else {
+            let plan = WaveKnotKeeperFeedbackPlan.refused(code: result.code)
+            mirror.message = plan.text
+            route(plan)
+        }
         return result
     }
+
+    // MARK: Feedback and sound (feature 326)
+
+    /// Plays `plan` through the feedback route (its haptic and its announcement) and logs it; `.none` does nothing.
+    func route(_ plan: WaveKnotKeeperFeedbackPlan) {
+        guard plan != .none else { return }
+        if let haptic = plan.haptic { feedback.haptic(haptic) }
+        if let text = plan.text, let kind = plan.kind {
+            feedback.announce(text, kind: kind)
+            announcements.append(text)
+        }
+        feedbackLog.append(plan)
+    }
+
+    /// The ambient recipe of `core`'s summary, target and stage.
+    static func recipe(_ core: WaveKnotKeeperExperienceCore) -> AmbientLoopRecipe {
+        WaveKnotKeeperSoundRecipe.recipe(summary: core.play.summary, target: core.play.level.target,
+                                         stage: core.play.stage)
+    }
+
+    /// Turns the ambient sound on or off; turning it on plays the recipe of the current rope and stage.
+    func setSound(on: Bool) {
+        if on, let core = latestCore { sound.offer(Self.recipe(core)) }
+        sound.setWanted(on)
+        mirror.soundOn = on
+    }
+
+    /// The controls view appeared (the loop may play).
+    func controlsAppeared() { sound.setOnScreen(true) }
+
+    /// The controls view disappeared (the loop stops).
+    func controlsDisappeared() { sound.setOnScreen(false) }
+
+    /// The scene became active or inactive.
+    func sceneActive(_ active: Bool) { sound.setActive(active) }
 
     /// The rope point a previewed `point.move` would reach, in kernel units; nil for another action or a bad value.
     static func ghost(_ action: ScriptedAction, snapshot: WaveKnotKeeperSceneSnapshot) -> WaveKnotKeeperPoint? {
@@ -248,6 +324,16 @@ final class WaveKnotKeeperPresenter: ExperiencePresenter {
     }
 
     func describe(_ core: WaveKnotKeeperExperienceCore) -> String {
+        if let previous = latestCore {
+            route(WaveKnotKeeperFeedbackPlan.after(old: previous, new: core))
+            let opened = previous.levelNumber != core.levelNumber || previous.mode != core.mode
+            let changed = previous.play.summary != core.play.summary
+            let ended = previous.play.stage != core.play.stage
+            if opened || changed || ended { sound.offer(Self.recipe(core)) }
+        } else {
+            // The first described state offers its recipe, so the sound never holds a placeholder.
+            sound.offer(Self.recipe(core))
+        }
         latestCore = core
         if let key = hintKey, key != Self.hintKey(core) {
             hintKey = nil

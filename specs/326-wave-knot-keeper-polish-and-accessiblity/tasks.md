@@ -50,7 +50,7 @@ ImplementationLock-100.
 
 ## Phase 5: Wiring (presenter, panel, scene, sound)
 
-- [ ] T-R02G0306-006 [US1] [US2] [US3] Create `Packages/ExperiencesRound02/WaveKnotKeeper/Experience/WaveKnotKeeperSound.swift` (wanted, on screen, active;
+- [X] T-R02G0306-006 [US1] [US2] [US3] Create `Packages/ExperiencesRound02/WaveKnotKeeper/Experience/WaveKnotKeeperSound.swift` (wanted, on screen, active; — Verified 2026-11-21: 2026-11-21 sim-27 exit 0 on sim-27.2: WaveKnotKeeperAccessibilityTests (recorded announcements and haptics equal the plans; level 1 won with the picker and direction buttons; drag previews not announced; sound state table and offers; drawn lights under Reduce Flashing; Reduce Motion stills identical; labels, values, layout at the largest text size) and all Wave Knot Keeper experience tests; refusals now shown in words (wiring and teaching tests updated); quiet placeholder recipe
   injected player for tests; recipe offered at level openings, summary changes, play ends and when turned on) and edit
   `Packages/ExperiencesRound02/WaveKnotKeeper/Experience/WaveKnotKeeperPresenter.swift` (route `WaveKnotKeeperFeedbackPlan` after each described change and for
   refusals through `feedback`, a feedback log, the eased lights stepped per frame into the scene, the sound),

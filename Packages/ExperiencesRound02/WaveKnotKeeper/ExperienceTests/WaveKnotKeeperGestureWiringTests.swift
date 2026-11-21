@@ -278,7 +278,8 @@ enum WaveKnotKeeperGestureScript {
         #expect(try WaveKnotKeeperTest.digest(shell) == digest)
         let message: String = try #require(shell.presenter.mirror.message, "the refusal is shown")
         let code: String = WaveKnotKeeperError.move("").reasonCode
-        #expect(message.contains(code), "\(message)")
+        // Feature 326: refusals are shown in words, the same words that are announced.
+        #expect(message == WaveKnotKeeperFeedbackPlan.refusalText(code: code), "\(message)")
         #expect(try Script.selected(shell) == drag.point, "the touch still selected the point")
         #expect(shell.presenter.gestures.phase == .idle)
     }

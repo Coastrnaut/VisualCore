@@ -41,6 +41,13 @@ public enum WaveKnotKeeperSoundRecipe {
         return seconds * rootHertz * (1 + clamped) * numerator / denominator
     }
 
+    /// The placeholder recipe a sound holds before the first state is described (feature 326, T-R02G0306-006): the root
+    /// for no crossings alone, at the base amplitude and gain, 8 s, one swell.
+    public static let quiet = AmbientLoopRecipe(seconds: seconds,
+                                                partials: [AmbientLoopPartial(cyclesPerLoop: cycles(crossings: 0),
+                                                                              amplitude: baseAmplitude)],
+                                                swellCycles: 1, gain: baseGain)
+
     /// The recipe for `summary`, `target` and `stage`: 8 s, one swell; the root (110 × (1 + target crossings) Hz, the
     /// base amplitude), the current partial (110 × (1 + summary crossings) Hz, or the root's frequency when the summary
     /// is degenerate; merged into the root when the frequencies are equal) at the base amplitude × the writhe factor, the

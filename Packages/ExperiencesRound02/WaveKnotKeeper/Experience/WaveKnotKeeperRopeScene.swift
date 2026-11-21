@@ -6,6 +6,10 @@
 // translucent sapphire cubes with bright edges. Geometry is rebuilt only when the points, gates, tier or aspect change; the pulses move by a
 // uniform. If a program fails, the scene falls back to the minimal tier's tube drawn with the shared unlit `MeshRenderer`
 // and keeps the reason; nothing here can reach the kernel.
+// Feature 326 (R02-G03-06) T-R02G0306-006 (FR-R02G0306-004; clarification Q3; research R4): the presenter's eased
+// `WaveKnotKeeperLights` scale the crossing weights (present marks by their levels, vanished marks fading where they
+// were), so the rope is rebuilt while a crossing fade runs; the target match and the win glow raise the glow shells'
+// opacity from 0.8 to 1 (`glowOpacity`), never the gain, so Reduce Flashing's cap holds.
 #if os(iOS)
 import Foundation
 import VisualCoreMath
@@ -26,6 +30,8 @@ final class WaveKnotKeeperRopeScene {
     var orbit = WaveKnotKeeperOrbit.authored
     /// Where the dragged handle would move, drawn as an ember ghost (feature 324); nil when no move is previewed.
     var preview: WaveKnotKeeperPoint?
+    /// The eased light levels (feature 326); nil draws feature 323's weights and full glow.
+    var lights: WaveKnotKeeperLights?
 
     private var registry: ResourceRegistry?
     private var ropeRenderer: ShaderMeshRenderer?
@@ -74,7 +80,7 @@ final class WaveKnotKeeperRopeScene {
         guard context.pixelWidth > 0, context.pixelHeight > 0 else { return }
         aspect = Double(context.pixelWidth) / Double(context.pixelHeight)
         let camera = WaveKnotKeeperSceneGeometry.camera(for: snapshot, aspect: aspect, orbit: orbit)
-        let key = Self.key(snapshot, tier: tier, aspect: aspect, fallback: fallbackReason != nil)
+        let key = Self.key(snapshot, tier: tier, aspect: aspect, fallback: fallbackReason != nil, lights: lights)
         if key != geometryKey { try rebuild(snapshot, tier: tier) }
         geometryKey = key
         if fallbackReason != nil {
@@ -89,15 +95,31 @@ final class WaveKnotKeeperRopeScene {
         try drawGates(snapshot, camera: camera)
     }
 
-    /// The geometry key: points, gates, tier, aspect and mode.
-    static func key(_ s: WaveKnotKeeperSceneSnapshot, tier: WaveKnotKeeperTier, aspect: Double, fallback: Bool) -> Int {
+    /// The geometry key: points, gates, tier, aspect, mode and (feature 326) the crossing lights' keys and levels, so
+    /// the rope is rebuilt while a crossing fade runs and not otherwise.
+    static func key(_ s: WaveKnotKeeperSceneSnapshot, tier: WaveKnotKeeperTier, aspect: Double, fallback: Bool,
+                    lights: WaveKnotKeeperLights? = nil) -> Int {
         var h = Hasher()
         h.combine(s.points)
         h.combine(s.gates)
         h.combine(tier.index)
         h.combine(aspect)
         h.combine(fallback)
+        if let lights {
+            let keys = lights.crossings.keys.sorted { ($0.first, $0.second) < ($1.first, $1.second) }
+            for key in keys {
+                h.combine(key)
+                h.combine(lights.crossings[key]?.level ?? 0)
+            }
+        }
         return h.finalize()
+    }
+
+    /// The glow shells' opacity: 0.8, raised to 1 by the eased target match or win glow (feature 326); 1 without
+    /// lights (feature 323's look).
+    static func glowOpacity(_ lights: WaveKnotKeeperLights?) -> Float {
+        guard let lights else { return 1 }
+        return Float(0.8 + 0.2 * min(max(max(lights.match, lights.glow), 0), 1))
     }
 
     private func rebuild(_ snapshot: WaveKnotKeeperSceneSnapshot, tier: WaveKnotKeeperTier) throws {
@@ -107,10 +129,10 @@ final class WaveKnotKeeperRopeScene {
         fallbackReason = keepFallback
         if fallbackReason == nil {
             do {
-                let rope = try WaveKnotKeeperSceneGeometry.ropeMesh(snapshot, tier: tier)
+                let rope = try WaveKnotKeeperSceneGeometry.ropeMesh(snapshot, tier: tier, lights: lights)
                 ropeRenderer = try Self.ropeRenderer(rope, fragment: ropeFragment, registry: registry)
                 if tier.glowShells > 0 {
-                    let glow = try WaveKnotKeeperSceneGeometry.glowMesh(snapshot, tier: tier)
+                    let glow = try WaveKnotKeeperSceneGeometry.glowMesh(snapshot, tier: tier, lights: lights)
                     glowRenderer = try Self.ropeRenderer(glow, fragment: ropeFragment, registry: registry)
                 }
                 handleRenderer = try Self.solidRenderer(try WaveKnotKeeperSceneGeometry.handleMesh(), registry: registry)
@@ -214,7 +236,7 @@ final class WaveKnotKeeperRopeScene {
             try glowRenderer.draw(blend: .additive) { p in
                 setCommon(p)
                 p.set("u_shell", Float(1))
-                p.set("u_opacity", Float(1))
+                p.set("u_opacity", Self.glowOpacity(lights))
             }
         }
     }
