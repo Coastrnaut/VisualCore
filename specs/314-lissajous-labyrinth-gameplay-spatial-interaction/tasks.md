@@ -86,7 +86,7 @@ tests stay short (< 10 s each).
 - [X] T-R02G0204-011 Script tests, run alone (`--name script-tests`) — Verified 2026-11-21: 2026-11-21 script-tests exit 0, run alone
 - [ ] T-R02G0204-012 {device} After ImplementationLock-100, on D1, D2 and D3: record gesture feel and touch-to-frame
   latency (SC-R02G0204-007). Not run before the lock; stays open and is carried to the device campaign.
-- [ ] T-R02G0204-013 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+- [X] T-R02G0204-013 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record — Verified 2026-11-21: 2026-11-21 converge round 1 converged (nothing appended); sealed 18 passing, 0 failed; recorded R02-G02-04 pass; T-R02G0204-012 {device} stays open
 
 ## Dependencies and parallel work
 
