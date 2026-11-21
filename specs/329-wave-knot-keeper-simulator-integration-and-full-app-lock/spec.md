@@ -25,7 +25,7 @@ Canonical overrides:
   prepares it). **Owner-only items:** none (no signing is needed for simulator builds).
 - **Shared features used:** the app's debug launch arguments (`-vcCandidates`, `-openExperience`, `-vcResetData`,
   `-vcSkipWelcome`), the app's interface test support, the registry's stored migration examples and the release checks.
-- **Model:** feature 319 (Wave Knot Keeper), itself after feature 309 (Aurora Loom). Already in place from earlier
+- **Model:** feature 319 (Lissajous Labyrinth), itself after feature 309 (Aurora Loom). Already in place from earlier
   Wave Knot Keeper features: panel play with the point picker and six direction buttons (features 323, 324), the
   round-two opening seed 0, the test-only golden code in the Release symbol list (feature 328).
 
