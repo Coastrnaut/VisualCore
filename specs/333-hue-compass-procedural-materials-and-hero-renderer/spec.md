@@ -47,8 +47,8 @@ example of an unregistered candidate.
 - Q: What exactly does the scene show, and how does it map the rules to space? → A: the compass lies in the xy-plane
   with bearing b at angle 2πb/96 counter-clockwise from +x, as in the kernel. The needle is a glass prism from the centre
   to radius 0.8 at the current bearing; 96 thin ticks sit at radius 0.95 … 1.0; the hue wheel is 24 arc segments
-  between radius 0.82 and 0.92, band h coloured by hue (h/24) at saturation 0.85 and value 1.0, each with a grayscale
-  glyph (shape h mod 4: dot, bar, triangle, ring; and ⌊h/4⌋ + 1 marks) so no band is told by colour alone; the fog is 96
+  between radius 0.82 and 0.92, band h coloured by hue (h/24) at saturation 0.85 and value 1.0 and drawn unlit (emissive), each with a
+  grayscale glyph in the segment's outer edge (radius 0.895 … 0.92) (shape h mod 4: dot, bar, triangle, ring; and ⌊h/4⌋ + 1 marks) so no band is told by colour alone; the fog is 96
   translucent prisms at radius 1.1 … 1.25, height 0.04 + 0.03 × density and brightness density/9 (luminance only); each
   probed bearing carries a pearl mark at radius 1.32 and the selection an ember mark; after the play ends the target
   bearing carries a sapphire ring. The camera is a fixed authored perspective looking down the z axis tilted 35° about x,
@@ -61,8 +61,8 @@ example of an unregistered candidate.
 - Q: How are rendered frames checked, and within which bounds? → A: the Core's CPU reference projects the needle tip,
   every band segment's centre, every fog prism's top and the probe marks through the same camera and gives the palette.
   Simulator tests render offscreen at 1,152 × 768 and check that the needle tip and each probe mark lie within 3 pixels
-  of a pixel brighter than the background by at least 0.15 in luminance, that each band segment's centre pixel is within
-  0.15 per channel of its band colour, and that the background matches night within 0.05 away from geometry. Palette:
+  of a pixel brighter than the background by at least 0.15 in luminance, that each band segment's pixel at radius 0.85 on its middle
+  angle (clear of the glyph) is within 0.15 per channel of its band colour, and that the background matches night within 0.05 away from geometry. Palette:
   night #05070F, pearl #E8E4DA, sapphire #2F6FD8, ember #E0703A, plus the 24 band colours. Impact: FR-R02G0403-006;
   SC-R02G0403-001.
 - Q: What happens on a shader failure, and what does the renderer read? → A: the presenter draws from an immutable
