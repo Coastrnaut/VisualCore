@@ -117,6 +117,14 @@ regression proves all 100 levels solvable as certified.
 - **Release builds:** test-only code (scenarios, golden descriptions) is excluded from the release configuration, which
   must still compile.
 - **Interface lookup:** every control the tests use has a stable identifier, so tests do not depend on wording.
+- **Apply with nothing pending:** Apply and Clear are hidden while nothing is pending.
+- **Apply past the allowance or the end of play:** the pending moves are sent in order; the first refused one (for
+  example the allowance spent, or the level already won by an earlier pending move) stops the rest, is announced with
+  its reason, and every remaining pending step is dropped; the moves already applied stay.
+- **Announcements of pending steps:** each stepper change announces "Ribbon r wave s pending. Apply to move." (phase
+  likewise); Apply's moves are announced as ordinary moves.
+- **Layout:** Apply and Clear sit in the panel's wrapping button rows, keep the 320-point iPhone and largest-text
+  layout of feature 306 and the 520-point readable width on iPad.
 
 ## Requirements *(mandatory)*
 
