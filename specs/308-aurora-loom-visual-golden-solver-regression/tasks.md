@@ -13,7 +13,7 @@ recorded only after every agent has reported). Commit after every task with its 
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G0108-002 Create `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomGolden.swift` (contracts/api.md: "16 frames: levels 1, 21, 41, 61, 81 at
+- [X] T-R02G0108-002 Create `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomGolden.swift` (contracts/api.md: "16 frames: levels 1, 21, 41, 61, 81 at — Verified 2026-11-20: 2026-11-20 host exit 0 (AuroraLoomGolden: 16 frames at 96 x 64, the size of the feature-303 frame checks, corrected from 768 x 512 in the artifacts; descriptions, digests, manifest, compare with a self-consistency check of each pinned entry; ribbon scene liveObjectCount counts its own mesh renderers, the programs being the host context's)
   tiers 0, 1, 2, time 0, plus the hero frame"; description JSON with sorted keys at 96 × 64, positions in 1/8 pixel,
   colours 0 … 255; SHA-256 digests; `manifest()` "{schema 1, frames: name → {description, digest}}"; `compare` "equal
   digest, or positions within one 1/8-pixel quantum and equal colours") and edit
@@ -50,7 +50,7 @@ recorded only after every agent has reported). Commit after every task with its 
 ## Phase 6: Story 4 — the checks run on every change (P2)
 
 - [ ] T-R02G0108-007 [P] [US4] Create `scripts/aurora_loom_regression.py` (agent D: host filter `AuroraLoomRegression`,
-  then `xcodebuild_package.py --only-testing` of the two simulator classes with `--max-seconds`; one summary line per
+  then `xcodebuild_package.py --only-testing` of the two simulator classes (bounded by its per-test time allowance); one summary line per
   part; non-zero exit on any failure; `--dry-run` prints the commands) with its tests in `scripts/test_scripts.py`;
   the lead adds the named step "Aurora Loom regression (host)" to `.github/workflows/ci.yml`; `--name script-tests`
   (alone) and `--name regression -- python3 scripts/aurora_loom_regression.py`

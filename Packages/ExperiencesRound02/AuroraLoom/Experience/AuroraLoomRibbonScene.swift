@@ -53,6 +53,14 @@ final class AuroraLoomRibbonScene {
     static let handleRadius = 0.08
 
     /// Records the registry and the view's aspect.
+    /// The GPU objects the scene itself holds: its mesh renderers, each with its vertex and index buffers (the shader
+    /// programs belong to the host context's shared registry); 0 after ``release()`` and before the first frame
+    /// (feature 308, R02-G01-08 T-R02G0108-002; memory regression).
+    var liveObjectCount: Int {
+        ribbonRenderers.count + gateRenderers.count + markerRenderers.count + fallbackRenderers.count
+            + controlRenderers.count
+    }
+
     func setup(_ context: RenderContext) {
         registry = context.resources
         resize(context)

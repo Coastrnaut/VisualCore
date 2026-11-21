@@ -76,7 +76,7 @@ the GPU objects; the GitHub workflow's host job runs `swift test --package-path 
   tests (solver regression and golden digests included) and adds a named step that runs the Aurora Loom regression
   filter alone, so a failure is visible by name. The local command `python3 scripts/aurora_loom_regression.py` runs the
   host regression filter and then the simulator regression test classes through `xcodebuild_package.py --only-testing`
-  with a time limit, and prints one summary line per part with pass or fail and the first failing name; its exit code is
+  bounded by that runner's per-test time allowance (180 s; it has no whole-run limit, amended during implement), and prints one summary line per part with pass or fail and the first failing name; its exit code is
   non-zero on any failure. Nothing in either is timed against the wall clock. Impact: FR-R02G0108-006, 007;
   SC-R02G0108-005.
 

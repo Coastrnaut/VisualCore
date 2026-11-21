@@ -19,5 +19,5 @@
   cycle 1 absorbs one-time caches; a count of the scene's live mesh renderers proves release independently of allocator noise.
 - **R5 — CI and the local command.** Decision: a named workflow step running `--filter AuroraLoomRegression`; a Python
   script running the host filter then `xcodebuild_package.py --only-testing` of the two simulator classes with
-  `--max-seconds`, one summary line per part. Rationale: the host job already builds the package; the script reuses the
+  its per-test time allowance (it has no whole-run limit), one summary line per part. Rationale: the host job already builds the package; the script reuses the
   time-limited runner (no open-ended waits).
