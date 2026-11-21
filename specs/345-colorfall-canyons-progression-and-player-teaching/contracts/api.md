@@ -15,7 +15,10 @@ public struct ColorfallCanyonsFailureExplanation: Sendable, Equatable { public l
     public let basin: Int; public let color: ColorfallCanyonsColor?; public let amount: Int; public let limit: Int
     public let tick: Int; public var text: String; public init?(play: ColorfallCanyonsPlay) }
 public enum ColorfallCanyonsTutorialStep: String, Sendable, Equatable, Codable { case steer, run, fill, done
-    public var text: String }
+    public var text: String
+    /// The step after an accepted action of `kind` (carve, valve, step) or the end of the level; `planEmpty` comes from
+    /// ColorfallCanyonsHints.plan of the new state.
+    public func advanced(after kind: ColorfallCanyonsRecordKind?, planEmpty: Bool, ended: Bool) -> ColorfallCanyonsTutorialStep }
 public struct ColorfallCanyonsProgress: Sendable, Equatable, Codable { /* best actions and stars per level, frontier;
     record(level:actions:smallest:) */ public static func stars(actions: Int, smallest: Int) -> Int
     public static func dailyLevel(year: Int, month: Int, day: Int) -> Int? }   // × 53
