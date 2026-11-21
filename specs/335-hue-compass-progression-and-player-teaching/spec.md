@@ -106,6 +106,8 @@ allowance without affecting progress.
   best selection instead.
 - **A locked level or an impossible date:** refused with a named reason.
 - **Practice and daily results:** never open levels; practice never awards stars.
+- **A daily level still locked in the campaign:** playable as the daily level, without opening it.
+- **Tutorial in practice or daily mode:** shown on levels 1 … 3 in every mode, with the same steps.
 
 ## Requirements *(mandatory)*
 
