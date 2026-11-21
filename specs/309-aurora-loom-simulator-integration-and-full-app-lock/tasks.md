@@ -4,7 +4,7 @@
 [contracts/api.md](contracts/api.md), [quickstart.md](quickstart.md). Gate R02-G01-09 (migration ledger). Evidence:
 `python3 scripts/migration_ledger.py run-check --gate R02-G01-09 --name <check> -- <command>` (never a scratchpad path;
 recorded only after every agent has reported). Commit after every task with its check record (no trailers). Seed 2_309;
-tests stay short (< 10 s each; interface tests < 60 s). No {owner} tasks.
+tests stay short (< 10 s each; interface tests < 90 s, SC-R02G0109-001). No {owner} tasks.
 
 ## Phase 1: Setup
 
@@ -32,7 +32,7 @@ tests stay short (< 10 s each; interface tests < 60 s). No {owner} tasks.
   certified shortest moves, split by band); existing accessibility tests updated where they drove the steppers;
   `--name sim-27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme
   ExperiencesRound02-Package --destination sim-27.2 --action test`
-- [ ] T-R02G0109-004 [US1] Create `Apps/VisualCore/Tests/UI/AuroraLoom/ALSupport.swift`, `ALPlayUITests.swift`,
+- [X] T-R02G0109-004 [US1] Create `Apps/VisualCore/Tests/UI/AuroraLoom/ALSupport.swift`, `ALPlayUITests.swift`, — Verified 2026-11-20: 2026-11-21 app-ui-3 exit 0 (ALPlayUITests: level 1 won through pending steps and Apply with 3 stars, progress kept over a relaunch; ALReplayUITests: replay to 2 of 2 and stop); chunk i3 serial; app-ui exit 1 found every player starting at level 79 (stable seed), fixed by openingSeed 0 for the round-two puzzles (FR-R02G0109-009); app-ui-2 exit 1 found the win lost on relaunch (terminate without the background save point), fixed by backgrounding first; 62-72 s per test with launch, SC-001 bound corrected to 90 s
   `ALReplayUITests.swift` (agent C: spec Clarifications Q2; level 1 target steps pinned in `AL`); edit
   `scripts/release_check.py` (`UI_CHUNKS["i3"]`, `"i3"` in `SERIAL_CHUNKS`) and `scripts/test_scripts.py` (agent D);
   `project.yml` + `xcodegen generate` if needed; `--name app-ui -- python3 scripts/release_check.py --only

@@ -340,7 +340,8 @@ final class AppModel {
                                       reduceMotion: preferences.reduceMotion,
                                       reduceFlashing: preferences.reduceFlashing,
                                       colorVision: preferences.colorVision ?? .standard)
-        let request = ExperienceOpenRequest(id: id, seed: Self.seed(for: id), snapshot: stored,
+        let seed = registration.openingSeed ?? Self.seed(for: id)
+        let request = ExperienceOpenRequest(id: id, seed: seed, snapshot: stored,
                                             refusedSnapshotFails: true) { registration.make(launch) }
         switch await session.open(request) {
         case .running, .suspended:

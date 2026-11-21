@@ -270,14 +270,18 @@ UI_CHUNKS = {
     "e3": ["VPLCanvasUITests", "VPLRecoveryUITests", "VPLReleaseUITests"],   # features 170, 171 (T-A23-505, 506, 608)
     "f3": ["GBLRunUITests", "GBLReleaseUITests"],   # feature 177 A24-P05 (T-A24-507), feature 178 A24-P06 (T-A24-608)
     "h3": ["ECReleaseUITests"],   # feature 185 A25-P06 (T-A25-608)
+    "i3": ["ALPlayUITests", "ALReplayUITests"],   # feature 309 R02-G01-09 (T-R02G0109-004)
 }
 # Chunks that run on one simulator (feature 066 A08-P06): the oscilloscope draws every frame on the main thread, and
 # two parallel clones competing for the host's CPU kept XCTest's idle wait from settling (single tests took 60–89 s in
 # parallel, 23–41 s serially, with the same total time).
-SERIAL_CHUNKS = {"p2", "q2", "r2", "s2", "t2", "u2", "v2", "w2", "x2", "y2", "z2", "a3", "b3", "c3", "d3", "e3", "f3", "h3"}
+SERIAL_CHUNKS = {"p2", "q2", "r2", "s2", "t2", "u2", "v2", "w2", "x2", "y2", "z2", "a3", "b3", "c3", "d3", "e3", "f3", "h3", "i3"}
 UNIFIED_LIMIT = 590       # seconds, below the ten-minute limit of one foreground command
 RELEASE_FORBIDDEN = ["DebugLaunch", "DebugExperience", "DebugInventory", "ScenarioLaunch", "ScenarioHostView",
-                     "vcDamageStat", "vcCandidates", "vc_ci_angle_standin"]
+                     "vcDamageStat", "vcCandidates", "vc_ci_angle_standin",
+                     # Feature 309 (R02-G01-09): test-only symbols of Aurora Loom that exist only under
+                     # DEBUG || VISUALCORE_AUTOMATION.
+                     "AuroraLoomGolden", "acceptanceScenarios"]
 
 
 def registered_ids(root: Path = ROOT) -> list[str]:

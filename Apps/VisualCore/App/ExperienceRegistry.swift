@@ -64,6 +64,10 @@ struct ExperienceRegistration: Sendable {
     let migrationProblems: @Sendable () async -> [String]
     /// The controls of the experience's core, for checking its scenario manifest.
     let controls: [ExperienceControl]
+    /// The seed a fresh open passes instead of the id's stable seed (feature 309, R02-G01-09): the round-two puzzles
+    /// map a seed to their opening level (`seed % 100 + 1`), so a player starts at level 1 with seed 0. Nil keeps the
+    /// stable seed of ``AppModel/seed(for:)``.
+    var openingSeed: UInt64?
     #if DEBUG || VISUALCORE_AUTOMATION
     /// The scenarios the verification runner plays for this experience (feature 195); nil when it has none yet,
     /// so that it cannot be verified.
@@ -538,6 +542,8 @@ extension ExperienceRegistry {
                 reduceMotion: launch.reduceMotion.resolved(system: system.reduceMotion),
                 reduceFlashing: launch.reduceFlashing.resolved(system: system.dimFlashingLights))
         }
+        // Seed 0 opens certified level 1 with only level 1 open (feature 309; the stable seed opened level 79).
+        registration.openingSeed = 0
         #if DEBUG || VISUALCORE_AUTOMATION
         registration.scenarioManifest = AuroraLoomExperienceCore.manifest(for: id)
         #endif
@@ -555,6 +561,8 @@ extension ExperienceRegistry {
                 reduceMotion: launch.reduceMotion.resolved(system: system.reduceMotion),
                 reduceFlashing: launch.reduceFlashing.resolved(system: system.dimFlashingLights))
         }
+        // Seed 0 opens certified level 1 (feature 309; the stable seed opened level 35).
+        registration.openingSeed = 0
         #if DEBUG || VISUALCORE_AUTOMATION
         registration.scenarioManifest = LissajousLabyrinthExperienceCore.manifest(for: id)
         #endif

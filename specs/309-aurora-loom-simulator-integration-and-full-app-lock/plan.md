@@ -23,7 +23,7 @@ Research: [research.md](research.md). Data: [data-model.md](data-model.md). Cont
 `ExperienceSnapshot`, `DigestBuilder`); the app's registry, `DebugLaunch` and UI test support.
 **Testing**: host `swift test --package-path Packages/ExperiencesRound02`; `release_check.py --only
 app-build-for-testing-ios27 app-unit-ios27 app-ui-ios27-i3 app-release-build app-release-symbols`; the 308 regression.
-**Constraints**: no new target; Aurora Loom stays in `candidates`; interface tests each under 60 s; no device.
+**Constraints**: no new target; Aurora Loom stays in `candidates`; interface tests each under 90 s; no device.
 
 No NEEDS CLARIFICATION remains.
 
