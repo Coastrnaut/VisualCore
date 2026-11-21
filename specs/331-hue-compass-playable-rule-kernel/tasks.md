@@ -58,7 +58,7 @@ recorded only after every agent has reported). Commit after every task with its 
 - [X] T-R02G0401-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-21: 2026-11-21 reference-1 exit 0
 - [X] T-R02G0401-010 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-21: 2026-11-21 reference-2 exit 0: 7 of 7 with chunk 1
 - [X] T-R02G0401-011 Script tests, run alone (`--name script-tests`) — Verified 2026-11-21: 2026-11-21 script-tests exit 0, run alone
-- [ ] T-R02G0401-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+- [X] T-R02G0401-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record — Verified 2026-11-21: 2026-11-21 converge round 1 appended T-R02G0401-013 (selection in contract and data model), implemented; round 2 converged; sealed 16 passing checks, 0 failed attempts; recorded R02-G04-01 pass (.autonomy/migration/evidence/R02-G04-01.json); validators PASS
 
 ## Dependencies and parallel work
 
