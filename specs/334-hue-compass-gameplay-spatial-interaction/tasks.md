@@ -63,3 +63,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 001 → 002 (agent B) → {003 (agent C), 004 (agent D)} → 005 (lead; agent E writes the wiring tests) → 006 … 010, 012.
 011 stays open until device testing. Shared files (presenter, scene, controls, docs) stay with the lead. MVP: Stories 1–3.
+
+## Phase 7: Convergence
+
+- [ ] T-R02G0404-013 Add `cancel()` to `Packages/ExperiencesRound02/HueCompass/Core/HueCompassGestureController.swift` (drops the pointers and any swipe, sends nothing, keeps the orbit), use it in `HueCompassPresenter.cancelPointers()` instead of replacing the controller, with a host test in `HueCompassGestureControllerTests.swift` (cancel mid-swipe and mid-orbit: no action, orbit kept, next gesture works), per FR-R02G0404-003 / clarification Q3 (partial); `--name host-5 -- swift test --package-path Packages/ExperiencesRound02 --filter HueCompassGestureControllerTests` and the wiring tests on sim-27.2 (`--name sim-27-2`)
