@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-21
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G04-03 (migration ledger, game feature of experience R02-G04) · ID namespace FR-R02G0403-###,
 SC-R02G0403-###, T-R02G0403-###
@@ -28,6 +28,60 @@ Canonical overrides:
 - **Shared features used:** R02-F05 (generated meshes), R02-F07 (emissive and glow passes), R02-F10 (quality tiers) and
   the shared custom-shader mesh renderer added at R02-G01-03, through the existing VisualCore packages; the kernel and
   certified levels of R02-G04-01 and -02.
+
+## Clarifications
+
+### Session 2026-11-21
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time. Facts checked in
+code (read-only, 2026-11-21): Wave Knot Keeper's experience (R02-G03-03 … 10) is the pattern in this package — a Core
+adapter, an immutable scene snapshot, a CPU projection reference, GLSL sources in the Core, an iOS-only experience target
+with presenter, scene and controls, a scenario manifest with 80 acceptance scenarios, a registration with content facts
+(`Catalog/registrations.json`: capabilities, quality tiers, palette, content, manifest, permissions, summary), and the
+public `ShaderMeshRenderer`; the Hue Compass kernel provides the level, play, wheel, clues and the certified catalog with
+its pinned digest (fcb10a90…8b15); the archive holds the rows R2-G04-QA-001 … 080 and the visual design (prismatic glass
+vectors in luminous spectral fog, instanced translucent prisms, analytic fog depth, a full-spectrum wheel with grayscale
+evidence glyphs, tiers that change only tessellation and glow); `AppModelTests` uses `r02-g04.hue-compass` as its
+example of an unregistered candidate.
+
+- Q: What exactly does the scene show, and how does it map the rules to space? → A: the compass lies in the xy-plane
+  with bearing b at angle 2πb/96 counter-clockwise from +x, as in the kernel. The needle is a glass prism from the centre
+  to radius 0.8 at the current bearing; 96 thin ticks sit at radius 0.95 … 1.0; the hue wheel is 24 arc segments
+  between radius 0.82 and 0.92, band h coloured by hue (h/24) at saturation 0.85 and value 1.0, each with a grayscale
+  glyph (shape h mod 4: dot, bar, triangle, ring; and ⌊h/4⌋ + 1 marks) so no band is told by colour alone; the fog is 96
+  translucent prisms at radius 1.1 … 1.25, height 0.04 + 0.03 × density and brightness density/9 (luminance only); each
+  probed bearing carries a pearl mark at radius 1.32 and the selection an ember mark; after the play ends the target
+  bearing carries a sapphire ring. The camera is a fixed authored perspective looking down the z axis tilted 35° about x,
+  fitting the compass's bounding circle of radius 1.4 (swipe and orbit come in R02-G04-04). The fog drifts slowly
+  (presentation time only). Nothing drawn is consulted by the rules. Impact: FR-R02G0403-001, 002, 006.
+- Q: What do the three quality tiers change? → A: `level-0` (richest): needle prism with 12 facets, 3 fog layers, 2 glow
+  shells; `level-1`: 8 facets, 2 fog layers, 1 glow shell; `level-2` (the design's "Tier 0, D3-safe"): 4 facets, 1 fog
+  layer, no glow. Bearings, colours, glyphs and marks sit at the same places at every tier. Levels are ordered richest
+  first; the presenter logs each tier change with its reason. Impact: FR-R02G0403-004; SC-R02G0403-001.
+- Q: How are rendered frames checked, and within which bounds? → A: the Core's CPU reference projects the needle tip,
+  every band segment's centre, every fog prism's top and the probe marks through the same camera and gives the palette.
+  Simulator tests render offscreen at 1,152 × 768 and check that the needle tip and each probe mark lie within 3 pixels
+  of a pixel brighter than the background by at least 0.15 in luminance, that each band segment's centre pixel is within
+  0.15 per channel of its band colour, and that the background matches night within 0.05 away from geometry. Palette:
+  night #05070F, pearl #E8E4DA, sapphire #2F6FD8, ember #E0703A, plus the 24 band colours. Impact: FR-R02G0403-006;
+  SC-R02G0403-001.
+- Q: What happens on a shader failure, and what does the renderer read? → A: the presenter draws from an immutable
+  `HueCompassSceneSnapshot` (bearing, offset, fog, tolerances, clues, selection, stage, frame time, and the target only
+  when the stage is won, failed or result) made by the adapter; it never holds the kernel. If a program fails to compile
+  or link, the scene draws the level-2 geometry unlit with the shared unlit mesh renderer, keeps `fallbackReason` and
+  keeps running; tier changes go to its `tierLog`. Reduce Motion holds the fog drift at time 0; Reduce Flashing caps the
+  glow gain. Impact: FR-R02G0403-003, 007; SC-R02G0403-002.
+- Q: How is the experience registered and what does the adapter accept? → A: `Catalog/registrations.json` gains
+  `r02-g04.hue-compass` (capabilities of at most 40 characters, tiers `level-0` … `level-2`, the four palette colours, the
+  scenario manifest `Packages/ExperiencesRound02/HueCompass/scenario-manifest.json`, no permissions, a summary of at
+  most 300 characters, content facts: 100 levels and the pinned catalog digest); `project.yml` and the app's experience
+  registry link `HueCompassExperience` as a candidate (`available: false` until X-R02-G04), opening at seed 0 (level 1);
+  `AppModelTests` switches its unregistered example to the next round-two game (`r02-g05.colorfall-canyons`). The adapter
+  (`HueCompassExperienceCore`) prepares certified level (seed mod 100) + 1 and accepts `compass.turn [steps]` (whole,
+  −48 … 48, not 0), `compass.probe`, `compass.select [bearing, band]`, `play.undo`, `play.redo` and `level.next`; the kernel
+  refuses everything out of range or out of stage; its digest is the level number and the play's fingerprint (never the
+  record history, so undo restores the earlier digest); snapshot schema 1 `{level, records}`. Impact: FR-R02G0403-005,
+  008, 009; SC-R02G0403-004.
 
 ## User Scenarios & Testing *(mandatory)*
 
