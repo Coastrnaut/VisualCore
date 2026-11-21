@@ -21,7 +21,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 3: Story 2 — the picture does not drift (P1)
 
-- [ ] T-R02G0408-003 [US2] Create `Packages/ExperiencesRound02/HueCompass/Core/HueCompassGolden.swift` (DEBUG or VISUALCORE_AUTOMATION; "16 frames:
+- [X] T-R02G0408-003 [US2] Create `Packages/ExperiencesRound02/HueCompass/Core/HueCompassGolden.swift` (DEBUG or VISUALCORE_AUTOMATION; "16 frames: — Verified 2026-11-21: 2026-11-21 HueCompassGolden (16 code-computed frames), golden-frames.json generated with HUE_COMPASS_WRITE_GOLDEN=1 (37,890 bytes, 16 digests), HueCompassGolden in RELEASE_FORBIDDEN; proven by host-2 exit 0
   levels 1, 21, 41, 61, 81 at tiers 0 … 2 at time 0 after the witness probes, plus the hero frame; at 1,152 × 768 with the
   authored camera: the needle tip, every band segment's colour sample point with its band colour, every probe mark
   centre, the selection mark and target ring when present, the night, pearl, ember and sapphire colours; positions rounded to 1/8 px; colours 8-bit sRGB; JSON with sorted

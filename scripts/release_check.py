@@ -293,7 +293,9 @@ RELEASE_FORBIDDEN = ["DebugLaunch", "DebugExperience", "DebugInventory", "Scenar
                      # Feature 318 (R02-G02-08): Lissajous Labyrinth's golden frames, test builds only.
                      "LissajousLabyrinthGolden",
                      # Feature 328 (R02-G03-08): Wave Knot Keeper's golden frames, test builds only.
-                     "WaveKnotKeeperGolden"]
+                     "WaveKnotKeeperGolden",
+                     # Feature 338 (R02-G04-08): Hue Compass's golden frames, test builds only.
+                     "HueCompassGolden"]
 
 
 def registered_ids(root: Path = ROOT) -> list[str]:
