@@ -9,6 +9,11 @@
 // distance and released while playing, sends one `point.move`; two fingers orbit (presentation only); a double tap on
 // empty space or `resetView()` returns to the authored view. The drag's candidate is drawn as an ember ghost handle;
 // a refused move is shown with its reason.
+// Feature 325 (R02-G03-05) T-R02G0305-005 (FR-R02G0305-001 … 005): the mirror carries the tutorial instruction, the hint
+// revealed so far (`showHint(port:)` reveals the next of three levels for the current play and tells the core a hint
+// was shown; any change of the play hides it), the failure explanation, the mode, the open levels with their stars and
+// the goal (allowance and certified shortest); `retry` starts the level again in its mode, and the daily level is
+// chosen from the local calendar date read here (`playDaily(port:date:)`), never in the core.
 #if os(iOS)
 import Foundation
 import SwiftUI
@@ -43,6 +48,20 @@ final class WaveKnotKeeperMirror {
     var targetWrithe = 0
     /// The text of the last refused change, if any.
     var message: String?
+    /// The tutorial instruction; nil when the tutorial is done (feature 325).
+    var instruction: String?
+    /// The hint level revealed (0 … 3) and its text (feature 325).
+    var hintLevel = 0
+    var hintText: String?
+    /// The failure explanation while the play has failed (feature 325).
+    var failureText: String?
+    /// The mode (feature 325).
+    var mode: WaveKnotKeeperMode = .campaign
+    /// The highest open level and the stars of each solved level (feature 325).
+    var frontier = 1
+    var stars: [Int: Int] = [:]
+    /// The certified shortest solution length of the current level (feature 325).
+    var shortest = 0
 }
 
 /// One entry of the tier log: the tier drawn and why it changed.
@@ -66,6 +85,12 @@ final class WaveKnotKeeperPresenter: ExperiencePresenter {
     private(set) var lastSnapshot: WaveKnotKeeperSceneSnapshot?
     /// The gesture controller (feature 324): arbitration, drags, orbit and selection.
     private(set) var gestures = WaveKnotKeeperGestureController()
+    /// The latest core described (feature 325): hints and retry read it.
+    private(set) var latestCore: WaveKnotKeeperExperienceCore?
+    /// The play the shown hint belongs to (level, mode and fingerprint); nil when no hint is shown (feature 325).
+    private var hintKey: String?
+    /// The date whose daily level is being played, so Retry restarts that level after midnight too (feature 325).
+    private(set) var dailyDate: DateComponents?
 
     init(reduceMotion: Bool, reduceFlashing: Bool) {
         self.reduceMotion = reduceMotion
@@ -155,7 +180,86 @@ final class WaveKnotKeeperPresenter: ExperiencePresenter {
         return snapshot.points[point].moved(WaveKnotKeeperDirection.allCases[index])
     }
 
+    // MARK: Teaching and progression (feature 325)
+
+    /// The key of the play a hint belongs to: level, mode and fingerprint.
+    private static func hintKey(_ core: WaveKnotKeeperExperienceCore) -> String {
+        "\(core.levelNumber)/\(core.mode)/\(core.play.fingerprint)"
+    }
+
+    /// Reveals the next hint level (up to 3) for the current play and tells the core that a hint was shown
+    /// (`tutorial.hint`, which only advances the tutorial); nothing when the play has ended.
+    func showHint(port: ExperienceActionPort) {
+        guard let core = latestCore else { return }
+        let key = Self.hintKey(core)
+        let next = hintKey == key ? min(mirror.hintLevel + 1, 3) : 1
+        guard let hint = core.hint(level: next) else {
+            hintKey = nil
+            mirror.hintLevel = 0
+            mirror.hintText = nil
+            return
+        }
+        hintKey = key
+        mirror.hintLevel = next
+        mirror.hintText = hint.text
+        if core.tutorial == .signature { _ = port.send("tutorial.hint", []) }
+    }
+
+    /// Ends the tutorial of the current level.
+    func dismissTutorial(port: ExperienceActionPort) {
+        send("tutorial.dismiss", [], port: port)
+    }
+
+    /// The action and values that start the current level again in its mode: `mode.practice` in practice, the daily
+    /// date's `mode.daily` in daily mode, `level.select` of the level in campaign.
+    func retryAction(date: DateComponents) -> (control: String, values: [Double]) {
+        guard let core = latestCore else { return ("mode.campaign", []) }
+        switch core.mode {
+        case .practice: return ("mode.practice", [])
+        case .daily: return ("mode.daily", Self.dateValues(dailyDate ?? date))
+        case .campaign: return ("level.select", [Double(core.levelNumber)])
+        }
+    }
+
+    /// Starts the current level again in its mode; in daily mode with the date that opened it (today's local date
+    /// when none is known).
+    @discardableResult
+    func retry(port: ExperienceActionPort, date: DateComponents = WaveKnotKeeperPresenter.today()) -> ActionResult {
+        let action = retryAction(date: date)
+        return send(action.control, action.values, port: port)
+    }
+
+    /// Plays the daily level of `date` (the local calendar date by default; the core never reads a clock).
+    @discardableResult
+    func playDaily(port: ExperienceActionPort, date: DateComponents = WaveKnotKeeperPresenter.today()) -> ActionResult {
+        let result = send("mode.daily", Self.dateValues(date), port: port)
+        if result.isAccepted { dailyDate = date }
+        return result
+    }
+
+    /// The local calendar date now, as Gregorian year, month and day in the current time zone.
+    static func today() -> DateComponents {
+        Calendar(identifier: .gregorian).dateComponents(in: .current, from: Date())
+    }
+
+    /// The values of `mode.daily` for `date`: year, month, day (0 for a missing part, which the engine refuses).
+    static func dateValues(_ date: DateComponents) -> [Double] {
+        [Double(date.year ?? 0), Double(date.month ?? 0), Double(date.day ?? 0)]
+    }
+
     func describe(_ core: WaveKnotKeeperExperienceCore) -> String {
+        latestCore = core
+        if let key = hintKey, key != Self.hintKey(core) {
+            hintKey = nil
+            mirror.hintLevel = 0
+            mirror.hintText = nil
+        }
+        mirror.instruction = core.tutorial == .done ? nil : core.tutorial.text
+        mirror.failureText = core.failureExplanation?.text
+        mirror.mode = core.mode
+        mirror.frontier = core.progress.frontier
+        mirror.stars = core.progress.solved.mapValues(\.stars)
+        mirror.shortest = core.certifiedShortest
         let play = core.play
         let snapshot = core.snapshot(time: 0)
         mirror.pointCount = play.points.count
@@ -176,15 +280,21 @@ final class WaveKnotKeeperPresenter: ExperiencePresenter {
         if let selected = snapshot.selected { text += "Point \(selected + 1) selected. " }
         text += "Moves \(play.spent) of \(play.level.allowance). "
         switch play.stage {
-        case .won: text += "The knot matches."
-        case .failed: text += "Out of moves."
+        case .won:
+            text += "The knot matches."
+            if core.mode != .practice {
+                let stars = WaveKnotKeeperProgress.stars(moves: play.spent, shortest: core.certifiedShortest)
+                text += " \(stars) of 3 stars."
+            }
+        case .failed:
+            text += "Out of moves. " + (core.failureExplanation?.text ?? "")
         default: break
         }
         return text
     }
 
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
-        AnyView(WaveKnotKeeperControls(port: port, mirror: mirror, resetView: { [weak self] in self?.resetView() }))
+        AnyView(WaveKnotKeeperControls(port: port, mirror: mirror, presenter: self))
     }
 }
 #endif

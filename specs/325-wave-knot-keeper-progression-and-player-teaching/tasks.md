@@ -49,7 +49,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks.
   `Packages/ExperiencesRound02/WaveKnotKeeper/CoreTests/WaveKnotKeeperExperienceCoreTests.swift` updates (conformance; actions; migration of a schema-1 payload;
   undo restores the digest with the tutorial advanced); `--name host-3 -- swift test --package-path
   Packages/ExperiencesRound02 --filter 'WaveKnotKeeperExperienceCoreTests|WaveKnotKeeperScenarios|WaveKnotKeeperRendererPurity|WaveKnotKeeperPanelWin'`
-- [ ] T-R02G0305-005 [US1] [US2] [US3] [US4] Edit `Packages/ExperiencesRound02/WaveKnotKeeper/Experience/WaveKnotKeeperPresenter.swift` and
+- [X] T-R02G0305-005 [US1] [US2] [US3] [US4] Edit `Packages/ExperiencesRound02/WaveKnotKeeper/Experience/WaveKnotKeeperPresenter.swift` and — Verified 2026-11-21: 2026-11-21 sim-27 exit 0 (iOS 27.2, teaching tests 6/6)
   `Packages/ExperiencesRound02/WaveKnotKeeper/Experience/WaveKnotKeeperControls.swift` (instruction with Dismiss; Hint revealing the next level, reset after any
   change of the play; failure explanation with Undo and Retry; level picker of open levels with bands and stars;
   Campaign / Daily (local calendar date) / Practice; the panel body split into small sections) and create
