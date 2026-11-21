@@ -28,7 +28,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
   keys; SHA-256"; manifest; compare with the one-quantum fallback and the pinned-digest self-check), generate
   `Packages/ExperiencesRound02/HueCompass/golden-frames.json` with `HUE_COMPASS_WRITE_GOLDEN=1`, and add `HueCompassGolden` to
   `RELEASE_FORBIDDEN` in `scripts/release_check.py`
-- [ ] T-R02G0408-004 [P] [US2] Create `Packages/ExperiencesRound02/HueCompass/CoreTests/HueCompassRegressionGoldenTests.swift` (agent B: every frame's
+- [X] T-R02G0408-004 [P] [US2] Create `Packages/ExperiencesRound02/HueCompass/CoreTests/HueCompassRegressionGoldenTests.swift` (agent B: every frame's — Verified 2026-11-21: 2026-11-21 host-2 exit 0: HueCompassRegressionGoldenTests 8/8 (every frame matches its pinned entry; pinned digests self-check; moved, recoloured, missing, unknown, wrong-schema, unreadable and hand-edited entries named; one-quantum move accepted; file rewritten only with the switch)
   recomputed description matches its pinned one; each pinned digest equals the digest of its pinned description; a
   moved position beyond a quantum, a changed colour, a missing frame, an unknown frame, schema ≠ 1 and a hand-edited
   description all fail naming the frame; the file is rewritten only with the switch); `--name host-2 -- swift test
