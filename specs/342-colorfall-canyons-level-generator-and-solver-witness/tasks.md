@@ -76,3 +76,7 @@ run uses). Fixture seed 2_342; tests stay short (< 10 s each).
 001 → 002 (lead) → 003 solver (lead) → {003 tests (agent A), 004 generator (lead) → 004 tests (agent C), 005 (agent B)} →
 006 (lead) → 007 … 012. Agent B codes against the solution contract with hand-made solutions; shared files (error,
 manifest, difficulty, solver, generator, catalog tests, witness files, docs) stay with the lead. MVP: Story 1.
+
+## Phase 7: Convergence
+
+- [ ] T-R02G0502-013 Document `ColorfallCanyonsGenerator.levelID(_:)`, `ColorfallCanyonsWitness.Totals`, `ColorfallCanyonsWitness.digest(_:)`, the witness's stored fields and that `decode` re-solves at the band's search depth in `specs/342-colorfall-canyons-level-generator-and-solver-witness/contracts/api.md` and `specs/342-colorfall-canyons-level-generator-and-solver-witness/data-model.md` per plan: contracts (partial)
