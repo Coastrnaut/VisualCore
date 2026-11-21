@@ -43,7 +43,8 @@ Hue Compass as the pattern (Core with level, play, records with previous and nex
   level has 1 … 3 springs (each one colour, release 1 … 4 units per tick, supply 1 … 999 units, valve open or closed at
   the start), 1 … 4 basins (capacity 1 … 999, required fill 0 … capacity, a required mix of per-mille shares per colour
   summing to 1,000 with a tolerance 0 … 500 per mille, and for protected basins a tolerated wrong-colour amount 0 … 999,
-  wrong meaning a colour whose required share is 0), at least one drain, a flow rate 1 … 8 units per tick, an action
+  wrong meaning a colour whose required share is 0; at least one basin has a required fill above 0), at least one
+  drain, a flow rate 1 … 8 units per tick, an action
   budget 1 … 30 and a tick limit 1 … 3,600 (60 s at the fixed 1/60 s tick). Impact: FR-R02G0501-001; SC-R02G0501-001.
 - Q: How does fluid move on a tick, exactly? → A: synchronously from the start-of-tick state, in this order: (1) every
   open or spring cell with volume V > 0 whose downhill neighbour exists sends r = min(V, flow rate) units to it; the
