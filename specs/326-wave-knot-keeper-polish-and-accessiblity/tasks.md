@@ -42,7 +42,7 @@ ImplementationLock-100.
 
 ## Phase 4: Story 3 — sound and haptics (P2)
 
-- [ ] T-R02G0306-005 [P] [US3] Create `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperSoundRecipe.swift` ("root 110 Hz × (1 + target crossings),
+- [X] T-R02G0306-005 [P] [US3] Create `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperSoundRecipe.swift` ("root 110 Hz × (1 + target crossings), — Verified 2026-11-21: 2026-11-21 host-3 exit 0: WaveKnotKeeperSoundRecipeTests 5/5 (equal and differing recipes, exact partials, valid for all 100 levels in every stage)
   partial 110 Hz × (1 + crossings), a fifth above the root, gains 0.6 … 1.0 of a base by |writhe − target writhe|, won adds
   an octave, failed halves the gains, 8 s") with `Packages/ExperiencesRound02/WaveKnotKeeper/CoreTests/WaveKnotKeeperSoundRecipeTests.swift` (equal for equal
   summary, target and stage; differs for a crossings or stage change; every recipe valid for `AmbientLoopRecipe`'s bounds
