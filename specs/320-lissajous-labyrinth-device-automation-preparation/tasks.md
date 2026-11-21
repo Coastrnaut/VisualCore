@@ -34,7 +34,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
 
 - [X] T-R02G0210-005 Docs: `docs/architecture/lissajous-labyrinth.md` (device preparation), — Verified 2026-11-21: 2026-11-21 round02-host exit 0; release step device-rows-r02-g02 passes; docs/architecture/lissajous-labyrinth.md device preparation section, Packages/ExperiencesRound02/README.md, docs/automatedtesting.md
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
-- [ ] T-R02G0210-006 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G0210-006 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-21: 2026-11-21 run-check rendering-27, rendering-26, experiences, host-full exit=0
   `--name host-full` (nothing in the app changes)
 - [ ] T-R02G0210-007 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G0210-008 Reference regression chunk 2 (`--name reference-2`)
