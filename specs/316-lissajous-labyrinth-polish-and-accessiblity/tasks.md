@@ -49,8 +49,9 @@ ImplementationLock-100.
   `Packages/ExperiencesRound02/LissajousLabyrinth/Experience/LissajousLabyrinthThreadScene.swift` (checkpoint, obstacle and glow levels from the presenter's lights),
   `Packages/ExperiencesRound02/LissajousLabyrinth/Experience/LissajousLabyrinthControls.swift` (labels and values of every control, Sound toggle, wrapping rows at
   accessibility sizes, 520-point width on iPad) and create `Packages/ExperiencesRound02/LissajousLabyrinth/ExperienceTests/LissajousLabyrinthAccessibilityTests.swift`
-  (agent C: recorded announcements and haptics through the presenter; level 1 won with the steppers and Apply; the sound
-  state table; labels and values; lights fade under Reduce Flashing in drawn frames; Reduce Motion stills identical);
+  (agent C: recorded announcements and haptics through the presenter; level 1 won with the steppers and Apply; a gesture
+  preview is not announced, its released action is; the sound state table, including a player that fails to start (the
+  choice stays on, the game is unaffected); labels and values; lights fade under Reduce Flashing in drawn frames; Reduce Motion stills identical);
   `--name sim-27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme
   ExperiencesRound02-Package --destination sim-27.2 --action test`
 
