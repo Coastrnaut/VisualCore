@@ -58,12 +58,12 @@ public struct HueCompassHint: Sendable, Equatable {
     public static func octantName(of bearing: Int) -> String { octantNames[octant(of: bearing)] }
 
     /// The hint in plain English (clarification Q1), with b, h the bearing and band and o the bearing's octant name:
-    /// - select: "Every clue now points to one place: select", "Select near o", "Select bearing b with band h"
+    /// - select: "Every clue now points to one place: select", "Select near o", "Select bearing b with band h" (h shown 1 … 24)
     /// - probe: "Probe once more", "Probe toward o", "Turn to bearing b and probe"
     /// - guess: "Best guess: select", "Best guess: select near o", "Best guess: select bearing b with band h"
     public var text: String {
         let octant: String = Self.octantName(of: bearing)
-        let selected: String = "bearing \(bearing) with band \(band ?? 0)"
+        let selected: String = "bearing \(bearing) with band \((band ?? 0) + 1)"
         switch (kind, level) {
         case (.select, 1): return "Every clue now points to one place: select"
         case (.select, 2): return "Select near " + octant
@@ -215,7 +215,7 @@ public struct HueCompassFailureExplanation: Sendable, Equatable {
 
     /// The explanation (clarification Q5), each followed by " Retry the level." (probes and selections cannot be
     /// undone):
-    /// - selection: "The target was bearing T (band B). Your selection was d bearings and e bands away; the tolerances
+    /// - selection: "The target was bearing T (band B, shown 1 … 24). Your selection was d bearings and e bands away; the tolerances
     ///   are t and u."
     /// - probes: "The last unit went to a probe; keep one for the selection."
     public var text: String {
@@ -224,7 +224,7 @@ public struct HueCompassFailureExplanation: Sendable, Equatable {
         case .probes:
             return "The last unit went to a probe; keep one for the selection." + retry
         case .selection:
-            return "The target was bearing \(target) (band \(targetBand)). Your selection was \(bearingDistance ?? 0) "
+            return "The target was bearing \(target) (band \(targetBand + 1)). Your selection was \(bearingDistance ?? 0) "
                 + "bearings and \(bandDistance ?? 0) bands away; the tolerances are \(bearingTolerance) and "
                 + "\(bandTolerance)." + retry
         }

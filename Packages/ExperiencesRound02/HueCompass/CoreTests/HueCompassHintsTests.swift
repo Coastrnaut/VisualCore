@@ -109,7 +109,7 @@ struct HueCompassHintsTests {
         let selection: HueCompassSelection = play.selection ?? HueCompassSelection(bearing: -1, band: -1)
         let bRaw: Int = ((selection.bearing - level.target) % 96 + 96) % 96
         let nRaw: Int = ((selection.band - level.targetBand) % 24 + 24) % 24
-        return "The target was bearing " + String(level.target) + " (band " + String(level.targetBand)
+        return "The target was bearing " + String(level.target) + " (band " + String(level.targetBand + 1)
             + "). Your selection was " + String(min(bRaw, 96 - bRaw)) + " bearings and " + String(min(nRaw, 24 - nRaw))
             + " bands away; the tolerances are " + String(level.bearingTolerance) + " and "
             + String(level.bandTolerance) + ". Retry the level."
@@ -343,9 +343,9 @@ struct HueCompassHintsTests {
             HueCompassHint(level: 3, kind: .guess, bearing: 13, band: 0, consistent: 4).text,
         ]
         let expected: [String] = [
-            "Every clue now points to one place: select", "Select near north", "Select bearing 24 with band 7",
+            "Every clue now points to one place: select", "Select near north", "Select bearing 24 with band 8",
             "Probe once more", "Probe toward west", "Turn to bearing 50 and probe",
-            "Best guess: select", "Best guess: select near north-east", "Best guess: select bearing 13 with band 0",
+            "Best guess: select", "Best guess: select near north-east", "Best guess: select bearing 13 with band 1",
         ]
         for index in 0..<texts.count { #expect(texts[index] == expected[index]) }
     }
@@ -426,7 +426,7 @@ struct HueCompassHintsTests {
         try miss.apply(.select(bearing: selection.bearing, band: selection.band), expecting: miss.fingerprint)
         let explanation: HueCompassFailureExplanation = try #require(HueCompassFailureExplanation(play: miss))
         #expect(explanation.bearingDistance == level.bearingTolerance + 1 && explanation.bandDistance == 0)
-        #expect(explanation.text == "The target was bearing \(level.target) (band \(level.targetBand)). Your selection "
+        #expect(explanation.text == "The target was bearing \(level.target) (band \(level.targetBand + 1)). Your selection "
             + "was \(level.bearingTolerance + 1) bearings and 0 bands away; the tolerances are "
             + "\(level.bearingTolerance) and \(level.bandTolerance). Retry the level.")
         var spent: HueCompassPlay = try Self.started(level)
