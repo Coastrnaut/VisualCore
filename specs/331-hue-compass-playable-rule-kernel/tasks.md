@@ -65,3 +65,7 @@ recorded only after every agent has reported). Commit after every task with its 
 001 → 002 (lead) → {003 (agent A), 004 (agent B), 005 (agent C), 006 (agent D)} → 007 … 012. Agents C and D code
 against the play contract in contracts/api.md; shared files (package, error, wheel, level, fixtures, docs) stay with the
 lead. MVP: Story 1.
+
+## Phase 7: Convergence
+
+- [ ] T-R02G0401-013 Document `HueCompassSelection` and `HueCompassPlay.selection` (the selected bearing and band pinned in the play fingerprint, spec clarification Q5) in `specs/331-hue-compass-playable-rule-kernel/contracts/api.md` and `specs/331-hue-compass-playable-rule-kernel/data-model.md` per plan: contracts (unrequested)
