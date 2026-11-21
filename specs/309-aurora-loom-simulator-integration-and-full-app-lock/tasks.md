@@ -61,7 +61,7 @@ tests stay short (< 10 s each; interface tests < 90 s, SC-R02G0109-001). No {own
 - [X] T-R02G0109-010 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-21: 2026-11-21 reference-2 exit 0: 7 of 7 with chunk 1
 - [ ] T-R02G0109-011 {device} After ImplementationLock-100: the same journeys on D1/D2/D3 (SC-R02G0109-006; feature 310
   prepares them)
-- [ ] T-R02G0109-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
+- [X] T-R02G0109-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record; — Verified 2026-11-21: 2026-11-21 converge round 1 appended T-R02G0109-013 (panel layout with pending steps), implemented (sim-27-4); round 2 converged; sealed; recorded R02-G01-09 pass (.autonomy/migration/evidence/R02-G01-09.json); validators PASS; CI run of this push checked next
   after the record push, check its CI run with `gh run list`
 
 ## Dependencies and parallel work

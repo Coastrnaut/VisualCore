@@ -80,12 +80,13 @@ evidence**: no physical-device test of the unified app has been run.
 
 Ledger totals today: the legacy ledger records **185 of 263** gates as passed (F00–F09 and the app phases
 A01-P00 … A19-P06, A20-P00 … A20-P06, A21-P00 … A21-P06, A22-P00 … A22-P06, A23-P00 … A23-P06, A24-P00 … A24-P06, A25-P00 … A25-P06); the unified-app ledger has 1,233 gates, with 25 experience gates (X-A01 … X-A25), 11 unified-app features,
-24 shared round features, both governance milestones and twelve round-two game features (R02-G01-01 … 08: Aurora Loom's rule
+24 shared round features, both governance milestones and thirteen round-two game features (R02-G01-01 … 09: Aurora Loom's rule
 kernel, its 100 solver-certified levels with witness files, its shader-drawn hero renderer, its touch controls and its
 teaching and progression (hints, failure explanations, tutorial, stars, daily and practice modes) and its polish and
 accessibility (announcements, haptics, Dynamic Type, slow fades, ambient sound) and its persistence and replay
 (traced results reconciled on restore, schema 3, replay of the best solution) and its regression net (solver
-re-certification, code-computed golden frames, memory cycles), a registered candidate
+re-certification, code-computed golden frames, memory cycles) and its in-app integration (panel play with
+pending steps, opening at level 1, app unit and interface tests, Release symbol check), a registered candidate
 of the app; R02-G02-01 … 03: Lissajous Labyrinth's rule kernel, its 100 solver-certified levels with witness
 files and its procedural renderer (luminous thread with depth fading, rings, obstacles, three tiers), a registered
 candidate; R02-G03-01: Wave Knot Keeper's rule kernel with exact lattice-rope geometry) passed.
