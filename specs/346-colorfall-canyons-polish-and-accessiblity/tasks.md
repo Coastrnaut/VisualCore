@@ -40,7 +40,7 @@ observations after ImplementationLock-100.
   settle jumps; an emptied sheet keeps its weights while fading); `--name host-2`
 - [ ] T-R02G0506-004 [US2] Edit `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsSceneGeometry.swift` (fluidPart, fluidMesh,
   featurePart and featureMesh take optional lights: sheet brightness and emitter brightness from the lights, fading
-  sheets drawn with their remembered weights; no lights = feature 343's meshes exactly) with tests in
+  sheets drawn with their remembered weights, a waterfall following the cell it falls from; no lights = feature 343's meshes exactly) with tests in
   `Packages/ExperiencesRound02/ColorfallCanyons/CoreTests/ColorfallCanyonsSceneGeometryTests.swift`; `--name host-geometry`
 
 ## Phase 4: Story 3 — sound and haptics (P2)

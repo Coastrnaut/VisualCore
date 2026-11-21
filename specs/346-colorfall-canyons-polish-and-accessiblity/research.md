@@ -12,9 +12,11 @@
 - **R4 Sheets keyed by cell.** Decision: a sheet's light is keyed by its cell and holds the brightness target of
   feature 343 (0.35 + 0.65 · min(volume, 24) / 24, 0 when empty) and the last colour weights it was drawn with, so a cell
   that empties fades out in its last colour and a filling cell fades in; an emitter's light is its brightness (1 flowing,
-  0.3 not). The fluid stream's brightness slot carries the eased level. Rationale: no shader or stream change.
+  0.3 not). The fluid stream's brightness slot carries the eased level; a waterfall uses the level and weights of the
+  cell it falls from. Rationale: no shader or stream change.
 - **R5 Win glow.** Decision: the glow shells' gain is `standardGlowGain × (1 + glow)`, clamped by the existing
-  `u_glowLimit` (0.5 under Reduce Flashing). Rationale: the win is a fade of the existing glow, capped.
+  `u_glowLimit` (0.5 under Reduce Flashing). At level-2, which has no glow shells, the win shows only
+  in the sheets' brightness. Rationale: the win is a fade of the existing glow, capped.
 - **R6 Sound from the basins.** Decision: root 98 Hz; cyan 98 × 3/2, coral 98 × 5/4, yellow 98 × 2, each with gain
   base × (0.3 + 0.7 · its share of all basin mass) when that colour is in a basin; a brighter octave when won, halved
   gains when failed; a 10-second loop. Rationale: the chord shows which colours have arrived; a pure function, so equal
