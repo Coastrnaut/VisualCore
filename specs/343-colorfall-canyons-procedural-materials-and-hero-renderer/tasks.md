@@ -8,7 +8,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 1: Setup
 
-- [ ] T-R02G0503-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test
+- [X] T-R02G0503-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test — Verified 2026-11-21: 2026-11-21 R02-G05-03.baseline-host/timing/round02 exit 0
   --package-path Packages/ExperiencesRound02`; the rendering baseline is R02-G05-02's rendering runs (exit 0)
 - [ ] T-R02G0503-002 Edit `Packages/ExperiencesRound02/Package.swift` (Core dependencies; `ColorfallCanyonsExperience` and its
   tests with iOS-conditioned rendering dependencies; the product) and create `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsSceneSnapshot.swift`
