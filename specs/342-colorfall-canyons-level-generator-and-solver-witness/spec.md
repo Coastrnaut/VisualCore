@@ -140,6 +140,8 @@ file is refused.
   refusal.
 - **More than one smallest edit set:** allowed; the witness picks one by a stated tie rule.
 - **A level solvable with no edit:** never emitted.
+- **A smallest edit count of 1:** the near miss (the witness minus its last edit) is the unedited level, so both
+  counterexamples name the same failure.
 - **Damaged, newer or edited witness files:** refused with a named reason.
 
 ## Requirements *(mandatory)*
