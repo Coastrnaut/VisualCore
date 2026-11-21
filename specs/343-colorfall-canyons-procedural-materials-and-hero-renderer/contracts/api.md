@@ -27,7 +27,19 @@ public enum ColorfallCanyonsSceneGeometry {
     public static func camera(_ snapshot: ColorfallCanyonsSceneSnapshot, aspect: Double) -> ColorfallCanyonsCamera
     public static func project(_ point: SIMD3<Double>, camera: ColorfallCanyonsCamera) -> SIMD2<Double>?   // 0 … 1 view coordinates
 }
-public enum ColorfallCanyonsShaders { terrainVertex, terrainFragment, fluidVertex, fluidFragment: String }   // GLSL ES 3.00
+public enum ColorfallCanyonsShaders { terrainVertex, terrainFragment, fluidVertex, fluidFragment: String   // GLSL ES 3.00
+    // uniform constants: mvpUniform u_mvp, modelUniform u_model, eyeUniform u_eye, unitUniform u_unit, lightDirectionUniform
+    // u_lightDir (terrain); cellUniform u_cell, timeUniform u_time, flowBandsUniform u_flowBands, glowGainUniform u_glowGain,
+    // glowLimitUniform u_glowLimit, shellUniform u_shell (fluid)
+    public enum TerrainMaterial: Int { case sandstone, rock, pearl, pit }
+    public static func weights(masses: [Int]) -> SIMD3<Double>; public static func flowCode(dx:dz:waterfall:) -> Double
+    public static func glowLimit(reduceFlashing: Bool) -> Double; public static func glowGain(for tier: ColorfallCanyonsTier) -> Double }
+// Streams (ShaderMeshRenderer binds only position, normal, uv): terrain — real normal, uv = (material code, shade);
+// fluid and feature — colour weights in the normal slot, uv = (brightness, flow code: 0 none, 1–4 = +x, −x, +z, −z,
+// +4 for a fall). Flow bands are the uniform u_flowBands (the tier's count), not geometry. Every draw culls back faces.
+public struct ColorfallCanyonsColouredMesh { public let mesh: Mesh; public let colours: [Vec4] }   // fallback colours
+// ColorfallCanyonsSceneGeometry also has terrainPart/fluidPart/featurePart (coloured meshes) and
+// pixel(_:camera:width:height:).
 public struct ColorfallCanyonsExperienceCore: ExperienceCore { /* canyon.carve, canyon.valve, time.step, play.undo,
     play.redo, level.next */ public func snapshot(time: Double) -> ColorfallCanyonsSceneSnapshot }
 #if DEBUG || VISUALCORE_AUTOMATION

@@ -7,5 +7,6 @@
 | `ColorfallCanyonsPattern` | cyan stripes, coral dots, yellow chevrons | one per colour |
 | `ColorfallCanyonsTier` | level-0: subdivision 4, 3 flow bands, 2 glow shells; level-1: 2, 2, 1; level-2: 1, 1, 0 | richest first; logged with reason on change |
 | `ColorfallCanyonsExperienceCore` | level number, play | digest = level number + play fingerprint; snapshot schema 1 `{level, records}` |
+| Mesh streams | terrain: normal, uv = (material code 0 … 3, shade); fluid and feature: colour weights in the normal slot, uv = (brightness, flow code 0 … 8) | flow bands are the uniform `u_flowBands`; back faces culled |
 | Controls | `canyon.carve [0 … 119]`, `canyon.valve [0 … 2]`, `time.step [1 … 600]`, `play.undo`, `play.redo`, `level.next` | kernel refusals pass through with their codes |
 | Candidate registration | id `r02-g05.colorfall-canyons`, tiers, palette, capabilities, content facts (100 levels, digest 68eec7b5…f019), scenario manifest | `available: false` until X-R02-G05 |
