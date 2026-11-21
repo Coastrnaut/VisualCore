@@ -59,7 +59,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 - [X] T-R02G0503-007 Docs: `docs/architecture/colorfall-canyons.md` (renderer and experience), — Verified 2026-11-21: 2026-11-21 round02-host exit 0; docs/architecture/colorfall-canyons.md (experience and renderer), Packages/ExperiencesRound02/README.md, docs/automatedtesting.md
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
-- [ ] T-R02G0503-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G0503-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-21: 2026-11-21 R02-G05-03 checks rendering-27, rendering-26, experiences, host-full, app-unit exit 0 (.autonomy/migration/checks/R02-G05-03.*.json)
   `--name host-full`, `--name app-unit`
 - [ ] T-R02G0503-009 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G0503-010 Reference regression chunk 2 (`--name reference-2`)
