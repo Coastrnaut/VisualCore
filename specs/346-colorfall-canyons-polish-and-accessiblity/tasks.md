@@ -15,7 +15,7 @@ observations after ImplementationLock-100.
 
 ## Phase 2: Story 1 — VoiceOver play (P1) 🎯
 
-- [ ] T-R02G0506-002 [P] [US1] [US3] Create `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsFeedbackPlan.swift` ("after(old:new:)" texts
+- [X] T-R02G0506-002 [P] [US1] [US3] Create `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsFeedbackPlan.swift` ("after(old:new:)" texts — Verified 2026-11-21: 2026-11-21 host exit 0: 10 tests (exact announcement texts, kinds and haptics for carves, valves, steps, undo, redo, refusals of every code, campaign and practice wins, time failure, level and mode changes, tutorial, cell picks, summary) (.autonomy/migration/checks/R02-G05-06.host.json); lead retest
   and kinds of clarification Q1: carve "Carved row r, column c. n actions left."; valve "<Colour> valve open." / "closed."
   with the same suffix; step "Tick t of T. f of m basins filled."; "Undone. " / "Redone. " + "Tick t of T. n actions
   left."; "picked(cell:columns:)" "Row r, column c picked." (state, no haptic); win "Every basin is filled. Level won
