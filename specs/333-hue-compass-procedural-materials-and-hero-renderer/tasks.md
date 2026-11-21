@@ -31,7 +31,7 @@ tests stay short (< 10 s each). No {owner} tasks.
   (finite and bounded for extreme settings; projections of every element inside the view with margin at 7 aspects;
   bearings, bands, glyphs and marks at the same places at every tier; fog brightness follows density only); `--name
   host-3`
-- [ ] T-R02G0403-005 [P] [US2] Create `Packages/ExperiencesRound02/HueCompass/Core/HueCompassExperienceCore.swift` (controls "compass.turn [−48 … 48, not 0],
+- [X] T-R02G0403-005 [P] [US2] Create `Packages/ExperiencesRound02/HueCompass/Core/HueCompassExperienceCore.swift` (controls "compass.turn [−48 … 48, not 0], — Verified 2026-11-21: 2026-11-21 host-4 exit 0 (agent C: adapter with compass.turn, compass.probe, compass.select, play.undo, play.redo, level.next; digest = level and play fingerprint; schema 1 restore by replay; 14 tests incl. conformance at seeds 0 and 99 and purity over 200 seeded snapshots, no target while playing, twin levels differing only in the target give equal snapshots while playing)
   compass.probe, compass.select [0 … 95, 0 … 23], play.undo, play.redo, level.next"; digest "level number and play
   fingerprint"; schema 1 `{level, records}`; quality profile of three levels; `snapshot(time:)` with no target while
   playing) with `Packages/ExperiencesRound02/HueCompass/CoreTests/HueCompassExperienceCoreTests.swift` (conformance; undo restores the digest; snapshot
