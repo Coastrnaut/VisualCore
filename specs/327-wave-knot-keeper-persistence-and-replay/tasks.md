@@ -58,7 +58,7 @@ tests stay short (< 10 s each).
 - [X] T-R02G0307-010 Script tests, run alone (`--name script-tests`) — Verified 2026-11-21: 2026-11-21 script-tests exit 0, run alone
 - [ ] T-R02G0307-011 {device} After ImplementationLock-100, on D1, D2 and D3: a save survives a real termination and
   restores to the same level, rope, moves and stars. Not run before the lock.
-- [ ] T-R02G0307-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+- [X] T-R02G0307-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record — Verified 2026-11-21: 2026-11-21 converge round 1 converged (nothing appended); sealed 17 passing; recorded R02-G03-07 pass; T-R02G0307-011 {device} stays open
 
 ## Dependencies and parallel work
 
