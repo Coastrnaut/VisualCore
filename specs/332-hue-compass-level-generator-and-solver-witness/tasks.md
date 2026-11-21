@@ -75,3 +75,7 @@ or {device} tasks (pure logic and host-generated content). Fixture seed 2_332; t
 001 → 002 (lead) → {003 (agent A), 005 (agent B)} → 004 (lead, needs the solver) → 006 → 007 … 012. Agent B codes against
 the solution contract with hand-made solutions; shared files (error, manifest, difficulty, generator, catalog tests,
 witness files, docs) stay with the lead. MVP: Story 1.
+
+## Phase 7: Convergence
+
+- [ ] T-R02G0402-013 Require in `Packages/ExperiencesRound02/HueCompass/Core/HueCompassWitness.swift` that the ambiguity's probes are exactly `[]` when the smallest count is 1 and `[0]` when it is 2 (refuse `.witness("ambiguity")` otherwise), with a test in `Packages/ExperiencesRound02/HueCompass/CoreTests/HueCompassWitnessTests.swift` editing a stored two-probe witness's ambiguity to another valid single bearing, per clarification Q4 / FR-R02G0402-004 (partial); `--name host-6 -- swift test --package-path Packages/ExperiencesRound02 --filter "HueCompassWitnessTests|HueCompassCatalogTests"`
