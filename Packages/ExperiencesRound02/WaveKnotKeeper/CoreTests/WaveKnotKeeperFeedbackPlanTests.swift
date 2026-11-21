@@ -212,4 +212,17 @@ import VisualCoreSimulation
         #expect(Plan.refused(code: locked.code).text == "That level is not open yet.")
         #expect(Plan.refused(code: date.code).text == "That date cannot be used.")
     }
+
+    /// Feature 327: the replay refusals are announced in their own words, the longer codes before `replay`.
+    @Test func replayRefusalsInWords() {
+        let codes: [String] = ["action.rule.r02-g03.no-replay", "action.rule.r02-g03.replay-end",
+                               "action.rule.r02-g03.replay"]
+        let texts: [String] = ["There is no saved solution to replay for this level.", "The replay is over.",
+                               "Stop the replay first."]
+        for index in codes.indices {
+            let expected: WaveKnotKeeperFeedbackPlan = WaveKnotKeeperFeedbackPlan(text: texts[index], kind: .rejection,
+                                                                                  haptic: .error)
+            #expect(WaveKnotKeeperFeedbackPlan.refused(code: codes[index]) == expected, "\(codes[index])")
+        }
+    }
 }

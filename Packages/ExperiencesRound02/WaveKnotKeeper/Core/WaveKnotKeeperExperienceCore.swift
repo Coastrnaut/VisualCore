@@ -44,6 +44,14 @@
 // records. Digest "r02-g03.wave-knot-keeper.v2": level, play fingerprint, progress and mode (never the tutorial step,
 // which undo does not move back). Snapshot schema 2: `{"level", "mode", "progress", "records", "tutorial"}`; schema-1
 // payloads migrate (the saved level open, campaign mode, the tutorial recomputed).
+//
+// Feature 327 (R02-G03-07) T-R02G0307-003 (FR-R02G0307-001 … 006; clarifications Q1–Q5): a campaign or daily win records
+// its winning trace (the play's net moves) with the result; restore reconciles every result
+// (`WaveKnotKeeperReconciliation`, the frontier as saved) and exposes `reconciliationDropped` (not digested); the replay
+// mode `replay(level)` plays a verified trace move by move with `replay.start [1…100]` (`r02-g03.no-replay`),
+// `replay.step` (`r02-g03.replay-end`) and `replay.stop`; in replay every other action except `point.select` and
+// `tutorial.dismiss` is refused (`r02-g03.replay`) and nothing is recorded. Digest "r02-g03.wave-knot-keeper.v3";
+// snapshot schema 3 (results carry `trace` and `verified`), migrating 1 → 2 → 3.
 import Foundation
 import Synchronization
 import VisualCoreDiagnostics
@@ -58,6 +66,12 @@ public enum WaveKnotKeeperExperienceRule {
     public static let locked = "r02-g03.locked"
     /// An impossible calendar date (feature 325).
     public static let date = "r02-g03.date"
+    /// No verified result with a trace to replay (feature 327).
+    public static let noReplay = "r02-g03.no-replay"
+    /// The replay has no further move (feature 327).
+    public static let replayEnd = "r02-g03.replay-end"
+    /// An action that is not allowed during replay (feature 327).
+    public static let replay = "r02-g03.replay"
 }
 
 /// Why a saved Wave Knot Keeper state was refused on restore (feature 323). A refused restore changes nothing.
@@ -75,12 +89,13 @@ public struct WaveKnotKeeperExperienceCore: ExperienceCore, Equatable {
     /// The experience's id in the catalog.
     public static let experienceID = "r02-g03.wave-knot-keeper"
     /// The snapshot schema this build writes.
-    public static let schemaVersion = 2
-    /// The digest's domain string (schema 2).
-    public static let digestDomain = "r02-g03.wave-knot-keeper.v2"
+    public static let schemaVersion = 3
+    /// The digest's domain string (schema 3).
+    public static let digestDomain = "r02-g03.wave-knot-keeper.v3"
     /// The action ids in declaration order.
     public static let actionIDs = ["point.move", "point.select", "play.undo", "play.redo", "level.next", "level.select",
-                                   "mode.daily", "mode.practice", "mode.campaign", "tutorial.dismiss", "tutorial.hint"]
+                                   "mode.daily", "mode.practice", "mode.campaign", "tutorial.dismiss", "tutorial.hint",
+                                   "replay.start", "replay.step", "replay.stop"]
     /// The allowance of a practice play: the kernel's maximum.
     public static let practiceAllowance = 64
     /// The level numbers of the catalog.
@@ -121,6 +136,9 @@ public struct WaveKnotKeeperExperienceCore: ExperienceCore, Equatable {
     /// The host quality tier (0 = level-0, the best, … 2, clamped); presentation only — not in the digest, the
     /// snapshot or `==`.
     public private(set) var qualityTier = 0
+    /// How many saved results the last restore dropped because they did not verify (feature 327); not in the digest,
+    /// the snapshot or `==`.
+    public private(set) var reconciliationDropped = 0
 
     /// A state playing `play` of level `levelNumber` with `progress`, `mode` and `tutorial`, whose reset returns to
     /// `opening` of `openingNumber`.
@@ -260,9 +278,34 @@ public struct WaveKnotKeeperExperienceCore: ExperienceCore, Equatable {
 
     // MARK: Contract
 
-    /// Schema 2 with the step 1 → 2 (``migratedToSchemaTwo(_:)``); a payload that does not decode is refused.
+    /// Schema 3 with the steps 1 → 2 (``migratedToSchemaTwo(_:)``) and 2 → 3 (``migratedToSchemaThree(_:)``); a
+    /// payload that does not decode is refused.
     public static var migrations: MigrationChain {
-        MigrationChain(currentVersion: schemaVersion, steps: [1: { payload in try migratedToSchemaTwo(payload) }])
+        MigrationChain(currentVersion: schemaVersion, steps: [1: { payload in try migratedToSchemaTwo(payload) },
+                                                             2: { payload in try migratedToSchemaThree(payload) }])
+    }
+
+    /// The schema-3 object of a schema-2 object: every solved result gains an empty `trace` and `verified` false.
+    ///
+    /// - Throws: ``WaveKnotKeeperRestoreRefusal/damaged`` when `object` has no progress with a solved list.
+    public static func migratedToSchemaThree(_ object: [String: Any]) throws -> [String: Any] {
+        guard var progress = object["progress"] as? [String: Any], let solved = progress["solved"] as? [Any] else {
+            throw WaveKnotKeeperRestoreRefusal.damaged
+        }
+        var entries: [Any] = []
+        for entry in solved {
+            guard var result = entry as? [String: Any] else {
+                entries.append(entry)
+                continue
+            }
+            result["trace"] = [Any]()
+            result["verified"] = false
+            entries.append(result)
+        }
+        progress["solved"] = entries
+        var migrated = object
+        migrated["progress"] = progress
+        return migrated
     }
 
     /// The schema-2 object of a schema-1 object `{"level", "records"}`: the saved level open, campaign mode, no
@@ -301,9 +344,12 @@ public struct WaveKnotKeeperExperienceCore: ExperienceCore, Equatable {
         ExperienceControl(id: "mode.campaign"),
         ExperienceControl(id: "tutorial.dismiss"),
         ExperienceControl(id: "tutorial.hint"),
+        ExperienceControl(id: "replay.start", ranges: [1...100]),
+        ExperienceControl(id: "replay.step"),
+        ExperienceControl(id: "replay.stop"),
     ]
 
-    /// The eleven controls with their declared ranges (see the file header).
+    /// The fourteen controls with their declared ranges (see the file header).
     public static var controls: [ExperienceControl] { declaredControls }
 
     /// The opening state of level `seed % 100 + 1`, in stage `playing`; no clock is read.
@@ -327,6 +373,9 @@ public struct WaveKnotKeeperExperienceCore: ExperienceCore, Equatable {
         if let refusal = ExperienceInput.validate(control: action.control, values: action.values,
                                                   controls: Self.declaredControls) {
             return .rejected(refusal)
+        }
+        if case .replay = mode, !Self.replayControls.contains(action.control) {
+            return .rejected(.rule(code: WaveKnotKeeperExperienceRule.replay))
         }
         var wholeValues: [Int] = []
         for value in action.values {
@@ -377,6 +426,26 @@ public struct WaveKnotKeeperExperienceCore: ExperienceCore, Equatable {
                 try open(number: progress.isOpen(levelNumber) ? levelNumber : progress.frontier, mode: .campaign)
             case "tutorial.dismiss":
                 tutorial = tutorial.dismissed
+            case "replay.start":
+                guard let result = progress.solved[wholeValues[0]], result.verified, !result.trace.isEmpty else {
+                    return .rejected(.rule(code: WaveKnotKeeperExperienceRule.noReplay))
+                }
+                try open(number: wholeValues[0], mode: .replay(level: wholeValues[0]))
+                tutorial = .done
+            case "replay.step":
+                guard case .replay(let level) = mode, let result = progress.solved[level], result.verified else {
+                    return .rejected(.rule(code: WaveKnotKeeperExperienceRule.noReplay))
+                }
+                let index = play.records.count
+                guard play.stage == .playing, index < result.trace.count else {
+                    return .rejected(.rule(code: WaveKnotKeeperExperienceRule.replayEnd))
+                }
+                try play.apply(result.trace[index], expecting: play.fingerprint)
+            case "replay.stop":
+                guard case .replay(let level) = mode else {
+                    return .rejected(.rule(code: WaveKnotKeeperExperienceRule.noReplay))
+                }
+                try open(number: progress.isOpen(level) ? level : progress.frontier, mode: .campaign)
             default:   // tutorial.hint
                 tutorial = tutorial.advancedByHint()
             }
@@ -412,13 +481,22 @@ public struct WaveKnotKeeperExperienceCore: ExperienceCore, Equatable {
         guard play.stage == .won else { return }
         switch mode {
         case .campaign:
-            progress.record(level: levelNumber, moves: play.spent, shortest: certifiedShortest, opensNext: true)
+            progress.record(level: levelNumber, moves: play.spent, shortest: certifiedShortest, opensNext: true,
+                            trace: winningTrace)
         case .daily:
-            progress.record(level: levelNumber, moves: play.spent, shortest: certifiedShortest, opensNext: false)
-        case .practice:
+            progress.record(level: levelNumber, moves: play.spent, shortest: certifiedShortest, opensNext: false,
+                            trace: winningTrace)
+        case .practice, .replay:
             break
         }
     }
+
+    /// The controls accepted during replay (feature 327).
+    static let replayControls: Set<String> = ["replay.start", "replay.step", "replay.stop", "tutorial.dismiss",
+                                              "point.select"]
+
+    /// The winning trace of the current play: its net moves in order (one per move spent).
+    var winningTrace: [WaveKnotKeeperMove] { play.undoStack }
 
     /// Back to the opening state the seed chose with no selection; the quality tier, which is not state, is kept.
     public mutating func reset() {
@@ -485,6 +563,9 @@ public struct WaveKnotKeeperExperienceCore: ExperienceCore, Equatable {
         if case .daily(let daily) = decoded.mode, daily != decoded.level {
             throw WaveKnotKeeperRestoreRefusal.damaged
         }
+        if case .replay(let replayed) = decoded.mode, replayed != decoded.level {
+            throw WaveKnotKeeperRestoreRefusal.damaged
+        }
         do throws(WaveKnotKeeperError) {
             let certified = try generated(number: decoded.level)
             let saved = decoded.mode == .practice ? try practiceLevel(of: certified.level) : certified.level
@@ -496,10 +577,19 @@ public struct WaveKnotKeeperExperienceCore: ExperienceCore, Equatable {
                 tutorial = firstTutorialStep(number: decoded.level, mode: decoded.mode, play: try freshPlay(of: saved))
             }
             let openingCore = try opening(number: levelNumber(forSeed: seed))
-            return WaveKnotKeeperExperienceCore(levelNumber: decoded.level, play: play, progress: decoded.progress,
-                                                mode: decoded.mode, tutorial: tutorial,
-                                                certifiedShortest: certified.solution.shortest,
-                                                openingNumber: openingCore.openingNumber, opening: openingCore.opening)
+            // Feature 327: every saved result is checked by replaying its trace; the frontier stays as saved.
+            let reconciled = WaveKnotKeeperReconciliation.reconcile(decoded.progress)
+            var core = WaveKnotKeeperExperienceCore(levelNumber: decoded.level, play: play,
+                                                    progress: reconciled.progress, mode: decoded.mode,
+                                                    tutorial: tutorial, certifiedShortest: certified.solution.shortest,
+                                                    openingNumber: openingCore.openingNumber,
+                                                    opening: openingCore.opening)
+            core.reconciliationDropped = reconciled.dropped
+            // A replay whose result did not survive the check returns to campaign at that level (or the frontier).
+            if case .replay(let level) = decoded.mode, reconciled.progress.solved[level]?.verified != true {
+                try core.open(number: core.progress.isOpen(level) ? level : core.progress.frontier, mode: .campaign)
+            }
+            return core
         } catch {
             throw WaveKnotKeeperRestoreRefusal.kernel(error)
         }

@@ -122,17 +122,20 @@ import VisualCoreExperience
     }
 
     @Test func theControlsTheTiersAndTheProfile() {
-        #expect(Core.experienceID == "r02-g03.wave-knot-keeper" && Core.schemaVersion == 2)
-        #expect(Core.digestDomain == "r02-g03.wave-knot-keeper.v2")
+        #expect(Core.experienceID == "r02-g03.wave-knot-keeper" && Core.schemaVersion == 3)
+        #expect(Core.digestDomain == "r02-g03.wave-knot-keeper.v3")
         #expect(Core.controls.map(\.id) == Core.actionIDs)
         #expect(Core.actionIDs == ["point.move", "point.select", "play.undo", "play.redo", "level.next", "level.select",
-                                   "mode.daily", "mode.practice", "mode.campaign", "tutorial.dismiss", "tutorial.hint"])
+                                   "mode.daily", "mode.practice", "mode.campaign", "tutorial.dismiss", "tutorial.hint",
+                                   "replay.start", "replay.step", "replay.stop"])
         #expect(Core.controls[0].ranges == [0...15, 0...5])
         #expect(Core.controls[1].ranges == [0...15])
         for index in 2..<5 { #expect(Core.controls[index].ranges.isEmpty) }
         #expect(Core.controls[5].ranges == [1...100])
         #expect(Core.controls[6].ranges == [1...9999, 1...12, 1...31])
         for index in 7..<11 { #expect(Core.controls[index].ranges.isEmpty) }
+        #expect(Core.controls[11].ranges == [1...100])
+        #expect(Core.controls[12].ranges.isEmpty && Core.controls[13].ranges.isEmpty)
         #expect(Core.practiceAllowance == 64)
         #expect(Core.directionOrder == [.plusX, .minusX, .plusY, .minusY, .plusZ, .minusZ])
         #expect(Core.qualityTiers == 3)
@@ -360,7 +363,7 @@ import VisualCoreExperience
             try Core.restore(payload: edited, seed: 31)
         }
         // The engine refuses a payload of a newer snapshot schema before the core sees it.
-        #expect(Core.migrations.currentVersion == 2)
+        #expect(Core.migrations.currentVersion == 3)
     }
 
     // MARK: Feature 325
@@ -489,5 +492,99 @@ import VisualCoreExperience
         }
         core.shedCaches()
         #expect(try Self.digest(core) == digest && core == before)
+    }
+
+    // MARK: Feature 327 (R02-G03-07) T-R02G0307-003
+
+    @Test func aCampaignWinRecordsItsTraceAndReplayReproducesIt() async throws {
+        var core: Core = try await Core.prepare(seed: 0)
+        #expect(core.apply(Self.act("replay.start", [1])) == .rejected(.rule(code: WaveKnotKeeperExperienceRule.noReplay)))
+        #expect(core.apply(Self.plain("replay.step")) == .rejected(.rule(code: WaveKnotKeeperExperienceRule.noReplay)))
+        #expect(core.apply(Self.plain("replay.stop")) == .rejected(.rule(code: WaveKnotKeeperExperienceRule.noReplay)))
+        // A detour (a quiet move and its undo) leaves the net moves: the certified solution.
+        let quiet: WaveKnotKeeperMove = try #require(Self.quietMove(on: [core.play.level]))
+        #expect(core.apply(Self.action(quiet)) == .accepted)
+        #expect(core.apply(Self.plain("play.undo")) == .accepted)
+        let solution: [WaveKnotKeeperMove] = try Core.generated(number: 1).solution.moves
+        for move in solution { #expect(core.apply(Self.action(move)) == .accepted) }
+        #expect(core.play.stage == .won)
+        let result: WaveKnotKeeperProgress.Result = try #require(core.progress.solved[1])
+        #expect(result.trace == solution && result.verified && result.bestMoves == solution.count)
+        let progress: WaveKnotKeeperProgress = core.progress
+        // Replay: a fresh play, the tutorial done, the trace move by move, then the end.
+        #expect(core.apply(Self.act("replay.start", [1])) == .accepted)
+        #expect(core.mode == .replay(level: 1) && core.tutorial == .done && core.play.records.isEmpty)
+        #expect(core.apply(Self.select(0)) == .accepted)
+        #expect(core.apply(Self.plain("tutorial.dismiss")) == .accepted)
+        let refused: [ExperienceAction] = [Self.action(quiet), Self.plain("play.undo"), Self.plain("play.redo"),
+                                           Self.plain("level.next"), Self.act("level.select", [1]),
+                                           Self.plain("mode.practice"), Self.plain("tutorial.hint")]
+        for action in refused {
+            #expect(core.apply(action) == .rejected(.rule(code: WaveKnotKeeperExperienceRule.replay)), "\(action)")
+        }
+        var fresh: WaveKnotKeeperPlay = try Core.freshPlay(of: try Core.level(number: 1))
+        for move in solution {
+            #expect(core.apply(Self.plain("replay.step")) == .accepted)
+            try fresh.apply(move, expecting: fresh.fingerprint)
+            #expect(core.play.fingerprint == fresh.fingerprint)
+        }
+        #expect(core.play.stage == .won && core.progress == progress, "replay never records")
+        #expect(core.apply(Self.plain("replay.step")) == .rejected(.rule(code: WaveKnotKeeperExperienceRule.replayEnd)))
+        // The replay round-trips through the snapshot.
+        let restored: Core = try Core.restore(payload: try core.snapshotPayload(), seed: 0)
+        #expect(restored == core && restored.reconciliationDropped == 0)
+        #expect(core.apply(Self.plain("replay.stop")) == .accepted)
+        #expect(core.mode == .campaign && core.levelNumber == 1 && core.progress == progress)
+    }
+
+    @Test func restoreReconcilesAndDropsAnEditedResult() async throws {
+        var core: Core = try await Core.prepare(seed: 0)
+        for move in try Core.generated(number: 1).solution.moves { #expect(core.apply(Self.action(move)) == .accepted) }
+        let text: String = try #require(String(data: try core.snapshotPayload(), encoding: .utf8))
+        #expect(text.contains("\"verified\":true"))
+        let honest: Core = try Core.restore(payload: Data(text.utf8), seed: 0)
+        #expect(honest.reconciliationDropped == 0 && honest.progress == core.progress)
+        // Two stars claimed for a three-star win: the replay disagrees, the result is dropped, the frontier stays.
+        let edited: String = text.replacingOccurrences(of: "\"stars\":3", with: "\"stars\":2")
+        #expect(edited != text)
+        let checked: Core = try Core.restore(payload: Data(edited.utf8), seed: 0)
+        #expect(checked.reconciliationDropped == 1 && checked.progress.solved[1] == nil)
+        #expect(checked.progress.frontier == core.progress.frontier)
+        // A replay of a dropped result restores in campaign.
+        var replaying: Core = core
+        #expect(replaying.apply(Self.act("replay.start", [1])) == .accepted)
+        let replayText: String = try #require(String(data: try replaying.snapshotPayload(), encoding: .utf8))
+        let replayEdited: String = replayText.replacingOccurrences(of: "\"stars\":3", with: "\"stars\":2")
+        let back: Core = try Core.restore(payload: Data(replayEdited.utf8), seed: 0)
+        #expect(back.mode == .campaign && back.reconciliationDropped == 1)
+    }
+
+    @Test func aSchemaTwoPayloadMigratesToThree() async throws {
+        var core: Core = try await Core.prepare(seed: 0)
+        for move in try Core.generated(number: 1).solution.moves { #expect(core.apply(Self.action(move)) == .accepted) }
+        var object: [String: Any] = try #require(
+            try JSONSerialization.jsonObject(with: try core.snapshotPayload()) as? [String: Any])
+        // The schema-2 form: results without trace or verified.
+        var progress: [String: Any] = try #require(object["progress"] as? [String: Any])
+        let solved: [Any] = try #require(progress["solved"] as? [Any])
+        var plain: [Any] = []
+        for entry in solved {
+            var result: [String: Any] = try #require(entry as? [String: Any])
+            result.removeValue(forKey: "trace")
+            result.removeValue(forKey: "verified")
+            plain.append(result)
+        }
+        progress["solved"] = plain
+        object["progress"] = progress
+        let migrated: [String: Any] = try Core.migratedToSchemaThree(object)
+        let payload: Data = try JSONSerialization.data(withJSONObject: migrated, options: [.sortedKeys])
+        let restored: Core = try Core.restore(payload: payload, seed: 0)
+        let result: WaveKnotKeeperProgress.Result = try #require(restored.progress.solved[1])
+        #expect(!result.verified && result.trace.isEmpty && result.stars == 3)
+        #expect(restored.reconciliationDropped == 0 && restored.progress.frontier == core.progress.frontier)
+        #expect(throws: WaveKnotKeeperRestoreRefusal.damaged) { try Core.migratedToSchemaThree(["level": 1]) }
+        // An unverified result cannot be replayed.
+        var replay: Core = restored
+        #expect(replay.apply(Self.act("replay.start", [1])) == .rejected(.rule(code: WaveKnotKeeperExperienceRule.noReplay)))
     }
 }

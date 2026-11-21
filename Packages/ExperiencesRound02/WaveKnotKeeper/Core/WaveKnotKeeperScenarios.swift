@@ -20,6 +20,7 @@
 // on even rows. The expected digests are derived by playing the entries on a core exactly as the engine plays them.
 // Feature 325 (R02-G03-05): rejection also refuses a locked `level.select`, a level beyond 100, an impossible
 // `mode.daily` date and wrong value counts of `mode.daily` and `mode.practice`.
+// Feature 327 (R02-G03-07): and replay without a verified result, outside replay, and out of range.
 #if DEBUG || VISUALCORE_AUTOMATION
 import Foundation
 import VisualCoreExperience
@@ -197,6 +198,11 @@ extension WaveKnotKeeperExperienceCore {
             refusedEntry("mode.daily", [2026, 2, 30], "action.rule." + WaveKnotKeeperExperienceRule.date),
             refusedEntry("mode.daily", [2026, 11], "action.wrong-value-count"),
             refusedEntry("mode.practice", [1], "action.wrong-value-count"),
+            // Feature 327: replay without a verified result, outside replay, and out of range.
+            refusedEntry("replay.start", [1], "action.rule." + WaveKnotKeeperExperienceRule.noReplay),
+            refusedEntry("replay.step", [], "action.rule." + WaveKnotKeeperExperienceRule.noReplay),
+            refusedEntry("replay.stop", [], "action.rule." + WaveKnotKeeperExperienceRule.noReplay),
+            refusedEntry("replay.start", [101], outOfRange),
         ]
         return entries
     }

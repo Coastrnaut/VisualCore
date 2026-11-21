@@ -23,7 +23,7 @@ tests stay short (< 10 s each).
 
 ## Phase 3: Stories 1 and 3 — save, migrate, replay (P1, P2)
 
-- [ ] T-R02G0307-003 [US1] [US2] [US3] Edit `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperExperienceCore.swift` (schema 3, migration
+- [X] T-R02G0307-003 [US1] [US2] [US3] Edit `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperExperienceCore.swift` (schema 3, migration — Verified 2026-11-21: 2026-11-21 host-2 exit 0: adapter schema 3, migration 2 -> 3, traces recorded, restore reconciles, replay start/step/stop and codes; scenarios and manifest regenerated; feedback plan replay words
   2 → 3 "results with an empty trace and verified false", digest v3; a campaign or daily win records the winning trace
   (the play's net moves); restore reconciles and exposes `reconciliationDropped` (not digested); actions
   "replay.start [1…100]" (`r02-g03.no-replay` without a verified traced result), "replay.step" (`r02-g03.replay-end`

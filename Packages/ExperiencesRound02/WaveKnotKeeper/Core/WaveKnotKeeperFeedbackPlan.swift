@@ -93,8 +93,20 @@ public struct WaveKnotKeeperFeedbackPlan: Sendable, Equatable {
     /// open yet." (a code containing `r02-g03.locked`), "That date cannot be used." (`r02-g03.date`), "That move is not
     /// allowed: it would leave the space, meet another point, pass through a strand outside a gate or pull the rope too
     /// tight." (`r02-g03.move`), "No moves are left." (`r02-g03.allowance`), "The level has ended." (`r02-g03.stage`),
-    /// otherwise "That change was refused.".
+    /// feature 327's "There is no saved solution to replay for this level." (`r02-g03.no-replay`), "The replay is
+    /// over." (`r02-g03.replay-end`) and "Stop the replay first." (`r02-g03.replay`), otherwise "That change was
+    /// refused.".
     public static func refusalText(code: String) -> String {
+        if code.contains(WaveKnotKeeperExperienceRule.noReplay) {
+            return "There is no saved solution to replay for this level."
+        }
+        // Checked before `replay`, whose code is a prefix of `replay-end` (feature 327).
+        if code.contains(WaveKnotKeeperExperienceRule.replayEnd) {
+            return "The replay is over."
+        }
+        if code.contains(WaveKnotKeeperExperienceRule.replay) {
+            return "Stop the replay first."
+        }
         if code.contains(WaveKnotKeeperExperienceRule.locked) {
             return "That level is not open yet."
         }
@@ -114,12 +126,19 @@ public struct WaveKnotKeeperFeedbackPlan: Sendable, Equatable {
         return "That change was refused."
     }
 
-    /// The name of a mode in a level announcement: "Campaign", "Practice" or "Daily level".
+    /// Whether `mode` is a replay (its win re-runs a stored result and claims no stars; feature 327).
+    public static func isReplay(_ mode: WaveKnotKeeperMode) -> Bool {
+        if case .replay = mode { return true }
+        return false
+    }
+
+    /// The name of a mode in a level announcement: "Campaign", "Practice", "Daily level" or "Replay".
     public static func modeName(_ mode: WaveKnotKeeperMode) -> String {
         switch mode {
         case .campaign: "Campaign"
         case .practice: "Practice"
         case .daily: "Daily level"
+        case .replay: "Replay"
         }
     }
 
@@ -162,7 +181,7 @@ public struct WaveKnotKeeperFeedbackPlan: Sendable, Equatable {
         switch core.play.stage {
         case .won:
             let text: String
-            if core.mode == .practice {
+            if core.mode == .practice || Self.isReplay(core.mode) {
                 text = "The knot matches. Level won in \(Self.moves(spent))."
             } else {
                 let stars: Int = WaveKnotKeeperProgress.stars(moves: spent, shortest: core.certifiedShortest)
