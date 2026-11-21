@@ -396,9 +396,9 @@ private func progressWitness(_ number: Int) throws -> HueCompassWitness {
         #expect(try decoded.encoded() == data)
         let text: String = String(decoding: data, as: UTF8.self)
         #expect(text == "{\"frontier\":3,\"solved\":["
-            + "{\"bestUnits\":2,\"level\":1,\"stars\":3},"
-            + "{\"bestUnits\":5,\"level\":2,\"stars\":1},"
-            + "{\"bestUnits\":3,\"level\":40,\"stars\":2}]}")
+            + "{\"bestUnits\":2,\"level\":1,\"stars\":3,\"trace\":[],\"verified\":false},"
+            + "{\"bestUnits\":5,\"level\":2,\"stars\":1,\"trace\":[],\"verified\":false},"
+            + "{\"bestUnits\":3,\"level\":40,\"stars\":2,\"trace\":[],\"verified\":false}]}")
         let empty: Data = try HueCompassProgress().encoded()
         #expect(try JSONDecoder().decode(HueCompassProgress.self, from: empty) == HueCompassProgress())
     }

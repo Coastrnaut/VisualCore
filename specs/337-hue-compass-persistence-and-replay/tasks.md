@@ -12,7 +12,7 @@ tests stay short (< 10 s each). {device} items are D1–D3 observations after Im
 
 ## Phase 2: Story 2 — reconcilable scores (P1) 🎯
 
-- [ ] T-R02G0407-002 [P] [US2] Edit `Packages/ExperiencesRound02/HueCompass/Core/HueCompassProgress.swift` (Result gains "trace: [HueCompassAction]" and
+- [X] T-R02G0407-002 [P] [US2] Edit `Packages/ExperiencesRound02/HueCompass/Core/HueCompassProgress.swift` (Result gains "trace: [HueCompassAction]" and — Verified 2026-11-21: 2026-11-21 host exit 0: HueCompassReconciliationTests 10/10 (every certified witness trace verifies; edited stars, units, a changed selection band, illegal and over-long traces dropped and counted; untraced kept; frontier unchanged) and HueCompassProgressTests
   "verified: Bool"; `record(level:units:smallest:mode:trace:)` stores a verified result, replacing only with fewer
   units; `drop(level:)`; encoding keeps old payloads decodable (missing trace → empty, verified false); mode case
   "replay(level:)" that awards no stars and opens nothing) and create `Packages/ExperiencesRound02/HueCompass/Core/HueCompassReconciliation.swift` ("a
