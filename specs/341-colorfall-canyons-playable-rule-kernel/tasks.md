@@ -37,7 +37,7 @@ in this feature (the CPU flow step is the reference the renderer of R02-G05-03 w
 
 ## Phase 4: Stories 2 and 3 — fail, pause, step, undo, redo, replay (P1)
 
-- [ ] T-R02G0501-004 [P] [US1] [US2] [US3] Create `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsPlay.swift` (stages "loading, tutorial, playing,
+- [X] T-R02G0501-004 [P] [US1] [US2] [US3] Create `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsPlay.swift` (stages "loading, tutorial, playing, — Verified 2026-11-21: 2026-11-21 host-3 exit 0 (play by the lead, 12 tests by agent B plus one by the lead: 500 known solutions win at the first met tick and fail on time without carves; contamination, overflow and time at the exact tick one unit either side; every refusal in order with no change; 500 seeded traces replay, tampered traces refused; undo/redo exact for every kind, from failed and while paused; full stage table; fingerprint against an independent byte layout). Agent B found that an undo or redo made while paused did not replay; the lead made replay pause or resume where a record's previous fingerprint says so and added testUndoAndRedoWhilePausedReplay
   paused, won, failed, result"; actions validated for stage, previous fingerprint, range or carvability, budget; carve and
   valve spend one, step(1 … 600) spends nothing and stops at the deciding tick; failures contamination, overflow, time;
   records with previous and next fingerprints; full undo and redo (from failed back to playing; won is final); replay)
