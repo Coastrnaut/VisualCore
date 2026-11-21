@@ -31,7 +31,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 4: Story 3 — play with the panel alone (P1)
 
-- [ ] T-R02G0304-004 [US3] Create `Packages/ExperiencesRound02/WaveKnotKeeper/CoreTests/WaveKnotKeeperPanelWinTests.swift` (agent D: all 100 certified levels
+- [X] T-R02G0304-004 [US3] Create `Packages/ExperiencesRound02/WaveKnotKeeper/CoreTests/WaveKnotKeeperPanelWinTests.swift` (agent D: all 100 certified levels — Verified 2026-11-21: 2026-11-21 host-4 exit 0 (all 100 certified levels won through point.select and point.move panel actions in exactly their certified shortest moves; 5 band tests, each under 3.2 s)
   won through the adapter's `point.select` and `point.move` actions the panel sends, in exactly their certified shortest
   number of moves, split by band); `--name host-4`
 
