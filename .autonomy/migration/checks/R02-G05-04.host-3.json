@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "ColorfallCanyonsGestureController"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter ColorfallCanyonsGestureController",
+  "elapsed_seconds": 5.495,
+  "exit_code": 0,
+  "finished": "2026-11-21T21:46:15+00:00",
+  "gate": "R02-G05-04",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G05-04.host-3.log",
+  "log_sha256": "bdacaa469024a801c1c0c7c1d37d0ef91470d2ba8cfd54b39239af3f6c5cbe2c",
+  "name": "host-3",
+  "started": "2026-11-21T21:46:10+00:00",
+  "timed_out": false
+}

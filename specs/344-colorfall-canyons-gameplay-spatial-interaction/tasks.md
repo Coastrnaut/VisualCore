@@ -25,7 +25,7 @@ existing programs).
 
 ## Phase 3: Stories 1 and 2 — drag to carve, tap a valve (P1) 🎯
 
-- [ ] T-R02G0504-003 [US1] [US2] Create `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsGestureController.swift` (states idle, dragging,
+- [X] T-R02G0504-003 [US1] [US2] Create `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsGestureController.swift` (states idle, dragging, — Verified 2026-11-21: 2026-11-21 host-3 exit 0: 10 tests (4,500 seeded drags and taps vs independent expectation over 3 sizes and 3 orbits; second fingers, cancels and 6 non-playing stages send no game action; double tap; orbit clamps; carvability equals the level rule) (.autonomy/migration/checks/R02-G05-04.host-3.json); lead retest
   orbiting, cancelled; carve after ≥ 16 points from a carvable start cell; valve on a spring tap (< 10 points); double tap
   on empty space within 0.35 s resets the view; second finger cancels a drag and orbits (yaw 90° per width, pitch 60° per
   height, clamped); cancelled phases send nothing; nothing but view resets while not playing; highlighted cell from

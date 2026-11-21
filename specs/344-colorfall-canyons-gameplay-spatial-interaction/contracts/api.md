@@ -25,6 +25,9 @@ public struct ColorfallCanyonsGestureController: Sendable {
     public var highlightedCell: Int?
     public mutating func handle(_ event: PointerEvent, viewSize: Vec2, snapshot: ColorfallCanyonsSceneSnapshot)
         -> [ColorfallCanyonsGestureAction]
+    public func camera(viewSize: Vec2, snapshot: ColorfallCanyonsSceneSnapshot) -> ColorfallCanyonsCamera?
+    public static func isCarvable(_ cell: Int, snapshot: ColorfallCanyonsSceneSnapshot) -> Bool   // == level.isCarvable
+    public mutating func cancel()
     public mutating func resetView() }
 // Presenter: pointer(_:viewSize:port:), resetView(); scene outlines the highlighted cell; panel gains "Reset view".
 ```
