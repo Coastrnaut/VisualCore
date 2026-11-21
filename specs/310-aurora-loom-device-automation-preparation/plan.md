@@ -18,7 +18,7 @@ Quickstart: [quickstart.md](quickstart.md).
 
 **Language/Version**: Python 3 (standard library) for the check; JSON and Markdown for the contract.
 **Primary dependencies**: Aurora Loom's `scenario-manifest.json`, `.autonomy/migration/ledger.json` (read only),
-`specs/30*-aurora-loom-*/tasks.md`, `docs/performance/budgets.md`.
+`specs/30[1-9]-aurora-loom-*/tasks.md` (features 301–309), `docs/performance/budgets.md`.
 **Testing**: `python3 scripts/test_scripts.py` (alone); `python3 scripts/check_device_rows.py --experience r02-g01.aurora-loom`.
 **Constraints**: no device contact, no device number, no Swift change, no change to the ledger.
 
