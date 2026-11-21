@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-21
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G03-03 (migration ledger, game feature of experience R02-G03) · ID namespace FR-R02G0303-###,
 SC-R02G0303-###, T-R02G0303-###
@@ -28,6 +28,58 @@ Canonical overrides:
 - **Shared features used:** R02-F05 (generated meshes), R02-F07 (emissive and glow passes), R02-F08 (curve sampling,
   frames and ribbon meshes), R02-F10 (quality tiers) and the shared custom-shader mesh renderer added at R02-G01-03,
   through the existing VisualCore packages; the kernel and certified levels of R02-G03-01 and -02.
+
+## Clarifications
+
+### Session 2026-11-21
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time. Facts checked in
+code (read-only, 2026-11-21): Lissajous Labyrinth's experience (R02-G02-03 … 10) is the pattern in this package — a Core
+adapter, an immutable scene snapshot, a CPU projection reference, GLSL sources in the Core, an iOS-only experience target
+with presenter, scene and controls, a scenario manifest with 80 acceptance scenarios, a registration with content facts,
+and the public `ShaderMeshRenderer`; the Wave Knot Keeper kernel provides the level, play, rules, geometry summary and
+the certified catalog with its pinned digest (12c8ecb8…933f); the archive holds the rows R2-G03-QA-001 … 080 and the
+visual design (glasslike light ropes, parallel-transport tubes with glow shells, palette pearl, sapphire and ember);
+`AppModelTests` uses `r02-g03.wave-knot-keeper` as its example of an unregistered candidate.
+
+- Q: What exactly does the scene show, and how does it map the rules to space? → A: the rope's control points (kernel
+  units −16 … 16) scaled by 1/8 into world units; the tube follows the control polygon itself, each segment straight and
+  each corner rounded by a quadratic arc between the points a quarter of the way along the two adjacent segments, so the
+  drawn crossings are the rules' crossings (a spline through the points could cross differently); tube radius 0.1 world
+  units with parallel-transport frames, a glass body in pearl and sapphire (fresnel rim) and an additive glow shell. At
+  each projected crossing of the summary the over-strand carries an ember caustic pulse (0.5 Hz, presentation time
+  only). Handles are small pearl spheres at the control points (ember when selected); gates are translucent sapphire
+  cubes with bright edges. The camera is a fixed authored perspective looking down the z axis, tilted 20° about x, fitting
+  the figure's bounding sphere (orbit comes in R02-G03-04). Nothing drawn is consulted by the rules. Impact:
+  FR-R02G0303-001, 002, 006.
+- Q: What do the three quality tiers change? → A: `level-0` (richest): 16 tube sides, 8 corner samples, 2 glow shells;
+  `level-1`: 10 sides, 4 corner samples, 1 glow shell; `level-2` (the design's "Tier 0, D3-safe"): 6 sides, 2 corner
+  samples, no glow. Control points, handles and gates sit at the same coordinates at every tier. Levels are ordered
+  richest first; the presenter logs each tier change with its reason. Impact: FR-R02G0303-004; SC-R02G0303-001.
+- Q: How are rendered frames checked, and within which bounds? → A: the Core's CPU reference projects the control
+  points, the segment midpoints and the gate centres through the same camera and gives the palette. Simulator tests
+  render offscreen at 1,152 × 768 (the size Lissajous settled on for thin geometry) and check that each projected control
+  point and segment midpoint (not hidden behind a gate) lies within 3 pixels of a pixel brighter than the background by
+  at least 0.15 in luminance, that each handle's centre pixel is within 0.15 per channel of pearl (or ember when
+  selected) and that the background matches the palette's night within 0.05 away from geometry. Palette: night #05070F,
+  pearl #E8E4DA, sapphire #2F6FD8, ember #E0703A. Impact: FR-R02G0303-006; SC-R02G0303-001.
+- Q: What happens on a shader failure, and what does the renderer read? → A: the presenter draws from an immutable
+  `WaveKnotKeeperSceneSnapshot` (points, gates, target, summary with each projected crossing's segment pair and over
+  strand, stage, selected point, frame time) made from the adapter; it never holds the kernel. If a program fails to
+  compile or link, the scene draws the level-2 tube unlit with the shared unlit mesh renderer, keeps `fallbackReason`
+  and keeps running; tier changes go to its `tierLog`. Reduce Motion holds the pulses at time 0; Reduce Flashing caps
+  the glow gain. Impact: FR-R02G0303-003, 007; SC-R02G0303-002.
+- Q: How is the experience registered and what does the adapter accept? → A: `Catalog/registrations.json` gains
+  `r02-g03.wave-knot-keeper` (capabilities of at most 40 characters, tiers `level-0` … `level-2`, the palette above, the
+  scenario manifest, no permissions, a summary of at most 300 characters, content facts: 100 levels and the pinned
+  catalog digest); `project.yml` and the app's experience registry link `WaveKnotKeeperExperience` as a candidate
+  (`available: false` until X-R02-G03), opening at seed 0 (level 1) like the other round-two puzzles; `AppModelTests`
+  switches its unregistered example to the next round-two game (`r02-g04.hue-compass`). The adapter
+  (`WaveKnotKeeperExperienceCore`) prepares certified level (seed mod 100) + 1 and accepts `point.move [point 0…15,
+  direction 0…5]` (whole numbers; the kernel refuses out-of-range, out-of-bounds, coincident, crossing and tension
+  moves), `point.select [point]` (presentation only, no digest change), `play.undo`, `play.redo` and `level.next`; its
+  digest is the level number and the play's fingerprint (never the record history, so undo restores the earlier digest);
+  snapshot schema 1 `{level, records}`. Impact: FR-R02G0303-005, 008, 009; SC-R02G0303-004.
 
 ## User Scenarios & Testing *(mandatory)*
 
