@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-21 (R02-G03-05: agents testing new files in a package the lead is editing see the lead's half-written file fail to compile; the lead keeps shared files compiling between saves, and an agent waits and retries rather than copying the package).
+Last updated: 2026-11-21 (R02-G03-06: agents build and test new files in an isolated copy of a package (scratchpad, the shared packages linked in) while the lead's regression chain runs on the real tree, and the lead copies the files in and reruns every test before ticking).
 
 ## 1. What is tested, and where
 
@@ -186,6 +186,12 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
 
 ### Swift and test-tool pitfalls
 
+- **Agents work in an isolated package copy during a long chain** (R02-G03-06, 2026-11-21). While the lead's
+  Stage One and reference chain ran on the real tree, the agents built and tested their new files in a scratchpad copy
+  of `Packages/ExperiencesRound02` (its sibling packages, `External` and the game's witness files linked in), so no
+  half-written file could reach the chain's builds. The lead then copied the files in and reran every test before
+  ticking. A scripted test that needs a particular kind of move (here, one that changes the crossing marks without
+  winning) searches the certified levels for one rather than assuming the opening level has it.
 - **Keep shared files compiling while agents test** (R02-G03-05, 2026-11-21). While agents ran `swift test` with their
   own scratch paths, the lead's in-progress adapter edit broke the package's compile for them for a few minutes. Each
   agent's build covers the whole package, so the lead saves shared files only in compiling states while agents run, and

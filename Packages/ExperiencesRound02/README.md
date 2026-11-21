@@ -161,3 +161,8 @@ Feature 325 (R02-G03-05) adds teaching and progression: `WaveKnotKeeperSolver.so
 and `WaveKnotKeeperTutorialStep`; the adapter gains level selection, daily, practice and campaign modes, the tutorial
 controls and snapshot schema 2; the panel shows the instruction, hints, the failure explanation, the goal, the modes and
 a level picker.
+
+Feature 326 (R02-G03-06) adds polish and accessibility: `WaveKnotKeeperFeedbackPlan` (announcements and haptics),
+`WaveKnotKeeperLights` (eased crossing, match and win levels; slow fades under Reduce Flashing), crossing weights from
+the lights in `WaveKnotKeeperSceneGeometry`, `WaveKnotKeeperSoundRecipe` and the iOS `WaveKnotKeeperSound`; the panel
+labels every control, shows refusals in words, wraps at large text sizes and adds a Sound toggle.

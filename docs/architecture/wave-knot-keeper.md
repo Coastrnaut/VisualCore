@@ -118,6 +118,25 @@ moves are listed point by point and direction by direction, and a state is solve
   `tutorial`) with a migration from schema 1; digest domain `r02-g03.wave-knot-keeper.v2`; new refusals
   `r02-g03.locked` and `r02-g03.date`.
 
+## Polish and accessibility (R02-G03-06)
+
+- **VoiceOver.** `WaveKnotKeeperFeedbackPlan` turns every change into one announcement through the shared feedback
+  route: a move ("Point 3 moved up. 2 crossings, writhe 0; target 1, 1. Moves 4 of 12."), a selection, undo and redo
+  (prefixed "Undone: " / "Redone: "), a win with stars, a failure with its explanation, a level or mode change with the
+  tutorial instruction, and every refusal in words (the panel shows the same words). Every control has a label and a
+  value; the point picker is adjustable; rows become columns at accessibility text sizes; the panel keeps a 520-point
+  readable width.
+- **Haptics.** Selection for an accepted move, success for a win, warning for a failure, error for a refusal; a move
+  that ends the play plans only the outcome.
+- **Comfort.** `WaveKnotKeeperLights` eases each crossing mark (keyed by its two segments), the target match and the win
+  glow over 0.15 s, or 0.45 s under Reduce Flashing where a started fade finishes before it turns back; a crossing that
+  disappears fades out where it was on its over-strand. The rope's crossing weights and the glow shells' opacity (0.8 …
+  1) follow the eased levels; the caustic pulse stays at 0.5 Hz, at half gain under Reduce Flashing and still under
+  Reduce Motion. Measured: at most 3 half-range crossings per second and fades of at least 0.4 s.
+- **Sound.** An optional ambient loop (Sound toggle, off by default) from `WaveKnotKeeperSoundRecipe`: a root at
+  110 Hz × (1 + target crossings), a partial at 110 Hz × (1 + crossings) that becomes a unison when the crossings match,
+  a fifth, an octave when won, halved when failed; it plays only while wanted, on screen and active.
+
 ## Failures
 
 `WaveKnotKeeperError` reason codes: `r02-g03.level`, `r02-g03.move`, `r02-g03.stage`, `r02-g03.stale`,
