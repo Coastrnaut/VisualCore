@@ -48,7 +48,7 @@ deducible within two, 60 % gives 15 not deducible.
   `SeededRandom(seed: SeedDerivation.derive(plannedSeed, index: k))`, in this order: the offset (0 … 23); the 96 fog
   densities, each clear (0) when a draw 0 … 99 is below the band's clear share (bands 1 … 5: 0, 10, 20, 30, 40 %),
   otherwise 1 … 9; the target (0 … 95); the start, redrawn until it is farther from the target than the bearing tolerance.
-  Tolerances (bearing, band) by band: (4, 2), (3, 1), (2, 1), (1, 0), (1, 0). The allowance is the manifest budget. A
+  Tolerances (bearing, band) by band: (4, 2), (3, 1), (2, 1), (1, 0), (1, 0). The allowance is the manifest budget (8 … 19, always more than the at most 2 probes plus the selection). A
   candidate is kept when its smallest probe count lies in the band's range (bands 1 … 3: 1; band 4: 1 … 2; band 5: 2) and
   both counterexamples exist; otherwise k grows, at most 64 candidates, then `generation(n)`. Ids `hue-compass-NNN`;
   tutorial flag on levels 1 … 3. Impact: FR-R02G0402-001; SC-R02G0402-001, 003.
