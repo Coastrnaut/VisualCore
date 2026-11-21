@@ -208,6 +208,10 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   edit a trace step by replacing it with a move the kernel itself refuses at that point (asserted in the test), so the
   expected drop is known without asking the reconciliation code under test; a random walk that happens to win a level
   opens the next one, so the tests do not cap the frontier.
+- **Hue Compass device rows** (R02-G04-10, 2026-11-21). `HueCompassDeviceRowsCheckTests` runs the generic device-row
+  check on the real definition and on copies with a scenario removed, a row field removed and T-R02G0409-011 uncovered;
+  the release step is `device-rows-r02-g04`. The check finds the earlier features from the game number alone
+  (R02-G04 → specs 331–339), so a new game needs no change to it.
 - **Interface tests: count the teardown, skip waits for present elements** (R02-G04-09, 2026-11-21). The Hue Compass
   interface tests first took 71, 93 and 97 s against the 90 s bound. The per-test time xcodebuild reports includes about
   24 s of app teardown after the last step, and every `waitFor` costs at least a second even for an element already on

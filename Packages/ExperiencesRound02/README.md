@@ -230,3 +230,7 @@ Feature 339 (R02-G04-09) adds the in-app integration: panel identifiers (`HueCom
 stored schema-1 and schema-2 examples (`HueCompassSchemaExamples`), app unit tests, and the interface tests
 `HCPlayUITests` and `HCReplayUITests` in serial chunk `m3`.
 
+Feature 340 (R02-G04-10) prepares the device campaign without touching a device: `docs/apps/hue-compass/device-rows.json`
+(rows HC-D1 … HC-D8, pending) and `docs/apps/hue-compass/device-campaign.md`, checked by
+`scripts/check_device_rows.py --experience r02-g04.hue-compass`.
+

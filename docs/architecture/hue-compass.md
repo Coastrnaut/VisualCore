@@ -207,3 +207,16 @@ large turn as single steps; the play accepts both.
 - **Stored examples.** The registration stores schema-1 and schema-2 examples (`HueCompassSchemaExamples`), which the
   app restores into schema 3; Hue Compass stays a candidate (not available without `-vcCandidates`) until X-R02-G04.
 - **Release.** The Release simulator build compiles without the test-only golden frames and scenarios.
+
+## Device preparation (feature 340, R02-G04-10)
+
+- **Contract, no device touched.** `docs/apps/hue-compass/device-rows.json` (schema 1 of feature 310) names the device
+  scenario set (the 11 standard and game scenarios and `fixture-level-1-solved`), the devices D1 iPhone 15, D2 iPad Pro
+  13-inch (M5) and D3 iPad (A16) on iPadOS 26.5 tied to DEV1/2/3-R02-G04, and rows HC-D1 … HC-D8: launch and first
+  frame, frame pacing per tier, memory and thermal state with the stress session, gesture feel and touch-to-frame,
+  sound and haptics, VoiceOver at the largest text size (non-gating), progress across a real termination, and the panel
+  journeys. Every row is "pending device campaign"; the written plan is
+  [`docs/apps/hue-compass/device-campaign.md`](../apps/hue-compass/device-campaign.md).
+- **Check.** `python3 scripts/check_device_rows.py --experience r02-g04.hue-compass` (release step
+  `device-rows-r02-g04`) proves every scenario exists, every row is complete and every {device} task of features 331–339
+  and every UA-F13 measurement is covered.
