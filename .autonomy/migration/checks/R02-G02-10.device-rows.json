@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_device_rows.py",
+    "--experience",
+    "r02-g02.lissajous-labyrinth"
+  ],
+  "command": "python3 scripts/check_device_rows.py --experience r02-g02.lissajous-labyrinth",
+  "elapsed_seconds": 0.037,
+  "exit_code": 0,
+  "finished": "2026-11-21T09:21:17+00:00",
+  "gate": "R02-G02-10",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G02-10.device-rows.log",
+  "log_sha256": "eae4347251d52191d43c2c96d1561958ec9fd4a7c32217a271c3cbb7ad5d156f",
+  "name": "device-rows",
+  "started": "2026-11-21T09:21:17+00:00",
+  "timed_out": false
+}

@@ -1,0 +1,227 @@
+{
+  "devices": [
+    {
+      "ledger": "DEV1-R02-G02",
+      "name": "D1"
+    },
+    {
+      "ledger": "DEV2-R02-G02",
+      "name": "D2"
+    },
+    {
+      "ledger": "DEV3-R02-G02",
+      "name": "D3"
+    }
+  ],
+  "experience": "r02-g02.lissajous-labyrinth",
+  "rows": [
+    {
+      "covers": [
+        "launch",
+        "first-frame"
+      ],
+      "devices": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "gating": true,
+      "id": "LL-D1",
+      "measurements": [
+        "launch",
+        "first-frame"
+      ],
+      "owner_steps": [
+        "The owner has the device in hand, unlocked, trusted and charged; the automation build is installed by the campaign (signing is the owner's)."
+      ],
+      "pass": "No shader program is compiled after the experience became interactive; stage times recorded for 200 samples per device and tier (docs/performance/budgets.md, proposal).",
+      "procedure": "Open Lissajous Labyrinth from the catalog with the testing argument, 200 times per device across the three host tiers; the campaign records preparation, shader set-up and first present as stage times.",
+      "status": "pending device campaign",
+      "title": "Launch and first frame"
+    },
+    {
+      "covers": [
+        "frame-pacing",
+        "T-R02G0203-012",
+        "T-R02G0208-012"
+      ],
+      "devices": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "gating": true,
+      "id": "LL-D2",
+      "measurements": [
+        "frame-pacing",
+        "frame-time-per-tier"
+      ],
+      "owner_steps": [
+        "The owner has the device in hand, unlocked, trusted and charged; the automation build is installed by the campaign (signing is the owner's)."
+      ],
+      "pass": "60 frames per second with automatic levels (a documented 30 frames per second mode is acceptable on the last level), 200 samples per device; frame time per pinned tier recorded.",
+      "procedure": "Run the hero and full-playthrough scenarios pinned to tiers 0, 1 and 2 in turn, then with automatic levels; the campaign records each frame's interval.",
+      "status": "pending device campaign",
+      "title": "Frame pacing and frame time per tier"
+    },
+    {
+      "covers": [
+        "memory",
+        "thermal",
+        "stress",
+        "T-R02G0208-012"
+      ],
+      "devices": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "gating": true,
+      "id": "LL-D3",
+      "measurements": [
+        "memory",
+        "thermal",
+        "stress"
+      ],
+      "owner_steps": [
+        "The owner has the device in hand, unlocked, trusted and charged; the automation build is installed by the campaign (signing is the owner's).",
+        "The owner keeps the device unplugged for the stress session and tells the campaign the starting battery level."
+      ],
+      "pass": "Memory flat within the declared resource budget over the session (the growth rule of feature 192), 200 samples per device; thermal state and any tier change recorded.",
+      "procedure": "Run the 30-minute round-two stress session of UA-F13 (levels opened, played, undone and replayed in a loop) at automatic levels; the campaign samples the footprint and the thermal state.",
+      "status": "pending device campaign",
+      "title": "Memory, thermal state and the round-two stress session"
+    },
+    {
+      "covers": [
+        "T-R02G0204-012"
+      ],
+      "devices": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "gating": true,
+      "id": "LL-D4",
+      "measurements": [
+        "touch-to-frame"
+      ],
+      "owner_steps": [
+        "The owner has the device in hand, unlocked, trusted and charged; the automation build is installed by the campaign (signing is the owner's).",
+        "The owner turns the dial rings and orbits with two fingers; the campaign does not synthesise touches on hardware."
+      ],
+      "pass": "Touch-to-frame latency recorded for 200 samples per device; turning a ring previews the dial value under the finger and one action is sent on release.",
+      "procedure": "Turn each of the four dial rings beside the figure and orbit the camera with two fingers on each device; the campaign records the interval from touch to the first frame showing the change.",
+      "status": "pending device campaign",
+      "title": "Gesture feel and touch-to-frame latency"
+    },
+    {
+      "covers": [
+        "T-R02G0206-011"
+      ],
+      "devices": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "gating": true,
+      "id": "LL-D5",
+      "measurements": [
+        "sound-audible",
+        "haptics-felt"
+      ],
+      "owner_steps": [
+        "The owner has the device in hand, unlocked, trusted and charged; the automation build is installed by the campaign (signing is the owner's).",
+        "The owner listens and feels, and sets the silent switch and the system haptics setting."
+      ],
+      "pass": "The loop is audible only while the sound is on, the panel is shown and the scene is active, and follows the silent switch; each planned haptic is felt (where the device has no haptic engine, the haptic part is recorded as not applicable).",
+      "procedure": "Turn the Sound toggle on and play a level to a win and to a failure with the haptics switch on; observe the ambient loop and the selection, success, warning and error haptics.",
+      "status": "pending device campaign",
+      "title": "Sound heard and haptics felt"
+    },
+    {
+      "covers": [
+        "T-R02G0206-011"
+      ],
+      "devices": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "gating": false,
+      "id": "LL-D6",
+      "measurements": [
+        "voiceover-observation"
+      ],
+      "owner_steps": [
+        "The owner has the device in hand, unlocked, trusted and charged; the automation build is installed by the campaign (signing is the owner's).",
+        "The owner turns VoiceOver and the text size on and off in Settings and performs the walk-through."
+      ],
+      "pass": "Every control is read with its label and value, pending values and actions are announced, the win is announced; the panel stays readable at the largest accessibility text size; recorded as an observation (non-gating, P-08).",
+      "procedure": "With VoiceOver on and the largest accessibility text size, set level 1's solution with the steppers as pending values, apply it and hear the win; replay it.",
+      "status": "pending device campaign",
+      "title": "VoiceOver walk-through (manual, non-gating)"
+    },
+    {
+      "covers": [
+        "T-R02G0207-011"
+      ],
+      "devices": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "gating": true,
+      "id": "LL-D7",
+      "measurements": [
+        "progress-kept"
+      ],
+      "owner_steps": [
+        "The owner has the device in hand, unlocked, trusted and charged; the automation build is installed by the campaign (signing is the owner's).",
+        "The owner ends the app from the app switcher."
+      ],
+      "pass": "Level 1 is solved with its stars, level 2 is open and the replay of level 1 is offered after the reopen.",
+      "procedure": "Win level 1, leave the app to the background, end it from the app switcher, reopen Lissajous Labyrinth.",
+      "status": "pending device campaign",
+      "title": "Progress across a real termination"
+    },
+    {
+      "covers": [
+        "T-R02G0209-011"
+      ],
+      "devices": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "gating": true,
+      "id": "LL-D8",
+      "measurements": [
+        "scenarios",
+        "journeys"
+      ],
+      "owner_steps": [
+        "The owner has the device in hand, unlocked, trusted and charged; the automation build is installed by the campaign (signing is the owner's)."
+      ],
+      "pass": "Every scenario of the device set passes; level 1 is won with 3 of 3 stars in 1 action, progress survives the relaunch, the replay ends at action 1 of 1.",
+      "procedure": "Run the device scenario set by id and the interface journeys of chunk k3 (win level 1 with pending values and Apply, relaunch, replay).",
+      "status": "pending device campaign",
+      "title": "Panel journeys in the app"
+    }
+  ],
+  "scenarios": [
+    "launch-first-frame",
+    "input-response",
+    "completion",
+    "rejection",
+    "save-restore",
+    "reset",
+    "suspend-resume",
+    "teardown-reentry",
+    "cancel-prepare",
+    "full-playthrough",
+    "hero",
+    "fixture-level-1-solved"
+  ],
+  "schema": 1
+}
