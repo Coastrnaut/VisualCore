@@ -1,0 +1,172 @@
+{
+  "actions" : [
+    {
+      "turn" : {
+        "_0" : -21
+      }
+    },
+    {
+      "probe" : {
+
+      }
+    },
+    {
+      "select" : {
+        "band" : 3,
+        "bearing" : 51
+      }
+    }
+  ],
+  "ambiguity" : {
+    "probes" : [
+
+    ],
+    "targets" : [
+      0,
+      7
+    ]
+  },
+  "clues" : [
+    {
+      "bearing" : 0,
+      "depth" : 185,
+      "hueGap" : 11
+    }
+  ],
+  "counts" : [
+    1
+  ],
+  "difficulty" : {
+    "bandTolerance" : 1,
+    "bearingTolerance" : 3,
+    "clearShare" : 10,
+    "largestAfterBestSingle" : 2,
+    "smallest" : 1,
+    "work" : 2
+  },
+  "fingerprints" : [
+    "890d81ad169323d1dda2b0ee6e51a1b1f349245079abc9338e5431e14edff975",
+    "939eebc08d44db538aec4983a437ce86fe687331aea631f39fe83ee0f7cd0367",
+    "66efedcbf651bdd668b6505eefaf8b83a9ac453622fe8d763f19dcce5a907630",
+    "23d58f962704ee42d44d16da3f4ac977ddd6af1b6f27141f5163cf6bc5b00f8e"
+  ],
+  "level" : {
+    "allowance" : 11,
+    "band" : 2,
+    "bandTolerance" : 1,
+    "bearingTolerance" : 3,
+    "fingerprint" : "1bed93fb54688a0d9b505572fbc74ffb063d08ed0fc39b3dd5fbece8de1f61a8",
+    "fog" : [
+      7,
+      8,
+      3,
+      7,
+      1,
+      5,
+      7,
+      6,
+      3,
+      8,
+      6,
+      7,
+      4,
+      4,
+      2,
+      3,
+      3,
+      7,
+      2,
+      9,
+      3,
+      2,
+      8,
+      1,
+      8,
+      6,
+      4,
+      5,
+      2,
+      7,
+      4,
+      3,
+      1,
+      8,
+      8,
+      0,
+      9,
+      8,
+      4,
+      2,
+      0,
+      0,
+      7,
+      7,
+      0,
+      7,
+      4,
+      8,
+      2,
+      7,
+      8,
+      4,
+      4,
+      0,
+      8,
+      8,
+      9,
+      1,
+      5,
+      2,
+      5,
+      7,
+      5,
+      2,
+      1,
+      9,
+      9,
+      2,
+      9,
+      4,
+      5,
+      5,
+      7,
+      2,
+      7,
+      5,
+      2,
+      8,
+      9,
+      0,
+      3,
+      0,
+      4,
+      0,
+      9,
+      1,
+      5,
+      4,
+      3,
+      8,
+      2,
+      0,
+      4,
+      6,
+      6,
+      2
+    ],
+    "id" : "hue-compass-021",
+    "offset" : 15,
+    "schema" : 1,
+    "seed" : 18277877370263854472,
+    "start" : 21,
+    "target" : 54,
+    "tutorial" : false
+  },
+  "nearMiss" : {
+    "band" : 4,
+    "bearing" : 58
+  },
+  "number" : 21,
+  "schema" : 1,
+  "skipped" : 0
+}

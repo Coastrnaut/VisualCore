@@ -1,0 +1,190 @@
+{
+  "actions" : [
+    {
+      "turn" : {
+        "_0" : 18
+      }
+    },
+    {
+      "probe" : {
+
+      }
+    },
+    {
+      "turn" : {
+        "_0" : 36
+      }
+    },
+    {
+      "probe" : {
+
+      }
+    },
+    {
+      "select" : {
+        "band" : 12,
+        "bearing" : 70
+      }
+    }
+  ],
+  "ambiguity" : {
+    "probes" : [
+      0
+    ],
+    "targets" : [
+      4,
+      93
+    ]
+  },
+  "clues" : [
+    {
+      "bearing" : 0,
+      "depth" : 52,
+      "hueGap" : 7
+    },
+    {
+      "bearing" : 36,
+      "depth" : 97,
+      "hueGap" : 8
+    }
+  ],
+  "counts" : [
+    4,
+    3
+  ],
+  "difficulty" : {
+    "bandTolerance" : 0,
+    "bearingTolerance" : 1,
+    "clearShare" : 40,
+    "largestAfterBestSingle" : 4,
+    "smallest" : 2,
+    "work" : 133
+  },
+  "fingerprints" : [
+    "5df93851fdeb5b2e0129c3f94eccafdfd36cd8fe62f9c2d65acfc62fdf50c4e1",
+    "7a748271d51cc14e078a5fca321bc51f6c0e7a7a371cea3671caaad0dc5da43c",
+    "eed0536d54bd7ec92d017fa8cac4b5e494b3bdf77e1043946902a6c066942d9f",
+    "9821f98b50bb8414307d78d00b0897ae68b337edcd4ed56536043ba7ee99ee20",
+    "2c00d78760f940b9b0339dd0a8e2bc4d1d959a349ba6013f155e15d1420068e0",
+    "9f16d052a134d42f36fde9a2cefeec7526c9ea934621c8e20a129c9c79c0131a"
+  ],
+  "level" : {
+    "allowance" : 19,
+    "band" : 5,
+    "bandTolerance" : 0,
+    "bearingTolerance" : 1,
+    "fingerprint" : "4b7012447e50de020820084b035feee1bc3a77af76609ae94d5c54ad5262d158",
+    "fog" : [
+      3,
+      0,
+      7,
+      0,
+      3,
+      0,
+      4,
+      7,
+      8,
+      7,
+      0,
+      4,
+      2,
+      0,
+      0,
+      9,
+      5,
+      0,
+      0,
+      6,
+      2,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      7,
+      2,
+      1,
+      8,
+      0,
+      0,
+      0,
+      8,
+      0,
+      4,
+      3,
+      7,
+      0,
+      1,
+      0,
+      5,
+      8,
+      0,
+      0,
+      1,
+      0,
+      1,
+      0,
+      0,
+      0,
+      9,
+      6,
+      5,
+      7,
+      0,
+      6,
+      6,
+      0,
+      0,
+      7,
+      5,
+      5,
+      8,
+      2,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      2,
+      0,
+      0,
+      0,
+      2,
+      3,
+      9,
+      1,
+      2,
+      6,
+      3,
+      2,
+      1,
+      3,
+      0,
+      1,
+      8,
+      1,
+      4,
+      3
+    ],
+    "id" : "hue-compass-099",
+    "offset" : 19,
+    "schema" : 1,
+    "seed" : 4060672816260545530,
+    "start" : 78,
+    "target" : 71,
+    "tutorial" : false
+  },
+  "nearMiss" : {
+    "band" : 12,
+    "bearing" : 73
+  },
+  "number" : 99,
+  "schema" : 1,
+  "skipped" : 0
+}

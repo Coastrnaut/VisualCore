@@ -52,7 +52,7 @@ or {device} tasks (pure logic and host-generated content). Fixture seed 2_332; t
   `Packages/ExperiencesRound02/HueCompass/CoreTests/HueCompassWitnessTests.swift` (round trip byte for byte; edited action, fingerprint, level, clue,
   counts, counterexamples and difficulty refused; newer schema and damaged JSON refused; the near miss fails; the
   ambiguity holds); `--name host-4`
-- [ ] T-R02G0402-006 [US2] [US3] [US4] Create `Packages/ExperiencesRound02/HueCompass/CoreTests/HueCompassCatalogTests.swift` (100 entries, 20 per band; the
+- [X] T-R02G0402-006 [US2] [US3] [US4] Create `Packages/ExperiencesRound02/HueCompass/CoreTests/HueCompassCatalogTests.swift` (100 entries, 20 per band; the — Verified 2026-11-21: 2026-11-21 host-5 exit 0 (catalog: pinned digest fcb10a90…8b15, progression, band means of the smallest count 1, 1, 1, 1.15, 2, tolerances never loosen, brute force agrees on levels 1, 11 … 91, all 100 stored witnesses sound, 100 witness files byte for byte)
   catalog generated twice is identical; pinned digest; `ProgressionRule.standard` holds on the smallest count; band means
   of the smallest count never fall and tolerances never loosen; on levels 1, 11, 21, … 91 the smallest count equals the
   brute force (SC-R02G0402-002); for all 100 levels every class after the witness
