@@ -87,3 +87,7 @@ observations after ImplementationLock-100.
 001 → {002 (agent A), 003 and 005 (agent B)} → 004 (lead) → 006 (lead; agent C writes the simulator tests) → 007 … 011,
 013. 012 is a {device} task outside this campaign. Shared files (package manifest, geometry, presenter, panel, scene,
 docs) stay with the lead. MVP: Story 1.
+
+## Phase 7: Convergence
+
+- [ ] T-R02G0506-014 Add `labelsValuesAndActionCoverage` to `Packages/ExperiencesRound02/ColorfallCanyons/ExperienceTests/ColorfallCanyonsAccessibilityTests.swift`: the label and value strings built outside the view body (`ColorfallCanyonsControls.progressValue`, `readableWidth` 520, `modeName`), the valve states ("open, n units left", "closed", "dry") and the cell picker's value ("row r, column c") from the mirror, `nativeActions` covering every action id with `gestureActions` a subset, the sound off by default, and the summary following a carve, per FR-R02G0506-001 and SC-R02G0506-001 (partial)
