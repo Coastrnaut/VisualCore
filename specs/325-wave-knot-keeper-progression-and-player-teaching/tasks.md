@@ -27,7 +27,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks.
 
 ## Phase 3: Stories 1 and 4 — tutorial, progress, daily, practice (P1, P2)
 
-- [ ] T-R02G0305-003 [P] [US1] [US4] Create `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperProgress.swift` (WaveKnotKeeperTutorialStep "move(point)
+- [X] T-R02G0305-003 [P] [US1] [US4] Create `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperProgress.swift` (WaveKnotKeeperTutorialStep "move(point) — Verified 2026-11-21: 2026-11-21 host-2 exit 0 (17 progress tests)
   → signature (an accepted move) → hints (the next accepted move or a hint) → done (a win); dismiss → done; undo never
   moves it back" with the texts of clarification Q2; WaveKnotKeeperMode "campaign, practice, daily(level)";
   WaveKnotKeeperProgress "level 1 open; a campaign win opens the next; a better result replaces a worse one; stars 3 at
