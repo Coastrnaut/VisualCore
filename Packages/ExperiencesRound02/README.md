@@ -198,3 +198,7 @@ Feature 332 (R02-G04-02) adds the content pipeline: `HueCompassManifest` (100 pl
 `HueCompassDifficulty` and versioned witness files (`HueCompassWitness`) under `docs/games/hue-compass/levels/`, with a
 pinned catalog digest.
 
+Feature 333 (R02-G04-03) adds the experience: the adapter `HueCompassExperienceCore`, the immutable scene snapshot,
+the compass geometry and GLSL sources in the Core, and the iOS-only `HueCompassExperience` target (presenter, compass
+scene, fallback, a minimal control panel); the experience is registered as a candidate with 94 scenarios.
+

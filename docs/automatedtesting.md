@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-21 (R02-G04-02: a prototype measured the band profiles before the generator was written; tests that read the witness files fail during the run that writes them).
+Last updated: 2026-11-21 (R02-G04-03: registering a candidate also extends the registered list pinned in RealCatalogTests).
 
 ## 1. What is tested, and where
 
@@ -297,6 +297,14 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   probe settles almost every Hue Compass level unless the tolerances are (1, 0) on fog with 30 … 40 % clear bearings,
   and that more clear fog makes levels undeducible within two probes; the band profiles were set from those counts and
   all 100 levels then generated on the first try (R02-G04-02).
+
+- **Registering a candidate extends a pinned list.** `RealCatalogTests.categoriesAndFamilyTags` pins every
+  experience that has a registration in `Catalog/registrations.json`; Hue Compass's candidate registration failed the
+  catalog-search check until the list named `r02-g04.hue-compass` (R02-G04-03). Extend it in the same change as the
+  registration.
+- **A renderer without a colour stream.** `ShaderMeshRenderer` binds position, normal and texture coordinates only;
+  Hue Compass's unlit meshes carry their colour in the normal slot and the fallback `MeshRenderer` gets explicit
+  colours and (0, 0, 1) normals, so its light term stays finite (R02-G04-03).
 
 ### Process
 

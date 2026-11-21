@@ -74,3 +74,27 @@ large turn as single steps; the play accepts both.
   with `HUE_COMPASS_WRITE_WITNESSES=1 swift test --package-path Packages/ExperiencesRound02 --filter
   HueCompassCatalogTests`.
 
+## Experience and renderer (feature 333, R02-G04-03)
+
+- **Adapter.** `HueCompassExperienceCore` opens certified level (seed mod 100) + 1 and accepts `compass.turn [steps]`
+  (−48 … 48, not 0), `compass.probe`, `compass.select [bearing, band]`, `play.undo`, `play.redo` and `level.next`; kernel
+  refusals pass through with their `r02-g04.*` codes and a fractional value is refused as `r02-g04.not-whole`. Its digest
+  is the level number and the play fingerprint; its snapshot (schema 1) is `{level, records}`, restored by replay.
+- **Snapshot.** The renderer reads only `HueCompassSceneSnapshot` (bearing, offset, fog, tolerances, clues, selection,
+  stage, time, level number); the target is in it only once the play has ended, so no frame of a playing level can give
+  the answer away.
+- **Scene.** The compass lies in the xy-plane, bearing b at angle 2πb/96. A faceted glass needle (pearl, fresnel rim)
+  reaches radius 0.8; 96 ticks sit at 0.95 … 1.0; the hue wheel is 24 unlit segments at 0.82 … 0.92 coloured by hue
+  band/24 (saturation 0.85, value 1.0) with a grayscale glyph (shape band mod 4, ⌊band/4⌋ + 1 marks) in each segment's
+  outer edge; the fog is 96 translucent prisms at 1.1 … 1.25 whose height and brightness follow density only; probes
+  leave pearl marks, the selection an ember mark, and the ended play a sapphire ring at the target. The camera looks
+  down −z tilted 35°, fitting a 1.45 bounding sphere for aspects 0.4 … 2.5. `ShaderMeshRenderer` has no colour stream,
+  so the unlit program reads each vertex's colour from the normal slot and the fog's brightness and drift phase from
+  the texture coordinates.
+- **Tiers.** level-0: 12 needle facets, 3 fog layers, 2 glow shells; level-1: 8, 2, 1; level-2: 4, 1, 0. Bearings,
+  colours, glyphs and marks sit at the same places at every tier; tier changes go to the presenter's `tierLog`.
+- **Fallback and accessibility.** A program that fails to build leaves the level-2 geometry drawn unlit with
+  `MeshRenderer` and keeps the reason. Reduce Motion holds the fog drift still; Reduce Flashing caps the glow gain.
+- **Registration.** `r02-g04.hue-compass` is a registered candidate (not available until X-R02-G04) with 94 scenarios
+  (`Packages/ExperiencesRound02/HueCompass/scenario-manifest.json`, regenerated with `UPDATE_SCENARIO_MANIFEST=1`).
+
