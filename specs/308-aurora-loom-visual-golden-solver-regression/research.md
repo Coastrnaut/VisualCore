@@ -7,7 +7,9 @@
 - **R2 — Golden baseline form.** Decision: a JSON description of projected positions (1/8 pixel) and 8-bit colours per
   frame, hashed with SHA-256, digests pinned in `golden-frames.json`. Rationale: code-only visuals forbid stored
   pictures made outside the code; a description is exact on every host, so CI catches drift without a GPU; the simulator
-  compares renders to the same description with tolerances. Alternatives: stored PNG frames (rejected: not code-only and
+  compares renders to the same description with tolerances. The file pins the descriptions as well as the digests:
+  positions come from Darwin's sine and cosine, whose last bit may change between macOS releases, so a mismatched digest
+  falls back to a comparison within one 1/8-pixel quantum before failing. Alternatives: stored PNG frames (rejected: not code-only and
   GPU-dependent); perceptual image hashes (rejected: tolerance-dependent and opaque).
 - **R3 — Golden set.** Decision: levels 1, 21, 41, 61, 81 (one per band) at tiers 0, 1, 2, time 0, plus the hero
   scenario's frame. Rationale: the same five levels the feature-303 render tests use, every tier, and the hero frame the

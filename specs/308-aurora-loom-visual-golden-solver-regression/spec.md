@@ -56,9 +56,12 @@ the GPU objects; the GitHub workflow's host job runs `swift test --package-path 
   frame (levels 1, 21, 41, 61, 81 at tiers 0, 1, 2 at frame time 0, plus the hero frame of the scenario manifest's hero
   scenario at tier 0: 16 frames) the Core computes, at 768 × 512, the projected pixel positions of every ribbon sample
   checked by the feature-303 frame check, of every gate marker and gate centre, rounded to 1/8 pixel, and the expected
-  colours as 8-bit sRGB; serialized as JSON with sorted keys, hashed with SHA-256. The 16 digests live in a committed
-  file `Packages/ExperiencesRound02/AuroraLoom/golden-frames.json`; the host test recomputes and compares them (so CI
-  catches drift), and rewrites the file only when `AURORA_LOOM_WRITE_GOLDEN=1` is set. The simulator test renders the
+  colours as 8-bit sRGB; serialized as JSON with sorted keys, hashed with SHA-256. The 16 descriptions and their digests
+  live in a committed file `Packages/ExperiencesRound02/AuroraLoom/golden-frames.json` (amended in analyze: positions
+  come from the system's sine and cosine, whose last bit may differ between macOS releases, so a digest alone could fail
+  CI without any visual change). The host test recomputes each description: an equal digest passes; otherwise every
+  position must lie within one 1/8-pixel quantum of the pinned one and every colour must be equal, or the test fails
+  naming the frame and the first differing value. The file is rewritten only when `AURORA_LOOM_WRITE_GOLDEN=1` is set. The simulator test renders the
   16 frames and checks them against the same descriptions with the feature-303 tolerances. Impact: FR-R02G0108-003,
   004; SC-R02G0108-003.
 - Q: How is memory measured and what releases are checked? → A: on the simulator, 12 cycles of open (prepare a level),

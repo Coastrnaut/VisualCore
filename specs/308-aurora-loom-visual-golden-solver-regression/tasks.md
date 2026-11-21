@@ -15,7 +15,8 @@ recorded only after every agent has reported). Commit after every task with its 
 
 - [ ] T-R02G0108-002 Create `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomGolden.swift` (contracts/api.md: "16 frames: levels 1, 21, 41, 61, 81 at
   tiers 0, 1, 2, time 0, plus the hero frame"; description JSON with sorted keys at 768 × 512, positions in 1/8 pixel,
-  colours 0 … 255; SHA-256 digests; `manifest()` "{schema 1, frames: name → digest}") and edit
+  colours 0 … 255; SHA-256 digests; `manifest()` "{schema 1, frames: name → {description, digest}}"; `compare` "equal
+  digest, or positions within one 1/8-pixel quantum and equal colours") and edit
   `Packages/ExperiencesRound02/AuroraLoom/Experience/AuroraLoomRibbonScene.swift` (`liveObjectCount`: programs and buffers held, 0 after `release()`);
   `--name host -- swift test --package-path Packages/ExperiencesRound02`
 
@@ -29,7 +30,7 @@ recorded only after every agent has reported). Commit after every task with its 
 ## Phase 4: Story 2 — the picture does not drift (P1)
 
 - [ ] T-R02G0108-004 [P] [US2] Create `Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomRegressionGoldenTests.swift` (agent B: 16 frames; descriptions
-  deterministic; digests equal `Packages/ExperiencesRound02/AuroraLoom/golden-frames.json`; the file rewritten only with `AURORA_LOOM_WRITE_GOLDEN=1`; a
+  deterministic; each equals its pinned entry in `Packages/ExperiencesRound02/AuroraLoom/golden-frames.json` (equal digest, or positions within one 1/8-pixel quantum and equal colours; a position moved by two quanta fails naming the frame); the file rewritten only with `AURORA_LOOM_WRITE_GOLDEN=1`; a
   missing, unreadable or incomplete manifest fails naming the file and frame; a moved camera, a changed palette colour
   and a changed tier each change the affected digests); the lead generates and commits `Packages/ExperiencesRound02/AuroraLoom/golden-frames.json`;
   `--name host-3 -- swift test --package-path Packages/ExperiencesRound02 --filter AuroraLoomRegressionGoldenTests`
@@ -63,7 +64,8 @@ recorded only after every agent has reported). Commit after every task with its 
 - [ ] T-R02G0108-010 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G0108-011 Reference regression chunk 2 (`--name reference-2`)
 - [ ] T-R02G0108-012 {device} After ImplementationLock-100: frame time and memory per tier on D1/D2/D3 (SC-R02G0108-007)
-- [ ] T-R02G0108-013 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+- [ ] T-R02G0108-013 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
+  after the record push, check its CI run with `gh run list` and fix any failure before the next gate (SC-R02G0108-005)
 
 ## Dependencies and parallel work
 

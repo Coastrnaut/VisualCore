@@ -9,7 +9,9 @@ public enum AuroraLoomGolden {
     public static func snapshot(_ frame: Frame) throws -> AuroraLoomSceneSnapshot
     public static func description(_ frame: Frame) throws -> Data           // JSON, sorted keys
     public static func digest(_ frame: Frame) throws -> String              // SHA-256 hex of the description
-    public static func manifest() throws -> Data                            // {"schema":1,"frames":{name: digest}}
+    public static func manifest() throws -> Data          // {"schema":1,"frames":{name: {"description":…, "digest":…}}}
+    public static func compare(_ frame: Frame, pinned: Data) throws -> String?   // nil when equal or within one quantum;
+                                                                                  // else the first differing value
 }
 // AuroraLoomRibbonScene (experience, internal): var liveObjectCount: Int — programs and buffers held; 0 after release.
 ```
