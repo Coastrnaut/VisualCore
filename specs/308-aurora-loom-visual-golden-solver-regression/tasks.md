@@ -34,7 +34,7 @@ recorded only after every agent has reported). Commit after every task with its 
   missing, unreadable or incomplete manifest fails naming the file and frame; a moved camera, a changed palette colour
   and a changed tier each change the affected digests); the lead generates and commits `Packages/ExperiencesRound02/AuroraLoom/golden-frames.json`;
   `--name host-3 -- swift test --package-path Packages/ExperiencesRound02 --filter AuroraLoomRegressionGoldenTests`
-- [ ] T-R02G0108-005 [P] [US2] Create `Packages/ExperiencesRound02/AuroraLoom/ExperienceTests/AuroraLoomRegressionGoldenFrameTests.swift` (agent C: each of the 16
+- [X] T-R02G0108-005 [P] [US2] Create `Packages/ExperiencesRound02/AuroraLoom/ExperienceTests/AuroraLoomRegressionGoldenFrameTests.swift` (agent C: each of the 16 — Verified 2026-11-20: 2026-11-20 sim-27-2 exit 0 (16 golden frames rendered at 96 x 64 match their descriptions: 5 levels x 3 tiers and the hero frame; sim-27 exit 65 was a compile error in the memory test's issue message, fixed)
   frames rendered off-screen at 96 × 64 through the session host and checked against its description: positions within
   2 px, colours within 0.12 per channel, background within 0.05 of night); `--name sim-27 -- python3
   scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package --destination
