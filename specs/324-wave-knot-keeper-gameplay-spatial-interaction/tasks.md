@@ -23,7 +23,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 3: Stories 1 and 2 — drag to move, orbit to look (P1) 🎯
 
-- [ ] T-R02G0304-003 [US1] [US2] Create `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperGestureController.swift` (idle, dragging, orbiting,
+- [X] T-R02G0304-003 [US1] [US2] Create `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperGestureController.swift` (idle, dragging, orbiting, — Verified 2026-11-21: 2026-11-21 host-3 exit 0 (gesture controller: 10 tests incl. 300 seeded drags equal Handles.candidate, every arbitration case, orbit rates and limits, double-tap reset, determinism)
   cancelled; one finger on a handle drags and selects; a tap selects only; a second finger cancels and orbits; release
   returns at most one `point.move [point, direction]`; nothing while not playing except selection; double tap on empty
   space resets the orbit) with `Packages/ExperiencesRound02/WaveKnotKeeper/CoreTests/WaveKnotKeeperGestureControllerTests.swift` (agent C: every arbitration
