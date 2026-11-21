@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-21
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G02-07 (migration ledger, game feature of experience R02-G02) · ID namespace FR-R02G0207-###,
 SC-R02G0207-###, T-R02G0207-###
@@ -27,6 +27,43 @@ Canonical overrides:
   progression, and R02-G02-01 … 06.
 - **Model:** feature 307 (Aurora Loom), including its lesson: the saved frontier is restored as saved (raising it from
   the kept results would open levels for an honest daily win).
+
+## Clarifications
+
+### Session 2026-11-21
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+307's answers (and its amendment) where the games agree. Facts checked in code (read-only audit, 2026-11-21): the app's
+`SavedStateStore` keeps one `state.json` per experience holding the encoded `ExperienceSnapshot`, writes it atomically,
+moves an unreadable file aside (at most three copies) and refuses a newer schema; the engine applies the experience's
+`MigrationChain`; Lissajous Labyrinth's adapter writes snapshot schema 2 `{level, mode, progress, records, tutorial}`
+with a 1 → 2 step; `LissajousLabyrinthProgress.Result` keeps best actions and stars, and its private `Entry` encoding
+can grow fields; the kernel's records carry previous and next fingerprints; undo leaves an undo stack of net changes.
+
+- Q: What is stored for each result, and when is it written? → A: each result keeps its best actions, stars and the
+  winning trace — the ordered actions (dial, value) of the play that earned it, its undo stack of net changes — plus
+  `verified`. A campaign or daily win replaces the stored result only when it uses fewer actions (ties keep the earlier
+  trace); practice records nothing. The shared store writes the snapshot at the app's save points (leaving the
+  experience, backgrounding); this feature does not change when. Impact: FR-R02G0207-001, 003; SC-R02G0207-001.
+- Q: How are scores reconciled on restore? → A: for every result with a trace: the certified level is generated, a fresh
+  play replays the trace (each action legal), and the result is kept only if the play ends won after exactly
+  `bestActions` actions and `stars` equals the stars rule for that count; otherwise it is dropped. The adapter exposes
+  the number dropped and the presenter announces it once ("n saved results could not be checked and were removed.").
+  Results without a trace (from schema 2) are kept, marked unverified. The frontier is restored as saved. Impact:
+  FR-R02G0207-003; SC-R02G0207-003.
+- Q: How do migrations work? → A: schema 3 adds the trace and `verified` to each result and the mode `replay(level)`.
+  1 → 2 is the existing step; 2 → 3 copies results with an empty trace and `verified: false`. A payload of schema 4 or
+  newer is refused by the shared store (newer schema); a damaged payload is refused with `damaged` and the opening state
+  is used. Impact: FR-R02G0207-002; SC-R02G0207-002.
+- Q: How does replay work? → A: the action `replay.start [level]` opens mode `replay(level)` with a fresh play of that
+  level when a verified result with a trace exists (`r02-g02.no-replay` otherwise); `replay.step` applies the next action
+  of the trace (`r02-g02.replay-end` after the last or once the play ended); `replay.stop` returns to campaign at that
+  level (the frontier when it is not open). During replay every other play action except `tutorial.dismiss` is refused
+  with `r02-g02.replay`; replay never changes progress; the tutorial is done during replay. Impact: FR-R02G0207-004;
+  SC-R02G0207-004.
+- Q: Which inputs make the state deterministic? → A: the seed (opening level), the certified catalog (fixed planned
+  seeds), the calendar date given to `mode.daily` and the recorded actions; the state reads no clock and no random
+  source, so a save restores and replays identically on every device. Impact: FR-R02G0207-005.
 
 ## User Scenarios & Testing *(mandatory)*
 
