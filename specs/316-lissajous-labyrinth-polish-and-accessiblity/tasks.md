@@ -26,7 +26,7 @@ ImplementationLock-100.
 
 ## Phase 3: Story 2 — comfort settings (P1)
 
-- [ ] T-R02G0206-003 [P] [US2] Create `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthLights.swift` ("checkpoint targets dim 0, next 0.5,
+- [X] T-R02G0206-003 [P] [US2] Create `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthLights.swift` ("checkpoint targets dim 0, next 0.5, — Verified 2026-11-21: 2026-11-21 host-2 exit 0: LissajousLabyrinthLightsTests 8/8 (targets; a scripted win and adversarial flicker under Reduce Flashing at 60 Hz: at most 3 half-range crossings per second and every complete fade over half the range at least 0.4 s; normal mode reaches targets in 0.15 s; the measure catches fast blinking in normal mode; settle, count changes, non-finite elapsed)
   visited 1; obstacle 0 or 1 touched; glow 1 when won; linear 0.15 s, or 0.45 s under Reduce Flashing where a started fade
   completes before turning back"; settle; step; maxHalfRangeCrossingsPerSecond) with
   `Packages/ExperiencesRound02/LissajousLabyrinth/CoreTests/LissajousLabyrinthLightsTests.swift` (a scripted win and adversarial flicker at 60 Hz: at most 3
