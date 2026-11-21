@@ -15,7 +15,7 @@ ImplementationLock-100.
 
 ## Phase 2: Story 1 — VoiceOver play (P1) 🎯
 
-- [ ] T-R02G0306-002 [P] [US1] [US3] Create `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperFeedbackPlan.swift` ("after(old:new:)" texts and kinds
+- [X] T-R02G0306-002 [P] [US1] [US3] Create `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperFeedbackPlan.swift` ("after(old:new:)" texts and kinds — Verified 2026-11-21: 2026-11-21 host exit 0: WaveKnotKeeperFeedbackPlanTests 6/6 (moves, selections, undo, redo, degenerate texts, campaign and practice wins, failure, level and mode changes, every refusal code; singular counts)
   of clarification Q1: "Point n moved <direction>. c crossings, writhe w; target C, W. Moves s of a." (degenerate: "Two
   strands overlap in the view." for the counts); "Undone: " / "Redone: "; "Point n selected."; win "The knot matches.
   Level won in s moves, k of 3 stars." (no stars in practice); failure = the feature-325 explanation; level or mode change
