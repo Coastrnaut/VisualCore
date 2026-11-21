@@ -206,3 +206,7 @@ Feature 334 (R02-G04-04) adds spatial play: `HueCompassOrbit`, `HueCompassDial` 
 the host-tested `HueCompassGestureController` (swipe to turn, tap the hub to probe, two-finger orbit, reset); the panel
 gains "Reset view".
 
+Feature 335 (R02-G04-05) adds teaching and progression: `HueCompassHints` with `HueCompassFailureExplanation`, and
+`HueCompassProgress` with `HueCompassMode` and `HueCompassTutorialStep`; the adapter gains level selection, daily,
+practice and campaign modes, the tutorial and snapshot schema 2.
+

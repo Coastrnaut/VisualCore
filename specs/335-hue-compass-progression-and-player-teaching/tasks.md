@@ -56,7 +56,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks.
 
 ## Phase 5: Regression, documentation and close
 
-- [ ] T-R02G0405-006 Docs: `docs/architecture/hue-compass.md` (teaching and progression),
+- [X] T-R02G0405-006 Docs: `docs/architecture/hue-compass.md` (teaching and progression), — Verified 2026-11-21: 2026-11-21 round02-host exit 0; architecture, package README and testing doc updated
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
 - [ ] T-R02G0405-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
   `--name host-full`, `--name app-unit`

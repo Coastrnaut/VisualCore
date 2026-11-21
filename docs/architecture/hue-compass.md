@@ -112,3 +112,21 @@ large turn as single steps; the play accepts both.
 - **Panel.** Turn ±1 and ±4, Probe, a band picker with Select, Undo, Redo, Next level and Reset view; all 100 certified
   levels are won through these actions alone (a witness turn of k becomes ⌊|k|/4⌋ presses of ±4 and |k| mod 4 of ±1).
 
+## Teaching and progression (feature 335, R02-G04-05)
+
+- **Tutorial.** Levels 1 … 3 (in every mode) show one instruction at a time: aim (until a turn), probe (until a probe —
+  "the hue gap counts bands to the target, the fog depth sums the fog between"), select (until the level ends);
+  `tutorial.dismiss` ends it; undo never moves it back.
+- **Hints.** A hint reasons only from the clues seen: the consistent set is every candidate whose clues at the probed
+  bearings equal those seen. When one selection accepts the whole set the hint names it; otherwise, with at least two
+  units left, a probe at the first bearing that settles the set (else the one that splits it best); with one unit left,
+  the selection accepting the most candidates ("best guess"). Three levels: what, where (an eighth of the compass, north
+  = bearing 24), exact. Following exact hints wins every certified level within its allowance.
+- **Failures.** A miss names the target's bearing and band and how far the selection was from each; an exhausted
+  allowance says the last unit went to a probe. Probes and selections cannot be undone, so the level is retried.
+- **Progress.** Level 1 is open; a campaign win opens the next; each level keeps its fewest units spent and its stars
+  (3 at most the certified smallest probe count + 1 units, 2 at most + 2, else 1). The daily level is (days since
+  2026-01-01 × 47) mod 100 + 1 and opens nothing; practice raises the allowance to 24 and records nothing. Progress, the
+  mode and the tutorial step are in snapshot schema 2 (migrated from 1); `level.select`, `mode.daily`, `mode.practice`,
+  `mode.campaign` and `tutorial.dismiss` are the new controls, with `r02-g04.locked` and `r02-g04.date` refusals.
+
