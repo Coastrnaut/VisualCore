@@ -30,7 +30,7 @@ import sys
 from pathlib import Path
 
 SCHEMA = 1
-EXPERIENCE_ID = re.compile(r"[a-z0-9]+\.[a-z0-9-]+")
+EXPERIENCE_ID = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*\.[a-z0-9-]+")  # a05.infinite-geometry, r02-g01.aurora-loom
 SCENARIO = re.compile(r"[a-z0-9-]{1,64}")
 RUN_ID = re.compile(r"[A-Za-z0-9-]{1,64}")
 SEED = re.compile(r"[0-9]+")
@@ -88,7 +88,7 @@ SHA1 = _leaf("40 lower-case hex characters", _matches(HEX40))
 
 FIELDS: dict = {
     "schema": INT,
-    "experience": _leaf("an experience id such as sample.orbit", _matches(EXPERIENCE_ID)),
+    "experience": _leaf("an experience id such as sample.orbit or r02-g01.aurora-loom", _matches(EXPERIENCE_ID)),
     "code": NONEMPTY,
     "scenario": _leaf("a scenario name of 1 to 64 characters a-z 0-9 -", _matches(SCENARIO)),
     "seed": _null(_leaf("a decimal string", _matches(SEED))),
@@ -359,6 +359,8 @@ SELF_TEST_CASES = [
      _edit(scenario="cancel-prepare", steps=[], digests__initial=None, digests__final=None), None),
     ("fail with a failure", _edit(result="fail", failures=["digest mismatch"]), None),
     *[(f"missing {k}", _edit(**{k: ...}), f"{k}: missing") for k in FIELDS],
+    ("round-two experience id", _edit(experience="r02-g01.aurora-loom"), None),
+    ("experience id with an empty round part", _edit(experience="r02-.aurora-loom"), "experience: expected an experience id"),
     ("seed as an integer", _edit(seed=42), "seed: expected a decimal string"),
     ("schema 0", _edit(schema=0), "unknown schema"),
     ("schema 2", _edit(schema=2), "newer schema"),
