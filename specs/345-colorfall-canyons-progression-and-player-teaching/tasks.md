@@ -32,13 +32,13 @@ R02-G05-03 are unchanged).
 ## Phase 3: Stories 1 and 4 — tutorial, progress, daily, practice (P1, P2)
 
 - [ ] T-R02G0505-003 [P] [US1] [US4] Create `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsProgress.swift` (ColorfallCanyonsTutorialStep
-  "steer → run (an edit was accepted and the plan is empty) → fill (an accepted step) → done (the level ends); dismiss →
-  done; undo never moves it back" with the texts of clarification Q2; ColorfallCanyonsMode "campaign, practice,
+  "steer → run (an edit was accepted and the plan is empty — the caller passes `planEmpty`) → fill (an accepted step) →
+  done (the level ends); dismiss → done; undo never moves it back" with the texts of clarification Q2; ColorfallCanyonsMode "campaign, practice,
   daily(level)"; ColorfallCanyonsProgress "level 1 open; a campaign win opens the next; a better result replaces a worse
   one; stars 3 at most smallest actions, 2 at most smallest + 2, else 1"; dailyLevel "(days from 2026-01-01 × 53) mod 100
   + 1, negative counts wrapped; nil for an impossible date") with
-  `Packages/ExperiencesRound02/ColorfallCanyons/CoreTests/ColorfallCanyonsProgressTests.swift` (agent C: tutorial scripts on levels 1 … 3 following
-  exact hints win and see every step in order; scripted progress through 100 levels; stars; every date 2026-01-01 …
+  `Packages/ExperiencesRound02/ColorfallCanyons/CoreTests/ColorfallCanyonsProgressTests.swift` (agent C: tutorial transitions on levels 1 … 3 driven by the
+  certified solutions with `planEmpty` given, every step seen in order; scripted progress through 100 levels; stars; every date 2026-01-01 …
   2036-12-31 maps to 1 … 100 and 100 consecutive days visit every level; impossible dates refused); `--name host-2`
 
 ## Phase 4: Adapter, scenarios and panel
@@ -51,7 +51,9 @@ R02-G05-03 are unchanged).
   r02-g05.locked, r02-g05.date), `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsScenarios.swift` and the regenerated
   `Packages/ExperiencesRound02/ColorfallCanyons/scenario-manifest.json`, with
   `Packages/ExperiencesRound02/ColorfallCanyons/CoreTests/ColorfallCanyonsExperienceCoreTests.swift` updates (conformance; actions; migration of a
-  schema-1 payload; undo restores the digest with the tutorial advanced; schema examples registered); `--name host-3`
+  schema-1 payload; undo restores the digest with the tutorial advanced; schema examples registered; on levels 1 … 3 a
+  scripted player following each instruction and the exact hints wins (SC-R02G0505-001); scenarios that use level.next
+  (now the next open level) regenerated and replayed); `--name host-3`
 - [ ] T-R02G0505-005 [US1] [US2] [US3] [US4] Edit `Packages/ExperiencesRound02/ColorfallCanyons/Experience/ColorfallCanyonsPresenter.swift` and
   `Packages/ExperiencesRound02/ColorfallCanyons/Experience/ColorfallCanyonsControls.swift` (instruction with Dismiss; Hint revealing the next level, reset
   after any change of the play; failure explanation with Undo and Retry; level picker of open levels with bands and
