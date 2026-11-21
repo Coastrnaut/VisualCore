@@ -314,6 +314,52 @@ import VisualCoreScenes
         #expect(ringVertices == 16 * 6)
     }
 
+    /// Feature 336 (T-R02G0406-004): settled lights draw feature 333's marks exactly, in every stage shown here.
+    @Test func settledLightsDrawTheMarksExactly() throws {
+        let fog: [Int] = Self.seededFog(7)
+        let won: HueCompassSceneSnapshot = try Self.snapshot(offset: 2, fog: fog, start: 10, target: 70,
+                                                             actions: [.probe, .turn(5), .probe,
+                                                                       .select(bearing: 70, band: (70 / 4 + 2) % 24)])
+        let cases: [HueCompassSceneSnapshot] = [
+            try Self.snapshot(fog: fog, start: 0, target: 48),
+            try Self.snapshot(offset: 2, fog: fog, start: 10, target: 70, actions: [.probe, .turn(5), .probe]),
+            won,
+        ]
+        for snapshot in cases {
+            var lights: HueCompassLights = HueCompassLights(reducedFlash: false)
+            lights.settle(to: snapshot)
+            let plain: HueCompassColouredMesh = try Geometry.markPart(snapshot)
+            let lit: HueCompassColouredMesh = try Geometry.markPart(snapshot, lights: lights)
+            #expect(lit.mesh.positions == plain.mesh.positions)
+            #expect(lit.mesh.indices == plain.mesh.indices)
+            #expect(lit.colours == plain.colours)
+        }
+    }
+
+    /// Feature 336: a mark that has vanished (a retry) fades out where it was, its size scaled by its level.
+    @Test func vanishedMarksShrinkWhereTheyWere() throws {
+        let fog: [Int] = Self.seededFog(8)
+        let probed: HueCompassSceneSnapshot = try Self.snapshot(offset: 2, fog: fog, start: 10, target: 70,
+                                                                actions: [.probe, .turn(5), .probe])
+        let fresh: HueCompassSceneSnapshot = try Self.snapshot(offset: 2, fog: fog, start: 10, target: 70)
+        var lights: HueCompassLights = HueCompassLights(reducedFlash: false)
+        lights.settle(to: probed)
+        lights.step(toward: fresh, elapsed: HueCompassLights.normalDuration / 2)
+        let marks: HueCompassColouredMesh = try Geometry.markPart(fresh, lights: lights)
+        #expect(marks.mesh.triangleCount == 16)
+        for bearing in [10, 15] {
+            let centre: SIMD3<Double> = Geometry.probeMarkCentre(bearing)
+            var farthest: Double = 0
+            for position in marks.mesh.positions {
+                let d: Double = Geometry.length(Self.simd(position) - centre)
+                if d < Geometry.probeMarkSize { farthest = max(farthest, d) }
+            }
+            #expect(abs(farthest - Geometry.probeMarkSize * 0.5) < 1e-9)
+        }
+        lights.step(toward: fresh, elapsed: HueCompassLights.normalDuration)
+        #expect(try Geometry.markPart(fresh, lights: lights).mesh.triangleCount == 0)
+    }
+
     @Test func glyphsStayClearOfTheSampleRing() throws {
         for offset in [0, 7, 23] {
             let snapshot: HueCompassSceneSnapshot = try Self.snapshot(offset: offset, fog: Self.seededFog(6),

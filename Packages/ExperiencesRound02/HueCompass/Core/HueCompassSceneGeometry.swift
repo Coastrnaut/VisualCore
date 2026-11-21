@@ -512,29 +512,62 @@ public enum HueCompassSceneGeometry {
     /// `snapshot.target` is not nil, a sapphire torus of radius 0.07 and tube 0.012 lying on the plane at
     /// ``targetRingCentre(_:)`` (16 × 6 segments, 192 triangles, uv (0, 1)). Wound to face outwards.
     ///
+    /// Feature 336 (R02-G04-06, research R4): with `lights`, the marks are drawn from the eased levels instead: a probe
+    /// mark at every bearing of `lights.probes` (the snapshot's probe order first, then fading marks by bearing), the selection mark at `lights.selection`'s bearing and the ring at
+    /// `lights.ring`'s bearing, each with its size (radius, and the ring's tube) scaled by its level; a mark at level 0
+    /// is not drawn. A mark that has disappeared from the snapshot thus fades out where it last was. Without lights the
+    /// output is feature 333's exactly.
+    ///
     /// - Throws: `MeshError` from `MeshBuilder` (not expected).
-    public static func markPart(_ snapshot: HueCompassSceneSnapshot) throws(MeshError) -> HueCompassColouredMesh {
+    public static func markPart(_ snapshot: HueCompassSceneSnapshot,
+                                lights: HueCompassLights? = nil) throws(MeshError) -> HueCompassColouredMesh {
         var parts: Parts = Parts()
-        for b in probeBearings(snapshot) {
-            try parts.octahedron(probeMarkCentre(b), radius: probeMarkSize, uv: Vec2(0, 0),
-                                 colour: colour(HueCompassPalette.pearl))
+        guard let lights else {
+            for b in probeBearings(snapshot) {
+                try parts.octahedron(probeMarkCentre(b), radius: probeMarkSize, uv: Vec2(0, 0),
+                                     colour: colour(HueCompassPalette.pearl))
+            }
+            if let selection = snapshot.selection {
+                try parts.octahedron(selectionMarkCentre(mod(selection.bearing, HueCompassWheel.bearings)),
+                                     radius: selectionMarkSize, uv: Vec2(0, 0.5),
+                                     colour: colour(HueCompassPalette.ember))
+            }
+            if let target = snapshot.target {
+                try parts.torus(targetRingCentre(mod(target, HueCompassWheel.bearings)), radius: targetRingRadius,
+                                tube: targetRingTube, uv: Vec2(0, 1), colour: colour(HueCompassPalette.sapphire))
+            }
+            return parts.built()
         }
-        if let selection = snapshot.selection {
-            try parts.octahedron(selectionMarkCentre(mod(selection.bearing, HueCompassWheel.bearings)),
-                                 radius: selectionMarkSize, uv: Vec2(0, 0.5), colour: colour(HueCompassPalette.ember))
+        // The snapshot's probe order first (so settled lights draw feature 333's mesh exactly), then fading marks.
+        let present: [Int] = probeBearings(snapshot)
+        let fading: [Int] = lights.probes.keys.filter { !present.contains($0) }.sorted()
+        for b in present + fading {
+            let level: Double = min(max(lights.probes[b] ?? 0, 0), 1)
+            guard level > 0 else { continue }
+            try parts.octahedron(probeMarkCentre(mod(b, HueCompassWheel.bearings)), radius: probeMarkSize * level,
+                                 uv: Vec2(0, 0), colour: colour(HueCompassPalette.pearl))
         }
-        if let target = snapshot.target {
-            try parts.torus(targetRingCentre(mod(target, HueCompassWheel.bearings)), radius: targetRingRadius,
-                            tube: targetRingTube, uv: Vec2(0, 1), colour: colour(HueCompassPalette.sapphire))
+        if let mark = lights.selection, mark.level > 0 {
+            let level: Double = min(mark.level, 1)
+            try parts.octahedron(selectionMarkCentre(mod(mark.bearing, HueCompassWheel.bearings)),
+                                 radius: selectionMarkSize * level, uv: Vec2(0, 0.5),
+                                 colour: colour(HueCompassPalette.ember))
+        }
+        if let mark = lights.ring, mark.level > 0 {
+            let level: Double = min(mark.level, 1)
+            try parts.torus(targetRingCentre(mod(mark.bearing, HueCompassWheel.bearings)),
+                            radius: targetRingRadius * level, tube: targetRingTube * level, uv: Vec2(0, 1),
+                            colour: colour(HueCompassPalette.sapphire))
         }
         return parts.built()
     }
 
-    /// The mark mesh of ``markPart(_:)``.
+    /// The mark mesh of ``markPart(_:lights:)``.
     ///
     /// - Throws: `MeshError` from `MeshBuilder` (not expected).
-    public static func markMesh(_ snapshot: HueCompassSceneSnapshot) throws(MeshError) -> Mesh {
-        try markPart(snapshot).mesh
+    public static func markMesh(_ snapshot: HueCompassSceneSnapshot,
+                                lights: HueCompassLights? = nil) throws(MeshError) -> Mesh {
+        try markPart(snapshot, lights: lights).mesh
     }
 
     // MARK: Camera

@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "HueCompassSceneGeometryTests"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter HueCompassSceneGeometryTests",
+  "elapsed_seconds": 3.562,
+  "exit_code": 0,
+  "finished": "2026-11-21T17:21:15+00:00",
+  "gate": "R02-G04-06",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G04-06.host-geometry.log",
+  "log_sha256": "a3c6420db4fcb41be4e95a2f2c85d343a7f5a0827f1306adc330a8e49f4ae558",
+  "name": "host-geometry",
+  "started": "2026-11-21T17:21:11+00:00",
+  "timed_out": false
+}

@@ -36,7 +36,7 @@ ImplementationLock-100.
   win and adversarial flicker (a turn and its undo every frame; a retry and replay) at 60 Hz: at most 3 half-range
   crossings per second and every complete one-way fade over half the range ≥ 0.4 s under Reduce Flashing; normal mode
   reaches targets in 0.15 s; settle jumps; a vanished mark keeps its bearing while fading); `--name host-2`
-- [ ] T-R02G0406-004 [US2] Edit `Packages/ExperiencesRound02/HueCompass/Core/HueCompassSceneGeometry.swift` (markPart and markMesh take optional lights:
+- [X] T-R02G0406-004 [US2] Edit `Packages/ExperiencesRound02/HueCompass/Core/HueCompassSceneGeometry.swift` (markPart and markMesh take optional lights: — Verified 2026-11-21: 2026-11-21 host-geometry exit 0: HueCompassSceneGeometryTests (settled lights draw feature 333's marks exactly; a vanished mark shrinks where it was and is gone at 0)
   each mark's radius scaled by its level, fading marks drawn at their remembered bearing; no lights = feature 333's
   marks exactly) with tests in `Packages/ExperiencesRound02/HueCompass/CoreTests/HueCompassSceneGeometryTests.swift`; `--name host-geometry -- swift test
   --package-path Packages/ExperiencesRound02 --filter HueCompassSceneGeometryTests`
