@@ -54,7 +54,7 @@ tests stay short (< 10 s each; interface tests < 90 s, SC-R02G0409-001). No {own
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`; `--name script-tests` (alone)
 - [X] T-R02G0409-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-21: 2026-11-21 rendering-27, rendering-26, experiences, host-full exit 0 (app-unit and app-ui are this gate's own runs)
   `--name host-full` (app-unit and app-ui are this gate's own runs)
-- [ ] T-R02G0409-009 Reference regression chunk 1 (`--name reference-1`)
+- [X] T-R02G0409-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-21: 2026-11-21 reference-1 exit 0
 - [ ] T-R02G0409-010 Reference regression chunk 2 (`--name reference-2`)
 - [ ] T-R02G0409-011 {device} After ImplementationLock-100: the same journeys on D1/D2/D3 (SC-R02G0409-006; feature 340
   prepares them)
