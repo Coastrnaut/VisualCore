@@ -1,6 +1,7 @@
 // ColorfallCanyonsError — feature 341 (R02-G05-01) T-R02G0501-002 (FR-R02G0501-011; clarification Q5). The refusals of
 // Colorfall Canyons's rule kernel, each with a stable reason code `r02-g05.*` that the experience logs with the level id
 // and tick.
+// Feature 342 (R02-G05-02) T-R02G0502-002 (FR-R02G0502-006; clarification Q5): `generation` and `witness`.
 
 /// A refusal of a Colorfall Canyons level, action or event.
 public enum ColorfallCanyonsError: Error, Equatable, Sendable {
@@ -18,6 +19,10 @@ public enum ColorfallCanyonsError: Error, Equatable, Sendable {
     case newerSchema(Int)
     /// A stored level or trace is damaged or breaks a rule; the payload describes the damage.
     case malformed(String)
+    /// No candidate of the manifest level (the payload is its number) met its band within 256 candidates (feature 342).
+    case generation(Int)
+    /// A witness is damaged, edited or no longer replays; the payload names the part (feature 342).
+    case witness(String)
 
     /// The stable reason code, `r02-g05.<kebab-case>`.
     public var reasonCode: String {
@@ -29,6 +34,8 @@ public enum ColorfallCanyonsError: Error, Equatable, Sendable {
         case .budget: "r02-g05.budget"
         case .newerSchema: "r02-g05.newer-schema"
         case .malformed: "r02-g05.malformed"
+        case .generation: "r02-g05.generation"
+        case .witness: "r02-g05.witness"
         }
     }
 }

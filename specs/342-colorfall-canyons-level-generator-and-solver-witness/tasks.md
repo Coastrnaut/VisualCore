@@ -14,7 +14,7 @@ run uses). Fixture seed 2_342; tests stay short (< 10 s each).
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G0502-002 Add `generation(Int)` ("r02-g05.generation") and `witness(String)` ("r02-g05.witness") to
+- [X] T-R02G0502-002 Add `generation(Int)` ("r02-g05.generation") and `witness(String)` ("r02-g05.witness") to — Verified 2026-11-21: 2026-11-21 host exit 0 (whole round-two package: error cases generation and witness, the 100-entry manifest from the planning index, ColorfallCanyonsDifficulty; existing tests unchanged)
   `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsError.swift`; create `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsManifest.swift` (ColorfallCanyonsManifestEntry
   "number 1 … 100, seed UInt64, band 1 … 5, budget 8 … 19", the 100 entries copied from `python3 scripts/planning_index.py
   levels --experience R02-G05` with the source line) and `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsDifficulty.swift` ("smallest, work, win
