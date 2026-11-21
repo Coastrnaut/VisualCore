@@ -13,14 +13,20 @@
 // for every aspect 0.4 … 2.5; the CPU projection is the reference that the simulator frame checks compare with
 // rendered pixels. Vertex streams follow ColorfallCanyonsShaders (T-R02G0503-003): ShaderMeshRenderer binds only
 // a_position, a_normal and a_uv. Doubles are used for drawing only; nothing here is consulted by the rules.
+//
+// Feature 344 (R02-G05-04) T-R02G0504-002 (FR-R02G0504-004; SC-R02G0504-003; research R3) adds the constrained orbit
+// (`ColorfallCanyonsOrbit`: yaw ±40° about +y, pitch 25° … 70° down from the horizon, authored yaw 0 and pitch 50°) and
+// `camera(_:aspect:orbit:)`, which refits the same bounding sphere so the 5 % margin holds at every orbit; the authored
+// camera is the authored orbit, bit for bit. Presentation only: never in the digest, the snapshot or the kernel.
 import Foundation
 import VisualCoreMath
 import VisualCoreScenes
 
 /// The camera of the Colorfall Canyons scene for one snapshot and aspect.
 ///
-/// Built only by ``ColorfallCanyonsSceneGeometry/camera(_:aspect:)``. World positions are in grid units (the grid's
-/// longer side is 2); ``viewProjection`` maps them to GL clip space (right-handed, depth −1 … 1).
+/// Built only by ``ColorfallCanyonsSceneGeometry/camera(_:aspect:orbit:)``
+/// (``ColorfallCanyonsSceneGeometry/camera(_:aspect:)`` is its authored orbit). World positions are in grid units (the
+/// grid's longer side is 2); ``viewProjection`` maps them to GL clip space (right-handed, depth −1 … 1).
 public struct ColorfallCanyonsCamera: Sendable, Equatable {
     /// The eye position in world units.
     public let eye: SIMD3<Double>
@@ -42,6 +48,47 @@ public struct ColorfallCanyonsCamera: Sendable, Equatable {
     public let projection: Mat4
     /// ``projection`` times ``view``.
     public let viewProjection: Mat4
+}
+
+/// The orbit of the Colorfall Canyons camera: a yaw about the vertical axis and a pitch down from the horizon, both in
+/// radians. Presentation only: never in the digest, the snapshot or the kernel, and not saved.
+///
+/// ``ColorfallCanyonsSceneGeometry/camera(_:aspect:orbit:)`` uses the ``clamped()`` orbit, so the eye always stays in
+/// front of the grid and above it (no vertical singularity) and the whole canyon stays in view.
+public struct ColorfallCanyonsOrbit: Sendable, Equatable {
+    /// The yaw in radians about +y, from the front (+z) towards +x; allowed −``yawLimit`` … ``yawLimit``.
+    public var yaw: Double
+    /// The pitch in radians: the angle of the eye direction above the horizon (the view looks down by it); allowed
+    /// ``pitchRange`` (25° … 70°).
+    public var pitch: Double
+
+    /// An orbit of the given yaw and pitch in radians (not clamped; see ``clamped()``).
+    public init(yaw: Double, pitch: Double) {
+        self.yaw = yaw
+        self.pitch = pitch
+    }
+
+    /// The authored orbit: yaw 0, pitch 50° (``ColorfallCanyonsSceneGeometry/pitch``), the fixed camera of R02-G05-03.
+    public static let authored = ColorfallCanyonsOrbit(yaw: 0, pitch: ColorfallCanyonsSceneGeometry.pitch)
+    /// The largest yaw either way, 40° in radians.
+    public static let yawLimit: Double = 40.0 * Double.pi / 180
+    /// The allowed pitches, 25° … 70° in radians.
+    public static let pitchRange: ClosedRange<Double> = (25.0 * Double.pi / 180)...(70.0 * Double.pi / 180)
+
+    /// This orbit with yaw clamped to −40° … 40° and pitch to 25° … 70°; a non-finite angle becomes the authored one.
+    public func clamped() -> ColorfallCanyonsOrbit {
+        let y: Double = yaw.isFinite ? yaw : Self.authored.yaw
+        let p: Double = pitch.isFinite ? pitch : Self.authored.pitch
+        return ColorfallCanyonsOrbit(yaw: min(max(y, -Self.yawLimit), Self.yawLimit),
+                                     pitch: min(max(p, Self.pitchRange.lowerBound), Self.pitchRange.upperBound))
+    }
+
+    /// The unit direction from the grid centre to the eye at the clamped orbit: (sin y · cos p, sin p, cos y · cos p)
+    /// with y the yaw and p the pitch; exactly ``ColorfallCanyonsSceneGeometry/eyeDirection`` at ``authored``.
+    public var eyeDirection: SIMD3<Double> {
+        let o: ColorfallCanyonsOrbit = clamped()
+        return SIMD3(sin(o.yaw) * cos(o.pitch), sin(o.pitch), cos(o.yaw) * cos(o.pitch))
+    }
 }
 
 /// A mesh with one colour per vertex (sRGB RGBA 0 … 1, alpha 1), aligned with `mesh.positions`.
@@ -498,16 +545,28 @@ public enum ColorfallCanyonsSceneGeometry {
         return max(radius, 1e-3) / sin(atan(limit))
     }
 
-    /// The fixed authored camera for `snapshot` and `aspect` (width / height): the eye on ``eyeDirection`` (in front,
-    /// +z, pitched 50° down) from the grid centre at the distance that fits the sphere of ``boundingRadius(_:)``,
-    /// looking at the grid centre with +y up (never parallel to the view direction) and a 45° vertical field of view.
-    /// For aspects 0.4 … 2.5 every vertex of every mesh projects inside the view with at least 5 % margin on every side.
-    /// A zero, negative or non-finite aspect is treated as 1; others are clamped to 0.1 … 10. Independent of the tier.
+    /// The fixed authored camera for `snapshot` and `aspect` (width / height): ``camera(_:aspect:orbit:)`` at
+    /// ``ColorfallCanyonsOrbit/authored``, so the eye lies on ``eyeDirection`` (in front, +z, pitched 50° down) from
+    /// the grid centre at the distance that fits the sphere of ``boundingRadius(_:)``, looking at the grid centre with
+    /// +y up (never parallel to the view direction) and a 45° vertical field of view. For aspects 0.4 … 2.5 every
+    /// vertex of every mesh projects inside the view with at least 5 % margin on every side. A zero, negative or
+    /// non-finite aspect is treated as 1; others are clamped to 0.1 … 10. Independent of the tier.
     public static func camera(_ snapshot: ColorfallCanyonsSceneSnapshot, aspect: Double) -> ColorfallCanyonsCamera {
+        camera(snapshot, aspect: aspect, orbit: .authored)
+    }
+
+    /// The camera for `snapshot`, `aspect` (width / height) and `orbit` (clamped, see
+    /// ``ColorfallCanyonsOrbit/clamped()``): the eye on ``ColorfallCanyonsOrbit/eyeDirection`` from the grid centre at
+    /// the distance that fits the sphere of ``boundingRadius(_:)`` (the fit does not depend on the direction, so the
+    /// 5 % margin holds at every orbit and aspect 0.4 … 2.5), looking at the grid centre with +y up (never parallel to
+    /// the view direction: the pitch is at most 70°) and a 45° vertical field of view. Aspects are made usable as in
+    /// ``camera(_:aspect:)``. Presentation only; independent of the tier.
+    public static func camera(_ snapshot: ColorfallCanyonsSceneSnapshot, aspect: Double,
+                              orbit: ColorfallCanyonsOrbit) -> ColorfallCanyonsCamera {
         let a: Double = usableAspect(aspect)
         let radius: Double = boundingRadius(snapshot)
         let d: Double = distance(radius: radius, aspect: a)
-        let eye: SIMD3<Double> = eyeDirection * d
+        let eye: SIMD3<Double> = orbit.eyeDirection * d
         let near: Double = max((d - radius) * 0.5, 1e-3)
         let far: Double = d + 2 * radius + 1
         let view: Mat4 = Mat4.lookAt(eye: vec(eye), target: Vec3(0, 0, 0), up: Vec3(0, 1, 0))

@@ -3,6 +3,7 @@
 ```swift
 public struct ColorfallCanyonsOrbit: Sendable, Equatable { public var yaw: Double; public var pitch: Double   // radians
     public static let authored: ColorfallCanyonsOrbit; public static let yawLimit: Double; public static let pitchRange: ClosedRange<Double>
+    public var eyeDirection: SIMD3<Double>   // unit, from the target towards the eye
     public func clamped() -> ColorfallCanyonsOrbit }
 extension ColorfallCanyonsSceneGeometry {
     public static func camera(_ snapshot: ColorfallCanyonsSceneSnapshot, aspect: Double,
@@ -10,6 +11,7 @@ extension ColorfallCanyonsSceneGeometry {
 public enum ColorfallCanyonsPick: Sendable, Equatable { case cell(Int), spring(Int), empty }
 public enum ColorfallCanyonsPicker {
     public static let minimumTarget: Double   // 22 points
+    public static let emitterHalfWidth: Double   // 0.18 · u
     public static func ray(_ point: SIMD2<Double>, size: SIMD2<Double>, camera: ColorfallCanyonsCamera)
         -> (origin: SIMD3<Double>, direction: SIMD3<Double>)?
     public static func pick(_ point: SIMD2<Double>, size: SIMD2<Double>, snapshot: ColorfallCanyonsSceneSnapshot,

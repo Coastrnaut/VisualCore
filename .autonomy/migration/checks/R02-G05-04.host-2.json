@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "ColorfallCanyonsPicker|ColorfallCanyonsSceneGeometry"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter 'ColorfallCanyonsPicker|ColorfallCanyonsSceneGeometry'",
+  "elapsed_seconds": 10.746,
+  "exit_code": 0,
+  "finished": "2026-11-21T21:45:17+00:00",
+  "gate": "R02-G05-04",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G05-04.host-2.log",
+  "log_sha256": "28c60a65c5c064cee240a420a241c5e96cf3f9f1b93cc7e88aaf2f604c37d6e9",
+  "name": "host-2",
+  "started": "2026-11-21T21:45:06+00:00",
+  "timed_out": false
+}

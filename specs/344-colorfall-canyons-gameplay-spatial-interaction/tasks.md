@@ -14,7 +14,7 @@ existing programs).
 
 ## Phase 2: Foundational — orbit and picking
 
-- [ ] T-R02G0504-002 [P] Add `ColorfallCanyonsOrbit` ("yaw ±40°, pitch 25° … 70°, authored (0, 50°)") and
+- [X] T-R02G0504-002 [P] Add `ColorfallCanyonsOrbit` ("yaw ±40°, pitch 25° … 70°, authored (0, 50°)") and — Verified 2026-11-21: 2026-11-21 host-2 exit 0: 20 tests in 2 suites (picker 5 incl. 500 seeded points vs independent pick; scene geometry 15 incl. orbit framing, authored camera bit-identical, highlight ring) (.autonomy/migration/checks/R02-G05-04.host-2.json); lead retest
   `camera(_:aspect:orbit:)` (distance refit to the bounding sphere with a 5 % margin; `camera(_:aspect:)` equals the
   authored orbit) to `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsSceneGeometry.swift`; create `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsPicker.swift` (touch
   ray through the drawn camera, block tops at their heights, emitter boxes of half-width 0.18·u, nearest hit, else the

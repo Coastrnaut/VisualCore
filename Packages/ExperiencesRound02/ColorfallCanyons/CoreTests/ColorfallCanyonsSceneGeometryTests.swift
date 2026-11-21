@@ -8,6 +8,10 @@
 // brightness and thickness follow the palette rules; empty cells have no sheet; bands and waterfalls follow the tier and
 // the drop; emitters dim; target arcs show only required colours; the camera is never singular. Plain loops and explicit
 // types (CI type-check rule).
+//
+// Feature 344 (R02-G05-04) T-R02G0504-002 (FR-R02G0504-004; SC-R02G0504-003): at the authored orbit and the four orbit
+// bound corners, aspects 0.4, 1 and 2.5, every terrain, fluid and feature vertex projects inside the view with a 5 %
+// margin; the authored camera is the authored orbit's camera; `ColorfallCanyonsOrbit.clamped()` keeps the bounds.
 import Foundation
 import Testing
 @testable import ColorfallCanyonsCore
@@ -507,5 +511,115 @@ import VisualCoreScenes
             #expect(Geometry.project(SIMD3(.nan, 0, 0), camera: one) == nil)
             #expect(Geometry.project(one.eye * 2, camera: one) == nil)
         }
+    }
+
+    /// The authored orbit and the four corners of the orbit bounds.
+    static let orbits: [ColorfallCanyonsOrbit] = [
+        .authored,
+        ColorfallCanyonsOrbit(yaw: -ColorfallCanyonsOrbit.yawLimit, pitch: ColorfallCanyonsOrbit.pitchRange.lowerBound),
+        ColorfallCanyonsOrbit(yaw: -ColorfallCanyonsOrbit.yawLimit, pitch: ColorfallCanyonsOrbit.pitchRange.upperBound),
+        ColorfallCanyonsOrbit(yaw: ColorfallCanyonsOrbit.yawLimit, pitch: ColorfallCanyonsOrbit.pitchRange.lowerBound),
+        ColorfallCanyonsOrbit(yaw: ColorfallCanyonsOrbit.yawLimit, pitch: ColorfallCanyonsOrbit.pitchRange.upperBound),
+    ]
+
+    @Test func everyVertexStaysInsideTheViewAtEveryOrbitBound() throws {
+        let level0: ColorfallCanyonsTier = ColorfallCanyonsTier.of(0)
+        for snapshot in try Self.extremeSnapshots() {
+            var points: [SIMD3<Double>] = []
+            for (_, part) in try Self.parts(snapshot, tier: level0) {
+                for p in part.mesh.positions { points.append(Self.simd(p)) }
+            }
+            for orbit in Self.orbits {
+                for aspect in [0.4, 1, 2.5] {
+                    let camera: ColorfallCanyonsCamera = Geometry.camera(snapshot, aspect: aspect, orbit: orbit)
+                    #expect(Self.isFinite(camera.viewProjection))
+                    #expect(Geometry.length(camera.eye) - camera.radius > camera.near)
+                    var outside: Int = 0
+                    for point in points {
+                        guard let v = Geometry.project(point, camera: camera) else {
+                            outside += 1
+                            continue
+                        }
+                        if !(v.x >= 0.05 && v.x <= 0.95 && v.y >= 0.05 && v.y <= 0.95) { outside += 1 }
+                    }
+                    #expect(outside == 0, "orbit \(orbit) aspect \(aspect)")
+                }
+            }
+        }
+    }
+
+    @Test func theOrbitCameraLooksFromTheOrbitDirection() throws {
+        for snapshot in try Self.extremeSnapshots() {
+            for orbit in Self.orbits {
+                let camera: ColorfallCanyonsCamera = Geometry.camera(snapshot, aspect: 1, orbit: orbit)
+                let eye: SIMD3<Double> = camera.eye
+                let horizontal: Double = (eye.x * eye.x + eye.z * eye.z).squareRoot()
+                #expect(abs(atan2(eye.y, horizontal) - orbit.pitch) < 1e-12)
+                #expect(abs(atan2(eye.x, eye.z) - orbit.yaw) < 1e-12)
+                #expect(abs(Geometry.length(eye) - Geometry.length(Geometry.camera(snapshot, aspect: 1).eye)) < 1e-12)
+                let centre: SIMD2<Double>? = Geometry.project(.zero, camera: camera)
+                #expect(centre != nil)
+                if let centre { #expect(abs(centre.x - 0.5) < 1e-9 && abs(centre.y - 0.5) < 1e-9) }
+            }
+        }
+    }
+
+    @Test func theAuthoredCameraIsTheAuthoredOrbit() throws {
+        #expect(ColorfallCanyonsOrbit.authored.yaw == 0)
+        #expect(ColorfallCanyonsOrbit.authored.pitch == Geometry.pitch)
+        #expect(ColorfallCanyonsOrbit.authored.eyeDirection == Geometry.eyeDirection)
+        let aspects: [Double] = [0.4, 0.6, 1, 1.333, 1.5, 2, 2.5, 0, .nan, 20]
+        for snapshot in try Self.extremeSnapshots() {
+            for aspect in aspects {
+                #expect(Geometry.camera(snapshot, aspect: aspect)
+                    == Geometry.camera(snapshot, aspect: aspect, orbit: .authored))
+            }
+        }
+    }
+
+    @Test func clampedKeepsTheOrbitBounds() throws {
+        let degree: Double = Double.pi / 180
+        #expect(abs(ColorfallCanyonsOrbit.yawLimit - 40 * degree) < 1e-15)
+        #expect(abs(ColorfallCanyonsOrbit.pitchRange.lowerBound - 25 * degree) < 1e-15)
+        #expect(abs(ColorfallCanyonsOrbit.pitchRange.upperBound - 70 * degree) < 1e-15)
+        #expect(ColorfallCanyonsOrbit.authored.clamped() == .authored)
+        let inside: ColorfallCanyonsOrbit = ColorfallCanyonsOrbit(yaw: 10 * degree, pitch: 30 * degree)
+        #expect(inside.clamped() == inside)
+        let low: ColorfallCanyonsOrbit = ColorfallCanyonsOrbit(yaw: -3, pitch: -1).clamped()
+        #expect(low.yaw == -ColorfallCanyonsOrbit.yawLimit && low.pitch == ColorfallCanyonsOrbit.pitchRange.lowerBound)
+        let high: ColorfallCanyonsOrbit = ColorfallCanyonsOrbit(yaw: 3, pitch: 2).clamped()
+        #expect(high.yaw == ColorfallCanyonsOrbit.yawLimit && high.pitch == ColorfallCanyonsOrbit.pitchRange.upperBound)
+        let odd: [Double] = [.nan, .infinity, -.infinity]
+        for value in odd {
+            #expect(ColorfallCanyonsOrbit(yaw: value, pitch: value).clamped() == .authored)
+            let yawOnly: ColorfallCanyonsOrbit = ColorfallCanyonsOrbit(yaw: value, pitch: 30 * degree).clamped()
+            #expect(yawOnly.yaw == 0 && yawOnly.pitch == 30 * degree)
+        }
+        // The camera of an out-of-bounds orbit is the camera of its clamped orbit.
+        let snapshot: Snapshot = try Self.extremeSnapshots()[0]
+        let wild: ColorfallCanyonsOrbit = ColorfallCanyonsOrbit(yaw: 2, pitch: 1.5)
+        #expect(Geometry.camera(snapshot, aspect: 1, orbit: wild) == Geometry.camera(snapshot, aspect: 1,
+                                                                                    orbit: wild.clamped()))
+    }
+    /// Feature 344 (research R5): the highlight ring frames the block top in pearl (material code 2, normal +y),
+    /// 0.01·u above it, inside the cell; an outside cell has no ring.
+    @Test func theHighlightRingFramesTheBlockTopInPearl() throws {
+        let snapshot: Snapshot = try Self.extremeSnapshots()[0]
+        let u: Double = Geometry.cellSize(snapshot)
+        for cell in [0, snapshot.cellCount - 1] {
+            let part: ColorfallCanyonsColouredMesh = try Geometry.highlightPart(cell, snapshot)
+            #expect(part.mesh.indices.count == 24 && part.colours.count == part.mesh.positions.count)
+            let top: SIMD3<Double> = Geometry.cellTop(cell, snapshot)
+            for index in 0..<part.mesh.positions.count {
+                let p: Vec3 = part.mesh.positions[index]
+                #expect(abs(p.y - (top.y + Geometry.highlightLift * u)) < 1e-9)
+                #expect(abs(p.x - top.x) <= 0.42 * u + 1e-9 && abs(p.z - top.z) <= 0.42 * u + 1e-9)
+                #expect(max(abs(p.x - top.x), abs(p.z - top.z)) >= 0.36 * u - 1e-9)
+                #expect(part.mesh.uvs[index].x == ColorfallCanyonsShaders.TerrainMaterial.pearl.code)
+                #expect(part.mesh.normals[index].y == 1)
+            }
+        }
+        #expect(try Geometry.highlightPart(-1, snapshot).mesh.indices.isEmpty)
+        #expect(try Geometry.highlightPart(snapshot.cellCount, snapshot).mesh.indices.isEmpty)
     }
 }
