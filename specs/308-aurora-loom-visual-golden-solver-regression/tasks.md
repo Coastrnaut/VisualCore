@@ -29,7 +29,7 @@ recorded only after every agent has reported). Commit after every task with its 
 
 ## Phase 4: Story 2 — the picture does not drift (P1)
 
-- [ ] T-R02G0108-004 [P] [US2] Create `Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomRegressionGoldenTests.swift` (agent B: 16 frames; descriptions
+- [X] T-R02G0108-004 [P] [US2] Create `Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomRegressionGoldenTests.swift` (agent B: 16 frames; descriptions — Verified 2026-11-20: 2026-11-20 host-3 exit 0 (6 tests: fixed set, deterministic descriptions, all 16 frames match golden-frames.json, named failures for unreadable, schema-2, incomplete and self-inconsistent files, 2-quantum moves and colour, tier and night changes caught, 1-quantum drift passes); golden-frames.json generated with AURORA_LOOM_WRITE_GOLDEN=1
   deterministic; each equals its pinned entry in `Packages/ExperiencesRound02/AuroraLoom/golden-frames.json` (equal digest, or positions within one 1/8-pixel quantum and equal colours; a position moved by two quanta fails naming the frame); the file rewritten only with `AURORA_LOOM_WRITE_GOLDEN=1`; a
   missing, unreadable or incomplete manifest fails naming the file and frame; a moved camera, a changed palette colour
   and a changed tier each change the affected digests); the lead generates and commits `Packages/ExperiencesRound02/AuroraLoom/golden-frames.json`;
