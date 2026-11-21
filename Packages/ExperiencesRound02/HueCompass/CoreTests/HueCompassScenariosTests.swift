@@ -66,7 +66,7 @@ private func playScenario(_ spec: ScenarioSpec) async throws
         let archived: [Int] = [20, 27, 34, 41, 48, 55, 62, 69, 76, 83, 90, 97, 4, 11, 18, 25, 32, 39, 46, 53]
         #expect(Array(Core.acceptanceLevels.prefix(20)) == archived)
         #expect(!Core.completionEntries.isEmpty && !Core.playthroughEntries.isEmpty && !Core.probesEntries.isEmpty)
-        #expect(Core.rejectionEntries.count == 21)
+        #expect(Core.rejectionEntries.count == 25, "21 and feature 337's four replay refusals")
     }
 
     @Test func derivedDigestsResultsAndOutcomesAreWhatTheEngineGives() async throws {

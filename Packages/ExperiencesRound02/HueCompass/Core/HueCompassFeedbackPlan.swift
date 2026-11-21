@@ -85,9 +85,16 @@ public struct HueCompassFeedbackPlan: Sendable, Equatable {
     /// The words of a refusal with reason code `code` (raw or prefixed), also shown by the panel: "That level is not
     /// open yet." (a code containing `r02-g04.locked`), "That date cannot be used." (`r02-g04.date`), "That action is
     /// not allowed here." (`r02-g04.action`), "No units are left." (`r02-g04.allowance`), "The level has ended."
-    /// (`r02-g04.stage`), "That value must be a whole number." (`r02-g04.not-whole`), otherwise "That change was
-    /// refused.".
+    /// (`r02-g04.stage`), "That value must be a whole number." (`r02-g04.not-whole`), feature 337's "There is no saved
+    /// solution to replay for this level." (`r02-g04.no-replay`), "The replay is over." (`r02-g04.replay-end`) and
+    /// "Stop the replay first." (`r02-g04.replay`), otherwise "That change was refused.".
     public static func refusalText(code: String) -> String {
+        if code.contains(HueCompassExperienceRule.noReplay) {
+            return "There is no saved solution to replay for this level."
+        }
+        // Checked before `replay`, whose code is a prefix of `replay-end` (feature 337).
+        if code.contains(HueCompassExperienceRule.replayEnd) { return "The replay is over." }
+        if code.contains(HueCompassExperienceRule.replay) { return "Stop the replay first." }
         if code.contains(HueCompassExperienceRule.locked) { return "That level is not open yet." }
         if code.contains(HueCompassExperienceRule.date) { return "That date cannot be used." }
         if code.contains(HueCompassExperienceRule.notWhole) { return "That value must be a whole number." }
@@ -118,6 +125,7 @@ public struct HueCompassFeedbackPlan: Sendable, Equatable {
         case .campaign: "Campaign"
         case .practice: "Practice"
         case .daily: "Daily level"
+        case .replay: "Replay"
         }
     }
 
@@ -148,7 +156,8 @@ public struct HueCompassFeedbackPlan: Sendable, Equatable {
         switch play.stage {
         case .won:
             var text: String = "The bearing and band match. Level won with \(units(spent))"
-            if core.mode != .practice {
+            // A replayed win re-runs a stored result and claims no stars (feature 337), like practice.
+            if core.mode.awardsStars {
                 let stars: Int = HueCompassProgress.stars(units: spent, smallest: core.certifiedSmallest)
                 text += ", \(stars) of 3 stars"
             }

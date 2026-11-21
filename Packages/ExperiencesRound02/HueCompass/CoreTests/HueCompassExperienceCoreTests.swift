@@ -89,18 +89,19 @@ import VisualCoreExperience
     }
 
     @Test func theControlsTheTiersAndTheProfile() {
-        #expect(Core.experienceID == "r02-g04.hue-compass" && Core.schemaVersion == 2)
-        #expect(Core.digestDomain == "r02-g04.hue-compass.v2")
+        #expect(Core.experienceID == "r02-g04.hue-compass" && Core.schemaVersion == 3)
+        #expect(Core.digestDomain == "r02-g04.hue-compass.v3")
         #expect(Core.controls.map(\.id) == Core.actionIDs)
         #expect(Core.actionIDs == ["compass.turn", "compass.probe", "compass.select", "play.undo", "play.redo",
                                    "level.next", "level.select", "mode.daily", "mode.practice", "mode.campaign",
-                                   "tutorial.dismiss"])
+                                   "tutorial.dismiss", "replay.start", "replay.step", "replay.stop"])
         #expect(Core.controls[0].ranges == [-48...48])
         #expect(Core.controls[2].ranges == [0...95, 0...23])
         #expect(Core.controls[6].ranges == [1...100])
         #expect(Core.controls[7].ranges == [1...9999, 1...12, 1...31])
         #expect(Core.practiceAllowance == 24 && Core.practiceAllowance == HueCompassLevel.allowances.upperBound)
-        let plainIndices: [Int] = [1, 3, 4, 5, 8, 9, 10]
+        #expect(Core.controls[11].ranges == [1...100])
+        let plainIndices: [Int] = [1, 3, 4, 5, 8, 9, 10, 12, 13]
         for index in plainIndices { #expect(Core.controls[index].ranges.isEmpty) }
         #expect(Core.qualityTiers == 3)
         let profile: QualityProfile = Core.qualityProfile
@@ -347,7 +348,7 @@ import VisualCoreExperience
         #expect(throws: HueCompassRestoreRefusal.kernel(.malformed("record 0"))) {
             try Core.restore(payload: edited, seed: 31)
         }
-        #expect(Core.migrations.currentVersion == 2)
+        #expect(Core.migrations.currentVersion == 3)
     }
 
     @Test func theEngineRefusesAnEnvelopeOfANewerSchema() async throws {
@@ -358,14 +359,14 @@ import VisualCoreExperience
         #expect(engine.handle(control: "compass.turn", values: [4]) == .accepted)
         let before: StateDigest = try engine.digest()
         let saved: ExperienceSnapshot = try engine.snapshot()
-        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 3, seed: saved.seed,
+        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 4, seed: saved.seed,
                                            stepIndex: saved.stepIndex, digest: saved.digest,
                                            payload: Data(saved.payload.utf8))
         var refused: Bool = false
         do {
             try engine.restore(newer)
         } catch {
-            refused = error == .snapshot(.newerSchema(found: 3, current: 2))
+            refused = error == .snapshot(.newerSchema(found: 4, current: 3))
         }
         #expect(refused)
         #expect(try engine.digest() == before)
@@ -569,5 +570,111 @@ import VisualCoreExperience
         }
         core.shedCaches()
         #expect(try Self.digest(core) == digest && core == before)
+    }
+
+    // MARK: Feature 337 (R02-G04-07) T-R02G0407-003
+
+    @Test func aCampaignWinRecordsItsTraceAndReplayReproducesIt() async throws {
+        var core: Core = try await Core.prepare(seed: 0)
+        let noReplay: ActionResult = .rejected(.rule(code: HueCompassExperienceRule.noReplay))
+        #expect(core.apply(Self.act("replay.start", [1])) == noReplay)
+        #expect(core.apply(Self.plain("replay.step")) == noReplay)
+        #expect(core.apply(Self.plain("replay.stop")) == noReplay)
+        // A detour (a turn and its undo, then a turn, its undo and its redo and the turn back) leaves the net actions:
+        // the turns and the certified witness actions.
+        #expect(core.apply(Self.turn(5)) == .accepted)
+        #expect(core.apply(Self.plain("play.undo")) == .accepted)
+        #expect(core.apply(Self.turn(3)) == .accepted)
+        #expect(core.apply(Self.plain("play.undo")) == .accepted)
+        #expect(core.apply(Self.plain("play.redo")) == .accepted)
+        #expect(core.apply(Self.turn(-3)) == .accepted)
+        let generated: HueCompassGenerated = try Core.generated(number: 1)
+        let witness: [HueCompassAction] = HueCompassWitness.actions(for: generated.solution, level: generated.level)
+        for kernel in witness { #expect(core.apply(Self.action(kernel)) == .accepted) }
+        #expect(core.play.stage == .won)
+        let result: HueCompassProgress.Result = try #require(core.progress.solved[1])
+        let trace: [HueCompassAction] = [.turn(3), .turn(-3)] + witness
+        #expect(result.trace == trace && result.verified && result.bestUnits == core.play.spent)
+        #expect(Core.netActions(core.play.records) == trace)
+        let progress: HueCompassProgress = core.progress
+        // Replay: a fresh play, the tutorial done, the trace action by action, then the end.
+        #expect(core.apply(Self.act("replay.start", [1])) == .accepted)
+        #expect(core.mode == .replay(level: 1) && core.tutorial == .done && core.play.records.isEmpty)
+        #expect(core.apply(Self.plain("tutorial.dismiss")) == .accepted)
+        let refused: [ExperienceAction] = [Self.turn(1), Self.plain("compass.probe"), Self.select(0, 0),
+                                           Self.plain("play.undo"), Self.plain("play.redo"), Self.plain("level.next"),
+                                           Self.act("level.select", [1]), Self.plain("mode.practice"),
+                                           Self.plain("mode.campaign"), Self.act("mode.daily", [2026, 11, 21])]
+        for action in refused {
+            #expect(core.apply(action) == .rejected(.rule(code: HueCompassExperienceRule.replay)), "\(action)")
+        }
+        var fresh: HueCompassPlay = try Core.freshPlay(of: try Core.level(number: 1))
+        for kernel in trace {
+            #expect(core.apply(Self.plain("replay.step")) == .accepted)
+            try fresh.apply(kernel, expecting: fresh.fingerprint)
+            #expect(core.play.fingerprint == fresh.fingerprint)
+        }
+        #expect(core.play.stage == .won && core.progress == progress, "replay never records")
+        #expect(core.apply(Self.plain("replay.step")) == .rejected(.rule(code: HueCompassExperienceRule.replayEnd)))
+        // The replay round-trips through the snapshot.
+        let restored: Core = try Core.restore(payload: try core.snapshotPayload(), seed: 0)
+        #expect(restored == core && restored.reconciliationDropped == 0)
+        #expect(core.apply(Self.plain("replay.stop")) == .accepted)
+        #expect(core.mode == .campaign && core.levelNumber == 1 && core.progress == progress)
+    }
+
+    @Test func restoreReconcilesAndDropsAnEditedResult() async throws {
+        var core: Core = try await Core.prepare(seed: 0)
+        try Self.win(&core, number: 1)
+        let stars: Int = try #require(core.progress.solved[1]).stars
+        let text: String = try #require(String(data: try core.snapshotPayload(), encoding: .utf8))
+        #expect(text.contains("\"verified\":true"))
+        let honest: Core = try Core.restore(payload: Data(text.utf8), seed: 0)
+        #expect(honest.reconciliationDropped == 0 && honest.progress == core.progress)
+        // Other stars claimed for the win: the replay disagrees, the result is dropped, the frontier stays.
+        let claimed: Int = stars == 3 ? 2 : 3
+        let edited: String = text.replacingOccurrences(of: "\"stars\":\(stars)", with: "\"stars\":\(claimed)")
+        #expect(edited != text)
+        let checked: Core = try Core.restore(payload: Data(edited.utf8), seed: 0)
+        #expect(checked.reconciliationDropped == 1 && checked.progress.solved[1] == nil)
+        #expect(checked.progress.frontier == core.progress.frontier)
+        // A replay of a dropped result restores in campaign.
+        var replaying: Core = core
+        #expect(replaying.apply(Self.act("replay.start", [1])) == .accepted)
+        let replayText: String = try #require(String(data: try replaying.snapshotPayload(), encoding: .utf8))
+        let replayEdited: String = replayText.replacingOccurrences(of: "\"stars\":\(stars)",
+                                                                   with: "\"stars\":\(claimed)")
+        let back: Core = try Core.restore(payload: Data(replayEdited.utf8), seed: 0)
+        #expect(back.mode == .campaign && back.reconciliationDropped == 1)
+    }
+
+    @Test func aSchemaTwoPayloadMigratesToThree() async throws {
+        var core: Core = try await Core.prepare(seed: 0)
+        try Self.win(&core, number: 1)
+        var object: [String: Any] = try #require(
+            try JSONSerialization.jsonObject(with: try core.snapshotPayload()) as? [String: Any])
+        // The schema-2 form: results without trace or verified.
+        var progress: [String: Any] = try #require(object["progress"] as? [String: Any])
+        let solved: [Any] = try #require(progress["solved"] as? [Any])
+        var plain: [Any] = []
+        for entry in solved {
+            var result: [String: Any] = try #require(entry as? [String: Any])
+            result.removeValue(forKey: "trace")
+            result.removeValue(forKey: "verified")
+            plain.append(result)
+        }
+        progress["solved"] = plain
+        object["progress"] = progress
+        let migrated: [String: Any] = try Core.migratedToSchemaThree(object)
+        let payload: Data = try JSONSerialization.data(withJSONObject: migrated, options: [.sortedKeys])
+        let restored: Core = try Core.restore(payload: payload, seed: 0)
+        let result: HueCompassProgress.Result = try #require(restored.progress.solved[1])
+        let stars: Int = try #require(core.progress.solved[1]).stars
+        #expect(!result.verified && result.trace.isEmpty && result.stars == stars)
+        #expect(restored.reconciliationDropped == 0 && restored.progress.frontier == core.progress.frontier)
+        #expect(throws: HueCompassRestoreRefusal.damaged) { try Core.migratedToSchemaThree(["level": 1]) }
+        // An unverified result cannot be replayed.
+        var replay: Core = restored
+        #expect(replay.apply(Self.act("replay.start", [1])) == .rejected(.rule(code: HueCompassExperienceRule.noReplay)))
     }
 }

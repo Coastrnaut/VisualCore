@@ -20,6 +20,7 @@
 // expected digests are derived by playing the entries on a core exactly as the engine plays them.
 // Feature 335 (R02-G04-05): rejection also refuses a locked `level.select`, a level beyond 100, an impossible
 // `mode.daily` date, `level.next` with no next open level and wrong value counts of `mode.daily` and `mode.practice`.
+// Feature 337 (R02-G04-07): and replay without a verified result, outside replay, and out of range.
 #if DEBUG || VISUALCORE_AUTOMATION
 import Foundation
 import VisualCoreExperience
@@ -146,6 +147,11 @@ extension HueCompassExperienceCore {
             refusedEntry("level.next", [], "action.rule." + HueCompassExperienceRule.locked),
             refusedEntry("mode.daily", [2026, 11], wrongCount),
             refusedEntry("mode.practice", [1], wrongCount),
+            // Feature 337: replay without a verified result, outside replay, and out of range.
+            refusedEntry("replay.start", [1], "action.rule." + HueCompassExperienceRule.noReplay),
+            refusedEntry("replay.step", [], "action.rule." + HueCompassExperienceRule.noReplay),
+            refusedEntry("replay.stop", [], "action.rule." + HueCompassExperienceRule.noReplay),
+            refusedEntry("replay.start", [101], outOfRange),
         ]
     }
 

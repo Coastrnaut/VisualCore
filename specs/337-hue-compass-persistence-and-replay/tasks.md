@@ -25,7 +25,7 @@ tests stay short (< 10 s each). {device} items are D1–D3 observations after Im
 
 ## Phase 3: Stories 1 and 3 — save, migrate, replay (P1, P2)
 
-- [ ] T-R02G0407-003 [US1] [US2] [US3] Edit `Packages/ExperiencesRound02/HueCompass/Core/HueCompassExperienceCore.swift` (schema 3, migration 2 → 3
+- [X] T-R02G0407-003 [US1] [US2] [US3] Edit `Packages/ExperiencesRound02/HueCompass/Core/HueCompassExperienceCore.swift` (schema 3, migration 2 → 3 — Verified 2026-11-21: 2026-11-21 host-2 exit 0: HueCompassExperienceCoreTests (schema 3, migrations 1 -> 3 and 2 -> 3, net-action traces with an undone turn left out, replay rules and codes, reconcile on restore), HueCompassScenariosTests (manifest regenerated, 25 rejection entries) and HueCompassFeedbackPlanTests (replay refusal words)
   "results with an empty trace and verified false", digest v3; a campaign or daily win records the winning trace (the
   play's net actions: turns, probes and the selection, an undone turn left out); restore reconciles and exposes
   `reconciliationDropped` (not digested); actions "replay.start [1…100]" (`r02-g04.no-replay` without a verified

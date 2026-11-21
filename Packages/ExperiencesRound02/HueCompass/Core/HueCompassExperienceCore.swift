@@ -52,6 +52,14 @@
 // progress and mode (never the tutorial step). Snapshot schema 2: `{"level", "mode", "progress", "records",
 // "tutorial"}`; schema-1 payloads migrate (no won levels, the saved level open, campaign mode, the tutorial at its
 // initial step).
+//
+// Feature 337 (R02-G04-07) T-R02G0407-003 (FR-R02G0407-001 … 006; clarifications Q1–Q5): a campaign or daily win records
+// its winning trace (the play's net actions: turns, probes and the selection, an undone turn left out) with the result;
+// restore reconciles every result (`HueCompassReconciliation`, the frontier as saved) and exposes
+// `reconciliationDropped` (not digested); the replay mode `replay(level)` plays a verified trace action by action with
+// `replay.start [1…100]` (`r02-g04.no-replay`), `replay.step` (`r02-g04.replay-end`) and `replay.stop`; in replay every
+// other action except `tutorial.dismiss` is refused (`r02-g04.replay`) and nothing is recorded. Digest
+// "r02-g04.hue-compass.v3"; snapshot schema 3 (results carry `trace` and `verified`), migrating 1 → 2 → 3.
 import Foundation
 import Synchronization
 import VisualCoreDiagnostics
@@ -66,6 +74,12 @@ public enum HueCompassExperienceRule {
     public static let locked = "r02-g04.locked"
     /// An impossible calendar date (feature 335).
     public static let date = "r02-g04.date"
+    /// No verified result with a trace to replay (feature 337).
+    public static let noReplay = "r02-g04.no-replay"
+    /// The replay has no further action (feature 337).
+    public static let replayEnd = "r02-g04.replay-end"
+    /// An action that is not allowed during replay (feature 337).
+    public static let replay = "r02-g04.replay"
 }
 
 /// Why a saved Hue Compass state was refused on restore (feature 333). A refused restore changes nothing.
@@ -78,18 +92,18 @@ public enum HueCompassRestoreRefusal: Error, Equatable, Sendable {
     case kernel(HueCompassError)
 }
 
-/// The state of Hue Compass as an experience (see the file header). Snapshot schema 2.
+/// The state of Hue Compass as an experience (see the file header). Snapshot schema 3.
 public struct HueCompassExperienceCore: ExperienceCore, Equatable {
     /// The experience's id in the catalog.
     public static let experienceID = "r02-g04.hue-compass"
     /// The snapshot schema this build writes.
-    public static let schemaVersion = 2
-    /// The digest's domain string (schema 2).
-    public static let digestDomain = "r02-g04.hue-compass.v2"
+    public static let schemaVersion = 3
+    /// The digest's domain string (schema 3).
+    public static let digestDomain = "r02-g04.hue-compass.v3"
     /// The action ids in declaration order.
     public static let actionIDs = ["compass.turn", "compass.probe", "compass.select", "play.undo", "play.redo",
                                    "level.next", "level.select", "mode.daily", "mode.practice", "mode.campaign",
-                                   "tutorial.dismiss"]
+                                   "tutorial.dismiss", "replay.start", "replay.step", "replay.stop"]
     /// The allowance of a practice play: the kernel's maximum (`HueCompassProgress.practiceAllowance`, 24).
     public static let practiceAllowance = HueCompassProgress.practiceAllowance
     /// The level numbers of the catalog.
@@ -126,6 +140,9 @@ public struct HueCompassExperienceCore: ExperienceCore, Equatable {
     /// The host quality tier (0 = level-0, the best, … 2, clamped); presentation only — not in the digest, the
     /// snapshot or `==`.
     public private(set) var qualityTier = 0
+    /// How many saved results the last restore dropped because they did not verify (feature 337); not in the digest,
+    /// the snapshot or `==`.
+    public private(set) var reconciliationDropped = 0
 
     /// A state playing `play` of level `levelNumber` with `progress`, `mode` and `tutorial`, whose reset returns to
     /// `opening` of `openingNumber`.
@@ -279,9 +296,34 @@ public struct HueCompassExperienceCore: ExperienceCore, Equatable {
 
     // MARK: Contract
 
-    /// Schema 2 with the step 1 → 2 (``migratedToSchemaTwo(_:)``); a payload that does not decode is refused.
+    /// Schema 3 with the steps 1 → 2 (``migratedToSchemaTwo(_:)``) and 2 → 3 (``migratedToSchemaThree(_:)``); a
+    /// payload that does not decode is refused.
     public static var migrations: MigrationChain {
-        MigrationChain(currentVersion: schemaVersion, steps: [1: { payload in try migratedToSchemaTwo(payload) }])
+        MigrationChain(currentVersion: schemaVersion, steps: [1: { payload in try migratedToSchemaTwo(payload) },
+                                                             2: { payload in try migratedToSchemaThree(payload) }])
+    }
+
+    /// The schema-3 object of a schema-2 object: every solved result gains an empty `trace` and `verified` false.
+    ///
+    /// - Throws: ``HueCompassRestoreRefusal/damaged`` when `object` has no progress with a solved list.
+    public static func migratedToSchemaThree(_ object: [String: Any]) throws -> [String: Any] {
+        guard var progress = object["progress"] as? [String: Any], let solved = progress["solved"] as? [Any] else {
+            throw HueCompassRestoreRefusal.damaged
+        }
+        var entries: [Any] = []
+        for entry in solved {
+            guard var result = entry as? [String: Any] else {
+                entries.append(entry)
+                continue
+            }
+            result["trace"] = [Any]()
+            result["verified"] = false
+            entries.append(result)
+        }
+        progress["solved"] = entries
+        var migrated = object
+        migrated["progress"] = progress
+        return migrated
     }
 
     /// The schema-2 object of a schema-1 object `{"level", "records"}`: no won levels with the saved level open,
@@ -320,10 +362,13 @@ public struct HueCompassExperienceCore: ExperienceCore, Equatable {
         ExperienceControl(id: "mode.practice"),
         ExperienceControl(id: "mode.campaign"),
         ExperienceControl(id: "tutorial.dismiss"),
+        ExperienceControl(id: "replay.start", ranges: [1...100]),
+        ExperienceControl(id: "replay.step"),
+        ExperienceControl(id: "replay.stop"),
     ]
 
-    /// The eleven controls with their declared ranges (see the file header); all but the turn, the selection,
-    /// `level.select` and `mode.daily` take no values.
+    /// The fourteen controls with their declared ranges (see the file header); all but the turn, the selection,
+    /// `level.select`, `mode.daily` and `replay.start` take no values.
     public static var controls: [ExperienceControl] { declaredControls }
 
     /// The opening state of level `seed % 100 + 1`, in stage `playing`; no clock is read.
@@ -347,6 +392,9 @@ public struct HueCompassExperienceCore: ExperienceCore, Equatable {
         if let refusal = ExperienceInput.validate(control: action.control, values: action.values,
                                                   controls: Self.declaredControls) {
             return .rejected(refusal)
+        }
+        if case .replay = mode, !Self.replayControls.contains(action.control) {
+            return .rejected(.rule(code: HueCompassExperienceRule.replay))
         }
         var wholeValues: [Int] = []
         for value in action.values {
@@ -393,6 +441,26 @@ public struct HueCompassExperienceCore: ExperienceCore, Equatable {
                 try open(number: levelNumber, mode: .practice)
             case "mode.campaign":
                 try open(number: progress.isOpen(levelNumber) ? levelNumber : progress.frontier, mode: .campaign)
+            case "replay.start":
+                guard let result = progress.solved[wholeValues[0]], result.verified, !result.trace.isEmpty else {
+                    return .rejected(.rule(code: HueCompassExperienceRule.noReplay))
+                }
+                try open(number: wholeValues[0], mode: .replay(level: wholeValues[0]))
+                tutorial = .done
+            case "replay.step":
+                guard case .replay(let level) = mode, let result = progress.solved[level], result.verified else {
+                    return .rejected(.rule(code: HueCompassExperienceRule.noReplay))
+                }
+                let index = play.records.count
+                guard play.stage == .playing, index < result.trace.count else {
+                    return .rejected(.rule(code: HueCompassExperienceRule.replayEnd))
+                }
+                try play.apply(result.trace[index], expecting: play.fingerprint)
+            case "replay.stop":
+                guard case .replay(let level) = mode else {
+                    return .rejected(.rule(code: HueCompassExperienceRule.noReplay))
+                }
+                try open(number: progress.isOpen(level) ? level : progress.frontier, mode: .campaign)
             default:   // tutorial.dismiss
                 tutorial = tutorial.afterDismiss()
             }
@@ -431,7 +499,41 @@ public struct HueCompassExperienceCore: ExperienceCore, Equatable {
     /// opens the next level; daily does not; practice records nothing).
     private mutating func recordIfWon() {
         guard play.stage == .won else { return }
-        progress.record(level: levelNumber, units: play.spent, smallest: certifiedSmallest, mode: mode)
+        if case .replay = mode { return }
+        progress.record(level: levelNumber, units: play.spent, smallest: certifiedSmallest, mode: mode,
+                        trace: winningTrace)
+    }
+
+    /// The controls accepted during replay (feature 337); the band pick is presentation only and sends no action.
+    static let replayControls: Set<String> = ["replay.start", "replay.step", "replay.stop", "tutorial.dismiss"]
+
+    /// The winning trace of the current play (feature 337): its net actions in order — turns, probes and the selection,
+    /// with a turn that was undone (and not redone) left out, so the trace never needs an undo.
+    var winningTrace: [HueCompassAction] { Self.netActions(play.records) }
+
+    /// The net actions of `records`: each turn, probe and selection appended in order; an undo removes the last turn
+    /// (keeping it for a redo), a redo appends the turn the last undo removed; any other action clears the redo list.
+    static func netActions(_ records: [HueCompassRecord]) -> [HueCompassAction] {
+        var actions: [HueCompassAction] = []
+        var undone: [HueCompassAction] = []
+        for record in records {
+            switch record.kind {
+            case .undo:
+                if let last = actions.last, case .turn = last {
+                    actions.removeLast()
+                    undone.append(last)
+                }
+            case .redo:
+                if let turn = undone.popLast() { actions.append(turn) }
+            case .turn:
+                actions.append(record.action)
+                undone.removeAll()
+            default:
+                actions.append(record.action)
+                undone.removeAll()
+            }
+        }
+        return actions
     }
 
     /// Back to the opening state the seed chose; the quality tier, which is not state, is kept.
@@ -453,7 +555,7 @@ public struct HueCompassExperienceCore: ExperienceCore, Equatable {
         }
     }
 
-    /// "r02-g04.hue-compass.v2", then the level number, the play's fingerprint (level, bearing, units spent, clues,
+    /// "r02-g04.hue-compass.v3", then the level number, the play's fingerprint (level, bearing, units spent, clues,
     /// stage, failure, selection), the progress and the mode (their sorted JSON); never the tutorial step.
     public func writeDigest(into builder: inout DigestBuilder) throws(DigestError) {
         builder.add(Self.digestDomain)
@@ -467,7 +569,7 @@ public struct HueCompassExperienceCore: ExperienceCore, Equatable {
 
     // MARK: Snapshot
 
-    /// The payload's JSON form (schema 2); `tutorial` is absent in a migrated schema-1 payload.
+    /// The payload's JSON form (schema 3); `tutorial` is absent in a migrated schema-1 payload.
     private struct Payload: Codable {
         var level: Int
         var mode: HueCompassMode
@@ -482,7 +584,7 @@ public struct HueCompassExperienceCore: ExperienceCore, Equatable {
                                                  records: play.records, tutorial: tutorial))
     }
 
-    /// The core of `payload` (schema 2): the records replayed on a fresh play of the saved level (the practice copy in
+    /// The core of `payload` (schema 3): the records replayed on a fresh play of the saved level (the practice copy in
     /// practice mode) with the saved progress, mode and tutorial step (the initial step when absent); a reset returns
     /// to the opening state `seed` chooses.
     ///
@@ -498,16 +600,27 @@ public struct HueCompassExperienceCore: ExperienceCore, Equatable {
         if case .daily(let daily) = decoded.mode, daily != decoded.level {
             throw HueCompassRestoreRefusal.damaged
         }
+        if case .replay(let replayed) = decoded.mode, replayed != decoded.level {
+            throw HueCompassRestoreRefusal.damaged
+        }
         do throws(HueCompassError) {
             let certified = try generated(number: decoded.level)
             let play = try HueCompassPlay.replay(level: try playedLevel(of: certified, mode: decoded.mode),
                                                  records: decoded.records)
             let tutorial = decoded.tutorial ?? HueCompassTutorialStep.initial(level: decoded.level)
             let openingCore = try opening(number: levelNumber(forSeed: seed))
-            return HueCompassExperienceCore(levelNumber: decoded.level, play: play, progress: decoded.progress,
-                                            mode: decoded.mode, tutorial: tutorial,
-                                            certifiedSmallest: certified.solution.smallest,
-                                            openingNumber: openingCore.openingNumber, opening: openingCore.opening)
+            // Feature 337: every saved result is checked by replaying its trace; the frontier stays as saved.
+            let reconciled = HueCompassReconciliation.reconcile(decoded.progress)
+            var core = HueCompassExperienceCore(levelNumber: decoded.level, play: play, progress: reconciled.progress,
+                                                mode: decoded.mode, tutorial: tutorial,
+                                                certifiedSmallest: certified.solution.smallest,
+                                                openingNumber: openingCore.openingNumber, opening: openingCore.opening)
+            core.reconciliationDropped = reconciled.dropped
+            // A replay whose result did not survive the check returns to campaign at that level (or the frontier).
+            if case .replay(let level) = decoded.mode, reconciled.progress.solved[level]?.verified != true {
+                try core.open(number: core.progress.isOpen(level) ? level : core.progress.frontier, mode: .campaign)
+            }
+            return core
         } catch {
             throw HueCompassRestoreRefusal.kernel(error)
         }
