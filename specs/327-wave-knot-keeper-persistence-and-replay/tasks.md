@@ -8,7 +8,7 @@ tests stay short (< 10 s each).
 
 ## Phase 1: Setup
 
-- [ ] T-R02G0307-001 Baselines: `--name baseline-round02`, `--name baseline-host`, `--name baseline-timing`
+- [X] T-R02G0307-001 Baselines: `--name baseline-round02`, `--name baseline-host`, `--name baseline-timing` — Verified 2026-11-21: 2026-11-21 baseline-round02, baseline-host, baseline-timing exit 0
 
 ## Phase 2: Story 2 — reconcilable scores (P1) 🎯
 
