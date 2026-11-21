@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesRound02",
+    "--scheme",
+    "ExperiencesRound02-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "ColorfallCanyonsExperienceTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package --destination sim-27.2 --action test --only-testing ColorfallCanyonsExperienceTests",
+  "elapsed_seconds": 10.45,
+  "exit_code": 0,
+  "finished": "2026-11-21T23:45:21+00:00",
+  "gate": "R02-G05-07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G05-07.sim-27.log",
+  "log_sha256": "2991b2fa7d650fb2b0a40764842e683e6adcc160c7fbe5c646b852c12558554e",
+  "name": "sim-27",
+  "started": "2026-11-21T23:45:11+00:00",
+  "timed_out": false
+}

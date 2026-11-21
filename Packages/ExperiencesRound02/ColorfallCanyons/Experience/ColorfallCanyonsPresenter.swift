@@ -32,6 +32,10 @@ import VisualCoreScenes
 // route (`feedback`, injectable), announces cell picks and refusals in words (the panel shows the same words), keeps a
 // feedback log, eases the scene's lights (`ColorfallCanyonsLights`, 0.45 s fades under Reduce Flashing) and offers the
 // ambient recipe to `ColorfallCanyonsSound` at level openings and changes of the basins or the stage. Presentation only.
+// Feature 347 (R02-G05-07) T-R02G0507-005 (FR-R02G0507-003, 004, 007): the mirror shows Replay for a verified solved
+// level and, during replay, its position with Step and Stop; the number of saved results reconciliation dropped is
+// announced once ("n saved results could not be checked and were removed."); the Sound toggle saves the choice through
+// `settings.sound`, and the restored choice is applied when the experience opens.
 
 /// What the controls show: the latest state the presenter described.
 @MainActor
@@ -96,6 +100,12 @@ final class ColorfallCanyonsMirror {
     var summary = ""
     /// Whether the ambient sound is on (feature 346; off by default).
     var soundOn = false
+    /// Whether the current level has a verified stored solution to replay (feature 347).
+    var replayAvailable = false
+    /// Whether a replay runs, its position and its length (feature 347).
+    var replaying = false
+    var replayPosition = 0
+    var replayLength = 0
 }
 
 /// One entry of the tier log: the tier drawn and why it changed.
@@ -139,6 +149,8 @@ final class ColorfallCanyonsPresenter: ExperiencePresenter {
     private var lightsLevel: String?
     /// The ambient sound (feature 346).
     let sound: ColorfallCanyonsSound
+    /// Whether the dropped results were announced (feature 347; once per presenter).
+    private var droppedAnnounced = false
 
     init(reduceMotion: Bool, reduceFlashing: Bool) {
         self.reduceMotion = reduceMotion
@@ -281,6 +293,36 @@ final class ColorfallCanyonsPresenter: ExperiencePresenter {
         mirror.soundOn = on
     }
 
+    /// Saves the sound choice through `settings.sound` (feature 347); the described change turns the loop on or off.
+    @discardableResult
+    func saveSound(on: Bool, port: ExperienceActionPort) -> ActionResult {
+        send("settings.sound", [on ? 1 : 0], port: port)
+    }
+
+    /// Starts the replay of the current level's best stored solution (`replay.start`; feature 347).
+    @discardableResult
+    func startReplay(port: ExperienceActionPort) -> ActionResult {
+        send("replay.start", [Double(mirror.levelNumber)], port: port)
+    }
+
+    /// Plays the next action of the running replay (`replay.step`).
+    @discardableResult
+    func stepReplay(port: ExperienceActionPort) -> ActionResult {
+        send("replay.step", [], port: port)
+    }
+
+    /// Stops the running replay and returns to the campaign (`replay.stop`).
+    @discardableResult
+    func stopReplay(port: ExperienceActionPort) -> ActionResult {
+        send("replay.stop", [], port: port)
+    }
+
+    /// Whether `mode` is a replay (feature 347).
+    static func isReplay(_ mode: ColorfallCanyonsMode) -> Bool {
+        if case .replay = mode { return true }
+        return false
+    }
+
     /// The controls view appeared (the loop may play).
     func controlsAppeared() { sound.setOnScreen(true) }
 
@@ -338,6 +380,7 @@ final class ColorfallCanyonsPresenter: ExperiencePresenter {
         case .practice: return ("mode.practice", [])
         case .daily: return ("mode.daily", Self.dateValues(dailyDate ?? date))
         case .campaign: return ("level.select", [Double(core.levelNumber)])
+        case .replay(let level): return ("replay.start", [Double(level)])
         }
     }
 
@@ -380,6 +423,33 @@ final class ColorfallCanyonsPresenter: ExperiencePresenter {
 
     func describe(_ core: ColorfallCanyonsExperienceCore) -> String {
         if latestCore?.levelNumber != core.levelNumber { mirror.pickedLevel = core.levelNumber }
+        // Feature 347: the saved sound choice is applied when it first appears or changes.
+        if latestCore == nil || latestCore?.soundOn != core.soundOn {
+            if core.soundOn { sound.offer(Self.recipe(core)) }
+            sound.setWanted(core.soundOn)
+            mirror.soundOn = core.soundOn
+        }
+        if !droppedAnnounced, core.reconciliationDropped > 0 {
+            droppedAnnounced = true
+            let count = core.reconciliationDropped
+            let text = count == 1 ? "1 saved result could not be checked and was removed."
+                : "\(count) saved results could not be checked and were removed."
+            route(ColorfallCanyonsFeedbackPlan(text: text, kind: .state, haptic: nil))
+        }
+        if let result = core.progress.solved[core.levelNumber] {
+            mirror.replayAvailable = result.verified && !result.trace.isEmpty && !Self.isReplay(core.mode)
+        } else {
+            mirror.replayAvailable = false
+        }
+        if case .replay(let level) = core.mode {
+            mirror.replaying = true
+            mirror.replayPosition = core.play.records.count
+            mirror.replayLength = core.progress.solved[level]?.trace.count ?? 0
+        } else {
+            mirror.replaying = false
+            mirror.replayPosition = 0
+            mirror.replayLength = 0
+        }
         if let previous = latestCore {
             route(ColorfallCanyonsFeedbackPlan.after(old: previous, new: core))
             let opened = previous.levelNumber != core.levelNumber || previous.mode != core.mode

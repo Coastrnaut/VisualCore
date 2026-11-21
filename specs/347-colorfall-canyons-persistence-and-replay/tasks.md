@@ -43,7 +43,7 @@ tests stay short (< 10 s each). {device} items are D1–D3 observations after Im
 
 ## Phase 4: Panel and simulator proof
 
-- [ ] T-R02G0507-005 [US3] Edit `Packages/ExperiencesRound02/ColorfallCanyons/Experience/ColorfallCanyonsPresenter.swift` and `Packages/ExperiencesRound02/ColorfallCanyons/Experience/ColorfallCanyonsControls.swift`
+- [X] T-R02G0507-005 [US3] Edit `Packages/ExperiencesRound02/ColorfallCanyons/Experience/ColorfallCanyonsPresenter.swift` and `Packages/ExperiencesRound02/ColorfallCanyons/Experience/ColorfallCanyonsControls.swift` — Verified 2026-11-21: 2026-11-21 sim-27 exit 0: ColorfallCanyonsExperienceTests 48 tests in 8 suites on sim-27.2 incl. 4 replay tests (replay reproduces the win step by step without changing progress; refusals in words; dropped result announced once; sound choice saved and applied) (.autonomy/migration/checks/R02-G05-07.sim-27.json); lead run
   (Replay for a verified solved level, Step and Stop with labels and values, the replay position; the Sound toggle sends
   `settings.sound` and the presenter applies the restored `soundOn` when the experience opens; the dropped results
   announced once: "n saved results could not be checked and were removed.") and create

@@ -40,6 +40,7 @@ struct ColorfallCanyonsControls: View {
                 timeRow
                 playRow
                 progressRows
+                replaySection
                 soundToggle
             }
             .padding()
@@ -64,9 +65,29 @@ struct ColorfallCanyonsControls: View {
         "Level \(mirror.levelNumber), tick \(mirror.tick) of \(mirror.tickLimit), \(mirror.remaining) actions left"
     }
 
-    /// The Sound toggle (feature 346; off by default).
+    /// Replay of the best stored solution: Replay, or during replay its position with Step and Stop (feature 347).
+    @ViewBuilder private var replaySection: some View {
+        if mirror.replaying {
+            Text("Replay: action \(mirror.replayPosition) of \(mirror.replayLength)").font(.callout)
+                .fixedSize(horizontal: false, vertical: true)
+            row {
+                Button("Step") { presenter.stepReplay(port: port) }
+                    .accessibilityLabel("Play the next action of the replay")
+                    .accessibilityValue("Action \(mirror.replayPosition) of \(mirror.replayLength)")
+                Button("Stop") { presenter.stopReplay(port: port) }
+                    .accessibilityLabel("Stop the replay")
+                    .accessibilityValue("\(mirror.replayLength) actions")
+            }
+        } else if mirror.replayAvailable {
+            Button("Replay best solution") { presenter.startReplay(port: port) }
+                .accessibilityLabel("Replay your best solution of this level")
+                .accessibilityValue("Level \(mirror.levelNumber)")
+        }
+    }
+
+    /// The Sound toggle (feature 346; off by default; saved through `settings.sound` since feature 347).
     @ViewBuilder private var soundToggle: some View {
-        Toggle("Sound", isOn: Binding(get: { mirror.soundOn }, set: { presenter.setSound(on: $0) }))
+        Toggle("Sound", isOn: Binding(get: { mirror.soundOn }, set: { presenter.saveSound(on: $0, port: port) }))
             .accessibilityLabel("Ambient sound")
             .accessibilityValue(mirror.soundOn ? "on" : "off")
     }
@@ -153,12 +174,13 @@ struct ColorfallCanyonsControls: View {
         return "Level \(level), band \(band)"
     }
 
-    /// The mode's name: campaign, daily or practice.
+    /// The mode's name: campaign, daily, practice or replay.
     static func modeName(_ mode: ColorfallCanyonsMode) -> String {
         switch mode {
         case .campaign: "campaign"
         case .practice: "practice"
         case .daily: "daily"
+        case .replay: "replay"
         }
     }
 

@@ -39,7 +39,8 @@ import VisualCoreExperienceHost
         var ids: [String] = []
         for control in ColorfallCanyonsExperienceCore.controls { ids.append(control.id) }
         #expect(ids == ["canyon.carve", "canyon.valve", "time.step", "play.undo", "play.redo", "level.next",
-                       "level.select", "mode.daily", "mode.practice", "mode.campaign", "tutorial.dismiss"])
+                       "level.select", "mode.daily", "mode.practice", "mode.campaign", "tutorial.dismiss",
+                       "replay.start", "replay.step", "replay.stop", "settings.sound"])
         #expect(ids == ColorfallCanyonsExperienceCore.actionIDs)
     }
 
