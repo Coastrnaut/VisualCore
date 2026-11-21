@@ -139,7 +139,9 @@ enum CatalogFixture {
                                // Feature 313 (R02-G02-03); integrated at X-R02-G02.
                                "r02-g02.lissajous-labyrinth",
                                // Feature 323 (R02-G03-03); integrated at X-R02-G03.
-                               "r02-g03.wave-knot-keeper"],
+                               "r02-g03.wave-knot-keeper",
+                               // Feature 333 (R02-G04-03); a candidate until X-R02-G04.
+                               "r02-g04.hue-compass"],
                 "the registrations of Catalog/registrations.json")
     }
 

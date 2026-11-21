@@ -1392,7 +1392,9 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     # Feature 313 (R02-G02-03): Lissajous Labyrinth, integrated at X-R02-G02.
                                     "LissajousLabyrinthCore", "LissajousLabyrinthExperience",
                                     # Feature 323 (R02-G03-03): Wave Knot Keeper, integrated at X-R02-G03.
-                                    "WaveKnotKeeperCore", "WaveKnotKeeperExperience"])
+                                    "WaveKnotKeeperCore", "WaveKnotKeeperExperience",
+                                    # Feature 333 (R02-G04-03): Hue Compass, a candidate until X-R02-G04.
+                                    "HueCompassCore", "HueCompassExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):
         listing = subprocess.run([sys.executable, str(HERE / "release_check.py"), "--list"],

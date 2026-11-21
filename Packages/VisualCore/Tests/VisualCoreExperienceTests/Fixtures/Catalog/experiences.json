@@ -1004,7 +1004,7 @@
       "id": "r02-g04.hue-compass",
       "code": "R02-G04",
       "title": "Hue Compass",
-      "summary": "Rotate a spectral compass to find a hidden target in a colored fog field",
+      "summary": "Turn a spectral compass and probe the coloured fog: each clue tells how many hue bands and how much fog lie between the probe and the hidden target. Deduce it and select its bearing and band before the probes run out. 100 certified levels. Drawn in code; offline.",
       "kind": "game",
       "tier": "free",
       "category": "puzzle",
@@ -1013,11 +1013,29 @@
         "chromatic-logic"
       ],
       "order": 29,
-      "palette": [],
+      "palette": [
+        "#05070F",
+        "#E8E4DA",
+        "#2F6FD8",
+        "#E0703A"
+      ],
       "tile_seed": 4011485366,
-      "capabilities": [],
-      "quality_tiers": [],
-      "content": null,
+      "capabilities": [
+        "Turn a spectral compass, probe the fog",
+        "Prismatic glass in luminous fog",
+        "100 solver-certified levels",
+        "Turns can be undone and redone",
+        "Three quality levels, same rules"
+      ],
+      "quality_tiers": [
+        "level-0",
+        "level-1",
+        "level-2"
+      ],
+      "content": {
+        "catalog_sha256": "fcb10a906350344bf23c9126d1c9cd2fd26bde25458cdc2924edb75a0bae8b15",
+        "levels": 100
+      },
       "available": false
     },
     {

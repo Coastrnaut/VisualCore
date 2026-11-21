@@ -1,0 +1,3109 @@
+{
+  "controls" : [
+    "compass.turn",
+    "compass.probe",
+    "compass.select",
+    "play.undo",
+    "play.redo",
+    "level.next"
+  ],
+  "experience" : "r02-g04.hue-compass",
+  "kind" : "game",
+  "round" : 2,
+  "scenarios" : [
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+        "initialDigest" : "10380799b3b75839a60c43e406a4f4605cd19d8b1bca5f87acc85d818733165e"
+      },
+      "name" : "launch-first-frame",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7d394b4fded659f1d6565da39e803240e589cc89b3e37e2205b797ab9e93a55f",
+        "initialDigest" : "10380799b3b75839a60c43e406a4f4605cd19d8b1bca5f87acc85d818733165e"
+      },
+      "name" : "input-response",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -27
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.probe",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.select",
+            "values" : [
+              84,
+              10
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "outcome" : "won"
+      },
+      "name" : "completion",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              49
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -49
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "compass.select",
+            "values" : [
+              96,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "compass.select",
+            "values" : [
+              0,
+              24
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "compass.select",
+            "values" : [
+              -1,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              1.5
+            ]
+          },
+          "result" : "action.rule.r02-g04.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "compass.select",
+            "values" : [
+              0.5,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g04.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "compass.select",
+            "values" : [
+              0,
+              2.5
+            ]
+          },
+          "result" : "action.rule.r02-g04.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g04.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g04.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g04.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "compass.probe",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "compass.select",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "10380799b3b75839a60c43e406a4f4605cd19d8b1bca5f87acc85d818733165e",
+        "initialDigest" : "10380799b3b75839a60c43e406a4f4605cd19d8b1bca5f87acc85d818733165e"
+      },
+      "name" : "rejection",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7d394b4fded659f1d6565da39e803240e589cc89b3e37e2205b797ab9e93a55f",
+        "initialDigest" : "10380799b3b75839a60c43e406a4f4605cd19d8b1bca5f87acc85d818733165e"
+      },
+      "name" : "save-restore",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "initialDigest" : "10380799b3b75839a60c43e406a4f4605cd19d8b1bca5f87acc85d818733165e",
+        "resetDigest" : true
+      },
+      "name" : "reset",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "suspend-resume",
+      "seed" : "0"
+    },
+    {
+      "cycles" : 5,
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "teardown-reentry",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "cancel-prepare",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -27
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.probe",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.select",
+            "values" : [
+              84,
+              10
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -25
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.probe",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.select",
+            "values" : [
+              57,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              21
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.probe",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.select",
+            "values" : [
+              64,
+              17
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "35fc078c38404dfb644abc11a9a6b86e1f16c571bacad119f07c265028d7bef0",
+        "initialDigest" : "10380799b3b75839a60c43e406a4f4605cd19d8b1bca5f87acc85d818733165e",
+        "outcome" : "won"
+      },
+      "name" : "full-playthrough",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7d394b4fded659f1d6565da39e803240e589cc89b3e37e2205b797ab9e93a55f",
+        "initialDigest" : "10380799b3b75839a60c43e406a4f4605cd19d8b1bca5f87acc85d818733165e"
+      },
+      "name" : "hero",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -21
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              49
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "58b45a92ec588eaf6641ea3226c152f60df9239cd772ec8fdb92886b3c06c77f",
+        "initialDigest" : "cb6a791c534b8e7cd419043f00bbb5e71b8bb6c8bc14229c2c38677c3adaf7ff"
+      },
+      "name" : "acceptance-001",
+      "seed" : "19"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              48
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g04.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "3e33a70da9dc31359a672f13c7727dd0fc33c90e06781304cc985dd1d1c99234",
+        "initialDigest" : "4fc447b8f8d7b9e5a002a7cbe5bfd10f92a6438dc48c91e794ce3a0dc5819d42"
+      },
+      "name" : "acceptance-002",
+      "seed" : "26"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              35
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              49
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "28e79ff16d3b30e57ce8bcfd0c4ed483a72f09a321315598b1c84c8788e41965",
+        "initialDigest" : "c21c9606f19a464c99800290e7d2a85b297cef96bce083f86e371a36d9a258fc"
+      },
+      "name" : "acceptance-003",
+      "seed" : "33"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -23
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g04.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "663b919737d2183fd6d66b61d37a6f16a3038e3c7be0823f5474a07adb3822d4",
+        "initialDigest" : "e82085700c0b3522df2e4ff6c0246899cd80cee6c88c29d44f49704163bc4d1c"
+      },
+      "name" : "acceptance-004",
+      "seed" : "40"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              10
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              49
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "3859ed1dc4301b1fb213edce0596f0bfa649cdb2a6a29b2f316c4cab3e906708",
+        "initialDigest" : "28b864a127672c3028f4e438e2810a5cd0c41fca3b754ecde7c4e5d49d638873"
+      },
+      "name" : "acceptance-005",
+      "seed" : "47"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -30
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g04.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ea90f6b8ce0d0115666119e870161032bfc7dffb3620a4bb898898e59286def7",
+        "initialDigest" : "d6b7181b55097847dc59ac4aa4d055c102326be23ba1cdd507626e6177aaea32"
+      },
+      "name" : "acceptance-006",
+      "seed" : "54"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              49
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d15f051cac85f8da9c2cbd8c2ee83a2213f861975bc4362a352ce6fd8bf0572b",
+        "initialDigest" : "4c996bf21d8cc8eca87ac6c4ab08ad8f41d0d4ac61ea89f9100a1902b23fff02"
+      },
+      "name" : "acceptance-007",
+      "seed" : "61"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g04.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8f8ca0ce35acceb044e38a1ceb3ba54039089af6aa668c6a301c85fdfef557e7",
+        "initialDigest" : "48e66afbc2a4043111491f95d60fd265a35af8024c7d6cc3fd2d858a54c1a795"
+      },
+      "name" : "acceptance-008",
+      "seed" : "68"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              33
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              49
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d04a82135a53c8158807db22587373ffc6bd945e087b8d02e82faee04324b656",
+        "initialDigest" : "6fea2511669fd817bdac1f911e7b929e99a333be297e185de308dccc511cc84a"
+      },
+      "name" : "acceptance-009",
+      "seed" : "75"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              36
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g04.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "0cf5ffc2ebd2148e88c2cbb5bddcbcf9b2142be1597740d3eaa41f4f8e8b4fff",
+        "initialDigest" : "c72e70a997520c4969770b4c82f7871e8f9bcd511449269d72660d5c755cd39c"
+      },
+      "name" : "acceptance-010",
+      "seed" : "82"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              15
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              49
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9804b49a7c15bfc3a0de5741f1ef4751c861cc19e8355ed0c72f2148e59885e7",
+        "initialDigest" : "337b93e09b7d09e0d19d5a64f8d9be763add5c3d2a660d10e7fc2532d002d0fd"
+      },
+      "name" : "acceptance-011",
+      "seed" : "89"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              8
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g04.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "18197d62dc8d950300f302696c3b27aa4c384e9ffa18e7bfcc612dff821430ce",
+        "initialDigest" : "4e8d32f4b61578097cc659beb89e6417b96d76c8408e300abce816152c2a9004"
+      },
+      "name" : "acceptance-012",
+      "seed" : "96"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              17
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              49
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "16834922d9ff19bbdfb153aaccd84b6c9c6026e7e457ba73f905a8baa28d6793",
+        "initialDigest" : "e129a3308f7b95a0b949b541d0b3892ded6edf5b183729d518024903c24b9f68"
+      },
+      "name" : "acceptance-013",
+      "seed" : "3"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -19
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g04.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8b2eeee8759afd034f49acf8db0b9d479424cbc26691c769698520d6712ff993",
+        "initialDigest" : "014bcfd8d08a563ef6a43196be6508d613964e2470cd3131b8cac2162591391a"
+      },
+      "name" : "acceptance-014",
+      "seed" : "10"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              25
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              49
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e77942af91f65581682be8ad084e7d63b7ec56f4ecc2926ff782f9b25d5f0675",
+        "initialDigest" : "ab2b82c53432c03b8d717d17e8335e3e4ecc62226b495788501b66c53c48b7a3"
+      },
+      "name" : "acceptance-015",
+      "seed" : "17"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -17
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g04.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "db49454affb9f949dfbc22e80ac03e4ca625ba7cc4c86e5b924c6de2f278d031",
+        "initialDigest" : "06764e7717cf3d7cb9012c8c7772973676d56047a30568f8008d6a568ce40891"
+      },
+      "name" : "acceptance-016",
+      "seed" : "24"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.probe",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              49
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "15d23ef351541ac3269145cde0ebca99e5a64baca21d6d02122f0f058c9af624",
+        "initialDigest" : "9fb5b388cddfe0ec2b1025f260f78e7202501e1e63eace0e34d60247ed67e123"
+      },
+      "name" : "acceptance-017",
+      "seed" : "31"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -9
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g04.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5c2eb85d1fcf2500585716538a77b8c9e13b6f5929b1f7004d3afced87a197ab",
+        "initialDigest" : "07eada4878913d30fff9f8ee5ed96b1d23427ae2375cd8968b6ca746a5785676"
+      },
+      "name" : "acceptance-018",
+      "seed" : "38"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              48
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              49
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "712c1116bf4a356a5b76027c48e4231c7f9c071e004a618a79c2b17d1c61320f",
+        "initialDigest" : "2e2bbe2d73672abc36a8f93b307ed7e10ab8c8e8ac07053aecdc4c26080059d0"
+      },
+      "name" : "acceptance-019",
+      "seed" : "45"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              28
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g04.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7520dba4521a9ccd9117d33a85b9807fa69b4e5e0279a33ef2695aa379d9785c",
+        "initialDigest" : "d5ee798339da0dd7ed9324461969a575ee2be7718a590d1572510ca0222355a5"
+      },
+      "name" : "acceptance-020",
+      "seed" : "52"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -27
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              49
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "21cd72250ec2ddb8f10f07deb08baca37219c51c88076ae109692537490fa3b0",
+        "initialDigest" : "02e3e263eeba84123dd04fa63590c7190e16f026d12cc8a0eb7a458e190eb306"
+      },
+      "name" : "acceptance-021",
+      "seed" : "59"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              16
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g04.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e62bebac14702cc875f4d03ffc56cd653d034146061ac6377d1d49a37dfb69cf",
+        "initialDigest" : "4c826e6392fedc6430981d546bccafb0a58d27f7bfaf56abe3e881e18aea0e98"
+      },
+      "name" : "acceptance-022",
+      "seed" : "66"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -28
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              49
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b45358decbfa22e87d7d5be1f0450856677b3e0bce208ad3a674493cc250105a",
+        "initialDigest" : "ecb8f52bc3848366f6ac2f9fa1542fccab170cbeef24f478ae3c8dfaaf679371"
+      },
+      "name" : "acceptance-023",
+      "seed" : "73"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -37
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g04.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b89ce15f13b0d79c20b104b2ab35a10e0df4dc09334da354a732a6e4c03112ff",
+        "initialDigest" : "b2b75735845e527c38d65fa91af3076fe24419912bd5635b4c0cfa185e1add39"
+      },
+      "name" : "acceptance-024",
+      "seed" : "80"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              49
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "c4f5fc5889c5adea0857a7a189021f36e59b18ccb7eec3071a3d04962ad38c0a",
+        "initialDigest" : "820833358b3b0b472af6a1a0d6fdcaedf6d6580e66f9d971d3c793c4815126f8"
+      },
+      "name" : "acceptance-025",
+      "seed" : "87"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -18
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g04.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8031b9ec1785ef6f8019877da8e4c443851a7f092b61973b7d3e7fba78cd0f96",
+        "initialDigest" : "1c0bcb316593c4c6571bf64286a0f66e8ff60833a7e38d2f929e5a9093b0ca63"
+      },
+      "name" : "acceptance-026",
+      "seed" : "94"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -25
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              49
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "3437beabd3a0044bde2085c1cf3d521dafd8e7898949740d19c3981ba7801d59",
+        "initialDigest" : "ab3302b779fa5b3eab7f1cde87bfb7b13e008b02c7486e8ed862aa678603182c"
+      },
+      "name" : "acceptance-027",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -34
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g04.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "c36533bd90dbf29a6ac686ec954b24f7f00f96196a70d0606781d2e64782e443",
+        "initialDigest" : "b2d3cb364febc4e74270039e01c333b497de1abe9cfe54fec659ee4aca385676"
+      },
+      "name" : "acceptance-028",
+      "seed" : "8"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -16
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              49
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8097f2bc8d09c65ccb125af735f7d110bb6a183e5ff31aa09dc7cdda2fc6886a",
+        "initialDigest" : "645a5c346cf82d5f7b13717ef0997af2a9a251da3639206e0a13b263dfa91c1b"
+      },
+      "name" : "acceptance-029",
+      "seed" : "15"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -46
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g04.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "bd391b166eaace5b58d1a4c15b3cb628e574b6cb7eb332cdc78b922e52724b28",
+        "initialDigest" : "a8e623740f5df2027423410d39597ce41551c8e14db9d1231d10cd706f26ae70"
+      },
+      "name" : "acceptance-030",
+      "seed" : "22"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -40
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              49
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "539dea2684f8dea4e4b29fcad9c2ac3cddb2a6a5333ad9345554a21de4bddd9c",
+        "initialDigest" : "ca9d8c7e7bfcc8fcb05c65bc634bcaaf3743cd63f8bee132877ecfdd8441e3d5"
+      },
+      "name" : "acceptance-031",
+      "seed" : "29"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              10
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g04.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "28ea0eaf800d12a3ea5eb68258f8fbf43ca40c7442b90c12180103d63f73344a",
+        "initialDigest" : "7b52453f46165117dda7e94a885afea044d438a6c6533935204065e19cd8f78c"
+      },
+      "name" : "acceptance-032",
+      "seed" : "36"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              32
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              49
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d6f79d46f4561fc9472678d614e1b7a6869c0567b3d59ab8df02b3ead790b8ac",
+        "initialDigest" : "a3ccfabda6cb2fa66524dfc88fa9821ca6c532a962ab299d7a5f76741fa2af47"
+      },
+      "name" : "acceptance-033",
+      "seed" : "43"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -40
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g04.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5d04429bd12ce48f4099c5e8e16c2fe68ade832b97462bd2ee300aacd2697d02",
+        "initialDigest" : "3e9ac6c8b74c2e542ad0f78c85066e62aae4471e23117d14bcbfc17a3e685a94"
+      },
+      "name" : "acceptance-034",
+      "seed" : "50"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              13
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              49
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "be51a721b1ff646108c5506f361f0568595ecdd6eca186e60c04a866337c112f",
+        "initialDigest" : "51b3b2523cfbb41fd44d9448015713eff7d4048bc074d0606d9b2516c2412743"
+      },
+      "name" : "acceptance-035",
+      "seed" : "57"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              36
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g04.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "967e42c18ce5eb2f68e0fa53f7a8756f2f9ee1e2a2c28535e59bae3756e13b50",
+        "initialDigest" : "1ddad540922f9fcd3c3303420183cbe08ae36e165e29bc54f89e4534d44ffa58"
+      },
+      "name" : "acceptance-036",
+      "seed" : "64"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -33
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              49
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d628f03db8f9f0aa8090d1c10b3f02d6ce964e8b6140228131969007a8782bcd",
+        "initialDigest" : "b0b96c4f8c0076ff362da2fb0ec587cb3a7b018910e00687894503d3feec5a62"
+      },
+      "name" : "acceptance-037",
+      "seed" : "71"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -32
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g04.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "0b1bb4fd59baf573d3fa0a612cbcf42031e30b6f1d1e09ddb2b1060a15afb658",
+        "initialDigest" : "fdb76b93573b8ebae5705b27bf6622c8c97df64c3c657a09c1f864e3890c682a"
+      },
+      "name" : "acceptance-038",
+      "seed" : "78"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -33
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              49
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "4a90b372509e629bef7b8c2817322de3b938b0fd258a20502ccd0cc4681c96d0",
+        "initialDigest" : "c4aa72873b13ea32eb6543acefcb361d0e0302e454e6bce144c7b978f8653a34"
+      },
+      "name" : "acceptance-039",
+      "seed" : "85"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              33
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g04.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7c6b104be80b979f14371a71249b2cd6296d08a9eef93a5f6328b703cb276f8e",
+        "initialDigest" : "4a4e417bb59747d0b6fe314161249d4bbdfdc63199e9a83727b6f448123ddbcf"
+      },
+      "name" : "acceptance-040",
+      "seed" : "92"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -29
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              49
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "901c6083b2895314898259b294929660a581dd816330329e59ec13c4c8bd43c4",
+        "initialDigest" : "1c7604a84b0c7b71e567e23555f65ec741be446897c525fa2841520208024ae3"
+      },
+      "name" : "acceptance-041",
+      "seed" : "99"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              40
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g04.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "81a91edb56ad946a9b5dfb84d78d36f8a27025c1e42a594b6bb9238bb2290458",
+        "initialDigest" : "99cca26bc5f2913dc129714a32499f089ec134a8a63eca740290e4ad4ff128f2"
+      },
+      "name" : "acceptance-042",
+      "seed" : "6"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              49
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a2340f4966e4becad110e506e68defe1160da05aea51afd0a40fd9ba08ecbc32",
+        "initialDigest" : "4e234f1a1be4df137935d65e20303b84298eac234bc8baaba7e1e182cd576d29"
+      },
+      "name" : "acceptance-043",
+      "seed" : "13"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -21
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g04.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "2b6f77eb3072268b4308dcefe5367af653f2e176ded37f7fb4226b5a56811cdf",
+        "initialDigest" : "6d8f0a26e3c51f3811880eb5d2a218502eafee8b7975a065ddc4acc2283482e0"
+      },
+      "name" : "acceptance-044",
+      "seed" : "20"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              23
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              49
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "2694d346fa14abefc81b242d0c37bbea57d3a2f52eef2faa345c7f61f02f57f6",
+        "initialDigest" : "55ead99962f0dd9e9a0c6542d48272bb244e29c834745b914db1d67df4340a4b"
+      },
+      "name" : "acceptance-045",
+      "seed" : "27"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -45
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g04.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "3ba2d79ec462be56416c65747b583c3a8a8329572068927bb1b638aa1e3237dd",
+        "initialDigest" : "d873f64165833ad83c3f89c87bf5c00d4c08dea735d3c871474edaac94c7c726"
+      },
+      "name" : "acceptance-046",
+      "seed" : "34"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              49
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "fcb24debf1771e0058c64b0f9a9e81de04a2d917fc700b7bd36b36f8e369234a",
+        "initialDigest" : "5b9e8d63ea04cdab6c1af3d520ba61f7cc36f80f76e9ee0641d7f57fcd5c0a22"
+      },
+      "name" : "acceptance-047",
+      "seed" : "41"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -16
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g04.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "94219b583397c2604a9f85cf73578584fc359a0e969f19196786fbf7d0730562",
+        "initialDigest" : "474529ad55c4f2bb5b3f00beddf415b43462e8b15934e87476a6aba4569a07ec"
+      },
+      "name" : "acceptance-048",
+      "seed" : "48"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -21
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              49
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9cde205b082badc6e281a0ebe53476e76cc33cd2bf0b5ac7ba2c535daf7ab7cc",
+        "initialDigest" : "24fee910a634b3b882fbfce29246a73a91620a6f3cb90bbdd3556d83d66c55a3"
+      },
+      "name" : "acceptance-049",
+      "seed" : "55"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              25
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g04.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "388cac8cd2c4c6857b6f1da3d4723a949637b16494df63b1dcbfbd617190391d",
+        "initialDigest" : "4e579ab6fc5c12eb8688c959ab418f211b38716de69cfdf6f24b1d31f25addcf"
+      },
+      "name" : "acceptance-050",
+      "seed" : "62"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -18
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              49
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "fc8ca08769e6d0798ab266527bbdcf87687815908fcc529faa47e87368a0e7e7",
+        "initialDigest" : "f0f721ec7d4be4afd7b9cf6ce30e48da3c47f89c52b01cca02a75b36d335f4d8"
+      },
+      "name" : "acceptance-051",
+      "seed" : "69"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              39
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g04.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6fe86823bd85d9dc203f180b2755badd6f4d42388c4a603449d563d4e5f7ddec",
+        "initialDigest" : "85cff7e46de929e979776baeece4b6361b1d4a96913b35d83951fe53e5fcc14a"
+      },
+      "name" : "acceptance-052",
+      "seed" : "76"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              21
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              49
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b796ebe76017a8da77f59e5ba8870844ada9361610e5d6402d0023d8399dcd13",
+        "initialDigest" : "c24cca8f5b9f4a91a9baf8aeff54ac2095db7560ccffaa0009a30e1346dd3d31"
+      },
+      "name" : "acceptance-053",
+      "seed" : "83"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -25
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g04.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ef0fea53d515f51ccdea1db4a06371c9f0e10a3a646d609906524c059738910f",
+        "initialDigest" : "00b2770c7d64facd16df12258f445de077a4718a8c97922efd79afeebbba35b2"
+      },
+      "name" : "acceptance-054",
+      "seed" : "90"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -34
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              49
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b8ee8cd0e472699340c730d482914e9465d36cc1b6139bda9f0fec7188c04548",
+        "initialDigest" : "85021b6ad79e7d12392a03f223c9065d7fd07615e792b3c3bc4c89e221ea762f"
+      },
+      "name" : "acceptance-055",
+      "seed" : "97"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g04.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d97684554ef5ea09496bea75f90fc286f08b58c1c245c5bc3567d1480034619b",
+        "initialDigest" : "3252f853fb0c1b5c66dcea5ca50929addc940f854d8d3e3e49d215f3e4ab1234"
+      },
+      "name" : "acceptance-056",
+      "seed" : "4"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -31
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              49
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ebe46a8e342a7d6dd1c4fff9c4d8b903512c40919fbe05c9b03bdcd7113ef0a5",
+        "initialDigest" : "2f388726bc72529333fe80afd77d0d0a047288327cf7c7dd300e1b60746ac5d0"
+      },
+      "name" : "acceptance-057",
+      "seed" : "11"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              39
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g04.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "bb0db14962287b920af8826483a55558db48722856e9f826cace644f4046e73f",
+        "initialDigest" : "7897e8b3c0da1e6025b2f1c43ce5de744f4fcdebb3c212301222603116fb5485"
+      },
+      "name" : "acceptance-058",
+      "seed" : "18"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              14
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              49
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "c7fa51ca75309db43e0974b467b4ef6701b906d604a136883f0dc6803bfc0379",
+        "initialDigest" : "ae3e52b4a7f3e4a256b8115f5e297f0162436010718183fcce23bb70c4d84a14"
+      },
+      "name" : "acceptance-059",
+      "seed" : "25"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g04.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "2ced19d2e4a45b25a52185a87f6f20f7703c00904970e123ecbb9498c8681d00",
+        "initialDigest" : "89da34d374e4c0bb72ca709394905aabc0032afc8b0d0291a22b7af04a0e5fbc"
+      },
+      "name" : "acceptance-060",
+      "seed" : "32"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              49
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9d8aed7705e28c62c4896d912b13f11622f995f0d252341c33e1c5e74e769e67",
+        "initialDigest" : "9c13c886f81c0e9ffa66e6fe6d8dbc371d8ced3a0ccde0d4bebbbee091838202"
+      },
+      "name" : "acceptance-061",
+      "seed" : "39"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              28
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g04.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ed952b5af545f533bec4bfea576a1fa2dbdf0791a2ee5048dd1f375099712f71",
+        "initialDigest" : "de143956143c105577bc760624dad61a7a4cae8404c292f43ed60ef2ba3b2f82"
+      },
+      "name" : "acceptance-062",
+      "seed" : "46"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              23
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              49
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8ad5eaed8d095435c9ab0de1c46b9ecfff42d4b3559e9766566cdb529f2d50d0",
+        "initialDigest" : "963e87fc9971e1baa7a3549b3f4df1057fbd0555765c9eac47bcd7efcdf09c76"
+      },
+      "name" : "acceptance-063",
+      "seed" : "53"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -41
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g04.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "c4290a0c302bc2091c1715de8f91447ab64cd285fcf7c921dc7666db5e708bee",
+        "initialDigest" : "48f286b9035c3d1dc5d1c6b1a172dded3bfb6d29d2bf40982e689e668a3dd553"
+      },
+      "name" : "acceptance-064",
+      "seed" : "60"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              24
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              49
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b10a60432e9faff20b0cae385eba3b2fec9ef2ee29b685d0c997c96ae32babe7",
+        "initialDigest" : "4a3ea4077e6e0c674659e50f29f2ba692ece1f90a7d69291cfd6d4eef8897039"
+      },
+      "name" : "acceptance-065",
+      "seed" : "67"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -13
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g04.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "3902f674b24f8160df643d808179d5a5f06fc8bd357ea65034a70dd1a5509441",
+        "initialDigest" : "7afee2c20ef8f9d793f50d8147e108828448699113df5d5748ba494b91b42bb4"
+      },
+      "name" : "acceptance-066",
+      "seed" : "74"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -46
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              49
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "3ced2a3b7c012d75b7396987082aa08cdc179414c0c0364c059d0f8cd32b6162",
+        "initialDigest" : "513c4b4ba2f5969bf240084a6a5e1a98c43d98dee6e918af733fe144710bb63e"
+      },
+      "name" : "acceptance-067",
+      "seed" : "81"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              41
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g04.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5ad0ee955ec7136e42f65bce373c6d635e58359808c4e3c37b82c510a06fe70b",
+        "initialDigest" : "9a60e62439aff42bbed90b68f83035ae33b87eed05d6b57ba0f7fa147df4bde2"
+      },
+      "name" : "acceptance-068",
+      "seed" : "88"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              26
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              49
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "65ce3d5bf93cae1bad9cf86842049de2ac8e025723a93b015085027b492f12d4",
+        "initialDigest" : "a9fb3f6d4ad81034f008b8372f8c7061fa8aae700438d47532cf7dac33f90cce"
+      },
+      "name" : "acceptance-069",
+      "seed" : "95"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              21
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g04.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "4e33b1952932ae049b764d17c98401bee28f6c0a2dfd0c9a5512a4be7d90387b",
+        "initialDigest" : "df01ce2910795934ac3b641f977fc918fab3ac9bbf1dbe51210cad0050bb535f"
+      },
+      "name" : "acceptance-070",
+      "seed" : "2"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              49
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ddc50aeca8c8c666e3d585213748f166500a471195834ca40826594eb6e35dba",
+        "initialDigest" : "239c5b3801011ecfa88e7ad4df2c420541af982b1ddc5397b3f3074c6559754d"
+      },
+      "name" : "acceptance-071",
+      "seed" : "9"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              41
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g04.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8ee0e5b239183c9ed0b8615bc9bd7807e8151922b8d0d4d3db97bf718691ccfd",
+        "initialDigest" : "540b9520a3ae1c51f14c08ce5df76b27421ad1b0dd72f1446f367a20ad64708f"
+      },
+      "name" : "acceptance-072",
+      "seed" : "16"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              47
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              49
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1688c850ca291d728773bea47946c5d264c76b4c975dc39f3fbd11769fc77a1f",
+        "initialDigest" : "2f06b7a217327126495232ac45c0b7f0840b9db3ef8e6f4bbae2c31c4e471d2c"
+      },
+      "name" : "acceptance-073",
+      "seed" : "23"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              14
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g04.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "db57b78f57ca3e9d76fca05b561e8cdfff33de1b7f006979a0e2fcbe503bd895",
+        "initialDigest" : "68221c101556aca442ba69828580e90785067c51357ae93930f5167b2448c627"
+      },
+      "name" : "acceptance-074",
+      "seed" : "30"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -36
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              49
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "4e610785a5f2fcaa5f6c999524cc51f0c789e65ceb9776d1f3d6dbe09e30254a",
+        "initialDigest" : "c78939025867572c9d3def6c8f6d057d325b17077b2ce8c3c6b9b6b96f5ffc2a"
+      },
+      "name" : "acceptance-075",
+      "seed" : "37"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -25
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g04.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e1a9e5935165b336bd111d728e5a8a75ec8efda627a0a27c2b475ca434a3f869",
+        "initialDigest" : "639092d43617106ca583febb2e8fb11ab56e484bfc1e638bf2e956b46d9c842c"
+      },
+      "name" : "acceptance-076",
+      "seed" : "44"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -11
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              49
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "67e050e6094ebe52bd53d9fd374c2362da32ece2b74c6a06e4c5d16e3a6f9f04",
+        "initialDigest" : "763290f3e0f6fd46176b0bd58aea396fc5dedfed45c5c9739c4e50c88f59c7d2"
+      },
+      "name" : "acceptance-077",
+      "seed" : "51"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g04.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "53086da2f130c37d02110ad82825bc2fd04db1ef80a9cf56d99278814465f93c",
+        "initialDigest" : "31fd469f39b8f5cdc2d1801f91807ad45d721fb3865b4d6449812100dac5c544"
+      },
+      "name" : "acceptance-078",
+      "seed" : "58"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -15
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              49
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "96929627339ca17ba2ba0d8aa4ed47a76ac6c95d0532043258792b7347a8c460",
+        "initialDigest" : "0c81e8e8b3a3b9987d32aa40e93903260be251d21901758d1d5d2b49266c3bab"
+      },
+      "name" : "acceptance-079",
+      "seed" : "65"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              27
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g04.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e98ba27aaf7305a30f0fe0105067c8ac4a55d0df893891dc899849dd31e32ebb",
+        "initialDigest" : "bc264acf758e48af1f5166401e77da09e88262f2888cbe0dd01b52ac3cb64673"
+      },
+      "name" : "acceptance-080",
+      "seed" : "72"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              -27
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.probe",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.select",
+            "values" : [
+              84,
+              10
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e83ee55997d759a8aa9f5fe42e73d20475f72fed7c5c808ed1eda9d8d4a3077b",
+        "initialDigest" : "10380799b3b75839a60c43e406a4f4605cd19d8b1bca5f87acc85d818733165e",
+        "outcome" : "won"
+      },
+      "name" : "fixture-level-1-solved",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.probe",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.probe",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.probe",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.probe",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.probe",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.probe",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.probe",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.probe",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "compass.probe",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "094c80af0e6492a7b58efc72bf3342e7e1ac316a8d516a78a6afe1f585e4db99",
+        "initialDigest" : "10380799b3b75839a60c43e406a4f4605cd19d8b1bca5f87acc85d818733165e",
+        "outcome" : "failed"
+      },
+      "name" : "fixture-probes-spent",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "compass.turn",
+            "values" : [
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7d394b4fded659f1d6565da39e803240e589cc89b3e37e2205b797ab9e93a55f",
+        "initialDigest" : "10380799b3b75839a60c43e406a4f4605cd19d8b1bca5f87acc85d818733165e"
+      },
+      "name" : "fixture-undo-redo",
+      "seed" : "0"
+    }
+  ],
+  "schema" : 1
+}

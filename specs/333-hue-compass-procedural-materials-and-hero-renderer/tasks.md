@@ -41,7 +41,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 3: Experience, registration and frames
 
-- [ ] T-R02G0403-006 Create `Packages/ExperiencesRound02/HueCompass/Experience/HueCompassExperience.swift`, `…Presenter.swift`, `…CompassScene.swift` (GL
+- [X] T-R02G0403-006 Create `Packages/ExperiencesRound02/HueCompass/Experience/HueCompassExperience.swift`, `…Presenter.swift`, `…CompassScene.swift` (GL — Verified 2026-11-21: 2026-11-21 sim-27, packages, catalog-search-2 exit 0 (experience target: presenter, compass scene, fallback, controls by an agent, built and tested by the lead on sim-27.2, 19 simulator tests: frames vs the CPU reference at three tiers on levels 1, 21, 41, 61, 81, fallback, zero size, aspects, Reduce Motion and Flashing, memory warning, identity; 94 scenarios with the 80 acceptance rows; candidate registered in Catalog/registrations.json, the registry, project.yml and the RealCatalogTests registered list (the first catalog-search attempt failed until that list named the candidate); AppModelTests example now r02-g05.colorfall-canyons; app-unit exit 0)
   scene with `ShaderMeshRenderer`; fallback; tier log; Reduce Motion and Reduce Flashing), `…Controls.swift` (labelled
   turn −4, −1, +1, +4, probe, band picker, select, undo, redo, next level), `Packages/ExperiencesRound02/HueCompass/Core/HueCompassScenarios.swift`
   (standard scenarios, full-playthrough, hero, fixtures, 80 acceptance scenarios R2-G04-QA-001 … 080) and
