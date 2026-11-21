@@ -9,6 +9,9 @@
 // of cyan), tutorial `steer`, certified smallest 2, certified actions carve 10, carve 10, step 120. Level 24: two
 // basins. The daily level of 2026-11-21 is level 73 (band 4). The expected texts are written out here, not built
 // with the plan's helpers. Explicit types, plain loops, short runs.
+// Feature 347 (R02-G05-07) T-R02G0507-003: the refusal words of `r02-g05.no-replay`, `r02-g05.replay-end` and
+// `r02-g05.replay`; entering replay is "Level 1, band 1, replay."; each replay step is announced like the action it
+// replays; a replayed win claims no stars; stopping is the campaign level plan; `settings.sound` plans nothing.
 import Foundation
 import Testing
 @testable import ColorfallCanyonsCore
@@ -209,5 +212,37 @@ import VisualCoreSimulation
             + "per mille, protected (0 wrong units tolerated). "
             + "Basin 2: cyan 0, coral 0, yellow 0; target at least 24 units: cyan none, coral 1000 ± 100 per mille, "
             + "yellow none, protected (0 wrong units tolerated).")
+    }
+
+    // MARK: Feature 347
+
+    @Test func replayIsAnnouncedLikePlayAndItsRefusalsHaveWords() throws {
+        var core: Core = try Core.opening(number: 1)
+        #expect(Self.refused(&core, "replay.start", [1], code: "r02-g05.no-replay").text
+            == "There is no saved solution to replay for this level.")
+        #expect(Self.refused(&core, "replay.step", [], code: "r02-g05.no-replay").text
+            == "There is no saved solution to replay for this level.")
+        #expect(Self.accepted(&core, "settings.sound", [1]) == Plan.none && core.soundOn)
+        _ = Self.accepted(&core, "canyon.carve", [10])
+        _ = Self.accepted(&core, "canyon.carve", [10])
+        _ = Self.accepted(&core, "time.step", [120])
+        #expect(core.progress.solved[1]?.verified == true)
+        #expect(Self.accepted(&core, "replay.start", [1]) == Self.level("Level 1, band 1, replay."))
+        #expect(Self.refused(&core, "canyon.carve", [10], code: "r02-g05.replay").text == "Stop the replay first.")
+        #expect(Self.refused(&core, "level.select", [1], code: "r02-g05.replay").text == "Stop the replay first.")
+        #expect(Self.accepted(&core, "replay.step") == Self.state("Carved row 2, column 5. 8 actions left."))
+        #expect(Self.accepted(&core, "replay.step") == Self.state("Carved row 2, column 5. 7 actions left."))
+        #expect(Self.accepted(&core, "settings.sound", [0]) == Plan.none && !core.soundOn)
+        let win: Plan = Self.accepted(&core, "replay.step")
+        #expect(win == Plan(text: "Every basin is filled. Level won with 2 actions.", kind: .outcome, haptic: .success))
+        #expect(Self.refused(&core, "replay.step", [], code: "r02-g05.replay-end").text == "The replay is over.")
+        #expect(Self.accepted(&core, "replay.stop") == Self.level("Level 1, band 1, campaign. " + Self.steer))
+        let codes: [String] = ["r02-g05.no-replay", "r02-g05.replay-end", "r02-g05.replay"]
+        let words: [String] = ["There is no saved solution to replay for this level.", "The replay is over.",
+                               "Stop the replay first."]
+        for index in 0..<codes.count {
+            #expect(Plan.refused(code: codes[index]) == Plan(text: words[index], kind: .rejection, haptic: .error))
+            #expect(Plan.refusalText(code: "action.rule." + codes[index]) == words[index], "prefixed \(codes[index])")
+        }
     }
 }

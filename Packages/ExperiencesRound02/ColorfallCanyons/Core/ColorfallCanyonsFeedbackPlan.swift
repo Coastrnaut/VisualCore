@@ -32,6 +32,12 @@
 //   4. otherwise (nothing changed, or only the tutorial step moved: `tutorial.dismiss`) →
 //      ``ColorfallCanyonsFeedbackPlan/none``.
 // A count of 1 takes the singular noun ("1 action left", "Level won with 1 action").
+// Feature 347 (R02-G05-07) T-R02G0507-003 (FR-R02G0507-004, 007; clarification Q4): entering replay (`replay.start`) and
+// leaving it (`replay.stop`) are level changes ("Level n, band b, replay." and the campaign plan); a `replay.step` adds
+// exactly one record, so it is announced like the action it replays; a replayed win claims no stars (the replay mode
+// awards none, like practice); `settings.sound` changes neither the play nor the tutorial, so it plans nothing (the sound
+// choice is presentation). The refusal words of `r02-g05.no-replay`, `r02-g05.replay-end` and `r02-g05.replay` are
+// "There is no saved solution to replay for this level.", "The replay is over." and "Stop the replay first.".
 import Foundation
 import VisualCoreSimulation
 
@@ -95,8 +101,16 @@ public struct ColorfallCanyonsFeedbackPlan: Sendable, Equatable {
     /// "That level is not open yet." (a code containing `r02-g05.locked`), "That date cannot be used."
     /// (`r02-g05.date`), "That action is not allowed here." (`r02-g05.action`), "No actions are left."
     /// (`r02-g05.budget`), "The level has ended." (`r02-g05.stage`), "That value must be a whole number."
-    /// (`r02-g05.not-whole`), otherwise "That change was refused.".
+    /// (`r02-g05.not-whole`), feature 347's "There is no saved solution to replay for this level."
+    /// (`r02-g05.no-replay`), "The replay is over." (`r02-g05.replay-end`) and "Stop the replay first."
+    /// (`r02-g05.replay`), otherwise "That change was refused.".
     public static func refusalText(code: String) -> String {
+        if code.contains(ColorfallCanyonsExperienceRule.noReplay) {
+            return "There is no saved solution to replay for this level."
+        }
+        // Checked before `replay`, whose code is a prefix of `replay-end` (feature 347).
+        if code.contains(ColorfallCanyonsExperienceRule.replayEnd) { return "The replay is over." }
+        if code.contains(ColorfallCanyonsExperienceRule.replay) { return "Stop the replay first." }
         if code.contains(ColorfallCanyonsExperienceRule.locked) { return "That level is not open yet." }
         if code.contains(ColorfallCanyonsExperienceRule.date) { return "That date cannot be used." }
         if code.contains(ColorfallCanyonsExperienceRule.notWhole) { return "That value must be a whole number." }
@@ -164,6 +178,7 @@ public struct ColorfallCanyonsFeedbackPlan: Sendable, Equatable {
         let ended: Bool = play.stage != old.play.stage && (play.stage == .won || play.stage == .failed)
         if ended && play.stage == .won {
             var text: String = "Every basin is filled. Level won with \(actions(play.spent))"
+            // A replayed win re-runs a stored result and claims no stars (feature 347), like practice.
             if new.mode.awardsStars {
                 let stars: Int = ColorfallCanyonsProgress.stars(actions: play.spent, smallest: new.certifiedSmallest)
                 text += ", \(stars) of 3 stars"

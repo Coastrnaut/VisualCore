@@ -24,7 +24,7 @@ tests stay short (< 10 s each). {device} items are D1–D3 observations after Im
 
 ## Phase 3: Stories 1 and 3 — save, migrate, replay (P1, P2)
 
-- [ ] T-R02G0507-003 [US1] [US2] [US3] Edit `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsExperienceCore.swift` (schema 3, migration 2 → 3
+- [X] T-R02G0507-003 [US1] [US2] [US3] Edit `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsExperienceCore.swift` (schema 3, migration 2 → 3 — Verified 2026-11-21: 2026-11-21 host-2 exit 0: 102 tests in 8 suites (schema 3 and digest v3; migrations 1 -> 3 and 2 -> 3 with progress kept unverified and sound off; wins record net-action traces; restore reconciles, honest kept, edited dropped and counted; replay start/step/stop with refusal codes and words; settings.sound snapshotted, never digested; manifest regenerated) (.autonomy/migration/checks/R02-G05-07.host-2.json); lead retest
   "results with an empty trace and verified false", digest v3; a campaign or daily win records the winning trace (the
   play's net actions: carves, valve toggles and steps, an undone action left out unless redone); restore reconciles and exposes
   `reconciliationDropped` (not digested); actions "replay.start [1…100]" (`r02-g05.no-replay` without a verified

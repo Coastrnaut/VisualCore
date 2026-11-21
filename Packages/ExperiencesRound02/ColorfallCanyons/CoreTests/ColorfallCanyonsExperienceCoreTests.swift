@@ -16,6 +16,13 @@
 // payload migrates; schema 2 round trips (practice and daily too) and invalid progress or mode is refused; and
 // SC-R02G0505-001: on levels 1 … 3 a scripted player following each instruction and the exact hints wins, seeing steer,
 // run, fill (or done when one step ends the level), done in order.
+// Feature 347 (R02-G05-07) T-R02G0507-003: schema 3 and digest v3 with the replay and sound controls; migrations 1 → 3
+// and 2 → 3 keep the progress, unverified and without traces, with the sound off; a campaign or daily win records a
+// verified trace equal to the play's net actions (an undone carve left out); restore of an honest save keeps every
+// result, an edited one (stars, actions, a trace step) drops it and reports `reconciliationDropped` with the frontier
+// kept; replay rules and codes (start, step through to won with the fingerprints of a fresh play, refusals, stop,
+// progress unchanged, a replay saved mid-way round trips); `settings.sound` round-trips through the snapshot and never
+// changes the digest.
 import Foundation
 import Testing
 @testable import ColorfallCanyonsCore
@@ -65,6 +72,7 @@ import VisualCoreExperience
                                          ScriptedAction("canyon.valve", [0]), ScriptedAction("mode.campaign"),
                                          ScriptedAction("mode.daily", [2026, 2, 4]),
                                          ScriptedAction("level.select", [1]),
+                                         ScriptedAction("settings.sound", [1]),
                                          ScriptedAction("time.step", [60])]
         let rejected: [ScriptedAction] = [ScriptedAction("canyon.carve", [120]),
                                           ScriptedAction("canyon.carve", [-1]),
@@ -85,7 +93,11 @@ import VisualCoreExperience
                                           ScriptedAction("mode.daily", [2026, 1]),
                                           ScriptedAction("mode.practice", [1]),
                                           ScriptedAction("mode.campaign", [1]),
-                                          ScriptedAction("tutorial.dismiss", [1])]
+                                          ScriptedAction("tutorial.dismiss", [1]),
+                                          ScriptedAction("replay.start", [101]),
+                                          ScriptedAction("replay.step"), ScriptedAction("replay.stop"),
+                                          ScriptedAction("settings.sound", [2]),
+                                          ScriptedAction("settings.sound", [0.5])]
         let plan = ConformancePlan(seeds: [0, 1], stepsPerSegment: 2, actions: actions, rejected: rejected)
         let report: ConformanceReport = await ExperienceConformance.run(Core.self, id: id, plan: plan)
         #expect(report.entries.count == ConformanceCheck.allCases.count)
@@ -93,21 +105,27 @@ import VisualCoreExperience
     }
 
     @Test func theControlsTheTiersAndTheProfile() {
-        #expect(Core.experienceID == "r02-g05.colorfall-canyons" && Core.schemaVersion == 2)
-        #expect(Core.digestDomain == "r02-g05.colorfall-canyons.v2")
+        #expect(Core.experienceID == "r02-g05.colorfall-canyons" && Core.schemaVersion == 3)
+        #expect(Core.digestDomain == "r02-g05.colorfall-canyons.v3")
         #expect(Core.controls.map(\.id) == Core.actionIDs)
         #expect(Core.actionIDs == ["canyon.carve", "canyon.valve", "time.step", "play.undo", "play.redo", "level.next",
-                                   "level.select", "mode.daily", "mode.practice", "mode.campaign", "tutorial.dismiss"])
+                                   "level.select", "mode.daily", "mode.practice", "mode.campaign", "tutorial.dismiss",
+                                   "replay.start", "replay.step", "replay.stop", "settings.sound"])
         #expect(Core.controls[0].ranges == [0...119])
         #expect(Core.controls[1].ranges == [0...2])
         #expect(Core.controls[2].ranges == [1...600])
         #expect(Core.controls[6].ranges == [1...100])
         #expect(Core.controls[7].ranges == [1...9999, 1...12, 1...31])
-        let plainIndices: [Int] = [3, 4, 5, 8, 9, 10]
+        #expect(Core.controls[11].ranges == [1...100])
+        #expect(Core.controls[14].ranges == [0...1])
+        let plainIndices: [Int] = [3, 4, 5, 8, 9, 10, 12, 13]
         for index in plainIndices { #expect(Core.controls[index].ranges.isEmpty) }
         #expect(Core.practiceBudget == 30 && ColorfallCanyonsExperienceRule.locked == "r02-g05.locked")
         #expect(ColorfallCanyonsExperienceRule.date == "r02-g05.date")
-        #expect(Core.qualityTiers == 3 && Core.migrations.currentVersion == 2)
+        #expect(ColorfallCanyonsExperienceRule.noReplay == "r02-g05.no-replay")
+        #expect(ColorfallCanyonsExperienceRule.replayEnd == "r02-g05.replay-end")
+        #expect(ColorfallCanyonsExperienceRule.replay == "r02-g05.replay")
+        #expect(Core.qualityTiers == 3 && Core.migrations.currentVersion == 3)
         let profile: QualityProfile = Core.qualityProfile
         #expect(profile.names == ["level-0", "level-1", "level-2"])
         #expect(profile.names == ColorfallCanyonsTier.all.map(\.name))
@@ -329,7 +347,7 @@ import VisualCoreExperience
         let text: String = try #require(String(data: payload, encoding: .utf8))
         #expect(text.hasPrefix("{\"level\":32,\"mode\":{\"mode\":\"campaign\"},"
                                    + "\"progress\":{\"frontier\":32,\"solved\":[]},\"records\":["))
-        #expect(text.hasSuffix("],\"tutorial\":\"done\"}"))
+        #expect(text.hasSuffix("],\"sound\":false,\"tutorial\":\"done\"}"))
         let restored: Core = try Core.restore(payload: payload, seed: 31)
         let restoredDigest: StateDigest = try Self.digest(restored)
         let savedDigest: StateDigest = try Self.digest(core)
@@ -410,14 +428,14 @@ import VisualCoreExperience
         #expect(engine.handle(control: "time.step", values: [4]) == .accepted)
         let before: StateDigest = try engine.digest()
         let saved: ExperienceSnapshot = try engine.snapshot()
-        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 3, seed: saved.seed,
+        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 4, seed: saved.seed,
                                            stepIndex: saved.stepIndex, digest: saved.digest,
                                            payload: Data(saved.payload.utf8))
         var refused: Bool = false
         do {
             try engine.restore(newer)
         } catch {
-            refused = error == .snapshot(.newerSchema(found: 3, current: 2))
+            refused = error == .snapshot(.newerSchema(found: 4, current: 3))
         }
         #expect(refused)
         #expect(try engine.digest() == before)
@@ -641,6 +659,7 @@ import VisualCoreExperience
                                             "records": try #require(object["records"])]
             let migrated: [String: Any] = try Core.migrations.migrate(schemaOne, from: 1)
             #expect(migrated["tutorial"] == nil && migrated["mode"] != nil && migrated["progress"] != nil)
+            #expect(migrated["sound"] as? Bool == false)
             let payload: Data = try JSONSerialization.data(withJSONObject: migrated, options: [.sortedKeys])
             let restored: Core = try Core.restore(payload: payload, seed: seed)
             let number: Int = Core.levelNumber(forSeed: seed)
@@ -652,7 +671,7 @@ import VisualCoreExperience
         }
         #expect(throws: ColorfallCanyonsRestoreRefusal.damaged) { try Core.migratedToSchemaTwo(["level": "x"]) }
         #expect(throws: ColorfallCanyonsRestoreRefusal.damaged) { try Core.migratedToSchemaTwo(["level": 3]) }
-        // Through the engine: a schema-1 envelope restores into schema 2.
+        // Through the engine: a schema-1 envelope restores into schema 3.
         let id: ExperienceID = try #require(ExperienceID(rawValue: Core.experienceID))
         var engine = ExperienceEngine<Core>(id: id)
         try await engine.prepare(seed: 4)
@@ -750,5 +769,241 @@ import VisualCoreExperience
             #expect(seen == full || seen == short, "level \(number): \(seen)")
             #expect(core.progress.solved[number] != nil && core.progress.isOpen(number + 1))
         }
+    }
+
+    // MARK: Feature 347
+
+    /// The snapshot payload of `core` as a JSON object.
+    static func object(_ core: Core) throws -> [String: Any] {
+        try #require(try JSONSerialization.jsonObject(with: try core.snapshotPayload()) as? [String: Any])
+    }
+
+    /// `object` as JSON data with sorted keys.
+    static func data(_ object: [String: Any]) throws -> Data {
+        try JSONSerialization.data(withJSONObject: object, options: [.sortedKeys])
+    }
+
+    /// `object` with the first solved result's field `key` set to `value` (nil removes it).
+    static func editedFirstResult(_ object: [String: Any], _ key: String, _ value: Any?) throws -> [String: Any] {
+        var edited: [String: Any] = object
+        var progress: [String: Any] = try #require(object["progress"] as? [String: Any])
+        var solved: [[String: Any]] = try #require(progress["solved"] as? [[String: Any]])
+        solved[0][key] = value
+        progress["solved"] = solved
+        edited["progress"] = progress
+        return edited
+    }
+
+    /// The refusal of rule `code`.
+    static func rule(_ code: String) -> ActionResult { .rejected(.rule(code: code)) }
+
+    @Test func aWinRecordsAVerifiedTraceOfTheNetActions() async throws {
+        // Level 1's certified actions are carve 10, carve 10, step 120; a carve undone and redone stays, a valve
+        // toggle undone and not redone is left out.
+        var core: Core = try await Core.prepare(seed: 0)
+        let script: [ExperienceAction] = [Self.act("canyon.carve", [10]), Self.act("play.undo"),
+                                          Self.act("play.redo"), Self.act("canyon.valve", [0]),
+                                          Self.act("play.undo"), Self.act("canyon.carve", [10]),
+                                          Self.act("time.step", [120])]
+        for action in script { #expect(core.apply(action) == .accepted, "\(action.control)") }
+        #expect(core.play.stage == .won && core.play.records.count == 7)
+        let result: ColorfallCanyonsProgress.Result = try #require(core.progress.solved[1])
+        let expected: [ColorfallCanyonsAction] = [.carve(10), .carve(10), .step(120)]
+        #expect(result.verified && result.trace == expected && result.bestActions == 2 && result.stars == 3)
+        #expect(result.trace == ColorfallCanyonsReconciliation.netActions(core.play.records))
+        #expect(ColorfallCanyonsReconciliation.verifies(level: 1, result: result))
+        #expect(core.progress.frontier == 2)
+        // Practice records nothing.
+        var practice: Core = try await Core.prepare(seed: 0)
+        #expect(practice.apply(Self.act("mode.practice")) == .accepted)
+        try Self.win(&practice, number: 1)
+        #expect(practice.progress.solved.isEmpty && practice.progress.frontier == 1)
+        // A daily win (2026-02-04 is level 3) records a verified trace and opens nothing.
+        var daily: Core = try await Core.prepare(seed: 0)
+        #expect(daily.apply(Self.act("mode.daily", [2026, 2, 4])) == .accepted)
+        try Self.win(&daily, number: 3)
+        let dailyResult: ColorfallCanyonsProgress.Result = try #require(daily.progress.solved[3])
+        #expect(dailyResult.verified && dailyResult.trace == ColorfallCanyonsReconciliation.netActions(daily.play.records))
+        #expect(daily.progress.frontier == 1)
+    }
+
+    @Test func restoreKeepsHonestResultsAndDropsEditedOnes() async throws {
+        var core: Core = try await Core.prepare(seed: 0)
+        try Self.win(&core, number: 1)
+        #expect(core.apply(Self.act("level.next")) == .accepted)
+        try Self.win(&core, number: 2)
+        #expect(core.progress.frontier == 3 && core.progress.solved.count == 2)
+        let honest: Core = try Core.restore(payload: try core.snapshotPayload(), seed: 0)
+        #expect(honest == core && honest.reconciliationDropped == 0)
+        #expect(try Self.digest(honest) == Self.digest(core))
+        let object: [String: Any] = try Self.object(core)
+        let savedProgress: [String: Any] = try #require(object["progress"] as? [String: Any])
+        let savedSolved: [[String: Any]] = try #require(savedProgress["solved"] as? [[String: Any]])
+        let trace: [Any] = try #require(savedSolved[0]["trace"] as? [Any])
+        // Edited stars, edited actions, a trace without its last step, a verified result without a trace.
+        let edits: [[String: Any]] = [try Self.editedFirstResult(object, "stars", 2),
+                                      try Self.editedFirstResult(object, "bestActions", 3),
+                                      try Self.editedFirstResult(object, "trace", Array(trace.dropLast())),
+                                      try Self.editedFirstResult(object, "trace", [Any]())]
+        for edit in edits {
+            let restored: Core = try Core.restore(payload: try Self.data(edit), seed: 0)
+            #expect(restored.reconciliationDropped == 1 && restored.progress.solved[1] == nil)
+            #expect(restored.progress.solved[2] == core.progress.solved[2] && restored.progress.frontier == 3)
+            #expect(restored.play == core.play && restored != core)
+            #expect(try Self.digest(restored) != Self.digest(core))
+        }
+        // An unverified result without a trace (an old save) is kept.
+        let untraced: [String: Any] = try Self.editedFirstResult(
+            try Self.editedFirstResult(object, "trace", [Any]()), "verified", false)
+        let kept: Core = try Core.restore(payload: try Self.data(untraced), seed: 0)
+        #expect(kept.reconciliationDropped == 0 && kept.progress.solved[1]?.verified == false)
+        #expect(kept.progress.solved[1]?.stars == 3)
+    }
+
+    @Test func replayPlaysTheStoredTraceAndNeverChangesProgress() async throws {
+        let noReplay: ActionResult = Self.rule(ColorfallCanyonsExperienceRule.noReplay)
+        let replayEnd: ActionResult = Self.rule(ColorfallCanyonsExperienceRule.replayEnd)
+        let inReplay: ActionResult = Self.rule(ColorfallCanyonsExperienceRule.replay)
+        var core: Core = try await Core.prepare(seed: 0)
+        #expect(core.apply(Self.act("replay.start", [1])) == noReplay)
+        #expect(core.apply(Self.act("replay.step")) == noReplay)
+        #expect(core.apply(Self.act("replay.stop")) == noReplay)
+        try Self.win(&core, number: 1)
+        #expect(core.apply(Self.act("replay.start", [2])) == noReplay)
+        #expect(core.apply(Self.act("replay.start", [1.5])) == Self.rule(ColorfallCanyonsExperienceRule.notWhole))
+        #expect(core.apply(Self.act("replay.start", [101])) == .rejected(.outOfRange(index: 0)))
+        let progress: ColorfallCanyonsProgress = core.progress
+        let trace: [ColorfallCanyonsAction] = try #require(progress.solved[1]).trace
+        #expect(core.apply(Self.act("replay.start", [1])) == .accepted)
+        #expect(core.mode == .replay(level: 1) && core.levelNumber == 1 && core.tutorial == .done)
+        #expect(core.play.records.isEmpty && core.play.stage == .playing)
+        let refused: [ExperienceAction] = [Self.act("canyon.carve", [10]), Self.act("canyon.valve", [0]),
+                                           Self.act("time.step", [1]), Self.act("play.undo"), Self.act("play.redo"),
+                                           Self.act("level.next"), Self.act("level.select", [1]),
+                                           Self.act("mode.daily", [2026, 2, 4]), Self.act("mode.practice"),
+                                           Self.act("mode.campaign")]
+        for action in refused {
+            let before: Core = core
+            #expect(core.apply(action) == inReplay, "\(action.control)")
+            #expect(core == before)
+        }
+        #expect(core.apply(Self.act("tutorial.dismiss")) == .accepted && core.tutorial == .done)
+        var fresh: ColorfallCanyonsPlay = try Core.freshPlay(of: try Core.level(number: 1))
+        for index in trace.indices {
+            #expect(core.apply(Self.act("replay.step")) == .accepted)
+            try fresh.apply(trace[index], expecting: fresh.fingerprint)
+            #expect(core.play.fingerprint == fresh.fingerprint && core.progress == progress)
+            if index == 0 {
+                // A replay saved mid-way round trips.
+                let restored: Core = try Core.restore(payload: try core.snapshotPayload(), seed: 0)
+                #expect(restored == core && restored.mode == .replay(level: 1))
+                #expect(try Self.digest(restored) == Self.digest(core))
+            }
+        }
+        #expect(core.play.stage == .won && core.outcome?.code == Core.wonCode && core.progress == progress)
+        #expect(core.apply(Self.act("replay.step")) == replayEnd)
+        #expect(core.apply(Self.act("replay.stop")) == .accepted)
+        #expect(core.mode == .campaign && core.levelNumber == 1 && core.play.records.isEmpty)
+        #expect(core.progress == progress && core.tutorial == .steer)
+        // A daily win beyond the frontier replays; stopping returns to the frontier; an edited save drops the replay.
+        #expect(core.apply(Self.act("mode.daily", [2026, 2, 4])) == .accepted)
+        try Self.win(&core, number: 3)
+        #expect(core.progress.frontier == 2 && core.progress.solved[3]?.verified == true)
+        #expect(core.apply(Self.act("replay.start", [3])) == .accepted)
+        #expect(core.apply(Self.act("replay.step")) == .accepted)
+        var stopped: Core = core
+        #expect(stopped.apply(Self.act("replay.stop")) == .accepted)
+        #expect(stopped.mode == .campaign && stopped.levelNumber == 2)
+        var object: [String: Any] = try Self.object(core)
+        var saved: [String: Any] = try #require(object["progress"] as? [String: Any])
+        var solved: [[String: Any]] = try #require(saved["solved"] as? [[String: Any]])
+        #expect(solved.count == 2 && solved[1]["level"] as? Int == 3)
+        solved[1]["bestActions"] = 9
+        saved["solved"] = solved
+        object["progress"] = saved
+        let dropped: Core = try Core.restore(payload: try Self.data(object), seed: 0)
+        #expect(dropped.reconciliationDropped == 1 && dropped.mode == .campaign && dropped.levelNumber == 2)
+        #expect(dropped.progress.solved[3] == nil && dropped.progress.solved[1] != nil)
+        // A replay mode naming another level is damaged.
+        object = try Self.object(core)
+        object["mode"] = ["mode": "replay", "level": 1]
+        #expect(throws: ColorfallCanyonsRestoreRefusal.damaged) {
+            try Core.restore(payload: try Self.data(object), seed: 0)
+        }
+    }
+
+    @Test func aSchemaTwoPayloadMigratesUnverifiedWithTheSoundOff() async throws {
+        var core: Core = try await Core.prepare(seed: 0)
+        try Self.win(&core, number: 1)
+        #expect(core.apply(Self.act("level.next")) == .accepted)
+        #expect(core.apply(Self.act("time.step", [5])) == .accepted)
+        #expect(core.apply(Self.act("settings.sound", [1])) == .accepted)
+        // The schema-2 form: results without `trace` and `verified`, no `sound`.
+        var object: [String: Any] = try Self.editedFirstResult(
+            try Self.editedFirstResult(try Self.object(core), "trace", nil), "verified", nil)
+        object["sound"] = nil
+        let migrated: [String: Any] = try Core.migrations.migrate(object, from: 2)
+        #expect(migrated["sound"] as? Bool == false)
+        let restored: Core = try Core.restore(payload: try Self.data(migrated), seed: 0)
+        let result: ColorfallCanyonsProgress.Result = try #require(restored.progress.solved[1])
+        let original: ColorfallCanyonsProgress.Result = try #require(core.progress.solved[1])
+        #expect(result.bestActions == original.bestActions && result.stars == original.stars)
+        #expect(result.trace.isEmpty && !result.verified)
+        #expect(restored.progress.frontier == core.progress.frontier && restored.reconciliationDropped == 0)
+        #expect(restored.play == core.play && restored.levelNumber == 2 && !restored.soundOn)
+        var replay: Core = restored
+        #expect(replay.apply(Self.act("replay.start", [1])) == Self.rule(ColorfallCanyonsExperienceRule.noReplay))
+        #expect(throws: ColorfallCanyonsRestoreRefusal.damaged) { try Core.migratedToSchemaThree(["level": 1]) }
+        // 1 → 3: a schema-1 object gains progress, mode and the sound off.
+        let schemaOne: [String: Any] = ["level": 2, "records": [Any]()]
+        let fromOne: [String: Any] = try Core.migrations.migrate(schemaOne, from: 1)
+        #expect(fromOne["sound"] as? Bool == false && fromOne["progress"] != nil)
+        let restoredOne: Core = try Core.restore(payload: try Self.data(fromOne), seed: 0)
+        #expect(restoredOne.levelNumber == 2 && restoredOne.progress.frontier == 2 && !restoredOne.soundOn)
+        // Through the engine: a schema-2 envelope restores into schema 3 with the same digest.
+        let id: ExperienceID = try #require(ExperienceID(rawValue: Core.experienceID))
+        var engine = ExperienceEngine<Core>(id: id)
+        try await engine.prepare(seed: 4)
+        try engine.activate()
+        #expect(engine.handle(control: "time.step", values: [6]) == .accepted)
+        let saved: ExperienceSnapshot = try engine.snapshot()
+        var savedObject: [String: Any] = try #require(
+            try JSONSerialization.jsonObject(with: Data(saved.payload.utf8)) as? [String: Any])
+        savedObject["sound"] = nil
+        let old = try ExperienceSnapshot(experience: id, schemaVersion: 2, seed: saved.seed,
+                                         stepIndex: saved.stepIndex, digest: saved.digest,
+                                         payload: try Self.data(savedObject))
+        let before: StateDigest = try engine.digest()
+        try engine.restore(old)
+        #expect(try engine.digest() == before)
+    }
+
+    @Test func theSoundChoiceRoundTripsAndIsNeverDigested() async throws {
+        var core: Core = try await Core.prepare(seed: 0)
+        #expect(!core.soundOn)
+        let off: Core = core
+        let digest: StateDigest = try Self.digest(core)
+        #expect(core.apply(Self.act("settings.sound", [1])) == .accepted)
+        #expect(core.soundOn && core != off)
+        #expect(try Self.digest(core) == digest)
+        let text: String = String(decoding: try core.snapshotPayload(), as: UTF8.self)
+        #expect(text.contains("\"sound\":true"))
+        let restored: Core = try Core.restore(payload: try core.snapshotPayload(), seed: 0)
+        #expect(restored == core && restored.soundOn)
+        #expect(try Self.digest(restored) == digest)
+        #expect(core.apply(Self.act("settings.sound", [2])) == .rejected(.outOfRange(index: 0)))
+        #expect(core.apply(Self.act("settings.sound", [0.5])) == Self.rule(ColorfallCanyonsExperienceRule.notWhole))
+        #expect(core.apply(Self.act("settings.sound")) == .rejected(.wrongValueCount(expected: 1, found: 0)))
+        #expect(core.soundOn)
+        // A payload without "sound" restores with the sound off.
+        var object: [String: Any] = try Self.object(core)
+        object["sound"] = nil
+        #expect(!(try Core.restore(payload: try Self.data(object), seed: 0)).soundOn)
+        var reset: Core = core
+        reset.reset()
+        #expect(!reset.soundOn && reset == off)
+        #expect(core.apply(Self.act("settings.sound", [0])) == .accepted)
+        #expect(!core.soundOn && core == off)
+        #expect(try Self.digest(core) == digest)
     }
 }

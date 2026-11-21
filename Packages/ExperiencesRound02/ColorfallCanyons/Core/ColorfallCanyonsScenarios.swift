@@ -23,6 +23,9 @@
 // `mode.daily` date, `level.next` with no next open level (`level.next` now moves to the next open level; each
 // full-playthrough win opens the next one) and wrong value counts of `mode.daily`, `mode.practice`, `mode.campaign` and
 // `tutorial.dismiss`.
+// Feature 347 (R02-G05-07): rejection also refuses replay without a verified result (`replay.start`), replay controls
+// outside replay (`replay.step`, `replay.stop`), a replay level and a sound value out of range, a fractional sound value
+// and wrong value counts of the replay and sound controls.
 #if DEBUG || VISUALCORE_AUTOMATION
 import Foundation
 import VisualCoreExperience
@@ -171,6 +174,16 @@ extension ColorfallCanyonsExperienceCore {
             refusedEntry("mode.practice", [1], wrongCount),
             refusedEntry("mode.campaign", [1], wrongCount),
             refusedEntry("tutorial.dismiss", [1], wrongCount),
+            // Feature 347: replay without a verified result, outside replay, out of range; the sound choice.
+            refusedEntry("replay.start", [1], "action.rule." + ColorfallCanyonsExperienceRule.noReplay),
+            refusedEntry("replay.step", [], "action.rule." + ColorfallCanyonsExperienceRule.noReplay),
+            refusedEntry("replay.stop", [], "action.rule." + ColorfallCanyonsExperienceRule.noReplay),
+            refusedEntry("replay.start", [101], outOfRange),
+            refusedEntry("replay.start", [], wrongCount),
+            refusedEntry("replay.step", [1], wrongCount),
+            refusedEntry("settings.sound", [2], outOfRange),
+            refusedEntry("settings.sound", [0.5], notWhole),
+            refusedEntry("settings.sound", [], wrongCount),
         ]
         return entries
     }
