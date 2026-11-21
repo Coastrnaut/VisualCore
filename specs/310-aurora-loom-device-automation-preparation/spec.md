@@ -102,6 +102,10 @@ number.
 - **D3's operating system:** the plan states D3 stays on iPadOS 26.5 and is refused otherwise.
 - **Long measurements:** the round-two stress session (UA-F13) runs only on devices; nothing here runs it.
 - **A missing scenario:** a definition naming a scenario that the manifest lacks fails the check, naming it.
+- **A missing or unreadable definition, a schema other than 1, or an unknown experience:** the check fails naming the
+  file or the id; it never passes by default.
+- **Owner-needed device states** (locked device, trust, signing, settings, charging): each row lists them as owner
+  steps; the campaign records them as BLOCKED_OWNER_ACTION with the steps and never waits for input (UA-F13).
 
 ## Requirements *(mandatory)*
 
