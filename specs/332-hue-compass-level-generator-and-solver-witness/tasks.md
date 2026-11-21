@@ -35,7 +35,7 @@ or {device} tasks (pure logic and host-generated content). Fixture seed 2_332; t
 
 ## Phase 4: Story 2 — levels come from their planned seeds (P1)
 
-- [ ] T-R02G0402-004 [US2] Create `Packages/ExperiencesRound02/HueCompass/Core/HueCompassGenerator.swift` (HueCompassBandProfile "tolerances (4, 2), (3, 1),
+- [X] T-R02G0402-004 [US2] Create `Packages/ExperiencesRound02/HueCompass/Core/HueCompassGenerator.swift` (HueCompassBandProfile "tolerances (4, 2), (3, 1), — Verified 2026-11-21: 2026-11-21 host-3 exit 0 (generator, 5 tests: profiles tighten by band, candidates deterministic, band ranges and budgets met, skipped candidates re-checked as not qualifying, impossible profile refused as generation(1); all 100 levels generate, band 5 skipping at most 4)
   (2, 1), (1, 0), (1, 0); clear share 0, 10, 20, 30, 40 %; smallest 1, 1, 1, 1 … 2, 2", `candidate(_:index:)` drawing
   offset, fog, target and start in that order from `SeededRandom(seed: SeedDerivation.derive(seed, index: k))`,
   HueCompassGenerated, `generate` with k = 0 … 63, id `hue-compass-NNN`, allowance = budget, tutorial for 1 … 3,

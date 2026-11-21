@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "HueCompassGeneratorTests"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter HueCompassGeneratorTests",
+  "elapsed_seconds": 2.277,
+  "exit_code": 0,
+  "finished": "2026-11-21T15:22:54+00:00",
+  "gate": "R02-G04-02",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G04-02.host-3.log",
+  "log_sha256": "bc88930cf0e5656b8465862f780025acc713a6ef8f838822fe3c2bda485f4416",
+  "name": "host-3",
+  "started": "2026-11-21T15:22:52+00:00",
+  "timed_out": false
+}
