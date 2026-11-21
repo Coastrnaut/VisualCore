@@ -22,7 +22,7 @@ recorded only after every agent has reported). Commit after every task with its 
 
 ## Phase 3: Story 1 — every level stays solvable (P1) 🎯
 
-- [ ] T-R02G0108-003 [P] [US1] Create `Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomRegressionSolverTests.swift` (agent A: per band, 20 levels each:
+- [X] T-R02G0108-003 [P] [US1] Create `Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomRegressionSolverTests.swift` (agent A: per band, 20 levels each: — Verified 2026-11-20: 2026-11-20 host-2 exit 0 (9 tests: all 100 levels match their witnesses, replay and re-solve to the certified shortest within 3,840 evaluations; 60 alterations of the 12 kinds on 5 levels all detected and named)
   generated level equals its witness's level, witness replays to a win in exactly its moves, `solve` returns exactly
   the certified shortest with winning moves and "work ≤ 3,840"; the twelve alterations of clarification Q2 each detected
   and named); `--name host-2 -- swift test --package-path Packages/ExperiencesRound02 --filter AuroraLoomRegressionSolverTests`
