@@ -45,9 +45,9 @@ rope changes; the presenter has no feedback route yet (refusals only show "That 
 
 - Q: What exactly is announced, and with which kind? → A: after an accepted move (`state`): "Point n moved <direction>.
   c crossings, writhe w; target C, W. Moves s of a." (directions right, left, up, down, over, under; for a degenerate
-  projection "Two strands overlap in the view." replaces the counts); undo and redo prefix "Undone: " / "Redone: " and
+  projection "Two strands overlap in the view. Target C crossings, writhe W." replaces the counts); undo and redo prefix "Undone: " / "Redone: " and
   name the point that changed; a selection (`state`): "Point n selected."; a win (`outcome`): "The knot matches. Level won
-  in s moves, k of 3 stars." (no stars in practice); a failure (`outcome`): the failure explanation of feature 325; a
+  in s moves, k of 3 stars." (no stars in practice; "crossing" and "move" are singular for a count of 1); a failure (`outcome`): the failure explanation of feature 325; a
   level or mode change (`level`): "Level n, band b, <mode>." with the tutorial instruction when shown; a refusal
   (`rejection`) in words: `r02-g03.locked` "That level is not open yet.", `r02-g03.date` "That date cannot be used.",
   `r02-g03.move` "That move is not allowed: it would leave the space, meet another point, pass through a strand outside
