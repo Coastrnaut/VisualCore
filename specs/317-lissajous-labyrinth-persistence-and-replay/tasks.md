@@ -32,7 +32,7 @@ tests stay short (< 10 s each).
   `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthScenarios.swift` and the regenerated `Packages/ExperiencesRound02/LissajousLabyrinth/scenario-manifest.json`, with
   `Packages/ExperiencesRound02/LissajousLabyrinth/CoreTests/LissajousLabyrinthExperienceCoreTests.swift` updates (schema 3, migrations 1 → 3 and 2 → 3, recording,
   replay rules and codes); `--name host-2`
-- [ ] T-R02G0207-004 [P] [US1] [US2] Create `Packages/ExperiencesRound02/LissajousLabyrinth/CoreTests/LissajousLabyrinthPersistenceTests.swift` (agent B: 500 seeded
+- [X] T-R02G0207-004 [P] [US1] [US2] Create `Packages/ExperiencesRound02/LissajousLabyrinth/CoreTests/LissajousLabyrinthPersistenceTests.swift` (agent B: 500 seeded — Verified 2026-11-21: 2026-11-21 host-3 exit 0: LissajousLabyrinthPersistenceTests 13/13 (500 seeded reachable states incl. traced wins, daily, practice and replay round-trip with equal digests and identical payloads; 100 schema-1 and 100 schema-2 payloads migrate with progress kept, schema-2 results unverified; 200 seeded saves: 250 honest results survive and 133 edited ones (stars, bestActions, a trace step, a removed action, a false verified claim) are dropped and counted exactly, frontier as saved)
   reachable states round-trip with equal digests; schema 1 and 2 payloads of 100 seeded states migrate and restore with
   progress kept; 200 seeded saves: honest results survive, edited ones are dropped and counted); `--name host-3`
 

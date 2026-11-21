@@ -82,7 +82,7 @@ public enum LissajousLabyrinthRestoreRefusal: Error, Equatable, Sendable {
     case kernel(LissajousLabyrinthError)
 }
 
-/// The state of Lissajous Labyrinth as an experience (see the file header). Snapshot schema 2.
+/// The state of Lissajous Labyrinth as an experience (see the file header). Snapshot schema 3.
 public struct LissajousLabyrinthExperienceCore: ExperienceCore, Equatable {
     /// The experience's id in the catalog.
     public static let experienceID = "r02-g02.lissajous-labyrinth"
@@ -359,7 +359,7 @@ public struct LissajousLabyrinthExperienceCore: ExperienceCore, Equatable {
         ExperienceControl(id: "replay.stop"),
     ]
 
-    /// The ten controls with their declared ranges (see the file header).
+    /// The thirteen controls with their declared ranges (see the file header).
     public static var controls: [ExperienceControl] { declaredControls }
 
     /// The opening state of level `seed % 100 + 1`, in stage `playing`; no clock is read.
@@ -527,7 +527,7 @@ public struct LissajousLabyrinthExperienceCore: ExperienceCore, Equatable {
         }
     }
 
-    /// "r02-g02.lissajous-labyrinth.v2", then the level number, the play's fingerprint (level, dials, actions spent,
+    /// "r02-g02.lissajous-labyrinth.v3", then the level number, the play's fingerprint (level, dials, actions spent,
     /// stage), the progress and the mode (their sorted JSON); never the tutorial step.
     public func writeDigest(into builder: inout DigestBuilder) throws(DigestError) {
         builder.add(Self.digestDomain)
@@ -541,7 +541,7 @@ public struct LissajousLabyrinthExperienceCore: ExperienceCore, Equatable {
 
     // MARK: Snapshot
 
-    /// The payload's JSON form (schema 2); `tutorial` is absent in a migrated schema-1 payload.
+    /// The payload's JSON form (schema 3); `tutorial` is absent in a migrated schema-1 payload.
     private struct Payload: Codable {
         var level: Int
         var mode: LissajousLabyrinthMode
