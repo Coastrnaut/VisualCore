@@ -117,13 +117,13 @@ buttons, steps, undo, redo), including winning every certified level.
 
 ### Functional Requirements
 
-- **FR-R02G0504-001**: A drag that starts on a carvable cell and moves at least a stated distance MUST send exactly one
-  carve of that cell on release; any other drag MUST send nothing.
+- **FR-R02G0504-001**: A drag that starts on a carvable cell and moves at least 16 points MUST send exactly one carve of
+  that cell on release; a touch that moves less than 10 points is a tap; any other drag MUST send nothing.
 - **FR-R02G0504-002**: A tap on a spring MUST send exactly one valve toggle of that spring; other taps MUST send nothing
   except a double tap on empty space, which resets the view.
 - **FR-R02G0504-003**: Picking MUST be analytic and deterministic: the touch ray through the drawn camera against the
-  block tops and emitter columns, the nearest hit winning, with stated minimum touch targets.
-- **FR-R02G0504-004**: Two-finger orbit MUST stay within stated yaw and pitch bounds, keep the scene inside the view at
+  block tops and emitter columns, the nearest hit winning, with a 22-point minimum touch target.
+- **FR-R02G0504-004**: Two-finger orbit MUST stay within yaw ±40° and pitch 25° … 70° (authored 0°, 50°), keep the scene inside the view at
   every aspect 0.4 … 2.5 and never enter the digest, the snapshot or the kernel; a reset returns to the authored view.
 - **FR-R02G0504-005**: While dragging, the picked cell MUST be highlighted and described; nothing changes in the kernel
   until release.
@@ -136,7 +136,7 @@ buttons, steps, undo, redo), including winning every certified level.
 
 - **Gesture controller**: state (idle, dragging, orbiting, cancelled), picked cell, start point, last points.
 - **Orbit**: yaw and pitch offsets from the authored view.
-- **Gesture action**: carve(cell) or valve(spring), at most one per gesture.
+- **Gesture action**: carve(cell), valve(spring) or resetView, at most one per gesture.
 
 ## Success Criteria *(mandatory)*
 

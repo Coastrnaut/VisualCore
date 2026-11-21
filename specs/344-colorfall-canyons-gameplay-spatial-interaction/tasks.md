@@ -36,14 +36,15 @@ existing programs).
 
 - [ ] T-R02G0504-004 [P] [US4] Create `Packages/ExperiencesRound02/ColorfallCanyons/CoreTests/ColorfallCanyonsPanelWinTests.swift`: all 100 certified levels won
   through panel actions only (the picker's carvable-cell order then `canyon.carve`, the valve buttons, Run as
-  `time.step` of the ticks left), split so each test is under 10 s; `--name host-4`
+  `time.step` of the ticks left), split so each test is under 10 s, plus panel Undo then Redo after a carve restoring
+  the digests before and after it; `--name host-4`
 
 ## Phase 5: Story 3 and wiring — orbit, reset, presenter
 
 - [ ] T-R02G0504-005 [US3] Wire `Packages/ExperiencesRound02/ColorfallCanyons/Experience/ColorfallCanyonsPresenter.swift` (`pointer(_:viewSize:port:)` routing through
   the gesture controller, `resetView()`, gesture and native action sets, the description "Carving row r, column c" while
-  dragging), `Packages/ExperiencesRound02/ColorfallCanyons/Experience/ColorfallCanyonsCanyonScene.swift` (the orbit's camera; the pearl outline of the highlighted
-  cell) and `Packages/ExperiencesRound02/ColorfallCanyons/Experience/ColorfallCanyonsControls.swift` ("Reset view"); agent E writes
+  dragging), `Packages/ExperiencesRound02/ColorfallCanyons/Experience/ColorfallCanyonsCanyonScene.swift` (the orbit's camera; the pearl rim ring of the highlighted
+  cell, research R5, through the terrain program) and `Packages/ExperiencesRound02/ColorfallCanyons/Experience/ColorfallCanyonsControls.swift` ("Reset view"); agent E writes
   `Packages/ExperiencesRound02/ColorfallCanyons/ExperienceTests/ColorfallCanyonsGestureWiringTests.swift` (touches through the pointer entry send the expected
   actions; orbit and reset change no digest); `--name sim-27`
 
