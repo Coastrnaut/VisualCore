@@ -150,7 +150,8 @@ other than stepping and stopping are refused during replay.
 
 ### Measurable Outcomes
 
-- **SC-R02G0507-001**: 500 seeded reachable states round-trip through the snapshot with equal digests.
+- **SC-R02G0507-001**: 500 seeded reachable states round-trip through the snapshot with equal digests; the sound choice
+  (on and off) survives the round trip and changes no digest.
 - **SC-R02G0507-002**: Schema 1 and 2 payloads for 100 seeded states migrate and restore with progress kept.
 - **SC-R02G0507-003**: For 200 seeded saves, every honest result survives restore and every edited result (stars,
   actions, trace step) is dropped and counted.

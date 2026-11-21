@@ -9,7 +9,8 @@ Make Colorfall Canyons's progress durable and checkable, following feature 337. 
 gain their winning trace (the play's net actions: carves, valve toggles and steps) and a `verified` flag
 (`ColorfallCanyonsProgress`), `ColorfallCanyonsReconciliation` replays each trace on its certified level on restore and drops what
 does not verify, the mode gains `replay(level:)`, and the adapter writes snapshot schema 3 with a 2 → 3 migration,
-records the winning trace of each campaign or daily win, reconciles on restore and adds `replay.start/step/stop`. In the
+records the winning trace of each campaign or daily win, reconciles on restore, adds `replay.start/step/stop` and saves
+the sound choice (`settings.sound`, snapshotted, not digested). In the
 iOS `ColorfallCanyonsExperience`: the panel offers Replay for a verified solved level with Step and Stop, and the presenter
 announces dropped results once and refusals of replay in words. Research: [research.md](research.md). Data:
 [data-model.md](data-model.md). API: [contracts/api.md](contracts/api.md). Quickstart: [quickstart.md](quickstart.md).
