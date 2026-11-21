@@ -61,6 +61,11 @@ import VisualCoreExperienceHost
         let session = ExperienceSession()
         defer { session.close() }
         let shell = try await LissajousLabyrinthTest.open(session, seed: 0)
+        // Feature 315: `level.next` moves to the next open level, so level 1 is won first (which opens level 2).
+        for action in try LissajousLabyrinthExperienceCore.generated(number: 1).solution.actions {
+            let dial = Double(LissajousLabyrinthExperienceCore.dialOrder.firstIndex(of: action.dial) ?? 0)
+            #expect(shell.handle(control: "dial.set", values: [dial, Double(action.value)]) == .accepted)
+        }
         let before = try LissajousLabyrinthTest.digest(shell)
         let result = shell.handle(control: "level.next")
         #expect(result == .accepted, "\(result.code)")

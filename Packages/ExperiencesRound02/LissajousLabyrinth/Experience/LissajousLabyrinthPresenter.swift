@@ -12,6 +12,11 @@
 // stops at the first refusal (announced with its reason) or when the level ends (announced as its outcome) and drops
 // the rest; `clearPending` drops them; any change of the play or level from elsewhere drops them too. Announcements go
 // through `ExperienceFeedback` (`feedback`, `.shared` unless a test injects one) and are logged in `announcements`.
+// Feature 315 (R02-G02-05) T-R02G0205-005 (FR-R02G0205-001 … 005): the mirror carries the tutorial instruction, the hint
+// revealed so far (`showHint(port:)` reveals the next of three levels for the current play and tells the core a hint
+// was shown; any change of the play hides it), the failure explanation, the mode, the open levels with their stars, the
+// goal (allowance and certified shortest); `retry` starts the level again in its mode, and the daily level is chosen
+// from the local calendar date read here (`playDaily(port:date:)`), never in the core.
 #if os(iOS)
 import Foundation
 import LissajousLabyrinthCore
@@ -45,6 +50,20 @@ final class LissajousLabyrinthMirror {
     var candidate: LissajousLabyrinthAction?
     /// The values the panel's steppers set but did not apply yet (feature 314); empty when nothing is pending.
     var pending = LissajousLabyrinthPending()
+    /// The tutorial instruction; nil when the tutorial is done (feature 315).
+    var instruction: String?
+    /// The hint level revealed (0 … 3) and its text (feature 315).
+    var hintLevel = 0
+    var hintText: String?
+    /// The failure explanation while the play has failed (feature 315).
+    var failureText: String?
+    /// The mode (feature 315).
+    var mode: LissajousLabyrinthMode = .campaign
+    /// The highest open level and the stars of each solved level (feature 315).
+    var frontier = 1
+    var stars: [Int: Int] = [:]
+    /// The certified shortest solution length of the current level (feature 315).
+    var shortest = 0
 }
 
 /// One entry of the tier log: the tier drawn and why it changed.
@@ -72,6 +91,10 @@ final class LissajousLabyrinthPresenter: ExperiencePresenter {
     private(set) var latestCore: LissajousLabyrinthExperienceCore?
     /// True while `applyPending` sends its actions, so the described changes do not count as outside changes.
     private var applying = false
+    /// The play the shown hint belongs to (level, mode and fingerprint); nil when no hint is shown (feature 315).
+    private var hintKey: String?
+    /// The date whose daily level is being played, so Retry restarts that level after midnight too (feature 315).
+    private(set) var dailyDate: DateComponents?
     /// The feedback route of announcements (tests inject their own).
     var feedback: ExperienceFeedback = .shared
     /// Every announcement made, oldest first (tests and diagnostics).
@@ -216,6 +239,75 @@ final class LissajousLabyrinthPresenter: ExperiencePresenter {
         return results
     }
 
+    // MARK: Teaching and progression (feature 315)
+
+    /// The key of the play a hint belongs to: level, mode and fingerprint.
+    private static func hintKey(_ core: LissajousLabyrinthExperienceCore) -> String {
+        "\(core.levelNumber)/\(core.mode)/\(core.play.fingerprint)"
+    }
+
+    /// Reveals the next hint level (up to 3) for the current play and tells the core that a hint was shown
+    /// (`tutorial.hint`, which only advances the tutorial); nothing when the play has ended or no solution is reachable.
+    func showHint(port: ExperienceActionPort) {
+        guard let core = latestCore else { return }
+        let key = Self.hintKey(core)
+        let next = hintKey == key ? min(mirror.hintLevel + 1, 3) : 1
+        guard let hint = core.hint(level: next) else {
+            hintKey = nil
+            mirror.hintLevel = 0
+            mirror.hintText = nil
+            return
+        }
+        hintKey = key
+        mirror.hintLevel = next
+        mirror.hintText = hint.text
+        announce(hint.text, kind: .state)
+        if core.tutorial == .checkpoints { _ = port.send("tutorial.hint", []) }
+    }
+
+    /// Ends the tutorial of the current level.
+    func dismissTutorial(port: ExperienceActionPort) {
+        send("tutorial.dismiss", port: port)
+    }
+
+    /// The action and values that start the current level again in its mode: `mode.practice` in practice, the daily
+    /// date's `mode.daily` in daily mode, `level.select` of the level in campaign.
+    func retryAction(date: DateComponents) -> (control: String, values: [Double]) {
+        guard let core = latestCore else { return ("mode.campaign", []) }
+        switch core.mode {
+        case .practice: return ("mode.practice", [])
+        case .daily: return ("mode.daily", Self.dateValues(dailyDate ?? date))
+        case .campaign: return ("level.select", [Double(core.levelNumber)])
+        }
+    }
+
+    /// Starts the current level again in its mode; in daily mode with the date that opened it (today's local date
+    /// when none is known).
+    @discardableResult
+    func retry(port: ExperienceActionPort, date: DateComponents = LissajousLabyrinthPresenter.today()) -> ActionResult {
+        let action = retryAction(date: date)
+        return send(action.control, action.values, port: port)
+    }
+
+    /// Plays the daily level of `date` (the local calendar date by default; the core never reads a clock).
+    @discardableResult
+    func playDaily(port: ExperienceActionPort,
+                   date: DateComponents = LissajousLabyrinthPresenter.today()) -> ActionResult {
+        let result = send("mode.daily", Self.dateValues(date), port: port)
+        if result.isAccepted { dailyDate = date }
+        return result
+    }
+
+    /// The local calendar date now, as Gregorian year, month and day in the current time zone.
+    static func today() -> DateComponents {
+        Calendar(identifier: .gregorian).dateComponents(in: .current, from: Date())
+    }
+
+    /// The values of `mode.daily` for `date`: year, month, day (0 for a missing part, which the engine refuses).
+    static func dateValues(_ date: DateComponents) -> [Double] {
+        [Double(date.year ?? 0), Double(date.month ?? 0), Double(date.day ?? 0)]
+    }
+
     /// Drops the pending values; sends nothing.
     func clearPending() {
         mirror.pending.clear()
@@ -244,6 +336,17 @@ final class LissajousLabyrinthPresenter: ExperiencePresenter {
             mirror.pending.clear()
         }
         latestCore = core
+        if let key = hintKey, key != Self.hintKey(core) {
+            hintKey = nil
+            mirror.hintLevel = 0
+            mirror.hintText = nil
+        }
+        mirror.instruction = core.tutorial == .done ? nil : core.tutorial.text
+        mirror.failureText = core.failureExplanation?.text
+        mirror.mode = core.mode
+        mirror.frontier = core.progress.frontier
+        mirror.stars = core.progress.solved.mapValues(\.stars)
+        mirror.shortest = core.certifiedShortest
         mirror.dials = play.dials
         mirror.stage = play.stage
         mirror.levelNumber = core.levelNumber
@@ -260,8 +363,14 @@ final class LissajousLabyrinthPresenter: ExperiencePresenter {
         text += "Dial \(Self.title(selected)) selected: \(mirror.candidate?.value ?? play.dials[selected]). "
         text += "Actions \(play.spent) of \(play.level.allowance). "
         switch play.stage {
-        case .won: text += "The path is safe."
-        case .failed: text += "Out of actions."
+        case .won:
+            text += "The path is safe."
+            if core.mode != .practice {
+                let stars = LissajousLabyrinthProgress.stars(actions: play.spent, shortest: core.certifiedShortest)
+                text += " \(stars) of 3 stars."
+            }
+        case .failed:
+            text += "Out of actions. " + (core.failureExplanation?.text ?? "")
         default: break
         }
         return text
