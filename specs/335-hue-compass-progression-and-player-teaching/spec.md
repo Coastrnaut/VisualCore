@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-21
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G04-05 (migration ledger, game feature of experience R02-G04) · ID namespace FR-R02G0405-###,
 SC-R02G0405-###, T-R02G0405-###
@@ -21,6 +21,53 @@ Canonical overrides:
 - **Superseded parts of the source prompt:** price, "no IAP", paid unlocks and the Round 2 lock; every level is free.
   **Device-only items:** none. **Owner-only items:** none.
 - **Model:** feature 325 (Wave Knot Keeper's progression and player teaching).
+
+## Clarifications
+
+### Session 2026-11-21
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+325's answers where the games agree. Facts checked in code (read-only, 2026-11-21): `HueCompassSolver` gives candidates,
+classes, the smallest acceptable selection and the first settling probe set; the play keeps the clues seen; turns are free,
+probes and the selection spend one unit each and a probe spending the last unit fails; the adapter prepares level
+(seed mod 100) + 1, accepts `compass.turn`, `compass.probe`, `compass.select`, `play.undo`, `play.redo` and `level.next`
+and snapshots `{level, records}` as schema 1; the core may not read a clock; the kernel's allowance is 2 … 24; undo covers
+turns only.
+
+- Q: How is a hint computed and what does each level reveal? → A: the consistent set is the candidates whose clues at
+  every probed bearing equal those seen. When one selection accepts the whole set (the solver's smallest acceptable
+  selection), the hint is that selection: level 1 "Every clue now points to one place: select", level 2 "Select near
+  <octant>" (the eighth of the compass, north = bearing 24), level 3 "Select bearing b with band h". Otherwise, when at
+  least two units remain, the hint is a probe at the first bearing (from 0) after which every class of the consistent set
+  is acceptable, else the bearing whose largest class is smallest (lowest on a tie): level 1 "Probe once more", level 2
+  "Probe toward <octant>", level 3 "Turn to bearing p and probe". With one unit left the hint is the selection accepting
+  the most members of the consistent set (lowest bearing, then band, on a tie), worded as at levels 1 … 3 with "best
+  guess". Hints never change the state, are unlimited, do not affect stars and reset to level 1 after any change of the
+  play. Impact: FR-R02G0405-002; SC-R02G0405-002.
+- Q: What does the tutorial show, and when does it advance? → A: on the tutorial levels 1 … 3, three instructions in
+  order: (1) "Swipe the compass, or use Turn, to aim the needle" until a turn is accepted; (2) "Tap the hub to probe: the
+  hue gap counts bands to the target, the fog depth sums the fog between" until a probe is accepted; (3) "When one
+  bearing and band fit every clue, choose the band and Select" until the level ends. `tutorial.dismiss` ends it for that
+  level; undo never moves it back. Impact: FR-R02G0405-001; SC-R02G0405-001.
+- Q: What are the progress and star rules? → A: as feature 325 with units spent: per level the best (fewest) units
+  spent in a win and the stars (3 when at most the certified smallest probe count + 1, 2 when at most that + 2, else 1; a
+  better result replaces a worse one); level 1 open; a campaign win opens the next; `level.select [n]` opens any open
+  level and refuses others (`r02-g04.locked`); `level.next` moves to the next open level (refused when none); five bands
+  of 20. Impact: FR-R02G0405-004; SC-R02G0405-004.
+- Q: How do the daily level and practice mode work? → A: the daily level is (days from 2026-01-01 to the given calendar
+  date × 47) mod 100 + 1, negative day counts wrapped into 0 … 99 (47 is coprime with 100 and differs from the other
+  round-two games' 37, 41 and 43); the date reaches the core as `mode.daily [year, month, day]` (an impossible date is
+  refused with `r02-g04.date`). Daily play follows campaign rules but does not open levels. `mode.practice` replays the
+  current level with the allowance raised to the kernel's maximum (24); practice results never award stars or open
+  levels; `mode.campaign` returns. Impact: FR-R02G0405-005; SC-R02G0405-004.
+- Q: Where does progress live, how is it versioned and how is a failure explained? → A: as feature 325: progress and the
+  mode are part of the experience state and its digest; the tutorial step is snapshotted but not digested; the hint level
+  is presentation (held by the presenter); the snapshot payload becomes schema 2 (`{level, records, progress, mode,
+  tutorial}`) with a migration from schema 1 (no progress, campaign mode, tutorial at its first step on tutorial levels).
+  A miss is explained as "The target was bearing T (band B). Your selection was d bearings and e bands away; the
+  tolerances are t and u." and an exhausted allowance as "The last unit went to a probe; keep one for the selection.",
+  each followed by "Retry the level." (probes and selections cannot be undone). Impact: FR-R02G0405-003, 007;
+  SC-R02G0405-003.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -71,7 +118,7 @@ allowance without affecting progress.
   hint never changes the state, is unlimited, does not affect stars and returns to its first level after any change of
   the play.
 - **FR-R02G0405-003**: A failure MUST be explained in accessible text (the selection's distance from the target in
-  bearings and bands, or the exhausted allowance) with undo and retry offered.
+  bearings and bands, or the exhausted allowance) with retry offered.
 - **FR-R02G0405-004**: Progress MUST follow defined rules: the first level open, a campaign win opens the next, bands
   shown, a goal and a result (stars) per level.
 - **FR-R02G0405-005**: A daily level MUST be a deterministic function of the local calendar date; a practice mode MUST
