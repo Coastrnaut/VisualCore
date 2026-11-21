@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-21
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G03-05 (migration ledger, game feature of experience R02-G03) · ID namespace FR-R02G0305-###,
 SC-R02G0305-###, T-R02G0305-###
@@ -21,6 +21,52 @@ Canonical overrides:
 - **Superseded parts of the source prompt:** price, "no IAP", the Round 2 lock and the per-round device campaign.
   **Device-only items:** none. **Owner-only items:** none.
 - **Model:** feature 315 (Wave Knot Keeper's progression and player teaching).
+
+## Clarifications
+
+### Session 2026-11-21
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+315's answers where the games agree. Facts checked in code (read-only, 2026-11-21): `WaveKnotKeeperSolver.solve(_:depth:)`
+finds the shortest move list from a level's start to a winning rope by breadth-first search over legal ropes to depth 3
+(at most 3,661 ropes expanded for 10 points); the kernel's summary is crossings, writhe and degeneracy against the
+target; the play has a tutorial stage that the adapter dismisses at once today on levels 1 … 3; the adapter prepares level
+(seed mod 100) + 1, accepts `point.move`, `point.select`, `play.undo`, `play.redo` and `level.next` and snapshots
+`{level, records}` as schema 1; the core may not read a clock; the allowance is 1 … 64.
+
+- Q: How is a hint computed and what does each level reveal? → A: the solver's breadth-first search runs from the
+  current rope (as a level whose start is the current rope) to the nearest winning rope, depth at most 3, giving the
+  shortest remaining move list. Level 1 names the point of its first move ("Move point 4"); level 2 adds the axis ("Move
+  point 4 along y"); level 3 adds the exact direction ("Move point 4 down (−y)", with "over"/"under" for ±z). Following
+  the level-3 hint shortens the shortest remaining solution by one. When no winning rope is within 3 moves, or the
+  shortest remaining solution is longer than the moves left, the hint says "No short solution from here; undo or retry"
+  and offers undo. Hints never change the state, are unlimited, do not affect stars, and reset to level 1 after any
+  change of the play. Impact: FR-R02G0305-002; SC-R02G0305-002.
+- Q: What does the tutorial show, and when does it advance? → A: on the tutorial levels 1 … 3, three instructions in
+  order: (1) "Drag point <n> one step (or use the panel)" (the level-1 hint's point) until any move is accepted;
+  (2) "Match the target's crossings and twist (writhe); strands pass through each other only inside the blue gates" until
+  the next accepted move or a hint is asked; (3) "Ask for a hint whenever you are stuck" until the level is won. A dismiss
+  action ends the tutorial for that level; undo never moves it back. Impact: FR-R02G0305-001; SC-R02G0305-001.
+- Q: What are the progress and star rules? → A: as feature 315: per level the best number of moves that won and the
+  stars (3 when equal to the certified shortest, 2 within shortest + 2, else 1; a better result replaces a worse one);
+  level 1 open; a campaign win opens the next; `level.select [n]` opens any open level and refuses others
+  (`r02-g03.locked`); `level.next` moves to the next open level (refused when none); five bands of 20. Impact:
+  FR-R02G0305-004; SC-R02G0305-004.
+- Q: How do the daily level and practice mode work? → A: the daily level is (days from 2026-01-01 to the given calendar
+  date × 43) mod 100 + 1, negative day counts wrapped into 0 … 99 (43 is coprime with 100, so 100 consecutive days visit
+  every level once, and the sequence differs from Aurora Loom's × 37 and Lissajous Labyrinth's × 41); the date reaches the
+  core as `mode.daily [year, month, day]` from the presenter (an impossible date is refused with `r02-g03.date`). Daily
+  play follows campaign rules but does not open levels. `mode.practice` replays the current level with the allowance
+  raised to the kernel's maximum (64); practice results never award stars or open levels; `mode.campaign` returns.
+  Impact: FR-R02G0305-005; SC-R02G0305-004.
+- Q: Where does progress live, how is it versioned and how is a failure explained? → A: as feature 315: progress and the
+  mode are part of the experience state and its digest; the tutorial step is snapshotted but not digested; the hint level
+  revealed so far is presentation (held by the presenter, reset after any change of the play); the snapshot payload
+  becomes schema 2 (`{level, records, progress, mode, tutorial}`) with a migration from schema 1 (no progress, campaign
+  mode, tutorial at its first step on tutorial levels). A failure is explained from the kernel's summary: "The rope has c
+  crossings and writhe w; the target is C and W." or, for a degenerate projection, "Two strands overlap in the view, so
+  the crossings cannot be counted.", each followed by "Undo the last move or retry the level." Impact: FR-R02G0305-003,
+  007; SC-R02G0305-003.
 
 ## User Scenarios & Testing *(mandatory)*
 
