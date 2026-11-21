@@ -13,7 +13,7 @@ or {device} tasks (pure logic and host-generated content). Fixture seed 2_322; t
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G0302-002 Add `generation(Int)` ("r02-g03.generation") and `witness(String)` ("r02-g03.witness") to
+- [X] T-R02G0302-002 Add `generation(Int)` ("r02-g03.generation") and `witness(String)` ("r02-g03.witness") to — Verified 2026-11-21: 2026-11-21 host exit 0 (whole round-two package with the error cases, manifest of 100 entries, difficulty and the solver's types and search)
   `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperError.swift`; create `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperManifest.swift` (WaveKnotKeeperManifestEntry
   "number 1 … 100, seed UInt64, band 1 … 5, budget 8 … 19", the 100 entries copied from `python3 scripts/planning_index.py
   levels --experience R02-G03` with the source line), `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperDifficulty.swift` ("shortest, points, gates,

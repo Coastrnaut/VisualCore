@@ -1,6 +1,6 @@
 // WaveKnotKeeperError — feature 321 (R02-G03-01) T-R02G0301-002 (FR-R02G0301-009; clarification Q5). The refusals of
 // Wave Knot Keeper's rule kernel, each with a stable reason code `r02-g03.*` that the experience logs with the level id
-// and tick.
+// and tick. Feature 322 (R02-G03-02) T-R02G0302-002 (FR-R02G0302-006; clarification Q5): `generation` and `witness`.
 
 /// A refusal of a Wave Knot Keeper level, move or event.
 public enum WaveKnotKeeperError: Error, Equatable, Sendable {
@@ -19,6 +19,10 @@ public enum WaveKnotKeeperError: Error, Equatable, Sendable {
     case newerSchema(Int)
     /// A stored level or trace is damaged or breaks a rule; the payload describes the damage.
     case malformed(String)
+    /// No candidate of the manifest level (the payload is its number) met its band within 64 candidates (feature 322).
+    case generation(Int)
+    /// A witness is damaged, edited or no longer replays; the payload names the part (feature 322).
+    case witness(String)
 
     /// The stable reason code, `r02-g03.<kebab-case>`.
     public var reasonCode: String {
@@ -30,6 +34,8 @@ public enum WaveKnotKeeperError: Error, Equatable, Sendable {
         case .allowance: "r02-g03.allowance"
         case .newerSchema: "r02-g03.newer-schema"
         case .malformed: "r02-g03.malformed"
+        case .generation: "r02-g03.generation"
+        case .witness: "r02-g03.witness"
         }
     }
 }
