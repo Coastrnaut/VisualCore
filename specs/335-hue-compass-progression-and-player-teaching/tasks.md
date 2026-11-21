@@ -13,7 +13,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks.
 
 ## Phase 2: Stories 2 and 3 — hints and failure explanations (P1) 🎯
 
-- [ ] T-R02G0405-002 [P] [US2] [US3] Create `Packages/ExperiencesRound02/HueCompass/Core/HueCompassHints.swift` (consistent set from the clues seen; hint
+- [X] T-R02G0405-002 [P] [US2] [US3] Create `Packages/ExperiencesRound02/HueCompass/Core/HueCompassHints.swift` (consistent set from the clues seen; hint — Verified 2026-11-21: 2026-11-21 host exit 0 (agent B: hints from the consistent set (never the target), probe/select/guess with octant wording, failure explanations with distances and tolerances; 8 tests: exact hints win all 100 levels within the allowance (2 steps per level in bands 1-3, at most 3 in bands 4-5), 2,000 seeded states with legal hints that never spend the last unit on a probe, 500 failures explained exactly)
   "levels 1 … 3: what, where (octant, north = bearing 24), exact"; selection when one selection accepts the consistent
   set; else with at least two units a probe at the first settling bearing, else the bearing with the smallest largest
   class, lowest on a tie; with one unit the best-guess selection; nil when not playing; HueCompassFailureExplanation
