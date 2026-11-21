@@ -68,4 +68,4 @@ lead. MVP: Story 1.
 
 ## Phase 7: Convergence
 
-- [ ] T-R02G0401-013 Document `HueCompassSelection` and `HueCompassPlay.selection` (the selected bearing and band pinned in the play fingerprint, spec clarification Q5) in `specs/331-hue-compass-playable-rule-kernel/contracts/api.md` and `specs/331-hue-compass-playable-rule-kernel/data-model.md` per plan: contracts (unrequested)
+- [X] T-R02G0401-013 Document `HueCompassSelection` and `HueCompassPlay.selection` (the selected bearing and band pinned in the play fingerprint, spec clarification Q5) in `specs/331-hue-compass-playable-rule-kernel/contracts/api.md` and `specs/331-hue-compass-playable-rule-kernel/data-model.md` per plan: contracts (unrequested) — Verified 2026-11-21: 2026-11-21 HueCompassSelection and HueCompassPlay.selection documented in contracts/api.md and data-model.md (grep: present in both); code unchanged

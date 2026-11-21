@@ -21,6 +21,7 @@ public enum HueCompassStage: String, Sendable, Codable, CaseIterable { case load
 public enum HueCompassEvent: Sendable, Equatable { case begin, dismissTutorial, pause, resume, showResult }
 public enum HueCompassRecordKind: String, Sendable, Codable { case turn, probe, select, undo, redo }
 public enum HueCompassFailure: String, Sendable, Codable, CaseIterable { case selection, probes }
+public struct HueCompassSelection: Sendable, Hashable, Codable { public let bearing: Int; public let band: Int }
 public struct HueCompassRecord: Sendable, Equatable, Codable { public let schema: Int; public let seed: UInt64; public let tick: Int
     public let kind: HueCompassRecordKind; public let action: HueCompassAction   // undo: the reverse turn; redo: the turn
     public let previous: String; public let next: String }
@@ -28,7 +29,8 @@ public struct HueCompassPlay: Sendable, Equatable {
     public static var schema: Int { 1 }; public static let turns: ClosedRange<Int>   // −48 … 48
     public let level: HueCompassLevel
     public private(set) var stage: HueCompassStage, bearing: Int, spent: Int, clues: [HueCompassClue],
-        records: [HueCompassRecord], failure: HueCompassFailure?
+        records: [HueCompassRecord], failure: HueCompassFailure?,
+        selection: HueCompassSelection?   // pinned in the fingerprint after a zero byte (spec Q5)
     public var fingerprint: String { get }; public var remaining: Int { get }; public var canUndo, canRedo: Bool { get }
     public init(level: HueCompassLevel)
     public mutating func handle(_ event: HueCompassEvent) throws(HueCompassError)            // .stage
