@@ -53,7 +53,7 @@ snapshot is schema 3 since feature 317 and stores no `examples:`; the canvas des
   -vcSkipWelcome -vcCandidates -openExperience r02-g02.lissajous-labyrinth`: dismiss the tutorial, set level 1's
   certified solution as pending values with the steppers, Apply, read "The path is safe" and "3 of 3 stars", the level
   picker shows level 2 open; relaunch without reset: the stars and level 2 are kept) and `LLReplayUITests` (after the
-  win, Replay, Step until the replay ends won, Stop back to the campaign). They run as a new serial chunk `j3` of
+  win, Replay, Step until the replay ends won, Stop back to the campaign). They run as a new serial chunk `k3` of
   `release_check.py`; each test stays under 90 s. Level 1's start dials and solution are pinned in `LL` and checked
   against the Core by an app unit test. Impact: FR-R02G0209-002, 007; SC-R02G0209-001.
 - Q: Which earlier-schema examples are stored and where do they come from? → A:

@@ -5,7 +5,7 @@ swift test --package-path Packages/ExperiencesRound02 --filter LissajousLabyrint
 ```
 
 ```bash
-python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27 app-ui-ios27-j3
+python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27 app-ui-ios27-k3
 ```
 
 ```bash

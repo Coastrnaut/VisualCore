@@ -1091,6 +1091,35 @@ class ReleaseCheckTests(unittest.TestCase):
         # Every serial chunk names a chunk that exists.
         self.assertLessEqual(relcheck.SERIAL_CHUNKS, set(relcheck.UI_CHUNKS))
 
+    def test_lissajous_labyrinth_ui_chunk_and_release_symbols(self):
+        """Feature 319 R02-G02-09 (T-R02G0209-004): the serial chunk `k3` runs the Lissajous Labyrinth interface
+        journeys (`j3` already belongs to Particle Universe), and the Release symbol check forbids Lissajous
+        Labyrinth's test-only names."""
+        self.assertEqual(relcheck.UI_CHUNKS["k3"], ["LLPlayUITests", "LLReplayUITests"])
+        self.assertEqual(relcheck.UI_CHUNKS["j3"], ["PUEmitterUITests", "PUForceUITests", "PUTrailUITests"])
+        self.assertIn("k3", relcheck.SERIAL_CHUNKS)
+        steps = {s.name: s.argv for s in relcheck.unified_app_steps("X")}
+        argv = steps["app-ui-ios27-k3"]
+        self.assertNotIn("--parallel", argv)
+        start = argv.index("--only-testing") + 1
+        self.assertEqual(argv[start:start + 2], ["VisualCoreUITests/LLPlayUITests", "VisualCoreUITests/LLReplayUITests"])
+        self.assertEqual(argv[start + 2], "--log-name")
+        for name in ("LissajousLabyrinthGolden", "acceptanceScenarios"):
+            self.assertIn(name, relcheck.RELEASE_FORBIDDEN)
+            self.assertIn(name, steps["app-release-symbols"])
+        self.assertLessEqual(relcheck.SERIAL_CHUNKS, set(relcheck.UI_CHUNKS))
+
+    def test_ui_chunk_keys_are_unique_in_source(self):
+        """Feature 319 (T-R02G0209-004): a repeated key in the `UI_CHUNKS` literal would silently drop the earlier
+        chunk's test classes, so the source literal is parsed and every key must appear once."""
+        tree = ast.parse((ROOT_DIR / "scripts" / "release_check.py").read_text())
+        literal = next(node.value for node in ast.walk(tree) if isinstance(node, ast.Assign)
+                       and any(isinstance(t, ast.Name) and t.id == "UI_CHUNKS" for t in node.targets))
+        keys = [k.value for k in literal.keys]
+        self.assertEqual(sorted(k for k in set(keys) if keys.count(k) > 1), [])
+        classes = [c for chunk in relcheck.UI_CHUNKS.values() for c in chunk]
+        self.assertEqual(len(classes), len(set(classes)), "a UI test class is listed in two chunks")
+
     def test_app_steps_are_discovered_per_app(self):
         """Feature 019 T-A02-115: documented-API, domain-package host tests and app tests for every app."""
         with tempfile.TemporaryDirectory() as d:

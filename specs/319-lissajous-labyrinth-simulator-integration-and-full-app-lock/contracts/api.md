@@ -10,5 +10,5 @@ extension LissajousLabyrinthExperienceCore {
 // Panel identifiers: experience.r02-g02.lissajous-labyrinth.{frequency-a, frequency-b, phase-a, phase-c, apply, clear,
 // undo, redo, next-level, reset-view, hint, dismiss-tutorial, failure-undo, retry, campaign, daily, practice, replay,
 // replay-step, replay-stop, level-picker, sound}
-// release_check.py: UI_CHUNKS["j3"] = ["LLPlayUITests", "LLReplayUITests"]; "j3" in SERIAL_CHUNKS
+// release_check.py: UI_CHUNKS["k3"] = ["LLPlayUITests", "LLReplayUITests"]; "k3" in SERIAL_CHUNKS
 ```

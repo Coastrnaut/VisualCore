@@ -11,7 +11,7 @@ migration examples, the pattern of `AuroraLoomSchemaExamples`). In the experienc
 every panel control (pending values, Apply and Clear exist since feature 314). In the app: the registration stores both
 examples (comment corrected); app unit tests restore them, pin level 1's start dials and solution against the Core, open
 the candidate through the registry and engine and confirm it is not available; interface tests `LLPlayUITests` and
-`LLReplayUITests` (namespace `LL`) in a new serial chunk `j3`; the Release simulator build and symbol check run as
+`LLReplayUITests` (namespace `LL`) in a new serial chunk `k3`; the Release simulator build and symbol check run as
 evidence (`LissajousLabyrinthGolden` and `acceptanceScenarios` are already forbidden). Feature 318's regression is re-run
 for all-level solvability. Research: [research.md](research.md). Data: [data-model.md](data-model.md). Contract:
 [contracts/api.md](contracts/api.md). Quickstart: [quickstart.md](quickstart.md).
@@ -22,7 +22,7 @@ for all-level solvability. Research: [research.md](research.md). Data: [data-mod
 **Primary dependencies**: LissajousLabyrinthCore and LissajousLabyrinthExperience; VisualCoreExperience
 (`MigrationExample`, `ExperienceSnapshot`, `DigestBuilder`); the app's registry, `DebugLaunch` and UI test support.
 **Testing**: host `swift test --package-path Packages/ExperiencesRound02`; `release_check.py --only
-app-build-for-testing-ios27 app-unit-ios27 app-ui-ios27-j3 app-release-build app-release-symbols`; the 318 regression.
+app-build-for-testing-ios27 app-unit-ios27 app-ui-ios27-k3 app-release-build app-release-symbols`; the 318 regression.
 **Constraints**: no new target; Lissajous Labyrinth stays in `candidates`; interface tests each under 90 s; no device.
 
 No NEEDS CLARIFICATION remains.
@@ -53,7 +53,7 @@ Apps/VisualCore/Tests/Unit/AppModelTests.swift                        edit  exam
 Apps/VisualCore/Tests/UI/LissajousLabyrinth/LLSupport.swift           new   (agent C)
 Apps/VisualCore/Tests/UI/LissajousLabyrinth/LLPlayUITests.swift       new   (agent C)
 Apps/VisualCore/Tests/UI/LissajousLabyrinth/LLReplayUITests.swift     new   (agent C)
-scripts/release_check.py, scripts/test_scripts.py                     edit  chunk j3 serial (agent D)
+scripts/release_check.py, scripts/test_scripts.py                     edit  chunk k3 serial (agent D)
 project.yml + xcodegen                                                 edit if the UI test sources need listing (lead)
 docs/architecture/lissajous-labyrinth.md, Packages/ExperiencesRound02/README.md, docs/automatedtesting.md (lead)
 ```
