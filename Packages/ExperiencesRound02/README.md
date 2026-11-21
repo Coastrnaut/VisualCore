@@ -113,6 +113,10 @@ Feature 316 (R02-G02-06) adds polish and accessibility: `LissajousLabyrinthFeedb
 `LissajousLabyrinthLights` (eased fades, Reduce Flashing) and `LissajousLabyrinthSoundRecipe` in the Core, and
 `LissajousLabyrinthSound` with a Sound toggle, labels, wrapping rows and a readable width in the experience.
 
+Feature 317 (R02-G02-07) adds persistence and replay: results with winning traces and a `verified` flag,
+`LissajousLabyrinthReconciliation` on restore, the `replay(level)` mode with `replay.start/step/stop`, and snapshot
+schema 3 migrating from 1 and 2.
+
 ## Wave Knot Keeper (R02-G03, `r02-g03.wave-knot-keeper`, free)
 
 `WaveKnotKeeperCore` (feature 321, R02-G03-01) is the playable rule kernel: `WaveKnotKeeperLevel` with

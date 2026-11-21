@@ -142,6 +142,18 @@ LISSAJOUS_LABYRINTH_WRITE_WITNESSES=1 swift test --package-path Packages/Experie
 - **Panel.** Labels and values on every control, button rows that become columns at accessibility text sizes, a
   520-point readable width; hearing, feeling and VoiceOver on hardware are D1–D3 observations.
 
+## Persistence and replay (R02-G02-07)
+
+- **Saved state.** Snapshot schema 3 (`level`, `mode`, `progress`, `records`, `tutorial`) in the app's shared store
+  (atomic write, quarantine, newer schemas refused); migrations 1 → 2 → 3, where 2 → 3 gives every result an empty trace
+  and `verified: false`. The state reads no clock and no random source.
+- **Reconcilable scores.** A campaign or daily win stores its winning trace (the play's net changes). On restore
+  `LissajousLabyrinthReconciliation` replays each trace on a fresh play of its certified level and keeps the result only
+  if it wins in exactly the recorded actions with the recorded stars; the number dropped is announced once. The frontier
+  is restored as saved (Aurora Loom's lesson: raising it would open levels for an honest daily win).
+- **Replay.** `replay.start [n]`, `replay.step`, `replay.stop` play a verified trace action by action; every other
+  action except dismissing the tutorial is refused during replay, and replay never changes progress.
+
 ## Failures
 
 `LissajousLabyrinthError` reason codes: `r02-g02.level`, `r02-g02.move`, `r02-g02.stage`, `r02-g02.stale`,
