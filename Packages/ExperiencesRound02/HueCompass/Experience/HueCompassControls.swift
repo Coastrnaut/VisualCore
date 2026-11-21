@@ -17,6 +17,8 @@
 // in words, and the panel tells the presenter when it is on screen and when the app's scene is active.
 // Feature 337 (R02-G04-07) T-R02G0407-005: Replay best solution for a verified solved level, and during replay its
 // position with Step and Stop, each with a label and a value.
+// Feature 339 (R02-G04-09) T-R02G0409-003 (FR-R02G0409-001; clarification Q1): every control carries the identifier
+// `experience.r02-g04.hue-compass.<name>` (`port.identifier`), the names listed in ``identifierNames``.
 #if os(iOS)
 import HueCompassCore
 import SwiftUI
@@ -33,6 +35,14 @@ struct HueCompassControls: View {
     static let turns: [Int] = [-4, -1, 1, 4]
     /// The button titles of the turn buttons.
     static let turnTitles: [String] = ["−4", "−1", "+1", "+4"]
+    /// The identifier names of the turn buttons, in order (feature 339).
+    static let turnNames: [String] = ["turn-minus-4", "turn-minus-1", "turn-plus-1", "turn-plus-4"]
+    /// Every control's identifier name (clarification Q1 of feature 339), each once; the identifier is
+    /// `experience.r02-g04.hue-compass.<name>` (`port.identifier`).
+    static let identifierNames: [String] = turnNames
+        + ["probe", "band-picker", "select", "undo", "redo", "next-level", "reset-view", "hint", "dismiss-tutorial",
+           "retry", "campaign", "daily", "practice", "replay", "replay-step", "replay-stop", "level-picker", "sound",
+           "summary"]
 
     @Environment(\.dynamicTypeSize) private var typeSize
     /// Whether the app's scene is active (convergence task T-R02G0406-014): the ambient loop plays only while it is.
@@ -90,14 +100,17 @@ struct HueCompassControls: View {
             row {
                 Button("Step") { presenter.stepReplay(port: port) }
                     .accessibilityLabel("Play the next action of the replay")
+                    .accessibilityIdentifier(port.identifier("replay-step"))
                     .accessibilityValue("Action \(mirror.replayPosition) of \(mirror.replayLength)")
                 Button("Stop") { presenter.stopReplay(port: port) }
                     .accessibilityLabel("Stop the replay")
+                    .accessibilityIdentifier(port.identifier("replay-stop"))
                     .accessibilityValue("\(mirror.replayLength) actions")
             }
         } else if mirror.replayAvailable {
             Button("Replay best solution") { presenter.startReplay(port: port) }
                 .accessibilityLabel("Replay your best solution of this level")
+                .accessibilityIdentifier(port.identifier("replay"))
                 .accessibilityValue("Level \(mirror.levelNumber)")
         }
     }
@@ -106,6 +119,7 @@ struct HueCompassControls: View {
     @ViewBuilder private var soundToggle: some View {
         Toggle("Sound", isOn: Binding(get: { mirror.soundOn }, set: { presenter.setSound(on: $0) }))
             .accessibilityLabel("Ambient sound")
+            .accessibilityIdentifier(port.identifier("sound"))
             .accessibilityValue(mirror.soundOn ? "on" : "off")
     }
 
@@ -124,6 +138,7 @@ struct HueCompassControls: View {
             .fixedSize(horizontal: false, vertical: true)
             .accessibilityElement(children: .ignore)
             .accessibilityLabel("Compass")
+            .accessibilityIdentifier(port.identifier("summary"))
             .accessibilityValue(mirror.summary)
         if let message = mirror.message {
             Text(message).font(.footnote).fixedSize(horizontal: false, vertical: true)
@@ -137,6 +152,7 @@ struct HueCompassControls: View {
             Text(instruction).font(.callout).fixedSize(horizontal: false, vertical: true)
             Button("Dismiss") { presenter.dismissTutorial(port: port) }
                 .accessibilityLabel("Dismiss the tutorial")
+                .accessibilityIdentifier(port.identifier("dismiss-tutorial"))
                 .accessibilityValue("Level \(mirror.levelNumber)")
         }
     }
@@ -147,6 +163,7 @@ struct HueCompassControls: View {
             Text(failure).font(.callout).fixedSize(horizontal: false, vertical: true)
             Button("Retry") { presenter.retry(port: port) }
                 .accessibilityLabel("Retry the level")
+                .accessibilityIdentifier(port.identifier("retry"))
                 .accessibilityValue("Level \(mirror.levelNumber)")
         }
     }
@@ -155,6 +172,7 @@ struct HueCompassControls: View {
     @ViewBuilder private var hintRow: some View {
         Button("Hint") { presenter.showHint(port: port) }
             .accessibilityLabel("Show a hint")
+            .accessibilityIdentifier(port.identifier("hint"))
             .accessibilityValue(mirror.hintLevel == 0 ? "none shown" : "level \(mirror.hintLevel) of 3")
         if let hint = mirror.hintText { Text(hint).font(.callout).fixedSize(horizontal: false, vertical: true) }
     }
@@ -164,14 +182,17 @@ struct HueCompassControls: View {
         row {
             Button("Campaign") { send("mode.campaign") }
                 .accessibilityLabel("Play the campaign")
+                .accessibilityIdentifier(port.identifier("campaign"))
                 .accessibilityValue(mirror.mode == .campaign ? "playing" : "not playing")
                 .accessibilityAddTraits(mirror.mode == .campaign ? .isSelected : [])
             Button("Daily") { presenter.playDaily(port: port) }
                 .accessibilityLabel("Play today's daily level")
+                .accessibilityIdentifier(port.identifier("daily"))
                 .accessibilityValue(Self.isDaily(mirror.mode) ? "playing" : "not playing")
                 .accessibilityAddTraits(Self.isDaily(mirror.mode) ? .isSelected : [])
             Button("Practice") { send("mode.practice") }
                 .accessibilityLabel("Practise this level with more units")
+                .accessibilityIdentifier(port.identifier("practice"))
                 .accessibilityValue(mirror.mode == .practice ? "playing" : "not playing")
                 .accessibilityAddTraits(mirror.mode == .practice ? .isSelected : [])
         }
@@ -193,6 +214,7 @@ struct HueCompassControls: View {
             }
         }
         .accessibilityLabel("Choose an open level")
+        .accessibilityIdentifier(port.identifier("level-picker"))
         .accessibilityValue("Level \(mirror.levelNumber); levels 1 to \(mirror.frontier) open")
     }
 
@@ -232,6 +254,7 @@ struct HueCompassControls: View {
             ForEach(0..<Self.turns.count, id: \.self) { index in
                 Button(Self.turnTitles[index]) { send("compass.turn", [Double(Self.turns[index])]) }
                     .accessibilityLabel(Self.turnLabel(Self.turns[index]))
+                    .accessibilityIdentifier(port.identifier(Self.turnNames[index]))
                     .accessibilityValue("Bearing \(mirror.bearing) of 96")
             }
         }
@@ -244,6 +267,7 @@ struct HueCompassControls: View {
                 onDecrement: { presenter.pickBand((mirror.pickedBand + 23) % 24) })
             .fixedSize(horizontal: false, vertical: true)
             .accessibilityLabel("Hue band to select")
+            .accessibilityIdentifier(port.identifier("band-picker"))
             .accessibilityValue("band \(mirror.pickedBand + 1) of 24")
     }
 
@@ -252,9 +276,11 @@ struct HueCompassControls: View {
         row {
             Button("Probe") { send("compass.probe") }
                 .accessibilityLabel("Probe the bearing under the needle")
+                .accessibilityIdentifier(port.identifier("probe"))
                 .accessibilityValue("Bearing \(mirror.bearing), \(mirror.allowance - mirror.spent) units left")
             Button("Select") { send("compass.select", [Double(mirror.bearing), Double(mirror.pickedBand)]) }
                 .accessibilityLabel("Select the bearing under the needle with the picked band")
+                .accessibilityIdentifier(port.identifier("select"))
                 .accessibilityValue("Bearing \(mirror.bearing), band \(mirror.pickedBand + 1)")
         }
     }
@@ -264,15 +290,19 @@ struct HueCompassControls: View {
         row {
             Button("Undo") { send("play.undo") }
                 .accessibilityLabel("Undo the last turn")
+                .accessibilityIdentifier(port.identifier("undo"))
                 .accessibilityValue(Self.progressValue(mirror))
             Button("Redo") { send("play.redo") }
                 .accessibilityLabel("Redo the turn")
+                .accessibilityIdentifier(port.identifier("redo"))
                 .accessibilityValue(Self.progressValue(mirror))
             Button("Next level") { send("level.next") }
                 .accessibilityLabel("Go to the next level")
+                .accessibilityIdentifier(port.identifier("next-level"))
                 .accessibilityValue(Self.progressValue(mirror))
             Button("Reset view") { presenter.resetView() }
                 .accessibilityLabel("Return the camera to the authored view")
+                .accessibilityIdentifier(port.identifier("reset-view"))
                 .accessibilityValue("Bearing \(mirror.bearing) of 96")
         }
     }

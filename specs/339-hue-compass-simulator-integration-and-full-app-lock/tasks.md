@@ -23,7 +23,7 @@ tests stay short (< 10 s each; interface tests < 90 s, SC-R02G0409-001). No {own
 
 ## Phase 3: Story 1 — the game works inside the real app (P1) 🎯
 
-- [ ] T-R02G0409-003 [US1] Edit `Packages/ExperiencesRound02/HueCompass/Experience/HueCompassControls.swift`:
+- [X] T-R02G0409-003 [US1] Edit `Packages/ExperiencesRound02/HueCompass/Experience/HueCompassControls.swift`: — Verified 2026-11-21: 2026-11-21 sim-27 exit 0 on sim-27.2: HueCompassIdentifierTests (the 23 names of Q1, each once; turn names in turn order; port prefix experience.r02-g04.hue-compass) and every Hue Compass experience test
   identifiers `experience.r02-g04.hue-compass.<name>` through `port.identifier` (spec Clarifications Q1 names,
   unique; `identifierNames` lists them); with `Packages/ExperiencesRound02/HueCompass/ExperienceTests/HueCompassIdentifierTests.swift`
   (agent E: every name of Q1 is listed once by the controls' identifier list and has the prefix); `--name sim-27 --
