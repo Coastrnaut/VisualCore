@@ -21,7 +21,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 - [X] T-R02G0303-003 [P] [US1] Create `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperShaders.swift` (rope, solid sources; uniform names; caustic pulse) with — Verified 2026-11-21: 2026-11-21 host-2 exit 0 (shader sources, 14 tests: version, uniforms, no samplers or loops, fresnel, caustic, glow shell, gate edge)
   `Packages/ExperiencesRound02/WaveKnotKeeper/CoreTests/WaveKnotKeeperShaderSourceTests.swift` (version line, declared uniforms, no texture samplers,
   bounded loops); `--name host-2`
-- [ ] T-R02G0303-004 [P] [US1] Create `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperSceneGeometry.swift` (world points × 1/8, rope tube along the
+- [X] T-R02G0303-004 [P] [US1] Create `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperSceneGeometry.swift` (world points × 1/8, rope tube along the — Verified 2026-11-21: 2026-11-21 host-3 exit 0 (geometry, camera, CPU reference; 9 tests: finite at extremes, inside the view at 7 aspects, tube passes every straight part, crossing weights on over-strands only)
   polygon with rounded corners and parallel-transport frames at a tier, handle icospheres, gate cubes, crossing weights,
   camera down −z tilted 20° fitted for aspect 0.4 … 2.5 with a 5 % margin, `project`)
   with `Packages/ExperiencesRound02/WaveKnotKeeper/CoreTests/WaveKnotKeeperSceneGeometryTests.swift` (finite and bounded for extreme settings; projections of
