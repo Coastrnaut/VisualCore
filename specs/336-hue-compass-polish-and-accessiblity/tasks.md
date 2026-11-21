@@ -15,7 +15,7 @@ ImplementationLock-100.
 
 ## Phase 2: Story 1 — VoiceOver play (P1) 🎯
 
-- [ ] T-R02G0406-002 [P] [US1] [US3] Create `Packages/ExperiencesRound02/HueCompass/Core/HueCompassFeedbackPlan.swift` ("after(old:new:)" texts and kinds of
+- [X] T-R02G0406-002 [P] [US1] [US3] Create `Packages/ExperiencesRound02/HueCompass/Core/HueCompassFeedbackPlan.swift` ("after(old:new:)" texts and kinds of — Verified 2026-11-21: 2026-11-21 host exit 0: HueCompassFeedbackPlanTests 6/6 (turns, probes, undo, redo, band picks, campaign and practice wins, probe and selection failures, level and mode changes, every refusal code, summary with and without clues)
   clarification Q1: turn "Bearing b of 96, band h. Units s of a."; probe "Probe at bearing b: hue gap g bands, fog depth
   d. Units s of a." ("band" for g = 1); "Undone: " / "Redone: "; "picked(band:)" "Band h picked." (state, no haptic); win
   "The bearing and band match. Level won with s units, k of 3 stars." (no stars in practice); failure = the feature-335
