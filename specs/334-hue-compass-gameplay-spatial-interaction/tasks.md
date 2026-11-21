@@ -32,7 +32,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 4: Story 4 — play with the panel alone (P1)
 
-- [ ] T-R02G0404-004 [US4] Create `Packages/ExperiencesRound02/HueCompass/CoreTests/HueCompassPanelWinTests.swift` (agent D: all 100 certified levels won
+- [X] T-R02G0404-004 [US4] Create `Packages/ExperiencesRound02/HueCompass/CoreTests/HueCompassPanelWinTests.swift` (agent D: all 100 certified levels won — Verified 2026-11-21: 2026-11-21 host-4 exit 0 (agent D: all 100 certified levels won through the panel's actions — witness turns as ±4 and ±1 presses, probes, the selection — one test per band, each about 1–2 s)
   through the adapter actions the panel sends — a witness turn of k as ⌊|k|/4⌋ turns of ±4 and |k| mod 4 turns of ±1,
   then the probe and the select — split by band); `--name host-4`
 
