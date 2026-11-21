@@ -23,7 +23,7 @@ or {device} tasks (pure logic and host-generated content). Fixture seed 2_332; t
 
 ## Phase 3: Story 1 — every shipped level can be deduced (P1) 🎯
 
-- [ ] T-R02G0402-003 [P] [US1] Implement `HueCompassSolver` in `Packages/ExperiencesRound02/HueCompass/Core/HueCompassSolver.swift` (clarification Q2:
+- [X] T-R02G0402-003 [P] [US1] Implement `HueCompassSolver` in `Packages/ExperiencesRound02/HueCompass/Core/HueCompassSolver.swift` (clarification Q2: — Verified 2026-11-21: 2026-11-21 host-2 exit 0 (agent A: 10 solver tests: hand-made levels needing 1, 2 and more than 2 probes, a 0-probe level proven impossible (at least 87 candidates), equal to an independent brute force on 40 seeded levels, soundness and real ambiguities, work bound, determinism; about 7 ms per solve)
   candidates farther from the start than the bearing tolerance; classes by clues at the probe bearings via a 96 × 96 clue
   table; a class acceptable when its circular bearing span ≤ 2 × bearing tolerance and band span ≤ 2 × band tolerance;
   the empty set, then singles, then pairs in lexicographic order; work = sets tried ≤ 4,657; best single bearing and its
