@@ -25,6 +25,8 @@
 // Feature 337 (R02-G04-07) T-R02G0407-005 (FR-R02G0407-003, 004): the mirror carries whether a replay is available for
 // the current level and, during replay, its position; `startReplay`, `stepReplay` and `stopReplay` send the replay
 // actions; the first described core whose restore dropped results announces them once.
+// Gate X-R02-G04: `probes` declares the frame probes the verification runner samples: two background corners, outside
+// the wheel, fog and needle, must be the dark night clear while the real scene (not the fallback) is drawn.
 #if os(iOS)
 import Foundation
 import HueCompassCore
@@ -355,6 +357,16 @@ final class HueCompassPresenter: ExperiencePresenter {
         let result = send("mode.daily", Self.dateValues(date), port: port)
         if result.isAccepted { dailyDate = date }
         return result
+    }
+
+    /// The frame probes of the frame last drawn (gate X-R02-G04): the top-left and bottom-right background corners,
+    /// outside the wheel, the fog and the needle (the camera fits the scene inside a margin), are `dark` (the night clear)
+    /// once a snapshot was drawn by the real scene; none otherwise.
+    func probes(_ core: HueCompassExperienceCore) -> [FrameProbe] {
+        guard lastSnapshot != nil, scene.fallbackReason == nil else { return [] }
+        return [FrameProbe(name: "night-top-left", x: 0.02, y: 0.02, expected: FrameColorClass.dark.rawValue),
+                FrameProbe(name: "night-bottom-right", x: 0.98, y: 0.98, expected: FrameColorClass.dark.rawValue)]
+            .compactMap { $0 }
     }
 
     /// Whether `mode` is a replay (feature 337).

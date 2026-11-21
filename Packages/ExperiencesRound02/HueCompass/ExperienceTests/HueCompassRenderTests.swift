@@ -90,5 +90,30 @@ import VisualCoreExperienceHost
         let rgba: [UInt8] = try HueCompassTest.still(session)
         HueCompassTest.checkFrame(rgba, snapshot: try #require(shell.presenter.lastSnapshot), "level 21 after refusals")
     }
+
+    /// Gate X-R02-G04: the presenter's frame probes (two night corners) match the drawn still at every tier.
+    @Test func theFrameProbesMatchTheDrawnFrame() async throws {
+        let session = ExperienceSession()
+        defer { session.close() }
+        let shell = try await HueCompassTest.open(session, seed: 0)
+        for tier in 0..<3 {
+            HueCompassTest.pin(session, shell, tier: tier)
+            let still: [UInt8] = try HueCompassTest.still(session)
+            // The still is top-down; FrameChecks reads rows bottom-up, as RenderHost.readPixels gives them.
+            let row: Int = HueCompassTest.width * 4
+            var rgba: [UInt8] = []
+            for y in stride(from: HueCompassTest.height - 1, through: 0, by: -1) {
+                rgba.append(contentsOf: still[(y * row)..<((y + 1) * row)])
+            }
+            let probes: [FrameProbe] = shell.presenter.probes(try HueCompassTest.core(shell))
+            #expect(probes.map(\.name) == ["night-top-left", "night-bottom-right"])
+            for probe in probes {
+                let found = FrameChecks.probe(probe, rgba: rgba, width: HueCompassTest.width,
+                                              height: HueCompassTest.height)
+                #expect(found?.rawValue == probe.expected, "tier \(tier) \(probe.name): \(found?.rawValue ?? "none")")
+            }
+        }
+        session.qualityPin = 0
+    }
 }
 #endif
