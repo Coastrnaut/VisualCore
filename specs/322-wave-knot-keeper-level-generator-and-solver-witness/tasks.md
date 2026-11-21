@@ -23,7 +23,7 @@ or {device} tasks (pure logic and host-generated content). Fixture seed 2_322; t
 
 ## Phase 3: Story 1 — every shipped level can be solved (P1) 🎯
 
-- [ ] T-R02G0302-003 [P] [US1] Implement `WaveKnotKeeperSolver.solve` in `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperSolver.swift`
+- [X] T-R02G0302-003 [P] [US1] Implement `WaveKnotKeeperSolver.solve` in `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperSolver.swift` — Verified 2026-11-21: 2026-11-21 host-2 exit 0 (7 solver tests: known shortest 1-3, depth bound, equal to an independent plain search on 8 seeded levels, replay to a winning final, crossing refused, work <= 3,661, determinism)
   (clarification Q2: breadth-first search over `WaveKnotKeeperRules.moves`/`apply` to depth ≤ 3, visited ropes by points,
   ties by the rules' move order, work = ropes expanded, the first explored rope with a move refused as
   `r02-g03.move("crossing")` recorded as the crossing counterexample) with `Packages/ExperiencesRound02/WaveKnotKeeper/CoreTests/WaveKnotKeeperSolverTests.swift`
