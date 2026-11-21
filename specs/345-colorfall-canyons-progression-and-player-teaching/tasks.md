@@ -51,7 +51,7 @@ R02-G05-03 are unchanged).
   r02-g05.locked, r02-g05.date), `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsScenarios.swift` and the regenerated
   `Packages/ExperiencesRound02/ColorfallCanyons/scenario-manifest.json`, with
   `Packages/ExperiencesRound02/ColorfallCanyons/CoreTests/ColorfallCanyonsExperienceCoreTests.swift` updates (conformance; actions; migration of a
-  schema-1 payload; undo restores the digest with the tutorial advanced; schema examples registered; on levels 1 … 3 a
+  schema-1 payload; undo restores the digest with the tutorial advanced; (schema examples are registered with the in-app integration, R02-G05-09, as for Hue Compass); on levels 1 … 3 a
   scripted player following each instruction and the exact hints wins (SC-R02G0505-001); scenarios that use level.next
   (now the next open level) regenerated and replayed); `--name host-3`
 - [ ] T-R02G0505-005 [US1] [US2] [US3] [US4] Edit `Packages/ExperiencesRound02/ColorfallCanyons/Experience/ColorfallCanyonsPresenter.swift` and
