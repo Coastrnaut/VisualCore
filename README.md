@@ -78,7 +78,7 @@ evidence**: no physical-device test of the unified app has been run.
 | R02-G02 Lissajous Labyrinth | integrated (X-R02-G02 pass, 2026-11-21) — a free puzzle of a luminous Lissajous thread steered by four dials past violet obstacles through copper checkpoints in order: 100 solver-certified levels with witness files, dial rings and panel play, hints, stars, daily and practice modes, replay of the best solution, verified on the iOS 27.2 and 26.5 simulators | [architecture](docs/architecture/lissajous-labyrinth.md) |
 | R02-G03 Wave Knot Keeper | integrated (X-R02-G03 pass, 2026-11-21) — a free puzzle of a glass rope of lattice control points moved one step at a time until its projected crossings and writhe match the target, strands passing each other only inside sapphire gates: 100 solver-certified levels with witness files, handle drags, orbit and panel play, hints, stars, daily and practice modes, replay of the best solution, verified on the iOS 27.2 and 26.5 simulators | [architecture](docs/architecture/wave-knot-keeper.md) |
 | R02-G04 Hue Compass | integrated (X-R02-G04 pass, 2026-11-21) — a free deduction puzzle of a spectral compass: turn a glass needle over a 96-bearing hue wheel, probe for clues by hue gap and fog depth (grayscale glyphs carry the same information), then select the hidden bearing and hue band within the allowance: 100 solver-certified levels with witness files, swipe, hub-tap, orbit and panel play, hints, stars, daily and practice modes, replay of the best solution, verified on the iOS 27.2 and 26.5 simulators | [architecture](docs/architecture/hue-compass.md) |
-| R02-G05 Colorfall Canyons | in progress — rule kernel done (R02-G05-01, 2026-11-21): springs of cyan, coral and yellow light-fluid run downhill over a carvable canyon grid into basins, moved in whole units each 1/60 s tick with exact per-colour conservation; carving and valves within a budget, wins by fill and colour mix, failures by contamination, overflow and time; level generator and solver witness (R02-G05-02) next | [architecture](docs/architecture/colorfall-canyons.md) |
+| R02-G05 Colorfall Canyons | in progress — rule kernel done (R02-G05-01, 2026-11-21): springs of cyan, coral and yellow light-fluid run downhill over a carvable canyon grid into basins, moved in whole units each 1/60 s tick with exact per-colour conservation; carving and valves within a budget, wins by fill and colour mix, failures by contamination, overflow and time; 100 seeded levels each proven solvable by a smallest edit set, with witness files (R02-G05-02); renderer (R02-G05-03) next | [architecture](docs/architecture/colorfall-canyons.md) |
 | Other games of Rounds 2–4 | planned | [catalog](docs/catalog/experience-catalog.json) |
 | Games of Rounds 5–12 | backlog | [catalog](docs/catalog/experience-catalog.json) |
 | Physical-device testing | none run; waits for `ImplementationLock-100` | [support matrix](docs/release/support-matrix.md) |
@@ -86,7 +86,7 @@ evidence**: no physical-device test of the unified app has been run.
 
 Ledger totals today: the legacy ledger records **185 of 263** gates as passed (F00–F09 and the app phases
 A01-P00 … A19-P06, A20-P00 … A20-P06, A21-P00 … A21-P06, A22-P00 … A22-P06, A23-P00 … A23-P06, A24-P00 … A24-P06, A25-P00 … A25-P06); the unified-app ledger has 1,233 gates, with 29 experience gates (X-A01 … X-A25, X-R02-G01 … X-R02-G04), 11 unified-app features,
-24 shared round features, both governance milestones and forty-one round-two game features (R02-G01-01 … 10: Aurora Loom's rule
+24 shared round features, both governance milestones and forty-two round-two game features (R02-G01-01 … 10: Aurora Loom's rule
 kernel, its 100 solver-certified levels with witness files, its shader-drawn hero renderer, its touch controls and its
 teaching and progression (hints, failure explanations, tutorial, stars, daily and practice modes) and its polish and
 accessibility (announcements, haptics, Dynamic Type, slow fades, ambient sound) and its persistence and replay
@@ -120,7 +120,7 @@ re-certification, code-computed golden frames, memory cycles) and its in-app int
 schema examples, app unit and interface tests, Release symbol check) and its device preparation (eight pending device rows over
 twelve scenarios, a campaign plan and a rows check), integrated at X-R02-G04; R02-G05-01: Colorfall Canyons's rule kernel
 with exact downhill flow, whole-unit colour sharing, exact conservation and a contamination, overflow, win and time
-verdict) passed.
+verdict; R02-G05-02: its 100 seeded levels with an edit-set solver, per-tick digests and witness files) passed.
 
 ```bash
 python3 Tools/python/desktop_runbook.py status   # legacy gates: framework and app phases
