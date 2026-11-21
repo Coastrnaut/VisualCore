@@ -69,3 +69,7 @@ tests stay short (< 10 s each; interface tests < 90 s, SC-R02G0109-001). No {own
 001 → 002 (lead; agent A tests) → 003 (lead; agent E tests) → {004 (agents C, D), 005 (agent B), 006 (agent D)} → 007 …
 010, 012. 011 stays open until device testing. Shared files (examples source, registry, presenter, controls, project.yml,
 docs) stay with the lead. MVP: Stories 1 and 2.
+
+## Phase 7: Convergence
+
+- [ ] T-R02G0109-013 Extend the panel-layout test in `Packages/ExperiencesRound02/AuroraLoom/ExperienceTests/AuroraLoomAccessibilityTests.swift` so the panel is also laid out with a step pending (Apply and Clear shown) at the largest accessibility text size at 320 and 1024 points wide, within the window and the 520-point readable width, per edge case "Layout" / FR-R02G0109-008 (partial); `--name sim-27-3 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package --destination sim-27.2 --action test`
