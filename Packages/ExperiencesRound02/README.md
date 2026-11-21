@@ -210,3 +210,9 @@ Feature 335 (R02-G04-05) adds teaching and progression: `HueCompassHints` with `
 `HueCompassProgress` with `HueCompassMode` and `HueCompassTutorialStep`; the adapter gains level selection, daily,
 practice and campaign modes, the tutorial and snapshot schema 2.
 
+Feature 336 (R02-G04-06) adds polish and accessibility: `HueCompassFeedbackPlan` (announcements, haptics, refusal
+words, the summary text), `HueCompassLights` (eased marks and win glow, Reduce Flashing fades) and
+`HueCompassSoundRecipe` in the Core (which now uses VisualCoreAudioDSP), and `HueCompassSound` with the presenter's
+feedback route, the eased scene marks, a summary element, wrapping rows, a 520-point panel and a Sound toggle in the
+experience.
+

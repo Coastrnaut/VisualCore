@@ -130,3 +130,30 @@ large turn as single steps; the play accepts both.
   mode and the tutorial step are in snapshot schema 2 (migrated from 1); `level.select`, `mode.daily`, `mode.practice`,
   `mode.campaign` and `tutorial.dismiss` are the new controls, with `r02-g04.locked` and `r02-g04.date` refusals.
 
+## Polish and accessibility (feature 336, R02-G04-06)
+
+- **VoiceOver.** `HueCompassFeedbackPlan` turns every change into one announcement through the shared feedback route:
+  a turn ("Bearing 12 of 96, band 4. Units left 9 of 11."), a probe ("Probe at bearing 12: hue gap 3 bands, fog depth 14.
+  Units left 8 of 11."), undo and redo (prefixed "Undone: " / "Redone: "), a band pick ("Band 6 picked."), a win with stars
+  (none in practice), a failure with its explanation, a level or mode change with the tutorial instruction, and every
+  refusal in words (the panel shows the same words). Announcements count the units left of the allowance; the win names the units spent. Every clue is spoken
+  as numbers, so no colour needs to be seen. Every control has a label and a value; a summary element ("Compass") reads
+  the bearing, band, units and last clue ("No clues yet." before a probe); the band stepper is adjustable; rows become
+  columns at accessibility text sizes; texts wrap; the panel keeps a 520-point readable width.
+- **Haptics.** Selection for an accepted turn, probe, undo or redo; success for a win; warning for a failure; error for
+  a refusal; band picks, level changes and swipe previews play none. An action that ends the play (a selection, or a
+  probe that spends the last unit) plans only the outcome.
+- **Comfort.** `HueCompassLights` eases each probe mark (keyed by its bearing), the selection mark, the target ring and
+  the win glow over 0.15 s, or 0.45 s under Reduce Flashing where a started fade finishes before it turns back. A mark
+  that disappears (a retry, a level change) shrinks where it was; a selection or ring wanted at another bearing fades out
+  and then in. The marks' size follows the eased level (`markPart(_:lights:)`; without lights it is feature 333's mesh
+  exactly) and the win glow raises the needle's glow-shell gain up to twice the standard gain, still clamped by the
+  Reduce Flashing cap of 0.5. A still drawn at a time that does not advance settles, so it shows the state asked for.
+  The fog drift stays at 0.1 Hz and is still under Reduce Motion. Measured: at most 3 half-range crossings per second
+  and fades of at least 0.4 s.
+- **Sound.** An optional ambient loop (Sound toggle, off by default) from `HueCompassSoundRecipe`: a root at 110 Hz, a
+  partial at 110 Hz × (1 + g / 12) for the last clue's hue gap g (rounded to whole cycles of the 8-second loop, a unison
+  with no clue or g = 0), a fifth, the loop gain lowered by fog depth (1 − 0.4 · min(d, 90) / 90), an octave when won,
+  halved when failed; `HueCompassSound` plays it only while wanted, on screen and active, and rebuilds it only at level
+  openings, new clues, play ends and when turned on.
+
