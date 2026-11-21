@@ -110,6 +110,8 @@ band picker and Select; every level can be won this way.
 
 - **Second finger during a swipe:** the swipe is cancelled (nothing sent) and the gesture becomes an orbit.
 - **A press that moves:** beyond the tap distance it is a swipe, not a probe.
+- **A swipe through or ending in the centre:** points within the 20-point dead zone add no angle; the angle gathered
+  before stands, and the turn is sent at release as usual.
 - **Stage not playing (won, failed, paused):** swipes and presses send nothing.
 - **A swipe that winds more than half a turn:** the turn is the net angle, wrapped to −47 … 48 bearings.
 - **Orbit limits and every aspect 0.4 … 2.5:** the compass stays inside the view with a 5 % margin.
