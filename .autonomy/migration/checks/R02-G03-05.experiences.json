@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesCreative",
+    "--scheme",
+    "ExperiencesCreative-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test",
+  "elapsed_seconds": 380.18,
+  "exit_code": 0,
+  "finished": "2026-11-21T12:10:05+00:00",
+  "gate": "R02-G03-05",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G03-05.experiences.log",
+  "log_sha256": "c2787904ce6c21bcecd3a0de6e58200e366733c1ff623c0afbdc9f7a2451ab7b",
+  "name": "experiences",
+  "started": "2026-11-21T12:03:45+00:00",
+  "timed_out": false
+}
