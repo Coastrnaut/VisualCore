@@ -28,7 +28,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
   keys; SHA-256"; manifest; compare with the one-quantum fallback and the pinned-digest self-check), generate
   `Packages/ExperiencesRound02/WaveKnotKeeper/golden-frames.json` with `WAVE_KNOT_KEEPER_WRITE_GOLDEN=1`, and add `WaveKnotKeeperGolden` to
   `RELEASE_FORBIDDEN` in `scripts/release_check.py`
-- [ ] T-R02G0308-004 [P] [US2] Create `Packages/ExperiencesRound02/WaveKnotKeeper/CoreTests/WaveKnotKeeperRegressionGoldenTests.swift` (agent B: every frame's
+- [X] T-R02G0308-004 [P] [US2] Create `Packages/ExperiencesRound02/WaveKnotKeeper/CoreTests/WaveKnotKeeperRegressionGoldenTests.swift` (agent B: every frame's — Verified 2026-11-21: 2026-11-21 host-2 exit 0: WaveKnotKeeperRegressionGoldenTests 7/7 (fixed set; deterministic; every frame matches the pinned file; pinned digests self-check; missing, unreadable, schema-2 and unknown frames named; 2-quantum move, colour and tier detail fail, one quantum passes; hand-edited description refused)
   recomputed description matches its pinned one; each pinned digest equals the digest of its pinned description; a
   moved position beyond a quantum, a changed colour, a missing frame, an unknown frame, schema ≠ 1 and a hand-edited
   description all fail naming the frame; the file is rewritten only with the switch); `--name host-2 -- swift test
