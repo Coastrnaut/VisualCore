@@ -72,3 +72,7 @@ in this feature (the CPU flow step is the reference the renderer of R02-G05-03 w
 001 → 002 (lead) → {003 (agent A), 004 (agent B), 005 (agent C), 006 (agent D)} → 007 … 012. Agents C and D code
 against the play contract in contracts/api.md; shared files (package, error, level, flow, fixtures, docs) stay with the
 lead. MVP: Story 1.
+
+## Phase 7: Convergence
+
+- [ ] T-R02G0501-013 Document `ColorfallCanyonsGround` (open, rock, drain as stored), `ColorfallCanyonsLevel.kind(of:)` (`ColorfallCanyonsCellKind` is not Codable), `ColorfallCanyonsBasin.description`, `ColorfallCanyonsFluid.volume(_:)` and the replay's pause/resume alignment in `specs/341-colorfall-canyons-playable-rule-kernel/contracts/api.md` and `specs/341-colorfall-canyons-playable-rule-kernel/data-model.md` per plan: contracts (partial)
