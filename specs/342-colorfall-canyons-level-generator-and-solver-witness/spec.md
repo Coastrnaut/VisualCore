@@ -119,7 +119,7 @@ changes the pinned fingerprints and fails the checks.
 ### User Story 3 - Difficulty that means something (Priority: P2)
 
 Each level carries difficulty metrics from the solver's actual result: the smallest number of edits that wins, the number
-of distinct routings the solver examined, the colours and basins involved and the ticks to the win. Harder bands need
+of distinct routings the solver simulated, the springs, basins and protected basins involved and the tick of the win. Harder bands need
 more edits, never faster reactions.
 
 **Independent Test**: band by band, the mean smallest edit count does not fall; the catalog keeps the progression rule.
@@ -154,8 +154,8 @@ file is refused.
 - **FR-R02G0502-002**: A solver MUST find the smallest set of edits (carves and valve toggles) that, followed by running
   time, wins the level, searching every set up to a stated size, with its work bounded by arithmetic; every simulated run
   MUST assert exact conservation.
-- **FR-R02G0502-003**: Each level MUST carry difficulty metrics (smallest edit count, distinct routings examined, ticks to
-  the win, colours and basins involved) derived from the level and the solver.
+- **FR-R02G0502-003**: Each level MUST carry difficulty metrics (smallest edit count, distinct routings simulated, win
+  tick, spring, basin and protected-basin counts, carvable-cell count) derived from the level and the solver.
 - **FR-R02G0502-004**: Each level MUST have a versioned witness record (level, actions, win tick, per-tick digests,
   conservation totals, counterexamples); damaged, newer and edited files MUST be refused.
 - **FR-R02G0502-005**: The catalog of 100 levels MUST have a digest pinned in tests and MUST satisfy the shared
@@ -167,7 +167,7 @@ file is refused.
 
 - **Manifest entry**: number, planned seed, band, move budget.
 - **Solver result**: smallest edit count, a smallest edit set, the win tick, work.
-- **Difficulty**: smallest edits, routings examined, ticks to the win, colours and basins.
+- **Difficulty**: smallest edits, routings simulated, win tick, springs, basins, protected basins, carvable cells.
 - **Witness**: schema, the level's stored form, actions, win tick, per-tick digests, totals, counterexamples, skipped
   candidates.
 - **Catalog**: the 100 levels in manifest order with a digest.
