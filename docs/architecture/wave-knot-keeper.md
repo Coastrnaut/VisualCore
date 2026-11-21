@@ -53,6 +53,23 @@ allowance 1 … 64 and tutorial. Decoding re-checks every rule and the fingerpri
 refused. `WaveKnotKeeperRules` expresses the game as the R02-F23 `PuzzleRules` contract: a state is the rope, the legal
 moves are listed point by point and direction by direction, and a state is solved when it wins the level.
 
+## Content (R02-G03-02)
+
+- **Manifest.** `WaveKnotKeeperManifest` holds the 100 planned levels of the archived design (number, seed, band 1 … 5,
+  budget 8 … 19).
+- **Generator.** Candidate k of a level draws from `SeedDerivation.derive(seed, index: k)`: a solved rope of 5 + band
+  points at seeded angles of a fixed 32-direction integer table (with `band` neighbour swaps so the projection crosses
+  itself), gates on rope points (bands 1 … 5: 0, 0, 1, 1, 2), then a scramble walk of 1, 2, 2, 3, 4 legal moves that
+  prefers moves changing the signature. The tension bound covers the walk plus slack; the allowance is the budget. A
+  candidate is kept when its shortest solution lies in the band's range (1, 1–2, 1–2, 2, 2–3) and both counterexamples
+  exist; at most 64 candidates, else `r02-g03.generation`.
+- **Solver.** A breadth-first search over legal ropes to depth 3 (at most 3,661 ropes expanded for 10 points), the first
+  shortest sequence in the rules' move order, plus the first explored rope with a refused crossing.
+- **Witness files.** `docs/games/wave-knot-keeper/levels/NNN.witness.json` (schema 1): the level, the moves, the play
+  fingerprints, the terminal summary, a near miss and a refused crossing, the difficulty and the skipped candidates.
+  Decoding replays everything and re-runs the solver; `WAVE_KNOT_KEEPER_WRITE_WITNESSES=1` regenerates the files. The
+  catalog digest is pinned in the tests.
+
 ## Failures
 
 `WaveKnotKeeperError` reason codes: `r02-g03.level`, `r02-g03.move`, `r02-g03.stage`, `r02-g03.stale`,

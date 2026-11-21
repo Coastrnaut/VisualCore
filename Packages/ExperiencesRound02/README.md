@@ -143,3 +143,7 @@ with `WaveKnotKeeperSummary`, the play state `WaveKnotKeeperPlay` with `WaveKnot
 `WaveKnotKeeperMove`, `WaveKnotKeeperDirection` and append-only `WaveKnotKeeperRecord`s, and `WaveKnotKeeperRules` for
 the R02-F23 puzzle contract. Refusals are `WaveKnotKeeperError` with `r02-g03.*` codes. Rules:
 [docs/architecture/wave-knot-keeper.md](../../docs/architecture/wave-knot-keeper.md).
+
+Feature 322 (R02-G03-02) adds the content pipeline: `WaveKnotKeeperManifest` (100 planned levels), the seeded
+`WaveKnotKeeperGenerator`, the breadth-first `WaveKnotKeeperSolver`, `WaveKnotKeeperDifficulty` and versioned witness
+files (`WaveKnotKeeperWitness`) under `docs/games/wave-knot-keeper/levels/`, with a pinned catalog digest.
