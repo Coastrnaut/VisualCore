@@ -62,6 +62,20 @@ public enum HueCompassFailure: String, Sendable, Codable, CaseIterable {
     case probes
 }
 
+/// The bearing and band a play selected.
+public struct HueCompassSelection: Sendable, Hashable, Codable {
+    /// The selected bearing, 0 … 95.
+    public let bearing: Int
+    /// The selected hue band, 0 … 23.
+    public let band: Int
+
+    /// A selection of the given values (not checked).
+    public init(bearing: Int, band: Int) {
+        self.bearing = bearing
+        self.band = band
+    }
+}
+
 /// The append-only record of one accepted action.
 public struct HueCompassRecord: Sendable, Equatable, Codable {
     /// The record schema (``HueCompassPlay/schema``).
@@ -113,6 +127,8 @@ public struct HueCompassPlay: Sendable, Equatable {
     public private(set) var records: [HueCompassRecord]
     /// Why the play failed, or nil.
     public private(set) var failure: HueCompassFailure?
+    /// The bearing and band selected, or nil before the selection.
+    public private(set) var selection: HueCompassSelection?
     /// Turns that undo can revert, latest last.
     private(set) var undoStack: [Int]
     /// Turns that redo can re-apply, latest last.
@@ -127,13 +143,16 @@ public struct HueCompassPlay: Sendable, Equatable {
         clues = []
         records = []
         failure = nil
+        selection = nil
         undoStack = []
         redoStack = []
     }
 
     /// The SHA-256 hex (``StableHash``) of the bytes, in order: the schema (one byte); the level fingerprint (UTF-8);
     /// the bearing and the units spent (one byte each); each clue's bearing and hue gap (one byte each) and depth (two
-    /// bytes, big-endian); the stage's raw value (UTF-8); the failure's raw value (UTF-8, nothing when there is none).
+    /// bytes, big-endian); the stage's raw value (UTF-8); the failure's raw value (UTF-8, nothing when there is none);
+    /// after a selection, a zero byte and the selected bearing and band (one byte each), so a record's next fingerprint
+    /// pins the selection itself, not only its verdict.
     public var fingerprint: String {
         var bytes: [UInt8] = [UInt8(truncatingIfNeeded: Self.schema)]
         bytes.append(contentsOf: Array(level.fingerprint.utf8))
@@ -147,6 +166,11 @@ public struct HueCompassPlay: Sendable, Equatable {
         }
         bytes.append(contentsOf: Array(stage.rawValue.utf8))
         if let failure { bytes.append(contentsOf: Array(failure.rawValue.utf8)) }
+        if let selection {
+            bytes.append(0)
+            bytes.append(UInt8(truncatingIfNeeded: selection.bearing))
+            bytes.append(UInt8(truncatingIfNeeded: selection.band))
+        }
         return StableHash.sha256Hex(bytes)
     }
 
@@ -218,6 +242,7 @@ public struct HueCompassPlay: Sendable, Equatable {
             spent += 1
             undoStack.removeAll()
             redoStack.removeAll()
+            selection = HueCompassSelection(bearing: selected, band: band)
             if level.accepts(bearing: selected, band: band) {
                 stage = .won
             } else {

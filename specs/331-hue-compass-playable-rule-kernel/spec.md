@@ -57,7 +57,8 @@ as the pattern (Core with level, play, records with previous and next fingerprin
   (a clue once seen cannot be unseen). Impact: FR-R02G0401-006; SC-R02G0401-002.
 - Q: How are records, fingerprints and stored forms defined? → A: as in R02-G03-01: every accepted turn, probe,
   selection, undo and redo appends a record (schema, level seed, tick, kind, operands, previous and next fingerprints);
-  the play fingerprint is the SHA-256 of the schema, level fingerprint, bearing, units spent, clues and stage; levels
+  the play fingerprint is the SHA-256 of the schema, level fingerprint, bearing, units spent, clues, stage,
+  failure and the selected bearing and band, so a record pins the selection itself; levels
   are JSON schema 1 with sorted keys and a fingerprint (the target and offset included; 96 fog densities), re-checked on
   decode; reason codes `r02-g04.level`, `.action`, `.stage`, `.stale`, `.allowance`, `.newer-schema`, `.malformed`.
   Impact: FR-R02G0401-005 … 010; SC-R02G0401-002, 005.

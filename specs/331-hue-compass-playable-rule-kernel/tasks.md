@@ -33,7 +33,7 @@ recorded only after every agent has reported). Commit after every task with its 
 
 ## Phase 4: Stories 2 and 3 — miss, run out, undo, redo, replay (P1)
 
-- [ ] T-R02G0401-004 [P] [US1] [US2] [US3] Create `Packages/ExperiencesRound02/HueCompass/Core/HueCompassPlay.swift` (stages "loading, tutorial,
+- [X] T-R02G0401-004 [P] [US1] [US2] [US3] Create `Packages/ExperiencesRound02/HueCompass/Core/HueCompassPlay.swift` (stages "loading, tutorial, — Verified 2026-11-21: 2026-11-21 host-3 exit 0 (play by the lead, 9 tests by agent B: 500 known solutions win exactly at the selection; every refusal in order stage, stale, range with no change; both failures; undo/redo exact; 500 seeded traces replay, tampered traces refused; full stage table; fingerprint against an independent byte statement). Agent B found that a selection changed within its verdict replayed; the lead pinned the selected bearing and band in the play fingerprint (spec Q5 updated) and the tamper test now catches any changed selection
   playing, paused, won, failed, result"; actions validated for range, stage, previous fingerprint, allowance; turns free,
   probes and selections spend one; a probe spending the last unit fails `probes`; a selection wins or fails
   `selection`; records with previous and next fingerprints; turn-only undo and redo, cleared by a probe or selection;

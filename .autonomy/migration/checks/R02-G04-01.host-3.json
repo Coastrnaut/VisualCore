@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "HueCompassPlayTests"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter HueCompassPlayTests",
+  "elapsed_seconds": 3.1,
+  "exit_code": 0,
+  "finished": "2026-11-21T15:06:17+00:00",
+  "gate": "R02-G04-01",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G04-01.host-3.log",
+  "log_sha256": "e8ec8cec92b226a9487be1e69e5b4a30d904c959ace525c1c2d703a08b223834",
+  "name": "host-3",
+  "started": "2026-11-21T15:06:14+00:00",
+  "timed_out": false
+}
