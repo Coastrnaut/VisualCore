@@ -80,7 +80,7 @@ observations after ImplementationLock-100.
 - [X] T-R02G0506-011 Script tests, run alone (`--name script-tests`) — Verified 2026-11-21: 2026-11-21 script-tests exit 0, run alone (.autonomy/migration/checks/R02-G05-06.script-tests.json)
 - [ ] T-R02G0506-012 {device} After ImplementationLock-100, on D1, D2 and D3: hear the ambient sound, feel the haptics,
   play level 1 with VoiceOver and the largest text size (SC-R02G0506-001 … 004 on hardware). Not run before the lock.
-- [ ] T-R02G0506-013 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+- [X] T-R02G0506-013 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record — Verified 2026-11-21: 2026-11-21 converge round 1 appended T-014 (done), round 2 clean; sealed 19 passing, 1 failed attempt (sim-27 first run); recorded pass (.autonomy/migration/evidence/R02-G05-06.json)
 
 ## Dependencies and parallel work
 
