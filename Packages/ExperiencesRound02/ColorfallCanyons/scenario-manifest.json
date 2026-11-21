@@ -1,0 +1,3020 @@
+{
+  "controls" : [
+    "canyon.carve",
+    "canyon.valve",
+    "time.step",
+    "play.undo",
+    "play.redo",
+    "level.next"
+  ],
+  "experience" : "r02-g05.colorfall-canyons",
+  "kind" : "game",
+  "round" : 2,
+  "scenarios" : [
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+        "initialDigest" : "4ca0d1899ef8a997b0314afb0431d648b98ac91e5c7fc64b4e88639070895625"
+      },
+      "name" : "launch-first-frame",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "152cc36dd8282a091615eb46741ee01ece896109b761bd38b966ddf4a7506b83",
+        "initialDigest" : "4ca0d1899ef8a997b0314afb0431d648b98ac91e5c7fc64b4e88639070895625"
+      },
+      "name" : "input-response",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              10
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              10
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              120
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "outcome" : "won"
+      },
+      "name" : "completion",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              120
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              -1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "canyon.valve",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              601
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              1.5
+            ]
+          },
+          "result" : "action.rule.r02-g05.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "canyon.valve",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "action.rule.r02-g05.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              2.5
+            ]
+          },
+          "result" : "action.rule.r02-g05.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              4
+            ]
+          },
+          "result" : "action.rule.r02-g05.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "canyon.valve",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g05.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g05.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g05.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              1,
+              2
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "4ca0d1899ef8a997b0314afb0431d648b98ac91e5c7fc64b4e88639070895625",
+        "initialDigest" : "4ca0d1899ef8a997b0314afb0431d648b98ac91e5c7fc64b4e88639070895625"
+      },
+      "name" : "rejection",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "152cc36dd8282a091615eb46741ee01ece896109b761bd38b966ddf4a7506b83",
+        "initialDigest" : "4ca0d1899ef8a997b0314afb0431d648b98ac91e5c7fc64b4e88639070895625"
+      },
+      "name" : "save-restore",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "initialDigest" : "4ca0d1899ef8a997b0314afb0431d648b98ac91e5c7fc64b4e88639070895625",
+        "resetDigest" : true
+      },
+      "name" : "reset",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "suspend-resume",
+      "seed" : "0"
+    },
+    {
+      "cycles" : 5,
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "teardown-reentry",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "cancel-prepare",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              10
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              10
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              120
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              21
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              21
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              103
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              107
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1251bf28896ac3ad107be97ebbc9041fcc801b97843b4821e3e049b8470600b2",
+        "initialDigest" : "4ca0d1899ef8a997b0314afb0431d648b98ac91e5c7fc64b4e88639070895625",
+        "outcome" : "won"
+      },
+      "name" : "full-playthrough",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "152cc36dd8282a091615eb46741ee01ece896109b761bd38b966ddf4a7506b83",
+        "initialDigest" : "4ca0d1899ef8a997b0314afb0431d648b98ac91e5c7fc64b4e88639070895625"
+      },
+      "name" : "hero",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              601
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "04a2f1eaf483c1d0cbec2913bdc109f23ac2afb5359e792a4077ae0f469d8724",
+        "initialDigest" : "dd035290ac7f498b3ca707c706b49acf210ba570bdf8d4d28b08aa429248e921"
+      },
+      "name" : "acceptance-001",
+      "seed" : "22"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              11
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "78eb81fa44fbc51425baac52b31588a5e2e29505641050ae7e84a06789ee434d",
+        "initialDigest" : "92ae719c3e43a38e91c4515c7ff3dc8daf6ae187bf9e60b64f9e2db7a25ddfbb"
+      },
+      "name" : "acceptance-002",
+      "seed" : "29"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              601
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "36c63ed5b4f096b96c7d1062ea90b49bb8605fd98ce894d3708229d0ef9c8383",
+        "initialDigest" : "47bbcdc5536ff90ba8b9750fe1d3ea75e1e1ebd847bcec999d845afb97dc8223"
+      },
+      "name" : "acceptance-003",
+      "seed" : "36"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              9
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a331e7b25732f2de83a58fb7f2548ccae1ca2aad7e466ef138e0ba15c878b019",
+        "initialDigest" : "ed6a199f3977a409b93fffe140ff357c1139a97faab196b03154ccf00e5d34e1"
+      },
+      "name" : "acceptance-004",
+      "seed" : "43"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              601
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "720745fbb8d2ed3a5af819f5c4d3adfaf8d0a5d28b2a2b4cf6db2f698f5466ba",
+        "initialDigest" : "e1f13e07bde3df2d8ecb741b43a704a87d07e0dca2d7920be20533e2758951b2"
+      },
+      "name" : "acceptance-005",
+      "seed" : "50"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1206d852358d1bec8f6aaaa55aa0b89d1b93ec40a1103e02271899c9034e0c4a",
+        "initialDigest" : "58c1d1f7eca380002bf7d3dfb96eaddfe01e22261a09f71d36c0eb43ec9765b2"
+      },
+      "name" : "acceptance-006",
+      "seed" : "57"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              601
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ed4d5024175f9de25d6dad1f5fed3f5a43f99886c4b97761af19807fd8103039",
+        "initialDigest" : "1b1f8444d1aa99dffe566f5b512e231c5049b5959acb3f3b5eb116f2407f26d2"
+      },
+      "name" : "acceptance-007",
+      "seed" : "64"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              15
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1f4b61447bf24f6d9f93f97d9106cb08ae5fe47b1902d1e6616df26e05111763",
+        "initialDigest" : "55dd70a6feadf8295aea9e3f03285b33a0ccbe4f5d5c4bfb21db529ff61a871a"
+      },
+      "name" : "acceptance-008",
+      "seed" : "71"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              601
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7a6d2197175a5ebb812ebd081301dd3fbc606d5d4ebd91bf15b6794417036cf7",
+        "initialDigest" : "991c364a8e5dbd6367d9909338c7a0761071ff2274618a2dbe8e4b650ac3099f"
+      },
+      "name" : "acceptance-009",
+      "seed" : "78"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              19
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "0cf699015c9007b434d71e8ceaa3ebb320da9f29a616b439bef0d657745fe63f",
+        "initialDigest" : "b07773250f30e2973873327265eb0306970bafe01f07ac94eb101ecedd884854"
+      },
+      "name" : "acceptance-010",
+      "seed" : "85"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              9
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              601
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e907dcbd82df57beacfebae0a6f90cd9b73d3a90b87e4903db84332ba121ee5f",
+        "initialDigest" : "86df9306db2b18ac9777c02b860e9c0121a59aba0f69ee9f5d2daf6c7d283fd4"
+      },
+      "name" : "acceptance-011",
+      "seed" : "92"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              11
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e7e494a0033cb8d5e6e7175563eb308756fe21d9270118295757d5e99262831c",
+        "initialDigest" : "0c971378152d0b77f0d210e0153dec381fa8d41b21534ba1dde9b23a738e6145"
+      },
+      "name" : "acceptance-012",
+      "seed" : "99"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              601
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5a45fc713d0862c81fd8f9a02bacda5a4f8a6deb7bcbb5ae14144d5bf5e9baa7",
+        "initialDigest" : "985d2501775ee206f3a388b24b5ab002828e111657067ec4e487c59e63b6232a"
+      },
+      "name" : "acceptance-013",
+      "seed" : "6"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              11
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1f6d6d64549036a15399a735c5e0ed6d80e80bff72232ad7811653f28f6eec7e",
+        "initialDigest" : "5b903d0caf8e90e9759a9a9d0573a577075d78ed05d70a46e727bd11c52c8cab"
+      },
+      "name" : "acceptance-014",
+      "seed" : "13"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              601
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "eb7f83d1f11c020419d03ea97b479fa9a76d4d47ee638b2c0acabcd7018efe34",
+        "initialDigest" : "7d48a7c974b86ac4b78a0efe07bdc843bd9b7cac7f2a941db66484c36501a2c3"
+      },
+      "name" : "acceptance-015",
+      "seed" : "20"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d97352ffd419a109275114a133cbcf921d991d4e23ee45eb5645f55205b31644",
+        "initialDigest" : "7086454ce25be8dfa1d28b33354554207144755a707e4465471ef3fb13a22af1"
+      },
+      "name" : "acceptance-016",
+      "seed" : "27"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              8
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              601
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "0a6ed2f9c5d522e6907cde2ae3b8222eed4d0b50d7a3d9a87a966b691a86ffda",
+        "initialDigest" : "83888afb26f90dd94ac6a02e6134fc836127515306b2e86f04c27661565b5e8b"
+      },
+      "name" : "acceptance-017",
+      "seed" : "34"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8e06e6d64c55c187d3cb79b46b9a8be59c1d7aaeb22c57a1a9e03557cd3c14b5",
+        "initialDigest" : "bead99da6ad69dde4f6a68d1468416d3437e890eca5c2cf5499d6e1d19ad1cdd"
+      },
+      "name" : "acceptance-018",
+      "seed" : "41"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              19
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              601
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "3006c08175539c7966b8702d1787884aebf0d223814fb006012d72b68a1d4efb",
+        "initialDigest" : "f09a0b2d1405d631392d6d077762dfafcd656a7cb40786b8107efa9f5e534b4f"
+      },
+      "name" : "acceptance-019",
+      "seed" : "48"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              10
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d15e5350790be2cbe11253f3681f285b9c1f36372f4c7602364a3218a10c97db",
+        "initialDigest" : "80141f03b197aca5fe72dffd4fe2ac21ee7690dcba6627727ce1f8394df9c042"
+      },
+      "name" : "acceptance-020",
+      "seed" : "55"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              15
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              601
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7d6b3abdf953d14058d5ee97af8106a97acb97c696887bd637cee74b5d68aa06",
+        "initialDigest" : "43ebdf2ce2faf3164756e6b1a81976f0b38580396b517648370ab53f51a92294"
+      },
+      "name" : "acceptance-021",
+      "seed" : "62"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "dd8faa7cfac2d0d2161c11673d6c65b40b0e2b618ca71e79bfc4955ae8feb9ac",
+        "initialDigest" : "8d01f6a195320b5e868eb5bbf7133016674b24a56359421130c9eda2abc16a65"
+      },
+      "name" : "acceptance-022",
+      "seed" : "69"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              601
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "08c43ba059e417aac8c75bec649c9cf638a6428a3a789c05b1eb0de02bb401b8",
+        "initialDigest" : "f035f08194e95f998e0629d8b3c735659465af85ad7e0b385b72ce06592f5bef"
+      },
+      "name" : "acceptance-023",
+      "seed" : "76"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              11
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6fd3dee41e3510223cffefe0d94befc6110b724e2725c23027261365aa01f36b",
+        "initialDigest" : "0ba4a897eb0d85d68b63d55b13737710a6dd16eab7d2c3240e1794ec2e63eccd"
+      },
+      "name" : "acceptance-024",
+      "seed" : "83"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              9
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              601
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "bcbb89a60ed4bf4acd677e00d28d46cb8dc09740d90ee0fa27384e1fc9d872e7",
+        "initialDigest" : "2f0b5402ed6e484a89728d6616097b7b5f290209d97c858db98578a23080d7de"
+      },
+      "name" : "acceptance-025",
+      "seed" : "90"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              22
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7d62d8d85bf0ba3ae084c21c79b72723cdb2e970aa41de1ebd6411c7883461d8",
+        "initialDigest" : "ee14ec7d3f6ca075a4c3871f3fcc95f6b87c2c57b8645fd0769bc88b239673fb"
+      },
+      "name" : "acceptance-026",
+      "seed" : "97"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              14
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              601
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "2e7e7c4818dcd907e963e2a1c77a0627710dbeed07ef0c9a25075ccd64aafb44",
+        "initialDigest" : "8b51d52d2edb4a52c4a94ceb09a5ca8304427887625ae9bbe5b4bea717455c3c"
+      },
+      "name" : "acceptance-027",
+      "seed" : "4"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              13
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "33635bdbaf4adb6610842cecb1dfab98dc63ae6d27e1c3beff98d6ea17e9080d",
+        "initialDigest" : "59b8e4ab7c5faf33cf64c5a3ae5c401d5c8cc75876bc3c80ebec48a3f2d7dc99"
+      },
+      "name" : "acceptance-028",
+      "seed" : "11"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              9
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              601
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5f0b25fdb8f576838ddbbe503791b5091795170eae37fd13758b08573c1b73ee",
+        "initialDigest" : "c3f334ecc927a0c82a4629eee905b69009015e5383d0f22722b912f94bbace71"
+      },
+      "name" : "acceptance-029",
+      "seed" : "18"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              11
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b06c9ddd9d2d5ff43f94f624ec829e7fe1d0a367b5daa67eef1e3330d41fecd1",
+        "initialDigest" : "cabd5a4cf50d26cf015b87d4496624a9921428905e9cd07e7cabdfd894756c11"
+      },
+      "name" : "acceptance-030",
+      "seed" : "25"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              601
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ac2dd7a9a588b41028d200cbd7ff574283e4557f98be501f8f4316ab0b3801f3",
+        "initialDigest" : "de6f678dfbb3b0c719b244770be53e79f7b425107abe6fd1deb4da45451c3016"
+      },
+      "name" : "acceptance-031",
+      "seed" : "32"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f4fbb699261be8917fca78e728eb997c344d6ef98bc6bfabdba0ca678c9b57ae",
+        "initialDigest" : "5085cf8fcd9fc1091ecb3ced823d6125be224ad6e046065902e145c0fd9d2c3b"
+      },
+      "name" : "acceptance-032",
+      "seed" : "39"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              13
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              601
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5ae27fc79e30b69570cb7d4c28cd452c2e91d60df827244673696a51d0829658",
+        "initialDigest" : "a92565f93085378fd396d68b31de157158e84e6404160cdf17e5d6156494f890"
+      },
+      "name" : "acceptance-033",
+      "seed" : "46"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              15
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "83cfe50f3d43c856b2ffe615bdebb4fc5f354bb4f1cf48a1c4ca6213b1d28670",
+        "initialDigest" : "88b0ebc2a4da20d4c7e78fdf0c1e0bb17037466ee739189ef9cd803074aedf32"
+      },
+      "name" : "acceptance-034",
+      "seed" : "53"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              15
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              601
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1f0541220c5a83d652174fc37753adc083f316f579a7e6655f9ea28c458d4707",
+        "initialDigest" : "76cd902bd65c839f8b897988a2cc0e5e9fb9fac7a1a54eaadc260eb2317644e5"
+      },
+      "name" : "acceptance-035",
+      "seed" : "60"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              18
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "cc23c545b20179846b41d0e5bdf3b7421f1435cd5291e42a68e042fb15604eb0",
+        "initialDigest" : "ff48310fa0f7b58d9837ab450b247e3977fb154314c30c656ca8244127bc9311"
+      },
+      "name" : "acceptance-036",
+      "seed" : "67"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              601
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "98c8f9a45c9d1cb36da9194291198a395afa52882561803644cd3cc78f2f97f6",
+        "initialDigest" : "3c5e782068e44efd6ea7747d7c297aa3ec07fa67682ffb3ea553f878a60bc841"
+      },
+      "name" : "acceptance-037",
+      "seed" : "74"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "cf43af8b1b8aae721067960007fc187a2c54759b3a617108ef152694a1a1049b",
+        "initialDigest" : "517b16b3f308981319b29875b63c38dab5d1b6e5ced3579990aadc21e7fb52d1"
+      },
+      "name" : "acceptance-038",
+      "seed" : "81"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              14
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              601
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "29e8e8db8f43ab0e04a0bf2a2d45c07eed16e8fdee7c33797b334cd8290c33ae",
+        "initialDigest" : "d9800623ae78dbb302e23f9abead88ad64b2ff28dce8b90fb336a8f1f086f5d4"
+      },
+      "name" : "acceptance-039",
+      "seed" : "88"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              10
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e8eaa5cd9a64def50bf279e362f0cd6162659512f8dc9535acd8f2f9bfb8d208",
+        "initialDigest" : "cf0637ad62cafb2c53c59f98820e7e11e40292714cf6d228e4dd63f6e659db8d"
+      },
+      "name" : "acceptance-040",
+      "seed" : "95"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              601
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8e8231d91ee9bf1a1b3302babababb2fc49243bf72ebf0c4e148c6ebdccab2c8",
+        "initialDigest" : "dca8a38528d99617684ca60d3fcac695422fb64a46f97dc6d05ad8872048f08e"
+      },
+      "name" : "acceptance-041",
+      "seed" : "2"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              9
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "af6a5400c08bb66b9672867ba8bb96d813cac9b998e1dcf78566f27836b3a0e3",
+        "initialDigest" : "fe51a9c64f016c617259337fc2e9139f4a6c2d7bc9a1758244bb5fd3e0b36899"
+      },
+      "name" : "acceptance-042",
+      "seed" : "9"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              15
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              601
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "259054cc00b357b5a179a6d7870054e4edabe3f2b1d3e2bee4cd459498f8f3f2",
+        "initialDigest" : "faa07b911e022b23b55ea557103762479ffbf93080a83115d356736d9ad986f4"
+      },
+      "name" : "acceptance-043",
+      "seed" : "16"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5d75e55f5de24aa998617778c66e14451b3e2ff307f9dfc6b0002832a9952af5",
+        "initialDigest" : "5d79f86083e90d8c87a0a24753d0ce65c1a2562acb6baf8085f49f9c3b00d3b7"
+      },
+      "name" : "acceptance-044",
+      "seed" : "23"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              9
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              601
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e6b6eae3b0d0064486eccdbbdbf74db51c5c0da781071adaaf596e1870e363a1",
+        "initialDigest" : "50a857fa04c601bb0d6466bd50c8e3b81485a9527a01099df7597db6c497967e"
+      },
+      "name" : "acceptance-045",
+      "seed" : "30"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              8
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a248ba425b6666bbf9cb31c00307f77dffe37427202c549736c3d5a418c09fc2",
+        "initialDigest" : "dbe1813b6a3b72c7011eb55f51dfae1e79e62069d2963ebc6494422f378932b0"
+      },
+      "name" : "acceptance-046",
+      "seed" : "37"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              601
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "bb515bf6983766f0fa4b611f7956f2698cff99e1fc07846f4919a370bb34d78b",
+        "initialDigest" : "bcdc589537e6e2f9819eb643ff4b6e3ec3d2391de636b9d1369cceab175eb4f8"
+      },
+      "name" : "acceptance-047",
+      "seed" : "44"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              8
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ac27e29770a8ec51003375b3e0c4d3872495bc992d292dbacc93365358dabf04",
+        "initialDigest" : "c29082b7588985ca5290395cd17281f91345a49d911f271aafe5b4a86df70d35"
+      },
+      "name" : "acceptance-048",
+      "seed" : "51"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              601
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "3b4ce57a15df0d801fa4ce3d66c0635d8a715f022afaa7237a4f0fa71a6f73d3",
+        "initialDigest" : "fbe196d6a7787f0eb05e76c624d7365a4689a56114d2d345afc9c3fc5e230891"
+      },
+      "name" : "acceptance-049",
+      "seed" : "58"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              9
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a6993a353068a194a739ba19b127a7413ef015bccf078af47bdce36a11f3babb",
+        "initialDigest" : "2d30a46271f1629cceabc5bf4441d361c2f28336a7f673be38728185bddf8f23"
+      },
+      "name" : "acceptance-050",
+      "seed" : "65"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              8
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              601
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f6e8c3ab287910b45b4e2eb351db1e5da678654f69b811a4d465981ea72c475c",
+        "initialDigest" : "c80d9ae1ccef3d6aaef7c0c391f25cd53ad036593a3564aea18d89e41f2abd0a"
+      },
+      "name" : "acceptance-051",
+      "seed" : "72"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              15
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "52dfca649b9f6ddcd46f2001d263ced43950b2072fdf1a7a0d9b3c888f47f454",
+        "initialDigest" : "2653af03eb242418533b65e5bdb607edf76f7a32b597f7c369971bb935c8705f"
+      },
+      "name" : "acceptance-052",
+      "seed" : "79"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              8
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              601
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "c3ad3fa43753b1dd3d00c86bd6a70347cec31ffec7762909e048303c42c97732",
+        "initialDigest" : "6456d7d0328be031ab8ccf0cb7b9e80eea1bef5b8c36bdefa9ee7acfce92c25a"
+      },
+      "name" : "acceptance-053",
+      "seed" : "86"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "13dc1d148834d6fc2d5f6d6ff2721f812662d80fd7587681aa5dc00e70371ee4",
+        "initialDigest" : "be6b2f03b7970bdfdc1a937a815045c1d79b7639299ad8becfa0878f9b4e85b7"
+      },
+      "name" : "acceptance-054",
+      "seed" : "93"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              10
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              601
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9bf0b3392ff2bf9dcd574b0e955b5a5c3bcf8465e54b4cc0a2b3f01390a2838d",
+        "initialDigest" : "4ca0d1899ef8a997b0314afb0431d648b98ac91e5c7fc64b4e88639070895625"
+      },
+      "name" : "acceptance-055",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              20
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8cf5c6f965f33380a840d03e776541b223b67732d761b369ca183e540e4af537",
+        "initialDigest" : "925861a7dcc51b8b2a3772de2b97e788fedbc93b3f304bcdb4b58e5ed4f27d8f"
+      },
+      "name" : "acceptance-056",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              11
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              601
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "93e2baba9956dcaec800f68c5cd2648c33d8c2ed5dfd57a470b7429fcea42218",
+        "initialDigest" : "46813524b945f3cf21261a696a62573ceeaa590d14ae49832894ad8a342ad71a"
+      },
+      "name" : "acceptance-057",
+      "seed" : "14"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              15
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "82f25169ad772b8bdb71d657df09609e11272acc9f819c550ff460ede93f9c5d",
+        "initialDigest" : "febcd55df05e7f5f1c22f7c6f6f7233517dd91b8495751522ae323f2d59c3ac6"
+      },
+      "name" : "acceptance-058",
+      "seed" : "21"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              10
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              601
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "000303f1fc6d9c6c81890943ea78cf7f18b9d65fc62ae91b353f4ae6d1d1ca9a",
+        "initialDigest" : "526b4c65f755fd25601c82e8d1c03b4a2f1dfb57db5139d9b1190c82469ed146"
+      },
+      "name" : "acceptance-059",
+      "seed" : "28"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              13
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8c571bb24858421856f55829350a52aacc038b425cbd55d703b9f38ab36f9d87",
+        "initialDigest" : "6a57ac15e2567d4248ddd6c9f1f2e9f1706c74e4c5c3a17b459d2b286b3fb8e8"
+      },
+      "name" : "acceptance-060",
+      "seed" : "35"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              601
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f9e700dee3041f53bb897bda5629ec114461ec9e6d74d3ed70a4a7b1f8627eec",
+        "initialDigest" : "cc269d1506d65e3984bbe2433559fce42f9b17566c44ec1901fc2301c8e1758e"
+      },
+      "name" : "acceptance-061",
+      "seed" : "42"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              10
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "731e46ef48bc50773e85d3c75b0466ee4ed3971d5d60dd6ea30eed6e04813881",
+        "initialDigest" : "c2c3ca2a99faef90a773e9eeb5a4695e9484477ee3eeb7a4ec948e687b4d10bc"
+      },
+      "name" : "acceptance-062",
+      "seed" : "49"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              601
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b74de565f24c2b3acb6d694a14eda5da9e33bd8ffac2f2cd6af033ddac4abc23",
+        "initialDigest" : "21af67e9a14111d52fe9512916bca1f1db2495fb39977d52d86c504d47fa8d76"
+      },
+      "name" : "acceptance-063",
+      "seed" : "56"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              15
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f7b9333c02b49f60a65a3f41320dfe08fbe96e68e5491a0293991520d672246a",
+        "initialDigest" : "3fb9826f1d7c478a2ea569f2a2e34cb159978d425f88f7b070b8552947c2a019"
+      },
+      "name" : "acceptance-064",
+      "seed" : "63"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              8
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              601
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1b0a72889185a6367fe3ad1f4a8a7aa97ef4c6fa0ced2dc36fd064026472dc67",
+        "initialDigest" : "8e2608769e261eca54e3a10a27ee41c04d81b0a043274043cef0d8886259e398"
+      },
+      "name" : "acceptance-065",
+      "seed" : "70"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              20
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "cd2a2506bb78505cf20c470cbb667c0e9520f6e2475439897a776d7162c7442a",
+        "initialDigest" : "44fc5c6cc4bf7a2fbf48867871880dae9229a216babab787a284a0918824d561"
+      },
+      "name" : "acceptance-066",
+      "seed" : "77"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              601
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7a80d7f5dcfd006be07980a6c694b9ffbec0cdcf00762aad269e7b60b40867a7",
+        "initialDigest" : "416dacb10ffc09dfc0d152780053da62edd587aea7ec5fec74e9c2261994fac6"
+      },
+      "name" : "acceptance-067",
+      "seed" : "84"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "02ccb134f96b60967dad7cf096a8584124bdc6f4c8fc156ae6a240736883abb3",
+        "initialDigest" : "1f3ceba89d9d224887aacfd3f60c2fbcade3201b10834ca146f6dd48807b2f59"
+      },
+      "name" : "acceptance-068",
+      "seed" : "91"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              14
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              601
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d093ab893ed6f16ff003f3eb84da43e4cabfe974752cab835f13a5505605feff",
+        "initialDigest" : "f1e2e301cf7e9ff6bb442d39101b811a50408970d9f310d4cffe86fc6a319968"
+      },
+      "name" : "acceptance-069",
+      "seed" : "98"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              8
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "14f84b4a7aaf20f7d5f15c33060aadf951af6854c5a77a0f0549d62c982bef2e",
+        "initialDigest" : "75c1cc8ff137d6da1e010e1b09c3a5816fdf2d360dfb8225085f33a65df73479"
+      },
+      "name" : "acceptance-070",
+      "seed" : "5"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              601
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9d3caaf53b5350f09031bd2ab95f8729e5b8e74035de83888cce76c7dcbe3fe3",
+        "initialDigest" : "9f070c6af1f1d4e04a36d2df59517dbe64e3522d7a4a933b16a0af71c68693f5"
+      },
+      "name" : "acceptance-071",
+      "seed" : "12"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "4088ae855cb14cb3d5daaa8e0d31f62d162bf4518e7f805ffcbaebf634d5183d",
+        "initialDigest" : "36206ae800eb5631aa1e9eb1bccdd5a4e5227af4d3dd95a15f415bb539f852fc"
+      },
+      "name" : "acceptance-072",
+      "seed" : "19"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              601
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7391dc6dcf370da94f1fa8bdb4f9643b2f5b96d3463f9bd2caf932f9345781ae",
+        "initialDigest" : "f9954c67bf86bcb70bb6a08b87d265512877d94e8eeade532d643a241ab0fa3b"
+      },
+      "name" : "acceptance-073",
+      "seed" : "26"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "0dd3f164238baecd9cd36bc5ba7d27ee0e31f6eef6706e781561da810e97a3b5",
+        "initialDigest" : "e25058eb16f197b505fb1a8bd3eb3512cc5e831a350ebebd9c09df179f968168"
+      },
+      "name" : "acceptance-074",
+      "seed" : "33"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              13
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              601
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "85f94e11e872918d0c03be75ad4f0ac5e417466025f3ff1c6d724ba8b59581c2",
+        "initialDigest" : "061a43c44d2f88c99c980f98bea53ed15704acb2653c382633933293955e725d"
+      },
+      "name" : "acceptance-075",
+      "seed" : "40"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              10
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "338ff1625b894d84c09420351decf3b4d0e002caec79250eab726dbe89f0bf28",
+        "initialDigest" : "40c705cf28fba76dad305d94963ea1fb0c5e18b96fb6097dcd79c17ad1d61918"
+      },
+      "name" : "acceptance-076",
+      "seed" : "47"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              9
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              601
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8a1195a73491827f7806797f1283a678a18b15c0521c9384d3538682f65739cb",
+        "initialDigest" : "b372835ec3bd2397297fff4c2a23ab983df1d828109cbee644f0807c1e359796"
+      },
+      "name" : "acceptance-077",
+      "seed" : "54"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              13
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "50febcede64b4ca8d046a8485da635f0d0c5bd3af4150f0effcd4b7c4d000185",
+        "initialDigest" : "f1961ef09ec4fbc0801e0166ae60923ce023141f19010ec0f45a9820b2599b82"
+      },
+      "name" : "acceptance-078",
+      "seed" : "61"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              601
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d338ef4f5f80c1d6f9db8624c23095886d813443383a5e9fc7925426adb16e14",
+        "initialDigest" : "6d56b5db09df6e0304a5c83a4f0caf0ceb26445e1615ff11621de7043bce396d"
+      },
+      "name" : "acceptance-079",
+      "seed" : "68"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7e676f90983c5b8147acfe8cce0fa1f45170ad043310ec27f4512475fa2877c3",
+        "initialDigest" : "c77e1b61aab5d4cfbfd570aa047dcb586e8ac00c61ad5a03df5fa65fb6eff7ef"
+      },
+      "name" : "acceptance-080",
+      "seed" : "75"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              10
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "canyon.carve",
+            "values" : [
+              10
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              120
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ea2c8032ba094f112c0b387827fc685a7cbe648fb83d0d6faa7ef60ea7e27788",
+        "initialDigest" : "4ca0d1899ef8a997b0314afb0431d648b98ac91e5c7fc64b4e88639070895625",
+        "outcome" : "won"
+      },
+      "name" : "fixture-level-1-solved",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              120
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1e9d8ad4a19db56523970483dc0586245e1d1c7d8ad685bf1d945ced4104f96f",
+        "initialDigest" : "4ca0d1899ef8a997b0314afb0431d648b98ac91e5c7fc64b4e88639070895625",
+        "outcome" : "failed"
+      },
+      "name" : "fixture-time-out",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "time.step",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "152cc36dd8282a091615eb46741ee01ece896109b761bd38b966ddf4a7506b83",
+        "initialDigest" : "4ca0d1899ef8a997b0314afb0431d648b98ac91e5c7fc64b4e88639070895625"
+      },
+      "name" : "fixture-undo-redo",
+      "seed" : "0"
+    }
+  ],
+  "schema" : 1
+}

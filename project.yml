@@ -235,6 +235,10 @@ targets:
         product: HueCompassCore
       - package: ExperiencesRound02
         product: HueCompassExperience
+      - package: ExperiencesRound02
+        product: ColorfallCanyonsCore
+      - package: ExperiencesRound02
+        product: ColorfallCanyonsExperience
     postBuildScripts:
       - name: Bundle licenses (UA-F04)
         basedOnDependencyAnalysis: false

@@ -1042,7 +1042,7 @@
       "id": "r02-g05.colorfall-canyons",
       "code": "R02-G05",
       "title": "Colorfall Canyons",
-      "summary": "Carve sluices to direct colored light-fluid into target basins",
+      "summary": "Carve short sluices and open spring valves so cyan, coral and yellow light-fluid runs down a mesa canyon into its basins, each filled with its own mix and none overflowing or tainted. 100 certified levels. Drawn in code; offline.",
       "kind": "game",
       "tier": "free",
       "category": "puzzle",
@@ -1051,11 +1051,30 @@
         "light-and-color"
       ],
       "order": 30,
-      "palette": [],
+      "palette": [
+        "#05070F",
+        "#8C5A3C",
+        "#19E3F0",
+        "#FF6F59",
+        "#FFD23F"
+      ],
       "tile_seed": 1480865471,
-      "capabilities": [],
-      "quality_tiers": [],
-      "content": null,
+      "capabilities": [
+        "Carve sluices, steer neon fluid",
+        "Neon falls over a mesa canyon",
+        "100 solver-certified levels",
+        "Every action can be undone",
+        "Three quality levels, same rules"
+      ],
+      "quality_tiers": [
+        "level-0",
+        "level-1",
+        "level-2"
+      ],
+      "content": {
+        "catalog_sha256": "68eec7b5df5790cd52979d6f01fdcad576fefe02436c2c0b655813fc8f55f019",
+        "levels": 100
+      },
       "available": false
     },
     {

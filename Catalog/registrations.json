@@ -718,6 +718,34 @@
       "manifest": "Packages/ExperiencesRound02/HueCompass/scenario-manifest.json",
       "permissions": [],
       "summary": "Turn a spectral compass and probe the coloured fog: each clue tells how many hue bands and how much fog lie between the probe and the hidden target. Deduce it and select its bearing and band before the probes run out. 100 certified levels. Drawn in code; offline."
+    },
+    "r02-g05.colorfall-canyons": {
+      "capabilities": [
+        "Carve sluices, steer neon fluid",
+        "Neon falls over a mesa canyon",
+        "100 solver-certified levels",
+        "Every action can be undone",
+        "Three quality levels, same rules"
+      ],
+      "quality_tiers": [
+        "level-0",
+        "level-1",
+        "level-2"
+      ],
+      "palette": [
+        "#05070F",
+        "#8C5A3C",
+        "#19E3F0",
+        "#FF6F59",
+        "#FFD23F"
+      ],
+      "content": {
+        "catalog_sha256": "68eec7b5df5790cd52979d6f01fdcad576fefe02436c2c0b655813fc8f55f019",
+        "levels": 100
+      },
+      "manifest": "Packages/ExperiencesRound02/ColorfallCanyons/scenario-manifest.json",
+      "permissions": [],
+      "summary": "Carve short sluices and open spring valves so cyan, coral and yellow light-fluid runs down a mesa canyon into its basins, each filled with its own mix and none overflowing or tainted. 100 certified levels. Drawn in code; offline."
     }
   }
 }

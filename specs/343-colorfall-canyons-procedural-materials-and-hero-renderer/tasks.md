@@ -39,7 +39,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 3: Experience, registration and frames
 
-- [ ] T-R02G0503-006 Create `Packages/ExperiencesRound02/ColorfallCanyons/Experience/ColorfallCanyonsExperience.swift`, `…Presenter.swift`, `…CanyonScene.swift` (GL
+- [X] T-R02G0503-006 Create `Packages/ExperiencesRound02/ColorfallCanyons/Experience/ColorfallCanyonsExperience.swift`, `…Presenter.swift`, `…CanyonScene.swift` (GL — Verified 2026-11-21: 2026-11-21 sim-27, packages, catalog-search, host-5 exit 0 (experience target: presenter with mirror, tier log, probes of two night corners and describe, GL canyon scene on ShaderMeshRenderer with back faces culled, fallback to the unlit level-2 geometry, Reduce Motion and Reduce Flashing, control panel; scenarios with 80 acceptance rows and three fixtures, scenario-manifest.json; candidate registered in Catalog/registrations.json, the registry and project.yml; AppModelTests example now r02-g06.chrono-constellator; 25 simulator tests by agent D: frames vs the CPU reference at three tiers on five levels, tiers, fallback, sizes, memory warning, Reduce Motion and Flashing, probes, identity — the first run showed far block sides covering tops without depth testing; the lead culled back faces and all pass)
   scene with `ShaderMeshRenderer`; fallback; tier log; Reduce Motion and Reduce Flashing; the presenter declares
   `probes(_:)` — two night corners, as the round-two X gates require — and its quality levels equal the Core's
   `qualityTiers`), `…Controls.swift` (labelled cell

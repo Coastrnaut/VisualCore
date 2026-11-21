@@ -1404,7 +1404,9 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     # Feature 323 (R02-G03-03): Wave Knot Keeper, integrated at X-R02-G03.
                                     "WaveKnotKeeperCore", "WaveKnotKeeperExperience",
                                     # Feature 333 (R02-G04-03): Hue Compass, integrated at X-R02-G04.
-                                    "HueCompassCore", "HueCompassExperience"])
+                                    "HueCompassCore", "HueCompassExperience",
+                                    # Feature 343 (R02-G05-03): Colorfall Canyons, a candidate until X-R02-G05.
+                                    "ColorfallCanyonsCore", "ColorfallCanyonsExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):
         listing = subprocess.run([sys.executable, str(HERE / "release_check.py"), "--list"],

@@ -27,6 +27,8 @@ let package = Package(
         .library(name: "HueCompassCore", targets: ["HueCompassCore"]),
         // Feature 341 (R02-G05-01): Colorfall Canyons's rule kernel, a candidate until X-R02-G05.
         .library(name: "ColorfallCanyonsCore", targets: ["ColorfallCanyonsCore"]),
+        // Feature 343 (R02-G05-03): Colorfall Canyons's experience (iOS only; a registered candidate until X-R02-G05).
+        .library(name: "ColorfallCanyonsExperience", targets: ["ColorfallCanyonsExperience"]),
         // Feature 323 (R02-G03-03): Wave Knot Keeper's experience (iOS only; a registered candidate until X-R02-G03).
         .library(name: "WaveKnotKeeperExperience", targets: ["WaveKnotKeeperExperience"]),
         // Feature 333 (R02-G04-03): Hue Compass's experience (iOS only; a registered candidate until X-R02-G04).
@@ -233,5 +235,23 @@ let package = Package(
                                    .product(name: "VisualCoreExperience", package: visualCore),
                                    .product(name: "VisualCoreDiagnostics", package: visualCore)],
                     path: "ColorfallCanyons/CoreTests"),
+        .target(name: "ColorfallCanyonsExperience",
+                dependencies: ["ColorfallCanyonsCore",
+                               .product(name: "VisualCoreMath", package: visualCore),
+                               .product(name: "VisualCoreScenes", package: visualCore),
+                               .product(name: "VisualCoreExperience", package: visualCore),
+                               .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
+                               .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
+                               .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS]))],
+                path: "ColorfallCanyons/Experience"),
+        .testTarget(name: "ColorfallCanyonsExperienceTests",
+                    dependencies: ["ColorfallCanyonsExperience", "ColorfallCanyonsCore",
+                                   .product(name: "VisualCoreMath", package: visualCore),
+                                   .product(name: "VisualCoreScenes", package: visualCore),
+                                   .product(name: "VisualCoreExperience", package: visualCore),
+                                   .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
+                                   .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
+                                   .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS]))],
+                    path: "ColorfallCanyons/ExperienceTests"),
     ]
 )
