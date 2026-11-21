@@ -64,7 +64,7 @@ recorded only after every agent has reported). Commit after every task with its 
 - [X] T-R02G0108-010 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-20: 2026-11-20 reference-1 exit 0
 - [X] T-R02G0108-011 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-20: 2026-11-20 reference-2 exit 0: 7 of 7 with chunk 1
 - [ ] T-R02G0108-012 {device} After ImplementationLock-100: frame time and memory per tier on D1/D2/D3 (SC-R02G0108-007)
-- [ ] T-R02G0108-013 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
+- [X] T-R02G0108-013 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record; — Verified 2026-11-20: 2026-11-20 converge round 1 converged (no task appended); sealed 17 passing checks, 1 failed attempt (sim-27 compile error, fixed); recorded R02-G01-08 pass (.autonomy/migration/evidence/R02-G01-08.json); validators PASS; CI run of this push checked next
   after the record push, check its CI run with `gh run list` and fix any failure before the next gate (SC-R02G0108-005)
 
 ## Dependencies and parallel work
