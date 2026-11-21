@@ -1,0 +1,133 @@
+{
+  "crossing" : {
+    "move" : {
+      "direction" : "minusY",
+      "point" : 4
+    },
+    "points" : [
+      {
+        "x" : 9,
+        "y" : -6,
+        "z" : -4
+      },
+      {
+        "x" : 4,
+        "y" : 12,
+        "z" : -2
+      },
+      {
+        "x" : -1,
+        "y" : 7,
+        "z" : -1
+      },
+      {
+        "x" : -7,
+        "y" : 3,
+        "z" : -2
+      },
+      {
+        "x" : -9,
+        "y" : 1,
+        "z" : 2
+      },
+      {
+        "x" : 5,
+        "y" : 2,
+        "z" : 2
+      },
+      {
+        "x" : -12,
+        "y" : 1,
+        "z" : 0
+      }
+    ]
+  },
+  "difficulty" : {
+    "crossings" : 0,
+    "gates" : 0,
+    "points" : 7,
+    "shortest" : 1,
+    "work" : 1
+  },
+  "fingerprints" : [
+    "9d47d3f11cc072b4b15aa5b5f54c4cff5f8ceab25b71c63f98db8e5b35306455",
+    "4a8815d804c9cf1a9f3f180296a13151fdcdfa9ab9a1741dcea8bdd3d5817a88"
+  ],
+  "level" : {
+    "allowance" : 10,
+    "band" : 2,
+    "fingerprint" : "b8e540e395f149391502cb71f06d829a55b9d3e2b42e947e4f50cfe80af34096",
+    "gates" : [
+
+    ],
+    "id" : "wave-knot-keeper-036",
+    "points" : [
+      {
+        "x" : 9,
+        "y" : -6,
+        "z" : -4
+      },
+      {
+        "x" : 4,
+        "y" : 12,
+        "z" : -2
+      },
+      {
+        "x" : -1,
+        "y" : 7,
+        "z" : -1
+      },
+      {
+        "x" : -7,
+        "y" : 3,
+        "z" : -2
+      },
+      {
+        "x" : -9,
+        "y" : 1,
+        "z" : 2
+      },
+      {
+        "x" : 5,
+        "y" : 2,
+        "z" : 2
+      },
+      {
+        "x" : -12,
+        "y" : 1,
+        "z" : 0
+      }
+    ],
+    "schema" : 1,
+    "seed" : 12503602835333621672,
+    "target" : {
+      "crossings" : 0,
+      "writhe" : 0
+    },
+    "tensionBound" : 1734,
+    "tutorial" : false
+  },
+  "moves" : [
+    {
+      "direction" : "plusY",
+      "point" : 4
+    }
+  ],
+  "nearMiss" : {
+    "crossings" : 0,
+    "degenerate" : true,
+    "move" : {
+      "direction" : "minusY",
+      "point" : 3
+    },
+    "writhe" : 0
+  },
+  "number" : 36,
+  "schema" : 1,
+  "skipped" : 6,
+  "terminal" : {
+    "crossings" : 0,
+    "tension" : 1474,
+    "writhe" : 0
+  }
+}

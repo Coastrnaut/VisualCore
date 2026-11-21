@@ -1,0 +1,169 @@
+{
+  "crossing" : {
+    "move" : {
+      "direction" : "plusZ",
+      "point" : 3
+    },
+    "points" : [
+      {
+        "x" : 11,
+        "y" : 0,
+        "z" : -3
+      },
+      {
+        "x" : 11,
+        "y" : 2,
+        "z" : -4
+      },
+      {
+        "x" : 5,
+        "y" : 3,
+        "z" : -1
+      },
+      {
+        "x" : -4,
+        "y" : 2,
+        "z" : -3
+      },
+      {
+        "x" : -9,
+        "y" : 3,
+        "z" : -4
+      },
+      {
+        "x" : -9,
+        "y" : -5,
+        "z" : -1
+      },
+      {
+        "x" : 1,
+        "y" : 9,
+        "z" : -3
+      },
+      {
+        "x" : -11,
+        "y" : 1,
+        "z" : 2
+      },
+      {
+        "x" : 0,
+        "y" : -6,
+        "z" : -4
+      }
+    ]
+  },
+  "difficulty" : {
+    "crossings" : 3,
+    "gates" : 1,
+    "points" : 9,
+    "shortest" : 2,
+    "work" : 20
+  },
+  "fingerprints" : [
+    "6a48ea5eac4ee5640cde697b6a9a74a9c62079484b46ecebac06917b57d1570c",
+    "078ed2aa7c9ccd67eb7338d9b4f4673ddb3e2494163c57186e7f6272886b2853",
+    "09841d637ae5eb05518857a3b409026ec56e3e9c1970f5db9b4da2b7c9697900"
+  ],
+  "level" : {
+    "allowance" : 16,
+    "band" : 4,
+    "fingerprint" : "198879dd3f79fd6ca0929a6c455ce3e8d3fbc1622971acacc8a36dfbec5b55b7",
+    "gates" : [
+      {
+        "max" : {
+          "x" : 6,
+          "y" : 4,
+          "z" : 0
+        },
+        "min" : {
+          "x" : 4,
+          "y" : 2,
+          "z" : -2
+        }
+      }
+    ],
+    "id" : "wave-knot-keeper-062",
+    "points" : [
+      {
+        "x" : 11,
+        "y" : 0,
+        "z" : -3
+      },
+      {
+        "x" : 11,
+        "y" : 2,
+        "z" : -4
+      },
+      {
+        "x" : 5,
+        "y" : 3,
+        "z" : -1
+      },
+      {
+        "x" : -4,
+        "y" : 2,
+        "z" : -4
+      },
+      {
+        "x" : -9,
+        "y" : 3,
+        "z" : -4
+      },
+      {
+        "x" : -9,
+        "y" : -5,
+        "z" : -1
+      },
+      {
+        "x" : 1,
+        "y" : 9,
+        "z" : -3
+      },
+      {
+        "x" : -11,
+        "y" : 1,
+        "z" : 2
+      },
+      {
+        "x" : 0,
+        "y" : -6,
+        "z" : -4
+      }
+    ],
+    "schema" : 1,
+    "seed" : 11783013915771259394,
+    "target" : {
+      "crossings" : 3,
+      "writhe" : 1
+    },
+    "tensionBound" : 1300,
+    "tutorial" : false
+  },
+  "moves" : [
+    {
+      "direction" : "plusX",
+      "point" : 3
+    },
+    {
+      "direction" : "minusY",
+      "point" : 4
+    }
+  ],
+  "nearMiss" : {
+    "crossings" : 2,
+    "degenerate" : true,
+    "move" : {
+      "direction" : "minusX",
+      "point" : 3
+    },
+    "writhe" : 0
+  },
+  "number" : 62,
+  "schema" : 1,
+  "skipped" : 13,
+  "terminal" : {
+    "crossings" : 3,
+    "tension" : 1116,
+    "writhe" : 1
+  }
+}

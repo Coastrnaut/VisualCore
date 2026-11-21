@@ -1,0 +1,133 @@
+{
+  "crossing" : {
+    "move" : {
+      "direction" : "minusZ",
+      "point" : 1
+    },
+    "points" : [
+      {
+        "x" : 1,
+        "y" : 9,
+        "z" : 3
+      },
+      {
+        "x" : -8,
+        "y" : 3,
+        "z" : -1
+      },
+      {
+        "x" : -8,
+        "y" : 5,
+        "z" : -3
+      },
+      {
+        "x" : -8,
+        "y" : -5,
+        "z" : 3
+      },
+      {
+        "x" : -4,
+        "y" : -10,
+        "z" : 4
+      },
+      {
+        "x" : 3,
+        "y" : -3,
+        "z" : -5
+      },
+      {
+        "x" : -1,
+        "y" : -8,
+        "z" : 1
+      }
+    ]
+  },
+  "difficulty" : {
+    "crossings" : 2,
+    "gates" : 0,
+    "points" : 7,
+    "shortest" : 1,
+    "work" : 1
+  },
+  "fingerprints" : [
+    "96065e12df7db9e35125d27649556c916f3a45136fb74ff28e2e720c1895e9f3",
+    "b3ad49a1c2ac636d6c75c8a4ebc17996e72ec00d1714b0df6d7e97215642b356"
+  ],
+  "level" : {
+    "allowance" : 13,
+    "band" : 2,
+    "fingerprint" : "03f03e839d872f1aaaa20aaaf1a8efaa58c5f2e746790ea146c0f143af28c08b",
+    "gates" : [
+
+    ],
+    "id" : "wave-knot-keeper-027",
+    "points" : [
+      {
+        "x" : 1,
+        "y" : 9,
+        "z" : 3
+      },
+      {
+        "x" : -8,
+        "y" : 3,
+        "z" : -1
+      },
+      {
+        "x" : -8,
+        "y" : 5,
+        "z" : -3
+      },
+      {
+        "x" : -8,
+        "y" : -5,
+        "z" : 3
+      },
+      {
+        "x" : -4,
+        "y" : -10,
+        "z" : 4
+      },
+      {
+        "x" : 3,
+        "y" : -3,
+        "z" : -5
+      },
+      {
+        "x" : -1,
+        "y" : -8,
+        "z" : 1
+      }
+    ],
+    "schema" : 1,
+    "seed" : 5511522274328741900,
+    "target" : {
+      "crossings" : 2,
+      "writhe" : 0
+    },
+    "tensionBound" : 1128,
+    "tutorial" : false
+  },
+  "moves" : [
+    {
+      "direction" : "minusX",
+      "point" : 1
+    }
+  ],
+  "nearMiss" : {
+    "crossings" : 1,
+    "degenerate" : true,
+    "move" : {
+      "direction" : "plusX",
+      "point" : 1
+    },
+    "writhe" : -1
+  },
+  "number" : 27,
+  "schema" : 1,
+  "skipped" : 1,
+  "terminal" : {
+    "crossings" : 2,
+    "tension" : 892,
+    "writhe" : 0
+  }
+}

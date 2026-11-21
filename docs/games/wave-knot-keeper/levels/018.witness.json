@@ -1,0 +1,123 @@
+{
+  "crossing" : {
+    "move" : {
+      "direction" : "plusX",
+      "point" : 0
+    },
+    "points" : [
+      {
+        "x" : 9,
+        "y" : 0,
+        "z" : 0
+      },
+      {
+        "x" : 9,
+        "y" : 6,
+        "z" : 2
+      },
+      {
+        "x" : 7,
+        "y" : 1,
+        "z" : 2
+      },
+      {
+        "x" : 4,
+        "y" : 4,
+        "z" : -3
+      },
+      {
+        "x" : 3,
+        "y" : 8,
+        "z" : -4
+      },
+      {
+        "x" : 0,
+        "y" : 5,
+        "z" : 4
+      }
+    ]
+  },
+  "difficulty" : {
+    "crossings" : 0,
+    "gates" : 0,
+    "points" : 6,
+    "shortest" : 1,
+    "work" : 1
+  },
+  "fingerprints" : [
+    "25d939034e349945b79ef4194fa3ff6b2b6a8e76bf5f9b00f27b4bf4ec4166aa",
+    "7b87efeb8944bdf7c25e8b64b8aee94052e0a2deef2b2b754c66e420e69bf194"
+  ],
+  "level" : {
+    "allowance" : 10,
+    "band" : 1,
+    "fingerprint" : "d84275dd6414c14369a47cabdfce2b25035b9194c8841e184c66b3966f5dde91",
+    "gates" : [
+
+    ],
+    "id" : "wave-knot-keeper-018",
+    "points" : [
+      {
+        "x" : 9,
+        "y" : 0,
+        "z" : 0
+      },
+      {
+        "x" : 9,
+        "y" : 6,
+        "z" : 2
+      },
+      {
+        "x" : 7,
+        "y" : 1,
+        "z" : 2
+      },
+      {
+        "x" : 4,
+        "y" : 4,
+        "z" : -3
+      },
+      {
+        "x" : 3,
+        "y" : 8,
+        "z" : -4
+      },
+      {
+        "x" : 0,
+        "y" : 5,
+        "z" : 4
+      }
+    ],
+    "schema" : 1,
+    "seed" : 3455041316581372216,
+    "target" : {
+      "crossings" : 0,
+      "writhe" : 0
+    },
+    "tensionBound" : 658,
+    "tutorial" : false
+  },
+  "moves" : [
+    {
+      "direction" : "minusX",
+      "point" : 0
+    }
+  ],
+  "nearMiss" : {
+    "crossings" : 2,
+    "degenerate" : false,
+    "move" : {
+      "direction" : "plusX",
+      "point" : 0
+    },
+    "writhe" : 0
+  },
+  "number" : 18,
+  "schema" : 1,
+  "skipped" : 12,
+  "terminal" : {
+    "crossings" : 0,
+    "tension" : 318,
+    "writhe" : 0
+  }
+}

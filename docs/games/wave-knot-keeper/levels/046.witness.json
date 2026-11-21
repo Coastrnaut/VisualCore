@@ -1,0 +1,154 @@
+{
+  "crossing" : {
+    "move" : {
+      "direction" : "plusZ",
+      "point" : 1
+    },
+    "points" : [
+      {
+        "x" : 11,
+        "y" : 0,
+        "z" : -4
+      },
+      {
+        "x" : 6,
+        "y" : 5,
+        "z" : 1
+      },
+      {
+        "x" : 10,
+        "y" : 2,
+        "z" : 2
+      },
+      {
+        "x" : -2,
+        "y" : 11,
+        "z" : 1
+      },
+      {
+        "x" : -7,
+        "y" : 7,
+        "z" : 3
+      },
+      {
+        "x" : -8,
+        "y" : 5,
+        "z" : -1
+      },
+      {
+        "x" : -9,
+        "y" : -3,
+        "z" : 3
+      },
+      {
+        "x" : 10,
+        "y" : -2,
+        "z" : 5
+      }
+    ]
+  },
+  "difficulty" : {
+    "crossings" : 0,
+    "gates" : 1,
+    "points" : 8,
+    "shortest" : 1,
+    "work" : 1
+  },
+  "fingerprints" : [
+    "1b5fadc11333e3317408945e49f33f5c909929285107f642668dee3464995cf5",
+    "fc51ea3b14f89e998ba0825b964cbaea9b76e76b4404ab703a7f7aa3c58a37e4"
+  ],
+  "level" : {
+    "allowance" : 14,
+    "band" : 3,
+    "fingerprint" : "90b4cf6639df2312bbdd6f4590d1a0d4363424d8f139e1f3361c05fc292c1977",
+    "gates" : [
+      {
+        "max" : {
+          "x" : 12,
+          "y" : 1,
+          "z" : -3
+        },
+        "min" : {
+          "x" : 10,
+          "y" : -1,
+          "z" : -5
+        }
+      }
+    ],
+    "id" : "wave-knot-keeper-046",
+    "points" : [
+      {
+        "x" : 11,
+        "y" : 0,
+        "z" : -4
+      },
+      {
+        "x" : 6,
+        "y" : 5,
+        "z" : 1
+      },
+      {
+        "x" : 10,
+        "y" : 2,
+        "z" : 2
+      },
+      {
+        "x" : -2,
+        "y" : 11,
+        "z" : 1
+      },
+      {
+        "x" : -7,
+        "y" : 7,
+        "z" : 3
+      },
+      {
+        "x" : -8,
+        "y" : 5,
+        "z" : -1
+      },
+      {
+        "x" : -9,
+        "y" : -3,
+        "z" : 3
+      },
+      {
+        "x" : 10,
+        "y" : -2,
+        "z" : 5
+      }
+    ],
+    "schema" : 1,
+    "seed" : 18348421686595302047,
+    "target" : {
+      "crossings" : 0,
+      "writhe" : 0
+    },
+    "tensionBound" : 1118,
+    "tutorial" : false
+  },
+  "moves" : [
+    {
+      "direction" : "minusX",
+      "point" : 1
+    }
+  ],
+  "nearMiss" : {
+    "crossings" : 0,
+    "degenerate" : true,
+    "move" : {
+      "direction" : "plusX",
+      "point" : 1
+    },
+    "writhe" : 0
+  },
+  "number" : 46,
+  "schema" : 1,
+  "skipped" : 5,
+  "terminal" : {
+    "crossings" : 0,
+    "tension" : 946,
+    "writhe" : 0
+  }
+}

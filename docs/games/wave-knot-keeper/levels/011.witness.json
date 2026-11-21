@@ -1,0 +1,123 @@
+{
+  "crossing" : {
+    "move" : {
+      "direction" : "plusZ",
+      "point" : 4
+    },
+    "points" : [
+      {
+        "x" : -7,
+        "y" : -7,
+        "z" : 4
+      },
+      {
+        "x" : 1,
+        "y" : 8,
+        "z" : 4
+      },
+      {
+        "x" : -2,
+        "y" : -11,
+        "z" : 0
+      },
+      {
+        "x" : 2,
+        "y" : -11,
+        "z" : -3
+      },
+      {
+        "x" : 7,
+        "y" : -5,
+        "z" : 2
+      },
+      {
+        "x" : 10,
+        "y" : -5,
+        "z" : 2
+      }
+    ]
+  },
+  "difficulty" : {
+    "crossings" : 1,
+    "gates" : 0,
+    "points" : 6,
+    "shortest" : 1,
+    "work" : 1
+  },
+  "fingerprints" : [
+    "dda8129c11169ec6aaabdcc14f303216c8d6f692bac79f349f8409f837d36683",
+    "cc606451c065dd45bfbfa7ce03f5aa352f5b963f05cf198faccc013622751582"
+  ],
+  "level" : {
+    "allowance" : 11,
+    "band" : 1,
+    "fingerprint" : "3ec291e75c19607e7ebaf6fcebc4f8f0f582b604ceabcfebee68d3d8de268c4a",
+    "gates" : [
+
+    ],
+    "id" : "wave-knot-keeper-011",
+    "points" : [
+      {
+        "x" : -7,
+        "y" : -7,
+        "z" : 4
+      },
+      {
+        "x" : 1,
+        "y" : 8,
+        "z" : 4
+      },
+      {
+        "x" : -2,
+        "y" : -11,
+        "z" : 0
+      },
+      {
+        "x" : 2,
+        "y" : -11,
+        "z" : -3
+      },
+      {
+        "x" : 7,
+        "y" : -5,
+        "z" : 2
+      },
+      {
+        "x" : 10,
+        "y" : -5,
+        "z" : 2
+      }
+    ],
+    "schema" : 1,
+    "seed" : 7365924857959872509,
+    "target" : {
+      "crossings" : 1,
+      "writhe" : 1
+    },
+    "tensionBound" : 1418,
+    "tutorial" : false
+  },
+  "moves" : [
+    {
+      "direction" : "minusY",
+      "point" : 4
+    }
+  ],
+  "nearMiss" : {
+    "crossings" : 2,
+    "degenerate" : false,
+    "move" : {
+      "direction" : "plusY",
+      "point" : 4
+    },
+    "writhe" : 0
+  },
+  "number" : 11,
+  "schema" : 1,
+  "skipped" : 0,
+  "terminal" : {
+    "crossings" : 1,
+    "tension" : 1082,
+    "writhe" : 1
+  }
+}

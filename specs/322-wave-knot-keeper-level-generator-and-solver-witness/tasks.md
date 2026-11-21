@@ -50,7 +50,7 @@ or {device} tasks (pure logic and host-generated content). Fixture seed 2_322; t
   non-replaying witnesses) with `Packages/ExperiencesRound02/WaveKnotKeeper/CoreTests/WaveKnotKeeperWitnessTests.swift` (round trip byte for byte; edited move,
   fingerprint, level, terminal, counterexamples and difficulty refused; newer schema and damaged JSON refused; the near
   miss does not win; the crossing counterexample is refused by the rules); `--name host-4`
-- [ ] T-R02G0302-006 [US2] [US3] [US4] Create `Packages/ExperiencesRound02/WaveKnotKeeper/CoreTests/WaveKnotKeeperCatalogTests.swift` (100 entries, 20 per band;
+- [X] T-R02G0302-006 [US2] [US3] [US4] Create `Packages/ExperiencesRound02/WaveKnotKeeper/CoreTests/WaveKnotKeeperCatalogTests.swift` (100 entries, 20 per band; — Verified 2026-11-21: 2026-11-21 host-5 exit 0 (catalog: pinned digest 12c8ecb8…933f, progression, band means shortest 1.0/1.1/1.15/2.0/2.1, plain search agrees on levels 1, 11 … 91, 100 witness files byte for byte)
   the catalog generated twice is identical; pinned digest; `ProgressionRule.standard` holds on shortest; band means of
   shortest and point count never fall; on levels 1, 11, 21, … 91 the shortest equals a plain breadth-first search over
   `PuzzleRules` (SC-R02G0302-002); each witness equals `docs/games/wave-knot-keeper/levels/NNN.witness.json` byte for

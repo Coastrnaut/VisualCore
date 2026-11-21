@@ -1,0 +1,123 @@
+{
+  "crossing" : {
+    "move" : {
+      "direction" : "plusY",
+      "point" : 2
+    },
+    "points" : [
+      {
+        "x" : 9,
+        "y" : 1,
+        "z" : -2
+      },
+      {
+        "x" : -9,
+        "y" : -6,
+        "z" : -1
+      },
+      {
+        "x" : -3,
+        "y" : -4,
+        "z" : -1
+      },
+      {
+        "x" : 2,
+        "y" : -4,
+        "z" : -3
+      },
+      {
+        "x" : 2,
+        "y" : -11,
+        "z" : 1
+      },
+      {
+        "x" : 4,
+        "y" : 0,
+        "z" : -4
+      }
+    ]
+  },
+  "difficulty" : {
+    "crossings" : 0,
+    "gates" : 0,
+    "points" : 6,
+    "shortest" : 1,
+    "work" : 1
+  },
+  "fingerprints" : [
+    "534e0a03162f71b8196bb7c32c667d284bc20482a22a0c293609701a6c9eda0e",
+    "ab637bc878b134f290db7aad4d9057d23085e798d37a6e25865800ca8ce27f90"
+  ],
+  "level" : {
+    "allowance" : 8,
+    "band" : 1,
+    "fingerprint" : "ba93c18ff5065cc2b39b5dff94d70ac8c8831ebc023c30ae6f3868a2c04ab62a",
+    "gates" : [
+
+    ],
+    "id" : "wave-knot-keeper-012",
+    "points" : [
+      {
+        "x" : 9,
+        "y" : 1,
+        "z" : -2
+      },
+      {
+        "x" : -9,
+        "y" : -6,
+        "z" : -1
+      },
+      {
+        "x" : -3,
+        "y" : -5,
+        "z" : -1
+      },
+      {
+        "x" : 2,
+        "y" : -4,
+        "z" : -3
+      },
+      {
+        "x" : 2,
+        "y" : -11,
+        "z" : 1
+      },
+      {
+        "x" : 4,
+        "y" : 0,
+        "z" : -4
+      }
+    ],
+    "schema" : 1,
+    "seed" : 2777127109071251391,
+    "target" : {
+      "crossings" : 0,
+      "writhe" : 0
+    },
+    "tensionBound" : 1006,
+    "tutorial" : false
+  },
+  "moves" : [
+    {
+      "direction" : "minusY",
+      "point" : 5
+    }
+  ],
+  "nearMiss" : {
+    "crossings" : 1,
+    "degenerate" : false,
+    "move" : {
+      "direction" : "plusX",
+      "point" : 0
+    },
+    "writhe" : -1
+  },
+  "number" : 12,
+  "schema" : 1,
+  "skipped" : 8,
+  "terminal" : {
+    "crossings" : 0,
+    "tension" : 668,
+    "writhe" : 0
+  }
+}
