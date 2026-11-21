@@ -8,7 +8,7 @@ or {device} tasks (pure logic and host-generated content). Fixture seed 2_322; t
 
 ## Phase 1: Setup
 
-- [ ] T-R02G0302-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test
+- [X] T-R02G0302-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test — Verified 2026-11-21: 2026-11-21 R02-G03-02.baseline-host/timing/round02 exit 0
   --package-path Packages/ExperiencesRound02`; the rendering baseline is R02-G02-10's rendering runs (exit 0)
 
 ## Phase 2: Foundational
@@ -35,7 +35,7 @@ or {device} tasks (pure logic and host-generated content). Fixture seed 2_322; t
 ## Phase 4: Story 2 — levels come from their planned seeds (P1)
 
 - [ ] T-R02G0302-004 [US2] Create `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperGenerator.swift` (WaveKnotKeeperBandProfile "points 6, 7, 8, 9,
-  10; gates 0, 0, 1, 1, 2 of side 3; scramble 1, 2, 2, 3, 3; shortest 1, 1–2, 2, 2–3, 3", the solved rope, gates,
+  10; gates 0, 0, 1, 1, 2 of side 3; scramble 1, 2, 2, 3, 4; shortest 1, 1–2, 1–2, 2, 2–3" (spec amendment), the solved rope, gates,
   scramble walk and tension bound of clarification Q1, WaveKnotKeeperGenerated, `generate` with candidates k = 0 … 63
   from `SeedDerivation.derive(seed, index: k)`, id `wave-knot-keeper-NNN`, allowance = budget, tutorial for 1 … 3,
   `.generation(number)` beyond 64, a candidate without both counterexamples skipped; `catalogDigest`) with

@@ -49,15 +49,15 @@ archived manifest's 100 entries (bands 1 … 5 × 20, budgets 8 … 19). Feature
   itself) at a seeded radius 5 … 12 and height −4 … 4, rounded to the lattice; it is kept only if simple, in bounds and
   with a non-degenerate projection, and its summary is the target. Gates: bands 1 … 5 get 0, 0, 1, 1, 2 cubes of side 3
   centred on seeded rope points. The start is `scramble` seeded legal moves from the solved rope (bands 1 … 5: 1, 2, 2,
-  3, 3), never stepping back onto an earlier rope; each step takes the first move, in the seeded order of the
+  3, 4), never stepping back onto an earlier rope; each step takes the first move, in the seeded order of the
   legal moves, whose rope's summary differs from the solved rope's, else the first legal move; the tension bound is the largest tension along that walk plus 64 ×
   (6 − band); the allowance is the manifest budget. A candidate is kept when the level is valid (its start does not win),
-  its shortest solution lies in its band's range (bands 1 … 5: 1, 1–2, 2, 2–3, 3 moves) and does not exceed the budget;
+  its shortest solution lies in its band's range (bands 1 … 5: 1, 1–2, 1–2, 2, 2–3 moves) and does not exceed the budget;
   otherwise k grows, at most 64 candidates, then `generation(n)`. Ids `wave-knot-keeper-NNN`; tutorial flag on levels
   1 … 3. Impact: FR-R02G0302-001; SC-R02G0302-001, 003.
 - Q: How does the solver find the shortest solution and how much work may it do? → A: `WaveKnotKeeperSolver` runs a
   breadth-first search from the start over legal ropes (the kernel's `WaveKnotKeeperRules.moves` and `apply`), ropes
-  compared by their points, to the first winning rope, depth at most 3 (the largest band range); ties by the rules' move
+  compared by their points, to the first winning rope, depth at most 3 (above the largest band range); ties by the rules' move
   order at each depth, so the witness is the first shortest sequence in that order. The work is the number of ropes
   expanded; with at most 10 points and 6 directions it is at most 1 + 60 + 3,600 = 3,661 expansions (at most 219,660 move
   checks) per level. A start not solved within the depth is unsolvable for the generator. Impact: FR-R02G0302-002;
@@ -74,6 +74,12 @@ archived manifest's 100 entries (bands 1 … 5 × 20, budgets 8 … 19). Feature
   the difficulty and the candidates skipped. A test rebuilds every witness and compares bytes; it writes the files only
   with `WAVE_KNOT_KEEPER_WRITE_WITNESSES=1`. Decoding refuses newer schemas, damaged files and witnesses that no longer
   replay. A candidate without both counterexamples is skipped. Impact: FR-R02G0302-004; SC-R02G0302-003, 005.
+
+Amendment found while implementing (2026-11-21): a first catalog probe with scramble 1, 2, 2, 3, 3 and shortest ranges
+1, 1–2, 2, 2–3, 3 failed 4 levels of band 3 and 19 of band 5: one unit step often restores the signature, so a scramble
+walk rarely ends 3 moves from every winning rope. Decision: scramble 1, 2, 2, 3, 4 and shortest 1, 1–2, 1–2, 2, 2–3; all
+100 levels generate (at most 39 of 64 candidates skipped), band means of shortest 1.0, 1.1, 1.15, 2.0, 2.1 (non-decreasing),
+and difficulty grows through rope length and gates as well. Impact: FR-R02G0302-001; SC-R02G0302-004.
 - Q: How is the catalog identified, how long may certification take and how are refusals named? → A: the digest is
   `PuzzleCatalog<WaveKnotKeeperRules>.digest(id: "wave-knot-keeper", identities:)` over the 100 level fingerprints in
   manifest order, pinned in a test. Certification tests are split by band so each runs under 10 seconds on a debug host

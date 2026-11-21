@@ -8,7 +8,7 @@
   Rationale: the win is a signature (crossings, writhe), not a single rope, so a backward or bidirectional search has no
   goal state; with ≤ 10 points the search is at most 3,661 expansions, small enough for every level on a debug host.
   Alternatives: iterative deepening (same bound, more repeated work); A* (no admissible heuristic for the signature).
-- **R3 — Band ranges.** Decision: shortest 1, 1–2, 2, 2–3, 3 moves and ropes of 6 … 10 points by band. Rationale: keeps the
+- **R3 — Band ranges.** Decision: shortest 1, 1–2, 1–2, 2, 2–3 moves (amended after the first catalog probe) and ropes of 6 … 10 points by band. Rationale: keeps the
   exhaustive search bounded while difficulty grows through rope length, gates and target crossings; allowances (8 … 19)
   leave room for exploration.
 - **R4 — Counterexamples.** Decision: near miss from the winning rope (first legal move that does not win) and a crossing
