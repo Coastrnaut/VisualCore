@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "LissajousLabyrinthGestureController"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter LissajousLabyrinthGestureController",
+  "elapsed_seconds": 4.413,
+  "exit_code": 0,
+  "finished": "2026-11-21T05:50:20+00:00",
+  "gate": "R02-G02-04",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G02-04.host-2.log",
+  "log_sha256": "8bfe5d2266f3eef530e230229d41d5e124991595be65e2d9679986403152778e",
+  "name": "host-2",
+  "started": "2026-11-21T05:50:15+00:00",
+  "timed_out": false
+}

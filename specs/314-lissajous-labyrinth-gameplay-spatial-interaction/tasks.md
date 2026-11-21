@@ -37,7 +37,7 @@ tests stay short (< 10 s each).
 
 ## Phase 3: Stories 1, 2 and 4 — dial rings, camera, selection (P1/P2) 🎯
 
-- [ ] T-R02G0204-004 [P] [US1] [US2] [US4] Create
+- [X] T-R02G0204-004 [P] [US1] [US2] [US4] Create — Verified 2026-11-21: 2026-11-21 host-2 exit 0: LissajousLabyrinthGestureControllerTests 15/15 (500 seeded turns end in the independently computed value at 390×844, 96×64, 1024×768; full and 1.5 turns; frequency clamps; preview; 1,000 seeded arbitration scripts send nothing; nearest-knob picking with lower-id ties; ring-band picking 0.7 … 1.3 with knob priority; orbit limits and double-tap reset; selection; determinism)
   `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthGestureController.swift` (states idle, turning,
   orbiting, cancelled; picking via HandlePicker; turns via HandleDrag on the ring plane with accumulated angle; one
   `LissajousLabyrinthAction` on release when changed; second finger cancels; cancelled touches; playing-only; orbit from
