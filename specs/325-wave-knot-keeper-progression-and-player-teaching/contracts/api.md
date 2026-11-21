@@ -15,7 +15,7 @@ public enum WaveKnotKeeperTutorialStep: Sendable, Equatable, Codable { case move
     public var text: String }
 public struct WaveKnotKeeperProgress: Sendable, Equatable, Codable { /* solved, frontier, record(level:moves:shortest:), stars */
     public static func dailyLevel(year: Int, month: Int, day: Int) -> Int? }   // × 43
-public enum WaveKnotKeeperMode: Sendable, Equatable, Codable { case campaign, practice, daily(year: Int, month: Int, day: Int) }
+public enum WaveKnotKeeperMode: Sendable, Equatable, Codable { case campaign, practice, daily(level: Int) }   // the date only picks the level
 // Adapter controls added: level.select [1…100], mode.daily [y, m, d], mode.practice, mode.campaign, tutorial.dismiss,
 // tutorial.hint; codes r02-g03.locked, r02-g03.date; snapshot schema 2 with migration from 1.
 ```
