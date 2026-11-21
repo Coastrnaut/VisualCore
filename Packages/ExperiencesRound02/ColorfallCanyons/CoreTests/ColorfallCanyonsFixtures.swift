@@ -144,7 +144,7 @@ enum ColorfallCanyonsFixtures {
             return try ColorfallCanyonsLevel(id: "random-\(index)", seed: seed &+ UInt64(index), difficulty: random.int(1...5),
                                              columns: columns, rows: rows, heights: heights, grounds: grounds,
                                              springs: springs, basins: basins, flowRate: random.int(1...8),
-                                             budget: random.int(1...30), tickLimit: random.int(1...600),
+                                             budget: random.int(1...30), tickLimit: random.int(1...120),
                                              tutorial: tutorial)
         } catch {
             preconditionFailure("random level \(index) is valid: \(error)")

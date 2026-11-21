@@ -29,7 +29,7 @@ in this feature (the CPU flow step is the reference the renderer of R02-G05-03 w
 
 ## Phase 3: Story 1 — route the colours (P1) 🎯
 
-- [ ] T-R02G0501-003 [P] [US1] Create `Packages/ExperiencesRound02/ColorfallCanyons/CoreTests/ColorfallCanyonsFlowTests.swift` (routing and every tick equal an
+- [X] T-R02G0501-003 [P] [US1] Create `Packages/ExperiencesRound02/ColorfallCanyons/CoreTests/ColorfallCanyonsFlowTests.swift` (routing and every tick equal an — Verified 2026-11-21: 2026-11-21 host-2 exit 0 (flow, 22 tests by agent A, retested by the lead: every tick of 500 seeded levels, valves as given and all toggled, run to their tick limit (random limits now 1 … 120 so the runs stay short), equals an independent brute-force reference; zero drift per colour every tick; largest-remainder sharing over 20,000 cases; pools, tie order, rock, basins, drains, dry springs, closed valves; verdict precedence and boundaries one unit either side)
   independent brute-force reference written in the test on 500 seeded levels run to their tick limit; total fluid and
   each colour's mass drift by exactly zero on every tick; sharing never creates or loses a unit and keeps the leftover
   rule; flat ground pools; ties follow east, south, west, north; a dry spring and a closed valve release nothing);
