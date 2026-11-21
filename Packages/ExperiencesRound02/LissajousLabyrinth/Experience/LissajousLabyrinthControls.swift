@@ -10,7 +10,9 @@
 // text is plain panel text read by VoiceOver. Feature 316 (R02-G02-06) T-R02G0206-005 (FR-R02G0206-001, 005, 006;
 // clarification Q5): every control carries a label and a value, button rows become columns at accessibility text sizes,
 // the panel keeps a readable width of at most 520 points, a Sound toggle (off by default) drives the ambient loop, and
-// the panel tells the presenter when it is on screen.
+// the panel tells the presenter when it is on screen. Feature 319 (R02-G02-09) T-R02G0209-003 (FR-R02G0209-001;
+// clarification Q1): every control carries the identifier `experience.r02-g02.lissajous-labyrinth.<name>`
+// (`port.identifier`), the names listed in ``identifierNames``.
 #if os(iOS)
 import LissajousLabyrinthCore
 import SwiftUI
@@ -48,6 +50,7 @@ struct LissajousLabyrinthControls: View {
                         Button("Dismiss") { presenter.dismissTutorial(port: port) }
                             .accessibilityLabel("Dismiss the tutorial")
                             .accessibilityValue("Tutorial shown")
+                            .accessibilityIdentifier(port.identifier("dismiss-tutorial"))
                     }
                 }
                 if let failure = mirror.failureText {
@@ -56,15 +59,18 @@ struct LissajousLabyrinthControls: View {
                         Button("Undo") { presenter.send("play.undo", port: port) }
                             .accessibilityLabel("Undo the last change")
                             .accessibilityValue(Self.progressValue(mirror))
+                            .accessibilityIdentifier(port.identifier("failure-undo"))
                         Button("Retry") { presenter.retry(port: port) }
                             .accessibilityLabel("Retry the level")
                             .accessibilityValue(Self.modeName(mirror.mode))
+                            .accessibilityIdentifier(port.identifier("retry"))
                     }
                 }
                 row {
                     Button("Hint") { presenter.showHint(port: port) }
                         .accessibilityLabel("Show a hint")
                         .accessibilityValue(mirror.hintLevel == 0 ? "none shown" : "level \(mirror.hintLevel) of 3")
+                        .accessibilityIdentifier(port.identifier("hint"))
                     if let hint = mirror.hintText { Text(hint).font(.callout) }
                 }
                 if let message = mirror.message {
@@ -80,15 +86,18 @@ struct LissajousLabyrinthControls: View {
                                 onDecrement: { presenter.stepPending(dial, by: -1) })
                             .accessibilityLabel(LissajousLabyrinthPresenter.title(dial))
                             .accessibilityValue(shown == current ? "\(shown)" : "\(shown), pending; now \(current)")
+                            .accessibilityIdentifier(port.identifier(Self.identifierName(dial)))
                     }
                     if !mirror.pending.isEmpty {
                         row {
                             Button("Apply") { presenter.applyPending(port: port) }
                                 .accessibilityLabel("Apply the pending dial values")
                                 .accessibilityValue("\(mirror.pending.values.count) pending")
+                                .accessibilityIdentifier(port.identifier("apply"))
                             Button("Clear") { presenter.clearPending() }
                                 .accessibilityLabel("Clear the pending dial values")
                                 .accessibilityValue("\(mirror.pending.values.count) pending")
+                                .accessibilityIdentifier(port.identifier("clear"))
                         }
                     }
                 }
@@ -96,29 +105,36 @@ struct LissajousLabyrinthControls: View {
                     Button("Undo") { presenter.send("play.undo", port: port) }
                         .accessibilityLabel("Undo the last change")
                         .accessibilityValue(Self.progressValue(mirror))
+                        .accessibilityIdentifier(port.identifier("undo"))
                     Button("Redo") { presenter.send("play.redo", port: port) }
                         .accessibilityLabel("Redo the change")
                         .accessibilityValue("Level \(mirror.levelNumber)")
+                        .accessibilityIdentifier(port.identifier("redo"))
                     Button("Next level") { presenter.send("level.next", port: port) }
                         .accessibilityLabel("Go to the next level")
                         .accessibilityValue("Level \(mirror.levelNumber) now")
+                        .accessibilityIdentifier(port.identifier("next-level"))
                     Button("Reset view") { presenter.resetView() }
                         .accessibilityLabel("Return the camera to the authored view")
                         .accessibilityValue("Camera")
+                        .accessibilityIdentifier(port.identifier("reset-view"))
                 }
                 row {
                     Button("Campaign") { presenter.send("mode.campaign", port: port) }
                         .accessibilityLabel("Play the campaign")
                         .accessibilityValue(mirror.mode == .campaign ? "Selected" : "Not selected")
                         .accessibilityAddTraits(mirror.mode == .campaign ? .isSelected : [])
+                        .accessibilityIdentifier(port.identifier("campaign"))
                     Button("Daily") { presenter.playDaily(port: port) }
                         .accessibilityLabel("Play today's daily level")
                         .accessibilityValue(Self.isDaily(mirror.mode) ? "Selected" : "Not selected")
                         .accessibilityAddTraits(Self.isDaily(mirror.mode) ? .isSelected : [])
+                        .accessibilityIdentifier(port.identifier("daily"))
                     Button("Practice") { presenter.send("mode.practice", port: port) }
                         .accessibilityLabel("Practise this level with more actions")
                         .accessibilityValue(mirror.mode == .practice ? "Selected" : "Not selected")
                         .accessibilityAddTraits(mirror.mode == .practice ? .isSelected : [])
+                        .accessibilityIdentifier(port.identifier("practice"))
                 }
                 if mirror.replaying {
                     Text("Replay: action \(mirror.replayPosition) of \(mirror.replayLength)").font(.callout)
@@ -126,14 +142,17 @@ struct LissajousLabyrinthControls: View {
                         Button("Step") { presenter.stepReplay(port: port) }
                             .accessibilityLabel("Play the next action of the replay")
                             .accessibilityValue("Action \(mirror.replayPosition) of \(mirror.replayLength)")
+                            .accessibilityIdentifier(port.identifier("replay-step"))
                         Button("Stop") { presenter.stopReplay(port: port) }
                             .accessibilityLabel("Stop the replay")
                             .accessibilityValue("\(mirror.replayLength) actions")
+                            .accessibilityIdentifier(port.identifier("replay-stop"))
                     }
                 } else if mirror.replayAvailable {
                     Button("Replay best solution") { presenter.startReplay(port: port) }
                         .accessibilityLabel("Replay your best solution of this level")
                         .accessibilityValue("Level \(mirror.levelNumber)")
+                        .accessibilityIdentifier(port.identifier("replay"))
                 }
                 Menu("Levels") {
                     ForEach(0..<5, id: \.self) { band in
@@ -150,15 +169,29 @@ struct LissajousLabyrinthControls: View {
                 }
                 .accessibilityLabel("Choose an open level")
                 .accessibilityValue("Levels 1 to \(mirror.frontier) open")
+                .accessibilityIdentifier(port.identifier("level-picker"))
                 Toggle("Sound", isOn: Binding(get: { mirror.soundOn }, set: { presenter.setSound(on: $0) }))
                     .accessibilityLabel("Ambient sound")
                     .accessibilityValue(mirror.soundOn ? "on" : "off")
+                    .accessibilityIdentifier(port.identifier("sound"))
             }
             .padding()
             .frame(maxWidth: Self.readableWidth, alignment: .leading)
         }
         .onAppear { presenter.controlsAppeared() }
         .onDisappear { presenter.controlsDisappeared() }
+    }
+
+    /// The identifier names of the panel's controls (feature 319, clarification Q1), each used once with the prefix
+    /// `experience.r02-g02.lissajous-labyrinth.` through `port.identifier`.
+    static let identifierNames: [String] = ["frequency-a", "frequency-b", "phase-a", "phase-c", "apply", "clear", "undo",
+                                            "redo", "next-level", "reset-view", "hint", "dismiss-tutorial",
+                                            "failure-undo", "retry", "campaign", "daily", "practice", "replay",
+                                            "replay-step", "replay-stop", "level-picker", "sound"]
+
+    /// The identifier name of `dial`'s stepper: "frequency-a", "frequency-b", "phase-a" or "phase-c".
+    static func identifierName(_ dial: LissajousLabyrinthDial) -> String {
+        identifierNames[LissajousLabyrinthDial.allCases.firstIndex(of: dial) ?? 0]
     }
 
     /// The goal line: actions allowed, the best possible and the mode.
