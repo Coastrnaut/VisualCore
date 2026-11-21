@@ -21,7 +21,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 3: Story 2 — the picture does not drift (P1)
 
-- [ ] T-R02G0208-003 [US2] Create `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthGolden.swift` (DEBUG or VISUALCORE_AUTOMATION; "16 frames:
+- [X] T-R02G0208-003 [US2] Create `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthGolden.swift` (DEBUG or VISUALCORE_AUTOMATION; "16 frames: — Verified 2026-11-21: 2026-11-21 LissajousLabyrinthGolden builds (DEBUG or automation only); golden-frames.json generated with LISSAJOUS_LABYRINTH_WRITE_GOLDEN=1 (schema 1, 16 frames, 128 path samples each, 63,861 bytes); LissajousLabyrinthGolden added to RELEASE_FORBIDDEN; proven by host-2
   levels 1, 21, 41, 61, 81 at tiers 0 … 2 at time 0, plus the hero frame; at 1,152 × 768 with the authored camera:
   every 32nd lap tick's sample, each checkpoint ring's band point and state colour, each obstacle's centre and colour,
   each dial ring's centre and knob, the night colour; positions rounded to 1/8 px; colours 8-bit sRGB; JSON with sorted

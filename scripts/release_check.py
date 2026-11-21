@@ -283,7 +283,9 @@ RELEASE_FORBIDDEN = ["DebugLaunch", "DebugExperience", "DebugInventory", "Scenar
                      "vcDamageStat", "vcCandidates", "vc_ci_angle_standin",
                      # Feature 309 (R02-G01-09): test-only symbols of Aurora Loom that exist only under
                      # DEBUG || VISUALCORE_AUTOMATION.
-                     "AuroraLoomGolden", "acceptanceScenarios"]
+                     "AuroraLoomGolden", "acceptanceScenarios",
+                     # Feature 318 (R02-G02-08): Lissajous Labyrinth's golden frames, test builds only.
+                     "LissajousLabyrinthGolden"]
 
 
 def registered_ids(root: Path = ROOT) -> list[str]:
