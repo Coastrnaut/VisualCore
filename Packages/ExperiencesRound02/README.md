@@ -216,3 +216,8 @@ words, the summary text), `HueCompassLights` (eased marks and win glow, Reduce F
 feedback route, the eased scene marks, a summary element, wrapping rows, a 520-point panel and a Sound toggle in the
 experience.
 
+Feature 337 (R02-G04-07) adds persistence and replay: results carry their winning trace and `verified`
+(`HueCompassProgress`), `HueCompassReconciliation` replays them on restore, the mode gains `replay(level:)` and the
+adapter writes snapshot schema 3 (migrating 1 → 2 → 3) with `replay.start/step/stop`; the panel offers Replay with Step
+and Stop and announces dropped results once.
+

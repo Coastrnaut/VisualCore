@@ -208,6 +208,11 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   edit a trace step by replacing it with a move the kernel itself refuses at that point (asserted in the test), so the
   expected drop is known without asking the reconciliation code under test; a random walk that happens to win a level
   opens the next one, so the tests do not cap the frontier.
+- **A trace of net actions needs no undo** (R02-G04-07, 2026-11-21). Hue Compass can undo only turns, so a winning
+  trace is the play's records with each undone turn removed and each redone one put back (`netActions`); the
+  persistence tests edit saves only in ways whose outcome is known without the code under test (a selection band
+  shifted by 12, which misses because band tolerances are at most 2; a step replaced by `turn(0)`, which the kernel
+  always refuses).
 - **A still at a repeated time settles its lights** (R02-G04-06, 2026-11-21). Hue Compass's render and tier tests draw
   every still at time 0; the eased lights first stepped by the 0 s between two such stills, so marks added by a probe
   stayed at size 0 and the mark checks missed them. A frame time that does not advance now counts as a separate picture

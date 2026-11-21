@@ -157,3 +157,22 @@ large turn as single steps; the play accepts both.
   halved when failed; `HueCompassSound` plays it only while wanted, on screen and active, and rebuilds it only at level
   openings, new clues, play ends and when turned on.
 
+## Persistence and replay (feature 337, R02-G04-07)
+
+- **Saving.** The app's shared saved-state store writes one atomic `state.json` per experience, quarantines an
+  unreadable file and refuses a newer schema; Hue Compass's snapshot is schema 3 `{level, mode, progress, records,
+  tutorial}`, migrating 1 → 2 → 3 (2 → 3 gives every result an empty trace, unverified). Digest
+  "r02-g04.hue-compass.v3".
+- **Reconcilable scores.** A campaign or daily win stores its fewest units, stars and winning trace — the play's net
+  actions (turns, probes and the selection; an undone turn left out, so the trace never needs an undo) — marked
+  verified, replacing a result only with fewer units. On restore `HueCompassReconciliation` replays every traced result
+  on a fresh play of its certified level and keeps it only if it wins having spent exactly its units with its stars; a
+  trace over 1,176 actions or with an illegal action never verifies. Dropped results are counted and announced once
+  ("1 saved result could not be checked and was removed."); untraced (schema-2) results are kept unverified; the
+  frontier is restored as saved.
+- **Replay.** `replay.start [level]` opens mode `replay(level)` for a verified traced result
+  (`r02-g04.no-replay` otherwise); `replay.step` applies the next action (`r02-g04.replay-end` after the last);
+  `replay.stop` returns to campaign. During replay every other action except `tutorial.dismiss` is refused
+  (`r02-g04.replay`, "Stop the replay first."); a replayed win records nothing and claims no stars. The panel offers
+  "Replay best solution", then Step and Stop with the position.
+
