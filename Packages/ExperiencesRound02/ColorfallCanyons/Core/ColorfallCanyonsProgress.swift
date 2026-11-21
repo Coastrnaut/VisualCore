@@ -7,6 +7,13 @@
 // open; a campaign win opens the next level, up to 100). The daily level is a clock-free function of a calendar date:
 // (days from 2026-01-01 × 53) mod 100 + 1, in integer arithmetic on the proleptic Gregorian calendar. Progress alone
 // opens every level. Every type is Codable with a stable, explicit form. Modelled on feature 335's HueCompassProgress.
+// Feature 347 (R02-G05-07) T-R02G0507-002 (FR-R02G0507-001, 003, 004; clarifications Q1–Q4; research R2, R6): each
+// result also keeps its winning trace (the ordered net actions of the play that earned it: carves, valve toggles and
+// steps, an undone action left out unless redone) and whether it is `verified`; a traced win replaces the result only
+// when it is better (fewer actions or more stars; ties keep the earlier trace); `drop(level:)` removes a result for
+// reconciliation; the mode gains `replay(level:)`, which records nothing and opens nothing. Encoded results carry `trace`
+// and `verified`; an encoding without them (schema 1 or 2) decodes as an unverified result without a trace. Modelled on
+// feature 337's HueCompassProgress.
 import Foundation
 
 /// The step of the Colorfall Canyons tutorial (levels 1 … 3, in every mode).
@@ -71,6 +78,9 @@ public enum ColorfallCanyonsMode: Sendable, Equatable, Hashable, Codable {
     /// The daily level `level` (1 … 100) of ``ColorfallCanyonsProgress/dailyLevel(year:month:day:)``: campaign rules,
     /// but a win never opens a level (a level still locked in the campaign is playable as the daily level).
     case daily(level: Int)
+    /// The replay of the stored winning trace of `level` (1 … 100) on a fresh play (feature 347); never records a
+    /// result, awards no stars and opens no level.
+    case replay(level: Int)
 
     /// The action budget of practice mode: the kernel's maximum, 30.
     public static let practiceBudget: Int = 30
@@ -80,8 +90,13 @@ public enum ColorfallCanyonsMode: Sendable, Equatable, Hashable, Codable {
         self == .practice ? Self.practiceBudget : base
     }
 
-    /// Whether a win in this mode records a result and stars: campaign and daily (never practice).
-    public var awardsStars: Bool { self != .practice }
+    /// Whether a win in this mode records a result and stars: campaign and daily (never practice or replay).
+    public var awardsStars: Bool {
+        switch self {
+        case .campaign, .daily: true
+        case .practice, .replay: false
+        }
+    }
 
     /// Whether a win in this mode opens the next level: campaign only.
     public var opensLevels: Bool { self == .campaign }
@@ -91,9 +106,10 @@ public enum ColorfallCanyonsMode: Sendable, Equatable, Hashable, Codable {
         case level
     }
 
-    /// Decodes `{"mode": "campaign"}`, `{"mode": "practice"}` or `{"mode": "daily", "level": n}`.
+    /// Decodes `{"mode": "campaign"}`, `{"mode": "practice"}`, `{"mode": "daily", "level": n}` or
+    /// `{"mode": "replay", "level": n}`.
     ///
-    /// - Throws: `DecodingError.dataCorrupted` for an unknown mode name or a daily level outside 1 … 100.
+    /// - Throws: `DecodingError.dataCorrupted` for an unknown mode name or a daily or replay level outside 1 … 100.
     public init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let name: String = try container.decode(String.self, forKey: .mode)
@@ -107,13 +123,20 @@ public enum ColorfallCanyonsMode: Sendable, Equatable, Hashable, Codable {
                                                        debugDescription: "daily level outside 1 … 100")
             }
             self = .daily(level: level)
+        case "replay":
+            let level: Int = try container.decode(Int.self, forKey: .level)
+            guard level >= 1 && level <= ColorfallCanyonsProgress.levelCount else {
+                throw DecodingError.dataCorruptedError(forKey: .level, in: container,
+                                                       debugDescription: "replay level outside 1 … 100")
+            }
+            self = .replay(level: level)
         default:
             throw DecodingError.dataCorruptedError(forKey: .mode, in: container,
                                                    debugDescription: "unknown mode \(name)")
         }
     }
 
-    /// Encodes the mode as `{"mode": <name>}`, with `"level"` for `daily`.
+    /// Encodes the mode as `{"mode": <name>}`, with `"level"` for `daily` and `replay`.
     public func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         switch self {
@@ -122,14 +145,17 @@ public enum ColorfallCanyonsMode: Sendable, Equatable, Hashable, Codable {
         case .daily(let level):
             try container.encode("daily", forKey: .mode)
             try container.encode(level, forKey: .level)
+        case .replay(let level):
+            try container.encode("replay", forKey: .mode)
+            try container.encode(level, forKey: .level)
         }
     }
 }
 
 /// The campaign progress of Colorfall Canyons: the won levels with their best results and the open frontier.
 ///
-/// Encoded as `{"frontier": n, "solved": [{"bestActions": a, "level": l, "stars": s}, …]}` with the won levels as an
-/// array sorted by level, so equal progress gives equal JSON (``encoded()`` also sorts the keys).
+/// Encoded as `{"frontier": n, "solved": [{"bestActions": a, "level": l, "stars": s, "trace": [action, …],
+/// "verified": v}, …]}` with the won levels as an array sorted by level, so equal progress gives equal JSON (``encoded()`` also sorts the keys).
 public struct ColorfallCanyonsProgress: Sendable, Equatable, Hashable, Codable {
     /// The best result of one won level.
     public struct Result: Sendable, Equatable, Hashable, Codable {
@@ -137,11 +163,19 @@ public struct ColorfallCanyonsProgress: Sendable, Equatable, Hashable, Codable {
         public let bestActions: Int
         /// The stars of that best result, 1 … 3.
         public let stars: Int
+        /// The winning actions of the play that earned the result, in order (its net carves, valve toggles and steps;
+        /// an undone action left out unless redone, so never an undo or a redo); empty for a result without a trace.
+        public let trace: [ColorfallCanyonsAction]
+        /// Whether the result was recorded with its trace (``ColorfallCanyonsReconciliation`` replays it); false for a
+        /// result restored from a save without traces.
+        public let verified: Bool
 
-        /// A result of the given values (not checked).
-        public init(bestActions: Int, stars: Int) {
+        /// A result of the given values (not checked); by default without a trace and unverified.
+        public init(bestActions: Int, stars: Int, trace: [ColorfallCanyonsAction] = [], verified: Bool = false) {
             self.bestActions = bestActions
             self.stars = stars
+            self.trace = trace
+            self.verified = verified
         }
     }
 
@@ -158,6 +192,25 @@ public struct ColorfallCanyonsProgress: Sendable, Equatable, Hashable, Codable {
     public static let dailyMultiplier: Int = 53
     /// The calendar years accepted by the daily level.
     public static let dailyYears: ClosedRange<Int> = 1...9999
+    /// The most carves and valve toggles a trace may hold and still verify (research R6): the largest budget, 30.
+    public static let maximumTraceEdits: Int = ColorfallCanyonsLevel.budgets.upperBound
+    /// The most steps a trace may hold and still verify (research R6): the largest tick limit, 3 600 (every accepted
+    /// step runs at least one tick).
+    public static let maximumTraceSteps: Int = ColorfallCanyonsLevel.tickLimits.upperBound
+
+    /// Whether `trace` lies within the bound of research R6: at most ``maximumTraceEdits`` carves and valve toggles and
+    /// at most ``maximumTraceSteps`` steps.
+    public static func withinTraceBound(_ trace: [ColorfallCanyonsAction]) -> Bool {
+        var edits: Int = 0
+        var steps: Int = 0
+        for action in trace {
+            switch action {
+            case .carve, .valve: edits += 1
+            case .step: steps += 1
+            }
+        }
+        return edits <= maximumTraceEdits && steps <= maximumTraceSteps
+    }
 
     /// The won levels (1 … 100) and their best results.
     public private(set) var solved: [Int: Result]
@@ -201,8 +254,9 @@ public struct ColorfallCanyonsProgress: Sendable, Equatable, Hashable, Codable {
 
     /// Records a win of `level` spending `actions` actions (certified smallest edit count `smallest`) in `mode`.
     ///
-    /// Practice records nothing. In campaign and daily mode the new result replaces a stored one only when it is better
-    /// (fewer actions or more stars); a worse or equal result keeps the stored one. A campaign win raises the frontier
+    /// Practice and replay record nothing. The result has no trace and is unverified. In campaign and daily mode the new
+    /// result replaces a stored one only when it is better (fewer actions or more stars); a worse or equal result keeps
+    /// the stored one. A campaign win raises the frontier
     /// to `level + 1` (at most 100); it never falls; a daily win opens nothing. A level outside 1 … 100 is ignored.
     ///
     /// - Returns: whether the stored result of `level` changed (a first or a better result).
@@ -223,6 +277,41 @@ public struct ColorfallCanyonsProgress: Sendable, Equatable, Hashable, Codable {
         }
         if mode.opensLevels { frontier = max(frontier, min(level + 1, Self.levelCount)) }
         return improved
+    }
+
+    /// Records a win of `level` spending `actions` actions (certified smallest edit count `smallest`) in `mode` with its
+    /// winning `trace`: a verified result (feature 347, clarification Q1).
+    ///
+    /// Practice and replay record nothing. In campaign and daily mode the new result replaces a stored one only when it
+    /// is better (fewer actions or more stars); an equal or worse result keeps the stored one (ties keep the earlier
+    /// trace). A campaign win raises the frontier to `level + 1` (at most 100); it never falls; a daily win opens
+    /// nothing. A level outside 1 … 100 is ignored.
+    ///
+    /// - Returns: whether the stored result of `level` changed (a first or a better result).
+    @discardableResult
+    public mutating func record(level: Int, actions: Int, smallest: Int, mode: ColorfallCanyonsMode = .campaign,
+                                trace: [ColorfallCanyonsAction]) -> Bool {
+        guard level >= 1 && level <= Self.levelCount, mode.awardsStars else { return false }
+        let result: Result = Result(bestActions: actions, stars: Self.stars(actions: actions, smallest: smallest),
+                                    trace: trace, verified: true)
+        var improved: Bool = false
+        if let old = solved[level] {
+            // Ties keep the earlier trace.
+            if result.bestActions < old.bestActions || result.stars > old.stars {
+                solved[level] = result
+                improved = true
+            }
+        } else {
+            solved[level] = result
+            improved = true
+        }
+        if mode.opensLevels { frontier = max(frontier, min(level + 1, Self.levelCount)) }
+        return improved
+    }
+
+    /// Removes the result of `level` (reconciliation drops a result that does not replay); the frontier is unchanged.
+    public mutating func drop(level: Int) {
+        solved[level] = nil
     }
 
     /// The daily level (1 … 100) of a calendar date: (d × 53) mod 100 + 1, where d is the days from 2026-01-01 to the
@@ -266,11 +355,13 @@ public struct ColorfallCanyonsProgress: Sendable, Equatable, Hashable, Codable {
         return try encoder.encode(self)
     }
 
-    /// One won level as encoded.
+    /// One won level as encoded; `trace` and `verified` are absent in schema-1 and schema-2 encodings.
     private struct Entry: Codable {
         let level: Int
         let bestActions: Int
         let stars: Int
+        let trace: [ColorfallCanyonsAction]?
+        let verified: Bool?
     }
 
     private enum CodingKeys: String, CodingKey {
@@ -278,7 +369,9 @@ public struct ColorfallCanyonsProgress: Sendable, Equatable, Hashable, Codable {
         case frontier
     }
 
-    /// Decodes progress; the won levels are an array of `{level, bestActions, stars}`.
+    /// Decodes progress; the won levels are an array of `{level, bestActions, stars, trace, verified}` (a missing trace
+    /// is empty, a missing `verified` false, so schema-1 and schema-2 saves stay readable). A trace is not checked here:
+    /// an illegal or over-long trace decodes and is dropped (and counted) by ``ColorfallCanyonsReconciliation``.
     ///
     /// - Throws: `DecodingError.dataCorrupted` for a frontier outside 1 … 100, a level outside 1 … 100 or repeated, stars
     ///   outside 1 … 3 or best actions below 0.
@@ -297,20 +390,22 @@ public struct ColorfallCanyonsProgress: Sendable, Equatable, Hashable, Codable {
                 throw DecodingError.dataCorruptedError(forKey: .solved, in: container,
                                                        debugDescription: "invalid won level \(entry.level)")
             }
-            solved[entry.level] = Result(bestActions: entry.bestActions, stars: entry.stars)
+            solved[entry.level] = Result(bestActions: entry.bestActions, stars: entry.stars, trace: entry.trace ?? [],
+                                         verified: entry.verified ?? false)
         }
         self.solved = solved
         self.frontier = frontier
     }
 
-    /// Encodes the frontier and the won levels as an array sorted by level.
+    /// Encodes the frontier and the won levels as an array sorted by level, each with its trace and `verified`.
     public func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(frontier, forKey: .frontier)
         var entries: [Entry] = []
         for level in solved.keys.sorted() {
             guard let result = solved[level] else { continue }
-            entries.append(Entry(level: level, bestActions: result.bestActions, stars: result.stars))
+            entries.append(Entry(level: level, bestActions: result.bestActions, stars: result.stars,
+                                 trace: result.trace, verified: result.verified))
         }
         try container.encode(entries, forKey: .solved)
     }

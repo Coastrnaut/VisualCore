@@ -387,8 +387,10 @@ import Testing
         #expect(decoded == progress)
         #expect(try decoded.encoded() == data)
         let text: String = String(decoding: data, as: UTF8.self)
-        #expect(text == "{\"frontier\":3,\"solved\":[{\"bestActions\":1,\"level\":1,\"stars\":3},"
-            + "{\"bestActions\":5,\"level\":2,\"stars\":1},{\"bestActions\":4,\"level\":70,\"stars\":2}]}")
+        #expect(text == "{\"frontier\":3,\"solved\":["
+            + "{\"bestActions\":1,\"level\":1,\"stars\":3,\"trace\":[],\"verified\":false},"
+            + "{\"bestActions\":5,\"level\":2,\"stars\":1,\"trace\":[],\"verified\":false},"
+            + "{\"bestActions\":4,\"level\":70,\"stars\":2,\"trace\":[],\"verified\":false}]}")
         let empty: ColorfallCanyonsProgress = try JSONDecoder().decode(
             ColorfallCanyonsProgress.self, from: Data("{\"frontier\":1,\"solved\":[]}".utf8))
         #expect(empty == ColorfallCanyonsProgress())
@@ -425,7 +427,8 @@ import Testing
             }
         }
         let badModes: [String] = ["{\"mode\":\"daily\",\"level\":0}", "{\"mode\":\"daily\",\"level\":101}",
-                                  "{\"mode\":\"daily\"}", "{\"mode\":\"replay\",\"level\":3}", "{\"level\":3}"]
+                                  "{\"mode\":\"daily\"}", "{\"mode\":\"replay\",\"level\":0}", "{\"mode\":\"replay\"}",
+                                  "{\"level\":3}"]
         for text in badModes {
             #expect(throws: (any Error).self, "\(text)") {
                 _ = try JSONDecoder().decode(ColorfallCanyonsMode.self, from: Data(text.utf8))

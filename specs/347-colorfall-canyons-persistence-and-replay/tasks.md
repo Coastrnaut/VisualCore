@@ -12,7 +12,7 @@ tests stay short (< 10 s each). {device} items are D1–D3 observations after Im
 
 ## Phase 2: Story 2 — reconcilable scores (P1) 🎯
 
-- [ ] T-R02G0507-002 [P] [US2] Edit `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsProgress.swift` (Result gains "trace: [ColorfallCanyonsAction]" and
+- [X] T-R02G0507-002 [P] [US2] Edit `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsProgress.swift` (Result gains "trace: [ColorfallCanyonsAction]" and — Verified 2026-11-21: 2026-11-21 host exit 0: 57 tests in 4 suites incl. 11 reconciliation tests (every certified trace verifies with 3 stars; 9 tampered results dropped and counted; untraced kept; frontier as saved; trace bound edges; net actions with undo/redo) (.autonomy/migration/checks/R02-G05-07.host.json); lead retest
   "verified: Bool"; `record(level:actions:smallest:mode:trace:)` stores a verified result, replacing only when better; `drop(level:)`; encoding keeps old payloads decodable (missing trace → empty, verified false); mode case
   "replay(level:)" that awards no stars and opens nothing) and create `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsReconciliation.swift` ("a
   result with a trace is kept only when a fresh play of its certified level (campaign budget) replays the trace to a
