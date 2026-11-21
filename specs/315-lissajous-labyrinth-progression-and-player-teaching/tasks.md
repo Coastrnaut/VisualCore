@@ -29,8 +29,8 @@ tests stay short (< 10 s each). No {owner} or {device} tasks.
 ## Phase 3: Stories 1 and 4 — tutorial, progress, daily, practice (P1, P2)
 
 - [ ] T-R02G0205-003 [P] [US1] [US4] Create `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthProgress.swift` (LissajousLabyrinthTutorialStep
-  "turn(dial) → checkpoints (next accepted action) → hints (next accepted action or a hint) → done (win); dismiss → done;
-  undo never moves it back" with the texts of clarification Q2; LissajousLabyrinthMode "campaign, practice, daily(level)";
+  "turn(dial) → checkpoints (an accepted dial action) → hints (the next accepted action or a hint) → done (a win);
+  dismiss → done; undo never moves it back" with the texts of clarification Q2; LissajousLabyrinthMode "campaign, practice, daily(level)";
   LissajousLabyrinthProgress "level 1 open; a campaign win opens the next; a better result replaces a worse one; stars 3 at
   shortest, 2 within shortest + 2, else 1"; dailyLevel "(days from 2026-01-01 × 41) mod 100 + 1, negative counts wrapped;
   nil for an impossible date") with `Packages/ExperiencesRound02/LissajousLabyrinth/CoreTests/LissajousLabyrinthProgressTests.swift` (tutorial scripts on levels
@@ -42,7 +42,9 @@ tests stay short (< 10 s each). No {owner} or {device} tasks.
 
 - [ ] T-R02G0205-004 [US1] [US2] [US3] [US4] Edit `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthExperienceCore.swift` (controls "level.select
   [1 … 100], mode.daily [year, month, day], mode.practice, mode.campaign, tutorial.dismiss"; practice allowance 64; daily
-  wins record results without opening levels; progress and mode in the digest, the tutorial step in the snapshot only;
+  wins record results without opening levels;
+  choosing daily or practice drops the left level's records, mode.campaign returns to a fresh campaign play of the same
+  level; the tutorial only on levels 1 … 3 in campaign mode, once per opening; progress and mode in the digest, the tutorial step in the snapshot only;
   the opened level's winning set as derived state; snapshot schema 2 `{level, records, progress, mode, tutorial}` with
   a 1 → 2 migration; codes r02-g02.locked, r02-g02.date), `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthScenarios.swift` and the regenerated
   `Packages/ExperiencesRound02/LissajousLabyrinth/scenario-manifest.json`, with `Packages/ExperiencesRound02/LissajousLabyrinth/CoreTests/LissajousLabyrinthExperienceCoreTests.swift` updates (conformance;
