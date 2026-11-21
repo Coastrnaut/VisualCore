@@ -115,7 +115,8 @@ refused.
 ### Functional Requirements
 
 - **FR-R02G0401-001**: A level MUST define the compass wheel (its bearings and hue bands), the hue offset, the fog
-  density of every bearing, the hidden target bearing, the bearing tolerance, the hue-band tolerance and the allowance.
+  density of every bearing, the hidden target bearing, the bearing tolerance, the hue-band tolerance and the allowance; its
+  start bearing MUST NOT already lie within the bearing tolerance of the target.
 - **FR-R02G0401-002**: The bearing of any integer direction MUST be decided exactly by a fixed sector rule on the wheel
   (the exact form of hue = (atan2(y, x) + offset) / 2π), each direction in exactly one sector.
 - **FR-R02G0401-003**: Turning the compass MUST change the current bearing by whole steps around the wheel and spend
