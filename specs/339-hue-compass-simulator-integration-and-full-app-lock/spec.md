@@ -5,7 +5,7 @@
 
 **Created**: 2026-11-21
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G04-09 (migration ledger, game feature of experience R02-G04) · ID namespace FR-R02G0409-###,
 SC-R02G0409-###, T-R02G0409-###
@@ -28,6 +28,50 @@ Canonical overrides:
 - **Model:** feature 329 (Wave Knot Keeper), itself after features 319 and 309. Already in place from earlier Hue Compass
   features: panel play with the turn buttons, Probe, the band stepper and Select (features 333, 334), the round-two
   opening seed 0, the test-only golden code in the Release symbol list (feature 338).
+
+## Clarifications
+
+### Session 2026-11-21
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+329's answers. Facts checked in code (read-only, 2026-11-21): feature 329 (Wave Knot Keeper) is the model
+(`Apps/VisualCore/Tests/UI/WaveKnotKeeper`, namespace `WK`, serial chunk `l3`; identifiers through
+`port.identifier(name)`; `WaveKnotKeeperSchemaExamples.swift`); Hue Compass's panel (`HueCompassControls`) has labels
+and values but no identifiers; its registration in `Apps/VisualCore/App/ExperienceRegistry.swift` still says "Snapshot
+schema 1, so no earlier example is stored yet" although the snapshot is schema 3 since feature 337; the canvas
+description (`HueCompassPresenter.describe`) names the level, the bearing and band, the clues, the units and, when won,
+"The bearing and hue match. k of 3 stars."; `RELEASE_FORBIDDEN` already holds `HueCompassGolden` (feature 338); the UI
+chunk keys in `release_check.py` use up to `l3` and not `m3`; no `HC` namespace exists in the app's tests.
+
+- Q: How do the interface tests find controls and what do they read? → A: every panel control gets the identifier
+  `experience.r02-g04.hue-compass.<name>` through `port.identifier(name)`: the buttons `turn-minus-4`, `turn-minus-1`,
+  `turn-plus-1`, `turn-plus-4`, `probe`, `select`, `undo`, `redo`, `next-level`, `reset-view`, `hint`,
+  `dismiss-tutorial`, `retry`, `campaign`, `daily`, `practice`, `replay`, `replay-step`, `replay-stop`, the stepper
+  `band-picker`, the menu `level-picker`, the toggle `sound` and the summary element `summary`. The tests read the canvas
+  description for the level, the bearing and the stars, and the replay step's value for the replay position. Impact:
+  FR-R02G0409-001, 002.
+- Q: Which interface tests exist and how are they grouped? → A: namespace `HC` in
+  `Apps/VisualCore/Tests/UI/HueCompass/HCSupport.swift`; `HCPlayUITests` (fresh launch with `-vcResetData
+  -vcSkipWelcome -vcCandidates -openExperience r02-g04.hue-compass`: dismiss the tutorial, play level 1's certified
+  witness with the turn buttons (each turn split into presses of 4 and 1), Probe, the band stepper and Select, read "The
+  bearing and hue match" and "3 of 3 stars", the level picker shows level 2 open; relaunch without reset: the stars and
+  level 2 are kept) and `HCReplayUITests` (after the win, Replay, Step until the replay ends won, Stop back to the
+  campaign). They run as a new serial chunk `m3` of `release_check.py` (its key checked unique); each test stays under 90
+  s. Level 1's start bearing, target, band and witness actions are pinned in `HC` and checked against the Core by an app
+  unit test. Impact: FR-R02G0409-002, 007; SC-R02G0409-001.
+- Q: Which earlier-schema examples are stored and where do they come from? → A:
+  `HueCompassExperienceCore.schemaOneExample()` (the schema-1 saved state of a seeded play of level 1 with one turn
+  that does not win) and `schemaTwoExample()` (schema 2 with progress and level 1 solved, no trace), both
+  `MigrationExample`s built in the Core (`HueCompassSchemaExamples.swift`, modelled on `WaveKnotKeeperSchemaExamples`),
+  registered with `examples:`; the app's migration check restores both into schema 3 with progress kept. The
+  registration's comment is corrected. Impact: FR-R02G0409-003; SC-R02G0409-002.
+- Q: What proves the release configuration excludes test-only code? → A: the existing `app-release-build` and
+  `app-release-symbols` steps; `HueCompassGolden` is already forbidden, and the scenarios exist only under
+  `DEBUG || VISUALCORE_AUTOMATION` (covered by the existing `acceptanceScenarios` entry). Impact: FR-R02G0409-004;
+  SC-R02G0409-003.
+- Q: How is "not available" checked? → A: an app unit test: without `-vcCandidates` the catalog lists
+  `r02-g04.hue-compass` as not available and the launcher cannot open it; the registry's candidates list contains it and
+  `all` does not. Impact: FR-R02G0409-006; SC-R02G0409-002.
 
 ## User Scenarios & Testing *(mandatory)*
 
