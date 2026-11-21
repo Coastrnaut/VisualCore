@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_device_rows.py",
+    "--experience",
+    "r02-g01.aurora-loom"
+  ],
+  "command": "python3 scripts/check_device_rows.py --experience r02-g01.aurora-loom",
+  "elapsed_seconds": 0.029,
+  "exit_code": 0,
+  "finished": "2026-11-21T05:19:30+00:00",
+  "gate": "R02-G01-10",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G01-10.device-rows.log",
+  "log_sha256": "3b20404a386239c554fa98b2d421848452ab3ddb5ead236cd03bf83d7d5a0865",
+  "name": "device-rows",
+  "started": "2026-11-21T05:19:30+00:00",
+  "timed_out": false
+}

@@ -13,7 +13,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
 
 ## Phase 2: Story 1 — the campaign knows what to run (P1) 🎯
 
-- [ ] T-R02G0110-002 [US1] Create `docs/apps/aurora-loom/device-rows.json` (data-model.md: "schema 1, sorted keys";
+- [X] T-R02G0110-002 [US1] Create `docs/apps/aurora-loom/device-rows.json` (data-model.md: "schema 1, sorted keys"; — Verified 2026-11-21: 2026-11-21 device-rows exit 0 (docs/apps/aurora-loom/device-rows.json: schema 1, D1-D3 tied to DEV1-3-R02-G01, 12 scenarios, rows AL-D1 to AL-D8 pending, no result field)
   devices D1 → DEV1-R02-G01, D2 → DEV2-R02-G01, D3 → DEV3-R02-G01; the 12 scenarios of clarification Q2; rows AL-D1 …
   AL-D8 of clarification Q1 with title, devices, procedure, measurements, pass (clarification Q5), gating (false only for
   AL-D6), covers, owner_steps, status "pending device campaign"; no result field)
