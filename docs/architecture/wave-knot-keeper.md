@@ -151,6 +151,23 @@ moves are listed point by point and direction by direction, and a state is solve
   `replay.stop` returns to the campaign; during replay only selection and dismissing the tutorial are allowed, and
   progress never changes. Refusal codes: `r02-g03.no-replay`, `r02-g03.replay-end`, `r02-g03.replay`.
 
+## Regression net (R02-G03-08)
+
+- **Solver regression.** For all 100 levels the generated level equals its witness, the witness replays to a win with
+  its recorded fingerprints, and the solver re-finds the certified shortest with work at most 3,661 expanded ropes and
+  equal to the certified work (largest 728); thirteen kinds of alteration (a control point, a gate, the target, the
+  tension bound, the allowance, a solution move's point or direction, the terminal, the near miss, the crossing
+  counterexample, a recorded fingerprint, the level fingerprint) each fail naming the level and the part.
+- **Golden frames, made by code.** `WaveKnotKeeperGolden` (test builds only; forbidden in Release) describes 16 frames
+  (levels 1, 21, 41, 61, 81 at three tiers, plus the hero frame) at 1,152 × 768: projected control points, midpoints,
+  gate centres and drawn crossings, palette colours and tier detail, pinned with SHA-256 digests in
+  `golden-frames.json`; an unequal digest falls back to one 1/8-pixel quantum. The simulator renders the same frames
+  and checks them with the feature-323 tolerances. Regenerate on purpose with `WAVE_KNOT_KEEPER_WRITE_GOLDEN=1`.
+- **Memory.** Twelve open-draw-warn-close cycles stay within 16 MB of the first when run alone (measured 29.7 …
+  30.4 MB); the rope scene holds no renderers after each warning and close.
+- **Running it.** CI runs the host part as "Wave Knot Keeper regression (host)"; locally
+  `python3 scripts/wave_knot_keeper_regression.py` runs host and simulator parts with one summary.
+
 ## Failures
 
 `WaveKnotKeeperError` reason codes: `r02-g03.level`, `r02-g03.move`, `r02-g03.stage`, `r02-g03.stale`,

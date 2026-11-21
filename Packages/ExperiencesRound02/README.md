@@ -170,3 +170,9 @@ labels every control, shows refusals in words, wraps at large text sizes and add
 Feature 327 (R02-G03-07) adds persistence and replay: results carry their winning trace and `verified`
 (`WaveKnotKeeperProgress`), `WaveKnotKeeperReconciliation` re-checks them on restore, the adapter writes snapshot schema
 3 with a 2 → 3 migration and adds `replay.start/step/stop`; the panel offers Replay best solution with Step and Stop.
+
+Feature 328 (R02-G03-08) adds the regression net: the solver regression over all 100 witnesses, `WaveKnotKeeperGolden`
+(16 code-computed golden frames pinned in `WaveKnotKeeper/golden-frames.json`; regenerate on purpose with
+`WAVE_KNOT_KEEPER_WRITE_GOLDEN=1 swift test --package-path Packages/ExperiencesRound02 --filter
+WaveKnotKeeperRegressionGoldenTests`), simulator golden-frame and memory tests, and
+`scripts/wave_knot_keeper_regression.py`.

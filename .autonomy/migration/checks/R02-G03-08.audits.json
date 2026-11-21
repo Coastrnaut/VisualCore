@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--audits",
+    "--only",
+    "r02-g03.wave-knot-keeper"
+  ],
+  "command": "python3 scripts/verify_experiences.py --audits --only r02-g03.wave-knot-keeper",
+  "elapsed_seconds": 2.412,
+  "exit_code": 0,
+  "finished": "2026-11-21T13:29:42+00:00",
+  "gate": "R02-G03-08",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G03-08.audits.log",
+  "log_sha256": "7615aa80c66977d4b26c31a93240abdb8aa0a043bd9a36092ae09a635b3cd99e",
+  "name": "audits",
+  "started": "2026-11-21T13:29:40+00:00",
+  "timed_out": false
+}

@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-21 (R02-G03-07: an edited-save test makes its edited trace step one the kernel refuses, so the expected drop does not depend on the reconciliation code under test).
+Last updated: 2026-11-21 (R02-G03-08: Wave Knot Keeper's regression net; a spec list counted by hand ("twelve" kinds of alteration that were thirteen) was caught by the agent writing the test, so a count in a spec is checked against its list).
 
 ## 1. What is tested, and where
 
@@ -186,6 +186,10 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
 
 ### Swift and test-tool pitfalls
 
+- **Count a spec's list, do not trust its number** (R02-G03-08, 2026-11-21). The Wave Knot Keeper regression spec said
+  "twelve kinds" of alteration but listed thirteen (a solution move's point and direction are two); the agent writing
+  the test covered all thirteen and reported the mismatch, and the spec, plan, checklist and tasks were corrected before
+  the gate. `python3 scripts/wave_knot_keeper_regression.py` runs the game's host and simulator regression in one go.
 - **Edit saves so the expectation is independent** (R02-G03-07, 2026-11-21). Wave Knot Keeper's persistence tests
   edit a trace step by replacing it with a move the kernel itself refuses at that point (asserted in the test), so the
   expected drop is known without asking the reconciliation code under test; a random walk that happens to win a level

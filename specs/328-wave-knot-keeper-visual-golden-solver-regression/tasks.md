@@ -55,7 +55,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02G0308-007 Docs: `docs/architecture/wave-knot-keeper.md` (regression net),
+- [X] T-R02G0308-007 Docs: `docs/architecture/wave-knot-keeper.md` (regression net), — Verified 2026-11-21: 2026-11-21 round02-host exit 0; audits exit 0; architecture regression net, package README (regeneration command), testing doc
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`; `--name audits -- python3
   scripts/verify_experiences.py --audits --only r02-g03.wave-knot-keeper`
 - [ ] T-R02G0308-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
