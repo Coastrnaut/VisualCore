@@ -62,7 +62,7 @@ run uses). Fixture seed 2_342; tests stay short (< 10 s each).
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02G0502-007 Docs: `docs/architecture/colorfall-canyons.md` (content pipeline), `Packages/ExperiencesRound02/README.md`,
+- [X] T-R02G0502-007 Docs: `docs/architecture/colorfall-canyons.md` (content pipeline), `Packages/ExperiencesRound02/README.md`, — Verified 2026-11-21: 2026-11-21 round02-host exit 0; docs/architecture/colorfall-canyons.md (content pipeline), Packages/ExperiencesRound02/README.md, docs/automatedtesting.md
   `docs/automatedtesting.md`; `--name round02-host`
 - [ ] T-R02G0502-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
   `--name host-full`

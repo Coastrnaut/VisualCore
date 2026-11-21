@@ -59,3 +59,29 @@ refuses damaged, edited and newer forms (`r02-g05.malformed`, `.newer-schema`). 
 game as an R02-F23 `PuzzleRules`: a position is (fluid, actions spent, outcome); the moves are a carve of each carvable
 cell, a toggle of each valve (while budget remains) and a single tick, so a certified solution (R02-G05-02) spells a
 long step as single ticks; the play accepts both.
+
+## Content pipeline (feature 342, R02-G05-02)
+
+- **Manifest.** `ColorfallCanyonsManifest` holds the 100 planned levels of the archived design (number, planned seed,
+  band 1 … 5, move budget 8 … 19), 20 per band.
+- **Generator.** Candidate k of a level draws from `SeededRandom(seed: SeedDerivation.derive(plannedSeed, index: k))`: a
+  mesa grid (bands 1–2: 6 × 5, band 3: 7 × 5, bands 4–5: 8 × 6) sloping down by two height steps per row with noise, rock
+  (15 %), bottom-row drains (20 %), depressions that pool fluid, springs on the top two rows (1, 2, 2, 3, 3 by band), a
+  flow rate and a tick limit. A planted plan then changes each spring's path once (the smallest carve depth 1 … 3 of a
+  cell on or next to the path); basins go where the planted paths pool, and their targets are what the planted run
+  leaves there. A candidate is kept when the planted plan wins, the unedited level does not, and the solver's smallest
+  edit count is in the band's range (1 … 2, 2 … 3, 3, 3, 3); at most 512 candidates (`r02-g05.generation` beyond).
+- **Solver.** `ColorfallCanyonsSolver` searches edit sets (carves plus valve toggles before the first tick, then letting
+  time run) of size 0 … 3 in a fixed order and returns the first that wins, so the count is smallest. Each set is keyed
+  by its routing and valves (a carve that changes no downhill choice changes nothing); every distinct key is simulated
+  once with conservation asserted every tick. Exact speed-ups: carves no fluid can reach within the depth are left out,
+  routing keys are updated incrementally with a Zobrist hash (compared in full on a hit), and the search runs an
+  allocation-free copy of the kernel's tick that stops once nothing can move; the returned set is re-run through the
+  kernel. The solver certifies plans made before the first tick, so a player who also edits during a run may do better.
+- **Difficulty.** `ColorfallCanyonsDifficulty`: smallest edits, routings simulated, win tick, springs, basins, protected
+  basins and carvable cells. Band means of the smallest count never fall and R02-F24's progression rule holds.
+- **Witness files.** `docs/games/colorfall-canyons/levels/NNN.witness.json` (schema 1) store the level, the winning
+  actions, the win tick, a digest of the cell masses after every tick, the totals at the win, the play fingerprints and
+  two counterexamples (the unedited level and the witness without its last edit, both failing); edited, newer or
+  non-replaying files are refused (`r02-g05.witness`). The catalog digest over the 100 level fingerprints is pinned.
+

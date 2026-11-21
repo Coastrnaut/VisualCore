@@ -243,3 +243,14 @@ colour sharing, exact conservation) with `ColorfallCanyonsVerdict` and `Colorfal
 `ColorfallCanyonsPlay` with `ColorfallCanyonsAction`, `ColorfallCanyonsStage`, `ColorfallCanyonsEvent` and append-only
 `ColorfallCanyonsRecord`s, and `ColorfallCanyonsRules` for the R02-F23 puzzle contract. Refusals are
 `ColorfallCanyonsError` with `r02-g05.*` codes. Rules: [docs/architecture/colorfall-canyons.md](../../docs/architecture/colorfall-canyons.md).
+
+Feature 342 (R02-G05-02) adds the content pipeline: `ColorfallCanyonsManifest` (100 planned levels), the seeded
+`ColorfallCanyonsGenerator` with `ColorfallCanyonsBandProfile` and `ColorfallCanyonsGenerated`, the edit-set solver
+`ColorfallCanyonsSolver` (`ColorfallCanyonsEdit`, `ColorfallCanyonsSolution`, depth 3), `ColorfallCanyonsDifficulty` and
+versioned witness files (`ColorfallCanyonsWitness`, `ColorfallCanyonsCounterexample`) under
+[docs/games/colorfall-canyons/levels/](../../docs/games/colorfall-canyons/levels/). After an intended rule change:
+
+```bash
+COLORFALL_CANYONS_WRITE_WITNESSES=1 swift test --package-path Packages/ExperiencesRound02 --filter ColorfallCanyonsCatalogTests
+```
+

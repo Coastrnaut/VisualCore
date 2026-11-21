@@ -190,6 +190,11 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   and shares an outflow between colours by largest remainder, so its flow tests assert zero drift per colour on every
   tick of 500 seeded levels and compare each tick with an independent brute-force step written in the test, instead
   of a tolerance.
+- **Measure a solver on the debug build before fixing its depth** (R02-G05-02, 2026-11-21). Colorfall Canyons's
+  edit-set search at depth 4 took about 30 s per band of 20 levels on the debug host build; an exact early stop of each
+  simulated run once nothing can move cut it fourfold, and depth 3 (with bands 4 and 5 differing by springs and grid
+  instead) brought every band to 3 … 15 s, so the catalog tests run in halves under 10 s each. The spec records the
+  correction.
 - **Quantise before hashing floats** for digests that must match across platforms (surface colours are hashed as
   16-bit values).
 
