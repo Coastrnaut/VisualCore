@@ -47,7 +47,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 5: Story 4 — the checks run on every change (P2)
 
-- [ ] T-R02G0208-006 [P] [US4] Create `scripts/lissajous_labyrinth_regression.py` and its test in `scripts/test_scripts.py`
+- [X] T-R02G0208-006 [P] [US4] Create `scripts/lissajous_labyrinth_regression.py` and its test in `scripts/test_scripts.py` — Verified 2026-11-21: 2026-11-21 regression exit 0: python3 scripts/lissajous_labyrinth_regression.py prints host PASS, simulator PASS (isolated memory bound), overall PASS; LissajousLabyrinthRegressionTests in test_scripts (5 tests); CI step Lissajous Labyrinth regression (host)
   (agent D: host filter `LissajousLabyrinthRegression`, then the simulator classes through
   `xcodebuild_package.py --only-testing` with the isolation variable, one summary line per part with pass or fail and
   the first failing name, a non-zero exit on any failure), and add the named step "Lissajous Labyrinth regression

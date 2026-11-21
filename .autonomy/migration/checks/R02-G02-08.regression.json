@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "scripts/lissajous_labyrinth_regression.py"
+  ],
+  "command": "python3 scripts/lissajous_labyrinth_regression.py",
+  "elapsed_seconds": 15.041,
+  "exit_code": 0,
+  "finished": "2026-11-21T08:34:52+00:00",
+  "gate": "R02-G02-08",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G02-08.regression.log",
+  "log_sha256": "4761d8c52b1b597a55af7cfe86e54f6d5ffd2d7275645e438faf68fc3971cd44",
+  "name": "regression",
+  "started": "2026-11-21T08:34:37+00:00",
+  "timed_out": false
+}
