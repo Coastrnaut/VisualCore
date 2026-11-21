@@ -19,7 +19,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
   only for HC-D6), covers, owner_steps, status "pending device campaign"; no result field); edit
   `scripts/release_check.py` (step `device-rows-r02-g04`); `--name device-rows -- python3 scripts/check_device_rows.py
   --experience r02-g04.hue-compass`
-- [ ] T-R02G0410-003 [P] [US1] Edit `scripts/test_scripts.py` (agent A: the real Hue Compass definition passes; a copy
+- [X] T-R02G0410-003 [P] [US1] Edit `scripts/test_scripts.py` (agent A: the real Hue Compass definition passes; a copy — Verified 2026-11-21: 2026-11-21 script-tests exit 0, run alone: HueCompassDeviceRowsCheckTests 6/6 (real definition passes; scenario, row field and T-R02G0409-011 removals fail by name; release step device-rows-r02-g04 runs the check)
   with a scenario removed, a copy with HC-D1's `pass` field removed and a copy with T-R02G0409-011 dropped from every row's covers each fail by name; the release
   step `device-rows-r02-g04` runs the check for `r02-g04.hue-compass`); `--name script-tests` (alone)
 
