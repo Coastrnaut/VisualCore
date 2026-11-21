@@ -43,7 +43,7 @@ ImplementationLock-100.
 
 ## Phase 4: Story 3 — sound and haptics (P2)
 
-- [ ] T-R02G0406-005 [P] [US3] Create `Packages/ExperiencesRound02/HueCompass/Core/HueCompassSoundRecipe.swift` ("root 110 Hz, a partial at 110 Hz × (1 + g /
+- [X] T-R02G0406-005 [P] [US3] Create `Packages/ExperiencesRound02/HueCompass/Core/HueCompassSoundRecipe.swift` ("root 110 Hz, a partial at 110 Hz × (1 + g / — Verified 2026-11-21: 2026-11-21 host-3 exit 0: HueCompassSoundRecipeTests 6/6 (equal and differing recipes, exact partials, valid for every certified level and clue in every stage)
   12) for the last hue gap g (unison with no clue), a fifth above the root, gains × (1 − 0.4 · min(d, 90) / 90) for fog
   depth d, won adds an octave, failed halves the gains, 8 s") with `Packages/ExperiencesRound02/HueCompass/CoreTests/HueCompassSoundRecipeTests.swift` (equal
   for equal clue and stage; differs for a hue-gap or stage change; every recipe valid for `AmbientLoopRecipe`'s bounds
