@@ -15,7 +15,7 @@ ImplementationLock-100.
 
 ## Phase 2: Story 1 — VoiceOver play (P1) 🎯
 
-- [ ] T-R02G0206-002 [P] [US1] [US3] Create `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthFeedbackPlan.swift` ("after(old:new:)" texts and
+- [X] T-R02G0206-002 [P] [US1] [US3] Create `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthFeedbackPlan.swift` ("after(old:new:)" texts and — Verified 2026-11-21: 2026-11-21 host exit 0: LissajousLabyrinthFeedbackPlanTests 7/7 (action, undo, redo, unchanged core; obstacle contact named; campaign win with 3 and 2 stars, practice win without; failure explanation and its rewind; level and mode changes with the tutorial instruction; every refusal code raw and prefixed; exact literal texts)
   kinds of clarification Q1: "<Dial> <value>. v of n checkpoints in order. Actions s of a." with " The path touches
   obstacle k." while touching; "Undone: " / "Redone: "; win "The path is safe. Level won in s actions, k of 3 stars." (no
   stars in practice); failure = the feature-315 explanation; level or mode change "Level n, band b, <mode>." plus the
