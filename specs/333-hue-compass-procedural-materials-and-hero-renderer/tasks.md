@@ -19,7 +19,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 2: Stories 1 and 2 — the scene and renderer purity (P1) 🎯
 
-- [ ] T-R02G0403-003 [P] [US1] Create `Packages/ExperiencesRound02/HueCompass/Core/HueCompassShaders.swift` (glass and solid sources; uniform names; band hue
+- [X] T-R02G0403-003 [P] [US1] Create `Packages/ExperiencesRound02/HueCompass/Core/HueCompassShaders.swift` (glass and solid sources; uniform names; band hue — Verified 2026-11-21: 2026-11-21 host-2 exit 0 (agent A: glass and solid GLSL ES 3.00 sources, 17 tests: version line, declared and used uniforms, no samplers or loops, the GLSL band rule equals HueCompassPalette.band for all 24 bands within 1e-9, capped glow, fog drift still at time 0; colour rides in the normal slot because ShaderMeshRenderer has no colour stream)
   transform equal to `HueCompassPalette.band`; fog drift; glow gain cap) with
   `Packages/ExperiencesRound02/HueCompass/CoreTests/HueCompassShaderSourceTests.swift` (version line, declared uniforms, no texture samplers, bounded
   loops, the hue formula's constants match the CPU's); `--name host-2`
