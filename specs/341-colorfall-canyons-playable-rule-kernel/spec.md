@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-21
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G05-01 (migration ledger, game feature of experience R02-G05) · ID namespace FR-R02G0501-###,
 SC-R02G0501-###, T-R02G0501-###
@@ -27,6 +27,52 @@ Canonical overrides:
   1/60 s), so every device decides the same and conservation holds exactly, not within a tolerance.
 - **Shared features used:** R02-F03 (numbers) and R02-F23 (puzzle contract: the kernel's rules are a puzzle contract, so
   R02-G05-02 can certify levels).
+
+## Clarifications
+
+### Session 2026-11-21
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time. Facts checked in
+code (read-only, 2026-11-21): `Packages/ExperiencesRound02` holds Aurora Loom, Lissajous Labyrinth, Wave Knot Keeper and
+Hue Compass as the pattern (Core with level, play, records with previous and next fingerprints, rules as R02-F23
+`PuzzleRules`, `StableHash` fingerprints, `r02-gNN.*` reason codes); no `ColorfallCanyons*` name exists.
+
+- Q: What exactly are the terrain, the cells and the quantities? → A: a grid of 4 … 12 columns by 4 … 10 rows; each cell
+  has an integer height 0 … 15 and a kind: open, rock (never holds or passes fluid), spring, basin or drain. Fluid is
+  counted in whole units per colour (cyan 0, coral 1, yellow 2); a cell's volume is the sum of its three colours. A
+  level has 1 … 3 springs (each one colour, release 1 … 4 units per tick, supply 1 … 999 units, valve open or closed at
+  the start), 1 … 4 basins (capacity 1 … 999, required fill 0 … capacity, a required mix of per-mille shares per colour
+  summing to 1,000 with a tolerance 0 … 500 per mille, and for protected basins a tolerated wrong-colour amount 0 … 999,
+  wrong meaning a colour whose required share is 0), at least one drain, a flow rate 1 … 8 units per tick, an action
+  budget 1 … 30 and a tick limit 1 … 3,600 (60 s at the fixed 1/60 s tick). Impact: FR-R02G0501-001; SC-R02G0501-001.
+- Q: How does fluid move on a tick, exactly? → A: synchronously from the start-of-tick state, in this order: (1) every
+  open or spring cell with volume V > 0 whose downhill neighbour exists sends r = min(V, flow rate) units to it; the
+  downhill neighbour is the non-rock 4-neighbour with the lowest height strictly below the cell's own, ties broken in
+  the order east, south, west, north; a cell with none holds its fluid (a pool); (2) the r units are shared between
+  colours by largest remainder of r · mass_c / V (floors first, the leftover units to the largest remainders, ties to
+  the lower colour index), so no unit is created or lost; (3) each open spring with supply left adds min(release,
+  supply) units of its colour to its own cell; (4) basins and drains only receive, and what reaches a drain is counted
+  as spilled per colour. Conservation: released = held in cells + held in basins + spilled, per colour, after every tick.
+  Impact: FR-R02G0501-002, 003; SC-R02G0501-003.
+- Q: What do the actions do and what do they cost? → A: `carve(cell)` lowers an open cell's height by one (refused at
+  height 0, or on rock, spring, basin or drain cells) and spends one action; `valve(spring)` toggles a spring's valve and
+  spends one action; `step(n)` advances n = 1 … 600 ticks and spends nothing, stopping at the first tick that ends the
+  level. After every tick: failure is decided first (contamination: a protected basin's wrong-colour mass exceeds its
+  tolerated amount; overflow: any basin's volume exceeds its capacity), then win (every basin with a required fill above
+  0 holds at least that fill and, for each colour c, |1,000 · mass_c − share_c · volume| ≤ tolerance · volume), then time
+  (the tick limit reached without a win). A level is never won at tick 0. Impact: FR-R02G0501-004, 005;
+  SC-R02G0501-001, 004.
+- Q: What can be undone, and from which stages? → A: every accepted carve, valve and step is undoable and redoable (the
+  kernel is fully deterministic, so undo restores the snapshot before the action and returns any action spent); a new
+  action clears the redo stack. Undo works in playing and paused, and from failed it returns to playing with the earlier
+  state (an honest retry, recorded); a won level is final and refuses undo. Impact: FR-R02G0501-007, 008;
+  SC-R02G0501-002.
+- Q: How are records, fingerprints and stored forms defined? → A: as in R02-G04-01: every accepted carve, valve, step,
+  undo and redo appends a record (schema, level seed, tick, kind, operands, previous and next fingerprints); the play
+  fingerprint is the SHA-256 of the schema, level fingerprint, tick, heights, valve states, supplies left, every cell's
+  and basin's colour masses, spilled masses, actions spent, stage and failure; levels are JSON schema 1 with sorted keys
+  and a fingerprint, re-checked on decode; reason codes `r02-g05.level`, `.action`, `.stage`, `.stale`, `.budget`,
+  `.newer-schema`, `.malformed`. Impact: FR-R02G0501-006 … 011; SC-R02G0501-002, 005.
 
 ## User Scenarios & Testing *(mandatory)*
 
