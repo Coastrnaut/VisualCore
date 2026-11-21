@@ -13,7 +13,7 @@ or {device} tasks (pure logic and host-generated content). Fixture seed 2_332; t
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G0402-002 Add `generation(Int)` ("r02-g04.generation") and `witness(String)` ("r02-g04.witness") to
+- [X] T-R02G0402-002 Add `generation(Int)` ("r02-g04.generation") and `witness(String)` ("r02-g04.witness") to — Verified 2026-11-21: 2026-11-21 host exit 0 (whole round-two package with the error cases, the 100-entry manifest, difficulty with band profiles and the generated type, and the solver's result types)
   `Packages/ExperiencesRound02/HueCompass/Core/HueCompassError.swift`; create `Packages/ExperiencesRound02/HueCompass/Core/HueCompassManifest.swift` (HueCompassManifestEntry "number 1 … 100,
   seed UInt64, band 1 … 5, budget 8 … 19", the 100 entries copied from `python3 scripts/planning_index.py levels
   --experience R02-G04` with the source line), `Packages/ExperiencesRound02/HueCompass/Core/HueCompassDifficulty.swift` ("smallest, largest class after the
