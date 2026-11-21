@@ -123,8 +123,9 @@ buttons, steps, undo, redo), including winning every certified level.
   except a double tap on empty space (`.ended` timestamps at most 0.35 s apart), which resets the view.
 - **FR-R02G0504-003**: Picking MUST be analytic and deterministic: the touch ray through the drawn camera against the
   block tops and emitter columns, the nearest hit winning, with a 22-point minimum touch target.
-- **FR-R02G0504-004**: Two-finger orbit MUST stay within yaw ±40° and pitch 25° … 70° (authored 0°, 50°), keep the scene inside the view at
-  every aspect 0.4 … 2.5 and never enter the digest, the snapshot or the kernel; a reset returns to the authored view.
+- **FR-R02G0504-004**: Two-finger orbit MUST stay within yaw ±40° and pitch 25° … 70° (authored 0°, 50°), keep the
+  scene inside the view at every aspect 0.4 … 2.5 and never enter the digest, the snapshot or the kernel; a reset
+  returns to the authored view.
 - **FR-R02G0504-005**: While dragging, the picked cell MUST be highlighted and described; nothing changes in the kernel
   until release.
 - **FR-R02G0504-006**: The panel MUST keep every action available without gestures and gain "Reset view"; every
