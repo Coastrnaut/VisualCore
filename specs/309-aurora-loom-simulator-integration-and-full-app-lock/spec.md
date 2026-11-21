@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-20
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G01-09 (migration ledger, game feature of experience R02-G01) · ID namespace FR-R02G0109-###,
 SC-R02G0109-###, T-R02G0109-###
@@ -24,6 +24,47 @@ Canonical overrides:
   prepares it). **Owner-only items:** none (no signing is needed for simulator builds).
 - **Shared features used:** the app's debug launch arguments (`-vcCandidates`, `-openExperience`, `-vcReset`,
   `-vcSkipWelcome`), the app's UI test support, the registry's stored migration examples and the release checks.
+
+## Clarifications
+
+### Session 2026-11-20
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time. Facts checked in
+code (read-only audit, 2026-11-20): the app's debug launch arguments are `-vcCandidates` (candidates become available and
+are registered; debug builds only), `-openExperience <id>`, `-vcResetData` and `-vcSkipWelcome`
+(`AppUITestSupport.VC`); A21's interface tests (`Apps/VisualCore/Tests/UI/Aurora`, namespace `AU`) are the model;
+`release_check.py` runs interface tests in named chunks (`UI_CHUNKS`, serial chunks in `SERIAL_CHUNKS`), builds the
+Release app for the simulator (`app-release-build`) and checks its symbols against `RELEASE_FORBIDDEN`
+(`app-release-symbols`); the registry stores earlier-schema examples through `ExperienceRegistration(..., examples:)`
+(A18's `schemaOneExample()`/`schemaTwoExample()` return `MigrationExample`); Aurora Loom's registration still says
+"Snapshot schema 1" although its snapshot is schema 3 since feature 307; its panel has labels and values but no
+accessibility identifiers.
+
+- Q: How do the interface tests find controls and what do they read? → A: every panel control gets the identifier
+  `experience.r02-g01.aurora-loom.<name>` through the experience's port (`port.identifier(name)`, as A21): `wave-<r>`,
+  `phase-<r>` (steppers, r = 1 … 3), `undo`, `redo`, `next-level`, `hint`, `retry`, `daily`, `practice`, `campaign`,
+  `level-picker`, `replay`, `replay-step`, `replay-stop`, `sound`, `skip-tutorial`. The tests read the canvas's
+  description (`session.canvas`, the presenter's `describe`) for the level, stars and replay position. Impact:
+  FR-R02G0109-001, 002.
+- Q: Which interface tests exist and how are they grouped? → A: namespace `AL` in
+  `Apps/VisualCore/Tests/UI/AuroraLoom/ALSupport.swift`; `ALPlayUITests` (fresh launch with `-vcResetData
+  -vcSkipWelcome -vcCandidates -openExperience r02-g01.aurora-loom`: skip the tutorial, win level 1 with the steppers
+  following its certified solution, read "3 of 3 stars" and level 2 open; relaunch without reset: the stars and level 2
+  are still there) and `ALReplayUITests` (after the win, Replay, Step until "Replay complete", Stop back to campaign).
+  They run as a new serial chunk `i3` of `release_check.py`. Each test stays under 60 s. Impact: FR-R02G0109-002, 007;
+  SC-R02G0109-001.
+- Q: Which earlier-schema examples are stored and where do they come from? → A: `AuroraLoomExperienceCore.schemaOneExample()`
+  (`{level, records}` of a seeded play of level 2 with two moves) and `schemaTwoExample()` (`{level, mode, progress,
+  records, tutorial}` with level 1 solved without a trace), both `MigrationExample`s built in the Core, registered with
+  `examples:`; the app's `SnapshotMigrationCheck` restores both into schema 3 with progress kept. The registration's
+  comment is corrected. Impact: FR-R02G0109-003; SC-R02G0109-002.
+- Q: What proves the release configuration excludes test-only code? → A: the existing `app-release-build` and
+  `app-release-symbols` steps, with `AuroraLoomGolden`, `AuroraLoomScenarios` and `manifestSeed` added to
+  `RELEASE_FORBIDDEN` (the symbols that exist only under `DEBUG || VISUALCORE_AUTOMATION`). Impact: FR-R02G0109-004;
+  SC-R02G0109-003.
+- Q: How is "not available" checked? → A: an app unit test: without `-vcCandidates` the catalog lists
+  `r02-g01.aurora-loom` as not available and the launcher cannot open it; the registry's candidates list contains it and
+  `all` does not. Impact: FR-R02G0109-006; SC-R02G0109-002.
 
 ## User Scenarios & Testing *(mandatory)*
 
