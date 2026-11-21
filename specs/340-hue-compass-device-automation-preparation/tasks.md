@@ -26,7 +26,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
 ## Phase 3: Story 2 — a person can follow the plan (P2)
 
 - [ ] T-R02G0410-004 [P] [US2] Create `docs/apps/hue-compass/device-campaign.md` (agent B, modelled on
-  `docs/apps/lissajous-labyrinth/device-campaign.md`: devices and order, D3 on iPadOS 26.5, owner actions as
+  `docs/apps/wave-knot-keeper/device-campaign.md`: devices and order, D3 on iPadOS 26.5, owner actions as
   BLOCKED_OWNER_ACTION, every row HC-D1 … HC-D8 with devices, procedure, pass condition and "pending device campaign",
   no number claimed, the stress session only in the device campaign); `--name docs -- python3 scripts/validate_docs.py`
 
