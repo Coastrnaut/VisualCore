@@ -10,7 +10,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 - [X] T-R02G0303-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test — Verified 2026-11-21: 2026-11-21 R02-G03-03.baseline-host/timing/round02 exit 0
   --package-path Packages/ExperiencesRound02`; the rendering baseline is R02-G03-02's rendering runs (exit 0)
-- [ ] T-R02G0303-002 Edit `Packages/ExperiencesRound02/Package.swift` (Core dependencies; `WaveKnotKeeperExperience`
+- [X] T-R02G0303-002 Edit `Packages/ExperiencesRound02/Package.swift` (Core dependencies; `WaveKnotKeeperExperience` — Verified 2026-11-21: 2026-11-21 host exit 0 (package: Wave Knot Keeper Core dependencies, experience target and tests; snapshot, palette, tiers, crossing marks)
   and its tests with iOS-conditioned rendering dependencies; the product) and create
   `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperSceneSnapshot.swift` (snapshot, `WaveKnotKeeperTier` "sides 16/10/6, corner samples 8/4/2, glow shells
   2/1/0, richest first", `WaveKnotKeeperPalette` "night #05070F, pearl #E8E4DA, sapphire #2F6FD8, ember #E0703A");
