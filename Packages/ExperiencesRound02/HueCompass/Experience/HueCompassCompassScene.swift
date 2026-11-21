@@ -10,6 +10,11 @@
 // mode change; the fog drift moves by a uniform. Reduce Flashing passes `HueCompassShaders.gainLimit(reduceFlashing:)`
 // as `u_gainLimit`. If a program fails, the scene falls back to the level-2 geometry drawn unlit with the shared
 // `MeshRenderer` (ambient 1, per-vertex colours) and keeps the reason; nothing here can reach the kernel.
+// Feature 334 (R02-G04-04) T-R02G0404-005 (FR-R02G0404-004, 005; clarifications Q3, Q4): the camera is
+// `HueCompassSceneGeometry.camera(aspect:orbit:)` at the gesture controller's orbit (presentation only), and while a
+// swipe previews a bearing a ghost needle is drawn after the real one: the same needle mesh turned about the z axis by
+// (preview − bearing) × 2π / 96 through `u_model`, pearl at half opacity, without glow shells. The fallback path draws
+// no ghost.
 #if os(iOS)
 import Foundation
 import HueCompassCore
@@ -26,11 +31,18 @@ final class HueCompassCompassScene {
     var glassFragment = HueCompassShaders.glassFragment
     /// Whether the glow gain is capped (Reduce Flashing).
     var reducedFlash = false
+    /// The camera orbit (feature 334; presentation only).
+    var orbit: HueCompassOrbit = .authored
+    /// The bearing the swipe in progress would turn to, drawn as a ghost needle (feature 334); nil when no swipe is
+    /// previewed.
+    var previewBearing: Int?
 
     /// The fog's translucency (`u_opacity` of the fog draw); the brightness density / 9 scales it further.
     static let fogOpacity: Double = 0.85
     /// The scale of glow shell `n` (1 …) about the needle's middle: 1 + 0.12 n.
     static let shellGrowth: Double = 0.12
+    /// The opacity of the ghost needle (clarification Q4: pearl at half opacity).
+    static let ghostOpacity: Double = 0.5
 
     /// The marks of one kind: the renderer and the base colour of its draw.
     private struct MarkDraw {
@@ -101,7 +113,7 @@ final class HueCompassCompassScene {
         try clear.render(context, frame: frame)
         guard context.pixelWidth > 0, context.pixelHeight > 0 else { return }
         aspect = Double(context.pixelWidth) / Double(context.pixelHeight)
-        let camera = HueCompassSceneGeometry.camera(aspect: aspect)
+        let camera = HueCompassSceneGeometry.camera(aspect: aspect, orbit: orbit)
         let key = Self.key(snapshot, tier: tier, fallback: fallbackReason != nil)
         if key != geometryKey { try rebuild(snapshot, tier: tier) }
         geometryKey = Self.key(snapshot, tier: tier, fallback: fallbackReason != nil)
@@ -113,6 +125,7 @@ final class HueCompassCompassScene {
         try drawWheel(camera, time: time)
         try drawFog(camera, time: time)
         try drawNeedle(snapshot, tier: tier, camera: camera)
+        try drawGhost(snapshot, camera: camera)
         try drawMarks(camera)
     }
 
@@ -239,12 +252,12 @@ final class HueCompassCompassScene {
 
     /// Sets the glass program's uniforms for one draw.
     private func setGlass(_ p: ShaderProgram, camera: HueCompassCamera, model: Mat4, colour: SIMD3<Double>,
-                          shell: Bool) {
+                          shell: Bool, opacity: Double = 1) {
         p.set("u_mvp", matrix4: (camera.viewProjection * model).floats)
         p.set("u_model", matrix4: model.floats)
         p.set("u_eye", Self.float3(camera.eye))
         p.set("u_color", Self.float3(colour))
-        p.set("u_opacity", Float(1))
+        p.set("u_opacity", Float(opacity))
         p.set("u_gain", Float(HueCompassShaders.standardGain))
         p.set("u_gainLimit", Float(gainLimit))
         p.set("u_shell", Float(shell ? 1 : 0))
@@ -258,6 +271,24 @@ final class HueCompassCompassScene {
         let s = 1 + shellGrowth * Double(n)
         let m = Vec3(middle.x, middle.y, middle.z)
         return Mat4.translation(m) * Mat4.scale(Vec3(s, s, s)) * Mat4.translation(Vec3(-m.x, -m.y, -m.z))
+    }
+
+    /// The model matrix of the ghost needle: the needle mesh (built at the snapshot's bearing) turned about the z axis
+    /// through the compass centre to `preview` (the identity when it is the snapshot's bearing); nil without a preview.
+    static func ghostModel(_ snapshot: HueCompassSceneSnapshot, preview: Int?) -> Mat4? {
+        guard let preview else { return nil }
+        let angle: Double = 2 * Double.pi * Double(preview - snapshot.bearing) / Double(HueCompassWheel.bearings)
+        return Mat4.rotation(Quat(axis: Vec3(0, 0, 1), angle: angle))
+    }
+
+    /// The ghost needle at the previewed bearing, pearl at half opacity, over the real needle.
+    private func drawGhost(_ snapshot: HueCompassSceneSnapshot, camera: HueCompassCamera) throws {
+        guard let needleRenderer, let model = Self.ghostModel(snapshot, preview: previewBearing) else { return }
+        let pearl = HueCompassPalette.pearl
+        let opacity: Double = Self.ghostOpacity
+        try needleRenderer.draw(blend: .premultipliedAlpha) { p in
+            self.setGlass(p, camera: camera, model: model, colour: pearl, shell: false, opacity: opacity)
+        }
     }
 
     private func drawNeedle(_ snapshot: HueCompassSceneSnapshot, tier: HueCompassTier,

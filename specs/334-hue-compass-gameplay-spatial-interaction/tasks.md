@@ -38,7 +38,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 5: Wiring — preview, presenter, panel
 
-- [ ] T-R02G0404-005 Edit `Packages/ExperiencesRound02/HueCompass/Experience/HueCompassPresenter.swift` (pointer entry through the gesture controller,
+- [X] T-R02G0404-005 Edit `Packages/ExperiencesRound02/HueCompass/Experience/HueCompassPresenter.swift` (pointer entry through the gesture controller, — Verified 2026-11-21: 2026-11-21 sim-27 exit 0 (agent E wired the presenter, scene and controls: pointer entry through the gesture controller, orbit camera, ghost needle at the preview, 'Turning to bearing n of 96', Reset view; 6 wiring tests on sim-27.2: swipes turn by the scripted steps, hub tap probes, orbit never changes the digest, reset and double tap, cancel sends nothing, nothing while won; 25 Hue Compass simulator tests pass)
   `resetView()`, orbit-aware camera, ghost needle at the preview, description "Turning to bearing n of 96"),
   `Packages/ExperiencesRound02/HueCompass/Experience/HueCompassCompassScene.swift` (orbit camera, ghost needle "pearl at half opacity") and
   `Packages/ExperiencesRound02/HueCompass/Experience/HueCompassControls.swift` ("Reset view"), with `Packages/ExperiencesRound02/HueCompass/ExperienceTests/HueCompassGestureWiringTests.swift`

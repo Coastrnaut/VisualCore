@@ -3,6 +3,8 @@
 // (the current bearing with the picked band), undo, redo and next level, each with an accessibility label and value;
 // every change is a kernel action sent through the action port. Swipe and orbit come in R02-G04-04; full accessibility
 // in R02-G04-06.
+// Feature 334 (R02-G04-04) T-R02G0404-005 (FR-R02G0404-004, 005; clarification Q4): the panel gains "Reset view",
+// which returns the camera to the authored view (presentation only; no kernel action).
 #if os(iOS)
 import HueCompassCore
 import SwiftUI
@@ -12,6 +14,8 @@ import VisualCoreExperienceHost
 struct HueCompassControls: View {
     let port: ExperienceActionPort
     let mirror: HueCompassMirror
+    /// Feature 334: "Reset view" returns the camera to the authored view.
+    var resetView: () -> Void = {}
 
     /// The turn steps of the four turn buttons, in order.
     static let turns: [Int] = [-4, -1, 1, 4]
@@ -91,6 +95,8 @@ struct HueCompassControls: View {
                 .accessibilityLabel("Redo the turn")
             Button("Next level") { send("level.next") }
                 .accessibilityLabel("Go to the next level")
+            Button("Reset view") { resetView() }
+                .accessibilityLabel("Return the camera to the authored view")
         }
     }
 

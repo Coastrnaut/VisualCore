@@ -4,6 +4,12 @@
 // Reduce Motion (the snapshot time stays at 0) and caps the glow under Reduce Flashing. A memory warning releases the
 // GPU objects; the next frame rebuilds them. The presenter only reads `core.snapshot`: no drawing result reaches the
 // kernel (renderer purity).
+// Feature 334 (R02-G04-04) T-R02G0404-005 (FR-R02G0404-001 … 005; clarifications Q3, Q4): canvas touches go through
+// `HueCompassGestureController` with the drawn view size and the last drawn snapshot: a released swipe sends one
+// `compass.turn [steps]`, a tap on the hub one `compass.probe`; two fingers orbit the camera and a double tap on empty
+// space or `resetView()` ("Reset view") returns to the authored view (presentation only: never in the digest or the
+// snapshot). While a swipe previews a bearing the scene draws a ghost needle there and the description reads "Turning
+// to bearing n of 96"; a refused action is shown with its reason.
 #if os(iOS)
 import Foundation
 import HueCompassCore
@@ -12,6 +18,7 @@ import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreMath
 import VisualCoreRendering
+import VisualCoreScenes
 
 /// What the controls show: the latest state the presenter described.
 @MainActor
@@ -55,6 +62,8 @@ final class HueCompassPresenter: ExperiencePresenter {
     private(set) var tierLog: [HueCompassTierChange] = []
     /// The last snapshot drawn (tests and the description).
     private(set) var lastSnapshot: HueCompassSceneSnapshot?
+    /// The gesture controller (feature 334): swipes, hub taps, orbit and the swipe preview.
+    private(set) var gestures = HueCompassGestureController()
 
     init(reduceMotion: Bool, reduceFlashing: Bool) {
         self.reduceMotion = reduceMotion
@@ -87,6 +96,8 @@ final class HueCompassPresenter: ExperiencePresenter {
         let time = reduceMotion ? 0 : frame.time
         let snapshot = core.snapshot(time: time)
         lastSnapshot = snapshot
+        scene.orbit = gestures.orbit
+        scene.previewBearing = gestures.previewBearing
         try scene.render(snapshot, tier: drawn, context: context, frame: frame, animate: !reduceMotion)
     }
 
@@ -96,6 +107,51 @@ final class HueCompassPresenter: ExperiencePresenter {
 
     func shedCaches() {
         scene.release()
+    }
+
+    // MARK: Touch controls (feature 334)
+
+    /// The canvas gestures send turns and probes only.
+    var gestureActions: Set<String> { ["compass.turn", "compass.probe"] }
+
+    /// The native controls send every action a gesture can, and more.
+    var nativeActions: Set<String> { Set(HueCompassExperienceCore.actionIDs) }
+
+    /// Routes a canvas touch through the gesture controller; a released swipe or a hub tap sends its one action.
+    func pointer(_ event: PointerEvent, viewSize: Vec2, port: ExperienceActionPort) {
+        guard let snapshot = lastSnapshot else { return }
+        let actions: [HueCompassGestureAction] = gestures.handle(event, viewSize: viewSize, snapshot: snapshot)
+        for action in actions {
+            switch action {
+            case .turn(let steps):
+                send("compass.turn", [Double(steps)], port: port)
+            case .probe:
+                send("compass.probe", [], port: port)
+            case .resetView:
+                break   // the controller has already returned to the authored orbit; the next frame draws it
+            }
+        }
+    }
+
+    /// Drops a touch in progress (the shell suspends the experience): a gesture under way is abandoned without an
+    /// action by starting a fresh controller, which forgets the fingers it held. The orbit is presentation only and
+    /// never saved (clarification Q3), so the camera returns to the authored view with it.
+    func cancelPointers() {
+        guard gestures.state != .idle else { return }
+        gestures = HueCompassGestureController()
+    }
+
+    /// Returns the camera to the authored view ("Reset view").
+    func resetView() {
+        gestures.resetView()
+    }
+
+    /// Sends `control` with `values`; a refusal is shown with its reason.
+    @discardableResult
+    func send(_ control: String, _ values: [Double], port: ExperienceActionPort) -> ActionResult {
+        let result = port.send(control, values)
+        mirror.message = result.isAccepted ? nil : "That change was refused: \(result.code)"
+        return result
     }
 
     func describe(_ core: HueCompassExperienceCore) -> String {
@@ -112,6 +168,9 @@ final class HueCompassPresenter: ExperiencePresenter {
         var text = "Hue Compass level \(core.levelNumber). "
         text += "The needle points to bearing \(snapshot.bearing) of 96, hue band \(band + 1) of 24. "
         let density: Int = snapshot.fog.indices.contains(snapshot.bearing) ? snapshot.fog[snapshot.bearing] : 0
+        if let preview = gestures.previewBearing {
+            text += "Turning to bearing \(preview) of 96. "
+        }
         text += "Fog density here \(density) of 9. "
         if let clue = snapshot.clues.last {
             text += "Last clue at bearing \(clue.bearing): hue gap \(clue.hueGap), depth \(clue.depth). "
@@ -131,7 +190,7 @@ final class HueCompassPresenter: ExperiencePresenter {
     }
 
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
-        AnyView(HueCompassControls(port: port, mirror: mirror))
+        AnyView(HueCompassControls(port: port, mirror: mirror, resetView: { [weak self] in self?.resetView() }))
     }
 }
 #endif
