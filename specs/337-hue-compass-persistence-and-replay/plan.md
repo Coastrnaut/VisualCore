@@ -21,7 +21,7 @@ and generator; VisualCoreExperience (`MigrationChain`, snapshots); the app's sha
 package. **Seeds**: tests use seed 2_337.
 **Testing**: host `swift test --package-path Packages/ExperiencesRound02` (500 seeded round trips, 100 schema-1 and
 schema-2 migrations, 200 seeded saves with honest and edited results, every certified level's solver trace replayed);
-simulator: replay through the port and the dropped announcement; app unit tests (candidate, schema examples); regression
+simulator: replay through the port and the dropped announcement; app unit tests (candidate; stored schema examples come in R02-G04-09); regression
 as R02-G04-06; script tests (alone). The scenario manifest is regenerated (schema 3 digests, new controls).
 **Performance**: reconciliation replays at most 100 traces of at most 24 units plus their turns on restore (each action
 is exact integer work; the 100 certified levels are generated once per process).
@@ -58,7 +58,6 @@ Packages/ExperiencesRound02/HueCompass/CoreTests/HueCompassPersistenceTests.swif
 Packages/ExperiencesRound02/HueCompass/Core/HueCompassFeedbackPlan.swift               edit  replay refusal words, replay step and dropped texts (lead)
 Packages/ExperiencesRound02/HueCompass/Experience/HueCompassPresenter.swift, HueCompassControls.swift   edit  replay buttons, dropped announcement (lead)
 Packages/ExperiencesRound02/HueCompass/ExperienceTests/HueCompassReplayTests.swift     new   replay through the port (agent C)
-Apps/VisualCore/Tests/Unit/AppModelTests.swift (schema examples, if the snapshot schema needs registered examples)        edit (lead)
 docs/architecture/hue-compass.md, Packages/ExperiencesRound02/README.md, docs/automatedtesting.md   edit (lead)
 ```
 

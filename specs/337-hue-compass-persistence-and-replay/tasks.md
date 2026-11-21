@@ -38,7 +38,8 @@ tests stay short (< 10 s each). {device} items are D1–D3 observations after Im
   replay rules and codes); `--name host-2`
 - [ ] T-R02G0407-004 [P] [US1] [US2] Create `Packages/ExperiencesRound02/HueCompass/CoreTests/HueCompassPersistenceTests.swift` (agent B: 500 seeded reachable
   states round-trip with equal digests; schema 1 and 2 payloads of 100 seeded states migrate and restore with progress
-  kept; 200 seeded saves: honest results survive, edited ones are dropped and counted); `--name host-3`
+  kept; 200 seeded saves: honest results survive, edited ones are dropped and counted; FR-R02G0407-005: the same save
+  restores to an equal digest twice and the daily level depends only on the date given); `--name host-3`
 
 ## Phase 4: Panel and simulator proof
 
@@ -46,9 +47,9 @@ tests stay short (< 10 s each). {device} items are D1–D3 observations after Im
   (Replay for a verified solved level, Step and Stop with labels and values, the replay position; the dropped results
   announced once: "n saved results could not be checked and were removed.") and create
   `Packages/ExperiencesRound02/HueCompass/ExperienceTests/HueCompassReplayTests.swift` (agent C: replay through the port reproduces the fingerprints action
-  by action and ends won; other actions refused during replay; progress unchanged; the dropped announcement once); if
-  the app's schema-example registry requires it, add Hue Compass schema-3 examples in
-  `Apps/VisualCore/Tests/Unit/AppModelTests.swift`; `--name sim-27 -- python3 scripts/xcodebuild_package.py --package
+  by action and ends won; other actions refused during replay; progress unchanged; the dropped announcement once); the
+  stored schema examples of the app registry come with the in-app integration feature R02-G04-09, as in feature 329;
+  `--name sim-27 -- python3 scripts/xcodebuild_package.py --package
   Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package --destination sim-27.2 --action test`
 
 ## Phase 5: Regression, documentation and close
