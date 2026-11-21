@@ -5,7 +5,7 @@
 // (control points and segment midpoints within 3 px of a pixel 0.15 brighter than night, handle centres pearl within
 // 0.15, gate centres tinted towards sapphire, background within 0.05 of night); `point.select` turns that handle ember
 // without changing the digest; a legal `point.move` changes the digest and the moved frame still matches. One test per
-// level, each well under 10 s.
+// level, each well under 10 s. Gate X-R02-G03: the frame probes (two night corners) match the drawn still.
 #if os(iOS)
 import Foundation
 import Testing
@@ -103,6 +103,31 @@ import VisualCoreExperienceHost
         let undone: [UInt8] = try WaveKnotKeeperTest.still(session)
         WaveKnotKeeperTest.checkFrame(undone, snapshot: try #require(shell.presenter.lastSnapshot),
                                       "level 41 after play.undo")
+    }
+
+    /// Gate X-R02-G03: the presenter's frame probes (two night corners) match the drawn still at every tier.
+    @Test func theFrameProbesMatchTheDrawnFrame() async throws {
+        let session = ExperienceSession()
+        defer { session.close() }
+        let shell = try await WaveKnotKeeperTest.open(session, seed: 0)
+        for tier in 0..<3 {
+            WaveKnotKeeperTest.pin(session, shell, tier: tier)
+            let still: [UInt8] = try WaveKnotKeeperTest.still(session)
+            // The still is top-down; FrameChecks reads rows bottom-up, as RenderHost.readPixels gives them.
+            let row: Int = WaveKnotKeeperTest.width * 4
+            var rgba: [UInt8] = []
+            for y in stride(from: WaveKnotKeeperTest.height - 1, through: 0, by: -1) {
+                rgba.append(contentsOf: still[(y * row)..<((y + 1) * row)])
+            }
+            let probes: [FrameProbe] = shell.presenter.probes(try WaveKnotKeeperTest.core(shell))
+            #expect(probes.map(\.name) == ["night-top-left", "night-bottom-right"])
+            for probe in probes {
+                let found = FrameChecks.probe(probe, rgba: rgba, width: WaveKnotKeeperTest.width,
+                                              height: WaveKnotKeeperTest.height)
+                #expect(found?.rawValue == probe.expected, "tier \(tier) \(probe.name): \(found?.rawValue ?? "none")")
+            }
+        }
+        session.qualityPin = 0
     }
 }
 #endif

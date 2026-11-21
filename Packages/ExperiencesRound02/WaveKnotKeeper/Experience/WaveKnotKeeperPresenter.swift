@@ -22,6 +22,8 @@
 // Feature 327 (R02-G03-07) T-R02G0307-005 (FR-R02G0307-003, 004): the mirror carries whether a replay is available for
 // the current level and, during replay, its position; `startReplay`, `stepReplay` and `stopReplay` send the replay
 // actions; the first described core whose restore dropped results announces them once.
+// Gate X-R02-G03: `probes` declares the frame probes the verification runner samples: two background corners, outside
+// the rope, handles and gates, must be the dark night clear while the real scene (not the fallback) is drawn.
 #if os(iOS)
 import Foundation
 import SwiftUI
@@ -351,6 +353,16 @@ final class WaveKnotKeeperPresenter: ExperiencePresenter {
     /// The values of `mode.daily` for `date`: year, month, day (0 for a missing part, which the engine refuses).
     static func dateValues(_ date: DateComponents) -> [Double] {
         [Double(date.year ?? 0), Double(date.month ?? 0), Double(date.day ?? 0)]
+    }
+
+    /// The frame probes of the frame last drawn (gate X-R02-G03): the top-left and bottom-right background corners,
+    /// outside the rope, handles and gates (the camera keeps a 5 % margin), are `dark` (the night clear) once a snapshot
+    /// was drawn by the real scene; none otherwise.
+    func probes(_ core: WaveKnotKeeperExperienceCore) -> [FrameProbe] {
+        guard lastSnapshot != nil, scene.fallbackReason == nil else { return [] }
+        return [FrameProbe(name: "night-top-left", x: 0.02, y: 0.02, expected: FrameColorClass.dark.rawValue),
+                FrameProbe(name: "night-bottom-right", x: 0.98, y: 0.98, expected: FrameColorClass.dark.rawValue)]
+            .compactMap { $0 }
     }
 
     func describe(_ core: WaveKnotKeeperExperienceCore) -> String {
