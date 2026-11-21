@@ -46,7 +46,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks.
   with `Packages/ExperiencesRound02/HueCompass/CoreTests/HueCompassExperienceCoreTests.swift` updates (conformance; actions; migration of a schema-1 payload;
   undo restores the digest with the tutorial advanced); `--name host-3 -- swift test --package-path
   Packages/ExperiencesRound02 --filter 'HueCompassExperienceCoreTests|HueCompassScenarios|HueCompassRendererPurity|HueCompassPanelWin'`
-- [ ] T-R02G0405-005 [US1] [US2] [US3] [US4] Edit `Packages/ExperiencesRound02/HueCompass/Experience/HueCompassPresenter.swift` and
+- [X] T-R02G0405-005 [US1] [US2] [US3] [US4] Edit `Packages/ExperiencesRound02/HueCompass/Experience/HueCompassPresenter.swift` and — Verified 2026-11-21: 2026-11-21 sim-27 exit 0 on sim-27.2: HueCompassTeachingTests and every Hue Compass experience test (presenter teaching mirror, hints, retry, daily date, mode and level controls)
   `Packages/ExperiencesRound02/HueCompass/Experience/HueCompassControls.swift` (instruction with Dismiss; Hint revealing the next level, reset after any
   change of the play; failure explanation with Retry; level picker of open levels with bands and stars; Campaign /
   Daily (local calendar date) / Practice) and create `Packages/ExperiencesRound02/HueCompass/ExperienceTests/HueCompassTeachingTests.swift` (agent D: hint

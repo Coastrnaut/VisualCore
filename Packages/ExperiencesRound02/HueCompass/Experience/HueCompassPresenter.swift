@@ -10,6 +10,13 @@
 // space or `resetView()` ("Reset view") returns to the authored view (presentation only: never in the digest or the
 // snapshot). While a swipe previews a bearing the scene draws a ghost needle there and the description reads "Turning
 // to bearing n of 96"; a refused action is shown with its reason.
+// Feature 335 (R02-G04-05) T-R02G0405-005 (FR-R02G0405-001 … 005; clarifications Q1–Q5): the mirror carries the tutorial
+// instruction, the hint revealed so far (`showHint(port:)` reveals the next of three levels for the current play; the
+// hint level is presentation only and any change of the play — level, mode or play fingerprint — hides it), the failure
+// explanation, the mode, the open levels with their stars and the goal (allowance and certified smallest probe count);
+// `retry` starts the level again in its mode (probes and selections cannot be undone, so there is no Undo after a
+// failure), and the daily level is chosen from the local calendar date read here (`playDaily(port:date:)`, sent as
+// `mode.daily [year, month, day]`), never in the core.
 #if os(iOS)
 import Foundation
 import HueCompassCore
@@ -41,6 +48,20 @@ final class HueCompassMirror {
     var clueCount = 0
     /// The text of the last refused change, if any.
     var message: String?
+    /// The tutorial instruction; nil when the tutorial is done (feature 335).
+    var instruction: String?
+    /// The hint level revealed (0 … 3) and its text (feature 335).
+    var hintLevel = 0
+    var hintText: String?
+    /// The failure explanation while the play has failed (feature 335).
+    var failureText: String?
+    /// The mode (feature 335).
+    var mode: HueCompassMode = .campaign
+    /// The highest open level and the stars of each won level (feature 335).
+    var frontier = 1
+    var stars: [Int: Int] = [:]
+    /// The certified smallest probe count of the current level (feature 335).
+    var smallest = 0
 }
 
 /// One entry of the tier log: the tier drawn and why it changed.
@@ -64,6 +85,12 @@ final class HueCompassPresenter: ExperiencePresenter {
     private(set) var lastSnapshot: HueCompassSceneSnapshot?
     /// The gesture controller (feature 334): swipes, hub taps, orbit and the swipe preview.
     private(set) var gestures = HueCompassGestureController()
+    /// The latest core described (feature 335): hints and retry read it.
+    private(set) var latestCore: HueCompassExperienceCore?
+    /// The play the shown hint belongs to (level, mode and fingerprint); nil when no hint is shown (feature 335).
+    private var hintKey: String?
+    /// The date whose daily level is being played, so Retry restarts that level after midnight too (feature 335).
+    private(set) var dailyDate: DateComponents?
 
     init(reduceMotion: Bool, reduceFlashing: Bool) {
         self.reduceMotion = reduceMotion
@@ -153,7 +180,88 @@ final class HueCompassPresenter: ExperiencePresenter {
         return result
     }
 
+    // MARK: Teaching and progression (feature 335)
+
+    /// The key of the play a hint belongs to: level, mode and fingerprint.
+    private static func hintKey(_ core: HueCompassExperienceCore) -> String {
+        "\(core.levelNumber)/\(core.mode)/\(core.play.fingerprint)"
+    }
+
+    /// Hides the hint shown.
+    private func clearHint() {
+        hintKey = nil
+        mirror.hintLevel = 0
+        mirror.hintText = nil
+    }
+
+    /// Reveals the next hint level (up to 3) for the current play; nothing (the hint hidden) when the play is not in
+    /// stage `playing`. Hints never change the state: no action is sent.
+    func showHint(port: ExperienceActionPort) {
+        guard let core = latestCore else { return }
+        let key: String = Self.hintKey(core)
+        let next: Int = hintKey == key ? min(mirror.hintLevel + 1, 3) : 1
+        guard let hint = core.hint(level: next) else {
+            clearHint()
+            return
+        }
+        hintKey = key
+        mirror.hintLevel = next
+        mirror.hintText = hint.text
+    }
+
+    /// Ends the tutorial of the current level.
+    func dismissTutorial(port: ExperienceActionPort) {
+        send("tutorial.dismiss", [], port: port)
+    }
+
+    /// The action and values that start the current level again in its mode: `mode.practice` in practice, the daily
+    /// date's `mode.daily` in daily mode, `level.select` of the level in campaign.
+    func retryAction(date: DateComponents) -> (control: String, values: [Double]) {
+        guard let core = latestCore else { return ("mode.campaign", []) }
+        switch core.mode {
+        case .practice: return ("mode.practice", [])
+        case .daily: return ("mode.daily", Self.dateValues(dailyDate ?? date))
+        case .campaign: return ("level.select", [Double(core.levelNumber)])
+        }
+    }
+
+    /// Starts the current level again in its mode; in daily mode with the date that opened it (today's local date
+    /// when none is known).
+    @discardableResult
+    func retry(port: ExperienceActionPort, date: DateComponents = HueCompassPresenter.today()) -> ActionResult {
+        let action = retryAction(date: date)
+        return send(action.control, action.values, port: port)
+    }
+
+    /// Plays the daily level of `date` (the local calendar date by default; the core never reads a clock).
+    @discardableResult
+    func playDaily(port: ExperienceActionPort, date: DateComponents = HueCompassPresenter.today()) -> ActionResult {
+        let result = send("mode.daily", Self.dateValues(date), port: port)
+        if result.isAccepted { dailyDate = date }
+        return result
+    }
+
+    /// The local calendar date now, as Gregorian year, month and day in the current time zone.
+    static func today() -> DateComponents {
+        Calendar(identifier: .gregorian).dateComponents(in: .current, from: Date())
+    }
+
+    /// The values of `mode.daily` for `date`: year, month, day (0 for a missing part, which the engine refuses).
+    static func dateValues(_ date: DateComponents) -> [Double] {
+        [Double(date.year ?? 0), Double(date.month ?? 0), Double(date.day ?? 0)]
+    }
+
     func describe(_ core: HueCompassExperienceCore) -> String {
+        latestCore = core
+        if let key = hintKey, key != Self.hintKey(core) { clearHint() }
+        mirror.instruction = core.tutorial == .done ? nil : core.tutorial.text
+        mirror.failureText = core.failureExplanation?.text
+        mirror.mode = core.mode
+        mirror.frontier = core.progress.frontier
+        var stars: [Int: Int] = [:]
+        for (level, result) in core.progress.solved { stars[level] = result.stars }
+        mirror.stars = stars
+        mirror.smallest = core.certifiedSmallest
         let play = core.play
         let snapshot = core.snapshot(time: 0)
         let band = snapshot.band(of: snapshot.bearing)
@@ -180,8 +288,14 @@ final class HueCompassPresenter: ExperiencePresenter {
         }
         text += "Units \(play.spent) of \(play.level.allowance). "
         switch play.stage {
-        case .won: text += "The bearing and hue match."
-        case .failed: text += "The search failed."
+        case .won:
+            text += "The bearing and hue match."
+            if core.mode != .practice {
+                let stars: Int = HueCompassProgress.stars(units: play.spent, smallest: core.certifiedSmallest)
+                text += " \(stars) of 3 stars."
+            }
+        case .failed:
+            text += "The search failed. " + (core.failureExplanation?.text ?? "")
         default: break
         }
         if let target = snapshot.target { text += " The target was bearing \(target)." }
@@ -189,7 +303,7 @@ final class HueCompassPresenter: ExperiencePresenter {
     }
 
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
-        AnyView(HueCompassControls(port: port, mirror: mirror, resetView: { [weak self] in self?.resetView() }))
+        AnyView(HueCompassControls(port: port, mirror: mirror, presenter: self))
     }
 }
 #endif
