@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-21
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G05-05 (migration ledger, game feature of experience R02-G05) · ID namespace FR-R02G0505-###,
 SC-R02G0505-###, T-R02G0505-###
@@ -22,6 +22,56 @@ Canonical overrides:
   of this free experience is free; "meaningful content" means all 100 certified levels in five difficulty bands with
   goals and results) and the Round 2 lock. **Device-only items:** none. **Owner-only items:** none.
 - **Model:** feature 335 (Hue Compass's progression and player teaching) and feature 325 (Wave Knot Keeper's).
+
+## Clarifications
+
+### Session 2026-11-21
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+335's answers where the games agree. Facts checked in code (read-only, 2026-11-21): `ColorfallCanyonsSolver` finds a
+smallest winning edit set (carves of carvable cells, each valve toggled at most once) of at most 3 edits applied before
+the first tick and runs to the verdict with exact conservation; every accepted action (carve, valve, step) spends from
+the level's budget (1 … 30) except steps, and every action can be undone and redone, including the one that failed the
+play; levels 1 … 3 carry the tutorial flag; the adapter prepares level (seed mod 100) + 1, accepts `canyon.carve`,
+`canyon.valve`, `time.step`, `play.undo`, `play.redo` and `level.next` (100 wraps to 1) and snapshots `{level, records}`
+as schema 1; the core may not read a clock.
+
+- Q: How is a hint computed and what does each level reveal? → A: from the current state (heights, fluid, valves, tick
+  and actions left), the hint searches edit sets applied now, of size 0, 1, 2 … up to min(actions left, 3), in the
+  solver's order, each run from the current fluid to the verdict; the first winning set is the plan. An empty plan
+  means "let it run": level 1 "Let the fluid run", level 2 "Run to the end", level 3 "Run: N ticks" (the ticks left). A
+  plan whose first edit is a carve: level 1 "Carve a channel", level 2 "Carve near row r", level 3 "Carve row r, column c";
+  a valve: level 1 "Switch a valve", level 2 "Switch the <colour> spring", level 3 "Open (or close) the <colour> valve".
+  When no set wins: "No win is reachable from here: undo the last change or retry the level." Hints never change the
+  state, are unlimited, do not affect stars and reset to level 1 after any change of the play; a won level has none.
+  "A state that can still win" means one whose plan exists. Impact: FR-R02G0505-002; SC-R02G0505-002.
+- Q: What does the tutorial show, and when does it advance? → A: on levels 1 … 3, three instructions in order: (1)
+  "Drag across a sandstone cell (or use Carve) to cut a channel, and tap a spring (or its valve button) to open or close
+  it, until the fluid will reach the right basins; a hint shows how" — it advances once an edit has been accepted and the
+  current plan is empty; (2) "Let the fluid run with Step or Run and watch the basins fill" — until a step is accepted;
+  (3) "Fill every basin with its colours without overflow; undo any change that sends a wrong colour in" — until the
+  level ends. `tutorial.dismiss` ends it for that level; undo never moves it back. Impact: FR-R02G0505-001;
+  SC-R02G0505-001.
+- Q: What are the progress and star rules? → A: as feature 335 with actions spent (carves and valve toggles): per level
+  the best (fewest) actions spent in a won campaign play and the stars (3 when at most the certified smallest edit
+  count, 2 when at most that + 2, else 1; a better result replaces a worse one); level 1 open; a campaign win opens the
+  next; `level.select [n]` opens any open level and refuses others (`r02-g05.locked`); `level.next` moves to the next
+  open level (refused when none, `r02-g05.locked`); the five bands of 20 are the certified difficulty bands.
+  Impact: FR-R02G0505-004; SC-R02G0505-004.
+- Q: How do the daily level and practice mode work? → A: the daily level is (days from 2026-01-01 to the given calendar
+  date × 53) mod 100 + 1, negative day counts wrapped into 0 … 99 (53 is coprime with 100 and differs from the other
+  round-two games' 37, 41, 43 and 47); the date reaches the core as `mode.daily [year, month, day]` (an impossible date
+  is refused with `r02-g05.date`). Daily play follows campaign rules but does not open levels. `mode.practice` replays
+  the current level with the budget raised to the kernel's maximum (30); practice results never award stars or open
+  levels; `mode.campaign` returns. Impact: FR-R02G0505-005; SC-R02G0505-004.
+- Q: Where does progress live, how is it versioned and how is a failure explained? → A: as feature 335: progress and the
+  mode are part of the experience state and its digest; the tutorial step is snapshotted but not digested; the hint
+  level is presentation (held by the presenter); the snapshot payload becomes schema 2 (`{level, records, progress,
+  mode, tutorial}`) with a migration from schema 1 (level 1 open plus the restored level, campaign mode, tutorial at its
+  first step on tutorial levels). Failures are explained from the failing tick: contamination "Basin k (row r, column c)
+  took n units of <colour>; it allows at most m."; overflow "Basin k overflowed: v units, its capacity is c."; time "Time
+  ran out at tick T: basin k holds <amounts>; it needs <target>." (the first unfilled basin), each followed by "Undo the
+  last change or retry the level." Impact: FR-R02G0505-003, 007; SC-R02G0505-003.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -88,15 +138,15 @@ budget without affecting progress.
 - **FR-R02G0505-001**: Levels with a tutorial MUST show one instruction at a time, derived from the current state, that
   advances when the player performs it and can be dismissed; instructions never block or perform actions.
 - **FR-R02G0505-002**: A hint MUST be available in three progressive levels, computed from the current state so that
-  following the exact hints from any state that can still win wins within the budget and tick limit; from a state that
-  cannot win it says so and suggests undo or retry. A hint never changes the state, is unlimited, does not affect stars
+  following the exact hints from any state that can still win (a winning set of at most 3 edits applied now exists) wins
+  within the budget and tick limit; from a state that cannot win it says so and suggests undo or retry. A hint never changes the state, is unlimited, does not affect stars
   and returns to its first level after any change of the play.
 - **FR-R02G0505-003**: A failure MUST be explained in accessible text naming the reason (contamination, overflow or time),
   the basin, the colour and the amounts against the target, with undo and retry offered.
 - **FR-R02G0505-004**: Progress MUST follow defined rules: the first level open, a campaign win opens the next, the five
   difficulty bands of 20 shown, a goal and a result (stars) per level.
-- **FR-R02G0505-005**: A daily level MUST be a deterministic function of the local calendar date; a practice mode MUST
-  relax the action budget without affecting progress.
+- **FR-R02G0505-005**: A daily level MUST be a deterministic function of the local calendar date ((days since
+  2026-01-01 × 53) mod 100 + 1); a practice mode MUST raise the action budget to 30 without affecting progress.
 - **FR-R02G0505-006**: All 100 levels MUST be playable without payment, advertising, accounts or network.
 - **FR-R02G0505-007**: Progress MUST be a versioned value the experience snapshot carries, with a migration from the
   current snapshot schema; existing tests pass; new public names documented; the reference regression passes.
