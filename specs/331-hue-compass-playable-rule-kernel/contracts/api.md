@@ -17,19 +17,26 @@ public enum HueCompassAction: Sendable, Hashable, Codable { case turn(Int), prob
 public struct HueCompassLevel: Sendable, Equatable { /* fields per data-model.md; init throws(HueCompassError); encoded(); decode(_:) */
     public func clue(at bearing: Int) -> HueCompassClue
     public func accepts(bearing: Int, band: Int) -> Bool }
-public struct HueCompassRecord: Sendable, Hashable, Codable { public let schema: Int; public let seed: UInt64; public let tick: Int
-    public let kind: String /* turn, probe, select, undo, redo */; public let action: HueCompassAction?
+public enum HueCompassStage: String, Sendable, Codable, CaseIterable { case loading, tutorial, playing, paused, won, failed, result }
+public enum HueCompassEvent: Sendable, Equatable { case begin, dismissTutorial, pause, resume, showResult }
+public enum HueCompassRecordKind: String, Sendable, Codable { case turn, probe, select, undo, redo }
+public enum HueCompassFailure: String, Sendable, Codable, CaseIterable { case selection, probes }
+public struct HueCompassRecord: Sendable, Equatable, Codable { public let schema: Int; public let seed: UInt64; public let tick: Int
+    public let kind: HueCompassRecordKind; public let action: HueCompassAction   // undo: the reverse turn; redo: the turn
     public let previous: String; public let next: String }
-public enum HueCompassStage: String, Sendable, Codable { case loading, tutorial, playing, paused, won, failed, result }
-public struct HueCompassPlay: Sendable {
+public struct HueCompassPlay: Sendable, Equatable {
+    public static var schema: Int { 1 }; public static let turns: ClosedRange<Int>   // −48 … 48
     public let level: HueCompassLevel
     public private(set) var stage: HueCompassStage, bearing: Int, spent: Int, clues: [HueCompassClue],
-        records: [HueCompassRecord], failure: String?            // "selection" | "probes"
-    public var fingerprint: String { get }
+        records: [HueCompassRecord], failure: HueCompassFailure?
+    public var fingerprint: String { get }; public var remaining: Int { get }; public var canUndo, canRedo: Bool { get }
     public init(level: HueCompassLevel)
-    public mutating func begin() throws(HueCompassError); pause(); resume(); dismissTutorial(); finish()
-    public mutating func apply(_ action: HueCompassAction, expecting fingerprint: String) throws(HueCompassError)
-    public mutating func undo(expecting:) throws(HueCompassError); redo(expecting:) throws(HueCompassError)
+    public mutating func handle(_ event: HueCompassEvent) throws(HueCompassError)            // .stage
+    public static func inRange(_ action: HueCompassAction) -> Bool
+    public mutating func apply(_ action: HueCompassAction, expecting previous: String) throws(HueCompassError)
+        // order: .stage, .stale, .action("range"), .allowance
+    public mutating func undo() throws(HueCompassError); public mutating func redo() throws(HueCompassError)
+        // .stage, .action("nothing-to-undo" | "nothing-to-redo"); turns only
     public static func replay(level: HueCompassLevel, records: [HueCompassRecord]) throws(HueCompassError) -> HueCompassPlay
 }
 public struct HueCompassRules: PuzzleRules { /* State = HueCompassRules.Position (bearing, spent, outcome), Move = HueCompassAction;
