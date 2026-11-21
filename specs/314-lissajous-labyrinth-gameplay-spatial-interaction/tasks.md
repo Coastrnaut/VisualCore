@@ -78,7 +78,7 @@ tests stay short (< 10 s each).
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host -- swift test --package-path
   Packages/ExperiencesRound02`; `--name audits -- python3 scripts/verify_experiences.py --audits --only
   r02-g02.lissajous-labyrinth`
-- [ ] T-R02G0204-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G0204-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-21: 2026-11-21 rendering-27, rendering-26, experiences, host-full and app-unit exit 0
   `--name host-full`, `--name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27
   app-unit-ios27`
 - [ ] T-R02G0204-009 Reference regression chunk 1 (`--name reference-1`)
