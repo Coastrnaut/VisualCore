@@ -69,7 +69,7 @@ ImplementationLock-100.
 
 - [X] T-R02G0406-007 Docs: `docs/architecture/hue-compass.md` (polish and accessibility), — Verified 2026-11-21: 2026-11-21 round02-host exit 0; architecture (polish and accessibility), package README and testing doc (stills at a repeated time settle) updated
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
-- [ ] T-R02G0406-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G0406-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-21: 2026-11-21 rendering-27, rendering-26, experiences, host-full, app-unit exit 0 on the final code (after T-014/T-015)
   `--name host-full`, `--name app-unit`
 - [ ] T-R02G0406-009 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G0406-010 Reference regression chunk 2 (`--name reference-2`)
