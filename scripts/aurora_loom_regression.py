@@ -45,7 +45,9 @@ XCTEST_FAILURE = re.compile(r"Test Case '-\[[^\]]*?(\w+)\]' failed")
 def commands() -> list[tuple[str, list[str]]]:
     """The parts in run order, each as (name, argv); every argv runs from the repository root."""
     host = ["swift", "test", "--package-path", PACKAGE, "--filter", HOST_FILTER]
-    simulator = ["python3", "scripts/xcodebuild_package.py", "--package", PACKAGE, "--scheme", SCHEME,
+    # The memory class's footprint bound applies only in a process of its own (feature 309); xcodebuild passes
+    # TEST_RUNNER_-prefixed variables to the test process without the prefix.
+    simulator = ["env", "TEST_RUNNER_AURORA_LOOM_MEMORY_ISOLATED=1", "python3", "scripts/xcodebuild_package.py", "--package", PACKAGE, "--scheme", SCHEME,
                  "--destination", DESTINATION, "--action", "test", "--only-testing", *SIMULATOR_TESTS]
     return [("host", host), ("simulator", simulator)]
 

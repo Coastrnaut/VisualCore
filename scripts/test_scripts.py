@@ -1074,6 +1074,23 @@ class ReleaseCheckTests(unittest.TestCase):
             self.assertNotIn("devicectl", " ".join(s.argv))
             self.assertNotIn("platform=iOS,id=", " ".join(s.argv))
 
+    def test_aurora_loom_ui_chunk_and_release_symbols(self):
+        """Feature 309 R02-G01-09 (T-R02G0109-004, T-R02G0109-006): the serial chunk `i3` runs the Aurora Loom
+        interface journeys, and the Release symbol check forbids Aurora Loom's test-only names."""
+        self.assertEqual(relcheck.UI_CHUNKS["i3"], ["ALPlayUITests", "ALReplayUITests"])
+        self.assertIn("i3", relcheck.SERIAL_CHUNKS)
+        steps = {s.name: s.argv for s in relcheck.unified_app_steps("X")}
+        argv = steps["app-ui-ios27-i3"]
+        self.assertNotIn("--parallel", argv)
+        start = argv.index("--only-testing") + 1
+        self.assertEqual(argv[start:start + 2], ["VisualCoreUITests/ALPlayUITests", "VisualCoreUITests/ALReplayUITests"])
+        self.assertEqual(argv[start + 2], "--log-name")
+        for name in ("AuroraLoomGolden", "acceptanceScenarios"):
+            self.assertIn(name, relcheck.RELEASE_FORBIDDEN)
+            self.assertIn(name, steps["app-release-symbols"])
+        # Every serial chunk names a chunk that exists.
+        self.assertLessEqual(relcheck.SERIAL_CHUNKS, set(relcheck.UI_CHUNKS))
+
     def test_app_steps_are_discovered_per_app(self):
         """Feature 019 T-A02-115: documented-API, domain-package host tests and app tests for every app."""
         with tempfile.TemporaryDirectory() as d:
@@ -5183,7 +5200,8 @@ class AuroraLoomRegressionTests(unittest.TestCase):
         lines = out.splitlines()
         self.assertEqual(lines, [
             "$ swift test --package-path Packages/ExperiencesRound02 --filter AuroraLoomRegression",
-            "$ python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme "
+            "$ env TEST_RUNNER_AURORA_LOOM_MEMORY_ISOLATED=1 python3 scripts/xcodebuild_package.py --package "
+            "Packages/ExperiencesRound02 --scheme "
             "ExperiencesRound02-Package --destination sim-27.2 --action test --only-testing "
             "AuroraLoomExperienceTests/AuroraLoomRegressionGoldenFrameTests "
             "AuroraLoomExperienceTests/AuroraLoomRegressionMemoryTests",

@@ -21,6 +21,10 @@ import VisualCoreRendering
     static let cycles = 12
     /// The footprint bound of clarification Q4: 16 MB.
     static let bound = 16 * 1_048_576
+    /// Whether the footprint bound applies: only when this class runs in a process of its own (the regression command
+    /// sets `TEST_RUNNER_AURORA_LOOM_MEMORY_ISOLATED=1`); the footprint is process-wide, so other suites running in
+    /// parallel move it (feature 309: a 91 MB spike from another suite at cycle 9). The release checks always apply.
+    static var isolated: Bool { ProcessInfo.processInfo.environment["AURORA_LOOM_MEMORY_ISOLATED"] == "1" }
 
     /// The readings in MB with two decimals, for the issue messages.
     static func describe(_ readings: [Int]) -> String {
@@ -59,6 +63,10 @@ import VisualCoreRendering
         print("aurora-loom memory: \(Self.describe(readings))")
         #expect(readings.count == Self.cycles, "\(readings.count) readings: \(Self.describe(readings))")
         guard let first: Int = readings.first else { return }
+        guard Self.isolated else {
+            print("aurora-loom memory: footprint bound not applied (not isolated; run scripts/aurora_loom_regression.py)")
+            return
+        }
         for index in 1..<readings.count {
             let drift: Int = readings[index] - first
             #expect(abs(drift) <= Self.bound,

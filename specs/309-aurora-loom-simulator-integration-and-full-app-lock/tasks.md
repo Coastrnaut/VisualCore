@@ -22,7 +22,7 @@ tests stay short (< 10 s each; interface tests < 60 s). No {owner} tasks.
 
 ## Phase 3: Story 1 — the game works inside the real app (P1) 🎯
 
-- [ ] T-R02G0109-003 [US1] Edit `Packages/ExperiencesRound02/AuroraLoom/Experience/AuroraLoomPresenter.swift` and `Packages/ExperiencesRound02/AuroraLoom/Experience/AuroraLoomControls.swift`:
+- [X] T-R02G0109-003 [US1] Edit `Packages/ExperiencesRound02/AuroraLoom/Experience/AuroraLoomPresenter.swift` and `Packages/ExperiencesRound02/AuroraLoom/Experience/AuroraLoomControls.swift`: — Verified 2026-11-20: 2026-11-20 sim-27-2 exit 0 (panel identifiers; pending steppers with Apply and Clear; AuroraLoomPanelTests: pending, order, clear, outside change, refusal mid-apply, all 100 levels won through the panel in their certified shortest); sim-27 exit 65: a refusal code compared without its action.rule prefix, and the memory footprint bound failing under the full parallel suite (91 MB spike from another suite), fixed by applying the bound only in the isolated regression run (regression exit 0, bound applied, flat within 0.2 MB)
   identifiers `experience.r02-g01.aurora-loom.<name>` (spec Clarifications Q1 names, plus `apply`, `clear`); pending
   stepper steps ("steppers set pending steps; Apply commits one move per changed control, ribbon order, wave before
   phase; Clear drops them; an outside change drops them"; announcement "Ribbon r wave s pending. Apply to move."; the

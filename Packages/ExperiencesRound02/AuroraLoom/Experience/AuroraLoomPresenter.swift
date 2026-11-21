@@ -19,6 +19,10 @@
 // Feature 307 (R02-G01-07) T-R02G0107-005 (FR-R02G0107-003, 004): the mirror carries whether a replay is available or
 // running with its position; `startReplay`, `stepReplay` and `stopReplay` send the replay actions; the first described
 // core whose restore dropped results announces them once (`AuroraLoomFeedbackPlan.dropped(count:)`).
+// Feature 309 (R02-G01-09) T-R02G0109-003 (FR-R02G0109-008; spec Amendment): the panel's steppers set pending steps
+// (`stepPending`, announced, no move); `applyPending` commits each pending change as one move (ribbon order, wave
+// before phase), stops at the first refusal and drops the rest; `clearPending` drops them; a change of the level, mode
+// or play from elsewhere drops them too.
 #if os(iOS)
 import AuroraLoomCore
 import Foundation
@@ -74,6 +78,9 @@ final class AuroraLoomMirror {
     var replayPosition = 0
     /// The moves of the stored trace of the level (feature 307); 0 when none is stored.
     var replayLength = 0
+    /// The steps the panel's steppers set but did not apply yet (feature 309); nil when nothing is pending. Controls
+    /// without a pending change hold the current step.
+    var pending: AuroraLoomSteps?
 }
 
 /// One entry of the feedback log (feature 306): the announcement and haptic planned for a change or refusal.
@@ -124,6 +131,8 @@ final class AuroraLoomPresenter: ExperiencePresenter {
     let sound: AuroraLoomSound
     /// Whether the dropped-results announcement was made (once per presenter; feature 307).
     private(set) var droppedAnnounced = false
+    /// True while `applyPending` sends its moves, so the described changes do not count as outside changes.
+    private var applying = false
 
     init(reduceMotion: Bool, reduceFlashing: Bool) {
         self.reduceMotion = reduceMotion
@@ -299,6 +308,53 @@ final class AuroraLoomPresenter: ExperiencePresenter {
         return send("ribbon.move", [Double(ribbon), Double(control), Double(step)], port: port)
     }
 
+    /// Steps the pending value of `ribbon`'s `control` (0 = wave, 1 = phase) by `delta`, wrapping 0 … 15, starting from
+    /// the pending value or the current step; announces "Ribbon r wave s pending. Apply to move." and sends no action
+    /// (feature 309).
+    func stepPending(ribbon: Int, control: Int, by delta: Int) {
+        guard let core = latestCore, (0..<3).contains(ribbon), (0...1).contains(control) else { return }
+        select(ribbon: ribbon)
+        var pending = mirror.pending ?? core.play.steps
+        let current = control == 0 ? pending.wave[ribbon] : pending.phase[ribbon]
+        let step = ((current + delta) % 16 + 16) % 16
+        if control == 0 { pending.wave[ribbon] = step } else { pending.phase[ribbon] = step }
+        mirror.pending = pending
+        let name = control == 0 ? "wave" : "phase"
+        route(AuroraLoomFeedbackPlan(text: "Ribbon \(ribbon + 1) \(name) \(step) pending. Apply to move.", kind: .state,
+                                     haptic: nil))
+    }
+
+    /// Sends one `ribbon.move` per control whose pending step differs from the current one, ribbon order, wave before
+    /// phase; stops at the first refusal (announced by `send`) and drops every remaining pending step; clears the pending
+    /// steps in every case. Returns the results in order (feature 309).
+    @discardableResult
+    func applyPending(port: ExperienceActionPort) -> [ActionResult] {
+        guard let pending = mirror.pending, let core = latestCore else { return [] }
+        applying = true
+        defer {
+            applying = false
+            mirror.pending = nil
+        }
+        let current = core.play.steps
+        var results: [ActionResult] = []
+        for ribbon in 0..<3 {
+            for control in 0..<2 {
+                let target = control == 0 ? pending.wave[ribbon] : pending.phase[ribbon]
+                let now = control == 0 ? current.wave[ribbon] : current.phase[ribbon]
+                guard target != now else { continue }
+                let result = send("ribbon.move", [Double(ribbon), Double(control), Double(target)], port: port)
+                results.append(result)
+                if !result.isAccepted { return results }
+            }
+        }
+        return results
+    }
+
+    /// Drops the pending steps; sends nothing (feature 309).
+    func clearPending() {
+        mirror.pending = nil
+    }
+
     /// Starts the replay of the current level's stored winning moves (`replay.start`; feature 307).
     @discardableResult
     func startReplay(port: ExperienceActionPort) -> ActionResult {
@@ -345,6 +401,11 @@ final class AuroraLoomPresenter: ExperiencePresenter {
 
     func describe(_ core: AuroraLoomExperienceCore) -> String {
         let play = core.play
+        if !applying, mirror.pending != nil, let previous = previousCore,
+           previous.levelNumber != core.levelNumber || previous.mode != core.mode
+            || previous.play.records != core.play.records {
+            mirror.pending = nil
+        }
         if !droppedAnnounced && core.reconciliationDropped > 0 {
             droppedAnnounced = true
             route(AuroraLoomFeedbackPlan.dropped(count: core.reconciliationDropped))
