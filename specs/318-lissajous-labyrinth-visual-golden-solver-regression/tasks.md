@@ -28,7 +28,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
   keys; SHA-256"; manifest; compare with the one-quantum fallback and the pinned-digest self-check), generate
   `Packages/ExperiencesRound02/LissajousLabyrinth/golden-frames.json` with `LISSAJOUS_LABYRINTH_WRITE_GOLDEN=1`, and add `LissajousLabyrinthGolden` to
   `RELEASE_FORBIDDEN` in `scripts/release_check.py`
-- [ ] T-R02G0208-004 [P] [US2] Create `Packages/ExperiencesRound02/LissajousLabyrinth/CoreTests/LissajousLabyrinthRegressionGoldenTests.swift` (agent B: every frame's
+- [X] T-R02G0208-004 [P] [US2] Create `Packages/ExperiencesRound02/LissajousLabyrinth/CoreTests/LissajousLabyrinthRegressionGoldenTests.swift` (agent B: every frame's — Verified 2026-11-21: 2026-11-21 host-2 exit 0: LissajousLabyrinthRegressionGoldenTests 7/7 (fixed golden set; deterministic descriptions; every frame matches the pinned file; each pinned digest equals its description's; missing, unreadable, schema-2 and unknown frames named; a 2-quantum move, a colour and a tier detail change fail, one quantum passes; a hand-edited description with its old digest refused)
   recomputed description matches its pinned one; each pinned digest equals the digest of its pinned description; a
   moved position beyond a quantum, a changed colour, a missing frame, an unknown frame, schema ≠ 1 and a hand-edited
   description all fail naming the frame; the file is rewritten only with the switch); `--name host-2 -- swift test
