@@ -29,7 +29,7 @@ ImplementationLock-100.
 
 ## Phase 3: Story 2 — comfort settings (P1)
 
-- [ ] T-R02G0406-003 [P] [US2] Create `Packages/ExperiencesRound02/HueCompass/Core/HueCompassLights.swift` ("probe marks keyed by bearing, 1 present, 0
+- [X] T-R02G0406-003 [P] [US2] Create `Packages/ExperiencesRound02/HueCompass/Core/HueCompassLights.swift` ("probe marks keyed by bearing, 1 present, 0 — Verified 2026-11-21: 2026-11-21 host-2 exit 0: HueCompassLightsTests 10/10 (scripted win and flicker under Reduce Flashing: at most 3 half-range crossings per second, fades >= 0.4 s; normal 0.15 s; vanished marks keep their bearing; a moved mark goes out then in)
   absent; selection mark and target ring remember their last bearing; glow 1 when won; linear 0.15 s, or 0.45 s under
   Reduce Flashing where a started fade completes before turning back; a probe level at 0 with target 0 is dropped";
   settle; step; isSettled; maxHalfRangeCrossingsPerSecond) with `Packages/ExperiencesRound02/HueCompass/CoreTests/HueCompassLightsTests.swift` (a scripted
