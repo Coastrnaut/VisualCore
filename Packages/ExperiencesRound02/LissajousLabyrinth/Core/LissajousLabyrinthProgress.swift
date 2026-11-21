@@ -194,6 +194,12 @@ public struct LissajousLabyrinthProgress: Sendable, Equatable, Hashable, Codable
         frontier = 1
     }
 
+    /// Opens every level up to `level` (clamped to 1 … 100); the frontier never falls. The adapter opens the level a seed
+    /// chose, so a session that starts beyond level 1 can play it (feature 315, T-R02G0205-004).
+    public mutating func open(through level: Int) {
+        frontier = max(frontier, min(max(level, 1), Self.levelCount))
+    }
+
     /// Whether `level` is open: 1 ≤ level ≤ ``frontier``.
     public func isOpen(_ level: Int) -> Bool { level >= 1 && level <= frontier }
 

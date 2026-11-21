@@ -25,6 +25,20 @@
 // (`LissajousLabyrinthPlay.replay`) and throws `LissajousLabyrinthRestoreRefusal` for a damaged payload, a level number
 // outside 1 … 100 or a trace the kernel refuses.
 //
+// Feature 315 (R02-G02-05) T-R02G0205-004 (FR-R02G0205-001 … 007; clarifications Q1–Q5): the core also holds the
+// player's progress (`LissajousLabyrinthProgress`: solved levels with best actions and stars, the open frontier), the mode
+// (campaign, practice with the allowance raised to 64, daily) and the tutorial step, and keeps the opened level's winning
+// settings as derived state for hints (`hint(level:)`) and the tutorial's first instruction. New actions:
+//   level.select [1…100]           an open level, fresh, in campaign mode (`r02-g02.locked` otherwise);
+//   mode.daily [year, month, day]  the date's daily level, fresh (`r02-g02.date` for an impossible date);
+//   mode.practice, mode.campaign   the current level fresh in that mode (campaign: the frontier when it is not open);
+//   tutorial.dismiss               the tutorial ends; tutorial.hint  a hint was shown (the tutorial advances).
+// `level.next` moves to the next open level. A win records the result (campaign opens the next level; daily never
+// does; practice records nothing). After a failure, `play.undo` rewinds the failing action by replaying the earlier
+// records. Digest "r02-g02.lissajous-labyrinth.v2": level, play fingerprint, progress and mode (never the tutorial step,
+// which undo does not move back). Snapshot schema 2: `{"level", "mode", "progress", "records", "tutorial"}`; schema-1
+// payloads migrate (the saved level open, campaign mode, the tutorial recomputed).
+//
 // Quality: three host tiers, best first as the contract requires (`qualityProfile` level 0 is the best and no budget
 // may rise). Host tier `t` draws `LissajousLabyrinthTier.of(t)`: level-0 = 4,096 samples, 2 glow passes, trail 512;
 // level-1 = 2,048, 1, 256; level-2 = 1,024, 0, 128. Outcome: `won` or `failed` while the play is in that stage,
@@ -39,11 +53,15 @@ import VisualCorePersistence
 public enum LissajousLabyrinthExperienceRule {
     /// A value that must be a whole number (dial, value) and is not.
     public static let notWhole = "r02-g02.not-whole"
+    /// A level that is not open yet (feature 315).
+    public static let locked = "r02-g02.locked"
+    /// An impossible calendar date (feature 315).
+    public static let date = "r02-g02.date"
 }
 
 /// Why a saved Lissajous Labyrinth state was refused on restore (feature 313). A refused restore changes nothing.
 public enum LissajousLabyrinthRestoreRefusal: Error, Equatable, Sendable {
-    /// The payload is not the JSON object `{"level", "records"}` or a field has the wrong type.
+    /// The payload is not the JSON object of its schema or a field has the wrong type.
     case damaged
     /// The level number is outside 1 … 100; the value is that number.
     case levelNumber(Int)
@@ -51,16 +69,19 @@ public enum LissajousLabyrinthRestoreRefusal: Error, Equatable, Sendable {
     case kernel(LissajousLabyrinthError)
 }
 
-/// The state of Lissajous Labyrinth as an experience (see the file header). Snapshot schema 1.
+/// The state of Lissajous Labyrinth as an experience (see the file header). Snapshot schema 2.
 public struct LissajousLabyrinthExperienceCore: ExperienceCore, Equatable {
     /// The experience's id in the catalog.
     public static let experienceID = "r02-g02.lissajous-labyrinth"
     /// The snapshot schema this build writes.
-    public static let schemaVersion = 1
-    /// The digest's domain string (schema 1).
-    public static let digestDomain = "r02-g02.lissajous-labyrinth.v1"
+    public static let schemaVersion = 2
+    /// The digest's domain string (schema 2).
+    public static let digestDomain = "r02-g02.lissajous-labyrinth.v2"
     /// The action ids in declaration order.
-    public static let actionIDs = ["dial.set", "play.undo", "play.redo", "level.next"]
+    public static let actionIDs = ["dial.set", "play.undo", "play.redo", "level.next", "level.select", "mode.daily",
+                                   "mode.practice", "mode.campaign", "tutorial.dismiss", "tutorial.hint"]
+    /// The allowance of a practice play: the kernel's maximum.
+    public static let practiceAllowance = 64
     /// The level numbers of the catalog.
     public static let levelNumbers: ClosedRange<Int> = 1...100
     /// The dials in the order of `dial.set`'s first value: frequencyA, frequencyB, phaseA, phaseC.
@@ -74,20 +95,48 @@ public struct LissajousLabyrinthExperienceCore: ExperienceCore, Equatable {
     public private(set) var levelNumber: Int
     /// The kernel's play of that level.
     public private(set) var play: LissajousLabyrinthPlay
+    /// The player's progress (feature 315): in the digest and the snapshot.
+    public private(set) var progress: LissajousLabyrinthProgress
+    /// The mode (feature 315): in the digest and the snapshot.
+    public private(set) var mode: LissajousLabyrinthMode
+    /// The tutorial step (feature 315): in the snapshot, not in the digest.
+    public private(set) var tutorial: LissajousLabyrinthTutorialStep
+    /// The certified shortest solution length of the current level (stars). Derived from the level number.
+    public private(set) var certifiedShortest: Int
+    /// The current level's winning settings, for hints. Derived from the level, so not in the digest, the snapshot or
+    /// `==`.
+    public private(set) var winning: [LissajousLabyrinthDials]
     /// The level number the seed chose; a reset returns to it. Derived from the seed, so not in the digest or `==`.
     public let openingNumber: Int
-    /// The fresh play of the opening level; a reset returns to it. Derived from the seed, so not in the digest or `==`.
-    private let openingPlay: LissajousLabyrinthPlay
+    /// The opening state; a reset returns to it. Derived from the seed, so not in the digest or `==`.
+    private let opening: Opening
+
+    /// What a reset restores.
+    struct Opening: Sendable {
+        let play: LissajousLabyrinthPlay
+        let progress: LissajousLabyrinthProgress
+        let tutorial: LissajousLabyrinthTutorialStep
+        let certifiedShortest: Int
+        let winning: [LissajousLabyrinthDials]
+    }
     /// The host quality tier (0 = level-0, the best, … 2, clamped); presentation only — not in the digest, the
     /// snapshot or `==`.
     public private(set) var qualityTier = 0
 
-    /// A state playing `play` of level `levelNumber`, whose reset returns to `openingPlay` of `openingNumber`.
-    init(levelNumber: Int, play: LissajousLabyrinthPlay, openingNumber: Int, openingPlay: LissajousLabyrinthPlay) {
+    /// A state playing `play` of level `levelNumber` with `progress`, `mode` and `tutorial`, whose reset returns to
+    /// `opening` of `openingNumber`.
+    init(levelNumber: Int, play: LissajousLabyrinthPlay, progress: LissajousLabyrinthProgress,
+         mode: LissajousLabyrinthMode, tutorial: LissajousLabyrinthTutorialStep, certifiedShortest: Int,
+         winning: [LissajousLabyrinthDials], openingNumber: Int, opening: Opening) {
         self.levelNumber = levelNumber
         self.play = play
+        self.progress = progress
+        self.mode = mode
+        self.tutorial = tutorial
+        self.certifiedShortest = certifiedShortest
+        self.winning = winning
         self.openingNumber = openingNumber
-        self.openingPlay = openingPlay
+        self.opening = opening
     }
 
     /// The level number a seed chooses: `seed % 100 + 1`.
@@ -125,13 +174,64 @@ public struct LissajousLabyrinthExperienceCore: ExperienceCore, Equatable {
         try LissajousLabyrinthPlay.replay(level: level, records: [])
     }
 
-    /// The opening state of manifest number `number`.
+    /// The winning settings of certified level `number`, computed once per process (about 0.1 s in a debug build).
+    private static let winningCache = Mutex<[Int: [LissajousLabyrinthDials]]>([:])
+
+    /// The winning settings of certified level `number` (1 … 100), cached.
+    ///
+    /// - Throws: as ``generated(number:)``.
+    public static func winningSettings(number: Int) throws(LissajousLabyrinthError) -> [LissajousLabyrinthDials] {
+        if let cached = winningCache.withLock({ $0[number] }) { return cached }
+        let settings = LissajousLabyrinthSolver.winningSettings(try level(number: number)).settings
+        winningCache.withLock { $0[number] = settings }
+        return settings
+    }
+
+    /// The practice copy of `level`: every field kept, the allowance raised to ``practiceAllowance``.
+    ///
+    /// - Throws: the kernel's refusal of the copy (never for a certified level).
+    public static func practiceLevel(of level: LissajousLabyrinthLevel) throws(LissajousLabyrinthError)
+        -> LissajousLabyrinthLevel {
+        try LissajousLabyrinthLevel(id: level.id, seed: level.seed, band: level.band, amplitudes: level.amplitudes,
+                                    frequencyC: level.frequencyC, start: level.start, checkpoints: level.checkpoints,
+                                    obstacles: level.obstacles, allowance: practiceAllowance, tutorial: level.tutorial)
+    }
+
+    /// The first tutorial step of a fresh play of manifest number `number` in `mode`: `turn(dial)` on levels 1 … 3 in
+    /// campaign mode, with `dial` the level-1 hint's dial; `done` otherwise.
+    public static func firstTutorialStep(number: Int, mode: LissajousLabyrinthMode, play: LissajousLabyrinthPlay,
+                                         winning: [LissajousLabyrinthDials]) -> LissajousLabyrinthTutorialStep {
+        guard mode == .campaign, LissajousLabyrinthGenerator.tutorialLevels.contains(number),
+              let hint = LissajousLabyrinthHints.hint(level: 1, play: play, winning: winning) else { return .done }
+        return .first(dial: hint.dial)
+    }
+
+    /// The opening state of manifest number `number`: campaign mode, the levels up to `number` open.
     ///
     /// - Throws: as ``level(number:)``.
     public static func opening(number: Int) throws(LissajousLabyrinthError) -> LissajousLabyrinthExperienceCore {
-        let play = try freshPlay(of: try level(number: number))
-        return LissajousLabyrinthExperienceCore(levelNumber: number, play: play, openingNumber: number,
-                                                openingPlay: play)
+        let certified = try generated(number: number)
+        let play = try freshPlay(of: certified.level)
+        let winning = try winningSettings(number: number)
+        var progress = LissajousLabyrinthProgress()
+        progress.open(through: number)
+        let tutorial = firstTutorialStep(number: number, mode: .campaign, play: play, winning: winning)
+        let opening = Opening(play: play, progress: progress, tutorial: tutorial,
+                              certifiedShortest: certified.solution.shortest, winning: winning)
+        return LissajousLabyrinthExperienceCore(levelNumber: number, play: play, progress: progress, mode: .campaign,
+                                                tutorial: tutorial, certifiedShortest: certified.solution.shortest,
+                                                winning: winning, openingNumber: number, opening: opening)
+    }
+
+    /// The hint of `level` (1 … 3) for the current play; nil when the play is not in stage `playing` or no solution is
+    /// reachable. Reads only.
+    public func hint(level: Int) -> LissajousLabyrinthHint? {
+        LissajousLabyrinthHints.hint(level: level, play: play, winning: winning)
+    }
+
+    /// The explanation of the current play's failure; nil unless the play failed.
+    public var failureExplanation: LissajousLabyrinthFailureExplanation? {
+        LissajousLabyrinthFailureExplanation(play: play)
     }
 
     /// An immutable copy of the play for drawing at the presenter's presentation time `time` (seconds). Reads only;
@@ -168,15 +268,42 @@ public struct LissajousLabyrinthExperienceCore: ExperienceCore, Equatable {
         qualityTier = min(max(tier, 0), Self.qualityTiers - 1)
     }
 
-    /// Equal states: the level number and the play (not the quality tier or the opening level).
+    /// Equal states: the level number, the play, the progress, the mode and the tutorial step (not the quality tier,
+    /// the derived winning set or the opening level).
     public static func == (lhs: LissajousLabyrinthExperienceCore, rhs: LissajousLabyrinthExperienceCore) -> Bool {
-        lhs.levelNumber == rhs.levelNumber && lhs.play == rhs.play
+        lhs.levelNumber == rhs.levelNumber && lhs.play == rhs.play && lhs.progress == rhs.progress
+            && lhs.mode == rhs.mode && lhs.tutorial == rhs.tutorial
     }
 
     // MARK: Contract
 
-    /// Schema 1, the first version: no migration steps.
-    public static var migrations: MigrationChain { MigrationChain(currentVersion: schemaVersion) }
+    /// Schema 2 with the step 1 → 2 (``migratedToSchemaTwo(_:)``); a payload that does not decode is refused.
+    public static var migrations: MigrationChain {
+        MigrationChain(currentVersion: schemaVersion, steps: [1: { payload in try migratedToSchemaTwo(payload) }])
+    }
+
+    /// The schema-2 object of a schema-1 object `{"level", "records"}`: the saved level open, campaign mode, no
+    /// tutorial key (restore computes the first step).
+    ///
+    /// - Throws: ``LissajousLabyrinthRestoreRefusal/damaged`` when `object` is not a schema-1 object.
+    public static func migratedToSchemaTwo(_ object: [String: Any]) throws -> [String: Any] {
+        guard let level = object["level"] as? Int, object["records"] is [Any] else {
+            throw LissajousLabyrinthRestoreRefusal.damaged
+        }
+        var progress = LissajousLabyrinthProgress()
+        progress.open(through: level)
+        var migrated = object
+        migrated["progress"] = try JSONSerialization.jsonObject(with: try payloadEncoder().encode(progress))
+        migrated["mode"] = try JSONSerialization.jsonObject(with: try payloadEncoder().encode(LissajousLabyrinthMode.campaign))
+        return migrated
+    }
+
+    /// The encoder of payloads: sorted keys, unescaped slashes.
+    static func payloadEncoder() -> JSONEncoder {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
+        return encoder
+    }
 
     /// The declared controls, built once.
     private static let declaredControls: [ExperienceControl] = [
@@ -184,9 +311,15 @@ public struct LissajousLabyrinthExperienceCore: ExperienceCore, Equatable {
         ExperienceControl(id: "play.undo"),
         ExperienceControl(id: "play.redo"),
         ExperienceControl(id: "level.next"),
+        ExperienceControl(id: "level.select", ranges: [1...100]),
+        ExperienceControl(id: "mode.daily", ranges: [1...9999, 1...12, 1...31]),
+        ExperienceControl(id: "mode.practice"),
+        ExperienceControl(id: "mode.campaign"),
+        ExperienceControl(id: "tutorial.dismiss"),
+        ExperienceControl(id: "tutorial.hint"),
     ]
 
-    /// The four controls with their declared ranges (see the file header); the last three take no values.
+    /// The ten controls with their declared ranges (see the file header).
     public static var controls: [ExperienceControl] { declaredControls }
 
     /// The opening state of level `seed % 100 + 1`, in stage `playing`; no clock is read.
@@ -211,28 +344,88 @@ public struct LissajousLabyrinthExperienceCore: ExperienceCore, Equatable {
                                                   controls: Self.declaredControls) {
             return .rejected(refusal)
         }
+        var wholeValues: [Int] = []
+        for value in action.values {
+            guard let whole = Self.whole(value) else {
+                return .rejected(.rule(code: LissajousLabyrinthExperienceRule.notWhole))
+            }
+            wholeValues.append(whole)
+        }
         do throws(LissajousLabyrinthError) {
             switch action.control {
             case "dial.set":
-                guard let dial = Self.whole(action.values[0]), let value = Self.whole(action.values[1]) else {
-                    return .rejected(.rule(code: LissajousLabyrinthExperienceRule.notWhole))
-                }
-                let move = LissajousLabyrinthAction(dial: Self.dialOrder[dial], value: value)
+                let move = LissajousLabyrinthAction(dial: Self.dialOrder[wholeValues[0]], value: wholeValues[1])
                 try play.apply(move, expecting: play.fingerprint)
+                tutorial = tutorial.advancedByAction(stage: play.stage)
+                recordIfWon()
             case "play.undo":
-                try play.undo()
+                if play.stage == .failed, !play.records.isEmpty {
+                    // The kernel undoes only while playing; after a failure, undo rewinds the failing action by
+                    // replaying every earlier record (FR-R02G0205-003: "undo or retry").
+                    play = try LissajousLabyrinthPlay.replay(level: play.level, records: Array(play.records.dropLast()))
+                } else {
+                    try play.undo()
+                }
             case "play.redo":
                 try play.redo()
-            default:   // level.next
-                let next = levelNumber % Self.levelNumbers.upperBound + 1
-                let fresh = try Self.freshPlay(of: try Self.level(number: next))
-                levelNumber = next
-                play = fresh
+                recordIfWon()
+            case "level.next":
+                var next = levelNumber % Self.levelNumbers.upperBound + 1
+                while !progress.isOpen(next) { next = next % Self.levelNumbers.upperBound + 1 }
+                try open(number: next, mode: .campaign)
+            case "level.select":
+                guard progress.isOpen(wholeValues[0]) else {
+                    return .rejected(.rule(code: LissajousLabyrinthExperienceRule.locked))
+                }
+                try open(number: wholeValues[0], mode: .campaign)
+            case "mode.daily":
+                guard let daily = LissajousLabyrinthProgress.dailyLevel(year: wholeValues[0], month: wholeValues[1],
+                                                                        day: wholeValues[2]) else {
+                    return .rejected(.rule(code: LissajousLabyrinthExperienceRule.date))
+                }
+                try open(number: daily, mode: .daily(level: daily))
+            case "mode.practice":
+                try open(number: levelNumber, mode: .practice)
+            case "mode.campaign":
+                try open(number: progress.isOpen(levelNumber) ? levelNumber : progress.frontier, mode: .campaign)
+            case "tutorial.dismiss":
+                tutorial = tutorial.dismissed
+            default:   // tutorial.hint
+                tutorial = tutorial.advancedByHint()
             }
         } catch {
             return .rejected(.rule(code: error.reasonCode))
         }
         return .accepted
+    }
+
+    /// A fresh play of manifest number `number` in `mode` (the practice copy in practice mode), with the level's first
+    /// tutorial step; changes nothing when the kernel refuses.
+    private mutating func open(number: Int, mode: LissajousLabyrinthMode) throws(LissajousLabyrinthError) {
+        let certified = try Self.generated(number: number)
+        let level = mode == .practice ? try Self.practiceLevel(of: certified.level) : certified.level
+        let fresh = try Self.freshPlay(of: level)
+        let winning = try Self.winningSettings(number: number)
+        levelNumber = number
+        play = fresh
+        self.mode = mode
+        certifiedShortest = certified.solution.shortest
+        self.winning = winning
+        tutorial = Self.firstTutorialStep(number: number, mode: mode, play: fresh, winning: winning)
+    }
+
+    /// After a win: campaign records the result and opens the next level; daily records it without opening; practice
+    /// records nothing.
+    private mutating func recordIfWon() {
+        guard play.stage == .won else { return }
+        switch mode {
+        case .campaign:
+            progress.record(level: levelNumber, actions: play.spent, shortest: certifiedShortest, opensNext: true)
+        case .daily:
+            progress.record(level: levelNumber, actions: play.spent, shortest: certifiedShortest, opensNext: false)
+        case .practice:
+            break
+        }
     }
 
     /// `value` as an `Int` when it is a finite whole number; nil otherwise.
@@ -241,10 +434,15 @@ public struct LissajousLabyrinthExperienceCore: ExperienceCore, Equatable {
         return Int(value)
     }
 
-    /// Back to the fresh play of the level the seed chose; the quality tier, which is not state, is kept.
+    /// Back to the opening state the seed chose; the quality tier, which is not state, is kept.
     public mutating func reset() {
         levelNumber = openingNumber
-        play = openingPlay
+        play = opening.play
+        progress = opening.progress
+        mode = .campaign
+        tutorial = opening.tutorial
+        certifiedShortest = opening.certifiedShortest
+        winning = opening.winning
     }
 
     /// `won` or `failed` while the play is in that stage; nil otherwise.
@@ -256,28 +454,33 @@ public struct LissajousLabyrinthExperienceCore: ExperienceCore, Equatable {
         }
     }
 
-    /// "r02-g02.lissajous-labyrinth.v1", then the level number and the play's fingerprint (level, dials, actions
-    /// spent, stage).
+    /// "r02-g02.lissajous-labyrinth.v2", then the level number, the play's fingerprint (level, dials, actions spent,
+    /// stage), the progress and the mode (their sorted JSON); never the tutorial step.
     public func writeDigest(into builder: inout DigestBuilder) throws(DigestError) {
         builder.add(Self.digestDomain)
         builder.add(levelNumber)
         // The play's fingerprint and not its record history, so undo restores the earlier digest exactly.
         builder.add(play.fingerprint)
+        let encoder = Self.payloadEncoder()
+        builder.add(String(decoding: (try? encoder.encode(progress)) ?? Data(), as: UTF8.self))
+        builder.add(String(decoding: (try? encoder.encode(mode)) ?? Data(), as: UTF8.self))
     }
 
     // MARK: Snapshot
 
-    /// The payload's JSON form.
+    /// The payload's JSON form (schema 2); `tutorial` is absent in a migrated schema-1 payload.
     private struct Payload: Codable {
         var level: Int
+        var mode: LissajousLabyrinthMode
+        var progress: LissajousLabyrinthProgress
         var records: [LissajousLabyrinthRecord]
+        var tutorial: LissajousLabyrinthTutorialStep?
     }
 
-    /// The JSON object `{"level", "records"}` with sorted keys and unescaped slashes.
+    /// The JSON object `{"level", "mode", "progress", "records", "tutorial"}` with sorted keys and unescaped slashes.
     public func snapshotPayload() throws -> Data {
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
-        return try encoder.encode(Payload(level: levelNumber, records: play.records))
+        try Self.payloadEncoder().encode(Payload(level: levelNumber, mode: mode, progress: progress,
+                                                 records: play.records, tutorial: tutorial))
     }
 
     /// The core of `payload`: the records replayed on a fresh play of the saved level; a reset returns to the level
@@ -292,15 +495,27 @@ public struct LissajousLabyrinthExperienceCore: ExperienceCore, Equatable {
         guard levelNumbers.contains(decoded.level) else {
             throw LissajousLabyrinthRestoreRefusal.levelNumber(decoded.level)
         }
+        if case .daily(let daily) = decoded.mode, daily != decoded.level {
+            throw LissajousLabyrinthRestoreRefusal.damaged
+        }
         do throws(LissajousLabyrinthError) {
-            let saved = try level(number: decoded.level)
+            let certified = try generated(number: decoded.level)
+            let saved = decoded.mode == .practice ? try practiceLevel(of: certified.level) : certified.level
             let play = try LissajousLabyrinthPlay.replay(level: saved, records: decoded.records)
+            let winning = try winningSettings(number: decoded.level)
+            let tutorial: LissajousLabyrinthTutorialStep
+            if let step = decoded.tutorial {
+                tutorial = step
+            } else {
+                tutorial = firstTutorialStep(number: decoded.level, mode: decoded.mode, play: try freshPlay(of: saved),
+                                             winning: winning)
+            }
             let openingNumber = levelNumber(forSeed: seed)
-            let openingPlay = openingNumber == decoded.level
-                ? try freshPlay(of: saved)
-                : try freshPlay(of: try Self.level(number: openingNumber))
-            return LissajousLabyrinthExperienceCore(levelNumber: decoded.level, play: play,
-                                                    openingNumber: openingNumber, openingPlay: openingPlay)
+            let openingCore = try opening(number: openingNumber)
+            return LissajousLabyrinthExperienceCore(levelNumber: decoded.level, play: play, progress: decoded.progress,
+                                                    mode: decoded.mode, tutorial: tutorial,
+                                                    certifiedShortest: certified.solution.shortest, winning: winning,
+                                                    openingNumber: openingNumber, opening: openingCore.opening)
         } catch {
             throw LissajousLabyrinthRestoreRefusal.kernel(error)
         }

@@ -163,6 +163,12 @@ extension LissajousLabyrinthExperienceCore {
             refusedEntry("play.redo", [], kernelMove),
             refusedEntry("dial.set", [0], "action.wrong-value-count"),
             refusedEntry("level.next", [1], "action.wrong-value-count"),
+            // Feature 315: a locked level, an impossible date and wrong value counts.
+            refusedEntry("level.select", [2], "action.rule." + LissajousLabyrinthExperienceRule.locked),
+            refusedEntry("level.select", [101], outOfRange),
+            refusedEntry("mode.daily", [2026, 2, 30], "action.rule." + LissajousLabyrinthExperienceRule.date),
+            refusedEntry("mode.daily", [2026, 11], "action.wrong-value-count"),
+            refusedEntry("mode.practice", [1], "action.wrong-value-count"),
         ]
     }
 

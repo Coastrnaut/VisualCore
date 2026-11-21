@@ -40,7 +40,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks.
 
 ## Phase 4: Adapter, scenarios and panel
 
-- [ ] T-R02G0205-004 [US1] [US2] [US3] [US4] Edit `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthExperienceCore.swift` (controls "level.select
+- [X] T-R02G0205-004 [US1] [US2] [US3] [US4] Edit `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthExperienceCore.swift` (controls "level.select — Verified 2026-11-21: 2026-11-21 host-3 exit 0: LissajousLabyrinthExperienceCoreTests 14/14 (conformance; schema 2, digest v2, ten controls; campaign wins record stars and open the next level, locked select refused; daily records without opening, impossible date refused; practice allowance 64 records nothing; campaign returns to the frontier; undo after a failure rewinds; tutorial advances by action and hint, undo restores the digest but not the step, dismiss; schema-1 payload migrates and restores with the tutorial recomputed; practice round trip) and LissajousLabyrinthScenariosTests with the regenerated manifest (new refusals: locked, out of range, date, value counts)
   [1 … 100], mode.daily [year, month, day], mode.practice, mode.campaign, tutorial.dismiss"; practice allowance 64; daily
   wins record results without opening levels;
   choosing daily or practice drops the left level's records, mode.campaign returns to a fresh campaign play of the same

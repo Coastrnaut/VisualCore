@@ -32,6 +32,11 @@ import VisualCoreExperience
         ExperienceAction(control: "dial.set", values: [dial, value], step: 0)
     }
 
+    /// A schema-2 payload of `level` in campaign mode with empty progress and no records (feature 315).
+    static func schemaTwo(level: Int) -> String {
+        "{\"level\":\(level),\"mode\":{\"mode\":\"campaign\"},\"progress\":{\"frontier\":1,\"solved\":[]},\"records\":[]}"
+    }
+
     /// A phase value for `phaseC` that differs from the current one.
     static func otherPhaseC(_ core: Core) -> Int {
         (core.play.dials.phaseC + 1) % 16
@@ -62,12 +67,17 @@ import VisualCoreExperience
     }
 
     @Test func theControlsTheTiersAndTheProfile() {
-        #expect(Core.experienceID == "r02-g02.lissajous-labyrinth" && Core.schemaVersion == 1)
-        #expect(Core.digestDomain == "r02-g02.lissajous-labyrinth.v1")
+        // Feature 315: schema 2, digest v2 and the teaching and progression controls.
+        #expect(Core.experienceID == "r02-g02.lissajous-labyrinth" && Core.schemaVersion == 2)
+        #expect(Core.digestDomain == "r02-g02.lissajous-labyrinth.v2")
         #expect(Core.controls.map(\.id) == Core.actionIDs)
-        #expect(Core.actionIDs == ["dial.set", "play.undo", "play.redo", "level.next"])
+        #expect(Core.actionIDs == ["dial.set", "play.undo", "play.redo", "level.next", "level.select", "mode.daily",
+                                   "mode.practice", "mode.campaign", "tutorial.dismiss", "tutorial.hint"])
         #expect(Core.controls[0].ranges == [0...3, 0...15])
         for index in 1..<4 { #expect(Core.controls[index].ranges.isEmpty) }
+        #expect(Core.controls[4].ranges == [1...100])
+        #expect(Core.controls[5].ranges == [1...9999, 1...12, 1...31])
+        for index in 6..<10 { #expect(Core.controls[index].ranges.isEmpty) }
         #expect(Core.dialOrder == [.frequencyA, .frequencyB, .phaseA, .phaseC])
         #expect(Core.qualityTiers == 3)
         let profile: QualityProfile = Core.qualityProfile
@@ -168,15 +178,23 @@ import VisualCoreExperience
     }
 
     @Test func nextLevelWrapsAndResetReturnsToTheSeedsLevel() async throws {
+        // Feature 315: `level.next` moves to the next open level. Seed 98 opens level 99 (levels 1 … 99 open), so the
+        // next open level after 99 wraps to 1; winning 99 in campaign opens 100.
         var core: Core = try await Core.prepare(seed: 98)
-        #expect(core.levelNumber == 99)
+        #expect(core.levelNumber == 99 && core.progress.frontier == 99)
         #expect(core.apply(Self.set(3, Double(Self.otherPhaseC(core)))) == .accepted)
+        #expect(core.apply(ExperienceAction(control: "level.next", step: 0)) == .accepted)
+        #expect(core.levelNumber == 1 && core.play.records.isEmpty && core.play.stage == .playing)
+        #expect(core.apply(ExperienceAction(control: "level.select", values: [99], step: 0)) == .accepted)
+        for action in try Core.generated(number: 99).solution.actions {
+            let dial = Double(Core.dialOrder.firstIndex(of: action.dial) ?? 0)
+            #expect(core.apply(Self.set(dial, Double(action.value))) == .accepted)
+        }
+        #expect(core.play.stage == .won && core.progress.isOpen(100))
         #expect(core.apply(ExperienceAction(control: "level.next", step: 0)) == .accepted)
         #expect(core.levelNumber == 100 && core.play.records.isEmpty && core.play.stage == .playing)
         #expect(core.apply(ExperienceAction(control: "level.next", step: 0)) == .accepted)
         #expect(core.levelNumber == 1 && core.play.stage == .playing)
-        let first: Core = try await Core.prepare(seed: 0)
-        #expect(core == first)
         core.reset()
         let fresh: Core = try await Core.prepare(seed: 98)
         let resetDigest: StateDigest = try Self.digest(core)
@@ -193,7 +211,7 @@ import VisualCoreExperience
         let payload: Data = try core.snapshotPayload()
         #expect(try core.snapshotPayload() == payload)
         let text: String = try #require(String(data: payload, encoding: .utf8))
-        #expect(text.hasPrefix("{\"level\":32,\"records\":["))
+        #expect(text.hasPrefix("{\"level\":32,\"mode\":{\"mode\":\"campaign\"},\"progress\":{\"frontier\":32,\"solved\":[]},\"records\":["))
         let restored: Core = try Core.restore(payload: payload, seed: 31)
         let restoredDigest: StateDigest = try Self.digest(restored)
         let savedDigest: StateDigest = try Self.digest(core)
@@ -214,10 +232,10 @@ import VisualCoreExperience
             try Core.restore(payload: Data("nope".utf8), seed: 31)
         }
         #expect(throws: LissajousLabyrinthRestoreRefusal.levelNumber(0)) {
-            try Core.restore(payload: Data("{\"level\":0,\"records\":[]}".utf8), seed: 31)
+            try Core.restore(payload: Data(Self.schemaTwo(level: 0).utf8), seed: 31)
         }
         #expect(throws: LissajousLabyrinthRestoreRefusal.levelNumber(101)) {
-            try Core.restore(payload: Data("{\"level\":101,\"records\":[]}".utf8), seed: 31)
+            try Core.restore(payload: Data(Self.schemaTwo(level: 101).utf8), seed: 31)
         }
         // The same records on another level: the first record's previous fingerprint is stale there.
         let wrongLevel: Data = Data(text.replacingOccurrences(of: "\"level\":32", with: "\"level\":33").utf8)
@@ -255,5 +273,97 @@ import VisualCoreExperience
         }
         core.shedCaches()
         #expect(try Self.digest(core) == digest && core == before)
+    }
+
+    // MARK: Feature 315 (R02-G02-05) T-R02G0205-004: progress, modes, tutorial, schema 2
+
+    /// Applies the certified solution of the core's level.
+    static func solve(_ core: inout Core) throws {
+        for action in try Core.generated(number: core.levelNumber).solution.actions {
+            let dial = Double(Core.dialOrder.firstIndex(of: action.dial) ?? 0)
+            #expect(core.apply(set(dial, Double(action.value))) == .accepted)
+        }
+    }
+
+    @Test func campaignWinsRecordStarsAndOpenTheNextLevel() async throws {
+        var core: Core = try await Core.prepare(seed: 0)
+        #expect(core.mode == .campaign && core.progress.frontier == 1)
+        #expect(core.apply(ExperienceAction(control: "level.select", values: [2], step: 0))
+            == .rejected(.rule(code: "r02-g02.locked")))
+        try Self.solve(&core)
+        #expect(core.play.stage == .won && core.progress.solved[1]?.stars == 3 && core.progress.isOpen(2))
+        #expect(core.apply(ExperienceAction(control: "level.next", step: 0)) == .accepted)
+        #expect(core.levelNumber == 2)
+        #expect(core.apply(ExperienceAction(control: "level.select", values: [1], step: 0)) == .accepted)
+        #expect(core.levelNumber == 1 && core.play.records.isEmpty)
+    }
+
+    @Test func dailyAndPracticeFollowTheirRules() async throws {
+        var core: Core = try await Core.prepare(seed: 0)
+        #expect(core.apply(ExperienceAction(control: "mode.daily", values: [2026, 1, 2], step: 0)) == .accepted)
+        #expect(core.mode == .daily(level: 42) && core.levelNumber == 42)
+        try Self.solve(&core)
+        #expect(core.play.stage == .won && core.progress.solved[42] != nil && core.progress.frontier == 1)
+        #expect(core.apply(ExperienceAction(control: "mode.daily", values: [2026, 2, 29], step: 0))
+            == .rejected(.rule(code: "r02-g02.date")))
+        #expect(core.apply(ExperienceAction(control: "mode.practice", step: 0)) == .accepted)
+        #expect(core.mode == .practice && core.play.level.allowance == Core.practiceAllowance)
+        let before = core.progress
+        try Self.solve(&core)
+        #expect(core.play.stage == .won && core.progress == before, "practice records nothing")
+        #expect(core.apply(ExperienceAction(control: "mode.campaign", step: 0)) == .accepted)
+        #expect(core.mode == .campaign && core.levelNumber == 1, "level 42 is not open: back to the frontier")
+    }
+
+    @Test func undoAfterAFailureRewindsTheFailingAction() async throws {
+        var core: Core = try await Core.prepare(seed: 0)
+        let other = Double(Self.otherPhaseC(core))
+        let start = Double(core.play.level.start.phaseC)
+        var turn = 0
+        while core.play.stage == .playing {
+            #expect(core.apply(Self.set(3, turn % 2 == 0 ? other : start)) == .accepted)
+            turn += 1
+        }
+        #expect(core.play.stage == .failed && core.failureExplanation != nil)
+        #expect(core.apply(ExperienceAction(control: "play.undo", step: 0)) == .accepted)
+        #expect(core.play.stage == .playing && core.play.spent == core.play.level.allowance - 1)
+    }
+
+    @Test func theTutorialAdvancesIsDismissedAndNeverChangesTheDigest() async throws {
+        var core: Core = try await Core.prepare(seed: 2)
+        let hint = try #require(core.hint(level: 1))
+        #expect(core.tutorial == .turn(hint.dial))
+        let before = try Self.digest(core)
+        let other = Double(Self.otherPhaseC(core))
+        #expect(core.apply(Self.set(3, other)) == .accepted)
+        #expect(core.tutorial == .checkpoints)
+        #expect(core.apply(ExperienceAction(control: "tutorial.hint", step: 0)) == .accepted)
+        #expect(core.tutorial == .hints)
+        #expect(core.apply(ExperienceAction(control: "play.undo", step: 0)) == .accepted)
+        #expect(try Self.digest(core) == before && core.tutorial == .hints, "undo restores the digest, not the step")
+        #expect(core.apply(ExperienceAction(control: "tutorial.dismiss", step: 0)) == .accepted)
+        #expect(core.tutorial == .done)
+        var later: Core = try await Core.prepare(seed: 10)
+        #expect(later.tutorial == .done, "level 11 has no tutorial")
+        #expect(later.apply(ExperienceAction(control: "mode.practice", step: 0)) == .accepted)
+        #expect(later.tutorial == .done)
+    }
+
+    @Test func aSchemaOnePayloadMigratesAndRestores() async throws {
+        let one: [String: Any] = ["level": 3, "records": [Any]()]
+        let migrated = try Core.migrations.migrate(one, from: 1)
+        let data = try JSONSerialization.data(withJSONObject: migrated, options: [.sortedKeys])
+        let restored = try Core.restore(payload: data, seed: 0)
+        #expect(restored.levelNumber == 3 && restored.mode == .campaign && restored.progress.frontier == 3)
+        #expect(restored.progress.solved.isEmpty && restored.play.records.isEmpty)
+        let hint = try #require(restored.hint(level: 1))
+        #expect(restored.tutorial == .turn(hint.dial), "the tutorial is recomputed for level 3")
+        #expect(throws: (any Error).self) { try Core.migrations.migrate(["records": [Any]()], from: 1) }
+        var core: Core = try await Core.prepare(seed: 0)
+        #expect(core.apply(ExperienceAction(control: "mode.practice", step: 0)) == .accepted)
+        let practice = try core.snapshotPayload()
+        let back = try Core.restore(payload: practice, seed: 0)
+        #expect(back == core && back.play.level.allowance == Core.practiceAllowance)
+        #expect(try Self.digest(back) == Self.digest(core))
     }
 }
