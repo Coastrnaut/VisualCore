@@ -1302,13 +1302,15 @@ final class AppModelTests: XCTestCase {
         XCTAssertEqual(LissajousLabyrinthExperienceCore.wonCode, "won")
     }
 
-    /// Clarification Q5: the interface tests pin level 1 in their `LL` namespace (Tests/UI/LissajousLabyrinth/
+    /// Clarification Q2: the interface tests pin level 1 in their `LL` namespace (Tests/UI/LissajousLabyrinth/
     /// LLSupport.swift, which this target cannot import); the same literals equal the Core's certified level 1: start
-    /// dials a 7, b 1, φ 5, ψ 12; one action, ψ to 3; final dials a 7, b 1, φ 5, ψ 3. Seed 0 opens level 1.
+    /// dials a 7, b 1, φ 5, ψ 12; one action, ψ to 3; final dials a 7, b 1, φ 5, ψ 3; allowance 9. Seed 0 opens
+    /// level 1 (T-R02G0209-013 added the allowance).
     func testLissajousLabyrinthLevelOneDialsEqualTheCore() throws {
         let certified = try LissajousLabyrinthExperienceCore.generated(number: 1)
         XCTAssertEqual(certified.level.start,
                        LissajousLabyrinthDials(frequencyA: 7, frequencyB: 1, phaseA: 5, phaseC: 12))
+        XCTAssertEqual(certified.level.allowance, 9, "LL.levelOneAllowance")
         XCTAssertEqual(certified.solution.shortest, 1)
         XCTAssertEqual(certified.solution.actions, [LissajousLabyrinthAction(dial: .phaseC, value: 3)])
         XCTAssertEqual(certified.solution.setting,

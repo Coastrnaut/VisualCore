@@ -69,4 +69,4 @@ lead. MVP: Stories 1 and 2.
 
 ## Phase 7: Convergence
 
-- [ ] T-R02G0209-013 In `Apps/VisualCore/Tests/Unit/AppModelTests.swift` `testLissajousLabyrinthLevelOneDialsEqualTheCore`, also assert level 1's allowance equals `LL.levelOneAllowance` (9) and cite clarification Q2 (not Q5) for the pins, per data-model "Level 1 constants" (partial); `--name app-unit-2 -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`
+- [X] T-R02G0209-013 In `Apps/VisualCore/Tests/Unit/AppModelTests.swift` `testLissajousLabyrinthLevelOneDialsEqualTheCore`, also assert level 1's allowance equals `LL.levelOneAllowance` (9) and cite clarification Q2 (not Q5) for the pins, per data-model "Level 1 constants" (partial); `--name app-unit-2 -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27` — Verified 2026-11-21: 2026-11-21 app-unit-2 exit 0 (level 1 allowance 9 pinned with the dials; citation Q2)
