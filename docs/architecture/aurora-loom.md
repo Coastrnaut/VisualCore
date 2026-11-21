@@ -163,6 +163,26 @@ catalog's levels.
   digest domain is `r02-g01.aurora-loom.v3`. The state reads no clock and no random source: seed, certified catalog,
   the given calendar date and the recorded actions determine it.
 
+## Regression (R02-G01-08)
+
+- **Solver regression.** Every one of the 100 certified levels is regenerated, matched with its witness file, replayed
+  to a win in exactly its recorded moves and re-solved: the solver must find exactly the certified shortest within
+  3 × (32 × 32 + 256) = 3,840 evaluations of work (counted, never timed). Twelve kinds of alteration (level tolerance,
+  allowance, a gate, a start step, ω; a solution move's ribbon, control or step; a witness's terminal steps,
+  counterexample or recorded shortest; the fingerprint) are each detected and named.
+- **Golden frames.** `AuroraLoomGolden` describes 16 frames (levels 1, 21, 41, 61, 81 at tiers 0, 1, 2 and the hero
+  frame) at the frame-check size 96 × 64: projected ribbon samples and marker pixels in 1/8 pixel, colours in 8 bits,
+  tier detail; JSON with sorted keys, SHA-256 digest. `Packages/ExperiencesRound02/AuroraLoom/golden-frames.json` pins
+  the descriptions and digests; a recomputed frame passes on an equal digest, or within one 1/8-pixel quantum with equal
+  colours (the system's sine may differ in the last bit between macOS releases). Regenerate on purpose only:
+  `AURORA_LOOM_WRITE_GOLDEN=1 swift test --package-path Packages/ExperiencesRound02 --filter AuroraLoomRegressionGoldenTests`.
+  On the simulator the 16 frames are rendered and checked against their descriptions (2 px, 0.12 per channel, 0.05 for
+  night).
+- **Memory.** On the simulator 12 open, draw, memory-warning, close cycles keep the footprint within 16 MB of the first
+  cycle's, and the ribbon scene holds no mesh renderers after each warning and close.
+- **Running it.** CI's host job runs the step "Aurora Loom regression (host)"; locally
+  `python3 scripts/aurora_loom_regression.py` runs the host and simulator parts and prints one summary.
+
 ## Failures
 
 `AuroraLoomError` reason codes: `r02-g01.level`, `r02-g01.move`, `r02-g01.stage`, `r02-g01.stale`,

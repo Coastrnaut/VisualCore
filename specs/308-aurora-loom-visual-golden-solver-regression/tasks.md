@@ -57,7 +57,7 @@ recorded only after every agent has reported). Commit after every task with its 
 
 ## Phase 7: Regression, documentation and close
 
-- [ ] T-R02G0108-008 Docs: `docs/architecture/aurora-loom.md` (regression), `Packages/ExperiencesRound02/README.md`,
+- [X] T-R02G0108-008 Docs: `docs/architecture/aurora-loom.md` (regression), `Packages/ExperiencesRound02/README.md`, — Verified 2026-11-20: 2026-11-20 round02-host exit 0; docs/architecture/aurora-loom.md regression section, Packages/ExperiencesRound02/README.md, docs/automatedtesting.md
   `docs/automatedtesting.md`; `--name round02-host`
 - [ ] T-R02G0108-009 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
   `--name host-full`, `--name app-unit`

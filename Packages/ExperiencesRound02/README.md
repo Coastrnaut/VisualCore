@@ -58,6 +58,10 @@ Feature 307 (R02-G01-07) adds persistence and replay: each result keeps its winn
 traces do not replay, the adapter writes snapshot schema 3 (migrations 1 → 2 → 3) and offers `replay.start`,
 `replay.step` and `replay.stop`; the panel shows Replay, Step and Stop and the presenter announces dropped results once.
 
+Feature 308 (R02-G01-08) adds the regression net: `AuroraLoomGolden` (16 code-computed golden frame descriptions pinned
+in `AuroraLoom/golden-frames.json`), the solver regression over all 100 levels, simulator golden-frame and memory
+checks, and `python3 scripts/aurora_loom_regression.py` to run every part with one summary.
+
 ## Lissajous Labyrinth (R02-G02, `r02-g02.lissajous-labyrinth`, free)
 
 `LissajousLabyrinthCore` (feature 311, R02-G02-01) is the playable rule kernel: the integer `LissajousLabyrinthSine`,
