@@ -27,7 +27,7 @@ tests stay short (< 10 s each).
   value round-trips through its knob; the stage holds every path of all 100 levels at start and solution dials; stage and
   rings inside 5 % for orbit limits × aspects 0.4, 0.5, 0.75, 1, 1.5, 2, 2.5); `--name host -- swift test --package-path
   Packages/ExperiencesRound02 --filter 'LissajousLabyrinthHandlesTests|LissajousLabyrinthSceneGeometryTests'`
-- [ ] T-R02G0204-003 [P] Create `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthPending.swift`
+- [X] T-R02G0204-003 [P] Create `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthPending.swift` — Verified 2026-11-21: 2026-11-21 host-pending exit 0: LissajousLabyrinthPendingTests 13/13 (all 100 certified levels won through pending values in exactly their certified shortest number of actions; frequency-B-first swap; no coprime order refused first; stepping wraps; set clamps/wraps; clear)
   (values "only dials that differ from the current value"; set, step "wraps in range", clear; actions(from:) "one per
   changed dial in the order frequencyA, frequencyB, phaseA, phaseC; frequencyB first when only that keeps every
   intermediate pair coprime; when neither order does, the refused order is returned so Apply stops with the reason")
