@@ -85,3 +85,31 @@ long step as single ticks; the play accepts both.
   two counterexamples (the unedited level and the witness without its last edit, both failing); edited, newer or
   non-replaying files are refused (`r02-g05.witness`). The catalog digest over the 100 level fingerprints is pinned.
 
+## Experience and renderer (feature 343, R02-G05-03)
+
+- **Adapter.** `ColorfallCanyonsExperienceCore` opens certified level (seed mod 100) + 1 (generated once per process) and
+  accepts `canyon.carve [cell]`, `canyon.valve [spring]`, `time.step [ticks]`, `play.undo`, `play.redo` and `level.next`;
+  its digest is the level number and the play fingerprint; snapshot schema 1 `{level, records}` restores by replay.
+- **Snapshot.** The presenter draws an immutable `ColorfallCanyonsSceneSnapshot` (grid, current heights, grounds,
+  springs with valves and supplies, basins and their targets, every cell's colour masses and downhill direction, stage,
+  failure, tick, level number and presentation time); it never holds the kernel, so no drawing result can change the
+  game.
+- **Scene.** The grid lies in the xz-plane with cell size u = 2 / max(columns, rows); block tops at 0.06·h·u (carving
+  lowers them at once), rock slabs raised, drains as dark pits, basins with pearl rims and three target arcs, springs as
+  glowing emitters dimmed when closed or dry. Fluid is an emissive sheet per cell whose colour is the mass-weighted mix of
+  cyan, coral and yellow and whose brightness follows the volume, with flow bands along the downhill direction (faster on
+  falls of two steps or more) moving with presentation time only. Each colour also carries a pattern (cyan stripes,
+  coral dots, yellow chevrons). The camera looks from the front, pitched 50° down, fitted to the bounding sphere of the
+  tallest element with a 5 % margin for aspects 0.4 … 2.5.
+- **Shaders.** GLSL ES 3.00 on the shared `ShaderMeshRenderer` (position, normal and uv streams): the terrain program
+  carries the material and shade in uv; the fluid program carries the colour weights in the normal slot and the
+  brightness and flow code in uv. Reduce Motion holds the bands still; Reduce Flashing caps the glow at 0.5.
+- **Tiers.** level-0: 4 × 4 top subdivision, 3 flow bands, 2 glow shells; level-1: 2 × 2, 2, 1; level-2: 1 × 1, 1, 0.
+  Positions never change between tiers; each tier change is logged with its reason. A program that fails to compile
+  draws the level-2 geometry unlit and keeps its reason. Depth testing is off on this path, so back faces are
+  culled (every face is wound counter-clockwise from its front) and the rows are drawn far to near: a block's far side
+  never covers its own top, and nearer blocks cover farther ones.
+- **Candidate.** Registered in `Catalog/registrations.json` (100 levels, digest 68eec7b5…f019) and linked into the one
+  app; it stays unavailable until X-R02-G05. Its scenario manifest has the standard scenarios, `full-playthrough`,
+  `hero`, three fixtures and the 80 acceptance rows R2-G05-QA-001 … 080.
+

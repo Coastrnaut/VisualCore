@@ -254,3 +254,10 @@ versioned witness files (`ColorfallCanyonsWitness`, `ColorfallCanyonsCounterexam
 COLORFALL_CANYONS_WRITE_WITNESSES=1 swift test --package-path Packages/ExperiencesRound02 --filter ColorfallCanyonsCatalogTests
 ```
 
+Feature 343 (R02-G05-03) adds the experience: in the Core the adapter `ColorfallCanyonsExperienceCore`, the immutable
+`ColorfallCanyonsSceneSnapshot` with `ColorfallCanyonsPalette`, `ColorfallCanyonsPattern` and `ColorfallCanyonsTier`, the
+geometry and CPU reference `ColorfallCanyonsSceneGeometry`, the GLSL sources `ColorfallCanyonsShaders` and the scenario
+manifest `ColorfallCanyonsScenarios` (`scenario-manifest.json`; `UPDATE_SCENARIO_MANIFEST=1` rewrites it); the iOS-only
+target `ColorfallCanyonsExperience` (presenter, GL canyon scene with fallback, control panel) and its simulator tests. A
+registered candidate until X-R02-G05.
+

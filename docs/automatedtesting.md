@@ -195,6 +195,10 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   simulated run once nothing can move cut it fourfold, and depth 3 (with bands 4 and 5 differing by springs and grid
   instead) brought every band to 3 … 15 s, so the catalog tests run in halves under 10 s each. The spec records the
   correction.
+- **Fit encodings to the renderer's streams** (R02-G05-03, 2026-11-21). `ShaderMeshRenderer` binds only position,
+  normal and uv, so Colorfall Canyons's fluid program reads its three colour weights from the normal slot and its
+  brightness and flow code from uv; the geometry and shader agents agreed on the encoding before the scene was written,
+  and a host test pins each code's range.
 - **Quantise before hashing floats** for digests that must match across platforms (surface colours are hashed as
   16-bit values).
 
