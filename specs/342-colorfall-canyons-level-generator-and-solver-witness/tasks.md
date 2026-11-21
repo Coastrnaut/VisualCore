@@ -9,7 +9,7 @@ run uses). Fixture seed 2_342; tests stay short (< 10 s each).
 
 ## Phase 1: Setup
 
-- [ ] T-R02G0502-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test
+- [X] T-R02G0502-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test — Verified 2026-11-21: 2026-11-21 R02-G05-02.baseline-host/timing/round02 exit 0
   --package-path Packages/ExperiencesRound02`; the rendering baseline is R02-G05-01's rendering runs (exit 0)
 
 ## Phase 2: Foundational
