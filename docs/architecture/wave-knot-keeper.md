@@ -70,6 +70,24 @@ moves are listed point by point and direction by direction, and a state is solve
   Decoding replays everything and re-runs the solver; `WAVE_KNOT_KEEPER_WRITE_WITNESSES=1` regenerates the files. The
   catalog digest is pinned in the tests.
 
+## Renderer and experience (R02-G03-03)
+
+- **Snapshot.** `WaveKnotKeeperSceneSnapshot` is the only thing the renderer reads: the rope's points, the gates, the
+  target, the projection summary and each proper crossing with its over-strand (`WaveKnotKeeperCrossingMark`), the
+  stage, the selected point and the presentation time. Nothing drawn reaches the kernel.
+- **Geometry.** `WaveKnotKeeperSceneGeometry` builds a closed glass tube along the control polygon (world = kernel ×
+  1/8, radius 0.1, straight segments with quadratic corner arcs, parallel-transport frames), so the drawn crossings are
+  the rules' crossings; glow shells, handle icospheres and gate cubes; the camera looks down −z tilted 20° and fits the
+  figure with a margin for aspects 0.4 … 2.5. Crossing weights in the rope mesh drive ember caustic pulses on
+  over-strands.
+- **Shaders.** `WaveKnotKeeperShaders` (GLSL ES 3.00): the rope program (pearl and sapphire glass with a fresnel rim,
+  ember pulses at 0.5 Hz, glow-shell mode) and the solid program (handles and gates with an edge term).
+- **Tiers.** level-0 … level-2: tube sides 16/10/6, corner samples 8/4/2, glow shells 2/1/0; coordinates never change.
+  A shader failure falls back to the minimal tube drawn unlit and records the reason.
+- **Adapter.** `WaveKnotKeeperExperienceCore`: `point.move [point, direction]`, `point.select`, `play.undo`,
+  `play.redo`, `level.next`; digest = level number + play fingerprint; snapshot schema 1 `{level, records}`. The
+  experience is a registered candidate (`-vcCandidates`) until X-R02-G03, with a 94-scenario manifest.
+
 ## Failures
 
 `WaveKnotKeeperError` reason codes: `r02-g03.level`, `r02-g03.move`, `r02-g03.stage`, `r02-g03.stale`,
