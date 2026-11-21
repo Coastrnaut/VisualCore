@@ -38,7 +38,7 @@ tests stay short (< 10 s each).
 
 ## Phase 4: Panel and simulator proof
 
-- [ ] T-R02G0307-005 [US3] Edit `Packages/ExperiencesRound02/WaveKnotKeeper/Experience/WaveKnotKeeperPresenter.swift` and
+- [X] T-R02G0307-005 [US3] Edit `Packages/ExperiencesRound02/WaveKnotKeeper/Experience/WaveKnotKeeperPresenter.swift` and — Verified 2026-11-21: 2026-11-21 sim-27 exit 0 on sim-27.2: WaveKnotKeeperReplayTests 5/5 (replay reproduces the win move by move with announcements and progress unchanged; other actions refused in words; retry restarts the replay; no replay without a verified result; dropped results announced once) and all Wave Knot Keeper experience tests
   `Packages/ExperiencesRound02/WaveKnotKeeper/Experience/WaveKnotKeeperControls.swift` (Replay for a verified solved level, Step and Stop with labels and
   values, the replay position; the dropped results announced once: "n saved results could not be checked and were
   removed.") and create `Packages/ExperiencesRound02/WaveKnotKeeper/ExperienceTests/WaveKnotKeeperReplayTests.swift` (agent C: replay through the port

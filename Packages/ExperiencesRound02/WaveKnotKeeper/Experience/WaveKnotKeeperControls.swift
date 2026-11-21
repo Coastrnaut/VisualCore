@@ -11,6 +11,8 @@
 // and a value, button rows become columns at accessibility text sizes, the panel keeps a readable width of at most 520
 // points (padding included), a Sound toggle (off by default) drives the ambient loop, refusals show in words, and the
 // panel tells the presenter when it is on screen.
+// Feature 327 (R02-G03-07) T-R02G0307-005: Replay best solution for a verified solved level, and during replay its
+// position with Step and Stop, each with a label and a value.
 #if os(iOS)
 import SwiftUI
 import VisualCoreExperienceHost
@@ -44,6 +46,7 @@ struct WaveKnotKeeperControls: View {
                 playRow
                 modeRow
                 levelMenu
+                replaySection
                 soundToggle
             }
             .padding()
@@ -59,6 +62,26 @@ struct WaveKnotKeeperControls: View {
             VStack(alignment: .leading, spacing: 8) { content() }
         } else {
             HStack(spacing: 16) { content() }
+        }
+    }
+
+    /// Replay of the best stored solution: Replay, or during replay its position with Step and Stop (feature 327).
+    @ViewBuilder private var replaySection: some View {
+        if mirror.replaying {
+            Text("Replay: move \(mirror.replayPosition) of \(mirror.replayLength)").font(.callout)
+                .fixedSize(horizontal: false, vertical: true)
+            row {
+                Button("Step") { presenter.stepReplay(port: port) }
+                    .accessibilityLabel("Play the next move of the replay")
+                    .accessibilityValue("Move \(mirror.replayPosition) of \(mirror.replayLength)")
+                Button("Stop") { presenter.stopReplay(port: port) }
+                    .accessibilityLabel("Stop the replay")
+                    .accessibilityValue("\(mirror.replayLength) moves")
+            }
+        } else if mirror.replayAvailable {
+            Button("Replay best solution") { presenter.startReplay(port: port) }
+                .accessibilityLabel("Replay your best solution of this level")
+                .accessibilityValue("Level \(mirror.levelNumber)")
         }
     }
 
@@ -80,6 +103,7 @@ struct WaveKnotKeeperControls: View {
         case .campaign: "Campaign"
         case .practice: "Practice"
         case .daily: "Daily level"
+        case .replay: "Replay"
         }
     }
 
@@ -178,6 +202,7 @@ struct WaveKnotKeeperControls: View {
         case .campaign: mode = "Campaign"
         case .practice: mode = "Practice"
         case .daily: mode = "Daily level"
+        case .replay: mode = "Replay"
         }
         return "\(mode) · goal: \(mirror.allowance) moves allowed, best possible \(mirror.shortest)"
     }

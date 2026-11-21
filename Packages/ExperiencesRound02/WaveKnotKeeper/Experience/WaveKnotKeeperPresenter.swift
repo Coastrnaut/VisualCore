@@ -19,6 +19,9 @@
 // (`feedback`, `.shared` unless a test injects one) and plans refusals with `refused(code:)`, showing the same words in
 // the panel; it keeps a feedback log, eases the scene's lights (`WaveKnotKeeperLights`, 0.45 s fades under Reduce
 // Flashing) and offers the ambient recipe to `WaveKnotKeeperSound` at level openings, summary changes and play ends.
+// Feature 327 (R02-G03-07) T-R02G0307-005 (FR-R02G0307-003, 004): the mirror carries whether a replay is available for
+// the current level and, during replay, its position; `startReplay`, `stepReplay` and `stopReplay` send the replay
+// actions; the first described core whose restore dropped results announces them once.
 #if os(iOS)
 import Foundation
 import SwiftUI
@@ -70,6 +73,12 @@ final class WaveKnotKeeperMirror {
     var shortest = 0
     /// Whether the ambient sound is on (feature 326; off by default).
     var soundOn = false
+    /// Whether a verified result with a trace exists for the current level (feature 327).
+    var replayAvailable = false
+    /// Whether a replay is running, its position and its length (feature 327).
+    var replaying = false
+    var replayPosition = 0
+    var replayLength = 0
 }
 
 /// One entry of the tier log: the tier drawn and why it changed.
@@ -113,6 +122,8 @@ final class WaveKnotKeeperPresenter: ExperiencePresenter {
     private var lightsLevel: String?
     /// The ambient sound (feature 326).
     let sound: WaveKnotKeeperSound
+    /// Whether the dropped results of a restore were announced (feature 327).
+    private var droppedAnnounced = false
 
     init(reduceMotion: Bool, reduceFlashing: Bool) {
         self.reduceMotion = reduceMotion
@@ -230,6 +241,24 @@ final class WaveKnotKeeperPresenter: ExperiencePresenter {
                                          stage: core.play.stage)
     }
 
+    /// Starts the replay of the current level's best stored solution (`replay.start`; feature 327).
+    @discardableResult
+    func startReplay(port: ExperienceActionPort) -> ActionResult {
+        send("replay.start", [Double(mirror.levelNumber)], port: port)
+    }
+
+    /// Plays the next move of the running replay (`replay.step`).
+    @discardableResult
+    func stepReplay(port: ExperienceActionPort) -> ActionResult {
+        send("replay.step", [], port: port)
+    }
+
+    /// Stops the running replay and returns to the campaign (`replay.stop`).
+    @discardableResult
+    func stopReplay(port: ExperienceActionPort) -> ActionResult {
+        send("replay.stop", [], port: port)
+    }
+
     /// Turns the ambient sound on or off; turning it on plays the recipe of the current rope and stage.
     func setSound(on: Bool) {
         if on, let core = latestCore { sound.offer(Self.recipe(core)) }
@@ -287,13 +316,14 @@ final class WaveKnotKeeperPresenter: ExperiencePresenter {
     }
 
     /// The action and values that start the current level again in its mode: `mode.practice` in practice, the daily
-    /// date's `mode.daily` in daily mode, `level.select` of the level in campaign.
+    /// date's `mode.daily` in daily mode, `level.select` of the level in campaign, `replay.start` in replay (327).
     func retryAction(date: DateComponents) -> (control: String, values: [Double]) {
         guard let core = latestCore else { return ("mode.campaign", []) }
         switch core.mode {
         case .practice: return ("mode.practice", [])
         case .daily: return ("mode.daily", Self.dateValues(dailyDate ?? date))
         case .campaign: return ("level.select", [Double(core.levelNumber)])
+        case .replay(let level): return ("replay.start", [Double(level)])
         }
     }
 
@@ -335,6 +365,28 @@ final class WaveKnotKeeperPresenter: ExperiencePresenter {
             sound.offer(Self.recipe(core))
         }
         latestCore = core
+        if !droppedAnnounced, core.reconciliationDropped > 0 {
+            droppedAnnounced = true
+            let count = core.reconciliationDropped
+            let text = count == 1 ? "1 saved result could not be checked and was removed."
+                : "\(count) saved results could not be checked and were removed."
+            route(WaveKnotKeeperFeedbackPlan(text: text, kind: .state, haptic: nil))
+        }
+        if let result = core.progress.solved[core.levelNumber] {
+            mirror.replayAvailable = result.verified && !result.trace.isEmpty
+                && !WaveKnotKeeperFeedbackPlan.isReplay(core.mode)
+        } else {
+            mirror.replayAvailable = false
+        }
+        if case .replay(let level) = core.mode {
+            mirror.replaying = true
+            mirror.replayPosition = core.play.records.count
+            mirror.replayLength = core.progress.solved[level]?.trace.count ?? 0
+        } else {
+            mirror.replaying = false
+            mirror.replayPosition = 0
+            mirror.replayLength = 0
+        }
         if let key = hintKey, key != Self.hintKey(core) {
             hintKey = nil
             mirror.hintLevel = 0
