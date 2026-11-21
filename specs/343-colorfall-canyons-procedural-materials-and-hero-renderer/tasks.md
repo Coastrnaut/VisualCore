@@ -23,7 +23,7 @@ tests stay short (< 10 s each). No {owner} tasks.
   fluid colour mix and patterns equal to the palette and pattern rules; flow-band phase from time; glow gain cap) with
   `Packages/ExperiencesRound02/ColorfallCanyons/CoreTests/ColorfallCanyonsShaderSourceTests.swift` (version line, declared uniforms, no texture samplers, bounded
   loops, the palette constants match the CPU's); `--name host-2`
-- [ ] T-R02G0503-004 [P] [US1] Create `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsSceneGeometry.swift` (cell size 2/max(columns, rows); block
+- [X] T-R02G0503-004 [P] [US1] Create `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsSceneGeometry.swift` (cell size 2/max(columns, rows); block — Verified 2026-11-21: 2026-11-21 host-3 exit 0 (agent B: terrain, fluid and feature meshes on agent A's stream encoding with coloured fallback parts, camera from +z pitched 50° fitted to the bounding sphere for aspects 0.4 … 2.5, project; the lead fitted the sphere to the thickest sheet so the camera stays put as fluid flows; 10 tests retested by the lead)
   tops at 0.06·h·u, rock +0.5·u, drains at 0, basin rims with three target arcs, spring emitters 0.6·u tall dimmed when
   closed or dry, fluid sheets 0.01·u above the top, thickness 0.02·u + 0.04·u·min(V, 24)/24, brightness 0.35 + 0.65·min(V,
   24)/24, flow bands along downhill per tier, camera from +z pitched 50° fitted to the bounding sphere of the tallest
