@@ -27,7 +27,7 @@ ImplementationLock-100.
 
 ## Phase 3: Story 2 — comfort settings (P1)
 
-- [ ] T-R02G0306-003 [P] [US2] Create `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperLights.swift` ("crossing marks keyed by their two segments,
+- [X] T-R02G0306-003 [P] [US2] Create `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperLights.swift` ("crossing marks keyed by their two segments, — Verified 2026-11-21: 2026-11-21 host-2 exit 0: WaveKnotKeeperLightsTests 10/10 (scripted win and move/undo flicker under Reduce Flashing: at most 3 half-range crossings per second, fades >= 0.4 s; normal 0.15 s; vanished marks keep segment and fraction)
   1 present, 0 absent, remembering the over segment and the fraction along it; match 1 while the summary equals the
   target; glow 1 when won; linear 0.15 s, or 0.45 s under Reduce Flashing where a started fade completes before turning
   back; a level at 0 with target 0 is dropped"; settle; step; isSettled; maxHalfRangeCrossingsPerSecond) with
