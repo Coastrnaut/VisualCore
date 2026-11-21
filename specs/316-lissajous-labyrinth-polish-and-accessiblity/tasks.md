@@ -57,7 +57,7 @@ ImplementationLock-100.
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02G0206-006 Docs: `docs/architecture/lissajous-labyrinth.md` (polish and accessibility),
+- [X] T-R02G0206-006 Docs: `docs/architecture/lissajous-labyrinth.md` (polish and accessibility), — Verified 2026-11-21: 2026-11-21 round02-host exit 0; audits exit 0 (content audit of r02-g02.lissajous-labyrinth); docs/architecture/lissajous-labyrinth.md polish and accessibility; package README; docs/automatedtesting.md (eased state and off-screen stills)
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`; `--name audits -- python3
   scripts/verify_experiences.py --audits --only r02-g02.lissajous-labyrinth`
 - [ ] T-R02G0206-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,

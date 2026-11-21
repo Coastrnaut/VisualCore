@@ -126,6 +126,22 @@ LISSAJOUS_LABYRINTH_WRITE_WITNESSES=1 swift test --package-path Packages/Experie
   allowance to 64 and records nothing. Snapshot schema 2 (`level`, `mode`, `progress`, `records`, `tutorial`) with a
   migration from schema 1.
 
+## Polish and accessibility (R02-G02-06)
+
+- **Announcements and haptics.** `LissajousLabyrinthFeedbackPlan` turns each change into one announcement and one
+  haptic: the dial, its value, the checkpoints in order and the actions left (`state`, selection); wins with stars and
+  failures with their explanation (`outcome`, success or warning); level and mode changes (`level`); refusals in words
+  (`rejection`, error). An action that ends the play plans only the outcome.
+- **Fades.** `LissajousLabyrinthLights` eases each checkpoint, obstacle and the win glow (0.15 s, 0.45 s under Reduce
+  Flashing, where a started fade finishes before turning back); a new level, or an off-screen still drawn at its own
+  time, settles at once. Reduce Motion holds the tracer head still.
+- **Sound.** `LissajousLabyrinthSoundRecipe` makes an 8-second ambient loop from the figure's own ratio (110 Hz × a and
+  × b, a fifth, phase-shaped gains, an octave when won, halved when failed); `LissajousLabyrinthSound` plays it while the
+  Sound toggle is on, the panel is on screen and the scene is active, and rebuilds it only at level openings, play ends
+  and when turned on.
+- **Panel.** Labels and values on every control, button rows that become columns at accessibility text sizes, a
+  520-point readable width; hearing, feeling and VoiceOver on hardware are D1–D3 observations.
+
 ## Failures
 
 `LissajousLabyrinthError` reason codes: `r02-g02.level`, `r02-g02.move`, `r02-g02.stage`, `r02-g02.stale`,

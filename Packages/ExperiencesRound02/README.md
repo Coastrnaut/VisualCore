@@ -109,6 +109,10 @@ Feature 315 (R02-G02-05) adds teaching and progression: `LissajousLabyrinthSolve
 campaign modes, the tutorial controls and snapshot schema 2; the panel shows the instruction, hints, the failure
 explanation, the goal, the modes and a level picker.
 
+Feature 316 (R02-G02-06) adds polish and accessibility: `LissajousLabyrinthFeedbackPlan` (announcements and haptics),
+`LissajousLabyrinthLights` (eased fades, Reduce Flashing) and `LissajousLabyrinthSoundRecipe` in the Core, and
+`LissajousLabyrinthSound` with a Sound toggle, labels, wrapping rows and a readable width in the experience.
+
 ## Wave Knot Keeper (R02-G03, `r02-g03.wave-knot-keeper`, free)
 
 `WaveKnotKeeperCore` (feature 321, R02-G03-01) is the playable rule kernel: `WaveKnotKeeperLevel` with
