@@ -56,7 +56,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 - [X] T-R02G0304-010 Script tests, run alone (`--name script-tests`) — Verified 2026-11-21: 2026-11-21 script-tests exit 0, run alone
 - [ ] T-R02G0304-011 {device} After ImplementationLock-100, on D1, D2 and D3: record gesture feel and touch-to-frame
   latency (SC-R02G0304-007)
-- [ ] T-R02G0304-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+- [X] T-R02G0304-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record — Verified 2026-11-21: 2026-11-21 converge round 1 converged (nothing appended); sealed 16 passing; recorded R02-G03-04 pass (.autonomy/migration/evidence/R02-G03-04.json); validators PASS; T-R02G0304-011 {device} stays open
 
 ## Dependencies and parallel work
 
