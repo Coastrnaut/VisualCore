@@ -83,7 +83,7 @@ evidence**: no physical-device test of the unified app has been run.
 
 Ledger totals today: the legacy ledger records **185 of 263** gates as passed (F00–F09 and the app phases
 A01-P00 … A19-P06, A20-P00 … A20-P06, A21-P00 … A21-P06, A22-P00 … A22-P06, A23-P00 … A23-P06, A24-P00 … A24-P06, A25-P00 … A25-P06); the unified-app ledger has 1,233 gates, with 27 experience gates (X-A01 … X-A25, X-R02-G01, X-R02-G02), 11 unified-app features,
-24 shared round features, both governance milestones and twenty-four round-two game features (R02-G01-01 … 10: Aurora Loom's rule
+24 shared round features, both governance milestones and twenty-five round-two game features (R02-G01-01 … 10: Aurora Loom's rule
 kernel, its 100 solver-certified levels with witness files, its shader-drawn hero renderer, its touch controls and its
 teaching and progression (hints, failure explanations, tutorial, stars, daily and practice modes) and its polish and
 accessibility (announcements, haptics, Dynamic Type, slow fades, ambient sound) and its persistence and replay
@@ -99,8 +99,9 @@ persistence and replay (traced results reconciled on restore, schema 3, replay o
 regression net (solver re-certification, code-computed golden frames, memory cycles) and its in-app
 integration (panel identifiers, stored schema examples, app unit and interface tests, Release symbol check) and its
 device preparation (eight pending device rows over twelve scenarios, a campaign plan and a rows check), integrated
-at X-R02-G02; R02-G03-01 … 04: Wave Knot Keeper's rule kernel with exact lattice-rope geometry, its 100 seeded levels with
-solver witness files, its glass-rope renderer and its touch controls (drag one lattice step, orbit, panel play),
+at X-R02-G02; R02-G03-01 … 05: Wave Knot Keeper's rule kernel with exact lattice-rope geometry, its 100 seeded levels with
+solver witness files, its glass-rope renderer, its touch controls (drag one lattice step, orbit, panel play) and its
+teaching and progression (hints, failure explanations, tutorial, stars, daily and practice modes),
 a registered candidate) passed.
 
 ```bash
