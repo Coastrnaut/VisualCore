@@ -73,8 +73,8 @@ the presenter has no feedback route yet (refusals show "That change was refused:
 - Q: Where does the sound choice live, and what is the recipe? → A: a Sound toggle in the panel, off by default, held by
   the presenter (presentation only; saving it is R02-G05-07). The recipe is a pure function of the basins and the stage:
   a root at 98 Hz, one partial per spring colour with fluid in the basins (cyan 98 × 3/2, coral 98 × 5/4, yellow 98 × 2)
-  whose gain is the base gain × (0.3 + 0.7 · that colour's share of all basin mass), a brighter added octave when won
-  and halved gains when failed; a 10-second loop. The presenter rebuilds the loop only when the level opens, a step,
+  whose gain is the base gain × (0.3 + 0.7 · that colour's share of all basin mass), the root alone while no basin holds
+  fluid; a brighter added octave when won and halved gains when failed; a 10-second loop. The presenter rebuilds the loop only when the level opens, a step,
   carve, valve, undo or redo changes the basins or the stage, or the toggle turns on, never per frame. The loop plays
   exactly while the choice is on, the controls are on screen and the scene is active. Impact: FR-R02G0506-006;
   SC-R02G0506-004.
