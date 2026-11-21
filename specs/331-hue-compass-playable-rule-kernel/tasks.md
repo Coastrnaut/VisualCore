@@ -25,7 +25,7 @@ recorded only after every agent has reported). Commit after every task with its 
 
 ## Phase 3: Story 1 — find the hidden bearing (P1) 🎯
 
-- [ ] T-R02G0401-003 [P] [US1] Create `Packages/ExperiencesRound02/HueCompass/CoreTests/HueCompassWheelTests.swift` (the sector rule agrees with an
+- [X] T-R02G0401-003 [P] [US1] Create `Packages/ExperiencesRound02/HueCompass/CoreTests/HueCompassWheelTests.swift` (the sector rule agrees with an — Verified 2026-11-21: 2026-11-21 host-2 exit 0 (wheel, 9 tests: the sector rule agrees with atan2 on all 960 off-boundary directions of the 33 x 33 lattice (1e-6 rad) and on 4,000 seeded large directions (1e-5 rad, above the 8.6e-6 rad rounding of the table); every boundary in exactly one sector; distances and arcs on all pairs; clues equal a brute-force walk for every bearing of 500 fixtures; hue gap independent of fog, depth independent of offset)
   independent `atan2` reference on every direction of a 33 × 33 lattice whose reference angle is more than
   10⁻⁶ rad from every boundary; every boundary vector
   belongs to exactly one sector; distances and arcs; clues equal a brute-force computation for every bearing of 500
