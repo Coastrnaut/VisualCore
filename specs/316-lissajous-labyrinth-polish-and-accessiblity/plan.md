@@ -28,8 +28,8 @@ VisualCoreExperienceHost (`ExperienceFeedback`) for the iOS experience. No new p
 **Testing**: `swift test --package-path Packages/ExperiencesRound02` (Core); the round-two simulator suite on sim-27.2
 with recording sinks (VoiceOver forced on through the route's init); regression as in 315; system accessibility audits
 wait for device testing.
-**Performance**: the plans are O(1) per action; the lights step at most 3 + 3 + 1 levels per frame (the catalog's levels
-have at most three checkpoints and three obstacles; the code takes any count); the recipe is built only when the loop is
+**Performance**: the plans are O(1) per action; the lights step at most 6 + 8 + 1 levels per frame (the catalog's levels
+have at most six checkpoints and eight obstacles, checked 2026-11-21; the code takes any count); the recipe is built only when the loop is
 rebuilt.
 **Constraints**: no state, digest or snapshot change (schema 2 stays); presentation only; Reduce Motion and Reduce
 Flashing from the host contract.
