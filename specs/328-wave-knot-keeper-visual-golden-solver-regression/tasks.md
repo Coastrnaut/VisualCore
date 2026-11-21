@@ -15,7 +15,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 - [ ] T-R02G0308-002 [P] [US1] Create `Packages/ExperiencesRound02/WaveKnotKeeper/CoreTests/WaveKnotKeeperRegressionSolverTests.swift` (agent A: for every
   level in five bands of 20, "the generated level equals its witness's level; the witness replays to a win in exactly
   its recorded moves with its recorded fingerprints; solve returns exactly the certified shortest whose moves win,
-  work ≤ 3,661 and equal to the certified work"; twelve named alterations of clarification Q2 each fail naming
+  work ≤ 3,661 and equal to the certified work"; thirteen named alterations of clarification Q2 each fail naming
   the level and the part); `--name host -- swift test --package-path Packages/ExperiencesRound02 --filter
   WaveKnotKeeperRegressionSolverTests`
 

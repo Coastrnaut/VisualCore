@@ -7,7 +7,7 @@
 
 Add a regression net around Wave Knot Keeper without changing its rules, following feature 318. In the host-tested
 `WaveKnotKeeperCore`: a solver regression over the 100 certified levels (witness replay with fingerprints, exact
-re-solve with work at most 3,661, twelve kinds of alteration detected and named) and `WaveKnotKeeperGolden`
+re-solve with work at most 3,661, thirteen kinds of alteration detected and named) and `WaveKnotKeeperGolden`
 (DEBUG or VISUALCORE_AUTOMATION only), which computes the code-only description of 16 golden frames (5 levels × 3 tiers
 plus the hero frame) at 1,152 × 768 and its SHA-256 digests; descriptions and digests are pinned in
 `golden-frames.json` (an equal digest passes, else positions within one 1/8-pixel quantum and equal colours; each pinned

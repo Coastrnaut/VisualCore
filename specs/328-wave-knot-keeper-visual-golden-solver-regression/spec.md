@@ -55,7 +55,7 @@ and already has a named Lissajous Labyrinth regression step; `scripts/xcodebuild
   its recorded moves with the recorded fingerprints, and `solve` from the start returns a solution of exactly the
   certified shortest length whose moves win, with `work` at most 3,661 and equal to the certified solution's work. Work
   is counted, never timed. The run is split by band (20 levels per test). Impact: FR-R02G0308-001; SC-R02G0308-001.
-- Q: Which alterations must the regression detect and how is each named? → A: twelve kinds, each applied to a copy and
+- Q: Which alterations must the regression detect and how is each named? → A: thirteen kinds (the solution move's point and direction count separately), each applied to a copy and
   each producing a failure message naming the level and the part: a level's control point, gate, target crossings,
   target writhe, tension bound, allowance; a solution move's point or direction; a witness's terminal, near miss,
   crossing counterexample, recorded fingerprint; the level fingerprint. Impact: FR-R02G0308-002; SC-R02G0308-002.
@@ -191,7 +191,7 @@ simulator parts and reports one summary.
 
 - **SC-R02G0308-001**: All 100 levels replay their witnesses and re-solve to their certified shortest length within
   3,661 ropes expanded of work (1 + 60 + 3,600, the most for a rope of at most 10 points at depth 3); 100 of 100.
-- **SC-R02G0308-002**: Each of the 12 kinds of alteration of clarification Q2 is detected and named.
+- **SC-R02G0308-002**: Each of the 13 kinds of alteration of clarification Q2 is detected and named.
 - **SC-R02G0308-003**: The golden set covers 5 levels × 3 tiers plus the hero frame (16 frames); every rendered frame
   matches its description within tolerance and every recomputed description matches its pinned entry (equal digest, or
   within one 1/8-pixel quantum with equal colours).

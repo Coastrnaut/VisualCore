@@ -15,7 +15,7 @@ Evaluated by the lead under the owner's standing delegation on 2026-11-21.
   the certified work) enumerated? [Completeness, Spec §Clarifications Q1]
 - [x] CHK002 Is the work bound a counted number with its derivation (3,661 ropes expanded: 1 + 60 + 3,600)? [Clarity, Spec
   §Clarifications Q1]
-- [x] CHK003 Are all twelve alteration kinds named with the naming rule for failures? [Completeness, Spec
+- [x] CHK003 Are all thirteen alteration kinds named with the naming rule for failures? [Completeness, Spec
   §Clarifications Q2]
 
 ## Golden frames
