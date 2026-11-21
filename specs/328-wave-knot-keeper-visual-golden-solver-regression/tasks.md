@@ -12,7 +12,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 2: Story 1 — every level stays solvable as certified (P1) 🎯
 
-- [ ] T-R02G0308-002 [P] [US1] Create `Packages/ExperiencesRound02/WaveKnotKeeper/CoreTests/WaveKnotKeeperRegressionSolverTests.swift` (agent A: for every
+- [X] T-R02G0308-002 [P] [US1] Create `Packages/ExperiencesRound02/WaveKnotKeeper/CoreTests/WaveKnotKeeperRegressionSolverTests.swift` (agent A: for every — Verified 2026-11-21: 2026-11-21 host exit 0: WaveKnotKeeperRegressionSolverTests 9/9 (five bands: generated level equals its witness, witness replays to a win with its fingerprints, solve gives the certified shortest with work <= 3,661 and equal to the certified work (largest 728); thirteen alterations of levels 44 and 87 each named)
   level in five bands of 20, "the generated level equals its witness's level; the witness replays to a win in exactly
   its recorded moves with its recorded fingerprints; solve returns exactly the certified shortest whose moves win,
   work ≤ 3,661 and equal to the certified work"; thirteen named alterations of clarification Q2 each fail naming
