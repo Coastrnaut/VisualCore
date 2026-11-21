@@ -120,7 +120,7 @@ buttons, steps, undo, redo), including winning every certified level.
 - **FR-R02G0504-001**: A drag that starts on a carvable cell and moves at least 16 points MUST send exactly one carve of
   that cell on release; a touch that moves less than 10 points is a tap; any other drag MUST send nothing.
 - **FR-R02G0504-002**: A tap on a spring MUST send exactly one valve toggle of that spring; other taps MUST send nothing
-  except a double tap on empty space, which resets the view.
+  except a double tap on empty space (`.ended` timestamps at most 0.35 s apart), which resets the view.
 - **FR-R02G0504-003**: Picking MUST be analytic and deterministic: the touch ray through the drawn camera against the
   block tops and emitter columns, the nearest hit winning, with a 22-point minimum touch target.
 - **FR-R02G0504-004**: Two-finger orbit MUST stay within yaw ±40° and pitch 25° … 70° (authored 0°, 50°), keep the scene inside the view at
