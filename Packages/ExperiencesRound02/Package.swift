@@ -225,7 +225,9 @@ let package = Package(
                                .product(name: "VisualCoreScenes", package: visualCore),
                                .product(name: "VisualCoreExperience", package: visualCore),
                                .product(name: "VisualCoreDiagnostics", package: visualCore),
-                               .product(name: "VisualCorePersistence", package: visualCore)],
+                               .product(name: "VisualCorePersistence", package: visualCore),
+                               // Feature 346 (R02-G05-06): the ambient recipe (pure, host-testable).
+                               .product(name: "VisualCoreAudioDSP", package: visualCore)],
                 path: "ColorfallCanyons/Core"),
         .testTarget(name: "ColorfallCanyonsCoreTests",
                     dependencies: ["ColorfallCanyonsCore",
@@ -233,7 +235,8 @@ let package = Package(
                                    .product(name: "VisualCoreMath", package: visualCore),
                                    .product(name: "VisualCoreScenes", package: visualCore),
                                    .product(name: "VisualCoreExperience", package: visualCore),
-                                   .product(name: "VisualCoreDiagnostics", package: visualCore)],
+                                   .product(name: "VisualCoreDiagnostics", package: visualCore),
+                                   .product(name: "VisualCoreAudioDSP", package: visualCore)],
                     path: "ColorfallCanyons/CoreTests"),
         .target(name: "ColorfallCanyonsExperience",
                 dependencies: ["ColorfallCanyonsCore",
@@ -242,7 +245,10 @@ let package = Package(
                                .product(name: "VisualCoreExperience", package: visualCore),
                                .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
                                .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
-                               .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS]))],
+                               .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS])),
+                               // Feature 346 (R02-G05-06): the ambient loop player and its recipe types.
+                               .product(name: "VisualCoreAudioDSP", package: visualCore),
+                               .product(name: "VisualCoreAudio", package: rendering, condition: .when(platforms: [.iOS]))],
                 path: "ColorfallCanyons/Experience"),
         .testTarget(name: "ColorfallCanyonsExperienceTests",
                     dependencies: ["ColorfallCanyonsExperience", "ColorfallCanyonsCore",
@@ -251,7 +257,8 @@ let package = Package(
                                    .product(name: "VisualCoreExperience", package: visualCore),
                                    .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
                                    .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
-                                   .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS]))],
+                                   .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS])),
+                                   .product(name: "VisualCoreAudioDSP", package: visualCore)],
                     path: "ColorfallCanyons/ExperienceTests"),
     ]
 )

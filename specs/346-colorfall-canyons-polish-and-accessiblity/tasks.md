@@ -9,7 +9,7 @@ observations after ImplementationLock-100.
 
 ## Phase 1: Setup
 
-- [ ] T-R02G0506-001 Baselines: `--name baseline-round02`, `--name baseline-host`, `--name baseline-timing`; add the
+- [X] T-R02G0506-001 Baselines: `--name baseline-round02`, `--name baseline-host`, `--name baseline-timing`; add the — Verified 2026-11-21: 2026-11-21 baseline-host, baseline-timing, baseline-round02 exit 0; VisualCoreAudioDSP added to ColorfallCanyonsCore and tests, VisualCoreAudio to the experience; package build exit 0 (.autonomy/migration/checks/R02-G05-06.*.json)
   `VisualCoreAudioDSP` product to the `ColorfallCanyonsCore` target in `Packages/ExperiencesRound02/Package.swift` (and to
   its test target); `--name package -- swift build --package-path Packages/ExperiencesRound02`
 
