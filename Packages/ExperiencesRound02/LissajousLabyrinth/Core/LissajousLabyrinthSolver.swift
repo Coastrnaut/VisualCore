@@ -1,6 +1,7 @@
 // LissajousLabyrinthSolver — feature 312 (R02-G02-02) T-R02G0202-002 (contract) and T-R02G0202-003 (FR-R02G0202-002;
 // clarification Q2; research R1–R3). Decides every legal setting of a level and finds the shortest action list from the
-// start to a winning setting through legal states.
+// start to a winning setting through legal states. Feature 315 (R02-G02-05) T-R02G0205-002 (FR-R02G0205-002;
+// research R1, R2) adds the same search from any dials over a given winning set, for hints.
 
 /// A proven shortest solution of a level.
 public struct LissajousLabyrinthSolution: Sendable, Equatable, Hashable, Codable {
@@ -67,7 +68,7 @@ public enum LissajousLabyrinthSolver {
     }()
 
     /// The dense index of `dials` (a, b, φ, ψ in lexicographic order; 20,736 slots, legal or not).
-    private static func index(_ dials: LissajousLabyrinthDials) -> Int {
+    static func index(_ dials: LissajousLabyrinthDials) -> Int {
         (((dials.frequencyA - 1) * frequencies + dials.frequencyB - 1) * phases + dials.phaseA) * phases + dials.phaseC
     }
 
@@ -361,54 +362,134 @@ public enum LissajousLabyrinthSolver {
     ///
     /// Breadth-first search from the start over legal states, exploring `LissajousLabyrinthRules.moves(in:)` in order
     /// (dial order a, b, φ, ψ; values ascending) and keeping the first parent found; it stops at the first depth that
-    /// holds a winning setting and picks the smallest winning (a, b, φ, ψ) of that depth.
+    /// holds a winning setting and picks the smallest winning (a, b, φ, ψ) of that depth. It is
+    /// ``solve(_:from:winning:)`` from `level.start` over `winningSettings(level).settings`, with the solution's `work`
+    /// set to the exact decisions spent on that winning set.
     public static func solve(_ level: LissajousLabyrinthLevel) -> LissajousLabyrinthSolution? {
         let decided = winningSettings(level)
-        guard !decided.settings.isEmpty else { return nil }
+        return search(level, from: level.start, winning: decided.settings, work: decided.work)
+    }
+
+    /// The proven shortest solution from `dials` to one of `winning`, or nil when `winning` is empty or none of it is
+    /// reachable through legal states (feature 315, R02-G02-05, T-R02G0205-002; research R1, R2).
+    ///
+    /// The same breadth-first search as ``solve(_:)`` (same moves, same order, first parent kept, stop at the first
+    /// depth holding a winning setting, smallest winning (a, b, φ, ψ) of that depth), started from `dials`. `winning`
+    /// should be `winningSettings(level).settings`, computed once per level, since it does not depend on the dials.
+    /// When `dials` itself is winning, the solution has `shortest` 0 and no actions. In the returned solution
+    /// `winningSettings` is `winning.count` and `work` is 0: this call spends no exact decisions, the winning set is
+    /// given.
+    public static func solve(_ level: LissajousLabyrinthLevel, from dials: LissajousLabyrinthDials,
+                             winning: [LissajousLabyrinthDials]) -> LissajousLabyrinthSolution? {
+        search(level, from: dials, winning: winning, work: 0)
+    }
+
+    /// The successors of every legal state, as flat lists: the successors of dense index i are
+    /// `successors.codes[successors.offsets[i] ..< successors.offsets[i + 1]]`, each code `to · 64 + dial · 16 + value`
+    /// (dial 0 … 3 in `LissajousLabyrinthDial.allCases` order), listed in `LissajousLabyrinthRules.moves(in:)` order:
+    /// dial a, b, φ, ψ; values ascending; the current value and non-coprime frequencies skipped. Illegal indices have
+    /// none. Computed once (about 640,000 codes); internal so tests can check it against the rules.
+    static let successors: (offsets: [Int32], codes: [Int32]) = {
         let slots = frequencies * frequencies * phases * phases
-        var winning = [Bool](repeating: false, count: slots)
-        for dials in decided.settings { winning[index(dials)] = true }
-        let rules = LissajousLabyrinthRules(level: level)
-        var parent = [Int](repeating: -1, count: slots)
-        var via = [LissajousLabyrinthAction?](repeating: nil, count: slots)
-        var seen = [Bool](repeating: false, count: slots)
-        var states: [LissajousLabyrinthDials?] = [LissajousLabyrinthDials?](repeating: nil, count: slots)
-        let origin = index(level.start)
-        seen[origin] = true
-        states[origin] = level.start
-        var frontier: [LissajousLabyrinthDials] = [level.start]
-        var goal = -1
-        while goal < 0 && !frontier.isEmpty {
-            for dials in frontier {
-                let i = index(dials)
-                if winning[i] && (goal < 0 || i < goal) { goal = i }
+        let strideA = frequencies * phases * phases, strideB = phases * phases
+        var offsets = [Int32](repeating: 0, count: slots + 1)
+        var codes: [Int32] = []
+        codes.reserveCapacity(14_080 * 46)
+        for from in 0..<slots {
+            offsets[from] = Int32(codes.count)
+            let a = from / strideA + 1, b = (from / strideB) % frequencies + 1
+            let phaseA = (from / phases) % phases, phaseC = from % phases
+            guard LissajousLabyrinthDials.gcd(a, b) == 1 else { continue }
+            for value in 1...frequencies where value != a && LissajousLabyrinthDials.gcd(value, b) == 1 {
+                codes.append(Int32((from + (value - a) * strideA) * 64 + value))
             }
-            if goal >= 0 { break }
-            var next: [LissajousLabyrinthDials] = []
-            for dials in frontier {
-                let from = index(dials)
-                for action in rules.moves(in: dials) {
-                    guard let reached = rules.apply(action, to: dials) else { continue }
-                    let to = index(reached)
-                    if seen[to] { continue }
-                    seen[to] = true
-                    parent[to] = from
-                    via[to] = action
-                    states[to] = reached
-                    next.append(reached)
+            for value in 1...frequencies where value != b && LissajousLabyrinthDials.gcd(a, value) == 1 {
+                codes.append(Int32((from + (value - b) * strideB) * 64 + 16 + value))
+            }
+            for value in 0..<phases where value != phaseA {
+                codes.append(Int32((from + (value - phaseA) * phases) * 64 + 32 + value))
+            }
+            for value in 0..<phases where value != phaseC {
+                codes.append(Int32((from + value - phaseC) * 64 + 48 + value))
+            }
+        }
+        offsets[slots] = Int32(codes.count)
+        return (offsets, codes)
+    }()
+
+    /// The dials of dense index `slot` (the inverse of `index(_:)`).
+    static func dials(_ slot: Int) -> LissajousLabyrinthDials {
+        LissajousLabyrinthDials(frequencyA: slot / (frequencies * phases * phases) + 1,
+                                frequencyB: (slot / (phases * phases)) % frequencies + 1,
+                                phaseA: (slot / phases) % phases, phaseC: slot % phases)
+    }
+
+    /// The breadth-first search of ``solve(_:from:winning:)``, reporting `work` in the solution.
+    ///
+    /// It works on dense indices: the successors of a state are taken from `successors`, in
+    /// `LissajousLabyrinthRules.moves(in:)` order, the first parent is kept, and the winners of a depth are noted while
+    /// that depth is generated, so the search stops at the first depth holding a winning setting with the smallest
+    /// winning index of that depth, exactly as a depth-by-depth scan would.
+    private static func search(_ level: LissajousLabyrinthLevel, from start: LissajousLabyrinthDials,
+                               winning settings: [LissajousLabyrinthDials], work: Int) -> LissajousLabyrinthSolution? {
+        guard !settings.isEmpty, start.isValid else { return nil }
+        let slots = frequencies * frequencies * phases * phases
+        let winning = UnsafeMutablePointer<Bool>.allocate(capacity: slots)
+        let seen = UnsafeMutablePointer<Bool>.allocate(capacity: slots)
+        let parent = UnsafeMutablePointer<Int32>.allocate(capacity: slots)
+        let via = UnsafeMutablePointer<Int16>.allocate(capacity: slots)
+        defer {
+            winning.deallocate()
+            seen.deallocate()
+            parent.deallocate()
+            via.deallocate()
+        }
+        winning.initialize(repeating: false, count: slots)
+        seen.initialize(repeating: false, count: slots)
+        parent.initialize(repeating: -1, count: slots)
+        via.initialize(repeating: -1, count: slots)
+        for dials in settings where dials.isValid { winning[index(dials)] = true }
+        let origin = index(start)
+        seen[origin] = true
+        var goal = winning[origin] ? origin : -1
+        var frontier: [Int] = [origin]
+        var next: [Int] = []
+        next.reserveCapacity(slots)
+        let table = successors
+        table.offsets.withUnsafeBufferPointer { offsets in
+            table.codes.withUnsafeBufferPointer { codes in
+                while goal < 0 && !frontier.isEmpty {
+                    next.removeAll(keepingCapacity: true)
+                    for from in frontier {
+                        var k = Int(offsets[from])
+                        let end = Int(offsets[from + 1])
+                        while k < end {
+                            let code = Int(codes[k])
+                            k += 1
+                            let to = code >> 6
+                            if seen[to] { continue }
+                            seen[to] = true
+                            parent[to] = Int32(from)
+                            via[to] = Int16(code & 63)
+                            next.append(to)
+                            if winning[to] && (goal < 0 || to < goal) { goal = to }
+                        }
+                    }
+                    swap(&frontier, &next)
                 }
             }
-            frontier = next
         }
-        guard goal >= 0, let setting = states[goal] else { return nil }
+        guard goal >= 0 else { return nil }
+        let dialOrder = LissajousLabyrinthDial.allCases
         var actions: [LissajousLabyrinthAction] = []
         var cursor = goal
-        while cursor != origin, let action = via[cursor] {
-            actions.append(action)
-            cursor = parent[cursor]
+        while cursor != origin {
+            let code = Int(via[cursor])
+            actions.append(LissajousLabyrinthAction(dial: dialOrder[code / 16], value: code % 16))
+            cursor = Int(parent[cursor])
         }
         actions.reverse()
-        return LissajousLabyrinthSolution(shortest: actions.count, actions: actions, setting: setting,
-                                          winningSettings: decided.settings.count, work: decided.work)
+        return LissajousLabyrinthSolution(shortest: actions.count, actions: actions, setting: dials(goal),
+                                          winningSettings: settings.count, work: work)
     }
 }

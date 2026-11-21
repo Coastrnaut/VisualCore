@@ -13,7 +13,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks.
 
 ## Phase 2: Stories 2 and 3 — hints and failure explanations (P1) 🎯
 
-- [ ] T-R02G0205-002 [P] [US2] [US3] Edit `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthSolver.swift` (`solve(_:from:winning:)`
+- [X] T-R02G0205-002 [P] [US2] [US3] Edit `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthSolver.swift` (`solve(_:from:winning:)` — Verified 2026-11-21: 2026-11-21 host exit 0: 24 tests in 3 suites (LissajousLabyrinthHintsTests 9 tests / 27 cases: certified solutions of all 100 levels unchanged through solve(_:from:winning:); 2,000 seeded reachable states: the level-3 hint shortens the remaining shortest by one, levels 1 and 2 agree, remaining equals an independent distance map; 500 seeded failures explained exactly; successor table equals the rules on all 20,736 indices; plus SolverTests and CatalogTests unchanged)
   "the certified breadth-first search from given dials over a winning set; solve(_:) delegates, certified solutions
   unchanged") and create `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthHints.swift` (LissajousLabyrinthHint "levels 1 … 3: dial, + raise or
   lower, + exact value, from the first action of the shortest remaining solution"; "No solution fits in the actions
