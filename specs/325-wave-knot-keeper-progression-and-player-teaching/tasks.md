@@ -13,7 +13,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks.
 
 ## Phase 2: Stories 2 and 3 — hints and failure explanations (P1) 🎯
 
-- [ ] T-R02G0305-002 [P] [US2] [US3] Edit `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperSolver.swift` (`solve(_:from:depth:)` "the certified
+- [X] T-R02G0305-002 [P] [US2] [US3] Edit `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperSolver.swift` (`solve(_:from:depth:)` "the certified — Verified 2026-11-21: 2026-11-21 host exit 0 (hints, solver, catalog)
   breadth-first search from a given rope, depth ≤ 3; solve(_:depth:) delegates, certified solutions unchanged") and
   create `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperHints.swift` (WaveKnotKeeperHint "levels 1 … 3: point, + axis, + exact direction, from
   the first move of the shortest remaining solution"; "No short solution from here; undo or retry" when none within

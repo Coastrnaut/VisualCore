@@ -5,7 +5,8 @@
 // order, so the result is the first shortest sequence in that order. The work is the number of ropes expanded (at most
 // 1 + 60 + 3,600 = 3,661 for a rope of 10 points). On the way the search records the first explored rope, in search
 // order, that has a move the rules refuse with `r02-g03.move("crossing")`: the crossing counterexample of the witness;
-// when the search wins before meeting one, the ropes discovered so far are scanned in search order.
+// when the search wins before meeting one, the ropes discovered so far are scanned in search order. Feature 325
+// (R02-G03-05) T-R02G0305-002 adds the search from a given rope (`solve(_:from:depth:)`), used by the hints.
 
 /// A rope and a move on it that the rules refuse because a strand would pass through another outside a gate.
 public struct WaveKnotKeeperCrossingExample: Sendable, Equatable, Hashable, Codable {
@@ -51,8 +52,19 @@ public enum WaveKnotKeeperSolver {
     public static let maximumDepth = 3
 
     /// The shortest solution of `level` within `depth` moves, or nil when no legal rope within `depth` moves wins.
+    /// The search from the level's start: ``solve(_:from:depth:)`` with `from: level.points`.
     public static func solve(_ level: WaveKnotKeeperLevel, depth: Int = maximumDepth) -> WaveKnotKeeperSolution? {
-        let start: [WaveKnotKeeperPoint] = level.points
+        solve(level, from: level.points, depth: depth)
+    }
+
+    /// The shortest solution of `level` from the rope `points` within `depth` moves, or nil when no legal rope within
+    /// `depth` moves of `points` wins (feature 325, T-R02G0305-002; clarification Q1). The same certified breadth-first
+    /// search as ``solve(_:depth:)`` — the same moves in the rules' order, the same tie rule — started from `points`
+    /// instead of the level's start, so a hint follows the certified solution's order. `points` is not validated; it
+    /// should be a rope reached by legal moves (a play's current rope).
+    public static func solve(_ level: WaveKnotKeeperLevel, from points: [WaveKnotKeeperPoint],
+                             depth: Int = maximumDepth) -> WaveKnotKeeperSolution? {
+        let start: [WaveKnotKeeperPoint] = points
         guard depth >= 0 else { return nil }
         // Each node: its rope, its parent's index and the move that reached it (none for the start).
         var ropes: [[WaveKnotKeeperPoint]] = [start]
