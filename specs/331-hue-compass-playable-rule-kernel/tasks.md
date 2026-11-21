@@ -8,7 +8,7 @@ recorded only after every agent has reported). Commit after every task with its 
 
 ## Phase 1: Setup
 
-- [ ] T-R02G0401-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test
+- [X] T-R02G0401-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test — Verified 2026-11-21: 2026-11-21 R02-G04-01.baseline-host/timing/round02 exit 0
   --package-path Packages/ExperiencesRound02`; the rendering baseline is R02-G03-10's rendering runs (exit 0)
 
 ## Phase 2: Foundational
