@@ -19,7 +19,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 2: Stories 1 and 2 — the scene and renderer purity (P1) 🎯
 
-- [ ] T-R02G0503-003 [P] [US1] Create `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsShaders.swift` (terrain and fluid sources; uniform names;
+- [X] T-R02G0503-003 [P] [US1] Create `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsShaders.swift` (terrain and fluid sources; uniform names; — Verified 2026-11-21: 2026-11-21 host-2 exit 0 (agent A: terrain and fluid GLSL ES 3.00 sources on the renderer's position/normal/uv streams — terrain materials and shade in uv, fluid colour weights in the normal slot, brightness and flow code in uv; flow bands from u_time only; glow capped by glowGainCap 0.5 under Reduce Flashing; 16 tests, retested by the lead)
   fluid colour mix and patterns equal to the palette and pattern rules; flow-band phase from time; glow gain cap) with
   `Packages/ExperiencesRound02/ColorfallCanyons/CoreTests/ColorfallCanyonsShaderSourceTests.swift` (version line, declared uniforms, no texture samplers, bounded
   loops, the palette constants match the CPU's); `--name host-2`
