@@ -25,7 +25,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks.
 
 ## Phase 3: Stories 1 and 4 — tutorial, progress, daily, practice (P1, P2)
 
-- [ ] T-R02G0405-003 [P] [US1] [US4] Create `Packages/ExperiencesRound02/HueCompass/Core/HueCompassProgress.swift` (HueCompassTutorialStep "aim → probe (an
+- [X] T-R02G0405-003 [P] [US1] [US4] Create `Packages/ExperiencesRound02/HueCompass/Core/HueCompassProgress.swift` (HueCompassTutorialStep "aim → probe (an — Verified 2026-11-21: 2026-11-21 host-2 exit 0 (agent C: tutorial steps aim/probe/select/done with Q2 texts and transitions, in every mode on levels 1-3; modes; progress with best units and stars 3/2/1, campaign unlocks, daily awards but never opens, practice records nothing; daily level x 47 by civil-date arithmetic; 21 tests incl. every date 2026-2036 and 100-day coverage)
   accepted turn) → select (an accepted probe) → done (the level ends); dismiss → done; undo never moves it back" with the
   texts of clarification Q2; HueCompassMode "campaign, practice, daily(level)"; HueCompassProgress "level 1 open; a
   campaign win opens the next; a better result replaces a worse one; stars 3 at most smallest + 1 units, 2 at most
