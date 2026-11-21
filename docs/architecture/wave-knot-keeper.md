@@ -137,6 +137,20 @@ moves are listed point by point and direction by direction, and a state is solve
   110 Hz × (1 + target crossings), a partial at 110 Hz × (1 + crossings) that becomes a unison when the crossings match,
   a fifth, an octave when won, halved when failed; it plays only while wanted, on screen and active.
 
+## Persistence and replay (R02-G03-07)
+
+- **Saving.** The app's shared saved-state store writes the snapshot atomically; Wave Knot Keeper's payload is schema 3
+  (`level`, `mode`, `progress`, `records`, `tutorial`), migrating 1 → 2 → 3 (schema-2 results gain an empty trace and
+  `verified` false). The state reads no clock and no random source: the seed, the certified catalog, the date given to
+  `mode.daily` and the recorded moves decide it.
+- **Reconcilable scores.** Each campaign or daily win stores its winning trace (the play's net moves) with the best
+  moves and stars; a later win replaces it only with fewer moves. On restore `WaveKnotKeeperReconciliation` replays every
+  traced result on its certified level and keeps it only if it wins in exactly the recorded moves with the recorded
+  stars; the number dropped is announced once. Untraced results are kept unverified; the frontier is restored as saved.
+- **Replay.** `replay.start [level]` opens a fresh play of a verified level, `replay.step` applies the next move and
+  `replay.stop` returns to the campaign; during replay only selection and dismissing the tutorial are allowed, and
+  progress never changes. Refusal codes: `r02-g03.no-replay`, `r02-g03.replay-end`, `r02-g03.replay`.
+
 ## Failures
 
 `WaveKnotKeeperError` reason codes: `r02-g03.level`, `r02-g03.move`, `r02-g03.stage`, `r02-g03.stale`,

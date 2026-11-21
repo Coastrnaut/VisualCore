@@ -61,7 +61,9 @@ when it uses fewer moves or earns more stars.
   of the trace (`r02-g03.replay-end` after the last or once the play ended); `replay.stop` returns to campaign at that
   level (the frontier when it is not open). During replay every other play action except `tutorial.dismiss` and
   `point.select` (presentation only) is refused with `r02-g03.replay`; replay never changes progress; the tutorial is
-  done during replay. Impact: FR-R02G0307-004; SC-R02G0307-004.
+  done during replay. The refusals are shown and announced in words: "There is no saved solution to replay for this
+  level.", "The replay is over." and "Stop the replay first."; a replayed win claims no stars. Impact: FR-R02G0307-004;
+  SC-R02G0307-004.
 - Q: Which inputs make the state deterministic? → A: the seed (opening level), the certified catalog (fixed planned
   seeds), the calendar date given to `mode.daily` and the recorded moves; the state reads no clock and no random
   source, so a save restores and replays identically on every device. Impact: FR-R02G0307-005.

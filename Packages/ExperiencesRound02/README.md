@@ -166,3 +166,7 @@ Feature 326 (R02-G03-06) adds polish and accessibility: `WaveKnotKeeperFeedbackP
 `WaveKnotKeeperLights` (eased crossing, match and win levels; slow fades under Reduce Flashing), crossing weights from
 the lights in `WaveKnotKeeperSceneGeometry`, `WaveKnotKeeperSoundRecipe` and the iOS `WaveKnotKeeperSound`; the panel
 labels every control, shows refusals in words, wraps at large text sizes and adds a Sound toggle.
+
+Feature 327 (R02-G03-07) adds persistence and replay: results carry their winning trace and `verified`
+(`WaveKnotKeeperProgress`), `WaveKnotKeeperReconciliation` re-checks them on restore, the adapter writes snapshot schema
+3 with a 2 → 3 migration and adds `replay.start/step/stop`; the panel offers Replay best solution with Step and Stop.

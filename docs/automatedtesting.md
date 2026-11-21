@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-21 (R02-G03-06: agents build and test new files in an isolated copy of a package (scratchpad, the shared packages linked in) while the lead's regression chain runs on the real tree, and the lead copies the files in and reruns every test before ticking).
+Last updated: 2026-11-21 (R02-G03-07: an edited-save test makes its edited trace step one the kernel refuses, so the expected drop does not depend on the reconciliation code under test).
 
 ## 1. What is tested, and where
 
@@ -186,6 +186,10 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
 
 ### Swift and test-tool pitfalls
 
+- **Edit saves so the expectation is independent** (R02-G03-07, 2026-11-21). Wave Knot Keeper's persistence tests
+  edit a trace step by replacing it with a move the kernel itself refuses at that point (asserted in the test), so the
+  expected drop is known without asking the reconciliation code under test; a random walk that happens to win a level
+  opens the next one, so the tests do not cap the frontier.
 - **Agents work in an isolated package copy during a long chain** (R02-G03-06, 2026-11-21). While the lead's
   Stage One and reference chain ran on the real tree, the agents built and tested their new files in a scratchpad copy
   of `Packages/ExperiencesRound02` (its sibling packages, `External` and the game's witness files linked in), so no

@@ -48,7 +48,7 @@ tests stay short (< 10 s each).
 
 ## Phase 5: Regression, documentation and close
 
-- [ ] T-R02G0307-006 Docs: `docs/architecture/wave-knot-keeper.md` (persistence and replay),
+- [X] T-R02G0307-006 Docs: `docs/architecture/wave-knot-keeper.md` (persistence and replay), — Verified 2026-11-21: 2026-11-21 round02-host exit 0; audits exit 0; architecture, package README, testing doc and the replay refusal words in the spec
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`; `--name audits -- python3
   scripts/verify_experiences.py --audits --only r02-g03.wave-knot-keeper`
 - [ ] T-R02G0307-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
