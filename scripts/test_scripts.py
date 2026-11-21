@@ -1109,6 +1109,16 @@ class ReleaseCheckTests(unittest.TestCase):
             self.assertIn(name, steps["app-release-symbols"])
         self.assertLessEqual(relcheck.SERIAL_CHUNKS, set(relcheck.UI_CHUNKS))
 
+    def test_wave_knot_keeper_ui_chunk(self):
+        """Feature 329 R02-G03-09 (T-R02G0309-004): the serial chunk `l3` runs the Wave Knot Keeper interface journeys."""
+        self.assertEqual(relcheck.UI_CHUNKS["l3"], ["WKPlayUITests", "WKReplayUITests"])
+        self.assertIn("l3", relcheck.SERIAL_CHUNKS)
+        steps = {s.name: s.argv for s in relcheck.unified_app_steps("X")}
+        argv = steps["app-ui-ios27-l3"]
+        self.assertNotIn("--parallel", argv)
+        start = argv.index("--only-testing") + 1
+        self.assertEqual(argv[start:start + 2], ["VisualCoreUITests/WKPlayUITests", "VisualCoreUITests/WKReplayUITests"])
+
     def test_ui_chunk_keys_are_unique_in_source(self):
         """Feature 319 (T-R02G0209-004): a repeated key in the `UI_CHUNKS` literal would silently drop the earlier
         chunk's test classes, so the source literal is parsed and every key must appear once."""

@@ -29,7 +29,7 @@ tests stay short (< 10 s each; interface tests < 90 s, SC-R02G0309-001). No {own
   (agent E: every name of Q1 is listed once by the controls' identifier list and has the prefix); `--name sim-27 --
   python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package
   --destination sim-27.2 --action test`
-- [ ] T-R02G0309-004 [US1] Create `Apps/VisualCore/Tests/UI/WaveKnotKeeper/WKSupport.swift`, `WKPlayUITests.swift`,
+- [X] T-R02G0309-004 [US1] Create `Apps/VisualCore/Tests/UI/WaveKnotKeeper/WKSupport.swift`, `WKPlayUITests.swift`, — Verified 2026-11-21: 2026-11-21 app-ui exit 0 (iOS 27.2): WKPlayUITests (win level 1 with the point picker and +x, 3 of 3 stars, level 2 open: 51 s; relaunch keeps progress: 63 s) and WKReplayUITests (replay to the win, stop: 40 s); chunk l3 serial in release_check.py with its script test
   `WKReplayUITests.swift` (agent C: spec Clarifications Q2; level 1 point count, solution moves and allowance pinned in `WK`; background
   before terminate on relaunch); edit `scripts/release_check.py` (`UI_CHUNKS["l3"]`, `"l3"` in `SERIAL_CHUNKS`) and
   `scripts/test_scripts.py` (agent D); `project.yml` + `xcodegen generate` if needed; `--name app-ui -- python3
