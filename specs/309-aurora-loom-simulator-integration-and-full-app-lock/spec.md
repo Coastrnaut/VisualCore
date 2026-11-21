@@ -59,7 +59,7 @@ accessibility identifiers.
   `examples:`; the app's `SnapshotMigrationCheck` restores both into schema 3 with progress kept. The registration's
   comment is corrected. Impact: FR-R02G0109-003; SC-R02G0109-002.
 - Q: What proves the release configuration excludes test-only code? → A: the existing `app-release-build` and
-  `app-release-symbols` steps, with `AuroraLoomGolden`, `AuroraLoomScenarios` and `manifestSeed` added to
+  `app-release-symbols` steps, with `AuroraLoomGolden` and `acceptanceScenarios` added to
   `RELEASE_FORBIDDEN` (the symbols that exist only under `DEBUG || VISUALCORE_AUTOMATION`). Impact: FR-R02G0109-004;
   SC-R02G0109-003.
 - Q: How is "not available" checked? → A: an app unit test: without `-vcCandidates` the catalog lists
