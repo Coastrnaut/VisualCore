@@ -18,7 +18,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
   AL-D8 of clarification Q1 with title, devices, procedure, measurements, pass (clarification Q5), gating (false only for
   AL-D6), covers, owner_steps, status "pending device campaign"; no result field)
 - [ ] T-R02G0110-003 [P] [US1] Create `scripts/check_device_rows.py` (contracts/device-rows.md; clarification Q4: shape,
-  manifest, ledger, coverage of the open {device} task lines of `specs/30*-aurora-loom-*/tasks.md`, the three
+  manifest, ledger, coverage of the open {device} task lines of `specs/30[1-9]-aurora-loom-*/tasks.md` (301–309 only), the three
   R02-G01-06 items and the six UA-F13 names; named failures; exit codes) with tests in `scripts/test_scripts.py` (agent
   A: the real definition passes; a removed scenario, a missing field, an uncovered item, a result field, a schema 2, an
   unreadable file and an unknown experience each fail by name); `--name device-rows -- python3
@@ -29,12 +29,12 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
 - [ ] T-R02G0110-004 [P] [US2] Create `docs/apps/aurora-loom/device-campaign.md` (agent B, modelled on
   `docs/apps/aurora/device-campaign.md`: devices and order, D3 on iPadOS 26.5, owner actions, every row AL-D1 … AL-D8 with
   devices, procedure, pass condition and "pending device campaign", no number claimed, short runs bounded by arithmetic
-  except the UA-F13 stress session, which only the device campaign runs); edit `scripts/release_check.py` (step
-  `device-rows`); `--name docs -- python3 scripts/validate_docs.py`
+  except the UA-F13 stress session, which only the device campaign runs); `--name docs -- python3 scripts/validate_docs.py`
 
 ## Phase 4: Regression, documentation and close
 
-- [ ] T-R02G0110-005 Docs: `docs/architecture/aurora-loom.md` (device preparation), `Packages/ExperiencesRound02/README.md`,
+- [ ] T-R02G0110-005 Lead: edit `scripts/release_check.py` (step `device-rows` running the check); docs:
+  `docs/architecture/aurora-loom.md` (device preparation), `Packages/ExperiencesRound02/README.md`,
   `docs/automatedtesting.md`; `--name round02-host`
 - [ ] T-R02G0110-006 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
   `--name host-full` (nothing in the app changes)

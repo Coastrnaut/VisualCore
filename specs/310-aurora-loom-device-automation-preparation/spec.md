@@ -57,8 +57,8 @@ frame, 60 fps with automatic levels, flat memory, 200 samples per device); A21's
   FR-R02G0110-001; data model.
 - Q: Where does the check run and what does it compare? → A: `scripts/check_device_rows.py --experience
   r02-g01.aurora-loom` (exit 1 with named reasons): JSON shape and required fields; every scenario in the manifest; the
-  devices equal the ledger's DEV1/2/3 rows of the experience; every open {device} task line in `specs/30*-aurora-loom-*/
-  tasks.md` and every UA-F13 measurement name (launch, first-frame, frame-pacing, memory, thermal, stress) is covered by
+  devices equal the ledger's DEV1/2/3 rows of the experience; every open {device} task line in the tasks of features 301–309
+  (`specs/30[1-9]-aurora-loom-*/tasks.md`; 310's own campaign task is not a coverage item) and every UA-F13 measurement name (launch, first-frame, frame-pacing, memory, thermal, stress) is covered by
   some row; every row's status is "pending device campaign" and no row carries a result or measured-value field. Tests in
   `scripts/test_scripts.py`; run in `release_check.py` as step `device-rows`. Impact: FR-R02G0110-004; SC-R02G0110-001,
   002.
