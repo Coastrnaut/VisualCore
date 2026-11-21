@@ -19,7 +19,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
   only for WK-D6), covers, owner_steps, status "pending device campaign"; no result field); edit
   `scripts/release_check.py` (step `device-rows-r02-g03`); `--name device-rows -- python3 scripts/check_device_rows.py
   --experience r02-g03.wave-knot-keeper`
-- [ ] T-R02G0310-003 [P] [US1] Edit `scripts/test_scripts.py` (agent A: the real Wave Knot Keeper definition passes; a copy
+- [X] T-R02G0310-003 [P] [US1] Edit `scripts/test_scripts.py` (agent A: the real Wave Knot Keeper definition passes; a copy — Verified 2026-11-21: 2026-11-21 script-tests exit 0 (alone): WaveKnotKeeperDeviceRowsCheckTests (real definition passes with 8 rows and 12 scenarios; a removed scenario, a missing pass field and an uncovered T-R02G0309-011 each fail by name; release step device-rows-r02-g03)
   with a scenario removed, a copy with WK-D1's `pass` field removed and a copy with T-R02G0309-011 dropped from every row's covers each fail by name; the release
   step `device-rows-r02-g03` runs the check for `r02-g03.wave-knot-keeper`); `--name script-tests` (alone)
 
