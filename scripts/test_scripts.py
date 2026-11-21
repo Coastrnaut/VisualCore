@@ -1380,7 +1380,9 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     # adapter core lives in the pure AuroraLoomCore, which the registry names).
                                     "AuroraLoomCore", "AuroraLoomExperience",
                                     # Feature 313 (R02-G02-03): Lissajous Labyrinth, integrated at X-R02-G02.
-                                    "LissajousLabyrinthCore", "LissajousLabyrinthExperience"])
+                                    "LissajousLabyrinthCore", "LissajousLabyrinthExperience",
+                                    # Feature 323 (R02-G03-03): Wave Knot Keeper, a candidate until X-R02-G03.
+                                    "WaveKnotKeeperCore", "WaveKnotKeeperExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):
         listing = subprocess.run([sys.executable, str(HERE / "release_check.py"), "--list"],

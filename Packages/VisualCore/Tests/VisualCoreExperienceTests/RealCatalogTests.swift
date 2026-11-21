@@ -136,7 +136,9 @@ enum CatalogFixture {
                                // Feature 303 (R02-G01-03); integrated at X-R02-G01.
                                "r02-g01.aurora-loom",
                                // Feature 313 (R02-G02-03); integrated at X-R02-G02.
-                               "r02-g02.lissajous-labyrinth"],
+                               "r02-g02.lissajous-labyrinth",
+                               // Feature 323 (R02-G03-03): Wave Knot Keeper, a candidate until X-R02-G03.
+                               "r02-g03.wave-knot-keeper"],
                 "the registrations of Catalog/registrations.json")
     }
 

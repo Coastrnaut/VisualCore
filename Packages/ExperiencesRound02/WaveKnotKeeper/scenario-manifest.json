@@ -1,0 +1,3181 @@
+{
+  "controls" : [
+    "point.move",
+    "point.select",
+    "play.undo",
+    "play.redo",
+    "level.next"
+  ],
+  "experience" : "r02-g03.wave-knot-keeper",
+  "kind" : "game",
+  "round" : 2,
+  "scenarios" : [
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+        "initialDigest" : "c111222cc1cec41b06a38abe47664c93ffefa4b013f5e5ba412d6ae0633c8b07"
+      },
+      "name" : "launch-first-frame",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              1,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "dea7d1bf07fa96174421a222075055545a0ff522869db01394368a8c6f1abc79",
+        "initialDigest" : "c111222cc1cec41b06a38abe47664c93ffefa4b013f5e5ba412d6ae0633c8b07"
+      },
+      "name" : "input-response",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "outcome" : "won"
+      },
+      "name" : "completion",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              16,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              6
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              -1,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0.5,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g03.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              2.5
+            ]
+          },
+          "result" : "action.rule.r02-g03.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              1,
+              5
+            ]
+          },
+          "result" : "action.rule.r02-g03.move",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g03.move",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g03.move",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "c111222cc1cec41b06a38abe47664c93ffefa4b013f5e5ba412d6ae0633c8b07",
+        "initialDigest" : "c111222cc1cec41b06a38abe47664c93ffefa4b013f5e5ba412d6ae0633c8b07"
+      },
+      "name" : "rejection",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              1,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "dea7d1bf07fa96174421a222075055545a0ff522869db01394368a8c6f1abc79",
+        "initialDigest" : "c111222cc1cec41b06a38abe47664c93ffefa4b013f5e5ba412d6ae0633c8b07"
+      },
+      "name" : "save-restore",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              1,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "initialDigest" : "c111222cc1cec41b06a38abe47664c93ffefa4b013f5e5ba412d6ae0633c8b07",
+        "resetDigest" : true
+      },
+      "name" : "reset",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "suspend-resume",
+      "seed" : "0"
+    },
+    {
+      "cycles" : 5,
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "teardown-reentry",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "cancel-prepare",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              3,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d2fe0bebd448721c741a53187d10840470f7577eee76ee795837719e9614518c",
+        "initialDigest" : "c111222cc1cec41b06a38abe47664c93ffefa4b013f5e5ba412d6ae0633c8b07",
+        "outcome" : "won"
+      },
+      "name" : "full-playthrough",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "dea7d1bf07fa96174421a222075055545a0ff522869db01394368a8c6f1abc79",
+        "initialDigest" : "c111222cc1cec41b06a38abe47664c93ffefa4b013f5e5ba412d6ae0633c8b07"
+      },
+      "name" : "hero",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              6
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "bdcc165f60237b11b6c67ea0f8eeb55960ebc1d88a67ed126a51502b7d5ba076",
+        "initialDigest" : "c640a93c46816c4b870e191feeff67855769df9f894017f190842b2a4e2ae1eb",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-001",
+      "seed" : "16"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              7,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g03.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f4be1311cf920ac2b0f34ee9e019b92d87a73a32cf216ccd60acdb55d33f5333",
+        "initialDigest" : "1cc3d2dc7812b926adb2fafbd746101f14466bc07aafe6133232a2ce55f07f4e",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-002",
+      "seed" : "23"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              2,
+              6
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b200e8f3c6a67ac26ee169d09fd57249f8a710e5a9aa7334a910627b6d2430b2",
+        "initialDigest" : "bd87c8beeb0dbc010aef2b7675dc0030b38aaa98f4eedc0e227a242bbcc9dff4",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-003",
+      "seed" : "30"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              7,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g03.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7f2e30700d6ea91cef72d681e5b92f3d990d153af91719fa80c765302a41d600",
+        "initialDigest" : "5da10c5f7259fff5a6d44928e2c377e12bd0427bfa8f3127347b87ccb931ede4",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-004",
+      "seed" : "37"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              4,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              4,
+              6
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "efecbc09ccedcd30c63b4d88eb247e9f9f45bf742377531fecca97d6805ff7ff",
+        "initialDigest" : "59146d2724728a14a430ddd4e2c1aa62c93e664460ce84ea1ba100c4107b0658",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-005",
+      "seed" : "44"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              3,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              4,
+              4
+            ]
+          },
+          "result" : "action.rule.r02-g03.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ceb1f7d989bff8f4ced8e69e4cf7551c3468115f99d1634207c058ac3fce40b3",
+        "initialDigest" : "e4d5aa1954c951764e1fdebf1bfbe2525f26fa2a5740e95a870321f75a1af362",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-006",
+      "seed" : "51"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              6,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              6,
+              6
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1624655fc2398e35569da8d45721fa0f3dd22ace3d21e5c8dc4b0d8067d97839",
+        "initialDigest" : "131cf8b0df5c447fd6bd3a3cac1151d12c77fc67cb52438edb0f49bd4803e74e",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-007",
+      "seed" : "58"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g03.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "694072542066c5fd4c7274b6625e4684215cfa79e8db99b7c01f0823c976e2b6",
+        "initialDigest" : "a0e2a8253ed5aadd8f9fd6d25098ecdfde93cf46d5e797bfcaecb223be6a8f28"
+      },
+      "name" : "acceptance-008",
+      "seed" : "65"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              6
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "29f709686f50a6bbf783027f3b636a8bdafc10430b232409bdd0db05dd38aed2",
+        "initialDigest" : "d673e1cc526ade1904af47d8ea219934f243af7e698ae13a969bdc14caa2f043"
+      },
+      "name" : "acceptance-009",
+      "seed" : "72"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              4,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              9,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g03.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "2de4cb31c346a151d44e24e3ede0b59255eb28649acf9d1eabc2181cd83f4c52",
+        "initialDigest" : "08af275410b24a72d1afca0fea3f7e9caaec9c971f5bbb5c853a231ac688fc0e"
+      },
+      "name" : "acceptance-010",
+      "seed" : "79"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              6,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              6,
+              6
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e49b9b926e655ff2c39fbd64ab2cccd87ea081b2e9f4256453cd6b3ec25d550f",
+        "initialDigest" : "2c6ad2f441b673876f45e7dedccd26443bcf3d5035666035735262c075b9459f"
+      },
+      "name" : "acceptance-011",
+      "seed" : "86"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              2,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              2,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g03.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "279f499a1ee17610a7940f2504bb983f7c7cb7ebb5656eeb1bac24fbef63786b",
+        "initialDigest" : "008a92a7b5e4b995831438892d5d0dea10a209045ca6bc2d63dc2fef5503b5b9"
+      },
+      "name" : "acceptance-012",
+      "seed" : "93"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              1,
+              6
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5318bac97eeffac270a825472e45f5fe47531642ab8149a1c964a8bc006d0cfc",
+        "initialDigest" : "c111222cc1cec41b06a38abe47664c93ffefa4b013f5e5ba412d6ae0633c8b07",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-013",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              1,
+              3
+            ]
+          },
+          "result" : "action.rule.r02-g03.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d700856efe313d7dbf3554d140b6f0a3f25a1534a17512527f111144ce801682",
+        "initialDigest" : "27af8cf124cc5a4b36c6f4f691c5309368bc22962ce867110c3c04fc69e80b2c",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-014",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              3,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              3,
+              6
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "812099b2b406342a800ffe59dacbdfa3a5f8209ab7babc5fe825e21b08a83f77",
+        "initialDigest" : "5144b1acb857f04a69bf611a24797be9b946e18a30a103375d62374a0d717978",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-015",
+      "seed" : "14"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              3,
+              5
+            ]
+          },
+          "result" : "action.rule.r02-g03.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6a4f263b2513c02b4f294489185e408299edbccc2c174478bf1f671a2d6d68a0",
+        "initialDigest" : "8d2f58a23cfab066cdf9a2ef9c3ffaeac9616ce9655bc87f55d6d4b58b0813fc",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-016",
+      "seed" : "21"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              1,
+              6
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "90872dbf946ecbd348852e67a84e16dea4e5cc9923875eff1100576d5af094bf",
+        "initialDigest" : "d56a09f3d84048cb8bea133f2d08840940f10d8542e6b02a576b88ba5ab23c88",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-017",
+      "seed" : "28"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              4,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              7,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g03.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "728f455092dd300ff0d699b38024a7f4ee6d63a70f53c492bf73988068a7877e",
+        "initialDigest" : "f537a30e9ba29a7f69ba66f801754c183336107ec73c50ffeb02c5178f577399",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-018",
+      "seed" : "35"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              1,
+              6
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a7e95f0d2648a77bebc484a11f01ed1d7447c805cd5e72fab96e1c224cbd7aa4",
+        "initialDigest" : "caf6cc9bb5a51b9cfd316779fa4516a8cdd4c132d90ba07634938becd29d7ebb",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-019",
+      "seed" : "42"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              3,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              7,
+              4
+            ]
+          },
+          "result" : "action.rule.r02-g03.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "933b9cc1511ab1fd96d84fc13c51d255c4ce7508f5a5e85efdcd1a8639dba11a",
+        "initialDigest" : "518028604681c724f6b89e7bd496e845033cb98051efcb3354fb0dcb10556245",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-020",
+      "seed" : "49"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              6
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b21a0117f8877aa481d88aac432b144454b551b9b64de3d78e83bbd40b78ae3f",
+        "initialDigest" : "47bcd46dc08f4562b0139a78b65d5a0b680d5a5fdd218b47f5aa62cf9c98a0bc",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-021",
+      "seed" : "56"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              3,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              6,
+              4
+            ]
+          },
+          "result" : "action.rule.r02-g03.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "4e8268e5f1ea47da5e1a134a2ef9d480eb6140024cdb42509664894a5572d9b6",
+        "initialDigest" : "5885780a7ce12020f2bca5e03ecc4a83852b7eb856a9ba89abbde293133d4182"
+      },
+      "name" : "acceptance-022",
+      "seed" : "63"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              6
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "533a28eb4d0e908c587c2fe4c902cf5b4ab102a2191e87338e82e5c635a4646a",
+        "initialDigest" : "9da216e787c6d5e91673ab6ab89f7a77e396e0e45cfd13c47105246fe8020164"
+      },
+      "name" : "acceptance-023",
+      "seed" : "70"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              9,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g03.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d3cefebda45ec41b96103e922b1bc38a3069dea085ba3dffcf90f0aa5ae937fb",
+        "initialDigest" : "42a166a0ae7ec3c6e961a44ba6c75e0b57f9e7332f60f19531576bbfb0eff908"
+      },
+      "name" : "acceptance-024",
+      "seed" : "77"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              2,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              2,
+              6
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "423ac3d4d623a9f2848c31edd581a28b3a4488aecded09cb81b591851b82435d",
+        "initialDigest" : "a736d1c4bb5535004531fc81e5200e123c6c7d63ca9e263b319359ab23259724"
+      },
+      "name" : "acceptance-025",
+      "seed" : "84"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              1,
+              3
+            ]
+          },
+          "result" : "action.rule.r02-g03.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "18c7397a85f9fedb82006ebefae3f5b38f8e2cecfa0b89a22fb108696a086eac",
+        "initialDigest" : "8bd1a0eccbe0a950ea32bf00703ff3f88eb192d2066f049e03aa1909fd3b2d40"
+      },
+      "name" : "acceptance-026",
+      "seed" : "91"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              3,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              3,
+              6
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "abc925104a6fdb13306c7c343b31cbaf0bb97d82dc366bd1e59cdc82fd578ebb",
+        "initialDigest" : "40458308cc423642a6f983a1ecd868462742d95e42272297c1650a7e0a740fc1"
+      },
+      "name" : "acceptance-027",
+      "seed" : "98"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g03.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a0757f2ce00e79fb6fa88bff24d984d018a76929199d43cb4f0ad476009391fb",
+        "initialDigest" : "d26a27e9a15c0f9085f77c891270d4e930bf30cd53c389207ae1baa176499714",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-028",
+      "seed" : "5"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              2,
+              6
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1e3f9c3b49edbe3462ba42f698f17ec07793b9bd50a57c8c0f42e27efbc56b9c",
+        "initialDigest" : "e38a52772f9498e1d854385deca2edc96a94609ea659cd47221f6af7d73fb47f",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-029",
+      "seed" : "12"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              4,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              5
+            ]
+          },
+          "result" : "action.rule.r02-g03.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "49db3a6baf516c1e65ebca3f2ea733564af2153a600ebad9fe4c0b32a56eb596",
+        "initialDigest" : "c903683b484fd8300f2459bbee5d84152fbbb0e12217c2429522044e85cc7657",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-030",
+      "seed" : "19"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              1,
+              6
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9d5648efe981e31536a98ac4c9da54a05c15750b751a116cbecc3b35b099f4f4",
+        "initialDigest" : "18f47fd6467874088c46eae754ca5c2d23d822cf400e5589e5a8e6c5a8e2ebc8",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-031",
+      "seed" : "26"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              6,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              4,
+              4
+            ]
+          },
+          "result" : "action.rule.r02-g03.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ee12cbd2baa2b66391b743aa3c330b39bf9c06dfb1d14ddb19678af57bb11042",
+        "initialDigest" : "0812f3700b05cc1a7a5952bcc89818b8b292597bc8d9ca650e2a742d6fd0208f",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-032",
+      "seed" : "33"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              5,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              5,
+              6
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5ad61c1e145e33dbb0717d2fd89e79a05821b2bd2cd2d4ac6c21da731ee6f196",
+        "initialDigest" : "d173e436b3d87fc1ee5c6f9cbbef2ed2682e2640a79d8de757fd5ac459377e4d",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-033",
+      "seed" : "40"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              1,
+              4
+            ]
+          },
+          "result" : "action.rule.r02-g03.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a62cf0e0b06874fef5999e30a9c0df0b74fd035d819cf72baefe4746f8e297c2",
+        "initialDigest" : "d8a4731b6537174e9b19dc7792819a31813adfec47273988b10d61b0c6661e00",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-034",
+      "seed" : "47"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              6
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f41a64584621dad5a6d84e6f78ac632445603ebfa6741c8783de61cbf59fbca9",
+        "initialDigest" : "a4451e632de3a6857b8c8a50ead59b1e742f0226bce9178a209d9dacc7a7b392",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-035",
+      "seed" : "54"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              3,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              9,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g03.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b5084b3e2a8c93578642f4622330682e768b2155ce824ccd7082d4cce151aa22",
+        "initialDigest" : "416294610ea2b40fa78360f2bf190ae69444f6b31573e97754251c9a591ff0a6"
+      },
+      "name" : "acceptance-036",
+      "seed" : "61"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              1,
+              6
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "3e0d67ab44bbf624c190dd0a7b92f53c5bb2368611a54708fc51c786d2ef2d1f",
+        "initialDigest" : "124609bc4ad23d961d40e6a06c499b0fa1650a3cf8ac65bbc4491737adf06c5d"
+      },
+      "name" : "acceptance-037",
+      "seed" : "68"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              6,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              9,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g03.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "981bdb544155d663da8d9509c7e9592f0c7d3a0fe6973c30f8d09e9e4409c09f",
+        "initialDigest" : "e6938ccc26338eddd5f5f504eef21233c1d3872ba5b36092a30b32b445e739bb"
+      },
+      "name" : "acceptance-038",
+      "seed" : "75"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              6,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              6,
+              6
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b4840b20b1e2825e4336d6f9707d3c5bd68cdba0cbe0e2714cc45d2f52d1637d",
+        "initialDigest" : "42ed8e939cb842e12fe9503ad1a32faee6a691faebc4974758947e39c104ecf2"
+      },
+      "name" : "acceptance-039",
+      "seed" : "82"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g03.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e8732ef1fd33874f4fc6d79c1ebb5331df8089d52fd70dee3f3580dcfcfb8b7f",
+        "initialDigest" : "39b0c383534478122c60c3b0694790113c61f9be7ff4e34f43c203d0f94cd3c0"
+      },
+      "name" : "acceptance-040",
+      "seed" : "89"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              6
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "2667383f9431f8f03365132575e82aeffe7d67cf316fe52eec8986049a57a822",
+        "initialDigest" : "ad3e28915c2d7cde9fc35823aa48584114157fef351ffcd75a1b6f2b749cda73"
+      },
+      "name" : "acceptance-041",
+      "seed" : "96"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              6,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g03.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1c42cd8f171f37a6886e5d14322cd29f2a5b20020da45e692dc1d72958e413eb",
+        "initialDigest" : "a034c60f6b5dd5c7733f2d04a228f95cfb9514796b2e63d51fb413ddc16eab86",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-042",
+      "seed" : "3"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              4,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              4,
+              6
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b26a210d8b92e3b414f88201cf49aa7098637687d0e94d8929dba9b0890f5ce6",
+        "initialDigest" : "999ac806fec0eeaf31d6097f07e4e6305531636b874fa0d317a5cd41b0bbda88",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-043",
+      "seed" : "10"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              2
+            ]
+          },
+          "result" : "action.rule.r02-g03.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "865728c003ff194edebef4e9980994105a7ba946019ca739925aa4466501706b",
+        "initialDigest" : "2f843c3623ff2ff81abba70ef77209e75e8ed605cfdf5ef1a06bb9f57777ae3e",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-044",
+      "seed" : "17"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              5,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              5,
+              6
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "0cacdf73a7cd43330d9043814d7e2de717a5d4001fa4b70c8cd5ac894f502249",
+        "initialDigest" : "8c83dc13774408820102303a90dc8deec77a5bf5e7324e241774bb1aa233c23f",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-045",
+      "seed" : "24"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              1,
+              5
+            ]
+          },
+          "result" : "action.rule.r02-g03.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "74b6c961d5cea45994a15069b2f7a18dd4dc3a29e2854e8bb900025363cb56c0",
+        "initialDigest" : "eb82bc6d4bf0558213655c5665fe38d823d2eafe26091a2fbbaac6d90c66f4de",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-046",
+      "seed" : "31"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              5,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              5,
+              6
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "75e1d336381f93c16a42c999fe5d7f933cf7f4f4a9930120ec66cc368da92c59",
+        "initialDigest" : "68ff7ece6722e2d541c110ea72023d1b6e744ea1ad2026a027c2cc947995469f"
+      },
+      "name" : "acceptance-047",
+      "seed" : "38"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              8,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g03.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "18e3a69b3b70dd1ec3d22e0b6f4fe67043337337457b0b23bbdd949cfce4e1c2",
+        "initialDigest" : "d05a452ec488295c4f1a285e6fcf3e15f34b549ecc63b5f7f49badd5d8b6896f",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-048",
+      "seed" : "45"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              2,
+              6
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "66297c6c4b4246a29274c5322be34759b48fe93c70de17bf233cfdd8c229fb3d",
+        "initialDigest" : "7dbe67645e1c36957e42c42d1567c321be3a24bc62dc32411554416de6b16fd1"
+      },
+      "name" : "acceptance-049",
+      "seed" : "52"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              8,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g03.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "c96e7ff5860e54f9463770871f5b9c4f6c6962a88fbe8822c6a99999d431e8b2",
+        "initialDigest" : "b6429e9aecedfa0cb6d9db500bb0fbe61cae51fd20bf37f930c5e03af208ca08",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-050",
+      "seed" : "59"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              3,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              3,
+              6
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "69d74d9ac21e30421eb47859f45068be2c81c6d150e57455b1b7eb2dfffe0aa4",
+        "initialDigest" : "8b8a0f2994a3ad1c7ee3e69263cc8c182989d595edd237f720a3e8e10eef1aad"
+      },
+      "name" : "acceptance-051",
+      "seed" : "66"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              4,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              9,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g03.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5ab0956e48372032da0d6a8b5ddef50ec91acd06c3a2fd71a3cee8535a3b639d",
+        "initialDigest" : "0d569ac4e4d1503ac085c82a79cf3eff5a1c01846059d60432435e798c672494"
+      },
+      "name" : "acceptance-052",
+      "seed" : "73"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              5,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              5,
+              6
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "af66f35e27b295175f7c4e8996a3aafc46c9efdea7b54750cc7e67a850cdbcfa",
+        "initialDigest" : "c8b09d5b1cd448080880cba95f468515d36c0b771a7c5472d817625693448a5a"
+      },
+      "name" : "acceptance-053",
+      "seed" : "80"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              5,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g03.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "c101a9b17bc3c5ba749de21fd117030b5c54f0883a2ea7d37b7b568faf52a08c",
+        "initialDigest" : "7d192e57a6edebe794b28e74bbb702a4c5b7ed34916d7eee59e232c1af3ad379"
+      },
+      "name" : "acceptance-054",
+      "seed" : "87"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              6
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7d3054e33c71b2b89918529f175b12a0e7837b2bc893c85ec6e3381b008e1c4c",
+        "initialDigest" : "578406ce0f9b330605edbfa6298ab1ae04e774e51e1d648eadff9972dee115d1"
+      },
+      "name" : "acceptance-055",
+      "seed" : "94"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              3,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              6,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g03.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "955289db2bd143432723ecb076b8fe092f3aae459076d8ca0ad34199b88b228b",
+        "initialDigest" : "39f5c24beb1113ae27f644829419a375871ce3fe67f5d0521d987007c820bf51",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-056",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              2,
+              6
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "cf97fbaee5494978f19497d100f729773e0b11a306c6c6a7532040a7f0fbcb03",
+        "initialDigest" : "32f1e47e9d4470895fa1c817e48f5d1bb95d14f2546884d9367ad24e55e90cc4",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-057",
+      "seed" : "8"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              6,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g03.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "45de6098669bc12f892388dea120f60fdcd1688317da4de19c2db8033cc81fda",
+        "initialDigest" : "524966896e26e1ad68e8a5178f095b9242018f85a1a9e08b38965c06009e71f6",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-058",
+      "seed" : "15"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              2,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              2,
+              6
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d4ef6aa5a982194b1159d5f00a739b98af532ebb34742034927604df6c76ee56",
+        "initialDigest" : "80103e13105cf224586dbeb4031759ef29052faab0f6fc35c0d1c78ac1ede697",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-059",
+      "seed" : "22"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              5
+            ]
+          },
+          "result" : "action.rule.r02-g03.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "776160d305e8674751a6fda11adb4b725f35657a3f74011b2ac1ff9bde0785ff",
+        "initialDigest" : "84d8107e56f7152ee0c25cbc3b71de43314517d6811001e5af17cb03ef0ed761",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-060",
+      "seed" : "29"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              3,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              3,
+              6
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d631607883649142fc36283862f159ba249f052ad21b358d14a96dd354584a64",
+        "initialDigest" : "304f9f0c79914a4e358b0628acbdd65024b734c95da93c0f1b55fbf845441e83",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-061",
+      "seed" : "36"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              8,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g03.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "18ca6bc5792c99909f49fd255135dc1c454071fc437815b66f401222dff3b6de",
+        "initialDigest" : "ab7e1a18d2d586c20bb579bbfe074b763a6840b5b1e1450f2c2ad3632d3f8152"
+      },
+      "name" : "acceptance-062",
+      "seed" : "43"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              1,
+              6
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7585cafc5b49443a07193bd10c493faed8108d1de7ab6395f5bbf5a9fb3f5cb3",
+        "initialDigest" : "c5c36c2acdc71b1feb09dc9d98b8516eebba49afb1120398131958226d01c502",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-063",
+      "seed" : "50"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              8,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g03.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1b5a31fa5c81575d9cf1d0e8ed6f9d49857fe35efdb523e9bb56fbdfd7b338cf",
+        "initialDigest" : "3fd7574948396c036687eda73952f51e7ef06ec00dbd84676a173471c974f4a2",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-064",
+      "seed" : "57"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              2,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              2,
+              6
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1f61b0d73c155cc3f5a48cc9760e16117f21df192fbad7ae7a8a4b3e20fee911",
+        "initialDigest" : "b4974545b7c75c2b803bebe9a6b3977b22b115448d32b49fda51e5739f493697"
+      },
+      "name" : "acceptance-065",
+      "seed" : "64"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              3,
+              2
+            ]
+          },
+          "result" : "action.rule.r02-g03.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b1604bd0f50b4ecee0a72761936bffd1145ac775a4ef3c4948c98c56fd7f9972",
+        "initialDigest" : "af74f0c9e4c635971a6460850209d629701bcffca82b52187d6e201128023c18"
+      },
+      "name" : "acceptance-066",
+      "seed" : "71"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              4,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              4,
+              6
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9ff0e832ca7fd84b5980192b0e1058ddf5f7b188fa25251de48e0b6e7d7fe304",
+        "initialDigest" : "9551f14077402fbeb7f6637e047ffc162c84f43b1ef845c78adef176160ddf79"
+      },
+      "name" : "acceptance-067",
+      "seed" : "78"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              7,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              4,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g03.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "c71aa525ca6c7da6fcca26fdab387dd851ba4c9a4cc9201956dca75dd8c2c133",
+        "initialDigest" : "b044babe0c84264669aadc0c83406267b054dcc9fb02c6b6332a8329cb33adc3"
+      },
+      "name" : "acceptance-068",
+      "seed" : "85"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              1,
+              6
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9d3654a3247a1a88558dec3c67b38f3549dc668b3f62d29c5c9f0fef06ae642b",
+        "initialDigest" : "92e8d85cdc441f08b077f324398d099005fee1e16faa2fff1a0dd33b98a806d4"
+      },
+      "name" : "acceptance-069",
+      "seed" : "92"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              1,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              3,
+              2
+            ]
+          },
+          "result" : "action.rule.r02-g03.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "3d1605cfd5fb2275ff5bc053402ebc0edbd2f06f02ce361000ec36f1b0f00ef3",
+        "initialDigest" : "d6f5d5e37534ede756ca4ea89ebc68669d51fa3d46822df1714003abf188682e"
+      },
+      "name" : "acceptance-070",
+      "seed" : "99"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              2,
+              6
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1a68656041d217f05c61f625895b80778c1311b0ed6e86724817c01b644e6f22",
+        "initialDigest" : "be4e6cd4ccb0869adef6edd62f7443bc605059882fffbfc9cb735eab94190eb9",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-071",
+      "seed" : "6"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              1,
+              4
+            ]
+          },
+          "result" : "action.rule.r02-g03.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "de164ac94fa907c2fcb61d37ff79b711e376bf374a64c03e733e2d37a7284dbf",
+        "initialDigest" : "d4b4b18b8ce17b5b2107edc8b493546dacce112b3208f15d530ac67b2df12e59",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-072",
+      "seed" : "13"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              6
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "2e1d5bdcc038d9f7d77ea9935c1c8504d9a8a4a2e6dcfc7bd689af901d2f1b1e",
+        "initialDigest" : "5853fde58e83bfef5994ffaf96b4f251beececa4d2c55c15a78115662174aae4",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-073",
+      "seed" : "20"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              7,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g03.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "232088f86b05ee38166a1148711731fbfb8fb0868d3d88752294032bfa8d85da",
+        "initialDigest" : "837427a0f1e64d42ecf6532398816af9290103079696156c6c3fb474dbdafab5",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-074",
+      "seed" : "27"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              3,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              3,
+              6
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5ab30e8b4624630322e107db4f68fab2b6738f2284a861eb12f7b1a830a7ffea",
+        "initialDigest" : "8228059c8a96a887317d36522e9376881a4948cbc453cc2b7920570d3e142b23"
+      },
+      "name" : "acceptance-075",
+      "seed" : "34"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              3,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              3,
+              2
+            ]
+          },
+          "result" : "action.rule.r02-g03.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "bc7737eed7d23d44df0ad9240dbc43d11b345f132176968b96ed71d1302d788f",
+        "initialDigest" : "a7734b21c3ff4bc381f503c5754dfb6ec01396bf905f8695a992f5666b8798ce",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-076",
+      "seed" : "41"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              6
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9b35fb9ca4a041c1401e5b893ef5e6d843bc17d1c79231abdcbc628da36aa318",
+        "initialDigest" : "9d42a74cdae85d67685d16e3f1de16e4945a79d60c2a1543589660dd414f5472",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-077",
+      "seed" : "48"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              8,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g03.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a0b3ef39f609d7cdcea61bcbc9a4b815301dde70bb16f88ee16d34735fd1e71f",
+        "initialDigest" : "bc7d89bc535e44f0f08fc5555eb6531628ef49344439154a697cd85d21beb347"
+      },
+      "name" : "acceptance-078",
+      "seed" : "55"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              6
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "84cd0fd26726ef0f0ceaa0788ae813a4b504ea69217bd81f8a7e02a86fe48de4",
+        "initialDigest" : "fbe7e6dc1ecc31f417491e6f6f00c9a4fe6ab1b2476b3d26f0cd4276d7d0b1cc"
+      },
+      "name" : "acceptance-079",
+      "seed" : "62"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              5,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g03.move",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "87ff8cb299f1af7ec5fe653a2529fec4d915184c48d8ea67aeafbae7b02535cd",
+        "initialDigest" : "36d5c44a1238e2c4ba304731a87cbaafa98ef6bb434c9c22c8dddc7ec90fe827"
+      },
+      "name" : "acceptance-080",
+      "seed" : "69"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5318bac97eeffac270a825472e45f5fe47531642ab8149a1c964a8bc006d0cfc",
+        "initialDigest" : "c111222cc1cec41b06a38abe47664c93ffefa4b013f5e5ba412d6ae0633c8b07",
+        "outcome" : "won"
+      },
+      "name" : "fixture-level-1-solved",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "44a4f811ce9f108c5db5e02ad874f3963d508d4bb128ca725e871c98fb262c74",
+        "initialDigest" : "c111222cc1cec41b06a38abe47664c93ffefa4b013f5e5ba412d6ae0633c8b07",
+        "outcome" : "failed"
+      },
+      "name" : "fixture-allowance-spent",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "point.move",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "dea7d1bf07fa96174421a222075055545a0ff522869db01394368a8c6f1abc79",
+        "initialDigest" : "c111222cc1cec41b06a38abe47664c93ffefa4b013f5e5ba412d6ae0633c8b07"
+      },
+      "name" : "fixture-undo-redo",
+      "seed" : "0"
+    }
+  ],
+  "schema" : 1
+}

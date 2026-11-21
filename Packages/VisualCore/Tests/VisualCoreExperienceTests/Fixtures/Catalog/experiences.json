@@ -966,7 +966,7 @@
       "id": "r02-g03.wave-knot-keeper",
       "code": "R02-G03",
       "title": "Wave Knot Keeper",
-      "summary": "Drag spectral control points to untie closed three-dimensional wave knots",
+      "summary": "Move the control points of a closed glass rope one lattice step at a time, never passing a strand through another outside a gate, until the rope's projected crossings and writhe match the target knot signature, within a move allowance. 100 certified levels; undo and redo. Drawn in code; offline.",
       "kind": "game",
       "tier": "free",
       "category": "puzzle",
@@ -975,11 +975,29 @@
         "wave-mathematics"
       ],
       "order": 28,
-      "palette": [],
+      "palette": [
+        "#05070F",
+        "#E8E4DA",
+        "#2F6FD8",
+        "#E0703A"
+      ],
       "tile_seed": 2914899599,
-      "capabilities": [],
-      "quality_tiers": [],
-      "content": null,
+      "capabilities": [
+        "Move rope points one step at a time",
+        "Glass light ropes with ember pulses",
+        "100 solver-certified levels",
+        "Every move can be undone and redone",
+        "Three quality levels, same rules"
+      ],
+      "quality_tiers": [
+        "level-0",
+        "level-1",
+        "level-2"
+      ],
+      "content": {
+        "catalog_sha256": "12c8ecb8aae7135ff939d99b41a6dc8cf17fb4b7380fb5e4c18347ac5987933f",
+        "levels": 100
+      },
       "available": false
     },
     {

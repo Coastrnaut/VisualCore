@@ -35,7 +35,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 3: Experience, registration and frames
 
-- [ ] T-R02G0303-006 Create `Packages/ExperiencesRound02/WaveKnotKeeper/Experience/WaveKnotKeeperExperience.swift`, `…Presenter.swift`, `…RopeScene.swift` (GL
+- [X] T-R02G0303-006 Create `Packages/ExperiencesRound02/WaveKnotKeeper/Experience/WaveKnotKeeperExperience.swift`, `…Presenter.swift`, `…RopeScene.swift` (GL — Verified 2026-11-21: 2026-11-21 sim-27 exit 0 (render vs CPU reference at 1152x768 on levels 1/21/41/61/81 at three tiers, handle and gate colours, tier log, fallback, zero size, aspects, memory warning, Reduce Motion and Flashing; scenarios 94 incl. 80 acceptance); packages, catalog-search exit 0; candidate registered; draw order fixed (handles over the rope)
   scene with `ShaderMeshRenderer`; fallback; tier log; Reduce Motion and Reduce Flashing), `…Controls.swift` (a labelled
   point picker, six direction buttons, undo, redo, next level), `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperScenarios.swift` (standard scenarios,
   full-playthrough, hero, fixtures, 80 acceptance scenarios R2-G03-QA-001 … 080) and `Packages/ExperiencesRound02/WaveKnotKeeper/scenario-manifest.json`; register

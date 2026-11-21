@@ -227,6 +227,10 @@ targets:
         product: LissajousLabyrinthCore
       - package: ExperiencesRound02
         product: LissajousLabyrinthExperience
+      - package: ExperiencesRound02
+        product: WaveKnotKeeperCore
+      - package: ExperiencesRound02
+        product: WaveKnotKeeperExperience
     postBuildScripts:
       - name: Bundle licenses (UA-F04)
         basedOnDependencyAnalysis: false

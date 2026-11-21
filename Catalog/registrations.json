@@ -664,6 +664,33 @@
       "manifest": "Packages/ExperiencesRound02/LissajousLabyrinth/scenario-manifest.json",
       "permissions": [],
       "summary": "Tune two coupled frequencies and two phases so a slowly moving point traces a closed three-dimensional flower that passes every checkpoint in order and touches no obstacle, within an action allowance. 100 certified levels; undo and redo. Drawn in code; offline."
+    },
+    "r02-g03.wave-knot-keeper": {
+      "capabilities": [
+        "Move rope points one step at a time",
+        "Glass light ropes with ember pulses",
+        "100 solver-certified levels",
+        "Every move can be undone and redone",
+        "Three quality levels, same rules"
+      ],
+      "quality_tiers": [
+        "level-0",
+        "level-1",
+        "level-2"
+      ],
+      "palette": [
+        "#05070F",
+        "#E8E4DA",
+        "#2F6FD8",
+        "#E0703A"
+      ],
+      "content": {
+        "catalog_sha256": "12c8ecb8aae7135ff939d99b41a6dc8cf17fb4b7380fb5e4c18347ac5987933f",
+        "levels": 100
+      },
+      "manifest": "Packages/ExperiencesRound02/WaveKnotKeeper/scenario-manifest.json",
+      "permissions": [],
+      "summary": "Move the control points of a closed glass rope one lattice step at a time, never passing a strand through another outside a gate, until the rope's projected crossings and writhe match the target knot signature, within a move allowance. 100 certified levels; undo and redo. Drawn in code; offline."
     }
   }
 }
