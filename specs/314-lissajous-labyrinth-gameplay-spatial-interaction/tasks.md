@@ -74,7 +74,7 @@ tests stay short (< 10 s each).
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02G0204-007 Docs: `docs/architecture/lissajous-labyrinth.md` (controls, stage, pending play),
+- [X] T-R02G0204-007 Docs: `docs/architecture/lissajous-labyrinth.md` (controls, stage, pending play), — Verified 2026-11-21: 2026-11-21 round02-host exit 0; audits exit 0 (content audit of r02-g02.lissajous-labyrinth); docs/architecture/lissajous-labyrinth.md touch controls and panel play; package README; docs/automatedtesting.md (sub-pixel checks scaled with the framing)
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host -- swift test --package-path
   Packages/ExperiencesRound02`; `--name audits -- python3 scripts/verify_experiences.py --audits --only
   r02-g02.lissajous-labyrinth`

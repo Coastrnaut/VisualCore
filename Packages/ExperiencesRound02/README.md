@@ -96,6 +96,13 @@ and CPU reference `LissajousLabyrinthSceneGeometry`, the GLSL sources `Lissajous
 the iOS-only target `LissajousLabyrinthExperience` the presenter, the GL thread scene and a minimal control panel. It is
 a registered candidate of the one app until X-R02-G02.
 
+Feature 314 (R02-G02-04) adds the touch controls: in the Core the dial-independent stage and content spheres and the
+camera orbit `LissajousLabyrinthOrbit` (`LissajousLabyrinthSceneGeometry`), the four dial rings
+`LissajousLabyrinthHandles`, the host-tested `LissajousLabyrinthGestureController` (one action per turn, two-finger
+orbit, selection) and the pending-value planner `LissajousLabyrinthPending`; in the experience the presenter's pointer
+route, the drawn rings, knobs, selection outline and turn preview, and a panel whose steppers set pending values with
+Apply, Clear and Reset view.
+
 ## Wave Knot Keeper (R02-G03, `r02-g03.wave-knot-keeper`, free)
 
 `WaveKnotKeeperCore` (feature 321, R02-G03-01) is the playable rule kernel: `WaveKnotKeeperLevel` with

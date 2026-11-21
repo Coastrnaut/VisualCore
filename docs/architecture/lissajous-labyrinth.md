@@ -94,6 +94,21 @@ LISSAJOUS_LABYRINTH_WRITE_WITNESSES=1 swift test --package-path Packages/Experie
   scenario manifest of the standard scenarios, `full-playthrough`, `hero`, three fixtures and the 80 acceptance rows
   R2-G02-QA-001 … 080; linked into the one app, not available until X-R02-G02.
 
+## Touch controls and panel play (R02-G02-04)
+
+- **Stage and rings.** `stageBounds(level:)` holds every path the level can draw (the amplitude box and every ball), so
+  the four dial rings beside it (`LissajousLabyrinthHandles`: radius 0.18 R, 0.45 R apart, 1.35 R to the right along the
+  authored camera, frequencyA, frequencyB, phaseA, phaseC from the top) never move while a dial turns. The camera fits
+  the content sphere around stage and rings; since then the figure takes about two thirds of the width it had.
+- **Turning.** A knob or a ring band (0.7 … 1.3 ring radius) is picked with R02-F22's rule; the turned angle accumulates
+  on the ring plane (clockwise from the eye raises the value, 40° per frequency step, 22.5° per phase step); release
+  sends one `dial.set` when the value changed. A second finger cancels the turn and orbits (azimuth ±40°, elevation
+  10° … 60°); a double tap on empty space resets the view. The camera is presentation only.
+- **Panel play.** Steppers set pending values; Apply sends one action per changed dial in the order frequencyA,
+  frequencyB, phaseA, phaseC, with the frequencies swapped when only that keeps every intermediate pair coprime, and
+  stops at a refusal or when the level ends. Every certified level is won this way in exactly its certified shortest
+  number of actions (host test over all 100 levels).
+
 ## Failures
 
 `LissajousLabyrinthError` reason codes: `r02-g02.level`, `r02-g02.move`, `r02-g02.stage`, `r02-g02.stale`,
