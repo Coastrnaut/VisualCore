@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-21 (R02-G04-03: registering a candidate also extends the registered list pinned in RealCatalogTests).
+Last updated: 2026-11-21 (R02-G04-04: atan2 of a negated zero puts the seam at −π; write 0 − dy).
 
 ## 1. What is tested, and where
 
@@ -305,6 +305,10 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
 - **A renderer without a colour stream.** `ShaderMeshRenderer` binds position, normal and texture coordinates only;
   Hue Compass's unlit meshes carry their colour in the normal slot and the fallback `MeshRenderer` gets explicit
   colours and (0, 0, 1) normals, so its light term stays finite (R02-G04-03).
+
+- **atan2 and negative zero.** `atan2(-dy, dx)` with dy = 0 passes −0.0 and returns −π for a point straight left of
+  the centre, so the same touch could read +π or −π; Hue Compass's dial computes `atan2(0 - dy, dx)` and keeps its
+  angles in (−π, π] (R02-G04-04).
 
 ### Process
 

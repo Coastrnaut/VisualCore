@@ -202,3 +202,7 @@ Feature 333 (R02-G04-03) adds the experience: the adapter `HueCompassExperienceC
 the compass geometry and GLSL sources in the Core, and the iOS-only `HueCompassExperience` target (presenter, compass
 scene, fallback, a minimal control panel); the experience is registered as a candidate with 94 scenarios.
 
+Feature 334 (R02-G04-04) adds spatial play: `HueCompassOrbit`, `HueCompassDial` (projected centre, swipe angle, hub) and
+the host-tested `HueCompassGestureController` (swipe to turn, tap the hub to probe, two-finger orbit, reset); the panel
+gains "Reset view".
+

@@ -98,3 +98,17 @@ large turn as single steps; the play accepts both.
 - **Registration.** `r02-g04.hue-compass` is a registered candidate (not available until X-R02-G04) with 94 scenarios
   (`Packages/ExperiencesRound02/HueCompass/scenario-manifest.json`, regenerated with `UPDATE_SCENARIO_MANIFEST=1`).
 
+## Interaction (feature 334, R02-G04-04)
+
+- **Swipe to turn.** A one-finger swipe turns a ghost needle by the finger's angle about the projected compass centre
+  (atan2 of the touch relative to the centre, screen up positive, increments accumulated the shorter way round; points
+  within 20 points of the centre add nothing). On release exactly one `compass.turn` of the nearest whole number of
+  bearings, wrapped into −47 … 48, is sent — nothing when it is 0.
+- **Press to probe.** A touch that ends within 10 points of where it began is a tap; inside the hub (the projected disc
+  of 0.3 world units, at least 30 points) it sends one `compass.probe`. A double tap outside the wheel resets the view.
+- **Orbit.** Two fingers orbit: yaw ±40° about the z axis and tilt 15° … 60° from it (authored 35°), refitted so the
+  1.45 sphere stays inside every view; presentation only, never in the digest, snapshot or kernel. A second finger
+  cancels a swipe.
+- **Panel.** Turn ±1 and ±4, Probe, a band picker with Select, Undo, Redo, Next level and Reset view; all 100 certified
+  levels are won through these actions alone (a witness turn of k becomes ⌊|k|/4⌋ presses of ±4 and |k| mod 4 of ±1).
+
