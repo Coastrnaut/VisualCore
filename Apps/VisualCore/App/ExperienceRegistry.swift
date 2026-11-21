@@ -575,11 +575,14 @@ extension ExperienceRegistry {
         return registration
     }
 
-    /// R02-G03 Wave Knot Keeper (feature 323, R02-G03-03): a candidate until X-R02-G03. Snapshot schema 1, so no earlier
-    /// example is stored yet.
+    /// R02-G03 Wave Knot Keeper (features 321–329, R02-G03-01…09): a candidate until X-R02-G03. Snapshot schema 3
+    /// (feature 327), so the schema-1 and schema-2 examples are stored (feature 329, R02-G03-09).
     fileprivate static var waveKnotKeeper: ExperienceRegistration? {
         guard let id = WaveKnotKeeperExperience.id else { return nil }
-        var registration = ExperienceRegistration(id: id, core: WaveKnotKeeperExperienceCore.self) { launch in
+        let examples = [WaveKnotKeeperExperienceCore.schemaOneExample(),
+                        WaveKnotKeeperExperienceCore.schemaTwoExample()].compactMap { $0 }
+        var registration = ExperienceRegistration(id: id, core: WaveKnotKeeperExperienceCore.self,
+                                                  examples: examples) { launch in
             let system = SystemAccessibilityObserver.systemValues()
             return WaveKnotKeeperExperience.make(
                 id: id, storage: launch.storage,

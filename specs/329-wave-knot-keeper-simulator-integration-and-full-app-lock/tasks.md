@@ -13,7 +13,7 @@ tests stay short (< 10 s each; interface tests < 90 s, SC-R02G0309-001). No {own
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G0309-002 Create `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperSchemaExamples.swift`
+- [X] T-R02G0309-002 Create `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperSchemaExamples.swift` — Verified 2026-11-21: 2026-11-21 host exit 0 (all round-two host tests): WaveKnotKeeperSchemaExampleTests 6/6 (both examples restore through migrations to schema 3 with progress kept; digests match; other versions nil; deterministic); registry stores both examples, comment corrected
   (contracts/api.md; data-model: schema 1 "a seeded play of level 1 with one move", schema 2 "campaign, frontier 2,
   level 1 solved without a trace", seed 7, the envelope of `AuroraLoomSchemaExamples`) with
   `Packages/ExperiencesRound02/WaveKnotKeeper/CoreTests/WaveKnotKeeperSchemaExampleTests.swift` (agent A: both
