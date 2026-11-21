@@ -29,8 +29,8 @@ enum CatalogFixture {
     }
 
     @Test func onlyExperiencesWithAPassingIntegrationGateAreAvailable() throws {
-        // X-A01 to X-A25, X-R02-G01 and X-R02-G02 are pass in the migration ledger (2026-11-13 to 2026-11-21); the build
-        // tool is the only writer of this flag.
+        // X-A01 to X-A25 and X-R02-G01 … G03 are pass in the migration ledger (2026-11-13 to 2026-11-21); the build tool
+        // is the only writer of this flag.
         #expect(try CatalogFixture.manifest().available.map(\.id.rawValue) == ["a01.generative-art-studio", "a02.fluid-art-playground", "a03.fractal-explorer",
                          "a04.particle-universe", "a05.infinite-geometry", "a06.visualcore-music-lab",
                          "a07.audio-odyssey", "a08.oscilloscope-studio", "a09.digital-aquarium",
@@ -46,7 +46,8 @@ enum CatalogFixture {
                          "a24.graphics-benchmark-lab",
                          "a25.effects-composer",
                          "r02-g01.aurora-loom",
-                         "r02-g02.lissajous-labyrinth"])
+                         "r02-g02.lissajous-labyrinth",
+                         "r02-g03.wave-knot-keeper"])
     }
 
     @Test func everyIdIsInTheGoldenListAndWellFormed() throws {
@@ -137,7 +138,7 @@ enum CatalogFixture {
                                "r02-g01.aurora-loom",
                                // Feature 313 (R02-G02-03); integrated at X-R02-G02.
                                "r02-g02.lissajous-labyrinth",
-                               // Feature 323 (R02-G03-03): Wave Knot Keeper, a candidate until X-R02-G03.
+                               // Feature 323 (R02-G03-03); integrated at X-R02-G03.
                                "r02-g03.wave-knot-keeper"],
                 "the registrations of Catalog/registrations.json")
     }

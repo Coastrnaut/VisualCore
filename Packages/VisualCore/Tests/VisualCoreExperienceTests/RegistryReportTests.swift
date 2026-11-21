@@ -59,7 +59,8 @@ import Testing
                          "a24.graphics-benchmark-lab",
                          "a25.effects-composer",
                          "r02-g01.aurora-loom",
-                         "r02-g02.lissajous-labyrinth"].compactMap(ExperienceID.init(rawValue:))
+                         "r02-g02.lissajous-labyrinth",
+                         "r02-g03.wave-knot-keeper"].compactMap(ExperienceID.init(rawValue:))
         #expect(manifest.registryReport(registered: integrated).isMatch)
         #expect(manifest.registryReport(registered: []).missingRegistrations == integrated)
     }

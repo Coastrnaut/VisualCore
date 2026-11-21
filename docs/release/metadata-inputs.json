@@ -229,9 +229,17 @@
       "name": "Lissajous Labyrinth",
       "permissions": [],
       "tier": "free"
+    },
+    {
+      "category": "puzzle",
+      "code": "R02-G03",
+      "id": "r02-g03.wave-knot-keeper",
+      "name": "Wave Knot Keeper",
+      "permissions": [],
+      "tier": "free"
     }
   ],
-  "ledger_sha256": "f6430a6353c564387c2b5c9d294088e164dcc0901f4cf62fd595b365a836a92c",
+  "ledger_sha256": "220885755777e5b4933cd756f6dc47fb7bb7f5777c2410b6c0140f4fccda698f",
   "privacy_answers": "unproven",
   "schema": 1
 }

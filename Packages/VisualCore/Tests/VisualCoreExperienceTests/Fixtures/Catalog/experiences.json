@@ -998,7 +998,7 @@
         "catalog_sha256": "12c8ecb8aae7135ff939d99b41a6dc8cf17fb4b7380fb5e4c18347ac5987933f",
         "levels": 100
       },
-      "available": false
+      "available": true
     },
     {
       "id": "r02-g04.hue-compass",
