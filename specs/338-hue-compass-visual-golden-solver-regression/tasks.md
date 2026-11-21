@@ -12,7 +12,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 2: Story 1 — every level stays solvable as certified (P1) 🎯
 
-- [ ] T-R02G0408-002 [P] [US1] Create `Packages/ExperiencesRound02/HueCompass/CoreTests/HueCompassRegressionSolverTests.swift` (agent A: for every
+- [X] T-R02G0408-002 [P] [US1] Create `Packages/ExperiencesRound02/HueCompass/CoreTests/HueCompassRegressionSolverTests.swift` (agent A: for every — Verified 2026-11-21: 2026-11-21 host exit 0: HueCompassRegressionSolverTests 9/9 (100 levels in five bands: witness replay with clues and fingerprints, smallest probe set that settles, work <= 4,657 and equal to certified, largest 3,533; fourteen alterations named)
   level in five bands of 20, "the generated level equals its witness's level; the witness's actions replay to a win with
   exactly its recorded clues and fingerprints; solve returns exactly the certified smallest probe set, which settles
   the level, work ≤ 4,657 and equal to the certified work"; fourteen named alterations of clarification Q2 each fail naming
