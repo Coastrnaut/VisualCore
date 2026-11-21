@@ -1,0 +1,364 @@
+// WaveKnotKeeperExperienceCoreTests — feature 323 (R02-G03-03) T-R02G0303-005 (FR-R02G0303-003, 005; SC-R02G0303-002;
+// clarification Q5). The adapter core: the shared conformance checks pass; the seed picks level `seed % 100 + 1`
+// deterministically in stage `playing`; a legal point.move changes the digest and an illegal one is refused with the
+// state unchanged (the engine's range checks, `r02-g03.not-whole`, the kernel's `r02-g03.move`); point.select changes
+// only the selection, never the digest; undo restores the earlier digest exactly and redo the later one; the certified
+// solution wins; `level.next` wraps 100 to 1 and reset returns; the snapshot round trip and refused payloads (damaged,
+// level out of range, a stale trace, an edited record, a record of a newer schema); the quality tier and the presenter's
+// snapshot time never touch the digest. Legal moves are found with the kernel's own `refusal(of:points:level:)`, so no
+// rope coordinates are hard-coded. Explicit types, plain loops, short runs.
+import Foundation
+import Testing
+@testable import WaveKnotKeeperCore
+import VisualCoreDiagnostics
+import VisualCoreExperience
+
+@Suite struct WaveKnotKeeperExperienceCoreTests {
+    typealias Core = WaveKnotKeeperExperienceCore
+
+    /// The digest of `core` as the engine computes it.
+    static func digest(_ core: Core) throws -> StateDigest {
+        var builder = DigestBuilder(domain: Core.experienceID)
+        try core.writeDigest(into: &builder)
+        return builder.finish()
+    }
+
+    /// The `point.move` action for a kernel move.
+    static func action(_ move: WaveKnotKeeperMove) -> ExperienceAction {
+        let index: Int = Core.directionOrder.firstIndex(of: move.direction) ?? 0
+        return ExperienceAction(control: "point.move", values: [Double(move.point), Double(index)], step: 0)
+    }
+
+    /// The `point.move` action with the given values.
+    static func move(_ point: Double, _ direction: Double) -> ExperienceAction {
+        ExperienceAction(control: "point.move", values: [point, direction], step: 0)
+    }
+
+    /// The `point.select` action with the given value.
+    static func select(_ point: Double) -> ExperienceAction {
+        ExperienceAction(control: "point.select", values: [point], step: 0)
+    }
+
+    /// A control with no values.
+    static func plain(_ control: String) -> ExperienceAction {
+        ExperienceAction(control: control, step: 0)
+    }
+
+    /// Whether `move` is legal on `level`'s start rope and does not win there.
+    static func isQuietStart(_ move: WaveKnotKeeperMove, level: WaveKnotKeeperLevel) -> Bool {
+        guard WaveKnotKeeperPlay.refusal(of: move, points: level.points, level: level) == nil else { return false }
+        var moved: [WaveKnotKeeperPoint] = level.points
+        moved[move.point] = moved[move.point].moved(move.direction)
+        return !level.wins(moved)
+    }
+
+    /// The first move in point-then-direction order that is legal and does not win from the start of every level in
+    /// `levels`.
+    static func quietMove(on levels: [WaveKnotKeeperLevel]) -> WaveKnotKeeperMove? {
+        let count: Int = levels.map(\.points.count).min() ?? 0
+        for point in 0..<count {
+            for direction in Core.directionOrder {
+                let move = WaveKnotKeeperMove(point: point, direction: direction)
+                var quiet: Bool = true
+                for level in levels where !isQuietStart(move, level: level) { quiet = false }
+                if quiet { return move }
+            }
+        }
+        return nil
+    }
+
+    /// The first move in point-then-direction order the kernel refuses on `core`'s rope, with its refusal.
+    static func refusedMove(on core: Core) -> (WaveKnotKeeperMove, WaveKnotKeeperError)? {
+        let play: WaveKnotKeeperPlay = core.play
+        for point in play.points.indices {
+            for direction in Core.directionOrder {
+                let move = WaveKnotKeeperMove(point: point, direction: direction)
+                if let refusal = WaveKnotKeeperPlay.refusal(of: move, points: play.points, level: play.level) {
+                    return (move, refusal)
+                }
+            }
+        }
+        return nil
+    }
+
+    @Test func conformance() async throws {
+        let id: ExperienceID = try #require(ExperienceID(rawValue: Core.experienceID))
+        // Levels 1 (tutorial) and 100 (hardest band), then 2 and 1 after level.next; the scripted moves are legal on
+        // them and none wins. Two seeds keep the run short (each preparation generates a certified level, once).
+        let first: WaveKnotKeeperMove = try #require(Self.quietMove(on: [try Core.level(number: 1),
+                                                                        try Core.level(number: 100)]))
+        let second: WaveKnotKeeperMove = try #require(Self.quietMove(on: [try Core.level(number: 2),
+                                                                         try Core.level(number: 1)]))
+        let a: [Double] = [Double(first.point), Double(Core.directionOrder.firstIndex(of: first.direction) ?? 0)]
+        let b: [Double] = [Double(second.point), Double(Core.directionOrder.firstIndex(of: second.direction) ?? 0)]
+        let actions: [ScriptedAction] = [ScriptedAction("point.select", [0]),
+                                         ScriptedAction("point.move", a),
+                                         ScriptedAction("play.undo"), ScriptedAction("play.redo"),
+                                         ScriptedAction("play.undo"), ScriptedAction("level.next"),
+                                         ScriptedAction("point.select", [3]),
+                                         ScriptedAction("point.move", b)]
+        let rejected: [ScriptedAction] = [ScriptedAction("point.move", [0, 0.5]),
+                                          ScriptedAction("point.move", [0.5, 1]),
+                                          ScriptedAction("point.move", [16, 0]),
+                                          ScriptedAction("point.move", [0, 6]),
+                                          ScriptedAction("point.move", [0]),
+                                          ScriptedAction("point.select", [16]),
+                                          ScriptedAction("point.select", [1.5]),
+                                          ScriptedAction("play.undo"), ScriptedAction("play.redo"),
+                                          ScriptedAction("level.next", [1]), ScriptedAction("bogus")]
+        let plan = ConformancePlan(seeds: [0, 99], stepsPerSegment: 2, actions: actions, rejected: rejected)
+        let report: ConformanceReport = await ExperienceConformance.run(Core.self, id: id, plan: plan)
+        #expect(report.entries.count == ConformanceCheck.allCases.count)
+        for entry in report.entries { #expect(entry.passed, "\(entry.check): \(entry.detail)") }
+    }
+
+    @Test func theControlsTheTiersAndTheProfile() {
+        #expect(Core.experienceID == "r02-g03.wave-knot-keeper" && Core.schemaVersion == 1)
+        #expect(Core.digestDomain == "r02-g03.wave-knot-keeper.v1")
+        #expect(Core.controls.map(\.id) == Core.actionIDs)
+        #expect(Core.actionIDs == ["point.move", "point.select", "play.undo", "play.redo", "level.next"])
+        #expect(Core.controls[0].ranges == [0...15, 0...5])
+        #expect(Core.controls[1].ranges == [0...15])
+        for index in 2..<5 { #expect(Core.controls[index].ranges.isEmpty) }
+        #expect(Core.directionOrder == [.plusX, .minusX, .plusY, .minusY, .plusZ, .minusZ])
+        #expect(Core.qualityTiers == 3)
+        let profile: QualityProfile = Core.qualityProfile
+        #expect(profile.names == ["level-0", "level-1", "level-2"])
+        #expect(QualityDeclaration.problems(profile: profile, tierCount: 3,
+                                            catalogNames: ["level-0", "level-1", "level-2"]).isEmpty)
+        let elements: [Double] = profile.levels.map(\.elementShare)
+        let iterations: [Double] = profile.levels.map(\.iterationShare)
+        let passes: [Int] = profile.levels.map(\.effectPasses)
+        let resolutions: [Double] = profile.levels.map(\.resolutionShare)
+        #expect(elements == [1, 0.625, 0.375] && iterations == [1, 0.5, 0.25] && passes == [2, 1, 0])
+        #expect(resolutions == [1, 1, 1])
+    }
+
+    @Test func theSeedPicksTheLevelDeterministically() async throws {
+        let seeds: [UInt64] = [0, 2, 100, 257]
+        let numbers: [Int] = [1, 3, 1, 58]
+        for index in seeds.indices {
+            #expect(Core.levelNumber(forSeed: seeds[index]) == numbers[index])
+            let first: Core = try await Core.prepare(seed: seeds[index])
+            let second: Core = try await Core.prepare(seed: seeds[index])
+            #expect(first.levelNumber == numbers[index] && first.openingNumber == numbers[index])
+            #expect(first == second)
+            #expect(try Self.digest(first) == Self.digest(second))
+            let expected: WaveKnotKeeperLevel = try Core.generated(number: numbers[index]).level
+            #expect(first.play.level == expected && first.play.points == expected.points)
+            #expect(first.play.stage == .playing && first.play.records.isEmpty && first.outcome == nil)
+            #expect(first.selected == nil)
+        }
+        #expect(Core.levelNumber(forSeed: 99) == 100)
+        // The cache hands back the generator's own level.
+        let fresh: WaveKnotKeeperLevel = try WaveKnotKeeperGenerator.generate(WaveKnotKeeperManifest.entries[0]).level
+        #expect(try Core.level(number: 1) == fresh)
+        #expect(throws: WaveKnotKeeperError.level("number")) { try Core.level(number: 0) }
+        #expect(throws: WaveKnotKeeperError.level("number")) { try Core.level(number: 101) }
+    }
+
+    @Test func aLegalMoveChangesTheDigestAndIllegalOnesChangeNothing() async throws {
+        var core: Core = try await Core.prepare(seed: 0)
+        let opening: StateDigest = try Self.digest(core)
+        let count: Int = core.play.points.count
+        let (refused, refusal): (WaveKnotKeeperMove, WaveKnotKeeperError) = try #require(Self.refusedMove(on: core))
+        let refusedValues: [Double] = Self.action(refused).values
+        var illegal: [[Double]] = [[0, 0.5], [0.25, 1], [16, 0], [-1, 0], [0, 6], [0, -1], [0, .nan], [0], [0, 1, 1],
+                                   refusedValues]
+        if count < 16 { illegal.append([Double(count), 0]) }
+        for values in illegal {
+            var copy: Core = core
+            let result: ActionResult = copy.apply(ExperienceAction(control: "point.move", values: values, step: 0))
+            #expect(!result.isAccepted, "\(values)")
+            let after: StateDigest = try Self.digest(copy)
+            #expect(copy == core && after == opening && copy.play.records.isEmpty, "\(values)")
+        }
+        var probe: Core = core
+        // The kernel's refusals pass through with its reason code.
+        #expect(probe.apply(Self.action(refused)) == .rejected(.rule(code: refusal.reasonCode)))
+        #expect(refusal.reasonCode == "r02-g03.move")
+        if count < 16 {
+            #expect(probe.apply(Self.move(Double(count), 0)) == .rejected(.rule(code: "r02-g03.move")))
+        }
+        // Outside the declared ranges: the engine's refusal; fractions: the adapter's.
+        #expect(probe.apply(Self.move(16, 0)) == .rejected(.outOfRange(index: 0)))
+        #expect(probe.apply(Self.move(0, 6)) == .rejected(.outOfRange(index: 1)))
+        #expect(probe.apply(Self.move(0, 1.5)) == .rejected(.rule(code: WaveKnotKeeperExperienceRule.notWhole)))
+        #expect(probe.apply(Self.plain("play.undo")) == .rejected(.rule(code: "r02-g03.move")))
+        #expect(probe.apply(Self.plain("play.redo")) == .rejected(.rule(code: "r02-g03.move")))
+        #expect(probe.apply(Self.plain("nope")) == .rejected(.unknownControl("nope")))
+        #expect(probe == core)
+        let legal: WaveKnotKeeperMove = try #require(Self.quietMove(on: [core.play.level]))
+        let expected: WaveKnotKeeperPoint = core.play.points[legal.point].moved(legal.direction)
+        #expect(core.apply(Self.action(legal)) == .accepted)
+        #expect(core.play.points[legal.point] == expected && core.play.records.count == 1 && core.play.spent == 1)
+        #expect(core.play.stage == .playing)
+        #expect(try Self.digest(core) != opening)
+    }
+
+    @Test func selectChangesOnlyTheSelection() async throws {
+        var core: Core = try await Core.prepare(seed: 0)
+        let opening: StateDigest = try Self.digest(core)
+        let count: Int = core.play.points.count
+        #expect(core.apply(Self.select(Double(count - 1))) == .accepted)
+        #expect(core.selected == count - 1 && core.snapshot(time: 0).selected == count - 1)
+        #expect(core.apply(Self.select(0)) == .accepted)
+        #expect(core.selected == 0)
+        #expect(try Self.digest(core) == opening && core.play.records.isEmpty)
+        if count < 16 {
+            #expect(core.apply(Self.select(Double(count))) == .rejected(.rule(code: "r02-g03.move")))
+        }
+        #expect(core.apply(Self.select(16)) == .rejected(.outOfRange(index: 0)))
+        #expect(core.apply(Self.select(0.5)) == .rejected(.rule(code: WaveKnotKeeperExperienceRule.notWhole)))
+        #expect(try core.selected == 0 && Self.digest(core) == opening)
+        // The selection is not in the payload: a restored core has none.
+        let restored: Core = try Core.restore(payload: try core.snapshotPayload(), seed: 0)
+        #expect(restored == core && restored.selected == nil)
+        core.reset()
+        #expect(core.selected == nil)
+    }
+
+    @Test func undoRestoresTheEarlierDigestAndRedoTheLater() async throws {
+        var core: Core = try await Core.prepare(seed: 12)
+        let start: [WaveKnotKeeperPoint] = core.play.points
+        let startDigest: StateDigest = try Self.digest(core)
+        let legal: WaveKnotKeeperMove = try #require(Self.quietMove(on: [core.play.level]))
+        #expect(core.apply(Self.action(legal)) == .accepted)
+        let moved: [WaveKnotKeeperPoint] = core.play.points
+        let movedDigest: StateDigest = try Self.digest(core)
+        #expect(movedDigest != startDigest)
+        #expect(core.apply(Self.plain("play.undo")) == .accepted)
+        #expect(core.play.points == start && core.play.spent == 0)
+        #expect(try Self.digest(core) == startDigest)
+        #expect(core.apply(Self.plain("play.redo")) == .accepted)
+        #expect(core.play.points == moved && core.play.spent == 1 && core.play.records.count == 3)
+        #expect(try Self.digest(core) == movedDigest)
+        #expect(core.apply(Self.plain("play.redo")) == .rejected(.rule(code: "r02-g03.move")))
+    }
+
+    @Test func theCertifiedSolutionWins() async throws {
+        let seeds: [UInt64] = [0, 41]
+        for seed in seeds {
+            var core: Core = try await Core.prepare(seed: seed)
+            let generated: WaveKnotKeeperGenerated = try Core.generated(number: core.levelNumber)
+            for move in generated.solution.moves {
+                #expect(core.apply(Self.action(move)) == .accepted, "seed \(seed) \(move)")
+            }
+            #expect(core.play.stage == .won && core.play.points == generated.solution.final, "seed \(seed)")
+            #expect(core.outcome?.code == Core.wonCode, "seed \(seed)")
+            #expect(core.snapshot(time: 0).matchesTarget)
+            let won: Core = core
+            #expect(core.apply(Self.plain("play.undo")) == .rejected(.rule(code: "r02-g03.stage")))
+            #expect(core == won)
+            core.reset()
+            #expect(core.play.stage == .playing && core.outcome == nil && core.play.records.isEmpty)
+        }
+    }
+
+    @Test func nextLevelWrapsAndResetReturnsToTheSeedsLevel() async throws {
+        var core: Core = try await Core.prepare(seed: 98)
+        #expect(core.levelNumber == 99)
+        let legal: WaveKnotKeeperMove = try #require(Self.quietMove(on: [core.play.level]))
+        #expect(core.apply(Self.action(legal)) == .accepted)
+        #expect(core.apply(Self.select(1)) == .accepted)
+        #expect(core.apply(Self.plain("level.next")) == .accepted)
+        #expect(core.levelNumber == 100 && core.play.records.isEmpty && core.play.stage == .playing)
+        #expect(core.selected == nil)
+        #expect(core.apply(Self.plain("level.next")) == .accepted)
+        #expect(core.levelNumber == 1 && core.play.stage == .playing)
+        let first: Core = try await Core.prepare(seed: 0)
+        #expect(core == first)
+        core.reset()
+        let fresh: Core = try await Core.prepare(seed: 98)
+        let resetDigest: StateDigest = try Self.digest(core)
+        let freshDigest: StateDigest = try Self.digest(fresh)
+        #expect(core == fresh && resetDigest == freshDigest)
+    }
+
+    @Test func snapshotRestoreRoundTripAndRefusals() async throws {
+        var core: Core = try await Core.prepare(seed: 31)
+        let legal: WaveKnotKeeperMove = try #require(Self.quietMove(on: [core.play.level]))
+        #expect(core.apply(Self.action(legal)) == .accepted)
+        #expect(core.apply(Self.plain("play.undo")) == .accepted)
+        #expect(core.apply(Self.plain("play.redo")) == .accepted)
+        #expect(core.apply(Self.plain("play.undo")) == .accepted)
+        let payload: Data = try core.snapshotPayload()
+        #expect(try core.snapshotPayload() == payload)
+        let text: String = try #require(String(data: payload, encoding: .utf8))
+        #expect(text.hasPrefix("{\"level\":32,\"records\":["))
+        let restored: Core = try Core.restore(payload: payload, seed: 31)
+        let restoredDigest: StateDigest = try Self.digest(restored)
+        let savedDigest: StateDigest = try Self.digest(core)
+        #expect(restored == core && restoredDigest == savedDigest)
+        #expect(restored.play.canRedo && restored.openingNumber == 32)
+        var redone: Core = restored
+        var original: Core = core
+        #expect(redone.apply(Self.plain("play.redo")) == .accepted)
+        #expect(original.apply(Self.plain("play.redo")) == .accepted)
+        #expect(redone == original)
+        let other: Core = try Core.restore(payload: payload, seed: 0)
+        #expect(other == core && other.openingNumber == 1)
+
+        #expect(throws: WaveKnotKeeperRestoreRefusal.damaged) {
+            try Core.restore(payload: Data("{}".utf8), seed: 31)
+        }
+        #expect(throws: WaveKnotKeeperRestoreRefusal.damaged) {
+            try Core.restore(payload: Data("nope".utf8), seed: 31)
+        }
+        #expect(throws: WaveKnotKeeperRestoreRefusal.damaged) {
+            try Core.restore(payload: Data("{\"level\":\"32\",\"records\":[]}".utf8), seed: 31)
+        }
+        #expect(throws: WaveKnotKeeperRestoreRefusal.levelNumber(0)) {
+            try Core.restore(payload: Data("{\"level\":0,\"records\":[]}".utf8), seed: 31)
+        }
+        #expect(throws: WaveKnotKeeperRestoreRefusal.levelNumber(101)) {
+            try Core.restore(payload: Data("{\"level\":101,\"records\":[]}".utf8), seed: 31)
+        }
+        // The same records on another level: the first record's previous fingerprint is stale there.
+        let wrongLevel: Data = Data(text.replacingOccurrences(of: "\"level\":32", with: "\"level\":1").utf8)
+        #expect(wrongLevel != payload)
+        #expect(throws: WaveKnotKeeperRestoreRefusal.kernel(.stale)) {
+            try Core.restore(payload: wrongLevel, seed: 31)
+        }
+        // A record of a newer schema: the replayed record (schema 1) differs from the stored one.
+        let newer: Data = Data(text.replacingOccurrences(of: "\"schema\":1", with: "\"schema\":2").utf8)
+        #expect(newer != payload)
+        #expect(throws: WaveKnotKeeperRestoreRefusal.kernel(.malformed("record 0"))) {
+            try Core.restore(payload: newer, seed: 31)
+        }
+        // An edited tick: the replayed record differs from the stored one.
+        let edited: Data = Data(text.replacingOccurrences(of: "\"tick\":0", with: "\"tick\":7").utf8)
+        #expect(edited != payload)
+        #expect(throws: WaveKnotKeeperRestoreRefusal.kernel(.malformed("record 0"))) {
+            try Core.restore(payload: edited, seed: 31)
+        }
+        // The engine refuses a payload of a newer snapshot schema before the core sees it.
+        #expect(Core.migrations.currentVersion == 1)
+    }
+
+    @Test func theTierAndTheSnapshotTimeNeverTouchTheDigest() async throws {
+        var core: Core = try await Core.prepare(seed: 44)
+        let legal: WaveKnotKeeperMove = try #require(Self.quietMove(on: [core.play.level]))
+        #expect(core.apply(Self.action(legal)) == .accepted)
+        let digest: StateDigest = try Self.digest(core)
+        let before: Core = core
+        let tiers: [Int] = [-3, 0, 1, 2, 9]
+        let clamped: [Int] = [0, 0, 1, 2, 2]
+        let sides: [Int] = [16, 16, 10, 6, 6]
+        for index in tiers.indices {
+            core.setQualityTier(tiers[index])
+            #expect(core.qualityTier == clamped[index] && core.renderTier.sides == sides[index])
+            #expect(try Self.digest(core) == digest && core == before)
+        }
+        let times: [Double] = [0, 1, 120.5, 1e9, -4, .nan]
+        for time in times {
+            let snapshot: WaveKnotKeeperSceneSnapshot = core.snapshot(time: time)
+            #expect(snapshot.points == core.play.points && snapshot.stage == core.play.stage)
+            #expect(snapshot.levelNumber == core.levelNumber && snapshot.time.isFinite)
+            core.update(step: 3)
+            #expect(try Self.digest(core) == digest)
+        }
+        core.shedCaches()
+        #expect(try Self.digest(core) == digest && core == before)
+    }
+}

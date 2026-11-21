@@ -27,7 +27,7 @@ tests stay short (< 10 s each). No {owner} tasks.
   with `Packages/ExperiencesRound02/WaveKnotKeeper/CoreTests/WaveKnotKeeperSceneGeometryTests.swift` (finite and bounded for extreme settings; projections of
   every element inside the view with margin at 7 aspects; the tube passes within one radius of every segment's
   straight part at every tier; crossing weights only on over-strands); `--name host-3`
-- [ ] T-R02G0303-005 [P] [US2] Create `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperExperienceCore.swift` (controls "point.move [0…15, 0…5],
+- [X] T-R02G0303-005 [P] [US2] Create `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperExperienceCore.swift` (controls "point.move [0…15, 0…5], — Verified 2026-11-21: 2026-11-21 host-4 exit 0 (adapter conformance and contract, renderer purity over 200 snapshots; 12 tests)
   point.select [0…15], play.undo, play.redo, level.next"; digest "level number and play fingerprint"; schema 1 `{level, records}`; quality
   profile of three levels) with `Packages/ExperiencesRound02/WaveKnotKeeper/CoreTests/WaveKnotKeeperExperienceCoreTests.swift` (conformance; undo restores the
   digest; snapshot round trip and refusals) and `Packages/ExperiencesRound02/WaveKnotKeeper/CoreTests/WaveKnotKeeperRendererPurityTests.swift` (200 seeded
