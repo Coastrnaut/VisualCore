@@ -16,6 +16,6 @@ public struct HueCompassProgress: Sendable, Equatable, Codable { /* best units a
     record(level:units:smallest:) */ public static func stars(units: Int, smallest: Int) -> Int
     public static func dailyLevel(year: Int, month: Int, day: Int) -> Int? }   // × 47
 public enum HueCompassMode: Sendable, Equatable, Codable { case campaign, practice, daily(level: Int) }
-// Adapter controls added: level.select [1…100], mode.daily [y, m, d], mode.practice, mode.campaign, tutorial.dismiss,
-// tutorial.hint; codes r02-g04.locked, r02-g04.date; snapshot schema 2 with migration from 1.
+// Adapter controls added: level.select [1…100], mode.daily [y, m, d], mode.practice, mode.campaign, tutorial.dismiss;
+// codes r02-g04.locked, r02-g04.date; snapshot schema 2 with migration from 1.
 ```

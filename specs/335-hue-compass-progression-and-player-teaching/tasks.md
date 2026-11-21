@@ -37,7 +37,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks.
 ## Phase 4: Adapter, scenarios and panel
 
 - [ ] T-R02G0405-004 [US1] [US2] [US3] [US4] Edit `Packages/ExperiencesRound02/HueCompass/Core/HueCompassExperienceCore.swift` (controls "level.select
-  [1 … 100], mode.daily [year, month, day], mode.practice, mode.campaign, tutorial.dismiss, tutorial.hint"; practice
+  [1 … 100], mode.daily [year, month, day], mode.practice, mode.campaign, tutorial.dismiss"; practice
   allowance 24; daily wins record results without opening levels and a locked daily level is playable; choosing daily
   or practice drops the left level's records, mode.campaign returns to a fresh campaign play of the same level; the
   tutorial on levels 1 … 3 in every mode, once per opening; progress and mode in the digest, the tutorial step in the

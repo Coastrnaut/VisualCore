@@ -9,7 +9,7 @@ Teach and pace Hue Compass on Wave Knot Keeper's feature-325 pattern: `HueCompas
 clues seen; a selection when it settles, else a settling or best-splitting probe, else a best guess on the last unit)
 with `HueCompassFailureExplanation`; `HueCompassProgress` (best units and stars, open frontier, daily level × 47),
 `HueCompassMode` and `HueCompassTutorialStep`; the adapter gains `level.select`, `mode.daily`, `mode.practice`,
-`mode.campaign`, `tutorial.dismiss` and `tutorial.hint`, codes `r02-g04.locked` and `r02-g04.date`, and snapshot schema 2
+`mode.campaign` and `tutorial.dismiss`, codes `r02-g04.locked` and `r02-g04.date`, and snapshot schema 2
 with a migration from 1; the presenter shows the tutorial, hints and failure text and the panel gains Hint and mode
 controls. Research: [research.md](research.md). Data: [data-model.md](data-model.md). API:
 [contracts/api.md](contracts/api.md). Quickstart: [quickstart.md](quickstart.md).
