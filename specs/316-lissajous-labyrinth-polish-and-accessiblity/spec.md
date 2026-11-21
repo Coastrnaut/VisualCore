@@ -124,7 +124,9 @@ a pure function of the dials and stage; the loop plays only while wanted, on scr
 ### Edge Cases
 
 - **Many quick actions (an Apply of several pending values, quick turns):** haptics and announcements obey the shared
-  rate limits; an outcome is never lost.
+  rate limits (a burst of announcements posts its newest, so after Apply the last action's state, or the outcome, is
+  heard); an outcome is never lost.
+- **A gesture turn in progress:** the preview is not announced; the released action is announced like any other.
 - **VoiceOver off:** no announcement is made; haptics still follow the switch.
 - **Audio session unavailable or interrupted:** the loop does not start or stops; the game is unaffected and the sound
   choice stays on.
