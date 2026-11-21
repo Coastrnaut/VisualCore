@@ -176,3 +176,7 @@ Feature 328 (R02-G03-08) adds the regression net: the solver regression over all
 `WAVE_KNOT_KEEPER_WRITE_GOLDEN=1 swift test --package-path Packages/ExperiencesRound02 --filter
 WaveKnotKeeperRegressionGoldenTests`), simulator golden-frame and memory tests, and
 `scripts/wave_knot_keeper_regression.py`.
+
+Feature 329 (R02-G03-09) integrates the game into the one app as a candidate: panel identifiers,
+`WaveKnotKeeperSchemaExamples.swift` (stored schema-1 and schema-2 examples), interface tests in
+`Apps/VisualCore/Tests/UI/WaveKnotKeeper` (chunk `l3`) and app unit tests.

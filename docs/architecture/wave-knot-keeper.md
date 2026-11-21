@@ -168,6 +168,18 @@ moves are listed point by point and direction by direction, and a state is solve
 - **Running it.** CI runs the host part as "Wave Knot Keeper regression (host)"; locally
   `python3 scripts/wave_knot_keeper_regression.py` runs host and simulator parts with one summary.
 
+## In-app integration (R02-G03-09)
+
+- **Identifiers.** Every panel control carries `experience.r02-g03.wave-knot-keeper.<name>` (point-picker, the six
+  move buttons, undo, redo, next-level, reset-view, hint, dismiss-tutorial, failure-undo, retry, campaign, daily,
+  practice, replay, replay-step, replay-stop, level-picker, sound).
+- **Interface tests.** `WKPlayUITests` wins level 1 through the point picker and the +x button (3 of 3 stars, level 2
+  open) and keeps the progress over a relaunch; `WKReplayUITests` replays the win and stops. They run as the serial
+  chunk `l3` of `release_check.py`.
+- **Stored examples.** `WaveKnotKeeperExperienceCore.schemaOneExample()` and `schemaTwoExample()` are registered; the
+  app's migration check restores both into schema 3.
+- **Candidate.** Wave Knot Keeper stays a candidate (not available without `-vcCandidates`) until X-R02-G03.
+
 ## Failures
 
 `WaveKnotKeeperError` reason codes: `r02-g03.level`, `r02-g03.move`, `r02-g03.stage`, `r02-g03.stale`,
