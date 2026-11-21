@@ -37,7 +37,9 @@ No NEEDS CLARIFICATION remains.
 | II App-neutral API | PASS — game code stays in ExperiencesRound02. |
 | IV Host-testable | PASS — solver regression and golden digests are host tests run by CI. |
 | V Implementation before devices | PASS — device frame time and memory are D1–D3 observations (SC-R02G0108-007). |
-| VII Code-only visuals | PASS — baselines are descriptions computed by code; no stored picture. |
+| III Explicit GPU Lifecycle and Thread Ownership | PASS — the memory cycles prove the scene releases its GPU objects on teardown and memory warnings. |
+| VI Evidence Over Assertion | PASS — every check is a recorded run; device figures wait for D1–D3. |
+| XIII Code-Driven Visuals | PASS — baselines are descriptions computed by code; no stored picture. |
 | IX Bounded input | PASS — work bound 3,840 per level; 16 frames; 12 memory cycles. |
 | XII One purchase, no advertising | PASS — free; no store code. |
 
