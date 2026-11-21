@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-21
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G05-06 (migration ledger, game feature of experience R02-G05) · ID namespace FR-R02G0506-###,
 SC-R02G0506-###, T-R02G0506-###
@@ -29,6 +29,62 @@ Canonical overrides:
   Motion and Reduce Flashing contract of the experience host, and R02-G05-01 … 05.
 - **Model:** feature 336 (Hue Compass's polish and accessibility), adapted to carving, valves, the fluid run, the basins
   and the touch controls of feature 344.
+
+## Clarifications
+
+### Session 2026-11-21
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+336's answers where the games agree. Facts checked in code (read-only, 2026-11-21): the shared `ExperienceFeedback`
+route, `AnnouncementKind` (`rejection`, `outcome`, `level`, `state`), `HapticKind` (`selection`, `success`, `warning`,
+`error`) and `AmbientLoopPlayer` with a fixed `AmbientLoopRecipe` (1 … 6 partials, 4 … 16 s) are those feature 336 used;
+Colorfall Canyons's flow bands move at 0.5 cycles per second (1 on waterfalls) with a band depth of 0.35, held at t = 0
+under Reduce Motion; its glow limit is 0.5 under Reduce Flashing (2.0 otherwise); fluid sheet brightness is
+0.35 + 0.65 · min(volume, 24) / 24 and changes at once when a step runs, an emitter dims to 0.3 when not flowing; the
+kernel's refusal codes are `r02-g05.action`, `budget`, `stage`, `stale`, `malformed`, `locked`, `date` and `not-whole`;
+the presenter has no feedback route yet (refusals show "That change was refused: <code>").
+
+- Q: What exactly is announced, and with which kind? → A: after an accepted carve (`state`): "Carved row r, column c. n
+  actions left." (n = budget − spent; "1 action left"); a valve: "<Colour> valve open." or "<Colour> valve closed." with
+  the same suffix; a step: "Tick t of T. f of m basins filled." (filled = the basin accepts its masses); undo and redo:
+  "Undone. " / "Redone. " followed by "Tick t of T. n actions left."; a cell picked in the panel (`state`): "Row r,
+  column c picked."; a win (`outcome`): "Every basin is filled. Level won with s actions, k of 3 stars." (without the
+  stars in practice); a failure (`outcome`): the failure explanation of feature 345; a level or mode change (`level`):
+  "Level n, band b, <mode>." with the tutorial instruction when shown; a refusal (`rejection`) in words:
+  `r02-g05.locked` "That level is not open yet.", `r02-g05.date` "That date cannot be used.", `r02-g05.action` "That
+  action is not allowed here.", `r02-g05.budget` "No actions are left.", `r02-g05.stage` "The level has ended.",
+  `r02-g05.not-whole` "That value must be a whole number.", any other code "That change was refused." Texts are a pure
+  function of the old and new core (and the refusal code), so tests compare them exactly; the panel shows the same
+  refusal text. Impact: FR-R02G0506-002; SC-R02G0506-002.
+- Q: Which haptics play, and how are bursts handled? → A: `selection` for an accepted carve, valve, step, undo or redo;
+  `success` for a win; `warning` for a failure; `error` for a refusal; cell picks, level changes and drag highlights play
+  none. The shared planners' intervals apply; when one action both changes the canyon and ends the play (a step that
+  wins or fails), only the outcome is planned, so an outcome is never dropped behind a selection haptic. Impact:
+  FR-R02G0506-003; SC-R02G0506-002.
+- Q: How are fades done and measured under Reduce Flashing? → A: the presenter keeps a light level per fluid cell (its
+  sheet brightness, 0 when empty), per spring emitter (1 flowing, 0.3 not) and the win glow (0 or 1), each easing toward
+  its target in presentation time (0.15 s normally, 0.45 s under Reduce Flashing, linear); under Reduce Flashing a fade
+  that has started finishes before it may turn back. The scene draws the eased levels; the state and digest never see
+  them. The flow bands stay at 0.5 (1 on waterfalls) cycles per second, below 3, with depth 0.35, and are still under
+  Reduce Motion. The measure: sampling the drawn levels every 1/60 s through a scripted win and adversarial flicker (a
+  valve toggled and undone every frame, steps of 1 tick, retry), no element crosses half its range more than 3 times per
+  second, and every complete one-way fade of more than half the range takes at least 0.4 s under Reduce Flashing.
+  Impact: FR-R02G0506-004; SC-R02G0506-003.
+- Q: Where does the sound choice live, and what is the recipe? → A: a Sound toggle in the panel, off by default, held by
+  the presenter (presentation only; saving it is R02-G05-07). The recipe is a pure function of the basins and the stage:
+  a root at 98 Hz, one partial per spring colour with fluid in the basins (cyan 98 × 3/2, coral 98 × 5/4, yellow 98 × 2)
+  whose gain is the base gain × (0.3 + 0.7 · that colour's share of all basin mass), a brighter added octave when won
+  and halved gains when failed; a 10-second loop. The presenter rebuilds the loop only when the level opens, a step,
+  carve, valve, undo or redo changes the basins or the stage, or the toggle turns on, never per frame. The loop plays
+  exactly while the choice is on, the controls are on screen and the scene is active. Impact: FR-R02G0506-006;
+  SC-R02G0506-004.
+- Q: What do Larger Text and Increase Contrast require of the panel? → A: the panel scrolls vertically, uses system text
+  styles that grow with Dynamic Type up to the largest accessibility size, wraps rather than truncates labels, and uses
+  system colours, so Increase Contrast applies; button rows wrap into a column at accessibility sizes; the cell picker is
+  an accessibility-adjustable element labelled "Cell to carve" with the value "row r, column c"; each valve button is
+  labelled "<Colour> valve" with the value "open, n units left", "closed" or "dry"; a summary element reads "Tick t of
+  T. n actions left. Basin k: cyan a, coral b, yellow c; target <description>." for every basin; on iPad the panel keeps
+  a readable width (at most 520 points). Impact: FR-R02G0506-001, 005; SC-R02G0506-001.
 
 ## User Scenarios & Testing *(mandatory)*
 
