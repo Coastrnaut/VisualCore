@@ -6,6 +6,7 @@ states, source licence, code-only graphics, iPad/iPhone layout, simulator proof,
 **Feature**: [spec.md](../spec.md)
 
 Ownership: `[x]` means the reviewer judged the requirement's quality sufficient; it says nothing about the code.
+Evaluated by the lead under the owner's standing delegation on 2026-11-21; failures were corrected in the artifacts.
 
 ## Player impact
 
