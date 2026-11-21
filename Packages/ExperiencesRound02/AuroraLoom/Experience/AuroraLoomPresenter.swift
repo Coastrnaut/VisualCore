@@ -23,6 +23,8 @@
 // (`stepPending`, announced, no move); `applyPending` commits each pending change as one move (ribbon order, wave
 // before phase), stops at the first refusal and drops the rest; `clearPending` drops them; a change of the level, mode
 // or play from elsewhere drops them too.
+// Gate X-R02-G01: `probes` declares the frame probes the verification runner samples: two background corners, outside
+// the fitted loom (5 % margin), must be the dark night clear while the real scene (not the fallback) is drawn.
 #if os(iOS)
 import AuroraLoomCore
 import Foundation
@@ -184,6 +186,15 @@ final class AuroraLoomPresenter: ExperiencePresenter {
 
     func teardown(_ context: RenderContext) {
         scene.release()
+    }
+
+    /// The frame probes of the frame last drawn (see the file header): the top-left and bottom-right background
+    /// corners are `dark` (the night clear) once a snapshot was drawn by the real scene; none otherwise.
+    func probes(_ core: AuroraLoomExperienceCore) -> [FrameProbe] {
+        guard lastSnapshot != nil, scene.fallbackReason == nil else { return [] }
+        return [FrameProbe(name: "night-top-left", x: 0.02, y: 0.02, expected: FrameColorClass.dark.rawValue),
+                FrameProbe(name: "night-bottom-right", x: 0.98, y: 0.98, expected: FrameColorClass.dark.rawValue)]
+            .compactMap { $0 }
     }
 
     func shedCaches() {
