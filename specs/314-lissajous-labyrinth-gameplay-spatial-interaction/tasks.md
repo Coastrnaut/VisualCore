@@ -62,7 +62,7 @@ tests stay short (< 10 s each).
 
 ## Phase 5: Simulator proof (P2)
 
-- [ ] T-R02G0204-006 [US1] [US2] [US3] [US4] Create
+- [X] T-R02G0204-006 [US1] [US2] [US3] [US4] Create — Verified 2026-11-21: 2026-11-21 sim-27 exit 0 on sim-27.2: LissajousLabyrinthGestureWiringTests 15/15 (turns through the shell's pointer entry set the named value; second finger, cancel, empty space, paused, won and failed play send nothing; a refused turn shows and announces its text; selection described and outlined; undo/redo after a gesture; orbit limits keep the frame and Reset view returns; pending Apply wins all 100 levels in their certified shortest; Clear, outside changes and a partway win). The run found two defects, fixed: the presenter did not drop a touch on suspend (cancelPointers added) and the selection outline lay outside the framed content (now inside the ring, 0.6 R). The new framing shrinks the figure, so the 313 frame checks run at 12 × (spec FR-R02G0204-008 amended); all Lissajous experience tests pass
   `Packages/ExperiencesRound02/LissajousLabyrinth/ExperienceTests/LissajousLabyrinthGestureWiringTests.swift` (scripted
   touches through the presenter's pointer entry change a dial by exactly the named value; a second finger and a cancel
   send nothing; paused or ended play sends nothing; a refused action shows its text with the state unchanged; the

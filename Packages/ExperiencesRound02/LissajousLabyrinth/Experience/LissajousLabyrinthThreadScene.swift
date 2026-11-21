@@ -38,8 +38,9 @@ final class LissajousLabyrinthThreadScene {
     /// The half width of a dial ring's band and of the selection outline's band, as fractions of the ring radius.
     static let ringBand = 0.06
     static let outlineBand = 0.05
-    /// The selection outline's radius as a fraction of the ring radius (outside the ring and its knobs).
-    static let outlineScale = 1.32
+    /// The selection outline's radius as a fraction of the ring radius: inside the ring and clear of its knobs (which
+    /// reach in to 0.75), so the outline stays within the content sphere the camera frames (ring plus knob, 1.25).
+    static let outlineScale = 0.6
 
     private var registry: ResourceRegistry?
     private var threadRenderer: ShaderMeshRenderer?

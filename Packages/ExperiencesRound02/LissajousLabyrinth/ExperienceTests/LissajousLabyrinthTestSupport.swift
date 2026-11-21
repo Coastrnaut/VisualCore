@@ -17,8 +17,11 @@
 // Adapted bound (documented): clarification Q3 names a 96 × 64 still. At that size the thread (0.035 world units)
 // projects to 0.17 … 0.25 px on the five checked levels, so pixel-centre rasterization (no multisampling) leaves 30 … 45 %
 // of the path samples without a lit pixel within 2 px, and ring bands are 0.2 … 0.6 px wide (a host CPU raster of the
-// Core meshes, 2026-11-20). The checks therefore run at 8 × that frame, 768 × 512 (the same aspect 1.5 and framing),
-// where the CPU raster finds every sample and every ring band. `width`/`height` below are the single place to change.
+// Core meshes, 2026-11-20). The checks therefore ran at 8 × that frame, 768 × 512 (the same aspect 1.5 and framing),
+// where the CPU raster finds every sample and every ring band. Feature 314 (R02-G02-04) frames the dial rings beside the
+// figure, which shrinks the figure on screen by about a third, so the checks now run at 12 × (1,152 × 768) and the
+// colour search radius grows by the same 1.5 (1.5 → 2.25 px): the same world distances as before. `width`/`height`
+// below are the single place to change.
 // Luminance is the Rec. 709 weighting of the stored 0 … 1 channel values. Short runs only (no sleep, no wall-clock
 // assertion).
 #if os(iOS)
@@ -45,7 +48,7 @@ enum LissajousLabyrinthTest {
     }
 
     /// The frame-check size: 8 × clarification Q3's 96 × 64 (see the file header), aspect 1.5.
-    static let width = 768, height = 512
+    static let width = 1_152, height = 768
     /// The seeds of the checked levels 1, 21, 41, 61 and 81.
     static let seeds: [UInt64] = [0, 20, 40, 60, 80]
     /// The path samples checked: every `tickStep`-th lap tick (128 per lap at every tier).
@@ -57,7 +60,7 @@ enum LissajousLabyrinthTest {
     static let colourTolerance = 0.12
     static let backgroundTolerance = 0.05
     /// How far (pixels) from the band point / obstacle centre a matching pixel may be.
-    static let colourSearch = 1.5
+    static let colourSearch = 2.25
     /// How far (pixels) a background pixel must be from every scene element.
     static let backgroundClearance = 6.0
     /// The obstacles' opacity in the scene (`drawSpheres`).

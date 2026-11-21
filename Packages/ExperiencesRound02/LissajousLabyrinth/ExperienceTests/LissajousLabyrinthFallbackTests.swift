@@ -107,8 +107,9 @@ import VisualCoreMath
         host.view.layoutIfNeeded()
         try LissajousLabyrinthTest.draw(session, frames: 2)
         #expect(shell.state != .failed)
-        // Aspects 0.4, 0.75, 1, 1.5 and 2.5, the short side 512 px (the thread's pixel width of the check size).
-        let sizes: [(w: Int, h: Int)] = [(512, 1_280), (512, 683), (512, 512), (768, 512), (1_280, 512)]
+        // Aspects 0.4, 0.75, 1, 1.5 and 2.5, the short side 768 px (the thread's pixel width of the check size; 512 px
+        // before feature 314 framed the dial rings beside the figure).
+        let sizes: [(w: Int, h: Int)] = [(768, 1_920), (768, 1_024), (768, 768), (1_152, 768), (1_920, 768)]
         for size in sizes {
             let rgba = try LissajousLabyrinthTest.still(session, width: size.w, height: size.h)
             let snapshot = try #require(shell.presenter.lastSnapshot)

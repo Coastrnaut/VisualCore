@@ -157,8 +157,10 @@ names it; undo after a gesture restores the digest from before it.
   Clear MUST drop them; an outside change (an action, undo, redo, next level, restore) MUST drop them; each pending value
   MUST be announced, and Apply and Clear MUST carry accessibility labels and be shown only while something is pending.
 - **FR-R02G0204-007**: Gesture logic MUST be deterministic and testable without a screen.
-- **FR-R02G0204-008**: Existing tests MUST pass unchanged except where they drove the steppers; new public names are
-  documented; the reference regression passes.
+- **FR-R02G0204-008**: Existing tests MUST pass unchanged except where they drove the steppers or where a pixel-check
+  size follows the new framing (amended 2026-11-21: the dial rings shrink the figure on screen, so the frame checks run at
+  12 × instead of 8 × the 96 × 64 still, with the colour search and the fallback test's sizes scaled by the same 1.5);
+  new public names are documented; the reference regression passes.
 
 ### Key Entities
 

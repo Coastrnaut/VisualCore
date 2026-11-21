@@ -143,6 +143,12 @@ final class LissajousLabyrinthPresenter: ExperiencePresenter {
         if let action { send(action, port: port) }
     }
 
+    /// Drops a touch in progress (the shell suspends the experience): the turn ends without an action.
+    func cancelPointers() {
+        gestures.cancel()
+        mirror.candidate = nil
+    }
+
     /// Selects `dial` (a stepper was used or a test selects it).
     func select(_ dial: LissajousLabyrinthDial) {
         gestures.select(dial)
