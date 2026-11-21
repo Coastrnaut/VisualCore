@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "ColorfallCanyonsPanelWin"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter ColorfallCanyonsPanelWin",
+  "elapsed_seconds": 10.423,
+  "exit_code": 0,
+  "finished": "2026-11-21T21:45:47+00:00",
+  "gate": "R02-G05-04",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G05-04.host-4.log",
+  "log_sha256": "e9767c1329b1ef061c9c801ff2895be62351a0fd31f17c0df2e012af65983e5f",
+  "name": "host-4",
+  "started": "2026-11-21T21:45:37+00:00",
+  "timed_out": false
+}

@@ -34,7 +34,7 @@ existing programs).
 
 ## Phase 4: Story 4 — every move without gestures (P1)
 
-- [ ] T-R02G0504-004 [P] [US4] Create `Packages/ExperiencesRound02/ColorfallCanyons/CoreTests/ColorfallCanyonsPanelWinTests.swift`: all 100 certified levels won
+- [X] T-R02G0504-004 [P] [US4] Create `Packages/ExperiencesRound02/ColorfallCanyons/CoreTests/ColorfallCanyonsPanelWinTests.swift`: all 100 certified levels won — Verified 2026-11-21: 2026-11-21 host-4 exit 0: 9 tests (all 100 certified levels won through panel actions in 8 groups; panel undo/redo restores digests), suite 7.6 s (.autonomy/migration/checks/R02-G05-04.host-4.json); lead retest
   through panel actions only (the picker's carvable-cell order then `canyon.carve`, the valve buttons, Run as
   `time.step` of the ticks left), split so each test is under 10 s, plus panel Undo then Redo after a carve restoring
   the digests before and after it; `--name host-4`
