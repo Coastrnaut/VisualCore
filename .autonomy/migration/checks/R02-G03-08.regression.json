@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "scripts/wave_knot_keeper_regression.py"
+  ],
+  "command": "python3 scripts/wave_knot_keeper_regression.py",
+  "elapsed_seconds": 11.829,
+  "exit_code": 0,
+  "finished": "2026-11-21T13:28:08+00:00",
+  "gate": "R02-G03-08",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G03-08.regression.log",
+  "log_sha256": "783b1783bf4b79caf93fce36d612c5292e802b220578a0124d8a5ef0c61c22cf",
+  "name": "regression",
+  "started": "2026-11-21T13:27:56+00:00",
+  "timed_out": false
+}
