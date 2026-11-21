@@ -36,7 +36,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 4: Stories 2 and 3 — simulator frames and memory (P1, P2)
 
-- [ ] T-R02G0408-005 [US2] [US3] Edit `Packages/ExperiencesRound02/HueCompass/Experience/HueCompassCompassScene.swift` (`liveObjectCount`: renderers
+- [X] T-R02G0408-005 [US2] [US3] Edit `Packages/ExperiencesRound02/HueCompass/Experience/HueCompassCompassScene.swift` (`liveObjectCount`: renderers — Verified 2026-11-21: 2026-11-21 sim-27 exit 0 on sim-27.2: HueCompassRegressionGoldenFrameTests (16 golden frames rendered, snapshots equal to the golden ones, feature-333 frame checks) and HueCompassRegressionMemoryTests (12 cycles; liveObjectCount 0 after each warning and close) with every Hue Compass experience test
   held, 0 after release) and create `Packages/ExperiencesRound02/HueCompass/ExperienceTests/HueCompassRegressionGoldenFrameTests.swift` and
   `Packages/ExperiencesRound02/HueCompass/ExperienceTests/HueCompassRegressionMemoryTests.swift` (agent C: the 16 frames rendered and checked
   against their descriptions with the feature-333 tolerances (3 px lit by 0.15, band colours within 0.15, background within 0.05); 12 open-draw-warn-close cycles with

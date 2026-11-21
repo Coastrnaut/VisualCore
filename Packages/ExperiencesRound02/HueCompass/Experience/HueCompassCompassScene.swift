@@ -15,6 +15,7 @@
 // swipe previews a bearing a ghost needle is drawn after the real one: the same needle mesh turned about the z axis by
 // (preview − bearing) × 2π / 96 through `u_model`, pearl at half opacity, without glow shells. The fallback path draws
 // no ghost.
+// Feature 338 (R02-G04-08) T-R02G0408-005: `liveObjectCount` reports the renderers held (0 after `release()`).
 #if os(iOS)
 import Foundation
 import HueCompassCore
@@ -74,6 +75,13 @@ final class HueCompassCompassScene {
     private var markDraws: [MarkDraw] = []
     private var fallbackRenderers: [MeshRenderer] = []
     private var geometryKey: GeometryKey?
+
+    /// The renderers the scene holds (each with its buffers): 0 after `release()` (feature 338, the memory regression).
+    /// The ghost needle and the glow shells are drawn with the needle renderer, so they never count on their own.
+    var liveObjectCount: Int {
+        (wheelRenderer == nil ? 0 : 1) + (fogRenderer == nil ? 0 : 1) + (needleRenderer == nil ? 0 : 1)
+            + markDraws.count + fallbackRenderers.count
+    }
     private var aspect = 1.0
 
     /// Records the registry and the view's aspect.
