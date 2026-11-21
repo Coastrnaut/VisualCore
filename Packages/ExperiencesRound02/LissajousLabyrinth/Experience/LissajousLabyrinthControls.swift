@@ -120,6 +120,21 @@ struct LissajousLabyrinthControls: View {
                         .accessibilityValue(mirror.mode == .practice ? "Selected" : "Not selected")
                         .accessibilityAddTraits(mirror.mode == .practice ? .isSelected : [])
                 }
+                if mirror.replaying {
+                    Text("Replay: action \(mirror.replayPosition) of \(mirror.replayLength)").font(.callout)
+                    row {
+                        Button("Step") { presenter.stepReplay(port: port) }
+                            .accessibilityLabel("Play the next action of the replay")
+                            .accessibilityValue("Action \(mirror.replayPosition) of \(mirror.replayLength)")
+                        Button("Stop") { presenter.stopReplay(port: port) }
+                            .accessibilityLabel("Stop the replay")
+                            .accessibilityValue("\(mirror.replayLength) actions")
+                    }
+                } else if mirror.replayAvailable {
+                    Button("Replay best solution") { presenter.startReplay(port: port) }
+                        .accessibilityLabel("Replay your best solution of this level")
+                        .accessibilityValue("Level \(mirror.levelNumber)")
+                }
                 Menu("Levels") {
                     ForEach(0..<5, id: \.self) { band in
                         Section("Band \(band + 1)") {
@@ -153,6 +168,7 @@ struct LissajousLabyrinthControls: View {
         case .campaign: mode = "Campaign"
         case .practice: mode = "Practice"
         case .daily: mode = "Daily level"
+        case .replay: mode = "Replay"
         }
         return "\(mode) · goal: \(mirror.allowance) actions allowed, best possible \(mirror.shortest)"
     }
@@ -168,6 +184,7 @@ struct LissajousLabyrinthControls: View {
         case .campaign: "Campaign"
         case .practice: "Practice"
         case .daily: "Daily level"
+        case .replay: "Replay"
         }
     }
 

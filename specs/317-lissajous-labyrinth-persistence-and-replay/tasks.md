@@ -38,7 +38,7 @@ tests stay short (< 10 s each).
 
 ## Phase 4: Panel and simulator proof
 
-- [ ] T-R02G0207-005 [US3] Edit `Packages/ExperiencesRound02/LissajousLabyrinth/Experience/LissajousLabyrinthPresenter.swift` and
+- [X] T-R02G0207-005 [US3] Edit `Packages/ExperiencesRound02/LissajousLabyrinth/Experience/LissajousLabyrinthPresenter.swift` and — Verified 2026-11-21: 2026-11-21 sim-27 exit 0 on sim-27.2: LissajousLabyrinthReplayTests 3/3 (replay reproduces the win's fingerprints action by action, ends won, progress unchanged, other actions refused, replay-end, stop returns to campaign, retry during replay restarts it; replay of an unsolved level refused; dropped results announced once, singular and plural) and all 49 Lissajous experience tests. Fixed on the way: specific words for the three replay refusals (host test added), a replay win claims no stars, replay is not offered while one runs
   `Packages/ExperiencesRound02/LissajousLabyrinth/Experience/LissajousLabyrinthControls.swift` (Replay for a verified solved level, Step and Stop with labels and
   values, the replay position; the dropped results announced once: "n saved results could not be checked and were
   removed.") and create `Packages/ExperiencesRound02/LissajousLabyrinth/ExperienceTests/LissajousLabyrinthReplayTests.swift` (agent C: replay through the port

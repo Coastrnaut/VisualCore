@@ -22,6 +22,9 @@
 // plans refusals with `refused(code:)`; it keeps a feedback log, eases the scene's lights (`LissajousLabyrinthLights`,
 // 0.45 s fades under Reduce Flashing) and offers the ambient recipe to `LissajousLabyrinthSound` at level openings and
 // play ends.
+// Feature 317 (R02-G02-07) T-R02G0207-005 (FR-R02G0207-003, 004): the mirror carries whether a replay is available for
+// the current level and, during replay, its position; `startReplay`, `stepReplay` and `stopReplay` send the replay
+// actions; the first described core whose restore dropped results announces them once.
 #if os(iOS)
 import Foundation
 import LissajousLabyrinthCore
@@ -71,6 +74,12 @@ final class LissajousLabyrinthMirror {
     var shortest = 0
     /// Whether the ambient sound is on (feature 316; off by default).
     var soundOn = false
+    /// Whether a verified result with a trace exists for the current level (feature 317).
+    var replayAvailable = false
+    /// Whether a replay is running, its position and its length (feature 317).
+    var replaying = false
+    var replayPosition = 0
+    var replayLength = 0
 }
 
 /// One entry of the tier log: the tier drawn and why it changed.
@@ -96,6 +105,8 @@ final class LissajousLabyrinthPresenter: ExperiencePresenter {
     private(set) var gestures = LissajousLabyrinthGestureController()
     /// The last described core (pending values, adjustments and the outside-change check).
     private(set) var latestCore: LissajousLabyrinthExperienceCore?
+    /// Whether the dropped results of a restore were announced (feature 317).
+    private var droppedAnnounced = false
     /// The haptic held while Apply sends its actions; played once when Apply ends (feature 316).
     private var heldHaptic: HapticKind?
     /// True while `applyPending` sends its actions, so the described changes do not count as outside changes.
@@ -313,7 +324,26 @@ final class LissajousLabyrinthPresenter: ExperiencePresenter {
         case .practice: return ("mode.practice", [])
         case .daily: return ("mode.daily", Self.dateValues(dailyDate ?? date))
         case .campaign: return ("level.select", [Double(core.levelNumber)])
+        case .replay(let level): return ("replay.start", [Double(level)])
         }
+    }
+
+    /// Starts the replay of the current level's best stored solution (`replay.start`; feature 317).
+    @discardableResult
+    func startReplay(port: ExperienceActionPort) -> ActionResult {
+        send("replay.start", [Double(mirror.levelNumber)], port: port)
+    }
+
+    /// Plays the next action of the running replay (`replay.step`).
+    @discardableResult
+    func stepReplay(port: ExperienceActionPort) -> ActionResult {
+        send("replay.step", port: port)
+    }
+
+    /// Stops the running replay and returns to the campaign (`replay.stop`).
+    @discardableResult
+    func stopReplay(port: ExperienceActionPort) -> ActionResult {
+        send("replay.stop", port: port)
     }
 
     /// Starts the current level again in its mode; in daily mode with the date that opened it (today's local date
@@ -421,7 +451,29 @@ final class LissajousLabyrinthPresenter: ExperiencePresenter {
                 sound.offer(LissajousLabyrinthSoundRecipe.recipe(dials: core.play.dials, stage: core.play.stage))
             }
         }
+        if !droppedAnnounced, core.reconciliationDropped > 0 {
+            droppedAnnounced = true
+            let count = core.reconciliationDropped
+            let text = count == 1 ? "1 saved result could not be checked and was removed."
+                : "\(count) saved results could not be checked and were removed."
+            route(LissajousLabyrinthFeedbackPlan(text: text, kind: .state, haptic: nil))
+        }
         latestCore = core
+        if let level = core.progress.solved[core.levelNumber] {
+            mirror.replayAvailable = level.verified && !level.trace.isEmpty
+                && !LissajousLabyrinthFeedbackPlan.isReplay(core.mode)
+        } else {
+            mirror.replayAvailable = false
+        }
+        if case .replay(let level) = core.mode {
+            mirror.replaying = true
+            mirror.replayPosition = core.play.records.count
+            mirror.replayLength = core.progress.solved[level]?.trace.count ?? 0
+        } else {
+            mirror.replaying = false
+            mirror.replayPosition = 0
+            mirror.replayLength = 0
+        }
         if let key = hintKey, key != Self.hintKey(core) {
             hintKey = nil
             mirror.hintLevel = 0

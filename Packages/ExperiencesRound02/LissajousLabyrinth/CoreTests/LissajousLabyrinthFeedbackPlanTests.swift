@@ -170,4 +170,17 @@ import VisualCoreSimulation
         #expect(Plan.refused(code: locked.code).text == "That level is not open yet.")
         #expect(Plan.refused(code: date.code).text == "That date cannot be used.")
     }
+
+    /// Feature 317: the replay refusals are announced in their own words, the two longer codes before `replay`.
+    @Test func replayRefusalsInWords() {
+        let cases: [(String, String)] = [
+            ("action.rule.r02-g02.no-replay", "There is no saved solution to replay for this level."),
+            ("action.rule.r02-g02.replay-end", "The replay is over."),
+            ("action.rule.r02-g02.replay", "Stop the replay first."),
+        ]
+        for (code, text) in cases {
+            #expect(LissajousLabyrinthFeedbackPlan.refused(code: code)
+                == LissajousLabyrinthFeedbackPlan(text: text, kind: .rejection, haptic: .error), "\(code)")
+        }
+    }
 }

@@ -80,7 +80,9 @@ public struct LissajousLabyrinthFeedbackPlan: Sendable, Equatable {
     /// "action.rule.r02-g02.locked"): kind `rejection`, haptic `error`, and the text "That level is not open yet."
     /// (a code containing `r02-g02.locked`), "That date cannot be used." (`r02-g02.date`), "That change is not allowed:
     /// the frequencies must share no factor, and a dial must change." (`r02-g02.move`), "No actions are left."
-    /// (`r02-g02.allowance`), "The level has ended." (`r02-g02.stage`), otherwise "That change was refused.".
+    /// (`r02-g02.allowance`), "The level has ended." (`r02-g02.stage`), "There is no saved solution to replay for this
+    /// level." (`r02-g02.no-replay`), "The replay is over." (`r02-g02.replay-end`), "Stop the replay first."
+    /// (`r02-g02.replay`), otherwise "That change was refused.".
     public static func refused(code: String) -> LissajousLabyrinthFeedbackPlan {
         let text: String
         if code.contains(LissajousLabyrinthExperienceRule.locked) {
@@ -93,10 +95,23 @@ public struct LissajousLabyrinthFeedbackPlan: Sendable, Equatable {
             text = "No actions are left."
         } else if code.contains(LissajousLabyrinthError.stage.reasonCode) {
             text = "The level has ended."
+        } else if code.contains(LissajousLabyrinthExperienceRule.noReplay) {
+            // Checked before `replay`, whose code is a substring of the two replay codes (feature 317).
+            text = "There is no saved solution to replay for this level."
+        } else if code.contains(LissajousLabyrinthExperienceRule.replayEnd) {
+            text = "The replay is over."
+        } else if code.contains(LissajousLabyrinthExperienceRule.replay) {
+            text = "Stop the replay first."
         } else {
             text = "That change was refused."
         }
         return LissajousLabyrinthFeedbackPlan(text: text, kind: .rejection, haptic: .error)
+    }
+
+    /// Whether `mode` is a replay (its win re-runs a stored result and claims no stars; feature 317).
+    public static func isReplay(_ mode: LissajousLabyrinthMode) -> Bool {
+        if case .replay = mode { return true }
+        return false
     }
 
     /// The name of a mode in a level announcement: "campaign", "practice", "daily level" or "replay".
@@ -129,7 +144,7 @@ public struct LissajousLabyrinthFeedbackPlan: Sendable, Equatable {
         switch core.play.stage {
         case .won:
             let text: String
-            if core.mode == .practice {
+            if core.mode == .practice || Self.isReplay(core.mode) {
                 text = "The path is safe. Level won in \(Self.actions(spent))."
             } else {
                 let stars: Int = LissajousLabyrinthProgress.stars(actions: spent, shortest: core.certifiedShortest)
