@@ -13,7 +13,8 @@
   level fails and the solver's smallest count is in the band's range. Rationale: a prototype that placed basins at random
   rarely reached them, and one that planted random carves mostly changed nothing (levels won unedited); this rule
   produced 20 of 20 levels per band within 256 candidates. Alternatives: hand-authored levels (excluded by the spec).
-- **R4 Band ranges.** Decision: smallest edits 1 … 2, 2 … 3, 3, 3 … 4, 4 for bands 1 … 5 with 1, 2, 2, 3, 3 springs.
+- **R4 Band ranges.** Decision: smallest edits 1 … 2, 2 … 3, 3, 3, 3 for bands 1 … 5 (corrected from 3 … 4 and 4 for bands 4
+  and 5 after measuring the depth-4 search on the debug host build) with 1, 2, 2, 3, 3 springs.
   Rationale: band means cannot fall, and R02-F24's progression rule (drop ≤ 1, jump ≤ 3) holds across band boundaries.
 - **R5 Witness digests.** Decision: 16 hex characters of the SHA-256 of the cell masses after every tick up to the win.
   Rationale: the source asks for per-tick state digests; 16 characters keep 100 files small while any change still shows.

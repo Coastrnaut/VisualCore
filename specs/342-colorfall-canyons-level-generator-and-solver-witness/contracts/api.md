@@ -12,7 +12,7 @@ public struct ColorfallCanyonsCounterexample: Sendable, Equatable, Codable { pub
 public struct ColorfallCanyonsSolution: Sendable, Equatable { public let edits: [ColorfallCanyonsEdit]
     public var smallest: Int { edits.count }; public let work: Int; public let smaller: Int; public let winTick: Int }
 public enum ColorfallCanyonsSolver {
-    public static let maximumDepth = 4
+    public static let maximumDepth = 3
     public static func moves(_ level: ColorfallCanyonsLevel) -> [ColorfallCanyonsEdit]   // carvable cells, then springs
     public static func routing(_ level: ColorfallCanyonsLevel, heights: [Int]) -> [Int?]   // every cell's downhill
     public static func run(_ level: ColorfallCanyonsLevel, edits: [ColorfallCanyonsEdit]) -> (verdict: ColorfallCanyonsVerdict, tick: Int)?  // nil: illegal set
@@ -28,7 +28,7 @@ public struct ColorfallCanyonsGenerated: Sendable, Equatable { public let entry:
     public let difficulty: ColorfallCanyonsDifficulty; public let skipped: Int }
 public enum ColorfallCanyonsGenerator {
     public static let tutorialLevels: ClosedRange<Int>   // 1 … 3
-    public static let maximumCandidates = 256
+    public static let maximumCandidates = 512
     public static func candidate(_ entry: ColorfallCanyonsManifestEntry, index: Int) -> (level: ColorfallCanyonsLevel, planted: [ColorfallCanyonsEdit])?
     public static func generate(_ entry: ColorfallCanyonsManifestEntry) throws(ColorfallCanyonsError) -> ColorfallCanyonsGenerated
     public static func catalogDigest(_ levels: [ColorfallCanyonsLevel]) -> String

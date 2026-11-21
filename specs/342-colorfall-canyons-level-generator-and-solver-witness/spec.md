@@ -58,17 +58,23 @@ with at most 6,540 distinct routings simulated by the solver for one level.
   Each basin's target is its planted contents V: shares by per-mille floor (rest to the largest colour), fill V − draw(0 …
   2) (at least 1), capacity V + draw(0 … 4), tolerance one of 50, 100, 150, protected with chance 60 % and 0 wrong units
   tolerated. A candidate is kept when the planted plan wins, the unedited level does not, and the solver's smallest edit
-  count lies in the band's range (bands 1 … 5: 1 … 2, 2 … 3, 3, 3 … 4, 4); otherwise k grows, at most 256 candidates, then
-  `generation(n)`. Ids `colorfall-canyons-NNN`; tutorial flag on levels 1 … 3; difficulty = band. Impact:
+  count lies in the band's range (bands 1 … 5: 1 … 2, 2 … 3, 3, 3, 3); otherwise k grows, at most 512 candidates, then
+  `generation(n)`. Corrected during implementation (2026-11-21, measured on the debug host build): ranges 3 … 4 and 4
+  for bands 4 and 5 needed a depth-4 search costing about 30 s per band, and level 49 found no candidate within 256 (its
+  371st qualifies); bands 4 and 5 now differ from band 3 by three springs and basins on a larger grid. Ids `colorfall-canyons-NNN`; tutorial flag on levels 1 … 3; difficulty = band. Impact:
   FR-R02G0502-001; SC-R02G0502-001, 003.
 - Q: How does the solver decide solvability and how much work may it do? → A: an edit set is a multiset of carves of the
   level's carvable cells (in cell order) plus a set of valve toggles (each spring at most once), applied before the first
-  tick, followed by running to the tick limit. `ColorfallCanyonsSolver` tries edit sets of size 0, 1, 2, 3, 4 in that
+  tick, followed by running to the tick limit. `ColorfallCanyonsSolver` tries edit sets of size 0, 1, 2, 3 in that
   order, each size in the lexicographic order of non-decreasing move lists (carves by cell, then valves by spring), skips
   sets that carve below height 0, and keys each by its routing (every cell's downhill neighbour) and valve states; each
   distinct key is simulated once, asserting exact conservation on every tick. The first winning set is the smallest. Work
-  = distinct keys simulated; enumeration is bounded by Σ_{k ≤ 4} C(m + k − 1, k) sets for m ≤ 48 + 3 moves. Search depth
-  4 is the bound: a level needing more is not certified. Impact: FR-R02G0502-002; SC-R02G0502-001, 002.
+  = distinct keys simulated; enumeration is bounded by Σ_{k ≤ 3} C(m + k − 1, k) sets for m ≤ 48 + 3 moves. Search depth
+  3 is the bound: a level needing more is not certified. Exact speed-ups (implementation, 2026-11-21): carves of cells no
+  fluid can reach within the depth (and touching none) are left out; routing keys are updated incrementally with a
+  64-bit Zobrist hash and compared in full on a hit; the search simulates with an allocation-free copy of the kernel's
+  tick that stops once nothing can move (then only the time failure remains), and the set it returns is re-run through
+  the kernel. Impact: FR-R02G0502-002; SC-R02G0502-001, 002.
 - Q: What difficulty metrics are stored and what progression is required? → A: `ColorfallCanyonsDifficulty` holds the
   smallest edit count, the distinct routings simulated, the win tick of the witness, the spring, basin and protected-basin
   counts and the carvable-cell count. The catalog in manifest order keeps R02-F24's standard `ProgressionRule` (drop at
@@ -136,7 +142,7 @@ file is refused.
 ### Edge Cases
 
 - **A seed whose candidate is unsolvable, too easy or too hard for its band:** the generator moves to the next candidate
-  deterministically (at most 256) and records how many it skipped; no candidate within the bound is a named
+  deterministically (at most 512) and records how many it skipped; no candidate within the bound is a named
   refusal.
 - **More than one smallest edit set:** allowed; the witness picks one by a stated tie rule.
 - **A level solvable with no edit:** never emitted.

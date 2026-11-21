@@ -26,7 +26,7 @@ Evaluated by the lead under the owner's standing delegation on 2026-11-21; failu
 
 ## Empty and error states
 
-- [x] CHK007 Are the failure modes named (no candidate within 256, damaged, newer, edited or non-replaying witness)? [Coverage,
+- [x] CHK007 Are the failure modes named (no candidate within 512, damaged, newer, edited or non-replaying witness)? [Coverage,
   Spec §Edge Cases; Clarifications Q5]
 - [x] CHK008 Are the counterexamples defined for every smallest count, including 1? [Edge Case, Spec §Edge Cases] —
   corrected: for a smallest count of 1 the near miss is the unedited level (added to the edge cases).

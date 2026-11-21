@@ -24,7 +24,7 @@ run uses). Fixture seed 2_342; tests stay short (< 10 s each).
 ## Phase 3: Story 1 — every shipped level can be solved (P1) 🎯
 
 - [ ] T-R02G0502-003 [US1] Implement `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsSolver.swift` (clarification Q2: ColorfallCanyonsEdit carve
-  and valve, moves = carvable cells in order then springs; edit sets of size 0 … 4 as non-decreasing move lists, each valve
+  and valve, moves = carvable cells in order then springs; edit sets of size 0 … 3 as non-decreasing move lists, each valve
   at most once, sets carving below 0 skipped; key = routing and valves, each key simulated once with conservation asserted
   every tick; first winning set is the smallest; work = distinct keys simulated; smaller = keys of fewer edits simulated;
   win tick; `run(_:edits:)`) and, after it, agent A's `Packages/ExperiencesRound02/ColorfallCanyons/CoreTests/ColorfallCanyonsSolverTests.swift` (seed 2_342:
@@ -35,10 +35,10 @@ run uses). Fixture seed 2_342; tests stay short (< 10 s each).
 ## Phase 4: Story 2 — levels come from their planned seeds (P1)
 
 - [ ] T-R02G0502-004 [US2] Create `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsGenerator.swift` (ColorfallCanyonsBandProfile "grid 6 × 5, 6 × 5,
-  7 × 5, 8 × 6, 8 × 6; springs 1, 2, 2, 3, 3; depressions 3, 4, 5, 8, 8; smallest 1 … 2, 2 … 3, 3, 3 … 4, 4",
+  7 × 5, 8 × 6, 8 × 6; springs 1, 2, 2, 3, 3; depressions 3, 4, 5, 8, 8; smallest 1 … 2, 2 … 3, 3, 3, 3",
   `candidate(_:index:)` drawing in the order of clarification Q1 from `SeededRandom(seed: SeedDerivation.derive(seed,
-  index: k))` with the planted plan and basins, ColorfallCanyonsGenerated, `generate` with k = 0 … 255, id
-  `colorfall-canyons-NNN`, budget = manifest budget, tutorial for 1 … 3, difficulty = band, `.generation(number)` beyond 256;
+  index: k))` with the planted plan and basins, ColorfallCanyonsGenerated, `generate` with k = 0 … 511, id
+  `colorfall-canyons-NNN`, budget = manifest budget, tutorial for 1 … 3, difficulty = band, `.generation(number)` beyond 512;
   `catalogDigest`) and, after it, agent C's `Packages/ExperiencesRound02/ColorfallCanyons/CoreTests/ColorfallCanyonsGeneratorTests.swift` (determinism; band
   ranges; budget; planted plan wins; unedited fails; skipped recorded and re-checked; an impossible profile refused);
   `--name host-3`

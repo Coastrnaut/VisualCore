@@ -7,7 +7,7 @@
 
 Extend `ColorfallCanyonsCore` (R02-G05-01, feature 341) with the content pipeline of Colorfall Canyons: the 100-entry
 manifest (`ColorfallCanyonsManifest`), the edit-set solver (`ColorfallCanyonsSolver`: the smallest multiset of carves and
-set of valve toggles before the first tick that wins when time runs, depth bound 4, each distinct routing simulated once
+set of valve toggles before the first tick that wins when time runs, depth bound 3, each distinct routing simulated once
 with conservation asserted), difficulty metrics (`ColorfallCanyonsDifficulty`), the seeded generator
 (`ColorfallCanyonsGenerator`: mesa terrain, springs, a planted path change per spring, basins at the planted pools with
 targets from the planted run; candidates until one is proven within its band) and versioned witness files
@@ -22,11 +22,11 @@ targets from the planted run; candidates until one is proven within its band) an
 `SeedDerivation.derive(_:index:)`, `PuzzleCatalog.digest(id:identities:)`, `ProgressionRule`); VisualCoreMath
 (`StableHash`). No GPU, GLSL, Objective-C++ or UIKit code; no new package or target.
 **Seeds**: level n uses its manifest seed; candidate k draws from `SeededRandom(seed: SeedDerivation.derive(seed, index:
-k))`, k = 0 … 255. Brute-force cross-checks use seed 2_342.
+k))`, k = 0 … 511. Brute-force cross-checks use seed 2_342.
 **CPU reference**: every simulated run uses R02-G05-01's `ColorfallCanyonsFluid.tick` and asserts `isConserved()` each tick.
 **Testing**: `swift test --package-path Packages/ExperiencesRound02` (CI step exists); regression as for 341.
-**Performance**: the solver enumerates at most Σ_{k ≤ 4} C(m + k − 1, k) edit sets (m ≤ 51 moves) and simulates each
-distinct routing once (the prototype's worst level: 6,540 runs of ≤ 120 ticks over ≤ 48 cells). Catalog tests are split
+**Performance**: the solver enumerates at most Σ_{k ≤ 3} C(m + k − 1, k) edit sets (m ≤ 51 moves) and simulates each
+distinct routing once; measured on the debug host build: 3.1 s (band 2) to 14.7 s (band 4) to regenerate 20 levels. Catalog tests are split
 by band (and halves) so each stays under 10 s on a debug host build; CI timings measured, never asserted.
 **Constraints**: additive to R02-G05-01's public API; budget = the manifest move budget (8 … 19); every value an exact
 integer; no network, no art; witness files written only with `COLORFALL_CANYONS_WRITE_WITNESSES=1`.
@@ -41,7 +41,7 @@ No NEEDS CLARIFICATION remains.
 | II App-neutral API | PASS — game code stays in ExperiencesRound02; VisualCore API unchanged. |
 | IV Host-testable | PASS — pure Core with host tests; witness files checked byte for byte on the host. |
 | V Implementation before devices | PASS — no device work. |
-| IX Bounded input | PASS — candidates (256), search (depth 4) and witness decoding bounded. |
+| IX Bounded input | PASS — candidates (512), search (depth 3) and witness decoding bounded. |
 | X Licensing and provenance | PASS — the manifest is copied from the archived design (round2.md); generated content is original. |
 | XI One app and stable identity | PASS — experience R02-G05; level and catalog fingerprints pinned. |
 | XII One purchase, no advertising | PASS — free tier; no store code. |
