@@ -2,6 +2,7 @@
 // bundled catalog and the registry agree; the app model shows the empty launcher for the real catalog and six
 // tiles in three sections for the fixture; a premium tile gives the notice and no session; the quality override
 // is applied when an experience opens. The storage helper `TestStorage` is in StoreTests.swift.
+import AuroraLoomCore
 import Foundation
 import SwiftUI
 import VisualCoreDiagnostics
@@ -1131,6 +1132,95 @@ final class AppModelTests: XCTestCase {
         storage.defaults.set(1, forKey: "one")
         storage.defaults.set(2, forKey: "two")
         XCTAssertEqual(DebugInventory.keys(defaults: storage.defaults, domain: storage.suite), ["one", "two"])
+    }
+
+    // MARK: Aurora Loom in the app (feature 309, R02-G01-09; T-R02G0109-005, FR-R02G0109-003, FR-R02G0109-006)
+
+    /// The Aurora Loom candidate's registration.
+    private func auroraLoomRegistration() throws -> ExperienceRegistration {
+        let id = try ExperienceID(AuroraLoomExperienceCore.experienceID)
+        return try XCTUnwrap(ExperienceRegistry.candidates.first { $0.id == id }, "Aurora Loom is a candidate")
+    }
+
+    /// Clarification Q3: the stored schema-1 and schema-2 examples restore to their digests through the migrations.
+    func testTheAuroraLoomRegistrationRestoresItsStoredExamples() async throws {
+        let registration = try auroraLoomRegistration()
+        XCTAssertEqual(AuroraLoomExperienceCore.schemaVersion, 3)
+        let one = try XCTUnwrap(AuroraLoomExperienceCore.schemaOneExample(), "schema-1 example")
+        let two = try XCTUnwrap(AuroraLoomExperienceCore.schemaTwoExample(), "schema-2 example")
+        XCTAssertEqual(one.version, 1)
+        XCTAssertEqual(two.version, 2)
+        let problems: [String] = await registration.migrationProblems()
+        XCTAssertEqual(problems, [], "\(registration.id)")
+    }
+
+    /// Without `-vcCandidates` Aurora Loom is a candidate only: outside `all`, unavailable and not opened.
+    func testAuroraLoomIsACandidateAndUnavailableWithoutTheCandidatesArgument() async throws {
+        let id = try ExperienceID(AuroraLoomExperienceCore.experienceID)
+        XCTAssertEqual(id.rawValue, "r02-g01.aurora-loom")
+        XCTAssertTrue(ExperienceRegistry.candidates.map(\.id).contains(id))
+        XCTAssertFalse(ExperienceRegistry.all.map(\.id).contains(id))
+        let categories = try CategoryList(data: bundled("categories"))
+        let manifest = try CatalogManifest(data: bundled("experiences"), categories: categories)
+        XCTAssertTrue(manifest.experiences.contains { $0.id == id }, "a catalog id")
+        XCTAssertFalse(manifest.available.contains { $0.id == id }, "not available")
+        let storage = try TestStorage(self)
+        let model = AppModel(environment: storage.environment(catalog: try bundled("experiences"),
+                                                              categories: try bundled("categories"),
+                                                              registry: ExperienceRegistry.all))
+        XCTAssertFalse(model.shown.map(\.id).contains(id), "no tile")
+        let opened = await model.open(id)
+        XCTAssertFalse(opened)
+        XCTAssertNil(model.session.experience)
+    }
+
+    /// With the candidates registered Aurora Loom is shown, opens through the registry and engine, and level 1 is
+    /// won by its certified solution as `ribbon.move [ribbon, control, step]` actions (control 0 wave, 1 phase).
+    func testAuroraLoomOpensAsACandidateAndLevelOneIsWonByItsCertifiedSolution() async throws {
+        let registration = try auroraLoomRegistration()
+        let id = registration.id
+        let storage = try TestStorage(self)
+        let base = try storage.environment(catalog: bundled("experiences"), categories: bundled("categories"),
+                                       registry: ExperienceRegistry.all, arguments: [DebugLaunch.candidatesArgument])
+        let environment = DebugLaunch.environment(base: base, candidates: [registration])
+        XCTAssertTrue(environment.registry.map(\.id).contains(id))
+        let model = AppModel(environment: environment)
+        XCTAssertTrue(model.shown.map(\.id).contains(id), "the launcher shows the candidate")
+        XCTAssertTrue(registration.controls.map(\.id).contains("ribbon.move"))
+
+        var engine = ExperienceEngine<AuroraLoomExperienceCore>(id: id)
+        try await engine.prepare(seed: 0)
+        try engine.activate()
+        XCTAssertNil(engine.outcome)
+        let certified = try AuroraLoomExperienceCore.generated(number: 1)
+        XCTAssertFalse(certified.solution.moves.isEmpty)
+        for move in certified.solution.moves {
+            let control: Double = move.control == .wave ? 0 : 1
+            let values: [Double] = [Double(move.ribbon), control, Double(move.step)]
+            XCTAssertEqual(engine.handle(control: "ribbon.move", values: values), .accepted, "\(values)")
+        }
+        XCTAssertEqual(engine.outcome?.code, "won")
+    }
+
+    /// Clarification Q5: the interface tests pin level 1's target steps; they equal the Core's certified solution.
+    /// Spec amendment (feature 309): the round-two puzzles open with seed 0, so a player starts at level 1 (the stable
+    /// seed of their ids opened Aurora Loom at level 79 and Lissajous Labyrinth at level 35).
+    func testTheRoundTwoPuzzlesOpenAtLevelOne() throws {
+        XCTAssertEqual(try auroraLoomRegistration().openingSeed, 0)
+        XCTAssertEqual(AuroraLoomExperienceCore.levelNumber(forSeed: 0), 1)
+        let lissajous = try ExperienceID("r02-g02.lissajous-labyrinth")
+        let registration = try XCTUnwrap(ExperienceRegistry.candidates.first { $0.id == lissajous })
+        XCTAssertEqual(registration.openingSeed, 0)
+        for other in ExperienceRegistry.all { XCTAssertNil(other.openingSeed, "\(other.id.rawValue) keeps its stable seed") }
+    }
+
+    func testAuroraLoomLevelOneTargetStepsEqualTheCore() throws {
+        let certified = try AuroraLoomExperienceCore.generated(number: 1)
+        XCTAssertEqual(certified.level.startSteps.wave, [15, 15, 3])
+        XCTAssertEqual(certified.level.startSteps.phase, [12, 12, 3])
+        XCTAssertEqual(certified.solution.setting.wave, [15, 15, 15])
+        XCTAssertEqual(certified.solution.setting.phase, [12, 12, 12])
+        XCTAssertEqual(AuroraLoomExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
     }
     #endif
 }

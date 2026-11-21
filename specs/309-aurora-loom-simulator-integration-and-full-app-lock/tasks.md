@@ -40,7 +40,7 @@ tests stay short (< 10 s each; interface tests < 90 s, SC-R02G0109-001). No {own
 
 ## Phase 4: Story 2 — the app's logic accepts the game (P1)
 
-- [ ] T-R02G0109-005 [US2] Edit `Apps/VisualCore/Tests/Unit/AppModelTests.swift` (agent B: both examples restore through
+- [X] T-R02G0109-005 [US2] Edit `Apps/VisualCore/Tests/Unit/AppModelTests.swift` (agent B: both examples restore through — Verified 2026-11-20: 2026-11-21 app-unit-2 exit 0 (examples restore through the app's migration check, the candidate opens and level 1 is won through the engine, unavailable without -vcCandidates, level 1 targets equal the Core, round-two puzzles open at level 1)
   the app's migration check; the candidate opens through the registry and engine and plays level 1 to a win; without
   `-vcCandidates` it is not available and not openable; `AL`'s pinned level 1 targets equal the Core's certified
   solution); `--name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`
