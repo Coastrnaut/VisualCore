@@ -13,6 +13,8 @@
 // panel tells the presenter when it is on screen.
 // Feature 327 (R02-G03-07) T-R02G0307-005: Replay best solution for a verified solved level, and during replay its
 // position with Step and Stop, each with a label and a value.
+// Feature 329 (R02-G03-09) T-R02G0309-003 (FR-R02G0309-001; clarification Q1): every control carries the identifier
+// `experience.r02-g03.wave-knot-keeper.<name>` (`port.identifier`), the names listed in ``identifierNames``.
 #if os(iOS)
 import SwiftUI
 import VisualCoreExperienceHost
@@ -28,6 +30,13 @@ struct WaveKnotKeeperControls: View {
     /// The button titles and spoken names of the six directions, in `WaveKnotKeeperDirection.allCases` order.
     static let titles: [String] = ["+x", "−x", "+y", "−y", "Over", "Under"]
     static let spoken: [String] = ["right", "left", "up", "down", "towards you (over)", "away from you (under)"]
+    /// The identifier names of the six direction buttons, in `WaveKnotKeeperDirection.allCases` order (feature 329).
+    static let directionNames: [String] = ["move-plus-x", "move-minus-x", "move-plus-y", "move-minus-y", "move-over",
+                                           "move-under"]
+    /// Every control's identifier name (clarification Q1 of feature 329), each once.
+    static let identifierNames: [String] = ["point-picker"] + directionNames
+        + ["undo", "redo", "next-level", "reset-view", "hint", "dismiss-tutorial", "failure-undo", "retry", "campaign",
+           "daily", "practice", "replay", "replay-step", "replay-stop", "level-picker", "sound"]
 
     @Environment(\.dynamicTypeSize) private var typeSize
 
@@ -74,14 +83,17 @@ struct WaveKnotKeeperControls: View {
                 Button("Step") { presenter.stepReplay(port: port) }
                     .accessibilityLabel("Play the next move of the replay")
                     .accessibilityValue("Move \(mirror.replayPosition) of \(mirror.replayLength)")
+                    .accessibilityIdentifier(port.identifier("replay-step"))
                 Button("Stop") { presenter.stopReplay(port: port) }
                     .accessibilityLabel("Stop the replay")
                     .accessibilityValue("\(mirror.replayLength) moves")
+                    .accessibilityIdentifier(port.identifier("replay-stop"))
             }
         } else if mirror.replayAvailable {
             Button("Replay best solution") { presenter.startReplay(port: port) }
                 .accessibilityLabel("Replay your best solution of this level")
                 .accessibilityValue("Level \(mirror.levelNumber)")
+                .accessibilityIdentifier(port.identifier("replay"))
         }
     }
 
@@ -90,6 +102,7 @@ struct WaveKnotKeeperControls: View {
         Toggle("Sound", isOn: Binding(get: { mirror.soundOn }, set: { presenter.setSound(on: $0) }))
             .accessibilityLabel("Ambient sound")
             .accessibilityValue(mirror.soundOn ? "on" : "off")
+            .accessibilityIdentifier(port.identifier("sound"))
     }
 
     /// The value of the play buttons: the level and the moves spent.
@@ -129,6 +142,7 @@ struct WaveKnotKeeperControls: View {
                 Button("Dismiss") { presenter.dismissTutorial(port: port) }
                     .accessibilityLabel("Dismiss the tutorial")
                     .accessibilityValue("Tutorial shown")
+                    .accessibilityIdentifier(port.identifier("dismiss-tutorial"))
             }
         }
     }
@@ -141,9 +155,11 @@ struct WaveKnotKeeperControls: View {
                 Button("Undo") { send("play.undo") }
                     .accessibilityLabel("Undo the last move")
                     .accessibilityValue(Self.progressValue(mirror))
+                    .accessibilityIdentifier(port.identifier("failure-undo"))
                 Button("Retry") { presenter.retry(port: port) }
                     .accessibilityLabel("Retry the level")
                     .accessibilityValue(Self.modeName(mirror.mode))
+                    .accessibilityIdentifier(port.identifier("retry"))
             }
         }
     }
@@ -154,6 +170,7 @@ struct WaveKnotKeeperControls: View {
             Button("Hint") { presenter.showHint(port: port) }
                 .accessibilityLabel("Show a hint")
                 .accessibilityValue(mirror.hintLevel == 0 ? "none shown" : "level \(mirror.hintLevel) of 3")
+                .accessibilityIdentifier(port.identifier("hint"))
             if let hint = mirror.hintText { Text(hint).font(.callout).fixedSize(horizontal: false, vertical: true) }
         }
     }
@@ -165,14 +182,17 @@ struct WaveKnotKeeperControls: View {
                 .accessibilityLabel("Play the campaign")
                 .accessibilityValue(mirror.mode == .campaign ? "Selected" : "Not selected")
                 .accessibilityAddTraits(mirror.mode == .campaign ? .isSelected : [])
+                .accessibilityIdentifier(port.identifier("campaign"))
             Button("Daily") { presenter.playDaily(port: port) }
                 .accessibilityLabel("Play today's daily level")
                 .accessibilityValue(Self.isDaily(mirror.mode) ? "Selected" : "Not selected")
                 .accessibilityAddTraits(Self.isDaily(mirror.mode) ? .isSelected : [])
+                .accessibilityIdentifier(port.identifier("daily"))
             Button("Practice") { send("mode.practice") }
                 .accessibilityLabel("Practise this level with more moves")
                 .accessibilityValue(mirror.mode == .practice ? "Selected" : "Not selected")
                 .accessibilityAddTraits(mirror.mode == .practice ? .isSelected : [])
+                .accessibilityIdentifier(port.identifier("practice"))
         }
     }
 
@@ -193,6 +213,7 @@ struct WaveKnotKeeperControls: View {
         }
         .accessibilityLabel("Choose an open level")
         .accessibilityValue("Levels 1 to \(mirror.frontier) open")
+        .accessibilityIdentifier(port.identifier("level-picker"))
     }
 
     /// The goal line: moves allowed, the best possible and the mode.
@@ -227,6 +248,7 @@ struct WaveKnotKeeperControls: View {
                     onDecrement: { select((mirror.selected + mirror.pointCount - 1) % mirror.pointCount) })
                 .accessibilityLabel("Selected point")
                 .accessibilityValue("\(mirror.selected + 1) of \(mirror.pointCount)")
+                .accessibilityIdentifier(port.identifier("point-picker"))
         }
     }
 
@@ -237,6 +259,7 @@ struct WaveKnotKeeperControls: View {
                 Button(Self.titles[index]) { send("point.move", [Double(mirror.selected), Double(index)]) }
                     .accessibilityLabel("Move the selected point \(Self.spoken[index])")
                     .accessibilityValue("Point \(mirror.selected + 1)")
+                    .accessibilityIdentifier(port.identifier(Self.directionNames[index]))
             }
         }
     }
@@ -247,15 +270,19 @@ struct WaveKnotKeeperControls: View {
             Button("Undo") { send("play.undo") }
                 .accessibilityLabel("Undo the last move")
                 .accessibilityValue(Self.progressValue(mirror))
+                .accessibilityIdentifier(port.identifier("undo"))
             Button("Redo") { send("play.redo") }
                 .accessibilityLabel("Redo the move")
                 .accessibilityValue(Self.progressValue(mirror))
+                .accessibilityIdentifier(port.identifier("redo"))
             Button("Next level") { send("level.next") }
                 .accessibilityLabel("Go to the next level")
                 .accessibilityValue("Level \(mirror.levelNumber) now")
+                .accessibilityIdentifier(port.identifier("next-level"))
             Button("Reset view") { presenter.resetView() }
                 .accessibilityLabel("Return the camera to the authored view")
                 .accessibilityValue("Camera")
+                .accessibilityIdentifier(port.identifier("reset-view"))
         }
     }
 

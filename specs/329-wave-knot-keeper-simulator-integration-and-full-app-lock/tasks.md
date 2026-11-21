@@ -23,7 +23,7 @@ tests stay short (< 10 s each; interface tests < 90 s, SC-R02G0309-001). No {own
 
 ## Phase 3: Story 1 — the game works inside the real app (P1) 🎯
 
-- [ ] T-R02G0309-003 [US1] Edit `Packages/ExperiencesRound02/WaveKnotKeeper/Experience/WaveKnotKeeperControls.swift`:
+- [X] T-R02G0309-003 [US1] Edit `Packages/ExperiencesRound02/WaveKnotKeeper/Experience/WaveKnotKeeperControls.swift`: — Verified 2026-11-21: 2026-11-21 sim-27 exit 0 on sim-27.2: WaveKnotKeeperIdentifierTests (23 names once each, the six direction names in order, the port prefix experience.r02-g03.wave-knot-keeper.) and all Wave Knot Keeper experience tests
   identifiers `experience.r02-g03.wave-knot-keeper.<name>` through `port.identifier` (spec Clarifications Q1 names,
   unique); with `Packages/ExperiencesRound02/WaveKnotKeeper/ExperienceTests/WaveKnotKeeperIdentifierTests.swift`
   (agent E: every name of Q1 is listed once by the controls' identifier list and has the prefix); `--name sim-27 --
