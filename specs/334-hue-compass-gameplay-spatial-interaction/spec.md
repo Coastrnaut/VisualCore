@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-21
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G04-04 (migration ledger, game feature of experience R02-G04) · ID namespace FR-R02G0404-###,
 SC-R02G0404-###, T-R02G0404-###
@@ -25,6 +25,47 @@ Canonical overrides:
 - **Shared features used:** R02-F22 (spatial interaction: gesture arbitration, assistive steps) through the existing
   VisualCore packages; the adapter and scene of R02-G04-03.
 - **Model:** feature 324 (Wave Knot Keeper's gameplay spatial interaction).
+
+## Clarifications
+
+### Session 2026-11-21
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time. Facts checked in
+code (read-only, 2026-11-21): Wave Knot Keeper's feature 324 solved the same problem with a host-tested
+`WaveKnotKeeperGestureController` taking `PointerEvent`s with the view size and the drawn snapshot (idle, dragging,
+orbiting, cancelled; at most one action per gesture) and an orbit in its scene geometry; Hue Compass's camera
+(`HueCompassSceneGeometry.camera(aspect:)`) looks down −z tilted 35° about x, fitting a 1.45 bounding sphere for aspects
+0.4 … 2.5; its panel already has turn −4, −1, +1, +4, Probe, a band picker, Select, Undo, Redo and Next level; its adapter
+accepts `compass.turn [steps]`, `compass.probe` and `compass.select [bearing, band]`.
+
+- Q: How does a swipe become a turn? → A: the angle is measured about the projected compass centre (the origin through
+  the drawn camera), counter-clockwise on screen being counter-clockwise on the compass (screen y points down, so angle =
+  atan2(−dy, dx)); the swipe accumulates the angle change between successive touch points, ignoring points within 20
+  points of the centre (where the angle is unstable); the preview is the start bearing plus round(accumulated angle ×
+  96 / 2π) bearings; on release one `compass.turn [steps]` is sent with steps wrapped into −47 … 48, nothing when 0.
+  Impact: FR-R02G0404-001; SC-R02G0404-001.
+- Q: How are touches arbitrated, and where is the hub? → A: a Core `HueCompassGestureController` with idle, swiping,
+  orbiting and cancelled states; a touch that ends within 10 points of where it began is a tap; a tap within the hub —
+  the projected disc of radius 0.3 world units about the centre, never smaller than 30 points — sends exactly one
+  `compass.probe`; a double tap (two taps within 0.35 s) outside the projected wheel (radius 1.0) resets the view; any
+  other tap sends nothing; a second finger cancels a swipe and orbits; a cancelled gesture sends nothing; while not
+  playing nothing is sent and no preview is shown. Impact: FR-R02G0404-002, 003; SC-R02G0404-002.
+- Q: What can the camera do? → A: two-finger orbit of yaw (±40° about the z axis, 90° per view width) and pitch (the tilt
+  from the z axis between 15° and 60°, authored 35°, 60° per view height); a double tap on empty space or "Reset view"
+  returns to the authored view; the distance refits so the 1.45 bounding sphere stays inside the view with a 5 % margin
+  at every orbit and aspect 0.4 … 2.5. Presentation only: never in the digest, the snapshot or the kernel; not saved.
+  Impact: FR-R02G0404-004; SC-R02G0404-003.
+- Q: How is a swipe previewed, and what does the panel need? → A: while swiping, a ghost needle (pearl at half opacity)
+  points at the preview bearing and the description reads "Turning to bearing n of 96"; the real needle stays until the
+  turn is accepted. The panel keeps its controls and gains "Reset view"; every certified witness is replayable through
+  the panel, a turn of k bearings becoming ⌊|k|/4⌋ presses of ±4 and |k| mod 4 presses of ±1. Impact: FR-R02G0404-005;
+  SC-R02G0404-004.
+- Q: How are gestures tested without a screen? → A: the Core gesture controller takes pointer events with the view size
+  and the drawn camera and returns at most one action per gesture plus the preview; tests feed scripted swipes (seeded
+  start angles, sweeps up to ±1.5 turns, radii and point counts), taps inside and outside the hub, second fingers,
+  cancels and non-playing stages at fixed sizes, and compare with the turn computed independently from the angles;
+  simulator tests send the same touches through the experience's pointer entry; a host test wins all 100 levels through
+  panel actions. Impact: FR-R02G0404-006; SC-R02G0404-001, 002, 004.
 
 ## User Scenarios & Testing *(mandatory)*
 
