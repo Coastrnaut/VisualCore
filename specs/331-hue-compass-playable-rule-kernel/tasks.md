@@ -45,7 +45,7 @@ recorded only after every agent has reported). Commit after every task with its 
 - [X] T-R02G0401-005 [P] [US4] Create `Packages/ExperiencesRound02/HueCompass/Core/HueCompassRules.swift` (`PuzzleRules`: State = position (bearing, — Verified 2026-11-21: 2026-11-21 host-4 exit 0 (HueCompassRules as PuzzleRules, 8 tests: 27 moves in order, ended positions offer nothing, agreement with the play on 200 seeded walks, 100 known solutions as single-step turns, PuzzleValidator certifies a hand-made level with a unique shortest solution)
   spent, outcome), Move = HueCompassAction; legal moves turn(+1), turn(−1), probe, select(current bearing, band 0 … 23)
   in that order) with `Packages/ExperiencesRound02/HueCompass/CoreTests/HueCompassRulesTests.swift` (agreement with the play on 200 walks); `--name host-4`
-- [ ] T-R02G0401-006 [P] Create `Packages/ExperiencesRound02/HueCompass/CoreTests/HueCompassInvariantTests.swift` (`testHueCompassTimeBoundary`,
+- [X] T-R02G0401-006 [P] Create `Packages/ExperiencesRound02/HueCompass/CoreTests/HueCompassInvariantTests.swift` (`testHueCompassTimeBoundary`, — Verified 2026-11-21: 2026-11-21 host-5 exit 0 (8 invariant tests, each with a seeded neighbouring-input check, seed 2_336)
   `…InputbudgetBoundary`, `…GoalBoundary`, `…RepeatabilityBoundary`, `…UndoBoundary`, `…FailurehonestyBoundary`,
   `…StabilityBoundary`, `…SaveBoundary`, each with a seeded neighbouring-input check, seed 2_336); `--name host-5`
 
