@@ -44,7 +44,7 @@ tests stay short (< 10 s each; interface tests < 90 s, SC-R02G0309-001). No {own
 
 ## Phase 5: Story 3 — builds and solvability (P2)
 
-- [ ] T-R02G0309-006 [US3] Release build and symbols (`WaveKnotKeeperGolden`, `acceptanceScenarios` already
+- [X] T-R02G0309-006 [US3] Release build and symbols (`WaveKnotKeeperGolden`, `acceptanceScenarios` already — Verified 2026-11-21: 2026-11-21 release exit 0 (Release simulator build; symbol check with WaveKnotKeeperGolden and acceptanceScenarios forbidden); regression exit 0 (all 100 levels re-solved, golden frames, isolated memory)
   forbidden): `--name release -- python3 scripts/release_check.py --only app-release-build app-release-symbols`;
   `--name regression -- python3 scripts/wave_knot_keeper_regression.py`
 
