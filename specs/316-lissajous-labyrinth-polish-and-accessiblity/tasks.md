@@ -35,7 +35,7 @@ ImplementationLock-100.
 
 ## Phase 4: Story 3 — sound and haptics (P2)
 
-- [ ] T-R02G0206-004 [P] [US3] Create `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthSoundRecipe.swift` ("110 Hz × a, 110 Hz × b, a fifth
+- [X] T-R02G0206-004 [P] [US3] Create `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthSoundRecipe.swift` ("110 Hz × a, 110 Hz × b, a fifth — Verified 2026-11-21: 2026-11-21 host-3 exit 0: LissajousLabyrinthSoundRecipeTests 5/5 (equal for equal inputs; differs for a frequency or stage change; exact partials and halving; valid AmbientLoopRecipe for every coprime pair, sampled phases and every stage)
   above the lower; gains 0.6 … 1.0 of a base by phase; won adds an octave; failed halves the gains; 8 s") with
   `Packages/ExperiencesRound02/LissajousLabyrinth/CoreTests/LissajousLabyrinthSoundRecipeTests.swift` (equal for equal dials and stage; differs for a frequency or
   stage change; every recipe valid for `AmbientLoopRecipe`'s bounds over all legal dials); `--name host-3`
