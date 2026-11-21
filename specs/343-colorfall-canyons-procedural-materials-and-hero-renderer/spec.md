@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-21
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G05-03 (migration ledger, game feature of experience R02-G05) · ID namespace FR-R02G0503-###,
 SC-R02G0503-###, T-R02G0503-###
@@ -29,6 +29,63 @@ Canonical overrides:
 - **Shared features used:** R02-F05 (generated meshes), R02-F07 (emissive and glow passes), R02-F10 (quality tiers and
   non-colour clues), R02-F18 (procedural terrain) and the shared custom-shader mesh renderer added at R02-G01-03, through
   the existing VisualCore packages; the kernel and certified levels of R02-G05-01 and -02.
+
+## Clarifications
+
+### Session 2026-11-21
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time. Facts checked in
+code (read-only, 2026-11-21): Hue Compass's experience (R02-G04-03 … 10) is the pattern in this package — a Core adapter
+with a per-process cache of generated levels, an immutable scene snapshot, a CPU projection reference, GLSL sources in the
+Core, an iOS-only experience target with presenter, scene and controls, a scenario manifest with 80 acceptance scenarios,
+a registration with content facts (`Catalog/registrations.json`: capabilities, quality tiers, palette, content,
+manifest, permissions, summary) and the public `ShaderMeshRenderer`; the Colorfall Canyons kernel provides the level,
+fluid, play, rules and the certified catalog with its pinned digest (68eec7b5…f019); `AppModelTests` uses
+`r02-g05.colorfall-canyons` as its example of an unregistered candidate.
+
+- Q: What exactly does the scene show, and how does it map the rules to space? → A: the grid lies in the xz-plane with
+  cell size u = 2 / max(columns, rows), column c at x = (c − (columns − 1)/2)·u and row r at z = (r − (rows − 1)/2)·u
+  (higher rows nearer the camera), y up. Each cell is a block whose top is at y = 0.06·h·u for its current height
+  h (carving lowers it at once); open ground is sandstone, rock a darker raised slab
+  (+0.5·u), a drain a dark pit at y = 0, a basin a pearl rim ring around its top, a spring a glowing emitter column of its
+  colour (height 0.6·u, dimmed when its valve is closed or its supply is spent). Fluid in a cell is a sheet 0.01·u above
+  the top, thickness 0.02·u + 0.04·u·min(V, 24)/24, colour the mass-weighted mix of the three palette colours, brightness
+  0.35 + 0.65·min(V, 24)/24; each passing cell with fluid and a downhill neighbour carries flow bands along that direction
+  (a waterfall where the drop is 2 or more steps). Each colour also has a pattern in the sheet (cyan: stripes, coral:
+  dots, yellow: chevrons) and each basin's rim shows its required mix as three arcs in those patterns. The camera is a
+  fixed authored perspective looking at the grid centre from the front (+z), pitched 50° down, fitted to the grid's
+  bounding sphere (radius √2 · max extent + 0.1) with a 5 % margin for aspect 0.4 … 2.5. Flow bands move with
+  presentation time only. Nothing drawn is consulted by the rules. Impact: FR-R02G0503-001, 002, 006.
+- Q: What do the three quality tiers change? → A: `level-0` (richest): each block top subdivided 4 × 4 with bevelled
+  generated normals, 3 flow bands per channel, 2 glow shells; `level-1`: 2 × 2, 2 bands, 1 glow shell; `level-2` (the
+  design's "Tier 0, D3-safe"): 1 × 1, 1 band, no glow. Cells, colours, patterns and marks sit at the same places at every
+  tier. Levels are ordered richest first; the presenter logs each tier change with its reason. Impact: FR-R02G0503-004;
+  SC-R02G0503-001.
+- Q: How are rendered frames checked, and within which bounds? → A: the Core's CPU reference projects every cell top's
+  centre, every spring emitter top and every basin centre through the same camera and gives the palette. Simulator tests
+  render offscreen at 1,152 × 768 and check that each spring emitter top lies within 3 pixels of a pixel brighter than the
+  background by at least 0.15 in luminance, that each open cell top centre's pixel differs from night by at least 0.1 in
+  luminance, and that the background matches night within 0.05 away from geometry. Palette: night #05070F, sandstone
+  #8C5A3C, rock #3B302C, pearl #E8E4DA, cyan #19E3F0, coral #FF6F59, yellow #FFD23F. Impact: FR-R02G0503-006;
+  SC-R02G0503-001.
+- Q: What happens on a shader failure, and what does the renderer read? → A: the presenter draws from an immutable
+  `ColorfallCanyonsSceneSnapshot` (grid, current heights, grounds, springs with valves and supplies, basins with targets,
+  every cell's masses, downhill directions, stage, failure, tick, level number and presentation time) made by the
+  adapter; it never holds the kernel. If a program fails to compile or link, the scene draws the level-2 geometry unlit
+  with the shared unlit mesh renderer, keeps `fallbackReason` and keeps running; tier changes go to its `tierLog`. Reduce
+  Motion holds the flow bands at time 0; Reduce Flashing caps the glow gain. Impact: FR-R02G0503-003, 007;
+  SC-R02G0503-002.
+- Q: How is the experience registered and what does the adapter accept? → A: `Catalog/registrations.json` gains
+  `r02-g05.colorfall-canyons` (capabilities of at most 40 characters, tiers `level-0` … `level-2`, the palette, the
+  scenario manifest `Packages/ExperiencesRound02/ColorfallCanyons/scenario-manifest.json`, no permissions, a summary of at
+  most 300 characters, content facts: 100 levels and the pinned catalog digest); `project.yml` and the app's experience
+  registry link `ColorfallCanyonsExperience` as a candidate (`available: false` until X-R02-G05), opening at seed 0
+  (level 1); `AppModelTests` switches its unregistered example to the next round-two game (`r02-g06.chrono-constellator`).
+  The adapter (`ColorfallCanyonsExperienceCore`) prepares certified level (seed mod 100) + 1 (generated once per process)
+  and accepts `canyon.carve [cell]` (whole, 0 … 119), `canyon.valve [spring]` (whole, 0 … 2), `time.step [ticks]`
+  (whole, 1 … 600), `play.undo`, `play.redo` and `level.next`; the kernel refuses everything out of range or out of
+  stage; its digest is the level number and the play's fingerprint (never the record history, so undo restores the
+  earlier digest); snapshot schema 1 `{level, records}`. Impact: FR-R02G0503-005, 008, 009; SC-R02G0503-004.
 
 ## User Scenarios & Testing *(mandatory)*
 
