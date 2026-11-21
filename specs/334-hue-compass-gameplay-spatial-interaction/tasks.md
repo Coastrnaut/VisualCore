@@ -23,7 +23,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 3: Stories 1, 2 and 3 — swipe, press, orbit (P1) 🎯
 
-- [ ] T-R02G0404-003 [US1] [US2] [US3] Create `Packages/ExperiencesRound02/HueCompass/Core/HueCompassGestureController.swift` (idle, swiping, orbiting,
+- [X] T-R02G0404-003 [US1] [US2] [US3] Create `Packages/ExperiencesRound02/HueCompass/Core/HueCompassGestureController.swift` (idle, swiping, orbiting, — Verified 2026-11-21: 2026-11-21 host-3 exit 0 (agent C: gesture controller idle/swiping/orbiting/cancelled; 500 seeded swipes at 3 views equal an independent screen-geometry computation; hub taps probe, a tap is a touch whose farthest travel stays under 10 pt; double tap outside the wheel within 0.35 s resets; second finger cancels and orbits at 90° per width and 60° per height, clamped; nothing while not playing; 9 tests)
   cancelled; accumulated angle with the dead zone; preview bearing; release sends at most one `turn(steps)`, "tap
   within 10 points" in the hub sends `probe`, double tap "within 0.35 s" outside the wheel resets the view; a second
   finger cancels and orbits "90° per view width, 60° per view height"; nothing while not playing) with
