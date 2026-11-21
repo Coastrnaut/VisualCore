@@ -137,8 +137,7 @@ final class HueCompassPresenter: ExperiencePresenter {
     /// action by starting a fresh controller, which forgets the fingers it held. The orbit is presentation only and
     /// never saved (clarification Q3), so the camera returns to the authored view with it.
     func cancelPointers() {
-        guard gestures.state != .idle else { return }
-        gestures = HueCompassGestureController()
+        gestures.cancel()
     }
 
     /// Returns the camera to the authored view ("Reset view").

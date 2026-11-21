@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "HueCompassGestureControllerTests"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter HueCompassGestureControllerTests",
+  "elapsed_seconds": 5.458,
+  "exit_code": 0,
+  "finished": "2026-11-21T16:42:22+00:00",
+  "gate": "R02-G04-04",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G04-04.host-5.log",
+  "log_sha256": "3c512f54c816eb35d264c2893efc2d5ba4e41b533d072024778d0aad88b6f051",
+  "name": "host-5",
+  "started": "2026-11-21T16:42:17+00:00",
+  "timed_out": false
+}

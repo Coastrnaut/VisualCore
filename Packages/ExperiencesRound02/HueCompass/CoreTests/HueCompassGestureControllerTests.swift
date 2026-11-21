@@ -537,4 +537,35 @@ import VisualCoreScenes
         #expect(first.orbit == second.orbit)
         #expect(a.count <= 200)
     }
+
+    /// T-R02G0404-013: a system cancel drops the gesture, sends nothing and keeps the orbit; the next gesture works.
+    @Test func cancelKeepsTheOrbitAndSendsNothing() throws {
+        let size: Vec2 = Vec2(720, 480)
+        let snapshot: Snapshot = try Self.playing(0)
+        var controller: Controller = Controller()
+        // Orbit with two fingers, then cancel mid-orbit.
+        _ = controller.handle(Self.event(1, .began, Vec2(300, 240), 0), viewSize: size, snapshot: snapshot)
+        _ = controller.handle(Self.event(2, .began, Vec2(420, 240), 0.01), viewSize: size, snapshot: snapshot)
+        _ = controller.handle(Self.event(1, .moved, Vec2(372, 240), 0.02), viewSize: size, snapshot: snapshot)
+        _ = controller.handle(Self.event(2, .moved, Vec2(492, 240), 0.03), viewSize: size, snapshot: snapshot)
+        let orbit: HueCompassOrbit = controller.orbit
+        #expect(orbit != .authored)
+        controller.cancel()
+        #expect(controller.state == .idle && controller.orbit == orbit && controller.previewBearing == nil)
+        // A swipe cancelled mid-way sends nothing and keeps the orbit.
+        let centre: Vec2 = Self.centre(size)
+        _ = controller.handle(Self.event(3, .began, Self.polar(centre, 120, 0), 1), viewSize: size, snapshot: snapshot)
+        _ = controller.handle(Self.event(3, .moved, Self.polar(centre, 120, Double.pi / 2), 1.1), viewSize: size,
+                              snapshot: snapshot)
+        controller.cancel()
+        #expect(controller.state == .idle && controller.orbit == orbit && controller.previewBearing == nil)
+        // The next touch starts a fresh gesture: a tap on the projected hub probes.
+        let camera: HueCompassCamera = try #require(controller.camera(viewSize: size))
+        let projected: SIMD2<Double> = try #require(HueCompassDial.centre(camera: camera, size: SIMD2(size.x, size.y)))
+        let hub: Vec2 = Vec2(projected.x, projected.y)
+        _ = controller.handle(Self.event(4, .began, hub, 2), viewSize: size, snapshot: snapshot)
+        let actions: [HueCompassGestureAction] = controller.handle(Self.event(4, .ended, hub, 2.05), viewSize: size,
+                                                                   snapshot: snapshot)
+        #expect(actions == [.probe])
+    }
 }

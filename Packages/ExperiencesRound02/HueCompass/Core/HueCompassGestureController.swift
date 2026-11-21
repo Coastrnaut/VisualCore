@@ -149,6 +149,16 @@ public struct HueCompassGestureController: Sendable {
         orbitMidpoint = tracker.centroid
     }
 
+    /// Drops every pointer and any swipe in progress without sending anything (a system cancel, such as the app going
+    /// to the background mid-gesture); the orbit is kept, and the next touch starts a fresh gesture (T-R02G0404-013).
+    public mutating func cancel() {
+        tracker = PointerTracker()
+        swipe = nil
+        orbitMidpoint = nil
+        previewBearing = nil
+        state = .idle
+    }
+
     // MARK: Phases
 
     private mutating func began(_ event: PointerEvent, viewSize: Vec2, snapshot: HueCompassSceneSnapshot) {
