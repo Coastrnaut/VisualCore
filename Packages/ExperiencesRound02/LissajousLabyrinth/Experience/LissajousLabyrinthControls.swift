@@ -1,7 +1,10 @@
 // LissajousLabyrinthControls — feature 313 (R02-G02-03) T-R02G0203-006 (FR-R02G0203-005; clarification Q5). The minimal
 // control panel: a stepper for each of the four dials (frequency A and B 1 … 9, phase A and C 0 … 15), undo, redo and
-// next level, each with an accessibility label and value; every change is a kernel action sent through the action port.
-// Dials, gestures and the trace scrubber come in R02-G02-04; full accessibility in R02-G02-06.
+// next level, each with an accessibility label and value. Feature 314 (R02-G02-04) T-R02G0204-005 (FR-R02G0204-005,
+// 006; clarification Q4): the steppers set pending values (no action; the value shown is the pending one, the title adds
+// the current one) and select their dial; Apply sends each pending change as one action in the planner's order and Clear
+// drops them, both shown only while something is pending; "Reset view" returns the camera to the authored view. Full
+// accessibility comes in R02-G02-06.
 #if os(iOS)
 import LissajousLabyrinthCore
 import SwiftUI
@@ -11,9 +14,7 @@ import VisualCoreExperienceHost
 struct LissajousLabyrinthControls: View {
     let port: ExperienceActionPort
     let mirror: LissajousLabyrinthMirror
-
-    /// The dials in control order with their names: frequency A, frequency B, phase A, phase C.
-    private static let names: [String] = ["Frequency A", "Frequency B", "Phase A", "Phase C"]
+    let presenter: LissajousLabyrinthPresenter
 
     var body: some View {
         ScrollView(.vertical) {
@@ -26,39 +27,43 @@ struct LissajousLabyrinthControls: View {
                 if let dials = mirror.dials {
                     ForEach(0..<4, id: \.self) { index in
                         let dial: LissajousLabyrinthDial = LissajousLabyrinthDial.allCases[index]
-                        let value: Int = dials[dial]
-                        Stepper("\(Self.names[index]) \(value)",
-                                onIncrement: { set(index, dial: dial, to: value + 1) },
-                                onDecrement: { set(index, dial: dial, to: value - 1) })
-                            .accessibilityLabel(Self.names[index])
-                            .accessibilityValue("\(value)")
+                        let current: Int = dials[dial]
+                        let shown: Int = mirror.pending.values[dial] ?? current
+                        Stepper(Self.title(dial, shown: shown, current: current),
+                                onIncrement: { presenter.stepPending(dial, by: 1) },
+                                onDecrement: { presenter.stepPending(dial, by: -1) })
+                            .accessibilityLabel(LissajousLabyrinthPresenter.title(dial))
+                            .accessibilityValue(shown == current ? "\(shown)" : "\(shown), pending; now \(current)")
+                    }
+                    if !mirror.pending.isEmpty {
+                        HStack(spacing: 16) {
+                            Button("Apply") { presenter.applyPending(port: port) }
+                                .accessibilityLabel("Apply the pending dial values")
+                            Button("Clear") { presenter.clearPending() }
+                                .accessibilityLabel("Clear the pending dial values")
+                        }
                     }
                 }
                 HStack(spacing: 16) {
-                    Button("Undo") { send("play.undo") }
+                    Button("Undo") { presenter.send("play.undo", port: port) }
                         .accessibilityLabel("Undo the last change")
-                    Button("Redo") { send("play.redo") }
+                    Button("Redo") { presenter.send("play.redo", port: port) }
                         .accessibilityLabel("Redo the change")
-                    Button("Next level") { send("level.next") }
+                    Button("Next level") { presenter.send("level.next", port: port) }
                         .accessibilityLabel("Go to the next level")
+                    Button("Reset view") { presenter.resetView() }
+                        .accessibilityLabel("Return the camera to the authored view")
                 }
             }
             .padding()
         }
     }
 
-    /// Sends `dial.set` for the dial at control index `index` to `value`, wrapped into the dial's range.
-    private func set(_ index: Int, dial: LissajousLabyrinthDial, to value: Int) {
-        let range = dial.range
-        let span = range.upperBound - range.lowerBound + 1
-        let wrapped = ((value - range.lowerBound) % span + span) % span + range.lowerBound
-        send("dial.set", [Double(index), Double(wrapped)])
-    }
-
-    /// Sends `control` and shows a refusal.
-    private func send(_ control: String, _ values: [Double] = []) {
-        let result = port.send(control, values)
-        mirror.message = result.isAccepted ? nil : "That change was refused: \(result.code)"
+    /// A stepper's title: "Phase C 12" when nothing is pending for it, "Phase C 3 (now 12)" when the pending value
+    /// differs.
+    static func title(_ dial: LissajousLabyrinthDial, shown: Int, current: Int) -> String {
+        let name = LissajousLabyrinthPresenter.title(dial)
+        return shown == current ? "\(name) \(shown)" : "\(name) \(shown) (now \(current))"
     }
 }
 #endif

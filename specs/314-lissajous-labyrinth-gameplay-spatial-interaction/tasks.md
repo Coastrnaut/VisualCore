@@ -49,7 +49,7 @@ tests stay short (< 10 s each).
 
 ## Phase 4: Story 3 — panel play, wiring (P1)
 
-- [ ] T-R02G0204-005 [US1] [US2] [US3] [US4] Wire the experience:
+- [X] T-R02G0204-005 [US1] [US2] [US3] [US4] Wire the experience: — Verified 2026-11-21: 2026-11-21 round02-build exit 0 (presenter routes touches through the gesture controller and sends dial.set; pending values with Apply/Clear, outside changes drop them, announcements; scene draws four cobalt dial rings, copper knobs, the selected dial's copper outline and the violet turn preview with the orbited camera; controls: pending steppers, Apply, Clear, Reset view); behaviour proven by T-R02G0204-006
   `Packages/ExperiencesRound02/LissajousLabyrinth/Experience/LissajousLabyrinthPresenter.swift` (pointer events →
   controller → `dial.set` through the port; refusal text; orbit into the camera; selection, candidate and pending values
   in the description and mirror; pending dropped on any committed change, undo, redo, next level, restore),
