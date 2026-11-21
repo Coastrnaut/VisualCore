@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore"
+  ],
+  "command": "swift test --package-path Packages/VisualCore",
+  "elapsed_seconds": 38.726,
+  "exit_code": 0,
+  "finished": "2026-11-21T11:36:45+00:00",
+  "gate": "R02-G03-04",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G03-04.host-full.log",
+  "log_sha256": "cc5177c5ad43fd4494aea42d19af22f43722edb40f3f64715758e3f9aa90e533",
+  "name": "host-full",
+  "started": "2026-11-21T11:36:07+00:00",
+  "timed_out": false
+}
