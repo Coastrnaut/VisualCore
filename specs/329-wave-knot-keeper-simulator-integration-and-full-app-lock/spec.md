@@ -5,7 +5,7 @@
 
 **Created**: 2026-11-21
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G03-09 (migration ledger, game feature of experience R02-G03) · ID namespace FR-R02G0309-###,
 SC-R02G0309-###, T-R02G0309-###
@@ -28,6 +28,49 @@ Canonical overrides:
 - **Model:** feature 319 (Lissajous Labyrinth), itself after feature 309 (Aurora Loom). Already in place from earlier
   Wave Knot Keeper features: panel play with the point picker and six direction buttons (features 323, 324), the
   round-two opening seed 0, the test-only golden code in the Release symbol list (feature 328).
+
+## Clarifications
+
+### Session 2026-11-21
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+319's answers. Facts checked in code (read-only, 2026-11-21): feature 319 (Lissajous Labyrinth) is the model
+(`Apps/VisualCore/Tests/UI/LissajousLabyrinth`, namespace `LL`, serial chunk `k3`; identifiers through
+`port.identifier(name)`; `LissajousLabyrinthSchemaExamples.swift`); Wave Knot Keeper's panel (`WaveKnotKeeperControls`)
+has labels and values but no identifiers; its registration in `Apps/VisualCore/App/ExperienceRegistry.swift` still says
+"Snapshot schema 1, so no earlier example is stored yet" although the snapshot is schema 3 since feature 327; the canvas
+description (`WaveKnotKeeperPresenter.describe`) names the level, the crossings and writhe against the target, the
+moves and, when won, "The knot matches. k of 3 stars."; `RELEASE_FORBIDDEN` already holds `WaveKnotKeeperGolden`
+(feature 328); the UI chunk keys in `release_check.py` do not yet use `l3`.
+
+- Q: How do the interface tests find controls and what do they read? → A: every panel control gets the identifier
+  `experience.r02-g03.wave-knot-keeper.<name>` through `port.identifier(name)`: the stepper `point-picker`, the buttons
+  `move-plus-x`, `move-minus-x`, `move-plus-y`, `move-minus-y`, `move-over`, `move-under`, `undo`, `redo`,
+  `next-level`, `reset-view`, `hint`, `dismiss-tutorial`, `failure-undo`, `retry`, `campaign`, `daily`, `practice`,
+  `replay`, `replay-step`, `replay-stop`, the menu `level-picker` and the toggle `sound`. The tests read the canvas
+  description for the level, the crossings and the stars, and the replay step's value for the replay position. Impact:
+  FR-R02G0309-001, 002.
+- Q: Which interface tests exist and how are they grouped? → A: namespace `WK` in
+  `Apps/VisualCore/Tests/UI/WaveKnotKeeper/WKSupport.swift`; `WKPlayUITests` (fresh launch with `-vcResetData
+  -vcSkipWelcome -vcCandidates -openExperience r02-g03.wave-knot-keeper`: dismiss the tutorial, play level 1's certified
+  solution with the point picker and the direction buttons, read "The knot matches" and "3 of 3 stars", the level picker
+  shows level 2 open; relaunch without reset: the stars and level 2 are kept) and `WKReplayUITests` (after the win,
+  Replay, Step until the replay ends won, Stop back to the campaign). They run as a new serial chunk `l3` of
+  `release_check.py`; each test stays under 90 s. Level 1's start rope and solution are pinned in `WK` and checked
+  against the Core by an app unit test. Impact: FR-R02G0309-002, 007; SC-R02G0309-001.
+- Q: Which earlier-schema examples are stored and where do they come from? → A:
+  `WaveKnotKeeperExperienceCore.schemaOneExample()` (the schema-1 saved state of a seeded play of level 1 with one move)
+  and `schemaTwoExample()` (schema 2 with progress and level 1 solved, no trace), both `MigrationExample`s built in the
+  Core (`WaveKnotKeeperSchemaExamples.swift`, modelled on `LissajousLabyrinthSchemaExamples`), registered with
+  `examples:`; the app's migration check restores both into schema 3 with progress kept. The registration's comment is
+  corrected. Impact: FR-R02G0309-003; SC-R02G0309-002.
+- Q: What proves the release configuration excludes test-only code? → A: the existing `app-release-build` and
+  `app-release-symbols` steps; `WaveKnotKeeperGolden` is already forbidden, and the scenarios exist only under
+  `DEBUG || VISUALCORE_AUTOMATION` (covered by the existing `acceptanceScenarios` entry). Impact: FR-R02G0309-004;
+  SC-R02G0309-003.
+- Q: How is "not available" checked? → A: an app unit test: without `-vcCandidates` the catalog lists
+  `r02-g03.wave-knot-keeper` as not available and the launcher cannot open it; the registry's candidates list contains
+  it and `all` does not. Impact: FR-R02G0309-006; SC-R02G0309-002.
 
 ## User Scenarios & Testing *(mandatory)*
 
