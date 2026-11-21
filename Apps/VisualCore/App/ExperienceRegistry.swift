@@ -551,11 +551,14 @@ extension ExperienceRegistry {
         return registration
     }
 
-    /// R02-G02 Lissajous Labyrinth (feature 313, R02-G02-03): a candidate until X-R02-G02. Snapshot schema 1, so no
-    /// earlier example is stored yet.
+    /// R02-G02 Lissajous Labyrinth (features 311–320, R02-G02-01…10): a candidate until X-R02-G02. Snapshot schema 3
+    /// (feature 317), so the schema-1 and schema-2 examples are stored (feature 319, R02-G02-09).
     fileprivate static var lissajousLabyrinth: ExperienceRegistration? {
         guard let id = LissajousLabyrinthExperience.id else { return nil }
-        var registration = ExperienceRegistration(id: id, core: LissajousLabyrinthExperienceCore.self) { launch in
+        let examples = [LissajousLabyrinthExperienceCore.schemaOneExample(),
+                        LissajousLabyrinthExperienceCore.schemaTwoExample()].compactMap { $0 }
+        var registration = ExperienceRegistration(id: id, core: LissajousLabyrinthExperienceCore.self,
+                                                  examples: examples) { launch in
             let system = SystemAccessibilityObserver.systemValues()
             return LissajousLabyrinthExperience.make(
                 id: id, storage: launch.storage,
