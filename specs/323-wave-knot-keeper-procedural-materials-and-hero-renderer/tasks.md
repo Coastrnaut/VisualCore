@@ -65,3 +65,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 001 → 002 → {003 (agent A), 004 (agent B), 005 (agent C)} → 006 (lead; agent D writes the simulator tests) → 007 … 011,
 013. 012 stays open until device testing. Shared files (Package.swift, snapshot, presenter, scene, controls, scenarios,
 registration, docs) stay with the lead. MVP: Stories 1 and 2.
+
+## Phase 5: Convergence
+
+- [ ] T-R02G0303-014 In `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperSceneGeometry.swift`, give every projected crossing its caustic weight at every tier wherever it falls on the over-strand (straight middle or corner arc): insert centreline samples at −2r … +2r around the crossing's nearest point on the drawn centreline of its over-strand segment, and extend `WaveKnotKeeperSceneGeometryTests.swift` so that for seeded ropes every crossing has a rope vertex of weight 1 within one radius of its 3D crossing point at tiers 0, 1 and 2, per FR-R02G0303-002 / clarification Q1 (partial); `--name host-5 -- swift test --package-path Packages/ExperiencesRound02 --filter WaveKnotKeeperSceneGeometryTests`, `--name sim-27-2`
