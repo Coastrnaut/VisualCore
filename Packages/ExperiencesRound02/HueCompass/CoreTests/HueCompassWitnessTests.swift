@@ -330,6 +330,32 @@ struct HueCompassBruteForce {
         }
     }
 
+    /// Clarification Q4 fixes the insufficient smaller set: `[0]` for a two-probe level. Another single bearing with a
+    /// genuine ambiguity is still refused (T-R02G0402-013), and a one-probe level's empty set may not become a single.
+    @Test func theAmbiguityProbesAreExactlyTheStatedSet() throws {
+        var checkedTwo: Int = 0
+        for witness in try Self.witnesses() {
+            let brute = try HueCompassBruteForce(witness.level)
+            if witness.difficulty.smallest == 2 {
+                let other: HueCompassAmbiguity = try #require(brute.ambiguity([5]))
+                let data: Data = try Self.edited(witness) { object in
+                    object["ambiguity"] = ["probes": other.probes, "targets": other.targets]
+                }
+                #expect(Self.refusal(data) == .witness("ambiguity"))
+                checkedTwo += 1
+            } else {
+                let single: HueCompassAmbiguity? = brute.ambiguity([0])
+                if let single {
+                    let data: Data = try Self.edited(witness) { object in
+                        object["ambiguity"] = ["probes": single.probes, "targets": single.targets]
+                    }
+                    #expect(Self.refusal(data) == .witness("ambiguity"))
+                }
+            }
+        }
+        #expect(checkedTwo > 0)
+    }
+
     @Test func schemaAndDamageRefusals() throws {
         let witness: HueCompassWitness = try #require(try Self.witnesses().first)
         #expect(Self.refusal(try Self.edited(witness) { $0["schema"] = 2 }) == .newerSchema(2))

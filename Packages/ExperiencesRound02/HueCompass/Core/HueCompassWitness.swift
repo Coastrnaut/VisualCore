@@ -398,15 +398,12 @@ struct HueCompassDeduction {
         return best
     }
 
-    /// Whether `ambiguity` is a probe set of `smallest − 1` ascending bearings with two ascending candidate targets that
-    /// share every clue of it and that no one selection accepts together.
+    /// Whether `ambiguity` is the insufficient smaller set of clarification Q4 — exactly `[]` when the smallest count is 1
+    /// and `[0]` (the first single bearing) when it is 2 — with two ascending candidate targets that share every clue of
+    /// it and that no one selection accepts together.
     func isValid(_ ambiguity: HueCompassAmbiguity, smallest: Int) -> Bool {
         let probes: [Int] = ambiguity.probes
-        guard probes.count == smallest - 1 else { return false }
-        for (i, p) in probes.enumerated() {
-            guard (0..<HueCompassWheel.bearings).contains(p) else { return false }
-            if i > 0 && probes[i - 1] >= p { return false }
-        }
+        guard (smallest == 1 && probes.isEmpty) || (smallest == 2 && probes == [0]) else { return false }
         let targets: [Int] = ambiguity.targets
         guard targets.count == 2, targets[0] < targets[1], candidates.contains(targets[0]),
               candidates.contains(targets[1]) else { return false }
