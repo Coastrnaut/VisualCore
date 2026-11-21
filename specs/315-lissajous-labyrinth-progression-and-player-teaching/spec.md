@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-21
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G02-05 (migration ledger, game feature of experience R02-G02) · ID namespace FR-R02G0205-###,
 SC-R02G0205-###, T-R02G0205-###
@@ -27,6 +27,51 @@ Canonical overrides:
 - **Model:** feature 305 (Aurora Loom), adapted to four dials (frequencies 1 … 9, coprime; phases 0 … 15), checkpoints
   visited in order and obstacles.
 
+## Clarifications
+
+### Session 2026-11-21
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+305's answers where the games agree. Facts checked in code (read-only audit, 2026-11-21): `LissajousLabyrinthSolver`
+finds a level's winning settings (independent of the start) and its proven shortest solution by breadth-first search over
+legal settings (every intermediate frequency pair coprime); the kernel's verdict is `contact(obstacle, tick)` (the first
+contact, tick of 4,096 per lap) or `missed(checkpoint)`; the play has a `tutorial` stage that the adapter dismisses at
+once today; the adapter prepares level (seed mod 100) + 1, accepts `dial.set`, `play.undo`, `play.redo` and `level.next`
+and snapshots `{level, records}` as schema 1; the core may not read a clock; the allowance is 1 … 64.
+
+- Q: How is a hint computed and what does each level reveal? → A: the solver's breadth-first search runs from the
+  current dials to the level's winning settings (the same moves, coprime rule and order as the certified solution), giving
+  the shortest remaining action list. Level 1 names the dial of its first action ("Turn Phase C"); level 2 adds the
+  direction ("Raise Phase C" when the target value is larger, "Lower" when smaller); level 3 adds the exact value ("Set
+  Phase C to 3"). Following the level-3 hint shortens the shortest remaining solution by one. When the shortest remaining
+  solution is longer than the actions left, the hint says "No solution fits in the actions left; undo or retry" and offers
+  undo. Hints never change the state, are unlimited, do not affect stars, and reset to level 1 after any change of the
+  play. Impact: FR-R02G0205-002; SC-R02G0205-002.
+- Q: What does the tutorial show, and when does it advance? → A: on the tutorial levels 1 … 3, three instructions in
+  order: (1) "Turn the <Dial> ring to change the path" (the level-1 hint's dial) until any dial action is accepted;
+  (2) "Copper checkpoints light up when the lap reaches them in order; keep the path off the violet spheres" until the
+  next accepted action or a hint is asked; (3) "Ask for a hint whenever you are stuck" until the level is won. A dismiss
+  action ends the tutorial for that level; undo never moves it back. Impact: FR-R02G0205-001; SC-R02G0205-001.
+- Q: What are the progress and star rules? → A: progress holds, per level, the best number of actions that won and the
+  stars: 3 when the actions equal the certified shortest solution, 2 within shortest + 2, otherwise 1; a better result
+  replaces a worse one. Level 1 is open; winning a level in campaign mode opens the next; `level.select [n]` opens any
+  open level and refuses others (`r02-g02.locked`); `level.next` moves to the next open level (refused when none). Bands
+  are the catalog's five bands of 20 levels. Impact: FR-R02G0205-004; SC-R02G0205-004.
+- Q: How do the daily level and practice mode work? → A: the daily level is (days from 2026-01-01 to the given calendar
+  date × 41) mod 100 + 1, negative day counts wrapped into 0 … 99 (41 is coprime with 100, so 100 consecutive days visit
+  every level once, and the sequence differs from Aurora Loom's × 37); the date reaches the core as the action
+  `mode.daily [year, month, day]` from the presenter (the core never reads a clock; an impossible date is refused with
+  `r02-g02.date`). Daily play follows campaign rules but does not open levels. `mode.practice` replays the current level
+  with the allowance raised to the kernel's maximum (64); practice results never award stars or open levels;
+  `mode.campaign` returns. Impact: FR-R02G0205-005; SC-R02G0205-004.
+- Q: Where does progress live, how is it versioned and how is a failure explained? → A: progress and the mode are part of
+  the experience state and its digest; the tutorial step and the hint level are snapshotted but not digested (they never
+  move back with undo, so undo still restores the earlier digest); the snapshot payload becomes schema 2 (`{level,
+  records, progress, mode, tutorial}`) with a migration from schema 1 (no progress, campaign mode, tutorial at its first
+  step on tutorial levels). A failure is explained from the kernel's verdict: "The path touches obstacle n at p % of the
+  lap" (n = index + 1, p = ⌊100 · tick / 4,096⌋) or "Checkpoint n is not reached in order" (n = index + 1), each followed
+  by "Undo the last change or retry the level." Impact: FR-R02G0205-003, 007; SC-R02G0205-003.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Learn the labyrinth from the first level (Priority: P1) 🎯
@@ -42,8 +87,8 @@ order and never prevents an action.
 
 **Acceptance Scenarios**:
 
-1. **Given** level 1 just opened, **When** the player has taken no action, **Then** the first instruction names a
-   frequency dial to turn.
+1. **Given** level 1 just opened, **When** the player has taken no action, **Then** the first instruction names the dial
+   of the level-1 hint to turn.
 2. **Given** a tutorial step is shown, **When** the player performs it, **Then** the next step is shown; dismissing ends the
    tutorial for that level.
 
@@ -97,7 +142,7 @@ mode allows more actions without affecting progress.
   advances when the player performs it and can be dismissed; instructions never block or perform actions.
 - **FR-R02G0205-002**: A hint MUST be available in three progressive levels (dial, direction, exact value), computed from
   the solver for the current dials so that following it keeps a shortest remaining solution; a hint never changes the
-  state and is unlimited.
+  state, is unlimited, does not affect stars and returns to level 1 after any change of the play.
 - **FR-R02G0205-003**: A failure MUST be explained in accessible text naming the kernel's verdict (the touched obstacle and
   the lap position of the contact, or the checkpoint not reached in order) with undo and retry offered.
 - **FR-R02G0205-004**: Progress MUST follow defined rules: the first level open, solving a level in campaign mode opens the
