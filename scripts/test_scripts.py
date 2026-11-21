@@ -1403,7 +1403,7 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     "LissajousLabyrinthCore", "LissajousLabyrinthExperience",
                                     # Feature 323 (R02-G03-03): Wave Knot Keeper, integrated at X-R02-G03.
                                     "WaveKnotKeeperCore", "WaveKnotKeeperExperience",
-                                    # Feature 333 (R02-G04-03): Hue Compass, a candidate until X-R02-G04.
+                                    # Feature 333 (R02-G04-03): Hue Compass, integrated at X-R02-G04.
                                     "HueCompassCore", "HueCompassExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):

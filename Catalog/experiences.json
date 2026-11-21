@@ -1036,7 +1036,7 @@
         "catalog_sha256": "fcb10a906350344bf23c9126d1c9cd2fd26bde25458cdc2924edb75a0bae8b15",
         "levels": 100
       },
-      "available": false
+      "available": true
     },
     {
       "id": "r02-g05.colorfall-canyons",

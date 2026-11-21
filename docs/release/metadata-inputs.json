@@ -237,9 +237,17 @@
       "name": "Wave Knot Keeper",
       "permissions": [],
       "tier": "free"
+    },
+    {
+      "category": "puzzle",
+      "code": "R02-G04",
+      "id": "r02-g04.hue-compass",
+      "name": "Hue Compass",
+      "permissions": [],
+      "tier": "free"
     }
   ],
-  "ledger_sha256": "220885755777e5b4933cd756f6dc47fb7bb7f5777c2410b6c0140f4fccda698f",
+  "ledger_sha256": "e6fac305734b5417073d49cadc8c5675b5cccb35c65e47cb6c780bf1acd258ce",
   "privacy_answers": "unproven",
   "schema": 1
 }

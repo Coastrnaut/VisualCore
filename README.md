@@ -77,14 +77,14 @@ evidence**: no physical-device test of the unified app has been run.
 | R02-G01 Aurora Loom | integrated (X-R02-G01 pass, 2026-11-21) — a free puzzle of three shader-drawn light ribbons brought into harmony through four gates: 100 solver-certified levels with witness files, touch and panel play, hints, stars, daily and practice modes, replay of the best solution, verified on the iOS 27.2 and 26.5 simulators | [architecture](docs/architecture/aurora-loom.md) |
 | R02-G02 Lissajous Labyrinth | integrated (X-R02-G02 pass, 2026-11-21) — a free puzzle of a luminous Lissajous thread steered by four dials past violet obstacles through copper checkpoints in order: 100 solver-certified levels with witness files, dial rings and panel play, hints, stars, daily and practice modes, replay of the best solution, verified on the iOS 27.2 and 26.5 simulators | [architecture](docs/architecture/lissajous-labyrinth.md) |
 | R02-G03 Wave Knot Keeper | integrated (X-R02-G03 pass, 2026-11-21) — a free puzzle of a glass rope of lattice control points moved one step at a time until its projected crossings and writhe match the target, strands passing each other only inside sapphire gates: 100 solver-certified levels with witness files, handle drags, orbit and panel play, hints, stars, daily and practice modes, replay of the best solution, verified on the iOS 27.2 and 26.5 simulators | [architecture](docs/architecture/wave-knot-keeper.md) |
-| R02-G04 Hue Compass | in progress — rule kernel done (R02-G04-01, 2026-11-21): an exact 96-bearing spectral compass with 24 hue bands, clues by hue gap and fog depth, probes and one selection sharing the allowance; 100 seeded levels proven deducible with witness files (R02-G04-02); a glass needle over a hue wheel with grayscale glyphs in luminous fog, drawn in code at three tiers and registered as a candidate (R02-G04-03); swipe to turn, tap the hub to probe, two-finger orbit and full panel play (R02-G04-04); hints, failure explanations, tutorial, stars, daily and practice modes (R02-G04-05); announcements, haptics, slow fades, ambient sound and a Dynamic Type panel (R02-G04-06); traced results reconciled on restore, schema 3 and replay of the best solution (R02-G04-07); solver re-certification, code-computed golden frames and memory cycles (R02-G04-08); panel identifiers, stored schema examples, app unit and interface tests and the Release check (R02-G04-09); eight pending device rows, a campaign plan and a rows check (R02-G04-10); integration gate X-R02-G04 next | [architecture](docs/architecture/hue-compass.md) |
-| Other games of Rounds 2–4 | planned | [catalog](docs/catalog/experience-catalog.json) | [catalog](docs/catalog/experience-catalog.json) |
+| R02-G04 Hue Compass | integrated (X-R02-G04 pass, 2026-11-21) — a free deduction puzzle of a spectral compass: turn a glass needle over a 96-bearing hue wheel, probe for clues by hue gap and fog depth (grayscale glyphs carry the same information), then select the hidden bearing and hue band within the allowance: 100 solver-certified levels with witness files, swipe, hub-tap, orbit and panel play, hints, stars, daily and practice modes, replay of the best solution, verified on the iOS 27.2 and 26.5 simulators | [architecture](docs/architecture/hue-compass.md) |
+| Other games of Rounds 2–4 | planned (Colorfall Canyons, R02-G05, is next) | [catalog](docs/catalog/experience-catalog.json) |
 | Games of Rounds 5–12 | backlog | [catalog](docs/catalog/experience-catalog.json) |
 | Physical-device testing | none run; waits for `ImplementationLock-100` | [support matrix](docs/release/support-matrix.md) |
 | App Store | VisualCore 1.0 (22 free experiences, build 1.0.0 (1), nothing for sale) submitted on 2026-11-18 and waiting for review, with automatic release; signing, App Store Connect and agreements stay owner actions | [build and archive](docs/release/build-and-archive.md), [name reservation](docs/release/name-reservation.md) |
 
 Ledger totals today: the legacy ledger records **185 of 263** gates as passed (F00–F09 and the app phases
-A01-P00 … A19-P06, A20-P00 … A20-P06, A21-P00 … A21-P06, A22-P00 … A22-P06, A23-P00 … A23-P06, A24-P00 … A24-P06, A25-P00 … A25-P06); the unified-app ledger has 1,233 gates, with 28 experience gates (X-A01 … X-A25, X-R02-G01, X-R02-G02, X-R02-G03), 11 unified-app features,
+A01-P00 … A19-P06, A20-P00 … A20-P06, A21-P00 … A21-P06, A22-P00 … A22-P06, A23-P00 … A23-P06, A24-P00 … A24-P06, A25-P00 … A25-P06); the unified-app ledger has 1,233 gates, with 29 experience gates (X-A01 … X-A25, X-R02-G01 … X-R02-G04), 11 unified-app features,
 24 shared round features, both governance milestones and forty round-two game features (R02-G01-01 … 10: Aurora Loom's rule
 kernel, its 100 solver-certified levels with witness files, its shader-drawn hero renderer, its touch controls and its
 teaching and progression (hints, failure explanations, tutorial, stars, daily and practice modes) and its polish and
@@ -111,13 +111,13 @@ app unit and interface tests, Release symbol check) and its device preparation (
 twelve scenarios, a campaign plan and a rows check), integrated at X-R02-G03; R02-G04-01 … 10: Hue Compass's rule kernel
 with an exact 96-bearing wheel, hue-gap and fog-depth clues and probes and a selection sharing the allowance, and its
 100 seeded levels with deduction-solver witness files and its spectral-compass renderer (glass needle, hue wheel
-with grayscale glyphs, luminous fog, three tiers), registered as a candidate, and its touch controls (swipe to turn, tap the hub to probe, two-finger orbit,
+with grayscale glyphs, luminous fog, three tiers), and its touch controls (swipe to turn, tap the hub to probe, two-finger orbit,
 panel play) and its teaching and progression (hints, failure explanations, tutorial, stars, daily and practice
 modes) and its polish and accessibility (announcements, haptics, Dynamic Type, slow fades, ambient sound) and its persistence
 and replay (traced results reconciled on restore, schema 3, replay of the best solution) and its regression net (solver
 re-certification, code-computed golden frames, memory cycles) and its in-app integration (panel identifiers, stored
 schema examples, app unit and interface tests, Release symbol check) and its device preparation (eight pending device rows over
-twelve scenarios, a campaign plan and a rows check)) passed.
+twelve scenarios, a campaign plan and a rows check), integrated at X-R02-G04) passed.
 
 ```bash
 python3 Tools/python/desktop_runbook.py status   # legacy gates: framework and app phases
@@ -219,7 +219,8 @@ python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phon
 
 `project.yml` is the XcodeGen specification of the VisualCore app, its unit and interface tests, and the Showcase.
 Xcode projects and build output are generated locally and are not committed. Debug builds show experiences that are
-still candidates (A14 Solar System Explorer today) with the launch argument `-vcCandidates`.
+still candidates (none today; each round-two game is one between its renderer feature and its X gate) with the launch
+argument `-vcCandidates`.
 
 ## Testing and continuous integration
 
@@ -257,7 +258,7 @@ team ids, secrets) over the commits of every push and pull request; it is never 
 | `Packages/VisualCore/` | pure Swift modules without GPU or UIKit code; tested on the macOS host |
 | `Packages/VisualCoreRendering/` | iOS modules over ANGLE: render host, experience host, resources, shaders, effects, UI, audio, automation |
 | `Packages/ExperiencesCreative/` | the creative experiences, one folder each with `Core`, `CoreTests`, `Experience`, `ExperienceTests` and a `scenario-manifest.json`: `GenerativeArtStudio`, `FluidArtPlayground`, `FractalExplorer`, `ParticleUniverse`, `InfiniteGeometry`, `VisualCoreMusicLab`, `AudioOdyssey`, `OscilloscopeStudio`, `DigitalAquarium` |
-| `Packages/ExperiencesRound02` | the round-two games, one folder each (pure `…Core` and iOS `…Experience` targets with their tests): Aurora Loom (integrated), Lissajous Labyrinth (integrated), Wave Knot Keeper (integrated) |
+| `Packages/ExperiencesRound02` | the round-two games, one folder each (pure `…Core` and iOS `…Experience` targets with their tests): Aurora Loom (integrated), Lissajous Labyrinth (integrated), Wave Knot Keeper (integrated), Hue Compass (integrated) |
 | `Packages/ExperiencesRound03` … `Round04` | **planned** packages for the premium games (ADR-0009, D-06) |
 | `Showcase/` | developer Showcase app; not an App Store product |
 | `Harnesses/` | non-shipping test hosts: `InteractiveDemo/`, `SecondConsumer/` (Lumen Garden, a small sample game), `ProjectMReference/` |

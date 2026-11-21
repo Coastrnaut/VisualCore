@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "r02-g04.hue-compass",
+    "--runtime",
+    "27"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only r02-g04.hue-compass --runtime 27",
+  "elapsed_seconds": 159.057,
+  "exit_code": 0,
+  "finished": "2026-11-21T19:32:09+00:00",
+  "gate": "X-R02-G04",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-R02-G04.followthrough-verify27.log",
+  "log_sha256": "efa0709cf1f3fd014d06c79eeaef105c222a2ec28a6fec9c42534098ed3e5886",
+  "name": "followthrough-verify27",
+  "started": "2026-11-21T19:29:30+00:00",
+  "timed_out": false
+}

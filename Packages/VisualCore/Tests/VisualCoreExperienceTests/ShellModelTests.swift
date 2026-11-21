@@ -274,7 +274,8 @@ import Testing
                          "a25.effects-composer",
                          "r02-g01.aurora-loom",
                          "r02-g02.lissajous-labyrinth",
-                         "r02-g03.wave-knot-keeper"])
+                         "r02-g03.wave-knot-keeper",
+                         "r02-g04.hue-compass"])
         for search in ["", "aurora"] {
             #expect(LauncherModel.state(manifest: .success(manifest), categories: categories, registered: [],
                                         searchText: search) == .empty, "nothing registered shows nothing")
