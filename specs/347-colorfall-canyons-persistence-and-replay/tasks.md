@@ -36,7 +36,7 @@ tests stay short (< 10 s each). {device} items are D1–D3 observations after Im
   solution to replay for this level.", "The replay is over.", "Stop the replay first."; a replayed win claims no stars),
   with `Packages/ExperiencesRound02/ColorfallCanyons/CoreTests/ColorfallCanyonsExperienceCoreTests.swift` updates (schema 3, migrations 1 → 3 and 2 → 3, recording,
   replay rules and codes); `--name host-2`
-- [ ] T-R02G0507-004 [P] [US1] [US2] Create `Packages/ExperiencesRound02/ColorfallCanyons/CoreTests/ColorfallCanyonsPersistenceTests.swift` (agent B: 500 seeded reachable
+- [X] T-R02G0507-004 [P] [US1] [US2] Create `Packages/ExperiencesRound02/ColorfallCanyons/CoreTests/ColorfallCanyonsPersistenceTests.swift` (agent B: 500 seeded reachable — Verified 2026-11-21: 2026-11-21 host-3 exit 0: 16 tests / 35 cases (500 seeded round trips with equal digests and the sound choice never digested; 200 schema-1/2 migrations with progress kept; 200 saves reconcile exactly; same payload restores twice; daily depends only on the date; all 100 witness traces replay with their fingerprints) (.autonomy/migration/checks/R02-G05-07.host-3.json); lead retest
   states round-trip with equal digests, the sound choice included and never digested; schema 1 and 2 payloads of 100 seeded states migrate and restore with progress
   kept; 200 seeded saves: honest results survive, edited ones are dropped and counted; FR-R02G0507-005: the same save
   restores to an equal digest twice and the daily level depends only on the date given); `--name host-3`
