@@ -64,9 +64,10 @@ fluid, play, rules and the certified catalog with its pinned digest (68eec7b5…
   SC-R02G0503-001.
 - Q: How are rendered frames checked, and within which bounds? → A: the Core's CPU reference projects every cell top's
   centre, every spring emitter top and every basin centre through the same camera and gives the palette. Simulator tests
-  render offscreen at 1,152 × 768 and check that each spring emitter top lies within 3 pixels of a pixel brighter than the
-  background by at least 0.15 in luminance, that each open cell top centre's pixel differs from night by at least 0.1 in
-  luminance, and that the background matches night within 0.05 away from geometry. Palette: night #05070F, sandstone
+  render offscreen at 1,152 × 768 and check that each flowing spring emitter top lies within 3 pixels of a pixel brighter than
+  the background by at least 0.15 in luminance (a closed or dry emitter is drawn dimmed, ×0.3), that the top centre's
+  pixel of every dry front-row open cell and of at least 80 % of all open cells differs from night by at least 0.1 in
+  luminance (fluid and nearer blocks may cover a top), and that the background matches night within 0.05 away from geometry. Palette: night #05070F, sandstone
   #8C5A3C, rock #3B302C, pearl #E8E4DA, cyan #19E3F0, coral #FF6F59, yellow #FFD23F. Impact: FR-R02G0503-006;
   SC-R02G0503-001.
 - Q: What happens on a shader failure, and what does the renderer read? → A: the presenter draws from an immutable
