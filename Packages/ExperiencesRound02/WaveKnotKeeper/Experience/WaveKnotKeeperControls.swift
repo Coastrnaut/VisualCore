@@ -12,6 +12,8 @@ import WaveKnotKeeperCore
 struct WaveKnotKeeperControls: View {
     let port: ExperienceActionPort
     let mirror: WaveKnotKeeperMirror
+    /// Feature 324: "Reset view" returns the camera to the authored view.
+    var resetView: () -> Void = {}
 
     /// The button titles and spoken names of the six directions, in `WaveKnotKeeperDirection.allCases` order.
     static let titles: [String] = ["+x", "−x", "+y", "−y", "Over", "Under"]
@@ -71,6 +73,8 @@ struct WaveKnotKeeperControls: View {
                 .accessibilityLabel("Redo the move")
             Button("Next level") { send("level.next") }
                 .accessibilityLabel("Go to the next level")
+            Button("Reset view") { resetView() }
+                .accessibilityLabel("Return the camera to the authored view")
         }
     }
 

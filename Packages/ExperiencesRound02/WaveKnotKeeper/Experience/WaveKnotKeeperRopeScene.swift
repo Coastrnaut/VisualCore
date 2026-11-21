@@ -1,5 +1,5 @@
 // WaveKnotKeeperRopeScene — feature 323 (R02-G03-03) T-R02G0303-006 (FR-R02G0303-001 … 004, 007; clarifications Q1–Q4;
-// research R1–R4). Draws one `WaveKnotKeeperSceneSnapshot` at one tier through the real GL path: the night clear, the
+// research R1–R4; feature 324: the orbit camera and the ember ghost of a previewed move). Draws one `WaveKnotKeeperSceneSnapshot` at one tier through the real GL path: the night clear, the
 // rope's glass tube with `WaveKnotKeeperShaders.rope*` (premultiplied; pearl and sapphire with a fresnel rim, ember
 // caustic pulses on over-strands at projected crossings), the tier's glow shells (the same program on wider tubes,
 // additive), the handles as pearl icospheres (ember when selected) over the rope and the crossing gates last as
@@ -22,6 +22,10 @@ final class WaveKnotKeeperRopeScene {
     var ropeFragment = WaveKnotKeeperShaders.ropeFragment
     /// Whether the glow gain is capped (Reduce Flashing).
     var reducedFlash = false
+    /// The camera orbit (feature 324; presentation only).
+    var orbit = WaveKnotKeeperOrbit.authored
+    /// Where the dragged handle would move, drawn as an ember ghost (feature 324); nil when no move is previewed.
+    var preview: WaveKnotKeeperPoint?
 
     private var registry: ResourceRegistry?
     private var ropeRenderer: ShaderMeshRenderer?
@@ -69,7 +73,7 @@ final class WaveKnotKeeperRopeScene {
         try clear.render(context, frame: frame)
         guard context.pixelWidth > 0, context.pixelHeight > 0 else { return }
         aspect = Double(context.pixelWidth) / Double(context.pixelHeight)
-        let camera = WaveKnotKeeperSceneGeometry.camera(for: snapshot, aspect: aspect)
+        let camera = WaveKnotKeeperSceneGeometry.camera(for: snapshot, aspect: aspect, orbit: orbit)
         let key = Self.key(snapshot, tier: tier, aspect: aspect, fallback: fallbackReason != nil)
         if key != geometryKey { try rebuild(snapshot, tier: tier) }
         geometryKey = key
@@ -81,6 +85,7 @@ final class WaveKnotKeeperRopeScene {
         // rope (each handle sits on its control point, inside the tube), then the translucent gates.
         try drawRope(snapshot, tier: tier, camera: camera, animate: animate)
         try drawHandles(snapshot, camera: camera)
+        try drawGhost(camera: camera)
         try drawGates(snapshot, camera: camera)
     }
 
@@ -165,6 +170,23 @@ final class WaveKnotKeeperRopeScene {
                 p.set("u_boxCenter", SIMD3<Float>(0, 0, 0))
                 p.set("u_boxHalf", SIMD3<Float>(1, 1, 1))
             }
+        }
+    }
+
+    /// The ember ghost of the previewed move: the handle sphere at the would-be point, translucent.
+    private func drawGhost(camera: WaveKnotKeeperCamera) throws {
+        guard let preview, let handleRenderer else { return }
+        let view = WaveKnotKeeperSceneGeometry.eyeDirection
+        let mvp = Self.mvp(camera, offset: WaveKnotKeeperSceneGeometry.world(preview))
+        try handleRenderer.draw(blend: .premultipliedAlpha) { p in
+            p.set("u_mvp", matrix4: mvp.floats)
+            p.set("u_color", Self.float3(WaveKnotKeeperPalette.ember))
+            p.set("u_opacity", Float(0.45))
+            p.set("u_rim", Float(1))
+            p.set("u_viewDir", Self.float3(view))
+            p.set("u_edge", Float(0))
+            p.set("u_boxCenter", SIMD3<Float>(0, 0, 0))
+            p.set("u_boxHalf", SIMD3<Float>(1, 1, 1))
         }
     }
 

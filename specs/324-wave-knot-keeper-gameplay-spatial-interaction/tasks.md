@@ -37,7 +37,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 5: Story 4 and wiring — selection, preview, presenter (P2)
 
-- [ ] T-R02G0304-005 [US4] Edit `Packages/ExperiencesRound02/WaveKnotKeeper/Experience/WaveKnotKeeperPresenter.swift` (pointer entry through the gesture
+- [X] T-R02G0304-005 [US4] Edit `Packages/ExperiencesRound02/WaveKnotKeeper/Experience/WaveKnotKeeperPresenter.swift` (pointer entry through the gesture — Verified 2026-11-21: 2026-11-21 sim-27 exit 0 (presenter pointer entry through the gesture controller, orbit camera, ember ghost preview, Reset view; 6 wiring tests: drag makes exactly one move, tap selects and draws ember, refused drag shows the reason, orbit and reset leave the digest, cancel sends nothing, preview is the would-be point)
   controller, `resetView()`, orbit-aware camera, ghost preview of the candidate, announcements of refusals),
   `Packages/ExperiencesRound02/WaveKnotKeeper/Experience/WaveKnotKeeperRopeScene.swift` (orbit camera, ember ghost sphere) and
   `Packages/ExperiencesRound02/WaveKnotKeeper/Experience/WaveKnotKeeperControls.swift` ("Reset view"), with `Packages/ExperiencesRound02/WaveKnotKeeper/ExperienceTests/WaveKnotKeeperGestureWiringTests.swift`
