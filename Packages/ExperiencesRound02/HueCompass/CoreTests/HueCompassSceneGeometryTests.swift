@@ -7,6 +7,10 @@
 // and fog layers change triangle counts; fog colour follows density only; band colours follow the offset; no target
 // geometry while the target is absent; the glyph region stays clear of the radius-0.85 sample ring. Plain loops and
 // explicit types (CI type-check rule); seed 2_333.
+// Feature 334 (R02-G04-04) T-R02G0404-002 (FR-R02G0404-004; SC-R02G0404-003; clarification Q3) adds the orbit: at every
+// orbit limit (yaw ±40°, tilt 15° and 60° and their corners) and 7 aspects every vertex and the sampled 1.45 sphere stay
+// inside the view with 5 %; the authored orbit gives exactly camera(aspect:) and the pre-orbit authored camera; clamping;
+// the view never rolls (the far side of the compass and +z stay up the screen).
 import Foundation
 import Testing
 @testable import HueCompassCore
@@ -372,6 +376,155 @@ import VisualCoreScenes
             #expect(abs(pixel.x - 576) < 1e-6 && abs(pixel.y - 384) < 1e-6)
         } else {
             Issue.record("centre pixel missing")
+        }
+    }
+
+    // MARK: Orbit (feature 334)
+
+    /// The orbits at every limit (yaw −40°, 0, 40° × tilt 15°, 35°, 60°: the four edges, the four corners and the
+    /// authored orbit).
+    static func limitOrbits() -> [HueCompassOrbit] {
+        let yaws: [Double] = [-HueCompassOrbit.yawLimit, 0, HueCompassOrbit.yawLimit]
+        let tilts: [Double] = [HueCompassOrbit.tiltRange.lowerBound, HueCompassOrbit.authored.tilt,
+                               HueCompassOrbit.tiltRange.upperBound]
+        var result: [HueCompassOrbit] = []
+        for yaw in yaws {
+            for tilt in tilts { result.append(HueCompassOrbit(yaw: yaw, tilt: tilt)) }
+        }
+        return result
+    }
+
+    /// The bit patterns of the 16 entries of `m`, column by column.
+    static func bits(_ m: Mat4) -> [UInt64] {
+        var result: [UInt64] = []
+        for c in [m.c0, m.c1, m.c2, m.c3] {
+            result.append(c.x.bitPattern)
+            result.append(c.y.bitPattern)
+            result.append(c.z.bitPattern)
+            result.append(c.w.bitPattern)
+        }
+        return result
+    }
+
+    @Test func everyElementProjectsInsideTheViewAtEveryOrbitLimit() throws {
+        var points: [SIMD3<Double>] = []
+        for snapshot in try Self.extremeSnapshots() {
+            for (_, part) in try Self.parts(snapshot, tier: HueCompassTier.all[0]) {
+                for p in part.mesh.positions { points.append(Self.simd(p)) }
+            }
+            for b in 0..<96 { points.append(Geometry.fogTop(b, in: snapshot) + SIMD3(0, 0, 0.01)) }
+        }
+        for b in 0..<96 {
+            points.append(Geometry.needleTip(try Self.bearingSnapshot(b)))
+            points.append(Geometry.selectionMarkCentre(b))
+            points.append(Geometry.targetRingCentre(b))
+        }
+        // The bounding sphere itself, at 400 Fibonacci points.
+        for i in 0..<400 {
+            let z: Double = 1 - 2 * (Double(i) + 0.5) / 400
+            let r: Double = (1 - z * z).squareRoot()
+            let phi: Double = Double(i) * Double.pi * (3 - 5.0.squareRoot())
+            points.append(SIMD3(r * cos(phi), r * sin(phi), z) * Geometry.boundingRadius)
+        }
+        let orbits: [HueCompassOrbit] = Self.limitOrbits()
+        #expect(orbits.count == 9)
+        for orbit in orbits {
+            for aspect in Self.aspects {
+                let camera: HueCompassCamera = Geometry.camera(aspect: aspect, orbit: orbit)
+                var outside: Int = 0
+                for p in points {
+                    guard let v = Geometry.project(p, camera: camera) else {
+                        outside += 1
+                        continue
+                    }
+                    if v.x < 0.05 || v.x > 0.95 || v.y < 0.05 || v.y > 0.95 { outside += 1 }
+                }
+                #expect(outside == 0,
+                        "yaw \(orbit.yaw) tilt \(orbit.tilt) aspect \(aspect): \(outside) of \(points.count) outside")
+                // Every point lies between the near and far planes.
+                #expect(Self.length(camera.eye) - Geometry.boundingRadius > camera.near)
+                #expect(Self.length(camera.eye) + Geometry.boundingRadius < camera.far)
+            }
+        }
+    }
+
+    /// The Euclidean length of `v`.
+    static func length(_ v: SIMD3<Double>) -> Double { (v * v).sum().squareRoot() }
+
+    @Test func authoredOrbitIsTheAuthoredCamera() {
+        #expect(HueCompassOrbit.authored == HueCompassOrbit(yaw: 0, tilt: 35.0 * Double.pi / 180))
+        #expect(HueCompassOrbit.authored.eyeDirection == Geometry.eyeDirection)
+        #expect(HueCompassOrbit.authored.up == SIMD3(0, 1, 0))
+        var aspects: [Double] = Self.aspects
+        aspects.append(contentsOf: [0.1, 3, 10, Double.nan, -1])
+        for aspect in aspects {
+            let authored: HueCompassCamera = Geometry.camera(aspect: aspect)
+            let orbited: HueCompassCamera = Geometry.camera(aspect: aspect, orbit: .authored)
+            #expect(authored == orbited)
+            #expect(Self.bits(authored.viewProjection) == Self.bits(orbited.viewProjection))
+            // The camera before the orbit existed, rebuilt from its definition: bit for bit the same.
+            let a: Double = Geometry.usableAspect(aspect)
+            let d: Double = Geometry.distance(radius: Geometry.boundingRadius, aspect: a)
+            let eye: SIMD3<Double> = Geometry.eyeDirection * d
+            let near: Double = max((d - Geometry.boundingRadius) * 0.5, 1e-3)
+            let far: Double = d + 2 * Geometry.boundingRadius + 1
+            let view: Mat4 = Mat4.lookAt(eye: Geometry.vec(eye), target: Vec3(0, 0, 0), up: Vec3(0, 1, 0))
+            let projection: Mat4 = Mat4.perspective(fovY: Geometry.fieldOfView, aspect: a, near: near, far: far)
+            #expect(Self.bits(authored.viewProjection) == Self.bits(projection * view))
+            #expect(authored.eye.x.bitPattern == eye.x.bitPattern && authored.eye.y.bitPattern == eye.y.bitPattern
+                    && authored.eye.z.bitPattern == eye.z.bitPattern)
+            #expect(authored.near == near && authored.far == far && authored.aspect == a)
+        }
+    }
+
+    @Test func orbitClampsToItsLimits() {
+        let degree: Double = Double.pi / 180
+        #expect(abs(HueCompassOrbit.yawLimit - 40 * degree) < 1e-15)
+        #expect(abs(HueCompassOrbit.tiltRange.lowerBound - 15 * degree) < 1e-15)
+        #expect(abs(HueCompassOrbit.tiltRange.upperBound - 60 * degree) < 1e-15)
+        let inside: HueCompassOrbit = HueCompassOrbit(yaw: 0.3, tilt: 0.5)
+        #expect(inside.clamped() == inside)
+        #expect(HueCompassOrbit(yaw: 2, tilt: 0).clamped()
+                == HueCompassOrbit(yaw: HueCompassOrbit.yawLimit, tilt: HueCompassOrbit.tiltRange.lowerBound))
+        #expect(HueCompassOrbit(yaw: -2, tilt: 3).clamped()
+                == HueCompassOrbit(yaw: -HueCompassOrbit.yawLimit, tilt: HueCompassOrbit.tiltRange.upperBound))
+        #expect(HueCompassOrbit(yaw: .nan, tilt: .infinity).clamped() == .authored)
+        // The camera uses the clamped orbit.
+        let far: HueCompassCamera = Geometry.camera(aspect: 1, orbit: HueCompassOrbit(yaw: 5, tilt: 5))
+        let limit: HueCompassCamera = Geometry.camera(aspect: 1, orbit: HueCompassOrbit(yaw: HueCompassOrbit.yawLimit,
+                                                                                         tilt: HueCompassOrbit.tiltRange.upperBound))
+        #expect(far == limit)
+        // The eye direction is a unit vector at the stated tilt from +z and yaw about +z.
+        for orbit in Self.limitOrbits() {
+            let e: SIMD3<Double> = orbit.eyeDirection
+            #expect(abs(Self.length(e) - 1) < 1e-12)
+            #expect(abs(acos(e.z) - orbit.tilt) < 1e-9)
+            #expect(abs(atan2(e.x, -e.y) - orbit.yaw) < 1e-9)
+        }
+    }
+
+    @Test func orbitNeverRollsTheView() {
+        for orbit in Self.limitOrbits() {
+            for aspect in Self.aspects {
+                let camera: HueCompassCamera = Geometry.camera(aspect: aspect, orbit: orbit)
+                guard let centre = Geometry.project(.zero, camera: camera),
+                      let lifted = Geometry.project(SIMD3(0, 0, 0.3), camera: camera) else {
+                    Issue.record("centre did not project")
+                    continue
+                }
+                // The centre is the middle of the view and the z axis points straight up the screen.
+                #expect(abs(centre.x - 0.5) < 1e-9 && abs(centre.y - 0.5) < 1e-9)
+                #expect(lifted.y < centre.y && abs(lifted.x - centre.x) < 1e-9)
+                // The far side of the compass (away from the eye) is above the centre, the near side below.
+                let away: SIMD3<Double> = SIMD3(-orbit.eyeDirection.x, -orbit.eyeDirection.y, 0)
+                if let farSide = Geometry.project(Geometry.unit(away), camera: camera),
+                   let nearSide = Geometry.project(-Geometry.unit(away), camera: camera) {
+                    #expect(farSide.y < centre.y && nearSide.y > centre.y)
+                    #expect(abs(farSide.x - centre.x) < 1e-9)
+                } else {
+                    Issue.record("compass sides did not project")
+                }
+            }
         }
     }
 }

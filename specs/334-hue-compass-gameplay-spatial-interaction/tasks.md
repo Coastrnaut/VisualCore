@@ -13,7 +13,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G0404-002 Edit `Packages/ExperiencesRound02/HueCompass/Core/HueCompassSceneGeometry.swift` (`HueCompassOrbit` "yaw −40° … 40°, tilt 15° … 60°,
+- [X] T-R02G0404-002 Edit `Packages/ExperiencesRound02/HueCompass/Core/HueCompassSceneGeometry.swift` (`HueCompassOrbit` "yaw −40° … 40°, tilt 15° … 60°, — Verified 2026-11-21: 2026-11-21 host-2 exit 0 (agent B: HueCompassOrbit yaw ±40°, tilt 15° … 60°, authored 35°, camera(aspect:orbit:) with the authored orbit bit-equal to camera(aspect:); HueCompassDial centre, hub ≥ 30 pt, angle with the 20 pt dead zone, shortest-way accumulation, rounding and wrapping; 300 seeded swipes; every orbit limit × 7 aspects keeps the compass inside with 5 %)
   authored 35°", `camera(aspect:orbit:)` refitting the 1.45 sphere for a 5 % margin; `camera(aspect:)` equals the
   authored orbit) and create `Packages/ExperiencesRound02/HueCompass/Core/HueCompassDial.swift` (projected centre, hub radius "0.3 world units, at least 30
   points", angle atan2(−dy, dx) with "dead zone 20 points", steps round(angle · 96 / 2π), wrapping into "−47 … 48") with

@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "HueCompassDialTests|HueCompassSceneGeometryTests"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter 'HueCompassDialTests|HueCompassSceneGeometryTests'",
+  "elapsed_seconds": 6.809,
+  "exit_code": 0,
+  "finished": "2026-11-21T16:15:33+00:00",
+  "gate": "R02-G04-04",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G04-04.host-2.log",
+  "log_sha256": "2daf03cebeb0b7108334a30c1bf9d4d35c2585389bc86b177f272fffd406b139",
+  "name": "host-2",
+  "started": "2026-11-21T16:15:26+00:00",
+  "timed_out": false
+}

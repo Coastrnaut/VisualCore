@@ -14,13 +14,18 @@
 // alpha, uv.y is the drift phase; the shader may drift fog tops ±0.01 in z at time ≠ 0, inside the 1.45 sphere). Every
 // mesh also comes with a per-vertex colour stream (`HueCompassColouredMesh`) for the shared unlit fallback renderer.
 // Doubles are used for drawing only; nothing here is consulted by the rules.
+// Feature 334 (R02-G04-04) T-R02G0404-002 (FR-R02G0404-004; SC-R02G0404-003; clarification Q3) adds the camera orbit
+// (`HueCompassOrbit`: yaw ±40° about the z axis, tilt 15° … 60° from the z axis, authored yaw 0 and tilt 35°) and
+// `camera(aspect:orbit:)`, which refits the same 1.45 bounding sphere so the 5 % margin holds at every orbit; the
+// authored camera is the authored orbit. Presentation only: never in the digest, the snapshot or the kernel.
 import Foundation
 import VisualCoreMath
 import VisualCoreScenes
 
 /// The camera of the Hue Compass scene for one aspect.
 ///
-/// Built only by ``HueCompassSceneGeometry/camera(aspect:)``. World positions are in compass units (the wheel's outer
+/// Built only by ``HueCompassSceneGeometry/camera(aspect:)`` (the authored orbit) and
+/// ``HueCompassSceneGeometry/camera(aspect:orbit:)``. World positions are in compass units (the wheel's outer
 /// tick radius is 1); ``viewProjection`` maps them to GL clip space (right-handed, depth −1 … 1).
 public struct HueCompassCamera: Sendable, Equatable {
     /// The eye position in world units.
@@ -35,8 +40,59 @@ public struct HueCompassCamera: Sendable, Equatable {
     public let near: Double
     /// The far clip distance.
     public let far: Double
-    /// The view-projection matrix: `Mat4.perspective` (GL depth range) times `Mat4.lookAt` with +y up.
+    /// The view-projection matrix: `Mat4.perspective` (GL depth range) times `Mat4.lookAt` with the orbit's
+    /// ``HueCompassOrbit/up`` (+y at the authored orbit).
     public let viewProjection: Mat4
+}
+
+/// The orbit of the Hue Compass camera (feature 334, R02-G04-04, clarification Q3): a yaw of the eye about the world z
+/// axis and a tilt of the eye direction from the z axis, both in radians. Presentation only: never in the digest, the
+/// snapshot, the kernel or the save.
+///
+/// The eye direction is (sin tilt · sin yaw, −sin tilt · cos yaw, cos tilt), so ``authored`` (yaw 0, tilt 35°)
+/// reproduces ``HueCompassSceneGeometry/eyeDirection`` exactly: the eye south of the compass (−y), looking at the
+/// origin. Positive yaw turns the eye counter-clockwise about +z (seen from above).
+public struct HueCompassOrbit: Sendable, Equatable {
+    /// The yaw in radians about +z, from the −y side towards +x; allowed −``yawLimit`` … ``yawLimit``.
+    public var yaw: Double
+    /// The tilt in radians: the angle of the eye direction from +z; allowed ``tiltRange`` (15° … 60°).
+    public var tilt: Double
+
+    /// An orbit of the given yaw and tilt in radians (not clamped; see ``clamped()``).
+    public init(yaw: Double, tilt: Double) {
+        self.yaw = yaw
+        self.tilt = tilt
+    }
+
+    /// The authored orbit: yaw 0, tilt 35° (``HueCompassSceneGeometry/tilt``).
+    public static let authored = HueCompassOrbit(yaw: 0, tilt: HueCompassSceneGeometry.tilt)
+    /// The largest yaw either way, 40° in radians.
+    public static let yawLimit: Double = 40.0 * Double.pi / 180
+    /// The allowed tilts, 15° … 60° in radians.
+    public static let tiltRange: ClosedRange<Double> = (15.0 * Double.pi / 180)...(60.0 * Double.pi / 180)
+
+    /// This orbit with yaw clamped to −40° … 40° and tilt to 15° … 60°; a non-finite angle becomes the authored one.
+    public func clamped() -> HueCompassOrbit {
+        let y: Double = yaw.isFinite ? yaw : Self.authored.yaw
+        let t: Double = tilt.isFinite ? tilt : Self.authored.tilt
+        return HueCompassOrbit(yaw: min(max(y, -Self.yawLimit), Self.yawLimit),
+                               tilt: min(max(t, Self.tiltRange.lowerBound), Self.tiltRange.upperBound))
+    }
+
+    /// The unit direction from the compass centre to the eye at the clamped orbit:
+    /// (sin t · sin y, −sin t · cos y, cos t) with y the yaw and t the tilt.
+    public var eyeDirection: SIMD3<Double> {
+        let o: HueCompassOrbit = clamped()
+        return SIMD3(sin(o.tilt) * sin(o.yaw), -sin(o.tilt) * cos(o.yaw), cos(o.tilt))
+    }
+
+    /// The world up vector of the view at the clamped orbit: +y turned by the yaw about +z, (−sin y, cos y, 0). It is
+    /// horizontal and never parallel to the eye direction (the tilt is at least 15°), so the far side of the compass
+    /// always appears above its centre and the view never rolls; +y exactly at yaw 0.
+    public var up: SIMD3<Double> {
+        let o: HueCompassOrbit = clamped()
+        return SIMD3(0 - sin(o.yaw), cos(o.yaw), 0)
+    }
 }
 
 /// A mesh with one colour per vertex (linear RGBA 0 … 1, alpha 1), aligned with `mesh.positions`.
@@ -498,17 +554,28 @@ public enum HueCompassSceneGeometry {
         return max(radius, 1e-3) / sin(atan(limit))
     }
 
-    /// The fixed authored camera for `aspect` (width / height): the eye on ``eyeDirection`` from the origin at the
-    /// distance that fits the bounding sphere of radius 1.45, looking at the origin with +y up and a 45° vertical field
-    /// of view. For aspects 0.4 … 2.5 every vertex of the needle, wheel, fog and marks projects inside the view with at
-    /// least 5 % margin on every side. Independent of the snapshot and the quality tier.
+    /// The fixed authored camera for `aspect` (width / height): ``camera(aspect:orbit:)`` at
+    /// ``HueCompassOrbit/authored``, so the eye lies on ``eyeDirection`` from the origin at the distance that fits the
+    /// bounding sphere of radius 1.45, looking at the origin with +y up and a 45° vertical field of view. For aspects
+    /// 0.4 … 2.5 every vertex of the needle, wheel, fog and marks projects inside the view with at least 5 % margin on
+    /// every side. Independent of the snapshot and the quality tier.
     public static func camera(aspect: Double) -> HueCompassCamera {
+        camera(aspect: aspect, orbit: .authored)
+    }
+
+    /// The camera for `aspect` (width / height) and `orbit` (clamped, see ``HueCompassOrbit/clamped()``): the eye on the
+    /// orbit's ``HueCompassOrbit/eyeDirection`` from the origin at the distance that fits the bounding sphere of radius
+    /// 1.45, looking at the origin with the orbit's ``HueCompassOrbit/up`` and a 45° vertical field of view. The fit is
+    /// of the bounding sphere, which does not depend on the view direction, so for every orbit and every aspect
+    /// 0.4 … 2.5 every vertex of the scene projects inside the view with at least 5 % margin on every side.
+    /// Independent of the snapshot and the quality tier; presentation only.
+    public static func camera(aspect: Double, orbit: HueCompassOrbit) -> HueCompassCamera {
         let a: Double = usableAspect(aspect)
         let d: Double = distance(radius: boundingRadius, aspect: a)
-        let eye: SIMD3<Double> = eyeDirection * d
+        let eye: SIMD3<Double> = orbit.eyeDirection * d
         let near: Double = max((d - boundingRadius) * 0.5, 1e-3)
         let far: Double = d + 2 * boundingRadius + 1
-        let view: Mat4 = Mat4.lookAt(eye: vec(eye), target: Vec3(0, 0, 0), up: Vec3(0, 1, 0))
+        let view: Mat4 = Mat4.lookAt(eye: vec(eye), target: Vec3(0, 0, 0), up: vec(orbit.up))
         let projection: Mat4 = Mat4.perspective(fovY: fieldOfView, aspect: a, near: near, far: far)
         return HueCompassCamera(eye: eye, target: .zero, fovY: fieldOfView, aspect: a, near: near, far: far,
                                 viewProjection: projection * view)
