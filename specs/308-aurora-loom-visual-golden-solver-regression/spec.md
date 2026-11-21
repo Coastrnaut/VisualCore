@@ -139,6 +139,10 @@ simulator parts and reports one summary.
 - **Memory measurement noise:** the bound applies after a warm-up cycle and to the growth between the first and last
   measured cycle, not to a single sample.
 - **A slower CI runner:** no wall-clock assertion runs on CI; time bounds are counted in solver work, not seconds.
+- **A missing, unreadable or incomplete golden manifest** (a frame without a digest, an unknown frame, a schema other
+  than 1): the regression fails naming the file and the frame; it is never regenerated without the explicit switch.
+- **Layout and aspect:** this feature changes no interface. Golden frames use one size (768 × 512, aspect 1.5); the
+  other aspects 0.4 … 2.5 and the iPhone and iPad panel layouts stay covered by the R02-G01-03 and R02-G01-06 tests.
 
 ## Requirements *(mandatory)*
 
