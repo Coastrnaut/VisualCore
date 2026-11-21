@@ -20,7 +20,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
   `scripts/release_check.py` (step `device-rows-r02-g02`); `--name device-rows -- python3 scripts/check_device_rows.py
   --experience r02-g02.lissajous-labyrinth`
 - [ ] T-R02G0210-003 [P] [US1] Edit `scripts/test_scripts.py` (agent A: the real Lissajous definition passes; a copy
-  with a scenario removed and a copy with T-R02G0209-011 dropped from every row's covers each fail by name; the release
+  with a scenario removed, a copy with LL-D1's `pass` field removed and a copy with T-R02G0209-011 dropped from every row's covers each fail by name; the release
   step `device-rows-r02-g02` runs the check for `r02-g02.lissajous-labyrinth`); `--name script-tests` (alone)
 
 ## Phase 3: Story 2 — a person can follow the plan (P2)
