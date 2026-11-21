@@ -16,7 +16,7 @@
   catalog shows.
 - **R4 — Memory measure.** Decision: `ProcessMemory.footprint()` after each of 12 cycles; bound 16 MB growth over cycle
   1; zero live GPU objects after each close and memory warning. Rationale: footprint is the figure the system judges;
-  cycle 1 absorbs one-time caches; a count of live programs and buffers proves release independently of allocator noise.
+  cycle 1 absorbs one-time caches; a count of the scene's live mesh renderers proves release independently of allocator noise.
 - **R5 — CI and the local command.** Decision: a named workflow step running `--filter AuroraLoomRegression`; a Python
   script running the host filter then `xcodebuild_package.py --only-testing` of the two simulator classes with
   `--max-seconds`, one summary line per part. Rationale: the host job already builds the package; the script reuses the

@@ -4,7 +4,7 @@
 public enum AuroraLoomGolden {
     public struct Frame: Sendable, Equatable { public let name: String; public let level: Int; public let tier: Int
         public let time: Double; public let moves: [AuroraLoomMove] }
-    public static let width = 768, height = 512
+    public static let width = 96, height = 64
     public static var frames: [Frame] { get }                              // 16, fixed order
     public static func snapshot(_ frame: Frame) throws -> AuroraLoomSceneSnapshot
     public static func description(_ frame: Frame) throws -> Data           // JSON, sorted keys
@@ -13,5 +13,5 @@ public enum AuroraLoomGolden {
     public static func compare(_ frame: Frame, pinned: Data) throws -> String?   // nil when equal or within one quantum;
                                                                                   // else the first differing value
 }
-// AuroraLoomRibbonScene (experience, internal): var liveObjectCount: Int — programs and buffers held; 0 after release.
+// AuroraLoomRibbonScene (experience, internal): var liveObjectCount: Int — mesh renderers held (each with its buffers); 0 after release.
 ```

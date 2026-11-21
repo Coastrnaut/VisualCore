@@ -8,16 +8,16 @@ recorded only after every agent has reported). Commit after every task with its 
 
 ## Phase 1: Setup
 
-- [ ] T-R02G0108-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test
+- [X] T-R02G0108-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test — Verified 2026-11-20: 2026-11-20 R02-G01-08.baseline-host/timing/round02 exit 0
   --package-path Packages/ExperiencesRound02`; the rendering baseline is R02-G03-01's rendering runs (exit 0)
 
 ## Phase 2: Foundational
 
 - [ ] T-R02G0108-002 Create `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomGolden.swift` (contracts/api.md: "16 frames: levels 1, 21, 41, 61, 81 at
-  tiers 0, 1, 2, time 0, plus the hero frame"; description JSON with sorted keys at 768 × 512, positions in 1/8 pixel,
+  tiers 0, 1, 2, time 0, plus the hero frame"; description JSON with sorted keys at 96 × 64, positions in 1/8 pixel,
   colours 0 … 255; SHA-256 digests; `manifest()` "{schema 1, frames: name → {description, digest}}"; `compare` "equal
   digest, or positions within one 1/8-pixel quantum and equal colours") and edit
-  `Packages/ExperiencesRound02/AuroraLoom/Experience/AuroraLoomRibbonScene.swift` (`liveObjectCount`: programs and buffers held, 0 after `release()`);
+  `Packages/ExperiencesRound02/AuroraLoom/Experience/AuroraLoomRibbonScene.swift` (`liveObjectCount`: mesh renderers held (each with its buffers), 0 after `release()`);
   `--name host -- swift test --package-path Packages/ExperiencesRound02`
 
 ## Phase 3: Story 1 — every level stays solvable (P1) 🎯
@@ -35,7 +35,7 @@ recorded only after every agent has reported). Commit after every task with its 
   and a changed tier each change the affected digests); the lead generates and commits `Packages/ExperiencesRound02/AuroraLoom/golden-frames.json`;
   `--name host-3 -- swift test --package-path Packages/ExperiencesRound02 --filter AuroraLoomRegressionGoldenTests`
 - [ ] T-R02G0108-005 [P] [US2] Create `Packages/ExperiencesRound02/AuroraLoom/ExperienceTests/AuroraLoomRegressionGoldenFrameTests.swift` (agent C: each of the 16
-  frames rendered off-screen at 768 × 512 through the session host and checked against its description: positions within
+  frames rendered off-screen at 96 × 64 through the session host and checked against its description: positions within
   2 px, colours within 0.12 per channel, background within 0.05 of night); `--name sim-27 -- python3
   scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package --destination
   sim-27.2 --action test`

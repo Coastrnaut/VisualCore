@@ -26,7 +26,7 @@ or app change.
 **Testing**: host `swift test --package-path Packages/ExperiencesRound02 --filter AuroraLoomRegression`; simulator
 `--only-testing` of the golden and memory test classes; the regression as in 307.
 **Performance**: the solver regression re-solves 100 levels (each at most 3,840 evaluations) and regenerates them,
-split into five band tests; golden descriptions are pure CPU work for 16 frames at 768 × 512. Counted, never timed.
+split into five band tests; golden descriptions are pure CPU work for 16 frames at 96 × 64. Counted, never timed.
 **Constraints**: additive; the only experience change is a test-visible live GPU object count on the ribbon scene.
 
 No NEEDS CLARIFICATION remains.

@@ -37,7 +37,8 @@ Answered autonomously under the owner's standing delegation, safest well-support
 code (read-only audit, 2026-11-20): `AuroraLoomSolver.solve(_:)` is exact (per-ribbon bounded descent of at most
 `maxSweeps` = 32 sweeps, then the full 256-setting grid) and counts every score evaluation in `work`; the 100 witness
 files are byte-checked by `AuroraLoomCatalogTests` and their refusals by `AuroraLoomWitnessTests`; the simulator render
-tests of feature 303 already compare frames with the CPU reference at 768 × 512; `ProcessMemory.footprint()`
+tests of feature 303 already compare frames with the CPU reference at 96 × 64 (amended during implement: an earlier
+wording said 768 × 512, which is Lissajous Labyrinth's size); `ProcessMemory.footprint()`
 (VisualCoreRendering) reads the process footprint through the public `task_info`; `AuroraLoomRibbonScene.release()` frees
 the GPU objects; the GitHub workflow's host job runs `swift test --package-path Packages/ExperiencesRound02`;
 `scripts/xcodebuild_package.py` runs simulator tests with `--only-testing` and a time limit.
@@ -54,7 +55,7 @@ the GPU objects; the GitHub workflow's host job runs `swift test --package-path 
   level fingerprint. Impact: FR-R02G0108-002; SC-R02G0108-002.
 - Q: What is a golden frame description, where is its digest pinned, and how is it regenerated? → A: for each golden
   frame (levels 1, 21, 41, 61, 81 at tiers 0, 1, 2 at frame time 0, plus the hero frame of the scenario manifest's hero
-  scenario at tier 0: 16 frames) the Core computes, at 768 × 512, the projected pixel positions of every ribbon sample
+  scenario at tier 0: 16 frames) the Core computes, at 96 × 64, the projected pixel positions of every ribbon sample
   checked by the feature-303 frame check, of every gate marker and gate centre, rounded to 1/8 pixel, and the expected
   colours as 8-bit sRGB; serialized as JSON with sorted keys, hashed with SHA-256. The 16 descriptions and their digests
   live in a committed file `Packages/ExperiencesRound02/AuroraLoom/golden-frames.json` (amended in analyze: positions
@@ -67,8 +68,9 @@ the GPU objects; the GitHub workflow's host job runs `swift test --package-path 
 - Q: How is memory measured and what releases are checked? → A: on the simulator, 12 cycles of open (prepare a level),
   draw 3 frames at tier 0, send a memory warning, draw 1 frame, close (teardown); the footprint is read with
   `ProcessMemory.footprint()` after each cycle; the bound is that every reading of cycles 2 … 12 stays within 16 MB of
-  cycle 1's reading. After each close and after each memory warning the scene holds no GPU objects (a test-visible count
-  of live programs and buffers is 0) and the next frame rebuilds them. An unavailable footprint fails the check with a
+  cycle 1's reading. After each close and after each memory warning the scene holds no GPU objects of its own (a
+  test-visible count of its mesh renderers, each holding its buffers, is 0; the shader programs belong to the host
+  context's shared registry, amended during implement) and the next frame rebuilds them. An unavailable footprint fails the check with a
   named reason rather than passing. Impact: FR-R02G0108-005; SC-R02G0108-004.
 - Q: How do CI and the local command report, and what do they run? → A: CI's host job keeps running all round-two host
   tests (solver regression and golden digests included) and adds a named step that runs the Aurora Loom regression
@@ -144,7 +146,7 @@ simulator parts and reports one summary.
 - **A slower CI runner:** no wall-clock assertion runs on CI; time bounds are counted in solver work, not seconds.
 - **A missing, unreadable or incomplete golden manifest** (a frame without a digest, an unknown frame, a schema other
   than 1): the regression fails naming the file and the frame; it is never regenerated without the explicit switch.
-- **Layout and aspect:** this feature changes no interface. Golden frames use one size (768 × 512, aspect 1.5); the
+- **Layout and aspect:** this feature changes no interface. Golden frames use one size (96 × 64, aspect 1.5); the
   other aspects 0.4 … 2.5 and the iPhone and iPad panel layouts stay covered by the R02-G01-03 and R02-G01-06 tests.
 
 ## Requirements *(mandatory)*
