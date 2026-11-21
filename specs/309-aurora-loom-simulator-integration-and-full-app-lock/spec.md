@@ -89,8 +89,8 @@ visible, labelled controls and read the experience's spoken description.
 
 **Acceptance Scenarios**:
 
-1. **Given** a fresh app on the simulator, **When** the tester opens Aurora Loom and changes ribbons with the panel's
-   steppers along level 1's solution, **Then** the level is won, the stars are shown and the next level opens.
+1. **Given** a fresh app on the simulator, **When** the tester opens Aurora Loom, sets level 1's solution steps as
+   pending steps with the panel's steppers and taps Apply, **Then** the level is won, the stars are shown and the next level opens.
 2. **Given** a won level, **When** the app is relaunched, **Then** the same progress, stars and open levels are shown.
 3. **Given** a solved level, **When** the tester taps Replay and steps through it, **Then** the replay ends won and
    Stop returns to the campaign.
