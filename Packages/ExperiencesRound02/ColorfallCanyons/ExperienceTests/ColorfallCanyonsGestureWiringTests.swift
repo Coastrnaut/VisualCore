@@ -313,5 +313,31 @@ enum ColorfallCanyonsGestureScript {
         try ColorfallCanyonsTest.draw(session)
         #expect(shell.presenter.scene.highlightedCell == nil)
     }
+
+    /// T-R02G0504-013 (FR-R02G0504-005): with the fluid program broken (the unlit fallback), a drag from a carvable
+    /// cell still highlights it, the frame with the unlit pearl ring draws without error and something visible, and the
+    /// release still sends one carve.
+    @Test func theFallbackDrawsTheHighlightAndTheDragStillCarves() async throws {
+        let session = ExperienceSession()
+        defer { session.close() }
+        let size: CGSize = CGSize(width: Script.viewWidth, height: Script.viewHeight)
+        let shell = try await ColorfallCanyonsTest.open(session, seed: 0, size: size) { $0.breakFluidShader() }
+        #expect(shell.presenter.fallbackReason != nil, "the fluid program is broken")
+        let target = try #require(try Script.carvableTarget(shell), "a carvable cell visible at the authored orbit")
+        let sentBefore: Script.Sent = Script.sent(shell)
+        var time: Double = 0
+        let end: Vec2 = Script.dragEnd(from: target.point)
+        Script.dragWithoutRelease(shell, from: target.point, to: end, time: &time)
+        try ColorfallCanyonsTest.draw(session)
+        #expect(shell.presenter.scene.highlightedCell == target.cell, "the fallback outlines the dragged cell")
+        let rgba: [UInt8] = try ColorfallCanyonsTest.still(session)
+        #expect(ColorfallCanyonsTest.nonNightPixels(rgba) > 0, "the fallback frame with the ring draws something")
+        #expect(shell.state != .failed)
+        Script.touch(shell, id: 1, .ended, at: end, time: &time)
+        let sentAfter: Script.Sent = Script.sent(shell)
+        #expect(sentAfter.accepted == sentBefore.accepted + 1 && sentAfter.rejected == sentBefore.rejected)
+        try ColorfallCanyonsTest.draw(session)
+        #expect(shell.presenter.scene.highlightedCell == nil)
+    }
 }
 #endif

@@ -67,4 +67,4 @@ stays open until device testing. Shared files (presenter, scene, controls, docs)
 
 ## Phase 7: Convergence
 
-- [ ] T-R02G0504-013 Add a simulator test to `Packages/ExperiencesRound02/ColorfallCanyons/ExperienceTests/ColorfallCanyonsGestureWiringTests.swift`: with the fluid shader broken (fallback), a drag from a carvable cell highlights it and the frame draws without error (the unlit pearl ring), and release still sends one carve, per FR-R02G0504-005 (partial)
+- [X] T-R02G0504-013 Add a simulator test to `Packages/ExperiencesRound02/ColorfallCanyons/ExperienceTests/ColorfallCanyonsGestureWiringTests.swift`: with the fluid shader broken (fallback), a drag from a carvable cell highlights it and the frame draws without error (the unlit pearl ring), and release still sends one carve, per FR-R02G0504-005 (partial) — Verified 2026-11-21: 2026-11-21 sim-27-converge exit 0: ColorfallCanyonsExperienceTests on sim-27.2 incl. theFallbackDrawsTheHighlightAndTheDragStillCarves (.autonomy/migration/checks/R02-G05-04.sim-27-converge.json)
