@@ -110,11 +110,14 @@ enum ExperienceRegistry {
     /// gate moves its registration from here to `all`.
     static let candidates: [ExperienceRegistration] = [hueCompass].compactMap { $0 }
 
-    /// R02-G04 Hue Compass (feature 333, R02-G04-03): a candidate until X-R02-G04. Snapshot schema 1, so no earlier
-    /// example is stored yet.
+    /// R02-G04 Hue Compass (feature 333, R02-G04-03): a candidate until X-R02-G04. Snapshot schema 3 (feature 337), so
+    /// the schema-1 and schema-2 examples are stored (feature 339, R02-G04-09).
     fileprivate static var hueCompass: ExperienceRegistration? {
         guard let id = HueCompassExperience.id else { return nil }
-        var registration = ExperienceRegistration(id: id, core: HueCompassExperienceCore.self) { launch in
+        let examples = [HueCompassExperienceCore.schemaOneExample(),
+                        HueCompassExperienceCore.schemaTwoExample()].compactMap { $0 }
+        var registration = ExperienceRegistration(id: id, core: HueCompassExperienceCore.self,
+                                                  examples: examples) { launch in
             let system = SystemAccessibilityObserver.systemValues()
             return HueCompassExperience.make(
                 id: id, storage: launch.storage,

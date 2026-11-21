@@ -13,7 +13,7 @@ tests stay short (< 10 s each; interface tests < 90 s, SC-R02G0409-001). No {own
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G0409-002 Create `Packages/ExperiencesRound02/HueCompass/Core/HueCompassSchemaExamples.swift`
+- [X] T-R02G0409-002 Create `Packages/ExperiencesRound02/HueCompass/Core/HueCompassSchemaExamples.swift` — Verified 2026-11-21: 2026-11-21 host exit 0 (whole round-two host suite): HueCompassSchemaExampleTests 7/7 (both examples restore through the migrations to schema 3 with progress kept; digests match; other versions nil; deterministic); registration stores both examples, comment corrected
   (contracts/api.md; data-model: schema 1 "a seeded play of level 1 with one turn that does not win", schema 2 "campaign, frontier 2,
   level 1 solved without a trace", seed 7, the envelope of `WaveKnotKeeperSchemaExamples`) with
   `Packages/ExperiencesRound02/HueCompass/CoreTests/HueCompassSchemaExampleTests.swift` (agent A: both
