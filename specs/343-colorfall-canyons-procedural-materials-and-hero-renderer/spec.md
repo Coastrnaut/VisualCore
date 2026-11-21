@@ -53,8 +53,9 @@ fluid, play, rules and the certified catalog with its pinned digest (68eec7b5…
   0.35 + 0.65·min(V, 24)/24; each passing cell with fluid and a downhill neighbour carries flow bands along that direction
   (a waterfall where the drop is 2 or more steps). Each colour also has a pattern in the sheet (cyan: stripes, coral:
   dots, yellow: chevrons) and each basin's rim shows its required mix as three arcs in those patterns. The camera is a
-  fixed authored perspective looking at the grid centre from the front (+z), pitched 50° down, fitted to the grid's
-  bounding sphere (radius √2 · max extent + 0.1) with a 5 % margin for aspect 0.4 … 2.5. Flow bands move with
+  fixed authored perspective looking at the grid centre from the front (+z), pitched 50° down, fitted to a
+  bounding sphere about the grid centre (at y = 0) whose radius is the distance to the farthest corner of the tallest
+  element (block tops, rock slabs and emitters included) plus 0.1, with a 5 % margin for aspect 0.4 … 2.5. Flow bands move with
   presentation time only. Nothing drawn is consulted by the rules. Impact: FR-R02G0503-001, 002, 006.
 - Q: What do the three quality tiers change? → A: `level-0` (richest): each block top subdivided 4 × 4 with bevelled
   generated normals, 3 flow bands per channel, 2 glow shells; `level-1`: 2 × 2, 2 bands, 1 glow shell; `level-2` (the
@@ -137,7 +138,8 @@ as available, and the experience package, registry, catalog and content checks p
 - **A shader that fails to compile or link:** the scene shows the documented fallback (the minimal tier, unlit), keeps
   the program name and reason, and the logical state is unchanged.
 - **Zero-size or very small views, rotation and resize:** a zero-size view draws nothing and reports no error; for every
-  aspect ratio from 0.4 to 2.5 the camera fits the whole terrain with a margin.
+  aspect ratio from 0.4 to 2.5 the camera fits the whole terrain, emitters included, with a margin of at least 5 % on
+  each side.
 - **Colour-blind players:** each colour of fluid also carries a distinct pattern, and every basin shows its required mix
   with the same patterns, so no information is carried by hue only.
 - **Memory warning:** caches are released and rebuilt on the next frame.
