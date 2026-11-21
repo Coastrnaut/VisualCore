@@ -66,3 +66,7 @@ tests stay short (< 10 s each; interface tests < 90 s, SC-R02G0209-001). No {own
 001 → 002 (lead; agent A tests) → 003 (lead; agent E tests) → {004 (agents C, D), 005 (agent B), 006} → 007 … 010, 012.
 011 stays open until device testing. Shared files (examples source, registry, controls, project.yml, docs) stay with the
 lead. MVP: Stories 1 and 2.
+
+## Phase 7: Convergence
+
+- [ ] T-R02G0209-013 In `Apps/VisualCore/Tests/Unit/AppModelTests.swift` `testLissajousLabyrinthLevelOneDialsEqualTheCore`, also assert level 1's allowance equals `LL.levelOneAllowance` (9) and cite clarification Q2 (not Q5) for the pins, per data-model "Level 1 constants" (partial); `--name app-unit-2 -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`
