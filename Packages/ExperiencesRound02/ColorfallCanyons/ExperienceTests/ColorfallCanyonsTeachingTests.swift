@@ -210,7 +210,8 @@ enum ColorfallCanyonsTeaching {
         #expect(locked == .rejected(.rule(code: ColorfallCanyonsExperienceRule.locked)), "\(locked.code)")
         #expect(locked.code.contains("r02-g05.locked"))
         let message: String = try #require(presenter.mirror.message, "the refusal is shown")
-        #expect(message == "That change was refused: \(locked.code)", "\(message)")
+        // Feature 346: refusals are shown in words.
+        #expect(message == "That level is not open yet.", "\(message)")
         #expect(try ColorfallCanyonsTest.digest(shell) == digest, "a refused pick changes nothing")
         #expect(presenter.mirror.levelNumber == 1)
 

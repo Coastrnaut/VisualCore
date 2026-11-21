@@ -34,6 +34,8 @@ final class ColorfallCanyonsCanyonScene {
     var orbit: ColorfallCanyonsOrbit = .authored
     /// The cell a drag in progress would carve, outlined in pearl; nil when no drag is in progress.
     var highlightedCell: Int?
+    /// The eased light levels of the sheets, emitters and win glow (feature 346); nil draws feature 343's levels.
+    var lights: ColorfallCanyonsLights?
     /// The light direction of the terrain (towards the light, from the upper left front).
     static let lightDirection = SIMD3<Float>(-0.4, 0.8, 0.45)
 
@@ -47,6 +49,8 @@ final class ColorfallCanyonsCanyonScene {
         let stage: ColorfallCanyonsStage
         let tier: Int
         let fallback: Bool
+        /// The eased lights (feature 346): while a fade runs they change every frame and the fluid is rebuilt.
+        let lights: ColorfallCanyonsLights?
     }
 
     private var registry: ResourceRegistry?
@@ -109,9 +113,9 @@ final class ColorfallCanyonsCanyonScene {
         guard context.pixelWidth > 0, context.pixelHeight > 0 else { return }
         aspect = Double(context.pixelWidth) / Double(context.pixelHeight)
         let camera = ColorfallCanyonsSceneGeometry.camera(snapshot, aspect: aspect, orbit: orbit)
-        let key = Self.key(snapshot, tier: tier, fallback: fallbackReason != nil)
+        let key = Self.key(snapshot, tier: tier, fallback: fallbackReason != nil, lights: lights)
         if key != geometryKey { try rebuild(snapshot, tier: tier) }
-        geometryKey = Self.key(snapshot, tier: tier, fallback: fallbackReason != nil)
+        geometryKey = Self.key(snapshot, tier: tier, fallback: fallbackReason != nil, lights: lights)
         if fallbackReason != nil {
             try drawFallback(camera)
             try drawHighlight(snapshot, camera: camera)
@@ -124,7 +128,8 @@ final class ColorfallCanyonsCanyonScene {
                       gain: ColorfallCanyonsShaders.standardGlowGain, shell: false)
         try drawFluid(fluidRenderer, camera: camera, cell: cell, time: time, bands: tier.flowBands,
                       gain: ColorfallCanyonsShaders.standardGlowGain, shell: false)
-        let gain = ColorfallCanyonsShaders.glowGain(for: tier)
+        // Feature 346 (research R5): the win glow scales the shells' gain; `u_glowLimit` still caps it.
+        let gain = ColorfallCanyonsShaders.glowGain(for: tier) * (1 + (lights?.glow ?? 0))
         if tier.glowShells > 0, gain > 0 {
             for _ in 0..<tier.glowShells {
                 try drawFluid(fluidRenderer, camera: camera, cell: cell, time: time, bands: tier.flowBands, gain: gain,
@@ -174,9 +179,10 @@ final class ColorfallCanyonsCanyonScene {
 
     /// The geometry key of `snapshot` at `tier` in the given mode.
     private static func key(_ s: ColorfallCanyonsSceneSnapshot, tier: ColorfallCanyonsTier,
-                            fallback: Bool) -> GeometryKey {
+                            fallback: Bool, lights: ColorfallCanyonsLights?) -> GeometryKey {
         GeometryKey(levelNumber: s.levelNumber, heights: s.heights, masses: s.masses, valves: s.springs.map(\.open),
-                    supplies: s.springs.map(\.supplyLeft), stage: s.stage, tier: tier.index, fallback: fallback)
+                    supplies: s.springs.map(\.supplyLeft), stage: s.stage, tier: tier.index, fallback: fallback,
+                    lights: lights)
     }
 
     private func rebuild(_ snapshot: ColorfallCanyonsSceneSnapshot, tier: ColorfallCanyonsTier) throws {
@@ -190,13 +196,13 @@ final class ColorfallCanyonsCanyonScene {
                 terrainRenderer = try Self.renderer(terrain, vertex: ColorfallCanyonsShaders.terrainVertex,
                                                     fragment: ColorfallCanyonsShaders.terrainFragment,
                                                     name: "colorfall-canyons-terrain", registry: registry)
-                let feature = try ColorfallCanyonsSceneGeometry.featureMesh(snapshot, tier: tier)
+                let feature = try ColorfallCanyonsSceneGeometry.featureMesh(snapshot, tier: tier, lights: lights)
                 if !feature.indices.isEmpty {
                     featureRenderer = try Self.renderer(feature, vertex: ColorfallCanyonsShaders.fluidVertex,
                                                         fragment: fluidFragment, name: "colorfall-canyons-fluid",
                                                         registry: registry)
                 }
-                let fluid = try ColorfallCanyonsSceneGeometry.fluidMesh(snapshot, tier: tier)
+                let fluid = try ColorfallCanyonsSceneGeometry.fluidMesh(snapshot, tier: tier, lights: lights)
                 if !fluid.indices.isEmpty {
                     fluidRenderer = try Self.renderer(fluid, vertex: ColorfallCanyonsShaders.fluidVertex,
                                                       fragment: fluidFragment, name: "colorfall-canyons-fluid",
@@ -213,8 +219,8 @@ final class ColorfallCanyonsCanyonScene {
         let up = Vec3(0, 1, 0)
         let parts: [(part: ColorfallCanyonsColouredMesh, colourInNormals: Bool)] = [
             (part: try ColorfallCanyonsSceneGeometry.terrainPart(snapshot, tier: minimal), colourInNormals: false),
-            (part: try ColorfallCanyonsSceneGeometry.featurePart(snapshot, tier: minimal), colourInNormals: true),
-            (part: try ColorfallCanyonsSceneGeometry.fluidPart(snapshot, tier: minimal), colourInNormals: true),
+            (part: try ColorfallCanyonsSceneGeometry.featurePart(snapshot, tier: minimal, lights: lights), colourInNormals: true),
+            (part: try ColorfallCanyonsSceneGeometry.fluidPart(snapshot, tier: minimal, lights: lights), colourInNormals: true),
         ]
         for entry in parts where !entry.part.mesh.indices.isEmpty {
             var mesh = entry.part.mesh

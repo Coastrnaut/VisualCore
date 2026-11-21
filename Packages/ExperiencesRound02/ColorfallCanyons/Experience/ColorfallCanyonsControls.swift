@@ -6,7 +6,11 @@
 // (FR-R02G0504-006): the panel gains "Reset view", which returns the camera to the authored view. Feature 345
 // (R02-G05-05) T-R02G0505-005 (FR-R02G0505-001 … 005): the tutorial instruction with Dismiss, Hint (each press reveals
 // the next level), the failure explanation with Undo and Retry, the goal and stars, Campaign / Daily / Practice and a
-// picker of the open levels; all as wrapping text in the panel, never over the canyon.
+// picker of the open levels; all as wrapping text in the panel, never over the canyon. Feature 346 (R02-G05-06)
+// T-R02G0506-006 (FR-R02G0506-001, 005, 006; clarification Q5): every control has a label and a value, a summary element
+// reads the tick, the actions left and every basin against its target, the cell picker announces its pick, refusals
+// show in words, button rows become columns at accessibility text sizes, the panel keeps a 520-point readable width,
+// a Sound toggle (off by default) and the scene phase drive the ambient loop.
 #if os(iOS)
 import ColorfallCanyonsCore
 import SwiftUI
@@ -16,8 +20,15 @@ import VisualCoreExperienceHost
 struct ColorfallCanyonsControls: View {
     let port: ExperienceActionPort
     let mirror: ColorfallCanyonsMirror
-    /// The presenter: reset view, hints, retry and the daily date (feature 345).
+    /// The presenter: reset view, hints, retry and the daily date (feature 345), feedback and sound (feature 346).
     let presenter: ColorfallCanyonsPresenter
+    /// The text size: rows become columns at accessibility sizes (feature 346).
+    @Environment(\.dynamicTypeSize) private var typeSize
+    /// Whether the app's scene is active: the ambient loop plays only while it is.
+    @Environment(\.scenePhase) private var scenePhase
+
+    /// The widest the panel's content grows, padding included (clarification Q5).
+    static let readableWidth: CGFloat = 520
 
     var body: some View {
         ScrollView(.vertical) {
@@ -29,18 +40,49 @@ struct ColorfallCanyonsControls: View {
                 timeRow
                 playRow
                 progressRows
+                soundToggle
             }
             .padding()
+            .frame(maxWidth: Self.readableWidth, alignment: .leading)
         }
+        .onAppear { presenter.controlsAppeared() }
+        .onDisappear { presenter.controlsDisappeared() }
+        .onChange(of: scenePhase) { _, phase in presenter.sceneActive(phase == .active) }
+    }
+
+    /// A row of controls that becomes a column at accessibility text sizes (feature 346).
+    @ViewBuilder private func row(@ViewBuilder _ content: () -> some View) -> some View {
+        if typeSize.isAccessibilitySize {
+            VStack(alignment: .leading, spacing: 8) { content() }
+        } else {
+            HStack(spacing: 12) { content() }
+        }
+    }
+
+    /// The value of the play buttons: the level, the tick and the actions left.
+    static func progressValue(_ mirror: ColorfallCanyonsMirror) -> String {
+        "Level \(mirror.levelNumber), tick \(mirror.tick) of \(mirror.tickLimit), \(mirror.remaining) actions left"
+    }
+
+    /// The Sound toggle (feature 346; off by default).
+    @ViewBuilder private var soundToggle: some View {
+        Toggle("Sound", isOn: Binding(get: { mirror.soundOn }, set: { presenter.setSound(on: $0) }))
+            .accessibilityLabel("Ambient sound")
+            .accessibilityValue(mirror.soundOn ? "on" : "off")
     }
 
     /// The level, actions, tick and stage lines.
     @ViewBuilder private var header: some View {
         Text("Level \(mirror.levelNumber) · actions left \(mirror.remaining) · tick \(mirror.tick) of \(mirror.tickLimit)")
             .font(.headline)
+            .fixedSize(horizontal: false, vertical: true)
         Text(mirror.status).font(.subheadline)
+            .fixedSize(horizontal: false, vertical: true)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Canyon")
+            .accessibilityValue(mirror.summary)
         if let message = mirror.message {
-            Text(message).font(.footnote)
+            Text(message).font(.footnote).fixedSize(horizontal: false, vertical: true)
         }
     }
 
@@ -51,9 +93,10 @@ struct ColorfallCanyonsControls: View {
                 Text(instruction).font(.callout).fixedSize(horizontal: false, vertical: true)
                 Button("Dismiss") { presenter.dismissTutorial(port: port) }
                     .accessibilityLabel("Dismiss the tutorial")
+                    .accessibilityValue("tutorial shown")
             }
         }
-        HStack(spacing: 12) {
+        row {
             Button("Hint") { presenter.showHint() }
                 .accessibilityLabel("Show a hint")
                 .accessibilityValue(mirror.hintLevel == 0 ? "none shown" : "level \(mirror.hintLevel) of 3")
@@ -66,11 +109,13 @@ struct ColorfallCanyonsControls: View {
         if let failure = mirror.failureText {
             VStack(alignment: .leading, spacing: 4) {
                 Text(failure).font(.callout).fixedSize(horizontal: false, vertical: true)
-                HStack(spacing: 12) {
+                row {
                     Button("Undo") { presenter.undo(port: port) }
                         .accessibilityLabel("Undo the last change")
+                        .accessibilityValue(Self.progressValue(mirror))
                     Button("Retry") { presenter.retry(port: port) }
                         .accessibilityLabel("Start the level again")
+                        .accessibilityValue(Self.progressValue(mirror))
                 }
             }
         }
@@ -78,7 +123,7 @@ struct ColorfallCanyonsControls: View {
 
     /// The mode buttons and the picker of open levels with their bands and stars (feature 345).
     @ViewBuilder private var progressRows: some View {
-        HStack(spacing: 12) {
+        row {
             Button("Campaign") { send("mode.campaign") }
                 .accessibilityLabel("Play the campaign")
                 .accessibilityValue(Self.modeName(mirror.mode) == "campaign" ? "selected" : "")
@@ -89,7 +134,7 @@ struct ColorfallCanyonsControls: View {
                 .accessibilityLabel("Practise this level with a larger budget")
                 .accessibilityValue(Self.modeName(mirror.mode) == "practice" ? "selected" : "")
         }
-        HStack(spacing: 12) {
+        row {
             Stepper(levelLabel(mirror.pickedLevel),
                     onIncrement: { mirror.pickedLevel = min(mirror.pickedLevel + 1, mirror.frontier) },
                     onDecrement: { mirror.pickedLevel = max(mirror.pickedLevel - 1, 1) })
@@ -97,6 +142,7 @@ struct ColorfallCanyonsControls: View {
                 .accessibilityValue(levelLabel(mirror.pickedLevel))
             Button("Play level") { send("level.select", [Double(mirror.pickedLevel)]) }
                 .accessibilityLabel("Play the picked level")
+                .accessibilityValue("level \(mirror.pickedLevel)")
         }
     }
 
@@ -118,10 +164,10 @@ struct ColorfallCanyonsControls: View {
 
     /// The cell picker and the carve button.
     @ViewBuilder private var carveRow: some View {
-        HStack(spacing: 12) {
+        row {
             Stepper("Cell \(mirror.pickedCellLabel)",
-                    onIncrement: { mirror.pickNext(1) },
-                    onDecrement: { mirror.pickNext(-1) })
+                    onIncrement: { presenter.pickCell(1) },
+                    onDecrement: { presenter.pickCell(-1) })
                 .accessibilityLabel("Cell to carve")
                 .accessibilityValue(mirror.pickedCellLabel)
             Button("Carve") {
@@ -134,10 +180,10 @@ struct ColorfallCanyonsControls: View {
 
     /// One valve button per spring.
     @ViewBuilder private var valveRow: some View {
-        HStack(spacing: 12) {
+        row {
             ForEach(0..<mirror.springNames.count, id: \.self) { index in
                 Button(mirror.springNames[index]) { send("canyon.valve", [Double(index)]) }
-                    .accessibilityLabel("Toggle the valve of the \(mirror.springNames[index]) spring")
+                    .accessibilityLabel("\(mirror.springNames[index].capitalized) valve")
                     .accessibilityValue(mirror.springStates.indices.contains(index) ? mirror.springStates[index] : "")
             }
         }
@@ -145,11 +191,13 @@ struct ColorfallCanyonsControls: View {
 
     /// Time steps of 1 and 10 ticks and run to the end.
     @ViewBuilder private var timeRow: some View {
-        HStack(spacing: 12) {
+        row {
             Button("Step 1") { send("time.step", [1]) }
                 .accessibilityLabel("Let the fluid run one tick")
+                .accessibilityValue("tick \(mirror.tick) of \(mirror.tickLimit)")
             Button("Step 10") { send("time.step", [10]) }
                 .accessibilityLabel("Let the fluid run ten ticks")
+                .accessibilityValue("tick \(mirror.tick) of \(mirror.tickLimit)")
             Button("Run") { send("time.step", [Double(max(1, min(600, mirror.tickLimit - mirror.tick)))]) }
                 .accessibilityLabel("Let the fluid run to the end")
                 .accessibilityValue("\(max(0, mirror.tickLimit - mirror.tick)) ticks left")
@@ -158,22 +206,25 @@ struct ColorfallCanyonsControls: View {
 
     /// Undo, redo and next level.
     @ViewBuilder private var playRow: some View {
-        HStack(spacing: 16) {
+        row {
             Button("Undo") { send("play.undo") }
                 .accessibilityLabel("Undo the last action")
+                .accessibilityValue(Self.progressValue(mirror))
             Button("Redo") { send("play.redo") }
                 .accessibilityLabel("Redo the action")
+                .accessibilityValue(Self.progressValue(mirror))
             Button("Next level") { send("level.next") }
                 .accessibilityLabel("Go to the next level")
+                .accessibilityValue("level \(mirror.levelNumber)")
             Button("Reset view") { presenter.resetView() }
                 .accessibilityLabel("Return the camera to the starting view")
+                .accessibilityValue("camera")
         }
     }
 
     /// Sends `control` and shows a refusal.
     private func send(_ control: String, _ values: [Double] = []) {
-        let result = port.send(control, values)
-        mirror.message = result.isAccepted ? nil : "That change was refused: \(result.code)"
+        presenter.send(control, values, port: port)
     }
 }
 #endif

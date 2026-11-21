@@ -54,7 +54,7 @@ observations after ImplementationLock-100.
 
 ## Phase 5: Wiring (presenter, panel, scene, sound)
 
-- [ ] T-R02G0506-006 [US1] [US2] [US3] Create `Packages/ExperiencesRound02/ColorfallCanyons/Experience/ColorfallCanyonsSound.swift` (wanted, on screen,
+- [X] T-R02G0506-006 [US1] [US2] [US3] Create `Packages/ExperiencesRound02/ColorfallCanyons/Experience/ColorfallCanyonsSound.swift` (wanted, on screen, — Verified 2026-11-21: 2026-11-21 sim-27-2 exit 0: ColorfallCanyonsExperienceTests 43 tests in 7 suites on sim-27.2 incl. 8 accessibility tests (recorded announcements and haptics, level 1 won with panel operations, drag highlight not announced, sound state table, lights fading under Reduce Flashing, Reduce Motion stills, summary) (.autonomy/migration/checks/R02-G05-06.sim-27-2.json; the first attempt sim-27 exit 65: a test-target import and the old refusal wording, both fixed); lead run
   active; injected player for tests; recipe offered at level openings, changes of the basins or stage and when turned on)
   and edit `Packages/ExperiencesRound02/ColorfallCanyons/Experience/ColorfallCanyonsPresenter.swift` (route
   `ColorfallCanyonsFeedbackPlan` after each described change, cell pick and refusal through `feedback`, a feedback log,

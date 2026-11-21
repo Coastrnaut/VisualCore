@@ -20,11 +20,18 @@
 import ColorfallCanyonsCore
 import Foundation
 import SwiftUI
+import VisualCoreAudioDSP
 import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreMath
 import VisualCoreRendering
 import VisualCoreScenes
+
+// Feature 346 (R02-G05-06) T-R02G0506-006 (FR-R02G0506-001 … 006; clarifications Q1–Q5): after each described change the
+// presenter routes `ColorfallCanyonsFeedbackPlan.after(old:new:)` (an announcement and a haptic) through its feedback
+// route (`feedback`, injectable), announces cell picks and refusals in words (the panel shows the same words), keeps a
+// feedback log, eases the scene's lights (`ColorfallCanyonsLights`, 0.45 s fades under Reduce Flashing) and offers the
+// ambient recipe to `ColorfallCanyonsSound` at level openings and changes of the basins or the stage. Presentation only.
 
 /// What the controls show: the latest state the presenter described.
 @MainActor
@@ -84,6 +91,11 @@ final class ColorfallCanyonsMirror {
         guard !carvable.isEmpty else { return }
         pickedIndex = ((pickedIndex + delta) % carvable.count + carvable.count) % carvable.count
     }
+
+    /// The summary element's words (feature 346): tick, actions left and every basin against its target.
+    var summary = ""
+    /// Whether the ambient sound is on (feature 346; off by default).
+    var soundOn = false
 }
 
 /// One entry of the tier log: the tier drawn and why it changed.
@@ -113,11 +125,27 @@ final class ColorfallCanyonsPresenter: ExperiencePresenter {
     private var hintKey: String?
     /// The date whose daily level is being played, so Retry restarts that level after midnight too (feature 345).
     private(set) var dailyDate: DateComponents?
+    /// The feedback route of announcements and haptics (feature 346; tests inject their own).
+    var feedback: ExperienceFeedback = .shared
+    /// Every announcement text routed, oldest first (feature 346).
+    private(set) var announcements: [String] = []
+    /// Every routed feedback plan, oldest first (feature 346; tests and diagnostics).
+    private(set) var feedbackLog: [ColorfallCanyonsFeedbackPlan] = []
+    /// The eased light levels the scene draws (feature 346).
+    private(set) var lights: ColorfallCanyonsLights
+    /// The frame time of the last draw, for easing the lights.
+    private var lastFrameTime: Double?
+    /// The level and mode the lights belong to.
+    private var lightsLevel: String?
+    /// The ambient sound (feature 346).
+    let sound: ColorfallCanyonsSound
 
     init(reduceMotion: Bool, reduceFlashing: Bool) {
         self.reduceMotion = reduceMotion
         self.reduceFlashing = reduceFlashing
         scene.reducedFlash = reduceFlashing
+        lights = ColorfallCanyonsLights(reducedFlash: reduceFlashing)
+        sound = ColorfallCanyonsSound(recipe: ColorfallCanyonsSoundRecipe.recipe(basinMasses: [], stage: .loading))
     }
 
     /// The tests' seam: before `setup`, replaces the fluid program's fragment source with one that does not compile.
@@ -145,6 +173,16 @@ final class ColorfallCanyonsPresenter: ExperiencePresenter {
         let time = reduceMotion ? 0 : frame.time
         let snapshot = core.snapshot(time: time)
         lastSnapshot = snapshot
+        // A new level (or mode) starts from its own lights: they settle at once; only changes within a play fade.
+        let level = "\(core.levelNumber)/\(core.mode)"
+        if let last = lastFrameTime, lightsLevel == level, frame.time > last {
+            lights.step(toward: snapshot, elapsed: frame.time - last)
+        } else {
+            lights.settle(to: snapshot)
+        }
+        lightsLevel = level
+        lastFrameTime = frame.time
+        scene.lights = lights
         scene.orbit = gestures.orbit
         scene.highlightedCell = gestures.highlightedCell
         try scene.render(snapshot, tier: drawn, context: context, frame: frame, animate: !reduceMotion)
@@ -198,9 +236,59 @@ final class ColorfallCanyonsPresenter: ExperiencePresenter {
     @discardableResult
     func send(_ control: String, _ values: [Double], port: ExperienceActionPort) -> ActionResult {
         let result = port.send(control, values)
-        mirror.message = result.isAccepted ? nil : "That change was refused: \(result.code)"
+        if result.isAccepted {
+            mirror.message = nil
+        } else {
+            let plan = ColorfallCanyonsFeedbackPlan.refused(code: result.code)
+            mirror.message = plan.text
+            route(plan)
+        }
         return result
     }
+
+    // MARK: Feedback and sound (feature 346)
+
+    /// Plays `plan` through the feedback route (its haptic and its announcement) and logs it; `.none` does nothing.
+    func route(_ plan: ColorfallCanyonsFeedbackPlan) {
+        guard plan != .none else { return }
+        if let haptic = plan.haptic { feedback.haptic(haptic) }
+        if let text = plan.text, let kind = plan.kind {
+            feedback.announce(text, kind: kind)
+            announcements.append(text)
+        }
+        feedbackLog.append(plan)
+    }
+
+    /// Moves the panel's cell pick by `delta` carvable cells and announces the cell ("Row r, column c picked.").
+    func pickCell(_ delta: Int) {
+        let before = mirror.pickedCell
+        mirror.pickNext(delta)
+        guard let cell = mirror.pickedCell, cell != before else { return }
+        route(ColorfallCanyonsFeedbackPlan.picked(cell: cell, columns: mirror.columns))
+    }
+
+    /// The ambient recipe of `core`'s basins and stage.
+    static func recipe(_ core: ColorfallCanyonsExperienceCore) -> AmbientLoopRecipe {
+        let snapshot = core.snapshot(time: 0)
+        return ColorfallCanyonsSoundRecipe.recipe(basinMasses: ColorfallCanyonsSoundRecipe.basinMasses(snapshot),
+                                                  stage: core.play.stage)
+    }
+
+    /// Turns the ambient sound on or off; turning it on plays the recipe of the current basins and stage.
+    func setSound(on: Bool) {
+        if on, let core = latestCore { sound.offer(Self.recipe(core)) }
+        sound.setWanted(on)
+        mirror.soundOn = on
+    }
+
+    /// The controls view appeared (the loop may play).
+    func controlsAppeared() { sound.setOnScreen(true) }
+
+    /// The controls view disappeared (the loop stops).
+    func controlsDisappeared() { sound.setOnScreen(false) }
+
+    /// The scene became active or inactive.
+    func sceneActive(_ active: Bool) { sound.setActive(active) }
 
     // MARK: Teaching and progression (feature 345)
 
@@ -292,7 +380,17 @@ final class ColorfallCanyonsPresenter: ExperiencePresenter {
 
     func describe(_ core: ColorfallCanyonsExperienceCore) -> String {
         if latestCore?.levelNumber != core.levelNumber { mirror.pickedLevel = core.levelNumber }
+        if let previous = latestCore {
+            route(ColorfallCanyonsFeedbackPlan.after(old: previous, new: core))
+            let opened = previous.levelNumber != core.levelNumber || previous.mode != core.mode
+            let changed = previous.play.fluid.masses != core.play.fluid.masses || previous.play.stage != core.play.stage
+            if opened || changed { sound.offer(Self.recipe(core)) }
+        } else {
+            // The first described state offers its recipe, so the sound never holds a placeholder.
+            sound.offer(Self.recipe(core))
+        }
         latestCore = core
+        mirror.summary = ColorfallCanyonsFeedbackPlan.summaryText(core: core)
         if let key = hintKey, key != Self.hintKey(core) { clearHint() }
         mirror.instruction = core.tutorial == .done ? nil : core.tutorial.text
         mirror.failureText = core.failureExplanation?.text

@@ -258,7 +258,8 @@ let package = Package(
                                    .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
                                    .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
                                    .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS])),
-                                   .product(name: "VisualCoreAudioDSP", package: visualCore)],
+                                   .product(name: "VisualCoreAudioDSP", package: visualCore),
+                                   .product(name: "VisualCoreSimulation", package: visualCore)],
                     path: "ColorfallCanyons/ExperienceTests"),
     ]
 )
