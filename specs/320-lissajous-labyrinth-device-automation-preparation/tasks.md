@@ -19,7 +19,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
   only for LL-D6), covers, owner_steps, status "pending device campaign"; no result field); edit
   `scripts/release_check.py` (step `device-rows-r02-g02`); `--name device-rows -- python3 scripts/check_device_rows.py
   --experience r02-g02.lissajous-labyrinth`
-- [ ] T-R02G0210-003 [P] [US1] Edit `scripts/test_scripts.py` (agent A: the real Lissajous definition passes; a copy
+- [X] T-R02G0210-003 [P] [US1] Edit `scripts/test_scripts.py` (agent A: the real Lissajous definition passes; a copy — Verified 2026-11-21: 2026-11-21 script-tests exit 0 alone (LissajousDeviceRowsCheckTests 6 tests: real definition passes; removed scenario, missing LL-D1 pass field, uncovered T-R02G0209-011 each fail by name; release step device-rows-r02-g02 runs the check)
   with a scenario removed, a copy with LL-D1's `pass` field removed and a copy with T-R02G0209-011 dropped from every row's covers each fail by name; the release
   step `device-rows-r02-g02` runs the check for `r02-g02.lissajous-labyrinth`); `--name script-tests` (alone)
 

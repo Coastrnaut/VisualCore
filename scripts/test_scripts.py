@@ -5375,6 +5375,8 @@ class DeviceRowsCheckTests(unittest.TestCase):
     GAME = "r02-g01.aurora-loom"
     DEFINITION = "docs/apps/aurora-loom/device-rows.json"
     MANIFEST = "Packages/ExperiencesRound02/AuroraLoom/scenario-manifest.json"
+    SPECS = "specs/30[1-9]-aurora-loom-*/tasks.md"
+    CODE = "R02-G01"
 
     @classmethod
     def setUpClass(cls):
@@ -5386,13 +5388,13 @@ class DeviceRowsCheckTests(unittest.TestCase):
         for rel in (self.DEFINITION, self.MANIFEST):
             (self.root / rel).parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(ROOT_DIR / rel, self.root / rel)
-        for tasks in sorted(ROOT_DIR.glob("specs/30[1-9]-aurora-loom-*/tasks.md")):
+        for tasks in sorted(ROOT_DIR.glob(self.SPECS)):
             target = self.root / tasks.relative_to(ROOT_DIR)
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(tasks, target)
         ledger = json.loads((ROOT_DIR / ".autonomy/migration/ledger.json").read_text(encoding="utf-8"))
         subset = {"schema": ledger.get("schema"),
-                  "gates": [g for g in ledger["gates"] if g["id"].endswith("R02-G01")]}
+                  "gates": [g for g in ledger["gates"] if g["id"].endswith(self.CODE)]}
         (self.root / ".autonomy/migration").mkdir(parents=True)
         (self.root / ".autonomy/migration/ledger.json").write_text(json.dumps(subset), encoding="utf-8")
 
@@ -5456,6 +5458,60 @@ class DeviceRowsCheckTests(unittest.TestCase):
     def test_unknown_experience_fails(self):
         self.edit(self.MANIFEST, lambda d: d.update(experience="r02-g99.other"))
         self.assert_fails("unknown experience")
+
+
+class LissajousDeviceRowsCheckTests(unittest.TestCase):
+    """Feature 320 R02-G02-10 (T-R02G0210-003, FR-R02G0210-003, FR-R02G0210-004, SC-R02G0210-001, SC-R02G0210-002):
+    the device-row check accepts Lissajous Labyrinth's real definition (LL-D1 ... LL-D8) and names each defect of a
+    temporary copy; the release check runs it as `device-rows-r02-g02`. Reuses the fixture helpers of
+    DeviceRowsCheckTests (feature 310)."""
+
+    GAME = "r02-g02.lissajous-labyrinth"
+    DEFINITION = "docs/apps/lissajous-labyrinth/device-rows.json"
+    MANIFEST = "Packages/ExperiencesRound02/LissajousLabyrinth/scenario-manifest.json"
+    SPECS = "specs/31[1-9]-lissajous-labyrinth-*/tasks.md"
+    CODE = "R02-G02"
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tool = load("check_device_rows")
+
+    setUp = DeviceRowsCheckTests.setUp
+    tearDown = DeviceRowsCheckTests.tearDown
+    run_main = DeviceRowsCheckTests.run_main
+    edit = DeviceRowsCheckTests.edit
+    assert_fails = DeviceRowsCheckTests.assert_fails
+
+    def test_real_repository_passes(self):
+        code, out = self.run_main(ROOT_DIR)
+        self.assertEqual(code, 0, out)
+        self.assertEqual(out.strip(), "device-rows r02-g02.lissajous-labyrinth: PASS (8 rows, 12 scenarios)")
+
+    def test_minimal_copy_passes(self):
+        code, out = self.run_main(self.root)
+        self.assertEqual(code, 0, out)
+
+    def test_scenario_removed_from_manifest_fails(self):
+        self.edit(self.MANIFEST, lambda d: d.update(
+            scenarios=[s for s in d["scenarios"] if s["name"] != "fixture-level-1-solved"]))
+        self.assert_fails("scenario fixture-level-1-solved not in the manifest")
+
+    def test_missing_row_field_fails(self):
+        self.edit(self.DEFINITION, lambda d: d["rows"][0].pop("pass"))
+        self.assert_fails("LL-D1: missing field pass")
+
+    def test_uncovered_task_fails(self):
+        def drop(d):
+            for row in d["rows"]:
+                if "T-R02G0209-011" in row["covers"]:
+                    row["covers"].remove("T-R02G0209-011")
+        self.edit(self.DEFINITION, drop)
+        self.assert_fails("T-R02G0209-011 not covered by any row")
+
+    def test_release_check_runs_the_check(self):
+        steps = {s.name: s.argv for s in relcheck.steps("X")}
+        self.assertEqual(steps["device-rows-r02-g02"][1:],
+                         ["scripts/check_device_rows.py", "--experience", "r02-g02.lissajous-labyrinth"])
 
 
 def ledger_tree_hash() -> str:
