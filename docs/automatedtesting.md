@@ -199,6 +199,10 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   normal and uv, so Colorfall Canyons's fluid program reads its three colour weights from the normal slot and its
   brightness and flow code from uv; the geometry and shader agents agreed on the encoding before the scene was written,
   and a host test pins each code's range.
+- **Compare picks with an independent ray test** (R02-G05-04, 2026-11-21). Colorfall Canyons's picker and gesture tests
+  compute the expected cell or spring in the test with their own plane and box intersections (only the ray is shared)
+  over seeded points, sizes and orbits, and each was shown to fail by changing one threshold; a panel test wins all 100
+  certified levels through panel actions, in eight groups so each stays short.
 - **Quantise before hashing floats** for digests that must match across platforms (surface colours are hashed as
   16-bit values).
 

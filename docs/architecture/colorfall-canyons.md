@@ -113,3 +113,25 @@ long step as single ticks; the play accepts both.
   app; it stays unavailable until X-R02-G05. Its scenario manifest has the standard scenarios, `full-playthrough`,
   `hero`, three fixtures and the 80 acceptance rows R2-G05-QA-001 … 080.
 
+## Touch controls (feature 344, R02-G05-04)
+
+- **Drag to carve.** A one-finger touch is picked at touch-down. When it starts on a carvable cell (open ground, no
+  spring or basin, height above 0) while playing, the cell's top gets a thin pearl ring and the description reads
+  "Carving row r, column c". When the finger lifts after having moved at least 16 points from where it began, exactly
+  one `canyon.carve [cell]` of that cell is sent; a touch that moves less than 10 points is a tap; between 10 and 16
+  points nothing is sent. Nothing changes in the kernel before release.
+- **Tap a valve.** A tap on a spring (its emitter column or its cell) sends one `canyon.valve [spring]`; a tap on a cell
+  sends nothing, so a stray tap never carves. Two taps on empty space whose releases are at most 0.35 s apart reset the
+  view, in every stage. While the play is not playing, drags and taps send no action and show no highlight.
+- **Analytic picking.** `ColorfallCanyonsPicker` casts the ray from the drawn camera through the touch point against
+  every block top (the cell's square at its top height) and every emitter column (a box of half-width 0.18·u); the
+  nearest hit wins, so a hidden cell resolves to the nearer, taller block. With no hit, the nearest projected top centre
+  or emitter top within 22 points wins; otherwise the touch is on empty space.
+- **Orbit.** Two fingers turn the camera: yaw ±40° (90° per view width) and pitch 25° … 70° down from the horizon
+  (authored 50°; 60° per view height, dragging up looks more from above). A second finger cancels a drag; a third
+  re-bases the midpoint. The distance refits the same bounding sphere, so the 5 % margin holds at every orbit and
+  aspect 0.4 … 2.5. "Reset view" in the panel or a double tap on empty space returns to the authored view. The orbit is
+  presentation only: never in the digest, the snapshot or the kernel, and not saved.
+- **Without gestures.** The panel keeps every action: the cell picker and Carve, a valve button per spring, Step 1,
+  Step 10, Run, Undo, Redo, Next level and Reset view. A host test wins all 100 certified levels through panel actions.
+

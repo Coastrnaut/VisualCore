@@ -261,3 +261,10 @@ manifest `ColorfallCanyonsScenarios` (`scenario-manifest.json`; `UPDATE_SCENARIO
 target `ColorfallCanyonsExperience` (presenter, GL canyon scene with fallback, control panel) and its simulator tests. A
 registered candidate until X-R02-G05.
 
+Feature 344 (R02-G05-04) adds touch controls: in the Core the constrained `ColorfallCanyonsOrbit` with
+`ColorfallCanyonsSceneGeometry.camera(_:aspect:orbit:)`, the analytic `ColorfallCanyonsPicker` (`ColorfallCanyonsPick`),
+the drag highlight ring `highlightPart(_:_:)` and `ColorfallCanyonsGestureController` (`ColorfallCanyonsGestureAction`:
+drag to carve, tap a valve, two-finger orbit, double-tap reset); in the experience the presenter's pointer entry and
+"Reset view". Host tests compare 500 seeded picks and 4,500 seeded gestures with independent computations and win all
+100 levels through panel actions.
+

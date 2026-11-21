@@ -50,7 +50,7 @@ existing programs).
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02G0504-006 Docs: `docs/architecture/colorfall-canyons.md` (gestures), `Packages/ExperiencesRound02/README.md`,
+- [X] T-R02G0504-006 Docs: `docs/architecture/colorfall-canyons.md` (gestures), `Packages/ExperiencesRound02/README.md`, — Verified 2026-11-21: 2026-11-21 docs updated (architecture touch controls, package README, testing lesson); round02-host exit 0 (.autonomy/migration/checks/R02-G05-04.round02-host.json); validate_docs pass
   `docs/automatedtesting.md`; `--name round02-host`
 - [ ] T-R02G0504-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
   `--name host-full`, `--name app-unit`
