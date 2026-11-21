@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "r02-g02.lissajous-labyrinth",
+    "--runtime",
+    "26"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only r02-g02.lissajous-labyrinth --runtime 26",
+  "elapsed_seconds": 126.872,
+  "exit_code": 0,
+  "finished": "2026-11-21T09:39:22+00:00",
+  "gate": "X-R02-G02",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-R02-G02.sim26.log",
+  "log_sha256": "2828687d110ce3f3e8536bd234d52da02014c8110b7af5759bcf7b59f050ff7c",
+  "name": "sim26",
+  "started": "2026-11-21T09:37:16+00:00",
+  "timed_out": false
+}
