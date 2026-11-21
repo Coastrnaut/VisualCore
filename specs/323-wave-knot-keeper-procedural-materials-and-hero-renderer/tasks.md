@@ -52,7 +52,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 - [X] T-R02G0303-007 Docs: `docs/architecture/wave-knot-keeper.md` (renderer and experience), — Verified 2026-11-21: 2026-11-21 round02-host exit 0; docs/architecture/wave-knot-keeper.md renderer section, Packages/ExperiencesRound02/README.md, docs/automatedtesting.md
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
-- [ ] T-R02G0303-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G0303-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-21: 2026-11-21 rendering-27, rendering-26, experiences, host-full, app-unit (with the Wave Knot Keeper candidate linked) exit 0
   `--name host-full`, `--name app-unit`
 - [ ] T-R02G0303-009 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G0303-010 Reference regression chunk 2 (`--name reference-2`)
