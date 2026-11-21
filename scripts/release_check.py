@@ -144,6 +144,8 @@ def steps(stamp: str) -> list[Step]:
         Step("device-rows", [PY, "scripts/check_device_rows.py", "--experience", "r02-g01.aurora-loom"]),
         # Feature 320 (R02-G02-10): the device rows of Lissajous Labyrinth.
         Step("device-rows-r02-g02", [PY, "scripts/check_device_rows.py", "--experience", "r02-g02.lissajous-labyrinth"]),
+        # Feature 330 (R02-G03-10): the device rows of Wave Knot Keeper.
+        Step("device-rows-r02-g03", [PY, "scripts/check_device_rows.py", "--experience", "r02-g03.wave-knot-keeper"]),
         Step("public-api", [PY, "scripts/check_public_api.py"]),
         Step("documented-api-showcase", [PY, "scripts/check_documented_api.py", "--sources", "Showcase/App"]),
         Step("documented-api-interactive-demo", [PY, "scripts/check_documented_api.py", "--sources", "Harnesses/InteractiveDemo"]),

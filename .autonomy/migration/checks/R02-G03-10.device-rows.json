@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_device_rows.py",
+    "--experience",
+    "r02-g03.wave-knot-keeper"
+  ],
+  "command": "python3 scripts/check_device_rows.py --experience r02-g03.wave-knot-keeper",
+  "elapsed_seconds": 0.029,
+  "exit_code": 0,
+  "finished": "2026-11-21T14:12:28+00:00",
+  "gate": "R02-G03-10",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G03-10.device-rows.log",
+  "log_sha256": "9d64d35b7a5dd04208ebb33a70b05be777b1432dc3119dd0e6136e9816c63577",
+  "name": "device-rows",
+  "started": "2026-11-21T14:12:28+00:00",
+  "timed_out": false
+}
