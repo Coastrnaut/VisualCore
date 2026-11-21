@@ -10,4 +10,4 @@
 | `ColorfallCanyonsFluid` | tick, heights, valves, supplies left, per-cell masses [3], spilled [3], released [3] | conservation: released = Σ cells + spilled per colour |
 | `ColorfallCanyonsAction` | carve(cell), valve(spring), step(ticks 1 … 600) | |
 | `ColorfallCanyonsPlay` | stage, fluid, spent, failure (`contamination`, `overflow`, `time`), records, undo/redo stacks (snapshots) | records carry previous and next fingerprints |
-| `ColorfallCanyonsRecord` | schema, level seed, tick, kind (carve, valve, step, undo, redo), action, previous and next fingerprints | appended for every accepted action |
+| `ColorfallCanyonsRecord` | schema, level seed, tick, kind (carve, valve, step, undo, redo), action (nil for undo and redo), previous and next fingerprints | appended for every accepted action |

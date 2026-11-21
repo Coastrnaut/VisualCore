@@ -146,7 +146,7 @@ refused.
 - **FR-R02G0501-005**: The level MUST be won exactly when, at the end of a tick within the tick limit, every target basin
   holds at least its required fill and its colour mix lies within tolerance; it MUST fail with a named reason when a
   protected basin's wrong colour exceeds its tolerated amount (contamination), when any basin exceeds its capacity
-  (overflow), or when the tick limit passes without a win (time). Failure is decided before win on the same tick.
+  (overflow), or when the tick limit is reached without a win (time). Failure is decided before win on the same tick.
 - **FR-R02G0501-006**: Every action MUST be validated (range, stage, previous fingerprint, budget) and refused without
   change when invalid.
 - **FR-R02G0501-007**: Undo and redo MUST restore exact states and fingerprints; replaying a record trace MUST reproduce
@@ -202,7 +202,7 @@ refused.
 | Exact win/failure evaluation | FR-R02G0501-005 |
 | Truth metric: fluid and dye-mass drift per tick | FR-R02G0501-003; SC-R02G0501-003 |
 | Puzzle contract for certification | FR-R02G0501-010 |
-| Invariants INV-01 … INV-10 | FR-R02G0501-012 |
+| Invariants INV-01 … 05 and INV-07 … 10 (INV-06 content belongs to R02-G05-02; INV-11 is superseded by the free tier; INV-12 novelty to R02-G05-02) | FR-R02G0501-012 |
 | Accessibility (colour independence) | FR-R02G0501-013 |
 
 ## Negative Requirements / Excluded scope

@@ -16,7 +16,7 @@ in this feature (the CPU flow step is the reference the renderer of R02-G05-03 w
 
 - [ ] T-R02G0501-002 Edit `Packages/ExperiencesRound02/Package.swift` (+ `ColorfallCanyonsCore`, `ColorfallCanyonsCoreTests`,
   product); create `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsError.swift` (codes "r02-g05.level, .action, .stage, .stale, .budget,
-  .newer-schema, .malformed"), `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsLevel.swift` (colours cyan 0, coral 1, yellow 2 with names;
+  .newer-schema, .malformed"), `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsLevel.swift` (colours cyan 0, coral 1, yellow 2 with names; each basin's required mix described in words and amounts (FR-R02G0501-013);
   cells "height 0 … 15", kinds open, rock, spring, basin, drain; springs "release 1 … 4, supply 1 … 999"; basins
   "capacity 1 … 999, fill 0 … capacity, shares per mille summing to 1,000, tolerance 0 … 500, tolerated wrong 0 … 999";
   "columns 4 … 12, rows 4 … 10", "1 … 3 springs", "1 … 4 basins", at least one drain, at least one basin with fill > 0,
