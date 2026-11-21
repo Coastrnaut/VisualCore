@@ -183,6 +183,19 @@ catalog's levels.
 - **Running it.** CI's host job runs the step "Aurora Loom regression (host)"; locally
   `python3 scripts/aurora_loom_regression.py` runs the host and simulator parts and prints one summary.
 
+## In the app (R02-G01-09)
+
+- **Opening.** The registration passes seed 0, so a fresh open starts at level 1 with only level 1 open (the app's
+  stable seed for the id would have opened level 79); Lissajous Labyrinth does the same. Aurora Loom stays a candidate,
+  listed as not available, until X-R02-G01; debug builds open it with `-vcCandidates`.
+- **Panel.** Every control carries `experience.r02-g01.aurora-loom.<name>`. The steppers set pending steps (no move);
+  Apply commits each pending change as one move (ribbon order, wave before phase), stops at the first refusal and drops
+  the rest; Clear drops them; an outside change drops them. So the panel alone wins every certified level in its
+  certified shortest number of moves (before, each tap was a move and a panel-only player could not win level 1).
+- **Saved states.** The registration stores schema-1 and schema-2 examples; the app's migration check restores both.
+- **Tests.** App unit tests (examples, candidate, opening level), interface chunk `i3` (`ALPlayUITests`,
+  `ALReplayUITests`), the Release build with `AuroraLoomGolden` and `acceptanceScenarios` forbidden in its symbols.
+
 ## Failures
 
 `AuroraLoomError` reason codes: `r02-g01.level`, `r02-g01.move`, `r02-g01.stage`, `r02-g01.stale`,

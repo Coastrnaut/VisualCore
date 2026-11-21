@@ -62,6 +62,10 @@ Feature 308 (R02-G01-08) adds the regression net: `AuroraLoomGolden` (16 code-co
 in `AuroraLoom/golden-frames.json`), the solver regression over all 100 levels, simulator golden-frame and memory
 checks, and `python3 scripts/aurora_loom_regression.py` to run every part with one summary.
 
+Feature 309 (R02-G01-09) integrates Aurora Loom into the one app on the simulator: `AuroraLoomSchemaExamples`
+(schema-1 and schema-2 examples registered), panel identifiers, pending stepper steps with Apply and Clear, opening at
+level 1, app unit tests, the interface chunk `i3` and the Release symbol check.
+
 ## Lissajous Labyrinth (R02-G02, `r02-g02.lissajous-labyrinth`, free)
 
 `LissajousLabyrinthCore` (feature 311, R02-G02-01) is the playable rule kernel: the integer `LissajousLabyrinthSine`,
