@@ -13,7 +13,7 @@ tests stay short (< 10 s each).
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G0204-002 [P] Edit `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthSceneGeometry.swift`
+- [X] T-R02G0204-002 [P] Edit `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthSceneGeometry.swift` — Verified 2026-11-21: 2026-11-21 host exit 0: LissajousLabyrinthHandlesTests 5/5 (layout, every value round-trips through its knob, rounding/clamping/wrapping, four handles, picker picks every projected knob at 3 sizes × 3 orbits) and LissajousLabyrinthSceneGeometryTests 11/11 (stage holds every path of all 100 levels at start and solution dials; stage and rings inside 90 % NDC for 9 orbits × 7 aspects × 4 levels; orbit clamping; authored camera = authored orbit)
   (`stageBounds(level:)` "the amplitude box ±amplitude per axis grown by pathMargin, and every checkpoint and obstacle
   ball; independent of the dials"; `contentBounds(level:)` stage plus rings; `LissajousLabyrinthOrbit` "azimuth offset
   −40° … 40° around atan2(0.55, 1.0), elevation 10° … 60°, authored ≈ 21.5°"; `camera(aspect:snapshot:orbit:)` fitting

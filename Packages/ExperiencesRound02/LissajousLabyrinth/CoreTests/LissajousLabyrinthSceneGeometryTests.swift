@@ -4,6 +4,10 @@
 // certified levels and on the extreme level; every mesh is finite and inside the bounding sphere for all 55 coprime
 // frequency pairs × phases at the largest amplitudes with frequency c = 9; triangle and vertex counts are as documented;
 // the icosphere lies on the ball's radius. Test data uses explicit types and plain loops (CI type-check rule); seed 2_313.
+// Feature 314 (R02-G02-04) T-R02G0204-002 (FR-R02G0204-001, 002, 004; clarifications Q1, Q3; research R1, R6): the camera
+// targets the centre of `contentBounds` (stage and rings); the stage holds every path sample of all 100 certified levels
+// at the start and the solution dials; stage and rings lie inside NDC ±0.9 for the authored orbit, the four corner limits
+// and the four mid-edges at aspects 0.4 … 2.5; the orbit clamps and its authored direction is `eyeDirection`.
 import Foundation
 import Testing
 @testable import LissajousLabyrinthCore
@@ -95,13 +99,15 @@ import VisualCoreSimulation
             for ball in s.level.obstacles { points.append(Geometry.world(ball)) }
             let b: (centre: Vec3, radius: Double) = Geometry.bounds(s)
             #expect(b.centre.isFinite && b.radius.isFinite && b.radius > 0)
+            let content: (centre: Vec3, radius: Double) = Geometry.contentBounds(level: s.level)
             for aspect in Self.aspects {
                 let height: Int = 64
                 let width: Int = Int((Double(height) * aspect).rounded())
                 let usedAspect: Double = Double(width) / Double(height)
                 let vp: Mat4 = Geometry.viewProjection(aspect: usedAspect, snapshot: s)
                 let cam: (eye: Vec3, target: Vec3, fovY: Double) = Geometry.camera(aspect: usedAspect, snapshot: s)
-                #expect(cam.target == b.centre && cam.fovY == Double.pi / 4 && cam.eye.isFinite)
+                // Feature 314: the camera now fits the dial-independent content (stage and rings), not `bounds(_:)`.
+                #expect(cam.target == content.centre && cam.fovY == Double.pi / 4 && cam.eye.isFinite)
                 var inside: Bool = true
                 for p in points {
                     guard let q = Geometry.project(p, viewProjection: vp, width: width, height: height) else {
@@ -112,7 +118,7 @@ import VisualCoreSimulation
                     if q.x < mx || q.x > Double(width) - mx || q.y < my || q.y > Double(height) - my { inside = false }
                 }
                 #expect(inside, "level \(s.level.id) aspect \(aspect)")
-                let centre: Vec2? = Geometry.project(b.centre, aspect: usedAspect, snapshot: s, width: width,
+                let centre: Vec2? = Geometry.project(content.centre, aspect: usedAspect, snapshot: s, width: width,
                                                      height: height)
                 #expect(centre != nil && abs(centre!.x - Double(width) / 2) < 1e-6
                         && abs(centre!.y - Double(height) / 2) < 1e-6)
@@ -253,5 +259,209 @@ import VisualCoreSimulation
         let second: Mesh = try Geometry.threadMesh(s, tier: .of(0))
         #expect(first == second)
         #expect(Geometry.viewProjection(aspect: 1.5, snapshot: s) == Geometry.viewProjection(aspect: 1.5, snapshot: s))
+    }
+
+    // MARK: Stage, content and orbit (feature 314)
+
+    /// The 100 certified levels and their solutions' final dials, read from the stored witness files (decoded without
+    /// the replay, which `LissajousLabyrinthCatalogTests` already proves equal to the regenerated catalog).
+    static func certifiedLevels() throws -> [(level: LissajousLabyrinthLevel, solved: LissajousLabyrinthDials)] {
+        let directory: URL = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+            .deletingLastPathComponent().deletingLastPathComponent()
+            .appendingPathComponent("docs/games/lissajous-labyrinth/levels", isDirectory: true)
+        var result: [(level: LissajousLabyrinthLevel, solved: LissajousLabyrinthDials)] = []
+        for entry in LissajousLabyrinthManifest.entries {
+            let name: String = String(LissajousLabyrinthGenerator.levelID(entry.number).suffix(3)) + ".witness.json"
+            let data: Data = try Data(contentsOf: directory.appendingPathComponent(name))
+            let witness: LissajousLabyrinthWitness = try JSONDecoder().decode(LissajousLabyrinthWitness.self, from: data)
+            var dials: LissajousLabyrinthDials = witness.level.start
+            for action in witness.actions { dials[action.dial] = action.value }
+            result.append((witness.level, dials))
+        }
+        return result
+    }
+
+    /// The orbits the framing is checked at: authored, the four corner limits and the four mid-edges.
+    static var orbits: [LissajousLabyrinthOrbit] {
+        let low: Double = LissajousLabyrinthOrbit.azimuthRange.lowerBound
+        let high: Double = LissajousLabyrinthOrbit.azimuthRange.upperBound
+        let bottom: Double = LissajousLabyrinthOrbit.elevationRange.lowerBound
+        let top: Double = LissajousLabyrinthOrbit.elevationRange.upperBound
+        let middle: Double = (bottom + top) / 2
+        var result: [LissajousLabyrinthOrbit] = [LissajousLabyrinthOrbit.authored]
+        result.append(LissajousLabyrinthOrbit(azimuthOffset: low, elevation: bottom))
+        result.append(LissajousLabyrinthOrbit(azimuthOffset: low, elevation: top))
+        result.append(LissajousLabyrinthOrbit(azimuthOffset: high, elevation: bottom))
+        result.append(LissajousLabyrinthOrbit(azimuthOffset: high, elevation: top))
+        result.append(LissajousLabyrinthOrbit(azimuthOffset: 0, elevation: bottom))
+        result.append(LissajousLabyrinthOrbit(azimuthOffset: 0, elevation: top))
+        result.append(LissajousLabyrinthOrbit(azimuthOffset: low, elevation: middle))
+        result.append(LissajousLabyrinthOrbit(azimuthOffset: high, elevation: middle))
+        return result
+    }
+
+    @Test func stageHoldsEveryPathOfAllCertifiedLevelsAtStartAndSolution() throws {
+        let levels: [(level: LissajousLabyrinthLevel, solved: LissajousLabyrinthDials)] = try Self.certifiedLevels()
+        #expect(levels.count == 100)
+        for item in levels {
+            let stage: (centre: Vec3, radius: Double) = Geometry.stageBounds(level: item.level)
+            #expect(stage.centre.isFinite && stage.radius > 0)
+            var inside: Bool = true
+            for dials in [item.level.start, item.solved] {
+                for p in LissajousLabyrinthLap.samples(dials, level: item.level) {
+                    if (Geometry.world(p) - stage.centre).length + Geometry.pathMargin > stage.radius + 1e-9 {
+                        inside = false
+                    }
+                }
+            }
+            var balls: [LissajousLabyrinthBall] = item.level.checkpoints
+            for ball in item.level.obstacles { balls.append(ball) }
+            for ball in balls where (Geometry.world(ball) - stage.centre).length + Geometry.radius(ball)
+                > stage.radius + 1e-9 { inside = false }
+            #expect(inside, "level \(item.level.id)")
+            // The drawn figure's bounds lie inside the stage, and the stage inside the content.
+            let snapshot: LissajousLabyrinthSceneSnapshot = Self.snapshot(item.level, time: 0)
+            let figure: (centre: Vec3, radius: Double) = Geometry.bounds(snapshot)
+            #expect((figure.centre - stage.centre).length + figure.radius <= stage.radius + 1e-9)
+            let content: (centre: Vec3, radius: Double) = Geometry.contentBounds(level: item.level)
+            #expect((stage.centre - content.centre).length + stage.radius <= content.radius + 1e-9)
+        }
+    }
+
+    @Test func stageIsIndependentOfTheDialsOnTheExtremeLevel() throws {
+        let first: LissajousLabyrinthLevel = try Self.extremeLevel(LissajousLabyrinthDials(
+            frequencyA: 1, frequencyB: 2, phaseA: 0, phaseC: 0))
+        let stage: (centre: Vec3, radius: Double) = Geometry.stageBounds(level: first)
+        var inside: Bool = true
+        for a in 1...9 {
+            for b in 1...9 {
+                let dials: LissajousLabyrinthDials = LissajousLabyrinthDials(frequencyA: a, frequencyB: b,
+                                                                             phaseA: (a * 3) % 16, phaseC: (b * 5) % 16)
+                guard dials.isValid else { continue }
+                let level: LissajousLabyrinthLevel = try Self.extremeLevel(dials)
+                let other: (centre: Vec3, radius: Double) = Geometry.stageBounds(level: level)
+                if other.centre != stage.centre || other.radius != stage.radius { inside = false }
+                for p in LissajousLabyrinthLap.samples(dials, level: level)
+                where (Geometry.world(p) - stage.centre).length + Geometry.pathMargin > stage.radius + 1e-9 {
+                    inside = false
+                }
+            }
+        }
+        #expect(inside)
+    }
+
+    @Test func orbitConstantsAndClamping() {
+        let degree: Double = Double.pi / 180
+        let authored: LissajousLabyrinthOrbit = LissajousLabyrinthOrbit.authored
+        #expect(authored.azimuthOffset == 0)
+        #expect(abs(LissajousLabyrinthOrbit.azimuth - atan2(0.55, 1.0)) < 1e-15)
+        #expect(abs(authored.elevation / degree - 21.5) < 0.1)
+        #expect((authored.eyeDirection - Geometry.eyeDirection).length < 1e-12)
+        #expect(abs(LissajousLabyrinthOrbit.azimuthRange.lowerBound + 40 * degree) < 1e-15)
+        #expect(abs(LissajousLabyrinthOrbit.azimuthRange.upperBound - 40 * degree) < 1e-15)
+        #expect(abs(LissajousLabyrinthOrbit.elevationRange.lowerBound - 10 * degree) < 1e-15)
+        #expect(abs(LissajousLabyrinthOrbit.elevationRange.upperBound - 60 * degree) < 1e-15)
+        #expect(authored.clamped() == authored)
+        let wide: LissajousLabyrinthOrbit = LissajousLabyrinthOrbit(azimuthOffset: 2, elevation: 3).clamped()
+        #expect(wide == LissajousLabyrinthOrbit(azimuthOffset: LissajousLabyrinthOrbit.azimuthRange.upperBound,
+                                                elevation: LissajousLabyrinthOrbit.elevationRange.upperBound))
+        let low: LissajousLabyrinthOrbit = LissajousLabyrinthOrbit(azimuthOffset: -2, elevation: -1).clamped()
+        #expect(low == LissajousLabyrinthOrbit(azimuthOffset: LissajousLabyrinthOrbit.azimuthRange.lowerBound,
+                                               elevation: LissajousLabyrinthOrbit.elevationRange.lowerBound))
+        let broken: LissajousLabyrinthOrbit = LissajousLabyrinthOrbit(azimuthOffset: Double.nan,
+                                                                      elevation: Double.infinity).clamped()
+        #expect(broken == authored)
+        let inside: LissajousLabyrinthOrbit = LissajousLabyrinthOrbit(azimuthOffset: 0.1, elevation: 0.5)
+        #expect(inside.clamped() == inside)
+        // The eye direction is a unit vector of the clamped orbit.
+        let far: LissajousLabyrinthOrbit = LissajousLabyrinthOrbit(azimuthOffset: 5, elevation: -5)
+        #expect(far.eyeDirection == far.clamped().eyeDirection)
+        #expect(abs(far.eyeDirection.length - 1) < 1e-12)
+        #expect(abs(asin(far.eyeDirection.y) - 10 * degree) < 1e-12)
+    }
+
+    @Test func authoredCameraEqualsTheAuthoredOrbit() throws {
+        let s: LissajousLabyrinthSceneSnapshot = try Self.certifiedSnapshots()[1]
+        let aspects: [Double] = Self.aspects + [0.0, Double.nan, 100.0]
+        for aspect in aspects {
+            let a: (eye: Vec3, target: Vec3, fovY: Double) = Geometry.camera(aspect: aspect, snapshot: s)
+            let b: (eye: Vec3, target: Vec3, fovY: Double) = Geometry.camera(aspect: aspect, snapshot: s,
+                                                                             orbit: .authored)
+            #expect(a.eye == b.eye && a.target == b.target && a.fovY == b.fovY)
+            #expect(Geometry.viewProjection(aspect: aspect, snapshot: s)
+                    == Geometry.viewProjection(aspect: aspect, snapshot: s, orbit: .authored))
+            let r1: (near: Double, far: Double) = Geometry.depthRange(aspect: aspect, snapshot: s)
+            let r2: (near: Double, far: Double) = Geometry.depthRange(aspect: aspect, snapshot: s, orbit: .authored)
+            #expect(r1.near == r2.near && r1.far == r2.far)
+            // The authored eye lies on `eyeDirection` from the content centre.
+            let offset: Vec3 = (a.eye - a.target).normalized
+            #expect((offset - Geometry.eyeDirection).length < 1e-9)
+        }
+        // An orbit moves the eye; an out-of-range orbit gives the camera of its clamped orbit; the target stays.
+        let far: LissajousLabyrinthOrbit = LissajousLabyrinthOrbit(azimuthOffset: 5, elevation: -5)
+        let moved: (eye: Vec3, target: Vec3, fovY: Double) = Geometry.camera(aspect: 1.5, snapshot: s, orbit: far)
+        let clamped: (eye: Vec3, target: Vec3, fovY: Double) = Geometry.camera(aspect: 1.5, snapshot: s,
+                                                                               orbit: far.clamped())
+        #expect(moved.eye == clamped.eye && moved.target == clamped.target)
+        #expect(moved.eye != Geometry.camera(aspect: 1.5, snapshot: s).eye)
+        #expect(moved.target == Geometry.camera(aspect: 1.5, snapshot: s).target)
+        // The framing does not depend on the dials: two levels that differ only in their dials frame identically.
+        let one: LissajousLabyrinthSceneSnapshot = Self.snapshot(try Self.extremeLevel(LissajousLabyrinthDials(
+            frequencyA: 1, frequencyB: 2, phaseA: 0, phaseC: 0)), time: 0)
+        let two: LissajousLabyrinthSceneSnapshot = Self.snapshot(try Self.extremeLevel(LissajousLabyrinthDials(
+            frequencyA: 8, frequencyB: 9, phaseA: 15, phaseC: 7)), time: 0)
+        #expect(Geometry.viewProjection(aspect: 1, snapshot: one) == Geometry.viewProjection(aspect: 1, snapshot: two))
+    }
+
+    @Test func stageAndRingsFitInsideNinetyPercentAtEveryOrbitAndAspect() throws {
+        let aspects: [Double] = [0.4, 0.5, 0.75, 1, 1.5, 2, 2.5]
+        let all: [(level: LissajousLabyrinthLevel, solved: LissajousLabyrinthDials)] = try Self.certifiedLevels()
+        var levels: [LissajousLabyrinthLevel] = [all[0].level, all[49].level, all[99].level]
+        levels.append(try Self.extremeLevel(LissajousLabyrinthDials(frequencyA: 1, frequencyB: 2, phaseA: 0,
+                                                                    phaseC: 0)))
+        // 26 directions (cube corners, edge midpoints and face centres) for sampling sphere surfaces.
+        var directions: [Vec3] = []
+        for x in -1...1 {
+            for y in -1...1 {
+                for z in -1...1 where x != 0 || y != 0 || z != 0 {
+                    directions.append(Vec3(Double(x), Double(y), Double(z)).normalized)
+                }
+            }
+        }
+        for level in levels {
+            let stage: (centre: Vec3, radius: Double) = Geometry.stageBounds(level: level)
+            var points: [Vec3] = []
+            for d in directions { points.append(stage.centre + d * stage.radius) }
+            for p in LissajousLabyrinthLap.samples(level.start, level: level) { points.append(Geometry.world(p)) }
+            let ringRadius: Double = LissajousLabyrinthHandles.ringRadius(level: level)
+            let knob: Double = LissajousLabyrinthHandles.knobRadius(level: level)
+            for dial in LissajousLabyrinthDial.allCases {
+                let centre: Vec3 = LissajousLabyrinthHandles.ringCentre(dial, level: level)
+                for k in 0..<32 {
+                    let t: Double = 2 * Double.pi * Double(k) / 32
+                    let rim: Vec3 = centre + (LissajousLabyrinthHandles.up * cos(t)
+                                              + LissajousLabyrinthHandles.right * sin(t)) * ringRadius
+                    for d in directions { points.append(rim + d * knob) }
+                }
+            }
+            let s: LissajousLabyrinthSceneSnapshot = Self.snapshot(level, time: 0)
+            for orbit in Self.orbits {
+                for aspect in aspects {
+                    let vp: Mat4 = Geometry.viewProjection(aspect: aspect, snapshot: s, orbit: orbit)
+                    var worst: Double = 0
+                    var behind: Bool = false
+                    for p in points {
+                        let clip: Vec4 = vp * Vec4(p, 1)
+                        if clip.w <= 0 {
+                            behind = true
+                            continue
+                        }
+                        worst = max(worst, abs(clip.x / clip.w), abs(clip.y / clip.w))
+                    }
+                    #expect(!behind && worst <= 0.9, "level \(level.id) orbit \(orbit) aspect \(aspect) \(worst)")
+                }
+            }
+        }
     }
 }

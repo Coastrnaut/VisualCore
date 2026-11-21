@@ -1,9 +1,12 @@
 // LissajousLabyrinthSceneGeometry — feature 313 (R02-G02-03) T-R02G0203-004 (FR-R02G0203-001, 006; clarifications Q1,
 // Q3; research R1–R4). The world of the labyrinth, built from a snapshot only: the lap's exact kernel samples scaled by
 // 1/1,024 into world units (at the tier's stride), the camera-facing thread strip through them, the checkpoint rings, the
-// obstacle icospheres and the tracer head disc, the fixed authored camera that fits the bounding sphere of path,
-// checkpoints and obstacles with a 5 % margin for every aspect 0.4 … 2.5, and the CPU projection that the simulator frame
-// checks compare with rendered pixels. Doubles are used for drawing only; nothing here is consulted by the rules.
+// obstacle icospheres and the tracer head disc, the authored camera that fits the scene with a 5 % margin for every
+// aspect 0.4 … 2.5 (since feature 314 the dial-independent content sphere, see below), and the CPU projection that
+// the simulator frame checks compare with rendered pixels. Doubles are used for drawing only; nothing here is consulted by the rules.
+// Feature 314 (R02-G02-04) T-R02G0204-002 (FR-R02G0204-001, 002, 004; clarifications Q1, Q3; research R1, R2, R6): the
+// dial-independent stage (`stageBounds`), the content sphere around the stage and the dial rings (`contentBounds`) that
+// the camera now fits, and the camera orbit (`LissajousLabyrinthOrbit`, azimuth ±40°, elevation 10° … 60°).
 import Foundation
 import VisualCoreMath
 import VisualCoreScenes
@@ -99,6 +102,57 @@ public enum LissajousLabyrinthSceneGeometry {
         return (centre, radius)
     }
 
+    /// The smallest sphere about the centre of the axis-aligned box around `spheres` that holds all of them.
+    static func enclosing(_ spheres: [(Vec3, Double)]) -> (centre: Vec3, radius: Double) {
+        var low = Vec3(Double.infinity, Double.infinity, Double.infinity)
+        var high = Vec3(-Double.infinity, -Double.infinity, -Double.infinity)
+        for (c, r) in spheres {
+            low = Vec3(min(low.x, c.x - r), min(low.y, c.y - r), min(low.z, c.z - r))
+            high = Vec3(max(high.x, c.x + r), max(high.y, c.y + r), max(high.z, c.z + r))
+        }
+        let centre = (low + high) * 0.5
+        var radius = 0.0
+        for (c, r) in spheres { radius = max(radius, (c - centre).length + r) }
+        return (centre, radius)
+    }
+
+    /// The stage of `level`: a bounding sphere that does not depend on the dials (feature 314, research R1).
+    ///
+    /// Every kernel sample of every setting lies in the amplitude box ±amplitude · 1,024 kernel units per axis (the
+    /// integer sine is at most 1,024), that is ±amplitude world units; the box is grown by ``pathMargin`` so the thread
+    /// and the head fit too. The sphere is the smallest one about the centre of the axis-aligned box around that grown
+    /// box and every checkpoint and obstacle ball (each with its radius) that holds all of them, so every path the level
+    /// can draw, at any dials, lies inside it. The dial rings of ``LissajousLabyrinthHandles`` are laid out against it.
+    public static func stageBounds(level: LissajousLabyrinthLevel) -> (centre: Vec3, radius: Double) {
+        let scale = Double(LissajousLabyrinthSine.scale) * unitsPerKernel
+        let ax = Double(level.amplitudes[0]) * scale + pathMargin
+        let ay = Double(level.amplitudes[1]) * scale + pathMargin
+        let az = Double(level.amplitudes[2]) * scale + pathMargin
+        var spheres: [(Vec3, Double)] = []
+        for sx in [-1.0, 1.0] {
+            for sy in [-1.0, 1.0] {
+                for sz in [-1.0, 1.0] { spheres.append((Vec3(sx * ax, sy * ay, sz * az), 0)) }
+            }
+        }
+        for ball in level.checkpoints { spheres.append((world(ball), radius(ball))) }
+        for ball in level.obstacles { spheres.append((world(ball), radius(ball))) }
+        return enclosing(spheres)
+    }
+
+    /// The content of `level` the camera fits: the sphere about the centre of the box around ``stageBounds(level:)``
+    /// and the four dial rings (each ring circle of ``LissajousLabyrinthHandles/ringRadius(level:)`` grown by
+    /// ``LissajousLabyrinthHandles/knobRadius(level:)`` so the knobs fit too) that holds all of them. Independent of
+    /// the dials.
+    public static func contentBounds(level: LissajousLabyrinthLevel) -> (centre: Vec3, radius: Double) {
+        let stage = stageBounds(level: level)
+        var spheres: [(Vec3, Double)] = [(stage.centre, stage.radius)]
+        let extent = LissajousLabyrinthHandles.ringRadius(level: level) + LissajousLabyrinthHandles.knobRadius(level: level)
+        for dial in LissajousLabyrinthDial.allCases {
+            spheres.append((LissajousLabyrinthHandles.ringCentre(dial, level: level), extent))
+        }
+        return enclosing(spheres)
+    }
+
     // MARK: Camera
 
     /// `aspect` made usable: a non-finite or non-positive aspect becomes 1; others are clamped to 0.1 … 10.
@@ -118,31 +172,44 @@ public enum LissajousLabyrinthSceneGeometry {
         return max(radius, 1e-3) / sin(alpha)
     }
 
-    /// The fixed authored camera for `aspect` (width / height): the eye on ``eyeDirection`` from the bounds centre at
-    /// the fitted distance, looking at the bounds centre, a 45° vertical field of view. For aspects 0.4 … 2.5 the whole
-    /// bounding sphere (path, checkpoints, obstacles, thread and head) fits with at least 5 % margin on every side.
+    /// The camera for `aspect` (width / height) at the authored orbit: ``camera(aspect:snapshot:orbit:)`` with
+    /// ``LissajousLabyrinthOrbit/authored``.
     public static func camera(aspect: Double,
                               snapshot: LissajousLabyrinthSceneSnapshot) -> (eye: Vec3, target: Vec3, fovY: Double) {
-        let b = bounds(snapshot)
-        let d = distance(radius: b.radius, aspect: aspect)
-        return (b.centre + eyeDirection * d, b.centre, fieldOfView)
+        camera(aspect: aspect, snapshot: snapshot, orbit: .authored)
     }
 
-    /// The eye distances of the bounding sphere's front and back for `aspect` (the fitted distance minus and plus the
-    /// radius, the front at least 0.001): the `u_fadeNear` and `u_fadeFar` of the thread's depth fading.
-    public static func depthRange(aspect: Double, snapshot: LissajousLabyrinthSceneSnapshot) -> (near: Double, far: Double) {
+    /// The camera for `aspect` (width / height) at `orbit` (clamped): the eye on the orbit's eye direction from the
+    /// centre of ``contentBounds(level:)`` of the snapshot's level at the closed-form fitted distance, looking at that
+    /// centre, a 45° vertical field of view. The fitted content is a sphere, so for every orbit and every aspect
+    /// 0.4 … 2.5 the stage (every path the level can draw, checkpoints, obstacles, thread and head) and the four dial
+    /// rings with their knobs fit with at least 5 % margin on every side. The framing does not depend on the dials.
+    public static func camera(aspect: Double, snapshot: LissajousLabyrinthSceneSnapshot,
+                              orbit: LissajousLabyrinthOrbit) -> (eye: Vec3, target: Vec3, fovY: Double) {
+        let b = contentBounds(level: snapshot.level)
+        let d = distance(radius: b.radius, aspect: aspect)
+        return (b.centre + orbit.eyeDirection * d, b.centre, fieldOfView)
+    }
+
+    /// The eye distances of the front and back of the drawn figure's bounding sphere (``bounds(_:)``) from the eye of
+    /// ``camera(aspect:snapshot:orbit:)``: the distance from the eye to the sphere's centre minus and plus its radius,
+    /// the front at least 0.001. These are the `u_fadeNear` and `u_fadeFar` of the thread's depth fading.
+    public static func depthRange(aspect: Double, snapshot: LissajousLabyrinthSceneSnapshot,
+                                  orbit: LissajousLabyrinthOrbit = .authored) -> (near: Double, far: Double) {
         let b = bounds(snapshot)
-        let d = distance(radius: b.radius, aspect: usableAspect(aspect))
+        let eye = camera(aspect: usableAspect(aspect), snapshot: snapshot, orbit: orbit).eye
+        let d = (b.centre - eye).length
         return (max(d - b.radius, 1e-3), d + b.radius)
     }
 
-    /// The view-projection of ``camera(aspect:snapshot:)``: `Mat4.perspective` (GL depth range, near half the gap to
-    /// the bounding sphere, far beyond it) times `Mat4.lookAt` with +y up.
-    public static func viewProjection(aspect: Double, snapshot: LissajousLabyrinthSceneSnapshot) -> Mat4 {
-        let b = bounds(snapshot)
+    /// The view-projection of ``camera(aspect:snapshot:orbit:)``: `Mat4.perspective` (GL depth range, near half the
+    /// gap to the content sphere, far beyond it) times `Mat4.lookAt` with +y up.
+    public static func viewProjection(aspect: Double, snapshot: LissajousLabyrinthSceneSnapshot,
+                                      orbit: LissajousLabyrinthOrbit = .authored) -> Mat4 {
+        let b = contentBounds(level: snapshot.level)
         let a = usableAspect(aspect)
         let d = distance(radius: b.radius, aspect: a)
-        let eye = b.centre + eyeDirection * d
+        let eye = b.centre + orbit.eyeDirection * d
         let view = Mat4.lookAt(eye: eye, target: b.centre, up: Vec3(0, 1, 0))
         let near = max((d - b.radius) * 0.5, 1e-3)
         let projection = Mat4.perspective(fovY: fieldOfView, aspect: a, near: near, far: d + 2 * b.radius + 1)
@@ -150,12 +217,12 @@ public enum LissajousLabyrinthSceneGeometry {
     }
 
     /// The pixel position of `p` in a `width` × `height` viewport (origin top left, y down) through
-    /// ``viewProjection(aspect:snapshot:)``; nil behind the camera, for a non-positive size or non-finite input.
+    /// ``viewProjection(aspect:snapshot:orbit:)``; nil behind the camera, for a non-positive size or non-finite input.
     public static func project(_ p: Vec3, aspect: Double, snapshot: LissajousLabyrinthSceneSnapshot, width: Int,
-                               height: Int) -> Vec2? {
+                               height: Int, orbit: LissajousLabyrinthOrbit = .authored) -> Vec2? {
         guard width > 0, height > 0 else { return nil }
-        return project(p, viewProjection: viewProjection(aspect: aspect, snapshot: snapshot), width: width,
-                       height: height)
+        return project(p, viewProjection: viewProjection(aspect: aspect, snapshot: snapshot, orbit: orbit),
+                       width: width, height: height)
     }
 
     /// `p` projected through a ready view-projection (see ``project(_:aspect:snapshot:width:height:)``).
@@ -378,5 +445,51 @@ public enum LissajousLabyrinthSceneGeometry {
             try facing(&builder, middle, ids[k], ids[j], centre, positions[k], positions[j], front: normal)
         }
         return builder.build()
+    }
+}
+
+/// The orbit of the Lissajous Labyrinth camera (feature 314, R02-G02-04, research R6): an azimuth offset around the
+/// authored azimuth and an elevation above the x–z plane, both in radians. Presentation only, never saved.
+///
+/// The azimuth is measured about +y from +z towards +x; the authored azimuth is atan2(0.55, 1.0) ≈ 28.8° and the authored
+/// elevation asin(0.45 / |(0.55, 0.45, 1.0)|) ≈ 21.5°, so ``authored`` reproduces
+/// `LissajousLabyrinthSceneGeometry.eyeDirection`.
+public struct LissajousLabyrinthOrbit: Sendable, Equatable {
+    /// The azimuth offset in radians, added to ``azimuth``; allowed −40° … 40°.
+    public var azimuthOffset: Double
+    /// The elevation above the x–z plane in radians; allowed 10° … 60°.
+    public var elevation: Double
+
+    /// An orbit of the given offset and elevation (not clamped; see ``clamped()``).
+    public init(azimuthOffset: Double, elevation: Double) {
+        self.azimuthOffset = azimuthOffset
+        self.elevation = elevation
+    }
+
+    /// The authored azimuth in radians, atan2(0.55, 1.0) ≈ 28.8°.
+    public static let azimuth: Double = atan2(0.55, 1.0)
+    /// The authored orbit: offset 0, elevation asin(0.45 / |(0.55, 0.45, 1.0)|) ≈ 21.5°.
+    public static let authored = LissajousLabyrinthOrbit(
+        azimuthOffset: 0, elevation: asin(0.45 / Vec3(0.55, 0.45, 1.0).length))
+    /// The allowed azimuth offsets in radians, −40° … 40°.
+    public static let azimuthRange: ClosedRange<Double> = (-40.0 * Double.pi / 180)...(40.0 * Double.pi / 180)
+    /// The allowed elevations in radians, 10° … 60°.
+    public static let elevationRange: ClosedRange<Double> = (10.0 * Double.pi / 180)...(60.0 * Double.pi / 180)
+
+    /// This orbit with each angle clamped to its range; a non-finite angle becomes the authored one.
+    public func clamped() -> LissajousLabyrinthOrbit {
+        let a: Double = azimuthOffset.isFinite ? azimuthOffset : Self.authored.azimuthOffset
+        let e: Double = elevation.isFinite ? elevation : Self.authored.elevation
+        return LissajousLabyrinthOrbit(
+            azimuthOffset: min(max(a, Self.azimuthRange.lowerBound), Self.azimuthRange.upperBound),
+            elevation: min(max(e, Self.elevationRange.lowerBound), Self.elevationRange.upperBound))
+    }
+
+    /// The unit direction from the content centre to the eye at the clamped orbit:
+    /// (cos e · sin a, sin e, cos e · cos a) with a = ``azimuth`` + offset and e the elevation.
+    public var eyeDirection: Vec3 {
+        let o: LissajousLabyrinthOrbit = clamped()
+        let a: Double = Self.azimuth + o.azimuthOffset
+        return Vec3(cos(o.elevation) * sin(a), sin(o.elevation), cos(o.elevation) * cos(a))
     }
 }
