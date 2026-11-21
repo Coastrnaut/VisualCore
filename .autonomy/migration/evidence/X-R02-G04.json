@@ -1,0 +1,85 @@
+{
+  "branch": "main",
+  "dirty": false,
+  "dirty_paths": [],
+  "failed_attempts": [],
+  "gate": "X-R02-G04",
+  "ledger": "migration",
+  "passing_checks": [
+    {
+      "command": "python3 scripts/verify_experiences.py --audits",
+      "exit_code": 0,
+      "finished": "2026-11-21T19:06:39+00:00",
+      "log": ".autonomy/logs/migration/X-R02-G04.audits.log",
+      "log_sha256": "74b2953244eedccca94451b9a68179b1a03587dc9e9ef1523c4f67dc602f9bdd",
+      "name": "audits"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package --destination sim-27.2 --action test --result-name xr02g04-host-2",
+      "exit_code": 0,
+      "finished": "2026-11-21T19:22:48+00:00",
+      "log": ".autonomy/logs/migration/X-R02-G04.host.log",
+      "log_sha256": "ef56053f541c3c21165d4122dc38aa63e6125afc22c770827f0554cb142e1300",
+      "name": "host"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean",
+      "exit_code": 0,
+      "finished": "2026-11-21T19:17:56+00:00",
+      "log": ".autonomy/logs/migration/X-R02-G04.reference-1.log",
+      "log_sha256": "2e16cdaa36222f7a1dfb123a2bc75712931869f7d8156b95ad6d69d70e51b4c6",
+      "name": "reference-1"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26",
+      "exit_code": 0,
+      "finished": "2026-11-21T19:18:20+00:00",
+      "log": ".autonomy/logs/migration/X-R02-G04.reference-2.log",
+      "log_sha256": "a815089b2a258362acc8a987685148f2c72332b1e86d427f9e9fd35a0149ae2f",
+      "name": "reference-2"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only r02-g04.hue-compass --runtime 26",
+      "exit_code": 0,
+      "finished": "2026-11-21T19:11:58+00:00",
+      "log": ".autonomy/logs/migration/X-R02-G04.sim26.log",
+      "log_sha256": "0f1a56fe77d27d9a0e33782d5351e52175db0189fb2740fca34577813a71c88c",
+      "name": "sim26"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only r02-g04.hue-compass --runtime 27",
+      "exit_code": 0,
+      "finished": "2026-11-21T19:09:23+00:00",
+      "log": ".autonomy/logs/migration/X-R02-G04.sim27.log",
+      "log_sha256": "9469cf7ce6d90a2f37a7546418cf297510f2d428756af6a4bb70f7479b84f713",
+      "name": "sim27"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-ui-ios27-m3",
+      "exit_code": 0,
+      "finished": "2026-11-21T19:16:02+00:00",
+      "log": ".autonomy/logs/migration/X-R02-G04.ui-m3.log",
+      "log_sha256": "c4267921783a743d08d014f16dc69c424679754baa7b6c137a3299654c9efc94",
+      "name": "ui-m3"
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "finished": "2026-11-21T19:16:43+00:00",
+      "log": ".autonomy/logs/migration/X-R02-G04.visualcore-host.log",
+      "log_sha256": "bac3dc686b766deeff9670067c512419ee855113e2921db4cc3a7a80b7474256",
+      "name": "visualcore-host"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name xr02g04-rendering",
+      "exit_code": 0,
+      "finished": "2026-11-21T19:17:31+00:00",
+      "log": ".autonomy/logs/migration/X-R02-G04.visualcore-rendering.log",
+      "log_sha256": "5ce7d1e8d5bdbbc2894b665a468533b52624a33770c0c6d14407d540f6c9e6bf",
+      "name": "visualcore-rendering"
+    }
+  ],
+  "revision": "baa883e1f266304febd20aee9ac817711f9aaaaf",
+  "revision_number": 1,
+  "sealed": "2026-11-21T19:23:34+00:00"
+}
