@@ -77,7 +77,8 @@ with at most 6,540 distinct routings simulated by the solver for one level.
   the kernel. Impact: FR-R02G0502-002; SC-R02G0502-001, 002.
 - Q: What difficulty metrics are stored and what progression is required? → A: `ColorfallCanyonsDifficulty` holds the
   smallest edit count, the distinct routings simulated, the win tick of the witness, the spring, basin and protected-basin
-  counts and the carvable-cell count. The catalog in manifest order keeps R02-F24's standard `ProgressionRule` (drop at
+  counts and the carvable-cell count; the work is measured at the band's search depth (the upper end of its range), because
+  the reachability bound of the moves depends on the depth. The catalog in manifest order keeps R02-F24's standard `ProgressionRule` (drop at
   most 1, jump at most 3) on the smallest edit count; the band ranges make band means non-decreasing. Impact:
   FR-R02G0502-003, 005; SC-R02G0502-004.
 - Q: What is in a witness file and how is it checked? → A: `docs/games/colorfall-canyons/levels/NNN.witness.json`, JSON

@@ -1,0 +1,263 @@
+{
+  "actions" : [
+    {
+      "carve" : {
+        "_0" : 7
+      }
+    },
+    {
+      "carve" : {
+        "_0" : 7
+      }
+    },
+    {
+      "carve" : {
+        "_0" : 10
+      }
+    },
+    {
+      "step" : {
+        "_0" : 75
+      }
+    }
+  ],
+  "difficulty" : {
+    "basins" : 2,
+    "carvableCells" : 31,
+    "protectedBasins" : 0,
+    "smallest" : 3,
+    "springs" : 3,
+    "winTick" : 12,
+    "work" : 70
+  },
+  "digests" : [
+    "2bbd4493d4b4fc85",
+    "af2212f4a253c60c",
+    "0205116b8499f7f8",
+    "99e48da36ac21ad4",
+    "c6db0e8a688dae7e",
+    "61da6b30810b7ba3",
+    "d441581c69bd7d02",
+    "eecdc5d599fa804e",
+    "67f6ef48af0f1877",
+    "979dd5a93e4af850",
+    "cf8699e8bfa7010f",
+    "c50cb5ce8e1aea29"
+  ],
+  "fingerprints" : [
+    "9b1de6ebe192c02f60c986511a2926c3ada120d9ce1b0583db655b09aebab744",
+    "428aedfadc8ffb25cc973af7b56868d878c5ad0166845c4bebf7d712529b6f8a",
+    "f71b13d93d2b2ca6335da1d4ee9fce04c0864fd2ac8072ab8f6fe79283274364",
+    "687453c0538c68b22d6acead08e7f0539a7851f6f1ade04174deb02964e8320f",
+    "57137155b69ea1a88f01bf3e136fa7e6690ded0a35580789f9372e5c7ccf2922"
+  ],
+  "level" : {
+    "basins" : [
+      {
+        "capacity" : 19,
+        "cell" : 26,
+        "fill" : 15,
+        "isProtected" : false,
+        "shares" : [
+          0,
+          1000,
+          0
+        ],
+        "tolerance" : 50,
+        "toleratedWrong" : 0
+      },
+      {
+        "capacity" : 23,
+        "cell" : 15,
+        "fill" : 19,
+        "isProtected" : false,
+        "shares" : [
+          1000,
+          0,
+          0
+        ],
+        "tolerance" : 100,
+        "toleratedWrong" : 0
+      }
+    ],
+    "budget" : 18,
+    "columns" : 8,
+    "difficulty" : 5,
+    "fingerprint" : "1a971eaa10e4a903357f4133ebb7e190cb5ea17963bc715c482005cc1c11c250",
+    "flowRate" : 5,
+    "grounds" : [
+      0,
+      0,
+      1,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      2,
+      0,
+      0,
+      2
+    ],
+    "heights" : [
+      11,
+      11,
+      11,
+      13,
+      12,
+      12,
+      14,
+      14,
+      11,
+      9,
+      9,
+      12,
+      8,
+      9,
+      11,
+      9,
+      3,
+      8,
+      5,
+      6,
+      9,
+      10,
+      5,
+      10,
+      5,
+      7,
+      0,
+      0,
+      0,
+      4,
+      6,
+      4,
+      5,
+      6,
+      2,
+      0,
+      2,
+      3,
+      6,
+      5,
+      2,
+      4,
+      0,
+      0,
+      0,
+      3,
+      4,
+      0
+    ],
+    "id" : "colorfall-canyons-082",
+    "rows" : 6,
+    "schema" : 1,
+    "seed" : 17559141691839778471,
+    "springs" : [
+      {
+        "cell" : 1,
+        "color" : 1,
+        "open" : true,
+        "release" : 3,
+        "supply" : 15
+      },
+      {
+        "cell" : 6,
+        "color" : 0,
+        "open" : true,
+        "release" : 2,
+        "supply" : 21
+      },
+      {
+        "cell" : 3,
+        "color" : 2,
+        "open" : true,
+        "release" : 2,
+        "supply" : 11
+      }
+    ],
+    "tickLimit" : 75,
+    "tutorial" : false
+  },
+  "nearMiss" : {
+    "edits" : [
+      {
+        "carve" : {
+          "_0" : 7
+        }
+      },
+      {
+        "carve" : {
+          "_0" : 7
+        }
+      }
+    ],
+    "reason" : "time",
+    "tick" : 75
+  },
+  "number" : 82,
+  "schema" : 1,
+  "skipped" : 6,
+  "smaller" : 65,
+  "totals" : {
+    "held" : [
+      21,
+      15,
+      11
+    ],
+    "released" : [
+      21,
+      15,
+      11
+    ],
+    "spilled" : [
+      0,
+      0,
+      0
+    ]
+  },
+  "unedited" : {
+    "edits" : [
+
+    ],
+    "reason" : "time",
+    "tick" : 75
+  },
+  "winTick" : 12
+}

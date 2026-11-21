@@ -1,0 +1,237 @@
+{
+  "actions" : [
+    {
+      "carve" : {
+        "_0" : 5
+      }
+    },
+    {
+      "carve" : {
+        "_0" : 5
+      }
+    },
+    {
+      "carve" : {
+        "_0" : 8
+      }
+    },
+    {
+      "step" : {
+        "_0" : 110
+      }
+    }
+  ],
+  "difficulty" : {
+    "basins" : 2,
+    "carvableCells" : 22,
+    "protectedBasins" : 1,
+    "smallest" : 3,
+    "springs" : 2,
+    "winTick" : 19,
+    "work" : 64
+  },
+  "digests" : [
+    "db91eca638925652",
+    "af140f48d5246c0c",
+    "94a54a1a6be8ae32",
+    "23864013eac61216",
+    "74cc187eb5b51c90",
+    "5aedc18cd6429851",
+    "974e8fdaeeb924b7",
+    "93ea516f56d68681",
+    "a4e0850b2298fab2",
+    "59d98e02e425c674",
+    "9c810e9c06b14282",
+    "025d4077c822dafe",
+    "57d6285dfa3c717b",
+    "ca3af79691bc2114",
+    "d39225f9383584bf",
+    "b8d7910aa84dffd7",
+    "3d44511942392fa6",
+    "f8e4806a7d6fa90d",
+    "2d43a939f4011396"
+  ],
+  "fingerprints" : [
+    "b1dd2eadd035f933fbba753a8db6770131c8555a39ca522ed2a18771cc80b52c",
+    "ce2fdbf5ff00b06143b0f0c1d69ce9c54dda9aeb18614673da96166a25bf7727",
+    "d1e03a9be180bd3ac94b993bc1bca86be69cc9e5fb19c8e22fa8ac40e47ce255",
+    "1b93b52f15a8de455261aa6bb72dff72a439c2f3ba6649b4c2b7ac466a0b86e4",
+    "2f1e2af5d8c42872df0aa9c03d3817dca02e94eb2c37c51f5156698a64e809b6"
+  ],
+  "level" : {
+    "basins" : [
+      {
+        "capacity" : 20,
+        "cell" : 20,
+        "fill" : 15,
+        "isProtected" : false,
+        "shares" : [
+          0,
+          0,
+          1000
+        ],
+        "tolerance" : 100,
+        "toleratedWrong" : 0
+      },
+      {
+        "capacity" : 15,
+        "cell" : 22,
+        "fill" : 12,
+        "isProtected" : true,
+        "shares" : [
+          1000,
+          0,
+          0
+        ],
+        "tolerance" : 100,
+        "toleratedWrong" : 0
+      }
+    ],
+    "budget" : 13,
+    "columns" : 7,
+    "difficulty" : 3,
+    "fingerprint" : "d877ab4949092fedcf535ca5fe88879576f720de9cd0a6f680388df7b2cf3b99",
+    "flowRate" : 4,
+    "grounds" : [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      2,
+      0,
+      2,
+      1,
+      0,
+      0
+    ],
+    "heights" : [
+      13,
+      13,
+      10,
+      12,
+      11,
+      12,
+      14,
+      10,
+      8,
+      11,
+      8,
+      12,
+      9,
+      12,
+      7,
+      6,
+      6,
+      10,
+      0,
+      8,
+      0,
+      6,
+      0,
+      5,
+      6,
+      2,
+      4,
+      0,
+      5,
+      0,
+      5,
+      0,
+      5,
+      3,
+      2
+    ],
+    "id" : "colorfall-canyons-057",
+    "rows" : 5,
+    "schema" : 1,
+    "seed" : 11912783037041691372,
+    "springs" : [
+      {
+        "cell" : 4,
+        "color" : 2,
+        "open" : true,
+        "release" : 1,
+        "supply" : 17
+      },
+      {
+        "cell" : 9,
+        "color" : 0,
+        "open" : true,
+        "release" : 3,
+        "supply" : 14
+      }
+    ],
+    "tickLimit" : 110,
+    "tutorial" : false
+  },
+  "nearMiss" : {
+    "edits" : [
+      {
+        "carve" : {
+          "_0" : 5
+        }
+      },
+      {
+        "carve" : {
+          "_0" : 5
+        }
+      }
+    ],
+    "reason" : "time",
+    "tick" : 110
+  },
+  "number" : 57,
+  "schema" : 1,
+  "skipped" : 101,
+  "smaller" : 45,
+  "totals" : {
+    "held" : [
+      14,
+      0,
+      17
+    ],
+    "released" : [
+      14,
+      0,
+      17
+    ],
+    "spilled" : [
+      0,
+      0,
+      0
+    ]
+  },
+  "unedited" : {
+    "edits" : [
+
+    ],
+    "reason" : "time",
+    "tick" : 110
+  },
+  "winTick" : 19
+}

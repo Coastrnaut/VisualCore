@@ -1,0 +1,176 @@
+{
+  "actions" : [
+    {
+      "carve" : {
+        "_0" : 6
+      }
+    },
+    {
+      "step" : {
+        "_0" : 81
+      }
+    }
+  ],
+  "difficulty" : {
+    "basins" : 1,
+    "carvableCells" : 22,
+    "protectedBasins" : 0,
+    "smallest" : 1,
+    "springs" : 1,
+    "winTick" : 9,
+    "work" : 4
+  },
+  "digests" : [
+    "7e9e6f099a7f103f",
+    "6900f2e080aa91cb",
+    "c61031a3fc85309d",
+    "e6c196b39044e345",
+    "6d15988ae334ac4f",
+    "ec40af0726e4c97d",
+    "f729f49602e7018e",
+    "b55259472ddeea25",
+    "67f0487ec4b064cb"
+  ],
+  "fingerprints" : [
+    "0a80b4cef217f3f329369814d7b63f09c56698f3dbb7dc0b81950ff9bff3defb",
+    "6f037cfb715607d8e8a5d515d763df4c495e4d92c477f2d42b2dbc0c545a95f2",
+    "9eb6a1be07ae2bbd25f4818f8d95c10c584ecab0ec1045ce1947ce71a88ba3e1"
+  ],
+  "level" : {
+    "basins" : [
+      {
+        "capacity" : 17,
+        "cell" : 12,
+        "fill" : 14,
+        "isProtected" : false,
+        "shares" : [
+          0,
+          1000,
+          0
+        ],
+        "tolerance" : 150,
+        "toleratedWrong" : 0
+      }
+    ],
+    "budget" : 9,
+    "columns" : 6,
+    "difficulty" : 1,
+    "fingerprint" : "4e04e532299da64cae5314625d821a32bbf47ca54fc7656c7ce3b754fda4c724",
+    "flowRate" : 4,
+    "grounds" : [
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      2
+    ],
+    "heights" : [
+      10,
+      13,
+      11,
+      11,
+      10,
+      14,
+      10,
+      9,
+      9,
+      10,
+      12,
+      10,
+      6,
+      7,
+      8,
+      5,
+      10,
+      6,
+      8,
+      0,
+      7,
+      6,
+      8,
+      0,
+      3,
+      2,
+      6,
+      6,
+      3,
+      0
+    ],
+    "id" : "colorfall-canyons-009",
+    "rows" : 5,
+    "schema" : 1,
+    "seed" : 2701840008984025545,
+    "springs" : [
+      {
+        "cell" : 0,
+        "color" : 1,
+        "open" : true,
+        "release" : 2,
+        "supply" : 14
+      }
+    ],
+    "tickLimit" : 81,
+    "tutorial" : false
+  },
+  "nearMiss" : {
+    "edits" : [
+
+    ],
+    "reason" : "time",
+    "tick" : 81
+  },
+  "number" : 9,
+  "schema" : 1,
+  "skipped" : 2,
+  "smaller" : 1,
+  "totals" : {
+    "held" : [
+      0,
+      14,
+      0
+    ],
+    "released" : [
+      0,
+      14,
+      0
+    ],
+    "spilled" : [
+      0,
+      0,
+      0
+    ]
+  },
+  "unedited" : {
+    "edits" : [
+
+    ],
+    "reason" : "time",
+    "tick" : 81
+  },
+  "winTick" : 9
+}

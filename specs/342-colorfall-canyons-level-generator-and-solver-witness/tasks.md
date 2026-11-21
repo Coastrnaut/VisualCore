@@ -53,7 +53,7 @@ run uses). Fixture seed 2_342; tests stay short (< 10 s each).
   `Packages/ExperiencesRound02/ColorfallCanyons/CoreTests/ColorfallCanyonsWitnessTests.swift` (round trip byte for byte; edited actions, digests, totals,
   fingerprints, level, counterexamples and difficulty refused; newer schema and damaged JSON refused; the counterexamples
   fail as recorded) by agent B; `--name host-4`
-- [ ] T-R02G0502-006 [US2] [US3] [US4] Create `Packages/ExperiencesRound02/ColorfallCanyons/CoreTests/ColorfallCanyonsCatalogTests.swift` (100 entries, 20 per band;
+- [X] T-R02G0502-006 [US2] [US3] [US4] Create `Packages/ExperiencesRound02/ColorfallCanyons/CoreTests/ColorfallCanyonsCatalogTests.swift` (100 entries, 20 per band; — Verified 2026-11-21: 2026-11-21 host-5 exit 0 (catalog tests by the lead: manifest, pinned digest 68eec7b5…f019, progression rule and non-falling band means, all 100 witnesses win with zero drift and fail unedited, a no-pruning brute force on levels 1, 11, … 91 finds no smaller set, witness files byte for byte per half band; the 100 files generated with COLORFALL_CANYONS_WRITE_WITNESSES=1)
   the catalog generated twice is identical; pinned digest; `ProgressionRule.standard` holds on the smallest count; band
   means never fall; on levels 1, 11, 21, … 91 the smallest count equals the brute force (SC-R02G0502-002); all 100
   witnesses replay to a win with zero drift; each witness equals `docs/games/colorfall-canyons/levels/NNN.witness.json`

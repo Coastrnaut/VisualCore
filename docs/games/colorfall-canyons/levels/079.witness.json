@@ -1,0 +1,262 @@
+{
+  "actions" : [
+    {
+      "carve" : {
+        "_0" : 3
+      }
+    },
+    {
+      "carve" : {
+        "_0" : 16
+      }
+    },
+    {
+      "carve" : {
+        "_0" : 16
+      }
+    },
+    {
+      "step" : {
+        "_0" : 92
+      }
+    }
+  ],
+  "difficulty" : {
+    "basins" : 2,
+    "carvableCells" : 33,
+    "protectedBasins" : 2,
+    "smallest" : 3,
+    "springs" : 3,
+    "winTick" : 11,
+    "work" : 79
+  },
+  "digests" : [
+    "e7c37f39f43a55d9",
+    "5bebb335cd8f7564",
+    "bbd5fb33bb8791e8",
+    "1101e5ef69061664",
+    "5eb4196917614f3e",
+    "8fa8467be5b32c20",
+    "4c9f8c17689fa097",
+    "0fcb68848ce1929c",
+    "dfe432956322f17b",
+    "2d02df55bb009daf",
+    "0929ad3ba9ce0e0d"
+  ],
+  "fingerprints" : [
+    "4f81f77b8a31e6ccd39b050d509218b487145f58c43dce4c336279d98258b360",
+    "f75ffb6da8e8174f12529241679e86e3552770c271228d905952f23fcb77c54a",
+    "c5ee87afb607ea0f03c117b42a42aa0b0b04e623f1c8481f07fb322ab9543632",
+    "e79c2d136041eabd87a15c491b65fd9873a86d6bb3fd79c888c4c5836fed519a",
+    "11c26f42264c52bc5846c5200da07467c3d5fc104092c8714c50237b67e60143"
+  ],
+  "level" : {
+    "basins" : [
+      {
+        "capacity" : 16,
+        "cell" : 25,
+        "fill" : 13,
+        "isProtected" : true,
+        "shares" : [
+          1000,
+          0,
+          0
+        ],
+        "tolerance" : 50,
+        "toleratedWrong" : 0
+      },
+      {
+        "capacity" : 15,
+        "cell" : 28,
+        "fill" : 12,
+        "isProtected" : true,
+        "shares" : [
+          0,
+          1000,
+          0
+        ],
+        "tolerance" : 50,
+        "toleratedWrong" : 0
+      }
+    ],
+    "budget" : 17,
+    "columns" : 8,
+    "difficulty" : 4,
+    "fingerprint" : "27de4f2c256b86f09a3547d0df197fe7bb787164514187702e76d61ee995b7a2",
+    "flowRate" : 3,
+    "grounds" : [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      2,
+      1,
+      0,
+      0,
+      1
+    ],
+    "heights" : [
+      14,
+      14,
+      11,
+      11,
+      12,
+      10,
+      13,
+      13,
+      8,
+      12,
+      11,
+      9,
+      10,
+      9,
+      11,
+      8,
+      9,
+      6,
+      9,
+      7,
+      8,
+      4,
+      2,
+      6,
+      8,
+      4,
+      5,
+      2,
+      0,
+      6,
+      0,
+      8,
+      6,
+      6,
+      6,
+      3,
+      2,
+      6,
+      6,
+      0,
+      4,
+      1,
+      1,
+      0,
+      2,
+      0,
+      1,
+      1
+    ],
+    "id" : "colorfall-canyons-079",
+    "rows" : 6,
+    "schema" : 1,
+    "seed" : 11919555199695665894,
+    "springs" : [
+      {
+        "cell" : 15,
+        "color" : 2,
+        "open" : true,
+        "release" : 1,
+        "supply" : 22
+      },
+      {
+        "cell" : 0,
+        "color" : 0,
+        "open" : true,
+        "release" : 3,
+        "supply" : 14
+      },
+      {
+        "cell" : 2,
+        "color" : 1,
+        "open" : true,
+        "release" : 2,
+        "supply" : 13
+      }
+    ],
+    "tickLimit" : 92,
+    "tutorial" : false
+  },
+  "nearMiss" : {
+    "edits" : [
+      {
+        "carve" : {
+          "_0" : 3
+        }
+      },
+      {
+        "carve" : {
+          "_0" : 16
+        }
+      }
+    ],
+    "reason" : "time",
+    "tick" : 92
+  },
+  "number" : 79,
+  "schema" : 1,
+  "skipped" : 86,
+  "smaller" : 60,
+  "totals" : {
+    "held" : [
+      14,
+      13,
+      11
+    ],
+    "released" : [
+      14,
+      13,
+      11
+    ],
+    "spilled" : [
+      0,
+      0,
+      0
+    ]
+  },
+  "unedited" : {
+    "edits" : [
+
+    ],
+    "reason" : "time",
+    "tick" : 92
+  },
+  "winTick" : 11
+}

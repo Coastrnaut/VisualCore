@@ -1,0 +1,183 @@
+{
+  "actions" : [
+    {
+      "carve" : {
+        "_0" : 13
+      }
+    },
+    {
+      "carve" : {
+        "_0" : 13
+      }
+    },
+    {
+      "step" : {
+        "_0" : 62
+      }
+    }
+  ],
+  "difficulty" : {
+    "basins" : 1,
+    "carvableCells" : 22,
+    "protectedBasins" : 0,
+    "smallest" : 2,
+    "springs" : 1,
+    "winTick" : 6,
+    "work" : 9
+  },
+  "digests" : [
+    "597c4fc170eb27eb",
+    "a6e818c5089b87ba",
+    "c602e13fa170ef94",
+    "21b9650734258825",
+    "c61fe1eeeae870a0",
+    "25f53af8e4318a1f"
+  ],
+  "fingerprints" : [
+    "871247cd522c4068618b63d7f7222c9780e6cfa61545922bcd07bd339b501d60",
+    "063563d6da3b48c1e8dcce71232735b9f47cfde259edba1b8f59faac8cad3605",
+    "23d6b0c011a1d635755cc589b06fe0493579aced01566e1149bbf4101ef87524",
+    "22d6369b0b32f27a054378d1bba0e221889f059adaf0e3e0c92f393897e7f14e"
+  ],
+  "level" : {
+    "basins" : [
+      {
+        "capacity" : 10,
+        "cell" : 14,
+        "fill" : 9,
+        "isProtected" : false,
+        "shares" : [
+          0,
+          0,
+          1000
+        ],
+        "tolerance" : 50,
+        "toleratedWrong" : 0
+      }
+    ],
+    "budget" : 8,
+    "columns" : 6,
+    "difficulty" : 1,
+    "fingerprint" : "5f3779edc365974ebc5f4d393fa0c9a7dd1b8ac010d56b2b4448dd6cb67ee3a6",
+    "flowRate" : 5,
+    "grounds" : [
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      2,
+      0,
+      0,
+      0,
+      0
+    ],
+    "heights" : [
+      11,
+      14,
+      12,
+      11,
+      14,
+      10,
+      12,
+      12,
+      9,
+      10,
+      11,
+      12,
+      7,
+      8,
+      5,
+      6,
+      10,
+      0,
+      5,
+      7,
+      6,
+      7,
+      5,
+      1,
+      4,
+      0,
+      3,
+      2,
+      4,
+      2
+    ],
+    "id" : "colorfall-canyons-012",
+    "rows" : 5,
+    "schema" : 1,
+    "seed" : 7487653462487634587,
+    "springs" : [
+      {
+        "cell" : 6,
+        "color" : 2,
+        "open" : true,
+        "release" : 3,
+        "supply" : 9
+      }
+    ],
+    "tickLimit" : 62,
+    "tutorial" : false
+  },
+  "nearMiss" : {
+    "edits" : [
+      {
+        "carve" : {
+          "_0" : 13
+        }
+      }
+    ],
+    "reason" : "time",
+    "tick" : 62
+  },
+  "number" : 12,
+  "schema" : 1,
+  "skipped" : 3,
+  "smaller" : 5,
+  "totals" : {
+    "held" : [
+      0,
+      0,
+      9
+    ],
+    "released" : [
+      0,
+      0,
+      9
+    ],
+    "spilled" : [
+      0,
+      0,
+      0
+    ]
+  },
+  "unedited" : {
+    "edits" : [
+
+    ],
+    "reason" : "time",
+    "tick" : 62
+  },
+  "winTick" : 6
+}

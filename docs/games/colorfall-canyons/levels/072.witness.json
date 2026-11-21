@@ -1,0 +1,268 @@
+{
+  "actions" : [
+    {
+      "carve" : {
+        "_0" : 15
+      }
+    },
+    {
+      "carve" : {
+        "_0" : 19
+      }
+    },
+    {
+      "carve" : {
+        "_0" : 19
+      }
+    },
+    {
+      "step" : {
+        "_0" : 85
+      }
+    }
+  ],
+  "difficulty" : {
+    "basins" : 2,
+    "carvableCells" : 30,
+    "protectedBasins" : 0,
+    "smallest" : 3,
+    "springs" : 3,
+    "winTick" : 17,
+    "work" : 357
+  },
+  "digests" : [
+    "37c4c65883a32565",
+    "973f3163e751a04d",
+    "67935e1e07910669",
+    "769f0a84a2cb687f",
+    "6bb02be613c6fc49",
+    "06121eac4be09e3b",
+    "5762b09fd21699aa",
+    "a7d6d13a8b8334a8",
+    "fd87551cc35783e2",
+    "e7f708d76dd3640f",
+    "13cc3281f1c526fe",
+    "7e4d1838194c5e7e",
+    "e257e40a2045d57a",
+    "cab7ebcc3e44352f",
+    "cc80cc3e26382e42",
+    "01920672dfbce064",
+    "69c29691234a0f6f"
+  ],
+  "fingerprints" : [
+    "1f39f0a87e27573bbcb4c9de9ad4d406db3fc90c83cb3eab0c1b386e5dd14464",
+    "56d4e8710d5f3241a1d474e66e20e1ae2d7616b833aded570c42bcff5b9d839b",
+    "aede0d879a8ccd2abd033404141bfc45f57d4a660b707a9e0a02b3dc8e2dd0ed",
+    "035e4d6bf1fb58c0617a252ebea444d54b751d70b6371bb62a122e0528750939",
+    "518b50160f74d87fb9baf30dbff521be5dab327a89b63788f6c22f3ba436cb96"
+  ],
+  "level" : {
+    "basins" : [
+      {
+        "capacity" : 42,
+        "cell" : 23,
+        "fill" : 38,
+        "isProtected" : false,
+        "shares" : [
+          0,
+          590,
+          410
+        ],
+        "tolerance" : 50,
+        "toleratedWrong" : 0
+      },
+      {
+        "capacity" : 21,
+        "cell" : 18,
+        "fill" : 15,
+        "isProtected" : false,
+        "shares" : [
+          1000,
+          0,
+          0
+        ],
+        "tolerance" : 50,
+        "toleratedWrong" : 0
+      }
+    ],
+    "budget" : 14,
+    "columns" : 8,
+    "difficulty" : 4,
+    "fingerprint" : "9bced44c3dbb1e39142c232f0b61636761a7ff30e1a1fce2980e081a2befec2f",
+    "flowRate" : 4,
+    "grounds" : [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      0,
+      0,
+      2,
+      0,
+      0,
+      2,
+      0,
+      0,
+      2
+    ],
+    "heights" : [
+      10,
+      11,
+      14,
+      12,
+      11,
+      14,
+      10,
+      14,
+      10,
+      10,
+      12,
+      8,
+      12,
+      12,
+      12,
+      11,
+      5,
+      10,
+      4,
+      9,
+      6,
+      7,
+      9,
+      9,
+      7,
+      0,
+      6,
+      5,
+      7,
+      5,
+      7,
+      7,
+      0,
+      0,
+      0,
+      6,
+      6,
+      6,
+      6,
+      4,
+      0,
+      0,
+      4,
+      2,
+      0,
+      1,
+      1,
+      0
+    ],
+    "id" : "colorfall-canyons-072",
+    "rows" : 6,
+    "schema" : 1,
+    "seed" : 16574130849420769508,
+    "springs" : [
+      {
+        "cell" : 14,
+        "color" : 2,
+        "open" : true,
+        "release" : 1,
+        "supply" : 16
+      },
+      {
+        "cell" : 7,
+        "color" : 1,
+        "open" : true,
+        "release" : 2,
+        "supply" : 23
+      },
+      {
+        "cell" : 12,
+        "color" : 0,
+        "open" : true,
+        "release" : 2,
+        "supply" : 17
+      }
+    ],
+    "tickLimit" : 85,
+    "tutorial" : false
+  },
+  "nearMiss" : {
+    "edits" : [
+      {
+        "carve" : {
+          "_0" : 15
+        }
+      },
+      {
+        "carve" : {
+          "_0" : 19
+        }
+      }
+    ],
+    "reason" : "time",
+    "tick" : 85
+  },
+  "number" : 72,
+  "schema" : 1,
+  "skipped" : 14,
+  "smaller" : 90,
+  "totals" : {
+    "held" : [
+      17,
+      23,
+      16
+    ],
+    "released" : [
+      17,
+      23,
+      16
+    ],
+    "spilled" : [
+      0,
+      0,
+      0
+    ]
+  },
+  "unedited" : {
+    "edits" : [
+
+    ],
+    "reason" : "time",
+    "tick" : 85
+  },
+  "winTick" : 17
+}

@@ -1,0 +1,245 @@
+{
+  "actions" : [
+    {
+      "carve" : {
+        "_0" : 19
+      }
+    },
+    {
+      "carve" : {
+        "_0" : 21
+      }
+    },
+    {
+      "carve" : {
+        "_0" : 21
+      }
+    },
+    {
+      "step" : {
+        "_0" : 86
+      }
+    }
+  ],
+  "difficulty" : {
+    "basins" : 2,
+    "carvableCells" : 24,
+    "protectedBasins" : 2,
+    "smallest" : 3,
+    "springs" : 2,
+    "winTick" : 27,
+    "work" : 263
+  },
+  "digests" : [
+    "be83c7956409cf91",
+    "556b9e967c4d097c",
+    "c1eb7bc2dcf42ca2",
+    "7bcd9ac3a1e0b808",
+    "9f7be26483def88e",
+    "f6ea34cf9af297c5",
+    "5d83f733e4090c16",
+    "5d11c22c6d695d8b",
+    "c6ce4269f83a5ff1",
+    "9b90ee5824c53539",
+    "3f711bf449edbb4d",
+    "745eae9788124869",
+    "05e32c0b195374a9",
+    "43e964e3e31f6176",
+    "d83f2efc394ff758",
+    "dc9c54d181008ef1",
+    "1fa1ae1e7bfd43ce",
+    "18c07ee7c69414d7",
+    "e8bc689be47a425f",
+    "ac1567912fa248e9",
+    "9b3d0ec0094b960f",
+    "5c5a2aabee9f02e4",
+    "8b680eb06ff50d9e",
+    "a4f0fe3f075c4ba2",
+    "744b8df4758b7ecf",
+    "841108266ca4384f",
+    "502eadd8209956c3"
+  ],
+  "fingerprints" : [
+    "7810100e5e12ff746cfff9d4cab523af859b86e255d64020d5dd02b1b663b79f",
+    "e7c1f47aeaec58681ffdd5f40f953913476b0ee09aedce1ad3c9054380027a32",
+    "8c1741d6eadab781a66ab73f5e23c029b1289e915931d65ced05b68687112513",
+    "753a4b24ecb928eed5e73ea7b6226e9f77649d0b2eee54810749fdd36553ca3d",
+    "a544c74a629a953dcdf951b875d6666d1484601e82cc59283272a9092406f338"
+  ],
+  "level" : {
+    "basins" : [
+      {
+        "capacity" : 21,
+        "cell" : 24,
+        "fill" : 17,
+        "isProtected" : true,
+        "shares" : [
+          0,
+          1000,
+          0
+        ],
+        "tolerance" : 50,
+        "toleratedWrong" : 0
+      },
+      {
+        "capacity" : 24,
+        "cell" : 22,
+        "fill" : 24,
+        "isProtected" : true,
+        "shares" : [
+          1000,
+          0,
+          0
+        ],
+        "tolerance" : 50,
+        "toleratedWrong" : 0
+      }
+    ],
+    "budget" : 13,
+    "columns" : 7,
+    "difficulty" : 3,
+    "fingerprint" : "23d2ecb20ced13b02b495efc5c13e234b261fd7a11722632079410211fe94a9b",
+    "flowRate" : 3,
+    "grounds" : [
+      1,
+      1,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      2,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "heights" : [
+      10,
+      12,
+      10,
+      11,
+      13,
+      14,
+      11,
+      9,
+      9,
+      9,
+      8,
+      11,
+      10,
+      12,
+      3,
+      5,
+      10,
+      7,
+      8,
+      10,
+      10,
+      4,
+      0,
+      6,
+      3,
+      4,
+      5,
+      5,
+      2,
+      0,
+      5,
+      4,
+      5,
+      6,
+      5
+    ],
+    "id" : "colorfall-canyons-049",
+    "rows" : 5,
+    "schema" : 1,
+    "seed" : 12588552762651727305,
+    "springs" : [
+      {
+        "cell" : 5,
+        "color" : 1,
+        "open" : true,
+        "release" : 2,
+        "supply" : 19
+      },
+      {
+        "cell" : 7,
+        "color" : 0,
+        "open" : true,
+        "release" : 1,
+        "supply" : 24
+      }
+    ],
+    "tickLimit" : 86,
+    "tutorial" : false
+  },
+  "nearMiss" : {
+    "edits" : [
+      {
+        "carve" : {
+          "_0" : 19
+        }
+      },
+      {
+        "carve" : {
+          "_0" : 21
+        }
+      }
+    ],
+    "reason" : "time",
+    "tick" : 86
+  },
+  "number" : 49,
+  "schema" : 1,
+  "skipped" : 371,
+  "smaller" : 98,
+  "totals" : {
+    "held" : [
+      24,
+      19,
+      0
+    ],
+    "released" : [
+      24,
+      19,
+      0
+    ],
+    "spilled" : [
+      0,
+      0,
+      0
+    ]
+  },
+  "unedited" : {
+    "edits" : [
+
+    ],
+    "reason" : "time",
+    "tick" : 86
+  },
+  "winTick" : 27
+}
