@@ -5,7 +5,9 @@
 // only the selection, never the digest; undo restores the earlier digest exactly and redo the later one; the certified
 // solution wins; `level.next` wraps 100 to 1 and reset returns; the snapshot round trip and refused payloads (damaged,
 // level out of range, a stale trace, an edited record, a record of a newer schema); the quality tier and the presenter's
-// snapshot time never touch the digest. Legal moves are found with the kernel's own `refusal(of:points:level:)`, so no
+// snapshot time never touch the digest. Feature 325 (R02-G03-05) T-R02G0305-004: the progression actions
+// (`level.select`, `mode.daily`, `mode.practice`, `mode.campaign`, `tutorial.dismiss`, `tutorial.hint`), a win's record,
+// the schema-1 → 2 migration and undo restoring the digest with the tutorial advanced. Legal moves are found with the kernel's own `refusal(of:points:level:)`, so no
 // rope coordinates are hard-coded. Explicit types, plain loops, short runs.
 import Foundation
 import Testing
@@ -83,8 +85,8 @@ import VisualCoreExperience
 
     @Test func conformance() async throws {
         let id: ExperienceID = try #require(ExperienceID(rawValue: Core.experienceID))
-        // Levels 1 (tutorial) and 100 (hardest band), then 2 and 1 after level.next; the scripted moves are legal on
-        // them and none wins. Two seeds keep the run short (each preparation generates a certified level, once).
+        // Levels 1 (tutorial) and 100 (hardest band), then 1 after level.next (only the seed's levels are open); the
+        // scripted moves are legal on them and none wins. Two seeds keep the run short (each preparation generates a certified level, once).
         let first: WaveKnotKeeperMove = try #require(Self.quietMove(on: [try Core.level(number: 1),
                                                                         try Core.level(number: 100)]))
         let second: WaveKnotKeeperMove = try #require(Self.quietMove(on: [try Core.level(number: 2),
@@ -96,7 +98,10 @@ import VisualCoreExperience
                                          ScriptedAction("play.undo"), ScriptedAction("play.redo"),
                                          ScriptedAction("play.undo"), ScriptedAction("level.next"),
                                          ScriptedAction("point.select", [3]),
-                                         ScriptedAction("point.move", b)]
+                                         ScriptedAction("point.move", b),
+                                         ScriptedAction("tutorial.hint"), ScriptedAction("tutorial.dismiss"),
+                                         ScriptedAction("mode.practice"), ScriptedAction("mode.campaign"),
+                                         ScriptedAction("mode.daily", [2026, 1, 1]), ScriptedAction("level.select", [1])]
         let rejected: [ScriptedAction] = [ScriptedAction("point.move", [0, 0.5]),
                                           ScriptedAction("point.move", [0.5, 1]),
                                           ScriptedAction("point.move", [16, 0]),
@@ -105,7 +110,11 @@ import VisualCoreExperience
                                           ScriptedAction("point.select", [16]),
                                           ScriptedAction("point.select", [1.5]),
                                           ScriptedAction("play.undo"), ScriptedAction("play.redo"),
-                                          ScriptedAction("level.next", [1]), ScriptedAction("bogus")]
+                                          ScriptedAction("level.next", [1]), ScriptedAction("bogus"),
+                                          ScriptedAction("level.select", [101]),
+                                          ScriptedAction("mode.daily", [2026, 2, 30]),
+                                          ScriptedAction("mode.daily", [2026, 1]),
+                                          ScriptedAction("mode.practice", [1])]
         let plan = ConformancePlan(seeds: [0, 99], stepsPerSegment: 2, actions: actions, rejected: rejected)
         let report: ConformanceReport = await ExperienceConformance.run(Core.self, id: id, plan: plan)
         #expect(report.entries.count == ConformanceCheck.allCases.count)
@@ -113,13 +122,18 @@ import VisualCoreExperience
     }
 
     @Test func theControlsTheTiersAndTheProfile() {
-        #expect(Core.experienceID == "r02-g03.wave-knot-keeper" && Core.schemaVersion == 1)
-        #expect(Core.digestDomain == "r02-g03.wave-knot-keeper.v1")
+        #expect(Core.experienceID == "r02-g03.wave-knot-keeper" && Core.schemaVersion == 2)
+        #expect(Core.digestDomain == "r02-g03.wave-knot-keeper.v2")
         #expect(Core.controls.map(\.id) == Core.actionIDs)
-        #expect(Core.actionIDs == ["point.move", "point.select", "play.undo", "play.redo", "level.next"])
+        #expect(Core.actionIDs == ["point.move", "point.select", "play.undo", "play.redo", "level.next", "level.select",
+                                   "mode.daily", "mode.practice", "mode.campaign", "tutorial.dismiss", "tutorial.hint"])
         #expect(Core.controls[0].ranges == [0...15, 0...5])
         #expect(Core.controls[1].ranges == [0...15])
         for index in 2..<5 { #expect(Core.controls[index].ranges.isEmpty) }
+        #expect(Core.controls[5].ranges == [1...100])
+        #expect(Core.controls[6].ranges == [1...9999, 1...12, 1...31])
+        for index in 7..<11 { #expect(Core.controls[index].ranges.isEmpty) }
+        #expect(Core.practiceAllowance == 64)
         #expect(Core.directionOrder == [.plusX, .minusX, .plusY, .minusY, .plusZ, .minusZ])
         #expect(Core.qualityTiers == 3)
         let profile: QualityProfile = Core.qualityProfile
@@ -256,20 +270,25 @@ import VisualCoreExperience
     }
 
     @Test func nextLevelWrapsAndResetReturnsToTheSeedsLevel() async throws {
-        var core: Core = try await Core.prepare(seed: 98)
-        #expect(core.levelNumber == 99)
+        // Seed 99 opens levels 1 … 100: level.next wraps 100 to 1, then moves to 2.
+        var core: Core = try await Core.prepare(seed: 99)
+        #expect(core.levelNumber == 100 && core.progress.frontier == 100)
         let legal: WaveKnotKeeperMove = try #require(Self.quietMove(on: [core.play.level]))
         #expect(core.apply(Self.action(legal)) == .accepted)
         #expect(core.apply(Self.select(1)) == .accepted)
         #expect(core.apply(Self.plain("level.next")) == .accepted)
-        #expect(core.levelNumber == 100 && core.play.records.isEmpty && core.play.stage == .playing)
+        #expect(core.levelNumber == 1 && core.play.records.isEmpty && core.play.stage == .playing)
         #expect(core.selected == nil)
         #expect(core.apply(Self.plain("level.next")) == .accepted)
-        #expect(core.levelNumber == 1 && core.play.stage == .playing)
-        let first: Core = try await Core.prepare(seed: 0)
-        #expect(core == first)
+        #expect(core.levelNumber == 2 && core.play.stage == .playing)
+        // Seed 0 opens level 1 only: level.next stays on level 1 with a fresh play.
+        var first: Core = try await Core.prepare(seed: 0)
+        let opening: Core = first
+        #expect(first.apply(Self.action(try #require(Self.quietMove(on: [first.play.level])))) == .accepted)
+        #expect(first.apply(Self.plain("level.next")) == .accepted)
+        #expect(first.levelNumber == 1 && first.play == opening.play)
         core.reset()
-        let fresh: Core = try await Core.prepare(seed: 98)
+        let fresh: Core = try await Core.prepare(seed: 99)
         let resetDigest: StateDigest = try Self.digest(core)
         let freshDigest: StateDigest = try Self.digest(fresh)
         #expect(core == fresh && resetDigest == freshDigest)
@@ -285,7 +304,8 @@ import VisualCoreExperience
         let payload: Data = try core.snapshotPayload()
         #expect(try core.snapshotPayload() == payload)
         let text: String = try #require(String(data: payload, encoding: .utf8))
-        #expect(text.hasPrefix("{\"level\":32,\"records\":["))
+        #expect(text.hasPrefix("{\"level\":32,\"mode\":"))
+        #expect(text.contains("\"progress\":") && text.contains("\"records\":[") && text.contains("\"tutorial\":"))
         let restored: Core = try Core.restore(payload: payload, seed: 31)
         let restoredDigest: StateDigest = try Self.digest(restored)
         let savedDigest: StateDigest = try Self.digest(core)
@@ -306,13 +326,20 @@ import VisualCoreExperience
             try Core.restore(payload: Data("nope".utf8), seed: 31)
         }
         #expect(throws: WaveKnotKeeperRestoreRefusal.damaged) {
-            try Core.restore(payload: Data("{\"level\":\"32\",\"records\":[]}".utf8), seed: 31)
+            try Core.restore(payload: Data(text.replacingOccurrences(of: "\"level\":32", with: "\"level\":\"32\"").utf8),
+                             seed: 31)
+        }
+        // A schema-1 payload reaches restore only through the migration chain.
+        #expect(throws: WaveKnotKeeperRestoreRefusal.damaged) {
+            try Core.restore(payload: Data("{\"level\":32,\"records\":[]}".utf8), seed: 31)
         }
         #expect(throws: WaveKnotKeeperRestoreRefusal.levelNumber(0)) {
-            try Core.restore(payload: Data("{\"level\":0,\"records\":[]}".utf8), seed: 31)
+            try Core.restore(payload: Data(text.replacingOccurrences(of: "\"level\":32", with: "\"level\":0").utf8),
+                             seed: 31)
         }
         #expect(throws: WaveKnotKeeperRestoreRefusal.levelNumber(101)) {
-            try Core.restore(payload: Data("{\"level\":101,\"records\":[]}".utf8), seed: 31)
+            try Core.restore(payload: Data(text.replacingOccurrences(of: "\"level\":32", with: "\"level\":101").utf8),
+                             seed: 31)
         }
         // The same records on another level: the first record's previous fingerprint is stale there.
         let wrongLevel: Data = Data(text.replacingOccurrences(of: "\"level\":32", with: "\"level\":1").utf8)
@@ -333,7 +360,109 @@ import VisualCoreExperience
             try Core.restore(payload: edited, seed: 31)
         }
         // The engine refuses a payload of a newer snapshot schema before the core sees it.
-        #expect(Core.migrations.currentVersion == 1)
+        #expect(Core.migrations.currentVersion == 2)
+    }
+
+    // MARK: Feature 325
+
+    /// The action `control` with whole values.
+    static func act(_ control: String, _ values: [Double] = []) -> ExperienceAction {
+        ExperienceAction(control: control, values: values, step: 0)
+    }
+
+    @Test func selectAndModesFollowTheProgress() async throws {
+        var core: Core = try await Core.prepare(seed: 0)
+        #expect(core.mode == .campaign && core.progress.frontier == 1)
+        let opening: Core = core
+        #expect(core.apply(Self.act("level.select", [2])) == .rejected(.rule(code: WaveKnotKeeperExperienceRule.locked)))
+        #expect(core.apply(Self.act("mode.daily", [2026, 2, 30]))
+                    == .rejected(.rule(code: WaveKnotKeeperExperienceRule.date)))
+        #expect(core.apply(Self.act("mode.daily", [2026, 1, 1.5]))
+                    == .rejected(.rule(code: WaveKnotKeeperExperienceRule.notWhole)))
+        #expect(core == opening)
+        // The certified solution of level 1 wins and opens level 2 with its stars.
+        let solution: [WaveKnotKeeperMove] = try Core.generated(number: 1).solution.moves
+        for move in solution { #expect(core.apply(Self.action(move)) == .accepted) }
+        #expect(core.play.stage == .won && core.progress.frontier == 2)
+        #expect(core.apply(Self.act("level.select", [2])) == .accepted)
+        #expect(core.levelNumber == 2 && core.mode == .campaign && core.play.records.isEmpty)
+        // Practice: the same level with the allowance raised; a practice win records nothing.
+        #expect(core.apply(Self.act("mode.practice")) == .accepted)
+        #expect(core.mode == .practice && core.levelNumber == 2 && core.play.level.allowance == Core.practiceAllowance)
+        #expect(core.tutorial == .done)
+        let before: WaveKnotKeeperProgress = core.progress
+        for move in try Core.generated(number: 2).solution.moves { #expect(core.apply(Self.action(move)) == .accepted) }
+        #expect(core.play.stage == .won && core.progress == before)
+        #expect(core.apply(Self.act("mode.campaign")) == .accepted)
+        #expect(core.mode == .campaign && core.levelNumber == 2 && core.play.records.isEmpty)
+        // Daily: the date's level, recorded on a win without opening a level.
+        let daily: Int = try #require(WaveKnotKeeperProgress.dailyLevel(year: 2026, month: 1, day: 1))
+        #expect(core.apply(Self.act("mode.daily", [2026, 1, 1])) == .accepted)
+        #expect(core.mode == .daily(level: daily) && core.levelNumber == daily)
+        let frontier: Int = core.progress.frontier
+        for move in try Core.generated(number: daily).solution.moves {
+            #expect(core.apply(Self.action(move)) == .accepted)
+        }
+        #expect(core.play.stage == .won && core.progress.frontier == frontier)
+        // Back to campaign: a daily level beyond the frontier falls back to the frontier.
+        #expect(core.apply(Self.act("mode.campaign")) == .accepted)
+        #expect(core.mode == .campaign && core.progress.isOpen(core.levelNumber))
+        // Reset returns to the opening state, progress included.
+        core.reset()
+        #expect(core == opening)
+    }
+
+    @Test func theTutorialAdvancesAndUndoRestoresTheDigestWithIt() async throws {
+        var core: Core = try await Core.prepare(seed: 0)
+        let hint: WaveKnotKeeperHint = try #require(core.hint(level: 1))
+        #expect(core.tutorial == .move(hint.point))
+        let startDigest: StateDigest = try Self.digest(core)
+        let legal: WaveKnotKeeperMove = try #require(Self.quietMove(on: [core.play.level]))
+        #expect(core.apply(Self.action(legal)) == .accepted)
+        #expect(core.tutorial == .signature)
+        #expect(core.apply(Self.plain("play.undo")) == .accepted)
+        // The digest returns; the tutorial does not move back.
+        #expect(try Self.digest(core) == startDigest && core.tutorial == .signature)
+        #expect(core.apply(Self.plain("tutorial.hint")) == .accepted)
+        #expect(try core.tutorial == .hints && Self.digest(core) == startDigest)
+        #expect(core.apply(Self.plain("tutorial.dismiss")) == .accepted)
+        #expect(core.tutorial == .done)
+        // Level 4 has no tutorial; neither has practice.
+        let later: Core = try await Core.prepare(seed: 3)
+        #expect(later.tutorial == .done)
+    }
+
+    @Test func aFailedPlayIsExplainedAndUndoRewindsTheFailingMove() async throws {
+        var core: Core = try await Core.prepare(seed: 0)
+        let entries: [ScenarioStep] = Core.allowanceEntries
+        #expect(!entries.isEmpty)
+        for entry in entries {
+            let scripted: ScriptedAction = try #require(entry.action)
+            #expect(core.apply(ExperienceAction(control: scripted.control, values: scripted.values, step: 0)) == .accepted)
+        }
+        #expect(core.play.stage == .failed)
+        let explanation: WaveKnotKeeperFailureExplanation = try #require(core.failureExplanation)
+        #expect(explanation.text.hasSuffix("Undo the last move or retry the level."))
+        #expect(core.hint(level: 3) == nil)
+        let spent: Int = core.play.spent
+        #expect(core.apply(Self.plain("play.undo")) == .accepted)
+        #expect(core.play.stage == .playing && core.play.spent == spent - 1 && core.failureExplanation == nil)
+    }
+
+    @Test func aSchemaOnePayloadMigrates() async throws {
+        var core: Core = try await Core.prepare(seed: 31)
+        let legal: WaveKnotKeeperMove = try #require(Self.quietMove(on: [core.play.level]))
+        #expect(core.apply(Self.action(legal)) == .accepted)
+        let object: [String: Any] = try #require(
+            try JSONSerialization.jsonObject(with: try core.snapshotPayload()) as? [String: Any])
+        let schemaOne: [String: Any] = ["level": try #require(object["level"]), "records": try #require(object["records"])]
+        let migrated: [String: Any] = try Core.migratedToSchemaTwo(schemaOne)
+        let payload: Data = try JSONSerialization.data(withJSONObject: migrated, options: [.sortedKeys])
+        let restored: Core = try Core.restore(payload: payload, seed: 31)
+        #expect(restored.levelNumber == 32 && restored.mode == .campaign && restored.progress.frontier == 32)
+        #expect(restored.play == core.play && restored.tutorial == .done)
+        #expect(try Self.digest(restored) == Self.digest(core))
+        #expect(throws: WaveKnotKeeperRestoreRefusal.damaged) { try Core.migratedToSchemaTwo(["level": "x"]) }
     }
 
     @Test func theTierAndTheSnapshotTimeNeverTouchTheDigest() async throws {

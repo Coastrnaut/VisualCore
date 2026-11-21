@@ -67,7 +67,7 @@ private func playScenario(_ spec: ScenarioSpec) async throws
         let archived: [Int] = [17, 24, 31, 38, 45, 52, 59, 66, 73, 80, 87, 94, 1, 8, 15, 22, 29, 36, 43, 50]
         #expect(Array(Core.acceptanceLevels.prefix(20)) == archived)
         #expect(!Core.inputEntries.isEmpty && !Core.completionEntries.isEmpty && !Core.allowanceEntries.isEmpty)
-        #expect(Core.rejectionEntries.count == 10)
+        #expect(Core.rejectionEntries.count == 15)
     }
 
     @Test func derivedDigestsResultsAndOutcomesAreWhatTheEngineGives() async throws {

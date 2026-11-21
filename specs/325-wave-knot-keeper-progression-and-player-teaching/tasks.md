@@ -39,7 +39,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks.
 
 ## Phase 4: Adapter, scenarios and panel
 
-- [ ] T-R02G0305-004 [US1] [US2] [US3] [US4] Edit `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperExperienceCore.swift` (controls "level.select
+- [X] T-R02G0305-004 [US1] [US2] [US3] [US4] Edit `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperExperienceCore.swift` (controls "level.select — Verified 2026-11-21: 2026-11-21 host-3 exit 0 (adapter, scenarios, purity, panel win)
   [1 … 100], mode.daily [year, month, day], mode.practice, mode.campaign, tutorial.dismiss, tutorial.hint"; practice
   allowance 64; daily wins record results without opening levels; choosing daily or practice drops the left level's
   records, mode.campaign returns to a fresh campaign play of the same level; the tutorial only on levels 1 … 3 in

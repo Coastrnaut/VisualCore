@@ -23,7 +23,7 @@
 // A kernel refusal (`WaveKnotKeeperError`) becomes `.rule(code: error.reasonCode)`. A refused action changes nothing.
 //
 // Digest ("r02-g03.wave-knot-keeper.v1"): the level number and the play's fingerprint (not its record history, so undo
-// restores the earlier digest exactly); never the selection, the quality tier or a time. Snapshot schema 1: the JSON
+// restores the earlier digest exactly); never the selection, the quality tier or a time. Snapshot schema 1 (feature 323; now 2, below): the JSON
 // object `{"level", "records"}` with sorted keys; restoring replays the records on a fresh play of that level
 // (`WaveKnotKeeperPlay.replay`) and throws `WaveKnotKeeperRestoreRefusal` for a damaged payload, a level number outside
 // 1 … 100 or a trace the kernel refuses (a record of a newer schema among them).
@@ -31,6 +31,19 @@
 // Quality: three host tiers, best first as the contract requires (`qualityProfile` level 0 is the best and no budget
 // may rise). Host tier `t` draws `WaveKnotKeeperTier.of(t)`: level-0 = 16 sides, 8 corner samples, 2 glow shells;
 // level-1 = 10, 4, 1; level-2 = 6, 2, 0. Outcome: `won` or `failed` while the play is in that stage, otherwise nil.
+//
+// Feature 325 (R02-G03-05) T-R02G0305-004 (FR-R02G0305-001 … 007; clarifications Q1–Q5): the core also holds the
+// player's progress (`WaveKnotKeeperProgress`: solved levels with best moves and stars, the open frontier), the mode
+// (campaign, practice with the allowance raised to 64, daily) and the tutorial step. New actions:
+//   level.select [1…100]           an open level, fresh, in campaign mode (`r02-g03.locked` otherwise);
+//   mode.daily [year, month, day]  the date's daily level, fresh (`r02-g03.date` for an impossible date);
+//   mode.practice, mode.campaign   the current level fresh in that mode (campaign: the frontier when it is not open);
+//   tutorial.dismiss               the tutorial ends; tutorial.hint  a hint was shown (the tutorial advances).
+// `level.next` moves to the next open level. A win records the result (campaign opens the next level; daily never
+// does; practice records nothing). After a failure, `play.undo` rewinds the failing move by replaying the earlier
+// records. Digest "r02-g03.wave-knot-keeper.v2": level, play fingerprint, progress and mode (never the tutorial step,
+// which undo does not move back). Snapshot schema 2: `{"level", "mode", "progress", "records", "tutorial"}`; schema-1
+// payloads migrate (the saved level open, campaign mode, the tutorial recomputed).
 import Foundation
 import Synchronization
 import VisualCoreDiagnostics
@@ -41,11 +54,15 @@ import VisualCorePersistence
 public enum WaveKnotKeeperExperienceRule {
     /// A value that must be a whole number (point, direction) and is not.
     public static let notWhole = "r02-g03.not-whole"
+    /// A level that is not open yet (feature 325).
+    public static let locked = "r02-g03.locked"
+    /// An impossible calendar date (feature 325).
+    public static let date = "r02-g03.date"
 }
 
 /// Why a saved Wave Knot Keeper state was refused on restore (feature 323). A refused restore changes nothing.
 public enum WaveKnotKeeperRestoreRefusal: Error, Equatable, Sendable {
-    /// The payload is not the JSON object `{"level", "records"}` or a field has the wrong type.
+    /// The payload is not the JSON object of its schema or a field has the wrong type.
     case damaged
     /// The level number is outside 1 … 100; the value is that number.
     case levelNumber(Int)
@@ -53,16 +70,19 @@ public enum WaveKnotKeeperRestoreRefusal: Error, Equatable, Sendable {
     case kernel(WaveKnotKeeperError)
 }
 
-/// The state of Wave Knot Keeper as an experience (see the file header). Snapshot schema 1.
+/// The state of Wave Knot Keeper as an experience (see the file header). Snapshot schema 2.
 public struct WaveKnotKeeperExperienceCore: ExperienceCore, Equatable {
     /// The experience's id in the catalog.
     public static let experienceID = "r02-g03.wave-knot-keeper"
     /// The snapshot schema this build writes.
-    public static let schemaVersion = 1
-    /// The digest's domain string (schema 1).
-    public static let digestDomain = "r02-g03.wave-knot-keeper.v1"
+    public static let schemaVersion = 2
+    /// The digest's domain string (schema 2).
+    public static let digestDomain = "r02-g03.wave-knot-keeper.v2"
     /// The action ids in declaration order.
-    public static let actionIDs = ["point.move", "point.select", "play.undo", "play.redo", "level.next"]
+    public static let actionIDs = ["point.move", "point.select", "play.undo", "play.redo", "level.next", "level.select",
+                                   "mode.daily", "mode.practice", "mode.campaign", "tutorial.dismiss", "tutorial.hint"]
+    /// The allowance of a practice play: the kernel's maximum.
+    public static let practiceAllowance = 64
     /// The level numbers of the catalog.
     public static let levelNumbers: ClosedRange<Int> = 1...100
     /// The directions in the order of `point.move`'s second value: +x, −x, +y, −y, +z, −z.
@@ -80,18 +100,40 @@ public struct WaveKnotKeeperExperienceCore: ExperienceCore, Equatable {
     public private(set) var selected: Int?
     /// The level number the seed chose; a reset returns to it. Derived from the seed, so not in the digest or `==`.
     public let openingNumber: Int
-    /// The fresh play of the opening level; a reset returns to it. Derived from the seed, so not in the digest or `==`.
-    private let openingPlay: WaveKnotKeeperPlay
+    /// The player's progress (feature 325): in the digest and the snapshot.
+    public private(set) var progress: WaveKnotKeeperProgress
+    /// The mode (feature 325): in the digest and the snapshot.
+    public private(set) var mode: WaveKnotKeeperMode
+    /// The tutorial step (feature 325): in the snapshot, not in the digest.
+    public private(set) var tutorial: WaveKnotKeeperTutorialStep
+    /// The certified shortest solution length of the current level (stars). Derived from the level number.
+    public private(set) var certifiedShortest: Int
+    /// The opening state; a reset returns to it. Derived from the seed, so not in the digest or `==`.
+    private let opening: Opening
+
+    /// What a reset restores.
+    struct Opening: Sendable {
+        let play: WaveKnotKeeperPlay
+        let progress: WaveKnotKeeperProgress
+        let tutorial: WaveKnotKeeperTutorialStep
+        let certifiedShortest: Int
+    }
     /// The host quality tier (0 = level-0, the best, … 2, clamped); presentation only — not in the digest, the
     /// snapshot or `==`.
     public private(set) var qualityTier = 0
 
-    /// A state playing `play` of level `levelNumber`, whose reset returns to `openingPlay` of `openingNumber`.
-    init(levelNumber: Int, play: WaveKnotKeeperPlay, openingNumber: Int, openingPlay: WaveKnotKeeperPlay) {
+    /// A state playing `play` of level `levelNumber` with `progress`, `mode` and `tutorial`, whose reset returns to
+    /// `opening` of `openingNumber`.
+    init(levelNumber: Int, play: WaveKnotKeeperPlay, progress: WaveKnotKeeperProgress, mode: WaveKnotKeeperMode,
+         tutorial: WaveKnotKeeperTutorialStep, certifiedShortest: Int, openingNumber: Int, opening: Opening) {
         self.levelNumber = levelNumber
         self.play = play
+        self.progress = progress
+        self.mode = mode
+        self.tutorial = tutorial
+        self.certifiedShortest = certifiedShortest
         self.openingNumber = openingNumber
-        self.openingPlay = openingPlay
+        self.opening = opening
     }
 
     /// The level number a seed chooses: `seed % 100 + 1`.
@@ -128,12 +170,51 @@ public struct WaveKnotKeeperExperienceCore: ExperienceCore, Equatable {
         try WaveKnotKeeperPlay.replay(level: level, records: [])
     }
 
-    /// The opening state of manifest number `number`.
+    /// The practice copy of `level`: every field kept, the allowance raised to ``practiceAllowance``.
+    ///
+    /// - Throws: the kernel's refusal of the copy (never for a certified level).
+    public static func practiceLevel(of level: WaveKnotKeeperLevel) throws(WaveKnotKeeperError) -> WaveKnotKeeperLevel {
+        try WaveKnotKeeperLevel(id: level.id, seed: level.seed, band: level.band, points: level.points,
+                                gates: level.gates, target: level.target, tensionBound: level.tensionBound,
+                                allowance: practiceAllowance, tutorial: level.tutorial)
+    }
+
+    /// The tutorial levels (clarification Q2).
+    public static let tutorialLevels: ClosedRange<Int> = 1...3
+
+    /// The first tutorial step of a fresh play of manifest number `number` in `mode`: `move(point)` on levels 1 … 3 in
+    /// campaign mode, with `point` the level-1 hint's point; `done` otherwise.
+    public static func firstTutorialStep(number: Int, mode: WaveKnotKeeperMode,
+                                         play: WaveKnotKeeperPlay) -> WaveKnotKeeperTutorialStep {
+        guard mode == .campaign, tutorialLevels.contains(number),
+              let hint = WaveKnotKeeperHints.hint(level: 1, play: play), hint.withinMoves else { return .done }
+        return .first(point: hint.point)
+    }
+
+    /// The opening state of manifest number `number`: campaign mode, the levels up to `number` open.
     ///
     /// - Throws: as ``level(number:)``.
     public static func opening(number: Int) throws(WaveKnotKeeperError) -> WaveKnotKeeperExperienceCore {
-        let play = try freshPlay(of: try level(number: number))
-        return WaveKnotKeeperExperienceCore(levelNumber: number, play: play, openingNumber: number, openingPlay: play)
+        let certified = try generated(number: number)
+        let play = try freshPlay(of: certified.level)
+        var progress = WaveKnotKeeperProgress()
+        progress.open(through: number)
+        let tutorial = firstTutorialStep(number: number, mode: .campaign, play: play)
+        let opening = Opening(play: play, progress: progress, tutorial: tutorial,
+                              certifiedShortest: certified.solution.shortest)
+        return WaveKnotKeeperExperienceCore(levelNumber: number, play: play, progress: progress, mode: .campaign,
+                                            tutorial: tutorial, certifiedShortest: certified.solution.shortest,
+                                            openingNumber: number, opening: opening)
+    }
+
+    /// The hint of `level` (1 … 3) for the current play; nil when the play is not in stage `playing`. Reads only.
+    public func hint(level: Int) -> WaveKnotKeeperHint? {
+        WaveKnotKeeperHints.hint(level: level, play: play)
+    }
+
+    /// The explanation of the current play's failure; nil unless the play failed.
+    public var failureExplanation: WaveKnotKeeperFailureExplanation? {
+        WaveKnotKeeperFailureExplanation(play: play)
     }
 
     /// An immutable copy of the play, the level number and the selection for drawing at the presenter's presentation
@@ -170,15 +251,42 @@ public struct WaveKnotKeeperExperienceCore: ExperienceCore, Equatable {
         qualityTier = min(max(tier, 0), Self.qualityTiers - 1)
     }
 
-    /// Equal states: the level number and the play (not the selection, the quality tier or the opening level).
+    /// Equal states: the level number, the play, the progress, the mode and the tutorial step (not the selection, the
+    /// quality tier or the opening level).
     public static func == (lhs: WaveKnotKeeperExperienceCore, rhs: WaveKnotKeeperExperienceCore) -> Bool {
-        lhs.levelNumber == rhs.levelNumber && lhs.play == rhs.play
+        lhs.levelNumber == rhs.levelNumber && lhs.play == rhs.play && lhs.progress == rhs.progress
+            && lhs.mode == rhs.mode && lhs.tutorial == rhs.tutorial
     }
 
     // MARK: Contract
 
-    /// Schema 1, the first version: no migration steps.
-    public static var migrations: MigrationChain { MigrationChain(currentVersion: schemaVersion) }
+    /// Schema 2 with the step 1 → 2 (``migratedToSchemaTwo(_:)``); a payload that does not decode is refused.
+    public static var migrations: MigrationChain {
+        MigrationChain(currentVersion: schemaVersion, steps: [1: { payload in try migratedToSchemaTwo(payload) }])
+    }
+
+    /// The schema-2 object of a schema-1 object `{"level", "records"}`: the saved level open, campaign mode, no
+    /// tutorial key (restore computes the first step).
+    ///
+    /// - Throws: ``WaveKnotKeeperRestoreRefusal/damaged`` when `object` is not a schema-1 object.
+    public static func migratedToSchemaTwo(_ object: [String: Any]) throws -> [String: Any] {
+        guard let level = object["level"] as? Int, object["records"] is [Any] else {
+            throw WaveKnotKeeperRestoreRefusal.damaged
+        }
+        var progress = WaveKnotKeeperProgress()
+        progress.open(through: level)
+        var migrated = object
+        migrated["progress"] = try JSONSerialization.jsonObject(with: try payloadEncoder().encode(progress))
+        migrated["mode"] = try JSONSerialization.jsonObject(with: try payloadEncoder().encode(WaveKnotKeeperMode.campaign))
+        return migrated
+    }
+
+    /// The encoder of payloads: sorted keys, unescaped slashes.
+    static func payloadEncoder() -> JSONEncoder {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
+        return encoder
+    }
 
     /// The declared controls, built once.
     private static let declaredControls: [ExperienceControl] = [
@@ -187,9 +295,15 @@ public struct WaveKnotKeeperExperienceCore: ExperienceCore, Equatable {
         ExperienceControl(id: "play.undo"),
         ExperienceControl(id: "play.redo"),
         ExperienceControl(id: "level.next"),
+        ExperienceControl(id: "level.select", ranges: [1...100]),
+        ExperienceControl(id: "mode.daily", ranges: [1...9999, 1...12, 1...31]),
+        ExperienceControl(id: "mode.practice"),
+        ExperienceControl(id: "mode.campaign"),
+        ExperienceControl(id: "tutorial.dismiss"),
+        ExperienceControl(id: "tutorial.hint"),
     ]
 
-    /// The five controls with their declared ranges (see the file header); the last three take no values.
+    /// The eleven controls with their declared ranges (see the file header).
     public static var controls: [ExperienceControl] { declaredControls }
 
     /// The opening state of level `seed % 100 + 1`, in stage `playing`; no clock is read.
@@ -214,30 +328,57 @@ public struct WaveKnotKeeperExperienceCore: ExperienceCore, Equatable {
                                                   controls: Self.declaredControls) {
             return .rejected(refusal)
         }
+        var wholeValues: [Int] = []
+        for value in action.values {
+            guard let whole = Self.whole(value) else {
+                return .rejected(.rule(code: WaveKnotKeeperExperienceRule.notWhole))
+            }
+            wholeValues.append(whole)
+        }
         do throws(WaveKnotKeeperError) {
             switch action.control {
             case "point.move":
-                guard let point = Self.whole(action.values[0]), let direction = Self.whole(action.values[1]) else {
-                    return .rejected(.rule(code: WaveKnotKeeperExperienceRule.notWhole))
-                }
-                let move = WaveKnotKeeperMove(point: point, direction: Self.directionOrder[direction])
+                let move = WaveKnotKeeperMove(point: wholeValues[0], direction: Self.directionOrder[wholeValues[1]])
                 try play.apply(move, expecting: play.fingerprint)
+                tutorial = tutorial.advancedByAction(stage: play.stage)
+                recordIfWon()
             case "point.select":
-                guard let point = Self.whole(action.values[0]) else {
-                    return .rejected(.rule(code: WaveKnotKeeperExperienceRule.notWhole))
-                }
-                guard play.points.indices.contains(point) else { throw .move("range") }
-                selected = point
+                guard play.points.indices.contains(wholeValues[0]) else { throw .move("range") }
+                selected = wholeValues[0]
             case "play.undo":
-                try play.undo()
+                if play.stage == .failed, !play.records.isEmpty {
+                    // The kernel undoes only while playing; after a failure, undo rewinds the failing move by
+                    // replaying every earlier record (FR-R02G0305-003: "undo or retry").
+                    play = try WaveKnotKeeperPlay.replay(level: play.level, records: Array(play.records.dropLast()))
+                } else {
+                    try play.undo()
+                }
             case "play.redo":
                 try play.redo()
-            default:   // level.next
-                let next = levelNumber % Self.levelNumbers.upperBound + 1
-                let fresh = try Self.freshPlay(of: try Self.level(number: next))
-                levelNumber = next
-                play = fresh
-                selected = nil
+                recordIfWon()
+            case "level.next":
+                var next = levelNumber % Self.levelNumbers.upperBound + 1
+                while !progress.isOpen(next) { next = next % Self.levelNumbers.upperBound + 1 }
+                try open(number: next, mode: .campaign)
+            case "level.select":
+                guard progress.isOpen(wholeValues[0]) else {
+                    return .rejected(.rule(code: WaveKnotKeeperExperienceRule.locked))
+                }
+                try open(number: wholeValues[0], mode: .campaign)
+            case "mode.daily":
+                guard let daily = WaveKnotKeeperProgress.dailyLevel(year: wholeValues[0], month: wholeValues[1],
+                                                                    day: wholeValues[2]) else {
+                    return .rejected(.rule(code: WaveKnotKeeperExperienceRule.date))
+                }
+                try open(number: daily, mode: .daily(level: daily))
+            case "mode.practice":
+                try open(number: levelNumber, mode: .practice)
+            case "mode.campaign":
+                try open(number: progress.isOpen(levelNumber) ? levelNumber : progress.frontier, mode: .campaign)
+            case "tutorial.dismiss":
+                tutorial = tutorial.dismissed
+            default:   // tutorial.hint
+                tutorial = tutorial.advancedByHint()
             }
         } catch {
             return .rejected(.rule(code: error.reasonCode))
@@ -251,11 +392,42 @@ public struct WaveKnotKeeperExperienceCore: ExperienceCore, Equatable {
         return Int(value)
     }
 
-    /// Back to the fresh play of the level the seed chose with no selection; the quality tier, which is not state, is
-    /// kept.
+    /// A fresh play of manifest number `number` in `mode` (the practice copy in practice mode), with the level's first
+    /// tutorial step and no selection; changes nothing when the kernel refuses.
+    private mutating func open(number: Int, mode: WaveKnotKeeperMode) throws(WaveKnotKeeperError) {
+        let certified = try Self.generated(number: number)
+        let level = mode == .practice ? try Self.practiceLevel(of: certified.level) : certified.level
+        let fresh = try Self.freshPlay(of: level)
+        levelNumber = number
+        play = fresh
+        self.mode = mode
+        certifiedShortest = certified.solution.shortest
+        tutorial = Self.firstTutorialStep(number: number, mode: mode, play: fresh)
+        selected = nil
+    }
+
+    /// After a win: campaign records the result and opens the next level; daily records it without opening; practice
+    /// records nothing.
+    private mutating func recordIfWon() {
+        guard play.stage == .won else { return }
+        switch mode {
+        case .campaign:
+            progress.record(level: levelNumber, moves: play.spent, shortest: certifiedShortest, opensNext: true)
+        case .daily:
+            progress.record(level: levelNumber, moves: play.spent, shortest: certifiedShortest, opensNext: false)
+        case .practice:
+            break
+        }
+    }
+
+    /// Back to the opening state the seed chose with no selection; the quality tier, which is not state, is kept.
     public mutating func reset() {
         levelNumber = openingNumber
-        play = openingPlay
+        play = opening.play
+        progress = opening.progress
+        mode = .campaign
+        tutorial = opening.tutorial
+        certifiedShortest = opening.certifiedShortest
         selected = nil
     }
 
@@ -268,32 +440,38 @@ public struct WaveKnotKeeperExperienceCore: ExperienceCore, Equatable {
         }
     }
 
-    /// "r02-g03.wave-knot-keeper.v1", then the level number and the play's fingerprint (level, rope, moves spent,
-    /// stage).
+    /// "r02-g03.wave-knot-keeper.v2", then the level number, the play's fingerprint (level, rope, moves spent, stage),
+    /// the progress and the mode (their sorted JSON); never the tutorial step.
     public func writeDigest(into builder: inout DigestBuilder) throws(DigestError) {
         builder.add(Self.digestDomain)
         builder.add(levelNumber)
         // The play's fingerprint and not its record history, so undo restores the earlier digest exactly.
         builder.add(play.fingerprint)
+        let encoder = Self.payloadEncoder()
+        builder.add(String(decoding: (try? encoder.encode(progress)) ?? Data(), as: UTF8.self))
+        builder.add(String(decoding: (try? encoder.encode(mode)) ?? Data(), as: UTF8.self))
     }
 
     // MARK: Snapshot
 
-    /// The payload's JSON form.
+    /// The payload's JSON form (schema 2); `tutorial` is absent in a migrated schema-1 payload.
     private struct Payload: Codable {
         var level: Int
+        var mode: WaveKnotKeeperMode
+        var progress: WaveKnotKeeperProgress
         var records: [WaveKnotKeeperRecord]
+        var tutorial: WaveKnotKeeperTutorialStep?
     }
 
-    /// The JSON object `{"level", "records"}` with sorted keys and unescaped slashes.
+    /// The JSON object `{"level", "mode", "progress", "records", "tutorial"}` with sorted keys and unescaped slashes.
     public func snapshotPayload() throws -> Data {
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
-        return try encoder.encode(Payload(level: levelNumber, records: play.records))
+        try Self.payloadEncoder().encode(Payload(level: levelNumber, mode: mode, progress: progress,
+                                                 records: play.records, tutorial: tutorial))
     }
 
-    /// The core of `payload`: the records replayed on a fresh play of the saved level, with no selection; a reset
-    /// returns to the level `seed` chooses.
+    /// The core of `payload` (schema 2): the records replayed on a fresh play of the saved level (the practice copy in
+    /// practice mode) with the saved progress, mode and tutorial step (the first step when absent), with no selection;
+    /// a reset returns to the opening state `seed` chooses.
     ///
     /// - Throws: ``WaveKnotKeeperRestoreRefusal`` for a damaged payload, a level number outside 1 … 100 or a level or
     ///   trace the kernel refuses.
@@ -304,15 +482,24 @@ public struct WaveKnotKeeperExperienceCore: ExperienceCore, Equatable {
         guard levelNumbers.contains(decoded.level) else {
             throw WaveKnotKeeperRestoreRefusal.levelNumber(decoded.level)
         }
+        if case .daily(let daily) = decoded.mode, daily != decoded.level {
+            throw WaveKnotKeeperRestoreRefusal.damaged
+        }
         do throws(WaveKnotKeeperError) {
-            let saved = try level(number: decoded.level)
+            let certified = try generated(number: decoded.level)
+            let saved = decoded.mode == .practice ? try practiceLevel(of: certified.level) : certified.level
             let play = try WaveKnotKeeperPlay.replay(level: saved, records: decoded.records)
-            let openingNumber = levelNumber(forSeed: seed)
-            let openingPlay = openingNumber == decoded.level
-                ? try freshPlay(of: saved)
-                : try freshPlay(of: try Self.level(number: openingNumber))
-            return WaveKnotKeeperExperienceCore(levelNumber: decoded.level, play: play, openingNumber: openingNumber,
-                                                openingPlay: openingPlay)
+            let tutorial: WaveKnotKeeperTutorialStep
+            if let step = decoded.tutorial {
+                tutorial = step
+            } else {
+                tutorial = firstTutorialStep(number: decoded.level, mode: decoded.mode, play: try freshPlay(of: saved))
+            }
+            let openingCore = try opening(number: levelNumber(forSeed: seed))
+            return WaveKnotKeeperExperienceCore(levelNumber: decoded.level, play: play, progress: decoded.progress,
+                                                mode: decoded.mode, tutorial: tutorial,
+                                                certifiedShortest: certified.solution.shortest,
+                                                openingNumber: openingCore.openingNumber, opening: openingCore.opening)
         } catch {
             throw WaveKnotKeeperRestoreRefusal.kernel(error)
         }

@@ -18,6 +18,8 @@
 // `point.move` (the first move of that level's certified solution) and then one illegal action — direction 6, refused
 // as out of range, on odd rows; a move the kernel refuses after the legal one (a strand crossing when there is one),
 // on even rows. The expected digests are derived by playing the entries on a core exactly as the engine plays them.
+// Feature 325 (R02-G03-05): rejection also refuses a locked `level.select`, a level beyond 100, an impossible
+// `mode.daily` date and wrong value counts of `mode.daily` and `mode.practice`.
 #if DEBUG || VISUALCORE_AUTOMATION
 import Foundation
 import VisualCoreExperience
@@ -189,6 +191,12 @@ extension WaveKnotKeeperExperienceCore {
             refusedEntry("play.redo", [], kernelMove),
             refusedEntry("point.move", [0], "action.wrong-value-count"),
             refusedEntry("level.next", [1], "action.wrong-value-count"),
+            // Feature 325: a locked level, an impossible date and wrong value counts.
+            refusedEntry("level.select", [2], "action.rule." + WaveKnotKeeperExperienceRule.locked),
+            refusedEntry("level.select", [101], outOfRange),
+            refusedEntry("mode.daily", [2026, 2, 30], "action.rule." + WaveKnotKeeperExperienceRule.date),
+            refusedEntry("mode.daily", [2026, 11], "action.wrong-value-count"),
+            refusedEntry("mode.practice", [1], "action.wrong-value-count"),
         ]
         return entries
     }
