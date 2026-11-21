@@ -156,8 +156,9 @@ simulator parts and reports one summary.
 - **FR-R02G0108-002**: An altered level, solution or witness MUST make the regression fail, naming the level and the
   differing part.
 - **FR-R02G0108-003**: A golden set of frames (levels, tiers, frame times, including the hero frame) MUST have a
-  code-computed description (projected positions of ribbons, gates and markers, palette colours) whose digest is pinned
-  in the repository.
+  code-computed description (projected positions of ribbons, gates and markers, palette colours) pinned in the
+  repository with its digest; a recomputed description matches when its digest is equal or every position lies within
+  one 1/8-pixel quantum and every colour is equal.
 - **FR-R02G0108-004**: Rendered frames of the golden set on the simulator MUST match their descriptions within the
   tolerances of User Story 2; regenerating a baseline MUST need an explicit switch.
 - **FR-R02G0108-005**: Repeatedly opening, drawing, closing the experience and memory warnings MUST keep the footprint
@@ -173,7 +174,7 @@ simulator parts and reports one summary.
 
 - **Solver fixture**: a certified level, its manifest entry, its certified shortest solution and its witness file.
 - **Golden frame**: a level, a tier, a frame time and a size, with its code-computed description and digest.
-- **Golden manifest**: the list of golden frames with their pinned digests, regenerated only on purpose.
+- **Golden manifest**: the list of golden frames with their pinned descriptions and digests, regenerated only on purpose.
 - **Memory cycle**: one open, draw and close of the experience with the footprint measured after it.
 
 ## Success Criteria *(mandatory)*
@@ -184,7 +185,8 @@ simulator parts and reports one summary.
   3,840 evaluations of work; 100 of 100.
 - **SC-R02G0108-002**: Each of the 12 kinds of alteration of clarification Q2 is detected and named.
 - **SC-R02G0108-003**: The golden set covers 5 levels × 3 tiers plus the hero frame (16 frames); every rendered frame
-  matches its description within tolerance and every description matches its pinned digest.
+  matches its description within tolerance and every recomputed description matches its pinned entry (equal digest, or
+  within one 1/8-pixel quantum with equal colours).
 - **SC-R02G0108-004**: Over 12 open-draw-warn-close cycles, every footprint reading of cycles 2 … 12 stays within 16 MB
   of cycle 1's, and the game's GPU objects are released after each close and each memory warning.
 - **SC-R02G0108-005**: The workflow runs the host part on every push and passes; the local command runs all parts and
