@@ -20,19 +20,41 @@
 //   time.step [1…600]      the ticks to run; whole; spends nothing and stops at the first tick that wins or fails;
 //   play.undo, play.redo   no values; the kernel's exact undo and redo (`r02-g05.action` when there is nothing to undo
 //                          or redo; undo works in a failed play and returns it to playing, a won play is final);
-//   level.next             no values; the next certified level (100 wraps to 1) with a fresh play.
+//   level.next             no values; the next certified level with a fresh play (feature 345: the next open level,
+//                          below).
 // A kernel refusal (`ColorfallCanyonsError`) becomes `.rule(code: error.reasonCode)`. A refused action changes nothing.
 //
-// Digest ("r02-g05.colorfall-canyons.v1"): the level number and the play's fingerprint (not its record history, so undo
-// restores the earlier digest exactly); never the quality tier or a time. Snapshot schema 1: the JSON object
-// `{"level", "records"}` with sorted keys; restoring replays the records on a fresh play of that level
-// (`ColorfallCanyonsPlay.replay`) and throws `ColorfallCanyonsRestoreRefusal` for a damaged payload, a level number
-// outside 1 … 100 or a trace the kernel refuses (a record of a newer schema among them).
+// Digest ("r02-g05.colorfall-canyons.v1"; feature 345: v2, below): the level number and the play's fingerprint (not its
+// record history, so undo restores the earlier digest exactly); never the quality tier or a time. Snapshot schema 1
+// (feature 343; now 2, below): the JSON object `{"level", "records"}` with sorted keys; restoring replays the records
+// on a fresh play of that level (`ColorfallCanyonsPlay.replay`) and throws `ColorfallCanyonsRestoreRefusal` for a
+// damaged payload, a level number outside 1 … 100 or a trace the kernel refuses (a record of a newer schema among them).
 //
 // Quality: three host tiers, best first as the contract requires (`qualityProfile` level 0 is the best and no budget
 // may rise). Host tier `t` draws `ColorfallCanyonsTier.of(t)`: level-0 = block tops subdivided 4 × 4, 3 flow bands, 2 glow
 // shells; level-1 = 2 × 2, 2, 1; level-2 = 1 × 1, 1, 0. Outcome: `won` or `failed` while the play is in that stage,
 // otherwise nil.
+//
+// Feature 345 (R02-G05-05) T-R02G0505-004 (FR-R02G0505-001 … 005; clarifications Q2–Q5): the core also holds the
+// player's progress (`ColorfallCanyonsProgress`: won levels with the fewest actions spent and stars, the open
+// frontier), the mode (campaign, practice with the budget raised to the kernel's maximum 30, daily) and the tutorial step. New
+// actions:
+//   level.select [1…100]           an open level, fresh, in campaign mode (`r02-g05.locked` otherwise);
+//   mode.daily [year, month, day]  the date's daily level, fresh (`r02-g05.date` for an impossible date); a daily level
+//                                  still locked in the campaign is playable and is not opened;
+//   mode.practice                  the current level fresh with the budget raised to 30;
+//   mode.campaign                  the current level fresh in campaign mode (the frontier when it is not open);
+//   tutorial.dismiss               the tutorial ends for this opening.
+// Choosing daily or practice drops the left level's records (the play starts fresh). `level.next` moves to the next
+// open level in campaign mode and is refused with `r02-g05.locked` when there is none (100 does not wrap). A win (the
+// play reaching `won` on an accepted action) records `progress.record(level:actions:smallest:mode:)` with the actions
+// spent and the certified smallest edit count (campaign opens the next level; daily never does; practice records
+// nothing). The tutorial starts at `ColorfallCanyonsTutorialStep.initial(level:)` at every opening (levels 1 … 3 in
+// every mode) and advances after each accepted carve, valve or step by `advanced(after:planEmpty:ended:)` (the hint's plan is
+// computed only while the step is `steer`); undo and redo never move it back. Digest "r02-g05.colorfall-canyons.v2":
+// level, play fingerprint, progress and mode (never the tutorial step). Snapshot schema 2: `{"level", "mode",
+// "progress", "records", "tutorial"}`; schema-1 payloads migrate (no won levels, the levels up to the saved level open,
+// campaign mode, the tutorial at its initial step).
 import Foundation
 import Synchronization
 import VisualCoreDiagnostics
@@ -43,11 +65,16 @@ import VisualCorePersistence
 public enum ColorfallCanyonsExperienceRule {
     /// A value that must be a whole number (cell, spring, ticks) and is not.
     public static let notWhole = "r02-g05.not-whole"
+    /// A level that is not open yet, or no next open level (feature 345).
+    public static let locked = "r02-g05.locked"
+    /// An impossible calendar date (feature 345).
+    public static let date = "r02-g05.date"
 }
 
 /// Why a saved Colorfall Canyons state was refused on restore (feature 343). A refused restore changes nothing.
 public enum ColorfallCanyonsRestoreRefusal: Error, Equatable, Sendable {
-    /// The payload is not the JSON object `{"level", "records"}` or a field has the wrong type.
+    /// The payload is not the JSON object of its schema, a field has the wrong type, or the progress or the mode is
+    /// invalid (feature 345).
     case damaged
     /// The level number is outside 1 … 100; the value is that number.
     case levelNumber(Int)
@@ -55,16 +82,19 @@ public enum ColorfallCanyonsRestoreRefusal: Error, Equatable, Sendable {
     case kernel(ColorfallCanyonsError)
 }
 
-/// The state of Colorfall Canyons as an experience (see the file header). Snapshot schema 1.
+/// The state of Colorfall Canyons as an experience (see the file header). Snapshot schema 2.
 public struct ColorfallCanyonsExperienceCore: ExperienceCore, Equatable {
     /// The experience's id in the catalog.
     public static let experienceID = "r02-g05.colorfall-canyons"
     /// The snapshot schema this build writes.
-    public static let schemaVersion = 1
-    /// The digest's domain string (schema 1).
-    public static let digestDomain = "r02-g05.colorfall-canyons.v1"
+    public static let schemaVersion = 2
+    /// The digest's domain string (schema 2).
+    public static let digestDomain = "r02-g05.colorfall-canyons.v2"
     /// The action ids in declaration order.
-    public static let actionIDs = ["canyon.carve", "canyon.valve", "time.step", "play.undo", "play.redo", "level.next"]
+    public static let actionIDs = ["canyon.carve", "canyon.valve", "time.step", "play.undo", "play.redo", "level.next",
+                                   "level.select", "mode.daily", "mode.practice", "mode.campaign", "tutorial.dismiss"]
+    /// The budget of a practice play: the kernel's maximum (`ColorfallCanyonsMode.practiceBudget`, 30).
+    public static let practiceBudget = ColorfallCanyonsMode.practiceBudget
     /// The level numbers of the catalog.
     public static let levelNumbers: ClosedRange<Int> = 1...100
     /// The declared range of a carved cell: the largest grid has 12 × 10 cells.
@@ -78,22 +108,48 @@ public struct ColorfallCanyonsExperienceCore: ExperienceCore, Equatable {
 
     /// The number of the certified level being played (1 … 100).
     public private(set) var levelNumber: Int
-    /// The kernel's play of that level.
+    /// The kernel's play of that level (of its practice copy in practice mode).
     public private(set) var play: ColorfallCanyonsPlay
     /// The level number the seed chose; a reset returns to it. Derived from the seed, so not in the digest or `==`.
     public let openingNumber: Int
-    /// The fresh play of the opening level; a reset returns to it. Derived from the seed, so not in the digest or `==`.
-    private let openingPlay: ColorfallCanyonsPlay
+    /// The player's progress (feature 345): in the digest and the snapshot.
+    public private(set) var progress: ColorfallCanyonsProgress
+    /// The mode (feature 345): in the digest and the snapshot.
+    public private(set) var mode: ColorfallCanyonsMode
+    /// The tutorial step (feature 345): in the snapshot, not in the digest.
+    public private(set) var tutorial: ColorfallCanyonsTutorialStep
+    /// The certified smallest edit count of the current level (stars). Derived from the level number.
+    public private(set) var certifiedSmallest: Int
+    /// The opening state; a reset returns to it. Derived from the seed, so not in the digest or `==`.
+    private let opening: Opening
     /// The host quality tier (0 = level-0, the best, … 2, clamped); presentation only — not in the digest, the
     /// snapshot or `==`.
     public private(set) var qualityTier = 0
 
-    /// A state playing `play` of level `levelNumber`, whose reset returns to `openingPlay` of `openingNumber`.
-    init(levelNumber: Int, play: ColorfallCanyonsPlay, openingNumber: Int, openingPlay: ColorfallCanyonsPlay) {
+    /// What a reset restores (feature 345).
+    struct Opening: Sendable {
+        /// The fresh play of the opening level.
+        let play: ColorfallCanyonsPlay
+        /// The opening progress: the levels up to the opening level open, none won.
+        let progress: ColorfallCanyonsProgress
+        /// The opening level's initial tutorial step.
+        let tutorial: ColorfallCanyonsTutorialStep
+        /// The opening level's certified smallest edit count.
+        let certifiedSmallest: Int
+    }
+
+    /// A state playing `play` of level `levelNumber` with `progress`, `mode` and `tutorial`, whose reset returns to
+    /// `opening` of `openingNumber`.
+    init(levelNumber: Int, play: ColorfallCanyonsPlay, progress: ColorfallCanyonsProgress, mode: ColorfallCanyonsMode,
+         tutorial: ColorfallCanyonsTutorialStep, certifiedSmallest: Int, openingNumber: Int, opening: Opening) {
         self.levelNumber = levelNumber
         self.play = play
+        self.progress = progress
+        self.mode = mode
+        self.tutorial = tutorial
+        self.certifiedSmallest = certifiedSmallest
         self.openingNumber = openingNumber
-        self.openingPlay = openingPlay
+        self.opening = opening
     }
 
     /// The level number a seed chooses: `seed % 100 + 1`.
@@ -131,12 +187,53 @@ public struct ColorfallCanyonsExperienceCore: ExperienceCore, Equatable {
         try ColorfallCanyonsPlay.replay(level: level, records: [])
     }
 
-    /// The opening state of manifest number `number`.
+    /// The practice copy of `level` (feature 345): every field kept, the budget raised to ``practiceBudget``.
+    ///
+    /// - Throws: the kernel's refusal of the copy (never for a certified level).
+    public static func practiceLevel(of level: ColorfallCanyonsLevel)
+        throws(ColorfallCanyonsError) -> ColorfallCanyonsLevel {
+        try ColorfallCanyonsLevel(id: level.id, seed: level.seed, difficulty: level.difficulty, columns: level.columns,
+                                  rows: level.rows, heights: level.heights, grounds: level.grounds,
+                                  springs: level.springs, basins: level.basins, flowRate: level.flowRate,
+                                  budget: ColorfallCanyonsMode.practice.budget(base: level.budget),
+                                  tickLimit: level.tickLimit, tutorial: level.tutorial)
+    }
+
+    /// The level a play of `certified` in `mode` uses: the practice copy in practice mode, otherwise the certified
+    /// level.
+    ///
+    /// - Throws: as ``practiceLevel(of:)``.
+    static func playedLevel(of certified: ColorfallCanyonsGenerated,
+                            mode: ColorfallCanyonsMode) throws(ColorfallCanyonsError) -> ColorfallCanyonsLevel {
+        mode == .practice ? try practiceLevel(of: certified.level) : certified.level
+    }
+
+    /// The opening state of manifest number `number`: campaign mode, the levels up to `number` open, none won, the
+    /// tutorial at its initial step.
     ///
     /// - Throws: as ``level(number:)``.
     public static func opening(number: Int) throws(ColorfallCanyonsError) -> ColorfallCanyonsExperienceCore {
-        let play = try freshPlay(of: try level(number: number))
-        return ColorfallCanyonsExperienceCore(levelNumber: number, play: play, openingNumber: number, openingPlay: play)
+        let certified = try generated(number: number)
+        let play = try freshPlay(of: certified.level)
+        var progress = ColorfallCanyonsProgress()
+        progress.open(through: number)
+        let tutorial = ColorfallCanyonsTutorialStep.initial(level: number)
+        let opening = Opening(play: play, progress: progress, tutorial: tutorial,
+                              certifiedSmallest: certified.solution.smallest)
+        return ColorfallCanyonsExperienceCore(levelNumber: number, play: play, progress: progress, mode: .campaign,
+                                              tutorial: tutorial, certifiedSmallest: certified.solution.smallest,
+                                              openingNumber: number, opening: opening)
+    }
+
+    /// The hint of `level` (1 … 3) for the current play (``ColorfallCanyonsHints/hint(level:play:)``); nil unless the
+    /// play is playing, paused or failed. Reads only.
+    public func hint(level: Int) -> ColorfallCanyonsHint? {
+        ColorfallCanyonsHints.hint(level: level, play: play)
+    }
+
+    /// The explanation of the current play's failure; nil unless the play failed.
+    public var failureExplanation: ColorfallCanyonsFailureExplanation? {
+        ColorfallCanyonsFailureExplanation(play: play)
     }
 
     /// An immutable copy of the play and the level number for drawing at the presenter's presentation time `time`
@@ -175,15 +272,43 @@ public struct ColorfallCanyonsExperienceCore: ExperienceCore, Equatable {
         qualityTier = min(max(tier, 0), Self.qualityTiers - 1)
     }
 
-    /// Equal states: the level number and the play (not the quality tier or the opening level).
+    /// Equal states: the level number, the play, the progress, the mode and the tutorial step (not the quality tier or
+    /// the opening level).
     public static func == (lhs: ColorfallCanyonsExperienceCore, rhs: ColorfallCanyonsExperienceCore) -> Bool {
-        lhs.levelNumber == rhs.levelNumber && lhs.play == rhs.play
+        lhs.levelNumber == rhs.levelNumber && lhs.play == rhs.play && lhs.progress == rhs.progress
+            && lhs.mode == rhs.mode && lhs.tutorial == rhs.tutorial
     }
 
     // MARK: Contract
 
-    /// Schema 1, the first version: no migration steps.
-    public static var migrations: MigrationChain { MigrationChain(currentVersion: schemaVersion) }
+    /// Schema 2 with the step 1 → 2 (``migratedToSchemaTwo(_:)``); a payload that does not decode is refused.
+    public static var migrations: MigrationChain {
+        MigrationChain(currentVersion: schemaVersion, steps: [1: { payload in try migratedToSchemaTwo(payload) }])
+    }
+
+    /// The schema-2 object of a schema-1 object `{"level", "records"}` (feature 345): no won levels with the levels up
+    /// to the saved level open, campaign mode, no tutorial key (restore starts the tutorial at its initial step).
+    ///
+    /// - Throws: ``ColorfallCanyonsRestoreRefusal/damaged`` when `object` is not a schema-1 object.
+    public static func migratedToSchemaTwo(_ object: [String: Any]) throws -> [String: Any] {
+        guard let level = object["level"] as? Int, object["records"] is [Any] else {
+            throw ColorfallCanyonsRestoreRefusal.damaged
+        }
+        var progress = ColorfallCanyonsProgress()
+        progress.open(through: level)
+        var migrated = object
+        migrated["progress"] = try JSONSerialization.jsonObject(with: try payloadEncoder().encode(progress))
+        migrated["mode"] = try JSONSerialization.jsonObject(
+            with: try payloadEncoder().encode(ColorfallCanyonsMode.campaign))
+        return migrated
+    }
+
+    /// The encoder of payloads and digested values: sorted keys, unescaped slashes.
+    static func payloadEncoder() -> JSONEncoder {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
+        return encoder
+    }
 
     /// The declared controls, built once: the cell, spring and tick ranges as `Double` ranges.
     private static let declaredControls: [ExperienceControl] = [
@@ -193,6 +318,11 @@ public struct ColorfallCanyonsExperienceCore: ExperienceCore, Equatable {
         ExperienceControl(id: "play.undo"),
         ExperienceControl(id: "play.redo"),
         ExperienceControl(id: "level.next"),
+        ExperienceControl(id: "level.select", ranges: [declared(levelNumbers)]),
+        ExperienceControl(id: "mode.daily", ranges: [declared(ColorfallCanyonsProgress.dailyYears), 1...12, 1...31]),
+        ExperienceControl(id: "mode.practice"),
+        ExperienceControl(id: "mode.campaign"),
+        ExperienceControl(id: "tutorial.dismiss"),
     ]
 
     /// `range` as the `Double` range a control declares.
@@ -200,11 +330,12 @@ public struct ColorfallCanyonsExperienceCore: ExperienceCore, Equatable {
         Double(range.lowerBound)...Double(range.upperBound)
     }
 
-    /// The six controls with their declared ranges (see the file header); all but the carve, the valve and the step
-    /// take no values.
+    /// The eleven controls with their declared ranges (see the file header); all but the carve, the valve, the step,
+    /// `level.select` and `mode.daily` take no values.
     public static var controls: [ExperienceControl] { declaredControls }
 
-    /// The opening state of level `seed % 100 + 1`, in stage `playing`; no clock is read.
+    /// The opening state of level `seed % 100 + 1`, in stage `playing`, campaign mode, the levels up to it open; no
+    /// clock is read.
     ///
     /// - Throws: `ExperienceFailure` with the kernel's reason code when the level cannot be generated.
     public static func prepare(seed: UInt64) async throws -> ColorfallCanyonsExperienceCore {
@@ -227,27 +358,53 @@ public struct ColorfallCanyonsExperienceCore: ExperienceCore, Equatable {
                                                   controls: Self.declaredControls) {
             return .rejected(refusal)
         }
+        var values: [Int] = []
+        for value in action.values {
+            guard let whole = Self.whole(value) else {
+                return .rejected(.rule(code: ColorfallCanyonsExperienceRule.notWhole))
+            }
+            values.append(whole)
+        }
         do throws(ColorfallCanyonsError) {
             switch action.control {
             case "canyon.carve", "canyon.valve", "time.step":
-                guard let value = Self.whole(action.values[0]) else {
-                    return .rejected(.rule(code: ColorfallCanyonsExperienceRule.notWhole))
-                }
                 let kernelAction: ColorfallCanyonsAction = switch action.control {
-                case "canyon.carve": .carve(value)
-                case "canyon.valve": .valve(value)
-                default: .step(value)
+                case "canyon.carve": .carve(values[0])
+                case "canyon.valve": .valve(values[0])
+                default: .step(values[0])
                 }
                 try play.apply(kernelAction, expecting: play.fingerprint)
+                advanceTutorial()
+                recordIfWon()
             case "play.undo":
                 try play.undo()
+                advanceTutorial()
             case "play.redo":
                 try play.redo()
-            default:   // level.next
-                let next = levelNumber % Self.levelNumbers.upperBound + 1
-                let fresh = try Self.freshPlay(of: try Self.level(number: next))
-                levelNumber = next
-                play = fresh
+                advanceTutorial()
+                recordIfWon()
+            case "level.next":
+                guard let next = progress.nextOpen(after: levelNumber) else {
+                    return .rejected(.rule(code: ColorfallCanyonsExperienceRule.locked))
+                }
+                try open(number: next, mode: .campaign)
+            case "level.select":
+                guard progress.isOpen(values[0]) else {
+                    return .rejected(.rule(code: ColorfallCanyonsExperienceRule.locked))
+                }
+                try open(number: values[0], mode: .campaign)
+            case "mode.daily":
+                guard let daily = ColorfallCanyonsProgress.dailyLevel(year: values[0], month: values[1],
+                                                                      day: values[2]) else {
+                    return .rejected(.rule(code: ColorfallCanyonsExperienceRule.date))
+                }
+                try open(number: daily, mode: .daily(level: daily))
+            case "mode.practice":
+                try open(number: levelNumber, mode: .practice)
+            case "mode.campaign":
+                try open(number: progress.isOpen(levelNumber) ? levelNumber : progress.frontier, mode: .campaign)
+            default:   // tutorial.dismiss
+                tutorial = tutorial.dismissed()
             }
         } catch {
             return .rejected(.rule(code: error.reasonCode))
@@ -261,10 +418,47 @@ public struct ColorfallCanyonsExperienceCore: ExperienceCore, Equatable {
         return Int(value)
     }
 
-    /// Back to the fresh play of the level the seed chose; the quality tier, which is not state, is kept.
+    /// Advances the tutorial step by the play's latest accepted record
+    /// (`ColorfallCanyonsTutorialStep.advanced(after:planEmpty:ended:)`): the hint's plan is computed only for a carve
+    /// or valve while the step is `steer`; an undo or a redo never moves the step back.
+    private mutating func advanceTutorial() {
+        guard tutorial != .done, let kind = play.records.last?.kind else { return }
+        let ended = play.stage == .won || play.stage == .failed
+        var planEmpty = false
+        if !ended, tutorial == .steer, kind == .carve || kind == .valve {
+            planEmpty = ColorfallCanyonsHints.plan(play)?.edits.isEmpty ?? false
+        }
+        tutorial = tutorial.advanced(after: kind, planEmpty: planEmpty, ended: ended)
+    }
+
+    /// A fresh play of manifest number `number` in `mode` (the practice copy in practice mode) with the level's initial
+    /// tutorial step; the records of the level left are dropped. Changes nothing when the kernel refuses.
+    private mutating func open(number: Int, mode: ColorfallCanyonsMode) throws(ColorfallCanyonsError) {
+        let certified = try Self.generated(number: number)
+        let fresh = try Self.freshPlay(of: try Self.playedLevel(of: certified, mode: mode))
+        levelNumber = number
+        play = fresh
+        self.mode = mode
+        certifiedSmallest = certified.solution.smallest
+        tutorial = ColorfallCanyonsTutorialStep.initial(level: number)
+    }
+
+    /// After an accepted action that won the play: records the actions spent against the certified smallest edit count
+    /// in the current mode (campaign opens the next level; daily does not; practice records nothing). A won play is
+    /// final, so a win is recorded once.
+    private mutating func recordIfWon() {
+        guard play.stage == .won else { return }
+        progress.record(level: levelNumber, actions: play.spent, smallest: certifiedSmallest, mode: mode)
+    }
+
+    /// Back to the opening state the seed chose (progress included); the quality tier, which is not state, is kept.
     public mutating func reset() {
         levelNumber = openingNumber
-        play = openingPlay
+        play = opening.play
+        progress = opening.progress
+        mode = .campaign
+        tutorial = opening.tutorial
+        certifiedSmallest = opening.certifiedSmallest
     }
 
     /// `won` or `failed` while the play is in that stage; nil otherwise.
@@ -276,35 +470,42 @@ public struct ColorfallCanyonsExperienceCore: ExperienceCore, Equatable {
         }
     }
 
-    /// "r02-g05.colorfall-canyons.v1", then the level number and the play's fingerprint (level, tick, heights, valves,
-    /// supplies, masses, spilled units, actions spent, stage, failure).
+    /// "r02-g05.colorfall-canyons.v2", then the level number, the play's fingerprint (level, tick, heights, valves,
+    /// supplies, masses, spilled units, actions spent, stage, failure), the progress and the mode (their sorted JSON);
+    /// never the tutorial step.
     public func writeDigest(into builder: inout DigestBuilder) throws(DigestError) {
         builder.add(Self.digestDomain)
         builder.add(levelNumber)
         // The play's fingerprint and not its record history, so undo restores the earlier digest exactly.
         builder.add(play.fingerprint)
+        let encoder = Self.payloadEncoder()
+        builder.add(String(decoding: (try? encoder.encode(progress)) ?? Data(), as: UTF8.self))
+        builder.add(String(decoding: (try? encoder.encode(mode)) ?? Data(), as: UTF8.self))
     }
 
     // MARK: Snapshot
 
-    /// The payload's JSON form.
+    /// The payload's JSON form (schema 2); `tutorial` is absent in a migrated schema-1 payload.
     private struct Payload: Codable {
         var level: Int
+        var mode: ColorfallCanyonsMode
+        var progress: ColorfallCanyonsProgress
         var records: [ColorfallCanyonsRecord]
+        var tutorial: ColorfallCanyonsTutorialStep?
     }
 
-    /// The JSON object `{"level", "records"}` with sorted keys and unescaped slashes.
+    /// The JSON object `{"level", "mode", "progress", "records", "tutorial"}` with sorted keys and unescaped slashes.
     public func snapshotPayload() throws -> Data {
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
-        return try encoder.encode(Payload(level: levelNumber, records: play.records))
+        try Self.payloadEncoder().encode(Payload(level: levelNumber, mode: mode, progress: progress,
+                                                 records: play.records, tutorial: tutorial))
     }
 
-    /// The core of `payload`: the records replayed on a fresh play of the saved level; a reset returns to the level
-    /// `seed` chooses.
+    /// The core of `payload` (schema 2): the records replayed on a fresh play of the saved level (the practice copy in
+    /// practice mode) with the saved progress, mode and tutorial step (the initial step when absent); a reset returns
+    /// to the opening state `seed` chooses.
     ///
-    /// - Throws: ``ColorfallCanyonsRestoreRefusal`` for a damaged payload, a level number outside 1 … 100 or a level or
-    ///   trace the kernel refuses.
+    /// - Throws: ``ColorfallCanyonsRestoreRefusal`` for a damaged payload (invalid progress, an unknown mode or a daily
+    ///   mode naming another level among them), a level number outside 1 … 100 or a level or trace the kernel refuses.
     public static func restore(payload: Data, seed: UInt64) throws -> ColorfallCanyonsExperienceCore {
         guard let decoded = try? JSONDecoder().decode(Payload.self, from: payload) else {
             throw ColorfallCanyonsRestoreRefusal.damaged
@@ -312,15 +513,20 @@ public struct ColorfallCanyonsExperienceCore: ExperienceCore, Equatable {
         guard levelNumbers.contains(decoded.level) else {
             throw ColorfallCanyonsRestoreRefusal.levelNumber(decoded.level)
         }
+        if case .daily(let daily) = decoded.mode, daily != decoded.level {
+            throw ColorfallCanyonsRestoreRefusal.damaged
+        }
         do throws(ColorfallCanyonsError) {
-            let saved = try level(number: decoded.level)
-            let play = try ColorfallCanyonsPlay.replay(level: saved, records: decoded.records)
-            let openingNumber = levelNumber(forSeed: seed)
-            let openingPlay = openingNumber == decoded.level
-                ? try freshPlay(of: saved)
-                : try freshPlay(of: try Self.level(number: openingNumber))
-            return ColorfallCanyonsExperienceCore(levelNumber: decoded.level, play: play, openingNumber: openingNumber,
-                                                  openingPlay: openingPlay)
+            let certified = try generated(number: decoded.level)
+            let play = try ColorfallCanyonsPlay.replay(level: try playedLevel(of: certified, mode: decoded.mode),
+                                                       records: decoded.records)
+            let tutorial = decoded.tutorial ?? ColorfallCanyonsTutorialStep.initial(level: decoded.level)
+            let openingCore = try opening(number: levelNumber(forSeed: seed))
+            return ColorfallCanyonsExperienceCore(levelNumber: decoded.level, play: play, progress: decoded.progress,
+                                                  mode: decoded.mode, tutorial: tutorial,
+                                                  certifiedSmallest: certified.solution.smallest,
+                                                  openingNumber: openingCore.openingNumber,
+                                                  opening: openingCore.opening)
         } catch {
             throw ColorfallCanyonsRestoreRefusal.kernel(error)
         }

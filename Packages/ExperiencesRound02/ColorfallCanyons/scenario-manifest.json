@@ -5,7 +5,12 @@
     "time.step",
     "play.undo",
     "play.redo",
-    "level.next"
+    "level.next",
+    "level.select",
+    "mode.daily",
+    "mode.practice",
+    "mode.campaign",
+    "tutorial.dismiss"
   ],
   "experience" : "r02-g05.colorfall-canyons",
   "kind" : "game",
@@ -16,7 +21,7 @@
 
       ],
       "expect" : {
-        "initialDigest" : "4ca0d1899ef8a997b0314afb0431d648b98ac91e5c7fc64b4e88639070895625"
+        "initialDigest" : "2c5ac2c61f434a45827dd9478c9813951af99739cd0c60bc3840a0f78198776f"
       },
       "name" : "launch-first-frame",
       "seed" : "0"
@@ -55,8 +60,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "152cc36dd8282a091615eb46741ee01ece896109b761bd38b966ddf4a7506b83",
-        "initialDigest" : "4ca0d1899ef8a997b0314afb0431d648b98ac91e5c7fc64b4e88639070895625"
+        "finalDigest" : "10324b8fce219e1ee2e9a047ff4c885497e274334fd94d7d57753d43af2063bd",
+        "initialDigest" : "2c5ac2c61f434a45827dd9478c9813951af99739cd0c60bc3840a0f78198776f"
       },
       "name" : "input-response",
       "seed" : "0"
@@ -262,11 +267,128 @@
           },
           "result" : "action.wrong-value-count",
           "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "level.select",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "action.rule.r02-g05.locked",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "level.select",
+            "values" : [
+              101
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "level.select",
+            "values" : [
+              1.5
+            ]
+          },
+          "result" : "action.rule.r02-g05.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "mode.daily",
+            "values" : [
+              2026,
+              2,
+              30
+            ]
+          },
+          "result" : "action.rule.r02-g05.date",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "mode.daily",
+            "values" : [
+              2025,
+              2,
+              29
+            ]
+          },
+          "result" : "action.rule.r02-g05.date",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "mode.daily",
+            "values" : [
+              2026,
+              13,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g05.locked",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "mode.daily",
+            "values" : [
+              2026,
+              11
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "mode.practice",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "mode.campaign",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "tutorial.dismiss",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
         }
       ],
       "expect" : {
-        "finalDigest" : "4ca0d1899ef8a997b0314afb0431d648b98ac91e5c7fc64b4e88639070895625",
-        "initialDigest" : "4ca0d1899ef8a997b0314afb0431d648b98ac91e5c7fc64b4e88639070895625"
+        "finalDigest" : "2c5ac2c61f434a45827dd9478c9813951af99739cd0c60bc3840a0f78198776f",
+        "initialDigest" : "2c5ac2c61f434a45827dd9478c9813951af99739cd0c60bc3840a0f78198776f"
       },
       "name" : "rejection",
       "seed" : "0"
@@ -305,8 +427,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "152cc36dd8282a091615eb46741ee01ece896109b761bd38b966ddf4a7506b83",
-        "initialDigest" : "4ca0d1899ef8a997b0314afb0431d648b98ac91e5c7fc64b4e88639070895625"
+        "finalDigest" : "10324b8fce219e1ee2e9a047ff4c885497e274334fd94d7d57753d43af2063bd",
+        "initialDigest" : "2c5ac2c61f434a45827dd9478c9813951af99739cd0c60bc3840a0f78198776f"
       },
       "name" : "save-restore",
       "seed" : "0"
@@ -345,7 +467,7 @@
         }
       ],
       "expect" : {
-        "initialDigest" : "4ca0d1899ef8a997b0314afb0431d648b98ac91e5c7fc64b4e88639070895625",
+        "initialDigest" : "2c5ac2c61f434a45827dd9478c9813951af99739cd0c60bc3840a0f78198776f",
         "resetDigest" : true
       },
       "name" : "reset",
@@ -486,8 +608,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "1251bf28896ac3ad107be97ebbc9041fcc801b97843b4821e3e049b8470600b2",
-        "initialDigest" : "4ca0d1899ef8a997b0314afb0431d648b98ac91e5c7fc64b4e88639070895625",
+        "finalDigest" : "ffb5bdf1b024cef306bf9f3adec293d5d3ad9d66ac58c31144615ae80767bcea",
+        "initialDigest" : "2c5ac2c61f434a45827dd9478c9813951af99739cd0c60bc3840a0f78198776f",
         "outcome" : "won"
       },
       "name" : "full-playthrough",
@@ -507,8 +629,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "152cc36dd8282a091615eb46741ee01ece896109b761bd38b966ddf4a7506b83",
-        "initialDigest" : "4ca0d1899ef8a997b0314afb0431d648b98ac91e5c7fc64b4e88639070895625"
+        "finalDigest" : "10324b8fce219e1ee2e9a047ff4c885497e274334fd94d7d57753d43af2063bd",
+        "initialDigest" : "2c5ac2c61f434a45827dd9478c9813951af99739cd0c60bc3840a0f78198776f"
       },
       "name" : "hero",
       "seed" : "0"
@@ -537,8 +659,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "04a2f1eaf483c1d0cbec2913bdc109f23ac2afb5359e792a4077ae0f469d8724",
-        "initialDigest" : "dd035290ac7f498b3ca707c706b49acf210ba570bdf8d4d28b08aa429248e921"
+        "finalDigest" : "238ec5f56a0c6ddaa905a353d0cab9d4f836dfc87b2f3caf03b4b1f8b5bb6db7",
+        "initialDigest" : "076ae8c20b122035342dd9ca39cad66ea99d907e140a72f9f4d26406512751bc"
       },
       "name" : "acceptance-001",
       "seed" : "22"
@@ -567,8 +689,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "78eb81fa44fbc51425baac52b31588a5e2e29505641050ae7e84a06789ee434d",
-        "initialDigest" : "92ae719c3e43a38e91c4515c7ff3dc8daf6ae187bf9e60b64f9e2db7a25ddfbb"
+        "finalDigest" : "0ec334c26cbe92864f656483bfdf25f0c2a86fed56aa7cdd0dbb135d2881845c",
+        "initialDigest" : "fca274c2e181ff11eae615246b88c8a7d9f951e7e77c1845d93ebb557bf3cf2a"
       },
       "name" : "acceptance-002",
       "seed" : "29"
@@ -597,8 +719,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "36c63ed5b4f096b96c7d1062ea90b49bb8605fd98ce894d3708229d0ef9c8383",
-        "initialDigest" : "47bbcdc5536ff90ba8b9750fe1d3ea75e1e1ebd847bcec999d845afb97dc8223"
+        "finalDigest" : "1117098db585cd3de47fc5bf01111e84df862a6f75e824454e4a66ad7959059d",
+        "initialDigest" : "e341f3ac9c0a1c9408e5c9571de9a9bcb1736359129d0a53c2658104ee8bfabe"
       },
       "name" : "acceptance-003",
       "seed" : "36"
@@ -627,8 +749,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "a331e7b25732f2de83a58fb7f2548ccae1ca2aad7e466ef138e0ba15c878b019",
-        "initialDigest" : "ed6a199f3977a409b93fffe140ff357c1139a97faab196b03154ccf00e5d34e1"
+        "finalDigest" : "f9268f6a6fbcc1ce403897aade53d7cecf75bbb079b4a27becddb2a0e11770a6",
+        "initialDigest" : "8d5381c43cb324604f20edff939c6f347468f13ef278c17358f1800268267750"
       },
       "name" : "acceptance-004",
       "seed" : "43"
@@ -657,8 +779,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "720745fbb8d2ed3a5af819f5c4d3adfaf8d0a5d28b2a2b4cf6db2f698f5466ba",
-        "initialDigest" : "e1f13e07bde3df2d8ecb741b43a704a87d07e0dca2d7920be20533e2758951b2"
+        "finalDigest" : "7cc11f4584ee34ddbe05612af7401efc4261da9cb248abf40fc6dfaa15326809",
+        "initialDigest" : "b061b288998064870136e10587e771341931e2af132aa8f56f6795d93f01171d"
       },
       "name" : "acceptance-005",
       "seed" : "50"
@@ -687,8 +809,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "1206d852358d1bec8f6aaaa55aa0b89d1b93ec40a1103e02271899c9034e0c4a",
-        "initialDigest" : "58c1d1f7eca380002bf7d3dfb96eaddfe01e22261a09f71d36c0eb43ec9765b2"
+        "finalDigest" : "0551f173e026c2521e5832b3f52ef8dcf82e46107f903e355ca66e642dcd8218",
+        "initialDigest" : "99137a50324209fea4c9a488c9609b30dfbd5c03111cd2157beb1a7764539a91"
       },
       "name" : "acceptance-006",
       "seed" : "57"
@@ -717,8 +839,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "ed4d5024175f9de25d6dad1f5fed3f5a43f99886c4b97761af19807fd8103039",
-        "initialDigest" : "1b1f8444d1aa99dffe566f5b512e231c5049b5959acb3f3b5eb116f2407f26d2"
+        "finalDigest" : "615f83213e3c6eb960693d8ba7a01dc20da949ebc70b58dc7050f3a6c75e9f69",
+        "initialDigest" : "1b60a3cebb22f1ceff63c6eba62d584185da8e2d2d902cd3439930409bd9ea7a"
       },
       "name" : "acceptance-007",
       "seed" : "64"
@@ -747,8 +869,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "1f4b61447bf24f6d9f93f97d9106cb08ae5fe47b1902d1e6616df26e05111763",
-        "initialDigest" : "55dd70a6feadf8295aea9e3f03285b33a0ccbe4f5d5c4bfb21db529ff61a871a"
+        "finalDigest" : "400b80f939166c1fd0f1e3c2e329fa336c5e7d2692097484cae9e31ebb8fcf01",
+        "initialDigest" : "8f9b30b7722bbe96af2d3b7c2fd7f115884c625e4ddb7e56187767271c435620"
       },
       "name" : "acceptance-008",
       "seed" : "71"
@@ -777,8 +899,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "7a6d2197175a5ebb812ebd081301dd3fbc606d5d4ebd91bf15b6794417036cf7",
-        "initialDigest" : "991c364a8e5dbd6367d9909338c7a0761071ff2274618a2dbe8e4b650ac3099f"
+        "finalDigest" : "3ff783afea8b27a51021d9ab9a214de8cb04d8567c900813b733ee90c87a75b6",
+        "initialDigest" : "fbfe23e3ed4a96bae29cf09923e53991750d5a4518ab3b3c7da92e9310efb8c1"
       },
       "name" : "acceptance-009",
       "seed" : "78"
@@ -807,8 +929,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "0cf699015c9007b434d71e8ceaa3ebb320da9f29a616b439bef0d657745fe63f",
-        "initialDigest" : "b07773250f30e2973873327265eb0306970bafe01f07ac94eb101ecedd884854"
+        "finalDigest" : "353a586ebf4e01953c9f3e7ab5aaf4188f7b8c777b031a783ee703a7b2d0cc30",
+        "initialDigest" : "112437636b4639af6d2af9994fa6bf845ca88205b9cb5c3399b8e87c012538c7"
       },
       "name" : "acceptance-010",
       "seed" : "85"
@@ -837,8 +959,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "e907dcbd82df57beacfebae0a6f90cd9b73d3a90b87e4903db84332ba121ee5f",
-        "initialDigest" : "86df9306db2b18ac9777c02b860e9c0121a59aba0f69ee9f5d2daf6c7d283fd4"
+        "finalDigest" : "c40c9918307af3b47102142d2c934a416c6d0e9b1917960d3b5d00222532ad19",
+        "initialDigest" : "d34d2cdc8bfa8027b19deec1ba0e8c63a587492b7d9d8ff7560386a778f816fb"
       },
       "name" : "acceptance-011",
       "seed" : "92"
@@ -867,8 +989,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "e7e494a0033cb8d5e6e7175563eb308756fe21d9270118295757d5e99262831c",
-        "initialDigest" : "0c971378152d0b77f0d210e0153dec381fa8d41b21534ba1dde9b23a738e6145"
+        "finalDigest" : "ae270a610350ce58dcea6424b7304cb3b649cbe1bfa63b31e9c21f1ff12a841f",
+        "initialDigest" : "202d8bc259d0803127b59f22b6abcbc9b8cb29c9c957cd7beaa7b72bb2ec70e3"
       },
       "name" : "acceptance-012",
       "seed" : "99"
@@ -897,8 +1019,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "5a45fc713d0862c81fd8f9a02bacda5a4f8a6deb7bcbb5ae14144d5bf5e9baa7",
-        "initialDigest" : "985d2501775ee206f3a388b24b5ab002828e111657067ec4e487c59e63b6232a"
+        "finalDigest" : "c2369923c84a72632b359c1b7761b4e69dc2725fc4f83d4bd7e257ecfa3f2c34",
+        "initialDigest" : "954d92f2e17b696d6bb7191d5cc0e2f0728b1f8072c5f138d96841ba25dacdbc"
       },
       "name" : "acceptance-013",
       "seed" : "6"
@@ -927,8 +1049,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "1f6d6d64549036a15399a735c5e0ed6d80e80bff72232ad7811653f28f6eec7e",
-        "initialDigest" : "5b903d0caf8e90e9759a9a9d0573a577075d78ed05d70a46e727bd11c52c8cab"
+        "finalDigest" : "e8759d82fb9b3618118e8caa207170b25f0cca143d2cf74d7cf7881f1735f7a6",
+        "initialDigest" : "cd656ce1b99c34e1622164b03c4ea6169217211546218c270c2f1173c89a280a"
       },
       "name" : "acceptance-014",
       "seed" : "13"
@@ -957,8 +1079,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "eb7f83d1f11c020419d03ea97b479fa9a76d4d47ee638b2c0acabcd7018efe34",
-        "initialDigest" : "7d48a7c974b86ac4b78a0efe07bdc843bd9b7cac7f2a941db66484c36501a2c3"
+        "finalDigest" : "dbe13b930cf40a3a5750145617a53795268b7d703243b487323fb7f36a600ae1",
+        "initialDigest" : "4cd03253be89f8ea10f9317ca41a6bef2b8a51f9eec6433b07ed30c22c14ec96"
       },
       "name" : "acceptance-015",
       "seed" : "20"
@@ -987,8 +1109,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "d97352ffd419a109275114a133cbcf921d991d4e23ee45eb5645f55205b31644",
-        "initialDigest" : "7086454ce25be8dfa1d28b33354554207144755a707e4465471ef3fb13a22af1"
+        "finalDigest" : "05db6cf614ef4edc8fb643811a13346319d43c0c19a88940244456be5d36b266",
+        "initialDigest" : "30ffa266f6e35644046c93888399dc53706ee64e2d5a11d7229ed27169d3acd4"
       },
       "name" : "acceptance-016",
       "seed" : "27"
@@ -1017,8 +1139,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "0a6ed2f9c5d522e6907cde2ae3b8222eed4d0b50d7a3d9a87a966b691a86ffda",
-        "initialDigest" : "83888afb26f90dd94ac6a02e6134fc836127515306b2e86f04c27661565b5e8b"
+        "finalDigest" : "55d6199502585e0d082304665f09f9b3bebc335d26e84c85a56185fbabd18a38",
+        "initialDigest" : "7624cdd911d84ca05c7418760fcffe24f4c47a52c8a97a19ae8ebf40bee16da9"
       },
       "name" : "acceptance-017",
       "seed" : "34"
@@ -1047,8 +1169,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "8e06e6d64c55c187d3cb79b46b9a8be59c1d7aaeb22c57a1a9e03557cd3c14b5",
-        "initialDigest" : "bead99da6ad69dde4f6a68d1468416d3437e890eca5c2cf5499d6e1d19ad1cdd"
+        "finalDigest" : "c2d99dbe6ec5eb8e258c31b2168c3ec2a0f8b3b7a78c34bb69be2d01b08c4e04",
+        "initialDigest" : "5a4ed5c0ef70b99dc8c51044b2eff3b1eb415f32ec8dce707b7c9adc8012d479"
       },
       "name" : "acceptance-018",
       "seed" : "41"
@@ -1077,8 +1199,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "3006c08175539c7966b8702d1787884aebf0d223814fb006012d72b68a1d4efb",
-        "initialDigest" : "f09a0b2d1405d631392d6d077762dfafcd656a7cb40786b8107efa9f5e534b4f"
+        "finalDigest" : "91b7121fb11f547fbe29e08987e5fe4a8891fb5d4bc7195c83125aa49e942185",
+        "initialDigest" : "f75d9dfe122af4dcac74580f6d9b4737f0dea88c6aca0b20fa2a71b17b841241"
       },
       "name" : "acceptance-019",
       "seed" : "48"
@@ -1107,8 +1229,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "d15e5350790be2cbe11253f3681f285b9c1f36372f4c7602364a3218a10c97db",
-        "initialDigest" : "80141f03b197aca5fe72dffd4fe2ac21ee7690dcba6627727ce1f8394df9c042"
+        "finalDigest" : "c060f79e15455b04da43592248953ff9e60f0881797be91378d3924c4654a910",
+        "initialDigest" : "f8196f44cbb413b1e2886723372e548e3021550f506b2e6ecbc33ba40f0320ba"
       },
       "name" : "acceptance-020",
       "seed" : "55"
@@ -1137,8 +1259,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "7d6b3abdf953d14058d5ee97af8106a97acb97c696887bd637cee74b5d68aa06",
-        "initialDigest" : "43ebdf2ce2faf3164756e6b1a81976f0b38580396b517648370ab53f51a92294"
+        "finalDigest" : "36519ae1c729923b3cd4ca77d7135ad45c6349075b5a1145a07879f50fde9783",
+        "initialDigest" : "436d4fff6e0200f5c7730413e1e443baddab467d9d03060824d1c7a1e58fdde8"
       },
       "name" : "acceptance-021",
       "seed" : "62"
@@ -1167,8 +1289,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "dd8faa7cfac2d0d2161c11673d6c65b40b0e2b618ca71e79bfc4955ae8feb9ac",
-        "initialDigest" : "8d01f6a195320b5e868eb5bbf7133016674b24a56359421130c9eda2abc16a65"
+        "finalDigest" : "6c588fd7113e160cc9b514be13659b64294ac4da00b57df655a32e9a42da58a1",
+        "initialDigest" : "343ee1f4c504f540f70d885189c5ba38d45d197cf8145cea1fd8ee68fe0d1df3"
       },
       "name" : "acceptance-022",
       "seed" : "69"
@@ -1197,8 +1319,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "08c43ba059e417aac8c75bec649c9cf638a6428a3a789c05b1eb0de02bb401b8",
-        "initialDigest" : "f035f08194e95f998e0629d8b3c735659465af85ad7e0b385b72ce06592f5bef"
+        "finalDigest" : "99d5d426bda91e86510b678e38a045d4fe58e56cdc29ee2bbba6a8813d4f2573",
+        "initialDigest" : "48900598693118906b17360b7a8b8849510a4a1ebe9ad8b93523e0d631851964"
       },
       "name" : "acceptance-023",
       "seed" : "76"
@@ -1227,8 +1349,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "6fd3dee41e3510223cffefe0d94befc6110b724e2725c23027261365aa01f36b",
-        "initialDigest" : "0ba4a897eb0d85d68b63d55b13737710a6dd16eab7d2c3240e1794ec2e63eccd"
+        "finalDigest" : "a0a5e286611ea7962836def910de8e75886bd9110ff7740bdd2bcc59df88b2ba",
+        "initialDigest" : "01ee55ba2d90cd0b82b842af17f17c96a55f91a1c069f1147181dc7832055aea"
       },
       "name" : "acceptance-024",
       "seed" : "83"
@@ -1257,8 +1379,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "bcbb89a60ed4bf4acd677e00d28d46cb8dc09740d90ee0fa27384e1fc9d872e7",
-        "initialDigest" : "2f0b5402ed6e484a89728d6616097b7b5f290209d97c858db98578a23080d7de"
+        "finalDigest" : "dd313f02b3d2e60a095809628e26400142da2c41c5ed6eec868803f0a2ae50df",
+        "initialDigest" : "930349fa15bc3d8640222b7ac18b53df78b1ce0fad8dbaf37cb5305ef015f98f"
       },
       "name" : "acceptance-025",
       "seed" : "90"
@@ -1287,8 +1409,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "7d62d8d85bf0ba3ae084c21c79b72723cdb2e970aa41de1ebd6411c7883461d8",
-        "initialDigest" : "ee14ec7d3f6ca075a4c3871f3fcc95f6b87c2c57b8645fd0769bc88b239673fb"
+        "finalDigest" : "e3702e6017451c36deaa334e7c97092ab20bc81bd9edbcffed6a2f3757da42a6",
+        "initialDigest" : "af52fe6a5896ca4e074422b75a3cd319f264d9a37102ff436183ce3b0035e5d3"
       },
       "name" : "acceptance-026",
       "seed" : "97"
@@ -1317,8 +1439,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "2e7e7c4818dcd907e963e2a1c77a0627710dbeed07ef0c9a25075ccd64aafb44",
-        "initialDigest" : "8b51d52d2edb4a52c4a94ceb09a5ca8304427887625ae9bbe5b4bea717455c3c"
+        "finalDigest" : "16451ff85e43f85a44e665838e9c8e920f3c7ae3b1712508b5bd5e83294e593d",
+        "initialDigest" : "459a7e5ebb6fcccec109c13a87c13ffe1af84d91e9c4d8ac6d7ce7b2a69057e8"
       },
       "name" : "acceptance-027",
       "seed" : "4"
@@ -1347,8 +1469,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "33635bdbaf4adb6610842cecb1dfab98dc63ae6d27e1c3beff98d6ea17e9080d",
-        "initialDigest" : "59b8e4ab7c5faf33cf64c5a3ae5c401d5c8cc75876bc3c80ebec48a3f2d7dc99"
+        "finalDigest" : "76bf1a3ddb9d2aa9475f1a5b7540844ad2399c2c02b120683d98106308519019",
+        "initialDigest" : "9ee2ee9a88423ab349a82b7f274b36491b8f8276ab277ea9f24f8dcc3fa514c0"
       },
       "name" : "acceptance-028",
       "seed" : "11"
@@ -1377,8 +1499,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "5f0b25fdb8f576838ddbbe503791b5091795170eae37fd13758b08573c1b73ee",
-        "initialDigest" : "c3f334ecc927a0c82a4629eee905b69009015e5383d0f22722b912f94bbace71"
+        "finalDigest" : "117e700583fd3a7aea6b80e969f2fe529c58bdd05c3c6a3f748e0fa85747012b",
+        "initialDigest" : "a234e80be1357afdc7a126d4acd827f502893b82579e9266c5bd0e4d24b13213"
       },
       "name" : "acceptance-029",
       "seed" : "18"
@@ -1407,8 +1529,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "b06c9ddd9d2d5ff43f94f624ec829e7fe1d0a367b5daa67eef1e3330d41fecd1",
-        "initialDigest" : "cabd5a4cf50d26cf015b87d4496624a9921428905e9cd07e7cabdfd894756c11"
+        "finalDigest" : "8167735601c2bc0369eb17b22bf3b3b31628c0c0320ece79e7e475eab6b13dd4",
+        "initialDigest" : "71726ce3345f7bf12d6814d71703bea3b8bda14e55e998c97e05400322877f9c"
       },
       "name" : "acceptance-030",
       "seed" : "25"
@@ -1437,8 +1559,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "ac2dd7a9a588b41028d200cbd7ff574283e4557f98be501f8f4316ab0b3801f3",
-        "initialDigest" : "de6f678dfbb3b0c719b244770be53e79f7b425107abe6fd1deb4da45451c3016"
+        "finalDigest" : "cd2e65b9745bfc85de5ee1bbd574467a64162b12161061732fef6a66fda3c43f",
+        "initialDigest" : "7f28bba734dc5072b4d50504aa5e88528a0fd7eb0d3b60734b8157c56d75f1d5"
       },
       "name" : "acceptance-031",
       "seed" : "32"
@@ -1467,8 +1589,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "f4fbb699261be8917fca78e728eb997c344d6ef98bc6bfabdba0ca678c9b57ae",
-        "initialDigest" : "5085cf8fcd9fc1091ecb3ced823d6125be224ad6e046065902e145c0fd9d2c3b"
+        "finalDigest" : "1d9090ec6dec7aea01ffe43e209a8a1b2b68082d2daf1d44a92b8e8bcb5d26ca",
+        "initialDigest" : "afc0fae7538a8b396d7d684b7e3e7e9a0485a46b769ee477c0e5067a81b7617a"
       },
       "name" : "acceptance-032",
       "seed" : "39"
@@ -1497,8 +1619,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "5ae27fc79e30b69570cb7d4c28cd452c2e91d60df827244673696a51d0829658",
-        "initialDigest" : "a92565f93085378fd396d68b31de157158e84e6404160cdf17e5d6156494f890"
+        "finalDigest" : "82565b4025febf13bf43318b69b30049fcc4fe39d76367073383c86cfd6cabcf",
+        "initialDigest" : "1d2de8e786ebe0867d0b461eea2da8dbdfea55fe07e1aef5209e8093a22ad60f"
       },
       "name" : "acceptance-033",
       "seed" : "46"
@@ -1527,8 +1649,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "83cfe50f3d43c856b2ffe615bdebb4fc5f354bb4f1cf48a1c4ca6213b1d28670",
-        "initialDigest" : "88b0ebc2a4da20d4c7e78fdf0c1e0bb17037466ee739189ef9cd803074aedf32"
+        "finalDigest" : "7016c2243c431224082ffdf5e1a0eb95a76c82ea0ed9ac3dd5104dd15f95b625",
+        "initialDigest" : "b3b17e08abddc35f4eb3db4849cf4074d5362a19e175657714602d49c3e9d7f7"
       },
       "name" : "acceptance-034",
       "seed" : "53"
@@ -1557,8 +1679,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "1f0541220c5a83d652174fc37753adc083f316f579a7e6655f9ea28c458d4707",
-        "initialDigest" : "76cd902bd65c839f8b897988a2cc0e5e9fb9fac7a1a54eaadc260eb2317644e5"
+        "finalDigest" : "04a8c6804e5c7f2dbbdbdcea270d5e067e712a2413d5d73a832d47c6151daba3",
+        "initialDigest" : "978c3ba3aca539194ff965f1b11edd43659160b28e89db52d294337f7688e4f0"
       },
       "name" : "acceptance-035",
       "seed" : "60"
@@ -1587,8 +1709,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "cc23c545b20179846b41d0e5bdf3b7421f1435cd5291e42a68e042fb15604eb0",
-        "initialDigest" : "ff48310fa0f7b58d9837ab450b247e3977fb154314c30c656ca8244127bc9311"
+        "finalDigest" : "dcc1ac7804f8ba34dd731e9a2e93ae6e980777d5b6db5b426f4a3761ec61bf1f",
+        "initialDigest" : "f98652ff80573ce5a46dab452478270dbc7057ee508993771b064119f26c8fa7"
       },
       "name" : "acceptance-036",
       "seed" : "67"
@@ -1617,8 +1739,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "98c8f9a45c9d1cb36da9194291198a395afa52882561803644cd3cc78f2f97f6",
-        "initialDigest" : "3c5e782068e44efd6ea7747d7c297aa3ec07fa67682ffb3ea553f878a60bc841"
+        "finalDigest" : "e8c9aa5f4f2da924ab9d320db20cc4fe469e030995d57c5a319ac438b518d096",
+        "initialDigest" : "7b13d2ae486768034248c4e9b98ad306afb941fe96979083194ca4aadf4cef20"
       },
       "name" : "acceptance-037",
       "seed" : "74"
@@ -1647,8 +1769,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "cf43af8b1b8aae721067960007fc187a2c54759b3a617108ef152694a1a1049b",
-        "initialDigest" : "517b16b3f308981319b29875b63c38dab5d1b6e5ced3579990aadc21e7fb52d1"
+        "finalDigest" : "e8c0467502d53d8e2f3c99808ad88f3fe8561f30cbd2614eb4ffca3d3ece6a9b",
+        "initialDigest" : "48b052ec5c7cf38137f8d98be19dfa4731c660add221d26677f63f9d79b0b87c"
       },
       "name" : "acceptance-038",
       "seed" : "81"
@@ -1677,8 +1799,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "29e8e8db8f43ab0e04a0bf2a2d45c07eed16e8fdee7c33797b334cd8290c33ae",
-        "initialDigest" : "d9800623ae78dbb302e23f9abead88ad64b2ff28dce8b90fb336a8f1f086f5d4"
+        "finalDigest" : "ea62dd7f1116a5d80e825bef36b5d5494f94577ea89bdc1522791f39a8a69281",
+        "initialDigest" : "a8d2b7acf8ed71ea9499d41f9e699b835edb2547e47dd900045eb8d816d99c9b"
       },
       "name" : "acceptance-039",
       "seed" : "88"
@@ -1707,8 +1829,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "e8eaa5cd9a64def50bf279e362f0cd6162659512f8dc9535acd8f2f9bfb8d208",
-        "initialDigest" : "cf0637ad62cafb2c53c59f98820e7e11e40292714cf6d228e4dd63f6e659db8d"
+        "finalDigest" : "10ecbea47e852305744f1395f6928c7dd11002ba7c3d3f883f384c600d0d45b4",
+        "initialDigest" : "f1a548885eef1969fe1efd6b8fae6aaaf264830fa0b7b77465d0ca04965ad59c"
       },
       "name" : "acceptance-040",
       "seed" : "95"
@@ -1737,8 +1859,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "8e8231d91ee9bf1a1b3302babababb2fc49243bf72ebf0c4e148c6ebdccab2c8",
-        "initialDigest" : "dca8a38528d99617684ca60d3fcac695422fb64a46f97dc6d05ad8872048f08e"
+        "finalDigest" : "1b49aa2e5083f8b13c95f31f2f639c1ab86e9ecae861c5600925a4a8e517c092",
+        "initialDigest" : "11e6496f4dd355e3220c64f50d06e7ff6302370c2ed68b760aa397ddd69b7789"
       },
       "name" : "acceptance-041",
       "seed" : "2"
@@ -1767,8 +1889,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "af6a5400c08bb66b9672867ba8bb96d813cac9b998e1dcf78566f27836b3a0e3",
-        "initialDigest" : "fe51a9c64f016c617259337fc2e9139f4a6c2d7bc9a1758244bb5fd3e0b36899"
+        "finalDigest" : "e3a7914db19227257e46f4672a0205871b3012053ef20fb8779c5b03931aed69",
+        "initialDigest" : "18db739c7ac307a8c1a3e5c99a2876d056aa0dc7023aeefdb915e30f53981053"
       },
       "name" : "acceptance-042",
       "seed" : "9"
@@ -1797,8 +1919,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "259054cc00b357b5a179a6d7870054e4edabe3f2b1d3e2bee4cd459498f8f3f2",
-        "initialDigest" : "faa07b911e022b23b55ea557103762479ffbf93080a83115d356736d9ad986f4"
+        "finalDigest" : "4ed96ba766c187958c7b8f77d48a0cf61e312c2fd3e4b37135c309364185cd6e",
+        "initialDigest" : "6d076e7c47a1d2639859461a7aafe988947b1d562c551640a49eff73cfa8e623"
       },
       "name" : "acceptance-043",
       "seed" : "16"
@@ -1827,8 +1949,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "5d75e55f5de24aa998617778c66e14451b3e2ff307f9dfc6b0002832a9952af5",
-        "initialDigest" : "5d79f86083e90d8c87a0a24753d0ce65c1a2562acb6baf8085f49f9c3b00d3b7"
+        "finalDigest" : "948e18b272f854587827ab7a49c23cf97493fc99cc3c0b167072eb93f3bc6826",
+        "initialDigest" : "6d1d7fad5d152175f01fd931f96ce6e6d4778beffa7b0eebfec76c634a9d6ac6"
       },
       "name" : "acceptance-044",
       "seed" : "23"
@@ -1857,8 +1979,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "e6b6eae3b0d0064486eccdbbdbf74db51c5c0da781071adaaf596e1870e363a1",
-        "initialDigest" : "50a857fa04c601bb0d6466bd50c8e3b81485a9527a01099df7597db6c497967e"
+        "finalDigest" : "8715ebbcd867df26d4c3ecdad968d0f69d6d9b9b551b60ef67b10cd748b7be5d",
+        "initialDigest" : "0930f5a37a2b6be41429d80bb3a7e3944e23c862b9bd8bbcc9de8eeef6dd72dd"
       },
       "name" : "acceptance-045",
       "seed" : "30"
@@ -1887,8 +2009,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "a248ba425b6666bbf9cb31c00307f77dffe37427202c549736c3d5a418c09fc2",
-        "initialDigest" : "dbe1813b6a3b72c7011eb55f51dfae1e79e62069d2963ebc6494422f378932b0"
+        "finalDigest" : "d3d6395406fd6487307fddff65a9f4d68a4f6ce4b22e258d9c693cdd45455e72",
+        "initialDigest" : "c544f5ce23d612113af4673db2dea49d00850523c56279a0dd8030073ab016f3"
       },
       "name" : "acceptance-046",
       "seed" : "37"
@@ -1917,8 +2039,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "bb515bf6983766f0fa4b611f7956f2698cff99e1fc07846f4919a370bb34d78b",
-        "initialDigest" : "bcdc589537e6e2f9819eb643ff4b6e3ec3d2391de636b9d1369cceab175eb4f8"
+        "finalDigest" : "d203e23a1adcb4a2075f1efc348599dc3e05402e0a4644006be838aa2b262f97",
+        "initialDigest" : "e51e7ae20839fdb1800738730c5a4795d9600355cdbf6cb04028ad5e1319a703"
       },
       "name" : "acceptance-047",
       "seed" : "44"
@@ -1947,8 +2069,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "ac27e29770a8ec51003375b3e0c4d3872495bc992d292dbacc93365358dabf04",
-        "initialDigest" : "c29082b7588985ca5290395cd17281f91345a49d911f271aafe5b4a86df70d35"
+        "finalDigest" : "f94c5fef046e1742fd17aaf205a44c2d3ab2fe1592af23fe63c95975ae803378",
+        "initialDigest" : "6b5889734d6bad49630bfd6bb25635f909621a9ad523d1643c6e25a5bd6a556d"
       },
       "name" : "acceptance-048",
       "seed" : "51"
@@ -1977,8 +2099,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "3b4ce57a15df0d801fa4ce3d66c0635d8a715f022afaa7237a4f0fa71a6f73d3",
-        "initialDigest" : "fbe196d6a7787f0eb05e76c624d7365a4689a56114d2d345afc9c3fc5e230891"
+        "finalDigest" : "bca19485a1056a2f6fce0377ae90b1b3d6ee1e6f46d957de2814337d328afac2",
+        "initialDigest" : "ec19d40f7e400a3fcbde64bfe83f087cace22640355eb7908384d3196f6d5b8c"
       },
       "name" : "acceptance-049",
       "seed" : "58"
@@ -2007,8 +2129,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "a6993a353068a194a739ba19b127a7413ef015bccf078af47bdce36a11f3babb",
-        "initialDigest" : "2d30a46271f1629cceabc5bf4441d361c2f28336a7f673be38728185bddf8f23"
+        "finalDigest" : "5c7b596ad7ba33f02e3e8edc959cf2910ad4c47ca8a9a365a9bf91a645fc2aa6",
+        "initialDigest" : "e2aa032c61805590aa33ab535a9a181c0e88b53545351e6ebe4e778e56b9ed34"
       },
       "name" : "acceptance-050",
       "seed" : "65"
@@ -2037,8 +2159,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "f6e8c3ab287910b45b4e2eb351db1e5da678654f69b811a4d465981ea72c475c",
-        "initialDigest" : "c80d9ae1ccef3d6aaef7c0c391f25cd53ad036593a3564aea18d89e41f2abd0a"
+        "finalDigest" : "07a01840fa9d94be6402a6762d7894050737e46567208751396febf8529d84ff",
+        "initialDigest" : "84fdcf6469f97121851cbfeef4a12410fa1c996622402d9fa580e04abbf432aa"
       },
       "name" : "acceptance-051",
       "seed" : "72"
@@ -2067,8 +2189,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "52dfca649b9f6ddcd46f2001d263ced43950b2072fdf1a7a0d9b3c888f47f454",
-        "initialDigest" : "2653af03eb242418533b65e5bdb607edf76f7a32b597f7c369971bb935c8705f"
+        "finalDigest" : "63ace6ad6ce30422e93fd97eff625af70e9aee31c33af356c4239afac82690c4",
+        "initialDigest" : "c40522534fb46935473e6785eef8513307b2df31a92e3c2bcbdf0868299a7b5e"
       },
       "name" : "acceptance-052",
       "seed" : "79"
@@ -2097,8 +2219,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "c3ad3fa43753b1dd3d00c86bd6a70347cec31ffec7762909e048303c42c97732",
-        "initialDigest" : "6456d7d0328be031ab8ccf0cb7b9e80eea1bef5b8c36bdefa9ee7acfce92c25a"
+        "finalDigest" : "8df5fb9d1c8b5de9d3e75a6b0cfae0b77077b342e6b8f82505de335dbb143687",
+        "initialDigest" : "7676fbe251d350cb958e09c990a2c05c82689d301a1e1231fc695d20b35729c8"
       },
       "name" : "acceptance-053",
       "seed" : "86"
@@ -2127,8 +2249,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "13dc1d148834d6fc2d5f6d6ff2721f812662d80fd7587681aa5dc00e70371ee4",
-        "initialDigest" : "be6b2f03b7970bdfdc1a937a815045c1d79b7639299ad8becfa0878f9b4e85b7"
+        "finalDigest" : "29e60af0bb29a65557ac5512ec111b8fda5fc28371437a8c506b957d33447bd3",
+        "initialDigest" : "56b737a9910dfe7e60be0e07b5b861599dbbbaf6a0fab005a6961d0d44d9db95"
       },
       "name" : "acceptance-054",
       "seed" : "93"
@@ -2157,8 +2279,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "9bf0b3392ff2bf9dcd574b0e955b5a5c3bcf8465e54b4cc0a2b3f01390a2838d",
-        "initialDigest" : "4ca0d1899ef8a997b0314afb0431d648b98ac91e5c7fc64b4e88639070895625"
+        "finalDigest" : "9c5a22e54e4dfa5ed48060807e5278e0ca56ccb15cbe763777e2629c74922592",
+        "initialDigest" : "2c5ac2c61f434a45827dd9478c9813951af99739cd0c60bc3840a0f78198776f"
       },
       "name" : "acceptance-055",
       "seed" : "0"
@@ -2187,8 +2309,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "8cf5c6f965f33380a840d03e776541b223b67732d761b369ca183e540e4af537",
-        "initialDigest" : "925861a7dcc51b8b2a3772de2b97e788fedbc93b3f304bcdb4b58e5ed4f27d8f"
+        "finalDigest" : "42e3f10b7c4127876e6c93112773b3f624ff60f613c7ae57e8a69d3406a2288d",
+        "initialDigest" : "353cd95415674a646396bce92ea3c7d0cb8fe63fbaa63984bc3ddb0d7a9a1bb3"
       },
       "name" : "acceptance-056",
       "seed" : "7"
@@ -2217,8 +2339,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "93e2baba9956dcaec800f68c5cd2648c33d8c2ed5dfd57a470b7429fcea42218",
-        "initialDigest" : "46813524b945f3cf21261a696a62573ceeaa590d14ae49832894ad8a342ad71a"
+        "finalDigest" : "409887a1d4ceb4d369e68628826c219b20dd9ab6e13c8b1f3d79fe8741dee791",
+        "initialDigest" : "e1bfc5a2007d086c86f48acefda088f60a9d681d40f74ad328568870a3ee97e0"
       },
       "name" : "acceptance-057",
       "seed" : "14"
@@ -2247,8 +2369,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "82f25169ad772b8bdb71d657df09609e11272acc9f819c550ff460ede93f9c5d",
-        "initialDigest" : "febcd55df05e7f5f1c22f7c6f6f7233517dd91b8495751522ae323f2d59c3ac6"
+        "finalDigest" : "0843aad21ffc6b55788c1fc0a9bc6b589b05783bf6f88f87d239a2d5332aeaa4",
+        "initialDigest" : "cb4d55333ba127b6b7363ce4cf32cf092b3fca276795775e2307dfa14328421a"
       },
       "name" : "acceptance-058",
       "seed" : "21"
@@ -2277,8 +2399,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "000303f1fc6d9c6c81890943ea78cf7f18b9d65fc62ae91b353f4ae6d1d1ca9a",
-        "initialDigest" : "526b4c65f755fd25601c82e8d1c03b4a2f1dfb57db5139d9b1190c82469ed146"
+        "finalDigest" : "d21a424c4f419915cb6bbc2e8073a5971359c55df587338d28c9d55395938a54",
+        "initialDigest" : "b2fe12ad3b1d337662eef642ded8f102b7bbfbce7e895d29bc7d17e6efcf7db4"
       },
       "name" : "acceptance-059",
       "seed" : "28"
@@ -2307,8 +2429,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "8c571bb24858421856f55829350a52aacc038b425cbd55d703b9f38ab36f9d87",
-        "initialDigest" : "6a57ac15e2567d4248ddd6c9f1f2e9f1706c74e4c5c3a17b459d2b286b3fb8e8"
+        "finalDigest" : "f26e905fb4c64e59c8b7200967d342c226e0c5718d32756ed7d51f1dfc48b15a",
+        "initialDigest" : "8563ca0e24efa2a2126a23fbfbbb4357ae32fd66a7df9d2aa7d89517b85f5044"
       },
       "name" : "acceptance-060",
       "seed" : "35"
@@ -2337,8 +2459,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "f9e700dee3041f53bb897bda5629ec114461ec9e6d74d3ed70a4a7b1f8627eec",
-        "initialDigest" : "cc269d1506d65e3984bbe2433559fce42f9b17566c44ec1901fc2301c8e1758e"
+        "finalDigest" : "09539d9a5274eb7ade80d0dcbb37876ccf555bd0658efbc89e31364aced0c0b7",
+        "initialDigest" : "3e339a0b452ca8e41369213dc143361b9668c7ac4d711434e9387629d37c2795"
       },
       "name" : "acceptance-061",
       "seed" : "42"
@@ -2367,8 +2489,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "731e46ef48bc50773e85d3c75b0466ee4ed3971d5d60dd6ea30eed6e04813881",
-        "initialDigest" : "c2c3ca2a99faef90a773e9eeb5a4695e9484477ee3eeb7a4ec948e687b4d10bc"
+        "finalDigest" : "a83295b8e926ecac7ced128eea65d5dbec2834d7ccb9c208badbd4c23fd8673c",
+        "initialDigest" : "1806450afc2e385e741a28de650d902e54389299d508ff13d86566fdd33b99da"
       },
       "name" : "acceptance-062",
       "seed" : "49"
@@ -2397,8 +2519,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "b74de565f24c2b3acb6d694a14eda5da9e33bd8ffac2f2cd6af033ddac4abc23",
-        "initialDigest" : "21af67e9a14111d52fe9512916bca1f1db2495fb39977d52d86c504d47fa8d76"
+        "finalDigest" : "99ddb47043171bf56fd51f56a2ac82683ca82b728df9ec68009bc93b7e996f80",
+        "initialDigest" : "7ab853281ef7e609344c48a25b5cfb1911abe2873561b6e1ab1847731430b162"
       },
       "name" : "acceptance-063",
       "seed" : "56"
@@ -2427,8 +2549,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "f7b9333c02b49f60a65a3f41320dfe08fbe96e68e5491a0293991520d672246a",
-        "initialDigest" : "3fb9826f1d7c478a2ea569f2a2e34cb159978d425f88f7b070b8552947c2a019"
+        "finalDigest" : "ec7ba4478223a2e907216b23d258995fd59f57a7f89d09b2841aefb0f05d8288",
+        "initialDigest" : "7b83d034ca614a40896314f34afe6774ff6b69ad0b5f32e207fa7a9a037e2293"
       },
       "name" : "acceptance-064",
       "seed" : "63"
@@ -2457,8 +2579,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "1b0a72889185a6367fe3ad1f4a8a7aa97ef4c6fa0ced2dc36fd064026472dc67",
-        "initialDigest" : "8e2608769e261eca54e3a10a27ee41c04d81b0a043274043cef0d8886259e398"
+        "finalDigest" : "1b79a91ce2396854b4df74252f565217c9c257dd2735bea393c6e0f002b5d929",
+        "initialDigest" : "131c10583c3f7e09b1d4eba0d653d4eb02bfa532b2b133c0d1cc0fc6756a4eb5"
       },
       "name" : "acceptance-065",
       "seed" : "70"
@@ -2487,8 +2609,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "cd2a2506bb78505cf20c470cbb667c0e9520f6e2475439897a776d7162c7442a",
-        "initialDigest" : "44fc5c6cc4bf7a2fbf48867871880dae9229a216babab787a284a0918824d561"
+        "finalDigest" : "4f87a44b22d765aeff49fc28138828ad9111f224168e8bec11bef978bea15a3d",
+        "initialDigest" : "7700805c22e1315fcd456520dde437e98432e25c2c8dfe8e25b9348dd53f644d"
       },
       "name" : "acceptance-066",
       "seed" : "77"
@@ -2517,8 +2639,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "7a80d7f5dcfd006be07980a6c694b9ffbec0cdcf00762aad269e7b60b40867a7",
-        "initialDigest" : "416dacb10ffc09dfc0d152780053da62edd587aea7ec5fec74e9c2261994fac6"
+        "finalDigest" : "095def8b0dc1b18b7a1726ebfe11b64afe467fa631875632e5b594dd105f6508",
+        "initialDigest" : "78e295eb580b0c6c764ddb52547495548ed54d45e9b23cc3e3a5f145e4c25a7b"
       },
       "name" : "acceptance-067",
       "seed" : "84"
@@ -2547,8 +2669,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "02ccb134f96b60967dad7cf096a8584124bdc6f4c8fc156ae6a240736883abb3",
-        "initialDigest" : "1f3ceba89d9d224887aacfd3f60c2fbcade3201b10834ca146f6dd48807b2f59"
+        "finalDigest" : "5e135583b2d3e6b2ff245ac33d762f396068a907a49c54d0cc15965e7f3916a3",
+        "initialDigest" : "d61a8c85b3c63818487fbdff2a39837e9352e4af2e82c582a2de23eb9b7c59b5"
       },
       "name" : "acceptance-068",
       "seed" : "91"
@@ -2577,8 +2699,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "d093ab893ed6f16ff003f3eb84da43e4cabfe974752cab835f13a5505605feff",
-        "initialDigest" : "f1e2e301cf7e9ff6bb442d39101b811a50408970d9f310d4cffe86fc6a319968"
+        "finalDigest" : "d4716d3fc0b0d2c58fe974487607c5caeaeb74811b2151e206c93d11ac4a7576",
+        "initialDigest" : "45d9975844c9e1bdb4286c21ca2410eb4b1f50297ea0d6d3f13af94b97f5ce18"
       },
       "name" : "acceptance-069",
       "seed" : "98"
@@ -2607,8 +2729,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "14f84b4a7aaf20f7d5f15c33060aadf951af6854c5a77a0f0549d62c982bef2e",
-        "initialDigest" : "75c1cc8ff137d6da1e010e1b09c3a5816fdf2d360dfb8225085f33a65df73479"
+        "finalDigest" : "d73219cf838e85122abdcd31a35d5abe969f01c282a67c932cdb0e9f21427e28",
+        "initialDigest" : "ee46249b9bcb4999c5a79da68ece2d7214948484f822f54524a775b14b41d6ba"
       },
       "name" : "acceptance-070",
       "seed" : "5"
@@ -2637,8 +2759,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "9d3caaf53b5350f09031bd2ab95f8729e5b8e74035de83888cce76c7dcbe3fe3",
-        "initialDigest" : "9f070c6af1f1d4e04a36d2df59517dbe64e3522d7a4a933b16a0af71c68693f5"
+        "finalDigest" : "d6a6d443fd264e592204524b0f171840f625dbc645129f2d74e67d805d9af6d7",
+        "initialDigest" : "f21f3d2eaa76e2538a6519d4fb8c676c7d6b4bd32ba031aa2f947dabdee40b5e"
       },
       "name" : "acceptance-071",
       "seed" : "12"
@@ -2667,8 +2789,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "4088ae855cb14cb3d5daaa8e0d31f62d162bf4518e7f805ffcbaebf634d5183d",
-        "initialDigest" : "36206ae800eb5631aa1e9eb1bccdd5a4e5227af4d3dd95a15f415bb539f852fc"
+        "finalDigest" : "559045d557a6475f1a4ab9fafa70dd6036b8cf8041af8476a78e09869d4655e8",
+        "initialDigest" : "ca6a47a224f93810d71e59daef45c0fb7465696898543c40bb29ff96cc842099"
       },
       "name" : "acceptance-072",
       "seed" : "19"
@@ -2697,8 +2819,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "7391dc6dcf370da94f1fa8bdb4f9643b2f5b96d3463f9bd2caf932f9345781ae",
-        "initialDigest" : "f9954c67bf86bcb70bb6a08b87d265512877d94e8eeade532d643a241ab0fa3b"
+        "finalDigest" : "9b3cef858788daa414700ba4be5d270c88e853077ec0edca7a9dd3b408d70033",
+        "initialDigest" : "9943f693a12f8b7fa1add01cc3434d590616a07cfa6bbfc1fdd9771d66fa9386"
       },
       "name" : "acceptance-073",
       "seed" : "26"
@@ -2727,8 +2849,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "0dd3f164238baecd9cd36bc5ba7d27ee0e31f6eef6706e781561da810e97a3b5",
-        "initialDigest" : "e25058eb16f197b505fb1a8bd3eb3512cc5e831a350ebebd9c09df179f968168"
+        "finalDigest" : "8154760f7febca4f696c2ab324e0efdd587525d23f22141f0bd45d492a9f3ddb",
+        "initialDigest" : "80a86ba9041caf4c1a0f6783fc94f21328cce798e9f3117cdca26bcfaa96b954"
       },
       "name" : "acceptance-074",
       "seed" : "33"
@@ -2757,8 +2879,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "85f94e11e872918d0c03be75ad4f0ac5e417466025f3ff1c6d724ba8b59581c2",
-        "initialDigest" : "061a43c44d2f88c99c980f98bea53ed15704acb2653c382633933293955e725d"
+        "finalDigest" : "29a45c5cd94986247ec11195d44ea7681daa0ef4a48b900cfb788009ff78a69e",
+        "initialDigest" : "4a40198f4d9fd1688ac96c19f2449194886c62e611b91fe60c08a670d0d67057"
       },
       "name" : "acceptance-075",
       "seed" : "40"
@@ -2787,8 +2909,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "338ff1625b894d84c09420351decf3b4d0e002caec79250eab726dbe89f0bf28",
-        "initialDigest" : "40c705cf28fba76dad305d94963ea1fb0c5e18b96fb6097dcd79c17ad1d61918"
+        "finalDigest" : "cda7bd3feb4c89ef9997fd50719970e9954523e466e25a60b6cc521c986e8282",
+        "initialDigest" : "2df4bca3d46daa82f0465f10c71d969dd20fc0b33d88cdb53f8b0f54c97cb7df"
       },
       "name" : "acceptance-076",
       "seed" : "47"
@@ -2817,8 +2939,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "8a1195a73491827f7806797f1283a678a18b15c0521c9384d3538682f65739cb",
-        "initialDigest" : "b372835ec3bd2397297fff4c2a23ab983df1d828109cbee644f0807c1e359796"
+        "finalDigest" : "a8efeaba17cd6e570caae76460183ba6833872234c3bc54c98c578e7dc8658e4",
+        "initialDigest" : "fe975fc026156dfb62b4bb2dbf7f19407a12ec67c3b1de58ab8fc0a5fd33f7dd"
       },
       "name" : "acceptance-077",
       "seed" : "54"
@@ -2847,8 +2969,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "50febcede64b4ca8d046a8485da635f0d0c5bd3af4150f0effcd4b7c4d000185",
-        "initialDigest" : "f1961ef09ec4fbc0801e0166ae60923ce023141f19010ec0f45a9820b2599b82"
+        "finalDigest" : "9b72f28a712a44083322d0ee03c7824d5f06b5527e28306c12fe9fab42a1c0ff",
+        "initialDigest" : "d1329b4ef198b4fc23c05763e36bfcc91006d610ce048c53e47706cf82507de5"
       },
       "name" : "acceptance-078",
       "seed" : "61"
@@ -2877,8 +2999,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "d338ef4f5f80c1d6f9db8624c23095886d813443383a5e9fc7925426adb16e14",
-        "initialDigest" : "6d56b5db09df6e0304a5c83a4f0caf0ceb26445e1615ff11621de7043bce396d"
+        "finalDigest" : "d38e778f047d4b3138f2108a850ace994bbc1d68a224890461522c4767f899e1",
+        "initialDigest" : "9cfc9572d46f4f2ffe9e2a1cce7dc089fc7d1a14786b6b7d0ceee35cf7e4bc68"
       },
       "name" : "acceptance-079",
       "seed" : "68"
@@ -2907,8 +3029,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "7e676f90983c5b8147acfe8cce0fa1f45170ad043310ec27f4512475fa2877c3",
-        "initialDigest" : "c77e1b61aab5d4cfbfd570aa047dcb586e8ac00c61ad5a03df5fa65fb6eff7ef"
+        "finalDigest" : "b8d80b97a241b4d5322546110cb3b20054245e41db8be4f76fa39e5eb3610b91",
+        "initialDigest" : "6f8d460146a94474e37d737168b30bad278af63ab6191f9dd2a22dbc5e61a464"
       },
       "name" : "acceptance-080",
       "seed" : "75"
@@ -2947,8 +3069,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "ea2c8032ba094f112c0b387827fc685a7cbe648fb83d0d6faa7ef60ea7e27788",
-        "initialDigest" : "4ca0d1899ef8a997b0314afb0431d648b98ac91e5c7fc64b4e88639070895625",
+        "finalDigest" : "8effffcf95591e7abb868034de2a61b43818d36fffb3bb82d506582242836bb2",
+        "initialDigest" : "2c5ac2c61f434a45827dd9478c9813951af99739cd0c60bc3840a0f78198776f",
         "outcome" : "won"
       },
       "name" : "fixture-level-1-solved",
@@ -2968,8 +3090,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "1e9d8ad4a19db56523970483dc0586245e1d1c7d8ad685bf1d945ced4104f96f",
-        "initialDigest" : "4ca0d1899ef8a997b0314afb0431d648b98ac91e5c7fc64b4e88639070895625",
+        "finalDigest" : "b16934bee28ffeec5846788e47fc8006234aba84928fcac38c2fbd03e53fc61c",
+        "initialDigest" : "2c5ac2c61f434a45827dd9478c9813951af99739cd0c60bc3840a0f78198776f",
         "outcome" : "failed"
       },
       "name" : "fixture-time-out",
@@ -3009,8 +3131,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "152cc36dd8282a091615eb46741ee01ece896109b761bd38b966ddf4a7506b83",
-        "initialDigest" : "4ca0d1899ef8a997b0314afb0431d648b98ac91e5c7fc64b4e88639070895625"
+        "finalDigest" : "10324b8fce219e1ee2e9a047ff4c885497e274334fd94d7d57753d43af2063bd",
+        "initialDigest" : "2c5ac2c61f434a45827dd9478c9813951af99739cd0c60bc3840a0f78198776f"
       },
       "name" : "fixture-undo-redo",
       "seed" : "0"

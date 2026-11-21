@@ -317,17 +317,29 @@ private func expectedExplanation(_ play: ColorfallCanyonsPlay)
         return (problems, planned, stuck)
     }
 
-    /// SC-R02G0505-002: seeded states 0 … 49.
-    @Test func seededStates0To49() throws { #expect(try checkSamples(0..<50).problems == []) }
+    /// SC-R02G0505-002: seeded states 0 … 24.
+    @Test func seededStates0To24() throws { #expect(try checkSamples(0..<25).problems == []) }
 
-    /// SC-R02G0505-002: seeded states 50 … 99.
-    @Test func seededStates50To99() throws { #expect(try checkSamples(50..<100).problems == []) }
+    /// SC-R02G0505-002: seeded states 25 … 49.
+    @Test func seededStates25To49() throws { #expect(try checkSamples(25..<50).problems == []) }
 
-    /// SC-R02G0505-002: seeded states 100 … 149.
-    @Test func seededStates100To149() throws { #expect(try checkSamples(100..<150).problems == []) }
+    /// SC-R02G0505-002: seeded states 50 … 74.
+    @Test func seededStates50To74() throws { #expect(try checkSamples(50..<75).problems == []) }
 
-    /// SC-R02G0505-002: seeded states 150 … 199.
-    @Test func seededStates150To199() throws { #expect(try checkSamples(150..<200).problems == []) }
+    /// SC-R02G0505-002: seeded states 75 … 99.
+    @Test func seededStates75To99() throws { #expect(try checkSamples(75..<100).problems == []) }
+
+    /// SC-R02G0505-002: seeded states 100 … 124.
+    @Test func seededStates100To124() throws { #expect(try checkSamples(100..<125).problems == []) }
+
+    /// SC-R02G0505-002: seeded states 125 … 149.
+    @Test func seededStates125To149() throws { #expect(try checkSamples(125..<150).problems == []) }
+
+    /// SC-R02G0505-002: seeded states 150 … 174.
+    @Test func seededStates150To174() throws { #expect(try checkSamples(150..<175).problems == []) }
+
+    /// SC-R02G0505-002: seeded states 175 … 199.
+    @Test func seededStates175To199() throws { #expect(try checkSamples(175..<200).problems == []) }
 
     /// The sample holds 200 states, some of them paused, so the paused branch is exercised too.
     @Test func seededSampleHoldsPausedStates() throws {

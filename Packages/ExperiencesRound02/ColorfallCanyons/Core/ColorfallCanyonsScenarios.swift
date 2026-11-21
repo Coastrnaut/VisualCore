@@ -19,6 +19,10 @@
 // (the first of that level's certified witness actions) and then one illegal action — a step of 601 ticks, refused as
 // out of range, on odd rows; a step of 0 ticks, also out of range, on even rows. The expected digests are derived by
 // playing the entries on a core exactly as the engine plays them.
+// Feature 345 (R02-G05-05): rejection also refuses a locked `level.select`, a level beyond 100, an impossible
+// `mode.daily` date, `level.next` with no next open level (`level.next` now moves to the next open level; each
+// full-playthrough win opens the next one) and wrong value counts of `mode.daily`, `mode.practice`, `mode.campaign` and
+// `tutorial.dismiss`.
 #if DEBUG || VISUALCORE_AUTOMATION
 import Foundation
 import VisualCoreExperience
@@ -155,6 +159,18 @@ extension ColorfallCanyonsExperienceCore {
             refusedEntry("time.step", [1, 2], wrongCount),
             refusedEntry("play.undo", [1], wrongCount),
             refusedEntry("level.next", [1], wrongCount),
+            // Feature 345: a locked level, an impossible date, no next open level and wrong value counts.
+            refusedEntry("level.select", [2], "action.rule." + ColorfallCanyonsExperienceRule.locked),
+            refusedEntry("level.select", [101], outOfRange),
+            refusedEntry("level.select", [1.5], notWhole),
+            refusedEntry("mode.daily", [2026, 2, 30], "action.rule." + ColorfallCanyonsExperienceRule.date),
+            refusedEntry("mode.daily", [2025, 2, 29], "action.rule." + ColorfallCanyonsExperienceRule.date),
+            refusedEntry("mode.daily", [2026, 13, 1], outOfRange),
+            refusedEntry("level.next", [], "action.rule." + ColorfallCanyonsExperienceRule.locked),
+            refusedEntry("mode.daily", [2026, 11], wrongCount),
+            refusedEntry("mode.practice", [1], wrongCount),
+            refusedEntry("mode.campaign", [1], wrongCount),
+            refusedEntry("tutorial.dismiss", [1], wrongCount),
         ]
         return entries
     }

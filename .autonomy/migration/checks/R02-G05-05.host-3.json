@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "ColorfallCanyonsExperienceCore|ColorfallCanyonsScenarios|ColorfallCanyonsRendererPurity|ColorfallCanyonsPanelWin|ColorfallCanyonsHints|ColorfallCanyonsProgress|ColorfallCanyonsGesture"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter 'ColorfallCanyonsExperienceCore|ColorfallCanyonsScenarios|ColorfallCanyonsRendererPurity|ColorfallCanyonsPanelWin|ColorfallCanyonsHints|ColorfallCanyonsProgress|ColorfallCanyonsGesture'",
+  "elapsed_seconds": 21.992,
+  "exit_code": 0,
+  "finished": "2026-11-21T22:30:18+00:00",
+  "gate": "R02-G05-05",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G05-05.host-3.log",
+  "log_sha256": "36f4ee7108e3376149681dd22677b9cdf1a53ed4a9c3370688d05a82a9b6de13",
+  "name": "host-3",
+  "started": "2026-11-21T22:29:56+00:00",
+  "timed_out": false
+}

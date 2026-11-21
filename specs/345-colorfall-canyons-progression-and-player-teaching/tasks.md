@@ -43,7 +43,7 @@ R02-G05-03 are unchanged).
 
 ## Phase 4: Adapter, scenarios and panel
 
-- [ ] T-R02G0505-004 [US1] [US2] [US3] [US4] Edit `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsExperienceCore.swift` (controls
+- [X] T-R02G0505-004 [US1] [US2] [US3] [US4] Edit `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsExperienceCore.swift` (controls — Verified 2026-11-21: 2026-11-21 host-3 exit 0: 85 tests in 7 suites (adapter schema 2 with 1 -> 2 migration, digest v2 with progress and mode, level.select/next/modes/tutorial.dismiss with r02-g05.locked/date, practice budget 30, daily without unlocking, wins record stars, scripted tutorial players win levels 1-3; scenario manifest regenerated; hint seeded tests split in 8) (.autonomy/migration/checks/R02-G05-05.host-3.json); lead retest
   "level.select [1 … 100], mode.daily [year, month, day], mode.practice, mode.campaign, tutorial.dismiss"; practice budget
   30; daily wins record results without opening levels and a locked daily level is playable; level.next to the next open
   level, refused when none; the tutorial on levels 1 … 3 in every mode; progress and mode in the digest, the tutorial step
