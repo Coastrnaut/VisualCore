@@ -10,7 +10,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 - [X] T-R02G0403-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test — Verified 2026-11-21: 2026-11-21 R02-G04-03.baseline-host/timing/round02 exit 0
   --package-path Packages/ExperiencesRound02`; the rendering baseline is R02-G04-02's rendering runs (exit 0)
-- [ ] T-R02G0403-002 Edit `Packages/ExperiencesRound02/Package.swift` (Core dependencies; `HueCompassExperience` and its
+- [X] T-R02G0403-002 Edit `Packages/ExperiencesRound02/Package.swift` (Core dependencies; `HueCompassExperience` and its — Verified 2026-11-21: 2026-11-21 host exit 0 (Core gains VisualCoreScenes, Experience, Diagnostics, Persistence; HueCompassSceneSnapshot with the target nil while playing, palette with the HSV band rule, glyphs, tiers 12/8/4 facets, 3/2/1 fog layers, 2/1/0 glow shells; the Experience target comes with T-006)
   tests with iOS-conditioned rendering dependencies; the product) and create `Packages/ExperiencesRound02/HueCompass/Core/HueCompassSceneSnapshot.swift`
   (snapshot with the target "nil while playing", `HueCompassTier` "facets 12/8/4, fog layers 3/2/1, glow shells 2/1/0,
   richest first", `HueCompassPalette` "night #05070F, pearl #E8E4DA, sapphire #2F6FD8, ember #E0703A; band(h) = hue
