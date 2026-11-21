@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "reference-engine-xcframework",
+    "reference-build-projectm-ios-sim",
+    "reference-clean"
+  ],
+  "command": "python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean",
+  "elapsed_seconds": 24.807,
+  "exit_code": 0,
+  "finished": "2026-11-21T11:37:56+00:00",
+  "gate": "R02-G03-04",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G03-04.reference-1.log",
+  "log_sha256": "fc55b33ccf01d3e270aa8713ae70d5f8e3584fd067c343f10ec84a32477a5c89",
+  "name": "reference-1",
+  "started": "2026-11-21T11:37:31+00:00",
+  "timed_out": false
+}
