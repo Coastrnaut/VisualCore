@@ -12,7 +12,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 2: Story 1 — every level stays solvable as certified (P1) 🎯
 
-- [ ] T-R02G0208-002 [P] [US1] Create `Packages/ExperiencesRound02/LissajousLabyrinth/CoreTests/LissajousLabyrinthRegressionSolverTests.swift` (agent A: for every
+- [X] T-R02G0208-002 [P] [US1] Create `Packages/ExperiencesRound02/LissajousLabyrinth/CoreTests/LissajousLabyrinthRegressionSolverTests.swift` (agent A: for every — Verified 2026-11-21: 2026-11-21 host exit 0: LissajousLabyrinthRegressionSolverTests 9/9 (five bands: each generated level equals its witness byte for byte, the witness replays to a win with its recorded fingerprints, solve gives exactly the certified shortest with matching actions, work at most 14,080 (largest recorded 3,609) and the recorded winning-setting count; twelve alterations of levels 7 and 86 each fail naming the level and the part). Spec SC-R02G0208-001 corrected from 3,840 to 14,080
   level in five bands of 20, "the generated level equals its witness's level; the witness replays to a win in exactly
   its recorded actions with its recorded fingerprints; solve returns exactly the certified shortest whose actions win,
   work ≤ 14,080 and the witness's winning-setting count"; twelve named alterations of clarification Q2 each fail naming
