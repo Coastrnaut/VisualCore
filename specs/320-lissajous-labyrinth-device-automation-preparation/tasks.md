@@ -25,7 +25,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
 
 ## Phase 3: Story 2 — a person can follow the plan (P2)
 
-- [ ] T-R02G0210-004 [P] [US2] Create `docs/apps/lissajous-labyrinth/device-campaign.md` (agent B, modelled on
+- [X] T-R02G0210-004 [P] [US2] Create `docs/apps/lissajous-labyrinth/device-campaign.md` (agent B, modelled on — Verified 2026-11-21: 2026-11-21 docs exit 0 (docs/apps/lissajous-labyrinth/device-campaign.md, the written twin of device-rows.json: devices and order, D3 on iPadOS 26.5, owner actions as BLOCKED_OWNER_ACTION, rows LL-D1 to LL-D8 pending, no number claimed)
   `docs/apps/aurora-loom/device-campaign.md`: devices and order, D3 on iPadOS 26.5, owner actions as
   BLOCKED_OWNER_ACTION, every row LL-D1 … LL-D8 with devices, procedure, pass condition and "pending device campaign",
   no number claimed, the stress session only in the device campaign); `--name docs -- python3 scripts/validate_docs.py`

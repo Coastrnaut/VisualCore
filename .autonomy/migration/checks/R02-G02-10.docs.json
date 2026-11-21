@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "scripts/validate_docs.py"
+  ],
+  "command": "python3 scripts/validate_docs.py",
+  "elapsed_seconds": 0.172,
+  "exit_code": 0,
+  "finished": "2026-11-21T09:23:19+00:00",
+  "gate": "R02-G02-10",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G02-10.docs.log",
+  "log_sha256": "5782ca262c34f37ed3e3ecaf57af5c10c9780b262288bc813d1003a7fedfe829",
+  "name": "docs",
+  "started": "2026-11-21T09:23:19+00:00",
+  "timed_out": false
+}
