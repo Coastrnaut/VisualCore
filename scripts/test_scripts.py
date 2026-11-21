@@ -1119,6 +1119,16 @@ class ReleaseCheckTests(unittest.TestCase):
         start = argv.index("--only-testing") + 1
         self.assertEqual(argv[start:start + 2], ["VisualCoreUITests/WKPlayUITests", "VisualCoreUITests/WKReplayUITests"])
 
+    def test_hue_compass_ui_chunk(self):
+        """Feature 339 R02-G04-09 (T-R02G0409-004): the serial chunk `m3` runs the Hue Compass interface journeys."""
+        self.assertEqual(relcheck.UI_CHUNKS["m3"], ["HCPlayUITests", "HCReplayUITests"])
+        self.assertIn("m3", relcheck.SERIAL_CHUNKS)
+        steps = {s.name: s.argv for s in relcheck.unified_app_steps("X")}
+        argv = steps["app-ui-ios27-m3"]
+        self.assertNotIn("--parallel", argv)
+        start = argv.index("--only-testing") + 1
+        self.assertEqual(argv[start:start + 2], ["VisualCoreUITests/HCPlayUITests", "VisualCoreUITests/HCReplayUITests"])
+
     def test_ui_chunk_keys_are_unique_in_source(self):
         """Feature 319 (T-R02G0209-004): a repeated key in the `UI_CHUNKS` literal would silently drop the earlier
         chunk's test classes, so the source literal is parsed and every key must appear once."""

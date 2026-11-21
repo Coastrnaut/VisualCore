@@ -29,7 +29,7 @@ tests stay short (< 10 s each; interface tests < 90 s, SC-R02G0409-001). No {own
   (agent E: every name of Q1 is listed once by the controls' identifier list and has the prefix); `--name sim-27 --
   python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package
   --destination sim-27.2 --action test`
-- [ ] T-R02G0409-004 [US1] Create `Apps/VisualCore/Tests/UI/HueCompass/HCSupport.swift`, `HCPlayUITests.swift`,
+- [X] T-R02G0409-004 [US1] Create `Apps/VisualCore/Tests/UI/HueCompass/HCSupport.swift`, `HCPlayUITests.swift`, — Verified 2026-11-21: 2026-11-21 app-ui-3 exit 0: HCPlayUITests (level 1 won with turn buttons, Probe, band stepper and Select: 3 of 3 stars, level 2 open; progress kept over a relaunch) and HCReplayUITests (Replay steps to the matching end, Stop returns to the campaign) in serial chunk m3, 63.8 s, 72.3 s and 60.5 s; earlier runs app-ui (96.7 s) and app-ui-2 (93.2 s) passed but exceeded the 90 s bound, fixed by revealing Step once and skipping the wait for present elements; test_hue_compass_ui_chunk passes
   `HCReplayUITests.swift` (agent C: spec Clarifications Q2; level 1 start bearing, target, band, allowance and witness actions pinned in `HC`; witness turns entered as presses of 4 then 1; background
   before terminate on relaunch); edit `scripts/release_check.py` (`UI_CHUNKS["m3"]`, `"m3"` in `SERIAL_CHUNKS`) and
   `scripts/test_scripts.py` (agent D; the key `m3` checked unique among the keys); `project.yml` + `xcodegen generate` if needed; `--name app-ui -- python3
