@@ -70,7 +70,7 @@ as schema 1; the core may not read a clock.
   level is presentation (held by the presenter); the snapshot payload becomes schema 2 (`{level, records, progress,
   mode, tutorial}`) with a migration from schema 1 (level 1 open plus the restored level, campaign mode, tutorial at its
   first step on tutorial levels). Failures are explained from the failing tick: contamination "Basin k (row r, column c)
-  took n units of <colour>; it allows at most m."; overflow "Basin k overflowed: v units, its capacity is c."; time "Time
+  took n units of wrong colour (<colours>, joined by "and"); it allows at most m."; overflow "Basin k overflowed: v units, its capacity is c."; time "Time
   ran out at tick T: basin k holds <amounts>; it needs <target>." (the first unfilled basin; amounts as "cyan a,
   coral b, yellow c", the target as the basin's description), each followed by "Undo the
   last change or retry the level." Impact: FR-R02G0505-003, 007; SC-R02G0505-003.

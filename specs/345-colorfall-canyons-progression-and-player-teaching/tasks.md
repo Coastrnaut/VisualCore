@@ -14,7 +14,7 @@ R02-G05-03 are unchanged).
 
 ## Phase 2: Stories 2 and 3 — hints and failure explanations (P1) 🎯
 
-- [ ] T-R02G0505-002 [P] [US2] [US3] Add `ColorfallCanyonsSolver.plan(_:from:budget:)` to
+- [X] T-R02G0505-002 [P] [US2] [US3] Add `ColorfallCanyonsSolver.plan(_:from:budget:)` to — Verified 2026-11-21: 2026-11-21 host exit 0: hints 18 + catalog 7 (pinned digest and witnesses unchanged) + solver 13 XCTest; exact hints win all 100 levels; 200 seeded states (111 with a plan won by hints, 89 stuck); 500 failures explained; plan from start equals solve (.autonomy/migration/checks/R02-G05-05.host.json); lead retest
   `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsSolver.swift` ("edit sets applied now, size 0 … min(budget, 3), in the
   solver's order with routing-key deduplication and reachability pruning from the current fluid; the returned set re-run
   through the kernel"; `solve(_:depth:)` results unchanged) and create
