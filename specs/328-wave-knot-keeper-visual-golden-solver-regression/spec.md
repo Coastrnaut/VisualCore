@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-21
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G03-08 (migration ledger, game feature of experience R02-G03) · ID namespace FR-R02G0308-###,
 SC-R02G0308-###, T-R02G0308-###
@@ -32,6 +32,59 @@ Canonical overrides:
   golden digest falls back to a one-quantum position comparison (system sine and cosine may differ in the last bit
   between macOS releases), the pinned descriptions are checked against their own digests, and a process-wide memory
   bound is applied only when its test class runs alone.
+
+## Clarifications
+
+### Session 2026-11-21
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+318's answers (and the amendments of feature 308) where the games agree. Facts checked in code (read-only audit,
+2026-11-21): `WaveKnotKeeperSolver.solve(_:from:depth:)` is a breadth-first search to depth 3 that counts the ropes it
+expands in `work` (at most 1 + 60 + 3,600 = 3,661 for the catalog's ropes of at most 10 points, which
+`WaveKnotKeeperSolverTests` already bounds); the 100 witness files (level, moves, fingerprints, terminal, near miss,
+crossing counterexample, difficulty, skipped) are byte-checked by `WaveKnotKeeperCatalogTests`; the simulator frame
+checks of feature 323 compare rendered frames with the CPU reference at 1,152 × 768 (control points and segment
+midpoints within 3 px of a pixel 0.15 brighter than night, handle centres pearl within 0.15, gate centres tinted towards
+sapphire, background within 0.05 of night); `ProcessMemory.footprint()` reads the process footprint;
+`WaveKnotKeeperRopeScene.release()` frees its renderers; the GitHub workflow's host job runs all round-two host tests
+and already has a named Lissajous Labyrinth regression step; `scripts/xcodebuild_package.py` runs simulator tests with
+`--only-testing`.
+
+- Q: What exactly does the solver regression check, and how is "within its work bound" measured? → A: for every one of
+  the 100 levels: the generated level equals its witness's level (fingerprint), the witness replays to a win in exactly
+  its recorded moves with the recorded fingerprints, and `solve` from the start returns a solution of exactly the
+  certified shortest length whose moves win, with `work` at most 3,661 and equal to the certified solution's work. Work
+  is counted, never timed. The run is split by band (20 levels per test). Impact: FR-R02G0308-001; SC-R02G0308-001.
+- Q: Which alterations must the regression detect and how is each named? → A: twelve kinds, each applied to a copy and
+  each producing a failure message naming the level and the part: a level's control point, gate, target crossings,
+  target writhe, tension bound, allowance; a solution move's point or direction; a witness's terminal, near miss,
+  crossing counterexample, recorded fingerprint; the level fingerprint. Impact: FR-R02G0308-002; SC-R02G0308-002.
+- Q: What is a golden frame description, where is its digest pinned, and how is it regenerated? → A: for each golden
+  frame (levels 1, 21, 41, 61, 81 at tiers 0, 1, 2 at presentation time 0, plus the hero frame of the scenario
+  manifest's hero scenario at tier 0: 16 frames) the Core computes, at 1,152 × 768 with the authored camera, the
+  projected pixel positions of every control point, every segment midpoint, every handle centre, every gate centre and
+  every drawn crossing point, rounded to 1/8 pixel, and the expected colours as 8-bit sRGB (night, pearl, sapphire,
+  ember); serialized as JSON with sorted keys and hashed with SHA-256. The 16 descriptions and their digests live in
+  `Packages/ExperiencesRound02/WaveKnotKeeper/golden-frames.json`; the host test recomputes each: an equal digest
+  passes; otherwise every position must lie within one 1/8-pixel quantum of the pinned one and every colour must be
+  equal, or the test fails naming the frame and the first differing value; each pinned digest must also equal the
+  digest of its pinned description. The file is rewritten only when `WAVE_KNOT_KEEPER_WRITE_GOLDEN=1` is set. The
+  simulator test renders the 16 frames and checks them against the same descriptions with the feature-323 tolerances.
+  Impact: FR-R02G0308-003, 004; SC-R02G0308-003.
+- Q: How is memory measured and what releases are checked? → A: on the simulator, 12 cycles of open (prepare a level),
+  draw 3 frames at tier 0, send a memory warning, draw 1 frame, close (teardown); the footprint is read with
+  `ProcessMemory.footprint()` after each cycle; the bound is that every reading of cycles 2 … 12 stays within 16 MB of
+  cycle 1's reading, applied only when the memory test class runs alone
+  (`TEST_RUNNER_WAVE_KNOT_KEEPER_MEMORY_ISOLATED=1`; in the full parallel suite the readings are only printed). After
+  each close and each memory warning the scene holds no renderers of its own (a test-visible count is 0) and the next
+  frame rebuilds them. An unavailable footprint fails the check with a named reason rather than passing. Impact:
+  FR-R02G0308-005; SC-R02G0308-004.
+- Q: How do CI and the local command report, and what do they run? → A: CI's host job keeps running all round-two host
+  tests and adds a named step that runs the Wave Knot Keeper regression filter alone. The local command
+  `python3 scripts/wave_knot_keeper_regression.py` runs the host regression filter and then the simulator regression
+  test classes through `xcodebuild_package.py --only-testing` (bounded by that runner's per-test time allowance), and
+  prints one summary line per part with pass or fail and the first failing name; its exit code is non-zero on any
+  failure. Nothing in either is timed against the wall clock. Impact: FR-R02G0308-006, 007; SC-R02G0308-005.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -67,7 +120,7 @@ within stated tolerances.
 **Acceptance Scenarios**:
 
 1. **Given** the golden set, **When** frames are rendered on the simulator, **Then** every frame matches its CPU
-   description (positions within 2 pixels, colours within 0.12 per channel, background within 0.05 of night).
+   description within the feature-323 tolerances (clarification Q3).
 2. **Given** a change to the scene geometry, palette or camera, **When** the regression runs, **Then** the pinned digest
    no longer matches and the regression fails until the baseline is regenerated on purpose.
 
