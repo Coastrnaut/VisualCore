@@ -10,6 +10,11 @@
 // cannot be undone, so no Undo there), the goal (units allowed, fewest probes), the mode (Campaign, Daily, Practice) and
 // a level picker of the open levels by band of 20 with their stars. The body is split into small sections so the type
 // checker stays fast. Every text is plain panel text read by VoiceOver.
+// Feature 336 (R02-G04-06) T-R02G0406-006 (FR-R02G0406-001, 005, 006; clarification Q5): every control carries a label
+// and a value, a summary element reads the bearing, band, units and last clue, the band stepper announces its pick,
+// button rows become columns at accessibility text sizes, texts wrap rather than truncate, the panel keeps a readable
+// width of at most 520 points (padding included), a Sound toggle (off by default) drives the ambient loop, refusals show
+// in words, and the panel tells the presenter when it is on screen.
 #if os(iOS)
 import HueCompassCore
 import SwiftUI
@@ -26,6 +31,11 @@ struct HueCompassControls: View {
     static let turns: [Int] = [-4, -1, 1, 4]
     /// The button titles of the turn buttons.
     static let turnTitles: [String] = ["−4", "−1", "+1", "+4"]
+
+    @Environment(\.dynamicTypeSize) private var typeSize
+
+    /// The widest the panel's content grows, padding included (clarification Q5).
+    static let readableWidth: CGFloat = 520
 
     /// The spoken name of a turn of `steps` bearings (positive: counter-clockwise, the kernel's angle direction).
     static func turnLabel(_ steps: Int) -> String {
@@ -48,64 +58,95 @@ struct HueCompassControls: View {
                 playRow
                 modeRow
                 levelMenu
+                soundToggle
             }
             .padding()
+            .frame(maxWidth: Self.readableWidth, alignment: .leading)
         }
+        .onAppear { presenter.controlsAppeared() }
+        .onDisappear { presenter.controlsDisappeared() }
+    }
+
+    /// A row of controls that becomes a column at accessibility text sizes (feature 336).
+    @ViewBuilder private func row(@ViewBuilder _ content: () -> some View) -> some View {
+        if typeSize.isAccessibilitySize {
+            VStack(alignment: .leading, spacing: 8) { content() }
+        } else {
+            HStack(spacing: 16) { content() }
+        }
+    }
+
+    /// The Sound toggle (feature 336; off by default).
+    @ViewBuilder private var soundToggle: some View {
+        Toggle("Sound", isOn: Binding(get: { mirror.soundOn }, set: { presenter.setSound(on: $0) }))
+            .accessibilityLabel("Ambient sound")
+            .accessibilityValue(mirror.soundOn ? "on" : "off")
+    }
+
+    /// The value of the play buttons: the level and the units spent.
+    static func progressValue(_ mirror: HueCompassMirror) -> String {
+        "Level \(mirror.levelNumber), units \(mirror.spent) of \(mirror.allowance)"
     }
 
     /// The level, units and bearing lines.
     @ViewBuilder private var header: some View {
         Text("Level \(mirror.levelNumber) · units \(mirror.spent) of \(mirror.allowance)")
             .font(.headline)
+            .fixedSize(horizontal: false, vertical: true)
         Text("Bearing \(mirror.bearing) · band \(mirror.bandUnderNeedle + 1) · clues \(mirror.clueCount)")
             .font(.subheadline)
+            .fixedSize(horizontal: false, vertical: true)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Compass")
+            .accessibilityValue(mirror.summary)
         if let message = mirror.message {
-            Text(message).font(.footnote)
+            Text(message).font(.footnote).fixedSize(horizontal: false, vertical: true)
         }
     }
 
     /// The goal line and the tutorial instruction with Dismiss (feature 335).
     @ViewBuilder private var teachingSection: some View {
-        Text(Self.goal(mirror)).font(.subheadline)
+        Text(Self.goal(mirror)).font(.subheadline).fixedSize(horizontal: false, vertical: true)
         if let instruction = mirror.instruction {
-            HStack(alignment: .firstTextBaseline, spacing: 12) {
-                Text(instruction).font(.callout)
-                Button("Dismiss") { presenter.dismissTutorial(port: port) }
-                    .accessibilityLabel("Dismiss the tutorial")
-            }
+            Text(instruction).font(.callout).fixedSize(horizontal: false, vertical: true)
+            Button("Dismiss") { presenter.dismissTutorial(port: port) }
+                .accessibilityLabel("Dismiss the tutorial")
+                .accessibilityValue("Level \(mirror.levelNumber)")
         }
     }
 
     /// The failure explanation with Retry (feature 335; probes and selections cannot be undone).
     @ViewBuilder private var failureSection: some View {
         if let failure = mirror.failureText {
-            Text(failure).font(.callout)
+            Text(failure).font(.callout).fixedSize(horizontal: false, vertical: true)
             Button("Retry") { presenter.retry(port: port) }
                 .accessibilityLabel("Retry the level")
+                .accessibilityValue("Level \(mirror.levelNumber)")
         }
     }
 
     /// The Hint button and the hint revealed so far (feature 335).
     @ViewBuilder private var hintRow: some View {
-        HStack(spacing: 12) {
-            Button("Hint") { presenter.showHint(port: port) }
-                .accessibilityLabel("Show a hint")
-                .accessibilityValue(mirror.hintLevel == 0 ? "none shown" : "level \(mirror.hintLevel) of 3")
-            if let hint = mirror.hintText { Text(hint).font(.callout) }
-        }
+        Button("Hint") { presenter.showHint(port: port) }
+            .accessibilityLabel("Show a hint")
+            .accessibilityValue(mirror.hintLevel == 0 ? "none shown" : "level \(mirror.hintLevel) of 3")
+        if let hint = mirror.hintText { Text(hint).font(.callout).fixedSize(horizontal: false, vertical: true) }
     }
 
     /// Campaign, Daily and Practice (feature 335).
     @ViewBuilder private var modeRow: some View {
-        HStack(spacing: 16) {
+        row {
             Button("Campaign") { send("mode.campaign") }
                 .accessibilityLabel("Play the campaign")
+                .accessibilityValue(mirror.mode == .campaign ? "playing" : "not playing")
                 .accessibilityAddTraits(mirror.mode == .campaign ? .isSelected : [])
             Button("Daily") { presenter.playDaily(port: port) }
                 .accessibilityLabel("Play today's daily level")
+                .accessibilityValue(Self.isDaily(mirror.mode) ? "playing" : "not playing")
                 .accessibilityAddTraits(Self.isDaily(mirror.mode) ? .isSelected : [])
             Button("Practice") { send("mode.practice") }
                 .accessibilityLabel("Practise this level with more units")
+                .accessibilityValue(mirror.mode == .practice ? "playing" : "not playing")
                 .accessibilityAddTraits(mirror.mode == .practice ? .isSelected : [])
         }
     }
@@ -126,6 +167,7 @@ struct HueCompassControls: View {
             }
         }
         .accessibilityLabel("Choose an open level")
+        .accessibilityValue("Level \(mirror.levelNumber); levels 1 to \(mirror.frontier) open")
     }
 
     /// The level numbers of band `band` (0 … 4): 20 band + 1 … 20 band + 20.
@@ -159,7 +201,7 @@ struct HueCompassControls: View {
 
     /// One button per turn step.
     @ViewBuilder private var turnRow: some View {
-        HStack(spacing: 12) {
+        row {
             ForEach(0..<Self.turns.count, id: \.self) { index in
                 Button(Self.turnTitles[index]) { send("compass.turn", [Double(Self.turns[index])]) }
                     .accessibilityLabel(Self.turnLabel(Self.turns[index]))
@@ -171,15 +213,16 @@ struct HueCompassControls: View {
     /// The band picker for the next selection: previous and next band.
     @ViewBuilder private var bandPicker: some View {
         Stepper("Band \(mirror.pickedBand + 1) of 24",
-                onIncrement: { mirror.pickedBand = (mirror.pickedBand + 1) % 24 },
-                onDecrement: { mirror.pickedBand = (mirror.pickedBand + 23) % 24 })
+                onIncrement: { presenter.pickBand((mirror.pickedBand + 1) % 24) },
+                onDecrement: { presenter.pickBand((mirror.pickedBand + 23) % 24) })
+            .fixedSize(horizontal: false, vertical: true)
             .accessibilityLabel("Hue band to select")
-            .accessibilityValue("Band \(mirror.pickedBand + 1) of 24")
+            .accessibilityValue("band \(mirror.pickedBand + 1) of 24")
     }
 
     /// Probe and select.
     @ViewBuilder private var probeRow: some View {
-        HStack(spacing: 16) {
+        row {
             Button("Probe") { send("compass.probe") }
                 .accessibilityLabel("Probe the bearing under the needle")
                 .accessibilityValue("Bearing \(mirror.bearing), \(mirror.allowance - mirror.spent) units left")
@@ -191,19 +234,23 @@ struct HueCompassControls: View {
 
     /// Undo, redo and next level.
     @ViewBuilder private var playRow: some View {
-        HStack(spacing: 16) {
+        row {
             Button("Undo") { send("play.undo") }
                 .accessibilityLabel("Undo the last turn")
+                .accessibilityValue(Self.progressValue(mirror))
             Button("Redo") { send("play.redo") }
                 .accessibilityLabel("Redo the turn")
+                .accessibilityValue(Self.progressValue(mirror))
             Button("Next level") { send("level.next") }
                 .accessibilityLabel("Go to the next level")
+                .accessibilityValue(Self.progressValue(mirror))
             Button("Reset view") { presenter.resetView() }
                 .accessibilityLabel("Return the camera to the authored view")
+                .accessibilityValue("Bearing \(mirror.bearing) of 96")
         }
     }
 
-    /// Sends `control` and shows a refusal.
+    /// Sends `control`; a refusal is shown and announced in words.
     private func send(_ control: String, _ values: [Double] = []) {
         presenter.send(control, values, port: port)
     }

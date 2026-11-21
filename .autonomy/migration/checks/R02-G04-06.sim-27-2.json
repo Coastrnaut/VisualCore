@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesRound02",
+    "--scheme",
+    "ExperiencesRound02-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "HueCompassExperienceTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package --destination sim-27.2 --action test --only-testing HueCompassExperienceTests",
+  "elapsed_seconds": 14.307,
+  "exit_code": 0,
+  "finished": "2026-11-21T17:23:13+00:00",
+  "gate": "R02-G04-06",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G04-06.sim-27-2.log",
+  "log_sha256": "0c7c757694369a16c614eeac947eb6142509058f72e21fd1ed2b2ad794b5e91b",
+  "name": "sim-27-2",
+  "started": "2026-11-21T17:22:59+00:00",
+  "timed_out": false
+}

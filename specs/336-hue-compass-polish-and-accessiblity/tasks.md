@@ -51,7 +51,7 @@ ImplementationLock-100.
 
 ## Phase 5: Wiring (presenter, panel, scene, sound)
 
-- [ ] T-R02G0406-006 [US1] [US2] [US3] Create `Packages/ExperiencesRound02/HueCompass/Experience/HueCompassSound.swift` (wanted, on screen, active; injected
+- [X] T-R02G0406-006 [US1] [US2] [US3] Create `Packages/ExperiencesRound02/HueCompass/Experience/HueCompassSound.swift` (wanted, on screen, active; injected — Verified 2026-11-21: 2026-11-21 sim-27-2 exit 0 (Hue Compass experience tests incl. HueCompassAccessibilityTests: recorded announcements and haptics equal the plans; level 1 won with turn buttons, Probe, band stepper and Select; swipe previews not announced; sound state table and offers; drawn lights under Reduce Flashing; Reduce Motion stills identical; labels, values, layout at the largest text size) and sim-27-full exit 0 (whole round-two suite on sim-27.2); refusals in words (teaching tests updated); a still at a non-advancing time settles the lights (first sim-27 attempt failed on that, exit 65)
   player for tests; recipe offered at level openings, new clues, play ends and when turned on) and edit
   `Packages/ExperiencesRound02/HueCompass/Experience/HueCompassPresenter.swift` (route `HueCompassFeedbackPlan` after each described change, band pick and
   refusal through `feedback`, a feedback log, the eased lights stepped per frame into the scene, the sound),

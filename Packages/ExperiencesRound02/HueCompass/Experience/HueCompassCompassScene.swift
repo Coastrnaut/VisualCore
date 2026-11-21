@@ -36,6 +36,9 @@ final class HueCompassCompassScene {
     /// The bearing the swipe in progress would turn to, drawn as a ghost needle (feature 334); nil when no swipe is
     /// previewed.
     var previewBearing: Int?
+    /// The eased light levels of the marks and the win glow (feature 336); nil draws the marks at full size and no win
+    /// glow (feature 333's picture).
+    var lights: HueCompassLights?
 
     /// The fog's translucency (`u_opacity` of the fog draw); the brightness density / 9 scales it further.
     static let fogOpacity: Double = 0.85
@@ -96,6 +99,7 @@ final class HueCompassCompassScene {
         fogRenderer = nil
         needleRenderer = nil
         markDraws = []
+        markLights = nil
         fallbackRenderers = []
         geometryKey = nil
     }
@@ -126,6 +130,7 @@ final class HueCompassCompassScene {
         try drawFog(camera, time: time)
         try drawNeedle(snapshot, tier: tier, camera: camera)
         try drawGhost(snapshot, camera: camera)
+        if fallbackReason == nil, lights != markLights { try rebuildMarks(snapshot) }
         try drawMarks(camera)
     }
 
@@ -148,14 +153,7 @@ final class HueCompassCompassScene {
                 fogRenderer = try Self.solidRenderer(fog.mesh, registry: registry)
                 let needle = try HueCompassSceneGeometry.needlePart(snapshot, tier: tier)
                 needleRenderer = try Self.glassRenderer(needle.mesh, fragment: glassFragment, registry: registry)
-                let marks = try HueCompassSceneGeometry.markPart(snapshot)
-                for kind in Self.markKinds {
-                    let part = Self.subset(marks.mesh, kind: kind.code)
-                    guard !part.indices.isEmpty else { continue }
-                    markDraws.append(MarkDraw(renderer: try Self.glassRenderer(part, fragment: glassFragment,
-                                                                               registry: registry),
-                                              colour: kind.colour))
-                }
+                try rebuildMarks(snapshot)
                 return
             } catch {
                 release()
@@ -185,6 +183,30 @@ final class HueCompassCompassScene {
             fallbackRenderers.append(renderer)
         }
     }
+
+    /// The lights the mark renderers were built with (feature 336).
+    private var markLights: HueCompassLights?
+
+    /// Rebuilds only the mark renderers from `snapshot` and the current ``lights`` (feature 336): while a fade runs
+    /// the marks change size every frame, the wheel, fog and needle do not.
+    private func rebuildMarks(_ snapshot: HueCompassSceneSnapshot) throws {
+        guard let registry else { return }
+        for draw in markDraws { draw.renderer.release() }
+        markDraws = []
+        markLights = lights
+        let marks = try HueCompassSceneGeometry.markPart(snapshot, lights: lights)
+        for kind in Self.markKinds {
+            let part = Self.subset(marks.mesh, kind: kind.code)
+            guard !part.indices.isEmpty else { continue }
+            markDraws.append(MarkDraw(renderer: try Self.glassRenderer(part, fragment: glassFragment,
+                                                                       registry: registry),
+                                      colour: kind.colour))
+        }
+    }
+
+    /// The gain of the needle's glow shells: the standard gain raised by the eased win glow (feature 336), at most
+    /// twice the standard gain; the shader still clamps it by `u_gainLimit` (0.5 under Reduce Flashing).
+    var shellGain: Double { HueCompassShaders.standardGain * (1 + (lights?.glow ?? 0)) }
 
     /// The three mark kinds: their uv.y code and base colour.
     private static let markKinds: [(code: Double, colour: SIMD3<Double>)] = [
@@ -252,13 +274,13 @@ final class HueCompassCompassScene {
 
     /// Sets the glass program's uniforms for one draw.
     private func setGlass(_ p: ShaderProgram, camera: HueCompassCamera, model: Mat4, colour: SIMD3<Double>,
-                          shell: Bool, opacity: Double = 1) {
+                          shell: Bool, opacity: Double = 1, gain: Double = HueCompassShaders.standardGain) {
         p.set("u_mvp", matrix4: (camera.viewProjection * model).floats)
         p.set("u_model", matrix4: model.floats)
         p.set("u_eye", Self.float3(camera.eye))
         p.set("u_color", Self.float3(colour))
         p.set("u_opacity", Float(opacity))
-        p.set("u_gain", Float(HueCompassShaders.standardGain))
+        p.set("u_gain", Float(gain))
         p.set("u_gainLimit", Float(gainLimit))
         p.set("u_shell", Float(shell ? 1 : 0))
     }
@@ -299,10 +321,11 @@ final class HueCompassCompassScene {
             self.setGlass(p, camera: camera, model: .identity, colour: pearl, shell: false)
         }
         guard tier.glowShells > 0 else { return }
+        let gain = shellGain
         for n in 1...tier.glowShells {
             let model = Self.shellModel(snapshot, shell: n)
             try needleRenderer.draw(blend: .additive) { p in
-                self.setGlass(p, camera: camera, model: model, colour: pearl, shell: true)
+                self.setGlass(p, camera: camera, model: model, colour: pearl, shell: true, gain: gain)
             }
         }
     }

@@ -8,7 +8,7 @@
 // target and the opposite band fails with the core's selection explanation; spending the allowance on probes fails with
 // the probe explanation; both end with "Retry the level." (no Undo: probes and selections cannot be undone), and Retry
 // in campaign is `level.select` of the level and gives a fresh play. Picker: a locked level (and `level.next` with no
-// open next level) is refused with `r02-g04.locked`, shown in the mirror's message, and changes nothing. Modes: the
+// open next level) is refused with `r02-g04.locked`, shown in the mirror's message (in words since feature 336), and changes nothing. Modes: the
 // daily level of 2026-01-01 is 1 ((0 × 47) mod 100 + 1), of 2026-01-02 is 48 (playable while locked, not opened),
 // `retryAction` keeps the date, 2026-02-30 is refused with `r02-g04.date`; practice raises the allowance to 24; the goal
 // line and the picker titles are formatted as the controls show them; a direct selection of the target wins level 1
@@ -221,7 +221,8 @@ enum HueCompassTeaching {
         #expect(locked == .rejected(.rule(code: HueCompassExperienceRule.locked)), "\(locked.code)")
         #expect(locked.code.contains("r02-g04.locked"))
         let message: String = try #require(presenter.mirror.message, "the refusal is shown")
-        #expect(message.contains("r02-g04.locked"), "\(message)")
+        // Feature 336: refusals are shown in words, the same words that are announced.
+        #expect(message == "That level is not open yet.", "\(message)")
         #expect(try HueCompassTest.digest(shell) == digest, "a refused pick changes nothing")
         #expect(presenter.mirror.levelNumber == 1)
         #expect(presenter.mirror.frontier == 1)
@@ -271,7 +272,7 @@ enum HueCompassTeaching {
         #expect(refused == .rejected(.rule(code: HueCompassExperienceRule.date)), "\(refused.code)")
         #expect(refused.code.contains("r02-g04.date"))
         let message: String = try #require(presenter.mirror.message)
-        #expect(message.contains("r02-g04.date"), "\(message)")
+        #expect(message == "That date cannot be used.", "\(message)")
         #expect(try HueCompassTest.digest(shell) == digest, "a refused date changes nothing")
         #expect(presenter.mirror.mode == .daily(level: 1))
         let kept: (control: String, values: [Double]) = presenter.retryAction(date: later)

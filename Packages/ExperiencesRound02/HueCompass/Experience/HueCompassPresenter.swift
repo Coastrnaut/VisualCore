@@ -17,10 +17,16 @@
 // `retry` starts the level again in its mode (probes and selections cannot be undone, so there is no Undo after a
 // failure), and the daily level is chosen from the local calendar date read here (`playDaily(port:date:)`, sent as
 // `mode.daily [year, month, day]`), never in the core.
+// Feature 336 (R02-G04-06) T-R02G0406-006 (FR-R02G0406-001 … 006; clarifications Q1–Q5): the presenter routes
+// `HueCompassFeedbackPlan.after(old:new:)` (an announcement and a haptic) through its feedback route (`feedback`,
+// `.shared` unless a test injects one), plans band picks with `picked(band:)` and refusals with `refused(code:)`, showing
+// the same words in the panel; it keeps a feedback log, eases the scene's lights (`HueCompassLights`, 0.45 s fades under
+// Reduce Flashing) and offers the ambient recipe to `HueCompassSound` at level openings, new clues and play ends.
 #if os(iOS)
 import Foundation
 import HueCompassCore
 import SwiftUI
+import VisualCoreAudioDSP
 import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreMath
@@ -62,6 +68,10 @@ final class HueCompassMirror {
     var stars: [Int: Int] = [:]
     /// The certified smallest probe count of the current level (feature 335).
     var smallest = 0
+    /// The summary element's words (feature 336): bearing, band, units and the last clue.
+    var summary = ""
+    /// Whether the ambient sound is on (feature 336; off by default).
+    var soundOn = false
 }
 
 /// One entry of the tier log: the tier drawn and why it changed.
@@ -91,11 +101,27 @@ final class HueCompassPresenter: ExperiencePresenter {
     private var hintKey: String?
     /// The date whose daily level is being played, so Retry restarts that level after midnight too (feature 335).
     private(set) var dailyDate: DateComponents?
+    /// The feedback route of announcements and haptics (feature 336; tests inject their own).
+    var feedback: ExperienceFeedback = .shared
+    /// Every announced text, oldest first (feature 336; tests and diagnostics).
+    private(set) var announcements: [String] = []
+    /// Every routed feedback plan, oldest first (feature 336; tests and diagnostics).
+    private(set) var feedbackLog: [HueCompassFeedbackPlan] = []
+    /// The eased light levels drawn by the scene (feature 336).
+    private(set) var lights: HueCompassLights
+    /// The frame time of the last draw, for easing the lights.
+    private var lastFrameTime: Double?
+    /// The fingerprint of the level (and mode copy) the lights belong to.
+    private var lightsLevel: String?
+    /// The ambient sound (feature 336).
+    let sound: HueCompassSound
 
     init(reduceMotion: Bool, reduceFlashing: Bool) {
         self.reduceMotion = reduceMotion
         self.reduceFlashing = reduceFlashing
         scene.reducedFlash = reduceFlashing
+        lights = HueCompassLights(reducedFlash: reduceFlashing)
+        sound = HueCompassSound(recipe: HueCompassSoundRecipe.recipe(clue: nil, stage: .loading))
     }
 
     /// The tests' seam: before `setup`, replaces the glass program's fragment source with one that does not compile.
@@ -123,6 +149,18 @@ final class HueCompassPresenter: ExperiencePresenter {
         let time = reduceMotion ? 0 : frame.time
         let snapshot = core.snapshot(time: time)
         lastSnapshot = snapshot
+        // A new level (or mode) starts from its own lights: they settle at once, only changes within a play fade. A
+        // frame time that does not advance (an off-screen still drawn at its own or the same time) is a separate
+        // picture: it settles too, so a still always shows the state it was asked for.
+        let level = "\(core.levelNumber)/\(core.mode)/\(core.play.level.fingerprint)"
+        if let last = lastFrameTime, lightsLevel == level, frame.time > last {
+            lights.step(toward: snapshot, elapsed: frame.time - last)
+        } else {
+            lights.settle(to: snapshot)
+        }
+        lightsLevel = level
+        lastFrameTime = frame.time
+        scene.lights = lights
         scene.orbit = gestures.orbit
         scene.previewBearing = gestures.previewBearing
         try scene.render(snapshot, tier: drawn, context: context, frame: frame, animate: !reduceMotion)
@@ -172,13 +210,61 @@ final class HueCompassPresenter: ExperiencePresenter {
         gestures.resetView()
     }
 
-    /// Sends `control` with `values`; a refusal is shown with its reason.
+    /// Sends `control` with `values`; a refusal is shown and announced in words (feature 336).
     @discardableResult
     func send(_ control: String, _ values: [Double], port: ExperienceActionPort) -> ActionResult {
         let result = port.send(control, values)
-        mirror.message = result.isAccepted ? nil : "That change was refused: \(result.code)"
+        if result.isAccepted {
+            mirror.message = nil
+        } else {
+            let plan = HueCompassFeedbackPlan.refused(code: result.code)
+            mirror.message = plan.text
+            route(plan)
+        }
         return result
     }
+
+    // MARK: Feedback and sound (feature 336)
+
+    /// Plays `plan` through the feedback route (its haptic and its announcement) and logs it; `.none` does nothing.
+    func route(_ plan: HueCompassFeedbackPlan) {
+        guard plan != .none else { return }
+        if let haptic = plan.haptic { feedback.haptic(haptic) }
+        if let text = plan.text, let kind = plan.kind {
+            feedback.announce(text, kind: kind)
+            announcements.append(text)
+        }
+        feedbackLog.append(plan)
+    }
+
+    /// Sets the band the picker holds for the next selection (0 … 23) and announces it ("Band h picked.").
+    func pickBand(_ band: Int) {
+        let picked: Int = min(max(band, 0), HueCompassWheel.bands - 1)
+        guard picked != mirror.pickedBand else { return }
+        mirror.pickedBand = picked
+        route(HueCompassFeedbackPlan.picked(band: picked))
+    }
+
+    /// The ambient recipe of `core`'s last clue and stage.
+    static func recipe(_ core: HueCompassExperienceCore) -> AmbientLoopRecipe {
+        HueCompassSoundRecipe.recipe(clue: core.play.clues.last, stage: core.play.stage)
+    }
+
+    /// Turns the ambient sound on or off; turning it on plays the recipe of the current clue and stage.
+    func setSound(on: Bool) {
+        if on, let core = latestCore { sound.offer(Self.recipe(core)) }
+        sound.setWanted(on)
+        mirror.soundOn = on
+    }
+
+    /// The controls view appeared (the loop may play).
+    func controlsAppeared() { sound.setOnScreen(true) }
+
+    /// The controls view disappeared (the loop stops).
+    func controlsDisappeared() { sound.setOnScreen(false) }
+
+    /// The scene became active or inactive.
+    func sceneActive(_ active: Bool) { sound.setActive(active) }
 
     // MARK: Teaching and progression (feature 335)
 
@@ -252,7 +338,18 @@ final class HueCompassPresenter: ExperiencePresenter {
     }
 
     func describe(_ core: HueCompassExperienceCore) -> String {
+        if let previous = latestCore {
+            route(HueCompassFeedbackPlan.after(old: previous, new: core))
+            let opened = previous.levelNumber != core.levelNumber || previous.mode != core.mode
+            let clued = previous.play.clues != core.play.clues
+            let ended = previous.play.stage != core.play.stage
+            if opened || clued || ended { sound.offer(Self.recipe(core)) }
+        } else {
+            // The first described state offers its recipe, so the sound never holds a placeholder.
+            sound.offer(Self.recipe(core))
+        }
         latestCore = core
+        mirror.summary = HueCompassFeedbackPlan.summaryText(core: core)
         if let key = hintKey, key != Self.hintKey(core) { clearHint() }
         mirror.instruction = core.tutorial == .done ? nil : core.tutorial.text
         mirror.failureText = core.failureExplanation?.text
