@@ -13,7 +13,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G0304-002 Edit `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperSceneGeometry.swift` (`WaveKnotKeeperOrbit` "yaw −40° … 40°, pitch 5° …
+- [X] T-R02G0304-002 Edit `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperSceneGeometry.swift` (`WaveKnotKeeperOrbit` "yaw −40° … 40°, pitch 5° … — Verified 2026-11-21: 2026-11-21 host-2 exit 0 (orbit yaw ±40 pitch 5-60 with refit inside 5 % at every limit and 7 aspects; handle picking nearest to the eye; 500 seeded drags equal an independent candidate; 20 tests)
   60°, authored 20°", `camera(for:aspect:orbit:)` refitting the bounds for a 5 % margin; the existing camera equals the
   authored orbit) and create `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperHandles.swift` (`pick` with "touch radius 22 points, nearest to
   the eye wins"; `candidate` "best-aligned projected unit step, ties to the lower direction index, snap ≥ max(6 points,

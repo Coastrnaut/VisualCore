@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "WaveKnotKeeperHandlesTests|WaveKnotKeeperSceneGeometryTests"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter 'WaveKnotKeeperHandlesTests|WaveKnotKeeperSceneGeometryTests'",
+  "elapsed_seconds": 5.013,
+  "exit_code": 0,
+  "finished": "2026-11-21T11:15:06+00:00",
+  "gate": "R02-G03-04",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G03-04.host-2.log",
+  "log_sha256": "44147ee054b285939362c5effd08d927a651825d946a13a38063183eb418b20f",
+  "name": "host-2",
+  "started": "2026-11-21T11:15:01+00:00",
+  "timed_out": false
+}

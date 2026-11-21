@@ -5,7 +5,8 @@
 // view with the 5 % margin at 7 aspects 0.4 … 2.5; the tube's centreline passes within one radius of every segment's
 // straight middle at every tier; crossing weights are non-zero only near crossings on their over-strands; tiers never
 // move points, handles or gates; zero-size and unusable aspects are safe. Plain loops and explicit types (CI type-check
-// rule); seed 2_323.
+// rule); seed 2_323. Feature 324 (T-R02G0304-002) adds the orbit: clamping, the authored orbit equal to the authored
+// camera, and the 5 % framing at every orbit limit (yaw ±40° × pitch 5°/60°) and 7 aspects.
 import Foundation
 import Testing
 @testable import WaveKnotKeeperCore
@@ -349,49 +350,61 @@ private func length(_ v: SIMD3<Double>) -> Double { WaveKnotKeeperSceneGeometry.
 
     // MARK: Camera
 
+    /// The points the framing must keep inside the view: control points, segment midpoints, the six axis extremes of
+    /// every handle sphere, every gate corner and centre, and every 7th rope vertex at every tier.
+    static func framingPoints(_ s: WaveKnotKeeperSceneSnapshot) throws -> [SIMD3<Double>] {
+        var points: [SIMD3<Double>] = Geometry.worldPoints(s) + Geometry.segmentMidpoints(s)
+        for c in Geometry.worldPoints(s) {
+            for axis in 0..<3 {
+                var e: SIMD3<Double> = .zero
+                e[axis] = 0.18
+                points.append(c + e)
+                points.append(c - e)
+            }
+        }
+        for gate in s.gates {
+            let box: (low: SIMD3<Double>, high: SIMD3<Double>) = Geometry.gateBox(gate)
+            for corner in 0..<8 {
+                points.append(SIMD3(corner & 1 == 0 ? box.low.x : box.high.x,
+                                    corner & 2 == 0 ? box.low.y : box.high.y,
+                                    corner & 4 == 0 ? box.low.z : box.high.z))
+            }
+            points.append(Geometry.gateCentre(gate))
+        }
+        for tier in WaveKnotKeeperTier.all {
+            let mesh: Mesh = try Geometry.ropeMesh(s, tier: tier)
+            var j: Int = 0
+            while j < mesh.positions.count {
+                points.append(SIMD3(mesh.positions[j].x, mesh.positions[j].y, mesh.positions[j].z))
+                j += 7
+            }
+        }
+        return points
+    }
+
+    /// Whether every point of `points` projects through `camera` inside view coordinates 0.05 … 0.95 on both axes.
+    static func insideWithMargin(_ points: [SIMD3<Double>], camera: WaveKnotKeeperCamera) -> Bool {
+        var inside: Bool = true
+        for p in points {
+            guard let q = Geometry.project(p, camera: camera) else {
+                inside = false
+                continue
+            }
+            if q.x < 0.05 || q.x > 0.95 || q.y < 0.05 || q.y > 0.95 { inside = false }
+        }
+        return inside
+    }
+
     @Test func everyElementProjectsInsideTheViewWithFivePercentMargin() throws {
         for s in try Self.extremeSnapshots() + Self.seededSnapshots(count: 8) {
-            var points: [SIMD3<Double>] = Geometry.worldPoints(s) + Geometry.segmentMidpoints(s)
-            for c in Geometry.worldPoints(s) {
-                for axis in 0..<3 {
-                    var e: SIMD3<Double> = .zero
-                    e[axis] = 0.18
-                    points.append(c + e)
-                    points.append(c - e)
-                }
-            }
-            for gate in s.gates {
-                let box: (low: SIMD3<Double>, high: SIMD3<Double>) = Geometry.gateBox(gate)
-                for corner in 0..<8 {
-                    points.append(SIMD3(corner & 1 == 0 ? box.low.x : box.high.x,
-                                        corner & 2 == 0 ? box.low.y : box.high.y,
-                                        corner & 4 == 0 ? box.low.z : box.high.z))
-                }
-                points.append(Geometry.gateCentre(gate))
-            }
-            for tier in WaveKnotKeeperTier.all {
-                let mesh: Mesh = try Geometry.ropeMesh(s, tier: tier)
-                var j: Int = 0
-                while j < mesh.positions.count {
-                    points.append(SIMD3(mesh.positions[j].x, mesh.positions[j].y, mesh.positions[j].z))
-                    j += 7
-                }
-            }
+            let points: [SIMD3<Double>] = try Self.framingPoints(s)
             let b: (centre: SIMD3<Double>, radius: Double) = Geometry.bounds(s)
             for aspect in Self.aspects {
                 let camera: WaveKnotKeeperCamera = Geometry.camera(for: s, aspect: aspect)
                 #expect(camera.target == b.centre && camera.fovY == Double.pi / 4 && camera.aspect == aspect)
                 let direction: SIMD3<Double> = (camera.eye - camera.target) / length(camera.eye - camera.target)
                 #expect(abs(direction.x) < 1e-12 && abs(direction.y - sin(Double.pi / 9)) < 1e-12)
-                var inside: Bool = true
-                for p in points {
-                    guard let q = Geometry.project(p, camera: camera) else {
-                        inside = false
-                        continue
-                    }
-                    if q.x < 0.05 || q.x > 0.95 || q.y < 0.05 || q.y > 0.95 { inside = false }
-                }
-                #expect(inside, "aspect \(aspect)")
+                #expect(Self.insideWithMargin(points, camera: camera), "aspect \(aspect)")
                 let centre: SIMD2<Double> = try #require(Geometry.project(b.centre, camera: camera))
                 #expect(abs(centre.x - 0.5) < 1e-9 && abs(centre.y - 0.5) < 1e-9)
                 let pixel: Vec2 = try #require(Geometry.pixel(b.centre, camera: camera, width: 1_152, height: 768))
@@ -401,6 +414,70 @@ private func length(_ v: SIMD3<Double>) -> Double { WaveKnotKeeperSceneGeometry.
             let camera: WaveKnotKeeperCamera = Geometry.camera(for: s, aspect: 1)
             let above: SIMD2<Double> = try #require(Geometry.project(b.centre + SIMD3(0, 0.5, 0), camera: camera))
             #expect(above.y < 0.5)
+        }
+    }
+
+    // MARK: Orbit (feature 324, T-R02G0304-002)
+
+    @Test func orbitClampsToItsLimits() {
+        typealias Orbit = WaveKnotKeeperOrbit
+        #expect(Orbit.authored == Orbit(yaw: 0, pitch: 20))
+        #expect(Orbit(yaw: 100, pitch: 100).clamped() == Orbit(yaw: 40, pitch: 60))
+        #expect(Orbit(yaw: -100, pitch: -10).clamped() == Orbit(yaw: -40, pitch: 5))
+        #expect(Orbit(yaw: 12.5, pitch: 33).clamped() == Orbit(yaw: 12.5, pitch: 33))
+        #expect(Orbit(yaw: -40, pitch: 5).clamped() == Orbit(yaw: -40, pitch: 5))
+        #expect(Orbit(yaw: Double.nan, pitch: Double.infinity).clamped() == Orbit.authored)
+        #expect(Orbit(yaw: -Double.infinity, pitch: 70).clamped() == Orbit(yaw: 0, pitch: 60))
+        // The eye direction is a unit vector and follows the clamped angles.
+        let limits: [Orbit] = [Orbit(yaw: -40, pitch: 5), Orbit(yaw: 40, pitch: 60), Orbit(yaw: 90, pitch: 90)]
+        for orbit in limits {
+            let e: SIMD3<Double> = orbit.eyeDirection
+            let c: Orbit = orbit.clamped()
+            #expect(abs(length(e) - 1) < 1e-12)
+            #expect(abs(e.y - sin(c.pitch * Double.pi / 180)) < 1e-12)
+            #expect(abs(atan2(e.x, e.z) - c.yaw * Double.pi / 180) < 1e-12)
+        }
+    }
+
+    @Test func authoredOrbitIsTheAuthoredCamera() throws {
+        #expect(WaveKnotKeeperOrbit.authored.eyeDirection == Geometry.eyeDirection)
+        for s in try Self.extremeSnapshots() + Self.seededSnapshots(count: 4) {
+            for aspect in Self.aspects + [0, Double.nan, 7] {
+                #expect(Geometry.camera(for: s, aspect: aspect)
+                        == Geometry.camera(for: s, aspect: aspect, orbit: .authored))
+            }
+            // An orbit outside the limits gives the camera of its clamped orbit.
+            let wild: WaveKnotKeeperOrbit = WaveKnotKeeperOrbit(yaw: 75, pitch: -30)
+            #expect(Geometry.camera(for: s, aspect: 1.5, orbit: wild)
+                    == Geometry.camera(for: s, aspect: 1.5, orbit: wild.clamped()))
+        }
+    }
+
+    @Test func everyOrbitLimitAndAspectKeepsTheSceneInsideWithFivePercentMargin() throws {
+        var orbits: [WaveKnotKeeperOrbit] = [.authored]
+        for yaw in [-40.0, 40.0] {
+            for pitch in [5.0, 60.0] { orbits.append(WaveKnotKeeperOrbit(yaw: yaw, pitch: pitch)) }
+        }
+        for s in try Self.extremeSnapshots() + Self.seededSnapshots(count: 8) {
+            let points: [SIMD3<Double>] = try Self.framingPoints(s)
+            let b: (centre: SIMD3<Double>, radius: Double) = Geometry.bounds(s)
+            for orbit in orbits {
+                for aspect in Self.aspects {
+                    let camera: WaveKnotKeeperCamera = Geometry.camera(for: s, aspect: aspect, orbit: orbit)
+                    #expect(camera.target == b.centre && camera.aspect == aspect)
+                    let direction: SIMD3<Double> = (camera.eye - camera.target) / length(camera.eye - camera.target)
+                    let expected: SIMD3<Double> = orbit.eyeDirection
+                    #expect(length(direction - expected) < 1e-9)
+                    #expect(Self.insideWithMargin(points, camera: camera),
+                            "yaw \(orbit.yaw) pitch \(orbit.pitch) aspect \(aspect)")
+                    let centre: SIMD2<Double> = try #require(Geometry.project(b.centre, camera: camera))
+                    #expect(abs(centre.x - 0.5) < 1e-9 && abs(centre.y - 0.5) < 1e-9)
+                    // World up stays up on screen.
+                    let above: SIMD2<Double> = try #require(Geometry.project(b.centre + SIMD3(0, 0.5, 0),
+                                                                            camera: camera))
+                    #expect(above.y < 0.5)
+                }
+            }
         }
     }
 

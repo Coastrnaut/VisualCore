@@ -5,14 +5,18 @@
 // carrying a per-vertex crossing weight for the caustic pulses, the glow shells, the handle icosphere and the gate
 // cubes, the fixed authored camera down −z tilted 20° about x that fits the figure's bounding sphere with a 5 % margin
 // for every aspect 0.4 … 2.5, and the CPU projection that the simulator frame checks compare with rendered pixels.
+// Feature 324 (R02-G03-04) T-R02G0304-002 (FR-R02G0304-004; SC-R02G0304-003; clarification Q3) adds the camera orbit
+// (`WaveKnotKeeperOrbit`, yaw ±40°, pitch 5° … 60°, authored 20°) and `camera(for:aspect:orbit:)`, which refits the same
+// bounding sphere so the 5 % margin holds at every orbit; the authored camera is the authored orbit.
 // Doubles are used for drawing only; nothing here is consulted by the rules.
 import Foundation
 import VisualCoreMath
 import VisualCoreScenes
 
-/// The fixed authored camera of the Wave Knot Keeper scene for one snapshot and one aspect.
+/// The camera of the Wave Knot Keeper scene for one snapshot, one aspect and one orbit (authored by default).
 ///
-/// Built only by ``WaveKnotKeeperSceneGeometry/camera(for:aspect:)``. World positions are in world units (kernel units
+/// Built only by ``WaveKnotKeeperSceneGeometry/camera(for:aspect:)`` (the authored orbit) and
+/// ``WaveKnotKeeperSceneGeometry/camera(for:aspect:orbit:)``. World positions are in world units (kernel units
 /// × 1/8); ``viewProjection`` maps them to GL clip space (right-handed, depth −1 … 1).
 public struct WaveKnotKeeperCamera: Sendable, Equatable {
     /// The eye position in world units.
@@ -29,6 +33,49 @@ public struct WaveKnotKeeperCamera: Sendable, Equatable {
     public let far: Double
     /// The view-projection matrix: `Mat4.perspective` (GL depth range) times `Mat4.lookAt` with +y up.
     public let viewProjection: Mat4
+}
+
+/// The orbit of the Wave Knot Keeper camera (feature 324, R02-G03-04, clarification Q3): a yaw about the world y axis
+/// and a pitch (tilt from +z about x, towards +y), both in degrees. Presentation only: never in the digest, the snapshot
+/// or the save.
+///
+/// The eye direction is (cos pitch · sin yaw, sin pitch, cos pitch · cos yaw), so ``authored`` (yaw 0, pitch 20)
+/// reproduces ``WaveKnotKeeperSceneGeometry/eyeDirection``.
+public struct WaveKnotKeeperOrbit: Sendable, Equatable {
+    /// The yaw in degrees about +y, from +z towards +x; allowed −40 … 40.
+    public var yaw: Double
+    /// The pitch in degrees, the tilt of the eye from +z about x towards +y; allowed 5 … 60.
+    public var pitch: Double
+
+    /// An orbit of the given yaw and pitch in degrees (not clamped; see ``clamped()``).
+    public init(yaw: Double, pitch: Double) {
+        self.yaw = yaw
+        self.pitch = pitch
+    }
+
+    /// The authored orbit: yaw 0°, pitch 20°.
+    public static let authored = WaveKnotKeeperOrbit(yaw: 0, pitch: 20)
+    /// The allowed yaws in degrees, −40 … 40.
+    public static let yawRange: ClosedRange<Double> = -40...40
+    /// The allowed pitches in degrees, 5 … 60.
+    public static let pitchRange: ClosedRange<Double> = 5...60
+
+    /// This orbit with yaw clamped to −40 … 40 and pitch to 5 … 60; a non-finite angle becomes the authored one.
+    public func clamped() -> WaveKnotKeeperOrbit {
+        let y: Double = yaw.isFinite ? yaw : Self.authored.yaw
+        let p: Double = pitch.isFinite ? pitch : Self.authored.pitch
+        return WaveKnotKeeperOrbit(yaw: min(max(y, Self.yawRange.lowerBound), Self.yawRange.upperBound),
+                                   pitch: min(max(p, Self.pitchRange.lowerBound), Self.pitchRange.upperBound))
+    }
+
+    /// The unit direction from the scene centre to the eye at the clamped orbit:
+    /// (cos p · sin y, sin p, cos p · cos y) with y the yaw and p the pitch in radians.
+    public var eyeDirection: SIMD3<Double> {
+        let o: WaveKnotKeeperOrbit = clamped()
+        let y: Double = o.yaw * Double.pi / 180
+        let p: Double = o.pitch * Double.pi / 180
+        return SIMD3(cos(p) * sin(y), sin(p), cos(p) * cos(y))
+    }
 }
 
 /// The geometry of the Wave Knot Keeper scene: world points, rope tube and glow, handles, gates, camera and projection.
@@ -215,15 +262,27 @@ public enum WaveKnotKeeperSceneGeometry {
         return max(radius, 1e-3) / sin(atan(limit))
     }
 
-    /// The fixed authored camera for `snapshot` and `aspect` (width / height): the eye on ``eyeDirection`` from the
-    /// bounds centre at the fitted distance, looking at the bounds centre with +y up and a 45° vertical field of view.
-    /// For aspects 0.4 … 2.5 the whole bounding sphere (rope, glow, handles and gates) projects inside the view with at
-    /// least 5 % margin on every side. Independent of the quality tier.
+    /// The fixed authored camera for `snapshot` and `aspect` (width / height): ``camera(for:aspect:orbit:)`` at
+    /// ``WaveKnotKeeperOrbit/authored``, so the eye lies on ``eyeDirection`` from the bounds centre at the fitted
+    /// distance, looking at the bounds centre with +y up and a 45° vertical field of view. For aspects 0.4 … 2.5 the
+    /// whole bounding sphere (rope, glow, handles and gates) projects inside the view with at least 5 % margin on every
+    /// side. Independent of the quality tier.
     public static func camera(for snapshot: WaveKnotKeeperSceneSnapshot, aspect: Double) -> WaveKnotKeeperCamera {
+        camera(for: snapshot, aspect: aspect, orbit: .authored)
+    }
+
+    /// The camera for `snapshot`, `aspect` (width / height) and `orbit` (clamped, see
+    /// ``WaveKnotKeeperOrbit/clamped()``): the eye on the orbit's ``WaveKnotKeeperOrbit/eyeDirection`` from the bounds
+    /// centre at the fitted distance, looking at the bounds centre with +y up and a 45° vertical field of view. The fit
+    /// is of the bounding sphere, which does not depend on the view direction, so for every orbit and every aspect
+    /// 0.4 … 2.5 the whole scene projects inside the view with at least 5 % margin on every side. Independent of the
+    /// quality tier; presentation only.
+    public static func camera(for snapshot: WaveKnotKeeperSceneSnapshot, aspect: Double,
+                              orbit: WaveKnotKeeperOrbit) -> WaveKnotKeeperCamera {
         let b = bounds(snapshot)
         let a = usableAspect(aspect)
         let d = distance(radius: b.radius, aspect: a)
-        let eye = b.centre + eyeDirection * d
+        let eye = b.centre + orbit.eyeDirection * d
         let near = max((d - b.radius) * 0.5, 1e-3)
         let far = d + 2 * b.radius + 1
         let view = Mat4.lookAt(eye: vec(eye), target: vec(b.centre), up: Vec3(0, 1, 0))
