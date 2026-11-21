@@ -45,11 +45,12 @@ archived manifest's 100 entries (bands 1 … 5 × 20, budgets 8 … 19). Feature
 - Q: How is a level built from its manifest entry? → A: the 100 entries (number, planned seed, band, move budget) are a
   table in `WaveKnotKeeperManifest` copied from the archived design with its provenance. Candidate k of entry n draws from
   `SeededRandom(seed: SeedDerivation.derive(plannedSeed, index: k))`: a solved rope of 5 + band points (6 … 10), each point
-  at a seeded angle around the origin (angles sorted, then `band − 1` seeded neighbour swaps so the projection crosses
+  at a seeded angle around the origin (angles sorted, then `band` seeded neighbour swaps so the projection crosses
   itself) at a seeded radius 5 … 12 and height −4 … 4, rounded to the lattice; it is kept only if simple, in bounds and
   with a non-degenerate projection, and its summary is the target. Gates: bands 1 … 5 get 0, 0, 1, 1, 2 cubes of side 3
   centred on seeded rope points. The start is `scramble` seeded legal moves from the solved rope (bands 1 … 5: 1, 2, 2,
-  3, 3), never stepping back onto an earlier rope; the tension bound is the largest tension along that walk plus 64 ×
+  3, 3), never stepping back onto an earlier rope; each step takes the first move, in the seeded order of the
+  legal moves, whose rope's summary differs from the solved rope's, else the first legal move; the tension bound is the largest tension along that walk plus 64 ×
   (6 − band); the allowance is the manifest budget. A candidate is kept when the level is valid (its start does not win),
   its shortest solution lies in its band's range (bands 1 … 5: 1, 1–2, 2, 2–3, 3 moves) and does not exceed the budget;
   otherwise k grows, at most 64 candidates, then `generation(n)`. Ids `wave-knot-keeper-NNN`; tutorial flag on levels
