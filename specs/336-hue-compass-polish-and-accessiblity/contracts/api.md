@@ -8,6 +8,7 @@ public struct HueCompassFeedbackPlan: Sendable, Equatable {
     public static func picked(band: Int) -> Self             // "Band h picked." (state, no haptic)
     public static func refused(code: String) -> Self         // rejection + error; texts of clarification Q1
     public static func refusalText(code: String) -> String   // the same words for the panel
+    public static func summaryText(core: HueCompassExperienceCore) -> String // the summary element of Q5 ("No clues yet.")
 }
 public struct HueCompassLights: Sendable, Equatable {
     public struct Mark: Sendable, Equatable { public let level: Double; public let bearing: Int }
