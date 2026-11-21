@@ -55,7 +55,7 @@ tests stay short (< 10 s each; interface tests < 90 s, SC-R02G0109-001). No {own
 
 - [X] T-R02G0109-007 Docs: `docs/architecture/aurora-loom.md` (in-app integration, pending steps), — Verified 2026-11-21: 2026-11-21 round02-host exit 0; script-tests exit 0 (alone); docs/architecture/aurora-loom.md in-app section, Packages/ExperiencesRound02/README.md, docs/automatedtesting.md
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`; `--name script-tests` (alone)
-- [ ] T-R02G0109-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G0109-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-21: 2026-11-21 rendering-27, rendering-26, experiences, host-full exit 0; app-unit-2 and app-ui-3 are this gate's own app runs
   `--name host-full` (app-unit and app-ui are this gate's own runs)
 - [ ] T-R02G0109-009 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G0109-010 Reference regression chunk 2 (`--name reference-2`)
