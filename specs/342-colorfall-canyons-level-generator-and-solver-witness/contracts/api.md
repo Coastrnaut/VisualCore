@@ -29,15 +29,24 @@ public struct ColorfallCanyonsGenerated: Sendable, Equatable { public let entry:
 public enum ColorfallCanyonsGenerator {
     public static let tutorialLevels: ClosedRange<Int>   // 1 … 3
     public static let maximumCandidates = 512
+    public static func levelID(_ number: Int) -> String   // colorfall-canyons-NNN
     public static func candidate(_ entry: ColorfallCanyonsManifestEntry, index: Int) -> (level: ColorfallCanyonsLevel, planted: [ColorfallCanyonsEdit])?
     public static func generate(_ entry: ColorfallCanyonsManifestEntry) throws(ColorfallCanyonsError) -> ColorfallCanyonsGenerated
     public static func catalogDigest(_ levels: [ColorfallCanyonsLevel]) -> String
 }
 public struct ColorfallCanyonsWitness: Sendable, Equatable, Codable {
     public static let schema = 1
+    public struct Totals: Sendable, Equatable, Codable { public let released, held, spilled: [Int]   // per colour at the win
+        public init(released: [Int], held: [Int], spilled: [Int]); public init(_ fluid: ColorfallCanyonsFluid) }
+    public let number: Int; public let level: ColorfallCanyonsLevel; public let actions: [ColorfallCanyonsAction]
+    public let winTick: Int; public let digests: [String]; public let totals: Totals; public let fingerprints: [String]
+    public let unedited: ColorfallCanyonsCounterexample; public let nearMiss: ColorfallCanyonsCounterexample
+    public let smaller: Int; public let difficulty: ColorfallCanyonsDifficulty; public let skipped: Int
+    public static func digest(_ fluid: ColorfallCanyonsFluid) -> String   // 16 hex of SHA-256 over 2-byte big-endian masses
     public static func actions(for solution: ColorfallCanyonsSolution, level: ColorfallCanyonsLevel) -> [ColorfallCanyonsAction]
     public static func make(_ generated: ColorfallCanyonsGenerated) throws(ColorfallCanyonsError) -> Self
     public func encoded() -> Data
-    public static func decode(_ data: Data) throws(ColorfallCanyonsError) -> Self   // refuses newer, damaged, non-replaying
+    public static func decode(_ data: Data) throws(ColorfallCanyonsError) -> Self   // refuses newer, damaged, non-replaying;
+        // re-solves at the band's search depth (work and smaller are measured there)
 }
 ```

@@ -79,4 +79,4 @@ manifest, difficulty, solver, generator, catalog tests, witness files, docs) sta
 
 ## Phase 7: Convergence
 
-- [ ] T-R02G0502-013 Document `ColorfallCanyonsGenerator.levelID(_:)`, `ColorfallCanyonsWitness.Totals`, `ColorfallCanyonsWitness.digest(_:)`, the witness's stored fields and that `decode` re-solves at the band's search depth in `specs/342-colorfall-canyons-level-generator-and-solver-witness/contracts/api.md` and `specs/342-colorfall-canyons-level-generator-and-solver-witness/data-model.md` per plan: contracts (partial)
+- [X] T-R02G0502-013 Document `ColorfallCanyonsGenerator.levelID(_:)`, `ColorfallCanyonsWitness.Totals`, `ColorfallCanyonsWitness.digest(_:)`, the witness's stored fields and that `decode` re-solves at the band's search depth in `specs/342-colorfall-canyons-level-generator-and-solver-witness/contracts/api.md` and `specs/342-colorfall-canyons-level-generator-and-solver-witness/data-model.md` per plan: contracts (partial) — Verified 2026-11-21: 2026-11-21 levelID, Witness.Totals, Witness.digest, the stored fields and decode's band-depth re-solve documented in contracts/api.md and data-model.md (grep: present); code unchanged

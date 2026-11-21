@@ -8,5 +8,5 @@
 | `ColorfallCanyonsDifficulty` | smallest, work, win tick, springs, basins, protected basins, carvable cells | |
 | `ColorfallCanyonsBandProfile` | columns, rows, springs, depressions, smallest range | bands 1 … 5 |
 | `ColorfallCanyonsGenerated` | entry, level, planted edits, solution, difficulty, skipped | skipped ≤ 511 |
-| `ColorfallCanyonsWitness` | schema 1, number, level, actions, win tick, digests, totals, fingerprints, unedited and near-miss counterexamples, smaller, difficulty, skipped | refuses newer, damaged, non-replaying |
+| `ColorfallCanyonsWitness` | schema 1, number, level, actions, win tick, digests (16 hex per tick), totals (`Totals`: released, held, spilled per colour), fingerprints, unedited and near-miss counterexamples, smaller, difficulty, skipped | refuses newer, damaged, non-replaying; decode re-solves at the band's search depth |
 | `ColorfallCanyonsCounterexample` | edits, reason, tick | the outcome is a failure |
