@@ -51,7 +51,7 @@ in this feature (the CPU flow step is the reference the renderer of R02-G05-03 w
   spent, outcome), Move = ColorfallCanyonsAction; legal moves carve(c) for each carvable cell in index order, valve(s) for
   each spring, step(1)) with `Packages/ExperiencesRound02/ColorfallCanyons/CoreTests/ColorfallCanyonsRulesTests.swift` (agreement with the play on 200 walks);
   `--name host-4`
-- [ ] T-R02G0501-006 [P] Create `Packages/ExperiencesRound02/ColorfallCanyons/CoreTests/ColorfallCanyonsInvariantTests.swift` (`testColorfallCanyonsTimeBoundary`,
+- [X] T-R02G0501-006 [P] Create `Packages/ExperiencesRound02/ColorfallCanyons/CoreTests/ColorfallCanyonsInvariantTests.swift` (`testColorfallCanyonsTimeBoundary`, — Verified 2026-11-21: 2026-11-21 host-5 exit 0 (9 invariant tests by agent D, retested by the lead against the final fixtures: time, input budget, goal, repeatability, undo, failure honesty, stability, save, renderer purity, each with a seeded neighbouring-input check, seed 2_346)
   `…InputbudgetBoundary`, `…GoalBoundary`, `…RepeatabilityBoundary`, `…UndoBoundary`, `…FailurehonestyBoundary`,
   `…StabilityBoundary`, `…SaveBoundary`, `…RendererpurityBoundary`, each with a seeded neighbouring-input check, seed
   2_346); `--name host-5`
