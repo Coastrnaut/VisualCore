@@ -178,6 +178,16 @@ LISSAJOUS_LABYRINTH_WRITE_WITNESSES=1 swift test --package-path Packages/Experie
   level 2 kept; `LLReplayUITests` replays the win to its end. They run as the serial chunk `k3` of
   `scripts/release_check.py`. Lissajous Labyrinth stays a candidate (`-vcCandidates`) until X-R02-G02.
 
+## Device preparation (R02-G02-10)
+
+- **Definition.** `docs/apps/lissajous-labyrinth/device-rows.json` names the device scenario set (the 11 standard and
+  game scenarios and `fixture-level-1-solved`), the devices D1, D2, D3 tied to the ledger's DEV1/2/3-R02-G02 rows, and
+  rows LL-D1 … LL-D8 (launch, frame pacing, memory and the stress session, gesture feel, sound and haptics, VoiceOver
+  (non-gating), termination, the panel journeys), each covering the deferred device tasks of features 313–319.
+- **Plan.** `docs/apps/lissajous-labyrinth/device-campaign.md` is the written twin for the owner and the campaign.
+- **Check.** `python3 scripts/check_device_rows.py --experience r02-g02.lissajous-labyrinth` (release step
+  `device-rows-r02-g02`). Every row is "pending device campaign"; no device is contacted before ImplementationLock-100.
+
 ## Failures
 
 `LissajousLabyrinthError` reason codes: `r02-g02.level`, `r02-g02.move`, `r02-g02.stage`, `r02-g02.stale`,

@@ -126,6 +126,10 @@ Feature 319 (R02-G02-09) integrates Lissajous Labyrinth into the one app on the 
 `experience.r02-g02.lissajous-labyrinth.<name>`, app unit tests, the interface chunk `k3` (`LLPlayUITests`,
 `LLReplayUITests`) and the Release symbol check.
 
+Feature 320 (R02-G02-10) prepares the device campaign without touching a device:
+`docs/apps/lissajous-labyrinth/device-rows.json` and `device-campaign.md` (rows LL-D1 … LL-D8), checked by `python3
+scripts/check_device_rows.py --experience r02-g02.lissajous-labyrinth`.
+
 ```bash
 LISSAJOUS_LABYRINTH_WRITE_GOLDEN=1 swift test --package-path Packages/ExperiencesRound02 --filter LissajousLabyrinthRegressionGoldenTests
 ```
