@@ -40,6 +40,31 @@ import VisualCoreExperienceHost
         session.qualityPin = 0
     }
 
+    /// Gate X-R02-G02: the presenter's frame probes (two night corners) match the drawn still at every tier.
+    @Test func theFrameProbesMatchTheDrawnFrame() async throws {
+        let session = ExperienceSession()
+        defer { session.close() }
+        let shell = try await LissajousLabyrinthTest.open(session, seed: 0)
+        for tier in 0..<3 {
+            LissajousLabyrinthTest.pin(session, shell, tier: tier)
+            let still = try LissajousLabyrinthTest.still(session)
+            // The still is top-down; FrameChecks reads rows bottom-up, as RenderHost.readPixels gives them.
+            let row = LissajousLabyrinthTest.width * 4
+            var rgba: [UInt8] = []
+            for y in stride(from: LissajousLabyrinthTest.height - 1, through: 0, by: -1) {
+                rgba.append(contentsOf: still[(y * row)..<((y + 1) * row)])
+            }
+            let probes = shell.presenter.probes(try #require(shell.engine.core))
+            #expect(probes.map(\.name) == ["night-top-left", "night-bottom-right"])
+            for probe in probes {
+                let found = FrameChecks.probe(probe, rgba: rgba, width: LissajousLabyrinthTest.width,
+                                              height: LissajousLabyrinthTest.height)
+                #expect(found?.rawValue == probe.expected, "tier \(tier) \(probe.name): \(found?.rawValue ?? "none")")
+            }
+        }
+        session.qualityPin = 0
+    }
+
     @Test func theCheckedLevelsShowEveryRingState() async throws {
         // Across levels 1 … 81 the checkpoints are unvisited, next and visited, and some lap touches an obstacle, so
         // the colour checks above cover every state of FR-R02G0203-002.

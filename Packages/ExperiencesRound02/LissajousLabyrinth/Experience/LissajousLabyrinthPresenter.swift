@@ -25,6 +25,8 @@
 // Feature 317 (R02-G02-07) T-R02G0207-005 (FR-R02G0207-003, 004): the mirror carries whether a replay is available for
 // the current level and, during replay, its position; `startReplay`, `stepReplay` and `stopReplay` send the replay
 // actions; the first described core whose restore dropped results announces them once.
+// Gate X-R02-G02: `probes` declares the frame probes the verification runner samples: two background corners, outside
+// the figure and the dial rings, must be the dark night clear while the real scene (not the fallback) is drawn.
 #if os(iOS)
 import Foundation
 import LissajousLabyrinthCore
@@ -188,6 +190,15 @@ final class LissajousLabyrinthPresenter: ExperiencePresenter {
 
     func shedCaches() {
         scene.release()
+    }
+
+    /// The frame probes of the frame last drawn (see the file header): the top-left and bottom-right background
+    /// corners are `dark` (the night clear) once a snapshot was drawn by the real scene; none otherwise.
+    func probes(_ core: LissajousLabyrinthExperienceCore) -> [FrameProbe] {
+        guard lastSnapshot != nil, scene.fallbackReason == nil else { return [] }
+        return [FrameProbe(name: "night-top-left", x: 0.02, y: 0.02, expected: FrameColorClass.dark.rawValue),
+                FrameProbe(name: "night-bottom-right", x: 0.98, y: 0.98, expected: FrameColorClass.dark.rawValue)]
+            .compactMap { $0 }
     }
 
     /// Whether the play was in stage `playing` at the last frame (gestures answer only then).
