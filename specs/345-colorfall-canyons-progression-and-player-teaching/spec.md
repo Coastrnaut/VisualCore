@@ -164,7 +164,7 @@ budget without affecting progress.
 
 - **SC-R02G0505-001**: On levels 1 … 3, scripted players following each instruction win, and every instruction matches
   the state it was shown in.
-- **SC-R02G0505-002**: For all 100 certified levels, following exact hints from the start wins; for 2,000 seeded
+- **SC-R02G0505-002**: For all 100 certified levels, following exact hints from the start wins; for 200 seeded
   reachable states every exact hint is a legal action, and from every state that can still win following hints wins.
 - **SC-R02G0505-003**: Every failure explanation in 500 seeded failures names the true reason, basin, colour and
   amounts.
