@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-21 (R02-G03-09: Wave Knot Keeper's interface tests run as the serial chunk l3; an agent that cannot run code pins level constants from the level's witness file and an app unit test checks them against the Core).
+Last updated: 2026-11-21 (R02-G03-10: Wave Knot Keeper's device rows checked by the release step device-rows-r02-g03; the definition was validated against a scratch root of the ledger, manifest and task files before it entered the repository).
 
 ## 1. What is tested, and where
 
@@ -186,6 +186,10 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
 
 ### Swift and test-tool pitfalls
 
+- **Validate a device definition in a scratch root first** (R02-G03-10, 2026-11-21). `check_device_rows.py --root`
+  reads only the ledger, the game's scenario manifest, its device definition and the tasks of its nine earlier
+  features, so a new definition was checked against a scratch copy of those while the regression chain ran on the real
+  tree, then copied in and checked again (`device-rows-r02-g03`).
 - **Pin constants from the witness, check them against the Core** (R02-G03-09, 2026-11-21). The agent writing Wave
   Knot Keeper's interface tests could not run code, so it read level 1's point count, allowance and solution from
   `docs/games/wave-knot-keeper/levels/001.witness.json`; an app unit test asserts the pinned values equal

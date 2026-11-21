@@ -180,6 +180,17 @@ moves are listed point by point and direction by direction, and a state is solve
   app's migration check restores both into schema 3.
 - **Candidate.** Wave Knot Keeper stays a candidate (not available without `-vcCandidates`) until X-R02-G03.
 
+## Device preparation (R02-G03-10)
+
+- **Rows.** `docs/apps/wave-knot-keeper/device-rows.json` defines rows WK-D1 … WK-D8 (launch and first frame, frame
+  pacing, memory and thermal state, gesture feel, sound and haptics, VoiceOver at the largest text size (non-gating),
+  progress across a real termination, the panel journeys) on D1, D2 and D3 in that order, with 12 device scenarios;
+  every row is "pending device campaign" and covers every open {device} task of features 321–329.
+- **Plan.** `docs/apps/wave-knot-keeper/device-campaign.md` is the person's plan; owner actions stay
+  BLOCKED_OWNER_ACTION and D3 stays on iPadOS 26.5.
+- **Check.** `python3 scripts/check_device_rows.py --experience r02-g03.wave-knot-keeper` (release step
+  `device-rows-r02-g03`) validates the definition against the manifest, the ledger's device rows and the open tasks.
+
 ## Failures
 
 `WaveKnotKeeperError` reason codes: `r02-g03.level`, `r02-g03.move`, `r02-g03.stage`, `r02-g03.stale`,

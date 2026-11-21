@@ -180,3 +180,6 @@ WaveKnotKeeperRegressionGoldenTests`), simulator golden-frame and memory tests, 
 Feature 329 (R02-G03-09) integrates the game into the one app as a candidate: panel identifiers,
 `WaveKnotKeeperSchemaExamples.swift` (stored schema-1 and schema-2 examples), interface tests in
 `Apps/VisualCore/Tests/UI/WaveKnotKeeper` (chunk `l3`) and app unit tests.
+
+Feature 330 (R02-G03-10) prepares the device campaign: `docs/apps/wave-knot-keeper/device-rows.json` (rows WK-D1 …
+WK-D8, all pending) and `device-campaign.md`, checked by the release step `device-rows-r02-g03`.
