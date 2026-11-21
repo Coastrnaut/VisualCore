@@ -10,7 +10,8 @@
 // the core, the native controls cover every action and `adjust` wraps 15 + 1 → 0 and 0 − 1 → 15. The panel is laid out
 // in a window at the largest accessibility text size at 320 and 1024 points wide: the fitting width stays within the
 // window and the hosted scroll view's content stays within the width and the 520-point readable width on iPad, and
-// grows taller than at the default size. The sound policy's state table uses a fake loop player (8 combinations, a
+// grows taller than at the default size; feature 309 adds the same layout with a step pending (Apply and Clear).
+// The sound policy's state table uses a fake loop player (8 combinations, a
 // recipe change while playing, a failing `play()`); the presenter's own sound (the real `AmbientLoopPlayer`) is only
 // checked with the sound choice off, so no audio starts in the simulator: no player is made, an ordinary move keeps the
 // offered recipe and a level change offers the new one. Reduce Flashing: the presenter's lights fade over 0.45 s; the
@@ -406,6 +407,31 @@ enum AuroraLoomAccess {
                 #expect(heights[1] > heights[0], "the text grows: \(heights)")
             }
         }
+        // Feature 309 (T-R02G0109-013): the same layout with a step pending, so the Apply and Clear row is shown.
+        shell.presenter.stepPending(ribbon: 0, control: 0, by: 1)
+        #expect(shell.presenter.mirror.pending != nil)
+        for screen in screens {
+            for size in sizes {
+                let frame: CGRect = CGRect(origin: .zero, size: screen)
+                let window: UIWindow = UIWindow(frame: frame)
+                let controller: UIHostingController<AnyView> =
+                    UIHostingController(rootView: AnyView(shell.controls.environment(\.dynamicTypeSize, size)))
+                window.rootViewController = controller
+                window.isHidden = false
+                controller.view.frame = frame
+                window.layoutIfNeeded()
+                controller.view.layoutIfNeeded()
+                let what: String = "\(Int(screen.width)) pt at \(size) with a step pending"
+                let fitting: CGSize = controller.sizeThatFits(in: CGSize(width: screen.width,
+                                                                         height: .greatestFiniteMagnitude))
+                #expect(fitting.width <= screen.width + 0.5, "\(what): fitting width \(fitting.width)")
+                let scroll: UIScrollView = try #require(Access.scrollView(in: controller.view), "\(what): scroll view")
+                let limit: CGFloat = min(screen.width, AuroraLoomControls.maximumWidth) + 0.5
+                #expect(scroll.contentSize.width <= limit, "\(what): content width \(scroll.contentSize.width)")
+                window.isHidden = true
+            }
+        }
+        shell.presenter.clearPending()
     }
 
     // MARK: Sound (FR-R02G0106-006; SC-R02G0106-004)
