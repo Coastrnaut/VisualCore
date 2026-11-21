@@ -10,6 +10,7 @@
 // `WaveKnotKeeperLights` scale the crossing weights (present marks by their levels, vanished marks fading where they
 // were), so the rope is rebuilt while a crossing fade runs; the target match and the win glow raise the glow shells'
 // opacity from 0.8 to 1 (`glowOpacity`), never the gain, so Reduce Flashing's cap holds.
+// Feature 328 (R02-G03-08) T-R02G0308-005: `liveObjectCount` reports the renderers held (0 after `release()`).
 #if os(iOS)
 import Foundation
 import VisualCoreMath
@@ -55,6 +56,13 @@ final class WaveKnotKeeperRopeScene {
     }
 
     /// Releases every GPU object; the next draw rebuilds them (memory warning, teardown).
+    /// The renderers the scene holds (each with its buffers): 0 after `release()` (feature 328, the memory regression).
+    /// The per-frame ghost handle is drawn with the handle renderer, so it never counts on its own.
+    var liveObjectCount: Int {
+        (ropeRenderer == nil ? 0 : 1) + (glowRenderer == nil ? 0 : 1) + (handleRenderer == nil ? 0 : 1)
+            + gateRenderers.count + (fallbackRenderer == nil ? 0 : 1)
+    }
+
     func release() {
         ropeRenderer?.release()
         glowRenderer?.release()

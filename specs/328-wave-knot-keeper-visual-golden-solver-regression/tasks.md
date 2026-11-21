@@ -36,7 +36,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 4: Stories 2 and 3 — simulator frames and memory (P1, P2)
 
-- [ ] T-R02G0308-005 [US2] [US3] Edit `Packages/ExperiencesRound02/WaveKnotKeeper/Experience/WaveKnotKeeperRopeScene.swift` (`liveObjectCount`: renderers
+- [X] T-R02G0308-005 [US2] [US3] Edit `Packages/ExperiencesRound02/WaveKnotKeeper/Experience/WaveKnotKeeperRopeScene.swift` (`liveObjectCount`: renderers — Verified 2026-11-21: 2026-11-21 sim-27 exit 0 on sim-27.2: WaveKnotKeeperRegressionGoldenFrameTests (16 golden frames rendered: drawn snapshot equals the golden one, described positions agree with the CPU reference, feature-323 tolerances) and WaveKnotKeeperRegressionMemoryTests (12 cycles 29.7 ... 30.4 MB; no renderers after each warning and close, rebuilt on the next frame); all Wave Knot Keeper experience tests
   held, 0 after release) and create `Packages/ExperiencesRound02/WaveKnotKeeper/ExperienceTests/WaveKnotKeeperRegressionGoldenFrameTests.swift` and
   `Packages/ExperiencesRound02/WaveKnotKeeper/ExperienceTests/WaveKnotKeeperRegressionMemoryTests.swift` (agent C: the 16 frames rendered and checked
   against their descriptions with the feature-323 tolerances (3 px, 0.15, sapphire tint, 0.05); 12 open-draw-warn-close cycles with
