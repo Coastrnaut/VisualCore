@@ -3148,7 +3148,8 @@ class GovernanceTests(unittest.TestCase):
     LEDGER_READERS = {"scripts/validate_autocreator.py", "scripts/render_autocreator.py", "scripts/build_traceability_matrix.py",
                       "scripts/planning_index.py", "scripts/build_catalog.py",
                       "scripts/check_app_targets.py",   # reads gate status only (UA-F10, FR-U10-011)
-                      "scripts/metadata_inputs.py"}     # reads X- gate status only (UA-F11, FR-U11-070)
+                      "scripts/metadata_inputs.py",     # reads X- gate status only (UA-F11, FR-U11-070)
+                      "scripts/check_device_rows.py"}   # reads DEV gate ids only (feature 310, FR-R02G0110-004)
     PUSHERS = {"scripts/tick_task.py", "scripts/prepush_scan.py"}
     SCRIPT_SUFFIXES = (".py", ".sh", ".bash", ".zsh", ".command", ".rb", ".yml", ".yaml")
     NOT_OURS = ("External/", "Vendor/", "docs/archive/")
@@ -5248,6 +5249,97 @@ class AuroraLoomRegressionTests(unittest.TestCase):
         code, out, _ = self.run_main("--skip-simulator", codes=(1,), outputs=("error: build failed",))
         self.assertEqual(code, 1)
         self.assertIn("aurora-loom-regression host: FAIL (exit 1; first failing: unknown)", out)
+
+
+class DeviceRowsCheckTests(unittest.TestCase):
+    """The device-row definition check (feature 310, T-R02G0110-003, FR-R02G0110-004, spec Edge Cases): the real
+    definition passes; on a temporary copy of the definition, manifest, ledger subset and task files each named defect
+    fails with a reason naming it."""
+
+    GAME = "r02-g01.aurora-loom"
+    DEFINITION = "docs/apps/aurora-loom/device-rows.json"
+    MANIFEST = "Packages/ExperiencesRound02/AuroraLoom/scenario-manifest.json"
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tool = load("check_device_rows")
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self._tmp.name)
+        for rel in (self.DEFINITION, self.MANIFEST):
+            (self.root / rel).parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(ROOT_DIR / rel, self.root / rel)
+        for tasks in sorted(ROOT_DIR.glob("specs/30[1-9]-aurora-loom-*/tasks.md")):
+            target = self.root / tasks.relative_to(ROOT_DIR)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(tasks, target)
+        ledger = json.loads((ROOT_DIR / ".autonomy/migration/ledger.json").read_text(encoding="utf-8"))
+        subset = {"schema": ledger.get("schema"),
+                  "gates": [g for g in ledger["gates"] if g["id"].endswith("R02-G01")]}
+        (self.root / ".autonomy/migration").mkdir(parents=True)
+        (self.root / ".autonomy/migration/ledger.json").write_text(json.dumps(subset), encoding="utf-8")
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def run_main(self, root):
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            code = self.tool.main(["--experience", self.GAME], root=root)
+        return code, out.getvalue()
+
+    def edit(self, rel, change):
+        path = self.root / rel
+        data = json.loads(path.read_text(encoding="utf-8"))
+        change(data)
+        path.write_text(json.dumps(data), encoding="utf-8")
+
+    def assert_fails(self, needle):
+        code, out = self.run_main(self.root)
+        self.assertEqual(code, 1, out)
+        lines = out.splitlines()
+        self.assertTrue(lines and all(l.startswith(f"device-rows {self.GAME}: ") for l in lines), out)
+        self.assertIn(needle, out)
+
+    def test_real_repository_passes(self):
+        code, out = self.run_main(ROOT_DIR)
+        self.assertEqual(code, 0, out)
+        self.assertRegex(out.strip(), r"^device-rows r02-g01\.aurora-loom: PASS \(\d+ rows, \d+ scenarios\)$")
+
+    def test_minimal_copy_passes(self):
+        code, out = self.run_main(self.root)
+        self.assertEqual(code, 0, out)
+
+    def test_scenario_removed_from_manifest_fails(self):
+        self.edit(self.MANIFEST, lambda d: d.update(scenarios=[s for s in d["scenarios"] if s["name"] != "hero"]))
+        self.assert_fails("scenario hero not in the manifest")
+
+    def test_missing_row_field_fails(self):
+        self.edit(self.DEFINITION, lambda d: d["rows"][0].pop("procedure"))
+        self.assert_fails("AL-D1: missing field procedure")
+
+    def test_uncovered_task_fails(self):
+        self.edit(self.DEFINITION, lambda d: d["rows"][3]["covers"].remove("T-R02G0104-011"))
+        self.assert_fails("T-R02G0104-011 not covered by any row")
+
+    def test_result_field_fails(self):
+        self.edit(self.DEFINITION, lambda d: d["rows"][1].update(result="58 fps"))
+        self.assert_fails("AL-D2: result field result")
+
+    def test_schema_two_fails(self):
+        self.edit(self.DEFINITION, lambda d: d.update(schema=2))
+        self.assert_fails("schema 2 is not 1")
+
+    def test_unreadable_or_missing_definition_fails(self):
+        (self.root / self.DEFINITION).write_text("{not json", encoding="utf-8")
+        self.assert_fails(f"unreadable definition {self.DEFINITION}")
+        (self.root / self.DEFINITION).unlink()
+        self.assert_fails(f"missing definition {self.DEFINITION}")
+
+    def test_unknown_experience_fails(self):
+        self.edit(self.MANIFEST, lambda d: d.update(experience="r02-g99.other"))
+        self.assert_fails("unknown experience")
 
 
 def ledger_tree_hash() -> str:

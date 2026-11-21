@@ -17,7 +17,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
   devices D1 → DEV1-R02-G01, D2 → DEV2-R02-G01, D3 → DEV3-R02-G01; the 12 scenarios of clarification Q2; rows AL-D1 …
   AL-D8 of clarification Q1 with title, devices, procedure, measurements, pass (clarification Q5), gating (false only for
   AL-D6), covers, owner_steps, status "pending device campaign"; no result field)
-- [ ] T-R02G0110-003 [P] [US1] Create `scripts/check_device_rows.py` (contracts/device-rows.md; clarification Q4: shape,
+- [X] T-R02G0110-003 [P] [US1] Create `scripts/check_device_rows.py` (contracts/device-rows.md; clarification Q4: shape, — Verified 2026-11-21: 2026-11-21 device-rows exit 0 (PASS, 8 rows, 12 scenarios); script-tests exit 0 alone (DeviceRowsCheckTests 9 tests: real repo passes; removed scenario, missing field, uncovered task, result field, schema 2, unreadable and missing file, unknown experience each fail by name); check_device_rows.py added to the reviewed ledger readers
   manifest, ledger, coverage of the open {device} task lines of `specs/30[1-9]-aurora-loom-*/tasks.md` (301–309 only), the three
   R02-G01-06 items and the six UA-F13 names; named failures; exit codes) with tests in `scripts/test_scripts.py` (agent
   A: the real definition passes; a removed scenario, a missing field, an uncovered item, a result field, a schema 2, an
