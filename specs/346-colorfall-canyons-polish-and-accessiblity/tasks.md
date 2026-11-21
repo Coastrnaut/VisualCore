@@ -77,7 +77,7 @@ observations after ImplementationLock-100.
   `--name host-full`, `--name app-unit`
 - [X] T-R02G0506-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-21: 2026-11-21 reference-1 exit 0 (.autonomy/migration/checks/R02-G05-06.reference-1.json)
 - [X] T-R02G0506-010 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-21: 2026-11-21 reference-2 exit 0 (.autonomy/migration/checks/R02-G05-06.reference-2.json)
-- [ ] T-R02G0506-011 Script tests, run alone (`--name script-tests`)
+- [X] T-R02G0506-011 Script tests, run alone (`--name script-tests`) — Verified 2026-11-21: 2026-11-21 script-tests exit 0, run alone (.autonomy/migration/checks/R02-G05-06.script-tests.json)
 - [ ] T-R02G0506-012 {device} After ImplementationLock-100, on D1, D2 and D3: hear the ambient sound, feel the haptics,
   play level 1 with VoiceOver and the largest text size (SC-R02G0506-001 … 004 on hardware). Not run before the lock.
 - [ ] T-R02G0506-013 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
