@@ -36,7 +36,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 4: Stories 2 and 3 — simulator frames and memory (P1, P2)
 
-- [ ] T-R02G0208-005 [US2] [US3] Edit `Packages/ExperiencesRound02/LissajousLabyrinth/Experience/LissajousLabyrinthThreadScene.swift` (`liveObjectCount`: renderers
+- [X] T-R02G0208-005 [US2] [US3] Edit `Packages/ExperiencesRound02/LissajousLabyrinth/Experience/LissajousLabyrinthThreadScene.swift` (`liveObjectCount`: renderers — Verified 2026-11-21: 2026-11-21 sim-27 exit 0 on sim-27.2: LissajousLabyrinthRegressionGoldenFrameTests (16 golden frames rendered: the drawn snapshot equals the described one; path samples, rings, obstacles and background within the 2 px / 0.12 / 0.05 tolerances; dial rings and knobs inside the frame) and LissajousLabyrinthRegressionMemoryTests (12 cycles, isolated run: 31.4 … 33.6 MB, within 16 MB of cycle 1; no renderers after each warning and close, rebuilt on the next frame); all 53 Lissajous experience tests. Found on the way: a still drawn at the same time as the last frame froze the fades, so a frame time that does not move forward now settles the lights
   held, 0 after release) and create `Packages/ExperiencesRound02/LissajousLabyrinth/ExperienceTests/LissajousLabyrinthRegressionGoldenFrameTests.swift` and
   `Packages/ExperiencesRound02/LissajousLabyrinth/ExperienceTests/LissajousLabyrinthRegressionMemoryTests.swift` (agent C: the 16 frames rendered and checked
   against their descriptions with the 2 px, 0.12 and 0.05 tolerances; 12 open-draw-warn-close cycles with

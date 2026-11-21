@@ -165,8 +165,9 @@ final class LissajousLabyrinthPresenter: ExperiencePresenter {
         let snapshot = core.snapshot(time: time)
         lastSnapshot = snapshot
         // A new level (or mode) starts from its own lights: they settle at once, only changes within a play fade. A
-        // frame time that goes back (an off-screen still drawn at its own time) is a separate picture: it settles too.
-        if let last = lastFrameTime, lightsLevel == snapshot.level.fingerprint, frame.time >= last {
+        // frame time that does not move forward (an off-screen still drawn at its own time, or at the same time as the
+        // last frame) is a separate picture: it settles too (feature 318: the hero golden frame).
+        if let last = lastFrameTime, lightsLevel == snapshot.level.fingerprint, frame.time > last {
             lights.step(toward: snapshot, elapsed: frame.time - last)
         } else {
             lights.settle(to: snapshot)

@@ -68,6 +68,13 @@ final class LissajousLabyrinthThreadScene {
         geometryKey = nil
     }
 
+    /// The renderers the scene holds (each with its buffers): 0 after `release()` (feature 318, the memory regression).
+    /// The per-frame knob, outline, preview and head meshes are released within their draw, so they never count.
+    var liveObjectCount: Int {
+        (threadRenderer == nil ? 0 : 1) + ringRenderers.count + sphereRenderers.count + dialRingRenderers.count
+            + (fallbackRenderer == nil ? 0 : 1)
+    }
+
     /// Releases every GPU object; the next draw rebuilds them (memory warning, teardown).
     func release() {
         threadRenderer?.release()
