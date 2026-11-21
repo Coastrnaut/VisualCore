@@ -13,7 +13,7 @@ tests stay short (< 10 s each; interface tests < 60 s). No {owner} tasks.
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G0109-002 Create `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomSchemaExamples.swift` (contracts/api.md; data-model: schema 1 "{level: 2,
+- [X] T-R02G0109-002 Create `Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomSchemaExamples.swift` (contracts/api.md; data-model: schema 1 "{level: 2, — Verified 2026-11-20: 2026-11-20 host exit 0 (AuroraLoomSchemaExamples: schema-1 and schema-2 examples, 6 host tests incl. the registry's migration check); registry stores both examples, comment corrected; app-unit exit 0 restores them in the app
   records: [two moves]}", schema 2 "{level 1, campaign, frontier 2, level 1 solved without a trace}", seed 7, A18's
   envelope) with `Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomSchemaExampleTests.swift` (agent A: both restore through `migrations` to
   schema 3 with progress kept; the expected digests match; versions other than 1 and 2 give nil); edit

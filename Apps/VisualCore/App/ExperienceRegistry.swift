@@ -524,11 +524,14 @@ extension ExperienceRegistry {
         return registration
     }
 
-    /// R02-G01 Aurora Loom (feature 303, R02-G01-03): a candidate until X-R02-G01. Snapshot schema 1, so no earlier
-    /// example is stored yet.
+    /// R02-G01 Aurora Loom (feature 303, R02-G01-03): a candidate until X-R02-G01. Snapshot schema 3 (feature 307,
+    /// R02-G01-07): the stored schema-1 and schema-2 examples prove the migrations (feature 309, R02-G01-09).
     fileprivate static var auroraLoom: ExperienceRegistration? {
         guard let id = AuroraLoomExperience.id else { return nil }
-        var registration = ExperienceRegistration(id: id, core: AuroraLoomExperienceCore.self) { launch in
+        let examples = [AuroraLoomExperienceCore.schemaOneExample(),
+                        AuroraLoomExperienceCore.schemaTwoExample()].compactMap { $0 }
+        var registration = ExperienceRegistration(id: id, core: AuroraLoomExperienceCore.self,
+                                                  examples: examples) { launch in
             let system = SystemAccessibilityObserver.systemValues()
             return AuroraLoomExperience.make(
                 id: id, storage: launch.storage,
