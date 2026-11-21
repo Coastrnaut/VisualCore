@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-21
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G03-02 (migration ledger, game feature of experience R02-G03) · ID namespace FR-R02G0302-###,
 SC-R02G0302-###, T-R02G0302-###
@@ -28,6 +28,56 @@ Canonical overrides:
 - **Shared features used:** R02-F23 (puzzle contract: `WaveKnotKeeperRules` from R02-G03-01) and R02-F24 (catalog
   digest, difficulty and progression rule); R02-F03 numbers.
 - **Model:** feature 312 (Lissajous Labyrinth's generator and solver witness).
+
+## Clarifications
+
+### Session 2026-11-21
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time. Facts checked in
+code (read-only, 2026-11-21): R02-G03-01's `WaveKnotKeeperLevel` (6 … 16 points in −16 … 16, at most 4 gates, tension
+bound 1 … 49,152, allowance 1 … 64; refused when the start passes through itself, already wins or exceeds the bound),
+`WaveKnotKeeperTarget` (crossings 0 … 32, |writhe| ≤ crossings, same parity), `WaveKnotKeeperRules.moves` (every legal
+single-point unit step in point then direction order, at most 6 per point), `WaveKnotKeeperGeometry.summary`, `isSimple`,
+`tension`, `WaveKnotKeeperPlay.refusal(of:points:level:)` with `r02-g03.move("crossing" | "tension" | …)`; R02-F24's
+`PuzzleCatalog.digest(id:identities:)`, `ProgressionRule`; `SeedDerivation.derive(_:index:)`, `SeededRandom`; the
+archived manifest's 100 entries (bands 1 … 5 × 20, budgets 8 … 19). Feature 312 is the pattern.
+
+- Q: How is a level built from its manifest entry? → A: the 100 entries (number, planned seed, band, move budget) are a
+  table in `WaveKnotKeeperManifest` copied from the archived design with its provenance. Candidate k of entry n draws from
+  `SeededRandom(seed: SeedDerivation.derive(plannedSeed, index: k))`: a solved rope of 5 + band points (6 … 10), each point
+  at a seeded angle around the origin (angles sorted, then `band − 1` seeded neighbour swaps so the projection crosses
+  itself) at a seeded radius 5 … 12 and height −4 … 4, rounded to the lattice; it is kept only if simple, in bounds and
+  with a non-degenerate projection, and its summary is the target. Gates: bands 1 … 5 get 0, 0, 1, 1, 2 cubes of side 3
+  centred on seeded rope points. The start is `scramble` seeded legal moves from the solved rope (bands 1 … 5: 1, 2, 2,
+  3, 3), never stepping back onto an earlier rope; the tension bound is the largest tension along that walk plus 64 ×
+  (6 − band); the allowance is the manifest budget. A candidate is kept when the level is valid (its start does not win),
+  its shortest solution lies in its band's range (bands 1 … 5: 1, 1–2, 2, 2–3, 3 moves) and does not exceed the budget;
+  otherwise k grows, at most 64 candidates, then `generation(n)`. Ids `wave-knot-keeper-NNN`; tutorial flag on levels
+  1 … 3. Impact: FR-R02G0302-001; SC-R02G0302-001, 003.
+- Q: How does the solver find the shortest solution and how much work may it do? → A: `WaveKnotKeeperSolver` runs a
+  breadth-first search from the start over legal ropes (the kernel's `WaveKnotKeeperRules.moves` and `apply`), ropes
+  compared by their points, to the first winning rope, depth at most 3 (the largest band range); ties by the rules' move
+  order at each depth, so the witness is the first shortest sequence in that order. The work is the number of ropes
+  expanded; with at most 10 points and 6 directions it is at most 1 + 60 + 3,600 = 3,661 expansions (at most 219,660 move
+  checks) per level. A start not solved within the depth is unsolvable for the generator. Impact: FR-R02G0302-002;
+  SC-R02G0302-002.
+- Q: What difficulty metrics are stored and what progression is required? → A: `WaveKnotKeeperDifficulty` holds the
+  shortest solution, the point count, the gate count, the target crossings and the work. The catalog in manifest order
+  keeps R02-F24's standard `ProgressionRule` (drop at most 1, jump at most 3) on shortest solutions; band means of
+  shortest and of point count never fall. Impact: FR-R02G0302-003, 005; SC-R02G0302-004.
+- Q: What is in a witness file and how is it checked? → A: `docs/games/wave-knot-keeper/levels/NNN.witness.json`, JSON
+  schema 1 with sorted keys: number, the level's stored form, the moves, the play fingerprints after `begin` and after
+  each move, the terminal summary (crossings, writhe, tension), the near miss (from the winning rope, the first legal move
+  in rules order whose rope does not win, with its summary), the crossing counterexample (the first rope explored by the
+  solver, in search order, with a move the rules refuse with `r02-g03.move("crossing")`: the rope's points and that move),
+  the difficulty and the candidates skipped. A test rebuilds every witness and compares bytes; it writes the files only
+  with `WAVE_KNOT_KEEPER_WRITE_WITNESSES=1`. Decoding refuses newer schemas, damaged files and witnesses that no longer
+  replay. A candidate without both counterexamples is skipped. Impact: FR-R02G0302-004; SC-R02G0302-003, 005.
+- Q: How is the catalog identified, how long may certification take and how are refusals named? → A: the digest is
+  `PuzzleCatalog<WaveKnotKeeperRules>.digest(id: "wave-knot-keeper", identities:)` over the 100 level fingerprints in
+  manifest order, pinned in a test. Certification tests are split by band so each runs under 10 seconds on a debug host
+  build (measured locally, not asserted on CI). New refusals: `generation(Int)` (`r02-g03.generation`) and
+  `witness(String)` (`r02-g03.witness`). Impact: FR-R02G0302-005, 006; SC-R02G0302-006.
 
 ## User Scenarios & Testing *(mandatory)*
 
