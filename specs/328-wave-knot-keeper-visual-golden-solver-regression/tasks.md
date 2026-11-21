@@ -65,7 +65,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 - [X] T-R02G0308-011 Script tests, run alone (`--name script-tests`) — Verified 2026-11-21: 2026-11-21 script-tests exit 0, run alone
 - [ ] T-R02G0308-012 {device} After ImplementationLock-100, on D1, D2 and D3: frame time and memory of the golden levels.
   Not run before the lock.
-- [ ] T-R02G0308-013 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+- [X] T-R02G0308-013 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record — Verified 2026-11-21: 2026-11-21 converge round 1 converged (nothing appended); sealed 17 passing; recorded R02-G03-08 pass; T-R02G0308-012 {device} stays open
 
 ## Dependencies and parallel work
 
