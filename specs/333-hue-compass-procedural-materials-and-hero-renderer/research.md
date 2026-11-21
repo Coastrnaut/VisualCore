@@ -12,7 +12,7 @@
 - **R3 Hidden target.** Decision: the snapshot holds the target only after the play ends. Rationale: the renderer cannot
   leak what it never receives; a purity test compares frames of two levels differing only in the target.
 - **R4 Camera.** Decision: a fixed authored view down −z tilted 35° about x, distance fitted to a bounding circle of
-  radius 1.4 for aspects 0.4 … 2.5 with a 5 % margin. Rationale: a readable wheel with visible prism depth.
+  radius 1.45 (marks at 1.32, fog prism tops up to 0.31 high) for aspects 0.4 … 2.5 with a 5 % margin. Rationale: a readable wheel with visible prism depth.
 - **R5 Reuse of R02-G03-03 patterns.** Decision: the adapter, snapshot, presenter, fallback, tier log, scenario manifest
   and registration follow Wave Knot Keeper's shapes so the shared checks apply unchanged; the digest is the level number
   and the play fingerprint.

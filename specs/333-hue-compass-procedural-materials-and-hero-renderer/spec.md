@@ -52,7 +52,7 @@ example of an unregistered candidate.
   translucent prisms at radius 1.1 … 1.25, height 0.04 + 0.03 × density and brightness density/9 (luminance only); each
   probed bearing carries a pearl mark at radius 1.32 and the selection an ember mark; after the play ends the target
   bearing carries a sapphire ring. The camera is a fixed authored perspective looking down the z axis tilted 35° about x,
-  fitting the compass's bounding circle of radius 1.4 (swipe and orbit come in R02-G04-04). The fog drifts slowly
+  fitting a bounding sphere of radius 1.45 about the centre, holding every mark and every fog prism top (at most 0.31 high) (swipe and orbit come in R02-G04-04). The fog drifts slowly
   (presentation time only). Nothing drawn is consulted by the rules. Impact: FR-R02G0403-001, 002, 006.
 - Q: What do the three quality tiers change? → A: `level-0` (richest): needle prism with 12 facets, 3 fog layers, 2 glow
   shells; `level-1`: 8 facets, 2 fog layers, 1 glow shell; `level-2` (the design's "Tier 0, D3-safe"): 4 facets, 1 fog

@@ -27,7 +27,7 @@ tests stay short (< 10 s each). No {owner} tasks.
   0.8 at a tier's facets, 96 ticks at 0.95 … 1.0, 24 unlit band segments at 0.82 … 0.92 with glyphs at 0.895 … 0.92, fog
   prisms at 1.1 … 1.25 with height 0.04 + 0.03 × density and brightness density/9 in the tier's layers, probe marks at
   1.32 (pearl), selection (ember) and target ring (sapphire, only when present), camera down −z tilted 35° fitted to
-  radius 1.4 for aspect 0.4 … 2.5 with a 5 % margin, `project`) with `Packages/ExperiencesRound02/HueCompass/CoreTests/HueCompassSceneGeometryTests.swift`
+  bounding-sphere radius 1.45 for aspect 0.4 … 2.5 with a 5 % margin, `project`) with `Packages/ExperiencesRound02/HueCompass/CoreTests/HueCompassSceneGeometryTests.swift`
   (finite and bounded for extreme settings; projections of every element inside the view with margin at 7 aspects;
   bearings, bands, glyphs and marks at the same places at every tier; fog brightness follows density only); `--name
   host-3`
