@@ -44,7 +44,7 @@ or {device} tasks (pure logic and host-generated content). Fixture seed 2_322; t
 
 ## Phase 5: Stories 3 and 4 — difficulty and honest witness files (P2)
 
-- [ ] T-R02G0302-005 [P] [US4] Create `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperWitness.swift` (schema 1; built by replaying the solution
+- [X] T-R02G0302-005 [P] [US4] Create `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperWitness.swift` (schema 1; built by replaying the solution — Verified 2026-11-21: 2026-11-21 host-4 exit 0 (8 witness tests: byte round trip, near miss loses, crossing refused, newer and damaged refused, every edited part refused; decode re-runs the solver)
   on a `WaveKnotKeeperPlay`: fingerprints after begin and each move; terminal summary; near miss and crossing
   counterexample per clarification Q4; sorted-key pretty JSON with a trailing newline; `decode` refuses newer, damaged and
   non-replaying witnesses) with `Packages/ExperiencesRound02/WaveKnotKeeper/CoreTests/WaveKnotKeeperWitnessTests.swift` (round trip byte for byte; edited move,
