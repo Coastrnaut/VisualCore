@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-21
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G04-02 (migration ledger, game feature of experience R02-G04) · ID namespace FR-R02G0402-###,
 SC-R02G0402-###, T-R02G0402-###
@@ -27,6 +27,60 @@ Canonical overrides:
 - **Shared features used:** R02-F23 (puzzle contract: `HueCompassRules` from R02-G04-01) and R02-F24 (catalog digest,
   difficulty and progression rule); R02-F03 numbers.
 - **Model:** feature 322 (Wave Knot Keeper's generator and solver witness).
+
+## Clarifications
+
+### Session 2026-11-21
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time. Facts checked in
+code (read-only, 2026-11-21): R02-G04-01's `HueCompassLevel` (offset 0 … 23, fog 96 × 0 … 9, target and start 0 … 95 with
+the start farther than the bearing tolerance, bearing tolerance 0 … 4, band tolerance 0 … 2, allowance 2 … 24),
+`HueCompassWheel` (bands, circular distances, arcs), `HueCompassLevel.clue(at:)` and `accepts(bearing:band:)`,
+`HueCompassPlay` (probes and the selection spend one unit, turns are free); R02-F24's `PuzzleCatalog.digest(id:
+identities:)`, `ProgressionRule`; `SeedDerivation.derive(_:index:)`, `SeededRandom`; the archived manifest's 100 entries
+(bands 1 … 5 × 20, budgets 8 … 19). Feature 322 is the pattern. A Python prototype (2026-11-21, 20 seeded levels per
+setting) measured how fog sparsity and tolerances drive the smallest probe count: with tolerances (2, 1) or looser every
+level needs one probe; with (1, 0), 30 % clear fog gives 14 one-probe and 6 two-probe levels, 40 % gives 10, 9 and 1 not
+deducible within two, 60 % gives 15 not deducible.
+
+- Q: How is a level built from its manifest entry? → A: the 100 entries (number, planned seed, band, move budget) are a
+  table in `HueCompassManifest` copied from the archived design with its provenance. Candidate k of entry n draws from
+  `SeededRandom(seed: SeedDerivation.derive(plannedSeed, index: k))`, in this order: the offset (0 … 23); the 96 fog
+  densities, each clear (0) when a draw 0 … 99 is below the band's clear share (bands 1 … 5: 0, 10, 20, 30, 40 %),
+  otherwise 1 … 9; the target (0 … 95); the start, redrawn until it is farther from the target than the bearing tolerance.
+  Tolerances (bearing, band) by band: (4, 2), (3, 1), (2, 1), (1, 0), (1, 0). The allowance is the manifest budget. A
+  candidate is kept when its smallest probe count lies in the band's range (bands 1 … 3: 1; band 4: 1 … 2; band 5: 2) and
+  both counterexamples exist; otherwise k grows, at most 64 candidates, then `generation(n)`. Ids `hue-compass-NNN`;
+  tutorial flag on levels 1 … 3. Impact: FR-R02G0402-001; SC-R02G0402-001, 003.
+- Q: How does the solver decide deducibility and how much work may it do? → A: the candidates are the 96 bearings
+  farther from the start than the bearing tolerance (the kernel forbids the others). A probe set S partitions them by
+  their clues at every bearing of S; S settles the level when every class is acceptable, i.e. some bearing is within the
+  bearing tolerance of every member and some band within the band tolerance of every member's band.
+  `HueCompassSolver` tries the empty set, then every set of one bearing, then every set of two, each in increasing
+  lexicographic order of bearings, and returns the first that settles (depth bound 2). The work is the number of sets
+  tried, at most 1 + 96 + 4,560 = 4,657 (at most 4,657 × 96 = 447,072 candidate classifications) per level. For the
+  witness, the selection is the smallest acceptable (bearing, band) of the true target's class (bearing first, then
+  band, each from 0). Impact: FR-R02G0402-002; SC-R02G0402-001, 002.
+- Q: What difficulty metrics are stored and what progression is required? → A: `HueCompassDifficulty` holds the smallest
+  probe count, the size of the largest class after the best single probe (the single bearing with the smallest largest
+  class, lowest bearing on a tie), the bearing and band tolerances, the clear-fog share and the work. The catalog in
+  manifest order keeps R02-F24's standard `ProgressionRule` (drop at most 1, jump at most 3) on the smallest probe count;
+  the band means of the smallest probe count never fall, and harder bands have tolerances no looser than easier ones.
+  Impact: FR-R02G0402-003, 005; SC-R02G0402-004.
+- Q: What is in a witness file and how is it checked? → A: `docs/games/hue-compass/levels/NNN.witness.json`, JSON schema 1
+  with sorted keys: number, the level's stored form, the actions (for each probe bearing in order: the shortest turn to
+  it, when not zero, then the probe; then the selection), the clues, the candidate count after each probe, the play
+  fingerprints after `begin` and after each action, the near miss (the selection of the target's bearing plus the bearing
+  tolerance plus one with the target's band, which fails), the insufficient smaller set (for a smallest count of 2, the
+  first single bearing in order; for 1, the empty set) with two consistent targets that no one selection accepts
+  together, the difficulty and the candidates skipped. A test rebuilds every witness and compares bytes; it writes the
+  files only with `HUE_COMPASS_WRITE_WITNESSES=1`. Decoding refuses newer schemas, damaged files and witnesses that no
+  longer replay. Impact: FR-R02G0402-004; SC-R02G0402-003, 005.
+- Q: How is the catalog identified, how long may certification take and how are refusals named? → A: the digest is
+  `PuzzleCatalog<HueCompassRules>.digest(id: "hue-compass", identities:)` over the 100 level fingerprints in manifest
+  order, pinned in a test. Certification tests are split by band so each runs under 10 seconds on a debug host build
+  (measured locally, not asserted on CI). New refusals: `generation(Int)` (`r02-g04.generation`) and `witness(String)`
+  (`r02-g04.witness`). Impact: FR-R02G0402-005, 006; SC-R02G0402-006.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -74,7 +128,7 @@ file is refused.
 ### Edge Cases
 
 - **A seed whose candidate is not deducible, too easy or too hard for its band:** the generator moves to the next
-  candidate deterministically (a bounded number) and records how many it skipped; no candidate within the bound is a
+  candidate deterministically (at most 64) and records how many it skipped; no candidate within the bound is a
   named refusal.
 - **More than one smallest probe set:** allowed; the witness picks one by a stated tie rule.
 - **A level deducible with a single probe (smallest count 1):** the "smaller probe set" counterexample is the empty set
