@@ -45,7 +45,7 @@ or {device} tasks (pure logic and host-generated content). Fixture seed 2_332; t
 
 ## Phase 5: Stories 3 and 4 — difficulty and honest witness files (P2)
 
-- [ ] T-R02G0402-005 [P] [US4] Create `Packages/ExperiencesRound02/HueCompass/Core/HueCompassWitness.swift` (schema 1; actions: for each probe bearing the
+- [X] T-R02G0402-005 [P] [US4] Create `Packages/ExperiencesRound02/HueCompass/Core/HueCompassWitness.swift` (schema 1; actions: for each probe bearing the — Verified 2026-11-21: 2026-11-21 host-4 exit 0 (agent B: 9 witness tests: byte round trip, canonical actions, near miss fails, ambiguity holds, newer and damaged refused, every edited part refused; decode re-derives everything without the solver)
   shortest turn when not zero, then the probe, then the selection; built by replaying them on a `HueCompassPlay`: clues,
   candidate counts after each probe, fingerprints after begin and each action; near miss and ambiguity per clarification
   Q4; sorted-key pretty JSON with a trailing newline; `decode` refuses newer, damaged and non-replaying witnesses) with
