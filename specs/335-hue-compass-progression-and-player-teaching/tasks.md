@@ -69,3 +69,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks.
 
 001 → {002 (agent B), 003 (agent C)} → 004 (lead) → 005 (lead; agent D writes the simulator tests) → 006 … 011. Shared
 files (adapter, scenarios, presenter, controls, docs) stay with the lead. MVP: Stories 1–3.
+
+## Phase 6: Convergence
+
+- [ ] T-R02G0405-012 Show hue bands as 1 … 24 in every player-facing text, matching the panel, the band picker and the descriptions: the select and guess hint texts in `Packages/ExperiencesRound02/HueCompass/Core/HueCompassHints.swift` ("Select bearing b with band h+1") and the failure text ("band B+1", band distances unchanged), with `HueCompassHintsTests.swift` and `HueCompassTeachingTests.swift` expecting the 1-based band, per FR-R02G0405-002, FR-R02G0405-003 (contradicts); `--name host-4 -- swift test --package-path Packages/ExperiencesRound02 --filter 'HueCompassHintsTests|HueCompassExperienceCoreTests'`
