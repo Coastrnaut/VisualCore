@@ -43,7 +43,8 @@ as schema 1; the core may not read a clock.
   plan whose first edit is a carve: level 1 "Carve a channel", level 2 "Carve near row r", level 3 "Carve row r, column c";
   a valve: level 1 "Switch a valve", level 2 "Switch the <colour> spring", level 3 "Open (or close) the <colour> valve".
   When no set wins: "No win is reachable from here: undo the last change or retry the level." Hints never change the
-  state, are unlimited, do not affect stars and reset to level 1 after any change of the play; a won level has none.
+  state, are unlimited, do not affect stars and reset to level 1 after any change of the play; they are given while
+  playing or paused; a failed play's hint is the undo-or-retry text; a won level has none.
   "A state that can still win" means one whose plan exists. Impact: FR-R02G0505-002; SC-R02G0505-002.
 - Q: What does the tutorial show, and when does it advance? → A: on levels 1 … 3, three instructions in order: (1)
   "Drag across a sandstone cell (or use Carve) to cut a channel, and tap a spring (or its valve button) to open or close
@@ -177,6 +178,8 @@ budget without affecting progress.
 - Saving progress to disk is R02-G05-07; announcements and haptics are R02-G05-06.
 - The kernel's tutorial stage is dismissed by the adapter today; the tutorial steps become the experience's own state.
 - Undo covers every action, including the one that failed the play, so a failure can be undone as well as retried.
+- The tutorial instruction, the hint and the failure text appear as wrapping text in the control panel on iPhone and
+  iPad, never over the canyon; Dynamic Type and announcements are R02-G05-06.
 
 ## Traceability
 
@@ -193,5 +196,6 @@ budget without affecting progress.
 
 ## Negative Requirements / Excluded scope
 
+- All text and rules are original; no new art, model or shader (the existing code-drawn scene is unchanged).
 - No paid unlocks, no advertising, no accounts, no network, no saving to disk in this feature, no device run, no
   availability before X-R02-G05.

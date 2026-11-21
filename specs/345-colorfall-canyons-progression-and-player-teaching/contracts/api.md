@@ -10,7 +10,7 @@ public struct ColorfallCanyonsHint: Sendable, Equatable { public let level: Int;
     public let cell: Int?; public let spring: Int?; public let ticks: Int; public let planSize: Int; public var text: String }
 public enum ColorfallCanyonsHints {
     public static func plan(_ play: ColorfallCanyonsPlay) -> ColorfallCanyonsSolution?          // nil: no win reachable
-    public static func hint(level: Int, play: ColorfallCanyonsPlay) -> ColorfallCanyonsHint? }  // nil when won or not playing
+    public static func hint(level: Int, play: ColorfallCanyonsPlay) -> ColorfallCanyonsHint? }  // playing/paused: the plan's hint; failed: kind stuck; won or other stages: nil
 public struct ColorfallCanyonsFailureExplanation: Sendable, Equatable { public let failure: ColorfallCanyonsFailure
     public let basin: Int; public let color: ColorfallCanyonsColor?; public let amount: Int; public let limit: Int
     public let tick: Int; public var text: String; public init?(play: ColorfallCanyonsPlay) }
