@@ -28,7 +28,7 @@ tests stay short (< 10 s each; interface tests < 90 s, SC-R02G0209-001). No {own
   unique); with `Packages/ExperiencesRound02/LissajousLabyrinth/ExperienceTests/LissajousLabyrinthIdentifierTests.swift`
   (agent E: every name of Q1 is listed once by the controls' identifier list and has the prefix); `--name sim-27 --
   python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package
-  --destination sim-27.2 --action test --only-testing <the Lissajous experience test classes>`
+  --destination sim-27.2 --action test`
 - [ ] T-R02G0209-004 [US1] Create `Apps/VisualCore/Tests/UI/LissajousLabyrinth/LLSupport.swift`, `LLPlayUITests.swift`,
   `LLReplayUITests.swift` (agent C: spec Clarifications Q2; level 1 start and final dials pinned in `LL`; background
   before terminate on relaunch); edit `scripts/release_check.py` (`UI_CHUNKS["j3"]`, `"j3"` in `SERIAL_CHUNKS`) and
