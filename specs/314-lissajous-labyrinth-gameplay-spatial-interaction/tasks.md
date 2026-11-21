@@ -68,7 +68,7 @@ tests stay short (< 10 s each).
   send nothing; paused or ended play sends nothing; a refused action shows its text with the state unchanged; the
   selection outline is drawn; the description names the selection; undo after a gesture restores the digest; frame checks
   hold at the orbit limits; Reset view returns the authored pose; pending Apply through the presenter wins all 100 levels
-  in their certified shortest; Clear and an outside change drop pending values); `--name sim-27 -- python3
+  in their certified shortest; Clear and an outside change drop pending values; Apply that wins partway stops and announces the win); `--name sim-27 -- python3
   scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package --destination
   sim-27.2 --action test`
 

@@ -99,7 +99,8 @@ the kernel's state changes by that one action.
 Two fingers orbit the camera around the figure within limits; a reset returns to the authored view; the puzzle never
 changes.
 
-**Independent Test**: orbiting to every limit and resetting changes no digest, and the figure stays inside the view.
+**Independent Test**: orbiting to every limit and resetting changes no digest, and the figure and the dial rings stay
+inside the view.
 
 ### User Story 3 - Win with the panel alone (Priority: P1)
 
@@ -114,6 +115,16 @@ once wins in exactly the certified shortest number of actions.
 
 The selected dial is outlined and described; undo and redo revert and repeat the last action.
 
+**Independent Test**: on the simulator, selecting each dial (by touch and by stepper) outlines it and the description
+names it; undo after a gesture restores the digest from before it.
+
+**Acceptance Scenarios**:
+
+1. **Given** a level in play, **When** the player touches a dial's ring or uses its stepper, **Then** that dial is
+   outlined and described as "Dial <name> selected: <value>".
+2. **Given** an action sent by a gesture, **When** the player taps Undo, **Then** the digest returns to its value before
+   the gesture; Redo repeats it.
+
 ### Edge Cases
 
 - **A second finger during a drag** switches to orbit and cancels the drag without an action.
@@ -122,6 +133,8 @@ The selected dial is outlined and described; undo and redo revert and repeat the
 - **Apply past the allowance or after a win:** the first refused action stops the rest, is announced with its reason,
   and the remaining pending values are dropped; applied actions stay.
 - **An outside change** (undo, redo, next level, restore) drops the pending values.
+- **Apply that ends the level partway** (a win before every pending action is sent): Apply stops, drops the rest and
+  the win is announced as a win, not as a refusal.
 
 ## Requirements *(mandatory)*
 
@@ -139,7 +152,8 @@ The selected dial is outlined and described; undo and redo revert and repeat the
 - **FR-R02G0204-005**: The selected dial MUST be outlined and described; undo and redo MUST be reachable from the panel.
 - **FR-R02G0204-006**: The panel's steppers MUST set pending values without sending actions; Apply MUST commit each
   changed dial as one action in the order frequencyA, frequencyB, phaseA, phaseC (the two frequencies swapped when only
-  that keeps every intermediate pair coprime), stop at the first refusal (announced with its reason) and drop the rest;
+  that keeps every intermediate pair coprime), stop at the first refusal (announced with its reason) or when the level ends (announced as its outcome) and drop
+  the rest;
   Clear MUST drop them; an outside change (an action, undo, redo, next level, restore) MUST drop them; each pending value
   MUST be announced, and Apply and Clear MUST carry accessibility labels and be shown only while something is pending.
 - **FR-R02G0204-007**: Gesture logic MUST be deterministic and testable without a screen.
