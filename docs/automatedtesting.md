@@ -208,6 +208,11 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   edit a trace step by replacing it with a move the kernel itself refuses at that point (asserted in the test), so the
   expected drop is known without asking the reconciliation code under test; a random walk that happens to win a level
   opens the next one, so the tests do not cap the frontier.
+- **Interface tests: count the teardown, skip waits for present elements** (R02-G04-09, 2026-11-21). The Hue Compass
+  interface tests first took 71, 93 and 97 s against the 90 s bound. The per-test time xcodebuild reports includes about
+  24 s of app teardown after the last step, and every `waitFor` costs at least a second even for an element already on
+  screen. Revealing the replay's Step button once and tapping the same element, and skipping the bounded wait when the
+  element already exists, brought them to 64, 72 and 60 s. The chunk key `m3` was checked unique before use.
 - **Hue Compass regression** (R02-G04-08, 2026-11-21). `python3 scripts/hue_compass_regression.py` runs the host
   filter `HueCompassRegression` (solver regression over 100 witnesses, golden descriptions) and then the simulator
   golden-frame and memory classes with `TEST_RUNNER_HUE_COMPASS_MEMORY_ISOLATED=1`; CI runs the host part as a named

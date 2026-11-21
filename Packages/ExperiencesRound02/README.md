@@ -226,3 +226,7 @@ code-computed golden frames pinned in `HueCompass/golden-frames.json`; regenerat
 `HUE_COMPASS_WRITE_GOLDEN=1 swift test --package-path Packages/ExperiencesRound02 --filter
 HueCompassRegressionGoldenTests`), simulator golden-frame and memory tests, and `scripts/hue_compass_regression.py`.
 
+Feature 339 (R02-G04-09) adds the in-app integration: panel identifiers (`HueCompassControls.identifierNames`), the
+stored schema-1 and schema-2 examples (`HueCompassSchemaExamples`), app unit tests, and the interface tests
+`HCPlayUITests` and `HCReplayUITests` in serial chunk `m3`.
+

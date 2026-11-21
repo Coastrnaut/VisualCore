@@ -194,3 +194,16 @@ large turn as single steps; the play accepts both.
   29.14 MB); the compass scene holds no renderers after each warning and close (`liveObjectCount`).
 - **Running it.** CI runs the host part as "Hue Compass regression (host)"; locally
   `python3 scripts/hue_compass_regression.py` runs host and simulator parts with one summary.
+
+## In-app integration (feature 339, R02-G04-09)
+
+- **Identifiers.** Every panel control carries `experience.r02-g04.hue-compass.<name>` (`HueCompassControls.identifierNames`,
+  23 names: the four turn buttons, probe, band-picker, select, undo, redo, next-level, reset-view, hint,
+  dismiss-tutorial, retry, campaign, daily, practice, replay, replay-step, replay-stop, level-picker, sound, summary).
+- **Interface tests.** `HCPlayUITests` wins level 1 through the panel (the witness's turn of −27 as six presses of −4 and
+  three of −1, Probe, a turn of −20 to bearing 84, the band stepper up to band 11, Select: 3 of 3 stars, level 2 open)
+  and keeps the progress over a relaunch; `HCReplayUITests` replays the win to its end and stops. They run as serial
+  chunk `m3`, each under 90 s (about 24 s of each is the app's teardown).
+- **Stored examples.** The registration stores schema-1 and schema-2 examples (`HueCompassSchemaExamples`), which the
+  app restores into schema 3; Hue Compass stays a candidate (not available without `-vcCandidates`) until X-R02-G04.
+- **Release.** The Release simulator build compiles without the test-only golden frames and scenarios.
