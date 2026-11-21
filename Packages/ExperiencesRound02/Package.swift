@@ -25,6 +25,8 @@ let package = Package(
         // Feature 321 (R02-G03-01): Wave Knot Keeper's rule kernel, a candidate until X-R02-G03.
         .library(name: "WaveKnotKeeperCore", targets: ["WaveKnotKeeperCore"]),
         .library(name: "HueCompassCore", targets: ["HueCompassCore"]),
+        // Feature 341 (R02-G05-01): Colorfall Canyons's rule kernel, a candidate until X-R02-G05.
+        .library(name: "ColorfallCanyonsCore", targets: ["ColorfallCanyonsCore"]),
         // Feature 323 (R02-G03-03): Wave Knot Keeper's experience (iOS only; a registered candidate until X-R02-G03).
         .library(name: "WaveKnotKeeperExperience", targets: ["WaveKnotKeeperExperience"]),
         // Feature 333 (R02-G04-03): Hue Compass's experience (iOS only; a registered candidate until X-R02-G04).
@@ -213,5 +215,15 @@ let package = Package(
                                    .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS])),
                                    .product(name: "VisualCoreAudioDSP", package: visualCore)],
                     path: "WaveKnotKeeper/ExperienceTests"),
+        // Feature 341 (R02-G05-01): Colorfall Canyons's pure rule kernel.
+        .target(name: "ColorfallCanyonsCore",
+                dependencies: [.product(name: "VisualCoreSimulation", package: visualCore),
+                               .product(name: "VisualCoreMath", package: visualCore)],
+                path: "ColorfallCanyons/Core"),
+        .testTarget(name: "ColorfallCanyonsCoreTests",
+                    dependencies: ["ColorfallCanyonsCore",
+                                   .product(name: "VisualCoreSimulation", package: visualCore),
+                                   .product(name: "VisualCoreMath", package: visualCore)],
+                    path: "ColorfallCanyons/CoreTests"),
     ]
 )

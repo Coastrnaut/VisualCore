@@ -14,7 +14,7 @@ in this feature (the CPU flow step is the reference the renderer of R02-G05-03 w
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G0501-002 Edit `Packages/ExperiencesRound02/Package.swift` (+ `ColorfallCanyonsCore`, `ColorfallCanyonsCoreTests`,
+- [X] T-R02G0501-002 Edit `Packages/ExperiencesRound02/Package.swift` (+ `ColorfallCanyonsCore`, `ColorfallCanyonsCoreTests`, — Verified 2026-11-21: 2026-11-21 host exit 0 (package targets; error codes; level with ranges, placement, drain and target rules, colour names and mix words, stored form; exact fluid tick with downhill routing, largest-remainder sharing, springs, drains, conservation and verdict; fixtures: 500 channel levels whose known solution wins and random valid levels; 5 level tests). The lead also wrote ColorfallCanyonsPlay (the rules and invariants depend on it); agent B writes its tests
   product); create `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsError.swift` (codes "r02-g05.level, .action, .stage, .stale, .budget,
   .newer-schema, .malformed"), `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsLevel.swift` (colours cyan 0, coral 1, yellow 2 with names; each basin's required mix described in words and amounts (FR-R02G0501-013);
   cells "height 0 … 15", kinds open, rock, spring, basin, drain; springs "release 1 … 4, supply 1 … 999"; basins
