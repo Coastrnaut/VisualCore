@@ -40,7 +40,9 @@ tests stay short (< 10 s each). No {owner} tasks.
 ## Phase 3: Experience, registration and frames
 
 - [ ] T-R02G0503-006 Create `Packages/ExperiencesRound02/ColorfallCanyons/Experience/ColorfallCanyonsExperience.swift`, `…Presenter.swift`, `…CanyonScene.swift` (GL
-  scene with `ShaderMeshRenderer`; fallback; tier log; Reduce Motion and Reduce Flashing), `…Controls.swift` (labelled cell
+  scene with `ShaderMeshRenderer`; fallback; tier log; Reduce Motion and Reduce Flashing; the presenter declares
+  `probes(_:)` — two night corners, as the round-two X gates require — and its quality levels equal the Core's
+  `qualityTiers`), `…Controls.swift` (labelled cell
   picker and carve, valve per spring, step 1 and 10, run to the end, undo, redo, next level),
   `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsScenarios.swift` (standard scenarios, full-playthrough, hero, fixtures, 80 acceptance scenarios
   R2-G05-QA-001 … 080) and `Packages/ExperiencesRound02/ColorfallCanyons/scenario-manifest.json`; register the candidate (`Catalog/registrations.json` with content
