@@ -111,6 +111,10 @@ jobs:
         run: python3 scripts/make_ci_angle_standins.py --out External/projectm-ios/Build/ANGLEFrameworks
       - name: ExperiencesRound02 host tests
         run: swift test --package-path Packages/ExperiencesRound02
+      - name: Aurora Loom regression (host)
+        # Feature 308 (R02-G01-08): the solver regression and the golden frame descriptions, named so a failure shows by
+        # name; the simulator part runs locally through scripts/aurora_loom_regression.py.
+        run: swift test --package-path Packages/ExperiencesRound02 --filter AuroraLoomRegression
 
   simulator-build:
     # US5/AC1: an iOS Simulator build of the pure VisualCore package (no ANGLE frameworks needed). Rendering, Showcase

@@ -49,7 +49,7 @@ recorded only after every agent has reported). Commit after every task with its 
 
 ## Phase 6: Story 4 — the checks run on every change (P2)
 
-- [ ] T-R02G0108-007 [P] [US4] Create `scripts/aurora_loom_regression.py` (agent D: host filter `AuroraLoomRegression`,
+- [X] T-R02G0108-007 [P] [US4] Create `scripts/aurora_loom_regression.py` (agent D: host filter `AuroraLoomRegression`, — Verified 2026-11-20: 2026-11-20 script-tests exit 0 (run alone; 4 new tests of scripts/aurora_loom_regression.py), regression exit 0 (host PASS, simulator PASS, one summary); CI step 'Aurora Loom regression (host)' added; the script drops --max-seconds, which xcodebuild_package.py does not have: its per-test allowance bounds the run (Q5 amended)
   then `xcodebuild_package.py --only-testing` of the two simulator classes (bounded by its per-test time allowance); one summary line per
   part; non-zero exit on any failure; `--dry-run` prints the commands) with its tests in `scripts/test_scripts.py`;
   the lead adds the named step "Aurora Loom regression (host)" to `.github/workflows/ci.yml`; `--name script-tests`

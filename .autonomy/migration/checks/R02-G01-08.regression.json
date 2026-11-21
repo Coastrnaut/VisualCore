@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "scripts/aurora_loom_regression.py"
+  ],
+  "command": "python3 scripts/aurora_loom_regression.py",
+  "elapsed_seconds": 9.841,
+  "exit_code": 0,
+  "finished": "2026-11-21T04:14:59+00:00",
+  "gate": "R02-G01-08",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G01-08.regression.log",
+  "log_sha256": "53b7171cf08856532ec6173e2a63a63da19677b2dbb45c3038abf27203a78030",
+  "name": "regression",
+  "started": "2026-11-21T04:14:49+00:00",
+  "timed_out": false
+}
