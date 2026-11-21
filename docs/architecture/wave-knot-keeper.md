@@ -88,6 +88,20 @@ moves are listed point by point and direction by direction, and a state is solve
   `play.redo`, `level.next`; digest = level number + play fingerprint; snapshot schema 1 `{level, records}`. The
   experience is a registered candidate (`-vcCandidates`) until X-R02-G03, with a 94-scenario manifest.
 
+## Interaction (R02-G03-04)
+
+- **Handles.** Every control point is a pickable handle (touch radius 22 points; where handles overlap, the one nearer
+  the eye wins).
+- **Drag to move.** A one-finger drag compares its vector with the six projected one-step vectors at the handle and
+  previews the best-aligned direction once the drag passes half that step's projected length (at least 6 points); the
+  release sends exactly one `point.move`, so a gesture never spends more than one move. A tap only selects.
+- **Orbit.** Two fingers orbit yaw ±40° and pitch 5° … 60° around the authored view (presentation only); a double tap on
+  empty space or "Reset view" returns to it. The camera refits so the rope, handles and gates stay in view.
+- **Panel.** The point picker and six direction buttons send the same moves, so every level can be won without
+  gestures (all 100 certified levels are won this way in their certified shortest moves in the tests).
+- **Testing.** `WaveKnotKeeperGestureController` and `WaveKnotKeeperHandles` are host-tested with scripted touches;
+  simulator tests send touches through the presenter's pointer entry.
+
 ## Failures
 
 `WaveKnotKeeperError` reason codes: `r02-g03.level`, `r02-g03.move`, `r02-g03.stage`, `r02-g03.stale`,

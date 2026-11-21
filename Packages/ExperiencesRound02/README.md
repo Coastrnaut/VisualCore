@@ -151,3 +151,7 @@ files (`WaveKnotKeeperWitness`) under `docs/games/wave-knot-keeper/levels/`, wit
 Feature 323 (R02-G03-03) adds the experience: the adapter `WaveKnotKeeperExperienceCore`, the immutable scene snapshot,
 the glass-rope geometry and GLSL sources in the Core, and the iOS-only `WaveKnotKeeperExperience` target (presenter,
 rope scene, minimal panel) registered as a candidate with a 94-scenario manifest.
+
+Feature 324 (R02-G03-04) adds spatial play: `WaveKnotKeeperHandles` (picking, drag to one lattice step),
+`WaveKnotKeeperGestureController` (drag, tap, two-finger orbit, reset) and the orbit camera; the panel gains "Reset
+view".
