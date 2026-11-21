@@ -45,7 +45,7 @@ run uses). Fixture seed 2_342; tests stay short (< 10 s each).
 
 ## Phase 5: Stories 3 and 4 — difficulty and honest witness files (P2)
 
-- [ ] T-R02G0502-005 [P] [US4] Create `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsWitness.swift` (schema 1; actions: the smallest edits as carve
+- [X] T-R02G0502-005 [P] [US4] Create `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsWitness.swift` (schema 1; actions: the smallest edits as carve — Verified 2026-11-21: 2026-11-21 host-4 exit 0 (witness and 16 tests by agent B, retested by the lead: round trip byte for byte, per-tick digests, totals, fingerprints, counterexamples, every edited part refused, newer and damaged refused, decode re-solves at the band depth)
   and valve actions, then step(tick limit); built by replaying them on a `ColorfallCanyonsPlay`: win tick, the 16-hex
   fluid digest after every tick up to the win, released, held and spilled totals per colour, fingerprints after begin and
   each action; unedited and near-miss counterexamples (reason, tick); smaller; difficulty; skipped; sorted-key pretty JSON
