@@ -65,8 +65,9 @@ and snapshots `{level, records}` as schema 1; the core may not read a clock; the
   with the allowance raised to the kernel's maximum (64); practice results never award stars or open levels;
   `mode.campaign` returns. Impact: FR-R02G0205-005; SC-R02G0205-004.
 - Q: Where does progress live, how is it versioned and how is a failure explained? → A: progress and the mode are part of
-  the experience state and its digest; the tutorial step and the hint level are snapshotted but not digested (they never
-  move back with undo, so undo still restores the earlier digest); the snapshot payload becomes schema 2 (`{level,
+  the experience state and its digest; the tutorial step is snapshotted but not digested (it never moves back with undo,
+  so undo still restores the earlier digest); the hint level revealed so far is presentation (amended at plan,
+  2026-11-21, as feature 305 did: the presenter holds it and resets it after any change of the play); the snapshot payload becomes schema 2 (`{level,
   records, progress, mode, tutorial}`) with a migration from schema 1 (no progress, campaign mode, tutorial at its first
   step on tutorial levels). A failure is explained from the kernel's verdict: "The path touches obstacle n at p % of the
   lap" (n = index + 1, p = ⌊100 · tick / 4,096⌋) or "Checkpoint n is not reached in order" (n = index + 1), each followed
