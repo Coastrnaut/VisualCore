@@ -83,3 +83,8 @@ ImplementationLock-100.
 001 → {002 (agent A), 003 and 005 (agent B)} → 004 (lead) → 006 (lead; agent C writes the simulator tests) → 007 … 011,
 013. 012 is a {device} task outside this campaign. Shared files (package manifest, geometry, presenter, panel, scene,
 docs) stay with the lead. MVP: Story 1.
+
+## Phase 7: Convergence
+
+- [ ] T-R02G0406-014 Report the scene phase from `Packages/ExperiencesRound02/HueCompass/Experience/HueCompassControls.swift` (`@Environment(\.scenePhase)`, `.onChange` → `presenter.sceneActive(phase == .active)`, as Aurora Loom's panel does) so the ambient loop stops while the app is inactive per FR-R02G0406-006 (partial)
+- [ ] T-R02G0406-015 Announce the units left ("Units L of a." with L = allowance − spent) in the turn, probe and summary texts of `Packages/ExperiencesRound02/HueCompass/Core/HueCompassFeedbackPlan.swift` (the win keeps the units spent), updating `HueCompassFeedbackPlanTests`, `HueCompassAccessibilityTests` and `docs/architecture/hue-compass.md`, per FR-R02G0406-002 and US1/AC1 (partial)
