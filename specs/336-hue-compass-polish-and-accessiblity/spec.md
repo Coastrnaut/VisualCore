@@ -79,8 +79,8 @@ level controls and Reset view; the presenter has no feedback route yet (refusals
   styles that grow with Dynamic Type up to the largest accessibility size, wraps rather than truncates labels, and uses
   system colours, so Increase Contrast applies; button rows wrap into a column at accessibility sizes; the band stepper
   is an accessibility-adjustable element labelled "Hue band to select" with the value "band h of 24"; the four turn
-  buttons are labelled with their spoken turns ("Turn 4 bearings counter-clockwise" …); a summary element reads the
-  bearing, band, units and the last clue; on iPad the panel keeps a readable width (at most 520 points). Impact:
+  buttons are labelled with their spoken turns ("Turn 4 bearings counter-clockwise" …); a summary element reads "Bearing b, band h. Units
+  s of a. Last clue: hue gap g bands, fog depth d." ("No clues yet." in place of the last clue before any probe); on iPad the panel keeps a readable width (at most 520 points). Impact:
   FR-R02G0406-001, 005; SC-R02G0406-001.
 
 ## User Scenarios & Testing *(mandatory)*
