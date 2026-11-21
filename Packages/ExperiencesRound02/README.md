@@ -66,6 +66,10 @@ Feature 309 (R02-G01-09) integrates Aurora Loom into the one app on the simulato
 (schema-1 and schema-2 examples registered), panel identifiers, pending stepper steps with Apply and Clear, opening at
 level 1, app unit tests, the interface chunk `i3` and the Release symbol check.
 
+Feature 310 (R02-G01-10) prepares the device campaign without touching a device: `docs/apps/aurora-loom/device-rows.json`
+and `device-campaign.md` (rows AL-D1 … AL-D8), checked by `python3 scripts/check_device_rows.py --experience
+r02-g01.aurora-loom`.
+
 ## Lissajous Labyrinth (R02-G02, `r02-g02.lissajous-labyrinth`, free)
 
 `LissajousLabyrinthCore` (feature 311, R02-G02-01) is the playable rule kernel: the integer `LissajousLabyrinthSine`,

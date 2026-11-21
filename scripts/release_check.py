@@ -140,6 +140,8 @@ def steps(stamp: str) -> list[Step]:
         # Feature 196 (UA-F10, FR-U10-010/011, FR-U10-020 to 022): one shippable app; packages match the catalog.
         Step("app-targets", [PY, "scripts/check_app_targets.py"]),
         Step("experience-packages", [PY, "scripts/check_experience_packages.py"]),
+        # Feature 310 (R02-G01-10): the device rows of Aurora Loom against its manifest, the ledger and its device tasks.
+        Step("device-rows", [PY, "scripts/check_device_rows.py", "--experience", "r02-g01.aurora-loom"]),
         Step("public-api", [PY, "scripts/check_public_api.py"]),
         Step("documented-api-showcase", [PY, "scripts/check_documented_api.py", "--sources", "Showcase/App"]),
         Step("documented-api-interactive-demo", [PY, "scripts/check_documented_api.py", "--sources", "Harnesses/InteractiveDemo"]),

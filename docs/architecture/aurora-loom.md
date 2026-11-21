@@ -196,6 +196,16 @@ catalog's levels.
 - **Tests.** App unit tests (examples, candidate, opening level), interface chunk `i3` (`ALPlayUITests`,
   `ALReplayUITests`), the Release build with `AuroraLoomGolden` and `acceptanceScenarios` forbidden in its symbols.
 
+## Device preparation (R02-G01-10)
+
+Nothing here touches a device. `docs/apps/aurora-loom/device-rows.json` defines the device scenario set (12 scenarios)
+and rows AL-D1 … AL-D8 for D1, D2 and D3 (launch and first frame, frame pacing and frame time per tier, memory with the
+thermal state and the round-two stress session, gesture feel, sound and haptics, a non-gating VoiceOver walk-through,
+progress across a real termination, the panel journeys), each "pending device campaign";
+`docs/apps/aurora-loom/device-campaign.md` is the plan for people; `scripts/check_device_rows.py` checks the definition
+against the scenario manifest, the ledger's DEV rows and every deferred device task of features 301–309 (release step
+`device-rows`). UA-F13's campaign runs the rows after ImplementationLock-100.
+
 ## Failures
 
 `AuroraLoomError` reason codes: `r02-g01.level`, `r02-g01.move`, `r02-g01.stage`, `r02-g01.stale`,
