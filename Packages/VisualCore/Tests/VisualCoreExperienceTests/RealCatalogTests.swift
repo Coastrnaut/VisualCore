@@ -29,8 +29,8 @@ enum CatalogFixture {
     }
 
     @Test func onlyExperiencesWithAPassingIntegrationGateAreAvailable() throws {
-        // X-A01 to X-A25 and X-R02-G01 are pass in the migration ledger (2026-11-13 to 2026-11-21); the build tool is the
-        // only writer of this flag.
+        // X-A01 to X-A25, X-R02-G01 and X-R02-G02 are pass in the migration ledger (2026-11-13 to 2026-11-21); the build
+        // tool is the only writer of this flag.
         #expect(try CatalogFixture.manifest().available.map(\.id.rawValue) == ["a01.generative-art-studio", "a02.fluid-art-playground", "a03.fractal-explorer",
                          "a04.particle-universe", "a05.infinite-geometry", "a06.visualcore-music-lab",
                          "a07.audio-odyssey", "a08.oscilloscope-studio", "a09.digital-aquarium",
@@ -45,7 +45,8 @@ enum CatalogFixture {
                          "a23.visual-programming-lab",
                          "a24.graphics-benchmark-lab",
                          "a25.effects-composer",
-                         "r02-g01.aurora-loom"])
+                         "r02-g01.aurora-loom",
+                         "r02-g02.lissajous-labyrinth"])
     }
 
     @Test func everyIdIsInTheGoldenListAndWellFormed() throws {
@@ -134,7 +135,7 @@ enum CatalogFixture {
                                "a25.effects-composer",
                                // Feature 303 (R02-G01-03); integrated at X-R02-G01.
                                "r02-g01.aurora-loom",
-                               // Feature 313 (R02-G02-03): Lissajous Labyrinth, a candidate until X-R02-G02.
+                               // Feature 313 (R02-G02-03); integrated at X-R02-G02.
                                "r02-g02.lissajous-labyrinth"],
                 "the registrations of Catalog/registrations.json")
     }

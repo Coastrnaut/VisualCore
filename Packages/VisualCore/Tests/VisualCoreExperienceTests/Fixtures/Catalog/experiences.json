@@ -960,7 +960,7 @@
         "catalog_sha256": "9c1d5652c1dc2badac0568fc25a79ef3a0a4683d2db290e1b1699b120430e96e",
         "levels": 100
       },
-      "available": false
+      "available": true
     },
     {
       "id": "r02-g03.wave-knot-keeper",

@@ -39,7 +39,8 @@ final class AppModelTests: XCTestCase {
         let report = manifest.registryReport(registered: registered)
         XCTAssertTrue(report.isMatch, "missing \(report.missingRegistrations), unexpected "
             + "\(report.unexpectedRegistrations), duplicates \(report.duplicates)")
-        // A01–A25 and R02-G01 are integrated (X-A01 to X-A25 and X-R02-G01 pass): registered and available, nothing else.
+        // A01–A25, R02-G01 and R02-G02 are integrated (X-A01 to X-A25, X-R02-G01 and X-R02-G02 pass): registered and
+        // available, nothing else.
         XCTAssertEqual(registered.count, manifest.available.count)
         XCTAssertEqual(registered.map(\.rawValue), ["a01.generative-art-studio", "a02.fluid-art-playground",
                                                      "a03.fractal-explorer", "a04.particle-universe",
@@ -53,7 +54,8 @@ final class AppModelTests: XCTestCase {
                                                      "a19.living-wallpapers", "a20.digital-zen-garden",
                                                      "a21.aurora", "a22.shader-studio",
                                                      "a23.visual-programming-lab", "a24.graphics-benchmark-lab",
-                                                     "a25.effects-composer", "r02-g01.aurora-loom"])
+                                                     "a25.effects-composer", "r02-g01.aurora-loom",
+                                                     "r02-g02.lissajous-labyrinth"])
         XCTAssertEqual(manifest.available.map(\.id), registered)
     }
 
@@ -79,8 +81,8 @@ final class AppModelTests: XCTestCase {
         let storage = try TestStorage(self)
         let integrated = ExperienceRegistry.all.map(\.id)
         // Any catalog experience before its X gate works as a candidate; R02-G03 is one (unavailable, not in `all`, not yet
-        // registered; R02-G02 is a real candidate since R02-G02-03, R02-G01 was one until X-R02-G01). The synthetic debug registration
-        // stands in for one.
+        // registered; R02-G01 and R02-G02 were real candidates until X-R02-G01 and X-R02-G02, so `candidates` is empty
+        // now). The synthetic debug registration stands in for one.
         let id = try XCTUnwrap(ExperienceID(rawValue: "r02-g03.wave-knot-keeper"))
         XCTAssertFalse(integrated.contains(id), "the synthetic candidate is not integrated")
         let candidate = DebugExperience.registration(for: id)
@@ -111,7 +113,8 @@ final class AppModelTests: XCTestCase {
         XCTAssertEqual(Set(ScenarioLaunch.targets().keys), all)
     }
 
-    /// The real catalog with the real registry shows the integrated experiences (A01–A25 and R02-G01 since their X gates).
+    /// The real catalog with the real registry shows the integrated experiences (A01–A25, R02-G01 and R02-G02 since
+    /// their X gates).
     func testTheRealCatalogShowsTheIntegratedExperiences() throws {
         let storage = try TestStorage(self)
         let model = AppModel(environment: storage.environment(catalog: try bundled("experiences"),
@@ -478,7 +481,7 @@ final class AppModelTests: XCTestCase {
             XCTAssertEqual(QualityDeclaration.problems(profile: profile, tierCount: profile.count,
                                                        catalogNames: names), [], "\(registration.id)")
         }
-        XCTAssertEqual(ExperienceRegistry.all.count, 26, "A01–A25 and R02-G01 are integrated")
+        XCTAssertEqual(ExperienceRegistry.all.count, 27, "A01–A25, R02-G01 and R02-G02 are integrated")
     }
 
     /// FR-U06-013: a pinned level is in force when the first frame is drawn, and the record says so.
@@ -1209,10 +1212,10 @@ final class AppModelTests: XCTestCase {
     func testTheRoundTwoPuzzlesOpenAtLevelOne() throws {
         XCTAssertEqual(try auroraLoomRegistration().openingSeed, 0)
         XCTAssertEqual(AuroraLoomExperienceCore.levelNumber(forSeed: 0), 1)
-        let lissajous = try ExperienceID("r02-g02.lissajous-labyrinth")
-        let registration = try XCTUnwrap(ExperienceRegistry.candidates.first { $0.id == lissajous })
-        XCTAssertEqual(registration.openingSeed, 0)
-        for other in ExperienceRegistry.all where other.id.rawValue != AuroraLoomExperienceCore.experienceID {
+        XCTAssertEqual(try lissajousLabyrinthRegistration().openingSeed, 0)
+        let puzzles: Set<String> = [AuroraLoomExperienceCore.experienceID,
+                                    LissajousLabyrinthExperienceCore.experienceID]
+        for other in ExperienceRegistry.all where !puzzles.contains(other.id.rawValue) {
             XCTAssertNil(other.openingSeed, "\(other.id.rawValue) keeps its stable seed")
         }
     }
@@ -1229,10 +1232,10 @@ final class AppModelTests: XCTestCase {
     // MARK: Lissajous Labyrinth in the app (feature 319, R02-G02-09; T-R02G0209-005, FR-R02G0209-003,
     // FR-R02G0209-006; clarifications Q2, Q3, Q5)
 
-    /// Lissajous Labyrinth's registration: a candidate until X-R02-G02.
+    /// Lissajous Labyrinth's registration (a candidate until X-R02-G02, integrated since 2026-11-21).
     private func lissajousLabyrinthRegistration() throws -> ExperienceRegistration {
         let id = try ExperienceID(LissajousLabyrinthExperienceCore.experienceID)
-        return try XCTUnwrap(ExperienceRegistry.candidates.first { $0.id == id }, "Lissajous Labyrinth is a candidate")
+        return try XCTUnwrap(ExperienceRegistry.all.first { $0.id == id }, "Lissajous Labyrinth is integrated")
     }
 
     /// Clarification Q3: the snapshot is schema 3 and the stored schema-1 and schema-2 examples restore to their
@@ -1249,29 +1252,29 @@ final class AppModelTests: XCTestCase {
         XCTAssertEqual(problems, [], "\(registration.id)")
     }
 
-    /// FR-R02G0209-006: without `-vcCandidates` Lissajous Labyrinth is a candidate only: outside `all`, listed in the
-    /// bundled catalog as not available, without a tile and not opened.
-    func testLissajousLabyrinthIsACandidateAndUnavailableWithoutTheCandidatesArgument() async throws {
+    /// X-R02-G02 (2026-11-21): Lissajous Labyrinth is integrated: in `all`, not a candidate, available in the bundled
+    /// catalog, shown and opened without `-vcCandidates` (FR-R02G0209-006 held until then).
+    func testLissajousLabyrinthIsIntegratedAndAvailableWithoutTheCandidatesArgument() async throws {
         let id = try ExperienceID(LissajousLabyrinthExperienceCore.experienceID)
         XCTAssertEqual(id.rawValue, "r02-g02.lissajous-labyrinth")
-        XCTAssertTrue(ExperienceRegistry.candidates.map(\.id).contains(id))
-        XCTAssertFalse(ExperienceRegistry.all.map(\.id).contains(id))
+        XCTAssertFalse(ExperienceRegistry.candidates.map(\.id).contains(id))
+        XCTAssertTrue(ExperienceRegistry.all.map(\.id).contains(id))
         let categories = try CategoryList(data: bundled("categories"))
         let manifest = try CatalogManifest(data: bundled("experiences"), categories: categories)
-        XCTAssertTrue(manifest.experiences.contains { $0.id == id }, "a catalog id")
-        XCTAssertFalse(manifest.available.contains { $0.id == id }, "not available")
+        XCTAssertTrue(manifest.available.contains { $0.id == id }, "available")
         let storage = try TestStorage(self)
         let model = AppModel(environment: storage.environment(catalog: try bundled("experiences"),
                                                               categories: try bundled("categories"),
                                                               registry: ExperienceRegistry.all))
-        XCTAssertFalse(model.shown.map(\.id).contains(id), "no tile")
+        XCTAssertTrue(model.shown.map(\.id).contains(id), "a tile")
         let opened = await model.open(id)
-        XCTAssertFalse(opened)
-        XCTAssertNil(model.session.experience)
+        XCTAssertTrue(opened)
+        XCTAssertNotNil(model.session.experience)
     }
 
-    /// FR-R02G0209-003, clarification Q2: with the candidates registered Lissajous Labyrinth is shown, opens through
-    /// the registry and engine, and level 1 is won by its certified solution as `dial.set [dial, value]` actions
+    /// FR-R02G0209-003, clarification Q2: with `-vcCandidates` (which the interface tests still pass; the integrated
+    /// registration is not added twice) Lissajous Labyrinth is shown, opens through the registry and engine, and
+    /// level 1 is won by its certified solution as `dial.set [dial, value]` actions
     /// (dial 0 frequencyA, 1 frequencyB, 2 phaseA, 3 phaseC).
     func testLissajousLabyrinthOpensAsACandidateAndLevelOneIsWonByItsCertifiedSolution() async throws {
         let registration = try lissajousLabyrinthRegistration()
@@ -1283,7 +1286,8 @@ final class AppModelTests: XCTestCase {
         let environment = DebugLaunch.environment(base: base, candidates: [registration])
         XCTAssertTrue(environment.registry.map(\.id).contains(id))
         let model = AppModel(environment: environment)
-        XCTAssertTrue(model.shown.map(\.id).contains(id), "the launcher shows the candidate")
+        XCTAssertEqual(environment.registry.filter { $0.id == id }.count, 1, "registered once")
+        XCTAssertTrue(model.shown.map(\.id).contains(id), "the launcher shows it")
         XCTAssertTrue(registration.controls.map(\.id).contains("dial.set"))
         XCTAssertEqual(registration.openingSeed, 0)
 

@@ -1,7 +1,7 @@
 // LLSupport — feature 319 (R02-G02-09) T-R02G0209-004 (FR-R02G0209-001, 002; clarifications Q1, Q2): helpers of the
-// interface tests of Lissajous Labyrinth (R02-G02) inside the one app, modelled on `ALSupport`. Lissajous Labyrinth is a
-// candidate until X-R02-G02; every launch carries `-vcCandidates` (DebugLaunch: the candidates' catalog entries become
-// available and are registered). A fresh start erases the data (`-vcResetData`, so no level is solved), skips the
+// interface tests of Lissajous Labyrinth (R02-G02) inside the one app, modelled on `ALSupport`. Lissajous Labyrinth was a
+// candidate until X-R02-G02 (2026-11-21); every launch still carries `-vcCandidates` (DebugLaunch: the candidates'
+// catalog entries become available and are registered). A fresh start erases the data (`-vcResetData`, so no level is solved), skips the
 // welcome and opens the experience directly with `-openExperience r02-g02.lissajous-labyrinth`; a relaunch
 // (`LL.reopen`) backgrounds the app first (its save point), terminates it and starts again without the reset, so the
 // stored progress (solved levels, stars, open levels) survives.

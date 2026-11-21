@@ -221,9 +221,17 @@
       "name": "Aurora Loom",
       "permissions": [],
       "tier": "free"
+    },
+    {
+      "category": "puzzle",
+      "code": "R02-G02",
+      "id": "r02-g02.lissajous-labyrinth",
+      "name": "Lissajous Labyrinth",
+      "permissions": [],
+      "tier": "free"
     }
   ],
-  "ledger_sha256": "2359667e84862574f6af39788165627a0554c1505843bd0ac42ae254c0958446",
+  "ledger_sha256": "f6430a6353c564387c2b5c9d294088e164dcc0901f4cf62fd595b365a836a92c",
   "privacy_answers": "unproven",
   "schema": 1
 }
