@@ -1,0 +1,65 @@
+# Tasks: R02-G05-04 — Colorfall Canyons: gameplay spatial interaction
+
+**Input**: [spec.md](spec.md), [plan.md](plan.md), [research.md](research.md), [data-model.md](data-model.md),
+[contracts/api.md](contracts/api.md), [quickstart.md](quickstart.md). Gate R02-G05-04 (migration ledger). Evidence:
+`python3 scripts/migration_ledger.py run-check --gate R02-G05-04 --name <check> -- <command>` (never a scratchpad path;
+recorded only after every agent has reported). Commit after every task with its check record (no trailers). Seed 2_344;
+tests stay short (< 10 s each). No {owner} tasks; no GLSL change (the highlight is a pearl outline drawn with the
+existing programs).
+
+## Phase 1: Setup
+
+- [ ] T-R02G0504-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test
+  --package-path Packages/ExperiencesRound02`; the rendering baseline is R02-G05-03's rendering runs (exit 0)
+
+## Phase 2: Foundational — orbit and picking
+
+- [ ] T-R02G0504-002 [P] Add `ColorfallCanyonsOrbit` ("yaw ±40°, pitch 25° … 70°, authored (0, 50°)") and
+  `camera(_:aspect:orbit:)` (distance refit to the bounding sphere with a 5 % margin; `camera(_:aspect:)` equals the
+  authored orbit) to `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsSceneGeometry.swift`; create `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsPicker.swift` (touch
+  ray through the drawn camera, block tops at their heights, emitter boxes of half-width 0.18·u, nearest hit, else the
+  nearest projected top centre or emitter top within 22 points, else empty) with `Packages/ExperiencesRound02/ColorfallCanyons/CoreTests/ColorfallCanyonsPickerTests.swift`
+  (an independent pick written in the test on 500 seeded points over certified levels, sizes and orbits; minimum target;
+  hidden cells resolved to the nearer block) and orbit framing in `Packages/ExperiencesRound02/ColorfallCanyons/CoreTests/ColorfallCanyonsSceneGeometryTests.swift`
+  (every element inside the view with a 5 % margin at the orbit bounds and aspects 0.4 … 2.5); `--name host-2`
+
+## Phase 3: Stories 1 and 2 — drag to carve, tap a valve (P1) 🎯
+
+- [ ] T-R02G0504-003 [US1] [US2] Create `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsGestureController.swift` (states idle, dragging,
+  orbiting, cancelled; carve after ≥ 16 points from a carvable start cell; valve on a spring tap (< 10 points); double tap
+  on empty space within 0.35 s resets the view; second finger cancels a drag and orbits (yaw 90° per width, pitch 60° per
+  height, clamped); cancelled phases send nothing; nothing but view resets while not playing; highlighted cell from
+  touch-down) with `Packages/ExperiencesRound02/ColorfallCanyons/CoreTests/ColorfallCanyonsGestureControllerTests.swift` (500 seeded scripted drags and taps
+  against an independent expectation; second fingers, cancels and non-playing stages send no game action); `--name host-3`
+
+## Phase 4: Story 4 — every move without gestures (P1)
+
+- [ ] T-R02G0504-004 [P] [US4] Create `Packages/ExperiencesRound02/ColorfallCanyons/CoreTests/ColorfallCanyonsPanelWinTests.swift`: all 100 certified levels won
+  through panel actions only (the picker's carvable-cell order then `canyon.carve`, the valve buttons, Run as
+  `time.step` of the ticks left), split so each test is under 10 s; `--name host-4`
+
+## Phase 5: Story 3 and wiring — orbit, reset, presenter
+
+- [ ] T-R02G0504-005 [US3] Wire `Packages/ExperiencesRound02/ColorfallCanyons/Experience/ColorfallCanyonsPresenter.swift` (`pointer(_:viewSize:port:)` routing through
+  the gesture controller, `resetView()`, gesture and native action sets, the description "Carving row r, column c" while
+  dragging), `Packages/ExperiencesRound02/ColorfallCanyons/Experience/ColorfallCanyonsCanyonScene.swift` (the orbit's camera; the pearl outline of the highlighted
+  cell) and `Packages/ExperiencesRound02/ColorfallCanyons/Experience/ColorfallCanyonsControls.swift` ("Reset view"); agent E writes
+  `Packages/ExperiencesRound02/ColorfallCanyons/ExperienceTests/ColorfallCanyonsGestureWiringTests.swift` (touches through the pointer entry send the expected
+  actions; orbit and reset change no digest); `--name sim-27`
+
+## Phase 6: Regression, documentation and close
+
+- [ ] T-R02G0504-006 Docs: `docs/architecture/colorfall-canyons.md` (gestures), `Packages/ExperiencesRound02/README.md`,
+  `docs/automatedtesting.md`; `--name round02-host`
+- [ ] T-R02G0504-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+  `--name host-full`, `--name app-unit`
+- [ ] T-R02G0504-008 Reference regression chunk 1 (`--name reference-1`)
+- [ ] T-R02G0504-009 Reference regression chunk 2 (`--name reference-2`)
+- [ ] T-R02G0504-010 Script tests, run alone (`--name script-tests`)
+- [ ] T-R02G0504-011 {device} After ImplementationLock-100: touch feel and latency on D1/D2/D3 (SC-R02G0504-006)
+- [ ] T-R02G0504-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+
+## Dependencies and parallel work
+
+001 → 002 (agent B) → {003 (agent C), 004 (agent D)} → 005 (lead; agent E writes the wiring tests) → 006 … 010, 012. 011
+stays open until device testing. Shared files (presenter, scene, controls, docs) stay with the lead. MVP: Stories 1, 2, 4.
