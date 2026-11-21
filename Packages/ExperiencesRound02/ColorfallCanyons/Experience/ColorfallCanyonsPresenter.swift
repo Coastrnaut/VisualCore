@@ -10,6 +10,12 @@
 // camera and a double tap on empty space or `resetView()` ("Reset view") returns to the authored view (presentation
 // only: never in the digest, the snapshot or the kernel). While a drag is in progress the picked cell is outlined in
 // pearl and the description begins "Carving row r, column c".
+// Feature 345 (R02-G05-05) T-R02G0505-005 (FR-R02G0505-001 … 005; clarifications Q1–Q5): the mirror carries the tutorial
+// instruction, the hint revealed so far (`showHint()` reveals the next of three levels for the current play; the hint
+// level is presentation only and any change of the play — level, mode or play fingerprint — hides it), the failure
+// explanation, the mode, the open levels with their stars and the goal (budget and certified smallest edit count);
+// `retry` starts the level again in its mode, `undo` takes back the last change, and the daily level is chosen from
+// the local calendar date read here (`playDaily(port:date:)`, sent as `mode.daily [year, month, day]`), never in the core.
 #if os(iOS)
 import ColorfallCanyonsCore
 import Foundation
@@ -43,6 +49,24 @@ final class ColorfallCanyonsMirror {
     var springStates: [String] = []
     /// The text of the last refused change, if any.
     var message: String?
+    /// The tutorial instruction; nil when the tutorial is done (feature 345).
+    var instruction: String?
+    /// The hint level revealed (0 … 3) and its text (feature 345).
+    var hintLevel = 0
+    var hintText: String?
+    /// The failure explanation while the play has failed (feature 345).
+    var failureText: String?
+    /// The mode (feature 345).
+    var mode: ColorfallCanyonsMode = .campaign
+    /// The highest open level and the stars of each won level (feature 345).
+    var frontier = 1
+    var stars: [Int: Int] = [:]
+    /// The goal: the actions spent, the budget and the certified smallest edit count (feature 345).
+    var spent = 0
+    var budget = 0
+    var smallest = 0
+    /// The level the picker holds, 1 … 100 (presentation only; only open levels can be chosen).
+    var pickedLevel = 1
 
     /// The picked cell, if any cell can be carved.
     var pickedCell: Int? {
@@ -83,6 +107,12 @@ final class ColorfallCanyonsPresenter: ExperiencePresenter {
     private(set) var lastSnapshot: ColorfallCanyonsSceneSnapshot?
     /// The gesture controller (feature 344): drags, valve taps, orbit and the drag highlight.
     private(set) var gestures = ColorfallCanyonsGestureController()
+    /// The latest core described (feature 345): hints and retry read it.
+    private(set) var latestCore: ColorfallCanyonsExperienceCore?
+    /// The play the shown hint belongs to (level, mode and fingerprint); nil when no hint is shown (feature 345).
+    private var hintKey: String?
+    /// The date whose daily level is being played, so Retry restarts that level after midnight too (feature 345).
+    private(set) var dailyDate: DateComponents?
 
     init(reduceMotion: Bool, reduceFlashing: Bool) {
         self.reduceMotion = reduceMotion
@@ -172,6 +202,84 @@ final class ColorfallCanyonsPresenter: ExperiencePresenter {
         return result
     }
 
+    // MARK: Teaching and progression (feature 345)
+
+    /// The key of the play a hint belongs to: level, mode and fingerprint.
+    private static func hintKey(_ core: ColorfallCanyonsExperienceCore) -> String {
+        "\(core.levelNumber)/\(core.mode)/\(core.play.fingerprint)"
+    }
+
+    /// Hides the hint shown.
+    private func clearHint() {
+        hintKey = nil
+        mirror.hintLevel = 0
+        mirror.hintText = nil
+    }
+
+    /// Reveals the next hint level (up to 3) for the current play; the hint is hidden when the play has none (won, or
+    /// not started). Hints never change the state: no action is sent.
+    func showHint() {
+        guard let core = latestCore else { return }
+        let key: String = Self.hintKey(core)
+        let next: Int = hintKey == key ? min(mirror.hintLevel + 1, 3) : 1
+        guard let hint = core.hint(level: next) else {
+            clearHint()
+            return
+        }
+        hintKey = key
+        mirror.hintLevel = next
+        mirror.hintText = hint.text
+    }
+
+    /// Ends the tutorial of the current level.
+    func dismissTutorial(port: ExperienceActionPort) {
+        send("tutorial.dismiss", [], port: port)
+    }
+
+    /// Takes back the last change (`play.undo`); after a failure this returns the play to playing.
+    @discardableResult
+    func undo(port: ExperienceActionPort) -> ActionResult {
+        send("play.undo", [], port: port)
+    }
+
+    /// The action and values that start the current level again in its mode: `mode.practice` in practice, the daily
+    /// date's `mode.daily` in daily mode, `level.select` of the level in campaign.
+    func retryAction(date: DateComponents) -> (control: String, values: [Double]) {
+        guard let core = latestCore else { return ("mode.campaign", []) }
+        switch core.mode {
+        case .practice: return ("mode.practice", [])
+        case .daily: return ("mode.daily", Self.dateValues(dailyDate ?? date))
+        case .campaign: return ("level.select", [Double(core.levelNumber)])
+        }
+    }
+
+    /// Starts the current level again in its mode; in daily mode with the date that opened it (today's local date
+    /// when none is known).
+    @discardableResult
+    func retry(port: ExperienceActionPort, date: DateComponents = ColorfallCanyonsPresenter.today()) -> ActionResult {
+        let action = retryAction(date: date)
+        return send(action.control, action.values, port: port)
+    }
+
+    /// Plays the daily level of `date` (the local calendar date by default; the core never reads a clock).
+    @discardableResult
+    func playDaily(port: ExperienceActionPort,
+                   date: DateComponents = ColorfallCanyonsPresenter.today()) -> ActionResult {
+        let result = send("mode.daily", Self.dateValues(date), port: port)
+        if result.isAccepted { dailyDate = date }
+        return result
+    }
+
+    /// The local calendar date now, as Gregorian year, month and day in the current time zone.
+    static func today() -> DateComponents {
+        Calendar(identifier: .gregorian).dateComponents(in: .current, from: Date())
+    }
+
+    /// The values of `mode.daily` for `date`: year, month, day (0 for a missing part, which the engine refuses).
+    static func dateValues(_ date: DateComponents) -> [Double] {
+        [Double(date.year ?? 0), Double(date.month ?? 0), Double(date.day ?? 0)]
+    }
+
     /// The frame probes of the frame last drawn: the top-left and bottom-right background corners, outside the terrain
     /// (the camera fits the scene inside a 5 % margin), are `dark` (the night clear) once a snapshot was drawn by the real
     /// scene; none otherwise.
@@ -183,6 +291,19 @@ final class ColorfallCanyonsPresenter: ExperiencePresenter {
     }
 
     func describe(_ core: ColorfallCanyonsExperienceCore) -> String {
+        if latestCore?.levelNumber != core.levelNumber { mirror.pickedLevel = core.levelNumber }
+        latestCore = core
+        if let key = hintKey, key != Self.hintKey(core) { clearHint() }
+        mirror.instruction = core.tutorial == .done ? nil : core.tutorial.text
+        mirror.failureText = core.failureExplanation?.text
+        mirror.mode = core.mode
+        mirror.frontier = core.progress.frontier
+        var stars: [Int: Int] = [:]
+        for (level, result) in core.progress.solved { stars[level] = result.stars }
+        mirror.stars = stars
+        mirror.spent = core.play.spent
+        mirror.budget = core.play.level.budget
+        mirror.smallest = core.certifiedSmallest
         let play = core.play
         let level = play.level
         let snapshot = core.snapshot(time: 0)
@@ -213,6 +334,7 @@ final class ColorfallCanyonsPresenter: ExperiencePresenter {
         switch play.stage {
         case .won:
             text += "Every basin is filled with its colours."
+            if let stars = mirror.stars[core.levelNumber] { text += " Stars: \(stars) of 3." }
             mirror.status = "Won"
         case .failed:
             let reason: String
@@ -222,6 +344,7 @@ final class ColorfallCanyonsPresenter: ExperiencePresenter {
             case .time, .none: reason = "Time ran out before every basin was filled."
             }
             text += reason
+            if let explanation = mirror.failureText { text += " " + explanation }
             mirror.status = "Failed: " + reason
         default:
             mirror.status = "Playing"
@@ -230,7 +353,7 @@ final class ColorfallCanyonsPresenter: ExperiencePresenter {
     }
 
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
-        AnyView(ColorfallCanyonsControls(port: port, mirror: mirror, resetView: { [weak self] in self?.resetView() }))
+        AnyView(ColorfallCanyonsControls(port: port, mirror: mirror, presenter: self))
     }
 }
 #endif

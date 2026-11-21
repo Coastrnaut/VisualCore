@@ -54,7 +54,7 @@ R02-G05-03 are unchanged).
   schema-1 payload; undo restores the digest with the tutorial advanced; (schema examples are registered with the in-app integration, R02-G05-09, as for Hue Compass); on levels 1 … 3 a
   scripted player following each instruction and the exact hints wins (SC-R02G0505-001); scenarios that use level.next
   (now the next open level) regenerated and replayed); `--name host-3`
-- [ ] T-R02G0505-005 [US1] [US2] [US3] [US4] Edit `Packages/ExperiencesRound02/ColorfallCanyons/Experience/ColorfallCanyonsPresenter.swift` and
+- [X] T-R02G0505-005 [US1] [US2] [US3] [US4] Edit `Packages/ExperiencesRound02/ColorfallCanyons/Experience/ColorfallCanyonsPresenter.swift` and — Verified 2026-11-21: 2026-11-21 sim-27 exit 0: ColorfallCanyonsExperienceTests 35 tests in 6 suites on sim-27.2 incl. 5 teaching tests (tutorial and dismiss, hint levels, failure text with undo and retry, locked picker, daily and practice, win records stars) (.autonomy/migration/checks/R02-G05-05.sim-27.json); lead run
   `Packages/ExperiencesRound02/ColorfallCanyons/Experience/ColorfallCanyonsControls.swift` (instruction with Dismiss; Hint revealing the next level, reset
   after any change of the play; failure explanation with Undo and Retry; level picker of open levels with bands and
   stars; Campaign / Daily (local calendar date) / Practice; all as wrapping panel text) and create
