@@ -18,7 +18,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 2: Story 1 and 2 — the scene and renderer purity (P1) 🎯
 
-- [ ] T-R02G0303-003 [P] [US1] Create `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperShaders.swift` (rope, solid sources; uniform names; caustic pulse) with
+- [X] T-R02G0303-003 [P] [US1] Create `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperShaders.swift` (rope, solid sources; uniform names; caustic pulse) with — Verified 2026-11-21: 2026-11-21 host-2 exit 0 (shader sources, 14 tests: version, uniforms, no samplers or loops, fresnel, caustic, glow shell, gate edge)
   `Packages/ExperiencesRound02/WaveKnotKeeper/CoreTests/WaveKnotKeeperShaderSourceTests.swift` (version line, declared uniforms, no texture samplers,
   bounded loops); `--name host-2`
 - [ ] T-R02G0303-004 [P] [US1] Create `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperSceneGeometry.swift` (world points × 1/8, rope tube along the
