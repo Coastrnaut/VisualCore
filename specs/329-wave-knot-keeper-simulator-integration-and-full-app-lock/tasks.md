@@ -37,7 +37,7 @@ tests stay short (< 10 s each; interface tests < 90 s, SC-R02G0309-001). No {own
 
 ## Phase 4: Story 2 — the app's logic accepts the game (P1)
 
-- [ ] T-R02G0309-005 [US2] Edit `Apps/VisualCore/Tests/Unit/AppModelTests.swift` (agent B: both examples restore through
+- [X] T-R02G0309-005 [US2] Edit `Apps/VisualCore/Tests/Unit/AppModelTests.swift` (agent B: both examples restore through — Verified 2026-11-21: 2026-11-21 app-unit exit 0: 91/91 (87 before + 4: stored examples restore through the migration check; candidate not available without -vcCandidates; opens as a candidate and level 1 is won by its certified solution; WK's pinned point count, solution moves and allowance equal the Core)
   the app's migration check; the candidate opens through the registry and engine and plays level 1 to a win; without
   `-vcCandidates` it is not available and not openable; `WK`'s pinned level 1 point count, solution moves and allowance (the convergence lesson of feature 319)
   equal the Core's); `--name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`

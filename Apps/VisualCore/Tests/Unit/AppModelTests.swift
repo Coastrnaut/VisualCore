@@ -11,6 +11,7 @@ import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCorePersistence
 import VisualCoreRendering
+import WaveKnotKeeperCore
 import XCTest
 @testable import VisualCoreApp
 
@@ -1320,6 +1321,100 @@ final class AppModelTests: XCTestCase {
         XCTAssertEqual(certified.solution.setting,
                        LissajousLabyrinthDials(frequencyA: 7, frequencyB: 1, phaseA: 5, phaseC: 3))
         XCTAssertEqual(LissajousLabyrinthExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
+    }
+
+    // MARK: Wave Knot Keeper in the app (feature 329, R02-G03-09; T-R02G0309-005, FR-R02G0309-003,
+    // FR-R02G0309-006; clarifications Q2, Q3, Q5)
+
+    /// Wave Knot Keeper's registration: a candidate until X-R02-G03.
+    private func waveKnotKeeperRegistration() throws -> ExperienceRegistration {
+        let id = try ExperienceID(WaveKnotKeeperExperienceCore.experienceID)
+        return try XCTUnwrap(ExperienceRegistry.candidates.first { $0.id == id }, "Wave Knot Keeper is a candidate")
+    }
+
+    /// Clarification Q3: the snapshot is schema 3 and the stored schema-1 and schema-2 examples restore to their
+    /// digests through the migrations (the app's migration check).
+    func testTheWaveKnotKeeperRegistrationRestoresItsStoredExamples() async throws {
+        let registration = try waveKnotKeeperRegistration()
+        XCTAssertEqual(WaveKnotKeeperExperienceCore.schemaVersion, 3)
+        let one = try XCTUnwrap(WaveKnotKeeperExperienceCore.schemaOneExample(), "schema-1 example")
+        let two = try XCTUnwrap(WaveKnotKeeperExperienceCore.schemaTwoExample(), "schema-2 example")
+        XCTAssertEqual(one.version, 1)
+        XCTAssertEqual(two.version, 2)
+        XCTAssertNotEqual(one.expectedDigest, two.expectedDigest)
+        let problems: [String] = await registration.migrationProblems()
+        XCTAssertEqual(problems, [], "\(registration.id)")
+    }
+
+    /// FR-R02G0309-006, clarification Q5: without `-vcCandidates` Wave Knot Keeper is a candidate only: outside `all`,
+    /// listed in the bundled catalog as not available, without a tile and not opened.
+    func testWaveKnotKeeperIsACandidateAndUnavailableWithoutTheCandidatesArgument() async throws {
+        let id = try ExperienceID(WaveKnotKeeperExperienceCore.experienceID)
+        XCTAssertEqual(id.rawValue, "r02-g03.wave-knot-keeper")
+        XCTAssertTrue(ExperienceRegistry.candidates.map(\.id).contains(id))
+        XCTAssertFalse(ExperienceRegistry.all.map(\.id).contains(id))
+        let categories = try CategoryList(data: bundled("categories"))
+        let manifest = try CatalogManifest(data: bundled("experiences"), categories: categories)
+        XCTAssertTrue(manifest.experiences.contains { $0.id == id }, "a catalog id")
+        XCTAssertFalse(manifest.available.contains { $0.id == id }, "not available")
+        let storage = try TestStorage(self)
+        let model = AppModel(environment: storage.environment(catalog: try bundled("experiences"),
+                                                              categories: try bundled("categories"),
+                                                              registry: ExperienceRegistry.all))
+        XCTAssertFalse(model.shown.map(\.id).contains(id), "no tile")
+        let opened = await model.open(id)
+        XCTAssertFalse(opened)
+        XCTAssertNil(model.session.experience)
+    }
+
+    /// FR-R02G0309-003, clarification Q2: with the candidates registered Wave Knot Keeper is shown, opens through the
+    /// registry and engine, and level 1 is won by its certified solution as `point.move [point, direction]` actions
+    /// (direction index into `directionOrder`: 0 plusX, 1 minusX, 2 plusY, 3 minusY, 4 plusZ, 5 minusZ).
+    func testWaveKnotKeeperOpensAsACandidateAndLevelOneIsWonByItsCertifiedSolution() async throws {
+        let registration = try waveKnotKeeperRegistration()
+        let id = registration.id
+        let storage = try TestStorage(self)
+        let base = try storage.environment(catalog: bundled("experiences"), categories: bundled("categories"),
+                                           registry: ExperienceRegistry.all,
+                                           arguments: [DebugLaunch.candidatesArgument])
+        let environment = DebugLaunch.environment(base: base, candidates: [registration])
+        XCTAssertTrue(environment.registry.map(\.id).contains(id))
+        let model = AppModel(environment: environment)
+        XCTAssertEqual(environment.registry.filter { $0.id == id }.count, 1, "registered once")
+        XCTAssertTrue(model.shown.map(\.id).contains(id), "the launcher shows the candidate")
+        XCTAssertTrue(registration.controls.map(\.id).contains("point.move"))
+        XCTAssertEqual(registration.openingSeed, 0)
+
+        var engine = ExperienceEngine<WaveKnotKeeperExperienceCore>(id: id)
+        try await engine.prepare(seed: 0)
+        try engine.activate()
+        XCTAssertNil(engine.outcome)
+        let certified = try WaveKnotKeeperExperienceCore.generated(number: 1)
+        XCTAssertFalse(certified.solution.moves.isEmpty)
+        for move in certified.solution.moves {
+            let direction = try XCTUnwrap(WaveKnotKeeperExperienceCore.directionOrder.firstIndex(of: move.direction))
+            let values: [Double] = [Double(move.point), Double(direction)]
+            XCTAssertEqual(engine.handle(control: "point.move", values: values), .accepted, "\(values)")
+        }
+        XCTAssertEqual(engine.outcome?.code, WaveKnotKeeperExperienceCore.wonCode)
+        XCTAssertEqual(WaveKnotKeeperExperienceCore.wonCode, "won")
+    }
+
+    /// Clarification Q2 (the convergence lesson of feature 319): the interface tests pin level 1 in their `WK`
+    /// namespace (Tests/UI/WaveKnotKeeper/WKSupport.swift, which this target cannot import); the same literals equal
+    /// the Core's certified level 1: a rope of 6 points, allowance 9, one move: point 1 (0-based) plusX, direction
+    /// index 0 (WK.levelOneMoves). Seed 0 opens level 1.
+    func testWaveKnotKeeperLevelOneEqualsTheCore() throws {
+        let certified = try WaveKnotKeeperExperienceCore.generated(number: 1)
+        XCTAssertEqual(certified.level.points.count, 6, "WK.levelOnePointCount")
+        XCTAssertEqual(certified.level.allowance, 9, "WK.levelOneAllowance")
+        XCTAssertEqual(certified.solution.shortest, 1, "WK.levelOneShortest")
+        XCTAssertEqual(certified.solution.moves, [WaveKnotKeeperMove(point: 1, direction: .plusX)], "WK.levelOneMoves")
+        XCTAssertEqual(WaveKnotKeeperExperienceCore.directionOrder.firstIndex(of: .plusX), 0,
+                       "WK.directions[0] is move-plus-x")
+        XCTAssertEqual(WaveKnotKeeperExperienceCore.directionOrder,
+                       [.plusX, .minusX, .plusY, .minusY, .plusZ, .minusZ], "WK.directions")
+        XCTAssertEqual(WaveKnotKeeperExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
     }
     #endif
 }
