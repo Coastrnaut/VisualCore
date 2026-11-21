@@ -14,7 +14,7 @@ at the preview and keeps the orbit; the panel gains "Reset view". Research: [res
 
 ## Technical Context
 
-**Language/Version**: Swift 6. **Primary dependencies**: VisualCoreSimulation and VisualCoreMath (`PointerEvent`,
+**Language/Version**: Swift 6. **Primary dependencies**: VisualCoreScenes (`PointerEvent`) and VisualCoreMath (
 `Vec2` as Wave Knot Keeper's gesture controller uses them), the Hue Compass Core of R02-G04-01 … 03,
 VisualCoreExperienceHost (pointer events) in the experience. No new package, target or VisualCore API.
 **Testing**: host `swift test --package-path Packages/ExperiencesRound02`; simulator package tests on sim-27.2; the app
