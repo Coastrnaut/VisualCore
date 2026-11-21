@@ -23,7 +23,7 @@ run uses). Fixture seed 2_342; tests stay short (< 10 s each).
 
 ## Phase 3: Story 1 — every shipped level can be solved (P1) 🎯
 
-- [ ] T-R02G0502-003 [US1] Implement `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsSolver.swift` (clarification Q2: ColorfallCanyonsEdit carve
+- [X] T-R02G0502-003 [US1] Implement `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsSolver.swift` (clarification Q2: ColorfallCanyonsEdit carve — Verified 2026-11-21: 2026-11-21 host-2 exit 0 (solver by the lead: edit sets 0 … 3, routing keys with an incremental Zobrist hash compared in full, reachability pruning, an allocation-free kernel copy with an exact settled stop, the result re-run through the kernel; 13 tests by agent A retested by the lead: hand-built levels needing 0 … 3 edits and nil beyond, an independent brute force with no pruning or cache on catalog levels of every band, candidates and fixtures, fast flow and router equal to the kernel on over 1,000 edit sets, every smaller set loses, pruning soundness, determinism)
   and valve, moves = carvable cells in order then springs; edit sets of size 0 … 3 as non-decreasing move lists, each valve
   at most once, sets carving below 0 skipped; key = routing and valves, each key simulated once with conservation asserted
   every tick; first winning set is the smallest; work = distinct keys simulated; smaller = keys of fewer edits simulated;

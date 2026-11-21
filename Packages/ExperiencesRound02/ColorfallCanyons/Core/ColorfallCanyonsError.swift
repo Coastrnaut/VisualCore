@@ -19,7 +19,7 @@ public enum ColorfallCanyonsError: Error, Equatable, Sendable {
     case newerSchema(Int)
     /// A stored level or trace is damaged or breaks a rule; the payload describes the damage.
     case malformed(String)
-    /// No candidate of the manifest level (the payload is its number) met its band within 256 candidates (feature 342).
+    /// No candidate of the manifest level (the payload is its number) met its band within 512 candidates (feature 342).
     case generation(Int)
     /// A witness is damaged, edited or no longer replays; the payload names the part (feature 342).
     case witness(String)
