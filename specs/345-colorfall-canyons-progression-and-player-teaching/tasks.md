@@ -65,7 +65,7 @@ R02-G05-03 are unchanged).
 
 - [X] T-R02G0505-006 Docs: `docs/architecture/colorfall-canyons.md` (teaching and progression), — Verified 2026-11-21: 2026-11-21 docs updated (architecture teaching and progression, package README, testing lesson); round02-host exit 0 (.autonomy/migration/checks/R02-G05-05.round02-host.json)
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
-- [ ] T-R02G0505-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G0505-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-21: 2026-11-21 rendering-27, rendering-26, experiences, host-full, app-unit exit 0 (.autonomy/migration/checks/R02-G05-05.*.json)
   `--name host-full`, `--name app-unit`
 - [ ] T-R02G0505-008 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G0505-009 Reference regression chunk 2 (`--name reference-2`)
