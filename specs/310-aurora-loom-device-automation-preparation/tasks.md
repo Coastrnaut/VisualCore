@@ -39,7 +39,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
 - [X] T-R02G0110-006 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-21: 2026-11-21 run-check rendering-27, rendering-26, experiences, host-full exit=0
   `--name host-full` (nothing in the app changes)
 - [X] T-R02G0110-007 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-21: 2026-11-21 run-check reference-1 exit=0
-- [ ] T-R02G0110-008 Reference regression chunk 2 (`--name reference-2`)
+- [X] T-R02G0110-008 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-21: 2026-11-21 run-check reference-2 exit=0
 - [ ] T-R02G0110-009 {device} After ImplementationLock-100: the device campaign (UA-F13) runs rows AL-D1 … AL-D8 on D1,
   D2, D3 (SC-R02G0110-004)
 - [ ] T-R02G0110-010 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
