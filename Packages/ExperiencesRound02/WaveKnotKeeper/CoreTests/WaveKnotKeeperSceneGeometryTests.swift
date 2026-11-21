@@ -287,6 +287,7 @@ private func length(_ v: SIMD3<Double>) -> Double { WaveKnotKeeperSceneGeometry.
             let p: [SIMD3<Double>] = Geometry.worldPoints(s)
             let n: Int = p.count
             var marks: [(segment: Int, point: SIMD3<Double>, inMiddle: Bool)] = []
+            var anchors: [(segment: Int, point: SIMD3<Double>)] = []
             for mark in s.crossings {
                 let x: SIMD3<Double> = try #require(Geometry.crossingPoint(mark, in: s))
                 #expect(abs(x.x - mark.x / 8) < 1e-9 && abs(x.y - mark.y / 8) < 1e-9)
@@ -294,6 +295,8 @@ private func length(_ v: SIMD3<Double>) -> Double { WaveKnotKeeperSceneGeometry.
                 let t: Double = dot(x - a, b - a) / dot(b - a, b - a)
                 let margin: Double = 0.2 / length(b - a)
                 marks.append((mark.over, x, t > 0.25 + margin && t < 0.75 - margin))
+                // T-R02G0303-014: the weight is measured from where the crossing lies on the drawn tube.
+                anchors.append((mark.over, try #require(Geometry.drawnCrossingPoint(mark, in: s))))
             }
             for tier in WaveKnotKeeperTier.all {
                 let samples: [WaveKnotKeeperSceneGeometry.Sample] = Geometry.centreline(s, tier: tier)
@@ -304,12 +307,22 @@ private func length(_ v: SIMD3<Double>) -> Double { WaveKnotKeeperSceneGeometry.
                     let sample: WaveKnotKeeperSceneGeometry.Sample = samples[(v / tier.sides) % samples.count]
                     if w == 0 { continue }
                     var near: Bool = false
-                    for m in marks where m.segment == sample.segment && length(sample.position - m.point) < 0.2 {
+                    for m in anchors where m.segment == sample.segment && length(sample.position - m.point) < 0.2 {
                         near = true
                     }
                     if !near { ok = false }
                 }
                 #expect(ok, "tier \(tier.index)")
+                // T-R02G0303-014: every crossing, in a straight middle or a corner, has a full-weight vertex within
+                // one radius of its drawn point at every tier.
+                for m in anchors {
+                    var lit: Bool = false
+                    for v in 0..<mesh.positions.count where mesh.uvs[v].x == 1 {
+                        let sample: WaveKnotKeeperSceneGeometry.Sample = samples[(v / tier.sides) % samples.count]
+                        if sample.segment == m.segment && length(sample.position - m.point) <= 0.1 { lit = true }
+                    }
+                    #expect(lit, "a crossing on segment \(m.segment) is lit at tier \(tier.index)")
+                }
                 for m in marks where m.inMiddle {
                     checkedCrossings += 1
                     var full: Bool = false, ramp: Bool = false

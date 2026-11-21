@@ -123,6 +123,55 @@ public enum WaveKnotKeeperSceneGeometry {
         return min(max(t, 0), 1)
     }
 
+    /// Where a crossing lies on the drawn tube (feature 323 convergence, T-R02G0303-014): on the straight middle of its
+    /// over-strand (segment parameter 0.25 … 0.75) it is ``crossingPoint(_:in:)``; nearer an end, the tube follows the
+    /// rounded corner there, so it is the point of that corner's arc, on the over-strand's half, whose xy-projection is
+    /// nearest the crossing's (searched at 129 arc parameters). `corner` is nil on the straight middle, else the corner
+    /// index and its arc parameter.
+    struct CrossingAnchor {
+        var segment: Int
+        var point: SIMD3<Double>
+        var corner: (index: Int, t: Double)?
+    }
+
+    /// The point of corner `i`'s arc at parameter `t` (see ``centreline(_:tier:radius:)``).
+    static func arcPoint(_ p: [SIMD3<Double>], corner i: Int, t: Double) -> SIMD3<Double> {
+        let n = p.count
+        let previous = p[(i + n - 1) % n], next = p[(i + 1) % n]
+        let a = p[i] + (previous - p[i]) * 0.25, b = p[i] + (next - p[i]) * 0.25
+        return a * ((1 - t) * (1 - t)) + p[i] * (2 * t * (1 - t)) + b * (t * t)
+    }
+
+    /// The drawn anchor of `mark` (see ``CrossingAnchor``); nil when the mark is unusable.
+    static func anchor(_ mark: WaveKnotKeeperCrossingMark, in snapshot: WaveKnotKeeperSceneSnapshot) -> CrossingAnchor? {
+        guard let s = crossingParameter(mark, points: snapshot.points),
+              let straight = crossingPoint(mark, in: snapshot) else { return nil }
+        if s >= 0.25 && s <= 0.75 { return CrossingAnchor(segment: mark.over, point: straight, corner: nil) }
+        let p = worldPoints(snapshot)
+        let n = p.count
+        // Near the start the tube is corner `over` (its half t ≥ 0.5 belongs to segment `over`); near the end it is
+        // corner `over + 1` (its half t < 0.5 belongs to segment `over`).
+        let corner = s < 0.25 ? mark.over : (mark.over + 1) % n
+        let range: ClosedRange<Double> = s < 0.25 ? 0.5...1 : 0...0.499_999
+        let target = SIMD2<Double>(mark.x * unitsPerKernel, mark.y * unitsPerKernel)
+        var best = (t: range.lowerBound, d: Double.infinity)
+        for k in 0...128 {
+            let t = range.lowerBound + (range.upperBound - range.lowerBound) * Double(k) / 128
+            let q = arcPoint(p, corner: corner, t: t)
+            let dx = q.x - target.x, dy = q.y - target.y
+            let d = (dx * dx + dy * dy).squareRoot()
+            if d < best.d { best = (t, d) }
+        }
+        return CrossingAnchor(segment: mark.over, point: arcPoint(p, corner: corner, t: best.t),
+                              corner: (corner, best.t))
+    }
+
+    /// The world point where `mark` lies on the drawn tube (see ``CrossingAnchor``); nil when unusable.
+    public static func drawnCrossingPoint(_ mark: WaveKnotKeeperCrossingMark,
+                                          in snapshot: WaveKnotKeeperSceneSnapshot) -> SIMD3<Double>? {
+        anchor(mark, in: snapshot)?.point
+    }
+
     /// The bounding sphere of the scene: the centre of the axis-aligned box around every control point (grown by
     /// ``pointMargin``) and every gate box corner, and the smallest radius about that centre holding all of them. Every
     /// vertex of the rope, glow, handle (placed at a control point) and gate meshes lies inside it. A snapshot without
@@ -214,8 +263,9 @@ public enum WaveKnotKeeperSceneGeometry {
     /// `tier.cornerSamples` (at least 2) even values of t from 0 to 1. Samples with t < 0.5 belong to segment i − 1,
     /// the others to segment i. Between corner i and corner i + 1 lies the straight middle of segment i, from B_i to
     /// A_(i+1); for each crossing whose over-strand is segment i, the points at −2, −1, 0, +1 and +2 tube radii along
-    /// the segment from the crossing point are inserted where they fall strictly inside the straight middle, so the
-    /// crossing weight's ramp is carried by vertices. Fewer than two points give no samples.
+    /// the segment from the crossing point are inserted where they fall strictly inside the straight middle; a crossing
+    /// in a corner region gets arc parameters at about −2 … +2 radii from its drawn anchor instead, so the crossing
+    /// weight's ramp is carried by vertices wherever the crossing lies. Fewer than two points give no samples.
     static func centreline(_ snapshot: WaveKnotKeeperSceneSnapshot, tier: WaveKnotKeeperTier,
                            radius: Double = tubeRadius) -> [Sample] {
         let p = worldPoints(snapshot)
@@ -223,7 +273,22 @@ public enum WaveKnotKeeperSceneGeometry {
         guard n >= 2 else { return [] }
         let c = max(tier.cornerSamples, 2)
         var extra: [[Double]] = Array(repeating: [], count: n)
+        var cornerExtra: [[Double]] = Array(repeating: [], count: n)
         for mark in snapshot.crossings {
+            guard let anchor = anchor(mark, in: snapshot) else { continue }
+            if let corner = anchor.corner {
+                // Arc parameters about ±1 and ±2 radii from the anchor, kept on the over-strand's half of the corner.
+                let half: ClosedRange<Double> = corner.t >= 0.5 ? 0.5...1 : 0...0.499_999
+                let step = 1e-4
+                let speed = safeLength(arcPoint(p, corner: corner.index, t: min(corner.t + step, 1))
+                                       - arcPoint(p, corner: corner.index, t: max(corner.t - step, 0)))
+                    / (min(corner.t + step, 1) - max(corner.t - step, 0))
+                for k in -2...2 {
+                    let t = speed > 0 ? corner.t + Double(k) * radius / speed : corner.t
+                    if half.contains(t) { cornerExtra[corner.index].append(t) }
+                }
+                continue
+            }
             guard let t = crossingParameter(mark, points: snapshot.points) else { continue }
             let length = safeLength(p[(mark.over + 1) % n] - p[mark.over])
             guard length > 0 else { continue }
@@ -237,8 +302,13 @@ public enum WaveKnotKeeperSceneGeometry {
         for i in 0..<n {
             let previous = p[(i + n - 1) % n], next = p[(i + 1) % n]
             let a = p[i] + (previous - p[i]) * 0.25, b = p[i] + (next - p[i]) * 0.25
-            for k in 0..<c {
-                let t = Double(k) / Double(c - 1)
+            var params: [Double] = []
+            for k in 0..<c { params.append(Double(k) / Double(c - 1)) }
+            params.append(contentsOf: cornerExtra[i])
+            params.sort()
+            var last = -1.0
+            for t in params where t - last > 1e-9 {
+                last = t
                 let q = a * ((1 - t) * (1 - t)) + p[i] * (2 * t * (1 - t)) + b * (t * t)
                 result.append(Sample(position: q, segment: t < 0.5 ? (i + n - 1) % n : i))
             }
@@ -260,12 +330,12 @@ public enum WaveKnotKeeperSceneGeometry {
     }
 
     /// The crossing weight of each centreline sample: for every crossing mark whose over-strand is the sample's
-    /// segment, clamp(2 − d / radius, 0, 1) with d the distance from the sample to ``crossingPoint(_:in:)``; the
+    /// segment, clamp(2 − d / radius, 0, 1) with d the distance from the sample to ``drawnCrossingPoint(_:in:)``; the
     /// largest over all marks; 0 for samples of other segments.
     static func weights(_ samples: [Sample], snapshot: WaveKnotKeeperSceneSnapshot, radius: Double) -> [Double] {
         var marks: [(segment: Int, point: SIMD3<Double>)] = []
         for mark in snapshot.crossings {
-            if let x = crossingPoint(mark, in: snapshot) { marks.append((mark.over, x)) }
+            if let x = drawnCrossingPoint(mark, in: snapshot) { marks.append((mark.over, x)) }
         }
         return samples.map { sample in
             var w = 0.0
