@@ -211,6 +211,9 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   targets lie anywhere in 0.35 … 1, so easing at a fixed rate per unit of range let short changes finish in under
   0.4 s; each fade now takes the full 0.45 s under Reduce Flashing, and the lights tests caught the rate-based rule by
   sabotage.
+- **A guard that only bounds work needs its own test** (R02-G05-07, 2026-11-21). Colorfall Canyons's trace bound (30
+  edits, 3,600 steps) never changes a verdict, because a longer trace cannot win within the budget and tick limit, so
+  removing it fails no behaviour test; the bound's edges are tested directly.
 - **Quantise before hashing floats** for digests that must match across platforms (surface colours are hashed as
   16-bit values).
 

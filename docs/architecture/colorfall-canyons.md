@@ -179,3 +179,20 @@ long step as single ticks; the play accepts both.
 - **Layout.** The panel scrolls, grows with Dynamic Type, turns button rows into columns at accessibility sizes, uses
   system colours and keeps a 520-point readable width on iPad.
 
+## Persistence and replay (feature 347, R02-G05-07)
+
+- **Saving.** The app's shared saved-state store keeps the experience's snapshot (atomic write, unreadable files set
+  aside, newer schemas refused). Snapshot schema 3 holds the level, the mode, the progress with the winning traces, the
+  records, the tutorial step and the sound choice; migrations bring schema 1 and 2 saves to 3 without losing progress
+  (their results are kept unverified, the sound off). The sound choice is snapshotted but never digested.
+- **Reconcilable scores.** A campaign or daily win stores the winning trace: the play's net actions (carves, valve
+  toggles and steps; an undone action is left out unless redone). On restore every traced result is replayed on a fresh
+  play of its certified level and kept only if it wins having spent exactly its recorded actions with its recorded
+  stars; the number dropped is announced once. A trace over 30 edits or 3,600 steps never verifies. The frontier is
+  restored as saved.
+- **Replay.** `replay.start [level]` plays a verified level's stored trace action by action (`replay.step`) and
+  `replay.stop` returns to the campaign; other play actions are refused during replay, and replay never changes
+  progress or awards stars.
+- **Determinism.** The state reads no clock or random source: the seed, the certified catalog, the date given to
+  `mode.daily` and the recorded actions decide everything, so a save restores and replays identically on every device.
+

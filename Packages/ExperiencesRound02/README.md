@@ -280,3 +280,8 @@ Feature 346 (R02-G05-06) adds polish and accessibility: `ColorfallCanyonsFeedbac
 `ColorfallCanyonsSoundRecipe` (an ambient loop from the basins) in the Core, `ColorfallCanyonsSound` and the panel's
 labels, values, summary element, Sound toggle and accessibility-size layout in the experience.
 
+Feature 347 (R02-G05-07) adds persistence and replay: results keep their winning trace and a verified flag,
+`ColorfallCanyonsReconciliation` replays each trace on restore and drops what does not verify, the adapter writes
+snapshot schema 3 (with the sound choice, not digested) with migrations from 1 and 2, and `replay.start`, `replay.step`
+and `replay.stop` replay a stored solution.
+
