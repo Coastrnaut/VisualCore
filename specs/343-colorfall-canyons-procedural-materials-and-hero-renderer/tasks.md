@@ -72,3 +72,8 @@ tests stay short (< 10 s each). No {owner} tasks.
 001 → 002 → {003 (agent A), 004 (agent B), 005 (agent C)} → 006 (lead; agent D writes the simulator tests) → 007 … 011,
 013. 012 stays open until device testing. Shared files (Package.swift, snapshot, presenter, scene, controls, scenarios,
 registration, docs) stay with the lead. MVP: Stories 1 and 2.
+
+## Phase 5: Convergence
+
+- [ ] T-R02G0503-014 State in `specs/343-colorfall-canyons-procedural-materials-and-hero-renderer/spec.md` clarification Q3 that the bright-pixel check applies to flowing emitters (a closed or dry emitter is drawn dimmed, ×0.3) and that open cell tops must differ from night for every dry front-row cell and at least 80 % of all open cells (fluid and nearer blocks may cover a top) — the bounds `ColorfallCanyonsTestSupport.checkFrame` enforces — per SC-R02G0503-001 (partial)
+- [ ] T-R02G0503-015 Document in `specs/343-colorfall-canyons-procedural-materials-and-hero-renderer/contracts/api.md` and `data-model.md` the stream encoding (terrain: material code and shade in uv; fluid: colour weights in the normal slot, brightness and flow code in uv), `ColorfallCanyonsColouredMesh` with the `…Part` functions, `pixel(_:camera:width:height:)`, the uniform constants, that flow bands are a shader uniform (`u_flowBands`) not geometry, and back-face culling on every draw, per plan: contracts (partial)
