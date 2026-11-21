@@ -10,7 +10,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 - [X] T-R02G0503-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test — Verified 2026-11-21: 2026-11-21 R02-G05-03.baseline-host/timing/round02 exit 0
   --package-path Packages/ExperiencesRound02`; the rendering baseline is R02-G05-02's rendering runs (exit 0)
-- [ ] T-R02G0503-002 Edit `Packages/ExperiencesRound02/Package.swift` (Core dependencies; `ColorfallCanyonsExperience` and its
+- [X] T-R02G0503-002 Edit `Packages/ExperiencesRound02/Package.swift` (Core dependencies; `ColorfallCanyonsExperience` and its — Verified 2026-11-21: 2026-11-21 host exit 0 (Core gains VisualCoreScenes, Experience, Diagnostics, Persistence; ColorfallCanyonsSceneSnapshot with palette, fluid mix and brightness, patterns, tiers 4/2/1, 3/2/1, 2/1/0; the Experience target follows with T-006 once its sources exist)
   tests with iOS-conditioned rendering dependencies; the product) and create `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsSceneSnapshot.swift`
   (snapshot per data-model.md; `ColorfallCanyonsTier` "subdivision 4/2/1, flow bands 3/2/1, glow shells 2/1/0, richest
   first"; `ColorfallCanyonsPalette` "night #05070F, sandstone #8C5A3C, rock #3B302C, pearl #E8E4DA, cyan #19E3F0, coral

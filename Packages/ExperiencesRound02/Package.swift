@@ -218,12 +218,20 @@ let package = Package(
         // Feature 341 (R02-G05-01): Colorfall Canyons's pure rule kernel.
         .target(name: "ColorfallCanyonsCore",
                 dependencies: [.product(name: "VisualCoreSimulation", package: visualCore),
-                               .product(name: "VisualCoreMath", package: visualCore)],
+                               .product(name: "VisualCoreMath", package: visualCore),
+                               // Feature 343 (R02-G05-03): meshes and the experience adapter, host-testable.
+                               .product(name: "VisualCoreScenes", package: visualCore),
+                               .product(name: "VisualCoreExperience", package: visualCore),
+                               .product(name: "VisualCoreDiagnostics", package: visualCore),
+                               .product(name: "VisualCorePersistence", package: visualCore)],
                 path: "ColorfallCanyons/Core"),
         .testTarget(name: "ColorfallCanyonsCoreTests",
                     dependencies: ["ColorfallCanyonsCore",
                                    .product(name: "VisualCoreSimulation", package: visualCore),
-                                   .product(name: "VisualCoreMath", package: visualCore)],
+                                   .product(name: "VisualCoreMath", package: visualCore),
+                                   .product(name: "VisualCoreScenes", package: visualCore),
+                                   .product(name: "VisualCoreExperience", package: visualCore),
+                                   .product(name: "VisualCoreDiagnostics", package: visualCore)],
                     path: "ColorfallCanyons/CoreTests"),
     ]
 )
