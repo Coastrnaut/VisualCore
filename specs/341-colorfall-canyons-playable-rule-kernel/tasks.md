@@ -47,7 +47,7 @@ in this feature (the CPU flow step is the reference the renderer of R02-G05-03 w
 
 ## Phase 5: Story 4 — contract and invariants (P2)
 
-- [ ] T-R02G0501-005 [P] [US4] Create `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsRules.swift` (`PuzzleRules`: State = position (fluid,
+- [X] T-R02G0501-005 [P] [US4] Create `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsRules.swift` (`PuzzleRules`: State = position (fluid, — Verified 2026-11-21: 2026-11-21 host-4 exit 0 (ColorfallCanyonsRules as PuzzleRules by agent C, 9 tests retested by the lead: move order, budget gating, ended positions, agreement with the play on 200 seeded walks (capped at 100 moves), 100 known solutions as single ticks, Position JSON, PuzzleValidator certifies a hand-made level and refuses wrong rules, illegal moves and unsolved paths)
   spent, outcome), Move = ColorfallCanyonsAction; legal moves carve(c) for each carvable cell in index order, valve(s) for
   each spring, step(1)) with `Packages/ExperiencesRound02/ColorfallCanyons/CoreTests/ColorfallCanyonsRulesTests.swift` (agreement with the play on 200 walks);
   `--name host-4`
