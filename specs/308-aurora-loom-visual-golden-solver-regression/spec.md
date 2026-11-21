@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-20
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G01-08 (migration ledger, game feature of experience R02-G01) · ID namespace FR-R02G0108-###,
 SC-R02G0108-###, T-R02G0108-###
@@ -28,6 +28,52 @@ Canonical overrides:
   **Owner-only items:** none.
 - **Shared features used:** the experience host's off-screen rendering and quality tiers, the shared scenario manifest
   and verification runner, the repository's GitHub workflow, and R02-G01-01 … 07.
+
+## Clarifications
+
+### Session 2026-11-20
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time. Facts checked in
+code (read-only audit, 2026-11-20): `AuroraLoomSolver.solve(_:)` is exact (per-ribbon bounded descent of at most
+`maxSweeps` = 32 sweeps, then the full 256-setting grid) and counts every score evaluation in `work`; the 100 witness
+files are byte-checked by `AuroraLoomCatalogTests` and their refusals by `AuroraLoomWitnessTests`; the simulator render
+tests of feature 303 already compare frames with the CPU reference at 768 × 512; `ProcessMemory.footprint()`
+(VisualCoreRendering) reads the process footprint through the public `task_info`; `AuroraLoomRibbonScene.release()` frees
+the GPU objects; the GitHub workflow's host job runs `swift test --package-path Packages/ExperiencesRound02`;
+`scripts/xcodebuild_package.py` runs simulator tests with `--only-testing` and a time limit.
+
+- Q: What exactly does the solver regression check, and how is "within its work bound" measured? → A: for every one of
+  the 100 levels: the generated level equals its witness's level (fingerprint), the witness replays to a win in exactly
+  its recorded moves, and `solve` from the start returns a solution of exactly the certified shortest length whose moves
+  win, with `work` at most 3 × (32 × 32 + 256) = 3,840 evaluations (three ribbons, each at most 32 sweeps of 32 settings
+  and the 256-setting grid). Work is counted, never timed. The run is split by band (20 levels per test). Impact:
+  FR-R02G0108-001; SC-R02G0108-001.
+- Q: Which alterations must the regression detect and how is each named? → A: twelve kinds, each applied to a copy and
+  each producing a failure message naming the level and the part: a level's tolerance, allowance, a gate, a ribbon start
+  step, ω; a solution move's ribbon, control or step; a witness's terminal steps, counterexample, recorded shortest; the
+  level fingerprint. Impact: FR-R02G0108-002; SC-R02G0108-002.
+- Q: What is a golden frame description, where is its digest pinned, and how is it regenerated? → A: for each golden
+  frame (levels 1, 21, 41, 61, 81 at tiers 0, 1, 2 at frame time 0, plus the hero frame of the scenario manifest's hero
+  scenario at tier 0: 16 frames) the Core computes, at 768 × 512, the projected pixel positions of every ribbon sample
+  checked by the feature-303 frame check, of every gate marker and gate centre, rounded to 1/8 pixel, and the expected
+  colours as 8-bit sRGB; serialized as JSON with sorted keys, hashed with SHA-256. The 16 digests live in a committed
+  file `Packages/ExperiencesRound02/AuroraLoom/golden-frames.json`; the host test recomputes and compares them (so CI
+  catches drift), and rewrites the file only when `AURORA_LOOM_WRITE_GOLDEN=1` is set. The simulator test renders the
+  16 frames and checks them against the same descriptions with the feature-303 tolerances. Impact: FR-R02G0108-003,
+  004; SC-R02G0108-003.
+- Q: How is memory measured and what releases are checked? → A: on the simulator, 12 cycles of open (prepare a level),
+  draw 3 frames at tier 0, send a memory warning, draw 1 frame, close (teardown); the footprint is read with
+  `ProcessMemory.footprint()` after each cycle; the bound is that every reading of cycles 2 … 12 stays within 16 MB of
+  cycle 1's reading. After each close and after each memory warning the scene holds no GPU objects (a test-visible count
+  of live programs and buffers is 0) and the next frame rebuilds them. An unavailable footprint fails the check with a
+  named reason rather than passing. Impact: FR-R02G0108-005; SC-R02G0108-004.
+- Q: How do CI and the local command report, and what do they run? → A: CI's host job keeps running all round-two host
+  tests (solver regression and golden digests included) and adds a named step that runs the Aurora Loom regression
+  filter alone, so a failure is visible by name. The local command `python3 scripts/aurora_loom_regression.py` runs the
+  host regression filter and then the simulator regression test classes through `xcodebuild_package.py --only-testing`
+  with a time limit, and prints one summary line per part with pass or fail and the first failing name; its exit code is
+  non-zero on any failure. Nothing in either is timed against the wall clock. Impact: FR-R02G0108-006, 007;
+  SC-R02G0108-005.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -127,13 +173,13 @@ simulator parts and reports one summary.
 
 ### Measurable Outcomes
 
-- **SC-R02G0108-001**: All 100 levels replay their witnesses and re-solve to their certified shortest length; 100 of 100.
-- **SC-R02G0108-002**: Each of at least 10 kinds of alteration (level field, solution move, witness step, fingerprint) is
-  detected and named.
-- **SC-R02G0108-003**: The golden set covers at least 5 levels × 3 tiers plus the hero frame; every rendered frame
+- **SC-R02G0108-001**: All 100 levels replay their witnesses and re-solve to their certified shortest length within
+  3,840 evaluations of work; 100 of 100.
+- **SC-R02G0108-002**: Each of the 12 kinds of alteration of clarification Q2 is detected and named.
+- **SC-R02G0108-003**: The golden set covers 5 levels × 3 tiers plus the hero frame (16 frames); every rendered frame
   matches its description within tolerance and every description matches its pinned digest.
-- **SC-R02G0108-004**: Over at least 10 open-draw-close cycles with memory warnings, footprint growth after the first
-  cycle stays within 16 MB and the game's GPU objects are released after each close.
+- **SC-R02G0108-004**: Over 12 open-draw-warn-close cycles, every footprint reading of cycles 2 … 12 stays within 16 MB
+  of cycle 1's, and the game's GPU objects are released after each close and each memory warning.
 - **SC-R02G0108-005**: The workflow runs the host part on every push and passes; the local command runs all parts and
   prints one summary.
 - **SC-R02G0108-006**: Existing tests pass; the reference regression passes 7 of 7; each test finishes in under 10 seconds.
