@@ -103,6 +103,12 @@ orbit, selection) and the pending-value planner `LissajousLabyrinthPending`; in 
 route, the drawn rings, knobs, selection outline and turn preview, and a panel whose steppers set pending values with
 Apply, Clear and Reset view.
 
+Feature 315 (R02-G02-05) adds teaching and progression: `LissajousLabyrinthSolver.solve(_:from:winning:)`,
+`LissajousLabyrinthHints` with `LissajousLabyrinthFailureExplanation`, and `LissajousLabyrinthProgress` with
+`LissajousLabyrinthMode` and `LissajousLabyrinthTutorialStep`; the adapter gains level selection, daily, practice and
+campaign modes, the tutorial controls and snapshot schema 2; the panel shows the instruction, hints, the failure
+explanation, the goal, the modes and a level picker.
+
 ## Wave Knot Keeper (R02-G03, `r02-g03.wave-knot-keeper`, free)
 
 `WaveKnotKeeperCore` (feature 321, R02-G03-01) is the playable rule kernel: `WaveKnotKeeperLevel` with

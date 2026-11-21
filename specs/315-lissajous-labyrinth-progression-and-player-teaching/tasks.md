@@ -60,7 +60,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks.
 
 ## Phase 5: Regression, documentation and close
 
-- [ ] T-R02G0205-006 Docs: `docs/architecture/lissajous-labyrinth.md` (teaching and progression),
+- [X] T-R02G0205-006 Docs: `docs/architecture/lissajous-labyrinth.md` (teaching and progression), — Verified 2026-11-21: 2026-11-21 round02-host exit 0; audits exit 0 (content audit of r02-g02.lissajous-labyrinth); docs/architecture/lissajous-labyrinth.md teaching and progression; package README; docs/automatedtesting.md (dense successor table for a hot search)
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`; `--name audits -- python3
   scripts/verify_experiences.py --audits --only r02-g02.lissajous-labyrinth`
 - [ ] T-R02G0205-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,

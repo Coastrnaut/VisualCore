@@ -109,6 +109,23 @@ LISSAJOUS_LABYRINTH_WRITE_WITNESSES=1 swift test --package-path Packages/Experie
   stops at a refusal or when the level ends. Every certified level is won this way in exactly its certified shortest
   number of actions (host test over all 100 levels).
 
+## Teaching and progression (R02-G02-05)
+
+- **Hints.** The solver's breadth-first search runs from the current dials over the level's winning settings (computed
+  once when the level opens, about 0.1 s); a precomputed successor table keeps each search under a millisecond. The
+  first action of the shortest remaining solution gives three levels: the dial, raise or lower, the exact value. Hints
+  are unlimited, change nothing and do not affect stars; "No solution fits in the actions left" when the remaining
+  solution is longer than the actions left.
+- **Failures.** The kernel's verdict in words: the touched obstacle and the lap position (⌊100 · tick / 4,096⌋ %), or the
+  checkpoint not reached in order, with Undo (which rewinds the failing action) and Retry.
+- **Tutorial.** On levels 1 … 3 in campaign mode: turn the hint's dial, then the checkpoint and sphere rule, then "ask for a
+  hint"; dismissable; undo never moves it back and it is not in the digest. Levels 1 and 2 are won in one action, so a
+  perfect play shows only the first instruction.
+- **Progress and modes.** Stars 3 / 2 / 1 against the certified shortest; campaign wins open the next level; the daily
+  level is (days since 2026-01-01 × 41) mod 100 + 1 from the local date the presenter sends; practice raises the
+  allowance to 64 and records nothing. Snapshot schema 2 (`level`, `mode`, `progress`, `records`, `tutorial`) with a
+  migration from schema 1.
+
 ## Failures
 
 `LissajousLabyrinthError` reason codes: `r02-g02.level`, `r02-g02.move`, `r02-g02.stage`, `r02-g02.stale`,

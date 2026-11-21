@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--audits",
+    "--only",
+    "r02-g02.lissajous-labyrinth"
+  ],
+  "command": "python3 scripts/verify_experiences.py --audits --only r02-g02.lissajous-labyrinth",
+  "elapsed_seconds": 2.312,
+  "exit_code": 0,
+  "finished": "2026-11-21T07:05:23+00:00",
+  "gate": "R02-G02-05",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G02-05.audits.log",
+  "log_sha256": "e285f33e520dbc96d939b6c359488a2724fefcd66788c4db947ae07da4aa9d65",
+  "name": "audits",
+  "started": "2026-11-21T07:05:21+00:00",
+  "timed_out": false
+}
