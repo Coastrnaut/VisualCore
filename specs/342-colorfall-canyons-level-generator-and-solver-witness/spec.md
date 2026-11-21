@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-21
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G05-02 (migration ledger, game feature of experience R02-G05) · ID namespace FR-R02G0502-###,
 SC-R02G0502-###, T-R02G0502-###
@@ -28,6 +28,66 @@ Canonical overrides:
 - **Shared features used:** R02-F23 (puzzle contract: `ColorfallCanyonsRules` from R02-G05-01) and R02-F24 (catalog
   digest, difficulty and progression rule); R02-F03 numbers.
 - **Model:** feature 332 (Hue Compass's generator and solver witness).
+
+## Clarifications
+
+### Session 2026-11-21
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time. Facts checked in
+code (read-only, 2026-11-21): R02-G05-01's `ColorfallCanyonsLevel` (grid 4 … 12 × 4 … 10, heights 0 … 15, open, rock and
+drain ground, 1 … 3 springs, 1 … 4 basins, flow rate 1 … 8, budget 1 … 30, tick limit 1 … 3,600), `ColorfallCanyonsFluid`
+(`downhill`, `tick`, `verdict`, `isConserved`), `ColorfallCanyonsPlay` and `ColorfallCanyonsRules`; R02-F24's
+`PuzzleCatalog.digest(id:identities:)` and `ProgressionRule`; `SeedDerivation.derive(_:index:)` and `SeededRandom`; the
+archived manifest's 100 entries (bands 1 … 5 × 20, move budgets 8 … 19). Feature 332 is the pattern. A Python prototype
+(2026-11-21, 20 seeded levels per band, the rules below) generated 20 of 20 levels in every band within 256 candidates,
+with at most 6,540 distinct routings simulated by the solver for one level.
+
+- Q: How is a level built from its manifest entry? → A: the 100 entries (number, planned seed, band, move budget) are a
+  table in `ColorfallCanyonsManifest` with their provenance. Candidate k of entry n draws from
+  `SeededRandom(seed: SeedDerivation.derive(plannedSeed, index: k))`, in this order: the grid (bands 1–2: 6 × 5, band 3:
+  7 × 5, bands 4–5: 8 × 6); per cell row-major a height clamp(12 − 2·row + draw(−2 … 2), 0 … 15) and rock with chance 15 %;
+  each bottom-row cell becomes a drain (height 0) with chance 20 %, and one drawn bottom cell when none did; depressions:
+  the first 3, 4, 5, 8, 8 (by band) of the shuffled open cells of rows 2 … rows − 2 are lowered to the lowest neighbour's
+  height minus draw(1 … 2) (at least 0); springs (1, 2, 2, 3, 3 by band) on distinct shuffled open cells of rows 0 … 1, the
+  colours a shuffled order of cyan, coral, yellow, release draw(1 … 3), supply draw(8 … 24), valves open; flow rate
+  draw(3 … 6); tick limit draw(60 … 120); the budget is the manifest budget. A planted plan then gives each spring in turn
+  one path change: the carvable cells on or next to that spring's current path, each with the smallest depth j of 1 … 3
+  whose carving changes the path, one chosen by draw, carved j times. Basins sit on the distinct end cells of the springs'
+  planted paths that are pools (open, no downhill neighbour, not a spring, not carved), hold fluid after the planted run to
+  the tick limit, and hold at least 3 units more there than after the unedited run; at least min(springs, 2) are needed.
+  Each basin's target is its planted contents V: shares by per-mille floor (rest to the largest colour), fill V − draw(0 …
+  2) (at least 1), capacity V + draw(0 … 4), tolerance one of 50, 100, 150, protected with chance 60 % and 0 wrong units
+  tolerated. A candidate is kept when the planted plan wins, the unedited level does not, and the solver's smallest edit
+  count lies in the band's range (bands 1 … 5: 1 … 2, 2 … 3, 3, 3 … 4, 4); otherwise k grows, at most 256 candidates, then
+  `generation(n)`. Ids `colorfall-canyons-NNN`; tutorial flag on levels 1 … 3; difficulty = band. Impact:
+  FR-R02G0502-001; SC-R02G0502-001, 003.
+- Q: How does the solver decide solvability and how much work may it do? → A: an edit set is a multiset of carves of the
+  level's carvable cells (in cell order) plus a set of valve toggles (each spring at most once), applied before the first
+  tick, followed by running to the tick limit. `ColorfallCanyonsSolver` tries edit sets of size 0, 1, 2, 3, 4 in that
+  order, each size in the lexicographic order of non-decreasing move lists (carves by cell, then valves by spring), skips
+  sets that carve below height 0, and keys each by its routing (every cell's downhill neighbour) and valve states; each
+  distinct key is simulated once, asserting exact conservation on every tick. The first winning set is the smallest. Work
+  = distinct keys simulated; enumeration is bounded by Σ_{k ≤ 4} C(m + k − 1, k) sets for m ≤ 48 + 3 moves. Search depth
+  4 is the bound: a level needing more is not certified. Impact: FR-R02G0502-002; SC-R02G0502-001, 002.
+- Q: What difficulty metrics are stored and what progression is required? → A: `ColorfallCanyonsDifficulty` holds the
+  smallest edit count, the distinct routings simulated, the win tick of the witness, the spring, basin and protected-basin
+  counts and the carvable-cell count. The catalog in manifest order keeps R02-F24's standard `ProgressionRule` (drop at
+  most 1, jump at most 3) on the smallest edit count; the band ranges make band means non-decreasing. Impact:
+  FR-R02G0502-003, 005; SC-R02G0502-004.
+- Q: What is in a witness file and how is it checked? → A: `docs/games/colorfall-canyons/levels/NNN.witness.json`, JSON
+  schema 1 with sorted keys: number, the level's stored form, the actions (the smallest edit set as carve and valve
+  actions in solver order, then `step(tick limit)`), the win tick, the fluid digest after every tick up to the win
+  (16 hex characters of the SHA-256 of the cell masses), the released, held and spilled totals per colour at the win, the
+  play fingerprints after `begin` and after each action, the unedited counterexample (its failure reason and tick), the
+  near miss (the witness minus its last edit, which fails, with reason and tick), the number of smaller edit sets that
+  were simulated and all failed, the difficulty and the candidates skipped. A test rebuilds every witness and compares
+  bytes; it writes the files only with `COLORFALL_CANYONS_WRITE_WITNESSES=1`. Decoding refuses newer schemas, damaged files
+  and witnesses that no longer replay. Impact: FR-R02G0502-004; SC-R02G0502-003, 005.
+- Q: How is the catalog identified, how long may certification take and how are refusals named? → A: the digest is
+  `PuzzleCatalog<ColorfallCanyonsRules>.digest(id: "colorfall-canyons", identities:)` over the 100 level fingerprints in
+  manifest order, pinned in a test. Certification tests are split by band (halves when needed) so each runs under 10
+  seconds on a debug host build (measured locally, not asserted on CI). New refusals: `generation(Int)`
+  (`r02-g05.generation`) and `witness(String)` (`r02-g05.witness`). Impact: FR-R02G0502-005, 006; SC-R02G0502-006.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -76,7 +136,7 @@ file is refused.
 ### Edge Cases
 
 - **A seed whose candidate is unsolvable, too easy or too hard for its band:** the generator moves to the next candidate
-  deterministically (within a stated bound) and records how many it skipped; no candidate within the bound is a named
+  deterministically (at most 256) and records how many it skipped; no candidate within the bound is a named
   refusal.
 - **More than one smallest edit set:** allowed; the witness picks one by a stated tie rule.
 - **A level solvable with no edit:** never emitted.
