@@ -17,7 +17,18 @@ public enum HueCompassAction: Sendable, Hashable, Codable { case turn(Int), prob
 public struct HueCompassLevel: Sendable, Equatable { /* fields per data-model.md; init throws(HueCompassError); encoded(); decode(_:) */
     public func clue(at bearing: Int) -> HueCompassClue
     public func accepts(bearing: Int, band: Int) -> Bool }
-public struct HueCompassPlay { /* stages, apply(_:expecting:), undo, redo, records, fingerprint, replay(level:records:) */ }
+public enum HueCompassStage: String, Sendable, Codable { case loading, tutorial, playing, paused, won, failed, result }
+public struct HueCompassPlay: Sendable {
+    public let level: HueCompassLevel
+    public private(set) var stage: HueCompassStage, bearing: Int, spent: Int, clues: [HueCompassClue],
+        records: [HueCompassRecord], failure: String?            // "selection" | "probes"
+    public var fingerprint: String { get }
+    public init(level: HueCompassLevel)
+    public mutating func begin() throws(HueCompassError); pause(); resume(); dismissTutorial(); finish()
+    public mutating func apply(_ action: HueCompassAction, expecting fingerprint: String) throws(HueCompassError)
+    public mutating func undo(expecting:) throws(HueCompassError); redo(expecting:) throws(HueCompassError)
+    public static func replay(level: HueCompassLevel, records: [HueCompassRecord]) throws(HueCompassError) -> HueCompassPlay
+}
 public struct HueCompassRules: PuzzleRules { /* State = HueCompassRules.Position (bearing, spent, outcome), Move = HueCompassAction;
     moves: turn(+1), turn(−1), probe, select(current bearing, band 0 … 23) */ }
 ```

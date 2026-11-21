@@ -144,7 +144,8 @@ refused.
 
 ### Key Entities
 
-- **Level**: wheel, offset, fog densities, target bearing, tolerances, allowance, tutorial flag, fingerprint.
+- **Level**: wheel, offset, fog densities, target bearing, start bearing, tolerances, allowance, tutorial flag,
+  fingerprint.
 - **Action**: turn (steps), probe, selection (bearing, band), undo, redo.
 - **Play**: stage, current bearing, allowance spent, clues, records, undo and redo stacks.
 - **Clue**: probed bearing, hue gap, fog depth.
@@ -158,7 +159,7 @@ refused.
 - **SC-R02G0401-002**: For 500 seeded action traces, replay reproduces every fingerprint and the outcome; undo of every
   turn restores the exact earlier state.
 - **SC-R02G0401-003**: The sector rule agrees with an independent angle computation on every direction of a 33 × 33
-  lattice away from boundaries, and clues equal a brute-force computation for every bearing of 500 seeded levels.
+  lattice whose reference angle is more than 10⁻⁶ rad from every sector boundary, and clues equal a brute-force computation for every bearing of 500 seeded levels.
 - **SC-R02G0401-004**: A wrong selection and a probe that spends the last unit fail with the reason named.
 - **SC-R02G0401-005**: Levels round-trip exactly; damaged, edited and newer forms are refused.
 - **SC-R02G0401-006**: Existing tests pass; the reference regression passes 7 of 7; each test under 10 seconds.
