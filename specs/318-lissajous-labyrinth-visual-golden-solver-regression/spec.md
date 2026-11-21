@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-21
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G02-08 (migration ledger, game feature of experience R02-G02) · ID namespace FR-R02G0208-###,
 SC-R02G0208-###, T-R02G0208-###
@@ -31,6 +31,59 @@ Canonical overrides:
 - **Model:** feature 308 (Aurora Loom), including its lessons: the golden digest falls back to a one-quantum position
   comparison (system sine and cosine may differ in the last bit between macOS releases), the pinned descriptions are
   checked against their own digests, and a process-wide memory bound is applied only when its test class runs alone.
+
+## Clarifications
+
+### Session 2026-11-21
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+308's answers (and its amendments) where the games agree. Facts checked in code (read-only audit, 2026-11-21):
+`LissajousLabyrinthSolver.solve(_:)` decides every one of the 14,080 legal settings (55 coprime frequency pairs × 256
+phase pairs) after two sound prefilters and counts the settings that reach the exact decision in `work`, then runs a
+breadth-first search; the 100 witness files (actions, fingerprints, terminal, near miss, non-coprime refusal) are
+byte-checked by `LissajousLabyrinthCatalogTests`; the simulator frame checks of features 313 and 314 compare rendered
+frames with the CPU reference at 1,152 × 768 (12 × the 96 × 64 still) with a 2-pixel sample radius and 0.12 colour
+tolerance; `ProcessMemory.footprint()` reads the process footprint; `LissajousLabyrinthThreadScene.release()` frees its
+renderers; the GitHub workflow's host job runs all round-two host tests; `scripts/xcodebuild_package.py` runs simulator
+tests with `--only-testing`.
+
+- Q: What exactly does the solver regression check, and how is "within its work bound" measured? → A: for every one of
+  the 100 levels: the generated level equals its witness's level (fingerprint), the witness replays to a win in exactly
+  its recorded actions with the recorded fingerprints, and `solve` from the start returns a solution of exactly the
+  certified shortest length whose actions win, with `work` at most 14,080 (the number of legal settings, every one
+  decided at most once) and the winning-setting count equal to the witness's. Work is counted, never timed. The run is
+  split by band (20 levels per test). Impact: FR-R02G0208-001; SC-R02G0208-001.
+- Q: Which alterations must the regression detect and how is each named? → A: twelve kinds, each applied to a copy and
+  each producing a failure message naming the level and the part: a level's amplitude, frequency C, a start dial, a
+  checkpoint ball, an obstacle ball, the allowance; a solution action's dial or value; a witness's terminal visits, near
+  miss, non-coprime refusal, recorded fingerprint; the level fingerprint. Impact: FR-R02G0208-002; SC-R02G0208-002.
+- Q: What is a golden frame description, where is its digest pinned, and how is it regenerated? → A: for each golden
+  frame (levels 1, 21, 41, 61, 81 at tiers 0, 1, 2 at presentation time 0, plus the hero frame of the scenario manifest's
+  hero scenario at tier 0: 16 frames) the Core computes, at 1,152 × 768 with the authored camera, the projected pixel
+  positions of every checked path sample (every 32nd lap tick), every checkpoint ring's band point, every obstacle's
+  centre and every dial ring's centre and knob, rounded to 1/8 pixel, and the expected colours as 8-bit sRGB (night,
+  each checkpoint ring's state colour, each obstacle's colour); serialized as JSON with sorted keys and hashed with
+  SHA-256. The 16 descriptions and their digests live in `Packages/ExperiencesRound02/LissajousLabyrinth/golden-frames.json`;
+  the host test recomputes each: an equal digest passes; otherwise every position must lie within one 1/8-pixel quantum
+  of the pinned one and every colour must be equal, or the test fails naming the frame and the first differing value;
+  each pinned digest must also equal the digest of its pinned description. The file is rewritten only when
+  `LISSAJOUS_LABYRINTH_WRITE_GOLDEN=1` is set. The simulator test renders the 16 frames and checks them against the same
+  descriptions with the feature-313/314 tolerances. Impact: FR-R02G0208-003, 004; SC-R02G0208-003.
+- Q: How is memory measured and what releases are checked? → A: on the simulator, 12 cycles of open (prepare a level),
+  draw 3 frames at tier 0, send a memory warning, draw 1 frame, close (teardown); the footprint is read with
+  `ProcessMemory.footprint()` after each cycle; the bound is that every reading of cycles 2 … 12 stays within 16 MB of
+  cycle 1's reading, applied only when the memory test class runs alone (`TEST_RUNNER_LISSAJOUS_LABYRINTH_MEMORY_ISOLATED=1`;
+  in the full parallel suite the readings are only printed — the lesson of feature 309). After each close and each memory
+  warning the scene holds no renderers of its own (a test-visible count is 0) and the next frame rebuilds them. An
+  unavailable footprint fails the check with a named reason rather than passing. Impact: FR-R02G0208-005;
+  SC-R02G0208-004.
+- Q: How do CI and the local command report, and what do they run? → A: CI's host job keeps running all round-two host
+  tests (solver regression and golden digests included) and adds a named step that runs the Lissajous Labyrinth
+  regression filter alone, so a failure is visible by name. The local command
+  `python3 scripts/lissajous_labyrinth_regression.py` runs the host regression filter and then the simulator regression
+  test classes through `xcodebuild_package.py --only-testing` (bounded by that runner's per-test time allowance), and
+  prints one summary line per part with pass or fail and the first failing name; its exit code is non-zero on any
+  failure. Nothing in either is timed against the wall clock. Impact: FR-R02G0208-006, 007; SC-R02G0208-005.
 
 ## User Scenarios & Testing *(mandatory)*
 
