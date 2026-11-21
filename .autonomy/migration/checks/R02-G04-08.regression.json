@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "scripts/hue_compass_regression.py"
+  ],
+  "command": "python3 scripts/hue_compass_regression.py",
+  "elapsed_seconds": 13.334,
+  "exit_code": 0,
+  "finished": "2026-11-21T18:03:27+00:00",
+  "gate": "R02-G04-08",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G04-08.regression.log",
+  "log_sha256": "b7298c3e23d63c5c823d58f54f551abfc1d4adc6b681e6200931b1668880df44",
+  "name": "regression",
+  "started": "2026-11-21T18:03:14+00:00",
+  "timed_out": false
+}

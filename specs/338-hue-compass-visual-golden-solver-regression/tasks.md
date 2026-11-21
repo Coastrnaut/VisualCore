@@ -47,7 +47,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 5: Story 4 — the checks run on every change (P2)
 
-- [ ] T-R02G0408-006 [P] [US4] Create `scripts/hue_compass_regression.py` and its test in `scripts/test_scripts.py`
+- [X] T-R02G0408-006 [P] [US4] Create `scripts/hue_compass_regression.py` and its test in `scripts/test_scripts.py` — Verified 2026-11-21: 2026-11-21 regression exit 0: scripts/hue_compass_regression.py ran the host filter (17 tests) and the isolated simulator classes (5 tests; footprint 28.75 ... 29.14 MB over 12 cycles), one summary per part; HueCompassRegressionTests 5/5 in scripts/test_scripts.py; CI step 'Hue Compass regression (host)'
   (agent D: host filter `HueCompassRegression`, then the simulator classes through
   `xcodebuild_package.py --only-testing` with the isolation variable, one summary line per part with pass or fail and
   the first failing name, a non-zero exit on any failure), and add the named step "Hue Compass regression
