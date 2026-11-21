@@ -35,7 +35,7 @@ ImplementationLock-100.
   at 60 Hz: at most 3 half-range crossings per second and every complete one-way fade over half the range ≥ 0.4 s under
   Reduce Flashing; normal mode reaches targets in 0.15 s; settle jumps; a vanished mark keeps its segment and fraction
   while fading); `--name host-2`
-- [ ] T-R02G0306-004 [US2] Edit `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperSceneGeometry.swift` (ropeMesh and glowMesh take optional lights:
+- [X] T-R02G0306-004 [US2] Edit `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperSceneGeometry.swift` (ropeMesh and glowMesh take optional lights: — Verified 2026-11-21: 2026-11-21 host-geometry exit 0: WaveKnotKeeperSceneGeometryTests 15/15 (settled lights draw feature 323's meshes exactly; a half-lit crossing halves its weights; a vanished crossing fades where it was)
   present marks' weights scaled by their levels, fading marks drawn at their remembered fraction of the over segment; no
   lights = feature 323's weights exactly) with tests in `Packages/ExperiencesRound02/WaveKnotKeeper/CoreTests/WaveKnotKeeperSceneGeometryTests.swift`;
   `--name host-geometry -- swift test --package-path Packages/ExperiencesRound02 --filter WaveKnotKeeperSceneGeometryTests`

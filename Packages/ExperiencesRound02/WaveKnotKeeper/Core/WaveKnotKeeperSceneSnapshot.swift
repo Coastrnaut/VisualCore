@@ -143,6 +143,20 @@ public struct WaveKnotKeeperSceneSnapshot: Sendable, Equatable {
         self.time = time.isFinite ? time : 0
     }
 
+    /// `snapshot` with its crossing marks replaced by `crossings` (every other field kept): the tests' seam for drawing
+    /// crossings that fade in and out on the same rope (feature 326, T-R02G0306-004). Internal; never drawn by the app.
+    init(_ snapshot: WaveKnotKeeperSceneSnapshot, crossings: [WaveKnotKeeperCrossingMark]) {
+        levelNumber = snapshot.levelNumber
+        points = snapshot.points
+        gates = snapshot.gates
+        target = snapshot.target
+        summary = snapshot.summary
+        self.crossings = crossings
+        stage = snapshot.stage
+        selected = snapshot.selected
+        time = snapshot.time
+    }
+
     /// The caustic pulse brightness 0 … 1 at the snapshot's time: 0.5 + 0.5 sin(2π · 0.5 · time).
     public var pulse: Double {
         0.5 + 0.5 * sin(2 * Double.pi * Self.pulseHertz * time)

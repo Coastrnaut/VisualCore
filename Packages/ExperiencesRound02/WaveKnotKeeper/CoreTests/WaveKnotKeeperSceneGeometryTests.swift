@@ -395,6 +395,66 @@ private func length(_ v: SIMD3<Double>) -> Double { WaveKnotKeeperSceneGeometry.
         return inside
     }
 
+    // MARK: Feature 326 (R02-G03-06) T-R02G0306-004: crossing weights from the eased lights.
+
+    @Test func settledLightsDrawFeature323sWeightsExactly() throws {
+        let snapshots: [WaveKnotKeeperSceneSnapshot] = try Self.extremeSnapshots() + Self.seededSnapshots(count: 6)
+        for s in snapshots {
+            var lights: WaveKnotKeeperLights = WaveKnotKeeperLights(reducedFlash: true)
+            lights.settle(to: s)
+            for tier in WaveKnotKeeperTier.all {
+                let plain: Mesh = try Geometry.ropeMesh(s, tier: tier)
+                #expect(try Geometry.ropeMesh(s, tier: tier, lights: lights) == plain)
+                #expect(try Geometry.glowMesh(s, tier: tier, lights: lights) == Geometry.glowMesh(s, tier: tier))
+            }
+        }
+    }
+
+    @Test func aHalfLitCrossingHalvesItsWeights() throws {
+        let snapshots: [WaveKnotKeeperSceneSnapshot] = try Self.seededSnapshots(count: 12).filter { !$0.crossings.isEmpty }
+        #expect(!snapshots.isEmpty)
+        for s in snapshots {
+            // Lights that know none of the marks yet draw them full; a fresh fade-in starts each at 0.
+            var fading: WaveKnotKeeperLights = WaveKnotKeeperLights(reducedFlash: true)
+            fading.settle(to: Self.withoutCrossings(s) ?? s)
+            fading.step(toward: s, elapsed: WaveKnotKeeperLights.reducedFlashDuration / 2)
+            let tier: WaveKnotKeeperTier = .of(0)
+            let plain: Mesh = try Geometry.ropeMesh(s, tier: tier)
+            let half: Mesh = try Geometry.ropeMesh(s, tier: tier, lights: fading)
+            var largest: Double = 0
+            for v in 0..<half.uvs.count {
+                #expect(half.uvs[v].x <= plain.uvs[v].x + 1e-12)
+                largest = max(largest, half.uvs[v].x)
+            }
+            #expect(abs(largest - 0.5) < 0.02, "largest weight \(largest)")
+        }
+    }
+
+    @Test func aVanishedCrossingFadesWhereItWas() throws {
+        let snapshots: [WaveKnotKeeperSceneSnapshot] = try Self.seededSnapshots(count: 12).filter { !$0.crossings.isEmpty }
+        #expect(!snapshots.isEmpty)
+        for s in snapshots {
+            guard let bare = Self.withoutCrossings(s) else { continue }
+            var lights: WaveKnotKeeperLights = WaveKnotKeeperLights(reducedFlash: true)
+            lights.settle(to: s)
+            lights.step(toward: bare, elapsed: 1.0 / 60)
+            // The rope without the marks still shows the fading marks, at most at their eased level.
+            let tier: WaveKnotKeeperTier = .of(0)
+            let mesh: Mesh = try Geometry.ropeMesh(bare, tier: tier, lights: lights)
+            let level: Double = lights.crossings.values.map(\.level).max() ?? 0
+            #expect(level > 0.9 && level < 1)
+            let largest: Double = mesh.uvs.map { Double($0.x) }.max() ?? 0
+            #expect(largest > 0 && largest <= level + 1e-9)
+            #expect(try Geometry.ropeMesh(bare, tier: tier) != mesh)
+        }
+    }
+
+    /// `s` with the same rope but no crossing marks (its marks dropped), for fade tests; nil when it has none.
+    static func withoutCrossings(_ s: WaveKnotKeeperSceneSnapshot) -> WaveKnotKeeperSceneSnapshot? {
+        guard !s.crossings.isEmpty else { return nil }
+        return WaveKnotKeeperSceneSnapshot(s, crossings: [])
+    }
+
     @Test func everyElementProjectsInsideTheViewWithFivePercentMargin() throws {
         for s in try Self.extremeSnapshots() + Self.seededSnapshots(count: 8) {
             let points: [SIMD3<Double>] = try Self.framingPoints(s)

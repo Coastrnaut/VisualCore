@@ -325,8 +325,12 @@ public enum WaveKnotKeeperSceneGeometry {
     /// the segment from the crossing point are inserted where they fall strictly inside the straight middle; a crossing
     /// in a corner region gets arc parameters at about −2 … +2 radii from its drawn anchor instead, so the crossing
     /// weight's ramp is carried by vertices wherever the crossing lies. Fewer than two points give no samples.
+    ///
+    /// Feature 326 (R02-G03-06): with `lights`, every crossing still fading out (its key no longer among the snapshot's
+    /// marks) inserts the same five points around its remembered fraction of its over segment, so its fading ramp is
+    /// carried by vertices too; without lights the samples are exactly feature 323's.
     static func centreline(_ snapshot: WaveKnotKeeperSceneSnapshot, tier: WaveKnotKeeperTier,
-                           radius: Double = tubeRadius) -> [Sample] {
+                           radius: Double = tubeRadius, lights: WaveKnotKeeperLights? = nil) -> [Sample] {
         let p = worldPoints(snapshot)
         let n = p.count
         guard n >= 2 else { return [] }
@@ -354,6 +358,14 @@ public enum WaveKnotKeeperSceneGeometry {
             for k in -2...2 {
                 let s = t + Double(k) * radius / length
                 if s > 0.25 + 1e-9 && s < 0.75 - 1e-9 { extra[mark.over].append(s) }
+            }
+        }
+        for fading in fadingCrossings(snapshot, lights: lights) {
+            let length = safeLength(p[(fading.over + 1) % n] - p[fading.over])
+            guard length > 0 else { continue }
+            for k in -2...2 {
+                let s = fading.fraction + Double(k) * radius / length
+                if s > 0.25 + 1e-9 && s < 0.75 - 1e-9 { extra[fading.over].append(s) }
             }
         }
         var result: [Sample] = []
@@ -391,19 +403,48 @@ public enum WaveKnotKeeperSceneGeometry {
     /// The crossing weight of each centreline sample: for every crossing mark whose over-strand is the sample's
     /// segment, clamp(2 − d / radius, 0, 1) with d the distance from the sample to ``drawnCrossingPoint(_:in:)``; the
     /// largest over all marks; 0 for samples of other segments.
-    static func weights(_ samples: [Sample], snapshot: WaveKnotKeeperSceneSnapshot, radius: Double) -> [Double] {
-        var marks: [(segment: Int, point: SIMD3<Double>)] = []
+    ///
+    /// Feature 326 (R02-G03-06): with `lights`, a present mark's weight is scaled by its eased level (1 when the lights
+    /// do not know it yet), and every crossing still fading out adds its weight, scaled by its level, about the point
+    /// at its remembered fraction of its over segment. Without lights the weights are exactly feature 323's.
+    static func weights(_ samples: [Sample], snapshot: WaveKnotKeeperSceneSnapshot, radius: Double,
+                        lights: WaveKnotKeeperLights? = nil) -> [Double] {
+        var marks: [(segment: Int, point: SIMD3<Double>, level: Double)] = []
         for mark in snapshot.crossings {
-            if let x = drawnCrossingPoint(mark, in: snapshot) { marks.append((mark.over, x)) }
+            let level = lights?.crossings[WaveKnotKeeperLights.Key(mark)]?.level ?? 1
+            if let x = drawnCrossingPoint(mark, in: snapshot) { marks.append((mark.over, x, level)) }
+        }
+        let p = worldPoints(snapshot)
+        let n = p.count
+        for fading in fadingCrossings(snapshot, lights: lights) where n >= 2 {
+            let a = p[fading.over], b = p[(fading.over + 1) % n]
+            marks.append((fading.over, a + (b - a) * fading.fraction, fading.level))
         }
         return samples.map { sample in
             var w = 0.0
             for m in marks where m.segment == sample.segment {
                 let d = length(sample.position - m.point)
-                w = max(w, min(max(2 - d / radius, 0), 1))
+                w = max(w, min(max(2 - d / radius, 0), 1) * m.level)
             }
             return w
         }
+    }
+
+    /// The crossing lights of `lights` still fading out: a level above 0, a key no longer among `snapshot`'s marks and
+    /// an over segment inside the rope; in key order, so the samples are deterministic. Empty without lights.
+    static func fadingCrossings(_ snapshot: WaveKnotKeeperSceneSnapshot,
+                                lights: WaveKnotKeeperLights?) -> [WaveKnotKeeperLights.Crossing] {
+        guard let lights else { return [] }
+        let present = Set(snapshot.crossings.map { WaveKnotKeeperLights.Key($0) })
+        let keys = lights.crossings.keys.filter { !present.contains($0) }
+            .sorted { ($0.first, $0.second) < ($1.first, $1.second) }
+        var result: [WaveKnotKeeperLights.Crossing] = []
+        for key in keys {
+            guard let crossing = lights.crossings[key], crossing.level > 0,
+                  snapshot.points.indices.contains(crossing.over), crossing.fraction.isFinite else { continue }
+            result.append(crossing)
+        }
+        return result
     }
 
     // MARK: Meshes
@@ -499,15 +540,19 @@ public enum WaveKnotKeeperSceneGeometry {
     /// empty mesh.
     ///
     /// - Throws: `MeshError` from `MeshBuilder` (not expected: about 5,000 vertices at most).
+    ///
+    /// Feature 326 (R02-G03-06): `lights` scales the crossing weights by their eased levels and keeps fading crossings
+    /// drawn (see ``weights(_:snapshot:radius:lights:)``); nil draws feature 323's weights exactly.
     public static func ropeMesh(_ snapshot: WaveKnotKeeperSceneSnapshot, tier: WaveKnotKeeperTier,
-                                radius: Double = tubeRadius) throws(MeshError) -> Mesh {
+                                radius: Double = tubeRadius,
+                                lights: WaveKnotKeeperLights? = nil) throws(MeshError) -> Mesh {
         let r = radius.isFinite && radius > 0 ? radius : tubeRadius
-        let samples = centreline(snapshot, tier: tier)
+        let samples = centreline(snapshot, tier: tier, lights: lights)
         let m = samples.count
         var builder = MeshBuilder()
         guard m >= 2 else { return builder.build() }
         let positions = samples.map(\.position)
-        let weight = weights(samples, snapshot: snapshot, radius: tubeRadius)
+        let weight = weights(samples, snapshot: snapshot, radius: tubeRadius, lights: lights)
         let tangent = tangents(positions)
         let normal = frames(tangent)
         var cumulative: [Double] = [0]
@@ -555,11 +600,11 @@ public enum WaveKnotKeeperSceneGeometry {
     /// shell keeps the rope's uv); an empty mesh at `level-2` or with fewer than two points. Drawn additively.
     ///
     /// - Throws: `MeshError` from `MeshBuilder` (not expected).
-    public static func glowMesh(_ snapshot: WaveKnotKeeperSceneSnapshot,
-                                tier: WaveKnotKeeperTier) throws(MeshError) -> Mesh {
+    public static func glowMesh(_ snapshot: WaveKnotKeeperSceneSnapshot, tier: WaveKnotKeeperTier,
+                                lights: WaveKnotKeeperLights? = nil) throws(MeshError) -> Mesh {
         var result = MeshBuilder().build()
         for radius in glowRadii(tier) {
-            let shell = try ropeMesh(snapshot, tier: tier, radius: radius)
+            let shell = try ropeMesh(snapshot, tier: tier, radius: radius, lights: lights)
             let offset = UInt32(result.positions.count)
             result.positions += shell.positions
             result.normals += shell.normals
