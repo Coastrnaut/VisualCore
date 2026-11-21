@@ -45,7 +45,7 @@ observations after ImplementationLock-100.
 
 ## Phase 4: Story 3 — sound and haptics (P2)
 
-- [ ] T-R02G0506-005 [P] [US3] Create `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsSoundRecipe.swift` ("root 98 Hz; cyan 98 × 3/2,
+- [X] T-R02G0506-005 [P] [US3] Create `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsSoundRecipe.swift` ("root 98 Hz; cyan 98 × 3/2, — Verified 2026-11-21: 2026-11-21 host-3 exit 0: 6 sound recipe tests (equal for equal basins and stage, differs by fill and stage, root alone without fluid, 1,400 valid recipes over all 100 witness start and solution states in 7 stages) (.autonomy/migration/checks/R02-G05-06.host-3.json); lead retest
   coral 98 × 5/4, yellow 98 × 2 for each colour present in a basin, gain base × (0.3 + 0.7 · share); the root alone with
   no basin fluid; won adds an octave, failed halves the gains, 10 s") with
   `Packages/ExperiencesRound02/ColorfallCanyons/CoreTests/ColorfallCanyonsSoundRecipeTests.swift` (agent B: equal for equal basins and stage; differs
