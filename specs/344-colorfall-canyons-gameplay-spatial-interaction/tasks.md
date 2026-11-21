@@ -64,3 +64,7 @@ existing programs).
 
 001 → 002 (agent B) → {003 (agent C), 004 (agent D)} → 005 (lead; agent E writes the wiring tests) → 006 … 010, 012. 011
 stays open until device testing. Shared files (presenter, scene, controls, docs) stay with the lead. MVP: Stories 1, 2, 4.
+
+## Phase 7: Convergence
+
+- [ ] T-R02G0504-013 Add a simulator test to `Packages/ExperiencesRound02/ColorfallCanyons/ExperienceTests/ColorfallCanyonsGestureWiringTests.swift`: with the fluid shader broken (fallback), a drag from a carvable cell highlights it and the frame draws without error (the unlit pearl ring), and release still sends one carve, per FR-R02G0504-005 (partial)
