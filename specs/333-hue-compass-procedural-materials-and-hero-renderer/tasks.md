@@ -23,7 +23,7 @@ tests stay short (< 10 s each). No {owner} tasks.
   transform equal to `HueCompassPalette.band`; fog drift; glow gain cap) with
   `Packages/ExperiencesRound02/HueCompass/CoreTests/HueCompassShaderSourceTests.swift` (version line, declared uniforms, no texture samplers, bounded
   loops, the hue formula's constants match the CPU's); `--name host-2`
-- [ ] T-R02G0403-004 [P] [US1] Create `Packages/ExperiencesRound02/HueCompass/Core/HueCompassSceneGeometry.swift` (bearing directions, needle prism to radius
+- [X] T-R02G0403-004 [P] [US1] Create `Packages/ExperiencesRound02/HueCompass/Core/HueCompassSceneGeometry.swift` (bearing directions, needle prism to radius — Verified 2026-11-21: 2026-11-21 host-3 exit 0 (agent B: needle prism, ticks, unlit band wheel with glyphs clear of the 0.85 sample ring, fog prisms by density, probe/selection/target marks, camera fitting the 1.45 sphere at aspects 0.4 … 2.5; 9 tests: finite and bounded, inside the view at 7 aspects, same places at every tier, fog colour from density only, band colours follow the offset, no target geometry while absent)
   0.8 at a tier's facets, 96 ticks at 0.95 … 1.0, 24 unlit band segments at 0.82 … 0.92 with glyphs at 0.895 … 0.92, fog
   prisms at 1.1 … 1.25 with height 0.04 + 0.03 × density and brightness density/9 in the tier's layers, probe marks at
   1.32 (pearl), selection (ember) and target ring (sapphire, only when present), camera down −z tilted 35° fitted to
