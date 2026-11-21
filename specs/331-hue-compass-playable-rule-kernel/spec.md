@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-21
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G04-01 (migration ledger, game feature of experience R02-G04) · ID namespace FR-R02G0401-###,
 SC-R02G0401-###, T-R02G0401-###
@@ -27,6 +27,40 @@ Canonical overrides:
   The source's continuous rule hue = (atan2(y, x) + offset) / 2π is realised as an exact sector test on that wheel.
 - **Shared features used:** R02-F03 (numbers) and R02-F23 (puzzle contract: the kernel's rules are a puzzle contract, so
   R02-G04-02 can certify levels).
+
+## Clarifications
+
+### Session 2026-11-21
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time. Facts checked in
+code (read-only, 2026-11-21): `Packages/ExperiencesRound02` holds Aurora Loom, Lissajous Labyrinth and Wave Knot Keeper
+as the pattern (Core with level, play, records with previous and next fingerprints, rules as R02-F23 `PuzzleRules`,
+`StableHash` fingerprints, `r02-gNN.*` reason codes); no `HueCompass*` name exists.
+
+- Q: What exactly is the compass wheel and how is a direction's bearing decided? → A: the wheel has 96 bearings
+  (0 … 95, counter-clockwise from +x) and 24 hue bands of 4 bearings each. Bearing k's sector is bounded by two fixed
+  integer boundary vectors from a constant table (vector k at angle 2πk/96, components rounded once to multiples of
+  1/65536 and stored as integer constants); a non-zero integer direction p is in sector k exactly when
+  cross(boundary k, p) ≥ 0 and cross(boundary k+1, p) < 0, so each direction is in exactly one sector, decided in
+  integers. The hue band of bearing b is (⌊b/4⌋ + offset) mod 24, the exact form of (atan2(y, x) + offset)/2π.
+  Impact: FR-R02G0401-001, 002; SC-R02G0401-003.
+- Q: What does a probe at bearing β return? → A: the hue gap, the circular distance between band(β) and band(τ) of the
+  target τ, unsigned, 0 … 12 bands; and the fog depth, the sum of the fog densities (0 … 9 each) of the bearings strictly
+  between β and τ along the shorter arc; when both arcs are equally long (48 apart), the counter-clockwise arc from β is
+  used. The hue gap never reads fog and the depth never reads hue. Impact: FR-R02G0401-003, 011; SC-R02G0401-003.
+- Q: What are the ranges of tolerances, allowance and actions, and when does a play end? → A: bearing tolerance 0 … 4
+  bearings, band tolerance 0 … 2 bands (circular distances), allowance 2 … 24. A turn moves the bearing by −48 … 48
+  non-zero steps (mod 96) and spends nothing. A probe spends one unit; a probe that spends the last unit records its
+  clue and fails the level (`probes`). A selection (bearing 0 … 95, band 0 … 23) spends one unit and wins or fails
+  (`selection`) at once. Impact: FR-R02G0401-003, 004; SC-R02G0401-001, 004.
+- Q: What can be undone? → A: only turns. Undo and redo stacks hold turns; a probe or a selection clears both stacks
+  (a clue once seen cannot be unseen). Impact: FR-R02G0401-006; SC-R02G0401-002.
+- Q: How are records, fingerprints and stored forms defined? → A: as in R02-G03-01: every accepted turn, probe,
+  selection, undo and redo appends a record (schema, level seed, tick, kind, operands, previous and next fingerprints);
+  the play fingerprint is the SHA-256 of the schema, level fingerprint, bearing, units spent, clues and stage; levels
+  are JSON schema 1 with sorted keys and a fingerprint (the target and offset included; 96 fog densities), re-checked on
+  decode; reason codes `r02-g04.level`, `.action`, `.stage`, `.stale`, `.allowance`, `.newer-schema`, `.malformed`.
+  Impact: FR-R02G0401-005 … 010; SC-R02G0401-002, 005.
 
 ## User Scenarios & Testing *(mandatory)*
 
