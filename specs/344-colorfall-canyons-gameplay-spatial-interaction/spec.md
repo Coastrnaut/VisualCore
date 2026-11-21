@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-21
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G05-04 (migration ledger, game feature of experience R02-G05) · ID namespace FR-R02G0504-###,
 SC-R02G0504-###, T-R02G0504-###
@@ -23,6 +23,47 @@ Canonical overrides:
   items:** none.
 - **Shared features used:** R02-F22 (spatial controls and analytic picking), R02-F26 (input and accessibility
   contract), the experience host's pointer events, and the kernel, adapter and renderer of R02-G05-01 … 03.
+
+## Clarifications
+
+### Session 2026-11-21
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time. Facts checked in
+code (read-only, 2026-11-21): Hue Compass's feature 334 solved the same problem with a host-tested
+`HueCompassGestureController` taking `PointerEvent`s (id, phase began/moved/ended/cancelled, location in view points with
+the origin top-left, timestamp) with the view size and the drawn snapshot (idle, swiping, orbiting, cancelled; at most
+one action per gesture; only event timestamps read) and an orbit in its scene geometry; Colorfall Canyons's camera
+(`ColorfallCanyonsSceneGeometry.camera(_:aspect:)`) looks from +z pitched 50° down, fitted to the bounding sphere of the
+tallest element; its panel has a cell picker with Carve, a valve button per spring, Step 1, Step 10, Run, Undo, Redo and
+Next level; its adapter accepts `canyon.carve [cell]` and `canyon.valve [spring]`.
+
+- Q: How does a drag become a carve? → A: a one-finger touch is picked at touch-down; if the pick is a carvable cell
+  (open, no spring or basin, height above 0) the gesture is a drag on that cell; when the finger lifts after having moved
+  at least 16 points from where it began, exactly one `canyon.carve [cell]` of the cell picked at touch-down is sent; a
+  touch that never moves 10 points is a tap; a drag between 10 and 16 points sends nothing. Impact: FR-R02G0504-001;
+  SC-R02G0504-001.
+- Q: How is a touch picked? → A: the ray from the drawn camera through the touch point (in view points, with the view's
+  aspect) is intersected with every block top (the square of the cell at y = its top height), every spring emitter
+  (its column as an axis-aligned box of half-width 0.18·u up to the emitter top) and nothing else; the hit with the
+  smallest ray distance wins (an emitter's cell picks the spring). When the ray hits nothing, the cell or emitter whose
+  projected top centre lies within 22 points of the touch (the minimum target) and nearest to it is picked; otherwise
+  the touch is on empty space. Impact: FR-R02G0504-003; SC-R02G0504-001.
+- Q: What do taps do? → A: a tap on a spring sends exactly one `canyon.valve [spring]`; a tap on a cell sends nothing
+  (carving needs a drag, so a stray tap never carves); two taps on empty space whose `.ended` timestamps are at most
+  0.35 s apart reset the view, in every stage. While the play is not in stage `playing`, drags and taps send no action
+  and show no highlight. Impact: FR-R02G0504-002; SC-R02G0504-002.
+- Q: What can the camera do? → A: two-finger orbit of yaw (±40° about the y axis, 90° per view width) and pitch (25° … 70°
+  down from the horizon, authored 50°, 60° per view height); a second finger cancels a drag (nothing sent); a third
+  re-bases the midpoint; a double tap on empty space or "Reset view" returns to the authored view; the distance refits so
+  the bounding sphere stays inside the view with a 5 % margin at every orbit and aspect 0.4 … 2.5. Presentation only:
+  never in the digest, the snapshot or the kernel; not saved. Impact: FR-R02G0504-004; SC-R02G0504-003.
+- Q: How is a drag previewed and tested? → A: from touch-down on a carvable cell until release, the cell's top is
+  outlined in pearl and the description reads "Carving row r, column c"; nothing changes in the kernel until release.
+  The Core gesture controller takes pointer events with the view size and the drawn snapshot and orbit and returns at
+  most one action per gesture plus the highlight; host tests feed 500 seeded drags and taps on certified levels at
+  several sizes and orbits and compare with an independent pick computed in the test; simulator tests send the same
+  touches through the experience's pointer entry; a host test wins all 100 certified levels through panel actions (the
+  picker's carvable-cell order, Carve, valve buttons and Run). Impact: FR-R02G0504-005 … 007; SC-R02G0504-001 … 004.
 
 ## User Scenarios & Testing *(mandatory)*
 
