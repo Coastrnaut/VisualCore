@@ -59,7 +59,7 @@ frame, 60 fps with automatic levels, flat memory, 200 samples per device); A21's
   r02-g01.aurora-loom` (exit 1 with named reasons): JSON shape and required fields; every scenario in the manifest; the
   devices equal the ledger's DEV1/2/3 rows of the experience; every open {device} task line in `specs/30*-aurora-loom-*/
   tasks.md` and every UA-F13 measurement name (launch, first-frame, frame-pacing, memory, thermal, stress) is covered by
-  some row; no number appears in any `pass` field followed by a measured value marker ("measured"). Tests in
+  some row; every row's status is "pending device campaign" and no row carries a result or measured-value field. Tests in
   `scripts/test_scripts.py`; run in `release_check.py` as step `device-rows`. Impact: FR-R02G0110-004; SC-R02G0110-001,
   002.
 - Q: What pass conditions do the rows use? → A: the app's proposed budgets where they exist (first frame without a shader
