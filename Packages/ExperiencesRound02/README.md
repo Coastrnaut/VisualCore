@@ -121,6 +121,11 @@ Feature 318 (R02-G02-08) adds the regression net: solver regression over the 100
 the pinned `LissajousLabyrinth/golden-frames.json`, simulator golden-frame and memory tests, and
 `python3 scripts/lissajous_labyrinth_regression.py`. After a reviewed visual change:
 
+Feature 319 (R02-G02-09) integrates Lissajous Labyrinth into the one app on the simulator while it stays a candidate:
+`LissajousLabyrinthSchemaExamples` (schema-1 and schema-2 examples registered), panel identifiers
+`experience.r02-g02.lissajous-labyrinth.<name>`, app unit tests, the interface chunk `k3` (`LLPlayUITests`,
+`LLReplayUITests`) and the Release symbol check.
+
 ```bash
 LISSAJOUS_LABYRINTH_WRITE_GOLDEN=1 swift test --package-path Packages/ExperiencesRound02 --filter LissajousLabyrinthRegressionGoldenTests
 ```

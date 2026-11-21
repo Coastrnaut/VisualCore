@@ -167,6 +167,17 @@ LISSAJOUS_LABYRINTH_WRITE_WITNESSES=1 swift test --package-path Packages/Experie
   alone) and leave the scene with no renderers after each warning and close.
 - **Running it.** CI's step "Lissajous Labyrinth regression (host)"; locally `python3 scripts/lissajous_labyrinth_regression.py`.
 
+## In the app (R02-G02-09)
+
+- **Stored examples.** `LissajousLabyrinthSchemaExamples` builds one saved state of schema 1 (level 1 with one action
+  that does not win) and one of schema 2 (level 1 solved before traces existed); the registration stores both and the
+  app's migration check restores them into schema 3.
+- **Identifiers.** Every panel control carries `experience.r02-g02.lissajous-labyrinth.<name>` (the names are
+  `LissajousLabyrinthControls.identifierNames`), beside its label and value.
+- **Interface tests.** `LLPlayUITests` wins level 1 with the steppers and Apply, then relaunches and finds the stars and
+  level 2 kept; `LLReplayUITests` replays the win to its end. They run as the serial chunk `k3` of
+  `scripts/release_check.py`. Lissajous Labyrinth stays a candidate (`-vcCandidates`) until X-R02-G02.
+
 ## Failures
 
 `LissajousLabyrinthError` reason codes: `r02-g02.level`, `r02-g02.move`, `r02-g02.stage`, `r02-g02.stale`,
