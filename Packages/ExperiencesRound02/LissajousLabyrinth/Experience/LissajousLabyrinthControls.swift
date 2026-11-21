@@ -13,6 +13,8 @@
 // the panel tells the presenter when it is on screen. Feature 319 (R02-G02-09) T-R02G0209-003 (FR-R02G0209-001;
 // clarification Q1): every control carries the identifier `experience.r02-g02.lissajous-labyrinth.<name>`
 // (`port.identifier`), the names listed in ``identifierNames``.
+// The body is split into six `@ViewBuilder` sections: as one expression it exceeded the CI runner's type-check time
+// (R02-G02-09 CI run, 2026-11-21).
 #if os(iOS)
 import LissajousLabyrinthCore
 import SwiftUI
@@ -40,146 +42,176 @@ struct LissajousLabyrinthControls: View {
     var body: some View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 8) {
-                Text("Level \(mirror.levelNumber) · actions \(mirror.spent) of \(mirror.allowance)")
-                    .font(.headline)
-                    .fixedSize(horizontal: false, vertical: true)
-                Text(Self.goal(mirror)).font(.subheadline)
-                if let instruction = mirror.instruction {
-                    HStack(alignment: .firstTextBaseline, spacing: 12) {
-                        Text(instruction).font(.callout)
-                        Button("Dismiss") { presenter.dismissTutorial(port: port) }
-                            .accessibilityLabel("Dismiss the tutorial")
-                            .accessibilityValue("Tutorial shown")
-                            .accessibilityIdentifier(port.identifier("dismiss-tutorial"))
-                    }
-                }
-                if let failure = mirror.failureText {
-                    Text(failure).font(.callout)
-                    row {
-                        Button("Undo") { presenter.send("play.undo", port: port) }
-                            .accessibilityLabel("Undo the last change")
-                            .accessibilityValue(Self.progressValue(mirror))
-                            .accessibilityIdentifier(port.identifier("failure-undo"))
-                        Button("Retry") { presenter.retry(port: port) }
-                            .accessibilityLabel("Retry the level")
-                            .accessibilityValue(Self.modeName(mirror.mode))
-                            .accessibilityIdentifier(port.identifier("retry"))
-                    }
-                }
-                row {
-                    Button("Hint") { presenter.showHint(port: port) }
-                        .accessibilityLabel("Show a hint")
-                        .accessibilityValue(mirror.hintLevel == 0 ? "none shown" : "level \(mirror.hintLevel) of 3")
-                        .accessibilityIdentifier(port.identifier("hint"))
-                    if let hint = mirror.hintText { Text(hint).font(.callout) }
-                }
-                if let message = mirror.message {
-                    Text(message).font(.footnote)
-                }
-                if let dials = mirror.dials {
-                    ForEach(0..<4, id: \.self) { index in
-                        let dial: LissajousLabyrinthDial = LissajousLabyrinthDial.allCases[index]
-                        let current: Int = dials[dial]
-                        let shown: Int = mirror.pending.values[dial] ?? current
-                        Stepper(Self.title(dial, shown: shown, current: current),
-                                onIncrement: { presenter.stepPending(dial, by: 1) },
-                                onDecrement: { presenter.stepPending(dial, by: -1) })
-                            .accessibilityLabel(LissajousLabyrinthPresenter.title(dial))
-                            .accessibilityValue(shown == current ? "\(shown)" : "\(shown), pending; now \(current)")
-                            .accessibilityIdentifier(port.identifier(Self.identifierName(dial)))
-                    }
-                    if !mirror.pending.isEmpty {
-                        row {
-                            Button("Apply") { presenter.applyPending(port: port) }
-                                .accessibilityLabel("Apply the pending dial values")
-                                .accessibilityValue("\(mirror.pending.values.count) pending")
-                                .accessibilityIdentifier(port.identifier("apply"))
-                            Button("Clear") { presenter.clearPending() }
-                                .accessibilityLabel("Clear the pending dial values")
-                                .accessibilityValue("\(mirror.pending.values.count) pending")
-                                .accessibilityIdentifier(port.identifier("clear"))
-                        }
-                    }
-                }
-                row {
-                    Button("Undo") { presenter.send("play.undo", port: port) }
-                        .accessibilityLabel("Undo the last change")
-                        .accessibilityValue(Self.progressValue(mirror))
-                        .accessibilityIdentifier(port.identifier("undo"))
-                    Button("Redo") { presenter.send("play.redo", port: port) }
-                        .accessibilityLabel("Redo the change")
-                        .accessibilityValue("Level \(mirror.levelNumber)")
-                        .accessibilityIdentifier(port.identifier("redo"))
-                    Button("Next level") { presenter.send("level.next", port: port) }
-                        .accessibilityLabel("Go to the next level")
-                        .accessibilityValue("Level \(mirror.levelNumber) now")
-                        .accessibilityIdentifier(port.identifier("next-level"))
-                    Button("Reset view") { presenter.resetView() }
-                        .accessibilityLabel("Return the camera to the authored view")
-                        .accessibilityValue("Camera")
-                        .accessibilityIdentifier(port.identifier("reset-view"))
-                }
-                row {
-                    Button("Campaign") { presenter.send("mode.campaign", port: port) }
-                        .accessibilityLabel("Play the campaign")
-                        .accessibilityValue(mirror.mode == .campaign ? "Selected" : "Not selected")
-                        .accessibilityAddTraits(mirror.mode == .campaign ? .isSelected : [])
-                        .accessibilityIdentifier(port.identifier("campaign"))
-                    Button("Daily") { presenter.playDaily(port: port) }
-                        .accessibilityLabel("Play today's daily level")
-                        .accessibilityValue(Self.isDaily(mirror.mode) ? "Selected" : "Not selected")
-                        .accessibilityAddTraits(Self.isDaily(mirror.mode) ? .isSelected : [])
-                        .accessibilityIdentifier(port.identifier("daily"))
-                    Button("Practice") { presenter.send("mode.practice", port: port) }
-                        .accessibilityLabel("Practise this level with more actions")
-                        .accessibilityValue(mirror.mode == .practice ? "Selected" : "Not selected")
-                        .accessibilityAddTraits(mirror.mode == .practice ? .isSelected : [])
-                        .accessibilityIdentifier(port.identifier("practice"))
-                }
-                if mirror.replaying {
-                    Text("Replay: action \(mirror.replayPosition) of \(mirror.replayLength)").font(.callout)
-                    row {
-                        Button("Step") { presenter.stepReplay(port: port) }
-                            .accessibilityLabel("Play the next action of the replay")
-                            .accessibilityValue("Action \(mirror.replayPosition) of \(mirror.replayLength)")
-                            .accessibilityIdentifier(port.identifier("replay-step"))
-                        Button("Stop") { presenter.stopReplay(port: port) }
-                            .accessibilityLabel("Stop the replay")
-                            .accessibilityValue("\(mirror.replayLength) actions")
-                            .accessibilityIdentifier(port.identifier("replay-stop"))
-                    }
-                } else if mirror.replayAvailable {
-                    Button("Replay best solution") { presenter.startReplay(port: port) }
-                        .accessibilityLabel("Replay your best solution of this level")
-                        .accessibilityValue("Level \(mirror.levelNumber)")
-                        .accessibilityIdentifier(port.identifier("replay"))
-                }
-                Menu("Levels") {
-                    ForEach(0..<5, id: \.self) { band in
-                        Section("Band \(band + 1)") {
-                            ForEach((band * 20 + 1)...(band * 20 + 20), id: \.self) { level in
-                                if level <= mirror.frontier {
-                                    Button(Self.levelTitle(level, stars: mirror.stars[level])) {
-                                        presenter.send("level.select", [Double(level)], port: port)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                .accessibilityLabel("Choose an open level")
-                .accessibilityValue("Levels 1 to \(mirror.frontier) open")
-                .accessibilityIdentifier(port.identifier("level-picker"))
-                Toggle("Sound", isOn: Binding(get: { mirror.soundOn }, set: { presenter.setSound(on: $0) }))
-                    .accessibilityLabel("Ambient sound")
-                    .accessibilityValue(mirror.soundOn ? "on" : "off")
-                    .accessibilityIdentifier(port.identifier("sound"))
+                statusSection
+                dialSection
+                playRow
+                modeRow
+                replaySection
+                levelSection
             }
             .padding()
             .frame(maxWidth: Self.readableWidth, alignment: .leading)
         }
         .onAppear { presenter.controlsAppeared() }
         .onDisappear { presenter.controlsDisappeared() }
+    }
+
+    /// The level, goal, tutorial, failure, hint and message lines.
+    @ViewBuilder private var statusSection: some View {
+        Text("Level \(mirror.levelNumber) · actions \(mirror.spent) of \(mirror.allowance)")
+            .font(.headline)
+            .fixedSize(horizontal: false, vertical: true)
+        Text(Self.goal(mirror)).font(.subheadline)
+        if let instruction = mirror.instruction {
+            HStack(alignment: .firstTextBaseline, spacing: 12) {
+                Text(instruction).font(.callout)
+                Button("Dismiss") { presenter.dismissTutorial(port: port) }
+                    .accessibilityLabel("Dismiss the tutorial")
+                    .accessibilityValue("Tutorial shown")
+                    .accessibilityIdentifier(port.identifier("dismiss-tutorial"))
+            }
+        }
+        if let failure = mirror.failureText {
+            Text(failure).font(.callout)
+            row {
+                Button("Undo") { presenter.send("play.undo", port: port) }
+                    .accessibilityLabel("Undo the last change")
+                    .accessibilityValue(Self.progressValue(mirror))
+                    .accessibilityIdentifier(port.identifier("failure-undo"))
+                Button("Retry") { presenter.retry(port: port) }
+                    .accessibilityLabel("Retry the level")
+                    .accessibilityValue(Self.modeName(mirror.mode))
+                    .accessibilityIdentifier(port.identifier("retry"))
+            }
+        }
+        row {
+            Button("Hint") { presenter.showHint(port: port) }
+                .accessibilityLabel("Show a hint")
+                .accessibilityValue(mirror.hintLevel == 0 ? "none shown" : "level \(mirror.hintLevel) of 3")
+                .accessibilityIdentifier(port.identifier("hint"))
+            if let hint = mirror.hintText { Text(hint).font(.callout) }
+        }
+        if let message = mirror.message {
+            Text(message).font(.footnote)
+        }
+    }
+
+    /// The four dial steppers (pending values) with Apply and Clear while something is pending.
+    @ViewBuilder private var dialSection: some View {
+        if let dials = mirror.dials {
+            ForEach(0..<4, id: \.self) { index in
+                let dial: LissajousLabyrinthDial = LissajousLabyrinthDial.allCases[index]
+                let current: Int = dials[dial]
+                let shown: Int = mirror.pending.values[dial] ?? current
+                Stepper(Self.title(dial, shown: shown, current: current),
+                        onIncrement: { presenter.stepPending(dial, by: 1) },
+                        onDecrement: { presenter.stepPending(dial, by: -1) })
+                    .accessibilityLabel(LissajousLabyrinthPresenter.title(dial))
+                    .accessibilityValue(shown == current ? "\(shown)" : "\(shown), pending; now \(current)")
+                    .accessibilityIdentifier(port.identifier(Self.identifierName(dial)))
+            }
+            if !mirror.pending.isEmpty {
+                row {
+                    Button("Apply") { presenter.applyPending(port: port) }
+                        .accessibilityLabel("Apply the pending dial values")
+                        .accessibilityValue("\(mirror.pending.values.count) pending")
+                        .accessibilityIdentifier(port.identifier("apply"))
+                    Button("Clear") { presenter.clearPending() }
+                        .accessibilityLabel("Clear the pending dial values")
+                        .accessibilityValue("\(mirror.pending.values.count) pending")
+                        .accessibilityIdentifier(port.identifier("clear"))
+                }
+            }
+        }
+    }
+
+    /// Undo, redo, next level and reset view.
+    @ViewBuilder private var playRow: some View {
+        row {
+            Button("Undo") { presenter.send("play.undo", port: port) }
+                .accessibilityLabel("Undo the last change")
+                .accessibilityValue(Self.progressValue(mirror))
+                .accessibilityIdentifier(port.identifier("undo"))
+            Button("Redo") { presenter.send("play.redo", port: port) }
+                .accessibilityLabel("Redo the change")
+                .accessibilityValue("Level \(mirror.levelNumber)")
+                .accessibilityIdentifier(port.identifier("redo"))
+            Button("Next level") { presenter.send("level.next", port: port) }
+                .accessibilityLabel("Go to the next level")
+                .accessibilityValue("Level \(mirror.levelNumber) now")
+                .accessibilityIdentifier(port.identifier("next-level"))
+            Button("Reset view") { presenter.resetView() }
+                .accessibilityLabel("Return the camera to the authored view")
+                .accessibilityValue("Camera")
+                .accessibilityIdentifier(port.identifier("reset-view"))
+        }
+    }
+
+    /// The campaign, daily and practice modes.
+    @ViewBuilder private var modeRow: some View {
+        row {
+            Button("Campaign") { presenter.send("mode.campaign", port: port) }
+                .accessibilityLabel("Play the campaign")
+                .accessibilityValue(mirror.mode == .campaign ? "Selected" : "Not selected")
+                .accessibilityAddTraits(mirror.mode == .campaign ? .isSelected : [])
+                .accessibilityIdentifier(port.identifier("campaign"))
+            Button("Daily") { presenter.playDaily(port: port) }
+                .accessibilityLabel("Play today's daily level")
+                .accessibilityValue(Self.isDaily(mirror.mode) ? "Selected" : "Not selected")
+                .accessibilityAddTraits(Self.isDaily(mirror.mode) ? .isSelected : [])
+                .accessibilityIdentifier(port.identifier("daily"))
+            Button("Practice") { presenter.send("mode.practice", port: port) }
+                .accessibilityLabel("Practise this level with more actions")
+                .accessibilityValue(mirror.mode == .practice ? "Selected" : "Not selected")
+                .accessibilityAddTraits(mirror.mode == .practice ? .isSelected : [])
+                .accessibilityIdentifier(port.identifier("practice"))
+        }
+    }
+
+    /// The replay controls, or the offer to replay the best solution.
+    @ViewBuilder private var replaySection: some View {
+        if mirror.replaying {
+            Text("Replay: action \(mirror.replayPosition) of \(mirror.replayLength)").font(.callout)
+            row {
+                Button("Step") { presenter.stepReplay(port: port) }
+                    .accessibilityLabel("Play the next action of the replay")
+                    .accessibilityValue("Action \(mirror.replayPosition) of \(mirror.replayLength)")
+                    .accessibilityIdentifier(port.identifier("replay-step"))
+                Button("Stop") { presenter.stopReplay(port: port) }
+                    .accessibilityLabel("Stop the replay")
+                    .accessibilityValue("\(mirror.replayLength) actions")
+                    .accessibilityIdentifier(port.identifier("replay-stop"))
+            }
+        } else if mirror.replayAvailable {
+            Button("Replay best solution") { presenter.startReplay(port: port) }
+                .accessibilityLabel("Replay your best solution of this level")
+                .accessibilityValue("Level \(mirror.levelNumber)")
+                .accessibilityIdentifier(port.identifier("replay"))
+        }
+    }
+
+    /// The level picker by band and the Sound toggle.
+    @ViewBuilder private var levelSection: some View {
+        Menu("Levels") {
+            ForEach(0..<5, id: \.self) { band in
+                Section("Band \(band + 1)") {
+                    ForEach((band * 20 + 1)...(band * 20 + 20), id: \.self) { level in
+                        if level <= mirror.frontier {
+                            Button(Self.levelTitle(level, stars: mirror.stars[level])) {
+                                presenter.send("level.select", [Double(level)], port: port)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .accessibilityLabel("Choose an open level")
+        .accessibilityValue("Levels 1 to \(mirror.frontier) open")
+        .accessibilityIdentifier(port.identifier("level-picker"))
+        Toggle("Sound", isOn: Binding(get: { mirror.soundOn }, set: { presenter.setSound(on: $0) }))
+            .accessibilityLabel("Ambient sound")
+            .accessibilityValue(mirror.soundOn ? "on" : "off")
+            .accessibilityIdentifier(port.identifier("sound"))
     }
 
     /// The identifier names of the panel's controls (feature 319, clarification Q1), each used once with the prefix
