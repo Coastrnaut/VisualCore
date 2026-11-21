@@ -48,8 +48,8 @@ accessibility identifiers.
   FR-R02G0109-001, 002.
 - Q: Which interface tests exist and how are they grouped? → A: namespace `AL` in
   `Apps/VisualCore/Tests/UI/AuroraLoom/ALSupport.swift`; `ALPlayUITests` (fresh launch with `-vcResetData
-  -vcSkipWelcome -vcCandidates -openExperience r02-g01.aurora-loom`: skip the tutorial, win level 1 with the steppers
-  following its certified solution, read "3 of 3 stars" and level 2 open; relaunch without reset: the stars and level 2
+  -vcSkipWelcome -vcCandidates -openExperience r02-g01.aurora-loom`: skip the tutorial, set level 1's certified target steps
+  as pending steps with the steppers, then Apply (one move per changed control, see the amendment below), and win, read "3 of 3 stars" and level 2 open; relaunch without reset: the stars and level 2
   are still there) and `ALReplayUITests` (after the win, Replay, Step until "Replay complete", Stop back to campaign).
   They run as a new serial chunk `i3` of `release_check.py`. Each test stays under 60 s. Impact: FR-R02G0109-002, 007;
   SC-R02G0109-001.
