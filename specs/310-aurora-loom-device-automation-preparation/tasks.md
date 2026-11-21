@@ -36,7 +36,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
 - [X] T-R02G0110-005 Lead: edit `scripts/release_check.py` (step `device-rows` running the check); docs: — Verified 2026-11-21: 2026-11-21 round02-host exit 0; release step device-rows passes; docs/architecture/aurora-loom.md device preparation section, Packages/ExperiencesRound02/README.md, docs/automatedtesting.md
   `docs/architecture/aurora-loom.md` (device preparation), `Packages/ExperiencesRound02/README.md`,
   `docs/automatedtesting.md`; `--name round02-host`
-- [ ] T-R02G0110-006 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G0110-006 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-21: 2026-11-21 run-check rendering-27, rendering-26, experiences, host-full exit=0
   `--name host-full` (nothing in the app changes)
 - [ ] T-R02G0110-007 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G0110-008 Reference regression chunk 2 (`--name reference-2`)
