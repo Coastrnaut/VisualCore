@@ -30,7 +30,7 @@ tests stay short (< 10 s each). No {owner} tasks.
   element + 0.1 with a 5 % margin for aspect 0.4 … 2.5, `project`) with `Packages/ExperiencesRound02/ColorfallCanyons/CoreTests/ColorfallCanyonsSceneGeometryTests.swift`
   (finite and bounded for extreme settings; every cell top and emitter inside the view with margin at 7 aspects; same
   positions at every tier; carving lowers the block); `--name host-3`
-- [ ] T-R02G0503-005 [P] [US2] Create `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsExperienceCore.swift` (controls "canyon.carve [0 … 119],
+- [X] T-R02G0503-005 [P] [US2] Create `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsExperienceCore.swift` (controls "canyon.carve [0 … 119], — Verified 2026-11-21: 2026-11-21 host-4 exit 0 (agent C: adapter with canyon.carve, canyon.valve, time.step, play.undo, play.redo, level.next, digest of level number and play fingerprint, schema 1 {level, records}, restore refusals, quality profile, levels generated once per process; 13 tests incl. 200 seeded purity snapshots, retested by the lead)
   canyon.valve [0 … 2], time.step [1 … 600], play.undo, play.redo, level.next"; digest "level number and play
   fingerprint"; schema 1 `{level, records}`; quality profile of three levels; levels generated once per process;
   `snapshot(time:)`) with `Packages/ExperiencesRound02/ColorfallCanyons/CoreTests/ColorfallCanyonsExperienceCoreTests.swift` (conformance; undo restores the
