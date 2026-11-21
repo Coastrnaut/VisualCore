@@ -17,6 +17,9 @@ public enum HueCompassAction: Sendable, Hashable, Codable { case turn(Int), prob
 public struct HueCompassLevel: Sendable, Equatable { /* fields per data-model.md; init throws(HueCompassError); encoded(); decode(_:) */
     public func clue(at bearing: Int) -> HueCompassClue
     public func accepts(bearing: Int, band: Int) -> Bool }
+public struct HueCompassRecord: Sendable, Hashable, Codable { public let schema: Int; public let seed: UInt64; public let tick: Int
+    public let kind: String /* turn, probe, select, undo, redo */; public let action: HueCompassAction?
+    public let previous: String; public let next: String }
 public enum HueCompassStage: String, Sendable, Codable { case loading, tutorial, playing, paused, won, failed, result }
 public struct HueCompassPlay: Sendable {
     public let level: HueCompassLevel
