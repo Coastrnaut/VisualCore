@@ -61,7 +61,7 @@ or {device} tasks (pure logic and host-generated content). Fixture seed 2_322; t
 
 - [X] T-R02G0302-007 Docs: `docs/architecture/wave-knot-keeper.md` (generator, solver, witness), — Verified 2026-11-21: 2026-11-21 round02-host exit 0; docs/architecture/wave-knot-keeper.md content section, Packages/ExperiencesRound02/README.md, docs/automatedtesting.md (witness regeneration)
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md` (witness regeneration); `--name round02-host`
-- [ ] T-R02G0302-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G0302-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-21: 2026-11-21 rendering-27, rendering-26, experiences, host-full, app-unit exit 0
   `--name host-full` and `--name app-unit`
 - [ ] T-R02G0302-009 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G0302-010 Reference regression chunk 2 (`--name reference-2`)
