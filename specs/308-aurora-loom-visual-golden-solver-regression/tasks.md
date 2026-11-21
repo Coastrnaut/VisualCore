@@ -42,7 +42,7 @@ recorded only after every agent has reported). Commit after every task with its 
 
 ## Phase 5: Story 3 — memory stays bounded (P2)
 
-- [ ] T-R02G0108-006 [US3] Create `Packages/ExperiencesRound02/AuroraLoom/ExperienceTests/AuroraLoomRegressionMemoryTests.swift` (agent C: 12 cycles of open, 3
+- [X] T-R02G0108-006 [US3] Create `Packages/ExperiencesRound02/AuroraLoom/ExperienceTests/AuroraLoomRegressionMemoryTests.swift` (agent C: 12 cycles of open, 3 — Verified 2026-11-20: 2026-11-20 sim-27-2 exit 0 (12 cycles: scene releases its mesh renderers after every warning and close and rebuilds on the next frame; footprint within 16 MB of cycle 1: in the full parallel suite up to +11.7 MB from other tests in the same process, alone flat within 0.1 MB in 4.6 s)
   frames, memory warning, 1 frame, close; `ProcessMemory.footprint()` after each; "every reading of cycles 2 … 12 within
   16 MB of cycle 1"; `liveObjectCount` 0 after each close and warning and > 0 after the next frame; an unavailable
   footprint fails named); runs in `--name sim-27`
