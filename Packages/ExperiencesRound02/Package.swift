@@ -24,6 +24,7 @@ let package = Package(
         .library(name: "LissajousLabyrinthExperience", targets: ["LissajousLabyrinthExperience"]),
         // Feature 321 (R02-G03-01): Wave Knot Keeper's rule kernel, a candidate until X-R02-G03.
         .library(name: "WaveKnotKeeperCore", targets: ["WaveKnotKeeperCore"]),
+        .library(name: "HueCompassCore", targets: ["HueCompassCore"]),
         // Feature 323 (R02-G03-03): Wave Knot Keeper's experience (iOS only; a registered candidate until X-R02-G03).
         .library(name: "WaveKnotKeeperExperience", targets: ["WaveKnotKeeperExperience"]),
     ],
@@ -123,6 +124,16 @@ let package = Package(
                                    .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS])),
                                    .product(name: "VisualCoreAudioDSP", package: visualCore)],
                     path: "LissajousLabyrinth/ExperienceTests"),
+        // Feature 331 (R02-G04-01): Hue Compass's pure rule kernel.
+        .target(name: "HueCompassCore",
+                dependencies: [.product(name: "VisualCoreSimulation", package: visualCore),
+                               .product(name: "VisualCoreMath", package: visualCore)],
+                path: "HueCompass/Core"),
+        .testTarget(name: "HueCompassCoreTests",
+                    dependencies: ["HueCompassCore",
+                                   .product(name: "VisualCoreSimulation", package: visualCore),
+                                   .product(name: "VisualCoreMath", package: visualCore)],
+                    path: "HueCompass/CoreTests"),
         .target(name: "WaveKnotKeeperCore",
                 dependencies: [.product(name: "VisualCoreSimulation", package: visualCore),
                                .product(name: "VisualCoreMath", package: visualCore),

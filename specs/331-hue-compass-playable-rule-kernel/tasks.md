@@ -13,7 +13,7 @@ recorded only after every agent has reported). Commit after every task with its 
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G0401-002 Edit `Packages/ExperiencesRound02/Package.swift` (+ `HueCompassCore`, `HueCompassCoreTests`, product); create
+- [X] T-R02G0401-002 Edit `Packages/ExperiencesRound02/Package.swift` (+ `HueCompassCore`, `HueCompassCoreTests`, product); create — Verified 2026-11-21: 2026-11-21 host exit 0 (package targets; error codes; exact wheel with the 96-vector boundary table; level with ranges, start rule, clue, acceptance, stored form; fixtures with known solutions, 500 verified to select an accepted pair; 7 level tests). The lead also wrote HueCompassPlay (the rules and invariants depend on it); agent B writes its tests
   `Packages/ExperiencesRound02/HueCompass/Core/HueCompassError.swift` (codes "r02-g04.level, .action, .stage, .stale, .allowance, .newer-schema,
   .malformed"), `Packages/ExperiencesRound02/HueCompass/Core/HueCompassWheel.swift` ("96 bearings, 24 bands of 4"; 96 integer boundary constants at angle
   2πk/96 × 65 536 rounded; sector test by cross products; band(b) = (⌊b/4⌋ + offset) mod 24; circular distances; shorter
