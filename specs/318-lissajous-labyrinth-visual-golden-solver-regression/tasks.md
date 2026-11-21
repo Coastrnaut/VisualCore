@@ -55,7 +55,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02G0208-007 Docs: `docs/architecture/lissajous-labyrinth.md` (regression net),
+- [X] T-R02G0208-007 Docs: `docs/architecture/lissajous-labyrinth.md` (regression net), — Verified 2026-11-21: 2026-11-21 round02-host exit 0; audits exit 0; docs/architecture/lissajous-labyrinth.md regression net; package README (regeneration command); docs/automatedtesting.md (regression command; frame time that does not move forward)
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`; `--name audits -- python3
   scripts/verify_experiences.py --audits --only r02-g02.lissajous-labyrinth`
 - [ ] T-R02G0208-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,

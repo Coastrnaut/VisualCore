@@ -117,6 +117,14 @@ Feature 317 (R02-G02-07) adds persistence and replay: results with winning trace
 `LissajousLabyrinthReconciliation` on restore, the `replay(level)` mode with `replay.start/step/stop`, and snapshot
 schema 3 migrating from 1 and 2.
 
+Feature 318 (R02-G02-08) adds the regression net: solver regression over the 100 levels, `LissajousLabyrinthGolden` with
+the pinned `LissajousLabyrinth/golden-frames.json`, simulator golden-frame and memory tests, and
+`python3 scripts/lissajous_labyrinth_regression.py`. After a reviewed visual change:
+
+```bash
+LISSAJOUS_LABYRINTH_WRITE_GOLDEN=1 swift test --package-path Packages/ExperiencesRound02 --filter LissajousLabyrinthRegressionGoldenTests
+```
+
 ## Wave Knot Keeper (R02-G03, `r02-g03.wave-knot-keeper`, free)
 
 `WaveKnotKeeperCore` (feature 321, R02-G03-01) is the playable rule kernel: `WaveKnotKeeperLevel` with

@@ -154,6 +154,19 @@ LISSAJOUS_LABYRINTH_WRITE_WITNESSES=1 swift test --package-path Packages/Experie
 - **Replay.** `replay.start [n]`, `replay.step`, `replay.stop` play a verified trace action by action; every other
   action except dismissing the tutorial is refused during replay, and replay never changes progress.
 
+## Regression net (R02-G02-08)
+
+- **Solver regression.** For all 100 levels: the generated level equals its witness, the witness replays to a win with
+  its recorded fingerprints, and the solver finds exactly the certified shortest with at most 14,080 settings decided
+  (counted, never timed); twelve kinds of alteration fail by name.
+- **Golden frames.** `LissajousLabyrinthGolden` (test builds only) describes 16 frames at 1,152 × 768 — path samples,
+  checkpoint band points with their state colours, obstacles, dial rings and knobs — pinned with SHA-256 digests in
+  `golden-frames.json`; an unequal digest falls back to one 1/8-pixel quantum, a hand-edited entry fails, and the file is
+  rewritten only with `LISSAJOUS_LABYRINTH_WRITE_GOLDEN=1`. The simulator renders the same frames and checks them.
+- **Memory.** Twelve open-draw-warn-close cycles keep the footprint within 16 MB of the first (asserted when the class runs
+  alone) and leave the scene with no renderers after each warning and close.
+- **Running it.** CI's step "Lissajous Labyrinth regression (host)"; locally `python3 scripts/lissajous_labyrinth_regression.py`.
+
 ## Failures
 
 `LissajousLabyrinthError` reason codes: `r02-g02.level`, `r02-g02.move`, `r02-g02.stage`, `r02-g02.stale`,
