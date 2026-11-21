@@ -207,6 +207,10 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   Canyons levels only to read their smallest edit counts and took 8 s; the rules it checks do not depend on the levels,
   so it uses synthetic counts and takes a millisecond. Hint tests over 200 seeded states run in eight groups of 25, since
   each hint search can take up to about 0.5 s on the debug build.
+- **Fade by time, not by rate, when targets vary** (R02-G05-06, 2026-11-21). Colorfall Canyons's sheet brightness
+  targets lie anywhere in 0.35 … 1, so easing at a fixed rate per unit of range let short changes finish in under
+  0.4 s; each fade now takes the full 0.45 s under Reduce Flashing, and the lights tests caught the rate-based rule by
+  sabotage.
 - **Quantise before hashing floats** for digests that must match across platforms (surface colours are hashed as
   16-bit values).
 

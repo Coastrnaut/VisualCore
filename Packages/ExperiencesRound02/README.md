@@ -275,3 +275,8 @@ set from the current fluid), `ColorfallCanyonsHints` with `ColorfallCanyonsHint`
 `tutorial.dismiss` with snapshot schema 2; the panel shows the tutorial, hints, failure text with Undo and Retry, modes
 and a level picker.
 
+Feature 346 (R02-G05-06) adds polish and accessibility: `ColorfallCanyonsFeedbackPlan` (announcements and haptics),
+`ColorfallCanyonsLights` (eased sheet, emitter and win-glow levels with a flash-rate measure) and
+`ColorfallCanyonsSoundRecipe` (an ambient loop from the basins) in the Core, `ColorfallCanyonsSound` and the panel's
+labels, values, summary element, Sound toggle and accessibility-size layout in the experience.
+

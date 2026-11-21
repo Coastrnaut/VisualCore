@@ -158,3 +158,24 @@ long step as single ticks; the play accepts both.
   saved one open, campaign mode, the tutorial at its first step on levels 1 … 3). Digest `r02-g05.colorfall-canyons.v2`
   holds the level, the play's fingerprint, the progress and the mode.
 
+## Polish and accessibility (feature 346, R02-G05-06)
+
+- **VoiceOver.** Every panel control has a label and a value; a summary element reads the tick, the actions left and
+  every basin's colours against its target; the cell picker announces its pick ("Row r, column c picked."). Each
+  accepted change is announced through the shared feedback route: a carve ("Carved row r, column c. n actions left."),
+  a valve ("Cyan valve open. …"), a step ("Tick t of T. f of m basins filled."), undo and redo; wins and failures (with
+  the failure explanation) as outcomes; level and mode changes; refusals in words, the same words the panel shows.
+  Colours are always spoken by name and amount, so play needs no colour vision.
+- **Haptics.** Selection for an accepted carve, valve, step, undo or redo; success for a win; warning for a failure; error
+  for a refusal; a step that ends the play plans only the outcome. The person's haptics switch is honoured.
+- **Comfort.** Fluid sheets, spring emitters and the win glow ease toward their targets, each fade taking 0.15 s (0.45 s
+  under Reduce Flashing, where a started fade finishes before it may turn back), so no element crosses half its range
+  more than three times a second; a sheet whose cell empties fades out in its last colour. The win glow scales the glow
+  shells, still capped at 0.5 under Reduce Flashing. The flow bands (0.5 cycles per second, 1 on waterfalls) are still
+  under Reduce Motion. None of this reaches the state or its digest.
+- **Sound.** An optional ambient loop (off by default) synthesized from the basins: a 98 Hz root with a partial per
+  colour that has reached a basin, weighted by its share; an octave when won, halved gains when failed; it plays only
+  while wanted, on screen and active, and touches no audio while off.
+- **Layout.** The panel scrolls, grows with Dynamic Type, turns button rows into columns at accessibility sizes, uses
+  system colours and keeps a 520-point readable width on iPad.
+
