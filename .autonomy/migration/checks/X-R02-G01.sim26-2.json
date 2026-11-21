@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "r02-g01.aurora-loom",
+    "--runtime",
+    "26"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only r02-g01.aurora-loom --runtime 26",
+  "elapsed_seconds": 93.734,
+  "exit_code": 0,
+  "finished": "2026-11-21T05:57:13+00:00",
+  "gate": "X-R02-G01",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-R02-G01.sim26-2.log",
+  "log_sha256": "52be84c783db07f527fb50eb7e1c618dfc00270c3a1dcda7b00af900fa1e0002",
+  "name": "sim26-2",
+  "started": "2026-11-21T05:55:39+00:00",
+  "timed_out": false
+}
