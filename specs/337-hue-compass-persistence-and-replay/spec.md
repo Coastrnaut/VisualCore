@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-21
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G04-07 (migration ledger, game feature of experience R02-G04) · ID namespace FR-R02G0407-###,
 SC-R02G0407-###, T-R02G0407-###
@@ -27,6 +27,47 @@ Canonical overrides:
   progression, and R02-G04-01 … 06.
 - **Model:** feature 327 (Wave Knot Keeper), itself after features 317 and 307, including their lesson: the
   saved frontier is restored as saved (raising it from the kept results would open levels for an honest daily win).
+
+## Clarifications
+
+### Session 2026-11-21
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+327's answers where the games agree. Facts checked in code (read-only audit, 2026-11-21): the shared `SavedStateStore`
+keeps one `state.json` per experience holding the encoded `ExperienceSnapshot`, writes it atomically, moves an unreadable
+file aside (at most three copies) and refuses a newer schema; the engine applies the experience's `MigrationChain`; Hue
+Compass's adapter writes snapshot schema 2 `{level, mode, progress, records, tutorial}` with a 1 → 2 step;
+`HueCompassProgress.Result` keeps `bestUnits` and `stars`; the kernel's records carry previous and next fingerprints;
+the play's undo and redo stacks hold turns only (probes and the selection cannot be undone); a win replaces a stored
+result when it spends fewer units.
+
+- Q: What is stored for each result, and when is it written? → A: each result keeps its fewest units spent, its stars
+  and the winning trace — the ordered net actions of the play that earned it (turns, probes and the selection; a turn
+  that was undone and not redone is left out, so the trace never contains an undo or a redo) — plus `verified`. A
+  campaign or daily win replaces the stored result only when it spends fewer units (ties keep the earlier trace);
+  practice records nothing. The shared store writes the snapshot at the app's save points (leaving the experience,
+  backgrounding); this feature does not change when. Impact: FR-R02G0407-001, 003; SC-R02G0407-001.
+- Q: How are scores reconciled on restore? → A: for every result with a trace: the certified level is generated, a fresh
+  play (campaign allowance) replays the trace (each action legal), and the result is kept only if the play ends won
+  having spent exactly `bestUnits` units and `stars` equals the stars rule for that count; otherwise it is dropped. The
+  adapter exposes the number dropped and the presenter announces it once ("n saved results could not be checked and
+  were removed.", singular for 1). Results without a trace (from schema 2) are kept, marked unverified. The frontier is
+  restored as saved. Impact: FR-R02G0407-003; SC-R02G0407-003.
+- Q: How do migrations work? → A: schema 3 adds the trace and `verified` to each result and the mode `replay(level)`.
+  1 → 2 is the existing step; 2 → 3 copies results with an empty trace and `verified: false`. A payload of schema 4 or
+  newer is refused by the shared store (newer schema); a damaged payload is refused with `damaged` and the opening state
+  is used. Impact: FR-R02G0407-002; SC-R02G0407-002.
+- Q: How does replay work? → A: the action `replay.start [level]` opens mode `replay(level)` with a fresh play of that
+  level when a verified result with a trace exists (`r02-g04.no-replay` otherwise); `replay.step` applies the next action
+  of the trace (`r02-g04.replay-end` after the last or once the play ended); `replay.stop` returns to campaign at that
+  level (the frontier when it is not open). During replay every other play action except `tutorial.dismiss` is refused
+  with `r02-g04.replay` (the band pick is presentation only and stays allowed); replay never changes progress; the
+  tutorial is done during replay. The refusals are shown and announced in words: "There is no saved solution to replay
+  for this level.", "The replay is over." and "Stop the replay first."; a replayed win claims no stars. Impact:
+  FR-R02G0407-004; SC-R02G0407-004.
+- Q: Which inputs make the state deterministic? → A: the seed (opening level), the certified catalog (fixed planned
+  seeds), the calendar date given to `mode.daily` and the recorded actions; the state reads no clock and no random
+  source, so a save restores and replays identically on every device. Impact: FR-R02G0407-005.
 
 ## User Scenarios & Testing *(mandatory)*
 
