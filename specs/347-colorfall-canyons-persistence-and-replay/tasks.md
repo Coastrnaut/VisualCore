@@ -37,7 +37,7 @@ tests stay short (< 10 s each). {device} items are D1–D3 observations after Im
   with `Packages/ExperiencesRound02/ColorfallCanyons/CoreTests/ColorfallCanyonsExperienceCoreTests.swift` updates (schema 3, migrations 1 → 3 and 2 → 3, recording,
   replay rules and codes); `--name host-2`
 - [ ] T-R02G0507-004 [P] [US1] [US2] Create `Packages/ExperiencesRound02/ColorfallCanyons/CoreTests/ColorfallCanyonsPersistenceTests.swift` (agent B: 500 seeded reachable
-  states round-trip with equal digests; schema 1 and 2 payloads of 100 seeded states migrate and restore with progress
+  states round-trip with equal digests, the sound choice included and never digested; schema 1 and 2 payloads of 100 seeded states migrate and restore with progress
   kept; 200 seeded saves: honest results survive, edited ones are dropped and counted; FR-R02G0507-005: the same save
   restores to an equal digest twice and the daily level depends only on the date given); `--name host-3`
 
