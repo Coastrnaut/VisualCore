@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-21
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G04-08 (migration ledger, game feature of experience R02-G04) · ID namespace FR-R02G0408-###,
 SC-R02G0408-###, T-R02G0408-###
@@ -32,6 +32,60 @@ Canonical overrides:
   golden digest falls back to a one-quantum position comparison (system sine and cosine may differ in the last bit
   between macOS releases), the pinned descriptions are checked against their own digests, and a process-wide memory
   bound is applied only when its test class runs alone.
+
+## Clarifications
+
+### Session 2026-11-21
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+328's answers where the games agree. Facts checked in code (read-only audit, 2026-11-21): `HueCompassSolver.solve(_:depth:)`
+tries the empty probe set, then every single bearing, then every pair in lexicographic order, counting the sets tried in
+`work` (at most 1 + 96 + 4,560 = 4,657 at depth 2, which `HueCompassSolverTests` already bounds); the 100 witness files
+(level, actions, clues, counts, fingerprints, near miss, ambiguity, difficulty, skipped) are byte-checked by
+`HueCompassCatalogTests`; the simulator frame checks of feature 333 compare rendered frames with the CPU reference at
+1,152 × 768 (the needle tip and each probe mark lit within 3 px by at least 0.15 over night, each checkable band
+segment's colour sample within 0.15 per channel, background within 0.05 of night); a memory warning releases the scene's
+GPU objects (`HueCompassFallbackTests`); the GitHub workflow's host job runs all round-two host tests and has named
+regression steps for the earlier round-two games; `scripts/xcodebuild_package.py` runs simulator tests with
+`--only-testing`.
+
+- Q: What exactly does the solver regression check, and how is "within its work bound" measured? → A: for every one of
+  the 100 levels: the generated level equals its witness's level (fingerprint), the witness's actions replay on a fresh
+  play to a win with exactly its recorded clues and fingerprints, and `solve` returns a probe set of exactly the
+  certified smallest size with `work` at most 4,657 and equal to the certified solution's work; the probe set settles
+  the level (every consistent candidate accepted by one selection). Work is counted, never timed. The run is split by
+  band (20 levels per test). Impact: FR-R02G0408-001; SC-R02G0408-001.
+- Q: Which alterations must the regression detect and how is each named? → A: fourteen kinds, each applied to a copy
+  and each producing a failure message naming the level and the part: a level's hue offset, a fog density, the target
+  bearing, the start bearing, the bearing tolerance, the band tolerance, the allowance; a solution probe bearing; a
+  witness's action, clue, near miss, ambiguity, recorded fingerprint; the level fingerprint. Impact: FR-R02G0408-002;
+  SC-R02G0408-002.
+- Q: What is a golden frame description, where is its digest pinned, and how is it regenerated? → A: for each golden
+  frame (levels 1, 21, 41, 61, 81 at tiers 0, 1, 2, each after its witness's probes but before the selection so the
+  probe marks show, at presentation time 0 and the authored camera, plus the hero frame of the scenario manifest's hero
+  scenario at tier 0: 16 frames) the Core computes, at 1,152 × 768, the projected pixel positions of the needle tip,
+  every band segment's colour sample point, every probe mark centre, the selection mark and the target ring when
+  present, rounded to 1/8 pixel, and the expected colours as 8-bit sRGB (night, pearl, ember, sapphire and each
+  segment's band colour); serialized as JSON with sorted keys and hashed with SHA-256. The 16 descriptions and their
+  digests live in `Packages/ExperiencesRound02/HueCompass/golden-frames.json`; the host test recomputes each: an equal
+  digest passes; otherwise every position must lie within one 1/8-pixel quantum of the pinned one and every colour must
+  be equal, or the test fails naming the frame and the first differing value; each pinned digest must also equal the
+  digest of its pinned description. The file is rewritten only when `HUE_COMPASS_WRITE_GOLDEN=1` is set. The simulator
+  test renders the 16 frames and checks them against the same descriptions with the feature-333 tolerances. Impact:
+  FR-R02G0408-003, 004; SC-R02G0408-003.
+- Q: How is memory measured and what releases are checked? → A: on the simulator, 12 cycles of open (prepare a level),
+  draw 3 frames at tier 0, send a memory warning, draw 1 frame, close (teardown); the footprint is read with
+  `ProcessMemory.footprint()` after each cycle; the bound is that every reading of cycles 2 … 12 stays within 16 MB of
+  cycle 1's reading, applied only when the memory test class runs alone (`TEST_RUNNER_HUE_COMPASS_MEMORY_ISOLATED=1`; in
+  the full parallel suite the readings are only printed). After each close and each memory warning the scene holds no
+  renderers of its own (a test-visible count is 0) and the next frame rebuilds them. An unavailable footprint fails the
+  check with a named reason rather than passing. Impact: FR-R02G0408-005; SC-R02G0408-004.
+- Q: How do CI and the local command report, and what do they run? → A: CI's host job keeps running all round-two host
+  tests and adds a named step that runs the Hue Compass regression filter alone. The local command
+  `python3 scripts/hue_compass_regression.py` runs the host regression filter and then the simulator regression test
+  classes through `xcodebuild_package.py --only-testing` (bounded by that runner's per-test time allowance), and prints
+  one summary line per part with pass or fail and the first failing name; its exit code is non-zero on any failure.
+  Nothing in either is timed against the wall clock. Impact: FR-R02G0408-006, 007; SC-R02G0408-005.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -137,7 +191,7 @@ simulator parts and reports one summary.
 
 - **SC-R02G0408-001**: All 100 levels replay their witnesses and re-solve to their certified smallest probe set within
   4,657 probe sets tried (1 + 96 + 4,560, the most at depth 2); 100 of 100.
-- **SC-R02G0408-002**: Each kind of alteration of clarification Q2 is detected and named.
+- **SC-R02G0408-002**: Each of the 14 kinds of alteration of clarification Q2 is detected and named.
 - **SC-R02G0408-003**: The golden set covers 5 levels × 3 tiers plus the hero frame (16 frames); every rendered frame
   matches its description within tolerance and every recomputed description matches its pinned entry (equal digest, or
   within one 1/8-pixel quantum with equal colours).
