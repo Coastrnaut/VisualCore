@@ -4,6 +4,7 @@
 // is applied when an experience opens. The storage helper `TestStorage` is in StoreTests.swift.
 import AuroraLoomCore
 import Foundation
+import LissajousLabyrinthCore
 import SwiftUI
 import VisualCoreDiagnostics
 import VisualCoreExperience
@@ -1223,6 +1224,96 @@ final class AppModelTests: XCTestCase {
         XCTAssertEqual(certified.solution.setting.wave, [15, 15, 15])
         XCTAssertEqual(certified.solution.setting.phase, [12, 12, 12])
         XCTAssertEqual(AuroraLoomExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
+    }
+
+    // MARK: Lissajous Labyrinth in the app (feature 319, R02-G02-09; T-R02G0209-005, FR-R02G0209-003,
+    // FR-R02G0209-006; clarifications Q2, Q3, Q5)
+
+    /// Lissajous Labyrinth's registration: a candidate until X-R02-G02.
+    private func lissajousLabyrinthRegistration() throws -> ExperienceRegistration {
+        let id = try ExperienceID(LissajousLabyrinthExperienceCore.experienceID)
+        return try XCTUnwrap(ExperienceRegistry.candidates.first { $0.id == id }, "Lissajous Labyrinth is a candidate")
+    }
+
+    /// Clarification Q3: the snapshot is schema 3 and the stored schema-1 and schema-2 examples restore to their
+    /// digests through the migrations (the app's migration check).
+    func testTheLissajousLabyrinthRegistrationRestoresItsStoredExamples() async throws {
+        let registration = try lissajousLabyrinthRegistration()
+        XCTAssertEqual(LissajousLabyrinthExperienceCore.schemaVersion, 3)
+        let one = try XCTUnwrap(LissajousLabyrinthExperienceCore.schemaOneExample(), "schema-1 example")
+        let two = try XCTUnwrap(LissajousLabyrinthExperienceCore.schemaTwoExample(), "schema-2 example")
+        XCTAssertEqual(one.version, 1)
+        XCTAssertEqual(two.version, 2)
+        XCTAssertNotEqual(one.expectedDigest, two.expectedDigest)
+        let problems: [String] = await registration.migrationProblems()
+        XCTAssertEqual(problems, [], "\(registration.id)")
+    }
+
+    /// FR-R02G0209-006: without `-vcCandidates` Lissajous Labyrinth is a candidate only: outside `all`, listed in the
+    /// bundled catalog as not available, without a tile and not opened.
+    func testLissajousLabyrinthIsACandidateAndUnavailableWithoutTheCandidatesArgument() async throws {
+        let id = try ExperienceID(LissajousLabyrinthExperienceCore.experienceID)
+        XCTAssertEqual(id.rawValue, "r02-g02.lissajous-labyrinth")
+        XCTAssertTrue(ExperienceRegistry.candidates.map(\.id).contains(id))
+        XCTAssertFalse(ExperienceRegistry.all.map(\.id).contains(id))
+        let categories = try CategoryList(data: bundled("categories"))
+        let manifest = try CatalogManifest(data: bundled("experiences"), categories: categories)
+        XCTAssertTrue(manifest.experiences.contains { $0.id == id }, "a catalog id")
+        XCTAssertFalse(manifest.available.contains { $0.id == id }, "not available")
+        let storage = try TestStorage(self)
+        let model = AppModel(environment: storage.environment(catalog: try bundled("experiences"),
+                                                              categories: try bundled("categories"),
+                                                              registry: ExperienceRegistry.all))
+        XCTAssertFalse(model.shown.map(\.id).contains(id), "no tile")
+        let opened = await model.open(id)
+        XCTAssertFalse(opened)
+        XCTAssertNil(model.session.experience)
+    }
+
+    /// FR-R02G0209-003, clarification Q2: with the candidates registered Lissajous Labyrinth is shown, opens through
+    /// the registry and engine, and level 1 is won by its certified solution as `dial.set [dial, value]` actions
+    /// (dial 0 frequencyA, 1 frequencyB, 2 phaseA, 3 phaseC).
+    func testLissajousLabyrinthOpensAsACandidateAndLevelOneIsWonByItsCertifiedSolution() async throws {
+        let registration = try lissajousLabyrinthRegistration()
+        let id = registration.id
+        let storage = try TestStorage(self)
+        let base = try storage.environment(catalog: bundled("experiences"), categories: bundled("categories"),
+                                           registry: ExperienceRegistry.all,
+                                           arguments: [DebugLaunch.candidatesArgument])
+        let environment = DebugLaunch.environment(base: base, candidates: [registration])
+        XCTAssertTrue(environment.registry.map(\.id).contains(id))
+        let model = AppModel(environment: environment)
+        XCTAssertTrue(model.shown.map(\.id).contains(id), "the launcher shows the candidate")
+        XCTAssertTrue(registration.controls.map(\.id).contains("dial.set"))
+        XCTAssertEqual(registration.openingSeed, 0)
+
+        var engine = ExperienceEngine<LissajousLabyrinthExperienceCore>(id: id)
+        try await engine.prepare(seed: 0)
+        try engine.activate()
+        XCTAssertNil(engine.outcome)
+        let certified = try LissajousLabyrinthExperienceCore.generated(number: 1)
+        XCTAssertFalse(certified.solution.actions.isEmpty)
+        for move in certified.solution.actions {
+            let dial = try XCTUnwrap(LissajousLabyrinthExperienceCore.dialOrder.firstIndex(of: move.dial))
+            let values: [Double] = [Double(dial), Double(move.value)]
+            XCTAssertEqual(engine.handle(control: "dial.set", values: values), .accepted, "\(values)")
+        }
+        XCTAssertEqual(engine.outcome?.code, LissajousLabyrinthExperienceCore.wonCode)
+        XCTAssertEqual(LissajousLabyrinthExperienceCore.wonCode, "won")
+    }
+
+    /// Clarification Q5: the interface tests pin level 1 in their `LL` namespace (Tests/UI/LissajousLabyrinth/
+    /// LLSupport.swift, which this target cannot import); the same literals equal the Core's certified level 1: start
+    /// dials a 7, b 1, φ 5, ψ 12; one action, ψ to 3; final dials a 7, b 1, φ 5, ψ 3. Seed 0 opens level 1.
+    func testLissajousLabyrinthLevelOneDialsEqualTheCore() throws {
+        let certified = try LissajousLabyrinthExperienceCore.generated(number: 1)
+        XCTAssertEqual(certified.level.start,
+                       LissajousLabyrinthDials(frequencyA: 7, frequencyB: 1, phaseA: 5, phaseC: 12))
+        XCTAssertEqual(certified.solution.shortest, 1)
+        XCTAssertEqual(certified.solution.actions, [LissajousLabyrinthAction(dial: .phaseC, value: 3)])
+        XCTAssertEqual(certified.solution.setting,
+                       LissajousLabyrinthDials(frequencyA: 7, frequencyB: 1, phaseA: 5, phaseC: 3))
+        XCTAssertEqual(LissajousLabyrinthExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
     }
     #endif
 }
