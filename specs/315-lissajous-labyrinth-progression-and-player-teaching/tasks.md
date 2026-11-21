@@ -28,7 +28,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks.
 
 ## Phase 3: Stories 1 and 4 — tutorial, progress, daily, practice (P1, P2)
 
-- [ ] T-R02G0205-003 [P] [US1] [US4] Create `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthProgress.swift` (LissajousLabyrinthTutorialStep
+- [X] T-R02G0205-003 [P] [US1] [US4] Create `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthProgress.swift` (LissajousLabyrinthTutorialStep — Verified 2026-11-21: 2026-11-21 host-2 exit 0: LissajousLabyrinthProgressTests 16/16 (tutorial scripts on levels 1 … 3 win, with a detour showing every instruction; campaign through 100 levels opens in order with 3 stars; star rule; better replaces worse; daily recording keeps the frontier; every date 2026 … 2036 maps to 1 … 100 and every 100-day window covers all levels; impossible dates refused; round trips)
   "turn(dial) → checkpoints (an accepted dial action) → hints (the next accepted action or a hint) → done (a win);
   dismiss → done; undo never moves it back" with the texts of clarification Q2; LissajousLabyrinthMode "campaign, practice, daily(level)";
   LissajousLabyrinthProgress "level 1 open; a campaign win opens the next; a better result replaces a worse one; stars 3 at
