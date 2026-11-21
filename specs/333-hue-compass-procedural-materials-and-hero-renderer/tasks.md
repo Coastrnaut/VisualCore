@@ -65,7 +65,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 - [X] T-R02G0403-010 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-21: 2026-11-21 reference-2 exit 0: 7 of 7 with chunk 1
 - [X] T-R02G0403-011 Script tests, run alone (`--name script-tests`) — Verified 2026-11-21: 2026-11-21 script-tests exit 0, run alone
 - [ ] T-R02G0403-012 {device} After ImplementationLock-100: frame time per tier on D1/D2/D3 (SC-R02G0403-006)
-- [ ] T-R02G0403-013 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+- [X] T-R02G0403-013 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record — Verified 2026-11-21: 2026-11-21 converge round 1 converged (nothing appended); sealed 19 passing checks, 1 failed attempt (catalog-search before the registered list was extended); recorded R02-G04-03 pass (.autonomy/migration/evidence/R02-G04-03.json); validators PASS
 
 ## Dependencies and parallel work
 
