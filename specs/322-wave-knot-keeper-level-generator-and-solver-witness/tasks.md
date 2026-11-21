@@ -34,7 +34,7 @@ or {device} tasks (pure logic and host-generated content). Fixture seed 2_322; t
 
 ## Phase 4: Story 2 — levels come from their planned seeds (P1)
 
-- [ ] T-R02G0302-004 [US2] Create `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperGenerator.swift` (WaveKnotKeeperBandProfile "points 6, 7, 8, 9,
+- [X] T-R02G0302-004 [US2] Create `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperGenerator.swift` (WaveKnotKeeperBandProfile "points 6, 7, 8, 9, — Verified 2026-11-21: 2026-11-21 host-3 exit 0 (generator: profiles, determinism per band, skipped candidates re-checked, tension bound covers the walk, impossible profile refused); amended band ranges after the first catalog probe
   10; gates 0, 0, 1, 1, 2 of side 3; scramble 1, 2, 2, 3, 4; shortest 1, 1–2, 1–2, 2, 2–3" (spec amendment), the solved rope, gates,
   scramble walk and tension bound of clarification Q1, WaveKnotKeeperGenerated, `generate` with candidates k = 0 … 63
   from `SeedDerivation.derive(seed, index: k)`, id `wave-knot-keeper-NNN`, allowance = budget, tutorial for 1 … 3,
