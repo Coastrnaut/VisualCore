@@ -70,7 +70,7 @@ R02-G05-03 are unchanged).
 - [X] T-R02G0505-008 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-21: 2026-11-21 reference-1 exit 0 (.autonomy/migration/checks/R02-G05-05.reference-1.json)
 - [X] T-R02G0505-009 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-21: 2026-11-21 reference-2 exit 0 (.autonomy/migration/checks/R02-G05-05.reference-2.json)
 - [X] T-R02G0505-010 Script tests, run alone (`--name script-tests`) — Verified 2026-11-21: 2026-11-21 script-tests exit 0, run alone (.autonomy/migration/checks/R02-G05-05.script-tests.json)
-- [ ] T-R02G0505-011 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+- [X] T-R02G0505-011 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record — Verified 2026-11-21: 2026-11-21 converge round 1 clean; sealed 16 passing; recorded pass (.autonomy/migration/evidence/R02-G05-05.json)
 
 ## Dependencies and parallel work
 
