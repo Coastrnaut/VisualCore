@@ -36,7 +36,7 @@ tests stay short (< 10 s each). {device} items are D1–D3 observations after Im
   solution to replay for this level.", "The replay is over.", "Stop the replay first."; a replayed win claims no stars),
   with `Packages/ExperiencesRound02/HueCompass/CoreTests/HueCompassExperienceCoreTests.swift` updates (schema 3, migrations 1 → 3 and 2 → 3, recording,
   replay rules and codes); `--name host-2`
-- [ ] T-R02G0407-004 [P] [US1] [US2] Create `Packages/ExperiencesRound02/HueCompass/CoreTests/HueCompassPersistenceTests.swift` (agent B: 500 seeded reachable
+- [X] T-R02G0407-004 [P] [US1] [US2] Create `Packages/ExperiencesRound02/HueCompass/CoreTests/HueCompassPersistenceTests.swift` (agent B: 500 seeded reachable — Verified 2026-11-21: 2026-11-21 host-3 exit 0: HueCompassPersistenceTests 15/15 (500 round trips, 100 schema-1 and 100 schema-2 migrations, 200 saves reconciled exactly, determinism)
   states round-trip with equal digests; schema 1 and 2 payloads of 100 seeded states migrate and restore with progress
   kept; 200 seeded saves: honest results survive, edited ones are dropped and counted; FR-R02G0407-005: the same save
   restores to an equal digest twice and the daily level depends only on the date given); `--name host-3`
