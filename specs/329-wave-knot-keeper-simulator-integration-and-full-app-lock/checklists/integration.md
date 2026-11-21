@@ -14,7 +14,7 @@ Evaluated by the lead under the owner's standing delegation on 2026-11-21; failu
   [Completeness, Spec §Clarifications Q1; FR-R02G0309-001]
 - [x] CHK002 Is the end-to-end journey stated step by step (open, dismiss tutorial, pick each point, tap its
   direction, win, stars, next level open, relaunch, replay, stop)? [Completeness, Spec §US1; Clarifications Q2]
-- [x] CHK003 Is what the tests read named (canvas description phrases "The path is safe", "3 of 3 stars")?
+- [x] CHK003 Is what the tests read named (canvas description phrases "The knot matches", "3 of 3 stars")?
   [Clarity, Spec §Clarifications Q1, Q2]
 - [x] CHK004 Is the save point before a relaunch addressed (background before terminate)? [Edge Case, Spec §Edge Cases]
 
