@@ -49,3 +49,28 @@ refuses damaged, edited and newer forms (`r02-g04.malformed`, `.newer-schema`). 
 an R02-F23 `PuzzleRules`: a position is (bearing, units spent, outcome), moves are turn(+1), turn(−1), probe and a
 selection at the current bearing of each of the 24 bands. The contract lists only single-step turns, so a certified solution (R02-G04-02) spells a
 large turn as single steps; the play accepts both.
+
+## Content: generator, solver and witnesses (feature 332, R02-G04-02)
+
+- **Manifest.** `HueCompassManifest` holds the 100 planned levels (20 per band, budgets 8 … 19) copied from the archived
+  design. Candidate k of level n draws from `SeededRandom(seed: SeedDerivation.derive(plannedSeed, index: k))`: the
+  offset, the 96 fog densities (each clear with the band's clear share), the target and a start farther from the target
+  than the bearing tolerance. Band profiles: tolerances (4, 2), (3, 1), (2, 1), (1, 0), (1, 0); clear fog 0, 10, 20, 30,
+  40 %; smallest probe counts 1, 1, 1, 1 … 2, 2. The allowance is the budget; ids `hue-compass-NNN`; levels 1 … 3 have the
+  tutorial; at most 64 candidates, then `r02-g04.generation`.
+- **Solver.** The candidates are the bearings farther from the start than the bearing tolerance. A probe set groups them
+  by their clues; it settles the level when every group has one selection (a bearing within the bearing tolerance of
+  every member and a band within the band tolerance of every member's band). `HueCompassSolver` tries the empty set,
+  then every single bearing, then every pair, in lexicographic order, and returns the first that settles (at most 4,657
+  sets, about 7 ms on a debug host). No level settles with no probe: at least 87 bearings are always candidates.
+- **Difficulty.** The smallest probe count, the largest group after the best single probe, the tolerances, the clear
+  share and the work. Band means of the smallest count are 1, 1, 1, 1.15 and 2; the catalog keeps R02-F24's progression
+  rule; its digest (`PuzzleCatalog<HueCompassRules>`, id `hue-compass`) is pinned in a test.
+- **Witnesses.** `docs/games/hue-compass/levels/NNN.witness.json` (schema 1): the level, the actions (a shortest turn to
+  each probe bearing, the probe, then the selection for the target's group), the clues, the candidates left after each
+  probe, the play fingerprints, a near-miss selection one bearing beyond the tolerance (fails) and an ambiguity (the
+  empty set or the first single bearing with two targets that share clues and no selection). Decoding re-derives
+  everything without the solver and refuses newer, damaged and edited files (`r02-g04.witness`). Regenerate on purpose
+  with `HUE_COMPASS_WRITE_WITNESSES=1 swift test --package-path Packages/ExperiencesRound02 --filter
+  HueCompassCatalogTests`.
+

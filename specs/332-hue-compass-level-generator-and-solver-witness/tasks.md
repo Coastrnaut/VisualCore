@@ -61,7 +61,7 @@ or {device} tasks (pure logic and host-generated content). Fixture seed 2_332; t
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02G0402-007 Docs: `docs/architecture/hue-compass.md` (content pipeline), `Packages/ExperiencesRound02/README.md`,
+- [X] T-R02G0402-007 Docs: `docs/architecture/hue-compass.md` (content pipeline), `Packages/ExperiencesRound02/README.md`, — Verified 2026-11-21: 2026-11-21 round02-host exit 0; docs/architecture/hue-compass.md (content pipeline), Packages/ExperiencesRound02/README.md, docs/automatedtesting.md (two lessons)
   `docs/automatedtesting.md`; `--name round02-host`
 - [ ] T-R02G0402-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
   `--name host-full`

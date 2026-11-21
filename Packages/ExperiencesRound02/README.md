@@ -192,3 +192,9 @@ WK-D8, all pending) and `device-campaign.md`, checked by the release step `devic
 `HueCompassEvent`, `HueCompassFailure` and append-only `HueCompassRecord`s, and `HueCompassRules` for the R02-F23 puzzle
 contract. Refusals are `HueCompassError` with `r02-g04.*` codes. Rules:
 [docs/architecture/hue-compass.md](../../docs/architecture/hue-compass.md).
+
+Feature 332 (R02-G04-02) adds the content pipeline: `HueCompassManifest` (100 planned levels), the seeded
+`HueCompassGenerator` with `HueCompassBandProfile`, the deduction solver `HueCompassSolver` (smallest probe set, depth 2),
+`HueCompassDifficulty` and versioned witness files (`HueCompassWitness`) under `docs/games/hue-compass/levels/`, with a
+pinned catalog digest.
+

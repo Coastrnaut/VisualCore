@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-21 (R02-G04-01: Hue Compass's kernel decides angles with a constant integer boundary table; the independent `atan2` reference is compared only away from the boundaries).
+Last updated: 2026-11-21 (R02-G04-02: a prototype measured the band profiles before the generator was written; tests that read the witness files fail during the run that writes them).
 
 ## 1. What is tested, and where
 
@@ -288,6 +288,15 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
 - **No mutating call inside `#expect`.** `#expect(model.paint(x: 1, y: 1, mode: .tap))` does not compile: the macro
   passes the receiver as an immutable `$0`. Assign the result first (`let painted = model.paint(…)`, then
   `#expect(painted)`), as with `await` in `XCTAssertEqual` (A16-P04, `SimulationBrushTests`).
+
+- **Run the writing pass of a file-pinning test on its own.** Hue Compass's catalog tests read the 100 witness files
+  in some tests and write them in others (with `HUE_COMPASS_WRITE_WITNESSES=1`); Swift Testing runs them in parallel, so
+  the readers fail on the first writing run (R02-G04-02). Write once, then run the suite again without the flag; only
+  the second run is evidence.
+- **Measure a generator's band profile before writing it.** A 20-level Python prototype per setting showed that one
+  probe settles almost every Hue Compass level unless the tolerances are (1, 0) on fog with 30 … 40 % clear bearings,
+  and that more clear fog makes levels undeducible within two probes; the band profiles were set from those counts and
+  all 100 levels then generated on the first try (R02-G04-02).
 
 ### Process
 
