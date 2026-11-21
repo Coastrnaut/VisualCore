@@ -426,20 +426,37 @@ public enum ColorfallCanyonsSceneGeometry {
     /// Colours: ``fluidColour(_:_:)``. The same at every tier (the shader draws the tier's flow bands).
     ///
     /// - Throws: `MeshError` from `MeshBuilder` (not expected).
-    public static func fluidPart(_ snapshot: ColorfallCanyonsSceneSnapshot,
-                                 tier: ColorfallCanyonsTier) throws(MeshError) -> ColorfallCanyonsColouredMesh {
+    ///
+    /// Feature 346 (R02-G05-06, research R4): with `lights`, every cell the lights hold a sheet for (level above 0) is
+    /// drawn with the eased level as its brightness and the remembered weights, so a cell that emptied fades out in its
+    /// last colour (at the thickness of one unit); a waterfall follows the cell it falls from. Without `lights` the mesh
+    /// is feature 343's exactly.
+    public static func fluidPart(_ snapshot: ColorfallCanyonsSceneSnapshot, tier: ColorfallCanyonsTier,
+                                 lights: ColorfallCanyonsLights? = nil) throws(MeshError) -> ColorfallCanyonsColouredMesh {
         var parts: Parts = Parts()
         let u: Double = cellSize(snapshot)
-        for cell in 0..<snapshot.cellCount where snapshot.volume(cell) > 0 {
+        for cell in 0..<snapshot.cellCount {
+            let volume: Int = snapshot.volume(cell)
+            let light: ColorfallCanyonsLights.Sheet? = lights?.sheets[cell]
+            if lights != nil {
+                guard let light, light.level > 0 else { continue }
+            } else if volume <= 0 {
+                continue
+            }
             let centre: SIMD3<Double> = cellCentre(cell, snapshot)
             let y0: Double = topHeight(cell, snapshot) + sheetLift * u
-            let y1: Double = sheetTop(cell, snapshot)
-            let weights: SIMD3<Double> = ColorfallCanyonsShaders.weights(masses: snapshot.masses[cell])
-            let uv: Vec2 = Vec2(ColorfallCanyonsPalette.brightness(volume: snapshot.volume(cell)), flowCode(cell, snapshot))
-            let colour: SIMD3<Double> = fluidColour(cell, snapshot)
+            let y1: Double = volume > 0 ? sheetTop(cell, snapshot) : y0 + sheetThickness(volume: 1, snapshot)
+            var weights: SIMD3<Double> = ColorfallCanyonsShaders.weights(masses: snapshot.masses[cell])
+            var uv: Vec2 = Vec2(ColorfallCanyonsPalette.brightness(volume: volume), flowCode(cell, snapshot))
+            var colour: SIMD3<Double> = fluidColour(cell, snapshot)
+            if let light {
+                weights = light.weights
+                uv = Vec2(light.level, volume > 0 ? flowCode(cell, snapshot) : 0)
+                colour = weightedColour(light.weights) * light.level
+            }
             try parts.box(centre: centre, half: sheetHalf * u, bottom: y0, top: y1, slot: weights, uv: uv,
                           colour: colour)
-            guard let next = snapshot.downhill[cell], isWaterfall(cell, snapshot) else { continue }
+            guard volume > 0, let next = snapshot.downhill[cell], isWaterfall(cell, snapshot) else { continue }
             let dir: SIMD3<Double> = unit(cellCentre(next, snapshot) - centre)
             let across: SIMD3<Double> = SIMD3(-dir.z, 0, dir.x)
             let edge: SIMD3<Double> = centre + dir * (u / 2 + waterfallOffset * u)
@@ -456,9 +473,15 @@ public enum ColorfallCanyonsSceneGeometry {
     /// The fluid mesh (see ``fluidPart(_:tier:)``).
     ///
     /// - Throws: `MeshError` from `MeshBuilder` (not expected).
-    public static func fluidMesh(_ snapshot: ColorfallCanyonsSceneSnapshot,
-                                 tier: ColorfallCanyonsTier) throws(MeshError) -> Mesh {
-        try fluidPart(snapshot, tier: tier).mesh
+    public static func fluidMesh(_ snapshot: ColorfallCanyonsSceneSnapshot, tier: ColorfallCanyonsTier,
+                                 lights: ColorfallCanyonsLights? = nil) throws(MeshError) -> Mesh {
+        try fluidPart(snapshot, tier: tier, lights: lights).mesh
+    }
+
+    /// The palette mix of colour `weights` (cyan, coral, yellow), each weight times its palette colour.
+    static func weightedColour(_ weights: SIMD3<Double>) -> SIMD3<Double> {
+        ColorfallCanyonsPalette.cyan * weights.x + ColorfallCanyonsPalette.coral * weights.y
+            + ColorfallCanyonsPalette.yellow * weights.z
     }
 
     /// The features (fluid program): a hexagonal emitter column 0.6·u tall on each spring (sides and top cap) with
@@ -468,8 +491,12 @@ public enum ColorfallCanyonsSceneGeometry {
     /// code 0 throughout. Colours: the palette colour times the brightness. The same at every tier.
     ///
     /// - Throws: `MeshError` from `MeshBuilder` (not expected).
-    public static func featurePart(_ snapshot: ColorfallCanyonsSceneSnapshot,
-                                   tier: ColorfallCanyonsTier) throws(MeshError) -> ColorfallCanyonsColouredMesh {
+    ///
+    /// Feature 346 (R02-G05-06): with `lights`, each emitter's brightness is its eased level (feature 343's when the lights
+    /// hold none for it).
+    public static func featurePart(_ snapshot: ColorfallCanyonsSceneSnapshot, tier: ColorfallCanyonsTier,
+                                   lights: ColorfallCanyonsLights? = nil) throws(MeshError)
+        -> ColorfallCanyonsColouredMesh {
         var parts: Parts = Parts()
         let u: Double = cellSize(snapshot)
         let up: SIMD3<Double> = SIMD3(0, 1, 0)
@@ -477,8 +504,10 @@ public enum ColorfallCanyonsSceneGeometry {
             let base: SIMD3<Double> = cellTop(snapshot.springs[s].cell, snapshot)
             let topY: Double = emitterTop(s, snapshot).y
             let weights: SIMD3<Double> = oneHot(snapshot.springs[s].color)
-            let uv: Vec2 = Vec2(emitterBrightness(s, snapshot), 0)
-            let colour: SIMD3<Double> = emitterColour(s, snapshot)
+            var brightness: Double = emitterBrightness(s, snapshot)
+            if let lights, lights.emitters.indices.contains(s) { brightness = lights.emitters[s] }
+            let uv: Vec2 = Vec2(brightness, 0)
+            let colour: SIMD3<Double> = ColorfallCanyonsPalette.colour(snapshot.springs[s].color) * brightness
             let r: Double = emitterRadius * u
             var ring: [SIMD3<Double>] = []
             for k in 0..<emitterSides {
@@ -516,9 +545,9 @@ public enum ColorfallCanyonsSceneGeometry {
     /// The feature mesh (see ``featurePart(_:tier:)``).
     ///
     /// - Throws: `MeshError` from `MeshBuilder` (not expected).
-    public static func featureMesh(_ snapshot: ColorfallCanyonsSceneSnapshot,
-                                   tier: ColorfallCanyonsTier) throws(MeshError) -> Mesh {
-        try featurePart(snapshot, tier: tier).mesh
+    public static func featureMesh(_ snapshot: ColorfallCanyonsSceneSnapshot, tier: ColorfallCanyonsTier,
+                                   lights: ColorfallCanyonsLights? = nil) throws(MeshError) -> Mesh {
+        try featurePart(snapshot, tier: tier, lights: lights).mesh
     }
 
     /// The one-hot weights (cyan, coral, yellow) of `color`.

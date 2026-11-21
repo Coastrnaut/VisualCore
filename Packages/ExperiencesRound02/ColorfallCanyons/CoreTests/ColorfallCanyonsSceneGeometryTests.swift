@@ -622,4 +622,55 @@ import VisualCoreScenes
         #expect(try Geometry.highlightPart(-1, snapshot).mesh.indices.isEmpty)
         #expect(try Geometry.highlightPart(snapshot.cellCount, snapshot).mesh.indices.isEmpty)
     }
+    /// Feature 346 (research R4): settled lights give feature 343's fluid and feature streams; a sheet whose cell has
+    /// emptied keeps being drawn with its remembered weights and eased level until it fades out; an emitter's
+    /// brightness is its eased level.
+    @Test func lightsFeedTheFluidAndFeatureStreams() throws {
+        for snapshot in try Self.playedSnapshots() {
+            var lights: ColorfallCanyonsLights = ColorfallCanyonsLights(reducedFlash: false)
+            lights.settle(to: snapshot)
+            let plain: Mesh = try Geometry.fluidMesh(snapshot, tier: .of(0))
+            let lit: Mesh = try Geometry.fluidMesh(snapshot, tier: .of(0), lights: lights)
+            #expect(lit.positions == plain.positions && lit.indices == plain.indices)
+            #expect(lit.normals == plain.normals)
+            #expect(lit.uvs.count == plain.uvs.count)
+            for index in 0..<lit.uvs.count {
+                #expect(abs(lit.uvs[index].x - plain.uvs[index].x) < 1e-12 && lit.uvs[index].y == plain.uvs[index].y)
+            }
+            let plainFeatures: Mesh = try Geometry.featureMesh(snapshot, tier: .of(0))
+            let litFeatures: Mesh = try Geometry.featureMesh(snapshot, tier: .of(0), lights: lights)
+            #expect(litFeatures == plainFeatures)
+        }
+    }
+
+    @Test func aFadingSheetKeepsItsWeightsAndEmittersTakeTheirLevel() throws {
+        let level: ColorfallCanyonsLevel = ColorfallCanyonsFixtures.fixture(0).level
+        let full: Snapshot = try Self.snapshot(level, Self.opening(level, ticks: 12))
+        let empty: Snapshot = try Self.snapshot(level, [])
+        var wet: [Int] = []
+        for cell in 0..<full.cellCount where full.volume(cell) > 0 && empty.volume(cell) == 0 { wet.append(cell) }
+        #expect(!wet.isEmpty, "the fixture's fluid reaches cells that are dry at the start")
+        var lights: ColorfallCanyonsLights = ColorfallCanyonsLights(reducedFlash: true)
+        lights.settle(to: full)
+        lights.step(toward: empty, elapsed: 0.1)
+        let lit: Mesh = try Geometry.fluidMesh(empty, tier: .of(0), lights: lights)
+        let plain: Mesh = try Geometry.fluidMesh(empty, tier: .of(0))
+        #expect(lit.indices.count > plain.indices.count, "the emptied sheets still fade")
+        for cell in wet {
+            let sheet: ColorfallCanyonsLights.Sheet = try #require(lights.sheets[cell], "cell \(cell) fading")
+            let fullWeights: SIMD3<Double> = ColorfallCanyonsShaders.weights(masses: full.masses[cell])
+            #expect(sheet.weights == fullWeights && sheet.level > 0)
+            #expect(sheet.level < ColorfallCanyonsPalette.brightness(volume: full.volume(cell)))
+        }
+        for spring in empty.springs.indices {
+            let features: ColorfallCanyonsColouredMesh = try Geometry.featurePart(empty, tier: .of(0), lights: lights)
+            #expect(!features.mesh.uvs.isEmpty)
+            #expect(lights.emitters.indices.contains(spring))
+        }
+        var settled: ColorfallCanyonsLights = ColorfallCanyonsLights(reducedFlash: false)
+        settled.settle(to: empty)
+        for spring in empty.springs.indices {
+            #expect(abs(settled.emitters[spring] - Geometry.emitterBrightness(spring, empty)) < 1e-12)
+        }
+    }
 }

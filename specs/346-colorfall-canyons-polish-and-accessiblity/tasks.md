@@ -38,7 +38,7 @@ observations after ImplementationLock-100.
   toggled and undone every frame; steps of 1 tick; a retry) at 60 Hz: at most 3 half-range crossings per second and
   every complete one-way fade over half the range ≥ 0.4 s under Reduce Flashing; normal mode reaches targets in 0.15 s;
   settle jumps; an emptied sheet keeps its weights while fading); `--name host-2`
-- [ ] T-R02G0506-004 [US2] Edit `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsSceneGeometry.swift` (fluidPart, fluidMesh,
+- [X] T-R02G0506-004 [US2] Edit `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsSceneGeometry.swift` (fluidPart, fluidMesh, — Verified 2026-11-21: 2026-11-21 host-geometry exit 0: 17 scene geometry tests incl. settled lights equal to feature 343's streams and an emptied sheet fading with its remembered weights (.autonomy/migration/checks/R02-G05-06.host-geometry.json)
   featurePart and featureMesh take optional lights: sheet brightness and emitter brightness from the lights, fading
   sheets drawn with their remembered weights, a waterfall following the cell it falls from; no lights = feature 343's meshes exactly) with tests in
   `Packages/ExperiencesRound02/ColorfallCanyons/CoreTests/ColorfallCanyonsSceneGeometryTests.swift`; `--name host-geometry`
