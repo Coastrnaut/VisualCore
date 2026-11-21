@@ -8,7 +8,7 @@ tests stay short (< 10 s each). {device} items are D1–D3 observations after Im
 
 ## Phase 1: Setup
 
-- [ ] T-R02G0507-001 Baselines: `--name baseline-round02`, `--name baseline-host`, `--name baseline-timing`
+- [X] T-R02G0507-001 Baselines: `--name baseline-round02`, `--name baseline-host`, `--name baseline-timing` — Verified 2026-11-21: 2026-11-21 baseline-host, baseline-timing, baseline-round02 exit 0 (.autonomy/migration/checks/R02-G05-07.baseline-*.json)
 
 ## Phase 2: Story 2 — reconcilable scores (P1) 🎯
 
