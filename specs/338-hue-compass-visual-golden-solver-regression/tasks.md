@@ -55,7 +55,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02G0408-007 Docs: `docs/architecture/hue-compass.md` (regression net),
+- [X] T-R02G0408-007 Docs: `docs/architecture/hue-compass.md` (regression net), — Verified 2026-11-21: 2026-11-21 round02-host exit 0; audits exit 0 (verify_experiences --audits --only r02-g04.hue-compass); architecture (regression net), package README and testing doc updated
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`; `--name audits -- python3
   scripts/verify_experiences.py --audits --only r02-g04.hue-compass`
 - [ ] T-R02G0408-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,

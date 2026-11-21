@@ -221,3 +221,8 @@ Feature 337 (R02-G04-07) adds persistence and replay: results carry their winnin
 adapter writes snapshot schema 3 (migrating 1 → 2 → 3) with `replay.start/step/stop`; the panel offers Replay with Step
 and Stop and announces dropped results once.
 
+Feature 338 (R02-G04-08) adds the regression net: the solver regression over all 100 witnesses, `HueCompassGolden` (16
+code-computed golden frames pinned in `HueCompass/golden-frames.json`; regenerate on purpose with
+`HUE_COMPASS_WRITE_GOLDEN=1 swift test --package-path Packages/ExperiencesRound02 --filter
+HueCompassRegressionGoldenTests`), simulator golden-frame and memory tests, and `scripts/hue_compass_regression.py`.
+

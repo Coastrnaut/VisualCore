@@ -176,3 +176,21 @@ large turn as single steps; the play accepts both.
   (`r02-g04.replay`, "Stop the replay first."); a replayed win records nothing and claims no stars. The panel offers
   "Replay best solution", then Step and Stop with the position.
 
+## Regression net (feature 338, R02-G04-08)
+
+- **Solver regression.** For all 100 levels the generated level equals its witness, the witness's actions replay to a
+  win with their recorded clues and fingerprints, and the solver re-finds the certified smallest probe set, which
+  settles the level, with work at most 4,657 probe sets and equal to the certified work (largest 3,533); fourteen kinds
+  of alteration (the hue offset, a fog density, the target, the start, the bearing tolerance, the band tolerance, the
+  allowance, a solution probe, a witness action, a clue, the near miss, the ambiguity, a recorded fingerprint, the level
+  fingerprint) each fail naming the level and the part.
+- **Golden frames, made by code.** `HueCompassGolden` (test builds only; forbidden in Release) describes 16 frames
+  (levels 1, 21, 41, 61, 81 at three tiers after their witness probes, plus the hero frame) at 1,152 × 768: the
+  projected needle tip, the 24 band colour samples with their colours, the probe marks, the selection mark and ring when
+  present, palette colours and tier detail, pinned with SHA-256 digests in `golden-frames.json`; an unequal digest falls
+  back to one 1/8-pixel quantum. The simulator renders the same frames and checks them with the feature-333 tolerances.
+  Regenerate on purpose with `HUE_COMPASS_WRITE_GOLDEN=1`.
+- **Memory.** Twelve open-draw-warn-close cycles stay within 16 MB of the first when run alone (measured 28.75 …
+  29.14 MB); the compass scene holds no renderers after each warning and close (`liveObjectCount`).
+- **Running it.** CI runs the host part as "Hue Compass regression (host)"; locally
+  `python3 scripts/hue_compass_regression.py` runs host and simulator parts with one summary.

@@ -208,6 +208,10 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   edit a trace step by replacing it with a move the kernel itself refuses at that point (asserted in the test), so the
   expected drop is known without asking the reconciliation code under test; a random walk that happens to win a level
   opens the next one, so the tests do not cap the frontier.
+- **Hue Compass regression** (R02-G04-08, 2026-11-21). `python3 scripts/hue_compass_regression.py` runs the host
+  filter `HueCompassRegression` (solver regression over 100 witnesses, golden descriptions) and then the simulator
+  golden-frame and memory classes with `TEST_RUNNER_HUE_COMPASS_MEMORY_ISOLATED=1`; CI runs the host part as a named
+  step. Golden frames show the witness probes (not a fresh play) so the probe marks are part of every level baseline.
 - **A trace of net actions needs no undo** (R02-G04-07, 2026-11-21). Hue Compass can undo only turns, so a winning
   trace is the play's records with each undone turn removed and each redone one put back (`netActions`); the
   persistence tests edit saves only in ways whose outcome is known without the code under test (a selection band

@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--audits",
+    "--only",
+    "r02-g04.hue-compass"
+  ],
+  "command": "python3 scripts/verify_experiences.py --audits --only r02-g04.hue-compass",
+  "elapsed_seconds": 2.596,
+  "exit_code": 0,
+  "finished": "2026-11-21T18:04:05+00:00",
+  "gate": "R02-G04-08",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G04-08.audits.log",
+  "log_sha256": "4ccad471bec83631bde339036faf4ac63e91c551876a71277e40bf7809d6c61e",
+  "name": "audits",
+  "started": "2026-11-21T18:04:02+00:00",
+  "timed_out": false
+}
