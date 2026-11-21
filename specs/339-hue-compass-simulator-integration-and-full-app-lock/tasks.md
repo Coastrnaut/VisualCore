@@ -44,7 +44,7 @@ tests stay short (< 10 s each; interface tests < 90 s, SC-R02G0409-001). No {own
 
 ## Phase 5: Story 3 — builds and solvability (P2)
 
-- [ ] T-R02G0409-006 [US3] Release build and symbols (`HueCompassGolden`, `acceptanceScenarios` already
+- [X] T-R02G0409-006 [US3] Release build and symbols (`HueCompassGolden`, `acceptanceScenarios` already — Verified 2026-11-21: 2026-11-21 release exit 0 (Release simulator build; HueCompassGolden and acceptanceScenarios absent from the Release binary); regression exit 0 (scripts/hue_compass_regression.py: 100 of 100 levels re-certified, golden frames, memory)
   forbidden): `--name release -- python3 scripts/release_check.py --only app-release-build app-release-symbols`;
   `--name regression -- python3 scripts/hue_compass_regression.py`
 
