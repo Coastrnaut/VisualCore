@@ -29,6 +29,47 @@ Canonical overrides:
   and Apply (feature 314), the round-two opening seed 0 (feature 309's amendment), the test-only golden code in the
   Release symbol list (feature 318).
 
+## Clarifications
+
+### Session 2026-11-21
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time. Facts checked in
+code (read-only, 2026-11-21): feature 309 (Aurora Loom) is the model (`Apps/VisualCore/Tests/UI/AuroraLoom`, namespace
+`AL`, serial chunk `i3`; identifiers through `port.identifier(name)`); Lissajous Labyrinth's panel
+(`LissajousLabyrinthControls`) has labels and values but no identifiers; its registration in
+`Apps/VisualCore/App/ExperienceRegistry.swift` still says "Snapshot schema 1, so no earlier examples" although the
+snapshot is schema 3 since feature 317 and stores no `examples:`; the canvas description
+(`LissajousLabyrinthPresenter.describe`) names the level, the four dials, the checkpoints, the actions and, when won,
+"The path is safe. s of 3 stars."; `RELEASE_FORBIDDEN` already holds `LissajousLabyrinthGolden` (feature 318).
+
+- Q: How do the interface tests find controls and what do they read? → A: every panel control gets the identifier
+  `experience.r02-g02.lissajous-labyrinth.<name>` through `port.identifier(name)`: the steppers `frequency-a`,
+  `frequency-b`, `phase-a`, `phase-c`, the buttons `apply`, `clear`, `undo`, `redo`, `next-level`, `reset-view`,
+  `hint`, `dismiss-tutorial`, `failure-undo`, `retry`, `campaign`, `daily`, `practice`, `replay`, `replay-step`,
+  `replay-stop`, the menu `level-picker` and the toggle `sound`. The tests read the canvas description for the level,
+  the dials and the stars, and the replay button's value for the replay position. Impact: FR-R02G0209-001, 002.
+- Q: Which interface tests exist and how are they grouped? → A: namespace `LL` in
+  `Apps/VisualCore/Tests/UI/LissajousLabyrinth/LLSupport.swift`; `LLPlayUITests` (fresh launch with `-vcResetData
+  -vcSkipWelcome -vcCandidates -openExperience r02-g02.lissajous-labyrinth`: dismiss the tutorial, set level 1's
+  certified solution as pending values with the steppers, Apply, read "The path is safe" and "3 of 3 stars", the level
+  picker shows level 2 open; relaunch without reset: the stars and level 2 are kept) and `LLReplayUITests` (after the
+  win, Replay, Step until the replay ends won, Stop back to the campaign). They run as a new serial chunk `j3` of
+  `release_check.py`; each test stays under 90 s. Level 1's start dials and solution are pinned in `LL` and checked
+  against the Core by an app unit test. Impact: FR-R02G0209-002, 007; SC-R02G0209-001.
+- Q: Which earlier-schema examples are stored and where do they come from? → A:
+  `LissajousLabyrinthExperienceCore.schemaOneExample()` (the schema-1 saved state of a seeded play of level 1 with one
+  action) and `schemaTwoExample()` (schema 2 with progress and level 1 solved, no trace), both `MigrationExample`s built
+  in the Core (`LissajousLabyrinthSchemaExamples.swift`, modelled on `AuroraLoomSchemaExamples`), registered with
+  `examples:`; the app's migration check restores both into schema 3 with progress kept. The registration's comment is
+  corrected. Impact: FR-R02G0209-003; SC-R02G0209-002.
+- Q: What proves the release configuration excludes test-only code? → A: the existing `app-release-build` and
+  `app-release-symbols` steps; `LissajousLabyrinthGolden` is already forbidden, and the Lissajous scenarios are checked
+  to exist only under `DEBUG || VISUALCORE_AUTOMATION` (covered by the existing `acceptanceScenarios` entry). Impact:
+  FR-R02G0209-004; SC-R02G0209-003.
+- Q: How is "not available" checked? → A: an app unit test: without `-vcCandidates` the catalog lists
+  `r02-g02.lissajous-labyrinth` as not available and the launcher cannot open it; the registry's candidates list
+  contains it and `all` does not. Impact: FR-R02G0209-006; SC-R02G0209-002.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - The game works inside the real app (Priority: P1) 🎯
