@@ -102,6 +102,22 @@ moves are listed point by point and direction by direction, and a state is solve
 - **Testing.** `WaveKnotKeeperGestureController` and `WaveKnotKeeperHandles` are host-tested with scripted touches;
   simulator tests send touches through the presenter's pointer entry.
 
+## Teaching and progression (R02-G03-05)
+
+- **Hints.** `WaveKnotKeeperSolver.solve(_:from:depth:)` runs the certified breadth-first search from the current rope
+  (depth at most 3 or the moves left). The first move of the shortest remaining solution gives three levels: the point,
+  then its axis, then the exact direction ("over"/"under" for ±z). Hints are unlimited, change nothing, do not affect
+  stars and reset after any change of the play; "No short solution from here; undo or retry" when none fits.
+- **Failures.** The kernel's summary in words: the rope's crossings and writhe against the target's, or two strands
+  overlapping in the view, followed by "Undo the last move or retry the level."; Undo rewinds the failing move.
+- **Tutorial.** On levels 1 … 3 in campaign mode: drag the hint's point one step, then match crossings and writhe through
+  the blue gates, then "ask for a hint"; dismissable; undo never moves it back and it is not in the digest.
+- **Progress and modes.** Stars 3 / 2 / 1 against the certified shortest (2 within shortest + 2); campaign wins open the
+  next level; the daily level is (days since 2026-01-01 × 43) mod 100 + 1 from the local date the presenter sends;
+  practice raises the allowance to 64 and records nothing. Snapshot schema 2 (`level`, `mode`, `progress`, `records`,
+  `tutorial`) with a migration from schema 1; digest domain `r02-g03.wave-knot-keeper.v2`; new refusals
+  `r02-g03.locked` and `r02-g03.date`.
+
 ## Failures
 
 `WaveKnotKeeperError` reason codes: `r02-g03.level`, `r02-g03.move`, `r02-g03.stage`, `r02-g03.stale`,

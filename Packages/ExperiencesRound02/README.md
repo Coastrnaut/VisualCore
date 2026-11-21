@@ -155,3 +155,9 @@ rope scene, minimal panel) registered as a candidate with a 94-scenario manifest
 Feature 324 (R02-G03-04) adds spatial play: `WaveKnotKeeperHandles` (picking, drag to one lattice step),
 `WaveKnotKeeperGestureController` (drag, tap, two-finger orbit, reset) and the orbit camera; the panel gains "Reset
 view".
+
+Feature 325 (R02-G03-05) adds teaching and progression: `WaveKnotKeeperSolver.solve(_:from:depth:)`,
+`WaveKnotKeeperHints` with `WaveKnotKeeperFailureExplanation`, and `WaveKnotKeeperProgress` with `WaveKnotKeeperMode`
+and `WaveKnotKeeperTutorialStep`; the adapter gains level selection, daily, practice and campaign modes, the tutorial
+controls and snapshot schema 2; the panel shows the instruction, hints, the failure explanation, the goal, the modes and
+a level picker.
