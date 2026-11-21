@@ -42,7 +42,7 @@ accessibility identifiers.
 
 - Q: How do the interface tests find controls and what do they read? → A: every panel control gets the identifier
   `experience.r02-g01.aurora-loom.<name>` through the experience's port (`port.identifier(name)`, as A21): `wave-<r>`,
-  `phase-<r>` (steppers, r = 1 … 3), `undo`, `redo`, `next-level`, `hint`, `retry`, `daily`, `practice`, `campaign`,
+  `phase-<r>` (steppers, r = 1 … 3), `apply`, `clear`, `undo`, `redo`, `next-level`, `hint`, `retry`, `daily`, `practice`, `campaign`,
   `level-picker`, `replay`, `replay-step`, `replay-stop`, `sound`, `skip-tutorial`. The tests read the canvas's
   description (`session.canvas`, the presenter's `describe`) for the level, stars and replay position. Impact:
   FR-R02G0109-001, 002.
@@ -65,6 +65,15 @@ accessibility identifiers.
 - Q: How is "not available" checked? → A: an app unit test: without `-vcCandidates` the catalog lists
   `r02-g01.aurora-loom` as not available and the launcher cannot open it; the registry's candidates list contains it and
   `all` does not. Impact: FR-R02G0109-006; SC-R02G0109-002.
+
+Amendment found while planning (2026-11-20): the panel's steppers spend one move per tap, so a player who uses only the
+panel (for example with VoiceOver) cannot win level 1 at all: ribbon 3 needs 4 + 7 single-step taps against an
+allowance of 9 and a certified shortest of 2 (feature 306 proved the win through `adjust` with whole deltas, which the
+steppers never send). Decision: the steppers set a **pending** step per ribbon control (shown as the stepper's value,
+"wave 15, now 3"); an **Apply** button commits every pending change as one move each, in ribbon order, wave before
+phase, exactly like a canvas drag commits one move per gesture; **Clear** drops the pending steps; pending steps are
+dropped when the level, mode or play changes from elsewhere. Moves, stars and the allowance are unchanged. Impact:
+FR-R02G0109-008; SC-R02G0109-007.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -125,6 +134,9 @@ regression proves all 100 levels solvable as certified.
 - **FR-R02G0109-005**: The all-level solvability regression (feature 308) MUST pass in this gate's evidence.
 - **FR-R02G0109-006**: Aurora Loom MUST stay a candidate: not listed as available, not openable from the catalog without
   the testing argument.
+- **FR-R02G0109-008**: The panel's steppers MUST set pending steps without spending moves; Apply MUST commit each
+  pending change as one move (ribbon order, wave before phase); Clear MUST drop them; pending steps MUST be dropped when
+  the level, mode or play changes from elsewhere, and MUST be announced and shown as the stepper's value.
 - **FR-R02G0109-007**: Existing tests MUST pass; the release checks that cover the app (interface test groups, app unit
   tests, app build) MUST include the new tests; the reference regression passes.
 
@@ -145,6 +157,8 @@ regression proves all 100 levels solvable as certified.
 - **SC-R02G0109-003**: Debug and release simulator builds of the app succeed.
 - **SC-R02G0109-004**: The solver regression passes for 100 of 100 levels.
 - **SC-R02G0109-005**: Existing tests pass; the reference regression passes 7 of 7.
+- **SC-R02G0109-007**: Every certified level can be won with the panel alone within its allowance, in exactly its
+  certified shortest number of moves (one Apply per solution); proven for all 100 levels through the presenter.
 - **SC-R02G0109-006** {device}: after ImplementationLock-100, the same journeys on D1/D2/D3 (feature 310 prepares them).
 
 ## Assumptions

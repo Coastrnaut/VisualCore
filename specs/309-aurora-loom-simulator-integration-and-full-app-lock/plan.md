@@ -7,7 +7,8 @@
 
 Prove Aurora Loom inside the one app on the simulator while it stays a candidate. In the host-tested `AuroraLoomCore`:
 `AuroraLoomExperienceCore.schemaOneExample()` and `schemaTwoExample()` (stored migration examples, A18 pattern). In
-the experience: stable accessibility identifiers on every panel control. In the app: the registration stores both
+the experience: stable accessibility identifiers on every panel control, and pending stepper steps with Apply and
+Clear (spec amendment: the steppers spent a move per tap, so panel-only players could not win level 1). In the app: the registration stores both
 examples (comment corrected); app unit tests restore them, open the candidate through the registry and engine and
 confirm it is not available; interface tests `ALPlayUITests` and `ALReplayUITests` (namespace `AL`) in a new
 serial chunk `i3`; `RELEASE_FORBIDDEN` gains `AuroraLoomGolden` and `acceptanceScenarios`, and the Release
@@ -45,7 +46,9 @@ Post-design re-check: PASS.
 ```text
 Packages/ExperiencesRound02/AuroraLoom/Core/AuroraLoomSchemaExamples.swift                         new   schemaOneExample, schemaTwoExample (lead)
 Packages/ExperiencesRound02/AuroraLoom/CoreTests/AuroraLoomSchemaExampleTests.swift                new   restore and migrate both (agent A)
-Packages/ExperiencesRound02/AuroraLoom/Experience/AuroraLoomControls.swift                         edit  identifiers (lead)
+Packages/ExperiencesRound02/AuroraLoom/Experience/AuroraLoomControls.swift                         edit  identifiers, pending steppers, Apply, Clear (lead)
+Packages/ExperiencesRound02/AuroraLoom/Experience/AuroraLoomPresenter.swift                        edit  pending steps, apply, clear (lead)
+Packages/ExperiencesRound02/AuroraLoom/ExperienceTests/AuroraLoomPanelTests.swift                  new   pending, apply, all 100 levels won through the panel (agent E)
 Apps/VisualCore/App/ExperienceRegistry.swift                   edit  examples, comment (lead)
 Apps/VisualCore/Tests/Unit/AppModelTests.swift                 edit  examples restore, candidate open, not available (agent B)
 Apps/VisualCore/Tests/UI/AuroraLoom/ALSupport.swift            new   (agent C)
