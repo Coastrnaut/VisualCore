@@ -31,7 +31,7 @@ R02-G05-03 are unchanged).
 
 ## Phase 3: Stories 1 and 4 — tutorial, progress, daily, practice (P1, P2)
 
-- [ ] T-R02G0505-003 [P] [US1] [US4] Create `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsProgress.swift` (ColorfallCanyonsTutorialStep
+- [X] T-R02G0505-003 [P] [US1] [US4] Create `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsProgress.swift` (ColorfallCanyonsTutorialStep — Verified 2026-11-21: 2026-11-21 host-2 exit 0: 17 tests in 0.07 s (tutorial steps steer/run/fill/done on levels 1-3 from certified solutions; undo/redo never move it; stars 3/2/1; scripted campaign through 100 levels; daily x 53 for every date 2026-2036 and 100-day coverage; impossible dates refused; practice/daily rules; Codable) (.autonomy/migration/checks/R02-G05-05.host-2.json); lead retest, campaign test made synthetic
   "steer → run (an edit was accepted and the plan is empty — the caller passes `planEmpty`) → fill (an accepted step) →
   done (the level ends); dismiss → done; undo never moves it back" with the texts of clarification Q2; ColorfallCanyonsMode "campaign, practice,
   daily(level)"; ColorfallCanyonsProgress "level 1 open; a campaign win opens the next; a better result replaces a worse
