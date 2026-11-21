@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "ColorfallCanyonsGeneratorTests"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter ColorfallCanyonsGeneratorTests",
+  "elapsed_seconds": 5.199,
+  "exit_code": 0,
+  "finished": "2026-11-21T20:47:10+00:00",
+  "gate": "R02-G05-02",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G05-02.host-3.log",
+  "log_sha256": "4668e7b49ad1faa715a0ac7ac45316d7874a047e8ddd5ff44ec1291665cc6a21",
+  "name": "host-3",
+  "started": "2026-11-21T20:47:05+00:00",
+  "timed_out": false
+}

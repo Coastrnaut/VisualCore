@@ -34,7 +34,7 @@ run uses). Fixture seed 2_342; tests stay short (< 10 s each).
 
 ## Phase 4: Story 2 — levels come from their planned seeds (P1)
 
-- [ ] T-R02G0502-004 [US2] Create `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsGenerator.swift` (ColorfallCanyonsBandProfile "grid 6 × 5, 6 × 5,
+- [X] T-R02G0502-004 [US2] Create `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsGenerator.swift` (ColorfallCanyonsBandProfile "grid 6 × 5, 6 × 5, — Verified 2026-11-21: 2026-11-21 host-3 exit 0 (generator by the lead: band profiles, candidates in the draw order of Q1, planted path changes, basins at pooled ends with planted targets, up to 512 candidates, levelID, catalog digest; 9 tests by agent C retested by the lead: determinism, profiles, generated level ranges, planted plan wins and unedited fails, difficulty from the solver, skipped candidates re-checked, refusal by number, digest, shuffle)
   7 × 5, 8 × 6, 8 × 6; springs 1, 2, 2, 3, 3; depressions 3, 4, 5, 8, 8; smallest 1 … 2, 2 … 3, 3, 3, 3",
   `candidate(_:index:)` drawing in the order of clarification Q1 from `SeededRandom(seed: SeedDerivation.derive(seed,
   index: k))` with the planted plan and basins, ColorfallCanyonsGenerated, `generate` with k = 0 … 511, id
