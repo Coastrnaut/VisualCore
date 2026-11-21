@@ -234,3 +234,12 @@ Feature 340 (R02-G04-10) prepares the device campaign without touching a device:
 (rows HC-D1 … HC-D8, pending) and `docs/apps/hue-compass/device-campaign.md`, checked by
 `scripts/check_device_rows.py --experience r02-g04.hue-compass`.
 
+## Colorfall Canyons (R02-G05, `r02-g05.colorfall-canyons`, free)
+
+`ColorfallCanyonsCore` (feature 341, R02-G05-01) is the playable rule kernel: `ColorfallCanyonsLevel` with
+`ColorfallCanyonsColor`, `ColorfallCanyonsGround`, `ColorfallCanyonsSpring` and `ColorfallCanyonsBasin` (immutable,
+fingerprinted, JSON schema 1), the exact fluid state `ColorfallCanyonsFluid` (synchronous downhill routing, whole-unit
+colour sharing, exact conservation) with `ColorfallCanyonsVerdict` and `ColorfallCanyonsFailure`, the play state
+`ColorfallCanyonsPlay` with `ColorfallCanyonsAction`, `ColorfallCanyonsStage`, `ColorfallCanyonsEvent` and append-only
+`ColorfallCanyonsRecord`s, and `ColorfallCanyonsRules` for the R02-F23 puzzle contract. Refusals are
+`ColorfallCanyonsError` with `r02-g05.*` codes. Rules: [docs/architecture/colorfall-canyons.md](../../docs/architecture/colorfall-canyons.md).

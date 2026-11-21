@@ -186,6 +186,10 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   a floating `atan2` reference agrees everywhere except within rounding of a boundary, so the comparison skips
   directions whose reference angle is within 10⁻⁶ rad of one, and the boundary vectors themselves are checked to fall
   in exactly one sector.
+- **Conserve exactly by sharing whole units** (R02-G05-01, 2026-11-21). Colorfall Canyons moves fluid in whole units
+  and shares an outflow between colours by largest remainder, so its flow tests assert zero drift per colour on every
+  tick of 500 seeded levels and compare each tick with an independent brute-force step written in the test, instead
+  of a tolerance.
 - **Quantise before hashing floats** for digests that must match across platforms (surface colours are hashed as
   16-bit values).
 
