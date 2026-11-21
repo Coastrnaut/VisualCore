@@ -144,7 +144,8 @@ buttons, steps, undo, redo), including winning every certified level.
 
 - **SC-R02G0504-001**: For 500 seeded scripted drags and taps on certified levels at several sizes, the actions sent equal
   an independent computation of the touched cell or spring, at most one per gesture.
-- **SC-R02G0504-002**: Second fingers, cancels and non-playing stages send nothing in every scripted case.
+- **SC-R02G0504-002**: Second fingers, cancels and non-playing stages send no game action (no carve and no valve) in
+  every scripted case; only the view may reset.
 - **SC-R02G0504-003**: At every orbit within bounds and every aspect 0.4 … 2.5 the scene stays inside the view with a
   5 % margin, and the digest never changes.
 - **SC-R02G0504-004**: All 100 certified levels are won through panel actions alone.
