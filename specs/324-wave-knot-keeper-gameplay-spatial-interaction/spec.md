@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-21
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G03-04 (migration ledger, game feature of experience R02-G03) · ID namespace FR-R02G0304-###,
 SC-R02G0304-###, T-R02G0304-###
@@ -24,6 +24,49 @@ Canonical overrides:
 - **Shared features used:** R02-F22 (spatial handles, picking, drag and assistive steps), R02-F10 (camera), the kernel,
   certified levels and renderer of R02-G03-01 … 03.
 - **Model:** feature 314 (Lissajous Labyrinth's gameplay spatial interaction).
+
+## Clarifications
+
+### Session 2026-11-21
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time. Facts checked in
+code (read-only, 2026-11-21): Lissajous Labyrinth's feature 314 solved the same problem with a host-tested
+`LissajousLabyrinthGestureController` (idle, turning, orbiting, cancelled; one action per gesture), an orbit in its scene
+geometry and handle picking; R02-F22 provides `SpatialHandle`, `HandlePicker.pick` (22 pt minimum radius), `HandleDrag`
+and `AssistiveStep`; Wave Knot Keeper's camera looks down −z tilted 20° about x with a 45° field of view and fits the
+bounding sphere for aspects 0.4 … 2.5; its handles are icospheres of radius 0.18 at the control points; its panel has a
+point picker (`point.select`) and six direction buttons that each send one `point.move`; its adapter accepts
+`point.move [point, direction 0…5]` and `point.select [point]`.
+
+- Q: How does a drag become a move? → A: the drag starts on a handle (picked with `HandlePicker` at the drawn camera, the
+  nearest to the eye among those within the touch radius); for each of the six directions the projected on-screen vector
+  of one lattice step (1/8 world unit) from the handle is computed with the drawn camera; the candidate is the direction
+  whose unit on-screen vector has the largest dot product with the drag vector, ties to the lower direction index, kept
+  only when the drag's component along it exceeds half that step's projected length (at least 6 points, so a tiny
+  projection cannot make a jitter a move); otherwise no candidate. Release sends exactly one `point.move [point,
+  direction]` for the candidate, or nothing. Impact: FR-R02G0304-001, 002; SC-R02G0304-001.
+- Q: How are touches arbitrated? → A: as features 304 and 314: a Core `WaveKnotKeeperGestureController` with idle,
+  dragging, orbiting and cancelled states; one finger on a handle starts dragging and selects that point
+  (`point.select`, presentation only); a second finger cancels the drag and orbits; a cancelled gesture sends nothing; a
+  release without movement beyond the snap distance is a tap that only selects; handles move only while playing (taps
+  still select); a refused move is announced with its reason and changes nothing. Impact: FR-R02G0304-003, 005;
+  SC-R02G0304-002.
+- Q: What can the camera do? → A: two-finger orbit of yaw (±40° around the authored view, 90° per view width) and pitch
+  (the tilt from the z axis between 5° and 60°, 60° per view height, authored 20°); a double tap on empty space or
+  "Reset view" returns to the authored view; the distance refits so the rope, handles and gates stay inside the view
+  with a 5 % margin at every orbit and aspect 0.4 … 2.5. Presentation only: never in the digest, the snapshot or the
+  kernel; not saved. Impact: FR-R02G0304-004; SC-R02G0304-003.
+- Q: How is the selection shown, and does the panel need pending moves? → A: the selected handle is drawn in ember (as
+  feature 323) and the description names it ("Point n selected"); a drag previews its candidate by drawing the selected
+  handle's would-be position as an ember ghost sphere. The panel needs no pending values: each direction button is
+  exactly one kernel move, the same unit a drag makes, so every certified solution is replayable through the panel with
+  one select and one button per move; the panel gains "Reset view". Impact: FR-R02G0304-005, 006; SC-R02G0304-004, 005.
+- Q: How are gestures tested without a screen? → A: the Core gesture controller takes pointer events with the view size
+  and the drawn camera and returns at most one action per gesture plus the preview and selection; tests feed scripted
+  drags (seeded directions and lengths from each handle, second fingers, cancels, empty space) at fixed sizes and compare
+  with the direction computed independently from the camera; simulator tests send the same touches through the
+  experience's pointer entry; a host test wins all 100 levels through `point.select` and panel moves. Impact:
+  FR-R02G0304-007; SC-R02G0304-001, 002, 004.
 
 ## User Scenarios & Testing *(mandatory)*
 
