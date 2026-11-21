@@ -88,7 +88,7 @@ which action — a probe that narrows the possible targets, or the selection onc
 ### User Story 3 - Understand a failure (Priority: P1)
 
 After a miss or running out of probes the player is told exactly why — how far the selection was from the target, or
-that the probes ran out — and offered undo or retry.
+that the probes ran out — and offered a retry.
 
 **Independent Test**: every failure explanation names the true distances or the exhausted allowance.
 
