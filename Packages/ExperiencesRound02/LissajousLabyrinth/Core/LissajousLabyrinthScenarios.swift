@@ -169,6 +169,11 @@ extension LissajousLabyrinthExperienceCore {
             refusedEntry("mode.daily", [2026, 2, 30], "action.rule." + LissajousLabyrinthExperienceRule.date),
             refusedEntry("mode.daily", [2026, 11], "action.wrong-value-count"),
             refusedEntry("mode.practice", [1], "action.wrong-value-count"),
+            // Feature 317: replay without a verified result, outside replay, and out of range.
+            refusedEntry("replay.start", [1], "action.rule." + LissajousLabyrinthExperienceRule.noReplay),
+            refusedEntry("replay.step", [], "action.rule." + LissajousLabyrinthExperienceRule.noReplay),
+            refusedEntry("replay.stop", [], "action.rule." + LissajousLabyrinthExperienceRule.noReplay),
+            refusedEntry("replay.start", [101], outOfRange),
         ]
     }
 

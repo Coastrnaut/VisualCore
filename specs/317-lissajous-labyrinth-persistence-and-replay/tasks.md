@@ -23,7 +23,7 @@ tests stay short (< 10 s each).
 
 ## Phase 3: Stories 1 and 3 — save, migrate, replay (P1, P2)
 
-- [ ] T-R02G0207-003 [US1] [US2] [US3] Edit `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthExperienceCore.swift` (schema 3, migration
+- [X] T-R02G0207-003 [US1] [US2] [US3] Edit `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthExperienceCore.swift` (schema 3, migration — Verified 2026-11-21: 2026-11-21 host-2 exit 0: LissajousLabyrinthExperienceCoreTests 16/16 (schema 3, digest v3, thirteen controls; a win records its trace and replay plays it action by action without changing progress, other actions refused during replay, replay-end and stop; schema 1 and 2 migrate to 3, untraced results kept unverified, an edited result dropped and counted with the frontier as saved, an honest save restores to the same digest) and LissajousLabyrinthScenariosTests with the regenerated manifest (replay refusals)
   2 → 3 "results with an empty trace and verified false", digest v3; a campaign or daily win records the winning trace
   (the play's net changes); restore reconciles and exposes `reconciliationDropped` (not digested); actions
   "replay.start [1…100]" (`r02-g02.no-replay` without a verified traced result), "replay.step" (`r02-g02.replay-end`

@@ -38,6 +38,13 @@
 // records. Digest "r02-g02.lissajous-labyrinth.v2": level, play fingerprint, progress and mode (never the tutorial step,
 // which undo does not move back). Snapshot schema 2: `{"level", "mode", "progress", "records", "tutorial"}`; schema-1
 // payloads migrate (the saved level open, campaign mode, the tutorial recomputed).
+// Feature 317 (R02-G02-07) T-R02G0207-003 (FR-R02G0207-001 … 006; clarifications Q1–Q5): a campaign or daily win records
+// its winning trace (the play's net changes) with the result; restore reconciles every result
+// (`LissajousLabyrinthReconciliation`, the frontier as saved) and exposes `reconciliationDropped` (not digested); the
+// replay mode `replay(level)` plays a verified trace action by action with `replay.start [1…100]`
+// (`r02-g02.no-replay`), `replay.step` (`r02-g02.replay-end`) and `replay.stop`; in replay every other action except
+// `tutorial.dismiss` is refused (`r02-g02.replay`) and nothing is recorded. Digest "r02-g02.lissajous-labyrinth.v3";
+// snapshot schema 3 (results carry `trace` and `verified`), migrating 1 → 2 → 3.
 //
 // Quality: three host tiers, best first as the contract requires (`qualityProfile` level 0 is the best and no budget
 // may rise). Host tier `t` draws `LissajousLabyrinthTier.of(t)`: level-0 = 4,096 samples, 2 glow passes, trail 512;
@@ -57,6 +64,12 @@ public enum LissajousLabyrinthExperienceRule {
     public static let locked = "r02-g02.locked"
     /// An impossible calendar date (feature 315).
     public static let date = "r02-g02.date"
+    /// No verified result with a trace to replay (feature 317).
+    public static let noReplay = "r02-g02.no-replay"
+    /// The replay has no further action (feature 317).
+    public static let replayEnd = "r02-g02.replay-end"
+    /// An action that is not allowed during replay (feature 317).
+    public static let replay = "r02-g02.replay"
 }
 
 /// Why a saved Lissajous Labyrinth state was refused on restore (feature 313). A refused restore changes nothing.
@@ -74,12 +87,13 @@ public struct LissajousLabyrinthExperienceCore: ExperienceCore, Equatable {
     /// The experience's id in the catalog.
     public static let experienceID = "r02-g02.lissajous-labyrinth"
     /// The snapshot schema this build writes.
-    public static let schemaVersion = 2
-    /// The digest's domain string (schema 2).
-    public static let digestDomain = "r02-g02.lissajous-labyrinth.v2"
+    public static let schemaVersion = 3
+    /// The digest's domain string (schema 3).
+    public static let digestDomain = "r02-g02.lissajous-labyrinth.v3"
     /// The action ids in declaration order.
     public static let actionIDs = ["dial.set", "play.undo", "play.redo", "level.next", "level.select", "mode.daily",
-                                   "mode.practice", "mode.campaign", "tutorial.dismiss", "tutorial.hint"]
+                                   "mode.practice", "mode.campaign", "tutorial.dismiss", "tutorial.hint",
+                                   "replay.start", "replay.step", "replay.stop"]
     /// The allowance of a practice play: the kernel's maximum.
     public static let practiceAllowance = 64
     /// The level numbers of the catalog.
@@ -103,6 +117,9 @@ public struct LissajousLabyrinthExperienceCore: ExperienceCore, Equatable {
     public private(set) var tutorial: LissajousLabyrinthTutorialStep
     /// The certified shortest solution length of the current level (stars). Derived from the level number.
     public private(set) var certifiedShortest: Int
+    /// How many saved results the last restore dropped because they did not verify (feature 317); not in the digest,
+    /// the snapshot or `==`.
+    public private(set) var reconciliationDropped = 0
     /// The current level's winning settings, for hints. Derived from the level, so not in the digest, the snapshot or
     /// `==`.
     public private(set) var winning: [LissajousLabyrinthDials]
@@ -277,9 +294,29 @@ public struct LissajousLabyrinthExperienceCore: ExperienceCore, Equatable {
 
     // MARK: Contract
 
-    /// Schema 2 with the step 1 → 2 (``migratedToSchemaTwo(_:)``); a payload that does not decode is refused.
+    /// Schema 3 with the steps 1 → 2 (``migratedToSchemaTwo(_:)``) and 2 → 3 (``migratedToSchemaThree(_:)``); a
+    /// payload that does not decode is refused.
     public static var migrations: MigrationChain {
-        MigrationChain(currentVersion: schemaVersion, steps: [1: { payload in try migratedToSchemaTwo(payload) }])
+        MigrationChain(currentVersion: schemaVersion, steps: [1: { payload in try migratedToSchemaTwo(payload) },
+                                                             2: { payload in try migratedToSchemaThree(payload) }])
+    }
+
+    /// The schema-3 object of a schema-2 object: every solved result gains an empty `trace` and `verified` false.
+    ///
+    /// - Throws: ``LissajousLabyrinthRestoreRefusal/damaged`` when `object` has no progress with a solved list.
+    public static func migratedToSchemaThree(_ object: [String: Any]) throws -> [String: Any] {
+        guard var progress = object["progress"] as? [String: Any], let solved = progress["solved"] as? [Any] else {
+            throw LissajousLabyrinthRestoreRefusal.damaged
+        }
+        progress["solved"] = solved.map { entry -> Any in
+            guard var result = entry as? [String: Any] else { return entry }
+            result["trace"] = [Any]()
+            result["verified"] = false
+            return result
+        }
+        var migrated = object
+        migrated["progress"] = progress
+        return migrated
     }
 
     /// The schema-2 object of a schema-1 object `{"level", "records"}`: the saved level open, campaign mode, no
@@ -317,6 +354,9 @@ public struct LissajousLabyrinthExperienceCore: ExperienceCore, Equatable {
         ExperienceControl(id: "mode.campaign"),
         ExperienceControl(id: "tutorial.dismiss"),
         ExperienceControl(id: "tutorial.hint"),
+        ExperienceControl(id: "replay.start", ranges: [1...100]),
+        ExperienceControl(id: "replay.step"),
+        ExperienceControl(id: "replay.stop"),
     ]
 
     /// The ten controls with their declared ranges (see the file header).
@@ -351,8 +391,31 @@ public struct LissajousLabyrinthExperienceCore: ExperienceCore, Equatable {
             }
             wholeValues.append(whole)
         }
+        if case .replay = mode, !Self.replayControls.contains(action.control) {
+            return .rejected(.rule(code: LissajousLabyrinthExperienceRule.replay))
+        }
         do throws(LissajousLabyrinthError) {
             switch action.control {
+            case "replay.start":
+                guard let result = progress.solved[wholeValues[0]], result.verified, !result.trace.isEmpty else {
+                    return .rejected(.rule(code: LissajousLabyrinthExperienceRule.noReplay))
+                }
+                try open(number: wholeValues[0], mode: .replay(level: wholeValues[0]))
+                tutorial = .done
+            case "replay.step":
+                guard case .replay(let level) = mode, let result = progress.solved[level], result.verified else {
+                    return .rejected(.rule(code: LissajousLabyrinthExperienceRule.noReplay))
+                }
+                let index = play.records.count
+                guard play.stage == .playing, index < result.trace.count else {
+                    return .rejected(.rule(code: LissajousLabyrinthExperienceRule.replayEnd))
+                }
+                try play.apply(result.trace[index], expecting: play.fingerprint)
+            case "replay.stop":
+                guard case .replay(let level) = mode else {
+                    return .rejected(.rule(code: LissajousLabyrinthExperienceRule.noReplay))
+                }
+                try open(number: progress.isOpen(level) ? level : progress.frontier, mode: .campaign)
             case "dial.set":
                 let move = LissajousLabyrinthAction(dial: Self.dialOrder[wholeValues[0]], value: wholeValues[1])
                 try play.apply(move, expecting: play.fingerprint)
@@ -399,6 +462,14 @@ public struct LissajousLabyrinthExperienceCore: ExperienceCore, Equatable {
         return .accepted
     }
 
+    /// The controls accepted during replay.
+    static let replayControls: Set<String> = ["replay.start", "replay.step", "replay.stop", "tutorial.dismiss"]
+
+    /// The winning trace of the current play: its net changes in order (one per action spent).
+    var winningTrace: [LissajousLabyrinthAction] {
+        play.undoStack.map { LissajousLabyrinthAction(dial: $0.dial, value: $0.to) }
+    }
+
     /// A fresh play of manifest number `number` in `mode` (the practice copy in practice mode), with the level's first
     /// tutorial step; changes nothing when the kernel refuses.
     private mutating func open(number: Int, mode: LissajousLabyrinthMode) throws(LissajousLabyrinthError) {
@@ -420,9 +491,11 @@ public struct LissajousLabyrinthExperienceCore: ExperienceCore, Equatable {
         guard play.stage == .won else { return }
         switch mode {
         case .campaign:
-            progress.record(level: levelNumber, actions: play.spent, shortest: certifiedShortest, opensNext: true)
+            progress.record(level: levelNumber, actions: play.spent, shortest: certifiedShortest, opensNext: true,
+                            trace: winningTrace)
         case .daily:
-            progress.record(level: levelNumber, actions: play.spent, shortest: certifiedShortest, opensNext: false)
+            progress.record(level: levelNumber, actions: play.spent, shortest: certifiedShortest, opensNext: false,
+                            trace: winningTrace)
         case .practice, .replay:
             break
         }
@@ -512,10 +585,20 @@ public struct LissajousLabyrinthExperienceCore: ExperienceCore, Equatable {
             }
             let openingNumber = levelNumber(forSeed: seed)
             let openingCore = try opening(number: openingNumber)
-            return LissajousLabyrinthExperienceCore(levelNumber: decoded.level, play: play, progress: decoded.progress,
-                                                    mode: decoded.mode, tutorial: tutorial,
-                                                    certifiedShortest: certified.solution.shortest, winning: winning,
-                                                    openingNumber: openingNumber, opening: openingCore.opening)
+            // Feature 317: every saved result is checked by replaying its trace; the frontier stays as saved.
+            let reconciled = LissajousLabyrinthReconciliation.reconcile(decoded.progress)
+            var core = LissajousLabyrinthExperienceCore(levelNumber: decoded.level, play: play,
+                                                        progress: reconciled.progress, mode: decoded.mode,
+                                                        tutorial: tutorial,
+                                                        certifiedShortest: certified.solution.shortest,
+                                                        winning: winning, openingNumber: openingNumber,
+                                                        opening: openingCore.opening)
+            core.reconciliationDropped = reconciled.dropped
+            // A replay whose result did not survive the check returns to campaign at that level (or the frontier).
+            if case .replay(let level) = decoded.mode, reconciled.progress.solved[level]?.verified != true {
+                try core.open(number: core.progress.isOpen(level) ? level : core.progress.frontier, mode: .campaign)
+            }
+            return core
         } catch {
             throw LissajousLabyrinthRestoreRefusal.kernel(error)
         }

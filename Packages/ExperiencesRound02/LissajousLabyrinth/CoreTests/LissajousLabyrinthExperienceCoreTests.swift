@@ -68,16 +68,20 @@ import VisualCoreExperience
 
     @Test func theControlsTheTiersAndTheProfile() {
         // Feature 315: schema 2, digest v2 and the teaching and progression controls.
-        #expect(Core.experienceID == "r02-g02.lissajous-labyrinth" && Core.schemaVersion == 2)
-        #expect(Core.digestDomain == "r02-g02.lissajous-labyrinth.v2")
+        // Feature 317: schema 3, digest v3 and the replay controls.
+        #expect(Core.experienceID == "r02-g02.lissajous-labyrinth" && Core.schemaVersion == 3)
+        #expect(Core.digestDomain == "r02-g02.lissajous-labyrinth.v3")
         #expect(Core.controls.map(\.id) == Core.actionIDs)
         #expect(Core.actionIDs == ["dial.set", "play.undo", "play.redo", "level.next", "level.select", "mode.daily",
-                                   "mode.practice", "mode.campaign", "tutorial.dismiss", "tutorial.hint"])
+                                   "mode.practice", "mode.campaign", "tutorial.dismiss", "tutorial.hint",
+                                   "replay.start", "replay.step", "replay.stop"])
         #expect(Core.controls[0].ranges == [0...3, 0...15])
         for index in 1..<4 { #expect(Core.controls[index].ranges.isEmpty) }
         #expect(Core.controls[4].ranges == [1...100])
         #expect(Core.controls[5].ranges == [1...9999, 1...12, 1...31])
         for index in 6..<10 { #expect(Core.controls[index].ranges.isEmpty) }
+        #expect(Core.controls[10].ranges == [1...100])
+        for index in 11..<13 { #expect(Core.controls[index].ranges.isEmpty) }
         #expect(Core.dialOrder == [.frequencyA, .frequencyB, .phaseA, .phaseC])
         #expect(Core.qualityTiers == 3)
         let profile: QualityProfile = Core.qualityProfile
@@ -365,5 +369,57 @@ import VisualCoreExperience
         let back = try Core.restore(payload: practice, seed: 0)
         #expect(back == core && back.play.level.allowance == Core.practiceAllowance)
         #expect(try Self.digest(back) == Self.digest(core))
+    }
+
+    // MARK: Feature 317 (R02-G02-07) T-R02G0207-003: traces, reconciliation, schema 3, replay
+
+    @Test func aWinRecordsItsTraceAndReplayPlaysIt() async throws {
+        var core: Core = try await Core.prepare(seed: 0)
+        #expect(core.apply(ExperienceAction(control: "replay.start", values: [1], step: 0))
+            == .rejected(.rule(code: "r02-g02.no-replay")))
+        try Self.solve(&core)
+        let result = try #require(core.progress.solved[1])
+        let solution = try Core.generated(number: 1).solution.actions
+        #expect(result.verified && result.trace == solution && result.bestActions == solution.count)
+        let progress = core.progress
+        #expect(core.apply(ExperienceAction(control: "replay.start", values: [1], step: 0)) == .accepted)
+        #expect(core.mode == .replay(level: 1) && core.play.records.isEmpty && core.tutorial == .done)
+        #expect(core.apply(Self.set(3, 0)) == .rejected(.rule(code: "r02-g02.replay")))
+        #expect(core.apply(ExperienceAction(control: "level.next", step: 0)) == .rejected(.rule(code: "r02-g02.replay")))
+        for _ in solution {
+            #expect(core.apply(ExperienceAction(control: "replay.step", step: 0)) == .accepted)
+        }
+        #expect(core.play.stage == .won && core.progress == progress, "replay never changes progress")
+        #expect(core.apply(ExperienceAction(control: "replay.step", step: 0))
+            == .rejected(.rule(code: "r02-g02.replay-end")))
+        #expect(core.apply(ExperienceAction(control: "replay.stop", step: 0)) == .accepted)
+        #expect(core.mode == .campaign && core.levelNumber == 1)
+    }
+
+    @Test func schemaOneAndTwoMigrateToThreeAndRestoreReconciles() async throws {
+        let one: [String: Any] = ["level": 3, "records": [Any]()]
+        let three = try Core.migrations.migrate(one, from: 1)
+        let restored = try Core.restore(payload: try JSONSerialization.data(withJSONObject: three), seed: 0)
+        #expect(restored.levelNumber == 3 && restored.progress.frontier == 3 && restored.reconciliationDropped == 0)
+        let two: [String: Any] = ["level": 2, "mode": ["mode": "campaign"], "records": [Any](),
+                                  "progress": ["frontier": 2, "solved": [["level": 1, "bestActions": 1, "stars": 3]]]]
+        let migrated = try Core.migrations.migrate(two, from: 2)
+        let fromTwo = try Core.restore(payload: try JSONSerialization.data(withJSONObject: migrated), seed: 0)
+        let kept = try #require(fromTwo.progress.solved[1])
+        #expect(!kept.verified && kept.trace.isEmpty && fromTwo.reconciliationDropped == 0)
+        // An edited result (stars raised on a slower trace) is dropped and counted; the frontier stays as saved.
+        var core: Core = try await Core.prepare(seed: 0)
+        try Self.solve(&core)
+        var object = try #require(try JSONSerialization.jsonObject(with: core.snapshotPayload()) as? [String: Any])
+        var progress = try #require(object["progress"] as? [String: Any])
+        var solved = try #require(progress["solved"] as? [[String: Any]])
+        solved[0]["bestActions"] = 2
+        progress["solved"] = solved
+        object["progress"] = progress
+        let edited = try Core.restore(payload: try JSONSerialization.data(withJSONObject: object), seed: 0)
+        #expect(edited.reconciliationDropped == 1 && edited.progress.solved[1] == nil && edited.progress.frontier == 2)
+        let honest = try Core.restore(payload: try core.snapshotPayload(), seed: 0)
+        #expect(honest == core && honest.reconciliationDropped == 0)
+        #expect(try Self.digest(honest) == Self.digest(core))
     }
 }
