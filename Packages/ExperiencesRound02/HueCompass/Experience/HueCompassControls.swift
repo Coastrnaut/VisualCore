@@ -15,6 +15,8 @@
 // button rows become columns at accessibility text sizes, texts wrap rather than truncate, the panel keeps a readable
 // width of at most 520 points (padding included), a Sound toggle (off by default) drives the ambient loop, refusals show
 // in words, and the panel tells the presenter when it is on screen and when the app's scene is active.
+// Feature 337 (R02-G04-07) T-R02G0407-005: Replay best solution for a verified solved level, and during replay its
+// position with Step and Stop, each with a label and a value.
 #if os(iOS)
 import HueCompassCore
 import SwiftUI
@@ -60,6 +62,7 @@ struct HueCompassControls: View {
                 playRow
                 modeRow
                 levelMenu
+                replaySection
                 soundToggle
             }
             .padding()
@@ -76,6 +79,26 @@ struct HueCompassControls: View {
             VStack(alignment: .leading, spacing: 8) { content() }
         } else {
             HStack(spacing: 16) { content() }
+        }
+    }
+
+    /// Replay of the best stored solution: Replay, or during replay its position with Step and Stop (feature 337).
+    @ViewBuilder private var replaySection: some View {
+        if mirror.replaying {
+            Text("Replay: action \(mirror.replayPosition) of \(mirror.replayLength)").font(.callout)
+                .fixedSize(horizontal: false, vertical: true)
+            row {
+                Button("Step") { presenter.stepReplay(port: port) }
+                    .accessibilityLabel("Play the next action of the replay")
+                    .accessibilityValue("Action \(mirror.replayPosition) of \(mirror.replayLength)")
+                Button("Stop") { presenter.stopReplay(port: port) }
+                    .accessibilityLabel("Stop the replay")
+                    .accessibilityValue("\(mirror.replayLength) actions")
+            }
+        } else if mirror.replayAvailable {
+            Button("Replay best solution") { presenter.startReplay(port: port) }
+                .accessibilityLabel("Replay your best solution of this level")
+                .accessibilityValue("Level \(mirror.levelNumber)")
         }
     }
 
@@ -186,6 +209,7 @@ struct HueCompassControls: View {
         case .campaign: mode = "Campaign"
         case .practice: mode = "Practice"
         case .daily: mode = "Daily level"
+        case .replay: mode = "Replay"
         }
         return "\(mode) · goal: \(mirror.allowance) units allowed, fewest probes \(mirror.smallest)"
     }

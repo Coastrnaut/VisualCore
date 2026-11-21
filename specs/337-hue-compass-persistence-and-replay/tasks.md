@@ -43,7 +43,7 @@ tests stay short (< 10 s each). {device} items are D1–D3 observations after Im
 
 ## Phase 4: Panel and simulator proof
 
-- [ ] T-R02G0407-005 [US3] Edit `Packages/ExperiencesRound02/HueCompass/Experience/HueCompassPresenter.swift` and `Packages/ExperiencesRound02/HueCompass/Experience/HueCompassControls.swift`
+- [X] T-R02G0407-005 [US3] Edit `Packages/ExperiencesRound02/HueCompass/Experience/HueCompassPresenter.swift` and `Packages/ExperiencesRound02/HueCompass/Experience/HueCompassControls.swift` — Verified 2026-11-21: 2026-11-21 sim-27 exit 0 on sim-27.2: HueCompassReplayTests (replay reproduces the win action by action; other actions refused with words; past the end refused; stop returns to campaign; no saved solution refused; dropped result announced once) and every Hue Compass experience test
   (Replay for a verified solved level, Step and Stop with labels and values, the replay position; the dropped results
   announced once: "n saved results could not be checked and were removed.") and create
   `Packages/ExperiencesRound02/HueCompass/ExperienceTests/HueCompassReplayTests.swift` (agent C: replay through the port reproduces the fingerprints action
