@@ -135,3 +135,26 @@ long step as single ticks; the play accepts both.
 - **Without gestures.** The panel keeps every action: the cell picker and Carve, a valve button per spring, Step 1,
   Step 10, Run, Undo, Redo, Next level and Reset view. A host test wins all 100 certified levels through panel actions.
 
+## Teaching and progression (feature 345, R02-G05-05)
+
+- **Tutorial.** On levels 1 … 3, in every mode, one instruction at a time: steer (carve channels or switch valves until
+  the fluid will reach the right basins), run (let the fluid run), fill (fill every basin without overflow). Steer
+  advances once an edit was accepted and the hint's plan is empty; run advances on an accepted step; the end of the level
+  ends it. Dismiss ends it for that opening; undo never moves it back. The step is snapshotted but not digested.
+- **Hints.** `ColorfallCanyonsSolver.plan(_:from:budget:)` searches edit sets applied now (at most min(actions left, 3))
+  from the current fluid with the solver's order, routing-key deduplication and reachability pruning, and re-runs the
+  set found through the kernel. Its first edit (or "run" when it is empty) is the hint, at three levels: what, where (the
+  row or the spring's colour), exactly. Without a plan the hint says no win is reachable and suggests undo or retry.
+  Hints never change the state, are unlimited and reset after any change of the play; a won level has none.
+- **Failure explanation.** From the failing tick, in the kernel's verdict order: the contaminated basin with the wrong
+  colours and their mass against the tolerance, the overflowing basin against its capacity, or at time-out the first
+  basin not filled with its amounts against its target; each ends "Undo the last change or retry the level."
+- **Progress.** Level 1 open; a campaign win opens the next and records the fewest actions spent and stars (3 at most the
+  certified smallest edit count, 2 within two more, else 1); five bands of 20. `level.select` and `level.next` refuse a
+  locked level (`r02-g05.locked`). The daily level is (days since 2026-01-01 × 53) mod 100 + 1 for the local date sent as
+  `mode.daily` (`r02-g05.date` for an impossible date); it records results but opens nothing. Practice raises the budget
+  to 30 and records nothing.
+- **Schema 2.** The snapshot is `{level, mode, progress, records, tutorial}`; schema-1 payloads migrate (levels up to the
+  saved one open, campaign mode, the tutorial at its first step on levels 1 … 3). Digest `r02-g05.colorfall-canyons.v2`
+  holds the level, the play's fingerprint, the progress and the mode.
+

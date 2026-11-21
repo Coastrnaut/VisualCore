@@ -203,6 +203,10 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   compute the expected cell or spring in the test with their own plane and box intersections (only the ray is shared)
   over seeded points, sizes and orbits, and each was shown to fail by changing one threshold; a panel test wins all 100
   certified levels through panel actions, in eight groups so each stays short.
+- **Keep shared generation out of per-test time** (R02-G05-05, 2026-11-21). A progress test generated all 100 Colorfall
+  Canyons levels only to read their smallest edit counts and took 8 s; the rules it checks do not depend on the levels,
+  so it uses synthetic counts and takes a millisecond. Hint tests over 200 seeded states run in eight groups of 25, since
+  each hint search can take up to about 0.5 s on the debug build.
 - **Quantise before hashing floats** for digests that must match across platforms (surface colours are hashed as
   16-bit values).
 

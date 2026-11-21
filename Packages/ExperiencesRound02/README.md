@@ -268,3 +268,10 @@ drag to carve, tap a valve, two-finger orbit, double-tap reset); in the experien
 "Reset view". Host tests compare 500 seeded picks and 4,500 seeded gestures with independent computations and win all
 100 levels through panel actions.
 
+Feature 345 (R02-G05-05) adds teaching and progression: `ColorfallCanyonsSolver.plan(_:from:budget:)` (a smallest edit
+set from the current fluid), `ColorfallCanyonsHints` with `ColorfallCanyonsHint` and
+`ColorfallCanyonsFailureExplanation`, and `ColorfallCanyonsProgress` with `ColorfallCanyonsMode` and
+`ColorfallCanyonsTutorialStep`; the adapter gains `level.select`, `mode.daily`, `mode.practice`, `mode.campaign` and
+`tutorial.dismiss` with snapshot schema 2; the panel shows the tutorial, hints, failure text with Undo and Retry, modes
+and a level picker.
+
