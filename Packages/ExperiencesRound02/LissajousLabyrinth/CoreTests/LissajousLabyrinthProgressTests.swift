@@ -332,8 +332,11 @@ private let progressWitnesses: Result<[LissajousLabyrinthWitness], any Error> = 
         #expect(decoded == progress)
         #expect(try decoded.encoded() == data)
         let text: String = String(decoding: data, as: UTF8.self)
-        #expect(text == "{\"frontier\":3,\"solved\":[{\"bestActions\":4,\"level\":1,\"stars\":3},"
-            + "{\"bestActions\":7,\"level\":2,\"stars\":1},{\"bestActions\":5,\"level\":40,\"stars\":2}]}")
+        // Feature 317: every entry now also carries its trace and `verified` (here a win without a trace).
+        #expect(text == "{\"frontier\":3,\"solved\":["
+            + "{\"bestActions\":4,\"level\":1,\"stars\":3,\"trace\":[],\"verified\":false},"
+            + "{\"bestActions\":7,\"level\":2,\"stars\":1,\"trace\":[],\"verified\":false},"
+            + "{\"bestActions\":5,\"level\":40,\"stars\":2,\"trace\":[],\"verified\":false}]}")
         let empty: Data = try LissajousLabyrinthProgress().encoded()
         #expect(try JSONDecoder().decode(LissajousLabyrinthProgress.self, from: empty) == LissajousLabyrinthProgress())
     }

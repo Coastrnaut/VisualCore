@@ -12,7 +12,7 @@ tests stay short (< 10 s each).
 
 ## Phase 2: Story 2 — reconcilable scores (P1) 🎯
 
-- [ ] T-R02G0207-002 [P] [US2] Edit `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthProgress.swift` (Result gains "trace: [LissajousLabyrinthAction]"
+- [X] T-R02G0207-002 [P] [US2] Edit `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthProgress.swift` (Result gains "trace: [LissajousLabyrinthAction]" — Verified 2026-11-21: 2026-11-21 host exit 0: LissajousLabyrinthReconciliationTests (every certified solution as a trace verifies, reconcile drops none; fewer actions replace, ties keep; traces encode and schema-2 entries decode unverified; overlong and out-of-range traces refused; edited stars, actions, a trace step, an illegal and a losing trace dropped and counted; untraced kept, frontier as saved; replay mode round trip) and LissajousLabyrinthProgressTests
   and "verified: Bool"; `record(level:actions:shortest:opensNext:trace:)` stores a verified result, replacing only with
   fewer actions; `drop(level:)`; encoding keeps old payloads decodable (missing trace → empty, verified false); mode
   case "replay(level:)") and create `Packages/ExperiencesRound02/LissajousLabyrinth/Core/LissajousLabyrinthReconciliation.swift` ("a result with a trace is kept

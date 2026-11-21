@@ -99,12 +99,13 @@ public struct LissajousLabyrinthFeedbackPlan: Sendable, Equatable {
         return LissajousLabyrinthFeedbackPlan(text: text, kind: .rejection, haptic: .error)
     }
 
-    /// The name of a mode in a level announcement: "campaign", "practice" or "daily level".
+    /// The name of a mode in a level announcement: "campaign", "practice", "daily level" or "replay".
     public static func modeName(_ mode: LissajousLabyrinthMode) -> String {
         switch mode {
         case .campaign: "campaign"
         case .practice: "practice"
         case .daily: "daily level"
+        case .replay: "replay"
         }
     }
 

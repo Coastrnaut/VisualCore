@@ -423,7 +423,7 @@ public struct LissajousLabyrinthExperienceCore: ExperienceCore, Equatable {
             progress.record(level: levelNumber, actions: play.spent, shortest: certifiedShortest, opensNext: true)
         case .daily:
             progress.record(level: levelNumber, actions: play.spent, shortest: certifiedShortest, opensNext: false)
-        case .practice:
+        case .practice, .replay:
             break
         }
     }
