@@ -12,7 +12,7 @@ tests stay short (< 10 s each).
 
 ## Phase 2: Story 2 — reconcilable scores (P1) 🎯
 
-- [ ] T-R02G0307-002 [P] [US2] Edit `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperProgress.swift` (Result gains "trace: [WaveKnotKeeperMove]"
+- [X] T-R02G0307-002 [P] [US2] Edit `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperProgress.swift` (Result gains "trace: [WaveKnotKeeperMove]" — Verified 2026-11-21: 2026-11-21 host exit 0: WaveKnotKeeperReconciliationTests 11/11 (every certified solution verifies; edited stars, moves, trace step, illegal and short traces dropped and counted; untraced kept; frontier unchanged; replace only with fewer moves) and WaveKnotKeeperProgressTests
   and "verified: Bool"; `record(level:moves:shortest:opensNext:trace:)` stores a verified result, replacing only with
   fewer moves; `drop(level:)`; encoding keeps old payloads decodable (missing trace → empty, verified false); mode
   case "replay(level:)") and create `Packages/ExperiencesRound02/WaveKnotKeeper/Core/WaveKnotKeeperReconciliation.swift` ("a result with a trace is kept

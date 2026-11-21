@@ -330,9 +330,9 @@ private func progressWitness(_ number: Int) throws -> WaveKnotKeeperWitness {
         #expect(try decoded.encoded() == data)
         let text: String = String(decoding: data, as: UTF8.self)
         #expect(text == "{\"frontier\":3,\"solved\":["
-            + "{\"bestMoves\":3,\"level\":1,\"stars\":3},"
-            + "{\"bestMoves\":6,\"level\":2,\"stars\":1},"
-            + "{\"bestMoves\":4,\"level\":40,\"stars\":2}]}")
+            + "{\"bestMoves\":3,\"level\":1,\"stars\":3,\"trace\":[],\"verified\":false},"
+            + "{\"bestMoves\":6,\"level\":2,\"stars\":1,\"trace\":[],\"verified\":false},"
+            + "{\"bestMoves\":4,\"level\":40,\"stars\":2,\"trace\":[],\"verified\":false}]}")
         let empty: Data = try WaveKnotKeeperProgress().encoded()
         #expect(try JSONDecoder().decode(WaveKnotKeeperProgress.self, from: empty) == WaveKnotKeeperProgress())
     }
