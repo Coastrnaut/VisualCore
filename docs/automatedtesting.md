@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-21 (R02-G03-10: Wave Knot Keeper's device rows checked by the release step device-rows-r02-g03; the definition was validated against a scratch root of the ledger, manifest and task files before it entered the repository).
+Last updated: 2026-11-21 (R02-G04-01: Hue Compass's kernel decides angles with a constant integer boundary table; the independent `atan2` reference is compared only away from the boundaries).
 
 ## 1. What is tested, and where
 
@@ -181,6 +181,11 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   directions to a 2^−30 grid made seam and pole vertices identical.
 - **Count combinations before writing them down.** A spec said 72 sampled states for 9 × 2 × 3 × 2 × 2 (216); the
   test that counted them caught it (A14-P05). Let tests count enumerations instead of hard-coding a number first.
+- **Decide angles with constant integer tables, test with floats away from the edges.** Hue Compass's sector of a
+  direction comes from 96 boundary vectors rounded once and stored as constants, tested by cross products (R02-G04-01);
+  a floating `atan2` reference agrees everywhere except within rounding of a boundary, so the comparison skips
+  directions whose reference angle is within 10⁻⁶ rad of one, and the boundary vectors themselves are checked to fall
+  in exactly one sector.
 - **Quantise before hashing floats** for digests that must match across platforms (surface colours are hashed as
   16-bit values).
 

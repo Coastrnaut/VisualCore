@@ -183,3 +183,12 @@ Feature 329 (R02-G03-09) integrates the game into the one app as a candidate: pa
 
 Feature 330 (R02-G03-10) prepares the device campaign: `docs/apps/wave-knot-keeper/device-rows.json` (rows WK-D1 …
 WK-D8, all pending) and `device-campaign.md`, checked by the release step `device-rows-r02-g03`.
+
+## Hue Compass (R02-G04, `r02-g04.hue-compass`, free)
+
+`HueCompassCore` (feature 331, R02-G04-01) is the playable rule kernel: the exact wheel `HueCompassWheel` (96 bearings,
+24 hue bands, the integer sector rule, circular distances, arcs) with `HueCompassClue` and `HueCompassAction`,
+`HueCompassLevel` (immutable, fingerprinted, JSON schema 1), the play state `HueCompassPlay` with `HueCompassStage`,
+`HueCompassEvent`, `HueCompassFailure` and append-only `HueCompassRecord`s, and `HueCompassRules` for the R02-F23 puzzle
+contract. Refusals are `HueCompassError` with `r02-g04.*` codes. Rules:
+[docs/architecture/hue-compass.md](../../docs/architecture/hue-compass.md).
