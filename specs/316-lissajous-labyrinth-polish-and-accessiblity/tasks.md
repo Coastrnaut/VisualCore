@@ -60,7 +60,7 @@ ImplementationLock-100.
 - [X] T-R02G0206-006 Docs: `docs/architecture/lissajous-labyrinth.md` (polish and accessibility), — Verified 2026-11-21: 2026-11-21 round02-host exit 0; audits exit 0 (content audit of r02-g02.lissajous-labyrinth); docs/architecture/lissajous-labyrinth.md polish and accessibility; package README; docs/automatedtesting.md (eased state and off-screen stills)
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`; `--name audits -- python3
   scripts/verify_experiences.py --audits --only r02-g02.lissajous-labyrinth`
-- [ ] T-R02G0206-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G0206-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-21: 2026-11-21 rendering-27, rendering-26, experiences, host-full and app-unit exit 0
   `--name host-full`, `--name app-unit`
 - [ ] T-R02G0206-008 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G0206-009 Reference regression chunk 2 (`--name reference-2`)
