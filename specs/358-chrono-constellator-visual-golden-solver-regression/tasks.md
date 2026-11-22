@@ -12,7 +12,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 2: Story 1 — every level stays solvable as certified (P1) 🎯
 
-- [ ] T-R02G0608-002 [P] [US1] Create `Packages/ExperiencesRound02/ChronoConstellator/CoreTests/ChronoConstellatorRegressionSolverTests.swift` (agent A: for every
+- [X] T-R02G0608-002 [P] [US1] Create `Packages/ExperiencesRound02/ChronoConstellator/CoreTests/ChronoConstellatorRegressionSolverTests.swift` (agent A: for every — Verified 2026-11-22: host exit=0 (14 tests, 124 cases: 100 levels in ten groups replay, re-solve and work bound; twelve alterations named on levels 1 and 41)
   level in ten groups of 10, "the generated level equals its witness's level; the witness's actions replay to a win at
   exactly its win tick with its per-tick digests and fingerprints; solve returns exactly the witness's phase changes,
   lower bound, window, windows and blocked count, with work ≤ tick limit + Σ window ticks"; twelve named alterations of
