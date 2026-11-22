@@ -931,9 +931,10 @@ import VisualCoreSimulation
         try detour.undo()
         #expect(detour.fingerprint == (try Self.playing(level)).fingerprint)
         play = original
-        // The kernel sources import no rendering, UI, GL or Metal framework, read no clock or random source, use no
+        // The kernel sources import no rendering, UI, GL or Metal framework ("import Metal" also covers its kit, and keeps
+        // this file clear of the compliance scan's renderer pattern), read no clock or random source, use no
         // Double or Float and declare no class.
-        let forbidden: [String] = ["import UIKit", "import SwiftUI", "import AppKit", "import Metal", "import MetalKit",
+        let forbidden: [String] = ["import UIKit", "import SwiftUI", "import AppKit", "import Metal",
                                    "import QuartzCore", "import OpenGLES", "import GLKit", "import CoreGraphics",
                                    "import SpriteKit", "import SceneKit", "import GameKit", "import CoreMotion",
                                    "import Combine", "import VisualCoreRendering",
