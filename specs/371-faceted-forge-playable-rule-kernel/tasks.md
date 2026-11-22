@@ -24,7 +24,7 @@ in this feature (the pieces are the CPU reference the renderer of R02-G08-03 wil
   tetrahedra; the cut of clarification Q2 with `.miss` unless a corner lies strictly on each side),
   `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeLevel.swift` ("crystal (4 … 14 half-spaces)", "bounded
   inside −6 … 6 with an interior", "budget 1 … 12", "sliver (fraction 0 < s < 1/2)", target "shares sum to 1; at least
-  two entries", faces "4 … 22", "difficulty 1 … 5"; pieces, directions and targets named in words (FR-R02G0801-013);
+  two entries", faces "4 … 26", "difficulty 1 … 5"; pieces, directions and targets named in words (FR-R02G0801-013);
   JSON schema 1 with sorted keys and fingerprint; decode re-checks) and
   `Packages/ExperiencesRound02/FacetedForge/CoreTests/FacetedForgeFixtures.swift` (seeded levels with a known winning
   cut sequence) with `Packages/ExperiencesRound02/FacetedForge/CoreTests/FacetedForgeFractionTests.swift` and
