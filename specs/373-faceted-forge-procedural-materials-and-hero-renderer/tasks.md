@@ -10,7 +10,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 - [X] T-R02G0803-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test — Verified 2026-11-22: 2026-11-22: baseline-host, baseline-timing exit 0; baseline-round02 exit 1 (uncommitted T-002 snapshot tripped the kernel's no-Double scan), baseline-round02-2 on the committed tree exit 0; rendering baseline = R02-G08-02 rendering-27/26 exit 0
   --package-path Packages/ExperiencesRound02`; the rendering baseline is R02-G08-02's rendering runs (exit 0)
-- [ ] T-R02G0803-002 Edit `Packages/ExperiencesRound02/Package.swift` (Core dependencies VisualCoreScenes,
+- [X] T-R02G0803-002 Edit `Packages/ExperiencesRound02/Package.swift` (Core dependencies VisualCoreScenes, — Verified 2026-11-22: 2026-11-22: host (swift test --filter FacetedForge) exit 0; Core dependencies now, the Experience targets join in T-006; the invariant tests' kernel scan now skips the five presentation sources
   VisualCoreExperience, VisualCoreDiagnostics, VisualCorePersistence now; `FacetedForgeExperience` and its tests with
   iOS-conditioned rendering dependencies join with their sources in T-006; the product) and create
   `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeSceneSnapshot.swift` (snapshot per data-model.md: pieces
