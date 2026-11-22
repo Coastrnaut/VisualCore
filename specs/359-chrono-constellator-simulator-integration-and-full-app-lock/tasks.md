@@ -25,7 +25,7 @@ change (the shaders and reference of R02-G06-03 are unchanged and re-proven by t
 
 ## Phase 3: Story 1 — the game works inside the real app (P1) 🎯
 
-- [ ] T-R02G0609-003 [US1] Edit `Packages/ExperiencesRound02/ChronoConstellator/Experience/ChronoConstellatorControls.swift`:
+- [X] T-R02G0609-003 [US1] Edit `Packages/ExperiencesRound02/ChronoConstellator/Experience/ChronoConstellatorControls.swift`: — Verified 2026-11-22: sim-27 exit=0 (ChronoConstellatorExperienceTests on sim-27.2 incl. ChronoConstellatorIdentifierTests: 28 names, each once, prefixed and unique)
   identifiers `experience.r02-g06.chrono-constellator.<name>` through `port.identifier` (spec Clarifications Q1 names:
   phase-down, phase-up, add-hold, remove-hold, step-1, step-10, run, rewind, undo, redo, next-level, reset-view, hint,
   dismiss-tutorial, failure-undo, failure-rewind, retry, campaign, daily, practice, play-level, replay, replay-step,

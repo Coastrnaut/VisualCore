@@ -12,7 +12,9 @@
 // element reads the tick, the edits left and every star, the star picker announces its pick, refusals appear in words,
 // a Sound toggle (off by default) starts the ambient loop, rows become columns at accessibility text sizes, the panel
 // keeps a readable width of 520 points on iPad, and the scene phase reaches the presenter so the loop stops in the
-// background.
+// background. Feature 359 (R02-G06-09) T-R02G0609-003 (FR-R02G0609-001; clarification Q1): every control carries the
+// identifier `experience.r02-g06.chrono-constellator.<name>` (`port.identifier`), the names listed in
+// ``identifierNames``.
 #if os(iOS)
 import ChronoConstellatorCore
 import SwiftUI
@@ -32,6 +34,15 @@ struct ChronoConstellatorControls: View {
 
     /// The widest the panel's content grows, padding included (clarification Q5).
     static let readableWidth: CGFloat = 520
+
+    /// Every control's identifier name (clarification Q1 of feature 359), each once; the identifier is
+    /// `experience.r02-g06.chrono-constellator.<name>` (`port.identifier`).
+    static let identifierNames: [String] = [
+        "phase-down", "phase-up", "add-hold", "remove-hold", "step-1", "step-10", "run", "rewind", "undo", "redo",
+        "next-level", "reset-view", "hint", "dismiss-tutorial", "failure-undo", "failure-rewind", "retry", "campaign",
+        "daily", "practice", "play-level", "replay", "replay-step", "replay-stop", "star-picker", "level-picker", "sound",
+        "summary",
+    ]
 
     /// The start and length of the hold the panel adds and removes.
     static let holdStart = 1
@@ -81,14 +92,17 @@ struct ChronoConstellatorControls: View {
                 Button("Step") { presenter.stepReplay(port: port) }
                     .accessibilityLabel("Play the next action of the replay")
                     .accessibilityValue("Action \(mirror.replayPosition) of \(mirror.replayLength)")
+                    .accessibilityIdentifier(port.identifier("replay-step"))
                 Button("Stop") { presenter.stopReplay(port: port) }
                     .accessibilityLabel("Stop the replay")
                     .accessibilityValue("\(mirror.replayLength) actions")
+                    .accessibilityIdentifier(port.identifier("replay-stop"))
             }
         } else if mirror.replayAvailable {
             Button("Replay best solution") { presenter.startReplay(port: port) }
                 .accessibilityLabel("Replay your best solution of this level")
                 .accessibilityValue("Level \(mirror.levelNumber)")
+                .accessibilityIdentifier(port.identifier("replay"))
         }
     }
 
@@ -97,6 +111,7 @@ struct ChronoConstellatorControls: View {
         Toggle("Sound", isOn: Binding(get: { mirror.soundOn }, set: { presenter.saveSound(on: $0, port: port) }))
             .accessibilityLabel("Ambient sound")
             .accessibilityValue(mirror.soundOn ? "on" : "off")
+            .accessibilityIdentifier(port.identifier("sound"))
     }
 
     /// The level, edits, tick and stage lines.
@@ -109,6 +124,7 @@ struct ChronoConstellatorControls: View {
             .accessibilityElement(children: .ignore)
             .accessibilityLabel("Sky")
             .accessibilityValue(mirror.summary)
+            .accessibilityIdentifier(port.identifier("summary"))
         if let message = mirror.message {
             Text(message).font(.footnote).fixedSize(horizontal: false, vertical: true)
         }
@@ -122,12 +138,14 @@ struct ChronoConstellatorControls: View {
                 Button("Dismiss") { presenter.dismissTutorial(port: port) }
                     .accessibilityLabel("Dismiss the tutorial")
                     .accessibilityValue(instruction)
+                    .accessibilityIdentifier(port.identifier("dismiss-tutorial"))
             }
         }
         row {
             Button("Hint") { presenter.showHint() }
                 .accessibilityLabel("Show a hint")
                 .accessibilityValue(mirror.hintLevel == 0 ? "none shown" : "level \(mirror.hintLevel) of 3")
+                .accessibilityIdentifier(port.identifier("hint"))
             Text("Goal: \(mirror.spent) of \(mirror.budget) edits; best possible \(mirror.smallest)")
                 .font(.footnote)
         }
@@ -141,12 +159,15 @@ struct ChronoConstellatorControls: View {
                     Button("Undo") { presenter.undo(port: port) }
                         .accessibilityLabel("Undo the last change")
                         .accessibilityValue(failure)
+                        .accessibilityIdentifier(port.identifier("failure-undo"))
                     Button("Rewind") { presenter.rewind(port: port) }
                         .accessibilityLabel("Return to tick 0 keeping the timeline")
                         .accessibilityValue(Self.progressValue(mirror))
+                        .accessibilityIdentifier(port.identifier("failure-rewind"))
                     Button("Retry") { presenter.retry(port: port) }
                         .accessibilityLabel("Start the level again")
                         .accessibilityValue("Level \(mirror.levelNumber)")
+                        .accessibilityIdentifier(port.identifier("retry"))
                 }
             }
         }
@@ -158,12 +179,15 @@ struct ChronoConstellatorControls: View {
             Button("Campaign") { send("mode.campaign") }
                 .accessibilityLabel("Play the campaign")
                 .accessibilityValue(Self.modeName(mirror.mode) == "campaign" ? "selected" : "")
+                .accessibilityIdentifier(port.identifier("campaign"))
             Button("Daily") { presenter.playDaily(port: port) }
                 .accessibilityLabel("Play today's daily level")
                 .accessibilityValue(Self.modeName(mirror.mode) == "daily" ? "selected" : "")
+                .accessibilityIdentifier(port.identifier("daily"))
             Button("Practice") { send("mode.practice") }
                 .accessibilityLabel("Practise this level with a larger budget")
                 .accessibilityValue(Self.modeName(mirror.mode) == "practice" ? "selected" : "")
+                .accessibilityIdentifier(port.identifier("practice"))
         }
         row {
             Stepper(levelLabel(mirror.pickedLevel),
@@ -171,9 +195,11 @@ struct ChronoConstellatorControls: View {
                     onDecrement: { mirror.pickedLevel = max(mirror.pickedLevel - 1, 1) })
                 .accessibilityLabel("Level to play")
                 .accessibilityValue(levelLabel(mirror.pickedLevel))
+                .accessibilityIdentifier(port.identifier("level-picker"))
             Button("Play level") { send("level.select", [Double(mirror.pickedLevel)]) }
                 .accessibilityLabel("Play the picked level")
                 .accessibilityValue(levelLabel(mirror.pickedLevel))
+                .accessibilityIdentifier(port.identifier("play-level"))
         }
     }
 
@@ -202,12 +228,15 @@ struct ChronoConstellatorControls: View {
                     onDecrement: { presenter.pickStar(-1) })
                 .accessibilityLabel("Star to edit")
                 .accessibilityValue(mirror.pickedStarLabel)
+                .accessibilityIdentifier(port.identifier("star-picker"))
             Button("Phase −") { sendPhase(-1) }
                 .accessibilityLabel("Start the picked star one cell earlier on its loop")
                 .accessibilityValue(mirror.pickedPhaseLabel)
+                .accessibilityIdentifier(port.identifier("phase-down"))
             Button("Phase +") { sendPhase(1) }
                 .accessibilityLabel("Start the picked star one cell later on its loop")
                 .accessibilityValue(mirror.pickedPhaseLabel)
+                .accessibilityIdentifier(port.identifier("phase-up"))
         }
     }
 
@@ -219,9 +248,11 @@ struct ChronoConstellatorControls: View {
             }
             .accessibilityLabel("Hold the picked star for \(Self.holdLength) ticks from tick \(Self.holdStart)")
             .accessibilityValue(mirror.pickedHoldsLabel)
+            .accessibilityIdentifier(port.identifier("add-hold"))
             Button("Remove hold") { send("star.release", [Double(mirror.pickedStar), Double(Self.holdStart)]) }
                 .accessibilityLabel("Remove the picked star's hold that starts at tick \(Self.holdStart)")
                 .accessibilityValue(mirror.pickedHoldsLabel)
+                .accessibilityIdentifier(port.identifier("remove-hold"))
         }
     }
 
@@ -231,15 +262,19 @@ struct ChronoConstellatorControls: View {
             Button("Step 1") { send("time.step", [1]) }
                 .accessibilityLabel("Replay one tick")
                 .accessibilityValue(Self.progressValue(mirror))
+                .accessibilityIdentifier(port.identifier("step-1"))
             Button("Step 10") { send("time.step", [10]) }
                 .accessibilityLabel("Replay ten ticks")
                 .accessibilityValue(Self.progressValue(mirror))
+                .accessibilityIdentifier(port.identifier("step-10"))
             Button("Run") { send("time.step", [Double(max(1, min(1_200, mirror.tickLimit - mirror.tick)))]) }
                 .accessibilityLabel("Replay to the end")
                 .accessibilityValue("\(max(0, mirror.tickLimit - mirror.tick)) ticks left")
+                .accessibilityIdentifier(port.identifier("run"))
             Button("Rewind") { send("time.rewind") }
                 .accessibilityLabel("Return to tick 0 keeping the timeline")
                 .accessibilityValue(Self.progressValue(mirror))
+                .accessibilityIdentifier(port.identifier("rewind"))
         }
     }
 
@@ -249,15 +284,19 @@ struct ChronoConstellatorControls: View {
             Button("Undo") { send("play.undo") }
                 .accessibilityLabel("Undo the last action")
                 .accessibilityValue(Self.progressValue(mirror))
+                .accessibilityIdentifier(port.identifier("undo"))
             Button("Redo") { send("play.redo") }
                 .accessibilityLabel("Redo the action")
                 .accessibilityValue(Self.progressValue(mirror))
+                .accessibilityIdentifier(port.identifier("redo"))
             Button("Next level") { send("level.next") }
                 .accessibilityLabel("Go to the next level")
                 .accessibilityValue("Level \(mirror.levelNumber)")
+                .accessibilityIdentifier(port.identifier("next-level"))
             Button("Reset view") { presenter.resetView() }
                 .accessibilityLabel("Return the camera to the starting view")
                 .accessibilityValue("camera")
+                .accessibilityIdentifier(port.identifier("reset-view"))
         }
     }
 
