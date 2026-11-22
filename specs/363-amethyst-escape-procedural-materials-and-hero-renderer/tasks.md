@@ -29,7 +29,7 @@ tests stay short (< 10 s each). No {owner} tasks.
   highlight layers driven by `u_time`; uniform names; glow gain cap; palette constants equal to the CPU's) with
   `Packages/ExperiencesRound02/AmethystEscape/CoreTests/AmethystEscapeShaderSourceTests.swift` (version line, declared
   uniforms, at most 16 vec4 uniforms, no texture samplers, bounded loops, palette constants match); agent A; `--name host-2`
-- [ ] T-R02G0703-004 [P] [US1] Create `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeSceneGeometry.swift`
+- [X] T-R02G0703-004 [P] [US1] Create `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeSceneGeometry.swift` — Verified 2026-11-22: 2026-11-22: host-3 (AmethystEscapeSceneGeometryTests, 8 tests) exit 0, rerun by the lead
   (shell k annulus from 0.2 + k·w to 0.2 + (k + 1)·w, w = 0.8 / n; wedge of sector s at world sector (s + offset) mod S,
   angles measured from +x towards +z (clockwise from above, as the kernel's +1); bevelled prisms of height h_k = 0.08 + 0.06·(n − 1 − k), inset 0.04·w, the tier's
   bevel segments; apertures as gaps in the rim band; platinum wall fins thickness 0.03·w, height h_k + 0.02 on the

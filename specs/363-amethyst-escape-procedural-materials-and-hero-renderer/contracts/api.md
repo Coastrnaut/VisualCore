@@ -20,10 +20,11 @@ public enum AmethystEscapeSceneGeometry {
     public static func wedgeTopCentre(shell: Int, sector: Int, _ snapshot: AmethystEscapeSceneSnapshot) -> SIMD3<Double>
     public static func pearlCentre(_ snapshot: AmethystEscapeSceneSnapshot) -> SIMD3<Double>
     public static func exitCentre(_ snapshot: AmethystEscapeSceneSnapshot) -> SIMD3<Double>
-    public static func crystalMesh(_ snapshot: AmethystEscapeSceneSnapshot, tier: AmethystEscapeTier) throws -> Mesh   // backdrop, wedges, fins, marks
-    public static func glowMesh(_ snapshot: AmethystEscapeSceneSnapshot, tier: AmethystEscapeTier) throws -> Mesh      // pearl, exit arrow, glow shells
+    public static func crystalMesh(_ snapshot: AmethystEscapeSceneSnapshot, tier: AmethystEscapeTier) throws -> Mesh   // backdrop, wedges back to front, fins, marks, exit arrow, move bar
+    public static func glowMesh(_ snapshot: AmethystEscapeSceneSnapshot, tier: AmethystEscapeTier) throws -> Mesh      // pearl core, pearl and exit glow shells
     public static func camera(_ snapshot: AmethystEscapeSceneSnapshot, aspect: Double) -> AmethystEscapeCamera
     public static func project(_ point: SIMD3<Double>, camera: AmethystEscapeCamera) -> SIMD2<Double>?   // 0 … 1 view coordinates
+    public static func crystalPart(_:tier:), glowPart(_:tier:) throws -> AmethystEscapeColouredMesh   // fallback colours
 }
 public enum AmethystEscapeShaders { crystalVertex, crystalFragment, glowVertex, glowFragment: String   // GLSL ES 3.00
     public static func glowLimit(reduceFlashing: Bool) -> Double; public static func glowGain(for tier: AmethystEscapeTier) -> Double }

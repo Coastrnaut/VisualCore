@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "AmethystEscapeSceneGeometry"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter AmethystEscapeSceneGeometry",
+  "elapsed_seconds": 3.058,
+  "exit_code": 0,
+  "finished": "2026-11-22T08:21:26+00:00",
+  "gate": "R02-G07-03",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G07-03.host-3.log",
+  "log_sha256": "0aa8c2937157d84c16f21f97472103383307f45701b84f0ef4d56a1e2eff2616",
+  "name": "host-3",
+  "started": "2026-11-22T08:21:23+00:00",
+  "timed_out": false
+}
