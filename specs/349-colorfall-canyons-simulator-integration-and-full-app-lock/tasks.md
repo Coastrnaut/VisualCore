@@ -25,7 +25,7 @@ change (the shaders and reference of R02-G05-03 are unchanged and re-proven by t
 
 ## Phase 3: Story 1 — the game works inside the real app (P1) 🎯
 
-- [ ] T-R02G0509-003 [US1] Edit `Packages/ExperiencesRound02/ColorfallCanyons/Experience/ColorfallCanyonsControls.swift`:
+- [X] T-R02G0509-003 [US1] Edit `Packages/ExperiencesRound02/ColorfallCanyons/Experience/ColorfallCanyonsControls.swift`: — Verified 2026-11-21: 2026-11-21 sim-27 exit 0: ColorfallCanyonsExperienceTests 56 tests in 11 suites on sim-27.2 incl. ColorfallCanyonsIdentifierTests (26 clarified names once, valve names for up to 3 springs, port prefix for every name) (.autonomy/migration/checks/R02-G05-09.sim-27.json); lead run
   identifiers `experience.r02-g05.colorfall-canyons.<name>` through `port.identifier` (spec Clarifications Q1 names:
   carve, valve-0 … valve-2, step-1, step-10, run, undo, redo, next-level, reset-view, hint, dismiss-tutorial,
   failure-undo, retry, campaign, daily, practice, play-level, replay, replay-step, replay-stop, cell-picker,

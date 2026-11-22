@@ -10,7 +10,9 @@
 // T-R02G0506-006 (FR-R02G0506-001, 005, 006; clarification Q5): every control has a label and a value, a summary element
 // reads the tick, the actions left and every basin against its target, the cell picker announces its pick, refusals
 // show in words, button rows become columns at accessibility text sizes, the panel keeps a 520-point readable width,
-// a Sound toggle (off by default) and the scene phase drive the ambient loop.
+// a Sound toggle (off by default) and the scene phase drive the ambient loop. Feature 349 (R02-G05-09) T-R02G0509-003
+// (FR-R02G0509-001; clarification Q1): every control carries the identifier `experience.r02-g05.colorfall-canyons.<name>`
+// (`port.identifier`), the names listed in ``identifierNames``.
 #if os(iOS)
 import ColorfallCanyonsCore
 import SwiftUI
@@ -29,6 +31,18 @@ struct ColorfallCanyonsControls: View {
 
     /// The widest the panel's content grows, padding included (clarification Q5).
     static let readableWidth: CGFloat = 520
+
+    /// The identifier names of the valve buttons, one per spring (a level has at most three springs; feature 349).
+    static let valveNames: [String] = ["valve-0", "valve-1", "valve-2"]
+    /// Every control's identifier name (clarification Q1 of feature 349), each once; the identifier is
+    /// `experience.r02-g05.colorfall-canyons.<name>` (`port.identifier`).
+    static let identifierNames: [String] = ["carve"] + valveNames
+        + ["step-1", "step-10", "run", "undo", "redo", "next-level", "reset-view", "hint", "dismiss-tutorial",
+           "failure-undo", "retry", "campaign", "daily", "practice", "play-level", "replay", "replay-step",
+           "replay-stop", "cell-picker", "level-picker", "sound", "summary"]
+
+    /// The identifier name of the valve button of spring `index`.
+    static func valveName(_ index: Int) -> String { "valve-\(index)" }
 
     var body: some View {
         ScrollView(.vertical) {
@@ -74,14 +88,17 @@ struct ColorfallCanyonsControls: View {
                 Button("Step") { presenter.stepReplay(port: port) }
                     .accessibilityLabel("Play the next action of the replay")
                     .accessibilityValue("Action \(mirror.replayPosition) of \(mirror.replayLength)")
+                    .accessibilityIdentifier(port.identifier("replay-step"))
                 Button("Stop") { presenter.stopReplay(port: port) }
                     .accessibilityLabel("Stop the replay")
                     .accessibilityValue("\(mirror.replayLength) actions")
+                    .accessibilityIdentifier(port.identifier("replay-stop"))
             }
         } else if mirror.replayAvailable {
             Button("Replay best solution") { presenter.startReplay(port: port) }
                 .accessibilityLabel("Replay your best solution of this level")
                 .accessibilityValue("Level \(mirror.levelNumber)")
+                .accessibilityIdentifier(port.identifier("replay"))
         }
     }
 
@@ -90,6 +107,7 @@ struct ColorfallCanyonsControls: View {
         Toggle("Sound", isOn: Binding(get: { mirror.soundOn }, set: { presenter.saveSound(on: $0, port: port) }))
             .accessibilityLabel("Ambient sound")
             .accessibilityValue(mirror.soundOn ? "on" : "off")
+            .accessibilityIdentifier(port.identifier("sound"))
     }
 
     /// The level, actions, tick and stage lines.
@@ -102,6 +120,7 @@ struct ColorfallCanyonsControls: View {
             .accessibilityElement(children: .ignore)
             .accessibilityLabel("Canyon")
             .accessibilityValue(mirror.summary)
+            .accessibilityIdentifier(port.identifier("summary"))
         if let message = mirror.message {
             Text(message).font(.footnote).fixedSize(horizontal: false, vertical: true)
         }
@@ -115,12 +134,14 @@ struct ColorfallCanyonsControls: View {
                 Button("Dismiss") { presenter.dismissTutorial(port: port) }
                     .accessibilityLabel("Dismiss the tutorial")
                     .accessibilityValue("tutorial shown")
+                    .accessibilityIdentifier(port.identifier("dismiss-tutorial"))
             }
         }
         row {
             Button("Hint") { presenter.showHint() }
                 .accessibilityLabel("Show a hint")
                 .accessibilityValue(mirror.hintLevel == 0 ? "none shown" : "level \(mirror.hintLevel) of 3")
+                .accessibilityIdentifier(port.identifier("hint"))
             Text("Goal: \(mirror.spent) of \(mirror.budget) actions; best possible \(mirror.smallest)")
                 .font(.footnote)
         }
@@ -134,9 +155,11 @@ struct ColorfallCanyonsControls: View {
                     Button("Undo") { presenter.undo(port: port) }
                         .accessibilityLabel("Undo the last change")
                         .accessibilityValue(Self.progressValue(mirror))
+                        .accessibilityIdentifier(port.identifier("failure-undo"))
                     Button("Retry") { presenter.retry(port: port) }
                         .accessibilityLabel("Start the level again")
                         .accessibilityValue(Self.progressValue(mirror))
+                        .accessibilityIdentifier(port.identifier("retry"))
                 }
             }
         }
@@ -148,12 +171,15 @@ struct ColorfallCanyonsControls: View {
             Button("Campaign") { send("mode.campaign") }
                 .accessibilityLabel("Play the campaign")
                 .accessibilityValue(Self.modeName(mirror.mode) == "campaign" ? "selected" : "")
+                .accessibilityIdentifier(port.identifier("campaign"))
             Button("Daily") { presenter.playDaily(port: port) }
                 .accessibilityLabel("Play today's daily level")
                 .accessibilityValue(Self.modeName(mirror.mode) == "daily" ? "selected" : "")
+                .accessibilityIdentifier(port.identifier("daily"))
             Button("Practice") { send("mode.practice") }
                 .accessibilityLabel("Practise this level with a larger budget")
                 .accessibilityValue(Self.modeName(mirror.mode) == "practice" ? "selected" : "")
+                .accessibilityIdentifier(port.identifier("practice"))
         }
         row {
             Stepper(levelLabel(mirror.pickedLevel),
@@ -161,9 +187,11 @@ struct ColorfallCanyonsControls: View {
                     onDecrement: { mirror.pickedLevel = max(mirror.pickedLevel - 1, 1) })
                 .accessibilityLabel("Level to play")
                 .accessibilityValue(levelLabel(mirror.pickedLevel))
+                .accessibilityIdentifier(port.identifier("level-picker"))
             Button("Play level") { send("level.select", [Double(mirror.pickedLevel)]) }
                 .accessibilityLabel("Play the picked level")
                 .accessibilityValue("level \(mirror.pickedLevel)")
+                .accessibilityIdentifier(port.identifier("play-level"))
         }
     }
 
@@ -192,11 +220,13 @@ struct ColorfallCanyonsControls: View {
                     onDecrement: { presenter.pickCell(-1) })
                 .accessibilityLabel("Cell to carve")
                 .accessibilityValue(mirror.pickedCellLabel)
+                .accessibilityIdentifier(port.identifier("cell-picker"))
             Button("Carve") {
                 if let cell = mirror.pickedCell { send("canyon.carve", [Double(cell)]) }
             }
             .accessibilityLabel("Carve the picked cell one step lower")
             .accessibilityValue(mirror.pickedCellLabel)
+            .accessibilityIdentifier(port.identifier("carve"))
         }
     }
 
@@ -207,6 +237,7 @@ struct ColorfallCanyonsControls: View {
                 Button(mirror.springNames[index]) { send("canyon.valve", [Double(index)]) }
                     .accessibilityLabel("\(mirror.springNames[index].capitalized) valve")
                     .accessibilityValue(mirror.springStates.indices.contains(index) ? mirror.springStates[index] : "")
+                    .accessibilityIdentifier(port.identifier(Self.valveName(index)))
             }
         }
     }
@@ -217,12 +248,15 @@ struct ColorfallCanyonsControls: View {
             Button("Step 1") { send("time.step", [1]) }
                 .accessibilityLabel("Let the fluid run one tick")
                 .accessibilityValue("tick \(mirror.tick) of \(mirror.tickLimit)")
+                .accessibilityIdentifier(port.identifier("step-1"))
             Button("Step 10") { send("time.step", [10]) }
                 .accessibilityLabel("Let the fluid run ten ticks")
                 .accessibilityValue("tick \(mirror.tick) of \(mirror.tickLimit)")
+                .accessibilityIdentifier(port.identifier("step-10"))
             Button("Run") { send("time.step", [Double(max(1, min(600, mirror.tickLimit - mirror.tick)))]) }
                 .accessibilityLabel("Let the fluid run to the end")
                 .accessibilityValue("\(max(0, mirror.tickLimit - mirror.tick)) ticks left")
+                .accessibilityIdentifier(port.identifier("run"))
         }
     }
 
@@ -232,15 +266,19 @@ struct ColorfallCanyonsControls: View {
             Button("Undo") { send("play.undo") }
                 .accessibilityLabel("Undo the last action")
                 .accessibilityValue(Self.progressValue(mirror))
+                .accessibilityIdentifier(port.identifier("undo"))
             Button("Redo") { send("play.redo") }
                 .accessibilityLabel("Redo the action")
                 .accessibilityValue(Self.progressValue(mirror))
+                .accessibilityIdentifier(port.identifier("redo"))
             Button("Next level") { send("level.next") }
                 .accessibilityLabel("Go to the next level")
                 .accessibilityValue("level \(mirror.levelNumber)")
+                .accessibilityIdentifier(port.identifier("next-level"))
             Button("Reset view") { presenter.resetView() }
                 .accessibilityLabel("Return the camera to the starting view")
                 .accessibilityValue("camera")
+                .accessibilityIdentifier(port.identifier("reset-view"))
         }
     }
 
