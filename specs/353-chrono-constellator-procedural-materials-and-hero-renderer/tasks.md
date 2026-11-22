@@ -46,7 +46,8 @@ tests stay short (< 10 s each). No {owner} tasks.
 ## Phase 3: Experience, registration and frames
 
 - [ ] T-R02G0603-006 Create `Packages/ExperiencesRound02/ChronoConstellator/Experience/ChronoConstellatorExperience.swift`,
-  `…Presenter.swift`, `…SkyScene.swift` (GL scene with `ShaderMeshRenderer`; fallback; tier log; Reduce Motion and Reduce
+  `…Presenter.swift`, `…SkyScene.swift` (GL scene with `ShaderMeshRenderer`, back faces culled on every draw as in the
+  Colorfall scene; fallback; tier log; Reduce Motion and Reduce
   Flashing; the presenter declares `probes(_:)` — two field corners, as the round-two X gates require — and its quality
   levels equal the Core's `qualityTiers`), `…Controls.swift` (labelled star picker, phase − and +, add and remove a hold,
   step 1 and 10, run to the end, rewind, undo, redo, next level),
@@ -62,7 +63,9 @@ tests stay short (< 10 s each). No {owner} tasks.
   Reduce Motion; identity); `--name sim-27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02
   --scheme ExperiencesRound02-Package --destination sim-27.2 --action test --only-testing
   ChronoConstellatorExperienceTests`; `--name packages -- python3 scripts/check_experience_packages.py`; `--name
-  catalog-search`
+  catalog-search -- swift test --package-path Packages/VisualCore --filter
+  'CatalogSearchTests|RealCatalogTests|RegistryReportTests'` (after `Catalog/registrations.json` changes; the summary
+  feeds catalog search and stays ≤ 300 characters)
 
 ## Phase 4: Regression, documentation and close
 
