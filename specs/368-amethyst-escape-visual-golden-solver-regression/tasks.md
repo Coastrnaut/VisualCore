@@ -39,7 +39,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 4: Stories 2 and 3 — simulator frames and memory (P1, P2)
 
-- [ ] T-R02G0708-005 [US2] [US3] Edit `Packages/ExperiencesRound02/AmethystEscape/Experience/AmethystEscapeCrystalScene.swift` (`liveObjectCount`: GPU
+- [X] T-R02G0708-005 [US2] [US3] Edit `Packages/ExperiencesRound02/AmethystEscape/Experience/AmethystEscapeCrystalScene.swift` (`liveObjectCount`: GPU — Verified 2026-11-22: sim-27 exit=0 (AmethystEscapeExperienceTests on sim-27.2, 60 tests: 16 golden frames match their descriptions with the feature-363 checks; 12 memory cycles, liveObjectCount 0 after warning and close)
   objects held, 0 after release) and create
   `Packages/ExperiencesRound02/AmethystEscape/ExperienceTests/AmethystEscapeRegressionGoldenFrameTests.swift` and
   `Packages/ExperiencesRound02/AmethystEscape/ExperienceTests/AmethystEscapeRegressionMemoryTests.swift` (agent C: the
