@@ -5,7 +5,7 @@
 
 **Created**: 2026-11-22
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G06-09 (migration ledger, game feature of experience R02-G06) · ID namespace FR-R02G0609-###,
 SC-R02G0609-###, T-R02G0609-###
@@ -23,6 +23,54 @@ Canonical overrides:
 - **Superseded parts of the source prompt:** price, "no IAP", the Round 2 lock and the per-round device campaign.
   **Device-only items:** the same journeys on D1/D2/D3 after ImplementationLock-100. **Owner-only items:** none.
 - **Model:** feature 349 (Chrono Constellator's simulator integration and full app lock).
+
+## Clarifications
+
+### Session 2026-11-22
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+349's answers. Facts checked in code (read-only, 2026-11-22): feature 349 (Colorfall Canyons) is the model
+(`Apps/VisualCore/Tests/UI/ColorfallCanyons`, namespace `CC`, serial chunk `n3`; identifiers through
+`port.identifier(name)`; `ColorfallCanyonsSchemaExamples.swift`); Chrono Constellator's panel
+(`ChronoConstellatorControls`) has labels and values but no identifiers, with two Undo and two Rewind buttons (the
+failure section's and the play row's) and steppers for the level and the star; its registration in
+`Apps/VisualCore/App/ExperienceRegistry.swift` still says "Snapshot schema 1, so no earlier example is stored yet"
+although the snapshot is schema 3 since feature 357; the panel's "Sky" element carries the summary and, when won, the
+canvas description says "Every star stands on its target." followed by "Stars: k of 3."; `RELEASE_FORBIDDEN` holds
+`ChronoConstellatorGolden` (feature 358); the UI chunk keys in `release_check.py` use up to `n3` and not `o3`; no `CR`
+namespace exists in the app's tests.
+
+- Q: How do the interface tests find controls and what do they read? → A: every panel control gets the identifier
+  `experience.r02-g06.chrono-constellator.<name>` through `port.identifier(name)`: the buttons `phase-down`, `phase-up`,
+  `add-hold`, `remove-hold`, `step-1`, `step-10`, `run`, `rewind`, `undo`, `redo`, `next-level`, `reset-view`, `hint`,
+  `dismiss-tutorial`, `failure-undo`, `failure-rewind`, `retry`, `campaign`, `daily`, `practice`, `play-level`,
+  `replay`, `replay-step`, `replay-stop`, the steppers `star-picker` and `level-picker`, the toggle `sound` and the
+  summary element `summary` (the "Sky" element). The tests read the canvas description for the level, the win and the
+  stars, and the replay step's value for the replay position. Impact: FR-R02G0609-001, 002.
+- Q: Which interface tests exist and how are they grouped? → A: namespace `CR` in
+  `Apps/VisualCore/Tests/UI/ChronoConstellator/CRSupport.swift`; `CRPlayUITests` (fresh launch with `-vcResetData
+  -vcSkipWelcome -vcCandidates -openExperience r02-g06.chrono-constellator`: dismiss the tutorial, play level 1's
+  certified solution with the star picker (stepping to each changed star) and Phase − / Phase + (the shorter way round
+  each star's loop to its certified phase), then Run; read "Every star stands on its target" and "Stars: 3 of 3", the
+  level picker shows level 2 open; relaunch without reset after sending the app to the background: the stars and level
+  2 are kept) and `CRReplayUITests` (after the win, Replay best solution, Step until the replay ends won, Stop back to
+  the campaign). They run as a new serial chunk `o3` of `release_check.py` (its key checked unique); each test stays
+  under 90 s. Level 1's certified phase changes and default phases are pinned in `CR` and checked against the Core by
+  an app unit test. Impact: FR-R02G0609-002, 007; SC-R02G0609-001.
+- Q: Which earlier-schema examples are stored and where do they come from? → A:
+  `ChronoConstellatorExperienceCore.schemaOneExample()` (the schema-1 saved state of a seeded play of level 1 with one
+  phase change that does not win) and `schemaTwoExample()` (schema 2 with progress and level 1 solved, no trace), both
+  `MigrationExample`s built in the Core (`ChronoConstellatorSchemaExamples.swift`, modelled on
+  `ColorfallCanyonsSchemaExamples`), registered with `examples:`; the app's migration check restores both into schema 3
+  with progress kept (a schema-2 result without a trace keeps its stars, as feature 357 reconciles). The registration's
+  comment is corrected. Impact: FR-R02G0609-003; SC-R02G0609-002.
+- Q: What proves the release configuration excludes test-only code? → A: the existing `app-release-build` and
+  `app-release-symbols` steps; `ChronoConstellatorGolden` is already forbidden, and the scenarios exist only under
+  `DEBUG || VISUALCORE_AUTOMATION` (covered by the existing `acceptanceScenarios` entry). Impact: FR-R02G0609-004;
+  SC-R02G0609-003.
+- Q: How is "not available" checked? → A: an app unit test: without `-vcCandidates` the catalog lists
+  `r02-g06.chrono-constellator` as not available and the launcher cannot open it; the registry's candidates list
+  contains it and `all` does not. Impact: FR-R02G0609-006; SC-R02G0609-002.
 
 ## User Scenarios & Testing *(mandatory)*
 
