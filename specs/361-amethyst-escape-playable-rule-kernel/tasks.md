@@ -65,7 +65,7 @@ in this feature (the crystal state is the CPU reference the renderer of R02-G07-
   `--name host-full`
 - [X] T-R02G0701-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-22: reference-1 exit=0
 - [X] T-R02G0701-010 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-22: reference-2 exit=0
-- [ ] T-R02G0701-011 Script tests, run alone (`--name script-tests`)
+- [X] T-R02G0701-011 Script tests, run alone (`--name script-tests`) — Verified 2026-11-22: script-tests exit=0 (run alone)
 - [ ] T-R02G0701-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
 
 ## Dependencies and parallel work
