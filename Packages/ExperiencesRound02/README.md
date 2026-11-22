@@ -290,3 +290,7 @@ alterations, `ColorfallCanyonsGolden` (test builds only) with 16 pinned golden f
 `ColorfallCanyons/golden-frames.json` (`COLORFALL_CANYONS_WRITE_GOLDEN=1` rewrites them), simulator golden-frame and
 memory tests, a CI step and `scripts/colorfall_canyons_regression.py`.
 
+Feature 349 (R02-G05-09) adds Colorfall Canyons's in-app integration: panel identifiers
+(`ColorfallCanyonsControls.identifierNames`), the stored schema-1 and schema-2 examples
+(`ColorfallCanyonsSchemaExamples`), app unit tests, and the interface tests `CCPlayUITests` and `CCReplayUITests` in
+serial chunk `n3`.

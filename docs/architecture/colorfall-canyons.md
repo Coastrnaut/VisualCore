@@ -216,3 +216,19 @@ long step as single ticks; the play accepts both.
 - **Where it runs.** CI's host job has a named "Colorfall Canyons regression (host)" step; locally,
   `python3 scripts/colorfall_canyons_regression.py` runs the host and simulator parts with one summary line each.
 
+
+## In-app integration (feature 349, R02-G05-09)
+
+- **Identifiers.** Every panel control carries `experience.r02-g05.colorfall-canyons.<name>`
+  (`ColorfallCanyonsControls.identifierNames`, 26 names: carve, valve-0 … valve-2 (one per spring; a level has at most
+  three), step-1, step-10, run, undo, redo, next-level, reset-view, hint, dismiss-tutorial, failure-undo, retry,
+  campaign, daily, practice, play-level, replay, replay-step, replay-stop, cell-picker, level-picker, sound, summary).
+- **Interface tests.** `CCPlayUITests` wins level 1 through the panel (its certified solution: the cell picker stepped
+  to row 2, column 5 (cell 10), Carve twice, Run: "Every basin is filled", "Stars: 3 of 3", level 2 open) and keeps the
+  progress over a relaunch; `CCReplayUITests` replays the win to its end and stops. They run as serial chunk `n3`, each
+  under 90 s. Level 1's certified actions and carvable-cell order are pinned in `CC` and checked against the Core by an
+  app unit test.
+- **Stored examples.** The registration stores schema-1 and schema-2 examples (`ColorfallCanyonsSchemaExamples`), which
+  the app restores into schema 3; Colorfall Canyons stays a candidate (not available without `-vcCandidates`) until
+  X-R02-G05.
+- **Release.** The Release simulator build compiles without the test-only golden descriptions and scenarios.

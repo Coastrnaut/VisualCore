@@ -240,6 +240,12 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   check on the real definition and on copies with a scenario removed, a row field removed and T-R02G0409-011 uncovered;
   the release step is `device-rows-r02-g04`. The check finds the earlier features from the game number alone
   (R02-G04 → specs 331–339), so a new game needs no change to it.
+- **Interface tests: tap a stepper's buttons, not its centre** (R02-G05-09, 2026-11-21). The first two runs of the
+  Colorfall Canyons interface tests failed with "not reached by scrolling the controls" on the cell and level pickers:
+  a SwiftUI `Stepper` element can report itself not hittable while it is on screen, so the reveal loop dragged the
+  controls 24 times without moving them. The helpers now skip scrolling when the stepper's Increment and Decrement
+  buttons are already hittable, and the reveal loop stops once a drag no longer moves its target. The tests then took
+  62, 76 and 47 s (chunk `n3`, key checked unique).
 - **Interface tests: count the teardown, skip waits for present elements** (R02-G04-09, 2026-11-21). The Hue Compass
   interface tests first took 71, 93 and 97 s against the 90 s bound. The per-test time xcodebuild reports includes about
   24 s of app teardown after the last step, and every `waitFor` costs at least a second even for an element already on
