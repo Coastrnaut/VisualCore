@@ -258,6 +258,7 @@ final class NocturneGardenPresenter: ExperiencePresenter {
         var text = "Nocturne Garden level \(core.levelNumber). "
         text += "\(play.moves) of \(level.budget) moves spent. \(mirror.measureLabel). "
         text += play.blooms.isEmpty ? "No bloom planted. " : mirror.bloomNames.joined(separator: "; ") + ". "
+        if let preview = mirror.previewText { text += "Dragging: \(preview). " }   // T-R02G0904-014
         switch play.stage {
         case .won, .result where play.failure == nil:
             text += "The shadow matches the target."

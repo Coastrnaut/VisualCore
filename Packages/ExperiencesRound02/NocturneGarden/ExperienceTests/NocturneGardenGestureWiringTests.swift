@@ -467,6 +467,9 @@ enum NocturneGardenGestureScript {
         try NocturneGardenTest.draw(session)
         #expect(shell.presenter.mirror.previewText == preview.text, "the drawn frame describes the preview")
         #expect(shell.presenter.mirror.previewText != nil)
+        // Feature 384 convergence (T-R02G0904-014): the description carries the preview's words while dragging.
+        let dragging: String = shell.presenter.describe(try NocturneGardenTest.core(shell))
+        #expect(dragging.contains("Dragging: " + preview.text), "\(dragging)")
         #expect(try Script.drawn(shell).preview.isEmpty, "the kept snapshot never carries the preview")
         #expect(Script.sent(shell) == sentBefore, "nothing is sent mid-drag")
         #expect(try NocturneGardenTest.digest(shell) == digest, "the preview never changes the digest")

@@ -88,7 +88,7 @@ controls, docs) stay with the lead. MVP: Stories 1 to 3 and 5.
 
 ## Phase 7: Convergence
 
-- [ ] T-R02G0904-014 Show the drag preview's words (`mirror.previewText`, "would match 12/16, leak 0 cells") in the panel
+- [X] T-R02G0904-014 Show the drag preview's words (`mirror.previewText`, "would match 12/16, leak 0 cells") in the panel — Verified 2026-11-22: sim-27-2 exit=0 (40 simulator tests; the panel header shows 'Dragging: would match …' while a bloom is dragged and describe(_:) carries it, asserted in the drag wiring test)
   header of `Packages/ExperiencesRound02/NocturneGarden/Experience/NocturneGardenControls.swift` while a bloom is
   dragged and include them in `describe(_:)` of `NocturneGardenPresenter.swift`, with an assertion in
   `Packages/ExperiencesRound02/NocturneGarden/ExperienceTests/NocturneGardenGestureWiringTests.swift` per

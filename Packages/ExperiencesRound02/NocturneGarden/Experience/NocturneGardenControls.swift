@@ -37,6 +37,12 @@ struct NocturneGardenControls: View {
         Text(mirror.status).font(.subheadline)
         Text(mirror.measureLabel).font(.footnote)
         Text(mirror.targetLabel).font(.footnote)
+        if let preview = mirror.previewText {
+            // Feature 384 convergence (T-R02G0904-014): the drag's exact preview in words.
+            Text("Dragging: " + preview).font(.footnote)
+                .accessibilityLabel("Drag preview")
+                .accessibilityValue(preview)
+        }
         if let message = mirror.message {
             Text(message).font(.footnote)
         }
