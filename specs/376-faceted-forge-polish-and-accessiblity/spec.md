@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-22
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G08-06 (migration ledger, game feature of experience R02-G08) · ID namespace FR-R02G0806-###,
 SC-R02G0806-###, T-R02G0806-###
@@ -24,6 +24,64 @@ Canonical overrides:
 - **Shared features used:** R02-F26 (input and accessibility contract, feedback route), R02-F10 (reduce flashing and
   non-colour clues), R02-F27 (ambient audio), and the kernel, content, adapter, renderer, gestures and teaching of
   R02-G08-01 … 05.
+
+## Clarifications
+
+### Session 2026-11-22
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+366's answers where the games agree. Facts checked in code (read-only, 2026-11-22): the shared `ExperienceFeedback`
+route, `AnnouncementKind` (`rejection`, `outcome`, `level`, `state`), `HapticKind` (`selection`, `success`, `warning`,
+`error`) and `AmbientLoopPlayer` with a fixed `AmbientLoopRecipe` (1 … 6 partials, 4 … 16 s) are those feature 366
+used; Faceted Forge's dispersion bands move at 0.8 rad/s per layer (at most 2.4 rad/s, about 0.38 cycles per second),
+still under Reduce Motion (time 0); its glow limit is 0.5 under Reduce Flashing (1.5 otherwise); the sliver cross
+appears at once on a sliver failure and the opening eases over 0.4 s from the level's start; the adapter's refusal codes
+are `r02-g08.action`, `stage`, `stale`, `miss`, `malformed`, `locked`, `date` and `not-whole`; the presenter shows
+refusals as "That change was refused: <code>" and logs their codes; pieces are named "piece k: s of the crystal, f
+faces" (the whole crystal before the first cut).
+
+- Q: What exactly is announced, and with which kind? → A: after an accepted cut (`state`): "Piece p cut in direction x
+  at depth d: n pieces now. c cuts left." (c = budget − cuts; "1 cut left"); undo and redo: "Undone. " / "Redone. "
+  followed by "n pieces. c cuts left."; a win (`outcome`): "The pieces match the target. Level won with m cuts made, k
+  of 3 stars." (without the stars in practice); a failure (`outcome`): the failure explanation of feature 375; a level
+  or mode change (`level`): "Level n, band b, <mode>." with the tutorial instruction when shown; a refusal (`rejection`)
+  in words: `r02-g08.locked` "That level is not open yet.", `r02-g08.date` "That date cannot be used.", `r02-g08.action`
+  "That cut is not possible here.", `r02-g08.miss` "That plane misses the piece.", `r02-g08.stage` "The level has
+  ended.", `r02-g08.not-whole` "That value must be a whole number.", any other code "That move was refused." Changes of
+  the preview choice (piece, direction, depth) are not announced: the adjustable pickers speak their own values. Texts
+  are a pure function of the old and new core (and the refusal code), so tests compare them exactly; the panel shows the
+  same refusal text. Impact: FR-R02G0806-002; SC-R02G0806-002.
+- Q: Which haptics play, and how are bursts handled? → A: `selection` for an accepted cut, undo or redo; `success` for a
+  win; `warning` for a failure; `error` for a refusal; choice changes, level changes and drag previews play none. The
+  shared planners' intervals apply; when one cut both moves and ends the play (the winning cut, a sliver or the last cut
+  of the budget), only the outcome is planned, so an outcome is never dropped behind a selection haptic. Impact:
+  FR-R02G0806-003; SC-R02G0806-002.
+- Q: How are fades done and measured under Reduce Flashing? → A: the presenter keeps a light level for the cut-face
+  glow (0.7 while playing, 1 once won, 0.35 once failed) and the sliver mark (1 while the failure is a sliver, else 0),
+  each easing toward its target in presentation time (0.15 s normally, 0.45 s under Reduce Flashing, linear; under
+  Reduce Flashing a fade that has started finishes before it may turn back), and the opening keeps its 0.4 s ease. The
+  scene draws the eased levels (the glow gain times the glow level, the sliver cross's colour times its level); the
+  state and digest never see them. The shimmer stays at about 0.38 cycles per second (below 3) and is still under Reduce
+  Motion. The measure: sampling the drawn levels every 1/60 s through a scripted win and adversarial flicker (a sliver
+  failure undone and repeated every frame, retry, level changes), no element crosses half its range more than 3 times
+  per second, and every complete one-way fade of more than half the range takes at least 0.4 s under Reduce Flashing.
+  Impact: FR-R02G0806-004; SC-R02G0806-003.
+- Q: Where does the sound choice live, and what is the recipe? → A: a Sound toggle in the panel, off by default, held by
+  the presenter (presentation only; saving it is R02-G08-07). The recipe is a pure function of the piece count, the
+  target's piece count and the stage: a root at 110 Hz and one partial per piece beyond the first, up to four, at 110 ×
+  (5/4, 3/2, 2, 5/2)[k − 1], each with the base gain, the root alone while the crystal is whole; an added octave when
+  won and halved gains when failed; a 12-second loop (every partial has a whole number of cycles in it). The presenter
+  rebuilds the loop only when the level opens, a cut, undo or redo changes the piece count or the stage, or the toggle
+  turns on, never per frame. The loop plays exactly while the choice is on, the controls are on screen and the scene is
+  active. Impact: FR-R02G0806-006; SC-R02G0806-004.
+- Q: What do Larger Text and Increase Contrast require of the panel? → A: the panel scrolls vertically, uses system text
+  styles that grow with Dynamic Type up to the largest accessibility size, wraps rather than truncates labels, and uses
+  system colours, so Increase Contrast applies; button rows wrap into a column at accessibility sizes; the piece,
+  direction and depth pickers are accessibility-adjustable elements labelled "Piece to cut" (value: the piece in
+  words), "Direction of the cut" (value "direction x") and "Depth of the cut" (value "depth d", or "the plane misses
+  this piece"); a summary element reads "c cuts left. n pieces: <each piece in words>. Target: <the target in words>.
+  Next cut: piece p, direction x, depth d."; on iPad the panel keeps a readable width (at most 520 points). Impact:
+  FR-R02G0806-001, 005; SC-R02G0806-001.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -80,8 +138,8 @@ pure function of the pieces and the stage; the loop plays only while wanted, on 
 
 ### Edge Cases
 
-- **Many quick actions (rapid cuts, undos and redos):** haptics and announcements obey the shared rate limits (a burst of
-  announcements posts its newest); an outcome is never lost.
+- **Many quick actions (rapid cuts, undos and redos):** haptics and announcements obey the shared rate limits (a burst
+  of announcements posts its newest); an outcome is never lost.
 - **A drag in progress:** the previewed plane is described but not announced; the committed cut is announced like any
   other.
 - **A cut that ends the level:** only the outcome is announced and felt.
@@ -128,13 +186,13 @@ pure function of the pieces and the stage; the loop plays only while wanted, on 
 - **SC-R02G0806-001**: 100 % of native controls expose a label and value; level 1 is completed using only the operations
   the accessibility actions perform (the pickers' increment and decrement, depth − and +, cut), with every step
   announced.
-- **SC-R02G0806-002**: For scripted sequences of cuts, undos, refusals, wins and failures, the recorded announcements and
-  haptics equal the plan exactly (kinds and texts).
+- **SC-R02G0806-002**: For scripted sequences of cuts, undos, refusals, wins and failures, the recorded announcements
+  and haptics equal the plan exactly (kinds and texts).
 - **SC-R02G0806-003**: With Reduce Flashing, no drawn element crosses half its brightness range more than 3 times per
   second over a scripted win and adversarial flicker, and every complete one-way fade of more than half the range takes
   at least 0.4 s; with Reduce Motion, two frames of the same state at different times are identical.
-- **SC-R02G0806-004**: The ambient recipe is identical for equal pieces and stages and differs when they differ; the loop
-  plays exactly while wanted, on screen and active (state-table test).
+- **SC-R02G0806-004**: The ambient recipe is identical for equal pieces and stages and differs when they differ; the
+  loop plays exactly while wanted, on screen and active (state-table test).
 - **SC-R02G0806-005**: Existing tests pass unchanged except where this feature adds wiring; each test under 10 s; the
   reference regression passes 7 of 7.
 - **SC-R02G0806-006** {device}: after ImplementationLock-100, sound, haptics and VoiceOver are checked on D1/D2/D3.
