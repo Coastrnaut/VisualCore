@@ -24,7 +24,7 @@ logic); no GLSL in this feature.
 
 ## Phase 3: Story 1 — every shipped level can be solved (P1) 🎯
 
-- [ ] T-R02G0902-003 [US1] Implement `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenSolver.swift` (clarification Q2: `needed` = least s with
+- [X] T-R02G0902-003 [US1] Implement `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenSolver.swift` (clarification Q2: `needed` = least s with — Verified 2026-11-22: host-2 exit=0 (NocturneGardenSolverTests 9: needed, stamp equals bloom cells, single bloom, sun move first, unreachable target nil, candidates solve at the bound and not one short, brute-force cover, determinism, work bound; agent A's tests retested by the lead)
   s·q ≥ p·|T|; `cover(e)` = largest |cells ∩ T| of one plant at e (supplied kinds, allowed sizes, anchors) with leak
   within the allowance; `lowerBound` L = min over allowed e ascending of [e ≠ opening] + ⌈needed / cover⌉;
   depth-first search per elevation for exactly L moves: a sun move first when needed, then plants ordered by shape score
