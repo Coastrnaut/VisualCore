@@ -29,7 +29,7 @@ tests stay short (< 10 s each). No {owner} tasks; one {device} task; no GLSL cha
 
 ## Phase 3: Story 2 — comfort settings (P1)
 
-- [ ] T-R02G0606-003 [P] [US2] Create `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorLights.swift` ("rings: 1 lit, 0.5 unlit; nodes: 1 on
+- [X] T-R02G0606-003 [P] [US2] Create `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorLights.swift` ("rings: 1 lit, 0.5 unlit; nodes: 1 on — Verified 2026-11-21: 2026-11-21: host-2 (ChronoConstellatorLightsTests: settle, 0.15/0.45 s fades, scripted win and adversarial flicker at 60 Hz <= 3 half-range crossings/s and fades >= 0.4 s under Reduce Flashing, collision mark) exit 0, lead retest
   target, 0.7 off; glow 1 when won; collision 1 when failed by collision; linear 0.15 s, or 0.45 s under Reduce Flashing
   where a started fade completes before turning back"; settle; step; isSettled; maxHalfRangeCrossingsPerSecond) with
   `Packages/ExperiencesRound02/ChronoConstellator/CoreTests/ChronoConstellatorLightsTests.swift` (agent B: a scripted win and adversarial flicker (a phase changed
