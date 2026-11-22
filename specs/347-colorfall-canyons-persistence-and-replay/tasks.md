@@ -64,7 +64,7 @@ tests stay short (< 10 s each). {device} items are D1–D3 observations after Im
 - [X] T-R02G0507-010 Script tests, run alone (`--name script-tests`) — Verified 2026-11-21: 2026-11-21 script-tests exit 0, run alone (.autonomy/migration/checks/R02-G05-07.script-tests.json)
 - [ ] T-R02G0507-011 {device} After ImplementationLock-100, on D1, D2 and D3: a save survives a real termination and
   restores to the same level, carved cells, valves, fluid, actions and stars. Not run before the lock.
-- [ ] T-R02G0507-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+- [X] T-R02G0507-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record — Verified 2026-11-21: 2026-11-21 converge round 1 clean; sealed 16 passing; recorded pass (.autonomy/migration/evidence/R02-G05-07.json)
 
 ## Dependencies and parallel work
 
