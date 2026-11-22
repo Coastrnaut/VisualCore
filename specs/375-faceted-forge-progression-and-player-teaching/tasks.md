@@ -76,3 +76,13 @@ tests stay short (< 10 s each). No {owner} or {device} tasks (no device-only beh
 001 → {002 (agent B), 003 (agent C)} → 004 (lead) → 005 (lead; agent D writes the teaching tests) → 006 … 011. Shared
 files (adapter, scenarios, presenter, controls, docs) stay with the lead. MVP: Stories 1–3.
 
+
+## Phase 6: Convergence
+
+- [ ] T-R02G0805-012 Keep a hint search off the frame per the Spec's edge case "A hint search that would run long … it
+  never stalls the frame" (partial): in `Packages/ExperiencesRound02/FacetedForge/Experience/FacetedForgePresenter.swift`
+  compute `core.hint(level:)` in a detached task (the core is a value), show "Finding a hint…" in the mirror meanwhile,
+  publish the result on the main actor only when the play it belongs to (level, mode, fingerprint) is still the current
+  one, and cache the plan's hints per play so later levels of the same play are immediate; cover it in
+  `Packages/ExperiencesRound02/FacetedForge/ExperienceTests/FacetedForgeTeachingTests.swift` (the hint arrives without
+  blocking the press; a cut before it arrives discards it); `--name sim-27-2`
