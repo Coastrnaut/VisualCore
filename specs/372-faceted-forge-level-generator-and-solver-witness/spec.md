@@ -43,20 +43,19 @@ prototype of these rules (2026-11-22, debug host build) certified all 100 manife
 candidates skipped for one level, at most 16,431 cut evaluations for one search and at most 4.5 s for one level.
 
 - Q: How is a level built from its manifest entry? → A: the 100 entries (number, planned seed, band, move budget) are a
-  table in `FacetedForgeManifest` with their provenance. Candidate k of entry n draws from
-  `SeededRandom(seed: SeedDerivation.derive(plannedSeed, index: k))`, in this order: the crystal by band (band 1 a cube
-  −a … a, a = 3 … 6; band 2 a box with each face at ±2 … 6; band 3 a cube a = 4 … 6 with one corner cut by x+y+z ≤ b,
-  b = a + 1 … 3a − 2; band 4 an octahedron |x|+|y|+|z| ≤ a, a = 5 … 6, written with the four body diagonals; band 5 a
-  cube a = 5 … 6 with two opposite corners cut, x+y+z ≤ b and x+y+z ≥ −b); the number of cuts c by band (2 … 3; 3 … 4;
-  4 … 5; 5 … 6; 6 … 7); then c cuts, each of a drawn piece (canonical order), a drawn direction (bands 1 … 2 the axes
-  and face diagonals, bands 3 … 5 all 13) and a drawn depth among the middle half of those that cross it (the outer quarter on each
-  side is left out, so pieces stay large enough). The target is the resulting
-  multiset of (share, face count); the sliver limit is 1/64 for every level. A candidate is kept when every piece's
-  share is at least 1/32, bands 3 … 5 use at least one body diagonal, and the solver certifies it within its work bound;
-  otherwise k grows, at most 256 candidates, then `generation(n)`. Ids `faceted-forge-NNN`; tutorial flag on levels
-  1 … 3; difficulty = band; budget = manifest budget. To hold the manifest budgets, the kernel's ranges widen
-  additively: budget 1 … 20 and target face counts 4 … 34 (14 crystal planes + 20 cuts); every earlier level stays
-  valid. Impact: FR-R02G0802-001, 006; SC-R02G0802-001, 003, 004.
+  table in `FacetedForgeManifest` with their provenance. Candidate k of entry n draws from `SeededRandom(seed:
+  SeedDerivation.derive(plannedSeed, index: k))`, in this order: the crystal by band (band 1 a cube −a … a, a = 3 … 6;
+  band 2 a box with each face at ±2 … 6; band 3 a cube a = 4 … 6 with one corner cut by x+y+z ≤ b, b = a + 1 … 3a − 2;
+  band 4 an octahedron |x|+|y|+|z| ≤ a, a = 5 … 6, written with the four body diagonals; band 5 a cube a = 5 … 6 with
+  two opposite corners cut, x+y+z ≤ b and x+y+z ≥ −b); the number of cuts c by band (2 … 3; 3 … 4; 4 … 5; 5 … 6; 6 … 7);
+  then c cuts, each of a drawn piece (canonical order), a drawn direction (bands 1 … 2 the axes and face diagonals,
+  bands 3 … 5 all 13) and a drawn depth among the middle half of those that cross it (the outer quarter on each side is
+  left out, so pieces stay large enough). The target is the resulting multiset of (share, face count); the sliver limit
+  is 1/64 for every level. A candidate is kept when every piece's share is at least 1/32, bands 3 … 5 use at least one
+  body diagonal, and the solver certifies it within its work bound; otherwise k grows, at most 256 candidates, then
+  `generation(n)`. Ids `faceted-forge-NNN`; tutorial flag on levels 1 … 3; difficulty = band; budget = manifest budget.
+  To hold the manifest budgets, the kernel's ranges widen additively: budget 1 … 20 and target face counts 4 … 34 (14
+  crystal planes + 20 cuts); every earlier level stays valid. Impact: FR-R02G0802-001, 006; SC-R02G0802-001, 003, 004.
 - Q: How does the solver decide the smallest cut count, and what proves it? → A: each accepted cut turns one piece into
   two, so a target of P pieces needs at least P − 1 cuts: that is the lower bound, and any winning sequence of P − 1 cuts
   proves it is the smallest. The solver searches depth-first for such a sequence from the crystal alone (not from the
