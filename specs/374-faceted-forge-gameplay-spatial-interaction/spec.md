@@ -62,7 +62,8 @@ direction, depth]`, `play.undo`, `play.redo` and `level.next`, cuts only while p
   60° down from the horizon, authored 30°, 60° per view height); a second finger cancels a drag or press (the choice
   returns to what it was at touch-down; nothing sent); a third re-bases the midpoint; a double tap (two taps at most
   0.35 s and 22 points apart) on empty space or "Reset view" returns to the authored view; the distance refits so the
-  bounding sphere of radius 1.45 stays inside the view with a 5 % margin at every orbit and aspect 0.4 … 2.5.
+  framing sphere of radius 1.65 (the opened crystal, reach 1.2, and the cut-mark row, whose bar ends lie 1.64 from the
+  centre) stays inside the view with a 5 % margin at every orbit, the authored one included, and aspect 0.4 … 2.5.
   Presentation only: not saved, so the snapshot schema stays 1. Impact: FR-R02G0804-006; SC-R02G0804-004.
 - Q: How is everything tested? → A: the Core gesture controller (`FacetedForgeGestureController`) takes pointer events
   with the view size and the drawn snapshot and orbit and returns the new preview choice, the actions to send (only
@@ -93,8 +94,9 @@ predicts, or none; the digest never changes.
 ### User Story 2 - Tilt the plane by its rim and slide it to depth (Priority: P1)
 
 A player drags the preview plane's rim: the plane tilts to follow the finger and snaps to the nearest of the 13 cut
-directions. A player drags the depth slider (or the plane's interior) along the plane's normal: the plane slides through
-the depths that cross the chosen piece, one step at a time. Both are previews: nothing changes in the game.
+directions. A player drags the depth slider — the plane's interior, which acts as the slider — along the plane's normal:
+the plane slides through the depths that cross the chosen piece, one step at a time. Both are previews: nothing changes
+in the game.
 
 **Why this priority**: choosing the plane is the game's main decision.
 
@@ -105,7 +107,7 @@ predicts; the digest never changes.
 
 1. **Given** a chosen piece, **When** a drag starts on the preview rim and ends, **Then** the direction is the one of
    the 13 nearest to the dragged orientation and the depth moves to the nearest crossing one.
-2. **Given** a chosen piece, **When** a drag starts on the preview interior or the depth slider and moves along the
+2. **Given** a chosen piece, **When** a drag starts on the preview interior (the depth slider) and moves along the
    plane's projected normal, **Then** the depth changes by the number of whole steps dragged, clamped to the crossing
    depths.
 
@@ -159,7 +161,7 @@ A player who cannot drag precisely can do everything through the labelled panel 
 - **FR-R02G0804-002**: A drag (at least 16 points) that starts within the touch target of the preview rim MUST, on
   release, set the direction to the one of the 13 nearest the dragged orientation and the depth to the nearest crossing
   one; during the drag the previewed plane MUST be drawn and described.
-- **FR-R02G0804-003**: A drag that starts on the preview interior or the depth slider MUST change the depth by whole
+- **FR-R02G0804-003**: A drag that starts on the preview interior (the depth slider) MUST change the depth by whole
   steps along the plane's projected normal, clamped to the depths that cross the chosen piece.
 - **FR-R02G0804-004**: A tap within the preview polygon while playing MUST send exactly one `piece.cut [piece,
   direction, depth]` with the current choice; otherwise a commit MUST send nothing.

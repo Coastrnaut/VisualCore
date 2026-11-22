@@ -16,8 +16,8 @@
   first, then the nearest opened face polygon of a piece, with a 22-point fallback target. Rationale: R2-F22's analytic
   picking; deterministic and host-testable.
 - **R5 Orbit bounds.** Decision: yaw ±40°, pitch 10° … 60° (authored 30°), distance refit to the bounding sphere of
-  radius 1.45. Rationale: R2-F22's constrained orbit avoids the vertical singularity and keeps the whole opened crystal
-  visible.
+  radius 1.65 (the opened crystal and the cut-mark row; 1.45 left the mark's bar ends outside). Rationale: R2-F22's
+  constrained orbit avoids the vertical singularity and keeps the whole opened crystal visible.
 - **R6 The preview while dragging.** Decision: the candidate choice is drawn through the existing preview of R02-G08-03
   (it is presentation state already); a cancel returns to the choice at touch-down. Rationale: the player sees the exact
   plane a commit would cut with.

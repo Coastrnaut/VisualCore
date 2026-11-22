@@ -14,8 +14,8 @@ tests stay short (< 10 s each). No {owner} tasks.
 ## Phase 2: Foundational — orbit and picking
 
 - [ ] T-R02G0804-002 [P] Add `FacetedForgeOrbit` ("yaw ±40°, pitch 10° … 60°, authored (0, 30°)") and
-  `camera(_:aspect:orbit:)` (distance refit to the bounding sphere of radius 1.45 with a 5 % margin; `camera(_:aspect:)`
-  equals the authored orbit, bit-identical) to
+  `camera(_:aspect:orbit:)` (distance refit to the framing sphere of radius 1.65 with a 5 % margin, the cut-mark row
+  included; `camera(_:aspect:)` equals the authored orbit, bit-identical) to
   `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeSceneGeometry.swift`; create
   `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgePicker.swift` (touch ray through the drawn camera; the
   opened preview rim within 22 points of its projected outline first, then the preview polygon (ray hit or inside its
