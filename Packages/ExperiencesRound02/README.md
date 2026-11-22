@@ -465,3 +465,8 @@ Feature 377 (R02-G08-07) adds persistence and replay: results carry their winnin
 `verified`; `FacetedForgeReconciliation` replays every trace on restore and drops results that do not verify; the
 adapter writes snapshot schema 3 with a 2 → 3 migration, adds `replay.start`, `replay.step`, `replay.stop` and
 `settings.sound`; the panel gains Replay, Step and Stop and announces dropped results once.
+
+Feature 378 (R02-G08-08) adds the regression net: solver and witness checks for all 100 levels with ten named
+alterations, `FacetedForgeGolden` (test builds only) with 16 pinned golden frame descriptions in
+`FacetedForge/golden-frames.json` (`FACETED_FORGE_WRITE_GOLDEN=1` rewrites them), simulator golden-frame and memory
+tests, a CI step and `scripts/faceted_forge_regression.py`.

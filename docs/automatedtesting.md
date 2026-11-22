@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-22 (R02-G08-07: Faceted Forge persistence; a count that includes undone work).
+Last updated: 2026-11-22 (R02-G08-08: Faceted Forge regression net and local command).
 
 ## 1. What is tested, and where
 
@@ -389,6 +389,13 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   files reach the test target only after `xcodegen generate`: the first run without it built and ran 0 tests, which the
   enumeration guard caught (0/3 declared tests). The level-1 journey is one Turn − and two Advances, and its pinned
   values are checked against the Core by an app unit test.
+- **Faceted Forge regression** (R02-G08-08, 2026-11-22). `python3 scripts/faceted_forge_regression.py` runs the host
+  filter `FacetedForgeRegression` (solver regression over 100 witnesses in tests of 10, ten named alterations, golden
+  descriptions) and then the simulator golden-frame and memory classes with
+  `TEST_RUNNER_FACETED_FORGE_MEMORY_ISOLATED=1`; CI runs the host part as a named step. Golden frames stop at most two
+  cuts in and one cut short of the win, fully opened, so pieces, the preview and the cut bars show in every baseline;
+  the level alterations reuse the unaltered certified solution so no altered level is re-solved. The golden frame test
+  pins the initial preview choice after its cuts, because the presenter keeps the player's choice across cuts.
 - **Amethyst Escape regression** (R02-G07-08, 2026-11-22). `python3 scripts/amethyst_escape_regression.py` runs the
   host filter `AmethystEscapeRegression` (solver regression over 100 witnesses in tests of 10, twelve named alterations,
   golden descriptions) and then the simulator golden-frame and memory classes with
