@@ -178,7 +178,7 @@ simulator parts and reports one summary.
 ### Measurable Outcomes
 
 - **SC-R02G0508-001**: All 100 levels replay their witnesses and re-solve to their certified smallest edit set with
-  exactly the certified work (distinct routings simulated); 100 of 100.
+  the witness's `smaller` count (distinct routings simulated) and win tick; 100 of 100.
 - **SC-R02G0508-002**: Each of the 12 kinds of alteration of clarification Q2 is detected and named.
 - **SC-R02G0508-003**: The golden set covers 5 levels × 3 tiers plus the hero frame (16 frames); every rendered frame
   matches its description within tolerance and every recomputed description matches its pinned entry (equal digest, or

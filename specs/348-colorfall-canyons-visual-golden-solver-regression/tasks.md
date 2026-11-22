@@ -57,7 +57,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 - [ ] T-R02G0508-007 Docs: `docs/architecture/colorfall-canyons.md` (regression net),
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`; `--name audits -- python3
-  scripts/verify_experiences.py --audits --only r02-g04.colorfall-canyons`
+  scripts/verify_experiences.py --audits --only r02-g05.colorfall-canyons`
 - [ ] T-R02G0508-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
   `--name host-full`, `--name app-unit`
 - [ ] T-R02G0508-009 Reference regression chunk 1 (`--name reference-1`)
