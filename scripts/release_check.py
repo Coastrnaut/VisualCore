@@ -308,7 +308,9 @@ RELEASE_FORBIDDEN = ["DebugLaunch", "DebugExperience", "DebugInventory", "Scenar
                      # Feature 348 (R02-G05-08): Colorfall Canyons's golden frames, test builds only.
                      "ColorfallCanyonsGolden",
                      # Feature 358 (R02-G06-08): Chrono Constellator's golden frames, test builds only.
-                     "ChronoConstellatorGolden"]
+                     "ChronoConstellatorGolden",
+                     # Feature 368 (R02-G07-08): Amethyst Escape's golden frames, test builds only.
+                     "AmethystEscapeGolden"]
 
 
 def registered_ids(root: Path = ROOT) -> list[str]:

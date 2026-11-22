@@ -23,7 +23,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 3: Story 2 — the picture does not drift (P1)
 
-- [ ] T-R02G0708-003 [US2] Create `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeGolden.swift` (DEBUG or VISUALCORE_AUTOMATION; "16 frames:
+- [X] T-R02G0708-003 [US2] Create `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeGolden.swift` (DEBUG or VISUALCORE_AUTOMATION; "16 frames: — Verified 2026-11-22: AmethystEscapeGolden compiles in the round-two package; golden-frames.json written with AMETHYST_ESCAPE_WRITE_GOLDEN=1 (16 frames) and reproduced byte for byte; RELEASE_FORBIDDEN lists AmethystEscapeGolden
   levels 1, 21, 41, 61, 81 at tiers 0 … 2 at time 0 after the witness's first min(smallest − 1, 3) actions, plus the
   hero frame at tier 0; at 1,152 × 768 with the authored camera: the pearl centre, the exit arrow centre and every wedge
   top centre (wedge order), positions rounded to 1/8 px and an off-screen point null; the move count and the move bar's
