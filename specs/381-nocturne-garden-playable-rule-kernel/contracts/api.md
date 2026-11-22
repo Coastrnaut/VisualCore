@@ -22,7 +22,8 @@ public struct NocturneGardenLevel: Sendable, Equatable, Codable { /* fields per 
     encoded() -> Data; static func decode(_:) throws(NocturneGardenError) -> Self; fingerprint */
     public func bloomName(_ index: Int, bloom: NocturneGardenBloom) -> String  // "bloom 1: tulip at column 3, row 0, size 2"
     public func targetDescription() -> String }                                 // FR-R02G0901-013
-public enum NocturneGardenFailure: Sendable, Hashable, Codable { case leak(Int), budget; public var code: String }  // leak(move)
+public enum NocturneGardenFailure: Sendable, Hashable, Codable { case leak(Int), budget; public var code: String }
+    // leak(move): the move index; the action and its bloom (or the sun) are read from the record of that move
 public enum NocturneGardenAction: Sendable, Hashable, Codable { case plant(NocturneGardenKind, Int, Int, Int),
     move(Int, Int, Int), resize(Int, Int), remove(Int), sun(Int) }
 public enum NocturneGardenStage: String, Sendable, Codable, CaseIterable { case loading, tutorial, playing, paused, won, failed, result }
