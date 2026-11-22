@@ -8,7 +8,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 1: Setup
 
-- [ ] T-R02G0803-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test
+- [X] T-R02G0803-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test — Verified 2026-11-22: 2026-11-22: baseline-host, baseline-timing exit 0; baseline-round02 exit 1 (uncommitted T-002 snapshot tripped the kernel's no-Double scan), baseline-round02-2 on the committed tree exit 0; rendering baseline = R02-G08-02 rendering-27/26 exit 0
   --package-path Packages/ExperiencesRound02`; the rendering baseline is R02-G08-02's rendering runs (exit 0)
 - [ ] T-R02G0803-002 Edit `Packages/ExperiencesRound02/Package.swift` (Core dependencies VisualCoreScenes,
   VisualCoreExperience, VisualCoreDiagnostics, VisualCorePersistence now; `FacetedForgeExperience` and its tests with
