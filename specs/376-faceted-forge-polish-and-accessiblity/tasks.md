@@ -72,3 +72,13 @@ tests stay short (< 10 s each). No {owner} tasks.
 001 → 002 (lead) → {003 (agent A), 004 (agent B)} → 005 (lead; agent C writes the accessibility tests) → 006 … 010,
 012. 011 stays open until device testing. Shared files (Package.swift, geometry, presenter, scene, controls, docs) stay
 with the lead. MVP: Stories 1 and 2.
+
+## Phase 5: Convergence
+
+- [ ] T-R02G0806-013 Fade the sliver cross out as well as in per FR-R02G0806-004 and SC-R02G0806-003 (partial): in
+  `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeSceneGeometry.swift` accept the centre of a fading cross
+  (`fadingSliver: SIMD3<Double>?`) drawn with the eased sliver level when the snapshot has no failure piece; in
+  `Packages/ExperiencesRound02/FacetedForge/Experience/FacetedForgePresenter.swift` remember the opened centre of the
+  last sliver piece and pass it while `lights.sliver` is above 0; test it in
+  `Packages/ExperiencesRound02/FacetedForge/CoreTests/FacetedForgeSceneGeometryTests.swift` (an undone sliver still
+  draws the cross at the fading level until it reaches 0); `--name host-4` and `--name sim-27-2`
