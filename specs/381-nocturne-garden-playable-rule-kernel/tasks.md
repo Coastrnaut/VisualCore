@@ -14,7 +14,7 @@ in this feature (the blooms and the mask are the CPU reference the renderer of R
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G0901-002 Edit `Packages/ExperiencesRound02/Package.swift` (+ `NocturneGardenCore`, `NocturneGardenCoreTests`,
+- [X] T-R02G0901-002 Edit `Packages/ExperiencesRound02/Package.swift` (+ `NocturneGardenCore`, `NocturneGardenCoreTests`, — Verified 2026-11-22: host (swift test --filter NocturneGarden: NocturneGardenLevelTests 11 — reason codes, every range refusal, stored form round trip and refusals, action encoding, names in words, six simple counter-clockwise outlines in bounds, hand-computed masks at every elevation, canonical order, match/leak/deviation edges, 500 fixtures whose arrangements match their targets with no leak and win only on the last plant) exit 0, lead retest
   product); create `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenError.swift` (codes "r02-g09.level, .action, .supply, .noop, .stage, .stale,
   .newer-schema, .malformed"), `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenBloom.swift` (the six kinds "tulip, bell, star, fern, rose, lily"
   as "simple polygons with integer vertices, foot at the origin, at most 16 vertices, within 3 × 6 cells at size 1";
