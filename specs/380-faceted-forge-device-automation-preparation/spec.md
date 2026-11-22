@@ -41,8 +41,8 @@ covered by a row.
 
 **Acceptance Scenarios**:
 
-1. **Given** the device row definition, **When** it is checked, **Then** every scenario it names exists in Amethyst
-   Escape's scenario manifest and every row has devices D1, D2, D3 (or a stated subset), a procedure, a pass condition
+1. **Given** the device row definition, **When** it is checked, **Then** every scenario it names exists in Faceted
+   Forge's scenario manifest and every row has devices D1, D2, D3 (or a stated subset), a procedure, a pass condition
    and the status "pending device campaign".
 2. **Given** the {device} tasks of features 371–379, **When** they are compared with the rows, **Then** each one is
    covered by at least one row.
@@ -59,8 +59,8 @@ number.
 
 **Acceptance Scenarios**:
 
-1. **Given** the written plan, **When** a person reads any row, **Then** it states the devices in order, the owner steps,
-   the procedure, what is measured and the pass condition, and no measured value.
+1. **Given** the written plan, **When** a person reads any row, **Then** it states the devices in order, the owner
+   steps, the procedure, what is measured and the pass condition, and no measured value.
 
 ### Edge Cases
 
