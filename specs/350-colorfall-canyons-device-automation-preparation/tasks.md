@@ -19,7 +19,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
   only for CC-D6), covers, owner_steps, status "pending device campaign"; no result field); edit
   `scripts/release_check.py` (step `device-rows-r02-g05`); `--name device-rows -- python3 scripts/check_device_rows.py
   --experience r02-g05.colorfall-canyons`
-- [ ] T-R02G0510-003 [P] [US1] Edit `scripts/test_scripts.py` (agent A: the real Colorfall Canyons definition passes; a copy
+- [X] T-R02G0510-003 [P] [US1] Edit `scripts/test_scripts.py` (agent A: the real Colorfall Canyons definition passes; a copy — Verified 2026-11-21: 2026-11-21 script-tests exit 0, run alone (.autonomy/migration/checks/R02-G05-10.script-tests.json): ColorfallCanyonsDeviceRowsCheckTests 6 tests (real definition passes; removed scenario, missing CC-D1 pass field and uncovered T-R02G0509-011 each fail by name; release step device-rows-r02-g05); lead retest
   with a scenario removed, a copy with CC-D1's `pass` field removed and a copy with T-R02G0509-011 dropped from every row's covers each fail by name; the release
   step `device-rows-r02-g05` runs the check for `r02-g05.colorfall-canyons`); `--name script-tests` (alone)
 
