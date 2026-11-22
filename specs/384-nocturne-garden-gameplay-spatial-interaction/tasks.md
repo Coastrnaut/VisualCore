@@ -85,3 +85,11 @@ tests stay short (< 10 s each). No {owner} tasks.
 001 → 002 (lead) → {003 (agent B), 005 (agent D)} → 004 (agent C, on B's picker) → 006 (lead; agent E writes the wiring
 tests) → 007 … 011, 013. 012 stays open until device testing. Shared files (snapshot, shaders, presenter, scene,
 controls, docs) stay with the lead. MVP: Stories 1 to 3 and 5.
+
+## Phase 7: Convergence
+
+- [ ] T-R02G0904-014 Show the drag preview's words (`mirror.previewText`, "would match 12/16, leak 0 cells") in the panel
+  header of `Packages/ExperiencesRound02/NocturneGarden/Experience/NocturneGardenControls.swift` while a bloom is
+  dragged and include them in `describe(_:)` of `NocturneGardenPresenter.swift`, with an assertion in
+  `Packages/ExperiencesRound02/NocturneGarden/ExperienceTests/NocturneGardenGestureWiringTests.swift` per
+  FR-R02G0904-002 / US2 (partial)
