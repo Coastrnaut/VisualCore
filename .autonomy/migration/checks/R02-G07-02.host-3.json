@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "AmethystEscapeGeneratorTests"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter AmethystEscapeGeneratorTests",
+  "elapsed_seconds": 3.888,
+  "exit_code": 0,
+  "finished": "2026-11-22T08:01:08+00:00",
+  "gate": "R02-G07-02",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G07-02.host-3.log",
+  "log_sha256": "ecd4c112545c2a92a7673741c309a75390745bfc8174f15b4494b6f3831d5d73",
+  "name": "host-3",
+  "started": "2026-11-22T08:01:04+00:00",
+  "timed_out": false
+}

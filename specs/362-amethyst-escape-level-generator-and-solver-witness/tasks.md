@@ -36,7 +36,7 @@ logic); no GLSL in this feature.
 
 ## Phase 4: Story 2 — levels come from their planned seeds (P1)
 
-- [ ] T-R02G0702-004 [US2] Create `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeGenerator.swift`
+- [X] T-R02G0702-004 [US2] Create `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeGenerator.swift` — Verified 2026-11-22: host-3 exit=0 (AmethystEscapeGeneratorTests 9/9: profiles, determinism, shape, skipped candidates re-checked, generation refusal)
   (AmethystEscapeBandProfile "6 × 2, 6 × 3, 8 × 3, 8 × 4, 10 × 4 sectors × shells; smallest 3 … 4, 5 … 6, 7 … 8, 9 … 10,
   11 … 12", `candidate(_:index:)` drawing in the order of clarification Q1 from `SeededRandom(seed:
   SeedDerivation.derive(seed, index: k))`, AmethystEscapeGenerated, `generate` with k = 0 … 511 refusing escapes by
