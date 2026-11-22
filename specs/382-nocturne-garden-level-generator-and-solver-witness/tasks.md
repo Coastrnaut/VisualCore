@@ -51,7 +51,7 @@ logic); no GLSL in this feature.
 
 ## Phase 5: Stories 3 and 4 — difficulty and honest witness files (P2)
 
-- [ ] T-R02G0902-005 [P] [US4] Create `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenWitness.swift` (schema 1; built by replaying the
+- [X] T-R02G0902-005 [P] [US4] Create `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenWitness.swift` (schema 1; built by replaying the — Verified 2026-11-22: host-4 exit=0 (NocturneGardenWitnessTests 14: byte-for-byte round trip, digest layout, near miss, every edited part refused by name, newer and damaged refused, make refusals; agent B's files retested by the lead)
   solution's actions on a `NocturneGardenPlay`: the 16-hex mask digest after every action, fingerprints after begin and
   each action; smallest and the bound (elevation, needed, cover); the near miss (the witness minus its last action: not
   won, shared below needed); difficulty; skipped; sorted-key pretty JSON with a trailing newline; `decode` refuses
