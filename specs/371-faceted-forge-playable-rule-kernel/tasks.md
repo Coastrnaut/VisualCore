@@ -40,7 +40,7 @@ in this feature (the pieces are the CPU reference the renderer of R02-G08-03 wil
 
 ## Phase 4: Stories 2 and 3 — sliver, budget, undo, redo, replay (P1)
 
-- [ ] T-R02G0801-004 [P] [US1] [US2] [US3] Create `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgePlay.swift`
+- [X] T-R02G0801-004 [P] [US1] [US2] [US3] Create `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgePlay.swift` — Verified 2026-11-22: host-3 exit=0 (FacetedForgePlayTests 12: fixtures win on the last cut, sliver at and below the limit, budget either side, 500 traces replay, undo exact, every refusal)
   (agent B: stages "loading, tutorial, playing, paused, won, failed, result"; actions validated for stage, previous
   fingerprint, range, miss; each accepted cut spends one cut; after a cut sliver, then win, then budget; failures sliver
   (piece, cut) and budget; pieces in canonical order; records with previous and next fingerprints; full undo and redo
