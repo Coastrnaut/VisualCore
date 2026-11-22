@@ -34,7 +34,7 @@ change (the shaders and reference of R02-G06-03 are unchanged and re-proven by t
   every name of Q1 is listed once by the controls' identifier list and has the prefix); `--name sim-27 -- python3
   scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package
   --destination sim-27.2 --action test --only-testing ChronoConstellatorExperienceTests`
-- [ ] T-R02G0609-004 [US1] Create `Apps/VisualCore/Tests/UI/ChronoConstellator/CRSupport.swift`, `CRPlayUITests.swift`,
+- [X] T-R02G0609-004 [US1] Create `Apps/VisualCore/Tests/UI/ChronoConstellator/CRSupport.swift`, `CRPlayUITests.swift`, — Verified 2026-11-22: app-ui exit=0 (chunk o3 on the iOS 27.2 phone: CRPlay win 54.7 s, relaunch 73.4 s, CRReplay 44.1 s; all < 90 s); o3 serial and unique, ReleaseCheckTests 14/14
   `CRReplayUITests.swift` (agent C: spec Clarifications Q2; level 1 certified phase changes, default phases and loop
   lengths pinned in `CR`; each changed star reached by stepping the star picker, then Phase + or Phase − the shorter way
   round its loop; Run; read "Every star stands on its target" and "Stars: 3 of 3"; background before terminate on

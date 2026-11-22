@@ -1139,6 +1139,16 @@ class ReleaseCheckTests(unittest.TestCase):
         start = argv.index("--only-testing") + 1
         self.assertEqual(argv[start:start + 2], ["VisualCoreUITests/CCPlayUITests", "VisualCoreUITests/CCReplayUITests"])
 
+    def test_chrono_constellator_ui_chunk(self):
+        """Feature 359 R02-G06-09 (T-R02G0609-004): the serial chunk `o3` runs the Chrono Constellator interface journeys."""
+        self.assertEqual(relcheck.UI_CHUNKS["o3"], ["CRPlayUITests", "CRReplayUITests"])
+        self.assertIn("o3", relcheck.SERIAL_CHUNKS)
+        steps = {s.name: s.argv for s in relcheck.unified_app_steps("X")}
+        argv = steps["app-ui-ios27-o3"]
+        self.assertNotIn("--parallel", argv)
+        start = argv.index("--only-testing") + 1
+        self.assertEqual(argv[start:start + 2], ["VisualCoreUITests/CRPlayUITests", "VisualCoreUITests/CRReplayUITests"])
+
     def test_ui_chunk_keys_are_unique_in_source(self):
         """Feature 319 (T-R02G0209-004): a repeated key in the `UI_CHUNKS` literal would silently drop the earlier
         chunk's test classes, so the source literal is parsed and every key must appear once."""
