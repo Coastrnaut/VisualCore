@@ -9,7 +9,7 @@ in this feature (the blooms and the mask are the CPU reference the renderer of R
 
 ## Phase 1: Setup
 
-- [ ] T-R02G0901-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test
+- [X] T-R02G0901-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test — Verified 2026-11-22: baseline-host, baseline-round02 exit 0; baseline-timing exit 1 under load (load average 13 right after the round-two suite: mesh build 5.96 s vs 5 s, analysis mean over 0.5), baseline-timing-2 exit 0; rendering baseline is X-R02-G08's visualcore-rendering run (exit 0)
   --package-path Packages/ExperiencesRound02`; the rendering baseline is X-R02-G08's visualcore-rendering run (exit 0)
 
 ## Phase 2: Foundational
