@@ -3,6 +3,7 @@
 // tiles in three sections for the fixture; a premium tile gives the notice and no session; the quality override
 // is applied when an experience opens. The storage helper `TestStorage` is in StoreTests.swift.
 import AuroraLoomCore
+import ColorfallCanyonsCore
 import Foundation
 import HueCompassCore
 import LissajousLabyrinthCore
@@ -1544,6 +1545,129 @@ final class AppModelTests: XCTestCase {
         XCTAssertEqual(HueCompassProgress.stars(units: 2, smallest: certified.solution.smallest), 3,
                        "a probe and the selection earn 3 of 3 stars")
         XCTAssertEqual(HueCompassExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
+    }
+
+    // MARK: Colorfall Canyons in the app (feature 349, R02-G05-09; T-R02G0509-005, FR-R02G0509-003,
+    // FR-R02G0509-006; SC-R02G0509-002)
+
+    /// Colorfall Canyons's registration: a candidate until X-R02-G05.
+    private func colorfallCanyonsRegistration() throws -> ExperienceRegistration {
+        let id = try ExperienceID(ColorfallCanyonsExperienceCore.experienceID)
+        return try XCTUnwrap(ExperienceRegistry.candidates.first { $0.id == id }, "Colorfall Canyons is a candidate")
+    }
+
+    /// FR-R02G0509-003: the snapshot is schema 3 and the stored schema-1 and schema-2 examples restore to their digests
+    /// through the migrations (the app's migration check).
+    func testTheColorfallCanyonsRegistrationRestoresItsStoredExamples() async throws {
+        let registration = try colorfallCanyonsRegistration()
+        XCTAssertEqual(ColorfallCanyonsExperienceCore.schemaVersion, 3)
+        let one = try XCTUnwrap(ColorfallCanyonsExperienceCore.schemaOneExample(), "schema-1 example")
+        let two = try XCTUnwrap(ColorfallCanyonsExperienceCore.schemaTwoExample(), "schema-2 example")
+        let versions: [Int] = [one.version, two.version]
+        XCTAssertEqual(versions, [1, 2])
+        XCTAssertNotEqual(one.expectedDigest, two.expectedDigest)
+        let problems: [String] = await registration.migrationProblems()
+        XCTAssertEqual(problems, [], "\(registration.id)")
+    }
+
+    /// FR-R02G0509-006: without `-vcCandidates` Colorfall Canyons is a candidate only: in `candidates`, outside `all`,
+    /// listed in the bundled catalog as not available, without a tile and not opened.
+    func testColorfallCanyonsIsACandidateAndUnavailableWithoutTheCandidatesArgument() async throws {
+        let id = try ExperienceID(ColorfallCanyonsExperienceCore.experienceID)
+        XCTAssertEqual(id.rawValue, "r02-g05.colorfall-canyons")
+        XCTAssertTrue(ExperienceRegistry.candidates.map(\.id).contains(id))
+        XCTAssertFalse(ExperienceRegistry.all.map(\.id).contains(id))
+        let categories = try CategoryList(data: bundled("categories"))
+        let manifest = try CatalogManifest(data: bundled("experiences"), categories: categories)
+        XCTAssertTrue(manifest.experiences.contains { $0.id == id }, "a catalog id")
+        XCTAssertFalse(manifest.available.contains { $0.id == id }, "not available")
+        let storage = try TestStorage(self)
+        let model = AppModel(environment: storage.environment(catalog: try bundled("experiences"),
+                                                              categories: try bundled("categories"),
+                                                              registry: ExperienceRegistry.all))
+        XCTAssertFalse(model.shown.map(\.id).contains(id), "no tile")
+        let opened = await model.open(id)
+        XCTAssertFalse(opened)
+        XCTAssertNil(model.session.experience)
+    }
+
+    /// FR-R02G0509-003, SC-R02G0509-002: with `-vcCandidates` Colorfall Canyons is shown, opens through the registry
+    /// and engine with seed 0 (level 1), and level 1 is won by its certified witness actions
+    /// (`ColorfallCanyonsWitness.make(_:).actions`) sent as `canyon.carve [cell]`, `canyon.valve [spring]` and
+    /// `time.step [ticks]`; the win opens level 2 and `level.next` plays it.
+    func testColorfallCanyonsOpensAsACandidateAndLevelOneIsWonByItsCertifiedWitness() async throws {
+        let registration = try colorfallCanyonsRegistration()
+        let id = registration.id
+        let storage = try TestStorage(self)
+        let base = try storage.environment(catalog: bundled("experiences"), categories: bundled("categories"),
+                                           registry: ExperienceRegistry.all,
+                                           arguments: [DebugLaunch.candidatesArgument])
+        let environment = DebugLaunch.environment(base: base, candidates: [registration])
+        XCTAssertTrue(environment.registry.map(\.id).contains(id))
+        XCTAssertEqual(environment.registry.filter { $0.id == id }.count, 1, "registered once")
+        let categories = try CategoryList(data: try XCTUnwrap(environment.categoriesData))
+        let manifest = try CatalogManifest(data: try XCTUnwrap(environment.catalogData), categories: categories)
+        XCTAssertTrue(manifest.available.contains { $0.id == id }, "available with the candidates argument")
+        let model = AppModel(environment: environment)
+        XCTAssertTrue(model.shown.map(\.id).contains(id), "the launcher shows the candidate")
+        let controls = registration.controls.map(\.id)
+        for control in ["canyon.carve", "canyon.valve", "time.step", "level.next"] {
+            XCTAssertTrue(controls.contains(control), control)
+        }
+        XCTAssertEqual(registration.openingSeed, 0)
+        XCTAssertEqual(ColorfallCanyonsExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
+
+        var engine = ExperienceEngine<ColorfallCanyonsExperienceCore>(id: id)
+        try await engine.prepare(seed: 0)
+        try engine.activate()
+        XCTAssertNil(engine.outcome)
+        XCTAssertEqual(engine.core?.levelNumber, 1)
+        let witness = try ColorfallCanyonsWitness.make(ColorfallCanyonsExperienceCore.generated(number: 1))
+        XCTAssertFalse(witness.actions.isEmpty)
+        for action in witness.actions {
+            let control: String
+            let values: [Double]
+            switch action {
+            case .carve(let cell):
+                control = "canyon.carve"
+                values = [Double(cell)]
+            case .valve(let spring):
+                control = "canyon.valve"
+                values = [Double(spring)]
+            case .step(let ticks):
+                control = "time.step"
+                values = [Double(ticks)]
+            }
+            XCTAssertEqual(engine.handle(control: control, values: values), .accepted, "\(control) \(values)")
+        }
+        XCTAssertEqual(engine.outcome?.code, ColorfallCanyonsExperienceCore.wonCode)
+        XCTAssertEqual(ColorfallCanyonsExperienceCore.wonCode, "won")
+        XCTAssertEqual(engine.core?.play.stage, ColorfallCanyonsStage.won)
+        XCTAssertEqual(engine.core?.progress.isOpen(2), true, "the win opens level 2")
+        XCTAssertEqual(engine.handle(control: "level.next"), .accepted)
+        XCTAssertEqual(engine.core?.levelNumber, 2)
+        XCTAssertNil(engine.outcome, "level 2 is being played")
+    }
+
+    /// The convergence lesson of feature 319: the interface tests pin level 1 (their own literals, which this target
+    /// cannot import); the same literals equal the Core's certified level 1: witness actions carve 10, carve 10,
+    /// step 120; certified smallest 2 edits; the carvable cells at the start; 6 columns. Seed 0 opens level 1.
+    func testColorfallCanyonsLevelOneEqualsTheCore() throws {
+        let pinnedActions: [ColorfallCanyonsAction] = [.carve(10), .carve(10), .step(120)]
+        let pinnedSmallest: Int = 2
+        let pinnedCarvable: [Int] = [0, 2, 3, 5, 6, 7, 8, 9, 10, 11, 13, 15, 18, 19, 20, 21, 22, 23, 25, 26, 27, 28, 29]
+        let pinnedColumns: Int = 6
+        let certified = try ColorfallCanyonsExperienceCore.generated(number: 1)
+        let level = certified.level
+        XCTAssertEqual(try ColorfallCanyonsWitness.make(certified).actions, pinnedActions, "level 1 witness actions")
+        XCTAssertEqual(certified.solution.smallest, pinnedSmallest, "level 1 smallest")
+        var carvable: [Int] = []
+        for cell in 0..<level.cellCount where level.isCarvable(cell, heights: level.heights) {
+            carvable.append(cell)
+        }
+        XCTAssertEqual(carvable, pinnedCarvable, "level 1 carvable cells at the start")
+        XCTAssertEqual(level.columns, pinnedColumns, "level 1 columns")
+        XCTAssertEqual(ColorfallCanyonsExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
     }
     #endif
 }

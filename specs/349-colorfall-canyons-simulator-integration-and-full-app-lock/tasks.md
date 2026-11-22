@@ -44,7 +44,7 @@ change (the shaders and reference of R02-G05-03 are unchanged and re-proven by t
 
 ## Phase 4: Story 2 — the app's logic accepts the game (P1)
 
-- [ ] T-R02G0509-005 [US2] Edit `Apps/VisualCore/Tests/Unit/AppModelTests.swift` (agent B: both examples restore through
+- [X] T-R02G0509-005 [US2] Edit `Apps/VisualCore/Tests/Unit/AppModelTests.swift` (agent B: both examples restore through — Verified 2026-11-21: 2026-11-21 app-unit exit 0 on the iOS 27.2 phone: 4 Colorfall Canyons AppModelTests (both examples restore through the migration check; candidate opens with -vcCandidates and level 1 is won by its certified actions, level 2 opens; unavailable and unopenable without it, in candidates not all; CC's pinned level 1 actions, smallest, carvable order and columns equal the Core) (.autonomy/migration/checks/R02-G05-09.app-unit.json); lead run
   the app's migration check; the candidate opens through the registry and engine and plays level 1 to a win; without
   `-vcCandidates` it is not available and not openable; `CC`'s pinned level 1 certified actions and carvable-cell order
   (the convergence lesson of feature 319) equal the Core's); `--name app-unit -- python3 scripts/release_check.py
