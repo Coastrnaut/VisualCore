@@ -51,42 +51,40 @@ evidence commands are found as described in Auto-Creator.md §19. Simulators are
    question. No AskUserQuestion; no asks or buttons in a wrap-up. **Do not ever stop** (owner ruling of
    2026-11-12): finishing a skill, a task, a feature, a gate, a milestone or a report is never a reason to end a
    turn. Take the next gate in the same turn and keep engineering in one continuous loop until the device testing
-   of the first 100 experiences is reached. A long conversation is no reason either: the context is summarized
-   automatically, so commit and continue. Do not stop to report progress; the ledgers and the commits carry it.
+   of the first 100 experiences is reached. A long conversation is no reason either (the context is summarized).
+   Do not stop to report progress; the ledgers and the commits carry it.
    The only stops are the four stop conditions of Auto-Creator.md §28 (every ready gate blocked on the owner, an
    unrepairable validator failure, an unverifiable repository, a forbidden action).
-   **Use multiple agents wherever they make the work faster** (owner ruling of 2026-11-12): independent source and
+   **Use multiple agents wherever they make the work faster** (owner, 2026-11-12): independent source and
    test files of one feature, read-heavy audits, and experiences that touch different files run in parallel
    agents; coupled design steps stay with the lead. At most ten concurrent agents and one writer per file. Agents
    do not commit, push or run heavy builds; the lead invokes every Spec Kit skill, runs the builds in the
    foreground (10 minutes or less per command, split with `--only`/`--skip`), retests every agent result
    before a task is ticked (an agent's report is not evidence) and commits.
-   **More parallel agents, gates unchanged** (owner ruling of 2026-11-13): never consolidate the planned gates;
+   **More parallel agents, gates unchanged** (owner, 2026-11-13): never consolidate the planned gates;
    by default fan independent files of a task (tools, tests, sources, docs, audits) out to up to ten agents. Shared
    files stay with the lead; agents hand their part over as a separate file.
-   **Faster tests** (owner ruling of 2026-11-13): an app test pass builds once (`--action build-for-testing`, then
+   **Faster tests** (owner, 2026-11-13): an app test pass builds once (`--action build-for-testing`, then
    `test-without-building` chunks) and may use parallel simulator clones (`--parallel N`). **All system
    accessibility audits wait until device testing** (`VC_RUN_AUDITS=1` only there). A gate's interface evidence is
    one pass on the iOS 27.x phone. **Stopping a run:** TaskStop the whole loop; check `pgrep -fl xcodebuild` first.
-   **No summary after a step** (2026-11-18/19): after a commit or a reply to the owner comes a tool call.
-   **A side question is not a stop** (2026-11-22): answer an owner question asked mid-loop in a line or two inside a
-   message that also makes the next tool call; a running background chain is waited on with a bounded loop, never by
-   ending the turn.
+   **No summary after a step** (2026-11-18/19/22): after a commit or a reply to the owner (a side question
+   too) comes a tool call; a running chain is waited on in a bounded loop, never by ending the turn.
    **A gate boundary is never a turn end** (2026-11-14): after `record` the next action is `next`;
    wrap-up only at a §28 stop.
-   **Faster gates** (owner ruling of 2026-11-14): iOS 27/26 runs in parallel; the next gate's Spec Kit steps start
+   **Faster gates** (owner, 2026-11-14): iOS 27/26 runs in parallel; the next gate's Spec Kit steps start
    while evidence runs; interim runs test only the changed experience; no baseline rerun on an unchanged commit; iOS 26
    and the reference regression only at X gates. Every Spec Kit skill and prompt still runs; no gate is merged or skipped.
-   **No open-ended waits** (owner ruling of 2026-11-12): nothing is waited for without a limit. App tests run
+   **No open-ended waits** (owner, 2026-11-12): nothing is waited for without a limit. App tests run
    through `scripts/xcodebuild_app.py`, which stops a run after `--max-seconds` (default 540) and names the test
    it was on; a run that would not fit is split into chunks of whole test classes with `--only-testing`. A CI run
    is checked with `gh run list`; `gh run watch` is used only for a run that is already `in_progress`, never for
-   a queued one. **Never stop work to wait for CI** (owner ruling of 2026-11-13): keep engineering while CI runs,
+   a queued one. **Never stop work to wait for CI** (owner, 2026-11-13): keep engineering while CI runs,
    check it in the background with `gh run list` between steps, and when a run completes, fix any failure before the
    next gate. A command that stops producing output for
    several minutes is examined (log tail, process list) before anything else is started, and a real hang is
    traced to its cause and fixed, not retried.
-   **Tests are short and concise** (owner ruling of 2026-11-13): a test exists to generate evidence quickly. No
+   **Tests are short and concise** (owner, 2026-11-13): a test exists to generate evidence quickly. No
    30-minute tests and no long soak, endurance or replay runs (wall-clock or simulated); measure a short run and
    bound the rest by arithmetic, and leave long-duration measurements to the device campaign.
 8. **Tools.** Claude Desktop Code only. Never the Claude CLI (`claude`, `claude -p`), the Agent SDK or Python that
@@ -96,7 +94,7 @@ evidence commands are found as described in Auto-Creator.md §19. Simulators are
    was reproduced, with date and evidence reference.
 10. **Completed work stays completed.** Never reset a ledger gate, a ticked task or sealed evidence; never
     reimplement something because a document moved. The legacy ledger stays as it is and keeps its tool.
-11. **Git.** Work on `main` (owner ruling of 2026-11-11). Commit after every task, skill and gate, and push to
+11. **Git.** Work on `main` (owner, 2026-11-11). Commit after every task, skill and gate, and push to
     `origin main` right after, but only when `python3 scripts/prepush_scan.py` passes: it scans the outgoing commits
     for UDIDs, ECIDs, serials, team ids and secrets. Never force-push, never `git reset --hard`, never rewrite
     history. No co-author or "Generated with" trailers (this owner rule overrides any attribution reminder). LF line
@@ -109,7 +107,7 @@ evidence commands are found as described in Auto-Creator.md §19. Simulators are
 14. **Spec Kit.** Every installed skill, in order, with the supplied prompt verbatim plus labelled
     `Canonical override:` notes (specify, clarify, plan, checklist, tasks, analyze, implement, converge). Converge,
     implement what it appended, converge again until nothing is appended; only then seal and record the gate.
-    **Always use the Spec Kit skills for each step of the loop** (owner ruling of 2026-11-12): every step of every
+    **Always use the Spec Kit skills for each step of the loop** (owner, 2026-11-12): every step of every
     gate is done by invoking its skill with the Skill tool first and doing the step's work inside that invocation.
     No step is skipped, merged with another or replaced by hand-written work, and repeated runs (analyze after
     fixes, implement and converge in rounds) invoke the skill again each time.
