@@ -1,0 +1,136 @@
+{
+  "actions" : [
+    {
+      "elevation" : 2,
+      "op" : "sun"
+    },
+    {
+      "column" : 9,
+      "kind" : "fern",
+      "op" : "plant",
+      "row" : 0,
+      "size" : 2
+    }
+  ],
+  "bound" : {
+    "cover" : 35,
+    "elevation" : 2,
+    "needed" : 28,
+    "sunMove" : true
+  },
+  "difficulty" : {
+    "forbiddenCells" : 13,
+    "kinds" : 1,
+    "required" : {
+      "denominator" : 5,
+      "numerator" : 4
+    },
+    "sizes" : 1,
+    "smallest" : 2,
+    "sunChange" : true,
+    "targetCells" : 35,
+    "work" : 1
+  },
+  "digests" : [
+    "e3b0c44298fc1c14",
+    "3349b68c12088baa"
+  ],
+  "fingerprints" : [
+    "806ffd027b7ce32c6460c123f39b42fb26bda17f459c8e6729c3b11a56c5f08b",
+    "0d0e6de06b9c056fcd8dd32715a9c0d0620705dbd05381c1d2540e2d4bb0003f",
+    "b01caaf6950c6466823f746d0098c8d7f88300a134e43e121c22b2520d503f4d"
+  ],
+  "level" : {
+    "budget" : 9,
+    "difficulty" : 1,
+    "elevations" : [
+      2,
+      3
+    ],
+    "fingerprint" : "d125d518a261f9930b890ba23897d48d34989bb1d1614e344c9762d0e723586a",
+    "forbidden" : [
+      24,
+      40,
+      61,
+      76,
+      102,
+      103,
+      108,
+      109,
+      125,
+      134,
+      135,
+      166,
+      187
+    ],
+    "height" : 12,
+    "id" : "nocturne-garden-013",
+    "leakAllowance" : 2,
+    "required" : {
+      "denominator" : 5,
+      "numerator" : 4
+    },
+    "schema" : 1,
+    "seed" : 6762266849606055977,
+    "sizes" : [
+      2
+    ],
+    "sun" : 3,
+    "supply" : {
+      "fern" : 1
+    },
+    "target" : [
+      9,
+      10,
+      25,
+      26,
+      41,
+      42,
+      43,
+      57,
+      58,
+      59,
+      60,
+      72,
+      73,
+      74,
+      87,
+      88,
+      89,
+      90,
+      105,
+      106,
+      107,
+      121,
+      122,
+      123,
+      124,
+      136,
+      137,
+      138,
+      151,
+      152,
+      153,
+      154,
+      169,
+      170,
+      186
+    ],
+    "tutorial" : false,
+    "width" : 16
+  },
+  "nearMiss" : {
+    "actions" : [
+      {
+        "elevation" : 2,
+        "op" : "sun"
+      }
+    ],
+    "needed" : 28,
+    "shared" : 0
+  },
+  "number" : 13,
+  "schema" : 1,
+  "skipped" : 0,
+  "smallest" : 2
+}

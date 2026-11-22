@@ -1,0 +1,155 @@
+{
+  "actions" : [
+    {
+      "elevation" : 2,
+      "op" : "sun"
+    },
+    {
+      "column" : 4,
+      "kind" : "rose",
+      "op" : "plant",
+      "row" : 0,
+      "size" : 2
+    }
+  ],
+  "bound" : {
+    "cover" : 52,
+    "elevation" : 2,
+    "needed" : 42,
+    "sunMove" : true
+  },
+  "difficulty" : {
+    "forbiddenCells" : 15,
+    "kinds" : 1,
+    "required" : {
+      "denominator" : 5,
+      "numerator" : 4
+    },
+    "sizes" : 1,
+    "smallest" : 2,
+    "sunChange" : true,
+    "targetCells" : 52,
+    "work" : 1
+  },
+  "digests" : [
+    "e3b0c44298fc1c14",
+    "0c76aa6718ac2433"
+  ],
+  "fingerprints" : [
+    "b48fa39f3bd7187bdca4c5bc1c7ddae23efee7c474adf990db0fd087ff57b871",
+    "481a54898acf8aeb273b6328e8a29fefcf0bd6968a97fd85794610fe4c6fa21d",
+    "6d3ff6be920ee070d2c54d6cc9d52597805c4b47162471e9e0002ede57d18d2e"
+  ],
+  "level" : {
+    "budget" : 10,
+    "difficulty" : 1,
+    "elevations" : [
+      2,
+      3
+    ],
+    "fingerprint" : "0eda7d87fa821fb4057cc5abf12837bd7a831e1060fdcabffd4feb2bfbc8c52d",
+    "forbidden" : [
+      3,
+      6,
+      22,
+      38,
+      50,
+      51,
+      54,
+      65,
+      72,
+      81,
+      136,
+      161,
+      168,
+      177,
+      178
+    ],
+    "height" : 12,
+    "id" : "nocturne-garden-006",
+    "leakAllowance" : 2,
+    "required" : {
+      "denominator" : 5,
+      "numerator" : 4
+    },
+    "schema" : 1,
+    "seed" : 13744564299956053504,
+    "sizes" : [
+      2
+    ],
+    "sun" : 3,
+    "supply" : {
+      "rose" : 1
+    },
+    "target" : [
+      4,
+      5,
+      20,
+      21,
+      36,
+      37,
+      52,
+      53,
+      67,
+      68,
+      69,
+      70,
+      82,
+      83,
+      84,
+      85,
+      86,
+      87,
+      98,
+      99,
+      100,
+      101,
+      102,
+      103,
+      114,
+      115,
+      116,
+      117,
+      118,
+      119,
+      130,
+      131,
+      132,
+      133,
+      134,
+      135,
+      146,
+      147,
+      148,
+      149,
+      150,
+      151,
+      162,
+      163,
+      164,
+      165,
+      166,
+      167,
+      179,
+      180,
+      181,
+      182
+    ],
+    "tutorial" : false,
+    "width" : 16
+  },
+  "nearMiss" : {
+    "actions" : [
+      {
+        "elevation" : 2,
+        "op" : "sun"
+      }
+    ],
+    "needed" : 42,
+    "shared" : 0
+  },
+  "number" : 6,
+  "schema" : 1,
+  "skipped" : 1,
+  "smallest" : 2
+}

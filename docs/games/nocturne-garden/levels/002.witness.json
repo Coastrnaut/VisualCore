@@ -1,0 +1,199 @@
+{
+  "actions" : [
+    {
+      "column" : 7,
+      "kind" : "tulip",
+      "op" : "plant",
+      "row" : 0,
+      "size" : 2
+    },
+    {
+      "column" : 11,
+      "kind" : "lily",
+      "op" : "plant",
+      "row" : 0,
+      "size" : 2
+    }
+  ],
+  "bound" : {
+    "cover" : 48,
+    "elevation" : 2,
+    "needed" : 68,
+    "sunMove" : false
+  },
+  "difficulty" : {
+    "forbiddenCells" : 20,
+    "kinds" : 2,
+    "required" : {
+      "denominator" : 5,
+      "numerator" : 4
+    },
+    "sizes" : 1,
+    "smallest" : 2,
+    "sunChange" : false,
+    "targetCells" : 84,
+    "work" : 2
+  },
+  "digests" : [
+    "ab98bdbc8485536c",
+    "3a509e0368ec6485"
+  ],
+  "fingerprints" : [
+    "a2f13b9af431787903a86e1269e86db6832dbb731f6dee4a825054caefe34ce7",
+    "8f5de8c0923f39ad4974b9871e784fbf1f39fa75bbabe43772d3038030d63264",
+    "d93d30e7f09659af54b9cbb62260f1d7d45f2f148b763da4c7a9796f4482253a"
+  ],
+  "level" : {
+    "budget" : 10,
+    "difficulty" : 1,
+    "elevations" : [
+      2,
+      3
+    ],
+    "fingerprint" : "ebfbfc87e859c08d6c29c5458b270563ed9346b27fd15be86068461b2e54c3a9",
+    "forbidden" : [
+      6,
+      10,
+      22,
+      29,
+      41,
+      45,
+      61,
+      69,
+      74,
+      116,
+      143,
+      148,
+      159,
+      167,
+      168,
+      175,
+      180,
+      182,
+      183,
+      184
+    ],
+    "height" : 12,
+    "id" : "nocturne-garden-002",
+    "leakAllowance" : 2,
+    "required" : {
+      "denominator" : 5,
+      "numerator" : 4
+    },
+    "schema" : 1,
+    "seed" : 6156573221856871337,
+    "sizes" : [
+      2
+    ],
+    "sun" : 2,
+    "supply" : {
+      "lily" : 1,
+      "tulip" : 1
+    },
+    "target" : [
+      7,
+      8,
+      11,
+      12,
+      23,
+      24,
+      27,
+      28,
+      39,
+      40,
+      43,
+      44,
+      55,
+      56,
+      59,
+      60,
+      70,
+      71,
+      72,
+      73,
+      75,
+      76,
+      85,
+      86,
+      87,
+      88,
+      89,
+      90,
+      91,
+      92,
+      93,
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      109,
+      117,
+      118,
+      119,
+      120,
+      121,
+      122,
+      123,
+      124,
+      125,
+      133,
+      134,
+      135,
+      136,
+      137,
+      138,
+      139,
+      140,
+      141,
+      142,
+      149,
+      150,
+      151,
+      152,
+      153,
+      154,
+      155,
+      156,
+      157,
+      158,
+      165,
+      166,
+      169,
+      170,
+      171,
+      172,
+      173,
+      174,
+      181,
+      185,
+      186,
+      187,
+      188,
+      189,
+      190
+    ],
+    "tutorial" : true,
+    "width" : 16
+  },
+  "nearMiss" : {
+    "actions" : [
+      {
+        "column" : 7,
+        "kind" : "tulip",
+        "op" : "plant",
+        "row" : 0,
+        "size" : 2
+      }
+    ],
+    "needed" : 68,
+    "shared" : 48
+  },
+  "number" : 2,
+  "schema" : 1,
+  "skipped" : 1,
+  "smallest" : 2
+}

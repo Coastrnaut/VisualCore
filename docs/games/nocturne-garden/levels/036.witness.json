@@ -1,0 +1,203 @@
+{
+  "actions" : [
+    {
+      "elevation" : 3,
+      "op" : "sun"
+    },
+    {
+      "column" : 8,
+      "kind" : "lily",
+      "op" : "plant",
+      "row" : 4,
+      "size" : 1
+    },
+    {
+      "column" : 12,
+      "kind" : "bell",
+      "op" : "plant",
+      "row" : 3,
+      "size" : 1
+    },
+    {
+      "column" : 3,
+      "kind" : "bell",
+      "op" : "plant",
+      "row" : 5,
+      "size" : 1
+    }
+  ],
+  "bound" : {
+    "cover" : 12,
+    "elevation" : 2,
+    "needed" : 37,
+    "sunMove" : false
+  },
+  "difficulty" : {
+    "forbiddenCells" : 38,
+    "kinds" : 2,
+    "required" : {
+      "denominator" : 20,
+      "numerator" : 17
+    },
+    "sizes" : 1,
+    "smallest" : 4,
+    "sunChange" : true,
+    "targetCells" : 43,
+    "work" : 3
+  },
+  "digests" : [
+    "e3b0c44298fc1c14",
+    "2f33c8de5b7e0df8",
+    "3c666c0db2801035",
+    "740ef5d548343dd6"
+  ],
+  "fingerprints" : [
+    "63233c0da2fd10e7b64438a58c301d51ecf0876d92b99f19dfbfbd4d8fa54717",
+    "93c499e4609d22cc494ed8d38d763efbd8846c333041380c2d5e4e2d8514582f",
+    "948e7fdff5feb69a7aef02c8ba83deb6a88c96a638b03746b78bb3fe1c1229d2",
+    "bbca89ef51fc90a1eb9503720441a51d25c004b55580b796d446a8a23d27e93f",
+    "99706fdabeadb754d1686087161e699286d35b08a5cd004ab96feed0bc0b7285"
+  ],
+  "level" : {
+    "budget" : 10,
+    "difficulty" : 2,
+    "elevations" : [
+      2,
+      3
+    ],
+    "fingerprint" : "fe101b923de750d0e9b85ba2f11e5b8820a9e3b575ac264b2dba14438c66b782",
+    "forbidden" : [
+      51,
+      52,
+      53,
+      69,
+      71,
+      84,
+      89,
+      91,
+      102,
+      111,
+      113,
+      127,
+      141,
+      144,
+      147,
+      154,
+      161,
+      167,
+      173,
+      181,
+      190,
+      191,
+      201,
+      202,
+      204,
+      205,
+      206,
+      210,
+      224,
+      226,
+      230,
+      244,
+      250,
+      251,
+      253,
+      262,
+      266,
+      270
+    ],
+    "height" : 14,
+    "id" : "nocturne-garden-036",
+    "leakAllowance" : 2,
+    "required" : {
+      "denominator" : 20,
+      "numerator" : 17
+    },
+    "schema" : 1,
+    "seed" : 11819479850381892443,
+    "sizes" : [
+      1,
+      2
+    ],
+    "sun" : 2,
+    "supply" : {
+      "bell" : 2,
+      "lily" : 1
+    },
+    "target" : [
+      72,
+      88,
+      92,
+      103,
+      108,
+      112,
+      123,
+      128,
+      131,
+      132,
+      133,
+      143,
+      148,
+      151,
+      152,
+      153,
+      162,
+      163,
+      164,
+      168,
+      172,
+      182,
+      183,
+      184,
+      187,
+      188,
+      189,
+      192,
+      203,
+      207,
+      208,
+      209,
+      212,
+      223,
+      227,
+      228,
+      229,
+      232,
+      243,
+      247,
+      248,
+      249,
+      263
+    ],
+    "tutorial" : false,
+    "width" : 20
+  },
+  "nearMiss" : {
+    "actions" : [
+      {
+        "elevation" : 3,
+        "op" : "sun"
+      },
+      {
+        "column" : 8,
+        "kind" : "lily",
+        "op" : "plant",
+        "row" : 4,
+        "size" : 1
+      },
+      {
+        "column" : 12,
+        "kind" : "bell",
+        "op" : "plant",
+        "row" : 3,
+        "size" : 1
+      }
+    ],
+    "needed" : 37,
+    "shared" : 30
+  },
+  "number" : 36,
+  "schema" : 1,
+  "skipped" : 4,
+  "smallest" : 4
+}

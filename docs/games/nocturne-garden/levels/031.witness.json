@@ -1,0 +1,211 @@
+{
+  "actions" : [
+    {
+      "elevation" : 2,
+      "op" : "sun"
+    },
+    {
+      "column" : 4,
+      "kind" : "star",
+      "op" : "plant",
+      "row" : 0,
+      "size" : 2
+    },
+    {
+      "column" : 16,
+      "kind" : "star",
+      "op" : "plant",
+      "row" : 2,
+      "size" : 2
+    }
+  ],
+  "bound" : {
+    "cover" : 36,
+    "elevation" : 2,
+    "needed" : 62,
+    "sunMove" : true
+  },
+  "difficulty" : {
+    "forbiddenCells" : 34,
+    "kinds" : 1,
+    "required" : {
+      "denominator" : 20,
+      "numerator" : 17
+    },
+    "sizes" : 1,
+    "smallest" : 3,
+    "sunChange" : true,
+    "targetCells" : 72,
+    "work" : 2
+  },
+  "digests" : [
+    "e3b0c44298fc1c14",
+    "e3d252c241ba9161",
+    "7a9ac6e6bcdd3fdc"
+  ],
+  "fingerprints" : [
+    "b5707bbd15a2f5d9fa72f574d7098a14fae5b895a22ef7643ab648ae050957ab",
+    "300c40ef420ff950034cd5b45ad82e39bdd0314b49065f3e1f68e242c48ff367",
+    "2d68ca6c39316801d838b33727db93e64be445d782623c8ab223459040270bad",
+    "34ae012ba8d5d81edba0531ccd6e7dc600c4fd6dfa63a18c547f81746b9db1b9"
+  ],
+  "level" : {
+    "budget" : 13,
+    "difficulty" : 2,
+    "elevations" : [
+      2,
+      3
+    ],
+    "fingerprint" : "cba3918ae067878a9fecf751c0a70262c1ba49e6c81a11ba396f65045a3ee8a8",
+    "forbidden" : [
+      6,
+      35,
+      37,
+      38,
+      43,
+      46,
+      63,
+      67,
+      78,
+      81,
+      108,
+      114,
+      142,
+      153,
+      159,
+      162,
+      167,
+      179,
+      181,
+      183,
+      186,
+      201,
+      202,
+      203,
+      214,
+      219,
+      233,
+      235,
+      238,
+      243,
+      244,
+      245,
+      246,
+      253
+    ],
+    "height" : 14,
+    "id" : "nocturne-garden-031",
+    "leakAllowance" : 2,
+    "required" : {
+      "denominator" : 20,
+      "numerator" : 17
+    },
+    "schema" : 1,
+    "seed" : 16574289603860237573,
+    "sizes" : [
+      1,
+      2
+    ],
+    "sun" : 3,
+    "supply" : {
+      "star" : 2
+    },
+    "target" : [
+      4,
+      5,
+      24,
+      25,
+      44,
+      45,
+      56,
+      57,
+      64,
+      65,
+      76,
+      77,
+      82,
+      83,
+      84,
+      85,
+      86,
+      87,
+      96,
+      97,
+      103,
+      104,
+      105,
+      106,
+      116,
+      117,
+      124,
+      125,
+      134,
+      135,
+      136,
+      137,
+      138,
+      139,
+      143,
+      144,
+      145,
+      146,
+      155,
+      156,
+      157,
+      158,
+      163,
+      164,
+      165,
+      166,
+      176,
+      177,
+      182,
+      184,
+      185,
+      187,
+      195,
+      196,
+      197,
+      198,
+      204,
+      205,
+      215,
+      216,
+      217,
+      218,
+      224,
+      225,
+      234,
+      236,
+      237,
+      239,
+      256,
+      257,
+      276,
+      277
+    ],
+    "tutorial" : false,
+    "width" : 20
+  },
+  "nearMiss" : {
+    "actions" : [
+      {
+        "elevation" : 2,
+        "op" : "sun"
+      },
+      {
+        "column" : 4,
+        "kind" : "star",
+        "op" : "plant",
+        "row" : 0,
+        "size" : 2
+      }
+    ],
+    "needed" : 62,
+    "shared" : 36
+  },
+  "number" : 31,
+  "schema" : 1,
+  "skipped" : 4,
+  "smallest" : 3
+}

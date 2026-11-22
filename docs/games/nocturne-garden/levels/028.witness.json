@@ -1,0 +1,162 @@
+{
+  "actions" : [
+    {
+      "column" : 2,
+      "kind" : "tulip",
+      "op" : "plant",
+      "row" : 0,
+      "size" : 1
+    },
+    {
+      "column" : 2,
+      "kind" : "lily",
+      "op" : "plant",
+      "row" : 1,
+      "size" : 1
+    },
+    {
+      "column" : 2,
+      "kind" : "star",
+      "op" : "plant",
+      "row" : 7,
+      "size" : 1
+    }
+  ],
+  "bound" : {
+    "cover" : 13,
+    "elevation" : 2,
+    "needed" : 27,
+    "sunMove" : false
+  },
+  "difficulty" : {
+    "forbiddenCells" : 18,
+    "kinds" : 3,
+    "required" : {
+      "denominator" : 20,
+      "numerator" : 17
+    },
+    "sizes" : 1,
+    "smallest" : 3,
+    "sunChange" : false,
+    "targetCells" : 31,
+    "work" : 50
+  },
+  "digests" : [
+    "bc46c776d14a670c",
+    "ab97881a558d289b",
+    "097044e1809b7a6b"
+  ],
+  "fingerprints" : [
+    "5a5a430f14708e15197504e9b4056769356d61e32239e348cb0579eaefac8ab5",
+    "38f8e57fc1a9485c8038faaa90eb899f3d4ab2d5fdd09eca60b6256350842719",
+    "4d5b8267fc7c1785ea90c9c968c6572581315b58f3ece03b6c328f412dbd413a",
+    "63da7c6463a6949c7139bcad65906e661738538053209484d130b3a24fafb48d"
+  ],
+  "level" : {
+    "budget" : 10,
+    "difficulty" : 2,
+    "elevations" : [
+      2,
+      3
+    ],
+    "fingerprint" : "98dfc6261c665afe01b5245dd37e1bc4ce966b8e8900a4392622fe45a4b86582",
+    "forbidden" : [
+      1,
+      20,
+      23,
+      24,
+      44,
+      64,
+      80,
+      84,
+      104,
+      120,
+      124,
+      180,
+      200,
+      204,
+      220,
+      224,
+      241,
+      262
+    ],
+    "height" : 14,
+    "id" : "nocturne-garden-028",
+    "leakAllowance" : 2,
+    "required" : {
+      "denominator" : 20,
+      "numerator" : 17
+    },
+    "schema" : 1,
+    "seed" : 11106031772621288568,
+    "sizes" : [
+      1,
+      2
+    ],
+    "sun" : 2,
+    "supply" : {
+      "lily" : 1,
+      "star" : 1,
+      "tulip" : 1
+    },
+    "target" : [
+      2,
+      22,
+      41,
+      42,
+      43,
+      61,
+      62,
+      63,
+      81,
+      82,
+      83,
+      101,
+      102,
+      103,
+      121,
+      122,
+      123,
+      141,
+      142,
+      143,
+      161,
+      162,
+      163,
+      181,
+      182,
+      183,
+      202,
+      221,
+      222,
+      223,
+      242
+    ],
+    "tutorial" : false,
+    "width" : 20
+  },
+  "nearMiss" : {
+    "actions" : [
+      {
+        "column" : 2,
+        "kind" : "tulip",
+        "op" : "plant",
+        "row" : 0,
+        "size" : 1
+      },
+      {
+        "column" : 2,
+        "kind" : "lily",
+        "op" : "plant",
+        "row" : 1,
+        "size" : 1
+      }
+    ],
+    "needed" : 27,
+    "shared" : 17
+  },
+  "number" : 28,
+  "schema" : 1,
+  "skipped" : 1,
+  "smallest" : 3
+}

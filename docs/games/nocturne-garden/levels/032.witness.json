@@ -1,0 +1,158 @@
+{
+  "actions" : [
+    {
+      "elevation" : 3,
+      "op" : "sun"
+    },
+    {
+      "column" : 6,
+      "kind" : "lily",
+      "op" : "plant",
+      "row" : 4,
+      "size" : 1
+    },
+    {
+      "column" : 8,
+      "kind" : "star",
+      "op" : "plant",
+      "row" : 1,
+      "size" : 1
+    }
+  ],
+  "bound" : {
+    "cover" : 12,
+    "elevation" : 2,
+    "needed" : 26,
+    "sunMove" : false
+  },
+  "difficulty" : {
+    "forbiddenCells" : 22,
+    "kinds" : 2,
+    "required" : {
+      "denominator" : 20,
+      "numerator" : 17
+    },
+    "sizes" : 1,
+    "smallest" : 3,
+    "sunChange" : true,
+    "targetCells" : 30,
+    "work" : 2
+  },
+  "digests" : [
+    "e3b0c44298fc1c14",
+    "bda81ce457e8f7ad",
+    "3bfd657cfb940373"
+  ],
+  "fingerprints" : [
+    "930ded438cae46197ba96596e9bf6502af2342179a6ab22f0f07fcf9c2d4c6b4",
+    "31095e5c93f76663905507eed37fce0ce9dd371784777b21109f0cdade850af0",
+    "74929d2be3be3172706bff29dd483a4ce0ad78c813cead645a3d15deb8857b23",
+    "d42132abd2ed255a8577d7db7bc51cb649b0afdbb74b83d75a3f55041ce69463"
+  ],
+  "level" : {
+    "budget" : 10,
+    "difficulty" : 2,
+    "elevations" : [
+      2,
+      3
+    ],
+    "fingerprint" : "ce1f6d823bb8ada4dcdedb4eb5a86801a6cfd6f56d05410e0d0d01a006719876",
+    "forbidden" : [
+      8,
+      9,
+      47,
+      49,
+      65,
+      67,
+      85,
+      90,
+      107,
+      125,
+      127,
+      145,
+      164,
+      167,
+      169,
+      184,
+      208,
+      209,
+      244,
+      248,
+      266,
+      268
+    ],
+    "height" : 14,
+    "id" : "nocturne-garden-032",
+    "leakAllowance" : 2,
+    "required" : {
+      "denominator" : 20,
+      "numerator" : 17
+    },
+    "schema" : 1,
+    "seed" : 3595179376317646879,
+    "sizes" : [
+      1,
+      2
+    ],
+    "sun" : 2,
+    "supply" : {
+      "lily" : 1,
+      "star" : 1
+    },
+    "target" : [
+      28,
+      48,
+      68,
+      86,
+      87,
+      88,
+      89,
+      106,
+      108,
+      126,
+      128,
+      146,
+      147,
+      148,
+      149,
+      166,
+      168,
+      185,
+      186,
+      187,
+      188,
+      205,
+      206,
+      207,
+      225,
+      226,
+      227,
+      245,
+      246,
+      247
+    ],
+    "tutorial" : false,
+    "width" : 20
+  },
+  "nearMiss" : {
+    "actions" : [
+      {
+        "elevation" : 3,
+        "op" : "sun"
+      },
+      {
+        "column" : 6,
+        "kind" : "lily",
+        "op" : "plant",
+        "row" : 4,
+        "size" : 1
+      }
+    ],
+    "needed" : 26,
+    "shared" : 17
+  },
+  "number" : 32,
+  "schema" : 1,
+  "skipped" : 4,
+  "smallest" : 3
+}

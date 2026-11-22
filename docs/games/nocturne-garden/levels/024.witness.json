@@ -1,0 +1,182 @@
+{
+  "actions" : [
+    {
+      "column" : 11,
+      "kind" : "tulip",
+      "op" : "plant",
+      "row" : 6,
+      "size" : 1
+    },
+    {
+      "column" : 4,
+      "kind" : "lily",
+      "op" : "plant",
+      "row" : 7,
+      "size" : 1
+    },
+    {
+      "column" : 14,
+      "kind" : "fern",
+      "op" : "plant",
+      "row" : 1,
+      "size" : 1
+    }
+  ],
+  "bound" : {
+    "cover" : 13,
+    "elevation" : 2,
+    "needed" : 30,
+    "sunMove" : false
+  },
+  "difficulty" : {
+    "forbiddenCells" : 34,
+    "kinds" : 3,
+    "required" : {
+      "denominator" : 20,
+      "numerator" : 17
+    },
+    "sizes" : 1,
+    "smallest" : 3,
+    "sunChange" : false,
+    "targetCells" : 35,
+    "work" : 3
+  },
+  "digests" : [
+    "64e0c25cb2e87253",
+    "f18eb61b24b0aabf",
+    "578153bde4332563"
+  ],
+  "fingerprints" : [
+    "5790eba96535397b29ec250a2e4feee7a5439a3f64f12ab62dfd506a714f1c93",
+    "605eb9913cd0ba870c880d6dd4d1eb9426021b7f00603bb9e67518d010072cb7",
+    "4f42ba9ec5e4dc9bd7d3cc842ec5f147d464f3fe5c4f57a2c6b4a00ddee3a6e9",
+    "4f24dc110c1188259b84f3583f68aaf4bd6733e74cd6f6ccf309fe89b5c33382"
+  ],
+  "level" : {
+    "budget" : 10,
+    "difficulty" : 2,
+    "elevations" : [
+      2,
+      3
+    ],
+    "fingerprint" : "6059407ac5a091cc4cbc63f6069b47dbceae6178b8c7b87b6c71ba46ca391518",
+    "forbidden" : [
+      13,
+      35,
+      56,
+      72,
+      92,
+      96,
+      110,
+      112,
+      115,
+      116,
+      130,
+      132,
+      133,
+      135,
+      143,
+      150,
+      152,
+      169,
+      173,
+      183,
+      185,
+      193,
+      202,
+      206,
+      209,
+      222,
+      226,
+      229,
+      242,
+      246,
+      249,
+      250,
+      251,
+      263
+    ],
+    "height" : 14,
+    "id" : "nocturne-garden-024",
+    "leakAllowance" : 2,
+    "required" : {
+      "denominator" : 20,
+      "numerator" : 17
+    },
+    "schema" : 1,
+    "seed" : 11795877946866159575,
+    "sizes" : [
+      1,
+      2
+    ],
+    "sun" : 2,
+    "supply" : {
+      "fern" : 1,
+      "lily" : 1,
+      "tulip" : 1
+    },
+    "target" : [
+      34,
+      54,
+      55,
+      73,
+      74,
+      94,
+      95,
+      113,
+      114,
+      131,
+      134,
+      144,
+      151,
+      164,
+      170,
+      171,
+      172,
+      184,
+      190,
+      191,
+      192,
+      203,
+      204,
+      205,
+      210,
+      211,
+      212,
+      223,
+      224,
+      225,
+      230,
+      232,
+      243,
+      244,
+      245
+    ],
+    "tutorial" : false,
+    "width" : 20
+  },
+  "nearMiss" : {
+    "actions" : [
+      {
+        "column" : 11,
+        "kind" : "tulip",
+        "op" : "plant",
+        "row" : 6,
+        "size" : 1
+      },
+      {
+        "column" : 4,
+        "kind" : "lily",
+        "op" : "plant",
+        "row" : 7,
+        "size" : 1
+      }
+    ],
+    "needed" : 30,
+    "shared" : 25
+  },
+  "number" : 24,
+  "schema" : 1,
+  "skipped" : 2,
+  "smallest" : 3
+}

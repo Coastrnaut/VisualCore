@@ -1,0 +1,177 @@
+{
+  "actions" : [
+    {
+      "column" : 10,
+      "kind" : "lily",
+      "op" : "plant",
+      "row" : 0,
+      "size" : 2
+    },
+    {
+      "column" : 8,
+      "kind" : "fern",
+      "op" : "plant",
+      "row" : 0,
+      "size" : 2
+    }
+  ],
+  "bound" : {
+    "cover" : 46,
+    "elevation" : 2,
+    "needed" : 52,
+    "sunMove" : false
+  },
+  "difficulty" : {
+    "forbiddenCells" : 17,
+    "kinds" : 2,
+    "required" : {
+      "denominator" : 5,
+      "numerator" : 4
+    },
+    "sizes" : 1,
+    "smallest" : 2,
+    "sunChange" : false,
+    "targetCells" : 65,
+    "work" : 2
+  },
+  "digests" : [
+    "29c2bde1088c11f7",
+    "ac589b80b68b6f26"
+  ],
+  "fingerprints" : [
+    "6111b776ad45a13aa8df0ecf43fbabb4fe1a8e66a21db37874d7990ae66bae03",
+    "8b34ebffa8ea1b1418291d64c2dc57d4720c1d8b8f683a492551528f296cbf77",
+    "68960fb4b1b64dbb5f9f8707a37ff56dabcaca8889b4ad0c97df484029a4b63b"
+  ],
+  "level" : {
+    "budget" : 9,
+    "difficulty" : 1,
+    "elevations" : [
+      2,
+      3
+    ],
+    "fingerprint" : "de53adc9f28cf1778c78737bd0b83bedf67733109b5601374040cdd81056a522",
+    "forbidden" : [
+      7,
+      12,
+      28,
+      54,
+      55,
+      60,
+      69,
+      70,
+      85,
+      93,
+      102,
+      109,
+      118,
+      119,
+      126,
+      166,
+      167
+    ],
+    "height" : 12,
+    "id" : "nocturne-garden-009",
+    "leakAllowance" : 2,
+    "required" : {
+      "denominator" : 5,
+      "numerator" : 4
+    },
+    "schema" : 1,
+    "seed" : 12639251858275725967,
+    "sizes" : [
+      2
+    ],
+    "sun" : 2,
+    "supply" : {
+      "fern" : 1,
+      "lily" : 1
+    },
+    "target" : [
+      8,
+      9,
+      10,
+      11,
+      24,
+      25,
+      26,
+      27,
+      40,
+      41,
+      42,
+      43,
+      56,
+      57,
+      58,
+      59,
+      71,
+      72,
+      73,
+      74,
+      75,
+      86,
+      87,
+      88,
+      89,
+      90,
+      91,
+      92,
+      104,
+      105,
+      106,
+      107,
+      108,
+      120,
+      121,
+      122,
+      123,
+      124,
+      135,
+      136,
+      137,
+      138,
+      139,
+      140,
+      141,
+      150,
+      151,
+      152,
+      153,
+      154,
+      155,
+      156,
+      157,
+      168,
+      169,
+      170,
+      171,
+      172,
+      173,
+      184,
+      185,
+      186,
+      187,
+      188,
+      189
+    ],
+    "tutorial" : false,
+    "width" : 16
+  },
+  "nearMiss" : {
+    "actions" : [
+      {
+        "column" : 10,
+        "kind" : "lily",
+        "op" : "plant",
+        "row" : 0,
+        "size" : 2
+      }
+    ],
+    "needed" : 52,
+    "shared" : 46
+  },
+  "number" : 9,
+  "schema" : 1,
+  "skipped" : 0,
+  "smallest" : 2
+}

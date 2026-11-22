@@ -58,7 +58,7 @@ logic); no GLSL in this feature.
   newer, damaged and non-replaying witnesses) with `Packages/ExperiencesRound02/NocturneGarden/CoreTests/NocturneGardenWitnessTests.swift` (round trip byte
   for byte; edited actions, digests, fingerprints, level, near miss and difficulty refused; newer schema and damaged JSON
   refused; the near miss behaves as recorded) by agent B; `--name host-4`
-- [ ] T-R02G0902-006 [US2] [US3] [US4] Create `Packages/ExperiencesRound02/NocturneGarden/CoreTests/NocturneGardenCatalogTests.swift` (100 entries, 20 per
+- [X] T-R02G0902-006 [US2] [US3] [US4] Create `Packages/ExperiencesRound02/NocturneGarden/CoreTests/NocturneGardenCatalogTests.swift` (100 entries, 20 per — Verified 2026-11-22: host-5 exit=0 (NocturneGardenCatalogTests 8: manifest, pinned digest ce13750a…, progression and band means, 100 witnesses win at the lower bound and are not won one move short, independent brute-force bound on two levels per band, full decode per band, 100 files byte for byte in 20 groups of 5; suite 11.3 s locally, slowest single test 6.1 s)
   band; the catalog generated twice is identical; pinned digest; `ProgressionRule.standard` holds on the smallest
   count; band means never fall; the independent check on two levels per band (SC-R02G0902-002); all 100 witnesses
   replay to a win; each witness equals `docs/games/nocturne-garden/levels/NNN.witness.json` byte for byte, in groups of

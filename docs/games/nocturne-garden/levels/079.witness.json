@@ -1,0 +1,251 @@
+{
+  "actions" : [
+    {
+      "elevation" : 1,
+      "op" : "sun"
+    },
+    {
+      "column" : 24,
+      "kind" : "bell",
+      "op" : "plant",
+      "row" : 7,
+      "size" : 1
+    },
+    {
+      "column" : 22,
+      "kind" : "fern",
+      "op" : "plant",
+      "row" : 12,
+      "size" : 1
+    },
+    {
+      "column" : 2,
+      "kind" : "fern",
+      "op" : "plant",
+      "row" : 15,
+      "size" : 1
+    },
+    {
+      "column" : 2,
+      "kind" : "star",
+      "op" : "plant",
+      "row" : 4,
+      "size" : 1
+    }
+  ],
+  "bound" : {
+    "cover" : 5,
+    "elevation" : 1,
+    "needed" : 18,
+    "sunMove" : true
+  },
+  "difficulty" : {
+    "forbiddenCells" : 90,
+    "kinds" : 3,
+    "required" : {
+      "denominator" : 20,
+      "numerator" : 19
+    },
+    "sizes" : 1,
+    "smallest" : 5,
+    "sunChange" : true,
+    "targetCells" : 18,
+    "work" : 4
+  },
+  "digests" : [
+    "e3b0c44298fc1c14",
+    "19a78a989ae9be93",
+    "a5016e67e4462b1d",
+    "2ccdab465b6d7423",
+    "646e9422a37ce615"
+  ],
+  "fingerprints" : [
+    "698620df32d72e75b22c415b270a3ccd294da1754934e40d84ad012bc9d9bb5d",
+    "8db87f3707d8b161dbc1521db8d3253412c3d7833c52eba1ed505d0c5661f1b6",
+    "fb9c07c4062bc248021c53ecc9997c108c84f407c90739d8d42db23182612988",
+    "919a008c83ac8e08429d063294b2e9e4190ba1b5111ae5f903e32be7673097f4",
+    "7ce9141e70c709f9139dbac84c7954df802b61a75f02187b10073ea02e380a25",
+    "4123f9e9cac165913c21923918fb28b306b996ba6634d97a5e087c4a85adcc98"
+  ],
+  "level" : {
+    "budget" : 17,
+    "difficulty" : 4,
+    "elevations" : [
+      1,
+      2,
+      3,
+      4
+    ],
+    "fingerprint" : "d46d36ec6e65e283b9022e3bfaa3e38b4b26bc34c11f56fe8d38b70cc783c328",
+    "forbidden" : [
+      56,
+      59,
+      60,
+      84,
+      85,
+      87,
+      112,
+      113,
+      116,
+      141,
+      143,
+      162,
+      166,
+      168,
+      169,
+      171,
+      189,
+      191,
+      192,
+      195,
+      198,
+      199,
+      200,
+      217,
+      218,
+      219,
+      221,
+      223,
+      224,
+      225,
+      228,
+      245,
+      250,
+      251,
+      273,
+      274,
+      277,
+      278,
+      279,
+      300,
+      301,
+      302,
+      304,
+      305,
+      306,
+      307,
+      327,
+      329,
+      330,
+      331,
+      334,
+      355,
+      356,
+      357,
+      359,
+      360,
+      364,
+      366,
+      367,
+      368,
+      383,
+      388,
+      392,
+      393,
+      394,
+      395,
+      396,
+      411,
+      412,
+      424,
+      439,
+      440,
+      441,
+      442,
+      443,
+      444,
+      448,
+      451,
+      469,
+      471,
+      472,
+      476,
+      479,
+      504,
+      506,
+      508,
+      533,
+      534,
+      535,
+      536
+    ],
+    "height" : 20,
+    "id" : "nocturne-garden-079",
+    "leakAllowance" : 1,
+    "required" : {
+      "denominator" : 20,
+      "numerator" : 19
+    },
+    "schema" : 1,
+    "seed" : 10267644705762178426,
+    "sizes" : [
+      1,
+      2,
+      3
+    ],
+    "sun" : 4,
+    "supply" : {
+      "bell" : 1,
+      "fern" : 2,
+      "lily" : 1,
+      "star" : 1
+    },
+    "target" : [
+      114,
+      142,
+      170,
+      220,
+      247,
+      248,
+      249,
+      276,
+      358,
+      385,
+      386,
+      413,
+      414,
+      422,
+      449,
+      450,
+      477,
+      478
+    ],
+    "tutorial" : false,
+    "width" : 28
+  },
+  "nearMiss" : {
+    "actions" : [
+      {
+        "elevation" : 1,
+        "op" : "sun"
+      },
+      {
+        "column" : 24,
+        "kind" : "bell",
+        "op" : "plant",
+        "row" : 7,
+        "size" : 1
+      },
+      {
+        "column" : 22,
+        "kind" : "fern",
+        "op" : "plant",
+        "row" : 12,
+        "size" : 1
+      },
+      {
+        "column" : 2,
+        "kind" : "fern",
+        "op" : "plant",
+        "row" : 15,
+        "size" : 1
+      }
+    ],
+    "needed" : 18,
+    "shared" : 15
+  },
+  "number" : 79,
+  "schema" : 1,
+  "skipped" : 2,
+  "smallest" : 5
+}

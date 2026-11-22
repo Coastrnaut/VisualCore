@@ -1,0 +1,185 @@
+{
+  "actions" : [
+    {
+      "column" : 5,
+      "kind" : "lily",
+      "op" : "plant",
+      "row" : 2,
+      "size" : 1
+    },
+    {
+      "column" : 7,
+      "kind" : "bell",
+      "op" : "plant",
+      "row" : 1,
+      "size" : 1
+    },
+    {
+      "column" : 1,
+      "kind" : "fern",
+      "op" : "plant",
+      "row" : 4,
+      "size" : 1
+    }
+  ],
+  "bound" : {
+    "cover" : 20,
+    "elevation" : 2,
+    "needed" : 36,
+    "sunMove" : true
+  },
+  "difficulty" : {
+    "forbiddenCells" : 30,
+    "kinds" : 3,
+    "required" : {
+      "denominator" : 20,
+      "numerator" : 17
+    },
+    "sizes" : 1,
+    "smallest" : 3,
+    "sunChange" : false,
+    "targetCells" : 42,
+    "work" : 192
+  },
+  "digests" : [
+    "33ec1cefe7aa9aeb",
+    "f2b481a008045930",
+    "ab3ccd28faa5e267"
+  ],
+  "fingerprints" : [
+    "e7f2297d9e1f9a1c42feff26a42cbe74aeaadb2fbcb34df732404dbf2832dd85",
+    "d2e8c1275c9592c9270120d23e6a6a3e162db329459eeed54e2bd296e74372fd",
+    "cec99bb796c63eae0ea0087c69e16db33533479d84871b348f3d234091266d23",
+    "8d3afeddda309a31ab6f15583cdfecded9039c8fa0d87873fc983aebee904132"
+  ],
+  "level" : {
+    "budget" : 11,
+    "difficulty" : 2,
+    "elevations" : [
+      2,
+      3
+    ],
+    "fingerprint" : "20648188b5ceea6923cae48e2709e575d42b51bd259b25230ba2a1cf886d06be",
+    "forbidden" : [
+      7,
+      24,
+      25,
+      44,
+      46,
+      60,
+      64,
+      68,
+      69,
+      80,
+      82,
+      89,
+      104,
+      120,
+      123,
+      124,
+      129,
+      140,
+      168,
+      183,
+      188,
+      203,
+      207,
+      208,
+      225,
+      226,
+      227,
+      240,
+      241,
+      242
+    ],
+    "height" : 14,
+    "id" : "nocturne-garden-037",
+    "leakAllowance" : 2,
+    "required" : {
+      "denominator" : 20,
+      "numerator" : 17
+    },
+    "schema" : 1,
+    "seed" : 4256142961634974210,
+    "sizes" : [
+      1,
+      2
+    ],
+    "sun" : 3,
+    "supply" : {
+      "bell" : 1,
+      "fern" : 1,
+      "lily" : 1
+    },
+    "target" : [
+      27,
+      45,
+      47,
+      65,
+      67,
+      81,
+      85,
+      86,
+      87,
+      88,
+      101,
+      105,
+      106,
+      107,
+      108,
+      121,
+      122,
+      125,
+      127,
+      141,
+      144,
+      145,
+      146,
+      147,
+      160,
+      161,
+      164,
+      165,
+      166,
+      167,
+      181,
+      182,
+      184,
+      185,
+      186,
+      187,
+      201,
+      204,
+      205,
+      206,
+      220,
+      221
+    ],
+    "tutorial" : false,
+    "width" : 20
+  },
+  "nearMiss" : {
+    "actions" : [
+      {
+        "column" : 5,
+        "kind" : "lily",
+        "op" : "plant",
+        "row" : 2,
+        "size" : 1
+      },
+      {
+        "column" : 7,
+        "kind" : "bell",
+        "op" : "plant",
+        "row" : 1,
+        "size" : 1
+      }
+    ],
+    "needed" : 36,
+    "shared" : 30
+  },
+  "number" : 37,
+  "schema" : 1,
+  "skipped" : 1,
+  "smallest" : 3
+}

@@ -1,0 +1,132 @@
+{
+  "actions" : [
+    {
+      "elevation" : 2,
+      "op" : "sun"
+    },
+    {
+      "column" : 10,
+      "kind" : "bell",
+      "op" : "plant",
+      "row" : 0,
+      "size" : 2
+    }
+  ],
+  "bound" : {
+    "cover" : 32,
+    "elevation" : 2,
+    "needed" : 26,
+    "sunMove" : true
+  },
+  "difficulty" : {
+    "forbiddenCells" : 12,
+    "kinds" : 1,
+    "required" : {
+      "denominator" : 5,
+      "numerator" : 4
+    },
+    "sizes" : 1,
+    "smallest" : 2,
+    "sunChange" : true,
+    "targetCells" : 32,
+    "work" : 1
+  },
+  "digests" : [
+    "e3b0c44298fc1c14",
+    "70388bd7fb340dba"
+  ],
+  "fingerprints" : [
+    "ce83165c4100b6da097fa63763ae053d878c6bce8e840f1dcd88c9f204ddfe0b",
+    "b11b731df379554d8aa8ca1ed8dbddc4e5b4c4a48ef7b0995811d65be6e38b64",
+    "3501198415c268f0d53e2b816a7f67de6ffe2f53c503176f65ae35269ff48455"
+  ],
+  "level" : {
+    "budget" : 10,
+    "difficulty" : 1,
+    "elevations" : [
+      2,
+      3
+    ],
+    "fingerprint" : "699fe56a444d351f73c7f19195944cc0b79768a52360933f7d0c0efcbfa9b609",
+    "forbidden" : [
+      9,
+      44,
+      56,
+      62,
+      88,
+      93,
+      104,
+      109,
+      120,
+      121,
+      124,
+      185
+    ],
+    "height" : 12,
+    "id" : "nocturne-garden-010",
+    "leakAllowance" : 2,
+    "required" : {
+      "denominator" : 5,
+      "numerator" : 4
+    },
+    "schema" : 1,
+    "seed" : 6165615312067970651,
+    "sizes" : [
+      2
+    ],
+    "sun" : 3,
+    "supply" : {
+      "bell" : 1
+    },
+    "target" : [
+      10,
+      11,
+      26,
+      27,
+      42,
+      43,
+      58,
+      59,
+      72,
+      73,
+      74,
+      75,
+      76,
+      77,
+      89,
+      90,
+      91,
+      92,
+      105,
+      106,
+      107,
+      108,
+      122,
+      123,
+      138,
+      139,
+      154,
+      155,
+      170,
+      171,
+      186,
+      187
+    ],
+    "tutorial" : false,
+    "width" : 16
+  },
+  "nearMiss" : {
+    "actions" : [
+      {
+        "elevation" : 2,
+        "op" : "sun"
+      }
+    ],
+    "needed" : 26,
+    "shared" : 0
+  },
+  "number" : 10,
+  "schema" : 1,
+  "skipped" : 1,
+  "smallest" : 2
+}

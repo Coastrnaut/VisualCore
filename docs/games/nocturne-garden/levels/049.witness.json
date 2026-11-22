@@ -1,0 +1,252 @@
+{
+  "actions" : [
+    {
+      "elevation" : 1,
+      "op" : "sun"
+    },
+    {
+      "column" : 4,
+      "kind" : "fern",
+      "op" : "plant",
+      "row" : 0,
+      "size" : 1
+    },
+    {
+      "column" : 16,
+      "kind" : "fern",
+      "op" : "plant",
+      "row" : 1,
+      "size" : 1
+    },
+    {
+      "column" : 6,
+      "kind" : "lily",
+      "op" : "plant",
+      "row" : 11,
+      "size" : 1
+    },
+    {
+      "column" : 12,
+      "kind" : "star",
+      "op" : "plant",
+      "row" : 10,
+      "size" : 1
+    }
+  ],
+  "bound" : {
+    "cover" : 5,
+    "elevation" : 1,
+    "needed" : 17,
+    "sunMove" : true
+  },
+  "difficulty" : {
+    "forbiddenCells" : 91,
+    "kinds" : 3,
+    "required" : {
+      "denominator" : 10,
+      "numerator" : 9
+    },
+    "sizes" : 1,
+    "smallest" : 5,
+    "sunChange" : true,
+    "targetCells" : 18,
+    "work" : 6
+  },
+  "digests" : [
+    "e3b0c44298fc1c14",
+    "6f03993f60b761da",
+    "32eae4a45ef4e56d",
+    "f46db9583f1f3e65",
+    "c0082ac08af568ce"
+  ],
+  "fingerprints" : [
+    "74a6861e855f27b2150b66f739f0abb807a1f8637dd956635941f2f7b94437c5",
+    "f4a251b2532467a76a7c3d6631db348ea90b39b57a1174d4a745b1e36c52811a",
+    "7fd18ae37e50d9d4b1e59609a04ae341bf634317579d8085fae7111d8b21f7bd",
+    "0480aefc4a3a1585418e9ad9942b8cf0c0e893bc5e7682633704793d9931e3dc",
+    "ef8e7407f7f2e8da6cbc3cc43dd287e22321739162497116fcdac2ecd81fc3e1",
+    "4fc0e13e60973f8bdbd825e519927c2ff84f21fb1bfa98c0c839e0ca45ddae43"
+  ],
+  "level" : {
+    "budget" : 13,
+    "difficulty" : 3,
+    "elevations" : [
+      1,
+      2,
+      3,
+      4
+    ],
+    "fingerprint" : "9e0c6982814c4808c6cef1c06d1c43f93d0e9fad166da7eec0111f66af41bdbc",
+    "forbidden" : [
+      1,
+      2,
+      6,
+      13,
+      14,
+      15,
+      17,
+      18,
+      25,
+      26,
+      29,
+      37,
+      38,
+      41,
+      42,
+      50,
+      53,
+      54,
+      61,
+      62,
+      65,
+      73,
+      75,
+      76,
+      85,
+      86,
+      89,
+      90,
+      97,
+      98,
+      99,
+      101,
+      102,
+      110,
+      111,
+      112,
+      113,
+      114,
+      133,
+      134,
+      136,
+      202,
+      203,
+      204,
+      205,
+      206,
+      220,
+      221,
+      222,
+      223,
+      229,
+      230,
+      244,
+      246,
+      247,
+      248,
+      250,
+      254,
+      267,
+      269,
+      272,
+      273,
+      274,
+      277,
+      278,
+      291,
+      293,
+      296,
+      298,
+      299,
+      301,
+      302,
+      315,
+      316,
+      320,
+      322,
+      323,
+      324,
+      325,
+      339,
+      340,
+      341,
+      342,
+      343,
+      344,
+      345,
+      347,
+      348,
+      349,
+      350,
+      368
+    ],
+    "height" : 16,
+    "id" : "nocturne-garden-049",
+    "leakAllowance" : 1,
+    "required" : {
+      "denominator" : 10,
+      "numerator" : 9
+    },
+    "schema" : 1,
+    "seed" : 1153941434918399120,
+    "sizes" : [
+      1,
+      2,
+      3
+    ],
+    "sun" : 4,
+    "supply" : {
+      "fern" : 2,
+      "lily" : 1,
+      "rose" : 1,
+      "star" : 1
+    },
+    "target" : [
+      4,
+      27,
+      28,
+      40,
+      51,
+      52,
+      63,
+      64,
+      87,
+      88,
+      252,
+      270,
+      276,
+      294,
+      300,
+      317,
+      318,
+      319
+    ],
+    "tutorial" : false,
+    "width" : 24
+  },
+  "nearMiss" : {
+    "actions" : [
+      {
+        "elevation" : 1,
+        "op" : "sun"
+      },
+      {
+        "column" : 4,
+        "kind" : "fern",
+        "op" : "plant",
+        "row" : 0,
+        "size" : 1
+      },
+      {
+        "column" : 16,
+        "kind" : "fern",
+        "op" : "plant",
+        "row" : 1,
+        "size" : 1
+      },
+      {
+        "column" : 6,
+        "kind" : "lily",
+        "op" : "plant",
+        "row" : 11,
+        "size" : 1
+      }
+    ],
+    "needed" : 17,
+    "shared" : 15
+  },
+  "number" : 49,
+  "schema" : 1,
+  "skipped" : 8,
+  "smallest" : 5
+}

@@ -1,0 +1,232 @@
+{
+  "actions" : [
+    {
+      "elevation" : 1,
+      "op" : "sun"
+    },
+    {
+      "column" : 18,
+      "kind" : "rose",
+      "op" : "plant",
+      "row" : 11,
+      "size" : 1
+    },
+    {
+      "column" : 6,
+      "kind" : "bell",
+      "op" : "plant",
+      "row" : 13,
+      "size" : 1
+    },
+    {
+      "column" : 15,
+      "kind" : "lily",
+      "op" : "plant",
+      "row" : 5,
+      "size" : 1
+    }
+  ],
+  "bound" : {
+    "cover" : 7,
+    "elevation" : 1,
+    "needed" : 16,
+    "sunMove" : true
+  },
+  "difficulty" : {
+    "forbiddenCells" : 88,
+    "kinds" : 3,
+    "required" : {
+      "denominator" : 10,
+      "numerator" : 9
+    },
+    "sizes" : 1,
+    "smallest" : 4,
+    "sunChange" : true,
+    "targetCells" : 17,
+    "work" : 4
+  },
+  "digests" : [
+    "e3b0c44298fc1c14",
+    "659d399efe8f8f02",
+    "6428a0a84609f720",
+    "342e7ceab81b07ff"
+  ],
+  "fingerprints" : [
+    "c6700cfd2e054071d5a6ffad1d50414da3be6244430c4b2222e5a2c3941016f4",
+    "fcba79baf6323ba454823b84bb91b6420093119a996a475c659def5d3cfc5a1a",
+    "173ad33658cb2cebb9b8a828d1407b89d096727cde8e80b3a3e1df600de004ed",
+    "4878454a3bfa0b4f5e8e78270984d4a8345cb6dc114900b90e6dcb565348bc23",
+    "5f785a31ba23e96b6012b423b81675387cb9b7137e0528562033ea3aacb1bdb3"
+  ],
+  "level" : {
+    "budget" : 13,
+    "difficulty" : 3,
+    "elevations" : [
+      1,
+      2,
+      3,
+      4
+    ],
+    "fingerprint" : "c8bfa9e6380b94817b5444133633feabaff7eebc48cbf95b419dfca18010c5b1",
+    "forbidden" : [
+      86,
+      87,
+      88,
+      89,
+      109,
+      110,
+      111,
+      112,
+      113,
+      132,
+      133,
+      134,
+      136,
+      137,
+      138,
+      156,
+      157,
+      158,
+      160,
+      161,
+      180,
+      181,
+      185,
+      186,
+      204,
+      206,
+      207,
+      208,
+      210,
+      228,
+      229,
+      230,
+      232,
+      233,
+      234,
+      235,
+      256,
+      258,
+      259,
+      260,
+      268,
+      269,
+      270,
+      271,
+      272,
+      279,
+      280,
+      281,
+      283,
+      284,
+      285,
+      291,
+      292,
+      293,
+      294,
+      295,
+      296,
+      303,
+      304,
+      308,
+      315,
+      316,
+      319,
+      320,
+      321,
+      327,
+      328,
+      332,
+      333,
+      339,
+      340,
+      345,
+      351,
+      352,
+      353,
+      354,
+      355,
+      356,
+      363,
+      365,
+      367,
+      368,
+      369,
+      375,
+      378,
+      379,
+      380,
+      381
+    ],
+    "height" : 16,
+    "id" : "nocturne-garden-045",
+    "leakAllowance" : 1,
+    "required" : {
+      "denominator" : 10,
+      "numerator" : 9
+    },
+    "schema" : 1,
+    "seed" : 12155536183406550306,
+    "sizes" : [
+      1,
+      2,
+      3
+    ],
+    "sun" : 4,
+    "supply" : {
+      "bell" : 1,
+      "lily" : 1,
+      "rose" : 1,
+      "star" : 1
+    },
+    "target" : [
+      135,
+      159,
+      182,
+      183,
+      184,
+      282,
+      305,
+      306,
+      307,
+      318,
+      329,
+      330,
+      331,
+      341,
+      342,
+      343,
+      366
+    ],
+    "tutorial" : false,
+    "width" : 24
+  },
+  "nearMiss" : {
+    "actions" : [
+      {
+        "elevation" : 1,
+        "op" : "sun"
+      },
+      {
+        "column" : 18,
+        "kind" : "rose",
+        "op" : "plant",
+        "row" : 11,
+        "size" : 1
+      },
+      {
+        "column" : 6,
+        "kind" : "bell",
+        "op" : "plant",
+        "row" : 13,
+        "size" : 1
+      }
+    ],
+    "needed" : 16,
+    "shared" : 12
+  },
+  "number" : 45,
+  "schema" : 1,
+  "skipped" : 0,
+  "smallest" : 4
+}
