@@ -1,0 +1,125 @@
+{
+  "actions" : [
+    {
+      "phase" : {
+        "_0" : 1,
+        "_1" : 10
+      }
+    },
+    {
+      "step" : {
+        "_0" : 284
+      }
+    }
+  ],
+  "blocked" : 0,
+  "difficulty" : {
+    "blocked" : 0,
+    "loopLengths" : [
+      6,
+      12
+    ],
+    "smallest" : 1,
+    "stars" : 2,
+    "winTick" : 6,
+    "windows" : 70
+  },
+  "digests" : [
+    "4d7f2734ef31107b",
+    "efb337dd1ab74481",
+    "17733f1a9f02883f",
+    "b4e83092da4549eb",
+    "aa68b1f35931509b",
+    "ae6727376f448e20"
+  ],
+  "fingerprints" : [
+    "92fc6b8306d1ac09741ca77392b6aab9571736ecbb0b52d32fc41694bfe85ddd",
+    "7d759f698ec17b17db12f1d75ef1ccbc41f236f2f30396131c56c287386802c4",
+    "63a145b89e08144846245020d344cceef82c35a0d30050b1fa9cb1a182d9ae51"
+  ],
+  "level" : {
+    "budget" : 11,
+    "columns" : 6,
+    "difficulty" : 1,
+    "fingerprint" : "b4cd5c3688a45b78d5bf1daa388c0a59d5c916db57daaaddac5decf85cd75f84",
+    "id" : "chrono-constellator-003",
+    "rows" : 5,
+    "schema" : 1,
+    "seed" : 14119094523848373240,
+    "stars" : [
+      {
+        "loop" : [
+          8,
+          14,
+          15,
+          9,
+          3,
+          2
+        ],
+        "phase" : 0,
+        "target" : 8
+      },
+      {
+        "loop" : [
+          19,
+          25,
+          26,
+          27,
+          28,
+          29,
+          23,
+          17,
+          16,
+          15,
+          14,
+          13
+        ],
+        "phase" : 7,
+        "target" : 28
+      }
+    ],
+    "tickLimit" : 284,
+    "tutorial" : true
+  },
+  "lowerBound" : 1,
+  "nearMiss" : {
+    "actions" : [
+      {
+        "step" : {
+          "_0" : 284
+        }
+      }
+    ],
+    "reason" : {
+      "collision" : {
+        "_0" : 0,
+        "_1" : 1,
+        "_2" : 15
+      }
+    },
+    "tick" : 2
+  },
+  "number" : 3,
+  "schema" : 1,
+  "skipped" : 1,
+  "unedited" : {
+    "actions" : [
+      {
+        "step" : {
+          "_0" : 284
+        }
+      }
+    ],
+    "reason" : {
+      "collision" : {
+        "_0" : 0,
+        "_1" : 1,
+        "_2" : 15
+      }
+    },
+    "tick" : 2
+  },
+  "winTick" : 6,
+  "window" : 6,
+  "windows" : 70
+}

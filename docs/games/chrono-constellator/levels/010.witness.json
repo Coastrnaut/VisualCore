@@ -1,0 +1,131 @@
+{
+  "actions" : [
+    {
+      "phase" : {
+        "_0" : 1,
+        "_1" : 6
+      }
+    },
+    {
+      "step" : {
+        "_0" : 296
+      }
+    }
+  ],
+  "blocked" : 0,
+  "difficulty" : {
+    "blocked" : 0,
+    "loopLengths" : [
+      14,
+      10
+    ],
+    "smallest" : 1,
+    "stars" : 2,
+    "winTick" : 6,
+    "windows" : 50
+  },
+  "digests" : [
+    "ef56dae48b3c4eb1",
+    "6ac48c5cdc1ae8bc",
+    "fc8aeb23b0e42173",
+    "6998f2d20ebf7894",
+    "b4484921bebc97d0",
+    "5581ec018e2ab9b9"
+  ],
+  "fingerprints" : [
+    "e7546dc07ec20b23053cbb3146e6a84b9d3f1dc774fca97e357813baf9877a7e",
+    "0741ea4fc07acbff4a87354c23848df08e9f49e05df74804d31a5e49f643f1f9",
+    "ae118c0cdf7c2ae2885b95f2cb0bdc3539ee8549a7a6a4418474d01e83ff014a"
+  ],
+  "level" : {
+    "budget" : 10,
+    "columns" : 6,
+    "difficulty" : 1,
+    "fingerprint" : "cdc655cfc21f8dfe4a85ae0882307520d2e9e7fefa4ec618deeb559a5bc3dbae",
+    "id" : "chrono-constellator-010",
+    "rows" : 5,
+    "schema" : 1,
+    "seed" : 8243387811602616916,
+    "stars" : [
+      {
+        "loop" : [
+          12,
+          18,
+          24,
+          25,
+          26,
+          27,
+          28,
+          22,
+          16,
+          10,
+          9,
+          8,
+          7,
+          6
+        ],
+        "phase" : 2,
+        "target" : 16
+      },
+      {
+        "loop" : [
+          6,
+          7,
+          8,
+          9,
+          10,
+          16,
+          15,
+          14,
+          13,
+          12
+        ],
+        "phase" : 3,
+        "target" : 8
+      }
+    ],
+    "tickLimit" : 296,
+    "tutorial" : false
+  },
+  "lowerBound" : 1,
+  "nearMiss" : {
+    "actions" : [
+      {
+        "step" : {
+          "_0" : 296
+        }
+      }
+    ],
+    "reason" : {
+      "collision" : {
+        "_0" : 0,
+        "_1" : 1,
+        "_2" : 8
+      }
+    },
+    "tick" : 9
+  },
+  "number" : 10,
+  "schema" : 1,
+  "skipped" : 1,
+  "unedited" : {
+    "actions" : [
+      {
+        "step" : {
+          "_0" : 296
+        }
+      }
+    ],
+    "reason" : {
+      "collision" : {
+        "_0" : 0,
+        "_1" : 1,
+        "_2" : 8
+      }
+    },
+    "tick" : 9
+  },
+  "winTick" : 6,
+  "window" : 6,
+  "windows" : 50
+}

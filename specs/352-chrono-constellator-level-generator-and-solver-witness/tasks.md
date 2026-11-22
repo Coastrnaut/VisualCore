@@ -59,7 +59,7 @@ the reference every run uses). Fixture seed 2_352; tests stay short (< 10 s each
   witnesses) with `Packages/ExperiencesRound02/ChronoConstellator/CoreTests/ChronoConstellatorWitnessTests.swift` (round
   trip byte for byte; edited actions, digests, fingerprints, level, counterexamples and difficulty refused; newer schema and
   damaged JSON refused; the counterexamples fail as recorded) by agent B; `--name host-4`
-- [ ] T-R02G0602-006 [US2] [US3] [US4] Create
+- [X] T-R02G0602-006 [US2] [US3] [US4] Create — Verified 2026-11-21: 2026-11-21 host-5 exit 0: ChronoConstellatorCatalogTests 7 tests in 1.2 s (100 entries, pinned digest 6483b20e…, progression and band means, all 100 witnesses win through the play and fail unedited, brute force on levels 1, 11, … 91, 100 witness files byte for byte) (.autonomy/migration/checks/R02-G06-02.host-5.json); difficulty gains puzzleDifficulty, generator levelID; 100 witness files generated with CHRONO_CONSTELLATOR_WRITE_WITNESSES=1
   `Packages/ExperiencesRound02/ChronoConstellator/CoreTests/ChronoConstellatorCatalogTests.swift` (100 entries, 20 per
   band; the catalog generated twice is identical; pinned digest; `ProgressionRule.standard` holds on the smallest count;
   band means never fall; on levels 1, 11, 21, … 91 the solver equals the phase-only brute force, with holds added on the band 1–2 samples

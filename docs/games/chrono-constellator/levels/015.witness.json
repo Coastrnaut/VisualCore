@@ -1,0 +1,124 @@
+{
+  "actions" : [
+    {
+      "phase" : {
+        "_0" : 0,
+        "_1" : 0
+      }
+    },
+    {
+      "step" : {
+        "_0" : 258
+      }
+    }
+  ],
+  "blocked" : 0,
+  "difficulty" : {
+    "blocked" : 0,
+    "loopLengths" : [
+      10,
+      10
+    ],
+    "smallest" : 1,
+    "stars" : 2,
+    "winTick" : 7,
+    "windows" : 51
+  },
+  "digests" : [
+    "796dfc1052271bdc",
+    "6dbf417cb82eb2a7",
+    "c2389d09bf52df16",
+    "5d8dba612e8489ca",
+    "73ea86ecc324b1e4",
+    "0d0c3705723d86d4",
+    "f9899ffc094e1bc4"
+  ],
+  "fingerprints" : [
+    "f486e4f73dd96cf005dbfe8b86a5cf0c3e7baf8ddbe49cc4cc6babd5af5f3fa1",
+    "ca17173fd978a7ac1ddb855feff9fcded5346958e1742c8cd57d9d02a12a5039",
+    "49ea4a4a6d1edfc3e02bcdd3140e4ab4bd28751cb4ab038e5ec0ccd5dee52d27"
+  ],
+  "level" : {
+    "budget" : 11,
+    "columns" : 6,
+    "difficulty" : 1,
+    "fingerprint" : "b91e883c894ea0a7d8a9d8330120f26d9fe0e8882b658c164cd7d17ca6a8972c",
+    "id" : "chrono-constellator-015",
+    "rows" : 5,
+    "schema" : 1,
+    "seed" : 6203107072865815566,
+    "stars" : [
+      {
+        "loop" : [
+          20,
+          26,
+          27,
+          28,
+          29,
+          23,
+          17,
+          16,
+          15,
+          14
+        ],
+        "phase" : 7,
+        "target" : 16
+      },
+      {
+        "loop" : [
+          8,
+          9,
+          10,
+          11,
+          17,
+          23,
+          22,
+          21,
+          20,
+          14
+        ],
+        "phase" : 1,
+        "target" : 20
+      }
+    ],
+    "tickLimit" : 258,
+    "tutorial" : false
+  },
+  "lowerBound" : 1,
+  "nearMiss" : {
+    "actions" : [
+      {
+        "step" : {
+          "_0" : 258
+        }
+      }
+    ],
+    "reason" : {
+      "time" : {
+
+      }
+    },
+    "tick" : 258
+  },
+  "number" : 15,
+  "schema" : 1,
+  "skipped" : 2,
+  "unedited" : {
+    "actions" : [
+      {
+        "step" : {
+          "_0" : 258
+        }
+      }
+    ],
+    "reason" : {
+      "time" : {
+
+      }
+    },
+    "tick" : 258
+  },
+  "winTick" : 7,
+  "window" : 7,
+  "windows" : 51
+}

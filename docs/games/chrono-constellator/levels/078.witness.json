@@ -1,0 +1,174 @@
+{
+  "actions" : [
+    {
+      "phase" : {
+        "_0" : 0,
+        "_1" : 0
+      }
+    },
+    {
+      "phase" : {
+        "_0" : 2,
+        "_1" : 2
+      }
+    },
+    {
+      "phase" : {
+        "_0" : 3,
+        "_1" : 4
+      }
+    },
+    {
+      "step" : {
+        "_0" : 324
+      }
+    }
+  ],
+  "blocked" : 184,
+  "difficulty" : {
+    "blocked" : 184,
+    "loopLengths" : [
+      10,
+      4,
+      8,
+      10
+    ],
+    "smallest" : 3,
+    "stars" : 4,
+    "winTick" : 1,
+    "windows" : 186
+  },
+  "digests" : [
+    "d8763760909ae641"
+  ],
+  "fingerprints" : [
+    "cfbb67bdc485ff84a36b3d7a450d86ca15276aabf4ebe00632d9a4a7e6f9f903",
+    "101f5b0640ce17f302424e7ff0b5669096d67b1ebcaa28dd37da04bf3de3752a",
+    "b1e2777fa1125cf74d84ba9014b83cad9018d83c0e4b3490994a2b0433842b1d",
+    "2f949d76b24d187d1bfcfc04330a0f76b384ed6feca300f037453dcb6db39a39",
+    "4394cdccdb9d7a0ff4ee20b98c54ca6ba288c74733033c030a4f87eb9b7ed782"
+  ],
+  "level" : {
+    "budget" : 16,
+    "columns" : 7,
+    "difficulty" : 4,
+    "fingerprint" : "46a53898b17fef62df89dd71a6adea0283e6a171800b1f440ba092fd04be23e5",
+    "id" : "chrono-constellator-078",
+    "rows" : 6,
+    "schema" : 1,
+    "seed" : 15315658681225812221,
+    "stars" : [
+      {
+        "loop" : [
+          17,
+          24,
+          31,
+          32,
+          33,
+          26,
+          19,
+          12,
+          11,
+          10
+        ],
+        "phase" : 1,
+        "target" : 24
+      },
+      {
+        "loop" : [
+          10,
+          11,
+          18,
+          17
+        ],
+        "phase" : 2,
+        "target" : 17
+      },
+      {
+        "loop" : [
+          17,
+          24,
+          31,
+          32,
+          25,
+          18,
+          11,
+          10
+        ],
+        "phase" : 0,
+        "target" : 32
+      },
+      {
+        "loop" : [
+          11,
+          12,
+          13,
+          20,
+          27,
+          34,
+          33,
+          32,
+          25,
+          18
+        ],
+        "phase" : 7,
+        "target" : 34
+      }
+    ],
+    "tickLimit" : 324,
+    "tutorial" : false
+  },
+  "lowerBound" : 3,
+  "nearMiss" : {
+    "actions" : [
+      {
+        "phase" : {
+          "_0" : 0,
+          "_1" : 0
+        }
+      },
+      {
+        "phase" : {
+          "_0" : 2,
+          "_1" : 2
+        }
+      },
+      {
+        "step" : {
+          "_0" : 324
+        }
+      }
+    ],
+    "reason" : {
+      "collision" : {
+        "_0" : 1,
+        "_1" : 3,
+        "_2" : 11
+      }
+    },
+    "tick" : 3
+  },
+  "number" : 78,
+  "schema" : 1,
+  "skipped" : 25,
+  "unedited" : {
+    "actions" : [
+      {
+        "step" : {
+          "_0" : 324
+        }
+      }
+    ],
+    "reason" : {
+      "collision" : {
+        "_0" : 1,
+        "_1" : 3,
+        "_2" : 11
+      }
+    },
+    "tick" : 3
+  },
+  "winTick" : 1,
+  "window" : 1,
+  "windows" : 186
+}

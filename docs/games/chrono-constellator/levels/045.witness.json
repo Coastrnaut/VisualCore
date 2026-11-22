@@ -1,0 +1,146 @@
+{
+  "actions" : [
+    {
+      "phase" : {
+        "_0" : 0,
+        "_1" : 1
+      }
+    },
+    {
+      "phase" : {
+        "_0" : 1,
+        "_1" : 1
+      }
+    },
+    {
+      "step" : {
+        "_0" : 224
+      }
+    }
+  ],
+  "blocked" : 97,
+  "difficulty" : {
+    "blocked" : 97,
+    "loopLengths" : [
+      10,
+      4,
+      12
+    ],
+    "smallest" : 2,
+    "stars" : 3,
+    "winTick" : 1,
+    "windows" : 98
+  },
+  "digests" : [
+    "3eb720cd54b99190"
+  ],
+  "fingerprints" : [
+    "31b1580435e84402a194a71bf138bbcbaeb0aa051447259b236ad80ba958f6a6",
+    "022b838bef5d24f8e387546e36a773a1d17c4ded5f89039e604dfd36b003da55",
+    "74419a9ba74a5ad4521480a71eaf44ad7d5ce448235e50d0fe0ec188eef7e1c7",
+    "1a793a95125ae1f40f1576c56cd0431e4073200d7393821246d6594f665cb5c3"
+  ],
+  "level" : {
+    "budget" : 13,
+    "columns" : 7,
+    "difficulty" : 3,
+    "fingerprint" : "75cb69862cff7d295186e87f8a1745b181de991b91d49119f7f466e093c1a3ba",
+    "id" : "chrono-constellator-045",
+    "rows" : 6,
+    "schema" : 1,
+    "seed" : 12886615230111636058,
+    "stars" : [
+      {
+        "loop" : [
+          28,
+          35,
+          36,
+          37,
+          38,
+          31,
+          24,
+          23,
+          22,
+          21
+        ],
+        "phase" : 0,
+        "target" : 36
+      },
+      {
+        "loop" : [
+          37,
+          38,
+          31,
+          30
+        ],
+        "phase" : 3,
+        "target" : 31
+      },
+      {
+        "loop" : [
+          28,
+          35,
+          36,
+          37,
+          38,
+          39,
+          32,
+          25,
+          24,
+          23,
+          22,
+          21
+        ],
+        "phase" : 4,
+        "target" : 39
+      }
+    ],
+    "tickLimit" : 224,
+    "tutorial" : false
+  },
+  "lowerBound" : 2,
+  "nearMiss" : {
+    "actions" : [
+      {
+        "phase" : {
+          "_0" : 0,
+          "_1" : 1
+        }
+      },
+      {
+        "step" : {
+          "_0" : 224
+        }
+      }
+    ],
+    "reason" : {
+      "time" : {
+
+      }
+    },
+    "tick" : 224
+  },
+  "number" : 45,
+  "schema" : 1,
+  "skipped" : 12,
+  "unedited" : {
+    "actions" : [
+      {
+        "step" : {
+          "_0" : 224
+        }
+      }
+    ],
+    "reason" : {
+      "collision" : {
+        "_0" : 0,
+        "_1" : 1,
+        "_2" : 37
+      }
+    },
+    "tick" : 13
+  },
+  "winTick" : 1,
+  "window" : 1,
+  "windows" : 98
+}

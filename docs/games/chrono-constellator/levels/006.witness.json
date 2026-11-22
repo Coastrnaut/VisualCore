@@ -1,0 +1,126 @@
+{
+  "actions" : [
+    {
+      "phase" : {
+        "_0" : 0,
+        "_1" : 1
+      }
+    },
+    {
+      "step" : {
+        "_0" : 254
+      }
+    }
+  ],
+  "blocked" : 0,
+  "difficulty" : {
+    "blocked" : 0,
+    "loopLengths" : [
+      10,
+      12
+    ],
+    "smallest" : 1,
+    "stars" : 2,
+    "winTick" : 3,
+    "windows" : 46
+  },
+  "digests" : [
+    "e51b4a0fe93f9a09",
+    "ebe37c8dd710dbf9",
+    "64ecbc0c5075928d"
+  ],
+  "fingerprints" : [
+    "163c21152dc696440eb37b5d12f9335c3fd7357721d1ef5a59c37295f9cf17cb",
+    "66b6c144fcd4d1149cc7fde3888beb8b096957e1b96739f0052a3d31530af390",
+    "3b0766246f029b9afa21f73d65721c966a91ca589c38c0beb48160b9dd2eaa29"
+  ],
+  "level" : {
+    "budget" : 10,
+    "columns" : 6,
+    "difficulty" : 1,
+    "fingerprint" : "6bdc3b64eb612d8e168bdcdfd9f10ac7455e2ac789821fd956d29c7d9196c24b",
+    "id" : "chrono-constellator-006",
+    "rows" : 5,
+    "schema" : 1,
+    "seed" : 9587264326419140634,
+    "stars" : [
+      {
+        "loop" : [
+          14,
+          20,
+          26,
+          27,
+          28,
+          22,
+          16,
+          10,
+          9,
+          8
+        ],
+        "phase" : 6,
+        "target" : 28
+      },
+      {
+        "loop" : [
+          0,
+          1,
+          2,
+          3,
+          4,
+          10,
+          16,
+          15,
+          14,
+          13,
+          12,
+          6
+        ],
+        "phase" : 10,
+        "target" : 1
+      }
+    ],
+    "tickLimit" : 254,
+    "tutorial" : false
+  },
+  "lowerBound" : 1,
+  "nearMiss" : {
+    "actions" : [
+      {
+        "step" : {
+          "_0" : 254
+        }
+      }
+    ],
+    "reason" : {
+      "collision" : {
+        "_0" : 0,
+        "_1" : 1,
+        "_2" : 16
+      }
+    },
+    "tick" : 20
+  },
+  "number" : 6,
+  "schema" : 1,
+  "skipped" : 1,
+  "unedited" : {
+    "actions" : [
+      {
+        "step" : {
+          "_0" : 254
+        }
+      }
+    ],
+    "reason" : {
+      "collision" : {
+        "_0" : 0,
+        "_1" : 1,
+        "_2" : 16
+      }
+    },
+    "tick" : 20
+  },
+  "winTick" : 3,
+  "window" : 3,
+  "windows" : 46
+}

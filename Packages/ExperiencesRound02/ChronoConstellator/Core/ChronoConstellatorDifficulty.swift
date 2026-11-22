@@ -3,6 +3,8 @@
 // edit count, the win tick of the witness, the star count, the loop lengths, the alignment windows considered (ticks with
 // the smallest misaligned count) and how many of them a collision blocks.
 
+import VisualCoreSimulation
+
 /// The difficulty metrics of a certified level.
 public struct ChronoConstellatorDifficulty: Sendable, Hashable, Codable {
     /// The smallest number of edits that wins (the solver's lower bound m*).
@@ -26,5 +28,11 @@ public struct ChronoConstellatorDifficulty: Sendable, Hashable, Codable {
         self.loopLengths = loopLengths
         self.windows = windows
         self.blocked = blocked
+    }
+
+    /// The R02-F24 difficulty of the progression rule: the smallest edit count, with the windows considered as the
+    /// explored measure.
+    public var puzzleDifficulty: PuzzleDifficulty {
+        PuzzleDifficulty(shortest: smallest, explored: windows)
     }
 }

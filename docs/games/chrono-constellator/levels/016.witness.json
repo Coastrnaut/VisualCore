@@ -1,0 +1,110 @@
+{
+  "actions" : [
+    {
+      "phase" : {
+        "_0" : 0,
+        "_1" : 5
+      }
+    },
+    {
+      "step" : {
+        "_0" : 269
+      }
+    }
+  ],
+  "blocked" : 0,
+  "difficulty" : {
+    "blocked" : 0,
+    "loopLengths" : [
+      8,
+      4
+    ],
+    "smallest" : 1,
+    "stars" : 2,
+    "winTick" : 1,
+    "windows" : 101
+  },
+  "digests" : [
+    "479757460b959fe2"
+  ],
+  "fingerprints" : [
+    "e9d09ac4e5b2114ff187c0ff0603c4535f184bb2759615e14f660a9ef88b00a3",
+    "3e58e12ad05b6905aabe3b53bc9e1c480c246871e5c5e6f0074f47bad119e4c3",
+    "1daae96076187bc19744e8950f71d4ac79950e21531d20edbb02fd667ad502e2"
+  ],
+  "level" : {
+    "budget" : 8,
+    "columns" : 6,
+    "difficulty" : 1,
+    "fingerprint" : "4050f2695cde5b0b4e761e651c81c84ea5d668986343ae10d71a92e3bc6fe867",
+    "id" : "chrono-constellator-016",
+    "rows" : 5,
+    "schema" : 1,
+    "seed" : 6973617141100418741,
+    "stars" : [
+      {
+        "loop" : [
+          6,
+          12,
+          18,
+          19,
+          13,
+          7,
+          1,
+          0
+        ],
+        "phase" : 0,
+        "target" : 1
+      },
+      {
+        "loop" : [
+          21,
+          22,
+          16,
+          15
+        ],
+        "phase" : 0,
+        "target" : 22
+      }
+    ],
+    "tickLimit" : 269,
+    "tutorial" : false
+  },
+  "lowerBound" : 1,
+  "nearMiss" : {
+    "actions" : [
+      {
+        "step" : {
+          "_0" : 269
+        }
+      }
+    ],
+    "reason" : {
+      "time" : {
+
+      }
+    },
+    "tick" : 269
+  },
+  "number" : 16,
+  "schema" : 1,
+  "skipped" : 0,
+  "unedited" : {
+    "actions" : [
+      {
+        "step" : {
+          "_0" : 269
+        }
+      }
+    ],
+    "reason" : {
+      "time" : {
+
+      }
+    },
+    "tick" : 269
+  },
+  "winTick" : 1,
+  "window" : 1,
+  "windows" : 101
+}

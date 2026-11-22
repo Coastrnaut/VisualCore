@@ -1,0 +1,122 @@
+{
+  "actions" : [
+    {
+      "phase" : {
+        "_0" : 1,
+        "_1" : 5
+      }
+    },
+    {
+      "step" : {
+        "_0" : 314
+      }
+    }
+  ],
+  "blocked" : 0,
+  "difficulty" : {
+    "blocked" : 0,
+    "loopLengths" : [
+      10,
+      10
+    ],
+    "smallest" : 1,
+    "stars" : 2,
+    "winTick" : 5,
+    "windows" : 62
+  },
+  "digests" : [
+    "11b5746260de9f6a",
+    "3788423afd0ede19",
+    "b4484921bebc97d0",
+    "426dfcabe27d3a75",
+    "bad00c61e0d6e5d7"
+  ],
+  "fingerprints" : [
+    "c4034cbce7c05fa8e7d695ab7b8719d5fe10dae82b43ebcf055d2a47a10ab518",
+    "0c7b0deea6a7c9c2d88f2eaf857b6cf439181f2b1714802cc07d4c1ce558a53c",
+    "515c15975ac3deaa5cb30f52bd16d472c8996d2a04e75c51fae77372c323882d"
+  ],
+  "level" : {
+    "budget" : 9,
+    "columns" : 6,
+    "difficulty" : 1,
+    "fingerprint" : "13bf6c054ab7026ab2fd20d106e28eef8e1053aa6f1ca4a03055bf3818f11a07",
+    "id" : "chrono-constellator-005",
+    "rows" : 5,
+    "schema" : 1,
+    "seed" : 862008082071655609,
+    "stars" : [
+      {
+        "loop" : [
+          18,
+          19,
+          20,
+          21,
+          22,
+          16,
+          15,
+          14,
+          13,
+          12
+        ],
+        "phase" : 1,
+        "target" : 15
+      },
+      {
+        "loop" : [
+          12,
+          18,
+          24,
+          25,
+          26,
+          20,
+          14,
+          8,
+          7,
+          6
+        ],
+        "phase" : 3,
+        "target" : 12
+      }
+    ],
+    "tickLimit" : 314,
+    "tutorial" : false
+  },
+  "lowerBound" : 1,
+  "nearMiss" : {
+    "actions" : [
+      {
+        "step" : {
+          "_0" : 314
+        }
+      }
+    ],
+    "reason" : {
+      "time" : {
+
+      }
+    },
+    "tick" : 314
+  },
+  "number" : 5,
+  "schema" : 1,
+  "skipped" : 1,
+  "unedited" : {
+    "actions" : [
+      {
+        "step" : {
+          "_0" : 314
+        }
+      }
+    ],
+    "reason" : {
+      "time" : {
+
+      }
+    },
+    "tick" : 314
+  },
+  "winTick" : 5,
+  "window" : 5,
+  "windows" : 62
+}

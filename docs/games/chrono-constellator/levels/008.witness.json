@@ -1,0 +1,124 @@
+{
+  "actions" : [
+    {
+      "phase" : {
+        "_0" : 1,
+        "_1" : 1
+      }
+    },
+    {
+      "step" : {
+        "_0" : 157
+      }
+    }
+  ],
+  "blocked" : 0,
+  "difficulty" : {
+    "blocked" : 0,
+    "loopLengths" : [
+      12,
+      10
+    ],
+    "smallest" : 1,
+    "stars" : 2,
+    "winTick" : 1,
+    "windows" : 29
+  },
+  "digests" : [
+    "8a44903b7a7ac046"
+  ],
+  "fingerprints" : [
+    "47193448b3db650c692034b7379686ff8b5e2e83de911795896c2c1fc410829e",
+    "aa99c54d62e54fc3b07a78fae1973d2fe71c33468e132941879abf3b6edbb011",
+    "8b5f52a8ee7bdadda6473d34a5441bc28a13dbd197d08234eea2cfa3c7e3ca23"
+  ],
+  "level" : {
+    "budget" : 8,
+    "columns" : 6,
+    "difficulty" : 1,
+    "fingerprint" : "04e09c2d4d64f4d3f4455ab92a13e537026234013262a99477d501ce35713952",
+    "id" : "chrono-constellator-008",
+    "rows" : 5,
+    "schema" : 1,
+    "seed" : 372773312318169174,
+    "stars" : [
+      {
+        "loop" : [
+          2,
+          3,
+          4,
+          5,
+          11,
+          17,
+          23,
+          22,
+          21,
+          20,
+          14,
+          8
+        ],
+        "phase" : 2,
+        "target" : 5
+      },
+      {
+        "loop" : [
+          12,
+          13,
+          14,
+          15,
+          16,
+          22,
+          21,
+          20,
+          19,
+          18
+        ],
+        "phase" : 2,
+        "target" : 14
+      }
+    ],
+    "tickLimit" : 157,
+    "tutorial" : false
+  },
+  "lowerBound" : 1,
+  "nearMiss" : {
+    "actions" : [
+      {
+        "step" : {
+          "_0" : 157
+        }
+      }
+    ],
+    "reason" : {
+      "collision" : {
+        "_0" : 0,
+        "_1" : 1,
+        "_2" : 14
+      }
+    },
+    "tick" : 20
+  },
+  "number" : 8,
+  "schema" : 1,
+  "skipped" : 1,
+  "unedited" : {
+    "actions" : [
+      {
+        "step" : {
+          "_0" : 157
+        }
+      }
+    ],
+    "reason" : {
+      "collision" : {
+        "_0" : 0,
+        "_1" : 1,
+        "_2" : 14
+      }
+    },
+    "tick" : 20
+  },
+  "winTick" : 1,
+  "window" : 1,
+  "windows" : 29
+}
