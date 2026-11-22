@@ -50,11 +50,13 @@ program).
 
 - [ ] T-R02G0604-005 [US4] Wire `Packages/ExperiencesRound02/ChronoConstellator/Experience/ChronoConstellatorPresenter.swift` (`pointer(_:viewSize:port:)` routing
   through the gesture controller, `select` setting the mirror's picked star, `resetView()`, the descriptions "Star n
-  (shape) would start at row r, column c" and "Scrub to tick t of T", refusals logged with their code),
+  (shape) would start at row r, column c", "Scrub to tick t of T" and, for a star drag or press after tick 0, "Edits
+  are made at tick 0: rewind first"; a gesture's refused action shown in the mirror message like the panel's and logged
+  with its code),
   `Packages/ExperiencesRound02/ChronoConstellator/Experience/ChronoConstellatorSkyScene.swift` (the orbit's camera; the candidate ring through the field program;
   fallback ring) and `Packages/ExperiencesRound02/ChronoConstellator/Experience/ChronoConstellatorControls.swift` ("Reset view"); agent E writes
   `Packages/ExperiencesRound02/ChronoConstellator/ExperienceTests/ChronoConstellatorGestureWiringTests.swift` (touches through the pointer entry send the expected
-  actions; orbit and reset change no digest); `--name sim-27 -- python3 scripts/xcodebuild_package.py --package
+  actions; orbit and reset change no digest; a refused gesture action is shown); `--name sim-27 -- python3 scripts/xcodebuild_package.py --package
   Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package --destination sim-27.2 --action test --only-testing
   ChronoConstellatorExperienceTests`
 
