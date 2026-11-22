@@ -59,7 +59,7 @@ tests stay short (< 10 s each). {device} items are D1–D3 observations after Im
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
 - [X] T-R02G0507-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-21: 2026-11-21 rendering-27, rendering-26, experiences, host-full, app-unit exit 0 (.autonomy/migration/checks/R02-G05-07.*.json)
   `--name host-full`, `--name app-unit`
-- [ ] T-R02G0507-008 Reference regression chunk 1 (`--name reference-1`)
+- [X] T-R02G0507-008 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-21: 2026-11-21 reference-1 exit 0 (.autonomy/migration/checks/R02-G05-07.reference-1.json)
 - [ ] T-R02G0507-009 Reference regression chunk 2 (`--name reference-2`)
 - [ ] T-R02G0507-010 Script tests, run alone (`--name script-tests`)
 - [ ] T-R02G0507-011 {device} After ImplementationLock-100, on D1, D2 and D3: a save survives a real termination and
