@@ -100,7 +100,7 @@ registration, docs) stay with the lead. MVP: Stories 1 and 2.
   `Packages/ExperiencesRound02/AmethystEscape/ExperienceTests/AmethystEscapeExperienceIdentityTests.swift` find, by a
   seeded search over the certified levels, a play whose advance drops the pearl into a blocked wedge, and check that the
   description names that wedge's shell and sector and that the frame tints that wedge amber; part of `--name sim-27-2`
-- [ ] T-R02G0703-015 Check the move bar's pixels against the CPU reference per FR-R02G0703-001 and SC-R02G0703-001
+- [X] T-R02G0703-015 Check the move bar's pixels against the CPU reference per FR-R02G0703-001 and SC-R02G0703-001 — Verified 2026-11-22: 2026-11-22: sim-27-3 (move bar midpoint checked in every checkFrame after a move, 5 levels x 3 tiers) exit 0
   (partial): in `Packages/ExperiencesRound02/AmethystEscape/ExperienceTests/AmethystEscapeRenderTests.swift` (with its
   support file) check, after at least one move, that a pixel within 3 px of the bar's midpoint differs from the backdrop
   by at least 0.1 at each tier on the 5 levels; `--name sim-27-2`
