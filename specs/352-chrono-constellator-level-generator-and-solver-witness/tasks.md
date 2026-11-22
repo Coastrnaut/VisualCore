@@ -9,7 +9,7 @@ the reference every run uses). Fixture seed 2_352; tests stay short (< 10 s each
 
 ## Phase 1: Setup
 
-- [ ] T-R02G0602-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test
+- [X] T-R02G0602-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test — Verified 2026-11-21: 2026-11-21 baseline-host, baseline-timing, baseline-round02 exit 0 (.autonomy/migration/checks/R02-G06-02.baseline-*.json); rendering baseline: R02-G06-01 rendering-27/26 exit 0
   --package-path Packages/ExperiencesRound02`; the rendering baseline is R02-G06-01's rendering runs (exit 0)
 
 ## Phase 2: Foundational
