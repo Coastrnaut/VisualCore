@@ -20,7 +20,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 2: Stories 1 and 2 — the scene and renderer purity (P1) 🎯
 
-- [ ] T-R02G0603-003 [P] [US1] Create `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorShaders.swift`
+- [X] T-R02G0603-003 [P] [US1] Create `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorShaders.swift` — Verified 2026-11-21: 2026-11-21: host-2 (ChronoConstellatorShaderSourceTests, 13 tests) exit 0, rerun by the lead
   (field and glow sources; uniform names; ribbon alpha decay and shimmer from time; glow gain cap; palette constants
   equal to the CPU's) with `Packages/ExperiencesRound02/ChronoConstellator/CoreTests/ChronoConstellatorShaderSourceTests.swift`
   (version line, declared uniforms, no texture samplers, bounded loops, palette constants match); agent A; `--name host-2`
