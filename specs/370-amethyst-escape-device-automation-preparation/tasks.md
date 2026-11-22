@@ -19,7 +19,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
   only for AE-D6), covers, owner_steps, status "pending device campaign"; no result field); edit
   `scripts/release_check.py` (step `device-rows-r02-g07`); `--name device-rows -- python3 scripts/check_device_rows.py
   --experience r02-g07.amethyst-escape`
-- [ ] T-R02G0710-003 [P] [US1] Edit `scripts/test_scripts.py` (agent A: the real Amethyst Escape definition passes; a
+- [X] T-R02G0710-003 [P] [US1] Edit `scripts/test_scripts.py` (agent A: the real Amethyst Escape definition passes; a — Verified 2026-11-22: script-tests exit=0 (run alone; AmethystEscapeDeviceRowsCheckTests 6/6: real definition passes, removed scenario, missing pass field and uncovered T-R02G0709-011 fail by name, release step runs the check)
   copy with a scenario removed, a copy with AE-D1's `pass` field removed and a copy with T-R02G0709-011 dropped from
   every row's covers each fail by name; the release step `device-rows-r02-g07` runs the check for
   `r02-g07.amethyst-escape`); `--name script-tests` (alone)
