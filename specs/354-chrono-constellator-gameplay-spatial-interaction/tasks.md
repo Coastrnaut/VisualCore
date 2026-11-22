@@ -28,7 +28,7 @@ program).
 
 ## Phase 3: Stories 1–3 — drag a star, scrub, record a hold (P1) 🎯
 
-- [ ] T-R02G0604-003 [US1] [US2] [US3] Create `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorGestureController.swift` (states idle, starDrag,
+- [X] T-R02G0604-003 [US1] [US2] [US3] Create `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorGestureController.swift` (states idle, starDrag, — Verified 2026-11-21: 2026-11-21: host-3 (GestureControllerTests, 7 tests: 500 seeded scripts vs independent expectation over 3 sizes and 3 orbits; second fingers, cancels and edits after tick 0 send no edit; 60 scrubs end in the plain replay digest) exit 0, lead retest
   scrub, orbiting, cancelled; star drag at tick 0 while playing: `phase(star, index)` after ≥ 16 points when the loop
   index differs from the current phase; scrub in playing and failed: `step(t′ − t)`, or `rewind` then `step(t′)` when
   t′ < t (no step when t′ = 0), nothing when t′ = t; long press ≥ 0.5 s under 10 points on a star at tick 0 while

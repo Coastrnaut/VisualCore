@@ -30,8 +30,12 @@ public struct ChronoConstellatorGestureController: Sendable {
     public static let dragDistance: Double    // 16 points
     public static let pressDuration: Double   // 0.5 s
     public static let holdStart: Int; public static let holdLength: Int   // 1, 10
+    public static let doubleTapWindow: Double   // 0.35 s
+    public static let barReach: Double          // 22 points: a touch this near the tick bar scrubs
+    public static let yawPerViewWidth: Double; public static let pitchPerViewHeight: Double   // 90°, 60°
     public private(set) var state: State; public private(set) var orbit: ChronoConstellatorOrbit
     public private(set) var candidateCell: Int?; public private(set) var scrubTick: Int?
+    public private(set) var draggedStar: Int?   // the star of a star gesture, for the description
     public mutating func handle(_ event: PointerEvent, viewSize: Vec2, snapshot: ChronoConstellatorSceneSnapshot)
         -> [ChronoConstellatorGestureAction]
     public func camera(viewSize: Vec2, snapshot: ChronoConstellatorSceneSnapshot) -> ChronoConstellatorCamera?
