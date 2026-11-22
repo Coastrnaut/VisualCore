@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-22 (R02-G06-09: Chrono Constellator interface chunk o3 and stored examples).
+Last updated: 2026-11-22 (R02-G06-10: Chrono Constellator device rows and their check).
 
 ## 1. What is tested, and where
 
@@ -270,6 +270,10 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   timeline tests compare every tick of 500 seeded levels with a reference written in the test that moves each star one
   step per tick unless a hold covers it. The baselines of a new game's first feature run with the new files set aside
   (moved to the scratchpad and the committed `Package.swift` restored), so they measure the tree before the feature.
+- **Chrono Constellator device rows** (R02-G06-10, 2026-11-22). `ChronoConstellatorDeviceRowsCheckTests` runs the same
+  generic check on `docs/apps/chrono-constellator/device-rows.json` and on copies with a scenario removed, CR-D1's
+  `pass` removed and T-R02G0609-011 uncovered; the release step is `device-rows-r02-g06` (specs 351–359 found from the
+  game number).
 - **Colorfall Canyons device rows** (R02-G05-10, 2026-11-21). `ColorfallCanyonsDeviceRowsCheckTests` runs the same
   generic check on `docs/apps/colorfall-canyons/device-rows.json` and on copies with a scenario removed, CC-D1's `pass`
   removed and T-R02G0509-011 uncovered; the release step is `device-rows-r02-g05` (specs 341–349 found from the game

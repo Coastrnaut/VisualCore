@@ -225,3 +225,16 @@ lengths 1 … 32 that the play accepts, each release, then a single step of the 
   stays a candidate (not available without `-vcCandidates`) until X-R02-G06.
 - **Release.** The Release simulator build compiles without the test-only golden descriptions and scenarios.
 
+## Device preparation (feature 360, R02-G06-10)
+
+- **Contract, no device touched.** `docs/apps/chrono-constellator/device-rows.json` (schema 1 of feature 310) names the
+  device scenario set (the 11 standard and game scenarios and `fixture-level-1-solved`), the devices D1 iPhone 15, D2
+  iPad Pro 13-inch (M5) and D3 iPad (A16) on iPadOS 26.5 tied to DEV1/2/3-R02-G06, and rows CR-D1 … CR-D8: launch and
+  first frame, frame pacing per tier, memory and thermal state with the stress session, touch feel and touch-to-frame
+  (star drags, timeline scrubs, hold presses, orbit), sound and haptics, VoiceOver at the largest text size
+  (non-gating), progress across a real termination, and the panel journeys. Every row is "pending device campaign"; the
+  written plan is [`docs/apps/chrono-constellator/device-campaign.md`](../apps/chrono-constellator/device-campaign.md).
+- **Check.** `python3 scripts/check_device_rows.py --experience r02-g06.chrono-constellator` (release step
+  `device-rows-r02-g06`) proves every scenario exists, every row is complete and every {device} task of features
+  351–359 and every UA-F13 measurement is covered.
+

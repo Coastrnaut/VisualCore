@@ -354,3 +354,8 @@ Feature 359 (R02-G06-09) adds Chrono Constellator's in-app integration: panel id
 (`ChronoConstellatorControls.identifierNames`), the stored schema-1 and schema-2 examples
 (`ChronoConstellatorSchemaExamples`), app unit tests, and the interface tests `CRPlayUITests` and `CRReplayUITests` in
 serial chunk `o3`.
+
+Feature 360 (R02-G06-10) prepares the device campaign without touching a device:
+`docs/apps/chrono-constellator/device-rows.json` (rows CR-D1 … CR-D8, pending) and
+`docs/apps/chrono-constellator/device-campaign.md`, checked by `scripts/check_device_rows.py --experience
+r02-g06.chrono-constellator`.
