@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-21
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G06-05 (migration ledger, game feature of experience R02-G06) · ID namespace FR-R02G0605-###,
 SC-R02G0605-###, T-R02G0605-###
@@ -23,6 +23,60 @@ Canonical overrides:
   goals and results), the "content count 78" milestone figure and the Round 2 lock. **Device-only items:** none.
   **Owner-only items:** none.
 - **Model:** feature 345 (Colorfall Canyons's progression and player teaching) and feature 335 (Hue Compass's).
+
+## Clarifications
+
+### Session 2026-11-21
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+345's answers where the games agree. Facts checked in code (read-only, 2026-11-21): `ChronoConstellatorSolver.solve`
+certifies a phase-only timeline of the smallest edit count from a level's default phases (the m* lower bound, nil when
+every window is blocked or the default already aligns); `ChronoConstellatorGenerator.winTick(_:timeline:)` replays a
+timeline to its win tick or nil; edits in use are the stars whose phase differs from the level's default plus the holds,
+within the budget (1 … 20, the kernel's maximum is 20); edits are accepted only at tick 0, `time.rewind` returns to tick
+0 keeping the timeline (also from failed), every action can be undone and redone and a won play is final; levels 1 … 3
+carry the tutorial flag; the adapter prepares level (seed mod 100) + 1 and snapshots `{level, records}` as schema 1; the
+core may not read a clock.
+
+- Q: How is a hint computed and what does each level reveal? → A: the plan comes from the current state. A won play has
+  no hint; a failed play's hint is "Undo the last change, rewind or retry the level." While playing or paused: if the
+  current timeline wins (a replay from tick 0 reaches a win tick), the plan is to run — at tick 0 or later: level 1
+  "Replay the timeline", level 2 "Run to the end", level 3 "Run: N ticks" (the ticks to the win tick from the current
+  tick). Otherwise, after tick 0 the plan is to rewind (every level: "Rewind to tick 0 to change the timeline"). At tick
+  0, if the timeline has holds, the plan removes the first hold (star order, then start): level 1 "Remove a hold", level
+  2 "Remove star k's hold", level 3 "Remove star k's hold from tick s"; without holds, the solver runs on the level with
+  the current phases as its defaults and its phase changes are the plan, accepted only if the edits in use afterwards
+  stay within the budget and the resulting timeline wins: level 1 "Change a star's start", level 2 "Change the start of
+  star k (shape)", level 3 "Start star k (shape) at row r, column c (phase p)" — the first change in star order. When
+  no plan exists: "No win is reachable from here: undo the last change, rewind or retry the level." Hints never change
+  the state, are unlimited, do not affect stars and reset to level 1 after any change of the play. "A state that can
+  still win" means one whose plan exists. Impact: FR-R02G0605-002; SC-R02G0605-002.
+- Q: What does the tutorial show, and when does it advance? → A: on levels 1 … 3, three instructions in order: (1)
+  "Drag a star along its silver loop (or use Phase − and +) to change where it starts, until every star can meet its
+  target on the same tick; a hint shows which" — it advances once a phase change has been accepted and the current
+  timeline wins; (2) "Replay with Step or Run and watch the ribbons" — until a step is accepted; (3) "Every star must
+  stand on its own target on the same tick without two stars meeting; undo or rewind a change that makes them collide"
+  — until the level ends. `tutorial.dismiss` ends it for that level; undo never moves it back. Impact: FR-R02G0605-001;
+  SC-R02G0605-001.
+- Q: What are the progress and star rules? → A: as feature 345 with edits in use at the win: per level the best (fewest)
+  edits of a won campaign play and the stars (3 when at most the certified smallest edit count, 2 when at most that + 2,
+  else 1; a better result replaces a worse one); level 1 open; a campaign win opens the next; `level.select [n]` opens
+  any open level and refuses others (`r02-g06.locked`); `level.next` moves to the next open level (refused when none,
+  `r02-g06.locked`); the five bands of 20 are the certified difficulty bands. Impact: FR-R02G0605-004; SC-R02G0605-004.
+- Q: How do the daily level and practice mode work? → A: the daily level is (days from 2026-01-01 to the given calendar
+  date × 59) mod 100 + 1, negative day counts wrapped into 0 … 99 (59 is coprime with 100 and differs from the other
+  round-two games' 37, 41, 43, 47 and 53); the date reaches the core as `mode.daily [year, month, day]` (an impossible
+  date is refused with `r02-g06.date`). Daily play follows campaign rules but does not open levels. `mode.practice`
+  replays the current level with the budget raised to the kernel's maximum (20); practice results never award stars or
+  open levels; `mode.campaign` returns. Impact: FR-R02G0605-005; SC-R02G0605-004.
+- Q: Where does progress live, how is it versioned and how is a failure explained? → A: as feature 345: progress and the
+  mode are part of the experience state and its digest; the tutorial step is snapshotted but not digested; the hint
+  level is presentation (held by the presenter); the snapshot payload becomes schema 2 (`{level, records, progress,
+  mode, tutorial}`) with a migration from schema 1 (level 1 open plus the restored level, campaign mode, tutorial at its
+  first step on tutorial levels). Failures are explained from the failing tick: collision "Star a (shape) and star b
+  (shape) met at row r, column c on tick T."; time "Time ran out at tick T: <stars off target, as "star k (shape) is at
+  row r, column c, its target is row r′, column c′", joined by "; ">.", each followed by "Undo the last change, rewind
+  or retry the level." Impact: FR-R02G0605-003, 007; SC-R02G0605-003.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -90,15 +144,17 @@ edit budget without affecting progress.
 - **FR-R02G0605-001**: Levels with a tutorial MUST show one instruction at a time, derived from the current state, that
   advances when the player performs it and can be dismissed; instructions never block or perform actions.
 - **FR-R02G0605-002**: A hint MUST be available in three progressive levels, computed from the current state so that
-  following the exact hints from any state that can still win wins within the budget and tick limit; from a state that
+  following the exact hints from any state that can still win (a run, a rewind, a hold removal or a certified set of
+  phase changes within the budget wins) wins within the budget and tick limit; from a state that
   cannot win it says so and suggests undo, rewind or retry. A hint never changes the state, is unlimited, does not affect
   stars and returns to its first level after any change of the play.
 - **FR-R02G0605-003**: A failure MUST be explained in accessible text naming the reason (collision or time), the stars,
   the cell or the stars off target, and the tick, with undo, rewind and retry offered.
 - **FR-R02G0605-004**: Progress MUST follow defined rules: the first level open, a campaign win opens the next, the five
   difficulty bands of 20 shown, a goal and a result (stars) per level.
-- **FR-R02G0605-005**: A daily level MUST be a deterministic function of the local calendar date; a practice mode MUST
-  raise the edit budget to the kernel's maximum without affecting progress.
+- **FR-R02G0605-005**: A daily level MUST be a deterministic function of the local calendar date ((days since
+  2026-01-01 × 59) mod 100 + 1); a practice mode MUST raise the edit budget to 20 (the kernel's maximum) without
+  affecting progress.
 - **FR-R02G0605-006**: All 100 levels MUST be playable without payment, advertising, accounts or network.
 - **FR-R02G0605-007**: Progress MUST be a versioned value the experience snapshot carries, with a migration from the
   current snapshot schema (1); existing tests pass; new public names documented; the reference regression passes.
